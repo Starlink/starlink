@@ -423,7 +423,7 @@ package @PACKAGE@ {
                 type _DOUBLE
                 vpath DEFAULT
                 ppath CURRENT
-                default 10.0
+                default 3.0
                 prompt {Signal-to-noise threshold for responsivity data}
                 helpkey *
             }
