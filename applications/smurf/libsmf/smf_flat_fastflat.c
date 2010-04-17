@@ -56,6 +56,11 @@
 *        Variance on the single is not used even if present.
 *     2010-03-16 (TIMJ):
 *        Store the flatfield name in the smfFile
+*     2010-04-16 (TIMJ):
+*        The flatfield ramp does not start at the reference value so the sky
+*        subtraction was failing to anchor the start of the observation. This
+*        resulted in little steps in the coadded ramp. Now the code extrapolates
+*        back to the reference heater and uses that in the sky fit.
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -103,18 +108,23 @@
 #include "smf_typ.h"
 #include "smf_err.h"
 
-int smf__sort_ints ( const void * a, const void * b );
+static int smf__sort_ints ( const void * a, const void * b );
+static double smf__calc_refheat_meas ( int indata[], size_t boloffset, size_t tstride, size_t nframes,
+                                       double heatdata[], double buffer[], size_t nmeas, int heatref,
+                                       int forward, int *status );
 
 void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) {
 
   size_t bstride = 0;         /* Bolometer stride */
   smfHead * hdr = NULL;       /* Local header of fflat */
+  int heatbounds[] = {0,0,0,0}; /* first and last two heater values in ramps */
   AstKeyMap * heatmap = NULL; /* KeyMap of heater settings */
   int heatref = 0;            /* Reference heater setting */
   char heatstr[20];           /* Buffer for heater settings as strings */
   int * heatval = NULL;       /* Heater values in sorted order */
   size_t i = 0;
   size_t maxfound = 0;        /* Maximum number found */
+  size_t meas_per_heat = 1;   /* Measurements per single heater value per ramp */
   dim_t nbols = 0;            /* number of bolometers */
   size_t nheat = 0;           /* Number of distinct heater settings */
   dim_t nframes = 0;          /* Total number of frames in fflat */
@@ -173,8 +183,30 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
 
   }
 
-  msgOutiff( MSG__VERB, "", "Fast flatfield ramp used %d heater settings, each of %zd measurements",
-             status, astMapSize( heatmap ), maxfound );
+  /* also track the first two heater values and the last two heater values in the ramp
+     in case we need them later. Bounds are first two values (0,1)
+     and last two values (2,3). This will also tell us how many readings we do per heater
+     setting on a single ramp. */
+  heatbounds[0] = (hdr->allState)[0].sc2_heat;
+  heatbounds[3] = (hdr->allState)[nframes-1].sc2_heat;
+  for (i = 0; i < nframes; i++ ) {
+    int thisheat = (hdr->allState)[i].sc2_heat;
+    if (thisheat != heatbounds[0] && heatbounds[1] == 0 ) {
+      heatbounds[1] = thisheat;
+      meas_per_heat = i;
+      break;
+    }
+  }
+  for ( i = nframes-1; i >= 1; i-- ) {
+    int thisheat = (hdr->allState)[i].sc2_heat;
+    if (thisheat != heatbounds[3] && heatbounds[2] == 0 ) {
+      heatbounds[2] = thisheat;
+      break;
+    }
+  }
+
+  msgOutiff( MSG__VERB, "", "Flatfield ramp used %d heater settings of step %d, each of %zd measurements in groups of %zd",
+             status, astMapSize( heatmap ), abs(heatbounds[1]-heatbounds[0]), maxfound, meas_per_heat );
 
   /* See how many distinct heater values we have */
   nheat = astMapSize( heatmap );
@@ -252,6 +284,11 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
     if (*status == SAI__OK) {
       double * ddata = NULL;
       double * dindices = NULL;
+      size_t extras = 0;    /* extra space required */
+      const size_t szfit = 30; /* number of points to use for ref heat extrapolation */
+      double * before_heat = NULL;
+      double * after_heat = NULL;
+      double * heatmeas = NULL;
 
       /* get the key based on the reference heater integer */
       sprintf( heatstr, "%d", heatref );
@@ -259,23 +296,82 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
       /* and hence we can get all the relevant indices */
       astMapGet1I( heatmap, heatstr, maxfound, &nind, indices );
 
+      /* see whether we need to anchor the data at the ends. We don't
+       need to be super accurate, just something to constrain the fit. */
+      if (heatbounds[0] != heatref) {
+        /* we are not starting at the reference heater but we can assume we
+         are close enough that a linear fit on the first N measurements in the
+         ramp will be a reasonable approximation. We'll need the first N heater
+         measurements. */
+        before_heat = smf_malloc( szfit, sizeof(*before_heat), 1, status );
+        extras += meas_per_heat;
+        for (i=0; i<szfit; i++) {
+          before_heat[i] = (hdr->allState)[i].sc2_heat;
+        }
+      }
+
+      if (heatbounds[3] != heatref ) {
+        /* we are not ending at the reference heater but we can assume we
+         are close enough that a linear fit on the first N measurements in the
+         ramp will be a reasonable approximation. We'll need the first N heater
+         measurements. */
+        after_heat = smf_malloc( szfit, sizeof(*after_heat), 1, status );
+        extras += meas_per_heat;
+        for (i=0;i<szfit; i++) {
+          after_heat[i] = (hdr->allState)[nframes-i].sc2_heat;
+        }
+      }
+
       /* and _DOUBLE versions because smf_fit_poly1d takes doubles */
-      ddata = smf_malloc( maxfound, sizeof(*ddata), 1, status);
-      dindices = smf_malloc( maxfound, sizeof(*dindices), 1, status );
+      ddata = smf_malloc( maxfound + extras, sizeof(*ddata), 1, status);
+      dindices = smf_malloc( maxfound + extras, sizeof(*dindices), 1, status );
+
+      if (before_heat || after_heat) heatmeas = smf_malloc( szfit, sizeof(*heatmeas), 1, status );
 
       if (*status == SAI__OK) {
         for (bol = 0; bol < nbols; bol++) {
           int idx;
           size_t nused;
+          size_t ndata = nind;
 
-          for (idx = 0; idx < nind; idx++) {
+          /* copy over the relevant data for this bolometer */
+          for (idx = 0; idx < ndata; idx++) {
             size_t slice = indices[idx];
             ddata[idx] = ffdata[ bol * bstride + slice*tstride ];
             dindices[idx] = slice;
           }
 
-          if (nind > 1) {
-            smf_fit_poly1d( skyorder, nind, 0, dindices, ddata, NULL,
+          /* Calculate any extrema for anchoring the fit */
+          if (before_heat) {
+            double result = smf__calc_refheat_meas( ffdata, bol*bstride,
+                                                    tstride, nframes, before_heat, heatmeas,
+                                                    szfit, heatref, 1, status );
+            /* push the result onto the array for fitting. Making sure we give it
+               equal weight by duplicating it. */
+            for (i = 0; i < meas_per_heat; i++) {
+              ddata[ndata] = result;
+              dindices[ndata] = heatref;
+              ndata++;
+            }
+          }
+
+          if (after_heat) {
+            double result = smf__calc_refheat_meas( ffdata, bol*bstride,
+                                                    tstride, nframes, after_heat, heatmeas,
+                                                    szfit, heatref, 0, status );
+            /* push the result onto the array for fitting */
+            for (i = 0; i < meas_per_heat; i++) {
+              ddata[ndata] = result;
+              dindices[ndata] = heatref;
+              ndata++;
+            }
+          }
+
+          msgOutiff( MSG__DEBUG20, "",
+                     "Calculating sky background at reference heater for bolometer %zd",
+                     status, bol);
+          if (ndata > 1) {
+            smf_fit_poly1d( skyorder, ndata, 0, dindices, ddata, NULL,
                             coeff, coeffvar, NULL, &nused, status );
 
           } else {
@@ -297,6 +393,9 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
 
       if (ddata) ddata = smf_free( ddata, status );
       if (dindices) dindices = smf_free( dindices, status );
+      if (before_heat) before_heat = smf_free( before_heat, status );
+      if (after_heat) after_heat = smf_free( after_heat, status );
+      if (heatmeas) heatmeas = smf_free( heatmeas, status );
 
       /* for each heater value we now need to calculate the measured signal */
       for ( i = 0; i < nheat; i++) {
@@ -332,6 +431,16 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
             if (idata[idx] != VAL__BADI) {
               /* calculate the reference value */
               EVALPOLY( poly, slice, skyorder, coeff );
+
+              /* This section can be uncommented to help debug any issues with sky removal.
+                 Just pick a bolometer number and grep for VALUES in the output. Then load
+                 into topcat */
+              /*
+              if (bol == 334) {
+                printf( "VALUES %zd %d %d %d %g %g\n", slice, idx, heatval[i],idata[idx], poly, (double)idata[idx] - poly);
+              }
+              */
+
               if (poly != VAL__BADD) idata[idx] -= poly;
               ngood++;
             }
@@ -397,7 +506,7 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
 
 }
 
-
+static
 int smf__sort_ints ( const void * a, const void * b ) {
   const int * ia;
   const int * ib;
@@ -412,4 +521,35 @@ int smf__sort_ints ( const void * a, const void * b ) {
   } else {
     return 0;
   }
+}
+
+/* Calculate the reference heater value by extrapolation */
+
+double smf__calc_refheat_meas ( int indata[], size_t boloffset, size_t tstride, size_t nframes,
+                                double heatdata[], double buffer[], size_t nmeas, int heatref,
+                                int forward, int *status ) {
+  double result = VAL__BADD;
+  size_t nused;
+  double coeff[2];
+  size_t i;
+
+  if (*status != SAI__OK) return result;
+
+  for (i = 0; i<nmeas; i++) {
+    size_t htindex;
+    if (forward) {
+      htindex = i;
+    } else {
+      htindex = nframes - i;
+    }
+    buffer[i] = indata[ boloffset + htindex * tstride ];
+  }
+  smf_fit_poly1d( 1, nmeas, 0, heatdata, buffer, NULL,
+                  coeff, NULL, NULL, &nused, status );
+
+  /* Evaluate the result and push it onto the array for fitting */
+  EVALPOLY( result, heatref, 1, coeff );
+  if (result != 0.0)
+    msgOutiff(MSG__DEBUG20, "", "Extrapolated heater value of %g\n",status, result);
+  return result;
 }
