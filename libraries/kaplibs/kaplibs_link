@@ -36,7 +36,7 @@
            `ndf_link` `ast_link -ems` \
            `fio_link` \
            `grp_link` `trn_link` \
-           `prm_link` `mag_link` \
+           `prm_link` \
            `psx_link` `pda_link` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
@@ -49,7 +49,7 @@
            `ndf_link` `ast_link -ems -grf` \
            `agp_link` `fio_link` \
            `grp_link` `trn_link` \
-           `prm_link` `mag_link` \
+           `prm_link` \
            `psx_link` `pda_link` \
            `pgplot_link -star`  \
            | awk 'BEGIN{RS=" ";FS="\n"}
@@ -64,7 +64,7 @@
            `ndf_link` `ast_link -ems -grf` \
            `agi_link` `fio_link` \
            `grp_link` `trn_link` \
-           `prm_link` `mag_link` \
+           `prm_link` \
            `psx_link` `pda_link` \
            `pgp_link`  \
            | awk 'BEGIN{RS=" ";FS="\n"}

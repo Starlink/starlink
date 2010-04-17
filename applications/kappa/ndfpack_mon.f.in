@@ -104,6 +104,8 @@
 *     19-OCT-2009 (DSB):
 *        Use NDG_BEGGH/NDG_ENDGH to record contents of group parameters in
 *        the history component of output NDFs.
+*     2010-04-16 (TIMJ):
+*        FITSIN has now been removed.
 *     {enter_further_changes_here}
 
 *-
@@ -251,10 +253,6 @@
 *  Imports FITS information into an NDF extension.
          ELSE IF ( NAME .EQ. 'FITSIMP' ) THEN
             CALL FITSIMP ( STATUS )
-
-*  Reads a FITS tape composed of simple, group or table files.
-         ELSE IF ( NAME .EQ. 'FITSIN' ) THEN
-            CALL FITSIN ( STATUS )
 
 *  Lists the FITS extension of an NDF.
          ELSE IF ( NAME .EQ. 'FITSLIST' ) THEN

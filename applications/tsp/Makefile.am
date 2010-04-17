@@ -37,7 +37,7 @@ display.f divide.f dstokes.f eplot.f extin.f flconv.f flip.f fplot.f   \
 imotion.f ipcs2stokes.f irflux.f irisap.f irispol.f lhatpol.f lmerge.f \
 ltcorr.f phaseplot.f pplot.f ptheta.f qplot.f qumerge.f quplot.f       \
 qusub.f rccdts.f rcgs2.f reverse.f rfigaro.f rhathsp.f rhatpol.f       \
-rhdsplot.f rhsp3.f rirps.f rotpa.f rturku.f scrunch.f shiftadd.f       \
+rhdsplot.f rirps.f rotpa.f rturku.f scrunch.f shiftadd.f       \
 skysub.f spflux.f splot.f subset.f subtract.f tbin.f tcadd.f tderiv.f  \
 textin.f tlist.f tmerge.f tsetbad.f tsextract.f tshift.f tsplot.f      \
 tsprofile.f xcopy.f slist.f impol.f irisapc.f irispolc.f

@@ -6,6 +6,10 @@ which provide general purpose algorithms required by the KAPPA package,
 and which may be of use to anyone developing their own KAPPA-like
 applications (see SUN/238).
 
+Version 3.1
+   - Remove FTS1_TREAD since the MAG library has now been removed from the
+     main Starlink source tree.
+
 Version 3.0
    - CCG routines' NBAD argument excludes bad elements not attributable
      to the MINPIX threshold.

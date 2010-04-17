@@ -28,7 +28,7 @@ fts1_lokey.f fts1_mandh.f fts1_ndfcm.f fts1_phead.f \
 fts1_prval.f fts1_ptkey.f fts1_qtype.f fts1_rdata.f \
 fts1_rfmod.f fts1_rgrda.f fts1_rootn.f \
 fts1_scofb.f fts1_skip.f \
-fts1_tread.f fts1_ukeyc.f fts1_vhead.f fts1_wcsax.f \
+fts1_ukeyc.f fts1_vhead.f fts1_wcsax.f \
 fts1_wcsdf.f fts1_wcsim.f fts1_wcsut.f fts1_wkeyc.f
 
 G_ROUTINES = fts1_gkeyx.gen fts1_ukeyx.gen fts1_wkeyx.gen 

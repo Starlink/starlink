@@ -14,7 +14,7 @@ intended to work in conjunction with Starlink's various specialised
 packages.
   </p></abstract>
   <dependencies >
-    <build>pcs</build><build>agi</build><build>ast</build><build>chr</build><build>cnf</build><build>fio</build><build>grp</build><build>hds</build><build>ifd</build><build>kaplibs</build><build>mag</build><build>mers</build><build>ndf</build><build>one</build><build>par</build><build>pcs</build><build>prm</build><build>psx</build><build>sae</build><build>shl</build><build>tcl</build><build>tk</build><build>trn</build><build option='link'>ard</build><build option='link'>atl</build><build option='link'>kaplibs</build><build option='link'>irq</build><build option='link'>one</build><build option='link'>shl</build><sourceset>sst</sourceset><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>pcs</build><build>agi</build><build>ast</build><build>chr</build><build>cnf</build><build>fio</build><build>grp</build><build>hds</build><build>ifd</build><build>kaplibs</build><build>mers</build><build>ndf</build><build>one</build><build>par</build><build>pcs</build><build>prm</build><build>psx</build><build>sae</build><build>shl</build><build>tcl</build><build>tk</build><build>trn</build><build option='link'>ard</build><build option='link'>atl</build><build option='link'>kaplibs</build><build option='link'>irq</build><build option='link'>one</build><build option='link'>shl</build><sourceset>sst</sourceset><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>

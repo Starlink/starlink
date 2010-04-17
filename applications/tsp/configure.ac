@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
  
 dnl    Initialisation: package name and version number
-AC_INIT(tsp, 2.3-3, ussc@star.rl.ac.uk)
+AC_INIT(tsp, 2.3-4, ussc@star.rl.ac.uk)
  
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -30,7 +30,7 @@ dnl    Private error file
 STAR_MESSGEN(user_err.msg)
 
 dnl    Declare the build and use dependencies for this package
-STAR_DECLARE_DEPENDENCIES([build],[sla figaro ndf ifd snx ncar mag],[link])
+STAR_DECLARE_DEPENDENCIES([build],[sla figaro ndf ifd snx ncar],[link])
 
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.

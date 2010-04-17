@@ -532,132 +532,6 @@ package kappa {
 
       action fitsin {
 
-         helplib {$KAPPA_HELP}
-
-         parameter auto {
-            position 4
-            type _LOGICAL
-            vpath DEFAULT
-            prompt {Automatic mode?}
-            helpkey *
-            default FALSE
-         }
-
-         parameter dscftable {
-            type FILENAME
-            access WRITE
-            vpath PROMPT
-            prompt {Name of FACTS description file}
-            helpkey *
-         }
-
-         parameter encodings {
-            type LITERAL
-            vpath DEFAULT
-            ppath DEFAULT CURRENT
-            prompt {FITS keywords to use when creating NDF WCS components}
-            helpkey *
-            default !
-         }
-
-         parameter files {
-            size *
-            position 2
-            type _CHAR
-            vpath PROMPT
-            prompt {Give a list of the numbers of the files to be processed}
-            helpkey *
-         }
-
-         parameter fmtcnv {
-            position 5
-            type _LOGICAL
-            vpath PROMPT
-            prompt {Convert data?}
-            helpkey *
-            default TRUE
-         }
-
-         parameter glocon {
-            type _LOGICAL
-            vpath DEFAULT
-            prompt {Data-conversion switch to apply globally?}
-            helpkey *
-            default FALSE
-         }
-
-         parameter label {
-            type _LOGICAL
-            vpath DEFAULT
-            prompt {Is the tape labelled?}
-            helpkey *
-            default FALSE
-         }
-
-         parameter logfile {
-            position 7
-            type FILENAME
-            access READ
-            vpath DEFAULT
-            ppath CURRENT DEFAULT
-            prompt {Filename to store FITS headers}
-            default !
-            helpkey *
-         }
-
-         parameter more {
-            type _LOGICAL
-            vpath PROMPT
-            prompt {Any more files?}
-            helpkey *
-            default FALSE
-         }
-
-         parameter mt {
-            position 1
-            ptype DEVICE
-            type TAPE
-            ppath CURRENT
-            prompt {Tape deck}
-            helpkey *
-         }
-
-         parameter out {
-            position 3
-            type NDF
-            access WRITE
-            vpath PROMPT
-            association ->GLOBAL.DATA_ARRAY
-            prompt {Output image}
-            helpkey *
-         }
-
-         parameter prefix {
-            position 6
-            type LITERAL
-            vpath PROMPT
-            ppath CURRENT DEFAULT
-            prompt {Prefix for the NDF file names?}
-            helpkey *
-            default fits
-         }
-
-         parameter rewind {
-            type _LOGICAL
-            vpath DEFAULT
-            prompt {Rewind the tape before reading?}
-            helpkey *
-            default TRUE
-         }
-
-         parameter table {
-            type FILENAME
-            access WRITE
-            vpath PROMPT
-            prompt {Name of output table}
-            helpkey *
-         }
-
       }
 
       action fitslist {
@@ -19134,6 +19008,10 @@ iraf! {
 
    command crelut {
       obsolete { The crelut command has been retired.  Use "lutedit" instead or use the crelut command in the KAPRH package---see SUN/239. }
+   }
+
+   command fitsin {
+      obsolete { The fitsin command has been removed. Supporting the MAG library has proven difficult and the removal of the MAG library has lead to the removal of this command. Consider using an older KAPPA version. }
    }
 
    icl {defhelp kappa $KAPPA_HELP 0}

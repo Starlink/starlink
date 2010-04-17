@@ -2,9 +2,9 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- @configure_input@ -->
 
-<component id="@PACKAGE@" support="U">
+<component id="@PACKAGE@" status="obsolete" support="U">
   <version>@PACKAGE_VERSION@</version>
-  <path>libraries/mag</path>
+  <path>libraries/obsolete/mag</path>
   <description>Fortran access to magentic tape devices</description>
   <abstract><p>
 The MAG subroutine library allows a programmer to write portable programs

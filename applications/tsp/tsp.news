@@ -1,6 +1,11 @@
 1 TSP - Time Series and Polarimetry package
                                                       Expires: ????.??.??
 
+ TSP 2.3-4 is now available.
+
+  o The RHSP3 command has been removed because the MAG tape I/O library
+    has been removed from the Starlink software due to support concerns.
+
  TSP 2.3-2 is now available.
 
  v2.3-2 has various internal fixes to correct problems that caused the

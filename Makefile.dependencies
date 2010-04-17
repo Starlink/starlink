@@ -168,7 +168,6 @@ $(MANIFESTS)/atools: \
 		$(MANIFESTS)/irq \
 		$(MANIFESTS)/kaplibs \
 		$(MANIFESTS)/lpg \
-		$(MANIFESTS)/mag \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/ncar \
 		$(MANIFESTS)/ndf \
@@ -416,7 +415,6 @@ $(MANIFESTS)/convert: \
 		$(MANIFESTS)/idi \
 		$(MANIFESTS)/kaplibs \
 		$(MANIFESTS)/lpg \
-		$(MANIFESTS)/mag \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/ncar \
 		$(MANIFESTS)/ndf \
@@ -495,7 +493,6 @@ $(MANIFESTS)/cupid: \
 		$(MANIFESTS)/irq \
 		$(MANIFESTS)/kaplibs \
 		$(MANIFESTS)/lpg \
-		$(MANIFESTS)/mag \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/ncar \
 		$(MANIFESTS)/ndf \
@@ -641,7 +638,6 @@ $(MANIFESTS)/dipso: \
 		$(MANIFESTS)/irq \
 		$(MANIFESTS)/kaplibs \
 		$(MANIFESTS)/lpg \
-		$(MANIFESTS)/mag \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/ncar \
 		$(MANIFESTS)/ndf \
@@ -704,7 +700,6 @@ $(MANIFESTS)/echomop: \
 		$(MANIFESTS)/irq \
 		$(MANIFESTS)/kaplibs \
 		$(MANIFESTS)/lpg \
-		$(MANIFESTS)/mag \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/ncar \
 		$(MANIFESTS)/ndf \
@@ -1356,7 +1351,6 @@ $(MANIFESTS)/irq: \
 		$(MANIFESTS)/idi \
 		$(MANIFESTS)/kaplibs \
 		$(MANIFESTS)/lpg \
-		$(MANIFESTS)/mag \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/messgen \
 		$(MANIFESTS)/ncar \
@@ -1411,7 +1405,6 @@ $(MANIFESTS)/jcmtdr: \
 		$(MANIFESTS)/idi \
 		$(MANIFESTS)/kaplibs \
 		$(MANIFESTS)/lpg \
-		$(MANIFESTS)/mag \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/ncar \
 		$(MANIFESTS)/ndf \
@@ -1471,7 +1464,6 @@ $(MANIFESTS)/kaplibs: \
 		$(MANIFESTS)/htx \
 		$(MANIFESTS)/idi \
 		$(MANIFESTS)/lpg \
-		$(MANIFESTS)/mag \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/messgen \
 		$(MANIFESTS)/ncar \
@@ -1521,7 +1513,6 @@ $(MANIFESTS)/kappa: \
 		$(MANIFESTS)/irq \
 		$(MANIFESTS)/kaplibs \
 		$(MANIFESTS)/lpg \
-		$(MANIFESTS)/mag \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/messgen \
 		$(MANIFESTS)/ncar \
@@ -1578,7 +1569,6 @@ $(MANIFESTS)/kaprh: \
 		$(MANIFESTS)/irq \
 		$(MANIFESTS)/kaplibs \
 		$(MANIFESTS)/lpg \
-		$(MANIFESTS)/mag \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/ncar \
 		$(MANIFESTS)/ndf \
@@ -1676,6 +1666,7 @@ $(MANIFESTS)/m4:
 	    fi \
 	  && $(MAKE_CPT)
 
+# Component mag is OBSOLETE -- do not build
 $(MANIFESTS)/mag: \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
@@ -1691,7 +1682,7 @@ $(MANIFESTS)/mag: \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
 		$(MANIFESTS)/starutil
-	cd libraries/mag \
+	cd libraries/obsolete/mag \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/match:
@@ -2053,7 +2044,6 @@ $(MANIFESTS)/polpack: \
 		$(MANIFESTS)/jpeg \
 		$(MANIFESTS)/kaplibs \
 		$(MANIFESTS)/lpg \
-		$(MANIFESTS)/mag \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/nbs \
 		$(MANIFESTS)/ncar \
@@ -2439,7 +2429,6 @@ $(MANIFESTS)/smurf: \
 		$(MANIFESTS)/irq \
 		$(MANIFESTS)/kaplibs \
 		$(MANIFESTS)/lpg \
-		$(MANIFESTS)/mag \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/messgen \
 		$(MANIFESTS)/ncar \
@@ -3032,12 +3021,10 @@ $(MANIFESTS)/tsp: \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/ifd \
-		$(MANIFESTS)/mag \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/messgen \
 		$(MANIFESTS)/ncar \
 		$(MANIFESTS)/ndf \
-		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/prm \
 		$(MANIFESTS)/psx \

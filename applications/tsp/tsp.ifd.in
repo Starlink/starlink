@@ -2792,31 +2792,6 @@ package tsp {
           }
 
       }
-      action rhsp3 {
-
-         parameter drive {
-            ptype DEVICE
-            vpath PROMPT
-            ppath CURRENT DEFAULT
-            default MTA0
-            prompt {Tape Drive}
-          }
-
-         parameter mjdzero {
-            type _DOUBLE
-            vpath PROMPT
-            ppath CURRENT
-            prompt {MJD (JD-2400000.5) at 0H U.T.}
-          }
-
-         parameter output {
-            type NDF
-            vpath PROMPT
-            ppath CURRENT
-            prompt {Output File}
-          }
-
-      }
       action rirps {
 
          parameter figaro {
@@ -4228,6 +4203,11 @@ package tsp {
 
       }
    }
+
+   command rhsp3 {
+      obsolete { The rhsp3 command has been removed. Supporting the MAG library has proven difficult and the removal of the MAG library has lead to the removal of this command. Consider using an older TSP version. }
+   }
+
 
    display {
 

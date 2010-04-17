@@ -46,7 +46,7 @@
 #-
 
       echo `ndf_link_adam` `snx_link_adam` \
-         `sgs_link_adam` `fio_link_adam` `prm_link_adam` `mag_link_adam` \
+         `sgs_link_adam` `fio_link_adam` `prm_link_adam` \
          `sla_link_adam` `pda_link` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}

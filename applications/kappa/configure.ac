@@ -36,7 +36,7 @@ STAR_PATH_TCLTK(8.5, [tk])
 AC_CHECK_HEADERS([tcl.h tk.h])
 
 dnl KAPPA source files depend on include files from the following components 
-STAR_DECLARE_DEPENDENCIES([build], [agi ast chr cnf fio grp hds ifd kaplibs mag mers ndf one par pcs prm psx sae shl tcl tk trn])
+STAR_DECLARE_DEPENDENCIES([build], [agi ast chr cnf fio grp hds ifd kaplibs mers ndf one par pcs prm psx sae shl tcl tk trn])
 
 dnl The KAPPA link script links against the following components
 STAR_DECLARE_DEPENDENCIES([build], [ard atl kaplibs irq one shl], [link])
