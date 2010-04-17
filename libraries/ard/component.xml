@@ -6,7 +6,7 @@
   <version>2.2</version>
   <path>libraries/ard</path>
   <description>ASCII Region Definition</description>
-  <abstract><p>The ARD (ASCII Region Definition) system provides a 
+  <abstract><p>The ARD (ASCII Region Definition) system provides a
      textual language for describing regions within a data array,
      together with software for converting a textual description
      into a pixel mask, or plotting it on a graphics device.

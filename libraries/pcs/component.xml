@@ -8,7 +8,7 @@
   <description>PCS -- Parameter and Communication Subsystems</description>
   <abstract>
     <p>Application programs often need to obtain parameter
-      values from a variety of sources and to communicate with other programs. 
+      values from a variety of sources and to communicate with other programs.
       The Parameter and Communication Subsystems (PCS) are a set of
       closely-related subroutine libraries which provide these
       facilities for many Starlink applications and the associated
@@ -18,7 +18,7 @@
       Software Environment which is described in Starlink Guide SG/4.
       Additional notes on using it under Unix are given in Starlink
       User Note SUN/144.</p>
-  </abstract> 
+  </abstract>
   <dependencies >
     <build>cnf</build><build>ems</build><build>hds</build><build>hlp</build><build>mers</build><build>psx</build><build>sae</build><build option='link'>chr</build><link>chr</link><link>ems</link><link>hds</link><link>hlp</link><link>mers</link><link>psx</link><sourceset>messgen</sourceset>
   </dependencies>

@@ -168,7 +168,7 @@ public class GenerateDependencies {
         System.err.println("GenerateDependencies [--test] [--verbose] "+
                            "[--makefile[=filename]] [--buildsequence=filename] "+
                            "[--flatdeps=filename] xml-file");
-        System.err.println("    At least one of --makefile, --buildsequence " + 
+        System.err.println("    At least one of --makefile, --buildsequence " +
                            "or --flatdeps must be specified");
         System.exit(1);
     }
@@ -232,7 +232,7 @@ public class GenerateDependencies {
         String manifestString = "$(MANIFESTS)/";
         String newlineString = " \\\n\t\t";
         String makeBuildsupportString =
-            "\t    && if test -f bootstrap; then \\\n" + 
+            "\t    && if test -f bootstrap; then \\\n" +
             "\t       ./bootstrap > bootstrap.log; \\\n" +
             "\t    fi \\\n" +
             "\t    && if test -n \"$$BUILDSUPPORT_PREFIX\"; then \\\n" +
@@ -275,12 +275,12 @@ public class GenerateDependencies {
                 "# file also defines the following targets:",
                 "#   buildsupport       - build each of the buildsupport tools",
                 "#   clean-buildsupport - clean the buildsupport tools",
-                "#   configure-deps     - build the set of components which ",
+                "#   configure-deps     - build the set of components which",
                 "#                        must be built before ./configure",
                 "# It additionally defines the variable SUPPORTED_COMPONENTS,",
                 "# containing the list of manifest files corresponding to",
                 "# components marked `supported' in their component.xml file.",
-                "# No other targets or variables defined here should be ",
+                "# No other targets or variables defined here should be",
                 "# regarded as persistent or otherwise relied upon.",
                 "",
                 "",

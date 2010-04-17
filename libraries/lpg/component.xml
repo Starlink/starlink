@@ -7,10 +7,10 @@
   <path>libraries/lpg</path>
   <description>Library to manage NDF QUALITY information textually
   </description>
-  <abstract><p> 
-     This library is a set of Fortran routines that provides looping of 
-     tasks within a monolith, in order to allow a command to be invoked 
-     repeatedly until all supplied data files (catalogues or NDFs) have 
+  <abstract><p>
+     This library is a set of Fortran routines that provides looping of
+     tasks within a monolith, in order to allow a command to be invoked
+     repeatedly until all supplied data files (catalogues or NDFs) have
      been processed.  Thus it can be used to enable lists of files
      including wildcards to be processed in a single command.
   </p></abstract>

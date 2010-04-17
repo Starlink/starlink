@@ -9,7 +9,7 @@
   <abstract><p>
 PONGO is a set of commands for interactively plotting data stored
 in ordinary text files. It is based around the PGPLOT (SUN/15) graphics
-package. 
+package.
   </p></abstract>
   <dependencies >
     <build>pcs</build><build option='link'>agi</build><build option='link'>sla</build><build option='link'>fio</build><build option='link'>pda</build><sourceset>star2html</sourceset>

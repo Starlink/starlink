@@ -7,7 +7,7 @@
   <path>applications/obsolete/cgs3dr</path>
   <description>CGS3DR - CGS3 Data Reduction</description>
   <abstract><p>
-      
+
   </p></abstract>
   <dependencies >
     <build>pcs</build><build option='link'>ary</build><build option='link'>ndf</build><build option='link'>prm</build><build option='link'>fio</build><build option='link'>tsp</build><build option='link'>figaro</build><build option='link'>chr</build><build option='link'>ndf</build><build option='link'>par</build><build option='link'>sae</build><sourceset>star2html</sourceset><sourceset>star2html</sourceset>

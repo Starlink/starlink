@@ -7,7 +7,7 @@
   <path>libraries/irq</path>
   <description>Library to manage NDF QUALITY information textually</description>
   <abstract><p> This library is a set of Fortran routines that permit
-  management and use of textual names representing bits in the NDF QUALITY 
+  management and use of textual names representing bits in the NDF QUALITY
   component.
     </p></abstract>
   <dependencies >

@@ -7,13 +7,13 @@
   <path>libraries/prm</path>
   <description>PRM --- Processing of Primitive Numerical Data</description>
   <abstract><p>This document describes the PRM package (once called
-      PRIMDAT), which 
+      PRIMDAT), which
       is a collection of Fortran functions and subroutines providing
       support for ``primitive data processing''.  Routines from this
       package may be used to perform arithmetic, mathematical
       operations, type conversion and inter-comparison of any of the
       primitive numerical data types supported by the Starlink
-      Hierarchical Data System HDS (SUN/92). 
+      Hierarchical Data System HDS (SUN/92).
     </p></abstract>
   <dependencies >
     <build>sae</build><sourceset>star2html</sourceset><sourceset>messgen</sourceset>

@@ -3,7 +3,7 @@
 # and the actual link script
 # Assumes that the returned kaplibs libraries match the directory name
 libs=`./kaplibs_link -nogrf`
-for l in kpg ira irq fts aif; do
+for l in kpg ira fts aif; do
   libs=`echo $libs | sed "s/-l$l/$l\/lib$l.la/"`
 done
 echo $libs

@@ -7,7 +7,7 @@
   <path>applications/ifd</path>
   <description>Interface Definition Files</description>
   <abstract>
-    <p>Interface Definition Files (IFDs) provide a generic method of 
+    <p>Interface Definition Files (IFDs) provide a generic method of
     defining the interface between Starlink (ADAM) applications and
     various software environments. Software is described which enables
     developers to create IFDs and use them to create files required

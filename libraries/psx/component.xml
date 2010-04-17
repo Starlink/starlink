@@ -10,7 +10,7 @@
       programmers to use the functionality provided by the POSIX and
       X/OPEN libraries. The use of this library will enable
       programmers to make use of operating system facilities in a
-      machine independent way.</p></abstract> 
+      machine independent way.</p></abstract>
   <dependencies >
     <build>cnf</build><build>ems</build><build>sae</build><build>starmem</build><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
