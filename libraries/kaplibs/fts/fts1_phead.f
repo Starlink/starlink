@@ -39,8 +39,8 @@
 *        mapped array may be passed.  This is a temporary kludge until
 *        the FITS readers are redesigned.
 *     MEDIUM = CHARACTER * ( * ) (Given)
-*        The medium containing the FITS file.  Currently supported are
-*        'DISK' for a disk file, and 'TAPE' for standard magnetic tape.
+*        The medium containing the FITS file.  Currently supported is
+*        'DISK' for a disk file.
 *     MD = INTEGER (Given)
 *        The tape or file descriptor depending on the value of %MEDIUM.
 *     LOC = CHARACTER * ( DAT__SZLOC ) (Given)
@@ -158,6 +158,7 @@
 *     End
 
 *  Copyright:
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     Copyright (C) 1987, 1988, 1989, 1990, 1992 Science & Engineering
 *                   Research Council.
 *     Copyright (C) 1996, 2004 Central Laboratory of the Research
@@ -235,6 +236,8 @@
 *        Revised FTS1_GKEYx calls.
 *     2004 September 1 (TIMJ):
 *        Use CNF_PVAL
+*     2010 April 19 (TIMJ):
+*        No longer allow tape.
 *     {enter_further_changes_here}
 *
 *  Bugs:
@@ -299,7 +302,6 @@
       LOGICAL MORE               ! More header cards to come?
       LOGICAL MOREXT             ! More extensions may yet be read?
       INTEGER SIZE               ! Size of the preallocated header area
-      LOGICAL TAPE               ! The medium is standard tape
       INTEGER TCARD              ! Total number of header cards in the
                                  ! sub-file
       LOGICAL THERE              ! EXTEND keyword present in current
@@ -311,7 +313,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Make sure the medium is permitted.
-      IF ( MEDIUM .NE. 'TAPE' .AND. MEDIUM .NE. 'DISK' ) THEN
+      IF ( MEDIUM .NE. 'DISK' ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'MEDIUM', MEDIUM )
          CALL ERR_REP( 'FTS1_PHEAD_MEDNAV',
@@ -319,10 +321,6 @@
      :     STATUS )
          GOTO 999
       END IF
-
-*  Use a logical for efficiency to determine which calls to make to
-*  read in the FITS file.
-      TAPE = MEDIUM .EQ. 'TAPE'
 
 *  A header section must start in a new record, so set the card number
 *  to beyond the maximum number of cards in a record.  This will cause
@@ -359,19 +357,11 @@
 *  are more header cards to follow.
       IF ( CARD .GE. NOCARD .AND. MORE ) THEN
 
-*  Read the tape.
-         IF ( TAPE ) THEN
-            CALL FTS1_TREAD( MD, BLKSIZ, ACTSIZ,
-     :                       %VAL( CNF_PVAL( BFPNTR ) ), OFFSET,
-     :                       %VAL( CNF_PVAL( RCPNTR ) ), STATUS )
-
 *  Read the disk file.
-         ELSE
-            CALL FTS1_DREAD( MD, BLKSIZ, ACTSIZ, .TRUE.,
-     :                       %VAL( CNF_PVAL( BFPNTR ) ),
-     :                       OFFSET, %VAL( CNF_PVAL( RCPNTR ) ),
-     :                       STATUS )
-         END IF
+         CALL FTS1_DREAD( MD, BLKSIZ, ACTSIZ, .TRUE.,
+     :                    %VAL( CNF_PVAL( BFPNTR ) ),
+     :                    OFFSET, %VAL( CNF_PVAL( RCPNTR ) ),
+     :                    STATUS )
 
 *  Error reading the FITS file.  Report context and abort.
          IF ( STATUS .NE. SAI__OK ) GOTO 980
@@ -448,20 +438,11 @@
 *  there are more header cards to follow.
          IF ( CARD .GE. NOCARD .AND. MORE ) THEN
 
-*  Read the tape.
-            IF ( TAPE ) THEN
-               CALL FTS1_TREAD( MD, BLKSIZ, ACTSIZ,
-     :                          %VAL( CNF_PVAL( BFPNTR ) ),
-     :                          OFFSET, %VAL( CNF_PVAL( RCPNTR ) ),
-     :                          STATUS )
-
 *  Read the disk file.
-            ELSE
-               CALL FTS1_DREAD( MD, BLKSIZ, ACTSIZ, .FALSE.,
-     :                          %VAL( CNF_PVAL( BFPNTR ) ), OFFSET,
-     :                          %VAL( CNF_PVAL( RCPNTR ) ),
-     :                          STATUS )
-            END IF
+            CALL FTS1_DREAD( MD, BLKSIZ, ACTSIZ, .FALSE.,
+     :                       %VAL( CNF_PVAL( BFPNTR ) ), OFFSET,
+     :                       %VAL( CNF_PVAL( RCPNTR ) ),
+     :                       STATUS )
 
 *  Error reading the FITS file.  Report context and abort.
             IF ( STATUS .NE. SAI__OK ) GOTO 980
@@ -483,19 +464,11 @@
 *  Skip over trailing blank card images to the end of the record by
 *  reading the next record.
 
-*  Read the tape.
-         IF ( TAPE ) THEN
-            CALL FTS1_TREAD( MD, BLKSIZ, ACTSIZ,
-     :                       %VAL( CNF_PVAL( BFPNTR ) ), OFFSET,
-     :                       %VAL( CNF_PVAL( RCPNTR ) ), STATUS )
-
 *  Read the disk file.
-         ELSE
-            CALL FTS1_DREAD( MD, BLKSIZ, ACTSIZ, .FALSE.,
-     :                       %VAL( CNF_PVAL( BFPNTR ) ), OFFSET,
-     :                       %VAL( CNF_PVAL( RCPNTR ) ),
-     :                       STATUS )
-         END IF
+         CALL FTS1_DREAD( MD, BLKSIZ, ACTSIZ, .FALSE.,
+     :                    %VAL( CNF_PVAL( BFPNTR ) ), OFFSET,
+     :                    %VAL( CNF_PVAL( RCPNTR ) ),
+     :                    STATUS )
 
 *  Error reading the FITS file.  Report context and abort.
          IF ( STATUS .NE. SAI__OK ) GOTO 980
@@ -573,22 +546,12 @@
 *  See if the current header block has been processed fully.
                IF ( CARD .GE. NOCARD .AND. MORE ) THEN
 
-*  Read the tape.
-                  IF ( TAPE ) THEN
-                     CALL FTS1_TREAD( MD, BLKSIZ, ACTSIZ,
-     :                                %VAL( CNF_PVAL( BFPNTR ) ),
-     :                                OFFSET,
-     :                                %VAL( CNF_PVAL( RCPNTR ) ),
-     :                                STATUS )
-
 *  Read the disk file.
-                  ELSE
-                     CALL FTS1_DREAD( MD, BLKSIZ, ACTSIZ, .FALSE.,
-     :                                %VAL( CNF_PVAL( BFPNTR ) ),
-     :                                OFFSET,
-     :                                %VAL( CNF_PVAL( RCPNTR ) ),
-     :                                STATUS )
-                  END IF
+                  CALL FTS1_DREAD( MD, BLKSIZ, ACTSIZ, .FALSE.,
+     :                             %VAL( CNF_PVAL( BFPNTR ) ),
+     :                             OFFSET,
+     :                             %VAL( CNF_PVAL( RCPNTR ) ),
+     :                             STATUS )
 
 *  Error reading the FITS file.  Report context and abort.
                   IF ( STATUS .NE. SAI__OK ) GOTO 980

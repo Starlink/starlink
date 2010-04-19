@@ -25,8 +25,8 @@
 
 *  Arguments:
 *     MEDIUM = CHARACTER * ( * ) (Given)
-*        The medium containing the FITS file.  Currently supported are
-*        'DISK' for a disk file, and 'TAPE' for standard magnetic tape.
+*        The medium containing the FITS file.  Currently supported is
+*        'DISK' for a disk file.
 *     MD     = INTEGER (Given)
 *        The tape or file descriptor depending on the value of %MEDIUM.
 *     SIZE   = INTEGER (Given)
@@ -105,6 +105,7 @@
 *     End
 
 *  Copyright:
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     Copyright (C) 1988, 1989, 1990, 1991, 1992 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -127,6 +128,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
 *     RDS: Richard D. Saxton (STARLINK, Leicester)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -149,6 +151,8 @@
 *        Added REVERS argument so that IEEE data are not reversed.
 *     1992 December (RDS):
 *        Added extra argument to FTS1_DREAD calls.
+*     2010 April 19 (TIMJ):
+*        Remove TAPE option.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -217,9 +221,6 @@
      :  NBYTES                 ! Number of bytes in data array or
                                ! parameters
 
-      LOGICAL                  ! True if:
-     :  TAPE                   ! The medium is a standard tape
-
 *.
 
 *    Check for an error on entry.
@@ -228,7 +229,7 @@
 
 *    Make sure the medium is permitted.
 
-      IF ( MEDIUM .NE. 'TAPE' .AND. MEDIUM .NE. 'DISK' ) THEN
+      IF ( MEDIUM .NE. 'DISK' ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'MEDIUM', MEDIUM )
          CALL ERR_REP( 'FTS1_RGRDA_MEDNAV',
@@ -241,11 +242,6 @@
 *    the data array.
 
       NBYTES = BPV * PCOUNT
-
-*    Use a logical for efficiency to determine which calls to make to
-*    read in the FITS file.
-
-      TAPE = MEDIUM .EQ. 'TAPE'
 
 *    Initialise the displacement pointer.
 
@@ -263,18 +259,10 @@
 
 *          No the buffer has been exhausted.
 
-*          Read the tape.
-
-            IF ( TAPE ) THEN
-               CALL FTS1_TREAD( MD, BLKSIZ, ACTSIZ, BUFFER, OFFSET,
-     :                          RECORD, STATUS )
-
 *          Read the disk file.
 
-            ELSE
-               CALL FTS1_DREAD( MD, BLKSIZ, ACTSIZ, .FALSE., BUFFER,
-     :                          OFFSET, RECORD, STATUS )
-            END IF
+            CALL FTS1_DREAD( MD, BLKSIZ, ACTSIZ, .FALSE., BUFFER,
+     :                       OFFSET, RECORD, STATUS )
 
 *          Error reading the FITS file.  Report context and abort.
 
@@ -339,18 +327,10 @@
 
 *          No the buffer has been exhausted.
 
-*          Read the tape.
-
-            IF ( TAPE ) THEN
-               CALL FTS1_TREAD( MD, BLKSIZ, ACTSIZ, BUFFER, OFFSET,
-     :                          RECORD, STATUS )
-
 *          Read the disk file.
 
-            ELSE
-               CALL FTS1_DREAD( MD, BLKSIZ, ACTSIZ, .FALSE., BUFFER,
-     :                          OFFSET, RECORD, STATUS )
-            END IF
+            CALL FTS1_DREAD( MD, BLKSIZ, ACTSIZ, .FALSE., BUFFER,
+     :                       OFFSET, RECORD, STATUS )
 
 *          Error reading the FITS file.  Report context and abort.
 
