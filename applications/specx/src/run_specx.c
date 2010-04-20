@@ -309,6 +309,37 @@ void hand2( int sig )
 {
    F77_INTEGER_TYPE status = 0;
 
+   if( sig ==  1 )
+     printf( "\n\n Signal 1 (sighup): hangup\n\n" );
+   else if( sig ==  2 )
+     printf( "\n\n Signal 2 (sigint): interrupt (rubout)\n\n" );
+   else if( sig ==  3 )
+     printf( "\n\n Signal 3 (sigquit): quit (ascii fs)\n\n" );
+   else if( sig ==  4 )
+     printf( "\n\n Signal 4 (sigill): illegal instruction\n\n" );
+   else if( sig ==  8 )
+     printf( "\n\n Signal 8 (sigfpe): floating point exception\n\n" );
+   else if( sig ==  9 )
+     printf( "\n\n Signal 9 (sigkill): kill (cannot be caught or ignored)\n\n");
+   else if( sig == 10 )
+     printf( "\n\n Signal 10 (sigbus): bus error\n\n" );
+   else if( sig == 11 )
+     printf( "\n\n Signal 11 (sigsegv): segmentation violation\n\n" );
+   else if( sig == 12 )
+     printf( "\n\n Signal 12 (sigsys): bad argument to system call\n\n" );
+   else if( sig == 15 )
+     printf( "\n\n Signal 15 (sigterm): termination signal from kill\n\n" );
+   else if( sig == 26 )
+     printf( "\n\n Signal 26 (sigttin): background tty read attempted\n\n" );
+   else if( sig == 27 )
+     printf( "\n\n Signal 27 (sigttou): background tty write attempted\n\n" );
+   else if( sig == 30 )
+     printf( "\n\n Signal 30 (sigxcpu): exceeded cpu limit\n\n" );
+   else if( sig == 31 )
+     printf( "\n\n Signal 31 (sigxfsz): exceeded file size limit\n\n" );
+   else
+     printf( "\n\n Exception %d detected by signal handler\n\n", sig );
+
    F77_CALL(ndf_end)(&status);
    F77_CALL(hds_stop)(&status);
 
