@@ -73,10 +73,12 @@
 *     2009-11-27 (TIMJ):
 *        Propagate provenance (if available on input) and merge input
 *        FITS headers.
+*     2010-04-19 (TIMJ):
+*        Propagate the bad bits mask from the inputs.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2009 Science and Technology Facilities Council.
+*     Copyright (C) 2009-2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -127,6 +129,7 @@
 
 void smurf_stackframes( int *status ) {
 
+  unsigned char badbit = 0;      /* Default bad bits mask */
   int dosort = 0;                /* Sort into time order? */
   AstFitsChan *fchan = NULL;     /* FitsChan holding output NDF FITS extension */
   AstFrame * frame2d;            /* 2D frame from input image */
@@ -190,6 +193,7 @@ void smurf_stackframes( int *status ) {
    */
   for (i=1; i<=size; i++) {
     smfData * data = NULL;
+    unsigned char bb = 0;
 
     smf_open_file( igrp, i, "READ", SMF__NOCREATE_DATA, &data, status);
     if (*status == SAI__OK) {
@@ -287,6 +291,12 @@ void smurf_stackframes( int *status ) {
     /* Merge fits headers as we go */
     if (*status == SAI__OK && data->hdr->fitshdr) smf_fits_outhdr( data->hdr->fitshdr,
                                                                    &fchan, status );
+
+    /* Retrieve the bad bits mask and OR it with the running value */
+    if (*status == SAI__OK) {
+      ndfBb( data->file->ndfid, &bb, status );
+      badbit |= bb;
+    }
 
     smf_close_file( &data, status );
   }
@@ -414,6 +424,9 @@ void smurf_stackframes( int *status ) {
   astAddFrame( outwcs, AST__BASE, totmap, totfrm );
 
   if (*status == SAI__OK) ndfPtwcs( outwcs, outdata->file->ndfid, status );
+
+  /* Store the bad bits mask */
+  if (*status == SAI__OK && odataq) ndfSbb( badbit, outdata->file->ndfid, status );
 
   /* Write output fits header if we have one */
   if( *status == SAI__OK && fchan && astGetI( fchan, "NCard" ) > 0 ) {
