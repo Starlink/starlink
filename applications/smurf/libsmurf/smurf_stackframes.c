@@ -376,7 +376,7 @@ void smurf_stackframes( int *status ) {
       odataq += szplane;
     }
     /* output metadata */
-    smf_accumulate_prov( data, igrp, i, outdata->file->ndfid,
+    smf_accumulate_prov( data, igrp, sortinfo[i-1].index, outdata->file->ndfid,
                          "SMURF:" TASK_NAME, status );
 
     smf_close_file( &data, status );
