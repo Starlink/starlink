@@ -81,7 +81,6 @@
       INCLUDE 'PAR_ERR'          ! PAR error values.
       INCLUDE 'MSG_PAR'          ! MSG_ constants.
       INCLUDE 'GRP_PAR'          ! GRP constants
-      INCLUDE 'NDG_ERR'          ! NDG error values.
 
 *  Arguments Given:
       CHARACTER PARAM*(*)
