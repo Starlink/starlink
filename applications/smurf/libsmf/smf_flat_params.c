@@ -71,6 +71,9 @@
 *        Original version.
 *     2010-04-09 (TIMJ):
 *        Add SNRMIN
+*     2010-04-20 (TIMJ):
+*        Columns in resistance file now start at 0 to be consistent
+*        with all other nomenclature.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -165,7 +168,7 @@ smf_flat_params( const smfData * refdata, const char refrespar[], const char res
     for (j = 0; j < (size_t)ncols; j++) {
       int ngot;
       char colname[6];
-      sprintf( colname, "COL%-d", (int)(j+1) );
+      sprintf( colname, "COL%-d", (int)j );
       astMapGet1D( resmap, colname, nrows, &ngot, &((*resistance)[nrows*j]));
       if (ngot != nrows) {
         if (*status == SAI__OK) {
