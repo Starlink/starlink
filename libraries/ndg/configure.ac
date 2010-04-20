@@ -11,7 +11,7 @@ AM_INIT_AUTOMAKE(1.8.2-starlink)
 
 dnl    Sanity-check: name a file in the source directory -- if this
 dnl    isn't found then configure will complain
-AC_CONFIG_SRCDIR([NDG_ERR])
+AC_CONFIG_SRCDIR([ndg_err.msg])
 
 dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS
