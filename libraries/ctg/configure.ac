@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
   
 dnl    Initialisation: package name and version number
-AC_INIT(ctg, 3.0, ussc@star.rl.ac.uk)
+AC_INIT(ctg, 3.0-1, ussc@star.rl.ac.uk)
   
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -33,6 +33,8 @@ dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
 STAR_LATEX_DOCUMENTATION(sun262)
  
+STAR_MESSGEN(ctg_err.msg)
+
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
 AC_CONFIG_FILES(Makefile component.xml)
