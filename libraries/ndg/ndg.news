@@ -2,6 +2,10 @@
 
 Version 5.9
 
+   o  NDG now uses its own facility code in the Starlink error message
+   system. This means that the constants defined in NDG_ERR have been
+   changed so any software using this file needs to be rebuilt.
+
    o  Change internal usage of ONE_FIND_FILE to PSX_WORDEXP.
    This stops the program from forking when expanding the wildcards
    and shell meta characters. Forking can be problematic when a

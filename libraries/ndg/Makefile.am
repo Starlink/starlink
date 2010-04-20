@@ -24,11 +24,13 @@ cincludedir = $(includedir)/star
 include_HEADERS = $(PUBLIC_INCLUDES)
 cinclude_HEADERS = $(PUBLIC_C_INCLUDES)
 
+include_MESSAGES = NDG_ERR
+
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 PRIVATE_INCLUDES = NDG_CONST NDG_COM1 NDG_COM2
 
-PUBLIC_INCLUDES = NDG_ERR NDG_PAR
+PUBLIC_INCLUDES = NDG_PAR
 PUBLIC_C_INCLUDES = ndg.h
 
 BASIC_C_ROUTINES = ndg1_regsb.c ndg1_match.c ndg_provenance.c \

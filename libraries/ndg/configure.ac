@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(ndg, 5.9, ussc@star.rl.ac.uk)
+AC_INIT(ndg, 5.9-1, ussc@star.rl.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -32,6 +32,8 @@ STAR_DECLARE_DEPENDENCIES(link,  [grp ndf] )
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
 STAR_LATEX_DOCUMENTATION(sun2)
+
+STAR_MESSGEN(ndg_err.msg)
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
