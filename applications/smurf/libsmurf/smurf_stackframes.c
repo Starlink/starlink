@@ -75,6 +75,7 @@
 *        FITS headers.
 *     2010-04-19 (TIMJ):
 *        Propagate the bad bits mask from the inputs.
+*        Use atlAddWcsAxis.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -117,6 +118,7 @@
 #include "mers.h"
 #include "star/one.h"
 #include "par.h"
+#include "star/atl.h"
 
 /* SMURF includes */
 #include "smurf_par.h"
@@ -406,22 +408,10 @@ void smurf_stackframes( int *status ) {
   }
   times = smf_free( times, status );
 
-  /* split up the current 2d frameset */
-  frame2d = astGetFrame( framewcs, AST__CURRENT );
-  map2d = astGetMapping( framewcs, AST__BASE, AST__CURRENT );
-
-  totfrm = astCmpFrame( frame2d, timefrm, " " );
-  totmap = astCmpMap( map2d, timemap, 0, " " );
-
-  /* Create a 3D GRID Frame. */
-  gridfrm = astFrame( 3, "Domain=GRID,Title=FITS pixel coordinates" );
-  astSet( gridfrm, "Unit(1)=pixel,Label(1)=FITS pixel axis 1" );
-  astSet( gridfrm, "Unit(2)=pixel,Label(2)=FITS pixel axis 2" );
-  astSet( gridfrm, "Unit(3)=pixel,Label(2)=FITS pixel axis 3" );
-
-  /* Create the frameset */
-  outwcs = astFrameSet( gridfrm, "  ");
-  astAddFrame( outwcs, AST__BASE, totmap, totfrm );
+  /* Create the new frameset */
+  outwcs = astCopy( framewcs );
+  atlAddWcsAxis( outwcs, (AstMapping *)timemap, (AstFrame *)timefrm, NULL, NULL,
+                 status );
 
   if (*status == SAI__OK) ndfPtwcs( outwcs, outdata->file->ndfid, status );
 
