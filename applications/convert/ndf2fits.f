@@ -837,7 +837,7 @@
 *  but later we need to known the number of files, not just the number
 *  of NDFs they contain.
       ELSE
-         CALL CON_RGNDF( 'IN', 0, 1,
+         CALL KPG1_RGNDF( 'IN', 0, 1,
      :                   '  Give more '//ITEM( :NITC)//'...',
      :                   IGRP2, NIFILE, STATUS )
       END IF

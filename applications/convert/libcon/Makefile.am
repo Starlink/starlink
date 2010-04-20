@@ -11,7 +11,7 @@ F_ROUTINES = \
  con_ffrmt.f con_fitax.f con_ftype.f con_gexch.f \
  con_gexrm.f con_gslic.f con_laxis.f \
  con_mandh.f con_ndfcm.f con_pcard.f con_pfith.f \
- con_rgasp.f con_raux.f  con_raxes.f con_rgndf.f con_rccc.f  \
+ con_rgasp.f con_raux.f  con_raxes.f con_rccc.f  \
  con_rcpy.f  con_saxis.f con_sphea.f con_spcpy.f con_sphst.f \
  con_trcha.f con_typsz.f con_vaxis.f con_vcorr.f con_wfman.f \
  con_wcspx.f con_wgasp.f con_wgrid.f con_wrpgm.f con_wrtif.f
