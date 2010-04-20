@@ -201,9 +201,9 @@ com.corr_tol = 5
 com.gain_tol = 5
 com.gain_abstol = 3
 
-# com.gain_box currently set to something large as there still seems to
-# some off behaviour to work out with the chunked common-mode code.
-com.gain_box = 600000
+# Set gain box to 30 seconds. This is about the timescale for
+# fridge oscillations.
+com.gain_box = 6000
 #com.corr_abstol = 0.2
 #com.gain_fgood = 0.25
 #com.gain_rat = 4.0
