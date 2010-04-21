@@ -95,6 +95,7 @@
 #include "smf_typ.h"
 #include "smf.h"
 #include "smurf_par.h"
+#include "smf_err.h"
 
 #include "mers.h"
 #include "prm_par.h"
@@ -357,7 +358,7 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
   }
 
   /* Analyze correlation coefficients */
-  if (corrs) {
+  if (corrs && *status == SAI__OK) {
     double csig = VAL__BADD;
     double cmean = VAL__BADD;
     size_t ngood = 0;
@@ -367,31 +368,35 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
 
     smf_stats1D( corrs, 1, nbol, NULL, 0, 0, &cmean, &csig, &ngood, status );
 
-    msgOutiff( MSG__DEBUG20, "", "Fit Correlation coefficients = %g +/- %g (%zd)\n",
-               status, cmean, csig, ngood);
-
-    /* Now loop over the bolometers and throw out the ones on the lower end of the
-       scale. If the mean is within 0.5 sigma of 1.0 we use a "mean - 1 sigma" threshold,
-       else we use a "mean - 3 sigma" threshold. We do this because the case where the
-       distribution is jammed up against 1.0 is decidedly non-gaussian. */
-    delta_mean = ( 1.0 - cmean ) / csig;
-    if ( delta_mean < 0.5 ) {
-      corr_thresh = corr_smalltol;
+    if (*status == SMF__INSMP) {
+      /* it has all gone horribly wrong. Let someone else report the bad news */
+      errAnnul( status );
     } else {
-      corr_thresh = corr_bigtol;
-    }
-    corr_thresh = cmean - ( csig * corr_thresh );
-    for ( bol = 0; bol < nbol; bol++ ) {
-      if (corrs[bol] != VAL__BADD && corrs[bol] < corr_thresh ) {
-        size_t i;
-        ncorr++;
-        /* blank that bolometer */
-        for (i=0; i<NCOEFF;i++) {
-          coptr[i*nbol+bol] = VAL__BADD;
+      msgOutiff( MSG__DEBUG20, "", "Fit Correlation coefficients = %g +/- %g (%zd)\n",
+                 status, cmean, csig, ngood);
+
+      /* Now loop over the bolometers and throw out the ones on the lower end of the
+         scale. If the mean is within 0.5 sigma of 1.0 we use a "mean - 1 sigma" threshold,
+         else we use a "mean - 3 sigma" threshold. We do this because the case where the
+         distribution is jammed up against 1.0 is decidedly non-gaussian. */
+      delta_mean = ( 1.0 - cmean ) / csig;
+      if ( delta_mean < 0.5 ) {
+        corr_thresh = corr_smalltol;
+      } else {
+        corr_thresh = corr_bigtol;
+      }
+      corr_thresh = cmean - ( csig * corr_thresh );
+      for ( bol = 0; bol < nbol; bol++ ) {
+        if (corrs[bol] != VAL__BADD && corrs[bol] < corr_thresh ) {
+          size_t i;
+          ncorr++;
+          /* blank that bolometer */
+          for (i=0; i<NCOEFF;i++) {
+            coptr[i*nbol+bol] = VAL__BADD;
+          }
         }
       }
     }
-
   }
 
 
