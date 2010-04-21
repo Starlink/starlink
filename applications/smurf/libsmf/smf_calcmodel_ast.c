@@ -74,10 +74,12 @@
 *        -add ast.zero_lowhits config parameter for zeroing the border
 *     2010-02-25 (TIMJ):
 *        Fix 32-bit incompatibility.
+*     2010-04-20 (EC):
+*        Set map quality bits if zero_lowhits requested.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006-2009 University of British Columbia.
+*     Copyright (C) 2006-2010 University of British Columbia.
 *     Copyright (C) 2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -152,6 +154,7 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)), smfDIMMData *d
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
   size_t tstride;               /* Time slice stride in data array */
+  unsigned char *mapqual = NULL;/* Quality map */
   double *mapvar = NULL;        /* Variance map */
   double *mapweight = NULL;     /* Weight map */
   double zero_lowhits=0;        /* Zero regions with low hit count? */
@@ -170,6 +173,7 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)), smfDIMMData *d
   qua = dat->qua[chunk];
   map = dat->map;
   hitsmap = dat->hitsmap;
+  mapqual = dat->mapqual;
   mapvar = dat->mapvar;
   mapweight = dat->mapweight;
   model = allmodel[chunk];
@@ -215,6 +219,7 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)), smfDIMMData *d
         map[i] = 0;
         mapweight[i] = VAL__BADD;
         mapvar[i] = VAL__BADD;
+        mapqual[i] |= SMF__MAPQ_ZERO;
         newzero ++;
       }
     }

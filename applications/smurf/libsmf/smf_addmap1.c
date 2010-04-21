@@ -14,10 +14,10 @@
 
 *  Invocation:
 *     smf_addmap1( double *map1, double *mapweight1,
-*                  int *hitsmap1, double *mapvar1,
+*                  int *hitsmap1, double *mapvar1, unsigned char *mapqual1,
 *                  double *map2, double *mapweight2,
-*                  int *hitsmap2, double *mapvar2, dim_t msize,
-*                  int *status ) {
+*                  int *hitsmap2, double *mapvar2, unsigned char *mapqual2,
+*                  dim_t msize, int *status ) {
 
 *  Arguments:
 *     map1 = double* (Given and Returned)
@@ -28,14 +28,18 @@
 *        Number of samples that land in map1 pixels
 *     mapvar1 = double* (Given and Returned)
 *        Variance of each pixel in map1
+*     mapqual1 = unsigned char* (Given and Returned)
+*        Quality map1
 *     map2 = double* (Given)
 *        The second map
 *     mapweight2 = double* (Given)
 *        Relative weighting for each pixel in map2
 *     hitsmap2 = int* (Given)
 *        Number of samples that land in map2 pixels
-*     mapvar2 = double* (Given and Returned)
+*     mapvar2 = double* (Given)
 *        Variance of each pixel in map2
+*     mapqual2 = unsigned char* (Given)
+*        Quality map2
 *     msize = dim_t (Given)
 *        Number of pixels in the maps
 *     status = int* (Given and Returned)
@@ -54,6 +58,8 @@
 *        Initial version.
 *     2008-07-03 (EC):
 *        Use dim_t for msize
+*     2010-04-20 (EC):
+*        Handle map quality arrays.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -61,7 +67,7 @@
 *     routine the variance map is set to 1/(mapweight1 + mapweight2).
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2008,2010 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -100,11 +106,10 @@
 
 #define FUNC_NAME "smf_addmap1"
 
-void smf_addmap1( double *map1, double *mapweight1,
-                  int *hitsmap1, double *mapvar1,
-                  double *map2, double *mapweight2,
-                  int *hitsmap2, double *mapvar2, dim_t msize,
-                  int *status ) {
+void smf_addmap1( double *map1, double *mapweight1, int *hitsmap1,
+                  double *mapvar1, unsigned char *mapqual1, double *map2,
+                  double *mapweight2, int *hitsmap2, double *mapvar2,
+                  unsigned char *mapqual2, dim_t msize, int *status ) {
 
   /* Local Variables */
   dim_t i;                   /* Loop counter */
@@ -131,11 +136,13 @@ void smf_addmap1( double *map1, double *mapweight1,
       mapweight1[i] = mapweight2[i];
       hitsmap1[i] = hitsmap2[i];
       mapvar1[i] = mapvar2[i];
+      mapqual1[i] = mapqual2[i];
     } else if( (map2[i] != VAL__BADD) && (mapvar2[i] != VAL__BADD) ) {
       /* Add together if both maps have good pixels */
       map1[i] = mapweight1[i]*map1[i] + mapweight2[i]*map2[i];
       mapweight1[i] += mapweight2[i];
       hitsmap1[i] += hitsmap2[i];
+      mapqual1[i] &= mapqual2[i];
 
       if( !mapweight1[i] ) {
 	*status = SAI__ERROR;

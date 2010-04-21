@@ -20,8 +20,8 @@
 *                    const smfArray *bbms, const smfArray * flatramps,
 *                    AstFrameSet *outfset, int moving, int *lbnd_out,
 *                    int *ubnd_out, size_t maxmem, double *map, int *hitsmap,
-*                    double *mapvar, double *weights, char data_units[],
-*                    int *status );
+*                    double *mapvar, unsigned char *mapqual, double *weights,
+*                    char data_units[], int *status );
 
 *  Arguments:
 *     wf = smfWorkForce * (Given)
@@ -61,6 +61,8 @@
 *        Number of samples that land in a pixel (ignore if NULL pointer)
 *     mapvar = double* (Returned)
 *        Variance of each pixel in map
+*     mapqual = unsigned char* (Returned)
+*        Quality for each pixel in map
 *     weights = double* (Returned)
 *        Relative weighting for each pixel in map
 *     data_units = char[] (Returned)
@@ -256,6 +258,8 @@
 *        - Replace dcthresh2 with dcmedianwidth config parameter.
 *     2010-04-13 (EC)
 *        Add shortmap to config file -- creates .MORE.SMURF.SHORTMAPS extension
+*     2010-04-20 (EC)
+*        Add map quality
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -317,7 +321,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      const smfArray *bbms, const smfArray * flatramps,
                      AstFrameSet *outfset, int moving, int *lbnd_out,
                      int *ubnd_out, size_t maxmem, double *map,
-                     int *hitsmap, double *mapvar,
+                     int *hitsmap, double *mapvar, unsigned char *mapqual,
                      double *weights, char data_units[], int *status ) {
 
   /* Local Variables */
@@ -422,8 +426,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int *thishits=NULL;           /* Pointer to this hits map */
   double *thismap=NULL;         /* Pointer to this map */
   smf_modeltype thismodel;      /* Type of current model */
-  double *thisweight=NULL;      /* Pointer to this weights map */
+  unsigned char *thisqual=NULL; /* Pointer to this quality map */
   double *thisvar=NULL;         /* Pointer to this variance map */
+  double *thisweight=NULL;      /* Pointer to this weights map */
   size_t try;                   /* Try to concatenate this many samples */
   size_t tstride;               /* Time stride */
   struct timeval tv1, tv2;      /* Timers */
@@ -946,15 +951,17 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         /* For the first chunk, calculate the map in-place */
         thismap = map;
         thishits = hitsmap;
+        thisqual = mapqual;
         thisvar = mapvar;
         thisweight = weights;
       } else if( contchunk == 1 ) {
         /* Subsequent chunks are done in new map arrays and then added to
            the first */
-        thismap = smf_malloc( msize, sizeof(*thismap), 0, status );
-        thishits = smf_malloc( msize, sizeof(*thishits), 0, status );
-        thisvar = smf_malloc( msize, sizeof(*thisvar), 0, status );
-        thisweight = smf_malloc( msize, sizeof(*thisweight), 0, status );
+        thismap = smf_malloc( msize, sizeof(*thismap), 1, status );
+        thishits = smf_malloc( msize, sizeof(*thishits), 1, status );
+        thisqual = smf_malloc( msize, sizeof(*thisqual), 1, status );
+        thisvar = smf_malloc( msize, sizeof(*thisvar), 1, status );
+        thisweight = smf_malloc( msize, sizeof(*thisweight), 1, status );
       }
 
       if( memiter ) {
@@ -1132,6 +1139,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       dat.lut = lut;
       dat.map = thismap;
       dat.hitsmap = thishits;
+      dat.mapqual = thisqual;
       dat.mapvar = thisvar;
       dat.mapweight = thisweight;
       dat.msize = msize;
@@ -2159,8 +2167,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       if( contchunk >= 1 ) {
         msgOut( " ", FUNC_NAME ": Adding map estimated from this continuous"
                 " chunk to total", status);
-        smf_addmap1( map, weights, hitsmap, mapvar, thismap, thisweight,
-                     thishits, thisvar, msize, status );
+        smf_addmap1( map, weights, hitsmap, mapvar, mapqual, thismap,
+                     thisweight, thishits, thisvar, thisqual, msize, status );
       }
     }
 
@@ -2290,6 +2298,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   /* The second set of map arrays get freed in the multiple contchunk case */
   if( thismap != map ) thismap = smf_free( thismap, status );
   if( thishits != hitsmap ) thishits = smf_free( thishits, status );
+  if( thisqual != mapqual ) thisqual = smf_free( thisqual, status );
   if( thisvar != mapvar ) thisvar = smf_free( thisvar, status );
   if( thisweight != weights ) thisweight = smf_free( thisweight, status );
 

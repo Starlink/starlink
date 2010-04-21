@@ -159,6 +159,8 @@
  *        Add SMF__Q_GAP (bits that indicate where gaps should be filled)
  *     2010-03-19 (EC):
  *        Renamed SMF__Q_BADS to SMF__Q_BADDA, and added SMF__Q_COM
+ *     2010-04-20 (EC):
+ *        Add map quality (SMF__MAPQ_ZERO, and mapqual in smfDIMMData)
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -386,6 +388,9 @@ static const size_t SMF__BADIDX = (size_t)-1;
 /* Number of active quality bits */
 #define SMF__NQBITS 8
 
+/* Quality bits for maps */
+#define SMF__MAPQ_ZERO 1     /* Pixels that have been constrained to 0 */
+
 /* Flags for smf_open_newfile
    Must be individual bits in a single integer
 */
@@ -556,6 +561,7 @@ typedef struct smfDIMMData {
   smfArray **gai;            /* array of smfArray's of bolo gain corrections */
   double *map;               /* pointer to the current map estimate */
   int *hitsmap;              /* pointer to the current hits map */
+  unsigned char *mapqual;    /* pointer to the current map quality */
   double *mapvar;            /* pointer to the current map variance estimate */
   double *mapweight;         /* pointer to the current map weight */
   dim_t msize;               /* number of elements in map */

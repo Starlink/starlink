@@ -43,13 +43,14 @@
 *  History:
 *     2008-04-24 (EC):
 *        Initial version.
+*     2010-04-20 (EC):
+*        Extra memory for quality array if iteratemap.
 *     {enter_further_changes_here}
 
 *  Notes:
 
 *  Copyright:
-*     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2005-2008 University of British Columbia.
+*     Copyright (C) 2008,2010 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -141,6 +142,9 @@ void smf_checkmem_map( const int lbnd[], const int ubnd[], int rebin,
     } else {
       /* For method=iterate we need space for hitsmap */
       total += sizeof(unsigned int)*mapsize;
+
+      /* also need space for quality map */
+      total += sizeof(unsigned char)*mapsize;
     }
 
     /* Set bad status if too big */

@@ -702,6 +702,8 @@
 *        Support flatfield ramps.
 *     2010-04-13 (EC):
 *        Support short maps with smf_iteratemap.
+*     2010-04-20 (EC):
+*        iteratemaps now have quality
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -811,6 +813,7 @@ void smurf_makemap( int *status ) {
   int lbnd_out[2];           /* Lower pixel bounds for output map */
   double *map=NULL;          /* Pointer to the rebinned map data */
   size_t mapmem=0;           /* Memory needed for output map */
+  unsigned char *mapqual=NULL; /* Map quality */
   size_t maxmem=0;           /* Max memory usage in bytes */
   int maxmem_mb;             /* Max memory usage in Mb */
   int maxmem_default = 1000; /* Default value for maxmem */
@@ -1452,8 +1455,7 @@ void smurf_makemap( int *status ) {
 
     /************************* I T E R A T E *************************************/
 
-    smfflags = 0;
-    smfflags |= SMF__MAP_VAR;
+    smfflags = SMF__MAP_VAR | SMF__MAP_QUAL;
     smf_open_newfile ( ogrp, 1, SMF__DOUBLE, 2, lbnd_out, ubnd_out, smfflags,
                        &odata, status );
 
@@ -1463,6 +1465,7 @@ void smurf_makemap( int *status ) {
       /* Map the data and variance arrays */
       map = (odata->pntr)[0];
       variance = (odata->pntr)[1];
+      mapqual = (odata->pntr)[2];
     }
 
     /* Work out the name for the root file path if bolomaps are being
@@ -1549,8 +1552,8 @@ void smurf_makemap( int *status ) {
 
     smf_iteratemap( wf, igrp, iterrootgrp, bolrootgrp, shortrootgrp,
                     keymap, NULL, bbms, flatramps, outfset, moving, lbnd_out,
-                    ubnd_out, maxmem-mapmem, map, hitsmap, variance, weights,
-                    data_units, status );
+                    ubnd_out, maxmem-mapmem, map, hitsmap, variance, mapqual,
+                    weights, data_units, status );
 
     if( bolrootgrp ) grpDelet( &bolrootgrp, status );
     if( iterrootgrp ) grpDelet( &iterrootgrp, status );
