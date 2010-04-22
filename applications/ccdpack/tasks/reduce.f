@@ -13,7 +13,7 @@
 *     ADAM A-task
 
 *  Invocation:
-*     CALL IMPORT( STATUS )
+*     CALL REDUCE( STATUS )
 
 *  Arguments:
 *     PID = CHARACTER * ( * ) (Given)
@@ -611,5 +611,8 @@ C      CALL SLV_KILLW( CCDRID, STATUS )
           CALL ERR_REP( 'REDUCE_ERR','REDUCE: error reducing CCD data.',
      :     STATUS )
       END IF
+
+*  Close logging system.
+      CALL CCD1_END( STATUS )
 
       END

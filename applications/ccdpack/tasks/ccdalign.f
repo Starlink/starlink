@@ -1074,5 +1074,8 @@
      :                  STATUS )
       END IF
 
+*  Close the logging system.
+      CALL CCD1_END( STATUS )
+
       END
 * $Id$

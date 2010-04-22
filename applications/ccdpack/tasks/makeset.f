@@ -1111,5 +1111,8 @@
      ;                  'MAKESET: Failed to write Set header.', STATUS )
       END IF
 
+*  Close the logging system.
+      CALL CCD1_END( STATUS )
+
       END
 * $Id$

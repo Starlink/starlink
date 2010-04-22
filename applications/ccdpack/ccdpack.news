@@ -1,5 +1,10 @@
 1 CCDPACK_bugfix_update
 
+  Release v4.0-24 fixes logging system bugs in the makeset, showset
+  reduce and ccdalign applications. Previously these applications did
+  not close the log file. This caused problems when running as a
+  detached task (ICL, Tk UIs etc.).
+
   Release v4.0-23 fixes a memory handling bug in ccdwish. This effected
   many of the UI applications, like PAIRNDF, CCDALIGN etc.
 
