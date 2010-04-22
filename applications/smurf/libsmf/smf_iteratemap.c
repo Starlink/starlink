@@ -260,6 +260,8 @@
 *        Add shortmap to config file -- creates .MORE.SMURF.SHORTMAPS extension
 *     2010-04-20 (EC)
 *        Add map quality
+*     2010-04-22 (EC)
+*        Add useful FITS headers for itermaps/bolomaps/shortmaps
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -1437,49 +1439,82 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                was the last chunk of data to be added */
 
             if( itermap && (i == nchunks-1) ) {
-               Grp *mgrp=NULL;        /* Temporary group to hold map name */
-               smfData *imapdata=NULL;/* smfData for this iteration map */
-               char tmpname[GRP__SZNAM+1]; /* temp name buffer */
-               char tempstr[20];
+              Grp *mgrp=NULL;        /* Temporary group to hold map name */
+              smfData *imapdata=NULL;/* smfData for this iteration map */
+              char tmpname[GRP__SZNAM+1]; /* temp name buffer */
+              char tempstr[20];
 
-               /* Create a name for this iteration map, take into
-                  account the chunk number. Only required if we are
-                  using a single output container. */
+              /* Create a name for this iteration map, take into
+                 account the chunk number. Only required if we are
+                 using a single output container. */
 
-               pname = tmpname;
-               grpGet( iterrootgrp, 1, 1, &pname, sizeof(tmpname), status );
-               one_strlcpy( name, tmpname, sizeof(name), status );
-               one_strlcat( name, ".", sizeof(name), status );
-               if (ncontchunks > 1) {
-                 sprintf(tempstr, "CH%02zd", contchunk);
-                 one_strlcat( name, tempstr, sizeof(name), status );
-               }
-               sprintf( tempstr, "I%03i", iter+1 );
-               one_strlcat( name, tempstr, sizeof(name), status );
-               mgrp = grpNew( "itermap", status );
-               grpPut1( mgrp, name, 0, status );
+              pname = tmpname;
+              grpGet( iterrootgrp, 1, 1, &pname, sizeof(tmpname), status );
+              one_strlcpy( name, tmpname, sizeof(name), status );
+              one_strlcat( name, ".", sizeof(name), status );
+              if (ncontchunks > 1) {
+                sprintf(tempstr, "CH%02zd", contchunk);
+                one_strlcat( name, tempstr, sizeof(name), status );
+              }
+              sprintf( tempstr, "I%03i", iter+1 );
+              one_strlcat( name, tempstr, sizeof(name), status );
+              mgrp = grpNew( "itermap", status );
+              grpPut1( mgrp, name, 0, status );
 
-               msgOutf( "", "*** Writing map from this iteration to %s", status,
-                        name );
+              msgOutf( "", "*** Writing map from this iteration to %s", status,
+                       name );
 
-               smf_open_newfile ( mgrp, 1, SMF__DOUBLE, 2, lbnd_out,
-                                  ubnd_out, SMF__MAP_VAR, &imapdata, status);
+              smf_open_newfile ( mgrp, 1, SMF__DOUBLE, 2, lbnd_out,
+                                 ubnd_out, SMF__MAP_VAR, &imapdata, status);
 
-               /* Copy over the signal and variance maps */
-               if( *status == SAI__OK ) {
-                 memcpy( imapdata->pntr[0], thismap, msize*sizeof(*thismap) );
-                 memcpy( imapdata->pntr[1], thisvar, msize*sizeof(*thismap) );
-               }
+              /* Copy over the signal and variance maps */
+              if( *status == SAI__OK ) {
+                memcpy( imapdata->pntr[0], thismap, msize*sizeof(*thismap) );
+                memcpy( imapdata->pntr[1], thisvar, msize*sizeof(*thismap) );
+              }
 
-               /* Write WCS (protecting the pointer dereference) */
-               smf_set_moving(outfset,status);
-               if (*status == SAI__OK && imapdata) {
-                 ndfPtwcs( outfset, imapdata->file->ndfid, status );
-               }
+              /* Write out a FITS header */
+              if( (*status == SAI__OK) && res[0]->sdata[0]->hdr &&
+                  res[0]->sdata[0]->hdr->allState ) {
+                AstFitsChan *fitschan=NULL;
+                JCMTState *allState = res[0]->sdata[0]->hdr->allState;
+                char *obsidss=NULL;
+                char obsidssbuf[SZFITSCARD+1];
 
-               /* Clean up */
-               if( mgrp ) grpDelet( &mgrp, status );
-               smf_close_file( &imapdata, status );
+                fitschan = astFitsChan ( NULL, NULL, " " );
+
+                obsidss = smf_getobsidss( res[0]->sdata[0]->hdr->fitshdr,
+                                          NULL, 0, obsidssbuf,
+                                          sizeof(obsidssbuf), status );
+                if( obsidss ) {
+                  astSetFitsS( fitschan, "OBSIDSS", obsidss,
+                               "Unique observation subsys identifier", 0 );
+                }
+                astSetFitsI( fitschan, "SEQSTART",
+                             allState[0].rts_num,
+                             "RTS index number of first frame", 0 );
+
+                smf_get_dims( res[0]->sdata[0], NULL, NULL, NULL, &ntslice,
+                              NULL, NULL, NULL, status );
+
+                astSetFitsI( fitschan, "SEQEND",
+                             allState[ntslice].rts_num,
+                             "RTS index number of last frame", 0 );
+
+                kpgPtfts( imapdata->file->ndfid, fitschan, status );
+
+                if( fitschan ) fitschan = astAnnul( fitschan );
+              }
+
+              /* Write WCS (protecting the pointer dereference) */
+              smf_set_moving(outfset,status);
+              if (*status == SAI__OK && imapdata) {
+                ndfPtwcs( outfset, imapdata->file->ndfid, status );
+              }
+
+              /* Clean up */
+              if( mgrp ) grpDelet( &mgrp, status );
+              smf_close_file( &imapdata, status );
             }
           }
 
@@ -1713,6 +1748,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                   smfData *mapdata=NULL;/* smfData for new map */
                   char tmpname[GRP__SZNAM+1]; /* temp name buffer */
                   char thisbol[20];     /* name particular to this bolometer */
+                  size_t col, row;
 
                   /* Set the quality back to good for this single bolometer */
                   qua_data[k*bstride] = bolomask[k];
@@ -1729,9 +1765,14 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                     sprintf(tempstr, "CH%02zd", contchunk);
                     one_strlcat( name, tempstr, sizeof(name), status );
                   }
+
+                  col = (k % res[0]->sdata[idx]->dims[1])+1;
+                  row = (k % res[0]->sdata[idx]->dims[1])+1;
+
                   sprintf( thisbol, "C%02luR%02lu",
-                           (k % res[0]->sdata[idx]->dims[1])+1,   /* x-coord */
-                           (k / res[0]->sdata[idx]->dims[1])+1 ); /* y-coord */
+                           col,   /* x-coord */
+                           row ); /* y-coord */
+
                   one_strlcat( name, thisbol, sizeof(name), status );
                   mgrp = grpNew( "bolomap", status );
                   grpPut1( mgrp, name, 0, status );
@@ -1754,6 +1795,20 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                                  mapdata->pntr[0],
                                  bmapweight, bhitsmap, mapdata->pntr[1], msize,
                                  NULL, status );
+
+                  /* Write out COLNUM and ROWNUM to FITS header */
+                  if( *status == SAI__OK ) {
+                    AstFitsChan *fitschan=NULL;
+
+                    fitschan = astFitsChan ( NULL, NULL, " " );
+
+                    astSetFitsI( fitschan, "COLNUM", col, "bolometer column",
+                                 0 );
+                    astSetFitsI( fitschan, "ROWNUM", row, "bolometer row", 0 );
+                    kpgPtfts( mapdata->file->ndfid, fitschan, status );
+
+                    if( fitschan ) fitschan = astAnnul( fitschan );
+                  }
 
                   /* Set the bolo to bad quality again */
                   qua_data[k*bstride] = SMF__Q_BADB;
@@ -1873,6 +1928,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             for( idx=0; (idx<res[0]->ndat)&&(nshort)&&(*status==SAI__OK);
                  idx++ ){
               int rebinflag = 0;
+              size_t shortstart, shortend;
 
               /* Pointers to everything we need */
               ast_data = (ast[0]->sdata[idx]->pntr)[0];
@@ -1901,10 +1957,15 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                 rebinflag |= AST__REBINEND;
               }
 
+
+              /* Time slices indices for start and end of short map */
+              shortstart = istart+sc*shortmap;
+              shortend = istart+(sc+1)*shortmap-1;
+
               smf_rebinmap1( res[0]->sdata[idx],
                              dat.noi ? dat.noi[0]->sdata[idx] : NULL,
                              lut_data, qua_data,
-                             istart+sc*shortmap, istart+(sc+1)*shortmap-1, 1,
+                             shortstart, shortend, 1,
                              SMF__Q_GOOD, varmapmethod,
                              rebinflag,
                              mapdata->pntr[0],
@@ -1917,6 +1978,27 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                   res_data[k] -= ast_data[k];
                 }
               }
+
+              /* Write out FITS header */
+              if( (*status == SAI__OK) && res[0]->sdata[idx]->hdr &&
+                  res[0]->sdata[idx]->hdr->allState ) {
+
+                AstFitsChan *fitschan=NULL;
+                JCMTState *allState = res[0]->sdata[idx]->hdr->allState;
+
+                fitschan = astFitsChan ( NULL, NULL, " " );
+
+                astSetFitsI( fitschan, "SEQSTART",
+                             allState[shortstart].rts_num,
+                             "RTS index number of first frame", 0 );
+                astSetFitsI( fitschan, "SEQEND",
+                             allState[shortend].rts_num,
+                             "RTS index number of last frame", 0 );
+                kpgPtfts( mapdata->file->ndfid, fitschan, status );
+
+                if( fitschan ) fitschan = astAnnul( fitschan );
+              }
+
             }
 
             /* Write WCS */
