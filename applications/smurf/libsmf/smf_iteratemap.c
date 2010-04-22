@@ -1911,7 +1911,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
               sprintf(tempstr, "CH%02zd", contchunk);
               one_strlcat( name, tempstr, sizeof(name), status );
             }
-            sprintf( thisshort, "SH%04zu", sc );
+            sprintf( thisshort, "SH%06zu", sc );
             one_strlcat( name, thisshort, sizeof(name), status );
             mgrp = grpNew( "shortmap", status );
             grpPut1( mgrp, name, 0, status );
