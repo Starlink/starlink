@@ -70,11 +70,13 @@
 *     2009-07-06 (TIMJ):
 *        Call atlRmblft to remove contiguous blank lines on input header.
 *        This will be called by atlMgfts but only if we are merging headers.
+*     2010-04-22 (TIMJ):
+*        Allow header merging even if a date is not available.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2007 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2007-2009 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -103,6 +105,7 @@
 #include "ast.h"
 #include "mers.h"
 #include "star/atl.h"
+#include "smf_err.h"
 
 static void
 smf__fits_copy_items( AstFitsChan * fromfits, AstFitsChan * tofits,
@@ -191,11 +194,20 @@ void smf_fits_outhdr( AstFitsChan * inhdr, AstFitsChan ** outhdr,
 
      /* Do not have access to smfData so need to set one up or duplicate code
         in smf_find_dateobs */
-     hdr.allState = NULL;
-     hdr.fitshdr = inhdr;
-     smf_find_dateobs( &hdr, &mjdnew, NULL, status );
-     hdr.fitshdr = *outhdr;
-     smf_find_dateobs( &hdr, &mjdref, NULL, status );
+     if (*status == SAI__OK) {
+       hdr.allState = NULL;
+       hdr.fitshdr = inhdr;
+       smf_find_dateobs( &hdr, &mjdnew, NULL, status );
+       hdr.fitshdr = *outhdr;
+       smf_find_dateobs( &hdr, &mjdref, NULL, status );
+       if (*status == SMF__NOKWRD) {
+         /* if there is no date information we just do what we can */
+         errAnnul( status );
+         mjdnew = 0.0;
+         mjdref = 0.0;
+       }
+
+     }
 
      if (mjdnew < mjdref) {
        /* input header is older than merged header:
@@ -209,7 +221,7 @@ void smf_fits_outhdr( AstFitsChan * inhdr, AstFitsChan ** outhdr,
           Copy beginfits from MERGE to INPUT
           Copy endfits from INPUT to MERGE
 
-          Do this even if dates are identical.
+          Do this even if dates are identical or if we could not read a date.
         */
        begfits = astCopy( *outhdr );
        endfits = astCopy( inhdr );
