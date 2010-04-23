@@ -79,6 +79,7 @@
 *     2010-04-23 (TIMJ):
 *        Force "not a time series" mode since we do get some images that
 *        have a dummy third dimension but won't have JCMTSTATE.
+*        Fix dimensionality test.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -250,12 +251,12 @@ void smurf_stackframes( int *status ) {
 
 	} else {
 	  /* check dimensionality */
-	  if (*status != SAI__OK) {
+	  if (*status == SAI__OK) {
 	    for (j = 1; j <= ndims; j++) {
 	      if ( refdims[j-1] != (data->dims)[j-1] ) {
 		*status = SAI__ERROR;
-		errRepf( " ", "Dimension %zu of file %zu differs from that of the first file",
-			 status, i, j );
+		errRepf( " ", "Dimension %zu of file %zu differs from that of the first file (%zu != %zu)",
+			 status, j, i, refdims[j-1], (data->dims)[j-1] );
 		break;
 	      }
 	    }
