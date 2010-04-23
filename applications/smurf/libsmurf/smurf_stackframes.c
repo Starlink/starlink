@@ -286,7 +286,7 @@ void smurf_stackframes( int *status ) {
     }
 
     /* Store the first WCS */
-    if (i==1) {
+    if (i==1 && *status == SAI__OK) {
       framewcs = astClone( data->hdr->wcs );
     }
 
