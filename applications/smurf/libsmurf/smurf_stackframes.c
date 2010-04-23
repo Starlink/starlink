@@ -76,6 +76,9 @@
 *     2010-04-19 (TIMJ):
 *        Propagate the bad bits mask from the inputs.
 *        Use atlAddWcsAxis.
+*     2010-04-23 (TIMJ):
+*        Force "not a time series" mode since we do get some images that
+*        have a dummy third dimension but won't have JCMTSTATE.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -197,7 +200,7 @@ void smurf_stackframes( int *status ) {
     smfData * data = NULL;
     unsigned char bb = 0;
 
-    smf_open_file( igrp, i, "READ", SMF__NOCREATE_DATA, &data, status);
+    smf_open_file( igrp, i, "READ", SMF__NOCREATE_DATA|SMF__NOTTSERIES, &data, status);
     if (*status == SAI__OK) {
       /* Remove trailing dims that are size 1 */
       size_t j;
@@ -360,7 +363,7 @@ void smurf_stackframes( int *status ) {
      header this time around */
   for (i = 1; i <= size; i++ ) {
     smfData * data = NULL;
-    smf_open_file( igrp, sortinfo[i-1].index, "READ", SMF__NOCREATE_HEAD, &data, status );
+    smf_open_file( igrp, sortinfo[i-1].index, "READ", SMF__NOCREATE_HEAD|SMF__NOTTSERIES, &data, status );
     if (*status != SAI__OK) break;
     if (dosort) times[i-1] = sortinfo[i-1].mjd;
 
