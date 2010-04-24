@@ -649,7 +649,7 @@ void ndfSbad( int bad,
               const char *comp,
               int *status );
 
-void ndfSbb( signed char badbit,
+void ndfSbb( unsigned char badbit,
              int indf,
              int *status );
 

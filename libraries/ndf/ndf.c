@@ -41,6 +41,7 @@
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 *     PWD: Peter W. Draper (JAC, Durham University)
 *     DSB: David S Berry (JAC, UCLan)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     <{enter_new_authors_here}>
 
 *  History:
@@ -64,6 +65,8 @@
 *        Added ndfHsdat.
 *     24-JUN-2009 (DSB):
 *        Fix memory allocation error in ndfHout_froutin.
+*     2010-04-23 (TIMJ):
+*        Synchronize args for ndfBb and ndfSbb
 *     <{enter_further_changes_here}>
 *-
 */
@@ -3005,23 +3008,23 @@ DECLARE_INTEGER(fstatus);
    return;
 }
 
-F77_SUBROUTINE(ndf_sbb)( BYTE(badbit),
+F77_SUBROUTINE(ndf_sbb)( UBYTE(badbit),
                          INTEGER(indf),
                          INTEGER(status) );
 
-void ndfSbb( signed char badbit,
+void ndfSbb( unsigned char badbit,
              int indf,
              int *status ) {
 
-DECLARE_BYTE(fbadbit);
+DECLARE_UBYTE(fbadbit);
 DECLARE_INTEGER(findf);
 DECLARE_INTEGER(fstatus);
 
-   F77_EXPORT_BYTE( badbit, fbadbit );
+   F77_EXPORT_UBYTE( badbit, fbadbit );
    F77_EXPORT_INTEGER( indf, findf );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_sbb)( BYTE_ARG(&fbadbit),
+   F77_CALL(ndf_sbb)( UBYTE_ARG(&fbadbit),
                       INTEGER_ARG(&findf),
                       INTEGER_ARG(&fstatus) );
 
