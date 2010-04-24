@@ -138,15 +138,12 @@ void smurf_stackframes( int *status ) {
   unsigned char badbit = 0;      /* Default bad bits mask */
   int dosort = 0;                /* Sort into time order? */
   AstFitsChan *fchan = NULL;     /* FitsChan holding output NDF FITS extension */
-  AstFrame * frame2d;            /* 2D frame from input image */
   AstObject * framewcs = NULL;   /* input WCS frame */
-  AstFrame * gridfrm;            /* 3d grid frame */
   size_t i;                      /* counter */
   Grp *igrp = NULL;              /* Input files */
   int indf;                      /* Input NDF identifer */
   int itemp;                     /* Temporary int */
   int lbnd[NDF__MXDIM];          /* Lower bounds of output */
-  AstShiftMap * map2d;
   char ndftype[NDF__SZTYP+1];    /* type of data array */
   Grp *ogrp = NULL;              /* Output group */
   char * odatad = NULL;          /* Output data array as bytes */
@@ -169,8 +166,6 @@ void smurf_stackframes( int *status ) {
   AstTimeFrame * timefrm = NULL; /* Timeframe */
   AstLutMap *timemap = NULL;     /* Output time mapping */
   double * times = NULL;         /* Array of MJDs for each input file */
-  AstCmpMap * totmap;
-  AstCmpFrame *totfrm;
   int ubnd[NDF__MXDIM];          /* Upper bounds of output */
 
   if (*status != SAI__OK) return;
