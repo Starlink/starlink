@@ -66,6 +66,8 @@
 *  History:
 *     2010-03-17 (TIMJ):
 *        Original version.
+*     2010-04-23 (TIMJ):
+*        Sanity check for 0 returned matches.
 
 *-
 */
@@ -122,9 +124,18 @@ F77_SUBROUTINE(psx_wordexp)( CHARACTER(WORDS), INTEGER(CONTEXT),
         retval = wordexp( words, &(ContextPtr->pwordexp), 0 );
 
         if (retval == 0) {
-          ContextPtr->nextpos = 1;
-          F77_EXPORT_CHARACTER( (ContextPtr->pwordexp.we_wordv)[0],
-                                EXPAN, EXPAN_length );
+          if ( ContextPtr->pwordexp.we_wordc > 0 ) {
+            ContextPtr->nextpos = 1;
+            F77_EXPORT_CHARACTER( (ContextPtr->pwordexp.we_wordv)[0],
+                                  EXPAN, EXPAN_length );
+          } else {
+            ContextPtr->nextpos = 0;
+            F77_EXPORT_CHARACTER( "", EXPAN, EXPAN_length );
+            *STATUS = PSX__BDWXP;
+            psx1_rep_c( "PSX_WORDEXP_ERR3",
+                        "No matches for wildcard expansion",
+                        STATUS );
+          }
         } else {
           *STATUS = PSX__BDWXP;
           switch(retval) {
@@ -174,6 +185,7 @@ F77_SUBROUTINE(psx_wordexp)( CHARACTER(WORDS), INTEGER(CONTEXT),
       if (ContextPtr) {
         wordfree( &(ContextPtr->pwordexp) );
         cnfFree( ContextPtr );
+        ContextPtr = NULL;
       }
     }
   } else {
