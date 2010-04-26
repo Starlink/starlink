@@ -203,7 +203,7 @@
          ELSE
             CALL CHR_PUTD( MEAN, BUFFER, NOWAT )
          END IF
-         NOWAT = MAX( WASAT + 12, NOWAT + 1 )
+         NOWAT = MAX( WASAT + 11, NOWAT + 1 )
          WASAT = NOWAT
 
          HEADER( NOWAT: ) = ' Std. Dev.'
@@ -213,7 +213,7 @@
          ELSE
             CALL CHR_PUTD( STDEV, BUFFER, NOWAT )
          END IF
-         NOWAT = MAX( WASAT + 12, NOWAT + 1 )
+         NOWAT = MAX( WASAT + 11, NOWAT + 1 )
          WASAT = NOWAT
 
          HEADER( NOWAT: ) = ' Max.'
@@ -223,7 +223,7 @@
          ELSE
             CALL CHR_PUTD( DMAX, BUFFER, NOWAT )
          END IF
-         NOWAT = MAX( WASAT + 12, NOWAT + 1 )
+         NOWAT = MAX( WASAT + 11, NOWAT + 1 )
          WASAT = NOWAT
 
          HEADER( NOWAT: ) = ' Min.'
@@ -233,7 +233,7 @@
          ELSE
             CALL CHR_PUTD( DMIN, BUFFER, NOWAT )
          END IF
-         NOWAT = MAX( WASAT + 12, NOWAT + 1 )
+         NOWAT = MAX( WASAT + 11, NOWAT + 1 )
          WASAT = NOWAT
 
          HEADER( NOWAT: ) = ' Total'
@@ -243,12 +243,12 @@
          ELSE
             CALL CHR_PUTD( SUM, BUFFER, NOWAT )
          END IF
-         NOWAT = MAX( WASAT + 12, NOWAT + 1 )
+         NOWAT = MAX( WASAT + 11, NOWAT + 1 )
          WASAT = NOWAT
 
          HEADER( NOWAT: ) = ' No. Pixels'
          CALL CHR_PUTI( NGOOD, BUFFER, NOWAT )
-         NOWAT = MAX( WASAT + 12, NOWAT + 1 )
+         NOWAT = MAX( WASAT + 11, NOWAT + 1 )
          WASAT = NOWAT
 
          IF ( DATSRC .NE. ' ' ) THEN
