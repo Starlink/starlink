@@ -2733,7 +2733,7 @@ void gaiaArrayMaskData( ARRAYinfo *dataInfo, ARRAYinfo *maskInfo,
                 for ( i = 0; i < nel; i++ ) {                           \
                     maskValue = SWAP_INT_( maskPtr[i] );                \
                     if ( maskValue != VAL__BADI && maskValue < vlen ) { \
-                        if ( vptr[maskValue] )  {                       \
+                        if ( maskValue > -1 && vptr[maskValue] )  {     \
                             destptr[i] = dataPtr[i];                    \
                         }                                               \
                         else {                                          \
@@ -2825,7 +2825,7 @@ void gaiaArrayMaskData( ARRAYinfo *dataInfo, ARRAYinfo *maskInfo,
                 for ( i = 0; i < nel; i++ ) {                           \
                     maskValue = maskPtr[i];                             \
                     if ( maskValue != VAL__BADI && maskValue < vlen ) { \
-                        if ( vptr[maskValue] )  {                       \
+                        if ( maskValue > -1 && vptr[maskValue] )  {     \
                             destptr[i] = dataPtr[i];                    \
                         }                                               \
                         else {                                          \

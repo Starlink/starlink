@@ -26,6 +26,10 @@
     down and control page up and down left and right (requires the keyboard
     focus to be in the main image).
 
+    Negative mask values are implicitly excluded by the mask toolbox.
+    Previously if you supplied a mask containing negative values this
+    caused an access violation. These values are now correctly ignored.
+
   Hawaiki release
   ===============
 
