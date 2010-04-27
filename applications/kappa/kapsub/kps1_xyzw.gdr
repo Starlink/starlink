@@ -33,9 +33,9 @@
 
 *  Arguments:
 *     DIM1 = INTEGER (Given)
-*        The first dimension of the 2-dimensional array.
+*        The first dimension of the two-dimensional array.
 *     DIM2 = INTEGER (Given)
-*        The second dimension of the 2-dimensional array.
+*        The second dimension of the two-dimensional array.
 *     ARRAY( DIM1, DIM2 ) = ? (Given)
 *        The input data array.
 *     XAXIS( DIM1 ) = DOUBLE PRECISION (Given)
