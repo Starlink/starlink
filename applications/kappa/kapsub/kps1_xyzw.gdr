@@ -102,6 +102,7 @@
 *  Authors:
 *     SMB: Steven M Beard (ROE)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -113,6 +114,9 @@
 *     2007 July 5 (MJC):
 *        Made X, Y, Z, and W arrays the same generic type as the input
 *        array, renaming from KPG1_XYWZ.
+*     2010 April 26 (TIMJ):
+*        Do not let through data with bad variances (rather than setting
+*        the weight to 0).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -220,9 +224,9 @@
      :                               VAR( IX, IY ) )
                      ELSE
 
-*  The variance is bad. Assume it is infinite and set the weight to
-*  zero.
-                        W( NGOOD ) = 0<CONST>
+*  The variance is bad. Assume it is infinite and so remove the
+*  point.
+                        NGOOD = NGOOD - 1
                      END IF
 
 *  Keep track of the maximum weight so far.
