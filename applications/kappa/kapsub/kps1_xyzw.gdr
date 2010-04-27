@@ -21,10 +21,13 @@
 *     This routine converts a two-dimensional array into a list of x-y
 *     co-ordinates, data values and weights for each of the good pixels
 *     in the array.  The x-y co-ordinates come from the axis arrays
-*     supplied.  Bad pixels are ignored if BAD is .TRUE..  If VARWTS is
-*     .TRUE., weights are calculated from the reciprocal of the
-*     variance for each pixel, otherwise the weights are returned 1.0.
+*     supplied.  If variance weighting is selected (VARWTS is .TRUE.), 
+*     weights are calculated from the reciprocal of the variance for
+*     each pixel, otherwise the weights are returned set to 1.0.
 *
+*     If BAD is .TRUE., the returned lists exclude bad pixels, and any
+*     pixels with bad variance when variance weighting is selected.
+
 *     This is a variant of the KAPLIBS routine KPG1_XYZW in which the
 *     X, Y, Z, and W arrays take the same type as the input data array.
 
@@ -40,7 +43,7 @@
 *     YAXIS( DIM2 ) = DOUBLE PRECISION (Given)
 *        Y axis co-ordinates for the input data array.
 *     BAD = LOGICAL (Given)
-*        Flag indicating whether bad values are likely to be present.
+*        Flag indicating whether bad values or variances may be present.
 *     VARWTS = LOGICAL (Given)
 *        Flag indicating if the variance array contains valid data.
 *     VAR( DIM1, DIM2 ) = ? (Given)
@@ -58,7 +61,8 @@
 *     W( SIZE ) = ? (Returned)
 *        The weight for each pixel.
 *     NGOOD = INTEGER (Returned)
-*        The number of good pixels.
+*        The number of good pixels, having both a good value and
+*        weight.
 *     XMIN = DOUBLE PRECISION (Returned)
 *        Minimum x co-ordinate.
 *     XMAX = DOUBLE PRECISION (Returned)
@@ -80,7 +84,7 @@
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council.
 *     Copyright (C) 1995 Central Laboratory of the Research Councils.
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -117,6 +121,8 @@
 *     2010 April 26 (TIMJ):
 *        Do not let through data with bad variances (rather than setting
 *        the weight to 0).
+*     2010 April 27 (MJC):
+*        Exclude pixels with bad variance from the fit.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -224,8 +230,8 @@
      :                               VAR( IX, IY ) )
                      ELSE
 
-*  The variance is bad. Assume it is infinite and so remove the
-*  point.
+*  The variance is bad.  Ignore this pixel from the fit because its
+*  weight is indeterminate.
                         NGOOD = NGOOD - 1
                      END IF
 
