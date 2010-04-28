@@ -129,7 +129,7 @@
 *     Copyright (C) 1995, 1997-1998, 2004 Central Laboratory of the
 *     Research Councils.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2007-2009 Science and Technology Facilities Council.
+*     Copyright (C) 2007-2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -194,6 +194,12 @@
 *     2009 December 19 (MJC):
 *        Instead of a fixed work array use a dynamic workspace whose
 *        type depends on the fit type.
+*     2010 April 28 (MJC):
+*        Permit output VARIANCE for the spline fit now that component
+*        SURFACEFIT.RMS is used.  This feature had been disabled because
+*        at one time variance was taken from the SURFACEFIT.FIT.VARIANCE 
+*        component which, however, was not present in the BSPLINE 
+*        variant.
 *     {enter_further_changes_here}
 
 *-
@@ -421,9 +427,6 @@
          CALL KPS1_BS2GE( FLOC, MXPAR, NXKNOT, NYKNOT, XKNOT, YKNOT,
      :                    SCALE, COEFF, %VAL( CNF_PVAL( WRKPTR ) ),
      :                    STATUS )
-
-*  There's no variance as yet in the SPLINE variant.
-         CREVAR = .FALSE.
 
 *  Set the fit limits from the exterior knots.
          PXMIN = DBLE( XKNOT( 1 ) )
