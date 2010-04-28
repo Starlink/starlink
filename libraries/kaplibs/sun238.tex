@@ -9388,8 +9388,8 @@ related items to be removed.
       \sstsubsection{
          MEDIUM = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         The medium containing the FITS file.  Currently supported are
-         {\tt '}DISK{\tt '} for a disk file, and {\tt '}TAPE{\tt '} for standard magnetic tape.
+         The medium containing the FITS file.  Currently supported is
+         {\tt '}DISK{\tt '} for a disk file.
       }
       \sstsubsection{
          MD = INTEGER (Given)
@@ -9672,8 +9672,8 @@ related items to be removed.
       \sstsubsection{
          MEDIUM = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         The medium containing the FITS file.  Currently supported are
-         {\tt '}DISK{\tt '} for a disk file, and {\tt '}TAPE{\tt '} for standard magnetic tape.
+         The medium containing the FITS file.  Currently supported is
+         {\tt '}DISK{\tt '} for a disk file.
       }
       \sstsubsection{
          MD     = INTEGER (Given)
@@ -10064,8 +10064,8 @@ related items to be removed.
       \sstsubsection{
          MEDIUM = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         The medium containing the FITS file.  Currently supported are
-         {\tt '}DISK{\tt '} for a disk file, and {\tt '}TAPE{\tt '} for standard magnetic tape.
+         The medium containing the FITS file.  Currently supported is
+         {\tt '}DISK{\tt '} for a disk file.
       }
       \sstsubsection{
          MD     = INTEGER (Given)
@@ -10238,8 +10238,8 @@ related items to be removed.
       \sstsubsection{
          MEDIUM = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         The medium containing the FITS file.  Currently supported are
-         {\tt '}DISK{\tt '} for a disk file, and {\tt '}TAPE{\tt '} for standard magnetic tape.
+         The medium containing the FITS file.  Currently supported is
+         {\tt '}DISK{\tt '} for a disk file.
       }
       \sstsubsection{
          MD     = INTEGER (Given)
@@ -10663,8 +10663,8 @@ related items to be removed.
       \sstsubsection{
          MEDIUM = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         The medium containing the FITS file.  Currently supported are
-         {\tt '}DISK{\tt '} for a disk file, and {\tt '}TAPE{\tt '} for standard magnetic tape.
+         The medium containing the FITS file.  Currently supported is
+         {\tt '}DISK{\tt '} for a disk file.
       }
       \sstsubsection{
          MD     = INTEGER (Given)
@@ -10735,76 +10735,6 @@ related items to be removed.
       }{
          Global status value.
       }
-   }
-}
-\sstroutine{
-   FTS1\_TREAD
-}{
-   Obtains a FITS record from a tape file
-}{
-   \sstdescription{
-      This routine reads the byte stream from the FITS tape file
-      and extracts a FITS record of 2880 bytes.  The blocksize of
-      the tape file is arbitrary save that it be no more than the
-      maximum FITS blocksize of 28800.
-   }
-   \sstinvocation{
-       CALL FTS1\_TREAD ( FD, BLKSIZ, ACTSIZ, BUFFER, OFFSET, RECORD,
-      :                  STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         FD = INTEGER (Given)
-      }{
-         The tape descriptor.
-      }
-      \sstsubsection{
-         BLKSIZ = INTEGER (Given)
-      }{
-         The maximum blocksize and dimension of the tape block.
-      }
-      \sstsubsection{
-         ACTSIZ = INTEGER (Given and Returned)
-      }{
-         The actual block size.  This need not be a multiple of the
-         FITS record length of 2880 bytes.  It must be known on input.
-      }
-      \sstsubsection{
-         BUFFER( ACTSIZ ) = BYTE (Given and Returned)
-      }{
-         The buffer containing the block of data. This is only read
-         when \%OFFSET does not equal \%ACTSIZ, i.e. there are some
-         non-header data within it.
-      }
-      \sstsubsection{
-         OFFSET = INTEGER (Given and Returned)
-      }{
-         The number of bytes in the current block already interpreted.
-      }
-      \sstsubsection{
-         RECORD( 2880 ) = BYTE (Returned)
-      }{
-         The current FITS record.  Successive calls will read of the
-         FITS records in sequence.
-      }
-      \sstsubsection{
-         STATUS  = INTEGER (Given and Returned)
-      }{
-         Global status value.
-      }
-   }
-   \sstdiytopic{
-      Prior requirements
-   }{
-      \sstitemlist{
-
-         \sstitem
-         The tape file should already be open and the first block
-         read.
-      }
-   }
-   \sstbugs{
-      None known.
    }
 }
 \sstroutine{

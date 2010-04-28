@@ -9,6 +9,8 @@ applications (see SUN/238).
 Version 3.1
    - Remove FTS1_TREAD since the MAG library has now been removed from the
      main Starlink source tree.
+   - New C function kpg1Config gets a KeyMap containing configuration 
+     parameters from the user, with name checking and default values supplied.
 
 Version 3.0
    - CCG routines' NBAD argument excludes bad elements not attributable
