@@ -1212,12 +1212,19 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
           if( !allbad ) {
              smf_stats1D( corr, 1, nbolo, NULL, 0, 0, &cmean, &csig, &cgood,
                           status );
-             msgSeti("B",iblock);
-             msgSeti("N",cgood);
-             msgOutif( MSG__VERB, "", "    Block ^B has ^N good bolos", status );
-             msgOutiff( MSG__DEBUG, "",
-                        "    corr coeff %8.5f +/- %8.5f", status, cmean, csig );
-          } else {
+             if( *status == SMF__INSMP ) {
+                errAnnul( status );
+                allbad = 1;
+             } else {
+                msgSeti("B",iblock);
+                msgSeti("N",cgood);
+                msgOutif( MSG__VERB, "", "    Block ^B has ^N good bolos", status );
+                msgOutiff( MSG__DEBUG, "",
+                           "    corr coeff %8.5f +/- %8.5f", status, cmean, csig );
+             }
+          }
+
+          if( allbad ) {
              cgood = 0;
              msgSeti("B",iblock);
              msgOutif( MSG__VERB, "", "    Block ^B has no good bolos", status );
@@ -1225,9 +1232,15 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
           if( !allbad ) {
              smf_stats1D( gcoeff, 1, nbolo, NULL, 0, 0, &gmean, &gsig, &ggood, status );
-             msgOutiff( MSG__DEBUG, " ",
-                        "    log(gain coeff) %8.5f +/- %8.5f", status,
-                        gmean, gsig);
+             if( *status == SMF__INSMP ) {
+                errAnnul( status );
+                allbad = 1;
+                cgood = 0;
+             } else {
+                msgOutiff( MSG__DEBUG, " ",
+                           "    log(gain coeff) %8.5f +/- %8.5f", status,
+                           gmean, gsig);
+             }
           } else {
              ggood = 0;
           }
