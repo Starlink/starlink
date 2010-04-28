@@ -544,6 +544,29 @@ c  Test putting single elements into vector entries.
       end if
 
       call ast_mapput0c( map, ' B', 'Hello', ' ', status )
+
+
+      call ast_setl( map, 'MapLocked', .TRUE., status )
+      if( status .eq. sai__ok ) then
+         call ast_mapput0c( map, ' BZZ', 'Bye Bye', ' ', STATUS )
+         if( status .eq. ast__badkey ) then
+            call err_annul( status )
+            call ast_clear( map, 'maplocked', status )
+         else
+            call stopit( status, 'Error GETELEM_12B' )
+         end if
+      end if
+
+
+
+
+
+
+
+
+
+
+
       call ast_mapputelemc( map, ' B ', 3, 'YES YES', STATUS )
 
       if( ast_maplength( map, ' B', status ) .ne. 2 ) then

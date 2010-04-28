@@ -173,8 +173,6 @@ OPRIN           <operation specifier invalid>
 NONIN           <no inside point found>
 MPKER           <requested key not found in KeyMap>
 MPPER           <error putting a named value into a KeyMap>
-
-
-
+BADKEY		<Attempt made to add an entry to a locked KeyMap>
 
 .END

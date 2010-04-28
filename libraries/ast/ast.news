@@ -16,6 +16,11 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
+- The KeyMap class has a new boolean attribute called MapLocked. If true 
+(non-zero), an error is reported if an attempt is made to add any new entries 
+to a KeyMap (the value associated with any old entry may still be changed #
+without error). The default is false (zero).
+
 - The Object class has a new method called astHasAttribute/AST_HASATTRIBUTE
 that returns a boolean value indicating if a specified Object has a named
 attribute.

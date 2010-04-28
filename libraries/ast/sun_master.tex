@@ -21878,6 +21878,23 @@ current version):
 
 \begin{enumerate}
 
+\item The KeyMap class has a new boolean attribute called MapLocked. If
+c+
+non-zero,
+c-
+f+
+.TRUE.,
+f-
+an error is reported if an attempt is made to add any new entries
+to a KeyMap (the value associated with any old entry may still be changed
+without error). The default is 
+c+
+zero.
+c-
+f+
+.FALSE.
+f-
+
 \item The Object class has a new method called astHasAttribute/AST\_HASATTRIBUTE
 that returns a boolean value indicating if a specified Object has a named
 attribute.

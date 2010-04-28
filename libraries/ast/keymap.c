@@ -34,6 +34,7 @@ c     void pointer,
 *
 *     - KeyError: Report an error if the requested key does not exist?
 *     - SizeGuess: The expected size of the KeyMap.
+*     - MapLocked: Prevent new entries being added to the KeyMap?
 
 *  Functions:
 c     In addition to those functions applicable to all Objects, the
@@ -138,6 +139,8 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map.
 *         "<bad>" as the formatted version of AST__BAD.
 *     3-MAR-2010 (DSB):
 *         Added astMapPutElem<X>.
+*     27-APR-2010 (DSB):
+*         Added MapLocked attribute.
 *class--
 */
 
@@ -392,6 +395,7 @@ static int MapLenC( AstKeyMap *, const char *, int * );
 static int MapLength( AstKeyMap *, const char *, int * );
 static int MapSize( AstKeyMap *, int * );
 static int MapType( AstKeyMap *, const char *, int * );
+static int RemoveTableEntry( AstKeyMap *, int, const char *, int * );
 static size_t SizeOfEntry( AstMapEntry *, int * );
 static void CheckCircle( AstKeyMap *, AstObject *, const char *, int * );
 static void Copy( const AstObject *, AstObject *, int * );
@@ -415,7 +419,6 @@ static void MapPut1F( AstKeyMap *, const char *, int, const float *, const char 
 static void MapPut1I( AstKeyMap *, const char *, int, const int *, const char *, int * );
 static void MapRemove( AstKeyMap *, const char *, int * );
 static void NewTable( AstKeyMap *, int, int * );
-static void RemoveTableEntry( AstKeyMap *, int, const char *, int * );
 
 static const char *GetAttrib( AstObject *, const char *, int * );
 static int TestAttrib( AstObject *, const char *, int * );
@@ -431,6 +434,11 @@ static int GetKeyError( AstKeyMap *, int * );
 static int TestKeyError( AstKeyMap *, int * );
 static void ClearKeyError( AstKeyMap *, int * );
 static void SetKeyError( AstKeyMap *, int, int * );
+
+static int GetMapLocked( AstKeyMap *, int * );
+static int TestMapLocked( AstKeyMap *, int * );
+static void ClearMapLocked( AstKeyMap *, int * );
+static void SetMapLocked( AstKeyMap *, int, int * );
 
 #if defined(THREAD_SAFE)
 static int ManageLock( AstObject *, int, int, AstObject **, int * );
@@ -661,6 +669,11 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
 /* --------- */
    } else if ( !strcmp( attrib, "keyerror" ) ) {
       astClearKeyError( this );
+
+/* MapLocked. */
+/* --------- */
+   } else if ( !strcmp( attrib, "maplocked" ) ) {
+      astClearMapLocked( this );
 
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
@@ -1917,6 +1930,15 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
          result = getattrib_buff;
       }
 
+/* MapLocked. */
+/* --------- */
+   } else if ( !strcmp( attrib, "maplocked" ) ) {
+      ival = astGetMapLocked( this );
+      if ( astOK ) {
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
+      }
+
 /* If the attribute name was not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
@@ -2381,6 +2403,11 @@ void astInitKeyMapVtab_(  AstKeyMapVtab *vtab, const char *name, int *status ) {
    vtab->SetKeyError = SetKeyError;
    vtab->GetKeyError = GetKeyError;
    vtab->TestKeyError = TestKeyError;
+
+   vtab->ClearMapLocked = ClearMapLocked;
+   vtab->SetMapLocked = SetMapLocked;
+   vtab->GetMapLocked = GetMapLocked;
+   vtab->TestMapLocked = TestMapLocked;
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
@@ -2856,6 +2883,7 @@ static void MapPut0##X( AstKeyMap *this, const char *key, Xtype value, \
    char *p;                /* Pointer to next key character */ \
    int itab;               /* Index of hash table element to use */ \
    int keylen;             /* Length of supplied key string */ \
+   int there;              /* Did the entry already exist in the KeyMap? */ \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
@@ -2899,11 +2927,17 @@ static void MapPut0##X( AstKeyMap *this, const char *key, Xtype value, \
       itab = HashFun( mapentry->key, this->mapsize - 1, &(mapentry->hash), status ); \
 \
 /* Remove any existing entry with the given key from the table element. */ \
-      RemoveTableEntry( this, itab, mapentry->key, status ); \
+      there = RemoveTableEntry( this, itab, mapentry->key, status ); \
+\
+/* If the KeyMap is locked we report an error if an attempt is made to add a value for \
+   a new key. */ \
+      if( !there && astGetMapLocked( this ) ) { \
+         astError( AST__BADKEY, "astMapPut0" #X "(%s): Failed to add item \"%s\" to a KeyMap: " \
+                   "\"%s\" is not a known item.", status, astGetClass( this ), key, key ); \
 \
 /* If all has gone OK, store the new entry at the head of the linked list \
    associated with the selected table entry. */ \
-      if( astOK ) { \
+      } else if( astOK ) { \
          mapentry = AddTableEntry( this, itab, mapentry, status ); \
 \
 /* If anything went wrong, try to delete the new entry. */ \
@@ -3051,6 +3085,7 @@ static void MapPut1##X( AstKeyMap *this, const char *key, int size, \
    int itab;               /* Index of hash table element to use */ \
    int i;                  /* Loop count */ \
    int keylen;             /* Length of supplied key string */ \
+   int there;              /* Did the entry already exist in the KeyMap? */ \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
@@ -3098,11 +3133,17 @@ static void MapPut1##X( AstKeyMap *this, const char *key, int size, \
       itab = HashFun( mapentry->key, this->mapsize - 1, &(mapentry->hash), status ); \
 \
 /* Remove any existing entry with the given key from the table element. */ \
-      RemoveTableEntry( this, itab, mapentry->key, status ); \
+      there = RemoveTableEntry( this, itab, mapentry->key, status ); \
+\
+/* If the KeyMap is locked we report an error if an attempt is made to add a value for \
+   a new key. */ \
+      if( !there && astGetMapLocked( this ) ) { \
+         astError( AST__BADKEY, "astMapPut1" #X "(%s): Failed to add item \"%s\" to a KeyMap: " \
+                   "\"%s\" is not a known item.", status, astGetClass( this ), key, key ); \
 \
 /* If all has gone OK, store the new entry at the head of the linked list \
    associated with the selected table entry. */ \
-      if( astOK ) { \
+      } else if( astOK ) { \
          mapentry = AddTableEntry( this, itab, mapentry, status ); \
 \
 /* If anything went wrong, try to delete the new entry. */ \
@@ -3183,6 +3224,7 @@ void astMapPut1AId_( AstKeyMap *this, const char *key, int size,
    int itab;               /* Index of hash table element to use */
    int i;                  /* Loop count */
    int keylen;             /* Length of supplied key string */
+   int there;              /* Did the entry already exist in the KeyMap? */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -3228,11 +3270,17 @@ void astMapPut1AId_( AstKeyMap *this, const char *key, int size,
       itab = HashFun( mapentry->key, this->mapsize - 1, &(mapentry->hash), status );
 
 /* Remove any existing entry with the given key from the table element. */
-      RemoveTableEntry( this, itab, mapentry->key, status );
+      there = RemoveTableEntry( this, itab, mapentry->key, status );
+
+/* If the KeyMap is locked we report an error if an attempt is made to add a value for
+   a new key. */
+      if( !there && astGetMapLocked( this ) ) {
+         astError( AST__BADKEY, "astMapPut1A(%s): Failed to add item \"%s\" to a KeyMap: "
+                   "\"%s\" is not a known item.", status, astGetClass( this ), key, key );
 
 /* If all has gone OK, store the new entry at the head of the linked list
    associated with the selected table entry. */
-      if( astOK ) {
+      } else if( astOK ) {
          mapentry = AddTableEntry( this, itab, mapentry, status );
 
 /* If anything went wrong, try to delete the new entry. */
@@ -4946,7 +4994,7 @@ f        The global status.
    itab = HashFun( key, this->mapsize - 1, &hash, status );
 
 /* Search the relevent table entry for the required MapEntry and remove it. */
-   RemoveTableEntry( this, itab, key, status );
+   (void) RemoveTableEntry( this, itab, key, status );
 
 }
 
@@ -5704,7 +5752,7 @@ static void NewTable( AstKeyMap *this, int size, int *status ){
    }
 }
 
-static void RemoveTableEntry( AstKeyMap *this, int itab, const char *key, int *status ){
+static int RemoveTableEntry( AstKeyMap *this, int itab, const char *key, int *status ){
 /*
 *  Name:
 *     RemoveTableEntry
@@ -5717,7 +5765,7 @@ static void RemoveTableEntry( AstKeyMap *this, int itab, const char *key, int *s
 
 *  Synopsis:
 *     #include "keymap.h"
-*     void RemoveTableEntry( AstKeyMap *this, int itab, const char *key, int *status )
+*     int RemoveTableEntry( AstKeyMap *this, int itab, const char *key, int *status )
 
 *  Class Membership:
 *     KeyMap member function.
@@ -5738,14 +5786,21 @@ static void RemoveTableEntry( AstKeyMap *this, int itab, const char *key, int *s
 *     status
 *        Pointer to the inherited status variable.
 
+*  Returned Value:
+*     Non-zero if the specified key was found. Zero otherwise.
+
 */
 
 /* Local Variables: */
    AstMapEntry **link;    /* Address to store foward link */
    AstMapEntry *next;     /* Pointer to next Entry to copy */
+   int result;
+
+/* Initialise */
+   result = 0;
 
 /* Check the global error status. */
-   if ( !astOK ) return;
+   if ( !astOK ) return result;
 
 /* The "next" variable holds the address of the next MapEntry to be
    checked. Initialise this to the MapEntry at the head of the linked
@@ -5776,6 +5831,9 @@ static void RemoveTableEntry( AstKeyMap *this, int itab, const char *key, int *s
 /* Set up the next MapEntry to be freed. */
          next = *link;
 
+/* Indicate we have found the key. */
+         result = 1;
+
 /* If the key for the current entry does not match the supplied key... */
       } else {
 
@@ -5787,6 +5845,9 @@ static void RemoveTableEntry( AstKeyMap *this, int itab, const char *key, int *s
          next = next->next;
       }
    }
+
+/* Return the result */
+   return result;
 }
 
 static AstMapEntry *SearchTableEntry( AstKeyMap *this, int itab, const char *key, int *status ){
@@ -5931,13 +5992,19 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
         && ( nc >= len ) ) {
       astSetSizeGuess( this, ival );
 
-
 /* KeyError. */
 /* --------- */
    } else if ( nc = 0,
         ( 1 == astSscanf( setting, "keyerror= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
       astSetKeyError( this, ival );
+
+/* MapLocked. */
+/* --------- */
+   } else if ( nc = 0,
+        ( 1 == astSscanf( setting, "maplocked= %d %n", &ival, &nc ) )
+        && ( nc >= len ) ) {
+      astSetMapLocked( this, ival );
 
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
@@ -6155,6 +6222,11 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
    } else if ( !strcmp( attrib, "keyerror" ) ) {
       result = astTestKeyError( this );
 
+/* MapLocked. */
+/* --------- */
+   } else if ( !strcmp( attrib, "maplocked" ) ) {
+      result = astTestMapLocked( this );
+
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
@@ -6288,6 +6360,43 @@ astMAKE_GET(KeyMap,KeyError,int,0,( ( this->keyerror != -INT_MAX ) ?
                                    this->keyerror : 0 ))
 astMAKE_SET(KeyMap,KeyError,int,keyerror,( value != 0 ))
 astMAKE_TEST(KeyMap,KeyError,( this->keyerror != -INT_MAX ))
+
+/*
+*att++
+*  Name:
+*     MapLocked
+
+*  Purpose:
+*     Prevent new entries being added to a KeyMap?
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer (boolean).
+
+*  Description:
+*     If this boolean attribute is set to
+c     a non-zero value,
+f     .TRUE.,
+*     an error will be reported if an attempt is made to add a new entry
+*     to the KeyMap. Note, the value associated with any existing entries
+*     can still be changed, but no new entries can be stored in the KeyMap.
+*     The default value
+c     (zero)
+f     (.FALSE.)
+*     allows new entries to be added to the KeyMap.
+
+*  Applicability:
+*     KeyMap
+*        All KeyMaps have this attribute.
+*att--
+*/
+astMAKE_CLEAR(KeyMap,MapLocked,maplocked,-INT_MAX)
+astMAKE_GET(KeyMap,MapLocked,int,0,( ( this->maplocked != -INT_MAX ) ?
+                                   this->maplocked : 0 ))
+astMAKE_SET(KeyMap,MapLocked,int,maplocked,( value != 0 ))
+astMAKE_TEST(KeyMap,MapLocked,( this->maplocked != -INT_MAX ))
 
 /* Copy constructor. */
 /* ----------------- */
@@ -6459,6 +6568,12 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
    set = TestKeyError( this, status );
    ival = set ? GetKeyError( this, status ) : astGetKeyError( this );
    astWriteInt( channel, "KyErr", set, 0, ival, "Report non-existant keys?" );
+
+/* MapLocked. */
+/* --------- */
+   set = TestMapLocked( this, status );
+   ival = set ? GetMapLocked( this, status ) : astGetMapLocked( this );
+   astWriteInt( channel, "MpLck", set, 0, ival, "Prevent addition of new entries?" );
 
 /* MapSize. */
 /* -------- */
@@ -6769,6 +6884,7 @@ AstKeyMap *astInitKeyMap_( void *mem, size_t size, int init, AstKeyMapVtab *vtab
       new->table = NULL;
       new->nentry = NULL;
       new->keyerror = -INT_MAX;
+      new->maplocked = -INT_MAX;
 
       NewTable( new, MIN_TABLE_SIZE, status );
 
@@ -6930,6 +7046,12 @@ AstKeyMap *astLoadKeyMap_( void *mem, size_t size, AstKeyMapVtab *vtab,
 /* --------- */
       new->keyerror = astReadInt( channel, "kyerr", -INT_MAX );
       if ( TestKeyError( new, status ) ) SetKeyError( new, new->keyerror, status );
+
+
+/* MapLocked. */
+/* --------- */
+      new->maplocked = astReadInt( channel, "mplck", -INT_MAX );
+      if ( TestMapLocked( new, status ) ) SetMapLocked( new, new->maplocked, status );
 
 /* MapSize. */
 /* -------- */

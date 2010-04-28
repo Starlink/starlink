@@ -122,6 +122,7 @@ typedef struct AstKeyMap {
    int *nentry;                        /* No. of Entries in each table element */
    int mapsize;                        /* Length of table */
    int keyerror;                       /* Report error if no key? */
+   int maplocked;                      /* Prevent addition of new entries? */
 } AstKeyMap;
 
 /* Virtual function table. */
@@ -186,6 +187,11 @@ typedef struct AstKeyMapVtab {
    int (* TestSizeGuess)( AstKeyMap *, int * );
    void (* SetSizeGuess)( AstKeyMap *, int, int * );
    void (* ClearSizeGuess)( AstKeyMap *, int * );
+
+   int (* GetMapLocked)( AstKeyMap *, int * );
+   int (* TestMapLocked)( AstKeyMap *, int * );
+   void (* ClearMapLocked)( AstKeyMap *, int * );
+   void (* SetMapLocked)( AstKeyMap *, int, int * );
 
    int (* GetKeyError)( AstKeyMap *, int * );
    int (* TestKeyError)( AstKeyMap *, int * );
@@ -312,6 +318,11 @@ int astGetKeyError_( AstKeyMap *, int * );
 int astTestKeyError_( AstKeyMap *, int * );
 void astSetKeyError_( AstKeyMap *, int, int * );
 void astClearKeyError_( AstKeyMap *, int * );
+
+int astGetMapLocked_( AstKeyMap *, int * );
+int astTestMapLocked_( AstKeyMap *, int * );
+void astSetMapLocked_( AstKeyMap *, int, int * );
+void astClearMapLocked_( AstKeyMap *, int * );
 #endif
 
 /* Function interfaces. */
@@ -421,6 +432,16 @@ astINVOKE(V,astGetKeyError_(astCheckKeyMap(this),STATUS_PTR))
 astINVOKE(V,astSetKeyError_(astCheckKeyMap(this),keyerror,STATUS_PTR))
 #define astTestKeyError(this) \
 astINVOKE(V,astTestKeyError_(astCheckKeyMap(this),STATUS_PTR))
+
+#define astClearMapLocked(this) \
+astINVOKE(V,astClearMapLocked_(astCheckKeyMap(this),STATUS_PTR))
+#define astGetMapLocked(this) \
+astINVOKE(V,astGetMapLocked_(astCheckKeyMap(this),STATUS_PTR))
+#define astSetMapLocked(this,maplocked) \
+astINVOKE(V,astSetMapLocked_(astCheckKeyMap(this),maplocked,STATUS_PTR))
+#define astTestMapLocked(this) \
+astINVOKE(V,astTestMapLocked_(astCheckKeyMap(this),STATUS_PTR))
+
 
 #else
 #define astMapGet0A(this,key,value) astINVOKE(V,astMapGet0AId_(astCheckKeyMap(this),key,(AstObject **)(value),STATUS_PTR))
