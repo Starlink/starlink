@@ -260,17 +260,15 @@ itcl::class gaia::GaiaAstDomain {
       for {set i 0} {$i < $ndomains} {incr i} {
          set system [lindex $domains_ $i]
          set index [expr $i+1]
-         if { ! [info exists added($system)] } {
-            set label $system
-            if { $index == $original_ } {
-               append label " (default)"
-            }
-            $itk_component(System) add \
-               -command [code $this set_domain $index] \
-               -label $label \
-               -value $index
-            set added($system) 1
+         set label $system
+         if { $index == $original_ } {
+            append label " (default)"
          }
+         $itk_component(System) add \
+            -command [code $this set_domain $index] \
+            -label $label \
+            -value $index
+         set added($system) 1
       }
       set_menu_default_
    }
