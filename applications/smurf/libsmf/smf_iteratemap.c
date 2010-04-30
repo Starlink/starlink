@@ -1767,7 +1767,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                   }
 
                   col = (k % res[0]->sdata[idx]->dims[1])+1;
-                  row = (k % res[0]->sdata[idx]->dims[1])+1;
+                  row = (k / res[0]->sdata[idx]->dims[1])+1;
 
                   sprintf( thisbol, "C%02luR%02lu",
                            col,   /* x-coord */
