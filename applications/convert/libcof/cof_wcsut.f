@@ -62,6 +62,10 @@
 *     20-SEP-2000 (DSB):
 *        Check that the number of axes in the current Frame is equal to
 *        the number of pixel axes in the NDF.
+*     30-APR-2010 (DSB):
+*        If the current Frame is removed because it is a duplicate of the 
+*        AXIS Frame, ensure that the real AXIS Frame is left as the current 
+*        Frame.
 *     {enter_further_changes_here}
 
 *-
@@ -186,9 +190,11 @@
                END DO
 
 *  Remove the Current Frame if it is a spurious copy of the AXIS Frame,
-*  and store the modified FrameSet back in the NDF.
+*  and store the modified FrameSet back in the NDF. Make frame 3 (AXIS)
+*  the current Frame.
                IF( ISAXIS ) THEN
                   CALL AST_REMOVEFRAME( IWCS, ICURR, STATUS )
+                  CALL AST_SETI( IWCS, 'Current', 3, STATUS )
                   CALL NDF_PTWCS( IWCS, INDF, STATUS )
                END IF
 
