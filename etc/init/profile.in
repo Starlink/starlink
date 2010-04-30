@@ -229,6 +229,12 @@ if test -f ${bindir}/cupid/cupid.sh; then
    export CUPID_HELP=${starhelpdir}/cupid/cupid
 fi
 
+#
+#  CURSA
+if test -f ${bindir}/cursa/cursa.csh; then
+   export CURSA_DIR=${bindir}/cursa
+fi
+
 #  DATACUBE
 
 if test -f ${bindir}/datacube/datacube.csh; then
@@ -505,6 +511,19 @@ else
   cupid () { ${STARLINK_DIR}/etc/notinst cupid; }
   cupidsetup () { ${STARLINK_DIR}/etc/notinst cupid; }
 fi
+
+#
+#   Cursa
+#
+
+if test -f ${bindir}/cursa/cursa.csh; then
+  cursa () { . $CURSA_DIR/cursa.sh; }
+  cursasetup () { . $CURSA_DIR/cursa.sh; }
+else
+  cursa () { ${STARLINK_DIR}/etc/notinst cursa; }
+  cursasetup () { ${STARLINK_DIR}/etc/notinst cursa; }
+fi
+
 
 #  DATACUBE
 

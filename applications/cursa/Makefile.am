@@ -2,7 +2,7 @@
 
 SUBDIRS = libcap
 
-bin_SCRIPTS = xcatview cursa_test.csh cursa.csh catcdsin \
+bin_SCRIPTS = xcatview cursa_test.csh cursa.csh cursa.sh catcdsin \
  catremote UrlReader.class UrlReader.java geturl cursa.cfg
 
 dist_noinst_SCRIPTS = cursa_link_adam
@@ -115,6 +115,13 @@ cursa.csh: cursa.csh.in
 	   $(srcdir)/cursa.csh.in >cursa.csh.tmp
 	mv cursa.csh.tmp cursa.csh
 
+cursa.sh: cursa.sh.in
+	rm -f cursa.sh.tmp cursa.sh
+	$(edit) \
+	   -e 's,@edited_input\@,cursa.sh: produced from cursa.sh.in by Makefile.am,' \
+	   $(srcdir)/cursa.sh.in >cursa.sh.tmp
+	mv cursa.sh.tmp cursa.sh
+
 cursa_test.csh: cursa_test.csh.in
 	rm -f cursa_test.csh.tmp cursa_test.csh
 	$(edit) \
@@ -126,13 +133,14 @@ dist_starnews_DATA = cursa.news
 
 dist_pkgdata_DATA = CURSA_CONDITIONS $(EXAMPLE_FILES)
 
-EXTRA_DIST = xcatview.in cursa_test.csh.in cursa.csh.in catcdsin.in \
-             catremote.in UrlReader.class UrlReader.java \
+EXTRA_DIST = xcatview.in cursa_test.csh.in cursa.csh.in cursa.sh.in \
+             catcdsin.in catremote.in UrlReader.class UrlReader.java \
              $(xcatviewsupport_DATA) $(cursasupport_DATA)
 
-CLEANFILES = version.dat catremote catcdsin cursa.csh cursa_test.csh xcatview \
-             catchart.ifc catchartrn.ifc catcoord.ifc catcopy.ifc catgrid.ifc \
-             catgscin.ifc catheader.ifc catpair.ifc catphotomfit.ifc catphotomlst.ifc \
-             catphotomtrn.ifc catselect.ifc catsort.ifc cursa catview cursa.ifc cursa.ifl \
+CLEANFILES = version.dat catremote catcdsin cursa.cshcursa.sh cursa_test.csh \
+             xcatview catchart.ifc catchartrn.ifc catcoord.ifc catcopy.ifc \
+             catgrid.ifc catgscin.ifc catheader.ifc catpair.ifc \
+             catphotomfit.ifc catphotomlst.ifc catphotomtrn.ifc \
+             catselect.ifc catsort.ifc cursa catview cursa.ifc cursa.ifl \
              catview.ifc
 
