@@ -24,7 +24,7 @@ cincludedir = $(includedir)/star
 include_HEADERS = $(PUBLIC_INCLUDES)
 cinclude_HEADERS = $(PUBLIC_C_INCLUDES)
 
-include_MESSAGES = NDG_ERR
+include_MESSAGES = NDG_ERR ndg_err.h
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
@@ -62,4 +62,4 @@ dist_starnews_DATA = ndg.news
 dist_pkgdata_DATA = LICENCE
 CLEANFILES = TOM.sdf DICK.sdf HARRY.sdf 
 
-
+BUILT_SOURCES = NDG_ERR ndg_err.h

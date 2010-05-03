@@ -21,3 +21,5 @@ ctg1_fpars.f ctg1_gtyps.f ctg1_match.f ctg1_sort.f  ctg1_subst.f \
 ctg_catas.f  ctg_catcr.f  ctg_gtsup.f  ctg_ptsup.f  ctg_setsz.f
 
 ADAM_F_ROUTINES = ctg_asso1.f ctg_assoc.f ctg_crea1.f ctg_creat.f 
+
+BUILT_SOURCES = CTG_ERR
