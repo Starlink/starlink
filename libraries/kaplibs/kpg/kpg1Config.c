@@ -43,6 +43,10 @@ AstKeyMap *kpg1Config( const char *param, const char *def, int *status ){
 *     status
 *        The inherited status.
 
+*  Notes:
+*     - The KeyError attribute is set non-zero in the returned KeyMap so that an error 
+*     will be reported by astMapGet<X> if the requested key does not exist in the KeyMap.  
+
 *  Returned Value:
 *     A pointer to the AST KeyMap, or NULL if an error occurrs.
 
@@ -73,6 +77,8 @@ AstKeyMap *kpg1Config( const char *param, const char *def, int *status ){
 *  History:
 *     28-APR-2010 (DSB):
 *        Original version.
+*     4-MAY-2010 (DSB):
+*        Set KeyError attribute non-zero in the returned KeyMap.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -131,6 +137,11 @@ AstKeyMap *kpg1Config( const char *param, const char *def, int *status ){
    the KeyMap. */
       if( ! astChrMatch( value, "DEF" ) ) kpg1Kymap( grp, &result, status );
    }
+
+/* Ensure the KeyError attribute is non-zero in the returned KeyMap so that an 
+   error is reported by astMapGet<X> if the KeyMap does not contain the requested 
+   entry. */
+   if( result ) astSetI( result, "KeyError", 1 );
 
 /* Delete the group, if any. */
    if( grp ) grpDelet( &grp, status );
