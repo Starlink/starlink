@@ -1,0 +1,126 @@
+#!/bin/sh
+#+
+#  Name:
+#     cursa.sh
+#
+#  Purpose:
+#     Start the CURSA system from the bash shell.
+#
+#  Type of Module:
+#     bash shell script.
+#
+#  Invocation:
+#     . cursa.sh
+#
+#  Authors:
+#     PWD: Peter W. Draper (JAC, Durham University)
+# {enter_new_authors_here}
+#
+#  History:
+#     30-APR-2010 (PWD):
+#       Created, based on the c-shell version.
+#-
+#
+
+#  Define aliases for the applications.
+catcopy () { $CURSA_DIR/catcopy ${1+"$@"}; }
+cursa_catcopy () { $CURSA_DIR/catcopy ${1+"$@"}; }
+
+catheader () { $CURSA_DIR/catheader ${1+"$@"}; }
+cursa_catheader () { $CURSA_DIR/catheader ${1+"$@"}; }
+
+catpair () { $CURSA_DIR/catpair ${1+"$@"}; }
+cursa_catpair () { $CURSA_DIR/catpair ${1+"$@"}; }
+
+catsort () { $CURSA_DIR/catsort ${1+"$@"}; }
+cursa_catsort () { $CURSA_DIR/catsort ${1+"$@"}; }
+
+catview () { $CURSA_DIR/catview ${1+"$@"}; }
+cursa_catview () { $CURSA_DIR/catview ${1+"$@"}; }
+
+catgscin () { $CURSA_DIR/catgscin ${1+"$@"}; }
+cursa_catgscin () { $CURSA_DIR/catgscin ${1+"$@"}; }
+
+catselect () { $CURSA_DIR/catselect ${1+"$@"}; }
+cursa_catselect () { $CURSA_DIR/catselect ${1+"$@"}; }
+
+catcoord () { $CURSA_DIR/catcoord ${1+"$@"}; }
+cursa_catcoord () { $CURSA_DIR/catcoord ${1+"$@"}; }
+
+catchart () { $CURSA_DIR/catchart ${1+"$@"}; }
+cursa_catchart () { $CURSA_DIR/catchart ${1+"$@"}; }
+
+catchartrn () { $CURSA_DIR/catchartrn ${1+"$@"}; }
+cursa_catchartrn () { $CURSA_DIR/catchartrn ${1+"$@"}; }
+
+catphotomfit () { $CURSA_DIR/catphotomfit ${1+"$@"}; }
+cursa_catphotomfit () { $CURSA_DIR/catphotomfit ${1+"$@"}; }
+
+catphotomrn () { $CURSA_DIR/catphotomrn ${1+"$@"}; }
+cursa_catphotomrn () { $CURSA_DIR/catphotomrn ${1+"$@"}; }
+
+catphotomlst () { $CURSA_DIR/catphotomlst ${1+"$@"}; }
+cursa_catphotomlst () { $CURSA_DIR/catphotomlst ${1+"$@"}; }
+
+catgrid () { $CURSA_DIR/catgrid ${1+"$@"}; }
+cursa_catgrid () { $CURSA_DIR/catgrid ${1+"$@"}; }
+
+catcdsin () { $starperl $CURSA_DIR/catcdsin ${1+"$@"}; }
+cursa_catcdsin () { $starperl $CURSA_DIR/catcdsin ${1+"$@"}; }
+
+catremote () { $starperl $CURSA_DIR/catremote ${1+"$@"}; }
+cursa_catremote  () { $starperl $CURSA_DIR/catremote ${1+"$@"}; }
+
+# tcl/tk script.
+
+xcatview () { $CURSA_DIR/xcatview ${1+"$@"}; }
+cursa_xcatview () { $CURSA_DIR/xcatview ${1+"$@"}; }
+
+#
+#  Environment variables for catremote.
+#  ===================================
+
+CATREM_URLREADER="$CURSA_DIR/geturl"
+export CATREM_URLREADER
+
+#
+#  Specify the configuration file to be used.  The URL given here is the
+#  the CURSA default.
+
+CATREM_CONFIG="$CURSA_DIR/cursa.cfg"
+export CATREM_CONFIG
+
+#
+#  Define the maximum number of objects which may be included in the
+#  returned table.
+
+CATREM_MAXOBJ=200
+export CATREM_MAXOBJ
+
+#
+#  Specify whether the URL constituting the query is echoed to the
+#  command line.  The options re:
+#    no   -  do not echo the URL (default),
+#    yes  -  echo the URL.
+
+CATREM_ECHOURL=no
+export CATREM_ECHOURL
+
+#
+#  Set the Java CLASSPATH environment variable to pick up the URLreader
+#  (note that CLASSPATH has to be set rather than setting the corresponding
+#  command line option because the latter does not work on alphas).
+
+CLASSPATH="${CURSA_DIR}"
+export CLASSPATH
+
+#
+#  Announce the availability of the CURSA commands.
+
+echo ""
+echo "   CURSA commands are now available -- (Version @PACKAGE_VERSION@)"
+echo ""
+
+#
+# end
+#
