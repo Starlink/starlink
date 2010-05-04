@@ -122,6 +122,7 @@ applications/astrom/astrom
 applications/atools/atools.csh
 applications/atools/atools.icl
 applications/atools/atools.sh
+applications/atools/history.help
 applications/atools/make_history_help
 
 applications/ccdpack/CCD1_PAR
