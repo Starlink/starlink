@@ -6,7 +6,7 @@
   <version>3</version>
   <path>docs/sc/005</path>
   <description>The 2-D CCD Data Reduction Cookbook</description>
-  <abstract><p>This cookbook presents simple recipes and scripts for 
+  <abstract><p>This cookbook presents simple recipes and scripts for
       reducing direct images acquired with optical CCD detectors.
       Using these recipes and scripts you can correct un-processed
       images obtained from CCDs for various instrumental effects to

@@ -8,10 +8,10 @@
   <description>Starlink C Programming Standard</description>
   <abstract><p>
     This describes Starlink's coding standard for the C language.
-    The advice wis grouped into five sections concerning 
-    Starlink naming conventions, programming advice, program design, 
+    The advice wis grouped into five sections concerning
+    Starlink naming conventions, programming advice, program design,
     machine independence, and preprocessor advice respectively.
-    The suggestions are made with maintainability, portability and 
+    The suggestions are made with maintainability, portability and
     efficiency in mind.
     </p></abstract>
   <dependencies >

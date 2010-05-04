@@ -12,7 +12,7 @@
      which can be accessed from Starlink computers. It also describes
      the Starlink software for manipulating catalogues and tables. A
      brief description is given of each facility or software item.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>

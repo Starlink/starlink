@@ -7,8 +7,8 @@
   <path>docs/sun/172</path>
   <description>FTNCHEK: A Fortran77 Source-code Checker</description>
   <abstract><p>
-  
-  </p></abstract>  
+
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>

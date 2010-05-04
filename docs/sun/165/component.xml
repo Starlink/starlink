@@ -14,7 +14,7 @@
     Spectrometer (LRS) data, or catalogue data. This document gives
     some guide-lines for users who want to produce their own IRAS90
     applications.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>

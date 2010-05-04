@@ -12,7 +12,7 @@
     advanced facilities of DEC VTn00, xterm and similar terminals. JED
     in this mode provides a reasonably good emulation of the VAX/VMS
     editor EDT in addition to many extra facilities
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>

@@ -10,8 +10,8 @@
      LATEX2HTML converts \LaTeX\ source files into a set of HTML
      files, suitable for browsing on the World Wide Web. It is used by
      STAR2HTML, which is the preferred program to use for converting
-     Starlink documents to hypertext form.  
-    </p></abstract>  
+     Starlink documents to hypertext form.
+    </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>

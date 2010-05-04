@@ -18,7 +18,7 @@
      to provide UK astronomers with quick and painless access to IUE
      data. This document describes how to interrogate the catalogue
      and extract data from the archive.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>

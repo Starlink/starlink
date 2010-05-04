@@ -7,8 +7,8 @@
   <path>docs/sun/247</path>
   <description>GHOSTSCRIPT - PostScript Interpreter/previewer</description>
   <abstract><p>
-    This document announces the availability of GHOSTSCRIPT on Starlink.  
-  </p></abstract>  
+    This document announces the availability of GHOSTSCRIPT on Starlink.
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>

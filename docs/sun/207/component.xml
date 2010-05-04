@@ -9,7 +9,7 @@
   <abstract><p>
      This is a brief manual indicating the availability of the NRAO
      Astronomical Image Processing System (AIPS) on Starlink.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>

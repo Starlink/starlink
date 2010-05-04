@@ -6,7 +6,7 @@
   <version>3</version>
   <path>docs/sc/002</path>
   <description>The DX Cookbook</description>
-  <abstract><p>IBM DX (Data Explorer) is the data visualisation package 
+  <abstract><p>IBM DX (Data Explorer) is the data visualisation package
      recommended by Starlink, particularly for the visualisation of
      three-dimensional scalar and vector data. This cookbook provides
      a set of simple recipes for performing common operations using

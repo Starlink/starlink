@@ -11,7 +11,7 @@
      systems. It has been adopted by Starlink as the recommended mail
      utility because of its ease of use compared with the mail
      utilities supplied as standard with the Unix operating system.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>

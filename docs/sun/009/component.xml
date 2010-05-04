@@ -11,7 +11,7 @@
     gives a brief description of how LaTeX works. It also tells how
     to display or print the document, and how to include a PostScript
     file.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
