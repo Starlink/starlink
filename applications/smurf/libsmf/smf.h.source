@@ -1413,6 +1413,8 @@ void smf_store_outputbounds (int updatepars, const int lbnd_out[3],
 void smf_string_to_dtype ( const char * datatype, smf_dtype *dtype,
                            int * status );
 
+const char * smf_subinst_str( smf_subinst_t subinst, int * status );
+
 void smf_subtract_dark ( smfData * indata, const smfData * dark1,
                          const smfData * dark2, smf_dark_sub_meth method,
                          int *status );
