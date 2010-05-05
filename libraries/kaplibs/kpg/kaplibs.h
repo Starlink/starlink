@@ -82,6 +82,8 @@
 *        Add kpg1Loctd.
 *     13-NOV-2009 (TIMJ):
 *        Add kpg1_pixsc
+*     2010-05-05 (TIMJ):
+*        Modify kpg1Config API
 *     {enter_further_changes_here}
 
 *-
@@ -161,7 +163,7 @@ void kpg1Elgau( float *, float *, float *, float *, int * );
 void kpg1Loctd( int, const int *, const int *, const double *, const float *, const int *, int, const float *, int, float, int, float *, float *, int * );
 void kpg1Ch2pm( HDSLoc *, AstPolyMap **, int * );
 void kpg1Fit1d( int, int, double *, double *, double *, double *, double *, int * );
-AstKeyMap *kpg1Config( const char *, const char *, int * );
+AstKeyMap *kpg1Config( const char *, const char *, AstKeyMap *, int * );
 
 void kpgPixsc( AstFrameSet * iwcs,
                const double at[],
