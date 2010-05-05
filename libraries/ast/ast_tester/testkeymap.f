@@ -4,7 +4,7 @@
       include 'AST_ERR'
       include 'SAE_PAR'
       integer status,map,map2,ival,aval,l,ivec(2),avec(4),nval,i,iat,
-     :        map3, km2
+     :        map1, map3, km2
       character cval*20,cvec(3)*10,key*20,cval0*40
       double precision dval, dvec(2)
       logical gota, gotc, gotd, goti, gotr,lval
@@ -12,6 +12,9 @@
 
       status = sai__ok
       call err_mark( status )
+      call ast_begin( status )
+
+c      call ast_watchmemory( 29286 )
 
       map = ast_keymap( ' ', status )
 
@@ -619,15 +622,253 @@ c  Test putting single elements into vector entries.
          call stopit( status, 'Error GETELEM_15' )
       end if
 
-
-
-
-
-
-
       call ast_annul( map, status )
 
 
+C  Test ast_mapcopy
+      map = ast_keymap( ' ', status )
+      map1 = ast_keymap( ' ', status )
+      map2 = ast_keymap( ' ', status )
+      map3 = ast_keymap( ' ', status )
+
+      call ast_mapput0i( map1, 'a1', 1, ' ', status )
+      call ast_mapput0i( map1, 'a2', 2, ' ', status )
+      call ast_mapput0i( map1, 'a3', 3, ' ', status )
+
+      call ast_mapput0c( map, 'aa1', 'Yes', ' ', status )
+      call ast_mapput0i( map, 'aa2', 2, ' ', status )
+      call ast_mapput0a( map, 'aa3', map1, ' ', status )
+
+      call ast_mapput0i( map2, 'b1', 10, ' ', status )
+      call ast_mapput0i( map2, 'b2', 20, ' ', status )
+      call ast_mapput0i( map2, 'b3', 30, ' ', status )
+
+      call ast_mapput0c( map3, 'bb1', 'No', ' ', status )
+      call ast_mapput0i( map3, 'aa2', 20, ' ', status )
+      call ast_mapput0a( map3, 'bb3', map2, ' ', status )
+
+      call ast_mapcopy( map, map3, status )
+
+      if( ast_mapsize( map, status ) .ne. 5 ) then
+         write(*,*) ast_mapsize( map, status )
+         call stopit( status, 'Error MAPCOPY_0' )
+      end if
+
+      if( .not. ast_mapget0c( map, 'aa1', cval, l, status ) ) then
+         call stopit( status, 'Error MAPCOPY_1' )
+      else if( cval .ne. 'Yes' ) then
+         write(*,*) cval
+         call stopit( status, 'Error MAPCOPY_2' )
+      end if
+
+      if( .not. ast_mapget0i( map, 'aa2', ival, status ) ) then
+         call stopit( status, 'Error MAPCOPY_3' )
+      else if( ival .ne. 20 ) then
+         write(*,*) ival
+         call stopit( status, 'Error MAPCOPY_4' )
+      end if
+
+      if( .not. ast_mapget0a( map, 'aa3', aval, status ) ) then
+         call stopit( status, 'Error MAPCOPY_5' )
+      else if( .not. ast_isakeymap( aval, status ) ) then
+         write(*,*) ast_getc( aval, 'Class' )
+         call stopit( status, 'Error MAPCOPY_6' )
+
+         if( .not. ast_mapget0i( aval, 'a1', ival, status ) ) then
+            call stopit( status, 'Error MAPCOPY_7' )
+         else if( ival .ne. 1 ) then
+            write(*,*) ival
+            call stopit( status, 'Error MAPCOPY_8' )
+         end if
+
+         if( .not. ast_mapget0i( aval, 'a2', ival, status ) ) then
+            call stopit( status, 'Error MAPCOPY_9' )
+         else if( ival .ne. 20 ) then
+            write(*,*) ival
+            call stopit( status, 'Error MAPCOPY_10' )
+         end if
+
+         if( .not. ast_mapget0i( aval, 'a3', ival, status ) ) then
+            call stopit( status, 'Error MAPCOPY_11' )
+         else if( ival .ne. 3 ) then
+            write(*,*) ival
+            call stopit( status, 'Error MAPCOPY_12' )
+         end if
+      end if
+
+      if( .not. ast_mapget0c( map, 'bb1', cval, l, status ) ) then
+         call stopit( status, 'Error MAPCOPY_13' )
+      else if( cval .ne. 'No' ) then
+         write(*,*) cval
+         call stopit( status, 'Error MAPCOPY_14' )
+      end if
+
+      if( .not. ast_mapget0a( map, 'bb3', aval, status ) ) then
+         call stopit( status, 'Error MAPCOPY_15' )
+      else if( .not. ast_isakeymap( aval, status ) ) then
+         write(*,*) ast_getc( aval, 'Class' )
+         call stopit( status, 'Error MAPCOPY_16' )
+
+         if( .not. ast_mapget0i( aval, 'b1', ival, status ) ) then
+            call stopit( status, 'Error MAPCOPY_17' )
+         else if( ival .ne. 10 ) then
+            write(*,*) ival
+            call stopit( status, 'Error MAPCOPY_18' )
+         end if
+
+         if( .not. ast_mapget0i( aval, 'b2', ival, status ) ) then
+            call stopit( status, 'Error MAPCOPY_19' )
+         else if( ival .ne. 20 ) then
+            write(*,*) ival
+            call stopit( status, 'Error MAPCOPY_20' )
+         end if
+
+         if( .not. ast_mapget0i( aval, 'b3', ival, status ) ) then
+            call stopit( status, 'Error MAPCOPY_21' )
+         else if( ival .ne. 30 ) then
+            write(*,*) ival
+            call stopit( status, 'Error MAPCOPY_22' )
+         end if
+      end if
+
+
+      map = ast_keymap( ' ', status )
+      map1 = ast_keymap( ' ', status )
+      map2 = ast_keymap( ' ', status )
+      map3 = ast_keymap( ' ', status )
+
+      call ast_mapput0i( map1, 'a1', 1, ' ', status )
+      call ast_mapput0i( map1, 'a2', 2, ' ', status )
+      call ast_mapput0i( map1, 'a3', 3, ' ', status )
+
+      call ast_mapput0c( map, 'aa1', 'Yes', ' ', status )
+      call ast_mapput0i( map, 'aa2', 2, ' ', status )
+      call ast_mapput0a( map, 'aa3', map1, ' ', status )
+
+      call ast_mapput0i( map2, 'b1', 10, ' ', status )
+      call ast_mapput0i( map2, 'b2', 20, ' ', status )
+      call ast_mapput0i( map2, 'b3', 30, ' ', status )
+
+      call ast_mapput0i( map3, 'aa1', 0, ' ', status )
+      call ast_mapput0i( map3, 'aa2', 20, ' ', status )
+      call ast_mapput0a( map3, 'aa3', map2, ' ', status )
+
+      call ast_mapcopy( map, map3, status )
+
+      if( ast_mapsize( map, status ) .ne. 3 ) then
+         write(*,*) ast_mapsize( map, status )
+         call stopit( status, 'Error MAPCOPY_23' )
+      end if
+
+      if( .not. ast_mapget0i( map, 'aa1', ival, status ) ) then
+         call stopit( status, 'Error MAPCOPY_24' )
+      else if( ival .ne. 0 ) then
+         write(*,*) ival
+         call stopit( status, 'Error MAPCOPY_25' )
+      end if
+
+      if( .not. ast_mapget0i( map, 'aa2', ival, status ) ) then
+         call stopit( status, 'Error MAPCOPY_26' )
+      else if( ival .ne. 20 ) then
+         write(*,*) ival
+         call stopit( status, 'Error MAPCOPY_27' )
+      end if
+
+      if( .not. ast_mapget0a( map, 'aa3', aval, status ) ) then
+         call stopit( status, 'Error MAPCOPY_28' )
+      else if( .not. ast_isakeymap( aval, status ) ) then
+         write(*,*) ast_getc( aval, 'Class' )
+         call stopit( status, 'Error MAPCOPY_29' )
+
+         if( .not. ast_mapget0i( aval, 'a1', ival, status ) ) then
+            call stopit( status, 'Error MAPCOPY_30' )
+         else if( ival .ne. 1 ) then
+            write(*,*) ival
+            call stopit( status, 'Error MAPCOPY_31' )
+         end if
+
+         if( .not. ast_mapget0i( aval, 'a2', ival, status ) ) then
+            call stopit( status, 'Error MAPCOPY_32' )
+         else if( ival .ne. 20 ) then
+            write(*,*) ival
+            call stopit( status, 'Error MAPCOPY_33' )
+         end if
+
+         if( .not. ast_mapget0i( aval, 'a3', ival, status ) ) then
+            call stopit( status, 'Error MAPCOPY_34' )
+         else if( ival .ne. 3 ) then
+            write(*,*) ival
+            call stopit( status, 'Error MAPCOPY_35' )
+         end if
+
+         if( .not. ast_mapget0i( aval, 'b1', ival, status ) ) then
+            call stopit( status, 'Error MAPCOPY_36' )
+         else if( ival .ne. 10 ) then
+            write(*,*) ival
+            call stopit( status, 'Error MAPCOPY_37' )
+         end if
+
+         if( .not. ast_mapget0i( aval, 'b2', ival, status ) ) then
+            call stopit( status, 'Error MAPCOPY_38' )
+         else if( ival .ne. 20 ) then
+            write(*,*) ival
+            call stopit( status, 'Error MAPCOPY_39' )
+         end if
+
+         if( .not. ast_mapget0i( aval, 'b3', ival, status ) ) then
+            call stopit( status, 'Error MAPCOPY_40' )
+         else if( ival .ne. 30 ) then
+            write(*,*) ival
+            call stopit( status, 'Error MAPCOPY_41' )
+         end if
+
+      end if
+
+
+      map = ast_keymap( ' ', status )
+      map1 = ast_keymap( ' ', status )
+      map2 = ast_keymap( ' ', status )
+      map3 = ast_keymap( ' ', status )
+
+      call ast_mapput0i( map1, 'a1', 1, ' ', status )
+      call ast_mapput0i( map1, 'a2', 2, ' ', status )
+      call ast_mapput0i( map1, 'a3', 3, ' ', status )
+
+      call ast_mapput0c( map, 'aa1', 'Yes', ' ', status )
+      call ast_mapput0i( map, 'aa2', 2, ' ', status )
+      call ast_mapput0a( map, 'aa3', map1, ' ', status )
+
+      call ast_mapput0i( map2, 'b1', 10, ' ', status )
+      call ast_mapput0i( map2, 'b2', 20, ' ', status )
+      call ast_mapput0i( map2, 'b3', 30, ' ', status )
+
+      call ast_mapput0i( map3, 'aa1', 0, ' ', status )
+      call ast_mapput0i( map3, 'aa2', 20, ' ', status )
+      call ast_mapput0a( map3, 'aa3', map2, ' ', status )
+
+      call ast_setl( map, 'MapLocked', .TRUE., status )
+      if( status .eq. SAI__OK ) then
+         call ast_mapcopy( map, map3, status )
+         if( status .eq. AST__BADKEY ) then
+            call err_annul( status )
+         else
+            call stopit( status, 'Error MAPCOPY_42' )
+         end if
+      end if
+
+
+
+
+
+
+
+
+
+
+      call ast_end( status )
+
+      call ast_activememory( ' ' )
+      call ast_flushmemory( 1 );
 
       call err_rlse( status )
 

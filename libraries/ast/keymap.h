@@ -176,6 +176,7 @@ typedef struct AstKeyMapVtab {
    void (* MapPutElemF)( AstKeyMap *, const char *, int, float, int * );
    void (* MapPutElemI)( AstKeyMap *, const char *, int, int, int * );
    void (* MapRemove)( AstKeyMap *, const char *, int * );
+   void (* MapCopy)( AstKeyMap *, AstKeyMap *, int * );
    int (* MapSize)( AstKeyMap *, int * );
    int (* MapLength)( AstKeyMap *, const char *, int * );
    int (* MapLenC)( AstKeyMap *, const char *, int * );
@@ -302,6 +303,7 @@ void astMapPutElemD_( AstKeyMap *, const char *, int, double, int * );
 void astMapPutElemF_( AstKeyMap *, const char *, int, float, int * );
 void astMapPutElemI_( AstKeyMap *, const char *, int, int, int * );
 void astMapRemove_( AstKeyMap *, const char *, int * );
+void astMapCopy_( AstKeyMap *, AstKeyMap *, int * );
 int astMapGet0P_( AstKeyMap *, const char *, void **, int * );
 int astMapGet1P_( AstKeyMap *, const char *, int, int *, void **, int * );
 int astMapGetElemP_( AstKeyMap *, const char *, int, void **, int * );
@@ -399,6 +401,7 @@ astINVOKE(O,astLoadKeyMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PT
 #define astMapPutElemC(this,key,elem,value) astINVOKE(V,astMapPutElemC_(astCheckKeyMap(this),key,elem,value,STATUS_PTR))
 #define astMapPutElemP(this,key,elem,value) astINVOKE(V,astMapPutElemP_(astCheckKeyMap(this),key,elem,value,STATUS_PTR))
 #define astMapRemove(this,key) astINVOKE(V,astMapRemove_(astCheckKeyMap(this),key,STATUS_PTR))
+#define astMapCopy(this,that) astINVOKE(V,astMapCopy_(astCheckKeyMap(this),astCheckKeyMap(that),STATUS_PTR))
 #define astMapSize(this) astINVOKE(V,astMapSize_(astCheckKeyMap(this),STATUS_PTR))
 #define astMapLength(this,key) astINVOKE(V,astMapLength_(astCheckKeyMap(this),key,STATUS_PTR))
 #define astMapLenC(this,key) astINVOKE(V,astMapLenC_(astCheckKeyMap(this),key,STATUS_PTR))

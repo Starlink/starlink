@@ -16,6 +16,7 @@
 *  Routines Defined:
 *     AST_ISAKEYMAP
 *     AST_KEYMAP
+*     AST_MAPCOPY
 *     AST_MAPPUT0<X>
 *     AST_MAPPUT1<X>
 *     AST_MAPGET0<X>
@@ -682,6 +683,18 @@ F77_SUBROUTINE(ast_mapremove)( INTEGER(THIS),
       key = astString( KEY, KEY_length );
       astMapRemove( astI2P( *THIS ), key );
       astFree( key );
+   )
+}
+
+F77_SUBROUTINE(ast_mapcopy)( INTEGER(THIS),
+                             INTEGER(THAT),
+                             INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_INTEGER(THAT)
+
+   astAt( "AST_MAPCOPY", NULL, 0 );
+   astWatchSTATUS(
+      astMapCopy( astI2P( *THIS ), astI2P( *THAT ) );
    )
 }
 

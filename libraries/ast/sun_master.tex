@@ -21878,6 +21878,15 @@ current version):
 
 \begin{enumerate}
 
+\item The KeyMap class has a new method called
+c+
+astMapCopy
+c-
+f+
+AST\_MAPCOPY
+\f-
+that copies entries from one KeyMap to another KeyMap.
+
 \item The KeyMap class has a new boolean attribute called MapLocked. If
 c+
 non-zero,
@@ -21887,7 +21896,7 @@ f+
 f-
 an error is reported if an attempt is made to add any new entries
 to a KeyMap (the value associated with any old entry may still be changed
-without error). The default is 
+without error). The default is
 c+
 zero.
 c-

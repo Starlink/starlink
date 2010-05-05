@@ -49,12 +49,13 @@ c     - astMapHasKey: Does the KeyMap contain a named entry?
 c     - astMapKey: Return the key name at a given index in the KeyMap
 c     - astMapLenC: Get the length of a named character entry in a KeyMap
 c     - astMapLength: Get the length of a named entry in a KeyMap
+c     - astMapCopy: Copy entries from one KeyMap into another
 c     - astMapPut0<X>: Add a new scalar entry to a KeyMap
 c     - astMapPut1<X>: Add a new vector entry to a KeyMap
 c     - astMapPutElem<X>: Puts a value into a vector entry in a KeyMap
 c     - astMapRemove: Removed a named entry from a KeyMap
 c     - astMapSize: Get the number of entries in a KeyMap
-c     - astMapType: Return the data type of a named entry in a map.
+c     - astMapType: Return the data type of a named entry in a map
 f     - AST_MAPGET0<X>: Get a named scalar entry from a KeyMap
 f     - AST_MAPGET1<X>: Get a named vector entry from a KeyMap
 f     - AST_MAPGETELEM<X>: Get an element of a named vector entry from a KeyMap
@@ -62,12 +63,13 @@ f     - AST_MAPHASKEY: Does the KeyMap contain a named entry?
 f     - AST_MAPKEY: Return the key name at a given index in the KeyMap
 f     - AST_MAPLENC: Get the length of a named character entry in a KeyMap
 f     - AST_MAPLENGTH: Get the length of a named entry in a KeyMap
+f     - AST_MAPCOPY: Copy entries from one KeyMap into another
 f     - AST_MAPPUT0<X>: Add a new scalar entry to a KeyMap
 f     - AST_MAPPUT1<X>: Add a new vector entry to a KeyMap
 f     - AST_MAPPUTELEM<X>: Puts a value into a vector entry in a KeyMap
 f     - AST_MAPREMOVE: Removed a named entry from a KeyMap
 f     - AST_MAPSIZE: Get the number of entries in a KeyMap
-f     - AST_MAPTYPE: Return the data type of a named entry in a map.
+f     - AST_MAPTYPE: Return the data type of a named entry in a map
 
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
@@ -142,8 +144,9 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map.
 *     27-APR-2010 (DSB):
 *         Added MapLocked attribute.
 *     4-MAY-2010 (DSB):
-*         Propagate MapLocked and KeyError attributes to any encapsulated
+*         - Propagate MapLocked and KeyError attributes to any encapsulated
 *         KeyMaps.
+*         - Added astMapCopy method.
 *class--
 */
 
@@ -422,6 +425,7 @@ static void MapPut1F( AstKeyMap *, const char *, int, const float *, const char 
 static void MapPut1I( AstKeyMap *, const char *, int, const int *, const char *, int * );
 static void MapRemove( AstKeyMap *, const char *, int * );
 static void NewTable( AstKeyMap *, int, int * );
+static void MapCopy( AstKeyMap *, AstKeyMap *, int * );
 
 static const char *GetAttrib( AstObject *, const char *, int * );
 static int TestAttrib( AstObject *, const char *, int * );
@@ -2552,6 +2556,7 @@ void astInitKeyMapVtab_(  AstKeyMapVtab *vtab, const char *name, int *status ) {
    vtab->MapPut1F = MapPut1F;
    vtab->MapPut1I = MapPut1I;
    vtab->MapRemove = MapRemove;
+   vtab->MapCopy = MapCopy;
    vtab->MapSize = MapSize;
    vtab->MapLenC = MapLenC;
    vtab->MapLength = MapLength;
@@ -2809,6 +2814,154 @@ static int ManageLock( AstObject *this_object, int mode, int extra,
 
 }
 #endif
+
+static void MapCopy( AstKeyMap *this, AstKeyMap *that, int *status ) {
+/*
+*++
+*  Name:
+c     astMapCopy
+f     AST_MAPCOPY
+
+*  Purpose:
+*     Copy entries from one KeyMap into another.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "keymap.h"
+c     void astMapCopy( AstKeyMap *this, AstKeyMap *that )
+f     CALL AST_MAPCOPY( THIS, THAT, STATUS )
+
+*  Class Membership:
+*     KeyMap method.
+
+*  Description:
+c     This function
+f     This routine
+*     copies all entries from one KeyMap into another.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the destination KeyMap.
+c     that
+f     THAT = INTEGER (Given)
+*        Pointer to the source KeyMap.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Notes:
+*     - Entries from the source KeyMap will replace any existing entries in
+*     the destination KeyMap that have the same key.
+*     - The one exception to the above rule is that if a source entry
+*     contains a scalar KeyMap entry, and the destination contains a
+*     scalar KeyMap entry with the same key, then the source KeyMap entry
+*     will be copied into the destination KeyMap entry using this function,
+*     rather than simply replacing the destination KeyMap entry.
+*     - If the destination entry has a non-zero value for its MapLocked
+*     attribute, then an error will be reported if the source KeyMap
+*     contains any keys that do not already exist within the destination
+*     KeyMap.
+
+*--
+*/
+
+/* Local Variables: */
+   AstMapEntry *in_entry; /* Pointer to next source entry to copy */
+   AstMapEntry *out_entry;/* Pointer to existing destination entry */
+   AstObject *in_obj;     /* Pointer for source Object entry */
+   AstObject *out_obj;    /* Pointer for destination Object entry */
+   const char *key;       /* Key for current entry */
+   int i;                 /* Index into source hash table */
+   int itab;              /* Index of destination hash table element */
+   int merged;            /* Were source and destination KeyMaps merged? */
+   unsigned long hash;    /* Full width hash value */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Loop round all entries in the source hash table. */
+   for( i = 0; i < that->mapsize; i++ ) {
+
+/* Get a pointer to the next source KeyMap entry. */
+      in_entry = that->table[ i ];
+
+/* Loop round all entries in this element of the source hash table. */
+      while( in_entry && astOK ) {
+
+/* Get its key. */
+         key = in_entry->key;
+
+/* Search for a destination entry with the same key. */
+         itab = HashFun( key, this->mapsize - 1, &hash, status );
+         out_entry = SearchTableEntry( this, itab, key, status );
+
+/* If the destination KeyMap does not contain an entry with the current
+   key, store a copy of the entry in the destination, or report an error
+   if the destination's MapLocked attribute is set. */
+         if( !out_entry ) {
+            if( astGetMapLocked( this ) ) {
+               astError( AST__BADKEY, "astMapCopy(%s): Failed to copy "
+                         "item \"%s\": \"%s\" is not a known item.", status,
+                         astGetClass( this ), key, key );
+            } else {
+               out_entry = CopyMapEntry( in_entry, status );
+               out_entry = AddTableEntry( this, itab, out_entry, status );
+            }
+
+/* If the destination KeyMap contains an entry with the current key... */
+         } else {
+
+/* The usual thing is to just replace the existing entry in the
+   destination with a copy of the source entry. The one case where this is
+   not done is if both entries are scalar KeyMaps. In this case the source
+   KeyMap is merged into the destination KeyMap using this function. First
+   see if we have this situation, and if so, copy the entries from the
+   source KeyMap to the destination KeyMap. */
+            merged = 0;
+            if( in_entry->nel == 0 || in_entry->nel == 1 ) {
+               if( out_entry->nel == 0 || out_entry->nel == 1 ) {
+                  if( in_entry->type == AST__OBJECTTYPE &&
+                      out_entry->type == AST__OBJECTTYPE ) {
+
+                     if( in_entry->nel == 0 ) {
+                        in_obj = ((Entry0A *)in_entry)->value;
+                     } else {
+                        in_obj = (((Entry1A *)in_entry)->value)[ 0 ];
+                     }
+
+                     if( out_entry->nel == 0 ) {
+                        out_obj = ((Entry0A *)out_entry)->value;
+                     } else {
+                        out_obj = (((Entry1A *)out_entry)->value)[ 0 ];
+                     }
+
+                     if( astIsAKeyMap( in_obj ) &&
+                         astIsAKeyMap( out_obj ) ) {
+
+                        astMapCopy( (AstKeyMap *) out_obj,
+                                    (AstKeyMap *) in_obj );
+                        merged = 0;
+                     }
+                  }
+               }
+            }
+
+/* If the source and desination entries are not KeyMaps, then just remove
+   the entry in the desination KeyMap and add a copy of the source entry. */
+            if( ! merged ) {
+               (void) RemoveTableEntry( this, itab, key, status );
+               out_entry = CopyMapEntry( in_entry, status );
+               out_entry = AddTableEntry( this, itab, out_entry, status );
+            }
+         }
+
+/* Update the address of the next MapEntry in the source. */
+         in_entry = in_entry->next;
+      }
+   }
+}
 
 static const char *MapKey( AstKeyMap *this, int index, int *status ) {
 /*
@@ -3099,10 +3252,11 @@ static void MapPut0##X( AstKeyMap *this, const char *key, Xtype value, \
       if( !there && astGetMapLocked( this ) ) { \
          astError( AST__BADKEY, "astMapPut0" #X "(%s): Failed to add item \"%s\" to a KeyMap: " \
                    "\"%s\" is not a known item.", status, astGetClass( this ), key, key ); \
+      } \
 \
 /* If all has gone OK, store the new entry at the head of the linked list \
    associated with the selected table entry. */ \
-      } else if( astOK ) { \
+      if( astOK ) { \
          mapentry = AddTableEntry( this, itab, mapentry, status ); \
 \
 /* If anything went wrong, try to delete the new entry. */ \
@@ -3305,10 +3459,11 @@ static void MapPut1##X( AstKeyMap *this, const char *key, int size, \
       if( !there && astGetMapLocked( this ) ) { \
          astError( AST__BADKEY, "astMapPut1" #X "(%s): Failed to add item \"%s\" to a KeyMap: " \
                    "\"%s\" is not a known item.", status, astGetClass( this ), key, key ); \
+      } \
 \
 /* If all has gone OK, store the new entry at the head of the linked list \
    associated with the selected table entry. */ \
-      } else if( astOK ) { \
+      if( astOK ) { \
          mapentry = AddTableEntry( this, itab, mapentry, status ); \
 \
 /* If anything went wrong, try to delete the new entry. */ \
@@ -3442,10 +3597,11 @@ void astMapPut1AId_( AstKeyMap *this, const char *key, int size,
       if( !there && astGetMapLocked( this ) ) {
          astError( AST__BADKEY, "astMapPut1A(%s): Failed to add item \"%s\" to a KeyMap: "
                    "\"%s\" is not a known item.", status, astGetClass( this ), key, key );
+      }
 
 /* If all has gone OK, store the new entry at the head of the linked list
    associated with the selected table entry. */
-      } else if( astOK ) {
+      if( astOK ) {
          mapentry = AddTableEntry( this, itab, mapentry, status );
 
 /* If anything went wrong, try to delete the new entry. */
@@ -7662,6 +7818,10 @@ MAKE_MAPPUTELEM_(P,void *)
 void astMapRemove_( AstKeyMap *this, const char *key, int *status ){
    if ( !astOK ) return;
    (**astMEMBER(this,KeyMap,MapRemove))(this,key, status );
+}
+void astMapCopy_( AstKeyMap *this, AstKeyMap *that, int *status ){
+   if ( !astOK ) return;
+   (**astMEMBER(this,KeyMap,MapCopy))(this, that, status );
 }
 int astMapSize_( AstKeyMap *this, int *status ){
    if ( !astOK ) return 0;

@@ -16,8 +16,11 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
-- The KeyMap class has a new boolean attribute called MapLocked. If true 
-(non-zero), an error is reported if an attempt is made to add any new entries 
+- The KeyMap class has a new method called astMapCopy/AST_MAPCOPY that
+copies entries from one KeyMap to another KeyMap.
+
+- The KeyMap class has a new boolean attribute called MapLocked. If true
+(non-zero), an error is reported if an attempt is made to add any new entries
 to a KeyMap (the value associated with any old entry may still be changed #
 without error). The default is false (zero).
 
