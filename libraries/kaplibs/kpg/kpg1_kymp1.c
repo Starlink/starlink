@@ -146,7 +146,7 @@ void kpg1Kymp1( const Grp *igrp, AstKeyMap **keymap, int *status ){
    old_status = astWatch( status );
 
 /* Create a new empty KeyMap. */
-   *keymap = astKeyMap( "" );
+   *keymap = astKeyMap( " " );
 
 /* Get the number of strings in the group. */
    size = grpGrpsz( igrp, status );
