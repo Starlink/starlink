@@ -53,5 +53,5 @@ com.boxmin  = 10
 # footprint, 150arcsec/sec scan, about 1 Hz... we're filtering at lower
 # frequencies than that).
 
-flt_450.filt_edgehigh = 0.1
-flt_850.filt_edgehigh = 0.3
+450.flt.filt_edgehigh = 0.1
+850.flt.filt_edgehigh = 0.3

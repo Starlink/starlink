@@ -1,0 +1,144 @@
+#+
+#  Name:
+#     smurf_makemap.def
+
+#  Purpose:
+#     Default parameters for SMURF application MAKEMAP.
+
+#  Description:
+#     This file specifies the default parameters for the MAKEMAP
+#     iterative map-maker.  The main purpose of this file is to
+#     guarantee an initial state for all parameters and to define all
+#     the allowed parameters so that a user will be notified in case
+#     of spelling mistakes. In practice the default dimmconfig.lis (in
+#     $STARLINK_DIR/share/smurf) contains the effective defaults since
+#     all other config files source it and it contains the default
+#     documentation.
+
+#  Notes:
+#     This file does not attempt to document what each value
+#     means. See the dimmconfig.lis file for documentation.
+
+#  Authors:
+#     TIMJ: Tim Jenness (JAC, Hawaii)
+
+#  History:
+#     2010-05-05 (TIMJ):
+#        Original version.
+
+#-
+
+# These come from smf_iteratemap
+
+numiter = -20
+tstep = 100
+chitol = 1e-4
+
+memiter = 0
+deldimm = 1
+
+bolomap = 0
+itermap = 0
+shortmap = 0
+
+ensureflat = 1
+noexportsetbad = 0
+varmapmethod = 0
+maxlen = 0
+padstart = 0
+padend = 0
+
+modelorder = (com,gai,ext,flt,ast,noi)
+exportndf = 0
+
+# These come from smf_get_cleanpar
+
+apod = 0
+badfrac = 0
+dcfitbox = 0
+dcmaxsteps = 10
+dcthresh = 3.0
+dcmedianwidth = 40
+dkclean = 0
+fillgaps = 1
+filt_edgelow = 0
+filt_edgehigh = 0
+filt_notchlow = <undef>
+filt_notchhigh = <undef>
+flagstat = 0
+order = -1
+spikethresh = 0
+spikeiter = 0
+
+# smf_model_create
+
+# TSTEP is read in two locations.
+# tstep = 100
+
+# Also read in smf_calcmodel_com
+# com.gain_box = 6000
+
+# We default these to be derived from the FITS headers
+ext.csotau = <undef>
+ext.filtertau = <undef>
+
+# smf_get_extpar
+
+ext.tausrc = auto
+ext.taumethod = adaptive
+
+# smf_calcmodel_ast
+
+ast.zero_lowhits = 0
+
+# smf_calcmodel_com
+
+com.boxcar = 0
+com.boxcard = 0
+com.boxfact = 0
+com.boxmin = 0
+
+com.corr_tol = 5
+com.corr_abstol = 0.2
+com.gain_tol = 5
+com.gain_fgood = 0.25
+com.gain_rat = 4
+com.gain_abstol = 3
+com.gain_box = 6000
+com.notfirst = 0
+
+gai.flatfield = 0
+
+# smf_calcmodel_dks
+
+dks.boxcar = 0
+
+# smf_calcmodel_gai
+
+# Also read in smf_calcmodel_com
+# com.gain_box = 6000
+
+# Also read in smf_calcmodel_com
+# gai.flatfield = 0
+
+# smf_calcmodel_flt
+
+flt.notfirst = 0
+
+# which calls smf_filter_fromkeymap which calls smf_get_cleanpar
+
+flt.filt_edgelow = 0
+flt.filt_edgehigh = 0
+flt.filt_notchlow = <undef>
+flt.filt_notchhigh = <undef>
+
+# smf_calcmodel_noi
+# these are a subset of smf_get_cleanpar options
+
+noi.dcfitbox = 0
+noi.dcmaxsteps = 10
+noi.dcthresh = 3.0
+noi.dcmedianwidth = 40
+noi.fillgaps = 1
+noi.spikethresh = 0
+noi.spikeiter = 0

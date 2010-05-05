@@ -136,6 +136,9 @@
 *        - Avoid some "type-punned" compiler warnings.
 *     2010-04-09 (DSB):
 *        - Prevent segvio if no gain model is supplied.
+*     2010-05-04 (TIMJ):
+*        Simplify KeyMap access. We now trigger an error if a key is missing
+*        and we ensure all keys have corresponding defaults.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -571,9 +574,9 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   size_t cgood;                 /* Number of good corr. coeff. samples */
   double cmean;                 /* mean of common-mode correlation coeff */
   double *corr=NULL;            /* Array to hold correlation coefficients */
-  double corr_abstol=0.2;       /* Absolute lowest corr. coeff. limit */
+  double corr_abstol=0;         /* Absolute lowest corr. coeff. limit */
   dim_t corr_offset=0;          /* Offset from gain to correlation value */
-  double corr_tol=5;            /* n-sigma correlation coeff. tolerance */
+  double corr_tol=0;            /* n-sigma correlation coeff. tolerance */
   double csig;                  /* standard deviation "                  */
   double csum;                  /* Sum of corr coeffs */
   int fillgaps;                 /* Are there any new gaps to fill? */
@@ -591,19 +594,19 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   smfArray *gai=NULL;           /* Pointer to GAI at chunk */
   double *gai_data=NULL;        /* Pointer to DATA component of GAI */
   double **gai_data_copy=NULL;  /* copy of gai_data for all subarrays */
-  double gain_abstol=5;         /* absolute gain coeff. tolerance */
-  dim_t gain_box=6000;          /* No. of time slices in a block */
-  double gain_fgood=0.25;       /* Fraction of good blocks required */
-  double gain_rat=4;            /* Ratio of usable gains */
-  double gain_tol=5;            /* n-sigma gain coeff. tolerance */
+  double gain_abstol=0;         /* absolute gain coeff. tolerance */
+  dim_t gain_box=0;             /* No. of time slices in a block */
+  double gain_fgood=0;          /* Fraction of good blocks required */
+  double gain_rat=0;            /* Ratio of usable gains */
+  double gain_tol=0;            /* n-sigma gain coeff. tolerance */
   size_t gbstride;              /* GAIn bolo stride */
   size_t gcstride;              /* GAIn coeff stride */
   AstKeyMap *gkmap=NULL;        /* Local GAIn keymap */
   dim_t i;                      /* Loop counter */
   dim_t iblock;                 /* Index of time block */
   int ii;                       /* Loop counter */
+  int ival = 0;                 /* Integer value */
   dim_t idx=0;                  /* Index within subgroup */
-  int ival;                     /* Integer value */
   dim_t j;                      /* Loop counter */
   smfCalcmodelComData *job_data=NULL; /* Array of job data */
   AstKeyMap *kmap=NULL;         /* Local keymap */
@@ -653,86 +656,51 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   nw = wf ? wf->nworker : 1;
 
   /* Obtain pointer to sub-keymap containing COM parameters */
-  if( !astMapGet0A( keymap, "COM", &obj ) ) {
-    kmap = NULL;
-  } else {
-    kmap = (AstKeyMap *) obj;
-  }
+  astMapGet0A( keymap, "COM", &obj );
+  kmap = (AstKeyMap *) obj;
+  obj = NULL;
 
   /* Obtain pointer to sub-keymap containing GAI parameters */
-  if( !astMapGet0A( keymap, "GAI", &obj ) ) {
-    gkmap = NULL;
-  } else {
-    gkmap = (AstKeyMap *) obj;
-  }
+  astMapGet0A( keymap, "GAI", &obj );
+  gkmap = (AstKeyMap *) obj;
 
   /* Parse parameters */
 
-  if( kmap ) {
-    /* Check for smoothing parameters in the CONFIG file */
-    if( astMapGet0I( kmap, "BOXCAR", &boxcar) ) {
-      do_boxcar = 1;
-    }
+  /* Check for smoothing parameters in the CONFIG file */
+  astMapGet0I( kmap, "BOXCAR", &boxcar);
+  if (boxcar > 0 ) do_boxcar = 1;
 
-    /* Check for damping parameter on boxcar */
-    if( astMapGet0D( kmap, "BOXFACT", &boxfact) ) {
-      do_boxfact = 1;
+  /* Check for damping parameter on boxcar */
+  astMapGet0D( kmap, "BOXFACT", &boxfact);
+  if (boxfact > 0) do_boxfact = 1;
 
-      /* If first iteration, set BOXCARD (this value will get decreased) */
-      if( flags&SMF__DIMM_FIRSTITER ) {
-        astMapPut0D( kmap, "BOXCARD", (double) boxcar, NULL );
-      }
+  /* If first iteration, set BOXCARD (this value will get decreased) */
+  if( flags&SMF__DIMM_FIRSTITER ) {
+    astMapPut0D( kmap, "BOXCARD", (double) boxcar, NULL );
+  }
 
-      if( !astMapGet0D( kmap, "BOXCARD", &boxcard) ) {
-        *status = SAI__ERROR;
-        errRep( "", FUNC_NAME ": Failed to retrieve BOXCARD from keymap",
-                status);
-      } else {
-        /* Use damped boxcar for smoothing width */
-        boxcar = (int) boxcard;
-      }
-    }
+  astMapGet0D( kmap, "BOXCARD", &boxcard);
+  /* Use damped boxcar for smoothing width */
+  boxcar = (int) boxcard;
 
-    /* Check for minimum boxcar width*/
-    if( astMapGet0I( kmap, "BOXMIN", &boxmin) ) {
-      do_boxmin = 1;
-    }
+  /* Check for minimum boxcar width*/
+  astMapGet0I( kmap, "BOXMIN", &boxmin);
+  if (boxmin > 0 ) do_boxmin = 1;
 
-    /* Bolo rejection parameters */
-    if( !astMapGet0D(kmap, "CORR_TOL", &corr_tol) ) {
-      corr_tol = 5;
-    }
+  /* Bolo rejection parameters */
+  astMapGet0D(kmap, "CORR_TOL", &corr_tol);
+  astMapGet0D(kmap, "CORR_ABSTOL", &corr_abstol);
+  astMapGet0D(kmap, "GAIN_TOL", &gain_tol);
+  astMapGet0D(kmap, "GAIN_FGOOD", &gain_fgood);
+  astMapGet0D(kmap, "GAIN_RAT", &gain_rat);
+  astMapGet0I(kmap, "GAIN_BOX", &ival);
+  gain_box = ival;
+  astMapGet0D(kmap, "GAIN_ABSTOL", &gain_abstol);
+  astMapGet0I(kmap, "NOTFIRST", &notfirst);
 
-    if( !astMapGet0D(kmap, "CORR_ABSTOL", &corr_abstol) ) {
-      corr_abstol = 0.2;
-    }
-
-    if( !astMapGet0D(kmap, "GAIN_TOL", &gain_tol) ) {
-      gain_tol = 5;
-    }
-
-    if( !astMapGet0D(kmap, "GAIN_FGOOD", &gain_fgood) ) {
-      gain_fgood = 0.25;
-    }
-
-    if( !astMapGet0D(kmap, "GAIN_RAT", &gain_rat) ) {
-      gain_rat = 4.0;
-    }
-
-    if( !astMapGet0I(kmap, "GAIN_BOX", &ival) ) {
-      gain_box = 6000;
-    } else {
-      gain_box = ival;
-    }
-
-
-    if( !astMapGet0D(kmap, "GAIN_ABSTOL", &gain_abstol) ) {
-      gain_abstol = 3;
-    }
-
-    if( !astMapGet0I(kmap, "NOTFIRST", &notfirst) ) {
-      notfirst = 0;
-    }
+  if (*status == SAI__OK && gain_box == 0) {
+    *status = SAI__ERROR;
+    errRep( "", "COM.gain_box must be defined and be greater than 0", status );
   }
 
   if( do_boxcar ) {
@@ -741,15 +709,13 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   }
 
   /* Are we using gains to adjust the flatfield? */
-  if( gkmap ) {
-    astMapGet0I( gkmap, "FLATFIELD", &gflat );
+  astMapGet0I( gkmap, "FLATFIELD", &gflat );
 
-    /* If gflat specified but no GAI model, warn user */
-    if( gflat && !(dat->gai) ) {
-      msgOut( "", FUNC_NAME
-              ": *** WARNING: GAI.FLATFIELD set but GAI not part of MODELORDER",
-              status);
-    }
+  /* If gflat specified but no GAI model, warn user */
+  if( gflat && !(dat->gai) ) {
+    msgOut( "", FUNC_NAME
+            ": *** WARNING: GAI.FLATFIELD set but GAI not part of MODELORDER",
+            status);
   }
 
   /* Are we skipping the first iteration? */

@@ -42,6 +42,7 @@
 
 *  Authors:
 *     Edward Chapin (UBC)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -55,10 +56,14 @@
 *        Measure normalized change in model between iterations (dchisq)
 *     2009-12-07 (EC)
 *        - optionally delay calculation until after 1st iteration (notfirst)
+*     2010-05-04 (TIMJ):
+*        Simplify KeyMap access. We now trigger an error if a key is missing
+*        and we ensure all keys have corresponding defaults.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2009 University of British Columbia.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -133,17 +138,12 @@ void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   /* Main routine */
   if (*status != SAI__OK) return;
 
-  /* Obtain pointer to sub-keymap containing FLT filter parameters */
-  if( !astMapGet0A( keymap, "FLT", &kmap ) ) {
-    msgOutif( MSG__VERB, " ", FUNC_NAME ": FLT model requested, "
-              "but no parameters specified.", status );
-    return;
-  }
+  /* Obtain pointer to sub-keymap containing FLT filter parameters. Something will
+     always be available.*/
+  astMapGet0A( keymap, "FLT", &kmap );
 
   /* Are we skipping the first iteration? */
-  if( !astMapGet0I(kmap, "NOTFIRST", &notfirst) ) {
-    notfirst = 0;
-  }
+  astMapGet0I(kmap, "NOTFIRST", &notfirst);
 
   if( notfirst && (flags & SMF__DIMM_FIRSTITER) ) {
     msgOutif( MSG__VERB, "", FUNC_NAME

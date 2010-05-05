@@ -513,9 +513,9 @@
 *     header. These are the number of tiles used to hold the output data,
 *     and the index of the NDF containing the header, in the range 1 to
 *     NUMTILES. See parameter TILEDIMS.
-*     The model configuration parameters can be sub-instrument dependent.
-*     For example, flt_850.edgelow will copy the edgelow value into the flt
-*     section only for 850 micron data. Similarly for flt_450.edgelow.
+*     - The model configuration parameters can be sub-instrument dependent.
+*     For example, 850.flt.edgelow will copy the edgelow value into the flt
+*     section only for 850 micron data. Similarly for 450.flt.edgelow.
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
@@ -704,12 +704,15 @@
 *        Support short maps with smf_iteratemap.
 *     2010-04-20 (EC):
 *        iteratemaps now have quality
+*     2010-05-04 (TIMJ):
+*        Use kpg1Config for reading config parameters including defaults values.
+*        This also required some code to determine the current sub-instrument.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2005-2010 University of British Columbia.
-*     Copyright (C) 2007-2009 Science and Technology Facilities Council.
+*     Copyright (C) 2007-2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -786,7 +789,6 @@ void smurf_makemap( int *status ) {
   int blank=0;                 /* Was a blank line just output? */
   smfBox *boxes = NULL;      /* Pointer to array of i/p file bounding boxes */
   smfArray *bbms = NULL;     /* Bad bolometer masks */
-  Grp *confgrp = NULL;       /* Group containing configuration file */
   smfArray *darks = NULL;   /* Dark data */
   smfData *data=NULL;        /* Pointer to SCUBA2 data struct */
   char data_units[SMF__CHARLABEL+1]; /* Units string */
@@ -809,7 +811,6 @@ void smurf_makemap( int *status ) {
   size_t itile;              /* Output tile index */
   int jin;                   /* Input NDF index within igrp */
   AstKeyMap *keymap=NULL;    /* Pointer to keymap of config settings */
-  size_t ksize=0;            /* Size of group containing CONFIG file */
   int lbnd_out[2];           /* Lower pixel bounds for output map */
   double *map=NULL;          /* Pointer to the rebinned map data */
   size_t mapmem=0;           /* Memory needed for output map */
@@ -978,10 +979,34 @@ void smurf_makemap( int *status ) {
     }
 
   } else if ( iterate ) {
-    /* Read a group of configuration settings into keymap */
-    kpg1Gtgrp( "CONFIG", &confgrp, &ksize, status );
-    kpg1Kymap( confgrp, &keymap, status );
-    if( confgrp ) grpDelet( &confgrp, status );
+    /* Read a group of configuration settings into keymap using defaults
+       and typo checking. Also need to know which subinstrument we are actively
+       interested in for merging purposes. We need to open a representative
+       file for that. */
+    smfData * data = NULL;
+    AstKeyMap * sub_instruments = astKeyMap( " " );
+
+    /* prefill with the list of known sub-instruments. */
+    for (i = 0; i < SMF__SUBINST_NSUBINST; i++ ) {
+      const char * substr = smf_subinst_str( i, status );
+      if (substr) astMapPut0I( sub_instruments, substr, 0, NULL );
+      printf("Setting default entry %s\n",substr);
+    }
+
+    smf_open_file( igrp, 1, "READ", SMF__NOCREATE_DATA, &data, status );
+    if (*status == SAI__OK) {
+      smf_subinst_t subinst = smf_calc_subinst( data->hdr, status );
+      const char * substr = smf_subinst_str( subinst, status );
+      if (substr) {
+        /* flag this as being the relevant sub-instrument */
+        astMapPut0I( sub_instruments, substr, 1, NULL );
+      }
+    }
+    astShow(sub_instruments);
+    smf_close_file( &data, status );
+    keymap = kpg1Config( "CONFIG", "$SMURF_DIR/smurf_makemap.def", sub_instruments, status );
+    astShow(keymap);
+    astAnnul( sub_instruments );
   }
 
   /* Calculate the map bounds */

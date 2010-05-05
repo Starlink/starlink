@@ -179,6 +179,9 @@
 *     2010-03-11 (TIMJ):
 *        Add darks and mask arguments to sync with smf_concat_smfGroup
 *        Add flatramps argument.
+*     2010-05-04 (TIMJ):
+*        Simplify KeyMap access. We now trigger an error if a key is missing
+*        and we ensure all keys have corresponding defaults.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -449,8 +452,8 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
             /* Calculate the LUT if necessary */
 
             if( mtype == SMF__LUT ) {
-              int tstep;
-              if( !astMapGet0I( keymap, "TSTEP", &tstep ) ) tstep = 100;
+              int tstep = 0;
+              astMapGet0I( keymap, "TSTEP", &tstep );
               smf_calc_mapcoord( wf, idata, outfset, moving, lbnd_out,
                                  ubnd_out, SMF__NOCREATE_FILE, tstep,
                                  status );
@@ -615,13 +618,11 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
                time series. Each box (except possibly the last one)
                contains "gain_box" time slices. */
 
-            gain_box = 6000;
-            if( astMapGet0A( keymap, "COM", &kmap ) ) {
-               if( astMapGet0I( kmap, "GAIN_BOX", &ival ) ) {
-                  gain_box = ival;
-               }
-               kmap = astAnnul( kmap );
-            }
+            astMapGet0A( keymap, "COM", &kmap );
+            astMapGet0I( kmap, "GAIN_BOX", &ival );
+            gain_box = ival;
+            kmap = astAnnul( kmap );
+
             if( isTordered ) {
               ntslice = (idata->dims)[2];
             } else {
@@ -832,31 +833,26 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
                  factors in the model bufffer */
 
               tau = VAL__BADD;
-              if( !astMapGet0A( keymap, "EXT", &kmap ) ) {
-                /* No keymap parameters: use adaptive method + AUTO by default */
-                kmap = NULL;
-                tausrc = SMF__TAUSRC_AUTO;
-                extmeth = SMF__EXTMETH_ADAPT;
-              } else {
-                /* Use sub-keymap containing EXT parameters */
-                smf_get_extpar( kmap, &tausrc, &extmeth, status );
-                if( tausrc == SMF__TAUSRC_CSOTAU ||
-                    tausrc == SMF__TAUSRC_AUTO ) {
-                  /* In AUTO mode we can let people specify a fallback CSO tau.
-                     In CSO mode a hard-coded value will be used for all files. */
-                  if( astMapGet0D( kmap, "CSOTAU", &tau ) ) {
-                    msgOutf( "", "*** EXTINCTION WARNING: single opacity value "
-                             "of CSO %g %s be used for ALL input files.", status,
-                             tau, ( tausrc == SMF__TAUSRC_CSOTAU ? "will" : "might" ) );
-                  }
-                } else if( tausrc == SMF__TAUSRC_TAU ) {
-                  if( astMapGet0D( kmap, "FILTERTAU", &tau ) ) {
-                    msgOutf( "", "*** EXTINCTION WARNING: single opacity value "
-                             "of %g will be used for ALL input files.", status, tau );
-                  }
+              astMapGet0A( keymap, "EXT", &kmap );
+
+              /* Use sub-keymap containing EXT parameters */
+              smf_get_extpar( kmap, &tausrc, &extmeth, status );
+              if( tausrc == SMF__TAUSRC_CSOTAU ||
+                  tausrc == SMF__TAUSRC_AUTO ) {
+                /* In AUTO mode we can let people specify a fallback CSO tau.
+                   In CSO mode a hard-coded value will be used for all files. */
+                if( astMapGet0D( kmap, "CSOTAU", &tau ) ) {
+                  msgOutf( "", "*** EXTINCTION WARNING: single opacity value "
+                           "of CSO %g %s be used for ALL input files.", status,
+                           tau, ( tausrc == SMF__TAUSRC_CSOTAU ? "will" : "might" ) );
                 }
-                kmap = astAnnul( kmap );
+              } else if( tausrc == SMF__TAUSRC_TAU ) {
+                if( astMapGet0D( kmap, "FILTERTAU", &tau ) ) {
+                  msgOutf( "", "*** EXTINCTION WARNING: single opacity value "
+                           "of %g will be used for ALL input files.", status, tau );
+                }
               }
+              kmap = astAnnul( kmap );
 
               /* Trap case where FILTERTAU requsted but no value given */
               if( (tausrc==SMF__TAUSRC_TAU) && (tau==VAL__BADD) ) {

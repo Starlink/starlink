@@ -92,6 +92,7 @@
 *  Authors:
 *     EC: Edward Chapin (UBC)
 *     DSB: David S. Berry (JAC, Hawaii)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -103,11 +104,15 @@
 *        Add fillgaps
 *     2010-03-23 (DSB):
 *        Replace old DC jump config parameters with new ones.
+*     2010-05-04 (TIMJ):
+*        Simplify KeyMap access. We now trigger an error if a key is missing
+*        and we ensure all keys have corresponding defaults.
 *     {enter_further_changes_here}
 
 *  Notes:
 
 *  Copyright:
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     Copyright (C) 2009-2010 University of British Columbia
 *     All Rights Reserved.
 
@@ -172,15 +177,13 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
   /* Obtain parameters from keymap when non-NULL pointers given */
 
   if( apod ) {
-    if( astMapGet0I( keymap, "APOD", &temp ) ) {
-      if( temp < 0 ) {
-        *status = SAI__ERROR;
-        errRep(FUNC_NAME, "APOD cannot be < 0.", status );
-      } else {
-        *apod = (size_t) temp;
-      }
+    *apod = 0;
+    astMapGet0I( keymap, "APOD", &temp );
+    if( temp < 0 ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "APOD cannot be < 0.", status );
     } else {
-      *apod = 0;
+      *apod = (size_t) temp;
     }
 
     msgOutiff( MSG__DEBUG, "", FUNC_NAME ": APOD=%zu", status,
@@ -188,24 +191,20 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
   }
 
   if( badfrac ) {
-    if( !astMapGet0D( keymap, "BADFRAC", badfrac ) ) {
-      *badfrac = 0;
-    }
-
+    *badfrac = 0.0;
+    astMapGet0D( keymap, "BADFRAC", badfrac );
     msgOutiff( MSG__DEBUG, "", FUNC_NAME ": BADFRAC=%f", status,
                *badfrac );
   }
 
   if( dcfitbox ) {
-    if( astMapGet0I( keymap, "DCFITBOX", &temp ) ) {
-      if( temp < 0 ) {
-        *status = SAI__ERROR;
-        errRep(FUNC_NAME, "dcfitbox cannot be < 0.", status );
-      } else {
-        *dcfitbox = (dim_t) temp;
-      }
+    *dcfitbox = 0;
+    astMapGet0I( keymap, "DCFITBOX", &temp );
+    if( temp < 0 ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "dcfitbox cannot be < 0.", status );
     } else {
-      *dcfitbox = 0;
+      *dcfitbox = (dim_t) temp;
     }
 
     msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCFITBOX=%" DIM_T_FMT, status,
@@ -213,15 +212,13 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
   }
 
   if( dcmaxsteps ) {
-    *dcmaxsteps = 10;
-
-    if( astMapGet0I( keymap, "DCMAXSTEPS", &temp ) ) {
-      if( (temp < 0) ) {
-        *status = SAI__ERROR;
-        errRep(FUNC_NAME, "DCMAXSTEPS must be 0 or more.", status );
-      } else {
-        *dcmaxsteps = temp;
-      }
+    *dcmaxsteps = 0;
+    astMapGet0I( keymap, "DCMAXSTEPS", &temp );
+    if( (temp < 0) ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "DCMAXSTEPS must be 0 or more.", status );
+    } else {
+      *dcmaxsteps = temp;
     }
 
     msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCMAXSTEPS=%i", status,
@@ -229,9 +226,9 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
   }
 
   if( dcthresh ) {
-    if( !astMapGet0D( keymap, "DCTHRESH", dcthresh ) ) {
-      *dcthresh = 3.0;
-    } else if( *dcthresh < 0 ) {
+    *dcthresh = 0;
+    astMapGet0D( keymap, "DCTHRESH", dcthresh );
+    if( *dcthresh < 0 ) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "DCTHRESH must be >= 0.", status );
     }
@@ -241,50 +238,45 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
   }
 
   if( dcmedianwidth ) {
-    if( !astMapGet0I( keymap, "DCMEDIANWIDTH", &temp ) ) {
-      *dcmedianwidth = 40;
-    } else {
-      *dcmedianwidth = temp;
-    }
+    *dcmedianwidth = 0;
+    astMapGet0I( keymap, "DCMEDIANWIDTH", &temp );
+    *dcmedianwidth = temp;
 
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCMEDIANWIDTH=%d", status,
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCMEDIANWIDTH=%" DIM_T_FMT, status,
                *dcmedianwidth );
   }
 
   if( dkclean ) {
-    if( astMapGet0I( keymap, "DKCLEAN", &temp ) ) {
-      if( (temp < 0) || (temp > 1) ) {
-        *status = SAI__ERROR;
-        errRep(FUNC_NAME, "DKCLEAN must be either 0 or 1.", status );
-      } else {
-        *dkclean = temp;
-      }
+    *dkclean = 0;
+    astMapGet0I( keymap, "DKCLEAN", &temp );
+    if( temp != 0 && temp != 1 ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "DKCLEAN must be either 0 or 1.", status );
     } else {
-      *dkclean = -1;
+      *dkclean = temp;
     }
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DKCLEAN=%i", status,
-               *dkclean );
+
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DKCLEAN is %s", status,
+               (*dkclean ? "enabled" : "disabled") );
   }
 
   if( fillgaps ) {
-    if( astMapGet0I( keymap, "FILLGAPS", &temp ) ) {
-      if( (temp < 0) || (temp > 1) ) {
-        *status = SAI__ERROR;
-        errRep(FUNC_NAME, "FILLGAPS must be either 0 or 1.", status );
-      } else {
-        *fillgaps = temp;
-      }
+    *fillgaps = 0;
+    astMapGet0I( keymap, "FILLGAPS", &temp );
+    if( (temp != 0) && (temp != 1) ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "FILLGAPS must be either 0 or 1.", status );
     } else {
-      *fillgaps = -1;
+      *fillgaps = temp;
     }
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": FILLGAPS=%i", status,
-               *fillgaps );
+
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": FILLGAPS is %s", status,
+               (*fillgaps ? "enabled" : "disabled" ) );
   }
 
   if( filt_edgelow ) {
-    if( !astMapGet0D( keymap, "FILT_EDGELOW", filt_edgelow ) ) {
-      *filt_edgelow = 0;
-    }
+    *filt_edgelow = 0;
+    astMapGet0D( keymap, "FILT_EDGELOW", filt_edgelow );
 
     if( *filt_edgelow ) {
       dofft = 1;
@@ -295,9 +287,8 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
   }
 
   if( filt_edgehigh ) {
-    if( !astMapGet0D( keymap, "FILT_EDGEHIGH", filt_edgehigh ) ) {
-      *filt_edgehigh = 0;
-    }
+    *filt_edgehigh = 0;
+    astMapGet0D( keymap, "FILT_EDGEHIGH", filt_edgehigh );
 
     if( *filt_edgehigh ) {
       dofft = 1;
@@ -359,22 +350,21 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
   }
 
   if( flagstat ) {
-    if( astMapGet0D( keymap, "FLAGSTAT", flagstat ) ) {
-      if( *flagstat < 0 ) {
-        *status = SAI__ERROR;
-        errRep(FUNC_NAME, "FLAGSTAT cannot be < 0.", status );
-      }
-    } else {
-      *flagstat = 0;
+    *flagstat = 0;
+    astMapGet0D( keymap, "FLAGSTAT", flagstat );
+    if( *flagstat < 0 ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "FLAGSTAT cannot be < 0.", status );
     }
+
     msgOutiff( MSG__DEBUG, "", FUNC_NAME ": FLAGSTAT=%f", status,
                *flagstat );
   }
 
   if( order ) {
-    if( !astMapGet0I( keymap, "ORDER", order ) ) {
-      *order = -1;
-    } else if( *order < -1 ) {
+    *order = -1;
+    astMapGet0I( keymap, "ORDER", order );
+    if( *order < -1 ) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "ORDER must be >= -1", status );
     }
@@ -383,9 +373,9 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
   }
 
   if( spikethresh ) {
-    if( !astMapGet0D( keymap, "SPIKETHRESH", spikethresh ) ) {
-      *spikethresh = 0;
-    } else if( *spikethresh < 0 ) {
+    *spikethresh = 0;
+    astMapGet0D( keymap, "SPIKETHRESH", spikethresh );
+    if( *spikethresh < 0 ) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "SPIKETHRESH must be >= 0.", status );
     }
@@ -395,6 +385,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
   }
 
   if( spikeiter ) {
+    *spikeiter = 0;
     if( astMapGet0I( keymap, "SPIKEITER", &temp ) ) {
       if( temp < 0 ) {
         *status = SAI__ERROR;
@@ -402,8 +393,6 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
       } else {
         *spikeiter = (size_t) temp;
       }
-    } else {
-      *spikeiter = 0;
     }
     msgOutiff( MSG__DEBUG, "", FUNC_NAME ": SPIKEITER=%zu", status,
                *spikeiter );

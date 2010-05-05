@@ -55,6 +55,9 @@
 *        Only invert if common-mode being used to flatfield data
 *     2010-02-25 (TIMJ):
 *        Fix 32-bit incompatibility.
+*     2010-05-04 (TIMJ):
+*        Simplify KeyMap access. We now trigger an error if a key is missing
+*        and we ensure all keys have corresponding defaults.
 *     {enter_further_changes_here}
 
 
@@ -104,7 +107,7 @@ void smf_calcmodel_gai( smfWorkForce *wf __attribute__((unused)),
 
   /* Local Variables */
   size_t bstride;               /* bolometer stride */
-  dim_t gain_box=6000;          /* No. of time slices in a block */
+  dim_t gain_box=0;             /* No. of time slices in a block */
   size_t gbstride;              /* GAIn bolo stride */
   size_t gcstride;              /* GAIn coeff stride */
   int gflat=0;                  /* correct flatfield using GAI */
@@ -138,25 +141,21 @@ void smf_calcmodel_gai( smfWorkForce *wf __attribute__((unused)),
   if( *status != SAI__OK ) return;
   if( !(flags&SMF__DIMM_INVERT) ) return;
 
-  /* Get the number of blocks into which to split each time series. Each box
-     (except possibly the last one contains "gain_box" time slices. */
-  gain_box = 6000;
-  if( astMapGet0A( keymap, "COM", &kmap ) ) {
-     if( astMapGet0I( kmap, "GAIN_BOX", &ival ) ) {
-        gain_box = ival;
-     }
-     kmap = astAnnul( kmap );
-  }
-
   /* Obtain pointer to sub-keymap containing GAI parameters */
-  if( astMapGet0A( keymap, "GAI", &kmap ) ) {
-    astMapGet0I( kmap, "FLATFIELD", &gflat );
-  }
+  astMapGet0A( keymap, "GAI", &kmap );
+  astMapGet0I( kmap, "FLATFIELD", &gflat );
+  if( kmap ) kmap = astAnnul( kmap );
 
   /* Only have to do something if gai.flatfield set */
-  if( !gflat ) {
-    goto L998;
-  }
+  if( !gflat ) return;
+
+  /* Get the number of blocks into which to split each time series. Each box
+     (except possibly the last one contains "gain_box" time slices. */
+  astMapGet0A( keymap, "COM", &kmap );
+  astMapGet0I( kmap, "GAIN_BOX", &ival );
+  gain_box = ival;
+  if (kmap) kmap = astAnnul( kmap );
+  if (*status != SAI__OK) return;
 
   /* Obtain pointers to relevant smfArrays for this chunk */
   res = dat->res[chunk];
@@ -241,8 +240,4 @@ void smf_calcmodel_gai( smfWorkForce *wf __attribute__((unused)),
     }
   }
 
- L998:
-
-  /* Clean up */
-  if( kmap ) kmap = astAnnul( kmap );
 }

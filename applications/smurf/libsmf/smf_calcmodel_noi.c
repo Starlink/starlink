@@ -48,6 +48,7 @@
 *  Authors:
 *     Edward Chapin (UBC)
 *     David Berry (JAC, Hawaii)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -87,10 +88,14 @@
 *        - Add dcthresh2 config parameter.
 *     2010-02-23 (DSB)
 *        - Replace dcthresh2 with dcmedianwidth config parameter.
+*     2010-05-04 (TIMJ):
+*        Simplify KeyMap access. We now trigger an error if a key is missing
+*        and we ensure all keys have corresponding defaults.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2005-2010 University of British Columbia.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -170,9 +175,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   if (*status != SAI__OK) return;
 
   /* Obtain pointer to sub-keymap containing NOI parameters */
-  if( !astMapGet0A( keymap, "NOI", &kmap ) ) {
-    kmap = NULL;
-  }
+  astMapGet0A( keymap, "NOI", &kmap );
 
   /* Obtain pointers to relevant smfArrays for this chunk */
   res = dat->res[chunk];

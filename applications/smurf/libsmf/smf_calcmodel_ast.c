@@ -43,6 +43,7 @@
 
 *  Authors:
 *     Edward Chapin (UBC)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -76,6 +77,9 @@
 *        Fix 32-bit incompatibility.
 *     2010-04-20 (EC):
 *        Set map quality bits if zero_lowhits requested.
+*     2010-05-04 (TIMJ):
+*        Simplify KeyMap access. We now trigger an error if a key is missing
+*        and we ensure all keys have corresponding defaults.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -163,9 +167,7 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)), smfDIMMData *d
   if (*status != SAI__OK) return;
 
   /* Obtain pointer to sub-keymap containing COM parameters */
-  if( !astMapGet0A( keymap, "AST", &kmap ) ) {
-    kmap = NULL;
-  }
+  astMapGet0A( keymap, "AST", &kmap );
 
   /* Obtain pointers to relevant smfArrays for this chunk */
   res = dat->res[chunk];
@@ -182,14 +184,12 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)), smfDIMMData *d
   }
 
   /* Parse parameters */
-  if( kmap ) {
-    /* Will we apply boundary condition to map? */
-    if( astMapGet0D( kmap, "ZERO_LOWHITS", &zero_lowhits) ) {
-      if( zero_lowhits < 0 ) {
-        *status = SAI__ERROR;
-        errRep( "", FUNC_NAME ": AST.ZERO_LOWHITS cannot be < 0.", status );
-      }
-    }
+
+  /* Will we apply boundary condition to map? */
+  astMapGet0D( kmap, "ZERO_LOWHITS", &zero_lowhits);
+  if( zero_lowhits < 0 ) {
+    *status = SAI__ERROR;
+    errRep( "", FUNC_NAME ": AST.ZERO_LOWHITS cannot be < 0.", status );
   }
 
   if( *status != SAI__OK ) {

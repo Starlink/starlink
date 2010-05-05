@@ -75,5 +75,5 @@ noi.spikethresh = 5
 
 # heavier high-pass filtering
 
-flt_450.filt_edgehigh = 0.2
-flt_850.filt_edgehigh = 0.6
+450.flt.filt_edgehigh = 0.2
+850.flt.filt_edgehigh = 0.6

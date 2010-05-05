@@ -262,6 +262,12 @@
 *        Add map quality
 *     2010-04-22 (EC)
 *        Add useful FITS headers for itermaps/bolomaps/shortmaps
+*     2010-05-04 (TIMJ):
+*        Simplify KeyMap access. We now trigger an error if a key is missing
+*        and we ensure all keys have corresponding defaults.
+*     2010-05-05 (TIMJ):
+*        Remove keymap merging of sub-instruments since this is now handled
+*        during configuration file reading.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -347,7 +353,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   double dcthresh;              /* Threshold for fixing primary DC steps */
   dim_t dcmedianwidth;          /* Median filter width for DC steps detection */
   int deldimm=0;                /* Delete temporary .DIMM files */
-  int tstep = 100;              /* Time step between full WCS calculations */
+  int tstep = 0;                /* Time step between full WCS calculations */
   int dimmflags;                /* Control flags for DIMM model components */
   int dofft=0;                  /* Set if freq. domain filtering the data */
   dim_t dsize;                  /* Size of data arrays in containers */
@@ -405,7 +411,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int nm=0;                     /* Signed int version of nmodels */
   dim_t nmodels=0;              /* Number of model components / iteration */
   dim_t ntslice;                /* Number of time slices */
-  int numiter;                  /* Total number iterations */
+  int numiter=0;                /* Total number iterations */
   dim_t padEnd=0;               /* How many samples of padding at the end */
   dim_t padStart=0;             /* How many samples of padding at the start */
   char *pname=NULL;             /* Poiner to name */
@@ -462,13 +468,11 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   /* Get size of the input group */
   isize = grpGrpsz( igrp, status );
 
-  /* Parse the CONFIG parameters stored in the keymap */
+  /* Parse the CONFIG parameters stored in the keymap. We assume that all variables
+     have been given defaults through the .def file. */
   if( *status == SAI__OK ) {
     /* Number of iterations */
-    if( !astMapGet0I( keymap, "NUMITER", &numiter ) ) {
-      numiter = -20;
-    }
-
+    astMapGet0I( keymap, "NUMITER", &numiter );
     if( numiter == 0 ) {
       *status = SAI__ERROR;
       errRep("", FUNC_NAME ": NUMITER cannot be 0", status);
@@ -487,14 +491,10 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
     if( *status == SAI__OK ) {
       /* Required positional accuracy, in output map pixels. */
-      if( !astMapGet0I( keymap, "TSTEP", &tstep ) ) {
-        tstep = 100;
-      }
+      astMapGet0I( keymap, "TSTEP", &tstep );
 
       /* Chisquared change tolerance for stopping */
-      if( !astMapGet0D( keymap, "CHITOL", &chitol ) ) {
-        chitol = 0.0001;
-      }
+      astMapGet0D( keymap, "CHITOL", &chitol );
 
       if( chitol <= 0 ) {
         *status = SAI__ERROR;
@@ -507,9 +507,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     /* Do iterations completely in memory - minimize disk I/O */
     if( *status == SAI__OK ) {
 
-      if( !astMapGet0I( keymap, "MEMITER", &memiter ) ) {
-        memiter = 0;
-      }
+      astMapGet0I( keymap, "MEMITER", &memiter );
 
       if( memiter ) {
         msgOutif(MSG__VERB, " ",
@@ -525,34 +523,22 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       }
 
       /* Are we going to produce single-bolo maps? */
-      if( !astMapGet0I( keymap, "BOLOMAP", &bolomap ) ) {
-        bolomap = 0;
-      }
+      astMapGet0I( keymap, "BOLOMAP", &bolomap );
 
       /* Are we going to produce maps for each iteration? */
-      if( !astMapGet0I( keymap, "ITERMAP", &itermap ) ) {
-        itermap = 0;
-      }
+      astMapGet0I( keymap, "ITERMAP", &itermap );
 
       /* Are we going to produce short maps every SHORTMAP time slices? */
-      if( !astMapGet0I( keymap, "SHORTMAP", &shortmap ) ) {
-        shortmap = 0;
-      }
+      astMapGet0I( keymap, "SHORTMAP", &shortmap );
 
       /* Are we going to apply the flatfield when we load data? */
-      if( !astMapGet0I( keymap, "ENSUREFLAT", &ensureflat ) ) {
-        ensureflat = 1;
-      }
+      astMapGet0I( keymap, "ENSUREFLAT", &ensureflat );
 
       /* Are we going to set bad values in exported models? */
-      if( !astMapGet0I( keymap, "NOEXPORTSETBAD", &noexportsetbad ) ) {
-        noexportsetbad = 0;
-      }
+      astMapGet0I( keymap, "NOEXPORTSETBAD", &noexportsetbad );
 
       /* Method to use for calculating the variance map */
-      if( !astMapGet0I( keymap, "VARMAPMETHOD", &varmapmethod ) ) {
-        varmapmethod = 0;
-      }
+      astMapGet0I( keymap, "VARMAPMETHOD", &varmapmethod );
 
       if( varmapmethod ) {
         msgOutif(MSG__VERB, " ",
@@ -575,60 +561,51 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
     /* Maximum length of a continuous chunk */
     if( *status == SAI__OK ) {
-      if( astMapGet0D( keymap, "MAXLEN", &dtemp ) ) {
+      astMapGet0D( keymap, "MAXLEN", &dtemp );
 
-        if( dtemp < 0.0 ) {
-          /* Trap negative MAXLEN */
-          *status = SAI__ERROR;
-          errRep(FUNC_NAME, "Negative value for MAXLEN supplied.", status);
-        } else if( dtemp == 0 ) {
-          /* 0 is OK... gets ignored later */
-          maxlen = 0;
-        } else {
-          /* Obtain sample length from header of first file in igrp */
-          smf_open_file( igrp, 1, "READ", SMF__NOCREATE_DATA, &data, status );
-          if( (*status == SAI__OK) && (data->hdr) ) {
-            steptime = data->hdr->steptime;
-
-            if( steptime > 0 ) {
-              maxlen = (dim_t) (dtemp / steptime);
-            } else {
-              /* Trap invalid sample length in header */
-              *status = SAI__ERROR;
-              errRep(FUNC_NAME, "Invalid STEPTIME in FITS header.", status);
-            }
-          }
-          smf_close_file( &data, status );
-        }
-      } else {
+      if( dtemp < 0.0 ) {
+        /* Trap negative MAXLEN */
+        *status = SAI__ERROR;
+        errRep(FUNC_NAME, "Negative value for MAXLEN supplied.", status);
+      } else if( dtemp == 0 ) {
+        /* 0 is OK... gets ignored later */
         maxlen = 0;
+      } else {
+        /* Obtain sample length from header of first file in igrp */
+        smf_open_file( igrp, 1, "READ", SMF__NOCREATE_DATA, &data, status );
+        if( (*status == SAI__OK) && (data->hdr) ) {
+          steptime = data->hdr->steptime;
+
+          if( steptime > 0 ) {
+            maxlen = (dim_t) (dtemp / steptime);
+          } else {
+            /* Trap invalid sample length in header */
+            *status = SAI__ERROR;
+            errRep(FUNC_NAME, "Invalid STEPTIME in FITS header.", status);
+          }
+        }
+        smf_close_file( &data, status );
       }
     }
 
     /* Padding */
     if( *status == SAI__OK ) {
-      if( astMapGet0I( keymap, "PADSTART", &temp ) ) {
-        if( temp < 0 ) {
-          *status = SAI__ERROR;
-          errRep(FUNC_NAME, "PADSTART cannot be < 0.", status );
-        } else {
-          padStart = (dim_t) temp;
-        }
+      astMapGet0I( keymap, "PADSTART", &temp );
+      if( temp < 0 ) {
+        *status = SAI__ERROR;
+        errRep(FUNC_NAME, "PADSTART cannot be < 0.", status );
       } else {
-        padStart = 0;
+        padStart = (dim_t) temp;
       }
     }
 
     if( *status == SAI__OK ) {
-      if( astMapGet0I( keymap, "PADEND", &temp ) ) {
-        if( temp < 0 ) {
-          *status = SAI__ERROR;
-          errRep(FUNC_NAME, "PADEND cannot be < 0.", status );
-        } else {
-          padEnd = (dim_t) temp;
-        }
+      astMapGet0I( keymap, "PADEND", &temp );
+      if( temp < 0 ) {
+        *status = SAI__ERROR;
+        errRep(FUNC_NAME, "PADEND cannot be < 0.", status );
       } else {
-        padEnd = 0;
+        padEnd = (dim_t) temp;
       }
     }
 
@@ -637,58 +614,52 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     haveext = 0;
 
     if( *status == SAI__OK ) {
-      if(astMapGet1C(keymap, "MODELORDER", 4, SMF_MODEL_MAX, &nm, modelnames)) {
-        nmodels = (dim_t) nm;
+      astMapGet1C(keymap, "MODELORDER", 4, SMF_MODEL_MAX, &nm, modelnames);
+      nmodels = (dim_t) nm;
 
-        /* Allocate modeltyps */
-        if( nmodels >= 1 ) {
-          modeltyps = smf_malloc( nmodels, sizeof(*modeltyps), 1, status );
-          /* Extra components for exportNDF_which for 'res', 'qua' */
-          exportNDF_which = smf_malloc( nmodels+2, sizeof(*exportNDF_which),
-                                        1, status );
-        } else {
-          msgOut(" ", FUNC_NAME ": No valid models in MODELORDER",
-                 status );
-        }
+      /* Allocate modeltyps */
+      if( nmodels >= 1 ) {
+        modeltyps = smf_malloc( nmodels, sizeof(*modeltyps), 1, status );
+        /* Extra components for exportNDF_which for 'res', 'qua' */
+        exportNDF_which = smf_malloc( nmodels+2, sizeof(*exportNDF_which),
+                                      1, status );
+      } else {
+        msgOut(" ", FUNC_NAME ": No valid models in MODELORDER",
+               status );
+      }
 
-        /* Loop over names and figure out enumerated type */
-        for( i=0; (*status==SAI__OK)&&(i<nmodels); i++ ) {
-          modelname = modelnames+i*4; /* Pointer to current name */
-          thismodel = smf_model_gettype( modelname, status );
+      /* Loop over names and figure out enumerated type */
+      for( i=0; (*status==SAI__OK)&&(i<nmodels); i++ ) {
+        modelname = modelnames+i*4; /* Pointer to current name */
+        thismodel = smf_model_gettype( modelname, status );
 
-          if( *status == SAI__OK ) {
-            modeltyps[i] = thismodel;
+        if( *status == SAI__OK ) {
+          modeltyps[i] = thismodel;
 
-            /* set haveast/whichast */
-            if( thismodel == SMF__AST ) {
-              haveast = 1;
-              whichast = i;
-            }
+          /* set haveast/whichast */
+          if( thismodel == SMF__AST ) {
+            haveast = 1;
+            whichast = i;
+          }
 
-            /* set havenoi/whichnoi */
-            if( thismodel == SMF__NOI ) {
-              havenoi = 1;
-              whichnoi = i;
-            }
+          /* set havenoi/whichnoi */
+          if( thismodel == SMF__NOI ) {
+            havenoi = 1;
+            whichnoi = i;
+          }
 
-            /* set haveext/whichext */
-            if( thismodel == SMF__EXT ) {
-              haveext = 1;
-              whichext = i;
-            }
+          /* set haveext/whichext */
+          if( thismodel == SMF__EXT ) {
+            haveext = 1;
+            whichext = i;
+          }
 
-            /* set havegai/whichgai */
-            if( thismodel == SMF__GAI ) {
-              havegai = 1;
-              whichgai = i;
-            }
+          /* set havegai/whichgai */
+          if( thismodel == SMF__GAI ) {
+            havegai = 1;
+            whichgai = i;
           }
         }
-      } else {
-        *status = SAI__ERROR;
-        errRep("", FUNC_NAME ": MODELORDER must be specified in config file!",
-               status);
-        nmodels = 0;
       }
     }
 
@@ -706,7 +677,6 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
 
     /* Will we export components to NDF files at the end? */
-    exportNDF = 0;
     if( (*status==SAI__OK) && astMapHasKey( keymap, "EXPORTNDF" ) ){
       /* There are two possibilities: (i) the user specified a "1" or
          a "0" indicating all or none of the models should be
@@ -714,54 +684,53 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
          names for each component that will be exported (same syntax as
          modelorder) */
 
-      if(astMapGet1C(keymap, "EXPORTNDF", 4, SMF_MODEL_MAX, &nm, modelnames)) {
-        /* Re-use variables used to parse MODELORDER. If there is a
+      astMapGet1C(keymap, "EXPORTNDF", 4, SMF_MODEL_MAX, &nm, modelnames);
+      /* Re-use variables used to parse MODELORDER. If there is a
          single element check to see if it is a single digit for the
          0/1 case. Otherwise try to find matches to each of the parsed
          MODELORDER components */
 
-        if( (nm==1) && (strlen(modelnames)<3) ) {
-          if( strtol(modelnames,NULL,10) == 1 ) {
-            /* Export all of the model components */
-            exportNDF = 1;
-            for( i=0; (*status==SAI__OK)&&(i<nmodels); i++ ) {
-              exportNDF_which[i] = 1;
-            }
+      if( (nm==1) && (strlen(modelnames)<3) ) {
+        if( strtol(modelnames,NULL,10) == 1 ) {
+          /* Export all of the model components */
+          exportNDF = 1;
+          for( i=0; (*status==SAI__OK)&&(i<nmodels); i++ ) {
+            exportNDF_which[i] = 1;
           }
-        } else {
-          /* Selectively export components */
-          for( ii=0; (*status==SAI__OK)&&(ii<nm); ii++ ) {
-            modelname = modelnames+ii*4; /* Pointer to current name */
-            thismodel = smf_model_gettype( modelname, status );
+        }
+      } else {
+        /* Selectively export components */
+        for( ii=0; (*status==SAI__OK)&&(ii<nm); ii++ ) {
+          modelname = modelnames+ii*4; /* Pointer to current name */
+          thismodel = smf_model_gettype( modelname, status );
 
-            /* Check to see if thismodel matches something in modeltyps */
-            for( j=0; (*status==SAI__OK)&&(j<nmodels); j++ ) {
-              if( thismodel == modeltyps[j] ) {
-                /* Found a hit -- export this model component */
-                exportNDF = 1;
-                exportNDF_which[j] = 1;
+          /* Check to see if thismodel matches something in modeltyps */
+          for( j=0; (*status==SAI__OK)&&(j<nmodels); j++ ) {
+            if( thismodel == modeltyps[j] ) {
+              /* Found a hit -- export this model component */
+              exportNDF = 1;
+              exportNDF_which[j] = 1;
 
-                /* Need to export RES as well if NOI is specified
-                   since it becomes the variance component of the
-                   residual file */
-                if( thismodel == SMF__NOI ) {
-                  exportNDF_which[nmodels]=1;
-                }
+              /* Need to export RES as well if NOI is specified
+                 since it becomes the variance component of the
+                 residual file */
+              if( thismodel == SMF__NOI ) {
+                exportNDF_which[nmodels]=1;
               }
             }
+          }
 
-            /* If the model type is 'qua' handle it here */
-            if( thismodel == SMF__QUA ) {
-              exportNDF = 1;
-              /* qua will be attached to any 3d model component */
-              exportNDF_which[nmodels+1]=1;
-            }
+          /* If the model type is 'qua' handle it here */
+          if( thismodel == SMF__QUA ) {
+            exportNDF = 1;
+            /* qua will be attached to any 3d model component */
+            exportNDF_which[nmodels+1]=1;
+          }
 
-            /* If the model type is 'res' handle it here */
-            if( thismodel == SMF__RES ) {
-              exportNDF = 1;
-              exportNDF_which[nmodels]=1;
-            }
+          /* If the model type is 'res' handle it here */
+          if( thismodel == SMF__RES ) {
+            exportNDF = 1;
+            exportNDF_which[nmodels]=1;
           }
         }
       }
@@ -774,36 +743,6 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     errRep("", FUNC_NAME ": AST error detected parsing config file!",
            status);
   }
-
-  /* Merge wavelength specific keymap entries - we need to know the wavelength
-     regime of this data so we either open a file or we have a parameter
-     passed in to smf_iteratemap from a previous file opening. Assumes
-     that all input files are same wavelength. */
-  smf_open_file( igrp, 1, "READ", SMF__NOCREATE_DATA, &data, status );
-  if (*status == SAI__OK) {
-    smf_subinst_t subinst;
-    const char  *suffix = NULL;
-    subinst = smf_calc_subinst( data->hdr, status );
-    if (subinst == SMF__SUBINST_850) {
-      suffix = "_850";
-    } else if (subinst == SMF__SUBINST_450) {
-      suffix = "_450";
-    } else {
-      if (*status == SAI__OK) {
-        *status = SAI__ERROR;
-        errRep( "", "Unrecognized sub-instrument", status );
-      }
-    }
-
-    /* these are upper case by this point */
-    smf_merge_keymaps( keymap, "FLT", suffix, status );
-    smf_merge_keymaps( keymap, "COM", suffix, status );
-    smf_merge_keymaps( keymap, "GAI", suffix, status );
-    smf_merge_keymaps( keymap, "EXT", suffix, status );
-    smf_merge_keymaps( keymap, "AST", suffix, status );
-    smf_merge_keymaps( keymap, "NOI", suffix, status );
-  }
-  smf_close_file( &data, status );
 
   if( untilconverge ) {
     msgSeti("MAX",maxiter);

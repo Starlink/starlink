@@ -7,7 +7,7 @@ SUBDIRS = libsmf libsmurf libsc2sim libacsis libaztec libgsd libsc2fts docs
 # can not use surf_mon_FCFLAGS yet
 AM_FCFLAGS = -Isrc -Isc2da -Isc2sim
 
-dist_bin_SCRIPTS = $(DYNSCRIPTS) $(STATICSCRIPTS)
+dist_bin_SCRIPTS = $(DYNSCRIPTS) $(STATICSCRIPTS) $(DEFAULTS)
 dist_noinst_SCRIPTS = smurf_link_adam
 bin_MONOLITHS = smurf_mon
 smurf_mon_SOURCES = smurf_mon.c $(DA_FILES) $(WVM_FILES)
@@ -115,6 +115,8 @@ DYNSCRIPTS = smurf.sh smurf.csh smurf.icl
 STATICSCRIPTS = scripts/jcmtstate2cat scripts/dumpocscfg scripts/gettsys \
 scripts/distortion scripts/showdistortion scripts/tobeam scripts/print_index \
 scripts/cbas scripts/bolcoords scripts/matched-filter
+
+DEFAULTS = defaults/smurf_makemap.def
 
 # IFL files
 IFL_FILES = $(smurf_mon_TASKS:=.ifl) smurf_mon.ifl
