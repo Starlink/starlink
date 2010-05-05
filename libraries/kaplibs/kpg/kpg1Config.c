@@ -7,6 +7,7 @@
 
 AstKeyMap *kpg1Config( const char *param, const char *def, int *status ){
 /*
+*+
 *  Name:
 *     kpg1Config
 
@@ -20,32 +21,32 @@ AstKeyMap *kpg1Config( const char *param, const char *def, int *status ){
 *     AstKeyMap *kpg1Config( const char *param, const char *def, int *status )
 
 *  Description:
-*     This function first creates a KeyMap by reading the values from a specified 
-*     text file (argument "def"). This text files specifies the complete list 
-*     of all allowed config parameters and their default values. The KeyMap is then 
-*     locked by setting its MapLocked attribute to a true value. A GRP group is then 
+*     This function first creates a KeyMap by reading the values from a specified
+*     text file (argument "def"). This text files specifies the complete list
+*     of all allowed config parameters and their default values. The KeyMap is then
+*     locked by setting its MapLocked attribute to a true value. A GRP group is then
 *     obtained from the environment using the specified parameter (argument "param").
-*     The config settings thus obtained are stored in the KeyMap. Since the KeyMap 
-*     has been locked, an error will be reported if the user-supplied group refers to 
-*     any config parameters that were not read earlier from the default file. 
+*     The config settings thus obtained are stored in the KeyMap. Since the KeyMap
+*     has been locked, an error will be reported if the user-supplied group refers to
+*     any config parameters that were not read earlier from the default file.
 *
-*     The beneifts of using this function are that 1) the user gets to know if they 
-*     mis-spell a config parameter name, and 2) the default parameter values can be 
+*     The beneifts of using this function are that 1) the user gets to know if they
+*     mis-spell a config parameter name, and 2) the default parameter values can be
 *     defined in a single place, rather than hard-wiring them into application code
 *     at each place where the coinfig parameter is used.
 
 *  Arguments:
-*     paramc
+*     paramc = const char * (Given)
 *        The name of the environment parameter to use.
-*     def
-*        The path to a file containing the default value for every allowaed config 
+*     def = const char * (Given)
+*        The path to a file containing the default value for every allowaed config
 *        parameter. For instance, "$SMURF_DIR/dimmconfig.def".
-*     status
+*     status = int * (Given & Returned)
 *        The inherited status.
 
 *  Notes:
-*     - The KeyError attribute is set non-zero in the returned KeyMap so that an error 
-*     will be reported by astMapGet<X> if the requested key does not exist in the KeyMap.  
+*     - The KeyError attribute is set non-zero in the returned KeyMap so that an error
+*     will be reported by astMapGet<X> if the requested key does not exist in the KeyMap.
 
 *  Returned Value:
 *     A pointer to the AST KeyMap, or NULL if an error occurrs.
@@ -87,6 +88,8 @@ AstKeyMap *kpg1Config( const char *param, const char *def, int *status ){
 
 *  Bugs:
 *     {note_any_bugs_here}
+
+*-
 */
 
 /* Local Varianles: */
@@ -116,7 +119,7 @@ AstKeyMap *kpg1Config( const char *param, const char *def, int *status ){
 /* Read a group of configuration setting from the specified environment parameter. */
    kpg1Gtgrp( param, &grp, &size, status );
 
-/* Lock the KeyMap so that an error will be reported if an attempt 
+/* Lock the KeyMap so that an error will be reported if an attempt
    is made to add any new entries to it. */
    astSetI( result, "MapLocked", 1 );
 
@@ -146,8 +149,8 @@ AstKeyMap *kpg1Config( const char *param, const char *def, int *status ){
 
    }
 
-/* Ensure the KeyError attribute is non-zero in the returned KeyMap so that an 
-   error is reported by astMapGet<X> if the KeyMap does not contain the requested 
+/* Ensure the KeyError attribute is non-zero in the returned KeyMap so that an
+   error is reported by astMapGet<X> if the KeyMap does not contain the requested
    entry. */
    if( result ) astSetI( result, "KeyError", 1 );
 
