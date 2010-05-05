@@ -990,7 +990,6 @@ void smurf_makemap( int *status ) {
     for (i = 0; i < SMF__SUBINST_NSUBINST; i++ ) {
       const char * substr = smf_subinst_str( i, status );
       if (substr) astMapPut0I( sub_instruments, substr, 0, NULL );
-      printf("Setting default entry %s\n",substr);
     }
 
     smf_open_file( igrp, 1, "READ", SMF__NOCREATE_DATA, &data, status );
@@ -1002,10 +1001,9 @@ void smurf_makemap( int *status ) {
         astMapPut0I( sub_instruments, substr, 1, NULL );
       }
     }
-    astShow(sub_instruments);
+
     smf_close_file( &data, status );
     keymap = kpg1Config( "CONFIG", "$SMURF_DIR/smurf_makemap.def", sub_instruments, status );
-    astShow(keymap);
     astAnnul( sub_instruments );
   }
 

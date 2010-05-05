@@ -206,7 +206,6 @@ static void kpg1__process_nesting( AstKeyMap * keymap,
   if (! nested ) return;
 
   nnest = astMapSize( nested );
-  astShow(nested);
   for (i=0; i < nnest; i++) {
     int keep = 0;
     const char * testkey = astMapKey( nested, i );
