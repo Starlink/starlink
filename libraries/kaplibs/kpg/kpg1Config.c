@@ -72,6 +72,7 @@ AstKeyMap *kpg1Config( const char *param, const char *def, int *status ){
 
 *  Authors:
 *     DSB: David S. Berry
+*     TIMJ: Tim Jenness
 *     {enter_new_authors_here}
 
 *  History:
@@ -79,6 +80,9 @@ AstKeyMap *kpg1Config( const char *param, const char *def, int *status ){
 *        Original version.
 *     4-MAY-2010 (DSB):
 *        Set KeyError attribute non-zero in the returned KeyMap.
+*     4-MAY-2010 (TIMJ):
+*        Merge defaults with supplied values in this routine so that
+*        we can correctly handle defaulting using <def>.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -86,16 +90,14 @@ AstKeyMap *kpg1Config( const char *param, const char *def, int *status ){
 */
 
 /* Local Varianles: */
-   AstKeyMap *result;           /* Returned KeyMap */
+   AstKeyMap *external = NULL;  /* Keymap of externally supplied values */
+   AstKeyMap *result = NULL;    /* Returned KeyMap */
    char *value;                 /* Pointer to GRP element buffer */
    char buffer[ GRP__SZNAM ];   /* Buffer for GRP element */
    int added;                   /* Number of names added to group */
    int flag;                    /* Flag */
    Grp *grp;                    /* Group to hold config values */
    size_t size;                 /* Size of group */
-
-/* Initialise */
-   result = NULL;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return result;
@@ -111,12 +113,12 @@ AstKeyMap *kpg1Config( const char *param, const char *def, int *status ){
 /* Delete the group. */
    grpDelet( &grp, status );
 
+/* Read a group of configuration setting from the specified environment parameter. */
+   kpg1Gtgrp( param, &grp, &size, status );
+
 /* Lock the KeyMap so that an error will be reported if an attempt 
    is made to add any new entries to it. */
    astSetI( result, "MapLocked", 1 );
-
-/* Read a group of configuration setting fromthe specified environment parameter. */
-   kpg1Gtgrp( param, &grp, &size, status );
 
 /* If no group was supplied, just annul any PAR__NULL error. */
    if( *status == PAR__NULL || size == 0 ) {
@@ -132,10 +134,16 @@ AstKeyMap *kpg1Config( const char *param, const char *def, int *status ){
          strcpy( value, " " );
       }
 
-/* Otherwise, store the configuration settings in the KeyMap. An error will be 
-   reported if a config parameter is specified that is not already present in 
-   the KeyMap. */
-      if( ! astChrMatch( value, "DEF" ) ) kpg1Kymap( grp, &result, status );
+/* Otherwise, store the configuration settings in the KeyMap. */
+      if( ! astChrMatch( value, "DEF" ) ) kpg1Kymap( grp, &external, status );
+
+/* Copy the overrides into the default. An error will be reported if a config
+   parameter is specified that is not already present in the KeyMap. */
+      astMapCopy( result, external );
+
+/* Delete the external KeyMap */
+      external = astAnnul( external );
+
    }
 
 /* Ensure the KeyError attribute is non-zero in the returned KeyMap so that an 
