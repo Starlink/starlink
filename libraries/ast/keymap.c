@@ -141,6 +141,9 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map.
 *         Added astMapPutElem<X>.
 *     27-APR-2010 (DSB):
 *         Added MapLocked attribute.
+*     4-MAY-2010 (DSB):
+*         Propagate MapLocked and KeyError attributes to any encapsulated
+*         KeyMaps.
 *class--
 */
 
@@ -679,6 +682,87 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
    method for further interpretation. */
    } else {
       (*parent_clearattrib)( this_object, attrib, status );
+   }
+}
+
+static void ClearKeyError( AstKeyMap *this, int *status ) {
+/*
+*+
+*  Name:
+*     astClearKeyError
+
+*  Purpose:
+*     Clear the value of the KeyError attribute for a KeyMap.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "keymap.h"
+*     void astClearKeyError( AstKeyMap *this )
+
+*  Class Membership:
+*     KeyMap method.
+
+*  Description:
+*     This function clears the value of the KeyError attribute for a
+*     KeyMap. It clears the attribute recursively in any KeyMaps
+*     contained within the supplied KeyMap.
+
+*  Parameters:
+*     this
+*        Pointer to the KeyMap.
+
+*-
+*/
+
+/* Local Variables: */
+   AstMapEntry *next;     /* Pointer to next Entry to copy */
+   AstObject **obj_list;  /* List of pointers to AST Object entries */
+   int i;                 /* Index into hash table */
+   int iel;               /* Index of current vector element */
+   int nel;               /* Number of elements in vector */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Clear the KeyError value in the supplied KeyMap. */
+   this->keyerror = -INT_MAX;
+
+/* Loop round each entry in the hash table. */
+   for( i = 0; i < this->mapsize; i++ ) {
+
+/* Get a pointer to the next KeyMap entry. */
+      next = this->table[ i ];
+
+/* Loop round all entries in this element of the hash table. */
+      while( next && astOK ) {
+
+/* If this entry has an Object data type, see if holds any KeyMaps. */
+         if( next->type == AST__OBJECTTYPE ) {
+
+/* Get the number of objects to check, and a pointer to the first. */
+            nel = next->nel;
+            if( nel == 0 ) {
+               obj_list = &( ((Entry0A *)next)->value );
+               nel = 1;
+            } else {
+               obj_list = ((Entry1A *)next)->value;
+            }
+
+/* Loop round checking all Objects. */
+            for( iel = 0; iel < nel; iel++ ) {
+
+/* If this Object is a KeyMap, clear its KeyError attribute. */
+               if( astIsAKeyMap( obj_list[ iel ] ) ) {
+                  astClearKeyError( (AstKeyMap *) obj_list[ iel ] );
+               }
+            }
+         }
+
+/* Get a pointer to the next entry. */
+         next = next->next;
+      }
    }
 }
 
@@ -6094,6 +6178,88 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
    }
 }
 
+static void SetKeyError( AstKeyMap *this, int keyerror, int *status ) {
+/*
+*+
+*  Name:
+*     astSetKeyError
+
+*  Purpose:
+*     Set the value of the KeyError attribute for a KeyMap.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "keymap.h"
+*     void astSetKeyError( AstKeyMap *this, int keyerror )
+
+*  Class Membership:
+*     KeyMap method.
+
+*  Description:
+*     This function sets the value of the KeyError attribute for a
+*     KeyMap. It also sets the attribute recursively in any KeyMaps
+*     contained within the supplied KeyMap.
+
+*  Parameters:
+*     this
+*        Pointer to the KeyMap.
+*     keyerror
+*        The new value for the attribute.
+*-
+*/
+
+/* Local Variables: */
+   AstMapEntry *next;     /* Pointer to next Entry to copy */
+   AstObject **obj_list;  /* List of pointers to AST Object entries */
+   int i;                 /* Index into hash table */
+   int iel;               /* Index of current vector element */
+   int nel;               /* Number of elements in vector */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Set the KeyError value in the supplied KeyMap. */
+   this->keyerror = keyerror ? 1 : 0;
+
+/* Loop round each entry in the hash table. */
+   for( i = 0; i < this->mapsize; i++ ) {
+
+/* Get a pointer to the next KeyMap entry. */
+      next = this->table[ i ];
+
+/* Loop round all entries in this element of the hash table. */
+      while( next && astOK ) {
+
+/* If this entry has an Object data type, see if holds any KeyMaps. */
+         if( next->type == AST__OBJECTTYPE ) {
+
+/* Get the number of objects to check, and a pointer to the first. */
+            nel = next->nel;
+            if( nel == 0 ) {
+               obj_list = &( ((Entry0A *)next)->value );
+               nel = 1;
+            } else {
+               obj_list = ((Entry1A *)next)->value;
+            }
+
+/* Loop round checking all Objects. */
+            for( iel = 0; iel < nel; iel++ ) {
+
+/* If this Object is a KeyMap, set its KeyError attribute. */
+               if( astIsAKeyMap( obj_list[ iel ] ) ) {
+                  astSetKeyError( (AstKeyMap *) obj_list[ iel ], keyerror );
+               }
+            }
+         }
+
+/* Get a pointer to the next entry. */
+         next = next->next;
+      }
+   }
+}
+
 static void SetMapLocked( AstKeyMap *this, int maplocked, int *status ) {
 /*
 *+
@@ -6513,15 +6679,19 @@ f     .FALSE.
 *     but no error will be reported. If KeyError is non-zero, then the
 *     same values are returned but an error is also reported.
 
+*  Notes:
+*     - When setting a new value for KeyError, the supplied value is
+*     propagated to any KeyMaps contained within the supplied KeyMap.
+*     - When clearing the KeyError attribute, the attribute is also
+*     cleared in any KeyMaps contained within the supplied KeyMap.
+
 *  Applicability:
 *     KeyMap
 *        All KeyMaps have this attribute.
 *att--
 */
-astMAKE_CLEAR(KeyMap,KeyError,keyerror,-INT_MAX)
 astMAKE_GET(KeyMap,KeyError,int,0,( ( this->keyerror != -INT_MAX ) ?
                                    this->keyerror : 0 ))
-astMAKE_SET(KeyMap,KeyError,int,keyerror,( value != 0 ))
 astMAKE_TEST(KeyMap,KeyError,( this->keyerror != -INT_MAX ))
 
 /*
@@ -7541,6 +7711,15 @@ void astClearMapLocked_( AstKeyMap *this, int *status ){
 void astSetMapLocked_( AstKeyMap *this, int maplocked, int *status ){
    if( !astOK ) return;
    (**astMEMBER(this,KeyMap,SetMapLocked))(this,maplocked, status );
+}
+
+void astClearKeyError_( AstKeyMap *this, int *status ){
+   if( !astOK ) return;
+   (**astMEMBER(this,KeyMap,ClearKeyError))(this, status );
+}
+void astSetKeyError_( AstKeyMap *this, int keyerror, int *status ){
+   if( !astOK ) return;
+   (**astMEMBER(this,KeyMap,SetKeyError))(this,keyerror, status );
 }
 
 

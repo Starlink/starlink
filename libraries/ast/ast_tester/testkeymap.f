@@ -7,7 +7,7 @@
      :        map3, km2
       character cval*20,cvec(3)*10,key*20,cval0*40
       double precision dval, dvec(2)
-      logical gota, gotc, gotd, goti, gotr
+      logical gota, gotc, gotd, goti, gotr,lval
       real rval
 
       status = sai__ok
@@ -576,6 +576,26 @@ c  Test putting single elements into vector entries.
          end if
       end if
 
+      if( ast_getl( km2, 'KeyError', status ) ) then
+         call stopit( status, 'Error GETELEM_12D' )
+      end if
+
+      call ast_setl( map, 'KeyError', .TRUE., status )
+
+      if( .not. ast_getl( km2, 'KeyError', status ) ) then
+         call stopit( status, 'Error GETELEM_12E' )
+      end if
+
+      if( status .eq. sai__ok ) then
+         lval = ast_mapget0c( km2, 'FRED', cval, l, status )
+         if( status .eq. AST__MPKER ) then
+            call err_annul( status )
+            call ast_clear( map, 'keyerror', status )
+            lval = ast_mapget0c( km2, 'FRED', cval, l, status )
+         else
+            call stopit( status, 'Error GETELEM_12F' )
+         end if
+      endif
 
 
 
