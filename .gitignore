@@ -365,6 +365,7 @@ applications/cursa/catremote
 applications/cursa/catview
 applications/cursa/cursa
 applications/cursa/cursa.csh
+applications/cursa/cursa.sh
 applications/cursa/cursa_test.csh
 applications/cursa/geturl
 applications/cursa/xcatview
