@@ -19,6 +19,7 @@
 *     AST_MAPCOPY
 *     AST_MAPPUT0<X>
 *     AST_MAPPUT1<X>
+*     AST_MAPPUTU
 *     AST_MAPGET0<X>
 *     AST_MAPGET1<X>
 *     AST_MAPGETELEM<X>
@@ -382,6 +383,26 @@ F77_SUBROUTINE(ast_mapput1r)( INTEGER(THIS),
    )
 }
 
+F77_SUBROUTINE(ast_mapputu)( INTEGER(THIS),
+                             CHARACTER(KEY),
+                             CHARACTER(COMMENT),
+                             INTEGER(STATUS)
+                             TRAIL(KEY)
+                             TRAIL(COMMENT) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(KEY)
+   GENPTR_CHARACTER(COMMENT)
+   char *comment, *key;
+
+   astAt( "AST_MAPPUTU", NULL, 0 );
+   astWatchSTATUS(
+      key = astString( KEY, KEY_length );
+      comment = astString( COMMENT, COMMENT_length );
+      astMapPutU( astI2P( *THIS ), key, comment );
+      astFree( key );
+      astFree( comment );
+   )
+}
 
 F77_LOGICAL_FUNCTION(ast_mapget0i)( INTEGER(THIS),
                                     CHARACTER(KEY),

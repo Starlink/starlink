@@ -857,13 +857,37 @@ C  Test ast_mapcopy
       end if
 
 
+C  Test AST_MAPPUTU and undefined values
+      map = ast_keymap( ' ', status )
+      call ast_mapputu( map, 'GG', 'A comment', status )
 
+      if( ast_mapget0i( map, 'GG', ival, status ) ) then
+         call stopit( status, 'Error UNDEF_1' )
+      else if( ast_mapget0c( map, 'GG', cval, l, status ) ) then
+         call stopit( status, 'Error UNDEF_2' )
+      else if( ast_mapget0a( map, 'GG', aval, status ) ) then
+         call stopit( status, 'Error UNDEF_3' )
+      else if( ast_mapget1i( map, 'GG', 2, nval, ivec,
+     :                      status ) ) then
+         call stopit( status, 'Error UNDEF_4' )
+      else if( ast_mapgetelemc( map, 'gg', 1,  cval, status ) ) then
+         call stopit( status, 'Error UNDEF_5' )
+      else if( .not. ast_maphaskey( map, 'GG', status ) ) then
+         call stopit( status, 'Error UNDEF_6' )
+      end if
 
+      if( ast_maptype( map, 'GG', status ) .ne. AST__UNDEFTYPE ) then
+         call stopit( status, 'Error UNDEF_7' )
+      else if( ast_mapsize( map, status ) .ne. 1 ) then
+         call stopit( status, 'Error UNDEF_8' )
+      end if
 
-
-
-
-
+      call ast_mapput0i( map, 'GG', 0, ' ', status )
+      if( .not. ast_mapget0i( map, 'GG', ival, status ) ) then
+         call stopit( status, 'Error UNDEF_9' )
+      else if( ival .ne. 0 ) then
+         call stopit( status, 'Error UNDEF_10' )
+      endif
 
       call ast_end( status )
 

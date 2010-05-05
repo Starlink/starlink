@@ -53,6 +53,7 @@ c     - astMapCopy: Copy entries from one KeyMap into another
 c     - astMapPut0<X>: Add a new scalar entry to a KeyMap
 c     - astMapPut1<X>: Add a new vector entry to a KeyMap
 c     - astMapPutElem<X>: Puts a value into a vector entry in a KeyMap
+c     - astMapPutU: Add a new entry to a KeyMap with an undefined value
 c     - astMapRemove: Removed a named entry from a KeyMap
 c     - astMapSize: Get the number of entries in a KeyMap
 c     - astMapType: Return the data type of a named entry in a map
@@ -67,6 +68,7 @@ f     - AST_MAPCOPY: Copy entries from one KeyMap into another
 f     - AST_MAPPUT0<X>: Add a new scalar entry to a KeyMap
 f     - AST_MAPPUT1<X>: Add a new vector entry to a KeyMap
 f     - AST_MAPPUTELEM<X>: Puts a value into a vector entry in a KeyMap
+f     - AST_MAPPUTU: Add a new entry to a KeyMap with an undefined value
 f     - AST_MAPREMOVE: Removed a named entry from a KeyMap
 f     - AST_MAPSIZE: Get the number of entries in a KeyMap
 f     - AST_MAPTYPE: Return the data type of a named entry in a map
@@ -147,6 +149,7 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map
 *         - Propagate MapLocked and KeyError attributes to any encapsulated
 *         KeyMaps.
 *         - Added astMapCopy method.
+*         - Added astMapPutU method and AST__UNDEFTYPE data type.
 *class--
 */
 
@@ -423,6 +426,7 @@ static void MapPut1C( AstKeyMap *, const char *, int, const char *const [], cons
 static void MapPut1D( AstKeyMap *, const char *, int, const double *, const char *, int * );
 static void MapPut1F( AstKeyMap *, const char *, int, const float *, const char *, int * );
 static void MapPut1I( AstKeyMap *, const char *, int, const int *, const char *, int * );
+static void MapPutU( AstKeyMap *, const char *, const char *, int * );
 static void MapRemove( AstKeyMap *, const char *, int * );
 static void NewTable( AstKeyMap *, int, int * );
 static void MapCopy( AstKeyMap *, AstKeyMap *, int * );
@@ -993,8 +997,16 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type, int *
    result = 1;
    cvalue = NULL;
 
-/* Consider conversion from "int". */
-   if( raw_type == AST__INTTYPE ) {
+/* Do nothing if both data types are AST__UNDEFTYPE. */
+    if( raw_type == AST__UNDEFTYPE && out_type == AST__UNDEFTYPE ) {
+
+/* Indicate failure if one of the two types is AST__UNDEFTYPE and the
+   other is not. */
+    } else if( raw_type == AST__UNDEFTYPE || out_type == AST__UNDEFTYPE ) {
+      result = 0;
+
+/* Otherwise, consider conversion from "int". */
+    } else if( raw_type == AST__INTTYPE ) {
       ival = *( (int *) raw );
 
 /* Consider conversion to "int". */
@@ -1360,8 +1372,11 @@ static AstMapEntry *CopyMapEntry( AstMapEntry *in, int *status ){
    text = in->comment;
    result->comment = text ? astStore( NULL, text, strlen( text ) + 1 ) : NULL;
 
-/* First deal with string entries. */
-   if( type == AST__STRINGTYPE ) {
+/* Nothing further to do for undefined values. */
+   if( type == AST__UNDEFTYPE ) {
+
+/* Next deal with string entries. */
+   } else if( type == AST__STRINGTYPE ) {
 
 /* Scalar valued entries... */
       if( nel == 0 ) {
@@ -1710,6 +1725,9 @@ static void DumpEntry( AstMapEntry *entry, AstChannel *channel, int nentry, int 
    } else if( type == AST__POINTERTYPE ) {
       com = "Item data type (pointer)";
 
+   } else if( type == AST__UNDEFTYPE ) {
+      com = "Item data type (undefined)";
+
    } else {
       com = "";
       astError( AST__INTER, "DumpEntry(KeyMap): Illegal map entry data "
@@ -1808,6 +1826,9 @@ static void DumpEntry( AstMapEntry *entry, AstChannel *channel, int nentry, int 
       astError( AST__INTER, "DumpEntry(KeyMap): Cannot dump KeyMaps in "
                 "which the values are arbitrary C pointers (possible "
                 "programming error)." , status);
+
+/* Nothing further to do for undefined values. */
+   } else if( type == AST__UNDEFTYPE ) {
 
 /* Report an error if the data type is unknown. */
    } else if( astOK ) {
@@ -1921,6 +1942,9 @@ static AstMapEntry *FreeMapEntry( AstMapEntry *in, int *status ){
 /* Similarly deal with single precision floating point entries. */
    } else if( type == AST__FLOATTYPE ) {
       if( nel > 0 ) ( (Entry1F *) in )->value = astFree( ( (Entry1F *) in )->value );
+
+/* Nothing further to do for undefined values. */
+   } else if( type == AST__UNDEFTYPE ) {
 
 /* Report an error if the data type is unknown. */
    } else {
@@ -2226,6 +2250,8 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 
          } else if( type == AST__FLOATTYPE ) {
             if( nel > 0 ) result += astTSizeOf( ( (Entry1F *) next )->value );
+
+         } else if( type == AST__UNDEFTYPE ) {
 
          } else {
             astError( AST__INTER, "astGetObjSize(KeyMap): Illegal map entry data "
@@ -2555,6 +2581,7 @@ void astInitKeyMapVtab_(  AstKeyMapVtab *vtab, const char *name, int *status ) {
    vtab->MapPut1D = MapPut1D;
    vtab->MapPut1F = MapPut1F;
    vtab->MapPut1I = MapPut1I;
+   vtab->MapPutU = MapPutU;
    vtab->MapRemove = MapRemove;
    vtab->MapCopy = MapCopy;
    vtab->MapSize = MapSize;
@@ -3226,6 +3253,7 @@ static void MapPut0##X( AstKeyMap *this, const char *key, Xtype value, \
       if( comment ) mapentry->comment = astStore( NULL, comment, strlen( comment ) + 1 ); \
       mapentry->type = Itype; \
       mapentry->nel = 0; \
+      mapentry->defined = 1; \
       entry->value = ValExp; \
 \
 /* Terminate the key string to exclude any trailing spaces. */ \
@@ -3429,6 +3457,7 @@ static void MapPut1##X( AstKeyMap *this, const char *key, int size, \
       if( comment ) mapentry->comment = astStore( NULL, comment, strlen( comment ) + 1 ); \
       mapentry->type = Itype; \
       mapentry->nel = size; \
+      mapentry->defined = 1; \
       entry->value = astMalloc( sizeof( Xtype )*(size_t)size ); \
 \
       if( astOK ) { \
@@ -3566,6 +3595,7 @@ void astMapPut1AId_( AstKeyMap *this, const char *key, int size,
       if( comment ) mapentry->comment = astStore( NULL, comment, strlen( comment ) + 1 );
       mapentry->type = AST__OBJECTTYPE;
       mapentry->nel = size;
+      mapentry->defined = 1;
       entry->value = astMalloc( sizeof( AstObject * )*(size_t)size );
 
       if( astOK ) {
@@ -3596,6 +3626,132 @@ void astMapPut1AId_( AstKeyMap *this, const char *key, int size,
    a new key. */
       if( !there && astGetMapLocked( this ) ) {
          astError( AST__BADKEY, "astMapPut1A(%s): Failed to add item \"%s\" to a KeyMap: "
+                   "\"%s\" is not a known item.", status, astGetClass( this ), key, key );
+      }
+
+/* If all has gone OK, store the new entry at the head of the linked list
+   associated with the selected table entry. */
+      if( astOK ) {
+         mapentry = AddTableEntry( this, itab, mapentry, status );
+
+/* If anything went wrong, try to delete the new entry. */
+      } else {
+         mapentry = FreeMapEntry( mapentry, status );
+      }
+   }
+}
+
+static void MapPutU( AstKeyMap *this, const char *key, const char *comment,
+                     int *status ) {
+/*
+*++
+*  Name:
+c     astMapPutU
+f     AST_MAPPUTU
+
+*  Purpose:
+*     Add an entry to a KeyMap with an undefined value.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "ast.h"
+c     void astMapPutU( AstKeyMap *this, const char *key, const char *comment );
+f     CALL AST_MAPPUTU( THIS, KEY, COMMENT, STATUS )
+
+*  Class Membership:
+*     KeyMap method.
+
+*  Description:
+c     This function
+f     This routine
+*     adds a new entry to a KeyMap, but no value is stored with the
+*     entry. The entry therefore has a special data type represented by
+*     symbolic constant AST__UNDEFTYPE.
+*
+*     An example use is to add entries with undefined values to a KeyMap
+*     prior to locking them with the MapLocked attribute. Such entries
+*     can act as placeholders for values that can be added to the KeyMap
+*     later.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the KeyMap in which to store the supplied value.
+c     key
+f     KEY = CHARACTER * ( * ) (Given)
+*        A character string to be stored with the value, which can later
+*        be used to identify the value. Trailing spaces are ignored.
+c     comment
+f     COMMENT = CHARACTER * ( * ) (Given)
+f        A comment string to be stored with the value.
+c        A pointer to a null-terminated comment string to be stored with the
+c        value. A NULL pointer may be supplied, in which case no comment is
+c        stored.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Notes:
+*     - Key names are case sensitive, and white space is considered
+*     significant.
+*     - If the supplied key is already in use in the KeyMap, the value
+*     associated with the key will be removed.
+
+*--
+*/
+
+/* Local Variables: */
+   AstMapEntry *mapentry;  /* Pointer to parent MapEntry structure */
+   char *p;                /* Pointer to next key character */
+   int itab;               /* Index of hash table element to use */
+   int keylen;             /* Length of supplied key string */
+   int there;              /* Did the entry already exist in the KeyMap? */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Allocate memory for the new MapEntry. */
+   mapentry = astMalloc( sizeof( AstMapEntry ) );
+   if( astOK ) {
+
+/* Initialise pointers in the new structure.*/
+      mapentry->next = NULL;
+      mapentry->key = NULL;
+      mapentry->hash = 0;
+      mapentry->comment = NULL;
+
+/* Now store the new values. */
+      keylen = strlen( key );
+      mapentry->key = astStore( NULL, key, keylen + 1 );
+      if( comment ) mapentry->comment = astStore( NULL, comment, strlen( comment ) + 1 );
+      mapentry->type = AST__UNDEFTYPE;
+      mapentry->nel = 0;
+      mapentry->defined = 0;
+
+/* Terminate the key string to exclude any trailing spaces. */
+      if( astOK ) {
+         p = (char *) mapentry->key + keylen;
+         while( --p >= mapentry->key ) {
+            if( *p == ' ' ) {
+               *p = 0;
+            } else {
+               break;
+            }
+         }
+      }
+
+/* Use the hash function to determine the element of the hash table in
+   which to store the new entry. */
+      itab = HashFun( mapentry->key, this->mapsize - 1, &(mapentry->hash), status );
+
+/* Remove any existing entry with the given key from the table element. */
+      there = RemoveTableEntry( this, itab, mapentry->key, status );
+
+/* If the KeyMap is locked we report an error if an attempt is made to add a value for
+   a new key. */
+      if( !there && astGetMapLocked( this ) ) {
+         astError( AST__BADKEY, "astMapPutU(%s): Failed to add item \"%s\" to a KeyMap: "
                    "\"%s\" is not a known item.", status, astGetClass( this ), key, key );
       }
 
@@ -3659,7 +3815,11 @@ c     value
 f     VALUE = <X>type (Returned)
 c        A pointer to a buffer in which to return the requested value.
 f        The requested value.
-*        If the requested key is not found, then the contents of the
+*        If the requested key is not found, or if it is found but has an
+*        undefined value (see
+c        astMapPutU),
+f        AST_MAPPUTU),
+*        then the contents of the
 *        buffer on entry to this function will be unchanged on exit.
 c        For pointer types ("A" and "C"), the buffer should be a suitable
 c        pointer, and the address of this pointer should be supplied as the
@@ -3674,13 +3834,13 @@ f        The global status.
 *  Returned Value:
 c     astMapGet0<X>()
 f     AST_MAPGET0<X> = LOGICAL
-f        A flag which is set to
-c        a non-zero value
+c        A non-zero value
 f        .TRUE.
-*        if the requested key name was found, and is set to
-c        zero
-f        .FALSE.
-*        otherwise.
+*        is returned if the requested key name was found, and does not have
+*        an undefined value (see
+c        astMapPutU). Zero
+f        AST_MAPPUTU). .FALSE.
+*        is returned otherwise.
 
 *  Notes:
 *     - No error is reported if the requested key cannot be found in the
@@ -3803,6 +3963,9 @@ static int MapGet0##X( AstKeyMap *this, const char *key, Xtype *value, int *stat
             raw = ((Entry1A *)mapentry)->value; \
          } \
 \
+      } else if( raw_type == AST__UNDEFTYPE ){ \
+         raw = NULL; \
+\
       } else { \
          raw = NULL; \
          astError( AST__INTER, "astMapGet0<X>(KeyMap): Illegal map entry data " \
@@ -3812,10 +3975,14 @@ static int MapGet0##X( AstKeyMap *this, const char *key, Xtype *value, int *stat
 \
 /* Convert the value, storing the result the supplied buffer. Report an \
    error if conversion is not possible. */ \
-      if( !ConvertValue( raw, raw_type, value, Itype, status ) && astOK ){ \
+      if( !raw ) { \
+         result = 0; \
+\
+      } else if( !ConvertValue( raw, raw_type, value, Itype, status ) && astOK ){ \
          astError( AST__MPGER, "astMapGet0" #X "(%s): The value of KeyMap key " \
                    "\"%s\" cannot be read using the requested data " \
                    "type.", status,astGetClass( this ), key ); \
+\
       } else { \
          result = 1; \
       } \
@@ -3945,6 +4112,9 @@ int astMapGet0AId_( AstKeyMap *this, const char *key, AstObject **value, int *st
             raw = ((Entry1A *)mapentry)->value;
          }
 
+      } else if( raw_type == AST__UNDEFTYPE ){
+         raw = NULL;
+
       } else {
          raw = NULL;
          astError( AST__INTER, "astMapGet0<X>(KeyMap): Illegal map entry data "
@@ -3954,10 +4124,14 @@ int astMapGet0AId_( AstKeyMap *this, const char *key, AstObject **value, int *st
 
 /* Convert the value, storing the result the supplied buffer. Report an
    error if conversion is not possible. */
-      if( !ConvertValue( raw, raw_type, value, AST__OBJECTTYPE, status ) && astOK ){
+      if( !raw ) {
+         result = 0;
+
+      } else if( !ConvertValue( raw, raw_type, value, AST__OBJECTTYPE, status ) && astOK ){
          astError( AST__MPGER, "astMapGet0A(%s): The value of KeyMap key "
                    "\"%s\" cannot be read using the requested data "
                    "type.", status, astGetClass( this ), key );
+
       } else {
          result = 1;
       }
@@ -4038,7 +4212,11 @@ c     value
 f     VALUE( MXVAL ) = <X>type (Returned)
 c        A pointer to an array in which to return the requested values.
 f        The requested values.
-*        If the requested key is not found, then the contents of the
+*        If the requested key is not found, or if it is found but has an
+*        undefined value (see
+c        astMapPutU),
+f        AST_MAPPUTU),
+*        then the contents of the
 *        buffer on entry to this function will be unchanged on exit.
 f     STATUS = INTEGER (Given and Returned)
 f        The global status.
@@ -4046,13 +4224,13 @@ f        The global status.
 *  Returned Value:
 c     astMapGet1<X>()
 f     AST_MAPGET1<X> = LOGICAL
-f        A flag which is set to
-c        a non-zero value
+c        A non-zero value
 f        .TRUE.
-*        if the requested key name was found, and is set to
-c        zero
-f        .FALSE.
-*        otherwise.
+*        is returned if the requested key name was found, and does not have
+*        an undefined value (see
+c        astMapPutU). Zero
+f        AST_MAPPUTU). .FALSE.
+*        is returned otherwise.
 
 *  Notes:
 *     - No error is reported if the requested key cannot be found in the
@@ -4193,6 +4371,10 @@ static int MapGet1##X( AstKeyMap *this, const char *key, int mxval, int *nval, X
             raw = ((Entry1A *)mapentry)->value; \
          } \
 \
+      } else if( raw_type == AST__UNDEFTYPE ){ \
+         raw_size = 0; \
+         raw = NULL; \
+\
       } else { \
          raw_size = 0; \
          raw = NULL; \
@@ -4215,7 +4397,10 @@ static int MapGet1##X( AstKeyMap *this, const char *key, int mxval, int *nval, X
 \
 /* Convert the value, storing the result in the supplied buffer. Report an \
    error if conversion is not possible. */ \
-         if( !ConvertValue( raw, raw_type, value + i, Itype, status ) && astOK ){ \
+         if( !raw ) { \
+            result = 0; \
+\
+         } else if( !ConvertValue( raw, raw_type, value + i, Itype, status ) && astOK ){ \
             astError( AST__MPGER, "astMapGet1" #X "(%s): The value of " \
                       "element %d of KeyMap key \"%s\" cannot be read using " \
                       "the requested data type.", status,astGetClass( this ), i + 1, key ); \
@@ -4365,6 +4550,10 @@ static int MapGet1C( AstKeyMap *this, const char *key, int l, int mxval,
             raw = ((Entry1A *)mapentry)->value;
          }
 
+      } else if( raw_type == AST__UNDEFTYPE ){
+         raw_size = 0;
+         raw = NULL;
+
       } else {
          raw_size = 0;
          raw = NULL;
@@ -4388,7 +4577,10 @@ static int MapGet1C( AstKeyMap *this, const char *key, int l, int mxval,
 
 /* Convert the value, storing the result in the supplied buffer. Report an
    error if conversion is not possible. */
-         if( !ConvertValue( raw, raw_type, &cvalue, AST__STRINGTYPE, status ) && astOK ){
+         if( !raw ) {
+            result = 0;
+
+         } else if( !ConvertValue( raw, raw_type, &cvalue, AST__STRINGTYPE, status ) && astOK ){
             astError( AST__MPGER, "astMapGet1C(%s): The value of "
                       "element %d of KeyMap key \"%s\" cannot be read using "
                       "the requested data type.", status,astGetClass( this ), i + 1, key );
@@ -4535,6 +4727,10 @@ int astMapGet1AId_( AstKeyMap *this, const char *key, int mxval, int *nval,
             raw = ((Entry1A *)mapentry)->value;
          }
 
+      } else if( raw_type == AST__UNDEFTYPE ){
+         raw_size = 0;
+         raw = NULL;
+
       } else {
          raw_size = 0;
          raw = NULL;
@@ -4557,7 +4753,10 @@ int astMapGet1AId_( AstKeyMap *this, const char *key, int mxval, int *nval,
 
 /* Convert the value, storing the result in the supplied buffer. Report an
    error if conversion is not possible. */
-         if( !ConvertValue( raw, raw_type, &avalue, AST__OBJECTTYPE, status ) && astOK ){
+         if( !raw ) {
+            result = 0;
+
+         } else if( !ConvertValue( raw, raw_type, &avalue, AST__OBJECTTYPE, status ) && astOK ){
             astError( AST__MPGER, "astMapGet1A(%s): The value of "
                       "element %d of KeyMap key \"%s\" cannot be read using "
                       "the requested data type.", status, astGetClass( this ),
@@ -4643,7 +4842,11 @@ c     value
 f     VALUE = <X>type (Returned)
 c        A pointer to a buffer in which to return the requested value.
 f        The requested value.
-*        If the requested key is not found, then the contents of the
+*        If the requested key is not found, or if it is found but has an
+*        undefined value (see
+c        astMapPutU),
+f        AST_MAPPUTU),
+*        then the contents of the
 *        buffer on entry to this function will be unchanged on exit.
 f     STATUS = INTEGER (Given and Returned)
 f        The global status.
@@ -4651,17 +4854,17 @@ f        The global status.
 *  Returned Value:
 c     astMapGetElem<X>()
 f     AST_MAPGETELEM<X> = LOGICAL
-f        A flag which is set to
-c        a non-zero value
+c        A non-zero value
 f        .TRUE.
-*        if the requested key name was found, and is set to
-c        zero
-f        .FALSE.
-*        otherwise.
+*        is returned if the requested key name was found, and does not have
+*        an undefined value (see
+c        astMapPutU). Zero
+f        AST_MAPPUTU). .FALSE.
+*        is returned otherwise.
 
 *  Notes:
 *     - No error is reported if the requested key cannot be found in the
-*     given KeyMap, but a
+*     given KeyMap, or if it has an undefined value, but a
 c     zero
 f     .FALSE.
 *     value will be returned as the function value.
@@ -4792,6 +4995,9 @@ static int MapGetElem##X( AstKeyMap *this, const char *key, int elem, \
             raw = ((Entry1A *)mapentry)->value; \
          } \
 \
+      } else if( raw_type == AST__UNDEFTYPE ){ \
+         raw = NULL; \
+\
       } else { \
          raw_size = 0; \
          raw = NULL; \
@@ -4813,7 +5019,7 @@ static int MapGetElem##X( AstKeyMap *this, const char *key, int elem, \
          } \
 \
 /* Get a pointer to the requested raw value. */ \
-      } else { \
+      } else if( raw ) { \
          raw = (char *) raw + elem*raw_size; \
 \
 /* Convert the requested value, storing the result in the supplied buffer. \
@@ -4963,6 +5169,9 @@ static int MapGetElemC( AstKeyMap *this, const char *key, int l, int elem,
             raw = ((Entry1A *)mapentry)->value;
          }
 
+      } else if( raw_type == AST__UNDEFTYPE ){
+         raw = NULL;
+
       } else {
          raw_size = 0;
          raw = NULL;
@@ -4983,7 +5192,7 @@ static int MapGetElemC( AstKeyMap *this, const char *key, int l, int elem,
          }
 
 /* Get a pointer to the requested raw value. */
-      } else {
+      } else if( raw ){
          raw = (char *) raw + elem*raw_size;
 
 /* Convert the value, storing the result in the supplied buffer. Report an
@@ -5129,6 +5338,9 @@ int astMapGetElemAId_( AstKeyMap *this, const char *key, int elem,
             raw = ((Entry1A *)mapentry)->value;
          }
 
+      } else if( raw_type == AST__UNDEFTYPE ){
+         raw = NULL;
+
       } else {
          raw_size = 0;
          raw = NULL;
@@ -5149,7 +5361,7 @@ int astMapGetElemAId_( AstKeyMap *this, const char *key, int elem,
          }
 
 /* Get a pointer to the requested raw value. */
-      } else {
+      } else if( raw ){
          raw = (char *) raw + elem*raw_size;
 
 /* Convert the value, storing the result in the supplied buffer. Report an
@@ -5224,6 +5436,11 @@ c        Non-zero if the key was found, and zero otherwise.
 f        .TRUE. if the key was found, and .FALSE. otherwise.
 
 *  Notes:
+c     - A non-zero function value
+f     - .TRUE.
+*     is returned if the key exists but has an undefined value (that is,
+*     the returned value does not depend on whether the entry has a
+*     defined value or not).
 *     - A function value of
 c     zero
 f     .FALSE.
@@ -5515,6 +5732,10 @@ c        This does not include the trailing null character.
             raw = ((Entry1A *)mapentry)->value;
          }
 
+      } else if( raw_type == AST__UNDEFTYPE ){
+         raw_size = 0;
+         raw = NULL;
+
       } else {
          raw_size = 0;
          raw = NULL;
@@ -5526,20 +5747,24 @@ c        This does not include the trailing null character.
 /* Treat scalars as single-value vectors. */
       if( nel == 0 ) nel = 1;
 
+/* Skip undefined values. */
+      if( raw ) {
+
 /* Initialise the maximum length of any formatted value in the entry. */
-      result= 0;
+         result= 0;
 
 /* Loop round all values in the vector. */
-      for( i = 0; i < nel && astOK; i++ ) {
+         for( i = 0; i < nel && astOK; i++ ) {
 
 /* Go through the motions of formatting the value. We do not actually
    need the formatted string (just its length) so we provide a NULL pointer
    for the output buffer. The entry is ignored if it cannot be formatted. */
-         l = ConvertValue( raw, raw_type, NULL, AST__STRINGTYPE, status );
-         if( l > result ) result = l;
+            l = ConvertValue( raw, raw_type, NULL, AST__STRINGTYPE, status );
+            if( l > result ) result = l;
 
 /* Increment the pointer to the next raw value. */
-         raw = (char *) raw + raw_size;
+            raw = (char *) raw + raw_size;
+         }
       }
    }
 
@@ -5698,9 +5923,10 @@ f        The global status.
 *  Notes:
 *     - If the entry originally holds a scalar value, it will be treated
 *     like a vector entry of length 1.
-*     - If the specified key cannot be found in the given KeyMap, a new
+*     - If the specified key cannot be found in the given KeyMap, or is
+*     found but has an undefined value, a new
 *     vector entry with the given name, and data type implied by <X>, is
-*     created and the supplied value is store din its first entry.
+*     created and the supplied value is stored in its first entry.
 *     - Key names are case sensitive, and white space is considered
 *     significant.
 
@@ -5763,9 +5989,10 @@ static void MapPutElem##X( AstKeyMap *this, const char *key, int elem, \
 /* Search the relevent table entry for the required MapEntry. */ \
    mapentry = SearchTableEntry( this, itab, key, status ); \
 \
-/* If the key was not found, create a new one with a single element, \
+/* If the key was not found, or was found but has an undefined value, create \
+   a new one with a single element, \
    and store the supplied value in it. */ \
-   if( !mapentry ) { \
+   if( !mapentry || mapentry->type == AST__UNDEFTYPE ) { \
       astMapPut1##X( this, key, 1, &value, NULL ); \
 \
 /* If the key was found.... */ \
@@ -5964,9 +6191,12 @@ f     AST_MAPTYPE = INTEGER
 *        One of AST__INTTYPE (for integer), AST__DOUBLETYPE (for double
 *        precision floating point), AST__FLOATTYPE (for single
 *        precision floating point), AST__STRINGTYPE (for character string),
-*        AST__OBJECTTYPE (for AST Object pointer) or AST__POINTERTYPE (for
-*        arbitrary C pointer). AST__BADTYPE is returned if the supplied
-*        key is not found in the KeyMap.
+*        AST__OBJECTTYPE (for AST Object pointer), AST__POINTERTYPE (for
+*        arbitrary C pointer) or AST__UNDEFTYPE (for undefined values
+*        created by
+c        astMapPutU).
+f        AST_MAPPUTU).
+*        AST__BADTYPE is returned if the supplied key is not found in the KeyMap.
 
 *  Notes:
 *     - A function value of AST__BADTYPE will be returned if an error has
@@ -6629,6 +6859,9 @@ static size_t SizeOfEntry( AstMapEntry *entry, int *status ){
 
    } else if( type == AST__FLOATTYPE ) {
       result = ( nel == 0 ) ? sizeof( Entry0F ) : sizeof( Entry1F );
+
+   } else if( type == AST__UNDEFTYPE ) {
+      result = sizeof( AstMapEntry );
 
 /* Report an error if the data type is unknown. */
    } else {
@@ -7734,6 +7967,7 @@ MAKE_MAPPUT0_(A,AstObject *)
 MAKE_MAPPUT0_(P,void *)
 #undef MAKE_MAPPUT0_
 
+
 #define MAKE_MAPPUT1_(X,Xtype) \
 void astMapPut1##X##_( AstKeyMap *this, const char *key, int size, \
                        Xtype value[], const char *comment, \
@@ -7814,6 +8048,11 @@ MAKE_MAPPUTELEM_(A,AstObject *)
 MAKE_MAPPUTELEM_(C,const char *)
 MAKE_MAPPUTELEM_(P,void *)
 #undef MAKE_MAPPUTELEM_
+
+void astMapPutU_( AstKeyMap *this, const char *key, const char *comment, int *status ){
+   if ( !astOK ) return;
+   (**astMEMBER(this,KeyMap,MapPutU))(this,key,comment,status);
+}
 
 void astMapRemove_( AstKeyMap *this, const char *key, int *status ){
    if ( !astOK ) return;

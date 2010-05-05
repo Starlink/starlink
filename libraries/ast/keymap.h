@@ -78,6 +78,7 @@
 #define AST__OBJECTTYPE 4
 #define AST__FLOATTYPE 5
 #define AST__POINTERTYPE 6
+#define AST__UNDEFTYPE 7
 
 /* Define constants used to size global arrays in this module. */
 #define AST__KEYMAP_GETATTRIB_BUFF_LEN 50       /* Max length of string returned by GetAttrib */
@@ -104,6 +105,7 @@ typedef struct AstMapEntry {
    int type;                 /* Data type. */
    int nel;                  /* 0 => scalar, >0 => array with "nel" elements */
    const char *comment;      /* Pointer to a comment for the entry */
+   int defined;              /* Non-zero if the entry value is defined */
 } AstMapEntry;
 
 /* KeyMap structure. */
@@ -151,6 +153,7 @@ typedef struct AstKeyMapVtab {
    void (* MapPut1C)( AstKeyMap *, const char *, int, const char *const [], const char *, int * );
    void (* MapPut1A)( AstKeyMap *, const char *, int, AstObject *const [], const char *, int * );
    void (* MapPut1P)( AstKeyMap *, const char *, int, void *const [], const char *, int * );
+   void (* MapPutU)( AstKeyMap *, const char *, const char *, int * );
    int (* MapGet0I)( AstKeyMap *, const char *, int *, int * );
    int (* MapGet0D)( AstKeyMap *, const char *, double *, int * );
    int (* MapGet0F)( AstKeyMap *, const char *, float *, int * );
@@ -302,6 +305,7 @@ void astMapPutElemC_( AstKeyMap *, const char *, int, const char *, int * );
 void astMapPutElemD_( AstKeyMap *, const char *, int, double, int * );
 void astMapPutElemF_( AstKeyMap *, const char *, int, float, int * );
 void astMapPutElemI_( AstKeyMap *, const char *, int, int, int * );
+void astMapPutU_( AstKeyMap *, const char *, const char *, int * );
 void astMapRemove_( AstKeyMap *, const char *, int * );
 void astMapCopy_( AstKeyMap *, AstKeyMap *, int * );
 int astMapGet0P_( AstKeyMap *, const char *, void **, int * );
@@ -371,6 +375,7 @@ astINVOKE(O,astLoadKeyMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PT
 /* Here we make use of astCheckKeyMap to validate KeyMap pointers
    before use.  This provides a contextual error report if a pointer
    to the wrong sort of Object is supplied. */
+#define astMapPutU(this,key,comment) astINVOKE(V,astMapPutU_(astCheckKeyMap(this),key,comment,STATUS_PTR))
 #define astMapPut0I(this,key,value,comment) astINVOKE(V,astMapPut0I_(astCheckKeyMap(this),key,value,comment,STATUS_PTR))
 #define astMapPut0D(this,key,value,comment) astINVOKE(V,astMapPut0D_(astCheckKeyMap(this),key,value,comment,STATUS_PTR))
 #define astMapPut0F(this,key,value,comment) astINVOKE(V,astMapPut0F_(astCheckKeyMap(this),key,value,comment,STATUS_PTR))

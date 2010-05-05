@@ -21878,13 +21878,32 @@ current version):
 
 \begin{enumerate}
 
+\item The KeyMap class now supports entries that have undefined values. A
+new method called
+c+
+astMapPutU
+c-
+f+
+AST\_MAPPUTU
+f-
+will store an entry with undefined value in a keymap. Methods that
+retrieve values from a KeyMap
+c+
+(astMapGet0<X>, etc.)
+c-
+f+
+(AST\_MAPGET0<X>, etc.)
+f-
+ignore entries with undefined values when searching for an entry with a given
+key.
+
 \item The KeyMap class has a new method called
 c+
 astMapCopy
 c-
 f+
 AST\_MAPCOPY
-\f-
+f-
 that copies entries from one KeyMap to another KeyMap.
 
 \item The KeyMap class has a new boolean attribute called MapLocked. If
