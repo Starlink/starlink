@@ -125,11 +125,11 @@ AstKeyMap *kpg1Config( const char *param, const char *def, int *status ){
 /* If a group was supplied, see if it consists of the single value "def".
    If so, we will leave the KeyMap unchanged. */
    } else {
+      value = buffer;
       if( size == 1 ) {
-         value = buffer;
-         grpGet( grp, 1, 1, &value, GRP__SZNAM, status );
+         grpGet( grp, 1, 1, &value, sizeof(buffer), status );
       } else {
-         value = " ";
+         strcpy( value, " " );
       }
 
 /* Otherwise, store the configuration settings in the KeyMap. An error will be 
