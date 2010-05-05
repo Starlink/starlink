@@ -2966,10 +2966,9 @@ f        The global status.
 
                      if( astIsAKeyMap( in_obj ) &&
                          astIsAKeyMap( out_obj ) ) {
-
                         astMapCopy( (AstKeyMap *) out_obj,
                                     (AstKeyMap *) in_obj );
-                        merged = 0;
+                        merged = 1;
                      }
                   }
                }
