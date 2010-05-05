@@ -734,7 +734,8 @@ typedef enum {
 typedef enum {
   SMF__SUBINST_NONE,
   SMF__SUBINST_850,
-  SMF__SUBINST_450
+  SMF__SUBINST_450,
+  SMF__SUBINST_NSUBINST  /* This is always the last entry */
 } smf_subinst_t;
 
 #endif /* SMF_TYP_DEFINED */
