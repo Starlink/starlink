@@ -57,6 +57,11 @@ F77_SUBROUTINE(kpg1_kymap)( INTEGER(IGRP), INTEGER(KEYMAP), INTEGER(STATUS) ) {
 *     that the KeyMap does not contain a value for keyword "method". The
 *     calling application should then usually use a default value for
 *     "method".
+*
+*     Assigning the value "<undef>" (case insensitive) to a keyword
+*     has the effect of forcing the value to be undefined. This can
+*     be useful in defining defaults where the keymap is locked
+*     after being populated.
 
 *  Arguments:
 *     IGRP = INTEGER (Given)

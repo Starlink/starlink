@@ -89,6 +89,9 @@ void kpg1Kymp2( const char *string, AstKeyMap *keymap, int *status ){
 *        Use c instead of equals+1 as pointer to value in scalar case
 *     25-FEB-2010 (DSB):
 *        Allow "keyword=<def>" syntax to be used for clearing a parameter.
+*     25-FEB-2010 (DSB):
+*        Allow "keyword=<undef>" syntax to be used to force a keyword to
+*        be in an undefined state.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -261,6 +264,11 @@ void kpg1Kymp2( const char *string, AstKeyMap *keymap, int *status ){
    value from the KeyMap. */
       } else if( astChrMatch( c, "<def>" ) ) {
          astMapRemove( keymap, comp );
+
+/* If the value string is "<undef>" (case insensitive) force the
+   value to be undefined */
+      } else if( astChrMatch( c, "<undef>" ) ) {
+        astMapPutU( keymap, comp, NULL );
 
 /* Now store scalar values. */
       } else {

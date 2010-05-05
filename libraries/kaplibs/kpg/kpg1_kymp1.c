@@ -59,6 +59,11 @@ void kpg1Kymp1( const Grp *igrp, AstKeyMap **keymap, int *status ){
 *     that the KeyMap does not contain a value for keyword "method". The
 *     calling application should then usually use a default value for
 *     "method".
+*
+*     Assigning the value "<undef>" (case insensitive) to a keyword
+*     has the effect of forcing the value to be undefined. This can
+*     be useful in defining defaults where the keymap is locked
+*     after being populated.
 
 *  Arguments:
 *     igrp
@@ -118,6 +123,8 @@ void kpg1Kymp1( const Grp *igrp, AstKeyMap **keymap, int *status ){
 *        Tweak to GRP C API.
 *     25-FEB-2010(DSB):
 *        Document the "keyword=<def>" facility.
+*     2010-05-05 (TIMJ):
+*        Document the "keyword=<undef>" facility.
 *     {enter_further_changes_here}
 
 *  Bugs:
