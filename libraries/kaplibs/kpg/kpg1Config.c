@@ -57,6 +57,10 @@ AstKeyMap *kpg1Config( const char *param, const char *def,
 *     def = const char * (Given)
 *        The path to a file containing the default value for every allowaed config
 *        parameter. For instance, "$SMURF_DIR/dimmconfig.def".
+*     nested = AstKeyMap * (Given)
+*        If non-NULL, used to determine which nested keys might be in the config
+*        and which should be merged with the base keymap. The values in the keymap
+*        should be true to indicate merging.
 *     status = int * (Given & Returned)
 *        The inherited status.
 
@@ -206,7 +210,7 @@ static void kpg1__process_nesting( AstKeyMap * keymap,
   for (i=0; i < nnest; i++) {
     int keep = 0;
     const char * testkey = astMapKey( nested, i );
-    printf("Checking for key %s\n", testkey );
+
     /* see if that is present in "keymap". No problem if it is not present.
        It should itself be a keymap if it is there. */
     if ( astMapHasKey( keymap, testkey ) ) {
@@ -251,7 +255,6 @@ static void kpg1__process_nesting( AstKeyMap * keymap,
 
       /* Now remove the nested item from "keymap" since we do not need it
          any more. */
-      printf("REMOVING KEY %s <<<<<<<<<<<<<<<<<\n", testkey );
       astMapRemove( keymap, testkey );
 
     }
