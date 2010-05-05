@@ -1324,7 +1324,7 @@ void kpgPixsc( AstFrameSet * iwcs,
 
   /* if the returned char array pointers are null we set a length
      that will work */
-  if ( (value) || unit && chrarr_length > 0) {
+  if ( (value || unit) && chrarr_length > 0) {
     strlength = chrarr_length;
   } else {
     strlength = 40;
