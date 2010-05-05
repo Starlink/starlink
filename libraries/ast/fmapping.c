@@ -83,6 +83,8 @@
 *        Added AST_TRANGRID.
 *     5-MAY-2009 (DSB):
 *        Added AST_REMOVEREGIONS.
+*     4-MAY-2010 (DSB):
+*        Add support for AST__VARWGT flag to AST_REBINSEQ<X>.
 */
 
 /* Define the astFORTRAN77 macro which prevents error messages from
@@ -560,20 +562,21 @@ F77_SUBROUTINE(ast_rebinseq##f)( INTEGER(THIS), \
    astAt( "AST_REBINSEQ"#F, NULL, 0 ); \
    astWatchSTATUS( \
 \
-/* If the AST__USEVAR flag is set, use the input and output variance \
-   arrays, otherwise pass NULL pointers. */ \
-      in_var = out_var = NULL; \
-      if ( AST__USEVAR & *FLAGS ) { \
-         in_var = (const Xtype *) IN_VAR; \
-         out_var = (Xtype *) OUT_VAR; \
-      } \
+/* We need the input variances if the AST__USEVAR or AST__VARWGT flag is \
+   set. Otherwise use a NULL pointer for the input variances. */ \
+   if ( AST__USEVAR & *FLAGS || AST__VARWGT & *FLAGS ) { \
+      in_var = (const Xtype *) IN_VAR; \
+   } else { \
+      in_var = NULL; \
+   } \
 \
-/* If the AST__GENVAR flag is set, use the output variance \
-   arrays, otherwise pass NULL pointers. */ \
-      if ( AST__GENVAR & *FLAGS ) { \
-         in_var = NULL; \
-         out_var = (Xtype *) OUT_VAR; \
-      } \
+/* We need the output variances if the AST__USEVAR or AST__GENVAR flag is \
+   set. Otherwise use a NULL pointer for the output variances. */ \
+   if ( AST__USEVAR & *FLAGS || AST__GENVAR & *FLAGS ) { \
+      out_var = (Xtype *) OUT_VAR; \
+   } else { \
+      out_var = NULL; \
+   } \
 \
       astRebinSeq##X( astI2P( *THIS ), *WLIM, *NDIM_IN, \
                    LBND_IN, UBND_IN, (const Xtype *) IN, in_var, \
