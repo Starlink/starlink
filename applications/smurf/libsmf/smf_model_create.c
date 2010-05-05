@@ -257,7 +257,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
   int fd=0;                     /* File descriptor */
   int flag=0;                   /* Flag */
   char fname_grpex[GRP__SZNAM+1];/* String for holding filename grpex */
-  dim_t gain_box=6000;          /* No. of time slices in a block */
+  dim_t gain_box=0;             /* No. of time slices in a block */
   smfDIMMHead head;             /* Header for the file */
   size_t headlen=0;             /* Size of header in bytes */
   void *headptr=NULL;           /* Pointer to header portion of buffer */
