@@ -4,7 +4,7 @@
       include 'AST_ERR'
       include 'SAE_PAR'
       integer status,map,map2,ival,aval,l,ivec(2),avec(4),nval,i,iat,
-     :        map3
+     :        map3, km2
       character cval*20,cvec(3)*10,key*20,cval0*40
       double precision dval, dvec(2)
       logical gota, gotc, gotd, goti, gotr
@@ -549,7 +549,7 @@ c  Test putting single elements into vector entries.
       call ast_setl( map, 'MapLocked', .TRUE., status )
       if( status .eq. sai__ok ) then
          call ast_mapput0c( map, ' BZZ', 'Bye Bye', ' ', STATUS )
-         if( status .eq. ast__badkey ) then
+         if( status .eq. AST__BADKEY ) then
             call err_annul( status )
             call ast_clear( map, 'maplocked', status )
          else
@@ -557,7 +557,24 @@ c  Test putting single elements into vector entries.
          end if
       end if
 
+      call ast_mapput0c( map, ' BZZ', 'Bye Bye', ' ', STATUS )
+      km2 = ast_keymap( ' ', status )
+      call ast_mapput0a( map, ' BZY', km2, ' ', STATUS )
+      call ast_mapput0c( km2, ' BZZ', 'Bye Bye', ' ', STATUS )
 
+      call ast_setl( map, 'MapLocked', .TRUE., status )
+      call ast_mapput0c( map, ' BZZ', 'You Bye', ' ', STATUS )
+      call ast_mapput0c( km2, ' BZZ', 'You Bye', ' ', STATUS )
+      if( status .eq. sai__ok ) then
+         call ast_mapput0c( km2, ' BZA', 'No Bye', ' ', STATUS )
+         if( status .eq. AST__BADKEY ) then
+            call err_annul( status )
+            call ast_clear( map, 'maplocked', status )
+            call ast_mapput0c( km2, ' BZA', 'No Bye', ' ', STATUS )
+         else
+            call stopit( status, 'Error GETELEM_12C' )
+         end if
+      end if
 
 
 

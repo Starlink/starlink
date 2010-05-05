@@ -11,17 +11,17 @@ set a = "test$1"
 echo "Building $a"
 if( "$a" == "testplot3d" ) then
    g95 -fno-second-underscore -w -g -o testplot3d testplot3d.f \
-       -L/star/lib -I/star/include \
+       -L$GITSTAR/lib -I$GITSTAR/include \
        `ast_link -ems -pgplot3d` `sla_link` `chr_link` `err_link`
 
 else if( -e "$a.f" ) then
-   g95 -fno-second-underscore -w -g -o $a $a.f -L/star/lib -I/star/include \
+   g95 -fno-second-underscore -w -g -o $a $a.f -L$GITSTAR/lib -I$GITSTAR/include \
        `ast_link -ems` `chr_link` `err_link` `prm_link` `psx_link`
 
 else if( -e "$a.c" ) then
-   gcc -o $a -g $a.c -I.. -L/star/lib `ast_link`
+   gcc -o $a -g $a.c -I.. -L$GITSTAR/lib `ast_link`
 
-else 
+else
    echo "Cannot find $a.f or $a.c"
 
 endif

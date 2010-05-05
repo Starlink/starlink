@@ -682,6 +682,87 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
    }
 }
 
+static void ClearMapLocked( AstKeyMap *this, int *status ) {
+/*
+*+
+*  Name:
+*     astClearMapLocked
+
+*  Purpose:
+*     Clear the value of the MapLocked attribute for a KeyMap.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "keymap.h"
+*     void astClearMapLocked( AstKeyMap *this )
+
+*  Class Membership:
+*     KeyMap method.
+
+*  Description:
+*     This function clears the value of the MapLocked attribute for a
+*     KeyMap. It clears the attribute recursively in any KeyMaps
+*     contained within the supplied KeyMap.
+
+*  Parameters:
+*     this
+*        Pointer to the KeyMap.
+
+*-
+*/
+
+/* Local Variables: */
+   AstMapEntry *next;     /* Pointer to next Entry to copy */
+   AstObject **obj_list;  /* List of pointers to AST Object entries */
+   int i;                 /* Index into hash table */
+   int iel;               /* Index of current vector element */
+   int nel;               /* Number of elements in vector */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Clear the MapLocked value in the supplied KeyMap. */
+   this->maplocked = -INT_MAX;
+
+/* Loop round each entry in the hash table. */
+   for( i = 0; i < this->mapsize; i++ ) {
+
+/* Get a pointer to the next KeyMap entry. */
+      next = this->table[ i ];
+
+/* Loop round all entries in this element of the hash table. */
+      while( next && astOK ) {
+
+/* If this entry has an Object data type, see if holds any KeyMaps. */
+         if( next->type == AST__OBJECTTYPE ) {
+
+/* Get the number of objects to check, and a pointer to the first. */
+            nel = next->nel;
+            if( nel == 0 ) {
+               obj_list = &( ((Entry0A *)next)->value );
+               nel = 1;
+            } else {
+               obj_list = ((Entry1A *)next)->value;
+            }
+
+/* Loop round checking all Objects. */
+            for( iel = 0; iel < nel; iel++ ) {
+
+/* If this Object is a KeyMap, clear its MapLocked attribute. */
+               if( astIsAKeyMap( obj_list[ iel ] ) ) {
+                  astClearMapLocked( (AstKeyMap *) obj_list[ iel ] );
+               }
+            }
+         }
+
+/* Get a pointer to the next entry. */
+         next = next->next;
+      }
+   }
+}
+
 static void ClearSizeGuess( AstKeyMap *this, int *status ) {
 /*
 *+
@@ -6013,6 +6094,88 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
    }
 }
 
+static void SetMapLocked( AstKeyMap *this, int maplocked, int *status ) {
+/*
+*+
+*  Name:
+*     astSetMapLocked
+
+*  Purpose:
+*     Set the value of the MapLocked attribute for a KeyMap.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "keymap.h"
+*     void astSetMapLocked( AstKeyMap *this, int maplocked )
+
+*  Class Membership:
+*     KeyMap method.
+
+*  Description:
+*     This function sets the value of the MapLocked attribute for a
+*     KeyMap. It also sets the attribute recursively in any KeyMaps
+*     contained within the supplied KeyMap.
+
+*  Parameters:
+*     this
+*        Pointer to the KeyMap.
+*     maplocked
+*        The new value for the attribute.
+*-
+*/
+
+/* Local Variables: */
+   AstMapEntry *next;     /* Pointer to next Entry to copy */
+   AstObject **obj_list;  /* List of pointers to AST Object entries */
+   int i;                 /* Index into hash table */
+   int iel;               /* Index of current vector element */
+   int nel;               /* Number of elements in vector */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Set the MapLocked value in the supplied KeyMap. */
+   this->maplocked = maplocked ? 1 : 0;
+
+/* Loop round each entry in the hash table. */
+   for( i = 0; i < this->mapsize; i++ ) {
+
+/* Get a pointer to the next KeyMap entry. */
+      next = this->table[ i ];
+
+/* Loop round all entries in this element of the hash table. */
+      while( next && astOK ) {
+
+/* If this entry has an Object data type, see if holds any KeyMaps. */
+         if( next->type == AST__OBJECTTYPE ) {
+
+/* Get the number of objects to check, and a pointer to the first. */
+            nel = next->nel;
+            if( nel == 0 ) {
+               obj_list = &( ((Entry0A *)next)->value );
+               nel = 1;
+            } else {
+               obj_list = ((Entry1A *)next)->value;
+            }
+
+/* Loop round checking all Objects. */
+            for( iel = 0; iel < nel; iel++ ) {
+
+/* If this Object is a KeyMap, set its MapLocked attribute. */
+               if( astIsAKeyMap( obj_list[ iel ] ) ) {
+                  astSetMapLocked( (AstKeyMap *) obj_list[ iel ], maplocked );
+               }
+            }
+         }
+
+/* Get a pointer to the next entry. */
+         next = next->next;
+      }
+   }
+}
+
 static void SetSizeGuess( AstKeyMap *this, int sizeguess, int *status ) {
 /*
 *+
@@ -6387,15 +6550,19 @@ c     (zero)
 f     (.FALSE.)
 *     allows new entries to be added to the KeyMap.
 
+*  Notes:
+*     - When setting a new value for MapLocked, the supplied value is
+*     propagated to any KeyMaps contained within the supplied KeyMap.
+*     - When clearing the MapLocked attribute, the attribute is also
+*     cleared in any KeyMaps contained within the supplied KeyMap.
+
 *  Applicability:
 *     KeyMap
 *        All KeyMaps have this attribute.
 *att--
 */
-astMAKE_CLEAR(KeyMap,MapLocked,maplocked,-INT_MAX)
 astMAKE_GET(KeyMap,MapLocked,int,0,( ( this->maplocked != -INT_MAX ) ?
                                    this->maplocked : 0 ))
-astMAKE_SET(KeyMap,MapLocked,int,maplocked,( value != 0 ))
 astMAKE_TEST(KeyMap,MapLocked,( this->maplocked != -INT_MAX ))
 
 /* Copy constructor. */
@@ -7365,6 +7532,15 @@ void astClearSizeGuess_( AstKeyMap *this, int *status ){
 void astSetSizeGuess_( AstKeyMap *this, int sizeguess, int *status ){
    if( !astOK ) return;
    (**astMEMBER(this,KeyMap,SetSizeGuess))(this,sizeguess, status );
+}
+
+void astClearMapLocked_( AstKeyMap *this, int *status ){
+   if( !astOK ) return;
+   (**astMEMBER(this,KeyMap,ClearMapLocked))(this, status );
+}
+void astSetMapLocked_( AstKeyMap *this, int maplocked, int *status ){
+   if( !astOK ) return;
+   (**astMEMBER(this,KeyMap,SetMapLocked))(this,maplocked, status );
 }
 
 
