@@ -103,7 +103,7 @@ proc get {query outfile} {
    }
 
    #  Check for a moved response and handle the re-direct.
-   if { [::http::ncode $response] == 302 } {
+   if { [::http::ncode $response] == 302 || [::http::ncode $response] == 303 } {
       array set meta [eval set $response\(meta\)]
       set location $meta(Location)
 
@@ -120,12 +120,13 @@ proc get {query outfile} {
 
          #  Funny location is already a URL, probably broken, but try it
          #  anyway.
-         set newquery $location.
+         set newquery $location
       }
 
       puts "Redirected to: $newquery"
       catch {::close $fid}
       get $newquery $outfile
+      return
    }
 
    #  Get content and copy to the file.
