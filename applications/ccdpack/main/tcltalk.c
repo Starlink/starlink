@@ -55,6 +55,7 @@
 
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -62,6 +63,8 @@
 *        Original version.
 *     28-JUL-2000 (MBT):
 *        Recoded to run the Tcl interpreter in a separate process.
+*     2010-05-06 (TIMJ):
+*        Add some const
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -78,6 +81,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <signal.h>
+#include <errno.h>
 #include "tcl.h"
 #include "sae_par.h"
 #include "tcltalk.h"
@@ -89,11 +93,10 @@
 
 
 /* Global variables. */
-   extern int errno;
    static char buffer[ BUFLENG ];          /* General purpose buffer */
 
 /* Static functions. */
-   static char *ccdTclEval( ccdTcl_Interp *cinterp, char *cmd, int *status );
+   static char *ccdTclEval( ccdTcl_Interp *cinterp, const char *cmd, int *status );
 
 
    ccdTcl_Interp *ccdTclStart( int *status ) {
@@ -165,7 +168,6 @@
 /* Local variables. */
       ccdTcl_Interp *cinterp;
       pid_t pid;
-      int *sp;
 
 /* Check inherited status. */
       if ( *status != SAI__OK ) return NULL;
@@ -178,7 +180,7 @@
    result strings up. */
       if ( pipe( cinterp->downfd ) || pipe( cinterp->upfd ) ) {
          *status = SAI__ERROR;
-         msgSetc( "ERROR", strerror( errno ) );
+         errSyser( "ERROR", errno );
          errRep( "CCD_TCL_PROC", "pipe: ^ERROR", status );
          free( cinterp );
          return NULL;
@@ -254,7 +256,7 @@
    }
 
 
-   static char *ccdTclEval( ccdTcl_Interp *cinterp, char *cmd, int *status ) {
+   static char *ccdTclEval( ccdTcl_Interp *cinterp, const char *cmd, int *status ) {
 /*
 *+
 *  Name:
@@ -285,7 +287,7 @@
 *  Arguments:
 *     cinterp = ccdTcl_Interp *
 *        The interpreter got from a previous ccdTclStart call.
-*     cmd = char *
+*     cmd = const char *
 *        A string representing a Tcl command.  As currently implemented
 *        this probably ought not to be too long; below 4096 characters
 *        should be all right.
@@ -419,7 +421,7 @@
       if ( tclrtn != TCL_OK ) {
          int done = 0;
          char *estart;
-         char *fmt = ( tclrtn == TCL_ERROR ) ? "Tcl error:\n%s"
+         const char *fmt = ( tclrtn == TCL_ERROR ) ? "Tcl error:\n%s"
                                              : "Unexpected Tcl return:\n%s";
          snprintf( buffer, BUFLENG - strlen( fmt ), fmt, retbuf );
          *status = SAI__ERROR;
@@ -523,7 +525,7 @@
    }
 
 
-   void ccdTclDo( ccdTcl_Interp *cinterp, char *script, int *status ) {
+   void ccdTclDo( ccdTcl_Interp *cinterp, const char *script, int *status ) {
 /*
 *+
 *  Name:
@@ -545,7 +547,7 @@
 *  Arguments:
 *     cinterp = ccdTcl_Interp *
 *        The interpreter got from a previous ccdTclStart call.
-*     script = char *
+*     script = const char *
 *        Any string of Tcl commands.
 *     status = int *
 *        The global status.
@@ -597,7 +599,7 @@
    }
 
 
-   void ccdTclRun( ccdTcl_Interp *cinterp, char *filename, int *status ) {
+   void ccdTclRun( ccdTcl_Interp *cinterp, const char *filename, int *status ) {
 /*
 *+
 *  Name:
@@ -617,7 +619,7 @@
 *  Arguments:
 *     cinterp = ccdTcl_Interp *
 *        The interpreter got from a previous ccdTclStart call.
-*     filename = char *
+*     filename = const char *
 *        Name of the Tcl script file to interpret.
 *     status = int *
 *        The global status.
@@ -674,7 +676,7 @@
    }
 
 
-   void ccdTclAppC( ccdTcl_Interp *cinterp, char *name, char *value,
+   void ccdTclAppC( ccdTcl_Interp *cinterp, const char *name, const char *value,
                     int *status ) {
 /*
 *+
@@ -694,9 +696,9 @@
 *  Arguments:
 *     cinterp = ccdTcl_Interp *
 *        The interpreter got from a previous ccdTclStart call.
-*     name = char *
+*     name = const char *
 *        The name of the variable to append to.
-*     value = char *
+*     value = const char *
 *        The item to appeand to the variable contents.
 *     status = int *
 *        The global status.
@@ -744,7 +746,7 @@
    }
 
 
-   void ccdTclSetI( ccdTcl_Interp *cinterp, char *name, int value,
+   void ccdTclSetI( ccdTcl_Interp *cinterp, const char *name, int value,
                     int *status ) {
 /*
 *+
@@ -760,7 +762,7 @@
 *  Arguments:
 *     cinterp = ccdTcl_Interp *
 *        The interpreter got from a previous ccdTclStart call.
-*     name = char *
+*     name = const char *
 *        The name of the variable to set.
 *     value = int
 *        The value to set the variable to.
@@ -810,7 +812,7 @@
    }
 
 
-   void ccdTclSetD( ccdTcl_Interp *cinterp, char *name, double value,
+   void ccdTclSetD( ccdTcl_Interp *cinterp, const char *name, double value,
                     int *status ) {
 /*
 *+
@@ -826,7 +828,7 @@
 *  Arguments:
 *     cinterp = ccdTcl_Interp *
 *        The interpreter got from a previous ccdTclStart call.
-*     name = char *
+*     name = const char *
 *        The name of the variable to set.
 *     value = double
 *        The value to set the variable to.
@@ -876,7 +878,7 @@
    }
 
 
-   void ccdTclSetC( ccdTcl_Interp *cinterp, char *name, char *value,
+   void ccdTclSetC( ccdTcl_Interp *cinterp, const char *name, const char *value,
                     int *status ) {
 /*
 *+
@@ -892,9 +894,9 @@
 *  Arguments:
 *     cinterp = ccdTcl_Interp *
 *        The interpreter got from a previous ccdTclStart call.
-*     name = char *
+*     name = const char *
 *        The name of the variable to set.
-*     value = char *
+*     value = const char *
 *        Pointer to string to set the variable to.
 *     status = int *
 *        The global status.
@@ -942,7 +944,7 @@
    }
 
 
-   void ccdTclGetI( ccdTcl_Interp *cinterp, char *script, int *value,
+   void ccdTclGetI( ccdTcl_Interp *cinterp, const char *script, int *value,
                     int *status ) {
 /*
 *+
@@ -958,7 +960,7 @@
 *  Arguments:
 *     cinterp = ccdTcl_Interp *
 *        The interpreter got from a previous ccdTclStart call.
-*     script = char *
+*     script = const char *
 *        A pointer to the text of a Tcl expression to evaluate.
 *     value = int *
 *        A pointer to the variable in which to store the result;
@@ -1016,7 +1018,7 @@
    }
 
 
-   void ccdTclGetD( ccdTcl_Interp *cinterp, char *script, double *value,
+   void ccdTclGetD( ccdTcl_Interp *cinterp, const char *script, double *value,
                     int *status ) {
 /*
 *+
@@ -1032,7 +1034,7 @@
 *  Arguments:
 *     cinterp = ccdTcl_Interp *
 *        The interpreter got from a previous ccdTclStart call.
-*     script = char *
+*     script = const char *
 *        A pointer to the text of a Tcl expression to evaluate.
 *     value = double *
 *        A pointer to the variable in which to store the result;
@@ -1091,7 +1093,7 @@
    }
 
 
-   char *ccdTclGetC( ccdTcl_Interp *cinterp, char *script, int *status ) {
+   char *ccdTclGetC( ccdTcl_Interp *cinterp, const char *script, int *status ) {
 /*
 *+
 *  Name:
@@ -1113,7 +1115,7 @@
 *  Arguments:
 *     cinterp = ccdTcl_Interp *
 *        The interpreter got from a previous ccdTclStart call.
-*     script = char *
+*     script = const char *
 *        A pointer to the text of a Tcl expression to evaluate.
 *     status = int *
 *        The global status.

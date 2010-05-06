@@ -40,11 +40,14 @@
 
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     10-OCT-2000 (MBT):
 *        Original version.
+*     2010-05-06 (TIMJ):
+*        Add some consting
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -70,21 +73,21 @@
 
    ccdTcl_Interp *ccdTclStart( int *status );
    void ccdTclStop( ccdTcl_Interp *cinterp, int *status );
-   void ccdTclRun( ccdTcl_Interp *cinterp, char *filename, int *status );
-   void ccdTclDo( ccdTcl_Interp *cinterp, char *script, int *status );
-   void ccdTclAppC( ccdTcl_Interp *cinterp, char *name, char *value,
+   void ccdTclRun( ccdTcl_Interp *cinterp, const char *filename, int *status );
+   void ccdTclDo( ccdTcl_Interp *cinterp, const char *script, int *status );
+   void ccdTclAppC( ccdTcl_Interp *cinterp, const char *name, const char *value,
                     int *status );
-   void ccdTclSetI( ccdTcl_Interp *cinterp, char *name, int value,
+   void ccdTclSetI( ccdTcl_Interp *cinterp, const char *name, int value,
                     int *status );
-   void ccdTclSetD( ccdTcl_Interp *cinterp, char *name, double value,
+   void ccdTclSetD( ccdTcl_Interp *cinterp, const char *name, double value,
                     int *status );
-   void ccdTclSetC( ccdTcl_Interp *cinterp, char *name, char *value,
+   void ccdTclSetC( ccdTcl_Interp *cinterp, const char *name, const char *value,
                     int *status );
-   void ccdTclGetI( ccdTcl_Interp *cinterp, char *script, int *value,
+   void ccdTclGetI( ccdTcl_Interp *cinterp, const char *script, int *value,
                     int *status );
-   void ccdTclGetD( ccdTcl_Interp *cinterp, char *script, double *value,
+   void ccdTclGetD( ccdTcl_Interp *cinterp, const char *script, double *value,
                     int *status );
-   char *ccdTclGetC( ccdTcl_Interp *cinterp, char *script, int *status );
+   char *ccdTclGetC( ccdTcl_Interp *cinterp, const char *script, int *status );
 
 #endif  /* CCD_TCLTALK_DEFINED */
 

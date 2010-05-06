@@ -62,7 +62,7 @@
 
 /* Declare function prototypes.
 */
-   void *ccdMall( char *type, int size, int *status );
+   void *ccdMall( const char *type, int size, int *status );
 
 /* General purpose buffer length.
 */
@@ -95,14 +95,14 @@
          char errname[ ERR__SZPAR ]; \
          int errmsg_leng; \
          int errname_leng; \
-         Tcl_Obj *result; \
-         result = Tcl_NewStringObj( "", 0 ); \
+         Tcl_Obj *_tcl_result; \
+         _tcl_result = Tcl_NewStringObj( "", 0 ); \
          while ( *status != SAI__OK ) { \
             errLoad( errname, ERR__SZPAR, &errname_leng, errmsg, \
                      CCDAUX_BUFLENG, &errmsg_leng, status ); \
-            Tcl_AppendStringsToObj( result, "\n", errmsg, (char *) NULL ); \
+            Tcl_AppendStringsToObj( _tcl_result, "\n", errmsg, (char *) NULL ); \
          } \
-         Tcl_SetObjResult( interp, result ); \
+         Tcl_SetObjResult( interp, _tcl_result ); \
          errRlse(); \
          return TCL_ERROR; \
       } \
@@ -128,14 +128,14 @@
          char errname[ ERR__SZPAR ]; \
          int errmsg_leng; \
          int errname_leng; \
-         Tcl_Obj *result; \
-         result = Tcl_NewStringObj( "", 0 ); \
+         Tcl_Obj *_tcl_result; \
+         _tcl_result = Tcl_NewStringObj( "", 0 ); \
          while ( *status != SAI__OK ) { \
             errLoad( errname, ERR__SZPAR, &errname_leng, errmsg, \
                      CCDAUX_BUFLENG, &errmsg_leng, status ); \
-            Tcl_AppendStringsToObj( result, "\n", errmsg, (char *) NULL ); \
+            Tcl_AppendStringsToObj( _tcl_result, "\n", errmsg, (char *) NULL ); \
          } \
-         Tcl_SetObjResult( interp, result ); \
+         Tcl_SetObjResult( interp, _tcl_result ); \
          errRlse(); \
          return TCL_ERROR; \
       } \

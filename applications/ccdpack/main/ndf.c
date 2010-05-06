@@ -330,7 +330,6 @@
 
 /* Machinery for calling ndfdisplay as a background process.
  */
-   Tcl_ObjCmdProc ndfdisplay;
    struct ndfdisplay_args {
       char *device;
       char *settings;
@@ -354,7 +353,6 @@
 /**********************************************************************/
       Ndf *ndf;
       static int counter = 0;
-      int i;
       Tcl_Obj *op;
 
 /* Check command arguments.  There should be a single extra argument for
@@ -522,12 +520,13 @@
                   int status[] = { SAI__OK };
                   int one = 1;
                   int icard;
+                  int incards = ndf1->fits.ncard;
                   F77_POINTER_TYPE ipfits;
                   DECLARE_CHARACTER( fkey, 80 );
                   DECLARE_CHARACTER( fvalue, 80 );
                   cnfExprt( key, fkey, 80 );
                   ipfits = cnfFptr( ndf1->fits.data );
-                  F77_CALL(ccd1_ftget)( INTEGER_ARG(&ndf1->fits.ncard),
+                  F77_CALL(ccd1_ftget)( INTEGER_ARG(&incards),
                                         POINTER_ARG(&ipfits),
                                         INTEGER_ARG(&one),
                                         CHARACTER_ARG(fkey),
@@ -717,7 +716,6 @@
                   Tcl_Obj *CONST objv[] ) {
 /**********************************************************************/
       Ndfset *ndfset;
-      AstFrameSet *wcs;
       static int counter = 0;
       int i;
       int nleng;
@@ -844,7 +842,7 @@
          int ncoeff;
          int nfrm;
          double coeffs[ 6 ];
-         char *cbadstr;
+         const char *cbadstr;
          char *dname;
          AstFrame *newframe;
          AstMapping *map;
@@ -1111,7 +1109,7 @@
 
 /* Clear up AST objects. */
                ASTCALL(
-                  astAnnul( map );
+                  map = astAnnul( map );
                )
             }
          }
@@ -1949,7 +1947,7 @@
       if ( ndf1->fits.loaded && ndf1->fits.ncard ) {
 	datAnnul( &ndf1->fits.loc, status );
       }
-      astAnnul( ndf->wcs );
+      ndf->wcs = astAnnul( ndf->wcs );
       ndfValid( ndf1->identifier, &valid, status );
       if ( valid ) ndfAnnul( &ndf1->identifier, status );
       if ( *status != SAI__OK ) errAnnul( status );
@@ -2181,7 +2179,6 @@
       float *gbox = pargs->gbox;
       float *vp = pargs->vp;
       double *bbox = pargs->bbox;
-      double psize = pargs->psize;
       double zoom = pargs->zoom;
       AstFrameSet *wcs = pargs->wcs;
       int *iframes = pargs->iframes;
@@ -2223,7 +2220,7 @@
          astGrid( plot );
          astSetI( wcs, "Base", bfrm );
          astSetI( wcs, "Current", cfrm );
-         astAnnul( plot );
+         plot = astAnnul( plot );
       )
 
 /* End PGPLOT buffering. */
@@ -2305,7 +2302,6 @@
          Ndf **ndfs;
          Ndf *ndf;
          Ndf1 *ndf1;
-         DECLARE_CHARACTER( ftype, DAT__SZTYP );
 
 /* Initialise some things. */
          percs[ 0 ] = loperc;
@@ -2419,8 +2415,8 @@
             map = astGetMapping( ndf->wcs, AST__BASE, iframes[ i ] );
             if ( fabs( zoom - 1.0 ) > 1. / (double) ( xndf + yndf ) ) {
                map = (AstMapping *)
-                     astCmpMap( map, (AstMapping *) astZoomMap( 2, zoom, "" ),
-                                1, "" );
+                     astCmpMap( map, (AstMapping *) astZoomMap( 2, zoom, " " ),
+                                1, " " );
             }
             map = astSimplify( map );
 

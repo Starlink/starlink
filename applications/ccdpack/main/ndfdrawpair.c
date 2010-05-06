@@ -140,6 +140,8 @@
 #include "tclndf.h"
 #include "ccdaux.h"
 
+   int NdfDrawpair( ClientData clientData, Tcl_Interp *interp, int objc,
+                    Tcl_Obj *CONST objv[] );
 
 /* Declare object function to be executed in the background. */
 
@@ -174,17 +176,13 @@
 *  the first element of the array in each dimension is 1, not 0.
 */
 
-      char *arglist = "device xorigin yorigin xdev ydev zoom "
+      const char *arglist = "device xorigin yorigin xdev ydev zoom "
                   /*   1      2       3       4    5    6      */
                       "ndfsetA frameA xoffA yoffA lopercA hipercA "
                   /*   7       8      9     10    11      12      */
                       "ndfsetB frameB xoffB yoffB lopercB hipercB ";
                   /*   13      14     15    16    17      18      */
       int retval;
-      int xpdev;
-      int ypdev;
-      int xporig;
-      int yporig;
       int *iframes[ 2 ];
       double xoff[ 2 ];
       double yoff[ 2 ];
@@ -200,11 +198,8 @@
       float yplo;
       float yphi;
       int *pixbloc[ 2 ];
-      double loval[ 2 ];
-      double hival[ 2 ];
       double loperc[ 2 ];
       double hiperc[ 2 ];
-      char *arg;
       char *device;
       int i;
       int locolour;
@@ -354,7 +349,6 @@
                        Tcl_Obj *CONST objv[] ) {
       int const badcolour = 0;
       int i;
-      int *status;
       int ngood = 0;
       int xpix[ 2 ];
       int xpof[ 2 ];

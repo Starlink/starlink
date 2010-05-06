@@ -3,7 +3,7 @@
 #include "sae_par.h"
 #include "ccdaux.h"
 
-   void *ccdMall( char *type, int size, int *status ) {
+   void *ccdMall( const char *type, int size, int *status ) {
 /*
 *+
 *  Name:
@@ -16,7 +16,7 @@
 *     Starlink C
 
 *  Arguments:
-*     type = char *
+*     type = const char *
 *        HDS type of memory to allocate, as a null-terminated string.
 *     size = int
 *        Number of elements of type type to allocate.

@@ -90,7 +90,7 @@
       struct {
          char *data;               /* The text of the FITS headers */
          int loaded;               /* Has the FITS array been loaded? */
-         int ncard;                /* Number of FITS cards present */
+         size_t ncard;             /* Number of FITS cards present */
          HDSLoc *loc;              /* Locator to NDF .MORE.FITS extension */
       } fits;                   /* Contents of FITS extension. */
    } Ndf1;
