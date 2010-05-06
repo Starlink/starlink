@@ -1122,9 +1122,6 @@ void smf_median_smooth( dim_t box, dim_t el, const double *dat,
                         unsigned char mask, double *out, double *w1,
                         double *w2, int *status );
 
-void smf_merge_keymaps ( AstKeyMap * keymap, const char * key, const char * suffix,
-                         int * status );
-
 void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarray,
                        const smfArray *darks, const smfArray *bbms,
                        const smfArray *flatramps, dim_t nchunks, smf_modeltype mtype,

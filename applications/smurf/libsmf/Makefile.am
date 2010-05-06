@@ -218,7 +218,6 @@ smf_mapbounds.c \
 smf_mapbounds_approx.c \
 smf_maskacsis.c \
 smf_median_smooth.c \
-smf_merge_keymaps.c \
 smf_model_create.c \
 smf_model_createHdr.c \
 smf_model_getname.c \
