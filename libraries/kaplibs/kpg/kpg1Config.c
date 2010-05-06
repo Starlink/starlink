@@ -1,4 +1,5 @@
 #include "star/grp.h"
+#include "star/ndg.h"
 #include "ast.h"
 #include "kaplibs.h"
 #include "sae_par.h"
@@ -181,6 +182,21 @@ AstKeyMap *kpg1Config( const char *param, const char *def,
    error is reported by astMapGet<X> if the KeyMap does not contain the requested
    entry. */
    if( result ) astSetI( result, "KeyError", 1 );
+
+/* Store the merged keymap as the keymap to be associated with this parameter.
+ * This is the one that will actually be used rather than the one that was given
+ * by the user. */
+   if ( result ) {
+     Grp * mergedgrp = NULL;
+
+     /* convert to a GRP */
+     kpg1Kygrp( result, &mergedgrp, status );
+
+     /* register it */
+     ndgAddgh( param, mergedgrp, status );
+
+     if (mergedgrp) grpDelet( &mergedgrp, status );
+   }
 
 /* Delete the group, if any. */
    if( grp ) grpDelet( &grp, status );
