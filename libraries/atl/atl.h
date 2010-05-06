@@ -29,6 +29,8 @@
 *        Add atlRmblft
 *     2010-01-12 (TIMJ):
 *        Add atlMapCopy
+*     2010-05-05 (TIMJ):
+*        Remove atlMapCopy
 
 *  Copyright:
 *     Copyright (C) 2009-2010 Science and Technology Facilities Council.
@@ -67,7 +69,6 @@ enum { ATL__MXDIM  = 7 };
 /* Public function prototypes */
 /* -------------------------- */
 AstRegion *atlMatchRegion( AstRegion *, AstFrame *, int * );
-void atlMapCopy( AstKeyMap * destkm, AstKeyMap * srckm, int * status );
 int atlMapGet1S( AstKeyMap *, const char *, int, int, int *, char *, int * );
 void atlAddWcsAxis( AstFrameSet *, AstMapping *, AstFrame *, int *, int *, int * );
 void atlAxtrm( AstFrameSet *, int *, int *, int *, double *, int * );
