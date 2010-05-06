@@ -35,6 +35,8 @@
 *        More const-ing goodness.
 *     15-JUL-2008 (TIMJ):
 *        Use size_t for index to match new Grp interface.
+*     6-MAY-2010 (DSB):
+*        Move ndgAddgh from ndg.c to ndg_adam.c
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -135,3 +137,25 @@ void ndgCreat( const char * param, const Grp *igrp0, Grp ** igrp, size_t *size, 
 
    return;
 }
+
+F77_SUBROUTINE(ndg_addgh)( CHARACTER(PARAM), INTEGER(IGRP), INTEGER(STATUS)
+                           TRAIL(PARAM) );
+
+void ndgAddgh( const char param[], const Grp * igrp, int * status ) {
+  DECLARE_INTEGER(IGRP);
+  DECLARE_CHARACTER( PARAM, PAR__SZNAM );
+  DECLARE_INTEGER(STATUS);
+
+  IGRP = grpC2F( igrp, status );
+  if (*status != SAI__OK) return;
+
+  F77_EXPORT_CHARACTER( param, PARAM, PAR__SZNAM );
+  F77_EXPORT_INTEGER( *status, STATUS );
+
+  F77_CALL(ndg_addgh)( CHARACTER_ARG(PARAM), INTEGER_ARG(&IGRP),
+                       INTEGER_ARG(&STATUS) TRAIL_ARG(PARAM) );
+
+  F77_IMPORT_INTEGER( STATUS, *status );
+  return;
+}
+
