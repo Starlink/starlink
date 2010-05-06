@@ -42,10 +42,12 @@
 *        Use size_t for index to match new Grp interface.
 *     13-AUG-2008 (DSB):
 *        Added ndgCopy.
+*     2010-05-05 (TIMJ):
+*        Add ndgAddgh
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2007, 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -89,6 +91,7 @@ NdgProvenance *ndgFreeProv( NdgProvenance *prov, int *status );
 NdgProvenance *ndgReadProv( int indf, const char *creator, int *status );
 int ndgCountProv( NdgProvenance *prov, int *status );
 int ndgIsHiddenProv( NdgProvenance *, int, int * );
+void ndgAddgh( const char param[], const Grp * igrp, int * status );
 void ndgAsexp( const char grpexp[], int verb, const Grp *igrp1, Grp **igrp2, size_t *size, int *flag, int *status );
 void ndgAssoc( const char *param, int verb, Grp **igrp, size_t *size, int *flag, int *status );
 void ndgBegpv( int *status );

@@ -43,11 +43,13 @@
 *        Use size_t for index to match new Grp interface.
 *     13-AUG-2008 (DSB):
 *        Added ndgCopy.
+*     2010-05-05 (TIMJ):
+*        Add ndgAddgh
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2007, 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -419,6 +421,24 @@ void ndgHltpv( int new, int *old, int *status ){
    F77_IMPORT_INTEGER( STATUS, *status );
 }
 
+F77_SUBROUTINE(ndg_addgh)( CHARACTER(PARAM), INTEGER(IGRP), INTEGER(STATUS)
+                           TRAIL(PARAM) );
 
+void ndgAddgh( const char param[], const Grp * igrp, int * status ) {
+  DECLARE_INTEGER(IGRP);
+  DECLARE_CHARACTER( PARAM, PAR__SZNAM );
+  DECLARE_INTEGER(STATUS);
 
+  IGRP = grpC2F( igrp, status );
+  if (*status != SAI__OK) return;
+
+  F77_EXPORT_CHARACTER( param, PARAM, PAR__SZNAM );
+  F77_EXPORT_INTEGER( *status, STATUS );
+
+  F77_CALL(ndg_addgh)( CHARACTER_ARG(PARAM), INTEGER_ARG(&IGRP),
+                       INTEGER_ARG(&STATUS) TRAIL_ARG(PARAM) );
+
+  F77_IMPORT_INTEGER( STATUS, *status );
+  return;
+}
 
