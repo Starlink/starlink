@@ -14,11 +14,11 @@
 
 *  Invocation:
 *     void smf_templateFit1<X>( CGEN_TYPE *data, unsigned char *qual,
-*                               unsigned char mask_meas, 
-*                               unsigned char mask_cor, const size_t n, 
-*                               const size_t stride, 
+*                               unsigned char mask_meas,
+*                               unsigned char mask_cor, const size_t n,
+*                               const size_t stride,
 *                               const double *template, int remove,
-*                               double *gain, double *offset, 
+*                               double *gain, double *offset,
 *                               double *corr, int *status )
 
 *  Arguments:
@@ -56,7 +56,7 @@
 *     by solving the maximum-likelihood values of gain and offset in
 *     the following expression:
 *
-*                 data(t) = gain*template(t) + offset 
+*                 data(t) = gain*template(t) + offset
 *
 *    Setting the remove flag will cause the fitted model to be
 *    subtracted from data. In this case, for any sample at which the
@@ -129,11 +129,11 @@
 #define FUNC_NAME "smf_templateFit1"
 
 void CGEN_FUNCTION(smf_templateFit1)( CGEN_TYPE *data, unsigned char *qual,
-                                      unsigned char mask_meas, 
-                                      unsigned char mask_cor, const size_t n, 
-                                      const size_t stride, 
+                                      unsigned char mask_meas,
+                                      unsigned char mask_cor, const size_t n,
+                                      const size_t stride,
                                       const double *template, int remove,
-                                      double *gain, double *offset, 
+                                      double *gain, double *offset,
                                       double *corr, int *status ) {
 
   /* Local variables */
@@ -160,7 +160,7 @@ void CGEN_FUNCTION(smf_templateFit1)( CGEN_TYPE *data, unsigned char *qual,
 
   if( !template ) {
     *status = SAI__ERROR;
-    errRep(" ", FUNC_NAME ": possible programming error, template is NULL", 
+    errRep(" ", FUNC_NAME ": possible programming error, template is NULL",
            status);
     return;
   }
@@ -186,7 +186,7 @@ void CGEN_FUNCTION(smf_templateFit1)( CGEN_TYPE *data, unsigned char *qual,
         s_dt += data[off]*template[i];
         s_t += template[i];
         s_tsq += template[i]*template[i];
-        ngood ++;        
+        ngood ++;
       }
       off += stride;
     }
@@ -200,7 +200,7 @@ void CGEN_FUNCTION(smf_templateFit1)( CGEN_TYPE *data, unsigned char *qual,
         s_dt += data[off]*template[i];
         s_t += template[i];
         s_tsq += template[i]*template[i];
-        ngood ++;        
+        ngood ++;
       }
       off += stride;
     }
@@ -215,28 +215,28 @@ void CGEN_FUNCTION(smf_templateFit1)( CGEN_TYPE *data, unsigned char *qual,
       /* Calculate fit coefficients */
       a = (ngood*s_dt - s_d*s_t) /
         (ngood*s_tsq - s_t*s_t);
-      
-      b = (s_d*s_tsq - s_t*s_dt) / 
+
+      b = (s_d*s_tsq - s_t*s_dt) /
         (ngood*s_tsq - s_t*s_t);
-      
+
       /* Return gain and offset if requested */
       if( gain ) {
         *gain = a;
       }
-      
+
       if( offset ) {
         *offset = b;
       }
-      
+
       /* Return linear correlation coefficient if requested */
       if( corr ) {
         *corr = (ngood*s_dt - s_d*s_t) /
           ( sqrt(ngood*s_tsq - s_t*s_t) * sqrt(ngood*s_dsq - s_d*s_d) );
 
         /* Trap very poor fits */
-        if( !isnormal(*corr) ) *corr=0; 
+        if( !isnormal(*corr) ) *corr=0;
       }
-      
+
       /* Remove fitted templated if requested */
       if( remove ) {
         off = 0;
@@ -244,22 +244,22 @@ void CGEN_FUNCTION(smf_templateFit1)( CGEN_TYPE *data, unsigned char *qual,
           for( i=0; i<n; i++ ) {
             if( !(qual[off]&mask_cor) && (template[i] != VAL__BADD) ) {
               data[off] -= (CGEN_TYPE) (a*template[i] + b);
-            } 
+            }
             off += stride;
-          }     
+          }
         } else {
           for( i=0; i<n; i++ ) {
             if( (data[off] != CGEN_BAD) && (template[i] != VAL__BADD) ) {
               data[off] -= (CGEN_TYPE) (a*template[i] + b);
-            } 
+            }
             off += stride;
-          }     
-        } 
+          }
+        }
       }
     }
   } else {
     *status = SMF__INSMP;
-    errRep( " ", FUNC_NAME 
+    errRep( " ", FUNC_NAME
             ": insufficient good data points (<3) in input arrays", status);
   }
 }
