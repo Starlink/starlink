@@ -496,14 +496,18 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
               head.data.lbnd[k] = (idata->lbnd)[k];
             }
 
-            smf_set_clabels( "Cumulative Signal", "Signal",
-                             idata->hdr->units, &head.hdr, status );
+            if (idata && idata->hdr) {
+              smf_set_clabels( "Cumulative Signal", "Signal",
+                               idata->hdr->units, &head.hdr, status );
+            }
             break;
 
           case SMF__RES: /* Model residual */
             /* Not much here since copyinput set */
-            smf_set_clabels( "Residual Signal", "Signal",
-                             idata->hdr->units, &head.hdr, status );
+            if (idata && idata->hdr) {
+              smf_set_clabels( "Residual Signal", "Signal",
+                               idata->hdr->units, &head.hdr, status );
+            }
             break;
 
           case SMF__AST: /* Time-domain projection of map */
@@ -514,8 +518,10 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
               head.data.lbnd[k] = (idata->lbnd)[k];
             }
 
-            smf_set_clabels( "Astronomical Signal", "Signal",
-                             idata->hdr->units, &head.hdr, status );
+            if (idata && idata->hdr) {
+              smf_set_clabels( "Astronomical Signal", "Signal",
+                               idata->hdr->units, &head.hdr, status );
+            }
             break;
 
           case SMF__COM: /* Common-mode at each time step */
@@ -523,8 +529,10 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
             head.data.ndims = 1;
             head.data.lbnd[0] = 1;
 
-            smf_set_clabels( "Common-mode Signal", "Signal",
-                             idata->hdr->units, &head.hdr, status );
+            if (idata && idata->hdr) {
+              smf_set_clabels( "Common-mode Signal", "Signal",
+                               idata->hdr->units, &head.hdr, status );
+            }
 
             if( isTordered ) { /* T is 3rd axis if time-ordered */
               head.data.dims[0] = (idata->dims)[2];
@@ -537,8 +545,10 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
             /* Currently just one variance for each bolometer */
             head.data.dtype = SMF__DOUBLE;
             head.data.ndims = 3;
-            smf_set_clabels( "Noise Variance", "Variance",
-                             idata->hdr->units, &head.hdr, status );
+            if (idata && idata->hdr) {
+              smf_set_clabels( "Noise Variance", "Variance",
+                               idata->hdr->units, &head.hdr, status );
+            }
             one_strlcat(head.hdr.units, "**2", sizeof(head.hdr.units), status);
 
             if( isTordered )  { /* T is 3rd axis if time-ordered */
@@ -670,8 +680,10 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
               head.data.lbnd[k] = (idata->lbnd)[k];
             }
 
-            smf_set_clabels( "Filtered-out Signal", "Signal",
-                             idata->hdr->units, &head.hdr, status );
+            if (idata && idata->hdr) {
+              smf_set_clabels( "Filtered-out Signal", "Signal",
+                               idata->hdr->units, &head.hdr, status );
+            }
             break;
 
           default:

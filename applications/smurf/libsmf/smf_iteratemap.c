@@ -936,15 +936,6 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       }
     }
 
-    /* Check units */
-    if (*status == SAI__OK) {
-      smfData *tmpdata = res[0]->sdata[0];
-      /* Check units are consistent */
-      if (tmpdata && tmpdata->hdr) {
-        smf_check_units( contchunk+1, data_units, tmpdata->hdr, status);
-      }
-    }
-
     /* Allocate space for the chisquared array */
     if( havenoi ) {
       chisquared = smf_malloc( nchunks, sizeof(*chisquared), 1, status );
@@ -1026,6 +1017,15 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                           NULL, 0, NULL, NULL,
                           &quagroup, memiter,
                           memiter, qua, flagstat, keymap, status );
+      }
+    }
+
+    /* Check units */
+    if (*status == SAI__OK && res && res[0]) {
+      smfData *tmpdata = res[0]->sdata[0];
+      /* Check units are consistent */
+      if (tmpdata && tmpdata->hdr) {
+        smf_check_units( contchunk+1, data_units, tmpdata->hdr, status);
       }
     }
 
