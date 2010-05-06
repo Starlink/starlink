@@ -34,7 +34,7 @@ numiter = -20
 tstep = 100
 chitol = 1e-4
 
-memiter = 0
+memiter = 1
 deldimm = 1
 
 bolomap = 0
