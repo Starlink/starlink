@@ -110,10 +110,11 @@
 *        If TRUE causes each HDU from the FITS file to be written as
 *        a component of an HDS container file.  Each component will be
 *        named HDU_n, where n is the FITS HDU number.  The primary HDU
-*        is numbered 0.  If the FITS HDU contains a data array, the HDS
-*        component will be an NDF; if not, it will be a structure of
-*        type FITS_HEADER containing the FITS header as an array of type
-*        _CHAR*80.
+*        is numbered 0.  (Note these can be altered for UKIRT_HDS data
+*        or where a table is used to assign names to HDUs.)  If the FITS
+*        HDU contains a data array, the HDS component will be an NDF; if
+*        not, it will be a structure of type FITS_HEADER containing the
+*        FITS header as an array of type _CHAR*80.
 *     NENCOD = INTEGER (Given)
 *        The number of encodings supplied in ENCODS.
 *     ENCODS( NENCOD ) = CHARACTER * ( * ) (Given)
@@ -244,6 +245,13 @@
 *        contents.  Thus the global HISTORY present in each sub-file is
 *        not duplicated in each SMURF-extension NDF.
 *
+*        -  When CONTNR is .TRUE., a former UKIRT_HDS container file,
+*        identified by the presence and values of HDSNAME and HDSTYPE 
+*        keywords may be created.  The container file has the original
+*        structure including the NDFs' names, unless a text file is 
+*        used to associate sub-files with NDFs (see FITS2NDF EXTABLE 
+*        documentation for details).
+*
 *     o  IUE Final Archive LILO, LIHI, SILO, SIHI
 *
 *        See routine COF_IUESI for details.
@@ -285,9 +293,9 @@
 *  Copyright:
 *     Copyright (C) 1994 Science & Engineering Research Council.
 *     Copyright (C) 1997-2004 Central Laboratory of the Research
-*     Councils. Copyright (C) 2006 Particle Physics & Astronomy
-*     Research Council. Copyright (C) 2007-2008 Science & Technology
-*     Facilities Council. All Rights Reserved.
+*     Councils.  Copyright (C) 2006 Particle Physics & Astronomy
+*     Research Council.  Copyright (C) 2007-2008, 2010 Science &
+*     Technology Facilities Council.  All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -395,6 +403,14 @@
 *     2008 February 12 (MJC):
 *        Added support for reading SMURF MEF files, ignoring duplicated
 *        HISTORY and AXIS information.
+*     2010 May 6 (MJC):
+*        Cope better with data that were formerly in a UKIRT_HDS
+*        container file using the HDSNAME and HDSTYPE keywords.
+*        -  Recreate each component NDF's name from its respective
+*        HDSNAME keyword.
+*        -  Retain the HEADER NDF instead of replacing it with a
+*        component of type FITS_HEADER.
+*        -  Reset the top-level type to UKIRT_HDS.
 *     {enter_further_changes_here}
 
 *-
@@ -496,7 +512,8 @@
       INTEGER GCMIN              ! Minimum group number (0|1)
       INTEGER GCOUNT             ! Value of FITS GCOUNT keyword
       CHARACTER * ( 12 ) GRPNAM  ! NDF-extension name for group element
-      CHARACTER * ( DAT__SZNAM ) NDFNAM ! Multi NDF name
+      CHARACTER * ( DAT__SZNAM ) HDSNAM ! Component name from multi-NDF
+      CHARACTER * ( DAT__SZTYP ) HDSTYP ! Component type from multi-NDF
       LOGICAL HDUPRE             ! HDUCLASn keyword is present?
       CHARACTER * ( NDF__SZFTP ) HDUCLA ! Classification of HDU
       INTEGER HDUTYP             ! HDU type (primary, IMAGE, ASCII or
@@ -509,6 +526,7 @@
       CHARACTER * ( NDF__SZTYP ) ITYPE ! NDF implementation data type
       LOGICAL LOOP               ! Loop for another FITS extension?
       LOGICAL MERGED             ! Headers have been merged?
+      LOGICAL NAMPRE             ! HDSNAME keyword is present?
       LOGICAL NATIVE             ! Propagate values, scale, and offset?
       LOGICAL MULTIP             ! More than one data array?
       INTEGER NBFTYP             ! Number of bytes in FITS-implied type
@@ -517,6 +535,7 @@
       INTEGER NCF                ! Number of characters in filename
       INTEGER NDFS(MAXEXT)       ! NDFs for each extn set in EXTABLE
       INTEGER NDFE               ! Identifier of effective NDF
+      CHARACTER * ( DAT__SZNAM ) NDFNAM ! Multi NDF name
       INTEGER NDIM               ! Number of dimensions
       LOGICAL NEEDED             ! Extension needed?
       LOGICAL NEWNDF             ! NDF needs sizing?
@@ -538,6 +557,7 @@
       CHARACTER * ( NDF__SZTYP ) STYPE ! NDF scaled array's data type
       LOGICAL THERE              ! NDF already created?
       CHARACTER * ( NDF__SZTYP ) TYPE ! NDF array's data type
+      LOGICAL TYPPRE             ! HDSTYPE keyword is present?
       CHARACTER * ( NDF__SZTYP ) UTYPE ! Use data type
       LOGICAL VALID              ! True if the NDF identifier is valid
       LOGICAL WRTEXT             ! True if write NDF FITS extension
@@ -860,6 +880,23 @@
 *  Define whether or not the extension came from an NDF.
                EXNDF = HDUPRE .AND. HDUCLA .EQ. 'NDF'
 
+*  Later data from multi-NDF container files will cause failure if the 
+*  user has forgotten to set the CONTAINER flag.  An attempt to put
+*  these into an NDF extension fails because there will be no EXTNAME
+*  keyword present.  These can be detected by the presence of the
+*  HDSNAME and HDSTYPE keywords.
+               CALL ERR_MARK
+               CALL COF_GKEYC( FUNITH, 'HDSNAME', NAMPRE, HDSNAM,
+     :                         COMENT, STATUS )
+               IF ( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
+               CALL ERR_RLSE
+
+               CALL ERR_MARK
+               CALL COF_GKEYC( FUNITH, 'HDSTYPE', TYPPRE, HDSTYP,
+     :                         COMENT, STATUS )
+               IF ( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
+               CALL ERR_RLSE
+
 *  For ordinary files the first (and only) value of the the "group"
 *  counter is zero.  This is what certain FITSIO routines expect.
                GCMIN = 0
@@ -887,10 +924,20 @@
      :                     CALL DAT_ERASE( PLOC, 'DATA_ARRAY', STATUS )
                      END IF
 
-*  Re-type the container file for EXTABLE output.
-                     IF ( CONTNR .OR. EXTABL )
-     :                 CALL DAT_RETYP( PLOC, 'NDF_CONTAINER', STATUS )
-
+*  Re-type the container file for EXTABLE output unless we think it
+*  originated from a UKIRT_HDS file.  The latter is a kludge and ought 
+*  to be handled as a Special Format in a UKIRT-specific routine.  It
+*  assumes that the first proper NDF is called I1 rather than I<n>, for
+*  integer n other than 1.
+                     IF ( CONTNR .OR. EXTABL ) THEN
+                        IF ( HDSNAM .EQ. 'I1' .AND.
+     :                       HDSTYP .EQ. 'NDF' ) THEN
+                           CALL DAT_RETYP( PLOC, 'UKIRT_HDS', STATUS )
+                        ELSE
+                           CALL DAT_RETYP( PLOC, 'NDF_CONTAINER',
+     :                                     STATUS )
+                        END IF
+                     END IF
                   END IF
 
 *  Set the minimum group counter.
@@ -1106,12 +1153,18 @@
 
 *  We are forcing a series of NDFs in a container file by using the
 *  CONTAINER parameter.
+                     
+*  The NDFs names may be stored in HDSNAME obtained earlier.
+                     IF ( NAMPRE ) THEN
+                        NDFNAM = HDSNAM
+                     ELSE
 
 *  Generate the name of the component NDF (HDU_n).  NPOS is updated so
 *  cannot be defined outside the FITS_extension loop.
-                     NDFNAM = 'HDU_'
-                     NPOS = 4
-                     CALL CHR_PUTI( NHDU, NDFNAM, NPOS )
+                        NDFNAM = 'HDU_'
+                        NPOS = 4
+                        CALL CHR_PUTI( NHDU, NDFNAM, NPOS )
+                     END IF
 
 *  Create a new NDF in the container file via an NDF placeholder from
 *  the top-level locator.  The data type and bounds will be changed
@@ -1307,13 +1360,16 @@
                   END IF
 
 *  If we are creating a MULTIP other than a Random Groups file, a header
-*  without data becomes an HDS structure of type FITS_HEADER, containing
-*  the FITS header as a _CHARACTER array.  Copy the FITS airlock to the
-*  top level.
+*  without data either becomes a) an HDS structure of type FITS_HEADER, 
+*  containing the FITS header as a _CHARACTER array; or b) when the
+*  HEADER was an NDF is restored as a HEADER.
                   ISNDF = .TRUE.
                   IF ( .NOT. DARRAY
-     :                 .AND. ( MULTIP .AND. .NOT. NONSDA ) ) THEN
+     :                 .AND. ( MULTIP .AND. .NOT. NONSDA )
+     :                 .AND. HDSTYP .NE. 'NDF' ) THEN
                      ISNDF = .FALSE.
+
+*  Copy the FITS airlock to the top level.
                      CALL NDF_XSTAT( NDFE, 'FITS', THERE, STATUS )
                      IF ( ( STATUS .EQ. SAI__OK )
      :                     .AND. THERE ) THEN

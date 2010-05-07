@@ -620,6 +620,11 @@
 *     contents.  Thus the global HISTORY present in each sub-file is
 *     not duplicated in each SMURF-extension NDF.
 *
+*     -  When CONTAINER is TRUE, a former UKIRT_HDS container file,
+*     identified by the presence and values of HDSNAME and HDSTYPE 
+*     keywords, may be recreated.  The container file has the original
+*     structure including the NDFs' names, unless an EXTABLE is used.
+*
 *     o  IUE Final Archive LILO, LIHI, SILO, SIHI
 *
 *     -  This converts an IUE LI or SI product stored as a FITS primary
