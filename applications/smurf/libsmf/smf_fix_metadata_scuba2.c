@@ -62,6 +62,8 @@
 *        Split from smf_fix_metadata
 *     2010-02-24 (TIMJ):
 *        Fix SHUTTER header for 20100223 fast flatfield ramps.
+*     2010-05-07 (TIMJ):
+*        Correct flatfield ramp heater values for pre-April 2010 data
 
 *  Copyright:
 *     Copyright (C) 2009-2010 Science & Technology Facilities Council.
@@ -179,14 +181,57 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
     msgOutif( msglev, "", INDENT "Mux temperature is being read from BASETEMP header.", status );
   }
 
-  /* Fast flats had incorrect SHUTTER settings for one night */
-  if (fitsvals.utdate == 20100223) {
+  /* work out if this is a fast flat observation taken before May 2010 */
+  if (fitsvals.utdate > 20100218 && fitsvals.utdate < 20100501) {
     char buff[100];
+    /* need to know whether this is a FASTFLAT */
     smf_getfitss( hdr, "SEQ_TYPE", buff, sizeof(buff), status );
-    if (strcmp( buff, "FASTFLAT") == 0) {
-      have_fixed |= SMF__FIXED_FITSHDR;
-      smf_fits_updateD( hdr, "SHUTTER", 1.0, "shutter position 0-Closed 1-Open", status );
-      msgOutif( msglev, "", INDENT "Shutter was open for fast flatfield ramp. Correcting.", status );
+
+    if (strcmp( buff, "FASTFLAT" ) == 0 ) {
+
+      /* Fast flats had incorrect SHUTTER settings for one night */
+      if (fitsvals.utdate == 20100223) {
+        have_fixed |= SMF__FIXED_FITSHDR;
+        smf_fits_updateD( hdr, "SHUTTER", 1.0, "shutter position 0-Closed 1-Open", status );
+        msgOutif( msglev, "", INDENT "Shutter was open for fast flatfield ramp. Correcting.", status );
+      }
+
+      /* Need to fix up SC2_HEAT ramps */
+      /* the problem is that the data were assumed to be taken with 3 measurements
+         in each heater setting. What actually happened was that the first 5 were
+         done at the reference setting and then the data were grouped in threes
+         finishing with a single value at the reference setting again.
+
+         For example the heater values and the actual values look something like
+
+           Stored    1 1 1 2 2 2 3 3 3 4 4 4 5 5 5
+           Actual    0 0 0 0 0 2 2 2 3 3 3 4 4 4 5
+
+         So we can correct for this by starting at the end and copying in the value
+         two slots further down until we get to position #4. Then replacing that with
+         the PIXHEAT number.
+      */
+
+      {
+        size_t i;
+        int pixheat = 0;
+        size_t nframes = hdr->nframes;
+        smf_getfitsi( hdr, "PIXHEAT", &pixheat, status );
+
+        /* shift everything up by 2 */
+        for (i=nframes-1; i > 4; i--) {
+          JCMTState * curstate = &((hdr->allState)[i]);
+          JCMTState * prevstate = &((hdr->allState)[i-2]);
+          curstate->sc2_heat = prevstate->sc2_heat;
+        }
+
+        /* fill in the first 5 slots with the same value */
+        for (i=0; i<5; i++) {
+          JCMTState * curstate = &((hdr->allState)[i]);
+          curstate->sc2_heat = pixheat;
+        }
+        have_fixed |= SMF__FIXED_JCMTSTATE;
+      }
     }
   }
 
