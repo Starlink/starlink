@@ -778,6 +778,10 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
                                    sizeof(hdr->obsidss), status );
           }
 
+          /* We need to assign a number of frames to the header just in case
+             it is needed in the metadata fixup */
+          hdr->nframes = nframes;
+
           /* Metadata corrections - hide the messages by default */
           if ( !(flags & SMF__NOFIX_METADATA) ) smf_fix_metadata( MSG__VERB, *data, status );
 
