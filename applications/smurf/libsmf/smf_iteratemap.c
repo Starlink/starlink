@@ -270,6 +270,7 @@
 *        during configuration file reading.
 *     2010-05-07 (TIMJ):
 *        Use atl instead of ast for putting values into a FITS chan.
+*        Write MJD to shortmaps
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -1923,6 +1924,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                   res[0]->sdata[idx]->hdr->allState ) {
                 AstFitsChan *fitschan=NULL;
                 JCMTState *allState = res[0]->sdata[idx]->hdr->allState;
+                size_t midpnt = (shortstart + shortend) / 2;
 
                 fitschan = astFitsChan ( NULL, NULL, " " );
 
@@ -1930,6 +1932,10 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                           "RTS index number of first frame", status );
                 atlPtfti( fitschan, "SEQEND", allState[shortend].rts_num,
                           "RTS index number of last frame", status);
+                atlPtftd( fitschan, "MJD-AVG", allState[midpnt].rts_end,
+                          "Average MJD of this map", status );
+                atlPtfts( fitschan, "TIMESYS", "TAI", "Time system for MJD-AVG",
+                          status );
 
                 kpgPtfts( mapdata->file->ndfid, fitschan, status );
 
