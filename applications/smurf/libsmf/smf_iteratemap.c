@@ -268,6 +268,8 @@
 *     2010-05-05 (TIMJ):
 *        Remove keymap merging of sub-instruments since this is now handled
 *        during configuration file reading.
+*     2010-05-07 (TIMJ):
+*        Use atl instead of ast for putting values into a FITS chan.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -310,6 +312,7 @@
 #include "prm_par.h"
 #include "par_par.h"
 #include "star/one.h"
+#include "star/atl.h"
 #include "fftw3.h"
 
 /* SMURF includes */
@@ -1426,19 +1429,17 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                                           NULL, 0, obsidssbuf,
                                           sizeof(obsidssbuf), status );
                 if( obsidss ) {
-                  astSetFitsS( fitschan, "OBSIDSS", obsidss,
-                               "Unique observation subsys identifier", 0 );
+                  atlPtfts( fitschan, "OBSIDSS", obsidss,
+                            "Unique observation subsys identifier", status );
                 }
-                astSetFitsI( fitschan, "SEQSTART",
-                             allState[0].rts_num,
-                             "RTS index number of first frame", 0 );
+                atlPtfti( fitschan, "SEQSTART", allState[0].rts_num,
+                          "RTS index number of first frame", status );
 
                 smf_get_dims( res[0]->sdata[0], NULL, NULL, NULL, &ntslice,
                               NULL, NULL, NULL, status );
 
-                astSetFitsI( fitschan, "SEQEND",
-                             allState[ntslice].rts_num,
-                             "RTS index number of last frame", 0 );
+                atlPtfti( fitschan, "SEQEND", allState[ntslice].rts_num,
+                          "RTS index number of last frame", status );
 
                 kpgPtfts( imapdata->file->ndfid, fitschan, status );
 
@@ -1741,9 +1742,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
                     fitschan = astFitsChan ( NULL, NULL, " " );
 
-                    astSetFitsI( fitschan, "COLNUM", col, "bolometer column",
-                                 0 );
-                    astSetFitsI( fitschan, "ROWNUM", row, "bolometer row", 0 );
+                    atlPtfti( fitschan, "COLNUM", col, "bolometer column", status);
+                    atlPtfti( fitschan, "ROWNUM", row, "bolometer row", status );
                     kpgPtfts( mapdata->file->ndfid, fitschan, status );
 
                     if( fitschan ) fitschan = astAnnul( fitschan );
@@ -1921,18 +1921,16 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
               /* Write out FITS header */
               if( (*status == SAI__OK) && res[0]->sdata[idx]->hdr &&
                   res[0]->sdata[idx]->hdr->allState ) {
-
                 AstFitsChan *fitschan=NULL;
                 JCMTState *allState = res[0]->sdata[idx]->hdr->allState;
 
                 fitschan = astFitsChan ( NULL, NULL, " " );
 
-                astSetFitsI( fitschan, "SEQSTART",
-                             allState[shortstart].rts_num,
-                             "RTS index number of first frame", 0 );
-                astSetFitsI( fitschan, "SEQEND",
-                             allState[shortend].rts_num,
-                             "RTS index number of last frame", 0 );
+                atlPtfti( fitschan, "SEQSTART", allState[shortstart].rts_num,
+                          "RTS index number of first frame", status );
+                atlPtfti( fitschan, "SEQEND", allState[shortend].rts_num,
+                          "RTS index number of last frame", status);
+
                 kpgPtfts( mapdata->file->ndfid, fitschan, status );
 
                 if( fitschan ) fitschan = astAnnul( fitschan );
