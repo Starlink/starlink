@@ -31,6 +31,8 @@
 *        Add atlMapCopy
 *     2010-05-05 (TIMJ):
 *        Remove atlMapCopy
+*     2010-05-07 (TIMJ):
+*        Add atlPtftd
 
 *  Copyright:
 *     Copyright (C) 2009-2010 Science and Technology Facilities Council.
@@ -82,6 +84,7 @@ void atlPlroi( AstPlot *, AstKeyMap **, int * );
 void atlPtfti( AstFitsChan *, const char *, int, const char *, int * );
 void atlPtftl( AstFitsChan *, const char *, int, const char *, int * );
 void atlPtftr( AstFitsChan *, const char *, float, const char *, int * );
+void atlPtftd( AstFitsChan *, const char *, double, const char *, int * );
 void atlPtfts( AstFitsChan *, const char *, const char *, const char *,  int * );
 void atlRmblft( AstFitsChan *, int * );
 void atlShow( AstObject *, const char *, const char *, int * );

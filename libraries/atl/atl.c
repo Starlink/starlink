@@ -29,10 +29,12 @@
 *        Add atlPtfti, atlPtfts
 *     6-JUL-2009 (TIMJ):
 *        Add atlRmblft
+*     2010-05-07 (TIMJ):
+*        Add atlPtftd
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2009 Science and Technology Facilities Council.
+*     Copyright (C) 2009-2010 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -357,6 +359,50 @@ void atlPtftr( AstFitsChan *this, const char *name, float value,
    return;
 }
 
+F77_SUBROUTINE(atl_ptftd)( INTEGER(THIS),
+                           CHARACTER(NAME),
+                           DOUBLE(VALUE),
+                           CHARACTER(COMMNT),
+                           INTEGER(STATUS)
+                           TRAIL(NAME)
+                           TRAIL(COMMNT) );
+
+void atlPtftd( AstFitsChan *this, const char *name, double value,
+               const char *comment, int *status ){
+   DECLARE_INTEGER(THIS);
+   DECLARE_CHARACTER_DYN(NAME);
+   DECLARE_DOUBLE(VALUE);
+   DECLARE_CHARACTER_DYN(COMMNT);
+   DECLARE_INTEGER(STATUS);
+
+   F77_EXPORT_INTEGER( astP2I( this ), THIS );
+
+   if( !astOK ) return;
+
+   F77_CREATE_CHARACTER( NAME, strlen( name ) );
+   F77_EXPORT_CHARACTER( name, NAME, NAME_length );
+
+   F77_EXPORT_DOUBLE( value, VALUE );
+
+   F77_CREATE_CHARACTER( COMMNT, strlen( comment ) );
+   F77_EXPORT_CHARACTER( comment, COMMNT, COMMNT_length );
+
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(atl_ptftd)( INTEGER_ARG(&THIS),
+                        CHARACTER_ARG(NAME),
+                        DOUBLE_ARG(&VALUE),
+                        CHARACTER_ARG(COMMNT),
+                        INTEGER_ARG(&STATUS)
+                        TRAIL_ARG(NAME)
+                        TRAIL_ARG(COMMNT) );
+
+   F77_FREE_CHARACTER( NAME );
+   F77_FREE_CHARACTER( COMMNT );
+   F77_IMPORT_INTEGER( STATUS, *status );
+
+   return;
+}
 
 F77_SUBROUTINE(atl_ptfts)( INTEGER(THIS),
                            CHARACTER(NAME),
