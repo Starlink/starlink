@@ -92,8 +92,8 @@ AstRegion *atlMatchRegion( AstRegion *region, AstFrame *frm, int *status ) {
    int *old_status;           /* Original status pointer */
    int axes[ ATL__MXDIM ];    /* Region axis index for each Frame axis */
    int i;                     /* Loop index */
-   int ibase;                 /* Index of base Frame */
-   int icurr;                 /* Index of current Frame */
+   int ibase = 0;             /* Index of base Frame */
+   int icurr = 0;             /* Index of current Frame */
    int j;                     /* Loop index */
    int nax;                   /* No. of axes in supplied Frame */
    int nfrm;                  /* Number of Frames in FrameSet */
@@ -101,7 +101,7 @@ AstRegion *atlMatchRegion( AstRegion *region, AstFrame *frm, int *status ) {
    int nwpick;                /* No. of of Frame axes to pick */
    int raxes[ ATL__MXDIM ];   /* Indicies of Region axes to pick */
    int waxes[ ATL__MXDIM ];   /* Indicies of Frame axes to pick */
-   int iframe;                /* Index of Frame to be checked */
+   int iframe = 0;            /* Index of Frame to be checked */
 
 /* Initialise */
    result = NULL;
