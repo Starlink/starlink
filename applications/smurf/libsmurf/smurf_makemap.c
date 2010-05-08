@@ -707,6 +707,8 @@
 *     2010-05-04 (TIMJ):
 *        Use kpg1Config for reading config parameters including defaults values.
 *        This also required some code to determine the current sub-instrument.
+*     2010-05-07 (TIMJ):
+*        Set bad-bits mask so that QUALITY has an effect.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -1598,6 +1600,9 @@ void smurf_makemap( int *status ) {
     /* Write WCS */
     smf_set_moving(outfset,status);
     ndfPtwcs( outfset, ondf, status );
+
+    /* Set bad bits mask to enable QUALITY */
+    if (mapqual) ndfSbb( 255, ondf, status );
 
     /* write units - hack we do not have a smfHead */
     if (strlen(data_units)) ndfCput( data_units, ondf, "UNITS", status);
