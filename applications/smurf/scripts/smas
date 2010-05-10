@@ -1,0 +1,327 @@
+#!/bin/tcsh
+
+#  Check a list of observations has been supplied on the command line.
+if( $# < 1 ) then
+   echo
+   echo "Short Map Analysis Script"
+   echo
+   echo "Usage: smas <in-list> <out-table> [-p]"
+   echo
+   echo "   <in-list> is a text file in which each line contains the path"
+   echo "   to an NDF holding a SCUBA-2 map of a point source. If an NDF"
+   echo "   contains a MORE.SMURF.SHORTMAPS extension item, then the NDFs"
+   echo "   in the SHORTMAPS array are used in place of the supplied NDF."
+   echo
+   echo "   <out-table> is the name of a text file in which to store a"
+   echo "   catalogue containing details of the source in each supplied map,"
+   echo "   as described below. This catalogue can be displayed and analysed"
+   echo "   using 'topcat -f ascii <out-table>'."
+   echo
+   echo "   Each NDF is processed in the same way. The KAPPA:PSF command"
+   echo "   is used to locate the accurate source centre and fit it using"
+   echo "   an elliptical Gaussian-like model. The details of the model"
+   echo "   are then appended to an output text file as a new row."
+   echo
+   echo "   The output catalogue has a row for every input NDF, and contains"
+   echo "   the following columns:"
+   echo "   - TAI: The MJD (in the TAI timescale) associated with the NDF"
+   echo "   - UTC: The UTC date and time string associated with the NDF"
+   echo "   - SEQSTART - RTS index number of first frame"
+   echo "   - SEQEND - RTS index number of last frame"
+   echo "   - XCEN: The X pixel co-ordinate at the centre of the source"
+   echo "   - YCEN: The Y pixel co-ordinate at the centre of the source"
+   echo "   - AMP: The peak value in the source"
+   echo "   - SUM: The total data sum in the source (see the "-p" option)"
+   echo "   - FWHM: The seeing-disc size: the full width at half maximum "
+   echo "   across the minor axis of the source (arc-seconds)"
+   echo "   - AXISR: The axis ratio of the source: the ratio of the major"
+   echo "   axis length to that of the minor axis."
+   echo "   - GAMMA: The radial fall-off parameter of the source. A gamma "
+   echo "   of two would be a Gaussian."
+   echo "   - ORIENT: The position angle (measured from north through east)"
+   echo "   of the major axis of the source, in degrees."
+   echo "   - NDF: The path to the NDF
+   echo
+   echo "   By default, the SUM column holds the sum of the pixel values"
+   echo "   in 60 arc-sec circular aperture (bad pixels are replaced using"
+   echo "   KAPPA:FILLBAD prior to finding the sum), but if the -p option"
+   echo "   is supplied it will hold the integral of the model star profile"
+   echo "   found by KAPPA:PSF."
+   echo
+   echo "   The SEQSTART and SEQEND columns will be set to 'null' if the "
+   echo "   supplied map does not contain these FITS headers."
+   exit
+endif
+
+#  Ensure ADAM tasks fail rather than prompt for parameter values
+setenv ADAM_NOPROMPT 1
+
+#  Check we have enough command line arguments.
+if( $# < 2 ) then
+   echo "Usage: smas <in-list> <out-table> [-p]"
+   exit
+endif
+
+# Check the input file exists
+if( ! -e "$1" ) then
+   echo "Input file not found: $1"
+   exit
+endif
+
+# Check the remaining options
+set sum_method = APERADD
+if( $# == 3 ) then
+   if( "$3" == "-p" ) then
+      set sum_method = PSF
+   else
+      echo "Unknown command line option - $3"
+      exit
+   endif
+else if( $# > 3 ) then
+   echo "Too many command line arguments"
+endif
+
+# Create the header for the output catalogue - a comment containing
+# the column names
+if( -e "$2" ) then
+   rm $2
+   if( -e "$2" ) then
+      exit
+   endif
+endif
+echo "# TAI UTC SEQSTART SEQEND XCEN YCEN AMP SUM FWHM AXISR GAMMA ORIENT NDF" > $2
+
+# Check no files are left over from previous runs
+rm -f files.smas >& /dev/null
+
+# First task is get a complete list of all the NDFs to be processed,
+# substituting shortmap names for their parent NDF name. Loop round each
+# NDF in the input text file
+set sar = -1
+set negative = -1
+foreach n (`cat $1`)
+
+# Ensure there is no ".sdf" on the end of the NDF name.
+   set dir = `dirname $n`
+   set base = `basename $n .sdf`
+   set in = "$dir/$base"
+   if( ! -e "$in.sdf" ) then
+      echo "Cannot find $in.sdf"
+      exit
+   endif
+
+#  Get the subarray name, and its corresponding integer index.
+   set subarray = `$KAPPA_DIR/fitsmod $in edit=print keyword=SUBARRAY`
+   if( $subarray == "s8a" ) then
+      set array = 0
+   else if( $subarray == "s8b" ) then
+      set array = 1
+   else if( $subarray == "s8c" ) then
+      set array = 2
+   else if( $subarray == "s8d" ) then
+      set array = 3
+   else if( $subarray == "s4a" ) then
+      set array = 4
+   else if( $subarray == "s4b" ) then
+      set array = 5
+   else if( $subarray == "s4c" ) then
+      set array = 6
+   else if( $subarray == "s4d" ) then
+      set array = 7
+   else
+      echo "Unknown subarray - $subarray"
+      exit
+   endif
+
+#  Check all the data is for the same wavelength.
+   if( $sar == -1 ) then
+      set sar = $array
+   else
+      if( $subarray != $sar ) then
+         echo "$n is for subarray $subarrray, which is not the same as the first NDF"
+         exit
+      endif
+   endif
+
+#  See if the data has been flat-fielded (as implied by the map units being "pW"). If not,
+#  the source features will be negative in the bolomaps.
+   $KAPPA_DIR/ndftrace $in quiet
+   set units = `$KAPPA_DIR/parget UNITS ndftrace`
+   if( $negative == -1 ) then
+      set units_old = $units
+      if( "$units" == "pW" ) then
+         set negative = 0;
+      else
+         set negative = 1;
+      endif
+
+   else if( "$units" != "$units_old" ) then
+      echo "$n has units $units, which is not the same as the first NDF ($units_old)"
+      exit
+
+   endif
+
+# See if the current NDF contains a list of shortmaps, and if so, how many.
+   $HDSTRACE_DIR/hdstrace $in.more.smurf.shortmaps | grep CH..SH >& log.smas
+   set text = `wc log.smas`
+   set nmap = $text[1]
+
+# First deal with NDFs containing shortmaps....
+   if( $nmap > 0 ) then
+
+# Write the full paths of the shortmaps (contained in column 1 of log.smas)
+# out to a temp file
+      foreach name (`cat log.smas | awk '{print $1}'`)
+         echo "$in.more.smurf.shortmaps.$name" >> files.smas
+      end
+
+# Now deal with NDF that do not contain shortmaps....
+   else
+
+# Just append the NDF path to the temp file.
+      echo "$in" >> files.smas
+   endif
+end
+
+# Next loop round all the NDFs to be processed.
+foreach n (`cat files.smas`)
+   echo "Doing $n"
+
+# Create a temp copy of the NDF so we can change it.
+   $KAPPA_DIR/ndfcopy $n  temp-smas
+   set ndf = temp-smas
+
+#  From here on, use pixel coords to refer to positions within the bolomap,
+#  increasing the format precision from the one decimal place provided by
+#  the NDF library. NDF does not allow us to change the Format attributes for
+#  the PIXEL Frame directly, so take a copy of the PIXEL Frame first, and set
+#  the Format attributes of the copy.
+   $KAPPA_DIR/wcsadd $ndf frame=pixel domain=newpix maptype=unit accept
+   $KAPPA_DIR/wcsattrib $ndf set 'format(1)' "%5.3f"
+   $KAPPA_DIR/wcsattrib $ndf set 'format(2)' "%5.3f"
+
+#  If source features are negative in the bolomap, negate the bolomap so that they become positive.
+   if( $negative == 1 ) then
+      $KAPPA_DIR/cmult $ndf -1 pos-smas
+      set ndf = "pos-smas"
+   endif
+
+#  Find the pixel coords at the centre of the feature. The feature is
+#  nominally at the reference point and so should, in the absence of errors,
+#  have pixel coords (0.5,0.5). PSF fails unless a good central position is
+#  supplied, so first find the peak value in a box centred on (0,0)
+   $KAPPA_DIR/stats $ndf'(0~20,0~20)' quiet
+   set maxco = `$KAPPA_DIR/parget maxcoord stats`
+   rm -f coin.smas > /dev/null
+   echo $maxco > coin.smas
+   $KAPPA_DIR/psf $ndf incat=! cofile=coin.smas isize=31 norm=f device=! | grep \!\! >& /dev/null
+
+#  Check a psf was found succesfully.
+   if( $status == 1 ) then
+
+#  Get the parameters of the psf.
+      set amp = `$KAPPA_DIR/parget amp1 psf`
+      set posxy = `$KAPPA_DIR/parget centre psf`
+      set axisr = `$KAPPA_DIR/parget axisr psf`
+      set fwhm = `$KAPPA_DIR/parget fwhm psf`
+      set orient = `$KAPPA_DIR/parget orient psf`
+      set gamma = `$KAPPA_DIR/parget gamma psf`
+
+#  Get the total data sum. Two methods - 1) aperture photometry...
+      if( $sum_method == APERADD ) then
+
+#  Choose the aperture size in pixels (60 arc-secs assuming default makemap pixel sizes of 2
+#  and 4 arc-seconds)..
+         if( $sar > 3 ) then
+            set diam = 30
+         else
+            set diam = 15
+         endif
+
+#  Replace any bad pixels within a box centred on the max pixel with sides twice
+#  the above diameter.
+         @ size = $diam + $diam
+         $KAPPA_DIR/fillbad in=$ndf\($maxco[1]~$size,$maxco[2]~$size\) size=2 out=filled-smas | grep \!\! >& /dev/null
+
+#  Do the aperture photometry within the filled image. Check some bad pixels
+#  were filled. If not, use $ndf instead of "filled-smas".
+         if( $status == 1 ) then
+            $KAPPA_DIR/aperadd filled-smas centre="'$posxy'" diam=$diam quiet
+         else
+            $KAPPA_DIR/aperadd $ndf centre="'$posxy'" diam=$diam quiet
+         endif
+         set fsum = `$KAPPA_DIR/parget total aperadd`
+
+#  Alternatively - 2) use the integral of the model PSF as the souce total data sum.
+      else
+         set fsum = `$KAPPA_DIR/parget total psf`
+      endif
+
+#  Get the sequence number at start and end, if possible
+      set seqstart = `$KAPPA_DIR/fitsmod $ndf edit=print keyword=SEQSTART`
+      echo $seqstart | grep "does not exist" >& /dev/null
+      if( $status != 1 ) then
+         set seqstart = null
+      endif
+
+      set seqend = `$KAPPA_DIR/fitsmod $ndf edit=print keyword=SEQEND`
+      echo $seqend | grep "does not exist" >& /dev/null
+      if( $status != 1 ) then
+         set seqend = null
+      endif
+
+#  If possible get the MJD-AVG and TIMESYS FITS headers (shortmaps should have both of these).
+      set mjdavg = `$KAPPA_DIR/fitsmod $ndf edit=print keyword=MJD-AVG`
+      echo $mjdavg | grep "does not exist" >& /dev/null
+      if( $status != 1 ) then
+         set mjdavg = null
+         set timesys = null
+      else
+         set timesys = `$KAPPA_DIR/fitsmod $ndf edit=print keyword=TIMESYS`
+         echo $timesys | grep "does not exist" >& /dev/null
+         if( $status != 1 ) then
+            set mjdavg = null
+            set timesys = null
+         endif
+      endif
+
+#  If we have an MJD-AVG, stor ein it as the TimeOrigin value in a TimeFrame.
+      $ATOOLS_DIR/asttimeframe options='system=mjd' result=tf
+      if( $mjdavg != null ) then
+         $ATOOLS_DIR/astset tf timescale $timesys result=tf
+         $ATOOLS_DIR/astset tf timeorigin $mjdavg result=tf
+
+# If we do not have an MJD-AVG value, get the epoch from the WCS FrameSet, and
+# store it as the TimeOrigin value in a TimeFrame.
+      else
+         $ATOOLS_DIR/astset tf timescale TDB result=tf
+         set tdb = `$ATOOLS_DIR/astget $ndf epoch`
+         $ATOOLS_DIR/astset tf timeorigin $tdb result=tf
+      endif
+
+#  Convert the TimeFrame to TAI timescale and get the converted TimeOrigin value.
+      $ATOOLS_DIR/astset tf timescale TAI result=tf
+      set tai = `$ATOOLS_DIR/astget tf timeorigin`
+
+#  Covert the TimeFrame to UTC timescale and get the converted TimeOrigin value.
+      $ATOOLS_DIR/astset tf timescale UTC result=tf
+      set utc = `$ATOOLS_DIR/astget tf timeorigin`
+
+#  Set the TimeFrame Format to ISO and get the UTC date-time string.
+      $ATOOLS_DIR/astset tf format iso.2T result=tf
+      set date = `$ATOOLS_DIR/astformat tf axis=1 value=0.0`
+
+#  Write a row to the output catalogue.
+      echo "$tai $date $seqstart $seqend $posxy[1] $posxy[2] $amp $fsum $fwhm $axisr $gamma $orient $n" >> $2
+
+#  Report any PSF failure.
+   else
+      echo "  psf failure"
+   endif
+end
+
+# Clean up.
+rm -f files.smas log.smas coin.smas temp-smas.sdf pos-smas.sdf filled-smas.sdf >& /dev/null
+
+
+
