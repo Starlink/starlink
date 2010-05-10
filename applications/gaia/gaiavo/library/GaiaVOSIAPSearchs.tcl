@@ -350,7 +350,31 @@ itcl::class gaiavo::GaiaVOSIAPSearchs {
    public method get_image_center_radius {} {
       set image [$itk_option(-gaiactrl) get_image]
       if { ! [$image isclear] } {
+
+         #  Coordinates have to be in J2000, so make sure image is set to
+         #  that. Catch this so that any problems are not fatal.
+         if { [$image astcelestial] } {
+            catch {
+               set oldsystem [$image astget "System"]
+               $image astset "System" "FK5"
+            }
+            catch {
+               set oldequinox [$image astget "Equinox"]
+               $image astset "Equinox" "2000"
+            }
+         }
+
          set center [$image wcscenter]
+
+         if { [$image astcelestial] } {
+            catch {
+               $image astset "System" $oldsystem
+            }
+            catch {
+               $image astset "Equinox" $oldequinox
+            }
+         }
+
          if { [llength $center] >= 2 } {
             lassign $center ra dec equinox
             set radius [format "%.2f" [$image wcsradius]]

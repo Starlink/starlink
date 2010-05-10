@@ -30,6 +30,9 @@
     Previously if you supplied a mask containing negative values this
     caused an access violation. These values are now correctly ignored.
 
+    The VO query toolboxes now convert the default query coordinates from
+    the image celestial coordinate system to FK5/J2000.
+
   Hawaiki release
   ===============
 
