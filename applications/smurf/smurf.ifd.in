@@ -3541,6 +3541,10 @@ package @PACKAGE@ {
         obey {$SMURF_DIR/cbas}
     }
 
+    command smas {
+        obey {$SMURF_DIR/smas}
+    }
+
     command matched-filter {
         obey {$SMURF_DIR/matched-filter}
     }

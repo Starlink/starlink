@@ -5,7 +5,7 @@ if( $# < 1 ) then
    echo
    echo "Short Map Analysis Script"
    echo
-   echo "Usage: smas <in-list> <out-table> [-p]"
+   echo "Usage: smas <in-list> <out-table>"
    echo
    echo "   <in-list> is a text file in which each line contains the path"
    echo "   to an NDF holding a SCUBA-2 map of a point source. If an NDF"
@@ -31,7 +31,8 @@ if( $# < 1 ) then
    echo "   - XCEN: The X pixel co-ordinate at the centre of the source"
    echo "   - YCEN: The Y pixel co-ordinate at the centre of the source"
    echo "   - AMP: The peak value in the source"
-   echo "   - SUM: The total data sum in the source (see the "-p" option)"
+   echo "   - SUM: The total data sum in the source. This is the integral"
+   echo "   of the Gaussian-like model calculated by KAPPA:PSF"
    echo "   - FWHM: The seeing-disc size: the full width at half maximum "
    echo "   across the minor axis of the source (arc-seconds)"
    echo "   - AXISR: The axis ratio of the source: the ratio of the major"
@@ -42,11 +43,12 @@ if( $# < 1 ) then
    echo "   of the major axis of the source, in degrees."
    echo "   - NDF: The path to the NDF
    echo
-   echo "   By default, the SUM column holds the sum of the pixel values"
-   echo "   in 60 arc-sec circular aperture (bad pixels are replaced using"
-   echo "   KAPPA:FILLBAD prior to finding the sum), but if the -p option"
-   echo "   is supplied it will hold the integral of the model star profile"
-   echo "   found by KAPPA:PSF."
+   echo "   For comparison, a set of extra columns is appended to these "
+   echo "   that give the source properties as calculated by KAPPA:BEAMFIT"
+   echo "   rather than KAPPA:PSF. These columns have the same names, but "
+   echo "   are prefixed by the letter B. Note, BEAMFIT assumes a gamma "
+   echo "   value of 2.0  (i.e. a pure Gaussian) and so there is no BGAMMA"
+   echo "   column in the output catalogue."
    echo
    echo "   The SEQSTART and SEQEND columns will be set to 'null' if the "
    echo "   supplied map does not contain these FITS headers."
@@ -58,7 +60,7 @@ setenv ADAM_NOPROMPT 1
 
 #  Check we have enough command line arguments.
 if( $# < 2 ) then
-   echo "Usage: smas <in-list> <out-table> [-p]"
+   echo "Usage: smas <in-list> <out-table>"
    exit
 endif
 
@@ -89,7 +91,7 @@ if( -e "$2" ) then
       exit
    endif
 endif
-echo "# TAI UTC SEQSTART SEQEND XCEN YCEN AMP SUM FWHM AXISR GAMMA ORIENT NDF" > $2
+echo "# TAI UTC SEQSTART SEQEND XCEN YCEN AMP SUM FWHM AXISR GAMMA ORIENT NDF BXCEN BYCEN BAMP BSUM BFWHM BAXISR BORIENT" > $2
 
 # Check no files are left over from previous runs
 rm -f files.smas >& /dev/null
@@ -191,14 +193,12 @@ foreach n (`cat files.smas`)
    $KAPPA_DIR/ndfcopy $n  temp-smas
    set ndf = temp-smas
 
-#  From here on, use pixel coords to refer to positions within the bolomap,
-#  increasing the format precision from the one decimal place provided by
-#  the NDF library. NDF does not allow us to change the Format attributes for
-#  the PIXEL Frame directly, so take a copy of the PIXEL Frame first, and set
-#  the Format attributes of the copy.
-   $KAPPA_DIR/wcsadd $ndf frame=pixel domain=newpix maptype=unit accept
-   $KAPPA_DIR/wcsattrib $ndf set 'format(1)' "%5.3f"
-   $KAPPA_DIR/wcsattrib $ndf set 'format(2)' "%5.3f"
+#  From here on, use offset sky coords to refer to positions within the map.
+   $KAPPA_DIR/wcsattrib $ndf set skyrefis origin
+
+#  ensure formatted axis values are decimal arc-seconds.
+   $KAPPA_DIR/wcsattrib $ndf set 'format(1)' s.2
+   $KAPPA_DIR/wcsattrib $ndf set 'format(2)' s.2
 
 #  If source features are negative in the bolomap, negate the bolomap so that they become positive.
    if( $negative == 1 ) then
@@ -206,14 +206,58 @@ foreach n (`cat files.smas`)
       set ndf = "pos-smas"
    endif
 
-#  Find the pixel coords at the centre of the feature. The feature is
+#  Find the offset sky coords at the centre of the feature. The feature is
 #  nominally at the reference point and so should, in the absence of errors,
-#  have pixel coords (0.5,0.5). PSF fails unless a good central position is
+#  have coords (0.0,0.0). PSF fails unless a good central position is
 #  supplied, so first find the peak value in a box centred on (0,0)
    $KAPPA_DIR/stats $ndf'(0~20,0~20)' quiet
-   set maxco = `$KAPPA_DIR/parget maxcoord stats`
+   set maxco = `$KAPPA_DIR/parget maxwcs stats`
    rm -f coin.smas > /dev/null
    echo $maxco > coin.smas
+
+#  Check there are some good pixels
+   set numgood = `$KAPPA_DIR/parget numgood stats`
+   if( $numgood == 0 ) then
+      echo "  no good data found"
+      continue
+   endif
+
+#  Determine the source parameters using kappa:beamfit
+   $KAPPA_DIR/beamfit $ndf mode=file coin=coin.smas  | grep \!\! >& /dev/null
+   if( $status == 1 ) then
+      set centre = `$KAPPA_DIR/parget centre beamfit`
+      set bxcen = $centre[1]
+      set bycen = $centre[2]
+      set bamp = `$KAPPA_DIR/parget amp beamfit`
+      set bamp = $bamp[1]
+      set bsum = `$KAPPA_DIR/parget sum beamfit`
+      set bfwhm = `$KAPPA_DIR/parget minfwhm beamfit`
+      set bfwhm = $bfwhm[1]
+      set majfwhm = `$KAPPA_DIR/parget majfwhm beamfit`
+      set majfwhm = $majfwhm[1]
+      set baxisr = `$KAPPA_DIR/calc exp="pa/pb" pa=$majfwhm pb=$bfwhm`
+      set borient = `$KAPPA_DIR/parget orient beamfit`
+      set borient = $borient[1]
+   else
+      echo "  beamfit failure"
+      set bxcen = null
+      set bycen = null
+      set bamp = null
+      set bsum = null
+      set bfwhm = null
+      set baxisr = null
+      set borient = null
+   endif
+
+# PSF is also sensative to low-level background structure, so threshold
+# the data at 5% of the peak value to exclude background regions.
+   set maxv = `$KAPPA_DIR/parget maximum stats`
+   set cut = `$KAPPA_DIR/calc exp="pa*0.05" pa=$maxv`
+   $KAPPA_DIR/thresh in=$ndf out=cut-smas thrlo=$cut newlo=bad thrhi=1.0E10 \
+                     newhi=bad quiet
+   set ndf = cut-smas
+
+#  Determine the source parameters using kappa:psf
    $KAPPA_DIR/psf $ndf incat=! cofile=coin.smas isize=31 norm=f device=! | grep \!\! >& /dev/null
 
 #  Check a psf was found succesfully.
@@ -228,7 +272,10 @@ foreach n (`cat files.smas`)
       set gamma = `$KAPPA_DIR/parget gamma psf`
 
 #  Get the total data sum. Two methods - 1) aperture photometry...
-      if( $sum_method == APERADD ) then
+#  NOTE - there is a bug in the ARD library that causes APERADD to fail
+#  if the current Frame is an offset SKY Frame. Until this bug is fixed,
+#  always use KAPPA:PSF to determine the SUM value.
+      if( $sum_method == THIS_SHOULD_BE_SIMPLY_APERADD ) then
 
 #  Choose the aperture size in pixels (60 arc-secs assuming default makemap pixel sizes of 2
 #  and 4 arc-seconds)..
@@ -312,7 +359,7 @@ foreach n (`cat files.smas`)
       set date = `$ATOOLS_DIR/astformat tf axis=1 value=0.0`
 
 #  Write a row to the output catalogue.
-      echo "$tai $date $seqstart $seqend $posxy[1] $posxy[2] $amp $fsum $fwhm $axisr $gamma $orient $n" >> $2
+      echo "$tai $date $seqstart $seqend $posxy[1] $posxy[2] $amp $fsum $fwhm $axisr $gamma $orient $n $bxcen $bycen $bamp $bsum $bfwhm $baxisr $borient " >> $2
 
 #  Report any PSF failure.
    else
@@ -321,7 +368,7 @@ foreach n (`cat files.smas`)
 end
 
 # Clean up.
-rm -f files.smas log.smas coin.smas temp-smas.sdf pos-smas.sdf filled-smas.sdf >& /dev/null
+rm -f files.smas log.smas cut-smas.sdf coin.smas temp-smas.sdf pos-smas.sdf filled-smas.sdf >& /dev/null
 
 
 
