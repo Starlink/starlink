@@ -14,14 +14,14 @@
 
 *  Invocation:
 *     smf_model_createHdr( smfData *model, smf_modeltype type,
-*                            AstFrameSet *refwcs, int *status );
+*                          smdHead *refhdr, int *status );
 
 *  Arguments:
 *     model = smfData * (Given)
 *        Pointer to smfData containing model information
 *     type = smf_modeltype (Given)
 *        Type of model
-*     refwcs = AstFrameSet * (Given)
+*     refhdr = smfHead * (Given)
 *        Pointer to time-series WCS frameset corresponding to this model
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -51,6 +51,8 @@
 *        Added SMF__FLT
 *     2010-04-08 (EC):
 *        Propagate JCMTState if present.
+*     2010-05-10 (EC):
+*        Avoid overwriting reference header if it is the same as the model.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -111,6 +113,11 @@ void smf_model_createHdr( smfData *model, smf_modeltype type,
   if( !model || !refhdr ) {
     *status = SAI__ERROR;
     errRep( "", FUNC_NAME ": Null input pointers", status );
+    return;
+  }
+
+  /* If the reference header is the same as the model header return */
+  if( refhdr == model->hdr ) {
     return;
   }
 
