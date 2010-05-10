@@ -190,7 +190,7 @@ foreach n (`cat files.smas`)
    echo "Doing $n"
 
 # Create a temp copy of the NDF so we can change it.
-   $KAPPA_DIR/ndfcopy $n  temp-smas
+   $KAPPA_DIR/ndfcopy $n'(0~30,0~30)'  temp-smas
    set ndf = temp-smas
 
 #  From here on, use offset sky coords to refer to positions within the map.
@@ -210,7 +210,7 @@ foreach n (`cat files.smas`)
 #  nominally at the reference point and so should, in the absence of errors,
 #  have coords (0.0,0.0). PSF fails unless a good central position is
 #  supplied, so first find the peak value in a box centred on (0,0)
-   $KAPPA_DIR/stats $ndf'(0~20,0~20)' quiet
+   $KAPPA_DIR/stats $ndf quiet
    set maxco = `$KAPPA_DIR/parget maxwcs stats`
    rm -f coin.smas > /dev/null
    echo $maxco > coin.smas
