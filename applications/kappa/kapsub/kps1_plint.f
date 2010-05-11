@@ -89,14 +89,14 @@
 *        algorithm uses approximate non-linear co-ordinate
 *        transformations in order to improve performance, and this
 *        parameter controls how inaccurate the resulting approximation
-*        is allowed to be, as a displacement in pixels of the input NDF.
+*        is allowed to be, as a displacement in pixels of the input NDF. 
 *        A value of zero will ensure that no such approximation is done,
 *        at the expense of increasing execution time.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -122,7 +122,10 @@
 *  History:
 *     2007 July 17 (MJC):
 *        Original version.
-*     {enter_changes_here}
+*     2010 May 11 (MJC):
+*        Still erase the temporary NDF even a bad status has occurred
+*        elsewhere.
+*     {enter_further_changes_here}
 
 *-
 
@@ -189,6 +192,7 @@
       INTEGER STATE              ! State of the supplied parameter
       INTEGER SUBFRM             ! AST pointer to subset Base Frame
       INTEGER TNDF               ! Identifier for temporary NDF
+      INTEGER TSTAT              ! Temporary status
       INTEGER UBNDI( NDF__MXDIM ) ! Upper bounds of input NDF
       INTEGER UBNDO( NDF__MXDIM ) ! Upper bounds of output NDF
       DOUBLE PRECISION UPO       ! Upper bound in output array
@@ -419,14 +423,21 @@
 
       IF ( CONTNR ) THEN
 
+*  Status may be bad, but we still want to remove the dummy NDF.
+         TSTAT = STATUS
+         CALL ERR_MARK
+         STATUS = SAI__OK
+
 *  As we needed to make an NDF initially so that we could use LPG repeat
-*  invocations for a series of input NDFs, this makes an undefined NDF
-*  structure at the top level.  We need to modify the structure type,
-*  and remove the dummy NDF.
+*  invocations for a series of input container files, this makes an
+*  undefined NDF structure at the top level.  We need to modify the
+*  structure type, and remove the dummy NDF.
          CALL NDF_LOC( TNDF, 'UPDATE', LOCN, STATUS )
          CALL DAT_RETYP( LOCN, 'NDF_CONTAINER', STATUS )
          CALL DAT_ERASE( LOCN, 'DATA_ARRAY', STATUS )
          CALL DAT_ANNUL( LOCN, STATUS )
+         CALL ERR_RLSE
+         STATUS = TSTAT
 
 *  Since the NDF has been erased, yet we want to release the
 *  temporary-NDF identifier, we need to ignore the error generated
