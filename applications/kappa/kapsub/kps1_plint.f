@@ -17,8 +17,8 @@
 
 *  Description:
 *     This routine extracts interpolated slices from an input NDF for
-*     one or more locations, and stores each slice in its own output NDF.
-*     Slices run parallel to pixel axes, but are not usually at
+*     one or more locations, and stores each slice in its own output 
+*     NDF.  Slices run parallel to pixel axes, but are not usually at
 *     pixel centres, hence the need to interpolate.  The user provides
 *     the slice's fixed co-ordinates in the current Frame through a
 *     parameter (PARAM(1)).  The axes of these fixed co-ordinates have
@@ -65,7 +65,7 @@
 *
 *        RSPARS( 1 ) is required by all the above schemes.  It is used
 *        to specify how many pixels are to contribute to the interpolated
-*        result on either side of the interpolation in each dimension.
+*        result on either side of the interpolation in each dimension. 
 *        Typically, a value of 2 is appropriate and the minimum allowed
 *        value is 1 (i.e. one pixel on each side).  A value of zero or
 *        fewer indicates that a suitable number of pixels should be
@@ -167,7 +167,7 @@
                                  ! for retained axes
       DOUBLE PRECISION FULPOS( NDF__MXDIM ) ! Current-frame co-ordinates
                                  ! of section
-      DOUBLE PRECISION GRDPOS( NDF__MXDIM )  ! Grid co-ordinates of
+      DOUBLE PRECISION GRDPOS( NDF__MXDIM ) ! Grid co-ordinates of
                                  ! section
       INTEGER I                  ! Position index
       DOUBLE PRECISION INPOS( NDF__MXDIM ) ! User-supplied position
@@ -313,14 +313,14 @@
      :                    0.0D0, STATUS )
          IF ( .NOT. SINGLE ) CALL MSG_BLANK( STATUS )
 
-*  If a null value was supplied, annul the error and indicate that
-*  the loop should be left.
+*  If a null value was supplied, annul the error and indicate that the 
+*  loop should be left.
          IF ( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
             MORE = .FALSE.
 
-*  If an abort value was supplied, do not annul the error but indicate that
-*  the loop should be left.
+*  If an abort value was supplied, do not annul the error but indicate
+*  that the loop should be left.
          ELSE IF ( STATUS .EQ. PAR__ABORT ) THEN
             MORE = .FALSE.
 

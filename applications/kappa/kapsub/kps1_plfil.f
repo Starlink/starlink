@@ -63,7 +63,7 @@
 *        each NDF is written to its own file.
 *     CONTNR = LOGICAL (Given)
 *        If set to .TRUE., the output NDFs are written as components of
-*        an HDS container file specified through parameter PARAMS(2).
+*        an HDS container file specified through parameter PARAMS(1).
 *     NAXC = INTEGER (Given)
 *        The number of axes in the current Frame.
 *     RETAX( NAXC ) = LOGICAL (Given)
@@ -78,7 +78,7 @@
 *
 *        RSPARS( 1 ) is required by all the above schemes.  It is used
 *        to specify how many pixels are to contribute to the interpolated
-*        result on either side of the interpolation in each dimension.
+*        result on either side of the interpolation in each dimension. 
 *        Typically, a value of 2 is appropriate and the minimum allowed
 *        value is 1 (i.e. one pixel on each side).  A value of zero or
 *        fewer indicates that a suitable number of pixels should be
@@ -102,7 +102,7 @@
 *        algorithm uses approximate non-linear co-ordinate
 *        transformations in order to improve performance, and this
 *        parameter controls how inaccurate the resulting approximation
-*        is allowed to be, as a displacement in pixels of the input NDF.
+*        is allowed to be, as a displacement in pixels of the input NDF. 
 *        A value of zero will ensure that no such approximation is done,
 *        at the expense of increasing execution time.
 *     NDIMS = INTEGER (Given)
@@ -266,7 +266,7 @@
 
 *  As we wish to use the multiple-input processing through LPG, we
 *  first make a dummy NDF of the required name,  Also modify the
-*  prompt string for PARAMS(2) parameter.
+*  prompt string for PARAMS(1) parameter.
          CALL PAR_PROMT( PARAMS( 1 ), 'Output HDS container file',
      :                   STATUS )
          CALL LPG_CREAT( PARAMS( 1 ), '_UBYTE', 1, 1, 1, TNDF, STATUS )

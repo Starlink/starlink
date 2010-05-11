@@ -32,14 +32,14 @@
 *        The mapping from input to output NDF.  This should be a
 *        ShiftMap between the GRID co-ordinates in the input and output
 *        NDFs.  At least one of the shifts should be zero belonging to
-*        a retained axis.        
+*        a retained axis.
 *     PARAMS( 2 ) = CHARACTER * ( * ) (Given)
 *        The names of environment parameters.  The elements are
 *        respectively for acquiring the name of the output NDF or
 *        container file, and the title of the output NDFs.
 *     CONTNR = LOGICAL (Given)
 *        If set to .TRUE., the output NDFs are written as components of
-*        an HDS container file specified through parameter PARAMS(2).
+*        an HDS container file specified through parameter PARAMS(1).
 *        Otherwise each NDF is written to its own file.
 *     PATH = CHARACTER * ( * ) (Given)
 *        If CONTNR is .TRUE. this is the path (including the name) to 
