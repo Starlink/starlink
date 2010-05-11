@@ -55,6 +55,9 @@ if( $# < 1 ) then
    exit
 endif
 
+# Ensure we can redirect output safely
+unset noclobber
+
 #  Ensure ADAM tasks fail rather than prompt for parameter values
 setenv ADAM_NOPROMPT 1
 
@@ -86,7 +89,7 @@ endif
 # Create the header for the output catalogue - a comment containing
 # the column names
 if( -e "$2" ) then
-   rm $2
+   rm -f $2
    if( -e "$2" ) then
       exit
    endif
@@ -164,7 +167,7 @@ foreach n (`cat $1`)
    endif
 
 # See if the current NDF contains a list of shortmaps, and if so, how many.
-   $HDSTRACE_DIR/hdstrace $in.more.smurf.shortmaps | grep CH..SH >& log.smas
+   $HDSTRACE_DIR/hdstrace $in.more.smurf.shortmaps | grep "<NDF>" >& log.smas
    set text = `wc log.smas`
    set nmap = $text[1]
 
