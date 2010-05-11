@@ -112,7 +112,7 @@
 *     by linear interpolation.
 
 *  Copyright:
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -140,6 +140,10 @@
 *        Original version derived from code in REGRID.
 *     2007 July 26 (MJC):
 *        Added AXIS propagation.
+*     2010 May 11 (MJC):
+*        Do not use LPG for NDFs propagated to a container file.
+*        LPG retains the original name, and does not use the
+*        generated NDF name.
 *     {enter_further_changes_here}
 
 *-
@@ -278,10 +282,10 @@
 
 *  Create a new NDF by propagation from the input one.  We can only use
 *  the LPG wildcard if there is only one output file.
-      IF ( CONTNR .OR. RESET ) THEN
-         CALL LPG_PROP( NDFI, 'AXIS,UNIT', PARAMS( 1 ), NDFO, STATUS )
-      ELSE
+      IF ( CONTNR ) THEN
          CALL NDF_PROP( NDFI, 'AXIS,UNIT', PARAMS( 1 ), NDFO, STATUS )
+      ELSE
+         CALL LPG_PROP( NDFI, 'AXIS,UNIT', PARAMS( 1 ), NDFO, STATUS )
       END IF
 
 *  Get a title for the new NDF from the parameter system.
@@ -468,4 +472,3 @@
       CALL NDF_ANNUL( NDFO, STATUS )
 
       END
-
