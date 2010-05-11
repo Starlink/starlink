@@ -70,6 +70,9 @@
 *  History:
 *     4-OCT-2001 (DSB):
 *        Original version.
+*     11-MAY-2010 (DSB):
+*        Fix calculation of BARTOP for colour indices which have 
+*        zero population.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -150,7 +153,7 @@
 
 *  Find the pixel index of the top of the histogram bar for the current
 *  colour index.
-               BARTOP = MIN( UBND2, NINT( POP*SCALE ) + LBND2 - 1 )
+               BARTOP = MIN( UBND2, NINT( POP*SCALE ) + LBND2 )
 
 *  Fill the pixels with the current colour index up to the height of the
 *  bar.
