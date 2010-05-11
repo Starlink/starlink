@@ -286,6 +286,8 @@ f     - AST_SKYOFFSETMAP: Obtain a Mapping from absolute to offset coordinates
 *        Add astSkyOffsetMap method.
 *     7-APR-2010 (DSB):
 *        Add IsLatAxis and IsLonAxis attributes.
+*     11-MAY-2010 (DSB):
+*        In SetSystem, clear SkyRefP as well as SkyRef.
 *class--
 */
 
@@ -8964,13 +8966,20 @@ static void SetSystem( AstFrame *this_frame, AstSystemType system, int *status )
       yin[ 0 ] = astGetSkyRef( sfrm, 1 );
       yin[ 1 ] = astGetSkyRefP( sfrm, 1 );
 
-/* Clear the SkyRef values to avoid infinite recursion in the following
-   call to astConvert. */
+/* Clear the SkyRef and SkyRefP values to avoid infinite recursion in the
+   following call to astConvert. */
       if( skyref_set ) {
          astClearSkyRef( sfrm, 0 );
          astClearSkyRef( sfrm, 1 );
          astClearSkyRef( this, 0 );
          astClearSkyRef( this, 1 );
+      }
+
+      if( skyrefp_set ) {
+         astClearSkyRefP( sfrm, 0 );
+         astClearSkyRefP( sfrm, 1 );
+         astClearSkyRefP( this, 0 );
+         astClearSkyRefP( this, 1 );
       }
 
 /* Also set AlignOffset and SkyRefIs so that the following call to
@@ -8980,8 +8989,8 @@ static void SetSystem( AstFrame *this_frame, AstSystemType system, int *status )
 
 /* Get the Mapping from the original System to the new System. Invoking
    astConvert will recursively invoke SetSystem again. This is why we need
-   to be careful to ensure that SkyRef is cleared above - doing so ensure
-   we do not end up with infinite recursion. */
+   to be careful to ensure that SkyRef and SKyRefP are cleared above - doing
+   so ensure we do not end up with infinite recursion. */
       fs = astConvert( sfrm, this, "" );
       if( !fs ) {
          if( astOK ) {
