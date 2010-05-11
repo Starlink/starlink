@@ -44,14 +44,9 @@
 *     BADFRAC = _DOUBLE (Read)
 *          Fraction of bad samples in order for entire bolometer to be
 *          flagged as bad. [0.0]
-*     DCBAD = _LOGICAL (Read)
-*          If true, instead of repairing DC steps, flag bolo as bad. [FALSE]
-*     DCBOX = _INTEGER (Read)
+*     DCFITBOX = _INTEGER (Read)
 *          Width of the box (samples) over which to estimate the mean
 *          signal level for DC step detection. [0]
-*     DCFLAGALL = _LOGICAL (Read)
-*          If true, at locations of DC steps repair/flag all bolometers
-*          at that location (overrides DCBAD). [FALSE]
 *     DCTHRESH = _DOUBLE (Read)
 *          N-sigma threshold at which to detect primary DC steps. [150.0]
 *     DCTHRESH2 = _DOUBLE (Read)
@@ -123,6 +118,8 @@
 *        Add FILLGAPS parameter
 *     2010-03-11 (TIMJ):
 *        Support flatfield ramps.
+*     2010-05-10 (TIMJ):
+*        Remove DCBAD and DCFLAGALL. Rename DCBOX to DCFITBOX
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -186,7 +183,7 @@ void smurf_sc2clean( int *status ) {
   double badfrac=0;         /* Fraction of bad samples to flag bad bolo */
   smfArray *darks = NULL;   /* Dark data */
   int dcbad;                /* Flag bolometers with steps as bad */
-  dim_t dcbox=0;            /* width of box for measuring DC steps */
+  dim_t dcfitbox=0;         /* width of box for measuring DC steps */
   int dcflag;               /* flag for DC step finder */
   int dcflagall;            /* Flag for repairing all bolos at step */
   double dcthresh=0;        /* n-sigma threshold for primary DC steps */
@@ -249,11 +246,7 @@ void smurf_sc2clean( int *status ) {
     atlGetParam( "APOD", keymap, status );
     atlGetParam( "BADFRAC", keymap, status );
     atlGetParam( "DCTHRESH", keymap, status );
-    parGet0l( "DCBAD", &dcbad, status );
-    astMapPut0I( keymap, "DCBAD", dcbad, NULL );
-    parGet0l( "DCFLAGALL", &dcflagall, status );
-    astMapPut0I( keymap, "DCFLAGALL", dcflagall, NULL );
-    atlGetParam( "DCBOX", keymap, status );
+    atlGetParam( "DCFITBOX", keymap, status );
     parGet0l( "DKCLEAN", &dkclean, status );
     astMapPut0I( keymap, "DKCLEAN", dkclean, NULL );
     parGet0l( "FILLGAPS", &fillgaps, status );
@@ -267,7 +260,7 @@ void smurf_sc2clean( int *status ) {
     atlGetParam( "SPIKEITER", keymap, status );
     atlGetParam( "SPIKETHRESH", keymap, status );
 
-    smf_get_cleanpar( keymap, &apod, &badfrac, &dcbox, &dcflag, &dcthresh,
+    smf_get_cleanpar( keymap, &apod, &badfrac, &dcfitbox, &dcflag, &dcthresh,
                       NULL, &dkclean, &fillgaps, NULL, NULL, NULL,
 		      NULL, NULL, NULL, &flagstat, &order, &spikethresh,
 		      &spikeiter, status ); }
@@ -300,25 +293,25 @@ void smurf_sc2clean( int *status ) {
     smf_update_quality( ffdata, NULL, 1, NULL, badfrac, status );
 
     /* Fix large DC steps */
-    if( dcthresh && dcbox ) {
+    if( dcthresh && dcfitbox ) {
       msgSetd("DCTHRESH",dcthresh);
       msgSetd("DCTHRESH2",dcthresh2);
-      msgSeti("DCBOX",dcbox);
+      msgSeti("DCBOX",dcfitbox);
       if( dcflag==1 ) {
         msgOutif(MSG__VERB," ",
-                 "Flagging bolos with ^DCTHRESH-sigma DC steps in ^DCBOX "
+                 "Flagging bolos with ^DCTHRESH-sigma DC steps in ^DCFITBOX "
                  "samples as bad", status);
       } else if( dcflag==2 ) {
         msgOutif(MSG__VERB," ",
                  "Fixing all bolos that show a secondary DC step of greater "
                  "than ^DCTHRESH2-sigma at times defined by primary DC steps "
-                 "greater than ^DCTHRESH-sigma in ^DCBOX samples", status);
+                 "greater than ^DCTHRESH-sigma in ^DCFITBOX samples", status);
       } else {
         msgOutif(MSG__VERB," ",
-                 "Fixing bolos at locations of DC steps size ^DCTHRESH-sigma in ^DCBOX samples",
+                 "Fixing bolos at locations of DC steps size ^DCTHRESH-sigma in ^DCFITBOX samples",
                  status);
       }
-      smf_correct_steps( wf, ffdata, NULL, dcthresh, dcthresh2, dcbox,
+      smf_correct_steps( wf, ffdata, NULL, dcthresh, dcthresh2, dcfitbox,
                          dcflag, NULL, status );
     }
 

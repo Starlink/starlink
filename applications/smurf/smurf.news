@@ -1,3 +1,8 @@
+1 SMURF_Version_1.1
+
+ o SC2CLEAN parameter DCBOX has been renamed DCFITBOX. DCBAD and DCFLAGALL
+   have been removed.
+
 1 SMURF_Version_1.0.0_(Hawaiki)
 
  o First version suitable for use for real SCUBA-2 data.

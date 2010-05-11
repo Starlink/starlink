@@ -2338,29 +2338,11 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter dcbad {
-                type _LOGICAL
-                vpath {DEFAULT}
-                prompt {Flag entire bolo bad if DC step is found}
-                ppath GLOBAL CURRENT
-                default FALSE
-                helpkey *
-            }
-
-            parameter dcbox {
+            parameter dcfitbox {
                 type _INTEGER
                 vpath {DEFAULT}
                 prompt {Size of box (samples) to measure means for DC step-finding}
                 default 0
-                helpkey *
-            }
-
-            parameter dcflagall {
-                type _LOGICAL
-                vpath {DEFAULT}
-                prompt {Flag/repair ALL BOLOS at locations of DC steps}
-                ppath GLOBAL CURRENT
-                default FALSE
                 helpkey *
             }
 
