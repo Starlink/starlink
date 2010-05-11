@@ -335,7 +335,7 @@ foreach n (`cat files.smas`)
          endif
       endif
 
-#  If we have an MJD-AVG, stor ein it as the TimeOrigin value in a TimeFrame.
+#  If we have an MJD-AVG, store it as the TimeOrigin value in a TimeFrame.
       $ATOOLS_DIR/asttimeframe options='system=mjd' result=tf
       if( $mjdavg != null ) then
          $ATOOLS_DIR/astset tf timescale $timesys result=tf
@@ -344,9 +344,11 @@ foreach n (`cat files.smas`)
 # If we do not have an MJD-AVG value, get the epoch from the WCS FrameSet, and
 # store it as the TimeOrigin value in a TimeFrame.
       else
+         $ATOOLS_DIR/astset tf system JEPOCH result=tf
          $ATOOLS_DIR/astset tf timescale TDB result=tf
          set tdb = `$ATOOLS_DIR/astget $ndf epoch`
          $ATOOLS_DIR/astset tf timeorigin $tdb result=tf
+         $ATOOLS_DIR/astset tf system MJD result=tf
       endif
 
 #  Convert the TimeFrame to TAI timescale and get the converted TimeOrigin value.
