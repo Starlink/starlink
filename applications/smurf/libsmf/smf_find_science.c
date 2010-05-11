@@ -84,6 +84,7 @@
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
+*     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -118,9 +119,12 @@
 *        between SEQSTART and SEQEND. This allows for NDF sections to be supplied.
 *     2010-04-07 (TIMJ):
 *        Ignore dark fast flats.
+*     2010-05-11 (EC):
+*        Handle data with no JCMTState array
 
 *  Copyright:
 *     Copyright (C) 2008-2010 Science and Technology Facilities Council.
+*     Copyright (C) 2010 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -257,16 +261,29 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, Grp **darkgrp, Grp **flat
         smf_getfitsi( infile->hdr, "SEQSTART", &seqstart, status );
         smf_getfitsi( infile->hdr, "SEQEND", &seqend, status );
         tmpState = infile->hdr->allState;
-        firstnum = (tmpState[0]).rts_num;
-        smf_smfFile_msg( infile->file, "F", 1, "<unknown file>", status);
-        if ( firstnum >= seqstart && firstnum <= seqend ) {
+
+        if( tmpState ) {
+          firstnum = (tmpState[0]).rts_num;
+          smf_smfFile_msg( infile->file, "F", 1, "<unknown file>", status);
+          if ( firstnum >= seqstart && firstnum <= seqend ) {
+            /* store the file in the output group */
+            ndgCpsup( ingrp, i, ogrp, status );
+            msgOutif(MSG__DEBUG, " ", "Non-dark file: ^F",status);
+            sccount++;
+          } else {
+            msgOutif( MSG__QUIET, "",
+                      "File ^F has a corrupt FITS header. Ignoring it.",
+                      status );
+          }
+        } else {
+          smf_smfFile_msg( infile->file, "F", 1, "<unknown file>", status);
           /* store the file in the output group */
           ndgCpsup( ingrp, i, ogrp, status );
-          msgOutif(MSG__DEBUG, " ", "Non-dark file: ^F",status);
+          msgOutif( MSG__DEBUG, " ",
+                    "File ^F lacks JCMTState: assuming it is non-dark",status);
           sccount++;
-        } else {
-          msgOutif( MSG__QUIET, "", "File ^F has a corrupt FITS header. Ignoring it.", status );
         }
+
       } else if (infile->hdr->seqtype == SMF__TYP_FASTFLAT ) {
         /* Early data erroneously had fastflats in the dark which are not overly
            useful from a calibration perspective. We need to filter these out since they
