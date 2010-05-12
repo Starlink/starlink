@@ -66,6 +66,8 @@
 *     POWER = _LOGICAL (Read)
 *          Use polar representation of FFT with squared
 *          amplitudes. [FALSE]
+*     ZEROBAD = _LOGICAL (Read)
+*          Zero any bad values in the data before taking FFT. [TRUE]
 
 *  Related Applications:
 *     SMURF: SC2CONCAT, SC2CLEAN, CALCNOISE
@@ -97,6 +99,8 @@
 *          data stream.
 *     2010-03-11 (TIMJ):
 *        Support flatfield ramps.
+*     2010-05-12 (EC):
+*        Add zerobad option.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -163,6 +167,7 @@ void smurf_sc2fft( int *status ) {
   Grp *fgrp = NULL;         /* Filtered group, no darks */
   smfArray *flatramps = NULL;/* Flatfield ramps */
   size_t gcount=0;          /* Grp index counter */
+  size_t i;                 /* Loop counter */
   smfGroup *igroup=NULL;    /* smfGroup corresponding to igrp */
   Grp *igrp = NULL;         /* Input group of files */
   int inverse=0;            /* If set perform inverse transform */
@@ -177,6 +182,7 @@ void smurf_sc2fft( int *status ) {
   size_t size;              /* Number of files in input group */
   smfData *tempdata=NULL;   /* Temporary smfData pointer */
   smfWorkForce *wf = NULL;  /* Pointer to a pool of worker threads */
+  int zerobad;              /* Zero VAL__BADD before taking FFT? */
 
   /* Main routine */
   ndfBegin();
@@ -233,6 +239,9 @@ void smurf_sc2fft( int *status ) {
   /* Are we going to assume amplitudes are squared? */
   parGet0l( "POWER", &power, status );
 
+  /* Are we going to zero bad values first? */
+  parGet0l( "ZEROBAD", &zerobad, status );
+
   /* Are we calculating the average power spectrum? */
   parGet0l( "AVPSPEC", &avpspec, status );
 
@@ -263,6 +272,29 @@ void smurf_sc2fft( int *status ) {
       if( concat->sdata[idx] ) {
         smfData * idata = concat->sdata[idx];
         int provid = NDF__NOID;
+        dim_t nbolo;                /* Number of detectors  */
+        dim_t ndata;                /* Number of data points */
+
+        smf_get_dims( idata,  NULL, NULL, &nbolo, NULL, &ndata, NULL, NULL,
+                      status );
+
+
+        /* Check for double precision data */
+        if( idata->dtype != SMF__DOUBLE ) {
+          *status = SAI__ERROR;
+          errRep( "", FUNC_NAME ": data are not double precision.", status );
+        }
+
+        /* Are we zeroing VAL__BADD? */
+        if( zerobad ) {
+          double *data= (double *) idata->pntr[0];
+
+          for( i=0; i<ndata; i++ ) {
+            if( data[i] == VAL__BADD ) {
+              data[i] = 0;
+            }
+          }
+        }
 
         /* Check whether we need to transform the data at all */
         isfft = smf_isfft(idata,NULL,NULL,NULL,status);
@@ -283,13 +315,10 @@ void smurf_sc2fft( int *status ) {
                each detector */
 
             double *whitenoise=NULL;
-            dim_t nbolo;                /* Number of detectors  */
             unsigned char *bolomask=NULL;
             double mean, sig, freqlo;
-            size_t i, ngood, newgood;
+            size_t ngood, newgood;
 
-            smf_get_dims( idata,  NULL, NULL, &nbolo, NULL, NULL, NULL, NULL,
-                          status );
             whitenoise = smf_malloc( nbolo, sizeof(*whitenoise), 1, status );
             bolomask = smf_malloc( nbolo, sizeof(*bolomask), 1, status );
 

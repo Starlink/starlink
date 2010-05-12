@@ -2777,6 +2777,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter zerobad {
+                type _LOGICAL
+                vpath {DEFAULT }
+                prompt {Set bad values to 0 before calculating FFT?}
+                ppath GLOBAL CURRENT
+                default TRUE
+                helpkey *
+            }
+
             # These are the generic flatfield parameters. Not in alphabetical order
             # with the other parameters to make it easier to do bulk copies
 
