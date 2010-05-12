@@ -31,16 +31,16 @@
 *     transformed data.
 
 *  Description:
+
 *     Perform the forward or inverse FFT of a smfData. In the time
-*     domain the data may be 1-d (e.g. a single bolometer), or 3-d
-*     (either x,y,time or time,x,y depending on isTordered flag). The
-*     frequency domain representation of the data is 2-d
-*     (frequency,component) if the input was 1-d, and 4-d if the input was
-*     3-d (always frequency,x,y,component -- i.e. bolo-ordered). Component
-*     is an axis of length 2 containing the real and imaginary parts.
-*     Inverse transforms always leave the data in bolo-ordered format. If the
-*     data are already transformed, this routine returns a NULL pointer.
-*     If a non-null pointer wf is supplied, tell FFW to use multiple threads.
+*     domain the data are 3-d (either x,y,time or time,x,y depending
+*     on isTordered flag). The frequency domain representation of the
+*     data is 4-d (always frequency,x,y,component --
+*     i.e. bolo-ordered). Component is an axis of length 2 containing
+*     the real and imaginary parts.  Inverse transforms always leave
+*     the data in bolo-ordered format. If the data are already
+*     transformed, this routine returns a NULL pointer.  If a non-null
+*     pointer wf is supplied, tell FFW to use multiple threads.
 
 *  Notes:
 
@@ -247,6 +247,7 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
   dim_t nbolo=0;                /* Number of detectors  */
   dim_t ndata=0;                /* Number of elements in new array */
   dim_t nf=0;                   /* Number of frequencies in FFT */
+  int njobs=0;                  /* Number of jobs to be processed */
   double norm=1.;               /* Normalization factor for the FFT */
   dim_t ntslice=0;              /* Number of time slices */
   int nw;                       /* Number of worker threads */
@@ -278,9 +279,7 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
   /* Check for double-precision data */
   if( indata->dtype != SMF__DOUBLE ) {
     *status = SAI__ERROR;
-    errRep( "", FUNC_NAME
-            ": Data is not double precision, must be flat-fielded first",
-            status );
+    errRep( "", FUNC_NAME ": Data are not double precision", status );
     return NULL;
   }
 
@@ -305,15 +304,6 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
     ntslice = data->dims[0];
     nf = ntslice/2 + 1;
     isFFT = 0;
-  } else if( data->ndims == 1 ) {
-    /* If 1-d data, only one axis to choose from */
-    ntslice = data->dims[0];
-    nf = ntslice/2 + 1;
-    nbolo=1;
-    isFFT = 0;
-  } else if( (data->ndims==2) && (data->dims[1]==2) ) {
-    /* 1-d FFT of a single bolo */
-    isFFT = smf_isfft( data, &ntslice, &nbolo, &nf, status );
   } else if( (data->ndims==4) && (data->dims[3]==2) ) {
     /* 3-d FFT of entire subarray */
     isFFT = smf_isfft( data, &ntslice, &nbolo, &nf, status );
@@ -345,28 +335,17 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
 
     if( inverse ) {
       /* Doing an inverse FFT to the time domain */
-      if( nbolo == 1 ) {
-        retdata->ndims = 1;
-        retdata->dims[0] = ntslice;
-      } else {
         retdata->ndims = 3;
         retdata->dims[0] = ntslice;
         retdata->dims[1] = data->dims[1];
         retdata->dims[2] = data->dims[2];
-      }
     } else {
       /* Doing a forward FFT to the frequency domain */
-      if( nbolo == 1 ) {
-        retdata->ndims = 2;
-        retdata->dims[0] = nf;
-        retdata->dims[1] = 2;
-      } else {
-        retdata->ndims = 4;
-        retdata->dims[0] = nf;
-        retdata->dims[1] = data->dims[1];
-        retdata->dims[2] = data->dims[2];
-        retdata->dims[3] = 2;
-      }
+      retdata->ndims = 4;
+      retdata->dims[0] = nf;
+      retdata->dims[1] = data->dims[1];
+      retdata->dims[2] = data->dims[2];
+      retdata->dims[3] = 2;
     }
 
     /* Returned data is always bolo-ordered */
@@ -394,6 +373,9 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
       step = 1;
     } else {
       step = nbolo/nw;
+      if( !step ) {
+        step = 1;
+      }
     }
 
     job_data = smf_malloc( nw, sizeof(*job_data), 1, status );
@@ -403,6 +385,15 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
 
       pdata->b1 = i*step;
       pdata->b2 = (i+1)*step-1;
+
+      /* if b1 is greater than the number of bolometers, we've run out
+         of jobs... */
+      if( pdata->b1 >= nbolo ) {
+        break;
+      }
+
+      /* increase the jobs counter */
+      njobs++;
 
       /* Ensure that the last thread picks up any left-over bolometers */
       if( (i==(nw-1)) && (pdata->b1<(nbolo-1)) ) {
@@ -525,7 +516,7 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
 
   /* Do the FFTs */
   smf_begin_job_context( wf, status );
-  for( i=0; (*status==SAI__OK)&&i<nw; i++ ) {
+  for( i=0; (*status==SAI__OK)&&i<njobs; i++ ) {
     pdata = job_data + i;
     pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata,
                                smfFFTDataParallel, NULL, status );
@@ -554,7 +545,7 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
 
   /* Clean up the job data array */
   if( job_data ) {
-    for( i=0; i<nw; i++ ) {
+    for( i=0; i<njobs; i++ ) {
       pdata = job_data + i;
       /* Destroy the plans */
       smf_mutex_lock( &smf_fft_data_mutex, status );
