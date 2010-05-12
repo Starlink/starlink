@@ -99,15 +99,9 @@ void smf_model_createHdr( smfData *model, smf_modeltype type,
                           smfHead *refhdr, int *status ) {
 
   /* Local Variables */
-  AstMapping *cbmap=NULL;       /* Pointer to current->base mapping */
   AstFrameSet *fset=NULL;       /* the returned framset */
-  int out[NDF__MXDIM];          /* Indices outputs of mapping */
   AstFitsChan *reffits=NULL;    /* Reference FITS header */
   AstFrameSet *refwcs=NULL;     /* Reference time series WCS */
-  int taxis;                    /* Index of time axis */
-  AstFrame *tfrm=NULL;          /* 1D frame (TimeFrame) */
-  AstMapping *tmap=NULL;        /* Mapping for time axis */
-
 
   /* Main routine */
   if( *status != SAI__OK ) return;
