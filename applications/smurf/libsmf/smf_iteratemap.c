@@ -271,6 +271,8 @@
 *     2010-05-07 (TIMJ):
 *        Use atl instead of ast for putting values into a FITS chan.
 *        Write MJD to shortmaps
+*     2010-05-12 (EC):
+*        Add support for collapsed quality for COM model exportation.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -2006,8 +2008,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             smf_dataOrder( ast[i]->sdata[idx], 1, status );
 
             /* Get quality array strides for smf_update_valbad */
-            smf_get_dims( qua[i]->sdata[idx], NULL, NULL, NULL, NULL, NULL,
-                          &bstride, &tstride, status );
+            smf_get_dims( qua[i]->sdata[idx], NULL, NULL, &nbolo, &ntslice,
+                          NULL, &bstride, &tstride, status );
 
             for( j=0; j<nmodels; j++ ) {
 
@@ -2116,6 +2118,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                   exportNDF_which[j] ) {
                 if( (model[j][i]->sdata[idx]->file->name)[0] ) {
                   int writequal;
+                  unsigned char *tempqual=NULL; /* temporary quality pointer */
 
                   smf_model_createHdr( model[j][i]->sdata[idx], modeltyps[j],
                                        hdr,status );
@@ -2129,15 +2132,33 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                   }
 
                   /* decide if we're writing quality: has to be requested,
-                     and need to have 3d data array (check array dimensions) */
-                  writequal = exportNDF_which[nmodels+1] &&
-                    smf_samedims_smfData( model[j][i]->sdata[idx],
-                                          qua[i]->sdata[idx], status );
+                     and either need to have 3d data array
+                     (check array dimensions), or we can supply a collapsed
+                     quality in the special case of COM */
+
+                  writequal = exportNDF_which[nmodels+1];
+                  if( modeltyps[j] == SMF__COM ) {
+                    if( writequal ) {
+                      smf_collapse_quality( qua_data, nbolo, ntslice, bstride,
+                                            tstride, 0, &tempqual, status );
+                    }
+                  } else {
+                    writequal &= smf_samedims_smfData( model[j][i]->sdata[idx],
+                                                       qua[i]->sdata[idx],
+                                                       status );
+                    tempqual = qua_data;
+                  }
 
                   smf_write_smfData( model[j][i]->sdata[idx],
                                      NULL,
-                                     writequal ? qua_data : NULL,
+                                     writequal ? tempqual : NULL,
                                      name, NULL, 0, NDF__NOID, status );
+
+                  /* if tempqual != qua_data it is locally allocated */
+                  if( tempqual != qua_data ) {
+                    tempqual = smf_free( tempqual, status );
+                  }
+
                 } else {
                   msgSetc("MOD",smf_model_getname(modeltyps[j], status) );
                   msgOut( " ",

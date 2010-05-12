@@ -598,6 +598,12 @@ void smf_close_smfDream( smfDream **dream, int * status );
 
 void smf_close_smfGroup( smfGroup **group, int *status );
 
+void smf_collapse_quality( const unsigned char *inqual,
+                           dim_t nbolo, dim_t ntslice,
+                           size_t bstride, size_t tstride,
+                           int collapse_time, unsigned char **outqual,
+                           int *status );
+
 void smf_collapse_tseries( const smfData *indata, int nclip, const float clip[],
                            double snrlim, int flagconst, smf_dtype dtype,
                            smfData **outdata, int *status );
