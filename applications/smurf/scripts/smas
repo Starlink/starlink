@@ -241,6 +241,12 @@ foreach n (`cat files.smas`)
       set baxisr = `$KAPPA_DIR/calc exp="pa/pb" pa=$majfwhm pb=$bfwhm`
       set borient = `$KAPPA_DIR/parget orient beamfit`
       set borient = $borient[1]
+
+#  Scale beamfit FWHM from radians to arc-seconds (we can't just change the
+#  Format attribue since beamfit writes the fwhm out as a double rather than
+#  as a string)
+      set bfwhm = `$KAPPA_DIR/calc exp="3600*180*pa/3.1415926536" pa=$bfwhm`
+
    else
       echo "  beamfit failure"
       set bxcen = null
