@@ -59,6 +59,7 @@
 *     PMA: Peter Allan (Starlink, RAL)
 *     RFWS: R.F. Warren-Smith (Starlink, RAL)
 *     AJC: Alan Chipperfield (Starlink, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -72,6 +73,9 @@
 *        Use CNF for memory de-allocation. Execute even if STATUS is set.
 *     23-JUN-2000 (AJC):
 *        Tidy refs to CNF routines
+*     12-MAY-2010 (TIMJ):
+*        Force pointer to 0 after freeing it. This makes it easier to spot
+*        pointers that have been freed.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -108,5 +112,5 @@ F77_SUBROUTINE(psx_free)( POINTER(pntr), INTEGER(status) )
 /* use from both C and Fortran).					    */
 
    cnfFree( cnfCptr( *pntr ) );
-
+   *pntr = (F77_POINTER_TYPE)0;
 }
