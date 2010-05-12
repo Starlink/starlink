@@ -53,6 +53,8 @@
 *        Propagate JCMTState if present.
 *     2010-05-10 (EC):
 *        Avoid overwriting reference header if it is the same as the model.
+*     2010-05-12 (EC):
+*        COM converted to 3d model from 1d (but with length 1 spatial axes)
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -151,56 +153,11 @@ void smf_model_createHdr( smfData *model, smf_modeltype type,
       break;
 
     case SMF__COM:
-      /* For 1=dimensional data, assume it is the time axis which we
-         extract from the 3d WCS */
-
-      /* Get a pointer to the current->base Mapping (i.e. the Mapping from
-         WCS coords to GRID coords). */
-      cbmap = astGetMapping( refwcs, AST__CURRENT, AST__BASE );
-
-      /* Use astMapSplit to split off the Mapping for the time
-         axis. This assumes that the time axis is the 3rd axis
-         (i.e. index 2) */
-
-      taxis = 3;
-      astMapSplit( cbmap, 1, &taxis, out, &tmap );
-
-      /* We now check that the Mapping was split succesfully. This should
-         always be the case for the time axis since the time axis is
-         independent of the others, but it is as well to check in case of
-         bugs, etc. */
-      if( !tmap ) {
-        /* The "tmap" mapping will have 1 input (the WCS time value) -
-           astMapSplit guarantees this. But we
-           should also check that it also has only one output (the
-           corresponding GRID axis). */
-        *status = SAI__ERROR;
-        errRep( "", FUNC_NAME ": Couldn't extract time-axis mapping",
-                status );
-      } else if( astGetI( tmap, "Nout" ) != 1 ) {
-        *status = SAI__ERROR;
-        errRep( "", FUNC_NAME
-                ": Time-axis mapping has incorrect number of outputs",
-                status );
-      } else {
-
-        /* Create a new FrameSet containing a 1D GRID Frame. */
-        fset = astFrameSet( astFrame( 1, "Domain=GRID" ), " " );
-
-        /* Extract the 1D Frame (presumably a TimeFrame)
-           describing time from the current (WCS) 3D Frame. */
-        tfrm = astPickAxes( refwcs, 1, &taxis, NULL);
-
-        /* Add the time frame into the 1D FrameSet, using the
-           Mapping returned by astMapSplit. Note, this Mapping
-           goes from time to grid, so we invert it first so that
-           it goes from grid to time, as required by
-           astAddFrame. */
-
-        astInvert( tmap );
-        astAddFrame( fset, AST__BASE, tmap, tfrm );
-      }
-
+      /* This is really a 1-d data set since we've collapsed along the
+         two spatial axes in the focal plane. However, these still
+         appear as dimensions of length 1 -- so we can just use the
+         full 3d WCS anyways. */
+      fset = astCopy( refwcs );
       break;
 
     case SMF__NOI:

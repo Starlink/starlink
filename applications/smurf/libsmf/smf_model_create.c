@@ -182,11 +182,13 @@
 *     2010-05-04 (TIMJ):
 *        Simplify KeyMap access. We now trigger an error if a key is missing
 *        and we ensure all keys have corresponding defaults.
+*     2010-05-12 (EC):
+*        Convert COM to 3d from 1d (but spatial axes have length 1)
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008,2010 Science and Technology Facilities Council.
-*     Copyright (C) 2006-2009 University of British Columbia.
+*     Copyright (C) 2006-2010 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -526,8 +528,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
 
           case SMF__COM: /* Common-mode at each time step */
             head.data.dtype = SMF__DOUBLE;
-            head.data.ndims = 1;
-            head.data.lbnd[0] = 1;
+            head.data.ndims = 3;
 
             if (idata && idata->hdr) {
               smf_set_clabels( "Common-mode Signal", "Signal",
@@ -535,9 +536,21 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
             }
 
             if( isTordered ) { /* T is 3rd axis if time-ordered */
-              head.data.dims[0] = (idata->dims)[2];
+              head.data.lbnd[0] = 0;
+              head.data.lbnd[1] = 0;
+              head.data.lbnd[2] = 1;
+
+              head.data.dims[0] = 1;
+              head.data.dims[1] = 1;
+              head.data.dims[2] = (idata->dims)[2];
             } else {           /* T is 1st axis if bolo-ordered */
+              head.data.lbnd[0] = 1;
+              head.data.lbnd[1] = 0;
+              head.data.lbnd[2] = 0;
+
               head.data.dims[0] = (idata->dims)[0];
+              head.data.dims[1] = 1;
+              head.data.dims[2] = 1;
             }
             break;
 
