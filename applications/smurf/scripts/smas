@@ -266,8 +266,23 @@ foreach n (`cat files.smas`)
                      newhi=bad quiet
    set ndf = cut-smas
 
+#  Find the size of the region containing the remaining good values.
+   $KAPPA_DIR/ndfcopy $ndf temp-smas trimbad
+   $KAPPA_DIR/ndftrace temp-smas quiet
+   set dim1 = `$KAPPA_DIR/parget dims\(1\) ndftrace`
+   set dim2 = `$KAPPA_DIR/parget dims\(2\) ndftrace`
+   if( $dim1 > $dim2 ) then
+      set isize = $dim1
+   else
+      set isize = $dim2
+   endif
+
+#  Ensure the size is odd since PSF reports an error is supplied an even
+#  ISIZE value.
+   set isize = `$KAPPA_DIR/calc exp="1+2*nint(pa/2-0.1)" pa=$isize`
+
 #  Determine the source parameters using kappa:psf
-   $KAPPA_DIR/psf $ndf incat=! cofile=coin.smas isize=31 norm=f device=! | grep \!\! >& /dev/null
+   $KAPPA_DIR/psf $ndf incat=! cofile=coin.smas isize=$isize norm=f device=! | grep \!\! >& /dev/null
 
 #  Check a psf was found succesfully.
    if( $status == 1 ) then
