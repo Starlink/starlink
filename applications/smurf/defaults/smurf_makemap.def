@@ -21,10 +21,13 @@
 
 #  Authors:
 #     TIMJ: Tim Jenness (JAC, Hawaii)
+#     DSB: David Berry (JAC, Hawaii)
 
 #  History:
 #     2010-05-05 (TIMJ):
 #        Original version.
+#     2010-05-12 (DSB):
+#        Added com.gain_is_one
 
 #-
 
@@ -106,6 +109,12 @@ com.gain_rat = 4
 com.gain_abstol = 3
 com.gain_box = 6000
 com.notfirst = 0
+
+# Setting com.gain_is_one non-zero causes all bolometer gains to be 
+# forced to 1.0 (and offsets to 0.0), but retains the real 
+# correlation coefficient so that bad bolometer blocks are still 
+# identified and rejected.
+com.gain_is_one = 0
 
 gai.flatfield = 0
 

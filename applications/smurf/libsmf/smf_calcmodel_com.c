@@ -139,6 +139,11 @@
 *     2010-05-04 (TIMJ):
 *        Simplify KeyMap access. We now trigger an error if a key is missing
 *        and we ensure all keys have corresponding defaults.
+*     2010-05-12 (DSB):
+*        Added com.gain_is_one. Setting this to one causes all 
+*        bolometer gains to be forced to 1.0 (and offsets to 0.0),
+*        but retains the real correlation coefficient so that bad 
+*        bolometer blocks are still identified and rejected.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -201,6 +206,7 @@ typedef struct smfCalcmodelComData {
   double *model_data;      /* pointer to common mode data */
   dim_t nblock;            /* No of time slice blocks per bolometer */
   dim_t nbolo;             /* number of bolometers */
+  int nogains;             /* Force all gains to unity? */
   dim_t ntslice;           /* number of time slices */
   int operation;           /* 0=undo COM, 1=new COM, 2=fit COM */
   double *res_data;        /* Pointer to common residual data */
@@ -236,6 +242,7 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
   double *model_data;      /* pointer to common mode data */
   dim_t nbolo;             /* number of bolometers */
   dim_t nblock;            /* Number of time blocks */
+  int nogains;             /* Force all gains to unity? */
   dim_t nsum;              /* Number of values summed in "sum" */
   dim_t ntime;             /* Number of remaining time slices */
   dim_t ntslice;           /* number of time slices */
@@ -279,6 +286,7 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
   qua_data = pdata->qua_data;
   weight = pdata->weight;
   gain_box = pdata->gain_box;
+  nogains = pdata->nogains;
   nblock = pdata->nblock;
 
 
@@ -518,6 +526,13 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
               }
               *(gai_data+igbase) = VAL__BADD;
               errAnnul( status );
+
+            /* If we are ignoring gains, force gains to 1.0 and offsets
+               to 0.0. Retain the correlation coeffs in order to flag bad
+               blocks. */
+            } else if( nogains ) {
+               *(gai_data+igbase) = 1.0;
+               *(gai_data+block_cstride+igbase) = 0.0;
             }
           }
 
@@ -618,6 +633,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   dim_t nblock=0;               /* Number of time blocks */
   dim_t ndata=0;                /* Total number of data points */
   size_t newbad;                /* Number of new bolos being flagged as bad */
+  int nogains;                  /* Force all gains to unity? */
   smfArray *noi=NULL;           /* Pointer to NOI at chunk */
   double *noi_data=NULL;        /* Pointer to DATA component of model */
   size_t noibstride;            /* bolo stride for noise */
@@ -697,6 +713,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   gain_box = ival;
   astMapGet0D(kmap, "GAIN_ABSTOL", &gain_abstol);
   astMapGet0I(kmap, "NOTFIRST", &notfirst);
+  astMapGet0I(kmap, "GAIN_IS_ONE", &nogains );
 
   if (*status == SAI__OK && gain_box == 0) {
     *status = SAI__ERROR;
@@ -935,6 +952,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         pdata->ijob = -1;
         pdata->weight = weight;
         pdata->gain_box = gain_box;
+        pdata->nogains = nogains;
         pdata->nblock = nblock;
       }
     }
@@ -1111,6 +1129,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
           pdata->ijob = -1;
           pdata->weight = weight;
           pdata->gain_box = gain_box;
+          pdata->nogains = nogains;
           pdata->nblock = nblock;
         }
 
