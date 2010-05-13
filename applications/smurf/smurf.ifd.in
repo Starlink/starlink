@@ -2366,7 +2366,7 @@ package @PACKAGE@ {
                 type _DOUBLE
                 vpath {DEFAULT}
                 prompt {N-sigma threshold for DC step repair}
-                default 150
+                default 5
                 helpkey *
             }
 
