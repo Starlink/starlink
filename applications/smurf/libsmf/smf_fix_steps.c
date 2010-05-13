@@ -821,8 +821,8 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
 
 /* Report the number of rejected bolometers. */
    if( ns > 0 ) {
-      msgOutiff( MSG__VERB, " ", "smf_fix_steps: flagged %d bad bolos.",
-                 status, (int) *nsteps );
+      msgOutiff( MSG__VERB, " ", "smf_fix_steps: flagged %zu bad bolos.",
+                 status, ns );
    }
 
 /* Return the number of rejected bolometers. */

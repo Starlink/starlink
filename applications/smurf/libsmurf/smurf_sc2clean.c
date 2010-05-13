@@ -294,18 +294,14 @@ void smurf_sc2clean( int *status ) {
 
     /* Fix large DC steps */
     if( dcthresh && dcfitbox ) {
-      size_t dcnsteps;
       msgOutiff(MSG__VERB,"",
                 "Flagging bolos with %lf-sigma DC steps in %zu "
-                "samples as bad, using %zu sample median filter and max DC %i "
-                "steps per min before flagging entire bolo bad.", status,
+                "samples as bad, using %zu-sample median filter and max %i "
+                "DC steps per min before flagging entire bolo bad.", status,
                 dcthresh, dcfitbox, dcmedianwidth, dcmaxsteps);
 
       smf_fix_steps( wf, ffdata, NULL, dcthresh, dcmedianwidth, dcfitbox,
-                     dcmaxsteps, &dcnsteps, status );
-      msgOutiff(MSG__VERB, "",
-                "... %zu entire bolos flagged bad due to DC steps", status,
-                dcnsteps);
+                     dcmaxsteps, NULL, status );
     }
 
     /* Flag spikes */
