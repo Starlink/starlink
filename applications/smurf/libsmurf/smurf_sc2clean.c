@@ -297,7 +297,9 @@ void smurf_sc2clean( int *status ) {
       size_t dcnsteps;
       msgOutiff(MSG__VERB,"",
                 "Flagging bolos with %lf-sigma DC steps in %zu "
-                "samples as bad", status, dcthresh, dcfitbox);
+                "samples as bad, using %zu sample median filter and max DC %i "
+                "steps per min before flagging entire bolo bad.", status,
+                dcthresh, dcfitbox, dcmedianwidth, dcmaxsteps);
 
       smf_fix_steps( wf, ffdata, NULL, dcthresh, dcmedianwidth, dcfitbox,
                      dcmaxsteps, &dcnsteps, status );
