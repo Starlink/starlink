@@ -203,6 +203,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
    int jtime;                  /* Index of time slice */
    int nblock;
    int ncorr;
+   size_t ns;
    int nsign;
    int nstep;
    int ntime;                  /* Number of time slices in usable range */
@@ -233,7 +234,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
    int dcminstepgap = 50;
 
 /* Initialise returned values. */
-   *nsteps = 0;
+   ns = 0;
 
 
 #ifdef DEBUG_STEPS
@@ -705,7 +706,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
 /* If this bolometer has no usable corrections or has too many steps, set
    the entire bolo bad. */
             if( ncorr == 0 || nstep > dcmaxsteps*( ((double) tpop)/12000.0 ) ) {
-               (*nsteps)++;
+               ns++;
                pq1 = qua + ibolo*bstride;
                for( jtime = 0; jtime < (int) ntslice; jtime++) {
                  *pq1 |= SMF__Q_BADB;
@@ -791,9 +792,14 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
    }
 
 /* Report the number of rejected bolometers. */
-   if( *nsteps > 0 ) {
+   if( ns > 0 ) {
       msgOutiff( MSG__VERB, " ", "smf_fix_steps: flagged %d bad bolos.",
                  status, (int) *nsteps );
+   }
+
+/* Return the number of rejected bolometers. */
+   if( nsteps ) {
+     *nsteps = ns;
    }
 
 #ifdef DEBUG_STEPS
