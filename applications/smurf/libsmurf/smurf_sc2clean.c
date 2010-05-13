@@ -45,16 +45,14 @@
 *          Fraction of bad samples in order for entire bolometer to be
 *          flagged as bad. [0.0]
 *     DCFITBOX = _INTEGER (Read)
-*          Width of the box (samples) over which to estimate the mean
-*          signal level for DC step detection. [0]
+*          Box size over which to fit data with a straight line on either side
+*          of a potential DC step. [400]
+*     DCMAXSTEPS = _INTEGER (Read)
+*          Maximum steps per min. allower before flagging entire bolo bad. [10]
+*     DCMEDIANWIDTH = _INTEGER (Read)
+*          Width of median filter smooth prior to finding DC jumps. [40]
 *     DCTHRESH = _DOUBLE (Read)
-*          N-sigma threshold at which to detect primary DC steps. [150.0]
-*     DCTHRESH2 = _DOUBLE (Read)
-*          N-sigma threshold at which to detect secondary DC steps.
-*          Secondary DC steps are those induced by a primary DC step in
-*          another bolometer. Secondary steps are assumed to occur at the
-*          same time slice as the primary step that induces them. DCTHRESH2
-*          should have a lower value than DCTHRESH. [10.0]
+*          N-sigma threshold at which to detect primary DC steps. [5.0]
 *     DKCLEAN = _LOGICAL (Read)
 *          If true fit and remove dark squid signals. [FALSE]
 *     FILLGAPS = _LOGICAL (Read)
@@ -120,6 +118,9 @@
 *        Support flatfield ramps.
 *     2010-05-10 (TIMJ):
 *        Remove DCBAD and DCFLAGALL. Rename DCBOX to DCFITBOX
+*     2010-05-13 (EC):
+*        Complete the conversion to smf_fix_steps from smf_correct_steps;
+*        add DCMAXSTEPS and DCMEDIANWIDTH, remove DCTHRESH2.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -182,12 +183,10 @@ void smurf_sc2clean( int *status ) {
   size_t apod=0;            /* Length of apodization window */
   double badfrac=0;         /* Fraction of bad samples to flag bad bolo */
   smfArray *darks = NULL;   /* Dark data */
-  int dcbad;                /* Flag bolometers with steps as bad */
   dim_t dcfitbox=0;         /* width of box for measuring DC steps */
-  int dcflag;               /* flag for DC step finder */
-  int dcflagall;            /* Flag for repairing all bolos at step */
+  int dcmaxsteps;           /* number of DC steps/min. to flag bolo bad */
+  dim_t dcmedianwidth;      /* median filter width before finding DC steps */
   double dcthresh=0;        /* n-sigma threshold for primary DC steps */
-  double dcthresh2=10.0;       /* n-sigma threshold for secondary DC steps */
   int dkclean;              /* Flag for dark squid cleaning */
   int fillgaps;             /* Flag to do gap filling */
   double flagstat;          /* Threshold for flagging stationary regions */
@@ -245,8 +244,10 @@ void smurf_sc2clean( int *status ) {
   } else {
     atlGetParam( "APOD", keymap, status );
     atlGetParam( "BADFRAC", keymap, status );
-    atlGetParam( "DCTHRESH", keymap, status );
     atlGetParam( "DCFITBOX", keymap, status );
+    atlGetParam( "DCMAXSTEPS", keymap, status );
+    atlGetParam( "DCMEDIANWIDTH", keymap, status );
+    atlGetParam( "DCTHRESH", keymap, status );
     parGet0l( "DKCLEAN", &dkclean, status );
     astMapPut0I( keymap, "DKCLEAN", dkclean, NULL );
     parGet0l( "FILLGAPS", &fillgaps, status );
@@ -260,12 +261,11 @@ void smurf_sc2clean( int *status ) {
     atlGetParam( "SPIKEITER", keymap, status );
     atlGetParam( "SPIKETHRESH", keymap, status );
 
-    smf_get_cleanpar( keymap, &apod, &badfrac, &dcfitbox, &dcflag, &dcthresh,
-                      NULL, &dkclean, &fillgaps, NULL, NULL, NULL,
+    smf_get_cleanpar( keymap, &apod, &badfrac, &dcfitbox, &dcmaxsteps,
+                      &dcthresh, &dcmedianwidth, &dkclean, &fillgaps,
+                      NULL, NULL, NULL,
 		      NULL, NULL, NULL, &flagstat, &order, &spikethresh,
 		      &spikeiter, status ); }
-
-    parGet0d( "DCTHRESH2", &dcthresh2, status );
 
   /* Loop over input files */
   if( *status == SAI__OK ) for( i=1; i<=size; i++ ) {
@@ -294,25 +294,16 @@ void smurf_sc2clean( int *status ) {
 
     /* Fix large DC steps */
     if( dcthresh && dcfitbox ) {
-      msgSetd("DCTHRESH",dcthresh);
-      msgSetd("DCTHRESH2",dcthresh2);
-      msgSeti("DCBOX",dcfitbox);
-      if( dcflag==1 ) {
-        msgOutif(MSG__VERB," ",
-                 "Flagging bolos with ^DCTHRESH-sigma DC steps in ^DCFITBOX "
-                 "samples as bad", status);
-      } else if( dcflag==2 ) {
-        msgOutif(MSG__VERB," ",
-                 "Fixing all bolos that show a secondary DC step of greater "
-                 "than ^DCTHRESH2-sigma at times defined by primary DC steps "
-                 "greater than ^DCTHRESH-sigma in ^DCFITBOX samples", status);
-      } else {
-        msgOutif(MSG__VERB," ",
-                 "Fixing bolos at locations of DC steps size ^DCTHRESH-sigma in ^DCFITBOX samples",
-                 status);
-      }
-      smf_correct_steps( wf, ffdata, NULL, dcthresh, dcthresh2, dcfitbox,
-                         dcflag, NULL, status );
+      size_t dcnsteps;
+      msgOutiff(MSG__VERB,"",
+                "Flagging bolos with %lf-sigma DC steps in %zu "
+                "samples as bad", status, dcthresh, dcfitbox);
+
+      smf_fix_steps( wf, ffdata, NULL, dcthresh, dcmedianwidth, dcfitbox,
+                     dcmaxsteps, &dcnsteps, status );
+      msgOutiff(MSG__VERB, "",
+                "... %zu entire bolos flagged bad due to DC steps", status,
+                dcnsteps);
     }
 
     /* Flag spikes */

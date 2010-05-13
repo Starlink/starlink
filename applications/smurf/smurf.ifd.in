@@ -2342,7 +2342,23 @@ package @PACKAGE@ {
                 type _INTEGER
                 vpath {DEFAULT}
                 prompt {Size of box (samples) to measure means for DC step-finding}
-                default 0
+                default 400
+                helpkey *
+            }
+
+            parameter dcmaxsteps {
+                type _INTEGER
+                vpath {DEFAULT}
+                prompt {Maximum steps per min. allower before flagging entire bolo bad}
+                default 10
+                helpkey *
+            }
+
+            parameter dcmedianwidth {
+                type _INTEGER
+                vpath {DEFAULT}
+                prompt {Width of median filter smooth prior to finding DC jumps}
+                default 40
                 helpkey *
             }
 
@@ -2351,14 +2367,6 @@ package @PACKAGE@ {
                 vpath {DEFAULT}
                 prompt {N-sigma threshold for DC step repair}
                 default 150
-                helpkey *
-            }
-
-            parameter dcthresh2 {
-                type _DOUBLE
-                vpath {DEFAULT}
-                prompt {N-sigma threshold for secondary DC step repair}
-                default 10
                 helpkey *
             }
 
