@@ -65,6 +65,14 @@
 *        - Reject blocks of steep samples if the median value at the
 *        start and end of the block are insufficiently different.
 *        - Extract median filtering code into another routine.
+*     13-MAY-2010 (DSB):
+*        - The RMS value in the gradient array could be badly affected 
+*        by very large steps. So do three 3*sigma rejection iterations
+*        to make the rms more robust.
+*        - Replace incorrect "break" with "continue". This could 
+*        cause the whole function to return early if a bolometer 
+*        with too few usable values was found.
+*        - Correct counting of rejected bolometers (returned in *nsteps). 
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -181,6 +189,8 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
    double clo;
    double corr;
    double diff;
+   double diff2;
+   double diff2_limit;
    double end_value;
    double fac;
    double mhi;
@@ -197,6 +207,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
    int boxlen;
    int boxstart;
    int iblock;
+   int iter;
    int itime;                  /* Index of time slice */
    int itime_hi;
    int itime_lo;
@@ -388,31 +399,47 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
 /* For each time slice, find the difference between the median value
    before and after the time slice. We leave a small gap between the two
    median boxes to allow for some rise time in any potential step. Find
-   the RMS value of these differences. If not defined, flag the entire
-   bolometer as bad, and pass on to the next bolometer. */
-            tpop = 0;
-            tsum2 = 0.0;
-            pw1 = work + dcmedianwidth/2;
-            pw2 = pw1 + dcmedianwidth + dcmediangap;
-            for( itime = itime_lo; itime <= itime_hi; itime++,pw1++,pw2++ ) {
-               if( *pw1 != VAL__BADD && *pw2 != VAL__BADD ) {
-                  diff = *pw2 - *pw1;
-                  tsum2 += diff*diff;
-                  tpop++;
+   the RMS value of these differences.  Iterate a few times, ignoring
+   differences larger than 3*RMS, to reduce the effect of really big
+   jumps. */
+            diff2_limit = VAL__MAXD;
+
+            for( iter = 0; iter < 3; iter++ ) {
+               tpop = 0;
+               tsum2 = 0.0;
+               pw1 = work + dcmedianwidth/2;
+               pw2 = pw1 + dcmedianwidth + dcmediangap;
+               for( itime = itime_lo; itime <= itime_hi; itime++,pw1++,pw2++ ) {
+                  if( *pw1 != VAL__BADD && *pw2 != VAL__BADD ) {
+                     diff = *pw2 - *pw1;
+                     diff2 = diff*diff;
+                     if( diff2 < diff2_limit ) {
+                        tsum2 += diff*diff;
+                        tpop++;
+                     }
+
+   #ifdef DEBUG_STEPS
+      tmp[ itime ].jump = diff;
+      tmp[ itime ].median = work[ itime ];
+   #endif
 
 
-#ifdef DEBUG_STEPS
-   tmp[ itime ].jump = diff;
-   tmp[ itime ].median = work[ itime ];
-#endif
+                  }
+               }
 
-
+               if( tpop > SMF__MINSTATSAMP ) {
+                  rms = sqrtf( tsum2/tpop );
+                  diff2_limit = 3.0*rms;
+                  diff2_limit *= diff2_limit;
+               } else {
+                  rms = VAL__BADD;
+                  break;
                }
             }
 
-            if( tpop > SMF__MINSTATSAMP ) {
-               rms = sqrtf( tsum2/tpop );
-            } else {
+/* If the time stream contains too few values, flag the entire bolometer as
+   bad, and pass on to the next bolometer. */
+            if( rms == VAL__BADD ) {
                msgOutiff( MSG__DEBUG, "", "smf_fix_steps: flagging "
                           "entire bad bolo %" DIM_T_FMT ", due to "
                           "insufficient samples", status, ibolo );
@@ -421,7 +448,8 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
                  *pq1 |= SMF__Q_BADB;
                   pq1 += tstride;
                }
-               break;
+               ns++;
+               continue;
             }
 
 /* Indicate we are currently looking for the start of a step. */
