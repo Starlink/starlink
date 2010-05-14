@@ -15,7 +15,7 @@
 *  Invocation:
 *     smf_clean_dksquid( smfData *indata, unsigned char *quality,
 *                        unsigned char mask, size_t window, smfData *model,
-*                        int calcdk, int nofit, int *status ) {
+*                        int calcdk, int nofit, int replacebad, int *status ) {
 
 *  Arguments:
 *     indata = smfData * (Given)
@@ -32,6 +32,8 @@
 *        If set, calc & store dark squids in model along with fit coefficients
 *     nofit = int (Given)
 *        If set, just obtain smoothed dark squid signals and don't fit/remove
+*     replacebad = int (Given)
+*        If set, replace dead squids in model with average of working ones(Given)
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -79,10 +81,13 @@
 *        Stride-ify
 *     2009-07-23 (TIMJ):
 *        Use msgFlevok rather than msgIflev
+*     2010-05-14 (EC):
+*        - add "replacebad" to replace dead DKsquids with average of working ones
+*        - remove means of DKsquids
 
 *  Copyright:
 *     Copyright (C) 2009 Science & Technology Facilities Council.
-*     Copyright (C) 2008-2009 University of British Columbia.
+*     Copyright (C) 2008-2010 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -122,29 +127,37 @@
 
 void smf_clean_dksquid( smfData *indata, unsigned char *quality,
                         unsigned char mask, size_t window, smfData *model,
-                        int calcdk, int nofit, int *status ) {
+                        int calcdk, int nofit, int replacebad, int *status ) {
 
   dim_t b;                /* Bolometer index */
   size_t bstride;         /* Bolometer index stride */
   double corr;            /* Linear correlation coefficient */
   double *corrbuf=NULL;   /* Array of correlation coeffs all bolos this col */
   int needDA=0;           /* Do we need dksquids from the DA? */
-  int dkgood;             /* Flag for non-constant dark squid */
+  int *dkgood=NULL;       /* Flag for non-constant dark squid */
   double *dksquid=NULL;   /* Buffer for smoothed dark squid */
+  double *dkav=NULL;      /* Buffer for average dark squid */
   int firstdk;            /* First value in dksquid signal */
   double gain;            /* Gain parameter from template fit */
   double *gainbuf=NULL;   /* Array of gains for all bolos in this col */
   size_t i;               /* Loop counter */
-  int isTordered;         /* Data order */
+  size_t jt1;
+  size_t jt2;
+  size_t ntot;
+  size_t jf1;             /* Starting tslice that should be fit */
+  size_t jf2;             /* Final tslice that should be fit */
   size_t j;               /* Loop counter */
   size_t k;               /* Loop counter */
   dim_t nbolo;            /* Number of bolometers */
   dim_t ncol;             /* Number of columns */
   dim_t ndata;            /* Number of data points */
+  size_t nfit;            /* number of samples over good range to fit */
+  size_t ngood=0;         /* number of good dark squids */
   dim_t nrow;             /* Number of rows */
   dim_t ntslice;          /* Number of time slices */
   double offset;          /* Offset parameter from template fit */
   double *offsetbuf=NULL; /* Array of offsets for all bolos in this col */
+  int pass;               /* two passes over data to get estimate of average */
   unsigned char *qua=NULL;/* Pointer to quality array */
   size_t tstride;         /* Time slice index stride */
 
@@ -170,11 +183,11 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
       return;
     } else if( !indata->da->dksquid) {
       /* Check for NULL dksquid */
-        *status = SAI__ERROR;
-        errRep( " ", FUNC_NAME
-                ": possible programming error, no dksquid array in smfData",
-                status);
-        return;
+      *status = SAI__ERROR;
+      errRep( " ", FUNC_NAME
+              ": possible programming error, no dksquid array in smfData",
+              status);
+      return;
     }
   }
 
@@ -182,8 +195,25 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
   smf_get_dims( indata, &nrow, &ncol, &nbolo, &ntslice, &ndata, &bstride,
                 &tstride, status );
 
-  /* Obtain the number of rows and columns */
-  isTordered = indata->isTordered;
+  /* Identify the range of data that should be fit using SMF__Q_BOUND */
+  if( qua ) {
+    smf_get_goodrange( qua, ntslice, tstride, SMF__Q_BOUND, &jf1, &jf2,
+                       status );
+  } else {
+    jf1 = 0;
+    jf2 = ntslice-1;
+  }
+  nfit = jf2-jf1+1;
+
+  /* Total total range only using SMF__Q_PAD */
+  if( qua ) {
+    smf_get_goodrange( qua, ntslice, tstride, SMF__Q_BOUND, &jt1, &jt2,
+                       status );
+  } else {
+    jt1 = 0;
+    jt2 = ntslice-1;
+  }
+  ntot = jt2-jt1+1;
 
   if( model ) {
     /* Check for valid model dimensions if supplied */
@@ -204,130 +234,197 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
     }
   } else {
     /* Otherwise allocate space for local dksquid buffer */
-    dksquid = smf_malloc( ntslice, sizeof(*dksquid), 0, status );
+    dksquid = smf_malloc( ntslice, sizeof(*dksquid), 1, status );
   }
 
   /* Pointer to quality */
   if( quality ) qua = quality;
   else qua = indata->pntr[2];
 
-  /* Loop over columns */
-  for( i=0; (*status==SAI__OK)&&(i<ncol); i++ ) {
+  /* Two passes: in the first we calculate an average dark squid to use as
+     a surrogate for columns with dead dark squids. In the second we do the
+     actual cleaning etc. */
 
-    /* Point dksquid, gainbuf, offsetbuf and corrbuf to the right
-       place in model if supplied. Initialize fit coeffs to
-       VAL__BADD */
-    if( model ) {
-      dksquid = model->pntr[0];
-      dksquid += i*(ntslice+nrow*3);
-      gainbuf = dksquid + ntslice;
-      offsetbuf = gainbuf + nrow;
-      corrbuf = offsetbuf + nrow;
+  dkgood = smf_malloc( ncol, sizeof(*dkgood), 1, status );
+  dkav = smf_malloc( ntslice, sizeof(*dkav), 1, status );
 
-      for( j=0; j<nrow; j++ ) {
-        gainbuf[j] = VAL__BADD;
-        offsetbuf[j] = VAL__BADD;
-        corrbuf[j] = VAL__BADD;
-      }
-    }
+  for( pass=0; (*status==SAI__OK)&&(pass<2); pass++ ) {
 
-    if( needDA ) {
-      /* Copy dark squids from the DA extension into dksquid */
-      for( j=0; j<ntslice; j++ ) {
-        dksquid[j] = indata->da->dksquid[i+ncol*j];
-      }
-    }
+    /* Loop over columns */
+    for( i=0; (*status==SAI__OK)&&(i<ncol); i++ ) {
 
-    /* Check for a good dark squid by seeing if it ever changes */
-    dkgood = 0;
-    firstdk = dksquid[0];
-    for( j=0; j<ntslice; j++ ) {
-      if( dksquid[j] != firstdk ) dkgood=1;
-    }
-
-    if( needDA && dkgood ) {
-      /* Smooth the dark squid template */
-      smf_boxcar1D( dksquid, ntslice, window, NULL, 0, status );
-    }
-
-    /* Loop over rows, removing the fitted dksquid template. */
-    for( j=0; (!nofit) && (*status==SAI__OK) && (j<nrow); j++ ) {
-
-      /* Calculate bolometer index from row/col counters */
-      if( SC2STORE__COL_INDEX ) {
-        b = i*nrow + j;
-      } else {
-        b = i + j*ncol;
+      /* Point dksquid, gainbuf, offsetbuf and corrbuf to the right
+         place in model if supplied. */
+      if( model ) {
+        dksquid = model->pntr[0];
+        dksquid += i*(ntslice+nrow*3);
+        gainbuf = dksquid + ntslice;
+        offsetbuf = gainbuf + nrow;
+        corrbuf = offsetbuf + nrow;
       }
 
-      /* If dark squid is bad, flag entire bolo as bad if it isn't already */
-      if( !dkgood && qua && !(qua[b*bstride]&SMF__Q_BADB) ) {
-        for( k=0; k<ntslice; k++ ) {
-          qua[b*bstride+k*tstride] |= SMF__Q_BADB;
+      /* First pass is just to copy the dark squid over to the model and replace
+         dead dark squids with the average */
+      if( pass==0 ) {
+
+        /* Copy dark squids from the DA extension into dksquid */
+        if( needDA && calcdk && model ) {
+          for( j=0; j<ntslice; j++ ) {
+            dksquid[j] = indata->da->dksquid[i+ncol*j];
+          }
+        }
+
+        /* Check for a good dark squid by seeing if it ever changes */
+        firstdk = dksquid[jt1];
+        for( j=jt1+1; j<=jt2; j++ ) {
+          if( dksquid[j] != firstdk ) {
+            dkgood[i] = 1;
+            ngood++;
+
+            /* Add good squid to average dksquid */
+            for( k=jt1; k<=jt2; k++ ) {
+              dkav[k] += dksquid[k];
+            }
+            break;
+          }
         }
       }
 
-      /* Try to fit if we think we have a good dark squid and bolo */
-      if((!qua && dkgood) || (qua && dkgood && !(qua[b*bstride]&SMF__Q_BADB))) {
+      /* Second pass actually do the fitting / replace with average dksquid if
+         dksquid was dead */
+      if( pass==1 ) {
 
-        switch( indata->dtype ) {
-        case SMF__DOUBLE:
-          smf_templateFit1D( &( ((double *)indata->pntr[0])[b*bstride] ),
-                             &qua[b*bstride], mask, mask,
-                             ntslice, tstride, dksquid, 1, &gain, &offset,
-                             &corr, status );
-          break;
+        /* Do some dksquid initialization if requested  */
+        if( (*status==SAI__OK) && needDA && calcdk && model && dkgood[i] ) {
+          double mean;
 
-        case SMF__INTEGER:
-          smf_templateFit1I( &( ((int *)indata->pntr[0])[b*bstride] ),
-                             &qua[b*bstride], mask, mask,
-                             ntslice, tstride, dksquid, 1, &gain, &offset,
-                             &corr, status );
-          break;
+          /* Smooth the dark squid template */
+          smf_boxcar1D( &dksquid[jt1], ntot, window, NULL, 0, status );
 
-        default:
-          msgSetc( "DT", smf_dtype_string( indata, status ));
-          *status = SAI__ERROR;
-          errRep( " ", FUNC_NAME
-                  ": Unsupported data type for dksquid cleaning (^DT)",
-                  status );
+          /* Also remove the mean because it isn't useful. */
+          smf_stats1D( &dksquid[jt1], 1, ntot, NULL, 0, 0, &mean, 0, NULL,
+                       status );
+
+          for( j=jt1; (*status==SAI__OK)&&(j<=jt2); j++ ) {
+            dksquid[j] -= mean;
+          }
         }
 
-        if( *status == SMF__INSMP ) {
-          /* Annul SMF__INSMP as it was probably due to a bad bolometer */
-          errAnnul( status );
-          if( msgFlevok( MSG__DEBUG, status) ) {
-            msgSeti( "COL", i );
-            msgSeti( "ROW", j );
-            msgOutif( MSG__DEBUG, "", FUNC_NAME
-                      ": ROW,COL (^ROW,^COL) insufficient good samples",
-                      status );
+        /* Initialize fit coeffs to VAL__BADD */
+        if( (*status == SAI__OK) && model ) {
+          for( j=0; j<nrow; j++ ) {
+            gainbuf[j] = VAL__BADD;
+            offsetbuf[j] = VAL__BADD;
+            corrbuf[j] = VAL__BADD;
+          }
+        }
+
+        /* Loop over rows, removing the fitted dksquid template. */
+        for( j=0; (!nofit) && (*status==SAI__OK) && (j<nrow); j++ ) {
+
+          /* Calculate bolometer index from row/col counters */
+          if( SC2STORE__COL_INDEX ) {
+            b = i*nrow + j;
+          } else {
+            b = i + j*ncol;
           }
 
-          /* Flag entire bolo as bad if it isn't already */
-          if( qua && !(qua[b*bstride]&SMF__Q_BADB) ) {
+          /* If dark squid is bad, flag entire bolo as bad if it isn't already */
+          if( !dkgood[i] && qua && !(qua[b*bstride]&SMF__Q_BADB) ) {
             for( k=0; k<ntslice; k++ ) {
               qua[b*bstride+k*tstride] |= SMF__Q_BADB;
             }
           }
-        } else {
-          /* Store gain and offset in model */
-          if( model ) {
-            gainbuf[j] = gain;
-            offsetbuf[j] = offset;
-            corrbuf[j] = corr;
-          }
 
-          if( msgFlevok( MSG__DEBUG, status ) ) {
-            msgSeti( "COL", i );
-            msgSeti( "ROW", j );
-            msgSetd( "GAI", gain );
-            msgSetd( "OFF", offset );
-            msgSetd( "CORR", corr );
-            msgOutif( MSG__DEBUG, "", FUNC_NAME
-                      ": ROW,COL (^ROW,^COL) GAIN,OFFSET,CORR "
-                      "(^GAI,^OFF,^CORR)", status );
+          /* Try to fit if we think we have a good dark squid and bolo, and only
+             the goodrange of data (excluding padding etc.) */
+          if((!qua && dkgood[i]) ||
+             (qua && dkgood[i] && !(qua[b*bstride]&SMF__Q_BADB))) {
+            double *d_d;
+            int *d_i;
+
+            switch( indata->dtype ) {
+            case SMF__DOUBLE:
+              d_d = (double *) indata->pntr[0];
+              smf_templateFit1D( &d_d[b*bstride+jf1*tstride],
+                                 &qua[b*bstride+jf1*tstride], mask, mask,
+                                 nfit, tstride, &dksquid[jf1], 1, &gain,
+                                 &offset, &corr, status );
+              break;
+
+            case SMF__INTEGER:
+              d_i = (int *) indata->pntr[0];
+              smf_templateFit1I( &d_i[b*bstride+jf1*tstride],
+                                 &qua[b*bstride+jf1*tstride], mask, mask,
+                                 nfit, tstride, &dksquid[jf1], 1, &gain,
+                                 &offset, &corr, status );
+              break;
+
+            default:
+              msgSetc( "DT", smf_dtype_string( indata, status ));
+              *status = SAI__ERROR;
+              errRep( " ", FUNC_NAME
+                      ": Unsupported data type for dksquid cleaning (^DT)",
+                      status );
+            }
+
+            if( *status == SMF__INSMP ) {
+              /* Annul SMF__INSMP as it was probably due to a bad bolometer */
+              errAnnul( status );
+              if( msgFlevok( MSG__DEBUG, status) ) {
+                msgSeti( "COL", i );
+                msgSeti( "ROW", j );
+                msgOutif( MSG__DEBUG, "", FUNC_NAME
+                          ": ROW,COL (^ROW,^COL) insufficient good samples",
+                          status );
+              }
+
+              /* Flag entire bolo as bad if it isn't already */
+              if( qua && !(qua[b*bstride]&SMF__Q_BADB) ) {
+                for( k=0; k<ntslice; k++ ) {
+                  qua[b*bstride+k*tstride] |= SMF__Q_BADB;
+                }
+              }
+            } else {
+              /* Store gain and offset in model */
+              if( model ) {
+                gainbuf[j] = gain;
+                offsetbuf[j] = offset;
+                corrbuf[j] = corr;
+              }
+
+              if( msgFlevok( MSG__DEBUG, status ) ) {
+                msgSeti( "COL", i );
+                msgSeti( "ROW", j );
+                msgSetd( "GAI", gain );
+                msgSetd( "OFF", offset );
+                msgSetd( "CORR", corr );
+                msgOutif( MSG__DEBUG, "", FUNC_NAME
+                          ": ROW,COL (^ROW,^COL) GAIN,OFFSET,CORR "
+                          "(^GAI,^OFF,^CORR)", status );
+              }
+            }
           }
+        }
+      }
+    }
+
+    /* Re-normalize the average dark-squid here at the end of pass 0 */
+    if( (pass==0) && (ngood) && (*status==SAI__OK) ) {
+      for( j=jt1; j<=jt2; j++ ) {
+        dkav[j] /= ngood;
+      }
+    }
+
+    /* Replace bad bolos in model with the average? */
+    if( replacebad && calcdk && needDA && model && (*status==SAI__OK) ) {
+      for( i=0; i<ncol; i++ ) {
+        dksquid = model->pntr[0];
+        dksquid += i*(ntslice+nrow*3);
+
+        if( !dkgood[i] ) {
+          memcpy( dksquid, dkav, sizeof(*dksquid)*ntslice );
+          dkgood[i] = 1;
         }
       }
     }
@@ -335,4 +432,7 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
 
   /* Free dksquid only if it was a local buffer */
   if( !model && dksquid ) dksquid = smf_free( dksquid, status );
+
+  if( dkgood ) dkgood = smf_free( dkgood, status );
+
 }

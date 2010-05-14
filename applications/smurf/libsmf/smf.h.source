@@ -584,7 +584,7 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
 
 void smf_clean_dksquid( smfData *indata, unsigned char *quality,
                         unsigned char mask, size_t window,  smfData *model,
-                        int calcdk, int nofit, int *status );
+                        int calcdk, int nofit, int replacebad, int *status );
 
 void smf_clone_data ( const smfData *idata, smfData **odata, int *status );
 

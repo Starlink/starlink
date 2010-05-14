@@ -345,10 +345,10 @@ void smurf_sc2clean( int *status ) {
 
     /* Clean out the dark squid signal */
     if( dkclean ) {
-	msgOutif(MSG__VERB," ",
-		 "Cleaning dark squid signals from data.",
-		 status);
-      smf_clean_dksquid( ffdata, NULL, 0, 100, NULL, 0, 0, status );
+      msgOutif(MSG__VERB," ",
+               "Cleaning dark squid signals from data.",
+               status);
+      smf_clean_dksquid( ffdata, NULL, 0, 100, NULL, 0, 0, 0, status );
     }
 
 

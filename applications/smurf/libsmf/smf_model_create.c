@@ -900,7 +900,8 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
                  head.data so that its pntr[0] temporarily points to the
                  model data array. */
               head.data.pntr[0] = dataptr;
-              smf_clean_dksquid(idata, NULL, 0, 0, &(head.data), 1, 1, status);
+              smf_clean_dksquid(idata, NULL, 0, 0, &(head.data), 1, 1, 1,
+                                status);
               head.data.pntr[0] = NULL;
             } else if( mtype == SMF__GAI ) {
               /* Initialize gain to 1, offset to 0, correlation to 0 */
