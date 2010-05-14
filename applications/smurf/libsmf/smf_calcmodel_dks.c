@@ -111,6 +111,10 @@ void smf_calcmodel_dks( smfWorkForce *wf __attribute__((unused)),
   dim_t idx=0;                  /* Index within subgroup */
   dim_t index;                  /* index into data buffer */
   dim_t j;                      /* Loop counter */
+  size_t jt1;
+  size_t jt2;
+  size_t jf1;                   /* Starting tslice that should be fit */
+  size_t jf2;                   /* Final tslice that should be fit */
   dim_t k;                      /* Loop counter */
   AstKeyMap *kmap=NULL;         /* Local keymap */
   smfArray *model=NULL;         /* Pointer to model at chunk */
@@ -120,6 +124,7 @@ void smf_calcmodel_dks( smfWorkForce *wf __attribute__((unused)),
   dim_t ncol;                   /* Number of columns */
   dim_t ndata=0;                /* Total number of data points */
   size_t ndchisq=0;             /* number of elements contributing to dchisq */
+  size_t nfit;                  /* number of samples over good range to fit */
   dim_t nmodel=0;               /* Total number of elements in model buffer */
   smfArray *noi=NULL;           /* Pointer to NOI at chunk */
   double *noi_data=NULL;        /* Pointer to DATA component of model */
@@ -127,6 +132,7 @@ void smf_calcmodel_dks( smfWorkForce *wf __attribute__((unused)),
   dim_t nointslice;             /* number of time slices for noise */
   size_t noitstride;            /* Time stride for noise */
   dim_t nrow;                   /* Number of rows */
+  size_t ntot;                  /* total good excluding padding */
   dim_t ntslice=0;              /* Number of time slices */
   double *offsetbuf=NULL;       /* Array of offsets for all bolos in this col */
   smfArray *qua=NULL;           /* Pointer to QUA at chunk */
@@ -189,6 +195,26 @@ void smf_calcmodel_dks( smfWorkForce *wf __attribute__((unused)),
     /* Geta pointer to the QUAlity array */
     qua_data = (qua->sdata[idx]->pntr)[0];
 
+    /* Identify the range of data that should be fit using SMF__Q_BOUND */
+    if( qua ) {
+      smf_get_goodrange( qua_data, ntslice, tstride, SMF__Q_BOUND, &jf1, &jf2,
+                         status );
+    } else {
+      jf1 = 0;
+      jf2 = ntslice-1;
+    }
+    nfit = jf2-jf1+1;
+
+    /* Total total range only using SMF__Q_PAD */
+    if( qua ) {
+      smf_get_goodrange( qua_data, ntslice, tstride, SMF__Q_PAD, &jt1, &jt2,
+                         status );
+    } else {
+      jt1 = 0;
+      jt2 = ntslice-1;
+    }
+    ntot = jt2-jt1+1;
+
     if( (res_data == NULL) || (model_data == NULL) || (qua_data == NULL) ) {
       *status = SAI__ERROR;
       errRep("", FUNC_NAME ": Null data in inputs", status);
@@ -210,6 +236,22 @@ void smf_calcmodel_dks( smfWorkForce *wf __attribute__((unused)),
         offsetbuf = gainbuf + nrow;
         corrbuf = offsetbuf + nrow;
 
+        /* For the first iteration we need to do some pre-processing */
+        if( (flags&SMF__DIMM_FIRSTITER) ) {
+          double mean;
+
+          /* boxcar smooth */
+          smf_boxcar1D( &dksquid[jt1], ntot, boxcar, NULL, 0, status );
+
+          /* remove the mean as it isn't useful */
+          smf_stats1D( &dksquid[jt1], 1, ntot, NULL, 0, 0, &mean, 0, NULL,
+                       status );
+
+          for( j=jt1; (*status==SAI__OK)&&(j<=jt2); j++ ) {
+            dksquid[j] -= mean;
+          }
+        }
+
         /* Loop over rows */
         for( j=0; (*status==SAI__OK)&&(j<nrow); j++ ) {
 
@@ -224,14 +266,12 @@ void smf_calcmodel_dks( smfWorkForce *wf __attribute__((unused)),
           /* Continue if the bolo is OK */
           if( !(qua_data[index]&SMF__Q_BADB) ) {
 
-            if( flags&SMF__DIMM_FIRSTITER ) {
-              /* For the first iteration we need to smooth the dark squids */
-              smf_boxcar1D( dksquid, ntslice, boxcar, NULL, 0, status );
+            /* If this isn't first iteration, put the previous iteration
+               back into the signal */
 
-            } else if( (gainbuf[j]!=VAL__BADD) && (offsetbuf[j]!=VAL__BADD) ) {
-              for( k=0; k<ntslice; k++ ) {
-                /* If this isn't first iteration, put the previous iteration
-                   back into the signal */
+            if( !(flags&SMF__DIMM_FIRSTITER) && (gainbuf[j]!=VAL__BADD) &&
+                (offsetbuf[j]!=VAL__BADD) ) {
+              for( k=jf1; k<=jf2; k++ ) {
                 if( (res_data[index+k]!=VAL__BADD) && (dksquid[k]!=VAL__BADD)) {
                   res_data[index+k] += dksquid[k]*gainbuf[j] + offsetbuf[j];
                 }
@@ -249,7 +289,7 @@ void smf_calcmodel_dks( smfWorkForce *wf __attribute__((unused)),
       /* Then re-fit and remove the dark squid signal */
       msgOutif( MSG__VERB, "", "   cleaning detectors", status );
       smf_clean_dksquid( res->sdata[idx], qua_data, SMF__Q_MOD, 0,
-                         model->sdata[idx], 0, 0, status );
+                         model->sdata[idx], 0, 0, 0, status );
 
       /* How has the model changed? */
       if( noi ) {
@@ -288,7 +328,7 @@ void smf_calcmodel_dks( smfWorkForce *wf __attribute__((unused)),
             if( !(qua_data[index]&SMF__Q_BADB) && (gainbuf[j]!=VAL__BADD) &&
                 (offsetbuf[j]!=VAL__BADD) ) {
 
-              for( k=0; k<ntslice; k++ ) {
+              for( k=jf1; k<=jf2; k++ ) {
 
                 if( !(qua_data[bolcounter*bstride+k*tstride]&SMF__Q_GOOD) ) {
                   dchisq += ( (dksquid[k]*gainbuf[j] + offsetbuf[j]) -
