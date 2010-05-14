@@ -108,11 +108,12 @@ com.gain_fgood = 0.25
 com.gain_rat = 4
 com.gain_abstol = 3
 com.gain_box = 6000
+com.fit_box = <undef>
 com.notfirst = 0
 
-# Setting com.gain_is_one non-zero causes all bolometer gains to be 
-# forced to 1.0 (and offsets to 0.0), but retains the real 
-# correlation coefficient so that bad bolometer blocks are still 
+# Setting com.gain_is_one non-zero causes all bolometer gains to be
+# forced to 1.0 (and offsets to 0.0), but retains the real
+# correlation coefficient so that bad bolometer blocks are still
 # identified and rejected.
 com.gain_is_one = 0
 

@@ -140,10 +140,17 @@
 *        Simplify KeyMap access. We now trigger an error if a key is missing
 *        and we ensure all keys have corresponding defaults.
 *     2010-05-12 (DSB):
-*        Added com.gain_is_one. Setting this to one causes all 
+*        Added com.gain_is_one. Setting this to one causes all
 *        bolometer gains to be forced to 1.0 (and offsets to 0.0),
-*        but retains the real correlation coefficient so that bad 
+*        but retains the real correlation coefficient so that bad
 *        bolometer blocks are still identified and rejected.
+*     2010-05-13 (DSB):
+*        - Added com.fit_box. Specifies the length (in time slices) over
+*        which the least squres fit (used to determine each gain and
+*        offset) is performed. FIT_BOX defaults to the value supplied for
+*        GAIN_BOX.
+*        - Speed up this function by only re-calculating gains and offsets
+*        for blocks that have not already converged.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -196,6 +203,7 @@ typedef struct smfCalcmodelComData {
   size_t b1;               /* Index of first bolometer of block */
   size_t b2;               /* Index of last bolometer of block */
   size_t bstride;          /* bolometer stride for res/qua */
+  dim_t fit_box;           /* Number of time slices used in each fit */
   double *gai_data;        /* pointer to gain model (can be NULL) data */
   dim_t gain_box;          /* Number of time slices per block */
   size_t gbstride;         /* gain bolo stride */
@@ -215,6 +223,7 @@ typedef struct smfCalcmodelComData {
   size_t tstride;          /* time stride for res/qua */
   unsigned char *qua_data; /* Pointer to common quality data */
   double *weight;          /* Weight at each point in model */
+  int *converged;          /* Flags saying if each bock has converged */
 } smfCalcmodelComData;
 
 
@@ -228,6 +237,8 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
   dim_t block_tstride;     /* Stride between time slice blocks */
   dim_t block_size;        /* Number of time slices in block */
   size_t bstride;          /* bolometer stride for res/qua */
+  int *converged;          /* Flags saying if each bock has converged */
+  dim_t fit_box;           /* Number of time slices used in each fit */
   double *gai_data;        /* pointer to gain model (can be NULL) data */
   double gain;             /* Gain value */
   dim_t gain_box;          /* Nominal number of time slices per block */
@@ -287,9 +298,9 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
   weight = pdata->weight;
   gain_box = pdata->gain_box;
   nogains = pdata->nogains;
+  fit_box = pdata->fit_box;
   nblock = pdata->nblock;
-
-
+  converged = pdata->converged;
 
 
   /* Undo the previous iteration of the model, each thread handles a
@@ -356,7 +367,7 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
         if( sum <= 0.0 ) {
           ijindex = j*bstride;
           for( i = 0; i < ntslice; i++ ) {
-            qua_data[ ijindex ] |= SMF__Q_BADB;
+            qua_data[ ijindex ] |= ( SMF__Q_BADB | SMF__Q_COM );
             ijindex += tstride;
           }
         }
@@ -489,6 +500,7 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
                status, pdata->operation, pdata->b1, pdata->b2 );
     smf_timerinit( &tv1, &tv2, status);
 
+    int delta_box = ( fit_box - gain_box )/2;
     block_cstride = gcstride*nblock;
     block_tstride = gain_box*tstride;
     for( i=pdata->b1; (*status==SAI__OK) && (i<=pdata->b2); i++ ) {
@@ -510,12 +522,28 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
           which may not be gain_box in number. */
           block_size = ( iblock < nblock - 1 ) ? gain_box : ntime;
 
-          /* Skip blocks that have already been rejected. */
-          if( gai_data[ igbase ] != VAL__BADD ) {
+          /* Skip blocks that have already been rejected, or have already
+             converged. */
+          if( gai_data[ igbase ] != VAL__BADD && !converged[ iblock ] ) {
 
-            smf_templateFit1D( res_data+ibase, qua_data+ibase,
-                               SMF__Q_GOOD, SMF__Q_MOD, block_size,
-                               tstride, m, 0, gai_data+igbase,
+            size_t box_start = ntslice - ntime;
+            size_t box_end = box_start + block_size - 1;
+
+            int fit_start = box_start - delta_box;
+            int fit_end = box_end + delta_box;
+
+            if( fit_start < 0 ) fit_start = 0;
+            if( fit_end >= (int) ntslice ) fit_end = ntslice - 1;
+
+            int fit_off = box_start - fit_start;
+            int fit_size = fit_end - fit_start + 1;
+
+            size_t ibase_box = ibase - fit_off*tstride;
+            double *m_box = m - fit_off*tstride;
+
+            smf_templateFit1D( res_data+ibase_box, qua_data+ibase_box,
+                               SMF__Q_GOOD, SMF__Q_MOD, fit_size,
+                               tstride, m_box, 0, gai_data+igbase,
                                gai_data+block_cstride+igbase,
                                gai_data+2*block_cstride+igbase, status );
 
@@ -582,6 +610,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   double boxcard=0;             /* double precision version of boxcar */
   double boxfact=0;             /* Box width damping parameter */
   int boxmin=0;                 /* Min boxcar width if boxfact set */
+  int *converged;               /* Flags saying if each bock has converged */
   int do_boxcar=0;              /* flag to do boxcar smooth */
   int do_boxfact=0;             /* flag to damp boxcar width */
   int do_boxmin=0;              /* flag for minimum boxcar */
@@ -596,9 +625,10 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   double csum;                  /* Sum of corr coeffs */
   int fillgaps;                 /* Are there any new gaps to fill? */
   int first;                    /* First pass round loop? */
+  dim_t fit_box=0;              /* No. of time slices used in template fit */
   double *gcoeff=NULL;          /* Array to hold gain coefficients */
   int gflat=0;                  /* If set use GAIn to adjust flatfield */
-  size_t ggood;                  /* Number of good gain. coeff. samples */
+  size_t ggood;                 /* Number of good gain. coeff. samples */
   dim_t glim = 1;               /* Lowest acceptable number of good blocks */
   double gmax;                  /* Largest acceptable gain */
   double gmin;                  /* Smallest acceptable gain */
@@ -631,6 +661,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   double *model_data_copy=NULL; /* Copy of model_data */
   dim_t nbolo=0;                /* Number of bolometers */
   dim_t nblock=0;               /* Number of time blocks */
+  int nconverged;               /* Number of converged blocks */
   dim_t ndata=0;                /* Total number of data points */
   size_t newbad;                /* Number of new bolos being flagged as bad */
   int nogains;                  /* Force all gains to unity? */
@@ -658,6 +689,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   dim_t thisnbolo=0;            /* Check each file same dims as first */
   dim_t thisndata=0;            /* "                                  */
   dim_t thisntslice=0;          /* "                                  */
+  int totgood;                  /* Number of good bolo blocks remaining */
   size_t tstride;               /* Time slice stride in data array */
   double *weight=NULL;          /* Weight at each point in model */
   double *wg;                   /* Work array holding gain values */
@@ -717,13 +749,28 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
   if (*status == SAI__OK && gain_box == 0) {
     *status = SAI__ERROR;
-    errRep( "", "COM.gain_box must be defined and be greater than 0", status );
+    errRep( "", "COM.gain_box must be greater than 0", status );
   }
 
   if( do_boxcar ) {
     msgSeti("BOX",boxcar);
     msgOutif(MSG__VERB, " ", "    boxcar width ^BOX", status);
   }
+
+  /* FIT_BOX defaults to GAIN_BOX (it should be null in the defaults file. */
+  if( astMapGet0I(kmap, "FIT_BOX", &ival) ) {
+     fit_box = ival;
+     if( fit_box < gain_box ) {
+        *status = SAI__ERROR;
+       msgSeti( "F", (int) fit_box );
+       msgSeti( "G", (int) gain_box );
+       errRep( "", "COM.FIT_BOX (^F) must not be smaller than COM.GAIN_BOX "
+               "(^G)", status );
+     }
+  } else {
+     fit_box = gain_box;
+  }
+
 
   /* Are we using gains to adjust the flatfield? */
   astMapGet0I( gkmap, "FLATFIELD", &gflat );
@@ -953,7 +1000,9 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         pdata->weight = weight;
         pdata->gain_box = gain_box;
         pdata->nogains = nogains;
+        pdata->fit_box = fit_box;
         pdata->nblock = nblock;
+        pdata->converged = NULL;
       }
     }
 
@@ -976,10 +1025,15 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
      template fits settle down to a list with no N-sigma outliers.
      ---------------------------------------------------------------- */
 
+  /* Allocate memory for a set of flags, one for each block, that
+     indicate if the block has converged or not. */
+  converged = smf_malloc( nblock, sizeof( *converged ), 0, status );
+
   fillgaps = 0;
   first = 1;
   quit = 0;
   while( !quit && (*status==SAI__OK) ) {
+
 
     /* Initialize to assumption that we'll finish this iteration */
     quit = 1;
@@ -988,11 +1042,9 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     memset(model_data,0,(model->sdata[0]->dims)[0]*sizeof(*model_data));
     memset(weight,0,(model->sdata[0]->dims)[0]*sizeof(*weight));
 
-
-
-
-
-
+    /* If this is the first pass, initialise the convergence flags to
+       zero. */
+    if( first ) memset( converged, 0, nblock*sizeof( *converged ) );
 
     /* Loop over index in subgrp (subarray) */
     for( idx=0; (idx<res->ndat)&&(*status==SAI__OK); idx++ ) {
@@ -1033,6 +1085,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         pdata->qua_data = qua_data;
         pdata->ijob = -1;
         pdata->weight = weight;
+        pdata->converged = converged;
       }
 
       for( ii=0; ii<nw; ii++ ) {
@@ -1130,7 +1183,9 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
           pdata->weight = weight;
           pdata->gain_box = gain_box;
           pdata->nogains = nogains;
+          pdata->fit_box = fit_box;
           pdata->nblock = nblock;
+          pdata->converged = converged;
         }
 
         for( ii=0; ii<nw; ii++ ) {
@@ -1141,8 +1196,6 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         }
         /* Wait until all of the submitted jobs have completed */
         smf_wait( wf, status );
-
-
 
         /* Identify blocks for which the fit is either too poor to use
            (i.e. low correlation), or very different from the fits for
@@ -1156,116 +1209,137 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         /* Loop over all blocks of time slices */
         newbad = 0;
         ntime = ntslice;
+        int prev_block_converged = 1;
+
         for( iblock = 0; iblock < nblock && *status == SAI__OK; iblock++ ) {
-          size_t igbase = iblock*gcstride;
-          size_t ibase = 0;
 
-          block_size = ( iblock < nblock - 1 ) ? gain_box : ntime;
-          ntime -= block_size;
+          /* Skip blocks that have already converged. */
+          if( ! converged[ iblock ] ) {
 
-          allbad = 1;
-          for( i = 0; i < nbolo; i++ ) {
+             size_t igbase = iblock*gcstride;
+             size_t ibase = 0;
+             int block_converged = 1;
 
-            /* Copy correlation coefficients into an array that has VAL__BADD
-               set at locations of bad bolometers. Blocks with negative
-               gains or correlations are considered to be bad. */
+             block_size = ( iblock < nblock - 1 ) ? gain_box : ntime;
+             ntime -= block_size;
 
-            if( !( qua_data[ i*bstride ] & SMF__Q_BADB) ) {
-              gcoeff[ i ] = gai_data[ igbase ];
-              corr[ i ] = gai_data[ igbase + corr_offset ];
-            } else {
-              gcoeff[ i ] = VAL__BADD;
-            }
+             allbad = 1;
+             for( i = 0; i < nbolo; i++ ) {
 
-            if( gcoeff[ i ] != VAL__BADD ) {
+               /* Copy correlation coefficients into an array that has VAL__BADD
+                  set at locations of bad bolometers. Blocks with negative
+                  gains or correlations are considered to be bad. */
 
-              if( gcoeff[ i ] > 0.0 && corr[ i ] > corr_abstol ){
-                 gcoeff[ i ] = log( gcoeff[ i ] );
-                 allbad = 0;
-              } else {
-                gcoeff[ i ] = VAL__BADD;
-                corr[ i ] = VAL__BADD;
-              }
+               if( !( qua_data[ i*bstride ] & SMF__Q_BADB) ) {
+                 gcoeff[ i ] = gai_data[ igbase ];
+                 corr[ i ] = gai_data[ igbase + corr_offset ];
+               } else {
+                 gcoeff[ i ] = VAL__BADD;
+               }
 
-            } else {
-              corr[ i ] = VAL__BADD;
-            }
+               if( gcoeff[ i ] != VAL__BADD ) {
 
-            igbase += gbstride;
-          }
+                 if( gcoeff[ i ] > 0.0 && corr[ i ] > corr_abstol ){
+                    gcoeff[ i ] = log( gcoeff[ i ] );
+                    allbad = 0;
+                 } else {
+                   gcoeff[ i ] = VAL__BADD;
+                   corr[ i ] = VAL__BADD;
+                 }
 
-          if( !allbad ) {
-             smf_stats1D( corr, 1, nbolo, NULL, 0, 0, &cmean, &csig, &cgood,
-                          status );
-             if( *status == SMF__INSMP ) {
-                errAnnul( status );
-                allbad = 1;
-             } else {
-                msgSeti("B",iblock);
-                msgSeti("N",cgood);
-                msgOutif( MSG__VERB, "", "    Block ^B has ^N good bolos", status );
-                msgOutiff( MSG__DEBUG, "",
-                           "    corr coeff %8.5f +/- %8.5f", status, cmean, csig );
+               } else {
+                 corr[ i ] = VAL__BADD;
+               }
+
+               igbase += gbstride;
              }
-          }
 
-          if( allbad ) {
-             cgood = 0;
-             msgSeti("B",iblock);
-             msgOutif( MSG__VERB, "", "    Block ^B has no good bolos", status );
-          }
-
-          if( !allbad ) {
-             smf_stats1D( gcoeff, 1, nbolo, NULL, 0, 0, &gmean, &gsig, &ggood, status );
-             if( *status == SMF__INSMP ) {
-                errAnnul( status );
-                allbad = 1;
-                cgood = 0;
-             } else {
-                msgOutiff( MSG__DEBUG, " ",
-                           "    log(gain coeff) %8.5f +/- %8.5f", status,
-                           gmean, gsig);
-             }
-          } else {
-             ggood = 0;
-          }
-
-          /* Flag new bad bolometers in the current block of time slices */
-          igbase = iblock*gcstride;
-          ibase = iblock*gain_box*tstride;
-
-          for( i = 0; i < nbolo && *status == SAI__OK; i++ ) {
-
-            /* Skip blocks that have already been rejected., */
-            if( gai_data[ igbase ] != VAL__BADD ) {
-
-              /* Reject blocks that 1) have a negative correlation or
-                 gain (indicated by bad values), or 2) have an unusually
-                 low correlation coeffcient, or 3) have an unusally low
-                 or high gain. */
-              if( corr[ i ] == VAL__BADD || gcoeff[ i ] == VAL__BADD ||
-                  ( (cmean - corr[ i ]) > corr_tol*csig ) || /*flag worse bols*/
-                  ( corr[ i ] < corr_abstol ) ||
-                  ( fabs( gcoeff[ i ]-gmean ) > gain_tol*gsig ) ||
-                  ( fabs( gcoeff[ i ]-gmean ) > gain_abstol ) ) {
-
-                quit = 0;
-
-                for( j = 0; j < block_size; j++ ) {
-                  qua_data[ ibase + j*tstride] |= SMF__Q_COM;
+             if( !allbad ) {
+                smf_stats1D( corr, 1, nbolo, NULL, 0, 0, &cmean, &csig, &cgood,
+                             status );
+                if( *status == SMF__INSMP ) {
+                   errAnnul( status );
+                   allbad = 1;
                 }
+             } else {
+                cgood = 0;
+             }
 
-                gai_data[ igbase ] = VAL__BADD;
-                gai_data[ igbase + off_offset ] = VAL__BADD;
-                gai_data[ igbase + corr_offset ] = VAL__BADD;
+             if( !allbad ) {
+                smf_stats1D( gcoeff, 1, nbolo, NULL, 0, 0, &gmean, &gsig, &ggood, status );
+                if( *status == SMF__INSMP ) {
+                   errAnnul( status );
+                   allbad = 1;
+                   cgood = 0;
+                }
+             } else {
+                ggood = 0;
+             }
 
-                newbad++;
+             /* Flag new bad bolometers in the current block of time slices */
+             igbase = iblock*gcstride;
+             ibase = iblock*gain_box*tstride;
 
-              }
-            }
+             for( i = 0; i < nbolo && *status == SAI__OK; i++ ) {
 
-            igbase += gbstride;
-            ibase += bstride;
+               /* Skip blocks that have already been rejected., */
+               if( gai_data[ igbase ] != VAL__BADD ) {
+
+                 /* Reject blocks that 1) have a negative correlation or
+                    gain (indicated by bad values), or 2) have an unusually
+                    low correlation coeffcient, or 3) have an unusally low
+                    or high gain. */
+                 if( corr[ i ] == VAL__BADD || gcoeff[ i ] == VAL__BADD ||
+                  ( (cmean - corr[ i ]) > corr_tol*csig ) ||    /*flag worse bols*/
+                     ( corr[ i ] < corr_abstol ) ||
+                     ( fabs( gcoeff[ i ]-gmean ) > gain_tol*gsig ) ||
+                     ( fabs( gcoeff[ i ]-gmean ) > gain_abstol ) ) {
+
+                   quit = 0;
+
+                   for( j = 0; j < block_size; j++ ) {
+                     qua_data[ ibase + j*tstride] |= SMF__Q_COM;
+                   }
+
+                   gai_data[ igbase ] = VAL__BADD;
+                   gai_data[ igbase + off_offset ] = VAL__BADD;
+                   gai_data[ igbase + corr_offset ] = VAL__BADD;
+
+                   newbad++;
+                   block_converged = 0;
+
+                 }
+               }
+
+               igbase += gbstride;
+               ibase += bstride;
+             }
+
+             /* If the previous block has not yet converged, we cannot
+                assume the current block has converged since the gains
+                and offsets are interpolated between blocks. So set the
+                block_converged flag to zero in this case. Also save  the
+                original "block_converged" flag for use with the next block. */
+             if( block_converged ) {
+                if( !prev_block_converged ) block_converged = 0;
+                prev_block_converged = 1;
+             } else {
+                prev_block_converged = 0;
+             }
+
+             /* If this block has converged, flag it as converged in the
+             "converged" array. */
+             if( block_converged ) {
+                converged[ iblock ] = 1;
+
+             /* If this block has not converged, flag it as unconverged in
+                the "converged" array, and also flag the previous block as
+                unconverged since the gains and offsets are interpolated
+                between blocks. */
+             } else {
+                converged[ iblock ] = 0;
+                if( iblock > 0 ) converged[ iblock - 1 ] = 0;
+             }
           }
         }
 
@@ -1275,6 +1349,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
            gain value is very different to the other gain values for the same
            bolometer. We also reject the entire boloemeter if it has too
            few good blocks. Loop round all remaining bolometers. */
+        totgood = 0;
         for( i = 0; i < nbolo && *status == SAI__OK; i++ ) {
           size_t ibase = i*bstride;
           if( !( qua_data[ ibase ] & SMF__Q_BADB) ) {
@@ -1327,9 +1402,16 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
                   gai_data[ igbase + corr_offset ] = VAL__BADD;
 
                   newbad++;
+                  ggood--;
+                  quit = 0;
+
+                  /* Flag this block and it's neighbours as unconverged. */
+                  if( iblock > 0 ) converged[ iblock - 1 ] = 0;
+                  converged[ iblock ] = 0;
+                  if( iblock < nblock - 1 ) converged[ iblock + 1 ] = 0;
 
                 } else {
-                   ibase += block_size*tstride;
+                  ibase += block_size*tstride;
                 }
 
                 igbase += gcstride;
@@ -1341,7 +1423,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
             } else {
 
               for( j = 0; j < ntslice; j++ ) {
-                qua_data[ ibase  ] |= SMF__Q_BADB;
+                qua_data[ ibase ] |= ( SMF__Q_BADB | SMF__Q_COM );
                 ibase += tstride;
               }
 
@@ -1355,16 +1437,34 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
               newbad += ggood;
 
+              quit = 0;
+              ggood = 0;
             }
+
+            totgood += ggood;
+
           }
         }
 
-        if( newbad ) {
-          msgSeti("NEW",newbad);
-          msgOutif( MSG__VERB, "",
-                    "    flagged ^NEW new bad bolo time-slice blocks", status );
-          fillgaps = 1;
+        nconverged = 0;
+        for( iblock = 0; iblock < nblock; iblock++ ) {
+           if( converged[ iblock ] ) nconverged++;
         }
+        msgSeti( "N", nconverged );
+        msgSeti( "M", nblock );
+        msgOutif( MSG__VERB, "",
+                  "    ^N out of ^M time-slice blocks have now converged", status );
+
+        msgSeti( "NEW", newbad );
+        msgOutif( MSG__VERB, "",
+                  "    flagged ^NEW new bad bolo time-slice blocks", status );
+
+        msgSeti( "NG", totgood );
+        msgSeti( "T", nblock*nbolo );
+        msgOutif( MSG__VERB, "",
+                  "    Out of ^T, ^NG bolo time-slice blocks are still good",
+                  status );
+        if( newbad ) fillgaps = 1;
 
         gcoeff = smf_free( gcoeff, status );
         corr = smf_free( corr, status );
@@ -1403,16 +1503,16 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
       /* around we go again... */
       msgOutif( MSG__DEBUG, "", "    Common mode not yet converged",
                 status );
+    } else {
+      msgOutif( MSG__DEBUG, "", "    Common mode converged",
+                status );
     }
 
     first = 0;
   }
 
-
-
-
-
-
+/* Free the convergence flags. */
+  converged = smf_free( converged, status );
 
 
 
