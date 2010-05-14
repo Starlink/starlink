@@ -571,6 +571,9 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                 if( da ) {
                   da->dksquid = smf_realloc( da->dksquid, ncol*tlen,
                                               sizeof(*(da->dksquid)), status );
+                  if( *status == SAI__OK ) {
+                    memset(da->dksquid, 0, ncol*tlen*sizeof(*(da->dksquid)));
+                  }
                 }
 
                 /* Un-set havearray values corresponding to flags */
