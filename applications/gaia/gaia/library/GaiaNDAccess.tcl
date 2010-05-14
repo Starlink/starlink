@@ -187,12 +187,23 @@ itcl::class gaia::GaiaNDAccess {
          if { $tdims_ == {} } {
             set tdims_ [${type_}::getdims $handle_ 1]
 
-            #  If necessary pad the dimensions up to the expected size.
+            #  If necessary pad the dimensions up or down to the expected
+            #  size, provided the extra dimensions are trivial.
             set needbounds $ndims
             set gotbounds [llength $tdims_]
             if { $gotbounds < $needbounds } {
                for {set i $gotbounds} {$i < $needbounds} {incr i} {
                   lappend tdims_ 1
+               }
+            } elseif { $gotbounds > $needbounds } {
+               for {set i [expr $gotbounds -1]} {$i >= $needbounds} {incr i -1} {
+                  if { [lindex $tdims_ $i] == 1 } {
+                     set tdims_ [lrange $tdims_ 0 [expr $i -1]]
+                  } else {
+                     #  None trivial, this is now an error.
+                     error "Too many non-trivial dimensions"
+                     break
+                  }
                }
             }
          }
@@ -388,8 +399,12 @@ itcl::class gaia::GaiaNDAccess {
    #  first three must be significant). The address of an array info structure
    #  is returned (query using getinfo).
    public method getimage {axis index trunc {component "DATA"}} {
+
+      puts "$axis, $index, $trunc, $component"
+
       if { $addr_($component) != 0 } {
          set dims [getdims $trunc]
+         puts "dims = $dims"
          return [eval "array::getimage $addr_($component) \
                           $dims $axis $index $cnfmap_"]
       }
