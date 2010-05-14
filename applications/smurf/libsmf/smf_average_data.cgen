@@ -13,7 +13,7 @@
 *     Library routine
 
 *  Invocation:
-*     void smf_average_data<X>( const smfData *data, dim_t start, dim_t nslice, 
+*     void smf_average_data<X>( const smfData *data, dim_t start, dim_t nslice,
 *                       const dim_t interval, CGEN_TYPE **avdata, size_t *nelem,
 *                       int *status);
 
@@ -34,7 +34,7 @@
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
-*  Description: 
+*  Description:
 *     This routine....  For DREAM data, interval should be set to the
 *     number of samples per cycle (nsampsycle); for STARE it should be
 *     1.
@@ -117,7 +117,7 @@
 
 #define FUNC_NAME "smf_average_dataD"
 
-void CGEN_FUNCTION(smf_average_data)( const smfData *data, dim_t start,  dim_t nslice, 
+void CGEN_FUNCTION(smf_average_data)( const smfData *data, dim_t start,  dim_t nslice,
                                       const dim_t interval, CGEN_TYPE **avdata,
                                       size_t *nelem, int *status) {
 
@@ -150,8 +150,8 @@ void CGEN_FUNCTION(smf_average_data)( const smfData *data, dim_t start,  dim_t n
       *status = SAI__ERROR;
       msgSeti("I",start);
       msgSeti("N",nframes-1);
-      errRep( FUNC_NAME, 
-              "Starting index, ^I, out of range (must lie between 0 and ^N)", 
+      errRep( FUNC_NAME,
+              "Starting index, ^I, out of range (must lie between 0 and ^N)",
               status );
       return;
     }
@@ -166,8 +166,8 @@ void CGEN_FUNCTION(smf_average_data)( const smfData *data, dim_t start,  dim_t n
         *status = SAI__ERROR;
         msgSeti("I",nslice);
         msgSeti("N",nframes);
-        errRep( FUNC_NAME, 
-                "Number of time slices to average, ^I, out of range (must lie between 1 and ^N)", 
+        errRep( FUNC_NAME,
+                "Number of time slices to average, ^I, out of range (must lie between 1 and ^N)",
                 status );
         return;
       }
@@ -179,8 +179,8 @@ void CGEN_FUNCTION(smf_average_data)( const smfData *data, dim_t start,  dim_t n
       *status = SAI__ERROR;
       msgSeti("I",interval);
       msgSeti("N",nframes);
-      errRep( FUNC_NAME, 
-              "Averaging interval, ^I, out of range (must lie between 1 and ^N)", 
+      errRep( FUNC_NAME,
+              "Averaging interval, ^I, out of range (must lie between 1 and ^N)",
               status );
       return;
     }
@@ -199,11 +199,11 @@ void CGEN_FUNCTION(smf_average_data)( const smfData *data, dim_t start,  dim_t n
       msgSeti("S",nslice);
       msgSeti("N",noutslice);
       msgSeti("F",nframes);
-      msgOutif(MSG__VERB, FUNC_NAME, 
-               "Warning: time stream does not contain an integer number of output time slices: noutslice * nslice (^N * ^S) != nframes (^F)", 
+      msgOutif(MSG__VERB, FUNC_NAME,
+               "Warning: time stream does not contain an integer number of output time slices: noutslice * nslice (^N * ^S) != nframes (^F)",
                status);
-      msgOutif(MSG__VERB, FUNC_NAME, 
-               "The final image will be made up from fewer samples than the rest", 
+      msgOutif(MSG__VERB, FUNC_NAME,
+               "The final image will be made up from fewer samples than the rest",
                status);
       /* Increment the number of output slices */
       noutslice++;
