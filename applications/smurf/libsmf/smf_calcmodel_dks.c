@@ -50,6 +50,8 @@
 *        - switch to subkeymap notation in config file
 *     2009-10-01 (EC)
 *        Measure normalized change in model between iterations (dchisq)
+*     2010-05-14 (EC)
+*        Modified initialization of dark squids, remove means.
 *     {enter_further_changes_here}
 
 *  Copyright:
