@@ -399,12 +399,9 @@ itcl::class gaia::GaiaNDAccess {
    #  first three must be significant). The address of an array info structure
    #  is returned (query using getinfo).
    public method getimage {axis index trunc {component "DATA"}} {
-
-      puts "$axis, $index, $trunc, $component"
-
       if { $addr_($component) != 0 } {
+
          set dims [getdims $trunc]
-         puts "dims = $dims"
          return [eval "array::getimage $addr_($component) \
                           $dims $axis $index $cnfmap_"]
       }
