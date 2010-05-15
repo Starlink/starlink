@@ -653,8 +653,10 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
 
               /* dark squids */
               if( da ) {
-                memcpy( &(da->dksquid[tchunk*ncol]), refdata->da->dksquid,
-                        reftlen*ncol*sizeof(*(da->dksquid)) );
+                if (refdata->da) {
+                  memcpy( &(da->dksquid[tchunk*ncol]), refdata->da->dksquid,
+                          reftlen*ncol*sizeof(*(da->dksquid)) );
+                }
               }
 
               /* Now do DATA/QUALITY/VARIANCE */
