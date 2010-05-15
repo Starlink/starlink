@@ -273,6 +273,8 @@
 *        Write MJD to shortmaps
 *     2010-05-12 (EC):
 *        Add support for collapsed quality for COM model exportation.
+*     2010-05-14 (TIMJ):
+*        Added map dimensions to smfDIMMData so set them
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -408,6 +410,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   char modelnames[SMF_MODEL_MAX*4]; /* Array of all model components names */
   smf_modeltype *modeltyps=NULL;/* Array of model types */
   smf_calcmodelptr modelptr=NULL; /* Pointer to current model calc function */
+  dim_t mdims[2];               /* Dimensions of map */
   dim_t msize;                  /* Number of elements in map */
   char name[GRP__SZNAM+1];      /* Buffer for storing exported model names */
   dim_t nbolo;                  /* Number of bolometers */
@@ -468,8 +471,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
            status);
   }
 
-  msize = (dim_t) (ubnd_out[0]-lbnd_out[0]+1) *
-    (dim_t) (ubnd_out[1]-lbnd_out[1]+1);
+  mdims[0] = ubnd_out[0] - lbnd_out[0] + 1;
+  mdims[1] = ubnd_out[1] - lbnd_out[1] + 1;
+  msize = mdims[0] * mdims[1];
 
   /* Get size of the input group */
   isize = grpGrpsz( igrp, status );
@@ -1089,6 +1093,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       dat.mapqual = thisqual;
       dat.mapvar = thisvar;
       dat.mapweight = thisweight;
+      dat.mdims[0] = mdims[0];
+      dat.mdims[1] = mdims[1];
       dat.msize = msize;
       dat.chisquared = chisquared;
       if( havenoi ) {

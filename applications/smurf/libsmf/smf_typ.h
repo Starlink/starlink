@@ -564,6 +564,7 @@ typedef struct smfDIMMData {
   unsigned char *mapqual;    /* pointer to the current map quality */
   double *mapvar;            /* pointer to the current map variance estimate */
   double *mapweight;         /* pointer to the current map weight */
+  dim_t mdims[2];            /* dimensions of map */
   dim_t msize;               /* number of elements in map */
   double *chisquared;        /* total chisquared at each chunk */
 } smfDIMMData;
