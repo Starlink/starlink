@@ -55,9 +55,12 @@
 *        Avoid overwriting reference header if it is the same as the model.
 *     2010-05-12 (EC):
 *        COM converted to 3d model from 1d (but with length 1 spatial axes)
+*     2010-05-14 (TIMJ):
+*        Added SMF__PLN
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     Copyright (C) 2008-2010 University of British Columbia.
 *     All Rights Reserved.
 
@@ -181,6 +184,10 @@ void smf_model_createHdr( smfData *model, smf_modeltype type,
       break;
 
     case SMF__FLT:
+      fset = astCopy( refwcs );
+      break;
+
+    case SMF__PLN:
       fset = astCopy( refwcs );
       break;
 

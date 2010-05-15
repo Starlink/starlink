@@ -47,9 +47,12 @@
 *        Fixed up warnings caused by incorrect return type
 *     2009-03-12 (EC):
 *        Added SMF__FLT
+*     2010-05-13 (TIMJ):
+*        Added SMF__PLN
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     Copyright (C) 2007-2009 University of British Columbia.
 *     All Rights Reserved.
 
@@ -121,6 +124,10 @@ smf_calcmodelptr smf_model_getptr( smf_modeltype type, int *status) {
 
   case SMF__FLT:
     retval = (smf_calcmodelptr) &smf_calcmodel_flt;
+    break;
+
+  case SMF__PLN:
+    retval = (smf_calcmodelptr) &smf_calcmodel_pln;
     break;
 
   default:

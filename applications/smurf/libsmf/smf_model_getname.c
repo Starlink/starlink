@@ -49,9 +49,12 @@
 *        Return const
 *     2009-03-12 (EC):
 *        Added SMF__FLT
+*     2010-05-13 (TIMJ):
+*        Added SMF__PLN
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     Copyright (C) 2006-2009 Particle Physics and Astronomy Research Council.
 *     University of British Columbia.
 *     All Rights Reserved.
@@ -147,6 +150,10 @@ const char *smf_model_getname( smf_modeltype type, int *status ) {
 
   case SMF__FLT:
     retval = "flt";
+    break;
+
+  case SMF__PLN:
+    retval = "pln";
     break;
 
   default:

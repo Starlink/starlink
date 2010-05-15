@@ -152,3 +152,7 @@ noi.dcmedianwidth = 40
 noi.fillgaps = 1
 noi.spikethresh = 0
 noi.spikeiter = 0
+
+# Plane fitting
+
+pln.notfirst = 0

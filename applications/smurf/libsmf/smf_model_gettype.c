@@ -28,6 +28,7 @@
 
 *  Authors:
 *     Edward Chapin (UBC)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -39,9 +40,12 @@
 *        Added QUA/LUT
 *     2009-03-12 (EC):
 *        Added SMF__FLT
+*     2010-05-13 (TIMJ):
+*        Added SMF__PLN
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2007-2009 University of British Columbia.
 *     All Rights Reserved.
@@ -124,6 +128,8 @@ smf_modeltype smf_model_gettype( const char *modelname, int *status ) {
     return SMF__GAI;
   } else if( strncmp( tempstring, "FLT", 3 ) == 0 ) {
     return SMF__FLT;
+  } else if( strncmp( tempstring, "PLN", 3 ) == 0 ) {
+    return SMF__PLN;
   } else {
     *status = SAI__ERROR;
     msgSetc("MNAME",modelname);

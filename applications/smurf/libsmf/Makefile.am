@@ -41,6 +41,7 @@ smf_calcmodel_ext.c \
 smf_calcmodel_flt.c \
 smf_calcmodel_gai.c \
 smf_calcmodel_noi.c \
+smf_calcmodel_pln.c \
 smf_check_detpos.c \
 smf_check_flat.c \
 smf_check_quality.c \
@@ -294,6 +295,7 @@ smf_subtract_dark.c \
 smf_subtract_plane.c \
 smf_subtract_plane1.c \
 smf_subtract_plane2.c \
+smf_subtract_plane3.c \
 smf_subtract_poly.c \
 smf_summarize_obs.c \
 smf_swmode_str.c \

@@ -536,6 +536,10 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
                         AstKeyMap *keymap, smfArray **allmodel, int flags,
                         int *status);
 
+void smf_calcmodel_pln( smfWorkForce *wf, smfDIMMData *dat, int chunk,
+                        AstKeyMap *keymap, smfArray **allmodel, int flags,
+                        int *status );
+
 int smf_check_detpos( smfData *data, int report, int *status );
 
 void smf_check_flat ( const smfData *data, int *status );
@@ -1430,6 +1434,10 @@ void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
 
 void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
                           int *status);
+
+void smf_subtract_plane3( smfWorkForce *wf, smfData *data,
+                          unsigned char *quality, const dim_t mdims[],
+                          const int lut[], int * status );
 
 void smf_subtract_poly( smfData *data, unsigned char *quality, int rel,
                         int *status );

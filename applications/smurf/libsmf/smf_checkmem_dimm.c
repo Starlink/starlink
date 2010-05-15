@@ -210,6 +210,9 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
         case SMF__FLT:
           total += nsamp*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
           break;
+        case SMF__PLN:
+          total += nsamp*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
+          break;
         case SMF__AST:
           /* Already accounted for as static memory usage above */
           break;

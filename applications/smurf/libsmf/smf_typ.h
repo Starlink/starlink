@@ -247,7 +247,8 @@ typedef enum smf_modeltype {
   SMF__QUA=8,             /* Quality flags */
   SMF__DKS=9,             /* Dark squid signals */
   SMF__GAI=10,            /* Relative Gain/Offset for each bolometer */
-  SMF__FLT=11             /* Frequency domain filter */
+  SMF__FLT=11,            /* Frequency domain filter */
+  SMF__PLN=12             /* Spatial plane removal */
 } smf_modeltype;
 
 /* Observing mode and type */

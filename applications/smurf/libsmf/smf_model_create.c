@@ -184,6 +184,8 @@
 *        and we ensure all keys have corresponding defaults.
 *     2010-05-12 (EC):
 *        Convert COM to 3d from 1d (but spatial axes have length 1)
+*     2010-05-13 (TIMJ):
+*        Add spatial plane fitting model
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -685,7 +687,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
           case SMF__FLT: /* Frequency domain filter */
             /* We will use a frequency domain filter to remove noise, but
                store what we removed with a time-domain representation for
-               easy visualization */
+               easy visualization. */
             head.data.dtype = SMF__DOUBLE;
             head.data.ndims = 3;
             for( k=0; k<3; k++ ) {
@@ -698,6 +700,25 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
                                idata->hdr->units, &head.hdr, status );
             }
             break;
+
+          case SMF__PLN: /* Spatial plane fitting */
+            /* Fit a plane to each time slice. Have a choice of
+               storing the fit itself in the model or else storing
+               the coefficients of the fit. Start with the easy
+               to visualise but memory-hungry case. */
+            head.data.dtype = SMF__DOUBLE;
+            head.data.ndims = 3;
+            for( k=0; k<3; k++ ) {
+              head.data.dims[k] = (idata->dims)[k];
+              head.data.lbnd[k] = (idata->lbnd)[k];
+            }
+
+            if (idata && idata->hdr) {
+              smf_set_clabels( "Fitted plane", "Signal",
+                               idata->hdr->units, &head.hdr, status );
+            }
+            break;
+
 
           default:
             *status = SAI__ERROR;
