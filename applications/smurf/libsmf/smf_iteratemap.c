@@ -1172,10 +1172,6 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
               msgOutif(MSG__VERB," ", "  update quality", status);
               smf_update_quality( data, qua_data, 1, NULL, badfrac, status );
 
-              /* initialize quality report */
-              smf_qualstats_report( qua[i], qcount_last, qcount_new,
-                                    1, status );
-
               if( baseorder >= 0 ) {
                 msgOutif(MSG__VERB," ", "  fit polynomial baselines", status);
                 smf_scanfit( data, qua_data, baseorder, status );
@@ -1234,9 +1230,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
               }
             }
 
-            /* report again after pre-processing to see what it did */
+            /* initial quality report */
             smf_qualstats_report( qua[i], qcount_last, qcount_new,
-                                  0, status );
+                                  1, status );
 
             /*** TIMER ***/
             msgOutiff( MSG__DEBUG, "", FUNC_NAME
