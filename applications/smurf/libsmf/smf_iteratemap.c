@@ -1443,7 +1443,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                 smf_get_dims( res[0]->sdata[0], NULL, NULL, NULL, &ntslice,
                               NULL, NULL, NULL, status );
 
-                atlPtfti( fitschan, "SEQEND", allState[ntslice].rts_num,
+                atlPtfti( fitschan, "SEQEND", allState[ntslice-1].rts_num,
                           "RTS index number of last frame", status );
 
                 kpgPtfts( imapdata->file->ndfid, fitschan, status );
