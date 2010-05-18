@@ -789,6 +789,10 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     return;
   }
 
+  /* Assert bolo-ordered data */
+  smf_model_dataOrder( dat, NULL, chunk, SMF__RES|SMF__QUA|SMF__GAI|SMF__NOI, 0,
+                       status );
+
   /* Obtain pointers to relevant smfArrays for this chunk */
   res = dat->res[chunk];
   qua = dat->qua[chunk];
@@ -813,15 +817,6 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     }
   }
   if(dat->noi) noi = dat->noi[chunk];
-
-
-  /* Assert bolo-ordered data */
-  for( idx=0; idx<res->ndat; idx++ ) if (*status == SAI__OK ) {
-    smf_dataOrder( res->sdata[idx], 0, status );
-    smf_dataOrder( qua->sdata[idx], 0, status );
-    if(gai) smf_dataOrder( gai->sdata[idx], 0, status );
-  }
-
 
   /* The common mode signal is stored as a single 1d vector for all 4
      subarrays.  The corresponding smfData is at position 0 in the

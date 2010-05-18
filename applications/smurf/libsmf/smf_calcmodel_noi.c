@@ -177,16 +177,13 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   /* Obtain pointer to sub-keymap containing NOI parameters */
   astMapGet0A( keymap, "NOI", &kmap );
 
+  /* Assert bolo-ordered data */
+  smf_model_dataOrder( dat, allmodel, chunk, SMF__RES|SMF__QUA, 0, status );
+
   /* Obtain pointers to relevant smfArrays for this chunk */
   res = dat->res[chunk];
   qua = dat->qua[chunk];
   model = allmodel[chunk];
-
-  /* Assert bolo-ordered data */
-  for( idx=0; idx<res->ndat; idx++ ) if (*status == SAI__OK ) {
-    smf_dataOrder( res->sdata[idx], 0, status );
-    smf_dataOrder( qua->sdata[idx], 0, status );
-  }
 
   /* Obtain parameters for NOI */
   if( kmap ) {

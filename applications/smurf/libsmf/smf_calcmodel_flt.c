@@ -151,6 +151,9 @@ void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     return;
   }
 
+  /* Assert bolo-ordered data */
+  smf_model_dataOrder( dat, allmodel, chunk, SMF__RES|SMF__QUA|SMF__NOI, 0, status );
+
   /* Obtain pointers to relevant smfArrays for this chunk */
   res = dat->res[chunk];
   qua = dat->qua[chunk];
@@ -163,13 +166,6 @@ void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     model_data_copy = smf_malloc( ndata, sizeof(*model_data_copy), 1, status);
   }
   model = allmodel[chunk];
-
-  /* Assert bolo-ordered data */
-  for( idx=0; idx<res->ndat; idx++ ) if (*status == SAI__OK ) {
-    smf_dataOrder( res->sdata[idx], 0, status );
-    smf_dataOrder( qua->sdata[idx], 0, status );
-    smf_dataOrder( model->sdata[idx], 0, status );
-  }
 
   /* Loop over index in subgrp (subarray) and put the previous iteration
      of the filtered component back into the residual before calculating

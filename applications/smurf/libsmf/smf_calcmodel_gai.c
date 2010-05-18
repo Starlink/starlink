@@ -157,6 +157,9 @@ void smf_calcmodel_gai( smfWorkForce *wf __attribute__((unused)),
   if (kmap) kmap = astAnnul( kmap );
   if (*status != SAI__OK) return;
 
+  /* Ensure everything is in bolo-order */
+  smf_model_dataOrder( dat, allmodel, chunk, SMF__RES|SMF__QUA|SMF__NOI, 0, status );
+
   /* Obtain pointers to relevant smfArrays for this chunk */
   res = dat->res[chunk];
   qua = dat->qua[chunk];
@@ -165,11 +168,6 @@ void smf_calcmodel_gai( smfWorkForce *wf __attribute__((unused)),
 
   /* Loop over index in subgrp (subarray) */
   for( idx=0; idx<res->ndat; idx++ ) {
-
-    /* Ensure everything is in bolo-order */
-    smf_dataOrder( res->sdata[idx], 0, status );
-    smf_dataOrder( qua->sdata[idx], 0, status );
-    smf_dataOrder( model->sdata[idx], 0, status );
 
     /* Get pointers to DATA components */
     res_data = (res->sdata[idx]->pntr)[0];

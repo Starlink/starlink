@@ -119,19 +119,16 @@ void smf_calcmodel_ext( smfWorkForce *wf __attribute__((unused)),
   qua = dat->qua[chunk];
   model = allmodel[chunk];
 
+  /* Ensure everything is in bolo-order */
+  smf_model_dataOrder( dat, allmodel, chunk, SMF__RES|SMF__QUA, 0, status);
+
   /* Loop over index in subgrp (subarray) */
   for( idx=0; idx<res->ndat; idx++ ) {
-
-    /* Ensure everything is in bolo-order */
-    smf_dataOrder( res->sdata[idx], 0, status );
-    smf_dataOrder( qua->sdata[idx], 0, status );
-    smf_dataOrder( model->sdata[idx], 0, status );
 
     /* Get pointers to DATA components */
     res_data = (res->sdata[idx]->pntr)[0];
     qua_data = (qua->sdata[idx]->pntr)[0];
     model_data = (model->sdata[idx]->pntr)[0];
-
 
     if( (res_data == NULL) || (model_data == NULL) || (qua_data == NULL) ) {
       *status = SAI__ERROR;

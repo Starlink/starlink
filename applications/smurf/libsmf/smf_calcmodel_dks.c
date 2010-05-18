@@ -151,6 +151,9 @@ void smf_calcmodel_dks( smfWorkForce *wf __attribute__((unused)),
     kmap = NULL;
   }
 
+  /* Assert bolo-ordered data */
+  smf_model_dataOrder( dat, NULL, chunk, SMF__RES|SMF__QUA|SMF__NOI, 0, status );
+
   /* Obtain pointers to relevant smfArrays for this chunk */
   res = dat->res[chunk];
   qua = dat->qua[chunk];
@@ -173,12 +176,6 @@ void smf_calcmodel_dks( smfWorkForce *wf __attribute__((unused)),
       errRep("", FUNC_NAME ": DKS.BOXCAR in config file (^BOX) must be >= 0.",
              status);
     }
-  }
-
-  /* Assert bolo-ordered data */
-  for( idx=0; (*status==SAI__OK)&&(idx<res->ndat); idx++ ) {
-    smf_dataOrder( res->sdata[idx], 0, status );
-    smf_dataOrder( qua->sdata[idx], 0, status );
   }
 
   /* Loop over index in subgrp (subarray) */
