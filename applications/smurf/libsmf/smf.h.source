@@ -1143,6 +1143,10 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
 void smf_model_createHdr( smfData *model, smf_modeltype type,
                           smfHead *refhdr, int *status );
 
+void
+smf_model_dataOrder( smfDIMMData *dat, smfArray ** allmodel, int chunk, smf_modeltype toOrder,
+                     int isTordered, int * status );
+
 const char *smf_model_getname( smf_modeltype type, int *status);
 
 smf_calcmodelptr smf_model_getptr( smf_modeltype type, int *status);

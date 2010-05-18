@@ -222,6 +222,7 @@ smf_maskacsis.c \
 smf_median_smooth.c \
 smf_model_create.c \
 smf_model_createHdr.c \
+smf_model_dataOrder.c \
 smf_model_getname.c \
 smf_model_getptr.c \
 smf_model_gettype.c \

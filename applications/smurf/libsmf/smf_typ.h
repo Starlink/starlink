@@ -234,21 +234,22 @@ typedef enum smf_dtype {
   SMF__UBYTE
 } smf_dtype;
 
-/* Different types of model components used by iterative map-maker */
+/* Different types of model components used by iterative map-maker. These are
+   powers of 2 so they can be used in bit masks. */
 typedef enum smf_modeltype {
-  SMF__NUL=0,             /* Null model */
-  SMF__CUM=1,             /* Cumulative time-stream model */
-  SMF__RES=2,             /* Residual time-stream signal */
-  SMF__AST=3,             /* Astronomical time-stream signal */
-  SMF__COM=4,             /* Common-mode signal */
-  SMF__NOI=5,             /* Noise model */
-  SMF__EXT=6,             /* Extinction correction */
-  SMF__LUT=7,             /* Pointing LUT */
-  SMF__QUA=8,             /* Quality flags */
-  SMF__DKS=9,             /* Dark squid signals */
-  SMF__GAI=10,            /* Relative Gain/Offset for each bolometer */
-  SMF__FLT=11,            /* Frequency domain filter */
-  SMF__PLN=12             /* Spatial plane removal */
+  SMF__NUL=0,               /* Null model */
+  SMF__CUM=1,               /* Cumulative time-stream model */
+  SMF__RES=2,               /* Residual time-stream signal */
+  SMF__AST=4,               /* Astronomical time-stream signal */
+  SMF__COM=8,               /* Common-mode signal */
+  SMF__NOI=16,              /* Noise model */
+  SMF__EXT=32,              /* Extinction correction */
+  SMF__LUT=64,              /* Pointing LUT */
+  SMF__QUA=128,             /* Quality flags */
+  SMF__DKS=256,             /* Dark squid signals */
+  SMF__GAI=512,             /* Relative Gain/Offset for each bolometer */
+  SMF__FLT=1024,            /* Frequency domain filter */
+  SMF__PLN=2048             /* Spatial plane removal */
 } smf_modeltype;
 
 /* Observing mode and type */
