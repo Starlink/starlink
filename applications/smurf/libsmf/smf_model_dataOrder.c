@@ -45,8 +45,7 @@
 *     {enter_new_authors_here}
 
 *  Notes:
-*     - Currently allows reordering of "ext", "res", "noi", "qua" and "lut".
-*     - The "gai" model is not modified by this routine.
+*     - Currently allows reordering of "ext", "res", "noi", "qua", "gai" and "lut".
 
 *  History:
 *     2010-05-17 (TIMJ):
@@ -117,6 +116,7 @@ smf_model_dataOrder( smfDIMMData *dat, smfArray ** allmodel, int chunk, smf_mode
   }
 
   if ( toOrder & SMF__EXT ) REORDER( "ext", dat->ext[chunk] );
+  if ( toOrder & SMF__GAI ) REORDER( "gai", dat->res[chunk] );
   if ( toOrder & SMF__RES ) REORDER( "res", dat->res[chunk] );
   if ( toOrder & SMF__NOI ) REORDER( "noi", dat->noi[chunk] );
   if ( toOrder & SMF__QUA ) REORDER( "qua", dat->qua[chunk] );
