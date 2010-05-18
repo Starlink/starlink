@@ -66,13 +66,16 @@
 *        start and end of the block are insufficiently different.
 *        - Extract median filtering code into another routine.
 *     13-MAY-2010 (DSB):
-*        - The RMS value in the gradient array could be badly affected 
+*        - The RMS value in the gradient array could be badly affected
 *        by very large steps. So do three 3*sigma rejection iterations
 *        to make the rms more robust.
-*        - Replace incorrect "break" with "continue". This could 
-*        cause the whole function to return early if a bolometer 
+*        - Replace incorrect "break" with "continue". This could
+*        cause the whole function to return early if a bolometer
 *        with too few usable values was found.
-*        - Correct counting of rejected bolometers (returned in *nsteps). 
+*        - Correct counting of rejected bolometers (returned in *nsteps).
+*     18-MAY-2010 (DSB):
+*        Ensure the first and last DCMEDIANWIDTH samples in each bolometer
+*        are continuous with the intermediate data.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -116,7 +119,6 @@
 
 /* A magic unsigned value */
 #define INIT 999999999
-
 
 
 #ifdef DEBUG_STEPS
@@ -746,9 +748,18 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
                ncorr = 0;
 
 /* Otherwise, add the correction onto the original data and flag each
-   jump. Modify the corrections to have an average value of zero. */
+   jump. Modify the corrections to have an average value of zero. The
+   first and last dcmedianwidth slices have not been tested for steps,
+   so all we can do is pass them through unchanged (except for adding the
+   initial and final corrections to ensure they are continuous with the
+   corrected data). */
             } else {
                avecorr = sumcorr/ncorr;
+
+               pd = dat + base;
+               for( itime = 0; itime < itime_lo; itime++,pd++ ) {
+                  if( *pd != VAL__BADD ) *pd -= avecorr;
+               }
 
                pd = dat + base + itime_lo*tstride;
                pq = qua + base + itime_lo*tstride;
@@ -765,6 +776,10 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
 
                   pd += tstride;
                   pq += tstride;
+               }
+
+               for( ; itime < (int) ntslice; itime++,pd++ ) {
+                  if( *pd != VAL__BADD ) *pd += corr;
                }
             }
 
