@@ -7,8 +7,8 @@ C_ROUTINES =  \
               sc2fts_entry.c sc2fts_common.c \
               sc2fts_addwcs.c sc2fts_groupcoadd.c sc2fts_portimbalance.c \
               sc2fts_freqcorr.c  sc2fts_ifgmflatfield.c  sc2fts_specflatfield.c \
-              sc2fts_transcorr.c
+              sc2fts_transcorr.c fts2_ast.c
 
 
-noinst_INCLUDES = sc2fts.h sc2fts_entry.h sc2fts_par.h sc2fts_common.h
+noinst_INCLUDES = sc2fts.h sc2fts_entry.h sc2fts_par.h sc2fts_common.h fts2_ast.h
 
