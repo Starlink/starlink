@@ -275,6 +275,8 @@
 *        Add support for collapsed quality for COM model exportation.
 *     2010-05-14 (TIMJ):
 *        Added map dimensions to smfDIMMData so set them
+*     2010-05-18 (TIMJ):
+*        Ensure that the LUT is ordered in the same way as the AST model
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -1332,6 +1334,10 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                  status);
 
           if( *status == SAI__OK ) {
+
+            /* Ensure we use the AST model ordering */
+            smf_model_dataOrder( &dat, NULL, i, SMF__RES|SMF__LUT|SMF__QUA,
+                                 ast[i]->sdata[0]->isTordered, status );
 
             /* Loop over subgroup index (subarray) */
             for( idx=0; idx<res[i]->ndat; idx++ ) {

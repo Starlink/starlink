@@ -80,6 +80,8 @@
 *     2010-05-04 (TIMJ):
 *        Simplify KeyMap access. We now trigger an error if a key is missing
 *        and we ensure all keys have corresponding defaults.
+*     2010-05-18 (TIMJ):
+*        Ensure that all models have the same ordering.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -225,12 +227,12 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)), smfDIMMData *d
     }
   }
 
+  /* Ensure everything is in the same data order */
+  smf_model_dataOrder( dat, allmodel, chunk, SMF__LUT|SMF__RES|SMF__QUA|SMF__NOI,
+                       lut->sdata[0]->isTordered, status );
+
   /* Loop over index in subgrp (subarray) */
   for( idx=0; idx<res->ndat; idx++ ) {
-
-    /* Ensure everything is in the same data order */
-    smf_dataOrder( res->sdata[idx], lut->sdata[idx]->isTordered, status );
-    smf_dataOrder( qua->sdata[idx], lut->sdata[idx]->isTordered, status );
 
     /* Get pointers to DATA components */
     res_data = (res->sdata[idx]->pntr)[0];
