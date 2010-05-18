@@ -133,18 +133,14 @@ void smf_calcmodel_pln( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   qua = dat->qua[chunk];
   lut = dat->lut[chunk];
 
+  /* Assert ICD-ordered data */
+  smf_model_dataOrder( dat, allmodel, chunk, SMF__RES|SMF__QUA|SMF__LUT,
+                       1, status );
+
   smf_get_dims( res->sdata[0],  NULL, NULL, NULL, NULL,
                 &ndata, NULL, NULL, status);
 
   model = allmodel[chunk];
-
-  /* Assert ICD-ordered data */
-  for( idx=0; idx<res->ndat; idx++ ) if (*status == SAI__OK ) {
-    smf_dataOrder( res->sdata[idx], 1, status );
-    smf_dataOrder( qua->sdata[idx], 1, status );
-    smf_dataOrder( model->sdata[idx], 1, status );
-    smf_dataOrder( lut->sdata[idx], 1, status );
-  }
 
   /* Loop over index in subgrp (subarray) and put the previous iteration
      of the filtered component back into the residual before calculating
