@@ -60,21 +60,23 @@
 *-
 */
 
-/* Standard includes */
+// Standard includes
 #include <math.h>
 
-/* STARLINK includes */
+// STARLINK includes
 #include "ast.h"
 #include "star/grp.h"
 
+#include "fts2_ast.h"
+
 void sc2fts_groupcoadd
 (
-Grp *igrp,
-Grp* ogrp,
-AstKeyMap* parKeymap,
-int *status          /* global status (given and returned) */
+  Grp *igrp,
+  Grp* ogrp,
+  AstKeyMap* parKeymap,
+  int *status                 // global status (given and returned)
 )
 {
-   printf("GroupCoAdd operation!\n");
-   if(parKeymap != NULL) astShow(parKeymap);
+  printf("OPERATION: GROUPCOADD...!\n");
+  if(parKeymap != NULL) astShow(parKeymap);
 }

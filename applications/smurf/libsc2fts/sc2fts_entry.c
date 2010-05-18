@@ -53,12 +53,13 @@
 *     {note_any_bugs_here}
 *-
 */
-/* standard C includes */
+
+// standard C includes
 #include <string.h>
 #include <stddef.h>
 #include <stdlib.h>
 
-/* STARLINK includes */
+// STARLINK includes
 #include "ast.h"
 #include "mers.h"
 #include "par.h"
@@ -71,57 +72,62 @@
 #include "star/grp.h"
 #include "star/kaplibs.h"
 
-/* SC2FTS includes */
+// SC2FTS includes
+#include "sc2fts.h"
 #include "sc2fts_par.h"
 #include "sc2fts_entry.h"
 
 #define FUNC_NAME "sc2fts_entry"
 
-/* define all fts-2-related calibration operations */
+/*
+ * Define all FTS-2 related calibration operations
+ */
 const struct sc2fts_fun sc2fts_cal[] =
 {
-  { "IFGMFLATFIELD", sc2fts_ifgmflatfield },  /* keywords:  */
-  { "ADDWCS",        sc2fts_addwcs },         /* keywords: none */
-  { "FREQCORR",      sc2fts_freqcorr },       /* keywords: theta */
-  { "PORTIMBALANCE", sc2fts_portimbalance },  /* keywords:  */
-  { "TRANSCORR",     sc2fts_transcorr },      /* keywords: tau, am, pwv */
-  { "SPECFLATFIELD", sc2fts_specflatfield },  /* keywords: resp */
-  { "GROUPCOADD",    sc2fts_groupcoadd }      /* keywords:  */
+  { "IFGMFLATFIELD", sc2fts_ifgmflatfield },  // keywords:
+  { "ADDWCS",        sc2fts_addwcs },         // keywords: none
+  { "FREQCORR",      sc2fts_freqcorr },       // keywords: theta
+  { "PORTIMBALANCE", sc2fts_portimbalance },  // keywords:  */
+  { "TRANSCORR",     sc2fts_transcorr },      // keywords: tau, am, pwv
+  { "SPECFLATFIELD", sc2fts_specflatfield },  // keywords: resp
+  { "GROUPCOADD",    sc2fts_groupcoadd }      // keywords:
 };
 
-/* the main entry to FTS-2 data reduction operation */
+/*
+ * The main entry to FTS-2 data reduction operation
+ */
 void sc2fts_entry ( int *status )         /* status: global status (given and returned) */
 {
-  /* local variables */
+  // Local variables
   int i;
-  int indf;                            /* NDF identifier of input file */
-  int ondf;                            /* NDF identifier of output file */
-  Grp *igrp = NULL;                    /* Group of input files */
-  Grp *ogrp = NULL;                    /* Group of output files */
-  Grp *parsgrp = NULL;                 /* Group containing parameters for each operation */
-  AstKeyMap *parsKeymap = NULL;        /* KeyMap of PARSLIST */
-  AstKeyMap *subParsKeymap = NULL;     /* KeyMap for each operation */
-  size_t ksize = 0;                   /* Number of items in a group */
-  char iname[GRP__SZNAM+1];           /* name of input file */
-  char oname[GRP__SZNAM+1];           /* name of output file */
-  char *pname = NULL;                  /* pointer to file name */
+  int indf;                            // NDF identifier of input file
+  int ondf;                            // NDF identifier of output file
+  Grp *igrp = NULL;                    // Group of input files
+  Grp *ogrp = NULL;                    // Group of output files
+  Grp *parsgrp = NULL;                 // Group containing parameters for each operation
+  AstKeyMap *parsKeymap = NULL;        // KeyMap of PARSLIST
+  AstKeyMap *subParsKeymap = NULL;     // KeyMap for each operation
+  size_t ksize = 0;                    // Number of items in a group
+  char iname[GRP__SZNAM+1];            // name of input file
+  char oname[GRP__SZNAM+1];            // name of output file
+  char *pname = NULL;                  // pointer to file name
 
-  /* Get group of input files */
+  // Get group of input files
   kpg1Gtgrp ( "IN", &igrp, &ksize, status );
 
-  /* Get group of output files */
+  // Get group of output files
   kpg1Gtgrp( "OUT",  &ogrp, &ksize, status );
 
-  /* Get the value for PARSLIST */
+  // Get the value for PARSLIST
   kpg1Gtgrp( "PARSLIST", &parsgrp, &ksize, status );
 
-  /* convert the value from Grp into Keymap */
+  // Convert the value from Grp into Keymap
   kpg1Kymap( parsgrp, &parsKeymap, status );
 
-  /* delete parsgrp */
+  // Delete parsgrp
   if( parsgrp ) grpDelet( &parsgrp, status );
 
-  /* Calibration Operations for FTS-2 */
+  // Calibration Operations for FTS-2
   if(astMapHasKey(parsKeymap, "GROUPCOADD") == 0) /* other operations but GROUPCOADD */
   {
     pname = iname;
@@ -133,43 +139,51 @@ void sc2fts_entry ( int *status )         /* status: global status (given and re
                                    * populate the output file with data from input file
                                    */
     {
-      /* start of NDF */
+      // BEGIN NDF
       ndfBegin();
 
-      /* Open the input file solely to propagate it to the output file */
+      // Open the input file solely to propagate it to the output file
       ndgNdfas( igrp, 1, "READ", &indf, status );
-      /* We want QUALITY too if it's available */
+
+      // We want QUALITY too if it's available
       ndgNdfpr( indf, "DATA,WCS,QUALITY", ogrp, 1, &ondf, status );
+
       ndfAnnul( &indf, status );
 
-      /* Close output file */
+      // Close output file
       ndfAnnul( &ondf, status );
 
-      /* end of NDF */
+      // END NDF
       ndfEnd( status );
     }
   }
 
-  for( i=0; i<sizeof(sc2fts_cal)/sizeof(sc2fts_cal[0]); i++ )
+  for( i = 0; i < sizeof(sc2fts_cal) / sizeof(sc2fts_cal[0]); i++ )
   {
-    /* the key/value pair in parsKeymap: op.key=value
-     * astMapGet0A will get a Keymap for an operation
-     */
+    // The key/value pair in parsKeymap: op.key=value
+    // astMapGet0A will get a Keymap for an operation
     if( astMapHasKey( parsKeymap, sc2fts_cal[i].name ) !=0 )
     {
-      if( astMapType( parsKeymap, sc2fts_cal[i].name ) == AST__OBJECTTYPE ) /* use user-defined values for parameters */
+      if( astMapType( parsKeymap, sc2fts_cal[i].name ) == AST__OBJECTTYPE ) // Use user-defined values for parameters
       {
         astMapGet0A( parsKeymap, sc2fts_cal[i].name, &subParsKeymap );
         (*(sc2fts_cal[i].op))( igrp, ogrp, subParsKeymap, status );
       }
-      else /* use default values for parameters */
+      else // use default values for parameters
       {
         (*(sc2fts_cal[i].op))( igrp, ogrp, NULL, status );
       }
     }
   }
 
-  if( igrp != NULL ) grpDelet( &igrp, status);
-  if( ogrp != NULL ) grpDelet( &ogrp, status);
-  printf("Implementation is under construction! \n");
+  if( igrp != NULL )
+  {
+    grpDelet( &igrp, status);
+  }
+  if( ogrp != NULL )
+  {
+    grpDelet( &ogrp, status);
+  }
+
+  printf("FTS2DR: Implementation is under construction! \n");
 }
