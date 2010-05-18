@@ -61,6 +61,9 @@
 *  History:
 *     25-MAR-2010 (DSB):
 *        Original version.
+*     18-MAY-2010 (DSB):
+*        Fix buffer over-run caused by incorrect value for ihi that sets
+*        the end of the main iout loop.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -170,7 +173,7 @@ void smf_median_smooth( dim_t box, dim_t el, const double *dat,
 /* Loop round the rest of the output array, stopping just before the
    final half box. "iout" gives the index of the centre element in the box,
    or the element just above centre if "box" is even. */
-   ihi = el - ( box - 1 )/2;
+   ihi = el - ( box + 1 )/2;
    for( ; iout < ihi; iout++ ) {
 
 /* Store the median value of the current box in the output array. If the
