@@ -57,6 +57,8 @@
 *        COM converted to 3d model from 1d (but with length 1 spatial axes)
 *     2010-05-14 (TIMJ):
 *        Added SMF__PLN
+*     2010-05-18 (EC):
+*        Write model type (3 characters) to FITS header "SMFMODEL"
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -92,6 +94,7 @@
 #include "prm_par.h"
 #include "par_par.h"
 #include "ast.h"
+#include "star/atl.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
@@ -102,6 +105,7 @@ void smf_model_createHdr( smfData *model, smf_modeltype type,
                           smfHead *refhdr, int *status ) {
 
   /* Local Variables */
+  AstFitsChan *fits=NULL;       /* New FITS header */
   AstFrameSet *fset=NULL;       /* the returned framset */
   AstFitsChan *reffits=NULL;    /* Reference FITS header */
   AstFrameSet *refwcs=NULL;     /* Reference time series WCS */
@@ -239,6 +243,13 @@ void smf_model_createHdr( smfData *model, smf_modeltype type,
       errRep( "", FUNC_NAME ": Ast error creating FITS header for ^MODEL",
               status);
     }
+  }
+
+  /* Add the model name to the FITS header */
+  fits = model->hdr->fitshdr;
+  if( fits ) {
+    atlPtfts( fits, "SMFMODEL", smf_model_getname(type,status),
+              "SMURF Iterative model component", status );
   }
 
   /* Propagate JCMTState */
