@@ -55,8 +55,6 @@
 #include "sc2store.h"
 
 /* Private functions */
-static AstFrameSet *timeWcs( int subnum, int ntime,const SC2STORETelpar* telpar,
-                             const double times[], int * status );
 static double sc2store_tzoffset(void);
 static void sc2store_initialise ( int *status );
 static void sc2store_fillbounds( size_t colsize, size_t rowsize, size_t dim3,
@@ -3464,8 +3462,8 @@ int *status                 /* global status (given and returned) */
 
 /* And create a convenience frameset for focal plane and time coordinates */
    oldstat = astWatch( status );
-   wcs = timeWcs ( subnum, nframes, telpar, ((double*)sc2store_ptr[RTS_END]),
-     status );
+   wcs = sc2store_timeWcs ( subnum, nframes, telpar,
+                            ((double*)sc2store_ptr[RTS_END]), status );
    ndfPtwcs ( wcs, sc2store_indf, status );
    wcs = astAnnul ( wcs );
    astWatch( oldstat );
@@ -3584,21 +3582,21 @@ int *status                 /* global status (given and returned) */
   sc2store_initialised = 1;
 }
 
-/* timeWcs:  Calculate frameset for time series. */
+/*+ sc2store_timeWcs:  Calculate frameset for time series. */
 
-static
-AstFrameSet *timeWcs( int subnum, int ntime, const SC2STORETelpar* telpar,
-                      const double times[], int * status ){
+AstFrameSet *sc2store_timeWcs( int subnum, int ntime,
+                               const SC2STORETelpar* telpar,
+                               const double times[], int * status ){
 
 /*
 *  Name:
-*     timeWcs
+*     sc2store_timeWcs
 
 *  Purpose:
 *     Calculate frameset for time series.
 
 *  Prototype:
-*     AstFrameSet *timeWcs( int subnum, int ntime,
+*     AstFrameSet *sc2store_timeWcs( int subnum, int ntime,
 *                const SC2STORETelpar * telpar,const double times[],
 *                int * status );
 

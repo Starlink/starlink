@@ -341,6 +341,17 @@ int compflag,         /* value to be set, 1=>compress 0=>don't (given) */
 int *status           /* global status (given and returned) */
 );
 
+/*+ sc2store_timeWcs:  Calculate frameset for time series. */
+
+AstFrameSet *sc2store_timeWcs
+(
+int subnum,                   /* Subarray index */
+int ntime,                    /* The number of time values supplied */
+const SC2STORETelpar* telpar, /* Additional telescope information */
+const double times[],         /* ntime MJD values (TAI timescale) */
+int * status                  /* global status (given and returned) */
+ );
+
 /*+ sc2store_unmapwts - unmap and close a DREAM weights file */
 
 void sc2store_unmapwts
