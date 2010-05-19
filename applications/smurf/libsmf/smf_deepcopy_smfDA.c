@@ -121,6 +121,9 @@ smf_deepcopy_smfDA( const smfData *old, int * status ) {
   /* Retrieve smfDA to copy */
   oldda = old->da;
 
+  /* Return if smfDA is NULL */
+  if( !oldda ) return NULL;
+
   /* Copy elements */
   nflat = oldda->nflat;
   nheat = oldda->nheat;
