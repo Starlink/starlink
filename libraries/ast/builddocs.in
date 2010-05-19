@@ -114,6 +114,9 @@ rm -f .sst.tmp
    getatt ${goodsource} >c_routines.tex
    cat getatt.labels >>global_c.labels; rm -f getatt.labels
 
+   getatt memory.c > memory_routines.tex
+   cat getatt.labels >>global_c.labels; rm -f getatt.labels
+
    getatt -u -f ${goodsource} >f_commands.tex
    cat getatt.labels >>global_f.labels; rm -f getatt.labels
    getatt -u ${goodsource} >c_commands.tex
@@ -129,6 +132,7 @@ rm -f .sst.tmp
    rm -f global.labels global_f.labels global_c.labels
    rm -f c_attribs.tex c_classes.tex c_routines.tex c_commands.tex
    rm -f f_attribs.tex f_classes.tex f_routines.tex f_commands.tex
+   rm -f memory_routines.tex
 
    latex sun210; latex sun210
    latex sun211; latex sun211

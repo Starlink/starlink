@@ -44,6 +44,8 @@
 *           Create a C string from an array of characters.
 *        astStringArray
 *           Create an array of C strings from an array of characters.
+*        astStringCase
+*           Convert a string to upper or lower case.
 *        astChrLen
 *           Returns length of a string without trailing white space, etc.
 *        astSscanf
@@ -107,6 +109,8 @@
 *        Added astRemoveLeadingBlanks.
 *     22-FEB-2008 (DSB):
 *        Added astChrSub.
+*     19-MAY-2010 (DSB):
+*        Added astStringCase.
 
 *-
 */
@@ -195,6 +199,7 @@ char **astChrSplitC_( const char *, char, int *, int * );
 int astChrMatch_( const char *, const char *, int * );
 int astChrMatchN_( const char *, const char *, size_t, int * );
 char **astStringArray_( const char *, int, int, int * );
+char *astStringCase_( const char *, int, int * );
 char *astString_( const char *, int, int * );
 int astSscanf_( const char *str, const char *format, ...);
 size_t astSizeOf_( const void *, int * );
@@ -251,6 +256,7 @@ void astEndPM_( int * );
 #define astAppendString(ptr,len,text) astERROR_INVOKE(astAppendString_(ptr,len,text,STATUS_PTR))
 #define astString(chars,nchars) astERROR_INVOKE(astString_(chars,nchars,STATUS_PTR))
 #define astStringArray(chars,nel,len) astERROR_INVOKE(astStringArray_(chars,nel,len,STATUS_PTR))
+#define astStringCase(string,toupper) astERROR_INVOKE(astStringCase_(string,toupper,STATUS_PTR))
 #define astChrLen(string) astERROR_INVOKE(astChrLen_(string,STATUS_PTR))
 #define astChr2Double(string) astERROR_INVOKE(astChr2Double_(string,STATUS_PTR))
 #define astRemoveLeadingBlanks(string) astERROR_INVOKE(astRemoveLeadingBlanks_(string,STATUS_PTR))

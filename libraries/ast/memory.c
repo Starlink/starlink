@@ -118,6 +118,10 @@
 *        Added astChr2Double.
 *     25-JUN-2009 (DSB):
 *        Fix handling of escape characters in astSplitC.
+*     19-MAY-2010 (DSB):
+*        - Added astStringCase.
+*        - Changed access from protected to public for commonly used
+*        functions.
 */
 
 /* Configuration results. */
@@ -487,7 +491,7 @@ static int CompareTimers2( const void *, const void * );
 /* ========================= */
 char *astAppendString_( char *str1, int *nc, const char *str2, int *status ) {
 /*
-*+
+*++
 *  Name:
 *     astAppendString
 
@@ -495,7 +499,7 @@ char *astAppendString_( char *str1, int *nc, const char *str2, int *status ) {
 *     Append a string to another string which grows dynamically.
 
 *  Type:
-*     Protected function.
+*     Public function.
 
 *  Synopsis:
 *     #include "memory.h"
@@ -509,10 +513,10 @@ char *astAppendString_( char *str1, int *nc, const char *str2, int *status ) {
 *  Parameters:
 *     str1
 *        Pointer to the null-terminated dynamic string, whose memory
-*        has been allocated using the AST memory allocation functions
-*        defined in "memory.h". If no space has yet been allocated for
-*        this string, a NULL pointer may be given and fresh space will
-*        be allocated by this function.
+*        has been allocated using an AST memory allocation function.
+*        If no space has yet been allocated for this string, a NULL
+*        pointer may be given and fresh space will be allocated by this
+*        function.
 *     nc
 *        Pointer to an integer containing the number of characters in
 *        the dynamic string (excluding the final null). This is used
@@ -528,18 +532,19 @@ char *astAppendString_( char *str1, int *nc, const char *str2, int *status ) {
 *        is to be appended to "str1".
 
 *  Returned Value:
-*     A possibly new pointer to the dynamic string with the new string
-*     appended (its location in memory may have to change if it has to
-*     be extended, in which case the original memory is automatically
-*     freed by this function). When the string is no longer required,
-*     its memory should be freed using astFree.
+*     astAppendString()
+*        A possibly new pointer to the dynamic string with the new string
+*        appended (its location in memory may have to change if it has to
+*        be extended, in which case the original memory is automatically
+*        freed by this function). When the string is no longer required,
+*        its memory should be freed using astFree.
 
 *  Notes:
 *     - If this function is invoked with the global error status set
 *     or if it should fail for any reason, then the returned pointer
 *     will be equal to "str1" and the dynamic string contents will be
 *     unchanged.
-*-
+*--
 */
 
 /* Local Variables: */
@@ -836,7 +841,7 @@ static char *CheckTempStart( const char *template, const char *temp,
 
 double astChr2Double_( const char *str, int *status ) {
 /*
-*+
+*++
 *  Name:
 *     astChr2Double
 
@@ -844,7 +849,7 @@ double astChr2Double_( const char *str, int *status ) {
 *     read a double value from a string.
 
 *  Type:
-*     Protected function.
+*     Public function.
 
 *  Synopsis:
 *     #include "memory.h"
@@ -860,12 +865,13 @@ double astChr2Double_( const char *str, int *status ) {
 *        Pointer to the string.
 
 *  Returned Value:
-*     The double value, or AST__BAD.
+*     astChr2Double()
+*       The double value, or AST__BAD.
 
 *  Notes:
 *     -  A value of AST__BAD is returned if this function is invoked with
 *     the global error status set or if it should fail for any reason.
-*-
+*--
 */
 
 /* Local Variables: */
@@ -892,7 +898,7 @@ double astChr2Double_( const char *str, int *status ) {
 
 int astChrMatch_( const char *str1, const char *str2, int *status ) {
 /*
-*+
+*++
 *  Name:
 *     astChrMatch
 
@@ -900,7 +906,7 @@ int astChrMatch_( const char *str1, const char *str2, int *status ) {
 *     Case insensitive string comparison.
 
 *  Type:
-*     Protected function.
+*     Public function.
 
 *  Synopsis:
 *     #include "memory.h"
@@ -918,12 +924,13 @@ int astChrMatch_( const char *str1, const char *str2, int *status ) {
 *        Pointer to the second string.
 
 *  Returned Value:
-*     Non-zero if the two strings match, otherwise zero.
+*     astChrMatch()
+*        Non-zero if the two strings match, otherwise zero.
 
 *  Notes:
 *     -  A value of zero is returned if this function is invoked with the
 *     global error status set or if it should fail for any reason.
-*-
+*--
 */
 
 /* Local Variables: */
@@ -957,7 +964,7 @@ int astChrMatch_( const char *str1, const char *str2, int *status ) {
 
 int astChrMatchN_( const char *str1, const char *str2, size_t n, int *status ) {
 /*
-*+
+*++
 *  Name:
 *     astChrMatchN
 
@@ -965,7 +972,7 @@ int astChrMatchN_( const char *str1, const char *str2, size_t n, int *status ) {
 *     Case insensitive string comparison of at most N characters
 
 *  Type:
-*     Protected function.
+*     Public function.
 
 *  Synopsis:
 *     #include "memory.h"
@@ -985,12 +992,13 @@ int astChrMatchN_( const char *str1, const char *str2, size_t n, int *status ) {
 *        Maximum number of characters to compare.
 
 *  Returned Value:
-*     Non-zero if the two strings match, otherwise zero.
+*     astChrMatchN()
+*        Non-zero if the two strings match, otherwise zero.
 
 *  Notes:
 *     -  A value of zero is returned if this function is invoked with the
 *     global error status set or if it should fail for any reason.
-*-
+*--
 */
 
 /* Local Variables: */
@@ -1029,7 +1037,7 @@ int astChrMatchN_( const char *str1, const char *str2, size_t n, int *status ) {
 
 char **astChrSplit_( const char *str, int *n, int *status ) {
 /*
-*+
+*++
 *  Name:
 *     astChrSplit
 
@@ -1037,7 +1045,7 @@ char **astChrSplit_( const char *str, int *n, int *status ) {
 *     Extract words from a supplied string.
 
 *  Type:
-*     Protected function.
+*     Public function.
 
 *  Synopsis:
 *     #include "memory.h"
@@ -1054,16 +1062,17 @@ char **astChrSplit_( const char *str, int *n, int *status ) {
 *        Address of an int in which to return the number of words returned.
 
 *  Returned Value:
-*     A pointer to a dynamically allocated array containing "*n" elements.
-*     Each element is a pointer to a dynamically allocated character
-*     string containing a word extracted from the supplied string. Each
-*     of these words will have no leading or trailing white space.
+*     astChrSplit()
+*        A pointer to a dynamically allocated array containing "*n" elements.
+*        Each element is a pointer to a dynamically allocated character
+*        string containing a word extracted from the supplied string. Each
+*        of these words will have no leading or trailing white space.
 
 *  Notes:
 *     -  A NULL pointer is returned if this function is invoked with the
 *     global error status set or if it should fail for any reason, or if
 *     the supplied string contains no words.
-*-
+*--
 */
 
 /* Local Variables: */
@@ -1129,7 +1138,7 @@ char **astChrSplit_( const char *str, int *n, int *status ) {
 
 char **astChrSplitC_( const char *str, char c, int *n, int *status ) {
 /*
-*+
+*++
 *  Name:
 *     astChrSplitC
 
@@ -1137,7 +1146,7 @@ char **astChrSplitC_( const char *str, char c, int *n, int *status ) {
 *     Split a string using a specified character delimiter.
 
 *  Type:
-*     Protected function.
+*     Public function.
 
 *  Synopsis:
 *     #include "memory.h"
@@ -1162,15 +1171,16 @@ char **astChrSplitC_( const char *str, char c, int *n, int *status ) {
 *        Address of an int in which to return the number of words returned.
 
 *  Returned Value:
-*     A pointer to a dynamically allocated array containing "*n" elements.
-*     Each element is a pointer to a dynamically allocated character
-*     string containing a word extracted from the supplied string.
+*     astChrSplitC()
+*        A pointer to a dynamically allocated array containing "*n" elements.
+*        Each element is a pointer to a dynamically allocated character
+*        string containing a word extracted from the supplied string.
 
 *  Notes:
 *     -  A NULL pointer is returned if this function is invoked with the
 *     global error status set or if it should fail for any reason, or if
 *     the supplied string contains no words.
-*-
+*--
 */
 
 /* Local Variables: */
@@ -1258,7 +1268,7 @@ char **astChrSplitC_( const char *str, char c, int *n, int *status ) {
 char **astChrSplitRE_( const char *str, const char *regexp, int *n,
                        const char **matchend, int *status ) {
 /*
-*+
+*++
 *  Name:
 *     astChrSplitRE
 
@@ -1266,7 +1276,7 @@ char **astChrSplitRE_( const char *str, const char *regexp, int *n,
 *     Extract sub-strings matching a specified regular expression.
 
 *  Type:
-*     Protected function.
+*     Public function.
 
 *  Synopsis:
 *     #include "memory.h"
@@ -1298,11 +1308,12 @@ char **astChrSplitRE_( const char *str, const char *regexp, int *n,
 *        not needed.
 
 *  Returned Value:
-*     A pointer to a dynamically allocated array containing "*n" elements.
-*     Each element is a pointer to a dynamically allocated character
-*     string containing a sub-string extracted from the supplied string.
-*     The array itself, and the strings within it, should all be freed
-*     using astFree when no longer needed.
+*     astChrSplitRE()
+*        A pointer to a dynamically allocated array containing "*n" elements.
+*        Each element is a pointer to a dynamically allocated character
+*        string containing a sub-string extracted from the supplied string.
+*        The array itself, and the strings within it, should all be freed
+*        using astFree when no longer needed.
 
 *  Notes:
 *     - If a parenthesised sub-string in the regular expression is matched
@@ -1314,7 +1325,7 @@ char **astChrSplitRE_( const char *str, const char *regexp, int *n,
 *     -  A NULL pointer is returned if this function is invoked with the
 *     global error status set or if it should fail for any reason, or if
 *     the supplied string contains no words.
-*-
+*--
 */
 
 /* Local Variables: */
@@ -1558,15 +1569,16 @@ char *ChrSuber( const char *test, const char *pattern, const char *subs[],
 char *astChrSub_( const char *test, const char *pattern, const char *subs[],
                   int nsub, int *status ){
 /*
-*+
+*++
 *  Name:
-*     astChrSub
+c     astChrSub
+f     AST_CHRSUB
 
 *  Purpose:
 *     Performs substitutions on a supplied string.
 
 *  Type:
-*     Protected function.
+*     Public function.
 
 *  Synopsis:
 c     #include "memory.h"
@@ -1606,15 +1618,15 @@ f        string does not match the template, then a blank string is
 f        returned.
 
 *  Returned Value:
-*     astChrSub()
-*        A pointer to a dynamically allocated string holding the result
-*	 of the substitutions, or NULL if the test string does not match
-*	 the template string. This string should be freed using astFree
-*	 when no longer needed. If no substituions are specified then a
-*	 copy of the test string is returned if it matches the template.
+c     astChrSub()
+c        A pointer to a dynamically allocated string holding the result
+c        of the substitutions, or NULL if the test string does not match
+c        the template string. This string should be freed using astFree
+c        when no longer needed. If no substituions are specified then a
+c        copy of the test string is returned if it matches the template.
 f     AST_CHRSUB = LOGICAL
-*        .TRUE. if the test string matched the supplied template, and
-*        .FALSE. otherwise.
+f        .TRUE. if the test string matched the supplied template, and
+f        .FALSE. otherwise.
 
 *  Template Syntax:
 *     The template syntax is a minimal form of regular expression, The
@@ -1623,17 +1635,27 @@ f     AST_CHRSUB = LOGICAL
 *     that still gives an overall match to the template). The only
 *     constraints allowed are "^" and "$". The following atoms are allowed:
 *
-*     [chars]: Matches any of the specified characters.
-*     [^chars]: Matches anything but the specified characters.
-*     .: Matches any single character.
-*     x: Matches the character x so long as x has no other significance.
-*     \x: Always matches the character x (except for [dDsSwW]).
-*     \d: Matches a single digit.
-*     \D: Matches anything but a single digit.
-*     \w: Matches any alphanumeric character, and "_".
-*     \W: Matches anything but alphanumeric characters, and "_".
-*     \s: Matches white space.
-*     \S: Matches anything but white space.
+*     - [chars]: Matches any of the specified characters.
+*
+*     - [^chars]: Matches anything but the specified characters.
+*
+*     - .: Matches any single character.
+*
+*     - x: Matches the character x so long as x has no other significance.
+*
+*     - \x: Always matches the character x (except for [dDsSwW]).
+*
+*     - \d: Matches a single digit.
+*
+*     - \D: Matches anything but a single digit.
+*
+*     - \w: Matches any alphanumeric character, and "_".
+*
+*     - \W: Matches anything but alphanumeric characters, and "_".
+*
+*     - \s: Matches white space.
+*
+*     - \S: Matches anything but white space.
 *
 *     Note, minus signs ("-") within brackets have no special significance,
 *     so ranges of characters must be specified explicitly.
@@ -1670,7 +1692,7 @@ c     -  A NULL pointer is returned if this function is invoked with the
 c     global error status set or if it should fail for any reason, or if
 c     the supplied test string does not match the template.
 
-*-
+*--
 */
 
 /* Call ChrSuber to do the work, without saving the matching parts of the
@@ -1680,7 +1702,7 @@ c     the supplied test string does not match the template.
 
 void *astFree_( void *ptr, int *status ) {
 /*
-*+
+*++
 *  Name:
 *     astFree
 
@@ -1688,7 +1710,7 @@ void *astFree_( void *ptr, int *status ) {
 *     Free previously allocated memory.
 
 *  Type:
-*     Protected function.
+*     Public function.
 
 *  Synopsis:
 *     #include "memory.h"
@@ -1696,7 +1718,7 @@ void *astFree_( void *ptr, int *status ) {
 
 *  Description:
 *     This function frees memory that has previouly been dynamically
-*     allocated.
+*     allocated using one of the AST memory function.
 
 *  Parameters:
 *     ptr
@@ -1707,14 +1729,10 @@ void *astFree_( void *ptr, int *status ) {
 *        been allocated, so that no action is required.
 
 *  Returned Value:
-*     Always NULL.
+*     astFree()
+*        Always returns a NULL pointer.
 
-*  Notes:
-*     - This function is documented as protected because it should not
-*     be invoked by external code. However, it is available via the
-*     external C interface so that it may be used when writing (e.g.)
-*     foreign language or graphics interfaces.
-*-
+*--
 */
 
 /* Local Variables: */
@@ -1772,7 +1790,7 @@ void *astFree_( void *ptr, int *status ) {
 
 void *astGrow_( void *ptr, int n, size_t size, int *status ) {
 /*
-*+
+*++
 *  Name:
 *     astGrow
 
@@ -1780,7 +1798,7 @@ void *astGrow_( void *ptr, int n, size_t size, int *status ) {
 *     Allocate memory for an adjustable array.
 
 *  Type:
-*     Protected function.
+*     Public function.
 
 *  Synopsis:
 *     #include "memory.h"
@@ -1805,9 +1823,10 @@ void *astGrow_( void *ptr, int n, size_t size, int *status ) {
 *        The size of each array element.
 
 *  Returned Value:
-*     If the memory was allocated successfully, a pointer to the start
-*     of the possibly new memory region is returned (this may be the
-*     same as the original pointer).
+*     astGrow()
+*        If the memory was allocated successfully, a pointer to the start
+*        of the possibly new memory region is returned (this may be the
+*        same as the original pointer).
 
 *  Notes:
 *     - When new memory is allocated, the existing contents are preserved.
@@ -1818,11 +1837,7 @@ void *astGrow_( void *ptr, int n, size_t size, int *status ) {
 *     - If this function is invoked with the global error status set,
 *     or if it fails for any reason, the original pointer value is
 *     returned and the memory contents are unchanged.
-*     - This function is documented as protected because it should not
-*     be invoked by external code. However, it is available via the
-*     external C interface so that it may be used when writing (e.g.)
-*     foreign language or graphics interfaces.
-*-
+*--
 */
 
 /* Local Variables: */
@@ -1877,7 +1892,7 @@ void *astGrow_( void *ptr, int n, size_t size, int *status ) {
 
 int astIsDynamic_( const void *ptr, int *status ) {
 /*
-*+
+*++
 *  Name:
 *     astIsDynamic
 
@@ -1885,7 +1900,7 @@ int astIsDynamic_( const void *ptr, int *status ) {
 *     Returns a flag indicating if memory was allocated dynamically.
 
 *  Type:
-*     Protected function.
+*     Public function.
 
 *  Synopsis:
 *     #include "memory.h"
@@ -1905,13 +1920,14 @@ int astIsDynamic_( const void *ptr, int *status ) {
 *        Pointer to test.
 
 *  Returned Value:
-*     Non-zero if the memory was allocated dynamically. Zero is returned
-*     if the supplied pointer is NULL.
+*     astIsDynamic()
+*        Non-zero if the memory was allocated dynamically. Zero is returned
+*        if the supplied pointer is NULL.
 
 *  Notes:
 *     - A value of zero is returned if this function is invoked with
 *     the global error status set, or if it fails for any reason.
-*-
+*--
 */
 
 /* Local Variables: */
@@ -1935,7 +1951,7 @@ int astIsDynamic_( const void *ptr, int *status ) {
 
 void *astMalloc_( size_t size, int *status ) {
 /*
-*+
+*++
 *  Name:
 *     astMalloc
 
@@ -1943,7 +1959,7 @@ void *astMalloc_( size_t size, int *status ) {
 *     Allocate memory.
 
 *  Type:
-*     Protected function.
+*     Public function.
 
 *  Synopsis:
 *     #include "memory.h"
@@ -1961,19 +1977,16 @@ void *astMalloc_( size_t size, int *status ) {
 *        The size of the memory region required (may be zero).
 
 *  Returned Value:
-*     If successful, the function returns a pointer to the start of
-*     the allocated memory region. If the size allocated is zero, this
-*     will be a NULL pointer.
+*     astMalloc()
+*        If successful, the function returns a pointer to the start of
+*        the allocated memory region. If the size allocated is zero, this
+*        will be a NULL pointer.
 
 *  Notes:
 *     - A pointer value of NULL is returned if this function is
 *     invoked with the global error status set or if it fails for any
 *     reason.
-*     - This function is documented as protected because it should not
-*     be invoked by external code. However, it is available via the
-*     external C interface so that it may be used when writing (e.g.)
-*     foreign language or graphics interfaces.
-*-
+*--
 */
 
 /* Local Constants: */
@@ -2138,7 +2151,6 @@ static char *ChrMatcher( const char *test, const char *end, const char *template
 *     -  A NULL pointer is returned if this function is invoked with the
 *     global error status set or if it should fail for any reason, or if
 *     the supplied test string does not match the template.
-*-
 */
 
 /* Local Variables: */
@@ -2533,7 +2545,7 @@ static char *ChrMatcher( const char *test, const char *end, const char *template
 
 int astMemCaching_( int newval, int *status ){
 /*
-*+
+*++
 *  Name:
 *     astMemCaching
 
@@ -2541,7 +2553,7 @@ int astMemCaching_( int newval, int *status ){
 *     Controls whether allocated but unused memory is cached in this module.
 
 *  Type:
-*     Protected function.
+*     Public function.
 
 *  Synopsis:
 *     #include "memory.h"
@@ -2565,9 +2577,10 @@ int astMemCaching_( int newval, int *status ){
 *        value is left unchanged.
 
 *  Returned Value:
-*     The original value of the MemoryCaching tuning parameter.
+*     astMemCaching()
+*        The original value of the MemoryCaching tuning parameter.
 
-*-
+*--
 */
 
 /* Local Variables: */
@@ -2693,7 +2706,7 @@ int astMemCaching_( int newval, int *status ){
 
 void *astRealloc_( void *ptr, size_t size, int *status ) {
 /*
-*+
+*++
 *  Name:
 *     astRealloc
 
@@ -2701,7 +2714,7 @@ void *astRealloc_( void *ptr, size_t size, int *status ) {
 *     Change the size of a dynamically allocated region of memory.
 
 *  Type:
-*     Protected function.
+*     Public function.
 
 *  Synopsis:
 *     #include "memory.h"
@@ -2729,10 +2742,11 @@ void *astRealloc_( void *ptr, size_t size, int *status ) {
 *        should not be negative.
 
 *  Returned Value:
-*     If the memory was reallocated successfully, a pointer to the
-*     start of the new memory region is returned (this may be the same
-*     as the original pointer). If size was given as zero, a NULL
-*     pointer is returned.
+*     astRealloc()
+*        If the memory was reallocated successfully, a pointer to the
+*        start of the new memory region is returned (this may be the same
+*        as the original pointer). If size was given as zero, a NULL
+*        pointer is returned.
 
 *  Notes:
 *     - If this function is invoked with the error status set, or if
@@ -2740,11 +2754,7 @@ void *astRealloc_( void *ptr, size_t size, int *status ) {
 *     and the memory contents are unchanged. Note that this behaviour
 *     differs from that of the standard C "realloc" function which
 *     returns NULL if it fails.
-*     - This function is documented as protected because it should not
-*     be invoked by external code. However, it is available via the
-*     external C interface so that it may be used when writing (e.g.)
-*     foreign language or graphics interfaces.
-*-
+*--
 */
 
 /* Local Constants: */
@@ -2867,7 +2877,7 @@ void *astRealloc_( void *ptr, size_t size, int *status ) {
 
 void astRemoveLeadingBlanks_( char *string, int *status ) {
 /*
-*+
+*++
 *  Name:
 *     astRemoveLeadingBlanks
 
@@ -2875,7 +2885,7 @@ void astRemoveLeadingBlanks_( char *string, int *status ) {
 *     Remove any leading white space from a string.
 
 *  Type:
-*     Protected function.
+*     Public function.
 
 *  Synopsis:
 *     #include "memory.h"
@@ -2889,7 +2899,7 @@ void astRemoveLeadingBlanks_( char *string, int *status ) {
 *     string
 *        Pointer to the string.
 
-*-
+*--
 */
 
 /* Local Variables: */
@@ -2918,7 +2928,7 @@ void astRemoveLeadingBlanks_( char *string, int *status ) {
 
 size_t astSizeOf_( const void *ptr, int *status ) {
 /*
-*+
+*++
 *  Name:
 *     astSizeOf
 
@@ -2926,7 +2936,7 @@ size_t astSizeOf_( const void *ptr, int *status ) {
 *     Determine the size of a dynamically allocated region of memory.
 
 *  Type:
-*     Protected function.
+*     Public function.
 
 *  Synopsis:
 *     #include "memory.h"
@@ -2942,17 +2952,14 @@ size_t astSizeOf_( const void *ptr, int *status ) {
 *        of the allocated memory was zero).
 
 *  Returned Value:
-*     The allocated size. This will be zero if a NULL pointer was
-*     supplied (no error will result).
+*     astSizeOf()
+*        The allocated size. This will be zero if a NULL pointer was
+*        supplied (no error will result).
 
 *  Notes:
 *     - A value of zero is returned if this function is invoked with
 *     the global error status set, or if it fails for any reason.
-*     - This function is documented as protected because it should not
-*     be invoked by external code. However, it is available via the
-*     external C interface so that it may be used when writing (e.g.)
-*     foreign language or graphics interfaces.
-*-
+*--
 */
 
 /* Local Variables: */
@@ -3104,7 +3111,7 @@ size_t astTSizeOf_( const void *ptr, int *status ) {
 
 void *astStore_( void *ptr, const void *data, size_t size, int *status ) {
 /*
-*+
+*++
 *  Name:
 *     astStore
 
@@ -3112,7 +3119,7 @@ void *astStore_( void *ptr, const void *data, size_t size, int *status ) {
 *     Store data in dynamically allocated memory.
 
 *  Type:
-*     Protected function.
+*     Public function.
 
 *  Synopsis:
 *     #include "memory.h"
@@ -3139,10 +3146,11 @@ void *astStore_( void *ptr, const void *data, size_t size, int *status ) {
 *        freed and a NULL pointer is returned.
 
 *  Returned Value:
-*     If the data were stored successfully, a pointer to the start of
-*     the possibly new memory region is returned (this may be the same
-*     as the original pointer). If size was given as zero, a NULL
-*     pointer is returned.
+*     astStore()
+*        If the data were stored successfully, a pointer to the start of
+*        the possibly new memory region is returned (this may be the same
+*        as the original pointer). If size was given as zero, a NULL
+*        pointer is returned.
 
 *  Notes:
 *     - This is a convenience function for use when storing data of
@@ -3153,11 +3161,7 @@ void *astStore_( void *ptr, const void *data, size_t size, int *status ) {
 *     - If this function is invoked with the error status set, or if
 *     it fails for any reason, the original pointer value is returned
 *     and the memory contents are unchanged.
-*     - This function is documented as protected because it should not
-*     be invoked by external code. However, it is available via the
-*     external C interface so that it may be used when writing (e.g.)
-*     foreign language or graphics interfaces.
-*-
+*--
 */
 
 /* Local Variables: */
@@ -3212,7 +3216,7 @@ void *astStore_( void *ptr, const void *data, size_t size, int *status ) {
 
 char *astString_( const char *chars, int nchars, int *status ) {
 /*
-*+
+*++
 *  Name:
 *     astString
 
@@ -3220,7 +3224,7 @@ char *astString_( const char *chars, int nchars, int *status ) {
 *     Create a C string from an array of characters.
 
 *  Type:
-*     Protected function.
+*     Public function.
 
 *  Synopsis:
 *     #include "memory.h"
@@ -3245,20 +3249,17 @@ char *astString_( const char *chars, int nchars, int *status ) {
 *        The number of characters in the array (zero or more).
 
 *  Returned Value:
-*     If successful, the function returns a pointer to the start of
-*     the allocated string. If the number of characters is zero, a
-*     zero-length string is still allocated and a pointer to it is
-*     returned.
+*     astString()
+*        If successful, the function returns a pointer to the start of
+*        the allocated string. If the number of characters is zero, a
+*        zero-length string is still allocated and a pointer to it is
+*        returned.
 
 *  Notes:
 *     - A pointer value of NULL is returned if this function is
 *     invoked with the global error status set or if it fails for any
 *     reason.
-*     - This function is documented as protected because it should not
-*     be invoked by external code. However, it is available via the
-*     external C interface so that it may be used when writing (e.g.)
-*     foreign language or graphics interfaces.
-*-
+*--
 */
 
 /* Local Variables: */
@@ -3295,7 +3296,7 @@ char *astString_( const char *chars, int nchars, int *status ) {
 
 char **astStringArray_( const char *chars, int nel, int len, int *status ) {
 /*
-*+
+*++
 *  Name:
 *     astStringArray
 
@@ -3303,7 +3304,7 @@ char **astStringArray_( const char *chars, int nel, int len, int *status ) {
 *     Create an array of C strings from an array of characters.
 
 *  Type:
-*     Protected function.
+*     Public function.
 
 *  Synopsis:
 *     #include "memory.h"
@@ -3337,14 +3338,15 @@ s
 *        string. This may be zero but should not be negative.
 
 *  Returned Value:
-*     A pointer to the start of the index array, which contains "nel"
-*     pointers pointing at the start of each null-terminated output
-*     string.
+*     astStringArray()
+*        A pointer to the start of the index array, which contains "nel"
+*        pointers pointing at the start of each null-terminated output
+*        string.
 *
-*     The returned pointer should be passed to astFree to de-allocate
-*     the memory used when it is no longer required. This will free
-*     both the index array and the memory used by the strings it
-*     points at.
+*        The returned pointer should be passed to astFree to de-allocate
+*        the memory used when it is no longer required. This will free
+*        both the index array and the memory used by the strings it
+*        points at.
 
 *  Notes:
 *     - A NULL pointer will also be returned if the value of "nel" is
@@ -3352,11 +3354,7 @@ s
 *     - A pointer value of NULL will also be returned if this function
 *     is invoked with the global error status set or if it fails for
 *     any reason.
-*     - This function is documented as protected because it should not
-*     be invoked by external code. However, it is available via the
-*     external C interface so that it may be used when writing (e.g.)
-*     foreign language or graphics interfaces.
-*-
+*--
 */
 
 /* Local Variables: */
@@ -3419,9 +3417,94 @@ s
    return result;
 }
 
+char *astStringCase_( const char *string, int upper, int *status ) {
+/*
+*++
+*  Name:
+*     astStringCase
+
+*  Purpose:
+*     Convert a string to upper or lower case.
+
+*  Type:
+*     Public function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     char *astStringCase( const char string, int upper )
+
+*  Description:
+*     This function converts a supplied string to upper or lower case,
+*     storing the result in dynamically allocated memory.
+
+*  Parameters:
+*     string
+*        Pointer to the null terminated string to be converted.
+*     upper
+*        If non-zero, the string is converted to upper case. Otherwise it
+*        is converted to lower case.
+
+*  Returned Value:
+*     astStringCase()
+*        If successful, the function returns a pointer to the start of
+*        the allocated string. The returned memory should be freed using
+*        astFree when no longer needed.
+
+*  Notes:
+*     - A pointer value of NULL is returned if this function is
+*     invoked with the global error status set or if it fails for any
+*     reason.
+*--
+*/
+
+/* Local Variables: */
+   char *pout;                   /* Pointer to next output character */
+   char *result;                 /* Pointer value to return */
+   const char *pin;              /* Pointer to next input character */
+   int i;                        /* Character index */
+   int len;                      /* String length */
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get the length of the supplied string, excluding the trailing null. */
+   len = strlen( string );
+
+/* Allocate memory to hold the converted string, plus terminating null. */
+   result = (char *) astMalloc( (size_t) ( len + 1 ) );
+
+/* If successful, copy the characters into the string, converting each
+   one to the requested case. */
+   if ( result ) {
+      pin = string;
+      pout = result;
+
+      if( upper ) {
+         for( i = 0; i < len; i++ ) {
+            *(pout++) = toupper( (int) *(pin++) );
+         }
+
+      } else {
+
+         for( i = 0; i < len; i++ ) {
+            *(pout++) = tolower( (int) *(pin++) );
+         }
+      }
+
+/* Terminate the string. */
+      *pout = '\0';
+   }
+
+/* Return the result. */
+   return result;
+}
+
 size_t astChrLen_( const char *string, int *status ) {
 /*
-*+
+*++
 *  Name:
 *     astChrLen
 
@@ -3429,7 +3512,7 @@ size_t astChrLen_( const char *string, int *status ) {
 *     Determine the used length of a string.
 
 *  Type:
-*     Protected function.
+*     Public function.
 
 *  Synopsis:
 *     #include "memory.h"
@@ -3445,11 +3528,12 @@ size_t astChrLen_( const char *string, int *status ) {
 *        Pointer to the string.
 
 *  Returned Value:
-*     The number of characters in the supplied string, not including the
-*     trailing newline, and any trailing white-spaces or non-printable
-*     characters.
+*     astChrLen()
+*        The number of characters in the supplied string, not including the
+*        trailing newline, and any trailing white-spaces or non-printable
+*        characters.
 
-*-
+*--
 */
 
 /* Local Variables: */
@@ -3575,7 +3659,7 @@ int astSscanf_( const char *str, const char *fmt, ...) {
    whether it is safe to use it as an index into the supplied. */
                      if( *c == 'n' ) *( (int *) ptr[ nptr - 1 ] ) = 0;
 
-	          } else {
+                  } else {
                      astError( AST__INTER, "astSscanf: Format string "
                                "'%s' contains more than %d fields "
                                "(AST internal programming error).", status,
@@ -3639,7 +3723,7 @@ int astSscanf_( const char *str, const char *fmt, ...) {
             nfld = 0;
             iptr = 0;
             c = (char *) fmt;
-	    while( *c ) {
+            while( *c ) {
 
 /* Field specifiers are marked by a % sign. */
                if( *c == '%' ) {
@@ -3660,7 +3744,7 @@ int astSscanf_( const char *str, const char *fmt, ...) {
 /* Increment the number of matched fields required. "%n" specifiers are not
    included in the value returned by sscanf so skip over them. */
                         if( *c != 'n' ) {
-			   nfld++;
+                           nfld++;
 
 /* If the % sign is followed by a "n", and was preceeded by a space, we
    may need to correct the returned character count. */

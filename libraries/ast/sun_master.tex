@@ -18939,6 +18939,68 @@ f+
 f-
 \normalsize
 
+c+
+\cleardoublepage
+\section{\label{ss:memoryfunctions}AST Memory Management and Utility Functions}
+AST provides a memory management layer that can be used in place of
+system functions such as {\tt malloc}, {\tt free}, {\tt realloc},
+\emph{etc.} The AST replacements for these functions ( {\tt astMalloc},
+{\tt astFree} and {\tt astRealloc}) add extra information to each
+allocated memory block that allows AST to check the validity of supplied
+pointers. For example, this extra information allows {\tt astFree} to
+detect if the supplied pointer has already been freed, and if so to issue
+an appropriate error message. The existence of this extra information is
+invisible to outside callers, and stored in a header block located just
+before the returned memory block.
+
+In addition to the standard functions, AST provides other memory management
+functions, such as:
+
+\begin{description}
+\item [{\tt astStore}] - stores data in dynamically allocated memory, allocating
+the memory (or adjusting the size of previously allocated memory) to match
+the amount of data to be stored.
+\item [{\tt astGrow}] - allocates and expands memory to hold an adjustable-sized array.
+\item [{\tt astAppendString}] - allocates and expands memory to hold a
+concatenated string.
+\end{description}
+
+Theses are just a few of the available utilities functions in the AST
+memory management layer. Prototypes for all AST memory management
+functions are included in the header file ``{\tt ast.h}''.
+
+An important restriction on these functions is that pointers created by
+other memory management functions, such as the system version of {\tt
+malloc} \emph{etc.}, should never supplied to an AST memory management
+function. Only pointers created by AST should be used by these functions.
+
+In addition to memory management functions, AST provides various other
+utility functions, such as a basic regular expression facility, and other
+string manipulation functions. These are also documented in this appendix.
+
+The AST memory management layer is implemented on top of the usual {\tt
+malloc}, {tt free} and {\tt realloc} functions. By default these will be
+the standard functions provided by <stdlib.h>. However, the facilities of
+the STARMEM package (included in the Starlink Software Collection) can be
+used to specify alternative functions to use. This requires that AST be
+configured using the ``--with-starmem'' option when it is built.
+
+The STARMEM package provides a wrapper for the standard malloc
+implementation that enables the user to switch malloc schemes at runtime
+by setting the STARMEM\_MALLOC environment variable. Currently allowed
+values for this variable are:
+
+\begin{description}
+\item [SYSTEM] - standard system malloc/free - the default
+\item [DL] - Doug Lea's malloc/free
+\item [GC] - Hans-Boehm Garbage Collection
+\end{description}
+
+\small
+\include{memory_routines}
+\normalsize
+c-
+
 \newpage
 \section{\xlabel{FitsWcsCoverage}\label{ss:fitswcscoverage}FITS-WCS Coverage}
 
@@ -21877,6 +21939,11 @@ occurred in the AST library between versions V5.3 and V5.3-1 (the
 current version):
 
 \begin{enumerate}
+
+c+
+\item The utility functions provided by the AST memory management layer
+are now documented in an appendix.
+c-
 
 \item The KeyMap class now supports entries that have undefined values. A
 new method called
