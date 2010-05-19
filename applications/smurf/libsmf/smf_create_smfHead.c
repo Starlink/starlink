@@ -156,6 +156,7 @@ smf_create_smfHead( int * status ) {
   hdr->detname = NULL;
   hdr->dpazel = 0;
   hdr->isCloned = 0;
+  hdr->mtype = SMF__NUL;
   hdr->telpos[0] = 0;
   hdr->telpos[1] = 0;
   hdr->telpos[2] = 0;

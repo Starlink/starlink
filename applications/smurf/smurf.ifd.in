@@ -2688,6 +2688,34 @@ package @PACKAGE@ {
 
         }
 
+        action sc2expandmodel {
+
+            helplib {$SMURF_HELP}
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT }
+                ppath GLOBAL CURRENT
+                association <-GLOBAL.DATA_ARRAY
+                prompt {Input NDF data structure}
+                helpkey *
+            }
+
+            parameter out {
+                position 2
+                type NDF
+                access WRITE
+                ppath CURRENT
+                default {'./\*_con'}
+                association ->GLOBAL.DATA_ARRAY
+                prompt {Output NDF data structure}
+                helpkey *
+            }
+
+        }
+
         action sc2fft {
 
             helplib {$SMURF_HELP}

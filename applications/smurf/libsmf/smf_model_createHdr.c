@@ -14,15 +14,16 @@
 
 *  Invocation:
 *     smf_model_createHdr( smfData *model, smf_modeltype type,
-*                          smdHead *refhdr, int *status );
+*                          smfData *refdata, int *status );
 
 *  Arguments:
 *     model = smfData * (Given)
 *        Pointer to smfData containing model information
 *     type = smf_modeltype (Given)
 *        Type of model
-*     refhdr = smfHead * (Given)
-*        Pointer to time-series WCS frameset corresponding to this model
+*     refdata = smfData * (Given)
+*        Pointer to reference data containing full time-series WCS frameset
+*        corresponding to this model.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -59,6 +60,9 @@
 *        Added SMF__PLN
 *     2010-05-18 (EC):
 *        Write model type (3 characters) to FITS header "SMFMODEL"
+*     2010-05-19 (EC):
+*        Use a full smfData as the reference, and write out full data
+*        dimensions for time series cube to FITS header.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -102,22 +106,25 @@
 #define FUNC_NAME "smf_model_createHdr"
 
 void smf_model_createHdr( smfData *model, smf_modeltype type,
-                          smfHead *refhdr, int *status ) {
+                          smfData *refdata, int *status ) {
 
   /* Local Variables */
   AstFitsChan *fits=NULL;       /* New FITS header */
   AstFrameSet *fset=NULL;       /* the returned framset */
   AstFitsChan *reffits=NULL;    /* Reference FITS header */
+  smfHead *refhdr=NULL;         /* Reference smfHead */
   AstFrameSet *refwcs=NULL;     /* Reference time series WCS */
 
   /* Main routine */
   if( *status != SAI__OK ) return;
 
-  if( !model || !refhdr ) {
+  if( !model || !refdata || !refdata->hdr ) {
     *status = SAI__ERROR;
     errRep( "", FUNC_NAME ": Null input pointers", status );
     return;
   }
+
+  refhdr = refdata->hdr;
 
   /* If the reference header is the same as the model header return */
   if( refhdr == model->hdr ) {
@@ -245,11 +252,41 @@ void smf_model_createHdr( smfData *model, smf_modeltype type,
     }
   }
 
-  /* Add the model name to the FITS header */
+  /* Add the model name to the FITS header and the bolometer dimensions */
   fits = model->hdr->fitshdr;
   if( fits ) {
+    dim_t nrows, ncols, ntslice;
+    int lbnd_r, lbnd_c, lbnd_t;
+
+    smf_get_dims( refdata, &nrows, &ncols, NULL, &ntslice, NULL, NULL,
+                  NULL, status );
+
+    if( refdata->isTordered ) {
+      lbnd_r = refdata->lbnd[SC2STORE__ROW_INDEX];
+      lbnd_c = refdata->lbnd[SC2STORE__COL_INDEX];
+      lbnd_t = refdata->lbnd[2];
+    } else {
+      lbnd_r = refdata->lbnd[1+SC2STORE__ROW_INDEX];
+      lbnd_c = refdata->lbnd[1+SC2STORE__COL_INDEX];
+      lbnd_t = refdata->lbnd[0];
+    }
+
     atlPtfts( fits, "SMFMODEL", smf_model_getname(type,status),
               "SMURF Iterative model component", status );
+
+    atlPtfti( fits, "SMFDIMR", nrows,
+              "SMURF row dimension length for raw data", status );
+    atlPtfti( fits, "SMFDIMC", ncols,
+              "SMURF col dimension length for raw data", status );
+    atlPtfti( fits, "SMFDIMT", ntslice,
+              "SMURF time dimension length for raw data", status );
+
+    atlPtfti( fits, "SMFLBNDR", lbnd_r,
+              "SMURF row dimension lower bound for raw data", status );
+    atlPtfti( fits, "SMFLBNDC", lbnd_c,
+              "SMURF col dimension lower bound for raw data", status );
+    atlPtfti( fits, "SMFLBNDT", lbnd_t,
+              "SMURF time dimension lower bound for raw data", status );
   }
 
   /* Propagate JCMTState */

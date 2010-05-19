@@ -43,6 +43,7 @@ rawunpress \
 remsky \
 sc2clean \
 sc2concat \
+sc2expandmodel \
 sc2fft \
 sc2fts \
 sc2sim \

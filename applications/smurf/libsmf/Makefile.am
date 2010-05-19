@@ -89,6 +89,7 @@ smf_create_smfDream.c \
 smf_create_smfFile.c \
 smf_create_smfFilter.c \
 smf_create_smfHead.c \
+smf_create_tswcs.c \
 smf_cso2filt_tau.c \
 smf_cubebounds.c \
 smf_cubegrid.c \
@@ -114,6 +115,7 @@ smf_dtype_string.c \
 smf_dtype_sz.c \
 smf_dump_smfData.c \
 smf_expand_tilegroup.c \
+smf_expmodel_dks.c \
 smf_ext2km.c \
 smf_extracols.c \
 smf_fft_avpspec.c \
@@ -223,6 +225,7 @@ smf_median_smooth.c \
 smf_model_create.c \
 smf_model_createHdr.c \
 smf_model_dataOrder.c \
+smf_model_getexpptr.c \
 smf_model_getname.c \
 smf_model_getptr.c \
 smf_model_gettype.c \

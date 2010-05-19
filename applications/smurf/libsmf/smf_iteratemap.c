@@ -385,7 +385,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int haveext=0;                /* Set if EXT is one of the models */
   int havegai=0;                /* Set if GAI is one of the models */
   int havenoi=0;                /* Set if NOI is one of the models */
-  smfHead *hdr=NULL;            /* Pointer to smfHead */
+  smfData *refdata=NULL;        /* Pointer to reference smfData */
   dim_t i;                      /* Loop counter */
   int ii;                       /* Loop counter */
   dim_t idx=0;                  /* index within subgroup */
@@ -2038,14 +2038,14 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             if( *status == SAI__OK ) {
               if( memiter ) {
                 /* Pointer to the header in the concatenated data */
-                hdr = res[i]->sdata[idx]->hdr;
+                refdata = res[i]->sdata[idx];
               } else {
                 /* Open the header of the original input file in memiter=0
                    case since it won't have been stored in the .DIMM files */
                 smf_open_file( igrp, resgroup->subgroups[i][idx], "READ",
                                SMF__NOCREATE_DATA, &data, status );
                 if( *status == SAI__OK ) {
-                  hdr = data->hdr;
+                  refdata = data;
                 }
               }
             }
@@ -2063,7 +2063,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
               if( exportNDF_which[nmodels] ) {
                 if( (res[i]->sdata[idx]->file->name)[0] ) {
-                  smf_model_createHdr( res[i]->sdata[idx], SMF__RES, hdr,
+                  smf_model_createHdr( res[i]->sdata[idx], SMF__RES, refdata,
                                        status );
                   smf_model_stripsuffix( res[i]->sdata[idx]->file->name,
                                          name, status );
@@ -2094,7 +2094,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
               if( exportNDF_which[whichast] ) {
 
                 if( (ast[i]->sdata[idx]->file->name)[0] ) {
-                  smf_model_createHdr( ast[i]->sdata[idx], SMF__AST, hdr,
+                  smf_model_createHdr( ast[i]->sdata[idx], SMF__AST, refdata,
                                        status );
                   smf_model_stripsuffix( ast[i]->sdata[idx]->file->name,
                                          name, status );
@@ -2129,7 +2129,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                   unsigned char *tempqual=NULL; /* temporary quality pointer */
 
                   smf_model_createHdr( model[j][i]->sdata[idx], modeltyps[j],
-                                       hdr,status );
+                                       refdata,status );
                   smf_model_stripsuffix( model[j][i]->sdata[idx]->file->name,
                                          name, status );
 

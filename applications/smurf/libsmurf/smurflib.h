@@ -119,6 +119,7 @@ void smurf_rawunpress( int * );
 void smurf_remsky( int * );
 void smurf_sc2clean( int * );
 void smurf_sc2concat( int * );
+void smurf_sc2expandmodel( int * );
 void smurf_sc2fft( int * );
 void smurf_sc2fts( int * );
 void smurf_sc2sim( int * );

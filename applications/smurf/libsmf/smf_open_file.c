@@ -198,12 +198,14 @@
  *        Change type of flatfield method in smfDA
  *     2010-03-16 (TIMJ):
  *        Use one_strlcpy instead of strncpy
+ *     2010-05-19 (EC):
+ *        Read the SMFMODEL FITS header into hdr->mtype.
  *     {enter_further_changes_here}
 
  *  Copyright:
  *     Copyright (C) 2007-2010 Science and Technology Facilities Council.
  *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
- *     Copyright (C) 2005-2008 University of British Columbia.
+ *     Copyright (C) 2005-2008,2010 University of British Columbia.
  *     All Rights Reserved.
 
  *  Licence:
@@ -966,6 +968,19 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
     msgOutiff( MSG__DEBUG, "", "Data read with label '%s (%s)'",
                status, (strlen(hdr->dlabel) ? hdr->dlabel : "<none>"),
                (strlen(hdr->units) ? hdr->units : ""));
+  }
+
+  /* Check to see if this is an iterative map-maker model */
+  if( hdr && hdr->fitshdr ) {
+    char mname[73];
+
+    smf_getfitss( hdr, "SMFMODEL", mname, sizeof(mname), status );
+    if( *status == SAI__OK ) {
+      hdr->mtype = smf_model_gettype( mname, status );
+    } else if( *status == SMF__NOKWRD ) {
+      /* If no SMFMODEL keyword present just annul the status and continue */
+      errAnnul(status);
+    }
   }
 
   /* free resources on error */

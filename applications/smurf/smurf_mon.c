@@ -126,6 +126,8 @@
 *     2009-10-16 (DSB):
 *        Use ndgBeggh and ndgEndgh to record expanded GRP groups in
 *        output NDF history.
+*     2010-05-19 (EC):
+*        Add SC2EXPANDMODEL
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -283,6 +285,8 @@ void smurf_mon( int * status ) {
     smurf_sc2clean( status );
   } else if (strcmp( taskname, "SC2CONCAT" ) == 0 ) {
     smurf_sc2concat( status );
+  } else if (strcmp( taskname, "SC2EXPANDMODEL" ) == 0 ) {
+    smurf_sc2expandmodel( status );
   } else if (strcmp( taskname, "SC2FFT" ) == 0 ) {
     smurf_sc2fft( status );
   } else if (strcmp( taskname, "SC2FTS" ) == 0 ) {

@@ -707,6 +707,8 @@ smfFilter *smf_create_smfFilter( smfData *template, int *status );
 
 smfHead* smf_create_smfHead( int * status );
 
+void smf_create_tswcs( smfHead *hdr, AstFrameSet **frameset, int *status );
+
 double smf_cso2filt_tau( const smfHead *hdr, double csotau, int *status);
 
 void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
@@ -782,6 +784,9 @@ void smf_dump_smfData( const smfData *data, int showflags, int *status );
 
 void smf_expand_tilegroup ( Grp * ogrp, size_t ntile, int npbin,
                             size_t * outsize, int * status);
+
+void smf_expmodel_dks( const smfData *indata, smfData **outdata,
+                       int *status);
 
 void smf_ext2km( int indf, const char *xname, AstKeyMap *keymap, int mode,
                  int *status );
@@ -1141,7 +1146,9 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
                        double flagstat, AstKeyMap *keymap, int *status );
 
 void smf_model_createHdr( smfData *model, smf_modeltype type,
-                          smfHead *refhdr, int *status );
+                          smfData *refdata, int *status );
+
+smf_expmodelptr smf_model_getexpptr( smf_modeltype type, int *status);
 
 void
 smf_model_dataOrder( smfDIMMData *dat, smfArray ** allmodel, int chunk, smf_modeltype toOrder,

@@ -27,6 +27,7 @@ smurf_rawfixmeta.c \
 smurf_remsky.c \
 smurf_sc2clean.c \
 smurf_sc2concat.c \
+smurf_sc2expandmodel.c \
 smurf_sc2fft.c \
 smurf_sc2fts.c \
 smurf_sc2sim.c \

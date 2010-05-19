@@ -161,6 +161,8 @@
  *        Renamed SMF__Q_BADS to SMF__Q_BADDA, and added SMF__Q_COM
  *     2010-04-20 (EC):
  *        Add map quality (SMF__MAPQ_ZERO, and mapqual in smfDIMMData)
+ *     2010-05-19 (EC):
+ *        Add mtype to smfHead, and smf_expmodelptr function prototype
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -471,6 +473,7 @@ typedef struct smfHead {
   char dlabel[SMF__CHARLABEL];/* Label associated with data */
   char title[SMF__CHARLABEL]; /* Title associated with data */
   char obsidss[SZFITSCARD];   /* Unique observation subsys id */
+  smf_modeltype mtype;        /* type if iterative map-maker model container */
 } smfHead;
 
 /* This structure contains ancilliary information obtained from a raw
@@ -575,6 +578,9 @@ typedef struct smfDIMMData {
 /* Prototype for function pointer to different models used by DIMM */
 typedef void(*smf_calcmodelptr)( smfWorkForce*, smfDIMMData*, int, AstKeyMap*,
                                  smfArray**, int, int* );
+
+/* Prototype for function pointer to expand different DIMM model components */
+typedef void(*smf_expmodelptr)( const smfData*, smfData**, int* );
 
 /* Represents a box in some 2D cartesian coordinate system. */
 typedef struct smfBox {
