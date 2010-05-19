@@ -6,12 +6,17 @@
 #include "par_err.h"
 #include "mers.h"
 
-/* internal helper routine */
-static void kpg1__process_nesting( AstKeyMap * keymap, AstKeyMap * nested,
-                                  int * status );
+
+/* Prototypes for internal helper routines */
+static void kpg1Config_ProcessNesting( AstKeyMap *keymap, AstKeyMap *nested,
+                                       int *status );
+static void kpg1Config_CheckNames( AstKeyMap *map1, AstKeyMap *map2, Grp *grp,
+                                   const char *param, int *status );
+
+
 
 AstKeyMap *kpg1Config( const char *param, const char *def,
-                       AstKeyMap * nested, int *status ){
+                       AstKeyMap *nested, int *status ){
 /*
 *+
 *  Name:
@@ -25,32 +30,64 @@ AstKeyMap *kpg1Config( const char *param, const char *def,
 
 *  Invocation:
 *     AstKeyMap *kpg1Config( const char *param, const char *def,
-*                   AstKeyMap * nested, int *status )
+*                            AstKeyMap *nested, int *status )
 
 *  Description:
-*     This function first creates a KeyMap by reading the values from a specified
-*     text file (argument "def"). This text files specifies the complete list
-*     of all allowed config parameters and their default values. The KeyMap is then
-*     locked by setting its MapLocked attribute to a true value. A GRP group is then
-*     obtained from the environment using the specified parameter (argument "param").
-*     The config settings thus obtained are stored in the KeyMap. Since the KeyMap
-*     has been locked, an error will be reported if the user-supplied group refers to
-*     any config parameters that were not read earlier from the default file.
+*     This function first creates a KeyMap by reading the values from a
+*     specified text file (argument "def"). This text files specifies the
+*     complete list of all allowed config parameters and their default
+*     values. The KeyMap is then locked by setting its MapLocked attribute
+*     to a true value. A GRP group is then obtained from the environment
+*     using the specified parameter (argument "param"). The config
+*     settings thus obtained are stored in the KeyMap. An error is reported
+*     if the user-supplied group refers to any config parameters that were
+*     not read earlier from the default file.
 *
-*     The "nested" keymap can be used to specify any nested keymaps that can be
-*     provided by the user but which can only contain values specified in the defaults.
-*     If the named items are present in the base keymap they will be copied in to the
-*     base if the value in the "nested" keymap is true. If the value is false they will
-*     simply be dropped. Both the default keymap and externally supplied overrides are
-*     processed in this way before the two are merged. This allows you to have a single
-*     config file with "x.a", "y.x.a" and "z.x.a" where the "y.x" will be copied to "x.a"
-*     but "z.x" will be dropped without having to explicitly specify default values for
-*     all of "z.x" and "y.x".
+*     Both the defaults file and the user-supplied configuration may
+*     contain several sets of "alternate" configuration parameter values,
+*     and the set to use can be specified by the caller via the supplied
+*     "nested" keymap. For instance, if a basic configuration contains
+*     keys "par1" and "par2", the user could supply two alternate sets of
+*     values for these keys by prepending each key name with the strings
+*     "850" and "450" (say). Thus, the user could supply values for any
+*     or all of: "par1", "par2", "450.par1", "450.par2", "850.par1",
+*     "850.par2".
 *
-*     The beneifts of using this function are that 1) the user gets to know if they
-*     mis-spell a config parameter name, and 2) the default parameter values can be
-*     defined in a single place, rather than hard-wiring them into application code
-*     at each place where the coinfig parameter is used.
+*     The "nested" keymap supplied by the caller serves two functions: 1)
+*     it defines the known alternatives, and 2) it specifies which of the
+*     aternatives is to be used. Each key in the supplied "nested" keymap
+*     should be the name of an allowed alternative. In the above example,
+*     a KeyMap containing keys "850" and "450" could be supplied. No
+*     error is reported if the user-supplied configuration fails to
+*     provide values for one or more of the alternatives. The value
+*     associated with each key in the "nested" keymap should be an
+*     integer - the alternative to be used should have a non-zero value,
+*     and all other should be zero.
+*
+*     So first, the configuration parameters specified by the supplied
+*     defaults file are examined. Any parameter that starts with the name
+*     of the selected alternative (i.e. the key within "nested" that has
+*     an associated value of 1) has the name of the alternative removed.
+*     Any parameter that start with the name of any of the other
+*     alternatives is simply removed from the configuration. Thus, using
+*     the above example, if "nested" contains two entries - one with key
+*     "850" and value "1", and the other with key "450" and value "0" -
+*     the "850.par1" and "850.par2" entries in the defaults file would be
+*     renamed as "par1" and "par2" (over-writing the original values for
+*     "par1" and "par2"), and the "450.par1" and "450.par2" entries would
+*     be deleted.
+*
+*     Next, the same process is applied to the user-supplied
+*     configuration obtained via the specified environment parameter.
+*
+*     Finally, the values in the user-supplied configuration are used to
+*     replace those in the defaults file.
+*
+*     The beneifts of using this function are that 1) the user gets to
+*     know if they mis-spell a config parameter name, and 2) the default
+*     parameter values can be defined in a single place, rather than
+*     hard-wiring them into application code at each place where the
+*     config parameter is used.
 
 *  Arguments:
 *     paramc = const char * (Given)
@@ -61,7 +98,7 @@ AstKeyMap *kpg1Config( const char *param, const char *def,
 *     nested = AstKeyMap * (Given)
 *        If non-NULL, used to determine which nested keys might be in the config
 *        and which should be merged with the base keymap. The values in the keymap
-*        should be true to indicate merging.
+*        should be non-zero to indicate merging.
 *     status = int * (Given & Returned)
 *        The inherited status.
 
@@ -107,6 +144,10 @@ AstKeyMap *kpg1Config( const char *param, const char *def,
 *        we can correctly handle defaulting using <def>.
 *     2010-05-05 (TIMJ):
 *        Add "nested" keymap to allow merging.
+*     19-MAY-2010 (DSB):
+*        - In order to get better error messages, do explicit checks that all
+*        user supplied keys are good, so that
+*        - Expand on the documentation for "nested".
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -140,7 +181,7 @@ AstKeyMap *kpg1Config( const char *param, const char *def,
    grpDelet( &grp, status );
 
 /* Handle nested entries */
-   kpg1__process_nesting( result, nested, status );
+  kpg1Config_ProcessNesting( result, nested, status );
 
 /* Lock the KeyMap so that an error will be reported if an attempt
    is made to add any new entries to it. */
@@ -166,11 +207,17 @@ AstKeyMap *kpg1Config( const char *param, const char *def,
 /* Otherwise, store the configuration settings in the KeyMap. */
       if( ! astChrMatch( value, "DEF" ) ) kpg1Kymap( grp, &external, status );
 
-/* Handle nested entries */
-      kpg1__process_nesting( external, nested, status );
+/* Handle alternate nested entries */
+     kpg1Config_ProcessNesting( external, nested, status );
 
-/* Copy the overrides into the default. An error will be reported if a config
-   parameter is specified that is not already present in the KeyMap. */
+/* Test every entry in the user-supplied configuration keymap. If an
+   entry is found which does not exist in the defaults keymap, report an
+   error. We could rely on astMapCopy to do this (called below) but the
+   wording of the error message created by astMapCopy is a bit too
+   generalised to be useful. */
+      kpg1Config_CheckNames( result, external, grp, param, status );
+
+/* Copy the overrides into the default. */
       astMapCopy( result, external );
 
 /* Delete the external KeyMap */
@@ -184,18 +231,18 @@ AstKeyMap *kpg1Config( const char *param, const char *def,
    if( result ) astSetI( result, "KeyError", 1 );
 
 /* Store the merged keymap as the keymap to be associated with this parameter.
- * This is the one that will actually be used rather than the one that was given
- * by the user. */
+   This is the one that will actually be used rather than the one that was given
+   by the user. */
    if ( result ) {
-     Grp * mergedgrp = NULL;
+     Grp *mergedgrp = NULL;
 
-     /* convert to a GRP */
+/* Convert to a GRP */
      kpg1Kygrp( result, &mergedgrp, status );
 
-     /* register it */
+/* Register it */
      ndgAddgh( param, mergedgrp, status );
-
      if (mergedgrp) grpDelet( &mergedgrp, status );
+
    }
 
 /* Delete the group, if any. */
@@ -213,8 +260,8 @@ AstKeyMap *kpg1Config( const char *param, const char *def,
  * copied to the base keymap. The entry is then deleted.
  */
 
-static void kpg1__process_nesting( AstKeyMap * keymap,
-                                   AstKeyMap * nested, int * status ) {
+static void kpg1Config_ProcessNesting( AstKeyMap * keymap, AstKeyMap * nested,
+                                       int * status ) {
   size_t i;
   size_t nnest;
 
@@ -276,3 +323,181 @@ static void kpg1__process_nesting( AstKeyMap * keymap,
   }
 
 }
+
+static void kpg1Config_CheckNames( AstKeyMap *map1, AstKeyMap *map2, Grp *grp,
+                                   const char *param, int *status ){
+/*
+*  Name:
+*     kpg1Config_CheckNames
+
+*  Purpose:
+*     Report an error if "map2" contains a key that is not in "map1".
+
+*  Invocation:
+*     void kpg1Config_CheckNames( AstKeyMap *map1, AstKeyMap *map2, Grp *grp,
+*                                 const char *param, int *status )
+
+*  Description:
+*     This function is a private helper function for kpg1Config. It
+*     checks that each entry in the "map2" KeyMap has a corresponding
+*     entry in "map1". If not, an error is reported. It handles nested
+*     KeyMaps by invoking itself recursively.
+
+*  Arguments:
+*     map1 = AstKeyMap * (Given)
+*        Pointer to a KeyMap holding defaults for all known configuration
+*        parameters.
+*     map2 = AstKeyMap * (Given)
+*        Pointer to a KeyMap holding user supplied configuration
+*        parameter values.
+*     grp = Grp * (Given)
+*        Pointer to the GRP group obtained from the user.
+*     param = const char * (Given)
+*        The ADAM parameter used to obtain the group.
+*     status = int * (Given & Returned)
+*        The inherited status.
+
+*  Authors:
+*     DSB: David S. Berry
+
+*  History:
+*     19-MAY-2010 (DSB):
+*        Original version.
+*/
+
+/* Local Variables: */
+   AstObject *obj1;          /* Object pointer obtained from map1 */
+   AstObject *obj2;          /* Object pointer obtained from map2 */
+   char *match;              /* Pointer to matching string */
+   char *up_badname;         /* Upper-case version of badname */
+   char *up_elem;            /* Upper case version of "elem" */
+   char elem[ GRP__SZNAM ];  /* Value of element in "grp" */
+   char file[ GRP__SZFNM ];  /* File name from which element was read */
+   char re[ 100 ];           /* Regular expression matching an assigment */
+   const char *badname;      /* String holding unknwon parameter name */
+   const char *key;          /* Key for entry being checked */
+   int file_len;             /* Length of file name */
+   int ielem;                /* Index of element in "grp" */
+   int ikey;                 /* Index of of entry in map2 */
+   int nelem;                /* Number of elements in "grp" */
+   int nkey;                 /* Number of entries in map2 */
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* Indicate we have not yet found any bad names in "map2". */
+   badname = NULL;
+
+/* Loop round every entry in "map2". Break if we encounter a bad name in
+   "map2", or if an error occurs. */
+   nkey = astMapSize( map2 );
+   for( ikey = 0; ikey < nkey && !badname && *status == SAI__OK; ikey++ ) {
+      key = astMapKey( map2, ikey );
+
+/* If an entry with the same name exists in "map1"... */
+      if( astMapHasKey( map1, key ) ) {
+
+/* ... and the entry is a KeyMap ... */
+         if( astMapType( map1, key ) == AST__OBJECTTYPE ) {
+
+/* ... and the corresponding "map2" entry is a KeyMap, call this function
+   recursively to check the contents of the two KeyMaps. */
+            if( astMapType( map2, key ) == AST__OBJECTTYPE ) {
+
+               (void) astMapGet0A( map1, key, &obj1 );
+               (void) astMapGet0A( map2, key, &obj2 );
+
+               kpg1Config_CheckNames( (AstKeyMap *) obj1,
+                                      (AstKeyMap *) obj2,
+                                      grp, param, status );
+
+/* Indicate we have found a bad name if the corresponding "map2" entry is not
+   a KeyMap. */
+            } else if( *status == SAI__OK ) {
+               badname = key;
+            }
+
+/* Free the AST object pointers. */
+            obj1 = astAnnul( obj1 );
+            obj2 = astAnnul( obj2 );
+         }
+
+/* If no such entry exists in "map1", indicate we have found a bad name. */
+      } else {
+         badname = key;
+      }
+   }
+
+/* If a bad name was found, search the group of user-supplied values for the
+   bad name, and then report an error including extra info about the bad
+   name. */
+   if( badname && *status == SAI__OK ) {
+
+/* Create an upper-case copy of the bad name. */
+      up_badname = astStringCase( badname, 1 );
+
+/* Create a regular expression that matches a string that assigns a value
+   to the upper case bad name (with or without preceededing parent key
+   names). */
+      sprintf( re, "\\.%s *\\=|^%s *\\=", up_badname, up_badname );
+
+/* Loop round all elements in the group. */
+      nelem =  grpGrpsz( grp, status );
+      for( ielem = 1; ielem <= nelem; ielem++ ) {
+
+/* Get the text of the element. */
+         grpInfoc( grp, ielem, "Name", elem, GRP__SZNAM, status );
+
+/* Create an upper-case copy of the element. */
+         up_elem = astStringCase( elem, 1 );
+
+/* See if it looks like a string that assigns a value to the bad name. If
+   so, break out of the loop with "up_elem" still set. */
+         match = astChrSub( up_elem, re, NULL, 0 );
+         if( match ) {
+            match = astFree( match );
+            break;
+         }
+
+/* Free resources. */
+         up_elem = astFree( up_elem );
+      }
+      up_badname = astFree( up_badname );
+
+/* If we found a grp element that assigns a value to the bad name, get the
+   name of the file from which the element was read. */
+      if( up_elem ) {
+         grpInfoc( grp, ielem, "File", file, GRP__SZFNM, status );
+      } else {
+         file[ 0 ] = 0;
+         file_len = 0;
+      }
+
+/* Create an error report, including the group element and the name of the file
+   from which the element was read, if possible. */
+      msgSetc( "M", badname );
+      msgSetc( "P", param );
+
+      *status = SAI__ERROR;
+      errRep( " ", "Unknown configuration parameter '^M' specified via environment "
+              "parameter ^P.", status );
+
+      if( up_elem ) {
+         msgSetc( "M", "Text was '" );
+         msgSetc( "M", elem );
+         msgSetc( "M", "'" );
+
+         if( astChrLen( file ) > 0 ) {
+            msgSetc( "M", " read from file '" );
+            msgSetc( "M", file );
+            msgSetc( "M", "'" );
+         }
+         msgSetc( "M", "." );
+         errRep( " ", "^M", status );
+      }
+
+      up_elem = astFree( up_elem );
+   }
+}
+
+
