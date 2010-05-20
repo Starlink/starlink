@@ -200,6 +200,8 @@
  *        Use one_strlcpy instead of strncpy
  *     2010-05-19 (EC):
  *        Read the SMFMODEL FITS header into hdr->mtype.
+ *     2010-05-20 (TIMJ):
+ *        Read JCMTSTATE if it is present even for non-3D data.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -567,35 +569,40 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
         /* and work out the observing mode (again, hope that headers are right) */
         if (hdr->fitshdr) smf_calc_mode( hdr, status );
 
-        /* If not time series, then we can retrieve the stored WCS
-           info. Note that the JCMTState parameter is filled ONLY for
-           time series data */
-        if ( !isTseries ) {
-          ndfGtwcs( indf, &(hdr->wcs), status);
-          hdr->nframes = 1;
-        } else {
-          /* Get the time series WCS */
-          ndfGtwcs( indf, &(hdr->tswcs), status );
-
-          /* Get the obsidss */
-          if( hdr->fitshdr ) {
-            (void )smf_getobsidss( hdr->fitshdr, NULL, 0, hdr->obsidss,
-                                   sizeof(hdr->obsidss), status );
-          }
-
+        /* We always try to read the JCMTSTATE even if we don't expect it to be
+           here. This lets us write out map models that have strangely compressed
+           data arrays and be able to expand them again */
+        hdr->nframes = 0;
+        if (*status == SAI__OK) {
           /* Need to get the location of the extension for STATE parsing */
           ndfXloc( indf, JCMT__EXTNAME, "READ", &tloc, status );
 
           /* Only read the state header if available */
           if( *status == SAI__OK ) {
-            /* Re-size the arrays in the JCMTSTATE extension to match the
-               pixel index bounds of the NDF. The resized arrays are stored in
-               a new temporary HDS object, and the old locator is annull. */
-            sc2store_resize_head( indf, &tloc, &xloc, status );
 
+            if ( isTseries ) {
+              /* Re-size the arrays in the JCMTSTATE extension to match the
+                 pixel index bounds of the NDF. The resized arrays are stored in
+                 a new temporary HDS object, and the old locator is annull. */
+              sc2store_resize_head( indf, &tloc, &xloc, status );
+              nframes = ndfdims[2];
+            } else {
+              /* Make sure the locator is in the right variable */
+              xloc = tloc;
+              tloc = NULL;
+
+              /* Find out how many state structures we really have without
+                 assuming we know the answer from the primary data array. This
+                 is more annoying than it should be because we have to open up
+                 one of the state entries, close it and then reopen it again. */
+              datIndex( xloc, 1, &tloc, status );
+              datSize( tloc, &nframes, status );
+              datAnnul( &tloc, status );
+
+            }
             /* And need to map the header making sure we have the right
                components for this instrument. */
-            nframes = ndfdims[2];
+
             sc2store_headrmap( xloc, nframes, hdr->instrument, status );
 
             /* Malloc some memory to hold all the time series data */
@@ -621,6 +628,21 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 
           /* Annul the locator in any case */
           if( xloc ) datAnnul( &xloc, status );
+        }
+
+        /* If not time series, then we can retrieve the stored WCS info. */
+        if ( !isTseries ) {
+          ndfGtwcs( indf, &(hdr->wcs), status);
+          if (hdr->nframes == 0) hdr->nframes = 1;
+        } else {
+          /* Get the time series WCS */
+          ndfGtwcs( indf, &(hdr->tswcs), status );
+
+          /* Get the obsidss */
+          if( hdr->fitshdr ) {
+            (void )smf_getobsidss( hdr->fitshdr, NULL, 0, hdr->obsidss,
+                                   sizeof(hdr->obsidss), status );
+          }
 
           /* Read the OCS configuration xml */
           hdr->ocsconfig = smf__read_ocsconfig( indf, status );
