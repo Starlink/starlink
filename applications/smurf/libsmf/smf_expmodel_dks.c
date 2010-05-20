@@ -137,6 +137,8 @@ void smf_expmodel_dks( const smfData *indata, smfData **outdata,
                                SMF__NOCREATE_VARIANCE | SMF__NOCREATE_QUALITY |
                                SMF__NOCREATE_FILE, status );
 
+  if (!data) return;
+
   d = smf_malloc( ndata, sizeof(*d), 0, status );
   if( *status == SAI__OK ) {
     for( i=0; i<ndata; i++ ) {
