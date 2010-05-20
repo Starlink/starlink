@@ -568,11 +568,16 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                               &bstr, &tstr, status );
 
                 /* Allocate space for enlarged dksquid array. */
-                if( da ) {
-                  da->dksquid = smf_realloc( da->dksquid, ncol*tlen,
-                                              sizeof(*(da->dksquid)), status );
+                if( da && da->dksquid) {
+                  da->dksquid->pntr[0] = smf_realloc(da->dksquid->pntr[0],
+                                                     ncol*tlen,
+                                                     smf_dtype_size(da->dksquid,
+                                                                    status),
+                                                     status);
+
                   if( *status == SAI__OK ) {
-                    memset(da->dksquid, 0, ncol*tlen*sizeof(*(da->dksquid)));
+                    memset( da->dksquid->pntr[0], 0,
+                            ncol*tlen*smf_dtype_size(da->dksquid,status) );
                   }
                 }
 
@@ -652,11 +657,11 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
               }
 
               /* dark squids */
-              if( da ) {
-                if (refdata->da) {
-                  memcpy( &(da->dksquid[tchunk*ncol]), refdata->da->dksquid,
-                          reftlen*ncol*sizeof(*(da->dksquid)) );
-                }
+              if( da->dksquid && refdata->da && refdata->da->dksquid) {
+                double *ptr = da->dksquid->pntr[0];
+                ptr += tchunk*ncol;
+                memcpy( ptr, refdata->da->dksquid->pntr[0],
+                        reftlen*ncol*smf_dtype_size(da->dksquid,status));
               }
 
               /* Now do DATA/QUALITY/VARIANCE */

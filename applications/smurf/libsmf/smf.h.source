@@ -621,7 +621,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                           dim_t padEnd, int flags,  int tstep,
                           smfArray **concat, int *status );
 
-smfDA *smf_construct_smfDA( smfDA * tofill, int *dksquid, double * flatcal,
+smfDA *smf_construct_smfDA( smfDA * tofill, smfData *dksquid, double * flatcal,
                             double * flatpar, smf_flatmeth flatmeth,
                             int nflat, double * heatval, int nheat, int * status );
 

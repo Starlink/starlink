@@ -13,7 +13,7 @@
 *     Subroutine
 
 *  Invocation:
-*     pntr = smf_construct_smfDA( smfDA * tofill, int *dksquid,
+*     pntr = smf_construct_smfDA( smfDA * tofill, smfData *dksquid,
 *                    double * flatcal, double * flatpar,
 *                    smf_flatmeth flatmeth, int nflat, double * heatval,
 *                    int nheat, int * status );
@@ -22,7 +22,7 @@
 *     tofill = smfDA* (Given)
 *        If non-NULL, this is the struct filled by this routine. Else,
 *        a smfDA is allocated and returned.
-*     dksquid = int* (Given)
+*     dksquid = smfData* (Given)
 *        Pointer to dark squid values
 *     flatcal = double* (Given)
 *        Pointer to array of flat calibration values.
@@ -116,7 +116,7 @@
 #define FUNC_NAME "smf_construct_smfDA"
 
 smfDA *
-smf_construct_smfDA( smfDA * tofill, int *dksquid, double * flatcal,
+smf_construct_smfDA( smfDA * tofill, smfData * dksquid, double * flatcal,
 		     double * flatpar, smf_flatmeth flatmeth,
                      int nflat, double * heatval, int nheat, int * status ) {
 

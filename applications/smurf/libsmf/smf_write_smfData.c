@@ -358,10 +358,11 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
       int id;
       int nmap;
       void *pntr[1];
-      int *outdksquid=NULL;
+      double *outdksquid=NULL;
 
-      if( da && da->dksquid && outdata && outdata->file &&
-          outdata->file->ndfid && (outdata->file->ndfid != NDF__NOID) ) {
+      if( da && da->dksquid && da->dksquid->pntr[0] && outdata &&
+          outdata->file && outdata->file->ndfid &&
+          (outdata->file->ndfid != NDF__NOID) ) {
 
         loc = smf_get_xloc( outdata, "SCUBA2", "SCUBA2", "UPDATE", 0, 0,
                             status );
@@ -374,11 +375,12 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
         id = smf_get_ndfid( loc, "DKSQUID", "WRITE", "UNKNOWN", "_INTEGER",
                             2, lbnd, ubnd, status );
 
-        ndfMap( id, "DATA", "_INTEGER", "WRITE", pntr, &nmap, status );
+        ndfMap( id, "DATA", "_DOUBLE", "WRITE", pntr, &nmap, status );
         outdksquid = pntr[0];
 
         if( (*status == SAI__OK) && (outdksquid) ) {
-          memcpy( outdksquid, da->dksquid, nmap*sizeof(*(da->dksquid)) );
+          memcpy( outdksquid, da->dksquid->pntr[0],
+                  nmap*sizeof(*outdksquid) );
         }
 
         ndfAnnul( &id, status );

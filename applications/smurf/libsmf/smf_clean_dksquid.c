@@ -269,8 +269,9 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
 
         /* Copy dark squids from the DA extension into dksquid */
         if( needDA && calcdk && model ) {
+          double *ptr = indata->da->dksquid->pntr[0];
           for( j=0; j<ntslice; j++ ) {
-            dksquid[j] = indata->da->dksquid[i+ncol*j];
+            dksquid[j] = ptr[i+ncol*j];
           }
         }
 

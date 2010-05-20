@@ -202,6 +202,8 @@
  *        Read the SMFMODEL FITS header into hdr->mtype.
  *     2010-05-20 (TIMJ):
  *        Read JCMTSTATE if it is present even for non-3D data.
+ *     2010-05-20 (EC):
+ *        Store dark squids in a smfData instead of a bare buffer
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -765,15 +767,35 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
         if (da->flatpar != NULL) memcpy(da->flatpar, flatpar,
                                         sizeof(*(da->flatpar))* da->nflat);
 
-        /* and dark squid */
+        /* and dark squid -- this is stored in a 3d smfData with the row
+           axis having length 1. */
         if (dksquid) {
 
-          da->dksquid = smf_malloc( rowsize * nframes, sizeof(*(da->dksquid)),
-                                    0, status );
+          da->dksquid = smf_create_smfData( SMF__NOCREATE_FILE |
+                                            SMF__NOCREATE_HEAD |
+                                            SMF__NOCREATE_DA, status );
+          da->dksquid->dtype = SMF__DOUBLE;
+          da->dksquid->isTordered = 1;
+          da->dksquid->ndims = 3;
+          da->dksquid->dims[0] = rowsize;
+          da->dksquid->dims[1] = 1;
+          da->dksquid->dims[2] = nframes;
+          da->dksquid->lbnd[0] = 0;
+          da->dksquid->lbnd[1] = 0;
+          da->dksquid->lbnd[2] = 1;
 
-          if (da->dksquid) memcpy( da->dksquid, dksquid,
-                                   sizeof(*(da->dksquid)) * rowsize * nframes );
+          da->dksquid->pntr[0] = smf_malloc( rowsize*nframes,
+                                             smf_dtype_size(da->dksquid,
+                                                            status),
+                                             0, status );
 
+          /* Convert to double precision when we copy into da->dksquid */
+          if( *status == SAI__OK ) {
+            double *ptr = da->dksquid->pntr[0];
+            for( i=0; i<(rowsize*nframes); i++ ) {
+              ptr[i] = (double) dksquid[i];
+            }
+          }
         }
 
         /* Create a FitsChan from the FITS headers */

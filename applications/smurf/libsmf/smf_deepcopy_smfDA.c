@@ -103,7 +103,7 @@
 smfDA *
 smf_deepcopy_smfDA( const smfData *old, int * status ) {
 
-  int *dksquid = NULL;    /* pointer to dark squid */
+  smfData *dksquid = NULL;/* pointer to dark squid */
   double *flatcal = NULL; /* pointer to flatfield calibration */
   double *flatpar = NULL; /* pointer to flatfield parameters */
   double *heatval = NULL; /* pointer to heater values */
@@ -156,10 +156,9 @@ smf_deepcopy_smfDA( const smfData *old, int * status ) {
   }
 
   if (oldda->dksquid) {
-    dksquid = smf_malloc( ncol*ntslice, sizeof(*dksquid), 0, status );
-    if (dksquid) {
-      memcpy( dksquid, oldda->dksquid, sizeof(*dksquid)*ncol*ntslice );
-    }
+    dksquid = smf_deepcopy_smfData( oldda->dksquid, 0, SMF__NOCREATE_HEAD |
+                                    SMF__NOCREATE_FILE | SMF__NOCREATE_DA,
+                                    status );
   }
 
   /* Construct the new smfData */

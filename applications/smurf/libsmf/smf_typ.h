@@ -163,6 +163,8 @@
  *        Add map quality (SMF__MAPQ_ZERO, and mapqual in smfDIMMData)
  *     2010-05-19 (EC):
  *        Add mtype to smfHead, and smf_expmodelptr function prototype
+ *     2010-05-20 (EC):
+ *        Dark squids are now stored in a smfData within smfDA
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -481,6 +483,8 @@ typedef struct smfHead {
    directly using smf_open_file but is used for flatfield calculations.
 */
 
+struct smfData;
+
 typedef struct smfDA {
   double *flatcal;           /* pointer to flatfield calibration */
   double *flatpar;           /* pointer to flatfield parameters */
@@ -488,11 +492,10 @@ typedef struct smfDA {
   smf_flatmeth flatmeth;     /* Flatfield algorithm name */
   size_t nflat;              /* number of flat coeffs per bol */
   size_t nheat;              /* number of elements in heatval */
-  int *dksquid;              /* dark squid for each column */
+  struct smfData *dksquid;   /* dark squid for each column */
 } smfDA;
 
 /* This struct stores DREAM parameters */
-
 typedef struct smfDream {
   size_t nvert;              /* Number of jiggle vertices */
   double jigscal;            /* SMU jiggle pattern scale factor (arcsec) */
