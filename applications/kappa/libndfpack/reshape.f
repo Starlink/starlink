@@ -109,6 +109,8 @@
 *        QUALITY values from 'variance' to 'quality'.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     20-MAY-2010 (DSB):
+*        Map output Quality array with type "_UBYTE", not ITYPE.
 *     {enter_further_changes_here}
 
 *-
@@ -336,7 +338,7 @@
 *  than the input, first initialise it with zero.
          CALL NDF_MAP( NDFI, 'Quality', '_UBYTE', 'READ', PNTRI, ELIN,
      :                 STATUS )
-         CALL NDF_MAP( NDFO, 'Quality', ITYPE, 'WRITE/ZERO', PNTRO,
+         CALL NDF_MAP( NDFO, 'Quality', '_UBYTE', 'WRITE/ZERO', PNTRO,
      :                 ELOUT, STATUS )
 
          CALL VEC_UBTOUB( .TRUE., EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
