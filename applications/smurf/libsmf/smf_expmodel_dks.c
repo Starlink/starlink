@@ -87,6 +87,7 @@ void smf_expmodel_dks( const smfData *indata, smfData **outdata,
 
   /* Local Variables */
   AstFrameSet *tswcs=NULL;      /* time series wcs for expanded data cube */
+  size_t bolo;                  /* bolo number */
   size_t bstride;               /* bolo stride */
   double *d=NULL;               /* pointer to data array */
   smfData *data=NULL;           /* newly created smfData */
@@ -94,7 +95,6 @@ void smf_expmodel_dks( const smfData *indata, smfData **outdata,
   double *gainbuf=NULL;         /* Array of gains for all bolos in this col */
   smfHead *hdr=NULL;            /* smfHead pointer */
   size_t i;                     /* Loop counter */
-  dim_t index;
   size_t j;                     /* Loop counter */
   size_t k;                     /* Loop counter */
   int lbnd_c;
@@ -177,23 +177,21 @@ void smf_expmodel_dks( const smfData *indata, smfData **outdata,
     /* Loop over rows */
     for( j=0; (*status==SAI__OK)&&(j<nrow); j++ ) {
 
-      /* Index in data array to start of the bolometer */
+      /* Calculate the bolo number */
       if( SC2STORE__COL_INDEX ) {
-        index = i*nrow + j;
+        bolo = i*nrow + j;
       } else {
-        index = i + j*ncol;
+        bolo = i + j*ncol;
       }
-      index *= ntslice;
 
       /* Scale the dark squid into the expanded buffer*/
       if( (gainbuf[j] != VAL__BADD) && (offsetbuf[j] != VAL__BADD) ) {
         for( k=0; k<ntslice; k++ ) {
           if( dksquid[k] != VAL__BADD) {
-            d[index+k] += dksquid[k]*gainbuf[j] + offsetbuf[j];
+            d[bolo*bstride+k*tstride] = dksquid[k]*gainbuf[j] + offsetbuf[j];
           }
         }
       }
-
     }
   }
 
