@@ -118,12 +118,12 @@ smf_model_dataOrder( smfDIMMData *dat, smfArray ** allmodel, int chunk, smf_mode
     REORDER( "current", allmodel[chunk] );
   }
 
-  if ( toOrder & SMF__EXT ) REORDER( "ext", dat->ext[chunk] );
-  if ( toOrder & SMF__GAI ) REORDER( "gai", dat->res[chunk] );
-  if ( toOrder & SMF__RES ) REORDER( "res", dat->res[chunk] );
-  if ( toOrder & SMF__NOI ) REORDER( "noi", dat->noi[chunk] );
-  if ( toOrder & SMF__QUA ) REORDER( "qua", dat->qua[chunk] );
-  if ( toOrder & SMF__LUT ) REORDER( "lut", dat->lut[chunk] );
+  if ( toOrder & SMF__EXT && dat->ext ) REORDER( "ext", dat->ext[chunk] );
+  if ( toOrder & SMF__GAI && dat->gai ) REORDER( "gai", dat->res[chunk] );
+  if ( toOrder & SMF__RES && dat->res ) REORDER( "res", dat->res[chunk] );
+  if ( toOrder & SMF__NOI && dat->noi ) REORDER( "noi", dat->noi[chunk] );
+  if ( toOrder & SMF__QUA && dat->qua ) REORDER( "qua", dat->qua[chunk] );
+  if ( toOrder & SMF__LUT && dat->lut ) REORDER( "lut", dat->lut[chunk] );
 
 }
 
