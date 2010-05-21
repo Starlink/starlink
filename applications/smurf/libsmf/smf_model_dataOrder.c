@@ -86,16 +86,19 @@
   {                                                                     \
     size_t idx;                                                         \
     for (idx = 0; idx < ARR->ndat; idx++) {                             \
-      if ( ARR->sdata[idx] ) {                                          \
+      int waschanged = 0;                                               \
+      int old_order = 0;                                                \
+      if ( ARR->sdata[idx] ) old_order = ARR->sdata[idx]->isTordered;   \
+      waschanged = smf_dataOrder( ARR->sdata[idx], isTordered, status ); \
+      if ( waschanged && ARR->sdata[idx] ) {                            \
         const char tordered[] = "time ordered";                         \
         const char bordered[] = "bolo ordered";                         \
         msgOutiff( MSG__VERB, " ",                                      \
-                   "Converting model %s from %s to %s\n",               \
+                   "    Converted %s model from %s to %s\n",           \
                    status, TYP,                                         \
-                   (ARR->sdata[idx]->isTordered ? tordered : bordered), \
+                   (old_order ? tordered : bordered),                   \
                    (isTordered ? tordered : bordered ) );               \
       }                                                                 \
-      smf_dataOrder( ARR->sdata[idx], isTordered, status );             \
     }                                                                   \
   }
 
@@ -112,7 +115,7 @@ smf_model_dataOrder( smfDIMMData *dat, smfArray ** allmodel, int chunk, smf_mode
   }
 
   if (allmodel) {
-    REORDER( "", allmodel[chunk] );
+    REORDER( "current", allmodel[chunk] );
   }
 
   if ( toOrder & SMF__EXT ) REORDER( "ext", dat->ext[chunk] );
