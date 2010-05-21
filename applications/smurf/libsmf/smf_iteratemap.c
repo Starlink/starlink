@@ -277,6 +277,8 @@
 *        Added map dimensions to smfDIMMData so set them
 *     2010-05-18 (TIMJ):
 *        Ensure that the LUT is ordered in the same way as the AST model
+*     2010-05-21 (DSB):
+*        Added dclimcorr argument for sm_fix_steps.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -359,6 +361,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   smfDIMMData dat;              /* Struct passed around to model components */
   smfData *data=NULL;           /* Temporary smfData pointer */
   dim_t dcfitbox=0;             /* Box size for linear fit on either side of a DC steps */
+  int dclimcorr=0;              /* Median filter width for DC steps detection */
   int dcmaxsteps=10;            /* Max number of DC jumps in a bolometer */
   double dcthresh;              /* Threshold for fixing primary DC steps */
   dim_t dcmedianwidth;          /* Median filter width for DC steps detection */
@@ -566,10 +569,10 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
     /* Data-cleaning parameters (should match SC2CLEAN) */
     smf_get_cleanpar( keymap, &apod, &badfrac, &dcfitbox, &dcmaxsteps,
-                      &dcthresh, &dcmedianwidth, NULL, &fillgaps, &f_edgelow,
-                      &f_edgehigh, f_notchlow, f_notchhigh, &f_nnotch,
-                      &dofft, &flagstat, &baseorder, &spikethresh,
-                      &spikeiter, status );
+                      &dcthresh, &dcmedianwidth, &dclimcorr, NULL, &fillgaps,
+                      &f_edgelow, &f_edgehigh, f_notchlow, f_notchhigh,
+		      &f_nnotch, &dofft, &flagstat, &baseorder,
+		      &spikethresh, &spikeiter, status );
 
     /* Maximum length of a continuous chunk */
     if( *status == SAI__OK ) {
@@ -1163,6 +1166,11 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           /* If first iteration pre-condition the data */
           if( iter == 0 ) {
 
+
+
+
+
+
             msgOut(" ", FUNC_NAME ": Pre-conditioning chunk", status);
             goodbolo=0; /* Initialize good bolo count for this chunk */
             for( idx=0; idx<res[i]->ndat; idx++ ) {
@@ -1188,7 +1196,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
               if( dcthresh && dcfitbox ) {
                 msgOutif(MSG__VERB," ", "  find bolos with steps...", status);
                 smf_fix_steps( wf, data, qua_data, dcthresh, dcmedianwidth,
-                               dcfitbox, dcmaxsteps, &nflag, status );
+                               dcfitbox, dcmaxsteps, dclimcorr, &nflag, status );
                 msgOutiff(MSG__VERB, "","  ...%zd flagged\n", status, nflag);
               }
 

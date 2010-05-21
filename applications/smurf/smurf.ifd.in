@@ -2346,6 +2346,14 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter dclimcorr {
+                type _INTEGER
+                vpath {DEFAULT}
+                prompt {Minimum number of bolos for a correlated DC jump}
+                default 10
+                helpkey *
+            }
+
             parameter dcmaxsteps {
                 type _INTEGER
                 vpath {DEFAULT}

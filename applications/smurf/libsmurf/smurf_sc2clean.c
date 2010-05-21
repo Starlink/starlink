@@ -121,6 +121,8 @@
 *     2010-05-13 (EC):
 *        Complete the conversion to smf_fix_steps from smf_correct_steps;
 *        add DCMAXSTEPS and DCMEDIANWIDTH, remove DCTHRESH2.
+*     2010-05-13 (DSB):
+*        Added dclimcorr to smf_fix_steps.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -185,6 +187,7 @@ void smurf_sc2clean( int *status ) {
   smfArray *darks = NULL;   /* Dark data */
   dim_t dcfitbox=0;         /* width of box for measuring DC steps */
   int dcmaxsteps;           /* number of DC steps/min. to flag bolo bad */
+  int dclimcorr;            /* Min. no. of bolos for a correlated step */
   dim_t dcmedianwidth;      /* median filter width before finding DC steps */
   double dcthresh=0;        /* n-sigma threshold for primary DC steps */
   int dkclean;              /* Flag for dark squid cleaning */
@@ -246,6 +249,7 @@ void smurf_sc2clean( int *status ) {
     atlGetParam( "BADFRAC", keymap, status );
     atlGetParam( "DCFITBOX", keymap, status );
     atlGetParam( "DCMAXSTEPS", keymap, status );
+    atlGetParam( "DCLIMCORR", keymap, status );
     atlGetParam( "DCMEDIANWIDTH", keymap, status );
     atlGetParam( "DCTHRESH", keymap, status );
     parGet0l( "DKCLEAN", &dkclean, status );
@@ -262,10 +266,10 @@ void smurf_sc2clean( int *status ) {
     atlGetParam( "SPIKETHRESH", keymap, status );
 
     smf_get_cleanpar( keymap, &apod, &badfrac, &dcfitbox, &dcmaxsteps,
-                      &dcthresh, &dcmedianwidth, &dkclean, &fillgaps,
-                      NULL, NULL, NULL,
-		      NULL, NULL, NULL, &flagstat, &order, &spikethresh,
-		      &spikeiter, status ); }
+                      &dcthresh, &dcmedianwidth, &dclimcorr, &dkclean,
+		      &fillgaps, NULL, NULL, NULL, NULL, NULL, NULL,
+		      &flagstat, &order, &spikethresh, &spikeiter, status
+		      ); }
 
   /* Loop over input files */
   if( *status == SAI__OK ) for( i=1; i<=size; i++ ) {
@@ -301,7 +305,7 @@ void smurf_sc2clean( int *status ) {
                 dcthresh, dcfitbox, dcmedianwidth, dcmaxsteps);
 
       smf_fix_steps( wf, ffdata, NULL, dcthresh, dcmedianwidth, dcfitbox,
-                     dcmaxsteps, NULL, status );
+                     dcmaxsteps, dclimcorr, NULL, status );
     }
 
     /* Flag spikes */

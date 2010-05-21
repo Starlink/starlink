@@ -900,7 +900,7 @@ void smf_flag_stationary( smfData *data, unsigned char *quality,
 
 void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
                     double dcthresh, dim_t dcmedianwidth, dim_t dcbox,
-                    int dcflag, size_t *nsteps, int *status );
+                    int dcflag, int dclimcorr, size_t *nsteps, int *status );
 
 void smf_flat_assign ( int use_da, smf_flatmeth inflatmeth, const smfData * powval,
                        const smfData * bolval, smfData * updata, int *status );
@@ -980,12 +980,12 @@ void smf_geod( const double pos[3], double *phi, double *h, double *lambda );
 
 void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
                        dim_t *dcbox, int *dcbad, double *dcthresh,
-                       dim_t *dcmedianwidth, int *dkclean, int *fillgaps,
-                       double *filt_edgelow, double *filt_edgehigh,
-                       double *filt_notchlow, double *filt_notchhigh,
-                       int *filt_nnotch, int *dofilt, double *flagstat,
-                       int *order, double *spikethresh, size_t
-                       *spikeiter, int *status );
+                       dim_t *dcmedianwidth, int *dclimcorr, int
+		       *dkclean, int *fillgaps, double *filt_edgelow,
+		       double *filt_edgehigh, double *filt_notchlow,
+		       double *filt_notchhigh, int *filt_nnotch, int
+		       *dofilt, double *flagstat, int *order, double
+		       *spikethresh, size_t *spikeiter, int *status );
 
 void smf_get_dims( const smfData *data, dim_t *nrows, dim_t *ncols,
                    dim_t *nbolo, dim_t *ntslice, dim_t *ndata,

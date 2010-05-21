@@ -15,7 +15,8 @@
 *  Invocation:
 *     smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
 *                       dim_t *dcfitbox, int *dcmaxsteps, double *dcthresh,
-*                       dim_t dcmedianwidth, int *dkclean, int *fillgaps,
+*                       dim_t *dcmedianwidth, int *dclimcorr,
+*                       int *dkclean, int *fillgaps,
 *                       double *filt_edgelow, double *filt_edgehigh,
 *                       double *filt_notchlow, double *filt_notchhigh,
 *                       int *filt_nnotch, int *dofilt, double *flagstat,
@@ -42,8 +43,12 @@
 *        data stream.
 *     dcthresh = double* (Returned)
 *        N-sigma threshold at which to detect DC steps
-*     dcmedianwidth = dim_t (Returned)
+*     dcmedianwidth = dim_t * (Returned)
 *        Width of median filter for DC step detection.
+*     dclimcorr = int * (Returned)
+*        Minimum number of bolometers that must have simultaneous steps
+*        in order to trigger step correction at the same time in all
+*        bolometers.
 *     dkclean = int* (Returned)
 *        If true, clean dark squids from bolos (NULL:-1)
 *     fillgaps = int* (Returned)
@@ -157,8 +162,8 @@
 
 void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
                        dim_t *dcfitbox, int *dcmaxsteps, double *dcthresh,
-                       dim_t *dcmedianwidth, int *dkclean, int *fillgaps,
-                       double *filt_edgelow, double *filt_edgehigh,
+                       dim_t *dcmedianwidth, int *dclimcorr, int *dkclean,
+                       int *fillgaps, double *filt_edgelow, double *filt_edgehigh,
                        double *filt_notchlow, double *filt_notchhigh,
                        int *filt_nnotch, int *dofilt, double *flagstat,
                        int *order, double *spikethresh, size_t *spikeiter,
@@ -244,6 +249,12 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
 
     msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCMEDIANWIDTH=%" DIM_T_FMT, status,
                *dcmedianwidth );
+  }
+
+  if( dclimcorr ) {
+    astMapGet0I( keymap, "DCLIMCORR", dclimcorr );
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCLIMCORR=%d", status,
+               *dclimcorr );
   }
 
   if( dkclean ) {

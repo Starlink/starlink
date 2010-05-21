@@ -14,8 +14,8 @@
 
 *  Invocation:
 *     smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int
-*			 chunk, AstKeyMap *keymap, smfArray
-*			 **allmodel, int flags, int *status)
+*                        chunk, AstKeyMap *keymap, smfArray
+*                        **allmodel, int flags, int *status)
 
 *  Arguments:
 *     wf = smfWorkForce * (Given)
@@ -91,6 +91,8 @@
 *     2010-05-04 (TIMJ):
 *        Simplify KeyMap access. We now trigger an error if a key is missing
 *        and we ensure all keys have corresponding defaults.
+*     2010-05-21 (DSB):
+*        Add dclimcorr argument to smf_fix_steps.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -143,6 +145,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   size_t bstride;               /* bolometer stride */
   int dcmaxsteps;               /* Maximum allowed number of dc jumps */
   dim_t dcfitbox;               /* Width of box for DC step detection */
+  int dclimcorr;                /* Minimum number of bolos with correlated steps */
   double dcthresh;              /* Threshold for DC step detection */
   dim_t dcmedianwidth;          /* Width of median filter in DC step detection */
   int fillgaps;                 /* If set perform gap filling */
@@ -189,9 +192,10 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   if( kmap ) {
 
     /* Data-cleaning parameters  */
-    smf_get_cleanpar( kmap, NULL, NULL, &dcfitbox, &dcmaxsteps, &dcthresh, &dcmedianwidth,
-                      NULL, &fillgaps, NULL, NULL, NULL, NULL, NULL, NULL,
-                      NULL, NULL, &spikethresh, &spikeiter, status );
+    smf_get_cleanpar( kmap, NULL, NULL, &dcfitbox, &dcmaxsteps, &dcthresh,
+                      &dcmedianwidth, &dclimcorr, NULL, &fillgaps, NULL,
+                      NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+                      &spikethresh, &spikeiter, status );
   }
 
 
@@ -221,8 +225,8 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
                     &mbstride, &mtstride, status );
 
       /* Only estimate the white noise level once at the beginning - the
-	 reason for this is to make measurements of the convergence
-	 easier. */
+         reason for this is to make measurements of the convergence
+         easier. */
 
       var = smf_malloc( nbolo, sizeof(*var), 0, status );
 
@@ -231,7 +235,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         smf_bolonoise( wf, res->sdata[idx], qua_data, 0, 0.5, SMF__F_WHITELO,
                        SMF__F_WHITEHI, 0, 0, var, NULL, NULL, status );
 
-	for( i=0; i<nbolo; i++ ) if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {
+        for( i=0; i<nbolo; i++ ) if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {
             /* Loop over time and store the variance for each sample */
             for( j=0; j<mntslice; j++ ) {
               model_data[i*mbstride+(j%mntslice)*mtstride] = var[i];
@@ -246,7 +250,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
       if( kmap ) {
         /* Flag spikes in the residual after first iteration */
         if( spikethresh && !(flags&SMF__DIMM_FIRSTITER) ) {
-	  /* Now re-flag */
+          /* Now re-flag */
           smf_flag_spikes( res->sdata[idx], var, qua_data,
                            SMF__Q_MOD,
                            spikethresh, spikeiter,
@@ -259,7 +263,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
         if( dcthresh && dcfitbox ) {
           smf_fix_steps( wf, res->sdata[idx], qua_data, dcthresh, dcmedianwidth,
-                             dcfitbox, dcmaxsteps, &nflag, status );
+                             dcfitbox, dcmaxsteps, dclimcorr, &nflag, status );
           msgOutiff(MSG__VERB, "","   detected %li bolos with DC steps\n",
                     status, nflag);
         }
