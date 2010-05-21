@@ -93,8 +93,8 @@ void smf_expmodel_dks( const smfData *indata, smfData **outdata,
   smfData *data=NULL;           /* newly created smfData */
   double *dksquid=NULL;         /* Pointer to current dark squid */
   double *gainbuf=NULL;         /* Array of gains for all bolos in this col */
-  smfHead *hdr=NULL;            /* smfHead pointer */
   size_t i;                     /* Loop counter */
+  smfHead *inhdr=NULL;          /* input smfHead pointer */
   size_t j;                     /* Loop counter */
   size_t k;                     /* Loop counter */
   int lbnd_c;
@@ -104,6 +104,7 @@ void smf_expmodel_dks( const smfData *indata, smfData **outdata,
   dim_t ncol;                   /* Number of columns */
   int ncols;
   dim_t ndata;                  /* Total number of data points */
+  smfHead *outhdr=NULL;         /* output smfHead pointer */
   dim_t nrow;                   /* Number of rows */
   int nrows;
   dim_t ntslice;                /* Number of time slices */
@@ -115,14 +116,20 @@ void smf_expmodel_dks( const smfData *indata, smfData **outdata,
   if (*status != SAI__OK) return;
 
   /* Get the dimensions of the expanded data */
-  hdr = indata->hdr;
+  inhdr = indata->hdr;
 
-  smf_getfitsi( hdr, "SMFDIMR", &nrows, status );
-  smf_getfitsi( hdr, "SMFDIMC", &ncols, status );
-  smf_getfitsi( hdr, "SMFDIMT", &ntslices, status );
-  smf_getfitsi( hdr, "SMFLBNDR", &lbnd_r, status );
-  smf_getfitsi( hdr, "SMFLBNDC", &lbnd_c, status );
-  smf_getfitsi( hdr, "SMFLBNDT", &lbnd_t, status );
+  if( !inhdr ) {
+    *status = SAI__ERROR;
+    errRep( "", FUNC_NAME ": model container does not have a header.", status );
+    return;
+  }
+
+  smf_getfitsi( inhdr, "SMFDIMR", &nrows, status );
+  smf_getfitsi( inhdr, "SMFDIMC", &ncols, status );
+  smf_getfitsi( inhdr, "SMFDIMT", &ntslices, status );
+  smf_getfitsi( inhdr, "SMFLBNDR", &lbnd_r, status );
+  smf_getfitsi( inhdr, "SMFLBNDC", &lbnd_c, status );
+  smf_getfitsi( inhdr, "SMFLBNDT", &lbnd_t, status );
 
   nrow = (dim_t) nrows;
   ncol = (dim_t) ncols;
@@ -155,12 +162,13 @@ void smf_expmodel_dks( const smfData *indata, smfData **outdata,
   data->lbnd[SC2STORE__COL_INDEX] = lbnd_c;
   data->lbnd[2] = lbnd_t;
 
-  smf_create_tswcs( hdr, &tswcs, status );
+  outhdr = data->hdr;
+  smf_create_tswcs( outhdr, &tswcs, status );
 
-  if( hdr->tswcs ) {
-    hdr->tswcs = astAnnul( hdr->tswcs );
+  if( outhdr->tswcs ) {
+    outhdr->tswcs = astAnnul( outhdr->tswcs );
   }
-  hdr->tswcs = tswcs;
+  outhdr->tswcs = tswcs;
 
   /* Figure out remaining dimensions information */
   smf_get_dims( data, NULL, NULL, &nbolo, NULL, NULL, &bstride, &tstride,status);
@@ -193,6 +201,29 @@ void smf_expmodel_dks( const smfData *indata, smfData **outdata,
         }
       }
     }
+  }
+
+  /* Once expanded these are no longer model files, so delete relevant FITS
+     headers */
+  if( (*status==SAI__OK) && (outhdr->fitshdr) ) {
+    AstFitsChan *fits = outhdr->fitshdr;
+
+    astClear( fits, "Card" );
+    if( astFindFits(fits, "SMFMODEL", NULL, 0) ) astDelFits( fits );
+    astClear( fits, "Card" );
+    if( astFindFits(fits, "SMFLBNDR", NULL, 0) ) astDelFits( fits );
+    astClear( fits, "Card" );
+    if( astFindFits(fits, "SMFDIMR", NULL, 0) ) astDelFits( fits );
+    astClear( fits, "Card" );
+    if( astFindFits(fits, "SMFDIMC", NULL, 0) ) astDelFits( fits );
+    astClear( fits, "Card" );
+    if( astFindFits(fits, "SMFDIMT", NULL, 0) ) astDelFits( fits );
+    astClear( fits, "Card" );
+    if( astFindFits(fits, "SMFLBNDR", NULL, 0) ) astDelFits( fits );
+    astClear( fits, "Card" );
+    if( astFindFits(fits, "SMFLBNDC", NULL, 0) ) astDelFits( fits );
+    astClear( fits, "Card" );
+    if( astFindFits(fits, "SMFLBNDT", NULL, 0) ) astDelFits( fits );
   }
 
   /* Return pointer to new data */
