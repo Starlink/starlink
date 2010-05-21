@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     smf_dataOrder( smfData *data, int isTordered, *status );
+*     waschanged = smf_dataOrder( smfData *data, int isTordered, *status );
 
 *  Arguments:
 *     data = smfData* (Given and Returned)
@@ -45,7 +45,10 @@
 *     read-only). The pointing LUT will only be re-ordered if it is
 *     already open (e.g. from a previous call to smf_open_mapcoord).
 
-*
+*  Returned Value:
+*     waschanged = int
+*        True if the data were re-ordered. False otherwise.
+
 *  Authors:
 *     EC: Edward Chapin (UBC)
 *     {enter_new_authors_here}
@@ -72,6 +75,8 @@
 *        Stride-ify
 *     2009-09-29 (TIMJ):
 *        Handle pixel origin reordering
+*     2010-05-20 (TIMJ):
+*        Return a boolean indicating whether the data were reordered or not.
 
 *  Notes:
 *     Nothing is done about the FITS channels or WCS information stored in
@@ -79,7 +84,7 @@
 *     bolo-ordered data produced with this routine.
 
 *  Copyright:
-*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2009-2010 Science & Technology Facilities Council.
 *     Copyright (C) 2005-2009 University of British Columbia.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
@@ -122,7 +127,7 @@
 
 #define FUNC_NAME "smf_dataOrder"
 
-void smf_dataOrder( smfData *data, int isTordered, int *status ) {
+int smf_dataOrder( smfData *data, int isTordered, int *status ) {
 
   /* Local Variables */
   size_t bstr1;                 /* bolometer index stride input */
@@ -144,27 +149,28 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
   size_t tstr1;                 /* time index stride input */
   size_t tstr2;                 /* time index stride output */
   size_t sz=0;                  /* Size of element of data array */
+  int waschanged = 0;           /* did we chagne the order? */
 
   /* Main routine */
-  if (*status != SAI__OK) return;
+  if (*status != SAI__OK) return waschanged;
 
   /* Check for valid isTordered */
   if( (isTordered != 0) && (isTordered != 1) ) {
     *status = SAI__ERROR;
     msgSeti("ISTORDERED",isTordered);
     errRep( "", FUNC_NAME ": Invalid isTordered (0/1): ^ISTORDERED", status);
-    return;
+    return waschanged;
   }
 
   /* Check for a valid data */
   if( !data ) {
     *status = SAI__ERROR;
     errRep( "", FUNC_NAME ": NULL data supplied", status);
-    return;
+    return waschanged;
   }
 
   /* If value of isTordered matches current value in smfData return */
-  if( data->isTordered == isTordered ) return;
+  if( data->isTordered == isTordered ) return waschanged;
 
   /* Make sure we're looking at 3-dimensions of bolo data */
   if( data->ndims != 3 ) {
@@ -173,8 +179,11 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
     errRep( "", FUNC_NAME
            ": Don't know how to handle ^NDIMS dimensions, should be 3.",
             status);
-    return;
+    return waschanged;
   }
+
+  /* we are going to change */
+  waschanged = 1;
 
   /* inPlace=1 if smfData was mapped! */
   if( data->file && (data->file->fd || data->file->ndfid) ) {
@@ -323,4 +332,6 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
     memcpy( data->lbnd, newlbnd, 3*sizeof(*newlbnd) );
     data->isTordered = isTordered;
   }
+
+  return waschanged;
 }
