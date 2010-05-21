@@ -657,7 +657,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
               }
 
               /* dark squids */
-              if( da->dksquid && refdata->da && refdata->da->dksquid) {
+              if( da && da->dksquid && refdata->da && refdata->da->dksquid) {
                 double *ptr = da->dksquid->pntr[0];
                 ptr += tchunk*ncol;
                 memcpy( ptr, refdata->da->dksquid->pntr[0],
