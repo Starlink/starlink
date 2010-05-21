@@ -47,6 +47,10 @@
 *     DCFITBOX = _INTEGER (Read)
 *          Box size over which to fit data with a straight line on either side
 *          of a potential DC step. [400]
+*     DCLIMCOR = _INTEGER (Read)
+*          Minimum number of bolometers that must have simultaneous steps
+*          in order to trigger step correction at the same time in all
+*          bolometers. [10]
 *     DCMAXSTEPS = _INTEGER (Read)
 *          Maximum steps per min. allower before flagging entire bolo bad. [10]
 *     DCMEDIANWIDTH = _INTEGER (Read)
