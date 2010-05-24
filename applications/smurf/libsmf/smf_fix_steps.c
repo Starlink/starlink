@@ -82,6 +82,11 @@
 *        are continuous with the intermediate data.
 *     21-MAY-2010 (DSB):
 *        Added dclimcorr.
+*     24-MAY-2010 (DSB):
+*        - Do not alter the padding values at start and end of each bolometer
+*        time series.
+*        - Apodize the initial and final correction for each bolometer
+*        time series, in the same way that smf_apodize does.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -172,7 +177,8 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
 			      itime_lo, int itime_hi, int *common, int
 			      maxsteps, dim_t dcfitbox, int dcminbox,
 			      float dcminpop, double dcthresh, double
-			      dcthresh2, int *status );
+			      dcthresh2, int pad_start, int pad_end,
+                  int itime_start, int itime_end, int *status );
 
 
 
@@ -217,6 +223,8 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
    int nblock;
    int nsign;
    int ntime;                  /* Number of time slices in usable range */
+   int pad_end;
+   int pad_start;
    int step_end;
    int step_limit;
    int step_start;
@@ -323,7 +331,13 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
 /* Find, and optionally repair, DC steps. */
    if( dcfitbox && (*status == SAI__OK) ) {
 
-/* Identify the first and last samples before/after padding+apodization */
+/* Identify the first and last samples before/after padding. */
+      smf_get_goodrange( qua, ntslice, 1, SMF__Q_PAD,
+                         &itime_start, &itime_end, status );
+      pad_start = itime_start;
+      pad_end = itime_end;
+
+/* Identify the first and last samples before/after padding and apodization. */
       smf_get_goodrange( qua, ntslice, 1, SMF__Q_BOUND,
                          &itime_start, &itime_end, status );
 
@@ -574,7 +588,8 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
                                      ntime, itime_lo, itime_hi, common,
                                      dcmaxsteps*( ((double) tpop)/12000.0 ),
                                      dcfitbox, dcminbox, dcminpop, dcthresh,
-                                     dcthresh2, status );
+                                     dcthresh2, pad_start, pad_end,
+                                     itime_start, itime_end, status );
          }
       }
 
@@ -624,7 +639,8 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
 					   ntslice, ntime, itime_lo,
 					   itime_hi, NULL, 0, dcfitbox,
 					   dcminbox, dcminpop, 0.0,
-					   dcthresh2, status );
+					   dcthresh2, pad_start, pad_end,
+                       itime_start, itime_end, status );
 
                }
             }
@@ -817,7 +833,9 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
                               dim_t ntslice, int ntime, int itime_lo,
                               int itime_hi, int *common, int maxsteps,
                               dim_t dcfitbox, int dcminbox, float dcminpop,
-                              double dcthresh, double dcthresh2, int *status ){
+                              double dcthresh, double dcthresh2,
+                              int pad_start, int pad_end, int itime_start,
+                              int itime_end, int *status ){
 
 /* Local Variables: */
    double *pd;
@@ -840,6 +858,7 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
    int boxstart;
    int iblock;
    int itime;                  /* Index of time slice */
+   int j;
    int jtime;                  /* Index of time slice */
    int ncorr;
    int nstep;
@@ -998,25 +1017,40 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
       ncorr = 0;
 
 /* Otherwise, add the correction onto the original data and flag each
-   jump. Modify the corrections to have an average value of zero. The
-   first and last dcmedianwidth slices have not been tested for steps,
-   so all we can do is pass them through unchanged (except for adding the
-   initial and final corrections to ensure they are continuous with the
-   corrected data). */
+   jump. Modify the corrections to have an average value of zero. */
    } else {
       avecorr = sumcorr/ncorr;
 
-      pd = dat + base;
-      for( itime = 0; itime < itime_lo; itime++,pd++ ) {
-         if( *pd != VAL__BADD ) *pd -= avecorr;
+/* Add on the apodised correction at the start (skipping padding). There
+   may or may not be any apodised data, depending on whether smf_apodize has
+   already been called or not. */
+      int thelen = itime_start - pad_start - 1;
+      j = 0;
+      pd = dat + ibolo*bstride + pad_start*tstride;
+      for( itime = pad_start; itime < itime_start; itime++,j++) {
+         if( *pd != VAL__BADD ) {
+            *pd += ( -avecorr )*( 0.5 - 0.5*cos( AST__DPI * (double) j / thelen ) );
+         }
+         pd += tstride;
       }
 
+/* The first dcmedianwidth slices after the apodised section have not been
+   tested for steps, so all we can do is pass them through unchanged
+   (except for adding the initial correction to ensure they are continuous
+   with the corrected data). Note, "itime_lo" and "itime_hi" are offsets
+   from "itime_start", not from zero. */
+      for( ; itime < itime_lo + itime_start; itime++) {
+         if( *pd != VAL__BADD ) *pd -= avecorr;
+         pd += tstride;
+      }
+
+/* Add on the full correction over the useful central section. */
       pd = dat + base + itime_lo*tstride;
       pq = qua + base + itime_lo*tstride;
       pw = work + itime_lo;
 
       corr = 0;
-      for( itime = itime_lo; itime <= itime_hi; itime++,pw++ ) {
+      for( ; itime <= itime_hi + itime_start; itime++,pw++ ) {
          if( *pw != VAL__BADD ) {
              corr = *pw - avecorr;
          } else {
@@ -1028,8 +1062,23 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
          pq += tstride;
       }
 
-      for( ; itime < (int) ntslice; itime++,pd++ ) {
+/* The last dcmedianwidth slices before the final apodised section have not
+   been tested for steps, so all we can do is pass them through unchanged
+   (except for adding the initial correction to ensure they are continuous
+   with the corrected data). */
+      for( ; itime <= itime_end; itime++) {
          if( *pd != VAL__BADD ) *pd += corr;
+         pd += tstride;
+      }
+
+/* Add on the apodised correction at the end (skipping padding). */
+      thelen = pad_end - itime_end - 1;
+      j = thelen;
+      for( ; itime < pad_end; itime++,j--) {
+         if( *pd != VAL__BADD ) {
+            *pd += corr*( 0.5 - 0.5*cos( AST__DPI * (double) j / thelen ) );
+         }
+         pd += tstride;
       }
    }
 
