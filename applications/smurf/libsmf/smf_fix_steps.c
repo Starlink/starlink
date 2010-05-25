@@ -522,6 +522,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
             step_limit = -1;
             start_value = VAL__BADD;
             end_value = VAL__BADD;
+            nsign = 0;
 
 /* Find the minimum significant gradient. */
             thresh = rms*dcthresh;
@@ -752,6 +753,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
    detected above at each time slice. Locate blocks of time slices at
    which more than "dclimcorr" bolometers were found to have large steps
    above. */
+         step_start = -1;
          nblock = 0;
          for( jtime = 0; jtime < ntime; jtime++ ) {
 
