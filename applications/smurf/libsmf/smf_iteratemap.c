@@ -1174,25 +1174,15 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             msgOut(" ", FUNC_NAME ": Pre-conditioning chunk", status);
             goodbolo=0; /* Initialize good bolo count for this chunk */
             for( idx=0; idx<res[i]->ndat; idx++ ) {
-              /* Synchronize quality flags */
 
+              /* Synchronize quality flags */
               data = res[i]->sdata[idx];
               qua_data = qua[i]->sdata[idx]->pntr[0];
 
               msgOutif(MSG__VERB," ", "  update quality", status);
               smf_update_quality( data, qua_data, 1, NULL, badfrac, status );
 
-              if( baseorder >= 0 ) {
-                msgOutif(MSG__VERB," ", "  fit polynomial baselines", status);
-                smf_scanfit( data, qua_data, baseorder, status );
-
-                msgOutif(MSG__VERB," ", "  remove polynomial baselines",
-                         status);
-                smf_subtract_poly( data, qua_data, 0, status );
-              }
-
               /* Flag/repair bad detectors with DC steps in them */
-
               if( dcthresh && dcfitbox ) {
                 msgOutif(MSG__VERB," ", "  find bolos with steps...", status);
                 smf_fix_steps( wf, data, qua_data, dcthresh, dcmedianwidth,
@@ -1200,6 +1190,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                 msgOutiff(MSG__VERB, "","  ...%zd flagged\n", status, nflag);
               }
 
+              /* Flag spikes */
               if( spikethresh ) {
                 msgOutif(MSG__VERB," ", "  flag spikes...", status);
                 smf_flag_spikes( data, NULL, qua_data,
@@ -1210,11 +1201,23 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                           status, nflag, aiter );
               }
 
+              /* Gap filling */
               if( fillgaps ) {
                 msgOutif(MSG__VERB," ", "  gap filling", status);
                 smf_fillgaps( wf, data, qua_data, SMF__Q_GAP, status );
               }
 
+              /* Remove baselines */
+              if( baseorder >= 0 ) {
+                msgOutif(MSG__VERB," ", "  fit polynomial baselines", status);
+                smf_scanfit( data, qua_data, baseorder, status );
+
+                msgOutif(MSG__VERB," ", "  remove polynomial baselines",
+                         status);
+                smf_subtract_poly( data, qua_data, 0, status );
+              }
+
+              /* Apodization */
               if( apod ) {
                 msgOutif(MSG__VERB," ", "  apodizing data", status);
                 smf_apodize( data, qua_data, apod, status );
