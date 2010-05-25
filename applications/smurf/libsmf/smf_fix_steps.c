@@ -94,6 +94,8 @@
 *        - Change dcminstepgap from 50 to 0.5*dcmedianwidth to allow
 *        such sub-steps (sometimes) to be processed as two separate steps.
 *        - Re-organise the debugging facilities.
+*        - If a step occurs too close to the start or end to be fixed,
+*        flag all samples as a jump up tp the start or end.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -138,7 +140,6 @@
 /* A magic unsigned value */
 #define INIT 999999999
 
-
 #ifdef DEBUG_STEPS
 
 #define DEBUG_ARGS , TimeData *timedata
@@ -151,7 +152,7 @@
 #define CHECK_2 16
 #define CHECK_3 32
 
-#define RECORD_BOLO (ibolo==200)
+#define RECORD_BOLO (ibolo==916)
 
 #define TOPCAT(fd, x) \
    if( x != VAL__BADD ) { \
@@ -1097,8 +1098,22 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
                             dat + base + boxstart*tstride,
                             qua + base + boxstart*tstride,
                             dcthresh2, &mlo, &clo, &rmslo, status );
+
+/* If the box length is less than dcminbox, we skip this block. */
       } else {
          mlo = VAL__BADD;
+
+/* If the box is short because it has extended to the start of the time
+   series, then flag all the samples from the start of the time series
+   as a jump, so that they will not be used. */
+         if( boxstart == 0 ) {
+            pq = qua + base + boxstart*tstride;
+            for( jtime = 0; jtime < boxlen; jtime++ ) {
+               *pq |= SMF__Q_JUMP;
+                pq += tstride;
+            }
+         }
+
       }
 
 /* Get the data value at the centre of the step as implied by the
@@ -1137,6 +1152,14 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
                             dcthresh2, &mhi, &chi, &rmshi, status );
       } else {
          mhi = VAL__BADD;
+
+         if( boxend == ntime - 1 ) {
+            pq = qua + base + boxstart*tstride;
+            for( jtime = 0; jtime < boxlen; jtime++ ) {
+               *pq |= SMF__Q_JUMP;
+                pq += tstride;
+            }
+         }
       }
 
       if( mhi != VAL__BADD ) {
