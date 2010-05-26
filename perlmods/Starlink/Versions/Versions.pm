@@ -761,8 +761,12 @@ sub _get_git_version {
     my $p = DateTime::Format::Strptime->new(pattern => '%Y-%m-%d %H:%M:%S %z',
                                             time_zone=>'UTC');
     my $dt = $p->parse_datetime($date);
-    $info{COMMITDATE} = $dt;
-    $info{STRING} .= " (".$dt->datetime.")";
+    if (defined $dt) {
+      $info{COMMITDATE} = $dt;
+      $info{STRING} .= " (".$dt->datetime.")";
+    } else {
+      $info{STRING} .= " (unknown date)";
+    }
   }
 
   return \%info;
