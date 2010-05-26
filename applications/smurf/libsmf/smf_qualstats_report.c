@@ -54,9 +54,13 @@
 *        Initial Version
 *     2010-03-19 (EC):
 *        Simplify interface, and keep track of total samples in map
+*     2010-05-25 (TIMJ):
+*        Convert "total samples available for map" into a number
+*        of working bolometers.
 
 *  Copyright:
 *     Copyright (C) 2010 University of British Columbia.
+*     Copyright (C) 2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -295,8 +299,9 @@ void smf_qualstats_report( const smfArray *qua,
 
     /* Total number of samples for the map */
     msgOutf("",
-            "Total samples available for map: %10zu, %5.2lf%% of max",
-            status, nmap, 100. * (double) nmap / (double) nmax );
+            "Total samples available for map: %10zu, %5.2lf%% of max (%g bolos)",
+            status, nmap, 100. * (double) nmap / (double) nmax,
+            (double)nmap / (double)(ntslice-tbound) );
 
     if( !init ) {
       msgOutf("",
