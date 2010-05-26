@@ -68,6 +68,8 @@
 #    2010-5-26 (DSB):
 #       - Avoid truncating the smoothed PSF when using the "-s" option.
 #       - Improve trapping of errors due to missing FITS headers
+#       - Account for bad pixels when correcting for the total data sum
+#         in the psf (by setting the new CONVOLVE parameter "NORM" to FALSE).
 
 #  Copyright:
 #     Copyright (C) 2010 Science & Technology Facilities Council.
@@ -286,50 +288,39 @@ endif
 # First get the ratio of the data to the variance in the input image.
 $KAPPA_DIR/maths exp="IA/VA" ia=$in out=mf_temp1
 
-# Smooth this using the supplied psf. This command occasionally (but not
-# always) issues the following error. It is not fatal, but should be
-# investiagted ASAP...
+# Smooth this using the supplied psf, without normalising the output. This
+# command occasionally (but not always) issues the following error. It is not
+# fatal, but should be investiagted ASAP...
 #
 # !! The ancestor NDF '/data/scuba2/work/matched-filter/mf_temp1' was included
 # !     twice within the provenance structure, but each occurrence specifies a
 # !     different set of parents.
 # !  Application exit status SAI__ERROR, Error
-# !  in=mf_temp1 out=mf_temp2 psf=mf_psf2 xcentre=0 ycentre=0
+# !  in=mf_temp1 out=mf_a psf=mf_psf2 xcentre=0 ycentre=0
 #
-$KAPPA_DIR/convolve in=mf_temp1 out=mf_temp2 psf=$psf xcentre=0 ycentre=0
-
-# The kappa:convolve command normalises the output NDF by dividing the
-# data values by the total data sum in the PSF. We do not want this
-# normalisation, so we now scale the output image created above by the
-# total data sum in the PSF.
-
-$KAPPA_DIR/stats $psf quiet
-set psf_sum = `$KAPPA_DIR/parget total stats`
-$KAPPA_DIR/cmult in=mf_temp2 out=mf_a scalar=$psf_sum
+$KAPPA_DIR/convolve in=mf_temp1 out=mf_a psf=$psf xcentre=0 ycentre=0 \
+                    norm=no
 
 # Now go on to create image B. Get the reciprocal of the variances from
 # the input image.
-$KAPPA_DIR/maths exp="1/VA" va=$in out=mf_temp1
+$KAPPA_DIR/maths exp="1/VA" va=$in out=mf_temp6
 
 # Get the square of the PSF.
 $KAPPA_DIR/mult in1=$psf in2=$psf out=mf_temp3
 
 # Smooth the reciprocal of the variances using the squared PSF.
-$KAPPA_DIR/convolve in=mf_temp1 out=mf_temp2 psf=mf_temp3 xcentre=0 ycentre=0
-
-# Undo the normalisation produced by kappa:convolve.
-$KAPPA_DIR/stats mf_temp3 quiet
-set psf2_sum = `$KAPPA_DIR/parget total stats`
-$KAPPA_DIR/cmult in=mf_temp2 out=mf_b scalar=$psf2_sum
+$KAPPA_DIR/convolve in=mf_temp6 out=mf_b psf=mf_temp3 xcentre=0 ycentre=0 \
+                    norm=no
 
 # The output image is the ratio of A and B.
 $KAPPA_DIR/div in1=mf_a in2=mf_b out=$out
 
 # The variance in the output image is the reciprocal of B.
-$KAPPA_DIR/maths exp="1/IA" ia=mf_b out=mf_temp1
-$KAPPA_DIR/setvar ndf=$out from=mf_temp1 comp=data
+$KAPPA_DIR/maths exp="1/IA" ia=mf_b out=mf_temp5
+$KAPPA_DIR/setvar ndf=$out from=mf_temp5 comp=data
 
 #  Clean up.
 rm -f mf_in.sdf mf_psf2.sdf mf_temp1.sdf mf_temp2.sdf mf_temp3.sdf \
-      mf_psf.sdf mf_a.sdf mf_b.sdf mf_temp0.sdf
+      mf_psf.sdf mf_a.sdf mf_b.sdf mf_temp0.sdf mf_temp5.sdf \
+      mf_temp6.sdf
 
