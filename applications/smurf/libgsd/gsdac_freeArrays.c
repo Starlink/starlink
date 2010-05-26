@@ -82,64 +82,64 @@ void gsdac_freeArrays ( const dasFlag dasFlag, gsdVars *gsdVars,
   if ( *status != SAI__OK ) return;
 
   if ( dasFlag == DAS_CROSS_CORR ) {
-    smf_free ( gsdVars->FEFreqs, status );
-    smf_free ( gsdVars->FESBSigns, status );
-    smf_free ( gsdVars->FELOFreqs, status );
+    astFree( gsdVars->FEFreqs );
+    astFree( gsdVars->FESBSigns );
+    astFree( gsdVars->FELOFreqs );
   }
 
   if ( dasFlag == DAS_NONE || dasFlag == DAS_CONT_CAL ) {
-    smf_free ( gsdVars->vRadial, status );
+    astFree( gsdVars->vRadial );
   }
 
-  smf_free ( gsdVars->scanVars1, status );
-  smf_free ( gsdVars->scanVars2, status );
-  smf_free ( gsdVars->scanTable1, status );
-  smf_free ( gsdVars->scanTable2, status );
-  smf_free ( gsdVars->mapTable, status );
-  smf_free ( gsdVars->phaseVars, status );
-  smf_free ( gsdVars->phaseTable, status );
-  smf_free ( gsdVars->corrModes, status );
-  smf_free ( gsdVars->bitModes, status );
-  smf_free ( gsdVars->sbOverlaps, status );
-  smf_free ( gsdVars->mixNums, status );
-  smf_free ( gsdVars->BEInputChans, status );
-  smf_free ( gsdVars->BEConnChans, status );
-  smf_free ( gsdVars->BEChans, status );
-  smf_free ( gsdVars->BESubsys, status );
-  smf_free ( gsdVars->centreFreqs, status );
-  smf_free ( gsdVars->restFreqs, status );
-  smf_free ( gsdVars->LOFreqs, status );
-  smf_free ( gsdVars->totIFs, status );
-  smf_free ( gsdVars->sbSigns, status );
-  smf_free ( gsdVars->BEInputFreqs, status );
-  smf_free ( gsdVars->freqRes, status );
-  smf_free ( gsdVars->bandwidths, status );
-  smf_free ( gsdVars->recTemps, status );
-  smf_free ( gsdVars->sourceSysTemps, status );
-  smf_free ( gsdVars->skyTemps, status );
-  smf_free ( gsdVars->telTemps, status );
-  smf_free ( gsdVars->gains, status );
-  smf_free ( gsdVars->calTemps, status );
-  smf_free ( gsdVars->opacities, status );
-  smf_free ( gsdVars->skyTrans, status );
-  smf_free ( gsdVars->alphas, status );
-  smf_free ( gsdVars->sbGainNorms, status );
-  smf_free ( gsdVars->telTrans, status );
-  smf_free ( gsdVars->FETSkyIm, status );
-  smf_free ( gsdVars->FESkyTrans, status );
-  smf_free ( gsdVars->FETSysIm, status );
-  smf_free ( gsdVars->sbRatios, status );
-  smf_free ( gsdVars->intTimes, status );
-  smf_free ( gsdVars->data, status );
+  astFree( gsdVars->scanVars1 );
+  astFree( gsdVars->scanVars2 );
+  astFree( gsdVars->scanTable1 );
+  astFree( gsdVars->scanTable2 );
+  astFree( gsdVars->mapTable );
+  astFree( gsdVars->phaseVars );
+  astFree( gsdVars->phaseTable );
+  astFree( gsdVars->corrModes );
+  astFree( gsdVars->bitModes );
+  astFree( gsdVars->sbOverlaps );
+  astFree( gsdVars->mixNums );
+  astFree( gsdVars->BEInputChans );
+  astFree( gsdVars->BEConnChans );
+  astFree( gsdVars->BEChans );
+  astFree( gsdVars->BESubsys );
+  astFree( gsdVars->centreFreqs );
+  astFree( gsdVars->restFreqs );
+  astFree( gsdVars->LOFreqs );
+  astFree( gsdVars->totIFs );
+  astFree( gsdVars->sbSigns );
+  astFree( gsdVars->BEInputFreqs );
+  astFree( gsdVars->freqRes );
+  astFree( gsdVars->bandwidths );
+  astFree( gsdVars->recTemps );
+  astFree( gsdVars->sourceSysTemps );
+  astFree( gsdVars->skyTemps );
+  astFree( gsdVars->telTemps );
+  astFree( gsdVars->gains );
+  astFree( gsdVars->calTemps );
+  astFree( gsdVars->opacities );
+  astFree( gsdVars->skyTrans );
+  astFree( gsdVars->alphas );
+  astFree( gsdVars->sbGainNorms );
+  astFree( gsdVars->telTrans );
+  astFree( gsdVars->FETSkyIm );
+  astFree( gsdVars->FESkyTrans );
+  astFree( gsdVars->FETSysIm );
+  astFree( gsdVars->sbRatios );
+  astFree( gsdVars->intTimes );
+  astFree( gsdVars->data );
 
   if ( dasFlag == DAS_CROSS_CORR ) {
-    smf_free ( gsdVars->hotPower, status );
-    smf_free ( gsdVars->skyPower, status );
-    smf_free ( gsdVars->samples, status );
+    astFree( gsdVars->hotPower );
+    astFree( gsdVars->skyPower );
+    astFree( gsdVars->samples );
   }
 
   if ( dasFlag == DAS_CROSS_CORR || dasFlag == DAS_TP ) {
-    smf_free ( gsdVars->totPower, status );
+    astFree( gsdVars->totPower );
   }
 
   if ( *status != SAI__OK ) {

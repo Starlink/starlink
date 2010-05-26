@@ -705,7 +705,7 @@ void smurf_sc2sim( int *status ) {
 
   nbol = inx.colsize * inx.rowsize;
   /* Bad bolometer mask */
-  bolos = smf_malloc( (size_t)(nbol), sizeof(int), 1, status );
+  bolos = astCalloc( (size_t)(nbol), sizeof(int), 1 );
   lbnd[0] = 1;
   lbnd[1] = 1;
   ubnd[SC2STORE__COL_INDEX] = inx.rowsize;
@@ -830,13 +830,13 @@ void smurf_sc2sim( int *status ) {
   }
 
   /* Free resources */
-  heater = smf_free( heater, status );
-  pzero = smf_free( pzero, status );
-  xbc = smf_free( xbc, status );
-  ybc = smf_free( ybc, status );
-  xbolo = smf_free( xbolo, status );
-  ybolo = smf_free( ybolo, status );
-  bolos = smf_free( bolos, status );
+  heater = astFree( heater );
+  pzero = astFree( pzero );
+  xbc = astFree( xbc );
+  ybc = astFree( ybc );
+  xbolo = astFree( xbolo );
+  ybolo = astFree( ybolo );
+  bolos = astFree( bolos );
 
   if ( ardGrp ) grpDelet ( &ardGrp, status );
   if ( simGrp ) grpDelet ( &simGrp, status );

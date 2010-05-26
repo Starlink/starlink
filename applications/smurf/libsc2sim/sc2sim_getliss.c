@@ -185,7 +185,7 @@ void sc2sim_getliss
 
   /* Determine the number of positions required for the pattern
      and allocate memory */
-  mapptr = smf_malloc ( mcount*2, sizeof(*mapptr), 1, status );
+  mapptr = astCalloc( mcount*2, sizeof(*mapptr), 1 );
 
   /* Calculate the amplitudes of x(t) and y(t) */
   amp_x = ((double)(x_numvert) * vert_spacing) / 2.0;
@@ -215,7 +215,7 @@ void sc2sim_getliss
 
   /* Allocate memory for all n cycles of the pattern */
   *lisscount = mcount * nmaps;
-  *posptr = smf_malloc ( (*lisscount * 2), sizeof(**posptr), 1, status );
+  *posptr = astCalloc( (*lisscount * 2), sizeof(**posptr), 1 );
 
   /* Copy the required number of cycles into the
      list of positions */
@@ -223,6 +223,6 @@ void sc2sim_getliss
     (*posptr)[i] = mapptr[i % (mcount * 2)];
   }
 
-  mapptr = smf_free ( mapptr, status );
+  mapptr = astFree( mapptr );
 
 }

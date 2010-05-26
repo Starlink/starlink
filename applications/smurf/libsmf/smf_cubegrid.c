@@ -420,7 +420,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    rather than RECEPPOS, then free the detpos array in the smfHead
    structure. This will cause smf_tslice_ast to use the fplanex/y values. */
       if( !usedetpos && hdr->detpos ) {
-         hdr->detpos = smf_free( (double *) hdr->detpos, status );
+         hdr->detpos = astFree( (double *) hdr->detpos );
       }
 
 /* Extend the work arrays so that they are big enough to hold the coords

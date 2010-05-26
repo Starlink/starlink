@@ -634,10 +634,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       /* Allocate modeltyps */
       if( nmodels >= 1 ) {
-        modeltyps = smf_malloc( nmodels, sizeof(*modeltyps), 1, status );
+        modeltyps = astCalloc( nmodels, sizeof(*modeltyps), 1 );
         /* Extra components for exportNDF_which for 'res', 'qua' */
-        exportNDF_which = smf_malloc( nmodels+2, sizeof(*exportNDF_which),
-                                      1, status );
+        exportNDF_which = astCalloc( nmodels+2, sizeof(*exportNDF_which), 1);
       } else {
         msgOut(" ", FUNC_NAME ": No valid models in MODELORDER",
                status );
@@ -913,11 +912,11 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       } else if( contchunk == 1 ) {
         /* Subsequent chunks are done in new map arrays and then added to
            the first */
-        thismap = smf_malloc( msize, sizeof(*thismap), 1, status );
-        thishits = smf_malloc( msize, sizeof(*thishits), 1, status );
-        thisqual = smf_malloc( msize, sizeof(*thisqual), 1, status );
-        thisvar = smf_malloc( msize, sizeof(*thisvar), 1, status );
-        thisweight = smf_malloc( msize, sizeof(*thisweight), 1, status );
+        thismap = astCalloc( msize, sizeof(*thismap), 1 );
+        thishits = astCalloc( msize, sizeof(*thishits), 1 );
+        thisqual = astCalloc( msize, sizeof(*thisqual), 1 );
+        thisvar = astCalloc( msize, sizeof(*thisvar), 1 );
+        thisweight = astCalloc( msize, sizeof(*thisweight), 1 );
       }
 
       if( memiter ) {
@@ -932,7 +931,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                  status);
 
         /* Allocate length 1 array of smfArrays. */
-        res = smf_malloc( nchunks, sizeof(*res), 1, status );
+        res = astCalloc( nchunks, sizeof(*res), 1 );
 
         /* Concatenate (no variance since we calculate it ourselves -- NOI) */
         smf_concat_smfGroup( wf, igroup, darks, bbms, flatramps, contchunk,
@@ -953,8 +952,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
     /* Allocate space for the chisquared array */
     if( havenoi ) {
-      chisquared = smf_malloc( nchunks, sizeof(*chisquared), 1, status );
-      lastchisquared = smf_malloc( nchunks, sizeof(*chisquared), 1, status );
+      chisquared = astCalloc( nchunks, sizeof(*chisquared), 1 );
+      lastchisquared = astCalloc( nchunks, sizeof(*chisquared), 1 );
     }
 
     /* Create containers for time-series model components */
@@ -964,9 +963,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     if( igroup && (*status == SAI__OK) ) {
 
       /* there is one smfArray for LUT, AST and QUA at each chunk */
-      lut = smf_malloc( nchunks, sizeof(*lut), 1, status );
-      ast = smf_malloc( nchunks, sizeof(*ast), 1, status );
-      qua = smf_malloc( nchunks, sizeof(*qua), 1, status );
+      lut = astCalloc( nchunks, sizeof(*lut), 1 );
+      ast = astCalloc( nchunks, sizeof(*ast), 1 );
+      qua = astCalloc( nchunks, sizeof(*qua), 1 );
 
       if( memiter ) {
         /* If iterating in memory then RES has already been created from
@@ -1007,7 +1006,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
            smf_model_create. Also assert bolo-ordered template
            (in this case res). */
 
-        res = smf_malloc( nchunks, sizeof(*res), 1, status );
+        res = astCalloc( nchunks, sizeof(*res), 1 );
 
         smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, 0,
                           SMF__RES, 0,
@@ -1052,15 +1051,15 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     if( igroup && (nmodels > 0) && (*status == SAI__OK) ) {
 
       /* nmodel array of pointers to nchunk smfArray pointers */
-      model = smf_malloc( nmodels, sizeof(*model), 1, status );
+      model = astCalloc( nmodels, sizeof(*model), 1 );
 
       if( memiter != 1 ) {
         /* Array of smfgroups (one for each dynamic model component) */
-        modelgroups = smf_malloc( nmodels, sizeof(*modelgroups), 1, status );
+        modelgroups = astCalloc( nmodels, sizeof(*modelgroups), 1 );
       }
 
       for( i=0; i<nmodels; i++ ) {
-        model[i] = smf_malloc( nchunks, sizeof(**model), 1, status );
+        model[i] = astCalloc( nchunks, sizeof(**model), 1 );
 
         if( memiter ) {
           smf_model_create( wf, NULL, res, darks, bbms, flatramps, nchunks,
@@ -1693,9 +1692,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                will unset BADB for one bolo at a time to make individual
                maps. */
 
-            bolomask = smf_malloc( nbolo, sizeof(*bolomask), 0, status );
-            bmapweight = smf_malloc(msize,sizeof(*bmapweight),0,status);
-            bhitsmap = smf_malloc(msize,sizeof(*bhitsmap),0,status);
+            bolomask = astCalloc( nbolo, sizeof(*bolomask), 0 );
+            bmapweight = astCalloc( msize, sizeof(*bmapweight), 0 );
+            bhitsmap = astCalloc( msize, sizeof(*bhitsmap), 0 );
 
             if( *status == SAI__OK ) {
               for( k=0; k<nbolo; k++ ) {
@@ -1792,9 +1791,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             }
 
             /* Free up memory */
-            if( bolomask ) bolomask = smf_free( bolomask, status );
-            if( bmapweight ) bmapweight = smf_free( bmapweight, status );
-            if( bhitsmap ) bhitsmap = smf_free( bhitsmap, status );
+            if( bolomask ) bolomask = astFree( bolomask );
+            if( bmapweight ) bmapweight = astFree( bmapweight );
+            if( bhitsmap ) bhitsmap = astFree( bhitsmap );
 
             /* Remove ast from res once again */
             for( k=0; k<dsize; k++ ) {
@@ -1821,8 +1820,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           int *shorthitsmap = NULL;
 
           /* Allocate space for the arrays */
-          shortmapweight = smf_malloc(msize,sizeof(*shortmapweight),0,status);
-          shorthitsmap = smf_malloc(msize,sizeof(*shorthitsmap),0,status);
+          shortmapweight = astCalloc( msize, sizeof(*shortmapweight), 0 );
+          shorthitsmap = astCalloc( msize, sizeof(*shorthitsmap), 0 );
 
           /* Use first subarray to figure out time dimension. Get the
              useful start and end points of the time series, and then
@@ -1976,8 +1975,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           }
 
           /* Free up memory */
-          if( shortmapweight ) shortmapweight = smf_free(shortmapweight,status);
-          if( shorthitsmap ) shorthitsmap = smf_free( shorthitsmap, status );
+          if( shortmapweight ) shortmapweight = astFree( shortmapweight );
+          if( shorthitsmap ) shorthitsmap = astFree( shorthitsmap );
         }
       }
 
@@ -2175,7 +2174,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
                   /* if tempqual != qua_data it is locally allocated */
                   if( tempqual != qua_data ) {
-                    tempqual = smf_free( tempqual, status );
+                    tempqual = astFree( tempqual );
                   }
 
                 } else {
@@ -2304,28 +2303,28 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       for( i=0; i<nchunks; i++ ) {
         if( res[i] ) smf_close_related( &res[i], status );
       }
-      res = smf_free( res, status );
+      res = astFree( res );
     }
 
     if( ast ) {
       for( i=0; i<nchunks; i++ ) {
         if( ast[i] ) smf_close_related( &ast[i], status );
       }
-      ast = smf_free( ast, status );
+      ast = astFree( ast );
     }
 
     if( lut ) {
       for( i=0; i<nchunks; i++ ) {
         if( lut[i] ) smf_close_related( &lut[i], status );
       }
-      lut = smf_free( lut, status );
+      lut = astFree( lut );
     }
 
     if( qua ) {
       for( i=0; i<nchunks; i++ ) {
         if( qua[i] ) smf_close_related( &qua[i], status );
       }
-      qua = smf_free( qua, status );
+      qua = astFree( qua );
     }
 
     /* dynamic model smfGroups */
@@ -2335,7 +2334,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       }
 
       /* Free array of smfGroup pointers at this time chunk */
-      modelgroups = smf_free( modelgroups, status );
+      modelgroups = astFree( modelgroups );
     }
 
     /* dynamic model smfArrays */
@@ -2349,26 +2348,26 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           }
 
           /* Free array of smfArray pointers for this model */
-          model[i] = smf_free( model[i], status );
+          model[i] = astFree( model[i] );
         }
       }
-      model = smf_free( model, status );
+      model = astFree( model );
     }
 
     /* Free chisquared array */
-    if( chisquared) chisquared = smf_free( chisquared, status );
-    if( lastchisquared) lastchisquared = smf_free( lastchisquared, status );
+    if( chisquared) chisquared = astFree( chisquared );
+    if( lastchisquared) lastchisquared = astFree( lastchisquared );
   }
 
   /* The second set of map arrays get freed in the multiple contchunk case */
-  if( thismap != map ) thismap = smf_free( thismap, status );
-  if( thishits != hitsmap ) thishits = smf_free( thishits, status );
-  if( thisqual != mapqual ) thisqual = smf_free( thisqual, status );
-  if( thisvar != mapvar ) thisvar = smf_free( thisvar, status );
-  if( thisweight != weights ) thisweight = smf_free( thisweight, status );
+  if( thismap != map ) thismap = astFree( thismap );
+  if( thishits != hitsmap ) thishits = astFree( thishits );
+  if( thisqual != mapqual ) thisqual = astFree( thisqual );
+  if( thisvar != mapvar ) thisvar = astFree( thisvar );
+  if( thisweight != weights ) thisweight = astFree( thisweight );
 
-  if( modeltyps ) modeltyps = smf_free( modeltyps, status );
-  if( exportNDF_which ) exportNDF_which = smf_free( exportNDF_which, status );
+  if( modeltyps ) modeltyps = astFree( modeltyps );
+  if( exportNDF_which ) exportNDF_which = astFree( exportNDF_which );
 
   if( igroup ) {
     smf_close_smfGroup( &igroup, status );

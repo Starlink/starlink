@@ -458,143 +458,143 @@ void gsdac_getGSDVars ( const gsd *gsd, const dasFlag dasFlag,
   /* Allocate memory for the GSD arrays. */
 
   if ( dasFlag == DAS_CROSS_CORR ) {
-    gsdVars->FEFreqs = smf_malloc ( gsdVars->nFEChans,
-                                    sizeof(double), 0, status );
-    gsdVars->FESBSigns = smf_malloc ( gsdVars->nFEChans,
-                                      sizeof(int), 0, status );
-    gsdVars->FELOFreqs = smf_malloc ( gsdVars->nFEChans,
-                                      sizeof(double), 0, status );
+    gsdVars->FEFreqs = astCalloc ( gsdVars->nFEChans,
+                                    sizeof(double), 0 );
+    gsdVars->FESBSigns = astCalloc ( gsdVars->nFEChans,
+                                      sizeof(int), 0 );
+    gsdVars->FELOFreqs = astCalloc ( gsdVars->nFEChans,
+                                      sizeof(double), 0 );
   }
 
   if ( dasFlag == DAS_NONE || dasFlag == DAS_CONT_CAL ) {
-    gsdVars->vRadial = smf_malloc ( gsdVars->nVRad,
-                                    sizeof(double), 0, status );
+    gsdVars->vRadial = astCalloc ( gsdVars->nVRad,
+                                    sizeof(double), 0 );
   }
 
-  gsdVars->scanVars1 = smf_malloc ( gsdVars->nScanVars1,
-                                    MAXSTRING-1 * sizeof(char), 0, status );
-  gsdVars->scanVars2 = smf_malloc ( gsdVars->nScanVars2,
-                                    MAXSTRING-1 * sizeof(char), 0, status );
-  gsdVars->scanTable1 = smf_malloc ( ( gsdVars->nScanVars1 * gsdVars->noScans ),
-                                     sizeof(float), 0, status );
-  gsdVars->scanTable2 = smf_malloc ( ( gsdVars->nScanVars2 * gsdVars->noScans ),
-                                     sizeof(float), 0, status );
-  gsdVars->mapTable = smf_malloc ( ( gsdVars->nMapDims * gsdVars->nMapPts ),
-                                   sizeof(float), 0, status );
-  gsdVars->phaseVars = smf_malloc ( gsdVars->nPhaseVars,
-                                    MAXSTRING-1 * sizeof(char), 0, status );
-  gsdVars->phaseTable = smf_malloc ( ( gsdVars->nPhaseVars * gsdVars->nPhases ),
-                                     sizeof(float), 0, status );
-  gsdVars->corrModes = smf_malloc ( gsdVars->nBESections,
-                                    sizeof(int), 0, status );
-  gsdVars->bitModes = smf_malloc ( gsdVars->nBESections,
-                                   sizeof(int), 0, status );
-  gsdVars->sbOverlaps = smf_malloc ( gsdVars->nBESections,
-                                     sizeof(float), 0, status );
-  gsdVars->mixNums = smf_malloc ( gsdVars->nBESections,
-                                  sizeof(float), 0, status );
-  gsdVars->BEInputChans = smf_malloc ( gsdVars->nBESections,
-                                       sizeof(int), 0, status );
-  gsdVars->BEConnChans = smf_malloc ( gsdVars->nBEChansIn,
-                                      sizeof(int), 0, status );
-  gsdVars->BEChans = smf_malloc ( gsdVars->nBESections,
-                                  sizeof(int), 0, status );
-  gsdVars->BESubsys = smf_malloc ( gsdVars->nBESections,
-                                   sizeof(int), 0, status );
-  gsdVars->centreFreqs = smf_malloc ( gsdVars->nBESections,
-                                      sizeof(double), 0, status );
-  gsdVars->restFreqs = smf_malloc ( gsdVars->nBESections,
-                                    sizeof(double), 0, status );
-  gsdVars->LOFreqs = smf_malloc ( gsdVars->nBESections,
-                                  sizeof(double), 0, status );
-  gsdVars->totIFs = smf_malloc ( gsdVars->nBESections,
-                                 sizeof(double), 0, status );
-  gsdVars->sbSigns = smf_malloc ( gsdVars->nBESections,
-                                  sizeof(int), 0, status );
-  gsdVars->BEInputFreqs = smf_malloc ( gsdVars->nBEChansIn,
-                                       sizeof(double), 0, status );
-  gsdVars->freqRes = smf_malloc ( gsdVars->nBESections,
-                                  sizeof(float), 0, status );
-  gsdVars->bandwidths = smf_malloc ( gsdVars->nBESections,
-                                     sizeof(float), 0, status );
-  gsdVars->recTemps = smf_malloc ( gsdVars->nBESections,
-                                   sizeof(float), 0, status );
+  gsdVars->scanVars1 = astCalloc ( gsdVars->nScanVars1,
+                                    MAXSTRING-1 * sizeof(char), 0 );
+  gsdVars->scanVars2 = astCalloc ( gsdVars->nScanVars2,
+                                    MAXSTRING-1 * sizeof(char), 0 );
+  gsdVars->scanTable1 = astCalloc ( ( gsdVars->nScanVars1 * gsdVars->noScans ),
+                                     sizeof(float), 0 );
+  gsdVars->scanTable2 = astCalloc ( ( gsdVars->nScanVars2 * gsdVars->noScans ),
+                                     sizeof(float), 0 );
+  gsdVars->mapTable = astCalloc ( ( gsdVars->nMapDims * gsdVars->nMapPts ),
+                                   sizeof(float), 0 );
+  gsdVars->phaseVars = astCalloc ( gsdVars->nPhaseVars,
+                                    MAXSTRING-1 * sizeof(char), 0 );
+  gsdVars->phaseTable = astCalloc ( ( gsdVars->nPhaseVars * gsdVars->nPhases ),
+                                     sizeof(float), 0 );
+  gsdVars->corrModes = astCalloc ( gsdVars->nBESections,
+                                    sizeof(int), 0 );
+  gsdVars->bitModes = astCalloc ( gsdVars->nBESections,
+                                   sizeof(int), 0 );
+  gsdVars->sbOverlaps = astCalloc ( gsdVars->nBESections,
+                                     sizeof(float), 0 );
+  gsdVars->mixNums = astCalloc ( gsdVars->nBESections,
+                                  sizeof(float), 0 );
+  gsdVars->BEInputChans = astCalloc ( gsdVars->nBESections,
+                                       sizeof(int), 0 );
+  gsdVars->BEConnChans = astCalloc ( gsdVars->nBEChansIn,
+                                      sizeof(int), 0 );
+  gsdVars->BEChans = astCalloc ( gsdVars->nBESections,
+                                  sizeof(int), 0 );
+  gsdVars->BESubsys = astCalloc ( gsdVars->nBESections,
+                                   sizeof(int), 0 );
+  gsdVars->centreFreqs = astCalloc ( gsdVars->nBESections,
+                                      sizeof(double), 0 );
+  gsdVars->restFreqs = astCalloc ( gsdVars->nBESections,
+                                    sizeof(double), 0 );
+  gsdVars->LOFreqs = astCalloc ( gsdVars->nBESections,
+                                  sizeof(double), 0 );
+  gsdVars->totIFs = astCalloc ( gsdVars->nBESections,
+                                 sizeof(double), 0 );
+  gsdVars->sbSigns = astCalloc ( gsdVars->nBESections,
+                                  sizeof(int), 0 );
+  gsdVars->BEInputFreqs = astCalloc ( gsdVars->nBEChansIn,
+                                       sizeof(double), 0 );
+  gsdVars->freqRes = astCalloc ( gsdVars->nBESections,
+                                  sizeof(float), 0 );
+  gsdVars->bandwidths = astCalloc ( gsdVars->nBESections,
+                                     sizeof(float), 0 );
+  gsdVars->recTemps = astCalloc ( gsdVars->nBESections,
+                                   sizeof(float), 0 );
 
   if ( dasFlag == DAS_CONT_CAL ) {
-    gsdVars->sourceSysTemps = smf_malloc ( gsdVars->nBESections * gsdVars->noScans,
-                                           sizeof(float), 0, status );
-    gsdVars->skyTemps = smf_malloc ( gsdVars->nBESections * gsdVars->noScans,
-                                     sizeof(float), 0, status );
+    gsdVars->sourceSysTemps = astCalloc ( gsdVars->nBESections * gsdVars->noScans,
+                                           sizeof(float), 0 );
+    gsdVars->skyTemps = astCalloc ( gsdVars->nBESections * gsdVars->noScans,
+                                     sizeof(float), 0 );
   } else {
-    gsdVars->sourceSysTemps = smf_malloc ( gsdVars->nBESections,
-                                           sizeof(float), 0, status );
-    gsdVars->skyTemps = smf_malloc ( gsdVars->nBESections,
-                                     sizeof(float), 0, status );
+    gsdVars->sourceSysTemps = astCalloc ( gsdVars->nBESections,
+                                           sizeof(float), 0 );
+    gsdVars->skyTemps = astCalloc ( gsdVars->nBESections,
+                                     sizeof(float), 0 );
   }
 
-  gsdVars->telTemps = smf_malloc ( gsdVars->nBESections,
-                                   sizeof(float), 0, status );
-  gsdVars->gains = smf_malloc ( gsdVars->nBESections,
-                                sizeof(float), 0, status );
-  gsdVars->calTemps = smf_malloc ( gsdVars->nBESections,
-                                   sizeof(float), 0, status );
-  gsdVars->opacities = smf_malloc ( gsdVars->nBESections,
-                                    sizeof(float), 0, status );
+  gsdVars->telTemps = astCalloc ( gsdVars->nBESections,
+                                   sizeof(float), 0 );
+  gsdVars->gains = astCalloc ( gsdVars->nBESections,
+                                sizeof(float), 0 );
+  gsdVars->calTemps = astCalloc ( gsdVars->nBESections,
+                                   sizeof(float), 0 );
+  gsdVars->opacities = astCalloc ( gsdVars->nBESections,
+                                    sizeof(float), 0 );
 
   if ( dasFlag == DAS_CONT_CAL ) {
-    gsdVars->skyTrans = smf_malloc ( gsdVars->nBESections * gsdVars->noScans,
-                                     sizeof(float), 0, status );
+    gsdVars->skyTrans = astCalloc ( gsdVars->nBESections * gsdVars->noScans,
+                                     sizeof(float), 0 );
   } else {
-    gsdVars->skyTrans = smf_malloc ( gsdVars->nBESections,
-                                     sizeof(float), 0, status );
+    gsdVars->skyTrans = astCalloc ( gsdVars->nBESections,
+                                     sizeof(float), 0 );
   }
 
-  gsdVars->alphas = smf_malloc ( gsdVars->nBESections,
-                                 sizeof(float), 0, status );
-  gsdVars->sbGainNorms = smf_malloc ( gsdVars->nBESections,
-                                      sizeof(float), 0, status );
-  gsdVars->telTrans = smf_malloc ( gsdVars->nBESections,
-                                   sizeof(float), 0, status );
+  gsdVars->alphas = astCalloc ( gsdVars->nBESections,
+                                 sizeof(float), 0 );
+  gsdVars->sbGainNorms = astCalloc ( gsdVars->nBESections,
+                                      sizeof(float), 0 );
+  gsdVars->telTrans = astCalloc ( gsdVars->nBESections,
+                                   sizeof(float), 0 );
 
   if ( dasFlag == DAS_CONT_CAL ) {
-    gsdVars->FETSkyIm = smf_malloc ( gsdVars->nBESections * gsdVars->noScans,
-                                     sizeof(float), 0, status );
-    gsdVars->FESkyTrans = smf_malloc ( gsdVars->nBESections * gsdVars->noScans,
-                                       sizeof(float), 0, status );
-    gsdVars->FETSysIm = smf_malloc ( gsdVars->nBESections * gsdVars->noScans,
-                                     sizeof(float), 0, status );
-    gsdVars->sbRatios = smf_malloc ( gsdVars->nBESections * gsdVars->noScans,
-                                     sizeof(float), 0, status );
+    gsdVars->FETSkyIm = astCalloc ( gsdVars->nBESections * gsdVars->noScans,
+                                     sizeof(float), 0 );
+    gsdVars->FESkyTrans = astCalloc ( gsdVars->nBESections * gsdVars->noScans,
+                                       sizeof(float), 0 );
+    gsdVars->FETSysIm = astCalloc ( gsdVars->nBESections * gsdVars->noScans,
+                                     sizeof(float), 0 );
+    gsdVars->sbRatios = astCalloc ( gsdVars->nBESections * gsdVars->noScans,
+                                     sizeof(float), 0 );
   } else {
-    gsdVars->FETSkyIm = smf_malloc ( gsdVars->nBESections,
-                                     sizeof(float), 0, status );
-    gsdVars->FESkyTrans = smf_malloc ( gsdVars->nBESections,
-                                       sizeof(float), 0, status );
-    gsdVars->FETSysIm = smf_malloc ( gsdVars->nBESections,
-                                     sizeof(float), 0, status );
-    gsdVars->sbRatios = smf_malloc ( gsdVars->nBESections,
-                                     sizeof(float), 0, status );
+    gsdVars->FETSkyIm = astCalloc ( gsdVars->nBESections,
+                                     sizeof(float), 0 );
+    gsdVars->FESkyTrans = astCalloc ( gsdVars->nBESections,
+                                       sizeof(float), 0 );
+    gsdVars->FETSysIm = astCalloc ( gsdVars->nBESections,
+                                     sizeof(float), 0 );
+    gsdVars->sbRatios = astCalloc ( gsdVars->nBESections,
+                                     sizeof(float), 0 );
   }
 
-  gsdVars->intTimes = smf_malloc ( gsdVars->noScans,
-                                   sizeof(int), 0, status );
-  gsdVars->data = smf_malloc ( ( gsdVars->nBEChansOut * gsdVars->nScanPts
-                                 * gsdVars->noScans ), sizeof(float), 0, status );
+  gsdVars->intTimes = astCalloc ( gsdVars->noScans,
+                                   sizeof(int), 0 );
+  gsdVars->data = astCalloc ( ( gsdVars->nBEChansOut * gsdVars->nScanPts
+                                 * gsdVars->noScans ), sizeof(float), 0 );
 
   if ( dasFlag == DAS_CROSS_CORR ) {
-    gsdVars->hotPower = smf_malloc ( gsdVars->nBESections * gsdVars->IFPerSection,
-                                     sizeof(float), 0, status );
-    gsdVars->skyPower = smf_malloc ( gsdVars->nBESections * gsdVars->IFPerSection,
-                                     sizeof(float), 0, status );
-    gsdVars->samples = smf_malloc ( gsdVars->nBEChansOut * gsdVars->IFONPhase *
-                                    gsdVars->noCycles, sizeof(float), 0, status );
-    gsdVars->totPower = smf_malloc ( gsdVars->nBESections * gsdVars->IFPerSection *
+    gsdVars->hotPower = astCalloc ( gsdVars->nBESections * gsdVars->IFPerSection,
+                                     sizeof(float), 0 );
+    gsdVars->skyPower = astCalloc ( gsdVars->nBESections * gsdVars->IFPerSection,
+                                     sizeof(float), 0 );
+    gsdVars->samples = astCalloc ( gsdVars->nBEChansOut * gsdVars->IFONPhase *
+                                    gsdVars->noCycles, sizeof(float), 0 );
+    gsdVars->totPower = astCalloc ( gsdVars->nBESections * gsdVars->IFPerSection *
                                      gsdVars->IFONPhase * gsdVars->noCycles,
-                                     sizeof(float), 0, status );
+                                     sizeof(float), 0 );
   } else if ( dasFlag == DAS_TP ) {
-    gsdVars->totPower = smf_malloc ( gsdVars->nBESections * gsdVars->IFPerSection *
+    gsdVars->totPower = astCalloc ( gsdVars->nBESections * gsdVars->IFPerSection *
                                      gsdVars->IFONPhase * gsdVars->nPhases *
-                                     gsdVars->noCycles, sizeof(float), 0, status );
+                                     gsdVars->noCycles, sizeof(float), 0 );
   }
 
   if ( dasFlag == DAS_CROSS_CORR ) {

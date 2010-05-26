@@ -531,8 +531,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
 
                 /* Allocate space for the concatenated allState */
                 hdr->nframes = tlen;
-                hdr->allState = smf_malloc( tlen, sizeof(*(hdr->allState)),
-                                            1, status );
+                hdr->allState = astCalloc( tlen, sizeof(*(hdr->allState)), 1 );
 
                 /* Allocate space in the smfData for DATA/VARAIANCE/QUALITY */
                 if( isTordered ) {
@@ -569,11 +568,10 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
 
                 /* Allocate space for enlarged dksquid array. */
                 if( da && da->dksquid) {
-                  da->dksquid->pntr[0] = smf_realloc(da->dksquid->pntr[0],
-                                                     ncol*tlen,
-                                                     smf_dtype_size(da->dksquid,
-                                                                    status),
-                                                     status);
+                  da->dksquid->pntr[0] = astRealloc(da->dksquid->pntr[0],
+                                                    ncol*tlen *
+                                                    smf_dtype_size(da->dksquid,
+                                                                   status) );
 
                   if( *status == SAI__OK ) {
                     memset( da->dksquid->pntr[0], 0,
@@ -590,7 +588,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                 for( k=0; k<3; k++ ) if( havearray[k] ) {
                     if( k == 2 ) sz = smf_dtype_sz( SMF__UBYTE, status );
                     else sz = smf_dtype_sz(data->dtype, status );
-                    data->pntr[k] = smf_malloc(ndata, sz, 1, status);
+                    data->pntr[k] = astCalloc( ndata, sz, 1 );
                   }
 
                 /* Check to see if havearray for QUALITY is not set,
@@ -598,15 +596,13 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                    case, allocate a fresh QUALITY component that will
                    not require propagation from the template */
                 if( !havearray[2] && !(flags & SMF__NOCREATE_QUALITY) ) {
-                  data->pntr[2] = smf_malloc(ndata,
-                                             smf_dtype_sz(SMF__UBYTE,status),
-                                             1, status);
+                  data->pntr[2] = astCalloc(ndata,
+                                            smf_dtype_sz(SMF__UBYTE,status), 1 );
                 }
 
                 /* Allocate space for the pointing LUT if needed */
                 if( havelut ) {
-                  data->lut = smf_malloc(ndata, sizeof(*(data->lut)), 1,
-                                         status);
+                  data->lut = astCalloc(ndata, sizeof(*(data->lut)), 1 );
                 }
 
                 /* Copy over the FITS header */

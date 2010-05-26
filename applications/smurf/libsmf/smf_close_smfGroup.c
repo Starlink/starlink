@@ -114,7 +114,7 @@ void smf_close_smfGroup ( smfGroup **group, int *status ) {
 
     /* Free chunk */
     if( (*group)->chunk ) {
-      (*group)->chunk = smf_free( (*group)->chunk, status );
+      (*group)->chunk = astFree( (*group)->chunk );
     } else {
       *status = SAI__ERROR;
       errRep( FUNC_NAME,
@@ -141,14 +141,14 @@ void smf_close_smfGroup ( smfGroup **group, int *status ) {
         } else {
           indices = subgroups[i];
           /* Free memory associated with current array of indices */
-          indices = smf_free( indices, status );
+          indices = astFree( indices );
         }
       }
     }
     /* Free pointer to subgroups */
-    subgroups = smf_free( subgroups, status );
+    subgroups = astFree( subgroups );
 
     /* Finally free the group */
-    *group = smf_free( *group, status);
+    *group = astFree( *group );
   }
 }

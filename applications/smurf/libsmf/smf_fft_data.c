@@ -356,8 +356,7 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
       ndata *= retdata->dims[j];
     }
 
-    retdata->pntr[0] = smf_malloc( ndata, smf_dtype_sz(retdata->dtype,status),
-                                   1, status );
+    retdata->pntr[0] = astCalloc( ndata, smf_dtype_sz(retdata->dtype,status), 1 );
 
     /* Describe the array dimensions for FFTW guru interface
        - dims describes the length and stepsize of time slices within bolometer
@@ -378,7 +377,7 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
       }
     }
 
-    job_data = smf_malloc( nw, sizeof(*job_data), 1, status );
+    job_data = astCalloc( nw, sizeof(*job_data), 1 );
 
     for( i=0; (*status==SAI__OK)&&i<nw; i++ ) {
       pdata = job_data + i;
@@ -552,7 +551,7 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
       fftw_destroy_plan( pdata->plan);
       smf_mutex_unlock( &smf_fft_data_mutex, status );
     }
-    job_data = smf_free( job_data, status );
+    job_data = astFree( job_data );
   }
 
   return retdata;

@@ -146,7 +146,7 @@ void smf_expmodel_dks( const smfData *indata, smfData **outdata,
 
   if (!data) return;
 
-  d = smf_malloc( ndata, sizeof(*d), 0, status );
+  d = astCalloc( ndata, sizeof(*d), 0 );
   if( *status == SAI__OK ) {
     for( i=0; i<ndata; i++ ) {
       d[i] = VAL__BADD;

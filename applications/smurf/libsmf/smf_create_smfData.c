@@ -125,7 +125,7 @@ smf_create_smfData( int flags, int * status ) {
 
   if (*status != SAI__OK) return NULL;
 
-  data = smf_malloc( 1, sizeof(smfData), 0, status );
+  data = astCalloc( 1, sizeof(smfData), 0 );
   if (! (flags & SMF__NOCREATE_FILE) )
     file = smf_create_smfFile( status );
   if (! (flags & SMF__NOCREATE_HEAD) )
@@ -169,10 +169,10 @@ smf_create_smfData( int flags, int * status ) {
   return data;
 
  CLEANUP:
-  data = smf_free( data, status );
-  file = smf_free( file, status );
-  hdr = smf_free( hdr, status );
-  da = smf_free( da, status );
+  data = astFree( data );
+  file = astFree( file );
+  hdr = astFree( hdr );
+  da = astFree( da );
 
   return NULL;
 }

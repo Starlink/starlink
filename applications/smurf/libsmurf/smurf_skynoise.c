@@ -241,7 +241,7 @@ void smurf_skynoise ( int *status ) {
    pixsize = 2500.0; /* Arcsec */
    size = 512; /* Surely this should be a parameter? */
    corner = ( sinx.atmrefnu * 15.0 ) / ( sinx.atmrefvel * 5156.0 );
-   spectrum = smf_malloc ( (size_t)(size*size*2), sizeof(*spectrum), 1, status );
+   spectrum = astCalloc( (size_t)(size*size*2), sizeof(*spectrum), 1 );
 
    lbnd[0] = 1;
    lbnd[1] = 1;
@@ -268,7 +268,7 @@ void smurf_skynoise ( int *status ) {
 
    ndfUnmap ( indf, "DATA", status );
 
-   spectrum = smf_free ( spectrum, status );
+   spectrum = astFree( spectrum );
 
    if ( simGrp ) grpDelet ( &simGrp, status );
    if ( obsGrp ) grpDelet ( &obsGrp, status );

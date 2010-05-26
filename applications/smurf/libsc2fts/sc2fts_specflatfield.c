@@ -129,7 +129,7 @@ int *status          /* global status (given and returned) */
    /* get the size of data_array */
    datSize(loc_data, &resp_size, status);
 
-   resp_vals = (float*)smf_malloc(resp_size, sizeof(float), 0, status);
+   resp_vals = (float*)astCalloc( resp_size, sizeof(float), 0 );
    /* get data_array */
    datGetVR(loc_data, resp_size, resp_vals,
             &resp_size, status);
@@ -147,7 +147,7 @@ int *status          /* global status (given and returned) */
    datAnnul(&loc_resp, status);
 
   /* release momery */
-  smf_free(resp_vals, status);
+  astFree( resp_vals );
 
   /* NDF end */
   ndfEnd(status);

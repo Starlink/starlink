@@ -138,7 +138,7 @@ void smf_create_tswcs( smfHead *hdr, AstFrameSet **frameset, int *status ){
   smf_find_subarray( hdr, NULL, 0, &subnum, status );
 
   /* copy RTS_END values into times, populate telpar, and call sc2ast_timeWcs */
-  times = smf_malloc( ntime, sizeof(*times), 1, status );
+  times = astCalloc( ntime, sizeof(*times), 1 );
 
   if( *status == SAI__OK ) {
     telpar.dut1 = dut1;
@@ -159,6 +159,6 @@ void smf_create_tswcs( smfHead *hdr, AstFrameSet **frameset, int *status ){
     }
   }
   /* Clean up */
-  if( times ) times = smf_free(times, status);
+  if( times ) times = astFree( times );
 
 }

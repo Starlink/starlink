@@ -192,8 +192,8 @@ void smf_flat_write( smf_flatmeth flatmeth, const char * flatname,
   /* Copy the data as integers so it can be written to data file. To
      prevent overflow in the variance we store that as doubles */
 
-  ibuf = smf_malloc( numbols * nframes, sizeof(*ibuf), 0, status );
-  outvar = smf_malloc( numbols * nframes, sizeof(*outvar), 0, status );
+  ibuf = astCalloc( numbols * nframes, sizeof(*ibuf), 0 );
+  outvar = astCalloc( numbols * nframes, sizeof(*outvar), 0 );
 
   dbuf = (bolval->pntr)[0];
   dvar = (bolval->pntr)[1];
@@ -218,8 +218,7 @@ void smf_flat_write( smf_flatmeth flatmeth, const char * flatname,
   smf_find_subarray( bolval->hdr, NULL, 0, &subnum, status );
 
   /* Create dummy components for output file */
-  dksquid = smf_malloc ( rowsize* nframes, sizeof(*dksquid),1,
-                         status );
+  dksquid = astCalloc ( rowsize* nframes, sizeof(*dksquid),1 );
   jig_vert[0][0] = 0;
   jig_vert[0][1] = 0;
   jig_path[0][0] = 0.0;
@@ -316,8 +315,8 @@ void smf_flat_write( smf_flatmeth flatmeth, const char * flatname,
 
   ndfAnnul( &indf, status);
 
-  if (ibuf) ibuf = smf_free( ibuf, status );
-  if (outvar) outvar = smf_free( outvar, status );
-  if (dksquid) dksquid = smf_free( dksquid, status );
-  if (state) state = smf_free( state, status );
+  if (ibuf) ibuf = astFree( ibuf );
+  if (outvar) outvar = astFree( outvar );
+  if (dksquid) dksquid = astFree( dksquid );
+  if (state) state = astFree( state );
 }

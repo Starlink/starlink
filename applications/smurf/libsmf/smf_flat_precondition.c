@@ -106,7 +106,7 @@ smf_flat_precondition( int allbad, smfData * powvald, smfData * bolvald, int *st
   nbol = (bolvald->dims)[0] * (bolvald->dims)[1];
 
   /* store the gradient points somewhere */
-  grad = smf_malloc( nheat, sizeof(*grad), 1, status );
+  grad = astCalloc( nheat, sizeof(*grad), 1 );
 
   /* naive gradient validator */
   for (bol=0; bol < nbol; bol++) {
@@ -185,6 +185,6 @@ smf_flat_precondition( int allbad, smfData * powvald, smfData * bolvald, int *st
     }
   }
 
-  if (grad) grad = smf_free( grad, status );
+  if (grad) grad = astFree( grad );
 
 }

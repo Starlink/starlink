@@ -192,13 +192,13 @@ size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snr
   if (istable) {
 
     /* Space for fit data */
-    bolv = smf_malloc( nheat, sizeof(*bolv), 0, status );
-    if (usevar && bolvalvar) bolvv = smf_malloc( nheat, sizeof(*bolvv), 0, status );
-    powv = smf_malloc( nheat, sizeof(*powv), 0, status );
+    bolv = astCalloc( nheat, sizeof(*bolv), 0 );
+    if (usevar && bolvalvar) bolvv = astCalloc( nheat, sizeof(*bolvv), 0 );
+    powv = astCalloc( nheat, sizeof(*powv), 0 );
 
     /* Polynomial expansion */
-    if (polyfit) polybol = smf_malloc( nheat*nbol, sizeof(*polybol), 0, status );
-    poly = smf_malloc( nheat, sizeof(*poly), 0, status );
+    if (polyfit) polybol = astCalloc( nheat*nbol, sizeof(*polybol), 0 );
+    poly = astCalloc( nheat, sizeof(*poly), 0 );
 
     /* prefil polynomial with bad */
     if (polybol) {
@@ -208,11 +208,11 @@ size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snr
     }
 
     /* some memory for good indices */
-    goodidx = smf_malloc( nheat, sizeof(*goodidx), 1, status );
+    goodidx = astCalloc( nheat, sizeof(*goodidx), 1 );
 
     /* coefficients */
-    coeffs = smf_malloc( order+1, sizeof(*coeffs), 1, status );
-    varcoeffs = smf_malloc( order+1, sizeof(*varcoeffs), 1, status );
+    coeffs = astCalloc( order+1, sizeof(*coeffs), 1 );
+    varcoeffs = astCalloc( order+1, sizeof(*varcoeffs), 1 );
 
     /* dim1 must change slower than dim0 */
     for (bol=0; bol < nbol; bol++) {
@@ -356,19 +356,19 @@ size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snr
       *polyfit = smf_construct_smfData( NULL, NULL, NULL, NULL, SMF__DOUBLE,
                                         pntr, 1, bolvald->dims, bolvald->lbnd, 3, 0, 0, NULL,
                                         NULL, status );
-      if (*status != SAI__OK && ! *polyfit) smf_free( polybol, status );
+      if (*status != SAI__OK && ! *polyfit) astFree( polybol );
     } else {
-      smf_free( polybol, status );
+      astFree( polybol );
     }
   }
 
-  if (goodidx) smf_free( goodidx, status );
-  if (coeffs) smf_free( coeffs, status );
-  if (varcoeffs) smf_free( varcoeffs, status );
-  if (poly) smf_free( poly, status );
-  if (bolv) smf_free( bolv, status );
-  if (bolvv) smf_free( bolvv, status );
-  if (powv) smf_free( powv, status );
+  if (goodidx) astFree( goodidx );
+  if (coeffs) astFree( coeffs );
+  if (varcoeffs) astFree( varcoeffs );
+  if (poly) astFree( poly );
+  if (bolv) astFree( bolv );
+  if (bolvv) astFree( bolvv );
+  if (powv) astFree( powv );
 
   if (*status != SAI__OK) {
     if (*polyfit) smf_close_file( polyfit, status );

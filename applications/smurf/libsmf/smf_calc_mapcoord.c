@@ -466,13 +466,13 @@ void smf_calc_mapcoord( smfWorkForce *wf, smfData *data, AstFrameSet *outfset,
       }
     } else {
       /* malloc the LUT array */
-      lut = smf_malloc( nbolo*ntslice, sizeof(*(data->lut)), 0, status );
+      lut = astCalloc( nbolo*ntslice, sizeof(*(data->lut)), 0 );
     }
 
     /* Calculate the number of bolometers and allocate space for the
        x- and y- output map coordinates */
 
-    //outmapcoord = smf_malloc( nbolo*2, sizeof(double), 0, status );
+    //outmapcoord = astCalloc( nbolo*2, sizeof(double), 0 );
 
     /* Retrieve the sky2map mapping from the output frameset (actually
        map2sky) */
@@ -500,7 +500,7 @@ void smf_calc_mapcoord( smfWorkForce *wf, smfData *data, AstFrameSet *outfset,
       /* --- Begin parellelized portion ------------------------------------ */
 
       /* Allocate job data for threads */
-      job_data = smf_malloc( nw, sizeof(*job_data), 1, status );
+      job_data = astCalloc( nw, sizeof(*job_data), 1 );
 
       /* Set up job data, and start calculating pointing for blocks of
          time slices in different threads */
@@ -640,7 +640,7 @@ void smf_calc_mapcoord( smfWorkForce *wf, smfData *data, AstFrameSet *outfset,
       astLock( pdata->sky2map, 0 );
       pdata->sky2map = astAnnul( pdata->sky2map );
     }
-    job_data = smf_free( job_data, status );
+    job_data = astFree( job_data );
   }
 
 }

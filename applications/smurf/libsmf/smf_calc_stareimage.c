@@ -205,8 +205,8 @@ void smf_calc_stareimage( smfData *data, const int naver, int *status) {
       smf_store_image( data, scu2redloc, j, 2, dims, numaver, 0, 0, avdata, NULL,
 		       status);
 
-      avdata = smf_free( avdata, status );
-      zero = smf_free( zero, status );
+      avdata = astFree( avdata );
+      zero = astFree( zero );
     }
     /* Add a history entry if everything's OK */
     smf_history_add(data, "smf_calc_stareimage",  status );

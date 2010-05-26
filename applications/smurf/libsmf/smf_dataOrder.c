@@ -230,7 +230,7 @@ int smf_dataOrder( smfData *data, int isTordered, int *status ) {
       sz = smf_dtype_sz(dtype, status);
 
       /* Allocate buffer */
-      newbuf = smf_malloc( ndata, sz, 0, status );
+      newbuf = astCalloc( ndata, sz, 0 );
 
       if( *status == SAI__OK ) {
 
@@ -283,10 +283,10 @@ int smf_dataOrder( smfData *data, int isTordered, int *status ) {
           /* Copy newbuf to oldbuf */
           memcpy( oldbuf, newbuf, ndata*sz );
           /* Free newbuf */
-          newbuf = smf_free( newbuf, status );
+          newbuf = astFree( newbuf );
         } else {
           /* Free oldbuf */
-          oldbuf = smf_free( oldbuf, status );
+          oldbuf = astFree( oldbuf );
           /* Set pntr to newbuf */
           data->pntr[i] = (void *) newbuf;
         }
@@ -303,7 +303,7 @@ int smf_dataOrder( smfData *data, int isTordered, int *status ) {
   /* If there is a LUT re-order it here */
   oldlut = data->lut;
   if( oldlut ) {
-    newlut = smf_malloc( ndata, sizeof(*newlut), 0, status );
+    newlut = astCalloc( ndata, sizeof(*newlut), 0 );
 
     if( *status == SAI__OK ) {
       for( j=0; j<ntslice; j++ ) {
@@ -316,10 +316,10 @@ int smf_dataOrder( smfData *data, int isTordered, int *status ) {
         /* Copy newlut to oldlut */
         memcpy( oldlut, newlut, ndata*sizeof(*newlut) );
         /* Free newlut */
-        newlut = smf_free( newlut, status );
+        newlut = astFree( newlut );
       } else {
         /* Free oldlut */
-        oldlut = smf_free( oldlut, status );
+        oldlut = astFree( oldlut );
         /* Set pntr to newbuf */
         data->lut = newlut;
       }

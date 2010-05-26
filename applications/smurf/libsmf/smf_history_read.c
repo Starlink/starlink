@@ -155,9 +155,9 @@ void smf_history_read( smfData* data,int *status) {
     datClen( shloc, &clen, status );
     datSize( shloc, &nrec, status );
 
-    pntrs = smf_malloc( nrec, sizeof(*pntrs), 0, status );
+    pntrs = astCalloc( nrec, sizeof(*pntrs), 0 );
     bufelem = (clen+1)*sizeof(*buffer);
-    buffer = smf_malloc( nrec, bufelem, 1, status );
+    buffer = astCalloc( nrec, bufelem, 1 );
 
     datGet1C( shloc, nrec, bufelem*nrec, buffer, pntrs, &nrec, status );
     datAnnul( &shloc, status );
@@ -168,8 +168,8 @@ void smf_history_read( smfData* data,int *status) {
       astMapPut0I( history, pntrs[i], 1, " " );
     }
 
-    pntrs = smf_free( pntrs, status );
-    buffer = smf_free( buffer, status );
+    pntrs = astFree( pntrs );
+    buffer = astFree( buffer );
 
   }
 

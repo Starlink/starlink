@@ -145,7 +145,7 @@ void smf_fit_poly1d ( size_t order, size_t nelem, double clip, const double x[],
     if (polydata) {
       pptr = polydata;
     } else {
-      polyptr = smf_malloc( nelem, sizeof(*polyptr), 1, status );
+      polyptr = astCalloc( nelem, sizeof(*polyptr), 1 );
       pptr = polyptr;
     }
 
@@ -156,7 +156,7 @@ void smf_fit_poly1d ( size_t order, size_t nelem, double clip, const double x[],
        is expanded properly afterwards. It does mean that
        we will always end up in the weighted branch even if
        there is no supplied variance. */
-    varptr = smf_malloc( nelem, sizeof(*varptr), 0, status );
+    varptr = astCalloc( nelem, sizeof(*varptr), 0 );
     if (varptr) {
       if (vary && varptr) {
         memcpy( varptr, vary, sizeof(*varptr) * nelem );
@@ -167,7 +167,7 @@ void smf_fit_poly1d ( size_t order, size_t nelem, double clip, const double x[],
       }
     }
 
-    resid = smf_malloc( nelem, sizeof(*resid), 0, status );
+    resid = astCalloc( nelem, sizeof(*resid), 0 );
 
     /* we are clipping */
     while (iterating && *status == SAI__OK) {
@@ -232,9 +232,9 @@ void smf_fit_poly1d ( size_t order, size_t nelem, double clip, const double x[],
     }
 
     /* clean up resources */
-    if (polyptr) polyptr = smf_free( polyptr, status );
-    if (resid) resid = smf_free( resid, status );
-    if (varptr) varptr = smf_free( varptr, status );
+    if (polyptr) polyptr = astFree( polyptr );
+    if (resid) resid = astFree( resid );
+    if (varptr) varptr = astFree( varptr );
 
   }
 
@@ -272,7 +272,7 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[], const doubl
   if (x) {
     xx = x;
   } else {
-    xptr = smf_malloc( nelem, sizeof(*xptr), 0, status );
+    xptr = astCalloc( nelem, sizeof(*xptr), 0 );
     for ( i = 0; i < nelem; i++) {
       xptr[i] = i;
     }
@@ -286,7 +286,7 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[], const doubl
 
     if (vary) {
       /* Space for the weights */
-      double * w = smf_malloc( nelem, sizeof(*w), 0, status );
+      double * w = astCalloc( nelem, sizeof(*w), 0 );
 
       /* weighted fit */
       for (i = 0; i < nelem; i++) {
@@ -301,13 +301,13 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[], const doubl
 
       gsl_fit_wlinear( xx, 1, w, 1, y, 1, nelem,  &c0, &c1, &cov00, &cov01, &cov11, &chisq );
 
-      w = smf_free( w, status );
+      w = astFree( w );
 
     } else {
       /* We need some space to copy the data because we are worried about bad values
          for x and y */
-      double * fx = smf_malloc( nelem, sizeof(*fx), 0, status );
-      double * fy = smf_malloc( nelem, sizeof(*fy), 0, status );
+      double * fx = astCalloc( nelem, sizeof(*fx), 0 );
+      double * fy = astCalloc( nelem, sizeof(*fy), 0 );
 
       for (i = 0; i < nelem; i++) {
         if ( xx[i] != VAL__BADD && y[i] != VAL__BADD ) {
@@ -319,8 +319,8 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[], const doubl
 
       gsl_fit_linear( fx, 1, fy, 1, nrgood, &c0, &c1, &cov00, &cov01, &cov11, &chisq );
 
-      fx = smf_free( fx, status );
-      fy = smf_free( fy, status );
+      fx = astFree( fx );
+      fy = astFree( fy );
     }
 
     /* copy the result */
@@ -365,10 +365,10 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[], const doubl
       if (varcoeffs) {
         var = varcoeffs;
       } else {
-        var = smf_malloc( order+1, sizeof(*var), 1, status );
+        var = astCalloc( order+1, sizeof(*var), 1 );
       }
       sc2math_cubfit( nelem, (double*)x, (double*)y, coeffs, var, status);
-      if (var && !varcoeffs) var = smf_free( var, status );
+      if (var && !varcoeffs) var = astFree( var );
 
       /* sc2math assumes all the points are good so if we seriously
          want to continue with this option we really need to filter the
@@ -478,6 +478,6 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[], const doubl
 
   }
 
-  if (xptr) xptr = smf_free( xptr, status );
+  if (xptr) xptr = astFree( xptr );
 
 }

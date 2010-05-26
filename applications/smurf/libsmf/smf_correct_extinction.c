@@ -436,7 +436,7 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
   /* It is more efficient to call astTranGrid than astTran2
      Allocate memory in adaptive mode just in case. */
   if (method == SMF__EXTMETH_FULL || method == SMF__EXTMETH_ADAPT ) {
-    azel = smf_malloc( 2*npts, sizeof(*azel), 0, status );
+    azel = astCalloc( 2*npts, sizeof(*azel), 0 );
   }
 
   /* Jump to the cleanup section if status is bad by this point
@@ -628,7 +628,7 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
   }
 
  CLEANUP:
-  if (azel) azel = smf_free(azel,status);
+  if (azel) azel = astFree( azel );
 
 }
 

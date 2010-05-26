@@ -161,8 +161,8 @@ void sc2sim_getpongends
        centered over (0,0) - note that this is 1 greater than the number
        of grid segments along each side. */
 
-    xgrid = smf_malloc( x_ngridseg+1, sizeof(*xgrid), 0, status );
-    ygrid = smf_malloc( y_ngridseg+1, sizeof(*ygrid), 0, status );
+    xgrid = astCalloc( x_ngridseg+1, sizeof(*xgrid), 0 );
+    ygrid = astCalloc( y_ngridseg+1, sizeof(*ygrid), 0 );
 
   }
 
@@ -234,8 +234,8 @@ void sc2sim_getpongends
 
     /* Clean up */
 
-    xgrid = smf_free( xgrid, status );
-    ygrid = smf_free( ygrid, status );
+    xgrid = astFree( xgrid );
+    ygrid = astFree( ygrid );
 
   }
 }

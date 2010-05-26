@@ -212,7 +212,7 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
   nheat = astMapSize( heatmap );
 
   /* sort the heater settings in an integer array */
-  heatval = smf_malloc( nheat, sizeof(*heatval), 1, status );
+  heatval = astCalloc( nheat, sizeof(*heatval), 1 );
   if (*status == SAI__OK) {
     for (i = 0; i < nheat; i++ ) {
       int h;
@@ -259,26 +259,25 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
     size_t bol;
 
     /* get some memory for the indices */
-    indices = smf_malloc( maxfound, sizeof(*indices), 1, status );
+    indices = astCalloc( maxfound, sizeof(*indices), 1 );
 
     /* and equivalent memory for the readings at each index */
-    idata = smf_malloc( maxfound, smf_dtype_sz( fflat->dtype, status ),
-                       1, status );
+    idata = astCalloc( maxfound, smf_dtype_sz( fflat->dtype, status ), 1 );
 
     /* Need some memory for the JCMTSTATE information. */
-    outstate = smf_malloc( nheat, sizeof(*outstate), 0, status );
+    outstate = astCalloc( nheat, sizeof(*outstate), 0 );
     (*bolvald)->hdr->allState = outstate;
 
     /* First need to compensate for any drift in the DC sky level.
        We do this by looking at the heater measurements for the reference
        heater as a function of time (index) for each bolometer and then
        fitting it with a polynomial. */
-    skycoeffs = smf_malloc( nbols * (skyorder+1), sizeof(*skycoeffs), 1, status );
-    skycoeffsvar = smf_malloc( nbols * (skyorder+1), sizeof(*skycoeffs), 1, status );
+    skycoeffs = astCalloc( nbols * (skyorder+1), sizeof(*skycoeffs), 1 );
+    skycoeffsvar = astCalloc( nbols * (skyorder+1), sizeof(*skycoeffs), 1 );
 
     /* temp memory to hold the coefficients for a single bolometer */
-    coeff = smf_malloc( skyorder + 1, sizeof(*coeff), 1, status );
-    coeffvar = smf_malloc( skyorder + 1, sizeof(*coeffvar), 1, status );
+    coeff = astCalloc( skyorder + 1, sizeof(*coeff), 1 );
+    coeffvar = astCalloc( skyorder + 1, sizeof(*coeffvar), 1 );
 
     /* check status after memory allocation */
     if (*status == SAI__OK) {
@@ -303,7 +302,7 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
          are close enough that a linear fit on the first N measurements in the
          ramp will be a reasonable approximation. We'll need the first N heater
          measurements. */
-        before_heat = smf_malloc( szfit, sizeof(*before_heat), 1, status );
+        before_heat = astCalloc( szfit, sizeof(*before_heat), 1 );
         extras += meas_per_heat;
         for (i=0; i<szfit; i++) {
           before_heat[i] = (hdr->allState)[i].sc2_heat;
@@ -315,7 +314,7 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
          are close enough that a linear fit on the first N measurements in the
          ramp will be a reasonable approximation. We'll need the first N heater
          measurements. */
-        after_heat = smf_malloc( szfit, sizeof(*after_heat), 1, status );
+        after_heat = astCalloc( szfit, sizeof(*after_heat), 1 );
         extras += meas_per_heat;
         for (i=0;i<szfit; i++) {
           after_heat[i] = (hdr->allState)[nframes-i].sc2_heat;
@@ -323,10 +322,10 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
       }
 
       /* and _DOUBLE versions because smf_fit_poly1d takes doubles */
-      ddata = smf_malloc( maxfound + extras, sizeof(*ddata), 1, status);
-      dindices = smf_malloc( maxfound + extras, sizeof(*dindices), 1, status );
+      ddata = astCalloc( maxfound + extras, sizeof(*ddata), 1 );
+      dindices = astCalloc( maxfound + extras, sizeof(*dindices), 1 );
 
-      if (before_heat || after_heat) heatmeas = smf_malloc( szfit, sizeof(*heatmeas), 1, status );
+      if (before_heat || after_heat) heatmeas = astCalloc( szfit, sizeof(*heatmeas), 1 );
 
       if (*status == SAI__OK) {
         for (bol = 0; bol < nbols; bol++) {
@@ -391,11 +390,11 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
         }
       }
 
-      if (ddata) ddata = smf_free( ddata, status );
-      if (dindices) dindices = smf_free( dindices, status );
-      if (before_heat) before_heat = smf_free( before_heat, status );
-      if (after_heat) after_heat = smf_free( after_heat, status );
-      if (heatmeas) heatmeas = smf_free( heatmeas, status );
+      if (ddata) ddata = astFree( ddata );
+      if (dindices) dindices = astFree( dindices );
+      if (before_heat) before_heat = astFree( before_heat );
+      if (after_heat) after_heat = astFree( after_heat );
+      if (heatmeas) heatmeas = astFree( heatmeas );
 
       /* for each heater value we now need to calculate the measured signal */
       for ( i = 0; i < nheat; i++) {
@@ -470,19 +469,19 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
       }
     }
 
-    if (idata) idata = smf_free( idata, status );
-    if (indices) indices = smf_free( indices, status );
-    if (coeff) coeff = smf_free( coeff, status );
-    if (coeffvar) coeffvar = smf_free( coeffvar, status );
-    if (skycoeffs) skycoeffs = smf_free( skycoeffs, status );
-    if (skycoeffsvar) skycoeffsvar = smf_free( skycoeffsvar, status );
+    if (idata) idata = astFree( idata );
+    if (indices) indices = astFree( indices );
+    if (coeff) coeff = astFree( coeff );
+    if (coeffvar) coeffvar = astFree( coeffvar );
+    if (skycoeffs) skycoeffs = astFree( skycoeffs );
+    if (skycoeffsvar) skycoeffsvar = astFree( skycoeffsvar );
 
   }
 
   /* Create a smfDA struct to store the heater settings. */
   if (*status == SAI__OK) {
     smfDA * da = NULL;
-    double * dheatval = smf_malloc( nheat, sizeof(*dheatval), 0, status );
+    double * dheatval = astCalloc( nheat, sizeof(*dheatval), 0 );
 
     for (i = 0; i < nheat; i++) {
       dheatval[i] = heatval[i];
@@ -501,7 +500,7 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
                                               fflat->file->name, status );
   }
 
-  if (heatval) heatval = smf_free( heatval, status );
+  if (heatval) heatval = astFree( heatval );
   heatmap = astAnnul( heatmap );
 
 }

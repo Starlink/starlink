@@ -181,8 +181,8 @@ void smf_scanfit( smfData *data, unsigned char *quality, size_t order,
      on output smfData.poly is always a malloc'd buffer. First free
      it to remove any old values, and then malloc new space */
 
-  data->poly = smf_free( data->poly, status );
-  data->poly = smf_malloc( nbol*ncoeff, sizeof(*(data->poly)), 1, status );
+  data->poly = astFree( data->poly );
+  data->poly = astCalloc( nbol*ncoeff, sizeof(*(data->poly)), 1 );
   if( *status == SAI__OK ) {
     data->ncoeff = ncoeff;
   }

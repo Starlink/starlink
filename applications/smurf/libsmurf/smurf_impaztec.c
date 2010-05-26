@@ -356,39 +356,39 @@ void smurf_impaztec( int *status ) {
     nframes = framespersecond*seconds;
 
     /* Allocate temporary memory for the bolometer signals */
-    bolosig = smf_malloc( nframes, sizeof( *bolosig ), 0, status );
+    bolosig = astCalloc( nframes, sizeof( *bolosig ), 0 );
 
     /* create and fill the header with rts/tcs data */
-    head = smf_malloc( nframes, sizeof(*head), 1, status );
+    head = astCalloc( nframes, sizeof(*head), 1 );
 
     /* Retrieve values to convert from the netcdf file. */
 
-    time = smf_malloc ( nframes, sizeof(*time), 1, status );
-    airmass = smf_malloc ( nframes, sizeof(*airmass), 1, status );
-    tel_lst = smf_malloc ( nframes, sizeof(*tel_lst), 1, status );
-    trackactc1 = smf_malloc ( nframes, sizeof(*trackactc1), 1, status );
-    trackactc2 = smf_malloc ( nframes, sizeof(*trackactc2), 1, status );
-    trackdemandc1 = smf_malloc ( nframes, sizeof(*trackdemandc1), 1, status );
-    trackdemandc2 = smf_malloc ( nframes, sizeof(*trackdemandc2), 1, status );
-    trackbasec1 = smf_malloc ( nframes, sizeof(*trackbasec1), 1, status );
-    trackbasec2 = smf_malloc ( nframes, sizeof(*trackbasec2), 1, status );
-    azelactc1 = smf_malloc ( nframes, sizeof(*azelactc1), 1, status );
-    azelactc2 = smf_malloc ( nframes, sizeof(*azelactc2), 1, status );
-    azeldemandc1 = smf_malloc ( nframes, sizeof(*azeldemandc1), 1, status );
-    azeldemandc2 = smf_malloc ( nframes, sizeof(*azeldemandc2), 1, status );
-    azelbasec1 = smf_malloc ( nframes, sizeof(*azelbasec1), 1, status );
-    azelbasec2 = smf_malloc ( nframes, sizeof(*azelbasec2), 1, status );
-    dbuf = smf_malloc( nframes*nbolos, sizeof(*dbuf), 0, status );
-    dksquid = smf_malloc( nframes*nbolos, sizeof(*dksquid), 0, status );
-    posptr = smf_malloc( 2*nframes, sizeof(*posptr), 0, status );
-    fcal = smf_malloc( nbolos, sizeof(*fcal), 0, status );
-    fpar = smf_malloc( nflat, sizeof(*fpar), 0, status );
-    mjuldate = smf_malloc ( nframes, sizeof(*mjuldate), 1, status );
-    tempbuff = smf_malloc ( nframes, sizeof(*tempbuff), 1, status );
-    ra_app = smf_malloc ( nframes, sizeof(*ra_app), 1, status );
-    dec_app = smf_malloc ( nframes, sizeof(*dec_app), 1, status );
+    time = astCalloc( nframes, sizeof(*time), 1 );
+    airmass = astCalloc( nframes, sizeof(*airmass), 1 );
+    tel_lst = astCalloc( nframes, sizeof(*tel_lst), 1 );
+    trackactc1 = astCalloc( nframes, sizeof(*trackactc1), 1 );
+    trackactc2 = astCalloc( nframes, sizeof(*trackactc2), 1 );
+    trackdemandc1 = astCalloc( nframes, sizeof(*trackdemandc1), 1 );
+    trackdemandc2 = astCalloc( nframes, sizeof(*trackdemandc2), 1 );
+    trackbasec1 = astCalloc( nframes, sizeof(*trackbasec1), 1 );
+    trackbasec2 = astCalloc( nframes, sizeof(*trackbasec2), 1 );
+    azelactc1 = astCalloc( nframes, sizeof(*azelactc1), 1 );
+    azelactc2 = astCalloc( nframes, sizeof(*azelactc2), 1 );
+    azeldemandc1 = astCalloc( nframes, sizeof(*azeldemandc1), 1 );
+    azeldemandc2 = astCalloc( nframes, sizeof(*azeldemandc2), 1 );
+    azelbasec1 = astCalloc( nframes, sizeof(*azelbasec1), 1 );
+    azelbasec2 = astCalloc( nframes, sizeof(*azelbasec2), 1 );
+    dbuf = astCalloc( nframes*nbolos, sizeof(*dbuf), 0 );
+    dksquid = astCalloc( nframes*nbolos, sizeof(*dksquid), 0 );
+    posptr = astCalloc( 2*nframes, sizeof(*posptr), 0 );
+    fcal = astCalloc( nbolos, sizeof(*fcal), 0 );
+    fpar = astCalloc( nflat, sizeof(*fpar), 0 );
+    mjuldate = astCalloc( nframes, sizeof(*mjuldate), 1 );
+    tempbuff = astCalloc( nframes, sizeof(*tempbuff), 1 );
+    ra_app = astCalloc( nframes, sizeof(*ra_app), 1 );
+    dec_app = astCalloc( nframes, sizeof(*dec_app), 1 );
 
-    quality = smf_malloc ( nframes, sizeof(*quality), 1, status );
+    quality = astCalloc( nframes, sizeof(*quality), 1 );
     memset( quality, 0, nframes*sizeof(int) );
 
     /* Calculate the time for each frame.  First, get the modified julian
@@ -881,32 +881,32 @@ void smurf_impaztec( int *status ) {
 
   /* Free memory */
  CLEANUP:
-  bolosig = smf_free ( bolosig, status );
-  head = smf_free ( head, status );
-  dbuf = smf_free ( dbuf, status );
-  dksquid = smf_free ( dksquid, status );
-  fcal = smf_free ( fcal, status );
-  fpar = smf_free ( fpar, status );
-  posptr = smf_free ( posptr, status );
-  mjuldate = smf_free ( mjuldate, status );
-  tempbuff = smf_free ( tempbuff, status );
+  bolosig = astFree( bolosig );
+  head = astFree( head );
+  dbuf = astFree( dbuf );
+  dksquid = astFree( dksquid );
+  fcal = astFree( fcal );
+  fpar = astFree( fpar );
+  posptr = astFree( posptr );
+  mjuldate = astFree( mjuldate );
+  tempbuff = astFree( tempbuff );
 
-  time = smf_free ( time, status );
-  airmass = smf_free ( airmass, status );
-  trackactc1 = smf_free ( trackactc1, status );
-  trackactc2 = smf_free ( trackactc2, status );
-  trackdemandc1 = smf_free ( trackdemandc1, status );
-  trackdemandc2 = smf_free ( trackdemandc2, status );
-  trackbasec1 = smf_free ( trackbasec1, status );
-  trackbasec2 = smf_free ( trackbasec2, status );
-  azelactc1 = smf_free ( azelactc1, status );
-  azelactc2 = smf_free ( azelactc2, status );
-  azeldemandc1 = smf_free ( azeldemandc1, status );
-  azeldemandc2 = smf_free ( azeldemandc2, status );
-  azelbasec1 = smf_free ( azelbasec1, status );
-  azelbasec2 = smf_free ( azelbasec2, status );
+  time = astFree( time );
+  airmass = astFree( airmass );
+  trackactc1 = astFree( trackactc1 );
+  trackactc2 = astFree( trackactc2 );
+  trackdemandc1 = astFree( trackdemandc1 );
+  trackdemandc2 = astFree( trackdemandc2 );
+  trackbasec1 = astFree( trackbasec1 );
+  trackbasec2 = astFree( trackbasec2 );
+  azelactc1 = astFree( azelactc1 );
+  azelactc2 = astFree( azelactc2 );
+  azeldemandc1 = astFree( azeldemandc1 );
+  azeldemandc2 = astFree( azeldemandc2 );
+  azelbasec1 = astFree( azelbasec1 );
+  azelbasec2 = astFree( azelbasec2 );
 
-  quality = smf_free ( quality, status );
+  quality = astFree( quality );
 
   if ( *status == SAI__OK ) {
     msgOutif(MSG__VERB," ",

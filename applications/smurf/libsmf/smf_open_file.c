@@ -465,7 +465,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
             ndfDim( gndf, NDF__MXDIM, pdims, &npdims, status );
             (*data)->ncoeff = pdims[2];
             /* Allocate memory for poly coeffs & copy over */
-            opoly = smf_malloc( npoly, sizeof( *opoly ), 0, status);
+            opoly = astCalloc( npoly, sizeof( *opoly ), 0 );
             memcpy( opoly, poly, npoly*sizeof( *opoly ) );
             (*data)->poly = opoly;
           }
@@ -608,8 +608,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
             sc2store_headrmap( xloc, nframes, hdr->instrument, status );
 
             /* Malloc some memory to hold all the time series data */
-            hdr->allState = smf_malloc( nframes, sizeof(*(hdr->allState)),
-                                        1, status );
+            hdr->allState = astCalloc( nframes, sizeof(*(hdr->allState)), 1 );
 
             /* Loop over each element, reading in the information */
             tmpState = hdr->allState;
@@ -756,9 +755,9 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
            This allows us to close the file immediately so that
            we do not need to worry about sc2store only allowing
            a single file at a time */
-        da->flatcal = smf_malloc( colsize * rowsize * da->nflat,
-                                  sizeof(*(da->flatcal)), 0, status );
-        da->flatpar = smf_malloc( da->nflat, sizeof(*(da->flatpar)), 0, status);
+        da->flatcal = astCalloc( colsize * rowsize * da->nflat,
+                                 sizeof(*(da->flatcal)), 0 );
+        da->flatpar = astCalloc( da->nflat, sizeof(*(da->flatpar)), 0 );
 
         /* Now copy across from the mapped version */
         if (da->flatcal != NULL) memcpy(da->flatcal, flatcal,
@@ -784,10 +783,9 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           da->dksquid->lbnd[1] = 0;
           da->dksquid->lbnd[2] = 1;
 
-          da->dksquid->pntr[0] = smf_malloc( rowsize*nframes,
-                                             smf_dtype_size(da->dksquid,
-                                                            status),
-                                             0, status );
+          da->dksquid->pntr[0] = astCalloc( rowsize*nframes,
+                                            smf_dtype_size(da->dksquid,
+                                                           status), 0 );
 
           /* Convert to double precision when we copy into da->dksquid */
           if( *status == SAI__OK ) {
@@ -1060,7 +1058,7 @@ static char * smf__read_ocsconfig ( int ndfid, int *status) {
       /* allocate it slightly bigger in case the config *just* fits
          in SIZE * CLEN characters and we can't terminate it. Also
          initialise it so that we can walk back from the end */
-      ocscfg = smf_malloc( size + 1, clen, 1, status );
+      ocscfg = astCalloc( size + 1, clen, 1 );
       ocscfg[0] = '\0'; /* just to make sure */
       dims[0] = size;
       datGetC( configloc, 1, dims, ocscfg, clen, status );

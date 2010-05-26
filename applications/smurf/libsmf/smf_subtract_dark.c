@@ -280,8 +280,8 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
                      &idkp1, &idkpv1, status );
     smf_select_pntr( dark2->pntr, dark2->dtype, &ddkp2, &ddkpv2,
                      &idkp2, &idkpv2, status );
-    dkbuf = smf_malloc( nbols, sizeof(*dkbuf), 0, status );
-    dkvbuf = smf_malloc( nbols, sizeof(*dkvbuf), 0, status );
+    dkbuf = astCalloc( nbols, sizeof(*dkbuf), 0 );
+    dkvbuf = astCalloc( nbols, sizeof(*dkvbuf), 0 );
     ddark = dkbuf;
     dvdark = dkvbuf;
 
@@ -460,8 +460,8 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
       }
   }
 
-  if (dkbuf) dkbuf = smf_free( dkbuf, status );
-  if (dkvbuf) dkvbuf = smf_free( dkvbuf, status );
+  if (dkbuf) dkbuf = astFree( dkbuf );
+  if (dkvbuf) dkvbuf = astFree( dkvbuf );
 
   return;
 }

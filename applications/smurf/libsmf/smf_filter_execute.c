@@ -342,7 +342,7 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data,
     step = nbolo/nw;
   }
 
-  job_data = smf_malloc( nw, sizeof(*job_data), 1, status );
+  job_data = astCalloc( nw, sizeof(*job_data), 1 );
   for( i=0; (*status==SAI__OK)&&i<nw; i++ ) {
     pdata = job_data + i;
 
@@ -361,10 +361,8 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data,
       pdata->qua = data->pntr[2];
     }
 
-    pdata->data_fft_r = smf_malloc( filt->dim, sizeof(*pdata->data_fft_r), 0,
-                                    status );
-    pdata->data_fft_i = smf_malloc( filt->dim, sizeof(*pdata->data_fft_i), 0,
-                                    status );
+    pdata->data_fft_r = astCalloc( filt->dim, sizeof(*pdata->data_fft_r), 0 );
+    pdata->data_fft_i = astCalloc( filt->dim, sizeof(*pdata->data_fft_i), 0 );
     pdata->filt = filt;
     pdata->ijob = -1;   /* Flag job as ready to start */
 
@@ -432,17 +430,16 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data,
   if( job_data ) {
     for( i=0; i<nw; i++ ) {
       pdata = job_data + i;
-      if( pdata->data_fft_r ) pdata->data_fft_r = smf_free( pdata->data_fft_r,
-                                                            status);
-      if( pdata->data_fft_i ) pdata->data_fft_i = smf_free( pdata->data_fft_i,
-                                                            status);
+      if( pdata->data_fft_r ) pdata->data_fft_r = astFree( pdata->data_fft_r );
+      if( pdata->data_fft_i ) pdata->data_fft_i = astFree( pdata->data_fft_i );
+
       /* Destroy the plans */
       smf_mutex_lock( &smf_filter_execute_mutex, status );
       fftw_destroy_plan( pdata->plan_forward );
       fftw_destroy_plan( pdata->plan_inverse );
       smf_mutex_unlock( &smf_filter_execute_mutex, status );
     }
-    job_data = smf_free( job_data, status );
+    job_data = astFree( job_data );
   }
 
 }

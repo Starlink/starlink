@@ -129,7 +129,7 @@ smf_create_smfHead( int * status ) {
 
   if (*status != SAI__OK) return NULL;
 
-  hdr = smf_malloc( 1, sizeof(smfHead), 0, status );
+  hdr = astCalloc( 1, sizeof(smfHead), 0 );
 
   if (*status != SAI__OK) {
     errRep(FUNC_NAME,"Unable to allocate memory for smfHead structure",

@@ -120,8 +120,8 @@ void sc2sim_fitheat
   }
 
   if ( nframes > 10 ) {
-    scan = smf_malloc ( nframes, sizeof(*scan), 1, status );
-    ht = smf_malloc ( nframes, sizeof(*ht), 1, status );
+    scan = astCalloc( nframes, sizeof(*scan), 1 );
+    ht = astCalloc( nframes, sizeof(*ht), 1 );
 
     for ( i=0; i<nframes; i++ ) {
       ht[i] = heat[i] - heat[nframes/2];
@@ -158,7 +158,7 @@ void sc2sim_fitheat
       }
     }
 
-    scan = smf_free ( scan, status );
+    scan = astFree( scan );
 
   }
 

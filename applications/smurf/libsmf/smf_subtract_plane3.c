@@ -154,8 +154,8 @@ smf_subtract_plane3( smfWorkForce *wf, smfData *data,
 
   /* get some memory for the lut coordinates so we do not need to calculate
      it multiple times. */
-  xpos = smf_malloc( nbolo, sizeof(*xpos), 0, status );
-  ypos = smf_malloc( nbolo, sizeof(*ypos), 0, status );
+  xpos = astCalloc( nbolo, sizeof(*xpos), 0 );
+  ypos = astCalloc( nbolo, sizeof(*ypos), 0 );
 
 
   /* We need to loop over each time slice populating the matrices */
@@ -234,7 +234,7 @@ smf_subtract_plane3( smfWorkForce *wf, smfData *data,
   gsl_vector_free( planefit );
   gsl_matrix_free( mcov );
 
-  xpos = smf_free( xpos, status );
-  ypos = smf_free( ypos, status );
+  xpos = astFree( xpos );
+  ypos = astFree( ypos );
 
 }

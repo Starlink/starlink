@@ -231,8 +231,8 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, Grp **darkgrp, Grp **flat
   /* Work out how many input files we have and allocate sufficient sorting
      space */
   insize = grpGrpsz( ingrp, status );
-  alldarks = smf_malloc( insize, sizeof(*alldarks), 1, status );
-  allfflats = smf_malloc( insize, sizeof(*allfflats), 1, status );
+  alldarks = astCalloc( insize, sizeof(*alldarks), 1 );
+  allfflats = astCalloc( insize, sizeof(*allfflats), 1 );
 
   /* check each file in turn */
   for (i = 1; i <= insize; i++) {
@@ -398,8 +398,8 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, Grp **darkgrp, Grp **flat
   }
 
   /* free memory */
-  alldarks = smf_free( alldarks, status );
-  allfflats = smf_free( allfflats, status );
+  alldarks = astFree( alldarks );
+  allfflats = astFree( allfflats );
 
   /* Store the output groups in the return variable or free it */
   if (darkgrp) {

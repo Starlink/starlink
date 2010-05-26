@@ -178,13 +178,13 @@ double smf_calc_covar ( const smfData *data, const size_t i, const size_t j,
 
   /* Allocate memory for data */
   npts = hi - lo + 1;
-  idata = smf_malloc( npts, sizeof(double), 1, status );
+  idata = astCalloc( npts, sizeof(double), 1 );
   if ( idata == NULL ) {
     msgSeti("N",i);
     errRep( FUNC_NAME, "Unable to allocate memory for bolometer ^N timeseries", status );
     return covar;
   }
-  jdata = smf_malloc( npts, sizeof(double), 1, status );
+  jdata = astCalloc( npts, sizeof(double), 1 );
   if ( jdata == NULL ) {
     msgSeti("N",j);
     errRep( FUNC_NAME, "Unable to allocate memory for bolometer ^N timeseries", status );
@@ -204,9 +204,9 @@ double smf_calc_covar ( const smfData *data, const size_t i, const size_t j,
 
   /* Free resources */
   if ( idata != NULL)
-    idata = smf_free( idata, status );
+    idata = astFree( idata );
   if ( jdata != NULL)
-    jdata = smf_free( jdata, status );
+    jdata = astFree( jdata );
 
   return covar;
 

@@ -163,7 +163,7 @@ void smf_flag_stationary( smfData *data, unsigned char *quality,
   }
 
   /* Allocate flag array */
-  flag = smf_malloc( ntslice, sizeof(*flag), 1, status );
+  flag = astCalloc( ntslice, sizeof(*flag), 1 );
 
   /* Initial conditions */
   if( *status == SAI__OK ) {
@@ -227,5 +227,5 @@ void smf_flag_stationary( smfData *data, unsigned char *quality,
   if( nflagged ) *nflagged = nflag;
 
   /* Clean up */
-  if( flag ) flag = smf_free( flag, status );
+  if( flag ) flag = astFree( flag );
 }

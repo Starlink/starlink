@@ -160,8 +160,8 @@ void aztec_fill_smfHead( smfHead * hdr, int indf, int * status ) {
   /* allocate memory for LUTs and copy */
   if (*status == SAI__OK) {
     hdr->ndet = AZTEC_NBOLO;
-    fplanex = smf_malloc( AZTEC_NBOLO, sizeof(*fplanex), 0, status );
-    fplaney = smf_malloc( AZTEC_NBOLO, sizeof(*fplaney), 0, status );
+    fplanex = astCalloc( AZTEC_NBOLO, sizeof(*fplanex), 0 );
+    fplaney = astCalloc( AZTEC_NBOLO, sizeof(*fplaney), 0 );
 
     /* Copy using a for loop in case for some reason the type of fplane*
        is changed from double in the future */

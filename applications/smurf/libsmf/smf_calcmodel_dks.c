@@ -164,7 +164,7 @@ void smf_calcmodel_dks( smfWorkForce *wf __attribute__((unused)),
 
     nmodel = (model->sdata[0])->dims[0] * (model->sdata[0])->dims[1];
 
-    model_data_copy = smf_malloc( nmodel, sizeof(*model_data_copy), 1, status);
+    model_data_copy = astCalloc( nmodel, sizeof(*model_data_copy), 1 );
   }
 
   /* Check for dark squid smoothing parameter in the CONFIG file */
@@ -356,5 +356,5 @@ void smf_calcmodel_dks( smfWorkForce *wf __attribute__((unused)),
   }
 
   if( kmap ) kmap = astAnnul( kmap );
-  if( model_data_copy ) model_data_copy = smf_free(model_data_copy, status);
+  if( model_data_copy ) model_data_copy = astFree( model_data_copy );
 }

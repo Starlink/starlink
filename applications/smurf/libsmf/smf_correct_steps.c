@@ -304,7 +304,7 @@ void smf_correct_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
        so allocate it now, and initialise a mutex to guard access to it.
        For other dclfags values, each thread creates its own alljump array. */
     if( dcflag == 2 ) {
-      alljump = smf_malloc( ntslice, sizeof(*alljump), 1, status );
+      alljump = astCalloc( ntslice, sizeof(*alljump), 1 );
       smf_mutex_init( &alljump_mutex, status );
     } else {
       alljump = NULL;
@@ -418,7 +418,7 @@ void smf_correct_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
     }
 
     /* Clean up */
-    alljump = smf_free( alljump, status );
+    alljump = astFree( alljump );
   }
 
 }
@@ -493,7 +493,7 @@ static void smfCorrectStepsParallel( void *job_data_ptr, int *status ) {
   if( dcflag == 2 ) {
     alljump = pdata->alljump;
   } else {
-    alljump = smf_malloc( ntslice, sizeof(*alljump), 1, status );
+    alljump = astCalloc( ntslice, sizeof(*alljump), 1 );
   }
 
   /* Loop over bolometers */
@@ -666,7 +666,7 @@ static void smfCorrectStepsParallel( void *job_data_ptr, int *status ) {
   }
 
   /* Free any thread local alljump array */
-  if( dcflag != 2 ) alljump = smf_free( alljump, status );
+  if( dcflag != 2 ) alljump = astFree( alljump );
 
   /* Return the number of flagged samples */
   pdata->ns = ns;
@@ -723,7 +723,7 @@ static void smfCorrectStepsParallel2( void *job_data_ptr, int *status ) {
   tstride = pdata2->tstride;
 
   /* Allocate local work array. */
-  thisjump = smf_malloc( ntslice, sizeof(*thisjump), 1, status );
+  thisjump = astCalloc( ntslice, sizeof(*thisjump), 1 );
 
   /* Loop over bolometers */
   for( i = b1; i <= b2 && *status==SAI__OK; i++ ) {
@@ -778,7 +778,7 @@ static void smfCorrectStepsParallel2( void *job_data_ptr, int *status ) {
   }
 
   /* Free resources */
-  thisjump = smf_free( thisjump, status );
+  thisjump = astFree( thisjump );
 }
 
 

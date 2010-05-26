@@ -161,8 +161,7 @@ smf_flat_params( const smfData * refdata, const char refrespar[], const char res
   }
 
   nbols = ncols * nrows;
-  *resistance = smf_malloc( nbols, sizeof(**resistance),
-                            0, status);
+  *resistance = astCalloc( nbols, sizeof(**resistance), 0 );
 
   if (*status == SAI__OK) {
     for (j = 0; j < (size_t)ncols; j++) {
@@ -230,7 +229,7 @@ smf_flat_params( const smfData * refdata, const char refrespar[], const char res
 
  CLEANUP:
   if (*status != SAI__OK) {
-    if (*resistance) *resistance = smf_free( *resistance, status );
+    if (*resistance) *resistance = astFree( *resistance );
   }
 
   return;

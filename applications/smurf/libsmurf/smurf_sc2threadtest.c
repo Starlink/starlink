@@ -289,7 +289,7 @@ void smurf_sc2threadtest( int *status ) {
           ": Creating ^NS subarrays of data with ^C chunks * ^T samples",
           status );
 
-  res = smf_malloc( nchunks, sizeof(*res), 1, status );
+  res = astCalloc( nchunks, sizeof(*res), 1 );
 
   for( k=0; (*status==SAI__OK)&&(k<nchunks); k++ ) {
 
@@ -311,8 +311,7 @@ void smurf_sc2threadtest( int *status ) {
 
         data->hdr->steptime = 0.005;
 
-        data->pntr[0] = smf_malloc( datalen, smf_dtype_sz(data->dtype,status),
-                                    1, status );
+        data->pntr[0] = astCalloc( datalen, smf_dtype_sz(data->dtype,status), 1 );
       }
 
       smf_addto_smfArray( res[k], data, status );
@@ -340,7 +339,7 @@ void smurf_sc2threadtest( int *status ) {
      smfTimeChunkData's that hold the information required for each
      thread */
 
-  job_data = smf_malloc( nthread, sizeof(*job_data), 1, status );
+  job_data = astCalloc( nthread, sizeof(*job_data), 1 );
 
   for( i=0; (i<(size_t)nthread) && (*status==SAI__OK); i++ ) {
     pdata = job_data + i;
@@ -526,10 +525,10 @@ void smurf_sc2threadtest( int *status ) {
         smf_close_related( &res[i], status );
       }
     }
-    res = smf_free( res, status );
+    res = astFree( res );
   }
   if( wf ) wf = smf_destroy_workforce( wf );
-  if( job_data ) job_data = smf_free( job_data, status );
+  if( job_data ) job_data = astFree( job_data );
 
   /* Ensure that FFTW doesn't have any used memory kicking around */
   fftw_cleanup();

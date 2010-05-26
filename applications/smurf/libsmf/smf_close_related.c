@@ -128,9 +128,9 @@ void smf_close_related ( smfArray **relfiles, int *status ) {
 
   /* Free dynamically allocated buffer */
   if ((*relfiles)->dyndata) {
-    (*relfiles)->dyndata = smf_free((*relfiles)->dyndata, status);
+    (*relfiles)->dyndata = astFree( (*relfiles)->dyndata );
   }
 
   /* Free resources of struct */
-  *relfiles = smf_free( *relfiles, status );
+  *relfiles = astFree( *relfiles );
 }

@@ -367,6 +367,9 @@
  *        Add smf_get_goodrange
  *     2010-03-18 (EC):
  *        Add smf_qual_str, smf_qualstats_report
+ *     2010-05-26 (TIMJ):
+ *        Remove SMURF memory allocation routine prototypes. Use AST
+ *        routines natively.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -962,8 +965,6 @@ void smf_flatfield ( const smfData *idata, const smfArray * flats, smfData **oda
 
 void smf_flatten ( smfData *data, int *status );
 
-#define smf_free(pntr,status) astFree(pntr)
-
 smfFilter *smf_free_smfFilter( smfFilter *filt, int *status );
 
 int ***smf_freepolbins( int nndf, int npbin, double **pangle, int ***ptime,
@@ -1104,9 +1105,6 @@ void smf_makefitschan( const char *system, double crpix[2], double crval[2],
 AstMapping *smf_maketanmap( double lon, double lat, AstMapping *cache[ 2 ],
                             int *status );
 
-void * smf_malloc( size_t nelem, size_t bytes_per_elem, int zero,
-                   int * status );
-
 void * smf_map_or_malloc( size_t nelem, smf_dtype type, int zero, int indf,
                           const char * comp, int * status );
 
@@ -1235,9 +1233,6 @@ void smf_qualstats_report( const smfArray *qua, size_t last_qcount[8],
 double smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
                         unsigned char *quality, unsigned char mask,
                         int *status );
-
-void * smf_realloc( void * pntr, size_t nelem, size_t bytes_per_elem,
-                    int * status );
 
 AstMapping *smf_rebin_totmap( smfData *data, dim_t itime,
                               AstSkyFrame *abskyfrm,

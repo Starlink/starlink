@@ -95,7 +95,7 @@ smf_create_smfFile( int * status ) {
 
   if (*status != SAI__OK) return NULL;
 
-  file = smf_malloc( 1, sizeof(smfFile), 0, status );
+  file = astCalloc( 1, sizeof(smfFile), 0 );
 
   if (*status != SAI__OK) {
     errRep(FUNC_NAME,"Unable to allocate memory for smfFile structure",

@@ -246,7 +246,7 @@ void smf_close_file( smfData ** data, int * status ) {
       freedata = 1;
     }
 
-    (*data)->file = smf_free( (*data)->file, status );
+    (*data)->file = astFree( (*data)->file );
   } else {
     /* no file - data is ours to free */
     freedata = 1;
@@ -275,45 +275,45 @@ void smf_close_file( smfData ** data, int * status ) {
           /* make sure we use free() */
           free(hdr->allState);
         } else {
-          hdr->allState = smf_free(hdr->allState, status);
+          hdr->allState = astFree( hdr->allState );
         }
       }
-      if (hdr->fplanex) hdr->fplanex = smf_free( hdr->fplanex, status );
-      if (hdr->fplaney) hdr->fplaney = smf_free( hdr->fplaney, status );
-      if (hdr->detpos) hdr->detpos = smf_free( hdr->detpos, status );
-      if (hdr->tsys) hdr->tsys = smf_free( hdr->tsys, status );
-      if (hdr->detname) hdr->detname = smf_free( hdr->detname, status );
-      if (hdr->ocsconfig) hdr->ocsconfig = smf_free( hdr->ocsconfig, status );
+      if (hdr->fplanex) hdr->fplanex = astFree( hdr->fplanex );
+      if (hdr->fplaney) hdr->fplaney = astFree( hdr->fplaney );
+      if (hdr->detpos) hdr->detpos = astFree( hdr->detpos );
+      if (hdr->tsys) hdr->tsys = astFree( hdr->tsys );
+      if (hdr->detname) hdr->detname = astFree( hdr->detname );
+      if (hdr->ocsconfig) hdr->ocsconfig = astFree( hdr->ocsconfig );
     }
-    hdr = smf_free( hdr, status );
+    hdr = astFree( hdr );
   }
 
   /* Now the smfDA itself */
   if ( (*data)->da != NULL ) {
     da = (*data)->da;
-    da->flatcal = smf_free( da->flatcal, status );
-    da->flatpar = smf_free( da->flatpar, status );
+    da->flatcal = astFree( da->flatcal );
+    da->flatpar = astFree( da->flatpar );
     if( da->dksquid) smf_close_file( &da->dksquid, status );
-    da->heatval = smf_free( da->heatval, status );
-    da = smf_free( da, status );
+    da->heatval = astFree( da->heatval );
+    da = astFree( da );
   }
 
   /* Free smfDream */
   if ( (*data)->dream != NULL ) {
     dream = (*data)->dream;
     if ( dream->gridwts != NULL)
-      dream->gridwts = smf_free( dream->gridwts, status );
+      dream->gridwts = astFree( dream->gridwts );
     if ( dream->invmatx != NULL)
-      dream->invmatx = smf_free( dream->invmatx, status );
-    dream= smf_free( dream, status );
+      dream->invmatx = astFree( dream->invmatx );
+    dream= astFree( dream );
   }
 
   /* Free up other pointers in the smfData: poly and lut */
   if ( (*data)->poly != NULL ) {
-    (*data)->poly = smf_free( (*data)->poly, status );
+    (*data)->poly = astFree( (*data)->poly );
   }
   if ( (*data)->lut != NULL ) {
-    (*data)->lut = smf_free( (*data)->lut, status );
+    (*data)->lut = astFree( (*data)->lut );
   }
 
   /* Free the data arrays if they are non-null (they should have been
@@ -322,7 +322,7 @@ void smf_close_file( smfData ** data, int * status ) {
   if (freedata) {
     for (i = 0; i < 3; i++ ) {
       if ( ((*data)->pntr)[i] != NULL )
-        ((*data)->pntr)[i] = smf_free( ((*data)->pntr)[i], status );
+        ((*data)->pntr)[i] = astFree( ((*data)->pntr)[i] );
     }
   } else if (isSc2store) {
     /* just the data array */
@@ -330,6 +330,6 @@ void smf_close_file( smfData ** data, int * status ) {
   }
 
   /* finally free smfData */
-  *data = smf_free( *data, status );
+  *data = astFree( *data );
 
 }

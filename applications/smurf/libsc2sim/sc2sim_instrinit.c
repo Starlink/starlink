@@ -188,12 +188,12 @@ void sc2sim_instrinit( struct sc2sim_obs_struct *inx,
   }
 
   decay = 5.0;
-  *heater = smf_malloc ( nbol, sizeof(**heater), 1, status );
-  *pzero = smf_malloc ( nbol, sizeof(**pzero), 1, status  );
-  *xbc = smf_malloc ( nbol, sizeof(**xbc), 1, status  );
-  *ybc = smf_malloc ( nbol, sizeof(**ybc), 1, status  );
-  *xbolo = smf_malloc ( nbol, sizeof(**xbolo), 1, status  );
-  *ybolo = smf_malloc ( nbol, sizeof(**ybolo), 1, status  );
+  *heater = astCalloc( nbol, sizeof(**heater), 1 );
+  *pzero = astCalloc( nbol, sizeof(**pzero), 1 );
+  *xbc = astCalloc( nbol, sizeof(**xbc), 1 );
+  *ybc = astCalloc( nbol, sizeof(**ybc), 1 );
+  *xbolo = astCalloc( nbol, sizeof(**xbolo), 1 );
+  *ybolo = astCalloc( nbol, sizeof(**ybolo), 1 );
 
 
   /*  Initialise the standard bolometer response function.

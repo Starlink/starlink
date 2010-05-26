@@ -144,7 +144,7 @@ void smurf_calcresp( int *status ) {
              &ogrp, &outsize, status );
 
   /* Allocate some memory for the tracking of the number of good bolometers */
-  ngood = smf_malloc( size, sizeof( *ngood ), 1, status );
+  ngood = astCalloc( size, sizeof( *ngood ), 1 );
 
   /* Loop over input files */
   for (i=1; i<=size; i++) {
@@ -205,7 +205,7 @@ void smurf_calcresp( int *status ) {
  CLEANUP:
   if (igrp) grpDelet( &igrp, status);
   if (ogrp) grpDelet( &ogrp, status);
-  if (ngood) ngood = smf_free( ngood, status );
+  if (ngood) ngood = astFree( ngood );
 
   ndfEnd( status );
 }

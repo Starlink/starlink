@@ -801,14 +801,13 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     gai = dat->gai[chunk];
 
     /* Make a copy of gai_data (each subarray) for calculating convergence */
-    gai_data_copy = smf_malloc( gai->ndat, sizeof(*gai_data_copy), 0, status );
+    gai_data_copy = astCalloc( gai->ndat, sizeof(*gai_data_copy), 0 );
     for( idx=0; (idx<gai->ndat)&&(*status==SAI__OK); idx++ ) {
 
       smf_get_dims( gai->sdata[idx],  NULL, NULL, NULL, NULL,
                     &thisndata, NULL, NULL, status);
 
-      gai_data_copy[idx] = smf_malloc( thisndata, sizeof(*gai_data_copy[idx]),
-                                       0, status );
+      gai_data_copy[idx] = astCalloc( thisndata, sizeof(*gai_data_copy[idx]), 0 );
 
       gai_data = (gai->sdata[idx]->pntr)[0];
 
@@ -827,15 +826,14 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     model_data = (model->sdata[0]->pntr)[0];
 
     /* Copy of model data array */
-    model_data_copy = smf_malloc( (model->sdata[0]->dims)[0],
-			  sizeof(*model_data_copy), 1, status );
+    model_data_copy = astCalloc( (model->sdata[0]->dims)[0],
+                                 sizeof(*model_data_copy), 1 );
     if( *status == SAI__OK ) {
       memcpy( model_data_copy, model_data, (model->sdata[0]->dims)[0] *
 	      sizeof(*model_data_copy) );
     }
     /* Temporary buffer to store weights */
-    weight = smf_malloc( (model->sdata[0]->dims)[0], sizeof(*weight), 0,
-			 status );
+    weight = astCalloc( (model->sdata[0]->dims)[0], sizeof(*weight), 0 );
 
     /* Find the number of blocks of time slices per bolometer. Each
        block contains "gain_box" time slices (except possibly for the
@@ -857,7 +855,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   }
 
   /* Allocate job data for threads */
-  job_data = smf_malloc( nw, sizeof(*job_data), 1, status );
+  job_data = astCalloc( nw, sizeof(*job_data), 1 );
 
 
 
@@ -1022,7 +1020,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
   /* Allocate memory for a set of flags, one for each block, that
      indicate if the block has converged or not. */
-  converged = smf_malloc( nblock, sizeof( *converged ), 0, status );
+  converged = astCalloc( nblock, sizeof( *converged ), 0 );
 
   fillgaps = 0;
   first = 1;
@@ -1198,8 +1196,8 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
            --------------------------------------------------      */
 
         /* Allocate work space. */
-        gcoeff = smf_malloc( nbolo, sizeof(*gcoeff), 0, status );
-        corr = smf_malloc( nbolo, sizeof(*corr), 0, status );
+        gcoeff = astCalloc( nbolo, sizeof(*gcoeff), 0 );
+        corr = astCalloc( nbolo, sizeof(*corr), 0 );
 
         /* Loop over all blocks of time slices */
         newbad = 0;
@@ -1461,8 +1459,8 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
                   status );
         if( newbad ) fillgaps = 1;
 
-        gcoeff = smf_free( gcoeff, status );
-        corr = smf_free( corr, status );
+        gcoeff = astFree( gcoeff );
+        corr = astFree( corr );
 
       } else {
         /* If we're not fitting a gain and offset, just remove common-mode
@@ -1507,7 +1505,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   }
 
 /* Free the convergence flags. */
-  converged = smf_free( converged, status );
+  converged = astFree( converged );
 
 
 
@@ -1665,21 +1663,21 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   }
 
   /* Clean up */
-  if( weight)  weight = smf_free( weight, status );
-  if( model_data_copy ) model_data_copy = smf_free( model_data_copy, status );
+  if( weight)  weight = astFree( weight );
+  if( model_data_copy ) model_data_copy = astFree( model_data_copy );
 
   if( gai_data_copy ) {
     for( idx=0; idx<gai->ndat; idx++ ) {
       if( gai_data_copy[idx] ) {
-        gai_data_copy[idx] = smf_free( gai_data_copy[idx], status );
+        gai_data_copy[idx] = astFree( gai_data_copy[idx] );
       }
     }
-    gai_data_copy = smf_free( gai_data_copy, status );
+    gai_data_copy = astFree( gai_data_copy );
   }
 
   /* Clean up the job data array */
   if( job_data ) {
-    job_data = smf_free( job_data, status );
+    job_data = astFree( job_data );
   }
 
   if( kmap ) kmap = astAnnul( kmap );

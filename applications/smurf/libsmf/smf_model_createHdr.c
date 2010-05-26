@@ -292,10 +292,11 @@ void smf_model_createHdr( smfData *model, smf_modeltype type,
   /* Propagate JCMTState */
   if( (*status==SAI__OK) && (refhdr->allState) ) {
     model->hdr->nframes = refhdr->nframes;
-    model->hdr->allState = smf_malloc( refhdr->nframes,
-                                       sizeof(*(model->hdr->allState)),
-                                       1, status );
-    memcpy( model->hdr->allState, refhdr->allState,
-            refhdr->nframes*sizeof(*refhdr->allState) );
+    model->hdr->allState = astCalloc( refhdr->nframes,
+                                      sizeof(*(model->hdr->allState)), 1 );
+    if (model->hdr->allState) {
+      memcpy( model->hdr->allState, refhdr->allState,
+              refhdr->nframes*sizeof(*refhdr->allState) );
+    }
   }
 }

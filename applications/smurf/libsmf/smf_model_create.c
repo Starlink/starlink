@@ -775,11 +775,11 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
           }
 
           if( nofile ) {
-            /* If there is no file associated with the data, use smf_malloc
+            /* If there is no file associated with the data, use malloc
                to allocate memory but don't initialize since we do that
                later */
 
-            dataptr = smf_malloc( datalen, 1, 0, status );
+            dataptr = astCalloc( datalen, 1, 0 );
 
           } else {
             /* If we are writing a file create and map it here */

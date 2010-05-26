@@ -146,7 +146,7 @@ void sc2sim_getast_wcs
      /* Allocate space for arrays */
 
      nboll = colsize * rowsize;
-     skycoord = smf_malloc( nboll*2, sizeof(*skycoord), 1, status );
+     skycoord = astCalloc( nboll*2, sizeof(*skycoord), 1 );
 
      lbnd_in[0] = 1;
      ubnd_in[SC2STORE__ROW_INDEX] = colsize;
@@ -178,7 +178,7 @@ void sc2sim_getast_wcs
        }
      }
 
-     skycoord = smf_free(skycoord, status);
+     skycoord = astFree( skycoord );
 
   /* Now deal with all other interpolation methods... */
 

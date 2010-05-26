@@ -203,7 +203,7 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
     obsNum = (int)gsdVars->nObs;
 
   for ( i = 0; i < gsdVars->nFEChans; i++ ) {
-    recepNames[i] = smf_malloc ( 3, sizeof( char ), 0, status );
+    recepNames[i] = astCalloc( 3, sizeof( char ), 0 );
     fPlaneX[i] = 0.0;
     fPlaneY[i] = 0.0;
   }
@@ -249,8 +249,8 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
                   fPlaneX, fPlaneY, OCSConfig, status );
 
   /* Allocate memory for JCMTState, and SpecHdr */
-  record = smf_malloc ( 1, sizeof ( *record ), 0, status );
-  specHdr = smf_malloc ( 1, sizeof ( *specHdr ), 0, status );
+  record = astCalloc( 1, sizeof ( *record ), 0 );
+  specHdr = astCalloc( 1, sizeof ( *specHdr ), 0 );
 
   msgOutif(MSG__VERB," ", "Getting date and time values", status);
 
@@ -266,10 +266,10 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
   }
 
   /* Allocate memory for the lineFreqs and IFFreqs. */
-  lineFreqs = smf_malloc ( gsdVars->nBESections,
-                           sizeof(double), 0, status );
-  IFFreqs = smf_malloc ( gsdVars->nBESections,
-                         sizeof(double), 0, status );
+  lineFreqs = astCalloc ( gsdVars->nBESections,
+                          sizeof(double), 0 );
+  IFFreqs = astCalloc ( gsdVars->nBESections,
+                        sizeof(double), 0 );
 
   /* Check to see if this is a special configuration and
      determine which subbands belong together. */
@@ -386,13 +386,13 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
   acsSpecCloseTS ( fitschan, 0, 0, NULL, status );
 
   /* Free allocated memory. */
-  smf_free ( record, status );
-  smf_free ( specHdr, status );
-  smf_free ( lineFreqs, status );
-  smf_free ( IFFreqs, status );
+  astFree( record );
+  astFree( specHdr );
+  astFree( lineFreqs );
+  astFree( IFFreqs );
 
   for ( i = 0; i < gsdVars->nFEChans; i++ ) {
-    smf_free ( recepNames[i], status );
+    astFree( recepNames[i] );
   }
 
 

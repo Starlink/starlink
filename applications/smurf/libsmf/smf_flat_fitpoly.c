@@ -162,7 +162,7 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
 
   /* Create the smfData for the result. Flatfield of type POLYNOMIAL
      requires the third dimension to be 6 so we initialise all to 0.0 */
-  coptr = smf_malloc( NCOEFF * nbol, sizeof(*coptr), 1, status );
+  coptr = astCalloc( NCOEFF * nbol, sizeof(*coptr), 1 );
   {
     void * pntr[3];
     dim_t dims[3];
@@ -183,14 +183,14 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
   }
 
   /* Get some work space for the fits */
-  scan = smf_malloc ( nheat, sizeof(*scan), 1, status );
-  if (bolvar) scanvar = smf_malloc ( nheat, sizeof(*scanvar), 1, status );
-  ht = smf_malloc ( nheat, sizeof(*ht), 1, status );
-  goodht = smf_malloc ( nheat, sizeof(*goodht), 1, status );
-  scoeff = smf_malloc( order + 1, sizeof(*scoeff), 0, status );
-  scoeffvar = smf_malloc( order + 1, sizeof(*scoeffvar), 0, status );
-  goodidx = smf_malloc( nheat, sizeof(*goodidx), 1, status );
-  corrs = smf_malloc( nbol, sizeof(*corrs), 0, status );
+  scan = astCalloc( nheat, sizeof(*scan), 1 );
+  if (bolvar) scanvar = astCalloc( nheat, sizeof(*scanvar), 1 );
+  ht = astCalloc( nheat, sizeof(*ht), 1 );
+  goodht = astCalloc( nheat, sizeof(*goodht), 1 );
+  scoeff = astCalloc( order + 1, sizeof(*scoeff), 0 );
+  scoeffvar = astCalloc( order + 1, sizeof(*scoeffvar), 0 );
+  goodidx = astCalloc( nheat, sizeof(*goodidx), 1 );
+  corrs = astCalloc( nbol, sizeof(*corrs), 0 );
 
   /* Assume that we have monotonically increasing heater settings and so
      pick a value from the middle as a reference. Ramps may well have an
@@ -201,8 +201,8 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
   }
 
   /* space for the calculated polynomial */
-  if (polyfit && order == 1) polybol = smf_malloc( nheat*nbol, sizeof(*polybol), 0, status );
-  poly = smf_malloc( nheat, sizeof(*poly), 0, status );
+  if (polyfit && order == 1) polybol = astCalloc( nheat*nbol, sizeof(*polybol), 0 );
+  poly = astCalloc( nheat, sizeof(*poly), 0 );
 
   /* Now loop over each bolometer and extract the measurements */
   for (bol=0; bol<nbol; bol++) {
@@ -417,21 +417,21 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
       *polyfit = smf_construct_smfData( NULL, NULL, NULL, NULL, SMF__DOUBLE,
                                         pntr, 1, bolvald->dims, bolvald->lbnd, 3, 0, 0, NULL,
                                         NULL, status );
-      if (*status != SAI__OK && ! *polyfit) polybol = smf_free( polybol, status );
+      if (*status != SAI__OK && ! *polyfit) polybol = astFree( polybol );
     } else {
-      polybol = smf_free( polybol, status );
+      polybol = astFree( polybol );
     }
   }
 
-  if (poly) poly = smf_free( poly, status );
-  if (scan) scan = smf_free( scan, status );
-  if (scanvar) scanvar = smf_free( scanvar, status );
-  if (scoeff) scoeff = smf_free( scoeff, status );
-  if (scoeffvar) scoeff = smf_free( scoeffvar, status );
-  if (ht) ht = smf_free( ht, status );
-  if (goodht) goodht = smf_free( goodht, status );
-  if (goodidx) goodidx = smf_free( goodidx, status );
-  if (corrs) corrs = smf_free( corrs, status );
+  if (poly) poly = astFree( poly );
+  if (scan) scan = astFree( scan );
+  if (scanvar) scanvar = astFree( scanvar );
+  if (scoeff) scoeff = astFree( scoeff );
+  if (scoeffvar) scoeff = astFree( scoeffvar );
+  if (ht) ht = astFree( ht );
+  if (goodht) goodht = astFree( goodht );
+  if (goodidx) goodidx = astFree( goodidx );
+  if (corrs) corrs = astFree( corrs );
 
   if (*status != SAI__OK) {
     if (*coeffs) smf_close_file( coeffs, status );

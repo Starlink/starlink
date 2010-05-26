@@ -178,7 +178,7 @@ void sc2sim_getstraightpong
   }
 
   /* Allocate memory for a single cycle of the pattern */
-  mapptr = smf_malloc ( mcount*2, sizeof(*mapptr), 1, status );
+  mapptr = astCalloc( mcount*2, sizeof(*mapptr), 1 );
 
   /* Get the positions for each scan segment */
   curroff = 0;
@@ -194,7 +194,7 @@ void sc2sim_getstraightpong
 
   /* Allocate memory for all n cycles of the pattern */
   *pongcount = mcount * nmaps;
-  *posptr = smf_malloc ( (*pongcount) * 2, sizeof(**posptr), 1, status );
+  *posptr = astCalloc( (*pongcount) * 2, sizeof(**posptr), 1 );
 
   /* Copy the required number of cycles into the
      list of positions */
@@ -202,6 +202,6 @@ void sc2sim_getstraightpong
     (*posptr)[j] = mapptr[j % (mcount * 2)];
   }
 
-  mapptr = smf_free ( mapptr, status );
+  mapptr = astFree( mapptr );
 
 }

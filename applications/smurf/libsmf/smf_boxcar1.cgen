@@ -142,7 +142,7 @@ void CGEN_FUNCTION(smf_boxcar1)( CGEN_TYPE *series, const size_t ninpts,
   }
 
   /* Make a copy of the time series that won't get altered as we go */
-  seriescopy = smf_malloc( ninpts, sizeof(*series), 0, status );
+  seriescopy = astCalloc( ninpts, sizeof(*series), 0 );
 
   if( *status == SAI__OK ) {
     memcpy( seriescopy, series, ninpts*sizeof(*series) );
@@ -237,6 +237,6 @@ void CGEN_FUNCTION(smf_boxcar1)( CGEN_TYPE *series, const size_t ninpts,
   }
 
   /* Clean Up */
-  if ( seriescopy ) seriescopy = smf_free( seriescopy, status );
+  if ( seriescopy ) seriescopy = astFree( seriescopy );
 
 }

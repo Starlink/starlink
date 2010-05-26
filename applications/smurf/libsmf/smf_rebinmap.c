@@ -336,7 +336,7 @@ void smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar,
             pdata->ijob = -1;
             smf_lock_data( pdata->data, 1, status );
             smf_close_file( &(pdata->data), status );
-            pdata->bolovar = smf_free( pdata->bolovar, status );
+            pdata->bolovar = astFree( pdata->bolovar );
             *nused += pdata->nused;
             break;
          }
@@ -382,7 +382,7 @@ void smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar,
          if( pdata->data ) {
             smf_lock_data( pdata->data, 1, status );
             smf_close_file( &(pdata->data), status );
-            pdata->bolovar = smf_free( pdata->bolovar, status );
+            pdata->bolovar = astFree( pdata->bolovar );
             *nused += pdata->nused;
          }
 

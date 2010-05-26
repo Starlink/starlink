@@ -113,7 +113,7 @@ void smf_close_mapcoord( smfData *data, int *status ) {
 
     /* If the LUT pointer is non-null and dofree=1 we should free it */
     if( dofree && data->lut ) {
-      data->lut = smf_free( data->lut, status );
+      data->lut = astFree( data->lut );
     }
   }
 }

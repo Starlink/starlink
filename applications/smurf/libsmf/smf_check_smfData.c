@@ -265,7 +265,7 @@ void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, i
     }
     if ( odata->poly == NULL) {
       npoly = (odata->dims)[0] * (odata->dims)[1] * odata->ncoeff;
-      opoly = smf_malloc( npoly, sizeof( double ), 0, status);
+      opoly = astCalloc( npoly, sizeof( double ), 0 );
       if ( *status == SAI__OK ) {
         memcpy( opoly, idata->poly, npoly*sizeof( double ) );
         odata->poly = opoly;

@@ -146,8 +146,8 @@ void smf_collapse_tseries( const smfData *indata, int nclip, const float clip[],
   dims[1] = (indata->dims)[1];
   nelem = dims[0] * dims[1];
   nbperel = smf_dtype_sz(dtype, status);
-  pntr[0] = smf_malloc( nelem, nbperel, 0, status );
-  pntr[1] = smf_malloc( nelem, nbperel, 0, status );
+  pntr[0] = astCalloc( nelem, nbperel, 0 );
+  pntr[1] = astCalloc( nelem, nbperel, 0 );
 
 
   /* Assign the pointers */
@@ -228,8 +228,8 @@ void smf_collapse_tseries( const smfData *indata, int nclip, const float clip[],
 
   /* must free the data if outdata is null */
   if (*outdata == NULL) {
-    pntr[0] = smf_free( pntr[0], status );
-    pntr[1] = smf_free( pntr[1], status );
+    pntr[0] = astFree( pntr[0] );
+    pntr[1] = astFree( pntr[1] );
   }
 
   return;

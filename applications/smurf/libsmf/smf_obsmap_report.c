@@ -138,7 +138,7 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
 
     /* Sort everything into order - this takes additional time since we have to read the
        KeyMap twice, but makes the output more amenable to scrutiny */
-    obslist = smf_malloc( nobs, sizeof(*obslist), 1, status );
+    obslist = astCalloc( nobs, sizeof(*obslist), 1 );
     for (i = 0; i < nobs; i++) {
       AstObject * ao = NULL;
       const char * instrume = NULL;
@@ -253,7 +253,7 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
     }
     msgBlankif( msglev, status );
 
-    obslist = smf_free( obslist, status );
+    obslist = astFree( obslist );
 
     /* Warn if we seem to have a mix of simulated and non-simulated data */
     if (nsim != 0 && nsim != nobs) {

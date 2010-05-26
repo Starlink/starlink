@@ -319,8 +319,8 @@ void smurf_sc2fft( int *status ) {
             double mean, sig, freqlo;
             size_t ngood, newgood;
 
-            whitenoise = smf_malloc( nbolo, sizeof(*whitenoise), 1, status );
-            bolomask = smf_malloc( nbolo, sizeof(*bolomask), 1, status );
+            whitenoise = astCalloc( nbolo, sizeof(*whitenoise), 1 );
+            bolomask = astCalloc( nbolo, sizeof(*bolomask), 1 );
 
 	    freqlo = 1. / (idata->hdr->steptime * idata->hdr->nframes);
 
@@ -368,8 +368,8 @@ void smurf_sc2fft( int *status ) {
             tempdata = smf_fft_avpspec( odata, bolomask, 1, SMF__Q_BADB,
                                         status );
             smf_close_file( &odata, status );
-            whitenoise = smf_free( whitenoise, status );
-            bolomask = smf_free( bolomask, status );
+            whitenoise = astFree( whitenoise );
+            bolomask = astFree( bolomask );
             odata = tempdata;
             tempdata = NULL;
 	    /* Store the number of good bolometers */

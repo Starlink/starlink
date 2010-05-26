@@ -214,7 +214,6 @@ smf_lock_data.c \
 smf_lock_related.c \
 smf_makefitschan.c \
 smf_maketanmap.c \
-smf_malloc.c \
 smf_map_or_malloc.c \
 smf_map_spikes.c \
 smf_mapbounds.c \
@@ -251,7 +250,6 @@ smf_qual_str.c \
 smf_qualstats.c \
 smf_qualstats_report.c \
 smf_quick_noise.c \
-smf_realloc.c \
 smf_rebin_totmap.c \
 smf_rebincube.c \
 smf_rebincube_ast.c \

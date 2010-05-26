@@ -32,12 +32,12 @@
 *        Pointer to global status.
 
 *  Return Value:
-*     smf_malloc = void*
+*     smf_map_or_malloc = void*
 *        Pointer. NULL on error.
 
 *  Description:
 *     Helper routine that will call ndfMap if supplied with an NDF identifier
-*     or else call smf_malloc to get the memory. If ndfMap is used status
+*     or else call astCalloc to get the memory. If ndfMap is used status
 *     will be set to bad if the number of mapped points are fewer than
 *     that requested in the call. The NDF will not be resized, it is assumed
 *     that this routine is being used to obtain a variance or quality
@@ -107,7 +107,7 @@ void * smf_map_or_malloc (size_t nelem, smf_dtype type, int zero, int indf,
 
   /* just malloc if we do not have a file */
   if ( indf == NDF__NOID) {
-    return smf_malloc( nelem, smf_dtype_sz(type, status), zero, status );
+    return astCalloc( nelem, smf_dtype_sz(type, status), zero );
   }
 
   ndfMap( indf, comp, smf_dtype_str(type, status),

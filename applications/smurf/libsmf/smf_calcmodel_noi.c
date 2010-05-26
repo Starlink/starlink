@@ -228,7 +228,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
          reason for this is to make measurements of the convergence
          easier. */
 
-      var = smf_malloc( nbolo, sizeof(*var), 0, status );
+      var = astCalloc( nbolo, sizeof(*var), 0 );
 
       if( flags & SMF__DIMM_FIRSTITER ) {
         /* Measure the noise from power spectra */
@@ -298,7 +298,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   }
 
   /* Clean Up */
-  if( var ) var = smf_free(var, status);
+  if( var ) var = astFree( var );
 
   if( kmap ) kmap = astAnnul( kmap );
 }

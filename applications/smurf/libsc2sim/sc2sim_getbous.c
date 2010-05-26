@@ -163,7 +163,7 @@ void sc2sim_getbous
   }
 
   /* Allocate memory for the list of positions */
-  *posptr = smf_malloc ( (*bouscount)*2, sizeof(**posptr), 1, status );
+  *posptr = astCalloc( (*bouscount)*2, sizeof(**posptr), 1 );
   curroff = 0;
   cend[0] = 0.0;
   cend[1] = 0.0;

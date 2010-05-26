@@ -302,7 +302,7 @@ void sc2sim_simframe
 
   /* Allocate space for array */
   if( *status == SAI__OK ) {
-    skycoord = smf_malloc ( nbol*2, sizeof(*skycoord), 1, status  );
+    skycoord = astCalloc( nbol*2, sizeof(*skycoord), 1 );
 
     lbnd_in[0] = 1;
     ubnd_in[SC2STORE__ROW_INDEX] = inx.colsize;
@@ -501,6 +501,6 @@ void sc2sim_simframe
   if( bolo2sky) bolo2sky = astAnnul(bolo2sky);
   if( bolo2map ) bolo2map = astAnnul(bolo2map);
   if( bolo2azel ) bolo2azel = astAnnul(bolo2azel);
-  skycoord = smf_free( skycoord, status );
+  skycoord = astFree( skycoord );
 }
 

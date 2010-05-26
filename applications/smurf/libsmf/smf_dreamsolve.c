@@ -193,7 +193,7 @@ void smf_dreamsolve( smfData *data, int *status ) {
     ncycles = nframes / nsampcycle;
 
     /* HACK - DEFINE!! */
-    qual = smf_malloc(nbol, sizeof(int), 1, status);
+    qual = astCalloc( nbol, sizeof(int), 1 );
 
     /* Pointers to the weights arrays. If either of these are NULL
        then it means we were not able to find the weights file */
@@ -235,17 +235,17 @@ void smf_dreamsolve( smfData *data, int *status ) {
                               0, NULL, status);
 
     /* Allocate memory for resources */
-    psbuf = smf_malloc( (size_t)(nsampcycle * nbol), sizeof(double), 1, status);
+    psbuf = astCalloc( (size_t)(nsampcycle * nbol), sizeof(double), 1 );
     if ( *status == SMF__NOMEM ) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unable to allocate memory for psbuf", status);
     }
-    pbolzero = smf_malloc( (size_t)nbol, sizeof(double), 1, status);
+    pbolzero = astCalloc( (size_t)nbol, sizeof(double), 1 );
     if ( *status == SMF__NOMEM ) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unable to allocate memory for polzero", status);
     }
-    map = smf_malloc( (size_t)maxmap, sizeof(double), 1, status);
+    map = astCalloc( (size_t)maxmap, sizeof(double), 1 );
     if ( *status == SMF__NOMEM ) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unable to allocate memory for map", status);

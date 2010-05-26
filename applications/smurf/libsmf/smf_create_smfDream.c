@@ -89,7 +89,7 @@ smfDream *smf_create_smfDream( int * status ) {
   if (*status != SAI__OK) return NULL;
 
   /* Create an empty smfDream  */
-  dream = smf_malloc( 1, sizeof(smfDream), 0, status );
+  dream = astCalloc( 1, sizeof(smfDream), 0 );
   if (*status != SAI__OK) {
     /* Add our own message to the stack */
     errRep(FUNC_NAME, "Unable to allocate memory for smfDream structure",
@@ -126,6 +126,6 @@ smfDream *smf_create_smfDream( int * status ) {
   return dream;
 
  CLEANUP:
-  dream = smf_free( dream, status );
+  dream = astFree( dream );
   return NULL;
 }

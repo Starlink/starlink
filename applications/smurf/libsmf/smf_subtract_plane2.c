@@ -268,9 +268,9 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
        fit */
 
     /* First, allocate space for the AzEl array */
-    azel = smf_malloc( 2*npts, sizeof(double), 0, status );
+    azel = astCalloc( 2*npts, sizeof(double), 0 );
     /* Bolometer indices */
-    indices = smf_malloc( nptsdat, sizeof(size_t), 0, status );
+    indices = astCalloc( nptsdat, sizeof(size_t), 0 );
     /* Free resources if status is bad after trying to allocate
        memory */
     if ( *status != SAI__OK ) goto CLEANUP;
@@ -425,8 +425,8 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
     gsl_matrix_free( mcov );
 
   CLEANUP:
-    if (azel) azel = smf_free(azel, status);
-    if (indices) indices = smf_free(indices, status);
+    if (azel) azel = astFree( azel );
+    if (indices) indices = astFree( indices );
   }
 
   /* Write history entry if we finish with good status. */

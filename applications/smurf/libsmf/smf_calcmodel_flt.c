@@ -163,7 +163,7 @@ void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
   if(dat->noi) {
     noi = dat->noi[chunk];
-    model_data_copy = smf_malloc( ndata, sizeof(*model_data_copy), 1, status);
+    model_data_copy = astCalloc( ndata, sizeof(*model_data_copy), 1 );
   }
   model = allmodel[chunk];
 
@@ -267,5 +267,5 @@ void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   }
 
   if( kmap ) kmap = astAnnul( kmap );
-  if( model_data_copy ) model_data_copy = smf_free(model_data_copy, status);
+  if( model_data_copy ) model_data_copy = astFree( model_data_copy );
 }

@@ -108,7 +108,7 @@ smfArray *smf_create_smfArray( int * status ) {
 
   if (*status != SAI__OK) return NULL;
 
-  ary = smf_malloc( 1, sizeof(smfArray), 0, status );
+  ary = astCalloc( 1, sizeof(smfArray), 0 );
 
   if (*status != SAI__OK) {
     /* Add our own message to the stack */
@@ -137,7 +137,7 @@ smfArray *smf_create_smfArray( int * status ) {
 
  CLEANUP:
   if ( ary )
-    ary = smf_free( ary, status );
+    ary = astFree( ary );
 
   return NULL;
 }

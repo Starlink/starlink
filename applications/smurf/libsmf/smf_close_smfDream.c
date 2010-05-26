@@ -86,9 +86,9 @@ void smf_close_smfDream( smfDream **dream, int * status ) {
   /* Always attempt to free resources regardless of status */
   if ( *dream != NULL ) {
     /* Free the pointers associated with the smfDream */
-    (*dream)->gridwts = smf_free( (*dream)->gridwts, status );
-    (*dream)->invmatx = smf_free( (*dream)->invmatx, status );
-    *dream = smf_free( *dream, status );
+    (*dream)->gridwts = astFree( (*dream)->gridwts );
+    (*dream)->invmatx = astFree( (*dream)->invmatx );
+    *dream = astFree( *dream );
   } else {
     if ( *status == SAI__OK ) {
       *status = SAI__ERROR;

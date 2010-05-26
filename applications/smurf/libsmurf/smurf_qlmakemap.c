@@ -422,7 +422,7 @@ void smurf_qlmakemap( int *status ) {
   } else {
     nweights = mapsize;
   }
-  weights = smf_malloc( nweights*wf->nworker, sizeof(double), 1, status);
+  weights = astCalloc( nweights*wf->nworker, sizeof(double), 1 );
 
   /* Create an output smfData */
   kpg1Wgndf( "OUT", igrp, 1, 1, "More output files required...",
@@ -447,9 +447,9 @@ void smurf_qlmakemap( int *status ) {
      rebinning is complete, these multiple output arrays are combined
      into one, and copied into the output NDF. */
     if( wf->nworker > 1 ) {
-      map = smf_malloc( mapsize*wf->nworker, sizeof(double), 0, status);
+      map = astCalloc( mapsize*wf->nworker, sizeof(double), 0 );
       if (genvar) {
-        variance = smf_malloc( mapsize*wf->nworker, sizeof(double), 0, status);
+        variance = astCalloc( mapsize*wf->nworker, sizeof(double), 0 );
       }
     } else {
       map = (odata->pntr)[0];
@@ -504,7 +504,7 @@ void smurf_qlmakemap( int *status ) {
     msgOutif(MSG__VERB, " ", "SMURF_QLMAKEMAP: Measuring Noise",
              status);
     smf_get_dims( data, NULL, NULL, &nbolo, NULL, NULL, NULL, NULL, status );
-    bolonoise = smf_malloc( nbolo, sizeof(*bolonoise), 1, status );
+    bolonoise = astCalloc( nbolo, sizeof(*bolonoise), 1 );
 
     /*** TIMER ***/
     smf_timerupdate(&tv1,&tv2,status);
@@ -548,8 +548,8 @@ void smurf_qlmakemap( int *status ) {
   if( *status == SAI__OK && wf->nworker > 1 ) {
     memcpy( (odata->pntr)[0], map, sizeof(double)*mapsize );
     if (variance) memcpy( (odata->pntr)[1], variance, sizeof(double)*mapsize );
-    if (map) map = smf_free( map, status );
-    if (variance) variance = smf_free( variance, status );
+    if (map) map = astFree( map );
+    if (variance) variance = astFree( variance );
   }
 
   /* Write WCS FrameSet to output file */
@@ -561,7 +561,7 @@ void smurf_qlmakemap( int *status ) {
   ndfCput("Flux Density", ondf, "LABEL", status);
 
   /* Free up weights array */
-  weights = smf_free( weights, status );
+  weights = astFree( weights );
 
   /* If the FitsChan is not empty, store it in the FITS extension of the
      output NDF (any existing FITS extension is deleted). */

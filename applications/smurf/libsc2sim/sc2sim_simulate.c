@@ -716,7 +716,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       /* Stare just points at a nasmyth offset of 0 from the map centre */
       msgOutif(MSG__VERB, " ", "Do a STARE observation", status );
       count = inx->numsamples;
-      posptr = smf_malloc ( count*2, sizeof(*posptr), 1, status );
+      posptr = astCalloc( count*2, sizeof(*posptr), 1 );
       if( *status == SAI__OK ) {
         memset( posptr, 0, count*2*sizeof(double) );
       }
@@ -728,7 +728,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       msgOutif(MSG__VERB, " ", "Do a NOISE observation", status );
       /* Always only lasts 10 s */
       count = 10. / inx->steptime;
-      posptr = smf_malloc ( count*2, sizeof(*posptr), 1, status );
+      posptr = astCalloc( count*2, sizeof(*posptr), 1 );
       if( *status == SAI__OK ) {
         memset( posptr, 0, count*2*sizeof(double) );
       }
@@ -755,7 +755,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
       /* dream uses the SMU to do the jiggle pattern so the posptr
          is just set to 0 */
-      posptr = smf_malloc ( count*2, sizeof(*posptr), 1, status );
+      posptr = astCalloc( count*2, sizeof(*posptr), 1 );
 
       if( *status == SAI__OK ) {
         memset( posptr, 0, count*2*sizeof(double) );
@@ -881,24 +881,24 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
      time-slice */
 
   /* All four subarrays need to have their data stored simultaneously */
-  dbuf = smf_malloc ( maxwrite*nbol*(sinx->nsubarrays), sizeof(*dbuf), 1, status );
-  digits = smf_malloc ( maxwrite*nbol, sizeof(*digits), 1, status );
-  dksquid = smf_malloc ( maxwrite*inx->rowsize, sizeof(*dksquid), 1, status );
+  dbuf = astCalloc( maxwrite*nbol*(sinx->nsubarrays), sizeof(*dbuf), 1 );
+  digits = astCalloc( maxwrite*nbol, sizeof(*digits), 1 );
+  dksquid = astCalloc( maxwrite*inx->rowsize, sizeof(*dksquid), 1 );
 
   /* Frames will be "chunked" into blocks of size 'maxwrite' */
-  mjuldate = smf_malloc ( maxwrite, sizeof(*mjuldate), 1, status );
-  lst = smf_malloc ( maxwrite, sizeof(*lst), 1, status );
-  base_az = smf_malloc ( maxwrite, sizeof(*base_az), 1, status );
-  base_el = smf_malloc ( maxwrite, sizeof(*base_el), 1, status );
-  base_p = smf_malloc ( maxwrite, sizeof(*base_p), 1, status );
-  bor_az = smf_malloc ( maxwrite, sizeof(*bor_az), 1, status );
-  bor_el = smf_malloc ( maxwrite, sizeof(*bor_el), 1, status );
-  bor_ra = smf_malloc ( maxwrite, sizeof(*bor_ra), 1, status );
-  bor_dec = smf_malloc ( maxwrite, sizeof(*bor_dec), 1, status );
-  jig_x_hor = smf_malloc ( maxwrite, sizeof(*jig_x_hor), 1, status );
-  jig_y_hor = smf_malloc ( maxwrite, sizeof(*jig_y_hor), 1, status );
-  airmass = smf_malloc ( maxwrite, sizeof(*airmass), 1, status );
-  head = smf_malloc( maxwrite, sizeof( *head ), 1, status );
+  mjuldate = astCalloc( maxwrite, sizeof(*mjuldate), 1 );
+  lst = astCalloc( maxwrite, sizeof(*lst), 1 );
+  base_az = astCalloc( maxwrite, sizeof(*base_az), 1 );
+  base_el = astCalloc( maxwrite, sizeof(*base_el), 1 );
+  base_p = astCalloc( maxwrite, sizeof(*base_p), 1 );
+  bor_az = astCalloc( maxwrite, sizeof(*bor_az), 1 );
+  bor_el = astCalloc( maxwrite, sizeof(*bor_el), 1 );
+  bor_ra = astCalloc( maxwrite, sizeof(*bor_ra), 1 );
+  bor_dec = astCalloc( maxwrite, sizeof(*bor_dec), 1 );
+  jig_x_hor = astCalloc( maxwrite, sizeof(*jig_x_hor), 1 );
+  jig_y_hor = astCalloc( maxwrite, sizeof(*jig_y_hor), 1 );
+  airmass = astCalloc( maxwrite, sizeof(*airmass), 1 );
+  head = astCalloc( maxwrite, sizeof( *head ), 1 );
 
   /* Create an instrumental 1/f noise sequence for each bolometer by
      generating random amplitudes for the sine and cosine
@@ -1619,23 +1619,23 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
  CLEANUP:
 
-  head = smf_free( head, status );
-  posptr = smf_free( posptr, status );
-  dbuf = smf_free( dbuf, status );
-  digits = smf_free( digits, status );
-  dksquid = smf_free( dksquid, status );
-  mjuldate = smf_free( mjuldate, status );
-  lst = smf_free( lst, status );
-  base_az = smf_free( base_az, status );
-  base_el = smf_free( base_el, status );
-  base_p = smf_free( base_p, status );
-  bor_az = smf_free( bor_az, status );
-  bor_el = smf_free( bor_el, status );
-  bor_ra = smf_free( bor_ra, status );
-  bor_dec = smf_free( bor_dec, status );
-  jig_x_hor = smf_free( jig_x_hor,status );
-  jig_y_hor = smf_free( jig_y_hor,status );
-  airmass = smf_free( airmass, status );
+  head = astFree( head );
+  posptr = astFree( posptr );
+  dbuf = astFree( dbuf );
+  digits = astFree( digits );
+  dksquid = astFree( dksquid );
+  mjuldate = astFree( mjuldate );
+  lst = astFree( lst );
+  base_az = astFree( base_az );
+  base_el = astFree( base_el );
+  base_p = astFree( base_p );
+  bor_az = astFree( bor_az );
+  bor_el = astFree( bor_el );
+  bor_ra = astFree( bor_ra );
+  bor_dec = astFree( bor_dec );
+  jig_x_hor = astFree( jig_x_hor );
+  jig_y_hor = astFree( jig_y_hor );
+  airmass = astFree( airmass );
 
   if ( !hitsonly ) {
 

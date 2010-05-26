@@ -199,8 +199,8 @@ int *status          /* global status (given and returned) */
   /* get dry/wet components */
   datSize(loc_dry, &drywet_size, status);
 
-  dry_ptr = smf_malloc(drywet_size, sizeof(float), 0, status);
-  wet_ptr = smf_malloc(drywet_size, sizeof(float), 0, status);
+  dry_ptr = astCalloc( drywet_size, sizeof(float), 0 );
+  wet_ptr = astCalloc( drywet_size, sizeof(float), 0 );
 
 
   datGetVR(loc_dry, drywet_size, dry_ptr,
@@ -209,7 +209,7 @@ int *status          /* global status (given and returned) */
             &drywet_size, status);
 
   /* generate combinative TAU and e^(-tau) */
-  tau_ptr = (float*)smf_malloc(drywet_size, sizeof(float), 0, status);
+  tau_ptr = (float*)astCalloc( drywet_size, sizeof(float), 0 );
   for(i=0; i<drywet_size; i++)
   {
     *(tau_ptr+i) = airmass*(pwv*(*(wet_ptr+i)) + *(dry_ptr+i));
@@ -217,8 +217,8 @@ int *status          /* global status (given and returned) */
   }
 
   /* release memories */
-  smf_free(dry_ptr, status);
-  smf_free(wet_ptr, status);
+  astFree( dry_ptr );
+  astFree( wet_ptr );
 
   /* close TAU file */
   datAnnul(&loc_wn_factor, status);
@@ -259,8 +259,8 @@ int *status          /* global status (given and returned) */
   else
   {
     nwn = (data->dims)[2];
-    tsm = (float*)smf_malloc(nwn, sizeof(float), 0, status);
-    ftswn_rel = (double*)smf_malloc(nwn, sizeof(double), 0, status);
+    tsm = (float*)astCalloc( nwn, sizeof(float), 0 );
+    ftswn_rel = (double*)astCalloc( nwn, sizeof(double), 0 );
     for(i=0; i<nwn; i++)
     {
       *(ftswn_rel + i) = i*fts_wnfactor/tau_wnfactor;
@@ -288,12 +288,12 @@ int *status          /* global status (given and returned) */
         }
       }
     /* release memory */
-    smf_free(tsm, status);
-    smf_free(ftswn_rel, status);
+    astFree( tsm );
+    astFree( ftswn_rel );
   }
 
   /* release memories */
-  smf_free(tau_ptr, status);
+  astFree( tau_ptr );
  printf("status = %d\n", *status);
   /* NDF end */
   ndfEnd(status);

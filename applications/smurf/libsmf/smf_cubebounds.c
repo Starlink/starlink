@@ -441,7 +441,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    rather than RECEPPOS, then free the detpos array in the smfHead
    structure. This will cause smf_tslice_ast to use the fplanex/y values. */
       if( !usedetpos && hdr->detpos ) {
-         hdr->detpos = smf_free( (double *) hdr->detpos, status );
+         hdr->detpos = astFree( (double *) hdr->detpos );
       }
 
 /* We want a description of the spectral WCS axis in the input file. If

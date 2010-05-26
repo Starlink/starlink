@@ -162,7 +162,7 @@ void smf_flat_assign ( int use_da, smf_flatmeth inflatmeth, const smfData * powv
   /* Number of bolometers comes from bolval */
   nbols = (bolval->dims)[0] * (bolval->dims)[1];
 
-  /* Get the output smfDA. smf_construct_smfDA should really use smf_realloc
+  /* Get the output smfDA. smf_construct_smfDA should really use astRealloc
      if called when it already has values. */
   outda = updata->da;
   if (!outda) {
@@ -173,15 +173,12 @@ void smf_flat_assign ( int use_da, smf_flatmeth inflatmeth, const smfData * powv
     outda->nflat = nflat;
     outda->flatmeth = flatmeth;
 
-    outda->flatcal = smf_realloc( outda->flatcal, nbols * nflat, sizeof(*(outda->flatcal)),
-                                  status );
-    outda->flatpar = smf_realloc( outda->flatpar, nflat, sizeof(*(outda->flatpar)),
-                                  status );
+    outda->flatcal = astRealloc( outda->flatcal, nbols * nflat * sizeof(*(outda->flatcal)) );
+    outda->flatpar = astRealloc( outda->flatpar, nflat * sizeof(*(outda->flatpar)) );
     /* optional */
     if (heatval && nheat) {
       outda->nheat = nheat;
-      outda->heatval = smf_realloc( outda->heatval, nheat, sizeof(*(outda->heatval)),
-                                    status );
+      outda->heatval = astRealloc( outda->heatval, nheat * sizeof(*(outda->heatval)) );
       if (outda->heatval) memcpy( outda->heatval, heatval, nheat * sizeof(*heatval));
     }
 

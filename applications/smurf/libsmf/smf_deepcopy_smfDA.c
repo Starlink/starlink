@@ -136,20 +136,20 @@ smf_deepcopy_smfDA( const smfData *old, int * status ) {
 
   /* Allocate space for and copy contents of pointers */
   if (oldda->flatcal && nflat > 0 ) {
-    flatcal = smf_malloc( nbol * nflat, sizeof(*flatcal), 0, status );
+    flatcal = astCalloc( nbol * nflat, sizeof(*flatcal), 0 );
     if ( flatcal != NULL ) {
       memcpy( flatcal, oldda->flatcal, sizeof(*flatcal)*nbol*nflat );
     }
   }
   if (oldda->flatpar && nflat > 0) {
-    flatpar = smf_malloc( nflat, sizeof(*flatpar), 0, status );
+    flatpar = astCalloc( nflat, sizeof(*flatpar), 0 );
     if ( flatpar != NULL ) {
       memcpy( flatpar, oldda->flatpar, sizeof(*flatpar)*nflat);
     }
   }
 
   if (oldda->heatval && nheat > 0) {
-    heatval = smf_malloc( nflat, sizeof(*heatval), 0, status );
+    heatval = astCalloc( nflat, sizeof(*heatval), 0 );
     if ( heatval != NULL ) {
       memcpy( heatval, oldda->heatval, sizeof(*heatval)*nflat);
     }

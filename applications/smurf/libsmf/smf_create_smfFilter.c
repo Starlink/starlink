@@ -111,7 +111,7 @@ smfFilter *smf_create_smfFilter( smfData *template, int *status ) {
 
   if (*status != SAI__OK) return NULL;
 
-  filt = smf_malloc( 1, sizeof(smfFilter), 0, status );
+  filt = astCalloc( 1, sizeof(smfFilter), 0 );
 
   if( *status == SAI__OK ) {
     filt->real = NULL;
@@ -204,7 +204,7 @@ smfFilter *smf_create_smfFilter( smfData *template, int *status ) {
 
   /* If we have bad status free filt */
   if( *status != SAI__OK ) {
-    filt = smf_free( filt, status );
+    filt = astFree( filt );
   }
 
   return filt;

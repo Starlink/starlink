@@ -131,7 +131,7 @@ smfGroup *smf_construct_smfGroup( const Grp *igrp, dim_t **subgroups, size_t *ch
   if ( *status != SAI__OK ) return NULL;
 
   /* Allocate space for smfGroup */
-  group = smf_malloc( 1, sizeof(smfGroup), 0, status);
+  group = astCalloc( 1, sizeof(smfGroup), 0 );
   if ( *status != SAI__OK ) {
     errRep(FUNC_NAME, "Unable to allocate memory for smfGroup", status);
     goto CLEANUP;
@@ -148,10 +148,9 @@ smfGroup *smf_construct_smfGroup( const Grp *igrp, dim_t **subgroups, size_t *ch
   /* Copy subgroups and chunk if requested */
   if( copy ) {
     /* subgroups */
-    newsubgroups = smf_malloc( ngroups, sizeof(*newsubgroups), 1, status );
+    newsubgroups = astCalloc( ngroups, sizeof(*newsubgroups), 1 );
     for( i=0; i<ngroups; i++ ) {
-      newsubgroups[i] = smf_malloc( nrelated, sizeof(**newsubgroups), 0,
-                                    status );
+      newsubgroups[i] = astCalloc( nrelated, sizeof(**newsubgroups), 0 );
       if( *status == SAI__OK ) {
         memcpy( newsubgroups[i], subgroups[i],
                 sizeof(**newsubgroups)*nrelated );
@@ -163,7 +162,7 @@ smfGroup *smf_construct_smfGroup( const Grp *igrp, dim_t **subgroups, size_t *ch
     }
 
     /* chunk */
-    group->chunk = smf_malloc( ngroups, sizeof(*chunk), 0, status );
+    group->chunk = astCalloc( ngroups, sizeof(*chunk), 0 );
     if( *status == SAI__OK ) {
       memcpy( group->chunk, chunk, sizeof(*chunk)*ngroups );
     }
@@ -183,7 +182,7 @@ smfGroup *smf_construct_smfGroup( const Grp *igrp, dim_t **subgroups, size_t *ch
 
  CLEANUP:
   if ( group )
-    group = smf_free( group, status );
+    group = astFree( group );
 
   return NULL;
 

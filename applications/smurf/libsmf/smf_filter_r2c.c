@@ -98,7 +98,7 @@ void smf_filter_r2c( smfFilter *filt, int *status ) {
   if( filt->isComplex ) return;
 
   /* Allocate space for the imaginary part */
-  filt->imag = smf_malloc( filt->dim, sizeof(*filt->imag), 1, status );
+  filt->imag = astCalloc( filt->dim, sizeof(*filt->imag), 1 );
 
   if( *status == SAI__OK ) {
     filt->isComplex = 1;

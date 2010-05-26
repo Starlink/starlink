@@ -1218,7 +1218,7 @@ void smurf_makemap( int *status ) {
          plane 2 of this 3-D array is stored in the weights component
          later. Initialize to zero. We need one such weights array for
          each thread, so we actually allocate a 4D array. */
-      weights3d = smf_malloc( 2*nxy*wf->nworker, sizeof(double), 1, status);
+      weights3d = astCalloc( 2*nxy*wf->nworker, sizeof(double), 1 );
 
       /* Each worker thread needs its own output array. This is needed since
          otherwise different threads may attempt to write to the same output
@@ -1228,8 +1228,8 @@ void smurf_makemap( int *status ) {
          rebinning is complete, these multiple output arrays are combined
          into one, and copied into the output NDF. */
       if( wf->nworker > 1 ) {
-         map = smf_malloc( nxy*wf->nworker, sizeof(double), 0, status);
-         variance = smf_malloc( nxy*wf->nworker, sizeof(double), 0, status);
+         map = astCalloc( nxy*wf->nworker, sizeof(double), 0 );
+         variance = astCalloc( nxy*wf->nworker, sizeof(double), 0 );
       } else {
          map = (odata->pntr)[0];
          variance = (odata->pntr)[1];
@@ -1358,8 +1358,8 @@ void smurf_makemap( int *status ) {
             memcpy( (odata->pntr)[0], map, sizeof(double)*nxy );
             memcpy( (odata->pntr)[1], variance, sizeof(double)*nxy );
          }
-         (void) smf_free( map, status );
-         (void) smf_free( variance, status );
+         (void) astFree( map );
+         (void) astFree( variance );
          map = (odata->pntr)[0];
          variance = (odata->pntr)[1];
       }
@@ -1380,7 +1380,7 @@ void smurf_makemap( int *status ) {
           }
         }
       }
-      weights3d = smf_free( weights3d, status );
+      weights3d = astFree( weights3d );
 
       /* Write WCS */
       if (wcstile2d) {
@@ -1405,7 +1405,6 @@ void smurf_makemap( int *status ) {
 
       /* Calculate median exposure time - use faster histogram-based
          method which should be accurate enough for our purposes */
-      /* Note that smf_find_median does not use smf_malloc */
       msgOutif( MSG__VERB, " ", "Calculating median output exposure time",
                 status );
       histogram = smf_find_median( NULL, exp_time, nxy, NULL, &medtexp, status );
@@ -1545,7 +1544,7 @@ void smurf_makemap( int *status ) {
              status);
 
     /* Allocate space for hitsmap */
-    hitsmap = smf_malloc( nxy, sizeof (*hitsmap), 1, status);
+    hitsmap = astCalloc( nxy, sizeof (*hitsmap), 1 );
 
     /* Loop over all input data files to setup provenance handling */
     for(i=1; (i<=size) && ( *status == SAI__OK ); i++ ) {
@@ -1595,7 +1594,7 @@ void smurf_makemap( int *status ) {
         }
       }
     }
-    hitsmap = smf_free( hitsmap, status );
+    hitsmap = astFree( hitsmap );
 
     /* Write WCS */
     smf_set_moving(outfset,status);
@@ -1621,7 +1620,6 @@ void smurf_makemap( int *status ) {
 
     /* Calculate median exposure time - use faster histogram-based
        method which should be accurate enough for our purposes */
-    /* Note that smf_find_median does not use smf_malloc */
     msgOutif( MSG__VERB, " ", "Calculating median output exposure time",
               status );
     histogram = smf_find_median( NULL, exp_time, nxy, NULL, &medtexp, status );
@@ -1679,7 +1677,7 @@ void smurf_makemap( int *status ) {
   if( igrp != NULL ) grpDelet( &igrp, status);
   if( igrp4 != NULL) grpDelet( &igrp4, status);
   if( ogrp != NULL ) grpDelet( &ogrp, status);
-  if( boxes ) boxes = smf_free( boxes, status );
+  if( boxes ) boxes = astFree( boxes );
   if( tiles ) tiles = smf_freetiles( tiles, ntile, status );
   if( darks ) smf_close_related( &darks, status );
   if( flatramps ) smf_close_related( &flatramps, status );

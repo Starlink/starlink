@@ -255,8 +255,8 @@ void smurf_badbolos( int *status ) {
    } else if ( strncmp( method, "RAN", 3 ) == 0 ) {
 
      /* Allocate memory for the arrays */
-     badcols = smf_malloc ( (size_t)dims[0], sizeof ( *badcols ), 1, status );
-     badrows = smf_malloc ( (size_t)dims[1], sizeof ( *badrows ), 1, status );
+     badcols = astCalloc( (size_t)dims[0], sizeof ( *badcols ), 1 );
+     badrows = astCalloc( (size_t)dims[1], sizeof ( *badrows ), 1 );
 
      /* Get number of bad columns and make sure it isn't greater
 	than the max */
@@ -374,8 +374,8 @@ void smurf_badbolos( int *status ) {
        }
      }
 
-     badcols = smf_free( badcols, status );
-     badrows = smf_free( badrows, status );
+     badcols = astFree( badcols );
+     badrows = astFree( badrows );
    }
 
    /* Report the bad pixel mask to the user */

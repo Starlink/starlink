@@ -277,7 +277,7 @@ smf_flat_calcflat( msglev_t msglev, const char flatname[],
   if (bolref) smf_close_file( &bolref, status );
   if (powref) smf_close_file( &powref, status );
   if (flatpoly) smf_close_file( &flatpoly, status );
-  if (resistance) resistance = smf_free( resistance, status );
+  if (resistance) resistance = astFree( resistance );
 
   return ngood;
 }

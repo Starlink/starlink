@@ -331,7 +331,7 @@ void smurf_calcflat( int *status ) {
       msgOutif( MSG__NORM, " ", "Reference heater setting: ^PX", status );
 
       /* get some memory for pixel heater settings */
-      pixheat = smf_malloc( flatfiles->ndat, sizeof(*pixheat), 0, status );
+      pixheat = astCalloc( flatfiles->ndat, sizeof(*pixheat), 0 );
 
       /* and some memory for non-reference frames */
       bbhtframe = smf_create_smfArray( status );
@@ -435,7 +435,7 @@ void smurf_calcflat( int *status ) {
   if (fgrp) grpDelet( &fgrp, status);
   if (ffgrp) grpDelet( &ffgrp, status);
   if (dkgrp) grpDelet( &dkgrp, status );
-  if (pixheat) pixheat = smf_free( pixheat, status );
+  if (pixheat) pixheat = astFree( pixheat );
 
   /* bolval is a simple pointer copy in fast ramp mode and will be freed when fflats is freed */
   if (!isfastramp) {

@@ -230,14 +230,14 @@ void smf_grp_related(  const Grp *igrp, const size_t grpsize,
 
   /* Allocate space for groups array - can't be any bigger than
      grpsize so use that. Initialize everything to NULL */
-  subgroups = smf_malloc( grpsize, sizeof(*subgroups), 1, status );
-  starts = smf_malloc( grpsize, sizeof(*starts), 1, status );
-  ends = smf_malloc( grpsize, sizeof(*ends), 1, status );
-  nbolx = smf_malloc( grpsize, sizeof(*nbolx), 1, status );
-  nboly = smf_malloc( grpsize, sizeof(*nboly), 1, status );
-  chunk = smf_malloc( grpsize, sizeof(*chunk), 1, status );
-  new_subgroups = smf_malloc( grpsize, sizeof(*new_subgroups), 1, status );
-  new_chunk = smf_malloc( grpsize, sizeof(*new_chunk) , 1, status );
+  subgroups = astCalloc( grpsize, sizeof(*subgroups), 1 );
+  starts = astCalloc( grpsize, sizeof(*starts), 1 );
+  ends = astCalloc( grpsize, sizeof(*ends), 1 );
+  nbolx = astCalloc( grpsize, sizeof(*nbolx), 1 );
+  nboly = astCalloc( grpsize, sizeof(*nboly), 1 );
+  chunk = astCalloc( grpsize, sizeof(*chunk), 1 );
+  new_subgroups = astCalloc( grpsize, sizeof(*new_subgroups), 1 );
+  new_chunk = astCalloc( grpsize, sizeof(*new_chunk) , 1 );
 
   if ( *status != SAI__OK ) goto CLEANUP;
 
@@ -246,7 +246,7 @@ void smf_grp_related(  const Grp *igrp, const size_t grpsize,
     /* If yes, then we only need to allocate space for 4 elements */
     nelem = SMF__MXSMF;
     /* And define the wavelength array */
-    lambda = smf_malloc( grpsize, sizeof(*lambda), 1, status );
+    lambda = astCalloc( grpsize, sizeof(*lambda), 1 );
   } else {
     /* OK we might have data from up to 8 subarrays so allocate
        twice as much space */
@@ -319,7 +319,7 @@ void smf_grp_related(  const Grp *igrp, const size_t grpsize,
       } else {
         /* If not, there's nothing to match so create it and add the
            current index */
-        indices = smf_malloc( nelem, sizeof(*indices), 1, status);
+        indices = astCalloc( nelem, sizeof(*indices), 1 );
         /* Initialize the pointers to NULL */
         if ( *status != SAI__OK ) {
           errRep(FUNC_NAME, "Unable to allocate memory to store index array", status);
@@ -362,8 +362,8 @@ void smf_grp_related(  const Grp *igrp, const size_t grpsize,
      continuous chunk flags. Also check that all of the same subarrays
      are present in subsequent chunks flagged "continuous". */
 
-  refsubsys = smf_malloc( nelem, sizeof(*refsubsys), 0, status );
-  all_len = smf_malloc( grpsize, sizeof(*all_len), 1, status );
+  refsubsys = astCalloc( nelem, sizeof(*refsubsys), 0 );
+  all_len = astCalloc( grpsize, sizeof(*all_len), 1 );
 
   thislen = 0;
   totlen = 0;
@@ -538,7 +538,7 @@ void smf_grp_related(  const Grp *igrp, const size_t grpsize,
   /* Now that the continuous chunks are flagged, check for any chunk that
      is shorter than SMF__MINCHUNKSAMP in length (time) and remove it */
 
-  keepchunk = smf_malloc( ngroups, sizeof(*keepchunk), 0, status );
+  keepchunk = astCalloc( ngroups, sizeof(*keepchunk), 0 );
 
   if( *status == SAI__OK ) {
 
@@ -602,7 +602,7 @@ void smf_grp_related(  const Grp *igrp, const size_t grpsize,
 
     for( i=0; i<ngroups; i++ ) {
       if( keepchunk[i] ) {
-        indices = smf_malloc( maxnelem, sizeof(*indices), 1, status);
+        indices = astCalloc( maxnelem, sizeof(*indices), 1 );
         if( *status == SAI__OK ) {
           memcpy( indices, subgroups[i], maxnelem*sizeof(*indices) );
           new_subgroups[new_ngroups] = indices;
@@ -650,32 +650,32 @@ void smf_grp_related(  const Grp *igrp, const size_t grpsize,
 
 
  CLEANUP:
-  starts = smf_free( starts, status );
-  ends = smf_free( ends, status );
-  nbolx = smf_free( nbolx, status );
-  nboly = smf_free( nboly, status );
-  refsubsys = smf_free( refsubsys, status );
-  keepchunk = smf_free( keepchunk, status );
-  chunk = smf_free( chunk, status );
-  all_len = smf_free( all_len, status);
-  lambda = smf_free( lambda, status );
+  starts = astFree( starts );
+  ends = astFree( ends );
+  nbolx = astFree( nbolx );
+  nboly = astFree( nboly );
+  refsubsys = astFree( refsubsys );
+  keepchunk = astFree( keepchunk );
+  chunk = astFree( chunk );
+  all_len = astFree( all_len );
+  lambda = astFree( lambda );
   if (data) smf_close_file( &data, status );
 
   if( subgroups ) {
     for( i=0; i<ngroups; i++ ) {
-      subgroups[i] = smf_free(subgroups[i], status);
+      subgroups[i] = astFree( subgroups[i] );
     }
-    subgroups = smf_free( subgroups, status );
+    subgroups = astFree( subgroups );
   }
 
   if( *status != SAI__OK ) {
-    new_chunk = smf_free(new_chunk, status);
+    new_chunk = astFree( new_chunk );
 
     if( new_subgroups ) {
       for( isub=0; isub<new_ngroups; i++ ) {
-        new_subgroups[isub] = smf_free( new_subgroups[isub], status );
+        new_subgroups[isub] = astFree( new_subgroups[isub] );
       }
-      new_subgroups = smf_free( new_subgroups, status );
+      new_subgroups = astFree( new_subgroups );
     }
 
   }

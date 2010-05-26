@@ -88,10 +88,10 @@ smfFilter *smf_free_smfFilter( smfFilter *filt, int *status ) {
   /* Try to free filt even if bad status on entry */
 
   if( filt ) {
-    filt->real = smf_free( filt->real, status );
-    filt->imag = smf_free( filt->imag, status );
+    filt->real = astFree( filt->real );
+    filt->imag = astFree( filt->imag );
     if( filt->wcs) filt->wcs = astAnnul( filt->wcs );
-    filt = smf_free( filt, status );
+    filt = astFree( filt );
   }
 
   return filt;

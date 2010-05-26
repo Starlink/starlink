@@ -199,8 +199,7 @@ void smf_apply_mask( smfData *indata, unsigned char *quality,
         }
       }
 
-      odata = smf_malloc( nelem, smf_dtype_sz(bbm->dtype, status ),
-                          0, status);
+      odata = astCalloc( nelem, smf_dtype_sz(bbm->dtype, status ), 0 );
       bbm->pntr[0] = odata;
 
       /* now copy in the mask */

@@ -173,7 +173,7 @@ void smf_subtract_poly(smfData *data, unsigned char *quality, int rel,
   }
 
   /* Allocate memory for one frame of data, initialize to zero */
-  firstframe = smf_malloc( nbol, sizeof(double), 1, status );
+  firstframe = astCalloc( nbol, sizeof(double), 1 );
   if ( firstframe == NULL ) {
     *status = SAI__ERROR;
     goto CLEANUP;
@@ -252,7 +252,7 @@ void smf_subtract_poly(smfData *data, unsigned char *quality, int rel,
   }
 
  CLEANUP:
-  smf_free( firstframe, status );
+  astFree( firstframe );
   /* Write history entry */
   if ( *status == SAI__OK ) {
     smf_history_add( data, FUNC_NAME, status);

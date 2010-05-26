@@ -200,7 +200,7 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
       if (rawconvert && (old->dtype == SMF__INTEGER) ) {
         nbytes = sizeof(double);
         dtype = SMF__DOUBLE;
-        pntr[i] = smf_malloc( npts, nbytes, 0, status);
+        pntr[i] = astCalloc( npts, nbytes, 0 );
         outdata = pntr[i];
         tstream = (old->pntr)[i];
         /* Input data are ints: must re-cast as double */
@@ -214,7 +214,7 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
         pntr[i] = outdata;
       } else {
         nbytes = smf_dtype_size(old, status);
-        pntr[i] = smf_malloc( npts, nbytes, 0, status);
+        pntr[i] = astCalloc( npts, nbytes, 0 );
         if ( pntr[i] == NULL ) {
           if ( i == 0) {
             msgSetc("C", "Data");
@@ -239,7 +239,7 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
   }
   /* Quality */
   if ( ((old->pntr)[2] != NULL) && create[2] ) {
-    pntr[2] = smf_malloc( npts, 1, 0, status);
+    pntr[2] = astCalloc( npts, 1, 0 );
     if ( pntr[2] == NULL ) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unable to allocate memory for Quality component", status);
@@ -257,7 +257,7 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
     } else {
       npts = dims[1]*dims[2]*ncoeff;
     }
-    poly = smf_malloc( npts, sizeof(double), 0, status);
+    poly = astCalloc( npts, sizeof(double), 0 );
     if ( *status != SAI__OK ) {
       errRep(FUNC_NAME,
              "Unable to allocate memory for polynomial coefficients", status);

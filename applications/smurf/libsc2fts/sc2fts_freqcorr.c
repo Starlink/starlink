@@ -172,9 +172,9 @@ int *status          /* global status (given and returned) */
      tstream = (float*)((data->pntr)[0]);
 
      /* allocate memory */
-     spectrum_orig = smf_malloc(nwn, sizeof(*spectrum_orig), 0, status);
-     spectrum_corr = smf_malloc(nwn, sizeof(*spectrum_corr), 0, status);
-     wn_corr = smf_malloc(nwn, sizeof(*wn_corr), 0, status);
+     spectrum_orig = astCalloc( nwn, sizeof(*spectrum_orig), 0 );
+     spectrum_corr = astCalloc( nwn, sizeof(*spectrum_corr), 0 );
+     wn_corr = astCalloc( nwn, sizeof(*wn_corr), 0 );
 
      for(i=0; i<nboly; i++)
        for(j=0; j<nbolx; j++)
@@ -195,8 +195,8 @@ int *status          /* global status (given and returned) */
          }
        }
      /* release memory */
-     smf_free(spectrum_corr, status);
-     smf_free(spectrum_orig, status);
+     astFree( spectrum_corr );
+     astFree( spectrum_orig );
    }
 
    /* close NDF file */

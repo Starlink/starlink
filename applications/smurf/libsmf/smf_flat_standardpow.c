@@ -153,7 +153,7 @@ smf_flat_standardpow( const smfData * bolvald, double refohms,
 
   /* Get some memory -
      bolometer power per heater setting */
-  powbol = smf_malloc( nheat, sizeof(*powbol), 1, status );
+  powbol = astCalloc( nheat, sizeof(*powbol), 1 );
 
   /* pointers to the flatfield data and variance */
   heatframe = (bolvald->pntr)[0];
@@ -318,7 +318,7 @@ smf_flat_standardpow( const smfData * bolvald, double refohms,
     }
 
  CLEANUP:
-  if (powbol) powbol = smf_free ( powbol, status );
+  if (powbol) powbol = astFree( powbol );
 
   if (*status != SAI__OK) {
     if (*bolrefd) smf_close_file( bolrefd, status );

@@ -1676,7 +1676,7 @@ void smurf_makecube( int *status ) {
    rather than detpos, then free the detpos array in the smfHead
    structure. This will cause smf_tslice_ast to use the fplanex/y values. */
                if( !usedetpos && data->hdr->detpos ) {
-                  data->hdr->detpos = smf_free( (double *) data->hdr->detpos, status );
+                  data->hdr->detpos = astFree( (double *) data->hdr->detpos );
                }
 
 /* Handle output FITS header creation/manipulation */

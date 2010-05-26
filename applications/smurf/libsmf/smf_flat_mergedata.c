@@ -151,7 +151,7 @@ void smf_flat_mergedata( const smfArray * heatframes,
 
   /* Get the representative jcmtstate information */
   if (*status == SAI__OK) {
-    JCMTState * state = smf_malloc( nheat, sizeof(*state), 0, status );
+    JCMTState * state = astCalloc( nheat, sizeof(*state), 0 );
     for (i = 0; i < nheat; i++) {
       smfData * frame = (heatframes->sdata)[i];
       memcpy( &(state[i]), &(frame->hdr->allState)[0], sizeof(*state) );
@@ -162,7 +162,7 @@ void smf_flat_mergedata( const smfArray * heatframes,
   /* Store the heater values in a smfDA */
   if (*status == SAI__OK) {
     smfDA * da = NULL;
-    double * dheatval = smf_malloc( nheat, sizeof(*heatval), 0, status );
+    double * dheatval = astCalloc( nheat, sizeof(*heatval), 0 );
     memcpy( dheatval, heatval, nheat * sizeof(*heatval) );
 
     da = smf_construct_smfDA( NULL, NULL, NULL, NULL,

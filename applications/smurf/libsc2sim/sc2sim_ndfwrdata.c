@@ -728,7 +728,7 @@ void sc2sim_ndfwrdata
   }
 
   /* Now we need to play with flat-fielded data */
-  rdata = smf_malloc( framesize*numsamples, sizeof(*rdata), 1, status );
+  rdata = astCalloc( framesize*numsamples, sizeof(*rdata), 1 );
   if (*status != SAI__OK) goto CLEANUP;
 
   /* Apply flatfield to timestream */
@@ -874,14 +874,14 @@ void sc2sim_ndfwrdata
   }
 
   /* Calculate polynomial fits and write out SCANFIT extension */
-  poly = smf_malloc( framesize*ncoeff, sizeof( *poly ), 0, status );
+  poly = astCalloc( framesize*ncoeff, sizeof( *poly ), 0 );
   sc2math_fitsky ( 0, framesize, numsamples, ncoeff, rdata, poly, status );
   sc2store_putscanfit ( inx->colsize, inx->rowsize, ncoeff, poly, status );
 
  CLEANUP:
   /* Free memory allocated for pointers */
-  if (poly) poly = smf_free( poly, status );
-  if (rdata) rdata = smf_free( rdata, status );
+  if (poly) poly = astFree( poly );
+  if (rdata) rdata = astFree( rdata );
 
   /* Close the file */
   sc2store_free ( status );

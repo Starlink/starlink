@@ -139,7 +139,7 @@ void smf_collapse_quality( const unsigned char *inqual,
     stride = tstride;
   }
 
-  qual = smf_malloc( len, sizeof(*qual), 0, status );
+  qual = astCalloc( len, sizeof(*qual), 0 );
 
   /* Loop over elements in collapsed array */
   for( i=0; i<len; i++ ) {
