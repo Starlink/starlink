@@ -245,7 +245,7 @@ if( "$fwhm_bg" != "" ) then
 
 #  Expand the PSF to cover +/- 4*SIGMA of the Gaussian, filling the
 #  padded areas with zeros.
-   @ dim = ( 4 * $fwhm_pix ) / 2
+   set dim = `$KAPPA_DIR/calc exp="nint((4*pa)/2)" pa=$fwhm_pix`
    $KAPPA_DIR/nomagic in=$psf\(-$dim\:$dim,-$dim\:$dim\) out=mf_temp0 repval=0 quiet
 
 #  Smooth the enlarged PSF with a Gaussian of this FWHM to get an estimate
