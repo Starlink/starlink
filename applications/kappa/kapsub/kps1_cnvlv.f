@@ -1,6 +1,7 @@
       SUBROUTINE KPS1_CNVLV( VAR, NX, NY, DATIN, VARIN, NXP, NYP, PSFIN,
-     :                       XC, YC, NPIX, NLIN, WLIM, DATOUT, VAROUT,
-     :                       BAD, ISTAT, W1, W2, W3, W4, STATUS )
+     :                       XC, YC, NPIX, NLIN, WLIM, NORM, DATOUT,
+     :                       VAROUT, BAD, ISTAT, W1, W2, W3, W4,
+     :                       STATUS )
 *+
 *  Name:
 *     KPS1_CNVLV
@@ -13,8 +14,8 @@
 
 *  Invocation:
 *     CALL KPS1_CNVLV( VAR, NX, NY, DATIN, VARIN, NXP, NYP, PSFIN, XC,
-*                      YC, NPIX, NLIN, WLIM, DATOUT, VAROUT, BAD, ISTAT,
-*                      W1, W2, W3, W4, STATUS )
+*                      YC, NPIX, NLIN, WLIM, NORM, DATOUT, VAROUT, BAD,
+*                      ISTAT, W1, W2, W3, W4, STATUS )
 
 *  Description:
 *     This routine convolves the supplied data array (and optionally
@@ -26,10 +27,13 @@
 *     hold the value zero, and the margins around the data (or
 *     variance) array is filled by replicating the closest edge pixels.
 *
-*     Bad pixels in the data and variance arrays are handled as
-*     follows: Each pixel in the data (or variance) array has an
-*     associated weight which is stored in a work array called the
-*     'mask' array.  This weight is 1 if both the data AND the variance
+*     Bad pixels in the data and variance arrays are handled in a
+*     manner that depends on the supplied value for NORM. If NORM is
+*     .FALSE., bad pixels are simply replaced by the mean value in the
+*     array, and included in the convolution as normal. If NORM is
+*     .TRUE., each pixel in the data (or variance) array has an
+*     associated weight which is stored in a work array called the 'mask'
+*     array (W3).  This weight is 1 if both the data AND the variance
 *     values are good (the requirement for a good variance value is
 *     removed if VAR is .FALSE.), and zero otherwise.  If a pixel has
 *     zero weight then the data AND variance values are set to zero
@@ -42,7 +46,7 @@
 *     The variance array is processed in a similar way to the data
 *     array, except that the square of the supplied PSF is used, and
 *     the smoothed variance array is normalised using the square of the
-*     smoothed mask array.
+*     smoothed mask array (if NORM is .TRUE.).
 *
 *     The supplied PSF array must not contain any bad values.
 
@@ -86,6 +90,11 @@
 *        then the corresponding output pixel (i.e. DATOUT) is set bad.
 *        If the supplied value of WLIM is negative, then the pattern of
 *        bad pixels is propagated from DATIN.
+*     NORM = LOGICAL (Given)
+*        If .TRUE., the returned array is normalised to correct for the
+*        presence of bad pixels in the input array. Otherwise, bad pixels
+*        are replaced with the mean value of the data array, and included
+*        in the convolution as normal.
 *     DATOUT( NX, NY ) = DOUBLE PRECISION (Returned)
 *        The output data array.
 *     VAROUT( NX, NY ) = DOUBLE PRECISION (Returned)
@@ -102,7 +111,7 @@
 *     W2( NPIX, NLIN ) = DOUBLE PRECISION (Returned)
 *        Work array.
 *     W3( NPIX, NLIN ) = DOUBLE PRECISION (Returned)
-*        Work array.
+*        Work array. Only accessed if NORM is .TRUE.
 *     W4( * ) = DOUBLE PRECISION (Returned)
 *        Work array.  Must be at least ( 3 * MAX( NPIX, NLIN ) + 15 )
 *        elements long.
@@ -111,7 +120,7 @@
 
 *  Copyright:
 *     Copyright (C) 1995 Central Laboratory of the Research Councils.
-*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2009-2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -143,6 +152,9 @@
 *        modern-style variable declarations.
 *     22-APR-2009 (DSB):
 *        Added ISTAT argument.
+*     26-MAY-2010 (DSB):
+*        - Allow for negative PSF values.
+*        - Add NORM argument.
 *     {enter_further_changes_here}
 
 *-
@@ -168,6 +180,7 @@
       INTEGER NPIX
       INTEGER NLIN
       REAL WLIM
+      LOGICAL NORM
 
 *  Arguments Returned:
       DOUBLE PRECISION DATOUT( NX, NY )
@@ -183,17 +196,20 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      LOGICAL ALLBAD             ! Are all input pixels bad ?
       DOUBLE PRECISION FAC       ! Correction factor for normalising VARIANCEs
       DOUBLE PRECISION INVAL     ! Input data or variance value
+      DOUBLE PRECISION MEAN      ! mean array value
+      DOUBLE PRECISION SUM       ! Sum of all good values
+      DOUBLE PRECISION W         ! Weight for current output pixel
       INTEGER LIN                ! Row counter for external arrays
+      INTEGER NGOOD              ! Number of good values in array
       INTEGER PIX                ! Column counter for external arrays
       INTEGER SHIFTX             ! X shift from external to internal arrays
       INTEGER SHIFTY             ! Y shift from external to internal arrays
-      LOGICAL USE                ! Can the current input pixel be used?
-      DOUBLE PRECISION W         ! Weight for current output pixel
       INTEGER WLIN               ! Row counter for internal (work) arrays
       INTEGER WPIX               ! Column counter for internal (work) arrays
+      LOGICAL ALLBAD             ! Are all input pixels bad ?
+      LOGICAL USE                ! Can the current input pixel be used?
 
 *.
 
@@ -205,24 +221,47 @@
 
 *  Prepare the PSF for smoothing the DATA array, and store its FFT in
 *  array W1.
-      CALL KPS1_CNVFP( .FALSE., NXP, NYP, PSFIN, NPIX, NLIN, XC,
+      CALL KPS1_CNVFP( NORM, .FALSE., NXP, NYP, PSFIN, NPIX, NLIN, XC,
      :                 YC, W1, STATUS )
       CALL KPG1_FFTFD( NPIX, NLIN, W1, W4, W1, STATUS )
-
-*  Set a flag indicating that no good pixels have yet been found in the
-*  input arrays.
-      ALLBAD = .TRUE.
 
 *  Find the pixel shifts which will centre the input and output NDF
 *  arrays within the internal work arrays.
       SHIFTX = ( NPIX - NX ) / 2
       SHIFTY = ( NLIN - NY ) / 2
 
+*  If we are not using a mask to normalised the returned values, we will
+*  replace bad data values with the mean data value. So find the mean now
+*  if required.
+      MEAN = 0.0D0
+      IF( .NOT. NORM ) THEN
+
+         SUM = 0.0D0
+         NGOOD = 0
+
+         DO LIN = 1, NY
+            DO PIX = 1, NX
+               INVAL = DATIN( PIX, LIN )
+               IF( INVAL .NE. VAL__BADD ) THEN
+                  SUM = SUM + INVAL
+                  NGOOD = NGOOD + 1
+               END IF
+            END DO
+         END DO
+
+         IF( NGOOD .GT. 0 ) MEAN = SUM / NGOOD
+
+      END IF
+
+*  Set a flag indicating that no good input DATA pixels have yet been
+*  found.
+      ALLBAD = .TRUE.
+
 *  Copy the input DATA array to W2, so that it is centred within W2.
-*  Create a mask image in W3 which is 1 for every pixel with a good
-*  DATA and (if available) VARIANCE value and zero everywhere else.
 *  Only use pixels which have good DATA and (if available) VARIANCE
-*  values (other DATA values are set to zero).
+*  values (other DATA values are set to zero or the mean). If required,
+*  also create a mask image in W3 which is 1 for every pixel with a good
+*  DATA and (if available) VARIANCE value and zero everywhere else.
       DO LIN = 1, NY
          WLIN = LIN + SHIFTY
 
@@ -235,13 +274,23 @@
             IF ( VAR ) USE = USE .AND.
      :                       ( VARIN( PIX, LIN ) .NE. VAL__BADD )
 
-            IF ( USE ) THEN
-               W2( WPIX, WLIN ) = INVAL
-               W3( WPIX, WLIN ) = 1.0D0
-               ALLBAD = .FALSE.
+            IF( NORM ) THEN
+               IF ( USE ) THEN
+                  W2( WPIX, WLIN ) = INVAL
+                  W3( WPIX, WLIN ) = 1.0D0
+                  ALLBAD = .FALSE.
+               ELSE
+                  W2( WPIX, WLIN ) = 0.0D0
+                  W3( WPIX, WLIN ) = 0.0D0
+               END IF
+
             ELSE
-               W2( WPIX, WLIN ) = 0.0D0
-               W3( WPIX, WLIN ) = 0.0D0
+               IF ( USE ) THEN
+                  W2( WPIX, WLIN ) = INVAL
+                  ALLBAD = .FALSE.
+               ELSE
+                  W2( WPIX, WLIN ) = MEAN
+               END IF
             END IF
 
          END DO
@@ -261,8 +310,8 @@
 *  and the mask array.
       CALL KPS1_CNVRP( 1 + SHIFTX, NX + SHIFTX, 1 + SHIFTY, NY + SHIFTY,
      :                 NPIX, NLIN, W2, STATUS )
-      CALL KPS1_CNVRP( 1 + SHIFTX, NX + SHIFTX, 1 + SHIFTY, NY + SHIFTY,
-     :                 NPIX, NLIN, W3, STATUS )
+      IF( NORM ) CALL KPS1_CNVRP( 1 + SHIFTX, NX + SHIFTX, 1 + SHIFTY,
+     :                            NY + SHIFTY, NPIX, NLIN, W3, STATUS )
 
 *  Take the forward FFT of the DATA array, storing the result back in
 *  the same array.
@@ -278,9 +327,11 @@
 
 *  Now smooth the mask array in the same way, storing the results back
 *  in W3.
-      CALL KPG1_FFTFD( NPIX, NLIN, W3, W4, W3, STATUS )
-      CALL KPG1_HMLTD( NPIX, NLIN, W3, W1, W3, STATUS )
-      CALL KPG1_FFTBD( NPIX, NLIN, W3, W4, W3, STATUS )
+      IF( NORM ) THEN
+         CALL KPG1_FFTFD( NPIX, NLIN, W3, W4, W3, STATUS )
+         CALL KPG1_HMLTD( NPIX, NLIN, W3, W1, W3, STATUS )
+         CALL KPG1_FFTBD( NPIX, NLIN, W3, W4, W3, STATUS )
+      END IF
 
 *  Set a flag indicating that no good output DATA pixels have yet been
 *  found.
@@ -289,6 +340,9 @@
 *  Set a flag indicating that no bad output DATA pixels have yet been
 *  found.
       BAD = .FALSE.
+
+*  Store the normalisation factor used if NORM = .FALSE.
+      W = 1.0D0
 
 *  Loop round each line of the output DATA array.  Form the index of
 *  the corresponding line in the smoothed input DATA array (W2).
@@ -301,7 +355,7 @@
             WPIX = PIX + SHIFTX
 
 *  Store the smoothed mask value.
-            W = W3( WPIX, WLIN )
+            IF( NORM ) W = W3( WPIX, WLIN )
 
 *  The output pixel will be bad if the weight for this pixel is too
 *  low, (if wlim is positive), or if the input DATA value was bad (if
@@ -316,7 +370,7 @@
 *  output.
             ELSE
 
-               IF ( W .GT. 0.0D0 ) THEN
+               IF ( W .NE. 0.0D0 ) THEN
                   DATOUT( PIX, LIN ) = W2( WPIX, WLIN ) / W
                   ALLBAD = .FALSE.
 
@@ -334,7 +388,7 @@
 
 *  Fill any output variance array with bad values and return with ISTAT set
 *  to 2 if all the output pixel values are bad.
-      IF ( ALLBAD ) THEN
+      IF ( NORM .AND. ALLBAD ) THEN
          IF( VAR ) CALL KPG1_FILLD( VAL__BADD, NX*NY, VAROUT, STATUS )
          ISTAT = 2
          GO TO 999
@@ -345,13 +399,34 @@
 
 *  The variance array is smoothed with the square of the supplied PSF.
 *  Prepare the squared PSF and store its FFT in W1.
-         CALL KPS1_CNVFP( .TRUE., NXP, NYP, PSFIN, NPIX, NLIN, XC,
+         CALL KPS1_CNVFP( NORM, .TRUE., NXP, NYP, PSFIN, NPIX, NLIN, XC,
      :                    YC, W1, STATUS )
          CALL KPG1_FFTFD( NPIX, NLIN, W1, W4, W1, STATUS )
 
+*  Find the mean variance value now if required.
+         MEAN = 0.0D0
+         IF( .NOT. NORM ) THEN
+
+            SUM = 0.0D0
+            NGOOD = 0
+
+            DO LIN = 1, NY
+               DO PIX = 1, NX
+                  INVAL = VARIN( PIX, LIN )
+                  IF( INVAL .NE. VAL__BADD ) THEN
+                     SUM = SUM + INVAL
+                     NGOOD = NGOOD + 1
+                  END IF
+               END DO
+            END DO
+
+            IF( NGOOD .GT. 0 ) MEAN = SUM / NGOOD
+
+         END IF
+
 *  Copy the input VARIANCE array to W2, so that it is centred within
 *  W2.  If the VARIANCE or corresponding DATA value is bad, replace the
-*  variance value with zero.
+*  variance value with zero or the mean value.
          DO LIN = 1, NY
             WLIN = LIN + SHIFTY
 
@@ -364,8 +439,10 @@
 
                IF (  USE ) THEN
                   W2( WPIX, WLIN ) = INVAL
-               ELSE
+               ELSE IF( NORM ) THEN
                   W2( WPIX, WLIN ) = 0.0D0
+               ELSE
+                  W2( WPIX, WLIN ) = MEAN
                END IF
 
             END DO
@@ -393,6 +470,9 @@
 *  factors no longer cancel.
          FAC = 1.0D0 / SQRT( DBLE( NPIX * NLIN ) )
 
+*  Store the normalisation factor used if NORM = .FALSE.
+         W = 1.0D0
+
 *  Loop round each line of the output VARIANCE array.  Form the index
 *  of the corresponding line in the smoothed input VARIANCE array (W2).
          DO LIN = 1, NY
@@ -404,7 +484,7 @@
                WPIX = PIX + SHIFTX
 
 *  Store the smoothed mask value.
-               W = W3( WPIX, WLIN )
+               IF( NORM ) W = W3( WPIX, WLIN )
 
 *  The output VARIANCE value will be bad iff the output DATA value was
 *  bad.  Otherwise, normalise the smoothed variance value using the

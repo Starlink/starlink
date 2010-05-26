@@ -1,5 +1,5 @@
-      SUBROUTINE KPS1_CNVFP( VAR, NXP, NYP, PSF, NPIX, NLIN, XCEN, YCEN,
-     :                       OUT, STATUS )
+      SUBROUTINE KPS1_CNVFP( NORM, VAR, NXP, NYP, PSF, NPIX, NLIN, XCEN,
+     :                       YCEN, OUT, STATUS )
 *+
 *  Name:
 *     KPS1_CNVFP
@@ -11,8 +11,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_CNVFP( VAR, NXP, NYP, PSF, NPIX, NLIN, XCEN, YCEN, OUT,
-*                      STATUS )
+*     CALL KPS1_CNVFP( NORM, VAR, NXP, NYP, PSF, NPIX, NLIN, XCEN, YCEN,
+*                      OUT, STATUS )
 
 *  Description:
 *     A constant background value is subtracted from the supplied PSF.
@@ -25,6 +25,8 @@
 *     the returned PSF values are squared.
 
 *  Arguments:
+*     NORM = LOGICAL (Given)
+*        Normalise the PSF to a data sum of unity before using?
 *     VAR = LOGICAL (Given)
 *        .TRUE. if the VARIANCE component is being smoothed.
 *     NXP = INTEGER (Given)
@@ -50,6 +52,7 @@
 
 *  Copyright:
 *     Copyright (C) 1995 Central Laboratory of the Research Councils.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -81,6 +84,8 @@
 *        modern-style variable declarations.
 *     1995 April 4 (DSB):
 *        Modified to normalise the total data sum in the PSF to 1.
+*     26-MAY-2010 (DSB):
+*        Added argument NORM.
 *     {enter_further_changes_here}
 
 *-
@@ -92,6 +97,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Arguments Given:
+      LOGICAL  NORM
       LOGICAL  VAR
       INTEGER  NXP
       INTEGER  NYP
@@ -198,7 +204,7 @@
       END DO
 
 *  If the PSF had zero data sum, abort.
-      IF ( SUM .EQ. 0.0D0 .AND. STATUS .EQ. SAI__OK ) THEN
+      IF ( NORM .AND. SUM .EQ. 0.0D0 .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'KPS1_CNVFP_ERR1', 'PSF has zero data sum.',
      :                  STATUS )
@@ -208,7 +214,8 @@
 *  Normalise the PSF to have a total data sum equal to the square root
 *  of the number of pixels in the image.  This ensures that the
 *  zero-frequency pixel will have value 1.0 when the FFT is taken.
-      FACTOR = SQRT( DBLE( NPIX * NLIN ) ) / SUM
+      FACTOR = SQRT( DBLE( NPIX * NLIN ) )
+      IF( NORM ) FACTOR = FACTOR / SUM
 
       DO LIN = 1, NLIN
          DO PIX = 1, NPIX

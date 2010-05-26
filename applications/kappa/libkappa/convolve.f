@@ -23,8 +23,8 @@
 *  Description:
 *     This application smooths an NDF using a Point-Spread Function
 *     given by a second NDF.  The output NDF is normalised to the same
-*     mean data value as the input NDF, and is the same size as the
-*     input NDF.
+*     mean data value as the input NDF (if parameter NORM is set to
+*     TRUE), and is the same size as the input NDF.
 
 *     The NDF being smoothed may have up to three dimensions.  If it
 *     has three significant dimensions, then the filter must be
@@ -47,6 +47,17 @@
 *        the NDF. []
 *     IN = NDF (Read)
 *        The input NDF containing the array to be smoothed.
+*     NORM = _LOGICAL (Read)
+*        Determines how the output NDF is normalised to take account of
+*        the total data sum in the PSF, and of the presence of bad pixels
+*        in the input NDF. If TRUE, bad pixels are excluded from the data
+*        sum for each output pixel, and the associated weight for the output
+*        pixel is reduced appropriately. The supplied PSF is normalised
+*        to a total data sum of unity so that the output NDF has same
+*        normalisation as the input NDF. If NORM is FALSE, bad pixels are
+*        replaced by the mean value and then included in the convolution as
+*        normal. The normalisation of the supplied PSF is left unchanged,
+*        and so determines the normalisation of the output NDF. [TRUE]
 *     OUT = NDF (Write)
 *        The output NDF which is to contain the smoothed array.
 *     PSF = NDF (Read)
@@ -60,14 +71,15 @@
 *        zero beyond the bounds of the supplied NDF.  It should have
 *        the same number of dimensions as the NDF being smoothed, unless
 *        the input NDF has three significant dimensions, whereupon the
-*        PSF must be two-dimensional.
+*        PSF must be two-dimensional. It will be normalised to a total
+*        data sum of unity if NORM is TRUE.
 *     TITLE = LITERAL (Read)
 *        A title for the output NDF.  A null (!) value means using the
 *        title of the input NDF. [!]
 *     WLIM = _REAL (Read)
-*        If the input array contains bad pixels, then this parameter
-*        may be used to determine the number of good pixels which must
-*        be present within the smoothing box before a valid output
+*        If the input array contains bad pixels, and NORM is TRUE, then
+*        this parameter may be used to determine the number of good pixels
+*        that must be present within the smoothing box before a valid output
 *        pixel is generated.  It can be used, for example, to prevent
 *        output pixels from being generated in regions where there are
 *        relatively few good pixels to contribute to the smoothed
@@ -90,7 +102,7 @@
 *        output pixel being created even if only one good input pixel
 *        contributes to it.  A value of 1.0 will result in a good output
 *        pixel being created only if all the input pixels which
-*        contribute to it are good. [!]
+*        contribute to it are good. See also NORM. [!]
 *     XCENTRE = _INTEGER (Read)
 *        The x pixel index (column number) of the centre of the PSF
 *        within the supplied PSF array.  The suggested default is the
@@ -140,7 +152,7 @@
 *     Copyright (C) 1995, 1998, 2004 Central Laboratory of the Research
 *     Councils. All Rights Reserved.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2009-2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -185,6 +197,8 @@
 *     22-APR-2009 (DSB):
 *        Continue to convolve remaining slices if a slice of a cube
 *        contains or produces no good data.
+*     26-MAY-2010 (DSB):
+*        Added parameter NORM.
 *     {enter_further_changes_here}
 
 *-
@@ -210,9 +224,6 @@
       PARAMETER ( PSFFRA = 0.01 )
 
 *  Local Variables:
-      LOGICAL BAD                ! Are there bad pixels in the array?
-      LOGICAL BADDAT             ! Bad values stored in o/p data array?
-      LOGICAL BADOUT             ! Bad pixels in output array?
       CHARACTER * ( 13 ) COMP    ! List of components to process
       INTEGER DIMI( 2 )          ! Dimensions of supplied input NDF
       INTEGER DIMP( 2 )          ! Dimensions of supplied PSF NDF
@@ -237,8 +248,7 @@
       INTEGER PAXHI              ! Upper pixel bound of perp. axis
       INTEGER PAXLO              ! Lower pixel bound of perp. axis
       INTEGER PAXVAL             ! Current pixel value on perp. axis
-      INTEGER PERPAX             ! Index of axis perp. to smoothing
-                                 ! plane
+      INTEGER PERPAX             ! Indx of axis perp. to smoothing plane
       INTEGER PSFXSZ             ! Width of PSF on 1st axis
       INTEGER PSFYSZ             ! Width of PSF on 2nd axis
       INTEGER SDIMI( 2 )         ! Indices of used axes for i/p
@@ -246,13 +256,17 @@
       INTEGER SLBNDP( 2 )        ! Low bounds of used axes of psf
       INTEGER SUBNDP( 2 )        ! High bounds of used axes of psf
       INTEGER UBND( NDF__MXDIM ) ! Upper bounds of NDF pixel axes
-      LOGICAL INBAD              ! Are all input data bad?
-      LOGICAL OUTBAD             ! Are all output data bad?
-      LOGICAL VAR                ! Does input NDF have a VARIANCE array?
       INTEGER W1DIM( 2 )         ! Dimensions of work array 1
-      REAL WLIM                  ! Fraction of good i/p pixels required
       INTEGER XCEN               ! X index of PSF centre pixel
       INTEGER YCEN               ! Y index of PSF centre pixel
+      LOGICAL BAD                ! Are there bad pixels in the array?
+      LOGICAL BADDAT             ! Bad values stored in o/p data array?
+      LOGICAL BADOUT             ! Bad pixels in output array?
+      LOGICAL INBAD              ! Are all input data bad?
+      LOGICAL NORM               ! Normalise returned array?
+      LOGICAL OUTBAD             ! Are all output data bad?
+      LOGICAL VAR                ! Does input NDF have a VARIANCE array?
+      REAL WLIM                  ! Fraction of good i/p pixels required
 
 *.
 
@@ -276,6 +290,9 @@
 *  Form the dimensions on the axes to be used of the input array.
       DIMI( 1 ) = UBND( SDIMI( 1 ) ) - LBND( SDIMI( 1 ) ) + 1
       DIMI( 2 ) = UBND( SDIMI( 2 ) ) - LBND( SDIMI( 2 ) ) + 1
+
+*  See if the output array should be normalised.
+      CALL PAR_GET0L( 'NORM', NORM, STATUS )
 
 *  Determine which arrays to process.
 *  ==================================
@@ -383,7 +400,13 @@
 *  Get the required workspace.
       CALL PSX_CALLOC( NPIX * NLIN, '_DOUBLE', IPW2, STATUS )
       CALL PSX_CALLOC( NPIX * NLIN, '_DOUBLE', IPW3, STATUS )
-      CALL PSX_CALLOC( NPIX * NLIN, '_DOUBLE', IPW4, STATUS )
+
+      IF( NORM ) THEN
+         CALL PSX_CALLOC( NPIX * NLIN, '_DOUBLE', IPW4, STATUS )
+      ELSE
+         IPW4 = IPW2
+      END IF
+
       CALL PSX_CALLOC( 3 * MAX( NPIX, NLIN ) + 15, '_DOUBLE', IPW5,
      :                 STATUS )
 
@@ -426,6 +449,7 @@
      :                    %VAL( CNF_PVAL( IPP ) ),
      :                    XCEN - SLBNDP( 1 ) + 1,
      :                    YCEN - SLBNDP( 2 ) + 1, NPIX, NLIN, WLIM,
+     :                    NORM,
      :                    %VAL( CNF_PVAL( IPO( 1 ) ) ),
      :                    %VAL( CNF_PVAL( IPO( 2 ) ) ), BADOUT, ISTAT,
      :                    %VAL( CNF_PVAL( IPW2 ) ),
@@ -478,7 +502,7 @@
       CALL PSX_FREE( IPW1, STATUS )
       CALL PSX_FREE( IPW2, STATUS )
       CALL PSX_FREE( IPW3, STATUS )
-      CALL PSX_FREE( IPW4, STATUS )
+      IF( NORM ) CALL PSX_FREE( IPW4, STATUS )
       CALL PSX_FREE( IPW5, STATUS )
 
 *  If an error occurred, delete the output NDF.

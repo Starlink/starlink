@@ -9661,6 +9661,15 @@ package kappa {
             helpkey *
          }
 
+         parameter norm {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath DEFAULT
+            default TRUE
+            prompt {Normalise the output NDF to match the input NDF?}
+            helpkey *
+         }
+
          parameter out {
             position 3
             type NDF
