@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.37}
 \newcommand{\stardocnumber}    {95.37}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2010 February 26}
+\newcommand{\stardocdate}      {2010 May 26}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.12}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -19880,17 +19880,43 @@ plot with PENROT={\tt TRUE} (11k).
    \sstdescription{
       This application smooths a one- or two-dimensional \NDFref{NDF} using a
       Point-Spread Function given by a second NDF.  The output NDF is
-      normalised to the same mean data value as the input NDF,
-      and is the same size as the input NDF.
+      normalised to the same mean data value as the input NDF (if Parameter
+      NORM is set to TRUE), and is the same size as the input NDF.
    }
    \sstusage{
       convolve in psf out xcentre ycentre
    }
    \sstparameters{
       \sstsubsection{
+         AXES( 2 ) = \_INTEGER (Read)
+      }{
+         This parameter is only accessed if the NDF has exactly three
+         significant pixel axes.  It should be set to the indices of the
+         NDF pixel axes which span the plane in which smoothing is to
+         be applied.  All pixel planes parallel to the specified plane
+         will be smoothed independently of each other.  The dynamic
+         default is the indices of the first two significant axes in
+         the NDF.  {\tt []}
+      }
+      \sstsubsection{
          IN = NDF (Read)
       }{
          The input NDF containing the image to be smoothed.
+      }
+      \sstsubsection{
+         NORM = \_LOGICAL (Read)
+      }{
+         Determines how the output NDF is normalised to take account of
+         the total data sum in the PSF, and of the presence of bad pixels
+         in the input NDF.  If {\tt TRUE}, bad pixels are excluded from the
+         data sum for each output pixel, and the associated weight for the 
+         output pixel is reduced appropriately.  The supplied PSF is 
+         normalised to a total data sum of unity so that the output NDF has
+         the same normalisation as the input NDF.  If NORM is {\tt FALSE}, 
+         bad pixels are replaced by the mean value and then included in the 
+         convolution as normal.  The normalisation of the supplied PSF is 
+         left unchanged, and so determines the normalisation of the output 
+         NDF.  {\tt [TRUE]}
       }
       \sstsubsection{
          OUT = NDF (Write)
@@ -19907,23 +19933,27 @@ plot with PENROT={\tt TRUE} (11k).
          constant background is removed from the PSF before use.  This
          background level is equal to the minimum of the absolute value
          in the four corner pixel values.  The PSF is assumed to be zero
-         beyond the bounds of the supplied NDF.
+         beyond the bounds of the supplied NDF.  It should have the 
+         same number of dimensions as the NDF being smoothed, unless
+         the input NDF has three significant dimensions, whereupon the
+         PSF must be two-dimensional.  It will be normalised to a total
+         data sum of unity if Parameter NORM is {\tt TRUE}.
       }
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         A \htmlref{title}{apndf:title} for the output NDF.  A null ({\tt{!}}) value means using the
-         title of the input NDF.  {\tt [!]}
+         A \htmlref{title}{apndf:title} for the output NDF.  A null ({\tt{!}}) 
+         value means using the title of the input NDF.  {\tt [!]}
       }
       \sstsubsection{
          WLIM = \_REAL (Read)
       }{
-         If the input image contains bad pixels, then this parameter
-         may be used to determine the number of good pixels which must
-         be present within the smoothing box before a valid output
-         pixel is generated.  It can be used, for example, to prevent
-         output pixels from being generated in regions where there are
-         relatively few good pixels to contribute to the smoothed
+         If the input array contains bad pixels, and NORM is {\tt TRUE}, 
+         then this parameter may be used to determine the number of good 
+         pixels that must be present within the smoothing box before a 
+         valid output pixel is generated.  It can be used, for example, to 
+         prevent output pixels from being generated in regions where there 
+         are relatively few good pixels to contribute to the smoothed
          result.
 
          By default, a null ({\tt{!}}) value is used for WLIM, which causes
@@ -19943,7 +19973,7 @@ plot with PENROT={\tt TRUE} (11k).
          output pixel being created even if only one good input pixel
          contributes to it.  A value of 1.0 will result in a good output
          pixel being created only if all the input pixels which
-         contribute to it are good.  {\tt [!]}
+         contribute to it are good.  See also Parameter NORM.  {\tt [!]}
       }
       \sstsubsection{
          XCENTRE = \_INTEGER (Read)
@@ -57133,6 +57163,14 @@ The following applications have been modified:
 The following applications have been modified:
 
 \begin{description}
+
+   \item [\htmlref{CONVOLVE}{CONVOLVE}]\mbox{}
+      \begin{itemize}
+        \item A new parameter NORM determines how the output NDF is
+        normalised to take account of the total data sum in the PSF,
+        and of the presence of bad pixels in the input NDF.
+        \item It now permits PSFs with negative areas.  
+      \end{itemize}
 
    \item [\htmlref{LISTSHOW}{LISTSHOW}]\mbox{}
       \begin{itemize}
