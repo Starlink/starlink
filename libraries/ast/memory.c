@@ -122,6 +122,8 @@
 *        - Added astStringCase.
 *        - Changed access from protected to public for commonly used
 *        functions.
+*     26-MAY-2010 (DSB):
+*        Added astCalloc.
 */
 
 /* Configuration results. */
@@ -401,7 +403,7 @@ static int PM_Stack_Size = 0;
 static Memory *Active_List = NULL;
 
 /* Should a new ID be issued each time a cached memory block is returned
-   by astMalloc? Otherwise, the same ID value is used throughtout the
+   by astMalloc? Otherwise, the same ID value is used throughout the
    life of a memory block. */
 static int Keep_ID = 0;
 
@@ -578,6 +580,78 @@ char *astAppendString_( char *str1, int *nc, const char *str2, int *status ) {
    }
 
 /* Return the result pointer. */
+   return result;
+}
+
+void *astCalloc_( size_t nmemb, size_t size, int init, int *status ) {
+/*
+*++
+*  Name:
+*     astCalloc
+
+*  Purpose:
+*     Allocate, and optionally initialise, memory.
+
+*  Type:
+*     Public function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     void *astCalloc( size_t nmemb, size_t size, int init )
+
+*  Description:
+*     This function allocates memory in a similar manner to the
+*     standard C "calloc" function, but with improved security
+*     (against memory leaks, etc.) and with error reporting. It also
+*     allows the allocated memory to be filled with zeros.
+*
+*     Like astMalloc, it allows zero-sized memory allocation
+*     (without error), resulting in a NULL returned pointer value.
+
+*  Parameters:
+*     nmemb
+*        The number of array elements for which memory is to be allocated.
+*     size
+*        The size of each array element, in bytes.
+*     init
+*        If non-zero, the allocated memory will be filled with zeros.
+
+*  Returned Value:
+*     astCalloc()
+*        If successful, the function returns a pointer to the start of
+*        the allocated memory region. If the size allocated is zero, this
+*        will be a NULL pointer.
+
+*  Notes:
+*     - A pointer value of NULL is returned if this function is
+*     invoked with the global error status set or if it fails for any
+*     reason.
+*--
+*/
+/* Local Variables: */
+   void *result;    /* Returned pointer */
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Attempt to allocate the required amount of memory. */
+   result = astMalloc( nmemb*size );
+
+/* If the above call failed due to failure of the system malloc function,
+   issue an extra error giving the number of elements and element size. */
+   if( astStatus == AST__NOMEM ) {
+      astError( AST__NOMEM, "(%lu elements, each of %lu bytes).", status,
+                (unsigned long) nmemb, (unsigned long) size );
+   }
+
+/* If the memory was allocated succesfuly, fill it with zeros if
+   required. */
+   if( result && init ) (void) memset( result, 0, nmemb*size );
+
+/* Return the result. */
    return result;
 }
 
