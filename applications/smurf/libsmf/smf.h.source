@@ -962,7 +962,7 @@ void smf_flatfield ( const smfData *idata, const smfArray * flats, smfData **oda
 
 void smf_flatten ( smfData *data, int *status );
 
-void *smf_free( void * pntr, int * status );
+#define smf_free(pntr,status) astFree(pntr)
 
 smfFilter *smf_free_smfFilter( smfFilter *filt, int *status );
 

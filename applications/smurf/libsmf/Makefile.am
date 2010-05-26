@@ -170,7 +170,6 @@ smf_flat_standardpow.c \
 smf_flat_write.c \
 smf_flatfield.c \
 smf_flatten.c \
-smf_free.c \
 smf_free_smfFilter.c \
 smf_freepolbins.c \
 smf_freetiles.c \

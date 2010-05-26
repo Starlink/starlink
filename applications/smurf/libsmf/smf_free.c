@@ -10,7 +10,7 @@
 *     Starlink ANSI C
 
 *  Type of Module:
-*     Subroutine
+*     Documentation for macro
 
 *  Invocation:
 *     pntr = smf_free( void * pntr, int * status );
@@ -22,14 +22,16 @@
 *        Pointer to global status.
 
 *  Description:
-
 *     This is the SMURF free routine. It should be used in preference
 *     to system free() and should be paired with a SMURF allocation
 *     routine (smf_malloc). If the free was successful a null pointer
 *     is returned, else the original.
+*
+*     This function is defined as a macro in smf.h.
 
 *  Authors:
 *     Tim Jenness (TIMJ)
+*     Andy Gibb (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -39,9 +41,12 @@
 *        Fix warning.
 *     2007-12-14 (AGG):
 *        Return null pointer if successful
+*     2010-05-25 (TIMJ):
+*        Replace with macro. Leave prologue in place for documentation.
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
 *     Council. University of British Columbia. All Rights Reserved.
 
@@ -65,42 +70,3 @@
 *     {note_any_bugs_here}
 *-
 */
-
-/* System includes */
-#include <stdlib.h>
-
-/* Starlink includes */
-#include "ast.h"
-#include "sae_par.h"
-#include "mers.h"
-
-/* SMURF includes */
-#include "smf.h"
-
-#define FUNC_NAME "smf_free"
-
-void *smf_free( void * pntr, int * status ) {
-
-  /* Status on entry to this routine */
-  int entrystatus;
-
-  /* If we have a non-NULL pointer, set about trying to free it */
-  if ( pntr ) {
-    /* Check the status on entry */
-    if ( *status == SAI__OK ) {
-      entrystatus = SAI__OK;
-    } else {
-      entrystatus = SAI__ERROR;
-    }
-    astFree( pntr );
-
-    /* Only add a new error message to stack if the error occurred in
-       the current call */
-    if ( !astOK && (entrystatus == SAI__OK ) ) {
-      errRep( FUNC_NAME, "Error freeing memory" , status );
-      return pntr;
-    }
-  }
-
-  return NULL;
-}
