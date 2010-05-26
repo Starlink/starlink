@@ -65,6 +65,9 @@
 #       - Added the "-s" option.
 #    2010-4-14 (DSB):
 #       - Changed to use Ed's way of removing background variations.
+#    2010-5-26 (DSB):
+#       - Avoid truncating the smoothed PSF when using the "-s" option.
+#       - Improve trapping of errors due to missing FITS headers
 
 #  Copyright:
 #     Copyright (C) 2010 Science & Technology Facilities Council.
@@ -161,7 +164,7 @@ else
 # Check the data is from JCMT.
    set telescope = `$KAPPA_DIR/fitsmod $in edit=print keyword=TELESCOP`
 
-   echo $telescope | grep \!\! >& /dev/null
+   echo $telescope | grep '\!\!\|TELESCOP' >& /dev/null
    if( $status == 0 ) then
       echo "Error determining telescope name"
       echo $telescope
@@ -175,6 +178,13 @@ else
 
 # Get the wavelength (in metres).
    set wavelen = `$KAPPA_DIR/fitsmod $in edit=print keyword=WAVELEN`
+
+   echo $wavelen | grep '\!\!\|WAVELEN' >& /dev/null
+   if( $status == 0 ) then
+      echo "Error determining wavelength"
+      echo $wavelen
+      exit
+   endif
 
 # Calculate the radius of the Airy disk in arc-sec, assuming a
 # mirror diameter of 15.0 metres.
@@ -233,12 +243,17 @@ if( "$fwhm_bg" != "" ) then
 #  Use this instead of the supplied input image in future.
    set in = mf_in
 
-#  Smooth the PSF with a Gaussian of this FWHM to get an estimate
+#  Expand the PSF to cover +/- 4*SIGMA of the Gaussian, filling the
+#  padded areas with zeros.
+   @ dim = ( 4 * $fwhm_pix ) / 2
+   $KAPPA_DIR/nomagic in=$psf\(-$dim\:$dim,-$dim\:$dim\) out=mf_temp0 repval=0 quiet
+
+#  Smooth the enlarged PSF with a Gaussian of this FWHM to get an estimate
 #  of the "background" (sort of) in the PSF.
-   $KAPPA_DIR/gausmooth in=$psf fwhm=$fwhm_pix out=mf_temp1
+   $KAPPA_DIR/gausmooth in=mf_temp0 fwhm=$fwhm_pix out=mf_temp1
 
 #  Remove this background from the PSF.
-   $KAPPA_DIR/sub in1=$psf in2=mf_temp1 out=mf_psf2
+   $KAPPA_DIR/sub in1=mf_temp0 in2=mf_temp1 out=mf_psf2
 
 #  Use this instead of the original PSF in future.
    set psf = mf_psf2
@@ -271,7 +286,16 @@ endif
 # First get the ratio of the data to the variance in the input image.
 $KAPPA_DIR/maths exp="IA/VA" ia=$in out=mf_temp1
 
-# Smooth this using the supplied psf.
+# Smooth this using the supplied psf. This command occasionally (but not
+# always) issues the following error. It is not fatal, but should be
+# investiagted ASAP...
+#
+# !! The ancestor NDF '/data/scuba2/work/matched-filter/mf_temp1' was included
+# !     twice within the provenance structure, but each occurrence specifies a
+# !     different set of parents.
+# !  Application exit status SAI__ERROR, Error
+# !  in=mf_temp1 out=mf_temp2 psf=mf_psf2 xcentre=0 ycentre=0
+#
 $KAPPA_DIR/convolve in=mf_temp1 out=mf_temp2 psf=$psf xcentre=0 ycentre=0
 
 # The kappa:convolve command normalises the output NDF by dividing the
@@ -290,7 +314,7 @@ $KAPPA_DIR/maths exp="1/VA" va=$in out=mf_temp1
 # Get the square of the PSF.
 $KAPPA_DIR/mult in1=$psf in2=$psf out=mf_temp3
 
-# Smooth the reciprocal of the variancess using the squared PSF.
+# Smooth the reciprocal of the variances using the squared PSF.
 $KAPPA_DIR/convolve in=mf_temp1 out=mf_temp2 psf=mf_temp3 xcentre=0 ycentre=0
 
 # Undo the normalisation produced by kappa:convolve.
@@ -307,5 +331,5 @@ $KAPPA_DIR/setvar ndf=$out from=mf_temp1 comp=data
 
 #  Clean up.
 rm -f mf_in.sdf mf_psf2.sdf mf_temp1.sdf mf_temp2.sdf mf_temp3.sdf \
-      mf_psf.sdf mf_a.sdf mf_b.sdf
+      mf_psf.sdf mf_a.sdf mf_b.sdf mf_temp0.sdf
 
