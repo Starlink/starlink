@@ -148,6 +148,8 @@
 *        - Modify ndg1TheSame so that CREATOR must match (in addition to
 *        PATH and DATE) for two Prov structures to be considered the same.
 *        - Remove trailing white space.
+*      28-MAY-2010 (DSB):
+*        Change ndg1TheSame to include checks on sameness of all ancestors.
 */
 
 
@@ -232,6 +234,8 @@ typedef struct HistRec {
 /* A structure that stores the provenance information for a single
    ancestor NDF. */
 typedef struct Prov {
+   int provid;                 /* Hash code describing the content of
+                                  this Prov and its ancestors */
    char *path;                 /* String holding the NDF path as returned
                                   by ndfMsg */
    char *date;                 /* String holding the formated UTC date & time
@@ -292,12 +296,14 @@ static int *ndg1ParentIndicies( Prov *, Provenance *, int *, int *, int * );
 static int ndg1CheckSameParents( Prov *, Prov *, int * );
 static int ndg1FindAncestorIndex( Prov *, Provenance *, int * );
 static int ndg1GetLogicalComp( HDSLoc *, const char *, int, int * );
+static int ndg1GetProvId( Prov *, int * );
 static int ndg1HashFun( const char *, int * );
 static int ndg1IntCmp( const void *, const void * );
 static int ndg1IsWanted( AstXmlElement *, int * );
 static int ndg1TheSame( Prov *, Prov *, int * );
 static void ndg1A2h( AstKeyMap *, HDSLoc *, int * );
 static void ndg1AddHistKM( AstKeyMap *, const char *, Prov *, int * );
+static void ndg1ClearProvId( Prov *, int * );
 static void ndg1CopyComps( HDSLoc *, HDSLoc *, int * );
 static void ndg1Disown( Prov *, Prov *, int * );
 static void ndg1H2a( HDSLoc *, AstKeyMap *, int * );
@@ -311,7 +317,7 @@ static void ndg1ResetIndices( Provenance *, int * );
 static void ndg1Rmprv( Provenance *, int, int * );
 static void ndg1WriteProvenanceExtension( Provenance *, HDSLoc *, int * );
 static void ndg1WriteProvenanceNDF( Provenance *, int, int, int * );
-static AstKeyMap *ndg1ShowProv( Prov *, int, AstKeyMap *, int * );
+static AstKeyMap *ndg1ShowProv( Prov *, int, AstKeyMap *, FILE *, int * );
 
 /* Public F77 wrapper functions. */
 /* ============================= */
@@ -2001,6 +2007,10 @@ void ndgModifyProv( NdgProvenance *prov, int ianc, AstKeyMap *km,
             more2 = astAnnul( more2 );
          }
 
+/* Indicate the ProvId value need to be recalculated to take account of
+   the changes. */
+         ndg1ClearProvId( anc, status );
+
 /* It is possioble that the changes may have resulted in the ancestor
    having the same path as another ancestor. So now check for duplicated
    ancestors and purge them. */
@@ -2960,6 +2970,48 @@ static int ndg1CheckSameParents( Prov *prov1, Prov *prov2, int *status ) {
    return result;
 }
 
+static void ndg1ClearProvId( Prov *prov, int *status ) {
+/*
+*  Name:
+*     ndg1ClearProvId
+
+*  Purpose:
+*     Clears the integer hash code associated with a Prov structure.
+
+*  Invocation:
+*     void ndg1ClearProvId( Prov *prov, int *status )
+
+*  Description:
+*     This function clears the hash code describing the content of the
+*     supplied Prov by setting it to zero, indicating that a new hash
+*     code should be calculated next time the hash code is acquired using
+*     ndg1GetProvId. It should be called when any of the text items
+*     within a Prov (path, date or creator) are changed. It also clears
+*     the hash codes in all child Prov structures (but not parents).
+
+*  Parameters:
+*     prov
+*        Pointer to the Prov structure to be cleared.
+*     status
+*        Pointer to the inherited status variable.
+
+*/
+
+/* Local Variables: */
+   int ichild;
+
+/* Check the local error status. */
+   if ( !astOK ) return;
+
+/* Clear the hash code in the supplied Prov.*/
+   prov->provid = 0;
+
+/* Clear the hash code in any child Provs.*/
+   for( ichild = 0; ichild < prov->nchild; ichild++ ) {
+      ndg1ClearProvId( prov->children[ ichild ], status );
+   }
+}
+
 static void ndg1CopyComps( HDSLoc *loc1, HDSLoc *loc2, int *status ){
 /*
 *  Name:
@@ -3866,6 +3918,7 @@ static Prov *ndg1FreeProv( Prov *prov, int *status ){
    prov->nparent = 0;
    prov->nchild = 0;
    prov->hhash = 0;
+   prov->provid = 0;
 
    hist_rec = prov->hist_recs;
    for( i = 0; i < prov->nhrec; i++,hist_rec++ ) {
@@ -4011,6 +4064,70 @@ static int ndg1GetLogicalComp( HDSLoc *loc, const char *comp, int def,
 
 /* Return the result. */
    return result;
+}
+
+static int ndg1GetProvId( Prov *prov, int *status ) {
+/*
+*  Name:
+*     ndg1GetProvId
+
+*  Purpose:
+*     Returns an integer hash code for a Prov structure.
+
+*  Invocation:
+*     int ndg1GetProvId( Prov *prov, int *status )
+
+*  Description:
+*     This function returns an integer hash code describing the content
+*     of the supplied Prov and all its ancestors (but not children). The
+*     hash code within the Prov structure (prov->provid) should never be
+*     accessed directly since it may be out of date. Instead, this function
+*     should always be used to get the hash code, since it will update the
+*     hash code when needed.
+
+*  Parameters:
+*     prov
+*        Pointer to the Prov structure for which a hash code is required.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     An integer hash code.
+
+*/
+
+/* Local Variables: */
+   int ihash;
+   int iparent;
+
+/* Initialise */
+   ihash = 0;
+
+/* Check the local error status. */
+   if ( !astOK ) return ihash;
+
+/* Get any existing hash code from the Prov structure. */
+   ihash = prov->provid;
+
+/* We only need to calculate a new one if the existing one is invalid. */
+   if( ihash == 0 ) {
+
+/* For each text item in the Prov structure, create a hash code and then
+   combine it with the existing hash code using a bit-wise exclusive-OR
+   operation. */
+      if( prov->path ) ihash ^= ndg1HashFun( prov->path, status );
+      if( prov->date ) ihash ^= ndg1HashFun( prov->date, status );
+      if( prov->creator ) ihash ^= ndg1HashFun( prov->creator, status );
+
+/* Obtain a hash code for each parent Prov, and combine it with the
+   existing hash code using a bit-wise exclusive-OR operation. */
+      for( iparent = 0; iparent < prov->nparent; iparent++ ) {
+         ihash ^= ndg1GetProvId( prov->parents[ iparent ], status );
+      }
+   }
+
+/* Return the hash code. */
+   return ihash;
 }
 
 static char *ndg1GetTextComp( HDSLoc *loc, const char *comp, char *buf,
@@ -4528,6 +4645,10 @@ static Prov *ndg1MakeProv( int index, const char *path, const char *date,
 /* Store the "hidden" flag. */
       result->hidden = hidden;
 
+/* Indicate no hash code describing the contents of the Prov has yet been
+   calculated. */
+      result->provid = 0;
+
 /* Store a deep copy of the "more" structure in a temporary HDS object.
    This copies all the top-level contents of "more" into the top-level
    of the temporary HDS object. */
@@ -4863,9 +4984,7 @@ static void ndg1PurgeProvenance( Provenance *provenance,
 */
 
 /* Local Variables; */
-   Prov *better;
    Prov *child;
-   Prov *poorer;
    Prov *prov1;
    Prov *prov2;
    int done;
@@ -4905,22 +5024,13 @@ static void ndg1PurgeProvenance( Provenance *provenance,
                }
 
 /* If the two provenance structures refer to the same NDF, break the
-   parent-child link for the poorer Prov and register the better Prov with
-   the parent in place of the poorer Prov. The better Prov is the one
-   that contains most information. */
+   parent-child link for the first Prov and register the second Prov with
+   the parent in place of the first Prov. */
                if( keep && *status == SAI__OK ) {
-                  if( keep == 1 ) {
-                     better = prov1;
-                     poorer = prov2;
-                  } else {
-                     better = prov2;
-                     poorer = prov1;
-                  }
-
-                  for( ichild = 0; ichild < poorer->nchild; ichild++ ) {
-                     child = poorer->children[ ichild ];
-                     ndg1Disown( poorer, child, status );
-                     ndg1ParentChild( better, child, status );
+                  for( ichild = 0; ichild < prov2->nchild; ichild++ ) {
+                     child = prov2->children[ ichild ];
+                     ndg1Disown( prov2, child, status );
+                     ndg1ParentChild( prov1, child, status );
                   }
 
                } else {
@@ -5809,16 +5919,12 @@ static int ndg1TheSame( Prov *prov1, Prov *prov2, int *status ) {
 
 * Returned Value:
 *   Non-zero if the two Prov structures describe the same NDF, and zero
-*   otherwise. If the two Prov structures describe the same NDF, then the
-*   returned value will be +1 if "prov1" contains more information than
-*   "prov2" and will be +2 otherwise.
+*   otherwise.
 
 */
 
 /* Local Variables: */
    int result;
-   int nitem1;
-   int nitem2;
 
 /* Initialise. */
    result = 0;
@@ -5828,55 +5934,20 @@ static int ndg1TheSame( Prov *prov1, Prov *prov2, int *status ) {
 
 /* If the pointer are the same, they describe the same ND. */
    if( prov1 == prov2 ) {
-      result = 2;
-
-/* Otherwise, we assume a match if the NDF path and (if known) the date
-   and (if known) the creator of the provenance information are the same. */
-   } else {
       result = 1;
 
-      if( prov1->path ) {
-         if( prov2->path ) {
-            if( strcmp( prov1->path, prov2->path ) ) result = 0;
-         } else {
-            result = 0;
-         }
-      } else if( prov2->path ) {
-         result = 0;
-      }
-
-      if( prov1->date && prov2->date ) {
-         if( strcmp( prov1->date, prov2->date ) ) result = 0;
-      } else if( prov1->date || prov2->date ) {
-         result = 0;
-      }
-
-      if( prov1->creator && prov2->creator ) {
-         if( strcmp( prov1->creator, prov2->creator ) ) result = 0;
-      } else if( prov1->creator || prov2->creator ) {
-         result = 0;
-      }
-
-/* If they refer to the same NDF, count the number of items of information
-   stored for "prov1" and "prov2". */
-      if( result ) {
-         nitem1 = 0;
-         if( prov1->date ) nitem1++;
-         if( prov1->creator ) nitem1++;
-         if( prov1->more ) nitem1++;
-         if( prov1->nparent ) nitem1++;
-
-         nitem2 = 0;
-         if( prov2->date ) nitem2++;
-         if( prov2->creator ) nitem2++;
-         if( prov2->more ) nitem2++;
-         if( prov2->nparent ) nitem2++;
-
-/* Return a non-zero result indicating which of the two Prov structures
-   contains the most information. */
-         result = ( nitem1 > nitem2 ) ? 1 : 2;
-
-      }
+/* Otherwise, we assume a match if the ProvId values match. The ProvId is
+   a hash code describing the content of the Prov and all its ancestors.
+   Since it is possible for the same NDF name to be re-used to hold
+   different data, just comparing the path is not good enough. Even
+   including the command and date is not good enough since the same
+   command may be used more than once to produce NDFs with the same name
+   within a very short time. For this reason we use the ProvId which
+   incorporates not only the name, command and date of this Prov, but also
+   all its ancestor Provs. */
+   } else {
+      result = ( ndg1GetProvId( prov1, status ) ==
+                 ndg1GetProvId( prov2, status ) );
    }
 
 /* Return the result. */
@@ -5956,8 +6027,8 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance,
          datCell( aloc, 1, dim, &cloc, status );
       }
 
-/* If this is not the main NDF provenance, use the PATH and DATE components
-   from the Prov structure. */
+/* If this is not the main NDF provenance, use components from the Prov
+   structure. */
       if( prov != provenance->main ) {
          path = prov->path;
          date = prov->date;
@@ -6280,7 +6351,8 @@ static char ndg1XmlSource( void *data, int *status ){
 
 
 
-static AstKeyMap *ndg1ShowProv( Prov *prov, int depth, AstKeyMap *km, int *status ){
+static AstKeyMap *ndg1ShowProv( Prov *prov, int depth, AstKeyMap *km,
+                                FILE *fd, int *status ){
 /*
 *  Name:
 *     ndg1ShowProv
@@ -6290,7 +6362,7 @@ static AstKeyMap *ndg1ShowProv( Prov *prov, int depth, AstKeyMap *km, int *statu
 
 *  Invocation:
 *     AstKeyMap *ndg1ShowProv( Prov *prov, int depth, AstKeyMap *km,
-*                              int *status )
+*                              FILE *fd, int *status )
 
 *  Description:
 *     This function is a debugging tool that displays a Prov structure.
@@ -6306,13 +6378,16 @@ static AstKeyMap *ndg1ShowProv( Prov *prov, int depth, AstKeyMap *km, int *statu
 *     km
 *        A KeyMap containing the addresses of the Prov structurs already
 *        displayed, or NULL if no structures have yet been displayed.
+*     fd
+*        Pointer to a file descriptor to which output is written. It is
+*        ignored and a new file is opened if depth is zero.
 *     status
 *        Inherited status pointer.
 
 *  Returned Value:
 *     A pointer to a KeyMap holding the address of all the Prov
 *     structures displayed. Should be freed using astAnnul after the top
-*     level entry to this fuhnction returns.
+*     level entry to this function returns.
 
 */
 
@@ -6328,6 +6403,12 @@ static AstKeyMap *ndg1ShowProv( Prov *prov, int depth, AstKeyMap *km, int *statu
 /* Check status */
    if( *status != SAI__OK ) return result;
 
+/* If this is the top level entry, open an output file. */
+   if( depth == 0 || ! fd ) {
+      sprintf( key, "prov_%p.log", prov );
+      fd = fopen( key, "w" );
+   }
+
 /* A keyMap to store the addresses of the Prov structures that have already
    been show. */
    if( !result ) result = astKeyMap( " " );
@@ -6340,20 +6421,20 @@ static AstKeyMap *ndg1ShowProv( Prov *prov, int depth, AstKeyMap *km, int *statu
    for( i = 0; i < 2*depth; i++ ) indent[ i ] = ' ';
    indent[ 2*depth ] = 0;
 
-/* Display teh path */
-   printf( "%s path: %s\n", indent, prov->path ? prov->path : "" );
+/* Display the path */
+   fprintf( fd, "%s path: %s\n", indent, prov->path ? prov->path : "" );
 
 /* If the Prov has already been displayed, issue a warning. */
    if( astMapHasKey( result, key ) ) {
-      printf( "%s >>> This Prov structure has already been displayed\n",
+      fprintf( fd, "%s >>> This Prov structure has already been displayed\n",
               indent );
 
 /* Otherwise, display the remaining details of this Prov */
    } else {
-      printf( "%s date: %s\n", indent, prov->date ? prov->date : "" );
-      printf( "%s creator: %s\n", indent, prov->creator ? prov->creator : "" );
-      printf( "%s index: %d\n", indent, prov->index );
-      printf( "%s hidden: %d\n", indent, prov->hidden );
+      fprintf( fd, "%s date: %s\n", indent, prov->date ? prov->date : "" );
+      fprintf( fd, "%s creator: %s\n", indent, prov->creator ? prov->creator : "" );
+      fprintf( fd, "%s index: %d\n", indent, prov->index );
+      fprintf( fd, "%s hidden: %d\n", indent, prov->hidden );
 
 /* Store the Prov address in the KeyMap so that the following recursive
    calls to this function can detect if the same Prov is reached by a
@@ -6362,18 +6443,25 @@ static AstKeyMap *ndg1ShowProv( Prov *prov, int depth, AstKeyMap *km, int *statu
 
 /* Display the child Provs (to avoid infinite loops). */
       for( i = 0; i < prov->nchild; i++ ) {
-         printf( "%s child %d:\n", indent, i );
-         (void) ndg1ShowProv( prov->children[ i ], depth + 1, result, status );
+         fprintf( fd, "%s child %d:\n", indent, i );
+         (void) ndg1ShowProv( prov->children[ i ], depth + 1, result, fd,
+                              status );
       }
 
 /* Display the parent Provs (to avoid infinite loops). */
       for( i = 0; i < prov->nparent; i++ ) {
-         printf( "%s parent %d:\n", indent, i );
-         (void) ndg1ShowProv( prov->parents[ i ], depth + 1, result, status );
+         fprintf( fd, "%s parent %d:\n", indent, i );
+         (void) ndg1ShowProv( prov->parents[ i ], depth + 1, result, fd,
+                              status );
       }
 
    }
 
+/* If this is the top level entry, close the output file. */
+   if( depth == 0 ) fclose( fd );
+
 /* Return a pointer to the KeyMap. */
    return result;
 }
+
+
