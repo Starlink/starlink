@@ -128,8 +128,11 @@ void smurf_sc2expandmodel( int *status ) {
     /* Check to see if this is a DIMM model component before expanding */
     if( idata->hdr && (idata->hdr->mtype != SMF__NUL) ) {
       expptr = smf_model_getexpptr( idata->hdr->mtype, status );
-      (*expptr)( idata, &odata, status );
-      smf_write_smfData( odata, NULL, NULL, NULL, ogrp, i, 0, status );
+
+      if( *status == SAI__OK ) {
+        (*expptr)( idata, &odata, status );
+        smf_write_smfData( odata, NULL, NULL, NULL, ogrp, i, 0, status );
+      }
     }
   }
 
