@@ -70,6 +70,10 @@
 #       - Improve trapping of errors due to missing FITS headers
 #       - Account for bad pixels when correcting for the total data sum
 #         in the psf (by setting the new CONVOLVE parameter "NORM" to FALSE).
+#    2010-5-27 (DSB):
+#       - When creating a PSF that will later be smoothed to remove backgrounds, 
+#         create the PSF with the required final size, rather than creating it 
+#         small and then padding it with zeros.
 
 #  Copyright:
 #     Copyright (C) 2010 Science & Technology Facilities Council.
@@ -149,6 +153,17 @@ set out = "$dir/$base"
 $KAPPA_DIR/ndftrace $in fullframe quiet
 set insize = `$KAPPA_DIR/parget fpixscale\(1\) ndftrace`
 
+# If a background fwhm was given on the command line, convert it
+# from arc-sec to input pixels, and double it (we will use 2*FWHM as the
+# half size of the PSF image.
+if( "$fwhm_bg" != "" ) then
+   set fwhm_pix = `$KAPPA_DIR/calc exp="'pa/pb'" pa=$fwhm_bg pb=$insize`
+   set dim = `$KAPPA_DIR/calc exp="nint(2*pa)" pa=$fwhm_pix`
+else
+   set fwhm_pix = 0
+   set dim = 0
+endif
+
 # If a PSF was given, check it exists.
 if( $#arg_list > 2 ) then
    set dir = `dirname $arg_list[3]`
@@ -196,8 +211,13 @@ else
 # Convert Airy radius from arc-sec to input pixels.
    set airy_pix = `$KAPPA_DIR/calc exp="'pa/pb'" pa=$airy pb=$insize`
 
-# Get the number of input pixels in 2 Airy radii.
+# Get the half-size for the PSF image. This is the larger of the number
+# of input pixels in 2 Airy radii, and the twice the background smoothing
+# FWHM (if supplied)
    set npix = `$KAPPA_DIR/calc exp="'2*pa'" pa=$airy_pix`
+   if( $npix < $dim ) then
+      set npix = $dim
+   endif
 
 # Create a flat image with value zero with bounds (-npix:npix,-npix:npix)
    $KAPPA_DIR/creframe lbound=\[-$npix,-$npix\] ubound=\[$npix,$npix\] \
@@ -232,9 +252,6 @@ endif
 # from the supplied image and from the PSF.
 if( "$fwhm_bg" != "" ) then
 
-# Convert the supplied FWHM from arc-sec to input pixels.
-   set fwhm_pix = `$KAPPA_DIR/calc exp="'pa/pb'" pa=$fwhm_bg pb=$insize`
-
 #  Smooth the input image with a Gaussian of this FWHM to get an estimate
 #  of the background in the image.
    $KAPPA_DIR/gausmooth in=$in fwhm=$fwhm_pix out=mf_temp1
@@ -245,9 +262,8 @@ if( "$fwhm_bg" != "" ) then
 #  Use this instead of the supplied input image in future.
    set in = mf_in
 
-#  Expand the PSF to cover +/- 4*SIGMA of the Gaussian, filling the
+#  Expand the PSF to cover +/- 2*FWHM of the Gaussian, filling the
 #  padded areas with zeros.
-   set dim = `$KAPPA_DIR/calc exp="nint((4*pa)/2)" pa=$fwhm_pix`
    $KAPPA_DIR/nomagic in=$psf\(-$dim\:$dim,-$dim\:$dim\) out=mf_temp0 repval=0 quiet
 
 #  Smooth the enlarged PSF with a Gaussian of this FWHM to get an estimate
