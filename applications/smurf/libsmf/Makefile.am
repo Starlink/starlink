@@ -116,6 +116,7 @@ smf_dtype_sz.c \
 smf_dump_smfData.c \
 smf_expand_tilegroup.c \
 smf_expmodel_dks.c \
+smf_expmodel_init.c \
 smf_ext2km.c \
 smf_extracols.c \
 smf_fft_avpspec.c \

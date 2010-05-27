@@ -835,8 +835,9 @@ void smf_dump_smfData( const smfData *data, int showflags, int *status );
 void smf_expand_tilegroup ( Grp * ogrp, size_t ntile, int npbin,
                             size_t * outsize, int * status);
 
-void smf_expmodel_dks( const smfData *indata, smfData **outdata,
-                       int *status);
+void smf_expmodel_dks( const smfData *indata, smfData **outdata, int *status);
+
+void smf_expmodel_init( const smfData *indata, smfData **outdata, int *status);
 
 void smf_ext2km( int indf, const char *xname, AstKeyMap *keymap, int mode,
                  int *status );
