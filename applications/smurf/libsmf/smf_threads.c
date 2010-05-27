@@ -113,6 +113,9 @@
 #include "ems.h"
 #include "ems_par.h"
 
+/* SMURF include for malloc definitions */
+#include "smf.h"
+
 /* Definition of the public interface of this module */
 #include "smf_threads.h"
 #include "smf_typ.h"
