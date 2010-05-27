@@ -143,6 +143,8 @@
  *        Change BPM to BBM.
  *     2010-03-11 (TIMJ):
  *        Add flatramps argument.
+ *     2010-05-27 (EC):
+ *        Calculate tswcs properly when padding using smf_create_tswcs
 
  *  Notes:
  *     If projection information supplied, pointing LUT will not be
@@ -257,12 +259,9 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
   size_t rbstr;                 /* Reference bolo stride */
   size_t rtstr;                 /* Reference time slice stride */
   JCMTState *sourceState=NULL;  /* temporary JCMTState pointer */
-  double steptime;              /* Length of a sample in seconds */
   dim_t tchunk = 0;             /* Time offset in concat. array this chunk */
   dim_t tend;                   /* Time at start of padded region */
-  AstFrame *tframe=NULL;        /* Pointer to TimeFrame */
   dim_t tlen;                   /* Time length entire concatenated array */
-  double torigin;               /* Origin of TimeFrame */
   dim_t tstart;                 /* Time at end of padded region */
   smf_dtype type;               /* type of array */
   size_t tstr;                  /* Concatenated time slice stride */
@@ -734,34 +733,52 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
           }
         }
 
-        /* If smfHead->allState present, pad with start/finish values */
+        /* If smfHead->allState present, pad with start/finish values, except
+           for the RTS_END which we will linearly extrapolate in order to
+           making plotting easier on us (since the time axis is implemented
+           with a LutMap in the tswcs frameset) */
         if( (data->hdr) && (data->hdr->allState) ) {
-          /* Pointer to first/last real JCMTState */
-          if( j==0 ) sourceState = data->hdr->allState + padStart;
-          else sourceState = data->hdr->allState + tlen - padEnd - 1;
+          JCMTState *allState = data->hdr->allState;
+          double step_rts;
+          double ref_rts;
 
-          /* Loop Over Time slice */
-          for( l=tstart; l<=tend; l++ ) {
-            memcpy( &(data->hdr->allState[l]),
-                    sourceState, sizeof(*sourceState) );
+          /* average step size in RTS_END */
+          step_rts = (allState[tlen-padEnd-1].rts_end -
+                      allState[padStart].rts_end) / (tlen-padStart-padEnd);
+
+          if( step_rts <= 0 ) {
+            *status = SAI__ERROR;
+            errRep( "", FUNC_NAME ": Error calculating average RTS_END step!",
+                    status );
+          } else {
+            /* Pointer to first/last real JCMTState, and reference RTS_END
+               for linear extrapolation. */
+            if( j==0 ) {
+              sourceState = allState + padStart;
+              ref_rts = sourceState->rts_end - padStart*step_rts;
+            } else {
+              sourceState = allState + tlen - padEnd - 1;
+              ref_rts = sourceState->rts_end + step_rts;
+            }
+
+            /* Loop Over Time slice */
+            for( l=tstart; l<=tend; l++ ) {
+              memcpy( &(allState[l]), sourceState, sizeof(*sourceState) );
+
+              /* Extrapolated rts_end into padded region */
+              allState[l].rts_end = ref_rts + (l-tstart)*step_rts;
+            }
           }
         }
       }
     }
 
-    /* Shift the origin of the time axis in the WCS if padStart != 0 */
-    if( *status == SAI__OK && padStart && data->hdr && data->hdr->tswcs ) {
-      /* Figure out the length of a sample in seconds */
-      steptime = data->hdr->steptime;
+    /* Calculate a new tswcs using the concatenated JCMTState */
+    if( (*status==SAI__OK) && padStart && data->hdr && data->hdr->allState ) {
 
-      /* Obtain pointer to TimeFrame */
-      tframe = astGetFrame( data->hdr->tswcs, AST__CURRENT );
+      if( data->hdr->tswcs ) data->hdr->tswcs = astAnnul( data->hdr->tswcs );
 
-      /* Subtract off padStart*steptime seconds from current TimeOrigin */
-      torigin = astGetD( tframe, "TimeOrigin" );
-      torigin -= padStart*steptime / (3600.*24.); /* Measured in days */
-      astSetD( tframe, "TimeOrigin", torigin );
-      tframe = astAnnul( tframe );
+      smf_create_tswcs( data->hdr, &data->hdr->tswcs, status );
     }
 
     /* Put this concatenated subarray into the smfArray */
