@@ -369,7 +369,8 @@
  *        Add smf_qual_str, smf_qualstats_report
  *     2010-05-26 (TIMJ):
  *        Remove SMURF memory allocation routine prototypes. Use AST
- *        routines natively.
+ *        routines natively. Provide debugging fallback using standard
+ *        routines.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -437,6 +438,52 @@
   } \
   result = _temp; \
 }
+
+/* These macros can be enabled to replace the AST malloc routines with
+   system default routines. This can sometimes help debuggers and tools
+   like valgrind. The AST malloc routine can get in the way as it uses
+   local caching. Note that we ignore the "init" parameter for astCalloc
+   and always force initialisation in this simplified macro.
+
+   Make sure that no SMURF routines include ast.h after including smf.h
+*/
+
+#define MALLOC_DEBUG 0
+#if MALLOC_DEBUG
+
+#undef astMalloc
+#undef astFree
+#undef astCalloc
+#undef astRealloc
+#undef astGrow
+#undef astStore
+
+#define astMalloc(size)  malloc(size)
+#define astCalloc(nmemb, size, init) calloc(nmemb, size)
+#define astRealloc(ptr, size) realloc(ptr, size)
+#define astGrow( ptr, n, size ) realloc(ptr, n*size)
+
+/* The prototype differs for system free(). This will trigger a "defined but not used"
+   warning when compiling in any routine that does not use smf_free but that can be
+   ignored since this is only for debugging. */
+#define astFree(ptr) debug_astFree(ptr)
+static inline void * debug_astFree( void * ptr );
+static inline void * debug_astFree( void * ptr ) { if (ptr) free(ptr); return NULL; }
+
+/* astStore is realloc+memcpy */
+#define astStore( ptr, data, size ) debug_astStore( ptr, data, size )
+
+static inline void * debug_astStore( void * ptr, const void * data, size_t size );
+static inline void * debug_astStore( void * ptr, const void * data, size_t size ) {
+  ptr = realloc( ptr, size );
+  if (ptr) memcpy( ptr, data, size );
+  return ptr;
+}
+
+#endif
+
+
+/* Function Prototypes */
 
 void smf_accumulate_prov( const smfData * data, const Grp* igrp, size_t index,
                           int ondf, const char *creator, int * status );
