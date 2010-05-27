@@ -208,7 +208,12 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
           total += 3*nrow*ncol*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
           break;
         case SMF__FLT:
-          total += nsamp*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
+          /* Presently the filter temporarily transforms the entire
+             data cube into a second array. We therefore need to
+             ensure enough memory to temporarily store the data cube
+             twice. In the future it would be better to do the
+             filtering one bolo at a time. */
+          total += 2*nsamp*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
           break;
         case SMF__PLN:
           total += nsamp*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
