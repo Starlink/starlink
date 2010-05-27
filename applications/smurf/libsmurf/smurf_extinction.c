@@ -272,10 +272,7 @@ void smurf_extinction( int * status ) {
   /* Place parameters into a keymap and extract values */
   if( *status == SAI__OK ) {
     keymap = astKeyMap( " " );
-    if( !astOK ) {
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "ast error detected creating new astKeyMap", status );
-    } else {
+    if( astOK ) {
       astMapPut0C( keymap, "TAUSRC", tausource, NULL );
       astMapPut0C( keymap, "TAUMETHOD", method, NULL );
       smf_get_extpar( keymap, &tausrc, &extmeth, status );

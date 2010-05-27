@@ -353,12 +353,6 @@ void smf_calc_mapcoord( smfWorkForce *wf, smfData *data, AstFrameSet *outfset,
 
       /* Get the system from the outfset to match each timeslice */
       system = astGetC( outfset, "system" );
-
-      if( !astOK ) {
-        *status = SAI__ERROR;
-        errRep(FUNC_NAME, "Error extracting mapping info from frameset",
-               status);
-      }
     }
 
     /* Before mapping the LUT, first check for existing WCS information

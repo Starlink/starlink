@@ -129,11 +129,8 @@ void smf_create_tswcs( smfHead *hdr, AstFrameSet **frameset, int *status ){
     dut1 = 0.0;
   }
 
-  if( !astOK ) {
-    *status = SAI__ERROR;
-    errRep( "", FUNC_NAME ": AST error reading DUT1 from smfHead", status );
-    return;
-  }
+  /* Return here if an error encountered */
+  if( *status != SAI__OK ) return;
 
   smf_find_subarray( hdr, NULL, 0, &subnum, status );
 

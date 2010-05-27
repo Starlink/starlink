@@ -245,10 +245,7 @@ void smurf_sc2clean( int *status ) {
 
   /* Place cleaning parameters into a keymap and extract values */
   keymap = astKeyMap( " " );
-  if( !astOK ) {
-    *status = SAI__ERROR;
-    errRep(FUNC_NAME, "ast error detected creating new astKeyMap", status );
-  } else {
+  if( astOK ) {
     atlGetParam( "APOD", keymap, status );
     atlGetParam( "BADFRAC", keymap, status );
     atlGetParam( "DCFITBOX", keymap, status );
@@ -272,8 +269,8 @@ void smurf_sc2clean( int *status ) {
     smf_get_cleanpar( keymap, &apod, &badfrac, &dcfitbox, &dcmaxsteps,
                       &dcthresh, &dcmedianwidth, &dclimcorr, &dkclean,
 		      &fillgaps, NULL, NULL, NULL, NULL, NULL, NULL,
-		      &flagstat, &order, &spikethresh, &spikeiter, status
-		      ); }
+		      &flagstat, &order, &spikethresh, &spikeiter, status );
+  }
 
   /* Loop over input files */
   if( *status == SAI__OK ) for( i=1; i<=size; i++ ) {

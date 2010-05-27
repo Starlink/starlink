@@ -329,13 +329,7 @@ void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
                   status);
         }
       }
-      /* Check if AST thinks all is well */
-      if (!astOK) {
-        if (*status == SAI__OK) {
-          *status = SAI__ERROR;
-          errRep( FUNC_NAME, "Error from AST", status);
-        }
-      }
+
       /* Transfrom from pixels to AZEL */
       /* This is done by picking the first two x,y pixel positions in
          the first frame and transforming them to AzEl */

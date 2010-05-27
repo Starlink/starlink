@@ -751,13 +751,6 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     }
   }
 
-  /* Trap bad AST status here from all the keymap calls */
-  if( (*status==SAI__OK) && !astOK ) {
-    *status = SAI__ERROR;
-    errRep("", FUNC_NAME ": AST error detected parsing config file!",
-           status);
-  }
-
   if( untilconverge ) {
     msgSeti("MAX",maxiter);
     msgOut(" ",

@@ -561,12 +561,6 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
         }
         /* Transfrom from pixels to AZEL */
         astTranGrid( wcs, 2, lbnd, ubnd, 0.1, 1000000, 1, 2, npts, azel );
-        if (!astOK) {
-          if (*status == SAI__OK) {
-            *status = SAI__ERROR;
-            errRep( FUNC_NAME, "Error from AST when attempting to set SYSTEM to AZEL: WCS is NULL", status);
-          }
-        }
       } else {
         /* this time slice may have bad telescope data so we trap for this and re-enable
            "quick" with a default value. We'll only get here if airmass was good but

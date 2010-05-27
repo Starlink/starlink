@@ -608,26 +608,11 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                 /* Copy over the FITS header */
                 if( (*status == SAI__OK) && (refhdr->fitshdr) ) {
                   hdr->fitshdr = astCopy( refhdr->fitshdr );
-                  if (!astOK) {
-                    if (*status == SAI__OK) {
-                      *status = SAI__ERROR;
-                      errRep( "", FUNC_NAME ": AST error copying FITS header",
-                              status);
-                    }
-                  }
                 }
 
                 /* Copy over the TSWCS */
                 if( (*status == SAI__OK) && (refhdr->tswcs) ) {
                   hdr->tswcs = astCopy( refhdr->tswcs );
-                  if (!astOK) {
-                    if (*status == SAI__OK) {
-                      *status = SAI__ERROR;
-                      errRep( "", FUNC_NAME
-                              ": AST error copying time series WCS",
-                              status);
-                    }
-                  }
                 }
               }
             }
@@ -777,14 +762,6 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
       torigin -= padStart*steptime / (3600.*24.); /* Measured in days */
       astSetD( tframe, "TimeOrigin", torigin );
       tframe = astAnnul( tframe );
-
-      /* Trap AST errors */
-      if( !astOK ) {
-        *status = SAI__ERROR;
-        errRep( "", FUNC_NAME
-                ": AST error correcting TimeOrigin in concatenated data.",
-                status );
-      }
     }
 
     /* Put this concatenated subarray into the smfArray */
