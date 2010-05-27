@@ -134,15 +134,15 @@ void smf_create_tswcs( smfHead *hdr, AstFrameSet **frameset, int *status ){
 
   smf_find_subarray( hdr, NULL, 0, &subnum, status );
 
-  /* copy RTS_END values into times, populate telpar, and call sc2ast_timeWcs */
+  /* copy RTS_END values into times, populate telpar, and call sc2store_timeWcs*/
   times = astCalloc( ntime, sizeof(*times), 1 );
 
   if( *status == SAI__OK ) {
     telpar.dut1 = dut1;
     telpar.longdeg = -telpos[0];
     telpar.latdeg = telpos[1];
-    telpar.instap_x = instap[0];
-    telpar.instap_y = instap[1];
+    telpar.instap_x = 0;
+    telpar.instap_y = 0;
 
     for( i=0; i<ntime; i++ ) {
       times[i] = allState[i].rts_end;
