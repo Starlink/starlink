@@ -13,11 +13,10 @@
 *     Library routine
 
 *  Invocation:
-
 *     smf_qualstats_report( const smfArray *qua,
 *                           size_t last_qcount[SMF__NQBITS],
 *                           size_t *last_nmap,
-*                           int init, double * nbol, int *status )
+*                           int init, size_t * ngood_tslice, int *status )
 
 *  Arguments:
 *     qua = const smfArray *qua (Given)
@@ -31,8 +30,8 @@
 *        last iteration. Updated to current number upon return.
 *     init = int (Given)
 *        If set, first call so initialize the qcount buffers.
-*     nbol = double* (Returned)
-*        If non-null, contains the effective number of bolometers.
+*     ngood_tslice = size_t* (Returned)
+*        If non-null, contains the number of usable time slices.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -46,9 +45,13 @@
 *     last_qcount is NULL don't check for differences from the last call.
 
 *  Notes:
+*     The effective number of bolometers in the map can be derived
+*     using
+*          nbolo_eff = *last_nmap / *ngood_tslice
 
 *  Authors:
 *     Edward Chapin (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -59,6 +62,8 @@
 *     2010-05-25 (TIMJ):
 *        Convert "total samples available for map" into a number
 *        of working bolometers.
+*     2010-05-26 (TIMJ):
+*        Return the number of usable time slices.
 
 *  Copyright:
 *     Copyright (C) 2010 University of British Columbia.
@@ -103,7 +108,7 @@
 void smf_qualstats_report( const smfArray *qua,
                            size_t last_qcount[SMF__NQBITS],
                            size_t *last_nmap, int init,
-                           double * nbol, int *status ) {
+                           size_t *ngood_tslice, int *status ) {
 
   /* Local Variables */
   size_t bstride;               /* bolo stride */
@@ -111,8 +116,8 @@ void smf_qualstats_report( const smfArray *qua,
   dim_t idx;                    /* Subarray counter */
   dim_t nbolo;                  /* number of bolos */
   size_t nbolo_tot;             /* total bolos in all subarrays */
-  double nbolo_eff;             /* Effective number of bolometers */
   size_t ndata;                 /* total number of data points */
+  size_t ntgood;                /* Number of good time slices */
   size_t nmap;                  /* number of good map samples */
   size_t nmax;                  /* theoretical maximum good map samples */
   dim_t ntslice;                /* number of time slices */
@@ -226,6 +231,9 @@ void smf_qualstats_report( const smfArray *qua,
   }
   tpad = qcount[whichbit] / nbolo_tot;
 
+  /* Calculate the number of time slices that can be used */
+  ntgood = ntslice - tbound;
+
   /* Generate report */
   if( *status == SAI__OK ) {
     ndata = nbolo_tot*ntslice;
@@ -236,7 +244,7 @@ void smf_qualstats_report( const smfArray *qua,
       msgOutf("", "bolos  : %zu", status, nbolo_tot );
       msgOutf("", "tslices: bnd:%zu(%.1lf min), map:%zu(%.1lf min), tot:%zu(%.1lf min)", status,
               ntslice-nmax/nbolo_tot, tbound*steptime/60.,
-              nmax/nbolo_tot, (ntslice-tbound)*steptime/60.,
+              nmax/nbolo_tot, ntgood*steptime/60.,
               ntslice, ntslice*steptime/60.);
       msgOutf("", "Total samples: %zu", status, ndata );
     }
@@ -301,11 +309,10 @@ void smf_qualstats_report( const smfArray *qua,
     }
 
     /* Total number of samples for the map */
-    nbolo_eff = (double)nmap / (double)(ntslice-tbound);
     msgOutf("",
             "Total samples available for map: %10zu, %5.2lf%% of max (%g bolos)",
-            status, nmap, 100. * (double) nmap / (double) nmax, nbolo_eff );
-    if (nbol) *nbol = nbolo_eff;
+            status, nmap, 100. * (double) nmap / (double) nmax,
+            (double)nmap / (double)ntgood );
 
     if( !init ) {
       msgOutf("",
@@ -323,6 +330,9 @@ void smf_qualstats_report( const smfArray *qua,
 
     /* Update last_nmap to nmap */
     *last_nmap = nmap;
+
+    if (ngood_tslice) *ngood_tslice = ntgood;
+
   }
 
 }
