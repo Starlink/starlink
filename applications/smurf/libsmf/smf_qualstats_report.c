@@ -17,7 +17,7 @@
 *     smf_qualstats_report( const smfArray *qua,
 *                           size_t last_qcount[SMF__NQBITS],
 *                           size_t *last_nmap,
-*                           int init, int *status )
+*                           int init, double * nbol, int *status )
 
 *  Arguments:
 *     qua = const smfArray *qua (Given)
@@ -31,6 +31,8 @@
 *        last iteration. Updated to current number upon return.
 *     init = int (Given)
 *        If set, first call so initialize the qcount buffers.
+*     nbol = double* (Returned)
+*        If non-null, contains the effective number of bolometers.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -101,7 +103,7 @@
 void smf_qualstats_report( const smfArray *qua,
                            size_t last_qcount[SMF__NQBITS],
                            size_t *last_nmap, int init,
-                           int *status ) {
+                           double * nbol, int *status ) {
 
   /* Local Variables */
   size_t bstride;               /* bolo stride */
@@ -109,6 +111,7 @@ void smf_qualstats_report( const smfArray *qua,
   dim_t idx;                    /* Subarray counter */
   dim_t nbolo;                  /* number of bolos */
   size_t nbolo_tot;             /* total bolos in all subarrays */
+  double nbolo_eff;             /* Effective number of bolometers */
   size_t ndata;                 /* total number of data points */
   size_t nmap;                  /* number of good map samples */
   size_t nmax;                  /* theoretical maximum good map samples */
@@ -298,10 +301,11 @@ void smf_qualstats_report( const smfArray *qua,
     }
 
     /* Total number of samples for the map */
+    nbolo_eff = (double)nmap / (double)(ntslice-tbound);
     msgOutf("",
             "Total samples available for map: %10zu, %5.2lf%% of max (%g bolos)",
-            status, nmap, 100. * (double) nmap / (double) nmax,
-            (double)nmap / (double)(ntslice-tbound) );
+            status, nmap, 100. * (double) nmap / (double) nmax, nbolo_eff );
+    if (nbol) *nbol = nbolo_eff;
 
     if( !init ) {
       msgOutf("",

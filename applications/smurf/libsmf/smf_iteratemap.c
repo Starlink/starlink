@@ -1244,7 +1244,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
             /* initial quality report */
             smf_qualstats_report( qua[i], qcount_last, qcount_new,
-                                  1, status );
+                                  1, NULL, status );
 
             /*** TIMER ***/
             msgOutiff( MSG__DEBUG, "", FUNC_NAME
@@ -1589,7 +1589,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
             /* report on the quality flags for this iterations before closing
              the quality */
-            smf_qualstats_report( qua[i], qcount_last, qcount_new, 0, status );
+            smf_qualstats_report( qua[i], qcount_last, qcount_new, 0, NULL, status );
 
             /* Check for consistency between quality and data arrays */
             for( idx=0; (*status==SAI__OK)&&(idx<res[i]->ndat); idx++ ) {
