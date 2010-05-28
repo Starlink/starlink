@@ -660,29 +660,21 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
 
             /* Note that we're using the time axis to store the coefficients */
             if( isTordered ) {
-              head.data.dims[SC2STORE__ROW_INDEX] =
-                (idata->dims)[SC2STORE__ROW_INDEX];
-              head.data.dims[SC2STORE__COL_INDEX] =
-                (idata->dims)[SC2STORE__COL_INDEX];
+              head.data.dims[0] = (idata->dims)[0];
+              head.data.dims[1] = (idata->dims)[1];
               head.data.dims[2] = 3*nblock;
 
-              head.data.lbnd[SC2STORE__ROW_INDEX] =
-                (idata->lbnd)[SC2STORE__ROW_INDEX];
-              head.data.lbnd[SC2STORE__COL_INDEX] =
-                (idata->lbnd)[SC2STORE__COL_INDEX];
+              head.data.lbnd[0] = (idata->lbnd)[0];
+              head.data.lbnd[1] = (idata->lbnd)[1];
               head.data.lbnd[2] = 1;
             } else {
               head.data.dims[0] = 3*nblock;
-              head.data.dims[1+SC2STORE__ROW_INDEX] =
-                (idata->dims)[1+SC2STORE__ROW_INDEX];
-              head.data.dims[1+SC2STORE__COL_INDEX] =
-                (idata->dims)[1+SC2STORE__COL_INDEX];
+              head.data.dims[1] = (idata->dims)[1];
+              head.data.dims[2] = (idata->dims)[2];
 
               head.data.lbnd[0] = 1;
-              head.data.lbnd[1+SC2STORE__ROW_INDEX] =
-                (idata->lbnd)[1+SC2STORE__ROW_INDEX];
-              head.data.lbnd[1+SC2STORE__COL_INDEX] =
-                (idata->lbnd)[1+SC2STORE__COL_INDEX];
+              head.data.lbnd[1] = (idata->lbnd)[1];
+              head.data.lbnd[2] = (idata->lbnd)[2];
             }
             break;
 
