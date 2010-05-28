@@ -97,10 +97,8 @@
 *        - If a step occurs too close to the start or end to be fixed,
 *        flag all samples as a jump up tp the start or end.
 *     28-MAY-2010 (DSB):
-*        - Exclude data previously flagged as a jump when fitting data before
-*        and after a candidate step.
-*        - Correct indexing of quality array in cases where jumps are found 
-*        close to the start or end of the time series.
+*        - Exclude data previously flagged as a jump when fitting data before 
+*        and after a candidate step. 
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -157,7 +155,7 @@
 #define CHECK_2 16
 #define CHECK_3 32
 
-#define RECORD_BOLO (ibolo==576)
+#define RECORD_BOLO (ibolo==807)
 
 #define TOPCAT(fd, x) \
    if( x != VAL__BADD ) { \
@@ -1018,7 +1016,6 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
    int boxstart;
    int end_prev;
    int iblock;
-   int is_step;
    int itime;
    int j;
    int jtime;
@@ -1115,10 +1112,10 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
    series, then flag all the samples from the start of the time series
    as a jump, so that they will not be used. */
          if( boxstart == 0 ) {
-            pq1 = qua + base + boxstart*tstride;
+            pq = qua + base + boxstart*tstride;
             for( jtime = 0; jtime < boxlen; jtime++ ) {
-               *pq1 |= SMF__Q_JUMP;
-                pq1 += tstride;
+               *pq |= SMF__Q_JUMP;
+                pq += tstride;
             }
          }
 
@@ -1162,10 +1159,10 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
          mhi = VAL__BADD;
 
          if( boxend == ntime - 1 ) {
-            pq1 = qua + base + boxstart*tstride;
+            pq = qua + base + boxstart*tstride;
             for( jtime = 0; jtime < boxlen; jtime++ ) {
-               *pq1 |= SMF__Q_JUMP;
-                pq1 += tstride;
+               *pq |= SMF__Q_JUMP;
+                pq += tstride;
             }
          }
       }
@@ -1186,7 +1183,6 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
       }
 
 /* Check the above two lines are defined. */
-      is_step = 0;
       if( end_value != VAL__BADD && start_value != VAL__BADD ) {
 
 /* Check the step is large enough. */
@@ -1212,24 +1208,25 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
    }
 #endif
 
-/* If the step is big enough, increment the number of steps found in this
-   bolometer, and increment the current correction. */
+
+
          if( fabs( diff ) >= thresh ) {
-            is_step = 1;
+
+/* Increment the number of steps found in this bolometer. */
             nstep++;
+
+/* Increment the current correction. */
             corr -= diff;
+
+/* Store bad corrections over the duration of the step itself. */
+            for( ; itime <= step_end; itime++,pw++ ) {
+               *pw = VAL__BADD;
+               pq += tstride;
+            }
          }
       }
-
-/* If required, store bad corrections over the duration of the step itself.
-   Move the pointers on even if the step cannot be used. */
-      for( ; itime <= step_end; itime++,pw++ ) {
-         if( is_step ) *pw = VAL__BADD;
-         pq += tstride;
-      }
-
-/* Advance to the next block. */
       block += 2;
+
    }
 
 /* Assign the current correction to the remaining time slices. */
