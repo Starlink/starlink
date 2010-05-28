@@ -123,6 +123,7 @@ gai.flatfield = 0
 # smf_calcmodel_dks
 
 dks.boxcar = 0
+dks.replacebad = 0
 
 # smf_calcmodel_gai
 

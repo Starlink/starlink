@@ -212,6 +212,9 @@ com.gain_box = 6000
 # model is specified)
 dks.boxcar = 100
 
+# if set, replace dead dark squids with average of working dark squids
+dks.replacebad = 0
+
 # additional despiking / DC step finding after each iteration within noi
 # calculation. Setting noi.spikeiter to 10050 will check for excursions
 # from a rolling median filter in a box length (10050-10000 = 50) samples

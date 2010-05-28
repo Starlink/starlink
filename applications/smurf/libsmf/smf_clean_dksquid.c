@@ -84,6 +84,8 @@
 *     2010-05-14 (EC):
 *        - add "replacebad" to replace dead DKsquids with average of working ones
 *        - remove means of DKsquids
+*     2010-05-28 (EC):
+*        Report number of new BADBOL if replacebad=0
 
 *  Copyright:
 *     Copyright (C) 2009 Science & Technology Facilities Council.
@@ -143,17 +145,18 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
   size_t i;               /* Loop counter */
   size_t jt1;
   size_t jt2;
-  size_t ntot;
   size_t jf1;             /* Starting tslice that should be fit */
   size_t jf2;             /* Final tslice that should be fit */
   size_t j;               /* Loop counter */
   size_t k;               /* Loop counter */
+  size_t nbad=0;          /* Number of new bad bolos due to bad dark squid */
   dim_t nbolo;            /* Number of bolometers */
   dim_t ncol;             /* Number of columns */
   dim_t ndata;            /* Number of data points */
   size_t nfit;            /* number of samples over good range to fit */
   size_t ngood=0;         /* number of good dark squids */
   dim_t nrow;             /* Number of rows */
+  size_t ntot;
   dim_t ntslice;          /* Number of time slices */
   double offset;          /* Offset parameter from template fit */
   double *offsetbuf=NULL; /* Array of offsets for all bolos in this col */
@@ -332,6 +335,7 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
 
           /* If dark squid is bad, flag entire bolo as bad if it isn't already */
           if( !dkgood[i] && qua && !(qua[b*bstride]&SMF__Q_BADB) ) {
+            nbad++;
             for( k=0; k<ntslice; k++ ) {
               qua[b*bstride+k*tstride] |= SMF__Q_BADB;
             }
@@ -429,6 +433,12 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
         }
       }
     }
+  }
+
+  /* Report number of new bad bolos that were flagged */
+  if( !replacebad && nbad ) {
+    msgOutiff( MSG__VERB, "", FUNC_NAME
+               ": %zu new bolos flagged bad due to dead DKS", status, nbad );
   }
 
   /* Free dksquid only if it was a local buffer */

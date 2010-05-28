@@ -186,6 +186,8 @@
 *        Convert COM to 3d from 1d (but spatial axes have length 1)
 *     2010-05-13 (TIMJ):
 *        Add spatial plane fitting model
+*     2010-05-28 (EC):
+*        Replacing dead dark squids with average is optional (dks.replacebad)
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -912,8 +914,15 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
                                       (double *) dataptr, status );
 
             } else if( mtype == SMF__DKS ) {
+              int replacebad;
+
               /* First set the entire buffer to 0 */
               memset( dataptr, 0, datalen );
+
+              /* Check for special DKS initialzation parameters */
+              astMapGet0A( keymap, "DKS", &kmap );
+              astMapGet0I( kmap, "REPLACEBAD", &replacebad );
+              kmap = astAnnul( kmap );
 
               /* Initialize the model to hold an un-smoothed copy of
                  the dark squids (get smoothed later in smf_calcmodel_dks).
@@ -921,8 +930,8 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
                  head.data so that its pntr[0] temporarily points to the
                  model data array. */
               head.data.pntr[0] = dataptr;
-              smf_clean_dksquid(idata, NULL, 0, 0, &(head.data), 1, 1, 1,
-                                status);
+              smf_clean_dksquid(idata, NULL, 0, 0, &(head.data), 1, 1,
+                                replacebad, status);
               head.data.pntr[0] = NULL;
             } else if( mtype == SMF__GAI ) {
               /* Initialize gain to 1, offset to 0, correlation to 0 */
