@@ -1275,6 +1275,10 @@ void smf_qualstats( const unsigned char *qual, dim_t nbolo, size_t bstride,
                     size_t *ngoodbolo, size_t *nmap, size_t *nmax,
                     int *status );
 
+void smf_qualstats_model( const smfArray *qua, size_t qcount[8], size_t * ngoodbolo,
+                          size_t * nmap, size_t *nmax, size_t * ntslice, size_t * ntgood,
+                          size_t * tbound, size_t *tpad, int * status );
+
 void smf_qualstats_report( const smfArray *qua, size_t last_qcount[8],
                            size_t *last_nmap, int init, size_t *ngood_tslice, int *status );
 

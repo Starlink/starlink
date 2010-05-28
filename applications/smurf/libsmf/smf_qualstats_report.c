@@ -64,6 +64,8 @@
 *        of working bolometers.
 *     2010-05-26 (TIMJ):
 *        Return the number of usable time slices.
+*     2010-05-27 (TIMJ):
+*        Factor out calculation code into smf_qualstats_model
 
 *  Copyright:
 *     Copyright (C) 2010 University of British Columbia.
@@ -111,27 +113,17 @@ void smf_qualstats_report( const smfArray *qua,
                            size_t *ngood_tslice, int *status ) {
 
   /* Local Variables */
-  size_t bstride;               /* bolo stride */
   size_t i;                     /* loop counter */
-  dim_t idx;                    /* Subarray counter */
-  dim_t nbolo;                  /* number of bolos */
   size_t nbolo_tot;             /* total bolos in all subarrays */
   size_t ndata;                 /* total number of data points */
   size_t ntgood;                /* Number of good time slices */
   size_t nmap;                  /* number of good map samples */
   size_t nmax;                  /* theoretical maximum good map samples */
   dim_t ntslice;                /* number of time slices */
-  dim_t ntslice_ref;            /* reference number of time slices */
   size_t qcount[8];             /* total current quality bit counter */
-  unsigned char *qual=NULL;     /* pointer to quality buffer */
   double steptime=0.005;        /* length of sample -- assume 200 Hz data */
-  size_t subqcount[8];          /* subarray quality bit counter */
-  size_t subnmap;               /* nmap for subarray */
-  size_t subnmax;               /* nmax for subarray */
   size_t tbound;                /* time slices in boundary */
   size_t tpad;                  /* time slices in padding */
-  size_t tstride;               /* time slice stride */
-  size_t whichbit;              /* which bit is set */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -167,72 +159,15 @@ void smf_qualstats_report( const smfArray *qua,
 
   /* Initialize counts */
   memset( qcount, 0, SMF__NQBITS*sizeof(*qcount) );
-  nmap = 0;
-  nmax = 0;
 
-  /* Loop over subarray */
-  nbolo_tot = 0;
-  ntslice_ref = 0;
-  for( idx=0; (idx<qua->ndat)&&(*status==SAI__OK); idx++ ) {
+  /* Find out the properties of the smfArray */
+  smf_qualstats_model( qua, qcount, &nbolo_tot, &nmap, &nmax,
+                       &ntslice, &ntgood, &tbound, &tpad, status );
 
-    /* Get pointer to quality array and its dimensions */
-    if( qua->sdata[idx]->dtype == SMF__UBYTE ) {
-      qual = qua->sdata[idx]->pntr[0];
-    } else {
-      qual = qua->sdata[idx]->pntr[2];
-    }
-
-    if( !qual ) {
-      *status = SAI__ERROR;
-      errRep(" ", FUNC_NAME
-             ": NULL qual pointer encountered", status);
-    } else {
-      smf_get_dims( qua->sdata[idx], NULL, NULL, &nbolo, &ntslice,
-                    NULL, &bstride, &tstride, status );
-
-
-      /* get quality statistics for the current subarray */
-      smf_qualstats( qual, nbolo, bstride, ntslice, tstride, subqcount, NULL,
-                     &subnmap, &subnmax, status );
-
-      /* add to total number of bolometers and check for length consistency */
-      nbolo_tot += nbolo;
-      if( !ntslice_ref ) {
-        ntslice_ref = ntslice;
-        if( qua->sdata[idx]->hdr ) {
-          steptime = qua->sdata[idx]->hdr->steptime;
-        }
-      } else if( ntslice != ntslice_ref ) {
-        *status = SAI__ERROR;
-        errRep(" ", FUNC_NAME
-               ": Different subarrays have mismatch in ntslice.", status);
-      }
-
-      if( *status == SAI__OK ) {
-        /* Add counts from this subarray to the total */
-        for( i=0; i<SMF__NQBITS; i++ ) {
-          qcount[i] += subqcount[i];
-        }
-
-        nmap += subnmap;
-        nmax += subnmax;
-      }
-
-    }
+  /* Get a more accurate steptime if we can */
+  if (qua->sdata[0] && qua->sdata[0]->hdr) {
+    steptime = qua->sdata[0]->hdr->steptime;
   }
-
-  /* Calculate time slices in boundary */
-  tbound = ntslice-nmax/nbolo_tot;
-
-  /* Calculate time slices in padding */
-  whichbit = 0;
-  while( !((1<<whichbit) & SMF__Q_PAD) ) { /* which bit is SMF__Q_PAD? */
-    whichbit++;
-  }
-  tpad = qcount[whichbit] / nbolo_tot;
-
-  /* Calculate the number of time slices that can be used */
-  ntgood = ntslice - tbound;
 
   /* Generate report */
   if( *status == SAI__OK ) {

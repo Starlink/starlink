@@ -249,6 +249,7 @@ smf_pattern_extract.c \
 smf_polext.c \
 smf_qual_str.c \
 smf_qualstats.c \
+smf_qualstats_model.c \
 smf_qualstats_report.c \
 smf_quick_noise.c \
 smf_rebin_totmap.c \
