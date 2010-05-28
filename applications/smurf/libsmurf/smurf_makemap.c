@@ -709,6 +709,8 @@
 *        This also required some code to determine the current sub-instrument.
 *     2010-05-07 (TIMJ):
 *        Set bad-bits mask so that QUALITY has an effect.
+*     2010-05-27 (TIMJ):
+*        Write out NBOLOEFF information.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -1476,6 +1478,7 @@ void smurf_makemap( int *status ) {
     Grp *iterrootgrp = NULL;
     Grp *shortrootgrp = NULL;
     char tempfile[GRP__SZNAM+1];
+    double nboloeff = 0.0;
 
     /************************* I T E R A T E *************************************/
 
@@ -1577,7 +1580,7 @@ void smurf_makemap( int *status ) {
     smf_iteratemap( wf, igrp, iterrootgrp, bolrootgrp, shortrootgrp,
                     keymap, NULL, bbms, flatramps, outfset, moving, lbnd_out,
                     ubnd_out, maxmem-mapmem, map, hitsmap, variance, mapqual,
-                    weights, data_units, status );
+                    weights, data_units, &nboloeff, status );
 
     if( bolrootgrp ) grpDelet( &bolrootgrp, status );
     if( iterrootgrp ) grpDelet( &iterrootgrp, status );
@@ -1635,6 +1638,10 @@ void smurf_makemap( int *status ) {
               "No. of tiles covering the field", status );
     atlPtfti( fchan, "TILENUM", 1,
               "Index of this tile (1->NUMTILES)", status );
+
+    /* Store the effective bolometer count */
+    atlPtftd( fchan, "NBOLOEFF", nboloeff,
+              "Effective bolometer count", status );
 
     /* If the FitsChan is not empty, store it in the FITS extension of the
        output NDF (any existing FITS extension is deleted). No need to

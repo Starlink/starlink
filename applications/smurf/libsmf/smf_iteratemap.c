@@ -21,7 +21,7 @@
 *                    AstFrameSet *outfset, int moving, int *lbnd_out,
 *                    int *ubnd_out, size_t maxmem, double *map, int *hitsmap,
 *                    double *mapvar, unsigned char *mapqual, double *weights,
-*                    char data_units[], int *status );
+*                    char data_units[], double *nboloeff, int *status );
 
 *  Arguments:
 *     wf = smfWorkForce * (Given)
@@ -69,6 +69,9 @@
 *        Data units read from the first chunk. These may be different from
 *        that read from raw data due to flatfielding. Should be a buffer
 *        of at least size SMF__CHARLABEL.
+*     nboloeff = double * (Returned)
+*        If non-NULL, will contain the effective number of bolometers used
+*        to create the map.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -279,6 +282,8 @@
 *        Ensure that the LUT is ordered in the same way as the AST model
 *     2010-05-21 (DSB):
 *        Added dclimcorr argument for sm_fix_steps.
+*     2010-05-27 (TIMJ):
+*        Add effective number of bolometers.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -342,7 +347,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      AstFrameSet *outfset, int moving, int *lbnd_out,
                      int *ubnd_out, size_t maxmem, double *map,
                      int *hitsmap, double *mapvar, unsigned char *mapqual,
-                     double *weights, char data_units[], int *status ) {
+                     double *weights, char data_units[], double * nboloeff, int *status ) {
 
   /* Local Variables */
   size_t aiter;                 /* Actual iterations of sigma clipper */
@@ -424,13 +429,14 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   size_t nflag;                 /* Number of flagged detectors */
   int nm=0;                     /* Signed int version of nmodels */
   dim_t nmodels=0;              /* Number of model components / iteration */
+  size_t nsamples_tot = 0;      /* Number of valid samples in all chunks */
+  size_t ntgood_tot = 0;        /* Number of good time slices in all chunks */
   dim_t ntslice;                /* Number of time slices */
   int numiter=0;                /* Total number iterations */
   dim_t padEnd=0;               /* How many samples of padding at the end */
   dim_t padStart=0;             /* How many samples of padding at the start */
   char *pname=NULL;             /* Poiner to name */
   size_t qcount_last[SMF__NQBITS];/* quality bit counter -- last itertaion */
-  size_t qcount_new[SMF__NQBITS]; /* quality bit counter -- current iteration */
   smfArray **qua=NULL;          /* Quality flags for each file */
   unsigned char *qua_data=NULL; /* Pointer to DATA component of qua */
   smfGroup *quagroup=NULL;      /* smfGroup of quality model files */
@@ -881,6 +887,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
   for( contchunk=0; contchunk<ncontchunks; contchunk++ ) {
 
+    size_t ntgood = 0;    /* Number of good time slices in this chunk */
+    size_t nsamples = 0;  /* Number of good samples in this chunk */
+
     if( memiter ) {
       msgSeti("CHUNK", contchunk+1);
       msgSeti("NUMCHUNK", ncontchunks);
@@ -1126,6 +1135,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         }
 
         for( i=0; i<nchunks; i++ ) {
+
           if( !memiter ) {
             msgSeti("CHUNK", i+1);
             msgSeti("NUMCHUNK", nchunks);
@@ -1236,8 +1246,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             }
 
             /* initial quality report */
-            smf_qualstats_report( qua[i], qcount_last, qcount_new,
-                                  1, NULL, status );
+            smf_qualstats_report( qua[i], qcount_last, &nsamples,
+                                  1, &ntgood, status );
 
             /*** TIMER ***/
             msgOutiff( MSG__DEBUG, "", FUNC_NAME
@@ -1436,6 +1446,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                 JCMTState *allState = res[0]->sdata[0]->hdr->allState;
                 char *obsidss=NULL;
                 char obsidssbuf[SZFITSCARD+1];
+                double iter_nboloeff;
+                size_t nmap;
+                size_t ngood_tslices;
 
                 fitschan = astFitsChan ( NULL, NULL, " " );
 
@@ -1454,6 +1467,15 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
                 atlPtfti( fitschan, "SEQEND", allState[ntslice-1].rts_num,
                           "RTS index number of last frame", status );
+
+                /* calculate the effective number of bolometers for this
+                   iteration */
+                smf_qualstats_model( qua[i], NULL, NULL, &nmap, NULL,
+                                     NULL, &ngood_tslices, NULL, NULL, status );
+
+                iter_nboloeff = (double)nmap / (double)ngood_tslices;
+                atlPtftd( fitschan, "NBOLOEFF", iter_nboloeff,
+                          "Effective bolometer count", status );
 
                 kpgPtfts( imapdata->file->ndfid, fitschan, status );
 
@@ -1582,7 +1604,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
             /* report on the quality flags for this iterations before closing
              the quality */
-            smf_qualstats_report( qua[i], qcount_last, qcount_new, 0, NULL, status );
+            smf_qualstats_report( qua[i], qcount_last, &nsamples, 0, &ntgood, status );
 
             /* Check for consistency between quality and data arrays */
             for( idx=0; (*status==SAI__OK)&&(idx<res[i]->ndat); idx++ ) {
@@ -2347,9 +2369,21 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       model = astFree( model );
     }
 
+    /* Keep track of total number of samples and total number of time slices */
+    ntgood_tot += ntgood;
+    nsamples_tot += nsamples;
+
     /* Free chisquared array */
     if( chisquared) chisquared = astFree( chisquared );
     if( lastchisquared) lastchisquared = astFree( lastchisquared );
+  }
+
+  /* Report the total number of effective bolometers */
+  if (nboloeff) *nboloeff = 0.0;
+  if (ntgood_tot > 0) {
+    msgOutiff(MSG__NORM, "", "Total samples available from all chunks: %zu (%g bolos)",
+              status, nsamples_tot, (double)nsamples_tot / (double)ntgood_tot );
+    if (nboloeff) *nboloeff = (double)nsamples_tot / (double)ntgood_tot;
   }
 
   /* The second set of map arrays get freed in the multiple contchunk case */
