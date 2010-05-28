@@ -96,6 +96,9 @@
 *        - Re-organise the debugging facilities.
 *        - If a step occurs too close to the start or end to be fixed,
 *        flag all samples as a jump up tp the start or end.
+*     28-MAY-2010 (DSB):
+*        - Exclude data previously flagged as a jump when fitting data before 
+*        and after a candidate step. 
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -152,7 +155,7 @@
 #define CHECK_2 16
 #define CHECK_3 32
 
-#define RECORD_BOLO (ibolo==916)
+#define RECORD_BOLO (ibolo==807)
 
 #define TOPCAT(fd, x) \
    if( x != VAL__BADD ) { \
@@ -882,7 +885,7 @@ static void smf1_step_linefit( int box, float minfrac, int stride, double *dat,
    pq = qua;
    pd = dat;
    for( i = 0; i < box; i++ ) {
-      if( !( *pq & SMF__Q_MOD ) ) {
+      if( !( *pq & SMF__Q_GOOD ) ) {
          sy += *pd;
          sx += i;
          sxy += i*( *pd );
@@ -952,7 +955,7 @@ static void smf1_step_linefit( int box, float minfrac, int stride, double *dat,
          pd = dat;
          for( i = 0; i < box; i++ ) {
 
-            if( !( *pq & SMF__Q_MOD ) && fabs( *pd - ( i*(*m) + (*c) ) ) > thresh ){
+            if( !( *pq & SMF__Q_GOOD ) && fabs( *pd - ( i*(*m) + (*c) ) ) > thresh ){
                sy2 -= *pd;
                sx2 -= i;
                sxy2 -= i*( *pd );
