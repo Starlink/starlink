@@ -97,8 +97,10 @@
 *        - If a step occurs too close to the start or end to be fixed,
 *        flag all samples as a jump up tp the start or end.
 *     28-MAY-2010 (DSB):
-*        - Exclude data previously flagged as a jump when fitting data before 
-*        and after a candidate step. 
+*        - Exclude data previously flagged as a jump when fitting data before
+*        and after a candidate step.
+*        - Fix incorrect indexing of quality array when steps are found close 
+*        to the start or end of the time series.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -1112,10 +1114,10 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
    series, then flag all the samples from the start of the time series
    as a jump, so that they will not be used. */
          if( boxstart == 0 ) {
-            pq = qua + base + boxstart*tstride;
+            pq1 = qua + base + boxstart*tstride;
             for( jtime = 0; jtime < boxlen; jtime++ ) {
-               *pq |= SMF__Q_JUMP;
-                pq += tstride;
+               *pq1 |= SMF__Q_JUMP;
+                pq1 += tstride;
             }
          }
 
@@ -1159,10 +1161,10 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
          mhi = VAL__BADD;
 
          if( boxend == ntime - 1 ) {
-            pq = qua + base + boxstart*tstride;
+            pq1 = qua + base + boxstart*tstride;
             for( jtime = 0; jtime < boxlen; jtime++ ) {
-               *pq |= SMF__Q_JUMP;
-                pq += tstride;
+               *pq1 |= SMF__Q_JUMP;
+                pq1 += tstride;
             }
          }
       }
