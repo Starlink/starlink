@@ -99,8 +99,12 @@
 *     28-MAY-2010 (DSB):
 *        - Exclude data previously flagged as a jump when fitting data before
 *        and after a candidate step.
-*        - Fix incorrect indexing of quality array when steps are found close 
+*        - Fix incorrect indexing of quality array when steps are found close
 *        to the start or end of the time series.
+*        - Clip at 2 sigma (not 3) when finding the RMS gradient, and
+*        then correct for the heavy clipping using the factor appropriate
+*        for pure Gaussian noise. heavier clipping does better in the
+*        presence of lots of steps.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -460,7 +464,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
    before and after the time slice. We leave a small gap between the two
    median boxes to allow for some rise time in any potential step. Find
    the RMS value of these differences (iterate a few times, ignoring
-   differences larger than 3*RMS, to reduce the effect of really big
+   differences larger than 2*RMS, to reduce the effect of really big
    jumps on the RMS value). */
             diff2_limit = VAL__MAXD;
 
@@ -498,7 +502,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
 
                if( tpop > SMF__MINSTATSAMP ) {
                   rms = sqrtf( tsum2/tpop );
-                  diff2_limit = 3.0*rms;
+                  diff2_limit = 2.0*rms;
                   diff2_limit *= diff2_limit;
                } else {
                   rms = VAL__BADD;
@@ -520,6 +524,9 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
                ns++;
                continue;
             }
+
+/* Correct for the severe 2 sigma clipping in the estimation of rms. */
+            rms *= 1.28;
 
 /* Indicate we are currently looking for the start of a step. */
             step_start = -1;
