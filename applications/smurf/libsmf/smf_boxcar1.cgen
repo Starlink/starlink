@@ -67,10 +67,14 @@
 *        -Only evaluate smooth values with good QUALITY / not VAL__BADD
 *     2008-08-28 (EC):
 *        Re-written as a generic function
+*     2010-05-28 (TIMJ):
+*        size_t can't go negative so "off" must be a long and when copying
+*        from i and window we need to cast to long before negating.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 University of British Columbia. All Rights
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2006-2008 University of British Columbia. All Rights
 *     Reserved.
 
 *  Licence:
@@ -118,7 +122,7 @@ void CGEN_FUNCTION(smf_boxcar1)( CGEN_TYPE *series, const size_t ninpts,
                                  unsigned char mask, int *status) {
 
   /* Local variables */
-  size_t off;                 /* offset from loop counter to modified sample */
+  long off;                   /* offset from loop counter to modified sample */
   size_t count;               /* Number of samples in window */
   size_t i;                   /* Loop counter */
   CGEN_TYPE *seriescopy;      /* Copy of the time series */
@@ -159,8 +163,8 @@ void CGEN_FUNCTION(smf_boxcar1)( CGEN_TYPE *series, const size_t ninpts,
 	  count++;
 	}
 
-	if( i < (window-1) ) off = -i/2;
-	else off = -window/2;
+	if( i < (window-1) ) off = -1 * (long)i/2;
+        else off = -1 * (long)window/2;
 
 	/* As soon as we have at least 2 samples start applying smooth val */
 	if( (count > 1) && !(qual[i+off]&mask) ) {
@@ -201,8 +205,8 @@ void CGEN_FUNCTION(smf_boxcar1)( CGEN_TYPE *series, const size_t ninpts,
 	  count++;
 	}
 
-	if( i < (window-1) ) off = -i/2;
-	else off = -window/2;
+	if( i < (window-1) ) off = -1 * (long)i/2;
+        else off = -1 * (long)window/2;
 
 	/* As soon as we have at least 2 samples start applying smooth val */
 	if( (count > 1) && (series[i+off] != CGEN_BAD) ) {
