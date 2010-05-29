@@ -16,9 +16,9 @@
 *     smf_rebinmap1( smfData *data, smfData *variance, int *lut,
 *                    unsigned char *qual, size_t tslice1, size_t tslice2,
 *                    int trange, unsigned char mask, int sampvar, int flags,
-*                    double *map, double *mapweight, int *hitsmap,
-*                    double *mapvar, dim_t msize, double *scalevariance,
-*                    int *status )
+*                    double *map, double *mapweight, double *mapweightsq,
+*                    int *hitsmap, double *mapvar, dim_t msize,
+*                    double *scalevariance, int *status )
 
 *  Arguments:
 *     data = smfData* (Given)
@@ -54,6 +54,8 @@
 *        The output map array
 *     mapweight = double* (Returned)
 *        Relative weighting for each pixel in map.
+*     mapweightsq = double* (Returned)
+*        Relative weighting squared for each pixel in map.
 *     hitsmap = unsigned int* (Returned)
 *        Number of samples that land in a pixel.
 *     mapvar = double* (Returned)
@@ -96,6 +98,9 @@
 *        Use smfDatas for data & variance in preparation for 2d variance arrays
 *     2010-04-13 (EC):
 *        Add ability to regrid a time range (tslice1, tslice2, trange)
+*     2010-05-28 (EC):
+*        Keep track of sum(weights^2) for test code using alternative sample
+*        variance formula (#define __SMF_REBINMAP__SAMPLE_STANDARD_DEVIATION)
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -136,6 +141,14 @@
 *-
 */
 
+
+/* Define the following if we want to use the sample standard deviation
+   instead of the standard deviation of the sample */
+
+//#define __SMF_REBINMAP__SAMPLE_STANDARD_DEVIATION
+
+
+
 #include <stdio.h>
 #include <string.h>
 
@@ -154,7 +167,8 @@
 void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
                     unsigned char *qual, size_t tslice1, size_t tslice2,
                     int trange, unsigned char mask, int sampvar,
-                    int flags, double *map, double *mapweight, int *hitsmap,
+                    int flags, double *map, double *mapweight,
+                    double *mapweightsq, int *hitsmap,
                     double *mapvar, dim_t msize, double *scalevariance,
                     int *status ) {
 
@@ -183,7 +197,8 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
   if (*status != SAI__OK) return;
 
   /* Check inputs */
-  if( !data || !map || !lut || !mapweight || !mapvar || !hitsmap ) {
+  if( !data || !map || !lut || !mapweight || !mapweightsq || !mapvar ||
+      !hitsmap ) {
     *status = SAI__ERROR;
     errRep(" ", FUNC_NAME ": Null inputs", status );
     return;
@@ -241,6 +256,7 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
   if( flags & AST__REBININIT ) {
     memset( map, 0, msize*sizeof(*map) );
     memset( mapweight, 0, msize*sizeof(*mapweight) );
+    memset( mapweightsq, 0, msize*sizeof(*mapweightsq) );
     memset( mapvar, 0, msize*sizeof(*mapvar) );
     memset( hitsmap, 0, msize*sizeof(*hitsmap) );
   }
@@ -262,6 +278,7 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
               thisweight = 1/var[vi];
               map[lut[di]] += thisweight*dat[di];
               mapweight[lut[di]] += thisweight;
+              mapweightsq[lut[di]] += thisweight*thisweight;
               hitsmap[lut[di]] ++;
 
               /* Calculate this sum to estimate E(x^2) */
@@ -283,6 +300,7 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
               thisweight = 1/var[vi];
               map[lut[di]] += thisweight*dat[di];
               mapweight[lut[di]] += thisweight;
+              mapweightsq[lut[di]] += thisweight*thisweight;
               hitsmap[lut[di]] ++;
 
               /* Calculate this sum to estimate E(x^2) */
@@ -307,6 +325,7 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
               thisweight = 1/var[vi];
               map[lut[di]] += thisweight*dat[di];
               mapweight[lut[di]] += thisweight;
+              mapweightsq[lut[di]] += thisweight*thisweight;
               hitsmap[lut[di]] ++;
             }
           }
@@ -324,6 +343,7 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
               thisweight = 1/var[vi];
               map[lut[di]] += thisweight*dat[di];
               mapweight[lut[di]] += thisweight;
+              mapweightsq[lut[di]] += thisweight*thisweight;
               hitsmap[lut[di]] ++;
             }
           }
@@ -344,6 +364,7 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
           if( (lut[di] != VAL__BADI) && !(qual[di]&mask) ) {
             map[lut[di]] += dat[di];
             mapweight[lut[di]] ++;
+            mapweightsq[lut[di]] ++;
             hitsmap[lut[di]] ++;
 
             /* Calculate this sum to estimate E(x^2) */
@@ -358,6 +379,7 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
 
           map[lut[di]] += dat[di];
           mapweight[lut[di]] ++;
+          mapweightsq[lut[di]] ++;
           hitsmap[lut[di]] ++;
 
           /* Calculate this sum to estimate E(x^2) */
@@ -384,13 +406,20 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
           mapvar[i] = VAL__BADD;
 	} else {
 	  /* Otherwise re-normalize */
+          double tempmap = map[i];
 	  thisweight = 1/mapweight[i];
 	  map[i] *= thisweight;
 
           /* variance only reliable if we had enough samples */
           if( hitsmap[i] >= SMF__MINSTATSAMP ) {
-            mapvar[i] = (mapvar[i]*thisweight - map[i]*map[i])/hitsmap[i];
 
+#ifdef __SMF_REBINMAP__SAMPLE_STANDARD_DEVIATION
+            mapvar[i] = (mapweight[i]*mapvar[i] - tempmap*tempmap) /
+              (mapweight[i]*mapweight[i] - mapweightsq[i]);
+#else
+            mapvar[i] = (mapweight[i]*mapvar[i] - tempmap*tempmap) /
+              (hitsmap[i]*mapweight[i]*mapweight[i]);
+#endif
             /* Work out average scale factor so that supplied weights
                would produce the same map variance estimate as the
                sample variance calculation that we just did. The average
@@ -421,6 +450,7 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
 	if( !mapweight[i] ) {
 	  /* If 0 weight set pixels to bad */
 	  mapweight[i] = VAL__BADD;
+	  mapweightsq[i] = VAL__BADD;
 	  map[i] = VAL__BADD;
 	  mapvar[i] = VAL__BADD;
 	} else {

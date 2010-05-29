@@ -1380,7 +1380,8 @@ void smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar,
 void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
                     unsigned char *qual, size_t tslice1, size_t tslice2,
                     int trange, unsigned char mask, int sampvar,
-                    int flags, double *map, double *mapweight, int *hitsmap,
+                    int flags, double *map, double *mapweight,
+                    double *mapweightsq, int *hitsmap,
                     double *mapvar, dim_t msize, double *scalevariance,
                     int *status );
 

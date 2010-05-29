@@ -163,6 +163,7 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)), smfDIMMData *d
   unsigned char *mapqual = NULL;/* Quality map */
   double *mapvar = NULL;        /* Variance map */
   double *mapweight = NULL;     /* Weight map */
+  double *mapweightsq = NULL;   /* Weight map squared */
   double zero_lowhits=0;        /* Zero regions with low hit count? */
 
   /* Main routine */
@@ -180,6 +181,7 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)), smfDIMMData *d
   mapqual = dat->mapqual;
   mapvar = dat->mapvar;
   mapweight = dat->mapweight;
+  mapweightsq = dat->mapweightsq;
   model = allmodel[chunk];
   if(dat->noi) {
     noi = dat->noi[chunk];
@@ -220,6 +222,7 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)), smfDIMMData *d
       if( (hitsmap[i] != VAL__BADI) && (hitsmap[i] < meanhits*zero_lowhits) ) {
         map[i] = 0;
         mapweight[i] = VAL__BADD;
+        mapweightsq[i] = VAL__BADD;
         mapvar[i] = VAL__BADD;
         mapqual[i] |= SMF__MAPQ_ZERO;
         newzero ++;

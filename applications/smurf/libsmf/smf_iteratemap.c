@@ -408,6 +408,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   smfArray **lut=NULL;          /* Pointing LUT for each file */
   int *lut_data=NULL;           /* Pointer to DATA component of lut */
   smfGroup *lutgroup=NULL;      /* smfGroup of lut model files */
+  double *mapweightsq=NULL;     /* map weight squared */
   dim_t maxconcat;              /* Longest continuous chunk length in samples*/
   dim_t maxfile;                /* Longest file length in time samples*/
   int maxiter=0;                /* Maximum number of iterations */
@@ -457,6 +458,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   unsigned char *thisqual=NULL; /* Pointer to this quality map */
   double *thisvar=NULL;         /* Pointer to this variance map */
   double *thisweight=NULL;      /* Pointer to this weights map */
+  double *thisweightsq=NULL;    /* Pointer to this weights map^2 */
   size_t try;                   /* Try to concatenate this many samples */
   size_t tstride;               /* Time stride */
   struct timeval tv1, tv2;      /* Timers */
@@ -911,6 +913,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         thisqual = mapqual;
         thisvar = mapvar;
         thisweight = weights;
+        mapweightsq = astCalloc( msize, sizeof(*mapweightsq), 0 );
+        thisweightsq = mapweightsq;
       } else if( contchunk == 1 ) {
         /* Subsequent chunks are done in new map arrays and then added to
            the first */
@@ -919,6 +923,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         thisqual = astCalloc( msize, sizeof(*thisqual), 1 );
         thisvar = astCalloc( msize, sizeof(*thisvar), 1 );
         thisweight = astCalloc( msize, sizeof(*thisweight), 1 );
+        thisweightsq = astCalloc( msize, sizeof(*thisweightsq), 1 );
       }
 
       if( memiter ) {
@@ -1089,7 +1094,6 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       /* Stuff pointers into smfDIMMData to pass around to model component
          solvers */
-
       memset( &dat, 0, sizeof(dat) ); /* Initialize structure */
       dat.res = res;
       dat.qua = qua;
@@ -1099,6 +1103,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       dat.mapqual = thisqual;
       dat.mapvar = thisvar;
       dat.mapweight = thisweight;
+      dat.mapweightsq = thisweightsq;
       dat.mdims[0] = mdims[0];
       dat.mdims[1] = mdims[1];
       dat.msize = msize;
@@ -1393,7 +1398,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                              dat.noi ? dat.noi[i]->sdata[idx] : NULL,
                              lut_data, qua_data, 0, 0, 0, SMF__Q_GOOD,
                              varmapmethod, rebinflags, thismap, thisweight,
-                             thishits, thisvar, msize, &scalevar, status );
+                             thisweightsq, thishits, thisvar, msize, &scalevar,
+                             status );
             }
 
             /*** TIMER ***/
@@ -1683,6 +1689,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           for( idx=0; idx<res[0]->ndat; idx++ ) {
             unsigned char *bolomask = NULL;
             double *bmapweight = NULL;
+            double *bmapweightsq = NULL;
             int *bhitsmap = NULL;
 
             /* Pointers to everything we need */
@@ -1709,6 +1716,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
             bolomask = astCalloc( nbolo, sizeof(*bolomask), 0 );
             bmapweight = astCalloc( msize, sizeof(*bmapweight), 0 );
+            bmapweightsq = astCalloc( msize, sizeof(*bmapweightsq), 0 );
             bhitsmap = astCalloc( msize, sizeof(*bhitsmap), 0 );
 
             if( *status == SAI__OK ) {
@@ -1769,8 +1777,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                                  SMF__Q_GOOD, varmapmethod,
                                  AST__REBININIT | AST__REBINEND,
                                  mapdata->pntr[0],
-                                 bmapweight, bhitsmap, mapdata->pntr[1], msize,
-                                 NULL, status );
+                                 bmapweight, bmapweightsq, bhitsmap,
+                                 mapdata->pntr[1], msize, NULL, status );
 
                   /* Write out COLNUM and ROWNUM to FITS header */
                   if( *status == SAI__OK ) {
@@ -1808,6 +1816,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             /* Free up memory */
             if( bolomask ) bolomask = astFree( bolomask );
             if( bmapweight ) bmapweight = astFree( bmapweight );
+            if( bmapweightsq ) bmapweightsq = astFree( bmapweightsq );
             if( bhitsmap ) bhitsmap = astFree( bhitsmap );
 
             /* Remove ast from res once again */
@@ -1832,10 +1841,12 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           size_t istart, iend, nshort=0;
           size_t sc;
           double *shortmapweight = NULL;
+          double *shortmapweightsq = NULL;
           int *shorthitsmap = NULL;
 
           /* Allocate space for the arrays */
           shortmapweight = astCalloc( msize, sizeof(*shortmapweight), 0 );
+          shortmapweightsq = astCalloc( msize, sizeof(*shortmapweightsq), 0 );
           shorthitsmap = astCalloc( msize, sizeof(*shorthitsmap), 0 );
 
           /* Use first subarray to figure out time dimension. Get the
@@ -1944,8 +1955,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                              SMF__Q_GOOD, varmapmethod,
                              rebinflag,
                              mapdata->pntr[0],
-                             shortmapweight, shorthitsmap, mapdata->pntr[1],
-                             msize, NULL, status );
+                             shortmapweight, shortmapweightsq, shorthitsmap,
+                             mapdata->pntr[1], msize, NULL, status );
 
               /* Remove ast from res once again */
               for( k=0; k<dsize; k++ ) {
@@ -1991,6 +2002,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
           /* Free up memory */
           if( shortmapweight ) shortmapweight = astFree( shortmapweight );
+          if( shortmapweightsq ) shortmapweightsq = astFree( shortmapweightsq );
           if( shorthitsmap ) shorthitsmap = astFree( shorthitsmap );
         }
       }
@@ -2392,6 +2404,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   if( thisqual != mapqual ) thisqual = astFree( thisqual );
   if( thisvar != mapvar ) thisvar = astFree( thisvar );
   if( thisweight != weights ) thisweight = astFree( thisweight );
+  if( thisweightsq != mapweightsq ) thisweightsq = astFree( thisweightsq );
+  if( mapweightsq ) mapweightsq = astFree( mapweightsq );
 
   if( modeltyps ) modeltyps = astFree( modeltyps );
   if( exportNDF_which ) exportNDF_which = astFree( exportNDF_which );
