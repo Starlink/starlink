@@ -165,7 +165,7 @@ void smf_calcmodel_pln( smfWorkForce *wf, smfDIMMData *dat, int chunk,
       if( *status == SAI__OK ) {
         /* Place last iteration of plane signal back into residual */
         for (i=0; i< nbolo*ntslice; i++) {
-          if ( !qua_data[i]*SMF__Q_BADB  && res_data[i] != VAL__BADD && model_data[i] != VAL__BADD ) {
+          if ( !qua_data[i]&SMF__Q_BADB  && res_data[i] != VAL__BADD && model_data[i] != VAL__BADD ) {
             res_data[i] += model_data[i];
           }
         }
@@ -183,7 +183,7 @@ void smf_calcmodel_pln( smfWorkForce *wf, smfDIMMData *dat, int chunk,
          in the model container */
       if( *status == SAI__OK ) {
         for (i=0; i< nbolo*ntslice; i++) {
-          if ( !qua_data[i]*SMF__Q_BADB  && res_data[i] != VAL__BADD && model_data[i] != VAL__BADD ) {
+          if ( !qua_data[i]&SMF__Q_BADB  && res_data[i] != VAL__BADD && model_data[i] != VAL__BADD ) {
             model_data[i] -= res_data[i];
           } else {
             model_data[i] = VAL__BADD;
