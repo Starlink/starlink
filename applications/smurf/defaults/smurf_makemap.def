@@ -159,3 +159,8 @@ noi.spikeiter = 0
 # Plane fitting
 
 pln.notfirst = 0
+
+# Time Series Smoothing
+
+smo.notfirst = 0
+smo.boxcar = 2000

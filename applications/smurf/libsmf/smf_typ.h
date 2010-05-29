@@ -165,6 +165,8 @@
  *        Add mtype to smfHead, and smf_expmodelptr function prototype
  *     2010-05-20 (EC):
  *        Dark squids are now stored in a smfData within smfDA
+ *     2010-05-27 (TIMJ):
+ *        Add SMF__SMO model.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -253,7 +255,8 @@ typedef enum smf_modeltype {
   SMF__DKS=256,             /* Dark squid signals */
   SMF__GAI=512,             /* Relative Gain/Offset for each bolometer */
   SMF__FLT=1024,            /* Frequency domain filter */
-  SMF__PLN=2048             /* Spatial plane removal */
+  SMF__PLN=2048,            /* Spatial plane removal */
+  SMF__SMO=4096             /* Time series smoothing */
 } smf_modeltype;
 
 /* Observing mode and type */

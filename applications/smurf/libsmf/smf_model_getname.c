@@ -51,6 +51,8 @@
 *        Added SMF__FLT
 *     2010-05-13 (TIMJ):
 *        Added SMF__PLN
+*     2010-05-27 (TIMJ):
+*        Add SMF__SMO
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -154,6 +156,10 @@ const char *smf_model_getname( smf_modeltype type, int *status ) {
 
   case SMF__PLN:
     retval = "pln";
+    break;
+
+  case SMF__SMO:
+    retval = "smo";
     break;
 
   default:

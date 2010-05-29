@@ -57,12 +57,15 @@
 *        Added SMF__FLT
 *     2009-03-20 (EC):
 *        Don't fail on SMF__AST (but don't add more memory)
+*     2010-05-27 (TIMJ):
+*        Add SMF__SMO model.
 *     {enter_further_changes_here}
 
 *  Notes:
 *     This should match memory allocated in smf_grp_related.
 
 *  Copyright:
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2005-2009 University of British Columbia.
 *     All Rights Reserved.
@@ -216,6 +219,9 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
           total += 2*nsamp*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
           break;
         case SMF__PLN:
+          total += nsamp*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
+          break;
+        case SMF__SMO:
           total += nsamp*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
           break;
         case SMF__AST:

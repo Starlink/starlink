@@ -63,6 +63,8 @@
 *     2010-05-19 (EC):
 *        Use a full smfData as the reference, and write out full data
 *        dimensions for time series cube to FITS header.
+*     2010-05-27 (TIMJ):
+*        Add SMF__SMO
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -199,6 +201,10 @@ void smf_model_createHdr( smfData *model, smf_modeltype type,
       break;
 
     case SMF__PLN:
+      fset = astCopy( refwcs );
+      break;
+
+    case SMF__SMO:
       fset = astCopy( refwcs );
       break;
 

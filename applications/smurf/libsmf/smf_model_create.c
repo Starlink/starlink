@@ -188,6 +188,8 @@
 *        Add spatial plane fitting model
 *     2010-05-28 (EC):
 *        Replacing dead dark squids with average is optional (dks.replacebad)
+*     2010-05-28 (TIMJ):
+*        Add SMO smoothing model
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -713,6 +715,20 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
             }
             break;
 
+          case SMF__SMO: /* Time series smoothing */
+            /* Smooth the time series and subtract it */
+            head.data.dtype = SMF__DOUBLE;
+            head.data.ndims = 3;
+            for( k=0; k<3; k++ ) {
+              head.data.dims[k] = (idata->dims)[k];
+              head.data.lbnd[k] = (idata->lbnd)[k];
+            }
+
+            if (idata && idata->hdr) {
+              smf_set_clabels( "Smoothed background", "Signal",
+                               idata->hdr->units, &head.hdr, status );
+            }
+            break;
 
           default:
             *status = SAI__ERROR;

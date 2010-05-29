@@ -42,6 +42,7 @@ smf_calcmodel_flt.c \
 smf_calcmodel_gai.c \
 smf_calcmodel_noi.c \
 smf_calcmodel_pln.c \
+smf_calcmodel_smo.c \
 smf_check_detpos.c \
 smf_check_flat.c \
 smf_check_quality.c \

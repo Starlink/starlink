@@ -42,6 +42,8 @@
 *        Added SMF__FLT
 *     2010-05-13 (TIMJ):
 *        Added SMF__PLN
+*     2010-05-27 (TIMJ):
+*        Add SMF__SMO
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -130,6 +132,8 @@ smf_modeltype smf_model_gettype( const char *modelname, int *status ) {
     return SMF__FLT;
   } else if( strncmp( tempstring, "PLN", 3 ) == 0 ) {
     return SMF__PLN;
+  } else if( strncmp( tempstring, "SMO", 3 ) == 0 ) {
+    return SMF__SMO;
   } else {
     *status = SAI__ERROR;
     msgSetc("MNAME",modelname);

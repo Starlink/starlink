@@ -590,6 +590,10 @@ void smf_calcmodel_pln( smfWorkForce *wf, smfDIMMData *dat, int chunk,
                         AstKeyMap *keymap, smfArray **allmodel, int flags,
                         int *status );
 
+void smf_calcmodel_smo( smfWorkForce *wf, smfDIMMData *dat, int chunk,
+                        AstKeyMap *keymap, smfArray **allmodel, int flags,
+                        int *status );
+
 int smf_check_detpos( smfData *data, int report, int *status );
 
 void smf_check_flat ( const smfData *data, int *status );
