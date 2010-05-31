@@ -145,7 +145,7 @@
 /* Define the following if we want to use the sample standard deviation
    instead of the standard deviation of the sample */
 
-//#define __SMF_REBINMAP__SAMPLE_STANDARD_DEVIATION
+/* #define __SMF_REBINMAP__SAMPLE_STANDARD_DEVIATION */
 
 
 
@@ -415,7 +415,7 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
 
 #ifdef __SMF_REBINMAP__SAMPLE_STANDARD_DEVIATION
             mapvar[i] = (mapweight[i]*mapvar[i] - tempmap*tempmap) /
-              (mapweight[i]*mapweight[i] - mapweightsq[i]);
+              (hitsmap[i]*(mapweight[i]*mapweight[i] - mapweightsq[i]));
 #else
             mapvar[i] = (mapweight[i]*mapvar[i] - tempmap*tempmap) /
               (hitsmap[i]*mapweight[i]*mapweight[i]);
