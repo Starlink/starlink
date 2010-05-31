@@ -45,6 +45,8 @@
 *        Initial version.
 *     2010-04-20 (EC):
 *        Extra memory for quality array if iteratemap.
+*     2010-05-31 (EC):
+*        Extra space required for mapweight^2 array in iteratemap
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -143,8 +145,11 @@ void smf_checkmem_map( const int lbnd[], const int ubnd[], int rebin,
       /* For method=iterate we need space for hitsmap */
       total += sizeof(unsigned int)*mapsize;
 
-      /* also need space for quality map */
+      /* space for quality map */
       total += sizeof(unsigned char)*mapsize;
+
+      /* smf_iteratemap also uses a local buffer to accumulate weights^2 */
+      total += sizeof(double)*mapsize;
     }
 
     /* Set bad status if too big */
