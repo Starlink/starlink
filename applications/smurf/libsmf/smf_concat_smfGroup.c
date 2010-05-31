@@ -774,7 +774,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
     }
 
     /* Calculate a new tswcs using the concatenated JCMTState */
-    if( (*status==SAI__OK) && padStart && data->hdr && data->hdr->allState ) {
+    if( (*status==SAI__OK) && data->hdr && data->hdr->allState ) {
 
       if( data->hdr->tswcs ) data->hdr->tswcs = astAnnul( data->hdr->tswcs );
 
