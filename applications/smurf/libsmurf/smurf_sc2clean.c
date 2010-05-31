@@ -127,6 +127,8 @@
 *        add DCMAXSTEPS and DCMEDIANWIDTH, remove DCTHRESH2.
 *     2010-05-13 (DSB):
 *        Added dclimcorr to smf_fix_steps.
+*     2010-05-31 (EC):
+*        Factor heavy lifting out to smf_clean_smfData
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -186,32 +188,18 @@
 void smurf_sc2clean( int *status ) {
 
   size_t aiter;             /* Number of iterations in sigma-clipper */
-  size_t apod=0;            /* Length of apodization window */
-  double badfrac=0;         /* Fraction of bad samples to flag bad bolo */
   smfArray *darks = NULL;   /* Dark data */
-  dim_t dcfitbox=0;         /* width of box for measuring DC steps */
-  int dcmaxsteps;           /* number of DC steps/min. to flag bolo bad */
-  int dclimcorr;            /* Min. no. of bolos for a correlated step */
-  dim_t dcmedianwidth;      /* median filter width before finding DC steps */
-  double dcthresh=0;        /* n-sigma threshold for primary DC steps */
   int dkclean;              /* Flag for dark squid cleaning */
   int fillgaps;             /* Flag to do gap filling */
-  double flagstat;          /* Threshold for flagging stationary regions */
   smfArray *flatramps = NULL;/* Flatfield ramps */
   smfData *ffdata = NULL;   /* Pointer to output data struct */
   Grp *fgrp = NULL;         /* Filtered group, no darks */
   size_t i = 0;             /* Counter, index */
   Grp *igrp = NULL;         /* Input group of files */
   AstKeyMap *keymap;        /* Keymap for storing cleaning parameters */
-  size_t nflag;             /* Number of flagged samples */
   Grp *ogrp = NULL;         /* Output group of files */
-  int order;                /* Order of polynomial for baseline fitting */
   size_t outsize;           /* Total number of NDF names in the output group */
   size_t size;              /* Number of files in input group */
-  double spikethresh;       /* Threshold for finding spikes */
-  size_t spikeiter=0;       /* Number of iterations for spike finder */
-  int dofft=0;              /* Set if freq. domain filtering the data */
-  smfFilter *filt=NULL;     /* Pointer to filter struct */
   smfWorkForce *wf = NULL;  /* Pointer to a pool of worker threads */
 
   /* Main routine */
@@ -225,7 +213,8 @@ void smurf_sc2clean( int *status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Filter out darks */
-  smf_find_science( igrp, &fgrp, NULL, NULL, 1, 1, SMF__NULL, &darks, &flatramps, status );
+  smf_find_science( igrp, &fgrp, NULL, NULL, 1, 1, SMF__NULL, &darks,
+                    &flatramps, status );
 
   /* input group is now the filtered group so we can use that and
      free the old input group */
@@ -265,11 +254,6 @@ void smurf_sc2clean( int *status ) {
     atlGetParam( "ORDER", keymap, status );
     atlGetParam( "SPIKEITER", keymap, status );
     atlGetParam( "SPIKETHRESH", keymap, status );
-
-    smf_get_cleanpar( keymap, &apod, &badfrac, &dcfitbox, &dcmaxsteps,
-                      &dcthresh, &dcmedianwidth, &dclimcorr, &dkclean,
-		      &fillgaps, NULL, NULL, NULL, NULL, NULL, NULL,
-		      &flagstat, &order, &spikethresh, &spikeiter, status );
   }
 
   /* Loop over input files */
@@ -294,104 +278,8 @@ void smurf_sc2clean( int *status ) {
       errRep(FUNC_NAME,	"Unable to flatfield data from file ^I of ^N", status);
     }
 
-    /* Update quality flags to match bad samples, and to apply badfrac */
-    smf_update_quality( ffdata, NULL, 1, NULL, badfrac, status );
-
-    /* Fix large DC steps */
-    if( dcthresh && dcfitbox ) {
-      msgOutiff(MSG__VERB,"",
-                "Flagging bolos with %lf-sigma DC steps in %zu "
-                "samples as bad, using %zu-sample median filter and max %i "
-                "DC steps per min before flagging entire bolo bad.", status,
-                dcthresh, dcfitbox, dcmedianwidth, dcmaxsteps);
-
-      smf_fix_steps( wf, ffdata, NULL, dcthresh, dcmedianwidth, dcfitbox,
-                     dcmaxsteps, dclimcorr, NULL, status );
-    }
-
-    /* Flag spikes */
-    if( spikethresh ) {
-      msgSetd("SPIKETHRESH",spikethresh);
-      msgSeti("SPIKEITER",spikeiter);
-
-      if( !spikeiter ) {
-	msgOutif(MSG__VERB," ",
-		 "Flagging ^spikethresh-sigma spikes iteratively to "
-                 "convergence.", status);
-
-      } else {
-	msgOutif(MSG__VERB," ",
-		 "Flagging ^spikethresh-sigma spikes with ^spikeiter "
-                 "iterations", status);
-      }
-
-      smf_flag_spikes( ffdata, NULL, NULL, SMF__Q_MOD, spikethresh, spikeiter,
-                       100, &aiter, &nflag, status );
-
-      if( *status == SAI__OK ) {
-	msgSeti("AITER",aiter);
-	msgOutif(MSG__VERB," ", "Finished in ^AITER iterations",
-		 status);
-      }
-    }
-
-    /* Flag periods of stationary pointing */
-    if( flagstat ) {
-      msgSetd("THRESH",flagstat);
-      msgOutif(MSG__VERB, "",
-               "Flagging regions with speeds < ^THRESH arcsec/sec", status );
-      smf_flag_stationary( ffdata, NULL, flagstat, &nflag, status );
-      if( *status == SAI__OK ) {
-	msgSeti("N",nflag);
-	msgOutif(MSG__VERB," ", "^N new time slices flagged",
-		 status);
-      }
-    }
-
-    /* Clean out the dark squid signal */
-    if( dkclean ) {
-      msgOutif(MSG__VERB," ",
-               "Cleaning dark squid signals from data.",
-               status);
-      smf_clean_dksquid( ffdata, NULL, 0, 100, NULL, 0, 0, 0, status );
-    }
-
-
-    /* Gap filling */
-    if( fillgaps ) {
-      msgOutif(MSG__VERB," ", "Gap filling.", status);
-      smf_fillgaps( wf, ffdata, NULL, SMF__Q_GAP, status );
-    }
-
-    /* Remove baselines */
-    if( order >= 0 ) {
-      msgSeti("ORDER",order);
-      msgOutif(MSG__VERB," ",
-               "Fitting and removing ^ORDER-order polynomial baselines",
-               status);
-      smf_scanfit( ffdata, NULL, order, status );
-      smf_subtract_poly( ffdata, NULL, 0, status );
-    }
-
-    /* Apodization */
-    if( apod ) {
-      msgOutif(MSG__VERB," ",
-               "Apodizing data.",
-               status);
-      smf_apodize( ffdata, NULL, apod, status );
-    }
-
-    /* frequency-domain filtering */
-    filt = smf_create_smfFilter( ffdata, status );
-    smf_filter_fromkeymap( filt, keymap, &dofft, status );
-
-    if( dofft ) {
-      msgOutif( MSG__VERB," ", "Apply frequency domain filter", status );
-      smf_filter_execute( wf, ffdata, NULL, filt, status );
-      smf_convert_bad( ffdata, status );
-    }
-
-    filt = smf_free_smfFilter( filt, status );
+    /* Clean the data */
+    smf_clean_smfData( wf, ffdata, NULL, keymap, status );
 
     /* Ensure that the data is ICD ordered before closing */
     smf_dataOrder( ffdata, 1, status );

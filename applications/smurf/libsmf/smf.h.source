@@ -644,6 +644,9 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
                         unsigned char mask, size_t window,  smfData *model,
                         int calcdk, int nofit, int replacebad, int *status );
 
+void smf_clean_smfData( smfWorkForce *wf, smfData *data, unsigned char *quality,
+                        AstKeyMap *keymap, int *status );
+
 void smf_clone_data ( const smfData *idata, smfData **odata, int *status );
 
 void smf_close_file( smfData **, int *status);

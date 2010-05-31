@@ -284,6 +284,8 @@
 *        Added dclimcorr argument for sm_fix_steps.
 *     2010-05-27 (TIMJ):
 *        Add effective number of bolometers.
+*     2010-05-31 (EC):
+*        Factor initial data cleaning out to smf_clean_smfData
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -350,13 +352,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      double *weights, char data_units[], double * nboloeff, int *status ) {
 
   /* Local Variables */
-  size_t aiter;                 /* Actual iterations of sigma clipper */
-  size_t apod=0;                /* Length of apodization window */
   smfArray **ast=NULL;          /* Astronomical signal */
   double *ast_data=NULL;        /* Pointer to DATA component of ast */
   smfGroup *astgroup=NULL;      /* smfGroup of ast model files */
-  double badfrac;               /* Bad bolo fraction for flagging */
-  int baseorder;                /* Order of poly for baseline fitting */
   int bolomap=0;                /* If set, produce single bolo maps */
   size_t bstride;               /* Bolometer stride */
   double *chisquared=NULL;      /* chisquared for each chunk each iter */
@@ -365,29 +363,16 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int converged=0;              /* Has stopping criteria been met? */
   smfDIMMData dat;              /* Struct passed around to model components */
   smfData *data=NULL;           /* Temporary smfData pointer */
-  dim_t dcfitbox=0;             /* Box size for linear fit on either side of a DC steps */
-  int dclimcorr=0;              /* Median filter width for DC steps detection */
-  int dcmaxsteps=10;            /* Max number of DC jumps in a bolometer */
-  double dcthresh;              /* Threshold for fixing primary DC steps */
-  dim_t dcmedianwidth;          /* Median filter width for DC steps detection */
   int deldimm=0;                /* Delete temporary .DIMM files */
   int tstep = 0;                /* Time step between full WCS calculations */
   int dimmflags;                /* Control flags for DIMM model components */
-  int dofft=0;                  /* Set if freq. domain filtering the data */
   dim_t dsize;                  /* Size of data arrays in containers */
   double dtemp;                 /* temporary double */
   int ensureflat=1;             /* flatfield data as they are loaded */
   int exportNDF=0;              /* If set export DIMM files to NDF at end */
   int *exportNDF_which=NULL;    /* Which models in modelorder will be exported*/
   int noexportsetbad=0;         /* Don't set bad values in exported models */
-  int fillgaps;                 /* If set perform gap filling */
-  smfFilter *filt=NULL;         /* Pointer to filter struct */
   double flagstat;              /* Threshold for flagging stationary regions */
-  double f_edgelow=0;           /* Freq. cutoff for low-pass edge filter */
-  double f_edgehigh=0;          /* Freq. cutoff for high-pass edge filter */
-  double f_notchlow[SMF__MXNOTCH]; /* Array low-freq. edges of notch filters */
-  double f_notchhigh[SMF__MXNOTCH];/* Array high-freq. edges of notch filters */
-  int f_nnotch=0;               /* Number of notch filters in array */
   dim_t goodbolo;               /* Number of good bolometers */
   int haveast=0;                /* Set if AST is one of the models */
   int haveext=0;                /* Set if EXT is one of the models */
@@ -427,7 +412,6 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   dim_t nbolo;                  /* Number of bolometers */
   dim_t nchunks=0;              /* Number of chunks within iteration loop */
   size_t ncontchunks=0;         /* Number continuous chunks outside iter loop*/
-  size_t nflag;                 /* Number of flagged detectors */
   int nm=0;                     /* Signed int version of nmodels */
   dim_t nmodels=0;              /* Number of model components / iteration */
   size_t nsamples_tot = 0;      /* Number of valid samples in all chunks */
@@ -448,8 +432,6 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   smfGroup *resgroup=NULL;      /* smfGroup of model residual files */
   double scalevar=0;            /* scale factor for variance */
   int shortmap=0;               /* If set, produce maps every shortmap tslices*/
-  size_t spikeiter=0;           /* Number of iter for spike detection */
-  double spikethresh;           /* Threshold for spike detection */
   double steptime;              /* Length of a sample in seconds */
   int temp;                     /* temporary signed integer */
   int *thishits=NULL;           /* Pointer to this hits map */
@@ -574,13 +556,11 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       }
     }
 
-
-    /* Data-cleaning parameters (should match SC2CLEAN) */
-    smf_get_cleanpar( keymap, &apod, &badfrac, &dcfitbox, &dcmaxsteps,
-                      &dcthresh, &dcmedianwidth, &dclimcorr, NULL, &fillgaps,
-                      &f_edgelow, &f_edgehigh, f_notchlow, f_notchhigh,
-		      &f_nnotch, &dofft, &flagstat, &baseorder,
-		      &spikethresh, &spikeiter, status );
+    /* Get flagstat from the keymap since it will be needed when we concatenate
+       data */
+    smf_get_cleanpar( keymap, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+                      NULL, NULL, NULL, NULL, NULL, NULL, NULL, &flagstat, NULL,
+		      NULL, NULL, status );
 
     /* Maximum length of a continuous chunk */
     if( *status == SAI__OK ) {
@@ -1181,63 +1161,10 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             msgOut(" ", FUNC_NAME ": Pre-conditioning chunk", status);
             goodbolo=0; /* Initialize good bolo count for this chunk */
             for( idx=0; idx<res[i]->ndat; idx++ ) {
-
-              /* Synchronize quality flags */
               data = res[i]->sdata[idx];
               qua_data = qua[i]->sdata[idx]->pntr[0];
 
-              msgOutif(MSG__VERB," ", "  update quality", status);
-              smf_update_quality( data, qua_data, 1, NULL, badfrac, status );
-
-              /* Flag/repair bad detectors with DC steps in them */
-              if( dcthresh && dcfitbox ) {
-                msgOutif(MSG__VERB," ", "  find bolos with steps...", status);
-                smf_fix_steps( wf, data, qua_data, dcthresh, dcmedianwidth,
-                               dcfitbox, dcmaxsteps, dclimcorr, &nflag, status );
-                msgOutiff(MSG__VERB, "","  ...%zd flagged\n", status, nflag);
-              }
-
-              /* Flag spikes */
-              if( spikethresh ) {
-                msgOutif(MSG__VERB," ", "  flag spikes...", status);
-                smf_flag_spikes( data, NULL, qua_data,
-                                 ~(SMF__Q_JUMP|SMF__Q_STAT),
-                                 spikethresh, spikeiter, 100,
-                                 &aiter, &nflag, status );
-                msgOutiff(MSG__VERB,"", "  ...found %zd in %zd iterations",
-                          status, nflag, aiter );
-              }
-
-              /* Gap filling */
-              if( fillgaps ) {
-                msgOutif(MSG__VERB," ", "  gap filling", status);
-                smf_fillgaps( wf, data, qua_data, SMF__Q_GAP, status );
-              }
-
-              /* Remove baselines */
-              if( baseorder >= 0 ) {
-                msgOutif(MSG__VERB," ", "  fit polynomial baselines", status);
-                smf_scanfit( data, qua_data, baseorder, status );
-
-                msgOutif(MSG__VERB," ", "  remove polynomial baselines",
-                         status);
-                smf_subtract_poly( data, qua_data, 0, status );
-              }
-
-              /* Apodization */
-              if( apod ) {
-                msgOutif(MSG__VERB," ", "  apodizing data", status);
-                smf_apodize( data, qua_data, apod, status );
-              }
-
-              /* filter the data */
-              filt = smf_create_smfFilter( data, status );
-              smf_filter_fromkeymap( filt, keymap, &dofft, status );
-              if( dofft ) {
-                msgOutif( MSG__VERB," ", "  frequency domain filter", status );
-                smf_filter_execute( NULL, data, qua_data, filt, status );
-              }
-              filt = smf_free_smfFilter( filt, status );
+              smf_clean_smfData( wf, data, qua_data, keymap, status );
 
               /* Count number of good bolometers in the file after flagging */
               smf_get_dims( data, NULL, NULL, &nbolo, NULL, NULL, &bstride,
