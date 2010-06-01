@@ -18,7 +18,7 @@
 *                               unsigned char mask_cor, const size_t n,
 *                               const size_t stride,
 *                               const double *template, int remove,
-*                               double *gain, double *offset,
+*                               int nooffset, double *gain, double *offset,
 *                               double *corr, int *status )
 
 *  Arguments:
@@ -42,6 +42,8 @@
 *        1-d array containing template to be fit (VAL__BADD samples ignored)
 *     remove = int (Given)
 *        If set, remove the fitted template from data
+*     nooffset = int (Given)
+*        If set only fit for gain. If offset provided set it to 0.
 *     gain = double* (Returned)
 *        If provided return the gain of the fit
 *     offset = double* (Returned)
@@ -58,12 +60,16 @@
 *
 *                 data(t) = gain*template(t) + offset
 *
-*    Setting the remove flag will cause the fitted model to be
-*    subtracted from data. In this case, for any sample at which the
-*    data and/or template values are VAL__BAD<X>, the value of data at
-*    that sample is set to VAL__BAD<X>. On error gain and offset are
-*    set to VAL__BADD. The fit fails if there are fewer than 3 good
-*    samples, in which case status is set to SMF__INSMP.
+*     Setting the remove flag will cause the fitted model to be
+*     subtracted from data. In this case, for any sample at which the
+*     data and/or template values are VAL__BAD<X>, the value of data
+*     at that sample is set to VAL__BAD<X>. On error gain and offset
+*     are set to VAL__BADD. The fit fails if there are fewer than 3
+*     good samples, in which case status is set to SMF__INSMP.
+*
+*     The fitter can also return a simplified fit only for the gain if
+*     nooffset is set (and the return value for offset will be
+*     explicitly set to 0).
 
 *  Notes:
 
@@ -80,10 +86,12 @@
 *        Don't set values to BAD if there is no estimate when removing template
 *     2008-12-15 (EC):
 *        Use two quality masks: one for measuremnt, one for template removal
+*     2010-06-01 (EC):
+*        Add nooffset parameter
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 University of British Columbia. All Rights
+*     Copyright (C) 2008,2010 University of British Columbia. All Rights
 *     Reserved.
 
 *  Licence:
@@ -133,12 +141,13 @@ void CGEN_FUNCTION(smf_templateFit1)( CGEN_TYPE *data, unsigned char *qual,
                                       unsigned char mask_cor, const size_t n,
                                       const size_t stride,
                                       const double *template, int remove,
-                                      double *gain, double *offset,
+                                      int nooffset, double *gain, double *offset,
                                       double *corr, int *status ) {
 
   /* Local variables */
   double a;                   /* Gain coefficient */
   double b;                   /* Offset coefficient */
+  double c;                   /* Correlation coefficient */
   size_t off;                 /* offset from loop counter to modified sample */
   size_t i;                   /* Loop counter */
   size_t ngood=0;             /* Number of good samples */
@@ -208,18 +217,31 @@ void CGEN_FUNCTION(smf_templateFit1)( CGEN_TYPE *data, unsigned char *qual,
 
   /* Check for divide-by-zero */
   if( ngood >= 3 ) {
-    if( (ngood*s_tsq==s_t*s_t) || (ngood*s_dsq==s_d*s_d) ) {
+    if( (ngood*s_tsq==s_t*s_t) || (ngood*s_dsq==s_d*s_d) || (s_tsq==0) ) {
       *status = SMF__DIVBZ;
       errRep( "", FUNC_NAME ": divide-by-zero detected", status );
     } else {
-      /* Calculate fit coefficients */
-      a = (ngood*s_dt - s_d*s_t) /
-        (ngood*s_tsq - s_t*s_t);
 
-      b = (s_d*s_tsq - s_t*s_dt) /
-        (ngood*s_tsq - s_t*s_t);
+      if( nooffset ) {
+        /* Calculate gain only */
+        a = s_dt/s_tsq;
+        b = 0;
+        /* Correlation coefficient */
+        c = (ngood*a*s_dt - a*s_d*s_t) / ( ngood*a*sqrt(s_tsq)*sqrt(s_dsq) );
+      } else {
+        /* Calculate gain and offset */
+        a = (ngood*s_dt - s_d*s_t) /
+          (ngood*s_tsq - s_t*s_t);
 
-      /* Return gain and offset if requested */
+        b = (s_d*s_tsq - s_t*s_dt) /
+          (ngood*s_tsq - s_t*s_t);
+
+        /* Correlation coefficient */
+        c = (ngood*s_dt - s_d*s_t) /
+          ( sqrt(ngood*s_tsq - s_t*s_t) * sqrt(ngood*s_dsq - s_d*s_d) );
+      }
+
+      /* Return gain, offset and correlation coefficient if requested */
       if( gain ) {
         *gain = a;
       }
@@ -228,13 +250,13 @@ void CGEN_FUNCTION(smf_templateFit1)( CGEN_TYPE *data, unsigned char *qual,
         *offset = b;
       }
 
-      /* Return linear correlation coefficient if requested */
       if( corr ) {
-        *corr = (ngood*s_dt - s_d*s_t) /
-          ( sqrt(ngood*s_tsq - s_t*s_t) * sqrt(ngood*s_dsq - s_d*s_d) );
-
-        /* Trap very poor fits */
-        if( !isnormal(*corr) ) *corr=0;
+        /* Trap bollocks */
+        if( !isnormal(c) ) {
+          *corr = 0;
+        } else {
+          *corr = c;
+        }
       }
 
       /* Remove fitted templated if requested */

@@ -292,15 +292,19 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
           }
         }
 
-        /* Now compare the fit to the data and get a correlation coefficient to decide
-           whether the data really do look like the fit. We need this because sometimes a nice
-           curvy line gets a high signal-to-noise linear fit. Ignore non-linear for the moment. Only
-           do this test if the SNR test has passed. */
+        /* Now compare the fit to the data and get a correlation
+           coefficient to decide whether the data really do look like
+           the fit. We need this because sometimes a nice curvy line
+           gets a high signal-to-noise linear fit. Ignore non-linear
+           for the moment. Only do this test if the SNR test has
+           passed. */
 
         if (c0 != VAL__BADD && c1 != VAL__BADD) {
-          smf_templateFit1D( scan, NULL, 0, 0, nrgood, 1, poly, 0, &gain, &offset, &corr, status );
+          smf_templateFit1D( scan, NULL, 0, 0, nrgood, 1, poly, 0, 0,
+                             &gain, &offset, &corr, status );
           msgOutiff(MSG__DEBUG20, "",
-                    " Template: Bol %zd Gain = %g offset = %g corr = %g", status, bol, gain, offset, corr );
+                    " Template: Bol %zd Gain = %g offset = %g corr = %g",
+                    status, bol, gain, offset, corr );
           corrs[bol] = corr;
         }
 

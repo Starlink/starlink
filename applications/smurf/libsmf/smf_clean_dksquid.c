@@ -86,6 +86,8 @@
 *        - remove means of DKsquids
 *     2010-05-28 (EC):
 *        Report number of new BADBOL if replacebad=0
+*     2010-06-01 (EC):
+*        Only fit gain of DKS, not gain and offset (to avoid COM offset degen.)
 
 *  Copyright:
 *     Copyright (C) 2009 Science & Technology Facilities Council.
@@ -353,7 +355,7 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
               d_d = (double *) indata->pntr[0];
               smf_templateFit1D( &d_d[b*bstride+jf1*tstride],
                                  &qua[b*bstride+jf1*tstride], mask, mask,
-                                 nfit, tstride, &dksquid[jf1], 1, &gain,
+                                 nfit, tstride, &dksquid[jf1], 1, 1, &gain,
                                  &offset, &corr, status );
               break;
 
@@ -361,7 +363,7 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
               d_i = (int *) indata->pntr[0];
               smf_templateFit1I( &d_i[b*bstride+jf1*tstride],
                                  &qua[b*bstride+jf1*tstride], mask, mask,
-                                 nfit, tstride, &dksquid[jf1], 1, &gain,
+                                 nfit, tstride, &dksquid[jf1], 1, 1, &gain,
                                  &offset, &corr, status );
               break;
 
