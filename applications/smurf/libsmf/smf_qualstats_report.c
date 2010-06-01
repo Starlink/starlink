@@ -177,8 +177,8 @@ void smf_qualstats_report( const smfArray *qua,
       msgOut( "", "--- Size of the entire data array ------------------------------------------",
               status );
       msgOutf("", "bolos  : %zu", status, nbolo_tot );
-      msgOutf("", "tslices: bnd:%zu(%.1lf min), map:%zu(%.1lf min), tot:%zu(%.1lf min)", status,
-              ntslice-nmax/nbolo_tot, tbound*steptime/60.,
+      msgOutf("", "tslices: bnd:%zu(%.1lf min), map:%zu(%.1lf min), tot:%" DIM_T_FMT "(%.1lf min)", status,
+              (size_t)ntslice-(nmax/nbolo_tot), tbound*steptime/60.,
               nmax/nbolo_tot, ntgood*steptime/60.,
               ntslice, ntslice*steptime/60.);
       msgOutf("", "Total samples: %zu", status, ndata );
@@ -195,12 +195,12 @@ void smf_qualstats_report( const smfArray *qua,
       switch( 1<<i ) {
       case SMF__Q_BADDA: /* flatfield or DA flagged -- bolo excluding padding*/
         sprintf( scalestr, "%7zu bolos  ",
-                 qcount[i] / (ntslice-tpad) );
+                 qcount[i] / ((size_t)ntslice-tpad) );
         break;
 
       case SMF__Q_BADB: /* Entire bolos */
         sprintf( scalestr, "%7zu bolos  ",
-                 qcount[i] / ntslice );
+                 qcount[i] / (size_t)ntslice );
         break;
 
       case SMF__Q_PAD: /* Padding is for all bolos at given tslice */

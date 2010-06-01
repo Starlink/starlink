@@ -14,8 +14,8 @@
 
 *  Invocation:
 *     smf_qualstats_model( const smfArray *qua, size_t qcount[8],
-*                          size_t * ngoodbolo, size_t * nmap, 
-*                          size_t *nmax,  size_t *ntslice, size_t * ntgood,
+*                          size_t * ngoodbolo, size_t * nmap,
+*                          size_t *nmax, dim_t *ntslice, size_t * ntgood,
 *                          size_t * tbound, size_t * tpad, int * status );
 
 *  Arguments:
@@ -64,6 +64,8 @@
 *  History:
 *     2010-05-27 (TIMJ):
 *        Initial version inherited from smf_qualstats_report
+*     2010-06-01 (TIMJ):
+*        Use dim_t for ntslice in an attempt at consistency.
 
 *  Copyright:
 *     Copyright (C) 2010 University of British Columbia.
@@ -107,7 +109,7 @@
 
 void
 smf_qualstats_model( const smfArray *qua, size_t qcount[8], size_t * ngoodbolo,
-                     size_t * nmap, size_t *nmax, size_t * ntslice, size_t * ntgood,
+                     size_t * nmap, size_t *nmax, dim_t * ntslice, size_t * ntgood,
                      size_t * tbound, size_t *tpad, int * status ) {
 
   /* Local Variables */
