@@ -779,6 +779,17 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
       if( data->hdr->tswcs ) data->hdr->tswcs = astAnnul( data->hdr->tswcs );
 
       smf_create_tswcs( data->hdr, &data->hdr->tswcs, status );
+
+      /* If we couldn't make the tswcs just annul error and continue... we
+         don't really need it for anything */
+      if( *status != SAI__OK ) {
+        errAnnul(status);
+        msgOut( "", FUNC_NAME ": Warning, Couldn't create TSWCS for data cube",
+                status );
+      }
+
+      /* Annul just in case it got made */
+      if( data->hdr->tswcs ) data->hdr->tswcs = astAnnul( data->hdr->tswcs );
     }
 
     /* Put this concatenated subarray into the smfArray */
