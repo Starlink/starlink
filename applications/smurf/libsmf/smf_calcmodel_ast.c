@@ -317,4 +317,6 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)),
     msgOutiff( MSG__VERB, "", "    normalized change in model: %lf", status,
                dchisq );
   }
+
+  if( kmap ) kmap = astAnnul( kmap );
 }
