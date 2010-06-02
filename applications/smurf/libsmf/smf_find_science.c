@@ -22,7 +22,9 @@
 *        Input group consisting of science and non-science observations.
 *     outgrp = Grp ** (Returned)
 *        Output group consisting of all the science observations. Can be
-*        NULL.
+*        NULL. If no science observations found, but darks are found, darks
+*        will ne returned in outgrp, and darkgrp and flatgrp will be explicitly
+*        set to NULL.
 *     darkgrp = Grp ** (Returned)
 *        If non-null, will contain the group of dark files. Will not be
 *        created if no darks were found. The group will be sorted by
@@ -121,6 +123,8 @@
 *        Ignore dark fast flats.
 *     2010-05-11 (EC):
 *        Handle data with no JCMTState array
+*     2010-06-01 (EC):
+*        Return darks in outgrp if no science data were found
 
 *  Copyright:
 *     Copyright (C) 2008-2010 Science and Technology Facilities Council.
@@ -401,17 +405,40 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, Grp **darkgrp, Grp **flat
   alldarks = astFree( alldarks );
   allfflats = astFree( allfflats );
 
-  /* Store the output groups in the return variable or free it */
-  if (darkgrp) {
-    *darkgrp = dgrp;
-  } else {
-    grpDelet( &dgrp, status);
-  }
-  if (flatgrp) {
-    *flatgrp = fgrp;
-  } else {
+  if( outgrp && (grpGrpsz(*outgrp,status)==0) && (grpGrpsz(dgrp,status)>0) ) {
+    /* If outgrp requested but no science observations were found, and
+       dark observations were found, return darks in outgrp and set
+       flatgrp and darkgrp to NULL. This is to handle cases where we
+       want to process data taken in the dark like normal science
+       data. */
+
+    *outgrp = dgrp;
+
+    if( darkgrp ){
+      *darkgrp = NULL;
+    }
+
+    if( flatgrp ) {
+      *flatgrp = NULL;
+    }
+
+    grpDelet( &ogrp, status);
     grpDelet( &fgrp, status);
+
+  } else {
+    /* Store the output groups in the return variable or free it */
+    if (darkgrp) {
+      *darkgrp = dgrp;
+    } else {
+      grpDelet( &dgrp, status);
+    }
+    if (flatgrp) {
+      *flatgrp = fgrp;
+    } else {
+      grpDelet( &fgrp, status);
+    }
   }
+
 
   msgSeti( "ND", sccount );
   msgSeti( "DK", dkcount );
