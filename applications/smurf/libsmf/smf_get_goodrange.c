@@ -113,7 +113,7 @@ void smf_get_goodrange( const unsigned char *quality, dim_t ntslice,
 
    if( i==ntslice ) {
      *status=SAI__ERROR;
-     errRep( "", FUNC_NAME ": Can't find jumps, entire array is flagged.",
+     errRep( "", FUNC_NAME ": Entire array is flagged!",
              status );
    } else {
      i1 = i;
