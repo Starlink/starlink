@@ -244,7 +244,6 @@
          CALL EMS_REP( 'SUP_CRINT1',
      :   'SUBPAR: Failed to obtain parameter file component for '//
      :   'parameter ^P', STATUS )
-         PRINT *, 'STATUS = ', STATUS
 
 *    If DAT__INCHK make the report more helpful.
          IF ( STATUS .EQ. DAT__INCHK ) THEN
