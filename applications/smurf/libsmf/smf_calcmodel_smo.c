@@ -45,6 +45,8 @@
 *  History:
 *     2010-05-27 (TIMJ):
 *        Initial version
+*     2010-06-01 (TIMJ):
+*        Simplify logic and use quality bits.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -158,6 +160,9 @@ void smf_calcmodel_smo( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   boldata = astCalloc( ntslice, sizeof(*boldata), 0 );
   bolqua  = astCalloc( ntslice, sizeof(*bolqua), 0 );
 
+  msgOutiff(MSG__VERB, "", "    Calculating smoothed model using boxcar of width %zu time slices",
+            status, boxcar);
+
   /* Loop over index in subgrp (subarray) and put the previous iteration
      of the filtered component back into the residual before calculating
      and removing the new filtered component */
@@ -181,57 +186,72 @@ void smf_calcmodel_smo( smfWorkForce *wf, smfDIMMData *dat, int chunk,
       errRep( "", FUNC_NAME ": Null data in inputs", status);
     } else {
 
+      /* Uncomment to aid debugging */
+      /*
+      smf_write_smfData( res->sdata[idx], NULL, qua_data, "res_in",
+                         NULL, 0, 0, status );
+      */
+
       if( *status == SAI__OK ) {
-        /* Place last iteration back into residual */
-        for (i=0; i< nbolo*ntslice; i++) {
-          if ( !qua_data[i]&SMF__Q_BADB  && res_data[i] != VAL__BADD && model_data[i] != VAL__BADD ) {
+        /* Place last iteration back into residual if this is a modifiable section of the time series */
+        for (i=0; i< ndata; i++) {
+          if ( !qua_data[i]&SMF__Q_MOD  && res_data[i] != VAL__BADD && model_data[i] != VAL__BADD ) {
             res_data[i] += model_data[i];
           }
         }
-
-        /* Copy the residual+old model into model_data where it will be
-           fitted again in this iteration. */
-        memcpy( model_data, res_data,
-                ndata*smf_dtype_size(res->sdata[idx],status) );
       }
+
+      /* Uncomment to aid debugging */
+      /*
+      smf_write_smfData( model->sdata[idx], NULL, qua_data, "model_b4",
+                         NULL, 0, 0, status );
+
+      smf_write_smfData( res->sdata[idx], NULL, qua_data, "res_b4",
+                         NULL, 0, 0, status );
+      */
 
       /* Smooth the data and subtract it from res */
       for (i=0; i< nbolo; i++) {
         size_t j;
         size_t boloff = i*bstride;
-        for (j=0; j<ntslice; j++) {
-          if (i == 100 && j > 30000 && j < 30010) {
-            printf("Copying value %g to index %zu (%zu, %zu,%zu,%zu)\n", res_data[boloff+j*tstride], j,boloff+j*tstride, boloff,i,tstride);
-          }
-          boldata[j] = res_data[boloff+j*tstride];
-          bolqua[j] = qua_data[boloff+j*tstride];
-        }
-        smf_boxcar1D( boldata, ntslice, boxcar, bolqua, SMF__Q_GOOD, status );
-        for (j=0; j<ntslice; j++) {
-          if (i == 100 && j > 30000 && j < 30010) {
-            printf("Restoring value %g to %g index %zu (%zu, %zu,%zu,%zu)\n", boldata[j], res_data[boloff+j*tstride], j,boloff+j*tstride, boloff,i,tstride);
-          }
 
-          if (res_data[boloff+j*tstride] != VAL__BADD && boldata[j] != VAL__BADD) {
-            res_data[boloff+j*tstride] -= boldata[j];
-          }
+        /* Copy the data for this bolometer into a temporary buffer */
+        for (j=0; j<ntslice; j++) {
+          size_t thisidx = boloff+j*tstride;
+          boldata[j] = res_data[thisidx];
+          bolqua[j] = qua_data[thisidx];
         }
-      }
 
-      /* Store the difference between the plane-subtracted signal and the residual
-         in the model container */
-      if( *status == SAI__OK ) {
-        for (i=0; i< nbolo*ntslice; i++) {
-          if ( !qua_data[i]&SMF__Q_BADB  && res_data[i] != VAL__BADD && model_data[i] != VAL__BADD ) {
-            model_data[i] -= res_data[i];
-          } else {
-            if (model_data[i] != VAL__BADD) {
-              if (model_data[i] != 0.0) printf("Found a new non-zero bad value\n");
-              model_data[i] = VAL__BADD;
+        /* Smooth that bolometer time series */
+        smf_boxcar1D( boldata, ntslice, boxcar, bolqua, SMF__Q_FIT, status );
+
+        /* Remove this model from the residual data and copy the data to the model */
+        for (j=0; j<ntslice; j++) {
+          size_t thisidx = boloff+j*tstride;
+
+          /* Modify RES if we are allowed to modify things */
+          if (!qua_data[thisidx] & SMF__Q_MOD) {
+            if (boldata[j] == VAL__BADD) {
+              res_data[thisidx] = VAL__BADD;
+            } else if (res_data[thisidx] != VAL__BADD) {
+              res_data[thisidx] -= boldata[j];
             }
+            /* Store the model */
+            model_data[thisidx] = boldata[j];
+          } else {
+            /* store bad value in the model */
+            model_data[thisidx] = VAL__BADD;
           }
         }
       }
+
+      /* Uncomment to aid debugging */
+      /*
+      smf_write_smfData( res->sdata[idx], NULL, qua_data, "res_af",
+                         NULL, 0, 0, status );
+      smf_write_smfData( model->sdata[idx], NULL, qua_data, "model_af",
+                         NULL, 0, 0, status );
+      */
 
     }
   }
