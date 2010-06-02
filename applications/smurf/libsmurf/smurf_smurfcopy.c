@@ -140,7 +140,8 @@ void smurf_smurfcopy ( int * status ) {
   kpg1Rgndf( "IN", 1, 1, "", &igrp, &size, status );
 
   /* Filter out darks */
-  smf_find_science( igrp, &fgrp, NULL, NULL, 0, 0, SMF__NULL, NULL, NULL, status );
+  smf_find_science( igrp, &fgrp, 0, NULL, NULL, 0, 0, SMF__NULL, NULL, NULL,
+                    status );
 
   /* input group is now the filtered group so we can use that and
      free the old input group */

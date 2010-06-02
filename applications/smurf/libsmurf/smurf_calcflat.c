@@ -213,7 +213,8 @@ void smurf_calcflat( int *status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Find darks (might be all) */
-  smf_find_science( igrp, &fgrp, &dkgrp, &ffgrp, 1, 0, SMF__DOUBLE, &darks, &fflats, status );
+  smf_find_science( igrp, &fgrp, 0, &dkgrp, &ffgrp, 1, 0, SMF__DOUBLE, &darks,
+                    &fflats, status );
 
   /* input group is now the filtered group so we can use that and
      free the old input group */

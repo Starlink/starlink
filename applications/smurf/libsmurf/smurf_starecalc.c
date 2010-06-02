@@ -156,7 +156,8 @@ void smurf_starecalc ( int *status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Filter out darks */
-  smf_find_science( igrp, &fgrp, NULL, NULL, 1, 0, SMF__NULL, &darks, NULL, status );
+  smf_find_science( igrp, &fgrp, 0, NULL, NULL, 1, 0, SMF__NULL, &darks, NULL,
+                    status );
 
   /* input group is now the filtered group so we can use that and
      free the old input group */

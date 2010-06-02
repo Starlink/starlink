@@ -136,7 +136,8 @@ void smurf_calcdark( int *status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Filter out non-darks and reduce the darks themselves */
-  smf_find_science( igrp, NULL, &dgrp, NULL, 1, 0, SMF__DOUBLE, &darks, NULL, status );
+  smf_find_science( igrp, NULL, 0, &dgrp, NULL, 1, 0, SMF__DOUBLE, &darks, NULL,
+                    status );
 
   /* no longer need the input group */
   grpDelet( &igrp, status );

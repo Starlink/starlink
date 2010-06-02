@@ -13,9 +13,10 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_find_science(const Grp * ingrp, Grp **outgrp, Grp **darkgrp, Grp **flatgrp,
-*                     int reducedark, int calcflat, smf_dtype darktype,
-*                     smfArray ** darks, smfArray **fflats, int * status );
+*     smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
+*                     Grp **darkgrp, Grp **flatgrp, int reducedark, int calcflat,
+*                     smf_dtype darktype, smfArray ** darks,
+*                     smfArray **fflats, int * status );
 
 *  Arguments:
 *     ingrp = const Grp* (Given)
@@ -24,7 +25,9 @@
 *        Output group consisting of all the science observations. Can be
 *        NULL. If no science observations found, but darks are found, darks
 *        will ne returned in outgrp, and darkgrp and flatgrp will be explicitly
-*        set to NULL.
+*        set to NULL if reverttodark is set.
+*     reverttodark = int (Given)
+*        If set will revert outgrp to darkgrp if no science observations found
 *     darkgrp = Grp ** (Returned)
 *        If non-null, will contain the group of dark files. Will not be
 *        created if no darks were found. The group will be sorted by
@@ -125,6 +128,8 @@
 *        Handle data with no JCMTState array
 *     2010-06-01 (EC):
 *        Return darks in outgrp if no science data were found
+*     2010-06-02 (EC):
+*        Only revert outgrp to darks if reverttodark set
 
 *  Copyright:
 *     Copyright (C) 2008-2010 Science and Technology Facilities Council.
@@ -180,13 +185,15 @@
 #define FUNC_NAME "smf_find_science"
 
 size_t
-smf__addto_sortinfo ( const smfData * indata, smfSortInfo allinfo[], size_t index,
-                      size_t counter, const char * type, int *status );
+smf__addto_sortinfo ( const smfData * indata, smfSortInfo allinfo[],
+                      size_t index,
+size_t counter, const char * type, int *status );
 
 
-void smf_find_science(const Grp * ingrp, Grp **outgrp, Grp **darkgrp, Grp **flatgrp,
-                      int reducedark, int calcflat, smf_dtype darktype,
-                      smfArray ** darks, smfArray **fflats, int * status ) {
+void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
+                      Grp **darkgrp, Grp **flatgrp, int reducedark,
+                      int calcflat, smf_dtype darktype, smfArray ** darks,
+                      smfArray **fflats, int * status ) {
 
   smfSortInfo *alldarks; /* array of sort structs for darks */
   smfSortInfo *allfflats; /* array of fast flat info */
@@ -405,12 +412,13 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, Grp **darkgrp, Grp **flat
   alldarks = astFree( alldarks );
   allfflats = astFree( allfflats );
 
-  if( outgrp && (grpGrpsz(*outgrp,status)==0) && (grpGrpsz(dgrp,status)>0) ) {
+  if( reverttodark && outgrp && (grpGrpsz(*outgrp,status)==0) &&
+      (grpGrpsz(dgrp,status)>0) ) {
     /* If outgrp requested but no science observations were found, and
        dark observations were found, return darks in outgrp and set
        flatgrp and darkgrp to NULL. This is to handle cases where we
        want to process data taken in the dark like normal science
-       data. */
+       data. To activate this behaviour set reverttodark */
 
     *outgrp = dgrp;
 
