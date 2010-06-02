@@ -1603,8 +1603,21 @@ void smurf_makemap( int *status ) {
     smf_set_moving(outfset,status);
     ndfPtwcs( outfset, ondf, status );
 
-    /* Set bad bits mask to enable QUALITY */
-    if (mapqual) ndfSbb( 255, ondf, status );
+    /* Set bad bits mask to enable QUALITY. We can have quality bits set
+       indicating where a boundary condition to zero the map has been used.
+       If ast.zero_notlast is set the boundary condition was not applied on
+       the last iteration so don't enable QUALITY bits for this case. */
+
+    if (mapqual) {
+      AstKeyMap *kmap=NULL; /* Local AST keymap */
+      int zero_notlast=0;   /* Don't zero boundary pixels on last iteration */
+
+      astMapGet0A( keymap, "AST", &kmap );
+      astMapGet0I( kmap, "ZERO_NOTLAST", &zero_notlast );
+      if( !zero_notlast ) ndfSbb( 255, ondf, status );
+
+      if( kmap ) kmap = astAnnul( kmap );
+    }
 
     /* write units - hack we do not have a smfHead */
     if (strlen(data_units)) ndfCput( data_units, ondf, "UNITS", status);

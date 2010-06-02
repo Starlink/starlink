@@ -1527,7 +1527,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                separate loop since the map estimate gets updated by
                each chunk in the main model component loop */
 
-            smf_calcmodel_ast( wf, &dat, i, keymap, ast, 0, status );
+            dimmflags=0;
+            if( iter==(maxiter-1) ) dimmflags |= SMF__DIMM_LASTITER;
+            smf_calcmodel_ast( wf, &dat, i, keymap, ast, dimmflags, status );
 
             /*** TIMER ***/
             msgOutiff( MSG__DEBUG, "", FUNC_NAME

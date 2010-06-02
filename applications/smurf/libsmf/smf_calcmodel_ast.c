@@ -123,14 +123,15 @@
 
 #define FUNC_NAME "smf_calcmodel_ast"
 
-void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)), smfDIMMData *dat, int chunk,
+void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)),
+                        smfDIMMData *dat, int chunk,
                         AstKeyMap *keymap __attribute__((unused)),
-                        smfArray **allmodel, int flags __attribute__((unused)),
-                        int *status) {
+                        smfArray **allmodel, int flags, int *status) {
 
   /* Local Variables */
   size_t bstride;               /* bolo stride */
   double dchisq=0;              /* this - last model residual chi^2 */
+  int dozero=0;                 /* zero boundaries on last iter? */
   int *hitsmap;                 /* Pointer to hitsmap data */
   dim_t i;                      /* Loop counter */
   dim_t idx=0;                  /* Index within subgroup */
@@ -165,6 +166,7 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)), smfDIMMData *d
   double *mapweight = NULL;     /* Weight map */
   double *mapweightsq = NULL;   /* Weight map squared */
   double zero_lowhits=0;        /* Zero regions with low hit count? */
+  int zero_notlast=0;           /* Don't zero on last iteration? */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -190,18 +192,27 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)), smfDIMMData *d
   /* Parse parameters */
 
   /* Will we apply boundary condition to map? */
-  astMapGet0D( kmap, "ZERO_LOWHITS", &zero_lowhits);
+  astMapGet0D( kmap, "ZERO_LOWHITS", &zero_lowhits );
   if( zero_lowhits < 0 ) {
     *status = SAI__ERROR;
     errRep( "", FUNC_NAME ": AST.ZERO_LOWHITS cannot be < 0.", status );
   }
 
+  astMapGet0I( kmap, "ZERO_NOTLAST", &zero_notlast );
+
   if( *status != SAI__OK ) {
     return;
   }
 
-  /* Constrain map to zero around the edge? */
-  if( (*status == SAI__OK) && (zero_lowhits) ) {
+  dozero = 0;
+  if( zero_lowhits ) {
+    if( zero_notlast && (flags&SMF__DIMM_LASTITER) ) dozero = 0;
+    else dozero = 1;
+  }
+
+  /* Constrain map to zero around the edge? We don't if this is the very last
+     iteration if zero_notlast is set. */
+  if( (*status == SAI__OK) && (zero_lowhits) && dozero ) {
     /* Set hits pixels with 0 hits to VAL__BADI so that stats1 ignores them */
     for( i=0; i<dat->msize; i++ ) {
       if( hitsmap[i] == 0 ) {

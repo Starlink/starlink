@@ -355,6 +355,7 @@ static const size_t SMF__BADIDX = (size_t)-1;
 #define SMF__DIMM_FIRSTCOMP 1 /* First component in the solution */
 #define SMF__DIMM_FIRSTITER 2 /* First iteration */
 #define SMF__DIMM_INVERT 4    /* Inverse of the model calculation */
+#define SMF__DIMM_LASTITER 8  /* Is this the last iteration? */
 
 /* Flags for smf_create_smf*, smf_open_file and smf_concat_smfGroup
    Must be individual bits in a single integer
