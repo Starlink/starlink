@@ -369,18 +369,20 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
    if( dcfitbox && (*status == SAI__OK) ) {
 
 /* Identify the first and last samples before/after padding. */
-      smf_get_goodrange( qua, ntslice, 1, SMF__Q_PAD,
+      smf_get_goodrange( qua, ntslice, tstride, SMF__Q_PAD,
                          &itime_start, &itime_end, status );
       pad_start = itime_start;
       pad_end = itime_end;
 
 /* Identify the first and last samples before/after padding and apodization. */
-      smf_get_goodrange( qua, ntslice, 1, SMF__Q_BOUND,
+      smf_get_goodrange( qua, ntslice, tstride, SMF__Q_BOUND,
                          &itime_start, &itime_end, status );
 
 /* Store the number of time slices in the good range. */
       ntime = itime_end - itime_start + 1;
 
+/* Check here for bad status before allocating memory */
+      if( *status != SAI__OK ) return;
 
 #ifdef DEBUG_STEPS
    TimeData *timedata = astMalloc( ntime*sizeof( *timedata ) );
