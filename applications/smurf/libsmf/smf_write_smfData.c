@@ -372,7 +372,7 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
         ubnd[0]=lbnd[0]+ncols-1;
         ubnd[1]=lbnd[1]+ntslice-1;
 
-        id = smf_get_ndfid( loc, "DKSQUID", "WRITE", "UNKNOWN", "_INTEGER",
+        id = smf_get_ndfid( loc, "DKSQUID", "WRITE", "UNKNOWN", "_DOUBLE",
                             2, lbnd, ubnd, status );
 
         ndfMap( id, "DATA", "_DOUBLE", "WRITE", pntr, &nmap, status );
