@@ -44,7 +44,7 @@
 # The following entries parametrise the tau relations
 # of the form
 #
-#   tau_filt = a ( tau_cso - b )
+#   tau_filt = a ( tau_cso + b )
 #
 # Each entry is named for the filter name as we expect
 # the value to depend on the filter not just the
@@ -53,5 +53,5 @@
 
 # Original filters delivered for SCUBA-2. Named "450" and "850".
 
-ext.taurelation.450 = (19.04,0.018)
-ext.taurelation.850 =  (5.36,0.006)
+ext.taurelation.450 = (19.04,-0.018)
+ext.taurelation.850 =  (5.36,-0.006)

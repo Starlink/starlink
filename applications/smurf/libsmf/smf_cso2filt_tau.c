@@ -37,7 +37,7 @@
 *  Notes:
 *     - Returns a value of VAL__BADD if status is set bad on entry
 *     - The tau relation is formulated as:
-*          tau_filt = a ( tau_cso - b )
+*          tau_filt = a ( tau_cso + b )
 *       and the keymap should contain an entry named "taurelation_FILT"
 *       containing "a" and "b".
 *     - The routine will not attempt to guess a tau relation.
@@ -111,7 +111,7 @@ double smf_cso2filt_tau( const smfHead *hdr, double csotau, AstKeyMap * extpars,
 
   /* Now look for the filter */
   if (astMapGet1D( taumap, filter, 2, &nvals, coeffs )) {
-    tau = coeffs[0] * ( csotau - coeffs[1] );
+    tau = coeffs[0] * ( csotau + coeffs[1] );
 
   } else {
     if (*status == SAI__OK) *status = SAI__ERROR;

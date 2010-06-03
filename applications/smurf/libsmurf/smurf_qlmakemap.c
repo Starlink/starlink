@@ -156,7 +156,7 @@
 *          where <FILT> is the filter name and "a" and "b" are the
 *          coefficients for a relationship of the form
 *
-*             tau_filt = a ( tau_cso - b )
+*             tau_filt = a ( tau_cso + b )
 *
 *          A null value will use the default relations. [!]
 
