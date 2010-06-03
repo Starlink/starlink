@@ -283,7 +283,6 @@ smf_resampcube_nn.c \
 smf_reshapendf.c \
 smf_samedims_smfData.c \
 smf_scalar_multiply.c \
-smf_scale_tau.c \
 smf_scanfit.c \
 smf_select_pntr.c \
 smf_set_clabels.c \
