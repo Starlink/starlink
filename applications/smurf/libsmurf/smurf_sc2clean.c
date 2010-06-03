@@ -186,8 +186,6 @@
 #define TASK_NAME "SC2CLEAN"
 
 void smurf_sc2clean( int *status ) {
-
-  size_t aiter;             /* Number of iterations in sigma-clipper */
   smfArray *darks = NULL;   /* Dark data */
   int dkclean;              /* Flag for dark squid cleaning */
   int fillgaps;             /* Flag to do gap filling */
