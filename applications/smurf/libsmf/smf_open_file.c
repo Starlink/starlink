@@ -827,7 +827,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
         /* and dark squids -- we typecast here as a double and store
            in a 3d smfData with the row axis having length 1. */
         if (dksquid) {
-          da->dksquid = smf_create_smfData(SMF__NOCREATE_FILE | 
+          da->dksquid = smf_create_smfData(SMF__NOCREATE_FILE |
                                            SMF__NOCREATE_HEAD |
                                            SMF__NOCREATE_DA, status );
           da->dksquid->dtype = SMF__DOUBLE;
