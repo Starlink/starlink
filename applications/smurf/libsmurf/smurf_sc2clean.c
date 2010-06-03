@@ -38,60 +38,48 @@
 *     Replacing spikes with noise is not yet implemented.
 
 *  ADAM Parameters:
-*     APOD = _INTEGER (Read)
-*          Apodize time series start and end with a Hanning window that rolls
-*          off in APOD samples. [0]
-*     BADFRAC = _DOUBLE (Read)
-*          Fraction of bad samples in order for entire bolometer to be
-*          flagged as bad. [0.0]
-*     DCFITBOX = _INTEGER (Read)
-*          Box size over which to fit data with a straight line on either side
-*          of a potential DC step. [400]
-*     DCLIMCOR = _INTEGER (Read)
-*          Minimum number of bolometers that must have simultaneous steps
-*          in order to trigger step correction at the same time in all
-*          bolometers. [10]
-*     DCMAXSTEPS = _INTEGER (Read)
-*          Maximum steps per min. allower before flagging entire bolo bad. [10]
-*     DCMEDIANWIDTH = _INTEGER (Read)
-*          Width of median filter smooth prior to finding DC jumps. [40]
-*     DCTHRESH = _DOUBLE (Read)
-*          N-sigma threshold at which to detect primary DC steps. [5.0]
-*     DKCLEAN = _LOGICAL (Read)
-*          If true fit and remove dark squid signals. [FALSE]
-*     FILLGAPS = _LOGICAL (Read)
-*          If true fill gaps with constrained realization of noise (e.g.
-*          regions of DC steps, spikes, bad DA samples).
-*     FILT_EDGEHIGH = _DOUBLE (Read)
-*          Apply a hard-edged high-pass filter at this frequency (Hz). [0.0]
-*     FILT_EDGELOW = _DOUBLE (Read)
-*          Apply a hard-edged low-pass filter at this frequency (Hz). [0.0]
-*     FILT_NOTCHHIGH = _DOUBLE (Read)
-*          Array of upper-frequency edges for hard notch filters (Hz). [0.0]
-*     FILT_NOTCHLOW = _DOUBLE (Read)
-*          Array of lower-frequency edges for hard notch filters (Hz). [0.0]
-*     FLAGSTAT = _DOUBLE (Read)
-*          Flag data during slew speeds less than FLAGSTAT (arcsec/sec). [0.0]
+*     CONFIG = GROUP (Read)
+*          Specifies values for the cleaning parameters. If the string
+*          "def" (case-insensitive) or a null (!) value is supplied, a
+*          set of default configuration parameter values will be used.
+*
+*          The supplied value should be either a comma-separated list of
+*          strings or the name of a text file preceded by an up-arrow
+*          character "^", containing one or more comma-separated lists of
+*          strings. Each string is either a "keyword=value" setting, or
+*          the name of a text file preceded by an up-arrow character
+*          "^". Such text files should contain further comma-separated
+*          lists which will be read and interpreted in the same manner
+*          (any blank lines or lines beginning with "#" are
+*          ignored). Within a text file, newlines can be used as
+*          delimiters, as well as commas. Settings are applied in the
+*          order in which they occur within the list, with later
+*          settings over-riding any earlier settings given for the same
+*          keyword.
+*
+*          Each individual setting should be of the form:
+*
+*             <keyword>=<value>
+*
+*          The available parameters are identical to the "CLEANDK.*"
+*          parameter available to the MAKEMAP task with "method=iter".
+*          Default values will be used for any unspecified
+*          parameters. Assigning the value "<def>" (case insensitive)
+*          to a keyword has the effect of reseting it to its default
+*          value. Unrecognised options are ignored (that is, no error
+*          is reported). [current value]
 *     IN = NDF (Read)
 *          Input files to be uncompressed and flatfielded.
 *     MSG_FILTER = _CHAR (Read)
 *          Control the verbosity of the application. Values can be
 *          NONE (no messages), QUIET (minimal messages), NORMAL,
 *          VERBOSE, DEBUG or ALL. [NORMAL]
-*     ORDER = _INTEGER (Read)
-*          Fit and remove polynomial baselines of this order. No
-*          fitting is done if negative. [-1]
 *     OUT = NDF (Write)
 *          Output file(s).
 *     OUTFILES = LITERAL (Write)
 *          The name of text file to create, in which to put the names of
 *          all the output NDFs created by this application (one per
 *          line). If a null (!) value is supplied no file is created. [!]
-*     SPIKEITER = _INTEGER (Read)
-*          If 0 iteratively find spikes until convergence. Otherwise
-*          execute precisely this many iterations. [0]
-*     SPIKETHRESH = _DOUBLE (Read)
-*          Flag spikes SPIKETHRESH-sigma away from the mean. [0.0]
 
 *  Related Applications:
 *     SMURF: SC2FFT
@@ -129,6 +117,9 @@
 *        Added dclimcorr to smf_fix_steps.
 *     2010-05-31 (EC):
 *        Factor heavy lifting out to smf_clean_smfData
+*     2010-06-03 (EC):
+*        -switch to using a config file from many ADAM parameters
+*        -use cleandk.* parameters to clean dark squids
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -187,14 +178,12 @@
 
 void smurf_sc2clean( int *status ) {
   smfArray *darks = NULL;   /* Dark data */
-  int dkclean;              /* Flag for dark squid cleaning */
-  int fillgaps;             /* Flag to do gap filling */
   smfArray *flatramps = NULL;/* Flatfield ramps */
   smfData *ffdata = NULL;   /* Pointer to output data struct */
   Grp *fgrp = NULL;         /* Filtered group, no darks */
   size_t i = 0;             /* Counter, index */
   Grp *igrp = NULL;         /* Input group of files */
-  AstKeyMap *keymap;        /* Keymap for storing cleaning parameters */
+  AstKeyMap *keymap=NULL;   /* Keymap for storing cleaning parameters */
   Grp *ogrp = NULL;         /* Output group of files */
   size_t outsize;           /* Total number of NDF names in the output group */
   size_t size;              /* Number of files in input group */
@@ -230,29 +219,9 @@ void smurf_sc2clean( int *status ) {
        " nothing to do", status );
   }
 
-  /* Place cleaning parameters into a keymap and extract values */
-  keymap = astKeyMap( " " );
-  if( astOK ) {
-    atlGetParam( "APOD", keymap, status );
-    atlGetParam( "BADFRAC", keymap, status );
-    atlGetParam( "DCFITBOX", keymap, status );
-    atlGetParam( "DCMAXSTEPS", keymap, status );
-    atlGetParam( "DCLIMCORR", keymap, status );
-    atlGetParam( "DCMEDIANWIDTH", keymap, status );
-    atlGetParam( "DCTHRESH", keymap, status );
-    parGet0l( "DKCLEAN", &dkclean, status );
-    astMapPut0I( keymap, "DKCLEAN", dkclean, NULL );
-    parGet0l( "FILLGAPS", &fillgaps, status );
-    astMapPut0I( keymap, "FILLGAPS", fillgaps, NULL );
-    atlGetParam( "FILT_EDGEHIGH", keymap, status );
-    atlGetParam( "FILT_EDGELOW", keymap, status );
-    atlGetParam( "FILT_NOTCHHIGH", keymap, status );
-    atlGetParam( "FILT_NOTCHLOW", keymap, status );
-    atlGetParam( "FLAGSTAT", keymap, status );
-    atlGetParam( "ORDER", keymap, status );
-    atlGetParam( "SPIKEITER", keymap, status );
-    atlGetParam( "SPIKETHRESH", keymap, status );
-  }
+  /* Place cleaning parameters into a keymap and set defaults */
+  keymap = kpg1Config( "CONFIG", "$SMURF_DIR/smurf_makemap.def", NULL,
+                       status );
 
   /* Loop over input files */
   if( *status == SAI__OK ) for( i=1; i<=size; i++ ) {
@@ -281,6 +250,32 @@ void smurf_sc2clean( int *status ) {
 
     /* Ensure that the data is ICD ordered before closing */
     smf_dataOrder( ffdata, 1, status );
+
+    /* Similarly, clean the dark squids */
+    if( ffdata->da && ffdata->da->dksquid ) {
+      smfData *dksquid = ffdata->da->dksquid;
+      AstKeyMap *kmap=NULL;
+      dim_t ndata;
+      unsigned char *dkqual=NULL;
+
+      msgOut("", FUNC_NAME ": cleaning dark squids", status);
+
+      /* Temporary quality buffer for dksquid */
+      smf_get_dims( dksquid, NULL, NULL, NULL, NULL, &ndata, NULL, NULL,
+                    status );
+      dkqual = astCalloc( ndata, sizeof(*dkqual), 1 );
+
+      /* also fudge the header so that we can get at JCMTState */
+      dksquid->hdr = ffdata->hdr;
+
+      /* clean darks using cleandk.* parameters */
+      astMapGet0A( keymap, "CLEANDK", &kmap );
+      smf_clean_smfData( wf, dksquid, dkqual, kmap, status );
+      if( kmap ) kmap = astAnnul( kmap );
+
+      /* Set hdr pointer to NULL again so that we don't accidentally close it*/
+      dksquid->hdr = NULL;
+    }
 
     /* Free resources for output data */
     smf_close_file( &ffdata, status );

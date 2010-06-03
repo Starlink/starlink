@@ -74,6 +74,26 @@ order = -1
 spikethresh = 0
 spikeiter = 0
 
+# these are analogous cleaning parameters for dark squids
+
+cleandk.apod = 0
+cleandk.badfrac = 0
+cleandk.dcfitbox = 0
+cleandk.dcmaxsteps = 10
+cleandk.dcthresh = 3.0
+cleandk.dcmedianwidth = 40
+cleandk.dclimcorr = 10
+cleandk.dkclean = 0
+cleandk.fillgaps = 1
+cleandk.filt_edgelow = 0
+cleandk.filt_edgehigh = 0
+cleandk.filt_notchlow = <undef>
+cleandk.filt_notchhigh = <undef>
+cleandk.flagstat = 0
+cleandk.order = -1
+cleandk.spikethresh = 0
+cleandk.spikeiter = 0
+
 # smf_model_create
 
 # TSTEP is read in two locations.

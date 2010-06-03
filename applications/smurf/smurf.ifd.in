@@ -2340,117 +2340,11 @@ package @PACKAGE@ {
         action sc2clean {
             helplib {$SMURF_HELP}
 
-            parameter apod {
-                type _INTEGER
-                vpath {DEFAULT}
-                prompt {Number of samples over which to apodize}
-                default 0
-                helpkey *
-            }
-
-            parameter badfrac {
-                type _DOUBLE
-                vpath {DEFAULT}
-                prompt {Fraction of bad samples to flag entire bolo bad}
-                default 0.0
-                helpkey *
-            }
-
-            parameter dcfitbox {
-                type _INTEGER
-                vpath {DEFAULT}
-                prompt {Size of box (samples) to measure means for DC step-finding}
-                default 400
-                helpkey *
-            }
-
-            parameter dclimcorr {
-                type _INTEGER
-                vpath {DEFAULT}
-                prompt {Minimum number of bolos for a correlated DC jump}
-                default 10
-                helpkey *
-            }
-
-            parameter dcmaxsteps {
-                type _INTEGER
-                vpath {DEFAULT}
-                prompt {Maximum steps per min. allower before flagging entire bolo bad}
-                default 10
-                helpkey *
-            }
-
-            parameter dcmedianwidth {
-                type _INTEGER
-                vpath {DEFAULT}
-                prompt {Width of median filter smooth prior to finding DC jumps}
-                default 40
-                helpkey *
-            }
-
-            parameter dcthresh {
-                type _DOUBLE
-                vpath {DEFAULT}
-                prompt {N-sigma threshold for DC step repair}
-                default 5
-                helpkey *
-            }
-
-            parameter dkclean {
-                type _LOGICAL
-                vpath {DEFAULT }
-                prompt {Fit and remove dark squid signals}
-                ppath GLOBAL CURRENT
-                default FALSE
-                helpkey *
-            }
-
-            parameter fillgaps {
-                type _LOGICAL
-                vpath {DEFAULT }
-                prompt {Replace flagged spikes/steps/bad samples with noise}
-                ppath GLOBAL CURRENT
-                default FALSE
-                helpkey *
-            }
-
-            parameter filt_edgehigh {
-                type _DOUBLE
-                vpath {DEFAULT}
-                prompt {Frequency [Hz] of hard high-pass filter}
-                default 0
-                helpkey *
-            }
-
-            parameter filt_edgelow {
-                type _DOUBLE
-                vpath {DEFAULT}
-                prompt {Frequency [Hz] of hard low-pass filter}
-                default 0
-                helpkey *
-            }
-
-            parameter filt_notchhigh {
-                type _DOUBLE
-                vpath {DEFAULT}
-                prompt {Array of upper-frequency edges [Hz] for notch filters}
-                default 0
-                helpkey *
-            }
-
-            parameter filt_notchlow {
-                type _DOUBLE
-                vpath {DEFAULT}
-                prompt {Array of lower-frequency edges [Hz] for notch filters}
-                default 0
-                helpkey *
-            }
-
-            parameter flagstat {
-                type _DOUBLE
-                vpath {DEFAULT}
-                prompt {Threshold slew velocity [arcsec/sec] to flag stationary}
-                default 0
+            parameter config {
+                type LITERAL
+                access READ
+                ppath CURRENT
+                prompt {Cleaning parameters}
                 helpkey *
             }
 
@@ -2461,14 +2355,6 @@ package @PACKAGE@ {
                 vpath {PROMPT }
                 association <-GLOBAL.DATA_ARRAY
                 prompt {Input timeseries}
-                helpkey *
-            }
-
-            parameter order {
-                type _INTEGER
-                vpath {DEFAULT}
-                prompt {Remove baseline polynomial of order}
-                default -1
                 helpkey *
             }
 
@@ -2488,22 +2374,6 @@ package @PACKAGE@ {
                 default !
                 vpath DEFAULT
                 ppath CURRENT DEFAULT
-                helpkey *
-            }
-
-            parameter spikeiter {
-                type _INTEGER
-                vpath {DEFAULT}
-                prompt {Number of iterations for spike-finder (0=until converge)}
-                default 0
-                helpkey *
-            }
-
-            parameter spikethresh {
-                type _DOUBLE
-                vpath {DEFAULT}
-                prompt {N-sigma threshold for spike-flagger}
-                default 0
                 helpkey *
             }
 
