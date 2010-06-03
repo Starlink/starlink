@@ -203,7 +203,7 @@ void smurf_calcnoise( int *status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Filter out darks */
-  smf_find_science( igrp, &fgrp, 0, &dkgrp, NULL, 1, 1, SMF__NULL, NULL,
+  smf_find_science( igrp, &fgrp, 1, &dkgrp, NULL, 1, 1, SMF__NULL, NULL,
                     &flatramps, status );
 
   /* input group is now the filtered group so we can use that and
