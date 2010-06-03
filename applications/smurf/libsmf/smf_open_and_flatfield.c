@@ -290,9 +290,8 @@ int smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
     msgOutif(MSG__DEBUG," ",
              "Data already flatfielded. Copying to output file ", status);
     if ( *ffdata == NULL ) {
-      /* Don't need the smfFile or smfDA components */
+      /* Don't need the smfFile */
       flags |= SMF__NOCREATE_FILE;
-      flags |= SMF__NOCREATE_DA;
       *ffdata = smf_deepcopy_smfData( data, 0, flags, status );
     } else {
       memcpy( ((*ffdata)->pntr)[0], (data->pntr)[0], npts * sizeof (double) );

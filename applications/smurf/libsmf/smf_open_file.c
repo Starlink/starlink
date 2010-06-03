@@ -204,6 +204,8 @@
  *        Read JCMTSTATE if it is present even for non-3D data.
  *     2010-05-20 (EC):
  *        Store dark squids in a smfData instead of a bare buffer
+ *     2010-06-03 (EC):
+ *        Map the dark squids even if data were already flatfielded
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -427,7 +429,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 
   /* Now we need to create some structures */
   if (flags & SMF__NOCREATE_HEAD) createflags |= SMF__NOCREATE_HEAD;
-  if (isFlat) createflags |= SMF__NOCREATE_DA;
+  if (flags & SMF__NOCREATE_DA) createflags |= SMF__NOCREATE_DA;
 
   /* Allocate memory for the smfData */
   *data = smf_create_smfData( createflags, status );
@@ -546,9 +548,65 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
         if (vexists) {
           ndfMap( indf, "VARIANCE", dtype, mode, &outdata[1], &nout, status );
         }
-
       }
 
+      /* Map the DA information (just dksquid at present) */
+      if ( !(flags & SMF__NOCREATE_DA) && (*data)->da ) {
+        HDSLoc *dkloc=NULL;
+        int dkdims[NDF__MXDIM];
+        smfFile *dkfile=NULL;
+        int dkndims;
+        int dkndf;
+        int dkplace;
+        int nmap;
+        void *pntr[1];
+
+        ndfXstat( indf, "SCUBA2", &itexists, status );
+        if( itexists ) {
+          ndfXloc( indf, "SCUBA2", mode, &dkloc, status );
+          if( (!dkloc) && (*status==SAI__OK) ) {
+            *status = SAI__ERROR;
+            errRep("", FUNC_NAME ": Unable to obtain an HDS locator to the "
+                   "SCUBA2 extension, despite its existence", status);
+          }
+          ndfOpen( dkloc, "DKSQUID", mode, "UNKNOWN", &dkndf, &dkplace, status);
+          if( (dkndf==NDF__NOID) && (*status==SAI__OK) ) {
+            *status = SAI__ERROR;
+            errRep("", FUNC_NAME ": Unable to obtain an NDF identifier for "
+                   "the DKSQUID", status);
+          }
+          ndfDim( dkndf, NDF__MXDIM, dkdims, &dkndims, status );
+          if( (dkndims!=2) && (*status==SAI__OK) ) {
+            *status = SAI__ERROR;
+            errRepf("", FUNC_NAME ": DKSQUID has %i dimensions, should be 2",
+                    status, dkndims);
+          }
+          ndfMap( dkndf, "DATA", "_DOUBLE", mode, pntr, &nmap, status );
+          if(*status == SAI__OK) {
+            da = (*data)->da;
+            da->dksquid = smf_create_smfData( SMF__NOCREATE_HEAD |
+                                              SMF__NOCREATE_DA, status );
+            da->dksquid->pntr[0] = pntr[0];
+
+            da->dksquid->dtype = SMF__DOUBLE;
+            da->dksquid->isTordered = 1;
+            da->dksquid->ndims = 3;
+            da->dksquid->dims[0] = dkdims[0];
+            da->dksquid->dims[1] = 1;
+            da->dksquid->dims[2] = dkdims[1];
+            da->dksquid->lbnd[0] = 0;
+            da->dksquid->lbnd[1] = 0;
+            da->dksquid->lbnd[2] = 1;
+
+            dkfile = da->dksquid->file;
+            dkfile->ndfid = dkndf;
+            dkfile->isSc2store = 0;
+            dkfile->isTstream = 1;
+          }
+        }
+      }
+
+      /* Map the header */
       if ( !(flags & SMF__NOCREATE_HEAD) ) {
 
         /* Read the units and data label */
@@ -766,13 +824,12 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
         if (da->flatpar != NULL) memcpy(da->flatpar, flatpar,
                                         sizeof(*(da->flatpar))* da->nflat);
 
-        /* and dark squid -- this is stored in a 3d smfData with the row
-           axis having length 1. */
+        /* and dark squids -- we typecast here as a double and store
+           in a 3d smfData with the row axis having length 1. */
         if (dksquid) {
-
-          da->dksquid = smf_create_smfData( SMF__NOCREATE_FILE |
-                                            SMF__NOCREATE_HEAD |
-                                            SMF__NOCREATE_DA, status );
+          da->dksquid = smf_create_smfData(SMF__NOCREATE_FILE | 
+                                           SMF__NOCREATE_HEAD |
+                                           SMF__NOCREATE_DA, status );
           da->dksquid->dtype = SMF__DOUBLE;
           da->dksquid->isTordered = 1;
           da->dksquid->ndims = 3;
