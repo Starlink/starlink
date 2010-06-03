@@ -168,6 +168,9 @@ double smf_calc_wvm( const smfHead *hdr, double approxam, int *status ) {
 
       /* convert zenith pwv to zenith tau */
       tau225 = pwv2tau( airmass, pwv );
+
+      /* and correct the calibration */
+      tau225 = tau225 * 1.01 + 0.01;
     }
   }
 
