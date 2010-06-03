@@ -93,7 +93,7 @@ AstKeyMap *kpg1Config( const char *param, const char *def,
 *     paramc = const char * (Given)
 *        The name of the environment parameter to use.
 *     def = const char * (Given)
-*        The path to a file containing the default value for every allowaed config
+*        The path to a file containing the default value for every allowed config
 *        parameter. For instance, "$SMURF_DIR/dimmconfig.def".
 *     nested = AstKeyMap * (Given)
 *        If non-NULL, used to determine which nested keys might be in the config
@@ -370,7 +370,7 @@ static void kpg1Config_CheckNames( AstKeyMap *map1, AstKeyMap *map2, Grp *grp,
    AstObject *obj2;          /* Object pointer obtained from map2 */
    char *match;              /* Pointer to matching string */
    char *up_badname;         /* Upper-case version of badname */
-   char *up_elem;            /* Upper case version of "elem" */
+   char *up_elem = NULL;     /* Upper case version of "elem" */
    char elem[ GRP__SZNAM ];  /* Value of element in "grp" */
    char file[ GRP__SZFNM ];  /* File name from which element was read */
    char re[ 100 ];           /* Regular expression matching an assigment */
