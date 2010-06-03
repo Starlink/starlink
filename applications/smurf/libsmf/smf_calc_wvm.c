@@ -140,9 +140,16 @@ double smf_calc_wvm( const smfHead *hdr, double approxam, int *status ) {
     if ( approxam != VAL__BADD && approxam > 0) {
       airmass = approxam;
     } else {
-      smf_getfitsd( hdr, "AMSTART", &airmass, status );
-      if (airmass == VAL__BADD) {
-        smf_getfitsd( hdr, "AMEND", &airmass, status );
+      double amstart = VAL__BADD;
+      double amend = VAL__BADD;
+      smf_getfitsd( hdr, "AMSTART", &amstart, status );
+      smf_getfitsd( hdr, "AMEND", &amend, status );
+      if (amstart != VAL__BADD && amend != VAL__BADD) {
+        airmass = (amstart + amend) / 2.0;
+      } else if (amstart != VAL__BADD) {
+        airmass = amstart;
+      } else {
+        airmass = amend;
       }
     }
   }
