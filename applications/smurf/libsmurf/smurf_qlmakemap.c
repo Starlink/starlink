@@ -145,6 +145,21 @@
 *          had for the first time slice. For any other system, no such
 *          shifts are applied, even if the base telescope position is
 *          changing through the observation. [TRACKING]
+*     TAUREL = GROUP (Read)
+*          Specifies values to be used for scaling the 225 GHz tau
+*          to the specific filter. These values will only be used if
+*          CSOTAU or WVMRAW methods are used to determine the tau.
+*          The group should have the form:
+*
+*             ext.taurelation.<FILT> = (a,b)
+*
+*          where <FILT> is the filter name and "a" and "b" are the
+*          coefficients for a relationship of the form
+*
+*             tau_filt = a ( tau_cso - b )
+*
+*          A null value will use the default relations. [!]
+
 
 *  Related Applications:
 *     SMURF: MAKEMAP
@@ -245,12 +260,14 @@
 *        Re-paralleize smf_bolonoise as the problem should now be fixed.
 *     2010-01-08 (AGG):
 *        Change BPM to BBM.
+*     2010-06-03 (TIMJ):
+*        Add TAUREL parameter.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research
 *     Council. Copyright (C) 2006-2010 University of British Columbia.
-*     Copyright (C) 2007-2008 Science and Technology Facilities Council.
+*     Copyright (C) 2007-2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -310,6 +327,7 @@ void smurf_qlmakemap( int *status ) {
   smfArray *darks = NULL;    /* Dark data */
   smfData *data = NULL;      /* Pointer to input SCUBA2 data struct */
   char data_units[SMF__CHARLABEL+1]; /* Units string */
+  AstKeyMap *extpars = NULL; /* Tau relation keymap */
   AstFitsChan *fchan = NULL; /* FitsChan holding output NDF FITS extension */
   smfFile *file=NULL;        /* Pointer to SCUBA2 data file struct */
   Grp * fgrp = NULL;         /* Filtered group, no darks */
@@ -381,6 +399,11 @@ void smurf_qlmakemap( int *status ) {
 
   /* Get group of bad bolometer masks and read them into a smfArray */
   smf_request_mask( "BBM", &bbms, status );
+
+  /* Read the tau relations from config file or group. We do not
+     allow sub instrument overloading because these are all values
+     based on filter name. */
+  extpars = kpg1Config( "TAUREL", "$SMURF_DIR/smurf_extinction.def", NULL, status );
 
   /* Get the celestial coordinate system for the output image. */
   parChoic( "SYSTEM", "TRACKING", "TRACKING,FK5,ICRS,AZEL,GALACTIC,"
@@ -499,7 +522,7 @@ void smurf_qlmakemap( int *status ) {
     /* Correct for atmospheric extinction using the mean WVM-derived
        225-GHz optical depth */
     smf_correct_extinction( data, SMF__TAUSRC_WVMRAW, SMF__EXTMETH_SINGLE,
-                            VAL__BADD, NULL, status );
+                            extpars, VAL__BADD, NULL, status );
 
     /* Calculate Noise */
     msgOutif(MSG__VERB, " ", "SMURF_QLMAKEMAP: Measuring Noise",

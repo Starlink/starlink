@@ -14,8 +14,8 @@
 
 *  Invocation:
 *     smf_correct_extinction(smfData *data, smf_tausrc tausrc,
-*                            smf_extmeth method, double tau, double *allextcorr,
-*                            int *status) {
+*                            smf_extmeth method, AstKeyMap * extpars, double tau,
+*                            double *allextcorr, int *status);
 
 *  Arguments:
 *     data = smfData* (Given)
@@ -31,9 +31,16 @@
 *          SMF__EXTMETH_SINGLE: Use single airmass for each time slice.
 *          SMF__EXTMETH_FULL: Calculate airmass for each bolometer.
 *          SMF__EXTMETH_ADAPT: Use FULL only if warranted. Else use FAST.
+*     extpars = AstKeyMap * (Given)
+*        AST keymap containing the parameters required to convert the
+*        tau (on the CSO scale) to the current filter. Must contain
+*        the "taurelation" key which itself will be a keymap
+*        containing the parameters for the specific filter. Currently
+*        only used if we are scaling from CSO or WVM.
 *     tau = double (Given)
-*        Optical depth at 225 GHz. Only used if tausrc is AUTO, TAU or CSOTAU. If
-*        the bad value is used a default value will be used from the header.
+*        Optical depth at 225 GHz or filter wavelength. Only used if tausrc is
+*        AUTO, TAU or CSOTAU. If the bad value is used a default value will be
+*        used from the header.
 *     allextcorr = double* (Given and Returned)
 *        If given, store calculated corrections for each bolo/time slice. Must
 *        have same dimensions as bolos in *data
@@ -153,6 +160,8 @@
 *          uses zero itself.
 *     2010-02-16 (TIMJ):
 *        Add auto mode to use WVM if available else CSO.
+*     2010-06-03 (TIMJ):
+*        Add extinction scaling parameters keymap.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -207,7 +216,7 @@ static int is_large_delta_atau ( double airmass1, double elevation1, double tau,
 #define FUNC_NAME "smf_correct_extinction"
 
 void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method,
-                            double tau, double *allextcorr, int *status) {
+                            AstKeyMap * extpars, double tau, double *allextcorr, int *status) {
 
   /* Local variables */
   double airmass;          /* Airmass */
@@ -349,7 +358,7 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
   /* If we have a CSO Tau then convert it to the current filter. This will also
      convert bad values to a value derived from the header if appropriate. */
   if ( tausrc == SMF__TAUSRC_CSOTAU ) {
-    tau = smf_cso2filt_tau( hdr, tau, status );
+    tau = smf_cso2filt_tau( hdr, tau, extpars, status );
     /* The tau source is now a real tau */
     tausrc = SMF__TAUSRC_TAU;
   }
@@ -455,7 +464,7 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
   /* initialise the tau if we are in WVM mode. Use an intelligent
      default in case we have some bad wvm data at the start.*/
   if (tausrc == SMF__TAUSRC_WVMRAW) {
-    tau = smf_cso2filt_tau( hdr, VAL__BADD, status );
+    tau = smf_cso2filt_tau( hdr, VAL__BADD, extpars, status );
   }
 
   /* Loop over number of time slices/frames */
@@ -497,7 +506,7 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
         newtau = 0;
       }
       if (newtau) {
-        tau = smf_calc_wvm( hdr, amprev, status );
+        tau = smf_calc_wvm( hdr, amprev, extpars, status );
         newtau = 0;
         /* Check status and/or value of tau */
         if ( tau == VAL__BADD ) {

@@ -908,7 +908,6 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
                            "of %g will be used for ALL input files.", status, tau );
                 }
               }
-              kmap = astAnnul( kmap );
 
               /* Trap case where FILTERTAU requsted but no value given */
               if( (tausrc==SMF__TAUSRC_TAU) && (tau==VAL__BADD) ) {
@@ -918,8 +917,11 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
                          status );
               }
 
-              smf_correct_extinction( idata, tausrc, extmeth, tau,
+              smf_correct_extinction( idata, tausrc, extmeth, kmap, tau,
                                       (double *) dataptr, status );
+
+              kmap = astAnnul( kmap );
+
 
             } else if( mtype == SMF__DKS ) {
               int replacebad;

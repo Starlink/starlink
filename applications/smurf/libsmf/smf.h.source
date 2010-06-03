@@ -555,7 +555,7 @@ void smf_calc_telpos( const double obsgeo[3], const char telName[],
 
 float smf_calc_telres( AstFitsChan *hdr, int *status );
 
-double smf_calc_wvm( const smfHead *hdr, double approxam, int *status );
+double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars, int *status );
 
 
 void smf_calcmodel_ast( smfWorkForce *wf, smfDIMMData *dat, int chunk,
@@ -725,7 +725,7 @@ void smf_copytime( struct timeval *target, struct timeval *source,
                    int *status);
 
 void smf_correct_extinction( smfData *data, smf_tausrc tausrc,
-                             smf_extmeth method, double tau,
+                             smf_extmeth method, AstKeyMap * extpars, double tau,
                              double *allextcorr, int *status);
 
 void smf_correct_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
@@ -766,7 +766,7 @@ smfHead* smf_create_smfHead( int * status );
 
 void smf_create_tswcs( smfHead *hdr, AstFrameSet **frameset, int *status );
 
-double smf_cso2filt_tau( const smfHead *hdr, double csotau, int *status);
+double smf_cso2filt_tau( const smfHead *hdr, double csotau, AstKeyMap * extpars, int *status);
 
 void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
                      int autogrid, int usedetpos, AstFrameSet *spacerefwcs,

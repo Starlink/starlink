@@ -82,6 +82,12 @@ spikeiter = 0
 # Also read in smf_calcmodel_com
 # com.gain_box = 6000
 
+# Load the tau relations from a separate config file
+# Also load this before any other "ext" defaults in case
+# they have local overrides for things other than
+# tau relations.
+^$SMURF_DIR/smurf_extinction.def
+
 # We default these to be derived from the FITS headers
 ext.csotau = <undef>
 ext.filtertau = <undef>

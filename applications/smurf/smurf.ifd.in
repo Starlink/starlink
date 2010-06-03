@@ -1009,6 +1009,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter taurel {
+                type LITERAL
+                default !
+                prompt {Group containing tau relationships}
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                helpkey *
+            }
+
             parameter tausrc {
                 position 3
                 type _CHAR
@@ -2133,6 +2142,15 @@ package @PACKAGE@ {
                 ppath CURRENT DEFAULT
                 prompt {Celestial coord system for output map}
                 default TRACKING
+                helpkey *
+            }
+
+            parameter taurel {
+                type LITERAL
+                default !
+                prompt {Group containing tau relationships}
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
                 helpkey *
             }
 

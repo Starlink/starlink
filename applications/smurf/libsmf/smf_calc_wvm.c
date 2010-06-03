@@ -13,7 +13,7 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_calc_wvm( const smfHead *hdr, double approxam, int *status) {
+*     smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars, int *status) {
 
 *  Arguments:
 *     hdr = const smfHead* (Given)
@@ -23,6 +23,11 @@
 *        If the Airmass value stored in the header is bad, this
 *        value is used as an approximation. If it is VAL__BADD
 *        the AMSTART and AMEND headers will be read from the header.
+*     extpars = AstKeyMap * (Given)
+*        AST keymap containing the parameters required to convert
+*        the tau (on the CSO scale) to the current filter. Must
+*        contain the "taurelation" key which itself will be a keymap
+*        containing the parameters for the specific filter.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -57,6 +62,8 @@
 *        Add fallback airmass value in case we have bad TCS data.
 *     2010-01-18 (TIMJ):
 *        Check for bad values in the WVM temperature readings.
+*     2010-06-03 (TIMJ):
+*        Add keymap containing tau scaling parameters.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -105,7 +112,7 @@
 #include "wvm/wvmCal.h"
 #include "wvm/wvmTau.h"
 
-double smf_calc_wvm( const smfHead *hdr, double approxam, int *status ) {
+double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars, int *status ) {
 
   /* Local variables */
   double airmass;           /* Airmass of current observation */
@@ -182,7 +189,7 @@ double smf_calc_wvm( const smfHead *hdr, double approxam, int *status ) {
   }
 
   /* Scale from CSO to filter tau */
-  tau = smf_cso2filt_tau( hdr, tau225, status );
+  tau = smf_cso2filt_tau( hdr, tau225, extpars, status );
 
   /*  printf("A = %g tau225 = %g tau = %g\n",airmass,tau225,tau);*/
 

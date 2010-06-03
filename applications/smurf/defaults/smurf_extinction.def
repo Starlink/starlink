@@ -1,0 +1,57 @@
+#+
+#  Name:
+#     smurf_extinction.def
+
+#  Purpose:
+#     Extinction correction parameters
+
+#  Description
+#     This file contains constants used for handling extinction
+#     correction. The names in these values are not sub-instrument
+#     names but are instead filter names. For SCUBA-2 it so happens that
+#     the first filters to be used were named after the sub-instrument.
+
+#  Notes:
+#     This file is loaded by the map-maker defaults file. It is
+#     separate to make it easier to be loaded into the EXTINCTION
+#     task and in that it differs somewhat from other defaults
+#     used by the map-maker.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 3 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public
+#     License along with this program; if not, write to the Free
+#     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+#     MA 02111-1307, USA
+
+#  Authors:
+#     TIMJ: Tim Jenness (JAC, Hawaii)
+
+#     2010-06-02 (TIMJ):
+#        First version.
+
+#-
+
+# The following entries parametrise the tau relations
+# of the form
+#
+#   tau_filt = a ( tau_cso - b )
+#
+# Each entry is named for the filter name as we expect
+# the value to depend on the filter not just the
+# sub-instrument. For this reason they are not simply
+# implemented as "450.ext.taurelation"
+
+# Original filters delivered for SCUBA-2. Named "450" and "850".
+
+ext.taurelation.450 = (19.04,0.018)
+ext.taurelation.850 =  (5.36,0.006)

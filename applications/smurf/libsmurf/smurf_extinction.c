@@ -69,6 +69,20 @@
 *          The name of text file to create, in which to put the names of
 *          all the output NDFs created by this application (one per
 *          line). If a null (!) value is supplied no file is created. [!]
+*     TAUREL = GROUP (Read)
+*          Specifies values to be used for scaling the 225 GHz tau
+*          to the specific filter. These values will only be used if
+*          CSOTAU or WVMRAW methods are used to determine the tau.
+*          The group should have the form:
+*
+*             ext.taurelation.<FILT> = (a,b)
+*
+*          where <FILT> is the filter name and "a" and "b" are the
+*          coefficients for a relationship of the form
+*
+*             tau_filt = a ( tau_cso - b )
+*
+*          A null value will use the default relations. [!]
 *     TAUSRC = _CHAR (Read)
 *          Source of optical depth data. Options are:
 *          - WVMRAW    - use the Water Vapour Monitor time series data
@@ -216,6 +230,7 @@ void smurf_extinction( int * status ) {
   /* Local Variables */
   smfArray *bbms = NULL;     /* Bad bolometer masks */
   smfArray *darks = NULL;    /* Dark data */
+  AstKeyMap *extpars = NULL; /* Tau relation keymap */
   Grp *fgrp = NULL;          /* Filtered group, no darks */
   smfArray *flatramps = NULL;/* Flatfield ramps */
   int has_been_sky_removed = 0;/* Data are sky-removed */
@@ -260,6 +275,11 @@ void smurf_extinction( int * status ) {
 
   /* Get group of pixel masks and read them into a smfArray */
   smf_request_mask( "BBM", &bbms, status );
+
+  /* Read the tau relations from config file or group. We do not
+     allow sub instrument overloading because these are all values
+     based on filter name. */
+  extpars = kpg1Config( "TAUREL", "$SMURF_DIR/smurf_extinction.def", NULL, status );
 
   /* Get tau source */
   parChoic( "TAUSRC", "Auto",
@@ -325,7 +345,7 @@ void smurf_extinction( int * status ) {
           param = "CSOTAU";
         } else if (tausrc == SMF__TAUSRC_TAU) {
           param = "FILTERTAU";
-          deftau = smf_cso2filt_tau( ohdr, deftau, status );
+          deftau = smf_cso2filt_tau( ohdr, deftau, extpars, status );
         }
         parGdr0d( param, deftau, 0.0,1.0, 1, &tau, status );
       } else if ( tausrc == SMF__TAUSRC_WVMRAW ) {
@@ -340,7 +360,7 @@ void smurf_extinction( int * status ) {
     /* Apply extinction correction - note that a check is made to
        determine whether the data have already been extinction
        corrected */
-    smf_correct_extinction( odata, tausrc, extmeth, tau, NULL, status );
+    smf_correct_extinction( odata, tausrc, extmeth, extpars, tau, NULL, status );
 
     /* Set character labels */
     smf_set_clabels( "Extinction corrected",NULL, NULL, odata->hdr, status);
@@ -364,5 +384,6 @@ void smurf_extinction( int * status ) {
   grpDelet( &igrp, status);
   grpDelet( &ogrp, status);
   if( keymap ) keymap = astAnnul( keymap );
+  if (extpars) extpars = astAnnul( extpars );
   ndfEnd( status );
 }
