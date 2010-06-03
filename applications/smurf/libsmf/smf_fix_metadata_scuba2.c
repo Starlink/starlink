@@ -64,6 +64,9 @@
 *        Fix SHUTTER header for 20100223 fast flatfield ramps.
 *     2010-05-07 (TIMJ):
 *        Correct flatfield ramp heater values for pre-April 2010 data
+*     2010-06-02 (TIMJ):
+*        Calculate STEPTIME from the RTS_END values. The actual steptime
+*        is slightly longer than the requested step time.
 
 *  Copyright:
 *     Copyright (C) 2009-2010 Science & Technology Facilities Council.
@@ -146,6 +149,37 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
     }
     return have_fixed;
   }
+
+  /* Clock jitter and readout efficiencies mean we need to recalculate STEPTIME from the data.
+     This is possible because we know that we have a continuous sequence in each file (unlike
+     ACSIS). */
+  if (hdr->allState) {
+    /* it will be odd if it is not there */
+    size_t nframes = hdr->nframes;
+    double start_time = (hdr->allState)[0].rts_end;
+    double end_time = (hdr->allState)[nframes-1].rts_end;
+    double steptime = VAL__BADD;
+    double newstep;
+
+    smf_getfitsd( hdr, "STEPTIME", &steptime, status );
+
+    /* duration of file in days */
+    newstep = end_time - start_time;
+
+    /* convert to seconds */
+    newstep *= SPD;
+
+    /* Convert to step time */
+    newstep /= (nframes - 1);
+
+    if (steptime != newstep) {
+      msgOutiff( msglev, "", INDENT "Recalculated step time as %g sec from JCMTSTATE (was %g sec)",
+                 status, newstep, steptime);
+      smf_fits_updateD( hdr, "STEPTIME", newstep, NULL, status );
+      have_fixed |= SMF__FIXED_FITSHDR;
+    }
+  }
+
 
   /* Read some FITS headers, intialising the struct first */
   fitsvals.utdate = VAL__BADI;
