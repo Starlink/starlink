@@ -41,7 +41,7 @@
 *     earlier invocations.
 
 *  Copyright:
-*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2009-2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -62,11 +62,14 @@
 
 *  Authors:
 *     DSB: David Berry (JAC, Hawaii)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     16-OCT-2009 (DSB):
 *        Original version.
+*     2010-06-03 (TIMJ):
+*        Trap PAR__NULL from parameter system.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -81,6 +84,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and functions
       INCLUDE 'GRP_PAR'          ! GRP constants
+      INCLUDE 'PAR_ERR'          ! PAR error codes
 
 *  Global Variables:
       INCLUDE 'NDG_COM2'         ! Global GRP history information
@@ -112,8 +116,14 @@
          END IF
 
 * Get the current un-interpreted parameter value.
-         CALL SUBPAR_FINDPAR( PARAM, IPAR, STATUS )
-         CALL SUBPAR_GETNAME( IPAR, GRPEXP, STATUS )
+         IF (STATUS .EQ. SAI__OK) THEN
+            CALL SUBPAR_FINDPAR( PARAM, IPAR, STATUS )
+            CALL SUBPAR_GETNAME( IPAR, GRPEXP, STATUS )
+            IF (STATUS .EQ. PAR__NULL) THEN
+               CALL ERR_ANNUL( STATUS )
+               GRPEXP = ' '
+            END IF
+         END IF
 
 *  Get the control characters used by the group for indirection and
 *  modification.
