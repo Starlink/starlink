@@ -94,6 +94,9 @@
 *        Change type of flatfield method in smfDA
 *     2010-03-11 (TIMJ):
 *        Support flatfield ramps.
+*     2010-06-03 (TIMJ):
+*        Rely on smf_find_science to work out whether we are calculating
+*        noise of darks or skys.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -161,8 +164,6 @@ void smurf_calcnoise( int *status ) {
   Grp * basegrp = NULL;     /* Basis group for output filenames */
   smfArray *concat=NULL;     /* Pointer to a smfArray */
   size_t contchunk;          /* Continuous chunk counter */
-  Grp *dkgrp = NULL;        /* Group of dark frames */
-  size_t dksize = 0;        /* Number of darks found */
   Grp *fgrp = NULL;         /* Filtered group, no darks */
   smfArray * flatramps = NULL; /* Flatfield ramps */
   size_t gcount=0;           /* Grp index counter */
@@ -203,29 +204,19 @@ void smurf_calcnoise( int *status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Filter out darks */
-  smf_find_science( igrp, &fgrp, 0, &dkgrp, NULL, 1, 1, SMF__NULL, NULL,
+  smf_find_science( igrp, &fgrp, 1, NULL, NULL, 1, 1, SMF__NULL, NULL,
                     &flatramps, status );
 
   /* input group is now the filtered group so we can use that and
      free the old input group */
   size = grpGrpsz( fgrp, status );
-  dksize = grpGrpsz( dkgrp, status );
   grpDelet( &igrp, status );
 
-  /* If we have all darks then we assume it's the dark files
-     that we are actually wanting to use for the noise. Otherwise
-     assume that the darks are to be ignored. */
   if (size > 0) {
     igrp = fgrp;
     fgrp = NULL;
-    grpDelet( &dkgrp, status ); /* no longer needed */
   } else {
-    msgOutif( MSG__NORM, " ", TASK_NAME ": Calculating noise properties of darks",
-              status );
-    size = dksize;
-    igrp = dkgrp;
-    dkgrp = NULL;
-    grpDelet( &fgrp, status );
+    msgOutif( MSG__NORM, " ", "No valid frames supplied. Nothing to do.", status );
   }
 
   /* We now need to combine files from the same subarray and same sequence
