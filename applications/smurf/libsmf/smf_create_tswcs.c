@@ -75,8 +75,6 @@
 
 /* SMURF includes */
 #include "libsmf/smf.h"
-#include "sc2da/sc2store_par.h"
-#include "sc2da/sc2store_sys.h"
 #include "sc2da/sc2store.h"
 
 #define FUNC_NAME "smf_create_tswcs"
