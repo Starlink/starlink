@@ -69,7 +69,7 @@
 *          value. Unrecognised options are ignored (that is, no error
 *          is reported). [current value]
 *     IN = NDF (Read)
-*          Input files to be uncompressed and flatfielded.
+*          Input files to be cleaned
 *     MSG_FILTER = _CHAR (Read)
 *          Control the verbosity of the application. Values can be
 *          NONE (no messages), QUIET (minimal messages), NORMAL,
@@ -215,7 +215,7 @@ void smurf_sc2clean( int *status ) {
     kpg1Wgndf( "OUT", igrp, size, size, "More output files required...",
                &ogrp, &outsize, status );
   } else {
-    msgOutif(MSG__NORM, " ","All supplied input frames were DARK,"
+    msgOutif(MSG__NORM, " ","All supplied input frames were filtered,"
        " nothing to do", status );
   }
 
@@ -229,20 +229,12 @@ void smurf_sc2clean( int *status ) {
     /* Open and flatfield in case we're using raw data */
     smf_open_and_flatfield(igrp, ogrp, i, darks, flatramps, &ffdata, status);
 
-    /* Check status to see if data are already flatfielded */
-    if (*status == SMF__FLATN) {
-      errAnnul( status );
-      msgOutif(MSG__VERB," ",
-	     "Data are already flatfielded", status);
-    } else if ( *status == SAI__OK) {
-      msgOutif(MSG__VERB," ", "Flat field applied", status);
-    } else {
-      /* Tell the user which file it was... */
-      /* Would be user-friendly to trap 1st etc... */
-      /*errFlush( status );*/
+    if (*status != SAI__OK) {
+      /* Tell the user which file went bad... */
+      /* Might be user-friendly to trap 1st etc and then continue on... */
       msgSeti("I",i);
       msgSeti("N",size);
-      errRep(FUNC_NAME,	"Unable to flatfield data from file ^I of ^N", status);
+      errRep(FUNC_NAME,	"Error opening from file ^I of ^N", status);
     }
 
     /* Clean the data */
