@@ -148,7 +148,7 @@ void smf_create_tswcs( smfHead *hdr, AstFrameSet **frameset, int *status ){
       times[i] = allState[i].rts_end;
     }
 
-    *frameset = sc2store_timeWcs( subnum, ntime, &telpar, times, status );
+    *frameset = sc2store_timeWcs( subnum, ntime, 0, &telpar, times, status );
 
     /* Clear the time zone information which is irrelevant and we don't know it*/
     if( *status == SAI__OK ) {

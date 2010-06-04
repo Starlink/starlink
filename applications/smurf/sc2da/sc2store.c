@@ -3462,7 +3462,7 @@ int *status                 /* global status (given and returned) */
 
 /* And create a convenience frameset for focal plane and time coordinates */
    oldstat = astWatch( status );
-   wcs = sc2store_timeWcs ( subnum, nframes, telpar,
+   wcs = sc2store_timeWcs ( subnum, nframes, 1, telpar,
                             ((double*)sc2store_ptr[RTS_END]), status );
    ndfPtwcs ( wcs, sc2store_indf, status );
    wcs = astAnnul ( wcs );
@@ -3584,7 +3584,7 @@ int *status                 /* global status (given and returned) */
 
 /*+ sc2store_timeWcs:  Calculate frameset for time series. */
 
-AstFrameSet *sc2store_timeWcs( int subnum, int ntime,
+AstFrameSet *sc2store_timeWcs( int subnum, int ntime, int use_tlut,
                                const SC2STORETelpar* telpar,
                                const double times[], int * status ){
 
@@ -3614,6 +3614,10 @@ AstFrameSet *sc2store_timeWcs( int subnum, int ntime,
 *        Subarray index
 *     ntime = int (Given)
 *        The number of time values supplied in "times".
+*     use_tlut = int (Given)
+*        If true use an accurate LutMap for the time axis. If false
+*        use an approximation via a WinMap. In most cases the WinMap
+*        will be fine assuming the sequence steps are evenly spaced.
 *     telpar = const SC2STORETelpar* (Given)
 *        Additional telescope information needed to flesh out the frameset.
 *     times = const double [] (Given)
@@ -3644,17 +3648,18 @@ AstFrameSet *sc2store_timeWcs( int subnum, int ntime,
 *     30-OCT-2009 (DSB):
 *        Take a deep copy of the FrameSet to avoid changing the cached
 *        FrameSet.
+*     2010-06-03 (TIMJ):
+*        Add use_tlut parameter to indicate that a LutMap should be used
+*        otherwise use a WinMap for speed.
 
 */
 
 /* Local Variables: */
    AstFrameSet *fset;
    AstFrameSet *result;
-   AstLutMap *timemap;
+   double origin = 0.0; /* reference time */
+   AstMapping *timemap;
    AstTimeFrame *timefrm;
-   double tcopy[2];  /* local copy of time lut for when only 1 number present */
-   double *ltimes;  /* pointer to a time array */
-   int malloced = 0; /* did we malloc a ltimes array */
 
 /* Initialise. */
    result = NULL;
@@ -3693,38 +3698,61 @@ AstFrameSet *sc2store_timeWcs( int subnum, int ntime,
 
    }
 
-   malloced = 0;
-   if (ntime == 1) {
-     /* a LutMap needs two numbers in its mapping so double up the
-	first time if we only have one value. */
-     tcopy[0] = times[0];
-     tcopy[1] = times[1];
-     ltimes = tcopy;
-     ntime = 2;
-   } else {
-     double origin = 0.0; /* reference time */
-     int i;
-     /* copy values and remove integer part of day */
-     ltimes = malloc( sizeof(*ltimes) * ntime );
-     if (ltimes) malloced = 1;
-     origin = floor( times[0] );
-     for (i = 0; i < ntime; i++ ) {
-       ltimes[i] = times[i] - origin;
-     }
-     astSetD(timefrm, "TimeOrigin", origin);
+   /* Calculate an origin for the time frame */
+   origin = floor(times[0]);
+   astSetD(timefrm, "TimeOrigin", origin);
 
-     /* We would like to use iso.0 for anything that is longer than 10 seconds (say)
-       else use iso.3 because can not take spectra faster than 0.005 second. */
-     if ( (ltimes[ntime-1] - ltimes[0]) < (10.0 / SC2AST_SPD) ) {
-       astSet(timefrm, "format=iso.3");
+   /* And set the formatting */
+   /* We would like to use iso.0 for anything that is longer than 10 seconds (say)
+      else use iso.3 because can not take spectra faster than 0.005 second. */
+   astSet(timefrm, "format=iso.0");
+   if ( ntime > 1 && (times[ntime-1] - times[0]) < (10.0 / SC2AST_SPD) ) {
+     astSet(timefrm, "format=iso.3");
+   }
+
+   /* Now we need to create the mapping. Use a LutMap if we have been requested
+      or if we only have one point. */
+   if (use_tlut || ntime == 1) {
+     double *ltimes = NULL; /* pointer to a time array */
+     int malloced = 0;      /* did we malloc a ltimes array */
+     double tcopy[2];       /* local copy of time lut for when only 1 number present */
+
+     if (ntime == 1) {
+       /* a LutMap needs two numbers in its mapping so double up the
+          first time if we only have one value. */
+       tcopy[0] = times[0] - origin;
+       tcopy[1] = tcopy[0];
+       ltimes = tcopy;
+       ntime = 2;
      } else {
-       astSet(timefrm, "format=iso.0");
+       int i;
+       /* copy values and remove integer part of day */
+       ltimes = malloc( sizeof(*ltimes) * ntime );
+       if (ltimes) malloced = 1;
+       origin = floor( times[0] );
+       for (i = 0; i < ntime; i++ ) {
+         ltimes[i] = times[i] - origin;
+       }
      }
+     timemap = (AstMapping*)astLutMap( ntime, ltimes, 1.0, 1.0, " " );
+
+     if (malloced) free( ltimes );
+   } else {
+     /* Use a winmap for speed. Assume PIXEL coordinates go from 1 -> N
+        and assume that we have a single sequence with no gaps. */
+     double ina[1];
+     double inb[1];
+     double outa[1];
+     double outb[1];
+
+     ina[0] = 1;
+     inb[0] = ntime;
+     outa[0] = times[0] - origin;
+     outb[0] = times[ntime-1] - origin;
+
+     timemap = (AstMapping*)astWinMap( 1, ina, inb, outa, outb, " " );
 
    }
-   timemap = astLutMap( ntime, ltimes, 1.0, 1.0, " " );
-
-   if (malloced) free( ltimes );
 
 /* Now append the time axis to every Frame in the FrameSet, except for the base Frame,
    which receives an extra grid axis instead. */

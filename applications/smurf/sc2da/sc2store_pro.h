@@ -347,6 +347,7 @@ AstFrameSet *sc2store_timeWcs
 (
 int subnum,                   /* Subarray index */
 int ntime,                    /* The number of time values supplied */
+int use_tlut,                 /* Use a LutMap else use WinMap */
 const SC2STORETelpar* telpar, /* Additional telescope information */
 const double times[],         /* ntime MJD values (TAI timescale) */
 int * status                  /* global status (given and returned) */
