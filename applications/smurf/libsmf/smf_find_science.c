@@ -369,8 +369,9 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
     }
   }
 
-  /* no need to do any more if neither darks nor darkgrp are defined */
-  if (dkcount > 0 && (darks || darkgrp) ) {
+  /* no need to do any more if neither darks nor darkgrp are defined or we might
+     be wanting to revert to darks. */
+  if (dkcount > 0 && (darks || darkgrp || reverttodark ) ) {
     smfArray * array = NULL;
 
     /* sort darks into order */
@@ -419,6 +420,9 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
        flatgrp and darkgrp to NULL. This is to handle cases where we
        want to process data taken in the dark like normal science
        data. To activate this behaviour set reverttodark */
+
+    msgOutiff( MSG__NORM, "", "Treating the dark%s as science data",
+               status, ( dkcount > 1 ? "s" : "" ) );
 
     *outgrp = dgrp;
 
