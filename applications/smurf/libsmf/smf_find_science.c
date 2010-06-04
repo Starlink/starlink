@@ -499,12 +499,12 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
 }
 
 
-/* Routine to put info from smfData into a sort struct. "index" is the index
+/* Routine to put info from smfData into a sort struct. "this_index" is the index
    in the input group. "counter" is the current position to use to store
    the item. Returns the next index to be used (ie updated counter). */
 
 size_t
-smf__addto_sortinfo ( const smfData * indata, smfSortInfo allinfo[], size_t index,
+smf__addto_sortinfo ( const smfData * indata, smfSortInfo allinfo[], size_t this_index,
                       size_t counter, const char * type, int *status ) {
   smfSortInfo * sortinfo = NULL;
 
@@ -517,7 +517,7 @@ smf__addto_sortinfo ( const smfData * indata, smfSortInfo allinfo[], size_t inde
   smf_find_dateobs( indata->hdr, &(sortinfo->mjd), NULL, status );
   msgOutiff(MSG__DEBUG, " ", "%s file: %s",status,
             type, indata->file->name);
-  sortinfo->index = index;
+  sortinfo->index = this_index;
   counter++;
   return counter;
 }
