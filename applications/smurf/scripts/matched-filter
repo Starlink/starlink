@@ -71,9 +71,11 @@
 #       - Account for bad pixels when correcting for the total data sum
 #         in the psf (by setting the new CONVOLVE parameter "NORM" to FALSE).
 #    2010-5-27 (DSB):
-#       - When creating a PSF that will later be smoothed to remove backgrounds, 
-#         create the PSF with the required final size, rather than creating it 
+#       - When creating a PSF that will later be smoothed to remove backgrounds,
+#         create the PSF with the required final size, rather than creating it
 #         small and then padding it with zeros.
+#    2010-6-7 (DSB):
+#       - Copy the input NDF data units to the output NDF.
 
 #  Copyright:
 #     Copyright (C) 2010 Science & Technology Facilities Council.
@@ -152,6 +154,9 @@ set out = "$dir/$base"
 # is a spatial axis, and that pixels are square.
 $KAPPA_DIR/ndftrace $in fullframe quiet
 set insize = `$KAPPA_DIR/parget fpixscale\(1\) ndftrace`
+
+# Get the input data units.
+set units = `$KAPPA_DIR/parget units ndftrace`
 
 # If a background fwhm was given on the command line, convert it
 # from arc-sec to input pixels, and double it (we will use 2*FWHM as the
@@ -334,6 +339,9 @@ $KAPPA_DIR/div in1=mf_a in2=mf_b out=$out
 # The variance in the output image is the reciprocal of B.
 $KAPPA_DIR/maths exp="1/IA" ia=mf_b out=mf_temp5
 $KAPPA_DIR/setvar ndf=$out from=mf_temp5 comp=data
+
+# Copy the input NDF units to the output NDF.
+$KAPPA_DIR/setunits $out \'$units\'
 
 #  Clean up.
 rm -f mf_in.sdf mf_psf2.sdf mf_temp1.sdf mf_temp2.sdf mf_temp3.sdf \
