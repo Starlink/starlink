@@ -287,6 +287,9 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *     27-FEB-2010 (DSB):
 *        - Make astQuadApprox faster, and fix a bug in the calculation of
 *        the matrix.
+*     7-JUN-2010 (DSB):
+*        In the KERNEL_<x>D rebinning macros, correct the test for the
+*        central point being outside the bounds of the output image.
 *class--
 */
 
@@ -17324,7 +17327,7 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
 /* Obtain the x coordinate of the current point and test if it is bad. \
    Also test that the central point falls within the output array. */ \
       x = coords[ 0 ][ point ]; \
-      ix = (int) floor( x ); \
+      ix = (int) floor( x + 0.5 ); \
       if( ix < lbnd_out[ 0 ] || ix > ubnd_out[ 0 ] ) bad = 1; \
       bad = bad || ( x == AST__BAD ); \
 \
@@ -17487,14 +17490,14 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
 /* Obtain the x coordinate of the current point and test if it is bad. \
    Also test that the central point falls within the output array. */ \
       x = coords[ 0 ][ point ]; \
-      ix = (int) floor( x ); \
+      ix = (int) floor( x + 0.5 ); \
       if( ix < lbnd_out[ 0 ] || ix > ubnd_out[ 0 ] ) bad = 1; \
       bad = bad || ( x == AST__BAD ); \
       if ( !bad ) { \
 \
 /* Similarly obtain and test the y coordinate. */ \
          y = coords[ 1 ][ point ]; \
-         iy = (int) floor( y ); \
+         iy = (int) floor( y + 0.5 ); \
          if( iy < lbnd_out[ 1 ] || iy > ubnd_out[ 1 ] ) bad = 1; \
          bad = bad || ( y == AST__BAD ); \
          if ( !bad ) { \
@@ -17750,7 +17753,7 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
 \
 /* Test if the coordinate is bad. If true, the corresponding output pixel \
    value will be bad, so give up on this point. */ \
-            ix = (int) floor( xn ); \
+            ix = (int) floor( xn + 0.5 ); \
             if( ix < lbnd_out[ idim ] || ix > ubnd_out[ idim ] ) bad = 1; \
             bad = bad || ( xn == AST__BAD ); \
             if ( bad ) break; \
