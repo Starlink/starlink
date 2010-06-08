@@ -51,6 +51,8 @@
 *        Added SMF__PLN
 *     2010-05-27 (TIMJ):
 *        Add SMF__SMO
+*     2010-06-08 (EC):
+*        Add SMF__TWO
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -134,6 +136,10 @@ smf_calcmodelptr smf_model_getptr( smf_modeltype type, int *status) {
 
   case SMF__SMO:
     retval = (smf_calcmodelptr) &smf_calcmodel_smo;
+    break;
+
+  case SMF__TWO:
+    retval = (smf_calcmodelptr) &smf_calcmodel_two;
     break;
 
   default:

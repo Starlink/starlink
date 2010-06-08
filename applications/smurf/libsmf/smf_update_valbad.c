@@ -61,10 +61,12 @@
 *       - handle iterative map-maker model components by supplying external
 *         quality array and dimensions
 *       - handle multiple data types
+*     2010-06-08 (EC):
+*        Add SMF__TWO
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008-2009 University of British Columbia.
+*     Copyright (C) 2008-2010 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -208,6 +210,18 @@ void smf_update_valbad( smfData *data, smf_modeltype mtype, unsigned char *qual,
          mode signal in each detector. See smf_model_create. */
       smf_get_dims( data, NULL, NULL, &nbolo, &ntslice, NULL, &bstride,
                     &tstride, status );
+      break;
+
+    case SMF__TWO:
+      /* Each of two time-series components followed by nbolo
+         coeffs. See smf_model_create. This one is tricky and can't be
+         done using the same method as other model components. Just
+         generate a warning message and return for now. */
+
+      msgOutif( MSG__VERB, "", FUNC_NAME
+                ": Don't currently handle TWO model components.",
+              status );
+      goto CLEANUP;
       break;
 
     default:

@@ -37,6 +37,8 @@
 *  History:
 *     2010-05-19 (EC):
 *        Initial Version
+*     2010-06-08 (EC):
+*        Add SMF__TWO
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -91,6 +93,10 @@ smf_expmodelptr smf_model_getexpptr( smf_modeltype type, int *status) {
 
   case SMF__DKS:
     retval = (smf_expmodelptr) &smf_expmodel_dks;
+    break;
+
+  case SMF__TWO:
+    retval = (smf_expmodelptr) &smf_expmodel_two;
     break;
 
   default:

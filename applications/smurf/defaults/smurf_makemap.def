@@ -28,6 +28,8 @@
 #        Original version.
 #     2010-05-12 (DSB):
 #        Added com.gain_is_one
+#     2010-06-08 (EC):
+#        Added two.amap, two.bmap
 
 #-
 
@@ -191,3 +193,8 @@ pln.notfirst = 0
 
 smo.notfirst = 0
 smo.boxcar = 2000
+
+# Two component common-mode
+
+two.amap = <undef>
+two.bmap = <undef>

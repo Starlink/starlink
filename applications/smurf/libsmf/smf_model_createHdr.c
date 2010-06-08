@@ -65,6 +65,8 @@
 *        dimensions for time series cube to FITS header.
 *     2010-05-27 (TIMJ):
 *        Add SMF__SMO
+*     2010-06-08 (EC):
+*        Add SMF__TWO
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -206,6 +208,11 @@ void smf_model_createHdr( smfData *model, smf_modeltype type,
 
     case SMF__SMO:
       fset = astCopy( refwcs );
+      break;
+
+    case SMF__TWO:
+      /* Don't know how to make a particularly meaningful framset */
+      fset = NULL;
       break;
 
     default:

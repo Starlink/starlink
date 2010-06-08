@@ -190,6 +190,8 @@
 *        Replacing dead dark squids with average is optional (dks.replacebad)
 *     2010-05-28 (TIMJ):
 *        Add SMO smoothing model
+*     2010-06-08 (EC):
+*        Add TWO component model
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -730,6 +732,28 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
             }
             break;
 
+          case SMF__TWO: /* TWO-component common-mode */
+            head.data.dtype = SMF__DOUBLE;
+            head.data.ndims = 2;
+            /* Each component is stored as a single vector: the time
+               series for the component followed by the nbolo
+               coefficients */
+            if( isTordered ) { /* T is 3rd axis if time-ordered */
+              head.data.dims[0] = (idata->dims)[2] +
+                (idata->dims)[0]*(idata->dims)[1];
+            } else {           /* T is 1st axis if bolo-ordered */
+              head.data.dims[0] = (idata->dims)[0] +
+                (idata->dims)[1]*(idata->dims)[2];
+            }
+
+            /* The second axis is length 2, for the two components */
+            head.data.dims[1] = 2;
+
+            smf_set_clabels( "Two Component Common-mode", "Value", "",
+                             &head.hdr, status );
+            break;
+
+
           default:
             *status = SAI__ERROR;
             msgSetc( "TYPE", smf_model_getname(mtype, status) );
@@ -958,6 +982,58 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
                 }
               }
 
+            } else if( mtype == SMF__TWO ) {
+              smfData *gdata=NULL;
+              Grp *ggrp=NULL;
+              double *gptr1=NULL;
+              double *gptr2=NULL;
+              const char *amapname = NULL;
+              const char *bmapname = NULL;
+
+              /* Load in gains from external files, setting un-defined values
+                 to VAL__BADD */
+
+              astMapGet0A( keymap, "TWO", &kmap );
+              astMapGet0C( kmap, "AMAP", &amapname );
+              astMapGet0C( kmap, "BMAP", &bmapname );
+              kmap = astAnnul( kmap );
+
+              smf_get_dims( idata, NULL, NULL, &nbolo, &ntslice, NULL,
+                            NULL, NULL, status);
+
+              ggrp = grpNew( "Gain Images", status );
+              grpPut1( ggrp, amapname, 0, status );
+              grpPut1( ggrp, bmapname, 0, status );
+
+              /* First gain map */
+              smf_open_file( ggrp, 1, "READ", 0, &gdata, status );
+              gptr1 = dataptr;
+              gptr1 += ntslice;
+              gptr2 = gdata->pntr[0];
+              for( k=0; k<nbolo; k++ ) {
+                if( gptr2[k] == 0 ) {
+                  gptr1[k] = VAL__BADD;
+                } else {
+                  gptr1[k] = gptr2[k];
+                }
+              }
+              smf_close_file( &gdata, status );
+
+              /* Second gain map */
+              smf_open_file( ggrp, 2, "READ", 0, &gdata, status );
+              gptr1 = dataptr;
+              gptr1 += ntslice + nbolo + ntslice;
+              gptr2 = gdata->pntr[0];
+              for( k=0; k<nbolo; k++ ) {
+                if( gptr2[k] == 0 ) {
+                  gptr1[k] = VAL__BADD;
+                } else {
+                  gptr1[k] = gptr2[k];
+                }
+              }
+              smf_close_file( &gdata, status );
+
+              grpDelet( &ggrp, status );
             } else {
               /* otherwise zero the buffer */
               memset( dataptr, 0, datalen );

@@ -59,6 +59,8 @@
 *        Don't fail on SMF__AST (but don't add more memory)
 *     2010-05-27 (TIMJ):
 *        Add SMF__SMO model.
+*     2010-06-08 (EC):
+*        Add SMF__TWO model.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -223,6 +225,11 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
           break;
         case SMF__SMO:
           total += nsamp*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
+          break;
+        case SMF__TWO:
+          /* two common-mode time series and coefficients for all the
+             detectors */
+          total += 2*(ndet+maxlen)*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
           break;
         case SMF__AST:
           /* Already accounted for as static memory usage above */

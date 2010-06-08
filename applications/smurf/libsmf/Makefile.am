@@ -43,6 +43,7 @@ smf_calcmodel_gai.c \
 smf_calcmodel_noi.c \
 smf_calcmodel_pln.c \
 smf_calcmodel_smo.c \
+smf_calcmodel_two.c \
 smf_check_detpos.c \
 smf_check_flat.c \
 smf_check_quality.c \
@@ -118,6 +119,7 @@ smf_dtype_sz.c \
 smf_dump_smfData.c \
 smf_expand_tilegroup.c \
 smf_expmodel_dks.c \
+smf_expmodel_two.c \
 smf_expmodel_init.c \
 smf_ext2km.c \
 smf_extracols.c \
