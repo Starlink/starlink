@@ -47,9 +47,15 @@ dnl   Starlink set.
 common_built_drivers="exdriv.lo pgdriv.lo cadriv.lo hgdriv.lo lxdriv.lo ppdriv.lo vtdriv.lo gidriv.lo hidriv.lo psdriv.lo ttdriv.lo cwdriv.lo gldriv.lo nedriv.lo wddriv.lo hpdriv.lo lsdriv.lo nudriv.lo qmdriv.lo vadriv.lo cgdriv.lo nexsup.lo rvdriv.lo x2driv.lo xmdriv.lo figdisp_comm.lo pgxwin.lo tkdriv.lo pkdriv.lo xadriv.lo"
 
 dnl   Make sure that X libs are included in tests.
-dnl   Apple puts libpng in the X11 distribution
+dnl   Apple puts libpng in the X11 distribution.
+dnl   Oddly gcc and cpp (in Snow Leopard) know how to find X11 include
+dnl   files without being told.  This means that the standard
+dnl   configure test does not both adding any include directories for
+dnl   X. This is unfortunate because PNG is sitting there but does not
+dnl   have the magical <X11/...> prefix to give cpp a hint.  We add
+dnl   the path here on the basis that it won't hurt anyone else.
 LIBS="$LIBS $X_LIBS"
-CPPFLAGS="$CPPFLAGS $X_CFLAGS"
+CPPFLAGS="$CPPFLAGS $X_CFLAGS -I/usr/X11/include"
 
 dnl   Add the png driver if the PNG header and library are available.
 AC_CHECK_HEADER(png.h,
