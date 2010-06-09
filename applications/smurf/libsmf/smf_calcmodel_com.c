@@ -151,6 +151,8 @@
 *        GAIN_BOX.
 *        - Speed up this function by only re-calculating gains and offsets
 *        for blocks that have not already converged.
+*     2010-06-09 (DSB):
+*        - If com.gain_is_one is set, force gains to unity on iteration 1.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -271,6 +273,7 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
   struct timeval tv1;      /* Timers */
   struct timeval tv2;      /* Timers */
 
+
   if( *status != SAI__OK ) return;
 
   /* Pointer to the data that this thread will process */
@@ -383,7 +386,7 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
       if( gai_data ) {
          ijindex = j*gbstride;
          for( i = 0; i < nblock; i++ ) {
-           gai_data[ ijindex ] = gain;      /* Gain */
+           gai_data[ ijindex ] = nogains ? 1.0 : gain;      /* Gain */
            gai_data[ ijindex + nblock*gcstride ] = 0.0;      /* Offset */
            gai_data[ ijindex + 2*nblock*gcstride ] = 1.0;      /* Correlation */
            ijindex += gcstride;
