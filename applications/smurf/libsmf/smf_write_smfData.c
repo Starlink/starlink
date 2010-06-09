@@ -48,12 +48,13 @@
 *     appropriate. smfDA will be ignored.
 
 *  Notes:
-*     Will not write Data Acquisition information. If time-series WCS
-*     information is in the header, it is assumed to be consistent with
-*     the data array. If a JCMTState array is present, it can only be written
-*     if the number of time slices can be determined. ntslices is assumed
-*     to be the length of the only axis if data is 1-d, and the length of the
-*     3rd axis for 3d data (ICD format).
+*     Will write out dark squids if present. If time-series WCS
+*     information is in the header, it is assumed to be consistent
+*     with the data array. If a JCMTState array is present, it can
+*     only be written if the number of time slices can be
+*     determined. ntslices is assumed to be the length of the only
+*     axis if data is 1-d, and the length of the 3rd axis for 3d data
+*     (ICD format).
 *
 *     It is an error for both "grp" and "filename" to be NULL.
 
