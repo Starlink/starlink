@@ -46,6 +46,8 @@
 *  History:
 *     2010-05-19 (EC):
 *        Initial version
+*     2010-06-9 (DSB):
+*        Guard against null idata pointers.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -126,7 +128,7 @@ void smurf_sc2expandmodel( int *status ) {
     smf_open_file(igrp, i, "READ", 0, &idata, status);
 
     /* Check to see if this is a DIMM model component before expanding */
-    if( idata->hdr && (idata->hdr->mtype != SMF__NUL) ) {
+    if( idata && idata->hdr && (idata->hdr->mtype != SMF__NUL) ) {
       expptr = smf_model_getexpptr( idata->hdr->mtype, status );
 
       if( *status == SAI__OK ) {
