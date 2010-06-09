@@ -215,7 +215,8 @@ void smf_calcmodel_two( smfWorkForce *wf __attribute__((unused)),
     /* Geta pointer to the QUAlity array */
     qua_data = (qua->sdata[idx]->pntr)[0];
 
-    /* Identify the range of data that should be fit using SMF__Q_BOUND */
+    /* Identify the range of data for chi^2 calc using SMF__Q_BOUND (i.e.
+       exclude the apodized region) */
     if( qua ) {
       smf_get_goodrange( qua_data, ntslice, tstride, SMF__Q_BOUND, &jf1, &jf2,
                          status );
@@ -225,7 +226,9 @@ void smf_calcmodel_two( smfWorkForce *wf __attribute__((unused)),
     }
     nfit = jf2-jf1+1;
 
-    /* Total total range only using SMF__Q_PAD */
+    /* Total range using SMF__Q_PAD to avoid causing discontinuities when
+       we fit/remove two-component common-mode (i.e. include apodized
+       region) */
     if( qua ) {
       smf_get_goodrange( qua_data, ntslice, tstride, SMF__Q_PAD, &jt1, &jt2,
                          status );
@@ -261,7 +264,7 @@ void smf_calcmodel_two( smfWorkForce *wf __attribute__((unused)),
             /* Continue if the bolo is OK */
             if( !(qua_data[index]&SMF__Q_BADB) && (coeff[j]!=VAL__BADD) ) {
 
-              for( k=jf1; k<=jf2; k++ ) {
+              for( k=jt1; k<=jt2; k++ ) {
                 if( (res_data[index+k*tstride]!=VAL__BADD) &&
                     (comp[k]!=VAL__BADD) ) {
                   res_data[index+k*tstride] += comp[k]*coeff[j];
@@ -341,6 +344,29 @@ void smf_calcmodel_two( smfWorkForce *wf __attribute__((unused)),
           }
           compa[i] = alpha*v1 + beta*v2;
           compb[i] = beta*v1 + gamma*v2;
+        }
+
+        /* Now remove model from the residual. Loop over component */
+        for( i=0; (*status==SAI__OK)&&(i<2); i++ ) {
+
+          /* get pointer to component time series and bolo coeffs */
+          comp = model_data;
+          comp += i*(ntslice+nbolo);
+          coeff = comp + ntslice;
+
+          /* Loop over bolometer */
+          for( j=0; (*status==SAI__OK)&&(j<nbolo); j++ ) {
+
+            /* index to start of the j bolo time series in data */
+            index = j*bstride;
+
+            /* Continue if the bolo is OK */
+            if( !(qua_data[index]&SMF__Q_BADB) ) {
+              for( k=jt1; k<=jt2; k++ ) {
+                res_data[index+k*tstride] -= comp[k]*coeff[j];
+              }
+            }
+          }
         }
       }
 
