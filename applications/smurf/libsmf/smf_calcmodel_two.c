@@ -240,27 +240,27 @@ void smf_calcmodel_two( smfWorkForce *wf __attribute__((unused)),
       errRep("", FUNC_NAME ": Null data in inputs", status);
     } else {
 
-      /* Loop over component */
-      for( i=0; (*status==SAI__OK)&&(i<2); i++ ) {
+      /* If this isn't first iteration, put the previous iteration
+         back into the signal */
+      if( !(flags&SMF__DIMM_FIRSTITER) ) {
 
-        /* get pointer to component time series and bolo coeffs */
-        comp = model_data;
-        comp += i*(ntslice+nbolo);
-        coeff = comp + ntslice;
+        /* Loop over component */
+        for( i=0; (*status==SAI__OK)&&(i<2); i++ ) {
 
-        /* Loop over bolometer */
-        for( j=0; (*status==SAI__OK)&&(j<nbolo); j++ ) {
+          /* get pointer to component time series and bolo coeffs */
+          comp = model_data;
+          comp += i*(ntslice+nbolo);
+          coeff = comp + ntslice;
 
-          /* index to start of the j bolo time series in data */
-          index = j*bstride;
+          /* Loop over bolometer */
+          for( j=0; (*status==SAI__OK)&&(j<nbolo); j++ ) {
 
-          /* Continue if the bolo is OK */
-          if( !(qua_data[index]&SMF__Q_BADB) && (coeff[j]!=VAL__BADD) ) {
+            /* index to start of the j bolo time series in data */
+            index = j*bstride;
 
-            /* If this isn't first iteration, put the previous iteration
-               back into the signal */
+            /* Continue if the bolo is OK */
+            if( !(qua_data[index]&SMF__Q_BADB) && (coeff[j]!=VAL__BADD) ) {
 
-            if( !(flags&SMF__DIMM_FIRSTITER) ) {
               for( k=jf1; k<=jf2; k++ ) {
                 if( (res_data[index+k*tstride]!=VAL__BADD) &&
                     (comp[k]!=VAL__BADD) ) {
