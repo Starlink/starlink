@@ -317,20 +317,15 @@ void smurf_sc2clean( int *status ) {
       if (size > 1 && i != size) errFlush(status);
     }
 
-    /* Clean the data */
-    smf_clean_smfData( wf, ffdata, NULL, keymap, status );
-
-    /* Ensure that the data is ICD ordered before closing */
-    smf_dataOrder( ffdata, 1, status );
-
-    /* Similarly, clean the dark squids */
+    /* clean the dark squids now since we might need to use them
+       to clean the bolometer data */
     if( ffdata && ffdata->da && ffdata->da->dksquid ) {
       smfData *dksquid = ffdata->da->dksquid;
       AstKeyMap *kmap=NULL;
       dim_t ndata;
       unsigned char *dkqual=NULL;
 
-      msgOut("", FUNC_NAME ": cleaning dark squids", status);
+      msgOut("", TASK_NAME ": cleaning dark squids", status);
 
       /* Temporary quality buffer for dksquid */
       smf_get_dims( dksquid, NULL, NULL, NULL, NULL, &ndata, NULL, NULL,
@@ -349,6 +344,14 @@ void smurf_sc2clean( int *status ) {
       /* Set hdr pointer to NULL again so that we don't accidentally close it*/
       dksquid->hdr = NULL;
     }
+
+    msgOut("", TASK_NAME ": cleaning bolometer data", status );
+
+    /* Clean the data */
+    smf_clean_smfData( wf, ffdata, NULL, keymap, status );
+
+    /* Ensure that the data is ICD ordered before closing */
+    smf_dataOrder( ffdata, 1, status );
 
     /* Free resources for output data */
     smf_close_file( &ffdata, status );
