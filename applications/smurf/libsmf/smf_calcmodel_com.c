@@ -153,7 +153,10 @@
 *        for blocks that have not already converged.
 *     2010-06-09 (DSB):
 *        - If com.gain_is_one is set, force gains to unity on iteration 1.
-*     {enter_further_changes_here}
+*     2010-06-10 (DSB):
+*        Use smf_tophat1D to smooth the common mode, rather than
+*        smf_boxcar1D (which can result in dicontinuities at the start
+*        and end of the smoothed common mode).
 
 *  Copyright:
 *     Copyright (C) 2006-2010 University of British Columbia.
@@ -1110,7 +1113,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     if( do_boxcar ) {
       /* Do the smooth */
 
-      smf_boxcar1D( model_data, ntslice, boxcar, NULL, 0, status );
+      smf_tophat1D( model_data, ntslice, boxcar, NULL, 0, status );
     }
 
 

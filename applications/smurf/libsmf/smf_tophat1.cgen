@@ -1,0 +1,212 @@
+/*+
+*  Name:
+*     smf_tophat1<X>
+
+*  Purpose:
+*     Smoothes a 1-D array with a top-hat filter.
+
+*  Language:
+*     Starlink ANSI C
+
+*  Type of Module:
+*     Subroutine
+
+*  Invocation:
+*     void smf_tophat1<X>( CGEN_TYPE *data, int nel,
+*                          int box, unsigned char *qual,
+*                          unsigned char mask, int *status )
+
+*  Arguments:
+*     data = CGEN_TYPE * (Given)
+*        Pointer to the 1D array to be smoothed.
+*     nel = const int (Given)
+*        Number of points in the input data.
+*     box = int (Given)
+*        The size of the top-hat filter box (in array elements). If an
+*        even number is supplied, the next higher odd number is used.
+*     qual = unsigned char * (Given)
+*        If specified, use this QUALITY array to decide which samples
+*        to use (see "mask"). Otherwise data are only ignored if set
+*        to VAL__BAD<X>.
+*     mask = unsigned char (Given)
+*        Use with qual to define which bits in quality are relevant to
+*        ignore data in the calculation.
+*     status = int * (Given and Returned)
+*        Pointer to global status.
+
+*  Description:
+*     This routine replaces each element of the supplied 1D array with
+*     the mean of the neighbouring elements in a box of width "box". It
+*     takes special care handling bad pixels, since a biased mean value
+*     can be created if there are different numbers of bad pixels in each
+*     half of the filter box. For instance, if the top half of the filter
+*     box contains more bad pixels than the bottom half, then the output
+*     mean value will be biased towards the data values in the bottom half.
+*
+*     This extra checking results in smf_tophat1 being slower than
+*     smf_boxcar1.
+
+*  Authors:
+*     David Berry (JAC, Hawaii)
+*     {enter_new_authors_here}
+
+*  History:
+*     10-JUN-2010 (DSN):
+*        Initial version.
+*     {enter_further_changes_here}
+
+*  Copyright:
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 3 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
+
+*  Bugs:
+*     {note_any_bugs_here}
+*-
+*/
+
+/* Starlink includes */
+#include "sae_par.h"
+#include "ast.h"
+
+/* SMURF includes */
+#include "smf.h"
+
+void CGEN_FUNCTION(smf_tophat1)( CGEN_TYPE *data, const int nel,
+                                 int box, unsigned char *qual,
+                                 unsigned char mask, int *status) {
+
+/* Local variables */
+   CGEN_TYPE *in_data;      /* Copy of the time data */
+   CGEN_TYPE *pin;          /* Pointer to central input value */
+   CGEN_TYPE *pout;         /* Pointer to next output value */
+   double sum;              /* Sum of values in the box */
+   int count;               /* Number of samples in box */
+   int hb;                  /* Half width of box */
+   int iout;                /* Index of current output element */
+   int j;                   /* Offset from central box element */
+   unsigned char *qin;      /* Pointer to central input quality */
+
+/* Check the inherited status. */
+   if (*status != SAI__OK) return;
+
+/* Return if the filtering operation would produce no chnage (i.e. if the
+   box is of width 1 or the array only has 1 point). */
+   if( box <= 1 || nel <= 1 ) return;
+
+/* We will be modifying the values in the supplied array, but we need to
+   retain the original values for later calculations, so take a copy of the
+   supplied array now. */
+   in_data = astStore( NULL, data, nel*sizeof( *data ) );
+
+/* Check the above pointer can be used safely. */
+   if( *status == SAI__OK ) {
+
+/* Get the half width of the box. */
+      hb = box/2;
+
+/* Initialise a pointer to the input data value at the centre of the
+   current filter box. */
+      pin = in_data;
+
+/* Initialise a pointer to the current output data value. */
+      pout = data;
+
+/* First deal with cases where we are using a quality array. */
+      if( qual ) {
+
+/* Initialise a pointer to the input quality value at the centre of the
+   current filter box. */
+         qin = qual;
+
+/* Loop round all output elements. */
+         for( iout = 0; iout < nel; iout++,pout++,pin++,qin++ ) {
+
+/* Initialise the sum and count of the input data values in the filter
+   box to hold the central input value. */
+            if( !( (*qin) & mask ) ) {
+               sum = *pin;
+               count = 1;
+            } else {
+               sum = 0;
+               count = 0;
+            }
+
+/* Loop round input data values in pairs, each element in a pair being an
+   equal distance from the centre of the filter box. */
+            for( j = 1; j <= hb; j++ ) {
+
+/* If both elements of the current pair are within the bounds of the input
+   array, and both have good values, add them both into the running sums. */
+               if( iout - j >= 0 && iout + j < nel &&
+                   !( qin[ -j ] & mask ) && !( qin[ j ] & mask ) ) {
+                  sum += pin[ -j ] + pin[ j ];
+                  count += 2;
+               }
+            }
+
+/* Store the output mean value. */
+            if( count > 0 ) {
+               *pout = sum/count;
+            } else {
+               *pout = CGEN_BAD;
+            }
+         }
+
+/* Now deal with cases where we are using bad values. */
+      } else {
+
+/* Loop round all output elements. */
+         for( iout = 0; iout < nel; iout++,pout++,pin++ ) {
+
+/* Initialise the sum and count of the input data values in the filter
+   box to hold the central input value. */
+            if( *pin != CGEN_BAD ) {
+               sum = *pin;
+               count = 1;
+            } else {
+               sum = 0;
+               count = 0;
+            }
+
+/* Loop round input data values in pairs, each element in a pair being an
+   equal distance from the centre of the filter box. */
+            for( j = 1; j <= hb; j++ ) {
+
+/* If both elements of the current pair are within the bounds of the input
+   array, and both have good values, add them both into the running sums. */
+               if( iout - j >= 0 && iout + j < nel &&
+                   pin[ -j ] != CGEN_BAD && pin[ j ] != CGEN_BAD ) {
+                  sum += pin[ -j ] + pin[ j ];
+                  count += 2;
+               }
+            }
+
+/* Store the output mean value. */
+            if( count > 0 ) {
+               *pout = sum/count;
+            } else {
+               *pout = CGEN_BAD;
+            }
+         }
+      }
+   }
+
+/* Free resources. */
+   in_data = astFree( in_data );
+
+}
