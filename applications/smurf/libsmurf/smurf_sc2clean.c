@@ -120,6 +120,10 @@
 *     2010-06-03 (EC):
 *        -switch to using a config file from many ADAM parameters
 *        -use cleandk.* parameters to clean dark squids
+*     2010-06-09 (TIMJ):
+*        Add sub-instrument support to config reading.
+*        Read the config file inside the loop so that the command will
+*        run properly with files that are from different sub-instruments.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -183,7 +187,6 @@ void smurf_sc2clean( int *status ) {
   Grp *fgrp = NULL;         /* Filtered group, no darks */
   size_t i = 0;             /* Counter, index */
   Grp *igrp = NULL;         /* Input group of files */
-  AstKeyMap *keymap=NULL;   /* Keymap for storing cleaning parameters */
   Grp *ogrp = NULL;         /* Output group of files */
   size_t outsize;           /* Total number of NDF names in the output group */
   size_t size;              /* Number of files in input group */
@@ -219,15 +222,20 @@ void smurf_sc2clean( int *status ) {
        " nothing to do", status );
   }
 
-  /* Place cleaning parameters into a keymap and set defaults */
-  keymap = kpg1Config( "CONFIG", "$SMURF_DIR/smurf_makemap.def", NULL,
-                       status );
-
   /* Loop over input files */
   if( *status == SAI__OK ) for( i=1; i<=size; i++ ) {
+    AstKeyMap * sub_instruments = NULL;
+    AstKeyMap * keymap = NULL;
 
     /* Open and flatfield in case we're using raw data */
     smf_open_and_flatfield(igrp, ogrp, i, darks, flatramps, &ffdata, status);
+
+    /* Place cleaning parameters into a keymap and set defaults. Do this inside
+       the loop in case we are cleaning files with differing sub-instruments. */
+    sub_instruments = smf_subinst_keymap( ffdata, NULL, 0, status );
+    keymap = kpg1Config( "CONFIG", "$SMURF_DIR/smurf_makemap.def", sub_instruments,
+                         status );
+    sub_instruments = astAnnul( sub_instruments );
 
     if (*status != SAI__OK) {
       /* Tell the user which file went bad... */
@@ -272,6 +280,8 @@ void smurf_sc2clean( int *status ) {
 
     /* Free resources for output data */
     smf_close_file( &ffdata, status );
+    if( keymap ) keymap = astAnnul( keymap );
+
   }
 
   /* Write out the list of output NDF names, annulling the error if a null
@@ -286,7 +296,6 @@ void smurf_sc2clean( int *status ) {
   if (flatramps) smf_close_related( &flatramps, status );
   grpDelet( &igrp, status);
   grpDelet( &ogrp, status);
-  if( keymap ) keymap = astAnnul( keymap );
   if( wf ) wf = smf_destroy_workforce( wf );
   fftw_cleanup();
   ndfEnd( status );
