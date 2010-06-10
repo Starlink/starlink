@@ -231,7 +231,12 @@ void smurf_sc2clean( int *status ) {
     smf_open_and_flatfield(igrp, ogrp, i, darks, flatramps, &ffdata, status);
 
     /* Place cleaning parameters into a keymap and set defaults. Do this inside
-       the loop in case we are cleaning files with differing sub-instruments. */
+       the loop in case we are cleaning files with differing sub-instruments.
+       Note that we use the map-maker defaults file here (which loads the sc2clean
+       defaults) so that we populate the locked keymap with all the parameters that
+       people may come across to allow them to load their map-maker config directly
+       into sc2clean.
+    */
     sub_instruments = smf_subinst_keymap( ffdata, NULL, 0, status );
     keymap = kpg1Config( "CONFIG", "$SMURF_DIR/smurf_makemap.def", sub_instruments,
                          status );

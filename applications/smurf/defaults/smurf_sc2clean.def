@@ -1,0 +1,72 @@
+#+
+#  Name:
+#     smurf_sc2clean.def
+
+#  Purpose:
+#     Default parameters for SMURF application MAKEMAP.
+
+#  Description:
+#     This file specifies the default parameters for the SC2CLEAN
+#     application.The main purpose of this file is to
+#     guarantee an initial state for all parameters and to define all
+#     the allowed parameters so that a user will be notified in case
+#     of spelling mistakes.
+#
+#     This file is also loaded by the map maker defaults file.
+
+#  Notes:
+#     This file does not attempt to document what each value
+#     means.
+
+#  Authors:
+#     TIMJ: Tim Jenness (JAC, Hawaii)
+
+#  History:
+#     2010-06-09 (TIMJ):
+#        Original version. Factored out from smurf_makemap.def for clarity.
+
+#-
+
+# These are read in smf_get_cleanpar
+
+apod = 0
+badfrac = 0
+dcfitbox = 0
+dcmaxsteps = 10
+dcthresh = 3.0
+dcmedianwidth = 40
+dclimcorr = 10
+dkclean = 0
+fillgaps = 1
+filt_edgelow = 0
+filt_edgehigh = 0
+filt_notchlow = <undef>
+filt_notchhigh = <undef>
+flagstat = 0
+order = -1
+spikethresh = 0
+spikeiter = 0
+
+
+# these are analogous cleaning parameters for dark squids
+# We do not have a clever syntax for recursively reading this
+# routine with a "cleandk" prefix so we have to duplicate all
+# the above values.
+
+cleandk.apod = 0
+cleandk.badfrac = 0
+cleandk.dcfitbox = 0
+cleandk.dcmaxsteps = 10
+cleandk.dcthresh = 3.0
+cleandk.dcmedianwidth = 40
+cleandk.dclimcorr = 10
+cleandk.dkclean = 0
+cleandk.fillgaps = 1
+cleandk.filt_edgelow = 0
+cleandk.filt_edgehigh = 0
+cleandk.filt_notchlow = <undef>
+cleandk.filt_notchhigh = <undef>
+cleandk.flagstat = 0
+cleandk.order = -1
+cleandk.spikethresh = 0
+cleandk.spikeiter = 0
