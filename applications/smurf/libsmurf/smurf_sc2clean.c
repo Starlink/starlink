@@ -316,10 +316,16 @@ void smurf_sc2clean( int *status ) {
       errRep(FUNC_NAME,	"Error opening file ^I of ^N", status);
       if (size > 1 && i != size) errFlush(status);
     } else {
+      int dkclean;
 
       /* clean the dark squids now since we might need to use them
          to clean the bolometer data */
-      if( ffdata && ffdata->da && ffdata->da->dksquid ) {
+
+      smf_get_cleanpar( keymap, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+                        &dkclean, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+                        NULL, NULL, NULL, NULL, status );
+
+      if( dkclean && ffdata && ffdata->da && ffdata->da->dksquid ) {
         smfData *dksquid = ffdata->da->dksquid;
         AstKeyMap *kmap=NULL;
         dim_t ndata;
