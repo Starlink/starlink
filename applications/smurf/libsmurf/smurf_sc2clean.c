@@ -234,7 +234,8 @@ void smurf_sc2clean( int *status ) {
       /* Might be user-friendly to trap 1st etc and then continue on... */
       msgSeti("I",i);
       msgSeti("N",size);
-      errRep(FUNC_NAME,	"Error opening from file ^I of ^N", status);
+      errRep(FUNC_NAME,	"Error opening file ^I of ^N", status);
+      if (size > 1 && i != size) errFlush(status);
     }
 
     /* Clean the data */
@@ -244,7 +245,7 @@ void smurf_sc2clean( int *status ) {
     smf_dataOrder( ffdata, 1, status );
 
     /* Similarly, clean the dark squids */
-    if( ffdata->da && ffdata->da->dksquid ) {
+    if( ffdata && ffdata->da && ffdata->da->dksquid ) {
       smfData *dksquid = ffdata->da->dksquid;
       AstKeyMap *kmap=NULL;
       dim_t ndata;
