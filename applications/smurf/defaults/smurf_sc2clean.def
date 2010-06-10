@@ -60,13 +60,19 @@ cleandk.dcmaxsteps = 10
 cleandk.dcthresh = 3.0
 cleandk.dcmedianwidth = 40
 cleandk.dclimcorr = 10
-cleandk.dkclean = 0
 cleandk.fillgaps = 1
 cleandk.filt_edgelow = 0
 cleandk.filt_edgehigh = 0
 cleandk.filt_notchlow = <undef>
 cleandk.filt_notchhigh = <undef>
-cleandk.flagstat = 0
-cleandk.order = -1
+cleandk.order = 0
 cleandk.spikethresh = 0
 cleandk.spikeiter = 0
+
+# the following two parameters are included because the same
+# code is used to clean bolometers and the dark squids. However,
+# in the context of cleaning dark squids they are meaningless
+# and are simply turned off.
+
+cleandk.dkclean = 0
+cleandk.flagstat = 0
