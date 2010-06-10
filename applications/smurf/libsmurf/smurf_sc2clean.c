@@ -22,20 +22,21 @@
 *  Description:
 *     This command is a  stand-alone task for cleaning SCUBA-2
 *     time-series data. Cleaning operations include:
-*     - flag entire bolometer
-*     data streams as bad based on a threshold fraction of bad
-*     samples;
-*     - removing large-scale detector drifts by fitting
-*     and removing low-order polynomial baselines;
+*     - flag entire bolometer data streams as bad based on a threshold
+*     fraction of bad samples;
+*     - removing large-scale detector drifts by fitting and removing
+*     low-order polynomial baselines;
 *     - identifying and repairing DC steps;
 *     - flagging spikes;
 *     - replacing spikes and other gaps in the data with a constrained
 *     realization of noise; and
 *     - applying other frequency-domain filters, such
 *     as a high-pass or correction of the DA system response.
-
-*  Notes:
-*     Replacing spikes with noise is not yet implemented.
+*
+*     All the above operations can be performed on the dark squid data. These
+*     take the same parameters used for cleaning the primary bolometer data
+*     but use the "cleandk" namespace. For example, "dcthresh" would become
+*     "cleandk.dcthresh".
 
 *  ADAM Parameters:
 *     CONFIG = GROUP (Read)
@@ -61,13 +62,17 @@
 *
 *             <keyword>=<value>
 *
-*          The available parameters are identical to the "CLEANDK.*"
-*          parameter available to the MAKEMAP task with "method=iter".
+*          The available parameters are identical to the cleaning parameters
+*          used by the iterative map-maker (method=ITER) and the list of parameters
+*          is explained in the "Configuration Parameters" section and can be
+*          found, with defaults, in $SMURF_DIR/smurf_sc2clean.def.
 *          Default values will be used for any unspecified
 *          parameters. Assigning the value "<def>" (case insensitive)
-*          to a keyword has the effect of reseting it to its default
-*          value. Unrecognised options are ignored (that is, no error
-*          is reported). [current value]
+*          to a keyword has the effect of resetting it to its default
+*          value. Options available to the map-maker but not understood
+*          by SC2CLEAN will be ignored. Parameters not understood will trigger
+*          an error. Use the "cleandk." namespace for configuring cleaning
+*          parameters for the dark squids. [current value]
 *     IN = NDF (Read)
 *          Input files to be cleaned
 *     MSG_FILTER = _CHAR (Read)
@@ -81,11 +86,72 @@
 *          all the output NDFs created by this application (one per
 *          line). If a null (!) value is supplied no file is created. [!]
 
+*  Configuration Parameters:
+*     APOD = INTEGER
+*       Apodize signals (smoothly roll-off) using sine/cosine functions at
+*       start and end of the signal across this many samples.
+*     BADFRAC = REAL
+*       Flag entire bolometer as dead if at least this fraction of the samples
+*       in a detector time series were flagged as bad by the DA system.
+*     DCFITBOX = REAL
+*       Number of samples (box size) in which the signal RMS is measured for
+*       the DC step finder.
+*     DCLIMCORR = INTEGER
+*       The detection threshold for steps that occur at the same time in
+*       many bolometers. Set it to zero to suppress checks for correlated
+*       steps. If dclimcorr is greater than zero, and a step is found at
+*       the same time in more than "dclimcorr" bolometers, then all
+*       bolometers are assumed to have a step at that time, and the step
+*       is fixed no matter how small it is.
+*     DCMAXSTEPS = INTEGER
+*       The maximum number of steps that can be corrected in each minute of
+*       good data (i.e. per 12000 samples) from a bolometer before the entire
+*       bolometer is flagged as bad. A value of zero will cause a bolometer to
+*       be rejected if any steps are found in the bolometer data stream.
+*     DCMEDIANWIDTH = INTEGER
+*       The width of the median filter used to smooth a bolometer data stream
+*       prior to finding DC jumps.
+*     DCTHRESH = REAL
+*       Threshold S/N to detect and flag DC (baseline) steps.
+*     DKCLEAN = LOGICAL
+*       Clean the bolometers using the dark squids. Defaults to false.
+*     FILLGAPS = LOGICAL
+*       Fill vicinity of spikes / DC steps with constrained realization of
+*       noise. You almost always want to do this.
+*     FILT_EDGEHIGH = REAL
+*       Hard-edge high-pass frequency-domain filter (Hz).
+*     FILT_EDGELOW = REAL
+*       Hard-edge low-pass frequency-domain filter (Hz).
+*     FILT_NOTCHHIGH( ) = REAL
+*       Hard-edge band-cut frequency-domain notch filters. FILT_NOTCHHIGH is
+*       an array of upper-edge frequencies (Hz).
+*     FILT_NOTCHLOW( ) = REAL
+*       Array of lower-edge frequencies corresponding to FILT_NOTCHHIGH.
+*     FLAGSTAT = REAL
+*       Flag data taken while the telescope was stationary so that it
+*       they are ignored in the final map. The value given is a threshold
+*       slew velocity (arcsec/sec) measured in tracking coordinates
+*       below which the telescope is considered to be stationary.
+*     ORDER = INTEGER
+*       Subtract a fitted baseline polynomial of this order (0 to remove mean).
+*     SPIKEITER = INTEGER
+*       Number of iterations for sigma-clipper (0=repeat to convergence).
+*     SPIKETHRESH = REAL
+*       Threshold S/N to flag spikes using sigma-clipper.
+
+*  Notes:
+*     - Replacing spikes with noise is not yet implemented.
+*     - Assumes that padding has been applied externally (e.g. in SC2CONCAT)
+*     - The default values and allowed parameters can be found in
+*     $SMURF_DIR/smurf_sc2clean.def
+*     - An iterative map-maker config file can be used.
+
 *  Related Applications:
-*     SMURF: SC2FFT
+*     SMURF: MAKEMAP, SC2CONCAT, SC2FFT
 
 *  Authors:
-*     Edward Chapin (UBC)
+*     EC: Edward Chapin (UBC)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
