@@ -273,6 +273,7 @@ void smurf_sc2clean( int *status ) {
       astMapGet0A( keymap, "CLEANDK", &kmap );
       smf_clean_smfData( wf, dksquid, dkqual, kmap, status );
       if( kmap ) kmap = astAnnul( kmap );
+      if (dkqual) dkqual = astFree( dkqual );
 
       /* Set hdr pointer to NULL again so that we don't accidentally close it*/
       dksquid->hdr = NULL;
