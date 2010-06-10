@@ -315,43 +315,45 @@ void smurf_sc2clean( int *status ) {
       msgSeti("N",size);
       errRep(FUNC_NAME,	"Error opening file ^I of ^N", status);
       if (size > 1 && i != size) errFlush(status);
+    } else {
+
+      /* clean the dark squids now since we might need to use them
+         to clean the bolometer data */
+      if( ffdata && ffdata->da && ffdata->da->dksquid ) {
+        smfData *dksquid = ffdata->da->dksquid;
+        AstKeyMap *kmap=NULL;
+        dim_t ndata;
+        unsigned char *dkqual=NULL;
+
+        msgOut("", TASK_NAME ": cleaning dark squids", status);
+
+        /* Temporary quality buffer for dksquid */
+        smf_get_dims( dksquid, NULL, NULL, NULL, NULL, &ndata, NULL, NULL,
+                      status );
+        dkqual = astCalloc( ndata, sizeof(*dkqual), 1 );
+
+        /* also fudge the header so that we can get at JCMTState */
+        dksquid->hdr = ffdata->hdr;
+
+        /* clean darks using cleandk.* parameters */
+        astMapGet0A( keymap, "CLEANDK", &kmap );
+        smf_clean_smfData( wf, dksquid, dkqual, kmap, status );
+        if( kmap ) kmap = astAnnul( kmap );
+        if (dkqual) dkqual = astFree( dkqual );
+
+        /* Set hdr pointer to NULL again so that we don't accidentally close it*/
+        dksquid->hdr = NULL;
+      }
+
+      msgOut("", TASK_NAME ": cleaning bolometer data", status );
+
+      /* Clean the data */
+      smf_clean_smfData( wf, ffdata, NULL, keymap, status );
+
+      /* Ensure that the data is ICD ordered before closing */
+      smf_dataOrder( ffdata, 1, status );
+
     }
-
-    /* clean the dark squids now since we might need to use them
-       to clean the bolometer data */
-    if( ffdata && ffdata->da && ffdata->da->dksquid ) {
-      smfData *dksquid = ffdata->da->dksquid;
-      AstKeyMap *kmap=NULL;
-      dim_t ndata;
-      unsigned char *dkqual=NULL;
-
-      msgOut("", TASK_NAME ": cleaning dark squids", status);
-
-      /* Temporary quality buffer for dksquid */
-      smf_get_dims( dksquid, NULL, NULL, NULL, NULL, &ndata, NULL, NULL,
-                    status );
-      dkqual = astCalloc( ndata, sizeof(*dkqual), 1 );
-
-      /* also fudge the header so that we can get at JCMTState */
-      dksquid->hdr = ffdata->hdr;
-
-      /* clean darks using cleandk.* parameters */
-      astMapGet0A( keymap, "CLEANDK", &kmap );
-      smf_clean_smfData( wf, dksquid, dkqual, kmap, status );
-      if( kmap ) kmap = astAnnul( kmap );
-      if (dkqual) dkqual = astFree( dkqual );
-
-      /* Set hdr pointer to NULL again so that we don't accidentally close it*/
-      dksquid->hdr = NULL;
-    }
-
-    msgOut("", TASK_NAME ": cleaning bolometer data", status );
-
-    /* Clean the data */
-    smf_clean_smfData( wf, ffdata, NULL, keymap, status );
-
-    /* Ensure that the data is ICD ordered before closing */
-    smf_dataOrder( ffdata, 1, status );
 
     /* Free resources for output data */
     smf_close_file( &ffdata, status );
