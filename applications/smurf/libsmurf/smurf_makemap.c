@@ -988,26 +988,7 @@ void smurf_makemap( int *status ) {
        and typo checking. Also need to know which subinstrument we are actively
        interested in for merging purposes. We need to open a representative
        file for that. */
-    smfData * sub_data = NULL;
-    AstKeyMap * sub_instruments = astKeyMap( " " );
-
-    /* prefill with the list of known sub-instruments. */
-    for (i = 0; i < SMF__SUBINST_NSUBINST; i++ ) {
-      const char * substr = smf_subinst_str( i, status );
-      if (substr) astMapPut0I( sub_instruments, substr, 0, NULL );
-    }
-
-    smf_open_file( igrp, 1, "READ", SMF__NOCREATE_DATA, &sub_data, status );
-    if (*status == SAI__OK) {
-      smf_subinst_t subinst = smf_calc_subinst( sub_data->hdr, status );
-      const char * substr = smf_subinst_str( subinst, status );
-      if (substr) {
-        /* flag this as being the relevant sub-instrument */
-        astMapPut0I( sub_instruments, substr, 1, NULL );
-      }
-    }
-
-    smf_close_file( &sub_data, status );
+    AstKeyMap * sub_instruments = smf_subinst_keymap( NULL, igrp, 1, status );
     keymap = kpg1Config( "CONFIG", "$SMURF_DIR/smurf_makemap.def", sub_instruments, status );
     sub_instruments = astAnnul( sub_instruments );
   }
