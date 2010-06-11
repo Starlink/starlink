@@ -157,6 +157,9 @@
 *        Use smf_tophat1D to smooth the common mode, rather than
 *        smf_boxcar1D (which can result in dicontinuities at the start
 *        and end of the smoothed common mode).
+*     2010-06-11 (DSB):
+*        Display the number of bolometers rejected for each reason if
+*        MSG_FILTER==DEBUG.
 
 *  Copyright:
 *     Copyright (C) 2006-2010 University of British Columbia.
@@ -198,6 +201,9 @@
 /* SMURF includes */
 #include "libsmf/smf.h"
 #include "libsmf/smf_err.h"
+
+/* Local macros */
+#define BAD_FIT VAL__MAXD/2
 
 /* ------------------------------------------------------------------------ */
 /* Local variables and functions */
@@ -558,7 +564,7 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
               for( j=0; j<block_size; j++ ) {
                 qua_data[ibase+j*tstride] |= SMF__Q_COM;
               }
-              *(gai_data+igbase) = VAL__BADD;
+              *(gai_data+igbase) = BAD_FIT;
               errAnnul( status );
 
             /* If we are ignoring gains, force gains to 1.0 and offsets
@@ -602,6 +608,7 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
 
 /* ------------------------------------------------------------------------ */
 
+#define NREASON 11
 #define FUNC_NAME "smf_calcmodel_com"
 
 void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
@@ -656,6 +663,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   dim_t i;                      /* Loop counter */
   dim_t iblock;                 /* Index of time block */
   int ii;                       /* Loop counter */
+  int ireason;                  /* Index of current reason for block rejection */
   int ival = 0;                 /* Integer value */
   dim_t idx=0;                  /* Index within subgroup */
   dim_t j;                      /* Loop counter */
@@ -689,6 +697,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   smfArray *qua=NULL;           /* Pointer to QUA at chunk */
   int quit;                     /* While loop quit flag */
   unsigned char *qua_data=NULL; /* Pointer to quality data */
+  int reason[ NREASON ];        /* No. of blocks rejected for each reason */
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
   size_t step;                  /* step size for dividing up work */
@@ -702,6 +711,21 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   double *woff;                 /* Work array holding offset values */
   double *wg_copy;              /* Work array holding old gain values */
   double *woff_copy;            /* Work array holding old offset values */
+
+  const char *reason_text[ NREASON ] = {
+                                   "fit failed",
+                                   "gain is negative",
+                                   "corr_abstol test failed",
+                                   "corr_tol test failed",
+                                   "corr_abstol test failed (2)",
+                                   "gain_tol test failed",
+                                   "gain_abstol test failed",
+                                   "unknown cause",
+                                   "gain_rat test failed - gain too high",
+                                   "gain_rat test failed - gain too low",
+                                   "gain_fgood test failed" };
+
+
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -1205,6 +1229,11 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         gcoeff = astCalloc( nbolo, sizeof(*gcoeff), 0 );
         corr = astCalloc( nbolo, sizeof(*corr), 0 );
 
+        /* For debugging purposes, we record the reasons why any
+           bolo-blocks are rejected. Initialise the number of bolo-blocks
+           rejected for each reason. */
+        memset( reason, 0, NREASON*sizeof( *reason ) );
+
         /* Loop over all blocks of time slices */
         newbad = 0;
         ntime = ntslice;
@@ -1232,18 +1261,34 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
                if( !( qua_data[ i*bstride ] & SMF__Q_BADB) ) {
                  gcoeff[ i ] = gai_data[ igbase ];
                  corr[ i ] = gai_data[ igbase + corr_offset ];
+
+                 if( gcoeff[ i ] == BAD_FIT ) {
+                    gcoeff[ i ] = VAL__BADD;
+                    reason[ 0 ]++;
+                    newbad++;
+                 }
+
                } else {
                  gcoeff[ i ] = VAL__BADD;
                }
 
                if( gcoeff[ i ] != VAL__BADD ) {
 
-                 if( gcoeff[ i ] > 0.0 && corr[ i ] > corr_abstol ){
+                 if( gcoeff[ i ] <= 0.0 ) {
+                    reason[ 1 ]++;
+                    newbad++;
+                    gcoeff[ i ] = VAL__BADD;
+                    corr[ i ] = VAL__BADD;
+
+                 } else if( corr[ i ] <= corr_abstol ) {
+                    reason[ 2 ]++;
+                    newbad++;
+                    gcoeff[ i ] = VAL__BADD;
+                    corr[ i ] = VAL__BADD;
+
+                 } else {
                     gcoeff[ i ] = log( gcoeff[ i ] );
                     allbad = 0;
-                 } else {
-                   gcoeff[ i ] = VAL__BADD;
-                   corr[ i ] = VAL__BADD;
                  }
 
                } else {
@@ -1304,9 +1349,27 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
                    gai_data[ igbase + off_offset ] = VAL__BADD;
                    gai_data[ igbase + corr_offset ] = VAL__BADD;
 
-                   newbad++;
                    block_converged = 0;
 
+                   /* Increment the number of rejected bolo-blocks, and
+                      record the reasons why blocks are rejected. Don't need
+                      to record VAL__BADD failures because they will have
+                      already been included in earlier reasons. */
+                   if( corr[ i ] != VAL__BADD && gcoeff[ i ] != VAL__BADD ){
+                      newbad++;
+
+                      if( ( (cmean - corr[ i ]) > corr_tol*csig ) ) {
+                         reason[ 3 ]++;
+                      } else if( corr[ i ] < corr_abstol ) {
+                         reason[ 4 ]++;
+                      } else if( fabs( gcoeff[ i ]-gmean ) > gain_tol*gsig ) {
+                         reason[ 5 ]++;
+                      } else if( fabs( gcoeff[ i ]-gmean ) > gain_abstol ) {
+                         reason[ 6 ]++;
+                      } else {
+                         reason[ 7 ]++;
+                      }
+                   }
                  }
                }
 
@@ -1409,6 +1472,13 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
                   converged[ iblock ] = 0;
                   if( iblock < nblock - 1 ) converged[ iblock + 1 ] = 0;
 
+                  /* Record the reasons why blocks are rejected. */
+                  if( g > gmax ) {
+                     reason[ 8 ]++;
+                  } else {
+                     reason[ 9 ]++;
+                  }
+
                 } else {
                   ibase += block_size*tstride;
                 }
@@ -1435,6 +1505,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
               }
 
               newbad += ggood;
+              reason[ 10 ] += ggood;
 
               quit = 0;
               ggood = 0;
@@ -1457,6 +1528,15 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         msgSeti( "NEW", newbad );
         msgOutif( MSG__VERB, "",
                   "    flagged ^NEW new bad bolo time-slice blocks", status );
+
+        for( ireason = 0; ireason < NREASON; ireason++ ) {
+           if( reason[ ireason ] > 0 ) {
+              msgSeti( "N", reason[ ireason ] );
+              msgSetc( "T", reason_text[ ireason ] );
+              msgOutif( MSG__DEBUG, "",
+                        "       (^N were flagged because ^T)", status );
+           }
+        }
 
         msgSeti( "NG", totgood );
         msgSeti( "T", nblock*nbolo );
