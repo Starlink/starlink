@@ -88,6 +88,8 @@
 *        Report number of new BADBOL if replacebad=0
 *     2010-06-01 (EC):
 *        Only fit gain of DKS, not gain and offset (to avoid COM offset degen.)
+*     2010-06-10 (EC):
+*        Don't remove the means here since that is handled by smf_clean_smfData
 
 *  Copyright:
 *     Copyright (C) 2009 Science & Technology Facilities Council.
@@ -194,6 +196,9 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
               status);
       return;
     }
+
+    /* Assert the correct data order here */
+    smf_dataOrder( indata->da->dksquid, 1, status );
   }
 
   /* Check for 3-d data and get dimensions */
@@ -302,18 +307,8 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
 
         /* Do some dksquid initialization if requested  */
         if( (*status==SAI__OK) && needDA && calcdk && model && dkgood[i] ) {
-          double mean;
-
           /* Smooth the dark squid template */
           smf_boxcar1D( &dksquid[jt1], ntot, window, NULL, 0, status );
-
-          /* Also remove the mean because it isn't useful. */
-          smf_stats1D( &dksquid[jt1], 1, ntot, NULL, 0, 0, &mean, 0, NULL,
-                       status );
-
-          for( j=jt1; (*status==SAI__OK)&&(j<=jt2); j++ ) {
-            dksquid[j] -= mean;
-          }
         }
 
         /* Initialize fit coeffs to VAL__BADD */

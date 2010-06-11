@@ -192,6 +192,8 @@
 *        Add SMO smoothing model
 *     2010-06-08 (EC):
 *        Add TWO component model
+*     2010-06-10 (EC):
+*        Add dark squid cleaning
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -374,8 +376,9 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
 
   oflag = 0;
 
-  /* Only map head if creating LUT, EXT or QUA */
-  if( (mtype != SMF__LUT) && (mtype != SMF__EXT) && (mtype != SMF__QUA) ) {
+  /* Only map head if creating LUT, EXT, QUA or DKS */
+  if( (mtype != SMF__LUT) && (mtype != SMF__EXT) && (mtype != SMF__QUA) &&
+      (mtype != SMF__DKS) ) {
     oflag |= SMF__NOCREATE_HEAD;
   }
 
@@ -953,7 +956,32 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
               /* First set the entire buffer to 0 */
               memset( dataptr, 0, datalen );
 
-              /* Check for special DKS initialzation parameters */
+              /* Apply basic DKS cleaning parameters */
+              if( idata->da && idata->da->dksquid ) {
+                smfData *dksquid = idata->da->dksquid;
+
+                msgOutif( MSG__VERB, "", FUNC_NAME ": cleaning dark squids",
+                          status);
+
+                /* fudge the header so that we can get at JCMTState */
+                dksquid->hdr = idata->hdr;
+
+                /* clean darks using cleandk.* parameters */
+                astMapGet0A( keymap, "CLEANDK", &kmap );
+                smf_clean_smfData( wf, dksquid, NULL, kmap, status );
+                if( kmap ) kmap = astAnnul( kmap );
+
+                /* Unset hdr pointer so that we don't accidentally close it */
+                dksquid->hdr = NULL;
+
+              } else {
+                *status = SAI__ERROR;
+                errRep( "", FUNC_NAME
+                        ": Reference smfData does not contain dark squids",
+                        status );
+              }
+
+              /* Check for additional special DKS initialzation parameters */
               astMapGet0A( keymap, "DKS", &kmap );
               astMapGet0I( kmap, "REPLACEBAD", &replacebad );
               kmap = astAnnul( kmap );

@@ -206,6 +206,8 @@
  *        Store dark squids in a smfData instead of a bare buffer
  *     2010-06-03 (EC):
  *        Map the dark squids even if data were already flatfielded
+ *     2010-06-10 (EC):
+ *        Add quality to dark squids
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -558,8 +560,9 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
         int dkndims;
         int dkndf;
         int dkplace;
+        int dqexists;
         int nmap;
-        void *pntr[1];
+        void *dpntr[] = {NULL,NULL,NULL};
 
         ndfXstat( indf, "SCUBA2", &itexists, status );
         if( itexists ) {
@@ -581,12 +584,30 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
             errRepf("", FUNC_NAME ": DKSQUID has %i dimensions, should be 2",
                     status, dkndims);
           }
-          ndfMap( dkndf, "DATA", "_DOUBLE", mode, pntr, &nmap, status );
+          ndfMap( dkndf, "DATA", "_DOUBLE", mode, &dpntr[0], &nmap, status );
+
+          /* Also generically map/create a quality array unless we're
+             in READ mode and one didn't previously exist */
+          ndfState( dkndf, "QUALITY", &dqexists, status );
+          if( dqexists ) {
+            msgOutif( MSG__DEBUG, "", "Mapping existing DKSQUID QUALITY",
+                      status);
+            ndfMap( dkndf, "QUALITY", "_UBYTE", mode, &dpntr[2], &nmap,
+                    status );
+          } else if( !strncmp(mode,"READ",4) ) {
+            msgOutif( MSG__DEBUG, "", "Creating new DKSQUID QUALITY",
+                      status);
+            ndfMap( dkndf, "QUALITY", "_UBYTE", "WRITE/ZERO", &dpntr[2], &nmap,
+                    status );
+          }
+
+
           if(*status == SAI__OK) {
             da = (*data)->da;
             da->dksquid = smf_create_smfData( SMF__NOCREATE_HEAD |
                                               SMF__NOCREATE_DA, status );
-            da->dksquid->pntr[0] = pntr[0];
+            da->dksquid->pntr[0] = dpntr[0];
+            da->dksquid->pntr[2] = dpntr[2];
 
             da->dksquid->dtype = SMF__DOUBLE;
             da->dksquid->isTordered = 1;
@@ -851,6 +872,11 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
               ptr[i] = (double) dksquid[i];
             }
           }
+
+          /* Create an empty QUALITY array */
+          da->dksquid->pntr[2] = astCalloc( rowsize*nframes,
+                                            smf_dtype_sz(SMF__UBYTE,status),
+                                            1);
         }
 
         /* Create a FitsChan from the FITS headers */

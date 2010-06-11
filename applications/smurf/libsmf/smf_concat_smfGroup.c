@@ -145,6 +145,8 @@
  *        Add flatramps argument.
  *     2010-05-27 (EC):
  *        Calculate tswcs properly when padding using smf_create_tswcs
+ *     2010-06-10 (EC):
+ *        Handle dark squid QUALITY
 
  *  Notes:
  *     If projection information supplied, pointing LUT will not be
@@ -472,17 +474,21 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
           if( *status == SAI__OK ) {
             /* If first chunk initialize the concatenated array */
             if( j == firstpiece ) {
+              int cflags=0;
+
               /* Copy first data right after the initial padding */
               tchunk = padStart;
 
               /* Allocate memory for empty smfData with a smfHead. Create
-                 a DA struct only if the input file has one. Create it as
-                 a clone rather than creating an empty smfDa. */
-              data = smf_create_smfData( SMF__NOCREATE_DA, status );
-              if (refdata->da) {
-                da = smf_deepcopy_smfDA( refdata, status );
-                data->da = da;
+                 a DA struct only if the input file has dark squids. */
+
+              if( !(refdata->da && refdata->da->dksquid) ) {
+                cflags |= SMF__NOCREATE_DA;
               }
+
+              data = smf_create_smfData( cflags, status );
+              da = data->da;
+
               if (refdata->history) data->history = astCopy( refdata->history );
 
               if( *status == SAI__OK ) {
@@ -566,16 +572,38 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                               &bstr, &tstr, status );
 
                 /* Allocate space for enlarged dksquid array. */
-                if( da && da->dksquid) {
-                  da->dksquid->pntr[0] = astRealloc(da->dksquid->pntr[0],
-                                                    ncol*tlen *
-                                                    smf_dtype_size(da->dksquid,
-                                                                   status) );
+                if( da ) {
+                  da->dksquid = smf_create_smfData(SMF__NOCREATE_FILE |
+                                                   SMF__NOCREATE_HEAD |
+                                                   SMF__NOCREATE_DA, status );
 
-                  if( *status == SAI__OK ) {
-                    memset( da->dksquid->pntr[0], 0,
-                            ncol*tlen*smf_dtype_size(da->dksquid,status) );
+                  /* Dimensions */
+                   da->dksquid->dtype = SMF__DOUBLE;
+                   da->dksquid->isTordered = 1;
+                   da->dksquid->ndims = 3;
+
+                   da->dksquid->dims[0] = ncol;
+                   da->dksquid->dims[1] = 1;
+                   da->dksquid->dims[2] = tlen;
+                   da->dksquid->lbnd[0] = 0;
+                   da->dksquid->lbnd[1] = 0;
+                   da->dksquid->lbnd[2] = 1;
+
+                  da->dksquid->pntr[0] = astCalloc(ncol*tlen,
+                                                   smf_dtype_size(da->dksquid,
+                                                                  status), 1 );
+
+                  /* QUALITY too if requested */
+                  if( !(flags&SMF__NOCREATE_QUALITY) ) {
+                    da->dksquid->pntr[2] = astCalloc(ncol*tlen,
+                                                     smf_dtype_sz(SMF__UBYTE,
+                                                                  status), 1 );
+                    if( *status == SAI__OK ) {
+                      memset( da->dksquid->pntr[2], 0,
+                              ncol*tlen*smf_dtype_sz(SMF__UBYTE,status) );
+                    }
                   }
+
                 }
 
                 /* Un-set havearray values corresponding to flags */
@@ -639,9 +667,17 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
               /* dark squids */
               if( da && da->dksquid && refdata->da && refdata->da->dksquid) {
                 double *ptr = da->dksquid->pntr[0];
+                unsigned char *qptr = da->dksquid->pntr[2];
+
                 ptr += tchunk*ncol;
                 memcpy( ptr, refdata->da->dksquid->pntr[0],
                         reftlen*ncol*smf_dtype_size(da->dksquid,status));
+
+                if( qptr && refdata->da->dksquid->pntr[2] ) {
+                  qptr += tchunk*ncol;
+                  memcpy( qptr, refdata->da->dksquid->pntr[2],
+                          reftlen*ncol*smf_dtype_sz(SMF__UBYTE,status));
+                }
               }
 
               /* Now do DATA/QUALITY/VARIANCE */
@@ -720,6 +756,30 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
             /* Loop over relevant time slices at set quality */
             for( l=tstart; l<=tend; l++ ) {
               ((char *)data->pntr[2])[l*tstr+k*bstr] |=  qual;
+            }
+          }
+        }
+
+        /* Similarly handle QUALITY for dark squids */
+        if( da && da->dksquid && da->dksquid->pntr[2] ) {
+          dim_t dnbolo;
+          size_t dbstr, dtstr;
+
+          smf_get_dims( da->dksquid, NULL, NULL, &dnbolo, NULL, NULL, &dbstr,
+                        &dtstr, status );
+
+           /* Loop over bolometer (column for dark squids) */
+          for( k=0; k<dnbolo; k++ ) {
+            /* SMF__Q_PAD always set */
+            qual = SMF__Q_PAD;
+
+            /* Check for SMF__Q_BADB in first sample of this column */
+            qual |= ((char *)da->dksquid->pntr[2])[padStart*dtstr+k*dbstr] &
+              SMF__Q_BADB;
+
+            /* Loop over relevant time slices at set quality */
+            for( l=tstart; l<=tend; l++ ) {
+              ((char *)da->dksquid->pntr[2])[l*dtstr+k*dbstr] |=  qual;
             }
           }
         }

@@ -161,6 +161,29 @@ fillgaps = 1
 #filt_notchlow  = (25,55)
 #filt_notchhigh = (35,65)
 
+# ----------------------------------------------------------------------------
+# A number of analagous parameters to clean dark squid signals before fitting
+# them to the data (only relevant if DKS is specified as a model component).
+# Note that if padding has been added to the bolometer data, it is
+# automatically added to the dark squids as well (i.e. there is no
+# cleandk.padstart/padend).
+# ----------------------------------------------------------------------------
+
+cleandk.apod = 100
+cleandk.badfrac = 0.05
+cleandk.dcfitbox = 400
+cleandk.dcmaxsteps = 10
+cleandk.dcthresh = 3.0
+cleandk.dcmedianwidth = 40
+cleandk.dclimcorr = 10
+cleandk.fillgaps = 1
+#cleandk.filt_edgelow = 0
+#cleandk.filt_edgehigh = 0
+#cleandk.filt_notchlow = <undef>
+#cleandk.filt_notchhigh = <undef>
+cleandk.order = 0
+#cleandk.spikethresh = 0
+#cleandk.spikeiter = 0
 
 # ----------------------------------------------------------------------------
 # These parameters control the iterative model components

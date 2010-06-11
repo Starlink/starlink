@@ -190,6 +190,8 @@
 *        Add sub-instrument support to config reading.
 *        Read the config file inside the loop so that the command will
 *        run properly with files that are from different sub-instruments.
+*     2010-06-10 (EC):
+*        Dark squids now have their own quality.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -329,25 +331,18 @@ void smurf_sc2clean( int *status ) {
         smfData *dksquid = ffdata->da->dksquid;
         AstKeyMap *kmap=NULL;
         dim_t ndata;
-        unsigned char *dkqual=NULL;
 
         msgOut("", TASK_NAME ": cleaning dark squids", status);
 
-        /* Temporary quality buffer for dksquid */
-        smf_get_dims( dksquid, NULL, NULL, NULL, NULL, &ndata, NULL, NULL,
-                      status );
-        dkqual = astCalloc( ndata, sizeof(*dkqual), 1 );
-
-        /* also fudge the header so that we can get at JCMTState */
+        /* fudge the header so that we can get at JCMTState */
         dksquid->hdr = ffdata->hdr;
 
         /* clean darks using cleandk.* parameters */
         astMapGet0A( keymap, "CLEANDK", &kmap );
-        smf_clean_smfData( wf, dksquid, dkqual, kmap, status );
+        smf_clean_smfData( wf, dksquid, NULL, kmap, status );
         if( kmap ) kmap = astAnnul( kmap );
-        if (dkqual) dkqual = astFree( dkqual );
 
-        /* Set hdr pointer to NULL again so that we don't accidentally close it*/
+        /* Unset hdr pointer so that we don't accidentally close it */
         dksquid->hdr = NULL;
       }
 

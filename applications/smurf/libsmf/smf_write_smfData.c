@@ -86,6 +86,8 @@
 *        Write out dark squids
 *     2010-01-29 (TIMJ):
 *        Fix writing of 3d variance for 3d data
+*     2010-06-10 (EC):
+*        Write dark squid quality
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -358,7 +360,8 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
       HDSLoc *loc=NULL;
       int id;
       int nmap;
-      void *pntr[1];
+      void *pntr[]={NULL,NULL,NULL};
+      unsigned char *outdkqual=NULL;
       double *outdksquid=NULL;
 
       if( da && da->dksquid && da->dksquid->pntr[0] && outdata &&
@@ -376,12 +379,21 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
         id = smf_get_ndfid( loc, "DKSQUID", "WRITE", "UNKNOWN", "_DOUBLE",
                             2, lbnd, ubnd, status );
 
-        ndfMap( id, "DATA", "_DOUBLE", "WRITE", pntr, &nmap, status );
+        ndfMap( id, "DATA", "_DOUBLE", "WRITE", &pntr[0], &nmap, status );
         outdksquid = pntr[0];
 
-        if( (*status == SAI__OK) && (outdksquid) ) {
-          memcpy( outdksquid, da->dksquid->pntr[0],
-                  nmap*sizeof(*outdksquid) );
+        if( (*status == SAI__OK) && outdksquid ) {
+          memcpy( outdksquid, da->dksquid->pntr[0], nmap*sizeof(*outdksquid) );
+        }
+
+        /* Also do the quality if it exists */
+        if( da->dksquid->pntr[2] ) {
+          ndfMap( id, "QUALITY", "_UBYTE", "WRITE", &pntr[2], &nmap, status );
+          outdkqual = pntr[2];
+
+          if( (*status==SAI__OK) && outdkqual ) {
+            memcpy( outdkqual, da->dksquid->pntr[2], nmap*sizeof(*outdkqual) );
+          }
         }
 
         ndfAnnul( &id, status );
