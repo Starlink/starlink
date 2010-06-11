@@ -105,6 +105,8 @@
 *        then correct for the heavy clipping using the factor appropriate
 *        for pure Gaussian noise. heavier clipping does better in the
 *        presence of lots of steps.
+*     11-JUN-2010 (DSB):
+*        Report the number of fixed steps if in verbose mode.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -222,7 +224,7 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
 			      float dcminpop, double dcthresh, double
 			      dcthresh2, int dcmaxstepwidth, int pad_start,
                               int pad_end, int itime_start, int itime_end,
-                              int *status DEBUG_ARGS );
+                              int *nfixed, int *status DEBUG_ARGS );
 
 
 void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
@@ -251,6 +253,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
    int *block;
    int *blocks;
    int *common;
+   int nfixed;
    int iblock;
    int iter;
    int itime;                  /* Index of time slice */
@@ -287,9 +290,9 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
    int dcminbox = 100;
    int dcminstepgap = 0.5*dcmedianwidth;
 
-/* Initialise returned values. */
+/* Initialise... */
    ns = 0;
-
+   nfixed = 0;
 
 #ifdef DEBUG_STEPS
    static int nentry = 0;
@@ -690,8 +693,9 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
                                      ntime, itime_lo, itime_hi, common,
                                      dcmaxsteps*( ((double) tpop)/12000.0 ),
                                      dcfitbox, dcminbox, dcminpop, dcthresh,
-                                     dcthresh2, dcmaxstepwidth, pad_start, pad_end,
-                                     itime_start, itime_end, status DEBUG_VALS );
+                                     dcthresh2, dcmaxstepwidth, pad_start,
+                                     pad_end, itime_start, itime_end, &nfixed,
+                                     status DEBUG_VALS );
          }
 
 
@@ -806,7 +810,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
 					   dcminbox, dcminpop, 0.0,
 					   dcthresh2, dcmaxstepwidth, pad_start,
                                            pad_end, itime_start, itime_end,
-                                           status DEBUG_VALS );
+                                           &nfixed, status DEBUG_VALS );
 
                }
             }
@@ -826,6 +830,10 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
 #endif
 
    }
+
+/* Report the number of fixed steps */
+   msgOutiff( MSG__VERB, " ", "smf_fix_steps: fixed %d steps.",
+              status, nfixed );
 
 /* Report the number of rejected bolometers. */
    if( ns > 0 ) {
@@ -1002,8 +1010,8 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
                               dim_t dcfitbox, int dcminbox, float dcminpop,
                               double dcthresh, double dcthresh2,
                               int dcmaxstepwidth, int pad_start, int pad_end,
-                              int itime_start, int itime_end, int *status
-                              DEBUG_ARGS ){
+                              int itime_start, int itime_end, int *nfixed,
+                              int *status DEBUG_ARGS ){
 
 /* Local Variables: */
    double *pd;
@@ -1330,6 +1338,10 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
          }
          pd += tstride;
       }
+
+/* Incrment the total number of steps fixed so far. */
+      *nfixed += nstep;
+
    }
 
    return result;
