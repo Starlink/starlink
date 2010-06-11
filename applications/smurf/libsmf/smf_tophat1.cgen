@@ -1,4 +1,4 @@
-/*+
+/*+ -*- C -*-
 *  Name:
 *     smf_tophat1<X>
 
@@ -51,7 +51,7 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     10-JUN-2010 (DSN):
+*     10-JUN-2010 (DSB):
 *        Initial version.
 *     {enter_further_changes_here}
 
@@ -138,7 +138,7 @@ void CGEN_FUNCTION(smf_tophat1)( CGEN_TYPE *data, const int nel,
 
 /* Initialise the sum and count of the input data values in the filter
    box to hold the central input value. */
-            if( !( (*qin) & mask ) ) {
+            if( !( (*qin) & mask ) && *pin != CGEN_BAD ) {
                sum = *pin;
                count = 1;
             } else {
@@ -153,7 +153,8 @@ void CGEN_FUNCTION(smf_tophat1)( CGEN_TYPE *data, const int nel,
 /* If both elements of the current pair are within the bounds of the input
    array, and both have good values, add them both into the running sums. */
                if( iout - j >= 0 && iout + j < nel &&
-                   !( qin[ -j ] & mask ) && !( qin[ j ] & mask ) ) {
+                   !( qin[ -j ] & mask ) && !( qin[ j ] & mask ) &&
+                    pin[ -j ] != CGEN_BAD && pin[ j ] != CGEN_BAD ) {
                   sum += pin[ -j ] + pin[ j ];
                   count += 2;
                }
