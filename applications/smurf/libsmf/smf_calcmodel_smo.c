@@ -49,6 +49,8 @@
 *        Simplify logic and use quality bits.
 *     2010-06-10 (TIMJ):
 *        Fix precedence bug in checking !SMF__Q_MOD
+*        Change from smf_boxcar1 to smf_tophat1 because the latter
+*        behaves better at the ends (despite being 10 times slower).
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -225,7 +227,7 @@ void smf_calcmodel_smo( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         }
 
         /* Smooth that bolometer time series */
-        smf_boxcar1D( boldata, ntslice, boxcar, bolqua, SMF__Q_FIT, status );
+        smf_tophat1D( boldata, ntslice, boxcar, bolqua, SMF__Q_FIT, status );
 
         /* Remove this model from the residual data and copy the data to the model */
         for (j=0; j<ntslice; j++) {
