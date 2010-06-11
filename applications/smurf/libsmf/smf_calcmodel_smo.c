@@ -47,6 +47,8 @@
 *        Initial version
 *     2010-06-01 (TIMJ):
 *        Simplify logic and use quality bits.
+*     2010-06-10 (TIMJ):
+*        Fix precedence bug in checking !SMF__Q_MOD
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -195,7 +197,7 @@ void smf_calcmodel_smo( smfWorkForce *wf, smfDIMMData *dat, int chunk,
       if( *status == SAI__OK ) {
         /* Place last iteration back into residual if this is a modifiable section of the time series */
         for (i=0; i< ndata; i++) {
-          if ( !qua_data[i]&SMF__Q_MOD  && res_data[i] != VAL__BADD && model_data[i] != VAL__BADD ) {
+          if ( !(qua_data[i]&SMF__Q_MOD)  && res_data[i] != VAL__BADD && model_data[i] != VAL__BADD ) {
             res_data[i] += model_data[i];
           }
         }
@@ -230,7 +232,7 @@ void smf_calcmodel_smo( smfWorkForce *wf, smfDIMMData *dat, int chunk,
           size_t thisidx = boloff+j*tstride;
 
           /* Modify RES if we are allowed to modify things */
-          if (!qua_data[thisidx] & SMF__Q_MOD) {
+          if (! (qua_data[thisidx] & SMF__Q_MOD) ) {
             if (boldata[j] == VAL__BADD) {
               res_data[thisidx] = VAL__BADD;
             } else if (res_data[thisidx] != VAL__BADD) {
