@@ -37,6 +37,14 @@
 *     Smooth the time series for each bolometer and subtract it from the original.
 
 *  Notes:
+*     This model can not (yet) introduce bad samples into the residual model. This
+*     is because it only smoothes data that can be fitted and that data can always be
+*     subtracted from the input. One difference between this model and others is that
+*     SMF__Q_FIT is used throughout rather than using SMF__Q_FIT for fitting the
+*     data and SMF__Q_MOD for correcting the data. This is because we do not really
+*     fit to the data at all and so can not interpolate over data that have been
+*     ignored by the fit. To handle that we would have to fit a function to the
+*     smoothed data to bridge the gap.
 
 *  Authors:
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -51,6 +59,8 @@
 *        Fix precedence bug in checking !SMF__Q_MOD
 *        Change from smf_boxcar1 to smf_tophat1 because the latter
 *        behaves better at the ends (despite being 10 times slower).
+*     2010-06-11 (TIMJ):
+*        Tweak quality handling one more time
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -197,9 +207,9 @@ void smf_calcmodel_smo( smfWorkForce *wf, smfDIMMData *dat, int chunk,
       */
 
       if( *status == SAI__OK ) {
-        /* Place last iteration back into residual if this is a modifiable section of the time series */
+        /* Place last iteration back into residual if this is a smoothable section of the time series */
         for (i=0; i< ndata; i++) {
-          if ( !(qua_data[i]&SMF__Q_MOD)  && res_data[i] != VAL__BADD && model_data[i] != VAL__BADD ) {
+          if ( !(qua_data[i]&SMF__Q_FIT)  && res_data[i] != VAL__BADD && model_data[i] != VAL__BADD ) {
             res_data[i] += model_data[i];
           }
         }
@@ -233,10 +243,13 @@ void smf_calcmodel_smo( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         for (j=0; j<ntslice; j++) {
           size_t thisidx = boloff+j*tstride;
 
-          /* Modify RES if we are allowed to modify things */
-          if (! (qua_data[thisidx] & SMF__Q_MOD) ) {
+          /* Modify RES if this section has smoothable quality */
+          if (! (qua_data[thisidx] & SMF__Q_FIT) ) {
             if (boldata[j] == VAL__BADD) {
-              res_data[thisidx] = VAL__BADD;
+              /* Need to set to bad quality but since SMO can not
+                 introduce bad values we shouldn't get here. For now
+                 we use the COM quality bit just in case. */
+              qua_data[thisidx] |= SMF__Q_COM;
             } else if (res_data[thisidx] != VAL__BADD) {
               res_data[thisidx] -= boldata[j];
             }
