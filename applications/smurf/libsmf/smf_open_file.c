@@ -208,6 +208,9 @@
  *        Map the dark squids even if data were already flatfielded
  *     2010-06-10 (EC):
  *        Add quality to dark squids
+ *      2010-06-14 (DSB):
+ *         Correct check for read access before creating a new QUALITY array 
+ *         in the DKSQUID NDF.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -594,7 +597,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
                       status);
             ndfMap( dkndf, "QUALITY", "_UBYTE", mode, &dpntr[2], &nmap,
                     status );
-          } else if( !strncmp(mode,"READ",4) ) {
+          } else if( strncmp(mode,"READ",4) ) {
             msgOutif( MSG__DEBUG, "", "Creating new DKSQUID QUALITY",
                       status);
             ndfMap( dkndf, "QUALITY", "_UBYTE", "WRITE/ZERO", &dpntr[2], &nmap,
