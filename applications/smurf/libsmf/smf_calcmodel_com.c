@@ -562,7 +562,7 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
 
             smf_templateFit1D( res_data+ibase_box, qua_data+ibase_box,
                                SMF__Q_GOOD, SMF__Q_MOD, fit_size,
-                               tstride, m_box, 0, 0, gai_data+igbase,
+                               tstride, m_box, 0, nooffs, gai_data+igbase,
                                gai_data+block_cstride+igbase,
                                gai_data+2*block_cstride+igbase, status );
 
