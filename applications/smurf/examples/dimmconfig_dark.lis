@@ -28,6 +28,9 @@ apod = 0
 # higher-order polynomial for baselines
 order = 5
 
+# Match dark squid apodization to main data array in case DKS is used
+cleandk.apod = 0
+
 # ----------------------------------------------------------------------------
 # These parameters control the iterative model components
 # ----------------------------------------------------------------------------

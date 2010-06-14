@@ -48,6 +48,8 @@ padstart = 1000
 padend = 1000
 apod = 1000
 
+# Match dark squid apodization to main data array in case DKS is used
+cleandk.apod = 1000
 
 # ----------------------------------------------------------------------------
 # These parameters control the iterative model components
