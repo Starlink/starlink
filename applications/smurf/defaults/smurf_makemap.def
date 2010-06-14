@@ -30,6 +30,8 @@
 #        Added com.gain_is_one
 #     2010-06-08 (EC):
 #        Added two.amap, two.bmap
+#     2010-06-13 (DSB):
+#        Added com.offset_is_zero
 
 #-
 
@@ -105,10 +107,11 @@ com.fit_box = <undef>
 com.notfirst = 0
 
 # Setting com.gain_is_one non-zero causes all bolometer gains to be
-# forced to 1.0 (and offsets to 0.0), but retains the real
-# correlation coefficient so that bad bolometer blocks are still
-# identified and rejected.
+# forced to 1.0. Setting com.offset_is_zero non-zero causes all bolometer
+# offsets to be forced to 0.0. The correlation coefficients are retained
+# so that bad bolometer blocks are still identified and rejected.
 com.gain_is_one = 0
+com.offset_is_zero = 0
 
 gai.flatfield = 0
 

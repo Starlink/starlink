@@ -160,6 +160,10 @@
 *     2010-06-11 (DSB):
 *        Display the number of bolometers rejected for each reason if
 *        MSG_FILTER==DEBUG.
+*     2010-06-13 (DSB):
+*        Added com.offset_is_zero. Setting this to one causes all
+*        bolometer offsets to be forced to 0.0. Setting com.gain_is_one
+*        to 1 no longer forces offsets to zero.
 
 *  Copyright:
 *     Copyright (C) 2006-2010 University of British Columbia.
@@ -226,6 +230,7 @@ typedef struct smfCalcmodelComData {
   dim_t nblock;            /* No of time slice blocks per bolometer */
   dim_t nbolo;             /* number of bolometers */
   int nogains;             /* Force all gains to unity? */
+  int nooffs;              /* Force all offsets to zero? */
   dim_t ntslice;           /* number of time slices */
   int operation;           /* 0=undo COM, 1=new COM, 2=fit COM */
   double *res_data;        /* Pointer to common residual data */
@@ -265,6 +270,7 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
   dim_t nbolo;             /* number of bolometers */
   dim_t nblock;            /* Number of time blocks */
   int nogains;             /* Force all gains to unity? */
+  int nooffs;              /* Force all offsets to zero? */
   dim_t nsum;              /* Number of values summed in "sum" */
   dim_t ntime;             /* Number of remaining time slices */
   dim_t ntslice;           /* number of time slices */
@@ -310,6 +316,7 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
   weight = pdata->weight;
   gain_box = pdata->gain_box;
   nogains = pdata->nogains;
+  nooffs = pdata->nooffs;
   fit_box = pdata->fit_box;
   nblock = pdata->nblock;
   converged = pdata->converged;
@@ -567,13 +574,14 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
               *(gai_data+igbase) = BAD_FIT;
               errAnnul( status );
 
-            /* If we are ignoring gains, force gains to 1.0 and offsets
-               to 0.0. Retain the correlation coeffs in order to flag bad
-               blocks. */
-            } else if( nogains ) {
-               *(gai_data+igbase) = 1.0;
-               *(gai_data+block_cstride+igbase) = 0.0;
+            /* If we are ignoring gains, force gains to 1.0. If we are
+               ignoring offsets, force offsets to 0.0. Retain the correlation
+               coeffs in order to flag bad blocks. */
+            } else {
+               if( nogains ) *(gai_data+igbase) = 1.0;
+               if( nooffs ) *(gai_data+block_cstride+igbase) = 0.0;
             }
+
           }
 
           ntime -= block_size;
@@ -679,6 +687,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   dim_t ndata=0;                /* Total number of data points */
   size_t newbad;                /* Number of new bolos being flagged as bad */
   int nogains;                  /* Force all gains to unity? */
+  int nooffs;                   /* Force all offsets to zero? */
   smfArray *noi=NULL;           /* Pointer to NOI at chunk */
   double *noi_data=NULL;        /* Pointer to DATA component of model */
   size_t noibstride;            /* bolo stride for noise */
@@ -776,6 +785,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   astMapGet0D(kmap, "GAIN_ABSTOL", &gain_abstol);
   astMapGet0I(kmap, "NOTFIRST", &notfirst);
   astMapGet0I(kmap, "GAIN_IS_ONE", &nogains );
+  astMapGet0I(kmap, "OFFSET_IS_ZERO", &nooffs );
 
   if (*status == SAI__OK && gain_box == 0) {
     *status = SAI__ERROR;
@@ -1023,6 +1033,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         pdata->weight = weight;
         pdata->gain_box = gain_box;
         pdata->nogains = nogains;
+        pdata->nooffs = nooffs;
         pdata->fit_box = fit_box;
         pdata->nblock = nblock;
         pdata->converged = NULL;
@@ -1206,6 +1217,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
           pdata->weight = weight;
           pdata->gain_box = gain_box;
           pdata->nogains = nogains;
+          pdata->nooffs = nooffs;
           pdata->fit_box = fit_box;
           pdata->nblock = nblock;
           pdata->converged = converged;
