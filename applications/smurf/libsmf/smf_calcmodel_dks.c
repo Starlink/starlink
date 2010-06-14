@@ -52,6 +52,9 @@
 *        Measure normalized change in model between iterations (dchisq)
 *     2010-05-14 (EC)
 *        Modified initialization of dark squids, remove means.
+*     2010-06-14 (EC)
+*        -Switch to smf_tophat1 from smf_boxcar1
+*        -don't need to remove mean since we now have cleandk.order
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -237,18 +240,8 @@ void smf_calcmodel_dks( smfWorkForce *wf __attribute__((unused)),
 
         /* For the first iteration we need to do some pre-processing */
         if( (flags&SMF__DIMM_FIRSTITER) ) {
-          double mean;
-
           /* boxcar smooth */
-          smf_boxcar1D( &dksquid[jt1], ntot, boxcar, NULL, 0, status );
-
-          /* remove the mean as it isn't useful */
-          smf_stats1D( &dksquid[jt1], 1, ntot, NULL, 0, 0, &mean, 0, NULL,
-                       status );
-
-          for( j=jt1; (*status==SAI__OK)&&(j<=jt2); j++ ) {
-            dksquid[j] -= mean;
-          }
+          smf_tophat1D( &dksquid[jt1], ntot, boxcar, NULL, 0, status );
         }
 
         /* Loop over rows */
