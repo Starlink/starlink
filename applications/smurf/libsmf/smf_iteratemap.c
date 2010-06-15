@@ -342,6 +342,20 @@
 
 #define FUNC_NAME "smf_iteratemap"
 
+/* private function for converting quality mask value to bit number by
+   bit-shifting until a bit is found. If no bits are set, return -1. Otherwise
+   bit number is 0-indexed */
+int smf_qualtobit(smf_qual_t q);
+
+int smf_qualtobit(smf_qual_t q) {
+  int num=-1;
+  if( q ) {
+    while( !((q>>num)&1) ) num++;
+  }
+  return num;
+}
+
+/* Main routine */
 void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      const Grp *bolrootgrp, const Grp *shortrootgrp,
                      AstKeyMap *keymap, const smfArray *darks,
@@ -373,7 +387,6 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int *exportNDF_which=NULL;    /* Which models in modelorder will be exported*/
   int noexportsetbad=0;         /* Don't set bad values in exported models */
   double flagstat;              /* Threshold for flagging stationary regions */
-  dim_t goodbolo;               /* Number of good bolometers */
   int haveast=0;                /* Set if AST is one of the models */
   int haveext=0;                /* Set if EXT is one of the models */
   int havegai=0;                /* Set if GAI is one of the models */
@@ -417,6 +430,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   size_t nsamples_tot = 0;      /* Number of valid samples in all chunks */
   size_t ntgood_tot = 0;        /* Number of good time slices in all chunks */
   dim_t ntslice;                /* Number of time slices */
+  size_t numdata;               /* Total number of samples in chunk */
   int numiter=0;                /* Total number iterations */
   dim_t padEnd=0;               /* How many samples of padding at the end */
   dim_t padStart=0;             /* How many samples of padding at the start */
@@ -1159,27 +1173,22 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
 
             msgOut(" ", FUNC_NAME ": Pre-conditioning chunk", status);
-            goodbolo=0; /* Initialize good bolo count for this chunk */
             for( idx=0; idx<res[i]->ndat; idx++ ) {
               data = res[i]->sdata[idx];
               qua_data = qua[i]->sdata[idx]->pntr[0];
-
               smf_clean_smfData( wf, data, qua_data, keymap, status );
-
-              /* Count number of good bolometers in the file after flagging */
-              smf_get_dims( data, NULL, NULL, &nbolo, NULL, NULL, &bstride,
-                            NULL, status );
-
-              for( j=0; (*status==SAI__OK)&&(j<nbolo); j++ ) {
-                if( !(qua_data[j*bstride]&SMF__Q_BADB) ) {
-                  goodbolo++;
-                }
-              }
             }
 
             /* initial quality report */
             smf_qualstats_report( qua[i], qcount_last, &nsamples,
-                                  1, &ntgood, status );
+                                  1, &ntgood, &numdata, status );
+
+            /* If no good bolos left, set status */
+            if( (*status==SAI__OK) &&
+                (qcount_last[smf_qualtobit(SMF__Q_BADB)] >= numdata) ) {
+              *status = SMF__INSMP;
+              errRep("", FUNC_NAME ": All bolos are bad", status );
+            }
 
             /*** TIMER ***/
             msgOutiff( MSG__DEBUG, "", FUNC_NAME
@@ -1539,7 +1548,15 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
             /* report on the quality flags for this iterations before closing
              the quality */
-            smf_qualstats_report( qua[i], qcount_last, &nsamples, 0, &ntgood, status );
+            smf_qualstats_report( qua[i], qcount_last, &nsamples, 0, &ntgood,
+                                  &numdata, status );
+
+            /* If no good bolos left, set status */
+            if( (*status==SAI__OK) &&
+                (qcount_last[smf_qualtobit(SMF__Q_BADB)] >= numdata) ) {
+              *status = SMF__INSMP;
+              errRep("", FUNC_NAME ": All bolos are bad", status );
+            }
 
             /* Check for consistency between quality and data arrays */
             for( idx=0; (*status==SAI__OK)&&(idx<res[i]->ndat); idx++ ) {
@@ -1555,9 +1572,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                 msgOut( "", FUNC_NAME ": ***********************************",
                         status );
               }
-
             }
-
 
             /* Close files if memiter not set */
             if( !memiter ) {
@@ -2325,6 +2340,12 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     msgOutiff(MSG__NORM, "", "Total samples available from all chunks: %zu (%g bolos)",
               status, nsamples_tot, (double)nsamples_tot / (double)ntgood_tot );
     if (nboloeff) *nboloeff = (double)nsamples_tot / (double)ntgood_tot;
+
+    /* Set status if no good samples */
+    if( (*status==SAI__OK) && (nsamples_tot==0) ) {
+      *status = SMF__INSMP;
+      errRep("", FUNC_NAME ": No good samples", status );
+    }
   }
 
   /* The second set of map arrays get freed in the multiple contchunk case */

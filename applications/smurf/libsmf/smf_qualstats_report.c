@@ -16,7 +16,8 @@
 *     smf_qualstats_report( const smfArray *qua,
 *                           size_t last_qcount[SMF__NQBITS],
 *                           size_t *last_nmap,
-*                           int init, size_t * ngood_tslice, int *status )
+*                           int init, size_t * ngood_tslice,
+*                           size_t *numdata, int *status )
 
 *  Arguments:
 *     qua = const smfArray *qua (Given)
@@ -32,6 +33,8 @@
 *        If set, first call so initialize the qcount buffers.
 *     ngood_tslice = size_t* (Returned)
 *        If non-null, contains the number of usable time slices.
+*     numdata = size_t* (Returned)
+*        If non-null, the maximum possible number of bolometers
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -66,6 +69,8 @@
 *        Return the number of usable time slices.
 *     2010-05-27 (TIMJ):
 *        Factor out calculation code into smf_qualstats_model
+*     2010-06-16 (EC):
+*        Return ndata.
 
 *  Copyright:
 *     Copyright (C) 2010 University of British Columbia.
@@ -110,7 +115,8 @@
 void smf_qualstats_report( const smfArray *qua,
                            size_t last_qcount[SMF__NQBITS],
                            size_t *last_nmap, int init,
-                           size_t *ngood_tslice, int *status ) {
+                           size_t *ngood_tslice, size_t *numdata,
+                           int *status ) {
 
   /* Local Variables */
   size_t i;                     /* loop counter */
@@ -268,6 +274,7 @@ void smf_qualstats_report( const smfArray *qua,
 
     if (ngood_tslice) *ngood_tslice = ntgood;
 
+    if (*numdata) *numdata = ndata;
   }
 
 }

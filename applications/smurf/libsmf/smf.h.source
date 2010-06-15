@@ -1298,7 +1298,8 @@ void smf_qualstats_model( const smfArray *qua, size_t qcount[8], size_t * ngoodb
                           size_t * tbound, size_t *tpad, int * status );
 
 void smf_qualstats_report( const smfArray *qua, size_t last_qcount[8],
-                           size_t *last_nmap, int init, size_t *ngood_tslice, int *status );
+                           size_t *last_nmap, int init, size_t *ngood_tslice,
+                           size_t *numdata, int *status );
 
 double smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
                         smf_qual_t *quality, smf_qual_t mask,
