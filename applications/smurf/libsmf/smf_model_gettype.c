@@ -47,7 +47,8 @@
 *     2010-06-08 (EC):
 *        Add SMF__TWO
 *     2010-06-14 (TIMJ):
-*        Alphabetize models
+*        Alphabetize models and use a switch statement rather than loads
+*        of strcmp calls.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -88,63 +89,84 @@
 #include "libsmf/smf.h"
 
 /* Other includes */
-#include <ctype.h>
+#include <string.h>
 
 #define FUNC_NAME "smf_model_gettype"
 
 smf_modeltype smf_model_gettype( const char *modelname, int *status ) {
 
   /* Local Variables */
-  dim_t i;
-  char tempstring[4];
+  smf_modeltype retval = SMF__NUL;
 
   /* Main routine */
-  if (*status != SAI__OK) return SMF__NUL;
+  if (*status != SAI__OK) return retval;
 
-  /* Make copy, convert to upper case */
-
-  strncpy( tempstring, modelname, 4 );
-  tempstring[3] = '\0';
-
-  for( i=0; i<3; i++ ) {
-    if( tempstring[i] != '\0' ) {
-      tempstring[i] = toupper( tempstring[i] );
+  /* Check first character since these models are pretty unique */
+  switch( modelname[0] ) {
+  case 'A':
+  case 'a':
+    retval = SMF__AST;
+    break;
+  case 'C':
+  case 'c':
+    if (strncasecmp( modelname, "COM", 3 ) == 0) {
+      retval = SMF__COM;
+    } else if (strncasecmp( modelname, "CUM", 3 ) == 0) {
+      retval = SMF__CUM;
     }
+    break;
+  case 'D':
+  case 'd':
+    retval = SMF__DKS;
+    break;
+  case 'E':
+  case 'e':
+    retval = SMF__EXT;
+    break;
+  case 'F':
+  case 'f':
+    retval = SMF__FLT;
+    break;
+  case 'G':
+  case 'g':
+    retval = SMF__GAI;
+    break;
+  case 'L':
+  case 'l':
+    retval = SMF__LUT;
+    break;
+  case 'N':
+  case 'n':
+    retval = SMF__NOI;
+    break;
+  case 'P':
+  case 'p':
+    retval = SMF__PLN;
+    break;
+  case 'R':
+  case 'r':
+    retval = SMF__RES;
+    break;
+  case 'S':
+  case 's':
+    retval = SMF__SMO;
+    break;
+  case 'T':
+  case 't':
+    retval = SMF__TWO;
+    break;
+  case 'Q':
+  case 'q':
+    retval = SMF__QUA;
+    break;
+  default:
+    retval = SMF__NUL;
   }
 
-  if( strncmp( tempstring, "AST", 3 ) == 0 ) {
-    return SMF__AST;
-  } else if( strncmp( tempstring, "COM", 3 ) == 0 ) {
-    return SMF__COM;
-  } else if( strncmp( tempstring, "CUM", 3 ) == 0 ) {
-    return SMF__CUM;
-  } else if( strncmp( tempstring, "DKS", 3 ) == 0 ) {
-    return SMF__DKS;
-  } else if( strncmp( tempstring, "EXT", 3 ) == 0 ) {
-    return SMF__EXT;
-  } else if( strncmp( tempstring, "FLT", 3 ) == 0 ) {
-    return SMF__FLT;
-  } else if( strncmp( tempstring, "GAI", 3 ) == 0 ) {
-    return SMF__GAI;
-  } else if( strncmp( tempstring, "LUT", 3 ) == 0 ) {
-    return SMF__LUT;
-  } else if( strncmp( tempstring, "NOI", 3 ) == 0 ) {
-    return SMF__NOI;
-  } else if( strncmp( tempstring, "PLN", 3 ) == 0 ) {
-    return SMF__PLN;
-  } else if( strncmp( tempstring, "RES", 3 ) == 0 ) {
-    return SMF__RES;
-  } else if( strncmp( tempstring, "SMO", 3 ) == 0 ) {
-    return SMF__SMO;
-  } else if( strncmp( tempstring, "TWO", 3 ) == 0 ) {
-    return SMF__TWO;
-  } else if( strncmp( tempstring, "QUA", 3 ) == 0 ) {
-    return SMF__QUA;
-  } else {
+  if ( retval == SMF__NUL && *status == SAI__OK ) {
     *status = SAI__ERROR;
-    msgSetc("MNAME",modelname);
-    errRep("", FUNC_NAME ": Invalid model name ^MNAME", status);
+    errRepf("", FUNC_NAME ": Invalid model name '%s'", status, modelname);
   }
 
-  return SMF__NUL;
+  return retval;
 }
