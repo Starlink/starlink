@@ -89,7 +89,7 @@
 #include "libsmf/smf.h"
 
 /* Other includes */
-#include <string.h>
+#include <strings.h>
 
 #define FUNC_NAME "smf_model_gettype"
 
