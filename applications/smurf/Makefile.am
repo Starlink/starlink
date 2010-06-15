@@ -70,7 +70,7 @@ examples/README \
 examples/atm.sdf \
 examples/candycanes.sdf \
 examples/dimmconfig.lis \
-examples/dimmconfig_dark.lis \
+examples/dimmconfig_fridgeflat.lis \
 examples/dimmconfig_distortionmap.lis \
 examples/dimmconfig_extended.lis \
 examples/dimmconfig_faint.lis \
