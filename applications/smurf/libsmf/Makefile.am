@@ -136,6 +136,7 @@ smf_filter_r2c.c \
 smf_find_acsis_corners.c \
 smf_find_bad_dets.c \
 smf_find_dateobs.c \
+smf_find_gains.c \
 smf_find_median.c \
 smf_find_science.c \
 smf_find_seqcount.c \
