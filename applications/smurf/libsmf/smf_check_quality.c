@@ -136,9 +136,9 @@ size_t smf_check_quality( smfData *data, unsigned char *quality,
 
   /* Check for QUALITY */
   if( quality ) {
-    qual = (unsigned char *) quality;       /* external QUALITY */
+    qual = quality;       /* external QUALITY */
   } else {
-    qual = (unsigned char *) data->pntr[2]; /* QUALITY given by smfData */
+    qual = data->pntr[2]; /* QUALITY given by smfData */
   }
 
   if( !qual ) {
