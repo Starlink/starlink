@@ -320,9 +320,12 @@ void smf_close_file( smfData ** data, int * status ) {
      freed if they were mapped to a file but not if they were stored
      in a separate action as temp storage */
   if (freedata) {
-    for (i = 0; i < 3; i++ ) {
+    for (i = 0; i < 2; i++ ) {
       if ( ((*data)->pntr)[i] != NULL )
         ((*data)->pntr)[i] = astFree( ((*data)->pntr)[i] );
+    }
+    if ( (*data)->qual ) {
+      (*data)->qual = astFree( (*data)->qual );
     }
   } else if (isSc2store) {
     /* just the data array */

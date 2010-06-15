@@ -130,7 +130,7 @@ void smf_create_bolfile( const Grp * bgrp, size_t index,
                       flags, bolmap, status );
   } else {
     void *pntr[] = {NULL, NULL};
-    smf_qual_t *qual;
+    smf_qual_t *qual = NULL;
     dim_t mydims[2];
     int mylbnd[2];
     size_t nbols;
