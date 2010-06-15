@@ -196,7 +196,7 @@ void smf_dump_smfData( const smfData *data, int showflags __attribute__((unused)
   } else {
     msgSetc("D"," V: NULL,");
   }
-  if ( (data->pntr)[2] != NULL ) {
+  if ( data->qual != NULL ) {
     msgSetc("D"," Q: OK");
   } else {
     msgSetc("D"," Q: NULL");

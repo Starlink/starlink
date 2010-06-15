@@ -14,8 +14,8 @@
 
 *  Invocation:
 *     void smf_boxcar1<X>( CGEN_TYPE *series, const size_t ninpts,
-*                          size_t window, unsigned char *qual,
-*                          unsigned char mask, int *status )
+*                          size_t window, smf_qual_t *qual,
+*                          smf_qual_t mask, int *status )
 
 *  Arguments:
 *     series = CGEN_TYPE* (Given)
@@ -28,7 +28,7 @@
 *        If specified, use this QUALITY array to decide which samples
 *        to use (provided mask). Otherwise data are only ignored if set
 *        to VAL__BADD.
-*     mask = unsigned char (Given)
+*     mask = smf_qual_t (Given)
 *        Use with qual to define which bits in quality are relevant to
 *        ignore data in the calculation.
 *     status = int* (Given and Returned)
@@ -118,8 +118,8 @@
 #define FUNC_NAME "smf_boxcar1"
 
 void CGEN_FUNCTION(smf_boxcar1)( CGEN_TYPE *series, const size_t ninpts,
-                                 size_t window, unsigned char *qual,
-                                 unsigned char mask, int *status) {
+                                 size_t window, smf_qual_t *qual,
+                                 smf_qual_t mask, int *status) {
 
   /* Local variables */
   long off;                   /* offset from loop counter to modified sample */

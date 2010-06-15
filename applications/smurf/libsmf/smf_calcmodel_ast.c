@@ -157,11 +157,11 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)),
   size_t noitstride;            /* Time stride for noise */
   dim_t ntslice=0;              /* Number of time slices */
   smfArray *qua=NULL;           /* Pointer to QUA at chunk */
-  unsigned char *qua_data=NULL; /* Pointer to quality data */
+  smf_qual_t *qua_data=NULL; /* Pointer to quality data */
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
   size_t tstride;               /* Time slice stride in data array */
-  unsigned char *mapqual = NULL;/* Quality map */
+  smf_qual_t *mapqual = NULL;/* Quality map */
   double *mapvar = NULL;        /* Variance map */
   double *mapweight = NULL;     /* Weight map */
   double *mapweightsq = NULL;   /* Weight map squared */

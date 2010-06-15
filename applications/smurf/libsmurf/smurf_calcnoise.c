@@ -400,10 +400,10 @@ void smurf_calcnoise( int *status ) {
           /* now mask the noise and ratio data */
           if (respmap) {
             double * rdata = (respmap->pntr)[0];
-            unsigned char * outq = (outdata->pntr)[2];
-            unsigned char * ratq = NULL;
+            smf_qual_t * outq = outdata->qual;
+            smf_qual_t * ratq = NULL;
 
-            if (ratdata) ratq = (ratdata->pntr)[2];
+            if (ratdata) ratq = ratdata->qual;
 
             /* set the quality mask */
             for (i = 0; i < (outdata->dims)[0]*(outdata->dims)[1]; i++) {

@@ -288,10 +288,10 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
   int itexists;              /* Boolean for presence of other components */
   char filename[GRP__SZNAM+1]; /* Input filename, derived from GRP */
   char *pname;               /* Pointer to input filename */
-  void *outdata[] = { NULL, NULL, NULL }; /* Array of pointers to
-                                             output data components:
-                                             one each for DATA,
-                                             QUALITY and VARIANCE */
+  void *outdata[] = { NULL, NULL }; /* Array of pointers to
+                                       output data components:
+                                       one each for DATA and VARIANCE */
+  smf_qual_t * outqual = NULL;/* Pointer to output quality */
   int isFlat = 1;            /* Flag to indicate if file flatfielded */
   int isTseries = 0;         /* Flag to specify whether the data are
                                 in time series format */
@@ -524,8 +524,18 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
               smf_create_qualname( mode, indf, &qlocs, status );
             }
             /* Last step, map quality */
-            ndfMap( indf, "QUALITY", "_UBYTE", mode, &outdata[2], &nout,
-                    status );
+            if ( SMF__QUALTYPE == SMF__UBYTE) {
+              void *qpntr[1];
+              ndfMap( indf, "QUALITY", "_UBYTE", mode, &qpntr[0], &nout,
+                      status );
+              outqual = qpntr[0];
+            } else {
+              if (*status == SAI__OK) {
+                *status = SAI__ERROR;
+                errRep( "", "Unable to read QUALITY as anything other than UBYTE at this time",
+                        status );
+              }
+            }
           } else {
             /* If no QUALITY, then first check for quality names and
                create if not present */
@@ -540,8 +550,18 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
             }
             /* Attempt to create QUALITY component - assume we have
                write or update access at this point */
-            ndfMap( indf, "QUALITY", "_UBYTE", "WRITE/ZERO", &outdata[2], &nout,
-                    status );
+            if ( SMF__QUALTYPE == SMF__UBYTE) {
+              void *qpntr[1];
+              ndfMap( indf, "QUALITY", "_UBYTE", "WRITE/ZERO", &qpntr[0], &nout,
+                      status );
+              outqual = qpntr[0];
+            } else {
+              if (*status == SAI__OK) {
+                *status = SAI__ERROR;
+                errRep( "", "Unable to read QUALITY as anything other than UBYTE at this time",
+                        status );
+              }
+            }
           }
           /* Done with quality names so free resources */
           irqRlse( &qlocs, status );
@@ -564,8 +584,10 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
         int dkndf;
         int dkplace;
         int dqexists;
+        char qmode[NDF__SZMMD+1];
         int nmap;
-        void *dpntr[] = {NULL,NULL,NULL};
+        void *dpntr[] = {NULL,NULL};
+        smf_qual_t * qpntr = NULL;
 
         ndfXstat( indf, "SCUBA2", &itexists, status );
         if( itexists ) {
@@ -592,16 +614,29 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           /* Also generically map/create a quality array unless we're
              in READ mode and one didn't previously exist */
           ndfState( dkndf, "QUALITY", &dqexists, status );
-          if( dqexists ) {
+          qmode[0] = '\0';
+          if ( dqexists ) {
+            one_strlcpy( qmode, mode, sizeof(qmode), status );
             msgOutif( MSG__DEBUG, "", "Mapping existing DKSQUID QUALITY",
                       status);
-            ndfMap( dkndf, "QUALITY", "_UBYTE", mode, &dpntr[2], &nmap,
-                    status );
-          } else if( strncmp(mode,"READ",4) ) {
+          } else if ( strncmp(mode, "READ", 4) != 0 ) {
+            one_strlcpy( qmode, "WRITE/ZERO", sizeof(qmode), status );
             msgOutif( MSG__DEBUG, "", "Creating new DKSQUID QUALITY",
                       status);
-            ndfMap( dkndf, "QUALITY", "_UBYTE", "WRITE/ZERO", &dpntr[2], &nmap,
-                    status );
+          }
+          if (strlen(mode)) {
+            if ( SMF__QUALTYPE == SMF__UBYTE ) {
+              void * qdkpntr[1];
+              ndfMap( dkndf, "QUALITY", "_UBYTE", qmode, &qdkpntr[0], &nmap,
+                      status );
+              qpntr = qdkpntr[0];
+            } else {
+              if (*status == SAI__OK) {
+                *status = SAI__ERROR;
+                errRep( "", "Unable to read DKS QUALITY as anything other than UBYTE at this time",
+                        status );
+              }
+            }
           }
 
 
@@ -610,7 +645,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
             da->dksquid = smf_create_smfData( SMF__NOCREATE_HEAD |
                                               SMF__NOCREATE_DA, status );
             da->dksquid->pntr[0] = dpntr[0];
-            da->dksquid->pntr[2] = dpntr[2];
+            da->dksquid->qual = qpntr;
 
             da->dksquid->dtype = SMF__DOUBLE;
             da->dksquid->isTordered = 1;
@@ -877,9 +912,8 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           }
 
           /* Create an empty QUALITY array */
-          da->dksquid->pntr[2] = astCalloc( rowsize*nframes,
-                                            smf_dtype_sz(SMF__UBYTE,status),
-                                            1);
+          da->dksquid->qual = astCalloc( rowsize*nframes,
+                                         sizeof(*(da->dksquid->qual)),1);
         }
 
         /* Create a FitsChan from the FITS headers */
@@ -1003,9 +1037,10 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 
       /* Store the data in the smfData struct if needed */
       if ( !(flags & SMF__NOCREATE_DATA) ) {
-        for (i=0; i<3; i++) {
+        for (i=0; i<2; i++) {
           ((*data)->pntr)[i] = outdata[i];
         }
+        (*data)->qual = outqual;
       }
       /* Store the dimensions, bounds and the size of each axis */
       (*data)->ndims = ndims;

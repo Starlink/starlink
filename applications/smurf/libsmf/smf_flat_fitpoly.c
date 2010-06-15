@@ -164,12 +164,11 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
      requires the third dimension to be 6 so we initialise all to 0.0 */
   coptr = astCalloc( NCOEFF * nbol, sizeof(*coptr), 1 );
   {
-    void * pntr[3];
+    void * pntr[2];
     dim_t dims[3];
     int lbnd[3];
     pntr[0] = coptr;
     pntr[1] = NULL;
-    pntr[2] = NULL;
     dims[0] = (bolvald->dims)[0];
     dims[1] = (bolvald->dims)[1];
     dims[2] = NCOEFF;
@@ -178,7 +177,7 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
     lbnd[2] = 1;
 
     *coeffs = smf_construct_smfData( NULL, NULL, NULL, NULL, SMF__DOUBLE,
-                                     pntr, 1, dims, lbnd, 3, 0, 0, NULL,
+                                     pntr, NULL, 1, dims, lbnd, 3, 0, 0, NULL,
                                      NULL, status);
   }
 
@@ -414,12 +413,11 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
 
   if (polybol) {
     if (polyfit) {
-      void *pntr[3];
+      void *pntr[2];
       pntr[0] = polybol;
       pntr[1] = NULL;
-      pntr[2] = NULL;
       *polyfit = smf_construct_smfData( NULL, NULL, NULL, NULL, SMF__DOUBLE,
-                                        pntr, 1, bolvald->dims, bolvald->lbnd, 3, 0, 0, NULL,
+                                        pntr, NULL, 1, bolvald->dims, bolvald->lbnd, 3, 0, 0, NULL,
                                         NULL, status );
       if (*status != SAI__OK && ! *polyfit) polybol = astFree( polybol );
     } else {

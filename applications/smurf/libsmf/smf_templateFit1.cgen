@@ -13,9 +13,9 @@
 *     Subroutine
 
 *  Invocation:
-*     void smf_templateFit1<X>( CGEN_TYPE *data, unsigned char *qual,
-*                               unsigned char mask_meas,
-*                               unsigned char mask_cor, const size_t n,
+*     void smf_templateFit1<X>( CGEN_TYPE *data, smf_qual_t *qual,
+*                               smf_qual_t mask_meas,
+*                               smf_qual_t mask_cor, const size_t n,
 *                               const size_t stride,
 *                               const double *template, int remove,
 *                               int nooffset, double *gain, double *offset,
@@ -28,10 +28,10 @@
 *        If specified, use this QUALITY array to decide which data samples
 *        to use (provided mask). Otherwise data are only ignored if set
 *        to VAL__BADD.
-*     mask_meas = unsigned char (Given)
+*     mask_meas = smf_qual_t (Given)
 *        Use with qual to define which bits in quality are relevant to
 *        ignore data in calculation of template fit.
-*     mask_cor = unsigned char (Given)
+*     mask_cor = smf_qual_t (Given)
 *        Use with qual to define which bits in quality are relevant to
 *        ignore data when removing fitted template (see remove flag).
 *     n = const size_t (Given)
@@ -136,9 +136,9 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_templateFit1"
 
-void CGEN_FUNCTION(smf_templateFit1)( CGEN_TYPE *data, unsigned char *qual,
-                                      unsigned char mask_meas,
-                                      unsigned char mask_cor, const size_t n,
+void CGEN_FUNCTION(smf_templateFit1)( CGEN_TYPE *data, smf_qual_t *qual,
+                                      smf_qual_t mask_meas,
+                                      smf_qual_t mask_cor, const size_t n,
                                       const size_t stride,
                                       const double *template, int remove,
                                       int nooffset, double *gain, double *offset,

@@ -13,13 +13,13 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_subtract_poly( smfData *data, unsigned char *quality, int rel,
+*     smf_subtract_poly( smfData *data, smf_qual_t *quality, int rel,
 *                        int *status )
 
 *  Arguments:
 *     data = smfData** (Given and Returned)
 *        Pointer to input data struct
-*     quality = unsigned char * (Given)
+*     quality = smf_qual_t * (Given)
 *        If set, use this buffer instead of QUALITY associated with data.
 *        If NULL, use the QUALITY associated with data.
 *     rel = int (Given)
@@ -114,7 +114,7 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_subtract_poly"
 
-void smf_subtract_poly(smfData *data, unsigned char *quality, int rel,
+void smf_subtract_poly(smfData *data, smf_qual_t *quality, int rel,
 		       int *status) {
 
   /* Local variables */
@@ -129,7 +129,7 @@ void smf_subtract_poly(smfData *data, unsigned char *quality, int rel,
   size_t nframes;             /* Number of time slices */
   double *outdata = NULL;     /* Pointer to output data array */
   double *poly = NULL;        /* Pointer to polynomial coefficents */
-  unsigned char *qual=NULL;   /* Pointer to QUALITY component */
+  smf_qual_t *qual=NULL;   /* Pointer to QUALITY component */
 
   /* Check status */
   if (*status != SAI__OK) return;
@@ -154,7 +154,7 @@ void smf_subtract_poly(smfData *data, unsigned char *quality, int rel,
   if( quality ) {
     qual = quality;
   } else {
-    qual = (data->pntr)[2];
+    qual = data->qual;
   }
 
   if( !qual && (*status == SAI__OK) ) {

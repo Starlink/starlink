@@ -103,7 +103,7 @@ void smf_flatten ( smfData *data, int *status ) {
   int nboll;                   /* Number of bolometers */
   int nframes;                 /* Number of frames (timeslices) */
   void *pntr[3];               /* Array of pointers for DATA, QUALITY & VARIANCE */
-  unsigned char *qual;         /* Pointer to quality array */
+  smf_qual_t *qual;         /* Pointer to quality array */
 
   if ( *status != SAI__OK ) return;
 
@@ -141,7 +141,7 @@ void smf_flatten ( smfData *data, int *status ) {
     smf_set_clabels( "Flatfielded", NULL, SIPREFIX "W", data->hdr, status);
 
     /* Now check for a QUALITY array */
-    qual = (data->pntr)[2];
+    qual = data->qual;
     if ( qual != NULL ) {
       /* Check for BAD values from flatfield routine and set QUALITY
 	 accordingly. Any bad values at this point means that those

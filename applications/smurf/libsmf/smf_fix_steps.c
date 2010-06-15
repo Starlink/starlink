@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     void smf_fix_steps( smfWorkForce *wf, smfData *data,
-*                         unsigned char *quality, double dcthresh,
+*                         smf_qual_t *quality, double dcthresh,
 *                         dim_t dcmedianwidth, dim_t dcfitbox, int dcmaxsteps,
 *                         int dclimcorr, size_t *nsteps, int *status )
 
@@ -23,7 +23,7 @@
 *        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData * (Given and Returned)
 *        The data that will be repaired (in-place)
-*     quality = unsigned char * (Given and Returned)
+*     quality = smf_qual_t * (Given and Returned)
 *        If set, use this buffer instead of QUALITY associated with data.
 *        If NULL, use the QUALITY associated with data. Locations of steps
 *        will have bit SMF__Q_JUMP set.
@@ -212,11 +212,11 @@ typedef struct BoloData {
 
 /* Prototypes for private functions. */
 static void smf1_step_linefit( int box, float minfrac, int stride, double *dat,
-                               unsigned char *qua, double nsigma, double *m,
+                               smf_qual_t *qua, double nsigma, double *m,
                                double *c, double *rms, int *status );
 
 static int smf1_step_correct( int nblock, int *blocks, double *work,
-                              unsigned char *qua, double *dat, size_t base,
+                              smf_qual_t *qua, double *dat, size_t base,
                               dim_t ibolo, size_t bstride, size_t
 			      tstride, dim_t ntslice, int ntime, int
 			      itime_lo, int itime_hi, int *common, int
@@ -227,7 +227,7 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
                               int *nfixed, int *status DEBUG_ARGS );
 
 
-void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
+void smf_fix_steps( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
                     double dcthresh, dim_t dcmedianwidth, dim_t dcfitbox,
                     int dcmaxsteps, int dclimcorr, size_t *nsteps, int *status ) {
 
@@ -276,8 +276,8 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
    size_t itime_start;         /* Time index at start of usable data stream */
    size_t ns;
    size_t tstride;             /* Bolo stride */
-   unsigned char *pq1;
-   unsigned char *qua = NULL;  /* Pointer to quality flags */
+   smf_qual_t *pq1;
+   smf_qual_t *qua = NULL;  /* Pointer to quality flags */
 
 /* Assign values to various configuration parameters that have not yet
    been made public. */
@@ -423,7 +423,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
    if( RECORD_BOLO ) {
       int kk;
       double *pd = dat + base;
-      unsigned char *pq = qua + base;
+      smf_qual_t *pq = qua + base;
       for( kk = 0; kk < ntime; kk++ ) {
          timedata[ kk ].indata = !( *pq & SMF__Q_MOD ) ? *pd : VAL__BADD;
          timedata[ kk ].inquality = (int) *pq;
@@ -713,7 +713,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
    if( !(qua[ base ] & SMF__Q_BADB) ) {
       if( RECORD_BOLO ) {
          double *pd = dat + base;
-         unsigned char *pq = qua + base;
+         smf_qual_t *pq = qua + base;
          for( itime = 0; itime < ntime; itime++ ) {
             timedata[ itime ].outdata = !( *pq & SMF__Q_MOD ) ? *pd : VAL__BADD;
             timedata[ itime ].outquality = (int) *pq;
@@ -858,7 +858,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
 
 
 static void smf1_step_linefit( int box, float minfrac, int stride, double *dat,
-                               unsigned char *qua, double nsigma, double *m,
+                               smf_qual_t *qua, double nsigma, double *m,
                                double *c, double *rms, int *status ){
 
 /* Local Variables: */
@@ -882,7 +882,7 @@ static void smf1_step_linefit( int box, float minfrac, int stride, double *dat,
    int niter;
    int pop2;
    int pop;
-   unsigned char *pq;
+   smf_qual_t *pq;
 
 /* Initialise returned values. */
    *m = VAL__BADD;
@@ -1003,7 +1003,7 @@ static void smf1_step_linefit( int box, float minfrac, int stride, double *dat,
 /* Loop round correcting steps at supplied times. */
 
 static int smf1_step_correct( int nblock, int *blocks, double *work,
-                              unsigned char *qua, double *dat, size_t base,
+                              smf_qual_t *qua, double *dat, size_t base,
                               dim_t ibolo, size_t bstride, size_t tstride,
                               dim_t ntslice, int ntime, int itime_lo,
                               int itime_hi, int *common, int maxsteps,
@@ -1045,8 +1045,8 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
    int step_end;
    int step_start;
    int step_width;
-   unsigned char *pq1;
-   unsigned char *pq;
+   smf_qual_t *pq1;
+   smf_qual_t *pq;
 
 /* Initialise returned value */
    result = 0;

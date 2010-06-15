@@ -184,7 +184,7 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
     total = nsamp*smf_dtype_sz(SMF__DOUBLE,status);     /* RES */
     total += nsamp*smf_dtype_sz(SMF__DOUBLE,status);    /* AST */
     total += nsamp*smf_dtype_sz(SMF__INTEGER,status);   /* LUT */
-    total += nsamp*smf_dtype_sz(SMF__UBYTE,status);     /* QUA */
+    total += nsamp*smf_dtype_sz(SMF__QUALTYPE,status);  /* QUA */
 
     total *= nrelated;  /* All of these get multiplies by # subarrays */
 

@@ -14,13 +14,13 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_apodize( smfData *data, unsigned char *quality, size_t len,
+*     smf_apodize( smfData *data, smf_qual_t *quality, size_t len,
 *                  int *status );
 
 *  Arguments:
 *     data = smfData* (Given)
 *        Pointer to smfData that will be modified.
-*     quality = unsigned char * (Given and Returned)
+*     quality = smf_qual_t * (Given and Returned)
 *        If set, use this buffer instead of QUALITY associated with data.
 *        If NULL, use the QUALITY associated with data. Locations of spikes
 *        will have bit SMF__Q_SPIKE set.
@@ -116,7 +116,7 @@
 
 #define FUNC_NAME "smf_apodize"
 
-void smf_apodize( smfData *data, unsigned char *quality, size_t len,
+void smf_apodize( smfData *data, smf_qual_t *quality, size_t len,
                   int *status ) {
 
   double ap;                    /* Apodization factor at this step */
@@ -129,7 +129,7 @@ void smf_apodize( smfData *data, unsigned char *quality, size_t len,
   dim_t nbolo;                  /* Number of bolometers */
   dim_t ndata;                  /* Number of data points */
   dim_t ntslice;                /* Number of time slices */
-  unsigned char *qua=NULL;      /* Pointer to the QUALITY array */
+  smf_qual_t *qua=NULL;      /* Pointer to the QUALITY array */
   size_t thelen=0;              /* apodization length */
   size_t tstride;               /* Time slice stride in data array */
 
@@ -155,7 +155,7 @@ void smf_apodize( smfData *data, unsigned char *quality, size_t len,
   if( quality ) {
     qua = quality;
   } else {
-    qua = data->pntr[2];
+    qua = data->qual;
   }
 
   /* Loop over bolometer */

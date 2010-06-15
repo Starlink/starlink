@@ -14,8 +14,8 @@
 
 *  Invocation:
 *     void smf_median_smooth( dim_t box, dim_t el, const double *dat,
-*                             const unsigned char *qua, size_t stride,
-*                             unsigned char mask, double *out, double *w1,
+*                             const smf_qual_t *qua, size_t stride,
+*                             smf_qual_t mask, double *out, double *w1,
 *                             double *w2, int *status )
 
 *  Arguments:
@@ -26,11 +26,11 @@
 *        separated by a step of "stride").
 *     dat = const double * (Given)
 *        The data array. Any VAL__BADD values are ignored.
-*     qua = const unsigned char * (given)
+*     qua = const smf_qual_t * (given)
 *        The quality array associated with the data array. May be NULL.
 *     stride = size_t (Given)
 *        The step between samples to use in the data and quality arrays.
-*     mask = unsigned char (Given)
+*     mask = smf_qual_t (Given)
 *        A mask specifying the samples that are to be includedin the
 *        median filtering.
 *     out = double * (Returned)
@@ -104,13 +104,13 @@
 #include <gsl/gsl_sort.h>
 
 void smf_median_smooth( dim_t box, dim_t el, const double *dat,
-                        const unsigned char *qua, size_t stride,
-                        unsigned char mask, double *out, double *w1,
+                        const smf_qual_t *qua, size_t stride,
+                        smf_qual_t mask, double *out, double *w1,
                         double *w2, int *status ){
 
 /* Local Variables: */
    const double *pdat;         /* Pointer to next bolo data value */
-   const unsigned char *pqua;  /* Pointer to next quality flag */
+   const smf_qual_t *pqua;  /* Pointer to next quality flag */
    dim_t ibox;                 /* Index within box */
    dim_t ihi;                  /* Upper limit for which median can be found */
    dim_t inbox;                /* No. of values currently in the box */

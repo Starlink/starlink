@@ -13,13 +13,13 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_fit_poly( const smfData *data, unsigned char *quality,
+*     smf_fit_poly( const smfData *data, smf_qual_t *quality,
 *                   const int order, int *status )
 
 *  Arguments:
 *     data = smfData* (Given and Returned)
 *        Pointer to input data struct
-*     quality = unsigned char * (Given)
+*     quality = smf_qual_t * (Given)
 *        If set, use this buffer instead of QUALITY associated with data.
 *        If NULL, use the QUALITY associated with data.
 *     order = int (Given)
@@ -111,7 +111,7 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_fit_poly"
 
-void smf_fit_poly( const smfData *data, unsigned char *quality,
+void smf_fit_poly( const smfData *data, smf_qual_t *quality,
                    const size_t order, double *poly, int *status) {
 
   /* Local variables */
@@ -126,7 +126,7 @@ void smf_fit_poly( const smfData *data, unsigned char *quality,
   size_t ncoeff = 2;       /* Number of coefficients to fit for; def. line */
   dim_t nframes = 0;      /* Number of frames */
   gsl_vector *psky=NULL;   /* Vector containing sky brightness */
-  unsigned char *qual=NULL;/* Pointer to QUALITY component */
+  smf_qual_t *qual=NULL;/* Pointer to QUALITY component */
   double xik;              /* */
   gsl_matrix *X=NULL;      /* Matrix of input positions */
   gsl_multifit_linear_workspace *work=NULL; /* Workspace */
@@ -168,7 +168,7 @@ void smf_fit_poly( const smfData *data, unsigned char *quality,
   if( quality ) {
     qual = quality;
   } else {
-    qual = (data->pntr)[2];
+    qual = data->qual;
   }
 
   if( !qual && (*status == SAI__OK) ) {

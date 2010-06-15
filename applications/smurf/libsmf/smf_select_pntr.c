@@ -13,11 +13,11 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_select_pntr( void *pntr[3], smf_dtype dtype, double **ddata,
+*     smf_select_pntr( void *pntr[2], smf_dtype dtype, double **ddata,
 *                       double **dvar, int **idata, int **ivar, int *status );
 
 *  Arguments:
-*     pntr = void * [3] (Given)
+*     pntr = void * [2] (Given)
 *        Array of void* pointers. Eg from a smfData.
 *     dtype = smf_dtype (Given)
 *        Data type associated with pntr[].
@@ -84,7 +84,7 @@
 #define FUNC_NAME "smf_select_pntr"
 
 void
-smf_select_pntr( void * const pntr[3], smf_dtype dtype, double **ddata, double **dvar,
+smf_select_pntr( void * const pntr[2], smf_dtype dtype, double **ddata, double **dvar,
                  int **idata, int **ivar, int *status ) {
 
   if (ddata) *ddata = NULL;

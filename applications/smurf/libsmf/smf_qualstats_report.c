@@ -37,9 +37,9 @@
 
 *  Description:
 *     The smfArray will contain pointers to smfData's for each subarray.
-*     If the main DATA components are SMF__UBYTE assume they contain
+*     If the main DATA components are SMF__QUALTYPE assume they contain
 *     the quality array (e.g. QUA from the iterative map-maker). If the
-*     main data array has a different type, check for the smfdata.pntr[2]
+*     main data array has a different type, check for the smfdata.qual
 *     array. Count the total number of quality bits and display a report
 *     on the number of flags, and the change from the previous call. If
 *     last_qcount is NULL don't check for differences from the last call.

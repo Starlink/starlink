@@ -15,7 +15,7 @@
 
 *  Invocation:
 *     smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
-*                      unsigned char *quality, unsigned char mask,
+*                      smf_qual_t *quality, smf_qual_t mask,
 *                      int *status )
 
 *  Arguments:
@@ -28,11 +28,11 @@
 *     nchunk = dim_t (Given)
 *        Number of evenly-spaced chunks of time-stream over which to estimate
 *        the sample standard deviation
-*     quality = usigned char* (Given)
+*     quality = smf_qual_t * (Given)
 *        If specified, use this QUALITY array instead of that in data
 *        to decide which samples to use (provided mask). Otherwise
 *        data are only ignored if set to VAL__BADD.
-*     mask = unsigned char (Given)
+*     mask = smf_qual_t (Given)
 *        Use with qual to define which bits in quality are relevant to
 *        ignore data in the calculation.
 *     status = int* (Given and Returned)
@@ -112,7 +112,7 @@
 
 
 double smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
-			unsigned char *quality, unsigned char mask,
+			smf_qual_t *quality, smf_qual_t mask,
 			int *status ) {
 
   /* Local variables */
@@ -126,7 +126,7 @@ double smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
   dim_t nbolo;                  /* Number of bolometers */
   size_t ngood;                 /* Number of good samples in r.m.s. check */
   dim_t ntslice;                /* Number of time slices */
-  unsigned char *qua=NULL;      /* Pointer to quality flags */
+  smf_qual_t *qua=NULL;      /* Pointer to quality flags */
   double retval=0;              /* Return value */
   double sig;                   /* r.m.s. of this chunk */
 
@@ -147,7 +147,7 @@ double smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
   if( quality ) {
     qua = quality;
   } else {
-    qua = data->pntr[2];
+    qua = data->qual;
   }
 
   /* Obtain data dimensions */

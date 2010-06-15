@@ -15,8 +15,8 @@
 
 *  Invocation:
 *     smf_update_valbad( smfData *data, smf_modeltype mtype,
-*                        unsigned char *qual, size_t qbstride,
-*                        size_t qtstride, unsigned char mask,
+*                        smf_qual_t *qual, size_t qbstride,
+*                        size_t qtstride, smf_qual_t mask,
 *                        int *status )
 
 *  Arguments:
@@ -27,7 +27,7 @@
 *        different dimensions from qual. In this specific case set
 *        mtype as well as qbstride and qtstride. Otherwise set mtype to
 *        SMF__NUL (or 0) if data and qual have the same dimensions.
-*     qual = unsigned char* (Given)
+*     qual = smf_qual_t* (Given)
 *        If provided use this quality array instead of one supplied with data.
 *        If being used with an iterative map-maker model component it is
 *        assumed to be a 3-dimensions array corresponding to time-series
@@ -38,7 +38,7 @@
 *     qtstride = size_t (Given)
 *        If mtype is set, provide the time slice stride for the qual array.
 *        Otherwise ignored.
-*     mask = unsigned char (Given)
+*     mask = smf_qual_t (Given)
 *        Bitmask of QUALITY flags to consider for setting VAL__BADD values
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -106,8 +106,8 @@
 
 #define FUNC_NAME "smf_update_valbad"
 
-void smf_update_valbad( smfData *data, smf_modeltype mtype, unsigned char *qual,
-                        size_t qbstride, size_t qtstride, unsigned char mask,
+void smf_update_valbad( smfData *data, smf_modeltype mtype, smf_qual_t *qual,
+                        size_t qbstride, size_t qtstride, smf_qual_t mask,
                         int *status ) {
 
   size_t bstride;               /* data bolo stride */
@@ -117,7 +117,7 @@ void smf_update_valbad( smfData *data, smf_modeltype mtype, unsigned char *qual,
   dim_t nbolo;                  /* Number of bolometers */
   dim_t ndata;                  /* Number of data points */
   dim_t ntslice;                /* Number of time slices */
-  unsigned char *quality=NULL;  /* Pointer to the QUALITY array */
+  smf_qual_t *quality=NULL;     /* Pointer to the QUALITY array */
   size_t tstride;               /* data time stride */
 
   if ( *status != SAI__OK ) return;
@@ -131,7 +131,7 @@ void smf_update_valbad( smfData *data, smf_modeltype mtype, unsigned char *qual,
   }
 
   /* Get the QUALITY array, or generate bad status */
-  quality = qual ? qual : data->pntr[2];
+  quality = qual ? qual : data->qual;
 
   if( !quality ) {
     *status = SAI__ERROR;

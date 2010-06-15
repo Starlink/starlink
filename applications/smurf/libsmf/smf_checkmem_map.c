@@ -146,7 +146,7 @@ void smf_checkmem_map( const int lbnd[], const int ubnd[], int rebin,
       total += sizeof(unsigned int)*mapsize;
 
       /* space for quality map */
-      total += sizeof(unsigned char)*mapsize;
+      total += sizeof(smf_qual_t)*mapsize;
 
       /* smf_iteratemap also uses a local buffer to accumulate weights^2 */
       total += sizeof(double)*mapsize;

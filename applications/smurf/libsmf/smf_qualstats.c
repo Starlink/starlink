@@ -14,13 +14,13 @@
 
 *  Invocation:
 
-*     smf_qualstats( const unsigned char *qual, dim_t nbolo, size_t bstride,
+*     smf_qualstats( const smf_qual_t *qual, dim_t nbolo, size_t bstride,
 *                    size_t ntslice, size_t tstride,  size_t qcount[8],
 *                    size_t *ngoodbolo, size_t *nmap, size_t *nmax,
 *                    int *status )
 
 *  Arguments:
-*     qual = const unsigned char * (Given)
+*     qual = const smf_qual_t * (Given)
 *        Pointer to quality array
 *     nbolo = dim_t (Given)
 *        Number of bolometers
@@ -102,7 +102,7 @@
 
 #define FUNC_NAME "smf_qualstats"
 
-void smf_qualstats( const unsigned char *qual, dim_t nbolo, size_t bstride,
+void smf_qualstats( const smf_qual_t *qual, dim_t nbolo, size_t bstride,
                     size_t ntslice, size_t tstride,
                     size_t qcount[SMF__NQBITS], size_t *ngoodbolo,
                     size_t *nmap, size_t *nmax,
@@ -152,7 +152,7 @@ void smf_qualstats( const unsigned char *qual, dim_t nbolo, size_t bstride,
 
       /* Loop over bits */
       for( k=0; k<SMF__NQBITS; k++ ) {
-        if( qual[offset] & ((unsigned char) (1 << k)) ) {
+        if( qual[offset] & ((smf_qual_t) (1 << k)) ) {
           qcount[k]++;
         }
       }

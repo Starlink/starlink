@@ -13,14 +13,14 @@
 *     Library routine
 
 *  Invocation:
-*     smf_flag_stationary( smfData *data, unsigned char *quality,
+*     smf_flag_stationary( smfData *data, smf_qual_t *quality,
 *                          double sthresh, size_t *nflagged,
 *                          int *status )
 
 *  Arguments:
 *     data = smfData * (Given and Returned)
 *        The data that will be flagged
-*     quality = unsigned char * (Given and Returned)
+*     quality = smf_qual_t * (Given and Returned)
 *        If set, use this buffer instead of QUALITY associated with data.
 *        If NULL, use the QUALITY associated with data.
 *     sthresh = double (Given)
@@ -91,7 +91,7 @@
 
 #define FUNC_NAME "smf_flag_stationary"
 
-void smf_flag_stationary( smfData *data, unsigned char *quality,
+void smf_flag_stationary( smfData *data, smf_qual_t *quality,
                           double sthresh, size_t *nflagged,
                           int *status ) {
 
@@ -99,7 +99,7 @@ void smf_flag_stationary( smfData *data, unsigned char *quality,
   double accel;                 /* Current acceleration */
   JCMTState *allState=NULL;     /* JCMT state information */
   size_t bstride;               /* Bolometers stride */
-  unsigned char *flag=NULL;     /* Array indicating which samples to flag */
+  smf_qual_t *flag=NULL;     /* Array indicating which samples to flag */
   dim_t i;                      /* Loop Counter */
   dim_t j;                      /* Loop Counter */
   double pos1_ac1=0;            /* Coordinates in 3-sample neighbourhood */
@@ -111,7 +111,7 @@ void smf_flag_stationary( smfData *data, unsigned char *quality,
   dim_t nbolo=0;                /* Number of bolometers */
   size_t nflag=0;               /* Number of new flagged samples */
   dim_t ntslice=0;              /* Number of time slices */
-  unsigned char *qua=NULL;      /* Pointer to quality flags */
+  smf_qual_t *qua=NULL;      /* Pointer to quality flags */
   double sep1;                  /* Angular separation between samples */
   double sep2;                  /* Angular separation between samples */
   double speed;                 /* Current speed */
@@ -153,7 +153,7 @@ void smf_flag_stationary( smfData *data, unsigned char *quality,
   if( quality ) {
     qua = quality;
   } else {
-    qua = data->pntr[2];
+    qua = data->qual;
   }
 
   if( !qua ) {

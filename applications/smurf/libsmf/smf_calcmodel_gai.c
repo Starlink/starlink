@@ -129,7 +129,7 @@ void smf_calcmodel_gai( smfWorkForce *wf __attribute__((unused)),
   dim_t npar;                   /* No. of parameters per bolometer */
   dim_t ntslice;                /* Number of time slices */
   smfArray *qua=NULL;           /* Pointer to QUA at chunk */
-  unsigned char *qua_data=NULL; /* Pointer to quality data */
+  smf_qual_t *qua_data=NULL; /* Pointer to quality data */
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DAT */
   double *scale;                /* Pointer to scale factor */

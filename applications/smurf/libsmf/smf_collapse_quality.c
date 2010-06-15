@@ -13,14 +13,14 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_collapse_quality( const unsigned char *inqual,
+*     smf_collapse_quality( const smf_qual_t *inqual,
 *                           dim_t nbolo, dim_t ntslice,
 *                           size_t bstride, size_t tstride,
-*                           int collapse_time, unsigned char **outqual,
+*                           int collapse_time, smf_qual_t **outqual,
 *                           int *status )
 
 *  Arguments:
-*     inqual = const unsigned char * (Given)
+*     inqual = const smf_qual_t * (Given)
 *        3D quality array to be collapsed
 *     nbolo = dim_t (Given)
 *        Number of bolometers
@@ -34,7 +34,7 @@
 *        current bolometer.
 *     collapse_time = int (Given)
 *        If set collapse along the time dimension. Otherwise collapse spatially.
-*     outqual = unsigned char** (Given)
+*     outqual = smf_qual_t** (Given)
 *        Address of pointer to newly created collapsed quality. If collapse_time
 *        set, the array will be of size nbolo. Otherwise it will be ntslice.
 *     status = int* (Given and Returned)
@@ -106,10 +106,10 @@
 
 #define FUNC_NAME "smf_collapse_quality"
 
-void smf_collapse_quality( const unsigned char *inqual,
+void smf_collapse_quality( const smf_qual_t *inqual,
                            dim_t nbolo, dim_t ntslice,
                            size_t bstride, size_t tstride,
-                           int collapse_time, unsigned char **outqual,
+                           int collapse_time, smf_qual_t **outqual,
                            int *status ) {
 
   size_t clen;                  /* length collapsed axis */
@@ -117,7 +117,7 @@ void smf_collapse_quality( const unsigned char *inqual,
   size_t i;                     /* loop counter */
   size_t j;                     /* loop counter */
   size_t len;                   /* length non-collapsed axis */
-  unsigned char *qual=NULL;     /* collapsed quality */
+  smf_qual_t *qual=NULL;     /* collapsed quality */
   size_t stride;                /* stride non-collapsed axis */
 
   /* Check for valid input pointers */

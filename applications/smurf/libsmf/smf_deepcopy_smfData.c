@@ -130,7 +130,7 @@ smfData *
 smf_deepcopy_smfData( const smfData *old, const int rawconvert,
                       const int flags, int * status ) {
 
-  int create[3];              /* Flag for copying each component */
+  int create[3];              /* Flag for copying each component (D,V,Q) */
   smfDA *da = NULL;           /* New smfDA */
   dim_t dims[NDF__MXDIM];     /* Dimensions of each axis of data array */
   smf_dtype dtype;            /* Data type */
@@ -145,8 +145,9 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
   smfData *new = NULL;        /* New smfData */
   size_t npts;                /* Number of data points */
   double *outdata;            /* Pointer to output DATA */
-  void *pntr[3];              /* Data, variance and quality arrays */
+  void *pntr[2];              /* Data and variance arrays */
   double *poly = NULL;        /* Polynomial coefficients */
+  smf_qual_t *qual = NULL;    /* Quality array */
   int *tstream;               /* Pointer to raw time series data */
   int virtual;                /* Is it a virtual smfData? */
   AstKeyMap *history = NULL;  /* Pointer to history */
@@ -238,16 +239,16 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
     }
   }
   /* Quality */
-  if ( ((old->pntr)[2] != NULL) && create[2] ) {
-    pntr[2] = astCalloc( npts, 1, 0 );
-    if ( pntr[2] == NULL ) {
+  if ( (old->qual != NULL) && create[2] ) {
+    qual = astCalloc( npts, sizeof(*qual), 0 );
+    if ( qual == NULL ) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unable to allocate memory for Quality component", status);
       return NULL;
     }
-    memcpy( pntr[2], (old->pntr)[2], npts );
+    memcpy( qual, old->qual, npts*sizeof(*qual) );
   } else {
-    pntr[2] = NULL;
+    qual = NULL;
   }
 
   /* Redefine npts for polynomial coefficients */
@@ -283,7 +284,7 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
     da = smf_deepcopy_smfDA( old, status );
 
   /* Construct the new smfData */
-  new = smf_construct_smfData( new, file, hdr, da, dtype, pntr, isTordered,
+  new = smf_construct_smfData( new, file, hdr, da, dtype, pntr, qual, isTordered,
                                dims, old->lbnd, ndims, virtual, ncoeff, poly, history,
                                status);
 

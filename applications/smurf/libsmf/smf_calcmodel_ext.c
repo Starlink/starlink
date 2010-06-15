@@ -106,7 +106,7 @@ void smf_calcmodel_ext( smfWorkForce *wf __attribute__((unused)),
   double *model_data=NULL;      /* Pointer to DATA component of model */
   dim_t ndata;                  /* Number of data points */
   smfArray *qua=NULL;           /* Pointer to QUA at chunk */
-  unsigned char *qua_data=NULL; /* Pointer to quality data */
+  smf_qual_t *qua_data=NULL; /* Pointer to quality data */
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
 

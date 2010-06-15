@@ -110,7 +110,7 @@ void smf_calcmodel_smo( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   /* Local Variables */
   size_t bstride;               /* bolo stride */
   double * boldata = NULL;      /* single bolometer time series */
-  unsigned char * bolqua = NULL;/* single bolometer quality */
+  smf_qual_t * bolqua = NULL;/* single bolometer quality */
   size_t boxcar = 0;            /* size of boxcar smooth window */
   int boxcar_i=0;               /* width in samples of boxcar filter */
   size_t i;                     /* Loop counter */
@@ -124,7 +124,7 @@ void smf_calcmodel_smo( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   int notfirst=0;               /* flag for delaying until after 1st iter */
   dim_t ntslice=0;              /* Number of time slices */
   smfArray *qua=NULL;           /* Pointer to QUA at chunk */
-  unsigned char *qua_data=NULL; /* Pointer to quality data */
+  smf_qual_t *qua_data=NULL; /* Pointer to quality data */
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
   size_t tstride;               /* Time slice stride in data array */

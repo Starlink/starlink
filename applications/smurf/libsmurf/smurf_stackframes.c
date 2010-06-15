@@ -135,7 +135,7 @@
 
 void smurf_stackframes( int *status ) {
 
-  unsigned char badbit = 0;      /* Default bad bits mask */
+  smf_qual_t badbit = 0;         /* Default bad bits mask */
   int dosort = 0;                /* Sort into time order? */
   AstFitsChan *fchan = NULL;     /* FitsChan holding output NDF FITS extension */
   AstObject * framewcs = NULL;   /* input WCS frame */
@@ -147,7 +147,7 @@ void smurf_stackframes( int *status ) {
   char ndftype[NDF__SZTYP+1];    /* type of data array */
   Grp *ogrp = NULL;              /* Output group */
   char * odatad = NULL;          /* Output data array as bytes */
-  char * odataq = NULL;          /* Output quality array */
+  smf_qual_t * odataq = NULL;    /* Output quality array */
   char * odatav = NULL;          /* Output variance array as bytes */
   double origin = 0.0;           /* Origin of time frame */
   smfData * outdata = NULL;      /* Output smfData */
@@ -194,7 +194,6 @@ void smurf_stackframes( int *status ) {
    */
   for (i=1; i<=size; i++) {
     smfData * data = NULL;
-    unsigned char bb = 0;
 
     smf_open_file( igrp, i, "READ", SMF__NOCREATE_DATA|SMF__NOTTSERIES, &data, status);
     if (*status == SAI__OK) {
@@ -295,6 +294,7 @@ void smurf_stackframes( int *status ) {
 
     /* Retrieve the bad bits mask and OR it with the running value */
     if (*status == SAI__OK) {
+      unsigned char bb = 0;
       ndfBb( data->file->ndfid, &bb, status );
       badbit |= bb;
     }
@@ -353,7 +353,7 @@ void smurf_stackframes( int *status ) {
   szplaneb = szplane * sztype;
   odatad = (outdata->pntr)[0];
   odatav = (outdata->pntr)[1];
-  odataq = (outdata->pntr)[2];
+  odataq = outdata->qual;
 
   /* Read each file again to get the data but do not bother getting a
      header this time around */
@@ -372,9 +372,9 @@ void smurf_stackframes( int *status ) {
       memcpy( odatav, (data->pntr)[1], szplaneb );
       odatav += szplaneb;
     }
-    if ( odataq && (data->pntr)[2] ) {
-      memcpy( odataq, (data->pntr)[2], szplane );
-      odataq += szplane;
+    if ( odataq && data->qual ) {
+      memcpy( odataq, data->qual, szplane * sizeof(*odataq) );
+      odataq += szplane; /* increment by number of elements */
     }
     /* output metadata */
     smf_accumulate_prov( data, igrp, sortinfo[i-1].index, outdata->file->ndfid,

@@ -13,7 +13,7 @@
 *     Library routine
 
 *  Invocation:
-*     smf_clean_smfData( smfWorkForce *wf, smfData *data, unsigned char *quality,
+*     smf_clean_smfData( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
 *                        AstKeyMap *keymap, int *status )
 
 *  Arguments:
@@ -21,7 +21,7 @@
 *        Pointer to a pool of worker threads. Can be NULL.
 *     data = smfData * (Given and Returned)
 *        The data that will be flagged
-*     quality = unsigned char * (Given and Returned)
+*     quality = smf_qual_t * (Given and Returned)
 *        If set, use this buffer instead of QUALITY associated with data.
 *        If NULL, use the QUALITY associated with data.
 *     keymap = AstKeyMap* (Given)
@@ -100,7 +100,7 @@
 
 #define FUNC_NAME "smf_clean_smfData"
 
-void smf_clean_smfData( smfWorkForce *wf, smfData *data, unsigned char *quality,
+void smf_clean_smfData( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
                         AstKeyMap *keymap, int *status ) {
 
   /* Local Variables */
@@ -119,7 +119,7 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data, unsigned char *quality,
   double flagstat;          /* Threshold for flagging stationary regions */
   size_t nflag;             /* Number of elements flagged */
   int order;                /* Order of polynomial for baseline fitting */
-  unsigned char *qua=NULL;  /* Pointer to quality */
+  smf_qual_t *qua=NULL;  /* Pointer to quality */
   double spikethresh;       /* Threshold for finding spikes */
   size_t spikeiter=0;       /* Number of iterations for spike finder */
 
@@ -129,7 +129,7 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data, unsigned char *quality,
   /* Check for valid inputs */
 
   if( quality ) qua = quality;
-  else qua = data->pntr[2];
+  else qua = data->qual;
 
   if( !qua ) {
     *status = SAI__ERROR;

@@ -14,8 +14,8 @@
 
 *  Invocation:
 *     pntr = smf_fft_avpspec( const smfData *pspec,
-*                             unsigned char *quality, size_t qstride,
-*                             unsigned char mask, int *status ) {
+*                             smf_qual_t *quality, size_t qstride,
+*                             smf_qual_t mask, int *status ) {
 
 *  Arguments:
 *     pspec = smfData * (Given)
@@ -26,7 +26,7 @@
 *        to VAL__BADD.
 *     qstride = size_t (Given)
 *        Bolo stride for quality. If 0 assumed to be same stride as pspec.
-*     mask = unsigned char (Given)
+*     mask = smf_qual_t (Given)
 *        Use with qual to define which bits in quality are relevant to
 *        ignore data in the calculation.
 *     status = int* (Given and Returned)
@@ -101,8 +101,8 @@
 
 #define FUNC_NAME "smf_fft_avpspec"
 
-smfData *smf_fft_avpspec( const smfData *pspec, unsigned char *quality,
-                          size_t qstride, unsigned char mask, int *status ) {
+smfData *smf_fft_avpspec( const smfData *pspec, smf_qual_t *quality,
+                          size_t qstride, smf_qual_t mask, int *status ) {
 
   size_t i;                     /* Loop counter */
   double *idptr=NULL;           /* Pointer to input data */

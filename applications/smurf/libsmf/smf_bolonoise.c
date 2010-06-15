@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_bolonoise( smfWorkForce *wf, const smfData *data,
-*                    unsigned char *quality, size_t window, double f_low,
+*                    smf_qual_t *quality, size_t window, double f_low,
 *                    double f_white1, double f_white2, double flagratio,
 *                    int nep, double *whitenoise, double *fratio,
 *                    smfData **fftpow, int *status )
@@ -24,7 +24,7 @@
 *        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData * (Given)
 *        Pointer to the input smfData.
-*     quality = unsigned char * (Given and Returned)
+*     quality = smf_qual_t * (Given and Returned)
 *        If set, use this buffer instead of QUALITY associated with data.
 *     window = size_t (Given)
 *        Width of boxcar smooth to apply to power spectrum before measurement
@@ -147,7 +147,7 @@
 #define FUNC_NAME "smf_bolonoise"
 
 void smf_bolonoise( smfWorkForce *wf, const smfData *data,
-                    unsigned char *quality, size_t window, double f_low,
+                    smf_qual_t *quality, size_t window, double f_low,
                     double f_white1, double f_white2, double flagratio,
                     int nep, double *whitenoise, double *fratio,
                     smfData **fftpow,int *status ) {
@@ -169,7 +169,7 @@ void smf_bolonoise( smfWorkForce *wf, const smfData *data,
   double p_low;            /* Power at f_low */
   double p_white;          /* Average power from f_white1 to f_white2 */
   smfData *pow=NULL;       /* Pointer to power spectrum data */
-  unsigned char *qua=NULL; /* Pointer to quality component */
+  smf_qual_t *qua=NULL; /* Pointer to quality component */
   double steptime=1;       /* Length of a sample in seconds */
   size_t tstride;          /* time index stride */
 
@@ -203,7 +203,7 @@ void smf_bolonoise( smfWorkForce *wf, const smfData *data,
   if( quality ) {
     qua = quality;
   } else {
-    qua = data->pntr[2];
+    qua = data->qual;
   }
 
   /* Initialize arrays */

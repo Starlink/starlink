@@ -147,6 +147,8 @@
  *        Calculate tswcs properly when padding using smf_create_tswcs
  *     2010-06-10 (EC):
  *        Handle dark squid QUALITY
+ *     2010-06-14 (TIMJ):
+ *        Refactor loops for separate quality component in smfData
 
  *  Notes:
  *     If projection information supplied, pointing LUT will not be
@@ -230,8 +232,9 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
   dim_t firstpiece = 0;         /* index to start of whichchunk */
   int foundfirst=0;             /* Flag indicates if first index found */
   int foundlast=0;              /* Flag indicates if last index found */
-  int havearray[3];             /* flags for DATA/QUALITY/VARIANCE present */
-  int havelut;                  /* flag for pointing LUT present */
+  int havearray[2];             /* flags for DATA/VARIANCE present */
+  int havequal=0;               /* flag for QUALITY present */
+  int havelut=0;                /* flag for pointing LUT present */
   smfHead *hdr;                 /* pointer to smfHead in concat data */
   dim_t i;                      /* Loop counter */
   Grp *ingrp=NULL;              /* Pointer to 1-element input group */
@@ -249,7 +252,6 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
   size_t outgrpsize;            /* Size of outgrp */
   int pass;                     /* Two passes over list of input files */
   char *pname;                  /* Pointer to input filename */
-  unsigned char qual;           /* Set quality */
   smfData *refdata=NULL;        /* Reference smfData */
   smf_dtype refdtype;           /* reference DATA/VARIANCE type */
   const char *refdtypestr;      /* const string for reference data type */
@@ -265,9 +267,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
   dim_t tend;                   /* Time at start of padded region */
   dim_t tlen;                   /* Time length entire concatenated array */
   dim_t tstart;                 /* Time at end of padded region */
-  smf_dtype type;               /* type of array */
   size_t tstr;                  /* Concatenated time slice stride */
-  dim_t sz;                     /* Data type size */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -374,9 +374,10 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
               refncol = ncol;
 
               /* Check for DATA/VARIANCE/QUALITY and data type */
-              for( k=0; k<3; k++ ) {
+              for( k=0; k<2; k++ ) {
                 havearray[k] = (refdata->pntr[k] != NULL);
               }
+              havequal = ( refdata->qual != NULL );
 
               /* Concatenated data is always double precision */
               refdtype = SMF__DOUBLE;
@@ -410,9 +411,9 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                         ": ^FILE ^FLAG component VARIANCE", status );
               }
 
-              if( (refdata->pntr[2] != NULL) != havearray[2] ) {
+              if( (refdata->qual != NULL) != havequal ) {
                 *status = SAI__ERROR;
-                if( havearray[2] ) msgSetc( "FLAG", "is missing" );
+                if( havequal ) msgSetc( "FLAG", "is missing" );
                 else msgSetc( "FLAG", "has extra" );
                 errRep( "", FUNC_NAME
                         ": ^FILE ^FLAG component QUALITY", status );
@@ -595,12 +596,10 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
 
                   /* QUALITY too if requested */
                   if( !(flags&SMF__NOCREATE_QUALITY) ) {
-                    da->dksquid->pntr[2] = astCalloc(ncol*tlen,
-                                                     smf_dtype_sz(SMF__UBYTE,
-                                                                  status), 1 );
+                    da->dksquid->qual = astCalloc(ncol*tlen, sizeof(*(da->dksquid->qual)), 1);
                     if( *status == SAI__OK ) {
-                      memset( da->dksquid->pntr[2], 0,
-                              ncol*tlen*smf_dtype_sz(SMF__UBYTE,status) );
+                      memset( da->dksquid->qual, 0,
+                              ncol*tlen*sizeof(*(da->dksquid->qual)) );
                     }
                   }
 
@@ -609,22 +608,21 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                 /* Un-set havearray values corresponding to flags */
                 havearray[0] = havearray[0] && !(flags&SMF__NOCREATE_DATA);
                 havearray[1] = havearray[1] && !(flags&SMF__NOCREATE_VARIANCE);
-                havearray[2] = havearray[2] && !(flags&SMF__NOCREATE_QUALITY);
+                havequal = havequal && !(flags&SMF__NOCREATE_QUALITY);
 
                 /* Allocate space for arrays being propagated from template */
-                for( k=0; k<3; k++ ) if( havearray[k] ) {
-                    if( k == 2 ) sz = smf_dtype_sz( SMF__UBYTE, status );
-                    else sz = smf_dtype_sz(data->dtype, status );
+                for( k=0; k<2; k++ ) if( havearray[k] ) {
+                    size_t sz = smf_dtype_sz(data->dtype, status );
                     data->pntr[k] = astCalloc( ndata, sz, 1 );
                   }
+                if (havequal) data->qual = astCalloc( ndata, sizeof(*(data->qual)), 1 );
 
                 /* Check to see if havearray for QUALITY is not set,
                    but SMF__NOCREATE_QUALITY is also not set. In this
                    case, allocate a fresh QUALITY component that will
                    not require propagation from the template */
-                if( !havearray[2] && !(flags & SMF__NOCREATE_QUALITY) ) {
-                  data->pntr[2] = astCalloc(ndata,
-                                            smf_dtype_sz(SMF__UBYTE,status), 1 );
+                if( !havequal && !(flags & SMF__NOCREATE_QUALITY) ) {
+                  data->qual = astCalloc(ndata, sizeof(*(data->qual)), 1);
                 }
 
                 /* Allocate space for the pointing LUT if needed */
@@ -667,25 +665,22 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
               /* dark squids */
               if( da && da->dksquid && refdata->da && refdata->da->dksquid) {
                 double *ptr = da->dksquid->pntr[0];
-                unsigned char *qptr = da->dksquid->pntr[2];
+                smf_qual_t *qptr = da->dksquid->qual;
 
                 ptr += tchunk*ncol;
                 memcpy( ptr, refdata->da->dksquid->pntr[0],
                         reftlen*ncol*smf_dtype_size(da->dksquid,status));
 
-                if( qptr && refdata->da->dksquid->pntr[2] ) {
+                if( qptr && refdata->da->dksquid->qual ) {
                   qptr += tchunk*ncol;
-                  memcpy( qptr, refdata->da->dksquid->pntr[2],
-                          reftlen*ncol*smf_dtype_sz(SMF__UBYTE,status));
+                  memcpy( qptr, refdata->da->dksquid->qual,
+                          reftlen*ncol*sizeof(*qptr) );
                 }
               }
 
               /* Now do DATA/QUALITY/VARIANCE */
-              for( k=0; k<3; k++ ) if( havearray[k] ) {
-                  if( k == 2 ) type = SMF__UBYTE;
-                  else type = data->dtype;
-
-                  switch( type ) {
+              for( k=0; k<2; k++ ) if( havearray[k] ) {
+                  switch( data->dtype ) {
                   case SMF__DOUBLE:
                     for( l=0; l<nbolo; l++ ) {
                       for( m=0; m<reftlen; m++ ) {
@@ -694,23 +689,22 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                       }
                     }
                     break;
-                  case SMF__UBYTE:
-                    for( l=0; l<nbolo; l++ ) {
-                      for( m=0; m<reftlen; m++ ) {
-                        ((unsigned char *)data->pntr[k])[(tchunk+m)*tstr +
-                                                         l*bstr] =
-                          ((unsigned char *)refdata->pntr[k])[m*rtstr +
-                                                              l*rbstr];
-                      }
-                    }
-                    break;
                   default:
-                    msgSetc("DTYPE",smf_dtype_str(type, status));
+                    msgSetc("DTYPE",smf_dtype_string(data, status));
                     *status = SAI__ERROR;
                     errRep( "", FUNC_NAME
                             ": Don't know how to handle ^DTYPE type.", status);
                   }
                 }
+              /* Quality */
+              if ( havequal ) {
+                for( l=0; l<nbolo; l++ ) {
+                  for( m=0; m<reftlen; m++ ) {
+                    (data->qual)[(tchunk+m)*tstr + l*bstr] =
+                          (refdata->qual)[m*rtstr + l*rbstr];
+                  }
+                }
+              }
 
               /* increment tchunk */
               tchunk += reftlen;
@@ -744,24 +738,24 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
       if( tend != tstart ) {
 
         /* If QUALITY present, set SMF__Q_BADB as needed and SMF__Q_PAD */
-        if( data->pntr[2] ) {
+        if( data->qual ) {
           /* Loop over bolometer */
           for( k=0; k<nbolo; k++ ) {
             /* SMF__Q_PAD always set */
-            qual = SMF__Q_PAD;
+            smf_qual_t qual = SMF__Q_PAD;
 
             /* Check for SMF__Q_BADB in first sample of this bolo */
-            qual |= ((char *)data->pntr[2])[padStart*tstr+k*bstr]&SMF__Q_BADB;
+            qual |= (data->qual)[padStart*tstr+k*bstr]&SMF__Q_BADB;
 
             /* Loop over relevant time slices at set quality */
             for( l=tstart; l<=tend; l++ ) {
-              ((char *)data->pntr[2])[l*tstr+k*bstr] |=  qual;
+              (data->qual)[l*tstr+k*bstr] |=  qual;
             }
           }
         }
 
         /* Similarly handle QUALITY for dark squids */
-        if( da && da->dksquid && da->dksquid->pntr[2] ) {
+        if( da && da->dksquid && da->dksquid->qual ) {
           dim_t dnbolo;
           size_t dbstr, dtstr;
 
@@ -771,15 +765,14 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
            /* Loop over bolometer (column for dark squids) */
           for( k=0; k<dnbolo; k++ ) {
             /* SMF__Q_PAD always set */
-            qual = SMF__Q_PAD;
+            smf_qual_t qual = SMF__Q_PAD;
 
             /* Check for SMF__Q_BADB in first sample of this column */
-            qual |= ((char *)da->dksquid->pntr[2])[padStart*dtstr+k*dbstr] &
-              SMF__Q_BADB;
+            qual |= (da->dksquid->qual)[padStart*dtstr+k*dbstr] & SMF__Q_BADB;
 
             /* Loop over relevant time slices at set quality */
             for( l=tstart; l<=tend; l++ ) {
-              ((char *)da->dksquid->pntr[2])[l*dtstr+k*dbstr] |=  qual;
+              (da->dksquid->qual)[l*dtstr+k*dbstr] |=  qual;
             }
           }
         }

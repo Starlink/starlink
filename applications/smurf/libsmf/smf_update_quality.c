@@ -14,14 +14,14 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_update_quality( smfData *data, unsigned char *target, int syncbad,
+*     smf_update_quality( smfData *data, smf_qual_t *target, int syncbad,
 *                         const int *badmask, double badfrac,
 *                         int *status );
 
 *  Arguments:
 *     data = smfData* (Given)
 *        Pointer to smfData that will contain the updated QUALITY array
-*     target = unsigned char* (Given)
+*     target = smf_qual_t* (Given)
 *        If defined update this buffer instead of the QUALITY in data
 *     syncbad = int (Given)
 *        If set ensure that every bad pixel (VAL__BADx) in the data array
@@ -122,7 +122,7 @@
 
 #define FUNC_NAME "smf_update_quality"
 
-void smf_update_quality( smfData *data, unsigned char *target, int syncbad,
+void smf_update_quality( smfData *data, smf_qual_t *target, int syncbad,
 			 const int *badmask, double badfrac,
 			 int *status ) {
 
@@ -134,7 +134,7 @@ void smf_update_quality( smfData *data, unsigned char *target, int syncbad,
   dim_t ntslice;                /* Number of time slices */
   size_t bstride;               /* bol stride */
   size_t tstride;               /* time slice stride */
-  unsigned char *qual=NULL;     /* Pointer to the QUALITY array */
+  smf_qual_t *qual=NULL;     /* Pointer to the QUALITY array */
 
   if ( *status != SAI__OK ) return;
 
@@ -142,8 +142,8 @@ void smf_update_quality( smfData *data, unsigned char *target, int syncbad,
   if( target ) {
     qual = target;                            /* QUALITY given by target */
   } else {
-    if( data->pntr[2] ) {
-      qual = data->pntr[2]; /* QUALITY given by smfData */
+    if( data->qual ) {
+      qual = data->qual; /* QUALITY given by smfData */
     } else {
       *status = SAI__ERROR;
       errRep( FUNC_NAME, "smfData does not contain a QUALITY component",

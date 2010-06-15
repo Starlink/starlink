@@ -13,19 +13,19 @@
 *     Library routine
 
 *  Invocation:
-*     smf_fillgaps( smfWorkForce *wf, smfData *data, unsigned char *quality,
-*                   unsigned char mask, int *status )
+*     smf_fillgaps( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
+*                   smf_qual_t mask, int *status )
 
 *  Arguments:
 *     wf = smfWorkForce * (Given)
 *        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData * (Given and Returned)
 *        The data that will be flagged
-*     quality = unsigned char * (Given and Returned)
+*     quality = smf_qual_t * (Given and Returned)
 *        If set, use this buffer instead of QUALITY associated with data.
 *        If NULL, use the QUALITY associated with data (however bad status
 *        will be set if internal QUALITY is also NULL).
-*     mask = unsigned char (Given)
+*     mask = smf_qual_t (Given)
 *        Define which bits in quality indicate locations of gaps to be filled.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -122,8 +122,8 @@ typedef struct smfFillGapsData {
   size_t b2;                    /* Index of last bolometer to be filledd */
   size_t bstride;               /* bolo stride */
   size_t tstride;               /* time slice stride */
-  unsigned char *qua;           /* Pointer to quality array */
-  unsigned char mask;           /* Quality mask for bad samples */
+  smf_qual_t *qua;           /* Pointer to quality array */
+  smf_qual_t mask;           /* Quality mask for bad samples */
 } smfFillGapsData;
 
 
@@ -133,8 +133,8 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status );
 
 
 
-void  smf_fillgaps( smfWorkForce *wf, smfData *data, unsigned char *quality,
-                    unsigned char mask, int *status ) {
+void  smf_fillgaps( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
+                    smf_qual_t mask, int *status ) {
 
 /* Local Variables */
   const gsl_rng_type *type;     /* GSL random number generator type */
@@ -148,7 +148,7 @@ void  smf_fillgaps( smfWorkForce *wf, smfData *data, unsigned char *quality,
   size_t tstride;               /* time slice stride */
   smfFillGapsData *job_data;    /* Structures holding data for worker threads */
   smfFillGapsData *pdata;       /* Pointer to data for next worker thread */
-  unsigned char *qua=NULL;      /* Pointer to quality array */
+  smf_qual_t *qua=NULL;      /* Pointer to quality array */
 
 /* Main routine */
   if (*status != SAI__OK) return;
@@ -161,7 +161,7 @@ void  smf_fillgaps( smfWorkForce *wf, smfData *data, unsigned char *quality,
   if( quality ) {
     qua = quality;
   } else {
-    qua = data->pntr[2];
+    qua = data->qual;
   }
 
   if( !qua ) {
@@ -277,8 +277,8 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
   size_t bstride;               /* bolo stride */
   size_t tstride;               /* time slice stride */
   smfFillGapsData *pdata = NULL;/* Pointer to job data */
-  unsigned char mask;           /* Quality mask for bad samples */
-  unsigned char *qua = NULL;    /* Pointer to quality array */
+  smf_qual_t mask;           /* Quality mask for bad samples */
+  smf_qual_t *qua = NULL;    /* Pointer to quality array */
 
   /* Pointer to the structure holding information needed by this thread. */
   pdata = (smfFillGapsData *) job_data_ptr;

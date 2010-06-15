@@ -108,7 +108,7 @@ void smf_calcmodel_pln( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   int notfirst=0;               /* flag for delaying until after 1st iter */
   dim_t ntslice=0;              /* Number of time slices */
   smfArray *qua=NULL;           /* Pointer to QUA at chunk */
-  unsigned char *qua_data=NULL; /* Pointer to quality data */
+  smf_qual_t *qua_data=NULL; /* Pointer to quality data */
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   smfArray *lut=NULL;           /* Pointer to LUT at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */

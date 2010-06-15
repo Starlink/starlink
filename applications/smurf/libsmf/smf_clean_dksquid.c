@@ -13,16 +13,16 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_clean_dksquid( smfData *indata, unsigned char *quality,
-*                        unsigned char mask, size_t window, smfData *model,
+*     smf_clean_dksquid( smfData *indata, smf_qual_t *quality,
+*                        smf_qual_t mask, size_t window, smfData *model,
 *                        int calcdk, int nofit, int replacebad, int *status ) {
 
 *  Arguments:
 *     indata = smfData * (Given)
 *        Pointer to the input smfData. Should be raw, un-flatfielded.
-*     quality = unsigned char * (Given)
+*     quality = smf_qual_t * (Given)
 *        Override quality inside indata
-*     mask = unsigned char (Given)
+*     mask = smf_qual_t (Given)
 *        Use to define which bits in quality are relevant to ignore indata
 *     window = size_t (Given)
 *        Width of boxcar smooth for squid before fitting and removing
@@ -131,8 +131,8 @@
 
 #define FUNC_NAME "smf_clean_dksquid"
 
-void smf_clean_dksquid( smfData *indata, unsigned char *quality,
-                        unsigned char mask, size_t window, smfData *model,
+void smf_clean_dksquid( smfData *indata, smf_qual_t *quality,
+                        smf_qual_t mask, size_t window, smfData *model,
                         int calcdk, int nofit, int replacebad, int *status ) {
 
   dim_t b;                /* Bolometer index */
@@ -165,7 +165,7 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
   double offset;          /* Offset parameter from template fit */
   double *offsetbuf=NULL; /* Array of offsets for all bolos in this col */
   int pass;               /* two passes over data to get estimate of average */
-  unsigned char *qua=NULL;/* Pointer to quality array */
+  smf_qual_t *qua=NULL;/* Pointer to quality array */
   size_t tstride;         /* Time slice index stride */
 
   if (*status != SAI__OK) return;
@@ -249,7 +249,7 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
 
   /* Pointer to quality */
   if( quality ) qua = quality;
-  else qua = indata->pntr[2];
+  else qua = indata->qual;
 
   /* Two passes: in the first we calculate an average dark squid to use as
      a surrogate for columns with dead dark squids. In the second we do the

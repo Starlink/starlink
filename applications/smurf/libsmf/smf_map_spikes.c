@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_map_spikes( smfData *data, smfData *variance, int *lut,
-*                     unsigned char *qual, unsigned char mask,
+*                     smf_qual_t *qual, smf_qual_t mask,
 *                     double *map, int *hitsmap, double *mapvar,
 *                     dim_t msize, double thresh, size_t *nflagged,
 *                     int *status )
@@ -32,7 +32,7 @@
 *     qual = usigned char* (Given and Returned)
 *        Quality array with same dimensions of data for setting new
 *        SMF__Q_SPIKE flags when outliers encountered.
-*     mask = unsigned char (Given)
+*     mask = smf_qual_t (Given)
 *        Define which bits in quality are relevant to ignore data in
 *        the calculation.
 *     map = double* (Given)
@@ -105,7 +105,7 @@
 #define FUNC_NAME "smf_map_spikes"
 
 void smf_map_spikes( smfData *data, smfData *variance, int *lut,
-                     unsigned char *qual, unsigned char mask, double *map,
+                     smf_qual_t *qual, smf_qual_t mask, double *map,
                      int *hitsmap, double *mapvar,
                      dim_t msize __attribute__((unused)), double thresh,
                      size_t *nflagged, int *status ) {

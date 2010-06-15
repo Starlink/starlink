@@ -14,9 +14,9 @@
 
 *  Invocation:
 *     smf_addmap1( double *map1, double *mapweight1,
-*                  int *hitsmap1, double *mapvar1, unsigned char *mapqual1,
+*                  int *hitsmap1, double *mapvar1, smf_qual_t *mapqual1,
 *                  double *map2, double *mapweight2,
-*                  int *hitsmap2, double *mapvar2, unsigned char *mapqual2,
+*                  int *hitsmap2, double *mapvar2, smf_qual_t *mapqual2,
 *                  dim_t msize, int *status ) {
 
 *  Arguments:
@@ -28,7 +28,7 @@
 *        Number of samples that land in map1 pixels
 *     mapvar1 = double* (Given and Returned)
 *        Variance of each pixel in map1
-*     mapqual1 = unsigned char* (Given and Returned)
+*     mapqual1 = smf_qual_t* (Given and Returned)
 *        Quality map1
 *     map2 = double* (Given)
 *        The second map
@@ -38,7 +38,7 @@
 *        Number of samples that land in map2 pixels
 *     mapvar2 = double* (Given)
 *        Variance of each pixel in map2
-*     mapqual2 = unsigned char* (Given)
+*     mapqual2 = smf_qual_t* (Given)
 *        Quality map2
 *     msize = dim_t (Given)
 *        Number of pixels in the maps
@@ -107,9 +107,9 @@
 #define FUNC_NAME "smf_addmap1"
 
 void smf_addmap1( double *map1, double *mapweight1, int *hitsmap1,
-                  double *mapvar1, unsigned char *mapqual1, double *map2,
+                  double *mapvar1, smf_qual_t *mapqual1, double *map2,
                   double *mapweight2, int *hitsmap2, double *mapvar2,
-                  unsigned char *mapqual2, dim_t msize, int *status ) {
+                  smf_qual_t *mapqual2, dim_t msize, int *status ) {
 
   /* Local Variables */
   dim_t i;                   /* Loop counter */

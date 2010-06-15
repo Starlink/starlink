@@ -47,7 +47,7 @@
 *  Description:
 *     Calculate statistics for a smfArray based on the quality information.
 *     The quality flags will either be read from the primary data component
-*     if the type is SMF__UBYTE or else will be read from the standard
+*     if the type is SMF__QUALTYPE or else will be read from the standard
 *     quality location in each smfData. Count the total number of quality bits
 *     and return them.
 
@@ -140,13 +140,13 @@ smf_qualstats_model( const smfArray *qua, size_t qcount[8], size_t * ngoodbolo,
   nbolo_tot = 0;
   ntslice_ref = 0;
   for( idx=0; (idx<qua->ndat)&&(*status==SAI__OK); idx++ ) {
-    unsigned char *qual=NULL;     /* pointer to quality buffer */
+    smf_qual_t *qual=NULL;     /* pointer to quality buffer */
 
     /* Get pointer to quality array and its dimensions */
-    if( qua->sdata[idx]->dtype == SMF__UBYTE ) {
+    if( qua->sdata[idx]->dtype == SMF__QUALTYPE ) {
       qual = qua->sdata[idx]->pntr[0];
     } else {
-      qual = qua->sdata[idx]->pntr[2];
+      qual = qua->sdata[idx]->qual;
     }
 
     if( !qual ) {

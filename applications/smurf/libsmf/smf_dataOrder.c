@@ -77,6 +77,8 @@
 *        Handle pixel origin reordering
 *     2010-05-20 (TIMJ):
 *        Return a boolean indicating whether the data were reordered or not.
+*     2010-06-14 (TIMJ):
+*        Refactor logic for new location of quality pointer.
 
 *  Notes:
 *     Nothing is done about the FITS channels or WCS information stored in
@@ -123,6 +125,12 @@
 #include "libsmf/smf.h"
 #include "libsmf/smf_err.h"
 
+static void * smf__dataOrder_array ( void * oldbuf, smf_dtype dtype, size_t ndata,
+                                     size_t ntslice, size_t nbolo,
+                                     size_t tstr1, size_t bstr1,
+                                     size_t tstr2, size_t bstr2, int inPlace,
+                                     int * status );
+
 /* Other includes */
 
 #define FUNC_NAME "smf_dataOrder"
@@ -132,23 +140,15 @@ int smf_dataOrder( smfData *data, int isTordered, int *status ) {
   /* Local Variables */
   size_t bstr1;                 /* bolometer index stride input */
   size_t bstr2;                 /* bolometer index stride output */
-  smf_dtype dtype;              /* Data array type */
   dim_t i;                      /* loop counter */
   int inPlace=0;                /* If set change array in-place */
-  dim_t j;                      /* loop counter */
-  dim_t k;                      /* loop counter */
-  void *oldbuf=NULL;            /* Pointer to old buffer */
-  int *oldlut=NULL;             /* Pointer to pointing LUT */
   dim_t nbolo;                  /* Number of bolometers */
   dim_t ndata;                  /* Number of data points */
-  void *newbuf=NULL;            /* Pointer to new buffer */
   dim_t newdims[3];             /* Size of each dimension new buffer */
   int newlbnd[3];               /* New pixel origin */
-  int *newlut=NULL;             /* Pointer to pointing LUT */
   dim_t ntslice;                /* Number of time slices */
   size_t tstr1;                 /* time index stride input */
   size_t tstr2;                 /* time index stride output */
-  size_t sz=0;                  /* Size of element of data array */
   int waschanged = 0;           /* did we chagne the order? */
 
   /* Main routine */
@@ -216,82 +216,16 @@ int smf_dataOrder( smfData *data, int isTordered, int *status ) {
   }
 
   /* Loop over elements of data->ptr and re-form arrays */
-  for( i=0; i<3; i++ ) if( data->pntr[i] ) {
-      /* Pointer to component we're looking at */
-      oldbuf = data->pntr[i];
+  for( i=0; i<2; i++ ) {
+    data->pntr[i] = smf__dataOrder_array( data->pntr[i], data->dtype, ndata,
+                                          ntslice, nbolo, tstr1, bstr1, tstr2,
+                                          bstr2, inPlace, status );
+  }
 
-      if( i==2 ) {     /* If QUALITY unsigned char */
-        dtype = SMF__UBYTE;
-      } else {         /* Otherwise get type from the smfData */
-        dtype = data->dtype;
-      }
-
-      /* Size of data type */
-      sz = smf_dtype_sz(dtype, status);
-
-      /* Allocate buffer */
-      newbuf = astCalloc( ndata, sz, 0 );
-
-      if( *status == SAI__OK ) {
-
-        /* Loop over all of the elements and re-order the data */
-        switch( dtype ) {
-        case SMF__INTEGER:
-          for( j=0; j<ntslice; j++ ) {
-            for( k=0; k<nbolo; k++ ) {
-              ((int *)newbuf)[j*tstr2+k*bstr2] =
-                ((int *)oldbuf)[j*tstr1+k*bstr1];
-            }
-          }
-          break;
-
-        case SMF__FLOAT:
-          for( j=0; j<ntslice; j++ ) {
-            for( k=0; k<nbolo; k++ ) {
-              ((float *)newbuf)[j*tstr2+k*bstr2] =
-                ((float *)oldbuf)[j*tstr1+k*bstr1];
-            }
-          }
-          break;
-
-        case SMF__DOUBLE:
-          for( j=0; j<ntslice; j++ ) {
-            for( k=0; k<nbolo; k++ ) {
-              ((double *)newbuf)[j*tstr2+k*bstr2] =
-                ((double *)oldbuf)[j*tstr1+k*bstr1];
-            }
-          }
-          break;
-
-        case SMF__UBYTE:
-          for( j=0; j<ntslice; j++ ) {
-            for( k=0; k<nbolo; k++ ) {
-              ((unsigned char *)newbuf)[j*tstr2+k*bstr2] =
-                ((unsigned char *)oldbuf)[j*tstr1+k*bstr1];
-            }
-          }
-          break;
-
-        default:
-          msgSetc("DTYPE",smf_dtype_string(data, status));
-          *status = SAI__ERROR;
-          errRep( "", FUNC_NAME
-                  ": Don't know how to handle ^DTYPE type.", status);
-        }
-
-        if( inPlace ) {
-          /* Copy newbuf to oldbuf */
-          memcpy( oldbuf, newbuf, ndata*sz );
-          /* Free newbuf */
-          newbuf = astFree( newbuf );
-        } else {
-          /* Free oldbuf */
-          oldbuf = astFree( oldbuf );
-          /* Set pntr to newbuf */
-          data->pntr[i] = (void *) newbuf;
-        }
-      }
-    }
+  /* And Quality */
+  data->qual = smf__dataOrder_array( data->qual, SMF__QUALTYPE, ndata,
+                                     ntslice, nbolo, tstr1, bstr1, tstr2,
+                                     bstr2, inPlace, status );
 
   /* If NDF associated with data, modify dimensions of the data */
   if( data->file && (data->file->ndfid != NDF__NOID) ) {
@@ -301,30 +235,9 @@ int smf_dataOrder( smfData *data, int isTordered, int *status ) {
   }
 
   /* If there is a LUT re-order it here */
-  oldlut = data->lut;
-  if( oldlut ) {
-    newlut = astCalloc( ndata, sizeof(*newlut), 0 );
-
-    if( *status == SAI__OK ) {
-      for( j=0; j<ntslice; j++ ) {
-        for( k=0; k<nbolo; k++ ) {
-          ((int *)newlut)[j*tstr2+k*bstr2] = ((int *)oldlut)[j*tstr1+k*bstr1];
-        }
-      }
-
-      if( inPlace ) {
-        /* Copy newlut to oldlut */
-        memcpy( oldlut, newlut, ndata*sizeof(*newlut) );
-        /* Free newlut */
-        newlut = astFree( newlut );
-      } else {
-        /* Free oldlut */
-        oldlut = astFree( oldlut );
-        /* Set pntr to newbuf */
-        data->lut = newlut;
-      }
-    }
-  }
+  data->lut = smf__dataOrder_array( data->lut, SMF__INTEGER, ndata, ntslice,
+                                    nbolo, tstr1, bstr1, tstr2, bstr2, inPlace,
+                                    status );
 
   /* Set the new dimensions in the smfData */
   if( *status == SAI__OK ) {
@@ -334,4 +247,97 @@ int smf_dataOrder( smfData *data, int isTordered, int *status ) {
   }
 
   return waschanged;
+}
+
+
+/* Provide pointer to void. Reorder that array in some new workspace
+   then either copy everything back into the supplied array and return it
+   or free the memory (assumed to be malloced and not mmapped) and return
+   the new workspace. */
+
+static void * smf__dataOrder_array ( void * oldbuf, smf_dtype dtype, size_t ndata,
+                                     size_t ntslice, size_t nbolo,
+                                     size_t tstr1, size_t bstr1,
+                                     size_t tstr2, size_t bstr2, int inPlace,
+                                     int * status ) {
+  size_t sz = 0;        /* Size of data type */
+  void * newbuf = NULL; /* Space to do the reordering */
+  void * retval = NULL; /* Return value with reordered buffer */
+
+  retval = oldbuf;
+  if (*status != SAI__OK) return retval;
+  if (!retval) return retval;
+
+  /* Size of data type */
+  sz = smf_dtype_sz(dtype, status);
+
+  /* Allocate buffer */
+  newbuf = astCalloc( ndata, sz, 0 );
+
+  if( *status == SAI__OK ) {
+    size_t j;
+    size_t k;
+
+    /* Loop over all of the elements and re-order the data */
+    switch( dtype ) {
+    case SMF__INTEGER:
+      for( j=0; j<ntslice; j++ ) {
+        for( k=0; k<nbolo; k++ ) {
+          ((int *)newbuf)[j*tstr2+k*bstr2] =
+            ((int *)oldbuf)[j*tstr1+k*bstr1];
+        }
+      }
+      break;
+
+    case SMF__FLOAT:
+      for( j=0; j<ntslice; j++ ) {
+        for( k=0; k<nbolo; k++ ) {
+          ((float *)newbuf)[j*tstr2+k*bstr2] =
+            ((float *)oldbuf)[j*tstr1+k*bstr1];
+        }
+      }
+      break;
+
+    case SMF__DOUBLE:
+      for( j=0; j<ntslice; j++ ) {
+        for( k=0; k<nbolo; k++ ) {
+          ((double *)newbuf)[j*tstr2+k*bstr2] =
+            ((double *)oldbuf)[j*tstr1+k*bstr1];
+        }
+      }
+      break;
+
+    case SMF__UBYTE:
+      for( j=0; j<ntslice; j++ ) {
+        for( k=0; k<nbolo; k++ ) {
+          ((unsigned char *)newbuf)[j*tstr2+k*bstr2] =
+            ((unsigned char *)oldbuf)[j*tstr1+k*bstr1];
+        }
+      }
+      break;
+
+    default:
+      msgSetc("DTYPE",smf_dtype_str(dtype, status));
+      *status = SAI__ERROR;
+      errRep( "", FUNC_NAME
+              ": Don't know how to handle ^DTYPE type.", status);
+    }
+
+    if( inPlace ) {
+      /* Copy newbuf to oldbuf */
+      memcpy( oldbuf, newbuf, ndata*sz );
+      /* Free newbuf */
+      newbuf = astFree( newbuf );
+
+      retval = oldbuf;
+    } else {
+      /* Free oldbuf */
+      oldbuf = astFree( oldbuf );
+      /* Set pntr to newbuf */
+      retval = newbuf;
+    }
+  }
+
+  return retval;
+
 }

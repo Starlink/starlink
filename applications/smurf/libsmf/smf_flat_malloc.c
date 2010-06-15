@@ -100,7 +100,7 @@ void smf_flat_malloc( size_t nheat, const smfData * refdata,
   int lbnd[] = { 1, 1, 1 };  /* Default pixel lower bounds */
   size_t nelem = 0;      /* Number of elements in first two dimensions of refdims */
   smfHead * oldhdr = NULL;   /* header from refdata */
-  void *pntr[] = { NULL, NULL, NULL };          /* pointers for smfData */
+  void *pntr[] = { NULL, NULL };          /* pointers for smfData */
   double * powval = NULL; /* Data array inside powrefd */
 
   if (bolvald) *bolvald = NULL;
@@ -124,10 +124,9 @@ void smf_flat_malloc( size_t nheat, const smfData * refdata,
     powval = astCalloc( nheat, sizeof(*powval), 1 );
     pntr[0] = powval;
     pntr[1] = NULL;
-    pntr[2] = NULL;
     dims[0] = nheat;
     *powvald = smf_construct_smfData( NULL, NULL, NULL, NULL, SMF__DOUBLE,
-                                      pntr, 1, dims, NULL, 1, 0, 0, NULL,
+                                      pntr, NULL, 1, dims, NULL, 1, 0, 0, NULL,
                                       NULL, status );
   }
 
@@ -136,7 +135,6 @@ void smf_flat_malloc( size_t nheat, const smfData * refdata,
     bolvalvar = astCalloc( nheat * nelem, sizeof(*bolvalvar), 1 );
     pntr[0] = bolval;
     pntr[1] = bolvalvar;
-    pntr[2] = NULL;
     dims[0] = refdata->dims[0];
     dims[1] = refdata->dims[1];
     dims[2] = nheat;
@@ -155,7 +153,7 @@ void smf_flat_malloc( size_t nheat, const smfData * refdata,
                                  NULL, oldhdr->obsidss, status );
 
     *bolvald = smf_construct_smfData( NULL, NULL, hdr, NULL, SMF__DOUBLE,
-                                      pntr, 1, dims, lbnd, 3, 0, 0, NULL,
+                                      pntr, NULL, 1, dims, lbnd, 3, 0, 0, NULL,
                                       NULL, status );
   }
 

@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     void smf_subtract_plane3( smfWorkForce *wf, smfData *data,
-*                         unsigned char *quality, const dim_t mdims[],
+*                         smf_qual_t *quality, const dim_t mdims[],
 *                         const int lut[], int * status );
 
 *  Arguments:
@@ -22,7 +22,7 @@
 *        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData * (Given and Returned)
 *        The data to be filtered (performed in-place)
-*     quality = unsigned char * (Given and Returned)
+*     quality = smf_qual_t * (Given and Returned)
 *        If set, use this buffer instead of QUALITY associated with data.
 *        Data with bad quality are ignored in the fit. Data with modifiable
 *        quality will have the fit subtracted.
@@ -104,7 +104,7 @@
 
 void
 smf_subtract_plane3( smfWorkForce *wf, smfData *data,
-                     unsigned char *quality, const dim_t mdims[],
+                     smf_qual_t *quality, const dim_t mdims[],
                      const int lut[], int * status ) {
 
   size_t bstride = 0;        /* Bolometer stride */
@@ -117,7 +117,7 @@ smf_subtract_plane3( smfWorkForce *wf, smfData *data,
   dim_t ntslice = 0;         /* Number of time slices */
   gsl_vector *planefit = NULL; /* Solution vector */
   gsl_vector *psky = NULL;   /* Vector containing sky brightness */
-  unsigned char * qua = NULL;/* Relevant quality information */
+  smf_qual_t * qua = NULL;/* Relevant quality information */
   size_t tstride = 0;        /* Time stride */
   gsl_vector *weights = NULL; /* Weights for sky brightness vector */
   gsl_multifit_linear_workspace *work = NULL; /* Workspace */
@@ -135,7 +135,7 @@ smf_subtract_plane3( smfWorkForce *wf, smfData *data,
   if( quality ) {
     qua = quality;
   } else {
-    qua = data->pntr[2];
+    qua = data->qual;
   }
 
   /* get dimension information */

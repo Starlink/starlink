@@ -15,7 +15,7 @@
 *  Invocation:
 
 *     smf_filter_execute( smfWorkForce *wf, smfData *data,
-*                         unsigned char *quality, smfFilter *filt,
+*                         smf_qual_t *quality, smfFilter *filt,
 *                         int *status )
 
 *  Arguments:
@@ -23,7 +23,7 @@
 *        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData * (Given and Returned)
 *        The data to be filtered (performed in-place)
-*     quality = unsigned char * (Given and Returned)
+*     quality = smf_qual_t * (Given and Returned)
 *        If set, use this buffer instead of QUALITY associated with data
 *     srate = double (Given)
 *        If nonzero specifies sample rate of data in Hz (otherwise taken
@@ -131,7 +131,7 @@ typedef struct smfFilterExecuteData {
   int ijob;                /* Job identifier */
   fftw_plan plan_forward;  /* for forward transformation */
   fftw_plan plan_inverse;  /* for inverse transformation */
-  unsigned char *qua;      /* quality pointer */
+  smf_qual_t *qua;      /* quality pointer */
 } smfFilterExecuteData;
 
 /* Function to be executed in thread: filter all of the bolos from b1 to b2
@@ -152,7 +152,7 @@ void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
   size_t j;                     /* Loop counter */
   dim_t nbolo;                  /* Number of bolometers */
   dim_t ntslice;                /* Number of time slices */
-  unsigned char *qua=NULL;      /* pointer to quality */
+  smf_qual_t *qua=NULL;      /* pointer to quality */
 
   if( *status != SAI__OK ) return;
 
@@ -260,7 +260,7 @@ void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
 #define FUNC_NAME "smf_filter_execute"
 
 void smf_filter_execute( smfWorkForce *wf, smfData *data,
-                         unsigned char *quality, smfFilter *filt,
+                         smf_qual_t *quality, smfFilter *filt,
                          int *status ) {
 
   /* Local Variables */
@@ -358,7 +358,7 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data,
     if( quality ) {
       pdata->qua = quality;
     } else {
-      pdata->qua = data->pntr[2];
+      pdata->qua = data->qual;
     }
 
     pdata->data_fft_r = astCalloc( filt->dim, sizeof(*pdata->data_fft_r), 0 );

@@ -13,19 +13,19 @@
 *     C function
 
 *  Invocation:
-*     void smf_get_goodrange( const unsigned char *quality, dim_t ntslice,
-*                             size_t tstride, unsigned char mask,
+*     void smf_get_goodrange( const smf_qual_t *quality, dim_t ntslice,
+*                             size_t tstride, smf_qual_t mask,
 *                             size_t *istart, size_t *iend, int *status );
 
 *  Arguments:
-*     quality = const unsigned char *(Given)
+*     quality = const smf_qual_t *(Given)
 *        Pointer to quality array
 *     ntslice = dim_t (Given)
 *        Number of tslices.
 *     tstride = size_t (Given)
 *        How many elements to skip to get to the next time slice for the
 *        current bolometer in quality
-*     mask = unsigned char (Given)
+*     mask = smf_qual_t (Given)
 *        Which quality bits used to determine the range.
 *     istart = size_t (Returned)
 *        Starting good index along the time axis
@@ -85,8 +85,8 @@
 
 #define FUNC_NAME "smf_get_goodrange"
 
-void smf_get_goodrange( const unsigned char *quality, dim_t ntslice,
-                        size_t tstride, unsigned char mask,
+void smf_get_goodrange( const smf_qual_t *quality, dim_t ntslice,
+                        size_t tstride, smf_qual_t mask,
                         size_t *istart, size_t *iend, int *status ) {
 
   size_t i1;

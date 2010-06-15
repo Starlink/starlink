@@ -237,7 +237,7 @@ typedef struct smfCalcmodelComData {
   size_t t1;               /* Index of first timeslice of block */
   size_t t2;               /* Index of last timeslice of block */
   size_t tstride;          /* time stride for res/qua */
-  unsigned char *qua_data; /* Pointer to common quality data */
+  smf_qual_t *qua_data; /* Pointer to common quality data */
   double *weight;          /* Weight at each point in model */
   int *converged;          /* Flags saying if each bock has converged */
 } smfCalcmodelComData;
@@ -280,7 +280,7 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
   double *res_data;        /* Pointer to common residual data */
   double sum;              /* Running sum of values */
   size_t tstride;          /* time stride for res/qua */
-  unsigned char *qua_data; /* Pointer to common quality data */
+  smf_qual_t *qua_data; /* Pointer to common quality data */
   double *weight=NULL;     /* Weight at each point in model */
   double *wg;              /* Work array holding gain values */
   double *woff;            /* Work array holding offset values */
@@ -705,7 +705,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   smfCalcmodelComData *pdata=NULL; /* Pointer to job data */
   smfArray *qua=NULL;           /* Pointer to QUA at chunk */
   int quit;                     /* While loop quit flag */
-  unsigned char *qua_data=NULL; /* Pointer to quality data */
+  smf_qual_t *qua_data=NULL; /* Pointer to quality data */
   int reason[ NREASON ];        /* No. of blocks rejected for each reason */
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
@@ -1173,7 +1173,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
       /* Get pointers */
       res_data = (double *)(res->sdata[idx]->pntr)[0];
-      qua_data = (unsigned char *)(qua->sdata[idx]->pntr)[0];
+      qua_data = (smf_qual_t *)(qua->sdata[idx]->pntr)[0];
       if( noi ) {
         smf_get_dims( noi->sdata[idx],  NULL, NULL, NULL, &nointslice,
                       NULL, &noibstride, &noitstride, status);
@@ -1625,7 +1625,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
       /* Get pointers */
       res_data = (double *)(res->sdata[idx]->pntr)[0];
-      qua_data = (unsigned char *)(qua->sdata[idx]->pntr)[0];
+      qua_data = (smf_qual_t *)(qua->sdata[idx]->pntr)[0];
       smf_get_dims( gai->sdata[idx],  NULL, NULL, NULL, NULL, NULL,
                     &gbstride, &gcstride, status);
       gai_data = (gai->sdata[idx]->pntr)[0];
@@ -1736,7 +1736,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
      use the bolometer values literally. */
   if( fillgaps ) {
     for( idx=0; (idx<res->ndat)&&(*status==SAI__OK); idx++ ) {
-      qua_data = (unsigned char *)(qua->sdata[idx]->pntr)[0];
+      qua_data = (smf_qual_t *)(qua->sdata[idx]->pntr)[0];
       smf_fillgaps( wf, res->sdata[idx], qua_data, SMF__Q_COM, status );
     }
   }

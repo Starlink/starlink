@@ -240,17 +240,17 @@ void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, i
   }
 
   /* Handle QUALITY separately */
-  if ( (idata->pntr)[2] != NULL ) {
-    if ( (odata->pntr)[2] == NULL ) {
+  if ( idata->qual != NULL ) {
+    if ( odata->qual == NULL ) {
       /* Check if output quality pntr is null. If so allocate memory and
          copy over input QUALITY array */
-      (odata->pntr)[2] = smf_map_or_malloc( npts, SMF__UBYTE, 0, ondf, comps[2], status );
-      memcpy( (odata->pntr)[2], (idata->pntr)[2], npts*sizeof(unsigned char) );
+      odata->qual = smf_map_or_malloc( npts, SMF__QUALTYPE, 0, ondf, comps[2], status );
+      memcpy( odata->qual, idata->qual, npts*sizeof(*(odata->qual)) );
     }
-  } else if ( !(flags & SMF__NOCREATE_QUALITY) && (odata->pntr)[2] == NULL ) {
+  } else if ( !(flags & SMF__NOCREATE_QUALITY) && odata->qual == NULL ) {
     /* If we are here then create a quality array if needed */
     msgOutif(MSG__DEBUG, "", "Allocating memory for QUALITY array", status);
-    (odata->pntr)[2] = smf_map_or_malloc( npts, SMF__UBYTE, 1, ondf, comps[2], status);
+    odata->qual = smf_map_or_malloc( npts, SMF__QUALTYPE, 1, ondf, comps[2], status);
   }
 
 

@@ -616,7 +616,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
             break;
 
           case SMF__QUA: /* Quality byte for each data point */
-            head.data.dtype = SMF__UBYTE;
+            head.data.dtype = SMF__QUALTYPE;
             head.data.ndims = 3;
             for( k=0; k<3; k++ ) {
               head.data.dims[k] = (idata->dims)[k];
@@ -894,8 +894,8 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
 
             } else if( mtype == SMF__QUA ) {
               /* If this is a QUA, and quality available in template copy it */
-              if( (idata->pntr)[2] ) {
-                memcpy( dataptr, (idata->pntr)[2], datalen );
+              if( idata->qual ) {
+                memcpy( dataptr, idata->qual, datalen );
               }
 
               /* If flagstat is set, try flagging quality bits here */

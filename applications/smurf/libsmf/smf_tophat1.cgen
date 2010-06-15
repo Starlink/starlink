@@ -13,8 +13,8 @@
 
 *  Invocation:
 *     void smf_tophat1<X>( CGEN_TYPE *data, int nel,
-*                          int box, unsigned char *qual,
-*                          unsigned char mask, int *status )
+*                          int box, smf_qual_t *qual,
+*                          smf_qual_t mask, int *status )
 
 *  Arguments:
 *     data = CGEN_TYPE * (Given)
@@ -24,11 +24,11 @@
 *     box = int (Given)
 *        The size of the top-hat filter box (in array elements). If an
 *        even number is supplied, the next higher odd number is used.
-*     qual = unsigned char * (Given)
+*     qual = smf_qual_t * (Given)
 *        If specified, use this QUALITY array to decide which samples
 *        to use (see "mask"). Otherwise data are only ignored if set
 *        to VAL__BAD<X>.
-*     mask = unsigned char (Given)
+*     mask = smf_qual_t (Given)
 *        Use with qual to define which bits in quality are relevant to
 *        ignore data in the calculation.
 *     status = int * (Given and Returned)
@@ -87,8 +87,8 @@
 #include "smf.h"
 
 void CGEN_FUNCTION(smf_tophat1)( CGEN_TYPE *data, const int nel,
-                                 int box, unsigned char *qual,
-                                 unsigned char mask, int *status) {
+                                 int box, smf_qual_t *qual,
+                                 smf_qual_t mask, int *status) {
 
 /* Local variables */
    CGEN_TYPE *in_data;      /* Copy of the time data */
@@ -99,7 +99,7 @@ void CGEN_FUNCTION(smf_tophat1)( CGEN_TYPE *data, const int nel,
    int hb;                  /* Half width of box */
    int iout;                /* Index of current output element */
    int j;                   /* Offset from central box element */
-   unsigned char *qin;      /* Pointer to central input quality */
+   smf_qual_t *qin;      /* Pointer to central input quality */
 
 /* Check the inherited status. */
    if (*status != SAI__OK) return;

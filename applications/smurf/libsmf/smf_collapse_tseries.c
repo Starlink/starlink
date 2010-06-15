@@ -127,7 +127,7 @@ void smf_collapse_tseries( const smfData *indata, int nclip, const float clip[],
   AstKeyMap * history = NULL; /* history */
   size_t nbperel;  /* Number of bytes in dtype */
   size_t nelem;   /* number of elements in mean image */
-  void *pntr[3] = { NULL, NULL, NULL }; /* pointers to data */
+  void *pntr[] = { NULL, NULL }; /* pointers to data */
 
   if (*status != SAI__OK) return;
 
@@ -223,7 +223,7 @@ void smf_collapse_tseries( const smfData *indata, int nclip, const float clip[],
   if (indata->history) history = astCopy( indata->history );
 
   *outdata = smf_construct_smfData( NULL, NULL,  hdr, NULL,
-                                    dtype, pntr, 1, dims, indata->lbnd, 2, 0, 0,
+                                    dtype, pntr, NULL, 1, dims, indata->lbnd, 2, 0, 0,
                                     NULL, history, status );
 
   /* must free the data if outdata is null */

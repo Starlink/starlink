@@ -166,7 +166,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   size_t nflag;                 /* Number of new flags */
   dim_t ntslice;                /* Number of time slices */
   smfArray *qua=NULL;           /* Pointer to RES at chunk */
-  unsigned char *qua_data=NULL; /* Pointer to RES at chunk */
+  smf_qual_t *qua_data=NULL; /* Pointer to RES at chunk */
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
   size_t spikeiter=0;           /* Number of iterations for spike detection */

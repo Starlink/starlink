@@ -129,7 +129,8 @@ void smf_create_bolfile( const Grp * bgrp, size_t index,
     smf_open_newfile( bgrp, index, SMF__DOUBLE, 2, lbnd, ubnd,
                       flags, bolmap, status );
   } else {
-    void *pntr[] = {NULL, NULL, NULL};
+    void *pntr[] = {NULL, NULL};
+    smf_qual_t *qual;
     dim_t mydims[2];
     int mylbnd[2];
     size_t nbols;
@@ -142,10 +143,10 @@ void smf_create_bolfile( const Grp * bgrp, size_t index,
 
     pntr[0] = astCalloc( nbols, sizeof(double), 0 );
     pntr[1] = astCalloc( nbols, sizeof(double), 0 );
-    if (hasqual) pntr[2] = astCalloc( nbols, sizeof(char), 0 );
+    if (hasqual) qual = astCalloc( nbols, sizeof(*qual), 0 );
 
     *bolmap = smf_construct_smfData( NULL, NULL, NULL, NULL, SMF__DOUBLE,
-                                     pntr, 0, mydims, mylbnd, 2, 0, 0, NULL,
+                                     pntr, qual, 0, mydims, mylbnd, 2, 0, 0, NULL,
                                      NULL, status );
   }
 

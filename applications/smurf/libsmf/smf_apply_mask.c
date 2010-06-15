@@ -13,14 +13,14 @@
 *     C function
 
 *  Invocation:
-*     void smf_apply_mask( smfData *indata, unsigned char *quality,
+*     void smf_apply_mask( smfData *indata, smf_qual_t *quality,
 *                          const smfArray *bbms, smf_dark_sub_meth method,
 *                          int *status)
 
 *  Arguments:
 *     indata = const smfData * (Given)
 *        Observation to be masked.
-*     quality = unsigned char * (Given and Returned)
+*     quality = smf_qual_t * (Given and Returned)
 *        If set, use this buffer instead of QUALITY associated with data.
 *        If NULL, use the QUALITY associated with data.
 *     bbms = smfArray * (Given)
@@ -107,7 +107,7 @@
 
 #define FUNC_NAME "smf_apply_mask"
 
-void smf_apply_mask( smfData *indata, unsigned char *quality,
+void smf_apply_mask( smfData *indata, smf_qual_t *quality,
                      const smfArray *bbms, smf_dark_sub_meth method,
                      int *status) {
 
@@ -118,7 +118,7 @@ void smf_apply_mask( smfData *indata, unsigned char *quality,
   smfData * bbm = NULL;
   smfFile * file = NULL;
   int masked = 0;
-  unsigned char *qua=NULL;
+  smf_qual_t *qua=NULL;
 
   if (*status != SAI__OK) return;
   if (!bbms) return;
@@ -138,7 +138,7 @@ void smf_apply_mask( smfData *indata, unsigned char *quality,
   if( quality ) {
     qua = quality;
   } else {
-    qua = indata->pntr[2];
+    qua = indata->qual;
   }
 
   /* get the file struct and create a token */

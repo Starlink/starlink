@@ -242,6 +242,14 @@ typedef enum smf_dtype {
   SMF__UBYTE
 } smf_dtype;
 
+/* Define a special quality type locally for SMURF. We have to define
+   the type in terms of the primary data types in smf_dtype, typedef
+   a local variable type and define a bad value */
+
+#define SMF__QUALTYPE SMF__UBYTE
+typedef unsigned char smf_qual_t;
+#define VAL__BADQ VAL__BADUB
+
 /* Different types of model components used by iterative map-maker. These are
    powers of 2 so they can be used in bit masks. */
 typedef enum smf_modeltype {
@@ -529,7 +537,8 @@ typedef struct smfData {
   smfDA * da;                /* If sc2store, associated data arrays */
   smfDream *dream;           /* DREAM parameters */
   smf_dtype dtype;           /* Data type of DATA and VARIANCE arrays */
-  void * pntr[3];            /* Array of pointers to DATA/VARIANCE/QUALITY */
+  void * pntr[2];            /* Array of pointers to DATA/VARIANCE/QUALITY */
+  smf_qual_t * qual;         /* Pointer for quality information */
   dim_t dims[NDF__MXDIM];    /* Dimensions of data array */
   int lbnd[NDF__MXDIM];      /* Lower PIXEL bounds of data array */
   int isTordered;            /* 0=order by bolo, 1=order by tslice (default) */
@@ -576,7 +585,7 @@ typedef struct smfDIMMData {
   smfArray **gai;            /* array of smfArray's of bolo gain corrections */
   double *map;               /* pointer to the current map estimate */
   int *hitsmap;              /* pointer to the current hits map */
-  unsigned char *mapqual;    /* pointer to the current map quality */
+  smf_qual_t *mapqual;       /* pointer to the current map quality */
   double *mapvar;            /* pointer to the current map variance estimate */
   double *mapweight;         /* pointer to the current map weight */
   double *mapweightsq;       /* pointer to the current map weight^2 */

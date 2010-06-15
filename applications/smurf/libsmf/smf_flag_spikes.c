@@ -13,8 +13,8 @@
 *     Library routine
 
 *  Invocation:
-*     smf_flag_spikes( smfData *data, double *bolovar, unsigned char *quality,
-*                      unsigned char mask, double thresh, size_t niter,
+*     smf_flag_spikes( smfData *data, double *bolovar, smf_qual_t *quality,
+*                      smf_qual_t mask, double thresh, size_t niter,
 *                      size_t maxiter, size_t *aiter, size_t *nflagged,
 *                      int *status )
 
@@ -24,11 +24,11 @@
 *     bolvar = double * (Given)
 *        If supplied, an array of externally supplied estimates of bolo
 *        variance. Can be NULL in which case the variance is measured.
-*     quality = unsigned char * (Given and Returned)
+*     quality = smf_qual_t * (Given and Returned)
 *        If set, use this buffer instead of QUALITY associated with data.
 *        If NULL, use the QUALITY associated with data. Locations of spikes
 *        will have bit SMF__Q_SPIKE set.
-*     mask = unsigned char (Given)
+*     mask = smf_qual_t (Given)
 *        Define which bits in quality are relevant to ignore data in
 *        the calculation.
 *     thresh = double (Given)
@@ -131,8 +131,8 @@
 
 #define FUNC_NAME "smf_flag_spikes"
 
-void smf_flag_spikes( smfData *data, double *bolovar, unsigned char *quality,
-                      unsigned char mask, double thresh, size_t niter,
+void smf_flag_spikes( smfData *data, double *bolovar, smf_qual_t *quality,
+                      smf_qual_t mask, double thresh, size_t niter,
                       size_t maxiter, size_t *aiter, size_t *nflagged,
                       int *status ) {
 
@@ -144,7 +144,7 @@ void smf_flag_spikes( smfData *data, double *bolovar, unsigned char *quality,
   dim_t i;                      /* Loop Counter */
   size_t iter=0;                /* Actual number of iterations */
   dim_t j;                      /* Loop Counter */
-  unsigned char *qua=NULL;      /* Pointer to quality flags */
+  smf_qual_t *qua=NULL;      /* Pointer to quality flags */
   double mean;                  /* Bolometer signal mean */
   dim_t nbolo=0;                /* Number of bolometers */
   size_t nflag;                 /* Number of samples flagged */
@@ -177,7 +177,7 @@ void smf_flag_spikes( smfData *data, double *bolovar, unsigned char *quality,
   if( quality ) {
     qua = quality;
   } else {
-    qua = data->pntr[2];
+    qua = data->qual;
   }
 
   if( !qua ) {

@@ -13,18 +13,18 @@
 *     Library routine
 
 *  Invocation:
-*     smf_flag_spikes2( smfData *data, unsigned char *quality,
-*                       unsigned char mask, double thresh,
+*     smf_flag_spikes2( smfData *data, smf_qual_t *quality,
+*                       smf_qual_t mask, double thresh,
 *                       size_t box, size_t *nflagged, int *status )
 
 *  Arguments:
 *     data = smfData * (Given and Returned)
 *        The data that will be flagged
-*     quality = unsigned char * (Given and Returned)
+*     quality = smf_qual_t * (Given and Returned)
 *        If set, use this buffer instead of QUALITY associated with data.
 *        If NULL, use the QUALITY associated with data. Locations of spikes
 *        will have bit SMF__Q_SPIKE set on exit.
-*     mask = unsigned char (Given)
+*     mask = smf_qual_t (Given)
 *        Define which bits in quality are relevant to ignore data in
 *        the calculation.
 *     thresh = double (Given)
@@ -107,8 +107,8 @@
 
 #define FUNC_NAME "smf_flag_spikes2"
 
-void smf_flag_spikes2( smfData *data, unsigned char *quality,
-                       unsigned char mask, double thresh,
+void smf_flag_spikes2( smfData *data, smf_qual_t *quality,
+                       smf_qual_t mask, double thresh,
                        size_t box, size_t *nflagged, int *status ){
 
 /* Local Variables */
@@ -147,10 +147,10 @@ void smf_flag_spikes2( smfData *data, unsigned char *quality,
    size_t newstride;           /* Vector stride to new time sample */
    size_t nflag;               /* Number of samples flagged */
    size_t tstride;             /* Vector stride between time samples */
-   unsigned char *pqua = NULL; /* Pointer to next quality flag */
-   unsigned char *pqua0 = NULL;/* Pointer to first bolo quality value */
-   unsigned char *pqua1 = NULL;/* Pointer to last bolo quality value */
-   unsigned char *qua = NULL;  /* Pointer to quality flags */
+   smf_qual_t *pqua = NULL; /* Pointer to next quality flag */
+   smf_qual_t *pqua0 = NULL;/* Pointer to first bolo quality value */
+   smf_qual_t *pqua1 = NULL;/* Pointer to last bolo quality value */
+   smf_qual_t *qua = NULL;  /* Pointer to quality flags */
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -162,7 +162,7 @@ void smf_flag_spikes2( smfData *data, unsigned char *quality,
    if( quality ) {
      qua = quality;
    } else {
-     qua = data->pntr[2];
+     qua = data->qual;
    }
 
 /* Report an error if we have no quality array. */

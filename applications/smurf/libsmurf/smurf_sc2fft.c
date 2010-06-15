@@ -316,7 +316,7 @@ void smurf_sc2fft( int *status ) {
                each detector */
 
             double *whitenoise=NULL;
-            unsigned char *bolomask=NULL;
+            smf_qual_t *bolomask=NULL;
             double mean, sig, freqlo;
             size_t ngood, newgood;
 

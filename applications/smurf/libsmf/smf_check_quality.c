@@ -15,13 +15,13 @@
 
 *  Invocation:
 *     size_t smf_check_quality( smfData *data,
-*                               unsigned char *quality,
+*                               smf_qual_t *quality,
 *                               int showbad, int *status );
 
 *  Arguments:
 *     data = smfData* (Given)
 *        Pointer to smfData
-*     quality = unsigned char* (Given)
+*     quality = smf_qual_t* (Given)
 *        If defined check this quality array instead of that supplied with data
 *     showbad = int (Given)
 *        If set, display locations where they where inconsistencies found.
@@ -93,7 +93,7 @@
 
 #define FUNC_NAME "smf_check_quality"
 
-size_t smf_check_quality( smfData *data, unsigned char *quality,
+size_t smf_check_quality( smfData *data, smf_qual_t *quality,
                           int showbad, int *status ) {
 
   int badqual;                  /* Bad quality at this sample? */
@@ -107,7 +107,7 @@ size_t smf_check_quality( smfData *data, unsigned char *quality,
   dim_t ntslice;                /* Number of time slices */
   size_t bstride;               /* bol stride */
   size_t tstride;               /* time slice stride */
-  unsigned char *qual=NULL;     /* Pointer to the QUALITY array */
+  smf_qual_t *qual=NULL;     /* Pointer to the QUALITY array */
   double val;                   /* Value from DATA array */
 
   if ( *status != SAI__OK ) return 0;
@@ -138,7 +138,7 @@ size_t smf_check_quality( smfData *data, unsigned char *quality,
   if( quality ) {
     qual = quality;       /* external QUALITY */
   } else {
-    qual = data->pntr[2]; /* QUALITY given by smfData */
+    qual = data->qual; /* QUALITY given by smfData */
   }
 
   if( !qual ) {

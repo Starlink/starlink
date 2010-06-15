@@ -950,7 +950,7 @@ void smurf_makemap( int *status ) {
   int lbnd_out[2];           /* Lower pixel bounds for output map */
   double *map=NULL;          /* Pointer to the rebinned map data */
   size_t mapmem=0;           /* Memory needed for output map */
-  unsigned char *mapqual=NULL; /* Map quality */
+  smf_qual_t *mapqual=NULL;  /* Map quality */
   size_t maxmem=0;           /* Max memory usage in bytes */
   int maxmem_mb;             /* Max memory usage in Mb */
   int maxmem_default = 1000; /* Default value for maxmem */
@@ -1606,7 +1606,7 @@ void smurf_makemap( int *status ) {
       /* Map the data and variance arrays */
       map = (odata->pntr)[0];
       variance = (odata->pntr)[1];
-      mapqual = (odata->pntr)[2];
+      mapqual = odata->qual;
     }
 
     /* Work out the name for the root file path if bolomaps are being

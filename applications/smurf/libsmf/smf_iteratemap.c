@@ -20,7 +20,7 @@
 *                    const smfArray *bbms, const smfArray * flatramps,
 *                    AstFrameSet *outfset, int moving, int *lbnd_out,
 *                    int *ubnd_out, size_t maxmem, double *map, int *hitsmap,
-*                    double *mapvar, unsigned char *mapqual, double *weights,
+*                    double *mapvar, smf_qual_t *mapqual, double *weights,
 *                    char data_units[], double *nboloeff, int *status );
 
 *  Arguments:
@@ -61,7 +61,7 @@
 *        Number of samples that land in a pixel (ignore if NULL pointer)
 *     mapvar = double* (Returned)
 *        Variance of each pixel in map
-*     mapqual = unsigned char* (Returned)
+*     mapqual = smf_qual_t* (Returned)
 *        Quality for each pixel in map
 *     weights = double* (Returned)
 *        Relative weighting for each pixel in map
@@ -348,7 +348,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      const smfArray *bbms, const smfArray * flatramps,
                      AstFrameSet *outfset, int moving, int *lbnd_out,
                      int *ubnd_out, size_t maxmem, double *map,
-                     int *hitsmap, double *mapvar, unsigned char *mapqual,
+                     int *hitsmap, double *mapvar, smf_qual_t *mapqual,
                      double *weights, char data_units[], double * nboloeff, int *status ) {
 
   /* Local Variables */
@@ -423,7 +423,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   char *pname=NULL;             /* Poiner to name */
   size_t qcount_last[SMF__NQBITS];/* quality bit counter -- last itertaion */
   smfArray **qua=NULL;          /* Quality flags for each file */
-  unsigned char *qua_data=NULL; /* Pointer to DATA component of qua */
+  smf_qual_t *qua_data=NULL; /* Pointer to DATA component of qua */
   smfGroup *quagroup=NULL;      /* smfGroup of quality model files */
   int quit=0;                   /* flag indicates when to quit */
   int rebinflags;               /* Flags to control rebinning */
@@ -437,7 +437,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int *thishits=NULL;           /* Pointer to this hits map */
   double *thismap=NULL;         /* Pointer to this map */
   smf_modeltype thismodel;      /* Type of current model */
-  unsigned char *thisqual=NULL; /* Pointer to this quality map */
+  smf_qual_t *thisqual=NULL; /* Pointer to this quality map */
   double *thisvar=NULL;         /* Pointer to this variance map */
   double *thisweight=NULL;      /* Pointer to this weights map */
   double *thisweightsq=NULL;    /* Pointer to this weights map^2 */
@@ -1616,7 +1616,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         } else {
           /* Loop over subgroup index (subarray) */
           for( idx=0; idx<res[0]->ndat; idx++ ) {
-            unsigned char *bolomask = NULL;
+            smf_qual_t *bolomask = NULL;
             double *bmapweight = NULL;
             double *bmapweightsq = NULL;
             int *bhitsmap = NULL;
@@ -2092,7 +2092,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                   exportNDF_which[j] ) {
                 if( (model[j][i]->sdata[idx]->file->name)[0] ) {
                   int writequal;
-                  unsigned char *tempqual=NULL; /* temporary quality pointer */
+                  smf_qual_t *tempqual=NULL; /* temporary quality pointer */
 
                   smf_model_createHdr( model[j][i]->sdata[idx], modeltyps[j],
                                        refdata,status );

@@ -13,14 +13,14 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_scanfit( smfData *data, unsigned char *quality, int order,
+*     smf_scanfit( smfData *data, smf_qual_t *quality, int order,
 *                  int *status );
 
 *  Arguments:
 *     data = smfData* (Given and Returned)
 *        Pointer to a pointer to smfData struct containing flatfielded data.
 *        Will be created by this routine, or NULL on error.
-*     quality = unsigned char * (Given)
+*     quality = smf_qual_t * (Given)
 *        If set, use this buffer instead of QUALITY associated with data.
 *        If NULL, use the QUALITY associated with data.
 *     order = int (Given)
@@ -118,7 +118,7 @@
 
 #define FUNC_NAME "smf_scanfit"
 
-void smf_scanfit( smfData *data, unsigned char *quality, size_t order,
+void smf_scanfit( smfData *data, smf_qual_t *quality, size_t order,
 		  int *status) {
 
   int cliptype;             /* Type of sigma clipping */

@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_write_smfData ( const smfData *data, const smfData *variance,
-*                        unsigned char *quality, const char * filename,
+*                        smf_qual_t *quality, const char * filename,
 *                        const Grp * igrp, size_t grpindex,
 *                        int provid, int * status );
 
@@ -27,7 +27,7 @@
 *        main data array of a second smfData called variance. variance
 *        can have the length of the time dimension be 0 in which case it
 *        is replicated at each time slice in the output file.
-*     quality = unsigned char * (Given)
+*     quality = smf_qual_t * (Given)
 *        If set, use this buffer instead of QUALITY associated with data.
 *     filename = const char * (Given)
 *        Name of output NDF if non-NULL. If NULL the filename is obtained
@@ -141,7 +141,7 @@
 #define FUNC_NAME "smf_write_smfData"
 
 void smf_write_smfData( const smfData *data, const smfData *variance,
-                        unsigned char *quality, const char * filename,
+                        smf_qual_t *quality, const char * filename,
                         const Grp * igrp, size_t grpindex,
                         int provid, int * status ) {
 
@@ -160,7 +160,7 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
   smfData * outdata = NULL;     /* Mapped output file */
   double *outvar = NULL;        /* pointer to output variance component */
   char prvname[2*PAR__SZNAM+1]; /* provenance ID string */
-  unsigned char *qual=NULL;     /* Pointer to QUALITY buffer */
+  smf_qual_t *qual=NULL;     /* Pointer to QUALITY buffer */
   int ubnd[NDF__MXDIM];         /* Upper pixel bounds */
   double *var=NULL;             /* Pointer to VARIANCE buffer */
   size_t vbstride;              /* bolo stride of variance */
@@ -187,7 +187,7 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
 
   /* Check for QUALITY components, and header */
   if( quality ) qual = quality;
-  else qual = (data->pntr)[2];
+  else qual = data->qual;
 
   /* see if we need to write quality */
   if ( qual ) flags |= SMF__MAP_QUAL;
@@ -310,7 +310,7 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
         }
       }
 
-      if( qual ) memcpy( (outdata->pntr)[2], qual, nelem * 1 );
+      if (qual) memcpy( outdata->qual, qual, nelem * sizeof(*qual) );
     }
 
     /* header information */
@@ -360,8 +360,7 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
       HDSLoc *loc=NULL;
       int id;
       int nmap;
-      void *pntr[]={NULL,NULL,NULL};
-      unsigned char *outdkqual=NULL;
+      void *pntr[]={NULL,NULL};
       double *outdksquid=NULL;
 
       if( da && da->dksquid && da->dksquid->pntr[0] && outdata &&
@@ -387,12 +386,21 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
         }
 
         /* Also do the quality if it exists */
-        if( da->dksquid->pntr[2] ) {
-          ndfMap( id, "QUALITY", "_UBYTE", "WRITE", &pntr[2], &nmap, status );
-          outdkqual = pntr[2];
-
-          if( (*status==SAI__OK) && outdkqual ) {
-            memcpy( outdkqual, da->dksquid->pntr[2], nmap*sizeof(*outdkqual) );
+        if( da->dksquid->qual ) {
+          if ( SMF__QUALTYPE == SMF__UBYTE ) {
+            void *qpntr[1];
+            unsigned char *outdkqual=NULL; /* unsigned char because we are mapping UBYTE */
+            ndfMap( id, "QUALITY", "_UBYTE", "WRITE", &qpntr[0], &nmap, status );
+            outdkqual = qpntr[0];
+            if( (*status==SAI__OK) && outdkqual ) {
+              memcpy( outdkqual, da->dksquid->qual, nmap*sizeof(*outdkqual) );
+            }
+          } else {
+            if (*status == SAI__OK) {
+              *status = SAI__ERROR;
+              errRep( "", "Unable to read QUALITY as anything other than UBYTE at this time",
+                      status );
+            }
           }
         }
 

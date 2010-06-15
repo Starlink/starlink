@@ -14,8 +14,8 @@
 
 *  Invocation:
 *     smf_rebinmap1( smfData *data, smfData *variance, int *lut,
-*                    unsigned char *qual, size_t tslice1, size_t tslice2,
-*                    int trange, unsigned char mask, int sampvar, int flags,
+*                    smf_qual_t *qual, size_t tslice1, size_t tslice2,
+*                    int trange, smf_qual_t mask, int sampvar, int flags,
 *                    double *map, double *mapweight, double *mapweightsq,
 *                    int *hitsmap, double *mapvar, dim_t msize,
 *                    double *scalevariance, int *status )
@@ -41,7 +41,7 @@
 *        If tslice2 >= tslice1 and trange set, regrid to tslice1 to tslice2
 *     trange = int (Given)
 *        If set, regrid from tslice1 to tslice2
-*     mask = unsigned char (Given)
+*     mask = smf_qual_t (Given)
 *        Use with qual to define which bits in quality are relevant to
 *        ignore data in the calculation.
 *     int sampvar (Given)
@@ -165,8 +165,8 @@
 #define FUNC_NAME "smf_rebinmap1"
 
 void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
-                    unsigned char *qual, size_t tslice1, size_t tslice2,
-                    int trange, unsigned char mask, int sampvar,
+                    smf_qual_t *qual, size_t tslice1, size_t tslice2,
+                    int trange, smf_qual_t mask, int sampvar,
                     int flags, double *map, double *mapweight,
                     double *mapweightsq, int *hitsmap,
                     double *mapvar, dim_t msize, double *scalevariance,

@@ -147,7 +147,7 @@ void smf_open_ndfname( const HDSLoc *loc, const char accmode[], const char filen
                        int *status) {
 
   /* Local variables */
-  void *datarr[3] = { NULL, NULL, NULL }; /* Pointers for data */
+  void *datarr[] = { NULL, NULL }; /* Pointers for data */
   int dims[NDF__MXDIM];         /* Extent of each dimension */
   smf_dtype dtype;              /* Data type */
   int flags = 0;                /* Flags for creating smfDA, smfFile and
@@ -256,7 +256,7 @@ void smf_open_ndfname( const HDSLoc *loc, const char accmode[], const char filen
 
   /* And populate the new smfData */
   *ndfdata = smf_construct_smfData( *ndfdata, newfile, NULL, NULL, dtype,
-                                    datarr, 1, (*ndfdata)->dims, (*ndfdata)->lbnd, ndims, 0, 0,
+                                    datarr, NULL, 1, (*ndfdata)->dims, (*ndfdata)->lbnd, ndims, 0, 0,
                                     NULL, NULL, status );
 
 }

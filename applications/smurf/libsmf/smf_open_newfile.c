@@ -149,7 +149,8 @@ void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, const int n
   int newndf;                   /* NDF identified for new file */
   IRQLocs *qlocs = NULL;        /* Named quality resources */
   char *pname = NULL;           /* Pointer to filename */
-  void *pntr[3] = { NULL, NULL, NULL }; /* Array of pointers for smfData */
+  void *pntr[] = { NULL, NULL }; /* Array of pointers for smfData */
+  smf_qual_t * qual = NULL;     /* Pointer to quality */
 
   if ( *status != SAI__OK ) return;
 
@@ -222,11 +223,21 @@ void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, const int n
     }
   }
   if ( flags & SMF__MAP_QUAL ) {
+    void * qpntr[1];
 
     /* Create the named QUALITY bits extension before calling ndfMap */
     smf_create_qualname( "WRITE", newndf, &qlocs, status );
 
-    ndfMap(newndf, "QUALITY", "_UBYTE", "WRITE/ZERO", &(pntr[2]), &nel, status);
+    if ( SMF__QUALTYPE == SMF__UBYTE) {
+      ndfMap(newndf, "QUALITY", "_UBYTE", "WRITE/ZERO", &(qpntr[0]), &nel, status);
+      qual = qpntr[0];
+    } else {
+      if (*status == SAI__OK) {
+        *status = SAI__ERROR;
+        errRep( "", "Unable to read QUALITY as anything other than UBYTE at this time",
+                status );
+      }
+    }
 
     /* Done with quality names so free resources */
     irqRlse( &qlocs, status );
@@ -264,7 +275,7 @@ void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, const int n
   }
 
   /* Fill the smfData */
-  *data = smf_construct_smfData( *data, file, NULL, NULL, dtype, pntr, 1,
+  *data = smf_construct_smfData( *data, file, NULL, NULL, dtype, pntr, qual, 1,
                                  (*data)->dims, (*data)->lbnd, ndims, 0, 0, NULL, NULL,
                                  status);
 

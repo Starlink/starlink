@@ -68,10 +68,12 @@
 *        Update to use new smf_free behaviour
 *     2009-09-29 (TIMJ):
 *        Initialize pixel origin.
+*     2010-06-14 (TIMJ):
+*        Initialise new QUAL element
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2009-2010 Science & Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
 *     Council. University of British Columbia. All Rights Reserved.
 
@@ -157,9 +159,11 @@ smf_create_smfData( int flags, int * status ) {
   data->history = NULL;
   data->isTordered = 1;
 
-  for (i = 0; i < 3; i++ ) {
+  for (i = 0; i < 2; i++ ) {
     (data->pntr)[i] = NULL;
   }
+  data->qual = NULL;
+
   for (i = 0; i < NDF__MXDIM; i++ ) {
     (data->dims)[i] = 0;
     (data->lbnd)[i] = 1;

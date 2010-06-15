@@ -15,8 +15,8 @@
 
 *  Invocation:
 *     void smf_stats1<X>( CGEN_TYPE *data, size_t stride, size_t nsamp,
-*                         unsigned char *qual, size_t qstride,
-*                         unsigned char mask, double *mean,
+*                         smf_qual_t *qual, size_t qstride,
+*                         smf_qual_t mask, double *mean,
 *                         double *sigma, size_t *ngood, int *status )
 
 *  Arguments:
@@ -32,7 +32,7 @@
 *        to CGEN_BAD.
 *     qstride = size_t (Given)
 *        Stride for qual. If 0 assumed to be stride.
-*     mask = unsigned char (Given)
+*     mask = smf_qual_t (Given)
 *        Use with qual to define which bits in quality are relevant to
 *        ignore data in the calculation.
 *     mean = double* (Given and Returned)
@@ -124,8 +124,8 @@
 #define FUNC_NAME "smf_stats1"
 
 void CGEN_FUNCTION(smf_stats1)( CGEN_TYPE *data, size_t stride, size_t nsamp,
-                                unsigned char *qual, size_t qstride,
-                                unsigned char mask, double *mean,
+                                smf_qual_t *qual, size_t qstride,
+                                smf_qual_t mask, double *mean,
                                 double *sigma, size_t *ngood,
                                 int *status ) {
 

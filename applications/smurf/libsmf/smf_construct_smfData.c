@@ -14,8 +14,8 @@
 
 *  Invocation:
 *     pntr = smf_construct_smfData( smfData * tofill, smfFile * file,
-*                      smfHead * hdr, smfDA * da,
-*                      smf_dtype dtype, void * pntr[3], int isTordered,
+*                      smfHead * hdr, smfDA * da, smf_dtype dtype,
+*                      void * pntr[2], smf_qual_t qual, int isTordered,
 *                      const dim_t dims[], const int lbnd[], int ndims,
 *                      int virtual, int ncoeff, double *poly,
 *                      AstKeyMap * history, int * status );
@@ -37,9 +37,11 @@
 *        Pointer to smfDa. Same behaviour as "hdr" and "file".
 *     dtype = smf_dtype (Given)
 *        Data type of this smfData.
-*     pntr[3] = void* (Given)
-*        Array of pointers to data, variance and quality. Pointers will
+*     pntr[2] = void* (Given)
+*        Array of pointers to data and variance. Pointers will
 *        be copied from this array.
+*     qual = smf_qual_t (Given)
+*        Pointer to quality. Pointer will be copied.
 *     isTordered = int (Given)
 *        If set, data is ICD-compliant time-ordered. Otherwise bolom-ordered.
 *     dims[] = const dim_t (Given)
@@ -98,10 +100,12 @@
 *        Add isTordered flag
 *     2009-09-29 (TIMJ):
 *        Initialize pixel origin.
+*     2010-06-14 (TIMJ):
+*        Add "qual"
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2009-2010 Science & Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
 *     Council. University of British Columbia. All Rights Reserved.
 *     All Rights Reserved.
@@ -145,8 +149,8 @@
 
 smfData *
 smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr,
-                       smfDA * da, smf_dtype dtype,
-                       void * pntr[3], int isTordered, const dim_t dims[],
+                       smfDA * da, smf_dtype dtype, void * pntr[2],
+                       smf_qual_t * qual, int isTordered, const dim_t dims[],
                        const int lbnd[], int ndims, int virtual, int ncoeff,
                        double *poly, AstKeyMap *history, int * status ) {
 
@@ -201,9 +205,10 @@ smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr,
       data->dtype = dtype;
       data->refcount = 1;
       data->virtual = virtual;
-      for (i = 0; i < 3; i++ ) {
+      for (i = 0; i < 2; i++ ) {
         (data->pntr)[i] = pntr[i];
       }
+      data->qual = qual;
       data->ndims = ndims;
       for (i = 0; i < ndims; i++ ) {
         (data->dims)[i] = dims[i];

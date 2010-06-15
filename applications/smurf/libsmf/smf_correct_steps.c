@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_correct_steps( smfWorkForce *wf, smfData *data,
-*                        unsigned char *quality,
+*                        smf_qual_t *quality,
 *                        double dcthresh, double dcthresh2, dim_t dcbox,
 *                        int dcflag, size_t *nsteps, int *status )
 
@@ -23,7 +23,7 @@
 *        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData * (Given and Returned)
 *        The data that will be repaired (in-place)
-*     quality = unsigned char * (Given and Returned)
+*     quality = smf_qual_t * (Given and Returned)
 *        If set, use this buffer instead of QUALITY associated with data.
 *        If NULL, use the QUALITY associated with data. Locations of steps
 *        will have bit SMF__Q_JUMP set.
@@ -155,7 +155,7 @@ typedef struct smfCorrectStepsData {
   size_t ns;                    /* Number of steps encountered */
   size_t tstride;               /* time slice stride */
   smfData *data;                /* Supplied data structure */
-  unsigned char *qua;           /* Pointer to quality array */
+  smf_qual_t *qua;           /* Pointer to quality array */
 } smfCorrectStepsData;
 
 
@@ -172,7 +172,7 @@ typedef struct smfCorrectStepsData2 {
   size_t iend;                  /* Index end of data stream */
   size_t istart;                /* Index start of data stream */
   size_t tstride;               /* time slice stride */
-  unsigned char *qua;           /* Pointer to quality array */
+  smf_qual_t *qua;           /* Pointer to quality array */
 } smfCorrectStepsData2;
 
 
@@ -185,7 +185,7 @@ static void smfCorrectStepsParallel2( void *job_data_ptr, int *status );
 /* -------------------------------------------------------------------------- */
 /* Local routine for correcting baseline steps */
 
-static void smf__correct_steps_baseline( double *dat, unsigned char *qua,
+static void smf__correct_steps_baseline( double *dat, smf_qual_t *qua,
                                          dim_t ntslice, size_t tstride,
                                          double *alljump ) {
   double baseline;
@@ -209,7 +209,7 @@ static void smf__correct_steps_baseline( double *dat, unsigned char *qua,
 /* ------------------------------------------------------------------------- */
 /* Public routine */
 
-void smf_correct_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
+void smf_correct_steps( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
                         double dcthresh, double dcthresh2, dim_t dcbox,
                         int dcflag, size_t *nsteps, int *status ) {
 
@@ -226,7 +226,7 @@ void smf_correct_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
   dim_t nbolo=0;                /* Number of bolometers */
   size_t ns=0;                  /* Number of steps encountered */
   dim_t ntslice=0;              /* Number of time slices */
-  unsigned char *qua=NULL;      /* Pointer to quality flags */
+  smf_qual_t *qua=NULL;      /* Pointer to quality flags */
   size_t tstride;               /* Bolo stride */
   smfCorrectStepsData *job_data;/* Structures holding data for worker threads */
   smfCorrectStepsData2 *job_data2;/* Structures holding data for worker threads */
@@ -246,7 +246,7 @@ void smf_correct_steps( smfWorkForce *wf, smfData *data, unsigned char *quality,
   if( quality ) {
     qua = quality;
   } else {
-    qua = data->pntr[2];
+    qua = data->qual;
   }
 
   if( !qua ) {
@@ -465,7 +465,7 @@ static void smfCorrectStepsParallel( void *job_data_ptr, int *status ) {
   size_t nmean2;                /* Number of samples in mean1 */
   dim_t ntslice=0;              /* Number of time slices */
   smfCorrectStepsData *pdata = NULL;/* Pointer to job data */
-  unsigned char *qua=NULL;      /* Pointer to quality flags */
+  smf_qual_t *qua=NULL;      /* Pointer to quality flags */
   size_t tstride;               /* Bolo stride */
   size_t wherebad=0;            /* Index causing bad bolo */
 
@@ -702,7 +702,7 @@ static void smfCorrectStepsParallel2( void *job_data_ptr, int *status ) {
   size_t nmean2;                /* Number of samples in mean1 */
   dim_t ntslice=0;              /* Number of time slices */
   smfCorrectStepsData2 *pdata2 = NULL;/* Pointer to job data */
-  unsigned char *qua=NULL;      /* Pointer to quality flags */
+  smf_qual_t *qua=NULL;      /* Pointer to quality flags */
   size_t tstride;               /* Bolo stride */
 
   /* Pointer to the structure holding information needed by this thread. */
