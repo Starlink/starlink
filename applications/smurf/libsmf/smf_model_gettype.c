@@ -46,6 +46,8 @@
 *        Add SMF__SMO
 *     2010-06-08 (EC):
 *        Add SMF__TWO
+*     2010-06-14 (TIMJ):
+*        Alphabetize models
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -110,34 +112,34 @@ smf_modeltype smf_model_gettype( const char *modelname, int *status ) {
     }
   }
 
-  if( strncmp( tempstring, "CUM", 3 ) == 0 ) {
-    return SMF__CUM;
-  } else if( strncmp( tempstring, "RES", 3 ) == 0 ) {
-    return SMF__RES;
-  } else if( strncmp( tempstring, "AST", 3 ) == 0 ) {
+  if( strncmp( tempstring, "AST", 3 ) == 0 ) {
     return SMF__AST;
   } else if( strncmp( tempstring, "COM", 3 ) == 0 ) {
     return SMF__COM;
-  } else if( strncmp( tempstring, "NOI", 3 ) == 0 ) {
-    return SMF__NOI;
-  } else if( strncmp( tempstring, "EXT", 3 ) == 0 ) {
-    return SMF__EXT;
-  } else if( strncmp( tempstring, "LUT", 3 ) == 0 ) {
-    return SMF__LUT;
-  } else if( strncmp( tempstring, "QUA", 3 ) == 0 ) {
-    return SMF__QUA;
+  } else if( strncmp( tempstring, "CUM", 3 ) == 0 ) {
+    return SMF__CUM;
   } else if( strncmp( tempstring, "DKS", 3 ) == 0 ) {
     return SMF__DKS;
-  } else if( strncmp( tempstring, "GAI", 3 ) == 0 ) {
-    return SMF__GAI;
+  } else if( strncmp( tempstring, "EXT", 3 ) == 0 ) {
+    return SMF__EXT;
   } else if( strncmp( tempstring, "FLT", 3 ) == 0 ) {
     return SMF__FLT;
+  } else if( strncmp( tempstring, "GAI", 3 ) == 0 ) {
+    return SMF__GAI;
+  } else if( strncmp( tempstring, "LUT", 3 ) == 0 ) {
+    return SMF__LUT;
+  } else if( strncmp( tempstring, "NOI", 3 ) == 0 ) {
+    return SMF__NOI;
   } else if( strncmp( tempstring, "PLN", 3 ) == 0 ) {
     return SMF__PLN;
+  } else if( strncmp( tempstring, "RES", 3 ) == 0 ) {
+    return SMF__RES;
   } else if( strncmp( tempstring, "SMO", 3 ) == 0 ) {
     return SMF__SMO;
   } else if( strncmp( tempstring, "TWO", 3 ) == 0 ) {
     return SMF__TWO;
+  } else if( strncmp( tempstring, "QUA", 3 ) == 0 ) {
+    return SMF__QUA;
   } else {
     *status = SAI__ERROR;
     msgSetc("MNAME",modelname);
