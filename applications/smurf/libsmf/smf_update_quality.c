@@ -143,7 +143,7 @@ void smf_update_quality( smfData *data, unsigned char *target, int syncbad,
     qual = target;                            /* QUALITY given by target */
   } else {
     if( data->pntr[2] ) {
-      qual = (unsigned char *) data->pntr[2]; /* QUALITY given by smfData */
+      qual = data->pntr[2]; /* QUALITY given by smfData */
     } else {
       *status = SAI__ERROR;
       errRep( FUNC_NAME, "smfData does not contain a QUALITY component",

@@ -1545,7 +1545,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             for( idx=0; (*status==SAI__OK)&&(idx<res[i]->ndat); idx++ ) {
               size_t nbad;
               nbad = smf_check_quality( res[i]->sdata[idx],
-                                        (unsigned char*)(qua[i]->sdata[idx]->pntr)[0],
+                                        (qua[i]->sdata[idx]->pntr)[0],
                                         0, status );
               if( nbad ) {
                 msgOut( "", FUNC_NAME ": *** Possible programming error! ***",
