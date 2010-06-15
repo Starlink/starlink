@@ -3516,14 +3516,14 @@ int StarRtdImage::draw_ellipse( double x, double y, const char *xy_units,
            << nx << " " << ny
            << " -outline " << bg
            << " -fill " << bg
-           << " -width 2 -stipple pat7 -tags {" << symbol_tags << "}"
+           << " -width 3 -stipple pat7 -tags {" << symbol_tags << "}"
            << std::endl;
     }
     os << canvasName_ << " create rtd_ellipse "
        << cx << " " << cy << " "
        << ex << " " << ey << " "
        << nx << " " << ny
-       << " -outline " << bg
+       << " -outline " << fg
        << " -fill " << fg
        << " -width 1 -stipple pat7 -tags {" << symbol_tags << "}"
        << std::endl;
@@ -3566,14 +3566,14 @@ int StarRtdImage::draw_rtdellipse( double *x, double *y, const char *xy_units,
            << x[2] << " " << y[2]
            << " -outline " << bg
            << " -fill " << bg
-           << " -width 2 -stipple pat7 -tags {" << symbol_tags << "}"
+           << " -width 3 -stipple pat7 -tags {" << symbol_tags << "}"
            << std::endl;
     }
     os << canvasName_ << " create rtd_ellipse "
        << x[0] << " " << y[0] << " "
        << x[1] << " " << y[1] << " "
        << x[2] << " " << y[2]
-       << " -outline " << bg
+       << " -outline " << fg
        << " -fill " << fg
        << " -width 1 -stipple pat7 -tags {" << symbol_tags << "}"
        << std::endl;
@@ -3614,14 +3614,14 @@ int StarRtdImage::draw_rotbox(double x, double y, const char *xy_units,
            << nx << " " << ny
            << " -outline " << bg
            << " -fill " << bg
-           << " -width 2 -stipple pat7 -tags {" << symbol_tags << "}"
+           << " -width 3 -stipple pat7 -tags {" << symbol_tags << "}"
            << std::endl;
     }
     os << canvasName_ << " create rtd_rotbox "
        << cx << " " << cy << " "
        << ex << " " << ey << " "
        << nx << " " << ny
-       << " -outline " << bg
+       << " -outline " << fg
        << " -fill " << fg
        << " -width 1 -stipple pat7 -tags {" << symbol_tags <<  "}"
        << std::endl;
@@ -3671,7 +3671,7 @@ int StarRtdImage::draw_rectangle( double x, double y, const char *xy_units,
     os << canvasName_ << " create rect "
        << x0 << ' ' << y0 << ' ' << x1 << ' ' << y1
        << " -outline " << fg
-       << " -fill " << bg
+       << " -fill " << fg
        << " -width 1 -stipple pat7 -tags " << "{" << symbol_tags << "}"
        << std::endl;
 
