@@ -2340,6 +2340,16 @@ package @PACKAGE@ {
         action sc2clean {
             helplib {$SMURF_HELP}
 
+            parameter bbm {
+                type NDF
+                access READ
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Bad bolometer masks}
+                default !
+                helpkey *
+            }
+
             parameter config {
                 type LITERAL
                 access READ

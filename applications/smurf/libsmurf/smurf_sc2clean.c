@@ -39,6 +39,13 @@
 *     "cleandk.dcthresh".
 
 *  ADAM Parameters:
+*     BBM = NDF (Read)
+*          Group of files to be used as bad bolometer masks. Each data file
+*          specified with the IN parameter will be masked. The corresponding
+*          previous mask for a subarray will be used. If there is no previous
+*          mask the closest following will be used. It is not an error for
+*          no mask to match. A NULL parameter indicates no mask files to be
+*          supplied. [!]
 *     CONFIG = GROUP (Read)
 *          Specifies values for the cleaning parameters. If the string
 *          "def" (case-insensitive) or a null (!) value is supplied, a
@@ -192,6 +199,8 @@
 *        run properly with files that are from different sub-instruments.
 *     2010-06-10 (EC):
 *        Dark squids now have their own quality.
+*     2010-06-15 (TIMJ):
+*        Add BBM support
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -249,6 +258,7 @@
 #define TASK_NAME "SC2CLEAN"
 
 void smurf_sc2clean( int *status ) {
+  smfArray *bbms = NULL;    /* Bad bolometer masks */
   smfArray *darks = NULL;   /* Dark data */
   smfArray *flatramps = NULL;/* Flatfield ramps */
   smfData *ffdata = NULL;   /* Pointer to output data struct */
@@ -290,6 +300,9 @@ void smurf_sc2clean( int *status ) {
        " nothing to do", status );
   }
 
+  /* Get group of bolometer masks and read them into a smfArray */
+  smf_request_mask( "BBM", &bbms, status );
+
   /* Loop over input files */
   if( *status == SAI__OK ) for( i=1; i<=size; i++ ) {
     AstKeyMap * sub_instruments = NULL;
@@ -297,6 +310,9 @@ void smurf_sc2clean( int *status ) {
 
     /* Open and flatfield in case we're using raw data */
     smf_open_and_flatfield(igrp, ogrp, i, darks, flatramps, &ffdata, status);
+
+    /* Apply a mask to the quality array and data array */
+    smf_apply_mask( ffdata, NULL, bbms, SMF__BBM_QUAL|SMF__BBM_DATA, status );
 
     /* Place cleaning parameters into a keymap and set defaults. Do this inside
        the loop in case we are cleaning files with differing sub-instruments.
