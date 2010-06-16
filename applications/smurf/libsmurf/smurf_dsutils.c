@@ -1965,7 +1965,7 @@ static void Filter( int n, double *flags, double *vals, double nsigma,
 static int SaveBoloMapping( const char *param, smfData *data, int *status ){
 
   /* Local Variables: */
-  AstFrameSet *swcsin;
+  AstFrameSet *swcsin = NULL;
   AstCmpMap *map;
   const char *skyrefis;
   double ox;
