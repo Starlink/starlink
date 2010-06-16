@@ -633,7 +633,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
             msgOutif( MSG__DEBUG, "", "Creating new DKSQUID QUALITY",
                       status);
           }
-          if (strlen(mode)) {
+          if (strlen(qmode)) {
             if ( SMF__QUALTYPE == SMF__UBYTE ) {
               void * qdkpntr[1];
               ndfMap( dkndf, "QUALITY", "_UBYTE", qmode, &qdkpntr[0], &nmap,
