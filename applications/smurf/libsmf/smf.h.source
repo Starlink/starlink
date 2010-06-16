@@ -896,6 +896,11 @@ int smf_find_gains( smfWorkForce *wf, smfData *data, double *template,
                     AstKeyMap *keymap, smf_qual_t goodqual, smf_qual_t badqual,
                     smf_qual_t *quality, smfData *gai, int *nrej, int *status );
 
+int smf_find_gains_array( smfWorkForce *wf, smfArray *data, double *template,
+                          AstKeyMap *keymap, smf_qual_t goodqual,
+                          smf_qual_t badqual, smfArray *quality,
+                          smfArray *gain, int *nrej, int *status );
+
 int *smf_find_median( const float *farray, const double *darray, size_t nel,
                       int *hist, float *median, int *status );
 
