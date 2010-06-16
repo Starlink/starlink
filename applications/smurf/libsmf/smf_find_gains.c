@@ -5,7 +5,7 @@
 
 *  Purpose:
 *     Using a given template, find the gain and offset for each bolometer
-*     and reject aberrant bolometers.
+*     in a smfData and reject aberrant bolometers.
 
 *  Language:
 *     Starlink ANSI C
@@ -17,7 +17,7 @@
 *     int smf_find_gains( smfWorkForce *wf, smfData *data,
 *                         double *template, AstKeyMap *keymap,
 *                         smf_qual_t goodqual, smf_qual_t badqual,
-*                         smf_qual_t *quality, smfData *gai,
+*                         smf_qual_t *quality, smfData *gain,
 *                         int *nrej, int *status )
 
 *  Arguments:
@@ -27,17 +27,56 @@
 *        The input data. Each bolometer time series will be compared to
 *        the template.
 *     template = double * (Given)
-*        The 1-dimensional template.
+*        The 1-dimensional template. The length of this array should
+*        equal the number of time slices in "data".
 *     keymap = AstKeyMap * (Given)
 *        An AST KeyMap holding values for the parameters required by this
 *        function:
 *
-*        - gain_box (int): The number of adjacent time slices that are
-*        to be described using a single gain and offset.
+*        - corr_abstol (double): A bolometer is rejected if its correlation
+*        coefficient is lower corr_abstol.
+*
+*        - corr_tol (double): A bolometer is rejected if its correlation
+*        coefficient is lower than the mean correlation coefficient by more
+*        than corr_tol times the standard deviation of the correlation
+*        coefficients. Note, all correlation coefficients lower than
+*        "corr_abstol" are removed before finding the mean and standard
+*        deviation of the correlation coefficients.
 *
 *        - fit_box (int): The number of adjacent time slices that are
 *        to be used when fitting the data to the template. fit_box should
 *        be no smaller than gain_box.
+*
+*        - gain_abstol (double): A bolometer is rejected if its log(gain)
+*        value more than gain_abstol from the mean log(gain) value. Note, all
+*        negative gains are removed before finding the mean of the log(gain)
+*        values.
+*
+*        - gain_box (int): The number of adjacent time slices that are
+*        to be described using a single gain and offset.
+*
+*        - gain_fgood (double): The minimum number of good blocks required
+*        for a usable bolometer, expressed as fraction in the range zero
+*        to one.
+*
+*        - gain_is_one (int): If non-zero, the bolometer gains determined
+*        by the least squares linear fit are ignored, and a value of unity
+*        is used for all gains. The offsets and correlation coefficients
+*        are still determined.
+*
+*        - gain_rat (double): The square root of the ratio of the maximum
+*        acceptable block gain within a bolometer to the minimum acceptable
+*        block gain. It is used when checking for consistency amongst the
+*        blocks of a single bolometer.
+*
+*        - gain_tol (double): A bolometer is rejected if its log(gain)
+*        value more than gain_tol standard deviations from the mean
+*        log(gain) value. Note, all negative gains are removed before
+*        finding the mean and standard deviation of the log(gain) values.
+*
+*        - offset_is_zero (int): If non-zero, the bolometer offsets are
+*        forced to zero within the least squares linear fit. The gains and
+*        correlation coefficients are still determined.
 *
 *     goodqual = smf_qual_t (Given)
 *        The quality value to be used when checking for values to be
@@ -49,7 +88,7 @@
 *     quality = smf_qual_t * (Given and Returned)
 *        If non-NULL, use this array instead of the QUALITY associated with
 *        "data". Samples rejected as aberrant will be flagged using "badqual".
-*     gai = smfData * (Given & Returned)
+*     gain = smfData * (Given & Returned)
 *        This holds the gains, offsets and correlation coefficients that
 *        scale the template values into the bolometer values for each block:
 *
@@ -76,25 +115,25 @@
 *        not be fit to the template, or that were rejected.
 *     nrej = int * (Given and Returned)
 *        Pointer to an array with one element for each bolometer block.
-*        That is, the size of this array should equal the number of blocks
-*        per bolometer, (i.e. one third of the size of the "time" axis in
-*        "gai"). The array should be filled with arbitrary non zero values
-*        before calling this function for the first time. On exit, each
-*        element holds the number of bolometers rejected from the
-*        corresponding block during the current invocation of this
+*        That is, the size of this array should equal the number of
+*        blocks per bolometer, (i.e. one third of the size of the "time"
+*        axis in "gai"). The array should be filled with arbitrary non
+*        zero values before calling this function for the first time. On
+*        exit, each element holds the number of bolometers rejected from
+*        the corresponding block during the current invocation of this
 *        function (i.e. bolometers rejected on previous invocations are
 *        not included in the returned counts). Thus if a value of zero is
 *        returned for a particular block, then it means that no further
-*        bolometers have been rejected from that block. If this function
-*        is called in an iterative rejection loop, the returned values
-*        should be left unchanged between invocations of this function.
-*        The supplied values are used to determine whether it is necessary
-*        to re-calculate the gains and offsets for the bolometers in each
+*        bolometers have been rejected from that block. The supplied
+*        values are used to determine whether it is necessary to
+*        re-calculate the gains and offsets for the bolometers in each
 *        block - if a block has a supplied value of zero in this array,
 *        and the two neighbouring blocks are also supplied as zero, then
-*        the central block of these three has converged, and so the bolometer
-*        gains and offsets in the central block (supplied within "gai") are
-*        left unchanged on exit.
+*        the central block of these three has converged, and so the
+*        bolometer gains and offsets in the central block (supplied
+*        within "gai") are left unchanged on exit. Note, the supplied
+*        values are treated as boolean zero/non-zero values - the specific
+*        non-zero value supplied is insignificant.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
