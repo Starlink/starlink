@@ -276,6 +276,7 @@ static char * smf__read_ocsconfig ( int ndfid, int *status);
 void smf_open_file( const Grp * igrp, size_t index, const char * mode,
                     int flags, smfData ** data, int *status) {
 
+  int canwrite = 0;          /* We can write to the file if true */
   char datatype[NDF__SZTYP+1];  /* String for DATA type */
   char dtype[NDF__SZTYP+1];  /* String for DATA/VARIANCE type */
   int indf;                  /* NDF identified for input file */
@@ -355,6 +356,14 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
   if ( igrp == NULL ) {
     *data = NULL;
     return;
+  }
+
+  /* Translate mode into a boolean */
+  if (strncmp( mode, "READ", 4) == 0) {
+    /* READ mode */
+    canwrite = 0;
+  } else {
+    canwrite = 1;
   }
 
   /* Get filename from the group */
@@ -510,7 +519,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
            map'd */
 
         if ( !(flags & SMF__NOCREATE_QUALITY) &&
-             ( qexists || strncmp(mode,"READ",4) ) ) {
+             ( qexists || canwrite ) ) {
 
           if ( qexists ) {
             irqFind( indf, &qlocs, xname, status );
@@ -540,7 +549,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
             /* If no QUALITY, then first check for quality names and
                create if not present */
             irqFind( indf, &qlocs, xname, status );
-            if ( *status == IRQ__NOQNI && strncmp(mode,"READ",4) ) {
+            if ( *status == IRQ__NOQNI && canwrite ) {
               errAnnul(status);
               smf_create_qualname( mode, indf, &qlocs, status );
             } else {
@@ -619,7 +628,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
             one_strlcpy( qmode, mode, sizeof(qmode), status );
             msgOutif( MSG__DEBUG, "", "Mapping existing DKSQUID QUALITY",
                       status);
-          } else if ( strncmp(mode, "READ", 4) != 0 ) {
+          } else if ( canwrite ) {
             one_strlcpy( qmode, "WRITE/ZERO", sizeof(qmode), status );
             msgOutif( MSG__DEBUG, "", "Creating new DKSQUID QUALITY",
                       status);
