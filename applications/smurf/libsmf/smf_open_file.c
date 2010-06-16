@@ -344,9 +344,6 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
   int npdims;                /* Number of dimensions in the polynomial array */
   int pdims[NDF__MXDIM];     /* Size of each dimension */
 
-  IRQLocs *qlocs = NULL;     /* Named quality resources */
-  char xname[DAT__SZNAM+1];  /* Name of extension holding quality names */
-
   /* make sure return pointer is initialised */
   *data = NULL;
 
@@ -520,56 +517,47 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 
         if ( !(flags & SMF__NOCREATE_QUALITY) &&
              ( qexists || canwrite ) ) {
+          char qmode[NDF__SZMMD+1];
+          IRQLocs *qlocs = NULL;     /* Named quality resources */
+          char xname[DAT__SZNAM+1];  /* Name of extension holding quality names */
 
-          if ( qexists ) {
-            irqFind( indf, &qlocs, xname, status );
-            if ( *status == SAI__OK ) {
+          /* Sort out quality names */
+          irqFind( indf, &qlocs, xname, status );
+          if ( *status == SAI__OK ) {
+            if (qexists) {
               msgOutif(MSG__DEBUG, "", "Quality names defined in file", status);
-            } else if (*status == IRQ__NOQNI) {
-              errAnnul( status );
-              msgOutif( MSG__DEBUG, "",
-                        "QUALITY present but no quality names extension in file",
-                        status );
-              smf_create_qualname( mode, indf, &qlocs, status );
-            }
-            /* Last step, map quality */
-            if ( SMF__QUALTYPE == SMF__UBYTE) {
-              void *qpntr[1];
-              ndfMap( indf, "QUALITY", "_UBYTE", mode, &qpntr[0], &nout,
-                      status );
-              outqual = qpntr[0];
-            } else {
-              if (*status == SAI__OK) {
-                *status = SAI__ERROR;
-                errRep( "", "Unable to read QUALITY as anything other than UBYTE at this time",
-                        status );
-              }
-            }
-          } else {
-            /* If no QUALITY, then first check for quality names and
-               create if not present */
-            irqFind( indf, &qlocs, xname, status );
-            if ( *status == IRQ__NOQNI && canwrite ) {
-              errAnnul(status);
-              smf_create_qualname( mode, indf, &qlocs, status );
             } else {
               msgOutif(MSG__DEBUG, "",
                        "File has quality names extension but no QUALITY",
                        status);
             }
-            /* Attempt to create QUALITY component - assume we have
-               write or update access at this point */
-            if ( SMF__QUALTYPE == SMF__UBYTE) {
-              void *qpntr[1];
-              ndfMap( indf, "QUALITY", "_UBYTE", "WRITE/ZERO", &qpntr[0], &nout,
+          } else if (*status == IRQ__NOQNI) {
+            errAnnul(status);
+            if (qexists) {
+              msgOutif( MSG__DEBUG, "",
+                        "QUALITY present but no quality names extension in file."
+                        " Creating them", status );
+            }
+            smf_create_qualname( mode, indf, &qlocs, status );
+          }
+
+          /* Now map the data with the appropriate mode */
+          qmode[0] = '\0';
+          if ( qexists ) {
+            one_strlcpy( qmode, mode, sizeof(qmode), status );
+          } else if ( canwrite ) {
+            one_strlcpy( qmode, "WRITE/ZERO", sizeof(qmode), status );
+          }
+          if ( SMF__QUALTYPE == SMF__UBYTE) {
+            void *qpntr[1];
+            ndfMap( indf, "QUALITY", "_UBYTE", qmode, &qpntr[0], &nout,
+                    status );
+            outqual = qpntr[0];
+          } else {
+            if (*status == SAI__OK) {
+              *status = SAI__ERROR;
+              errRep( "", "Unable to read QUALITY as anything other than UBYTE at this time",
                       status );
-              outqual = qpntr[0];
-            } else {
-              if (*status == SAI__OK) {
-                *status = SAI__ERROR;
-                errRep( "", "Unable to read QUALITY as anything other than UBYTE at this time",
-                        status );
-              }
             }
           }
           /* Done with quality names so free resources */
