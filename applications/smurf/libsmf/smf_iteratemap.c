@@ -342,19 +342,6 @@
 
 #define FUNC_NAME "smf_iteratemap"
 
-/* private function for converting quality mask value to bit number by
-   bit-shifting until a bit is found. If no bits are set, return -1. Otherwise
-   bit number is 0-indexed */
-int smf_qualtobit(smf_qual_t q);
-
-int smf_qualtobit(smf_qual_t q) {
-  int num=-1;
-  if( q ) {
-    while( !((q>>num)&1) ) num++;
-  }
-  return num;
-}
-
 /* Main routine */
 void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      const Grp *bolrootgrp, const Grp *shortrootgrp,
@@ -1185,7 +1172,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
             /* If no good bolos left, set status */
             if( (*status==SAI__OK) &&
-                (qcount_last[smf_qualtobit(SMF__Q_BADB)] >= numdata) ) {
+                (qcount_last[smf_qual_to_bit(SMF__Q_BADB,status)] >= numdata) ) {
               *status = SMF__INSMP;
               errRep("", FUNC_NAME ": All bolos are bad", status );
             }
@@ -1553,7 +1540,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
             /* If no good bolos left, set status */
             if( (*status==SAI__OK) &&
-                (qcount_last[smf_qualtobit(SMF__Q_BADB)] >= numdata) ) {
+                (qcount_last[smf_qual_to_bit(SMF__Q_BADB, status)] >= numdata) ) {
               *status = SMF__INSMP;
               errRep("", FUNC_NAME ": All bolos are bad", status );
             }

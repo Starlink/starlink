@@ -207,10 +207,8 @@ smf_qualstats_model( const smfArray *qua, size_t qcount[8], size_t * ngoodbolo,
 
   /* Calculate time slices in padding */
   if (tpad) {
-    size_t whichbit = 0;
-    while( !((1<<whichbit) & SMF__Q_PAD) ) { /* which bit is SMF__Q_PAD? */
-      whichbit++;
-    }
+    /* which bit is SMF__Q_PAD? */
+    size_t whichbit = smf_qual_to_bit( SMF__Q_PAD, status );
     *tpad = qcount[whichbit] / nbolo_tot;
   }
 
