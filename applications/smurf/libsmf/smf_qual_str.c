@@ -92,7 +92,7 @@ const char *smf_qual_str( int bit, int *status ) {
   if (*status != SAI__OK) return retval;
 
   /* now switch on bit mask */
-  switch( 1<<bit ) {
+  switch( BIT_TO_VAL(bit) ) {
   case SMF__Q_BADDA:
     retval = "BADDA";
     break;

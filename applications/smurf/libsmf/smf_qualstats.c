@@ -152,7 +152,7 @@ void smf_qualstats( const smf_qual_t *qual, dim_t nbolo, size_t bstride,
 
       /* Loop over bits */
       for( k=0; k<SMF__NQBITS; k++ ) {
-        if( qual[offset] & ((smf_qual_t) (1 << k)) ) {
+        if( qual[offset] & BIT_TO_VAL(k) ) {
           qcount[k]++;
         }
       }

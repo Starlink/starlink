@@ -381,6 +381,9 @@ static const size_t SMF__BADIDX = (size_t)-1;
 #define SMF__NOFIX_METADATA 128 /* Do not fix up metadata */
 #define SMF__NOTTSERIES   256    /* File is not time series data */
 
+/* Macro to convert a bit position to an integer value */
+#define BIT_TO_VAL(bit) (1<<bit)
+
 /* Data quality bit mask (bits in single byte for QUALITY arrays) */
 #define SMF__Q_BADDA 1    /* Bad sample flagged by DA system  */
 #define SMF__Q_BADB 2     /* All samples from this bolo should be ignored */
