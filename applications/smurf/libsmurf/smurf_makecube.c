@@ -35,7 +35,7 @@
 *     Optionally, the output cube can be split up into several separate
 *     NDFs, each containing a spatial tile extracted from the full cube
 *     (see parameter TILEDIMS). These tiles abut exactly in pixel
-*     co-ordinates and can be combined (for example) using kappa PASTE.
+*     co-ordinates and can be combined (for example) using KAPPA:PASTE.
 *
 *     In addition, there is an option to divide the output up into separate
 *     polarisation angle bins (see parameter POLBINSIZE). If this option
@@ -43,10 +43,10 @@
 *     within the same container file), each one containing the input data
 *     relating to a particular range of polarisation angle.
 *
-*     The full output cube can be either a regularly gridded tangent plane
+*     The full output cube can be either a regularly gridded tangent-plane
 *     projection of the sky, or a sparse array (see parameter SPARSE).
 *     If a tangent plane projection is selected, the parameters of the
-*     projection from sky to pixel grid coordinates can be specified using
+*     projection from sky to pixel grid co-ordinates can be specified using
 *     parameters CROTA, PIXSIZE, REFLAT, REFLON. Alternatively, parameter
 *     AUTOGRID can be set true, in which case projection parameters are
 *     determined automatically in a manner that favours projections that
@@ -56,7 +56,7 @@
 *
 *     Variance values in the output can be calculated either on the basis
 *     of the spread of input dat avalues contributing to each output pixel,
-*     or on the basis of the system noise temperature values supplied in the
+*     or on the basis of the system-noise temperature values supplied in the
 *     input NDFs (see parameter GENVAR).
 
 *  ADAM Parameters:
@@ -78,8 +78,8 @@
 *          close to the centre of pixels in the output cube. If FALSE,
 *          REFLON/REFLAT are set to the first pointing BASE position, CROTA
 *          is set to the MAP_PA value in the FITS header (converted to the
-*          requested sky co-oridnate system), and PIXSIZE is set to 6
-*          arc-seconds. In addition, if AUTOGRID is TRUE the precise placement
+*          requested sky co-ordinate system), and PIXSIZE is set to 6
+*          arcseconds. In addition, if AUTOGRID is TRUE the precise placement
 *          of the tangent point is adjusted by up to 1 pixel along each
 *          spatial pixel axis in order to optimise the grid. [FALSE]
 *     BADMASK = LITERAL (Read)
@@ -94,14 +94,14 @@
 *          ("FIRST"). The value supplied for this parameter is used only if
 *          SPREAD is set to "Nearest" (otherwise "AND" is always used):
 *
-*          - "FIRST" -- The bad pixel mask in each output spectrum is
+*          - "FIRST" -- The bad-pixel mask in each output spectrum is
 *          inherited from the first input spectrum that contributes to the
 *          output spectrum. Any subsequent input spectra that contribute
-*          to the same output spectrum but which have a different bad pixel
+*          to the same output spectrum but which have a different bad-pixel
 *          mask are ignored. So an output pixel will be bad if and only if
 *          the corresponding pixel in the first input NDF that contributes
 *          to it is bad. Since this scheme ignores entire input spectra
-*          if they do not conform to the expected bad pixel mask, the noise
+*          if they do not conform to the expected bad-pixel mask, the noise
 *          in the output can be higher than using the other schemes. However,
 *          this scheme has the benefit of using much less memory than the
 *          "AND" scheme, and will in general produce fewer bad pixels in
@@ -152,7 +152,7 @@
 *     CROTA = _REAL (Read)
 *          Only accessed if a null value is supplied for parameter REF.
 *          The angle, in degrees, from north through east (in the
-*          coordinate system specified by the SYSTEM parameter) to the second
+*          co-ordinate system specified by the SYSTEM parameter) to the second
 *          pixel axis in the output cube. The dynamic default value is
 *          determined by the AUTOGRID parameter. []
 *     DETECTORS = LITERAL (Read)
@@ -170,7 +170,7 @@
 *          For each name in the group, an extra column is added to the
 *          output catalogue containing the value of the named extension
 *          item for every table row (i.e. for each data sample). These
-*          extra columns can be viewed and manipulated with general purpose
+*          extra columns can be viewed and manipulated with general-purpose
 *          FITS table tools such as TOPCAT, but will not be displayed by
 *          the KAPPA:LISTSHOW command. One use for these extra columns is
 *          to allow the catalogue to be filtered (e.g. by TOPCAT) to
@@ -178,17 +178,17 @@
 *          requirement specified by the JCMTState contents. No extra
 *          columns are added if a null (!) value is supplied. [!]
 *     FBL( ) = _DOUBLE (Write)
-*          Sky coordinates (radians) of the bottom left corner of the
+*          Sky co-ordinates (radians) of the bottom-left corner of the
 *          output cube (the corner with the smallest PIXEL dimension
-*          for axis 1 and the smallest pixel dimension for axis 2). No
+*          for Axis 1 and the smallest pixel dimension for Axis 2). No
 *          check is made that the pixel corresponds to valid data. Note
 *          that the position is reported for the centre of the pixel.
 *          If SPARSE mode is enabled the positions reported will not
 *          be reliable.
 *     FBR( ) = _DOUBLE (Write)
-*          Sky coordinates (radians) of the bottom right corner of the
+*          Sky co-ordinates (radians) of the bottom right corner of the
 *          output cube (the corner with the largest PIXEL dimension
-*          for axis 1 and the smallest pixel dimension for axis 2). No
+*          for Axis 1 and the smallest pixel dimension for Axis 2). No
 *          check is made that the pixel corresponds to valid data. Note
 *          that the position is reported for the centre of the pixel.
 *          If SPARSE mode is enabled the positions reported will not
@@ -197,32 +197,32 @@
 *          The lower bounds of the bounding box enclosing the output
 *          cube in the selected output WCS Frame. The values are
 *          calculated even if no output cube is created. Celestial
-*          axis values will be in units of radians, spectral axis
+*          axis values will be in units of radians, spectral-axis
 *          units will be in the same units as the input frameset
 *          (matching those used in the SPECBOUNDS parameter). The
-*          parameter is named to be consistent with KAPPA NDFTRACE
+*          parameter is named to be consistent with KAPPA:NDFTRACE
 *          output.
 *     FUBND( ) = _DOUBLE (Write)
 *          The upper bounds of the bounding box enclosing the output
 *          cube in the selected output WCS Frame. The values are
 *          calculated even if no output cube is created. Celestial
-*          axis values will be in units of radians, spectral axis
+*          axis values will be in units of radians, spectral-axis
 *          units will be in the same units of the input frameset
 *          (matching those used in the SPECBOUNDS parameter). The
-*          parameter is named to be consistent with KAPPA NDFTRACE
+*          parameter is named to be consistent with KAPPA:NDFTRACE
 *          output.
 *     FTL( ) = _DOUBLE (Write)
-*          Sky coordinates (radians) of the top left corner of the
+*          Sky co-ordinates (radians) of the top left corner of the
 *          output cube (the corner with the smallest PIXEL dimension
-*          for axis 1 and the largest pixel dimension for axis 2). No
+*          for Axis 1 and the largest pixel dimension for Axis 2). No
 *          check is made that the pixel corresponds to valid data. Note
 *          that the position is reported for the centre of the pixel.
 *          If SPARSE mode is enabled the positions reported will not
 *          be reliable.
 *     FTR( ) = _DOUBLE (Write)
-*          Sky coordinates (radians) of the top right corner of the
+*          Sky co-ordinates (radians) of the top right corner of the
 *          output cube (the corner with the largest PIXEL dimension
-*          for axis 1 and the largest pixel dimension for axis 2). No
+*          for Axis 1 and the largest pixel dimension for Axis 2). No
 *          check is made that the pixel corresponds to valid data. Note
 *          that the position is reported for the centre of the pixel.
 *          If SPARSE mode is enabled the positions reported will not
@@ -252,7 +252,7 @@
 *          ["Tsys"]
 *
 *     IN = NDF (Read)
-*          Input file(s)
+*          Input raw data file(s)
 *     INWEIGHT = _LOGICAL (Read)
 *          Indicates if the input spectra should be weighted when combining
 *          two or more input spectra together to form an output spectrum.
@@ -260,9 +260,9 @@
 *          associated with the input spectra, as determined from the Tsys
 *          values in the input. [TRUE]
 *     LBND( 2 ) = _INTEGER (Read)
-*        An array of values giving the lower pixel index bound on each
-*        spatial axis of the output NDF. The suggested default values
-*        encompass all the input spatial information. []
+*          An array of values giving the lower pixel-index bound on each
+*          spatial axis of the output NDF. The suggested default values
+*          encompass all the input spatial information. []
 *     LBOUND( 3 ) = _INTEGER (Write)
 *          The lower pixel bounds of the output NDF. Note, values will be
 *          written to this output parameter even if a null value is supplied
@@ -295,7 +295,7 @@
 *          An output catalogue in which to store all the spatial detector
 *          positions used to make the output cube (i.e. those selected using
 *          the DETECTORS parameter). By default, the stored positions are in
-*          the same sky coordinate system as the current Frame in the output
+*          the same sky co-ordinate system as the current Frame in the output
 *          NDF (but see parameter CATFRAME). The label associated with each
 *          row in the catalogue is the detector name. The detector positions
 *          in the catalogue are ordered as follows: all the positions for
@@ -337,8 +337,8 @@
 *          to the point-spread function of the input data.  []
 *     PIXSIZE( 2 ) = _REAL (Read)
 *          Only accessed if a null value is supplied for parameter REF.
-*          Pixel dimensions in the output image, in arcsec. If only one value
-*          is supplied, the same value will be used for both axes. The
+*          Pixel dimensions in the output image, in arcseconds. If only one
+*          value is supplied, the same value will be used for both axes. The
 *          dynamic default value is determined by the AUTOGRID parameter. []
 *     POLBINSIZE = _REAL (Read)
 *          This parameter is only prompted for if the input files contain
@@ -355,12 +355,12 @@
 *          complete range of analyser angles (0 to 360 degrees). A
 *          separate output cube will be created for each bin that is not
 *          empty, and each output NDF will contain a POLPACK extension
-*          suitable for use with the POLPACK POLCAL command. These NDFs
+*          suitable for use with the POLPACK:POLCAL command. These NDFs
 *          are all stored in a single HDS container file (one per tile)
 *          with the name specified by parameter OUT. Within this
 *          container file, each cube will be held in a component with
 *          name of the form "P<N>" appended to the end, where "<N>" is an
-*          integer bin index. The largest value of N is written to putput
+*          integer bin index. The largest value of N is written to output
 *          parameter NPOLBIN. If a null value (!) is supplied, then a
 *          single output NDF (without POLPACK extension) is created for
 *          each tile, containing all input data.
@@ -373,37 +373,38 @@
 *     REF = NDF (Read)
 *          An existing NDF that is to be used to define the output grid.
 *          If supplied, the output grid will be aligned with the supplied
-*          reference NDF. The supplied NDF need not be 3D. For instance,
-*          a 2D image can be supplied in which case the spatial axes of
-*          the output cube will be aligned with the reference image and
-*          the spectral axis will be inherited form the first input NDF.
-*          If a null (!) value is supplied then the output grid is
+*          reference NDF. The supplied NDF need not be three-dimensional. For
+*          instance, a two-dimensional image can be supplied in which case the
+*          spatial axes of the output cube will be aligned with the reference
+*          image and the spectral axis will be inherited form the first input
+*          NDF. If a null (!) value is supplied then the output grid is
 *          determined by parameters AUTOGRID, REFLON, REFLAT, etc. [!]
 *     REFLAT = LITERAL (Read)
 *          Only accessed if a null value is supplied for parameter REF.
-*          The formatted celestial latitude value at the tangent point of
+*          The formatted celestial-latitude value at the tangent point of
 *          the spatial projection in the output cube. This should be provided
-*          in the system specified by parameter SYSTEM. The dynamic default
+*          in the system specified by parameter SYSTEM. The dynamic-default
 *          value is determined by the AUTOGRID parameter. []
 *     REFLON = LITERAL (Read)
 *          Only accessed if a null value is supplied for parameter REF.
-*          The formatted celestial longitude value at the tangent point of
+*          The formatted celestial-longitude value at the tangent point of
 *          the spatial projection in the output cube. This should be provided
-*          in the system specified by parameter SYSTEM. The dynamic default
+*          in the system specified by parameter SYSTEM. The dynamic-default
 *          value is determined by the AUTOGRID parameter. []
 *     SPARSE = _LOGICAL (Read)
 *          Indicates if the spectra in the output cube should be stored
 *          as a sparse array, or as a regularly gridded array. If FALSE,
-*          pixel axes 1 and 2 of the output cube represent a regularly
+*          pixel Axes 1 and 2 of the output cube represent a regularly
 *          gridded tangent plane projection of the sky, with parameters
 *          determined by CROTA, PIXSIZE, REFLON and REFLAT. Each input
-*          spectrum is placed at the appropropriate pixel position in this
-*          3D projection, as given by the celestial coordinates associated
-*          with the spectrum. If SPARSE is TRUE, then each input spectrum
-*          is given an associated index, starting from 1, and the spectrum
-*          with index "I" is stored at pixel position (I,1) in the output
-*          cube (pixel axis 2 will always have the value 1 - that is, axis
-*          2 is a degenerate axis that spans only a single pixel).
+*          spectrum is placed at the appropriate pixel position in this
+*          three-dimensional projection, as given by the celestial
+*          co-ordinates associated with the spectrum. If SPARSE is TRUE, then
+*          each input spectrum is given an associated index, starting from 1,
+*          and the spectrum with index "I" is stored at pixel position (I,1)
+*          in the output cube (pixel Axis 2 will always have the value 1 --
+*          that is, Axis 2 is a degenerate axis that spans only a single 
+*          pixel).
 *
 *          In both cases, the third pixel axis in the output cube
 *          corresponds to spectral position (frequency, velocity, etc).
@@ -412,10 +413,10 @@
 *          can be used to transform pixel position into the corresponding
 *          (celestial longitude, celestial latitude, spectral position)
 *          values. However, if SPARSE is TRUE, then the inverse transformation
-*          (i.e. from (long,lat,spec) to pixel coordinates) will not be
+*          (i.e. from (long,lat,spec) to pixel co-ordinates) will not be
 *          defined. This means, for instance, that if a sparse array is
-*          displayed as a 2D image, then it will not be possible to
-*          annotated the axes with WCS values. Also, whilst KAPPA:WCSMOSAIC
+*          displayed as a two-dimensional image, then it will not be possible
+*          to annotate the axes with WCS values. Also, whilst KAPPA:WCSMOSAIC
 *          will succesfully align the data in a sparse array with a
 *          regularly gridded cube, KAPPA:WCSALIGN will not, since WCSALIGN
 *          needs the inverse transformation to be defined.
@@ -434,12 +435,12 @@
 *          string containing a pair of axis values separated by white space
 *          or commas. The first should be the spectral value corresponding to
 *          lower pixel bound in the output cube, and the second should be
-*          the spectral value corresponding to upper pixel bounds in the
+*          the spectral value corresponding to upper pixel bound in the
 *          output cube. The supplied values should refer to the spectral
 *          system described by the WCS FrameSet of the first input NDF. To
 *          see what this is, supply a single colon (":") for the parameter
 *          value. This will display a description of the required spectral
-*          coordinate system, and then re-prompt for a new parameter value.
+*          co-ordinate system, and then re-prompt for a new parameter value.
 *          The dynamic default is determined by the SPECUNION parameter. []
 *     SPECUNION = _LOGICAL (Read)
 *          Determines how the default spectral bounds for the output are
@@ -497,12 +498,12 @@
 *          For further details of these schemes, see the descriptions of
 *          routine AST_REBINx in SUN/211. ["Nearest"]
 *     SYSTEM = LITERAL (Read)
-*          The celestial coordinate system for the output cube. One of
+*          The celestial co-ordinate system for the output cube. One of
 *          ICRS, GAPPT, FK5, FK4, FK4-NO-E, AZEL, GALACTIC, ECLIPTIC. It
 *          can also be given the value "TRACKING", in which case the
 *          system used will be which ever system was used as the tracking
 *          system during in the observation. The value supplied for the
-*          CROTA parameter should refer to the coordinate system specified
+*          CROTA parameter should refer to the co-ordinate system specified
 *          by this parameter.
 *
 *          The choice of system also determines if the telescope is
@@ -547,7 +548,7 @@
 *          1). The number of tiles used to cover the entire output cube is
 *          written to output parameter NTILES. The tiles all share the same
 *          projection and so can be simply pasted together in pixel
-*          coordinates to reconstruct the full size output array. The tiles
+*          co-ordinates to reconstruct the full size output array. The tiles
 *          are centred so that the reference position (given by REFLON and
 *          REFLAT) falls at the centre of a tile. If a tile receives no
 *          input data, then no corresponding output NDF is created, but
@@ -555,7 +556,7 @@
 *          null (!) value is supplied for TILEDIMS, then the
 *          entire output array is created as a single tile and stored in
 *          a single output NDF with the name given by parameter OUT
-*          (without any "_<N>" appendix). [!]
+*          (without any "_<N>" appendage). [!]
 *     TRIM = _LOGICAL (Read)
 *          If TRUE, then the output cube will be trimmed to exclude any
 *          borders filled with bad data caused by one or more detectors
@@ -571,9 +572,9 @@
 *          will result in the border tiles being smaller than the central
 *          tiles. [FALSE]
 *     UBND( 2 ) = _INTEGER (Read)
-*        An array of values giving the upper pixel index bound on each
-*        spatial axis of the output NDF. The suggested default values
-*        encompass all the input spatial information. []
+*          An array of values giving the upper pixel-index bound on each
+*          spatial axis of the output NDF. The suggested default values
+*          encompass all the input spatial information. []
 *     UBOUND( 3 ) = _INTEGER (Write)
 *          The upper pixel bounds of the output NDF. Note, values will be
 *          written to this output parameter even if a null value is supplied
@@ -1018,7 +1019,7 @@ void smurf_makecube( int *status ) {
 /* Report observation details early */
    smf_summarize_obs( igrp, status );
 
-/* Get the celestial coordinate system for the output cube. */
+/* Get the celestial co-ordinate system for the output cube. */
    parChoic( "SYSTEM", "TRACKING", "TRACKING,FK5,ICRS,AZEL,GALACTIC,"
              "GAPPT,FK4,FK4-NO-E,ECLIPTIC", 1, system, 10, status );
 
@@ -1077,7 +1078,7 @@ void smurf_makecube( int *status ) {
       autogrid = 0;
    }
 
-/* See if the input data is to be aligned in the output coordinate system
+/* See if the input data is to be aligned in the output co-ordinate system
    rather than teh default of ICRS. */
    parGet0l( "ALIGNSYS", &alignsys, status );
 
@@ -1112,7 +1113,7 @@ void smurf_makecube( int *status ) {
    Also choose whether to use the 2D or the 3D weighting system. The 2D
    system assumes that all pixels in a given output spectrum have the
    same weight and variance, and requires much less memory than the 3D
-   system. Do not bother asking if we are using a 3d spread function by
+   system. Do not bother asking if we are using a 3D spread function by
    definition. */
    if (spread == AST__NEAREST) {
      parChoic( "BADMASK", "OR", "AND,OR,FIRST", 1, pabuf, 10, status );
@@ -1277,8 +1278,8 @@ void smurf_makecube( int *status ) {
 
 /* Get the base->current Mapping from the output WCS FrameSet, and split it
    into two Mappings; one (oskymap) that maps the first 2 GRID axes into
-   celestial sky coordinates, and one (ospecmap) that maps the third GRID
-   axis into a spectral coordinate. Also extract the SpecFrame and
+   celestial sky co-ordinates, and one (ospecmap) that maps the third GRID
+   axis into a spectral co-ordinate. Also extract the SpecFrame and
    SkyFrame from the current Frame. */
    tmap = astGetMapping( wcsout, AST__BASE, AST__CURRENT );
    tfrm = astGetFrame( wcsout, AST__CURRENT );
