@@ -362,40 +362,57 @@ static const size_t SMF__BADIDX = (size_t)-1;
 /* Name of SMURF history component */
 #define SMURF__HISTEXT "SMURFHIST"
 
+/* Macro to convert a bit position to an integer value */
+#define BIT_TO_VAL(bit) (1<<bit)
+
 /* Bit flags for smf_calcmodel* model component calculations */
-#define SMF__DIMM_FIRSTCOMP 1 /* First component in the solution */
-#define SMF__DIMM_FIRSTITER 2 /* First iteration */
-#define SMF__DIMM_INVERT 4    /* Inverse of the model calculation */
-#define SMF__DIMM_LASTITER 8  /* Is this the last iteration? */
+typedef enum {
+  SMF__DIMM_FIRSTCOMP = BIT_TO_VAL(0),  /* First component in the solution */
+  SMF__DIMM_FIRSTITER = BIT_TO_VAL(1),  /* First iteration */
+  SMF__DIMM_INVERT    = BIT_TO_VAL(2),  /* Inverse of the model calculation */
+  SMF__DIMM_LASTITER  = BIT_TO_VAL(3)   /* Is this the last iteration? */
+} smf_calcmodel_flags;
 
 /* Flags for smf_create_smf*, smf_open_file and smf_concat_smfGroup
    Must be individual bits in a single integer
 */
-#define SMF__NOCREATE_DA 1       /* Don't open DA data */
-#define SMF__NOCREATE_HEAD 2     /* Don't open header */
-#define SMF__NOCREATE_FILE 4     /* Don't open file */
-#define SMF__NOCREATE_DATA 8     /* Don't open DATA/QUALITY/VARIANCE */
-#define SMF__NOCREATE_VARIANCE 16/* If !SMF__NOCREATE_DATA don't map VARIANCE*/
-#define SMF__NOCREATE_QUALITY 32 /* If !SMF__NOCREATE_DATA don't map QUALITY */
-#define SMF__NOCREATE_LUT 64     /* Don't open pointing LUT */
-#define SMF__NOFIX_METADATA 128 /* Do not fix up metadata */
-#define SMF__NOTTSERIES   256    /* File is not time series data */
+typedef enum {
+  SMF__NOCREATE_DA       = BIT_TO_VAL(0),  /* Don't open DA data */
+  SMF__NOCREATE_HEAD     = BIT_TO_VAL(1),  /* Don't open header */
+  SMF__NOCREATE_FILE     = BIT_TO_VAL(2),  /* Don't open file */
+  SMF__NOCREATE_DATA     = BIT_TO_VAL(3),  /* Don't open DATA/QUALITY/VARIANCE */
+  SMF__NOCREATE_VARIANCE = BIT_TO_VAL(4),  /* If !SMF__NOCREATE_DATA don't map VARIANCE*/
+  SMF__NOCREATE_QUALITY  = BIT_TO_VAL(5),  /* If !SMF__NOCREATE_DATA don't map QUALITY */
+  SMF__NOCREATE_LUT      = BIT_TO_VAL(6),  /* Don't open pointing LUT */
+  SMF__NOFIX_METADATA    = BIT_TO_VAL(7),  /* Do not fix up metadata */
+  SMF__NOTTSERIES        = BIT_TO_VAL(8)   /* File is not time series data */
+} smf_open_file_flags;
 
-/* Macro to convert a bit position to an integer value */
-#define BIT_TO_VAL(bit) (1<<bit)
+/* Flags for smf_open_newfile
+   Must be individual bits in a single integer
+*/
+typedef enum {
+  SMF__MAP_VAR  = BIT_TO_VAL(3),
+  SMF__MAP_QUAL = BIT_TO_VAL(4)
+} smf_open_newfile_flags;
 
 /* Data quality bit mask (bits in single byte for QUALITY arrays) */
-#define SMF__Q_BADDA 1    /* Bad sample flagged by DA system  */
-#define SMF__Q_BADB 2     /* All samples from this bolo should be ignored */
-#define SMF__Q_SPIKE 4    /* Location of a spike */
-#define SMF__Q_JUMP 8     /* Location of a DC jump */
-#define SMF__Q_PAD 16     /* Padded data */
-#define SMF__Q_APOD 32    /* Apodized/boundary data */
-#define SMF__Q_STAT 64    /* Telescope stationary */
-#define SMF__Q_COM 128    /* Flagged as bad chunk in common-mode rejection */
+typedef enum {
+  SMF__Q_BADDA   = BIT_TO_VAL(0),   /* Bad sample flagged by DA system  */
+  SMF__Q_BADB    = BIT_TO_VAL(1),   /* All samples from this bolo should be ignored */
+  SMF__Q_SPIKE   = BIT_TO_VAL(2),   /* Location of a spike */
+  SMF__Q_JUMP    = BIT_TO_VAL(3),   /* Location of a DC jump */
+  SMF__Q_PAD     = BIT_TO_VAL(4),   /* Padded data */
+  SMF__Q_APOD    = BIT_TO_VAL(5),   /* Apodized/boundary data */
+  SMF__Q_STAT    = BIT_TO_VAL(6),   /* Telescope stationary */
+  SMF__Q_COM     = BIT_TO_VAL(7),   /* Flagged as bad chunk in common-mode rejection */
+} smf_qual_bits;
+
+/* Number of quality bits is one more than the last bit number used above */
+#define SMF__NQBITS 8
 
 /* These macros are for several commonly-used combinations of quality flags */
-#define SMF__Q_GOOD 255            /* Samples that don't go into the map. Also
+#define SMF__Q_GOOD (~(smf_qual_t)0)   /* Samples that don't go into the map. Also
                                       don't include in chi^2 */
 #define SMF__Q_MOD (SMF__Q_BADDA|SMF__Q_BADB|SMF__Q_PAD) /* Samples that can't
                                                            be modified
@@ -409,17 +426,10 @@ static const size_t SMF__BADIDX = (size_t)-1;
 #define SMF__Q_BOUND (SMF__Q_PAD|SMF__Q_APOD)            /* apodized/padded
                                                             boundary */
 
-/* Number of active quality bits */
-#define SMF__NQBITS 8
-
 /* Quality bits for maps */
-#define SMF__MAPQ_ZERO 1     /* Pixels that have been constrained to 0 */
-
-/* Flags for smf_open_newfile
-   Must be individual bits in a single integer
-*/
-#define SMF__MAP_VAR 8
-#define SMF__MAP_QUAL 16
+typedef enum {
+  SMF__MAPQ_ZERO = BIT_TO_VAL(0)   /* Pixels that have been constrained to 0 */
+} smf_qual_map_bits;
 
 /* Define a structure used to hold information cached by smf_create_lutwcs. */
 typedef struct smfCreateLutwcsCache {
