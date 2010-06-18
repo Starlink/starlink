@@ -13,11 +13,18 @@
 *     C function
 
 *  Invocation:
-*     const char *smf_qual_str( int bit, int *status );
+*     const char *smf_qual_str( int usebit, int bit_or_val,
+*                  const char **descr, int *status );
 
 *  Arguments:
-*     bit = int (Given)
-*        Bit number in the range 0 to SMF__NQBITS-1
+*     usebit = int (Given)
+*        If true "bit is used to determine the relevant quality. Else
+*        "val" is used.
+*     bit_or_val = int (Given)
+*        If "usebit" is true this is a bit number in the range 0 to SMF__NQBITS-1.
+*        Else it is the actual quality value to be tested.
+*     descr = const char ** (Given)
+*        Pointer to const string buffer describing the quality. Can be NULL.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -27,10 +34,13 @@
 
 *  Description:
 *     This function returns a string name corresponding to the given quality
-*     Bit.  Returns NULL pointer if outside the allowable range.
+*     Bit or quality value. It can also be used to obtain a string description
+*     of what the quality represents. Returns NULL pointer if outside
+*     the allowable range.
 
 *  Authors:
 *     Edward Chapin (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -38,11 +48,13 @@
 *        Initial version, copied from smf_dtype_str.c
 *     2010-03-19 (EC):
 *        Rename SMF__Q_BADS to SMF__Q_BADDA, and added SMF__Q_COM
-
-*  Notes:
-*     Make sure these strings match descriptions in smf_create_qualname
+*     2010-06-17 (TIMJ):
+*        Change API to allow the description to be in the same place
+*        as the string identifier. Also allow a value to be given directly
+*        as well as an alternative to the bit number.
 
 *  Copyright:
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     Copyright (C) 2010 University of British Columbia.
 *     All Rights Reserved.
 
@@ -83,51 +95,71 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_qual_str"
 
-const char *smf_qual_str( int bit, int *status ) {
+const char *smf_qual_str( int usebit, int bit_or_val,
+                          const char **descr, int *status ) {
 
   /* Set a default value */
   const char * retval = NULL;
+  const char * ldescr = "No description available";
+  int qval = 0;
 
   /* Check entry status */
   if (*status != SAI__OK) return retval;
 
+  /* Choose how we have been given a value */
+  if (usebit) {
+    qval = BIT_TO_VAL(bit_or_val);
+  } else {
+    qval = bit_or_val;
+  }
+
   /* now switch on bit mask */
-  switch( BIT_TO_VAL(bit) ) {
+  switch( qval ) {
   case SMF__Q_BADDA:
     retval = "BADDA";
+    ldescr = "Set iff a sample is flagged by the DA";
     break;
 
   case SMF__Q_BADB:
     retval = "BADBOL";
+    ldescr = "Set iff all data from bolo to be ignored";
     break;
 
   case SMF__Q_SPIKE:
     retval = "SPIKE";
+    ldescr = "Set iff a spike is detected";
     break;
 
   case SMF__Q_JUMP:
     retval = "DCJUMP";
+    ldescr = "Set iff a DC jump is present";
     break;
 
   case SMF__Q_PAD:
     retval = "PAD";
+    ldescr = "Set iff data are padding";
     break;
 
   case SMF__Q_APOD:
     retval = "APOD";
+    ldescr = "Set iff data are apodized/boundary";
     break;
 
   case SMF__Q_STAT:
     retval = "STAT";
+    ldescr = "Set iff telescope was stationary";
     break;
 
   case SMF__Q_COM:
     retval = "COM";
+    ldescr = "Set iff data common-mode rejected";
     break;
 
   default:
     retval = NULL;
   }
+
+  if (descr) *descr = ldescr;
 
   return retval;
 }

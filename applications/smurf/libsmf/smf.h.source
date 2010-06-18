@@ -1291,7 +1291,8 @@ int smf_pattern_extract ( const char * sourcestr, const char * pattern,
 
 void smf_polext( int ondf, double angle, int *status );
 
-const char *smf_qual_str( int bit, int *status );
+const char *smf_qual_str( int usebit, int bit_or_val,
+                          const char **descr, int *status );
 
 int smf_qual_to_bit( smf_qual_t q, int *status );
 

@@ -65,11 +65,13 @@
 *        Simplify using smf_qual_str
 *     2010-03-19 (EC):
 *        Added SMF__Q_COM
+*     2010-06-17 (TIMJ):
+*        Use new API for smf_qual_str to simplify code.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008 University of British Columbia.
-*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -139,29 +141,19 @@ void smf_create_qualname( const char *mode, int indf, IRQLocs **qlocs,
 
   /* Add SMURF quality names -- check against smf_qual_str */
   msgOutif(MSG__DEBUG, "", "Adding SMURF quality names", status);
-  irqAddqn( *qlocs, smf_qual_str(0,status), 0,
-	    "Set iff a sample is flagged by the DA", status );
-  irqAddqn( *qlocs, smf_qual_str(1,status), 0,
-	    "Set iff all data from bolo to be ignored", status );
-  irqAddqn( *qlocs, smf_qual_str(2,status), 0,
-            "Set iff a spike is detected", status );
-  irqAddqn( *qlocs, smf_qual_str(3,status), 0,
-            "Set iff a DC jump is present", status );
-  irqAddqn( *qlocs, smf_qual_str(4,status), 0,
-            "Set iff data are padding", status );
-  irqAddqn( *qlocs, smf_qual_str(5,status), 0,
-            "Set iff data are apodized/boundary", status );
-  irqAddqn( *qlocs, smf_qual_str(6,status), 0,
-            "Set iff telescope was stationary", status );
-  irqAddqn( *qlocs, smf_qual_str(7,status), 0,
-            "Set iff data common-mode rejected", status );
+  for (i=0; i<SMF__NQBITS; i++) {
+    const char * qdesc = NULL; /* Description of quality */
+    const char * qstr = NULL;  /* Quality string identifier */
+    qstr = smf_qual_str( 1, i, &qdesc, status );
 
-  for( i=0; (i<SMF__NQBITS)&&(*status==SAI__OK); i++ ) {
+    /* Set the quality name */
+    irqAddqn( *qlocs, qstr, 0, qdesc, status );
+
     /* Now fix the bits to the desired values */
-    irqFxbit( *qlocs, smf_qual_str(i,status), i+1, &fixed, status );
+    irqFxbit( *qlocs, qstr, i+1, &fixed, status );
 
     /* Set names to read only */
-    irqRwqn( *qlocs, smf_qual_str(i,status), 1, 1, &value, status );
+    irqRwqn( *qlocs, qstr, 1, 1, &value, status );
   }
 
   if ( smurfloc ) datAnnul( &smurfloc, status);

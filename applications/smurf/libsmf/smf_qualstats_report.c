@@ -231,14 +231,14 @@ void smf_qualstats_report( const smfArray *qua,
 
       if( init ) {
         msgOutf("","%6s: %10zu (%5.2lf%%),%20s", status,
-                smf_qual_str(i,status),
+                smf_qual_str(1, i, NULL, status),
                 qcount[i],
                 100. * (double) qcount[i] / (double) ndata,
                 scalestr);
       } else {
         msgOutf("","%6s: %10zu (%5.2lf%%),%20s,change %10li (%+.2lf%%)",
                 status,
-                smf_qual_str(i,status),
+                smf_qual_str(1, i, NULL, status),
                 qcount[i],
                 100. * (double) qcount[i] / (double) ndata,
                 scalestr,
