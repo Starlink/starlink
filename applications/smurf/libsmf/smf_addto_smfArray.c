@@ -89,6 +89,7 @@
 #include "sae_par.h"
 #include "mers.h"
 #include "ndf.h"
+#include "ast.h"
 
 /* SMURF routines */
 #include "smf.h"
