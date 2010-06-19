@@ -207,6 +207,7 @@
 #include "sc2da/dream_par.h"
 #include "sc2da/sc2ast.h"
 #include "ast.h"
+#include "prm_par.h"
 #include "ndf.h"
 #include "star/grp.h"
 #include "smurf_typ.h"
