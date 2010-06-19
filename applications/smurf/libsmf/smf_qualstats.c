@@ -4,7 +4,7 @@
 *     smf_qualstats
 
 *  Purpose:
-*     Produce statistics on quality flagging in a single array.
+*     Produce statistics on quality flagging in a single time series array.
 
 *  Language:
 *     Starlink ANSI C
@@ -13,7 +13,6 @@
 *     Library routine
 
 *  Invocation:
-
 *     smf_qualstats( const smf_qual_t *qual, dim_t nbolo, size_t bstride,
 *                    size_t ntslice, size_t tstride,  size_t qcount[8],
 *                    size_t *ngoodbolo, size_t *nmap, size_t *nmax,
@@ -48,8 +47,8 @@
 *        Pointer to global status.
 
 *  Description:
-*     Traverse the quality array and count the number of occurrences of
-*     each quality bit.
+*     Traverse the quality array of a time series and count the number
+*     of occurrences of each quality bit.
 
 *  Notes:
 
@@ -128,7 +127,7 @@ void smf_qualstats( const smf_qual_t *qual, dim_t nbolo, size_t bstride,
   }
 
   /* Initialize the counters */
-  memset( qcount, 0, SMF__NQBITS*sizeof(*qcount) );
+  memset( qcount, 0, SMF__NQBITS_TSERIES*sizeof(*qcount) );
 
   /* Loop over bolo and time slice, and count occurrences of quality bits */
   for( i=0; i<nbolo; i++ ) {
@@ -151,7 +150,7 @@ void smf_qualstats( const smf_qual_t *qual, dim_t nbolo, size_t bstride,
       }
 
       /* Loop over bits */
-      for( k=0; k<SMF__NQBITS; k++ ) {
+      for( k=0; k<SMF__NQBITS_TSERIES; k++ ) {
         if( qual[offset] & BIT_TO_VAL(k) ) {
           qcount[k]++;
         }

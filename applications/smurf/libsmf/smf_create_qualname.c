@@ -141,10 +141,10 @@ void smf_create_qualname( const char *mode, int indf, IRQLocs **qlocs,
 
   /* Add SMURF quality names -- check against smf_qual_str */
   msgOutif(MSG__DEBUG, "", "Adding SMURF quality names", status);
-  for (i=0; i<SMF__NQBITS; i++) {
+  for (i=0; i<SMF__NQBITS_TSERIES; i++) {
     const char * qdesc = NULL; /* Description of quality */
     const char * qstr = NULL;  /* Quality string identifier */
-    qstr = smf_qual_str( 1, i, &qdesc, status );
+    qstr = smf_qual_str( SMF__QFAM_TSERIES, 1, i, &qdesc, status );
 
     /* Set the quality name */
     irqAddqn( *qlocs, qstr, 0, qdesc, status );

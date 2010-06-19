@@ -408,9 +408,6 @@ typedef enum {
   SMF__Q_COM     = BIT_TO_VAL(7),   /* Flagged as bad chunk in common-mode rejection */
 } smf_qual_bits;
 
-/* Number of quality bits is one more than the last bit number used above */
-#define SMF__NQBITS 8
-
 /* These macros are for several commonly-used combinations of quality flags */
 #define SMF__Q_GOOD (~(smf_qual_t)0)   /* Samples that don't go into the map. Also
                                       don't include in chi^2 */
@@ -430,6 +427,23 @@ typedef enum {
 typedef enum {
   SMF__MAPQ_ZERO = BIT_TO_VAL(0)   /* Pixels that have been constrained to 0 */
 } smf_qual_map_bits;
+
+/* We have separate quality familys */
+typedef enum {
+  SMF__QFAM_TSERIES,   /* Time series quality */
+  SMF__QFAM_MAP,       /* Output map quality */
+  SMF__QFAM_TCOMP,     /* Compressed time series quality */
+} smf_qfam_t;
+
+/* Number of quality bits in each family. SMF__NQBITS can be used
+   for declaring array sizes. */
+typedef enum {
+  SMF__NQBITS_TSERIES = 8,
+  SMF__NQBITS_MAP     = 1,
+  SMF__NQBITS_TCOMP   = 5,
+  SMF__NQBITS         = 8    /* Largest number of bits in a family */
+} smf_qfam_count_t;
+
 
 /* Define a structure used to hold information cached by smf_create_lutwcs. */
 typedef struct smfCreateLutwcsCache {

@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_qualstats_report( const smfArray *qua,
-*                           size_t last_qcount[SMF__NQBITS],
+*                           size_t last_qcount[SMF__NQBITS_TSERIES],
 *                           size_t *last_nmap,
 *                           int init, size_t * ngood_tslice,
 *                           size_t *numdata, int *status )
@@ -113,7 +113,7 @@
 #define FUNC_NAME "smf_qualstats_report"
 
 void smf_qualstats_report( const smfArray *qua,
-                           size_t last_qcount[SMF__NQBITS],
+                           size_t last_qcount[SMF__NQBITS_TSERIES],
                            size_t *last_nmap, int init,
                            size_t *ngood_tslice, size_t *numdata,
                            int *status ) {
@@ -157,14 +157,14 @@ void smf_qualstats_report( const smfArray *qua,
 
   if( init ) {
     /* Initialize last_qcount */
-    memset( last_qcount, 0, SMF__NQBITS*sizeof(*last_qcount) );
+    memset( last_qcount, 0, SMF__NQBITS_TSERIES*sizeof(*last_qcount) );
 
     /* Initialize last_namp */
     *last_nmap = 0;
   }
 
   /* Initialize counts */
-  memset( qcount, 0, SMF__NQBITS*sizeof(*qcount) );
+  memset( qcount, 0, SMF__NQBITS_TSERIES*sizeof(*qcount) );
 
   /* Find out the properties of the smfArray */
   smf_qualstats_model( qua, qcount, &nbolo_tot, &nmap, &nmax,
@@ -192,7 +192,7 @@ void smf_qualstats_report( const smfArray *qua,
 
     msgOutf("", "--- Quality flagging statistics --------------------------------------------",
             status );
-    for( i=0; (i<SMF__NQBITS)&&(*status==SAI__OK); i++ ) {
+    for( i=0; (i<SMF__NQBITS_TSERIES)&&(*status==SAI__OK); i++ ) {
 
       char scalestr[80];
 
@@ -231,14 +231,14 @@ void smf_qualstats_report( const smfArray *qua,
 
       if( init ) {
         msgOutf("","%6s: %10zu (%5.2lf%%),%20s", status,
-                smf_qual_str(1, i, NULL, status),
+                smf_qual_str(SMF__QFAM_TSERIES, 1, i, NULL, status),
                 qcount[i],
                 100. * (double) qcount[i] / (double) ndata,
                 scalestr);
       } else {
         msgOutf("","%6s: %10zu (%5.2lf%%),%20s,change %10li (%+.2lf%%)",
                 status,
-                smf_qual_str(1, i, NULL, status),
+                smf_qual_str(SMF__QFAM_TSERIES, 1, i, NULL, status),
                 qcount[i],
                 100. * (double) qcount[i] / (double) ndata,
                 scalestr,
@@ -267,7 +267,7 @@ void smf_qualstats_report( const smfArray *qua,
 
   if( *status == SAI__OK ) {
     /* Update last_qcount to qcount */
-    memcpy(last_qcount, qcount, SMF__NQBITS*sizeof(*last_qcount));
+    memcpy(last_qcount, qcount, SMF__NQBITS_TSERIES*sizeof(*last_qcount));
 
     /* Update last_nmap to nmap */
     *last_nmap = nmap;

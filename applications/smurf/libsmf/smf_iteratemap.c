@@ -422,7 +422,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   dim_t padEnd=0;               /* How many samples of padding at the end */
   dim_t padStart=0;             /* How many samples of padding at the start */
   char *pname=NULL;             /* Poiner to name */
-  size_t qcount_last[SMF__NQBITS];/* quality bit counter -- last itertaion */
+  size_t qcount_last[SMF__NQBITS_TSERIES];/* quality bit counter -- last itertaion */
   smfArray **qua=NULL;          /* Quality flags for each file */
   smf_qual_t *qua_data=NULL; /* Pointer to DATA component of qua */
   smfGroup *quagroup=NULL;      /* smfGroup of quality model files */

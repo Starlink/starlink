@@ -13,10 +13,12 @@
 *     C function
 
 *  Invocation:
-*     const char *smf_qual_str( int usebit, int bit_or_val,
+*     const char *smf_qual_str( smf_qfam_t family, int usebit, int bit_or_val,
 *                  const char **descr, int *status );
 
 *  Arguments:
+*     family = smf_qfam_t (Given)
+*        Indicate which family of quality bits is represented in "qual".
 *     usebit = int (Given)
 *        If true "bit is used to determine the relevant quality. Else
 *        "val" is used.
@@ -37,6 +39,9 @@
 *     Bit or quality value. It can also be used to obtain a string description
 *     of what the quality represents. Returns NULL pointer if outside
 *     the allowable range.
+*
+*     The values returned depend on the quality family being requested. For
+*     example we could be interested in time series quality or map quality.
 
 *  Authors:
 *     Edward Chapin (UBC)
@@ -52,6 +57,8 @@
 *        Change API to allow the description to be in the same place
 *        as the string identifier. Also allow a value to be given directly
 *        as well as an alternative to the bit number.
+*     2010-06-17 (TIMJ):
+*        Add quality family.
 
 *  Copyright:
 *     Copyright (C) 2010 Science & Technology Facilities Council.
@@ -95,7 +102,7 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_qual_str"
 
-const char *smf_qual_str( int usebit, int bit_or_val,
+const char *smf_qual_str( smf_qfam_t family, int usebit, int bit_or_val,
                           const char **descr, int *status ) {
 
   /* Set a default value */
@@ -113,50 +120,95 @@ const char *smf_qual_str( int usebit, int bit_or_val,
     qval = bit_or_val;
   }
 
-  /* now switch on bit mask */
-  switch( qval ) {
-  case SMF__Q_BADDA:
-    retval = "BADDA";
-    ldescr = "Set iff a sample is flagged by the DA";
-    break;
+  if (family == SMF__QFAM_TSERIES) {
+    /* now switch on bit mask */
+    switch( qval ) {
+    case SMF__Q_BADDA:
+      retval = "BADDA";
+      ldescr = "Set iff a sample is flagged by the DA";
+      break;
 
-  case SMF__Q_BADB:
-    retval = "BADBOL";
-    ldescr = "Set iff all data from bolo to be ignored";
-    break;
+    case SMF__Q_BADB:
+      retval = "BADBOL";
+      ldescr = "Set iff all data from bolo to be ignored";
+      break;
 
-  case SMF__Q_SPIKE:
-    retval = "SPIKE";
-    ldescr = "Set iff a spike is detected";
-    break;
+    case SMF__Q_SPIKE:
+      retval = "SPIKE";
+      ldescr = "Set iff a spike is detected";
+      break;
 
-  case SMF__Q_JUMP:
-    retval = "DCJUMP";
-    ldescr = "Set iff a DC jump is present";
-    break;
+    case SMF__Q_JUMP:
+      retval = "DCJUMP";
+      ldescr = "Set iff a DC jump is present";
+      break;
 
-  case SMF__Q_PAD:
-    retval = "PAD";
-    ldescr = "Set iff data are padding";
-    break;
+    case SMF__Q_PAD:
+      retval = "PAD";
+      ldescr = "Set iff data are padding";
+      break;
 
-  case SMF__Q_APOD:
-    retval = "APOD";
-    ldescr = "Set iff data are apodized/boundary";
-    break;
+    case SMF__Q_APOD:
+      retval = "APOD";
+      ldescr = "Set iff data are apodized/boundary";
+      break;
 
-  case SMF__Q_STAT:
-    retval = "STAT";
-    ldescr = "Set iff telescope was stationary";
-    break;
+    case SMF__Q_STAT:
+      retval = "STAT";
+      ldescr = "Set iff telescope was stationary";
+      break;
 
-  case SMF__Q_COM:
-    retval = "COM";
-    ldescr = "Set iff data common-mode rejected";
-    break;
+    case SMF__Q_COM:
+      retval = "COM";
+      ldescr = "Set iff data common-mode rejected";
+      break;
 
-  default:
-    retval = NULL;
+    default:
+      retval = NULL;
+    }
+  } else if (family == SMF__QFAM_MAP) {
+    /* now switch on bit mask */
+    switch( qval ) {
+    case SMF__MAPQ_ZERO:
+      retval = "ZERO";
+      ldescr = "Set iff a map output pixel was zeroed by the map-maker";
+      break;
+
+    default:
+      retval = NULL;
+    }
+  } else if (family == SMF__QFAM_TCOMP) {
+    /* now switch on bit mask */
+    switch( qval ) {
+    case SMF__TCOMPQ_BAD:
+      retval = "BADBOLO";
+      ldescr = "Set if bolometer data were inherently bad";
+      break;
+    case SMF__TCOMPQ_ENDS:
+      retval = "ENDS";
+      ldescr = "Set if the ends of the time series should not be used";
+      break;
+    case SMF__TCOMPQ_BLIP:
+      retval = "BLIP";
+      ldescr = "Set if bolometer went bad for a moment";
+      break;
+    case SMF__TCOMPQ_MATCH:
+      retval = "MATCH";
+      ldescr = "Set if this part of time series did not look like others";
+      break;
+    case SMF__TCOMPQ_TEL:
+      retval = "TEL";
+      ldescr = "Set if telescope was not in useful state";
+      break;
+    default:
+      retval = NULL;
+    }
+
+
+  } else {
+    *status = SAI__ERROR;
+    errRep("", "Did not understand requested quality family",
+           status );
   }
 
   if (descr) *descr = ldescr;

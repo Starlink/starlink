@@ -132,7 +132,7 @@ smf_qualstats_model( const smfArray *qua, size_t qcount[8], size_t * ngoodbolo,
   }
 
   /* Initialize counts */
-  if (qcount) memset( qcount, 0, SMF__NQBITS*sizeof(*qcount) );
+  if (qcount) memset( qcount, 0, SMF__NQBITS_TSERIES*sizeof(*qcount) );
   nmap_tot = 0;
   nmax_tot = 0;
 
@@ -183,7 +183,7 @@ smf_qualstats_model( const smfArray *qua, size_t qcount[8], size_t * ngoodbolo,
       if( *status == SAI__OK ) {
         /* Add counts from this subarray to the total */
         if (qcount) {
-          for( i=0; i<SMF__NQBITS; i++ ) {
+          for( i=0; i<SMF__NQBITS_TSERIES; i++ ) {
             qcount[i] += subqcount[i];
           }
         }
