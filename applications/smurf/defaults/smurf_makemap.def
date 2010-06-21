@@ -139,6 +139,18 @@ flt.filt_edgehigh = 0
 flt.filt_notchlow = <undef>
 flt.filt_notchhigh = <undef>
 
+# Specifies the minimum fraction of good values that must contribute to a
+# filtered value. For instance, if wlim is 0.9 then a filtered data value
+# is flagged as bad unless at least 0.9 of the input values that
+# contribute to it are good (i.e. have not been flagged as unusable for
+# any reason). Thus a high filt_wlim value (i.e. close to 1.0) will cause
+# more data to be rejected, and a low value (i.e. close to 0.0) will cause
+# less data to be rejected. A value of <undef> causes the old filtering
+# algorithm to be used that is based on filling gaps with artificial data.
+# If the new algorithm is used the following additional settings can be
+# made: "apod=0, fillgaps=0, noi.fillgaps=0".
+flt.filt_wlim = <undef>
+
 # smf_calcmodel_noi
 # these are a subset of smf_get_cleanpar options
 

@@ -44,6 +44,7 @@
 
 *  Authors:
 *     Edward Chapin (UBC)
+*     David S Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -70,6 +71,10 @@
 *        - Each thread gets its own plan, rather than reusing same one
 *     2010-04-01 (EC):
 *        - add option of an external quality array
+*     2010-06-22 (DSB):
+*        Alternative approach to handling missing data - store zero for
+*        missing values and then correct by normalising the filtered data
+*        using a filtered mask.
 
 *  Copyright:
 *     Copyright (C) 2007-2009 University of British Columbia.
@@ -112,6 +117,7 @@
 #include "libsmf/smf_typ.h"
 #include "libsmf/smf.h"
 
+
 /* ------------------------------------------------------------------------ */
 /* Local variables and functions */
 
@@ -131,7 +137,7 @@ typedef struct smfFilterExecuteData {
   int ijob;                /* Job identifier */
   fftw_plan plan_forward;  /* for forward transformation */
   fftw_plan plan_inverse;  /* for inverse transformation */
-  smf_qual_t *qua;      /* quality pointer */
+  smf_qual_t *qua;         /* quality pointer */
 } smfFilterExecuteData;
 
 /* Function to be executed in thread: filter all of the bolos from b1 to b2
@@ -146,13 +152,29 @@ void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
   double *data_fft_r=NULL;      /* Real part of the data FFT */
   double *data_fft_i=NULL;      /* Imaginary part of the data FFT */
   smfData *data=NULL;           /* smfData that we're working on */
+  double *dmask = NULL;         /* Array holding data values to be filtered */
+  double fac;                   /* Factor for scaling the ral and imag parts */
+  double fr;                    /* Real filter value */
+  double fi;                    /* Imaginary filter value */
+  double *inv_filt_r = NULL;    /* Array holding inverted real filter values */
+  double *inv_filt_i = NULL;    /* Array holding inverted imaginary filter values */
   smfFilterExecuteData *pdata=NULL; /* Pointer to job data */
   smfFilter *filt=NULL;         /* Frequency domain filter */
   size_t i;                     /* Loop counter */
+  int iloop;                    /* Loop counter */
+  int invert;                   /* Invert the filter to produce a low pass filter? */
   size_t j;                     /* Loop counter */
+  double *mask = NULL;          /* Array holding mask values to be filtered */
   dim_t nbolo;                  /* Number of bolometers */
+  int newalg;                   /* Use new algorithm for handling missing data? */
   dim_t ntslice;                /* Number of time slices */
-  smf_qual_t *qua=NULL;      /* pointer to quality */
+  smf_qual_t *qua=NULL;         /* pointer to quality */
+  smf_qual_t *qbase=NULL;       /* pointer to first quality element */
+  double rad;                   /* The modulus of the complex filter value */
+  double unit;                  /* Unit filter value */
+  double *use_filt_r = NULL;    /* Array holding real filter values to use */
+  double *use_filt_i = NULL;    /* Array holding imaginary filter values to use */
+
 
   if( *status != SAI__OK ) return;
 
@@ -211,43 +233,211 @@ void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
     return;
   }
 
+  /* We have two alternative ways to handle mising data - the original,
+     which is to apodise the data and then replace missing data with
+     artificial noisey data before filtering it, or the new, which is to
+     replace missing data with zeros before filtering it and then correct
+     for this by normalising the filtered data using a mask filtered in
+     the same way as the data. If "wlim" is VAL__BADD we use the original
+     method. */
+  newalg = ( filt->wlim != VAL__BADD );
 
-  for( i=pdata->b1; (*status==SAI__OK) && (i<=pdata->b2); i++ )
-    if( !qua || !(qua[i*bstride]&SMF__Q_BADB) ) { /* Check for bad bolo flag */
+  /* Missing or flagged data will be set to zero before filtering.
+     The effect of this on the filtered data is removed by dividing the
+     filtered data by the filtered mask (the mask is an array that is 1.0
+     for usable data and 0.0 for missing data). However, if the total
+     data sum in the effective smoothing kernel (i.e. the inverse fourier
+     transformation of the filter function) is zero, then the filtered
+     mask will be full of zeros, except maybe for values near to missing
+     data, and so cannot be used to normalised the filtered data. Any
+     filter that removes the DC level (i.e. a high pass or notch filter)
+     will do this. So if we are doing a high pass or notch filter, we
+     first invert the filter so that it becomes a low pass filter
+     (i.e. we use filter (1-F), where F is the high pass filter), then
+     filter both data and mask using the inverted filter, then normalised
+     the filtered data by dividing it by the filtered mask, and then
+     subtract the normalised filtered data from the original data. We
+     have a high pass or notch filter if the first element of the filter
+     has value zero. In this case we will use the inverted filter. */
+  invert = ( newalg && filt->real[ 0 ] == 0.0 );
+  if( filt->isComplex && filt->imag[ 0 ] != 0.0 ) invert = 0;
+
+  /* If required, create arrays holding the inverted filter values */
+  if( invert ) {
+    unit = 1.0/filt->ntslice;
+
+    if( filt->isComplex ) {
+
+      inv_filt_r = astMalloc( filt->dim*sizeof( *inv_filt_r ) );
+      inv_filt_i = astMalloc( filt->dim*sizeof( *inv_filt_i ) );
+      if( *status == SAI__OK ) {
+
+        for( j = 0; j < filt->dim; j++ ) {
+          fr = filt->real[ j ];
+          fi = filt->imag[ j ];
+          rad = sqrt( fr*fr + fi*fi );
+
+          if( rad != 0.0 ) {
+            fac = unit/rad - 1.0;
+            inv_filt_r[ j ] = fr*fac;
+            inv_filt_i[ j ] = fi*fac;
+          } else {
+            inv_filt_r[ j ] = unit;
+            inv_filt_i[ j ] = 0.0;
+          }
+
+        }
+
+        use_filt_r = inv_filt_r;
+        use_filt_i = inv_filt_i;
+      }
+
+    } else {
+
+      inv_filt_r = astMalloc( filt->dim*sizeof( *inv_filt_r ) );
+      if( *status == SAI__OK ) {
+
+        for( j = 0; j < filt->dim; j++ ) {
+          fr = filt->real[ j ];
+          inv_filt_r[ j ] = unit - fr;
+        }
+
+        use_filt_r = inv_filt_r;
+      }
+    }
+
+  /* Otherwise, use the supplied filter values */
+  } else {
+    use_filt_r = filt->real;
+    use_filt_i = filt->imag;
+  }
+
+  /* Allocate work arrays to hold the mask and the masked data array */
+  if( newalg ) {
+    mask = astMalloc( ntslice*sizeof( *mask ) );
+    dmask = astMalloc( ntslice*sizeof( *dmask ) );
+  }
+
+  /* Loop round filtering all bolometers. */
+  for( i=pdata->b1; (*status==SAI__OK) && (i<=pdata->b2); i++ ) {
+    qbase = qua ? qua + i*bstride : NULL;
+
+    if( !qbase || !(qbase[0]&SMF__Q_BADB) ) { /* Check for bad bolo flag */
 
       /* Obtain pointer to the correct chunk of data */
       base = data->pntr[0];
       base += i*bstride;
 
-      /* Execute forward transformation using the guru interface */
-      fftw_execute_split_dft_r2c( pdata->plan_forward, base,
-                                  data_fft_r, data_fft_i );
-
-      /* Apply the frequency-domain filter */
-      if( filt->isComplex ) {
-        for( j=0; j<filt->dim; j++ ) {
-          /* Complex times complex, using only 3 multiplies */
-          ac = data_fft_r[j] * filt->real[j];
-          bd = data_fft_i[j] * filt->imag[j];
-
-          aPb = data_fft_r[j] + data_fft_i[j];
-          cPd = filt->real[j] + filt->imag[j];
-
-          data_fft_r[j] = ac - bd;
-          data_fft_i[j] = aPb*cPd - ac - bd;
-        }
+      /* Create a mask array that is the same length as the data array,
+         with 1.0 at every usable data value and 0.0 at every unusable
+         data value. At the same time, create a new data array by
+         multiplying the original data array by this mask. */
+      if( newalg ) {
+         for( j = 0; j < ntslice; j++ ){
+            if( base[ j ] != VAL__BADD &&
+                ( !qbase || !( qbase[ j ] & SMF__Q_GOOD ) ) ) {
+               mask[ j ] = 1.0;
+               dmask[ j ] = base[ j ];
+            } else {
+               mask[ j ] = 0.0;
+               dmask[ j ] = 0.0;
+            }
+         }
       } else {
-        for( j=0; j<filt->dim; j++ ) {
-          /* Complex times real */
-          data_fft_r[j] *= filt->real[j];
-          data_fft_i[j] *= filt->real[j];
-        }
+         dmask = base;
       }
 
-      /* Perform inverse transformation using guru interface */
-      fftw_execute_split_dft_c2r( pdata->plan_inverse, data_fft_r,
-                                  data_fft_i, base );
+      /* Loop to filter first the masked data array, and then the mask,
+         using the same filter. */
+      for( iloop = 0; iloop < ( newalg ? 2 : 1 ); iloop++ ) {
+         base = iloop ? mask : dmask;
+
+         /* Execute forward transformation using the guru interface */
+         fftw_execute_split_dft_r2c( pdata->plan_forward, base,
+                                     data_fft_r, data_fft_i );
+
+         /* Apply the frequency-domain filter */
+         if( filt->isComplex ) {
+           for( j=0; j<filt->dim; j++ ) {
+             /* Complex times complex, using only 3 multiplies */
+             ac = data_fft_r[j] * use_filt_r[j];
+             bd = data_fft_i[j] * use_filt_i[j];
+
+             aPb = data_fft_r[j] + data_fft_i[j];
+             cPd = use_filt_r[j] + use_filt_i[j];
+
+             data_fft_r[j] = ac - bd;
+             data_fft_i[j] = aPb*cPd - ac - bd;
+           }
+         } else {
+           for( j=0; j<filt->dim; j++ ) {
+             /* Complex times real */
+             data_fft_r[j] *= use_filt_r[j];
+             data_fft_i[j] *= use_filt_r[j];
+           }
+         }
+
+         /* Perform inverse transformation using guru interface */
+         fftw_execute_split_dft_c2r( pdata->plan_inverse, data_fft_r,
+                                     data_fft_i, base );
+      }
+
+
+      /* Divide the filtered masked data array by the filtered mask,
+         thus normalising the filtered data and removing any ringing
+         introduced by missing data values. The wlim parameter allows
+         control of what happens close to missing data - a value of zero
+         means "retain as much data as possible, even though the data
+         close to a missing section may be biassed by the asymetric
+         distribution of usable data values", a value of 1.0 "retain only
+         data that is definately not biassed by the asymetric
+	 distribution of usable data values", value inbetween 0.0 and 1.0
+	 are mid way between these extremes. If we inverted the filter
+	 before filtering, we now need to compensate for the inversion by
+	 subtracting the filtered (and normalised) data from the supplied
+	 data. */
+      if( newalg ) {
+        base = data->pntr[0];
+        base += i*bstride;
+
+        if( invert ) {
+
+          for( j = 0; j < ntslice; j++ ){
+            if( mask[ j ] >= filt->wlim && mask[ j ] != 0.0 ) {
+              base[ j ] -= dmask[ j ]/mask[ j ];
+
+            /* If the current filtered data value has contributions from
+               an insufficient faction of good input data values, flag it
+               as a spike in order to exclude it from further calculations.
+               Clearly it's not a spike but we have run out of quality bits
+               until Tim finishes his work on expanding the quality array. */
+            } else if( qbase ) {
+               qbase[ j ] |= SMF__Q_SPIKE;
+            }
+          }
+
+        } else {
+
+          for( j = 0; j < ntslice; j++ ){
+            if( mask[ j ] >= filt->wlim && mask[ j ] != 0.0 ) {
+              base[ j ] = dmask[ j ]/mask[ j ];
+            } else if( qbase ) {
+              qbase[ j ] |= SMF__Q_SPIKE;
+            }
+          }
+
+        }
+      }
     }
+  }
+
+  /* Free work arrays */
+  if( newalg ) {
+     mask = astFree( mask );
+     dmask = astFree( dmask );
+     inv_filt_r = astFree( inv_filt_r );
+     inv_filt_i = astFree( inv_filt_i );
+  }
 
   msgOutiff( MSG__DEBUG, "",
              "smfFilterExecuteParallel: thread finishing bolos %zu -- %zu",

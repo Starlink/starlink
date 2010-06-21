@@ -42,6 +42,7 @@ filt_edgelow = 0
 filt_edgehigh = 0
 filt_notchlow = <undef>
 filt_notchhigh = <undef>
+filt_wlim = <undef>
 flagstat = 0
 order = -1
 spikethresh = 0

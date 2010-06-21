@@ -35,11 +35,14 @@
 *
 *  Authors:
 *     EC: Edward Chapin (UBC)
+*     DSB: David S Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     2009-04-17 (EC):
 *        Initial version.
+*     2010-06-21 (DSB):
+*        Store a a value for the "wlim" component of the filter structure.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -122,5 +125,10 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap, int *dofilt,
     if( f_nnotch ) {
       smf_filter_notch( filt, f_notchlow, f_notchhigh, f_nnotch, status );
     }
+
+    if( ! astMapGet0D( keymap, "FILT_WLIM", &(filt->wlim) ) ) {
+       filt->wlim = VAL__BADD;
+    }
+
   }
 }

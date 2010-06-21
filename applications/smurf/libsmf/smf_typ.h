@@ -686,6 +686,7 @@ typedef struct smfFilter {
   dim_t ntslice;        /* # of time slices in input data */
   double *real;         /* Real part of the filter */
   AstFrameSet *wcs;     /* Frameset describing filter */
+  double wlim;          /* Minimum weight for valid filtered values */
 } smfFilter;
 
 /* Structure for static headers of DIMM files. Only some of the entries

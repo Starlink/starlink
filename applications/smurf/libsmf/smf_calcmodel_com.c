@@ -1100,6 +1100,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
      surround good data. This is needed since subsequent filtering
      operations may not ignore flagged bolometer values but may instead
      use the bolometer values literally. */
+  if( fillgaps ) astMapGet0I( keymap, "FILLGAPS", &fillgaps );
   if( fillgaps ) {
     for( idx=0; (idx<res->ndat)&&(*status==SAI__OK); idx++ ) {
       qua_data = (smf_qual_t *)(qua->sdata[idx]->pntr)[0];

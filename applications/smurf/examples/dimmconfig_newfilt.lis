@@ -1,0 +1,46 @@
+^$STARLINK_DIR/share/smurf/dimmconfig.lis
+
+# *** Specialized config that uses the new filtering algorithm
+#
+# The original filtering algorithm handled missing or rejected data
+# by filling the gaps in the data stream with artifical data that was
+# linear with time, and included gaussian noise at a typical level. This
+# is a potentially fragile approach which relies on the artifical data
+# being a reasonable representation of the real data. The random noise
+# added to the artifical data also introduces a random element into the
+# data values in the final map.
+#
+# This configuration file uses an alternative approach, which excludes
+# the missing data completely from the filtered data. It does this by
+# filling the gaps in the data stream with the value zero prior to
+# filtering the data. In addition, it creates a mask that has value 1.0
+# at each used data sample and 0.0 at each unused data sample, and
+# filters this mask in the saem way as the data stream. The filtered data
+# stream is then normalised by dividing it by the filtered mask.
+#
+# The new algorithm is roughly a factor of two slower than the old
+# algorithm, due to two FFTs being needed per bolometer instead of one.
+#
+# ***
+
+
+# "filt_wlim" specifies the minimum fraction of good values that must
+# contribute to a filtered value. For instance, if wlim is 0.9 then a
+# filtered data value is flagged as bad unless at least 0.9 of the input
+# values that contribute to it are good (i.e. have not been flagged as
+# unusable for any reason). Thus a high filt_wlim value (i.e. close to
+# 1.0) will cause more data to be rejected, and a low value (i.e. close to
+# 0.0) will cause less data to be rejected. A value of <undef> causes the
+# old filtering algorithm to be used that is based on filling gaps with
+# artificial data.
+filt_wlim = 0.9
+flt.filt_wlim = 0.9
+
+# Apodisation is not needed in the new algorithm, so we can save some
+# data samples by switching it off.
+apod=0
+
+# Also there is no need to gap fill, which will save us some time.
+fillgaps=0
+noi.fillgaps=0
+
