@@ -150,6 +150,11 @@
 *        - Remove trailing white space.
 *      28-MAY-2010 (DSB):
 *        Change ndg1TheSame to include checks on sameness of all ancestors.
+*      21-JUN-2010 (DSB):
+*         - Save calculated ProvId value in the Prov structure to avoid 
+*         recalculating it each time it is needed.
+*         - Indicate that the ProvId value in a Prov is stale out of date
+*         when the list of parents in the Prov is changed.
 */
 
 
@@ -2986,8 +2991,9 @@ static void ndg1ClearProvId( Prov *prov, int *status ) {
 *     supplied Prov by setting it to zero, indicating that a new hash
 *     code should be calculated next time the hash code is acquired using
 *     ndg1GetProvId. It should be called when any of the text items
-*     within a Prov (path, date or creator) are changed. It also clears
-*     the hash codes in all child Prov structures (but not parents).
+*     within a Prov (path, date or creator), or the list of parents, is
+*     changed. It also clears the hash codes in all child Prov structures
+*     (but not parents).
 
 *  Parameters:
 *     prov
@@ -3358,6 +3364,10 @@ static void ndg1Disown( Prov *parent, Prov *child, int *status ){
 
 /* Nullify the trailing elements of the array that are no longer used. */
    for( i = j; i < parent->nchild; i++ ) parent->children[ j ] = NULL;
+
+/* Clear the ProvId hash code that describes the contents of the child
+   (since it's list of parents has changed). */
+   ndg1ClearProvId( child, status );
 
 /* Reduce the number of children. */
    parent->nchild = j;
@@ -4124,6 +4134,10 @@ static int ndg1GetProvId( Prov *prov, int *status ) {
       for( iparent = 0; iparent < prov->nparent; iparent++ ) {
          ihash ^= ndg1GetProvId( prov->parents[ iparent ], status );
       }
+
+/* For efficiency, store the hash code in the Prov structure so that it
+   does not need to be recalculated next time it is required. */
+      prov->provid = ihash;
    }
 
 /* Return the hash code. */
@@ -4830,6 +4844,11 @@ static void ndg1ParentChild( Prov *parent, Prov *child, int *status ){
                                   sizeof( Prov * ) );
       if( astOK ) parent->children[ parent->nchild++ ] = child;
    }
+
+/* Clear the ProvId hash code that describes the contents of the child
+   (since it's list of parents has changed). */
+   ndg1ClearProvId( child, status );
+
 }
 
 static void ndg1ParentChildIndex( Provenance *provenance, int iparent,
