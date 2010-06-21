@@ -324,6 +324,16 @@ static void ndg1WriteProvenanceExtension( Provenance *, HDSLoc *, int * );
 static void ndg1WriteProvenanceNDF( Provenance *, int, int, int * );
 static AstKeyMap *ndg1ShowProv( Prov *, int, AstKeyMap *, FILE *, int * );
 
+/* Debug stuff.... */
+static void ndg1DumpInfo( Prov *prov1, Prov *prov2, int *status );
+static int static_badtype = 0;
+static const char *static_badpath = NULL;
+static Provenance *static_provenance = NULL;
+static int static_provid1 = -2;
+static int static_provid2 = -2;
+
+
+
 /* Public F77 wrapper functions. */
 /* ============================= */
 
@@ -2955,6 +2965,8 @@ static int ndg1CheckSameParents( Prov *prov1, Prov *prov2, int *status ) {
 /* Clear the returned flag and leave the loop if the KeyMap does not
    contain an entry with key equal to the path of the current parent. */
       if( ! astMapHasKey( km, prov2->parents[ i ]->path ) ) {
+         static_badtype = 0;
+         static_badpath = prov2->parents[ i ]->path;
          result = 0;
          break;
 
@@ -2966,7 +2978,11 @@ static int ndg1CheckSameParents( Prov *prov1, Prov *prov2, int *status ) {
 
 /* If any entries remain in the KeyMap (indicating parents of prov1
    that are not parents of prov2), clear the returned flag. */
-   if( result && astMapSize( km ) > 0 ) result = 0;
+   if( result && astMapSize( km ) > 0 ) {
+      static_badtype = 1;
+      astMapGet0C( km, astMapKey( km, 0 ), &static_badpath );
+      result = 0;
+   }
 
 /* Free resources. */
    km = astAnnul( km );
@@ -5015,6 +5031,9 @@ static void ndg1PurgeProvenance( Provenance *provenance,
 /* Check the inherited status value. */
    if( *status != SAI__OK ) return;
 
+   static_provenance = provenance;
+
+
 /* Loop through every Prov structure in the supplied Provenance. */
    for( i = 0; i < provenance->nprov; i++ ) {
       prov1 = provenance->provs[ i ];
@@ -5032,6 +5051,18 @@ static void ndg1PurgeProvenance( Provenance *provenance,
                if( keep ) {
                   if( !ndg1CheckSameParents( prov1, prov2, status ) ) {
                      if( *status == SAI__OK ) {
+
+
+
+
+/* >>>  Temporary fix to dump info to see why this error is being
+        reported. <<< */
+                        ndg1DumpInfo( prov1, prov2, status );
+
+
+
+
+
                         *status = SAI__ERROR;
                         msgSetc( "N", prov1->path );
                         errRep( " ", "The ancestor NDF '^N' was included "
@@ -5954,6 +5985,8 @@ static int ndg1TheSame( Prov *prov1, Prov *prov2, int *status ) {
 /* If the pointer are the same, they describe the same ND. */
    if( prov1 == prov2 ) {
       result = 1;
+      static_provid1 = -1;
+      static_provid2 = -1;
 
 /* Otherwise, we assume a match if the ProvId values match. The ProvId is
    a hash code describing the content of the Prov and all its ancestors.
@@ -5965,8 +5998,9 @@ static int ndg1TheSame( Prov *prov1, Prov *prov2, int *status ) {
    incorporates not only the name, command and date of this Prov, but also
    all its ancestor Provs. */
    } else {
-      result = ( ndg1GetProvId( prov1, status ) ==
-                 ndg1GetProvId( prov2, status ) );
+      static_provid1 = ndg1GetProvId( prov1, status );
+      static_provid2 = ndg1GetProvId( prov2, status );
+      result = (static_provid1 == static_provid2);
    }
 
 /* Return the result. */
@@ -6483,4 +6517,120 @@ static AstKeyMap *ndg1ShowProv( Prov *prov, int depth, AstKeyMap *km,
    return result;
 }
 
+
+static void ndg1DumpInfo( Prov *prov1, Prov *prov2, int *status ){
+
+   AstKeyMap *pkm;
+   FILE *fd=NULL;
+   Prov **prov;
+   char logfile[200];
+   char pf[50];
+   const char *home;
+   int iprov, jprov, j;
+
+   if( *status != SAI__OK ) return;
+
+   home = getenv( "HOME" );
+   if( !home ) {
+      *status = SAI__ERROR;
+      errRep( " ", "WARNING: ndg1DumpInfo failed to get HOME directory.", status );
+      errFlush( status );
+      return;
+   }
+
+   sprintf( logfile, "%s/ndg.log", home );
+   fd = fopen( logfile, "w" );
+   if( !fd ) {
+      *status = SAI__ERROR;
+      msgSetc( "F", logfile );
+      errRep( " ", "WARNING: ndg1DumpInfo failed to open ndg log file '^F'.", status );
+      errFlush( status );
+      return;
+   }
+
+   fprintf( fd, "Error occurred whilst purging duplicate ancestors "
+                "in %s\n", static_provenance->main->path );
+
+   prov = static_provenance->provs;
+   pkm = astKeyMap( " " );
+   for( iprov = 0; iprov < static_provenance->nprov; iprov++,prov++ ) {
+      sprintf( pf, "%p", *prov );
+      astMapPut0I( pkm, pf, iprov, NULL );
+   }
+
+   fprintf( fd, "PROV1: provid=%d path=%s index=", static_provid1,
+            prov1->path );
+
+   sprintf( pf, "%p", prov1 );
+   if( !astMapGet0I( pkm, pf, &iprov ) ) {
+      fprintf( fd, "unknown\n" );
+   } else {
+      fprintf( fd, "%d\n", iprov );
+   }
+
+   fprintf( fd, "PROV2: provid=%d path=%s index=", static_provid2,
+            prov2->path );
+
+   sprintf( pf, "%p", prov2 );
+   if( !astMapGet0I( pkm, pf, &iprov ) ) {
+      fprintf( fd, "unknown\n" );
+   } else {
+      fprintf( fd, "%d\n", iprov );
+   }
+
+   if( static_badtype == 0 ) {
+      fprintf( fd, "PROV2 is a child of %s but PROV1 is not.\n",
+               static_badpath );
+   } else {
+      fprintf( fd, "PROV1 is a child of %s but PROV2 is not.\n",
+               static_badpath );
+   }
+
+   fprintf( fd, "\n\n" );
+
+
+   prov = static_provenance->provs;
+   for( iprov = 0; iprov < static_provenance->nprov; iprov++,prov++ ) {
+      fprintf( fd, "Index %d:\n", iprov );
+      fprintf( fd, "   path=%s\n", (*prov)->path );
+      fprintf( fd, "   provid=%d\n", (*prov)->provid );
+      fprintf( fd, "   date=%s\n", (*prov)->date );
+      fprintf( fd, "   creator=%s\n", (*prov)->creator );
+      fprintf( fd, "   index=%d\n", (*prov)->index );
+      fprintf( fd, "   hhash=%d\n", (*prov)->hhash );
+      fprintf( fd, "   more=%p\n", (*prov)->more );
+      fprintf( fd, "   nparent=%d\n", (*prov)->nparent );
+      fprintf( fd, "   nchild=%d\n", (*prov)->nchild );
+      fprintf( fd, "   hist_recs=%p\n", (*prov)->hist_recs );
+      fprintf( fd, "   nhrec=%d\n", (*prov)->nhrec );
+      fprintf( fd, "   hidden=%d\n", (*prov)->hidden );
+
+      fprintf( fd, "   Parents: " );
+      for( j = 0; j < (*prov)->nparent; j++ ) {
+         sprintf( pf, "%p", (*prov)->parents[ j ] );
+         if( !astMapGet0I( pkm, pf, &jprov ) ) {
+            fprintf( fd, "?? " );
+         } else {
+            fprintf( fd, "%d ", jprov );
+         }
+      }
+      fprintf( fd, "\n");
+
+      fprintf( fd, "   Children: " );
+      for( j = 0; j < (*prov)->nchild; j++ ) {
+         sprintf( pf, "%p", (*prov)->children[ j ] );
+         if( !astMapGet0I( pkm, pf, &jprov ) ) {
+            fprintf( fd, "?? " );
+         } else {
+            fprintf( fd, "%d ", jprov );
+         }
+      }
+      fprintf( fd, "\n");
+
+   }
+
+   pkm = astAnnul( pkm );
+   if( fclose( fd ) ) perror( "ndg1DumpInfo");
+
+}
 
