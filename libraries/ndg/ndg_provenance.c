@@ -151,10 +151,12 @@
 *      28-MAY-2010 (DSB):
 *        Change ndg1TheSame to include checks on sameness of all ancestors.
 *      21-JUN-2010 (DSB):
-*         - Save calculated ProvId value in the Prov structure to avoid 
+*         - Save calculated ProvId value in the Prov structure to avoid
 *         recalculating it each time it is needed.
 *         - Indicate that the ProvId value in a Prov is stale out of date
 *         when the list of parents in the Prov is changed.
+*      212-JUN-2010 (DSB):
+*         Fix loop termination bug in ndg1Rmprv.
 */
 
 
@@ -308,6 +310,7 @@ static int ndg1IsWanted( AstXmlElement *, int * );
 static int ndg1TheSame( Prov *, Prov *, int * );
 static void ndg1A2h( AstKeyMap *, HDSLoc *, int * );
 static void ndg1AddHistKM( AstKeyMap *, const char *, Prov *, int * );
+static void ndg1Check( const char *, Prov *, AstKeyMap *, int * )__attribute__((unused));
 static void ndg1ClearProvId( Prov *, int * );
 static void ndg1CopyComps( HDSLoc *, HDSLoc *, int * );
 static void ndg1Disown( Prov *, Prov *, int * );
@@ -322,7 +325,7 @@ static void ndg1ResetIndices( Provenance *, int * );
 static void ndg1Rmprv( Provenance *, int, int * );
 static void ndg1WriteProvenanceExtension( Provenance *, HDSLoc *, int * );
 static void ndg1WriteProvenanceNDF( Provenance *, int, int, int * );
-static AstKeyMap *ndg1ShowProv( Prov *, int, AstKeyMap *, FILE *, int * );
+static AstKeyMap *ndg1ShowProv( Prov *, int, AstKeyMap *, FILE *, int * )__attribute__((unused));
 
 /* Debug stuff.... */
 static void ndg1DumpInfo( Prov *prov1, Prov *prov2, int *status );
@@ -2906,6 +2909,146 @@ static void ndg1AddHistKM( AstKeyMap *km, const char *key, Prov *prov,
 /* Free the array holding the pointers. */
       vector = astFree( vector );
    }
+}
+
+static void ndg1Check( const char *text, Prov *prov, AstKeyMap *km,
+                       int *status ) {
+/*
+*  Name:
+*     ndg1Check
+
+*  Purpose:
+*     Check that all parent-child links are consistent.
+
+*  Invocation:
+*     void ndg1Check( const char *text, Prov *prov, AstKeyMap *km,
+*                     int *status )
+
+*  Description:
+*     This function checks that all parents of the supplied Prov include
+*     the Prov within their list of children. It then checks that all
+*     children of the supplied Prov include the Prov within their list
+*     of parents. It also calls itself recursively to check each parent
+*     and child in the same way, taking care to avoid infinite loops.
+*
+*     If any of these checks fail, an error is reported.
+
+*  Arguments:
+*     text
+*        A text message to include at the start of the error report. The
+*        remaining text in the error report identifies the parent and child
+*        for which the check failed.
+*     prov
+*        The Prov structure from which to start the checks.
+*     km
+*        An AstKeyMap containing a list of the Prov structures that have
+*        already been checked and so should not be re-checked. This is
+*        used to avoid infinite loops. Each entry in the KeyMap should
+*        have a key which is the address of a Prov structure, formatted
+*        into a character string using "%p". The value associated with
+*        the key is arbitrary and unused. A NULL pointer can be supplied
+*        on the top level entry to this function, in which case a new
+*        KeyMap will be created.
+*     status
+*        Inherited status pointer.
+
+*/
+
+/* Local Variables: */
+   Prov *child;
+   Prov *parent;
+   char key[40];
+   int annul;
+   int i, j, ok;
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* Create a KeyMap is required, noting whether we should annull the
+   KeyMap before leaving this function. */
+   if( !km ) {
+      km = astKeyMap( " " );
+      annul = 1;
+   } else {
+      annul = 0;
+   }
+
+/* Add the supplied Prov to the list of Provs that should not be
+   re-checked. Do it now, at the start, as this prevents subsequent calls
+   to this function re-checking the supplied Prov. */
+   sprintf( key, "%p", prov );
+   astMapPut0I( km, key, 0, NULL );
+
+/* Check each parent of the supplied Prov. */
+   for( i = 0; i < prov->nparent && *status == SAI__OK; i++ ) {
+      parent = prov->parents[ i ];
+
+/* See if the current parent recognises the suppleid Prov as a child. */
+      ok = 0;
+      for( j = 0; j < parent->nchild; j++ ) {
+         if( parent->children[ j ] == prov ) {
+            ok = 1;
+            break;
+         }
+      }
+
+/* If not report an error. */
+      if( ! ok && *status == SAI__OK ) {
+         *status = SAI__ERROR;
+         msgSetc( "P", parent->path );
+         msgSetc( "C", prov->path );
+         msgSetc( "T", text );
+         errRep( " ", "^T: ^P is a parent of ^C, but the inverse "
+                 "relationship does not exist.", status );
+
+/* If this parent looks OK so far, and it has not previously been checked,
+   call this function recursively to check the parent's other family
+   connections. */
+      } else {
+         sprintf( key, "%p", parent );
+         if( !astMapHasKey( km, key ) ) {
+            ndg1Check( text, parent, km, status );
+         }
+
+      }
+   }
+
+/* Check each child of the supplied Prov. */
+   for( i = 0; i < prov->nchild && *status == SAI__OK; i++ ) {
+      child = prov->children[ i ];
+
+/* See if the current child recognises the suppleid Prov as a parent. */
+      ok = 0;
+      for( j = 0; j < child->nparent; j++ ) {
+         if( child->parents[ j ] == prov ) {
+            ok = 1;
+            break;
+         }
+      }
+
+/* If not report an error. */
+      if( ! ok && *status == SAI__OK ) {
+         *status = SAI__ERROR;
+         msgSetc( "C", child->path );
+         msgSetc( "P", prov->path );
+         msgSetc( "T", text );
+         errRep( " ", "^T: ^C is a child of ^P, but the inverse "
+                 "relationship does not exist.", status );
+
+/* If this child looks OK so far, and it has not previously been checked,
+   call this function recursively to check the child's other family
+   connections. */
+      } else {
+         sprintf( key, "%p", child );
+         if( !astMapHasKey( km, key ) ) {
+            ndg1Check( text, child, km, status );
+         }
+
+      }
+   }
+
+/* If the KeyMap was created within this invocation, annul it. */
+   if( annul ) km = astAnnul( km );
 }
 
 static int ndg1CheckSameParents( Prov *prov1, Prov *prov2, int *status ) {
@@ -5869,7 +6012,7 @@ static void ndg1Rmprv( Provenance *prov, int ianc, int *status ){
 
 /* Loop round all the direct parents of the ancestor. */
       n = anc->nparent;
-      for( iparent = 0; iparent < anc->nparent; iparent++ ) {
+      for( iparent = 0; iparent < n; iparent++ ) {
          parent = anc->parents[ 0 ];
 
 /* Break the parent-child link between the ancestor and the current
@@ -5896,6 +6039,119 @@ static void ndg1Rmprv( Provenance *prov, int ianc, int *status ){
               "only ^N ancestors found.", status );
    }
 
+}
+
+static AstKeyMap *ndg1ShowProv( Prov *prov, int depth, AstKeyMap *km,
+                                FILE *fd, int *status ){
+/*
+*  Name:
+*     ndg1ShowProv
+
+*  Purpose:
+*     Display a Prov structure with all its parents and children.
+
+*  Invocation:
+*     AstKeyMap *ndg1ShowProv( Prov *prov, int depth, AstKeyMap *km,
+*                              FILE *fd, int *status )
+
+*  Description:
+*     This function is a debugging tool that displays a Prov structure.
+*
+*     The displayed information is a bit confusing at the moment. Could be
+*     improved.
+
+*  Arguments:
+*     prov
+*        Pointer to the Prov structure to display.
+*     depth
+*        The level of recursive nesting.
+*     km
+*        A KeyMap containing the addresses of the Prov structurs already
+*        displayed, or NULL if no structures have yet been displayed.
+*     fd
+*        Pointer to a file descriptor to which output is written. It is
+*        ignored and a new file is opened if depth is zero.
+*     status
+*        Inherited status pointer.
+
+*  Returned Value:
+*     A pointer to a KeyMap holding the address of all the Prov
+*     structures displayed. Should be freed using astAnnul after the top
+*     level entry to this function returns.
+
+*/
+
+/* Local Variables: */
+   AstKeyMap *result;
+   char indent[2000];
+   char key[100];
+   int i;
+
+/* Initialise */
+   result = km;
+
+/* Check status */
+   if( *status != SAI__OK ) return result;
+
+/* If this is the top level entry, open an output file. */
+   if( depth == 0 || ! fd ) {
+      sprintf( key, "prov_%p.log", prov );
+      fd = fopen( key, "w" );
+   }
+
+/* A keyMap to store the addresses of the Prov structures that have already
+   been show. */
+   if( !result ) result = astKeyMap( " " );
+
+/* Get a string representation of the address of the supplied Prov
+   structure. */
+   sprintf( key, "%p", prov );
+
+/* Set up the indentation string. */
+   for( i = 0; i < 2*depth; i++ ) indent[ i ] = ' ';
+   indent[ 2*depth ] = 0;
+
+/* Display the path */
+   fprintf( fd, "%s path: %s\n", indent, prov->path ? prov->path : "" );
+
+/* If the Prov has already been displayed, issue a warning. */
+   if( astMapHasKey( result, key ) ) {
+      fprintf( fd, "%s >>> This Prov structure has already been displayed\n",
+              indent );
+
+/* Otherwise, display the remaining details of this Prov */
+   } else {
+      fprintf( fd, "%s date: %s\n", indent, prov->date ? prov->date : "" );
+      fprintf( fd, "%s creator: %s\n", indent, prov->creator ? prov->creator : "" );
+      fprintf( fd, "%s index: %d\n", indent, prov->index );
+      fprintf( fd, "%s hidden: %d\n", indent, prov->hidden );
+
+/* Store the Prov address in the KeyMap so that the following recursive
+   calls to this function can detect if the same Prov is reached by a
+   second path. */
+      astMapPut0I( result, key, 1, NULL );
+
+/* Display the child Provs (to avoid infinite loops). */
+      for( i = 0; i < prov->nchild; i++ ) {
+         fprintf( fd, "%s child %d:\n", indent, i );
+         (void) ndg1ShowProv( prov->children[ i ], depth + 1, result, fd,
+                              status );
+      }
+
+/* Display the parent Provs (to avoid infinite loops). */
+      for( i = 0; i < prov->nparent; i++ ) {
+         fprintf( fd, "%s parent %d:\n", indent, i );
+         (void) ndg1ShowProv( prov->parents[ i ], depth + 1, result, fd,
+                              status );
+      }
+
+   }
+
+/* If this is the top level entry, close the output file. */
+   if( depth == 0 ) fclose( fd );
+
+/* Return a pointer to the KeyMap. */
+   return result;
 }
 
 static HDSLoc *ndg1TCopy( HDSLoc *loc, int *status ){
@@ -6398,123 +6654,6 @@ static char ndg1XmlSource( void *data, int *status ){
 */
    if( *status != SAI__OK ) return 0;
    return *( (* (char **) data )++ );
-}
-
-
-
-
-
-static AstKeyMap *ndg1ShowProv( Prov *prov, int depth, AstKeyMap *km,
-                                FILE *fd, int *status ){
-/*
-*  Name:
-*     ndg1ShowProv
-
-*  Purpose:
-*     Display a Prov structure with all its parents and children.
-
-*  Invocation:
-*     AstKeyMap *ndg1ShowProv( Prov *prov, int depth, AstKeyMap *km,
-*                              FILE *fd, int *status )
-
-*  Description:
-*     This function is a debugging tool that displays a Prov structure.
-*
-*     The displayed information is a bit confusing at the moment. Could be
-*     improved.
-
-*  Arguments:
-*     prov
-*        Pointer to the Prov structure to display.
-*     depth
-*        The level of recursive nesting.
-*     km
-*        A KeyMap containing the addresses of the Prov structurs already
-*        displayed, or NULL if no structures have yet been displayed.
-*     fd
-*        Pointer to a file descriptor to which output is written. It is
-*        ignored and a new file is opened if depth is zero.
-*     status
-*        Inherited status pointer.
-
-*  Returned Value:
-*     A pointer to a KeyMap holding the address of all the Prov
-*     structures displayed. Should be freed using astAnnul after the top
-*     level entry to this function returns.
-
-*/
-
-/* Local Variables: */
-   AstKeyMap *result;
-   char indent[2000];
-   char key[100];
-   int i;
-
-/* Initialise */
-   result = km;
-
-/* Check status */
-   if( *status != SAI__OK ) return result;
-
-/* If this is the top level entry, open an output file. */
-   if( depth == 0 || ! fd ) {
-      sprintf( key, "prov_%p.log", prov );
-      fd = fopen( key, "w" );
-   }
-
-/* A keyMap to store the addresses of the Prov structures that have already
-   been show. */
-   if( !result ) result = astKeyMap( " " );
-
-/* Get a string representation of the address of the supplied Prov
-   structure. */
-   sprintf( key, "%p", prov );
-
-/* Set up the indentation string. */
-   for( i = 0; i < 2*depth; i++ ) indent[ i ] = ' ';
-   indent[ 2*depth ] = 0;
-
-/* Display the path */
-   fprintf( fd, "%s path: %s\n", indent, prov->path ? prov->path : "" );
-
-/* If the Prov has already been displayed, issue a warning. */
-   if( astMapHasKey( result, key ) ) {
-      fprintf( fd, "%s >>> This Prov structure has already been displayed\n",
-              indent );
-
-/* Otherwise, display the remaining details of this Prov */
-   } else {
-      fprintf( fd, "%s date: %s\n", indent, prov->date ? prov->date : "" );
-      fprintf( fd, "%s creator: %s\n", indent, prov->creator ? prov->creator : "" );
-      fprintf( fd, "%s index: %d\n", indent, prov->index );
-      fprintf( fd, "%s hidden: %d\n", indent, prov->hidden );
-
-/* Store the Prov address in the KeyMap so that the following recursive
-   calls to this function can detect if the same Prov is reached by a
-   second path. */
-      astMapPut0I( result, key, 1, NULL );
-
-/* Display the child Provs (to avoid infinite loops). */
-      for( i = 0; i < prov->nchild; i++ ) {
-         fprintf( fd, "%s child %d:\n", indent, i );
-         (void) ndg1ShowProv( prov->children[ i ], depth + 1, result, fd,
-                              status );
-      }
-
-/* Display the parent Provs (to avoid infinite loops). */
-      for( i = 0; i < prov->nparent; i++ ) {
-         fprintf( fd, "%s parent %d:\n", indent, i );
-         (void) ndg1ShowProv( prov->parents[ i ], depth + 1, result, fd,
-                              status );
-      }
-
-   }
-
-/* If this is the top level entry, close the output file. */
-   if( depth == 0 ) fclose( fd );
-
-/* Return a pointer to the KeyMap. */
-   return result;
 }
 
 
