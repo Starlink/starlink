@@ -19,4 +19,5 @@ BORDB      <Bolo-ordered bolometer data>
 WDIM       <Wrong data dimensions>
 DIVBZ      <Divide-by-zero detected>
 INFREQ     <Invalid frequency specified>
+BADQNM     <Unknown quality name>
 .END
