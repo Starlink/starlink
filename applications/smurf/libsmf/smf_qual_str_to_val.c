@@ -70,6 +70,7 @@
 */
 
 #include "smf.h"
+#include "mers.h"
 
 #include "sae_par.h"
 #include "smf_err.h"
