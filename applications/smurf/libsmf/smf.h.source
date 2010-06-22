@@ -1296,6 +1296,8 @@ const char * smf_qfamily_str( smf_qfam_t qfamily, int * status );
 const char *smf_qual_str( smf_qfam_t family, int usebit, int bit_or_val,
                           const char **descr, int *status );
 
+smf_qual_t smf_qual_str_to_val( const char *qname, smf_qfam_t * family, int * status );
+
 int smf_qual_to_bit( smf_qual_t q, int *status );
 
 void smf_qualstats( const smf_qual_t *qual, dim_t nbolo, size_t bstride,

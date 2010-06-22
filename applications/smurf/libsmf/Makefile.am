@@ -255,6 +255,7 @@ smf_pattern_extract.c \
 smf_polext.c \
 smf_qfamily_str.c \
 smf_qual_str.c \
+smf_qual_str_to_val.c \
 smf_qual_to_bit.c \
 smf_qualstats.c \
 smf_qualstats_model.c \
