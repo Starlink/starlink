@@ -390,7 +390,9 @@ typedef enum {
 } smf_open_file_flags;
 
 /* Flags for smf_open_newfile
-   Must be individual bits in a single integer
+   Must be individual bits in a single integer and must not clash with
+   flags used in smf_create_smf* (the first three smf_open_file_flags above).
+   Hence this enum starts at bit 3.
 */
 typedef enum {
   SMF__MAP_VAR  = BIT_TO_VAL(3),
