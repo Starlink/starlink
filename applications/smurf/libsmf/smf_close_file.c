@@ -97,6 +97,8 @@
 *        Free caches used by smf_create_lutwcs and smf_detpos_wcs.
 *     2009-06-23 (TIMJ):
 *        Free ocsconfig
+*     2010-06-18 (TIMJ):
+*        Free file quality as special case.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -206,6 +208,13 @@ void smf_close_file( smfData ** data, int * status ) {
       isSc2store = 1;
 
     } else if ( file->ndfid != NDF__NOID ) {
+
+      /* Handle quality as a special case */
+      if ( (*data)->qual) {
+        (*data)->qual = smf_qual_unmap( file->ndfid, (*data)->qfamily,
+                                        (*data)->qual, status );
+      }
+
       /* Annul the NDF (which will unmap things) */
       ndfAnnul( &(file->ndfid), status );
 

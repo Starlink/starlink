@@ -147,7 +147,6 @@ void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, const int n
   int isTstream = 0;            /* Flag to denote time series (3-D) data */
   int nel;                      /* Number of mapped elements */
   int newndf;                   /* NDF identified for new file */
-  IRQLocs *qlocs = NULL;        /* Named quality resources */
   char *pname = NULL;           /* Pointer to filename */
   void *pntr[] = { NULL, NULL }; /* Array of pointers for smfData */
   smf_qual_t * qual = NULL;     /* Pointer to quality */
@@ -223,24 +222,9 @@ void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, const int n
     }
   }
   if ( flags & SMF__MAP_QUAL ) {
-    void * qpntr[1];
-
-    /* Create the named QUALITY bits extension before calling ndfMap */
-    smf_create_qualname( "WRITE", newndf, &qlocs, status );
-
-    if ( SMF__QUALTYPE == SMF__UBYTE) {
-      ndfMap(newndf, "QUALITY", "_UBYTE", "WRITE/ZERO", &(qpntr[0]), &nel, status);
-      qual = qpntr[0];
-    } else {
-      if (*status == SAI__OK) {
-        *status = SAI__ERROR;
-        errRep( "", "Unable to read QUALITY as anything other than UBYTE at this time",
-                status );
-      }
-    }
-
-    /* Done with quality names so free resources */
-    irqRlse( &qlocs, status );
+    /* this is a clean slate so no need to worry about quality family */
+    size_t nqout;
+    qual = smf_qual_map( newndf, "WRITE/ZERO", NULL, &nqout, status );
 
     if ( *status != SAI__OK ) {
       errRep(FUNC_NAME, "Unable to map quality array", status);

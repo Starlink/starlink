@@ -310,6 +310,8 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
         }
       }
 
+      /* Quality. Just copy from input to output */
+      outdata->qfamily = data->qfamily;
       if (qual) memcpy( outdata->qual, qual, nelem * sizeof(*qual) );
     }
 
@@ -385,23 +387,15 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
           memcpy( outdksquid, da->dksquid->pntr[0], nmap*sizeof(*outdksquid) );
         }
 
-        /* Also do the quality if it exists */
+        /* Also do the quality if it exists. Map it as smf_qual_t, copy the
+           quality, unmap it to force write to disk. */
         if( da->dksquid->qual ) {
-          if ( SMF__QUALTYPE == SMF__UBYTE ) {
-            void *qpntr[1];
-            unsigned char *outdkqual=NULL; /* unsigned char because we are mapping UBYTE */
-            ndfMap( id, "QUALITY", "_UBYTE", "WRITE", &qpntr[0], &nmap, status );
-            outdkqual = qpntr[0];
-            if( (*status==SAI__OK) && outdkqual ) {
-              memcpy( outdkqual, da->dksquid->qual, nmap*sizeof(*outdkqual) );
-            }
-          } else {
-            if (*status == SAI__OK) {
-              *status = SAI__ERROR;
-              errRep( "", "Unable to read QUALITY as anything other than UBYTE at this time",
-                      status );
-            }
+          size_t nqmap;
+          smf_qual_t * outdkqual = smf_qual_map( id, "WRITE", NULL, &nqmap, status );
+          if( (*status==SAI__OK) && outdkqual ) {
+            memcpy( outdkqual, da->dksquid->qual, nmap*sizeof(*outdkqual) );
           }
+          outdkqual = smf_qual_unmap( id, da->dksquid->qfamily, outdkqual, status );
         }
 
         ndfAnnul( &id, status );

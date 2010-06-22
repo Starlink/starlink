@@ -209,8 +209,11 @@
  *     2010-06-10 (EC):
  *        Add quality to dark squids
  *      2010-06-14 (DSB):
- *         Correct check for read access before creating a new QUALITY array 
- *         in the DKSQUID NDF.
+ *        Correct check for read access before creating a new QUALITY array
+ *        in the DKSQUID NDF.
+ *     2010-06-18 (TIMJ):
+ *        Use smf_qual_map to map QUALITY information and store quality family
+ *        in smfData.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -254,11 +257,9 @@
 #include "smf_typ.h"
 #include "smf_err.h"
 #include "mers.h"
-#include "star/irq.h"
 #include "star/kaplibs.h"
 #include "star/one.h"
 #include "kpg_err.h"
-#include "irq_err.h"
 #include "prm_par.h"
 
 /* SC2DA includes */
@@ -293,6 +294,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
                                        output data components:
                                        one each for DATA and VARIANCE */
   smf_qual_t * outqual = NULL;/* Pointer to output quality */
+  smf_qfam_t qfamily = SMF__QFAM_NULL; /* Quality family of file */
   int isFlat = 1;            /* Flag to indicate if file flatfielded */
   int isTseries = 0;         /* Flag to specify whether the data are
                                 in time series format */
@@ -517,52 +519,20 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 
         if ( !(flags & SMF__NOCREATE_QUALITY) &&
              ( qexists || canwrite ) ) {
+          size_t nqout;
           char qmode[NDF__SZMMD+1];
-          IRQLocs *qlocs = NULL;     /* Named quality resources */
-          char xname[DAT__SZNAM+1];  /* Name of extension holding quality names */
-
-          /* Sort out quality names */
-          irqFind( indf, &qlocs, xname, status );
-          if ( *status == SAI__OK ) {
-            if (qexists) {
-              msgOutif(MSG__DEBUG, "", "Quality names defined in file", status);
-            } else {
-              msgOutif(MSG__DEBUG, "",
-                       "File has quality names extension but no QUALITY",
-                       status);
-            }
-          } else if (*status == IRQ__NOQNI) {
-            errAnnul(status);
-            if (qexists) {
-              msgOutif( MSG__DEBUG, "",
-                        "QUALITY present but no quality names extension in file."
-                        " Creating them", status );
-            }
-            smf_create_qualname( mode, indf, &qlocs, status );
-          }
 
           /* Now map the data with the appropriate mode */
           qmode[0] = '\0';
           if ( qexists ) {
             one_strlcpy( qmode, mode, sizeof(qmode), status );
+
           } else if ( canwrite ) {
             one_strlcpy( qmode, "WRITE/ZERO", sizeof(qmode), status );
           }
-          if ( SMF__QUALTYPE == SMF__UBYTE) {
-            void *qpntr[1];
-            ndfMap( indf, "QUALITY", "_UBYTE", qmode, &qpntr[0], &nout,
-                    status );
-            outqual = qpntr[0];
-          } else {
-            if (*status == SAI__OK) {
-              *status = SAI__ERROR;
-              errRep( "", "Unable to read QUALITY as anything other than UBYTE at this time",
-                      status );
-            }
-          }
-          /* Done with quality names so free resources */
-          irqRlse( &qlocs, status );
+          outqual = smf_qual_map( indf, qmode, &qfamily, &nqout, status );
         }
+
         /* Always map DATA if we get this far */
         ndfMap( indf, "DATA", dtype, mode, &outdata[0], &nout, status );
 
@@ -606,7 +576,6 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
             errRepf("", FUNC_NAME ": DKSQUID has %i dimensions, should be 2",
                     status, dkndims);
           }
-          ndfMap( dkndf, "DATA", "_DOUBLE", mode, &dpntr[0], &nmap, status );
 
           /* Also generically map/create a quality array unless we're
              in READ mode and one didn't previously exist */
@@ -622,20 +591,12 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
                       status);
           }
           if (strlen(qmode)) {
-            if ( SMF__QUALTYPE == SMF__UBYTE ) {
-              void * qdkpntr[1];
-              ndfMap( dkndf, "QUALITY", "_UBYTE", qmode, &qdkpntr[0], &nmap,
-                      status );
-              qpntr = qdkpntr[0];
-            } else {
-              if (*status == SAI__OK) {
-                *status = SAI__ERROR;
-                errRep( "", "Unable to read DKS QUALITY as anything other than UBYTE at this time",
-                        status );
-              }
-            }
+            size_t nqmap;
+            qpntr = smf_qual_map( dkndf, qmode, NULL, &nqmap, status );
           }
 
+          /* Map DATA after quality to prevent automatic quality masking */
+          ndfMap( dkndf, "DATA", "_DOUBLE", mode, &dpntr[0], &nmap, status );
 
           if(*status == SAI__OK) {
             da = (*data)->da;
@@ -643,6 +604,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
                                               SMF__NOCREATE_DA, status );
             da->dksquid->pntr[0] = dpntr[0];
             da->dksquid->qual = qpntr;
+            da->dksquid->qfamily = SMF__QFAM_TSERIES;
 
             da->dksquid->dtype = SMF__DOUBLE;
             da->dksquid->isTordered = 1;
@@ -911,6 +873,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           /* Create an empty QUALITY array */
           da->dksquid->qual = astCalloc( rowsize*nframes,
                                          sizeof(*(da->dksquid->qual)),1);
+          da->dksquid->qfamily = SMF__QFAM_TSERIES;
         }
 
         /* Create a FitsChan from the FITS headers */
@@ -1038,6 +1001,11 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           ((*data)->pntr)[i] = outdata[i];
         }
         (*data)->qual = outqual;
+
+        /* if this is time series data then we have time series quality
+           if we have no additional information. */
+        if (qfamily == SMF__QFAM_NULL && isTseries) qfamily = SMF__QFAM_TSERIES;
+        (*data)->qfamily = qfamily;
       }
       /* Store the dimensions, bounds and the size of each axis */
       (*data)->ndims = ndims;

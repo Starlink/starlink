@@ -1303,6 +1303,9 @@ void smurf_makemap( int *status ) {
       /* Abort if an error has occurred. */
       if( *status != SAI__OK ) goto L999;
 
+      /* we know this is a map */
+      odata->qfamily = SMF__QFAM_MAP;
+
       /* Convenience pointers */
       file = odata->file;
       ondf = file->ndfid;
@@ -1603,6 +1606,7 @@ void smurf_makemap( int *status ) {
     if ( *status == SAI__OK ) {
       file = odata->file;
       ondf = file->ndfid;
+      odata->qfamily = SMF__QFAM_MAP;
       /* Map the data and variance arrays */
       map = (odata->pntr)[0];
       variance = (odata->pntr)[1];
