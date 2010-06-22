@@ -168,10 +168,11 @@ const char *smf_qual_str( smf_qfam_t family, int usebit, int bit_or_val,
     }
   } else if (family == SMF__QFAM_MAP) {
     /* now switch on bit mask */
+    /*          012345678901234567890123456789012345678901234567890 << 50 characters */
     switch( qval ) {
     case SMF__MAPQ_ZERO:
       retval = "ZERO";
-      ldescr = "Set iff a map output pixel was zeroed by the map-maker";
+      ldescr = "Set iff output pixel was zeroed by the map-maker";
       break;
 
     default:
@@ -179,6 +180,7 @@ const char *smf_qual_str( smf_qfam_t family, int usebit, int bit_or_val,
     }
   } else if (family == SMF__QFAM_TCOMP) {
     /* now switch on bit mask */
+    /*          012345678901234567890123456789012345678901234567890 << 50 characters */
     switch( qval ) {
     case SMF__TCOMPQ_BAD:
       retval = "BADBOLO";
@@ -186,7 +188,7 @@ const char *smf_qual_str( smf_qfam_t family, int usebit, int bit_or_val,
       break;
     case SMF__TCOMPQ_ENDS:
       retval = "ENDS";
-      ldescr = "Set if the ends of the time series should not be used";
+      ldescr = "Set if the ends of the time series are bad";
       break;
     case SMF__TCOMPQ_BLIP:
       retval = "BLIP";
@@ -194,7 +196,7 @@ const char *smf_qual_str( smf_qfam_t family, int usebit, int bit_or_val,
       break;
     case SMF__TCOMPQ_MATCH:
       retval = "MATCH";
-      ldescr = "Set if this part of time series did not look like others";
+      ldescr = "Set if time series did not look like others";
       break;
     case SMF__TCOMPQ_TEL:
       retval = "TEL";
