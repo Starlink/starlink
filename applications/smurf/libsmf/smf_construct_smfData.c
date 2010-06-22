@@ -15,9 +15,9 @@
 *  Invocation:
 *     pntr = smf_construct_smfData( smfData * tofill, smfFile * file,
 *                      smfHead * hdr, smfDA * da, smf_dtype dtype,
-*                      void * pntr[2], smf_qual_t qual, int isTordered,
-*                      const dim_t dims[], const int lbnd[], int ndims,
-*                      int virtual, int ncoeff, double *poly,
+*                      void * pntr[2], smf_qual_t qual, smf_qfam_t qfamily,
+*                      int isTordered, const dim_t dims[], const int lbnd[],
+*                      int ndims, int virtual, int ncoeff, double *poly,
 *                      AstKeyMap * history, int * status );
 
 *  Arguments:
@@ -42,6 +42,8 @@
 *        be copied from this array.
 *     qual = smf_qual_t (Given)
 *        Pointer to quality. Pointer will be copied.
+*     qfamily = smf_qfam_t (Given)
+*        Quality family used in "qual".
 *     isTordered = int (Given)
 *        If set, data is ICD-compliant time-ordered. Otherwise bolom-ordered.
 *     dims[] = const dim_t (Given)
@@ -102,6 +104,8 @@
 *        Initialize pixel origin.
 *     2010-06-14 (TIMJ):
 *        Add "qual"
+*     2010-06-18 (TIMJ):
+*        Add qfamily
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -150,9 +154,9 @@
 smfData *
 smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr,
                        smfDA * da, smf_dtype dtype, void * pntr[2],
-                       smf_qual_t * qual, int isTordered, const dim_t dims[],
-                       const int lbnd[], int ndims, int virtual, int ncoeff,
-                       double *poly, AstKeyMap *history, int * status ) {
+                       smf_qual_t * qual, smf_qfam_t qfamily, int isTordered,
+                       const dim_t dims[], const int lbnd[], int ndims, int virtual,
+                       int ncoeff, double *poly, AstKeyMap *history, int * status ) {
 
   /* need to make sure that any memory we malloc will be freed on error
      so make sure we NULL all pointers first. */
@@ -209,6 +213,7 @@ smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr,
         (data->pntr)[i] = pntr[i];
       }
       data->qual = qual;
+      data->qfamily = qfamily;
       data->ndims = ndims;
       for (i = 0; i < ndims; i++ ) {
         (data->dims)[i] = dims[i];

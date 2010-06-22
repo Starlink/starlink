@@ -284,7 +284,7 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
     da = smf_deepcopy_smfDA( old, status );
 
   /* Construct the new smfData */
-  new = smf_construct_smfData( new, file, hdr, da, dtype, pntr, qual, isTordered,
+  new = smf_construct_smfData( new, file, hdr, da, dtype, pntr, qual, old->qfamily, isTordered,
                                dims, old->lbnd, ndims, virtual, ncoeff, poly, history,
                                status);
 

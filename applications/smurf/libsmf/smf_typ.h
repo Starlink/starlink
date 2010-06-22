@@ -431,6 +431,7 @@ typedef enum {
 
 /* We have separate quality familys */
 typedef enum {
+  SMF__QFAM_NULL,      /* No family */
   SMF__QFAM_TSERIES,   /* Time series quality */
   SMF__QFAM_MAP,       /* Output map quality */
   SMF__QFAM_TCOMP,     /* Compressed time series quality */
@@ -567,6 +568,7 @@ typedef struct smfData {
   smf_dtype dtype;           /* Data type of DATA and VARIANCE arrays */
   void * pntr[2];            /* Array of pointers to DATA/VARIANCE/QUALITY */
   smf_qual_t * qual;         /* Pointer for quality information */
+  smf_qfam_t qfamily;        /* Quality family used in "qual" */
   dim_t dims[NDF__MXDIM];    /* Dimensions of data array */
   int lbnd[NDF__MXDIM];      /* Lower PIXEL bounds of data array */
   int isTordered;            /* 0=order by bolo, 1=order by tslice (default) */

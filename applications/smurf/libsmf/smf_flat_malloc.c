@@ -126,7 +126,8 @@ void smf_flat_malloc( size_t nheat, const smfData * refdata,
     pntr[1] = NULL;
     dims[0] = nheat;
     *powvald = smf_construct_smfData( NULL, NULL, NULL, NULL, SMF__DOUBLE,
-                                      pntr, NULL, 1, dims, NULL, 1, 0, 0, NULL,
+                                      pntr, NULL, SMF__QFAM_NULL, 1,
+                                      dims, NULL, 1, 0, 0, NULL,
                                       NULL, status );
   }
 
@@ -153,7 +154,7 @@ void smf_flat_malloc( size_t nheat, const smfData * refdata,
                                  NULL, oldhdr->obsidss, status );
 
     *bolvald = smf_construct_smfData( NULL, NULL, hdr, NULL, SMF__DOUBLE,
-                                      pntr, NULL, 1, dims, lbnd, 3, 0, 0, NULL,
+                                      pntr, NULL, SMF__QFAM_TSERIES, 1, dims, lbnd, 3, 0, 0, NULL,
                                       NULL, status );
   }
 

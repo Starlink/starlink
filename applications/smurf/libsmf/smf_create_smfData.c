@@ -70,6 +70,8 @@
 *        Initialize pixel origin.
 *     2010-06-14 (TIMJ):
 *        Initialise new QUAL element
+*     2010-06-18 (TIMJ):
+*        Initialise qfamily element
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -163,6 +165,7 @@ smf_create_smfData( int flags, int * status ) {
     (data->pntr)[i] = NULL;
   }
   data->qual = NULL;
+  data->qfamily = SMF__QFAM_NULL;
 
   for (i = 0; i < NDF__MXDIM; i++ ) {
     (data->dims)[i] = 0;
