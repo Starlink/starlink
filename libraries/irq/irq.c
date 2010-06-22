@@ -46,6 +46,8 @@
 *        Use starmem.
 *     2009 August 24 (MJC):
 *        Separate IRQ.
+*     2010-06-17 (TIMJ):
+*        Add irqNxtqn and irqNumqn
 *     {enter_further_changes_here}
 
 *-
@@ -504,3 +506,97 @@ void irqRbit( const IRQLocs *locs, const char *qname, int *bit, int *status ){
    F77_FREE_CHARACTER( QNAME );
 }
 
+/* ------------------------------- */
+
+F77_SUBROUTINE(irq_nxtqn)( CHARACTER_ARRAY(LOCS),
+                           INTEGER(CONTXT),
+                           CHARACTER(QNAME),
+                           LOGICAL(FIXED),
+                           LOGICAL(VALUE),
+                           INTEGER(BIT),
+                           CHARACTER(COMMNT),
+                           LOGICAL(DONE),
+                           INTEGER(STATUS)
+                           TRAIL(LOCS)
+                           TRAIL(QNAME)
+                           TRAIL(COMMNT) );
+
+void irqNxtqn( const IRQLocs *locs, IRQcntxt *contxt, const char *qname, int *fixed, int *value,
+               int *bit, char *commnt, int commnt_len, int * done, int *status ){
+
+   DECLARE_CHARACTER_ARRAY(LOCS,DAT__SZLOC,5);
+   DECLARE_CHARACTER_DYN(QNAME);
+   DECLARE_INTEGER(CONTXT);
+   DECLARE_LOGICAL(FIXED);
+   DECLARE_LOGICAL(VALUE);
+   DECLARE_INTEGER(BIT);
+   DECLARE_CHARACTER_DYN(COMMNT);
+   DECLARE_LOGICAL(DONE);
+   DECLARE_INTEGER(STATUS);
+
+   HDS_EXPORT_CLOCATOR( locs->loc[0], LOCS[0], status );
+   HDS_EXPORT_CLOCATOR( locs->loc[1], LOCS[1], status );
+   HDS_EXPORT_CLOCATOR( locs->loc[2], LOCS[2], status );
+   HDS_EXPORT_CLOCATOR( locs->loc[3], LOCS[3], status );
+   HDS_EXPORT_CLOCATOR( locs->loc[4], LOCS[4], status );
+
+   F77_CREATE_EXPORT_CHARACTER( qname, QNAME );
+   F77_CREATE_CHARACTER( COMMNT, commnt_len-1 );
+   F77_EXPORT_INTEGER( *status, STATUS );
+   F77_EXPORT_INTEGER( *contxt, CONTXT );
+
+   F77_CALL(irq_nxtqn)( CHARACTER_ARRAY_ARG(LOCS),
+                        INTEGER_ARG(&CONTXT),
+                        CHARACTER_ARG(QNAME),
+                        LOGICAL_ARG(&FIXED),
+                        LOGICAL_ARG(&VALUE),
+                        INTEGER_ARG(&BIT),
+                        CHARACTER_ARG(COMMNT),
+                        LOGICAL_ARG(&DONE),
+                        INTEGER_ARG(&STATUS)
+                        TRAIL_ARG(LOCS)
+                        TRAIL_ARG(QNAME)
+                        TRAIL_ARG(COMMNT) );
+
+   F77_IMPORT_LOGICAL( FIXED, *fixed );
+   F77_IMPORT_LOGICAL( VALUE, *value );
+   F77_IMPORT_INTEGER( BIT, *bit );
+   F77_IMPORT_CHARACTER( COMMNT, COMMNT_length, commnt );
+   F77_IMPORT_INTEGER( CONTXT, *contxt );
+   F77_IMPORT_LOGICAL( DONE, *done );
+   F77_IMPORT_INTEGER( STATUS, *status );
+
+   F77_FREE_CHARACTER( QNAME );
+   F77_FREE_CHARACTER( COMMNT );
+}
+
+/* ------------------------------- */
+F77_SUBROUTINE(irq_numqn)( CHARACTER_ARRAY(LOCS),
+                           INTEGER(NAMES),
+                           INTEGER(STATUS)
+                           TRAIL(LOCS) );
+
+int irqNumqn( const IRQLocs *locs, int *status ) {
+  int names;
+
+  DECLARE_CHARACTER_ARRAY(LOCS,DAT__SZLOC,5);
+  DECLARE_INTEGER(NAMES);
+  DECLARE_INTEGER(STATUS);
+
+  HDS_EXPORT_CLOCATOR( locs->loc[0], LOCS[0], status );
+  HDS_EXPORT_CLOCATOR( locs->loc[1], LOCS[1], status );
+  HDS_EXPORT_CLOCATOR( locs->loc[2], LOCS[2], status );
+  HDS_EXPORT_CLOCATOR( locs->loc[3], LOCS[3], status );
+  HDS_EXPORT_CLOCATOR( locs->loc[4], LOCS[4], status );
+
+  F77_EXPORT_INTEGER( *status, STATUS );
+
+  F77_CALL(irq_numqn)( CHARACTER_ARRAY_ARG(LOCS),
+                       INTEGER_ARG(&NAMES),
+                       INTEGER_ARG(&STATUS)
+                       TRAIL_ARG(LOCS) );
+
+  F77_IMPORT_INTEGER( NAMES, names );
+  F77_IMPORT_INTEGER( STATUS, *status );
+  return names;
+}

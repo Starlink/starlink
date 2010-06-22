@@ -42,6 +42,8 @@
 *  History:
 *     2009 August 24 (MJC):
 *        Original version based upon DSB's kaplibs.h.
+*     2010-06-17 (TIMJ):
+*        Add irqNxtqn and irqNumqn
 *     {enter_changes_here}
 
 *-
@@ -87,6 +89,8 @@ typedef struct IRQLocs {
    HDSLoc *loc[ 5 ];
 } IRQLocs;
 
+/* Just hide the integer-ness of the context variable */
+typedef int IRQcntxt;
 
 
 /* Prototypes for public functions */
@@ -102,5 +106,8 @@ void irqRlse( IRQLocs **, int * );
 void irqRwqn( const IRQLocs *, const char *, int, int, int *, int * );
 void irqSetqm( const IRQLocs *, int, const char *, int, float *, int *, int * );
 void irqFxbit( const IRQLocs *, const char *, int, int *, int * );
+void irqNxtqn( const IRQLocs *locs, IRQcntxt *contxt, const char *qname, int *fixed, int *value,
+               int *bit, char *commnt, int commnt_len, int *done, int *status );
+int irqNumqn( const IRQLocs *locs, int *status );
 
 #endif
