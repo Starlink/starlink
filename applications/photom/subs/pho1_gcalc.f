@@ -86,6 +86,8 @@
 *        when this is FALSE.
 *     30-DEC-2000 (AA):
 *        Bug fix, signal was corrected for exposure time, but the error wasn't
+*     17-JUN-2010 (Andy Gibb, UBC):
+*        Write sky/signal values <1e-2 in E11.4 format
 *     {enter_changes_here}
 *
 *  Bugs :
@@ -286,16 +288,18 @@
 *   Mag error
       WRITE( CERRMG, '( F9.3 )' ) ERRMAG
 
-*   Sky - use E format if number is too large
+*   Sky - use E format if number is too large or too small
       PSKY = SKY * PADU
-      IF ( ( PSKY .GT. 1.0E6 ) .OR. ( PSKY .LT. -1.0E6 ) ) THEN
+      IF ( ( PSKY .GT. 1.0E6 ) .OR. ( PSKY .LT. -1.0E6 )
+     :     .OR. ((PSKY .LT. 1.0E-2) .AND. (PSKY .GT. -1.0E-2)) ) THEN
          WRITE( CSKY, '( E11.4 )' ) PSKY
       ELSE
          WRITE( CSKY, '( F11.3 )' ) PSKY
       ENDIF
 
-*   Signal - use E format if number is too large
-      IF ( ( SIGNAL .GT. 1.0E6 ) .OR. ( SIGNAL .LT. -1.0E6 ) ) THEN
+*   Signal - use E format if number is too large or too small
+      IF ( ( SIGNAL .GT. 1.0E6 ) .OR. ( SIGNAL .LT. -1.0E6 )
+     :    .OR. ((SIGNAL .LT. 1.0E-2) .AND. (SIGNAL .GT. -1.0E-2)) ) THEN
          WRITE( CSIG, '( E11.4 )' ) SIGNAL
       ELSE
          WRITE( CSIG, '( F11.3 )' ) SIGNAL
