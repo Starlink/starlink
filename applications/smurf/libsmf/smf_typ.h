@@ -431,6 +431,22 @@ typedef enum {
   SMF__MAPQ_ZERO = BIT_TO_VAL(0)   /* Pixels that have been constrained to 0 */
 } smf_qual_map_bits;
 
+/* These are used to group SMURF TSERIES quality into related groups that
+   can be written to an NDF quality array. Should have no more than
+   8 of these. These are compressed versions of the TSERIES family as the
+   MAP quality does not have more than 8 bits. They are designated
+   as members of the TCOMP family. They are not expected to be visible in
+   SMURF itself since they are only used when reading or writing QUALITY to
+   a file using 8bit quality. */
+
+typedef enum {
+  SMF__TCOMPQ_BAD   = BIT_TO_VAL(0),
+  SMF__TCOMPQ_ENDS  = BIT_TO_VAL(1),
+  SMF__TCOMPQ_BLIP  = BIT_TO_VAL(2),
+  SMF__TCOMPQ_MATCH = BIT_TO_VAL(3),
+  SMF__TCOMPQ_TEL   = BIT_TO_VAL(4),
+} smf_tcomp_qual_bits;
+
 /* We have separate quality familys */
 typedef enum {
   SMF__QFAM_NULL,      /* No family */
