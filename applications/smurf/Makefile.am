@@ -75,6 +75,7 @@ examples/dimmconfig_distortionmap.lis \
 examples/dimmconfig_extended.lis \
 examples/dimmconfig_faint.lis \
 examples/dimmconfig_veryshort.lis \
+examples/dimmconfig_newfilt.lis \
 examples/dreamobs.lis \
 examples/dreamsim.lis \
 examples/heatrunobs.lis \
