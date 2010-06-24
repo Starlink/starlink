@@ -163,6 +163,11 @@ const char *smf_qual_str( smf_qfam_t family, int usebit, int bit_or_val,
       ldescr = "Set iff data common-mode rejected";
       break;
 
+    case SMF__Q_FILT:
+      retval = "FILT";
+      ldescr = "Set iff sample could not be filtered";
+      break;
+
     default:
       retval = NULL;
     }

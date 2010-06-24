@@ -424,7 +424,8 @@ typedef enum {
   SMF__Q_PAD     = BIT_TO_VAL(4),   /* Padded data */
   SMF__Q_APOD    = BIT_TO_VAL(5),   /* Apodized/boundary data */
   SMF__Q_STAT    = BIT_TO_VAL(6),   /* Telescope stationary */
-  SMF__Q_COM     = BIT_TO_VAL(7)    /* Flagged as bad chunk in common-mode rejection */
+  SMF__Q_COM     = BIT_TO_VAL(7),   /* Flagged as bad chunk in common-mode rejection */
+  SMF__Q_FILT    = BIT_TO_VAL(8)    /* Weight less than wlim when filtering */
 } smf_qual_bits;
 
 /* These macros are for several commonly-used combinations of quality flags */
@@ -474,10 +475,10 @@ typedef enum {
 /* Number of quality bits in each family. SMF__NQBITS can be used
    for declaring array sizes. */
 typedef enum {
-  SMF__NQBITS_TSERIES = 8,
+  SMF__NQBITS_TSERIES = 9,
   SMF__NQBITS_MAP     = 1,
   SMF__NQBITS_TCOMP   = 5,
-  SMF__NQBITS         = 8    /* Largest number of bits in a family */
+  SMF__NQBITS         = 9    /* Largest number of bits in a family */
 } smf_qfam_count_t;
 
 

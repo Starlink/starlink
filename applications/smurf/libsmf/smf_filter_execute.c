@@ -407,12 +407,10 @@ void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
               base[ j ] -= dmask[ j ]/mask[ j ];
 
             /* If the current filtered data value has contributions from
-               an insufficient faction of good input data values, flag it
-               as a spike in order to exclude it from further calculations.
-               Clearly it's not a spike but we have run out of quality bits
-               until Tim finishes his work on expanding the quality array. */
+               an insufficient faction of good input data values, flag
+               it. */
             } else if( qbase ) {
-               qbase[ j ] |= SMF__Q_SPIKE;
+               qbase[ j ] |= SMF__Q_FILT;
             }
           }
 
@@ -422,7 +420,7 @@ void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
             if( mask[ j ] >= filt->wlim && mask[ j ] != 0.0 ) {
               base[ j ] = dmask[ j ]/mask[ j ];
             } else if( qbase ) {
-              qbase[ j ] |= SMF__Q_SPIKE;
+              qbase[ j ] |= SMF__Q_FILT;
             }
           }
 
