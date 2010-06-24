@@ -408,7 +408,7 @@ typedef enum {
   SMF__Q_PAD     = BIT_TO_VAL(4),   /* Padded data */
   SMF__Q_APOD    = BIT_TO_VAL(5),   /* Apodized/boundary data */
   SMF__Q_STAT    = BIT_TO_VAL(6),   /* Telescope stationary */
-  SMF__Q_COM     = BIT_TO_VAL(7),   /* Flagged as bad chunk in common-mode rejection */
+  SMF__Q_COM     = BIT_TO_VAL(7)    /* Flagged as bad chunk in common-mode rejection */
 } smf_qual_bits;
 
 /* These macros are for several commonly-used combinations of quality flags */
