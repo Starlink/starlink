@@ -166,6 +166,7 @@
      :          STATUS .EQ. SAI__OK ) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETC( 'N', OLDNAM )
+               CALL MSG_SETI( 'B', BIT )
                CALL ERR_REP( 'IRQ_FXBIT_ERR0', 'IRQ_FXBIT: The '//
      :                          'quality name ''^N'' is already '//
      :                          'associated with bit ^B.', STATUS )
