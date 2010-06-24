@@ -67,6 +67,7 @@
 #include "smf.h"
 
 #include "sae_par.h"
+#include "mers.h"
 
 size_t smf_qfamily_count( smf_qfam_t family, int * status ) {
 
