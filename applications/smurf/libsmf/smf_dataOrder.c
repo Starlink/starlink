@@ -79,6 +79,8 @@
 *        Return a boolean indicating whether the data were reordered or not.
 *     2010-06-14 (TIMJ):
 *        Refactor logic for new location of quality pointer.
+*     2010-06-21 (TIMJ):
+*        Add _UWORD support.
 
 *  Notes:
 *     Nothing is done about the FITS channels or WCS information stored in
@@ -303,6 +305,15 @@ static void * smf__dataOrder_array ( void * oldbuf, smf_dtype dtype, size_t ndat
         for( k=0; k<nbolo; k++ ) {
           ((double *)newbuf)[j*tstr2+k*bstr2] =
             ((double *)oldbuf)[j*tstr1+k*bstr1];
+        }
+      }
+      break;
+
+    case SMF__USHORT:
+      for( j=0; j<ntslice; j++ ) {
+        for( k=0; k<nbolo; k++ ) {
+          ((unsigned short *)newbuf)[j*tstr2+k*bstr2] =
+            ((unsigned short *)oldbuf)[j*tstr1+k*bstr1];
         }
       }
       break;
