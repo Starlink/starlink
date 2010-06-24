@@ -80,7 +80,7 @@
 smf_qual_t smf_qual_str_to_val( const char *qname, smf_qfam_t * family, int * status ) {
 
   smf_qual_t retval = 0;
-  smf_qfam_t lfamily = 0;
+  smf_qfam_t lfamily = SMF__QFAM_NULL;
 
   if (*status != SAI__OK) return retval;
 
@@ -133,6 +133,7 @@ smf_qual_t smf_qual_str_to_val( const char *qname, smf_qfam_t * family, int * st
              status, qname );
   }
 
+  if (family) *family = lfamily;
   return retval;
 
 }
