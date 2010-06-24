@@ -392,6 +392,7 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
         if( da->dksquid->qual ) {
           size_t nqmap;
           smf_qual_t * outdkqual = smf_qual_map( id, "WRITE", NULL, &nqmap, status );
+          da->dksquid->qfamily = SMF__QFAM_TSERIES; /* always */
           if( (*status==SAI__OK) && outdkqual ) {
             memcpy( outdkqual, da->dksquid->qual, nmap*sizeof(*outdkqual) );
           }

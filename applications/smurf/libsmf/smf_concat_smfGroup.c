@@ -493,6 +493,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
               if (refdata->history) data->history = astCopy( refdata->history );
 
               if( *status == SAI__OK ) {
+                data->qfamily = refdata->qfamily;
                 /* Copy over basic header information from the reference */
                 hdr = data->hdr;
                 refhdr = refdata->hdr;

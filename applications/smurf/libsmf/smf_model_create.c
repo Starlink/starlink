@@ -498,6 +498,9 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
           memset( &head, 0, sizeof(head) );
           head.data.dtype=SMF__NULL;
 
+          /* All models use TSERIES quality */
+          head.data.qfamily = SMF__QFAM_TSERIES;
+
           /* Determine dimensions of model component */
           switch( mtype ) {
 
@@ -1086,6 +1089,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
               data = smf_create_smfData( flag, status );
 
               if( *status == SAI__OK ) {
+                data->qfamily = head.data.qfamily;
                 data->isTordered = head.data.isTordered;
                 data->dtype = head.data.dtype;
                 data->ndims = head.data.ndims;
