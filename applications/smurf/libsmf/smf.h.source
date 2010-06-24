@@ -1291,6 +1291,8 @@ int smf_pattern_extract ( const char * sourcestr, const char * pattern,
 
 void smf_polext( int ondf, double angle, int *status );
 
+size_t smf_qfamily_count( smf_qfam_t qfamily, int * status );
+
 const char * smf_qfamily_str( smf_qfam_t qfamily, int * status );
 
 smf_qual_t * smf_qual_map( int indf, const char mode[],
