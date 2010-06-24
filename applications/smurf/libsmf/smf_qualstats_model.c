@@ -13,7 +13,7 @@
 *     Library routine
 
 *  Invocation:
-*     smf_qualstats_model( const smfArray *qua, size_t qcount[8],
+*     smf_qualstats_model( const smfArray *qua, size_t qcount[SMF__NQBITS],
 *                          size_t * ngoodbolo, size_t * nmap,
 *                          size_t *nmax, dim_t *ntslice, size_t * ntgood,
 *                          size_t * tbound, size_t * tpad, int * status );
@@ -21,7 +21,7 @@
 *  Arguments:
 *     qua = const smfArray *qua (Given)
 *        Pointer to smfArray of smfData's containing quality
-*     qcount = size_t[8] (Returned)
+*     qcount = size_t[SMF__NQBITS] (Returned)
 *        Pointer to array that will count number of occurences of each
 *        quality bit in qual. Can be NULL.
 *     ngoodbolo = size_t* (Returned)
@@ -108,7 +108,7 @@
 #define FUNC_NAME "smf_qualstats_report"
 
 void
-smf_qualstats_model( const smfArray *qua, size_t qcount[8], size_t * ngoodbolo,
+smf_qualstats_model( const smfArray *qua, size_t qcount[SMF__NQBITS], size_t * ngoodbolo,
                      size_t * nmap, size_t *nmax, dim_t * ntslice, size_t * ntgood,
                      size_t * tbound, size_t *tpad, int * status ) {
 
@@ -157,7 +157,7 @@ smf_qualstats_model( const smfArray *qua, size_t qcount[8], size_t * ngoodbolo,
       size_t bstride;               /* bolo stride */
       dim_t nbolo;                  /* number of bolos */
       dim_t nslices;                /* Number of time slices in this smfData */
-      size_t subqcount[8];          /* subarray quality bit counter */
+      size_t subqcount[SMF__NQBITS];/* subarray quality bit counter */
       size_t subnmap;               /* nmap for subarray */
       size_t subnmax;               /* nmax for subarray */
       size_t tstride;               /* time slice stride */

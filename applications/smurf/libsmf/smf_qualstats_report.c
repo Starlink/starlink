@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_qualstats_report( const smfArray *qua,
-*                           size_t last_qcount[SMF__NQBITS_TSERIES],
+*                           size_t last_qcount[SMF__NQBITS],
 *                           size_t *last_nmap,
 *                           int init, size_t * ngood_tslice,
 *                           size_t *numdata, int *status )
@@ -22,7 +22,7 @@
 *  Arguments:
 *     qua = const smfArray *qua (Given)
 *        Pointer to smfArray of smfData's containing quality
-*     last_qcount = size_t[8] (Given and Returned)
+*     last_qcount = size_t[SMF__NQBITS] (Given and Returned)
 *        Pointer to array that countains number of occurences of each
 *        quality bit in qual from the last call. Updated to current counts
 *        upon return.
@@ -113,7 +113,7 @@
 #define FUNC_NAME "smf_qualstats_report"
 
 void smf_qualstats_report( const smfArray *qua,
-                           size_t last_qcount[SMF__NQBITS_TSERIES],
+                           size_t last_qcount[SMF__NQBITS],
                            size_t *last_nmap, int init,
                            size_t *ngood_tslice, size_t *numdata,
                            int *status ) {
@@ -126,7 +126,7 @@ void smf_qualstats_report( const smfArray *qua,
   size_t nmap;                  /* number of good map samples */
   size_t nmax;                  /* theoretical maximum good map samples */
   dim_t ntslice;                /* number of time slices */
-  size_t qcount[8];             /* total current quality bit counter */
+  size_t qcount[SMF__NQBITS];   /* total current quality bit counter */
   double steptime=0.005;        /* length of sample -- assume 200 Hz data */
   size_t tbound;                /* time slices in boundary */
   size_t tpad;                  /* time slices in padding */

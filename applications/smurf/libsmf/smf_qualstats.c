@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_qualstats( const smf_qual_t *qual, dim_t nbolo, size_t bstride,
-*                    size_t ntslice, size_t tstride,  size_t qcount[8],
+*                    size_t ntslice, size_t tstride,  size_t qcount[SMF__NQBITS],
 *                    size_t *ngoodbolo, size_t *nmap, size_t *nmax,
 *                    int *status )
 
@@ -31,7 +31,7 @@
 *     tstride = size_t (Given)
 *        How many elements to skip to get to the next time slice for the
 *        current bolometer.
-*     qcount = size_t[8] (Returned)
+*     qcount = size_t[SMF__NQBITS] (Returned)
 *        Pointer to array that will count number of occurences of each
 *        quality bit in qual.
 *     ngoodbolo = size_t* (Returned)
