@@ -58,6 +58,8 @@
 *       Add explicit history listing.
 *     2010-03-09 (TIMJ):
 *       Change flatfield type in smfDA
+*     2010-06-23 (TIMJ):
+*        Add Quality family.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -198,6 +200,7 @@ void smf_dump_smfData( const smfData *data, int showflags __attribute__((unused)
   }
   if ( data->qual != NULL ) {
     msgSetc("D"," Q: OK");
+    msgFmt("D", " (family: %s)", smf_qfamily_str( data->qfamily, status ) );
   } else {
     msgSetc("D"," Q: NULL");
   }
