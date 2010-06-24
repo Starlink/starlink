@@ -399,7 +399,23 @@ typedef enum {
   SMF__MAP_QUAL = BIT_TO_VAL(4)
 } smf_open_newfile_flags;
 
-/* Data quality bit mask (bits in single byte for QUALITY arrays) */
+/* Data quality bit mask (bits in single byte for QUALITY arrays).
+
+   To add a new quality bit:
+
+   1. Add an entry to the relevant family in this file
+   2. Increase the corresponding NQBITS constants (increasing SMF__NQBITS
+      if required)
+   3. Add quality to smf_qual_str_to_val
+   4. Add quality to smf_qual_str
+   5. If this is a compressible bit add it to the relevant test in
+      smf_qual_unmap
+   6. If this is a compressible bit add the decompression to smf_qual_map
+
+ */
+
+
+/* Time Series Quality */
 typedef enum {
   SMF__Q_BADDA   = BIT_TO_VAL(0),   /* Bad sample flagged by DA system  */
   SMF__Q_BADB    = BIT_TO_VAL(1),   /* All samples from this bolo should be ignored */
