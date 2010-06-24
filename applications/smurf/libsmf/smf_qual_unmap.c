@@ -93,34 +93,15 @@
 
 smf_qual_t * smf_qual_unmap( int indf, smf_qfam_t family, smf_qual_t * qual, int * status ) {
   int canwrite = 0;   /* can we write to the file? */
-  int wasmapped = 0;  /* Was the QUALITY mapped? */
-  size_t NQBITS = 0;  /* Number of quality bits in this family */
+  size_t nqbits = 0;  /* Number of quality bits in this family */
 
   if (*status != SAI__OK) return NULL;
 
-  /* see if the data were mapped */
-  wasmapped = ( SMF__QUALTYPE == SMF__UBYTE ? 1 : 0 );
+  /* do nothing if there is no quality */
+  if (!qual) return NULL;
 
   /* if we do not have an NDF identifier we just free the memory */
   if (indf == NDF__NOID) goto CLEANUP;
-
-  /* work out how many quality items are in this family */
-  switch( family ) {
-  case SMF__QFAM_TSERIES:
-    NQBITS = SMF__NQBITS_TSERIES;
-    break;
-  case SMF__QFAM_MAP:
-    NQBITS = SMF__NQBITS_MAP;
-    break;
-  default:
-    /* note that TCOMP is not an allowed quality because SMURF should not be
-       using it anywhere in a permanent way. */
-    *status = SAI__ERROR;
-    ndfMsg( "NDF", indf );
-    errRepf( "", "Unsupported quality family '%s' for quality unmapping of "
-             "file ^NDF", status, smf_qfamily_str(family,status) );
-    goto CLEANUP;
-  }
 
   /* See if we have WRITE access to the file */
   ndfIsacc( indf, "WRITE", &canwrite, status );
@@ -131,28 +112,46 @@ smf_qual_t * smf_qual_unmap( int indf, smf_qfam_t family, smf_qual_t * qual, int
      are stored. */
   if ( canwrite && qual ) {
     int highbit = -1; /* highest bit used */
+    size_t i;
     int lowbit = -1;  /* Lowest bit used */
     int nout;
     int nqual = 0;
     void *qpntr[1];
     size_t qcount[SMF__NQBITS]; /* statically allocate the largest array */
     IRQLocs *qlocs;
-    smf_qual_t * qmap;
+    unsigned char * qmap;
     int there;
+
+    if (family == SMF__QFAM_TCOMP || family == SMF__QFAM_NULL) {
+      /* note that TCOMP is not an allowed quality because SMURF should not be
+         using it anywhere in a permanent way. */
+      *status = SAI__ERROR;
+      ndfMsg( "NDF", indf );
+      errRepf( "", "Unsupported quality family '%s' for quality unmapping of "
+               "file ^NDF", status, smf_qfamily_str(family,status) );
+      goto CLEANUP;
+    }
+
+    /* work out how many quality items are in this family */
+    nqbits = smf_qfamily_count( family, status );
+
+    /* initialize qcount */
+    for (i=0; i<SMF__NQBITS; i++) {
+      qcount[i] = 0;
+    }
 
     /* how many pixels in NDF (assumed to be number in quality) */
     ndfSize( indf, &nout, status );
 
     /* Work out which bits are actually used */
     if (*status == SAI__OK) {
-      size_t i;
       size_t k;
       /* now we try to be a bit clever. It may be a mistake since we have to
          do multiple passes through "qual". First determine how many quality
          bits are actually set. */
       for (i = 0; i<nout; i++) {
         /* try all the bits */
-        for( k=0; k<NQBITS; k++ ) {
+        for( k=0; k<nqbits; k++ ) {
           if( qual[i] & BIT_TO_VAL(k) ) {
             qcount[k]++;
           }
@@ -160,7 +159,7 @@ smf_qual_t * smf_qual_unmap( int indf, smf_qfam_t family, smf_qual_t * qual, int
       }
 
       /* see how many we got */
-      for (k=0; k<NQBITS; k++) {
+      for (k=0; k<nqbits; k++) {
         if ( qcount[k] ) {
           nqual++;
           highbit = k;
@@ -169,15 +168,7 @@ smf_qual_t * smf_qual_unmap( int indf, smf_qfam_t family, smf_qual_t * qual, int
       }
     }
 
-    /* we need to unmap if we are about to use IRQ */
-    if (wasmapped) {
-      ndfMsg( "FILE", indf );
-      msgOutif( MSG__DEBUG20, "", "Unmapped QUALITY ^FILE", status );
-      if (indf != NDF__NOID) ndfUnmap( indf, "QUALITY", status );
-      return NULL;
-    }
-
-    /* for IRQ we need to ensure the SMURF extension exists so open and annul it. */
+    /* for IRQ we need to ensure the SMURF extension exists so open and annul it if it is missing. */
     if (*status == SAI__OK) {
       char xname[DAT__SZNAM+1];
       irqFind( indf, &qlocs, xname, status );
@@ -194,129 +185,116 @@ smf_qual_t * smf_qual_unmap( int indf, smf_qfam_t family, smf_qual_t * qual, int
       }
     }
 
-    if (wasmapped) {
-      if (*status == SAI__OK) {
-        printf("ASSUME THIS WAS MAPPED QUALITY %p\n",qual);
-        if (highbit < 8) {
-          size_t k;
+    /* malloced so we need to map and copy over the values. IRQ
+       names need to be set BEFORE we copy. */
 
-          /* Just write out the quality names. Depends on family
-             and we have to start at bit 0 */
-          for (k=lowbit; k<=highbit; k++) {
-            const char * qdesc = NULL; /* Description of quality */
-            const char * qstr = NULL;  /* Quality string identifier */
-            qstr = smf_qual_str( family, 1, k, &qdesc, status );
+    /* Map the quality component with WRITE access */
+    ndfMap( indf, "QUALITY", "_UBYTE", "WRITE", &qpntr[0], &nout, status );
+    qmap = qpntr[0];
 
-            /* Set the quality name */
-            if (qstr) {
-              irqAddqn( qlocs, qstr, 0, qdesc, status );
-            } else {
-              char buff[10];
-              sprintf(buff, "BIT%d", (int)k );
-              irqAddqn( qlocs, buff, 0, "Unknown quality", status );
-            }
-          }
+    /* we assume the number of elements in "qual" is the same as in "qmap" */
+    if (*status == SAI__OK) {
+      size_t k;
 
-        } else {
-          *status = SAI__ERROR;
-          errRep("", "Too many quality bits being used!",
-                 status );
-        }
-      }
-    } else {
-      /* malloced so we need to map and copy over the values. IRQ
-         names need to be set BEFORE we copy. */
+      /* if we only have 8 or fewer bits active we can just compress
+         by mapping them to the lower 8 bits. This will work if we also
+         set the IRQ quality names in the NDF. */
+      if (nqual == 0 ) {
+        /* easy */
+        memset( qmap, 0, nout * smf_dtype_sz( SMF__UBYTE, status ) );
+      } else if ( nqual <= 8 ) {
+        size_t curbit = 0;
 
-      /* Map the quality component with WRITE access */
-      ndfMap( indf, "QUALITY", "_UBYTE", "WRITE", &qpntr[0], &nout, status );
-      qmap = qpntr[0];
-      printf("MAPPED QUALITY %p\n",qmap);
-      /* we assume the number of elements in "qual" is the same as in "qmap" */
-      if (*status == SAI__OK) {
-        size_t i;
-        size_t k;
-
-        /* if we only have 8 or fewer bits active we can just compress
-           by mapping them to the lower 8 bits. This will work if we also
-           set the IRQ quality names in the NDF. */
-        if (nqual == 0 ) {
-          /* easy */
-          memset( qmap, 0, nout * smf_dtype_sz( SMF__UBYTE, status ) );
-        } else if ( nqual <= 8 ) {
-
-          /* and the quality names. Start at lowbit and go to highbit
+        /* and the quality names. Start at lowbit and go to highbit
            knowing that we have shifted them down so that lowbit in qual
            is bit 0 in NDF. */
-          for (k=lowbit; k<=highbit; k++) {
-            if (qcount[k]) {
-              const char * qdesc = NULL; /* Description of quality */
-              const char * qstr = NULL;  /* Quality string identifier */
-              qstr = smf_qual_str( family, 1, k, &qdesc, status );
-
-              irqAddqn( qlocs, qstr, 0, qdesc, status );
-            }
-          }
-
-          /* shift them down */
-          for (i=0; i<nout; i++) {
-            size_t curbit = 0;
-            qmap[i] = 0;
-
-            for (k=lowbit; k<=highbit; k++) {
-              if (qcount[k] && qual[k]&BIT_TO_VAL(k)) {
-                qmap[i] |= BIT_TO_VAL(curbit);
-                curbit++;
-              }
-            }
-          }
-
-        } else {
-
-          /* Quality names are now needed and we have to write them
-             all out because we have not compressed the bits in the
-             output quality array we've only compressed the input */
-
-          for (k=0; k<=SMF__NQBITS_TCOMP; k++) {
+        for (k=lowbit; k<=highbit; k++) {
+          if (qcount[k]) {
+            int fixed = 0;             /* is bit fixed? */
             const char * qdesc = NULL; /* Description of quality */
             const char * qstr = NULL;  /* Quality string identifier */
-            qstr = smf_qual_str( SMF__QFAM_TCOMP, 1, k, &qdesc, status );
+            curbit++;
+            qstr = smf_qual_str( family, 1, k, &qdesc, status );
 
-            /* Set the quality name */
             irqAddqn( qlocs, qstr, 0, qdesc, status );
+            irqFxbit( qlocs, qstr, curbit, &fixed, status );
           }
+        }
 
-          /* compress them */
-          for (i = 0; i<nout; i++) {
-            qmap[i] = 0;
-            if (qual[i]) {
-              if ( qual[i] & (SMF__Q_BADDA|SMF__Q_BADB) ) {
-                qmap[i] |= SMF__TCOMPQ_BAD;
+        /* shift them down */
+        for (i=0; i<nout; i++) {
+          curbit = 0;
+          qmap[i] = 0;
+
+          for (k=lowbit; k<=highbit; k++) {
+            /* was this bit used by this data array? */
+            if (qcount[k]) {
+              /* was the bit set for this location? */
+              if ( qual[i]&BIT_TO_VAL(k)) {
+                qmap[i] |= BIT_TO_VAL(curbit);
               }
-              if ( qual[i] & (SMF__Q_APOD|SMF__Q_PAD) ) {
-                qmap[i] |= SMF__TCOMPQ_ENDS;
-              }
-              if ( qual[i] & (SMF__Q_JUMP|SMF__Q_SPIKE) ) {
-                qmap[i] |= SMF__TCOMPQ_BLIP;
-              }
-              if ( qual[i] & (SMF__Q_COM) ) {
-                qmap[i] |= SMF__TCOMPQ_MATCH;
-              }
-              if ( qual[i] & (SMF__Q_STAT) ) {
-                qmap[i] |= SMF__TCOMPQ_TEL;
-              }
-              if (qmap[i] == 0 ) {
-                /* something went wrong. We missed a quality bit somewhere */
-                msgOutiff(MSG__QUIET, "", FUNC_NAME ": Untested quality bit found"
-                          " in position %zu with value %u", status,
-                          i, (unsigned int)qual[i]);
-              }
+              curbit++;
             }
           }
-
         }
+
+      } else {
+        size_t curbit = 0;
+
+        /* Quality names are now needed and we have to write them
+           all out because we have not compressed the bits in the
+           output quality array we've only compressed the input.
+           To limit the number of active bits we'd have to copy the
+           compressed bits to the output and then set the quality
+           names but IRQ does not let you do that so you would need
+           to run through the entire array first counting which bits
+           were used. */
+
+        for (k=0; k<SMF__NQBITS_TCOMP; k++) {
+          int fixed = 0;
+          const char * qdesc = NULL; /* Description of quality */
+          const char * qstr = NULL;  /* Quality string identifier */
+          qstr = smf_qual_str( SMF__QFAM_TCOMP, 1, k, &qdesc, status );
+
+          /* Set the quality name */
+          irqAddqn( qlocs, qstr, 0, qdesc, status );
+          curbit++;
+          irqFxbit( qlocs, qstr, curbit, &fixed, status );
+        }
+
+        /* compress them */
+        for (i = 0; i<nout; i++) {
+          qmap[i] = 0;
+          if (qual[i]) {
+            if ( qual[i] & (SMF__Q_BADDA|SMF__Q_BADB) ) {
+              qmap[i] |= SMF__TCOMPQ_BAD;
+            }
+            if ( qual[i] & (SMF__Q_APOD|SMF__Q_PAD) ) {
+              qmap[i] |= SMF__TCOMPQ_ENDS;
+            }
+            if ( qual[i] & (SMF__Q_JUMP|SMF__Q_SPIKE) ) {
+              qmap[i] |= SMF__TCOMPQ_BLIP;
+            }
+            if ( qual[i] & (SMF__Q_COM) ) {
+              qmap[i] |= SMF__TCOMPQ_MATCH;
+            }
+            if ( qual[i] & (SMF__Q_STAT) ) {
+              qmap[i] |= SMF__TCOMPQ_TEL;
+            }
+            if (qmap[i] == 0 ) {
+              /* something went wrong. We missed a quality bit somewhere */
+              msgOutiff(MSG__QUIET, "", FUNC_NAME ": Untested quality bit found"
+                        " in position %zu with value %u", status,
+                        i, (unsigned int)qual[i]);
+            }
+          }
+        }
+
       }
     }
 
+    /* Unmap quality */
+    ndfUnmap( indf, "QUALITY", status );
 
     /* release IRQ resources */
     irqRlse( &qlocs, status );
@@ -324,10 +302,7 @@ smf_qual_t * smf_qual_unmap( int indf, smf_qfam_t family, smf_qual_t * qual, int
 
  CLEANUP:
   /* Tidy up */
-  if (!wasmapped) {
-    /* assume smf_quality_map malloced it */
-    qual = astFree( qual );
-  }
+  qual = astFree( qual );
   return NULL;
 
 }

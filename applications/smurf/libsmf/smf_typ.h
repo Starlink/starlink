@@ -247,9 +247,9 @@ typedef enum smf_dtype {
    the type in terms of the primary data types in smf_dtype, typedef
    a local variable type and define a bad value */
 
-#define SMF__QUALTYPE SMF__UBYTE
-typedef unsigned char smf_qual_t;
-#define VAL__BADQ VAL__BADUB
+#define SMF__QUALTYPE SMF__USHORT
+typedef unsigned short smf_qual_t;
+#define VAL__BADQ VAL__BADUW
 
 /* Different types of model components used by iterative map-maker. These are
    powers of 2 so they can be used in bit masks. */

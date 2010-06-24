@@ -97,50 +97,21 @@ smf_qual_t * smf_qual_map( int indf, const char mode[], smf_qfam_t *family,
                            size_t *nmap, int * status ) {
 
   size_t i;             /* Loop counter */
-  smf_qfam_t lfamily = SMF__QFAM_TSERIES; /* Local quality family */
+  smf_qfam_t lfamily = SMF__QFAM_NULL; /* Local quality family */
   int nout;             /* Number of elements mapped */
   int numqn = 0;        /* number of quality names */
   IRQLocs *qlocs = NULL;/* IRQ Quality */
   unsigned char *qmap;  /* pointer to mapped unsigned bytes */
   void *qpntr[1];       /* Somewhere to put the mapped pointer */
   smf_qual_t *retval = NULL; /* Returned pointer */
-  int willmap = 0;      /* Will we mmap or copy? */
   char xname[DAT__SZNAM+1];  /* Name of extension holding quality names */
 
 
   if (*status != SAI__OK) return retval;
 
-  /* are we mapping or copying */
-  willmap = ( SMF__QUALTYPE == SMF__UBYTE ? 1 : 0 );
-
-  /* if we are mapping we need to define quality before we set it. Just assume
-     we have a single quality family. */
-  if (willmap && strncmp(mode, "WRITE",5) == 0 ) {
-    irqFind( indf, &qlocs, xname, status );
-    if (*status == IRQ__NOQNI) {
-      errAnnul( status );
-      smf_create_qualname( mode, indf, &qlocs, status );
-    }
-  }
-
-  /* Map the quality component (we always need to do this) */
-  ndfMap( indf, "QUALITY", "_UBYTE", mode, &qpntr[0], &nout, status );
-  qmap = qpntr[0];
-
+  /* how many elements do we need */
+  ndfSize( indf, &nout, status );
   if (nmap) *nmap = nout;
-
-  /* in this case we assume a single family of quality
-     and the values just get used without modification */
-  if ( willmap ) {
-    /* we are done so we can just return the mapped pointer */
-    retval = qmap;
-    ndfMsg( "FILE", indf );
-    msgOutiff( MSG__DEBUG20, "", "Mapped QUALITY (%p) in ^FILE with mode %s ",
-               status, qmap, mode );
-    if (family) *family = lfamily;
-    if (qlocs) irqRlse( &qlocs, status );
-    return retval;
-  }
 
   /* malloc the QUALITY buffer */
   retval = astCalloc( nout, sizeof(*retval), 0 );
@@ -161,9 +132,12 @@ smf_qual_t * smf_qual_map( int indf, const char mode[], smf_qfam_t *family,
 
     /* unmap the NDF buffer and return the pointer */
     if (family) *family = lfamily;
-    ndfUnmap( indf, "QUALITY", status );
     return retval;
   }
+
+  /* Map the quality component (we always need to do this) */
+  ndfMap( indf, "QUALITY", "_UBYTE", mode, &qpntr[0], &nout, status );
+  qmap = qpntr[0];
 
   /* Need to find out what quality names are in play so we
      can work out which family to translate them to */
@@ -214,17 +188,23 @@ smf_qual_t * smf_qual_map( int indf, const char mode[], smf_qfam_t *family,
          less than 9 bits because they are in the NDF file. */
       qval = smf_qual_str_to_val( qname, &tmpfam, status );
 
-      if (*status == SMF__BADQNM) {
+      if (*status == SMF__BADQNM || tmpfam == SMF__QFAM_NULL ) {
         /* annul status and just copy this bit from the file
            to SMURF without change. This might result in a clash
            of bits but we either do that or drop out the loop
            and assume everything is broken */
-        errAnnul(status);
+        if (*status != SAI__OK) errAnnul(status);
         ndfqtosmf[bit] = bit;
         ndfqtoval[bit] = BIT_TO_VAL(bit);
 
       } else {
-        lfamily = tmpfam;
+        if (lfamily == SMF__QFAM_NULL) {
+          lfamily = tmpfam;
+        } else if (lfamily != tmpfam) {
+          msgOutif(MSG__QUIET, "",
+                   "WARNING: Quality names in file come from different families",
+                   status );
+        }
         ndfqtosmf[bit] = smf_qual_to_bit( qval, status );
         ndfqtoval[bit] = qval;
 
@@ -235,7 +215,7 @@ smf_qual_t * smf_qual_map( int indf, const char mode[], smf_qfam_t *family,
 
     /* Now copy from the file and translate the bits. If this is an
        identity mapping or we do not know the family then we go quick. */
-    if (identity || lfamily == 0) {
+    if ( (identity && lfamily != SMF__QFAM_TCOMP) || lfamily == SMF__QFAM_NULL) {
       for (i=0; i<nout; i++) {
         retval[i] = qmap[i];
       }
@@ -286,13 +266,17 @@ smf_qual_t * smf_qual_map( int indf, const char mode[], smf_qfam_t *family,
           }
         }
       }
+
+      /* we have uncompressed */
+      if (lfamily == SMF__QFAM_TCOMP) lfamily = SMF__QFAM_TSERIES;
+
     }
 
   }
 
   /* Free quality */
   irqRlse( &qlocs, status );
-  printf("STATUS IN QAUL MAP %d\n",*status);
+
   /* no longer need the mapped data */
   ndfUnmap( indf, "QUALITY", status );
 
