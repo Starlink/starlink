@@ -521,7 +521,7 @@ F77_SUBROUTINE(irq_nxtqn)( CHARACTER_ARRAY(LOCS),
                            TRAIL(QNAME)
                            TRAIL(COMMNT) );
 
-void irqNxtqn( const IRQLocs *locs, IRQcntxt *contxt, const char *qname, int *fixed, int *value,
+void irqNxtqn( const IRQLocs *locs, IRQcntxt *contxt, char *qname, int *fixed, int *value,
                int *bit, char *commnt, int commnt_len, int * done, int *status ){
 
    DECLARE_CHARACTER_ARRAY(LOCS,DAT__SZLOC,5);
@@ -540,7 +540,7 @@ void irqNxtqn( const IRQLocs *locs, IRQcntxt *contxt, const char *qname, int *fi
    HDS_EXPORT_CLOCATOR( locs->loc[3], LOCS[3], status );
    HDS_EXPORT_CLOCATOR( locs->loc[4], LOCS[4], status );
 
-   F77_CREATE_EXPORT_CHARACTER( qname, QNAME );
+   F77_CREATE_CHARACTER( QNAME, IRQ__SZQNM );
    F77_CREATE_CHARACTER( COMMNT, commnt_len-1 );
    F77_EXPORT_INTEGER( *status, STATUS );
    F77_EXPORT_INTEGER( *contxt, CONTXT );
@@ -561,6 +561,7 @@ void irqNxtqn( const IRQLocs *locs, IRQcntxt *contxt, const char *qname, int *fi
    F77_IMPORT_LOGICAL( FIXED, *fixed );
    F77_IMPORT_LOGICAL( VALUE, *value );
    F77_IMPORT_INTEGER( BIT, *bit );
+   F77_IMPORT_CHARACTER( QNAME, QNAME_length, qname );
    F77_IMPORT_CHARACTER( COMMNT, COMMNT_length, commnt );
    F77_IMPORT_INTEGER( CONTXT, *contxt );
    F77_IMPORT_LOGICAL( DONE, *done );

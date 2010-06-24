@@ -106,7 +106,7 @@ void irqRlse( IRQLocs **, int * );
 void irqRwqn( const IRQLocs *, const char *, int, int, int *, int * );
 void irqSetqm( const IRQLocs *, int, const char *, int, float *, int *, int * );
 void irqFxbit( const IRQLocs *, const char *, int, int *, int * );
-void irqNxtqn( const IRQLocs *locs, IRQcntxt *contxt, const char *qname, int *fixed, int *value,
+void irqNxtqn( const IRQLocs *locs, IRQcntxt *contxt, char *qname, int *fixed, int *value,
                int *bit, char *commnt, int commnt_len, int *done, int *status );
 int irqNumqn( const IRQLocs *locs, int *status );
 
