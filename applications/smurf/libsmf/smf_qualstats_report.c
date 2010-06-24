@@ -13,19 +13,22 @@
 *     Library routine
 
 *  Invocation:
-*     smf_qualstats_report( const smfArray *qua,
+*     smf_qualstats_report( smf_qfam_t qfamily, const smfArray *qua,
 *                           size_t last_qcount[SMF__NQBITS],
 *                           size_t *last_nmap,
 *                           int init, size_t * ngood_tslice,
 *                           size_t *numdata, int *status )
 
 *  Arguments:
+*     qfamily = smf_qfam_t (Given)
+*        Quality family associated with this quality array.
 *     qua = const smfArray *qua (Given)
 *        Pointer to smfArray of smfData's containing quality
 *     last_qcount = size_t[SMF__NQBITS] (Given and Returned)
 *        Pointer to array that countains number of occurences of each
 *        quality bit in qual from the last call. Updated to current counts
-*        upon return.
+*        upon return. Will only use the number of elements determined by
+*        the quality family.
 *     last_nmap = size_t* (Given and Returned)
 *        Pointer to number of samples that would have gone into the map
 *        last iteration. Updated to current number upon return.
@@ -71,6 +74,8 @@
 *        Factor out calculation code into smf_qualstats_model
 *     2010-06-16 (EC):
 *        Return ndata.
+*     2010-06-23 (TIMJ):
+*        Add quality family support.
 
 *  Copyright:
 *     Copyright (C) 2010 University of British Columbia.
@@ -112,7 +117,7 @@
 
 #define FUNC_NAME "smf_qualstats_report"
 
-void smf_qualstats_report( const smfArray *qua,
+void smf_qualstats_report( smf_qfam_t qfamily, const smfArray *qua,
                            size_t last_qcount[SMF__NQBITS],
                            size_t *last_nmap, int init,
                            size_t *ngood_tslice, size_t *numdata,
@@ -125,6 +130,7 @@ void smf_qualstats_report( const smfArray *qua,
   size_t ntgood;                /* Number of good time slices */
   size_t nmap;                  /* number of good map samples */
   size_t nmax;                  /* theoretical maximum good map samples */
+  size_t nqbits = 0;            /* Number of quality bits in this family */
   dim_t ntslice;                /* number of time slices */
   size_t qcount[SMF__NQBITS];   /* total current quality bit counter */
   double steptime=0.005;        /* length of sample -- assume 200 Hz data */
@@ -155,19 +161,21 @@ void smf_qualstats_report( const smfArray *qua,
     return;
   }
 
+  nqbits = smf_qfamily_count( qfamily, status );
+
   if( init ) {
     /* Initialize last_qcount */
-    memset( last_qcount, 0, SMF__NQBITS_TSERIES*sizeof(*last_qcount) );
+    memset( last_qcount, 0, nqbits*sizeof(*last_qcount) );
 
     /* Initialize last_namp */
     *last_nmap = 0;
   }
 
   /* Initialize counts */
-  memset( qcount, 0, SMF__NQBITS_TSERIES*sizeof(*qcount) );
+  memset( qcount, 0, nqbits*sizeof(*qcount) );
 
   /* Find out the properties of the smfArray */
-  smf_qualstats_model( qua, qcount, &nbolo_tot, &nmap, &nmax,
+  smf_qualstats_model( qfamily, qua, qcount, &nbolo_tot, &nmap, &nmax,
                        &ntslice, &ntgood, &tbound, &tpad, status );
 
   /* Get a more accurate steptime if we can */
@@ -192,7 +200,7 @@ void smf_qualstats_report( const smfArray *qua,
 
     msgOutf("", "--- Quality flagging statistics --------------------------------------------",
             status );
-    for( i=0; (i<SMF__NQBITS_TSERIES)&&(*status==SAI__OK); i++ ) {
+    for( i=0; (i<nqbits)&&(*status==SAI__OK); i++ ) {
 
       char scalestr[80];
 
@@ -231,14 +239,14 @@ void smf_qualstats_report( const smfArray *qua,
 
       if( init ) {
         msgOutf("","%6s: %10zu (%5.2lf%%),%20s", status,
-                smf_qual_str(SMF__QFAM_TSERIES, 1, i, NULL, status),
+                smf_qual_str(qfamily, 1, i, NULL, status),
                 qcount[i],
                 100. * (double) qcount[i] / (double) ndata,
                 scalestr);
       } else {
         msgOutf("","%6s: %10zu (%5.2lf%%),%20s,change %10li (%+.2lf%%)",
                 status,
-                smf_qual_str(SMF__QFAM_TSERIES, 1, i, NULL, status),
+                smf_qual_str(qfamily, 1, i, NULL, status),
                 qcount[i],
                 100. * (double) qcount[i] / (double) ndata,
                 scalestr,
@@ -267,7 +275,7 @@ void smf_qualstats_report( const smfArray *qua,
 
   if( *status == SAI__OK ) {
     /* Update last_qcount to qcount */
-    memcpy(last_qcount, qcount, SMF__NQBITS_TSERIES*sizeof(*last_qcount));
+    memcpy(last_qcount, qcount, nqbits*sizeof(*last_qcount));
 
     /* Update last_nmap to nmap */
     *last_nmap = nmap;

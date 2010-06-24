@@ -13,17 +13,20 @@
 *     Library routine
 
 *  Invocation:
-*     smf_qualstats_model( const smfArray *qua, size_t qcount[SMF__NQBITS],
-*                          size_t * ngoodbolo, size_t * nmap,
+*     smf_qualstats_model( smf_qfam_t qfamily, const smfArray *qua,
+*                          size_t qcount[SMF__NQBITS], size_t * ngoodbolo, size_t * nmap,
 *                          size_t *nmax, dim_t *ntslice, size_t * ntgood,
 *                          size_t * tbound, size_t * tpad, int * status );
 
 *  Arguments:
+*     qfamily = smf_qfam_t (Given)
+*        Quality family associated with this quality array.
 *     qua = const smfArray *qua (Given)
 *        Pointer to smfArray of smfData's containing quality
 *     qcount = size_t[SMF__NQBITS] (Returned)
 *        Pointer to array that will count number of occurences of each
-*        quality bit in qual. Can be NULL.
+*        quality bit in qual. Will only use the number of elements determined
+*        by the quality family. Can be NULL.
 *     ngoodbolo = size_t* (Returned)
 *        If specified, return number of bolometers that are flagged as good.
 *     nmap = size_t* (Returned)
@@ -66,6 +69,8 @@
 *        Initial version inherited from smf_qualstats_report
 *     2010-06-01 (TIMJ):
 *        Use dim_t for ntslice in an attempt at consistency.
+*     2010-06-23 (TIMJ):
+*        Add quality family support.
 
 *  Copyright:
 *     Copyright (C) 2010 University of British Columbia.
@@ -108,9 +113,9 @@
 #define FUNC_NAME "smf_qualstats_report"
 
 void
-smf_qualstats_model( const smfArray *qua, size_t qcount[SMF__NQBITS], size_t * ngoodbolo,
-                     size_t * nmap, size_t *nmax, dim_t * ntslice, size_t * ntgood,
-                     size_t * tbound, size_t *tpad, int * status ) {
+smf_qualstats_model( smf_qfam_t qfamily, const smfArray *qua, size_t qcount[SMF__NQBITS],
+                     size_t * ngoodbolo, size_t * nmap, size_t *nmax, dim_t * ntslice,
+                     size_t * ntgood, size_t * tbound, size_t *tpad, int * status ) {
 
   /* Local Variables */
   size_t i;                     /* loop counter */
@@ -118,6 +123,7 @@ smf_qualstats_model( const smfArray *qua, size_t qcount[SMF__NQBITS], size_t * n
   size_t nbolo_tot;             /* total bolos in all subarrays */
   size_t nmap_tot;              /* number of good map samples */
   size_t nmax_tot;              /* theoretical maximum good map samples */
+  size_t nqbits = 0;            /* Number of quality bits in this family */
   dim_t ntslice_ref;            /* reference number of time slices */
   size_t tbound_local;          /* Local calculation of tbound */
 
@@ -132,7 +138,8 @@ smf_qualstats_model( const smfArray *qua, size_t qcount[SMF__NQBITS], size_t * n
   }
 
   /* Initialize counts */
-  if (qcount) memset( qcount, 0, SMF__NQBITS_TSERIES*sizeof(*qcount) );
+  nqbits = smf_qfamily_count( qfamily, status );
+  if (qcount) memset( qcount, 0, nqbits*sizeof(*qcount) );
   nmap_tot = 0;
   nmax_tot = 0;
 
@@ -167,8 +174,8 @@ smf_qualstats_model( const smfArray *qua, size_t qcount[SMF__NQBITS], size_t * n
 
 
       /* get quality statistics for the current subarray */
-      smf_qualstats( qual, nbolo, bstride, nslices, tstride, subqcount, NULL,
-                     &subnmap, &subnmax, status );
+      smf_qualstats( qfamily, qual, nbolo, bstride, nslices, tstride, subqcount,
+                     NULL, &subnmap, &subnmax, status );
 
       /* add to total number of bolometers and check for length consistency */
       nbolo_tot += nbolo;
@@ -183,7 +190,7 @@ smf_qualstats_model( const smfArray *qua, size_t qcount[SMF__NQBITS], size_t * n
       if( *status == SAI__OK ) {
         /* Add counts from this subarray to the total */
         if (qcount) {
-          for( i=0; i<SMF__NQBITS_TSERIES; i++ ) {
+          for( i=0; i<nqbits; i++ ) {
             qcount[i] += subqcount[i];
           }
         }

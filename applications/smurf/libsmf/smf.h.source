@@ -1307,16 +1307,16 @@ int smf_qual_to_bit( smf_qual_t q, int *status );
 
 smf_qual_t * smf_qual_unmap( int indf, smf_qfam_t family, smf_qual_t * qual, int * status );
 
-void smf_qualstats( const smf_qual_t *qual, dim_t nbolo, size_t bstride,
+void smf_qualstats( smf_qfam_t qfamily, const smf_qual_t *qual, dim_t nbolo, size_t bstride,
                     size_t ntslice, size_t tstride,  size_t qcount[SMF__NQBITS],
                     size_t *ngoodbolo, size_t *nmap, size_t *nmax,
                     int *status );
 
-void smf_qualstats_model( const smfArray *qua, size_t qcount[SMF__NQBITS], size_t * ngoodbolo,
+void smf_qualstats_model( smf_qfam_t qfamily, const smfArray *qua, size_t qcount[SMF__NQBITS], size_t * ngoodbolo,
                           size_t * nmap, size_t *nmax, dim_t * ntslice, size_t * ntgood,
                           size_t * tbound, size_t *tpad, int * status );
 
-void smf_qualstats_report( const smfArray *qua, size_t last_qcount[SMF__NQBITS],
+void smf_qualstats_report( smf_qfam_t qfamily, const smfArray *qua, size_t last_qcount[SMF__NQBITS],
                            size_t *last_nmap, int init, size_t *ngood_tslice,
                            size_t *numdata, int *status );
 

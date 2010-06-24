@@ -13,12 +13,14 @@
 *     Library routine
 
 *  Invocation:
-*     smf_qualstats( const smf_qual_t *qual, dim_t nbolo, size_t bstride,
-*                    size_t ntslice, size_t tstride,  size_t qcount[SMF__NQBITS],
-*                    size_t *ngoodbolo, size_t *nmap, size_t *nmax,
-*                    int *status )
+*     smf_qualstats( smf_qfam_t qfamily, const smf_qual_t *qual, dim_t nbolo,
+*                    size_t bstride, size_t ntslice, size_t tstride,
+*                    size_t qcount[SMF__NQBITS], size_t *ngoodbolo, size_t *nmap,
+*                    size_t *nmax, int *status )
 
 *  Arguments:
+*     qfamily = smf_qfam_t (Given)
+*        Quality family associated with this quality array.
 *     qual = const smf_qual_t * (Given)
 *        Pointer to quality array
 *     nbolo = dim_t (Given)
@@ -33,7 +35,8 @@
 *        current bolometer.
 *     qcount = size_t[SMF__NQBITS] (Returned)
 *        Pointer to array that will count number of occurences of each
-*        quality bit in qual.
+*        quality bit in qual. Will only use the number of elements determined
+*        by the quality family.
 *     ngoodbolo = size_t* (Returned)
 *        If specified, return number of bolometers that are flagged as good.
 *     nmap = size_t* (Returned)
@@ -54,6 +57,7 @@
 
 *  Authors:
 *     Edward Chapin (UBC)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -61,6 +65,8 @@
 *        Initial Version
 *     2010-03-19 (EC):
 *        Track samples that could go into the map (nmap, nmax)
+*     2010-06-23 (TIMJ):
+*        Add quality family support.
 
 *  Copyright:
 *     Copyright (C) 2010 University of British Columbia.
@@ -101,8 +107,8 @@
 
 #define FUNC_NAME "smf_qualstats"
 
-void smf_qualstats( const smf_qual_t *qual, dim_t nbolo, size_t bstride,
-                    size_t ntslice, size_t tstride,
+void smf_qualstats( smf_qfam_t qfamily, const smf_qual_t *qual, dim_t nbolo,
+                    size_t bstride, size_t ntslice, size_t tstride,
                     size_t qcount[SMF__NQBITS], size_t *ngoodbolo,
                     size_t *nmap, size_t *nmax,
                     int *status ) {
@@ -114,6 +120,7 @@ void smf_qualstats( const smf_qual_t *qual, dim_t nbolo, size_t bstride,
   size_t numgoodbolo=0;
   size_t nummap=0;
   size_t nummax=0;
+  size_t nqbits = 0;            /* Number of quality bits in this family */
   size_t offset;
 
   /* Main routine */
@@ -127,7 +134,8 @@ void smf_qualstats( const smf_qual_t *qual, dim_t nbolo, size_t bstride,
   }
 
   /* Initialize the counters */
-  memset( qcount, 0, SMF__NQBITS_TSERIES*sizeof(*qcount) );
+  nqbits = smf_qfamily_count( qfamily, status );
+  memset( qcount, 0, nqbits*sizeof(*qcount) );
 
   /* Loop over bolo and time slice, and count occurrences of quality bits */
   for( i=0; i<nbolo; i++ ) {
@@ -150,7 +158,7 @@ void smf_qualstats( const smf_qual_t *qual, dim_t nbolo, size_t bstride,
       }
 
       /* Loop over bits */
-      for( k=0; k<SMF__NQBITS_TSERIES; k++ ) {
+      for( k=0; k<nqbits; k++ ) {
         if( qual[offset] & BIT_TO_VAL(k) ) {
           qcount[k]++;
         }

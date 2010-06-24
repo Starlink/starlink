@@ -1167,7 +1167,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             }
 
             /* initial quality report */
-            smf_qualstats_report( qua[i], qcount_last, &nsamples,
+            smf_qualstats_report( SMF__QFAM_TSERIES, qua[i], qcount_last, &nsamples,
                                   1, &ntgood, &numdata, status );
 
             /* If no good bolos left, set status */
@@ -1399,7 +1399,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
                 /* calculate the effective number of bolometers for this
                    iteration */
-                smf_qualstats_model( qua[i], NULL, NULL, &nmap, NULL,
+                smf_qualstats_model( SMF__QFAM_TSERIES, qua[i], NULL, NULL, &nmap, NULL,
                                      NULL, &ngood_tslices, NULL, NULL, status );
 
                 iter_nboloeff = (double)nmap / (double)ngood_tslices;
@@ -1535,7 +1535,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
             /* report on the quality flags for this iterations before closing
              the quality */
-            smf_qualstats_report( qua[i], qcount_last, &nsamples, 0, &ntgood,
+            smf_qualstats_report( SMF__QFAM_TSERIES, qua[i], qcount_last, &nsamples, 0, &ntgood,
                                   &numdata, status );
 
             /* If no good bolos left, set status */
