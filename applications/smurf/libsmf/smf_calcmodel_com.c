@@ -361,8 +361,10 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
             res_data[ ijindex ] += wg[ i ]*model_data[ i ] + woff[ i ];
 
             /* Increment the sums used to find the RMS bolometer value. */
-            sum += res_data[ ijindex ]*res_data[ ijindex ];
-            nsum++;
+            if( !(qua_data[ ijindex ] & SMF__Q_FIT ) ) {
+               sum += res_data[ ijindex ]*res_data[ ijindex ];
+               nsum++;
+            }
           }
 
           /* Advance to next element of res_data and qua_data arrays. */
