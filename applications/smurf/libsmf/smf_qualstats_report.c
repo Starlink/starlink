@@ -282,7 +282,7 @@ void smf_qualstats_report( smf_qfam_t qfamily, const smfArray *qua,
 
     if (ngood_tslice) *ngood_tslice = ntgood;
 
-    if (*numdata) *numdata = ndata;
+    if (numdata) *numdata = ndata;
   }
 
 }
