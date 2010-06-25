@@ -36,7 +36,7 @@
 *  Description:
 *     Execute a frequency domain filter, but store what was removed with a
 *     time-domain representation for easy visualization. The data should
-*     already have been padded/apodized in a pre-processing step.
+*     already have been padded (but not apodized) in a pre-processing step.
 
 *  Notes:
 

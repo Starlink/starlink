@@ -75,6 +75,9 @@
 *        Alternative approach to handling missing data - store zero for
 *        missing values and then correct by normalising the filtered data
 *        using a filtered mask.
+*     2010-06-25 (DSB):
+*        Doing apodisation here, each time the filter is applied, 
+*        rather than as a pre-processing step. 
 
 *  Copyright:
 *     Copyright (C) 2007-2009 University of British Columbia.
@@ -128,13 +131,16 @@ pthread_mutex_t smf_filter_execute_mutex = PTHREAD_MUTEX_INITIALIZER;
    exclusive parts of the master smfData so we don't need to make
    local copies of the entire smfData. */
 typedef struct smfFilterExecuteData {
+  size_t apod_length;      /* apodization length */
   size_t b1;               /* Index of first bolometer to be filtered */
   size_t b2;               /* Index of last bolometer to be filtered */
   smfData *data;           /* Pointer to master smfData */
   double *data_fft_r;      /* Real part of the data FFT (1-bolo) */
   double *data_fft_i;      /* Imaginary part of the data FFT (1-bolo)*/
   smfFilter *filt;         /* Pointer to the filter */
+  size_t first;            /* First sample apodization at start */
   int ijob;                /* Job identifier */
+  size_t last;             /* Last sample apodization at end */
   fftw_plan plan_forward;  /* for forward transformation */
   fftw_plan plan_inverse;  /* for inverse transformation */
   smf_qual_t *qua;         /* quality pointer */
@@ -147,6 +153,8 @@ void smfFilterExecuteParallel( void *job_data_ptr, int *status );
 
 void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
   double ac, bd, aPb, cPd;      /* Components for complex multiplication */
+  double ap;                    /* Apodisation roll-off function value */
+  size_t apod_length=0;         /* Apodization length */
   double *base=NULL;            /* Pointer to start of current bolo in array */
   size_t bstride;               /* Bolometer stride */
   double *data_fft_r=NULL;      /* Real part of the data FFT */
@@ -154,6 +162,7 @@ void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
   smfData *data=NULL;           /* smfData that we're working on */
   double *dmask = NULL;         /* Array holding data values to be filtered */
   double fac;                   /* Factor for scaling the ral and imag parts */
+  size_t first;                 /* First sample apodization at start */
   double fr;                    /* Real filter value */
   double fi;                    /* Imaginary filter value */
   double *inv_filt_r = NULL;    /* Array holding inverted real filter values */
@@ -164,6 +173,7 @@ void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
   int iloop;                    /* Loop counter */
   int invert;                   /* Invert the filter to produce a low pass filter? */
   size_t j;                     /* Loop counter */
+  size_t last;                  /* Last sample apodization at end */
   double *mask = NULL;          /* Array holding mask values to be filtered */
   dim_t nbolo;                  /* Number of bolometers */
   int newalg;                   /* Use new algorithm for handling missing data? */
@@ -193,6 +203,10 @@ void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
   data_fft_r = pdata->data_fft_r;
   data_fft_i = pdata->data_fft_i;
   qua = pdata->qua;
+  first = pdata->first;
+  last = pdata->last;
+  apod_length = pdata->apod_length;
+
 
   if( !data ) {
     *status = SAI__ERROR;
@@ -328,6 +342,22 @@ void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
       base = data->pntr[0];
       base += i*bstride;
 
+      /* Apodise the data with a Hanning window to avoid ringing. Not needed
+         if using the new algorithm (i.e. using a mask). */
+      if( qbase ) {
+        for( j = 0; j < apod_length; j++ ) {
+          ap = 0.5 - 0.5*cos( AST__DPI * (double) j / apod_length );
+          if( !(qbase[ first + j ] & SMF__Q_MOD )) base[ first + j ] *= ap;
+          if( !(qbase[ last - j ] & SMF__Q_MOD )) base[ last - j ] *= ap;
+        }
+      } else {
+        for( j = 0; j < apod_length; j++ ) {
+          ap = 0.5 - 0.5*cos( AST__DPI * (double) j / apod_length );
+          if( base[ first + j ] != VAL__BADD ) base[ first + j ] *= ap;
+          if( base[ last - j ] != VAL__BADD ) base[ last - j ] *= ap;
+        }
+      }
+
       /* Create a mask array that is the same length as the data array,
          with 1.0 at every usable data value and 0.0 at every unusable
          data value. At the same time, create a new data array by
@@ -427,6 +457,16 @@ void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
         }
       }
     }
+
+    /* Set quality for all detectors regardless of whether they are
+       bad or not -- across 2*apod_length samples at both start and finish. */
+    if( qbase ) {
+      for( j = 0; j < 2*apod_length; j++ ) {
+        qbase[ first + j ] |= SMF__Q_APOD;
+        qbase[ last - j ] |= SMF__Q_APOD;
+      }
+    }
+
   }
 
   /* Free work arrays */
@@ -452,14 +492,18 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data,
                          int *status ) {
 
   /* Local Variables */
+  size_t apod_length=0;           /* apodization length */
   fftw_iodim dims;                /* I/O dimensions for transformations */
+  size_t first;                   /* First sample apodization at start */
   int i;                          /* Loop counter */
   smfFilterExecuteData *job_data=NULL;/* Array of job data for each thread */
+  size_t last;                    /* Last sample apodization at end */
   dim_t nbolo=0;                  /* Number of bolometers */
   dim_t ndata=0;                  /* Total number of data points */
   int nw;                         /* Number of worker threads */
   dim_t ntslice=0;                /* Number of time slices */
-  smfFilterExecuteData *pdata=NULL;   /* Pointer to current job data */
+  smf_qual_t *qua=NULL;           /* Pointer to quality flags */
+  smfFilterExecuteData *pdata=NULL; /* Pointer to current job data */
   size_t step;                    /* step size for dividing up work */
 
   /* Main routine */
@@ -514,6 +558,33 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data,
 
   if( *status != SAI__OK ) return;
 
+  /* Pointers to quality */
+  if( quality ) {
+    qua = quality;
+  } else {
+    qua = data->qual;
+  }
+
+  /* Determine the first and last samples to apodize (after padding), if
+     any. Assumed to be the same for all bolometers. */
+  smf_get_goodrange( qua, ntslice, 1, SMF__Q_PAD, &first, &last, status );
+
+  /* Can we apodize? */
+  apod_length = filt->apod_length;
+  if( *status == SAI__OK ) {
+    if( apod_length == SMF__MAXAPLEN ) {
+      apod_length = (last-first+1)/2;
+      msgOutiff( MSG__DEBUG, "", FUNC_NAME
+                 ": Using maximum apodization length, %zu samples.",
+                 status, apod_length );
+    } else if( (last-first+1) < (2*apod_length) ) {
+      *status = SAI__ERROR;
+      errRepf("", FUNC_NAME
+              ": Can't apodize, not enough samples (%zu < %zu).", status,
+              last-first+1, 2*apod_length);
+    }
+  }
+
   /* Describe the input and output array dimensions for FFTW guru interface.
      - dims describes the length and stepsize of time slices within a bolometer
   */
@@ -542,16 +613,14 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data,
       pdata->b2=nbolo-1;
     }
     pdata->data = data;
-
-    if( quality ) {
-      pdata->qua = quality;
-    } else {
-      pdata->qua = data->qual;
-    }
+    pdata->qua = qua;
 
     pdata->data_fft_r = astCalloc( filt->dim, sizeof(*pdata->data_fft_r), 0 );
     pdata->data_fft_i = astCalloc( filt->dim, sizeof(*pdata->data_fft_i), 0 );
     pdata->filt = filt;
+    pdata->first = first;
+    pdata->apod_length = apod_length;
+    pdata->last = last;
     pdata->ijob = -1;   /* Flag job as ready to start */
 
 

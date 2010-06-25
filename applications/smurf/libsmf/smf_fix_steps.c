@@ -107,6 +107,9 @@
 *        presence of lots of steps.
 *     11-JUN-2010 (DSB):
 *        Report the number of fixed steps if in verbose mode.
+*     25-JUN-2010 (DSB):
+*        Apodisation is now done later in smf_execute_filter, so there
+*        is no need to apodise in this function.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -223,7 +226,7 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
 			      maxsteps, dim_t dcfitbox, int dcminbox,
 			      float dcminpop, double dcthresh, double
 			      dcthresh2, int dcmaxstepwidth, int pad_start,
-                              int pad_end, int itime_start, int itime_end,
+                              int itime_start, int itime_end,
                               int *nfixed, int *status DEBUG_ARGS );
 
 
@@ -377,7 +380,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
       pad_start = itime_start;
       pad_end = itime_end;
 
-/* Identify the first and last samples before/after padding and apodization. */
+/* Identify the first and last samples before/after padding. */
       smf_get_goodrange( qua, ntslice, tstride, SMF__Q_BOUND,
                          &itime_start, &itime_end, status );
 
@@ -694,7 +697,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
                                      dcmaxsteps*( ((double) tpop)/12000.0 ),
                                      dcfitbox, dcminbox, dcminpop, dcthresh,
                                      dcthresh2, dcmaxstepwidth, pad_start,
-                                     pad_end, itime_start, itime_end, &nfixed,
+                                     itime_start, itime_end, &nfixed,
                                      status DEBUG_VALS );
          }
 
@@ -809,7 +812,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
 					   itime_hi, NULL, 0, dcfitbox,
 					   dcminbox, dcminpop, 0.0,
 					   dcthresh2, dcmaxstepwidth, pad_start,
-                                           pad_end, itime_start, itime_end,
+                                           itime_start, itime_end,
                                            &nfixed, status DEBUG_VALS );
 
                }
@@ -1009,7 +1012,7 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
                               int itime_hi, int *common, int maxsteps,
                               dim_t dcfitbox, int dcminbox, float dcminpop,
                               double dcthresh, double dcthresh2,
-                              int dcmaxstepwidth, int pad_start, int pad_end,
+                              int dcmaxstepwidth, int pad_start,
                               int itime_start, int itime_end, int *nfixed,
                               int *status DEBUG_ARGS ){
 
@@ -1036,7 +1039,6 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
    int end_prev;
    int iblock;
    int itime;
-   int j;
    int jtime;
    int ncorr;
    int nstep;
@@ -1279,25 +1281,13 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
    } else {
       avecorr = sumcorr/ncorr;
 
-/* Add on the apodised correction at the start (skipping padding). There
-   may or may not be any apodised data, depending on whether smf_apodize has
-   already been called or not. */
-      int thelen = itime_start - pad_start - 1;
-      j = 0;
-      pd = dat + ibolo*bstride + pad_start*tstride;
-      for( itime = pad_start; itime < itime_start; itime++,j++) {
-         if( *pd != VAL__BADD ) {
-            *pd += ( -avecorr )*( 0.5 - 0.5*cos( AST__DPI * (double) j / thelen ) );
-         }
-         pd += tstride;
-      }
-
-/* The first dcmedianwidth slices after the apodised section have not been
+/* The first dcmedianwidth slices after the padding section have not been
    tested for steps, so all we can do is pass them through unchanged
    (except for adding the initial correction to ensure they are continuous
    with the corrected data). Note, "itime_lo" and "itime_hi" are offsets
    from "itime_start", not from zero. */
-      for( ; itime < itime_lo + itime_start; itime++) {
+      pd = dat + ibolo*bstride + pad_start*tstride;
+      for( itime = pad_start; itime < itime_lo + itime_start; itime++) {
          if( *pd != VAL__BADD ) *pd -= avecorr;
          pd += tstride;
       }
@@ -1320,7 +1310,7 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
          pq += tstride;
       }
 
-/* The last dcmedianwidth slices before the final apodised section have not
+/* The last dcmedianwidth slices before the final padding section have not
    been tested for steps, so all we can do is pass them through unchanged
    (except for adding the initial correction to ensure they are continuous
    with the corrected data). */
@@ -1329,19 +1319,8 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
          pd += tstride;
       }
 
-/* Add on the apodised correction at the end (skipping padding). */
-      thelen = pad_end - itime_end - 1;
-      j = thelen;
-      for( ; itime < pad_end; itime++,j--) {
-         if( *pd != VAL__BADD ) {
-            *pd += corr*( 0.5 - 0.5*cos( AST__DPI * (double) j / thelen ) );
-         }
-         pd += tstride;
-      }
-
 /* Incrment the total number of steps fixed so far. */
       *nfixed += nstep;
-
    }
 
    return result;

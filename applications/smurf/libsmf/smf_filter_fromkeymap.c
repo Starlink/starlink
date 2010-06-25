@@ -43,6 +43,8 @@
 *        Initial version.
 *     2010-06-21 (DSB):
 *        Store a a value for the "wlim" component of the filter structure.
+*     2010-06-25 (DSB):
+*        Store a a value for the "apod_length" component of the filter structure.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -97,6 +99,7 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap, int *dofilt,
   double f_notchlow[SMF__MXNOTCH]; /* Array low-freq. edges of notch filters */
   double f_notchhigh[SMF__MXNOTCH];/* Array high-freq. edges of notch filters */
   int f_nnotch=0;           /* Number of notch filters in array */
+  int ival;                 /* Dummy integer argument */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -129,6 +132,9 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap, int *dofilt,
     if( ! astMapGet0D( keymap, "FILT_WLIM", &(filt->wlim) ) ) {
        filt->wlim = VAL__BADD;
     }
+
+    astMapGet0I( keymap, "APOD", &ival );
+    filt->apod_length = ival;
 
   }
 }

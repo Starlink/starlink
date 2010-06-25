@@ -310,7 +310,7 @@ void smf_correct_steps( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
       alljump = NULL;
     }
 
-    /* identify first and last samples before/after padding+apodization */
+    /* identify first and last samples before/after padding */
     smf_get_goodrange( qua, ntslice, 1, SMF__Q_BOUND, &istart, &iend, status );
 
     /* Begin a job context. */

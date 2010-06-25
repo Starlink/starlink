@@ -58,3 +58,4 @@ com.boxmin  = 10
 
 450.flt.filt_edgehigh = 0.1
 850.flt.filt_edgehigh = 0.3
+flt.apod = 1000

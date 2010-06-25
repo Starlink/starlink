@@ -55,11 +55,14 @@
 
 *  Authors:
 *     Edward Chapin (UBC)
+*     David S Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     2010-05-31 (EC):
 *        Initial Version factored out of smurf_sc2clean and smf_iteratemap
+*     2010-06-25 (DSB):
+*        Move apodisation to smf_filter_execute.
 
 *  Copyright:
 *     Copyright (C) 2010 Univeristy of British Columbia.
@@ -105,7 +108,6 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
 
   /* Local Variables */
   size_t aiter;             /* Actual iterations of sigma clipper */
-  size_t apod;              /* Length of apodization window */
   double badfrac;           /* Fraction of bad samples to flag bad bolo */
   dim_t dcfitbox;           /* width of box for measuring DC steps */
   int dclimcorr;            /* Min. no. of bolos for a correlated step */
@@ -151,7 +153,7 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
   }
 
   /* Get cleaning parameters */
-  smf_get_cleanpar( keymap, &apod, &badfrac, &dcfitbox, &dcmaxsteps,
+  smf_get_cleanpar( keymap, NULL, &badfrac, &dcfitbox, &dcmaxsteps,
                     &dcthresh, &dcmedianwidth, &dclimcorr, &dkclean,
                     &fillgaps, NULL, NULL, NULL, NULL, NULL, NULL,
                     &flagstat, &order, &spikethresh, &spikeiter, status );
@@ -217,13 +219,6 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
                status, order );
     smf_scanfit( data, qua, order, status );
     smf_subtract_poly( data, qua, 0, status );
-  }
-
-  /* Apodization */
-  if( apod ) {
-    msgOutiff( MSG__VERB, "", FUNC_NAME": Apodizing data across %zu samples",
-               status, apod );
-    smf_apodize( data, qua, apod, status );
   }
 
   /* filter the data */

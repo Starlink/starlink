@@ -700,6 +700,7 @@ typedef struct smfTile {
 
 /* Structure to encapsulate frequency-domain filters implemented with FFTW. */
 typedef struct smfFilter {
+  size_t apod_length;   /* apodization length */
   double df;            /* frequency step for each sample [Hz] */
   dim_t dim;            /* number of samples in filt */
   double *imag;         /* Imaginary part of the filter */

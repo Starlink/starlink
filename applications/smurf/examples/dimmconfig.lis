@@ -257,6 +257,7 @@ noi.dcfitbox = 0
 
 450.flt.filt_edgehigh = 0.1
 850.flt.filt_edgehigh = 0.3
+flt.apod = 100
 
 #flt.filt_edgelow = 90
 #flt.filt_notchlow  = (25,55)

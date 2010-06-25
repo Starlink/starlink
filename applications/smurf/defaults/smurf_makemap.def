@@ -134,6 +134,7 @@ flt.notfirst = 0
 
 # which calls smf_filter_fromkeymap which calls smf_get_cleanpar
 
+flt.apod = 0
 flt.filt_edgelow = 0
 flt.filt_edgehigh = 0
 flt.filt_notchlow = <undef>

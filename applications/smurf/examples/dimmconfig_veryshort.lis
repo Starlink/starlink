@@ -49,3 +49,7 @@ com.gain_abstol = 5
 # weaker spike detection
 noi.spikethresh = 50
 noi.spikeiter = 0
+
+# No apodisation
+flt.apod = 0
+
