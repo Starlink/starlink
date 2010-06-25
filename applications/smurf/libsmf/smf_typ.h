@@ -408,9 +408,13 @@ typedef enum {
       if required)
    3. Add quality to smf_qual_str_to_val
    4. Add quality to smf_qual_str
-   5. If this is a compressible bit add it to the relevant test in
-      smf_qual_unmap
-   6. If this is a compressible bit add the decompression to smf_qual_map
+
+   If you have more than 8 bits in the quality family you now need to modify
+   smf_qual_map and smf_qual_unmap to indicate how the new bit maps to the
+   compressed version (e.g. TSERIES mapping to TCOMP). If this is the first
+   time that this family has exceeded 8 bits and there is no compressed
+   equivalent then a new family will be needed to handle the compression
+   and associated new code in map/unmap.
 
  */
 
@@ -464,7 +468,7 @@ typedef enum {
   SMF__TCOMPQ_TEL   = BIT_TO_VAL(4),
 } smf_tcomp_qual_bits;
 
-/* We have separate quality familys */
+/* We have separate quality families */
 typedef enum {
   SMF__QFAM_NULL,      /* No family */
   SMF__QFAM_TSERIES,   /* Time series quality */
