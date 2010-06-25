@@ -33,8 +33,8 @@
 # 0.0) will cause less data to be rejected. A value of <undef> causes the
 # old filtering algorithm to be used that is based on filling gaps with
 # artificial data.
-filt_wlim = 0.9
-flt.filt_wlim = 0.9
+filt_wlim = 0.5
+flt.filt_wlim = 0.5
 
 # Apodisation is not needed in the new algorithm, so we can save some
 # data samples by switching it off.
