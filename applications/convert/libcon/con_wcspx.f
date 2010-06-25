@@ -100,6 +100,8 @@
 *        New interface for ATL_WCSPX.
 *      16-APR-2008 (DSB):
 *        ATL_WCSPX now requires CRPIX rather than DIM.
+*     2010-06-24 (TIMJ):
+*        IFFREQ is a _DOUBLE not an _INTEGER.
 *     {enter_further_changes_here}
 
 *-
@@ -204,8 +206,8 @@
       CALL AST_MAPPUT0I( KM1, KEY, IVAL, ' ', STATUS )
 
       KEY = 'IFFREQ(1)'
-      CALL NDF_XGT0I( IMAP, 'SPECX', KEY, IVAL, STATUS )
-      CALL AST_MAPPUT0I( KM1, KEY, IVAL, ' ', STATUS )
+      CALL NDF_XGT0D( IMAP, 'SPECX', KEY, DVAL, STATUS )
+      CALL AST_MAPPUT0D( KM1, KEY, DVAL, ' ', STATUS )
 
 *  Extract the required items from the SPECX_MAP extension (if it exists),
 *  and put them in an AST KeyMap as required by ATL_WCSPX.
