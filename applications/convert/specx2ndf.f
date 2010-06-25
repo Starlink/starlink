@@ -250,6 +250,9 @@
 *        Add a variance component to the output NDF.
 *     21-APR-2008 (DSB):
 *        Add AXIS parameter.
+*     2010-06-24 (TIMJ):
+*        GSD bad value is 9999 so convert that to VAL__BADR when
+*        copying to the output.
 *     {enter_further_changes_here}
 
 *-
@@ -598,14 +601,14 @@
                MUPBND( 2 ) = 1
                CALL NDF_SBND( 3, MLWBND, MUPBND, INDF2, STATUS )
 
-*  Copy the data values.
+*  Copy the data values. GSD uses 9999 to mean a bad value and those will
+*  appear in SPECX data files unmodified. Convert them to Starlink bad values.
                CALL NDF_MAP( INDF1, 'DATA', '_REAL', 'READ', IPIN, EL,
      :                       STATUS )
                CALL NDF_MAP( INDF2, 'DATA', '_REAL', 'WRITE', IPOUT, EL,
      :                       STATUS )
-               CALL VEC_RTOR( .FALSE., EL, %VAL( CNF_PVAL( IPIN ) ),
-     :                        %VAL( CNF_PVAL( IPOUT ) ),
-     :                        IERR, NERR, STATUS )
+               CALL CON__CPGSD( EL, %VAL( CNF_PVAL( IPIN ) ),
+     :              %VAL( CNF_PVAL( IPOUT ) ), STATUS )
 
 *  Unmap the array components.
                CALL NDF_UNMAP( INDF1, '*', STATUS )
@@ -693,5 +696,30 @@
          CALL ERR_REP( 'SPECX2NDF_ERR', 'SPECX2NDF: failed to '//
      :                 'convert SPECX map file.', STATUS )
       END IF
+
+      END
+
+*  Helper routine to allow data copy with GSD bad value support.
+
+      SUBROUTINE CON__CPGSD( EL, INDATA, OUTDATA, STATUS )
+
+      INCLUDE 'PRM_PAR'
+      INCLUDE 'SAE_PAR'
+
+      INTEGER EL
+      REAL INDATA( * )
+      REAL OUTDATA( * )
+      INTEGER STATUS
+      INTEGER I
+
+      IF (STATUS .NE. SAI__OK) RETURN
+
+      DO I = 1, EL
+         IF ( INDATA( I ) .EQ. 9999 ) THEN
+            OUTDATA( I ) = VAL__BADR
+         ELSE
+            OUTDATA( I ) = INDATA( I )
+         END IF
+      END DO
 
       END
