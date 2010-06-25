@@ -882,6 +882,10 @@ f     - AST_TESTFITS: Test if a keyword has a defined value in a FitsChan
 *        Fix axis numbering in SkyPole.
 *     12-FEB-2010 (DSB):
 *        Use "<bad>" to represent AST__BAD externally.
+*     25-JUN-2010 (DSB):
+*        Fix problem rounding lots of 9's in RoundFString. The problem
+*        only affected negative values, and could lead to an extra zero
+*        being included in the integer part.
 *class--
 */
 
@@ -21662,7 +21666,7 @@ static void RoundFString( char *text, int width, int *status ){
 /* Retain one trailing zero before a decimal point. */
          if( *c == '.' ) c++;
 
-/* We put a terminator folling the last non-zero character. The
+/* We put a terminator following the last non-zero character. The
    terminator is the exponent, if there was one, or a null character. */
          c++;
          if( exp ) {
@@ -21767,7 +21771,9 @@ static void RoundFString( char *text, int width, int *status ){
          if( neg ) *(c++) = '-';
          *(c++) = '1';
 
-/* Now put in the correct number of zeros. */
+/* Now find the number of zeros to place after the leading "1". This is
+   the number of characters in front of the terminator marking the end of
+   the integer part of the number. */
          if( dot ) {
             nzero = dot - start;
          } else if( exp ) {
@@ -21775,6 +21781,12 @@ static void RoundFString( char *text, int width, int *status ){
          } else {
             nzero = last - start;
          }
+
+/* If the number is negative, the above count will include the leading
+   minus sign, which is not a digit. So reduce the count by one. */
+         if( neg ) nzero--;
+
+/* Now put in the correct number of zeros. */
          for( i = 0; i < nzero; i++ ) *(c++) = '0';
 
 /* If the original string containsed a decimal point, make sure the
