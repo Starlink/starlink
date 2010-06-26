@@ -45,6 +45,8 @@
 *        Original
 *     2008-03-19 (JB):
 *        Removed unused variables.
+*     2010-06-25 (TIMJ):
+*        Use strncasecmp
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -93,28 +95,22 @@ void gsdac_velEncode ( const char *vframe, const char *vdef,
   int i;                      /* index for vdef */
   int j;                      /* index for vframe */
   int k;                      /* loop counter */
-  char upper[3];              /* uppercase string */
   const char *vdefs[] = { "", "RAD", "OPT", "REL" };
   const char *vframes[] = { "", "TOPO", "LSR", "HELI", "GEO", "BARY", "TELL" };
 
   /* Check inherited status */
   if ( *status != SAI__OK ) return;
 
-  /* Get the first three characters of the GSD velocity def'n
-     in uppercase. */
-  strncpy ( upper, vdef, 3 );
-
-  for ( k = 0; k < 3; k++ ) {
-    upper[k] = toupper ( upper[k] );
+  /* compare input with values in vdefs */
+  i = 0;
+  for (k=1; k<=3; k++) {
+    if (strncasecmp( vdef, vdefs[k], 3 ) == 0 ) {
+      i = k;
+      break;
+    }
   }
 
-  /* Find the corresponding vdefs index. */
-  i = 1;
-  while ( i <= 3 && ( strncmp ( upper, vdefs[i], 3 ) != 0 ) ) {
-    i++;
-  }
-
-  if ( i > 3 ) {
+  if ( i == 0 ) {
     msgOut ( FUNC_NAME,
              "Did not understand velocity definition string, assuming RADIO.",
              status );
@@ -122,18 +118,13 @@ void gsdac_velEncode ( const char *vframe, const char *vdef,
   }
 
 
-  /* Get the first three characters of the GSD velocity frame
-     in uppercase. */
-  strncpy ( upper, vframe, 3 );
-
-  for ( k = 0; k < 3; k++ ) {
-    upper[k] = toupper ( upper[k] );
-  }
-
-  /* Find the corresponding vframes index. */
-  j = 1;
-  while ( j <= 6 && ( strncmp ( upper, vframes[j], 3 ) != 0 ) ) {
-    j++;
+  /* compare input with values in vframes */
+  j = 0;
+  for (k=1; k<=6; k++) {
+    if (strncasecmp( vframe, vframes[k], 3 ) == 0 ) {
+      j = k;
+      break;
+    }
   }
 
   /* Equate BARYCENTRIC with GEOCENTRIC. */
@@ -142,7 +133,7 @@ void gsdac_velEncode ( const char *vframe, const char *vdef,
   /* Equsate TELLURIC with TOPOCENTRIC. */
   if ( j == 6 ) j = 1;
 
-  if ( j > 6 ) {
+  if ( j == 0 ) {
     msgOut ( FUNC_NAME,
              "Did not understand velocity frame string, assuming LSR.",
              status );
