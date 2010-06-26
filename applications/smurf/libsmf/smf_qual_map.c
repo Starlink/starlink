@@ -97,9 +97,10 @@ smf_qual_t * smf_qual_map( int indf, const char mode[], smf_qfam_t *family,
                            size_t *nmap, int * status ) {
 
   size_t i;             /* Loop counter */
+  int itemp = 0;        /* temporary int */
   smf_qfam_t lfamily = SMF__QFAM_NULL; /* Local quality family */
-  int nout;             /* Number of elements mapped */
-  int numqn = 0;        /* number of quality names */
+  size_t nout;          /* Number of elements mapped */
+  size_t numqn = 0;     /* number of quality names */
   IRQLocs *qlocs = NULL;/* IRQ Quality */
   unsigned char *qmap;  /* pointer to mapped unsigned bytes */
   void *qpntr[1];       /* Somewhere to put the mapped pointer */
@@ -110,7 +111,8 @@ smf_qual_t * smf_qual_map( int indf, const char mode[], smf_qfam_t *family,
   if (*status != SAI__OK) return retval;
 
   /* how many elements do we need */
-  ndfSize( indf, &nout, status );
+  ndfSize( indf, &itemp, status );
+  nout = itemp;
   if (nmap) *nmap = nout;
 
   /* malloc the QUALITY buffer */
@@ -136,7 +138,7 @@ smf_qual_t * smf_qual_map( int indf, const char mode[], smf_qfam_t *family,
   }
 
   /* Map the quality component (we always need to do this) */
-  ndfMap( indf, "QUALITY", "_UBYTE", mode, &qpntr[0], &nout, status );
+  ndfMap( indf, "QUALITY", "_UBYTE", mode, &qpntr[0], &itemp, status );
   qmap = qpntr[0];
 
   /* Need to find out what quality names are in play so we

@@ -246,7 +246,6 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
       *status = SAI__ERROR;
       errRep(" ", "Interpolation not yet supported for dark subtract", status);
       return;
-      break;
   case SMF__DKSUB_MEAN:
     if (!dark1 || !dark2) {
       *status = SAI__ERROR;

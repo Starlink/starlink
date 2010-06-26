@@ -329,7 +329,7 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
 
       if (*status == SAI__OK) {
         for (bol = 0; bol < nbols; bol++) {
-          int idx;
+          size_t idx;
           size_t nused;
           size_t ndata = nind;
 
@@ -413,7 +413,7 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
           double mean = VAL__BADD;
           double sigma = VAL__BADD;
           size_t ngood = 0;
-          int idx;
+          size_t idx;
 
           /* Get the polynomial data */
           for (idx = 0; idx <= skyorder; idx++) {
@@ -422,7 +422,7 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
           }
 
           /* Obtain the measurements for that bolometer */
-          for (idx = 0; idx < nind; idx++ ) {
+          for (idx = 0; idx < (size_t)nind; idx++ ) {
             size_t slice = indices[idx];
             double poly = 0.0;
             idata[idx] = ffdata[ bol*bstride + slice*tstride ];
@@ -436,7 +436,7 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
                  into topcat */
               /*
               if (bol == 334) {
-                printf( "VALUES %zd %d %d %d %g %g\n", slice, idx, heatval[i],idata[idx], poly, (double)idata[idx] - poly);
+                printf( "VALUES %zu %zu %d %d %g %g\n", slice, idx, heatval[i],idata[idx], poly, (double)idata[idx] - poly);
               }
               */
 

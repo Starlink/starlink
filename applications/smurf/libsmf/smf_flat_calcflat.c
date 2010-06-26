@@ -174,7 +174,7 @@ smf_flat_calcflat( msglev_t msglev, const char flatname[],
     /* now coeffs is in fact the new bolval */
     if (*status == SAI__OK && coeffs) {
       double *flatpar = (powref->pntr)[0];
-      int idx = 0;
+      dim_t idx = 0;
 
       smf_close_file( &bolref, status );
       bolref = coeffs;

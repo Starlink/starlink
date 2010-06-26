@@ -116,7 +116,6 @@ void smf_apply_mask( smfData *indata, smf_qual_t *quality,
   smfData * bbm1 = NULL;
   smfData * bbm2 = NULL;
   smfData * bbm = NULL;
-  smfFile * file = NULL;
   int masked = 0;
   smf_qual_t *qua=NULL;
 

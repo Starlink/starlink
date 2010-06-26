@@ -228,7 +228,7 @@ void smf_dump_smfData( const smfData *data, int showflags __attribute__((unused)
   if ( data->history == NULL ) {
     msgOut("", "  history = NULL", status );
   } else {
-    int nrec = astMapSize( data->history );
+    size_t nrec = astMapSize( data->history );
     if (nrec == 0) {
       msgOut( "", "  history = empty", status );
     } else {

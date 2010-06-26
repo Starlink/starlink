@@ -178,7 +178,7 @@ void gsdac_getMapVars ( const gsdVars *gsdVars, const char *samMode,
       errRep ( FUNC_NAME, "Equatorial coordinates not supported", status );
       return;
       /*strcpy ( mapVars->loclCrd, "HADEC" ); */
-      break;
+      /*break;*/
     case COORD_RD:
       strcpy ( mapVars->loclCrd, "APP" );
       break;

@@ -365,11 +365,11 @@ int smf_fix_metadata_acsis ( msglev_t msglev, smfData * data, int have_fixed, in
   fitsvals.chop_thr = VAL__BADD;
   fitsvals.chop_pa = VAL__BADD;
   fitsvals.rot_pa = VAL__BADD;
-  strcpy( fitsvals.chop_crd, "" );
-  strcpy( fitsvals.rot_crd, "" );
-  strcpy( fitsvals.instrume, "" );
-  strcpy( fitsvals.obsid, "" );
-  strcpy( fitsvals.obsidss, "" );
+  *(fitsvals.chop_crd) = '\0';
+  *(fitsvals.rot_crd) = '\0';
+  *(fitsvals.instrume) = '\0';
+  *(fitsvals.obsid) = '\0';
+  *(fitsvals.obsidss) = '\0';
 
   smf_getfitsi( hdr, "OBSNUM", &(fitsvals.obsnum), status );
   smf_getfitsi( hdr, "UTDATE", &(fitsvals.utdate), status );

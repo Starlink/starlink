@@ -172,6 +172,7 @@
 #include "star/grp.h"
 #include "star/hds.h"
 #include "star/ndg.h"
+#include "star/one.h"
 #include "ast.h"
 #include "ems.h"
 #include "sc2da/sc2ast.h"
@@ -221,8 +222,8 @@ void smurf_mon( int * status ) {
 
   /* Get the GRP and HDS status for leak checking - need the task name
      to mask out parameter names. Also need to mask out the monlith name */
-  strcpy(filter, "!SMURF_MON,!");
-  strcat(filter, taskname );
+  one_strlcpy( filter, "!SMURF_MON,!", sizeof(filter), status);
+  one_strlcat( filter, taskname, sizeof(filter), status );
   grpInfoi( NULL, 0, "NGRP", &ngrp0, status );
   hdsInfoI( NULL, "LOCATORS", filter, &nloc0, status );
 

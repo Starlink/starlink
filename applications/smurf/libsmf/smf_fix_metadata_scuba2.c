@@ -183,7 +183,7 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
 
   /* Read some FITS headers, intialising the struct first */
   fitsvals.utdate = VAL__BADI;
-  strcpy( fitsvals.instrume, "" );
+  *(fitsvals.instrume) = '\0';
   smf_getfitsi( hdr, "UTDATE", &(fitsvals.utdate), status );
   smf_getfitss( hdr, "INSTRUME", fitsvals.instrume, sizeof(fitsvals.instrume), status );
 

@@ -164,7 +164,7 @@ void gsdac_putJCMTStateC ( const gsdVars *gsdVars, const unsigned int stepNum,
       errRep ( FUNC_NAME, "Equatorial coordinates not supported", status );
       return;
       /*strcpy ( record->tcs_tr_sys, "HADEC" ); */
-      break;
+      /* break; */
     case COORD_RD:
       strcpy ( record->tcs_tr_sys, "APP" );
       break;

@@ -346,7 +346,6 @@ void smurf_sc2clean( int *status ) {
       if( dkclean && ffdata && ffdata->da && ffdata->da->dksquid ) {
         smfData *dksquid = ffdata->da->dksquid;
         AstKeyMap *kmap=NULL;
-        dim_t ndata;
 
         msgOut("", TASK_NAME ": cleaning dark squids", status);
 

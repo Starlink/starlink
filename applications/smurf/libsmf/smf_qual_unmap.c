@@ -113,8 +113,9 @@ smf_qual_t * smf_qual_unmap( int indf, smf_qfam_t family, smf_qual_t * qual, int
   if ( canwrite && qual ) {
     int highbit = -1; /* highest bit used */
     size_t i;
+    int itemp;
     int lowbit = -1;  /* Lowest bit used */
-    int nout;
+    size_t nout;
     int nqual = 0;
     void *qpntr[1];
     size_t qcount[SMF__NQBITS]; /* statically allocate the largest array */
@@ -141,7 +142,8 @@ smf_qual_t * smf_qual_unmap( int indf, smf_qfam_t family, smf_qual_t * qual, int
     }
 
     /* how many pixels in NDF (assumed to be number in quality) */
-    ndfSize( indf, &nout, status );
+    ndfSize( indf, &itemp, status );
+    nout = itemp;
 
     /* Work out which bits are actually used */
     if (*status == SAI__OK) {
@@ -189,7 +191,7 @@ smf_qual_t * smf_qual_unmap( int indf, smf_qfam_t family, smf_qual_t * qual, int
        names need to be set BEFORE we copy. */
 
     /* Map the quality component with WRITE access */
-    ndfMap( indf, "QUALITY", "_UBYTE", "WRITE", &qpntr[0], &nout, status );
+    ndfMap( indf, "QUALITY", "_UBYTE", "WRITE", &qpntr[0], &itemp, status );
     qmap = qpntr[0];
 
     /* we assume the number of elements in "qual" is the same as in "qmap" */
@@ -208,7 +210,7 @@ smf_qual_t * smf_qual_unmap( int indf, smf_qfam_t family, smf_qual_t * qual, int
         /* and the quality names. Start at lowbit and go to highbit
            knowing that we have shifted them down so that lowbit in qual
            is bit 0 in NDF. */
-        for (k=lowbit; k<=highbit; k++) {
+        for (k=lowbit; k<=(size_t)highbit; k++) {
           if (qcount[k]) {
             int fixed = 0;             /* is bit fixed? */
             const char * qdesc = NULL; /* Description of quality */
@@ -226,7 +228,7 @@ smf_qual_t * smf_qual_unmap( int indf, smf_qfam_t family, smf_qual_t * qual, int
           curbit = 0;
           qmap[i] = 0;
 
-          for (k=lowbit; k<=highbit; k++) {
+          for (k=lowbit; k<=(size_t)highbit; k++) {
             /* was this bit used by this data array? */
             if (qcount[k]) {
               /* was the bit set for this location? */

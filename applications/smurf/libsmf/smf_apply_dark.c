@@ -89,7 +89,6 @@ int smf_apply_dark( smfData *indata, const smfArray *darks,
   size_t dark2;
   smfData * dkdata1 = NULL;
   smfData * dkdata2 = NULL;
-  smfFile * file = NULL;
   int retval = 0;
 
   if (*status != SAI__OK) return retval;

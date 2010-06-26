@@ -146,7 +146,7 @@ size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snr
   size_t nbol;                 /* number of bolometers */
   size_t nheat;                /* number of heater measurements */
   size_t ngood = 0;            /* number of valid responsivities */
-  int nrgood = 0;              /* number of good responsivities for bolo */
+  size_t nrgood = 0;           /* number of good responsivities for bolo */
   double *poly = NULL;         /* polynomial expansion of each fit */
   double *polybol = NULL;      /* polynomial expansion for all bolometers */
   double *powv = NULL;         /* Temp space for power values */
@@ -161,7 +161,6 @@ size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snr
   const int usevar = 1;
   const double MINRESP = 0.1e6;/* Minimum "in specification" responsivity A/W */
   const double MAXRESP = 5.0e6;/* Maximum "in specification" responsivity A/W */
-  const double CLIP    = 3.0;  /* Sigma clipping for responsivity fit */
 
   if (*status != SAI__OK) return ngood;
 

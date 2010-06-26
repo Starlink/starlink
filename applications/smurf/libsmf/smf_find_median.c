@@ -156,7 +156,6 @@ int *smf_find_median( const float *farray, const double *darray, size_t nel,
        tfarray = astFree( tfarray );
 
      } else {
-       double dmedian;
        tdarray = astStore( NULL, darray, nel*sizeof( *tdarray ) );
        kpg1Medud( 1, nel, tdarray, &dmedian, &neluse, status );
        tdarray = astFree( tdarray );

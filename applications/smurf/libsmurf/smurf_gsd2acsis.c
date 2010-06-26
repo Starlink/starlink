@@ -125,6 +125,7 @@
 #include "gsd.h"
 #include "sae_par.h"
 #include "par.h"
+#include "star/one.h"
 
 /* SMURF includes */
 #include "smurflib.h"
@@ -164,7 +165,7 @@ void smurf_gsd2acsis( int *status ) {
 
   if ( *status == PAR__NULL ) {
     errAnnul ( status );
-    strcpy ( directory, "." );
+    one_strlcpy ( directory, ".", sizeof(directory), status );
   }
 
   msgOutif(MSG__VERB," ",
