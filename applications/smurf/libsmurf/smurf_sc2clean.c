@@ -387,6 +387,7 @@ void smurf_sc2clean( int *status ) {
   /* Tidy up after ourselves: release the resources used by the grp routines */
   if (darks) smf_close_related( &darks, status );
   if (flatramps) smf_close_related( &flatramps, status );
+  if (bbms) smf_close_related( &bbms, status );
   grpDelet( &igrp, status);
   grpDelet( &ogrp, status);
   if( wf ) wf = smf_destroy_workforce( wf );
