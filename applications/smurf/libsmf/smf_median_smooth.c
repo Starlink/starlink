@@ -4,7 +4,7 @@
 *     smf_median_smooth
 
 *  Purpose:
-*     Smooth a 1D data array using a fast median box filter.
+*     Smooth a 1D data array using a fast median, minimum or maximum box filter.
 
 *  Language:
 *     Starlink ANSI C
@@ -13,14 +13,19 @@
 *     C function
 
 *  Invocation:
-*     void smf_median_smooth( dim_t box, dim_t el, const double *dat,
-*                             const smf_qual_t *qua, size_t stride,
-*                             smf_qual_t mask, double *out, double *w1,
-*                             double *w2, int *status )
+*     void smf_median_smooth( dim_t box, int filter_type, dim_t el,
+*                             const double *dat, const smf_qual_t *qua,
+*                             size_t stride, smf_qual_t mask, double *out,
+*                             double *w1, double *w2, int *status )
 
 *  Arguments:
 *     box = dim_t (Given)
 *        The width of the box.
+*     filter_type = int (Given)
+*        The type of filter to use:
+*        0: Replace each value with the median of the local values
+*        1: Replace each value with the minimum of the local values
+*        2: Replace each value with the maximum of the local values
 *     el = dim_t (Given)
 *        The number of elements to used from the data array (each
 *        separated by a step of "stride").
@@ -46,13 +51,14 @@
 
 *  Description:
 *     This routine creates a 1D output array in which each value is the
-*     median of the input values in a box of width "box", centred on the
-*     output value. The method attempts to be efficient in that it avoids
-*     sorting the list of values in the filter box for every output value.
-*     Instead, it modifies the filter box for the previous output value -
-*     which is known already to be sorted - by removing the oldest
-*     value in the box and inserting a new value value at the correct
-*     place in the list.
+*     median, minimum or maximum (as selected via "filter_type") of the
+*     input values in a box of width "box", centred on the output value.
+*
+*     The method attempts to be efficient in that it avoids sorting the
+*     list of values in the filter box for every output value. Instead, it
+*     modifies the filter box for the previous output value - which is
+*     known already to be sorted - by removing the oldest value in the box
+*     and inserting a new value value at the correct place in the list.
 
 *  Authors:
 *     David S Berry (JAC, Hawaii)
@@ -64,6 +70,8 @@
 *     18-MAY-2010 (DSB):
 *        Fix buffer over-run caused by incorrect value for ihi that sets
 *        the end of the main iout loop.
+*     28-JUN-2010 (DSB):
+*        Added argument "filter_type".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -103,10 +111,10 @@
 /* Other includes */
 #include <gsl/gsl_sort.h>
 
-void smf_median_smooth( dim_t box, dim_t el, const double *dat,
-                        const smf_qual_t *qua, size_t stride,
-                        smf_qual_t mask, double *out, double *w1,
-                        double *w2, int *status ){
+void smf_median_smooth( dim_t box, int filter_type, dim_t el,
+                        const double *dat, const smf_qual_t *qua,
+                        size_t stride, smf_qual_t mask, double *out,
+                        double *w1, double *w2, int *status ){
 
 /* Local Variables: */
    const double *pdat;         /* Pointer to next bolo data value */
@@ -124,9 +132,16 @@ void smf_median_smooth( dim_t box, dim_t el, const double *dat,
    int iadd;                   /* Index within box at which to store new value */
    int iremove;                /* Index within box of element to be removed */
 
-
 /* Check inherited status */
    if( *status != SAI__OK ) return;
+
+/* Check the filter type. */
+   if( filter_type < 0 || filter_type > 2 ) {
+      *status = SAI__ERROR;
+      msgSeti( "T", filter_type );
+      errRep( " ", "smf_median_smooth: Illegal filter type value ^T "
+              "(internal SMURF programming error).", status );
+   }
 
 /* First initialise the filter box to contain the first "box" values from the
    supplied array. Do not store bad or flagged values in the filter box. The
@@ -183,6 +198,12 @@ void smf_median_smooth( dim_t box, dim_t el, const double *dat,
    the box is empty use VAL__BADD. */
       if( inbox == 0 ) {
          *(pout++) = VAL__BADD;
+
+      } else if( filter_type == 1 ) {
+         *(pout++) = w1[ 0 ];
+
+      } else if( filter_type == 2 ) {
+         *(pout++) = w1[ inbox - 1 ];
 
       } else if( inbox % 2 == 1 ) {
          *(pout++) = w1[ inbox/2 ];
