@@ -194,6 +194,8 @@
 *        Add TWO component model
 *     2010-06-10 (EC):
 *        Add dark squid cleaning
+*     2010-06-28 (AGG):
+*        Update POSIX version to 200809L to build on Fedora 13
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -223,7 +225,7 @@
 */
 
 /* Need ftruncate to be prototyped */
-#define _POSIX_C_SOURCE 200112L
+#define _POSIX_C_SOURCE 200809L
 
 /* General includes */
 #include <sys/mman.h>
