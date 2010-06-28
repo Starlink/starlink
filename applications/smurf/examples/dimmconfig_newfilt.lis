@@ -41,7 +41,3 @@ flt.filt_wlim = 0.5
 apod=0
 flt.apod=0
 
-# Also there is no need to gap fill, which will save us some time.
-fillgaps=0
-noi.fillgaps=0
-
