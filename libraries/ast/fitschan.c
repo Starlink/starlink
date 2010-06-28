@@ -886,6 +886,10 @@ f     - AST_TESTFITS: Test if a keyword has a defined value in a FitsChan
 *        Fix problem rounding lots of 9's in RoundFString. The problem
 *        only affected negative values, and could lead to an extra zero
 *        being included in the integer part.
+*     28-JUN-2010 (DSB):
+*        Another problem in RoundFString! If the value has a series of
+*        9's followed by a series of zeros, with no decimal point (e.g.
+*        "260579999000"), then the trailing zeros were being lost.
 *class--
 */
 
@@ -21663,7 +21667,7 @@ static void RoundFString( char *text, int width, int *status ){
 /* If any trailing zeros were found... */
       if( c > text ) {
 
-/* Retain one trailing zero before a decimal point. */
+/* Retain one trailing zero after a decimal point. */
          if( *c == '.' ) c++;
 
 /* We put a terminator following the last non-zero character. The
@@ -21745,9 +21749,14 @@ static void RoundFString( char *text, int width, int *status ){
    is no danger of a carry. */
          *a = *a + 1;
 
-/* Fill with zeros up to the decimal point. */
+/* Fill with zeros up to the decimal point, or to  the end if there is no
+   decimal point. */
          c = a + 1;
-         while( dot && c < dot ) *(c++) = '0';
+         if( dot ) {
+            while( c < dot ) *(c++) = '0';
+         } else {
+            while( *c ) *(c++) = '0';
+         }
 
 /* Now make "c" point to the first character for the terminator. This is
    usually the character following the last non-nine digit. However, if
@@ -21766,7 +21775,7 @@ static void RoundFString( char *text, int width, int *status ){
 /* Put the modified text at the left of the available space. */
          c = text;
 
-/* Start with a munus sing if needed, followed by the leading "1" (caused
+/* Start with a minus sing if needed, followed by the leading "1" (caused
    by the overflow from the long string of 9's). */
          if( neg ) *(c++) = '-';
          *(c++) = '1';
@@ -21798,7 +21807,7 @@ static void RoundFString( char *text, int width, int *status ){
 
       }
 
-/* We put a terminator folling the last non-zero character. The
+/* We put a terminator following the last non-zero character. The
    terminator is the exponent, if there was one, or a null character. */
       if( c ) {
          if( exp ) {
