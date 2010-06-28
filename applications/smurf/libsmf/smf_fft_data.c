@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     pntr = smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
-*                          int *status );
+*                          smf_qual_t *quality, size_t len, int *status );
 
 *  Arguments:
 *     wf = smfWorkForce * (Given)
@@ -23,6 +23,15 @@
 *        Pointer to the input smfData
 *     inverse = int (Given)
 *        If set perform inverse transformation. Otherwise forward.
+*     quality = smf_qual_t * (Given)
+*        If set, use this buffer instead of QUALITY associated with indata.
+*        If NULL, use the QUALITY associated with indata.
+*     len = size_t (Given)
+*        Number of samples over which to apply apodization. Can be set to
+*        SMF__MAXAPLEN in which case the routine will automatically apodize
+*        the entire data stream (maximum valid value of len). Set it to
+*        zero to prevent apodisation (e.g. if the data has already been
+*        apodised).
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -71,6 +80,10 @@
 *         submitted within this function.
 *     2009-10-28 (DSB):
 *         Use sc2ast_make_bolo_frame.
+*     2010-06-28 (DSB):
+*         Added arguments qyality and len (needed since with the new
+*         filtering scheme, the data may not have been apodised on entry
+*         to this function).
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -226,7 +239,7 @@ void smfFFTDataParallel( void *job_data_ptr, int *status ) {
 #define FUNC_NAME "smf_fft_data"
 
 smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
-                       int *status ) {
+                       smf_qual_t *quality, size_t len, int *status ) {
   double *baseR=NULL;           /* base pointer to real part of transform */
   double *baseI=NULL;           /* base pointer to imag part of transform */
   double *baseB=NULL;           /* base pointer to bolo in time domain */
@@ -294,6 +307,9 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
   if( indata->isTordered && (indata->ndims == 3) ) {
     smf_dataOrder( data, 0, status );
   }
+
+  /* Apodise the data if required. */
+  if( len ) smf_apodize( data, quality, len, status );
 
   /* Data dimensions. Time dimensions are either 1-d or 3-d. Frequency
      dimensions are either 2- or 4-d to store the real and imaginary

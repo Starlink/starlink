@@ -510,7 +510,7 @@ void smf_apply_mask( smfData *indata, smf_qual_t *quality,
 void smf_bolonoise( smfWorkForce *wf, const smfData *data,
                     smf_qual_t *quality, size_t window, double f_low,
                     double f_white1, double f_white2, double flagratio,
-                    int nep, double *whitenoise, double *fratio,
+                    int nep, size_t len, double *whitenoise, double *fratio,
                     smfData **fftpow,int *status );
 
 double smf_calc_covar( const smfData *data, const size_t i, const size_t j,
@@ -864,7 +864,7 @@ smfData *smf_fft_avpspec( const smfData *pspec, smf_qual_t *quality,
 void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status );
 
 smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
-                       int *status );
+                       smf_qual_t *quality, size_t len, int *status );
 
 void  smf_fillgaps( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
                     smf_qual_t mask, int *status );

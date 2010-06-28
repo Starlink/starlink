@@ -142,6 +142,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
   /* Local Variables */
   size_t aiter;                 /* Actual iterations of sigma clipper */
+  size_t apod_length;           /* Apodisation length */
   size_t bstride;               /* bolometer stride */
   int dcmaxsteps;               /* Maximum allowed number of dc jumps */
   dim_t dcfitbox;               /* Width of box for DC step detection */
@@ -153,6 +154,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   dim_t id;                     /* Loop counter */
   dim_t idx=0;                  /* Index within subgroup */
   dim_t im;                     /* Loop counter */
+  int ival;                     /* Integer value */
   dim_t j;                      /* Loop counter */
   AstKeyMap *kmap=NULL;         /* Local keymap */
   size_t mbstride;              /* model bolometer stride */
@@ -198,6 +200,9 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
                       &spikethresh, &spikeiter, status );
   }
 
+  /* Get apodisation length. */
+  astMapGet0I( keymap, "APOD", &ival );
+  apod_length = ival;
 
   /* Initialize chisquared */
   dat->chisquared[chunk] = 0;
@@ -233,7 +238,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
       if( flags & SMF__DIMM_FIRSTITER ) {
         /* Measure the noise from power spectra */
         smf_bolonoise( wf, res->sdata[idx], qua_data, 0, 0.5, SMF__F_WHITELO,
-                       SMF__F_WHITEHI, 0, 0, var, NULL, NULL, status );
+                       SMF__F_WHITEHI, 0, 0, apod_length, var, NULL, NULL, status );
 
         for( i=0; i<nbolo; i++ ) if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {
             /* Loop over time and store the variance for each sample */

@@ -16,7 +16,7 @@
 *     smf_bolonoise( smfWorkForce *wf, const smfData *data,
 *                    smf_qual_t *quality, size_t window, double f_low,
 *                    double f_white1, double f_white2, double flagratio,
-*                    int nep, double *whitenoise, double *fratio,
+*                    int nep, size_t len, double *whitenoise, double *fratio,
 *                    smfData **fftpow, int *status )
 
 *  Arguments:
@@ -40,6 +40,12 @@
 *     nep = int (Given)
 *        If set, calculate whitenoise in 1 second of averaged time-series data
 *        by dividing by the sample rate.
+*     len = size_t (Given)
+*        Number of samples over which to apply apodization. Can be set to
+*        SMF__MAXAPLEN in which case the routine will automatically apodize
+*        the entire data stream (maximum valid value of len). Set it to
+*        zero to prevent apodisation (e.g. if the data has already been
+*        apodised).
 *     whitenoise = double* (Returned)
 *        Externally allocated array (nbolos) that will hold estimates of
 *        the mean-square variances in bolo signals produced by white noise.
@@ -149,7 +155,7 @@
 void smf_bolonoise( smfWorkForce *wf, const smfData *data,
                     smf_qual_t *quality, size_t window, double f_low,
                     double f_white1, double f_white2, double flagratio,
-                    int nep, double *whitenoise, double *fratio,
+                    int nep, size_t len, double *whitenoise, double *fratio,
                     smfData **fftpow,int *status ) {
 
   double *base=NULL;       /* Pointer to base coordinates of array */
@@ -211,7 +217,7 @@ void smf_bolonoise( smfWorkForce *wf, const smfData *data,
   if( fratio ) for(i=0; i<nbolo; i++) fratio[i] = VAL__BADD;
 
   /* FFT the data and convert to polar power form */
-  pow = smf_fft_data( wf, data, 0, status );
+  pow = smf_fft_data( wf, data, 0, quality, len, status );
   smf_convert_bad(  pow, status );
   smf_fft_cart2pol( pow, 0, 1, status );
   smf_isfft( pow, NULL, NULL, &nf, status );

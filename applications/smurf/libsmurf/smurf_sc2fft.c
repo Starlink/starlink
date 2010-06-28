@@ -326,7 +326,7 @@ void smurf_sc2fft( int *status ) {
 	    freqlo = 1. / (idata->hdr->steptime * idata->hdr->nframes);
 
             smf_bolonoise( wf, idata, NULL, 1, freqlo, SMF__F_WHITELO,
-                           SMF__F_WHITEHI, 0, 1, whitenoise, NULL, &odata,
+                           SMF__F_WHITEHI, 0, 1, 0, whitenoise, NULL, &odata,
                            status );
 
             /* Initialize quality */
@@ -384,7 +384,7 @@ void smurf_sc2fft( int *status ) {
             }
 
             /* Tranform the data */
-            odata = smf_fft_data( wf, idata, inverse, status );
+            odata = smf_fft_data( wf, idata, inverse, NULL, 0, status );
             smf_convert_bad( odata, status );
 
             if( inverse ) {
