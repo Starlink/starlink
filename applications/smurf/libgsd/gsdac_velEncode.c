@@ -73,7 +73,7 @@
 */
 
 /* Standard includes */
-#include <string.h>
+#include <strings.h>
 #include <ctype.h>
 
 /* Starlink includes */
