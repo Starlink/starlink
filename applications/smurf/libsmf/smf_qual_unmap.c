@@ -53,6 +53,8 @@
 *  History:
 *     2010-06-17 (TIMJ):
 *        Initial version
+*     2010-06-29 (TIMJ):
+*        Always create new IRQ structure when writing out.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -170,22 +172,18 @@ smf_qual_t * smf_qual_unmap( int indf, smf_qfam_t family, smf_qual_t * qual, int
       }
     }
 
-    /* for IRQ we need to ensure the SMURF extension exists so open and annul it if it is missing. */
-    if (*status == SAI__OK) {
-      char xname[DAT__SZNAM+1];
-      irqFind( indf, &qlocs, xname, status );
-      if (*status == IRQ__NOQNI) {
-        errAnnul( status );
-        ndfXstat( indf, SMURF__EXTNAME, &there, status );
-        if (!there) {
-          HDSLoc * smurfloc = NULL;
-          /* Create SMURF extension if it does not already exist */
-          ndfXnew( indf, SMURF__EXTNAME, SMURF__EXTTYPE, 0, NULL, &smurfloc, status );
-          if (smurfloc) datAnnul( &smurfloc, status );
-        }
-        irqNew( indf, SMURF__EXTNAME, &qlocs, status );
-      }
+    /* for IRQ we need to ensure the SMURF extension exists so open and annul it if it is missing.
+       We are completely rewriting any IRQ information so we have to delete any previously existing
+       IRQ extension. */
+    irqDelet( indf, status );
+    ndfXstat( indf, SMURF__EXTNAME, &there, status );
+    if (!there) {
+      HDSLoc * smurfloc = NULL;
+      /* Create SMURF extension if it does not already exist */
+      ndfXnew( indf, SMURF__EXTNAME, SMURF__EXTTYPE, 0, NULL, &smurfloc, status );
+      if (smurfloc) datAnnul( &smurfloc, status );
     }
+    irqNew( indf, SMURF__EXTNAME, &qlocs, status );
 
     /* malloced so we need to map and copy over the values. IRQ
        names need to be set BEFORE we copy. */
