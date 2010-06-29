@@ -48,6 +48,7 @@
 
 *  Authors:
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     DSB: David S Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -61,6 +62,8 @@
 *        behaves better at the ends (despite being 10 times slower).
 *     2010-06-11 (TIMJ):
 *        Tweak quality handling one more time
+*     2010-06-29 (DSB):
+*        Add option for median smoothing.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -113,6 +116,7 @@ void smf_calcmodel_smo( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   smf_qual_t * bolqua = NULL;/* single bolometer quality */
   size_t boxcar = 0;            /* size of boxcar smooth window */
   int boxcar_i=0;               /* width in samples of boxcar filter */
+  int filter_type;              /* The type of smoothing to perform */
   size_t i;                     /* Loop counter */
   dim_t idx=0;                  /* Index within subgroup */
   AstKeyMap *kmap=NULL;         /* Pointer to PLN-specific keys */
@@ -128,6 +132,8 @@ void smf_calcmodel_smo( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
   size_t tstride;               /* Time slice stride in data array */
+  double *w1 = NULL;            /* Work space for median filtering */
+  double *w2 = NULL;            /* Work space for median filtering */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -156,6 +162,15 @@ void smf_calcmodel_smo( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     }
   }
 
+  /* Get the type of smoothing filter to use: zero=median, 
+     anything else=mean*/
+  astMapGet0I( kmap, "TYPE", &filter_type );
+
+  /* Allocate any work space needed by the filter */
+  if( filter_type == 0 ) {
+     w1 = astMalloc( boxcar*sizeof( *w1 ) );
+     w2 = astMalloc( boxcar*sizeof( *w2 ) );
+  }
 
   /* Obtain pointers to relevant smfArrays for this chunk */
   res = dat->res[chunk];
@@ -237,7 +252,13 @@ void smf_calcmodel_smo( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         }
 
         /* Smooth that bolometer time series */
-        smf_tophat1D( boldata, ntslice, boxcar, bolqua, SMF__Q_FIT, status );
+        if( filter_type == 0 ) {
+           smf_median_smooth( (dim_t) boxcar, 0, ntslice, res_data+boloff,
+                              qua_data+boloff, 1, SMF__Q_FIT, boldata,
+                              w1, w2, status );
+        } else {
+           smf_tophat1D( boldata, ntslice, boxcar, bolqua, SMF__Q_FIT, status );
+        }
 
         /* Remove this model from the residual data and copy the data to the model */
         for (j=0; j<ntslice; j++) {
@@ -273,8 +294,15 @@ void smf_calcmodel_smo( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     }
   }
 
-  if ( boldata ) boldata = astFree( boldata );
-  if ( bolqua ) bolqua = astFree( bolqua );
+  /* Free work space (astFree returns without action if a NULL pointer is
+     supplied). */
+  w1 = astFree( w1 );
+  w2 = astFree( w2 );
+  boldata = astFree( boldata );
+  bolqua = astFree( bolqua );
+  model_data_copy = astFree( model_data_copy );
+
+  /* Annul AST Object pointers (astAnnul reports an error if a NULL pointer
+     is supplied). */
   if( kmap ) kmap = astAnnul( kmap );
-  if( model_data_copy ) model_data_copy = astFree( model_data_copy );
 }
