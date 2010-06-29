@@ -357,7 +357,7 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
                gsdVars->centreFreqs[subBandNum]*1000000.0, "" );
   astMapPut0I( datePointing, "JFINC(1)",
                gsdVars->freqRes[subBandNum]*1000000.0, "" );
-  astMapPut0I ( datePointing, "IFFREQ(1)", IFFreqs[subBandNum], "" );
+  astMapPut0D( datePointing, "IFFREQ(1)", IFFreqs[subBandNum], "" );
   astMapPut0I( datePointing, "CENTRECODE", gsdVars->centreCode, "" );
 
   /* Convert cell sizes to radians. */
