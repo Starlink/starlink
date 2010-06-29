@@ -843,6 +843,8 @@
 *        Set bad-bits mask so that QUALITY has an effect.
 *     2010-05-27 (TIMJ):
 *        Write out NBOLOEFF information.
+*     2010-06-28 (TIMJ):
+*        Properly support varying step time.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -955,6 +957,7 @@ void smurf_makemap( int *status ) {
   int maxmem_mb;             /* Max memory usage in Mb */
   int maxmem_default = 1000; /* Default value for maxmem */
   double maxtexp = 0.0;      /* Maximum exposure time */
+  double meanstep = 0.0;     /* Mean steptime for output map */
   float medtexp = 0.0;       /* Median exposure time */
   char method[LEN__METHOD];  /* String for map-making method */
   int moving = 0;            /* Is the telescope base position changing? */
@@ -1019,7 +1022,7 @@ void smurf_makemap( int *status ) {
 
   /* Filter out darks */
   smf_find_science( igrp, &fgrp, 0, NULL, NULL, 1, 1, SMF__NULL, &darks,
-                    &flatramps, status );
+                    &flatramps, &meanstep, status );
 
   /* input group is now the filtered group so we can use that and
      free the old input group */
@@ -1522,6 +1525,10 @@ void smurf_makemap( int *status ) {
       astSetFitsCM( fchan, " ", 0 );
       astSetFitsCM( fchan, "---- Data Processing ----", 0 );
 
+      /* Store the mean step time (overwriting an existing value if required) */
+      atlPtftd( fchan, "STEPTIME", meanstep,
+                "RTS step time during an RTS sequence", status );
+
       /* Calculate median exposure time - use faster histogram-based
          method which should be accurate enough for our purposes */
       msgOutif( MSG__VERB, " ", "Calculating median output exposure time",
@@ -1751,6 +1758,10 @@ void smurf_makemap( int *status ) {
     astSetI( fchan, "CARD", astGetI( fchan, "NCard" ) + 1 );
     astSetFitsCM( fchan, " ", 0 );
     astSetFitsCM( fchan, "---- Data Processing ----", 0 );
+
+    /* Store the mean step time (overwriting an existing value if required) */
+    atlPtftd( fchan, "STEPTIME", meanstep,
+              "RTS step time during an RTS sequence", status );
 
     /* Calculate median exposure time - use faster histogram-based
        method which should be accurate enough for our purposes */

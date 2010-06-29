@@ -205,7 +205,7 @@ void smurf_calcnoise( int *status ) {
 
   /* Filter out darks */
   smf_find_science( igrp, &fgrp, 1, NULL, NULL, 1, 1, SMF__NULL, NULL,
-                    &flatramps, status );
+                    &flatramps, NULL, status );
 
   /* input group is now the filtered group so we can use that and
      free the old input group */

@@ -16,7 +16,7 @@
 *     smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
 *                     Grp **darkgrp, Grp **flatgrp, int reducedark, int calcflat,
 *                     smf_dtype darktype, smfArray ** darks,
-*                     smfArray **fflats, int * status );
+*                     smfArray **fflats, double * meanstep, int * status );
 
 *  Arguments:
 *     ingrp = const Grp* (Given)
@@ -58,6 +58,8 @@
 *        are found. The flatfield solution will be calculated and stored in the smfDA
 *        component of each smfData if "calcflat" is true. Ramps are collapsed using
 *        smf_flat_fastflat irrespective of the calcflat parameter.
+*     meanstep = double * (Returned)
+*        If non-NULL will contain the mean step time of all the data in outgrp
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -130,6 +132,8 @@
 *        Return darks in outgrp if no science data were found
 *     2010-06-02 (EC):
 *        Only revert outgrp to darks if reverttodark set
+*     2010-06-28 (TIMJ):
+*        Add mean step time calculation
 
 *  Copyright:
 *     Copyright (C) 2008-2010 Science and Technology Facilities Council.
@@ -176,6 +180,7 @@
 #include "star/one.h"
 #include "ast.h"
 #include "star/one.h"
+#include "prm_par.h"
 
 /* SMURF routines */
 #include "smf.h"
@@ -184,31 +189,39 @@
 
 #define FUNC_NAME "smf_find_science"
 
-size_t
+static size_t
 smf__addto_sortinfo ( const smfData * indata, smfSortInfo allinfo[],
                       size_t index,
 size_t counter, const char * type, int *status );
 
+static void
+smf__addto_durations( const smfData *indata, double * duration,
+                      size_t * nsteps, int *status );
 
 void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
                       Grp **darkgrp, Grp **flatgrp, int reducedark,
                       int calcflat, smf_dtype darktype, smfArray ** darks,
-                      smfArray **fflats, int * status ) {
+                      smfArray **fflats, double * meanstep, int * status ) {
 
   smfSortInfo *alldarks; /* array of sort structs for darks */
   smfSortInfo *allfflats; /* array of fast flat info */
   Grp * dgrp = NULL;  /* Internal dark group */
+  double duration_darks = 0.0; /* total duration of all darks */
+  double duration_sci = 0.0;  /* Duration of all science observations */
   size_t dkcount = 0; /* Dark counter */
   size_t ffcount = 0; /* Fast flat counter */
   Grp * fgrp = NULL;  /* Fast flat group */
   size_t i;           /* loop counter */
   smfData *infile = NULL; /* input file */
   size_t insize;     /* number of input files */
+  size_t nsteps_dark = 0;    /* Total number of steps for darks */
+  size_t nsteps_sci = 0;     /* Total number of steps for science */
   AstKeyMap * obsmap = NULL; /* Info from all observations */
   AstKeyMap * objmap = NULL; /* All the object names used */
   Grp *ogrp = NULL;   /* local copy of output group */
   size_t sccount = 0; /* Number of accepted science files */
 
+  if (meanstep) *meanstep = VAL__BADD;
   if (outgrp) *outgrp = NULL;
   if (darkgrp) *darkgrp = NULL;
   if (darks) *darks = NULL;
@@ -258,6 +271,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
     if (smf_isdark( infile, status )) {
       /* Store the sorting information */
       dkcount = smf__addto_sortinfo( infile, alldarks, i, dkcount, "Dark", status );
+      smf__addto_durations( infile, &duration_darks, &nsteps_dark, status );
     } else {
       /* compare sequence type with observation type and drop it (for now)
          if they differ */
@@ -280,6 +294,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
             /* store the file in the output group */
             ndgCpsup( ingrp, i, ogrp, status );
             msgOutif(MSG__DEBUG, " ", "Non-dark file: ^F",status);
+            smf__addto_durations( infile, &duration_sci, &nsteps_sci, status );
             sccount++;
           } else {
             msgOutif( MSG__QUIET, "",
@@ -292,6 +307,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
           ndgCpsup( ingrp, i, ogrp, status );
           msgOutif( MSG__DEBUG, " ",
                     "File ^F lacks JCMTState: assuming it is non-dark",status);
+          smf__addto_durations( infile, &duration_sci, &nsteps_sci, status );
           sccount++;
         }
 
@@ -437,6 +453,8 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
     grpDelet( &ogrp, status);
     grpDelet( &fgrp, status);
 
+    if (meanstep && nsteps_dark > 0) *meanstep = duration_darks / nsteps_dark;
+
   } else {
     /* Store the output groups in the return variable or free it */
     if (darkgrp) {
@@ -449,8 +467,9 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
     } else {
       grpDelet( &fgrp, status);
     }
-  }
 
+    if (meanstep && nsteps_sci > 0) *meanstep = duration_sci / nsteps_sci;
+  }
 
   msgSeti( "ND", sccount );
   msgSeti( "DK", dkcount );
@@ -493,6 +512,11 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
               "and ^ND ^NDTXT", status );
   }
 
+  if (meanstep && *meanstep != VAL__BADD) {
+    msgOutiff( MSG__VERB, "", "Mean step time for input files = %g sec",
+             status, *meanstep );
+  }
+
   /* Now report the details of the observation */
   smf_obsmap_report( MSG__NORM, obsmap, objmap, status );
 
@@ -507,7 +531,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
    in the input group. "counter" is the current position to use to store
    the item. Returns the next index to be used (ie updated counter). */
 
-size_t
+static size_t
 smf__addto_sortinfo ( const smfData * indata, smfSortInfo allinfo[], size_t this_index,
                       size_t counter, const char * type, int *status ) {
   smfSortInfo * sortinfo = NULL;
@@ -524,4 +548,21 @@ smf__addto_sortinfo ( const smfData * indata, smfSortInfo allinfo[], size_t this
   sortinfo->index = this_index;
   counter++;
   return counter;
+}
+
+/* Helper routine to just add the number of steps and the duration of the
+   file to a running total */
+
+static void smf__addto_durations ( const smfData *indata, double *duration,
+                                   size_t *nsteps, int *status ) {
+  if (*status != SAI__OK) return;
+  if (!indata) return;
+  if (!indata->hdr) return;
+  if (indata->hdr->steptime == VAL__BADD) return;
+  if (indata->hdr->nframes == 0) return;
+
+  *nsteps += indata->hdr->nframes;
+  *duration += ( indata->hdr->nframes * indata->hdr->steptime );
+
+  return;
 }

@@ -339,6 +339,7 @@ void smurf_qlmakemap( int *status ) {
   double *map = NULL;        /* Pointer to the rebinned map data */
   size_t mapsize;            /* Number of pixels in output image */
   double meansky;            /* Mean sky level for current file */
+  double meanstep = 0.0;     /* Mean step time */
   int moving = 0;            /* Flag to denote a moving object */
   dim_t nbolo;               /* Number of bolometers */
   int nparam = 0;            /* Number of extra parameters for pixel spreading scheme*/
@@ -382,7 +383,7 @@ void smurf_qlmakemap( int *status ) {
 
   /* Filter out darks */
   smf_find_science( igrp, &fgrp, 0, NULL, NULL, 1, 0, SMF__NULL, &darks, NULL,
-                    status );
+                    &meanstep, status );
 
   /* input group is now the filtered group so we can use that and
      free the old input group */

@@ -907,7 +907,7 @@ int *smf_find_median( const float *farray, const double *darray, size_t nel,
 void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
                       Grp **darkgrp, Grp **flatgrp, int reducedark, int calcflat,
                       smf_dtype darktype, smfArray ** darks, smfArray **fflats,
-                      int * status );
+                      double * meanstep, int * status );
 
 void smf_find_seqcount( const smfHead * hdr, int *seqcount, int *status );
 

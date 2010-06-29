@@ -141,7 +141,7 @@ void smurf_smurfcopy ( int * status ) {
 
   /* Filter out darks */
   smf_find_science( igrp, &fgrp, 0, NULL, NULL, 0, 0, SMF__NULL, NULL, NULL,
-                    status );
+                    NULL, status );
 
   /* input group is now the filtered group so we can use that and
      free the old input group */

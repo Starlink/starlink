@@ -181,7 +181,7 @@ void smurf_sc2concat( int *status ) {
 
   /* Filter out darks */
   smf_find_science( igrp, &fgrp, 1, NULL, NULL, 1, 1, SMF__NULL, &darks,
-                    &flatramps, status );
+                    &flatramps, NULL, status );
 
   /* input group is now the filtered group so we can use that and
      free the old input group */

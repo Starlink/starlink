@@ -142,7 +142,7 @@ void smurf_dreamsolve ( int *status ) {
 
   /* Filter out darks */
   smf_find_science( igrp, &fgrp, 0, NULL, NULL, 1, 0, SMF__NULL, &darks, NULL,
-                    status );
+                    NULL, status );
 
   /* input group is now the filtered group so we can use that and
      free the old input group */
