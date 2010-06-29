@@ -63,7 +63,8 @@
 *     2010-06-11 (TIMJ):
 *        Tweak quality handling one more time
 *     2010-06-29 (DSB):
-*        Add option for median smoothing.
+*        - Add option for median smoothing.
+*        - Re-structure to use multi-threading.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -105,6 +106,25 @@
 
 #define FUNC_NAME "smf_calcmodel_smo"
 
+/* Local data types: */
+typedef struct smfCalcmodelSmoJobData {
+   dim_t b1;
+   dim_t b2;
+   dim_t nbolo;
+   dim_t ntslice;
+   double *model_data;
+   double *res_data;
+   int filter_type;
+   size_t boxcar;
+   size_t bstride;
+   size_t tstride;
+   smf_qual_t *qua_data;
+} smfCalcmodelSmoJobData;
+
+/* Local prototypes: */
+static void smf1_calcmodel_smo_job( void *job_data, int *status );
+
+/* Main entry point. */
 void smf_calcmodel_smo( smfWorkForce *wf, smfDIMMData *dat, int chunk,
                         AstKeyMap *keymap, smfArray **allmodel,
                         int flags __attribute__((unused)),
@@ -112,13 +132,13 @@ void smf_calcmodel_smo( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
   /* Local Variables */
   size_t bstride;               /* bolo stride */
-  double * boldata = NULL;      /* single bolometer time series */
-  smf_qual_t * bolqua = NULL;/* single bolometer quality */
   size_t boxcar = 0;            /* size of boxcar smooth window */
   int boxcar_i=0;               /* width in samples of boxcar filter */
   int filter_type;              /* The type of smoothing to perform */
   size_t i;                     /* Loop counter */
   dim_t idx=0;                  /* Index within subgroup */
+  int iworker;                  /* Owkrer index */
+  smfCalcmodelSmoJobData *job_data=NULL; /* Pointer to all job data structures */
   AstKeyMap *kmap=NULL;         /* Pointer to PLN-specific keys */
   smfArray *model=NULL;         /* Pointer to model at chunk */
   double *model_data=NULL;      /* Pointer to DATA component of model */
@@ -127,13 +147,14 @@ void smf_calcmodel_smo( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   dim_t ndata=0;                /* Total number of data points */
   int notfirst=0;               /* flag for delaying until after 1st iter */
   dim_t ntslice=0;              /* Number of time slices */
+  int nworker;                  /* No. of worker threads in supplied Workforce */
+  smfCalcmodelSmoJobData *pdata=NULL; /* Pointer to current data structure */
   smfArray *qua=NULL;           /* Pointer to QUA at chunk */
   smf_qual_t *qua_data=NULL; /* Pointer to quality data */
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
+  int step;                     /* Number of bolometers per thread */
   size_t tstride;               /* Time slice stride in data array */
-  double *w1 = NULL;            /* Work space for median filtering */
-  double *w2 = NULL;            /* Work space for median filtering */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -162,15 +183,9 @@ void smf_calcmodel_smo( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     }
   }
 
-  /* Get the type of smoothing filter to use: zero=median, 
+  /* Get the type of smoothing filter to use: zero=median,
      anything else=mean*/
   astMapGet0I( kmap, "TYPE", &filter_type );
-
-  /* Allocate any work space needed by the filter */
-  if( filter_type == 0 ) {
-     w1 = astMalloc( boxcar*sizeof( *w1 ) );
-     w2 = astMalloc( boxcar*sizeof( *w2 ) );
-  }
 
   /* Obtain pointers to relevant smfArrays for this chunk */
   res = dat->res[chunk];
@@ -185,12 +200,12 @@ void smf_calcmodel_smo( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
   model = allmodel[chunk];
 
-  /* Some space for each time series */
-  boldata = astCalloc( ntslice, sizeof(*boldata), 0 );
-  bolqua  = astCalloc( ntslice, sizeof(*bolqua), 0 );
-
   msgOutiff(MSG__VERB, "", "    Calculating smoothed model using boxcar of width %zu time slices",
             status, boxcar);
+
+  /* Create structures used to pass information to the worker threads. */
+  nworker = wf ? wf->nworker : 1;
+  job_data = astMalloc( nworker*sizeof( *job_data ) );
 
   /* Loop over index in subgrp (subarray) and put the previous iteration
      of the filtered component back into the residual before calculating
@@ -200,10 +215,6 @@ void smf_calcmodel_smo( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
     smf_get_dims( res->sdata[idx],  NULL, NULL, &nbolo, &ntslice,
                   &ndata, &bstride, &tstride, status);
-
-    /* make sure we have enough space */
-    boldata = astRealloc( boldata, ntslice * sizeof(*boldata) );
-    bolqua = astRealloc( bolqua, ntslice * sizeof(*bolqua) );
 
     /* Get pointers to data/quality/model */
     res_data = (res->sdata[idx]->pntr)[0];
@@ -239,8 +250,154 @@ void smf_calcmodel_smo( smfWorkForce *wf, smfDIMMData *dat, int chunk,
                          NULL, 0, 0, status );
       */
 
-      /* Smooth the data and subtract it from res */
-      for (i=0; i< nbolo; i++) {
+      /* Determine which bolometers are to be processed by which threads. */
+      step = nbolo/nworker;
+      if( step < 1 ) step = 1;
+
+      for( iworker = 0; iworker < nworker; iworker++ ) {
+        pdata = job_data + iworker;
+        pdata->b1 = iworker*step;
+        pdata->b2 = pdata->b1 + step - 1;
+      }
+
+      /* Ensure that the last thread picks up any left-over bolometers */
+      pdata->b2 = nbolo - 1;
+
+      /* Store all the other info needed by the worker threads, and submit the
+         jobs to apply the smoothing. */
+      for( iworker = 0; iworker < nworker; iworker++ ) {
+         pdata = job_data + iworker;
+
+         pdata->boxcar = boxcar;
+         pdata->bstride = bstride;
+         pdata->bstride = bstride;
+         pdata->filter_type = filter_type;
+         pdata->model_data = model_data;
+         pdata->nbolo = nbolo;
+         pdata->nbolo = nbolo;
+         pdata->ntslice = ntslice;
+         pdata->ntslice = ntslice;
+         pdata->qua_data = qua_data;
+         pdata->qua_data = qua_data;
+         pdata->res_data = res_data;
+         pdata->res_data = res_data;
+         pdata->tstride = tstride;
+         pdata->tstride = tstride;
+
+         smf_add_job( wf, SMF__REPORT_JOB, pdata, smf1_calcmodel_smo_job, NULL,
+                      status );
+      }
+      smf_wait( wf, status );
+
+      /* Uncomment to aid debugging */
+      /*
+      smf_write_smfData( res->sdata[idx], NULL, qua_data, "res_af",
+                         NULL, 0, 0, status );
+      smf_write_smfData( model->sdata[idx], NULL, qua_data, "model_af",
+                         NULL, 0, 0, status );
+      */
+
+    }
+  }
+
+  /* Free work space (astFree returns without action if a NULL pointer is
+     supplied). */
+  model_data_copy = astFree( model_data_copy );
+  job_data = astFree( job_data );
+
+  /* Annul AST Object pointers (astAnnul reports an error if a NULL pointer
+     is supplied). */
+  if( kmap ) kmap = astAnnul( kmap );
+}
+
+
+
+
+
+static void smf1_calcmodel_smo_job( void *job_data, int *status ) {
+/*
+*  Name:
+*     smf1_calcmodel_smo_job
+
+*  Purpose:
+*     Smooth each bolometer.
+
+*  Invocation:
+*     void smf1_calcmodel_smo_job( void *job_data, int *status )
+
+*  Arguments:
+*     job_data = void * (Given)
+*        Pointer to the data needed by the job. Should be a pointer to a
+*        smfCalcmodelSmoJobData structure.
+*     status = int * (Given and Returned)
+*        Pointer to global status.
+
+*  Description:
+*     This routine runs in a worker thread to smooth the specified bolometer
+*     time streams using the specified filter.
+
+*/
+
+/* Local Variables: */
+   dim_t b1;
+   dim_t b2;
+   dim_t i;
+   dim_t nbolo;
+   dim_t ntslice;
+   double *boldata = NULL;
+   double *model_data;
+   double *res_data;
+   double *w1 = NULL;
+   double *w2 = NULL;
+   int filter_type;
+   size_t boxcar;
+   size_t bstride;
+   size_t tstride;
+   smfCalcmodelSmoJobData *pdata;
+   smf_qual_t *bolqua = NULL;
+   smf_qual_t *qua_data;
+   struct timeval tv1;
+   struct timeval tv2;
+
+   /* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+   /* Get a pointer to the job data, and then extract its contents into a
+      set of local variables. */
+   pdata = (smfCalcmodelSmoJobData *) job_data;
+
+   b1 = pdata->b1;
+   b2 = pdata->b2;
+   boxcar = pdata->boxcar;
+   bstride = pdata->bstride;
+   filter_type = pdata->filter_type;
+   model_data = pdata->model_data;
+   nbolo = pdata->nbolo;
+   ntslice = pdata->ntslice;
+   qua_data = pdata->qua_data;
+   res_data = pdata->res_data;
+   tstride = pdata->tstride;
+
+   /* Check we have something to do. */
+   if( b1 < nbolo ) {
+
+      /* Debugging message indicating thread started work */
+      msgOutiff( MSG__DEBUG, "", "smf_calcmodel_smo: thread starting on bolos %zu -- %zu",
+                 status, b1, b2 );
+      smf_timerinit( &tv1, &tv2, status);
+
+      /* Allocate work space */
+      boldata = astMalloc( ntslice*sizeof( *boldata ) );
+      bolqua  = astMalloc( ntslice*sizeof( *bolqua ) );
+      if( filter_type == 0 ) {
+        w1 = astMalloc( boxcar*sizeof( *w1 ) );
+        w2 = astMalloc( boxcar*sizeof( *w2 ) );
+      }
+
+      /* Loop round all the bolometers to be processed by this thread. */
+      for( i = b1; i <= b2 && *status == SAI__OK; i++ ) {
+
+        /* Smooth the data and subtract it from res */
         size_t j;
         size_t boloff = i*bstride;
 
@@ -283,26 +440,15 @@ void smf_calcmodel_smo( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         }
       }
 
-      /* Uncomment to aid debugging */
-      /*
-      smf_write_smfData( res->sdata[idx], NULL, qua_data, "res_af",
-                         NULL, 0, 0, status );
-      smf_write_smfData( model->sdata[idx], NULL, qua_data, "model_af",
-                         NULL, 0, 0, status );
-      */
+/* Free work space. */
+      w1 = astFree( w1 );
+      w2 = astFree( w2 );
+      boldata = astFree( boldata );
+      bolqua = astFree( bolqua );
 
-    }
-  }
-
-  /* Free work space (astFree returns without action if a NULL pointer is
-     supplied). */
-  w1 = astFree( w1 );
-  w2 = astFree( w2 );
-  boldata = astFree( boldata );
-  bolqua = astFree( bolqua );
-  model_data_copy = astFree( model_data_copy );
-
-  /* Annul AST Object pointers (astAnnul reports an error if a NULL pointer
-     is supplied). */
-  if( kmap ) kmap = astAnnul( kmap );
+/* Report the time taken in this thread. */
+      msgOutiff( MSG__DEBUG, "", "smf_calcmodel_smo: thread finishing bolos %zu -- %zu (%.3f sec)",
+                 status, b1, b2, smf_timerupdate( &tv1, &tv2, status ) );
+   }
 }
+
