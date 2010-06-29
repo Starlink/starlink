@@ -2643,6 +2643,16 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter bbm {
+                type NDF
+                access READ
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Bad bolometer masks}
+                default !
+                helpkey *
+            }
+
             parameter FLAT {
                 type _LOGICAL
                 vpath {DEFAULT }

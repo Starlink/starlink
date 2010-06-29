@@ -37,6 +37,13 @@
 *          Calculate average power spectrum over "good" bolometers
 *     AVPSPECTHRESH = _DOUBLE (Read)
 *          N-sigma noise threshold to define "good" bolometers for AVPSPEC
+*     BBM = NDF (Read)
+*          Group of files to be used as bad bolometer masks. Each data file
+*          specified with the IN parameter will be masked. The corresponding
+*          previous mask for a subarray will be used. If there is no previous
+*          mask the closest following will be used. It is not an error for
+*          no mask to match. A NULL parameter indicates no mask files to be
+*          supplied. [!]
 *     FLAT = _LOGICAL (Read)
 *          If set ensure data are flatfielded. If not set do not scale the
 *          data in any way (but convert to DOUBLE). [TRUE]
@@ -101,6 +108,8 @@
 *        Support flatfield ramps.
 *     2010-05-12 (EC):
 *        Add zerobad option.
+*     2010-06-25 (TIMJ):
+*        Add BBM parameter
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -160,6 +169,7 @@ void smurf_sc2fft( int *status ) {
   int avpspec=0;            /* Flag for doing average power spectrum */
   double avpspecthresh=0;   /* Threshold noise for detectors in avpspec */
   Grp * basegrp = NULL;     /* Basis group for output filenames */
+  smfArray *bbms = NULL;    /* Bad bolometer masks */
   smfArray *concat=NULL;    /* Pointer to a smfArray */
   size_t contchunk;         /* Continuous chunk counter */
   smfArray *darks = NULL;   /* dark frames */
@@ -220,6 +230,8 @@ void smurf_sc2fft( int *status ) {
              " nothing to do", status );
   }
 
+  /* Get group of bolometer masks and read them into a smfArray */
+  smf_request_mask( "BBM", &bbms, status );
 
   /* Obtain the number of continuous chunks and subarrays */
   if( *status == SAI__OK ) {
@@ -275,6 +287,9 @@ void smurf_sc2fft( int *status ) {
         int provid = NDF__NOID;
         dim_t nbolo;                /* Number of detectors  */
         dim_t ndata;                /* Number of data points */
+
+        /* Apply a mask to the quality array and data array */
+        smf_apply_mask( idata, NULL, bbms, SMF__BBM_QUAL|SMF__BBM_DATA, status );
 
         smf_get_dims( idata,  NULL, NULL, &nbolo, NULL, &ndata, NULL, NULL,
                       status );
@@ -435,6 +450,7 @@ void smurf_sc2fft( int *status ) {
   if( igroup ) smf_close_smfGroup( &igroup, status );
   if( wf ) wf = smf_destroy_workforce( wf );
   if( flatramps ) smf_close_related( &flatramps, status );
+  if (bbms) smf_close_related( &bbms, status );
 
   ndfEnd( status );
 
