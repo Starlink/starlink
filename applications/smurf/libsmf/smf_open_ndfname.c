@@ -87,6 +87,8 @@
 *        Factor out WCS check for moving sources to smf_set_moving
 *     2009-09-29 (TIMJ):
 *        Read lower bounds of NDF and store in smfData
+*     2010-06-28 (TIMJ):
+*        Allow for WRITE/ZERO and WRITE/BAD
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -125,6 +127,7 @@
 #include "star/ndg.h"
 #include "star/grp.h"
 #include "star/hds.h"
+#include "star/one.h"
 #include "ndf.h"
 #include "mers.h"
 #include "msg_par.h"
@@ -154,6 +157,7 @@ void smf_open_ndfname( const HDSLoc *loc, const char accmode[], const char filen
 				   smfHead components in the output smfData */
   int i;
   int ndat;                     /* Number of elements mapped in the requested NDF */
+  char ndfaccmode[NDF__SZMMD+1];/* Access mode to use to open the file */
   int ndimsmapped;              /* Number of dimensions in mapped NDF */
   int ndfid;                    /* NDF identifier */
   AstFrameSet *ndfwcs = NULL;   /* Copy of input FrameSet to write to NDF */
@@ -172,14 +176,23 @@ void smf_open_ndfname( const HDSLoc *loc, const char accmode[], const char filen
     return;
   }
 
+  /* Start be assuming the requested access mode can be used for mapping
+     and file opening */
+  one_strlcpy( ndfaccmode, accmode, sizeof(ndfaccmode), status );
+
   /* Note: write access clears the contents of the NDF */
   if ( strncmp( accmode, "WRITE", 5 ) == 0 ) {
     msgOutif(MSG__DEBUG," ", "Opening NDF with WRITE access: this will clear the current contents if the NDF exists.", status);
     updating = 1;
+
+    /* We can have WRITE/ZERO or WRITE/BAD so we need to force WRITE
+       into the NDF open access mode */
+    one_strlcpy( ndfaccmode, "WRITE", sizeof(ndfaccmode), status );
+
   } else if ( strncmp( accmode, "UPDATE", 6) == 0) {
     updating = 1;
   }
-  ndfOpen( loc, extname, accmode, state, &ndfid, &place, status );
+  ndfOpen( loc, extname, ndfaccmode, state, &ndfid, &place, status );
   if ( *status != SAI__OK ) {
     errRep( FUNC_NAME,
 	    "Call to ndfOpen failed: unable to obtain an NDF identifier",
