@@ -20,7 +20,7 @@
 *                    const smfArray *bbms, const smfArray * flatramps,
 *                    AstFrameSet *outfset, int moving, int *lbnd_out,
 *                    int *ubnd_out, size_t maxmem, double *map, int *hitsmap,
-*                    double *mapvar, smf_qual_t *mapqual, double *weights,
+*                    double *exp_time, double *mapvar, smf_qual_t *mapqual, double *weights,
 *                    char data_units[], double *nboloeff, int *status );
 
 *  Arguments:
@@ -59,6 +59,8 @@
 *        The output map array
 *     hitsmap = int* (Returned)
 *        Number of samples that land in a pixel (ignore if NULL pointer)
+*     exp_time = double* (Returned)
+*        Exposure time per map pixel (ignore if NULL pointer)
 *     mapvar = double* (Returned)
 *        Variance of each pixel in map
 *     mapqual = smf_qual_t* (Returned)
@@ -286,6 +288,9 @@
 *        Add effective number of bolometers.
 *     2010-05-31 (EC):
 *        Factor initial data cleaning out to smf_clean_smfData
+*     2010-06-28 (TIMJ):
+*        Pass in explicit exposure time array so that we can handle variable
+*        step times.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -349,7 +354,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      const smfArray *bbms, const smfArray * flatramps,
                      AstFrameSet *outfset, int moving, int *lbnd_out,
                      int *ubnd_out, size_t maxmem, double *map,
-                     int *hitsmap, double *mapvar, smf_qual_t *mapqual,
+                     int *hitsmap, double * exp_time, double *mapvar, smf_qual_t *mapqual,
                      double *weights, char data_units[], double * nboloeff, int *status ) {
 
   /* Local Variables */
@@ -2191,6 +2196,15 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                 " chunk to total", status);
         smf_addmap1( map, weights, hitsmap, mapvar, mapqual, thismap,
                      thisweight, thishits, thisvar, thisqual, msize, status );
+      }
+
+      /* Add this chunk of exposure time to the total. We assume the array was
+         initialised to zero and will not contain bad values. */
+      steptime = res[0]->sdata[0]->hdr->steptime;
+      for (i=0; (i<msize) && (*status == SAI__OK); i++) {
+        if ( map[i] != VAL__BADD) {
+          exp_time[i] += steptime * (double)hitsmap[i];
+        }
       }
     }
 

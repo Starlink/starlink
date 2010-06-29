@@ -984,7 +984,6 @@ void smurf_makemap( int *status ) {
   AstFrameSet *spacerefwcs = NULL;/* WCS Frameset for spatial reference axes */
   AstFrameSet *specrefwcs = NULL;/* WCS Frameset for spectral reference axis */
   int spread = AST__NEAREST; /* Code for pixel spreading scheme */
-  double steptime = VAL__BADD; /* Integration time per sample, from FITS header */
   char system[10];           /* Celestial coordinate system for output image */
   smfData *tdata=NULL;       /* Exposure time data */
   int tileborder;            /* Dimensions (in pixels) of tile overlap */
@@ -1422,11 +1421,6 @@ void smurf_makemap( int *status ) {
           /* Check units are consistent */
           smf_check_units( ifile, data_units, data->hdr, status);
 
-          /* Store steptime for calculating EXP_TIME first time round*/
-          if ( steptime == VAL__BADD) {
-            steptime = data->hdr->steptime;
-          }
-
           /* Propagate provenance to the output file */
           smf_accumulate_prov( data, tile->grp, ifile, ondf, "SMURF:MAKEMAP(REBIN)",
                                status);
@@ -1495,7 +1489,7 @@ void smurf_makemap( int *status ) {
           exp_time[i] = VAL__BADD;
           weights[i] = VAL__BADD;
         } else {
-          exp_time[i] = steptime * weights3d[i];
+          exp_time[i] = meanstep * weights3d[i];
           weights[i] = weights3d[i+nxy];
           if ( exp_time[i] > maxtexp ) {
             maxtexp = exp_time[i];
@@ -1662,6 +1656,8 @@ void smurf_makemap( int *status ) {
                        &tdata, status );
     if ( tdata ) {
       exp_time = (tdata->pntr)[0];
+      /* initialise with zero exposure time */
+      memset( exp_time, nxy*sizeof(*exp_time), 0);
     }
 
     /* Free the extension locator */
@@ -1683,11 +1679,6 @@ void smurf_makemap( int *status ) {
         errRep(FUNC_NAME, "Error opening input file ^I of ^S for provenance tracking", status);
       }
 
-      /* Store steptime for calculating EXP_TIME */
-      if ( i==1 ) {
-        steptime = data->hdr->steptime;
-      }
-
       /* Propagate provenance to the output file */
       smf_accumulate_prov( data, igrp, i, ondf, "SMURF:MAKEMAP(ITER)",
                            status);
@@ -1704,25 +1695,21 @@ void smurf_makemap( int *status ) {
 
     smf_iteratemap( wf, igrp, iterrootgrp, bolrootgrp, shortrootgrp,
                     keymap, NULL, bbms, flatramps, outfset, moving, lbnd_out,
-                    ubnd_out, maxmem-mapmem, map, hitsmap, variance, mapqual,
+                    ubnd_out, maxmem-mapmem, map, hitsmap, exp_time, variance, mapqual,
                     weights, data_units, &nboloeff, status );
 
     if( bolrootgrp ) grpDelet( &bolrootgrp, status );
     if( iterrootgrp ) grpDelet( &iterrootgrp, status );
     if( shortrootgrp ) grpDelet( &shortrootgrp, status );
 
-    /* Calculate exposure time per output pixel from hitsmap */
-    for (i=0; (i<nxy) && (*status == SAI__OK); i++) {
-      if ( map[i] == VAL__BADD) {
-        exp_time[i] = VAL__BADD;
-      } else {
-        exp_time[i] = steptime * hitsmap[i];
-        if ( exp_time[i] > maxtexp ) {
-          maxtexp = exp_time[i];
-        }
-      }
-    }
+    /* free the hits map */
     hitsmap = astFree( hitsmap );
+
+    /* Set array to BAD where we have no integration time (otherwise the
+     median calculation will not work properly) */
+    for (i=0; (i<nxy) && (*status == SAI__OK); i++) {
+      if ( map[i] == VAL__BADD ) exp_time[i] = VAL__BADD;
+    }
 
     /* Write WCS */
     smf_set_moving(outfset,status);
