@@ -1394,7 +1394,7 @@ itcl::class gaia::GaiaSextractor {
       $itk_component(kronmin) configure -value $defaults_(kronmin)
       $itk_component(petrofact) configure -value $defaults_(petrofact)
       $itk_component(petromin) configure -value $defaults_(petromin)
-      $itk_component(fluxradius) configure -value $defaults_(kronfact)
+      $itk_component(fluxfrac) configure -value $defaults_(kronfact)
       $itk_component(photmask) configure -value $defaults_(photmask)
 
    }
