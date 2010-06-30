@@ -465,7 +465,8 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
 
 /* Smooth the bolometer data stream using a median block filter. Put the
    smoothed data in "work". */
-            smf_median_smooth( dcmedianwidth, 0, ntime, dat + base, qua + base,
+            smf_median_smooth( dcmedianwidth, SMF__FILT_MEDIAN, ntime,
+                               dat + base, qua + base,
                                tstride, SMF__Q_MOD, work, w1, w2, status );
 
 /* For each time slice, find the difference between the median value

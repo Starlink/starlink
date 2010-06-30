@@ -838,4 +838,15 @@ typedef enum {
   SMF__SUBINST_NSUBINST  /* This is always the last entry */
 } smf_subinst_t;
 
+/* Filtering options */
+
+typedef enum {
+  SMF__FILT_NONE,
+  SMF__FILT_MEAN,     /* running mean */
+  SMF__FILT_MEDIAN,   /* median filter */
+  SMF__FILT_MAX,      /* max of the local values */
+  SMF__FILT_MIN       /* min of the local values */
+} smf_filt_t;
+
+
 #endif /* SMF_TYP_DEFINED */

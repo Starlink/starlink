@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     void smf_median_smooth( dim_t box, int filter_type, dim_t el,
+*     void smf_median_smooth( dim_t box, smf_filt_t filter_type, dim_t el,
 *                             const double *dat, const smf_qual_t *qua,
 *                             size_t stride, smf_qual_t mask, double *out,
 *                             double *w1, double *w2, int *status )
@@ -21,11 +21,11 @@
 *  Arguments:
 *     box = dim_t (Given)
 *        The width of the box.
-*     filter_type = int (Given)
+*     filter_type = smf_filt_t (Given)
 *        The type of filter to use:
-*        0: Replace each value with the median of the local values
-*        1: Replace each value with the minimum of the local values
-*        2: Replace each value with the maximum of the local values
+*        SMF__FILT_MEDIAN: Replace each value with the median of the local values
+*        SMF__FILT_MIN: Replace each value with the minimum of the local values
+*        SMF__FILT_MAX: Replace each value with the maximum of the local values
 *     el = dim_t (Given)
 *        The number of elements to used from the data array (each
 *        separated by a step of "stride").
@@ -72,6 +72,8 @@
 *        the end of the main iout loop.
 *     28-JUN-2010 (DSB):
 *        Added argument "filter_type".
+*     2010-06-29 (TIMJ):
+*        Use an enum for filter_type
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -111,7 +113,7 @@
 /* Other includes */
 #include <gsl/gsl_sort.h>
 
-void smf_median_smooth( dim_t box, int filter_type, dim_t el,
+void smf_median_smooth( dim_t box, smf_filt_t filter_type, dim_t el,
                         const double *dat, const smf_qual_t *qua,
                         size_t stride, smf_qual_t mask, double *out,
                         double *w1, double *w2, int *status ){
@@ -136,7 +138,9 @@ void smf_median_smooth( dim_t box, int filter_type, dim_t el,
    if( *status != SAI__OK ) return;
 
 /* Check the filter type. */
-   if( filter_type < 0 || filter_type > 2 ) {
+   if (filter_type != SMF__FILT_MEDIAN &&
+       filter_type != SMF__FILT_MIN &&
+       filter_type != SMF__FILT_MAX ) {
       *status = SAI__ERROR;
       msgSeti( "T", filter_type );
       errRep( " ", "smf_median_smooth: Illegal filter type value ^T "
@@ -199,10 +203,10 @@ void smf_median_smooth( dim_t box, int filter_type, dim_t el,
       if( inbox == 0 ) {
          *(pout++) = VAL__BADD;
 
-      } else if( filter_type == 1 ) {
+      } else if( filter_type == SMF__FILT_MIN ) {
          *(pout++) = w1[ 0 ];
 
-      } else if( filter_type == 2 ) {
+      } else if( filter_type == SMF__FILT_MAX ) {
          *(pout++) = w1[ inbox - 1 ];
 
       } else if( inbox % 2 == 1 ) {
