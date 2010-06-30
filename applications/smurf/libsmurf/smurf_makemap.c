@@ -520,12 +520,18 @@
 *       used when calculating the correlation coefficient.
 *     COM.GAIN_FGOOD = REAL
 *       Minimum fraction of good boxes for a usable bolometer.
+*     COM.GAIN_IS_ONE = LOGICAL
+*       Setting com.gain_is_one non-zero causes all bolometer gains to be
+*       forced to 1.0
 *     COM.GAIN_RAT = REAL
 *       Ratio of largest usable gain to mean gain for a bolometer.
 *     COM.GAIN_TOL = REAL
 *       N-sigma away from mean gain coefficient tolerance.
 *     COM.NOTFIRST = LOGICAL
 *       If true the common mode will not be subtracted on the first iteration.
+*     COM.OFFSET_IS_ZERO = LOGICAL
+*       Setting com.offset_is_zero non-zero causes all bolometer
+*       offsets to be forced to 0.0.
 *     DKS.BOXCAR = INTEGER
 *       If DKS (dark squid) model component requested, boxcar the dark squid
 *       signal by this many samples before fitting/removing from each detector
@@ -560,6 +566,9 @@
 *          - CSOTAU    - use a single 225GHz tau value
 *          - FILTERTAU - use a single tau value for this wavelength
 *          - AUTO      - Use WVM if available else 225 GHz tau. (default)
+*     FLT.APOD = INTEGER
+*       Apodize signals (smoothly roll-off) using sine/cosine functions at
+*       start and end of the signal across this many samples.
 *     FLT.FILT_EDGEHIGH = REAL
 *       If FLT specified, perform filtering as an iterative component, rather
 *       than doing it once at the beginning as a pre-processing step. See
@@ -576,6 +585,17 @@
 *       If FLT specified, perform filtering as an iterative component, rather
 *       than doing it once at the beginning as a pre-processing step. See
 *       FILT_ NOTCHLOW.
+*     FLT.FILT_WLIM = INTEGER
+*       Specifies the minimum fraction of good values that must contribute to a
+*       filtered value. For instance, if wlim is 0.9 then a filtered data value
+*       is flagged as bad unless at least 0.9 of the input values that
+*       contribute to it are good (i.e. have not been flagged as unusable for
+*       any reason). Thus a high filt_wlim value (i.e. close to 1.0) will cause
+*       more data to be rejected, and a low value (i.e. close to 0.0) will cause
+*       less data to be rejected. A value of <undef> causes the old filtering
+*       algorithm to be used that is based on filling gaps with artificial data.
+*       If the new algorithm is used the following additional settings can be
+*       made: "apod=0, fillgaps=0, noi.fillgaps=0".
 *     FLT.NOTFIRST = LOGICAL
 *       If true the filter model will not be executed for the first iteration.
 *     GAI.FLATFIELD = LOGICAL
@@ -620,7 +640,9 @@
 *       Number of samples to use for box car smoothing filter. Defaults to 2000.
 *     SMO.NOTFIRST = LOGICAL
 *       If true the SMO model will not be executed in the first iteration.
-
+*     SMO.TYPE = STRING
+*       Type of filter to remove. Current options are "mean" and "median". Default
+*       is mean.
 
 *  Related Applications:
 *     SMURF: QLMAKEMAP

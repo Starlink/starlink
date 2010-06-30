@@ -31,6 +31,8 @@ maxlen = 0
 #  ast = estimate the map and astronomical signal
 #  flt = apply filter to time streams
 #  noi = estimate time-domain variance
+#  smo = time series smoothing using a median or mean boxcar filter
+#  pln = remove plane from each time slice
 
 modelorder = (com,gai,ext,flt,ast,noi)
 
@@ -304,3 +306,9 @@ ext.taumethod =adaptive
 
 # ast.zero_lowhits = 0.5
 # ast.zero_notlast = 1
+
+# Smooth the time series
+
+# Type of filter: mean or median
+
+smo.type = median
