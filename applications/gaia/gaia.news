@@ -33,6 +33,10 @@
     The VO query toolboxes now convert the default query coordinates from
     the image celestial coordinate system to FK5/J2000.
 
+    Add support for the FLUX_RADIUS parameter to the object detection toolbox.
+    This determines the half-light radius (actually radius which contains
+    half of the auto flux) by default.
+
   Hawaiki release
   ===============
 

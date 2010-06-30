@@ -467,7 +467,7 @@ itcl::class gaia::GaiaSextractor {
          $star_sex_ delete_sometime
       }
       if { $namer_ != {} } {
-	 catch {delete object $namer_}
+         catch {delete object $namer_}
       }
    }
 
@@ -1256,6 +1256,30 @@ itcl::class gaia::GaiaSextractor {
       add_short_help $itk_component(petromin) \
          {Minimum applicable radius for Petrosian magnitudes}
 
+      #  Flux fraction. Get a fractional flux value to determine a radius.
+      #  Half-light, or really half kron flux.
+      itk_component add fluxfrac {
+         LabelEntryScale $childsite.fluxfrac \
+            -text "Flux fraction:" \
+            -labelwidth $lwidth \
+            -valuewidth $vwidth \
+            -increment 0.1  \
+            -resolution 0.1 \
+            -anchor w \
+            -show_arrows 1 \
+            -show_scale 1 \
+            -from 0.0 \
+            -to 1.0 \
+            -fix_range 1 \
+            -validate real \
+            -value $values_(fluxfrac) \
+            -textvariable [scope values_(fluxfrac)] \
+            -command [code $this set_values_ fluxfrac]
+      }
+      pack $itk_component(fluxfrac) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(fluxfrac) \
+         {Fraction of auto flux, gives a radius parameter}
+
       #  Type of MASKing used on photometry neighbours.
       itk_component add photmask {
          LabelMenu $childsite.detmask \
@@ -1370,6 +1394,7 @@ itcl::class gaia::GaiaSextractor {
       $itk_component(kronmin) configure -value $defaults_(kronmin)
       $itk_component(petrofact) configure -value $defaults_(petrofact)
       $itk_component(petromin) configure -value $defaults_(petromin)
+      $itk_component(fluxradius) configure -value $defaults_(kronfact)
       $itk_component(photmask) configure -value $defaults_(photmask)
 
    }
@@ -2015,6 +2040,10 @@ itcl::class gaia::GaiaSextractor {
       set to_(petromin) special
       set special_(petromin) {do_nothing_}
 
+      #  Flux fraction.
+      set from_(PHOT_FLUXFRAC) fluxfrac
+      set to_(fluxfrac) PHOT_FLUXFRAC
+
       #  CCD saturation level.
       set from_(SATUR_LEVEL) photsat
       set to_(photsat) SATUR_LEVEL
@@ -2137,6 +2166,7 @@ itcl::class gaia::GaiaSextractor {
       set values_(kronmin) 3.5
       set values_(petrofact) 2.0
       set values_(petromin) 3.5
+      set values_(fluxfrac) 0.5
       set values_(photmask) "NONE"
       set values_(dettype) "CCD"
       set values_(imagescale) 1.0
@@ -2173,7 +2203,7 @@ itcl::class gaia::GaiaSextractor {
          catname catpar cattype minsize threshtype detthresh
          analthresh detfilter debthresh debcontrast detclean deteffic
          photzero photnum photapps kronfact kronmin petrofact petromin
-         photmask dettype imagescale photsat photgain photgamma fwhm
+         fluxfrac photmask dettype imagescale photsat photgain photgamma fwhm
          nettable backmesh backfilter backtype backvalue backphot backthick
          checktype checkimage memory_objstack memory_pixstack memory_bufsize
          verbose_type radtype radthresh
@@ -2255,14 +2285,14 @@ itcl::class gaia::GaiaSextractor {
          #  image by default.
          set image [$itk_option(-rtdimage) fullname]
          if { $image != "" } {
-	    $namer_ configure -imagename $image
-	    set image [$namer_ ndfname]
+            $namer_ configure -imagename $image
+            set image [$namer_ ndfname]
             set diskimage [$namer_ diskfile]
 
             set detect $values_(detname)
             if { $detect != "" && $detect != "NONE" } {
-	       $namer_ configure -imagename $detect
-	       set detect [$namer_ ndfname]
+               $namer_ configure -imagename $detect
+               set detect [$namer_ ndfname]
                set diskdetect [$namer_ diskfile]
             } else {
                set detect ""
@@ -2273,10 +2303,10 @@ itcl::class gaia::GaiaSextractor {
             #  the disk file is upto date.
             $itk_option(-image) save_if_volatile
 
-	    #  Set the command to run when measurements are available.
-	    if { $args != "" } {
-	       set complete_cmd_ $args
-	    }
+            #  Set the command to run when measurements are available.
+            if { $args != "" } {
+               set complete_cmd_ $args
+            }
 
             #  And run the application as required. Note NDFs cannot
             #  be processed by native version, nor can FITS not stored
@@ -2611,8 +2641,8 @@ itcl::class gaia::GaiaSextractor {
 
       #  Issue the measurements available command if needed.
       if { $complete_cmd_ != {} } {
-	 eval $complete_cmd_
-	 set complete_cmd_ {}
+         eval $complete_cmd_
+         set complete_cmd_ {}
       }
    }
 
@@ -2620,7 +2650,7 @@ itcl::class gaia::GaiaSextractor {
    public method get_catname {} {
        set name [get_catname_]
        if { [info exists astrocatnames_($name)] } {
-	   return $astrocatnames_($name)
+           return $astrocatnames_($name)
        }
        return ""
    }
@@ -2887,6 +2917,7 @@ itcl::class gaia::GaiaSextractor {
       {MAGERR_WIN} {RMS error for MAG_WIN}
       {KRON_RADIUS} {Kron apertures in units of A or B}
       {PETRO_RADIUS} {Petrosian apertures in units of A or B}
+      {FLUX_RADIUS} {Fraction-of-light radius}
       {BACKGROUND} {Background at centroid position}
       {THRESHOLD} {Detection threshold above background}
       {FLUX_MAX} {Peak flux above background}
