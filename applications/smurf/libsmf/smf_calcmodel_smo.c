@@ -104,6 +104,8 @@
 #include "libsmf/smf.h"
 #include "libsmf/smf_err.h"
 
+#include <strings.h>
+
 #define FUNC_NAME "smf_calcmodel_smo"
 
 /* Local data types: */
@@ -114,7 +116,7 @@ typedef struct smfCalcmodelSmoJobData {
    dim_t ntslice;
    double *model_data;
    double *res_data;
-   int filter_type;
+   smf_filt_t filter_type;
    size_t boxcar;
    size_t bstride;
    size_t tstride;
@@ -134,7 +136,7 @@ void smf_calcmodel_smo( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   size_t bstride;               /* bolo stride */
   size_t boxcar = 0;            /* size of boxcar smooth window */
   int boxcar_i=0;               /* width in samples of boxcar filter */
-  int filter_type;              /* The type of smoothing to perform */
+  smf_filt_t filter_type;       /* The type of smoothing to perform */
   size_t i;                     /* Loop counter */
   dim_t idx=0;                  /* Index within subgroup */
   int iworker;                  /* Owkrer index */
@@ -155,6 +157,7 @@ void smf_calcmodel_smo( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   double *res_data=NULL;        /* Pointer to DATA component of res */
   int step;                     /* Number of bolometers per thread */
   size_t tstride;               /* Time slice stride in data array */
+  const char * typestr = NULL;  /* smo.type value */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -183,9 +186,14 @@ void smf_calcmodel_smo( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     }
   }
 
-  /* Get the type of smoothing filter to use: zero=median,
-     anything else=mean*/
-  astMapGet0I( kmap, "TYPE", &filter_type );
+  /* Get the type of smoothing filter to use. Anthing that is not "MEDIAN" is mean */
+  filter_type = SMF__FILT_MEAN;
+  if (astMapGet0C( kmap, "TYPE", &typestr ) ) {
+    if (strncasecmp( typestr, "MED", 3 ) == 0 ) {
+      filter_type = SMF__FILT_MEDIAN;
+    }
+  }
+  printf("FILTER TYPE = %d\n", filter_type);
 
   /* Obtain pointers to relevant smfArrays for this chunk */
   res = dat->res[chunk];
@@ -349,7 +357,7 @@ static void smf1_calcmodel_smo_job( void *job_data, int *status ) {
    double *res_data;
    double *w1 = NULL;
    double *w2 = NULL;
-   int filter_type;
+   smf_filt_t filter_type;
    size_t boxcar;
    size_t bstride;
    size_t tstride;
@@ -389,7 +397,7 @@ static void smf1_calcmodel_smo_job( void *job_data, int *status ) {
       /* Allocate work space */
       boldata = astMalloc( ntslice*sizeof( *boldata ) );
       bolqua  = astMalloc( ntslice*sizeof( *bolqua ) );
-      if( filter_type == 0 ) {
+      if( filter_type == SMF__FILT_MEDIAN ) {
         w1 = astMalloc( boxcar*sizeof( *w1 ) );
         w2 = astMalloc( boxcar*sizeof( *w2 ) );
       }
@@ -409,7 +417,7 @@ static void smf1_calcmodel_smo_job( void *job_data, int *status ) {
         }
 
         /* Smooth that bolometer time series */
-        if( filter_type == 0 ) {
+        if( filter_type == SMF__FILT_MEDIAN ) {
            smf_median_smooth( (dim_t) boxcar, SMF__FILT_MEDIAN, ntslice, res_data+boloff,
                               qua_data+boloff, 1, SMF__Q_FIT, boldata,
                               w1, w2, status );
