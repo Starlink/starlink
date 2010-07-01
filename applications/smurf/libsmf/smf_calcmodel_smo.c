@@ -193,7 +193,6 @@ void smf_calcmodel_smo( smfWorkForce *wf, smfDIMMData *dat, int chunk,
       filter_type = SMF__FILT_MEDIAN;
     }
   }
-  printf("FILTER TYPE = %d\n", filter_type);
 
   /* Obtain pointers to relevant smfArrays for this chunk */
   res = dat->res[chunk];
