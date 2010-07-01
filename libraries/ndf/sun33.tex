@@ -14904,6 +14904,15 @@ locator}{sun92}{using_locators}}
          write.
 
          \sstitem
+         If the MMOD argument includes the \hi{'}/ZERO\hi{'} option, the
+         bad pixel flag for the array will be reset to false to indicate
+         that there are no bad values present in the array (see
+         NDF\_BAD). If any bad values are then placed into the mapped
+         array, NDF\_SBAD should normally be called to set the bad pixel
+         flag true. If this is not done, the bad values in the array may
+         be treated as literal values by subsequent applications.
+
+         \sstitem
          If this routine is called with STATUS set, then a value of 1
          will be returned for the EL argument, although no further
          processing will occur.  The same value will also be returned if

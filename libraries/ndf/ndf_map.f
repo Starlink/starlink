@@ -43,13 +43,20 @@
 *     of these mapped components will be returned (in the specified
 *     order) in the elements of the array PNTR, which must be of
 *     sufficient size to accommodate them.
-*     - If the array is stored in scaled form, then the mapped values
-*     will be the result of applying the approproate scale and zero terms
-*     to the elements of the underlying array.
-*     - Scaled arrays are read-only. An error will be reported if the array
-*     is stored in scaled form and the access mode is UPDATE or WRITE.
 *     -  The result of mapping the QUALITY component with a data type
 *     other than '_UBYTE' is not defined and should not be used.
+*     -  If the array is stored in scaled form, then the mapped values
+*     will be the result of applying the approproate scale and zero terms
+*     to the elements of the underlying array.
+*     -  Scaled arrays are read-only. An error will be reported if the array
+*     is stored in scaled form and the access mode is UPDATE or WRITE.
+*     -  If the MMOD argument includes the '/ZERO' option, the bad pixel
+*     flag for the array will be reset to false to indicate that there are
+*     no bad values present in the array (see NDF_BAD). If any bad values
+*     are then placed into the mapped array, NDF_SBAD should normally be
+*     called to set the bad pixel flag true. If this is not done, the bad
+*     values in the array may be treated as literal values by subsequent
+*     applications.
 *     -  If this routine is called with STATUS set, then a value of 1
 *     will be returned for the EL argument, although no further
 *     processing will occur.  The same value will also be returned if
