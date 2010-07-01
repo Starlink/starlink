@@ -33,6 +33,7 @@
 
 *  Authors:
 *     J.Balfour (UBC)
+*     V.Tilanus (JAC)
 *     {enter_new_authors_here}
 
 *  History :
@@ -50,9 +51,11 @@
 *        Correct scanVel calculation.
 *     2008-04-14 (JB):
 *        Remove obsType argument (not needed).
+*     2010-07-01 (VT):
+*        Fixed string equalities.
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008,2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -143,21 +146,20 @@ void gsdac_getMapVars ( const gsdVars *gsdVars, const char *samMode,
 
   /* Get the chopping parameters for grid beamswitches
      and samples. */
-  if ( ( strcmp ( samMode, "grid" ) == 0 &&
-         strcmp ( mapVars->swMode, "chop" ) == 0 ) ||
-       strcmp ( samMode, "sample" ) == 0 ) {
 
-    if ( strncmp ( gsdVars->chopCoords, "AZ", 2 ) )
+  if ( strcmp ( mapVars->swMode, "chop" ) == 0 ) {
+
+    if ( strncmp ( gsdVars->chopCoords, "AZ", 2 ) == 0 )
       strcpy ( mapVars->chopCrd, "AZEL" );
-    else if ( strncmp ( gsdVars->chopCoords, "EQ", 2 ) )
-      strcpy ( mapVars->chopCrd, "HADEC" );
-    else if ( strncmp ( gsdVars->chopCoords, "RB", 2 ) )
+    else if ( strncmp ( gsdVars->chopCoords, "EQ", 2 ) == 0 )
+	  strcpy ( mapVars->chopCrd, "HADEC" );
+    else if ( strncmp ( gsdVars->chopCoords, "RB", 2 ) == 0 )
       strcpy ( mapVars->chopCrd, "B1950" );
-    else if ( strncmp ( gsdVars->chopCoords, "RJ", 2 ) )
+    else if ( strncmp ( gsdVars->chopCoords, "RJ", 2 ) == 0 )
       strcpy ( mapVars->chopCrd, "J2000" );
-    else if ( strncmp ( gsdVars->chopCoords, "RD", 2 ) )
+    else if ( strncmp ( gsdVars->chopCoords, "RD", 2 ) == 0 )
       strcpy ( mapVars->chopCrd, "APP" );
-    else if ( strncmp ( gsdVars->chopCoords, "GA", 2 ) )
+    else if ( strncmp ( gsdVars->chopCoords, "GA", 2 ) == 0 )
       strcpy ( mapVars->chopCrd, "GAL" );
     else {
       strcpy ( mapVars->chopCrd, "" );
