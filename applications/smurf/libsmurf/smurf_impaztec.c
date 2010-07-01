@@ -334,7 +334,7 @@ void smurf_impaztec( int *status ) {
   if( *status == SAI__OK ) {
 
     /* Populate bolo LUT */
-    memset( &hdr, sizeof(hdr), 0 );
+    memset( &hdr, 0, sizeof(hdr) );
     aztec_fill_smfHead( &hdr, 0, status );
 
     /* Preset some required values */

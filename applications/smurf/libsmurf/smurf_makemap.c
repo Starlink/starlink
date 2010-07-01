@@ -1679,7 +1679,7 @@ void smurf_makemap( int *status ) {
     if ( tdata ) {
       exp_time = (tdata->pntr)[0];
       /* initialise with zero exposure time */
-      memset( exp_time, nxy*sizeof(*exp_time), 0);
+      memset( exp_time, 0, nxy*sizeof(*exp_time) );
     }
 
     /* Free the extension locator */
