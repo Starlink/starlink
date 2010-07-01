@@ -445,11 +445,11 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
 
             /* Find the gradient and offset for the straight line used to
                create the replacement values for the flagged block. */
-            if( jstart <= 0 ) {
+            if( jstart <= 0 || ml == VAL__BADD || cl == VAL__BADD  ) {
               grad = 0.0;
               offset = mr*( jend + 1 ) + cr;
 
-            } else if( jend >= jfinal ) {
+            } else if( jend >= jfinal || mr == VAL__BADD || cr == VAL__BADD  ) {
               grad = 0.0;
               offset = ml*( jstart - 1 ) + cl;
 
