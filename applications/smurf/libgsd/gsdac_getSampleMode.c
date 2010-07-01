@@ -33,6 +33,7 @@
 
 *  Authors:
 *     J.Balfour (UBC)
+*     V.Tilanus (JAC)
 *     {enter_new_authors_here}
 
 *  History :
@@ -40,9 +41,11 @@
 *        Original
 *     2008-03-19 (JB):
 *        Include mers.h
+*     2010-07-01 (VT):
+*        Use ACSIS oberving modes
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008,2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -92,13 +95,14 @@ void gsdac_getSampleMode ( const gsdVars *gsdVars,
     strcpy ( obsType, "pointing" );
   else if ( strncmp ( gsdVars->obsType, "FOCUS", 5 ) == 0 )
     strcpy ( obsType, "focus" );
+  else if ( strncmp ( gsdVars->obsType, "SKYDIP", 6 ) == 0 )
+    strcpy ( obsType, "skydip" );
   else if ( strncmp ( gsdVars->obsType, "SAMPLE", 6 ) == 0 ||
             strncmp ( gsdVars->obsType, "GRID", 4 ) == 0 ||
             strncmp ( gsdVars->obsType, "ON/OFF", 6 ) == 0 ||
             strncmp ( gsdVars->obsType, "PATTERN", 7 ) == 0 ||
             strncmp ( gsdVars->obsType, "RASTER", 6 ) == 0 ||
-            strncmp ( gsdVars->obsType, "SKYDIP", 6 ) == 0 ||
-            strncmp ( gsdVars->obsType, "SPIRAL", 6 ) == 0 ) {
+                        strncmp ( gsdVars->obsType, "SPIRAL", 6 ) == 0 ) {
     strcpy ( obsType, "science" );
   } else {
     *status = SAI__ERROR;
@@ -108,9 +112,7 @@ void gsdac_getSampleMode ( const gsdVars *gsdVars,
 
   /* Get the switch mode and sample mode in ACSIS format. */
   if ( strncmp ( gsdVars->obsType, "RASTER", 6 ) == 0 )
-    strcpy ( samMode, "raster" );
-  else if ( strncmp ( gsdVars->obsType, "SAMPLE", 6 ) == 0 )
-    strcpy ( samMode, "sample" );
+    strcpy ( samMode, "scan" );
   else
     strcpy ( samMode, "grid" );
 

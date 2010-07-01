@@ -67,6 +67,7 @@
 *  Authors:
 *     J.Balfour (UBC)
 *     Tim Jenness (JAC)
+*     V.Tilanus (JAC)
 *     {enter_new_authors_here}
 
 *  History :
@@ -125,6 +126,8 @@
 *        Use astSetFitsU to set undefined values.
 *     2009-07-08 (TIMJ):
 *        Use astSetFitsCM instead of astSetFitsCN
+*     2010-07-01 (VT):
+*        Use ACSIS oberving mode.
 
 *  Copyright:
 *     Copyright (C) 2008-2009 Science and Technology Facilities Council.
@@ -392,7 +395,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
   /* STEPTIME is SCAN_TIME for grids, and SCAN_TIME divided by the
      number of points in a scan for rasters. */
-  if ( strncmp ( samMode, "raster", 6 ) == 0 ) {
+  if ( strcmp ( samMode, "scan" ) == 0 ) {
 
     if ( strncmp ( gsdVars->obsDirection, "HORIZONTAL", 10 ) == 0 )
       stepTime = gsdVars->scanTime / gsdVars->nMapPtsX;
@@ -671,7 +674,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   astSetFitsS ( fitschan, "REFRECEP", recepNames[0],
                 "Receptor with unit sensitivity", 0 );
 
-  if ( strcmp ( samMode, "sample" ) == 0 ) {
+  if ( strcmp ( samMode, "grid" ) == 0 ) {
     astSetFitsU ( fitschan, "MEDTSYS", "[K] Median of the T-sys across all receptors", 0 );
   } else {
     astSetFitsF ( fitschan, "MEDTSYS",
@@ -782,9 +785,8 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   astSetFitsS ( fitschan, "OBS_TYPE", obsType,
 		"Type of observation", 0 );
 
-  if ( ( strcmp ( samMode, "grid" ) == 0
-       && strcmp ( mapVars->swMode, "chop" ) == 0 ) ||
-       strcmp ( samMode, "sample" ) == 0 ) {
+  if ( strcmp ( samMode, "grid" ) == 0
+       && strcmp ( mapVars->swMode, "chop" ) == 0 ) {
 
     astSetFitsS ( fitschan, "CHOP_CRD", mapVars->chopCrd,
                   "Chopping co-ordinate system", 0 );
@@ -824,7 +826,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
   astSetFitsU ( fitschan, "JIG_SCAL", "Scale size of jiggle pattern", 0 );
 
-  if ( strcmp ( samMode, "raster" ) == 0
+  if ( strcmp ( samMode, "scan" ) == 0
        && strcmp ( mapVars->swMode, "pssw" ) == 0 ) {
 
     astSetFitsF ( fitschan, "MAP_HGHT", mapVars->mapHght,

@@ -32,6 +32,7 @@
 
 *  Authors:
 *     J.Balfour (UBC)
+*     V.Tilanus (JAC)
 *     {enter_new_authors_here}
 
 *  History :
@@ -45,9 +46,11 @@
 *        Calculate startIdx for grids/rasters.
 *     2008-04-03 (JB):
 *        startidx = 1 for rasters.
+*     2010-07-01 (VT):
+*        Use ACSIS oberving mode.
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008,2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -110,7 +113,7 @@ void gsdac_getStartIdx ( const gsdVars *gsdVars, const char *samMode,
   found = 0;
   i = 1;
 
-  if ( strncmp ( samMode, "sample", 6 ) == 0 ) {
+  if ( strcmp ( samMode, "grid" ) == 0 ) {
 
     *startIdx = 1;
     return;
@@ -144,7 +147,7 @@ void gsdac_getStartIdx ( const gsdVars *gsdVars, const char *samMode,
 
   /* If this is a raster, only increment on each row.  Remember
      that the index begins at 1, not 0. */
-  /*if ( strncmp ( samMode, "raster", 6 ) == 0 ) {
+  /*if ( strcmp ( samMode, "scan" ) == 0 ) {
 
     if ( posCol )
       *startIdx = startCol + ( nRows - 1.0 ) / 2.0 + 1.0;
@@ -157,7 +160,7 @@ void gsdac_getStartIdx ( const gsdVars *gsdVars, const char *samMode,
   /* The start coordinates are usually in the bottom left
      hand corner, but if x and/or y decreases in the first
      row/column, a different corner is the "start". */
-  if ( strncmp ( samMode, "grid", 4 ) == 0 ) {
+  if ( strcmp ( samMode, "grid" ) == 0 ) {
     if ( posRow  )
       expStartCol = ( nCols - 1.0 ) / -2.0;
     else

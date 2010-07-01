@@ -53,6 +53,7 @@
 *        Remove obsType argument (not needed).
 *     2010-07-01 (VT):
 *        Fixed string equalities.
+*        Renamed Raster to Scan.
 
 *  Copyright:
 *     Copyright (C) 2008,2010 Science and Technology Facilities Council.
@@ -211,7 +212,7 @@ void gsdac_getMapVars ( const gsdVars *gsdVars, const char *samMode,
   strcpy ( mapVars->scanCrd, mapVars->loclCrd );
 
   /* Get the map and scan parameters for rasters. */
-  if ( strcmp ( samMode, "raster" ) == 0
+  if ( strcmp ( samMode, "scan" ) == 0
        && strcmp ( mapVars->swMode, "pssw" ) == 0 ) {
 
     /* Get the map height and width. */
