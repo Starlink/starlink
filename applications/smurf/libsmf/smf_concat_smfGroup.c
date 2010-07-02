@@ -149,6 +149,9 @@
  *        Handle dark squid QUALITY
  *     2010-06-14 (TIMJ):
  *        Refactor loops for separate quality component in smfData
+ *     2010-07-01 (TIMJ):
+ *        Fix smfDA logic so that we again copy more than just
+ *        the dksquid item.
 
  *  Notes:
  *     If projection information supplied, pointing LUT will not be
@@ -475,20 +478,19 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
           if( *status == SAI__OK ) {
             /* If first chunk initialize the concatenated array */
             if( j == firstpiece ) {
-              int cflags=0;
 
               /* Copy first data right after the initial padding */
               tchunk = padStart;
 
               /* Allocate memory for empty smfData with a smfHead. Create
-                 a DA struct only if the input file has dark squids. */
-
-              if( !(refdata->da && refdata->da->dksquid) ) {
-                cflags |= SMF__NOCREATE_DA;
+                 a DA struct only if the input file has one. Create it as
+                 a clone rather than creating an empty smfDa. */
+              data = smf_create_smfData( SMF__NOCREATE_DA, status );
+              if (refdata->da && data) {
+                /* do not copy dark squids. We do that below */
+                data->da = smf_deepcopy_smfDA( refdata, 0, status );
+                da = data->da;
               }
-
-              data = smf_create_smfData( cflags, status );
-              da = data->da;
 
               if (refdata->history) data->history = astCopy( refdata->history );
 
@@ -597,6 +599,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
 
                   /* QUALITY too if requested */
                   if( !(flags&SMF__NOCREATE_QUALITY) ) {
+                    da->dksquid->qfamily = refdata->da->dksquid->qfamily;
                     da->dksquid->qual = astCalloc(ncol*tlen, sizeof(*(da->dksquid->qual)), 1);
                     if( *status == SAI__OK ) {
                       memset( da->dksquid->qual, 0,
