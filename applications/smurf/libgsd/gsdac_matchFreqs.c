@@ -44,6 +44,7 @@
 
 *  Authors:
 *     J.Balfour (UBC)
+*     V. Tilanus (JAC)
 *     {enter_new_authors_here}
 
 *  History :
@@ -56,9 +57,11 @@
 *        routine.
 *     2008-04-30 (JB):
 *        Change IF for MPI frontend.
+*     2010-07-01 (VT):
+*        Simplify IF freq logic
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008, 2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -149,32 +152,12 @@ void gsdac_matchFreqs ( const gsdVars *gsdVars, double *lineFreqs,
 
   }
 
-  /* If this is flagged as a special configuration, set each of the
-     IFFreqs to the corresponding value found in the GSD BES_TOT_IF
-     array.  Otherwise, set all IFFreqs to 4.0 GHz. */
-  if ( special ) {
+  /* Set IF frequency for each subsystem */
 
-    for ( i = 0; i < gsdVars->nBESections; i++ ) {
+  for ( i = 0; i < gsdVars->nBESections; i++ ) {
 
-      IFFreqs[i] = gsdVars->totIFs[i];
-      lineFreqs[i] = gsdVars->centreFreqs[i];
-
-    }
-
-  } else {
-
-    for ( i = 0; i < gsdVars->nBESections; i++ ) {
-
-      /* MPI frontends used an IF of 3.5 GHz, other frontends
-         used 4.0GHz. */
-      if ( strncmp ( gsdVars->frontend, "MPI", 3 ) == 0 )
-        IFFreqs[i] = 3.5 * gsdVars->sbSigns[i];
-      else
-        IFFreqs[i] = 4.0 * gsdVars->sbSigns[i];
-
-      lineFreqs[i] = gsdVars->restFreqs[i];
-
-    }
+     IFFreqs[i] = gsdVars->totIFs[i];
+     lineFreqs[i] = gsdVars->restFreqs[i];
 
   }
 
