@@ -60,6 +60,8 @@
 *       Change flatfield type in smfDA
 *     2010-06-23 (TIMJ):
 *        Add Quality family.
+*     2010-07-01 (TIMJ):
+*        Include dark squid smfData in dump if present
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -429,6 +431,13 @@ void smf_dump_smfData( const smfData *data, int showflags __attribute__((unused)
     msgOut("", "    nflat = ^F", status);
     msgOutf("","    heatval = %s", status, ( da->heatval ? "OK" : "NULL" ));
     msgOutf("","    nheat = %zd", status, da->nheat);
+    if ( da->dksquid ) {
+      msgOut("", " begin dksquid", status );
+      smf_dump_smfData( da->dksquid, showflags, status );
+      msgOut("", " end dksquid", status);
+    } else {
+      msgOut( "", "   dksquid = NULL", status );
+    }
   }
 
   /* smfDream */
