@@ -113,6 +113,11 @@ tclIndex
 version.dat
 world-stamp
 
+# LaTeX
+
+*.texml/
+*.texml_tar
+
 # These are non-standard ignores. They could go in subdirs but for now
 put them in global.
 
@@ -782,6 +787,20 @@ docs/sc/013/examples/p2.f.xml
 docs/sc/013/examples/p3.f.xml
 docs/sc/013/sc13.pdf
 docs/sc/013/sc13.texml_tar
+
+docs/ssn/078/ssn78-1.eps
+docs/ssn/078/ssn78-1.pdf
+docs/ssn/078/ssn78-2.eps
+docs/ssn/078/ssn78-2.pdf
+docs/ssn/078/ssn78-3.eps
+docs/ssn/078/ssn78-3.pdf
+docs/ssn/078/ssn78-4.eps
+docs/ssn/078/ssn78-4.pdf
+docs/ssn/078/ssn78-5.eps
+docs/ssn/078/ssn78-5.pdf
+docs/ssn/078/ssn78.pdf
+
+docs/sun/248/sun248.pdf
 
 etc/init/cshrc
 etc/init/login
