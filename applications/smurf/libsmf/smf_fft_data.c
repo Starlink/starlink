@@ -84,6 +84,8 @@
 *         Added arguments qyality and len (needed since with the new
 *         filtering scheme, the data may not have been apodised on entry
 *         to this function).
+*     2010-07-01 (TIMJ):
+*        Make sure that quality in smfData really is used.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -252,6 +254,7 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
   double df=0;                  /* Frequency step size in Hz */
   fftw_iodim dims;              /* I/O dimensions for transformations */
   AstCmpMap *fftmapping=NULL;   /* Mapping from GRID to curframe2d */
+  int flags = 0;                /* Copy flags for smfData */
   int i;                        /* Loop counter */
   int isFFT=0;                  /* Are the input data freq. domain? */
   size_t j;                     /* Loop counter */
@@ -297,11 +300,12 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
   }
 
   /* Create a copy of the input data since FFT operations often do
-     calculations in-place */
-  data = smf_deepcopy_smfData( indata, 0, SMF__NOCREATE_VARIANCE |
-                               SMF__NOCREATE_QUALITY |
-                               SMF__NOCREATE_FILE |
-                               SMF__NOCREATE_DA, status );
+     calculations in-place. Only copy quality if we have quality
+     in the smfData and we are not using an external quality. */
+  flags = SMF__NOCREATE_VARIANCE | SMF__NOCREATE_FILE |
+    SMF__NOCREATE_DA;
+  if (quality || ! indata->qual) flags |= SMF__NOCREATE_QUALITY;
+  data = smf_deepcopy_smfData( indata, 0, flags, status );
 
   /* Re-order a time-domain cube if needed */
   if( indata->isTordered && (indata->ndims == 3) ) {
