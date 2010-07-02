@@ -128,6 +128,7 @@
 *        Use astSetFitsCM instead of astSetFitsCN
 *     2010-07-01 (VT):
 *        Use ACSIS oberving mode.
+*        Fix (mainly) JOS FITS headers
 
 *  Copyright:
 *     Copyright (C) 2008-2009 Science and Technology Facilities Council.
@@ -194,7 +195,8 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   float IFchanSp;             /* TOPO IF channel spacing (Hz) */
   char instrume[SZFITSCARD];  /* front-end receiver */
   double intTime;             /* total time spent integrating (s) */
-  int josMin;                 /* ?? */
+  int josMult;                /* times around the jiggle (i.e. 1) */
+  int josMin;                 /* minimum step time psw */
   int min;                    /* minutes for time conversion. */
   const char *molecule;       /* target molecular species */
   int month;                  /* months for time conversion. */
@@ -276,14 +278,9 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
   } else {
 
-    i = 0;
-    intTime = 0.0;
-    for ( i = 0; i < gsdVars->nScan; i++ ) {
-      intTime += gsdVars->intTimes[i];
-    }
+    intTime = gsdVars->nCycle * gsdVars->cycleTime;
 
   }
-
 
   /* ACSIS Specific. */
 
@@ -393,33 +390,33 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
   /* JOS parameters */
 
-  /* STEPTIME is SCAN_TIME for grids, and SCAN_TIME divided by the
-     number of points in a scan for rasters. */
+  /* STEPTIME is SCAN_TIME divided by the number of points in a scan
+     for rasters. For PSW spectra it is SCAN_TIME/2 and for BSW
+     it is SCAN_TIME/4 -- because acsis expects a minimum unit
+     of ABBA for the nod --*/
   if ( strcmp ( samMode, "scan" ) == 0 ) {
-
-    if ( strncmp ( gsdVars->obsDirection, "HORIZONTAL", 10 ) == 0 )
+    if ( strncmp ( gsdVars->obsDirection, "HORIZONTAL", 10 ) == 0 ) {
       stepTime = gsdVars->scanTime / gsdVars->nMapPtsX;
-    else
+    } else {
       stepTime = gsdVars->scanTime / gsdVars->nMapPtsY;
-
+    }
+    josMin = 1;
+    josMult = 0;
+  } else if ( strcmp ( mapVars->swMode, "chop" ) == 0 ) {
+      stepTime = gsdVars->scanTime / 4.0;
+      josMin = 0;
+      josMult = 1;
   } else {
-
-    stepTime = gsdVars->scanTime;
-
+      stepTime = gsdVars->scanTime / 2.0;
+      josMin = stepTime;
+      josMult = 0;
   }
 
-
-  /* Get the JOS_MIN (1 for raster, for sample this is the number
-     of STEPTIME integrations coadded into a single spectrum. */
-  if ( strcmp ( samMode, "sample" ) == 0 )
-    josMin = gsdVars->nScan;
-  else
-    josMin = 1;
 
   /* Get the length of time in the reference, and the number
      of steps between references. set up defaults first to avoid compiler
      warnings. */
-  nRefStep = (double)(gsdVars->scanTime);
+  nRefStep = 1;
   stBetRef = 1;
 
   if ( gsdVars->obsContinuous ) {
@@ -917,15 +914,28 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   astSetFitsF ( fitschan, "STEPTIME", stepTime,
                 "RTS step time during an RTS sequence", 0 );
 
-  astSetFitsI ( fitschan, "NUM_CYC", gsdVars->nCycle,
+  /* Since coadding is happening in the correlator before writing out
+  ** the spectrum, in ACSIS land the number of cycles is 1 instead
+  ** of gsdVars->nCycle
+  */
+
+  astSetFitsI ( fitschan, "NUM_CYC", 1,
                 "Number of times to repeat entire recipe", 0 );
 
   astSetFitsI ( fitschan, "NUM_NODS", 1,
                 "Number of times to repeat nod set", 0 );
 
-  astSetFitsU ( fitschan, "JOS_MULT", "", 0 );//k description
+  if (josMult == 0) {
+    astSetFitsU ( fitschan, "JOS_MULT", "Nr of steps between bsw", 0 );
+  } else {
+    astSetFitsI ( fitschan, "JOS_MULT", josMult, "Nr of steps between bsw", 0 );
+  }
 
-  astSetFitsI ( fitschan, "JOS_MIN", josMin, "", 0 );//k description
+  if (josMin == 0) {
+    astSetFitsU ( fitschan, "JOS_MIN", "Nr of steps between psw", 0 );
+  } else {
+    astSetFitsI ( fitschan, "JOS_MIN", josMin, "Nr of steps between psw", 0 );
+  }
 
   astSetFitsU ( fitschan, "NCALSTEP", "Number of RTS steps for each CAL", 0 );
 
