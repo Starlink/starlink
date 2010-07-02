@@ -85,8 +85,8 @@
 *        ARDFILE is set to null. If the current co-ordinate Frame of the
 *        NDF is a SKY Frame (e.g. RA and DEC), then the value should be
 *        supplied as an increment of celestial latitude (e.g. DEC). Thus,
-*        "10.2" means 10.2 arcseconds, "30:0" would mean 30 arcminutes,
-*        and "1:0:0" would mean 1 degree. If the current co-ordinate
+*        "10.2" means 10.2 degrees, "0:30" would mean 30 arcminutes,
+*        and "0:0:1" would mean 1 arcsecond. If the current co-ordinate
 *        Frame is not a SKY Frame, then the diameter should be specified
 *        as an increment along axis 1 of the current co-ordinate Frame.
 *        Thus, if the current Frame is PIXEL, the value should be given
@@ -234,6 +234,9 @@
 *     2009 July 24 (MJC):
 *        Remove QUIET parameter and use the current reporting level
 *        instead (set by the global MSG_FILTER environment variable).
+*     2-JUL-2010 (DSB):
+*        - Report an error if the aperture does not overlap the NDF.
+*        - Correct docs for DIAM parameter.
 *     {enter_further_changes_here}
 
 *-
@@ -419,6 +422,14 @@
      :               %VAL( CNF_PVAL( IPMASK ) ),
      :               LBNDI, UBNDI, LBNDE, UBNDE,
      :               STATUS )
+
+*  Check the region overlaps the NDF.
+      IF( LBNDI( 1 ) .GT. UBNDI( 1 ) .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'APERADD_ERR1', 'The supplied aperture does '//
+     :                 'not overlap the supplied NDF.', STATUS )
+         GO TO 999
+      END IF
 
 *  Create a section from the input NDF which just encloses the aperture.
       CALL NDF_SECT( INDF1, NDIM, LBNDI, UBNDI, INDF2, STATUS )

@@ -13622,9 +13622,9 @@ KAPPA: \htmlref{CADD}{CADD},
          ARDFILE is set to null.  If the \htmlref{current co-ordinate
          Frame}{se:curframe}~ of the NDF is a SKY Frame (\emph{e.g.} RA and
          DEC), then the value should be supplied as an increment of celestial
-         latitude (\emph{e.g.} DEC).  Thus, {\tt "10.2"} means 10.2 arcseconds,
-         {\tt "30:0"} would mean 30 arcminutes, and {\tt "1:0:0"} would mean
-         1 degree.  If the current co-ordinate Frame is not a SKY Frame, then
+         latitude (\emph{e.g.} DEC).  Thus, {\tt "10.2"} means 10.2 degrees,
+         {\tt "0:30"} would mean 30 arcminutes, and {\tt "0:0:1"} would mean
+         1 arcsecond.  If the current co-ordinate Frame is not a SKY Frame, then
          the diameter should be specified as an increment along Axis~1 of
          the current co-ordinate Frame.  Thus, if the current Frame is
          PIXEL, the value should be given simply as a number of pixels.
@@ -19909,13 +19909,13 @@ plot with PENROT={\tt TRUE} (11k).
          Determines how the output NDF is normalised to take account of
          the total data sum in the PSF, and of the presence of bad pixels
          in the input NDF.  If {\tt TRUE}, bad pixels are excluded from the
-         data sum for each output pixel, and the associated weight for the 
-         output pixel is reduced appropriately.  The supplied PSF is 
+         data sum for each output pixel, and the associated weight for the
+         output pixel is reduced appropriately.  The supplied PSF is
          normalised to a total data sum of unity so that the output NDF has
-         the same normalisation as the input NDF.  If NORM is {\tt FALSE}, 
-         bad pixels are replaced by the mean value and then included in the 
-         convolution as normal.  The normalisation of the supplied PSF is 
-         left unchanged, and so determines the normalisation of the output 
+         the same normalisation as the input NDF.  If NORM is {\tt FALSE},
+         bad pixels are replaced by the mean value and then included in the
+         convolution as normal.  The normalisation of the supplied PSF is
+         left unchanged, and so determines the normalisation of the output
          NDF.  {\tt [TRUE]}
       }
       \sstsubsection{
@@ -19933,7 +19933,7 @@ plot with PENROT={\tt TRUE} (11k).
          constant background is removed from the PSF before use.  This
          background level is equal to the minimum of the absolute value
          in the four corner pixel values.  The PSF is assumed to be zero
-         beyond the bounds of the supplied NDF.  It should have the 
+         beyond the bounds of the supplied NDF.  It should have the
          same number of dimensions as the NDF being smoothed, unless
          the input NDF has three significant dimensions, whereupon the
          PSF must be two-dimensional.  It will be normalised to a total
@@ -19942,17 +19942,17 @@ plot with PENROT={\tt TRUE} (11k).
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         A \htmlref{title}{apndf:title} for the output NDF.  A null ({\tt{!}}) 
+         A \htmlref{title}{apndf:title} for the output NDF.  A null ({\tt{!}})
          value means using the title of the input NDF.  {\tt [!]}
       }
       \sstsubsection{
          WLIM = \_REAL (Read)
       }{
-         If the input array contains bad pixels, and NORM is {\tt TRUE}, 
-         then this parameter may be used to determine the number of good 
-         pixels that must be present within the smoothing box before a 
-         valid output pixel is generated.  It can be used, for example, to 
-         prevent output pixels from being generated in regions where there 
+         If the input array contains bad pixels, and NORM is {\tt TRUE},
+         then this parameter may be used to determine the number of good
+         pixels that must be present within the smoothing box before a
+         valid output pixel is generated.  It can be used, for example, to
+         prevent output pixels from being generated in regions where there
          are relatively few good pixels to contribute to the smoothed
          result.
 
@@ -57169,7 +57169,7 @@ The following applications have been modified:
         \item A new parameter NORM determines how the output NDF is
         normalised to take account of the total data sum in the PSF,
         and of the presence of bad pixels in the input NDF.
-        \item It now permits PSFs with negative areas.  
+        \item It now permits PSFs with negative areas.
       \end{itemize}
 
    \item [\htmlref{LISTSHOW}{LISTSHOW}]\mbox{}
