@@ -97,6 +97,8 @@
 *     2010-06-03 (TIMJ):
 *        Rely on smf_find_science to work out whether we are calculating
 *        noise of darks or skys.
+*     2010-07-01 (TIMJ):
+*        smf_bolonoise can now handle apodization.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -291,9 +293,6 @@ void smurf_calcnoise( int *status ) {
         if (strlen(noiseunits)) one_strlcat( noiseunits, " ", sizeof(noiseunits), status );
         one_strlcat( noiseunits, "Hz**-0.5", sizeof(noiseunits), status );
 
-        /* Apodize */
-        smf_apodize(thedata, NULL, SMF__MAXAPLEN, status );
-
         /* Create the output file if required, else a malloced smfData */
         smf_create_bolfile( ogrp, gcount, thedata, "Noise",
                             noiseunits, 1, &outdata, status );
@@ -306,7 +305,7 @@ void smurf_calcnoise( int *status ) {
         if (*status == SAI__OK) {
           double * od = (outdata->pntr)[0];
           smf_bolonoise( wf, thedata, NULL, 0, f_low, freqs[0], freqs[1],
-                         10.0, 1, 0,
+                         10.0, 1, SMF__MAXAPLEN,
                          (outdata->pntr)[0], (ratdata->pntr)[0],
                          (powgrp ? &powdata : NULL), status );
 
