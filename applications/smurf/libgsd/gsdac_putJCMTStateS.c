@@ -42,6 +42,7 @@
 
 *  Authors:
 *     Jen Balfour (JAC, UBC)
+*     V. Tilanus (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -63,10 +64,12 @@
 *        Convert sample time to days before adding to TAI.
 *     2008-04-25 (JB):
 *        enviro_air_temp should be tamb.
+*     2010-07-01 (VT):
+*        Fix some JCMTSTATE problems
 
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008, 2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -158,6 +161,14 @@ void gsdac_putJCMTStateS ( const gsdVars *gsdVars,
 
   record->tcs_tr_bc2 = wcs->baseTr2;
 
+  record->tcs_en_dc1 = record->tcs_tr_dc1;
+
+  record->tcs_en_dc2 = record->tcs_tr_dc2;
+
+  record->tcs_dm_abs = record->tcs_tr_ac1;
+
+  record->tcs_dm_rel = 0.0;
+
   record->tcs_index = wcs->index;
 
  /* Get the frontend LO frequency. */
@@ -172,7 +183,7 @@ void gsdac_putJCMTStateS ( const gsdVars *gsdVars,
     arrayIndex = subBandNum;
   }
 
-  record->enviro_air_temp = gsdVars->tamb;
+  record->enviro_air_temp = gsdVars->tamb + 273.15; /* Kelvin */
 
   record->fe_doppler = gsdVars->restFreqs[subBandNum] /
                ( record->fe_lofreq + gsdVars->totIFs[subBandNum] );

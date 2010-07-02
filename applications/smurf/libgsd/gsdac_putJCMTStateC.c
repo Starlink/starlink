@@ -39,6 +39,7 @@
 
 *  Authors:
 *     Jen Balfour (JAC, UBC)
+*     V. Tilanus (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -62,9 +63,11 @@
 *        Don't convert PAMB, it is already in mbar.
 *     2008-04-30 (JB):
 *        Allow for MPI frontend.
+*     2010-07-01 (VT):
+*        Fix some JCMTSTATE problems
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008, 2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -203,9 +206,12 @@ void gsdac_putJCMTStateC ( const gsdVars *gsdVars, const unsigned int stepNum,
     record->acs_offexposure = record->acs_exposure *
                               sqrt(gsdVars->nScanPts);
   } else {
-    record->acs_exposure = gsdVars->intTimes[stepNum];
-    record->acs_offexposure = record->acs_exposure;
-  }
+     /* record->acs_exposure = gsdVars->intTimes[stepNum];
+     ** record->acs_offexposure = record->acs_exposure;
+     */
+     record -> acs_exposure = (double)(gsdVars->scanTime) / 2.0;
+     record -> acs_offexposure = (double)(gsdVars->scanTime) / 2.0;
+}
 
   record->acs_no_prev_ref = VAL__BADI;
 
