@@ -128,6 +128,7 @@ void smf_create_bolfile( const Grp * bgrp, size_t index,
     /* create the file for WRITE access */
     smf_open_newfile( bgrp, index, SMF__DOUBLE, 2, lbnd, ubnd,
                       flags, bolmap, status );
+    if (*bolmap) (*bolmap)->qfamily = SMF__QFAM_TSERIES;
   } else {
     void *pntr[] = {NULL, NULL};
     smf_qual_t *qual = NULL;
