@@ -115,6 +115,14 @@ void smf_flat_malloc( size_t nheat, const smfData * refdata,
     return;
   }
 
+  /* Sanity check */
+  if ( nheat == 0 ) {
+    *status = SAI__ERROR;
+    errRep( "", "No flatfield information present for creating new smfData",
+            status );
+    return;
+  }
+
   if ( !smf_validate_smfData( refdata, 1, 0, status ) ) return;
   oldhdr = refdata->hdr;
 
