@@ -105,7 +105,7 @@ void smf_check_smfDA( const smfData *idata, smfData *odata, int * status ) {
   if ( oda == NULL) {
     /* If output smfDA is null, then copy from input */
     if ( ida != NULL ) {
-      oda = smf_deepcopy_smfDA( idata, status );
+      oda = smf_deepcopy_smfDA( idata, 1, status );
     } else {
       /* Report error if input smfDA is null */
       if ( *status == SAI__OK) {

@@ -13,11 +13,15 @@
 *     Subroutine
 
 *  Invocation:
-*     newda = smf_deepcopy_smfDA( const smfData *old, int * status );
+*     newda = smf_deepcopy_smfDA( const smfData *old, int cpdks, int * status );
 
 *  Arguments:
 *     old = const smfData* (Given)
 *        Pointer to smfData containing smfDA to be copied
+*     cpdks = int (Given)
+*        If true the dark squid smfData will be copied. If false
+*        not dark squid information will be copied and the dksquid
+*        will be NULL.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -56,6 +60,8 @@
 *        Initialise to NULL the pointers that are passed to
 *        smf_construct_smfDA in case the supplied smfDA does not contain
 *        the corresponding arrays.
+*     2010-07-01 (TIMJ):
+*        Allow for the dark squid copy to be disabled.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -101,7 +107,7 @@
 #define FUNC_NAME "smf_deepcopy_smfDA"
 
 smfDA *
-smf_deepcopy_smfDA( const smfData *old, int * status ) {
+smf_deepcopy_smfDA( const smfData *old, int cpdks, int * status ) {
 
   smfData *dksquid = NULL;/* pointer to dark squid */
   double *flatcal = NULL; /* pointer to flatfield calibration */
@@ -155,7 +161,7 @@ smf_deepcopy_smfDA( const smfData *old, int * status ) {
     }
   }
 
-  if (oldda->dksquid) {
+  if (cpdks && oldda->dksquid) {
     dksquid = smf_deepcopy_smfData( oldda->dksquid, 0, SMF__NOCREATE_HEAD |
                                     SMF__NOCREATE_FILE | SMF__NOCREATE_DA,
                                     status );

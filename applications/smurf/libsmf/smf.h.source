@@ -786,7 +786,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 
 int smf_dataOrder( smfData *data, int isTordered, int *status );
 
-smfDA * smf_deepcopy_smfDA ( const smfData *old, int * status);
+smfDA * smf_deepcopy_smfDA ( const smfData *old, int cpdks, int * status);
 
 smfData * smf_deepcopy_smfData ( const smfData *old, const int rawconvert,
                                  const int flags, int * status);
