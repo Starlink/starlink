@@ -162,8 +162,13 @@ void smf_apodize( smfData *data, smf_qual_t *quality, size_t len,
   for( i=0; (*status==SAI__OK)&&(i<nbolo); i++ ) {
 
     /* Determine the first and last samples to apodize (after padding) */
-    smf_get_goodrange( qua+i*bstride, ntslice, tstride, SMF__Q_PAD,
-                       &first, &last, status );
+    if (qua) {
+      smf_get_goodrange( qua+i*bstride, ntslice, tstride, SMF__Q_PAD,
+                         &first, &last, status );
+    } else {
+      first = 0;
+      last = ntslice -1 ;
+    }
 
     /* Can we apodize? */
     if( *status == SAI__OK ) {
