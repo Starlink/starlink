@@ -177,8 +177,8 @@ void smf_create_bolfile( const Grp * bgrp, size_t index,
     if (frnum != AST__NOFRAME) astSetI( wcs, "CURRENT", frnum );
 
     (*bolmap)->hdr = smf_construct_smfHead( NULL, refdata->hdr->instrument,
-                                             wcs, astCopy( refdata->hdr->fitshdr ),
-                                             NULL, NULL, 0, refdata->hdr->instap, 1,
+                                             wcs, NULL, astCopy( refdata->hdr->fitshdr ),
+                                             NULL, 0, refdata->hdr->instap, 1,
                                              refdata->hdr->steptime, refdata->hdr->obsmode,
                                              refdata->hdr->swmode, refdata->hdr->obstype,
                                              refdata->hdr->seqtype, 0, NULL, NULL,
