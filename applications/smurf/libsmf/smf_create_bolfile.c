@@ -62,6 +62,8 @@
 *        Add ability to enable quality.
 *     2010-03-15 (TIMJ):
 *        New API for smf_construct_smfHead
+*     2010-07-02 (TIMJ):
+*        Work with any data order for refdata.
 
 *  Notes:
 *     - Does not propogate provenance or history from refdata.
@@ -106,19 +108,28 @@ void smf_create_bolfile( const Grp * bgrp, size_t index,
                          const char *units, int hasqual, smfData **bolmap,
                          int *status ) {
 
+  int col_index = SC2STORE__COL_INDEX;
   int lbnd[2];
   int ubnd[2];
+  int row_index = SC2STORE__ROW_INDEX;
 
   *bolmap = NULL;
   if (*status != SAI__OK) return;
 
-  /* Calculate bounds */
-  lbnd[SC2STORE__ROW_INDEX] = (refdata->lbnd)[SC2STORE__ROW_INDEX];
-  lbnd[SC2STORE__COL_INDEX] = (refdata->lbnd)[SC2STORE__COL_INDEX];
+  /* Calculate bounds - take into accont time ordering of reference
+     smfData. */
+  if ( ! refdata->isTordered ) {
+    /* one further along */
+    col_index++;
+    row_index++;
+  }
+
+  lbnd[SC2STORE__ROW_INDEX] = (refdata->lbnd)[row_index];
+  lbnd[SC2STORE__COL_INDEX] = (refdata->lbnd)[col_index];
   ubnd[SC2STORE__ROW_INDEX] = lbnd[SC2STORE__ROW_INDEX] +
-          (refdata->dims)[SC2STORE__ROW_INDEX] - 1;
-  ubnd[SC2STORE__COL_INDEX] = lbnd[SC2STORE__ROW_INDEX] +
-          (refdata->dims)[SC2STORE__COL_INDEX] - 1;
+          (refdata->dims)[row_index] - 1;
+  ubnd[SC2STORE__COL_INDEX] = lbnd[SC2STORE__COL_INDEX] +
+          (refdata->dims)[col_index] - 1;
 
   /* either create the file or use malloc */
   if (bgrp) {
