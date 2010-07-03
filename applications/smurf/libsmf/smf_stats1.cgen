@@ -14,19 +14,19 @@
 *     Subroutine
 
 *  Invocation:
-*     void smf_stats1<X>( CGEN_TYPE *data, size_t stride, size_t nsamp,
-*                         smf_qual_t *qual, size_t qstride,
+*     void smf_stats1<X>( const CGEN_TYPE *data, size_t stride, size_t nsamp,
+*                         const smf_qual_t *qual, size_t qstride,
 *                         smf_qual_t mask, double *mean,
 *                         double *sigma, size_t *ngood, int *status )
 
 *  Arguments:
-*     data = CGEN_TYPE* (Given)
+*     data = const CGEN_TYPE* (Given)
 *        Pointer to input data array
 *     stride = size_t (Given)
 *        Index stride between elements
 *     nsamp = size_t (Given)
 *        Length of the interval to analyze
-*     qual = smf_qual_t* (Given)
+*     qual = const smf_qual_t* (Given)
 *        If specified, use this QUALITY array to decide which samples
 *        to use (provided mask). Otherwise data are only ignored if set
 *        to CGEN_BAD.
@@ -123,8 +123,8 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_stats1"
 
-void CGEN_FUNCTION(smf_stats1)( CGEN_TYPE *data, size_t stride, size_t nsamp,
-                                smf_qual_t *qual, size_t qstride,
+void CGEN_FUNCTION(smf_stats1)( const CGEN_TYPE *data, size_t stride, size_t nsamp,
+                                const smf_qual_t *qual, size_t qstride,
                                 smf_qual_t mask, double *mean,
                                 double *sigma, size_t *ngood,
                                 int *status ) {

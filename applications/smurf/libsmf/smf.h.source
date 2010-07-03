@@ -1320,8 +1320,8 @@ void smf_qualstats_report( smf_qfam_t qfamily, const smfArray *qua, size_t last_
                            size_t *last_nmap, int init, size_t *ngood_tslice,
                            size_t *numdata, int *status );
 
-double smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
-                        smf_qual_t *quality, smf_qual_t mask,
+double smf_quick_noise( const smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
+                        const smf_qual_t *quality, smf_qual_t mask,
                         int *status );
 
 AstMapping *smf_rebin_totmap( smfData *data, dim_t itime,

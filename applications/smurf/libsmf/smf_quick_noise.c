@@ -14,12 +14,12 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
+*     smf_quick_noise( const smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
 *                      smf_qual_t *quality, smf_qual_t mask,
 *                      int *status )
 
 *  Arguments:
-*     data = smfData* (Given)
+*     data = const smfData* (Given)
 *        Pointer to bolo-ordered smfData
 *     bolo = dim_t (Given)
 *        The offset of the bolometer in question (in range [0,nbolo-1])
@@ -111,8 +111,8 @@
 #define FUNC_NAME "smf_quick_noise"
 
 
-double smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
-			smf_qual_t *quality, smf_qual_t mask,
+double smf_quick_noise( const smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
+			const smf_qual_t *quality, smf_qual_t mask,
 			int *status ) {
 
   /* Local variables */
@@ -126,7 +126,7 @@ double smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
   dim_t nbolo;                  /* Number of bolometers */
   size_t ngood;                 /* Number of good samples in r.m.s. check */
   dim_t ntslice;                /* Number of time slices */
-  smf_qual_t *qua=NULL;      /* Pointer to quality flags */
+  const smf_qual_t *qua=NULL;   /* Pointer to quality flags */
   double retval=0;              /* Return value */
   double sig;                   /* r.m.s. of this chunk */
 
