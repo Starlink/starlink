@@ -31,7 +31,7 @@
 *        created by smf_model_create).
 *     lut = int* (Given)
 *        1-d LUT for indices of data points in map (same dimensions as data)
-*     qual = usigned char* (Given)
+*     qual = smf_qual_t* (Given)
 *        If specified, use this QUALITY array to decide which samples
 *        to use (provided mask). Otherwise data are only ignored if set
 *        to VAL__BADD. Same dimensions as data.

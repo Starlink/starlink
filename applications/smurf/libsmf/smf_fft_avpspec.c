@@ -20,7 +20,7 @@
 *  Arguments:
 *     pspec = smfData * (Given)
 *        Pointer to a 4-d smfData containing individual bolo power spectra
-*     quality = usigned char* (Given)
+*     quality = smf_qual_t* (Given)
 *        If specified, use this QUALITY array to decide which bolometers
 *        to use (provided mask). Otherwise data are only ignored if set
 *        to VAL__BADD.

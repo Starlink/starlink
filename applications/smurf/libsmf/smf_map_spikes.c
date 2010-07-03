@@ -29,7 +29,7 @@
 *        (e.g. a NOI model component created by smf_model_create).
 *     lut = int* (Given)
 *        1-d LUT for indices of data points in map (same dimensions as data)
-*     qual = usigned char* (Given and Returned)
+*     qual = smf_qual_t* (Given and Returned)
 *        Quality array with same dimensions of data for setting new
 *        SMF__Q_SPIKE flags when outliers encountered.
 *     mask = smf_qual_t (Given)
