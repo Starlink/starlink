@@ -93,6 +93,10 @@
 *        and we ensure all keys have corresponding defaults.
 *     2010-05-21 (DSB):
 *        Add dclimcorr argument to smf_fix_steps.
+*     2010-06-28 (DSB):
+*        Do apodization in smf_bolonoise
+*     2010-07-02 (TIMJ):
+*        Use same apodization as used by CALCNOISE.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -200,10 +204,6 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
                       &spikethresh, &spikeiter, status );
   }
 
-  /* Get apodisation length. */
-  astMapGet0I( keymap, "APOD", &ival );
-  apod_length = ival;
-
   /* Initialize chisquared */
   dat->chisquared[chunk] = 0;
   nchisq = 0;
@@ -238,7 +238,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
       if( flags & SMF__DIMM_FIRSTITER ) {
         /* Measure the noise from power spectra */
         smf_bolonoise( wf, res->sdata[idx], qua_data, 0, 0.5, SMF__F_WHITELO,
-                       SMF__F_WHITEHI, 0, 0, apod_length, var, NULL, NULL, status );
+                       SMF__F_WHITEHI, 0, 0, SMF__MAXAPLEN, var, NULL, NULL, status );
 
         for( i=0; i<nbolo; i++ ) if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {
             /* Loop over time and store the variance for each sample */
