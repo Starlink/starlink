@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     pntr = smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
-*                          smf_qual_t *quality, size_t len, int *status );
+*                          const smf_qual_t *quality, size_t len, int *status );
 
 *  Arguments:
 *     wf = smfWorkForce * (Given)
@@ -23,7 +23,7 @@
 *        Pointer to the input smfData
 *     inverse = int (Given)
 *        If set perform inverse transformation. Otherwise forward.
-*     quality = smf_qual_t * (Given)
+*     const quality = smf_qual_t * (Given)
 *        If set, use this buffer instead of QUALITY associated with indata.
 *        If NULL, use the QUALITY associated with indata.
 *     len = size_t (Given)
@@ -86,10 +86,12 @@
 *         to this function).
 *     2010-07-01 (TIMJ):
 *        Make sure that quality in smfData really is used.
+*     2010-07-02 (TIMJ):
+*        Use const quality
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2010 Science and Technology Facilities Council.
 *     Copyright (C) 2008 University of British Columbia.
 *     All Rights Reserved.
 
@@ -241,7 +243,7 @@ void smfFFTDataParallel( void *job_data_ptr, int *status ) {
 #define FUNC_NAME "smf_fft_data"
 
 smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
-                       smf_qual_t *quality, size_t len, int *status ) {
+                       const smf_qual_t *quality, size_t len, int *status ) {
   double *baseR=NULL;           /* base pointer to real part of transform */
   double *baseI=NULL;           /* base pointer to imag part of transform */
   double *baseB=NULL;           /* base pointer to bolo in time domain */
@@ -254,7 +256,6 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
   double df=0;                  /* Frequency step size in Hz */
   fftw_iodim dims;              /* I/O dimensions for transformations */
   AstCmpMap *fftmapping=NULL;   /* Mapping from GRID to curframe2d */
-  int flags = 0;                /* Copy flags for smfData */
   int i;                        /* Loop counter */
   int isFFT=0;                  /* Are the input data freq. domain? */
   size_t j;                     /* Loop counter */
@@ -299,34 +300,18 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
     return NULL;
   }
 
-  /* Create a copy of the input data since FFT operations often do
-     calculations in-place. Only copy quality if we have quality
-     in the smfData and we are not using an external quality. */
-  flags = SMF__NOCREATE_VARIANCE | SMF__NOCREATE_FILE |
-    SMF__NOCREATE_DA;
-  if (quality || ! indata->qual) flags |= SMF__NOCREATE_QUALITY;
-  data = smf_deepcopy_smfData( indata, 0, flags, status );
-
-  /* Re-order a time-domain cube if needed */
-  if( indata->isTordered && (indata->ndims == 3) ) {
-    smf_dataOrder( data, 0, status );
-  }
-
-  /* Apodise the data if required. */
-  if( len ) smf_apodize( data, quality, len, status );
-
   /* Data dimensions. Time dimensions are either 1-d or 3-d. Frequency
      dimensions are either 2- or 4-d to store the real and imaginary
      parts along the last index. */
 
-  if( data->ndims == 3 ) {
-    nbolo = data->dims[1]*data->dims[2];
-    ntslice = data->dims[0];
+  if( indata->ndims == 3 ) {
+    nbolo = indata->dims[1]*indata->dims[2];
+    ntslice = indata->dims[0];
     nf = ntslice/2 + 1;
     isFFT = 0;
-  } else if( (data->ndims==4) && (data->dims[3]==2) ) {
+  } else if( (indata->ndims==4) && (indata->dims[3]==2) ) {
     /* 3-d FFT of entire subarray */
-    isFFT = smf_isfft( data, &ntslice, &nbolo, &nf, status );
+    isFFT = smf_isfft( indata, &ntslice, &nbolo, &nf, status );
   } else {
     *status = SAI__ERROR;
     errRep( "", FUNC_NAME ": smfData has strange dimensions", status );
@@ -338,6 +323,42 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
   if( (*status==SAI__OK) && (isFFT != inverse) ) {
     retdata = NULL;
     goto CLEANUP;
+  }
+
+  /* Create a copy of the input data since FFT operations often do
+     calculations in-place. The returned FFT smfData should not
+     have quality so we only need quality for apodizing and that
+     apodization will not be propagated back to the input
+     smfData since we work on the copy. We therefore create
+     a workspace copy of the quality. */
+  data = smf_deepcopy_smfData( indata, 0,
+                               SMF__NOCREATE_VARIANCE |
+                               SMF__NOCREATE_QUALITY |
+                               SMF__NOCREATE_FILE |
+                               SMF__NOCREATE_DA, status );
+
+  /* Re-order a time-domain cube if needed */
+  if( indata->isTordered && (indata->ndims == 3) ) {
+    smf_dataOrder( data, 0, status );
+  }
+
+  /* Create some quality. We only apodize if we are doing a
+     forward FFT. */
+  if (len && !inverse) {
+    smf_qual_t *qua = NULL;
+
+    if (quality || data->qual ) {
+      const smf_qual_t *tempqual = NULL;
+
+      qua = astCalloc( nbolo * ntslice, sizeof(*qua), 0 );
+      tempqual = (quality ? quality : data->qual );
+      memcpy( qua, tempqual, nbolo*ntslice * sizeof(*qua) );
+    }
+
+    /* Apodise the data */
+    smf_apodize( data, qua, len, status );
+
+    if (qua) qua = astFree( qua );
   }
 
   /* Create a new smfData, copying over everything except for the bolo
