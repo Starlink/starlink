@@ -305,8 +305,8 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
      parts along the last index. */
 
   if( indata->ndims == 3 ) {
-    nbolo = indata->dims[1]*indata->dims[2];
-    ntslice = indata->dims[0];
+    smf_get_dims( indata, NULL, NULL, &nbolo, &ntslice, NULL, NULL, NULL,
+                  status );
     nf = ntslice/2 + 1;
     isFFT = 0;
   } else if( (indata->ndims==4) && (indata->dims[3]==2) ) {
