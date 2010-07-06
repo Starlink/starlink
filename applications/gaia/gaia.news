@@ -33,9 +33,12 @@
     The VO query toolboxes now convert the default query coordinates from
     the image celestial coordinate system to FK5/J2000.
 
-    Add support for the FLUX_RADIUS parameter to the object detection toolbox.
-    This determines the half-light radius (actually radius which contains
-    half of the auto flux) by default.
+    Support for the FLUX_RADIUS parameter has been added to the object
+    detection toolbox. This determines the half-light radius (actually
+    radius which contains half of the auto flux) by default.
+
+    A bug in the overlay grid graphics handler has been fixed. Previously
+    use of a lot of fonts could cause GAIA to crash.
 
   Hawaiki release
   ===============

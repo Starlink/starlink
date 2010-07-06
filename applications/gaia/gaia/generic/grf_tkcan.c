@@ -1241,15 +1241,15 @@ int astGAttr( int attr, double value, double *old_value, int prim ){
             ConfigInfo.size = value;
         }
 
-    } else if( attr == GRF__FONT ){
+    } else if ( attr == GRF__FONT ){
 
         /* If required retrieve the current character font, and set a
            new font. */
-        if( old_value ) *old_value = (double) ConfigInfo.font;
+        if ( old_value ) *old_value = (double) ConfigInfo.font;
 
-        if( value != AST__BAD ) {
-            ConfigInfo.font = MAX( 0, MIN( sizeof( Fonts ) / sizeof( char * ) - 1,
-                                           (int) value ) );
+        if ( value != AST__BAD ) {
+            int nfonts = (int) ( sizeof( Fonts ) / sizeof( fontInfo ) - 1);
+            ConfigInfo.font = MAX( 0, MIN( nfonts, (int) value ) );
         }
 
     } else if( attr == GRF__COLOUR ){
