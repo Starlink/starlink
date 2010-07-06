@@ -157,7 +157,7 @@ void smurf_calcdark( int *status ) {
        since we do not want to get a large file the wrong size */
     ndgNdfas( dgrp, i, "READ", &indf, status );
 
-    smf_apply_mask( dark, NULL, bbms, SMF__BBM_DATA, status );
+    smf_apply_mask( dark, NULL, bbms, SMF__BBM_DATA, 0, status );
     smf_write_smfData( dark, NULL, NULL, NULL, ogrp, i, indf, status );
     ndfAnnul( &indf, status);
   }

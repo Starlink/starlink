@@ -15,7 +15,7 @@
 *  Invocation:
 *     void smf_apply_mask( smfData *indata, smf_qual_t *quality,
 *                          const smfArray *bbms, smf_dark_sub_meth method,
-*                          int *status)
+*                          smf_qual_t addqual, int *status)
 
 *  Arguments:
 *     indata = const smfData * (Given)
@@ -31,6 +31,9 @@
 *        is modified or both. If quality is to be modified it must exist
 *        if only quality is to be modified. ie, if data are also to be
 *        modified quality can be optional.
+*     addqual = smf_qual_t (Given)
+*        Additional quality that can be applied when masking a bolometer.
+*        Only used for SMF__BBM_QUAL and SMF__BBM_QQUAL.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -39,10 +42,10 @@
 *     apply the best to the supplied data set. No error if no suitable mask
 *     can be found. Available methods (which can be combined) are
 *       SMF__BBM_DATA - Mask the data array with VAL__BADx
-*       SMF__BBM_QUAL - Mask the quality array with SMF__Q_BADB
+*       SMF__BBM_QUAL - Mask the quality array with SMF__Q_BADB|addqual
 *       SMF__BBM_QQUAL- Mask the first slice of the quality array with
-*                       SMF__Q_BADB. If both QUAL and QQUAL are specified
-*                       QUAL takes precedence.
+*                       SMF__Q_BADB|addqual. If both QUAL and QQUAL are
+*                       specified QUAL takes precedence.
 
 *  Authors:
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -62,6 +65,8 @@
 *        Change BPM to BBM.
 *     2010-03-16 (TIMJ):
 *        Use smf_smfFile_msg
+*     2010-07-06 (TIMJ):
+*        Add addqual parameter to allow
 
 *  Notes:
 *      - for efficiency use SMF__BBM_QQUAL alone. All other methods
@@ -109,7 +114,7 @@
 
 void smf_apply_mask( smfData *indata, smf_qual_t *quality,
                      const smfArray *bbms, smf_dark_sub_meth method,
-                     int *status) {
+                     smf_qual_t addqual, int *status) {
 
   size_t previdx;
   size_t nextidx;
@@ -245,16 +250,17 @@ void smf_apply_mask( smfData *indata, smf_qual_t *quality,
       if (qua) {
         if (method & SMF__BBM_QUAL) {
           smf_update_quality( indata, qua, 1,
-                              bbm->pntr[0], 0, 0, status);
+                              bbm->pntr[0], addqual, 0, status);
         } else {
           /* just mask the first nelem items */
+          smf_qual_t maskqual = SMF__Q_BADB | addqual;
           int *mask = bbm->pntr[0];
           size_t nelem = bbm->dims[0] * bbm->dims[1];
           size_t i;
 
           for (i=0; i<nelem; i++) {
             if (mask[i] == VAL__BADI) {
-              qua[i] |= SMF__Q_BADB;
+              qua[i] |= maskqual;
             }
           }
 

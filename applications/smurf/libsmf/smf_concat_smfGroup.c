@@ -456,7 +456,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
           }
 
           /* Apply bad bolometer mask */
-          smf_apply_mask( refdata, NULL, bbms, SMF__BBM_DATA, status );
+          smf_apply_mask( refdata, NULL, bbms, SMF__BBM_DATA, 0, status );
 
           /* Calculate the pointing LUT if requested */
           if( !(flags & SMF__NOCREATE_LUT) && outfset ) {

@@ -312,7 +312,7 @@ void smurf_sc2clean( int *status ) {
     smf_open_and_flatfield(igrp, ogrp, i, darks, flatramps, &ffdata, status);
 
     /* Apply a mask to the quality array and data array */
-    smf_apply_mask( ffdata, NULL, bbms, SMF__BBM_QUAL|SMF__BBM_DATA, status );
+    smf_apply_mask( ffdata, NULL, bbms, SMF__BBM_QUAL|SMF__BBM_DATA, 0, status );
 
     /* Place cleaning parameters into a keymap and set defaults. Do this inside
        the loop in case we are cleaning files with differing sub-instruments.

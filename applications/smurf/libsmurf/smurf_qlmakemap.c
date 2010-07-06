@@ -500,7 +500,7 @@ void smurf_qlmakemap( int *status ) {
        Clearly would be more efficient if badfrac could be given to
        smf_apply_mask.
     */
-    smf_apply_mask( data, NULL, bbms, SMF__BBM_QUAL, status );
+    smf_apply_mask( data, NULL, bbms, SMF__BBM_QUAL, 0, status );
 
     /* Update quality array */
     smf_update_quality( data, NULL, 1, NULL, 0, 0.05, status );

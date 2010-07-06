@@ -190,7 +190,7 @@ void smurf_scanfit( int * status ) {
     }
 
     /* Mask out bad bolometers - mask data array not quality array */
-    smf_apply_mask( ffdata, NULL, bbms, SMF__BBM_DATA, status );
+    smf_apply_mask( ffdata, NULL, bbms, SMF__BBM_DATA, 0, status );
 
     smf_scanfit( ffdata, NULL, order, status );
 

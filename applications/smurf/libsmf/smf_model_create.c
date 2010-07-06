@@ -458,7 +458,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
             if( !(oflag&SMF__NOCREATE_DATA) ) {
               smf_open_and_flatfield( igroup->grp, NULL, idx, darks, flatramps,
                                       &idata, status );
-              smf_apply_mask( idata, NULL, bbms, SMF__BBM_DATA, status );
+              smf_apply_mask( idata, NULL, bbms, SMF__BBM_DATA, 0, status );
 
             } else {
               smf_open_file( igroup->grp, idx, "READ", oflag, &idata, status );

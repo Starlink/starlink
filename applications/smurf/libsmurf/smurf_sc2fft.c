@@ -289,7 +289,7 @@ void smurf_sc2fft( int *status ) {
         dim_t ndata;                /* Number of data points */
 
         /* Apply a mask to the quality array and data array */
-        smf_apply_mask( idata, NULL, bbms, SMF__BBM_QUAL|SMF__BBM_DATA, status );
+        smf_apply_mask( idata, NULL, bbms, SMF__BBM_QUAL|SMF__BBM_DATA, 0, status );
 
         smf_get_dims( idata,  NULL, NULL, &nbolo, NULL, &ndata, NULL, NULL,
                       status );
