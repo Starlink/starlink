@@ -166,8 +166,6 @@ void smf_clipped_stats1D( const double *data, size_t nclips,
     /* Calculate stats with our quality and qstride of 1 */
     smf_stats1D( data, stride, nsamp, qua, 1, BADQUAL, &lmean, &lsigma, &lngood, status );
 
-    printf( "Stats call %zu : %g +/- %g (%zu)\n", clip+1, lmean, lsigma, lngood);
-
     /* Flag any values exceeding the specified clip */
     lngood = smf__flag_clipped_data( data, stride, nsamp, qua, BADQUAL, lmean, lsigma,
                                      clips[clip], status );
