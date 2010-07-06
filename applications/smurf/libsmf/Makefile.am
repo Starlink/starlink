@@ -60,6 +60,7 @@ smf_choose_darks.c \
 smf_choose_flat.c \
 smf_choosepolbins.c \
 smf_choosetiles.c \
+smf_clipped_stats1D.c \
 smf_clean_dksquid.c \
 smf_clean_smfData.c \
 smf_clone_data.c \
