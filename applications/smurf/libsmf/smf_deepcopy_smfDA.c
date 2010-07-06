@@ -62,6 +62,9 @@
 *        the corresponding arrays.
 *     2010-07-01 (TIMJ):
 *        Allow for the dark squid copy to be disabled.
+*     2010-07-06 (DSB):
+*        Get dimensions using smf_get_dims so that bolo-ordered data
+*        can be handled. 
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -136,9 +139,7 @@ smf_deepcopy_smfDA( const smfData *old, int cpdks, int * status ) {
   flatmeth = oldda->flatmeth;
 
   /* Need the number of bolometers, columns and time slices */
-  nbol = (old->dims)[0] * (old->dims)[1];
-  ncol = (old->dims)[SC2STORE__COL_INDEX];
-  ntslice = (old->dims)[2];
+  smf_get_dims( old, NULL, &ncol, &nbol, &ntslice, NULL, NULL, NULL, status );
 
   /* Allocate space for and copy contents of pointers */
   if (oldda->flatcal && nflat > 0 ) {
