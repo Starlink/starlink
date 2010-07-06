@@ -16,7 +16,8 @@
 *     void smf_fix_steps( smfWorkForce *wf, smfData *data,
 *                         smf_qual_t *quality, double dcthresh,
 *                         dim_t dcmedianwidth, dim_t dcfitbox, int dcmaxsteps,
-*                         int dclimcorr, size_t *nsteps, int *status )
+*                         int dclimcorr, size_t *nrej, smfStepFix **steps,
+*                         int *nsteps, int *status )
 
 *  Arguments:
 *     wf = smfWorkForce * (Given)
@@ -48,11 +49,25 @@
 *        the same time in more than "dclimcorr" bolometers, then all
 *        bolometers are assumed to have a step at that time, and the step
 *        is fixed no matter how small it is.
+*     nrej = size_t * (Returned)
+*        The number of bolometers rejected due to having too many steps.
+*     steps = smfStepFix ** (Returned)
+*        Address of a pointer to the first element of an array of
+*        smfStepFix structures. If the pointer is NULL on entry, then a
+*        new array is allocated and a pointer to the array is stored at the
+*        supplied address on exit. If the supplied address is NULL, then
+*        no array is allocated.
+*
+*        On exit, the number of elements in the array (if it exists) will
+*        be equal to the value of "*nstep". Each element is a smfStepFix
+*        structure that describes a single fixed step.
+*     nstep = int * (Returned)
+*        The number of fixed steps.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
 *  Description:
-*     Coming soon...
+*     Coming soon(ish)...
 
 *  Authors:
 *     David S Berry (JAC, Hawaii)
@@ -76,7 +91,7 @@
 *        - Replace incorrect "break" with "continue". This could
 *        cause the whole function to return early if a bolometer
 *        with too few usable values was found.
-*        - Correct counting of rejected bolometers (returned in *nsteps).
+*        - Correct counting of rejected bolometers (returned in *nrej).
 *     18-MAY-2010 (DSB):
 *        Ensure the first and last DCMEDIANWIDTH samples in each bolometer
 *        are continuous with the intermediate data.
@@ -110,6 +125,9 @@
 *     25-JUN-2010 (DSB):
 *        Apodisation is now done later in smf_execute_filter, so there
 *        is no need to apodise in this function.
+*     6-JUL-2010 (DSB):
+*        - Rename old "nstep" argument as "nrej".
+*        - Added arguments "steps" and "nstep".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -166,7 +184,7 @@
 #define CHECK_2 16
 #define CHECK_3 32
 
-#define RECORD_BOLO (ibolo==807)
+#define RECORD_BOLO (ibolo==718)
 
 #define TOPCAT(fd, x) \
    if( x != VAL__BADD ) { \
@@ -227,12 +245,14 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
 			      float dcminpop, double dcthresh, double
 			      dcthresh2, int dcmaxstepwidth, int pad_start,
                               int itime_start, int itime_end,
-                              int *nfixed, int *status DEBUG_ARGS );
+                              int *nfixed, smfStepFix **steps,
+                              int *status DEBUG_ARGS );
 
 
 void smf_fix_steps( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
                     double dcthresh, dim_t dcmedianwidth, dim_t dcfitbox,
-                    int dcmaxsteps, int dclimcorr, size_t *nsteps, int *status ) {
+                    int dcmaxsteps, int dclimcorr, size_t *nrej,
+                    smfStepFix **steps, int *nstep, int *status ) {
 
 /* Local Variables */
    dim_t ibolo;                /* Index of bolometer */
@@ -296,6 +316,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
 /* Initialise... */
    ns = 0;
    nfixed = 0;
+   if( nstep ) *nstep = 0;
 
 #ifdef DEBUG_STEPS
    static int nentry = 0;
@@ -418,8 +439,9 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
 /* Loop round all usable bolometers. "base" holds the offset to the start
    of the usable data for the bolometer.  */
       for( ibolo = 0; ibolo < nbolo && *status==SAI__OK; ibolo++ ) {
-         base = ibolo*bstride + itime_start*tstride;
+         base = ibolo*bstride;
          if( !(qua[ base ] & SMF__Q_BADB) ) {
+            base += itime_start*tstride;
 
 #ifdef DEBUG_STEPS
 
@@ -699,7 +721,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
                                      dcfitbox, dcminbox, dcminpop, dcthresh,
                                      dcthresh2, dcmaxstepwidth, pad_start,
                                      itime_start, itime_end, &nfixed,
-                                     status DEBUG_VALS );
+                                     steps, status DEBUG_VALS );
          }
 
 
@@ -714,6 +736,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
 
 
 #ifdef DEBUG_STEPS
+   base = ibolo*bstride + itime_start*tstride;
    if( !(qua[ base ] & SMF__Q_BADB) ) {
       if( RECORD_BOLO ) {
          double *pd = dat + base;
@@ -814,7 +837,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
 					   dcminbox, dcminpop, 0.0,
 					   dcthresh2, dcmaxstepwidth, pad_start,
                                            itime_start, itime_end,
-                                           &nfixed, status DEBUG_VALS );
+                                           &nfixed, steps, status DEBUG_VALS );
 
                }
             }
@@ -846,9 +869,10 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
    }
 
 /* Return the number of rejected bolometers. */
-   if( nsteps ) {
-     *nsteps = ns;
-   }
+   if( nrej ) *nrej = ns;
+
+/* Return the number of fixed steps. */
+   if( nstep ) *nstep = nfixed;
 
 #ifdef DEBUG_STEPS
    fclose( fd1 );
@@ -1015,7 +1039,7 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
                               double dcthresh, double dcthresh2,
                               int dcmaxstepwidth, int pad_start,
                               int itime_start, int itime_end, int *nfixed,
-                              int *status DEBUG_ARGS ){
+                              smfStepFix **steps, int *status DEBUG_ARGS ){
 
 /* Local Variables: */
    double *pd;
@@ -1237,6 +1261,9 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
 /* Increment the number of steps found in this bolometer. */
             nstep++;
 
+/* Increment the total number of steps found in all bolometers. */
+            (*nfixed)++;
+
 /* Increment the current correction. */
             corr -= diff;
 
@@ -1244,6 +1271,17 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
             for( ; itime <= step_end; itime++,pw++ ) {
                *pw = VAL__BADD;
                pq += tstride;
+            }
+
+/* If required, store details of the step in the returned structure. */
+            if( steps ) {
+               *steps = astGrow( *steps, *nfixed, sizeof( **steps ) );
+               if( *status == SAI__OK ) {
+                  (*steps)[ *nfixed - 1 ].start = step_start;
+                  (*steps)[ *nfixed - 1 ].end = step_end;
+                  (*steps)[ *nfixed - 1 ].ibolo = ibolo;
+                  (*steps)[ *nfixed - 1 ].size = diff;
+               }
             }
          }
       }
@@ -1320,8 +1358,6 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
          pd += tstride;
       }
 
-/* Incrment the total number of steps fixed so far. */
-      *nfixed += nstep;
    }
 
    return result;

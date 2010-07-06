@@ -973,8 +973,9 @@ void smf_flag_stationary( smfData *data, smf_qual_t *quality,
                           int *status );
 
 void smf_fix_steps( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
-                    double dcthresh, dim_t dcmedianwidth, dim_t dcbox,
-                    int dcflag, int dclimcorr, size_t *nsteps, int *status );
+                    double dcthresh, dim_t dcmedianwidth, dim_t dcfitbox,
+                    int dcmaxsteps, int dclimcorr, size_t *nrej,
+                    smfStepFix **steps, int *nstep, int *status );
 
 void smf_flat_assign ( int use_da, smf_flatmeth inflatmeth, const smfData * powval,
                        const smfData * bolval, smfData * updata, int *status );

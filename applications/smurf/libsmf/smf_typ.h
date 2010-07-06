@@ -811,6 +811,16 @@ typedef struct {
 } smfSortInfo;
 
 
+/* Struct to store a description of a fixed step. */
+
+typedef struct smfStepFix {
+  int start;      /* Index of time slice at start of step */
+  int end;        /* Index of time slice at end of step */
+  int ibolo;      /* Index of bolometer containing step */
+  double size;    /* The size of the step rise or fall */
+} smfStepFix;
+
+
 /* These are the bits defined in the DA for use in the SCUBA-2 DRCONTROL
    structure to indicate whether we are missing information from a particular
    DRAMA task. A completely valid state item will have a DRCONTROL flag

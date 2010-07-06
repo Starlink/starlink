@@ -268,7 +268,8 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
         if( dcthresh && dcfitbox ) {
           smf_fix_steps( wf, res->sdata[idx], qua_data, dcthresh, dcmedianwidth,
-                             dcfitbox, dcmaxsteps, dclimcorr, &nflag, status );
+                         dcfitbox, dcmaxsteps, dclimcorr, &nflag, NULL, NULL,
+                         status );
           msgOutiff(MSG__VERB, "","   detected %li bolos with DC steps\n",
                     status, nflag);
         }
