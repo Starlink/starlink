@@ -337,13 +337,29 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
             "diff thresh line_start line_end rmslo rmshi\n");
 #endif
 
-
-
 /* Check the inherited status. */
    if( *status != SAI__OK ) return;
 
 /* Check we have double precision data. */
    if( !smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status ) ) return;
+
+/* Used to dump the input data (e.g. for use in a regression test). Must
+   be time ordered, otherwise errors occurr when smf_open_file aopens the
+   file. */
+#ifdef DUMP_INPUT
+   smfData *tdata = data;
+   msgOut( "", "Dumping smf_fix_steps input data to NDF 'fix_steps_input.sdf'.",
+           status );
+   if( ! data->isTordered ) {
+      tdata = smf_deepcopy_smfData( data, 0, 0, status );
+      if( quality ) tdata->pntr[ 2 ] = astStore( tdata->pntr[ 2 ], quality,
+                                                 astSizeOf( quality ) );
+      smf_dataOrder( tdata, 1, status );
+   }
+   smf_write_smfData ( tdata, NULL, quality ? quality : tdata->pntr[ 2 ],
+                       "fix_steps_input", NULL, 0, 0, status );
+   if( tdata != data ) smf_close_file( &tdata, status );
+#endif
 
 /* Get pointers to data and quality arrays. */
    dat = data->pntr[ 0 ];

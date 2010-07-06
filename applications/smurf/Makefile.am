@@ -31,6 +31,7 @@ dreamsolve \
 dreamweights \
 dsutils \
 extinction \
+fixsteps \
 flatfield \
 gsd2acsis \
 gsdshow \

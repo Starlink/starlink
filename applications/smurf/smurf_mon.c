@@ -262,6 +262,8 @@ void smurf_mon( int * status ) {
     smurf_dsutils( status );
   } else if (strcmp( taskname, "EXTINCTION" ) == 0 ) {
     smurf_extinction( status );
+  } else if (strcmp( taskname, "FIXSTEPS" ) == 0 ) {
+    smurf_fixsteps( status );
   } else if (strcmp( taskname, "FLATFIELD" ) == 0 ) {
     smurf_flatfield( status );
   } else if (strcmp( taskname, "GSD2ACSIS" ) == 0 ) {

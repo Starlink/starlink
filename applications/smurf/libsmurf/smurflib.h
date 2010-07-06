@@ -108,6 +108,7 @@ void smurf_dreamweights( int * );
 void smurf_dsutils( int * );
 void smurf_extinction( int * );
 void smurf_flatfield( int * );
+void smurf_fixsteps( int * );
 void smurf_gsd2acsis( int * );
 void smurf_gsdshow( int * );
 void smurf_impaztec( int * );
