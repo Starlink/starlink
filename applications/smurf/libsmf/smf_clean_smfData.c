@@ -160,7 +160,7 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
 
   /* Update quality by synchronizing to the data array VAL__BADD values */
   msgOutif(MSG__VERB,"", FUNC_NAME ": update quality", status);
-  smf_update_quality( data, qua, 1, NULL, badfrac, status );
+  smf_update_quality( data, qua, 1, NULL, 0, badfrac, status );
 
   /* Fix DC steps */
   if( dcthresh && dcfitbox ) {

@@ -15,7 +15,7 @@
 
 *  Invocation:
 *     smf_update_quality( smfData *data, smf_qual_t *target, int syncbad,
-*                         const int *badmask, double badfrac,
+*                         const int *badmask, smf_qual_t addqual, double badfrac,
 *                         int *status );
 
 *  Arguments:
@@ -31,6 +31,10 @@
 *        Each position that is bad will set SMF__Q_BADB for all data
 *        for that detector. Can be NULL. The value for non-bad pixels does
 *        not matter.
+*     addqual = smf_qual_t (Given)
+*        By default SMF__Q_BADB is used to indicate an entire bolometer has
+*        been masked. This parameter allows additional quality to be associated
+*        to allow the type of mask to be specified.
 *     badfrac = double (Given)
 *        If nonzero, fraction of samples for entire bolo to be flagged as bad
 *        using SMF__Q_BADB.
@@ -78,6 +82,9 @@
 *        Check data array when badfrac is true buy syncbad is false.
 *     2010-03-19 (EC):
 *        Rename SMF__Q_BADS to SMF__Q_BADDA
+*     2010-07-06 (TIMJ):
+*        Add ability to use additional quality for the output mask
+*        and not just SMF__Q_BADB.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -123,7 +130,7 @@
 #define FUNC_NAME "smf_update_quality"
 
 void smf_update_quality( smfData *data, smf_qual_t *target, int syncbad,
-			 const int *badmask, double badfrac,
+			 const int *badmask, smf_qual_t addqual, double badfrac,
 			 int *status ) {
 
   dim_t i;                      /* loop counter */
@@ -252,8 +259,9 @@ void smf_update_quality( smfData *data, smf_qual_t *target, int syncbad,
 
         /* Now apply the badmask */
         if( isbad ) {
+          smf_qual_t outqual = SMF__Q_BADB | addqual;
           for( j=0; j<ntslice; j++ ) {
-            qual[tstride*j + c] |= SMF__Q_BADB;
+            qual[tstride*j + c] |= outqual;
           }
         }
       }

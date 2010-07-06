@@ -245,7 +245,7 @@ void smf_apply_mask( smfData *indata, smf_qual_t *quality,
       if (qua) {
         if (method & SMF__BBM_QUAL) {
           smf_update_quality( indata, qua, 1,
-                              bbm->pntr[0], 0, status);
+                              bbm->pntr[0], 0, 0, status);
         } else {
           /* just mask the first nelem items */
           int *mask = bbm->pntr[0];

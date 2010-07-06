@@ -503,7 +503,7 @@ void smurf_qlmakemap( int *status ) {
     smf_apply_mask( data, NULL, bbms, SMF__BBM_QUAL, status );
 
     /* Update quality array */
-    smf_update_quality( data, NULL, 1, NULL, 0.05, status );
+    smf_update_quality( data, NULL, 1, NULL, 0, 0.05, status );
 
     /* Check units are consistent */
     smf_check_units( i, data_units, data->hdr, status);
