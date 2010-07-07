@@ -1,3 +1,6 @@
+set label_($this,title) ""
+set label_($this,label(1)) ""
+set label_($this,label(2)) ""
 set position_($this,edge1) bottom
 set position_($this,edge2) left
 set position_($this,labelup1) 0

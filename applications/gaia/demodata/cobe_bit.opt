@@ -50,8 +50,8 @@ set system_(system) fk5
 set system_(epoch) default
 set system_(equinox) default
 set label_($this,title) "COBE all sky projection (FK5/J2000)"
-set label_($this,label(1)) "α"
-set label_($this,label(2)) "δ"
+set label_($this,label(1)) "\u03B1"
+set label_($this,label(2)) "\u03B4"
 set Xformat_($this,sep) i
 set Yformat_($this,sep) i
 set Xformat_($this,+) 0
