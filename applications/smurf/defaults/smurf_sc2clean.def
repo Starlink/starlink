@@ -47,7 +47,7 @@ flagstat = 0
 order = -1
 spikethresh = 0
 spikeiter = 0
-
+noiseclip = 0.0
 
 # these are analogous cleaning parameters for dark squids
 # We do not have a clever syntax for recursively reading this

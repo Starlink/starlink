@@ -108,7 +108,7 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap, int *dofilt,
   smf_get_cleanpar( keymap, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                     NULL, NULL, &f_edgelow, &f_edgehigh, f_notchlow,
                     f_notchhigh, &f_nnotch, &dofft, NULL, NULL, NULL,
-                    NULL, status );
+                    NULL, NULL, status );
 
   /* Return dofilt if requested */
   if( dofilt ) {

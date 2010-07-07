@@ -163,6 +163,11 @@ fillgaps = 1
 #filt_notchlow  = (25,55)
 #filt_notchhigh = (35,65)
 
+# Clip bolometers based on their noise. This parameter will remove
+# any bolometers noisier than noiseclip standard deviations above
+# the mean.
+noiseclip = 4.0
+
 # ----------------------------------------------------------------------------
 # A number of analagous parameters to clean dark squid signals before fitting
 # them to the data (only relevant if DKS is specified as a model component).

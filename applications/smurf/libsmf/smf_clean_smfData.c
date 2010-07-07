@@ -120,6 +120,7 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
   smfFilter *filt=NULL;     /* Frequency domain filter */
   double flagstat;          /* Threshold for flagging stationary regions */
   size_t nflag;             /* Number of elements flagged */
+  double noiseclip = 0;     /* Sigma clipping based on noise */
   int order;                /* Order of polynomial for baseline fitting */
   smf_qual_t *qua=NULL;  /* Pointer to quality */
   double spikethresh;       /* Threshold for finding spikes */
@@ -156,7 +157,8 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
   smf_get_cleanpar( keymap, NULL, &badfrac, &dcfitbox, &dcmaxsteps,
                     &dcthresh, &dcmedianwidth, &dclimcorr, &dkclean,
                     &fillgaps, NULL, NULL, NULL, NULL, NULL, NULL,
-                    &flagstat, &order, &spikethresh, &spikeiter, status );
+                    &flagstat, &order, &spikethresh, &spikeiter, &noiseclip,
+                    status );
 
   /* Update quality by synchronizing to the data array VAL__BADD values */
   msgOutif(MSG__VERB,"", FUNC_NAME ": update quality", status);
@@ -229,5 +231,8 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
     smf_filter_execute( wf, data, qua, filt, status );
   }
   filt = smf_free_smfFilter( filt, status );
+
+  /* Noise mask */
+  if (noiseclip > 0.0) smf_mask_noisy( wf, data, qua, noiseclip, status );
 
 }

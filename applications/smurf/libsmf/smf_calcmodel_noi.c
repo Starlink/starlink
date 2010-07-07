@@ -201,7 +201,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     smf_get_cleanpar( kmap, NULL, NULL, &dcfitbox, &dcmaxsteps, &dcthresh,
                       &dcmedianwidth, &dclimcorr, NULL, &fillgaps, NULL,
                       NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-                      &spikethresh, &spikeiter, status );
+                      &spikethresh, &spikeiter, NULL, status );
   }
 
   /* Initialize chisquared */

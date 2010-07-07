@@ -21,7 +21,7 @@
 *                       double *filt_notchlow, double *filt_notchhigh,
 *                       int *filt_nnotch, int *dofilt, double *flagstat,
 *                       int *order, double *spikethresh, size_t *spikeiter,
-*                       int *status )
+*                       double * noiseclip, int *status )
 
 *  Arguments:
 *     keymap = AstKeyMap* (Given)
@@ -77,6 +77,10 @@
 *     spikeiter = size_t* (Returned)
 *        If 0 iteratively find spikes until convergence. Otherwise
 *        execute precisely this many iterations (NULL:0)
+*     noiseclip = double * (Returned)
+*        Number of standard deviations to clip the upper bound
+*        of a noise distribution in order to generate a bad bolometer
+*        mask.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -112,6 +116,8 @@
 *     2010-05-04 (TIMJ):
 *        Simplify KeyMap access. We now trigger an error if a key is missing
 *        and we ensure all keys have corresponding defaults.
+*     2010-07-06 (TIMJ):
+*        Add noiseclip parameter.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -167,7 +173,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
                        double *filt_notchlow, double *filt_notchhigh,
                        int *filt_nnotch, int *dofilt, double *flagstat,
                        int *order, double *spikethresh, size_t *spikeiter,
-                       int *status ) {
+                       double * noiseclip, int *status ) {
 
   int dofft=0;                  /* Flag indicating that filtering is required */
   int f_nnotch=0;               /* Number of notch filters in array */
@@ -408,4 +414,12 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
     msgOutiff( MSG__DEBUG, "", FUNC_NAME ": SPIKEITER=%zu", status,
                *spikeiter );
   }
+
+  if( noiseclip ) {
+    astMapGet0D( keymap, "NOISECLIP", noiseclip );
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": NOISECLIP=%g", status,
+               *noiseclip );
+  }
+
+
 }

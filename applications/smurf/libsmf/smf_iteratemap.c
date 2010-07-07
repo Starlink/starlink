@@ -566,7 +566,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
        data */
     smf_get_cleanpar( keymap, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                       NULL, NULL, NULL, NULL, NULL, NULL, NULL, &flagstat, NULL,
-		      NULL, NULL, status );
+		      NULL, NULL, NULL, status );
 
     /* Maximum length of a continuous chunk */
     if( *status == SAI__OK ) {
