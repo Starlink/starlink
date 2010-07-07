@@ -219,15 +219,7 @@ void smf_qualstats_report( smf_qfam_t qfamily, const smfArray *qua,
         break;
 
       case SMF__Q_PAD: /* Padding is for all bolos at given tslice */
-        sprintf( scalestr, "%7zu tslices",
-                 qcount[i] / nbolo_tot );
-        break;
-
       case SMF__Q_APOD: /* Apodization is for all bolos at given tslice */
-        sprintf( scalestr, "%7zu tslices",
-                 qcount[i] / nbolo_tot );
-        break;
-
       case SMF__Q_STAT: /* Stationary is for all bolos at given tslice */
         sprintf( scalestr, "%7zu tslices",
                  qcount[i] / nbolo_tot );
