@@ -81,6 +81,8 @@
 *        Refactor logic for new location of quality pointer.
 *     2010-06-21 (TIMJ):
 *        Add _UWORD support.
+*     2010-07-07 (TIMJ):
+*        Reorder sidequal
 
 *  Notes:
 *     Nothing is done about the FITS channels or WCS information stored in
@@ -246,6 +248,14 @@ int smf_dataOrder( smfData *data, int isTordered, int *status ) {
     memcpy( data->dims, newdims, 3*sizeof(*newdims) );
     memcpy( data->lbnd, newlbnd, 3*sizeof(*newlbnd) );
     data->isTordered = isTordered;
+  }
+
+  /* Force any external quality to same ordering */
+  if (data->sidequal) {
+    int qchanged = 0;
+    qchanged = smf_dataOrder( data->sidequal, isTordered, status );
+    /* and indicate if we changed anything (but not if we did not) */
+    if (qchanged) waschanged = qchanged;
   }
 
   return waschanged;
