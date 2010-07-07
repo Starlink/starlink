@@ -79,6 +79,7 @@
 /* Starlink includes */
 #include "mers.h"
 #include "par.h"
+#include "star/one.h"
 #include "sae_par.h"
 #include "par_err.h"
 
@@ -107,13 +108,13 @@ FILE *smf_open_textfile( const char *param, const char *mode, const char *def,
    while( !result && *status == SAI__OK ) {
 
 /* Get a value for the parameter. */
-      parGet0c( param, filename, MAXLEN, status );
+      parGet0c( param, filename, sizeof(filename), status );
 
 /* If a null value was supplied, and we have a default file, annull the
    error and use the default file name. */
       if( *status == PAR__NULL && def ) {
          errAnnul( status );
-         strcpy( filename, def );
+         one_strlcpy( filename, def, sizeof(filename), status );
          isdef = 1;
       } else {
          isdef = 0;
