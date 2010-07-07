@@ -1206,6 +1206,9 @@ void smf_mapbounds_approx( Grp *igrp, size_t index, char *system,
                            AstFrameSet **outframeset, int *moving,
                            int *status );
 
+void smf_mask_noisy( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
+                     double sigclip, int * status );
+
 void smf_maskacsis( int indf, int *mask, int *status );
 
 void smf_median_smooth( dim_t box, smf_filt_t filter_type, dim_t el, const double *dat,
