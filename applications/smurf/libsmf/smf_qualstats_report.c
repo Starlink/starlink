@@ -213,6 +213,7 @@ void smf_qualstats_report( smf_qfam_t qfamily, const smfArray *qua,
         break;
 
       case SMF__Q_BADB: /* Entire bolos */
+      case SMF__Q_NOISE: /* Noisy bolometers are entire bolos */
         sprintf( scalestr, "%7zu bolos  ",
                  qcount[i] / (size_t)ntslice );
         break;

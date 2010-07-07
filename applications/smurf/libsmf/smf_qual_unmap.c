@@ -55,6 +55,8 @@
 *        Initial version
 *     2010-06-29 (TIMJ):
 *        Always create new IRQ structure when writing out.
+*     2010-07-06 (TIMJ):
+*        Add SMF__Q_NOISE
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -266,7 +268,7 @@ smf_qual_t * smf_qual_unmap( int indf, smf_qfam_t family, smf_qual_t * qual, int
         for (i = 0; i<nout; i++) {
           qmap[i] = 0;
           if (qual[i]) {
-            if ( qual[i] & (SMF__Q_BADDA|SMF__Q_BADB) ) {
+            if ( qual[i] & (SMF__Q_BADDA|SMF__Q_BADB|SMF__Q_NOISE) ) {
               qmap[i] |= SMF__TCOMPQ_BAD;
             }
             if ( qual[i] & (SMF__Q_APOD|SMF__Q_PAD) ) {

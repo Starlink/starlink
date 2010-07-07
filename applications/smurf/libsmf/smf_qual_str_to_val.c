@@ -42,6 +42,8 @@
 *  History:
 *     2010-06-17 (TIMJ):
 *        Initial version
+*     2010-07-06 (TIMJ):
+*        Add SMF__Q_NOISE
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -111,6 +113,9 @@ smf_qual_t smf_qual_str_to_val( const char *qname, smf_qfam_t * family, int * st
     lfamily = SMF__QFAM_TSERIES;
   } else if ( strcmp(qname, "FILT") == 0 ) {
     retval = SMF__Q_FILT;
+    lfamily = SMF__QFAM_TSERIES;
+  } else if ( strcmp(qname, "NOISE") == 0 ) {
+    retval = SMF__Q_NOISE;
     lfamily = SMF__QFAM_TSERIES;
   } else if ( strcmp(qname, "ZERO") == 0 ) {
     retval = SMF__MAPQ_ZERO;

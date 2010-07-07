@@ -59,6 +59,8 @@
 *        as well as an alternative to the bit number.
 *     2010-06-17 (TIMJ):
 *        Add quality family.
+*     2010-07-06 (TIMJ):
+*        Add SMF__Q_NOISE
 
 *  Copyright:
 *     Copyright (C) 2010 Science & Technology Facilities Council.
@@ -166,6 +168,11 @@ const char *smf_qual_str( smf_qfam_t family, int usebit, int bit_or_val,
     case SMF__Q_FILT:
       retval = "FILT";
       ldescr = "Set iff sample could not be filtered";
+      break;
+
+    case SMF__Q_NOISE:
+      retval = "NOISE";
+      ldescr = "Set if bolometer was too noisy";
       break;
 
     default:
