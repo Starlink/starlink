@@ -67,6 +67,7 @@
 *        Use smf_smfFile_msg
 *     2010-07-06 (TIMJ):
 *        Add addqual parameter to allow
+*        Allow QUAL mode to work with any time order
 
 *  Notes:
 *      - for efficiency use SMF__BBM_QQUAL alone. All other methods
@@ -122,6 +123,7 @@ void smf_apply_mask( smfData *indata, smf_qual_t *quality,
   smfData * bbm2 = NULL;
   smfData * bbm = NULL;
   int masked = 0;
+  dim_t nbolo = 0;
   smf_qual_t *qua=NULL;
 
   if (*status != SAI__OK) return;
@@ -131,7 +133,7 @@ void smf_apply_mask( smfData *indata, smf_qual_t *quality,
   smf_choose_closest( bbms, indata, &previdx, &nextidx, status );
 
   /* Only handles time-ordered at the moment */
-  if( indata->isTordered != 1 ) {
+  if( indata->isTordered != 1 && method != SMF__BBM_QUAL ) {
     *status = SAI__ERROR;
     errRep( "", FUNC_NAME ": bolo-ordered data not currently supported",
             status );
@@ -144,6 +146,9 @@ void smf_apply_mask( smfData *indata, smf_qual_t *quality,
   } else {
     qua = indata->qual;
   }
+
+  /* Get some properties of the input smfData */
+  smf_get_dims( indata, NULL, NULL, &nbolo, NULL, NULL, NULL, NULL, status );
 
   /* get the file struct and create a token */
   smf_smfFile_msg( indata->file, "FILE", 1, "<no file>", status);
@@ -189,16 +194,16 @@ void smf_apply_mask( smfData *indata, smf_qual_t *quality,
       nelem = bbm->dims[0] * bbm->dims[1];
 
       /* sanity check */
-      if (nelem != (indata->dims[0] * indata->dims[1]) ) {
+      if (nelem != nbolo ) {
         if (*status == SAI__OK) {
           *status = SAI__ERROR;
           msgSeti( "B1", bbm->dims[0]);
           msgSeti( "B2", bbm->dims[1]);
-          msgSeti( "D1", indata->dims[0]);
-          msgSeti( "D2", indata->dims[1]);
+          msgSeti( "TB", bbm->dims[0] * bbm->dims[1] );
+          msgSeti( "NB", nbolo );
           errRep( " ", FUNC_NAME ": the selected bad bolometer mask has a "
-                  "different number of elements (^B1,^B2) than the data "
-                  "it is masking (^D1,^D2)",
+                  "different number of elements (^B1 x ^B2 = ^TB) than the data "
+                  "it is masking (^NB)",
                   status);
         }
       }
