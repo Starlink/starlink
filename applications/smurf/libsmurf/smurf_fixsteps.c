@@ -33,6 +33,11 @@
 *     DCFITBOX, DCLIMCORR, etc.
 
 *  ADAM Parameters:
+*     CHANGED = _LOGICAL (Write)
+*        An output parameter to which is written a flag indicating if any
+*        significant differences were found between the step fixes
+*        produced by the current invocation of this program, and the step
+*        fixes described in the file specified via parameter OLDSTEPS.
 *     CONFIG = GROUP (Read)
 *        Specifies default values for the configuration parameters used
 *        by the step fixing algorithm. This should be a configuration
@@ -70,8 +75,8 @@
 *        Name of a text file to create, holding a description of each
 *        step that was fixed by the step fixing algorithm. The created
 *        file can be re-used in a later run via the OLDSTEPS parameter.
-*        If a null (!) value is supplied for NEWSTEPS, no file is
-*        created. [!]
+*        It can also be viewed using "topcat -f ascii". If a null (!)
+*        value is supplied for NEWSTEPS, no file is created. [!]
 *     OLDSTEPS = FILENAME (Read)
 *        Name of a text file holding a description of each step that
 *        should be fixed, if the step fixing algorithm is working
@@ -124,6 +129,8 @@
 #endif
 
 #include <stdio.h>
+#include <ctype.h>
+#include <float.h>
 
 /* STARLINK includes */
 #include "ast.h"
@@ -142,19 +149,29 @@
 /* Local constants */
 #define FUNC_NAME "smurf_fixsteps"
 
+/* Prototypes for local functions: */
+static int smf1_check_steps( FILE *fd, double dcthresh, dim_t dcmedianwidth,
+                             dim_t dcfitbox, int dcmaxsteps, int dclimcorr,
+                             size_t nrej, smfStepFix *steps, int nstep,
+                             int *status );
 
+
+/* Main entry */
 void smurf_fixsteps( int *status ) {
 
 /* Local Variables */
    AstKeyMap *keymap;        /* Default config parameter values */
    AstKeyMap *sub_instruments; /* Info about sub-instruments */
+   FILE *fd = NULL;          /* File descriptor */
    Grp *igrp = NULL;         /* Input group of files */
    Grp *ogrp = NULL;         /* Output group of files */
    dim_t dcfitbox;           /* DCFITBOX config parameter */
    dim_t dcmedianwidth;      /* DCMEDIANWIDTH config parameter */
    double dcthresh;          /* DCTHRESH config parameter */
+   int changed;              /* Have any step fixes changed? */
    int dclimcorr;            /* DCLIMCORR config parameter */
    int dcmaxsteps;           /* DCMAXSTEPS config parameter */
+   int istep;                /* Index of current step */
    int itemp;                /* Intermediate value */
    int nsteps;               /* Number of new step fixes */
    size_t nrej;              /* Number of rejected bolometers */
@@ -233,24 +250,67 @@ void smurf_fixsteps( int *status ) {
                   dcmaxsteps, dclimcorr, &nrej, &newsteps, &nsteps,
                   status );
 
+   if( nrej == 0 ) {
+      msgOut( "", "No bolometers were rejected", status );
+   } else if( nrej == 1 ) {
+      msgOut( "", "One bolometer was rejected", status );
+   } else {
+      msgSeti( "NREJ", nrej );
+      msgOut( "", "^NREJ bolometers were rejected", status );
+   }
+
+   if( nsteps == 0 ) {
+      msgOut( "", "No steps were fixed", status );
+   } else if( nsteps == 1 ) {
+      msgOut( "", "One step was fixed", status );
+   } else {
+      msgSeti( "NSTEPS", nsteps );
+      msgOut( "", "^NSTEPS steps were fixed", status );
+   }
+
+/* If required, write out to a text file details of the steps that were
+   fixed. */
+   fd = smf_open_textfile( "NEWSTEPS", "w", "<none>", status );
+   if( fd ) {
+      fprintf( fd, "# Steps fixed in '%s'\n", indata->file->name );
+      fprintf( fd, "# Number of steps fixed = %d\n", (int) nsteps );
+      fprintf( fd, "# Number of bolometers rejected = %d\n", (int) nrej );
+      fprintf( fd, "#\n" );
+      fprintf( fd, "# DCFITBOX = %d\n", (int) dcfitbox );
+      fprintf( fd, "# DCLIMCORR = %d\n", dclimcorr );
+      fprintf( fd, "# DCMAXSTEPS = %d\n", dcmaxsteps );
+      fprintf( fd, "# DCMEDIANWIDTH = %d\n", (int) dcmedianwidth );
+      fprintf( fd, "# DCTHRESH = %g\n", dcthresh );
+      fprintf( fd, "#\n" );
+      fprintf( fd, "# istep start end ibolo size\n" );
+
+      for( istep = 0; istep < nsteps; istep++ ) {
+         fprintf( fd, "%d %d %d %d %.*g\n", istep,
+                                       ( newsteps[ istep ] ).start,
+                                       ( newsteps[ istep ] ).end,
+                                       ( newsteps[ istep ] ).ibolo,
+                              DBL_DIG, ( newsteps[ istep ] ).size );
+      }
+      fclose( fd );
+   }
 
 
-
-
-
-
-
-
-/* ADD THE OLDSTEPS and NEWSTEPS STUFF HERE..... */
-
-
-
-
-
-
-
-
-
+/* If required, compare the steps fixed by this invocation with a previous
+   set of step fixes. */
+   fd = smf_open_textfile( "OLDSTEPS", "r", "<none>", status );
+   if( fd ) {
+      msgBlank( status );
+      changed = smf1_check_steps( fd, dcthresh, dcmedianwidth,
+                                  dcfitbox, dcmaxsteps, dclimcorr,
+                                  nrej, newsteps, nsteps, status );
+      parPut0l( "CHANGED", changed, status );
+      if( ! changed ) {
+         msgOut( "", "There are no significant differences "
+                 "between old and new step fixes.", status );
+      }
+      msgBlank( status );
+      fclose( fd );
+   }
 
 /* If required, create the output NDF. */
    if( outsize > 0 && indata && indata->file ) {
@@ -273,4 +333,268 @@ void smurf_fixsteps( int *status ) {
    if( *status != SAI__OK ) msgOutif( MSG__VERB, " ", "FIXSTEPS failed.",
                                       status );
 }
+
+
+/* Max size of one line of text read from the supplied file. */
+#define BUFSIZE 255
+
+static int smf1_check_steps( FILE *fd, double dcthresh, dim_t dcmedianwidth,
+                             dim_t dcfitbox, int dcmaxsteps, int dclimcorr,
+                             size_t nrej, smfStepFix *steps, int nstep,
+                             int *status ) {
+/*
+*  Name:
+*     smf1_check_steps
+
+*  Purpose:
+*     Compare new steps with old steps read from a text file.
+
+*  Invocation:
+*     int smf1_check_steps( FILE *fd, double dcthresh, dim_t dcmedianwidth,
+*                           dim_t dcfitbox, int dcmaxsteps, int dclimcorr,
+*                           size_t nrej, smfStepFix *steps, int nstep,
+*                           int *status )
+
+*  Arguments:
+*     fd = FILE * (Given)
+*        A file descriptor from which to read the details of the steps
+*        fixed on a previous run of this program. The associated text
+*        file should have been created using the NEWSTEPS parameter.
+*     dcthresh = double (Given)
+*        Value of DCTHRESH used in the current invocation of this program.
+*     dcmedianwidth = dim_t (Given)
+*        Value of DCMEDIANWIDTH used in the current invocation of this program.
+*     dcfitbox = dim_t (Given)
+*        Value of DCFITBOX used in the current invocation of this program.
+*     dcmaxsteps = int (Given)
+*        Value of DCMAXSTEPS used in the current invocation of this program.
+*     dclimcorr = int (Given)
+*        Value of DCLIMCORR used in the current invocation of this program.
+*     nrej = size_t (Given)
+*        The number of bolometers rejected in the current invocation of
+*        this program.
+*     steps = smfStepFix * (Given)
+*        A pointer to the first element of an array of smfStepFix structures
+*        describing the steps fixed in the current invocation of this program.
+*     nstep = int (Given)
+*        The number of fixed steps in the current invocation of this program.
+*     status = int* (Given and Returned)
+*        Pointer to global status.
+
+*  Description:
+*     Reads information from the supplied file and reports any
+*     significant differences with the information produced by the curent
+*     invocation of this program.
+
+*  Returned Value:
+*     Zero if no significant differences were found. Non-zero otherwise.
+
+*/
+
+/* Local Variables: */
+   char buf[ BUFSIZE + 1 ];
+   char *c;
+   double dval;
+   double size;
+   int bad;
+   int end;
+   int ibolo;
+   int iline;
+   int istep;
+   int ival;
+   int nc;
+   int nold;
+   int result;
+   int stage;
+   int start;
+
+/* Check the inherited status. */
+   if( *status != SAI__OK ) return 0;
+
+/* Indicate that no sognificant differences have been found yet. */
+   result = 0;
+
+/* Indicate we have not yet reached the tabular data. */
+   stage = 0;
+
+/* Initialise the index of the next step to compare. */
+   istep = 0;
+
+/* Indicate we do not yet know how many steps are described in the text
+   file. */
+   nold = -1;
+
+/* Indicate no bad lines found yet. */
+   bad = 0;
+
+/* Loop round reading lines of text from the supplied file until an
+   illegal line is read or the end of file is reached. */
+   iline = 0;
+   while( !bad && fgets( buf, BUFSIZE, fd ) ) {
+      iline++;
+
+/* Remove trailing white space. */
+      c = buf + strlen( buf ) - 1;
+      while( isspace( *c ) && c > buf ) c--;
+      c[ 1 ] = 0;
+
+/* scanf indicates success if the strings do not fail to match before the
+   end of the shorter of the two. So we need to check that sufficient
+   characters are compared. Initialise the number of characters compared. */
+      nc = 0;
+
+/* If we are not yet in the tabular data, look for header lines, and
+   issue a message if the old value is different to the new value. */
+      if( stage == 0 ) {
+
+         if( sscanf( buf, "# Number of steps fixed = %d%n", &ival, &nc )
+                     && nc > 26 ) {
+            if( ival != nstep ) {
+               msgSeti( "O", ival );
+               msgSeti( "N", nstep );
+               msgOut( "", "No. of steps fixed changed from ^O to ^N",
+                       status );
+               result = 1;
+            }
+
+            nold = ival;
+
+         } else if( sscanf( buf, "# Number of bolometers rejected = %d%n",
+                            &ival, &nc ) && nc > 34 ) {
+            if( ival != (int) nrej ) {
+               msgSeti( "O", ival );
+               msgSeti( "N", nrej );
+               msgOut( "", "No. of bolometers rejected changed from ^O to ^N",
+                       status );
+               result = 1;
+            }
+
+         } else if( sscanf( buf, "# DCFITBOX = %d%n", &ival, &nc ) && nc > 13 ) {
+            if( ival != (int) dcfitbox ) {
+               msgSeti( "O", ival );
+               msgSeti( "N", dcfitbox );
+               msgOut( "", "Warning: DCFITBOX changed from ^O to ^N", status );
+            }
+
+         } else if( sscanf( buf, "# DCLIMCORR = %d%n", &ival, &nc ) && nc > 14 ) {
+            if( ival != dclimcorr ) {
+               msgSeti( "O", ival );
+               msgSeti( "N", dclimcorr );
+               msgOut( "", "Warning: DCLIMCORR changed from ^O to ^N", status );
+            }
+
+         } else if( sscanf( buf, "# DCMAXSTEPS = %d%n", &ival, &nc ) && nc > 14 ) {
+            if( ival != dcmaxsteps ) {
+               msgSeti( "O", ival );
+               msgSeti( "N", dcmaxsteps );
+               msgOut( "", "Warning: DCMAXSTEPS changed from ^O to ^N", status );
+            }
+
+         } else if( sscanf( buf, "# DCMEDIANWIDTH = %d%n", &ival, &nc )
+                    && nc > 18 ) {
+            if( ival != (int) dcmedianwidth ) {
+               msgSeti( "O", ival );
+               msgSeti( "N", dcmedianwidth );
+               msgOut( "", "Warning: DCMEDIANWIDTH changed from ^O to ^N", status );
+            }
+
+         } else if( sscanf( buf, "# DCTHRESH = %lg%n", &dval, &nc ) && nc > 13 ) {
+            if( fabs( dval - dcthresh ) > 1.0E-10 ) {
+               msgSetd( "O", dval );
+               msgSetd( "N", dcthresh );
+               msgOut( "", "Warning: DCTHRESH changed from ^O to ^N", status );
+            }
+
+/* Look for the line that marks the start of the tabular data. */
+         } else if( !strcmp( buf, "# istep start end ibolo size" ) ) {
+            stage = 1;
+
+/* Abort if an illegal header line is read. */
+         } else if( strcmp( buf, "#" ) &&
+                    strncmp( buf, "# Steps fixed in '", 18 ) ) {
+            bad = 1;
+         }
+
+/* If we are now reading tabular data, compare values, and report any
+   significant differences. */
+      } else if( istep < nstep ) {
+
+         if( sscanf( buf, "%d %d %d %d %lg%n", &ival, &start, &end, &ibolo, &size, &nc )
+             == 5 && nc > 14 ) {
+
+            if( ival != istep ) {
+               *status = SAI__ERROR;
+               msgSeti( "I", istep );
+               errRep( "", "Step ^I data not found in old steps file:", status );
+               bad = 1;
+
+            } else if( abs( start - steps[ istep ].start ) > 1 ) {
+               msgSeti( "I", istep );
+               msgSeti( "O", start );
+               msgSeti( "N", steps[ istep ].start );
+               msgOut( "", "start: old=^O new=^N (step ^I)", status );
+               result = 1;
+
+            } else if( abs( end - steps[ istep ].end ) > 1 ) {
+               msgSeti( "I", istep );
+               msgSeti( "O", end );
+               msgSeti( "N", steps[ istep ].end );
+               msgOut( "", "end: old=^O new=^N (step ^I)", status );
+               result = 1;
+
+            } else if( ibolo != steps[ istep ].ibolo ) {
+               msgSeti( "I", istep );
+               msgSeti( "O", ibolo );
+               msgSeti( "N", steps[ istep ].ibolo );
+               msgOut( "", "ibolo: old=^O new=^N (step ^I)", status );
+               result = 1;
+
+            } else if( fabs( size - steps[ istep ].size ) >
+                       1.0E-5*fabs( size + steps[ istep ].size ) ) {
+               msgSeti( "I", istep );
+               msgSetd( "O", size );
+               msgSetd( "N", steps[ istep ].size );
+               msgOut( "", "size: old=^O new=^N (step ^I)", status );
+               result = 1;
+            }
+
+/* Increment the index of the next step to check. */
+            istep++;
+
+/* Abort if an illegal line is read. */
+         } else {
+            bad = 1;
+         }
+      }
+   }
+
+/* Report an error if the last line read was illegal. */
+   if( bad ) {
+      *status = SAI__ERROR;
+      msgSeti( "I", iline );
+      errRep( "", "Illegal line found in old steps file (line ^I):", status );
+      msgSetc( "L", buf );
+      errRep( "", "'^L'", status );
+
+/* Report an error if the number of steps in the old file is still unknown */
+   } else if( nold == -1 ) {
+      *status = SAI__ERROR;
+      errRep( "", "Required line not found in old steps file:", status );
+      errRep( "", "'# Number of steps fixed = ...'", status );
+
+/* Report an error if the number of lines of tabular data was wrong. */
+   } else if( istep != nold ) {
+      *status = SAI__ERROR;
+      errRep( "", "Incorrect number of step descriptions in old steps file.",
+              status );
+      msgSeti( "I", istep );
+      msgSeti( "N", nold );
+      errRep( "", "Header says file contains ^N steps but data for ^I "
+              "steps was found.", status );
+   }
+
+   return result;
+}
+
+
 

@@ -1297,6 +1297,9 @@ void smf_open_related_model( const smfGroup *group, const dim_t subindex,
                              const char *accmode, smfArray **relfiles,
                              int *status );
 
+FILE *smf_open_textfile( const char *param, const char *mode, const char *def,
+                         int *status );
+
 int smf_pattern_extract ( const char * sourcestr, const char * pattern,
                           double *dresult, char * sresult, size_t szstr, int * status );
 

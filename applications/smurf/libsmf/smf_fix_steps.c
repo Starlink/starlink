@@ -55,8 +55,9 @@
 *        Address of a pointer to the first element of an array of
 *        smfStepFix structures. If the pointer is NULL on entry, then a
 *        new array is allocated and a pointer to the array is stored at the
-*        supplied address on exit. If the supplied address is NULL, then
-*        no array is allocated.
+*        supplied address on exit (the array should be freed using
+*        astFree when no longer needed). If the supplied address is NULL,
+*        then no array is allocated.
 *
 *        On exit, the number of elements in the array (if it exists) will
 *        be equal to the value of "*nstep". Each element is a smfStepFix

@@ -253,6 +253,7 @@ smf_open_newfile.c \
 smf_open_raw_asdouble.c \
 smf_open_related.c \
 smf_open_related_model.c \
+smf_open_textfile.c \
 smf_pattern_extract.c \
 smf_polext.c \
 smf_qfamily_count.c \

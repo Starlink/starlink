@@ -1090,6 +1090,15 @@ package @PACKAGE@ {
         action fixsteps {
             helplib {$SMURF_HELP}
 
+            parameter changed {
+                type _LOGICAL
+                access WRITE
+                vpath DEFAULT
+                prompt {Were and significant changes found?}
+                default FALSE
+                helpkey *
+            }
+
             parameter config {
                 type LITERAL
                 access READ
@@ -1153,13 +1162,18 @@ package @PACKAGE@ {
             parameter newsteps {
                 type LITERAL
                 prompt {Name of output text file holding new step descriptions}
+                vpath DEFAULT
+                ppath CURRENT
+                default !
                 helpkey *
             }
 
             parameter oldsteps {
                 type LITERAL
                 prompt {Name of input text file holding old step descriptions}
-                vpath CURRENT
+                vpath DEFAULT
+                ppath CURRENT
+                default !
                 helpkey *
             }
 
