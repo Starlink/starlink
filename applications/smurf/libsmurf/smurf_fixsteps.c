@@ -404,6 +404,7 @@ static int smf1_check_steps( FILE *fd, double dcthresh, dim_t dcmedianwidth,
    int ival;
    int nc;
    int nold;
+   int report;
    int result;
    int stage;
    int start;
@@ -426,6 +427,9 @@ static int smf1_check_steps( FILE *fd, double dcthresh, dim_t dcmedianwidth,
 
 /* Indicate no bad lines found yet. */
    bad = 0;
+
+/* Indicate we have not yet reported a changed step. */
+   report = 1;
 
 /* Loop round reading lines of text from the supplied file until an
    illegal line is read or the end of file is reached. */
@@ -517,7 +521,7 @@ static int smf1_check_steps( FILE *fd, double dcthresh, dim_t dcmedianwidth,
 
 /* If we are now reading tabular data, compare values, and report any
    significant differences. */
-      } else if( istep < nstep ) {
+      } else {
 
          if( sscanf( buf, "%d %d %d %d %lg%n", &ival, &start, &end, &ibolo, &size, &nc )
              == 5 && nc > 14 ) {
@@ -528,19 +532,22 @@ static int smf1_check_steps( FILE *fd, double dcthresh, dim_t dcmedianwidth,
                errRep( "", "Step ^I data not found in old steps file:", status );
                bad = 1;
 
-            } else if( abs( start - steps[ istep ].start ) > 1 ) {
-               msgSeti( "I", istep );
-               msgSeti( "O", start );
-               msgSeti( "N", steps[ istep ].start );
-               msgOut( "", "start: old=^O new=^N (step ^I)", status );
-               result = 1;
+            } else if( istep >= nstep ) {
+               /* Just ignore old steps that are not found any more. */
 
-            } else if( abs( end - steps[ istep ].end ) > 1 ) {
+            } else if( !report ) {
+               /* Do nothing if we have already reported a changed step. */
+
+            } else if( start > steps[ istep ].end ||  /* Check no overlap */
+                       end < steps[ istep ].start ) {
                msgSeti( "I", istep );
-               msgSeti( "O", end );
-               msgSeti( "N", steps[ istep ].end );
-               msgOut( "", "end: old=^O new=^N (step ^I)", status );
+               msgSeti( "OS", start );
+               msgSeti( "NS", steps[ istep ].start );
+               msgSeti( "OE", end );
+               msgSeti( "NE", steps[ istep ].end );
+               msgOut( "", "start,end: old=(^OS,^OE) new=(^NS,^NE) (step ^I)", status );
                result = 1;
+               report = 0;
 
             } else if( ibolo != steps[ istep ].ibolo ) {
                msgSeti( "I", istep );
@@ -548,14 +555,16 @@ static int smf1_check_steps( FILE *fd, double dcthresh, dim_t dcmedianwidth,
                msgSeti( "N", steps[ istep ].ibolo );
                msgOut( "", "ibolo: old=^O new=^N (step ^I)", status );
                result = 1;
+               report = 0;
 
             } else if( fabs( size - steps[ istep ].size ) >
-                       1.0E-5*fabs( size + steps[ istep ].size ) ) {
+                       0.01*fabs( size + steps[ istep ].size ) ) {
                msgSeti( "I", istep );
                msgSetd( "O", size );
                msgSetd( "N", steps[ istep ].size );
                msgOut( "", "size: old=^O new=^N (step ^I)", status );
                result = 1;
+               report = 0;
             }
 
 /* Increment the index of the next step to check. */
