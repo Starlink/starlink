@@ -21,6 +21,13 @@ set width_(axes) 1.0
 set width_(ticks) 1.0
 set size_(majticklen) 3.0
 set size_(minticklen) 1.0
+set gridsize_($this,whole) 1
+set gridsize_($this,xfrac) 0.8
+set gridsize_($this,yfrac) 0.8
+set style_(grid) 0
+set style_(border) 0
+set style_(axes) 0
+set style_(ticks) 0
 set element_($this,border) 0
 set element_($this,grid) 1
 set element_($this,numlab) 1
@@ -36,9 +43,9 @@ set colour_(numlab) 3
 set colour_(axes) 2
 set colour_(textlab) 11
 set colour_(ticks) 0
-set font_(title) 17
-set font_(numlab) 17
-set font_(textlab) 17
+set font_(title) 6
+set font_(numlab) 6
+set font_(textlab) 6
 set system_(system) fk5
 set system_(epoch) default
 set system_(equinox) default
@@ -59,7 +66,3 @@ set Yformat_($this,s) 1
 set Xformat_($this,.) 1
 set Yformat_($this,.) 0
 set format_($this,noformat) 1
-set label_($this,title) ""
-set label_($this,label(1)) ""
-set label_($this,label(2)) ""
-set gridsize_($this,whole) 1
