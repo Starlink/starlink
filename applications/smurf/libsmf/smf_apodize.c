@@ -158,17 +158,19 @@ void smf_apodize( smfData *data, smf_qual_t *quality, size_t len,
     qua = data->qual;
   }
 
+  /* Determine the first and last samples to apodize (after padding) */
+  if (qua) {
+    smf_get_goodrange( qua, ntslice, tstride, SMF__Q_PAD, &first, &last,
+                       status );
+  } else {
+    first = 0;
+    last = ntslice -1 ;
+  }
+
+
+
   /* Loop over bolometer */
   for( i=0; (*status==SAI__OK)&&(i<nbolo); i++ ) {
-
-    /* Determine the first and last samples to apodize (after padding) */
-    if (qua) {
-      smf_get_goodrange( qua+i*bstride, ntslice, tstride, SMF__Q_PAD,
-                         &first, &last, status );
-    } else {
-      first = 0;
-      last = ntslice -1 ;
-    }
 
     /* Can we apodize? */
     if( *status == SAI__OK ) {
