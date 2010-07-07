@@ -204,6 +204,9 @@ void smf_qualstats_report( smf_qfam_t qfamily, const smfArray *qua,
 
       char scalestr[80];
 
+      /* Do not report anything when there is nothing to say */
+      if ( qcount[i] == 0 ) continue;
+
       /* Report numbers of detectors or time slices if it makes sense for
          the given quality bit */
       switch( BIT_TO_VAL(i) ) {
