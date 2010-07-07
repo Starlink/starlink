@@ -135,7 +135,7 @@ void smf_expmodel_init( const smfData *indata, smfData **outdata, int *status) {
 
   data = smf_deepcopy_smfData( indata, 0, SMF__NOCREATE_DATA |
                                SMF__NOCREATE_VARIANCE | SMF__NOCREATE_QUALITY |
-                               SMF__NOCREATE_FILE, status );
+                               SMF__NOCREATE_FILE | SMF__NOCREATE_DA, status );
 
   if (!data) return;
 
