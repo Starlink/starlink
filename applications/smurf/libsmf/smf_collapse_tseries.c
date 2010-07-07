@@ -224,7 +224,7 @@ void smf_collapse_tseries( const smfData *indata, int nclip, const float clip[],
 
   *outdata = smf_construct_smfData( NULL, NULL,  hdr, NULL,
                                     dtype, pntr, NULL, SMF__QFAM_TSERIES,
-                                    1, dims, indata->lbnd, 2, 0, 0,
+                                    NULL, 1, dims, indata->lbnd, 2, 0, 0,
                                     NULL, history, status );
 
   /* must free the data if outdata is null */

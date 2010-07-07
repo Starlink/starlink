@@ -16,9 +16,9 @@
 *     pntr = smf_construct_smfData( smfData * tofill, smfFile * file,
 *                      smfHead * hdr, smfDA * da, smf_dtype dtype,
 *                      void * pntr[2], smf_qual_t qual, smf_qfam_t qfamily,
-*                      int isTordered, const dim_t dims[], const int lbnd[],
-*                      int ndims, int virtual, int ncoeff, double *poly,
-*                      AstKeyMap * history, int * status );
+*                      smfData * sidequal, int isTordered, const dim_t dims[],
+*                      const int lbnd[], int ndims, int virtual, int ncoeff,
+*                      double * poly, AstKeyMap * history, int * status );
 
 *  Arguments:
 *     tofill = smfData * (Given)
@@ -44,6 +44,11 @@
 *        Pointer to quality. Pointer will be copied.
 *     qfamily = smf_qfam_t (Given)
 *        Quality family used in "qual".
+*     sidequal = smfData * (Given)
+*        Override external quality that can be used in preference to "qual".
+*        This pointer will be copied and it is assumed that the smfData
+*        will be freed in another location. See smf_select_qualpntr to determine
+*        which pointer to use for quality.
 *     isTordered = int (Given)
 *        If set, data is ICD-compliant time-ordered. Otherwise bolom-ordered.
 *     dims[] = const dim_t (Given)
@@ -106,6 +111,8 @@
 *        Add "qual"
 *     2010-06-18 (TIMJ):
 *        Add qfamily
+*     2010-07-07 (TIMJ):
+*        Add sidequal
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -154,9 +161,10 @@
 smfData *
 smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr,
                        smfDA * da, smf_dtype dtype, void * pntr[2],
-                       smf_qual_t * qual, smf_qfam_t qfamily, int isTordered,
-                       const dim_t dims[], const int lbnd[], int ndims, int virtual,
-                       int ncoeff, double *poly, AstKeyMap *history, int * status ) {
+                       smf_qual_t * qual, smf_qfam_t qfamily, smfData * sidequal,
+                       int isTordered, const dim_t dims[], const int lbnd[], int ndims,
+                        int virtual, int ncoeff, double *poly, AstKeyMap *history,
+                       int * status ) {
 
   /* need to make sure that any memory we malloc will be freed on error
      so make sure we NULL all pointers first. */
@@ -214,6 +222,7 @@ smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr,
       }
       data->qual = qual;
       data->qfamily = qfamily;
+      data->sidequal = sidequal;
       data->ndims = ndims;
       for (i = 0; i < ndims; i++ ) {
         (data->dims)[i] = dims[i];

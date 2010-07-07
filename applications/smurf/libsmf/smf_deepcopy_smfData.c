@@ -48,6 +48,9 @@
 *     - Can be freed with a smf_free if header resources are freed first.
 *     - The mapped smfData is no longer associated with a file so the
 *       output smfFile component will not include an NDF identifier.
+*     - The sidequal pointer is copied without deep copying the smfData
+*       itself. This is because the memory associated with the sidqual
+*       is not owned by the smfData.
 
 *  Authors:
 *     Tim Jenness (TIMJ)
@@ -81,10 +84,12 @@
 *        Correctly calculate npts if isTordered=0
 *     2008-08-26 (TIMJ):
 *        Need to trap VAL__BADI
+*     2010-07-07 (TIMJ):
+*        Note sidequal behaviour.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008, 2010 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
 *     Council. University of British Columbia. All Rights Reserved.
 
@@ -284,9 +289,9 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
     da = smf_deepcopy_smfDA( old, 1, status );
 
   /* Construct the new smfData */
-  new = smf_construct_smfData( new, file, hdr, da, dtype, pntr, qual, old->qfamily, isTordered,
-                               dims, old->lbnd, ndims, virtual, ncoeff, poly, history,
-                               status);
+  new = smf_construct_smfData( new, file, hdr, da, dtype, pntr, qual, old->qfamily,
+                               old->sidequal, isTordered, dims, old->lbnd, ndims,
+                               virtual, ncoeff, poly, history, status);
 
   return new;
 }

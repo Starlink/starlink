@@ -352,7 +352,7 @@ size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snr
       pntr[0] = polybol;
       pntr[1] = NULL;
       *polyfit = smf_construct_smfData( NULL, NULL, NULL, NULL, SMF__DOUBLE,
-                                        pntr, NULL, SMF__QFAM_TSERIES, 1,
+                                        pntr, NULL, SMF__QFAM_TSERIES, NULL, 1,
                                         bolvald->dims, bolvald->lbnd, 3, 0, 0, NULL,
                                         NULL, status );
       if (*status != SAI__OK && ! *polyfit) astFree( polybol );

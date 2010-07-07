@@ -608,6 +608,7 @@ typedef struct smfData {
   smf_dtype dtype;           /* Data type of DATA and VARIANCE arrays */
   void * pntr[2];            /* Array of pointers to DATA/VARIANCE/QUALITY */
   smf_qual_t * qual;         /* Pointer for quality information */
+  struct smfData * sidequal; /* Override external quality not owned by this smfData */
   smf_qfam_t qfamily;        /* Quality family used in "qual" */
   dim_t dims[NDF__MXDIM];    /* Dimensions of data array */
   int lbnd[NDF__MXDIM];      /* Lower PIXEL bounds of data array */
