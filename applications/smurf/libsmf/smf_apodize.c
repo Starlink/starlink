@@ -167,27 +167,25 @@ void smf_apodize( smfData *data, smf_qual_t *quality, size_t len,
     last = ntslice -1 ;
   }
 
-
+  /* Can we apodize? */
+  if( *status == SAI__OK ) {
+    if( len == SMF__MAXAPLEN ) {
+      thelen = (last-first+1)/2;
+      msgOutiff( MSG__DEBUG, "", FUNC_NAME
+                 ": Using maximum apodization length, %zu samples.",
+                 status, thelen );
+    } else if( (last-first+1) < (2*len) ) {
+      *status = SAI__ERROR;
+      errRepf("", FUNC_NAME
+              ": Can't apodize, not enough samples (%zu < %zu).", status,
+              last-first+1, 2*len);
+    } else {
+      thelen = len;
+    }
+  }
 
   /* Loop over bolometer */
   for( i=0; (*status==SAI__OK)&&(i<nbolo); i++ ) {
-
-    /* Can we apodize? */
-    if( *status == SAI__OK ) {
-      if( len == SMF__MAXAPLEN ) {
-        thelen = (last-first+1)/2;
-        msgOutiff( MSG__DEBUG, "", FUNC_NAME
-                   ": Using maximum apodization length, %zu samples.",
-                   status, thelen );
-      } else if( (last-first+1) < (2*len) ) {
-        *status = SAI__ERROR;
-        errRepf("", FUNC_NAME
-                ": Can't apodize, not enough samples (%zu < %zu).", status,
-                last-first+1, 2*len);
-      } else {
-        thelen = len;
-      }
-    }
 
     /* Do the apodization */
     if( *status == SAI__OK ) {
