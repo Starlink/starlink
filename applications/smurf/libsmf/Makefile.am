@@ -298,6 +298,8 @@ smf_samedims_smfData.c \
 smf_scalar_multiply.c \
 smf_scanfit.c \
 smf_select_pntr.c \
+smf_select_cqualpntr.c \
+smf_select_qualpntr.c \
 smf_set_clabels.c \
 smf_set_moving.c \
 smf_smfFile_msg.c \
