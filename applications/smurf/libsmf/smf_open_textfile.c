@@ -164,6 +164,10 @@ FILE *smf_open_textfile( const char *param, const char *mode, const char *def,
             errFlush( status );
          }
       }
+
+/* Cancel the parameter if a new value is required. */
+      if( !result ) parCancl( param, status );
+
    }
 
 /* Return the file pointer. */
