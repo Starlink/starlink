@@ -1195,6 +1195,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter sizetol {
+                type _DOUBLE
+                prompt {Minimum significant relative error in step height}
+                ppath CURRENT
+                vpath DEFAULT
+                default 0.05
+                helpkey *
+            }
+
         }
 
         action flatfield {

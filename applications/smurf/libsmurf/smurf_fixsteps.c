@@ -93,6 +93,11 @@
 *     OUT = NDF (Write)
 *        The fixed time series cube. May be null (!), in which case no
 *        output NDF is created.
+*     SIZETOL = _DOUBLE (Read)
+*        Gives the fraction (i.e. relative error) by which two step sizes
+*        must differ for them to be considered different. In addition,
+*        the absolute difference between two step sizes must also differ
+*        by more than SIZETOL times the clipped RMS step size. [0.05]
 
 *  Authors:
 *     DSB: David Berry (JAC, Hawaii)
@@ -154,8 +159,9 @@
 #define FUNC_NAME "smurf_fixsteps"
 
 /* Prototypes for local functions: */
-static int smf1_check_steps( dim_t nx, int nold, int nnew, smfStepFix *oldsteps,
-                             smfStepFix *newsteps, int *status );
+static int smf1_check_steps( dim_t nx, double sizetol, int nold, int nnew,
+                             smfStepFix *oldsteps, smfStepFix *newsteps,
+                             int *status );
 
 static void smf1_write_steps( FILE *fd, smfData *data, int nstep,
                               smfStepFix *steps, double dcthresh,
@@ -171,6 +177,7 @@ static smfStepFix *smf1_read_steps( FILE *fd, double dcthresh0,
 
 static int smf1_order_steps( const void *a, const void *b );
 
+static double smf1_get_rmssize( int nstep, smfStepFix *steps, int *status );
 
 /* Main entry */
 void smurf_fixsteps( int *status ) {
@@ -184,6 +191,7 @@ void smurf_fixsteps( int *status ) {
    dim_t dcfitbox;           /* DCFITBOX config parameter */
    dim_t dcmedianwidth;      /* DCMEDIANWIDTH config parameter */
    double dcthresh;          /* DCTHRESH config parameter */
+   double sizetol;           /* Tolerance allowed on step height */
    int changed;              /* Have any step fixes changed? */
    int dclimcorr;            /* DCLIMCORR config parameter */
    int dcmaxsteps;           /* DCMAXSTEPS config parameter */
@@ -300,19 +308,22 @@ void smurf_fixsteps( int *status ) {
    previous invocation of this program. */
    fd = smf_open_textfile( "OLDSTEPS", "r", "<none>", status );
    if( fd ) {
-      msgBlank( status );
+
+/* Get SIZETOL - the minimum significant fractional error in step sizes. */
+      parGet0d( "SIZETOL", &sizetol, status );
 
 /* Read the contents of the file, issuing a warning if the global
    properties read from the file (e.g. parameters used, no. of steps
    found, etc) differ from those of the current invocation. */
+      msgBlank( status );
       oldsteps = smf1_read_steps( fd, dcthresh, dcmedianwidth,
                                   dcfitbox, dcmaxsteps, dclimcorr,
                                   nrej, nnew, &nold, status );
 
 /* Compare the new step fixes with the old step fixes, issuing a warning
    for the first step fix that has changed. */
-      changed = smf1_check_steps( data->dims[ 0 ], nold, nnew, oldsteps,
-                                  newsteps, status );
+      changed = smf1_check_steps( data->dims[ 0 ], sizetol, nold, nnew,
+                                  oldsteps, newsteps, status );
 
 /* Store a flag indicating if any sstep fixes have chnaged. */
       parPut0l( "CHANGED", changed, status );
@@ -415,6 +426,7 @@ static smfStepFix *smf1_read_steps( FILE *fd, double dcthresh0,
    double dval;
    double size;
    int bad;
+   int corr;
    int end;
    int ibolo;
    int iline;
@@ -522,7 +534,7 @@ static smfStepFix *smf1_read_steps( FILE *fd, double dcthresh0,
             }
 
 /* Look for the line that marks the start of the tabular data. */
-         } else if( !strcmp( buf, "# istep start end ibolo size" ) ) {
+         } else if( !strcmp( buf, "# istep start end ibolo size corr" ) ) {
             stage = 1;
             msgBlank( status );
 
@@ -540,8 +552,8 @@ static smfStepFix *smf1_read_steps( FILE *fd, double dcthresh0,
       } else {
 
 /* Extract the numerical values from the line of text. */
-         if( sscanf( buf, "%d %d %d %d %lg%n", &ival, &start, &end, &ibolo, &size, &nc )
-             == 5 && nc > 14 ) {
+         if( sscanf( buf, "%d %d %d %d %lg %d%n", &ival, &start, &end, &ibolo,
+                     &size, &corr, &nc ) == 6 && nc > 14 ) {
 
 /* Report an error if there is a jump in the step index (indicates lines
    missing from the supplied file). */
@@ -559,6 +571,7 @@ static smfStepFix *smf1_read_steps( FILE *fd, double dcthresh0,
                result[ istep ].start = start;
                result[ istep ].end = end;
                result[ istep ].size = size;
+               result[ istep ].corr = corr;
             }
 
 /* Increment the index of the next step to check. */
@@ -600,8 +613,9 @@ static smfStepFix *smf1_read_steps( FILE *fd, double dcthresh0,
 }
 
 
-static int smf1_check_steps( dim_t nx, int nold, int nnew, smfStepFix *oldsteps,
-                             smfStepFix *newsteps, int *status ){
+static int smf1_check_steps( dim_t nx, double sizetol, int nold, int nnew,
+                             smfStepFix *oldsteps, smfStepFix *newsteps,
+                             int *status ){
 /*
 *  Name:
 *     smf1_check_steps
@@ -611,12 +625,15 @@ static int smf1_check_steps( dim_t nx, int nold, int nnew, smfStepFix *oldsteps,
 *     has changed significantly.
 
 *  Invocation:
-*     int smf1_check_steps( dim_t nx, int nold, int nnew, smfStepFix *oldsteps,
-*                           smfStepFix *newsteps, int *status )
+*     int smf1_check_steps( dim_t nx, double sizetol, int nold, int nnew,
+*                           smfStepFix *oldsteps, smfStepFix *newsteps,
+*                           int *status )
 
 *  Arguments:
 *     nx = dim_t (Given)
 *        The length of the first axis of the bolometer array.
+*     sizetol = double (Given)
+*        The minimum significant relative error in step size.
 *     nold = int (Given)
 *        The number of steps in the "oldsteps" array.
 *     nnew = int (Given)
@@ -641,7 +658,9 @@ static int smf1_check_steps( dim_t nx, int nold, int nnew, smfStepFix *oldsteps,
 *     1) No matching step fix is found. Fixes match if they have exactly
 *     the same  bolometer index, and have overlapping extent in time.
 *
-*     2) the height of the steps differ by more than 1 percent.
+*     2) the relative error between the step sizes is more than "sizetol"
+*        AND the absolute error between the step sizes is more than
+*        "sizetol" times the clipped RMS step size.
 
 *  Returned Value:
 *     Zero if no significant differences were found. Non-zero otherwise.
@@ -649,6 +668,8 @@ static int smf1_check_steps( dim_t nx, int nold, int nnew, smfStepFix *oldsteps,
 */
 
 /* Local Variables: */
+   double abslim;
+   double dsize;
    int inew;
    int iold;
    int result;
@@ -662,6 +683,14 @@ static int smf1_check_steps( dim_t nx, int nold, int nnew, smfStepFix *oldsteps,
 
 /* Check the inherited status. */
    if( *status != SAI__OK ) return result;
+
+/* Find the absolute minimum significant difference between step sizes.
+   This is "sizetol" times the clipped RMS step size in the new steps. */
+   abslim = sizetol*smf1_get_rmssize( nnew, newsteps, status );
+   msgSetd( "T", abslim );
+   msgOut( "", "Ignoring differences in step size smaller than ^T",
+           status );
+   msgBlank( status );
 
 /* Sort the two arrays using bolometer index as the primary sort key,
    start time as the secondary sort key, end time as the tertiary
@@ -684,6 +713,9 @@ static int smf1_check_steps( dim_t nx, int nold, int nnew, smfStepFix *oldsteps,
 
 /* Loop round comparing steps. */
    while( iold < nold && inew < nnew ) {
+
+/* Note the absolute difference in step size. */
+      dsize = fabs( pold->size - pnew->size );
 
 /* If the old and new step do not overlap, or are for different
    bolometers, then either a new step has been found or an old step
@@ -730,8 +762,8 @@ static int smf1_check_steps( dim_t nx, int nold, int nnew, smfStepFix *oldsteps,
 
 /* If all pairs of steps have matched so far, but the current pair have different
    heights, issue a warning and abort. */
-      } else if( fabs( pold->size - pnew->size ) >
-                 0.01*fabs( pold->size + pnew->size ) ) {
+      } else if( dsize > abslim &&
+                 dsize > sizetol*fabs( 0.5*( pold->size + pnew->size ) ) ) {
 
          msgSetd( "O", pold->size );
          msgSetd( "N", pnew->size );
@@ -895,16 +927,17 @@ static void smf1_write_steps( FILE *fd, smfData *data, int nstep,
    fprintf( fd, "#\n" );
 
 /* Write out the topcat column header line. */
-   fprintf( fd, "# istep start end ibolo size\n" );
+   fprintf( fd, "# istep start end ibolo size corr\n" );
 
 /* Write out the details of each step. */
    for( istep = 0; istep < nstep; istep++ ) {
-      fprintf( fd, "%d %d %d %d %.*g\n",
+      fprintf( fd, "%d %d %d %d %.*g %d\n",
                                     ( steps[ istep ] ).id,
                                     ( steps[ istep ] ).start,
                                     ( steps[ istep ] ).end,
                                     ( steps[ istep ] ).ibolo,
-                           DBL_DIG, ( steps[ istep ] ).size );
+                           DBL_DIG, ( steps[ istep ] ).size,
+                                    ( steps[ istep ] ).corr );
    }
 }
 
@@ -988,3 +1021,98 @@ static int smf1_order_steps( const void *a, const void *b ){
    return result;
 }
 
+static double smf1_get_rmssize( int nstep, smfStepFix *steps, int *status ){
+/*
+*  Name:
+*     smf1_get_rmssize
+
+*  Purpose:
+*     Get the clipped RMS step size.
+
+*  Invocation:
+*     double smf1_get_rmssize( int nstep, smfStepFix *steps, int *status )
+
+*  Arguments:
+*     nstep = int (Given)
+*        Length of the "steps" array.
+*     steps = smfStepFix * (Given)
+*        Pointer to an array of step fix structures.
+*     status = int * (given and Returned)
+*        Ingerited status
+
+*  Description:
+*     This function obtains the RMS step size, iterating threee times to
+*     remove steps that are larger than 3 times teh RMS step size from the
+*     previous iteration.
+
+* Returned value:
+*     The clipped RMS step size.
+
+*/
+
+/* Local Variables: */
+   double rms;
+   double size;
+   double sum2;
+   double threshold;
+   int istep;
+   int iter;
+   int nsum;
+   smfStepFix *step;
+
+/* Initialise */
+   rms = 0.0;
+   threshold = VAL__MAXD;
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return rms;
+
+/* Find the RMS step size, excluding steps larger than 3 times the
+   RMS of the step sizes on the previous iteration. Perform 3 clipping
+   iterations. */
+   for( iter = 0; iter < 3; iter++ ) {
+
+/* Initialise running sums. */
+      sum2 = 0.0;
+      nsum = 0;
+
+/* Loop round all steps. */
+      step = steps;
+      for( istep = 0; istep < nstep; istep++,step++ ) {
+         size = step->size;
+
+/* Check that this step size is no more than 3 times the RMS from
+   the previous iteration. Only use steps that were not detected
+   as correlated steps (since there will be lots of these with very small
+   step sizes). */
+         if( fabs( size ) < threshold && !(step->corr) ) {
+
+/* If so, increment the running sums. */
+            sum2 += size*size;
+            nsum++;
+         }
+      }
+
+/* Report an error and abort if all steps were rejected. */
+      if( nsum == 0 ) {
+         *status = SAI__ERROR;
+         errRep( "", "All steps rejected when calculating RMS step size.",
+                 status );
+         break;
+      }
+
+/* Calculate the RMS of the remaining step sizes. */
+      rms = sum2/nsum ;
+      if( rms > 0.0 ) {
+         rms = sqrt( rms );
+      } else {
+         rms = 0.0;
+      }
+
+/* Set the threshold for the next iteration. */
+      threshold = 3.0*rms;
+   }
+
+/* Return the result */
+   return rms;
+}

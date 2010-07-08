@@ -820,6 +820,7 @@ typedef struct smfStepFix {
   int ibolo;      /* Index of bolometer containing step */
   double size;    /* The size of the step rise or fall */
   int id;         /* Integer identifier for the step fix */
+  int corr;       /* Was step fixed as a "correlated step"? */
 } smfStepFix;
 
 
