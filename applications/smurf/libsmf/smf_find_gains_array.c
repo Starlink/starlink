@@ -17,7 +17,7 @@
 *     int smf_find_gains_array( smfWorkForce *wf, smfArray *data,
 *                               double *template, AstKeyMap *keymap,
 *                               smf_qual_t goodqual, smf_qual_t badqual,
-*                               smfArray *quality, smfArray *gain,
+*                               smfArray *gain,
 *                               int *nrej, int *status )
 
 *  Arguments:
@@ -85,9 +85,6 @@
 *        The quality value to be assigned to samples that are found to be
 *        aberrant. In addition, if an entire bolometer is set bad, its
 *        first sample will be flagged with SMF__Q_BADB.
-*     quality = smfArray (Given and Returned)
-*        If non-NULL, use this array instead of the QUALITY associated with
-*        "data". Samples rejected as aberrant will be flagged using "badqual".
 *     gain = smfArray * (Given & Returned)
 *        This holds the gains, offsets and correlation coefficients that
 *        scale the template values into the bolometer values for each block:
@@ -194,7 +191,7 @@
 /* Main entry */
 int smf_find_gains_array( smfWorkForce *wf, smfArray *data, double *template,
                           AstKeyMap *keymap, smf_qual_t goodqual,
-                          smf_qual_t badqual, smfArray *quality,
+                          smf_qual_t badqual,
                           smfArray *gain, int *nrej, int *status ){
 
 /* Local Variables: */
@@ -222,7 +219,6 @@ int smf_find_gains_array( smfWorkForce *wf, smfArray *data, double *template,
    if( nsub == 1 ) {
       nbad = smf_find_gains( wf, data->sdata[ 0 ], template,
                              keymap, goodqual, badqual,
-                             quality->sdata[ 0 ]->pntr[ 0 ],
                              gain->sdata[ 0 ], nrej, status );
 
 /* If there are two or more sub-arrays, we need to combine the "nrej"
@@ -260,7 +256,6 @@ int smf_find_gains_array( smfWorkForce *wf, smfArray *data, double *template,
    of sub-array bolometers rejected from each block into "nrej_in". */
             nbad += smf_find_gains( wf, data->sdata[ isub ], template,
                                     keymap, goodqual, badqual,
-                                    quality->sdata[ isub ]->pntr[ 0 ],
                                     gain->sdata[ isub ], nrej_in, status );
 
 /* Update the total number of bolometers rejected from each block, summed

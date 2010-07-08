@@ -312,7 +312,7 @@ void smurf_extinction( int * status ) {
     }
 
     /* Mask out bad pixels - mask data array not quality array */
-    smf_apply_mask( odata, NULL, bbms, SMF__BBM_DATA, 0, status );
+    smf_apply_mask( odata, bbms, SMF__BBM_DATA, 0, status );
 
     /* Now check that the data are sky-subtracted */
     if ( !smf_history_check( odata, "smf_subtract_plane", status ) ) {

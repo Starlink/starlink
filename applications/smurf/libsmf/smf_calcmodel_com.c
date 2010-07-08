@@ -959,7 +959,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
        If we do not have a GAI model, then zero bolometers are rejected. */
     nbad = gai ? smf_find_gains_array( wf, res, model_data, kmap,
                                        SMF__Q_GOOD, SMF__Q_COM,
-                                       qua, gai, nrej, status ) : 0;
+                                       gai, nrej, status ) : 0;
 
     /* If no bolometers were rejected we can quit the loop. */
     if( nbad > 0 ) {
@@ -1105,8 +1105,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   if( fillgaps ) astMapGet0I( keymap, "FILLGAPS", &fillgaps );
   if( fillgaps ) {
     for( idx=0; (idx<res->ndat)&&(*status==SAI__OK); idx++ ) {
-      qua_data = (smf_qual_t *)(qua->sdata[idx]->pntr)[0];
-      smf_fillgaps( wf, res->sdata[idx], qua_data, SMF__Q_COM, status );
+      smf_fillgaps( wf, res->sdata[idx], SMF__Q_COM, status );
     }
   }
 

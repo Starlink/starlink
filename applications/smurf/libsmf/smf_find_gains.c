@@ -17,15 +17,14 @@
 *     int smf_find_gains( smfWorkForce *wf, smfData *data,
 *                         double *template, AstKeyMap *keymap,
 *                         smf_qual_t goodqual, smf_qual_t badqual,
-*                         smf_qual_t *quality, smfData *gain,
-*                         int *nrej, int *status )
+*                         smfData *gain, int *nrej, int *status )
 
 *  Arguments:
 *     wf = smfWorkForce * (Given)
 *        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData * (Given)
 *        The input data. Each bolometer time series will be compared to
-*        the template.
+*        the template. Samples rejected as aberrant will be flagged using "badqual".
 *     template = double * (Given)
 *        The 1-dimensional template. The length of this array should
 *        equal the number of time slices in "data".
@@ -85,9 +84,6 @@
 *        The quality value to be assigned to samples that are found to be
 *        aberrant. In addition, if an entire bolometer is set bad, its
 *        first sample will be flagged with SMF__Q_BADB.
-*     quality = smf_qual_t * (Given and Returned)
-*        If non-NULL, use this array instead of the QUALITY associated with
-*        "data". Samples rejected as aberrant will be flagged using "badqual".
 *     gain = smfData * (Given & Returned)
 *        This holds the gains, offsets and correlation coefficients that
 *        scale the template values into the bolometer values for each block:
@@ -238,7 +234,7 @@ static void smf1_find_gains_job( void *job_data, int *status );
 /* Main entry */
 int smf_find_gains( smfWorkForce *wf, smfData *data, double *template,
                     AstKeyMap *keymap, smf_qual_t goodqual,
-                    smf_qual_t badqual, smf_qual_t *quality,
+                    smf_qual_t badqual,
                     smfData *gain, int *nrej, int *status ){
 
 /* Local Variables: */
@@ -330,11 +326,7 @@ int smf_find_gains( smfWorkForce *wf, smfData *data, double *template,
 
 /* Get pointers to data, quality and gain arrays. */
    dat = data->pntr[ 0 ];
-   if( quality ) {
-      qua = quality;
-   } else {
-      qua = data->pntr[ 2 ];
-   }
+   qua = smf_select_qualpntr( data, NULL, status );
    gai = gain->pntr[ 0 ];
 
 /* Report an error if any are missing. */

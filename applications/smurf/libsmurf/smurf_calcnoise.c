@@ -304,7 +304,7 @@ void smurf_calcnoise( int *status ) {
 
         if (*status == SAI__OK) {
           double * od = (outdata->pntr)[0];
-          smf_bolonoise( wf, thedata, NULL, 0, f_low, freqs[0], freqs[1],
+          smf_bolonoise( wf, thedata, 0, f_low, freqs[0], freqs[1],
                          10.0, 1, SMF__MAXAPLEN,
                          (outdata->pntr)[0], (ratdata->pntr)[0],
                          (powgrp ? &powdata : NULL), status );
@@ -318,7 +318,7 @@ void smurf_calcnoise( int *status ) {
             int provid = NDF__NOID;
             /* open a reference input file for provenance propagation */
             ndgNdfas( basegrp, gcount, "READ", &provid, status );
-            smf_write_smfData( powdata, NULL, NULL, NULL, powgrp, gcount, provid, status );
+            smf_write_smfData( powdata, NULL, NULL, powgrp, gcount, provid, status );
             smf_close_file( &powdata, status );
             ndfAnnul( &provid, status );
           }

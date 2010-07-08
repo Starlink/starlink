@@ -13,8 +13,7 @@
 *     C function
 
 *  Invocation:
-*     void smf_fix_steps( smfWorkForce *wf, smfData *data,
-*                         smf_qual_t *quality, double dcthresh,
+*     void smf_fix_steps( smfWorkForce *wf, smfData *data, double dcthresh,
 *                         dim_t dcmedianwidth, dim_t dcfitbox, int dcmaxsteps,
 *                         int dclimcorr, size_t *nrej, smfStepFix **steps,
 *                         int *nsteps, int *status )
@@ -23,10 +22,7 @@
 *     wf = smfWorkForce * (Given)
 *        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData * (Given and Returned)
-*        The data that will be repaired (in-place)
-*     quality = smf_qual_t * (Given and Returned)
-*        If set, use this buffer instead of QUALITY associated with data.
-*        If NULL, use the QUALITY associated with data. Locations of steps
+*        The data that will be repaired (in-place). Locations of steps
 *        will have bit SMF__Q_JUMP set.
 *     dcthresh = double (Given)
 *        N-sigma threshold for DC jump to be detected.
@@ -250,7 +246,7 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
                               int *status DEBUG_ARGS );
 
 
-void smf_fix_steps( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
+void smf_fix_steps( smfWorkForce *wf, smfData *data,
                     double dcthresh, dim_t dcmedianwidth, dim_t dcfitbox,
                     int dcmaxsteps, int dclimcorr, size_t *nrej,
                     smfStepFix **steps, int *nstep, int *status ) {
@@ -348,27 +344,20 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
    be time ordered, otherwise errors occurr when smf_open_file aopens the
    file. */
 #ifdef DUMP_INPUT
-   smfData *tdata = data;
-   msgOut( "", "Dumping smf_fix_steps input data to NDF 'fix_steps_input.sdf'.",
-           status );
-   if( ! data->isTordered ) {
-      tdata = smf_deepcopy_smfData( data, 0, 0, status );
-      if( quality ) tdata->pntr[ 2 ] = astStore( tdata->pntr[ 2 ], quality,
-                                                 astSizeOf( quality ) );
-      smf_dataOrder( tdata, 1, status );
-   }
-   smf_write_smfData ( tdata, NULL, quality ? quality : tdata->pntr[ 2 ],
+   {
+     int isT = data->isTordered;
+     msgOut( "", "Dumping smf_fix_steps input data to NDF 'fix_steps_input.sdf'.",
+             status );
+     smf_dataOrder( data, 1, status );
+     smf_write_smfData ( tdata, NULL,
                        "fix_steps_input", NULL, 0, 0, status );
-   if( tdata != data ) smf_close_file( &tdata, status );
+     smf_dataOrder( data, isT, status );
+   }
 #endif
 
 /* Get pointers to data and quality arrays. */
    dat = data->pntr[ 0 ];
-   if( quality ) {
-      qua = quality;
-   } else {
-      qua = data->pntr[ 2 ];
-   }
+   qua = smf_select_qualpntr( data, NULL, status );
 
 /* Report an error if either are missing. */
    if( !qua ) {

@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     pntr = smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
-*                          const smf_qual_t *quality, size_t len, int *status );
+*                          size_t len, int *status );
 
 *  Arguments:
 *     wf = smfWorkForce * (Given)
@@ -23,9 +23,6 @@
 *        Pointer to the input smfData
 *     inverse = int (Given)
 *        If set perform inverse transformation. Otherwise forward.
-*     const quality = smf_qual_t * (Given)
-*        If set, use this buffer instead of QUALITY associated with indata.
-*        If NULL, use the QUALITY associated with indata.
 *     len = size_t (Given)
 *        Number of samples over which to apply apodization. Can be set to
 *        SMF__MAXAPLEN in which case the routine will automatically apodize
@@ -243,7 +240,7 @@ void smfFFTDataParallel( void *job_data_ptr, int *status ) {
 #define FUNC_NAME "smf_fft_data"
 
 smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
-                       const smf_qual_t *quality, size_t len, int *status ) {
+                       size_t len, int *status ) {
   double *baseR=NULL;           /* base pointer to real part of transform */
   double *baseI=NULL;           /* base pointer to imag part of transform */
   double *baseB=NULL;           /* base pointer to bolo in time domain */
@@ -337,28 +334,27 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
                                SMF__NOCREATE_FILE |
                                SMF__NOCREATE_DA, status );
 
-  /* Re-order a time-domain cube if needed */
-  if( indata->isTordered && (indata->ndims == 3) ) {
-    smf_dataOrder( data, 0, status );
-  }
-
   /* Create some quality. We only apodize if we are doing a
      forward FFT. */
   if (len && !inverse) {
-    smf_qual_t *qua = NULL;
+    const smf_qual_t *inqual = smf_select_cqualpntr( indata, NULL, status );
 
-    if (quality || data->qual ) {
-      const smf_qual_t *tempqual = NULL;
-
-      qua = astCalloc( nbolo * ntslice, sizeof(*qua), 0 );
-      tempqual = (quality ? quality : data->qual );
-      memcpy( qua, tempqual, nbolo*ntslice * sizeof(*qua) );
+    /* we know that "data" does not have a quality component because
+       we did a deepcopy without copying it */
+    if (inqual) {
+      data->qual = astCalloc( nbolo * ntslice, sizeof(*(data->qual)), 0 );
+      if (data->qual) memcpy( data->qual, inqual, nbolo*ntslice * sizeof(*(data->qual)) );
     }
 
     /* Apodise the data */
-    smf_apodize( data, qua, len, status );
+    smf_apodize( data, len, status );
 
-    if (qua) qua = astFree( qua );
+    if (data->qual) data->qual = astFree( data->qual );
+  }
+
+  /* Re-order a time-domain cube if needed */
+  if( indata->isTordered && (indata->ndims == 3) ) {
+    smf_dataOrder( data, 0, status );
   }
 
   /* Create a new smfData, copying over everything except for the bolo

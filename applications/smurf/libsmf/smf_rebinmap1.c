@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_rebinmap1( smfData *data, smfData *variance, int *lut,
-*                    smf_qual_t *qual, size_t tslice1, size_t tslice2,
+*                    size_t tslice1, size_t tslice2,
 *                    int trange, smf_qual_t mask, int sampvar, int flags,
 *                    double *map, double *mapweight, double *mapweightsq,
 *                    int *hitsmap, double *mapvar, dim_t msize,
@@ -31,10 +31,6 @@
 *        created by smf_model_create).
 *     lut = int* (Given)
 *        1-d LUT for indices of data points in map (same dimensions as data)
-*     qual = smf_qual_t* (Given)
-*        If specified, use this QUALITY array to decide which samples
-*        to use (provided mask). Otherwise data are only ignored if set
-*        to VAL__BADD. Same dimensions as data.
 *     tslice1 = size_t (Given)
 *        If tslice2 >= tslice1 and trange set, regrid to tslice1 to tslice2
 *     tslice2 = size_t (Given)
@@ -165,7 +161,7 @@
 #define FUNC_NAME "smf_rebinmap1"
 
 void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
-                    smf_qual_t *qual, size_t tslice1, size_t tslice2,
+                    size_t tslice1, size_t tslice2,
                     int trange, smf_qual_t mask, int sampvar,
                     int flags, double *map, double *mapweight,
                     double *mapweightsq, int *hitsmap,
@@ -181,6 +177,7 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
   size_t j;                  /* Loop counter */
   dim_t nbolo;               /* number of bolos */
   dim_t ntslice;             /* number of time slices */
+  smf_qual_t * qual = NULL;  /* Quality pointer */
   double scalevar;           /* variance scale factor */
   double scaleweight;        /* weights for calculating scalevar */
   size_t t1, t2;             /* range of time slices to re-grid */
@@ -211,6 +208,7 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
   }
 
   dat = data->pntr[0];
+  qual = smf_select_qualpntr( data, NULL, status );
   smf_get_dims( data, NULL, NULL, &nbolo, &ntslice, NULL, &dbstride,
                 &dtstride, status );
 

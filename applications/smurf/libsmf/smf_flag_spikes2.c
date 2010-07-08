@@ -13,16 +13,12 @@
 *     Library routine
 
 *  Invocation:
-*     smf_flag_spikes2( smfData *data, smf_qual_t *quality,
-*                       smf_qual_t mask, double thresh,
+*     smf_flag_spikes2( smfData *data, smf_qual_t mask, double thresh,
 *                       size_t box, size_t *nflagged, int *status )
 
 *  Arguments:
 *     data = smfData * (Given and Returned)
-*        The data that will be flagged
-*     quality = smf_qual_t * (Given and Returned)
-*        If set, use this buffer instead of QUALITY associated with data.
-*        If NULL, use the QUALITY associated with data. Locations of spikes
+*        The data that will be flagged. Locations of spikes
 *        will have bit SMF__Q_SPIKE set on exit.
 *     mask = smf_qual_t (Given)
 *        Define which bits in quality are relevant to ignore data in
@@ -107,8 +103,7 @@
 
 #define FUNC_NAME "smf_flag_spikes2"
 
-void smf_flag_spikes2( smfData *data, smf_qual_t *quality,
-                       smf_qual_t mask, double thresh,
+void smf_flag_spikes2( smfData *data, smf_qual_t mask, double thresh,
                        size_t box, size_t *nflagged, int *status ){
 
 /* Local Variables */
@@ -159,11 +154,7 @@ void smf_flag_spikes2( smfData *data, smf_qual_t *quality,
    smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status );
 
 /* Get a pointer to the quality array to use. */
-   if( quality ) {
-     qua = quality;
-   } else {
-     qua = data->qual;
-   }
+   qua = smf_select_qualpntr( data, NULL, status );
 
 /* Report an error if we have no quality array. */
    if( !qua && *status == SAI__OK ) {

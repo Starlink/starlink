@@ -237,7 +237,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
       if( flags & SMF__DIMM_FIRSTITER ) {
         /* Measure the noise from power spectra */
-        smf_bolonoise( wf, res->sdata[idx], qua_data, 0, 0.5, SMF__F_WHITELO,
+        smf_bolonoise( wf, res->sdata[idx], 0, 0.5, SMF__F_WHITELO,
                        SMF__F_WHITEHI, 0, 0, SMF__MAXAPLEN, var, NULL, NULL, status );
 
         for( i=0; i<nbolo; i++ ) if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {
@@ -256,8 +256,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         /* Flag spikes in the residual after first iteration */
         if( spikethresh && !(flags&SMF__DIMM_FIRSTITER) ) {
           /* Now re-flag */
-          smf_flag_spikes( res->sdata[idx], var, qua_data,
-                           SMF__Q_MOD,
+          smf_flag_spikes( res->sdata[idx], var, SMF__Q_MOD,
                            spikethresh, spikeiter,
                            100, &aiter, &nflag, status );
 
@@ -267,7 +266,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         }
 
         if( dcthresh && dcfitbox ) {
-          smf_fix_steps( wf, res->sdata[idx], qua_data, dcthresh, dcmedianwidth,
+          smf_fix_steps( wf, res->sdata[idx], dcthresh, dcmedianwidth,
                          dcfitbox, dcmaxsteps, dclimcorr, &nflag, NULL, NULL,
                          status );
           msgOutiff(MSG__VERB, "","   detected %li bolos with DC steps\n",
@@ -276,7 +275,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
         if( fillgaps ) {
           msgOutif(MSG__VERB," ", "   gap filling", status);
-          smf_fillgaps( wf, res->sdata[idx], qua_data, SMF__Q_GAP, status );
+          smf_fillgaps( wf, res->sdata[idx], SMF__Q_GAP, status );
         }
       }
 

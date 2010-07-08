@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_write_smfData ( const smfData *data, const smfData *variance,
-*                        smf_qual_t *quality, const char * filename,
+*                        const char * filename,
 *                        const Grp * igrp, size_t grpindex,
 *                        int provid, int * status );
 
@@ -27,8 +27,6 @@
 *        main data array of a second smfData called variance. variance
 *        can have the length of the time dimension be 0 in which case it
 *        is replicated at each time slice in the output file.
-*     quality = smf_qual_t * (Given)
-*        If set, use this buffer instead of QUALITY associated with data.
 *     filename = const char * (Given)
 *        Name of output NDF if non-NULL. If NULL the filename is obtained
 *        from the group.
@@ -141,7 +139,7 @@
 #define FUNC_NAME "smf_write_smfData"
 
 void smf_write_smfData( const smfData *data, const smfData *variance,
-                        smf_qual_t *quality, const char * filename,
+                        const char * filename,
                         const Grp * igrp, size_t grpindex,
                         int provid, int * status ) {
 
@@ -160,7 +158,8 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
   smfData * outdata = NULL;     /* Mapped output file */
   double *outvar = NULL;        /* pointer to output variance component */
   char prvname[2*PAR__SZNAM+1]; /* provenance ID string */
-  smf_qual_t *qual=NULL;     /* Pointer to QUALITY buffer */
+  smf_qfam_t qfamily = SMF__QFAM_NULL; /* Quality family */
+  const smf_qual_t *qual=NULL;  /* Pointer to QUALITY buffer */
   int ubnd[NDF__MXDIM];         /* Upper pixel bounds */
   double *var=NULL;             /* Pointer to VARIANCE buffer */
   size_t vbstride;              /* bolo stride of variance */
@@ -186,8 +185,7 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
   }
 
   /* Check for QUALITY components, and header */
-  if( quality ) qual = quality;
-  else qual = data->qual;
+  qual = smf_select_cqualpntr( data, &qfamily, status );
 
   /* see if we need to write quality */
   if ( qual ) flags |= SMF__MAP_QUAL;
@@ -311,7 +309,7 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
       }
 
       /* Quality. Just copy from input to output */
-      outdata->qfamily = data->qfamily;
+      outdata->qfamily = qfamily;
       if (qual) memcpy( outdata->qual, qual, nelem * sizeof(*qual) );
     }
 

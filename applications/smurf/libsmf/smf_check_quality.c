@@ -15,14 +15,11 @@
 
 *  Invocation:
 *     size_t smf_check_quality( smfData *data,
-*                               smf_qual_t *quality,
 *                               int showbad, int *status );
 
 *  Arguments:
 *     data = smfData* (Given)
 *        Pointer to smfData
-*     quality = smf_qual_t* (Given)
-*        If defined check this quality array instead of that supplied with data
 *     showbad = int (Given)
 *        If set, display locations where they where inconsistencies found.
 *     status = int* (Given and Returned)
@@ -93,8 +90,7 @@
 
 #define FUNC_NAME "smf_check_quality"
 
-size_t smf_check_quality( smfData *data, smf_qual_t *quality,
-                          int showbad, int *status ) {
+size_t smf_check_quality( smfData *data, int showbad, int *status ) {
 
   int badqual;                  /* Bad quality at this sample? */
   double *d=NULL;               /* Pointer to data array */
@@ -135,11 +131,7 @@ size_t smf_check_quality( smfData *data, smf_qual_t *quality,
   d = (double *) data->pntr[0];
 
   /* Check for QUALITY */
-  if( quality ) {
-    qual = quality;       /* external QUALITY */
-  } else {
-    qual = data->qual; /* QUALITY given by smfData */
-  }
+  qual = smf_select_qualpntr( data, NULL, status );
 
   if( !qual ) {
     *status = SAI__ERROR;

@@ -271,7 +271,7 @@ void smurf_fixsteps( int *status ) {
    wf = smf_create_workforce( smf_get_nthread( status ), status );
 
 /* Fix the steps. */
-   smf_fix_steps( wf, data, NULL, dcthresh, dcmedianwidth, dcfitbox,
+   smf_fix_steps( wf, data, dcthresh, dcmedianwidth, dcfitbox,
                   dcmaxsteps, dclimcorr, &nrej, &newsteps, &nnew,
                   status );
 
@@ -343,7 +343,7 @@ void smurf_fixsteps( int *status ) {
 
 /* If required, create the output NDF. */
    if( outsize > 0 && indata && indata->file ) {
-      smf_write_smfData( data, NULL, NULL, NULL, ogrp, 1,
+      smf_write_smfData( data, NULL, NULL, ogrp, 1,
                          indata->file->ndfid, status );
    }
 

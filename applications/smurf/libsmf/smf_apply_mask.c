@@ -13,16 +13,13 @@
 *     C function
 
 *  Invocation:
-*     void smf_apply_mask( smfData *indata, smf_qual_t *quality,
+*     void smf_apply_mask( smfData *indata,
 *                          const smfArray *bbms, smf_dark_sub_meth method,
 *                          smf_qual_t addqual, int *status)
 
 *  Arguments:
-*     indata = const smfData * (Given)
+*     indata = smfData * (Given)
 *        Observation to be masked.
-*     quality = smf_qual_t * (Given and Returned)
-*        If set, use this buffer instead of QUALITY associated with data.
-*        If NULL, use the QUALITY associated with data.
 *     bbms = smfArray * (Given)
 *        Masks for each subarray (e.g. returned by smf_reqest_mask call)
 *     method = smf_bbm_meth (Given)
@@ -113,7 +110,7 @@
 
 #define FUNC_NAME "smf_apply_mask"
 
-void smf_apply_mask( smfData *indata, smf_qual_t *quality,
+void smf_apply_mask( smfData *indata,
                      const smfArray *bbms, smf_dark_sub_meth method,
                      smf_qual_t addqual, int *status) {
 
@@ -141,11 +138,7 @@ void smf_apply_mask( smfData *indata, smf_qual_t *quality,
   }
 
   /* Internal or external quality? */
-  if( quality ) {
-    qua = quality;
-  } else {
-    qua = indata->qual;
-  }
+  qua = smf_select_qualpntr( indata, NULL, status );
 
   /* Get some properties of the input smfData */
   smf_get_dims( indata, NULL, NULL, &nbolo, NULL, NULL, NULL, NULL, status );
@@ -254,8 +247,7 @@ void smf_apply_mask( smfData *indata, smf_qual_t *quality,
       masked = 1;
       if (qua) {
         if (method & SMF__BBM_QUAL) {
-          smf_update_quality( indata, qua, 1,
-                              bbm->pntr[0], addqual, 0, status);
+          smf_update_quality( indata, 1, bbm->pntr[0], addqual, 0, status);
         } else {
           /* just mask the first nelem items */
           smf_qual_t maskqual = SMF__Q_BADB | addqual;

@@ -13,16 +13,12 @@
 *     Library routine
 
 *  Invocation:
-*     smf_flag_stationary( smfData *data, smf_qual_t *quality,
-*                          double sthresh, size_t *nflagged,
+*     smf_flag_stationary( smfData *data, double sthresh, size_t *nflagged,
 *                          int *status )
 
 *  Arguments:
 *     data = smfData * (Given and Returned)
 *        The data that will be flagged
-*     quality = smf_qual_t * (Given and Returned)
-*        If set, use this buffer instead of QUALITY associated with data.
-*        If NULL, use the QUALITY associated with data.
 *     sthresh = double (Given)
 *        Speed threshold (arcsec/sec) below which data are flagged.
 *     nflagged = size_t * (Returned)
@@ -91,8 +87,7 @@
 
 #define FUNC_NAME "smf_flag_stationary"
 
-void smf_flag_stationary( smfData *data, smf_qual_t *quality,
-                          double sthresh, size_t *nflagged,
+void smf_flag_stationary( smfData *data, double sthresh, size_t *nflagged,
                           int *status ) {
 
   /* Local Variables */
@@ -150,11 +145,7 @@ void smf_flag_stationary( smfData *data, smf_qual_t *quality,
             status );
   }
 
-  if( quality ) {
-    qua = quality;
-  } else {
-    qua = data->qual;
-  }
+  qua = smf_select_qualpntr( data, NULL, status );
 
   if( !qua ) {
     *status = SAI__ERROR;

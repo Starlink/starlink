@@ -15,7 +15,7 @@
 
 *  Invocation:
 *     smf_update_valbad( smfData *data, smf_modeltype mtype,
-*                        smf_qual_t *qual, size_t qbstride,
+*                        const smf_qual_t *qual, size_t qbstride,
 *                        size_t qtstride, smf_qual_t mask,
 *                        int *status )
 
@@ -25,13 +25,11 @@
 *     mtype = smf_modeltype (Given)
 *        If data is an iterative map-maker model component it may have
 *        different dimensions from qual. In this specific case set
-*        mtype as well as qbstride and qtstride. Otherwise set mtype to
-*        SMF__NUL (or 0) if data and qual have the same dimensions.
-*     qual = smf_qual_t* (Given)
-*        If provided use this quality array instead of one supplied with data.
-*        If being used with an iterative map-maker model component it is
-*        assumed to be a 3-dimensions array corresponding to time-series
-*        data, and both qbstride and qtstride must be set. qual can be NULL.
+*        mtype and qual as well as qbstride and qtstride. Otherwise set mtype to
+*        SMF__NUL (or 0) if internal data and quality are to be used.
+*     qual = const smf_qual_t* (Given)
+*        This quality will be used if mtype is not SMF__NUL.
+*        Both qbstride and qtstride must be set.
 *     qbstride = size_t (Given)
 *        If mtype is set, provide the bolometer stride for the qual array.
 *        Otherwise ignored.
@@ -63,6 +61,8 @@
 *       - handle multiple data types
 *     2010-06-08 (EC):
 *        Add SMF__TWO
+*     2010-07-07 (TIMJ):
+*        Only use qual pointer for models
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -106,7 +106,7 @@
 
 #define FUNC_NAME "smf_update_valbad"
 
-void smf_update_valbad( smfData *data, smf_modeltype mtype, smf_qual_t *qual,
+void smf_update_valbad( smfData *data, smf_modeltype mtype, const smf_qual_t *qual,
                         size_t qbstride, size_t qtstride, smf_qual_t mask,
                         int *status ) {
 
@@ -117,7 +117,6 @@ void smf_update_valbad( smfData *data, smf_modeltype mtype, smf_qual_t *qual,
   dim_t nbolo;                  /* Number of bolometers */
   dim_t ndata;                  /* Number of data points */
   dim_t ntslice;                /* Number of time slices */
-  smf_qual_t *quality=NULL;     /* Pointer to the QUALITY array */
   size_t tstride;               /* data time stride */
 
   if ( *status != SAI__OK ) return;
@@ -130,17 +129,27 @@ void smf_update_valbad( smfData *data, smf_modeltype mtype, smf_qual_t *qual,
     goto CLEANUP;
   }
 
-  /* Get the QUALITY array, or generate bad status */
-  quality = qual ? qual : data->qual;
-
-  if( !quality ) {
-    *status = SAI__ERROR;
-    errRep( "", FUNC_NAME ": smfData does not contain a QUALITY component",
-            status);
-    goto CLEANUP;
-  }
-
   if( mtype == SMF__NUL ) { /* If mtype unspecified data & qual same dims */
+
+    /* Get the QUALITY array, or generate bad status */
+    smf_qual_t *quality = smf_select_qualpntr( data, NULL, status );
+
+    if( !quality ) {
+      if (*status != SAI__OK) {
+        *status = SAI__ERROR;
+        errRep( "", FUNC_NAME ": smfData does not contain a QUALITY component",
+                status);
+      }
+      goto CLEANUP;
+    }
+
+    if (qual) {
+      if (*status != SAI__OK) {
+        *status = SAI__ERROR;
+        errRep( "", FUNC_NAME ": qual unexpectedly not NULL", status);
+      }
+      goto CLEANUP;
+    }
 
     /* Calculate data dimensions.  Don't use smf_get_dims as it doesn't
        know what to do with oddly-shaped array. */
@@ -178,6 +187,13 @@ void smf_update_valbad( smfData *data, smf_modeltype mtype, smf_qual_t *qual,
       }
     }
   } else {                  /* Otherwise data & qual may have different dims */
+
+    if( !qual ) {
+      *status = SAI__ERROR;
+      errRep( "", FUNC_NAME ": supplied quality is NULL",
+              status);
+      goto CLEANUP;
+    }
 
     switch( mtype ) {
     case SMF__COM:
@@ -221,6 +237,7 @@ void smf_update_valbad( smfData *data, smf_modeltype mtype, smf_qual_t *qual,
       msgOutif( MSG__VERB, "", FUNC_NAME
                 ": Don't currently handle TWO model components.",
               status );
+
       goto CLEANUP;
       break;
 
@@ -246,7 +263,7 @@ void smf_update_valbad( smfData *data, smf_modeltype mtype, smf_qual_t *qual,
 
     for( i=0; (*status==SAI__OK)&&(i<nbolo); i++ ) {
       for( j=0; (*status==SAI__OK)&&(j<ntslice); j++ ) {
-        if( quality[i*qbstride + j*qtstride]&mask ) {
+        if( qual[i*qbstride + j*qtstride]&mask ) {
 
           /* Array index in data */
           offset = i*bstride + j*tstride;

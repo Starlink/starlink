@@ -231,7 +231,7 @@ void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
       /* Apply the filter to the residual */
       if( dofft ) {
-        smf_filter_execute( wf, res->sdata[idx], qua_data, filt, status );
+        smf_filter_execute( wf, res->sdata[idx], filt, status );
       }
 
       /* Store the difference between the filtered signal and the residual

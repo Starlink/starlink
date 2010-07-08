@@ -15,16 +15,13 @@
 *  Invocation:
 
 *     smf_filter_execute( smfWorkForce *wf, smfData *data,
-*                         smf_qual_t *quality, smfFilter *filt,
-*                         int *status )
+*                         smfFilter *filt, int *status )
 
 *  Arguments:
 *     wf = smfWorkForce * (Given)
 *        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData * (Given and Returned)
 *        The data to be filtered (performed in-place)
-*     quality = smf_qual_t * (Given and Returned)
-*        If set, use this buffer instead of QUALITY associated with data
 *     srate = double (Given)
 *        If nonzero specifies sample rate of data in Hz (otherwise taken
 *        from JCMTState associated with data).
@@ -488,8 +485,7 @@ void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
 #define FUNC_NAME "smf_filter_execute"
 
 void smf_filter_execute( smfWorkForce *wf, smfData *data,
-                         smf_qual_t *quality, smfFilter *filt,
-                         int *status ) {
+                         smfFilter *filt, int *status ) {
 
   /* Local Variables */
   size_t apod_length=0;           /* apodization length */
@@ -559,11 +555,7 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data,
   if( *status != SAI__OK ) return;
 
   /* Pointers to quality */
-  if( quality ) {
-    qua = quality;
-  } else {
-    qua = data->qual;
-  }
+  qua = smf_select_qualpntr( data, NULL, status );
 
   /* Determine the first and last samples to apodize (after padding), if
      any. Assumed to be the same for all bolometers. */

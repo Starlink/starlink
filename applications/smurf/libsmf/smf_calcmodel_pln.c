@@ -179,7 +179,7 @@ void smf_calcmodel_pln( smfWorkForce *wf, smfDIMMData *dat, int chunk,
       }
 
       /* Calculate the fit and subtract it*/
-      smf_subtract_plane3( wf, res->sdata[idx], qua_data, dat->mdims, lut_data, status );
+      smf_subtract_plane3( wf, res->sdata[idx], dat->mdims, lut_data, status );
 
       /* Store the difference between the plane-subtracted signal and the residual
          in the model container */

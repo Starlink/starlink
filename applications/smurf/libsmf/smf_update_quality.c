@@ -14,15 +14,13 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_update_quality( smfData *data, smf_qual_t *target, int syncbad,
+*     smf_update_quality( smfData *data, int syncbad,
 *                         const int *badmask, smf_qual_t addqual, double badfrac,
 *                         int *status );
 
 *  Arguments:
 *     data = smfData* (Given)
 *        Pointer to smfData that will contain the updated QUALITY array
-*     target = smf_qual_t* (Given)
-*        If defined update this buffer instead of the QUALITY in data
 *     syncbad = int (Given)
 *        If set ensure that every bad pixel (VAL__BADx) in the data array
 *        has a corresponding quality of SMF__Q_BADDA.
@@ -42,14 +40,13 @@
 *        Pointer to global status.
 
 *  Description:
-*     This routine updates an existing QUALITY array. By default (if
-*     target is NULL), the QUALITY component associated with data is
-*     updated.  Alternatively a new buffer target can be specified. A
+*     This routine updates an existing QUALITY array. The quality
+*     associated with the smfData will be modified. A
 *     mask indicating which bolometers are bad and should be
 *     completely ignored (SMF__Q_BADB) may be supplied. Additionally,
 *     the routine will ensure that QUALITY has SMF__Q_BADDA set for
-*     each bad data point (VAL__BADD). If no DATA or QUALITY (unless
-*     target specified) arrays are associated with the smfData bad
+*     each bad data point (VAL__BADD). If no DATA or QUALITY
+*     arrays are associated with the smfData bad
 *     status is set (SAI__ERROR) and the function returns.
 
 *  Notes:
@@ -85,6 +82,8 @@
 *     2010-07-06 (TIMJ):
 *        Add ability to use additional quality for the output mask
 *        and not just SMF__Q_BADB.
+*     2010-07-07 (TIMJ):
+*        New quality sidecar scheme
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -129,7 +128,7 @@
 
 #define FUNC_NAME "smf_update_quality"
 
-void smf_update_quality( smfData *data, smf_qual_t *target, int syncbad,
+void smf_update_quality( smfData *data, int syncbad,
 			 const int *badmask, smf_qual_t addqual, double badfrac,
 			 int *status ) {
 
@@ -146,17 +145,14 @@ void smf_update_quality( smfData *data, smf_qual_t *target, int syncbad,
   if ( *status != SAI__OK ) return;
 
   /* Check for QUALITY */
-  if( target ) {
-    qual = target;                            /* QUALITY given by target */
-  } else {
-    if( data->qual ) {
-      qual = data->qual; /* QUALITY given by smfData */
-    } else {
+  qual = smf_select_qualpntr( data, NULL, status );
+  if (!qual) {
+    if (*status == SAI__OK) {
       *status = SAI__ERROR;
       errRep( FUNC_NAME, "smfData does not contain a QUALITY component",
               status);
-      return;
     }
+    return;
   }
 
   /* Check for DATA */

@@ -13,7 +13,7 @@
 *     Library routine
 
 *  Invocation:
-*     smf_mask_noisy( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
+*     smf_mask_noisy( smfWorkForce *wf, smfData *data,
 *                       double sigclip, int * status );
 
 *  Arguments:
@@ -21,9 +21,6 @@
 *        Pointer to a pool of worker threads. Can be NULL.
 *     data = smfData * (Given and Returned)
 *        The data that will be flagged
-*     quality = smf_qual_t * (Given and Returned)
-*        If set, use this buffer instead of QUALITY associated with data.
-*        If NULL, use the QUALITY associated with data.
 *     sigclip = double (Given)
 *        Number of standard deviations above the mean to clip noisy bolometers.
 *        Returns immediately unless this value is greater than zero.
@@ -47,6 +44,8 @@
 *  History:
 *     2010-07-02 (TIMJ):
 *        Initial version
+*     2010-07-07 (TIMJ):
+*        Use new quality scheme.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -79,7 +78,7 @@
 #include "sae_par.h"
 #include "mers.h"
 
-void smf_mask_noisy( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
+void smf_mask_noisy( smfWorkForce *wf, smfData *data,
                        double sigclip, int * status ) {
 
   const float clips[] = { 5, 5, 5, 5, 5 };  /* Clip levels for noise data */
@@ -106,7 +105,7 @@ void smf_mask_noisy( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
   if (noisemap) noisedata = (noisemap->pntr)[0];
 
   /* Calculate the noise on each bolometer */
-  smf_bolonoise( wf, data, quality, 0, 0.5, SMF__F_WHITELO,
+  smf_bolonoise( wf, data, 0, 0.5, SMF__F_WHITELO,
                  SMF__F_WHITEHI, 0, 0, SMF__MAXAPLEN,
                  (noisemap->pntr)[0], NULL, NULL, status );
 
@@ -151,7 +150,7 @@ void smf_mask_noisy( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
     smfArray *masks = smf_create_smfArray( status );
     if (masks) masks->owndata = 0;  /* someone else owns the smfData */
     smf_addto_smfArray( masks, noisemap, status );
-    smf_apply_mask( data, quality, masks, SMF__BBM_QUAL, SMF__Q_NOISE,
+    smf_apply_mask( data, masks, SMF__BBM_QUAL, SMF__Q_NOISE,
                     status );
     smf_close_related( &masks, status );
   }

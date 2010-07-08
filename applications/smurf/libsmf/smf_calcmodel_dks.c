@@ -280,7 +280,7 @@ void smf_calcmodel_dks( smfWorkForce *wf __attribute__((unused)),
 
       /* Then re-fit and remove the dark squid signal */
       msgOutif( MSG__VERB, "", "   cleaning detectors", status );
-      smf_clean_dksquid( res->sdata[idx], qua_data, SMF__Q_MOD, 0,
+      smf_clean_dksquid( res->sdata[idx], SMF__Q_MOD, 0,
                          model->sdata[idx], 0, 0, 0, status );
 
       /* How has the model changed? */

@@ -21,10 +21,6 @@
 *        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData * (Given and Returned)
 *        The data that will be flagged
-*     quality = smf_qual_t * (Given and Returned)
-*        If set, use this buffer instead of QUALITY associated with data.
-*        If NULL, use the QUALITY associated with data (however bad status
-*        will be set if internal QUALITY is also NULL).
 *     mask = smf_qual_t (Given)
 *        Define which bits in quality indicate locations of gaps to be filled.
 *     status = int* (Given and Returned)
@@ -133,7 +129,7 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status );
 
 
 
-void  smf_fillgaps( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
+void  smf_fillgaps( smfWorkForce *wf, smfData *data,
                     smf_qual_t mask, int *status ) {
 
 /* Local Variables */
@@ -158,11 +154,7 @@ void  smf_fillgaps( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
 
 /* Pointers to data and quality */
   dat = data->pntr[0];
-  if( quality ) {
-    qua = quality;
-  } else {
-    qua = data->qual;
-  }
+  qua = smf_select_qualpntr( data, NULL, status );
 
   if( !qua ) {
     *status = SAI__ERROR;

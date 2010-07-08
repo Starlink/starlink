@@ -226,7 +226,7 @@ void smurf_remsky( int * status ) {
       /* This seems inefficient but it works */
       smf_open_and_flatfield( igrp, ogrp, i, darks, flatramps, &odata, status );
       /* Mask out bad bolometers - mask data array not quality array */
-      smf_apply_mask( odata, NULL, bbms, SMF__BBM_DATA, 0, status );
+      smf_apply_mask( odata, bbms, SMF__BBM_DATA, 0, status );
       smf_close_file( &odata, status);
     }
     /* Group output files together now that they exist */
@@ -246,7 +246,7 @@ void smurf_remsky( int * status ) {
       smf_open_and_flatfield( igrp, ogrp, i, darks, flatramps, &odata, status );
 
       /* Mask out bad bolometers - mask data array not quality array */
-      smf_apply_mask( odata, NULL, bbms, SMF__BBM_DATA, 0, status );
+      smf_apply_mask( odata, bbms, SMF__BBM_DATA, 0, status );
 
       if (*status != SAI__OK) {
         /* Tell the user which file it was... */
@@ -256,7 +256,7 @@ void smurf_remsky( int * status ) {
       if ( *status == SAI__OK ) {
         if ( strncmp( method, "POLY", 4 ) == 0 ) {
           /* Bolometer-based sky removal */
-          smf_subtract_poly( odata, NULL, 0, status );
+          smf_subtract_poly( odata, 0, status );
           /* Check status */
         } else if ( strncmp( method, "PLAN", 4 ) == 0 ) {
           /* Timeslice-based sky removal */

@@ -29,7 +29,7 @@
 *          - SMF__NOCREATE_DA       Do not copy the smfDA
 *          - SMF__NOCREATE_DATA     Do not copy DATA component
 *          - SMF__NOCREATE_VARIANCE Do not copy VARIANCE component
-*          - SMF__NOCREATE_QUALITY  Do not copy QUALITY component
+*          - SMF__NOCREATE_QUALITY  Do not copy QUALITY or sidequal component
 *
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -51,6 +51,8 @@
 *     - The sidequal pointer is copied without deep copying the smfData
 *       itself. This is because the memory associated with the sidqual
 *       is not owned by the smfData.
+*     - The sidequal pointer is not copied if SMF__NOCREATE_QUALITY flag
+*       is set.
 
 *  Authors:
 *     Tim Jenness (TIMJ)
@@ -153,6 +155,7 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
   void *pntr[2];              /* Data and variance arrays */
   double *poly = NULL;        /* Polynomial coefficients */
   smf_qual_t *qual = NULL;    /* Quality array */
+  smfData * sidequal = NULL;  /* Sidecar quality */
   int *tstream;               /* Pointer to raw time series data */
   int virtual;                /* Is it a virtual smfData? */
   AstKeyMap *history = NULL;  /* Pointer to history */
@@ -288,9 +291,14 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
   if (! (flags & SMF__NOCREATE_DA) )
     da = smf_deepcopy_smfDA( old, 1, status );
 
+  /* Sidecar quality */
+  if ( ! (flags & SMF__NOCREATE_QUALITY) ) {
+    sidequal = old->sidequal;
+  }
+
   /* Construct the new smfData */
   new = smf_construct_smfData( new, file, hdr, da, dtype, pntr, qual, old->qfamily,
-                               old->sidequal, isTordered, dims, old->lbnd, ndims,
+                               sidequal, isTordered, dims, old->lbnd, ndims,
                                virtual, ncoeff, poly, history, status);
 
   return new;

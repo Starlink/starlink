@@ -198,7 +198,7 @@ void smurf_starecalc ( int *status ) {
     smf_open_and_flatfield( igrp, ogrp, i, darks, NULL, &data, status );
 
     /* Mask out bad bolometers - mask data array not quality array */
-    smf_apply_mask( data, NULL, bbms, SMF__BBM_DATA, 0, status );
+    smf_apply_mask( data, bbms, SMF__BBM_DATA, 0, status );
 
     smf_calc_stareimage( data, naver, status );
 

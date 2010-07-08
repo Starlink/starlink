@@ -13,8 +13,8 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_bolonoise( smfWorkForce *wf, const smfData *data,
-*                    smf_qual_t *quality, size_t window, double f_low,
+*     smf_bolonoise( smfWorkForce *wf, smfData *data,
+*                    size_t window, double f_low,
 *                    double f_white1, double f_white2, double flagratio,
 *                    int nep, size_t len, double *whitenoise, double *fratio,
 *                    smfData **fftpow, int *status )
@@ -24,8 +24,6 @@
 *        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData * (Given)
 *        Pointer to the input smfData.
-*     quality = smf_qual_t * (Given and Returned)
-*        If set, use this buffer instead of QUALITY associated with data.
 *     window = size_t (Given)
 *        Width of boxcar smooth to apply to power spectrum before measurement
 *     f_low = double (Given)
@@ -111,10 +109,13 @@
 *     2009-10-13 (TIMJ):
 *        Allow the caller to retain the FFT. Move NEP parameter
 *        before return values.
+*     2010-07-07 (TIMJ):
+*        Can not have const input because we update its quality.
+*        No longer explicit sidecar quality as argument.
 
 *  Copyright:
 *     Copyright (C) 2008-2009 University of British Columbia.
-*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -152,8 +153,8 @@
 
 #define FUNC_NAME "smf_bolonoise"
 
-void smf_bolonoise( smfWorkForce *wf, const smfData *data,
-                    smf_qual_t *quality, size_t window, double f_low,
+void smf_bolonoise( smfWorkForce *wf, smfData *data,
+                    size_t window, double f_low,
                     double f_white1, double f_white2, double flagratio,
                     int nep, size_t len, double *whitenoise, double *fratio,
                     smfData **fftpow,int *status ) {
@@ -206,18 +207,12 @@ void smf_bolonoise( smfWorkForce *wf, const smfData *data,
     }
   }
 
-  if( quality ) {
-    qua = quality;
-  } else {
-    qua = data->qual;
-  }
-
   /* Initialize arrays */
   if( whitenoise ) for(i=0; i<nbolo; i++) whitenoise[i] = VAL__BADD;
   if( fratio ) for(i=0; i<nbolo; i++) fratio[i] = VAL__BADD;
 
   /* FFT the data and convert to polar power form */
-  pow = smf_fft_data( wf, data, 0, qua, len, status );
+  pow = smf_fft_data( wf, data, 0, len, status );
   smf_convert_bad(  pow, status );
   smf_fft_cart2pol( pow, 0, 1, status );
   smf_isfft( pow, NULL, NULL, &nf, status );
@@ -226,6 +221,10 @@ void smf_bolonoise( smfWorkForce *wf, const smfData *data,
   i_low = smf_get_findex( f_low, df, nf, status );
   i_w1 = smf_get_findex( f_white1, df, nf, status );
   i_w2 = smf_get_findex( f_white2, df, nf, status );
+
+  /* Get the quality pointer from the smfData so that we can mask known
+     bad bolometer. */
+  qua = smf_select_qualpntr( data, NULL, status );
 
   /* Loop over detectors */
   for( i=0; (*status==SAI__OK)&&(i<nbolo); i++ )

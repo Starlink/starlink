@@ -13,15 +13,11 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_subtract_poly( smfData *data, smf_qual_t *quality, int rel,
-*                        int *status )
+*     smf_subtract_poly( smfData *data, int rel, int *status );
 
 *  Arguments:
-*     data = smfData** (Given and Returned)
+*     data = smfData* (Given and Returned)
 *        Pointer to input data struct
-*     quality = smf_qual_t * (Given)
-*        If set, use this buffer instead of QUALITY associated with data.
-*        If NULL, use the QUALITY associated with data.
 *     rel = int (Given)
 *        Integer flag to denote whether the polynomial is subtracted
 *        relative to the first value (as for 1/f drifts)
@@ -114,8 +110,7 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_subtract_poly"
 
-void smf_subtract_poly(smfData *data, smf_qual_t *quality, int rel,
-		       int *status) {
+void smf_subtract_poly(smfData *data, int rel, int *status) {
 
   /* Local variables */
   double baseline = 0.0;      /* Baseline level to be subtracted */
@@ -151,11 +146,7 @@ void smf_subtract_poly(smfData *data, smf_qual_t *quality, int rel,
   outdata = (data->pntr)[0];
 
   /* Return with error if there is no QUALITY component */
-  if( quality ) {
-    qual = quality;
-  } else {
-    qual = data->qual;
-  }
+  qual = smf_select_qualpntr( data, NULL, status );
 
   if( !qual && (*status == SAI__OK) ) {
     *status = SAI__ERROR;

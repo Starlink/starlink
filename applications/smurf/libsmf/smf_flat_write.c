@@ -302,7 +302,7 @@ void smf_flat_write( smf_flatmeth flatmeth, const char * flatname,
     one_strlcat( fitfile, ".MORE.SMURF.FLATFIT", sizeof(fitfile), status );
 
     /* create the file */
-    smf_write_smfData( polyfit, NULL, NULL, fitfile, NULL, 0, NDF__NOID, status );
+    smf_write_smfData( polyfit, NULL, fitfile, NULL, 0, NDF__NOID, status );
 
     /* Same WCS as the main file */
     ndfOpen( NULL, fitfile, "UPDATE", "OLD", &fndf, &place, status );

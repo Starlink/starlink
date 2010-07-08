@@ -13,21 +13,18 @@
 *     Library routine
 
 *  Invocation:
-*     smf_flag_spikes( smfData *data, double *bolovar, smf_qual_t *quality,
+*     smf_flag_spikes( smfData *data, double *bolovar,
 *                      smf_qual_t mask, double thresh, size_t niter,
 *                      size_t maxiter, size_t *aiter, size_t *nflagged,
 *                      int *status )
 
 *  Arguments:
 *     data = smfData * (Given and Returned)
-*        The data that will be flagged
+*        The data that will be flagged. Locations of spikes
+*        will have bit SMF__Q_SPIKE set.
 *     bolvar = double * (Given)
 *        If supplied, an array of externally supplied estimates of bolo
 *        variance. Can be NULL in which case the variance is measured.
-*     quality = smf_qual_t * (Given and Returned)
-*        If set, use this buffer instead of QUALITY associated with data.
-*        If NULL, use the QUALITY associated with data. Locations of spikes
-*        will have bit SMF__Q_SPIKE set.
 *     mask = smf_qual_t (Given)
 *        Define which bits in quality are relevant to ignore data in
 *        the calculation.
@@ -131,7 +128,7 @@
 
 #define FUNC_NAME "smf_flag_spikes"
 
-void smf_flag_spikes( smfData *data, double *bolovar, smf_qual_t *quality,
+void smf_flag_spikes( smfData *data, double *bolovar,
                       smf_qual_t mask, double thresh, size_t niter,
                       size_t maxiter, size_t *aiter, size_t *nflagged,
                       int *status ) {
@@ -157,7 +154,7 @@ void smf_flag_spikes( smfData *data, double *bolovar, smf_qual_t *quality,
 
   /* If requested, use the alternative spike flagger. */
   if( niter > 10000 ) {
-     smf_flag_spikes2( data, quality, mask, thresh, niter-10000, nflagged,
+     smf_flag_spikes2( data, mask, thresh, niter-10000, nflagged,
                        status );
      /* Set aiter to something since smf_flag_spikes2 doesn't */
      if( aiter ) {
@@ -174,11 +171,7 @@ void smf_flag_spikes( smfData *data, double *bolovar, smf_qual_t *quality,
 
   /* Pointers to data and quality */
   dat = data->pntr[0];
-  if( quality ) {
-    qua = quality;
-  } else {
-    qua = data->qual;
-  }
+  qua = smf_select_qualpntr( data, NULL, status );
 
   if( !qua ) {
     *status = SAI__ERROR;

@@ -13,7 +13,7 @@
 *     Library routine
 
 *  Invocation:
-*     smf_clean_smfData( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
+*     smf_clean_smfData( smfWorkForce *wf, smfData *data,
 *                        AstKeyMap *keymap, int *status )
 
 *  Arguments:
@@ -21,9 +21,6 @@
 *        Pointer to a pool of worker threads. Can be NULL.
 *     data = smfData * (Given and Returned)
 *        The data that will be flagged
-*     quality = smf_qual_t * (Given and Returned)
-*        If set, use this buffer instead of QUALITY associated with data.
-*        If NULL, use the QUALITY associated with data.
 *     keymap = AstKeyMap* (Given)
 *        keymap containing parameters to control cleaning
 *     status = int* (Given and Returned)
@@ -103,7 +100,7 @@
 
 #define FUNC_NAME "smf_clean_smfData"
 
-void smf_clean_smfData( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
+void smf_clean_smfData( smfWorkForce *wf, smfData *data,
                         AstKeyMap *keymap, int *status ) {
 
   /* Local Variables */
@@ -122,7 +119,6 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
   size_t nflag;             /* Number of elements flagged */
   double noiseclip = 0;     /* Sigma clipping based on noise */
   int order;                /* Order of polynomial for baseline fitting */
-  smf_qual_t *qua=NULL;  /* Pointer to quality */
   double spikethresh;       /* Threshold for finding spikes */
   size_t spikeiter=0;       /* Number of iterations for spike finder */
 
@@ -130,15 +126,6 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
   if (*status != SAI__OK) return;
 
   /* Check for valid inputs */
-
-  if( quality ) qua = quality;
-  else qua = data->qual;
-
-  if( !qua ) {
-    *status = SAI__ERROR;
-    errRep( "", FUNC_NAME ": NULL quality supplied", status );
-    return;
-  }
 
   if( data->ndims != 3 ) {
     *status = SMF__WDIM;
@@ -162,7 +149,7 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
 
   /* Update quality by synchronizing to the data array VAL__BADD values */
   msgOutif(MSG__VERB,"", FUNC_NAME ": update quality", status);
-  smf_update_quality( data, qua, 1, NULL, 0, badfrac, status );
+  smf_update_quality( data, 1, NULL, 0, badfrac, status );
 
   /* Fix DC steps */
   if( dcthresh && dcfitbox ) {
@@ -172,7 +159,7 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
               "DC steps per min before flagging entire bolo bad...", status,
               dcthresh, dcfitbox, dcmedianwidth, dcmaxsteps);
 
-    smf_fix_steps( wf, data, qua, dcthresh, dcmedianwidth, dcfitbox, dcmaxsteps,
+    smf_fix_steps( wf, data, dcthresh, dcmedianwidth, dcfitbox, dcmaxsteps,
                    dclimcorr, &nflag, NULL, NULL, status );
 
     msgOutiff(MSG__VERB, "", FUNC_NAME": ...%zd flagged\n", status, nflag);
@@ -181,7 +168,7 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
   /* Flag Spikes */
   if( spikethresh ) {
     msgOutif(MSG__VERB," ", FUNC_NAME ": flag spikes...", status);
-    smf_flag_spikes( data, NULL, qua, SMF__Q_FIT, spikethresh, spikeiter,
+    smf_flag_spikes( data, NULL, SMF__Q_FIT, spikethresh, spikeiter,
                      100, &aiter, &nflag, status );
     msgOutiff(MSG__VERB,"", FUNC_NAME ": ...found %zd in %zd iterations",
               status, nflag, aiter );
@@ -193,7 +180,7 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
       msgOutiff( MSG__VERB, "", FUNC_NAME
                  ": Flagging regions with slew speeds < %lf arcsec/sec", status,
                  flagstat );
-      smf_flag_stationary( data, qua, flagstat, &nflag, status );
+      smf_flag_stationary( data, flagstat, &nflag, status );
       msgOutiff( MSG__VERB,"", "%zu new time slices flagged", status, nflag);
     } else {
       msgOutif( MSG__DEBUG, "", FUNC_NAME
@@ -205,13 +192,13 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
   if( dkclean ) {
     msgOutif(MSG__VERB, "", FUNC_NAME ": Cleaning dark squid signals from data.",
              status);
-    smf_clean_dksquid( data, qua, 0, 100, NULL, 0, 0, 0, status );
+    smf_clean_dksquid( data, 0, 100, NULL, 0, 0, 0, status );
   }
 
   /* Gap filling */
   if( fillgaps ) {
     msgOutif(MSG__VERB, "", FUNC_NAME ": Gap filling.", status);
-    smf_fillgaps( wf, data, qua, SMF__Q_GAP, status );
+    smf_fillgaps( wf, data, SMF__Q_GAP, status );
   }
 
   /* Remove baselines */
@@ -219,8 +206,8 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
     msgOutiff( MSG__VERB,"", FUNC_NAME
                ": Fitting and removing %i-order polynomial baselines",
                status, order );
-    smf_scanfit( data, qua, order, status );
-    smf_subtract_poly( data, qua, 0, status );
+    smf_scanfit( data, order, status );
+    smf_subtract_poly( data, 0, status );
   }
 
   /* filter the data */
@@ -228,11 +215,11 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
   smf_filter_fromkeymap( filt, keymap, &dofft, status );
   if( dofft ) {
     msgOutif( MSG__VERB, "", FUNC_NAME ": frequency domain filter", status );
-    smf_filter_execute( wf, data, qua, filt, status );
+    smf_filter_execute( wf, data, filt, status );
   }
   filt = smf_free_smfFilter( filt, status );
 
   /* Noise mask */
-  if (noiseclip > 0.0) smf_mask_noisy( wf, data, qua, noiseclip, status );
+  if (noiseclip > 0.0) smf_mask_noisy( wf, data, noiseclip, status );
 
 }

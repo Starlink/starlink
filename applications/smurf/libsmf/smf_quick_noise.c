@@ -15,12 +15,12 @@
 
 *  Invocation:
 *     smf_quick_noise( const smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
-*                      smf_qual_t *quality, smf_qual_t mask,
-*                      int *status )
+*                      smf_qual_t mask, int *status )
 
 *  Arguments:
 *     data = const smfData* (Given)
-*        Pointer to bolo-ordered smfData
+*        Pointer to bolo-ordered smfData. If no quality are available we only
+*        ignore data with value VAL__BADD.
 *     bolo = dim_t (Given)
 *        The offset of the bolometer in question (in range [0,nbolo-1])
 *     nsamp = dim_t (Given)
@@ -28,10 +28,6 @@
 *     nchunk = dim_t (Given)
 *        Number of evenly-spaced chunks of time-stream over which to estimate
 *        the sample standard deviation
-*     quality = smf_qual_t * (Given)
-*        If specified, use this QUALITY array instead of that in data
-*        to decide which samples to use (provided mask). Otherwise
-*        data are only ignored if set to VAL__BADD.
 *     mask = smf_qual_t (Given)
 *        Use with qual to define which bits in quality are relevant to
 *        ignore data in the calculation.
@@ -112,8 +108,7 @@
 
 
 double smf_quick_noise( const smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
-			const smf_qual_t *quality, smf_qual_t mask,
-			int *status ) {
+			smf_qual_t mask, int *status ) {
 
   /* Local variables */
   double *dat=NULL;             /* Pointer to bolo data */
@@ -144,11 +139,7 @@ double smf_quick_noise( const smfData *data, dim_t bolo, dim_t nsamp, dim_t nchu
   if (!smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status )) return retval;
 
   /* Check for QUALITY arrays */
-  if( quality ) {
-    qua = quality;
-  } else {
-    qua = data->qual;
-  }
+  qua = smf_select_cqualpntr( data, NULL, status );
 
   /* Obtain data dimensions */
   smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, NULL, NULL, NULL, status );

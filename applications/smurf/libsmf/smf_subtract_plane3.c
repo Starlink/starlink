@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     void smf_subtract_plane3( smfWorkForce *wf, smfData *data,
-*                         smf_qual_t *quality, const dim_t mdims[],
+*                         const dim_t mdims[],
 *                         const int lut[], int * status );
 
 *  Arguments:
@@ -22,10 +22,6 @@
 *        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData * (Given and Returned)
 *        The data to be filtered (performed in-place)
-*     quality = smf_qual_t * (Given and Returned)
-*        If set, use this buffer instead of QUALITY associated with data.
-*        Data with bad quality are ignored in the fit. Data with modifiable
-*        quality will have the fit subtracted.
 *     mdims = const dim_t[] (Given)
 *        Dimensions of map.
 *     lut = const int * (Given)
@@ -104,7 +100,7 @@
 
 void
 smf_subtract_plane3( smfWorkForce *wf, smfData *data,
-                     smf_qual_t *quality, const dim_t mdims[],
+                     const dim_t mdims[],
                      const int lut[], int * status ) {
 
   size_t bstride = 0;        /* Bolometer stride */
@@ -132,11 +128,7 @@ smf_subtract_plane3( smfWorkForce *wf, smfData *data,
   smf_dataOrder( data, 1, status );
 
   /* Select quality */
-  if( quality ) {
-    qua = quality;
-  } else {
-    qua = data->qual;
-  }
+  qua = smf_select_qualpntr( data, NULL, status );
 
   /* get dimension information */
   smf_get_dims( data, NULL, NULL, &nbolo, &ntslice, NULL, &bstride,

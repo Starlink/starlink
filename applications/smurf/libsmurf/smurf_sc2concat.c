@@ -252,7 +252,7 @@ void smurf_sc2concat( int *status ) {
     /* Export concatenated data for each subarray to NDF file */
     for( idx=0; (*status==SAI__OK)&&idx<concat->ndat; idx++ ) {
       if( concat->sdata[idx]->file && concat->sdata[idx]->file->name ) {
-        smf_write_smfData( concat->sdata[idx], NULL, NULL, NULL, ogrp, gcount,
+        smf_write_smfData( concat->sdata[idx], NULL, NULL, ogrp, gcount,
                            NDF__NOID, status );
       } else {
         *status = SAI__ERROR;

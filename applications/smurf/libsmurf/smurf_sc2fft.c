@@ -289,7 +289,7 @@ void smurf_sc2fft( int *status ) {
         dim_t ndata;                /* Number of data points */
 
         /* Apply a mask to the quality array and data array */
-        smf_apply_mask( idata, NULL, bbms, SMF__BBM_QUAL|SMF__BBM_DATA, 0, status );
+        smf_apply_mask( idata, bbms, SMF__BBM_QUAL|SMF__BBM_DATA, 0, status );
 
         smf_get_dims( idata,  NULL, NULL, &nbolo, NULL, &ndata, NULL, NULL,
                       status );
@@ -340,7 +340,7 @@ void smurf_sc2fft( int *status ) {
 
 	    freqlo = 1. / (idata->hdr->steptime * idata->hdr->nframes);
 
-            smf_bolonoise( wf, idata, NULL, 1, freqlo, SMF__F_WHITELO,
+            smf_bolonoise( wf, idata, 1, freqlo, SMF__F_WHITELO,
                            SMF__F_WHITEHI, 0, 1, 0, whitenoise, NULL, &odata,
                            status );
 
@@ -399,7 +399,7 @@ void smurf_sc2fft( int *status ) {
             }
 
             /* Tranform the data */
-            odata = smf_fft_data( wf, idata, inverse, NULL, 0, status );
+            odata = smf_fft_data( wf, idata, inverse, 0, status );
             smf_convert_bad( odata, status );
 
             if( inverse ) {
@@ -415,7 +415,7 @@ void smurf_sc2fft( int *status ) {
           ndgNdfas( basegrp, gcount, "READ", &provid, status );
 
           /* Export the data to a new file */
-          smf_write_smfData( odata, NULL, NULL, NULL, ogrp, gcount, provid,
+          smf_write_smfData( odata, NULL, NULL, ogrp, gcount, provid,
                              status );
 
           /* Free resources */

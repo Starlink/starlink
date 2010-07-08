@@ -14,14 +14,15 @@
 
 *  Invocation:
 *     smf_map_spikes( smfData *data, smfData *variance, int *lut,
-*                     smf_qual_t *qual, smf_qual_t mask,
+*                     smf_qual_t mask,
 *                     double *map, int *hitsmap, double *mapvar,
 *                     dim_t msize, double thresh, size_t *nflagged,
 *                     int *status )
 
 *  Arguments:
 *     data = smfData* (Given)
-*        Pointer to data stream to be flagged
+*        Pointer to data stream to be flagged. Quality will be flagged
+*        with SMF__Q_SPIKE.
 *     variance = smfData* (Given) Pointer to smfData containing
 *        variance. Can be either 2d (one value for each bolo), or 3d
 *        (time-varying for each bolo). In the former case ndims should
@@ -29,9 +30,6 @@
 *        (e.g. a NOI model component created by smf_model_create).
 *     lut = int* (Given)
 *        1-d LUT for indices of data points in map (same dimensions as data)
-*     qual = smf_qual_t* (Given and Returned)
-*        Quality array with same dimensions of data for setting new
-*        SMF__Q_SPIKE flags when outliers encountered.
 *     mask = smf_qual_t (Given)
 *        Define which bits in quality are relevant to ignore data in
 *        the calculation.
@@ -105,7 +103,7 @@
 #define FUNC_NAME "smf_map_spikes"
 
 void smf_map_spikes( smfData *data, smfData *variance, int *lut,
-                     smf_qual_t *qual, smf_qual_t mask, double *map,
+                     smf_qual_t mask, double *map,
                      int *hitsmap, double *mapvar,
                      dim_t msize __attribute__((unused)), double thresh,
                      size_t *nflagged, int *status ) {
@@ -121,6 +119,7 @@ void smf_map_spikes( smfData *data, smfData *variance, int *lut,
   dim_t nbolo;               /* number of bolos */
   size_t nflag=0;            /* Number of samples flagged */
   dim_t ntslice;             /* number of time slices */
+  smf_qual_t * qual = NULL;  /* Quality to update for flagging */
   double threshsq;           /* square of thresh */
   double *var=NULL;          /* Pointer to variance array */
   size_t vbstride;           /* bolo stride of variance */
@@ -147,6 +146,7 @@ void smf_map_spikes( smfData *data, smfData *variance, int *lut,
   }
 
   dat = data->pntr[0];
+  qual = smf_select_qualpntr( data, NULL, status );
   smf_get_dims( data, NULL, NULL, &nbolo, &ntslice, &dsize, &dbstride,
                 &dtstride, status );
 

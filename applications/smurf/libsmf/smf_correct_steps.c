@@ -14,7 +14,6 @@
 
 *  Invocation:
 *     smf_correct_steps( smfWorkForce *wf, smfData *data,
-*                        smf_qual_t *quality,
 *                        double dcthresh, double dcthresh2, dim_t dcbox,
 *                        int dcflag, size_t *nsteps, int *status )
 
@@ -22,10 +21,7 @@
 *     wf = smfWorkForce * (Given)
 *        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData * (Given and Returned)
-*        The data that will be repaired (in-place)
-*     quality = smf_qual_t * (Given and Returned)
-*        If set, use this buffer instead of QUALITY associated with data.
-*        If NULL, use the QUALITY associated with data. Locations of steps
+*        The data that will be repaired (in-place). Locations of steps
 *        will have bit SMF__Q_JUMP set.
 *     dcthresh = double (Given)
 *        N-sigma threshold for primary DC jump to be detected.
@@ -209,7 +205,7 @@ static void smf__correct_steps_baseline( double *dat, smf_qual_t *qua,
 /* ------------------------------------------------------------------------- */
 /* Public routine */
 
-void smf_correct_steps( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
+void smf_correct_steps( smfWorkForce *wf, smfData *data,
                         double dcthresh, double dcthresh2, dim_t dcbox,
                         int dcflag, size_t *nsteps, int *status ) {
 
@@ -243,11 +239,7 @@ void smf_correct_steps( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
 
   /* Pointers to data and quality */
   dat = data->pntr[0];
-  if( quality ) {
-    qua = quality;
-  } else {
-    qua = data->qual;
-  }
+  qua = smf_select_qualpntr( data, NULL, status );
 
   if( !qua ) {
     *status = SAI__ERROR;
@@ -513,7 +505,7 @@ static void smfCorrectStepsParallel( void *job_data_ptr, int *status ) {
                    &mean2, NULL, &nmean2, status );
 
       /* Estimate expected rms in a box as the bolo rms */
-      dcstep = smf_quick_noise( data, i, dcbox, 10, qua, SMF__Q_MOD,
+      dcstep = smf_quick_noise( data, i, dcbox, 10, SMF__Q_MOD,
                                 status ) * dcthresh;
 
       if( *status == SAI__OK ) {

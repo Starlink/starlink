@@ -19,7 +19,7 @@
 *                       int isTordered, AstFrameSet *outfset, int moving,
 *                       int *lbnd_out, int *ubnd_out, smfGroup **mgroup,
 *                       int nofile, int leaveopen, smfArray **mdata,
-*                       double flagstat, AstKeyMap *keymap, int *status )
+*                       AstKeyMap *keymap, int *status )
 
 *  Arguments:
 *     wf = smfWorkForce * (Given)
@@ -68,8 +68,6 @@
 *        smfArray pointers. The top-level array must already be
 *        allocated (same number of elements as ngroups in igroup), but
 *        the individual smfArrays get allocated here.
-*     flagstat = double (Given)
-*        Speed threshold (arcsec/sec) below which data are flagged (SMF__QUA)
 *     keymap = AstKeyMap* (Given)
 *        keymap containing parameters to control map-maker
 *     status = int* (Given and Returned)
@@ -91,11 +89,7 @@
 *  Notes:
 *     QUAlity components are initialized to 0. Before using the caller
 *     should synchronize the SMF__Q_BADDA bits with
-*     smf_update_quality. In addition, the "flagstat" option can be
-*     specified to set the quality bit SMF__Q_STAT based on pointing
-*     information in the header. This is useful to calculate here
-*     since model components may not have their JCMTState information
-*     propagated.
+*     smf_update_quality.
 
 *  Authors:
 *     Edward Chapin (UBC)
@@ -257,7 +251,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
                        int isTordered, AstFrameSet *outfset, int moving,
                        int *lbnd_out, int *ubnd_out, smfGroup **mgroup,
                        int nofile, int leaveopen, smfArray **mdata,
-                       double flagstat, AstKeyMap *keymap, int *status ) {
+                       AstKeyMap *keymap, int *status ) {
 
   /* Local Variables */
   size_t bstride;               /* Bolometer stride in data array */
@@ -458,7 +452,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
             if( !(oflag&SMF__NOCREATE_DATA) ) {
               smf_open_and_flatfield( igroup->grp, NULL, idx, darks, flatramps,
                                       &idata, status );
-              smf_apply_mask( idata, NULL, bbms, SMF__BBM_DATA, 0, status );
+              smf_apply_mask( idata, bbms, SMF__BBM_DATA, 0, status );
 
             } else {
               smf_open_file( igroup->grp, idx, "READ", oflag, &idata, status );
@@ -903,18 +897,6 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
                 memcpy( dataptr, idata->qual, datalen );
               }
 
-              /* If flagstat is set, try flagging quality bits here */
-              if( flagstat > 0 ) {
-                msgOutiff(MSG__VERB, "", FUNC_NAME
-                          ": flagging regions slewing < %f arcsec/sec...",
-                          status, flagstat );
-                smf_flag_stationary( idata, dataptr, flagstat, &nflag, status );
-                if( *status == SAI__OK ) {
-                  msgOutiff(MSG__VERB," ", FUNC_NAME
-                            ": %zu new time slices flagged", status, nflag );
-                }
-              }
-
             } else if( mtype == SMF__EXT ) {
               /* In this case run smf_correct_extinction on the input data
                  (with only the header mapped) and store the correction
@@ -973,7 +955,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
 
                 /* clean darks using cleandk.* parameters */
                 astMapGet0A( keymap, "CLEANDK", &kmap );
-                smf_clean_smfData( wf, dksquid, NULL, kmap, status );
+                smf_clean_smfData( wf, dksquid, kmap, status );
                 if( kmap ) kmap = astAnnul( kmap );
 
                 /* Unset hdr pointer so that we don't accidentally close it */
@@ -997,7 +979,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
                  head.data so that its pntr[0] temporarily points to the
                  model data array. */
               head.data.pntr[0] = dataptr;
-              smf_clean_dksquid(idata, NULL, 0, 0, &(head.data), 1, 1,
+              smf_clean_dksquid(idata, 0, 0, &(head.data), 1, 1,
                                 replacebad, status);
               head.data.pntr[0] = NULL;
             } else if( mtype == SMF__GAI ) {

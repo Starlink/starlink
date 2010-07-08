@@ -13,15 +13,12 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_clean_dksquid( smfData *indata, smf_qual_t *quality,
-*                        smf_qual_t mask, size_t window, smfData *model,
+*     smf_clean_dksquid( smfData *indata, smf_qual_t mask, size_t window, smfData *model,
 *                        int calcdk, int nofit, int replacebad, int *status ) {
 
 *  Arguments:
 *     indata = smfData * (Given)
 *        Pointer to the input smfData. Should be raw, un-flatfielded.
-*     quality = smf_qual_t * (Given)
-*        Override quality inside indata
 *     mask = smf_qual_t (Given)
 *        Use to define which bits in quality are relevant to ignore indata
 *     window = size_t (Given)
@@ -131,8 +128,7 @@
 
 #define FUNC_NAME "smf_clean_dksquid"
 
-void smf_clean_dksquid( smfData *indata, smf_qual_t *quality,
-                        smf_qual_t mask, size_t window, smfData *model,
+void smf_clean_dksquid( smfData *indata, smf_qual_t mask, size_t window, smfData *model,
                         int calcdk, int nofit, int replacebad, int *status ) {
 
   dim_t b;                /* Bolometer index */
@@ -248,8 +244,7 @@ void smf_clean_dksquid( smfData *indata, smf_qual_t *quality,
   }
 
   /* Pointer to quality */
-  if( quality ) qua = quality;
-  else qua = indata->qual;
+  qua = smf_select_qualpntr( indata, 0, status );
 
   /* Two passes: in the first we calculate an average dark squid to use as
      a surrogate for columns with dead dark squids. In the second we do the

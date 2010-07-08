@@ -1462,7 +1462,7 @@ void smurf_makemap( int *status ) {
           }
 
           /* Mask out bad bolometers - mask data array not quality array */
-          smf_apply_mask( data, NULL, bbms, SMF__BBM_DATA, 0, status );
+          smf_apply_mask( data, bbms, SMF__BBM_DATA, 0, status );
 
           /* Rebin the data onto the output grid. This also closes the
              data file.  */
