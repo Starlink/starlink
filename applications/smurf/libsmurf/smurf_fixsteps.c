@@ -554,6 +554,7 @@ static smfStepFix *smf1_read_steps( FILE *fd, double dcthresh0,
 /* Otherwise, store the numerical values in the next element of the
    returned array. */
             } else if( istep < nold ){
+               result[ istep ].id = ival;
                result[ istep ].ibolo = ibolo;
                result[ istep ].start = start;
                result[ istep ].end = end;
@@ -663,8 +664,8 @@ static int smf1_check_steps( dim_t nx, int nold, int nnew, smfStepFix *oldsteps,
    if( *status != SAI__OK ) return result;
 
 /* Sort the two arrays using bolometer index as the primary sort key,
-   start time as the secondary sort key, and end time as the tertiary
-   sort key. */
+   start time as the secondary sort key, end time as the tertiary
+   sort key, and step height as quaternary sort key. */
    qsort( oldsteps, nold, sizeof(smfStepFix), smf1_order_steps );
    qsort( newsteps, nnew, sizeof(smfStepFix), smf1_order_steps );
 
@@ -706,7 +707,8 @@ static int smf1_check_steps( dim_t nx, int nold, int nnew, smfStepFix *oldsteps,
    the old fix array. Report this and abort. */
       } else if( qold ) {
 
-         msgOut( "", "A new step was found:", status );
+         msgSeti( "I", qnew->id );
+         msgOut( "", "A new step (index ^I) was found:", status );
 
          msgSeti( "B", qnew->ibolo );
          msgSeti( "X", qnew->ibolo % nx );
@@ -734,6 +736,12 @@ static int smf1_check_steps( dim_t nx, int nold, int nnew, smfStepFix *oldsteps,
          msgSetd( "O", pold->size );
          msgSetd( "N", pnew->size );
          msgOut( "", "Step size changed from ^O to ^N:", status );
+
+         msgSeti( "I", pnew->id );
+         msgOut( "", "   New index = ^I", status );
+
+         msgSeti( "I", pold->id );
+         msgOut( "", "   Old index = ^I", status );
 
          msgSeti( "B", pold->ibolo );
          msgSeti( "X", pold->ibolo % nx );
@@ -769,7 +777,8 @@ static int smf1_check_steps( dim_t nx, int nold, int nnew, smfStepFix *oldsteps,
    if( !qold && !result && nold > nnew ) qold = oldsteps + nnew;
    if( qold ){
 
-      msgOut( "", "An old step is no longer found:", status );
+      msgSeti( "I", qold->id );
+      msgOut( "", "An old step (index ^I) is no longer found:", status );
 
       msgSeti( "B", qold->ibolo );
       msgSeti( "X", qold->ibolo % nx );
@@ -788,9 +797,10 @@ static int smf1_check_steps( dim_t nx, int nold, int nnew, smfStepFix *oldsteps,
 /* If no differences have been found but there are more steps in the new list
    than in the old list, report it. */
    } else if( !result && nold < nnew ) {
-      msgOut( "", "A new step was found at:", status );
-
       qnew = newsteps + nold;
+
+      msgSeti( "I", qnew->id );
+      msgOut( "", "A new step (index ^I) was found:", status );
 
       msgSeti( "B", qnew->ibolo );
       msgSeti( "X", qnew->ibolo % nx );
@@ -889,7 +899,8 @@ static void smf1_write_steps( FILE *fd, smfData *data, int nstep,
 
 /* Write out the details of each step. */
    for( istep = 0; istep < nstep; istep++ ) {
-      fprintf( fd, "%d %d %d %d %.*g\n", istep,
+      fprintf( fd, "%d %d %d %d %.*g\n",
+                                    ( steps[ istep ] ).id,
                                     ( steps[ istep ] ).start,
                                     ( steps[ istep ] ).end,
                                     ( steps[ istep ] ).ibolo,
@@ -918,7 +929,12 @@ static int smf1_order_steps( const void *a, const void *b ){
 *  Description:
 *     Compares the two supplied step fixes too see which should come
 *     first in the sorting order. This function is designed to be used
-*     with the "qsort" system function.
+*     with the "qsort" system function. The order of sorting is:
+*
+*     1) bolometer index
+*     2) start time
+*     3) end time
+*     4) step height
 
 * Returned value:
 *     Returns -1 if "a" comes before "b" in the sorting order.
@@ -957,7 +973,14 @@ static int smf1_order_steps( const void *a, const void *b ){
    } else if( afix->end > bfix->end ){
       result = +1;
 
-/* If the end times are equal, the fixes are equal. */
+/* If the start times are equal, compare step height. */
+   } else if( afix->size < bfix->size ){
+      result = -1;
+
+   } else if( afix->size > bfix->size ){
+      result = +1;
+
+/* If everything is equal, the fixes are equal. */
    } else {
       result = 0;
    }

@@ -819,6 +819,7 @@ typedef struct smfStepFix {
   int end;        /* Index of time slice at end of step */
   int ibolo;      /* Index of bolometer containing step */
   double size;    /* The size of the step rise or fall */
+  int id;         /* Integer identifier for the step fix */
 } smfStepFix;
 
 

@@ -1298,6 +1298,7 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
                   (*steps)[ *nfixed - 1 ].end = step_end;
                   (*steps)[ *nfixed - 1 ].ibolo = ibolo;
                   (*steps)[ *nfixed - 1 ].size = diff;
+                  (*steps)[ *nfixed - 1 ].id = *nfixed - 1;
                }
             }
          }
