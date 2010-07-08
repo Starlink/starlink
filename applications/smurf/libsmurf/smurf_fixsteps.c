@@ -737,10 +737,11 @@ static int smf1_check_steps( dim_t nx, double sizetol, int nold, int nnew,
    have previously found a mismatching pair of steps (i.e. steps that are
    at different bolometers or times), then the new fix is not present in
    the old fix array. Report this and abort. */
-      } else if( qold ) {
+      } else if( qold && fabs( qold->size ) > abslim ){
 
          msgSeti( "I", qnew->id );
-         msgOut( "", "A new step (index ^I) was found:", status );
+         msgSetc( "W", qnew->corr ? "secondary" : "primary" );
+         msgOut( "", "A new ^W step (index ^I) was found:", status );
 
          msgSeti( "B", qnew->ibolo );
          msgSeti( "X", qnew->ibolo % nx );
@@ -770,10 +771,12 @@ static int smf1_check_steps( dim_t nx, double sizetol, int nold, int nnew,
          msgOut( "", "Step size changed from ^O to ^N:", status );
 
          msgSeti( "I", pnew->id );
-         msgOut( "", "   New index = ^I", status );
+         msgSetc( "W", pnew->corr ? "secondary" : "primary" );
+         msgOut( "", "   New index = ^I (^W)", status );
 
          msgSeti( "I", pold->id );
-         msgOut( "", "   Old index = ^I", status );
+         msgSetc( "W", pold->corr ? "secondary" : "primary" );
+         msgOut( "", "   Old index = ^I (^W)", status );
 
          msgSeti( "B", pold->ibolo );
          msgSeti( "X", pold->ibolo % nx );
@@ -807,10 +810,11 @@ static int smf1_check_steps( dim_t nx, double sizetol, int nold, int nnew,
    been found but there are more steps in the old list than in the new list.
    Report this. */
    if( !qold && !result && nold > nnew ) qold = oldsteps + nnew;
-   if( qold ){
+   if( qold && fabs( qold->size ) > abslim ){
 
       msgSeti( "I", qold->id );
-      msgOut( "", "An old step (index ^I) is no longer found:", status );
+      msgSetc( "W", qold->corr ? "secondary" : "primary" );
+      msgOut( "", "An old ^W step (index ^I) is no longer found:", status );
 
       msgSeti( "B", qold->ibolo );
       msgSeti( "X", qold->ibolo % nx );
@@ -830,23 +834,25 @@ static int smf1_check_steps( dim_t nx, double sizetol, int nold, int nnew,
    than in the old list, report it. */
    } else if( !result && nold < nnew ) {
       qnew = newsteps + nold;
+      if( fabs( qnew->size ) > abslim ) {
+         msgSeti( "I", qnew->id );
+         msgSetc( "W", qnew->corr ? "secondary" : "primary" );
+         msgOut( "", "A new ^W step (index ^I) was found:", status );
 
-      msgSeti( "I", qnew->id );
-      msgOut( "", "A new step (index ^I) was found:", status );
+         msgSeti( "B", qnew->ibolo );
+         msgSeti( "X", qnew->ibolo % nx );
+         msgSeti( "Y", qnew->ibolo / nx );
+         msgOut( "", "   Bolometer = ^B (^X,^Y)", status );
 
-      msgSeti( "B", qnew->ibolo );
-      msgSeti( "X", qnew->ibolo % nx );
-      msgSeti( "Y", qnew->ibolo / nx );
-      msgOut( "", "   Bolometer = ^B (^X,^Y)", status );
+         msgSeti( "S", qnew->start );
+         msgSeti( "E", qnew->end );
+         msgOut( "", "   Time slice range = ^S:^E", status );
 
-      msgSeti( "S", qnew->start );
-      msgSeti( "E", qnew->end );
-      msgOut( "", "   Time slice range = ^S:^E", status );
+         msgSetd( "H", qnew->size );
+         msgOut( "", "   Height = ^H", status );
 
-      msgSetd( "H", qnew->size );
-      msgOut( "", "   Height = ^H", status );
-
-      result = 1;
+         result = 1;
+      }
    }
 
    return result;
@@ -992,21 +998,15 @@ static int smf1_order_steps( const void *a, const void *b ){
    } else if( afix->ibolo > bfix->ibolo ) {
       result = +1;
 
-/* If the bolometer indicies are equal, compare the start time. */
-   } else if( afix->start < bfix->start ){
+/* If the bolometer indicies are equal, compare the step time. if the
+   steps are disjoint in time, order by the start time. */
+   } else if( afix->end < bfix->start ) {
       result = -1;
 
-   } else if( afix->start > bfix->start ){
-      result = +1;
+   } else if( bfix->end < afix->start ) {
+      result = 1;
 
-/* If the start times are equal, compare the end time. */
-   } else if( afix->end < bfix->end ){
-      result = -1;
-
-   } else if( afix->end > bfix->end ){
-      result = +1;
-
-/* If the start times are equal, compare step height. */
+/* If the steps overlap, order by the step size. */
    } else if( afix->size < bfix->size ){
       result = -1;
 
