@@ -131,6 +131,7 @@ FILE *smf_open_textfile( const char *param, const char *mode, const char *def,
 /* If an error occurred, issue a suitable error message, and then flush
    the error to the user so what we can continue to get a new file name. */
          if( !result ) {
+            *status = SAI__ERROR;
             msgSetc( "P", param );
             errRep( "", "Failed to open a text file using parameter ^P.",
                     status );
