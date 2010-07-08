@@ -70,7 +70,7 @@
 *        default value is obtained via the CONFIG parameter. [!]
 *     IN = NDF (Read)
 *        The time series cube to be fixed. Note, the data must be time
-*        ordered, not bolometer ordered.
+*        ordered (like the original raw data), not bolometer ordered.
 *     NEWSTEPS = FILENAME (Write)
 *        Name of a text file to create, holding a description of each
 *        step that was fixed by the step fixing algorithm. The created
@@ -153,7 +153,7 @@
 static int smf1_check_steps( FILE *fd, double dcthresh, dim_t dcmedianwidth,
                              dim_t dcfitbox, int dcmaxsteps, int dclimcorr,
                              size_t nrej, smfStepFix *steps, int nstep,
-                             int *status );
+                             dim_t nx, int *status );
 
 
 /* Main entry */
@@ -302,7 +302,8 @@ void smurf_fixsteps( int *status ) {
       msgBlank( status );
       changed = smf1_check_steps( fd, dcthresh, dcmedianwidth,
                                   dcfitbox, dcmaxsteps, dclimcorr,
-                                  nrej, newsteps, nsteps, status );
+                                  nrej, newsteps, nsteps, data->dims[ 0 ],
+                                  status );
       parPut0l( "CHANGED", changed, status );
       if( ! changed ) {
          msgOut( "", "There are no significant differences "
@@ -341,7 +342,7 @@ void smurf_fixsteps( int *status ) {
 static int smf1_check_steps( FILE *fd, double dcthresh, dim_t dcmedianwidth,
                              dim_t dcfitbox, int dcmaxsteps, int dclimcorr,
                              size_t nrej, smfStepFix *steps, int nstep,
-                             int *status ) {
+                             dim_t nx, int *status ) {
 /*
 *  Name:
 *     smf1_check_steps
@@ -353,7 +354,7 @@ static int smf1_check_steps( FILE *fd, double dcthresh, dim_t dcmedianwidth,
 *     int smf1_check_steps( FILE *fd, double dcthresh, dim_t dcmedianwidth,
 *                           dim_t dcfitbox, int dcmaxsteps, int dclimcorr,
 *                           size_t nrej, smfStepFix *steps, int nstep,
-*                           int *status )
+*                           dim_t nx, int *status )
 
 *  Arguments:
 *     fd = FILE * (Given)
@@ -378,6 +379,8 @@ static int smf1_check_steps( FILE *fd, double dcthresh, dim_t dcmedianwidth,
 *        describing the steps fixed in the current invocation of this program.
 *     nstep = int (Given)
 *        The number of fixed steps in the current invocation of this program.
+*     nx = dim_t (Given)
+*        The length of the first pixel axis in the bolometer array.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -512,6 +515,7 @@ static int smf1_check_steps( FILE *fd, double dcthresh, dim_t dcmedianwidth,
 /* Look for the line that marks the start of the tabular data. */
          } else if( !strcmp( buf, "# istep start end ibolo size" ) ) {
             stage = 1;
+            msgBlank( status );
 
 /* Abort if an illegal header line is read. */
          } else if( strcmp( buf, "#" ) &&
@@ -532,38 +536,48 @@ static int smf1_check_steps( FILE *fd, double dcthresh, dim_t dcmedianwidth,
                errRep( "", "Step ^I data not found in old steps file:", status );
                bad = 1;
 
+/* Just ignore old steps that are not found any more. */
             } else if( istep >= nstep ) {
-               /* Just ignore old steps that are not found any more. */
 
+/* Do nothing if we have already reported a changed step. */
             } else if( !report ) {
-               /* Do nothing if we have already reported a changed step. */
 
-            } else if( start > steps[ istep ].end ||  /* Check no overlap */
-                       end < steps[ istep ].start ) {
-               msgSeti( "I", istep );
-               msgSeti( "OS", start );
-               msgSeti( "NS", steps[ istep ].start );
-               msgSeti( "OE", end );
-               msgSeti( "NE", steps[ istep ].end );
-               msgOut( "", "start,end: old=(^OS,^OE) new=(^NS,^NE) (step ^I)", status );
-               result = 1;
-               report = 0;
+/* If the old and new step do not overlap, or are for different
+   bolometers, or have significantly different height, display the
+   details of the differences. */
+            } else if( start > steps[ istep ].end ||
+                       end < steps[ istep ].start ||
 
-            } else if( ibolo != steps[ istep ].ibolo ) {
-               msgSeti( "I", istep );
-               msgSeti( "O", ibolo );
-               msgSeti( "N", steps[ istep ].ibolo );
-               msgOut( "", "ibolo: old=^O new=^N (step ^I)", status );
-               result = 1;
-               report = 0;
+                       ibolo != steps[ istep ].ibolo ||
 
-            } else if( fabs( size - steps[ istep ].size ) >
+                       fabs( size - steps[ istep ].size ) >
                        0.01*fabs( size + steps[ istep ].size ) ) {
+
                msgSeti( "I", istep );
-               msgSetd( "O", size );
-               msgSetd( "N", steps[ istep ].size );
-               msgOut( "", "size: old=^O new=^N (step ^I)", status );
-               result = 1;
+               msgSeti( "B", ibolo );
+               msgSeti( "X", ibolo % nx );
+               msgSeti( "Y", ibolo / nx );
+               msgSeti( "S", start );
+               msgSeti( "E", end );
+               msgSetd( "H", size );
+               msgOut( "", "Old step ^I: start:end=(^S:^E) ibolo=^B (^X,^Y) "
+                       "step height=^H", status );
+
+               msgSeti( "I", istep );
+               msgSeti( "B", steps[ istep ].ibolo );
+               msgSeti( "X", steps[ istep ].ibolo % nx );
+               msgSeti( "Y", steps[ istep ].ibolo / nx );
+               msgSeti( "S", steps[ istep ].start );
+               msgSeti( "E", steps[ istep ].end );
+               msgSetd( "H", steps[ istep ].size );
+               msgOut( "", "New step ^I: start:end=(^S:^E) ibolo=^B (^X,^Y) "
+                       "step height=^H", status );
+
+/* A single missing step can cause all later steps to appear to be different,
+   so to avoid inundating the user with too much information, we only report the
+   first difference. But we continue to count later steps to ensure the number
+   of step descriptions in the file is equal to the number specified in the
+   file header. */
                report = 0;
             }
 
