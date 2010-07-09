@@ -903,6 +903,12 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
             //  Read the headers once, this determines the default encoding.
             astClear( chan, "Card" );
             const char *default_encoding = astGetC( chan, "Encoding" );
+
+            //  The PC and CD forms are both permitted, use the one that the
+            //  channel already contains.
+            int cdmatrix = astGetI( chan, "CDMatrix" );
+
+            //  Now destructively do the read.
             AstFrameSet *tmpset = (AstFrameSet *) astRead( chan );
             if ( !astOK ) {
                 astClearStatus;
@@ -935,6 +941,9 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
 
             //  Clear the channel of all existing WCS information.
             astPurgeWCS( chan );
+
+            //  Reset the CDMatrix value back to that used initially.
+            astSetI( chan, "CDMatrix", cdmatrix );
 
             //  If the card position is still at the beginning for any reason
             //  then we should move it past the standard headers, these are
