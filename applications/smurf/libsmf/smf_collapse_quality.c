@@ -13,7 +13,7 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_collapse_quality( const smf_qual_t *inqual,
+*     smf_collapse_quality( const smf_qual_t *inqual, smf_qfam_t qfamily,
 *                           dim_t nbolo, dim_t ntslice,
 *                           size_t bstride, size_t tstride,
 *                           int collapse_time, smf_qual_t **outqual,
@@ -22,6 +22,8 @@
 *  Arguments:
 *     inqual = const smf_qual_t * (Given)
 *        3D quality array to be collapsed
+*     qfamily = smf_qfam_t (Given)
+*        Family associated with quality.
 *     nbolo = dim_t (Given)
 *        Number of bolometers
 *     ntslice = dim_t (Given)
@@ -54,8 +56,11 @@
 *  History:
 *     2010-05-12 (EC):
 *        Initial version
+*     2010-07-09 (TIMJ):
+*        Set default mask based on quality family.
 
 *  Copyright:
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     Copyright (C) 2010 Universty of British Columbia.
 *     All Rights Reserved.
 
@@ -106,7 +111,7 @@
 
 #define FUNC_NAME "smf_collapse_quality"
 
-void smf_collapse_quality( const smf_qual_t *inqual,
+void smf_collapse_quality( const smf_qual_t *inqual, smf_qfam_t qfamily,
                            dim_t nbolo, dim_t ntslice,
                            size_t bstride, size_t tstride,
                            int collapse_time, smf_qual_t **outqual,
@@ -117,6 +122,8 @@ void smf_collapse_quality( const smf_qual_t *inqual,
   size_t i;                     /* loop counter */
   size_t j;                     /* loop counter */
   size_t len;                   /* length non-collapsed axis */
+  smf_qual_t mask = 0;          /* All bits set */
+  size_t nqbits = 0;            /* Number of quality bits in family */
   smf_qual_t *qual=NULL;     /* collapsed quality */
   size_t stride;                /* stride non-collapsed axis */
 
@@ -141,9 +148,19 @@ void smf_collapse_quality( const smf_qual_t *inqual,
 
   qual = astCalloc( len, sizeof(*qual), 0 );
 
+  /* Need to work out the initial bad quality for this family.
+     When we collapse we retain a bit in the output if it
+     is set in all collapsed data. We have an intial guess
+     of all bits set for the family */
+  nqbits = smf_qfamily_count( qfamily, status );
+  mask = 0;
+  for (i=0; i<nqbits; i++) {
+    mask |= BIT_TO_VAL(i);
+  }
+
   /* Loop over elements in collapsed array */
   for( i=0; i<len; i++ ) {
-    qual[i] = 255;
+    qual[i] = mask;
     /* Loop over dimension to be collapsed */
     for( j=0; j<clen; j++ ) {
       qual[i] &= inqual[i*stride + j*bstride];

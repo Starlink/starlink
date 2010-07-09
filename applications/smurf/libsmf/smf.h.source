@@ -666,7 +666,7 @@ void smf_close_smfDream( smfDream **dream, int * status );
 
 void smf_close_smfGroup( smfGroup **group, int *status );
 
-void smf_collapse_quality( const smf_qual_t *inqual,
+void smf_collapse_quality( const smf_qual_t *inqual, smf_qfam_t qfamily,
                            dim_t nbolo, dim_t ntslice,
                            size_t bstride, size_t tstride,
                            int collapse_time, smf_qual_t **outqual,

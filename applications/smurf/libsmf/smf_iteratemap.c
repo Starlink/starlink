@@ -2106,7 +2106,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                   if( modeltyps[j] == SMF__COM && qua_data ) {
                     smf_qual_t *tempqual = NULL;
                     smfData * com = model[j][i]->sdata[idx];
-                    smf_collapse_quality( qua_data, nbolo, ntslice, bstride,
+                    smf_collapse_quality( qua_data, com->qfamily, nbolo, ntslice, bstride,
                                           tstride, 0, &tempqual, status );
                     com->sidequal = smf_construct_smfData( NULL, NULL, NULL, NULL,
                                                            SMF__QUALTYPE, NULL,
