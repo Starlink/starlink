@@ -49,6 +49,9 @@
 *     smf_qual_map.
 *     - The quality names of the items written by this routine are recorded
 *     using IRQ.
+*     - We set badbits mask except when the MAP family is being used. This is
+*     because currently MAKEMAP handles badbits mask based on config settings. The
+*     fix here is to attach a badbits mask to the quality information.
 
 *  History:
 *     2010-06-17 (TIMJ):
@@ -57,6 +60,9 @@
 *        Always create new IRQ structure when writing out.
 *     2010-07-06 (TIMJ):
 *        Add SMF__Q_NOISE
+*     2010-07-08 (TIMJ):
+*        Enable quality in output file using ndfSbb.
+*        Except for map family.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -126,6 +132,9 @@ smf_qual_t * smf_qual_unmap( int indf, smf_qfam_t family, smf_qual_t * qual, int
     IRQLocs *qlocs;
     unsigned char * qmap;
     int there;
+
+    ndfMsg( "FILE", indf );
+    msgOutif( MSG__DEBUG, "", "Finalising quality for file ^FILE", status);
 
     if (family == SMF__QFAM_TCOMP || family == SMF__QFAM_NULL) {
       /* note that TCOMP is not an allowed quality because SMURF should not be
@@ -297,6 +306,10 @@ smf_qual_t * smf_qual_unmap( int indf, smf_qfam_t family, smf_qual_t * qual, int
 
     /* Unmap quality */
     ndfUnmap( indf, "QUALITY", status );
+
+    /* Set the badbits mask to enable all quality by default.
+       Do not do this for MAP quality at the moment. */
+    if (family != SMF__QFAM_MAP) ndfSbb( 255, indf, status );
 
     /* release IRQ resources */
     irqRlse( &qlocs, status );
