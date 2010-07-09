@@ -39,9 +39,10 @@
 *        Data type of this smfData.
 *     pntr[2] = void* (Given)
 *        Array of pointers to data and variance. Pointers will
-*        be copied from this array.
+*        be copied from this array. Can be NULL if you want to defer assigning
+*        pointers to the smfData.
 *     qual = smf_qual_t (Given)
-*        Pointer to quality. Pointer will be copied.
+*        Pointer to quality. Pointer will be copied. Can be NULL.
 *     qfamily = smf_qfam_t (Given)
 *        Quality family used in "qual".
 *     sidequal = smfData * (Given)
@@ -80,8 +81,8 @@
 
 *  Notes:
 *     - refcount will be set to 1 in this routine.
-*     - If the pntr[] data arrays are malloced, there will be a memory
-*       leak if new values are copied in.
+*     - The pntr[] and qual pointers are copied and will be owned by the smfData.
+*       Do not free them independently.
 *     - Free this memory using smf_close_file
 *     - Data arrays are not populated by this routine. The pointers
 *       are set to NULL.
@@ -113,6 +114,8 @@
 *        Add qfamily
 *     2010-07-07 (TIMJ):
 *        Add sidequal
+*     2010-07-09 (TIMJ):
+*        Do not crash if pntr[] is NULL.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -217,8 +220,10 @@ smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr,
       data->dtype = dtype;
       data->refcount = 1;
       data->virtual = virtual;
-      for (i = 0; i < 2; i++ ) {
-        (data->pntr)[i] = pntr[i];
+      if (pntr) {
+        for (i = 0; i < 2; i++ ) {
+          (data->pntr)[i] = pntr[i];
+        }
       }
       data->qual = qual;
       data->qfamily = qfamily;
