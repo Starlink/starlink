@@ -199,7 +199,7 @@
 *  ... add contextual information.
          CALL MSG_SETC( 'P', PARAM )
          CALL ERR_REP( 'GRP_GROUP_ERR1',
-     : 'GRP_GROUP: Unable to associate a group of names with '//
+     : 'GRP_GROUP: Unable to associate a group of names with'//
      : ' parameter %^P', STATUS )
 
 *  Flush the error stack.
@@ -244,7 +244,7 @@
       ELSE IF( STATUS .NE. SAI__OK ) THEN
          CALL MSG_SETC( 'P', PARAM )
          CALL ERR_REP( 'GRP_GROUP_ERR4',
-     : 'GRP_GROUP: Unable to associate a group of names with '//
+     : 'GRP_GROUP: Unable to associate a group of names with'//
      : ' parameter %^P', STATUS )
       END IF
 
