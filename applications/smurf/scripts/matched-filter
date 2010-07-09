@@ -219,7 +219,7 @@ else
 # Get the half-size for the PSF image. This is the larger of the number
 # of input pixels in 2 Airy radii, and the twice the background smoothing
 # FWHM (if supplied)
-   set npix = `$KAPPA_DIR/calc exp="'2*pa'" pa=$airy_pix`
+   set npix = `$KAPPA_DIR/calc exp="'nint(2*pa)'" pa=$airy_pix`
    if( $npix < $dim ) then
       set npix = $dim
    endif
