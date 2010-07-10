@@ -420,7 +420,7 @@ void smurf_calcflat( int *status ) {
      */
 
     ngood = smf_flat_calcflat( MSG__NORM, flatname, "REFRES", "RESIST", "METHOD", "ORDER",
-                               "RESP", "RESPMASK", "SNRMIN", igrp, bolval, status );
+                               "RESP", "RESPMASK", "SNRMIN", igrp, bolval, NULL, status );
     parPut0i( "NGOOD", ngood, status );
 
   }

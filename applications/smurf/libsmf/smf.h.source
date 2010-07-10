@@ -991,7 +991,7 @@ smf_flat_calcflat( msglev_t msglev, const char flatname[],
                    const char methpar[], const char orderpar[],
                    const char resppar[], const char respmaskpar[],
                    const char snrminpar[], const Grp * prvgrp,
-                   smfData *flatdata, int *status );
+                   smfData *flatdata, smfData **respmapout, int *status );
 
 void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status );
 

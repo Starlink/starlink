@@ -373,7 +373,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
             if (calcflat) {
               (void)smf_flat_calcflat( MSG__VERB, NULL, "REFRES", "RESIST",
                                        "FLATMETH", "FLATORDER", NULL, "RESPMASK",
-                                       "FLATSNR", NULL, infile, status );
+                                       "FLATSNR", NULL, infile, NULL, status );
             }
 
           }

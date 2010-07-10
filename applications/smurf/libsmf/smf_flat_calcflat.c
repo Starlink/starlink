@@ -18,7 +18,7 @@
 *                   const char methpar[], const char orderpar[],
 *                   const char resppar[], const char respmaskpar[],
 *                   const char snrminpar[], const Grp * prvgrp,
-*                   smfData *flatdata, int *status );
+*                   smfData *flatdata, smfData **respmapout, int *status );
 
 *  Arguments:
 *     msglev = msglev_t (Given)
@@ -51,6 +51,10 @@
 *        Flatfield measurements. Expects the "da" structure to contain the heater
 *        settings. (see smf_flat_mergedata or smf_flat_fastflat). On exit will
 *        contain the flatfield result in the "da" structure.
+*     respmapout = smfData ** (Returned)
+*        If non-NULL this will contain the responsivity map calculated from the
+*        flatfield. Can be NULL on return if there was an error calculating the
+*        flatfield.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -76,6 +80,8 @@
 *        comes from.
 *     2010-04-09 (TIMJ):
 *        Move SNRMIN parameter and now pass into smf_flat_fitpoly.
+*     2010-07-09 (TIMJ):
+*        Provide option to return responsivity image.
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -129,7 +135,7 @@ smf_flat_calcflat( msglev_t msglev, const char flatname[],
                    const char methpar[], const char orderpar[],
                    const char resppar[], const char respmaskpar[],
                    const char snrminpar[], const Grp * prvgrp,
-                   smfData *flatdata, int *status ) {
+                   smfData *flatdata, smfData **respmapout, int *status ) {
 
   smfData * bolref = NULL;  /* Corrected bolometer data */
   smf_flatmeth flatmeth;    /* Flatfielding method */
@@ -145,6 +151,8 @@ smf_flat_calcflat( msglev_t msglev, const char flatname[],
   smfData * respmap = NULL; /* Responsivity data */
   int respmask = 0;         /* Mask bolometers that have bad responsivity? */
   double snrmin = 10.0;     /* Default SNR minimum value for good responsivity */
+
+  if (respmapout) *respmapout = NULL;  /* initialise return value */
 
   if (*status != SAI__OK) return ngood;
 
@@ -271,7 +279,12 @@ smf_flat_calcflat( msglev_t msglev, const char flatname[],
     /* write the provenance at the end since we have some problems with A-tasks
        in the pipeline causing trouble if the OUT parameter has not yet been set */
     if (respmap->file) smf_accumulate_prov( NULL, prvgrp, 1, respmap->file->ndfid, "SMURF:CALCFLAT", status );
-    smf_close_file( &respmap, status );
+
+    if ( respmapout ) {
+      *respmapout = respmap;
+    } else {
+      smf_close_file( &respmap, status );
+    }
   }
 
   if (bolref) smf_close_file( &bolref, status );
