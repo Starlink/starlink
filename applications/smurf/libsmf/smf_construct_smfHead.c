@@ -41,7 +41,8 @@
 *        FITS header. The pointer is copied, not the contents.
 *     allState = JCMTState* (Given)
 *        Pointer to array of time series information for all time slices.
-*        Should be at least "curslice" in size. Contents are not copied.
+*        Should be at least "curslice" in size. Contents are not copied but it is
+*        assumed that the memory will be owned by this smfHead.
 *     curframe = dim_t (Given)
 *        Current time index corresponding to the associated WCS. sc2head
 *        will be set to this location.
@@ -100,10 +101,12 @@
 *       Use astCopy or astClone when calling if reference counts
 *       should be incremented.
 *     - "state" is set to point into allState[curslice]
-*     - allState is not copied. In general the time series information
-*       can be copied between headers without being modified. If this
-*       memory should be freed by smf_close_file, set the isCloned flag
-*       to false.
+*     - It is assumed that any array pointers supplied to this routine
+*       (allState, fplanex, ocsconfig etc) will become owned by this
+*       struct. If this is not the case set isCloned to true when the
+*       smfHead is constructed. Note that if any of them are to be owned
+*       by the struct all of them must be owned by the struct since
+*       smf_close_file will assume this.
 *     - Free this memory using smf_close_file, via a smfData structure.
 *     - Can be freed with a smf_free if header resources are freed first.
 *     - obsidss, units, data label and title are copied into this header and will
@@ -153,6 +156,8 @@
 *        Add ocsconfig
 *     2010-03-15 (TIMJ):
 *        Add seqtype and obsidss. Use one_strlcpy
+*     2010-07-09 (TIMJ):
+*        Change default for isCloned to false.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -237,7 +242,7 @@ smf_construct_smfHead( smfHead * tofill, inst_t instrument,
     hdr->detname = detname;
     hdr->dpazel = dpazel;
     hdr->tsys = tsys;
-    hdr->isCloned = 1;
+    hdr->isCloned = 0;
     hdr->instap[0] = instap[0];
     hdr->instap[1] = instap[1];
     hdr->telpos[0] = telpos[0];
