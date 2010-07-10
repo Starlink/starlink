@@ -43,10 +43,12 @@
 *     2008-07-16 (TIMJ):
 *        Clone the NDF identifier so it can be closed separately.
 *        Use one_strlcpy.
+*     2010-07-09 (TIMJ):
+*        If the input smfFile is NULL we also return NULL.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2010 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
 *     Council. University of British Columbia. All Rights Reserved.
 
@@ -100,6 +102,7 @@ smf_deepcopy_smfFile( const smfFile *old, int * status ) {
   smfFile *new = NULL;       /* Pointer to new smfFile struct */
 
   if (*status != SAI__OK) return NULL;
+  if (!old) return NULL;
 
   /* Copy elements */
   isTstream = old->isTstream;

@@ -284,7 +284,7 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
   if (! (flags & SMF__NOCREATE_FILE) ) {
     file = smf_deepcopy_smfFile( old->file, status );
     /* annul the cloned NDF identifier if it is there */
-    if (file->ndfid != NDF__NOID) ndfAnnul( &(file->ndfid), status );
+    if (file && file->ndfid != NDF__NOID) ndfAnnul( &(file->ndfid), status );
   }
 
   /* Copy smfDA if desired */
