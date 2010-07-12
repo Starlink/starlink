@@ -50,11 +50,11 @@ DATA_FILES = $(NDFS) $(NON_NDFS)
 
 #  List of ancillary data files (non-NDFs).
 
-NON_NDFS = m31_arm.FIT ccdframec.FIT 
+NON_NDFS = m31_arm.FIT ccdframec.FIT
 
 #  List of ancillary data files (NDFs).
 
-NDFS = $(LUTS) $(TEST_FILES) 
+NDFS = $(LUTS) $(TEST_FILES)
 
 #  Define the standard colour tables.
 
@@ -93,7 +93,7 @@ styles/kappa_linplot_keystyle.def styles/kappa_vecplot_keystyle.def   \
 styles/kappa_display_keystyle.def styles/sty0 styles/sty1 styles/sty2 \
 styles/sty3 styles/kappa_contour_keystyle.def                         \
 styles/kappa_drawnorth_style.def styles/kappa_linplot_style.def       \
-styles/style.def styles/kappa_clinplot_specstyle.def 
+styles/style.def styles/kappa_clinplot_specstyle.def
 
 #  Define the package demo files for use with stardemo.tcl
 
@@ -118,7 +118,7 @@ help/picgrid.hlp help/piclast.hlp help/picxy.hlp
 #  Monolith help files.
 
 MON_HELP_FILES = libkappa/kapmon.hlp libkapview/kapview.hlp \
-libndfpack/ndfpack.hlp 
+libndfpack/ndfpack.hlp
 
 #  Define the tasks for each monolith.
 
@@ -138,7 +138,7 @@ KAPVIEW_TASKS = ardplot clinplot colcomp contour cursor drawsig \
 drawnorth display elprof gdclear gdnames gdset gdstate linplot lutable \
 lutsave lutview lutedit mlinplot paldef palentry palread palsave \
 piccur picdef picempty picentire picin piclabel piclist picsel \
-pictrans picvis scatter vecplot 
+pictrans picvis scatter vecplot
 
 NDFPACK_TASKS = axconv axlabel axunits erase fitsdin fitsexist fitsexp \
 fitsimp fitsin fitslist fitsmod fitstext fitsval hiscom hislist hisset \
@@ -159,7 +159,8 @@ PUBLICSCRIPTS = $(SHELLSCRIPTS) $(ICL_FILES) $(TCL_FILES) \
 
 NODIST_PUBLICSCRIPTS = $(NODIST_SHELLSCRIPTS)
 
-SHELLSCRIPTS = fitsedit.csh fitshead.csh lutread.csh pazo.csh s2p
+SHELLSCRIPTS = fitsedit.csh fitshead.csh lutread.csh pazo.csh s2p \
+makepv.csh
 
 NODIST_SHELLSCRIPTS = multiplot.csh
 
@@ -191,8 +192,8 @@ MONO_IFL = $(MONO_SOURCE:.f=.ifl)
 
 DYNSCRIPTS = kappa.csh kappa.icl kappa.sh
 
-#  Generate ifl and startup scripts from the ifd file and then do any 
-#  necessary post processing of the generated files to overcome 
+#  Generate ifl and startup scripts from the ifd file and then do any
+#  necessary post processing of the generated files to overcome
 #  deficiencies in ifd2star
 $(IFL_FILES) $(DYNSCRIPTS): kappa.ifd
 	$(IFD2STAR) kappa
@@ -205,7 +206,7 @@ $(IFL_FILES) $(DYNSCRIPTS): kappa.ifd
 	mv temp kappa.icl
 	sed -e "s#picx(y) picdef mode=xy fraction=1.0#picx(y) picdef xy 1.0#g" kappa.icl > temp
 	mv temp kappa.icl
-      
+
 	sed -e 's#prefix=""#prefix=\\"\\"#g' kappa.csh > temp
 	mv temp kappa.csh
 
