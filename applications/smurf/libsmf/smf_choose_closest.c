@@ -109,6 +109,7 @@ void smf_choose_closest( const smfArray *alldata, const smfData *indata,
   *nextidx = SMF__BADIDX;
 
   if (*status  != SAI__OK) return;
+  if (!indata) return;
 
   /* get reference MJD and subarray number */
   smf_find_dateobs( indata->hdr, &reftime, NULL, status );

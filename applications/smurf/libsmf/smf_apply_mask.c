@@ -125,6 +125,12 @@ void smf_apply_mask( smfData *indata,
 
   if (*status != SAI__OK) return;
   if (!bbms) return;
+  if (!indata) {
+    *status = SAI__ERROR;
+    errRep("", "Supplied smfData for masking is a NULL pointer."
+           " (possible programming error)", status );
+    return;
+  }
 
   /* work out which masks are suitable */
   smf_choose_closest( bbms, indata, &previdx, &nextidx, status );
