@@ -1109,6 +1109,14 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter continue {
+                type _LOGICAL
+                prompt {Continue to report further changes?}
+                ppath DEFAULT
+                default YES
+                helpkey *
+            }
+
             parameter dcfitbox {
                 type _INTEGER
                 prompt {Number of samples in fitting box}
@@ -1146,6 +1154,15 @@ package @PACKAGE@ {
                 prompt {Threshold signal to noise ratio to detect and flag steps}
                 ppath DYNAMIC
                 vpath DYNAMIC
+                helpkey *
+            }
+
+            parameter first {
+                type _INTEGER
+                prompt {Index of first changed step to report}
+                ppath CURRENT DEFAULT
+                vpath DEFAULT
+                default 1
                 helpkey *
             }
 

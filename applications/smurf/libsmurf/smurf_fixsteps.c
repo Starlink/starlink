@@ -32,8 +32,9 @@
 *     new step fixes.
 *
 *     Configuration parameters for the step fixing algorithm can be supplied
-*     either within a "makemap"-style configuration file (see parameter CONFIG),
-*     or via command line environment parameters DCFITBOX, DCLIMCORR, etc.
+*     either within a "makemap"-style configuration file (see parameter
+*     CONFIG), or via command line environment parameters DCFITBOX,
+*     DCLIMCORR, etc.
 
 *  ADAM Parameters:
 *     CHANGED = _LOGICAL (Write)
@@ -45,11 +46,16 @@
 *        Specifies default values for the configuration parameters used
 *        by the step fixing algorithm. This should be a configuration
 *        such as supplied for the MAKEMAP command.
-*     DCFITBOX = REAL
+*     CONTINUE = _LOGICAL (Read)
+*        This parameter is prompted for after each changed step is
+*        described. If TRUE is supplied, then the program continues to
+*        display details of further changed steps. If FALSE is supplied,
+*        the program aborts.
+*     DCFITBOX = _REAL
 *        Number of samples (box size) in which the signal RMS is measured
 *        for the DC step finder. The run time default value is obtained via
 *        the CONFIG parameter. [!]
-*     DCLIMCORR = INTEGER
+*     DCLIMCORR = _INTEGER
 *        The detection threshold for steps that occur at the same time in
 *        many bolometers. Set it to zero to suppress checks for correlated
 *        steps. If dclimcorr is greater than zero, and a step is found at
@@ -57,20 +63,24 @@
 *        bolometers are assumed to have a step at that time, and the step
 *        is fixed no matter how small it is. The run time default value is
 *        obtained via the CONFIG parameter. [!]
-*     DCMAXSTEPS = INTEGER
+*     DCMAXSTEPS = _INTEGER
 *        The maximum number of steps that can be corrected in each minute of
 *        good data (i.e. per 12000 samples) from a bolometer before the
 *        entire bolometer is flagged as bad. A value of zero will cause a
 *        bolometer to be rejected if any steps are found in the bolometer
 *        data stream. The run time default value is obtained via the CONFIG
 *        parameter. [!]
-*     DCMEDIANWIDTH = INTEGER
+*     DCMEDIANWIDTH = _INTEGER
 *        The width of the median filter used to smooth a bolometer data
 *        stream prior to finding DC jumps. The run time default value is
 *        obtained via the CONFIG parameter. [!]
-*     DCTHRESH = REAL
+*     DCTHRESH = _REAL
 *        Threshold S/N to detect and flag DC (baseline) steps. The run time
 *        default value is obtained via the CONFIG parameter. [!]
+*     FIRST = _INTEGER
+*        The index of the first change to be display (the first change
+*        has index 1). Each change report starts with an index followed
+*        by a colon. [1]
 *     IN = NDF (Read)
 *        The time series cube to be fixed. Note, the data must be time
 *        ordered (like the original raw data), not bolometer ordered.
@@ -159,7 +169,8 @@
 #define FUNC_NAME "smurf_fixsteps"
 
 /* Prototypes for local functions: */
-static int smf1_check_steps( dim_t nx, double sizetol, int nold, int nnew,
+static int smf1_check_steps( const char *param, int first, dim_t nx,
+                             double sizetol, int nold, int nnew,
                              smfStepFix *oldsteps, smfStepFix *newsteps,
                              int *status );
 
@@ -174,8 +185,6 @@ static smfStepFix *smf1_read_steps( FILE *fd, double dcthresh0,
                                     int dcmaxsteps0, int dclimcorr0,
                                     size_t nrej0, int nstep0, int *nstep,
                                     int *status );
-
-static int smf1_order_steps( const void *a, const void *b );
 
 static double smf1_get_rmssize( int nstep, smfStepFix *steps, int *status );
 
@@ -195,6 +204,7 @@ void smurf_fixsteps( int *status ) {
    int changed;              /* Have any step fixes changed? */
    int dclimcorr;            /* DCLIMCORR config parameter */
    int dcmaxsteps;           /* DCMAXSTEPS config parameter */
+   int first;                /* Index of first change to report */
    int itemp;                /* Intermediate value */
    int nnew;                 /* Number of new step fixes */
    int nold;                 /* Number of old step fixes */
@@ -320,10 +330,13 @@ void smurf_fixsteps( int *status ) {
                                   dcfitbox, dcmaxsteps, dclimcorr,
                                   nrej, nnew, &nold, status );
 
+/* Get the index of the first change to report. */
+      parGet0i( "FIRST", &first, status );
+
 /* Compare the new step fixes with the old step fixes, issuing a warning
    for the first step fix that has changed. */
-      changed = smf1_check_steps( data->dims[ 0 ], sizetol, nold, nnew,
-                                  oldsteps, newsteps, status );
+      changed = smf1_check_steps( "CONTINUE", first, data->dims[ 0 ], sizetol,
+                                  nold, nnew, oldsteps, newsteps, status );
 
 /* Store a flag indicating if any sstep fixes have chnaged. */
       parPut0l( "CHANGED", changed, status );
@@ -613,7 +626,8 @@ static smfStepFix *smf1_read_steps( FILE *fd, double dcthresh0,
 }
 
 
-static int smf1_check_steps( dim_t nx, double sizetol, int nold, int nnew,
+static int smf1_check_steps( const char *param, int first, dim_t nx,
+                             double sizetol, int nold, int nnew,
                              smfStepFix *oldsteps, smfStepFix *newsteps,
                              int *status ){
 /*
@@ -621,15 +635,21 @@ static int smf1_check_steps( dim_t nx, double sizetol, int nold, int nnew,
 *     smf1_check_steps
 
 *  Purpose:
-*     Compare two sets of steps, issuing a warning for the first step that
+*     Compare two sets of steps, issuing a warning for each step that
 *     has changed significantly.
 
 *  Invocation:
-*     int smf1_check_steps( dim_t nx, double sizetol, int nold, int nnew,
+*     int smf1_check_steps( const char *param, int first, dim_t nx,
+*                           double sizetol, int nold, int nnew,
 *                           smfStepFix *oldsteps, smfStepFix *newsteps,
 *                           int *status )
 
 *  Arguments:
+*     param = const char * (Given)
+*        Name of parameter to use when asking the user whether to
+*        continue to look for further changes.
+*     first = int (Given)
+*        The index of the first change to report.
 *     nx = dim_t (Given)
 *        The length of the first axis of the bolometer array.
 *     sizetol = double (Given)
@@ -650,17 +670,14 @@ static int smf1_check_steps( dim_t nx, double sizetol, int nold, int nnew,
 *        Pointer to global status.
 
 *  Description:
-*     The steps are first sorted into bolometer order, and time order within
-*     each bolometer (since the order in which the steps are fixed is not
-*     significant). A warning message is reported and the function returns
-*     if either of the following occur for a step:
-*
-*     1) No matching step fix is found. Fixes match if they have exactly
-*     the same  bolometer index, and have overlapping extent in time.
-*
-*     2) the relative error between the step sizes is more than "sizetol"
-*        AND the absolute error between the step sizes is more than
-*        "sizetol" times the clipped RMS step size.
+*     Firstly, an attempt it made to associated each old step with a
+*     corresponding new step (i.e. a new step that occurs at the same
+*     time and in the same bolometer as the old step). Warning messages
+*     are issued about each old step for which no corresponding new step
+*     can be found, or for which the corresponding new step has a
+*     significantly different height to the old step. Finally, warnings
+*     messages are also issued for each new step that has not been
+*     associated with an old step.
 
 *  Returned Value:
 *     Zero if no significant differences were found. Non-zero otherwise.
@@ -670,13 +687,17 @@ static int smf1_check_steps( dim_t nx, double sizetol, int nold, int nnew,
 /* Local Variables: */
    double abslim;
    double dsize;
+   double dsize_min;
+   int *fnew;
+   int *new_flags;
+   int cont;
    int inew;
    int iold;
+   int jnew;
+   int match;
    int result;
    smfStepFix *pnew;
    smfStepFix *pold;
-   smfStepFix *qnew;
-   smfStepFix *qold;
 
 /* Initialise the returned value. */
    result = 0;
@@ -692,172 +713,192 @@ static int smf1_check_steps( dim_t nx, double sizetol, int nold, int nnew,
            status );
    msgBlank( status );
 
-/* Sort the two arrays using bolometer index as the primary sort key,
-   start time as the secondary sort key, end time as the tertiary
-   sort key, and step height as quaternary sort key. */
-   qsort( oldsteps, nold, sizeof(smfStepFix), smf1_order_steps );
-   qsort( newsteps, nnew, sizeof(smfStepFix), smf1_order_steps );
+/* Allocate memory to hold an array with one element for each new step.
+   Each element holds zero if the new step has not yet been associated
+   with any old step. Otherwise, it holds the one-based index of the
+   associated old step. Initialise it to hold zero at every element. */
+   new_flags = astCalloc( nnew, sizeof( *new_flags ), 1 );
+   if( *status == SAI__OK ) {
 
-/* Initialise the indicies of the first pair of steps to be compared. */
-   iold = 0;
-   inew = 0;
+/* Loop round each old step. */
+      pold = oldsteps;
+      for( iold = 0; iold < nold; iold++,pold++ ) {
 
-/* Initialise pointers to the first pair of steps to be compared. */
-   pold = oldsteps;
-   pnew = newsteps;
+/* Ignore old steps with bolometer indicies greater than 5000 */
+         if( pold->ibolo > 5000 ) continue;
 
-/* These are used to record a pair of fixes, one of which is either a new
-   fix or a missing fix. As yet we have not found such a pair. */
-   qold = NULL;
-   qnew= NULL;
+/* Indicate no new step has yet been associated with the old step. */
+         jnew = -1;
+         dsize_min = VAL__MAXD;
+         match = 0;
 
-/* Loop round comparing steps. */
-   while( iold < nold && inew < nnew ) {
+/* Loop round all new steps. */
+         pnew = newsteps;
+         fnew = new_flags;
+         for( inew = 0; inew < nnew; inew++,pnew++,fnew++ ) {
 
-/* Note the absolute difference in step size. */
-      dsize = fabs( pold->size - pnew->size );
+/* Ignore this new step if it has already been associated with a previous
+   old step. */
+            if( ! *fnew ) {
 
-/* If the old and new step do not overlap, or are for different
-   bolometers, then either a new step has been found or an old step
-   has not been found. */
-      if( pold->ibolo != pnew->ibolo ||
-          pold->start > pnew->end || pold->end < pnew->start ) {
+/* See if the current new and old steps occur in the same bolometer and
+   have overlapping time spans. If so they are considered to be at the
+   same time. */
+               if( pold->ibolo == pnew->ibolo &&
+                   pold->start <= pnew->end &&
+                   pold->end >= pnew->start ) {
 
-/* If this is the first mis-match, save pointers to the two differing fixes. */
-         if( !qold ) {
-            qold = pold;
-            qnew= pnew;
+/* Get the difference in step size between the old and new steps. */
+                  dsize = fabs( pold->size - pnew->size );
+
+/* Note the index of the matching new step that is most similar in height
+   to the old step. */
+                  if( dsize < dsize_min ) {
+                     jnew = inew;
+                     dsize_min = dsize;
+                  }
+
+/* If the old and new step heights are about the same then we associate
+   the new step with the old step. Store the (one based) index of the
+   corresponding old step. We do not need to check any more new steps,
+   so break out of the new step loop. */
+                  if( dsize < abslim ||
+                      dsize < sizetol*fabs( 0.5*( pold->size + pnew->size ) ) ) {
+                     match = 1;
+                     *fnew = iold + 1;
+                     break;
+                  }
+               }
+            }
          }
 
-/* Move on to compare the same old fix with the next new fix. */
-         pnew++;
-         inew++;
+/* If a new step was found at the same time and place as the old step, and
+   with the same height, pass on to the next old step. */
+         if( ! match ) {
 
-/* If the current pair of fixes are at the same bolometer and time, but we
-   have previously found a mismatching pair of steps (i.e. steps that are
-   at different bolometers or times), then the new fix is not present in
-   the old fix array. Report this and abort. */
-      } else if( qold && fabs( qold->size ) > abslim ){
+/* If no new step was found at the same time and place as the old step, an old
+   step has dissappeared. */
+            if( jnew == -1 ) {
 
-         msgSeti( "I", qnew->id );
-         msgSetc( "W", qnew->corr ? "secondary" : "primary" );
-         msgOut( "", "A new ^W step (index ^I) was found:", status );
+/* If the old step was of significant height, tell the user. */
+               if( fabs( pold->size ) > abslim ){
+                  result++;
 
-         msgSeti( "B", qnew->ibolo );
-         msgSeti( "X", qnew->ibolo % nx );
-         msgSeti( "Y", qnew->ibolo / nx );
-         msgOut( "", "   Bolometer = ^B (^X,^Y)", status );
+                  if( result >= first ) {
+                     msgSeti( "N", result );
+                     msgSeti( "I", pold->id );
+                     msgSetc( "W", pold->corr ? "secondary" : "primary" );
+                     msgOut( "", "^N: An old ^W step (index ^I) is no longer found:", status );
 
-         msgSeti( "S", qnew->start );
-         msgSeti( "E", qnew->end );
-         msgOut( "", "   Time slice range = ^S:^E", status );
+                     msgSeti( "B", pold->ibolo );
+                     msgSeti( "X", pold->ibolo % nx );
+                     msgSeti( "Y", pold->ibolo / nx );
+                     msgOut( "", "   Bolometer = ^B (^X,^Y)", status );
 
-         msgSetd( "H", qnew->size );
-         msgOut( "", "   Height = ^H", status );
+                     msgSeti( "S", pold->start );
+                     msgSeti( "E", pold->end );
+                     msgOut( "", "   Time slice range = ^S:^E", status );
 
-         qold = NULL;
-         qnew = NULL;
+                     msgSetd( "H", pold->size );
+                     msgOut( "", "   Height = ^H", status );
 
-         result = 1;
-         break;
 
-/* If all pairs of steps have matched so far, but the current pair have different
-   heights, issue a warning and abort. */
-      } else if( dsize > abslim &&
-                 dsize > sizetol*fabs( 0.5*( pold->size + pnew->size ) ) ) {
+                     parGet0l( param, &cont, status );
+                     parCancl( param, status );
+                     if( !cont || *status != SAI__OK ) break;
+                     msgBlank( status );
+                  }
+               }
 
-         msgSetd( "O", pold->size );
-         msgSetd( "N", pnew->size );
-         msgOut( "", "Step size changed from ^O to ^N:", status );
+/* If one or more new step were found at the same time and place as the
+   old step (but with a significantly different height), tell the user
+   about the change in height. */
+            } else {
+               pnew = newsteps + jnew;
+               result++;
 
-         msgSeti( "I", pnew->id );
-         msgSetc( "W", pnew->corr ? "secondary" : "primary" );
-         msgOut( "", "   New index = ^I (^W)", status );
+               if( result >= first ) {
+                  msgSeti( "I", result );
+                  msgSetd( "O", pold->size );
+                  msgSetd( "N", pnew->size );
+                  msgOut( "", "^I: Step size changed from ^O to ^N:", status );
 
-         msgSeti( "I", pold->id );
-         msgSetc( "W", pold->corr ? "secondary" : "primary" );
-         msgOut( "", "   Old index = ^I (^W)", status );
+                  msgSeti( "I", pnew->id );
+                  msgSetc( "W", pnew->corr ? "secondary" : "primary" );
+                  msgOut( "", "   New index = ^I (^W)", status );
 
-         msgSeti( "B", pold->ibolo );
-         msgSeti( "X", pold->ibolo % nx );
-         msgSeti( "Y", pold->ibolo / nx );
-         msgOut( "", "   Bolometer = ^B (^X,^Y)", status );
+                  msgSeti( "I", pold->id );
+                  msgSetc( "W", pold->corr ? "secondary" : "primary" );
+                  msgOut( "", "   Old index = ^I (^W)", status );
 
-         msgSeti( "S", pold->start );
-         msgSeti( "E", pold->end );
-         msgOut( "", "   Old time slice range = ^S:^E", status );
+                  msgSeti( "B", pold->ibolo );
+                  msgSeti( "X", pold->ibolo % nx );
+                  msgSeti( "Y", pold->ibolo / nx );
+                  msgOut( "", "   Bolometer = ^B (^X,^Y)", status );
 
-         msgSeti( "S", pnew->start );
-         msgSeti( "E", pnew->end );
-         msgOut( "", "   New time slice range = ^S:^E", status );
+                  msgSeti( "S", pold->start );
+                  msgSeti( "E", pold->end );
+                  msgOut( "", "   Old time slice range = ^S:^E", status );
 
-         result = 1;
-         break;
+                  msgSeti( "S", pnew->start );
+                  msgSeti( "E", pnew->end );
+                  msgOut( "", "   New time slice range = ^S:^E", status );
 
-/* If the steps are equal, move on to the next pair. */
-      } else {
-         pold++;
-         iold++;
+                  parGet0l( param, &cont, status );
+                  parCancl( param, status );
+                  if( !cont || *status != SAI__OK ) break;
+                  msgBlank( status );
+               }
+            }
+         }
+      }
 
-         pnew++;
-         inew++;
+/* We have now checked all old steps for matching new steps. If no
+   significant change has yet been found, look for new steps that
+   have not been associated with an old step. */
+      pnew = newsteps;
+      fnew = new_flags;
+      for( inew = 0; inew < nnew && cont; inew++,pnew++,fnew++ ) {
+         if( ! *fnew ) {
+
+/* If the new step is off significant height, tell the user. */
+            if( fabs( pnew->size ) > abslim ){
+               result++;
+
+               if( result >= first ) {
+                  msgSeti( "N", result );
+                  msgSeti( "I", pnew->id );
+                  msgSetc( "W", pnew->corr ? "secondary" : "primary" );
+                  msgOut( "", "^N: A new ^W step (index ^I) was found:", status );
+
+                  msgSeti( "B", pnew->ibolo );
+                  msgSeti( "X", pnew->ibolo % nx );
+                  msgSeti( "Y", pnew->ibolo / nx );
+                  msgOut( "", "   Bolometer = ^B (^X,^Y)", status );
+
+                  msgSeti( "S", pnew->start );
+                  msgSeti( "E", pnew->end );
+                  msgOut( "", "   Time slice range = ^S:^E", status );
+
+                  msgSetd( "H", pnew->size );
+                  msgOut( "", "   Height = ^H", status );
+
+                  parGet0l( param, &cont, status );
+                  parCancl( param, status );
+                  if( !cont || *status != SAI__OK ) break;
+                  msgBlank( status );
+               }
+            }
+         }
       }
    }
 
-/* If we found a mismatching pair of steps (i.e. steps that are at different
-   bolometers or times), but never found a matching new fix, then old fix is
-   not present in the new fix array. Also the case if no differences have
-   been found but there are more steps in the old list than in the new list.
-   Report this. */
-   if( !qold && !result && nold > nnew ) qold = oldsteps + nnew;
-   if( qold && fabs( qold->size ) > abslim ){
+/* Free resources. */
+   new_flags = astFree( new_flags );
 
-      msgSeti( "I", qold->id );
-      msgSetc( "W", qold->corr ? "secondary" : "primary" );
-      msgOut( "", "An old ^W step (index ^I) is no longer found:", status );
-
-      msgSeti( "B", qold->ibolo );
-      msgSeti( "X", qold->ibolo % nx );
-      msgSeti( "Y", qold->ibolo / nx );
-      msgOut( "", "   Bolometer = ^B (^X,^Y)", status );
-
-      msgSeti( "S", qold->start );
-      msgSeti( "E", qold->end );
-      msgOut( "", "   Time slice range = ^S:^E", status );
-
-      msgSetd( "H", qold->size );
-      msgOut( "", "   Height = ^H", status );
-
-      result = 1;
-
-/* If no differences have been found but there are more steps in the new list
-   than in the old list, report it. */
-   } else if( !result && nold < nnew ) {
-      qnew = newsteps + nold;
-      if( fabs( qnew->size ) > abslim ) {
-         msgSeti( "I", qnew->id );
-         msgSetc( "W", qnew->corr ? "secondary" : "primary" );
-         msgOut( "", "A new ^W step (index ^I) was found:", status );
-
-         msgSeti( "B", qnew->ibolo );
-         msgSeti( "X", qnew->ibolo % nx );
-         msgSeti( "Y", qnew->ibolo / nx );
-         msgOut( "", "   Bolometer = ^B (^X,^Y)", status );
-
-         msgSeti( "S", qnew->start );
-         msgSeti( "E", qnew->end );
-         msgOut( "", "   Time slice range = ^S:^E", status );
-
-         msgSetd( "H", qnew->size );
-         msgOut( "", "   Height = ^H", status );
-
-         result = 1;
-      }
-   }
-
+/* Return the result. */
    return result;
 }
-
 
 
 static void smf1_write_steps( FILE *fd, smfData *data, int nstep,
@@ -945,80 +986,6 @@ static void smf1_write_steps( FILE *fd, smfData *data, int nstep,
                            DBL_DIG, ( steps[ istep ] ).size,
                                     ( steps[ istep ] ).corr );
    }
-}
-
-
-static int smf1_order_steps( const void *a, const void *b ){
-/*
-*  Name:
-*     smf1_order_steps
-
-*  Purpose:
-*     Decide on the sorting order for two step fixes.
-
-*  Invocation:
-*     int smf1_order_steps( const void *a, const void *b )
-
-*  Arguments:
-*     a = void * (Given)
-*        Pointer to a smfStepFix structure.
-*     b = void * (Given)
-*        Pointer to another smfStepFix structure.
-
-*  Description:
-*     Compares the two supplied step fixes too see which should come
-*     first in the sorting order. This function is designed to be used
-*     with the "qsort" system function. The order of sorting is:
-*
-*     1) bolometer index
-*     2) start time
-*     3) end time
-*     4) step height
-
-* Returned value:
-*     Returns -1 if "a" comes before "b" in the sorting order.
-*     Returns 0 if "a" and "b" are equal in the sorting order.
-*     Returns +1 if "a" comes after "b" in the sorting order.
-
-*/
-
-/* Local Variables: */
-   const smfStepFix *afix;
-   const smfStepFix *bfix;
-   int result;
-
-/* Get pointers to the smfStepFix structures. */
-   afix = (const smfStepFix *) a;
-   bfix = (const smfStepFix *) b;
-
-/* First compare the bolometer index */
-   if( afix->ibolo < bfix->ibolo ) {
-      result = -1;
-
-   } else if( afix->ibolo > bfix->ibolo ) {
-      result = +1;
-
-/* If the bolometer indicies are equal, compare the step time. if the
-   steps are disjoint in time, order by the start time. */
-   } else if( afix->end < bfix->start ) {
-      result = -1;
-
-   } else if( bfix->end < afix->start ) {
-      result = 1;
-
-/* If the steps overlap, order by the step size. */
-   } else if( afix->size < bfix->size ){
-      result = -1;
-
-   } else if( afix->size > bfix->size ){
-      result = +1;
-
-/* If everything is equal, the fixes are equal. */
-   } else {
-      result = 0;
-   }
-
-   return result;
 }
 
 static double smf1_get_rmssize( int nstep, smfStepFix *steps, int *status ){
