@@ -134,6 +134,9 @@
 *        Only revert outgrp to darks if reverttodark set
 *     2010-06-28 (TIMJ):
 *        Add mean step time calculation
+*     2010-07-12 (TIMJ):
+*        Disable unstable bolometers as defined from before and after flatfield
+*        ramps.
 
 *  Copyright:
 *     Copyright (C) 2008-2010 Science and Technology Facilities Council.
@@ -352,6 +355,9 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
 
     /* now open the flats and store them if requested */
     if (*status == SAI__OK) {
+      smfData * prevresp = NULL;
+      smfData * prevflat = NULL;
+
       for (i = 0; i < ffcount; i++ ) {
         size_t ori_index =  (allfflats[i]).index;
 
@@ -371,16 +377,93 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
             infile = outfile;
 
             if (calcflat) {
+              smfData * curresp = NULL;
               (void)smf_flat_calcflat( MSG__VERB, NULL, "REFRES", "RESIST",
                                        "FLATMETH", "FLATORDER", NULL, "RESPMASK",
-                                       "FLATSNR", NULL, infile, NULL, status );
+                                       "FLATSNR", NULL, infile, &curresp, status );
+
+              /* See if we need to compare responsivity images */
+              if ( prevresp && curresp &&
+                   strcmp(prevresp->hdr->obsidss, curresp->hdr->obsidss) == 0 ) {
+                size_t bol = 0;
+                smfData * ratio = NULL;
+                double *in1 = NULL;
+                double *in2 = NULL;
+                double mean = VAL__BADD;
+                size_t nbolo = (prevresp->dims)[0] * (prevresp->dims)[1];
+                size_t ngood = 0;
+                double *out = NULL;
+                double sigma = VAL__BADD;
+                float clips[] = { 5.0, 5.0 }; /* 5.0 sigma iterative clip */
+
+                /* get some memory for the ratio if we have not already.
+                   We could get some memory once assuming each flat has the
+                   same number of bolometers... */
+                ratio = smf_deepcopy_smfData( prevresp, 0, 0, status );
+
+                /* divide: smf_divide_smfData ? */
+                in1 = (prevresp->pntr)[0];
+                in2 = (curresp->pntr)[0];
+                out = (ratio->pntr)[0];
+
+                for (bol=0; bol<nbolo;bol++) {
+                  if ( in1[bol] != VAL__BADD && in1[bol] != 0.0 &&
+                       in2[bol] != VAL__BADD && in2[bol] != 0.0 ) {
+                    out[bol] = in1[bol] / in2[bol];
+                  } else {
+                    out[bol] = VAL__BADD;
+                  }
+                }
+
+                /* find some statistics */
+                smf_clipped_stats1D( out, 2, clips, 1, nbolo, NULL, 0, 0, &mean, &sigma,
+                                     &ngood, status );
+
+                msgOutiff( MSG__DEBUG, "", "Flatfield fast ramp ratio mean = %g +/- %g (%zu bolometers)",
+                           status, mean, sigma, ngood);
+
+                if (*status == SAI__OK && mean != VAL__BADD && sigma != VAL__BADD && prevflat->da) {
+                  /* Now flag the flatfield as bad for bolometers that have changed
+                     more than N sigma from the mean (the mean should be 1.0 within errors) */
+                  double sigclip = 3.0 * sigma;  /* 3 sigma clip */
+                  double thrlo = mean - sigclip;
+                  double thrhi = mean + sigclip;
+                  size_t nmasked = 0;
+                  double *flatcal = prevflat->da->flatcal;
+
+                  /* we can just set the first slice of the flatcal to bad. That should
+                     be enough to disable the entire bolometer. We have just read these
+                     data so they should be in ICD order. */
+                  for (bol=0; bol<nbolo;bol++) {
+                    if ( out[bol] != VAL__BADD &&
+                         (out[bol] < thrlo || out[bol] > thrhi ) ) {
+                      flatcal[bol] = VAL__BADD;
+                      nmasked++;
+                    }
+                  }
+
+                  if ( nmasked > 0 ) {
+                    msgOutiff( MSG__NORM, "", "Masked %zu bolometers because of flatfield ramp instability",
+                               status, nmasked );
+                  }
+
+                }
+
+                smf_close_file( &ratio, status );
+              }
+
+              /* Free previous and then store new previous */
+              if (prevresp) smf_close_file( &prevresp, status );
+              prevresp = curresp;
             }
 
           }
 
           smf_addto_smfArray( array, infile, status );
+          prevflat = infile;
         }
       }
+      if (prevresp) smf_close_file( &prevresp, status );
       if (fflats) *fflats = array;
     }
   }
