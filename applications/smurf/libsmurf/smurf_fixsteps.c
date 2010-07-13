@@ -199,6 +199,7 @@ void smurf_fixsteps( int *status ) {
    Grp *ogrp = NULL;         /* Output group of files */
    dim_t dcfitbox;           /* DCFITBOX config parameter */
    dim_t dcmedianwidth;      /* DCMEDIANWIDTH config parameter */
+   dim_t nx;                 /* Length of first pixel axis */
    double dcthresh;          /* DCTHRESH config parameter */
    double sizetol;           /* Tolerance allowed on step height */
    int changed;              /* Have any step fixes changed? */
@@ -314,6 +315,19 @@ void smurf_fixsteps( int *status ) {
       fclose( fd );
    }
 
+/* If required, create the output NDF. */
+   if( outsize > 0 && indata && indata->file ) {
+      smf_write_smfData( data, NULL, NULL, ogrp, 1,
+                         indata->file->ndfid, status );
+   }
+
+/* Save the length of the first pixel axis. */
+   nx = data->dims[ 0 ];
+
+/* Close the NDFs. */
+   smf_close_file( &data, status );
+   smf_close_file( &indata, status );
+
 /* Attempt to open a file containing descriptions of steps fixed by a
    previous invocation of this program. */
    fd = smf_open_textfile( "OLDSTEPS", "r", "<none>", status );
@@ -335,7 +349,7 @@ void smurf_fixsteps( int *status ) {
 
 /* Compare the new step fixes with the old step fixes, issuing a warning
    for the first step fix that has changed. */
-      changed = smf1_check_steps( "CONTINUE", first, data->dims[ 0 ], sizetol,
+      changed = smf1_check_steps( "CONTINUE", first, nx, sizetol,
                                   nold, nnew, oldsteps, newsteps, status );
 
 /* Store a flag indicating if any sstep fixes have chnaged. */
@@ -354,15 +368,7 @@ void smurf_fixsteps( int *status ) {
       oldsteps = astFree( oldsteps );
    }
 
-/* If required, create the output NDF. */
-   if( outsize > 0 && indata && indata->file ) {
-      smf_write_smfData( data, NULL, NULL, ogrp, 1,
-                         indata->file->ndfid, status );
-   }
-
 /* Free resources. */
-   smf_close_file( &data, status );
-   smf_close_file( &indata, status );
    wf = smf_destroy_workforce( wf );
    newsteps = astFree( newsteps );
    grpDelet( &igrp, status );
