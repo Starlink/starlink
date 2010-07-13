@@ -78,7 +78,7 @@
 *     2009-10-28 (DSB):
 *         Use sc2ast_make_bolo_frame.
 *     2010-06-28 (DSB):
-*         Added arguments qyality and len (needed since with the new
+*         Added arguments quality and len (needed since with the new
 *         filtering scheme, the data may not have been apodised on entry
 *         to this function).
 *     2010-07-01 (TIMJ):
