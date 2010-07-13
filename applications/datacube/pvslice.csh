@@ -319,5 +319,6 @@ $KAPPA_DIR/setaxis $outfile 3 wcs
 # ========
 cleanup:
 rm -f pvslice_temp*
+unsetenv ADAM_NOPROMPT
 
 exit
