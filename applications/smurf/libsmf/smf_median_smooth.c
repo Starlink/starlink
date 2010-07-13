@@ -136,7 +136,6 @@ void smf_median_smooth( dim_t box, smf_filt_t filter_type, float wlim,
    dim_t iold;                 /* Index of oldest value in "w2" */
    dim_t iout;                 /* Index within out array */
    dim_t minin;                /* Min no of valid i/p values for a valid o/p value */
-   dim_t offset;               /* Offset from next new value to central value */
    double *pout;               /* Pointer to next output value */
    double *pw1;                /* Pointer to next "w1" value */
    double *pw2;                /* Pointer to next "w2" value */
@@ -144,6 +143,7 @@ void smf_median_smooth( dim_t box, smf_filt_t filter_type, float wlim,
    double dold;                /* Data value being removed from the filter box */
    int iadd;                   /* Index within box at which to store new value */
    int iremove;                /* Index within box of element to be removed */
+   int offset;                 /* Offset from next new value to central value */
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -215,7 +215,7 @@ void smf_median_smooth( dim_t box, smf_filt_t filter_type, float wlim,
 
 /* Not the offset from the input value that is to be added into the filter
    box next, and the current central input value. */
-   offset = -( box + 1 )/2;
+   offset = -stride*(int)( ( box + 1 )/2 );
 
 /* Loop round the rest of the output array, stopping just before the
    final half box. "iout" gives the index of the centre element in the box,
