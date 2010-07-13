@@ -18845,10 +18845,6 @@ iraf! {
       obey {$KAPPA_DIR/fitshead.csh}
    }
 
-   command makepv {
-      obey {$KAPPA_DIR/makepv.csh}
-   }
-
    command outline {
       task contour {
          alias {outl(ine)}

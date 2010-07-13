@@ -159,8 +159,7 @@ PUBLICSCRIPTS = $(SHELLSCRIPTS) $(ICL_FILES) $(TCL_FILES) \
 
 NODIST_PUBLICSCRIPTS = $(NODIST_SHELLSCRIPTS)
 
-SHELLSCRIPTS = fitsedit.csh fitshead.csh lutread.csh pazo.csh s2p \
-makepv.csh
+SHELLSCRIPTS = fitsedit.csh fitshead.csh lutread.csh pazo.csh s2p
 
 NODIST_SHELLSCRIPTS = multiplot.csh
 
