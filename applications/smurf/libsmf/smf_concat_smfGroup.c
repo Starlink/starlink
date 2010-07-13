@@ -576,7 +576,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                               &bstr, &tstr, status );
 
                 /* Allocate space for enlarged dksquid array. */
-                if( da ) {
+                if( da && refdata->da && refdata->da->dksquid ) {
                   da->dksquid = smf_create_smfData(SMF__NOCREATE_FILE |
                                                    SMF__NOCREATE_HEAD |
                                                    SMF__NOCREATE_DA, status );
