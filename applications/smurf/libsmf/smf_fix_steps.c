@@ -495,7 +495,8 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data,
    smoothed data in "work". */
             smf_median_smooth( dcmedianwidth, SMF__FILT_MEDIAN, -1.0,
                                ntime, dat + base, qua + base,
-                               tstride, SMF__Q_MOD, work, w1, w2, status );
+                               tstride, SMF__Q_MOD, work, w1, w2, NULL,
+                               NULL, status );
 
 /* For each time slice, find the difference between the median value
    before and after the time slice. We leave a small gap between the two

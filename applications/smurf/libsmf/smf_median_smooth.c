@@ -17,7 +17,8 @@
 *                             float wlim, dim_t el, const double *dat,
 *                             const smf_qual_t *qua, size_t stride,
 *                             smf_qual_t mask, double *out, double *w1,
-*                             double *w2, int *status )
+*                             double *w2, double *mean, double *sigma,
+*                             int *status )
 
 *  Arguments:
 *     box = dim_t (Given)
@@ -53,6 +54,12 @@
 *        A work array of length "box".
 *     w2 = double * (Given and Returned)
 *        A work array of length "box".
+*     mean = double * (Returned)
+*        An optional array to recieve the mean value in each filter box.
+*        If not NULL, it should have "el" elements.
+*     sigma = double * (Returned)
+*        An optional array to recieve the standard deviation in each filter
+*        box. If supplied, it should have "el" elements.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -60,6 +67,9 @@
 *     This routine creates a 1D output array in which each value is the
 *     median, minimum or maximum (as selected via "filter_type") of the
 *     input values in a box of width "box", centred on the output value.
+*
+*     It optionally also returns the mean and standard deviation of the
+*     data values in each filter box.
 *
 *     The method attempts to be efficient in that it avoids sorting the
 *     list of values in the filter box for every output value. Instead, it
@@ -82,7 +92,7 @@
 *     2010-06-29 (TIMJ):
 *        Use an enum for filter_type
 *     2010-07-13 (DSB):
-*        Added argument wlim.
+*        Added arguments wlim, mean and sigma.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -125,7 +135,8 @@
 void smf_median_smooth( dim_t box, smf_filt_t filter_type, float wlim,
                         dim_t el, const double *dat, const smf_qual_t *qua,
                         size_t stride, smf_qual_t mask, double *out,
-                        double *w1, double *w2, int *status ){
+                        double *w1, double *w2, double *mean, double *sigma,
+                        int *status ){
 
 /* Local Variables: */
    const double *pdat;         /* Pointer to next bolo data value */
@@ -136,11 +147,17 @@ void smf_median_smooth( dim_t box, smf_filt_t filter_type, float wlim,
    dim_t iold;                 /* Index of oldest value in "w2" */
    dim_t iout;                 /* Index within out array */
    dim_t minin;                /* Min no of valid i/p values for a valid o/p value */
-   double *pout;               /* Pointer to next output value */
+   double *mout;               /* Pointer to next output mean value */
+   double *pout;               /* Pointer to next output median value */
+   double *sout;               /* Pointer to next output sigma value */
    double *pw1;                /* Pointer to next "w1" value */
    double *pw2;                /* Pointer to next "w2" value */
    double dnew;                /* Data value being added into the filter box */
    double dold;                /* Data value being removed from the filter box */
+   double meanval;             /* Mean of values in filter box */
+   double outval;              /* Main output filter value */
+   double sum;                 /* Sum of values in filter box */
+   double sum2;                /* Sum of squared values in filter box */
    int iadd;                   /* Index within box at which to store new value */
    int iremove;                /* Index within box of element to be removed */
    int offset;                 /* Offset from next new value to central value */
@@ -180,10 +197,14 @@ void smf_median_smooth( dim_t box, smf_filt_t filter_type, float wlim,
    pqua = qua;
    pw1 = w1;
    pw2 = w2;
+   sum = 0.0;
+   sum2 = 0.0;
    for( ibox = 0; ibox < box; ibox++ ) {
 
       if( ( !qua || !( *pqua & mask ) ) && *pdat != VAL__BADD ) {
          *(pw2++) = *(pw1++) = *pdat;
+         sum += *pdat;
+         sum2 += ( *pdat )*( *pdat );
       } else {
          *(pw2++) = VAL__BADD;
       }
@@ -208,12 +229,18 @@ void smf_median_smooth( dim_t box, smf_filt_t filter_type, float wlim,
 /* If any good values are stored in the filter box, we now sort them. */
    if( inbox > 0 ) gsl_sort( w1, 1, inbox );
 
-/* Fill the first half-box of the output array with bad values. */
+/* Fill the first half-box of the output array(s) with bad values. */
    ihi = box/2;
+   mout = mean;
+   sout = sigma;
    pout = out;
-   for( iout = 0; iout < ihi; iout++ ) *(pout++) = VAL__BADD;
+   for( iout = 0; iout < ihi; iout++ ) {
+      *(pout++) = VAL__BADD;
+      if( sigma ) *(sout++) = VAL__BADD;
+      if( mean ) *(mout++) = VAL__BADD;
+   }
 
-/* Not the offset from the input value that is to be added into the filter
+/* Note the offset from the input value that is to be added into the filter
    box next, and the current central input value. */
    offset = -stride*(int)( ( box + 1 )/2 );
 
@@ -230,27 +257,49 @@ void smf_median_smooth( dim_t box, smf_filt_t filter_type, float wlim,
    the box contains insufficient good values use VAL__BADD. If the
    central input value is bad, use VAL__BADD. */
       if( inbox == 0 ) {
-         *(pout++) = VAL__BADD;
+         outval = VAL__BADD;
 
       } else if( minin == 0 && ( pdat[ offset ] == VAL__BADD ||
                           ( qua && ( pqua[ offset ] & mask ) ) ) ){
-         *(pout++) = VAL__BADD;
+         outval = VAL__BADD;
 
       } else if( inbox < minin ) {
-         *(pout++) = VAL__BADD;
+         outval = VAL__BADD;
 
       } else if( filter_type == SMF__FILT_MIN ) {
-         *(pout++) = w1[ 0 ];
+         outval = w1[ 0 ];
 
       } else if( filter_type == SMF__FILT_MAX ) {
-         *(pout++) = w1[ inbox - 1 ];
+         outval = w1[ inbox - 1 ];
 
       } else if( inbox % 2 == 1 ) {
-         *(pout++) = w1[ inbox/2 ];
+         outval = w1[ inbox/2 ];
 
       } else {
          ibox = inbox/2;
-         *(pout++) = 0.5*( w1[ ibox ] + w1[ ibox - 1 ] );
+         outval = 0.5*( w1[ ibox ] + w1[ ibox - 1 ] );
+      }
+
+      *(pout++) = outval;
+
+/* Store the optional mean value. */
+      meanval = ( inbox > 0 ) ? sum/inbox : VAL__BADD;
+
+      if( mean ) {
+         if( outval != VAL__BADD ) {
+            *(mout++) = meanval;
+         } else {
+            *(mout++) = VAL__BADD;
+         }
+      }
+
+/* Store the optional standard deviation value. */
+      if( sigma ) {
+         if( outval != VAL__BADD ) {
+            *(sout++) = sqrt( sum2/inbox - meanval*meanval );
+         } else {
+            *(sout++) = VAL__BADD;
+         }
       }
 
 /* Now advance the box by one sample and update the supplied values
@@ -272,6 +321,10 @@ void smf_median_smooth( dim_t box, smf_filt_t filter_type, float wlim,
 /* If the new value to be added into the box is good... */
       if( dnew != VAL__BADD ) {
 
+/* Increment sums. */
+         sum += dnew;
+         sum2 += dnew*dnew;
+
 /* Find the index (iadd) within the w1 box at which to store the new
    value so as to maintain the ordering of the values in the box. Could do
    a binary chop here, but the box size is presumably going to be very
@@ -291,6 +344,10 @@ void smf_median_smooth( dim_t box, smf_filt_t filter_type, float wlim,
                   if( iremove != -1 ) break;
                }
             }
+
+/* Decrement sums. */
+            sum -= dold;
+            sum2 -= dold*dold;
 
          } else {
             for( iadd = 0; iadd < (int) inbox; iadd++ ) {
@@ -335,6 +392,10 @@ void smf_median_smooth( dim_t box, smf_filt_t filter_type, float wlim,
 /* If the value being added is bad but the value being removed is good... */
       } else if( dold != VAL__BADD ){
 
+/* Decrement sums. */
+         sum -= dold;
+         sum2 -= dold*dold;
+
 /* Find the index (iremove) within the w1 box at which is stored the value
    that is leaving the box. */
          iremove = -1;
@@ -359,8 +420,12 @@ void smf_median_smooth( dim_t box, smf_filt_t filter_type, float wlim,
       pqua += stride;
    }
 
-/* Fill the last half-box of the output array with bad values. */
-   for( ; iout < el; iout++ ) *(pout++) = VAL__BADD;
+/* Fill the last half-box of the output array(s) with bad values. */
+   for( ; iout < el; iout++ ) {
+      *(pout++) = VAL__BADD;
+      if( sigma ) *(sout++) = VAL__BADD;
+      if( mean ) *(mout++) = VAL__BADD;
+   }
 
 }
 
