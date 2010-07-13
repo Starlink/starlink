@@ -13,10 +13,11 @@
 *     C function
 
 *  Invocation:
-*     void smf_median_smooth( dim_t box, smf_filt_t filter_type, dim_t el,
-*                             const double *dat, const smf_qual_t *qua,
-*                             size_t stride, smf_qual_t mask, double *out,
-*                             double *w1, double *w2, int *status )
+*     void smf_median_smooth( dim_t box, smf_filt_t filter_type,
+*                             float wlim, dim_t el, const double *dat,
+*                             const smf_qual_t *qua, size_t stride,
+*                             smf_qual_t mask, double *out, double *w1,
+*                             double *w2, int *status )
 
 *  Arguments:
 *     box = dim_t (Given)
@@ -26,6 +27,12 @@
 *        SMF__FILT_MEDIAN: Replace each value with the median of the local values
 *        SMF__FILT_MIN: Replace each value with the minimum of the local values
 *        SMF__FILT_MAX: Replace each value with the maximum of the local values
+*     wlim = double (Given)
+*        A value in the range 0.0 to 1.0 that gives the minimum fraction of
+*        valid input values that a filter box must contain in order to
+*        produce a valid output value. If a value smaller than 0.0 or
+*        larger than 1.0 is supplied, then an output value will be bad if
+*        and only if the corresponding input value is bad.
 *     el = dim_t (Given)
 *        The number of elements to used from the data array (each
 *        separated by a step of "stride").
@@ -74,6 +81,8 @@
 *        Added argument "filter_type".
 *     2010-06-29 (TIMJ):
 *        Use an enum for filter_type
+*     2010-07-13 (DSB):
+*        Added argument wlim.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -113,19 +122,21 @@
 /* Other includes */
 #include <gsl/gsl_sort.h>
 
-void smf_median_smooth( dim_t box, smf_filt_t filter_type, dim_t el,
-                        const double *dat, const smf_qual_t *qua,
+void smf_median_smooth( dim_t box, smf_filt_t filter_type, float wlim,
+                        dim_t el, const double *dat, const smf_qual_t *qua,
                         size_t stride, smf_qual_t mask, double *out,
                         double *w1, double *w2, int *status ){
 
 /* Local Variables: */
    const double *pdat;         /* Pointer to next bolo data value */
-   const smf_qual_t *pqua;  /* Pointer to next quality flag */
+   const smf_qual_t *pqua;     /* Pointer to next quality flag */
    dim_t ibox;                 /* Index within box */
    dim_t ihi;                  /* Upper limit for which median can be found */
    dim_t inbox;                /* No. of values currently in the box */
    dim_t iold;                 /* Index of oldest value in "w2" */
    dim_t iout;                 /* Index within out array */
+   dim_t minin;                /* Min no of valid i/p values for a valid o/p value */
+   dim_t offset;               /* Offset from next new value to central value */
    double *pout;               /* Pointer to next output value */
    double *pw1;                /* Pointer to next "w1" value */
    double *pw2;                /* Pointer to next "w2" value */
@@ -145,6 +156,19 @@ void smf_median_smooth( dim_t box, smf_filt_t filter_type, dim_t el,
       msgSeti( "T", filter_type );
       errRep( " ", "smf_median_smooth: Illegal filter type value ^T "
               "(internal SMURF programming error).", status );
+   }
+
+/* Store the minimum number of valid input values that must be present in
+   a filter box to create a valid output value. */
+   if( wlim >= 0 && wlim <= 1.0 ) {
+      minin = wlim*box + 0.5;
+      if( minin == 0 ) {
+         minin = 1;
+      } else if( minin > box ) {
+         minin = box;
+      }
+   } else {
+      minin = 0;
    }
 
 /* First initialise the filter box to contain the first "box" values from the
@@ -189,6 +213,10 @@ void smf_median_smooth( dim_t box, smf_filt_t filter_type, dim_t el,
    pout = out;
    for( iout = 0; iout < ihi; iout++ ) *(pout++) = VAL__BADD;
 
+/* Not the offset from the input value that is to be added into the filter
+   box next, and the current central input value. */
+   offset = -( box + 1 )/2;
+
 /* Loop round the rest of the output array, stopping just before the
    final half box. "iout" gives the index of the centre element in the box,
    or the element just above centre if "box" is even. */
@@ -199,8 +227,16 @@ void smf_median_smooth( dim_t box, smf_filt_t filter_type, dim_t el,
    current box contains an odd number of good values, use the central good
    value as the median value. If the box contains an even number of good
    values, use the mean of the two central values as the median value. If
-   the box is empty use VAL__BADD. */
+   the box contains insufficient good values use VAL__BADD. If the
+   central input value is bad, use VAL__BADD. */
       if( inbox == 0 ) {
+         *(pout++) = VAL__BADD;
+
+      } else if( minin == 0 && ( pdat[ offset ] == VAL__BADD ||
+                          ( qua && ( pqua[ offset ] & mask ) ) ) ){
+         *(pout++) = VAL__BADD;
+
+      } else if( inbox < minin ) {
          *(pout++) = VAL__BADD;
 
       } else if( filter_type == SMF__FILT_MIN ) {

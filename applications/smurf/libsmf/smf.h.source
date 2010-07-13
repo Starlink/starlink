@@ -1207,7 +1207,8 @@ void smf_mask_noisy( smfWorkForce *wf, smfData *data,
 
 void smf_maskacsis( int indf, int *mask, int *status );
 
-void smf_median_smooth( dim_t box, smf_filt_t filter_type, dim_t el, const double *dat,
+void smf_median_smooth( dim_t box, smf_filt_t filter_type, float wlim,
+                        dim_t el, const double *dat,
                         const smf_qual_t *qua, size_t stride,
                         smf_qual_t mask, double *out, double *w1,
                         double *w2, int *status );

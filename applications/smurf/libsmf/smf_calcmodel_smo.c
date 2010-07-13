@@ -417,9 +417,9 @@ static void smf1_calcmodel_smo_job( void *job_data, int *status ) {
 
         /* Smooth that bolometer time series */
         if( filter_type == SMF__FILT_MEDIAN ) {
-           smf_median_smooth( (dim_t) boxcar, SMF__FILT_MEDIAN, ntslice, res_data+boloff,
-                              qua_data+boloff, 1, SMF__Q_FIT, boldata,
-                              w1, w2, status );
+           smf_median_smooth( (dim_t) boxcar, SMF__FILT_MEDIAN, 0.0, ntslice,
+                              res_data+boloff, qua_data+boloff, 1, SMF__Q_FIT,
+                              boldata, w1, w2, status );
         } else {
            smf_tophat1D( boldata, ntslice, boxcar, bolqua, SMF__Q_FIT, status );
         }
