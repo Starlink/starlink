@@ -73,8 +73,8 @@
 *        missing values and then correct by normalising the filtered data
 *        using a filtered mask.
 *     2010-06-25 (DSB):
-*        Doing apodisation here, each time the filter is applied, 
-*        rather than as a pre-processing step. 
+*        Doing apodisation here, each time the filter is applied,
+*        rather than as a pre-processing step.
 
 *  Copyright:
 *     Copyright (C) 2007-2009 University of British Columbia.
