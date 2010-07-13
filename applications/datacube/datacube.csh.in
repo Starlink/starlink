@@ -17,7 +17,7 @@
 #
 #  Copyright:
 #     Copyright (C) 2000-2005 Central Laboratory of the Research Councils.
-#     Copyright (C) 2008 Science & Technology Facilities Council.
+#     Copyright (C) 2008, 2010 Science & Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -85,6 +85,8 @@
 #        Add maths and setunits definitions.
 #     2008 June 30 (MJC):
 #        Add settype, sub, and trendview definitions.
+#     2010 July 13 (MJC):
+#        ADD pvslice script.
 #     {enter_further_changes_here}
 #
 #-
@@ -101,6 +103,8 @@ alias passband        source ${DATACUBE_DIR}/passband.csh
 alias dat_passband    source ${DATACUBE_DIR}/passband.csh
 alias peakmap         source ${DATACUBE_DIR}/peakmap.csh
 alias dat_peakmap     source ${DATACUBE_DIR}/peakmap.csh
+alias pvslice         source ${DATACUBE_DIR}/pvslice.csh
+alias dat_pvslice     source ${DATACUBE_DIR}/pvslice.csh
 alias ripper          source ${DATACUBE_DIR}/ripper.csh
 alias dat_ripper      source ${DATACUBE_DIR}/ripper.csh
 alias squash          source ${DATACUBE_DIR}/squash.csh

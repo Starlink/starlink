@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="datacube" support="S">
-  <version>1.2</version>
+  <version>1.3</version>
   <path>applications/datacube</path>
   <description>DATACUBE - An IFS datacube manipulation package</description>
   <abstract><p>DATACUBE is a package which includes the IFU Data Product Co

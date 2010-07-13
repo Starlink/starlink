@@ -1,3 +1,27 @@
+1 DATACUBE_Version_1.3
+
+  A new release of DATACUBE (V1.3) has been made.  Further
+  details can be found in SUN/237.  This can be viewed with
+  the commands "showme sun237".  The main changes are:
+
+2 New_Commands
+ The following script has been added:
+
+   o  pvslice
+      Extracts and displays position-velocity slice from a 
+      (RA,Dec,vel) cube.  The slice need not be parallel to either
+      spatial pixel axis, and it is defined using the graphics 
+      cursor.
+
+2 Modified_Commands
+The following applications have been modified:
+
+   o  Internal script checkndf--used in all of the public
+      scripts--now has a -q option to prevent the reporting of the
+      filename and its vital statistics.  It has also has an 
+      improved NDF-validation method, which allows for NDFs within 
+      a container file or NDF extension. 
+
 1 DATACUBE_Version_1.2
 
   A new release of DATACUBE (V1.2) has been made.  Further
@@ -7,10 +31,10 @@
 2 New_Commands
  The following script has been added:
 
-   o trendview
-     Plots multiple spectra from a cube overlaying fitted trends
-     and spectral-feature mask.  It enables assessment of baseline
-     subtraction and feature masking.
+   o  trendview
+      Plots multiple spectra from a cube overlaying fitted trends
+      and spectral-feature mask.  It enables assessment of baseline
+      subtraction and feature masking.
 
 2 Modified_Commands
  The following scripts have been modified:

@@ -8,9 +8,9 @@ dist_bin_SCRIPTS = $(USERSCRIPTS) $(INTERNALSCRIPTS)
 # xcompare, place it in its command order so the help file will be in
 # alphabetical order.
 USERSCRIPTS = compare.csh gridspec.csh multistack.csh \
-              passband.csh peakmap.csh ripper.csh squash.csh \
-              stacker.csh step.csh trendview.csh velmap.csh \
-              velmoment.csh compare_x.csh
+              passband.csh peakmap.csh pvslice.csh ripper.csh \
+              squash.csh stacker.csh step.csh trendview.csh \
+              velmap.csh velmoment.csh compare_x.csh
 
 # The are subroutine-like scripts used by the public scripts, 
 # but are not part of the documented set of DATACUBE scripts.

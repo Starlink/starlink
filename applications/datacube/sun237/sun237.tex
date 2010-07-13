@@ -15,11 +15,11 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {237.3}
+\newcommand{\stardocnumber}    {237.4}
 \newcommand{\stardocauthors}   {A.~Allan \& Malcolm J. Currie}
-\newcommand{\stardocdate}      {2008 July 1}
+\newcommand{\stardocdate}      {2010 July 13}
 \newcommand{\stardoctitle}     {DATACUBE --- An IFS datacube manipulation package}
-\newcommand{\stardocversion}   {Version 1.2}
+\newcommand{\stardocversion}   {Version 1.3}
 \newcommand{\stardocmanual}    {User's Manual}
 \newcommand{\stardocabstract}  {
 \htmlref{DATACUBE}{DATACUBE} is a package which includes the IFU Data Product Cookbook (\xref{SC/16}{sc16}{}), and a collection of example shell scripts for IFS data cube manipulation.
@@ -605,6 +605,7 @@
    \item 2006 March 10; Version 1.1 Add gridspec and velmoment, and
          used implementation status (MJC)
    \item 2008 July 2; Version 1.2 Added trendview and improved the introduction (MJC)
+   \item 2010 July 13; Version 1.2 Added pvslice (MJC)
 
  \end{enumerate}
 
@@ -650,6 +651,8 @@ features using the cursor.
 \item to view a grid of channel maps of defined spectral width
       (\htmlref{{\bf step}}{step});
 \item to extract individual spectra (\htmlref{{\bf ripper}}{ripper});
+\item to extract an arbitrary position-spectral slice 
+      (\htmlref{{\bf pvslice}}{pvslice});
 \item to compare spectra (\htmlref{{\bf compare}}{compare},
       \htmlref{{\bf stacker}}{stacker});
 \item to average and compare groups of spectra
@@ -743,7 +746,7 @@ applications with the {\tt kappa} command
 \small\begin{verbatim}
    % kappa
 
-        KAPPA commands are now available -- (Version 1.9-8)
+        KAPPA commands are now available -- (Version 1.12)
 
         Type kaphelp for help on KAPPA commands.
         Type 'showme sun95' to browse the hypertext documentation.
@@ -1110,6 +1113,103 @@ co-operation and contributions.
       and \FIGAROref\ packages.
    }
 }
+\newpage
+\sstroutine{
+   pvslice
+}{
+   Extracts and displays a velocity-position slice from an (RA,Dec,vel) cube
+}{
+   \sstdescription{
+      This script extracts and displays a slice from a position-velocity
+      cube.  The slice need not be parallel to either spatial pixel axis.
+
+      The script displays the middle spatial plane from the supplied cube
+      in the left half of the current graphics device.  You are then invited
+      to select two spatial positions within the displayed plane using the
+      cursor.  A two-dimensional slice is then extracted from the cube that
+      passes through the two selected spatial positions.  The first axis in
+      this slice measures spatial distance along the line, and the second axis
+      is the velocity axis.  This slice appears in the right-hand side of
+      the current graphics device, and seved to the specified output NDF.
+   }
+   \sstusage{
+      pvslice -i filename -o filename [-ci index]
+   }
+   \sstdiytopic{
+      Command-line Arguments
+   }{
+      \ssthitemlist{
+         \sstitem {\bf{\tt{-ci}}} {\em index}\\
+           The colour or colour index of the annotations on the left-hand
+           display indicating the spatial location of the slice.  An index
+           should be a positive integer no more than 15, normally 2 or 3 to
+           stand out from other elements of the plot.  If absent the
+           annotations will appear in red. {\tt []}
+
+         \sstitem
+         {\bf{\tt{-i}}} {\em filename}\\
+           The name of an existing three-dimensional (RA,Dec,vel) cube.
+           The script will prompt for the input file if not supplied on
+           the command line.
+
+         \sstitem
+         {\bf{\tt{-o}}} {\em filename}\\
+           The name of the NDF in which to store the velocity-position
+           slice.  The script will prompt for this NDF if it is not
+           supplied via this option.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         pvslice -i orion\_masked -o orion\_pvmap
+      }{
+         This extracts a user-selected plane from the cube NDF called
+         orion\_masked, and saves it to NDF orion\_pvmap.  The slice is
+         shown to the right of the spatial image.
+      }
+   }
+   \sstnotes{
+      \ssthitemlist{
+
+         \sstitem
+         The WCS in the returned NDF is somewhat complex; it has a
+         degenerate pixel axis and a degenerate WCS axis. These could be
+         removed using {\tt ndfcopy trim}, but this would result in a WCS
+         with no inverse transformation (from current to pixel), which gives
+         problems when displaying it, \emph{etc.} Alternatively, the AXIS frame 
+         can be used by doing {\tt wcsframe frame=axis}.
+
+         \sstitem
+         To avoid modification of the input cube, the script creates a
+         temporary copy in the current directory, and deletes the copy upon
+         completion.
+
+         \sstitem
+         While the script is intended to make position-velocity slices
+         from spectral cubes, the contents of the third axis is arbitrary.
+
+         \sstitem
+         The script clears the graphics database for the current device.
+         It then creates two FRAME pictures with labels a1 and a2.  Within each
+         of these \xref{DISPLAY}{sun95}{DISPLAY} creates FRAME and DATA pictures, 
+         the former holding annotated axes.  On exit a2 is the current picture.
+
+         \sstitem
+         The label for the spatial (first) axis in the slice plot is
+         {\tt "Offset from start"}.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      \xref{KAPPA}{sun95}{}: \xref{PROFILE}{sun95}{PROFILE};
+      \xref{FIGARO}{sun86}{}: \xref{SLICE}{sun86}{SLICE}.
+   }
+   \sstimplementationstatus{
+      This script invokes a collection of A-tasks from the \KAPPA\ package.
+   }
+}
+
 \newpage
 \sstroutine{
    ripper
@@ -1854,10 +1954,10 @@ through new internal routine {\tt checkndf.csh}.
 \end{itemize}
 
 
-\section{\xlabel{se_changes}Release Notes---V1.2\label{se:changes}}
+\section{Release Notes---V1.2}
 
 \subsection{New Commands}
-The following new scripts have been added:
+The following new script has been added:
 
 \begin{description}
    \item [\htmlref{{\bf trendview}}{trendview}] \mbox{}
@@ -1904,6 +2004,32 @@ the WCS Frame is reset before re-plotting in final individual-pixel
 refit loop (previously the wrong spectral co-ordinate could be
 plotted); and the logic for deciding whether to create or switch WCS
 Frames is disentangled enabling DSBSPECTRUM data to be used.
+
+\end{itemize}
+
+\section{\xlabel{se_changes}Release Notes---V1.3\label{se:changes}}
+
+\subsection{New Commands}
+The following new script has been added:
+
+\begin{description}
+   \item [\htmlref{{\bf pvslice}}{pvslice}] \mbox{}
+     Extracts and displays position-velocity slice from a 
+     (RA,Dec,vel) cube.  The slice need not be parallel to either
+     spatial pixel axis, and it is defined using the graphics 
+     cursor.
+\end{description}
+
+\subsection{Modified Commands}
+The following applications have been modified:
+
+\begin{itemize}
+
+\item Internal script {\bf checkndf}---used in all of the public
+scripts---now has a {\tt -q} option to prevent the reporting of the
+filename and its vital statistics.  It has also has an improved 
+NDF-validation method, which allows for NDFs within a container file or NDF
+extension. 
 
 \end{itemize}
 
