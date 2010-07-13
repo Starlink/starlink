@@ -20,9 +20,13 @@
 #     If either fails, the script is exited with an error report.
 #
 #     The name of the file and its vital statistics: dimensionality,
-#     shape, bounds, and total number of pixels are reported.
+#     shape, bounds, and total number of pixels are reported, unless
+#     the -q option is present.
 #
 #  Parameters:
+#     -q
+#       If present it disables the reporting the file name and its
+#       statistics.
 #     -s script
 #       The name of the calling script.  This name in uppercase without
 #       any path or file extension is used in error reports.  [""]
@@ -55,10 +59,15 @@
 #  History:
 #     2006 March 9 (MJC):
 #       Original version.
+#     2010 July 13 (MJC):
+#       Added -q option.  Use DSB's method involving  NDFTRACE to validate
+#       the input NDF.
 #     {enter_further_changes_here}
 #
 #  Copyright:
 #     Copyright (C) 2006 Central Laboratory of the Research Councils
+#     Copyright (C) 2010 Science and Technology Facilities Council.
+#     All Rights Reserved.
 #-
 
 # Preliminaries
@@ -66,10 +75,16 @@
 
 # Get command-line options.
 set cn_script = ""
+set quiet = "FALSE"
 
 set args = ($argv[1-])
 while ( $#args > 0 )
    switch ($args[1])
+   case -q:    # supress reporting
+      set quiet = "TRUE"
+      shift args
+      breaksw
+ 
    case -s:    # calling script name
       shift args
 
@@ -77,6 +92,7 @@ while ( $#args > 0 )
       set cn_script = `echo $args[1]:r:t | awk '{print toupper($0)"_"}'`
       shift args
       breaksw
+
    case *:     # rubbish disposal
       shift args
       breaksw
@@ -133,14 +149,16 @@ endif
 set cn_bounds = "${cn_lbnd[1]}:${cn_ubnd[1]}, ${cn_lbnd[2]}:${cn_ubnd[2]}, ${cn_lbnd[3]}:${cn_ubnd[3]}"
 @ pixnum = $dims[1] * $dims[2] * $dims[3]
 
-echo " "
-echo "      Input NDF:"
-echo "        File: ${infile}.sdf"
+if ( $quiet == "FALSE" ) then
+   echo " "
+   echo "      Input NDF:"
+   echo "        File: ${infile}.sdf"
 
-echo "      Shape:"
-echo "        No. of dimensions: ${cn_ndim}"
-echo "        Dimension size(s): ${dims[1]} x ${dims[2]} x ${dims[3]}"
-echo "        Pixel bounds     : ${cn_bounds}"
-echo "        Total pixels     : $pixnum"
+   echo "      Shape:"
+   echo "        No. of dimensions: ${cn_ndim}"
+   echo "        Dimension size(s): ${dims[1]} x ${dims[2]} x ${dims[3]}"
+   echo "        Pixel bounds     : ${cn_bounds}"
+   echo "        Total pixels     : $pixnum"
+endif
 
 exit
