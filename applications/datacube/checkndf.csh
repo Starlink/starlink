@@ -123,18 +123,20 @@ set ndf_section = `echo $infile | \
 # extension being supplied in the name.
 set infile = ${cn_name:r}
 
-# Check that it exists.
-if ( ! -e ${infile}.sdf ) then
-   echo "${cn_script}ERR: ${infile}.sdf does not exist."
+# Check the supplied NDF exists (it may be an NDF inside another NDF so
+# we cannot just check that the .sdf file exists).
+$KAPPA_DIR/ndftrace ${infile} | grep \!\! > /dev/null
+if ( $status == 0 ) then
+   echo "${cn_script}ERR: ${infile} does not exist."
    exit 1
 endif
 
 # Check that it is a cube.
-ndftrace ${infile}${ndf_section} >& /dev/null
-set cn_ndim = `parget ndim ndftrace`
-set dims = `parget dims ndftrace`
-set cn_lbnd = `parget lbound ndftrace`
-set cn_ubnd = `parget ubound ndftrace`
+$KAPPA_DIR/ndftrace ${infile}${ndf_section} >& /dev/null
+set cn_ndim = `$KAPPA_DIR/parget ndim ndftrace`
+set dims = `$KAPPA_DIR/parget dims ndftrace`
+set cn_lbnd = `$KAPPA_DIR/parget lbound ndftrace`
+set cn_ubnd = `$KAPPA_DIR/parget ubound ndftrace`
 
 if ( $cn_ndim != 3 ) then
    echo "${cn_script}ERR: ${infile}.sdf is not a datacube."
