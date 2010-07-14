@@ -25,7 +25,10 @@
 %        Updated metadata, set version to 0.5, removed .eps from filenames
 %     2010-01-18 (EC):
 %        Update examples, add Douglas Scott as author, prepare in general
-%        for this version 1.0 release coinciding with shared risk observing
+%        for this version 1.0 release coinciding with shared risk
+%        observing
+%    2010-07-13 (TJ):
+%        New sc2clean interface.
 %     {Add further history here}
 %
 % -
@@ -52,12 +55,13 @@
 \newcommand{\stardocinitials}  {SC}
 \newcommand{\stardocsource}    {sc\stardocnumber}
 \newcommand{\stardoccopyright}
-{Copyright \copyright\ 2009 University of British Columbia}
-\newcommand{\stardocnumber}    {19.2}
+{Copyright \copyright\ 2009-2010 University of British Columbia \\
+ Copyright \copyright\ 2009-2010 Science \& Technology Facilities Council}
+\newcommand{\stardocnumber}    {19.3}
 \newcommand{\stardocauthors}   {Edward Chapin, Douglas Scott \& Tim Jenness}
-\newcommand{\stardocdate}      {18 January 2010}
+\newcommand{\stardocdate}      {1 August 2010}
 \newcommand{\stardoctitle}     {The SMURF SCUBA-2 Data Analysis Cookbook}
-\newcommand{\stardocversion}   {1.0}
+\newcommand{\stardocversion}   {1.1}
 \newcommand{\stardocmanual}    {\ }
 \newcommand{\stardocabstract}  {
 
@@ -640,7 +644,7 @@ operation. For example,
 
 \begin{myquote}
 \begin{verbatim}
-% sc2concat 's4a20091214_00015_000*.sdf' '*_con'
+% sc2concat 's4a20091214_00015_000*.sdf' './*_con'
 \end{verbatim}
 \end{myquote}
 
@@ -770,7 +774,7 @@ concatenated data by re-gridding it into a pixelated map:
 
 \begin{myquote}
 \begin{verbatim}
-% s4a20091214_00015_0002_con.sdf uranus method=rebin
+% makemap s4a20091214_00015_0002_con.sdf uranus method=rebin
 \end{verbatim}
 \end{myquote}
 
@@ -813,7 +817,8 @@ detector time stream, storing the cleaned data in a file called
 
 \begin{myquote}
 \begin{verbatim}
-% sc2clean s4a20091214_00015_0002_con.sdf clean order=0
+% sc2clean s4a20091214_00015_0002_con.sdf clean \
+     config="order=0"
 \end{verbatim}
 \end{myquote}
 
@@ -843,18 +848,14 @@ be identified and repaired using some extra parameters to \clean:
 
 \begin{myquote}
 \begin{verbatim}
-% sc2clean s4a20091214_00015_0002_con.sdf clean2 order=0 dcbox=50 \
-dcthresh=200 dcflagall fillgaps
+% sc2clean s4a20091214_00015_0002_con.sdf clean2 \
+   config='"order=0,dcfitbox=400,dcthresh=5,fillgaps=1"'
 \end{verbatim}
 \end{myquote}
 
 The parameters starting with `dc' indicate that \clean\ should look
 for steps in the data in excess of 200-$\sigma$ comparing two
-consecutive boxcar averages of length 50 samples. `dcflagall'
-indicates that {\em all} the detectors will have steps repaired at
-that time slice when a step is found in {\em any individual} bolometer
-(since there is significant crosstalk and large steps tend to be
-correlated with small steps in many other detectors). Finally,
+consecutive boxcar averages of length 50 samples.  Finally,
 `fillgaps' indicates that the data range around the identified steps
 ($\pm 50$ samples in this case) should be replaced with a constrained
 (smooth) realization of noise to avoid introducing spikes into the
@@ -871,6 +872,20 @@ Fig.~\ref{fig:map_dc_mean}.
 \label{fig:map_dc_mean}
 \end{center}
 \end{figure}
+
+The command line can get long, so it is also possible to write the
+configuration parameters into a text file and specify the text file
+for CONFIG using the standard group notation:
+
+\begin{myquote}
+\begin{verbatim}
+% sc2clean s4a20091214_00015_0002_con.sdf clean2 \
+   config=^myconfig.lis
+\end{verbatim}
+\end{myquote}
+
+An example config file containing the default values for each item
+can be found in \verb|${SMURF_DIR}/smurf_sc2clean.def|.
 
 \subsubsection{\xlabel{movie}Watching a movie}
 
@@ -921,7 +936,7 @@ single large file.
 
 \begin{myquote}
 \begin{verbatim}
-% sc2concat sc2concat 's4a20091214_00015_000?.sdf' '*_con2' padstart=1000 \
+% sc2concat 's4a20091214_00015_000?.sdf' './*_con2' padstart=1000 \
 padend=1000
 
 Out of 2 input files, 0 were darks and 2 were not darks
@@ -929,13 +944,27 @@ Processing data from instrument 'SCUBA-2' for object 'URANUS' from the
 following observation  :
   20091214 #15 scan
 
-% sc2clean s4a20091214_00015_0002_con2.sdf clean3 order=0 dcbox=50 \
-dcthresh=200 dcflagall fillgaps apod=1000 filt_edgehigh=0.5
+% sc2clean s4a20091214_00015_0002_con2.sdf clean3 \
+   config=^${STARLINK_DIR}/share/smurf/sc19_clean3.lis
 
 Processing data from instrument 'SCUBA-2' for object 'URANUS' from the
 following observation  :
   20091214 #15 scan
 
+\end{verbatim}
+\end{myquote}
+
+where the text file contains the following configuration options:
+
+\begin{myquote}
+\begin{verbatim}
+order=0
+dcfitbox=400
+dcthresh=5
+dcmedianwidth=40
+fillgaps=1
+apod=1000
+filt_edgehigh=0.5
 \end{verbatim}
 \end{myquote}
 
@@ -963,8 +992,8 @@ following commands:
 \begin{myquote}
 \begin{verbatim}
 
-% sc2clean s4a20091214_00015_0002_con2 clean4 order=0 dcbox=50 \
-dcthresh=200 dcflagall fillgaps apod=1000
+% sc2clean s4a20091214_00015_0002_con2 clean4 \
+   config='"^${STARLINK_DIR}/share/smurf/sc19_clean3.lis,filt_edgehigh=0"'
 
 Processing data from instrument 'SCUBA-2' for object 'URANUS' from the
 following observation  :
@@ -1041,7 +1070,7 @@ the previous example:
 % kappa
 
 
-     KAPPA commands are now available -- (Version 1.11-11)
+     KAPPA commands are now available -- (Version 1.12-1)
 
      Type kaphelp for help on KAPPA commands.
      Type 'showme sun95' to browse the hypertext documentation.
@@ -1052,37 +1081,43 @@ the previous example:
 
 
 
-% showqual clean4 yes
-  BADSAM          (bit 1) - "Set iff a sample is flagged by the DA" (4416000)
-  BADBOL          (bit 2) - "Set iff all data from bolo to be ignored" (0)
-  SPIKE           (bit 3) - "Set iff a spike is detected" (0)
-  DCJUMP          (bit 4) - "Set iff a DC jump is present" (1024000)
-  PAD             (bit 5) - "Set iff data are padding" (2560000)
-  APOD            (bit 6) - "Set iff data are apodized/boundary" (5120000)
-  STAT            (bit 7) - "Set iff telescope was stationary" (0)
+% showqual clean4 count
+  BADDA           (bit 1) - "Set iff a sample is flagged by the DA" (4416000)
+  BADBOL          (bit 2) - "Set iff all data from bolo to be ignored" (5194000)
+  DCJUMP          (bit 3) - "Set iff a DC jump is present" (25497)
+  PAD             (bit 4) - "Set iff data are padding" (2560000)
+  APOD            (bit 5) - "Set iff data are apodized/boundary" (5120000)
 \end{verbatim}
 \end{myquote}
 
-The `yes' supplied to \showqual\ indicates that the total number of
+The `count' supplied to \showqual\ indicates that the total number of
 occurences of each Quality flag in the data should be counted and
 displayed.  This example shows that 4416000 samples in total were
-flagged `\texttt{BADSAM}' by the data acquisition system. Since each
+flagged `\texttt{BADDA}' by the data acquisition system. Since each
 bolometer produced about 14000 samples (including 2000 for padding),
-this corresponds to 4416000/14000 $\sim$ 315 detectors that were not
-operational (out of 1280). Since there are $40\times32=1280$
-bolometers, and a total of 100 samples are flagged (50 before, and 50
-after) at the locations of DC steps ({\texttt DCJUMP})in {\em all}
-detectors, there are $1024000/(1280*100)=8$ DC steps that were
-identified. Similarly, $1280 \mathrm{bolometers} \times 2000 =
+this corresponds to 4416000/12000 $\sim$ 368 detectors that were not
+operational (out of 1280). Similarly, $1280 \,\mathrm{bolometers} \times 2000 =
 2560000$ samples flagged as padding, {\texttt PAD}. Finally, the
 apodization ({\texttt APOD}) is flagged over the same sample length as
 the padding, but then that same amount again is flagged beyond this
 region to avoid including any ringing in the final map (i.e. $2560000
 \times 2 = 5120000$).
 
-During map-making flagged samples will not be used. However, for
-visualization purposes the \Kappa\ task \qualtobad\ may be used to
-convert samples with given quality bits to a {\em magic\/} or {\em
+During map-making flagged samples will not be used and by default they
+will be hidden from view of all Starlink tools. However, if you wish
+to see the data that was flagged you can use the \Kappa\ task \setbb\
+command to enable a particular flag or turn them all off.
+
+\begin{myquote}
+\begin{verbatim}
+% setbb clean4 0
+\end{verbatim}
+\end{myquote}
+
+will disable quality and make visible all the underlying data.
+
+Additionally, the \Kappa\ task \qualtobad\ may be used to
+permanently convert samples with given quality bits to a {\em magic\/} or {\em
   invalid\/} value. For example:
 
 \begin{myquote}
