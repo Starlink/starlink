@@ -369,6 +369,17 @@ void smurf_sc2clean( int *status ) {
       /* Ensure that the data is ICD ordered before closing */
       smf_dataOrder( ffdata, 1, status );
 
+      /* Report statistics (currently need a smfArray for that) */
+      if (*status == SAI__OK) {
+        smfArray *tmparr = smf_create_smfArray( status );
+        size_t last_qcount[SMF__NQBITS];
+        size_t last_nmap = 0;
+        if (tmparr) tmparr->owndata = 0;  /* someone else owns smfData */
+        smf_addto_smfArray( tmparr, ffdata, status );
+        smf_qualstats_report( MSG__VERB, SMF__QFAM_TSERIES, tmparr, last_qcount,
+                              &last_nmap, 1, NULL, NULL, status );
+        smf_close_related( &tmparr, status );
+      }
     }
 
     /* Free resources for output data */
