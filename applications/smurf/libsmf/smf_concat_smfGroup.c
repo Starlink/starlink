@@ -152,6 +152,8 @@
  *     2010-07-01 (TIMJ):
  *        Fix smfDA logic so that we again copy more than just
  *        the dksquid item.
+ *     2010-07-14 (TIMJ):
+ *        Simplify multi-pass logic
 
  *  Notes:
  *     If projection information supplied, pointing LUT will not be
@@ -253,7 +255,6 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
   dim_t nrow;                   /* Number of rows */
   Grp *outgrp=NULL;             /* Pointer to 1-element output group */
   size_t outgrpsize;            /* Size of outgrp */
-  int pass;                     /* Two passes over list of input files */
   char *pname;                  /* Pointer to input filename */
   smfData *refdata=NULL;        /* Reference smfData */
   smf_dtype refdtype;           /* reference DATA/VARIANCE type */
@@ -333,392 +334,396 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
     /* Two passes over data for the subarray: first time to identify
        dimensions of each file, second time to actually open each file
        and copy into single array. */
-    for( pass=0; pass<2; pass++ ) {
-      /* Loop over subgroups (number of time chunks), continuing only
-         if the chunk is equal to whichchunk */
-      for( j=firstpiece; j<=lastpiece; j++ ) {
-        /* First pass - get dimensions */
-        if( pass == 0 ) {
 
-          smf_open_file( igrp->grp, igrp->subgroups[j][i], "READ",
-                         flags, &refdata, status );
+    /* Loop over subgroups (number of time chunks), continuing only
+       if the chunk is equal to whichchunk */
+    for( j=firstpiece; j<=lastpiece; j++ ) {
+      /* First pass through the data - get dimensions */
 
-          /* Verify that the array is 3-dimensional and compatible with the
-             reference array dimensions. */
-          if( *status == SAI__OK ) {
-            smf_smfFile_msg( refdata->file, "FILE", 1, "<unknown file", status );
+      smf_open_file( igrp->grp, igrp->subgroups[j][i], "READ",
+                     flags, &refdata, status );
 
-            if( refdata->ndims != 3 ) {
-              *status = SAI__ERROR;
-              errRep( "", FUNC_NAME
-                      ": ^FILE does not contain 3-dimensional data!",
-                      status );
-            }
-          }
+      /* Verify that the array is 3-dimensional and compatible with the
+         reference array dimensions. */
+      if( *status == SAI__OK ) {
+        smf_smfFile_msg( refdata->file, "FILE", 1, "<unknown file", status );
 
-          /* If data order is 0 (bolo-ordered) then fail since that case
-             is not currently handled. */
-          if( (*status == SAI__OK) && (refdata->isTordered == 0) ) {
-            *status = SAI__ERROR;
-            errRep( "", FUNC_NAME
-                    ": ^FILE contains bolo-ordered data (unsupported)",
-                    status);
-          }
-
-          /* Get data dimensions */
-          smf_get_dims( refdata, &nrow, &ncol,
-                        NULL, &reftlen, NULL, NULL, NULL, status );
-
-          if( *status == SAI__OK ) {
-            if( j == firstpiece ) {
-              /* If this is the first chunk we will use it for refdims
-                 - check the number of bolometers! */
-              refnrow = nrow;
-              refncol = ncol;
-
-              /* Check for DATA/VARIANCE/QUALITY and data type */
-              for( k=0; k<2; k++ ) {
-                havearray[k] = (refdata->pntr[k] != NULL);
-              }
-              havequal = ( refdata->qual != NULL );
-
-              /* Concatenated data is always double precision */
-              refdtype = SMF__DOUBLE;
-              refdtypestr = smf_dtype_string(refdata, status);
-
-            } else {
-              /* Check these dims against refdims */
-              if( (nrow != refnrow) || (ncol != refncol) ) {
-                *status = SAI__ERROR;
-                msgSeti( "XREF", refnrow );
-                msgSeti( "YREF", refncol );
-                msgSeti( "X", nrow );
-                msgSeti( "Y", ncol );
-                errRep( "", FUNC_NAME ": Detector dimensions (^X,^Y) in "
-                        "^FILE do not match reference (^XREF,^YREF)", status );
-              }
-
-              /* Check existence of DATA/QUALITY/VARIANCE */
-              if( (refdata->pntr[0] != NULL) != havearray[0] ) {
-                *status = SAI__ERROR;
-                if( havearray[0] ) msgSetc( "FLAG", "is missing" );
-                else msgSetc( "FLAG", "has extra" );
-                errRep( "", FUNC_NAME ": ^FILE ^FLAG component DATA", status );
-              }
-
-              if( (refdata->pntr[1] != NULL) != havearray[1] ) {
-                *status = SAI__ERROR;
-                if( havearray[1] ) msgSetc( "FLAG", "is missing" );
-                else msgSetc( "FLAG", "has extra" );
-                errRep( "", FUNC_NAME
-                        ": ^FILE ^FLAG component VARIANCE", status );
-              }
-
-              if( (refdata->qual != NULL) != havequal ) {
-                *status = SAI__ERROR;
-                if( havequal ) msgSetc( "FLAG", "is missing" );
-                else msgSetc( "FLAG", "has extra" );
-                errRep( "", FUNC_NAME
-                        ": ^FILE ^FLAG component QUALITY", status );
-              }
-            }
-          }
-
-          if( *status == SAI__OK ) {
-            /* At this stage increment tlen for this chunk */
-            tlen += reftlen;
-          }
-
-          /* Close the reference file */
-          smf_close_file( &refdata, status );
+        if( refdata->ndims != 3 ) {
+          *status = SAI__ERROR;
+          errRep( "", FUNC_NAME
+                  ": ^FILE does not contain 3-dimensional data!",
+                  status );
         }
+      }
 
-        /* Second pass copy data over to new array */
-        if( (pass == 1) && (*status == SAI__OK) ) {
-          /* Open the file corresponding to this chunk. Data may
-             require flat-fielding. */
-          if (ensureflat) {
+      /* If data order is 0 (bolo-ordered) then fail since that case
+         is not currently handled. */
+      if( (*status == SAI__OK) && (refdata->isTordered == 0) ) {
+        *status = SAI__ERROR;
+        errRep( "", FUNC_NAME
+                ": ^FILE contains bolo-ordered data (unsupported)",
+                status);
+      }
+
+      /* Get data dimensions */
+      smf_get_dims( refdata, &nrow, &ncol,
+                    NULL, &reftlen, NULL, NULL, NULL, status );
+
+      if( *status == SAI__OK ) {
+        if( j == firstpiece ) {
+          /* If this is the first chunk we will use it for refdims
+             - check the number of bolometers! */
+          refnrow = nrow;
+          refncol = ncol;
+
+          /* Check for DATA/VARIANCE/QUALITY and data type */
+          for( k=0; k<2; k++ ) {
+            havearray[k] = (refdata->pntr[k] != NULL);
+          }
+          havequal = ( refdata->qual != NULL );
+
+          /* Concatenated data is always double precision */
+          refdtype = SMF__DOUBLE;
+          refdtypestr = smf_dtype_string(refdata, status);
+
+        } else {
+          /* Check these dims against refdims */
+          if( (nrow != refnrow) || (ncol != refncol) ) {
+            *status = SAI__ERROR;
+            msgSeti( "XREF", refnrow );
+            msgSeti( "YREF", refncol );
+            msgSeti( "X", nrow );
+            msgSeti( "Y", ncol );
+            errRep( "", FUNC_NAME ": Detector dimensions (^X,^Y) in "
+                    "^FILE do not match reference (^XREF,^YREF)", status );
+          }
+
+          /* Check existence of DATA/QUALITY/VARIANCE */
+          if( (refdata->pntr[0] != NULL) != havearray[0] ) {
+            *status = SAI__ERROR;
+            if( havearray[0] ) msgSetc( "FLAG", "is missing" );
+            else msgSetc( "FLAG", "has extra" );
+            errRep( "", FUNC_NAME ": ^FILE ^FLAG component DATA", status );
+          }
+
+          if( (refdata->pntr[1] != NULL) != havearray[1] ) {
+            *status = SAI__ERROR;
+            if( havearray[1] ) msgSetc( "FLAG", "is missing" );
+            else msgSetc( "FLAG", "has extra" );
+            errRep( "", FUNC_NAME
+                    ": ^FILE ^FLAG component VARIANCE", status );
+          }
+
+          if( (refdata->qual != NULL) != havequal ) {
+            *status = SAI__ERROR;
+            if( havequal ) msgSetc( "FLAG", "is missing" );
+            else msgSetc( "FLAG", "has extra" );
+            errRep( "", FUNC_NAME
+                    ": ^FILE ^FLAG component QUALITY", status );
+          }
+        }
+      }
+
+      if( *status == SAI__OK ) {
+        /* At this stage increment tlen for this chunk */
+        tlen += reftlen;
+      }
+
+      /* Close the reference file */
+      smf_close_file( &refdata, status );
+    }
+
+    /* Loop over subgroups (number of time chunks), continuing only
+       if the chunk is equal to whichchunk */
+    for( j=firstpiece; j<=lastpiece; j++ ) {
+
+      /* Second pass copy data over to new array */
+      if( *status == SAI__OK ) {
+        /* Open the file corresponding to this chunk. Data may
+           require flat-fielding. */
+        if (ensureflat) {
+          smf_open_and_flatfield( igrp->grp, NULL, igrp->subgroups[j][i],
+                                  darks, flatramps, &refdata, status );
+        } else {
+          /* open as raw if raw else just open as whatever we have */
+          smfData * tmpdata = NULL;
+          smf_open_file( igrp->grp, igrp->subgroups[j][i], "READ",
+                         SMF__NOCREATE_DATA, &tmpdata, status );
+          if (tmpdata && tmpdata->file && tmpdata->file->isSc2store) {
+            smf_open_raw_asdouble( igrp->grp, igrp->subgroups[j][i],
+                                   darks, &refdata, status );
+          } else {
             smf_open_and_flatfield( igrp->grp, NULL, igrp->subgroups[j][i],
                                     darks, flatramps, &refdata, status );
-          } else {
-            /* open as raw if raw else just open as whatever we have */
-            smfData * tmpdata = NULL;
-            smf_open_file( igrp->grp, igrp->subgroups[j][i], "READ",
-                           SMF__NOCREATE_DATA, &tmpdata, status );
-            if (tmpdata && tmpdata->file && tmpdata->file->isSc2store) {
-              smf_open_raw_asdouble( igrp->grp, igrp->subgroups[j][i],
-                                     darks, &refdata, status );
-            } else {
-              smf_open_and_flatfield( igrp->grp, NULL, igrp->subgroups[j][i],
-                                      darks, flatramps, &refdata, status );
-            }
-            smf_close_file( &tmpdata, status );
           }
-
-          /* Apply bad bolometer mask */
-          smf_apply_mask( refdata, bbms, SMF__BBM_DATA, 0, status );
-
-          /* Calculate the pointing LUT if requested */
-          if( !(flags & SMF__NOCREATE_LUT) && outfset ) {
-
-            /* Set havelut flag */
-            havelut = 1;
-
-            /* Calculate the LUT for this chunk */
-            smf_calc_mapcoord( wf, refdata, outfset, moving, lbnd_out, ubnd_out,
-                               SMF__NOCREATE_FILE, tstep, status );
-          } else {
-            havelut = 0;
-          }
-
-          /* Get reference dimensions/strides */
-          smf_get_dims( refdata, NULL, NULL, &nbolo, &reftlen, &refndata,
-                        &rbstr, &rtstr, status );
-
-          if( *status == SAI__OK ) {
-            /* If first chunk initialize the concatenated array */
-            if( j == firstpiece ) {
-
-              /* Copy first data right after the initial padding */
-              tchunk = padStart;
-
-              /* Allocate memory for empty smfData with a smfHead. Create
-                 a DA struct only if the input file has one. Create it as
-                 a clone rather than creating an empty smfDa. */
-              data = smf_create_smfData( SMF__NOCREATE_DA, status );
-              if (refdata->da && data) {
-                /* do not copy dark squids. We do that below */
-                data->da = smf_deepcopy_smfDA( refdata, 0, status );
-                da = data->da;
-              }
-
-              if (refdata->history) data->history = astCopy( refdata->history );
-
-              if( *status == SAI__OK ) {
-                data->qfamily = refdata->qfamily;
-                /* Copy over basic header information from the reference */
-                hdr = data->hdr;
-                refhdr = refdata->hdr;
-                hdr->instrument = refhdr->instrument;
-                hdr->steptime = refhdr->steptime;
-                hdr->obsmode = refhdr->obsmode;
-                hdr->obstype = refhdr->obstype;
-                hdr->swmode = refhdr->swmode;
-                smf_set_clabels( refhdr->title, refhdr->dlabel,
-                             refhdr->units, hdr, status );
-
-                switch ( hdr->instrument ) {
-                case INST__AZTEC:
-                  aztec_fill_smfHead( hdr, NDF__NOID, status );
-                  break;
-                default:
-                  break;
-                  /* SCUBA-2 has nothing special here because the focal plane
-                     coordinates are derived using an AST polyMap */
-                }
-
-                /* Copy over the name of the first file in
-                   subarray. Use a grpex to strip off the path, and
-                   then add the suffix "_con.dimm" to denote concatenated
-                   iterative map-maker data */
-
-                ingrp = grpNew( "GRP", status );
-                outgrp = grpNew( "GRP", status );
-
-                ndgCpsup( igrp->grp, igrp->subgroups[j][i], ingrp, status );
-                ndgCrexp( "./*_con" SMF__DIMM_SUFFIX "|.sdf||", ingrp, &outgrp,
-                          &outgrpsize, &flag, status );
-
-                pname = filename;
-                grpGet( outgrp, 1, 1, &pname, SMF_PATH_MAX, status);
-
-                grpDelet( &ingrp, status );
-                grpDelet( &outgrp, status );
-
-                one_strlcpy( data->file->name, filename,
-                             sizeof(data->file->name), status );
-
-                /* Allocate space for the concatenated allState */
-                hdr->nframes = tlen;
-                hdr->allState = astCalloc( tlen, sizeof(*(hdr->allState)), 1 );
-
-                /* Allocate space in the smfData for DATA/VARAIANCE/QUALITY */
-                if( isTordered ) {
-                  data->dims[SC2STORE__COL_INDEX] = refncol;
-                  data->dims[SC2STORE__ROW_INDEX] = refnrow;
-                  data->dims[2] = tlen;
-                  ncol = data->dims[SC2STORE__COL_INDEX];
-
-                  /* lbounds in the concatenated data match the reference */
-                  for (k = 0; k < 3; k++) {
-                    (data->lbnd)[k] = (refdata->lbnd)[k];
-                  }
-                } else {
-                  data->dims[0] = tlen;
-                  data->dims[SC2STORE__ROW_INDEX+1] = refnrow;
-                  data->dims[SC2STORE__COL_INDEX+1] = refncol;
-                  ncol = data->dims[1+SC2STORE__COL_INDEX];
-
-                  /* lbounds must be altered if bolo-ordered concatenated data*/
-                  data->lbnd[0] = refdata->lbnd[2];
-                  data->lbnd[1] = refdata->lbnd[0];
-                  data->lbnd[2] = refdata->lbnd[1];
-                }
-                data->ndims = 3;
-
-                /* Set the data type and order */
-                data->dtype = refdtype;
-                data->isTordered = isTordered;
-                ndata = nbolo*tlen;
-
-                /* get the strides */
-                smf_get_dims( data, NULL, NULL, NULL, NULL, NULL,
-                              &bstr, &tstr, status );
-
-                /* Allocate space for enlarged dksquid array. */
-                if( da && refdata->da && refdata->da->dksquid ) {
-                  da->dksquid = smf_create_smfData(SMF__NOCREATE_FILE |
-                                                   SMF__NOCREATE_HEAD |
-                                                   SMF__NOCREATE_DA, status );
-
-                  /* Dimensions */
-                   da->dksquid->dtype = SMF__DOUBLE;
-                   da->dksquid->isTordered = 1;
-                   da->dksquid->ndims = 3;
-
-                   da->dksquid->dims[0] = ncol;
-                   da->dksquid->dims[1] = 1;
-                   da->dksquid->dims[2] = tlen;
-                   da->dksquid->lbnd[0] = 0;
-                   da->dksquid->lbnd[1] = 0;
-                   da->dksquid->lbnd[2] = 1;
-
-                  da->dksquid->pntr[0] = astCalloc(ncol*tlen,
-                                                   smf_dtype_size(da->dksquid,
-                                                                  status), 1 );
-
-                  /* QUALITY too if requested */
-                  if( !(flags&SMF__NOCREATE_QUALITY) ) {
-                    da->dksquid->qfamily = refdata->da->dksquid->qfamily;
-                    da->dksquid->qual = astCalloc(ncol*tlen, sizeof(*(da->dksquid->qual)), 1);
-                    if( *status == SAI__OK ) {
-                      memset( da->dksquid->qual, 0,
-                              ncol*tlen*sizeof(*(da->dksquid->qual)) );
-                    }
-                  }
-
-                }
-
-                /* Un-set havearray values corresponding to flags */
-                havearray[0] = havearray[0] && !(flags&SMF__NOCREATE_DATA);
-                havearray[1] = havearray[1] && !(flags&SMF__NOCREATE_VARIANCE);
-                havequal = havequal && !(flags&SMF__NOCREATE_QUALITY);
-
-                /* Allocate space for arrays being propagated from template */
-                for( k=0; k<2; k++ ) if( havearray[k] ) {
-                    size_t sz = smf_dtype_sz(data->dtype, status );
-                    data->pntr[k] = astCalloc( ndata, sz, 1 );
-                  }
-                if (havequal) data->qual = astCalloc( ndata, sizeof(*(data->qual)), 1 );
-
-                /* Check to see if havearray for QUALITY is not set,
-                   but SMF__NOCREATE_QUALITY is also not set. In this
-                   case, allocate a fresh QUALITY component that will
-                   not require propagation from the template */
-                if( !havequal && !(flags & SMF__NOCREATE_QUALITY) ) {
-                  data->qual = astCalloc(ndata, sizeof(*(data->qual)), 1);
-                }
-
-                /* Allocate space for the pointing LUT if needed */
-                if( havelut ) {
-                  data->lut = astCalloc(ndata, sizeof(*(data->lut)), 1 );
-                }
-
-                /* Copy over the FITS header */
-                if( (*status == SAI__OK) && (refhdr->fitshdr) ) {
-                  hdr->fitshdr = astCopy( refhdr->fitshdr );
-                }
-
-                /* Copy over the TSWCS */
-                if( (*status == SAI__OK) && (refhdr->tswcs) ) {
-                  hdr->tswcs = astCopy( refhdr->tswcs );
-                }
-              }
-            }
-
-            /* Copy DATA/QUALITY/VARIANCE and JCMTstate information into
-               concatenated smfData */
-            if( *status == SAI__OK ) {
-              /* Copy over JCMTstate */
-              hdr = data->hdr;
-              refhdr = refdata->hdr;
-
-              memcpy( (void *) &(hdr->allState[tchunk]), refhdr->allState,
-                      reftlen*sizeof(*hdr->allState) );
-
-              /* Copy LUT */
-              if( havelut ) {
-                for( l=0; l<nbolo; l++ ) {
-                  for( m=0; m<reftlen; m++ ) {
-                    data->lut[(tchunk+m)*tstr + l*bstr] =
-                      refdata->lut[m*rtstr + l*rbstr];
-                  }
-                }
-              }
-
-              /* dark squids */
-              if( da && da->dksquid && refdata->da && refdata->da->dksquid) {
-                double *ptr = da->dksquid->pntr[0];
-                smf_qual_t *qptr = da->dksquid->qual;
-
-                ptr += tchunk*ncol;
-                memcpy( ptr, refdata->da->dksquid->pntr[0],
-                        reftlen*ncol*smf_dtype_size(da->dksquid,status));
-
-                if( qptr && refdata->da->dksquid->qual ) {
-                  qptr += tchunk*ncol;
-                  memcpy( qptr, refdata->da->dksquid->qual,
-                          reftlen*ncol*sizeof(*qptr) );
-                }
-              }
-
-              /* Now do DATA/QUALITY/VARIANCE */
-              for( k=0; k<2; k++ ) if( havearray[k] ) {
-                  switch( data->dtype ) {
-                  case SMF__DOUBLE:
-                    for( l=0; l<nbolo; l++ ) {
-                      for( m=0; m<reftlen; m++ ) {
-                        ((double *)data->pntr[k])[(tchunk+m)*tstr + l*bstr] =
-                          ((double *)refdata->pntr[k])[m*rtstr + l*rbstr];
-                      }
-                    }
-                    break;
-                  default:
-                    msgSetc("DTYPE",smf_dtype_string(data, status));
-                    *status = SAI__ERROR;
-                    errRep( "", FUNC_NAME
-                            ": Don't know how to handle ^DTYPE type.", status);
-                  }
-                }
-              /* Quality */
-              if ( havequal ) {
-                for( l=0; l<nbolo; l++ ) {
-                  for( m=0; m<reftlen; m++ ) {
-                    (data->qual)[(tchunk+m)*tstr + l*bstr] =
-                          (refdata->qual)[m*rtstr + l*rbstr];
-                  }
-                }
-              }
-
-              /* increment tchunk */
-              tchunk += reftlen;
-            }
-          }
-          /* Close the file we had open */
-          smf_close_file( &refdata, status );
+          smf_close_file( &tmpdata, status );
         }
 
+        /* Apply bad bolometer mask */
+        smf_apply_mask( refdata, bbms, SMF__BBM_DATA, 0, status );
+
+        /* Calculate the pointing LUT if requested */
+        if( !(flags & SMF__NOCREATE_LUT) && outfset ) {
+
+          /* Set havelut flag */
+          havelut = 1;
+
+          /* Calculate the LUT for this chunk */
+          smf_calc_mapcoord( wf, refdata, outfset, moving, lbnd_out, ubnd_out,
+                             SMF__NOCREATE_FILE, tstep, status );
+        } else {
+          havelut = 0;
+        }
+
+        /* Get reference dimensions/strides */
+        smf_get_dims( refdata, NULL, NULL, &nbolo, &reftlen, &refndata,
+                      &rbstr, &rtstr, status );
+
+        if( *status == SAI__OK ) {
+          /* If first chunk initialize the concatenated array */
+          if( j == firstpiece ) {
+
+            /* Copy first data right after the initial padding */
+            tchunk = padStart;
+
+            /* Allocate memory for empty smfData with a smfHead. Create
+               a DA struct only if the input file has one. Create it as
+               a clone rather than creating an empty smfDa. */
+            data = smf_create_smfData( SMF__NOCREATE_DA, status );
+            if (refdata->da && data) {
+              /* do not copy dark squids. We do that below */
+              data->da = smf_deepcopy_smfDA( refdata, 0, status );
+              da = data->da;
+            }
+
+            if (refdata->history) data->history = astCopy( refdata->history );
+
+            if( *status == SAI__OK ) {
+              data->qfamily = refdata->qfamily;
+              /* Copy over basic header information from the reference */
+              hdr = data->hdr;
+              refhdr = refdata->hdr;
+              hdr->instrument = refhdr->instrument;
+              hdr->steptime = refhdr->steptime;
+              hdr->obsmode = refhdr->obsmode;
+              hdr->obstype = refhdr->obstype;
+              hdr->swmode = refhdr->swmode;
+              smf_set_clabels( refhdr->title, refhdr->dlabel,
+                               refhdr->units, hdr, status );
+
+              switch ( hdr->instrument ) {
+              case INST__AZTEC:
+                aztec_fill_smfHead( hdr, NDF__NOID, status );
+                break;
+              default:
+                break;
+                /* SCUBA-2 has nothing special here because the focal plane
+                   coordinates are derived using an AST polyMap */
+              }
+
+              /* Copy over the name of the first file in
+                 subarray. Use a grpex to strip off the path, and
+                 then add the suffix "_con.dimm" to denote concatenated
+                 iterative map-maker data */
+
+              ingrp = grpNew( "GRP", status );
+              outgrp = grpNew( "GRP", status );
+
+              ndgCpsup( igrp->grp, igrp->subgroups[j][i], ingrp, status );
+              ndgCrexp( "./*_con" SMF__DIMM_SUFFIX "|.sdf||", ingrp, &outgrp,
+                        &outgrpsize, &flag, status );
+
+              pname = filename;
+              grpGet( outgrp, 1, 1, &pname, SMF_PATH_MAX, status);
+
+              grpDelet( &ingrp, status );
+              grpDelet( &outgrp, status );
+
+              one_strlcpy( data->file->name, filename,
+                           sizeof(data->file->name), status );
+
+              /* Allocate space for the concatenated allState */
+              hdr->nframes = tlen;
+              hdr->allState = astCalloc( tlen, sizeof(*(hdr->allState)), 1 );
+
+              /* Allocate space in the smfData for DATA/VARAIANCE/QUALITY */
+              if( isTordered ) {
+                data->dims[SC2STORE__COL_INDEX] = refncol;
+                data->dims[SC2STORE__ROW_INDEX] = refnrow;
+                data->dims[2] = tlen;
+                ncol = data->dims[SC2STORE__COL_INDEX];
+
+                /* lbounds in the concatenated data match the reference */
+                for (k = 0; k < 3; k++) {
+                  (data->lbnd)[k] = (refdata->lbnd)[k];
+                }
+              } else {
+                data->dims[0] = tlen;
+                data->dims[SC2STORE__ROW_INDEX+1] = refnrow;
+                data->dims[SC2STORE__COL_INDEX+1] = refncol;
+                ncol = data->dims[1+SC2STORE__COL_INDEX];
+
+                /* lbounds must be altered if bolo-ordered concatenated data*/
+                data->lbnd[0] = refdata->lbnd[2];
+                data->lbnd[1] = refdata->lbnd[0];
+                data->lbnd[2] = refdata->lbnd[1];
+              }
+              data->ndims = 3;
+
+              /* Set the data type and order */
+              data->dtype = refdtype;
+              data->isTordered = isTordered;
+              ndata = nbolo*tlen;
+
+              /* get the strides */
+              smf_get_dims( data, NULL, NULL, NULL, NULL, NULL,
+                            &bstr, &tstr, status );
+
+              /* Allocate space for enlarged dksquid array. */
+              if( da && refdata->da && refdata->da->dksquid ) {
+                da->dksquid = smf_create_smfData(SMF__NOCREATE_FILE |
+                                                 SMF__NOCREATE_HEAD |
+                                                 SMF__NOCREATE_DA, status );
+
+                /* Dimensions */
+                da->dksquid->dtype = SMF__DOUBLE;
+                da->dksquid->isTordered = 1;
+                da->dksquid->ndims = 3;
+
+                da->dksquid->dims[0] = ncol;
+                da->dksquid->dims[1] = 1;
+                da->dksquid->dims[2] = tlen;
+                da->dksquid->lbnd[0] = 0;
+                da->dksquid->lbnd[1] = 0;
+                da->dksquid->lbnd[2] = 1;
+
+                da->dksquid->pntr[0] = astCalloc(ncol*tlen,
+                                                 smf_dtype_size(da->dksquid,
+                                                                status), 1 );
+
+                /* QUALITY too if requested */
+                if( !(flags&SMF__NOCREATE_QUALITY) ) {
+                  da->dksquid->qfamily = refdata->da->dksquid->qfamily;
+                  da->dksquid->qual = astCalloc(ncol*tlen, sizeof(*(da->dksquid->qual)), 1);
+                  if( *status == SAI__OK ) {
+                    memset( da->dksquid->qual, 0,
+                            ncol*tlen*sizeof(*(da->dksquid->qual)) );
+                  }
+                }
+
+              }
+
+              /* Un-set havearray values corresponding to flags */
+              havearray[0] = havearray[0] && !(flags&SMF__NOCREATE_DATA);
+              havearray[1] = havearray[1] && !(flags&SMF__NOCREATE_VARIANCE);
+              havequal = havequal && !(flags&SMF__NOCREATE_QUALITY);
+
+              printf(" HAVE QUAL 2 = %d\n", havequal );
+              /* Allocate space for arrays being propagated from template */
+              for( k=0; k<2; k++ ) if( havearray[k] ) {
+                  size_t sz = smf_dtype_sz(data->dtype, status );
+                  data->pntr[k] = astCalloc( ndata, sz, 1 );
+                }
+              if (havequal) data->qual = astCalloc( ndata, sizeof(*(data->qual)), 1 );
+
+              /* Check to see if havearray for QUALITY is not set,
+                 but SMF__NOCREATE_QUALITY is also not set. In this
+                 case, allocate a fresh QUALITY component that will
+                 not require propagation from the template */
+              if( !havequal && !(flags & SMF__NOCREATE_QUALITY) ) {
+                data->qual = astCalloc(ndata, sizeof(*(data->qual)), 1);
+              }
+
+              /* Allocate space for the pointing LUT if needed */
+              if( havelut ) {
+                data->lut = astCalloc(ndata, sizeof(*(data->lut)), 1 );
+              }
+
+              /* Copy over the FITS header */
+              if( (*status == SAI__OK) && (refhdr->fitshdr) ) {
+                hdr->fitshdr = astCopy( refhdr->fitshdr );
+              }
+
+              /* Copy over the TSWCS */
+              if( (*status == SAI__OK) && (refhdr->tswcs) ) {
+                hdr->tswcs = astCopy( refhdr->tswcs );
+              }
+            }
+          }
+
+          /* Copy DATA/QUALITY/VARIANCE and JCMTstate information into
+             concatenated smfData */
+          if( *status == SAI__OK ) {
+            /* Copy over JCMTstate */
+            hdr = data->hdr;
+            refhdr = refdata->hdr;
+
+            memcpy( (void *) &(hdr->allState[tchunk]), refhdr->allState,
+                    reftlen*sizeof(*hdr->allState) );
+
+            /* Copy LUT */
+            if( havelut ) {
+              for( l=0; l<nbolo; l++ ) {
+                for( m=0; m<reftlen; m++ ) {
+                  data->lut[(tchunk+m)*tstr + l*bstr] =
+                    refdata->lut[m*rtstr + l*rbstr];
+                }
+              }
+            }
+
+            /* dark squids */
+            if( da && da->dksquid && refdata->da && refdata->da->dksquid) {
+              double *ptr = da->dksquid->pntr[0];
+              smf_qual_t *qptr = da->dksquid->qual;
+
+              ptr += tchunk*ncol;
+              memcpy( ptr, refdata->da->dksquid->pntr[0],
+                      reftlen*ncol*smf_dtype_size(da->dksquid,status));
+
+              if( qptr && refdata->da->dksquid->qual ) {
+                qptr += tchunk*ncol;
+                memcpy( qptr, refdata->da->dksquid->qual,
+                        reftlen*ncol*sizeof(*qptr) );
+              }
+            }
+
+            /* Now do DATA/QUALITY/VARIANCE */
+            for( k=0; k<2; k++ ) if( havearray[k] ) {
+                switch( data->dtype ) {
+                case SMF__DOUBLE:
+                  for( l=0; l<nbolo; l++ ) {
+                    for( m=0; m<reftlen; m++ ) {
+                      ((double *)data->pntr[k])[(tchunk+m)*tstr + l*bstr] =
+                        ((double *)refdata->pntr[k])[m*rtstr + l*rbstr];
+                    }
+                  }
+                  break;
+                default:
+                  msgSetc("DTYPE",smf_dtype_string(data, status));
+                  *status = SAI__ERROR;
+                  errRep( "", FUNC_NAME
+                          ": Don't know how to handle ^DTYPE type.", status);
+                }
+              }
+            /* Quality */
+            if ( havequal ) {
+              printf("I DO HAVE QUALITY DAMNIT\n");
+              for( l=0; l<nbolo; l++ ) {
+                for( m=0; m<reftlen; m++ ) {
+                  (data->qual)[(tchunk+m)*tstr + l*bstr] =
+                    (refdata->qual)[m*rtstr + l*rbstr];
+                }
+              }
+            }
+
+            /* increment tchunk */
+            tchunk += reftlen;
+          }
+        }
+        /* Close the file we had open */
+        smf_close_file( &refdata, status );
       }
+
     }
 
     /* Full subarray is now concatenated. Finish up by filling the padded
@@ -766,7 +771,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
           smf_get_dims( da->dksquid, NULL, NULL, &dnbolo, NULL, NULL, &dbstr,
                         &dtstr, status );
 
-           /* Loop over bolometer (column for dark squids) */
+          /* Loop over bolometer (column for dark squids) */
           for( k=0; k<dnbolo; k++ ) {
             /* SMF__Q_PAD always set */
             smf_qual_t qual = SMF__Q_PAD;
