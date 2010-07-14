@@ -226,7 +226,6 @@
 
 \newcommand{\Coulson}{\htmladdnormallink{Coulson}{http://www.jach.hawaii.edu/JACdocs/JCMT/SCD/SN/003/ }}
 
-
 % +
 %  Name:
 %     sc.tex
@@ -246,6 +245,8 @@
 %     13-AUG-1998 (PWD):
 %        Converted for use with LaTeX2HTML version 98.2 and
 %        Star2HTML version 1.3.
+%      1-FEB-2000 (AJC):
+%        Add Copyright statement in LaTeX
 %     {Add further history here}
 %
 % -
@@ -261,20 +262,16 @@
 \setlength{\parskip}{\medskipamount}
 \setlength{\unitlength}{1mm}
 
-% -------------------------------------------------------------------------
-
-
+% -----------------------------------------------------------------------------
 %  Hypertext definitions.
 %  ======================
-% These are used by the LaTeX2HTML translator in conjunction with
-% star2html.
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
 
 %  Comment.sty: version 2.0, 19 June 1992
 %  Selectively in/exclude pieces of text.
 %
 %  Author
-%    Victor Eijkhout
-%    <eijkhout@cs.utk.edu>
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
 %    Department of Computer Science
 %    University Tennessee at Knoxville
 %    104 Ayres Hall
@@ -320,12 +317,9 @@
 \excludecomment{htmlonly}
 
 %  Hypertext commands etc. This is a condensed version of the html.sty
-%  file supplied with LaTeX2HTML by: Nikos Drakos
-%  <nikos@cbl.leeds.ac.uk> &
-%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML
-%  documentation
-%  should be consulted about all commands (and the environments
-%  defined above)
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
 %  except \xref and \xlabel which are Starlink specific.
 
 \newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
@@ -354,13 +348,10 @@
 %  generally otherwise).
 \renewcommand{\_}{\texttt{\symbol{95}}}
 
-% ------------------------------------------------------------------------
-
-
+% -----------------------------------------------------------------------------
 %  Debugging.
 %  =========
-%  Remove % on the following to debug links in the HTML version using
-%  Latex.
+%  Remove % on the following to debug links in the HTML version using Latex.
 
 % \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
 % \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
@@ -369,14 +360,14 @@
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
 %end{latexonly}
-% -------------------------------------------------------------------------
-
-
+% -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
+
+
+
+
 % ? End of document specific commands
-% -------------------------------------------------------------------------
-
-
+% -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
 \renewcommand{\thepage}{\roman{page}}
@@ -386,9 +377,8 @@
 %  Latex document header.
 %  ======================
 \begin{latexonly}
-   \textsc{University of British Columbia} \hfill {\textbf
-\stardocname}\\
-   {\large  Science \& Technology Facilities Council}\\
+   \textsc{University of British Columbia} \hfill \textbf{\stardocname}\\
+   {\large Science \& Technology Facilities Council}\\
    {\large Starlink Project\\}
    {\large \stardoccategory\ \stardocnumber}
    \begin{flushright}
@@ -399,11 +389,11 @@
    \rule{\textwidth}{0.5mm}
    \vspace{5mm}
    \begin{center}
-   {\Huge\textbf  \stardoctitle \\ [2.5ex]}
-   {\LARGE\textbf \stardocversion \\ [4ex]}
-   {\Huge\textbf  \stardocmanual}
+   {\Huge\textbf{\stardoctitle \\ [2.5ex]}}
+   {\LARGE\textbf{\stardocversion \\ [4ex]}}
+   {\Huge\textbf{\stardocmanual}}
    \end{center}
-%   \vspace{5mm}
+   \vspace{5mm}
 
 % ? Add picture here if required for the LaTeX version.
 %   e.g. \includegraphics[scale=0.3]{filename.ps}
@@ -413,10 +403,10 @@
 % ? End of picture
 
 % ? Heading for abstract if used.
-%   \vspace{10mm}
-%   \begin{center}
-%      {\Large\textbf Abstract}
-%   \end{center}
+   \vspace{10mm}
+   \begin{center}
+      {\Large\textbf{Abstract}}
+   \end{center}
 % ? End of heading for abstract.
 \end{latexonly}
 
@@ -424,7 +414,7 @@
 %  ==========================
 \begin{htmlonly}
    \xlabel{}
-   \begin{rawhtml} <H1 ALIGN=CENTER> \end{rawhtml}
+   \begin{rawhtml} <H1> \end{rawhtml}
       \stardoctitle\\
       \stardocversion\\
       \stardocmanual
@@ -440,12 +430,10 @@
    \stardocauthors \\
    \stardocdate
    \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research
-Council}
-                        {http://www.pparc.ac.uk} \\
+      \htmladdnormallink{University of British Columbia}
+                        {http://www.ubc.ca} \\
+      \htmladdnormallink{Science \& Technology Facilities Council}
+                        {http://www.scitech.ac.uk} \\
    \begin{rawhtml} </H3> <H2> \end{rawhtml}
       \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
    \begin{rawhtml} </H2> \end{rawhtml}
@@ -454,9 +442,8 @@ Council}
 
 %  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to
-%  this point in the document (this should always go before the
-%  abstract \section).
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
   \begin{rawhtml}
     <HR>
@@ -466,20 +453,27 @@ Council}
         {stardoccontents}}
 
 % ? New section for abstract if used.
-%  \section{\xlabel{abstract}Abstract}
+  \section{\xlabel{abstract}Abstract}
 % ? End of new section for abstract
 \end{htmlonly}
 
-% ------------------------------------------------------------------------
-
-
+% -----------------------------------------------------------------------------
 % ? Document Abstract. (if used)
 %  ==================
 \stardocabstract
 % ? End of document abstract
-% ------------------------------------------------------------------------
 
+% -----------------------------------------------------------------------------
+% ? Latex Copyright Statement
+%  =========================
+\begin{latexonly}
+\newpage
+\vspace*{\fill}
+\stardoccopyright
+\end{latexonly}
+% ? End of Latex copyright statement
 
+% -----------------------------------------------------------------------------
 % ? Latex document Table of Contents (if used).
 %  ===========================================
   \newpage
@@ -490,13 +484,11 @@ Council}
     \markboth{\stardocname}{\stardocname}
   \end{latexonly}
 % ? End of Latex document table of contents
-% -------------------------------------------------------------------------
-
+% -----------------------------------------------------------------------------
 
 \cleardoublepage
 \renewcommand{\thepage}{\arabic{page}}
 \setcounter{page}{1}
-
 
 \section{\xlabel{introduction}Introduction}
 
