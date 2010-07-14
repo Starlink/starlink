@@ -208,6 +208,11 @@
 *        NINT now defined in smf.h
 *     18-DEC-2008 (TIMJ):
 *        Use smf_makefitschan
+*     14-JUL-2010 (DSB):
+*        Changed specbounds values to be the spectral values at the outer
+*        edges of the first and last channel, rather than the values at
+*        the channel centres. This makes it consistent with the values
+*        written to the FLBND and FUBND parameters.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -872,9 +877,13 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    }
 
 /* See if the user wants to restrict the spectral range of the output cube.
-   First get the bounds of the full frequency axis. */
-   ispecbounds[ 0 ] = dlbnd[ 2 ];
-   ispecbounds[ 1 ] = dubnd[ 2 ];
+   First get the bounds of the full frequency axis. Note, the specbounds
+   values suppleid by the user are the spectral values at the outer edges
+   of the first and last channel, not the centre of the channels. This is
+   done so that the values written to output parameters FLBND/FUBND can be
+   supplied directly as values for SPECBOUNDS.  */
+   ispecbounds[ 0 ] = dlbnd[ 2 ] - 0.5;
+   ispecbounds[ 1 ] = dubnd[ 2 ] + 0.5;
    astTran1( ospecmap, 2, ispecbounds, 0, specbounds );
 
 /* Now allow the user to provide alternative values. The above values are
@@ -890,6 +899,10 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
       ispecbounds[ 0 ] = ispecbounds[ 1 ];
       ispecbounds[ 1 ] = temp;
    }
+
+/* Correct back to the centre of the first and last channel. */
+   ispecbounds[ 0 ] += 0.5;
+   ispecbounds[ 1 ] -= 0.5;
 
 /* Check the specified spectral bounds have some overlap with the available
    spectral range. */

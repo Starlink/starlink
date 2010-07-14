@@ -201,7 +201,8 @@
 *          units will be in the same units as the input frameset
 *          (matching those used in the SPECBOUNDS parameter). The
 *          parameter is named to be consistent with KAPPA:NDFTRACE
-*          output.
+*          output. Note, the stored values correspond to the outer edges
+*          of the first pixel, not to the pixel centre.
 *     FUBND( ) = _DOUBLE (Write)
 *          The upper bounds of the bounding box enclosing the output
 *          cube in the selected output WCS Frame. The values are
@@ -210,7 +211,8 @@
 *          units will be in the same units of the input frameset
 *          (matching those used in the SPECBOUNDS parameter). The
 *          parameter is named to be consistent with KAPPA:NDFTRACE
-*          output.
+*          output. Note, the stored values correspond to the outer edges
+*          of the first pixel, not to the pixel centre.
 *     FTL( ) = _DOUBLE (Write)
 *          Sky co-ordinates (radians) of the top left corner of the
 *          output cube (the corner with the smallest PIXEL dimension
@@ -403,7 +405,7 @@
 *          each input spectrum is given an associated index, starting from 1,
 *          and the spectrum with index "I" is stored at pixel position (I,1)
 *          in the output cube (pixel Axis 2 will always have the value 1 --
-*          that is, Axis 2 is a degenerate axis that spans only a single 
+*          that is, Axis 2 is a degenerate axis that spans only a single
 *          pixel).
 *
 *          In both cases, the third pixel axis in the output cube
@@ -434,14 +436,15 @@
 *          the output cube. The supplied parameter value should be a
 *          string containing a pair of axis values separated by white space
 *          or commas. The first should be the spectral value corresponding to
-*          lower pixel bound in the output cube, and the second should be
-*          the spectral value corresponding to upper pixel bound in the
-*          output cube. The supplied values should refer to the spectral
-*          system described by the WCS FrameSet of the first input NDF. To
-*          see what this is, supply a single colon (":") for the parameter
-*          value. This will display a description of the required spectral
-*          co-ordinate system, and then re-prompt for a new parameter value.
-*          The dynamic default is determined by the SPECUNION parameter. []
+*          the lower edge of the first spectral channel in the output cube, and
+*          the second should be the spectral value corresponding to the upper
+*          edge of the last spectral channel. The supplied values should refer
+*          to the spectral system described by the WCS FrameSet of the first
+*          input NDF. To see what this is, supply a single colon (":") for the
+*          parameter value. This will display a description of the required
+*          spectral co-ordinate system, and then re-prompt for a new parameter
+*          value. The dynamic default is determined by the SPECUNION
+*          parameter. []
 *     SPECUNION = _LOGICAL (Read)
 *          Determines how the default spectral bounds for the output are
 *          chosen. If a TRUE value is supplied, then the defaults for the

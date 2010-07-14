@@ -3,6 +3,12 @@
  o SC2CLEAN parameter DCBOX has been renamed DCFITBOX. DCBAD and DCFLAGALL
    have been removed.
 
+ o MAKECUBE parameter SPECBOUNDS now supplies values for the outer edges
+   of the first and last spectral channel, not the channel centres as
+   before. This means the values written to the FLBND and FUBND parameters
+   can now be re-used directly as values for SPECBOUNDS without the need
+   to change them by half a pixel.
+
 1 SMURF_Version_1.0.0_(Hawaiki)
 
  o First version suitable for use for real SCUBA-2 data.
