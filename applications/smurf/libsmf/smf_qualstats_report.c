@@ -76,6 +76,8 @@
 *        Return ndata.
 *     2010-06-23 (TIMJ):
 *        Add quality family support.
+*     2010-07-14 (TIMJ):
+*        Control message level of report
 
 *  Copyright:
 *     Copyright (C) 2010 University of British Columbia.
@@ -117,8 +119,8 @@
 
 #define FUNC_NAME "smf_qualstats_report"
 
-void smf_qualstats_report( smf_qfam_t qfamily, const smfArray *qua,
-                           size_t last_qcount[SMF__NQBITS],
+void smf_qualstats_report( msglev_t msglev, smf_qfam_t qfamily,
+                           const smfArray *qua, size_t last_qcount[SMF__NQBITS],
                            size_t *last_nmap, int init,
                            size_t *ngood_tslice, size_t *numdata,
                            int *status ) {
@@ -188,17 +190,18 @@ void smf_qualstats_report( smf_qfam_t qfamily, const smfArray *qua,
     ndata = nbolo_tot*ntslice;
 
     if( init ) {
-      msgOut( "", "--- Size of the entire data array ------------------------------------------",
+      msgOutiff(msglev, "", "--- Size of the entire data array ------------------------------------------",
               status );
-      msgOutf("", "bolos  : %zu", status, nbolo_tot );
-      msgOutf("", "tslices: bnd:%zu(%.1lf min), map:%zu(%.1lf min), tot:%" DIM_T_FMT "(%.1lf min)", status,
-              (size_t)ntslice-(nmax/nbolo_tot), tbound*steptime/60.,
-              nmax/nbolo_tot, ntgood*steptime/60.,
-              ntslice, ntslice*steptime/60.);
-      msgOutf("", "Total samples: %zu", status, ndata );
+      msgOutiff(msglev, "", "bolos  : %zu", status, nbolo_tot );
+      msgOutiff(msglev, "", "tslices: bnd:%zu(%.1lf min), map:%zu(%.1lf min), tot:%"
+                DIM_T_FMT "(%.1lf min)", status,
+                (size_t)ntslice-(nmax/nbolo_tot), tbound*steptime/60.,
+                nmax/nbolo_tot, ntgood*steptime/60.,
+                ntslice, ntslice*steptime/60.);
+      msgOutiff(msglev, "", "Total samples: %zu", status, ndata );
     }
 
-    msgOutf("", "--- Quality flagging statistics --------------------------------------------",
+    msgOutiff(msglev, "", "--- Quality flagging statistics --------------------------------------------",
             status );
     for( i=0; (i<nqbits)&&(*status==SAI__OK); i++ ) {
 
@@ -234,38 +237,38 @@ void smf_qualstats_report( smf_qfam_t qfamily, const smfArray *qua,
       }
 
       if( init ) {
-        msgOutf("","%6s: %10zu (%5.2lf%%),%20s", status,
-                smf_qual_str(qfamily, 1, i, NULL, status),
-                qcount[i],
-                100. * (double) qcount[i] / (double) ndata,
-                scalestr);
+        msgOutiff(msglev, "","%6s: %10zu (%5.2lf%%),%20s", status,
+                  smf_qual_str(qfamily, 1, i, NULL, status),
+                  qcount[i],
+                  100. * (double) qcount[i] / (double) ndata,
+                  scalestr);
       } else {
-        msgOutf("","%6s: %10zu (%5.2lf%%),%20s,change %10li (%+.2lf%%)",
-                status,
-                smf_qual_str(qfamily, 1, i, NULL, status),
-                qcount[i],
-                100. * (double) qcount[i] / (double) ndata,
-                scalestr,
-                (long) qcount[i] - (long) last_qcount[i],
-                ((long) qcount[i] - (long) last_qcount[i]) ?
-                100. * ((double) qcount[i] - (double) last_qcount[i]) /
-                (double) last_qcount[i] : 0 );
+        msgOutiff(msglev, "","%6s: %10zu (%5.2lf%%),%20s,change %10li (%+.2lf%%)",
+                  status,
+                  smf_qual_str(qfamily, 1, i, NULL, status),
+                  qcount[i],
+                  100. * (double) qcount[i] / (double) ndata,
+                  scalestr,
+                  (long) qcount[i] - (long) last_qcount[i],
+                  ((long) qcount[i] - (long) last_qcount[i]) ?
+                  100. * ((double) qcount[i] - (double) last_qcount[i]) /
+                  (double) last_qcount[i] : 0 );
       }
     }
 
     /* Total number of samples for the map */
-    msgOutf("",
-            "Total samples available for map: %10zu, %5.2lf%% of max (%g bolos)",
-            status, nmap, 100. * (double) nmap / (double) nmax,
-            (double)nmap / (double)ntgood );
+    msgOutiff(msglev, "",
+              "Total samples available for map: %10zu, %5.2lf%% of max (%g bolos)",
+              status, nmap, 100. * (double) nmap / (double) nmax,
+              (double)nmap / (double)ntgood );
 
     if( !init ) {
-      msgOutf("",
-              "     Change from last report: %10li, %+.2lf%% of previous",
-              status, (long) nmap - (long) *last_nmap,
-              ((long) nmap - (long) *last_nmap) ?
-              100. * ((double) nmap - (double) *last_nmap) /
-              (double) *last_nmap : 0 );
+      msgOutiff(msglev, "",
+                "     Change from last report: %10li, %+.2lf%% of previous",
+                status, (long) nmap - (long) *last_nmap,
+                ((long) nmap - (long) *last_nmap) ?
+                100. * ((double) nmap - (double) *last_nmap) /
+                (double) *last_nmap : 0 );
     }
   }
 

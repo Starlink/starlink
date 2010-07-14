@@ -1166,7 +1166,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             }
 
             /* initial quality report */
-            smf_qualstats_report( SMF__QFAM_TSERIES, qua[i], qcount_last, &nsamples,
+            smf_qualstats_report( MSG__NORM, SMF__QFAM_TSERIES, qua[i], qcount_last, &nsamples,
                                   1, &ntgood, &numdata, status );
 
             /* If no good bolos left, set status */
@@ -1534,8 +1534,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
             /* report on the quality flags for this iterations before closing
              the quality */
-            smf_qualstats_report( SMF__QFAM_TSERIES, qua[i], qcount_last, &nsamples, 0, &ntgood,
-                                  &numdata, status );
+            smf_qualstats_report( MSG__NORM, SMF__QFAM_TSERIES, qua[i], qcount_last, &nsamples, 0,
+                                  &ntgood, &numdata, status );
 
             /* If no good bolos left, set status */
             if( (*status==SAI__OK) &&
