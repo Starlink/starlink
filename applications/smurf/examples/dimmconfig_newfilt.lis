@@ -35,6 +35,7 @@
 # artificial data.
 filt_wlim = 0.5
 flt.filt_wlim = 0.5
+cleandk.filt_wlim = 0.5
 
 # Apodisation is not needed in the new algorithm, so we can save some
 # data samples by switching it off.
