@@ -22,7 +22,6 @@
 *.ifd
 *.ifl
 *.la
-*.lis
 *.lo
 *.lof
 *.lot
@@ -123,6 +122,7 @@ put them in global.
 
 applications/astrom/params.f
 applications/astrom/astrom
+applications/astrom/astrom.lis
 
 applications/atools/atools.csh
 applications/atools/atools.icl
@@ -863,6 +863,7 @@ libraries/gns/gns_ididevices
 libraries/gns/idibuild
 
 libraries/gsd/gsd_print
+libraries/gsd/gsd_test.lis
 
 libraries/gwm/gwmXrefresh
 libraries/gwm/xdestroy
