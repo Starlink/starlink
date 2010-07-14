@@ -146,7 +146,6 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
   /* Local Variables */
   size_t aiter;                 /* Actual iterations of sigma clipper */
-  size_t apod_length;           /* Apodisation length */
   size_t bstride;               /* bolometer stride */
   int dcmaxsteps;               /* Maximum allowed number of dc jumps */
   dim_t dcfitbox;               /* Width of box for DC step detection */
@@ -158,7 +157,6 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   dim_t id;                     /* Loop counter */
   dim_t idx=0;                  /* Index within subgroup */
   dim_t im;                     /* Loop counter */
-  int ival;                     /* Integer value */
   dim_t j;                      /* Loop counter */
   AstKeyMap *kmap=NULL;         /* Local keymap */
   size_t mbstride;              /* model bolometer stride */
@@ -261,7 +259,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
                            100, &aiter, &nflag, status );
 
           msgOutiff(MSG__VERB," ",
-                    "   flagged %li new %lf-sig spikes in %li "
+                    "   flagged %zu new %lf-sig spikes in %zu "
                     "iterations", status, nflag, spikethresh, aiter);
         }
 
@@ -269,7 +267,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
           smf_fix_steps( wf, res->sdata[idx], dcthresh, dcmedianwidth,
                          dcfitbox, dcmaxsteps, dclimcorr, &nflag, NULL, NULL,
                          status );
-          msgOutiff(MSG__VERB, "","   detected %li bolos with DC steps\n",
+          msgOutiff(MSG__VERB, "","   detected %zu bolos with DC steps\n",
                     status, nflag);
         }
 

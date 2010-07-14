@@ -389,7 +389,8 @@ static void smf1_calcmodel_smo_job( void *job_data, int *status ) {
    if( b1 < nbolo ) {
 
       /* Debugging message indicating thread started work */
-      msgOutiff( MSG__DEBUG, "", "smf_calcmodel_smo: thread starting on bolos %zu -- %zu",
+      msgOutiff( MSG__DEBUG, "", "smf_calcmodel_smo: thread starting on bolos %" DIM_T_FMT
+                 " -- %" DIM_T_FMT,
                  status, b1, b2 );
       smf_timerinit( &tv1, &tv2, status);
 
@@ -454,7 +455,8 @@ static void smf1_calcmodel_smo_job( void *job_data, int *status ) {
       bolqua = astFree( bolqua );
 
 /* Report the time taken in this thread. */
-      msgOutiff( MSG__DEBUG, "", "smf_calcmodel_smo: thread finishing bolos %zu -- %zu (%.3f sec)",
+      msgOutiff( MSG__DEBUG, "", "smf_calcmodel_smo: thread finishing bolos %" DIM_T_FMT
+                 " -- %" DIM_T_FMT "(%.3f sec)",
                  status, b1, b2, smf_timerupdate( &tv1, &tv2, status ) );
    }
 }

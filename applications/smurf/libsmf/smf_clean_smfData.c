@@ -154,8 +154,8 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data,
   /* Fix DC steps */
   if( dcthresh && dcfitbox ) {
     msgOutiff(MSG__VERB, "", FUNC_NAME
-              ": Flagging bolos with %lf-sigma DC steps in %zu "
-              "samples as bad, using %zu-sample median filter and max %i "
+              ": Flagging bolos with %lf-sigma DC steps in %" DIM_T_FMT " "
+              "samples as bad, using %" DIM_T_FMT "-sample median filter and max %d "
               "DC steps per min before flagging entire bolo bad...", status,
               dcthresh, dcfitbox, dcmedianwidth, dcmaxsteps);
 

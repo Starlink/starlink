@@ -119,9 +119,9 @@ smf_deepcopy_smfDA( const smfData *old, int cpdks, int * status ) {
   smf_flatmeth flatmeth;  /* Flatfield method */
   size_t nheat;           /* number of entries in heatval */
   size_t nflat;           /* number of flat coeffs per bol */
-  size_t nbol;            /* Number of bolometers */
-  size_t ncol;            /* Number of columns */
-  size_t ntslice;         /* NUmber of time slices */
+  dim_t nbol;             /* Number of bolometers */
+  dim_t ncol;             /* Number of columns */
+  dim_t ntslice;          /* NUmber of time slices */
   smfDA *newda = NULL;             /* Pointer to new smfDA struct */
   smfDA *oldda = NULL;             /* Pointer to new smfDA struct */
 
