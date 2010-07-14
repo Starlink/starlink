@@ -70,6 +70,7 @@ cleandk.order = 0
 cleandk.spikethresh = 0
 cleandk.spikeiter = 0
 cleandk.noiseclip = 0.0
+cleandk.filt_wlim = <undef>
 
 # the following two parameters are included because the same
 # code is used to clean bolometers and the dark squids. However,
