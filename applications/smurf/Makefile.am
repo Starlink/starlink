@@ -91,6 +91,7 @@ examples/pongsim.lis \
 examples/resist.cfg \
 examples/s4a20091214_00015_0002.sdf \
 examples/s4a20091214_00015_0003.sdf \
+examples/sc19_clean3.lis \
 examples/simpar.lis \
 examples/simpar_dream.lis \
 examples/simpar_heatrun.lis \
