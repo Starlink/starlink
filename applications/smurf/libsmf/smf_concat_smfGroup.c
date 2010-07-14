@@ -154,6 +154,7 @@
  *        the dksquid item.
  *     2010-07-14 (TIMJ):
  *        Simplify multi-pass logic
+ *        Propagate quality that was in flatfielded data even if not in raw
 
  *  Notes:
  *     If projection information supplied, pointing LUT will not be
@@ -457,6 +458,15 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                                     darks, flatramps, &refdata, status );
           }
           smf_close_file( &tmpdata, status );
+        }
+
+        /* Set havequal flag based on first file. This is required
+           because the initial pass through for dimensions only looked
+           at the file itself and not the result of flatfielding.
+           Flatfielding creates a quality array. Without this raw data
+           will not have quality values propagated. */
+        if ( j == firstpiece ) {
+          havequal = ( refdata->qual != NULL );
         }
 
         /* Apply bad bolometer mask */
