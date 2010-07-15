@@ -42,8 +42,3 @@ cleandk.filt_wlim = 0.5
 apod=0
 flt.apod=0
 cleandk.apod=0
-
-# Nor is extra padding required
-padstart=0
-padend=0
-
