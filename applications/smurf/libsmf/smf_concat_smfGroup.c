@@ -628,7 +628,6 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
               havearray[1] = havearray[1] && !(flags&SMF__NOCREATE_VARIANCE);
               havequal = havequal && !(flags&SMF__NOCREATE_QUALITY);
 
-              printf(" HAVE QUAL 2 = %d\n", havequal );
               /* Allocate space for arrays being propagated from template */
               for( k=0; k<2; k++ ) if( havearray[k] ) {
                   size_t sz = smf_dtype_sz(data->dtype, status );
@@ -717,7 +716,6 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
               }
             /* Quality */
             if ( havequal ) {
-              printf("I DO HAVE QUALITY DAMNIT\n");
               for( l=0; l<nbolo; l++ ) {
                 for( m=0; m<reftlen; m++ ) {
                   (data->qual)[(tchunk+m)*tstr + l*bstr] =
