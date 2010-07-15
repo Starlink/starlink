@@ -42,8 +42,9 @@
 *     Dark squids  : DKCLEAN
 *     Gap filling  : FILLGAPS
 *     Baselines    : ORDER
-*     Apodization  : APOD
-*     Filtering    : FILT_EDGELOW, FILT_EDGEHIGH, FILT_NOTCHLOW, FILT_NOTCHHIGH
+*     Filtering    : FILT_EDGELOW, FILT_EDGEHIGH, FILT_NOTCHLOW, FILT_NOTCHHIGH,
+*                    APOD, FILT_WLIM
+*     Noisy Bolos  : NOISECLIP
 
 *  Notes:
 *     The resulting dataOrder of the cube is not guaranteed, so smf_dataOrder

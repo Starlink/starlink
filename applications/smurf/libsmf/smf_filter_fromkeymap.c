@@ -44,7 +44,7 @@
 *     2010-06-21 (DSB):
 *        Store a a value for the "wlim" component of the filter structure.
 *     2010-06-25 (DSB):
-*        Store a a value for the "apod_length" component of the filter structure.
+*        Store a value for the "apod_length" component of the filter structure.
 *     {enter_further_changes_here}
 
 *  Notes:
