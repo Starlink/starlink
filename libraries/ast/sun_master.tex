@@ -21931,12 +21931,10 @@ f-
 method can now be used to append one or more axes to all Frames in a FrameSet.
 \end{enumerate}
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V5.3-1}
+\subsection{Changes Introduced in V5.3-1}
 
 The following describes the most significant changes which have
-occurred in the AST library between versions V5.3 and V5.3-1 (the
-current version):
+occurred in the AST library between versions V5.3 and V5.3-1:
 
 \begin{enumerate}
 
@@ -22072,6 +22070,23 @@ element if required.
 frequency is less than the absoliute value of the intermediate frequency.
 
 \end{enumerate}
+
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V5.3-2}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V5.3-1 and V5.3-2 (the
+current version):
+
+\begin{enumerate}
+
+\item A bug in FitsChan has been fixed that caused ``-SIN'' projection
+codes within FITS-WCS headers to be mis-interpreted, resulting in no
+FrameSet being read by astRead.
+
+\end{enumerate}
+
 
 Programs which are statically linked will need to be re-linked in
 order to take advantage of these new facilities.

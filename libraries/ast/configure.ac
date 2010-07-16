@@ -7,7 +7,7 @@ dnl   1.5.  It should work with autoconf versions 2.50 or better, and
 dnl   automake 1.6 or better.
 
 dnl   Initialisation: package name and version number
-AC_INIT(ast, 5.3-1, ussc@star.rl.ac.uk)
+AC_INIT(ast, 5.3-2, ussc@star.rl.ac.uk)
 
 dnl   Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -21,7 +21,7 @@ AC_CONFIG_SRCDIR([ast_link.in])
 STAR_DEFAULTS
 
 #   See if the --with-starmem option has been provided. This sets the
-#   preprocesor macro HAVE_STAR_MEM_H. 
+#   preprocesor macro HAVE_STAR_MEM_H.
 AC_ARG_WITH(
       [starmem],
       AC_HELP_STRING([--with-starmem],
@@ -101,7 +101,7 @@ STAR_CNF_F2C_COMPATIBLE
 # Determine the type of Fortran character string lengths.
 STAR_CNF_TRAIL_TYPE
 
-#   Declare the message file.  
+#   Declare the message file.
 STAR_MESSGEN(ast_err.msg)
 
 #   Test for non-ANSI behaviour in sscanf on some platforms, reported by

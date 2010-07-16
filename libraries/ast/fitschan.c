@@ -890,6 +890,9 @@ f     - AST_TESTFITS: Test if a keyword has a defined value in a FitsChan
 *        Another problem in RoundFString! If the value has a series of
 *        9's followed by a series of zeros, with no decimal point (e.g.
 *        "260579999000"), then the trailing zeros were being lost.
+*     16-JUL-2010 (DSB):
+*        In SpecTrans, avoid over-writing the spatial projection code
+*        with the spectral projection code.
 *class--
 */
 
@@ -24428,7 +24431,8 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
    char lattype[MXCTYPELEN];      /* CTYPE value for latitude axis */
    char lontype[MXCTYPELEN];      /* CTYPE value for longitude axis */
    char spectype[MXCTYPELEN];     /* CTYPE value for spectral axis */
-   char prj[6];                   /* Projection string */
+   char prj[6];                   /* Spatial projection string */
+   char sprj[6];                  /* Spectral projection string */
    char s;                        /* Co-ordinate version character */
    char ss;                       /* Co-ordinate version character */
    double cdelt;                  /* CDELT value */
@@ -24549,48 +24553,48 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 
 /* Check for spectral algorithms from early drafts of paper III */
             } else {
-               prj[ 0 ] = '-';
+               sprj[ 0 ] = '-';
                if( !strncmp( cval + 4, "-WAV", 4 ) ) {
-                  prj[ 1 ] = 'W';
+                  sprj[ 1 ] = 'W';
                } else if( !strncmp( cval + 4, "-FRQ", 4 ) ) {
-                  prj[ 1 ] = 'F';
+                  sprj[ 1 ] = 'F';
                } else if( !strncmp( cval + 4, "-VEL", 4 ) ) {
-                  prj[ 1 ] = 'V';
+                  sprj[ 1 ] = 'V';
                } else {
-                  prj[ 0 ] = 0;
+                  sprj[ 0 ] = 0;
                }
-               if( *prj ) {
-                  prj[ 2 ] = '2';
+               if( *sprj ) {
+                  sprj[ 2 ] = '2';
                   if( !strncmp( cval, "WAVE", 4 ) ) {
-                     prj[ 3 ] = 'W';
+                     sprj[ 3 ] = 'W';
                   } else if( !strncmp( cval, "FREQ", 4 ) ) {
-                     prj[ 3 ] = 'F';
+                     sprj[ 3 ] = 'F';
                   } else if( !strncmp( cval, "VELO", 4 ) ) {
-                     prj[ 3 ] = 'V';
+                     sprj[ 3 ] = 'V';
                   } else if( !strncmp( cval, "VRAD", 4 ) ) {
-                     prj[ 3 ] = 'F';
+                     sprj[ 3 ] = 'F';
                   } else if( !strncmp( cval, "VOPT", 4 ) ) {
-                     prj[ 3 ] = 'W';
+                     sprj[ 3 ] = 'W';
                   } else if( !strncmp( cval, "ZOPT", 4 ) ) {
-                     prj[ 3 ] = 'W';
+                     sprj[ 3 ] = 'W';
                   } else if( !strncmp( cval, "ENER", 4 ) ) {
-                     prj[ 3 ] = 'F';
+                     sprj[ 3 ] = 'F';
                   } else if( !strncmp( cval, "WAVN", 4 ) ) {
-                     prj[ 3 ] = 'F';
+                     sprj[ 3 ] = 'F';
                   } else if( !strncmp( cval, "BETA", 4 ) ) {
-                     prj[ 3 ] = 'V';
+                     sprj[ 3 ] = 'V';
                   } else {
-                     prj[ 0 ] = 0;
+                     sprj[ 0 ] = 0;
                   }
                }
-               if( *prj ) {
+               if( *sprj ) {
                   strcpy( spectype, cval );
-                  if( prj[ 1 ] == prj[ 3 ] ) {
-                     strcpy( prj, strlen( cval ) > 8 ? "----" : "    " );
+                  if( sprj[ 1 ] == sprj[ 3 ] ) {
+                     strcpy( sprj, strlen( cval ) > 8 ? "----" : "    " );
                   } else {
-                     prj[ 4 ] = 0;
+                     sprj[ 4 ] = 0;
                   }
-                  strncpy( spectype + 4, prj, 4 );
+                  strncpy( spectype + 4, sprj, 4 );
                   cval = spectype;
                   SetValue( ret, FormatKey( "CTYPE", j + 1, -1, s, status ),
                            (void *) &cval, AST__STRING, NULL, status );
