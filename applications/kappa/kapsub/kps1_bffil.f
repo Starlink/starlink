@@ -20,8 +20,8 @@
 *                      REFLAB, NPAR, FPAR, STATUS )
 
 *  Description:
-*     This routine finds the Gaussian fits to a batch of image
-*     beam features given initial guesses at their positions with
+*     This routine finds the generalised Gaussian fits to a batch of
+*     image beam features given initial guesses at their positions with
 *     optional constraints of some parameters.  The initial
 *     beam positions are obtained from a text file or catalogue.
 *     The routine also estimates the errors on the fitted parameters,
@@ -92,6 +92,7 @@
 *        4 -- Are the beam positions fixed at the supplied co-ordinates?
 *        5 -- Are the relative amplitudes fixed?
 *        6 -- Are the separations to the secondary beam positions fixed?
+*        7 -- Is the shape parameter fixed?
 *     AMPRAT( BF__MXPOS - 1 ) = REAL (Given)
 *        The ratios of the secondary beam `sources' to the first beam.
 *        These ratios contrain the fitting provided FIXCON(5) is .TRUE.
@@ -106,8 +107,8 @@
 *        .FALSE. the region size is defined by argument FITREG.
 *     FITREG( 2 ) = INTEGER (Given)
 *        The dimensions of the box to use when estimating the Gaussian
-*        in pixels.  The box is centred around each beam position.  Each
-*        value must be at least 9.  It is only accessed if FAREA is
+*        fit in pixels.  The box is centred around each beam position.
+*        each value must be at least 9.  It is only accessed if FAREA is
 *        .FALSE.
 *     REFPOS( BF__NDIM ) = DOUBLE PRECISION (Given)
 *        The reference position measured in the current WCS Frame.  The
@@ -139,8 +140,9 @@
 *      the include file BF_PAR.
 
 *  Copyright:
-*     Copyright (C) 2007 Particle Physics and Astronomy Research
-*     Council.  All Rights Reserved.
+*     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -197,6 +199,9 @@
 *        KPS1_BFCRF.
 *     2007 July 9 (MJC):
 *        Added REFLAB argument passed to KPS1_BFLOG.
+*     2010 July 5 (MJC):
+*        Switched to generalised Gaussian fit by the introduction of
+*        the shape exponent.
 *     {enter_further_changes_here}
 
 *-

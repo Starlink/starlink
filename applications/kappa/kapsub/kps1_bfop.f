@@ -15,10 +15,10 @@
 *                     POLAR, POLSIG, RMS, STATUS )
 
 *  Description:
-*     The supplied Gaussian parameters from BEAMFIT are written to the
-*     environment.  Each output parameter is a two-element vector
-*     containing the fit coefficient in the first element, and its error
-*     in the second for the primary beam.
+*     The supplied generalised Gaussian parameters from BEAMFIT are 
+*     written to the environment.  Each output parameter is a two-element
+*     vector containing the fit coefficient in the first element, and its
+*     error in the second, applicable to the primary beam.
 *
 *     The parameters written are as follows.
 *
@@ -34,6 +34,7 @@
 *        AMP      _DOUBLE   The amplitude of the Gaussian beam
 *        BACK     _DOUBLE   The background level
 *        RMS      _REAL     The RMS of the fit
+*        GAMMA    _DOUBLE   The shape exponent of the fit
 *
 *    In addition there is always a further vector parameter
 *
@@ -96,7 +97,7 @@
 
 *  Copyright:
 *     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2009 Science and Technology Facilities Council.
+*     Copyright (C) 2009, 2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -140,8 +141,10 @@
 *        Made the last change more general using Digits attribute and
 *        checking for AsTime axes.
 *     2009 November 3 (DSB):
-*        Avoid accessing SkyFrame attributes if the supplied Frame is not
-*        a SkyFrame.
+*        Avoid accessing SkyFrame attributes if the supplied Frame is
+*        not a SkyFrame.
+*     2010 July 5 (MJC):
+*        Switched to generalised Gaussian fit adding its exponent.
 *     {enter_further_changes_here}
 
 *-
@@ -211,13 +214,13 @@
 *  Frame is a SkyFrame.
       ISSKY = AST_ISASKYFRAME( RFRM , STATUS )
 
-*  Inquire current number of SkyFrame format precision digits
+*  Inquire the current number of SkyFrame format-precision digits,
 *  and whether the axis should be formatted as a time axis.
 *  Not all types of Frame have an AsTime attribute, so check for
-*  and annull any errors that occur when getting the value of AsTime.
+*  and annul any errors that occur when getting the value of AsTime.
       PREC( 1 ) = AST_GETI( RFRM, 'Digits(1)', STATUS )
       PREC( 2 ) = AST_GETI( RFRM, 'Digits(2)', STATUS )
-      IF( ISSKY ) THEN
+      IF ( ISSKY ) THEN
          TIME( 1 ) = AST_GETL( RFRM, 'AsTime(1)', STATUS )
          TIME( 2 ) = AST_GETL( RFRM, 'AsTime(2)', STATUS )
       ELSE
@@ -309,12 +312,18 @@
 *  ===
       CALL PAR_PUT0R( 'RMS', SNGL( RMS ), STATUS )
 
+*  GAMMA
+*  =====
+      WORK( 1 ) = P( 8 )
+      WORK( 2 ) = SIGMA( 8 )
+      CALL PAR_PUT1D( 'GAMMA', 2, WORK, STATUS )
+
 *  OFFSET of primary beam
 *  ======================
 
 *  Obtain the latitude axis so that the required precision
 *  is used.
-      IF( ISSKY ) THEN
+      IF ( ISSKY ) THEN
          LAT = AST_GETI( RFRM, 'LatAxis', STATUS )
       ELSE
          LAT = 1

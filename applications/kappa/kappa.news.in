@@ -6,6 +6,16 @@
 
 2 Modified_applications
 
+   o  BEAMFIT
+
+      -  The model has been extended to a generalised Gaussian,
+      for which the shape exponent may also be a free parameter of
+      the fit.  This feature is controlled by the new GAUSS 
+      parameter, whose default retains the previous behaviour, 
+      namely fitting to a normal Gaussian (shape exponent=2).  There
+      is a new GAMMA output parameter to record the shape exponent
+      of the primary beam.
+
    o  CONVOLVE
    
       -  A new parameter NORM determines how the output NDF is

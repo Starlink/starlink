@@ -14637,20 +14637,21 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
    Fits beam features in a two-dimensional NDF
 }{
    \sstdescription{
-      This fits Gaussians to beam features within the data array of a
-      two-dimensional NDF given approximate initial co-ordinates.  It
-      uses an unconstrained least-squares minimisation using the
-      residuals and a modified Levenberg-Marquardt algorithm.  The
-      beam feature is a set of connected pixels which are either
-      above or below the surrounding background region.  The errors in
-      the fitted coefficients are also calculated.
+      This fits generalised Gaussians (\emph{cf.} \htmlref{PSF}{PSF}) to beam
+      features within the data array of a two-dimensional NDF given approximate
+      initial co-ordinates.  It uses an unconstrained least-squares minimisation
+      involving the residuals and a modified Levenberg-Marquardt
+      algorithm.  The beam feature is a set of connected pixels which
+      are either above or below the surrounding background region.  The
+      errors in the fitted coefficients are also calculated.
 
       You may apply various constraints.  These are either fixed, or
-      relative.   Fixed values include the FWHM or background level.
-      Relative constraints define the properties of secondary beam
-      features with respect to the primary (first given) feature, and
-      can specify amplitude ratios, and beam separations in Cartesian
-      or polar co-ordinates.
+      relative.  Fixed values include the FWHM, background level,
+      or the shape exponent that defaults to 2 thus fits a normal
+      distribution.  Relative constraints define the properties of
+      secondary beam features with respect to the primary (first given)
+      feature, and can specify amplitude ratios, and beam separations in
+      Cartesian or polar co-ordinates.
 
       Four methods are available for obtaining the initial positions,
       selected using Parameter MODE:
@@ -14820,6 +14821,14 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          (although it is actually the centres being fit).
          It is advisable not to use this option in the inaccurate
          {\tt "Cursor"} mode.  {\tt [FALSE]}
+      }
+      \sstsubsection{
+         GAUSS = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE}, the shape exponent is fixed to be 2; in other words
+         the beams are modelled as two-dimensional normal distributions.
+         If {\tt FALSE}, the shape exponent is a free parameter in each fit. 
+         {\tt [TRUE]}
       }
       \sstsubsection{
          INCAT = FILENAME (Read)
@@ -15064,6 +15073,11 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          beam in the current co-ordinate Frame of the NDF.
       }
       \sstsubsection{
+         GAMMA( 2 ) = \_DOUBLE (Write)
+      }{
+         The primary beam position's shape exponent and its error.
+      }
+      \sstsubsection{
          MAJFWHM( 2 ) = \_DOUBLE (Write)
       }{
          The primary beam position's major-axis FWHM and its error,
@@ -15158,10 +15172,11 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          is required.
       }
       \sstexamplesubsection{
-         beamfit ndf=mars\_3pos mode=interface beams=1 pos="5.0,-3.5" fixfwhm=16.5
+         beamfit ndf=mars\_3pos mode=interface beams=1 pos="5.0,-3.5" fixfwhm=16.5 gauss=f
       }{
          As above but now the Gaussian is constrained to have a FWHM of
-         16.5 arcseconds and be circular.
+         16.5 arcseconds and be circular, but the shape exponent is not
+         constrained to be 2.
       }
       \sstexamplesubsection{
          beamfit mars\_3pos in beams=1 fixfwhm=16.5 fitarea=51 pos="5.,-3.5"
@@ -57163,6 +57178,17 @@ The following applications have been modified:
 The following applications have been modified:
 
 \begin{description}
+
+   \item [\htmlref{BEAMFIT}{BEAMFIT}]\mbox{}
+      \begin{itemize}
+        \item The model has been extended to a generalised Gaussian,
+        for which the shape exponent may also be a free parameter of the
+        fit.  This feature is controlled by the new GAUSS parameter,
+        whose default retains the previous behaviour, namely fitting to
+        a normal Gaussian (shape exponent=2).  There is a new GAMMA
+        output parameter to record the shape exponent of the primary
+        beam.
+      \end{itemize}
 
    \item [\htmlref{CONVOLVE}{CONVOLVE}]\mbox{}
       \begin{itemize}

@@ -4,7 +4,8 @@
 *     KPS1_BFFTG
 
 *  Purpose:
-*     Finds the residuals from multiple two-dimensional Gaussians.
+*     Finds the residuals from multiple two-dimensional generalised
+*     Gaussian fits.
 
 *  Language:
 *     Starlink Fortran 77
@@ -14,9 +15,9 @@
 
 *  Description:
 *     The supplied co-ordinates are converted to values corresponding
-*     to a set of two-dimensional Gaussian fit parameters defined by
-*     the argument XC (together with other information passed from
-*     KPS1_BFFT in common block BF_COM).  The resulting image
+*     to a set of two-dimensional generalised Gauissian parameters 
+*     defined by the argument XC (together with other information passed 
+*     from KPS1_BFFT in common block BF_COM).  The resulting image
 *     intensities are compared with the supplied data values and the
 *     residuals in intensity at each position are returned in FVEC.
 
@@ -37,11 +38,12 @@
 *           5  --  Position angle of the major axis in radians
 *           6  --  Amplitude
 *           7  --  Background (assumed to be a constant level)
+*           8  --  Shape exponent
 *
 *        Where each fit parameter has been fixed by the user, the
 *        remaining elements in XC are shuffled down to occupy the
 *        location which otherwise would have been used by the fixed
-*        Gaussian-fit parameter.  Fixed parameter values are supplied
+*        Gaussian parameter.  Fixed parameter values are supplied
 *        in common, as is the number of Gaussians.
 *     DATA( M ) = DOUBLE PRECISION (Given)
 *        The data values.
@@ -53,8 +55,9 @@
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 2007 Particle Physics and Astronomy Research
-*     Council.  All Rights Reserved.
+*     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -81,9 +84,12 @@
 *        Original version.
 *     2007 April 27 (MJC):
 *        Added FIXAMP and FIXRAT arguments, and concurrent fitting of
-*        multiple Gaussians,
+*        multiple Gaussians.
 *     2007 May 14 (MJC):
 *        Support fixed separations.
+*     2010 July 5 (MJC):
+*        Switched to generalised Gaussian fit by the introduction of
+*        the shape exponent.
 *     {enter_further_changes_here}
 
 *-
@@ -130,6 +136,8 @@
 *           Amplitude ratios fixed by the user?
 *        SEPARC = LOGICAL (Read)
 *           Are the separations fixed?
+*        SHAPEC = LOGICAL (Read)
+*           Exponent of the Gaussian function fixed by user?
 
 *  Arguments Given:
       INTEGER M
@@ -209,6 +217,13 @@
             I = I + 1
             PC( 7, IG ) = XC( I )
          END IF
+
+*  Copy latest shape exponent.
+         IF ( .NOT. SHAPEC ) THEN
+            I = I + 1
+            PC( 8, IG ) = XC( I )
+         END IF
+         
       END DO
 
 *  Variance weighting
@@ -231,16 +246,27 @@
                      CT = COS( PC( 5, IG ) )
                      ST = SIN( PC( 5, IG ) )
 
-*  Evaluate sum of Gaussians.  Recall PC( 1, IG ) and PC( 2, IG ) are
-*  the x and y centre co-ordinates respectively for the IGth Gaussian.
-*  PC( 3, IG ) and PC( 4, IG ) are the major-and minor-axis standard
-*  deviations respectively.
+*  Evaluate sum of Gaussian fits.  Recall PC( 1, IG ) and PC( 2, IG )
+*  are the x and y centre co-ordinates respectively for the IGth 
+*  Gaussian fit.
                      E1 = ( XX - PC( 1, IG ) ) * CT +
      :                    ( YY - PC( 2, IG ) ) * ST
                      E2 = ( YY - PC( 2, IG ) ) * CT -
      :                    ( XX - PC( 1, IG ) ) * ST
+
+*  PC( 3, IG ) and PC( 4, IG ) are the major- and minor-axis standard
+*  deviations respectively for the IGth Gaussian fit.  PC( 8, IG ) is the
+*  corresponding Gaussian shape exponent.  For normal Gaussians just
+*  square.  For arbitrary shaped Gaussians, scale the exponent
+*  accordingly.  The squaring avoids have to record and restore the sign
+*  of negative E1 and E2.
                      E3 = E1 * E1 / ( PC( 3, IG ) * PC( 3, IG ) )
                      E4 = E2 * E2 / ( PC( 4, IG ) * PC( 4, IG ) )
+                     IF ( ABS( PC( 8, IG ) - 2.0D0 ) .GT. 1.D-6 ) THEN
+                        E3 = E3 ** ( PC( 8, IG ) / 2.0D0 )
+                        E4 = E4 ** ( PC( 8, IG ) / 2.0D0 )
+                     END IF
+
                      E5 = EXP( -0.5 * ( E3 + E4 ) )
                      E6 = E5 * PC( 6, IG ) + PC( 7, IG )
                      GI = GI + E6
@@ -272,16 +298,27 @@
                      CT = COS( PC( 5, IG ) )
                      ST = SIN( PC( 5, IG ) )
 
-*  Evaluate sum of Gaussians.  Recall PC( 1, IG ) and PC( 2, IG ) are
-*  the x and y centre co-ordinates respectively for the IGth Gaussian.
-*  PC( 3, IG ) and PC( 4, IG ) are the major-and minor-axis standard
-*  deviations respectively.
+*  Evaluate sum of Gaussian fits.  Recall PC( 1, IG ) and PC( 2, IG ) 
+*  are the x and y centre co-ordinates respectively for the IGth 
+*  Gaussian.
                      E1 = ( XX - PC( 1, IG ) ) * CT +
      :                    ( YY - PC( 2, IG ) ) * ST
                      E2 = ( YY - PC( 2, IG ) ) * CT -
      :                    ( XX - PC( 1, IG ) ) * ST
+
+*  PC( 3, IG ) and PC( 4, IG ) are the major- and minor-axis standard
+*  deviations respectively for the IGth Gaussian fit.  PC( 8, IG ) is the
+*  corresponding Gaussian shape exponent.  For normal Gaussians just
+*  square.  For arbitrary shaped Gaussians, scale the exponent
+*  accordingly.  The squaring avoids have to record and restore the sign
+*  of negative E1 and E2.
                      E3 = E1 * E1 / ( PC( 3, IG ) * PC( 3, IG ) )
                      E4 = E2 * E2 / ( PC( 4, IG ) * PC( 4, IG ) )
+                     IF ( ABS( PC( 8, IG ) - 2.0D0 ) .GT. 1.D-6 ) THEN
+                        E3 = E3 ** ( PC( 8, IG ) / 2.0D0 )
+                        E4 = E4 ** ( PC( 8, IG ) / 2.0D0 )
+                     END IF
+
                      E5 = EXP( -0.5 * ( E3 + E4 ) )
                      E6 = E5 * PC( 6, IG ) + PC( 7, IG )
                      GI = GI + E6

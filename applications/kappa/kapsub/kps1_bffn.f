@@ -19,9 +19,9 @@
 *     defined in include file BF_COM.
 *
 *     The argument XC (together with values supplied in common) defines
-*     a Gaussian fit to imaging data.  The residuals between the
-*     resulting fitted image and the original image supplied in common
-*     are returned in argument FVEC.
+*     a generalised Gaussian fit to imaging data.  The residuals between
+*     the resulting fitted image and the original image supplied in a
+*     COMMON block are returned in argument FVEC.
 *
 *     If an error occurs in this routine, an error is reported and the
 *     status value is returned in common variable ISTAT.
@@ -42,6 +42,7 @@
 *           5  --  Position angle of the major axis in radians
 *           6  --  Amplitude
 *           7  --  Background (assumed to be a constant level)
+*           8  --  Shape exponent
 *
 *        Where each fit parameter has been fixed by the user, the
 *        remaining elements in XC are shuffled down to occupy the
@@ -54,8 +55,9 @@
 *        Success flag.  0 is success.  Negative is failure.
 
 *  Copyright:
-*     Copyright (C) 2007 Particle Physics and Astronomy Research
-*     Council.  All Rights Reserved.
+*     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -80,6 +82,8 @@
 *  History:
 *     2007 February 14 (MJC):
 *        Original version.
+*     2010 July 5 (MJC):
+*        Switch to generalised Gaussian fit in documentation.
 *     {enter_further_changes_here}
 
 *-
@@ -111,7 +115,7 @@
 
 *.
 
-*  Call a lower level routine to do the work, passing the work arrays
+*  Call a lower-level routine to do the work, passing the work arrays
 *  using %VAL so that their contents can be accessed.
       CALL KPS1_BFFTG( M, N, XC, %VAL( CNF_PVAL( IPWD ) ),
      :                 %VAL( CNF_PVAL( IPWV ) ), FVEC, ISTAT )

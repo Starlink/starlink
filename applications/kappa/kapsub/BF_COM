@@ -39,6 +39,7 @@
 
 *  Copyright:
 *     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Authors:
@@ -52,7 +53,9 @@
 *        Split into two include files.  Added RATIOC and ARATIO.
 *     2007 May 14 (MJC):
 *        Added SEPARC and PIXOFF.
-*     {enter_changes_here}
+*     2010 July 5 (MJC):
+*        Added SHAPEC.
+*     {enter_further_changes_here}
 
 *-
 
@@ -100,6 +103,8 @@
 *           Amplitude ratios fixed by the user?
 *        SEPARC = LOGICAL
 *           Are the separations fixed by the user?
+*        SHAPEC = LOGICAL
+*           Is the shape exponent of the Gaussian fixed?
 *        ISTAT = INTEGER
 *           Local status value
 
@@ -118,8 +123,9 @@
       LOGICAL POSC               ! Position co-ordinates fixed?
       LOGICAL RATIOC             ! Amplitude ratios fixed by user?
       LOGICAL SEPARC             ! Separations fixed by user?
+      LOGICAL SHAPEC             ! Shape exponent fixed by user?
       INTEGER ISTAT              ! Local status value
 
       COMMON /BF1_COM/ PC, PIXOFF, ARATIO, USEVAR, NBEAMS
       COMMON /BF2_COM/ IPWD, IPWV, LBND, UBND, AMPC, BACKC, FWHMC,
-     :                 ORIC, POSC, RATIOC, SEPARC, ISTAT
+     :                 ORIC, POSC, RATIOC, SEPARC, SHAPEC, ISTAT

@@ -89,8 +89,9 @@
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 2007 Particle Physics and Astronomy Research
-*     Council.  All Rights Reserved.
+*     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2007, 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -144,6 +145,9 @@
 *        For a SkyFrame report centre errors in arcseconds instead of
 *        sexagesimal.  Added REFLAB argument to indicate which reference
 *        point was used.
+*     2010 July 5 (MJC):
+*        Switched to generalised normal distribution by introducing the
+*        shape exponent.
 *     {enter_further_changes_here}
 
 *-
@@ -726,8 +730,33 @@
             CALL MSG_OUTIF( MSG__NORM, ' ', BUF( : LBUF ), STATUS )
          END IF
 
+*  Shape
+*  =====
+         WRITE ( FORMAT, '(''F'',I1,''.3'')' )
+     :     MAX( 0, INT( LOG10( P( 8, IB ) + VAL__EPSD ) ) ) + 5
+         CALL MSG_FMTR( 'GAMMA', FORMAT, SNGL( P( 8, IB ) ) )
+         IF ( SIGMA( 8, IB ) .EQ. VAL__BADD ) THEN
+
+*  Display the amplitude.
+            CALL MSG_LOAD( 'KPS1_BFLOG_MSG11', '    Shape exponent '/
+     :                     /' : ^GAMMA', BUF, LBUF, STATUS )
+
+         ELSE
+            WRITE ( FORMAT, '(''F'',I1,''.3'')' )
+     :        MAX( 0, INT( LOG10( P( 8, IB ) + VAL__EPSD ) ) ) + 5
+            CALL MSG_FMTR( 'GAMMAE', FORMAT, SNGL( SIGMA( 8, IB ) ) )
+
+*  Display the exponent and its error.
+            CALL MSG_LOAD( 'KPS1_BFLOG_MSG11E', '    Shape exponent '/
+     :                     /' : ^GAMMA +/- ^GAMMAE',
+     :                     BUF, LBUF, STATUS )
+         END IF
+         IF ( LOGF ) CALL FIO_WRITE( FD, BUF( : LBUF ), STATUS )
+         CALL MSG_OUTIF( MSG__NORM, ' ', BUF( : LBUF ), STATUS )
+
          IF ( LOGF ) CALL FIO_WRITE( FD, ' ', STATUS )
          CALL MSG_BLANKIF( MSG__NORM, STATUS )
+
       END DO
 
 *  Give a title for the parameter values which are to be displayed.

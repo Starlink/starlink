@@ -20,20 +20,21 @@
 *        The global status.
 
 *  Description:
-*     This fits Gaussians to beam features within the data array of a
-*     two-dimensional NDF given approximate initial co-ordinates.  It
-*     uses an unconstrained least-squares minimisation using the
-*     residuals and a modified Levenberg-Marquardt algorithm.  The
-*     beam feature is a set of connected pixels which are either
-*     above or below the surrounding background region.  The errors in
-*     the fitted coefficients are also calculated.
+*     This fits generalised Gaussians (cf. PSF) to beam features within
+*     the data array of a two-dimensional NDF given approximate initial
+*     co-ordinates.  It uses an unconstrained least-squares minimisation
+*     involving the residuals and a modified Levenberg-Marquardt
+*     algorithm.  The beam feature is a set of connected pixels which
+*     are either above or below the surrounding background region.  The
+*     errors in the fitted coefficients are also calculated.
 *
 *     You may apply various constraints.  These are either fixed, or
-*     relative.   Fixed values include the FWHM or background level.
-*     Relative constraints define the properties of secondary beam
-*     features with respect to the primary (first given) feature, and
-*     can specify amplitude ratios, and beam separations in Cartesian
-*     or polar co-ordinates.
+*     relative.  Fixed values include the FWHM, background level,
+*     or the shape exponent that defaults to 2 thus fits a normal
+*     distribution.  Relative constraints define the properties of
+*     secondary beam features with respect to the primary (first given)
+*     feature, and can specify amplitude ratios, and beam separations in
+*     Cartesian or polar co-ordinates.
 *
 *     Four methods are available for obtaining the initial positions,
 *     selected using Parameter MODE:
@@ -162,6 +163,13 @@
 *        (although it is actually the centres being fit).  It is
 *        advisable not to use this option in the inaccurate "Cursor"
 *        mode.  [FALSE]
+*     GAMMA( 2 ) = _DOUBLE (Write)
+*        The primary beam position's shape exponent and its error.
+*     GAUSS = _LOGICAL (Read)
+*        If TRUE, the shape exponent is fixed to be 2; in other words
+*        the beams are modelled as two-dimensional normal distributions.
+*        If FALSE, the shape exponent is a free parameter in each fit. 
+*        [TRUE]
 *     INCAT = FILENAME (Read)
 *        A catalogue containing a positions list giving the initial
 *        guesses at the beam positions, such as produced by applications
@@ -390,9 +398,10 @@
 *             fixback=0.0
 *        As above but now the background is fixed to be zero.
 *     beamfit ndf=mars_3pos mode=interface beams=1 pos="5.0,-3.5"
-*             fixfwhm=16.5
+*             fixfwhm=16.5 gauss=f
 *        As above but now the Gaussian is constrained to have a FWHM of
-*        16.5 arcseconds and be circular.
+*        16.5 arcseconds and be circular, but the shape exponent is not
+*        constrained to be 2.
 *     beamfit mars_3pos in beams=1 fixfwhm=16.5 fitarea=51 pos="5.,-3.5"
 *        As above but now the fitted data is restricted to areas 51x51
 *        pixels about the initial guess positions.  All the other
@@ -468,7 +477,7 @@
 
 *  Copyright:
 *     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2009 Science and Technology Facilities Council.
+*     Copyright (C) 2009, 2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -537,6 +546,13 @@
 *        Thus it is now possible to fit to arbitrary planes of a cube.
 *     8-DEC-2009 (DSB):
 *        Added parameter SUM.
+*     2010 July 5 (MJC):
+*        Added support for generalised Gaussians through the shape
+*        exponent output to new Parameter GAMMA.  The current
+*        behaviour of fitting to normal distributions is retained
+*        through the new defaulted GAUSS parameter.  Removed unnecessary
+*        constant, and moved the initialisation of some variables to
+*        keep valgrind happy.
 *     {enter_further_changes_here}
 
 *-
@@ -560,9 +576,6 @@
       INTEGER  STATUS
 
 *  Local Constants:
-      INTEGER MXPOS              ! Maximum number of beam positions
-      PARAMETER ( MXPOS = 5 )
-
       INTEGER MXCOEF              ! Maximum number of fit coefficients
       PARAMETER ( MXCOEF = BF__NCOEF * BF__MXPOS )
 
@@ -572,7 +585,7 @@
       DOUBLE PRECISION ATTR( 20 )! Saved graphics attribute values
       CHARACTER*9 ATT            ! AST attribute name
       DOUBLE PRECISION BC( BF__NDIM )! Dummy base co-ordinates
-      CHARACTER*132  BUFOUT      ! Buffer for writing the logfile
+      CHARACTER*132 BUFOUT       ! Buffer for writing the logfile
       LOGICAL CAT                ! Catalogue mode was selected
       DOUBLE PRECISION CENTRE( BF__NDIM ) ! Map centre pixel co-ords
       INTEGER CFRM               ! Pointer to Current Frame of the NDF
@@ -1128,8 +1141,8 @@
             DO I = 1, NPOS
                J = ( I - 1 ) * BF__NCOEF
 
-*  Note we calculate the standard deviations of the Gaussian, so apply
-*  the standard scaling.
+*  Note we calculate the standard deviations of the Gaussian fit, so
+*  apply the standard scaling.
                FPAR( 3 + J ) = FWHM( 1 ) / S2FWHM
                FPAR( 4 + J ) = FPAR( 3 + J )
                FPAR( 5 + J ) = 0.0D0
@@ -1140,8 +1153,8 @@
             DO I = 1, NPOS
                J = ( I - 1 ) * BF__NCOEF
 
-*  Note we calculate the standard deviations of the Gaussian, so apply
-*  the standard scaling.
+*  Note we calculate the standard deviations of the Gaussian fit, so
+*  apply the standard scaling.
                FPAR( 3 + J ) = MAX( FWHM( 1 ), FWHM( 2 ) ) / S2FWHM
                FPAR( 4 + J ) = MIN( FWHM( 1 ), FWHM( 2 ) ) / S2FWHM
             END DO
@@ -1183,6 +1196,16 @@
 *  about the primary beam's centre?  A null defaults to TRUE.
          CALL PAR_GTD0L( 'POLAR', .TRUE., .TRUE., POLAR, STATUS )
 
+      END IF
+
+*  Is the fit a normal Gaussian?
+*  -----------------------------
+*  Determine whether or not the shape exponent gamma is a free parameter.
+      CALL PAR_GET0L( 'GAUSS', FIXCON( 7 ), STATUS )
+      IF ( FIXCON( 7 ) ) THEN
+         DO I = 1, NPOS
+            FPAR( 8 + ( I - 1 ) * BF__NCOEF ) = 2.0D0
+         END DO
       END IF
 
 *  Record input data in the log file.
@@ -1287,6 +1310,11 @@
 *  Start a new NDF context.
       CALL NDF_BEGIN
 
+* Keep valgrind happy.
+      ITYPE = '_DOUBLE'
+      IPD = 0
+      IPRES = 0
+
 *  Create a new NDF, by propagating the shape, size, WCS, etc. from the
 *  input NDF.
       CALL LPG_PROP( NDFI, 'NOLABEL,WCS,AXIS', 'RESID', NDFR, STATUS )
@@ -1297,8 +1325,6 @@
       IF ( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          RESID = .FALSE.
-         IPRES = 0
-         IPD = 0
 
 *  Determine the data type to use for the summation
          CALL NDF_MTYPE( '_REAL,_DOUBLE', NDFI, NDFI, 'Data', ITYPE,

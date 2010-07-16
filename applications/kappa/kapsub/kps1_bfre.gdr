@@ -55,8 +55,9 @@
 *     type specified.
 
 *  Copyright:
-*     Copyright (C) 2007, 2009 Particle Physics and Astronomy Research
-*     Council.  All Rights Reserved.
+*     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2009, 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -89,6 +90,9 @@
 *        reverse sense).
 *     8-DEC-2009 (DSB):
 *        Added arguments SUM and RESID.
+*     2010 July 5 (MJC):
+*        Switched to generalised Gaussian fit by the introduction of
+*        the shape exponent.
 *     {enter_further_changes_here}
 
 *-
@@ -133,8 +137,7 @@
       INTEGER I                  ! Loop counter
       INTEGER IG                 ! Gaussian counter
       INTEGER J                  ! Loop counter
-      REAL SIGMA                 ! The Gaussian width along the minor
-                                 ! axis
+      REAL SIGMA                 ! Gaussian width along the minor axis
       DOUBLE PRECISION ST        ! Sine of the orientation
       DOUBLE PRECISION XX        ! X pixel co-ordinate
       DOUBLE PRECISION YY        ! Y pixel co-ordinate
@@ -180,23 +183,34 @@
                CT = COS( FPAR( 5 + BPO ) )
                ST = SIN( FPAR( 5 + BPO ) )
 
-*  Evaluate sum of Gaussians.  Recall FPAR( 1 + BPO ) and 
+*  Evaluate the sum of the Gaussians.  Recall FPAR( 1 + BPO ) and 
 *  FPAR( 2 + BPO ) are the x and y centre co-ordinates respectively for
-*  the IGth Gaussian.   FPAR( 3 + BPO ) and  FPAR( 4  + BPO ) are the 
-*  major- and minor-axis standard deviations respectively.
+*  the IGth Gaussian. 
                E1 = ( XX - FPAR( 1 + BPO ) ) * CT +
      :              ( YY - FPAR( 2 + BPO ) ) * ST
                E2 = ( YY - FPAR( 2 + BPO ) ) * CT - 
      :              ( XX - FPAR( 1 + BPO ) ) * ST
+
+*  FPAR( 3 + BPO ) and  FPAR( 4  + BPO ) are the major- and minor-axis
+*  standard deviations respectively.  FPAR( 8 + BPO ) is the
+*  corresponding Gaussian shape exponent.  For normal Gaussians just
+*  square.  For generalised Gaussians scale the exponent accordingly.
+*  The squaring avoids having to record and restore the sign of negative
+*  E1 and E2.
                E3 = E1 * E1 / ( FPAR( 3 + BPO ) *  FPAR( 3 + BPO ) )
                E4 = E2 * E2 / ( FPAR( 4 + BPO ) *  FPAR( 4 + BPO ) )
+               IF ( ABS( FPAR( 8 + BPO ) - 2.0D0 ) .GT. 1.D-6 ) THEN
+                  E3 = E3 ** ( FPAR( 8 + BPO ) / 2.0D0 )
+                  E4 = E4 ** ( FPAR( 8 + BPO ) / 2.0D0 )
+               END IF
+                  
                E5 = EXP( -0.5 * ( E3 + E4 ) )
                E6 = E5 * FPAR( 6 + BPO ) + BACK( IG )
                GI = GI + E6
             END DO
  
 *  If required, form the residual.
-            IF( RESID ) THEN
+            IF ( RESID ) THEN
                IF ( IN( I, J ) .NE. VAL__BAD<T> ) THEN
                   OUT( I, J ) = IN( I, J ) - NUM_DTO<T>( GI )
                ELSE

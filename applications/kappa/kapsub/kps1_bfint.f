@@ -21,18 +21,18 @@
 *                      STATUS )
 
 *  Description:
-*     This routine finds the Gaussian fits to a batch of image beam
-*     features given initial guesses at their positions with optional
-*     constraints of some parameters.  The initial beam positions are
-*     identified interatively by the user, either with a cursor or
-*     through an environment parameter.  These may also be interpreted
-*     as fixed positions or specify secondary-beam separations in axis
-*     or polar co-ordinates depending on the selected constraints.  The
-*     routine also estimates the errors on the fitted parameters, and
-*     presents the results to a log file and the screen.  Amongst the
-*     results are the rms of the fit, the offset of the primary beam
-*     from a reference point, and the polar co-ordinates of secondary
-*     beams from the primary beam's location.
+*     This routine finds the generalised Gaussian fits to a batch of
+*     image beam features given initial guesses at their positions with
+*     optional constraints of some parameters.  The initial beam
+*     positions are identified interatively by the user, either with a
+*     cursor or through an environment parameter.  These may also be
+*     interpreted as fixed positions or specify secondary-beam
+*     separations in axis or polar co-ordinates depending on the
+*     selected constraints.  The routine also estimates the errors on
+*     the fitted parameters, and presents the results to a log file and
+*     the screen.  Amongst the results are the rms of the fit, the 
+*     offset of the primary beam from a reference point, and the polar
+*     co-ordinates of secondary beams from the primary beam's location.
 *
 *     All the co-ordinates are converted to pixel co-ordinates before
 *     any fits are made and reported.  This enables the required AST
@@ -107,7 +107,8 @@
 *        4 -- Are the beam positions fixed at the supplied co-ordinates?
 *        5 -- Are the relative amplitudes fixed?
 *        6 -- Are the separations to the secondary beam positions fixed?
-*
+*        7 -- Is the shape parameter fixed?
+*        
 *        Options 3 and 6 will set to .FALSE. if either is .TRUE. on
 *        entry and if MAP2 does not have the inverse transformation.
 *     AMPRAT( BF__MXPOS - 1 ) = REAL (Given)
@@ -158,7 +159,7 @@
 
 *  Copyright:
 *     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2009 Science and Technology Facilities Council.
+*     Copyright (C) 2009-2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -186,7 +187,7 @@
 *        Original version.
 *     2007 April 27 (MJC):
 *        Added FIXAMP and FIXRAT arguments, and concurrent fitting of
-*        multiple Gaussians,
+*        multiple Gaussians.
 *     2007 May 11 (MJC):
 *        Pass constraint flags as an array to shorten the API.
 *     2007 May 14 (MJC):
@@ -223,6 +224,9 @@
 *        Added REFLAB argument passed to KPS1_BFLOG.
 *     2009 January 31 (MJC):
 *        Check that the input co-ordinates lie with the array bounds.
+*     2010 July 5 (MJC):
+*        Switched to generalised Gaussian fit by the introduction of
+*        the shape exponent.
 *     {enter_further_changes_here}
 
 *-
@@ -353,7 +357,7 @@
       DOUBLE PRECISION INCO( NDF__MXDIM ) ! Parameter-supplied position
       DATA INCO / NDF__MXDIM * AST__BAD /
       DOUBLE PRECISION INPOS( BF__MXPOS, NDF__MXDIM ) ! Supplied
-      DATA INPOS / NUMCO * AST__BAD /                  ! positions
+      DATA INPOS / NUMCO * AST__BAD /                 ! positions
 
 *.
 
@@ -518,7 +522,7 @@
                INPOS( NBPS + 1, 2 ) = DBLE( YIN )
             END IF
 
-* Indicate that we do not need to see the cursor instructions again.
+*  Indicate that we do not need to see the cursor instructions again.
             INFO = .FALSE.
 
 *  Interactive mode
@@ -528,6 +532,7 @@
 *  parameter is incremented for each beam position to make them
 *  distinct for command-line usage.
          ELSE
+
 *  Create separate parameter names for each beam position.
             IF ( NBPS .EQ. 0 ) THEN
                PARNAM = PARAM

@@ -5,8 +5,8 @@
 *     KPS1_BFFT
 
 *  Purpose:
-*     Finds two-dimensional Gaussian parameter values which are
-*     consistent with a supplied set of data values.
+*     Finds two-dimensional generalised Gaussian parameter values that 
+*     are consistent with a supplied set of data values.
 
 *  Language:
 *     Starlink Fortran 77
@@ -39,6 +39,7 @@
 *        4 -- Are the beam positions fixed at the supplied co-ordinates?
 *        5 -- Are the relative amplitudes fixed?
 *        6 -- Are the separations to the secondary beam positions fixed?
+*        7 -- Is the shape exponent fixed?
 *     AMPRAT( BF__MXPOS - 1 ) = REAL (Given)
 *        The ratios of the secondary beam 'sources' to the first beam.
 *        These ratios contrain the fitting provided FIXCON(5) is .TRUE.
@@ -48,14 +49,14 @@
 *     NP = INTEGER (Given)
 *        The size of array P.
 *     P( NP ) = DOUBLE PRECISION (Given and Returned)
-*        The Gaussian fit parameters.  On entry, the array holds any
+*        The Gaussian-fit parameters.  On entry, the array holds any
 *        explicit parameter values requested by the user (as indicated
 *        by the argument FIXCON).  Other elements of the array are
 *        ignored.  On exit, such values are unchanged, but the other
 *        elements are returned holding the best value of the
 *        corresponding fit parameter.
 *     SIGMA( NP ) = DOUBLE PRECISION (Returned)
-*        The errors in the Gaussian fit parameters.
+*        The errors in the Gaussian-fit parameters.
 *     RMS = DOUBLE PRECISION (Returned)
 *        The RMS residual.
 *     STATUS = INTEGER (Given and Returned)
@@ -136,6 +137,9 @@
 *        it now only restricts to the storage available in KPS1_STPAx.
 *     2010 January 12 (TIMJ):
 *        Ensure that the initial guess lies within the pixel bounds.
+*     2010 July 5 (MJC):
+*        Switched to generalised Gaussian fit by the introduction of
+*        the shape exponent.
 *     {enter_further_changes_here}
 
 *-
@@ -184,6 +188,8 @@
 *           Were the amnplitude ratios fixed?
 *        SEPARC = LOGICAL (Write)
 *           Are the separations fixed?
+*        SHAPEC = LOGICAL (Write)
+*           Shape exponent of the Gaussian fixed by user?
 *        UBND( BF__NDIM ) = INTEGER (Write)
 *           The upper pixel bounds of the data and variance arrays.
 
@@ -294,6 +300,7 @@
       POSC = FIXCON( 4 )
       RATIOC = FIXCON( 5 )
       SEPARC = FIXCON( 6 )
+      SHAPEC = FIXCON( 7 )
 
 *  Arrays
       DO I = 1, BF__NDIM
@@ -353,10 +360,11 @@
             ORIENT = 0.0
             INIT( 1 ) = PIXPOS( IG, 1 )
             INIT( 2 ) = PIXPOS( IG, 2 )
-         ELSE IF ( INIT(1) .GT. DBLE(FUBND(1)) .OR.
-     :           INIT(2) .GT. DBLE(FUBND(2)) .OR.
-     :           INIT(1) .LT. DBLE(FLBND(1)) .OR.
-     :           INIT(2) .LT. DBLE(FLBND(2)) ) THEN
+
+         ELSE IF ( INIT( 1 ) .GT. DBLE( FUBND( 1 ) ) .OR.
+     :             INIT( 2 ) .GT. DBLE( FUBND( 2 ) ) .OR.
+     :             INIT( 1 ) .LT. DBLE( FLBND( 1 ) ) .OR.
+     :             INIT( 2 ) .LT. DBLE( FLBND( 2 ) ) ) THEN
             SIGMIN = 5.0
             AXRAT = 1.0
             ORIENT = 0.0
@@ -461,6 +469,13 @@
             PC( 7, IG ) = XC( N )
          END IF
 
+*  Start near a Gaussian exponent.
+         IF ( .NOT. SHAPEC ) THEN
+            N = N + 1
+            XC( N ) = 1.999
+            PC( 8, IG ) = XC( N )
+         END IF
+
       END DO
 
 *  Perform the fitting.
@@ -494,8 +509,8 @@
       IF ( STATUS .NE. SAI__OK ) GO TO 999
       IF ( ISTAT .NE. SAI__OK ) THEN
          STATUS = ISTAT
-         CALL ERR_REP( 'KPS1_BFFT_ERR2', 'Error fitting Gaussian ',
-     :                 STATUS )
+         CALL ERR_REP( 'KPS1_BFFT_ERR2', 'Error fitting generalised '/
+     :                 /' Gaussian.', STATUS )
       ELSE
 
 *  Report an error if the PDA routine could not find an answer.
@@ -599,6 +614,12 @@
          ELSE
             SIGMA( 7 + GO ) = SIGMA( 7 )
          END IF
+
+         IF ( .NOT. SHAPEC ) THEN
+            N = N + 1
+            SIGMA( 8 + GO ) = SD( N )
+         END IF
+
       END DO
 
 *  Jump to here if an error occurs.

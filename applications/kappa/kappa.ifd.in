@@ -7669,6 +7669,23 @@ package kappa {
             helpkey *
          }
 
+         parameter gamma {
+            size *
+            access WRITE
+            type _DOUBLE
+            vpath INTERNAL
+            prompt {Object to contain the shape exponent and its error for the primary beam}
+            helpkey *
+         }
+
+         parameter gauss {
+            type _LOGICAL
+            vpath DEFAULT
+            prompt {Constrain to normal-Gaussian fits?}
+            helpkey *
+            default TRUE
+         }
+
          parameter incat {
             type FILENAME
             ppath GLOBAL CURRENT
