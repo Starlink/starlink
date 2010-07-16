@@ -513,9 +513,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 
         /* If access mode is READ, map the QUALITY array only if it
            already existed, and SMF__NOCREATE_QUALITY is not set. However,
-           if the access mode is not READ, create QUALITY by default.
-           Map first so that QUALITY can be used to mask DATA when it is
-           map'd */
+           if the access mode is not READ, create QUALITY by default. */
 
         if ( !(flags & SMF__NOCREATE_QUALITY) &&
              ( qexists || canwrite ) ) {
@@ -531,6 +529,12 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
             one_strlcpy( qmode, "WRITE/ZERO", sizeof(qmode), status );
           }
           outqual = smf_qual_map( indf, qmode, &qfamily, &nqout, status );
+
+          /* Since we may not technically be mapping the QUALITY at this
+             point (if it was mapped, copied, unmapped) we have to tell
+             NDF not to use automatic quality masking */
+          ndfSqmf( 0, indf, status );
+
         }
 
         /* Always map DATA if we get this far */
