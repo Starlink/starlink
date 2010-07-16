@@ -203,7 +203,6 @@
          GOTO 999
       END IF
 
-
 *  Constrain the number of loops.
       MITER = MIN( 10, MAX( 1, MXITER ) )
 
@@ -246,7 +245,7 @@
      :                            DELTAX
             END DO
 
-* Reset the best-fit value for the current parameter.
+*  Reset the best-fit value for the current parameter.
             X( J ) = XCOPY
          END DO
 
@@ -274,7 +273,7 @@
 
 *  Normalisation factor requires the sum of the squared deviations
 *  and the number of degrees of freedom, estimating the the
-* statistical error from the scatter in the data.
+*  statistical error from the scatter in the data.
          SUMRES = 0.0D0
          DO J = 1, M
             SUMRES = SUMRES + DRESID( J ) * DRESID( J )
