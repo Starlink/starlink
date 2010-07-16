@@ -13,7 +13,7 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_flat_params( const smfData * refdata, const char refrespar[],
+*     smf_flat_params( const smfData * refdata,
 *                      const char resistpar[], const char methpar[], const char orderpar[],
 *                      const char snrminpar[], double * refres, double **resistance, int * nrows,
 *                      int * ncols, smf_flatmeth *flatmeth,
@@ -21,12 +21,11 @@
 
 *  Arguments:
 *     refdata = const smfData * (Given)
-*        Reference smfData for checking dimensionality of resistance file.
-*        No check is done if NULL.
-*     refrespar = const char [] (Given)
-*        Name of the parameter to use for the reference resistance value.
+*        Reference smfData for checking dimensionality of resistance file and for
+*        deciding on the correct reference resistance based on the subarray.
 *     resistpar = const char [] (Given)
-*        Name of the parameter to use for the resistor file (group).
+*        Name of the parameter to use for the resistor file. Also contains
+*        reference resistance. (group).
 *     methpar = const char [] (Given)
 *        Name of the parameter to use to request the flatfield
 *        method.
@@ -74,6 +73,9 @@
 *     2010-04-20 (TIMJ):
 *        Columns in resistance file now start at 0 to be consistent
 *        with all other nomenclature.
+*     2010-07-15 (TIMJ):
+*        Use kpg1Config to read resistor information based on subarray.
+*        Remove refrespar since that information is now in the resistor file.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -111,22 +113,23 @@
 #include "prm_par.h"
 #include "sae_par.h"
 
+#include <ctype.h>
+
 void
-smf_flat_params( const smfData * refdata, const char refrespar[], const char resistpar[],
+smf_flat_params( const smfData * refdata, const char resistpar[],
                  const char methpar[], const char orderpar[], const char snrminpar[],
                  double * refohms, double **resistance, int * outrows,
                  int * outcols, smf_flatmeth  *flatmeth,
                  int * order, double * snrmin, int * status ) {
 
   size_t j = 0;             /* Counter, index */
-  size_t ksize;             /* Size of key map group */
   char method[SC2STORE_FLATLEN]; /* flatfield method string */
   size_t nbols;              /* Number of bolometers */
   int ncols;                 /* number of columns read from resistor data */
   int nrows;                 /* number of rows read from resistor data */
-  Grp *resgrp =  NULL;       /* Resistor group */
   AstKeyMap * resmap = NULL; /* Resistor map */
-
+  AstKeyMap * subarrays = NULL; /* Subarray lookup table */
+  char thissub[5];           /* This sub-instrument string */
 
   if (resistance) *resistance = NULL;
 
@@ -138,15 +141,50 @@ smf_flat_params( const smfData * refdata, const char refrespar[], const char res
     return;
   }
 
-  /* get the reference pixel heater resistance */
-  parGdr0d( refrespar, 2.0, 0, VAL__MAXD, 1, refohms, status );
+  if (!refdata) {
+    *status = SAI__ERROR;
+    errRep( "", "Must provide reference data file to calculate flatfield parameters"
+            " (possible programming error)", status );
+    return;
+  }
 
-  /* Get the bolometer resistor settings */
-  kpg1Gtgrp( resistpar, &resgrp, &ksize, status );
-  kpg1Kymap( resgrp, &resmap, status );
-  if( resgrp ) grpDelet( &resgrp, status );
+  /* Based on refdata we now need to calculate the default reference
+     resistance and retrieve the correct resistance entry for each bolometer.
+     We need the subarray string so that we can set up a look up keymap.
+     There is no code in SMURF to return all the known subarrays but
+     we need to know all the options in order to use kpg1Config. */
+  subarrays = astKeyMap( " " );
+  astMapPut0I( subarrays, "S4A", 0, NULL );
+  astMapPut0I( subarrays, "S4B", 0, NULL );
+  astMapPut0I( subarrays, "S4C", 0, NULL );
+  astMapPut0I( subarrays, "S4D", 0, NULL );
+  astMapPut0I( subarrays, "S8A", 0, NULL );
+  astMapPut0I( subarrays, "S8B", 0, NULL );
+  astMapPut0I( subarrays, "S8C", 0, NULL );
+  astMapPut0I( subarrays, "S8D", 0, NULL );
+
+  /* and indicate which subarray we are interested in (uppercased) */
+  smf_find_subarray( refdata->hdr, thissub, sizeof(thissub), NULL, status );
+  { /* need to uppercase */
+    size_t l = strlen(thissub);
+    for (j=0;j<l;j++) {
+      thissub[j] = toupper(thissub[j]);
+    }
+  }
+  astMapPut0I( subarrays, thissub, 1, NULL );
+
+  /* Read the config file */
+  resmap = kpg1Config( resistpar, "$SMURF_DIR/smurf_calcflat.def", subarrays, status );
+  subarrays = astAnnul( subarrays );
 
   if (*status != SAI__OK) goto CLEANUP;
+
+  /* Read the reference resistance */
+  astMapGet0D( resmap, "REFRES", refohms );
+
+  msgOutiff(MSG__VERB, "",
+            "Read reference resistance for subarray %s of %g ohms\n",
+            status, thissub, *refohms );
 
   /* Parse the file and generate a 2d array of resistor settings */
   if (!astMapGet0I( resmap, "NROWS", &nrows ) ) {
@@ -182,18 +220,16 @@ smf_flat_params( const smfData * refdata, const char refrespar[], const char res
     }
 
     /* Check row vs column count */
-    if (refdata) {
-      if ( (refdata->dims)[SC2STORE__COL_INDEX] != (size_t)ncols ||
-           (refdata->dims)[SC2STORE__ROW_INDEX] != (size_t)nrows ) {
-        *status = SAI__ERROR;
-        msgSeti( "RC", ncols );
-        msgSeti( "RR", nrows );
-        msgSeti( "DC", (refdata->dims)[SC2STORE__COL_INDEX]);
-        msgSeti( "DR", (refdata->dims)[SC2STORE__ROW_INDEX]);
-        errRep( " ", "Dimensions of subarray from resistor file (^RC x ^RR)"
-                " do not match those of data file (^DC x ^DR)", status );
-        goto CLEANUP;
-      }
+    if ( (refdata->dims)[SC2STORE__COL_INDEX] != (size_t)ncols ||
+         (refdata->dims)[SC2STORE__ROW_INDEX] != (size_t)nrows ) {
+      *status = SAI__ERROR;
+      msgSeti( "RC", ncols );
+      msgSeti( "RR", nrows );
+      msgSeti( "DC", (refdata->dims)[SC2STORE__COL_INDEX]);
+      msgSeti( "DR", (refdata->dims)[SC2STORE__ROW_INDEX]);
+      errRep( " ", "Dimensions of subarray from resistor file (^RC x ^RR)"
+              " do not match those of data file (^DC x ^DR)", status );
+      goto CLEANUP;
     }
 
     /* Replace small values with bad */

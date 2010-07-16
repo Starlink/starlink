@@ -419,7 +419,7 @@ void smurf_calcflat( int *status ) {
        expected measurement from each bolometer at each power setting.
      */
 
-    ngood = smf_flat_calcflat( MSG__NORM, flatname, "REFRES", "RESIST", "METHOD", "ORDER",
+    ngood = smf_flat_calcflat( MSG__NORM, flatname, "RESIST", "METHOD", "ORDER",
                                "RESP", "RESPMASK", "SNRMIN", igrp, bolval, NULL, status );
     parPut0i( "NGOOD", ngood, status );
 

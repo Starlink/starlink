@@ -987,7 +987,7 @@ void smf_flat_assign ( int use_da, smf_flatmeth inflatmeth, const smfData * powv
 
 size_t
 smf_flat_calcflat( msglev_t msglev, const char flatname[],
-                   const char refrespar[], const char resistpar[],
+                   const char resistpar[],
                    const char methpar[], const char orderpar[],
                    const char resppar[], const char respmaskpar[],
                    const char snrminpar[], const Grp * prvgrp,
@@ -1011,7 +1011,7 @@ smf_flatmeth smf_flat_methcode ( const char * flatname, int * status );
 const char * smf_flat_methstring( smf_flatmeth flatmeth, int * status );
 
 void
-smf_flat_params( const smfData * refdata, const char refrespar[], const char resistpar[],
+smf_flat_params( const smfData * refdata, const char resistpar[],
                  const char methpar[], const char orderpar[], const char snrminpar[],
                  double * refohms, double **resistance, int * nrows,
                  int * ncols, smf_flatmeth  *flatmeth,

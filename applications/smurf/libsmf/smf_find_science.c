@@ -137,6 +137,8 @@
 *     2010-07-12 (TIMJ):
 *        Disable unstable bolometers as defined from before and after flatfield
 *        ramps.
+*     2010-07-15 (TIMJ):
+*        API change for smf_flat_calcflat
 
 *  Copyright:
 *     Copyright (C) 2008-2010 Science and Technology Facilities Council.
@@ -378,7 +380,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
 
             if (calcflat) {
               smfData * curresp = NULL;
-              (void)smf_flat_calcflat( MSG__VERB, NULL, "REFRES", "RESIST",
+              (void)smf_flat_calcflat( MSG__VERB, NULL, "RESIST",
                                        "FLATMETH", "FLATORDER", NULL, "RESPMASK",
                                        "FLATSNR", NULL, infile, &curresp, status );
 

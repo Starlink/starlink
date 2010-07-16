@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     size_t smf_flat_calcflat( msglev_t msglev, const char flatname[],
-*                   const char refrespar[], const char resistpar[],
+*                   const char resistpar[],
 *                   const char methpar[], const char orderpar[],
 *                   const char resppar[], const char respmaskpar[],
 *                   const char snrminpar[], const Grp * prvgrp,
@@ -26,11 +26,9 @@
 *     flatname = const char [] (Given)
 *        Name of output flatfield file. Can be NULL if no flat field file
 *        should be written.
-*     refrespar = const char [] (Given)
-*        Name of the ADAM parameter to use to determine the reference resistance.
 *     resistpar = const char [] (Given)
 *        Name of the ADAM parameter to use to determine the group of resistance
-*        values for each bolometer.
+*        values for each bolometer along with the reference resistance.
 *     methpar = const char [] (Given)
 *        Name of the ADAM parameter to use to determine the flatfielding method to use.
 *     orderpar = const char [] (Given)
@@ -82,6 +80,8 @@
 *        Move SNRMIN parameter and now pass into smf_flat_fitpoly.
 *     2010-07-09 (TIMJ):
 *        Provide option to return responsivity image.
+*     2010-07-15 (TIMJ):
+*        API change for smf_flat_params
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -131,7 +131,7 @@
 
 size_t
 smf_flat_calcflat( msglev_t msglev, const char flatname[],
-                   const char refrespar[], const char resistpar[],
+                   const char resistpar[],
                    const char methpar[], const char orderpar[],
                    const char resppar[], const char respmaskpar[],
                    const char snrminpar[], const Grp * prvgrp,
@@ -157,7 +157,7 @@ smf_flat_calcflat( msglev_t msglev, const char flatname[],
   if (*status != SAI__OK) return ngood;
 
   /* Get flatfield processing parameters */
-  smf_flat_params( flatdata, refrespar, resistpar, methpar, orderpar, snrminpar,
+  smf_flat_params( flatdata, resistpar, methpar, orderpar, snrminpar,
                    &refohms, &resistance,  NULL, NULL,
                    &flatmeth, &order, &snrmin, status );
 

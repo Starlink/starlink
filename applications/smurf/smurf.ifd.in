@@ -212,6 +212,8 @@
 #         Use starperl in perl aliases
 #     2010-02-09 (AGG):
 #         Add NGOOD output parameter for SC2FFT
+#     2010-07-15 (TIMJ):
+#         Remove REFRES parameters since now included in RESIST config file.
 #     {enter_changes_here}
 
 #  Bugs:
@@ -380,15 +382,6 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter refres {
-                type _DOUBLE
-                access READ
-                ppath  DYNAMIC CURRENT
-                prompt {Reference pixel heater resistance}
-                helpkey *
-            }
-
-
             parameter resist {
                 position 3
                 type LITERAL
@@ -520,15 +513,6 @@ package @PACKAGE@ {
                 ppath CURRENT DEFAULT
                 default 10.0
                 prompt {Signal-to-noise threshold for responsivity data}
-                helpkey *
-            }
-
-            parameter refres {
-                type _DOUBLE
-                access READ
-                vpath  DYNAMIC CURRENT
-                ppath  DYNAMIC CURRENT
-                prompt {Reference pixel heater resistance}
                 helpkey *
             }
 
@@ -1056,15 +1040,6 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter refres {
-                type _DOUBLE
-                access READ
-                vpath  DYNAMIC CURRENT
-                ppath  DYNAMIC CURRENT
-                prompt {Reference pixel heater resistance}
-                helpkey *
-            }
-
             parameter resist {
                 type LITERAL
                 access READ
@@ -1294,15 +1269,6 @@ package @PACKAGE@ {
                 ppath CURRENT DEFAULT
                 default 10.0
                 prompt {Signal-to-noise threshold for responsivity data}
-                helpkey *
-            }
-
-            parameter refres {
-                type _DOUBLE
-                access READ
-                vpath  DYNAMIC CURRENT
-                ppath  DYNAMIC CURRENT
-                prompt {Reference pixel heater resistance}
                 helpkey *
             }
 
@@ -2126,15 +2092,6 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter refres {
-                type _DOUBLE
-                access READ
-                vpath  DYNAMIC CURRENT
-                ppath  DYNAMIC CURRENT
-                prompt {Reference pixel heater resistance}
-                helpkey *
-            }
-
             parameter resist {
                 type LITERAL
                 access READ
@@ -2442,15 +2399,6 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter refres {
-                type _DOUBLE
-                access READ
-                vpath  DYNAMIC CURRENT
-                ppath  DYNAMIC CURRENT
-                prompt {Reference pixel heater resistance}
-                helpkey *
-            }
-
             parameter resist {
                 type LITERAL
                 access READ
@@ -2551,15 +2499,6 @@ package @PACKAGE@ {
                 ppath CURRENT DEFAULT
                 default 10.0
                 prompt {Signal-to-noise threshold for responsivity data}
-                helpkey *
-            }
-
-            parameter refres {
-                type _DOUBLE
-                access READ
-                vpath  DYNAMIC CURRENT
-                ppath  DYNAMIC CURRENT
-                prompt {Reference pixel heater resistance}
                 helpkey *
             }
 
@@ -2696,15 +2635,6 @@ package @PACKAGE@ {
                 ppath CURRENT DEFAULT
                 default 10.0
                 prompt {Signal-to-noise threshold for responsivity data}
-                helpkey *
-            }
-
-            parameter refres {
-                type _DOUBLE
-                access READ
-                vpath  DYNAMIC CURRENT
-                ppath  DYNAMIC CURRENT
-                prompt {Reference pixel heater resistance}
                 helpkey *
             }
 
@@ -2902,15 +2832,6 @@ package @PACKAGE@ {
                 ppath CURRENT DEFAULT
                 default 10.0
                 prompt {Signal-to-noise threshold for responsivity data}
-                helpkey *
-            }
-
-            parameter refres {
-                type _DOUBLE
-                access READ
-                vpath  DYNAMIC CURRENT
-                ppath  DYNAMIC CURRENT
-                prompt {Reference pixel heater resistance}
                 helpkey *
             }
 
@@ -3166,15 +3087,6 @@ package @PACKAGE@ {
                 ppath CURRENT DEFAULT
                 default 10.0
                 prompt {Signal-to-noise threshold for responsivity data}
-                helpkey *
-            }
-
-            parameter refres {
-                type _DOUBLE
-                access READ
-                vpath  DYNAMIC CURRENT
-                ppath  DYNAMIC CURRENT
-                prompt {Reference pixel heater resistance}
                 helpkey *
             }
 
