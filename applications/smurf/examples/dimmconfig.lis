@@ -118,7 +118,7 @@ flagstat = 2
 # --- Many of the following may not be useful ---
 
 # S/N threshold to detect DC steps
-dcthresh = 5
+dcthresh = 6
 
 # box size over which to fit data with a straight line on either side of
 # a potential DC jump.
@@ -180,7 +180,7 @@ cleandk.apod = 100
 cleandk.badfrac = 0.05
 cleandk.dcfitbox = 400
 cleandk.dcmaxsteps = 10
-cleandk.dcthresh = 3.0
+cleandk.dcthresh = 6.0
 cleandk.dcmedianwidth = 40
 cleandk.dclimcorr = 10
 cleandk.fillgaps = 1

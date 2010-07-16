@@ -65,6 +65,8 @@
 
 *  Description:
 *     Coming soon(ish)...
+*
+*     This code is a mess. Lots of tidying up, commenting, rationalising, etc, needed.
 
 *  Authors:
 *     David S Berry (JAC, Hawaii)
@@ -169,6 +171,9 @@
 /* A magic unsigned value */
 #define INIT 999999999
 
+/* Max number of iterations. */
+#define MAXITER 10
+
 #ifdef DEBUG_STEPS
 
 #define DEBUG_ARGS , TimeData *timedata
@@ -181,7 +186,7 @@
 #define CHECK_2 16
 #define CHECK_3 32
 
-#define RECORD_BOLO (ibolo==718)
+#define RECORD_BOLO (ibolo==164)
 
 #define TOPCAT(fd, x) \
    if( x != VAL__BADD ) { \
@@ -197,6 +202,7 @@ typedef struct TimeData {
    int outquality;
    int ibolo;
    double jump;
+   double rjump;
    double median;
    int in_rms;
    int flags;
@@ -206,19 +212,16 @@ typedef struct TimeData {
    double change;
    double fac;
    double diff;
-   double thresh;
    double line_start;
    double line_end;
+   double start_val;
+   double end_val;
    double rmslo;
    double rmshi;
-} TimeData;
-
-typedef struct BoloData {
-   int ibolo;
-   double rms_jump;
+   double sigma;
+   double noise;
    double thresh;
-} BoloData;
-
+} TimeData;
 
 #else
 
@@ -245,7 +248,6 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
                               int *nfixed, smfStepFix **steps,
                               int *status DEBUG_ARGS );
 
-
 void smf_fix_steps( smfWorkForce *wf, smfData *data,
                     double dcthresh, dim_t dcmedianwidth, dim_t dcfitbox,
                     int dcmaxsteps, int dclimcorr, size_t *nrej,
@@ -254,25 +256,29 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data,
 /* Local Variables */
    dim_t ibolo;                /* Index of bolometer */
    dim_t nbolo;                /* Number of bolometers */
+   dim_t iel;
+   dim_t nel;
    dim_t ntslice;              /* Number of time slices */
    double *dat = NULL;         /* Pointer to bolo data */
    double *pw1;
    double *pw2;
    double *w1;
    double *w2;
-   double *work;
-   double diff2;
-   double diff2_limit;
+   double *work1;
+   int *work2;
+   double *work3;
+   double *work4;
    double diff;
    double end_value;
    double fac;
    double rms;
+   double tsum2;
    double start_value;
    double thresh;
-   double tsum2;
    int *block;
    int *blocks;
    int *common;
+   int more;
    int nfixed;
    int iblock;
    int iter;
@@ -280,35 +286,43 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data,
    int itime_hi;
    int itime_lo;
    int jtime;                  /* Index of time slice */
+   int jstart;
+   int jend;
    int nblock;
    int nsign;
    int ntime;                  /* Number of time slices in usable range */
+   int new_high;
    int pad_end;
    int pad_start;
    int step_end;
    int step_limit;
    int step_start;
+   int bad_in_step;
    int step_width;
    int tpop;
    size_t base;                /* Index to start of current bolo */
+   size_t qbase;
    size_t bstride;             /* Bolo stride */
    size_t itime_end;           /* Time index at end of usable data stream */
    size_t itime_start;         /* Time index at start of usable data stream */
    size_t ns;
    size_t tstride;             /* Bolo stride */
    smf_qual_t *pq1;
-   smf_qual_t *qua = NULL;  /* Pointer to quality flags */
+   smf_qual_t *pq2;
+   smf_qual_t *qua = NULL;     /* Pointer to quality flags */
+   smf_qual_t *tqua = NULL;    /* Pointer to temporary quality flags */
 
 /* Assign values to various configuration parameters that have not yet
    been made public. */
    double dcthresh2 = 7.0;
+   double dcthresh3 = 0.5*dcthresh;
    float dcminpop = 0.05;
    int dcmediangap = 3;
    double dcminsignratio = 0.8;
-   int dcminstepwidth = 0.7*dcmedianwidth;
+   int dcminstepwidth = 0.6*dcmedianwidth;
    int dcmaxstepwidth = 3.0*dcmedianwidth;
    int dcminbox = 100;
-   int dcminstepgap = 0.5*dcmedianwidth;
+   int dcminstepgap = 100;
 
 /* Initialise... */
    ns = 0;
@@ -319,19 +333,12 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data,
    static int nentry = 0;
    char buf[ 200 ];
 
-   sprintf( buf, "bolo_%d.asc", ++nentry );
-   FILE *fd1 = fopen( buf, "w" );
-   fprintf( fd1, "# dcthresh=%g\n", dcthresh );
-   fprintf( fd1, "# dctmedianwidth=%d\n", dcmedianwidth );
-   fprintf( fd1, "# dcfitbox=%d\n", dcfitbox );
-   fprintf( fd1, "# dcmaxsteps=%d\n", dcmaxsteps );
-   fprintf( fd1, "# ibolo rms_jump thresh\n");
-
-   sprintf( buf, "data_%d.asc", nentry );
+   sprintf( buf, "data_%d.asc", ++nentry );
    FILE *fd2 = fopen( buf, "w" );
-   fprintf( fd2, "# itime indata inquality outdata outquality ibolo jump "
+   fprintf( fd2, "# itime indata inquality outdata outquality ibolo jump rjump "
             "median in_rms flags istep_width step_width nsign change fac "
-            "diff thresh line_start line_end rmslo rmshi\n");
+            "diff line_start line_end start_val end_val rmslo rmshi sigma noise thresh "
+            "iter\n");
 #endif
 
 /* Check the inherited status. */
@@ -349,7 +356,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data,
      msgOut( "", "Dumping smf_fix_steps input data to NDF 'fix_steps_input.sdf'.",
              status );
      smf_dataOrder( data, 1, status );
-     smf_write_smfData ( tdata, NULL,
+     smf_write_smfData ( data, NULL,
                        "fix_steps_input", NULL, 0, 0, status );
      smf_dataOrder( data, isT, status );
    }
@@ -371,7 +378,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data,
    }
 
 /* Get the data dimensions and strides. */
-   smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, NULL, &bstride,
+   smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, &nel, &bstride,
                  &tstride, status );
 
 /* Report an error if the data stream is too short for the box size. */
@@ -419,15 +426,20 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data,
 
 #ifdef DEBUG_STEPS
    TimeData *timedata = astMalloc( ntime*sizeof( *timedata ) );
-   BoloData *bolodata = astMalloc( sizeof( *bolodata ) );
 #endif
 
 /* Allocate work arrays. */
-      w1 = astMalloc( sizeof( *w1 )*dcmedianwidth );
-      w2 = astMalloc( sizeof( *w2 )*dcmedianwidth );
-      work = astMalloc( sizeof( *work )*ntime );
+      w1 = astMalloc( sizeof( *w1 )*dcfitbox );
+      w2 = astMalloc( sizeof( *w2 )*dcfitbox );
+      work1 = astMalloc( sizeof( *work1 )*ntime );
+      work2 = astMalloc( sizeof( *work2 )*ntime );
+      work3 = astMalloc( sizeof( *work3 )*ntime );
+      work4 = astMalloc( sizeof( *work4 )*ntime );
       blocks = astMalloc( sizeof( *blocks )*200 );
       common = astMalloc( sizeof( *common )*ntime );
+
+/* Produce a copy of the supplied quality array. */
+      tqua = astStore( NULL, qua, sizeof( *tqua )*nel );
 
 /* The "common" array has an element for every used time slice, and each
    element holds the number of bolometers that have a candidate step at
@@ -445,23 +457,35 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data,
 /* Loop round all usable bolometers. "base" holds the offset to the start
    of the usable data for the bolometer.  */
       for( ibolo = 0; ibolo < nbolo && *status==SAI__OK; ibolo++ ) {
-         base = ibolo*bstride;
-         if( !(qua[ base ] & SMF__Q_BADB) ) {
-            base += itime_start*tstride;
+         qbase = ibolo*bstride;
+         if( !(qua[ qbase ] & SMF__Q_BADB) ) {
+            base = qbase + itime_start*tstride;
+
+/* The "work2" array holds non-zero for every time slice that has
+   previously been found to have a high gradient. Fill it with zeros. */
+            memset( work2, 0, sizeof( *work2 )*ntime );
+
+/* Iterate. On each iteration the larger jumps are rejected. quit the
+   loop if the bolometer has not been flagged bad on a previous iteration. */
+            more = 1;
+            for( iter = 0; iter < MAXITER && more && *status == SAI__OK &&
+                 !(tqua[ qbase ] & SMF__Q_BADB); iter++ ) {
+               more = 0;
 
 #ifdef DEBUG_STEPS
 
    if( RECORD_BOLO ) {
       int kk;
       double *pd = dat + base;
-      smf_qual_t *pq = qua + base;
+      smf_qual_t *pq = tqua + base;
       for( kk = 0; kk < ntime; kk++ ) {
-         timedata[ kk ].indata = !( *pq & SMF__Q_MOD ) ? *pd : VAL__BADD;
+         timedata[ kk ].indata = *pd;
          timedata[ kk ].inquality = (int) *pq;
          timedata[ kk ].outdata = VAL__BADD;
          timedata[ kk ].outquality = 0;
          timedata[ kk ].ibolo = ibolo;
          timedata[ kk ].jump = VAL__BADD;
+         timedata[ kk ].rjump = VAL__BADD;
          timedata[ kk ].median = VAL__BADD;
          timedata[ kk ].in_rms = 0;
          timedata[ kk ].flags = 0;
@@ -471,20 +495,20 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data,
          timedata[ kk ].change = VAL__BADD;
          timedata[ kk ].fac = VAL__BADD;
          timedata[ kk ].diff = VAL__BADD;
-         timedata[ kk ].thresh = VAL__BADD;
          timedata[ kk ].line_start = VAL__BADD;
          timedata[ kk ].line_end = VAL__BADD;
+         timedata[ kk ].start_val = VAL__BADD;
+         timedata[ kk ].end_val = VAL__BADD;
          timedata[ kk ].rmslo = VAL__BADD;
          timedata[ kk ].rmshi = VAL__BADD;
+         timedata[ kk ].sigma = VAL__BADD;
+         timedata[ kk ].noise = VAL__BADD;
+         timedata[ kk ].thresh = VAL__BADD;
 
          pd += tstride;
          pq += tstride;
       };
    }
-
-   bolodata->ibolo = ibolo;
-   bolodata->rms_jump = VAL__BADD;
-   bolodata->thresh = VAL__BADD;
 
 #endif
 
@@ -492,65 +516,54 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data,
             nblock = 0;
 
 /* Smooth the bolometer data stream using a median block filter. Put the
-   smoothed data in "work". */
-            smf_median_smooth( dcmedianwidth, SMF__FILT_MEDIAN, -1.0,
-                               ntime, dat + base, qua + base,
-                               tstride, SMF__Q_MOD, work, w1, w2, NULL,
+   smoothed data in "work1". */
+            smf_median_smooth( dcmedianwidth, SMF__FILT_MEDIAN, -1.0, ntime,
+                               dat + base, tqua + base,
+                               tstride, SMF__Q_MOD, work1, w1, w2, NULL,
                                NULL, status );
 
-/* For each time slice, find the difference between the median value
-   before and after the time slice. We leave a small gap between the two
-   median boxes to allow for some rise time in any potential step. Find
-   the RMS value of these differences (iterate a few times, ignoring
-   differences larger than 2*RMS, to reduce the effect of really big
-   jumps on the RMS value). */
-            diff2_limit = VAL__MAXD;
-
-            for( iter = 0; iter < 3; iter++ ) {
-               tpop = 0;
-               tsum2 = 0.0;
-               pw1 = work + dcmedianwidth/2;
-               pw2 = pw1 + dcmedianwidth + dcmediangap;
-               for( itime = itime_lo; itime <= itime_hi; itime++,pw1++,pw2++ ) {
-                  if( *pw1 != VAL__BADD && *pw2 != VAL__BADD ) {
-                     diff = *pw2 - *pw1;
-                     diff2 = diff*diff;
-                     if( diff2 < diff2_limit ) {
-                        tsum2 += diff*diff;
-                        tpop++;
-
-#ifdef DEBUG_STEPS
-      if( RECORD_BOLO ) timedata[ itime ].in_rms = 1;
-   } else {
-      if( RECORD_BOLO ) timedata[ itime ].in_rms = 0;
-#endif
-
-                     }
-
-#ifdef DEBUG_STEPS
-   if( RECORD_BOLO ) {
-      timedata[ itime ].jump = diff;
-      timedata[ itime ].median = work[ itime ];
-   }
-#endif
-
-
+/* Form the gradient at each time slice as the difference between the median 
+   values half a median box to the left and right of the time slice. */
+            pw1 = work1 + dcmedianwidth/2;;
+            pw2 = pw1 + dcmedianwidth + dcmediangap;
+            for( itime = itime_lo; itime <= itime_hi; itime++,pw1++,pw2++ ) {
+               if( *pw1 != VAL__BADD && *pw2 != VAL__BADD ) {
+                  if( work2[ itime ] == 0 ) {
+                     work3[ itime ] = *pw2 - *pw1;
+                  } else {
+                     work3[ itime ] = VAL__BADD;
                   }
-               }
-
-               if( tpop > SMF__MINSTATSAMP ) {
-                  rms = sqrtf( tsum2/tpop );
-                  diff2_limit = 2.0*rms;
-                  diff2_limit *= diff2_limit;
                } else {
-                  rms = VAL__BADD;
-                  break;
+                  work3[ itime ] = VAL__BADD;
                }
             }
 
-/* If the time stream contains too few values, flag the entire bolometer as
-   bad, and pass on to the next bolometer. */
-            if( rms == VAL__BADD ) {
+/* Smooth the gradients using a larger median box filter. */
+            smf_median_smooth( dcfitbox, SMF__FILT_MEDIAN, -1.0, ntime,
+                               work3, NULL, 1, 0, work4, w1, w2, NULL,
+                               NULL, status );
+
+/* Subtract the smoothed gradients form the original gradients. This means that 
+   work4 now holds an indication of unusually high gradient compared to the typical 
+   gradient in the area. */ 
+            tpop = 0;
+            tsum2 = 0.0;
+            for( itime = itime_lo; itime <= itime_hi; itime++ ) {
+               if( work3[ itime ] != VAL__BADD && work4[ itime ] != VAL__BADD ) {
+                  work4[ itime ] = work3[ itime ] - work4[ itime ];
+                  if( work2[ itime ] == 0 ) {
+                     diff = work4[ itime ];
+                     tsum2 += diff*diff;
+                     tpop++;
+                  }
+               } else {
+                  work4[ itime ] = VAL__BADD;
+               }
+            }
+
+/* If the time stream contains too few values, or all values are equal,
+   flag the entire bolometer as bad, and pass on to the next bolometer. */
+            if( tpop <= SMF__MINSTATSAMP || tsum2 <= 0.0  ) {
                msgOutiff( MSG__DEBUG, "", "smf_fix_steps: flagging "
                           "entire bad bolo %" DIM_T_FMT ", due to "
                           "insufficient samples", status, ibolo );
@@ -561,10 +574,13 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data,
                }
                ns++;
                continue;
-            }
 
-/* Correct for the severe 2 sigma clipping in the estimation of rms. */
-            rms *= 1.28;
+            } else {
+               rms = sqrt( tsum2/tpop );
+               for( itime = 0; itime < ntime; itime++ ) {
+                  work3[ itime ] = rms;
+               }
+            }
 
 /* Indicate we are currently looking for the start of a step. */
             step_start = -1;
@@ -573,28 +589,39 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data,
             start_value = VAL__BADD;
             end_value = VAL__BADD;
             nsign = 0;
-
-/* Find the minimum significant gradient. */
-            thresh = rms*dcthresh;
-
-#ifdef DEBUG_STEPS
-   bolodata->rms_jump = rms;
-   bolodata->thresh = thresh;
-#endif
-
-
+            bad_in_step = 0;
 
 /* Scan through the range of time slices for which both median box values
    can be found. The "itime" variable gives the index of the central
    sample in the gap between the two median boxes (the upper of the two
    central samples if dcmediangap is even). */
-            pw1 = work + dcmedianwidth/2;
+            pw1 = work1 + dcmedianwidth/2;
             pw2 = pw1 + dcmedianwidth + dcmediangap;
             for( itime = itime_lo; itime <= itime_hi; itime++,pw1++,pw2++ ) {
 
-/* Get the difference at this time */
-               if( *pw1 != VAL__BADD && *pw2 != VAL__BADD ) {
-                  diff = *pw2 - *pw1;
+#ifdef DEBUG_STEPS
+   if( RECORD_BOLO ) {
+      timedata[ itime ].median = work1[ itime ];
+   }
+#endif
+
+/* Get the difference in the median filtered value on either side of
+   this time slice. */
+               diff = work4[ itime ];
+               if( diff != VAL__BADD && *pw1 != VAL__BADD &&
+                                        *pw2 != VAL__BADD ) {
+
+/* Find the minimum significant difference at this time. */
+                  thresh = work3[ itime ]*dcthresh;
+
+#ifdef DEBUG_STEPS
+   if( RECORD_BOLO ) {
+      timedata[ itime ].noise = work3[ itime ];
+      timedata[ itime ].thresh = thresh;
+      timedata[ itime ].jump = *pw2 - *pw1;
+      timedata[ itime ].rjump = work4[ itime ];
+   }
+#endif
 
 /* If the absolute difference between the two median values is greater than the
    minimum significant step height, note the sign of the difference. */
@@ -619,7 +646,6 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data,
       }
    }
 #endif
-
 
 /* If we are currently looking for the start of a new step, record the
    index of the step start, and the median value before the start. */
@@ -651,8 +677,32 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data,
    which the step could end, we now know where the step ends. */
                   } else if( step_start != -1 && itime >= step_limit ) {
 
+/* Use BADDA quality (temporarily) to indicate that the high gradient
+   samples should be excluded from further iterations. */
+                     jstart = step_start - dcmediangap;
+                     if( jstart < 0 ) jstart = 0;
+
+                     jend = step_end + dcmediangap;
+                     if( jend >= ntime ) jend = ntime - 1;
+
+                     pq1 = tqua + base + jstart*tstride;
+                     new_high = 0;
+                     for( jtime = jstart; jtime <= jend; jtime++ ) {
+                        if( ! (*pq1 & SMF__Q_BADDA) ) {
+                           *pq1 |= SMF__Q_BADDA;
+                           new_high = 1;
+                        }
+                        work2[ jtime ] = 1;
+                        pq1 += tstride;
+                     }
+
+/* Indicate we need to do at least one more iteration. */
+                     if( new_high ) more++;
+
 /* If the step rise is too short or too long, we ignore the step. Also,
-   if the sign of the step is insufficiently clear, we ignore it. */
+   if the sign of the step is insufficiently clear, we ignore it. Also, 
+   if the step contains any bad values (e.g. samples flagged on previous 
+   iterations) ignore it. */
                      step_width = step_end - step_start + 1;
 
 #ifdef DEBUG_STEPS
@@ -663,11 +713,11 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data,
          timedata[ jtime ].step_width = (double)(step_width-dcminstepwidth)/(double)(dcmaxstepwidth-dcminstepwidth);
          timedata[ jtime ].nsign = (double)abs(nsign)/(double)(dcminsignratio*step_width);
       }
-      printf("dcminstepwidth=%d dcmaxstepwidth=%d dcminsignratio=%g\n", dcminstepwidth, dcmaxstepwidth, dcminsignratio);
    }
 #endif
 
-                     if( step_width >= dcminstepwidth &&
+                     if( !bad_in_step &&
+                         step_width >= dcminstepwidth &&
                          step_width <= dcmaxstepwidth &&
                          abs( nsign ) >= dcminsignratio*step_width ) {
 
@@ -707,21 +757,24 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data,
    }
 #endif
 
-
-
                            }
                         }
                      }
 
 /* Indicate we are now looking for the start of a new step. */
                      step_start = -1;
+                     bad_in_step = 0;
                   }
+
+/* Indicate the step contains some bad values. */
+               } else if( step_start != -1 ){
+                  bad_in_step = 1;
                }
             }
 
 /* Now measure each candidate jump and apply all required corrections to
    the bolometer time stream. */
-            ns += smf1_step_correct( nblock, blocks, work, qua, dat, base,
+            ns += smf1_step_correct( nblock, blocks, work1, tqua, dat, base,
                                      ibolo, bstride, tstride, ntslice,
                                      ntime, itime_lo, itime_hi, common,
                                      dcmaxsteps*( ((double) tpop)/12000.0 ),
@@ -729,27 +782,15 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data,
                                      dcthresh2, dcmaxstepwidth, pad_start,
                                      itime_start, itime_end, &nfixed,
                                      steps, status DEBUG_VALS );
-         }
-
-
-
-
-
-
-
-
-
-
-
 
 #ifdef DEBUG_STEPS
    base = ibolo*bstride + itime_start*tstride;
    if( !(qua[ base ] & SMF__Q_BADB) ) {
       if( RECORD_BOLO ) {
          double *pd = dat + base;
-         smf_qual_t *pq = qua + base;
+         smf_qual_t *pq = tqua + base;
          for( itime = 0; itime < ntime; itime++ ) {
-            timedata[ itime ].outdata = !( *pq & SMF__Q_MOD ) ? *pd : VAL__BADD;
+            timedata[ itime ].outdata = *pd;
             timedata[ itime ].outquality = (int) *pq;
             pd += tstride;
             pq += tstride;
@@ -761,6 +802,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data,
             fprintf( fd2, "%d ", timedata[itime].outquality);
             fprintf( fd2, "%d ", timedata[itime].ibolo);
             TOPCAT( fd2, timedata[itime].jump );
+            TOPCAT( fd2, timedata[itime].rjump );
             TOPCAT( fd2, timedata[itime].median );
             fprintf( fd2, "%d ", timedata[itime].in_rms );
             fprintf( fd2, "%d ", timedata[itime].flags );
@@ -770,29 +812,26 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data,
             TOPCAT( fd2, timedata[itime].change );
             TOPCAT( fd2, timedata[itime].fac );
             TOPCAT( fd2, timedata[itime].diff );
-            TOPCAT( fd2, timedata[itime].thresh );
             TOPCAT( fd2, timedata[itime].line_start );
             TOPCAT( fd2, timedata[itime].line_end );
+            TOPCAT( fd2, timedata[itime].start_val );
+            TOPCAT( fd2, timedata[itime].end_val );
             TOPCAT( fd2, timedata[itime].rmslo );
             TOPCAT( fd2, timedata[itime].rmshi );
+            TOPCAT( fd2, timedata[itime].sigma );
+            TOPCAT( fd2, timedata[itime].noise );
+            TOPCAT( fd2, timedata[itime].thresh );
+            fprintf( fd2, "%d ", iter );
             fprintf( fd2, "\n" );
 
 
          }
       }
-
-      fprintf( fd1, "%d ", bolodata->ibolo );
-      TOPCAT( fd1, bolodata->rms_jump );
-      TOPCAT( fd1, bolodata->thresh );
-      fprintf( fd1, "\n" );
    }
 #endif
 
-
-
-
-
-
+            }
+         }
       }
 
 /* A large, detected, step at a certain time often corresponds to smaller
@@ -811,12 +850,14 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data,
 
             if( common[ jtime ] > dclimcorr ) {
                if( step_start == -1 ) step_start = jtime;
+               step_end = jtime;
+               step_limit = jtime + dcminstepgap;
 
-            } else {
-               if( step_start != -1 ) {
-                  step_end = jtime - 1;
-                  step_width = step_end - step_start + 1;
+            } else if( step_start != -1  && jtime >= step_limit) {
+               step_width = step_end - step_start + 1;
 
+               if( step_width > dcminstepwidth &&
+                   step_width < dcmaxstepwidth ) {
                   iblock = nblock++;
                   blocks = astGrow( blocks, 2*nblock, sizeof( *blocks ) );
                   if( *status == SAI__OK ) {
@@ -824,24 +865,25 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data,
                      block[ 0 ] = step_start;
                      block[ 1 ] = step_end;
                   }
-
-                  step_start = -1;
                }
+
+               step_start = -1;
             }
          }
 
 /* If any correlated steps were found, correct every bolometer at the
-   position of each correlated jump. */
+   position of each correlated jump. Use a lower threshold "dcthresh3) than 
+   for primary steps. */
          if( nblock > 0 ) {
             for( ibolo = 0; ibolo < nbolo && *status==SAI__OK; ibolo++ ) {
                base = ibolo*bstride + itime_start*tstride;
-               if( !(qua[ base ] & SMF__Q_BADB) ) {
+               if( !(tqua[ base ] & SMF__Q_BADB) ) {
 
-                  ns += smf1_step_correct( nblock, blocks, work, qua, dat,
+                  ns += smf1_step_correct( nblock, blocks, work1, tqua, dat,
                                            base, ibolo, bstride, tstride,
 					   ntslice, ntime, itime_lo,
 					   itime_hi, NULL, 0, dcfitbox,
-					   dcminbox, dcminpop, 0.0,
+					   dcminbox, dcminpop, dcthresh3,
 					   dcthresh2, dcmaxstepwidth, pad_start,
                                            itime_start, itime_end,
                                            &nfixed, steps, status DEBUG_VALS );
@@ -851,16 +893,27 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data,
          }
       }
 
+/* Copy the SMF__Q_JUMP and SMF__Q_BADB flags from the temporary quality
+   array to the real quality array.  */
+      pq1 = qua;
+      pq2 = tqua;
+      for( iel = 0; iel < nel; iel++,pq1++,pq2++ ) {
+         *pq1 |= ( *pq2 & ( SMF__Q_JUMP | SMF__Q_BADB  ) );
+      }
+
 /* Free workspace */
       w1 = astFree( w1 );
       w2 = astFree( w2 );
-      work = astFree( work );
+      work1 = astFree( work1 );
+      work2 = astFree( work2 );
+      work3 = astFree( work3 );
+      work4 = astFree( work4 );
+      tqua = astFree( tqua );
       blocks = astFree( blocks );
       common = astFree( common );
 
 #ifdef DEBUG_STEPS
    timedata = astFree( timedata );
-   bolodata = astFree( bolodata );
 #endif
 
    }
@@ -882,7 +935,6 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data,
    if( nstep ) *nstep = nfixed;
 
 #ifdef DEBUG_STEPS
-   fclose( fd1 );
    fclose( fd2 );
 #endif
 
@@ -1121,22 +1173,21 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
 
 /* Store the current correction up to the start of the current block. */
       for( ; itime < step_start; itime++,pw++ ) {
+         *pw = corr;
          if( !( *pq & SMF__Q_MOD ) ) {
-            *pw = corr;
             ncorr++;
             sumcorr += corr;
-         } else {
-            *pw = VAL__BADD;
          }
          pq += tstride;
       }
 
-/* We now fit a straight line to the data just before the step. The fit
-   box ends at the start of the step, and usually extends for "dcfitbox"
+/* We now fit a straight line to the data just before the step. The
+   fit box ends some way before the start of the step (to avoid any
+   unusual behaviour close to the step), and usually extends for "dcfitbox"
    samples. However, the box is truncated at the end of the previous step
-   (so long as this leaves at least DCMAXSTEPWIDTH samples in the box),
-   or at the start of the time stream. */
-      boxend = step_start - 1;
+   (so long as this leaves at least DCMAXSTEPWIDTH samples in the box), or
+   at the start of the time stream. */
+      boxend = step_start - 1 - dcmaxstepwidth;
       boxstart = end_prev + 1;
       boxlen = boxend - boxstart + 1;
       if( boxlen < dcmaxstepwidth ){
@@ -1167,7 +1218,7 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
          if( boxstart == 0 ) {
             pq1 = qua + base + boxstart*tstride;
             for( jtime = 0; jtime < boxlen; jtime++ ) {
-               *pq1 |= SMF__Q_JUMP;
+                *pq1 |= SMF__Q_JUMP;
                 pq1 += tstride;
             }
          }
@@ -1177,12 +1228,13 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
 /* Get the data value at the centre of the step as implied by the
    above fitted line. */
       if( mlo != VAL__BADD ) {
-         start_value = mlo*( boxlen + step_width/2 ) + clo;
+         start_value = mlo*( step_start + step_width/2 - boxstart ) + clo;
 
 #ifdef DEBUG_STEPS
    if( RECORD_BOLO ) {
       timedata[ boxstart ].line_end = clo;
-      timedata[ step_start ].line_start = mlo*boxlen + clo;
+      timedata[ boxstart + boxlen ].line_start = mlo*boxlen + clo;
+      timedata[ step_start + step_width/2 ].start_val = start_value;
    }
 #endif
 
@@ -1192,7 +1244,7 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
 
 /* In the same way fit a line to the data just after the step, and get
    the data value at the centre of the step as implied by the fitted line. */
-      boxstart = step_end + 1;
+      boxstart = step_end + 1 + dcmaxstepwidth;
       boxend = start_next - 1;
       boxlen = boxend - boxstart + 1;
       if( boxlen < dcmaxstepwidth ){
@@ -1214,19 +1266,20 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
          if( boxend == ntime - 1 ) {
             pq1 = qua + base + boxstart*tstride;
             for( jtime = 0; jtime < boxlen; jtime++ ) {
-               *pq1 |= SMF__Q_JUMP;
+                *pq1 |= SMF__Q_JUMP;
                 pq1 += tstride;
             }
          }
       }
 
       if( mhi != VAL__BADD ) {
-         end_value = mhi*( -step_width/2 ) + chi;
+         end_value = mhi*( step_end - step_width/2 - boxstart ) + chi;
 
 #ifdef DEBUG_STEPS
    if( RECORD_BOLO ) {
       timedata[ boxstart ].line_start = chi;
       timedata[ boxstart + boxlen ].line_end = mhi*boxlen + chi;
+      timedata[ step_end - step_width/2 ].end_val = end_value;
    }
 #endif
 
@@ -1247,14 +1300,11 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
          }
 
 
-
-
 #ifdef DEBUG_STEPS
    if( RECORD_BOLO ) {
       for( jtime = step_start; jtime <= step_end; jtime++ ) {
          timedata[ jtime ].flags |= CHECK_3;
          timedata[ jtime ].diff = diff;
-         timedata[ jtime ].thresh = thresh;
          timedata[ jtime ].rmshi = rmshi;
          timedata[ jtime ].rmslo = rmslo;
       }
@@ -1300,12 +1350,10 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
 
 /* Assign the current correction to the remaining time slices. */
    for( ; itime < ntime; itime++,pw++ ) {
+      *pw = corr;
       if( !( *pq & SMF__Q_MOD ) ) {
-         *pw = corr;
          ncorr++;
          sumcorr += corr;
-      } else {
-         *pw = VAL__BADD;
       }
       pq += tstride;
    }
@@ -1348,11 +1396,11 @@ static int smf1_step_correct( int nblock, int *blocks, double *work,
       corr = 0;
       for( ; itime <= itime_hi + itime_start; itime++,pw++ ) {
          if( *pw != VAL__BADD ) {
-             corr = *pw - avecorr;
+            corr = *pw - avecorr;
          } else {
             *pq |= SMF__Q_JUMP;
          }
-         *pd += corr;
+         if( *pd != VAL__BADD ) *pd += corr;
 
          pd += tstride;
          pq += tstride;
