@@ -18,8 +18,8 @@
  *                          const smfArray *flatramps,
  *                          size_t whichchunk, int ensureflat, int isTordered,
  *                          AstFrameSet *outfset, int moving,
- *                          int *lbnd_out, int *ubnd_out, dim_t padStart,
- *                          dim_t padEnd, int flags, int tstep,
+ *                          int *lbnd_out, int *ubnd_out, dim_t req_padStart,
+ *                          dim_t req_padEnd, int flags, int tstep,
  *                          smfArray **concat, int *status )
 
  *  Arguments:
@@ -54,10 +54,12 @@
  *     ubnd_out = double* (Given)
  *        2-element array pixel coord. for the upper bounds of the output map
  *        (if outfset specified)
- *     padStart = dim_t (Given)
- *        Pad start of concatenated array with this many samples.
- *     padEnd = dim_t (Given)
- *        Pad end of concatenated array with this many samples.
+ *     req_padStart = dim_t (Given)
+ *        Pad start of concatenated array with this many samples. Will have no
+ *        effect if the data have been padded previously.
+ *     req_padEnd = dim_t (Given)
+ *        Pad end of concatenated array with this many samples. Will have no
+ *        effect if the data have been padded previously.
  *     flags = int (Given)
  *        Additional flags to control processing of individual data files
  *        as they are being concatenated.
@@ -155,6 +157,8 @@
  *     2010-07-14 (TIMJ):
  *        Simplify multi-pass logic
  *        Propagate quality that was in flatfielded data even if not in raw
+ *     2010-07-16 (TIMJ):
+ *        Only pad if the data have not already been padded.
 
  *  Notes:
  *     If projection information supplied, pointing LUT will not be
@@ -165,8 +169,8 @@
  *     QUALITY is present in the template, prevent propagation to the
  *     concatenated file by setting SMF__NOCREATE_VARIANCE /
  *     SMF__NOCREATE_QUALITY. Specifying padStart and/or padEnd will
- *     pad the data with the specified number of samples. Also note
- *     that the new padded region will have:
+ *     pad the data with the specified number of samples unless the data
+ *     have already been padded. Also note that the new padded region will have:
  *       - DATA and VARIANCE values set to 0
  *       - QUALITY set to SMF__Q_PAD
  *       - QUALITY also set to SMF__Q_BADB if the BADB flag was set at the
@@ -225,8 +229,8 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                           const smfArray *flatramps, size_t whichchunk,
                           int ensureflat, int isTordered,
                           AstFrameSet *outfset, int moving,
-                          int *lbnd_out, int *ubnd_out, dim_t padStart,
-                          dim_t padEnd, int flags, int tstep,
+                          int *lbnd_out, int *ubnd_out, dim_t req_padStart,
+                          dim_t req_padEnd, int flags, int tstep,
                           smfArray **concat, int *status ) {
 
   /* Local Variables */
@@ -256,6 +260,8 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
   dim_t nrow;                   /* Number of rows */
   Grp *outgrp=NULL;             /* Pointer to 1-element output group */
   size_t outgrpsize;            /* Size of outgrp */
+  dim_t padEnd = 0;             /* Padding to use for end of this chunk */
+  dim_t padStart = 0;           /* Padding to use for start of this chunk */
   char *pname;                  /* Pointer to input filename */
   smfData *refdata=NULL;        /* Reference smfData */
   smf_dtype refdtype;           /* reference DATA/VARIANCE type */
@@ -329,8 +335,11 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
   /* Loop over related elements (number of subarrays) */
   for( i=0; (*status == SAI__OK) && i<nrelated; i++ ) {
 
-    /* Initialize time length of concatenated array to amount of padding */
-    tlen = padStart + padEnd;
+    /* Initialize time length of concatenated array. We will add on padding if the
+       first and last files have not already recevied padding */
+    tlen = 0;
+    padEnd = 0;
+    padStart = 0;
 
     /* Two passes over data for the subarray: first time to identify
        dimensions of each file, second time to actually open each file
@@ -368,7 +377,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
 
       /* Get data dimensions */
       smf_get_dims( refdata, &nrow, &ncol,
-                    NULL, &reftlen, NULL, NULL, NULL, status );
+                    NULL, &reftlen, &refndata, NULL, NULL, status );
 
       if( *status == SAI__OK ) {
         if( j == firstpiece ) {
@@ -382,6 +391,15 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
             havearray[k] = (refdata->pntr[k] != NULL);
           }
           havequal = ( refdata->qual != NULL );
+
+          /* Look for padding at start. Just need to look at the quality
+             of the very first element. */
+          if (refdata && refdata->qual && (refdata->qual)[0] & SMF__Q_PAD ) {
+            padStart = 0;
+          } else {
+            /* Use the requested value */
+            padStart = req_padStart;
+          }
 
           /* Concatenated data is always double precision */
           refdtype = SMF__DOUBLE;
@@ -423,6 +441,16 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                     ": ^FILE ^FLAG component QUALITY", status );
           }
         }
+
+        /* Check padding at end */
+        if (j == lastpiece) {
+          if (refdata && refdata->qual && (refdata->qual)[refndata-1] & SMF__Q_PAD ) {
+            padEnd = 0;
+          } else {
+            padEnd = req_padEnd;
+          }
+        }
+
       }
 
       if( *status == SAI__OK ) {
@@ -433,6 +461,9 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
       /* Close the reference file */
       smf_close_file( &refdata, status );
     }
+
+    /* Add any padding to the length */
+    tlen += padStart + padEnd;
 
     /* Loop over subgroups (number of time chunks), continuing only
        if the chunk is equal to whichchunk */
