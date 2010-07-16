@@ -12,6 +12,8 @@
 
 
 modelorder = (com,gai,ext,dks,ast,noi)
+exportndf = (com,gai,ast,flt,dks,smo,pln,res,noi,qua)
+itermap=1
 
 padstart = 1000
 padend = 1000
