@@ -13,14 +13,16 @@
 *     Library routine
 
 *  Invocation:
-*     smf_qualstats( smf_qfam_t qfamily, const smf_qual_t *qual, dim_t nbolo,
+*     smf_qualstats( smf_qfam_t qfamily, int nopad, const smf_qual_t *qual, dim_t nbolo,
 *                    size_t bstride, size_t ntslice, size_t tstride,
 *                    size_t qcount[SMF__NQBITS], size_t *ngoodbolo, size_t *nmap,
-*                    size_t *nmax, int *status )
+*                    size_t *nmax, size_t *tpad, int *status )
 
 *  Arguments:
 *     qfamily = smf_qfam_t (Given)
 *        Quality family associated with this quality array.
+*     nopad = int (Given)
+*        If true the padded region will not be included in the quality count.
 *     qual = const smf_qual_t * (Given)
 *        Pointer to quality array
 *     nbolo = dim_t (Given)
@@ -46,6 +48,8 @@
 *        If specified, return the maximum theoretical number of samples that
 *        could be used for a map -- excluding only SMF__Q_PAD|SMF__Q_APOD
 *        (padding/apodization).
+*     tpad = size_t * (Returned)
+*        Number of slices of padding. Can be NULL.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -67,6 +71,8 @@
 *        Track samples that could go into the map (nmap, nmax)
 *     2010-06-23 (TIMJ):
 *        Add quality family support.
+*     2010-07-16 (TIMJ):
+*        Add ability to not include padded data. Add tpad parameter.
 
 *  Copyright:
 *     Copyright (C) 2010 University of British Columbia.
@@ -107,10 +113,10 @@
 
 #define FUNC_NAME "smf_qualstats"
 
-void smf_qualstats( smf_qfam_t qfamily, const smf_qual_t *qual, dim_t nbolo,
+void smf_qualstats( smf_qfam_t qfamily, int nopad, const smf_qual_t *qual, dim_t nbolo,
                     size_t bstride, size_t ntslice, size_t tstride,
                     size_t qcount[SMF__NQBITS], size_t *ngoodbolo,
-                    size_t *nmap, size_t *nmax,
+                    size_t *nmap, size_t *nmax, size_t *tpad,
                     int *status ) {
 
   /* Local Variables */
@@ -122,6 +128,14 @@ void smf_qualstats( smf_qfam_t qfamily, const smf_qual_t *qual, dim_t nbolo,
   size_t nummax=0;
   size_t nqbits = 0;            /* Number of quality bits in this family */
   size_t offset;
+  size_t slice_start = 0;       /* First time slice to analyse */
+  size_t slice_end = 0;         /* last time slice */
+
+  /* init */
+  if (tpad) *tpad = 0;
+  if (nmax) *nmax = 0;
+  if (nmap) *nmap = 0;
+  if (ngoodbolo) *ngoodbolo = 0;
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -137,6 +151,15 @@ void smf_qualstats( smf_qfam_t qfamily, const smf_qual_t *qual, dim_t nbolo,
   nqbits = smf_qfamily_count( qfamily, status );
   memset( qcount, 0, nqbits*sizeof(*qcount) );
 
+  /* Determine start and end time slices */
+  if (nopad) {
+    smf_get_goodrange( qual, ntslice, tstride, SMF__Q_PAD, &slice_start,
+                       &slice_end, status );
+  } else {
+    slice_start = 0;
+    slice_end = ntslice-1;
+  }
+
   /* Loop over bolo and time slice, and count occurrences of quality bits */
   for( i=0; i<nbolo; i++ ) {
 
@@ -145,7 +168,7 @@ void smf_qualstats( smf_qfam_t qfamily, const smf_qual_t *qual, dim_t nbolo,
       numgoodbolo++;
     }
 
-    for( j=0; j<ntslice; j++ ) {
+    for( j=slice_start; j<=slice_end; j++ ) {
       offset = i*bstride+j*tstride;
 
       /* Count samples for nmap and nmax */
@@ -179,5 +202,15 @@ void smf_qualstats( smf_qfam_t qfamily, const smf_qual_t *qual, dim_t nbolo,
     *nmax = nummax;
   }
 
+  if (tpad) {
+    if (nopad) {
+      /* we got this directly */
+      *tpad = slice_start +  ( (ntslice -1) - slice_end );
+    } else {
+      /* which bit is SMF__Q_PAD? */
+      size_t whichbit = smf_qual_to_bit( SMF__Q_PAD, status );
+      *tpad = qcount[whichbit] / nbolo;
+    }
+  }
 
 }

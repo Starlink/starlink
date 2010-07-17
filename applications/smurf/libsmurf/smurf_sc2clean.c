@@ -376,7 +376,7 @@ void smurf_sc2clean( int *status ) {
         size_t last_nmap = 0;
         if (tmparr) tmparr->owndata = 0;  /* someone else owns smfData */
         smf_addto_smfArray( tmparr, ffdata, status );
-        smf_qualstats_report( MSG__VERB, SMF__QFAM_TSERIES, tmparr, last_qcount,
+        smf_qualstats_report( MSG__VERB, SMF__QFAM_TSERIES, 1, tmparr, last_qcount,
                               &last_nmap, 1, NULL, NULL, status );
         smf_close_related( &tmparr, status );
       }

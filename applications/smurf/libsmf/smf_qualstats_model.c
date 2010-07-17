@@ -13,7 +13,7 @@
 *     Library routine
 
 *  Invocation:
-*     smf_qualstats_model( smf_qfam_t qfamily, const smfArray *qua,
+*     smf_qualstats_model( smf_qfam_t qfamily, int nopad, const smfArray *qua,
 *                          size_t qcount[SMF__NQBITS], size_t * ngoodbolo, size_t * nmap,
 *                          size_t *nmax, dim_t *ntslice, size_t * ntgood,
 *                          size_t * tbound, size_t * tpad, int * status );
@@ -21,8 +21,12 @@
 *  Arguments:
 *     qfamily = smf_qfam_t (Given)
 *        Quality family associated with this quality array.
+*     nopad = int (Given)
+*        If true the padded region will not be included in the calculation.
 *     qua = const smfArray *qua (Given)
-*        Pointer to smfArray of smfData's containing quality
+*        Pointer to smfArray of smfData's containing quality. Assumes that the
+*        dimensionality of each smfData is the same and that the padding
+*        is the same.
 *     qcount = size_t[SMF__NQBITS] (Returned)
 *        Pointer to array that will count number of occurences of each
 *        quality bit in qual. Will only use the number of elements determined
@@ -37,13 +41,15 @@
 *        could be used for a map -- excluding only SMF__Q_PAD|SMF__Q_APOD
 *        (padding/apodization).
 *     ntslice = size_t * (Returned)
-*        Number of time slices in model. Can be NULL.
+*        Number of time slices in model. Can be NULL. Will not include padding if "nopad"
+*        is true.
 *     ntgood = size_t * (Returned)
-*        Number of good time slices in model (not including padding). Can be NULL.
+*        Number of good time slices in model (not including padding or apodization). Can be NULL.
 *     tbound = size_t * (Returned)
-*        Number of time slice in boundary. Can be NULL.
+*        Number of time slice in boundary. Can be NULL. Will not include padding if "nopad"
+*        is true.
 *     tpad = size_t * (Returned)
-*        Number of time slices in padding. Can be NULL.
+*        Number of time slices in padding. Can be NULL. Will be zero if nopad is false.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -71,6 +77,9 @@
 *        Use dim_t for ntslice in an attempt at consistency.
 *     2010-06-23 (TIMJ):
 *        Add quality family support.
+*     2010-07-16 (TIMJ):
+*        Support "nopad" parameter so that we can calculate quality
+*        stats ignoring padding.
 
 *  Copyright:
 *     Copyright (C) 2010 University of British Columbia.
@@ -113,7 +122,7 @@
 #define FUNC_NAME "smf_qualstats_report"
 
 void
-smf_qualstats_model( smf_qfam_t qfamily, const smfArray *qua, size_t qcount[SMF__NQBITS],
+smf_qualstats_model( smf_qfam_t qfamily, int nopad, const smfArray *qua, size_t qcount[SMF__NQBITS],
                      size_t * ngoodbolo, size_t * nmap, size_t *nmax, dim_t * ntslice,
                      size_t * ntgood, size_t * tbound, size_t *tpad, int * status ) {
 
@@ -126,6 +135,7 @@ smf_qualstats_model( smf_qfam_t qfamily, const smfArray *qua, size_t qcount[SMF_
   size_t nqbits = 0;            /* Number of quality bits in this family */
   dim_t ntslice_ref;            /* reference number of time slices */
   size_t tbound_local;          /* Local calculation of tbound */
+  size_t tpad_ref;              /* Reference padding slices */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -146,6 +156,7 @@ smf_qualstats_model( smf_qfam_t qfamily, const smfArray *qua, size_t qcount[SMF_
   /* Loop over subarray */
   nbolo_tot = 0;
   ntslice_ref = 0;
+  tpad_ref = 0;
   for( idx=0; (idx<qua->ndat)&&(*status==SAI__OK); idx++ ) {
     smf_qual_t *qual=NULL;     /* pointer to quality buffer */
 
@@ -168,23 +179,36 @@ smf_qualstats_model( smf_qfam_t qfamily, const smfArray *qua, size_t qcount[SMF_
       size_t subnmap;               /* nmap for subarray */
       size_t subnmax;               /* nmax for subarray */
       size_t tstride;               /* time slice stride */
+      size_t tpadslices;            /* number of time slices in padding */
 
       smf_get_dims( qua->sdata[idx], NULL, NULL, &nbolo, &nslices,
                     NULL, &bstride, &tstride, status );
 
 
       /* get quality statistics for the current subarray */
-      smf_qualstats( qfamily, qual, nbolo, bstride, nslices, tstride, subqcount,
-                     NULL, &subnmap, &subnmax, status );
+      smf_qualstats( qfamily, nopad, qual, nbolo, bstride, nslices, tstride, subqcount,
+                     NULL, &subnmap, &subnmax, &tpadslices, status );
 
       /* add to total number of bolometers and check for length consistency */
       nbolo_tot += nbolo;
       if( !ntslice_ref ) {
+        /* Remove padding from this number if nopad is true */
+        if (nopad) {
+          nslices -= tpadslices;
+        }
         ntslice_ref = nslices;
       } else if( nslices != ntslice_ref ) {
         *status = SAI__ERROR;
         errRep(" ", FUNC_NAME
                ": Different subarrays have mismatch in number of time slices.", status);
+      }
+
+      if (!tpad_ref) {
+        tpad_ref = tpadslices;
+      } else if ( tpad_ref != tpadslices ) {
+        *status = SAI__ERROR;
+        errRep( "", FUNC_NAME
+                ": Different subarrays have mismatch in padding", status );
       }
 
       if( *status == SAI__OK ) {
@@ -212,11 +236,14 @@ smf_qualstats_model( smf_qfam_t qfamily, const smfArray *qua, size_t qcount[SMF_
   tbound_local = ntslice_ref-nmax_tot/nbolo_tot;
   if (tbound) *tbound = tbound_local;
 
-  /* Calculate time slices in padding */
+  /* Calculate time slices in padding if we got padding statistics. The alternative
+     is to calculate this using smf_get_goodrange for each smfData. */
   if (tpad) {
-    /* which bit is SMF__Q_PAD? */
-    size_t whichbit = smf_qual_to_bit( SMF__Q_PAD, status );
-    *tpad = qcount[whichbit] / nbolo_tot;
+    if (!nopad) {
+      *tpad = tpad_ref;
+    } else {
+      *tpad = 0;
+    }
   }
 
   /* Calculate the number of time slices that can be used */

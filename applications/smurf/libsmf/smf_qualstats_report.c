@@ -13,15 +13,19 @@
 *     Library routine
 
 *  Invocation:
-*     smf_qualstats_report( smf_qfam_t qfamily, const smfArray *qua,
-*                           size_t last_qcount[SMF__NQBITS],
+*     smf_qualstats_report( msglev_t msglev, smf_qfam_t qfamily, int nopad,
+*                           const smfArray *qua, size_t last_qcount[SMF__NQBITS],
 *                           size_t *last_nmap,
 *                           int init, size_t * ngood_tslice,
 *                           size_t *numdata, int *status )
 
 *  Arguments:
+*     msglev = msglev_t (Given)
+*        Messaging level for output.
 *     qfamily = smf_qfam_t (Given)
 *        Quality family associated with this quality array.
+*     nopad = int (Given)
+*        If true padding will not be included in report.
 *     qua = const smfArray *qua (Given)
 *        Pointer to smfArray of smfData's containing quality
 *     last_qcount = size_t[SMF__NQBITS] (Given and Returned)
@@ -78,6 +82,8 @@
 *        Add quality family support.
 *     2010-07-14 (TIMJ):
 *        Control message level of report
+*     2010-07-16 (TIMJ):
+*        Add ability to ignore padding.
 
 *  Copyright:
 *     Copyright (C) 2010 University of British Columbia.
@@ -119,7 +125,7 @@
 
 #define FUNC_NAME "smf_qualstats_report"
 
-void smf_qualstats_report( msglev_t msglev, smf_qfam_t qfamily,
+void smf_qualstats_report( msglev_t msglev, smf_qfam_t qfamily, int nopad,
                            const smfArray *qua, size_t last_qcount[SMF__NQBITS],
                            size_t *last_nmap, int init,
                            size_t *ngood_tslice, size_t *numdata,
@@ -177,7 +183,7 @@ void smf_qualstats_report( msglev_t msglev, smf_qfam_t qfamily,
   memset( qcount, 0, nqbits*sizeof(*qcount) );
 
   /* Find out the properties of the smfArray */
-  smf_qualstats_model( qfamily, qua, qcount, &nbolo_tot, &nmap, &nmax,
+  smf_qualstats_model( qfamily, nopad, qua, qcount, &nbolo_tot, &nmap, &nmax,
                        &ntslice, &ntgood, &tbound, &tpad, status );
 
   /* Get a more accurate steptime if we can */
