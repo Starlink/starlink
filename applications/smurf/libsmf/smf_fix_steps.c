@@ -522,11 +522,14 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data,
                                tstride, SMF__Q_MOD, work1, w1, w2, NULL,
                                NULL, status );
 
-/* Form the gradient at each time slice as the difference between the median 
+/* Form the gradient at each time slice as the difference between the median
    values half a median box to the left and right of the time slice. */
+            pw1 = work3;
+            for( itime = 0; itime < itime_lo; itime++ ) *(pw1++) = VAL__BADD;
+
             pw1 = work1 + dcmedianwidth/2;;
             pw2 = pw1 + dcmedianwidth + dcmediangap;
-            for( itime = itime_lo; itime <= itime_hi; itime++,pw1++,pw2++ ) {
+            for( ; itime <= itime_hi; itime++,pw1++,pw2++ ) {
                if( *pw1 != VAL__BADD && *pw2 != VAL__BADD ) {
                   if( work2[ itime ] == 0 ) {
                      work3[ itime ] = *pw2 - *pw1;
@@ -538,14 +541,17 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data,
                }
             }
 
+            pw1 = work3 + itime;
+            for( ; itime < ntime; itime++ ) *(pw1++) = VAL__BADD;
+
 /* Smooth the gradients using a larger median box filter. */
             smf_median_smooth( dcfitbox, SMF__FILT_MEDIAN, -1.0, ntime,
                                work3, NULL, 1, 0, work4, w1, w2, NULL,
                                NULL, status );
 
-/* Subtract the smoothed gradients form the original gradients. This means that 
-   work4 now holds an indication of unusually high gradient compared to the typical 
-   gradient in the area. */ 
+/* Subtract the smoothed gradients form the original gradients. This means that
+   work4 now holds an indication of unusually high gradient compared to the typical
+   gradient in the area. */
             tpop = 0;
             tsum2 = 0.0;
             for( itime = itime_lo; itime <= itime_hi; itime++ ) {
@@ -700,8 +706,8 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data,
                      if( new_high ) more++;
 
 /* If the step rise is too short or too long, we ignore the step. Also,
-   if the sign of the step is insufficiently clear, we ignore it. Also, 
-   if the step contains any bad values (e.g. samples flagged on previous 
+   if the sign of the step is insufficiently clear, we ignore it. Also,
+   if the step contains any bad values (e.g. samples flagged on previous
    iterations) ignore it. */
                      step_width = step_end - step_start + 1;
 
@@ -872,7 +878,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data,
          }
 
 /* If any correlated steps were found, correct every bolometer at the
-   position of each correlated jump. Use a lower threshold "dcthresh3) than 
+   position of each correlated jump. Use a lower threshold "dcthresh3) than
    for primary steps. */
          if( nblock > 0 ) {
             for( ibolo = 0; ibolo < nbolo && *status==SAI__OK; ibolo++ ) {
