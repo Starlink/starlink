@@ -292,6 +292,9 @@ smf_qual_t * smf_qual_unmap( int indf, smf_qfam_t family, smf_qual_t * qual, int
             if ( qual[i] & (SMF__Q_STAT) ) {
               qmap[i] |= SMF__TCOMPQ_TEL;
             }
+            if ( qual[i] & (SMF__Q_FILT) ) {
+              qmap[i] |= SMF__TCOMPQ_FILT;
+            }
             if (qmap[i] == 0 ) {
               /* something went wrong. We missed a quality bit somewhere */
               msgOutiff(MSG__QUIET, "", FUNC_NAME ": Untested quality bit found"

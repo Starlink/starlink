@@ -214,6 +214,10 @@ const char *smf_qual_str( smf_qfam_t family, int usebit, int bit_or_val,
       retval = "TEL";
       ldescr = "Set if telescope was not in useful state";
       break;
+    case SMF__TCOMPQ_FILT:
+      retval = "CFILT";
+      ldescr = "Set if data could not be filtered";
+      break;
     default:
       retval = NULL;
     }

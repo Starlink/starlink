@@ -251,6 +251,8 @@ smf_qual_t * smf_qual_map( int indf, const char mode[], smf_qfam_t *family,
                     retval[i] |= SMF__Q_COM;
                   } else if (ndfqtoval[k] & SMF__TCOMPQ_TEL) {
                     retval[i] |= SMF__Q_STAT;
+                  } else if (ndfqtoval[k] & SMF__TCOMPQ_FILT) {
+                    retval[i] |= SMF__Q_FILT;
                   } else {
                     /* just do the normal mapping */
                     retval[i] |= ndfqtoval[k];
