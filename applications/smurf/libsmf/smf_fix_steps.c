@@ -263,7 +263,6 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data,
    double *pw1;
    double *pw2;
    double *w1;
-   double *w2;
    double *work1;
    int *work2;
    double *work3;
@@ -300,6 +299,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data,
    int bad_in_step;
    int step_width;
    int tpop;
+   int *w3;
    size_t base;                /* Index to start of current bolo */
    size_t qbase;
    size_t bstride;             /* Bolo stride */
@@ -307,6 +307,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data,
    size_t itime_start;         /* Time index at start of usable data stream */
    size_t ns;
    size_t tstride;             /* Bolo stride */
+   size_t *w2;
    smf_qual_t *pq1;
    smf_qual_t *pq2;
    smf_qual_t *qua = NULL;     /* Pointer to quality flags */
@@ -431,6 +432,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data,
 /* Allocate work arrays. */
       w1 = astMalloc( sizeof( *w1 )*dcfitbox );
       w2 = astMalloc( sizeof( *w2 )*dcfitbox );
+      w3 = astMalloc( sizeof( *w3 )*dcfitbox );
       work1 = astMalloc( sizeof( *work1 )*ntime );
       work2 = astMalloc( sizeof( *work2 )*ntime );
       work3 = astMalloc( sizeof( *work3 )*ntime );
@@ -519,8 +521,8 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data,
    smoothed data in "work1". */
             smf_median_smooth( dcmedianwidth, SMF__FILT_MEDIAN, -1.0, ntime,
                                dat + base, tqua + base,
-                               tstride, SMF__Q_MOD, work1, w1, w2, NULL,
-                               NULL, status );
+                               tstride, SMF__Q_MOD, work1, w1, w2, w3,
+                               status );
 
 /* Form the gradient at each time slice as the difference between the median
    values half a median box to the left and right of the time slice. */
@@ -546,8 +548,8 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data,
 
 /* Smooth the gradients using a larger median box filter. */
             smf_median_smooth( dcfitbox, SMF__FILT_MEDIAN, -1.0, ntime,
-                               work3, NULL, 1, 0, work4, w1, w2, NULL,
-                               NULL, status );
+                               work3, NULL, 1, 0, work4, w1, w2, w3,
+                               status );
 
 /* Subtract the smoothed gradients form the original gradients. This means that
    work4 now holds an indication of unusually high gradient compared to the typical
@@ -851,6 +853,8 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data,
    which more than "dclimcorr" bolometers were found to have large steps
    above. */
          step_start = -1;
+         step_end = -1;
+         step_limit = -1;
          nblock = 0;
          for( jtime = 0; jtime < ntime; jtime++ ) {
 
@@ -910,6 +914,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data,
 /* Free workspace */
       w1 = astFree( w1 );
       w2 = astFree( w2 );
+      w3 = astFree( w3 );
       work1 = astFree( work1 );
       work2 = astFree( work2 );
       work3 = astFree( work3 );

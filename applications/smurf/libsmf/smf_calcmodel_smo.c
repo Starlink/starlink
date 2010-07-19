@@ -355,11 +355,12 @@ static void smf1_calcmodel_smo_job( void *job_data, int *status ) {
    double *model_data;
    double *res_data;
    double *w1 = NULL;
-   double *w2 = NULL;
+   int *w3 = NULL;
    smf_filt_t filter_type;
    size_t boxcar;
    size_t bstride;
    size_t tstride;
+   size_t *w2 = NULL;
    smfCalcmodelSmoJobData *pdata;
    smf_qual_t *bolqua = NULL;
    smf_qual_t *qua_data;
@@ -400,6 +401,7 @@ static void smf1_calcmodel_smo_job( void *job_data, int *status ) {
       if( filter_type == SMF__FILT_MEDIAN ) {
         w1 = astMalloc( boxcar*sizeof( *w1 ) );
         w2 = astMalloc( boxcar*sizeof( *w2 ) );
+        w3 = astMalloc( boxcar*sizeof( *w3 ) );
       }
 
       /* Loop round all the bolometers to be processed by this thread. */
@@ -420,7 +422,7 @@ static void smf1_calcmodel_smo_job( void *job_data, int *status ) {
         if( filter_type == SMF__FILT_MEDIAN ) {
            smf_median_smooth( (dim_t) boxcar, SMF__FILT_MEDIAN, 0.0, ntslice,
                               res_data+boloff, qua_data+boloff, 1, SMF__Q_FIT,
-                              boldata, w1, w2, NULL, NULL, status );
+                              boldata, w1, w2, w3, status );
         } else {
            smf_tophat1D( boldata, ntslice, boxcar, bolqua, SMF__Q_FIT, status );
         }
@@ -451,6 +453,7 @@ static void smf1_calcmodel_smo_job( void *job_data, int *status ) {
 /* Free work space. */
       w1 = astFree( w1 );
       w2 = astFree( w2 );
+      w3 = astFree( w3 );
       boldata = astFree( boldata );
       bolqua = astFree( bolqua );
 

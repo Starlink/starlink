@@ -17,8 +17,7 @@
 *                             float wlim, dim_t el, const double *dat,
 *                             const smf_qual_t *qua, size_t stride,
 *                             smf_qual_t mask, double *out, double *w1,
-*                             double *w2, double *mean, double *sigma,
-*                             int *status )
+*                             size_t *w2, int *w3, int *status )
 
 *  Arguments:
 *     box = dim_t (Given)
@@ -52,14 +51,10 @@
 *        flag values for which no median value could be calculated.
 *     w1 = double * (Given and Returned)
 *        A work array of length "box".
-*     w2 = double * (Given and Returned)
+*     w2 = size_t * (Given and Returned)
 *        A work array of length "box".
-*     mean = double * (Returned)
-*        An optional array to recieve the mean value in each filter box.
-*        If not NULL, it should have "el" elements.
-*     sigma = double * (Returned)
-*        An optional array to recieve the standard deviation in each filter
-*        box. If supplied, it should have "el" elements.
+*     w3 = int * (Given and Returned)
+*        A work array of length "box".
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -93,6 +88,10 @@
 *        Use an enum for filter_type
 *     2010-07-13 (DSB):
 *        Added arguments wlim, mean and sigma.
+*     2010-07-19 (DSB):
+*        Re-implement using a binary chop to search the sorted list.
+*        Remove arguments mean and sigma which turned out not to be
+*        needed.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -135,32 +134,31 @@
 void smf_median_smooth( dim_t box, smf_filt_t filter_type, float wlim,
                         dim_t el, const double *dat, const smf_qual_t *qua,
                         size_t stride, smf_qual_t mask, double *out,
-                        double *w1, double *w2, double *mean, double *sigma,
-                        int *status ){
+                        double *w1, size_t *w2, int *w3, int *status ){
 
 /* Local Variables: */
    const double *pdat;         /* Pointer to next bolo data value */
    const smf_qual_t *pqua;     /* Pointer to next quality flag */
-   dim_t ibox;                 /* Index within box */
    dim_t ihi;                  /* Upper limit for which median can be found */
    dim_t inbox;                /* No. of values currently in the box */
    dim_t iold;                 /* Index of oldest value in "w2" */
    dim_t iout;                 /* Index within out array */
+   dim_t jhi;                  /* Index of last element in search box */
+   dim_t jlo;                  /* Index of first element in search box */
+   dim_t jtest;                /* Index of element at centre of search box */
    dim_t minin;                /* Min no of valid i/p values for a valid o/p value */
-   double *mout;               /* Pointer to next output mean value */
+   dim_t off;                  /* Vector index of ne wvalue */
    double *pout;               /* Pointer to next output median value */
-   double *sout;               /* Pointer to next output sigma value */
-   double *pw1;                /* Pointer to next "w1" value */
-   double *pw2;                /* Pointer to next "w2" value */
+   double *pw1;                /* Pointer to next sorted data value */
    double dnew;                /* Data value being added into the filter box */
-   double dold;                /* Data value being removed from the filter box */
-   double meanval;             /* Mean of values in filter box */
    double outval;              /* Main output filter value */
-   double sum;                 /* Sum of values in filter box */
-   double sum2;                /* Sum of squared values in filter box */
-   int iadd;                   /* Index within box at which to store new value */
-   int iremove;                /* Index within box of element to be removed */
+   int ibox;                   /* Index within box */
+   int jbox;                   /* Index within box */
+   int newi;                   /* Index within "w1" at which to store new value */
    int offset;                 /* Offset from next new value to central value */
+   int oldi;                   /* Index within "w1" of the old value */
+   size_t *perm;               /* Initial permutation array */
+   size_t *pw2;                /* Pointer to next sorted data index */
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -188,61 +186,75 @@ void smf_median_smooth( dim_t box, smf_filt_t filter_type, float wlim,
       minin = 0;
    }
 
-/* First initialise the filter box to contain the first "box" values from the
-   supplied array. Do not store bad or flagged values in the filter box. The
-   good values are stored at the start of the "w1" array, with no gaps.
-   The "w2" array holds all values in the box, good or bad, in the order
-   they occur in the time-series (i.e. un-sorted). */
-   pdat = dat;
-   pqua = qua;
-   pw1 = w1;
-   pw2 = w2;
-   sum = 0.0;
-   sum2 = 0.0;
-   for( ibox = 0; ibox < box; ibox++ ) {
+/* Initialise the number of good values in the initial filter box. */
+   inbox = 0;
 
-      if( ( !qua || !( *pqua & mask ) ) && *pdat != VAL__BADD ) {
-         *(pw2++) = *(pw1++) = *pdat;
-         sum += *pdat;
-         sum2 += ( *pdat )*( *pdat );
-      } else {
-         *(pw2++) = VAL__BADD;
+/* Get an index that sorts the first "box" data values into ascending
+   order. This includes bad values, and flagged values. Returned "perm"
+   values are in the range 0 to "box". */
+   perm = astMalloc( box*sizeof( *perm ) );
+   if( *status == SAI__OK ) {
+      gsl_sort_index( perm, dat, stride, (size_t) box );
+
+/* Loop round each element in the first filter box. */
+      for( ibox = 0; ibox < (int) box; ibox++ ) {
+
+/* Get the vector index of the i'th largest value in the filter box
+   (which may be a bad or flagged value since GSL does not recognise
+   these). */
+         jbox = perm[ ibox ];
+         off = stride*jbox;
+
+/* Get the value. Use bad if the element is flagged. */
+         if( !qua || !( qua[ off ] & mask ) ) {
+            dnew = dat[ off ];
+         } else {
+            dnew = VAL__BADD;
+         }
+
+/* If the value is not bad, store at the next free element of the w1 array.
+   Also, store its original index (i.e. its index within the box) in "w2",
+   and store the inverse look-up in "w3". That is, "w2" gives box index
+   as a function of sorted index, and "w3" gives sorted index as a
+   function of box index. */
+         if( dnew != VAL__BADD ) {
+            w1[ inbox ] = dnew;
+            w2[ inbox ] = jbox;
+            w3[ jbox ] = inbox;
+            inbox++;
+         } else {
+            w3[ jbox ] = -1;
+         }
+
       }
 
-/* Get pointers to the next data and quality values. */
-      pdat += stride;
-      pqua += stride;
+/* Free the perm array since we will not be sorting explicitly again. */
+      perm = astFree( perm );
    }
 
-/* Initialise the index at which to store the next data value in the
-   "w2" array. The first new value added to the box will over-write element
-   zero - the oldest value in the box. */
+/* Initialise the box index of the oldest value in the filter box. */
    iold = 0;
 
-/* Note the number of good values stored in the filter box. */
-   inbox = (int)( pw1 - w1 );
-
 /* If there are any bad data values, pad out the w1 array with bad
-   values. */
-   for( ibox = inbox; ibox < box; ibox++ ) w1[ ibox ] = VAL__BADD;
-
-/* If any good values are stored in the filter box, we now sort them. */
-   if( inbox > 0 ) gsl_sort( w1, 1, inbox );
-
-/* Fill the first half-box of the output array(s) with bad values. */
-   ihi = box/2;
-   mout = mean;
-   sout = sigma;
-   pout = out;
-   for( iout = 0; iout < ihi; iout++ ) {
-      *(pout++) = VAL__BADD;
-      if( sigma ) *(sout++) = VAL__BADD;
-      if( mean ) *(mout++) = VAL__BADD;
+   values, and w2 array with -1 values. */
+   for( ibox = inbox; ibox < (int) box; ibox++ ) {
+      w1[ ibox ] = VAL__BADD;
+      w2[ ibox ] = -1;
    }
+
+/* Fill the first half-box of the output array with bad values. */
+   ihi = box/2;
+   pout = out;
+   for( iout = 0; iout < ihi; iout++ ) *(pout++) = VAL__BADD;
 
 /* Note the offset from the input value that is to be added into the filter
    box next, and the current central input value. */
    offset = -stride*(int)( ( box + 1 )/2 );
+
+/* Initialise pointers to the next data and quality value to enter the
+   filter box. */
+   pdat = dat + stride*box;
+   pqua = qua + stride*box;
 
 /* Loop round the rest of the output array, stopping just before the
    final half box. "iout" gives the index of the centre element in the box,
@@ -250,12 +262,12 @@ void smf_median_smooth( dim_t box, smf_filt_t filter_type, float wlim,
    ihi = el - ( box + 1 )/2;
    for( ; iout < ihi; iout++ ) {
 
-/* Store the median value of the current box in the output array. If the
-   current box contains an odd number of good values, use the central good
-   value as the median value. If the box contains an even number of good
-   values, use the mean of the two central values as the median value. If
-   the box contains insufficient good values use VAL__BADD. If the
-   central input value is bad, use VAL__BADD. */
+/* Store the median or other required value of the current box in the
+   output array. If the current box contains an odd number of good values,
+   use the central good value as the median value. If the box contains an
+   even number of good values, use the mean of the two central values as
+   the median value. If the box contains insufficient good values use
+   VAL__BADD. If the central input value is bad, use VAL__BADD. */
       if( inbox == 0 ) {
          outval = VAL__BADD;
 
@@ -282,150 +294,152 @@ void smf_median_smooth( dim_t box, smf_filt_t filter_type, float wlim,
 
       *(pout++) = outval;
 
-/* Store the optional mean value. */
-      meanval = ( inbox > 0 ) ? sum/inbox : VAL__BADD;
-
-      if( mean ) {
-         if( outval != VAL__BADD ) {
-            *(mout++) = meanval;
-         } else {
-            *(mout++) = VAL__BADD;
-         }
-      }
-
-/* Store the optional standard deviation value. */
-      if( sigma ) {
-         if( outval != VAL__BADD ) {
-            *(sout++) = sqrt( sum2/inbox - meanval*meanval );
-         } else {
-            *(sout++) = VAL__BADD;
-         }
-      }
-
-/* Now advance the box by one sample and update the supplied values
-   accordingly. Get the data value for the time slice that is about to
-   enter the filter box. Set it bad if it is flagged in the quality array. */
+/* Now advance the box by one sample. Get the data value for the time
+   slice that is about to enter the filter box. Set it bad if it is
+   flagged in the quality array. */
       dnew = *pdat;
       if( qua && ( *pqua & mask ) ) dnew = VAL__BADD;
 
-/* Get the data value for the time slice that is about to leave the filter
-   box. */
-      dold = w2[ iold ];
+/* Find the index at which the new value should be stored within the
+   sorted filter box (w1). If the new value is bad, we do not put it into
+   the filter box. Just store a new index of -1 to indicate this. */
+      if( dnew == VAL__BADD ) {
+         newi = -1;
 
-/* Store the new value in "w2" in place of the old value, and then
-   increment the index of the next "w2" value to be removed, wrapping back
-   to the start when the end of the array is reached. */
-      w2[ (iold)++ ] = dnew;
-      if( iold == box ) iold = 0;
+/* If the new value is larger than the largest value currently in the
+   filter box, it goes at the end of w1. */
+      } else if( inbox == 0 || dnew >= w1[ inbox - 1 ] ) {
+         newi = inbox;
 
-/* If the new value to be added into the box is good... */
-      if( dnew != VAL__BADD ) {
+/* If the new value is smaller than the smallest value currently in the
+   filter box, it goes at the start of w1. */
+      } else if( dnew <= w1[ 0 ] ) {
+         newi = 0;
 
-/* Increment sums. */
-         sum += dnew;
-         sum2 += dnew*dnew;
+/* Otherwise do a binary chop on the values in the "w2" array in order to
+   find the index at which the new value should be stored. */
+      } else {
 
-/* Find the index (iadd) within the w1 box at which to store the new
-   value so as to maintain the ordering of the values in the box. Could do
-   a binary chop here, but the box size is presumably going to be very
-   small and so it's probably not worth it. At the same time, look for
-   the value that is leaving the box (if it is not bad). */
-         iremove = -1;
-         iadd = -1;
+/* Initialise index of the first element that is still within the search
+   range. */
+         jlo = 0;
 
-         if( dold != VAL__BADD ) {
-            for( ibox = 0; ibox < inbox; ibox++ ) {
-               if( iremove == -1 && w1[ ibox ] == dold ) {
-                  iremove = ibox;
-                  if( iadd != -1 ) break;
-               }
-               if( iadd == -1 && w1[ ibox ] >= dnew ) {
-                  iadd = ibox;
-                  if( iremove != -1 ) break;
-               }
-            }
+/* Initialise index of the last element that is still within the search
+   range. */
+         jhi = inbox - 1;
 
-/* Decrement sums. */
-            sum -= dold;
-            sum2 -= dold*dold;
+/* Loop until the search range contains only a single element. */
+         while( jhi - jlo > 1 ) {
 
-         } else {
-            for( iadd = 0; iadd < (int) inbox; iadd++ ) {
-               if( w1[ iadd ] >= dnew ) break;
-            }
-         }
+/* Get the index of the mid value to test. */
+            jtest = ( jlo + jhi ) /2;
 
-/* If the new value is larger than any value currently in w1, we add it
-   to the end. */
-         if( iadd == -1 ) iadd = inbox;
+/* If the mid value in the current search range is greater than or equal
+   to the new value, the new value must lie in the lower half (including
+   the test point itself in the upper half). Restrict the search range
+   to the lower half. */
+            if( w1[ jtest ] >= dnew ) {
+               jhi = jtest;
 
-/* If the value being removed is bad, shuffle all the good values greater
-   than the new value up one element, and increment the number of good
-   values for this bolometer box. */
-         if( iremove == -1 ) {
-            for( ibox = inbox; (int) ibox > iadd; ibox-- ) {
-               w1[ ibox ] = w1[ ibox - 1 ];
-            }
-            (inbox)++;
-
-/* If the value being removed is good and the value being added is greater
-   than the value being removed, shuffle all the intermediate values down
-   one element within the box. */
-         } else if( (int) iadd > iremove ) {
-            for( ibox = iremove; (int) ibox < iadd - 1; ibox++ ) {
-               w1[ ibox ] = w1[ ibox + 1 ];
-            }
-            iadd--;
-
-/* If the value being removed is good and the value being added is less
-   than or equal to the value being removed, shuffle all the intermediate
-   values up one element within the box. */
-         } else {
-            for( ibox = iremove; (int) ibox > iadd; ibox-- ) {
-               w1[ ibox ] = w1[ ibox - 1 ];
+/* If the mid value in the current search range is less than the new
+   value, the new value must lie in the upper half. Restrict the search range
+   to the upper half. */
+            } else {
+               jlo = jtest;
             }
          }
 
-/* Store the new value in the box. */
-         w1[ iadd ] = dnew;
-
-/* If the value being added is bad but the value being removed is good... */
-      } else if( dold != VAL__BADD ){
-
-/* Decrement sums. */
-         sum -= dold;
-         sum2 -= dold*dold;
-
-/* Find the index (iremove) within the w1 box at which is stored the value
-   that is leaving the box. */
-         iremove = -1;
-         for( iremove = 0; iremove < (int) inbox; iremove++ ) {
-            if( w1[ iremove ] == dold ) break;
-         }
-
-/* Move all the larger values down one element in "w1" to fill the gap
-   left by the removal. */
-         for( iremove++; iremove < (int) inbox; iremove++ ) {
-            w1[ iremove - 1 ] = w1[ iremove ];
-         }
-
-/* Over-write the un-used last element with a bad value, and decrement
-   the number of values in "w1". */
-         w1[ iremove - 1 ] = VAL__BADD;
-         (inbox)--;
+/* The new value goes in in front of the "jhi" value. */
+         newi = jhi;
       }
+
+/* Get the index within w1/w2 of the oldest value in the filter box. */
+      oldi = w3[ iold ];
+
+/* If the new value being added into the box is good... */
+      if( newi >= 0 ) {
+
+/* If the old value being removed from the box is good... */
+         if( oldi >= 0 ) {
+
+/* If the value being removed is larger than the value being added, we
+   need to shunt the intermediate values up, over-writing the old value,
+   to make room for the new value. */
+            if( oldi > newi ) {
+               pw1 = w1 + oldi - 1;
+               pw2 = w2 + oldi - 1;
+               for( ibox = oldi; ibox > newi; ibox--,pw1--,pw2--) {
+                  pw1[ 1 ] = *pw1;
+                  w3[ ( pw2[ 1 ] = *pw2 ) ] = ibox;
+               }
+
+/* If the value being removed is smaller than the value being added, we
+   need to shunt the intermediate values down, over-writing the old value,
+   to make room for the new value. */
+            } else if( newi > oldi ) {
+               newi--;
+               pw1 = w1 + oldi;
+               pw2 = w2 + oldi;
+               for( ibox = oldi; ibox < newi; ibox++,pw1++,pw2++ ) {
+                  *pw1 = pw1[ 1 ];
+                  w3[ ( *pw2 = pw2[ 1 ] ) ] = ibox;
+               }
+            }
+
+/* Then store the new value, and its associated indices. */
+            w1[ newi ] = dnew;
+            w2[ newi ] = iold;
+            w3[ iold ] = newi;
+
+/* If the new value is good but the old value is bad, shunt the higher
+   values up to open up a slot for the new value. */
+         } else {
+            for( ibox = inbox; ibox > newi; ibox-- ) {
+               w1[ ibox ] = w1[ ibox - 1 ];
+               w2[ ibox ] = w2[ ibox - 1 ];
+               w3[ w2[ ibox ] ] = ibox;
+            }
+
+/* Then store the new value, and its associated indices. */
+            w1[ newi ] = dnew;
+            w2[ newi ] = iold;
+            w3[ iold ] = newi;
+
+/* Increment the number of good values in the filter box. */
+            inbox++;
+         }
+
+/* If the new value is bad but the old value is good, shunt the higher
+   values down to over-write the old value. */
+      } else if( oldi >= 0 ) {
+         for( ibox = oldi + 1; ibox < (int) inbox; ibox++ ) {
+            w1[ ibox - 1 ] = w1[ ibox ];
+            w2[ ibox - 1 ] = w2[ ibox ];
+            w3[ w2[ ibox - 1 ] ] = ibox - 1;
+         }
+
+/* Decrement the number of good values in the filter box. */
+         inbox--;
+
+/* Then store the new value, and its associated indices. */
+         w1[ inbox ] = dnew;
+         w2[ inbox ] = -1;
+         w3[ iold ] = -1;
+
+/* If the new value is bad but the old value is also bad, do nothing. */
+      }
+
+/* Increment the index of the oldest element int he filter box. If we hit
+   the end of the "w3" array, start again at the beginning. */
+      if( ++iold == box ) iold = 0;
 
 /* Increment the pointers. */
       pdat += stride;
       pqua += stride;
    }
 
-/* Fill the last half-box of the output array(s) with bad values. */
-   for( ; iout < el; iout++ ) {
-      *(pout++) = VAL__BADD;
-      if( sigma ) *(sout++) = VAL__BADD;
-      if( mean ) *(mout++) = VAL__BADD;
-   }
+/* Fill the last half-box of the output array with bad values. */
+   for( ; iout < el; iout++ ) *(pout++) = VAL__BADD;
 
 }
 
