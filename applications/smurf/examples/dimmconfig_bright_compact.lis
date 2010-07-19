@@ -1,0 +1,49 @@
+^$STARLINK_DIR/share/smurf/dimmconfig_newfilt.lis
+
+# *** Specialized config for bright, isolated compact sources ***
+#
+# This config file is for maps with a bright central compact source. In
+# particular the strategy is aimed at short scans of calibrators (which
+# may be quite bright).
+#
+# The template for this configuration is dimmconfig_newfilt which is
+# identical to the default dimmconfig, except that it uses a window
+# function to handle gaps in the data, rather than gap-filling with a
+# noise realization. This method is slightly slower and uses more
+# memory, but enables us to use all of the available data, including
+# the ends of the data stream that would normally be apodized. This is
+# particularly useful for some of the very short scans used, for
+# example, for focus (as short as 10 seconds).
+#
+# We constrain the edges of the map to zero using ast.zero_lowhits=1.0
+# (all pixels with the mean number of hits or less set to zero), and
+# ast.zero_notlast=1. We also set the iterations to a higher value
+# than the defaults. Together these settings enable us to produce
+# reasonable maps of bright calibrators even if there is poor
+# cross-linking. A word of warning: if the source is near the edge of
+# the map this configuration may give odd results due to the value of
+# ast.zero_lowhits! If you suspect a problem, compare the location of
+# the source to the zero-masked pixels (see QUALITY component of the
+# resulting map). If the mask overlaps with the source, the value of
+# ast.zero_notlast will have to be reduced. In addition, you may run
+# into problems if the map is poorly sampled (e.g. only a single pass
+# across the field, or not many working detectors) as the coverage will
+# be highly non-uniform, again, potentially setting good pixels where
+# the source is located to zero.
+#
+# Finally, we delay calculation of the common-mode (and associated
+# bolometer rejection) until after the first iteration. For short
+# scans this can be important as the astronomical signal may dominate.
+#
+# ***********************************************************
+
+# more iterations in case there is poor cross-linking
+numiter = 20
+
+# delay calculation of COM until after the first iteration since the source
+# may be brighter than the common-mode signal.
+com.notfirst = 1
+
+# use boundary constraints since the source is assumed to be isolated
+ast.zero_lowhits = 1.0
+ast.zero_notlast = 1.0
