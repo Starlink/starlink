@@ -39,40 +39,26 @@ bolomap = 1
 # Do not flatfield data so that the maps are in DAC units.
 ensureflat=0
 
+# Much weaker noise clip
+noiseclip = 10.0
+
+# Less aggressive DC step finder to avoid problems with bright sources
+dcthresh = 100
+
 # ----------------------------------------------------------------------------
 # The following parameters control data-cleaning before iterations start
 # ----------------------------------------------------------------------------
 
-# --- Many of the following may not be useful ---
-
-# Less aggressive to ensure that as much usable data get through as
-# possible.
-dcthresh = 200
-
-# box size over which to fit the data with a straight line on each side of
-# a potential DC jump.
-dcfitbox = 400
-
-
-# ----------------------------------------------------------------------------
-# These parameters control the iterative model components
-# ----------------------------------------------------------------------------
-
-# Again, less aggressive bolo flagging. Also, handle bolos in entire
-# chunks. Even if we get chunked common-mode flagging to work much better,
-# these maps of bright point sources may cause problems.
+# Less aggressive bolo flagging. Also, handle bolos in entire
+# chunks. Even if we get chunked common-mode flagging to work much
+# better, these maps of bright point sources may cause problems.
 
 com.corr_tol = 7
-com.gain_tol = 5
-com.gain_abstol = 3
+com.gain_tol = 7
+com.gain_abstol = 5
 com.gain_box = 600000
 
-# low-pass filter dark squid signals using boxcar of this width (if dks
-# model is specified)
-dks.boxcar = 100
-
 # Don't do any extra de-spiking / step finding iteratively
-
 noi.spikethresh = 0
 noi.spikeiter = 0
 noi.dcfitbox = 0
