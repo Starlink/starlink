@@ -98,6 +98,7 @@ obsMode sc2sim_getobsmode( char *name, int *status ) {
   else if( strcmp( name, "SINGLESCAN" ) == 0 ) return MODE__SINGLESCAN;
   else if( strcmp( name, "LISS" ) == 0 ) return MODE__LISS;
   else if( strcmp( name, "NOISE" ) == 0 ) return MODE__NOISE;
+  else if( strcmp( name, "EXTERNAL" ) == 0 ) return MODE__EXTERNAL;
   else return MODE__NONE;
 
 }

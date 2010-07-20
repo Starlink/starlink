@@ -851,6 +851,19 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
       break;
 
+    case MODE__EXTERNAL:
+      /* Call sc2sim_getexternal to get scan pointing solution */
+      msgOutif(MSG__VERB, " ", "Do an EXTERNAL observation", status );
+      sc2sim_getexternal(inx->externobs, &count, posptr, status );
+
+      /* indicate that we only have one pass */
+      inx->nmaps = 1;
+      steps_per_map = count;
+
+      exit(0);
+
+      break;
+
     default: /* should never be reached...*/
       msgSetc( "MODE", inx->obsmode );
       errRep("", "^MODE is not a supported observation mode", status);
@@ -1352,6 +1365,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
               case MODE__SINGLESCAN:
               case MODE__BOUS:
               case MODE__LISS:
+              case MODE__EXTERNAL:
               case MODE__PONG:
                 /* Assumes steps are spread equally over nmaps */
                 percent = (100 * (head[j].rts_num % steps_per_map)) / steps_per_map;

@@ -144,7 +144,7 @@ struct bolpix             /* pixel location of bolometer */
 
 /* Enumerated type for observing modes */
 typedef enum {MODE__STARE, MODE__DSTARE, MODE__DREAM, MODE__PONG,
-	      MODE__POLSPIN, MODE__HEATRUN, MODE__NOISE,
+	      MODE__POLSPIN, MODE__HEATRUN, MODE__NOISE, MODE__EXTERNAL,
               MODE__BOUS, MODE__SINGLESCAN, MODE__LISS, MODE__NONE} obsMode;
 
 /* Enumerated type for map coordinate frame */
@@ -205,6 +205,7 @@ struct sc2sim_obs_struct      /* parameters read from obs input file */
   int numsamples;             /* number of samples in STARE */
   size_t nvert;               /* Nr of vertices in the Jiggle pattern */
   char obsmode[80];           /* Observation mode (DREAM, STARE, PONG etc) */
+  char externobs[80];         /* filename of an external SCUBA2 observation used to generate a scan pattern */
   char obstype[80];           /* Observation type (POINT, FOCUS or SCIENCE) */
   int planetnum;              /* Number corresponding to a planet */
   int platenum;               /* number of waveplate rotations */

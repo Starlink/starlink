@@ -462,6 +462,14 @@ double **posptr,     /* list of positions (returned) */
 int *status          /* global status (given and returned) */
 );
 
+void sc2sim_getexternal
+(
+char external[80],   /* the name of the external observation */
+int *scancount,      /* number of positions in pattern (returned) */
+double *posptr,     /* list of positions (returned) */
+int *status          /* global status (given and returned) */
+);
+
 void sc2sim_getspread
 (
 int numbols,             /* Number of bolometers (given) */

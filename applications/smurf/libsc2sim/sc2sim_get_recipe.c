@@ -45,6 +45,8 @@
  *        Add support for NOISE observing mode
  *     2010-03-16 (TIMJ):
  *        Use one_strlcpy and change API.
+ *     2010-07-14 (TM)
+ *        Add support for EXTERNAL observing mode
 
  *  Copyright:
  *     Copyright (C) 2010 Science & Technology Facilities Council.
@@ -96,6 +98,7 @@ void sc2sim_get_recipe ( const struct sc2sim_obs_struct *inx, char *recipe,
   /* Check for SCAN mode data */
   if ( (strncmp( inx->obsmode, "PONG", 4) == 0) ||
        (strncmp( inx->obsmode, "SCAN", 4) == 0) ||
+       (strncmp( inx->obsmode, "EXTERNAL", 4) == 0) ||
        (strncmp( inx->obsmode, "LISS", 4) == 0) ||
        (strncmp( inx->obsmode, "BOUS", 4) == 0) ) {
     scan = 1;

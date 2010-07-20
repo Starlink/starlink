@@ -451,6 +451,11 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
     itemp = nvert_x;
   inx->nvert = itemp;
 
+  if ( !astMapGet0C ( keymap, "EXTERNOBS", &temp ) )
+    one_strlcpy ( inx->externobs, "none", sizeof("none"), status );
+  else
+    one_strlcpy ( inx->externobs, temp, sizeof(inx->externobs), status );
+
   astMapGet0C ( keymap, "OBSMODE", &temp );
 
   if ( !astMapGet0C ( keymap, "OBSMODE", &temp ) )
