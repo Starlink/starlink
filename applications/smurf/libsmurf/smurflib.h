@@ -22,6 +22,7 @@
 *     Tim Jenness (JAC, Hawaii)
 *     Andy Gibb (UBC)
 *     Edward Chapin (UBC)
+*     Coskun (Josh) Oba (University of Lethbridge)
 *     {enter_new_authors_here}
 
 *  History:
@@ -67,6 +68,9 @@
 *        Add calcresp
 *     2009-05-19 (TIMJ):
 *        Add RAWFIXMETA
+*     2010-07-19 (COBA):
+#         Add FTS2_FLATFIELD, FTS2_FREQCORR, FTS2_PORTIMBAL, 
+#             FTS2_REMOVEBSE, FTS2_SPATIALWCS, FTS2_TRANSCORR
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -109,6 +113,12 @@ void smurf_dsutils( int * );
 void smurf_extinction( int * );
 void smurf_flatfield( int * );
 void smurf_fixsteps( int * );
+void smurf_fts2_flatfield( int * );
+void smurf_fts2_freqcorr( int * );
+void smurf_fts2_portimbal( int * );
+void smurf_fts2_removebse( int * );
+void smurf_fts2_spatialwcs( int * );
+void smurf_fts2_transcorr( int * );
 void smurf_gsd2acsis( int * );
 void smurf_gsdshow( int * );
 void smurf_impaztec( int * );

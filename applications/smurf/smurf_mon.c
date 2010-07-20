@@ -33,6 +33,7 @@
 *     David Berry (JAC, UCLan)
 *     Andy Gibb (UBC)
 *     Ed Chapin (UBC)
+*     Coskun (Josh) Oba (University of Lethbridge)
 *     {enter_new_authors_here}
 
 *  History:
@@ -128,6 +129,8 @@
 *        output NDF history.
 *     2010-05-19 (EC):
 *        Add SC2EXPANDMODEL
+*     2010-07-19 (COBA):
+*        Add FTS2_FREQCORR, FTS2_REMOVEBSE, FTS2_SPATIALWCS
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -266,6 +269,12 @@ void smurf_mon( int * status ) {
     smurf_fixsteps( status );
   } else if (strcmp( taskname, "FLATFIELD" ) == 0 ) {
     smurf_flatfield( status );
+  } else if (strcmp( taskname, "FTS2_FREQCORR" ) == 0 ) {
+    smurf_fts2_freqcorr( status );
+  } else if (strcmp( taskname, "FTS2_REMOVEBSE" ) == 0 ) {
+    smurf_fts2_removebse( status );
+  } else if (strcmp( taskname, "FTS2_SPATIALWCS" ) == 0 ) {
+    smurf_fts2_spatialwcs( status );
   } else if (strcmp( taskname, "GSD2ACSIS" ) == 0 ) {
     smurf_gsd2acsis( status );
   } else if (strcmp( taskname, "GSDSHOW" ) == 0 ) {

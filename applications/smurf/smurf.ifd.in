@@ -214,6 +214,9 @@
 #         Add NGOOD output parameter for SC2FFT
 #     2010-07-15 (TIMJ):
 #         Remove REFRES parameters since now included in RESIST config file.
+#     2010-07-19 (COBA):
+#         Add FTS2_FLATFIELD, FTS2_FREQCORR, FTS2_PORTIMBAL, 
+#             FTS2_REMOVEBSE, FTS2_SPATIALWCS, FTS2_TRANSCORR
 #     {enter_changes_here}
 
 #  Bugs:
@@ -1292,6 +1295,173 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+        }
+
+        action fts2_flatfield {
+
+            helplib {$SMURF_HELP}
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                prompt {Input data files}
+                helpkey *
+            }
+
+            parameter out {
+                position 2
+                type NDF
+                access WRITE
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                prompt {Output data files}
+                helpkey *
+            }
+        }
+
+        action fts2_freqcorr {
+
+            helplib {$SMURF_HELP}
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                prompt {Input data files}
+                helpkey *
+            }
+
+            parameter out {
+                position 2
+                type NDF
+                access WRITE
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                prompt {Output data files}
+                helpkey *
+            }
+
+            parameter theta {
+                position 3
+                type _CHAR
+                vpath {PROMPT}
+                prompt {THETA: The data file which stores the off-axis angles of pixels...}
+                helpkey *
+            }
+        }
+
+        action fts2_portimbal {
+
+            helplib {$SMURF_HELP}
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                prompt {Input data files}
+                helpkey *
+            }
+
+            parameter out {
+                position 2
+                type NDF
+                access WRITE
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                prompt {Output data files}
+                helpkey *
+            }
+        }
+
+        action fts2_removebse {
+
+            helplib {$SMURF_HELP}
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                prompt {Input data files}
+                helpkey *
+            }
+
+            parameter out {
+                position 2
+                type NDF
+                access WRITE
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                prompt {Output data files}
+                helpkey *
+            }
+
+            parameter bse {
+                position 3
+                type _CHAR
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                prompt {BSE: The data files which stores the beamsplitter self emission interferogram...}
+                helpkey *
+            }
+        }
+
+        action fts2_spatialwcs {
+
+            helplib {$SMURF_HELP}
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                prompt {Input data files}
+                helpkey *
+            }
+
+            parameter out {
+                position 2
+                type NDF
+                access WRITE
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                prompt {Output data files}
+                helpkey *
+            }
+        }
+
+        action fts2_transcorr {
+
+            helplib {$SMURF_HELP}
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                prompt {Input data files}
+                helpkey *
+            }
+
+            parameter out {
+                position 2
+                type NDF
+                access WRITE
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                prompt {Output data files}
+                helpkey *
+            }
         }
 
         action gsd2acsis {

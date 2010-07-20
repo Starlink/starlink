@@ -17,6 +17,12 @@ smurf_dsutils.c \
 smurf_extinction.c \
 smurf_fixsteps.c \
 smurf_flatfield.c \
+smurf_fts2_flatfield.c \
+smurf_fts2_freqcorr.c \
+smurf_fts2_portimbal.c \
+smurf_fts2_removebse.c \
+smurf_fts2_spatialwcs.c \
+smurf_fts2_transcorr.c \
 smurf_gsd2acsis.c \
 smurf_gsdshow.c \
 smurf_impaztec.c \
