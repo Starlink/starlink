@@ -893,6 +893,8 @@ f     - AST_TESTFITS: Test if a keyword has a defined value in a FitsChan
 *     16-JUL-2010 (DSB):
 *        In SpecTrans, avoid over-writing the spatial projection code
 *        with the spectral projection code.
+*     20-JUL-2010 (DSB):
+*        Correct interpretation of NCP projection code.
 *class--
 */
 
@@ -24448,6 +24450,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
    double restfreq;               /* Rest frequency (Hz) */
    double rowsum2;                /* Sum of squared CDi_j row elements */
    double sinrota;                /* Sin( CROTA ) */
+   double sinval;                 /* Sin( dec ref ) */
    const int *mp;                 /* Pointer to next projection parameter index */
    int axlat;                     /* Index of latitude axis */
    int axlon;                     /* Index of longitude axis */
@@ -25143,9 +25146,9 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
          GetValue2( ret, this, FormatKey( "CRVAL", axlat + 1, -1, s, status ),
                    AST__FLOAT, (void *) &dval, 1, method, class, status );
 
-         dval = sin( dval*AST__DD2R );
-         if( dval != 0.0 ) {
-            dval = cos( dval*AST__DD2R )/dval;
+         sinval = sin( dval*AST__DD2R );
+         if( sinval != 0.0 ) {
+            dval = cos( dval*AST__DD2R )/sinval;
 
 /* Replace NCP with SIN in the CTYPE values. */
             strcpy( lontype + 4, "-SIN" );
@@ -25157,21 +25160,13 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
             SetValue( ret, FormatKey( "CTYPE", axlat + 1, -1, s, status ),
                       (void *) &cval, AST__STRING, NULL, status );
 
-/* Store the new projection parameters using names suitable to the
+/* Store the new projection parameters using names suitable to FITS_WCS
    encoding. */
-            if( encoding == FITSWCS_ENCODING ){
-               SetValue( ret, FormatKey( "PV", axlat + 1, 2, s, status ),
-                         (void *) &dval, AST__FLOAT, NULL, status );
-               dval = 0.0;
-               SetValue( ret, FormatKey( "PV", axlat + 1, 1, s, status ),
-                         (void *) &dval, AST__FLOAT, NULL, status );
-            } else {
-               SetValue( ret, FormatKey( "PROJP", 2, -1, s, status ),
-                         (void *) &dval, AST__FLOAT, NULL, status );
-               dval = 0.0;
-               SetValue( ret, FormatKey( "PROJP", 1, -1, s, status ),
-                         (void *) &dval, AST__FLOAT, NULL, status );
-            }
+            SetValue( ret, FormatKey( "PV", axlat + 1, 2, s, status ),
+                      (void *) &dval, AST__FLOAT, NULL, status );
+            dval = 0.0;
+            SetValue( ret, FormatKey( "PV", axlat + 1, 1, s, status ),
+                      (void *) &dval, AST__FLOAT, NULL, status );
          }
       }
 
