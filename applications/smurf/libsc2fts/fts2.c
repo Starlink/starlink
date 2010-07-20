@@ -52,6 +52,7 @@
 #include <ctype.h>
 
 // STARLINK includes
+#include "ast.h"
 #include "star/ndg.h"
 #include "star/grp.h"
 #include "ndf.h"
@@ -131,7 +132,6 @@ double fts2_getScanVelocity(smfData* data, int* status)
 /*
  * Gets the FTS-2 positions.
  * Caller is responsible for freeing the returned positions.
- * Example: smf_free(positions, status);
  */
 double* fts2_getPositions(smfData* data, int* status)
 {
@@ -141,8 +141,8 @@ double* fts2_getPositions(smfData* data, int* status)
   HDSLoc* hdsLocPosition = NULL;
   datFind(hdsLoc, "FTS_POS", &hdsLocPosition, status);
   datSize(hdsLocPosition, &count, status);
-  double* positions = (double*) malloc(count * sizeof(double));
-  float* tmp = (float*) malloc(count * sizeof(float));
+  double* positions = (double*) astMalloc(count * sizeof(double));
+  float* tmp = (float*) astMalloc(count * sizeof(float));
   datGetVR(hdsLocPosition, count, tmp, &count, status);
   if(*status == SAI__OK)
   {
@@ -152,7 +152,7 @@ double* fts2_getPositions(smfData* data, int* status)
     }
   }
   // FREE RESOURCES
-  free(tmp);
+  astFree(tmp);
   datAnnul(&hdsLoc, status);
   datAnnul(&hdsLocPosition, status);
 

@@ -74,6 +74,7 @@
 #include <stdio.h>
 
 // STARLINK includes
+#include "ast.h"
 #include "star/ndg.h"
 #include "star/grp.h"
 #include "ndf.h"

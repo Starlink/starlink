@@ -72,6 +72,7 @@
 #include <stdio.h>
 
 // STARLINK includes
+#include "ast.h"
 #include "star/ndg.h"
 #include "star/grp.h"
 #include "ndf.h"
@@ -214,8 +215,9 @@ void smurf_fts2_removebse(int* status)
 
     // REMOVE BSE FROM SOURCE
     int srcN = srcData->dims[2]; // Source sample size
-    double* bseIFG    = smf_malloc(bseN, sizeof(double), 0, status);
-    double* bseIFGNew = smf_malloc(srcN, sizeof(double), 0, status);
+    double* bseIFG    = (double*) astMalloc(bseN * sizeof(double));
+    double* bseIFGNew = (double*) astMalloc(srcN * sizeof(double));
+
     int pixelCount = srcWidth * srcHeight;
     int index, pixelIndex;
     for(int i = 0; i < srcHeight; i++)
@@ -252,10 +254,10 @@ void smurf_fts2_removebse(int* status)
     }
 
     // FREE RESOURCES
-    bseIFGNew = smf_free(bseIFGNew, status);
-    bseIFG = smf_free(bseIFG, status);   
-    bseX = smf_free(bseX, status);
-    srcX = smf_free(srcX, status);
+    astFree(bseIFGNew);
+    astFree(bseIFG);   
+    astFree(bseX);
+    astFree(srcX);
     smf_close_file(&srcData, status);
   }
 

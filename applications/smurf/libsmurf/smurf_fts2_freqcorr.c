@@ -73,6 +73,7 @@
 #include <stdio.h>
 
 // STARLINK includes
+#include "ast.h"
 #include "star/ndg.h"
 #include "star/grp.h"
 #include "ndf.h"
@@ -154,10 +155,10 @@ void smurf_fts2_freqcorr(int *status)
 
     // FREQUENCY CORRECTION
     int srcN = srcData->dims[2]; // Source sample size
-    double* ifg    = smf_malloc(srcN, sizeof(double), 0, status);
-    double* ifgNew = smf_malloc(srcN, sizeof(double), 0, status);
-    double* wn     = smf_malloc(srcN, sizeof(double), 0, status);
-    double* wnNew  = smf_malloc(srcN, sizeof(double), 0, status);
+    double* ifg    = (double*) astMalloc(srcN * sizeof(double));
+    double* ifgNew = (double*) astMalloc(srcN * sizeof(double));
+    double* wn     = (double*) astMalloc(srcN * sizeof(double));
+    double* wnNew  = (double*) astMalloc(srcN * sizeof(double));
     int pixelCount = srcWidth * srcHeight;
     int index, pixelIndex;
     for(int i = 0; i < srcHeight; i++)
@@ -187,9 +188,10 @@ void smurf_fts2_freqcorr(int *status)
     }
 
     // FREE RESOURCES
-    ifgNew = smf_free(ifgNew, status);
-    ifg = smf_free(ifg, status);   
-    wn = smf_free(wn, status);   
+    astFree(ifgNew);
+    astFree(ifg);   
+    astFree(wn);      
+    astFree(wnNew);  
     smf_close_file(&srcData, status);
   }
 

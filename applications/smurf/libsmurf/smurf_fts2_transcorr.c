@@ -64,6 +64,7 @@
 #include <stdio.h>
 
 // STARLINK includes
+#include "ast.h"
 #include "star/ndg.h"
 #include "star/grp.h"
 #include "ndf.h"
@@ -138,26 +139,26 @@ void smurf_fts2_transcorr(int *status)
   size_t dryCount;
   datFind(hdsLocMore, "DRY", &hdsLoc, status);
   datSize(hdsLoc, &dryCount, status);
-  dryData = (double*) malloc(dryCount * sizeof(double));
+  dryData = (double*) astMalloc(dryCount * sizeof(double));
   datGetVD(hdsLoc, dryCount, dryData, &dryCount, status);  
   // WET DATA
   double* wetData = NULL;
   size_t wetCount;
   datFind(hdsLocMore, "WET", &hdsLoc, status);
   datSize(hdsLoc, &wetCount, status);
-  wetData = (double*) malloc(wetCount * sizeof(double));
+  wetData = (double*) astMalloc(wetCount * sizeof(double));
   datGetVD(hdsLoc, wetCount, wetData, &wetCount, status);
 
   // COMPUTE e^(-TAU)
   double* tau = NULL;
-  tau = (double*) malloc(dryCount * sizeof(double));
+  tau = (double*) astMalloc(dryCount * sizeof(double));
   for(int i = 0; i < dryCount; i++)
   {
     tau[i] = exp(-(airMass * PWV * wetData[i] + dryData[i]));
   }
   // FREE RESOURCES
-  free(dryData);
-  free(wetData);
+  astFree(dryData);
+  astFree(wetData);
   datAnnul(&hdsLocMore, status);
   datAnnul(&hdsLoc, status);
 
@@ -208,12 +209,12 @@ void smurf_fts2_transcorr(int *status)
     }
 
     // FREE RESOURCES
-    free(tsm);
-    free(ftsWNRel);
+    astFree(tsm);
+    astFree(ftsWNRel);
   }
 
   // FREE RESOURCES
-  free(tauData);
+  smf_close_file(&tauData, status);
 
   // END
   ndfEnd(status);
