@@ -22,12 +22,25 @@
       normalised to take account of the total data sum in the PSF,
       and of the presence of bad pixels in the input NDF.
       -  It now permits PSFs with negative areas.
-    
+
+   o  HISTAT
+
+      -  Bad percentile values are no longer written to the PERVAL
+      output parameter.
+
    o  LISTSHOW
 
       -  A new Parameter STEP has been added that allows a subset
       of the positions identifiers between FIRST and LAST to be 
       displayed.
+
+   o  MAKESURFACE
+
+      -  Output variances can now be created for spline fits.
+      
+   o  NDFTRACE
+
+      -  Writes Parameter FPIXSCALE even if QUIET=TRUE.
 
    o  PSF
 
