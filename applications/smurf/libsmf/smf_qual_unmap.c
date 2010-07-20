@@ -283,7 +283,7 @@ smf_qual_t * smf_qual_unmap( int indf, smf_qfam_t family, smf_qual_t * qual, int
             if ( qual[i] & (SMF__Q_APOD|SMF__Q_PAD) ) {
               qmap[i] |= SMF__TCOMPQ_ENDS;
             }
-            if ( qual[i] & (SMF__Q_JUMP|SMF__Q_SPIKE) ) {
+            if ( qual[i] & (SMF__Q_JUMP|SMF__Q_SPIKE|SMF__Q_FILT) ) {
               qmap[i] |= SMF__TCOMPQ_BLIP;
             }
             if ( qual[i] & (SMF__Q_COM) ) {
@@ -291,9 +291,6 @@ smf_qual_t * smf_qual_unmap( int indf, smf_qfam_t family, smf_qual_t * qual, int
             }
             if ( qual[i] & (SMF__Q_STAT) ) {
               qmap[i] |= SMF__TCOMPQ_TEL;
-            }
-            if ( qual[i] & (SMF__Q_FILT) ) {
-              qmap[i] |= SMF__TCOMPQ_FILT;
             }
             if (qmap[i] == 0 ) {
               /* something went wrong. We missed a quality bit somewhere */

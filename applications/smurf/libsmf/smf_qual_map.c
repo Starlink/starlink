@@ -246,13 +246,11 @@ smf_qual_t * smf_qual_map( int indf, const char mode[], smf_qfam_t *family,
                   } else if (ndfqtoval[k] & SMF__TCOMPQ_ENDS) {
                     retval[i] |= (SMF__Q_PAD|SMF__Q_APOD);
                   } else if (ndfqtoval[k] & SMF__TCOMPQ_BLIP) {
-                    retval[i] |= (SMF__Q_SPIKE | SMF__Q_JUMP);
+                    retval[i] |= (SMF__Q_SPIKE | SMF__Q_JUMP | SMF__Q_FILT);
                   } else if (ndfqtoval[k] & SMF__TCOMPQ_MATCH) {
                     retval[i] |= SMF__Q_COM;
                   } else if (ndfqtoval[k] & SMF__TCOMPQ_TEL) {
                     retval[i] |= SMF__Q_STAT;
-                  } else if (ndfqtoval[k] & SMF__TCOMPQ_FILT) {
-                    retval[i] |= SMF__Q_FILT;
                   } else {
                     /* just do the normal mapping */
                     retval[i] |= ndfqtoval[k];

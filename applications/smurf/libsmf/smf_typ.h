@@ -467,7 +467,6 @@ typedef enum {
   SMF__TCOMPQ_BLIP  = BIT_TO_VAL(2),
   SMF__TCOMPQ_MATCH = BIT_TO_VAL(3),
   SMF__TCOMPQ_TEL   = BIT_TO_VAL(4),
-  SMF__TCOMPQ_FILT  = BIT_TO_VAL(5)
 } smf_tcomp_qual_bits;
 
 /* We have separate quality families */
