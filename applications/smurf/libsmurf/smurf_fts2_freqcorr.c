@@ -90,7 +90,6 @@
 #include "libsmf/smf_err.h"
 #include "sc2da/sc2store.h"
 #include "libsc2fts/fts2.h"
-#include "libsc2fts/fts2_interpolation.h"
 
 #define FUNC_NAME "smurf_fts2_freqcorr"
 #define TASK_NAME "FTS2_FREQCORR"

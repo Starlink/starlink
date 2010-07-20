@@ -89,7 +89,6 @@
 #include "libsmf/smf_err.h"
 #include "sc2da/sc2store.h"
 #include "libsc2fts/fts2.h"
-#include "libsc2fts/fts2_interpolation.h"
 
 #define FUNC_NAME "smurf_fts2_removebse"
 #define TASK_NAME "FTS2_REMOVEBSE"
@@ -135,7 +134,7 @@ void smurf_fts2_removebse(int* status)
   smf_find_subarray(bseData->hdr, NULL, 0, &bseSubarray, status);
 
   // GET FTS-2 SCAN MODE
-  FTS2Mode bseMode = fts2_getScanMode(bseData, status);
+  FTSMode bseMode = fts2_getScanMode(bseData, status);
   if(bseMode != FSCAN)
   {
     *status = SAI__ERROR;
@@ -194,7 +193,7 @@ void smurf_fts2_removebse(int* status)
     }
 
     // GET FTS-2 SCAN MODE
-    FTS2Mode srcMode = fts2_getScanMode(srcData, status);
+    FTSMode srcMode = fts2_getScanMode(srcData, status);
     if(srcMode != FSCAN)
     {
       *status = SAI__ERROR;

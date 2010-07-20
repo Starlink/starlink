@@ -82,7 +82,6 @@
 #include "libsmf/smf_err.h"
 #include "sc2da/sc2store.h"
 #include "libsc2fts/fts2.h"
-#include "libsc2fts/fts2_interpolation.h"
 
 #define FUNC_NAME "smurf_fts2_transcorr"
 #define TASK_NAME "FTS2_TRANSCORR"
@@ -179,9 +178,9 @@ void smurf_fts2_transcorr(int *status)
 
     int nwn = srcData->dims[2];
     double* tsm = NULL;
-    tsm = (double*) malloc(nwn * sizeof(double));
+    tsm = (double*) astMalloc(nwn * sizeof(double));
     double* ftsWNRel = NULL;
-    ftsWNRel = (double*) malloc(nwn * sizeof(double));
+    ftsWNRel = (double*) astMalloc(nwn * sizeof(double));
     for(int i = 0; i < nwn; i++)
     {
       ftsWNRel[i] = i * wnFactor / tauFactor;
