@@ -46,4 +46,4 @@ com.notfirst = 1
 
 # use boundary constraints since the source is assumed to be isolated
 ast.zero_lowhits = 1.0
-ast.zero_notlast = 1.0
+ast.zero_notlast = 1
