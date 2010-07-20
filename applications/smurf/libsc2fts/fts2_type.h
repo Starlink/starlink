@@ -1,10 +1,10 @@
 /*
 *+
 *  Name:
-*     fts2_interpolation.h
+*     fts2_type.h
 
 *  Purpose:
-*     Definitions of interpolation methods utilized by the FTS2 data reduction.
+*     Definitions of general purpose types needed by FTS2.
 
 *  Language:
 *     Starlink ANSI C
@@ -14,7 +14,7 @@
 *  Invocation:
 
 *  Description:
-*     Definitions of interpolation methods utilized by the FTS2 data reduction.
+*     Definitions of general purpose types needed by FTS2.
 
 *  Authors:
 *     Coskun (Josh) OBA (UoL)
@@ -47,19 +47,36 @@
 *-
 */
 
-#ifndef FTS2_INTERPOLATION_H_
-#define FTS2_INTERPOLATION_H_
+// 
+// BOOLEAN TYPE
+//
+typedef enum boolean
+{
+  FALSE = 0,
+  TRUE = 1
+} bool;
 
-/*
- * Given m known (x, y) points, computes the n (xNew, yNew) points
- * at the specified xNew locations using natural spline interpolation algorithm.
- */
-void fts2_naturalCubicSplineInterpolator(double* x, double* y, int m, double* xNew, double* yNew, int n);
+//
+// FTS-2 SCAN MODES
+//
+typedef enum SMF__FTS_Mode
+{
+  UNKNOWN = -1, // Undefined or Unknown
+  FSCAN = 0,    // Fast Scan
+  STEPINT = 1   // Step-and-Integrate
+} FTSMode;
 
-/*
- * Given m x-data points, returns the index of the interval
- * containing the specified xNew location using Bisection algorithm.
- * Returns -1 if xTarget is NOT in the interval.
- */
-int fts2_getSplineIndex(double* x, int m, double xNew);
-#endif
+//
+//  SCUBA-2 SUBARRAYS
+//
+typedef enum SMF__SCUBA2_SUBARRAY
+{
+  s8a = 0, // 850 A
+  s8b = 1, // 850 B
+  s8c = 2, // 850 C
+  s8d = 3, // 850 D
+  s4a = 4, // 450 A
+  s4b = 5, // 450 B
+  s4c = 6, // 450 C
+  s4d = 7  // 450 D
+} SC2_Subarray;

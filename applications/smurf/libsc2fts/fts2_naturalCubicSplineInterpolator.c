@@ -1,20 +1,24 @@
 /*
 *+
 *  Name:
-*     fts2_interpolation.c
+*     fts2_naturalCubicSplineInterpolator.c
 
 *  Purpose:
-*     Implementation of interpolation methods utilized by the FTS2 data reduction.
+*     Implementation of natural cubic spline interpolation.
 
 *  Language:
 *     Starlink ANSI C
 
 *  Type of Module:
+*     Function
 
 *  Invocation:
+*     fts2_naturalCubicSplineInterpolator(double* x, double* y, int m, double* xNew, double* yNew, int n)
 
 *  Description:
-*     Implementation of interpolation methods utilized by the FTS2 data reduction.
+*     Given m known (x, y) points, computes the n (xNew, yNew) points
+*     at the specified xNew locations using natural spline interpolation 
+*     algorithm.
 
 *  Authors:
 *     Coskun (Josh) OBA (UoL)
@@ -51,18 +55,18 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "fts2_interpolation.h"
+// STARLINK INCLUDES
+#include "ast.h"
 
-/*
- * Given m known (x, y) points, computes the n (xNew, yNew) points
- * at the specified xNew locations using natural spline interpolation algorithm.
- */
+// SMURF INCLUDES
+#include "fts2.h"
+
 void fts2_naturalCubicSplineInterpolator(double* x, double* y, int m, double* xNew, double* yNew, int n)
 {
   int NSpline = m - 1; // Number of splines
 
-  double* DX = (double*) malloc(NSpline * sizeof(double));
-  double* DY = (double*) malloc(NSpline * sizeof(double));
+  double* DX = (double*) astMalloc(NSpline * sizeof(double));
+  double* DY = (double*) astMalloc(NSpline * sizeof(double));
 
   int j;
   for(int i = 1; i < m; i++)
@@ -74,10 +78,10 @@ void fts2_naturalCubicSplineInterpolator(double* x, double* y, int m, double* xN
 
   // FORM & SOLVE THE TRI-DIAGONAL MATRIX
   int N = m - 2;
-  double* M0 = (double*) malloc(N * sizeof(double)); // Main diagonal
-  double* MA = (double*) malloc(N * sizeof(double)); // Sub-main diagonal
-  double* MB = (double*) malloc(N * sizeof(double)); // Upper main diagonal
-  double* MD = (double*) malloc(N * sizeof(double)); // Right-Hand side
+  double* M0 = (double*) astMalloc(N * sizeof(double)); // Main diagonal
+  double* MA = (double*) astMalloc(N * sizeof(double)); // Sub-main diagonal
+  double* MB = (double*) astMalloc(N * sizeof(double)); // Upper main diagonal
+  double* MD = (double*) astMalloc(N * sizeof(double)); // Right-Hand side
   for(int i = 0; i < N; i++)
   {
     M0[i] = 2.0 * (DX[i] + DX[i + 1]);
@@ -105,13 +109,16 @@ void fts2_naturalCubicSplineInterpolator(double* x, double* y, int m, double* xN
   }
   Z[0] = Z[m - 1] = 0; // Natural Cubic Spline Condition
 
-  free(MA); free(M0); free(MB); free(MD);
+  astFree(MA); 
+  astFree(M0); 
+  astFree(MB); 
+  astFree(MD);
 
   // COMPUTE CUBIC SPLINE COEFFICIENTS FOR EACH SPLINE
-  double* A = (double*) malloc(NSpline * sizeof(double));
-  double* B = (double*) malloc(NSpline * sizeof(double));
-  double* C = (double*) malloc(NSpline * sizeof(double));
-  double* D = (double*) malloc(NSpline * sizeof(double));
+  double* A = (double*) astMalloc(NSpline * sizeof(double));
+  double* B = (double*) astMalloc(NSpline * sizeof(double));
+  double* C = (double*) astMalloc(NSpline * sizeof(double));
+  double* D = (double*) astMalloc(NSpline * sizeof(double));
   for(int i = 0; i < NSpline; i++)
   {
     A[i] = (Z[i + 1] - Z[i]) / (6.0 * DX[i]);
@@ -119,7 +126,9 @@ void fts2_naturalCubicSplineInterpolator(double* x, double* y, int m, double* xN
     C[i] = DY[i] / DX[i] - DX[i] * (2.0 * Z[i] + Z[i + 1]) / 6.0;
     D[i] = y[i];
   }
-  free(Z); free(DX); free(DY);
+  astFree(Z); 
+  astFree(DX); 
+  astFree(DY);
 
   // COMPUTE YNEW[I] FOR EACH XNEW[I]
   double X, X2, X3;
@@ -138,34 +147,8 @@ void fts2_naturalCubicSplineInterpolator(double* x, double* y, int m, double* xN
       yNew[i] = A[i] * X3 + B[i] * X2 + C[i] * X + D[i];
     }
   }
-  free(A); free(B); free(C); free(D);
-}
-
-/*
- * Given m x-data points, returns the index of the interval
- * containing the specified xNew location using Bisection algorithm.
- * Returns -1 if xTarget is NOT in the interval.
- */
-int fts2_getSplineIndex(double* x, int m, double xNew)
-{
-  if( xNew < x[0] || xNew > x[m -1])
-  {
-    return -1;
-  }
-
-  int start = 0;
-  int end = m - 1;
-  while((end - start) > 1)
-  {
-    int index = (start + end) >> 1;
-    if(xNew < x[index])
-    {
-      end = index;
-    }
-    else
-    {
-      start = index;
-    }
-  }
-  return start;
+  astFree(A); 
+  astFree(B); 
+  astFree(C); 
+  astFree(D);
 }

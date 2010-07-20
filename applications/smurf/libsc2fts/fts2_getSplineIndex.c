@@ -1,20 +1,23 @@
 /*
 *+
 *  Name:
-*     fts2.h
+*     fts2_getSplineIndex.c
 
 *  Purpose:
-*     Definitions of FTS2 utility methods.
+*     Finds the spline index of the specified xNew value in the given array.
 
 *  Language:
 *     Starlink ANSI C
 
 *  Type of Module:
+*     Function
 
 *  Invocation:
+*     fts2_getSplineIndex(double* x, int m, double xNew)
 
 *  Description:
-*     Definitions of FTS2 utility methods.
+*     Given m number of x-data points returns the spline index of the specified 
+*     xNew value using bisection method.
 
 *  Authors:
 *     Coskun (Josh) OBA (UoL)
@@ -47,17 +50,33 @@
 *-
 */
 
-// SMURF includes
-#include "fts2_type.h"
-#include "libsmf/smf_typ.h"
+#include <math.h>
+#include <stdlib.h>
+#include <stdio.h>
 
-bool    fts2_isInBeam(smfData* data, int* status);
-double  fts2_getMirrorPosition(smfData* data, int* status);
-double  fts2_getScanVelocity(smfData* data, int* status);
-double* fts2_getPositions(smfData* data, int* status);
-double  fts2_getWaveNumberFactor(smfData* data, int* status);
-FTSMode fts2_getScanMode(smfData* data, int* status);
+// SMURF INCLUDES
+#include "fts2.h"
 
-int     fts2_getSplineIndex(double* x, int m, double xNew);
-void    fts2_naturalCubicSplineInterpolator(double* x, double* y, int m, double* xNew, double* yNew, int n);
+int fts2_getSplineIndex(double* x, int m, double xNew)
+{
+  if( xNew < x[0] || xNew > x[m -1])
+  {
+    return -1;
+  }
 
+  int start = 0;
+  int end = m - 1;
+  while((end - start) > 1)
+  {
+    int index = (start + end) >> 1;
+    if(xNew < x[index])
+    {
+      end = index;
+    }
+    else
+    {
+      start = index;
+    }
+  }
+  return start;
+}
