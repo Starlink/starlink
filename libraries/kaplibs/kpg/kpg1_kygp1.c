@@ -81,6 +81,8 @@ void kpg1Kygp1( AstKeyMap *keymap, Grp **igrp, const char *prefix,
 *        Original version.
 *     15-JUL-2008 (TIMJ):
 *        Tweak to GRP C API.
+*     2010-07-19 (TIMJ):
+*        Handle vector keymap entries.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -149,15 +151,41 @@ void kpg1Kygp1( AstKeyMap *keymap, Grp **igrp, const char *prefix,
             if( dval == VAL__BADD ) bad = 1;
          }
 
-/* If it not bad, get its formatted value. */
+/* If it not bad, get its formatted value. We also make sure that astMapGet0C returns
+   true because we intend to skip undefined values. */
          if( !bad && astMapGet0C( keymap, key, &value ) ) {
+            size_t length;
 
-/* Put it in the group. */
+/* Write the key and equals sign to a buffer */
             nc = 0;
             text = astAppendString( NULL, &nc, prefix );
             text = astAppendString( text, &nc, key );
             text = astAppendString( text, &nc, "=" );
-            text = astAppendString( text, &nc, value );
+
+            length = astMapLength( keymap, key );
+
+            if( length > 1 ) {
+/* Vector so we need to use  (a,b,c) syntax */
+               char thiselem[GRP__SZNAM+1];
+               size_t l;
+
+               text = astAppendString( text, &nc, "(");
+               for ( l = 0; l < length; l++) {
+                  if( astMapGetElemC( keymap, key, sizeof(thiselem), l, thiselem ) ) {
+                     text = astAppendString( text, &nc, thiselem );
+                  }
+/* always deal with the comma. Even if value was undef we need to put in the comma */
+                  if( l < (length - 1) ) {
+                     text = astAppendString( text, &nc, "," );
+                  }
+               }
+               text = astAppendString( text, &nc, ")");
+
+            } else {
+/* Scalar */
+               text = astAppendString( text, &nc, value );
+            }
+/* Put it in the group. */
             grpPut1( *igrp, text, 0, status );
             text = astFree( text );
          }
