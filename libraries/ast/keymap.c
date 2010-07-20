@@ -4802,7 +4802,7 @@ c     #include "ast.h"
 c     int astMapGetElem<X>( AstKeyMap *this, const char *key, int elem,
 c                           <X>type *value )
 c     int astMapGetElemC( AstKeyMap *this, const char *key, int l, int elem,
-c                         const char *value )
+c                         char *value )
 f     RESULT = AST_MAPGETELEM<X>( THIS, KEY, ELEM, VALUE, STATUS )
 
 *  Class Membership:
