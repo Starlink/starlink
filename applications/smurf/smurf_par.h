@@ -47,6 +47,9 @@
  *        Add SIPREFIX and SIMULT.
  *     2010-07-14 (TIMJ):
  *        Update SC2FLAT__DTOI value.
+ *     2010-07-20 (TIMJ):
+ *        Retain incorrect DTOI value until we can pin down accurate values
+ *        for the resistors.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -190,7 +193,7 @@ error can not determine PI
 
 /* Heater circuit constant for converting D/A setting to Amps */
 
-#define SC2FLAT__DTOI (24.7e-6/65536)
+#define SC2FLAT__DTOI (20.0e-6/65536)
 
 /* Convert raw DAC numbers to current
    - include factor for MCE low-pass filter
