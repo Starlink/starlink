@@ -59,6 +59,8 @@
 *        Change IF for MPI frontend.
 *     2010-07-01 (VT):
 *        Simplify IF freq logic
+*     2010-07-22 (VT):
+*        Added a check the the freq logic to deal with special cases.
 
 *  Copyright:
 *     Copyright (C) 2008, 2010 Science and Technology Facilities Council.
@@ -138,27 +140,43 @@ void gsdac_matchFreqs ( const gsdVars *gsdVars, double *lineFreqs,
 
   }
 
-  /* Check for any spacing greater than 150 MHz. */
-  for ( i = 1; i < gsdVars->nBESections; i++ ) {
-
-    if ( 1000.0 * fabs ( centreFreqs[i] - centreFreqs[i - 1] ) > 150.0 ) {
-
-      i = gsdVars->nBESections;
+  /* Check the index of each spectrum to see if their values are the same
+   * or different. If they are the same then we have a special case, If they
+   * they are different we don't have a special case unless the spacing is 
+   * geater then 150 MHz. */
+  
+  i = 1;
+  while ( special == 0 && i < gsdVars->nBESections ) {
+    if ( gsdVars->BESubsys[i] != gsdVars->BESubsys[i-1] ) {
       special = 1;
-      msgOutif(MSG__VERB," ",
-      	       "This appears to be a special configuration", status);
-
     }
+    i++;
+  }  
 
+  /* Check for any spacing greater than 150 MHz. */
+  if (special == 1) {
+    special = 0; /* Assume it is wideband and set it back to special if there 
+                  * is no overlap */
+    for ( i = 1; i < gsdVars->nBESections; i++ ) {
+      if ( 1000.0 * fabs ( centreFreqs[i] - centreFreqs[i - 1] ) > 150.0 ) {
+        i = gsdVars->nBESections;
+        special = 1;
+        msgOutif(MSG__VERB," ",
+      	         "This appears to be a special configuration", status);
+      }
+    }
   }
 
+  
   /* Set IF frequency for each subsystem */
 
   for ( i = 0; i < gsdVars->nBESections; i++ ) {
 
      IFFreqs[i] = gsdVars->totIFs[i];
      lineFreqs[i] = gsdVars->restFreqs[i];
-
+     if ( special == 0 ) {
+       gsdVars->BESubsys[i] = 0;
+     }
   }
 
 }

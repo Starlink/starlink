@@ -129,6 +129,8 @@
 *     2010-07-01 (VT):
 *        Use ACSIS oberving mode.
 *        Fix (mainly) JOS FITS headers
+*     2010-07-22 (VT):
+*        Added SPECID FITS header.
 
 *  Copyright:
 *     Copyright (C) 2008-2009 Science and Technology Facilities Council.
@@ -576,6 +578,11 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   astSetFitsF ( fitschan, "INT_TIME", intTime,
                 "Time spent integrating, entire", 0 );
 
+  /* DAS Specific */
+  astSetFitsCM ( fitschan,
+                 "---- DAS Specific ----", 0 );
+  astSetFitsI ( fitschan, "SPECID", gsdVars->BESubsys[subBandNum],
+                "Spectrum ID for this subband", 0 );
 
   /* ACSIS Specific. */
   astSetFitsCM ( fitschan,
@@ -612,7 +619,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   astSetFitsI ( fitschan, "NCHNSUBS", gsdVars->BEChans[subBandNum],
                 "Number of subbands", 0 );
 
-  astSetFitsI ( fitschan, "REFCHAN", refChan,
+  astSetFitsF ( fitschan, "REFCHAN", refChan,
                 "Reference IF channel No.", 0 );
 
   astSetFitsF ( fitschan, "IFCHANSP", IFchanSp,
