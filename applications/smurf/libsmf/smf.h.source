@@ -1056,7 +1056,7 @@ void smf_gandoff( dim_t ibolo, dim_t time0, dim_t time1, dim_t ntime,
 
 void smf_geod( const double pos[3], double *phi, double *h, double *lambda );
 
-void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
+void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac,
                        dim_t *dcbox, int *dcbad, double *dcthresh,
                        dim_t *dcmedianwidth, int *dclimcorr, int
 		       *dkclean, int *fillgaps, double *filt_edgelow,
@@ -1093,6 +1093,8 @@ int smf_get_ndfid ( const HDSLoc *loc, const char *name, const char *accmode,
                     const int *lbnd, const int *ubnd, int *status );
 
 int smf_get_nthread( int *status );
+
+dim_t smf_get_padding( AstKeyMap *keymap, double steptime, int report, int *status );
 
 void smf_get_projpar( AstSkyFrame *skyframe, const double skyref[2],
                       int moving, int autogrid,

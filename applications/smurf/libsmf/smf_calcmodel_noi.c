@@ -196,7 +196,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   if( kmap ) {
 
     /* Data-cleaning parameters  */
-    smf_get_cleanpar( kmap, NULL, NULL, &dcfitbox, &dcmaxsteps, &dcthresh,
+    smf_get_cleanpar( kmap, NULL, &dcfitbox, &dcmaxsteps, &dcthresh,
                       &dcmedianwidth, &dclimcorr, NULL, &fillgaps, NULL,
                       NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                       &spikethresh, &spikeiter, NULL, status );

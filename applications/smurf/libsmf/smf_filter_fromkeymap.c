@@ -45,6 +45,8 @@
 *        Store a a value for the "wlim" component of the filter structure.
 *     2010-06-25 (DSB):
 *        Store a value for the "apod_length" component of the filter structure.
+*     2010-07-22 (DSB):
+*        Use a dynamic default for APOD based on frequency.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -96,16 +98,18 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap, int *dofilt,
   int dofft=0;              /* Set if freq. domain filtering the data */
   double f_edgelow;         /* Freq. cutoff for low-pass edge filter */
   double f_edgehigh;        /* Freq. cutoff for high-pass edge filter */
+  double f_low;             /* Lowest edge frequency */
   double f_notchlow[SMF__MXNOTCH]; /* Array low-freq. edges of notch filters */
   double f_notchhigh[SMF__MXNOTCH];/* Array high-freq. edges of notch filters */
   int f_nnotch=0;           /* Number of notch filters in array */
+  int i;                    /* Loop count */
   int ival;                 /* Dummy integer argument */
 
   /* Main routine */
   if (*status != SAI__OK) return;
 
   /* Search for filtering parameters in the keymap */
-  smf_get_cleanpar( keymap, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+  smf_get_cleanpar( keymap, NULL, NULL, NULL, NULL, NULL, NULL,
                     NULL, NULL, &f_edgelow, &f_edgehigh, f_notchlow,
                     f_notchhigh, &f_nnotch, &dofft, NULL, NULL, NULL,
                     NULL, NULL, status );
@@ -133,8 +137,31 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap, int *dofilt,
        filt->wlim = VAL__BADD;
     }
 
-    astMapGet0I( keymap, "APOD", &ival );
-    filt->apod_length = ival;
 
+    /* If no apodisation length has been given, use a default of
+       1/(steptime*freq) where freq is the lowest edge or notch
+       frequency. */
+
+    if( astMapGet0I( keymap, "APOD", &ival ) ) {
+       filt->apod_length = ival;
+
+    } else {
+
+      f_low = ( f_edgehigh > 0.0 ) ? f_edgehigh : VAL__MAXD;
+      if( f_edgelow > 0.0 && f_edgelow < f_low ) f_low = f_edgelow;
+      for( i = 0; i < f_nnotch; i++ ) {
+        if( f_notchlow[ i ] > 0.0 && f_notchlow[ i ] < f_low ) f_low = f_notchlow[ i ];
+      }
+
+      if( f_low != VAL__MAXD ) {
+         filt->apod_length = 0.5*filt->df*filt->ntslice/f_low;
+      } else {
+         filt->apod_length = 0;
+      }
+
+      msgSeti( "P", (int) filt->apod_length );
+      msgOutif( MSG__VERB, "", "Apodising ^P samples at start and end of "
+                "each time stream.", status );
+    }
   }
 }

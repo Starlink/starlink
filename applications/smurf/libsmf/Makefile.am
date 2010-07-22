@@ -193,6 +193,7 @@ smf_get_gridcoords.c \
 smf_get_moltrans.c \
 smf_get_ndfid.c \
 smf_get_nthread.c \
+smf_get_padding.c \
 smf_get_projpar.c \
 smf_get_smurfloc.c \
 smf_get_spread.c \

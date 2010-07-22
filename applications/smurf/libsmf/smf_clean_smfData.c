@@ -142,7 +142,7 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data,
   }
 
   /* Get cleaning parameters */
-  smf_get_cleanpar( keymap, NULL, &badfrac, &dcfitbox, &dcmaxsteps,
+  smf_get_cleanpar( keymap, &badfrac, &dcfitbox, &dcmaxsteps,
                     &dcthresh, &dcmedianwidth, &dclimcorr, &dkclean,
                     &fillgaps, NULL, NULL, NULL, NULL, NULL, NULL,
                     &flagstat, &order, &spikethresh, &spikeiter, &noiseclip,

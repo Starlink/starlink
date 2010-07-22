@@ -89,18 +89,15 @@ exportndf = 0
 # The following parameters control data-cleaning before iterations start
 # ----------------------------------------------------------------------------
 
-# --- Padding, apodization and mean subtraction are all fairly useful ---
-
-# Number of samples of padding to add to start and end before filtering
-padstart = 100
-padend = 100
-
-# Apodize signals with a sin function roll-off across apod samples
-apod = 100
+# --- Mean subtraction is fairly useful ---
 
 # subtract a baseline polynomial of this order
 order = 0
 
+# Use default apodisation based on filter frequency. This over-rides the default 
+# of zero in smurf_sc2clean.def. Keep the <undef> default for PAD which is set up
+# in smurf_makemap.def.
+apod = <undef>
 
 # --- badfrac ensures that bad data from DA system are ignored ---
 
@@ -176,7 +173,7 @@ noiseclip = 4.0
 # cleandk.padstart/padend).
 # ----------------------------------------------------------------------------
 
-cleandk.apod = 100
+cleandk.apod=<undef>
 cleandk.badfrac = 0.05
 cleandk.dcfitbox = 400
 cleandk.dcmaxsteps = 10
@@ -259,11 +256,12 @@ noi.fillgaps = 1
 # explicitly turn off iterative DC step finding for now
 noi.dcfitbox = 0
 
+#  Use default apodisation based on filter frequency
+flt.apod = <undef>
 
 # iterative filter.
 450.flt.filt_edgehigh = 0.1
 850.flt.filt_edgehigh = 0.3
-flt.apod = 100
 
 #flt.filt_edgelow = 90
 #flt.filt_notchlow  = (25,55)

@@ -52,26 +52,16 @@ com.gain_abstol = 3
 
 noi.spikethresh = 5
 
-# heavier high-pass filtering. Note that the padding/apodization length
-# is calculated as the number of samples that corresponds to the period
-# of the knee frequency in the high-pass filter (i.e. 200*(1/freq) )
+# heavier high-pass filtering. Note that the default padding/apodization
+# that will be used is the number of samples that corresponds to the
+# period of the knee frequency in the high-pass filter (i.e. 200*(1/freq) )
 
 450.filt_edgehigh = 0.2
-450.apod = 1000
 450.flt.filt_edgehigh = 0.2
-450.flt.apod = 1000
-450.padstart = 1000
-450.padend = 1000
-450.cleandk.apod = 1000
 450.cleandk.filt_edgehigh = 0.2
 
 850.filt_edgehigh = 0.6
-850.apod = 333
 850.flt.filt_edgehigh = 0.6
-850.flt.apod = 333
-850.padstart = 333
-850.padend = 333
-850.cleandk.apod = 333
 850.cleandk.filt_edgehigh = 0.6
 
 # can constrain much of the map to be zero until the final iteration

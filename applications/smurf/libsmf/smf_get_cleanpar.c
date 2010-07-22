@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
+*     smf_get_cleanpar( AstKeyMap *keymap, double *badfrac,
 *                       dim_t *dcfitbox, int *dcmaxsteps, double *dcthresh,
 *                       dim_t *dcmedianwidth, int *dclimcorr,
 *                       int *dkclean, int *fillgaps,
@@ -26,8 +26,6 @@
 *  Arguments:
 *     keymap = AstKeyMap* (Given)
 *        keymap containing parameters
-*     apod = size_t* (Returned)
-*        Apodize time series within this number of samples (NULL:0)
 *     badfrac = double* (Returned)
 *        Fraction of bad samples in order for entire bolometer to be
 *        flagged as bad (NULL:0)
@@ -166,7 +164,7 @@
 
 #define FUNC_NAME "smf_get_cleanpar"
 
-void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
+void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac,
                        dim_t *dcfitbox, int *dcmaxsteps, double *dcthresh,
                        dim_t *dcmedianwidth, int *dclimcorr, int *dkclean,
                        int *fillgaps, double *filt_edgelow, double *filt_edgehigh,
@@ -186,20 +184,6 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
 
 
   /* Obtain parameters from keymap when non-NULL pointers given */
-
-  if( apod ) {
-    *apod = 0;
-    astMapGet0I( keymap, "APOD", &temp );
-    if( temp < 0 ) {
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "APOD cannot be < 0.", status );
-    } else {
-      *apod = (size_t) temp;
-    }
-
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": APOD=%zu", status,
-               *apod );
-  }
 
   if( badfrac ) {
     *badfrac = 0.0;

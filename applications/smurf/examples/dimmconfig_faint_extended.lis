@@ -12,12 +12,6 @@
 
 modelorder = (com,gai,ext,dks,ast,noi)
 
-padstart = 1000
-padend = 1000
-
-apod = 1000
-cleandk.apod = 1000
-
 450.filt_edgehigh = 0.1
 850.filt_edgehigh = 0.3
 

@@ -291,6 +291,8 @@
 *     2010-06-28 (TIMJ):
 *        Pass in explicit exposure time array so that we can handle variable
 *        step times.
+*     2010-07-22 (DSB):
+*        Use smf_get_padding to get padding with a dynamic default value.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -438,7 +440,6 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   double scalevar=0;            /* scale factor for variance */
   int shortmap=0;               /* If set, produce maps every shortmap tslices*/
   double steptime;              /* Length of a sample in seconds */
-  int temp;                     /* temporary signed integer */
   int *thishits=NULL;           /* Pointer to this hits map */
   double *thismap=NULL;         /* Pointer to this map */
   smf_modeltype thismodel;      /* Type of current model */
@@ -561,6 +562,15 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       }
     }
 
+    /* Obtain sample length from header of first file in igrp */
+    smf_open_file( igrp, 1, "READ", SMF__NOCREATE_DATA, &data, status );
+    if( (*status == SAI__OK) && (data->hdr) ) {
+        steptime = data->hdr->steptime;
+    } else {
+        steptime = -1;
+    }
+    smf_close_file( &data, status );
+
     /* Maximum length of a continuous chunk */
     if( *status == SAI__OK ) {
       astMapGet0D( keymap, "MAXLEN", &dtemp );
@@ -572,44 +582,17 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       } else if( dtemp == 0 ) {
         /* 0 is OK... gets ignored later */
         maxlen = 0;
+      } else if( steptime > 0 ) {
+        maxlen = (dim_t) (dtemp / steptime);
       } else {
-        /* Obtain sample length from header of first file in igrp */
-        smf_open_file( igrp, 1, "READ", SMF__NOCREATE_DATA, &data, status );
-        if( (*status == SAI__OK) && (data->hdr) ) {
-          steptime = data->hdr->steptime;
-
-          if( steptime > 0 ) {
-            maxlen = (dim_t) (dtemp / steptime);
-          } else {
-            /* Trap invalid sample length in header */
-            *status = SAI__ERROR;
-            errRep(FUNC_NAME, "Invalid STEPTIME in FITS header.", status);
-          }
-        }
-        smf_close_file( &data, status );
+        /* Trap invalid sample length in header */
+        *status = SAI__ERROR;
+        errRep(FUNC_NAME, "Invalid STEPTIME in FITS header.", status);
       }
     }
 
     /* Padding */
-    if( *status == SAI__OK ) {
-      astMapGet0I( keymap, "PADSTART", &temp );
-      if( temp < 0 ) {
-        *status = SAI__ERROR;
-        errRep(FUNC_NAME, "PADSTART cannot be < 0.", status );
-      } else {
-        padStart = (dim_t) temp;
-      }
-    }
-
-    if( *status == SAI__OK ) {
-      astMapGet0I( keymap, "PADEND", &temp );
-      if( temp < 0 ) {
-        *status = SAI__ERROR;
-        errRep(FUNC_NAME, "PADEND cannot be < 0.", status );
-      } else {
-        padEnd = (dim_t) temp;
-      }
-    }
+    padStart = padEnd = smf_get_padding( keymap, steptime, 1, status );
 
     /* Type and order of models to fit from MODELORDER keyword */
     havenoi = 0;

@@ -52,8 +52,7 @@ ensureflat = 1
 noexportsetbad = 0
 varmapmethod = 0
 maxlen = 0
-padstart = 0
-padend = 0
+pad = <undef>
 
 modelorder = (com,gai,ext,flt,ast,noi)
 exportndf = 0
