@@ -1,4 +1,4 @@
-^$STARLINK_DIR/share/smurf/dimmconfig_newfilt.lis
+^$STARLINK_DIR/share/smurf/dimmconfig.lis
 
 # *** Specialized config for bright, isolated compact sources ***
 #
@@ -14,6 +14,7 @@
 # the ends of the data stream that would normally be apodized. This is
 # particularly useful for some of the very short scans used, for
 # example, for focus (as short as 10 seconds).
+# *** CURRENTLY NOT TRUE, HAVE REVERTED TO OLD METHOD FOR NOW ***
 #
 # We constrain the edges of the map to zero using ast.zero_lowhits=1.0
 # (all pixels with the mean number of hits or less set to zero), and
