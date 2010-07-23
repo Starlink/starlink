@@ -1329,6 +1329,249 @@ model components.
 \subsection{\xlabel{Cosmology}Cosmology Data}
 \label{sec:cosmology}
 
+Deep cosmology observations are typically designed to detect
+un-resolved high-redshift galaxies. Since the surface density of these
+distant sources falls rapidly with increasing brightness, most objects
+are, on average, only slightly brighter than the extra-galactic
+confusion limit --- the flux density below which the surface density
+of sources is so great that there are many blended objects within a
+telescope beam. Consequently, the sources of interest are usually only
+a few standard deviations brighter than the noise in the map (caused
+by a combination instrumental and source confusion). In light of this,
+the recommended strategy for reducing such maps involves two basic
+steps:
+
+\begin{enumerate}
+
+\item Create a map using {\texttt dimmconfig\_blank\_field} which,
+  compared to the default configuration, sacrifices structure on large
+  scales to gain the best possible noise performance on small scales
+  (i.e. making the map as flat as possible). This is a good compromise
+  since the sources should generally be the size of a telescope beam.
+
+\item Run the map through a combined `matched filter' (which
+  effectively fits a PSF centered over every pixel in the map) and a
+  background supression filter (removing additional residual
+  large-scale noise). This is a fairly standard technique used
+  throughout the extra-galactic submm community to identify potential
+  sources.
+
+\end{enumerate}
+
+For this example we will reduce a 13 minute, 450\,\micron, $6' \times
+6'$ CURVY\_PONG map towards the cluster MS0451. The data may be
+retrieved from {\bf URL?}. Although not deep enough to detect any
+individual sources, this example is useful to illustrate features that
+are common to most of the extra-galactic SRO data from the Spring of
+2010.
+
+First, assuming the data are in the current directory, we produce a map
+using the specialized {\texttt dimmconfig\_blank\_field}:
+
+\begin{myquote}
+\begin{verbatim}
+% makemap s4a20100313_00029_00\*.sdf map450 method=iterate \
+config=^$STARLINK_DIR/share/smurf/dimmconfig_blank_field.lis
+\end{verbatim}
+\end{myquote}
+
+For comparison, we also make a map using the default configuration:
+
+\begin{myquote}
+\begin{verbatim}
+% makemap s4a20100313_00029_00\*.sdf map450_default method=iterate \
+config=^$STARLINK_DIR/share/smurf/dimmconfig.lis
+\end{verbatim}
+\end{myquote}
+
+Both of the maps are shown in Fig.~\ref{fig:cosmomap}. Clearly the
+specialized configuration for cosmology fields yields a flatter map,
+although the white noise level is still quite large (no obvious
+sources are visible), and there is some residual structure in the map
+caused by low-frequency noise that is not effectively modelled/removed
+by the map-maker (vertical stripes that are aligned with the map
+edges).
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.49\linewidth]{sc19_cosmo_map}
+\includegraphics[width=0.49\linewidth]{sc19_cosmo_map_default} \\
+\caption{Maps of a deep cosmology field, MS0451, at 450\,\micron. {\bf
+    Left:} map using the specialized {\texttt
+    dimmconfig\_blank\_field} which gives a significantly flatter
+  result than {\bf Right:} map using the default {\texttt
+    dimmconfig}.}
+\label{fig:cosmomap}
+\end{center}
+\end{figure}
+
+In order to optimally find sources that are the size of the telescope
+beam, and suppress this residual large-scale noise, we provide a
+script called {\texttt matched-filter}.
+
+If there were no large-scale noise in the map, the filtered signal map
+would be calculated as follows:
+%
+\begin{equation}
+\mathcal{M} = \frac{[M(x,y)/\sigma^2(x,y)] \otimes P(x,y)}
+  {[1/\sigma^2(x,y)] \otimes [P^2(x,y)]}.
+\end{equation}
+%
+where $M(x,y)$ and $\sigma(x,y)$ are the signal and RMS
+noise maps produced by \smurf, and $P(x,y)$ is a map of the
+PSF. `$\otimes$' denotes the 2-dimensional cross-correlation
+operator. Similarly, the variance map would be calculated as
+%
+\begin{equation}
+  \mathcal{N}^2 = \frac{1}{[1/\sigma^2(x,y)] \otimes [P^2(x,y)]}.
+\end{equation}
+%
+This operation is equivalent to calculating the maximum-likelihood fit
+of the PSF centered over every pixel in the map, taking into account
+the noise. Presently $P$ is simply modelled as an ideal Gaussian
+with a FWHM set to the diffraction limit of the telescope.
+
+However, since there is large-scale (and therefore correlated from
+pixel to pixel) noise, the script also has an additional step. It
+first smooths the map by cross-correlating with a larger Gaussian
+kernel to estimate the background, and then subtracts it from the
+image. The same operation is also applied to the PSF to estimate the
+effective shape of a point-source in this background-subtracted map.
+
+Before applying the filter to our cosmology data, we first look at the
+effect it has on the map of Uranus from Fig.~\ref{fig:itermap}. The script
+is executed as follows:
+
+\begin{myquote}
+\begin{verbatim}
+% $SMURF_DIR/matched-filter -np -s 15 uranus uranus_sm
+\end{verbatim}
+\end{myquote}
+%
+Here the `{\texttt -s 15}' flag indicates that the background should
+be estimated by first smoothing the map and PSF with a $15''$ FWHM
+Gaussian, and the `{\texttt -np}' flag indicates that the output map,
+{\texttt uranus\_sm}, should be re-normalized such that the peak
+fluxes of point sources are conserved. The result is shown in
+Fig.~\ref{fig:cosmo_filt}.
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.46\linewidth]{sc19_uranus_filt}
+\includegraphics[width=0.525\linewidth]{sc19_cosmo_map_filt}
+\caption{450\,\micron\ maps processed with the {\texttt
+    matched-filter} script, suppressing scales larger than
+  $15''$. {\bf Left:} filtered map of Uranus from
+  Fig.~\ref{fig:itermap}. {\bf Righ:} filtered version of deep
+  Cosmology map from left-hand panel of Fig.~\ref{fig:cosmomap}.}
+\label{fig:cosmo_filt}
+\end{center}
+\end{figure}
+
+The map is generally flatter, and the noise level is significantly
+reduced. However, the price that we pay for suppressing signal on
+scales larger that $15''$ is visible as the large negative ring around
+the source; for this particular case the dip is about 10\% of the peak
+signal.
+
+Now that we know what this procedure does to a bright point source, we
+proceed to filter the deep map. It is shown next to Uranus in
+Fig.~\ref{fig:cosmo_filt}.
+
+\begin{myquote}
+\begin{verbatim}
+% $SMURF_DIR/matched-filter -np -s 15 map450 map450_sm
+\end{verbatim}
+\end{myquote}
+
+As hoped, this map has most of the remaining large-scale residual
+structure removed, and in general the noise is significantly reduced.
+
+Finally, how should we find sources? The filtered map also contains a
+VARIANCE component, so it is easy to produce a S/N map using the \Kappa\
+tasks \ndfcopy\ and \Div:
+
+\begin{myquote}
+\begin{verbatim}
+% ndfcopy map450_sm map450_sm_noise comp=error
+% div map450_sm map450_sm_noise map450_sm_snr
+\end{verbatim}
+\end{myquote}
+
+The resulting map, {\texttt map450\_sm\_snr} is shown in
+Fig.~\ref{fig:cosmo_snr}. Compared to Fig.~\ref{fig:cosmo_filt} the
+edges no longer appear as noisy because they have been down-weighted
+by the larger noise estimated there.
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.49\linewidth]{sc19_cosmo_map_snr}
+\caption{S/N map produced from the match-filtered deep cosmology map
+  in Fig.~\ref{fig:cosmo_filt}, scaled from $-4\sigma$ (black) to
+  $+4\sigma$ (white).}
+\label{fig:cosmo_snr}
+\end{center}
+\end{figure}
+
+A basic procedure for identifying sources would be to locate peaks
+above some threshold S/N. However, as a word of caution, even after
+all of these steps the noise may not be perfectly well-behaved. In
+this example we do not expect any real astronomical source, so the S/N
+map {\em should} have a brightness distribution that resembles a
+Gaussian with standard deviation $\sigma=1$ and mean zero. We perform
+this comparison for the central $100 \times 100$ pixels of the S/N map
+in Fig.~\ref{fig:cosmo_snrcompare}, well away from any edge
+effects. In this case we find that the real distribution is slightly
+narrower than expected, suggesting that the noise has been
+over-estimated.
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.8\linewidth]{sc19_cosmo_snrcompare}
+\caption{The distribution of S/N for the central $100 \times 100$
+  pixels of Fig.~\ref{fig:cosmo_filt} (histogram), compared with an
+  ideal Gaussian distribution with mean zero and $\sigma=1$ (dashed
+  line). The fact that the real distribution is skinnier demonstrates
+  that in this region of the map the noise is probably slightly
+  over-estimated.}
+\label{fig:cosmo_snrcompare}
+\end{center}
+\end{figure}
+
+We recognize that noise characterization is of utmost importance to
+the deep Cosmology surveys, and we will continue to develop methods
+for estimating the true noise distributions in the final maps (e.g.,
+using Monte Carlo simulations). Also, the Gaussian background noise
+suppression currently implemented in the matched-filter is
+isotropic. Clearly some of the residual large-scale noise has a
+preferred direction (such as the vertical stripes in
+Fig.~\ref{fig:cosmomap}). We are therefore investigating ways of
+automatically estimating more efficient filters for specific map
+geometries that will hopefully result in flatter maps, with reduced
+negative ringing around sources.
+
+As a parting word on this subject, we mention some other tests that
+PI's should consider undertaking:
+
+\begin{itemize}
+
+\item Split your data into mutually-exclusive subsets and produce
+  independent maps. Are the highest S/N peaks detected in each of
+  them?
+
+\item Use {\em jackknife} tests to verify the estimated noise
+  levels. Produce two maps from independent portions of the data and
+  difference them (e.g., using the \Kappa\ task \sub). This will
+  remove any astronomical signal, but increase the noise by a factor
+  of about $\sqrt{2}$. Is the standard deviation in the central pixels
+  (where the noise should hopefully be uniform) roughly $\sqrt{2}$
+  larger than the noise estimated for either of the original maps?
+
+\item How many {\em negative} peaks above a given S/N are there
+  compared to the {\em positive} peaks?
+
+\end{itemize}
+
 \subsection{\xlabel{Galactic}Extended Galactic Sources}
 \label{sec:galactic}
 
