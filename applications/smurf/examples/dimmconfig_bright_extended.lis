@@ -1,0 +1,12 @@
+^$STARLINK_DIR/share/smurf/dimmconfig.lis
+
+# *** Specialized config for scans of bright/extended structure ***
+#
+# For bright extended regions we simply increase the number of
+# iterations. This is required because we have not yet implemented
+# an automatic convergence test for the larger-scale structures
+# in the map.
+#
+# ****************************************************************
+
+numiter = 20
