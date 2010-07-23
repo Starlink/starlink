@@ -1085,8 +1085,8 @@ flagged `\texttt{BADDA}' by the data acquisition system. Since each
 bolometer produced about 14000 samples (including 2000 for padding),
 this corresponds to 4416000/12000 $\sim$ 368 detectors that were not
 operational (out of 1280). Similarly, $1280 \,\mathrm{bolometers} \times 2000 =
-2560000$ samples flagged as padding, {\texttt PAD}. Finally, the
-apodization ({\texttt APOD}) is flagged over the same sample length as
+2560000$ samples flagged as padding, \texttt{ PAD}. Finally, the
+apodization (\texttt{ APOD}) is flagged over the same sample length as
 the padding, but then that same amount again is flagged beyond this
 region to avoid including any ringing in the final map (i.e. $2560000
 \times 2 = 5120000$).
@@ -1129,7 +1129,7 @@ all at the end, we can instead do everything in one go using the
 The DIMM is enabled using the \texttt{method=iterate} switch to the
 \makemap\ task. In the following example we will produce a map of
 Uranus using the test data supplied with this \starlink\ distribution
-in {\texttt \$STARLINK\_DIR/share/smurf/s4a20091214\_00015\_000*.sdf}. All
+in \texttt{ \$STARLINK\_DIR/share/smurf/s4a20091214\_00015\_000*.sdf}. All
 of the settings for the DIMM are stored in the configuration file
 `\texttt{dimmconfig.lis}'. In this example we will use the default
 configuration file that is installed in the \starlink\ tree, which is
@@ -1320,6 +1320,128 @@ the common-mode component. Finally, the residual signal is quite flat,
 indicating that most of the signal has been accounted for in the other
 model components.
 
+\subsection{\xlabel{config}Configuration Files}
+
+Since the DIMM has a large number of parameters, several configuration
+files are supplied with \smurf\ for reducing common types of data. All
+of these files can be found in \texttt{ \$STARLINK\_DIR/share/smurf/}
+with filenames of the form \texttt{ dimmconfig*.lis}. The default
+\texttt{ dimmconfig.lis} should give reasonable results for most types
+of observations. Note that this file also contains the full set of
+parameters with extensive documentation. For clarity, all of the other
+configuration files for specific observations types are derived from
+\texttt{ dimmconfig.lis} and simply override the relevant
+parameters.
+
+While we have tried to test a wide variety of data sets with these
+files, it is certainly worth trying at least the default, and the
+specific configuration that sounds like it would be appropriate for
+your project:
+
+\begin{description}
+
+\item[\texttt{dimmconfig.lis}] Before the iterative solution begins,
+  some pre-processing steps are performed, like repairing DC steps,
+  turning off particularly noisy bolometers (see the
+  \texttt{noiseclip} parameter), and the mean levels are subtracted.
+  The default configuration solves for the following models:
+  \texttt{COM, GAI, EXT, FLT, AST, NOI}. \texttt{COM, GAI} work
+  together to calculate the average signal template of all the
+  detectors, and then fit/remove the templates from each
+  detector. They also identify outlier detectors that do not resemble
+  the template and remove them from the final solution. \texttt{EXT}
+  applies the extinction correction (derived from the water vapour
+  monitor by default), and then \texttt{FLT} applies a high-pass
+  filter to the data (above 0.1\,Hz and 0.3\,Hz at 450\,\micron\ and
+  850\,\micron\ respectively). These cutoff frequencies are only
+  approximate, but appear to give good results under a wide variety of
+  sitations. Finally \texttt{AST} estimates the astronomical signal
+  contribution to the bolometer signals from the current map estimate,
+  and \texttt{NOI} measures the noise in the residual signals for each
+  detector to establish weights for the data as they are placed into
+  the map.
+
+\item[\texttt{dimmconfig\_blank\_field.lis}] This configuration is
+  tuned for deep cosmology surveys for which the goal is to detect
+  low-S/N point sources. Instead of iteratively applying a high-pass
+  filter (\texttt{FLT}), which can result in convergence problems when
+  there is little signal in the map, a single, harsher high-pass
+  filter is applied as a pre-processing step (0.2\, and 0.6\,Hz at
+  450\,\micron\ and 850\,\micron). There are also more conservative
+  cuts to remove noisy/problematic detectors. Finally, the parameters
+  \texttt{ast.zero\_lowhits} and \texttt{ast.zero\_notlast} are set to
+  constrain much of the map to precisely zero for all but the last of
+  5 iterations. This helps with map convergence, and is a reasonable
+  prior for a blank-field.
+
+\item[\texttt{dimmconfig\_bright\_compact.lis}] This configuration is
+  aimed at reducing maps of bright, compact sources that are isolated
+  near the centre of the map. The number of iterations are increased,
+  and as in \texttt{dimmconfig\_blank\_field.lis}, the
+  \texttt{ast.zero\_lowhits} and \texttt{ast.zero\_notlast} parameters
+  are used to constrain the map edges to zero for all but the final
+  iteration. This strategy helps with map convergence significantly,
+  and can provide good maps of bright sources, even in cases where
+  scan patterns failed at high-elevation and the telescope degenerated
+  into a scan back-and-forth along a single position angle on the sky.
+
+\item[\texttt{dimmconfig\_bright\_extended.lis}] The only difference
+  between this configuration and the default is to increase the
+  iterations to 20 in order to allow more time for high-S/N
+  large-scale structure to converge. In the future automatic
+  convergence tests will be added, but for now the number of
+  iterations is fairly subjective. We recommend setting the parameter
+  \texttt{itermap=1}, and then visually inspecting the maps produced
+  after each itermap (e.g., \texttt{gaia map.more.smurf.itermaps}) to
+  help determine an appropriate.
+
+\item[\texttt{dimmconfig\_distortionmap.lis}] This configuration is
+  used primarily by the instrument team to produce single detector
+  maps for finely-spaced scans over calibrators (see the
+  \texttt{bolomap} parameter). These are used to measure the
+  focal-plane offsets for each detector, and to constrain the relative
+  detector responsivities.
+
+\item[\texttt{dimmconfig\_faint\_extended.lis}] It is presently very
+  challenging to produce SCUBA-2 maps of faint extended structures
+  given its low-frequency noise performance. In particular, for some
+  osberving configurations, wide scans can suffer significant magnetic
+  field pickup. If there are no bright sources in the map, a single
+  high-pass filter may be applied at the start (as in
+  \texttt{dimmconfig\_blank\_field.lis}). Then, the dark-squid signals
+  (one for each column in the array, sensitive primarily to this
+  pickup) can be used as templates to fit and remove this extra
+  low-frequency noise component, the \texttt{DKS} model. Note that for
+  maps of brighter structures, \texttt{DKS} does not have much of an
+  impact, and may simply increase the noise as all three of
+  \texttt{COM}, \texttt{FLT}, and \texttt{DKS} model the low-frequency
+  detector noise, and are somewhat degenerate.  In addition, a more
+  conservative cut on noisy bolometers is applied
+  (\texttt{noiseclip=2.0}).
+
+\item[\texttt{dimmconfig\_fridgeflat.lis}] This configuration is also
+  primarily for use by the engineering team. It was designed to reduce
+  data with the SCUBA-2 shutter closed, in order to study the response
+  of the detectors to internal temperature variations in the
+  refrigeration system.
+
+\item[\texttt{dimmconfig\_newfilt.lis}] This configuration file
+  illustrates an alternative method for handling gaps in the data. By
+  default, when portions of a bolometer data stream are flagged, they
+  are filled with a constrained realization of noise to ensure
+  continuity when filtering (although the samples themselves are not
+  added to the final map). This modified configuration handles the
+  problems of gaps by creating a window function with `1' at locations
+  of good data, and `0' where there are gaps. Both the real data (with
+  gaps) and this window function are filtered. The ringing in the
+  filtered window function can then be used to compensate for ringing
+  in the real filtered data caused by the gaps. This method can
+  preserve more of the data, and is probably more robust. However, it
+  requires more memory and is slightly slower, and gives results that
+  closely resemble the defaults.
+
+\end{description}
+
 \section{\xlabel{calib}Calibrating SCUBA-2 Data}
 \label{sec:calib}
 
@@ -1343,7 +1465,7 @@ steps:
 
 \begin{enumerate}
 
-\item Create a map using {\texttt dimmconfig\_blank\_field} which,
+\item Create a map using \texttt{ dimmconfig\_blank\_field} which,
   compared to the default configuration, sacrifices structure on large
   scales to gain the best possible noise performance on small scales
   (i.e. making the map as flat as possible). This is a good compromise
@@ -1366,7 +1488,7 @@ are common to most of the extra-galactic SRO data from the Spring of
 2010.
 
 First, assuming the data are in the current directory, we produce a map
-using the specialized {\texttt dimmconfig\_blank\_field}:
+using the specialized \texttt{ dimmconfig\_blank\_field}:
 
 \begin{myquote}
 \begin{verbatim}
@@ -1397,9 +1519,9 @@ edges).
 \includegraphics[width=0.49\linewidth]{sc19_cosmo_map}
 \includegraphics[width=0.49\linewidth]{sc19_cosmo_map_default} \\
 \caption{Maps of a deep cosmology field, MS0451, at 450\,\micron. {\bf
-    Left:} map using the specialized {\texttt
+    Left:} map using the specialized \texttt{
     dimmconfig\_blank\_field} which gives a significantly flatter
-  result than {\bf Right:} map using the default {\texttt
+  result than {\bf Right:} map using the default \texttt{
     dimmconfig}.}
 \label{fig:cosmomap}
 \end{center}
@@ -1407,7 +1529,7 @@ edges).
 
 In order to optimally find sources that are the size of the telescope
 beam, and suppress this residual large-scale noise, we provide a
-script called {\texttt matched-filter}.
+script called \texttt{ matched-filter}.
 
 If there were no large-scale noise in the map, the filtered signal map
 would be calculated as follows:
@@ -1448,10 +1570,10 @@ is executed as follows:
 \end{verbatim}
 \end{myquote}
 %
-Here the `{\texttt -s 15}' flag indicates that the background should
+Here the `\texttt{ -s 15}' flag indicates that the background should
 be estimated by first smoothing the map and PSF with a $15''$ FWHM
-Gaussian, and the `{\texttt -np}' flag indicates that the output map,
-{\texttt uranus\_sm}, should be re-normalized such that the peak
+Gaussian, and the `\texttt{ -np}' flag indicates that the output map,
+\texttt{ uranus\_sm}, should be re-normalized such that the peak
 fluxes of point sources are conserved. The result is shown in
 Fig.~\ref{fig:cosmo_filt}.
 
@@ -1459,7 +1581,7 @@ Fig.~\ref{fig:cosmo_filt}.
 \begin{center}
 \includegraphics[width=0.46\linewidth]{sc19_uranus_filt}
 \includegraphics[width=0.525\linewidth]{sc19_cosmo_map_filt}
-\caption{450\,\micron\ maps processed with the {\texttt
+\caption{450\,\micron\ maps processed with the \texttt{
     matched-filter} script, suppressing scales larger than
   $15''$. {\bf Left:} filtered map of Uranus from
   Fig.~\ref{fig:itermap}. {\bf Righ:} filtered version of deep
@@ -1498,7 +1620,7 @@ tasks \ndfcopy\ and \Div:
 \end{verbatim}
 \end{myquote}
 
-The resulting map, {\texttt map450\_sm\_snr} is shown in
+The resulting map, \texttt{ map450\_sm\_snr} is shown in
 Fig.~\ref{fig:cosmo_snr}. Compared to Fig.~\ref{fig:cosmo_filt} the
 edges no longer appear as noisy because they have been down-weighted
 by the larger noise estimated there.
