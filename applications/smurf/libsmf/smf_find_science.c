@@ -139,6 +139,8 @@
 *        ramps.
 *     2010-07-15 (TIMJ):
 *        API change for smf_flat_calcflat
+*     2010-07-23 (TIMJ):
+*        Trap bad flatfield ramps.
 
 *  Copyright:
 *     Copyright (C) 2008-2010 Science and Technology Facilities Council.
@@ -359,21 +361,29 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
     if (*status == SAI__OK) {
       smfData * prevresp = NULL;
       smfData * prevflat = NULL;
+      size_t start_ffcount = ffcount;
 
-      for (i = 0; i < ffcount; i++ ) {
+      for (i = 0; i < start_ffcount; i++ ) {
         size_t ori_index =  (allfflats[i]).index;
-
-        /* Store the entry in the output group */
-        ndgCpsup( ingrp, ori_index, fgrp, status );
 
         if (array) {
           smfData * outfile = NULL;
 
-          /* read filename from new group */
-          smf_open_file( fgrp, i+1, "READ", 0, &infile, status );
+          /* read filename from group */
+          smf_open_file( ingrp, ori_index, "READ", 0, &infile, status );
 
           /* Collapse it */
           smf_flat_fastflat( infile, &outfile, status );
+          if (*status == SMF__BADFLAT) {
+            errAnnul( status );
+            smf_smfFile_msg( infile->file, "F", 1, "<unknown file>", status );
+            msgOutif( MSG__QUIET, "",
+                      "Flatfield ramp file ^F could not be processed. Ignoring.",
+                      status );
+            ffcount--;
+            continue;
+          }
+
           if (outfile) {
             smf_close_file( &infile, status );
             infile = outfile;
@@ -464,9 +474,18 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
           smf_addto_smfArray( array, infile, status );
           prevflat = infile;
         }
+
+        /* Store the entry in the output group */
+        ndgCpsup( ingrp, ori_index, fgrp, status );
+
       }
       if (prevresp) smf_close_file( &prevresp, status );
-      if (fflats) *fflats = array;
+      if (array->ndat) {
+        if (fflats) *fflats = array;
+      } else {
+        smf_close_related(&array, status );
+        if (fflats) *fflats = NULL;
+      }
     }
   }
 

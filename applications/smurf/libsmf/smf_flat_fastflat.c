@@ -61,6 +61,8 @@
 *        subtraction was failing to anchor the start of the observation. This
 *        resulted in little steps in the coadded ramp. Now the code extrapolates
 *        back to the reference heater and uses that in the sky fit.
+*     2010-07-23 (TIMJ):
+*        Set status to BADFLAT if we encounter bad values in SC2_HEAT.
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -191,6 +193,16 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
   heatbounds[3] = (hdr->allState)[nframes-1].sc2_heat;
   for (i = 0; i < nframes; i++ ) {
     int thisheat = (hdr->allState)[i].sc2_heat;
+    if (thisheat == VAL__BADI) {
+      /* flat ramps should never have bad heater values so if we see one we decide
+         that this ramp is invalid */
+      if (*status == SAI__OK) {
+        *status = SMF__BADFLAT;
+        errRep( "", "Bad values in the SC2_HEAT state structure. Can not calculate flatfield.",
+                status);
+      }
+      break;
+    }
     if (thisheat != heatbounds[0] && heatbounds[1] == 0 ) {
       heatbounds[1] = thisheat;
       meas_per_heat = i;
@@ -495,7 +507,7 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
 
   /* Store the ramp filename in a smfFile so that we know where the flatfield
      data came from */
-  if (fflat->file) {
+  if (fflat->file && *status == SAI__OK) {
     (*bolvald)->file = smf_construct_smfFile( (*bolvald)->file, NDF__NOID, 0, 0,
                                               fflat->file->name, status );
   }

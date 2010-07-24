@@ -223,6 +223,13 @@ void smurf_calcflat( int *status ) {
   igrp = fgrp;
   fgrp = NULL;
 
+  /* Sanity check */
+  if ( *status == SAI__OK && grpGrpsz(ffgrp, status ) == 0 && grpGrpsz( dkgrp, status ) == 0) {
+    *status = SAI__ERROR;
+    errRep("", "No good files supplied to routine for flatfielding", status );
+    goto CLEANUP;
+  }
+
   /* See whether we had all darks or science + dark or fast flatfields. For some reason
      grpGrpsz returns 1 if status is bad */
   if ( *status == SAI__OK && grpGrpsz( ffgrp, status ) > 0 && fflats ) {
@@ -250,7 +257,7 @@ void smurf_calcflat( int *status ) {
     /* and find the subarray */
     smf_find_subarray( bolval->hdr, subarray, sizeof(subarray), NULL, status );
 
-  } else if ( size == 0 ) {
+  } else if ( size == 0 && darks && darks->ndat > 0 ) {
     /* everything is in the dark */
     flatfiles = darks;
     darks = NULL;
