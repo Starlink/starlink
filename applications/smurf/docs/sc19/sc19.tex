@@ -1445,6 +1445,250 @@ your project:
 \section{\xlabel{calib}Calibrating SCUBA-2 Data}
 \label{sec:calib}
 
+\subsection{Extinction Correction}
+
+Analysis of the SCUBA-2 skydips and heater-tracking data from the
+S2SRO data has allowed calculation of the opacity factors for the
+SCUBA-2 450$\mu$m and 850$\mu$m filters to be determined.
+
+The Archibald et al (2002)~\cite{archibald} paper describes how the
+CSO(225GHz) tau to SCUBA opacity terms were determined for the
+different SCUBA filters. It was assumed for commissioning and S2SRO
+that the new SCUBA-2 filters were sufficiently similar to the
+wide-band SCUBA filters that these terms could be used for extinction
+correction. For reference the SCUBA corrections were:
+\begin{equation}
+Tau(450\mu m) = 26.2 \times (Tau_{225GHz} - 0.014)
+\end{equation}
+and
+\begin{equation}
+Tau(850\mu m) = 4.02 \times (Tau_{225GHz} - 0.001)
+\end{equation}
+
+The JCMT water vapour radiometer (WVM) now is calibrated to provide a
+higher-frequency opacity value which has been scaled to the
+CSO(225GHz) tau. The WVM (not the CSO 225GHz tipper) data was used for
+this analysis.
+
+The new filter opacities as determined by the skydip data are as follows:
+
+\begin{equation}
+Tau(450\mu m) = 19.04 \times (Tau_{225GHz} - 0.018)
+\end{equation}
+and
+\begin{equation}
+Tau(850\mu m) = 5.36 \times (Tau_{225GHz} - 0.006)
+\end{equation}
+
+The extinction correction parameters that scale from CSO to the
+relevant filter have been added to the mapmaker code. You can override
+these values by setting \verb|ext.taurelation.filtname| in your
+map-maker config files to the two coefficients `(a,b)' that you want
+to use (where filtname is the name of the filter). The defaults are
+listed in \verb\$SMURF_DIR/smurf_extinction.def\. We have also
+added a slight calibration tweak to WVM-derived values to correct them
+to the CSO scale. It is worth noting that if an individual science map
+and corresponding calibrator observation is already reduced with the
+old factors (and your source and calibrator are at about the same
+airmass and if the tau did not change appreciably), any errors in
+extinction correction should be cancelled out in the calibration.
+
+
+\subsection{Flux conversion factors}
+
+Primary and secondary calibrator observations have been reduced using
+the specifically designed dimmconfig\_bright\_compact.lis. The
+pipeline and the PICARD recipes produce a set of different FCF
+values. Details of the PICARD recipes can be found at
+http://www.oracdr.org/oracdr/PICARD.
+
+
+For calibration of primary and secondary calibrators, the FCFs and NEFD's have been calculated as follows:
+\begin{enumerate}
+\item{The PICARD recipe SCUBA2\_FCFNEFD takes the reduced map, crops
+    it and runs background removal. Surface fitting parameters are
+    changable in the parameter file.}
+\item{It then runs the Kappa \verb\beamfit\ program on the specified
+    point source. Calibrators such as CRL618, HLTAU, Uranus and Mars
+    are already hard-coded into the recipe. If a source of known flux
+    is not included in the recipe, then you can add a line to your
+    parameter file with the known flux: FLUX\_450 = 0.050 or FLUX\_850
+    = 0.005 for example. Beamfit will calculate the peak flux, the
+    integrated flux over a requested aperture (30 arcsec radius
+    default), and the FWHM etc.}
+
+
+An example of a PICARD parameter file (used for reduction of the 850$\mu$m calibrators) is shown here:
+
+\begin{myquote}
+\begin{verbatim}
+
+[SCUBA2_FCFNEFD]
+APERTURE_RADIUS=30.0
+AUTOPHOTOM=1
+BACKGROUND_FITMETHOD=fitsurface
+MASK_SOURCE=1
+FITSURFACE_FITTYPE=spline
+FITSURFACE_FITPAR=4
+FITSURFACE_KEEPSURFACE=1
+USEFCF=1
+VERBOSE=1
+FLUX_850.HLTAU=2.36
+FLUX_850.CRL2688=6.4
+FLUX_850.ARP220=0.688
+FLUX_850.ALPHAORI=0.629
+FLUX_850.TWHYDRAE=1.37
+FLUX_850.V883ORI=1.34
+LOGFILE=1
+\end{verbatim}
+\end{myquote}
+
+\item {It then uses the above to calculate the FCF terms described below.}
+\end{enumerate}
+
+\begin{itemize}
+
+\item {\textbf{FCF(arcsec)}}
+
+\begin{equation}
+\label{eq:fcf_arcsec}
+FCF_{arcsec} = \frac{S_{tot}}{P_{int} \times A}
+\end{equation}
+
+where $S_{tot}$ is the total flux of the calibrator, $P_{int}$ is the
+integrated sum of the source in the map (in pW) and A is the pixel
+area in arcsec$^2$, producing an FCF in Jy/arcsec$^2$/pW. This
+FCF(arcsec) is the number to multiply your map by when you wish to use
+the calibrated map to do aperture photometry.
+
+\item{\textbf{FCF(beam)}}
+
+\begin{equation}
+\label{eq:fcf_beam}
+FCF_{arcsec} = \frac{S_{peak}}{P_{int} \times A}
+\end{equation}
+producing an FCF in units of Jy/beam/pW.
+
+The Measured peak flux here is derived from the Gaussian fit applied
+by beamfit. The peak value is susceptible to pointing and focus
+errors, and we have found this number to be somewhat unreliable,
+particularly at 450$\mu$m. This FCF(beam) is the number to multiply
+your map by when you wish to measure absolute peak fluxes of discrete
+sources.
+
+To overcome the problems encountered as a result of the peak errors, a
+third FCF method has been derived, where the FCF(arcsec) is taken and
+modeled with a Gaussian beam with a FWHM equivalent to that of the
+JCMT beam at each wavelength. The resulting FCF calculates a
+'equivalent peak' FCF from the integrated value assuming that the
+point source is a perfect Gaussian.
+
+\item{\textbf{FCF(beamequiv)}}
+\begin{equation}
+\label{eq:fcf_beamequiv}
+FCF_{beamequiv}  = \frac{S_{tot} \times 1.133 \times {FWHM_{beam}}^2}{P_{int} \times A}
+\end{equation}
+
+ or more conveniently:
+\begin{equation}
+FCF(beamequiv) = FCF(arcsec) \times 1.133 \times {FWHM_{beam}}^2
+\end{equation}
+where FWHM is 7.5'' and 14.0'' for the 450$\mu$m and 850$\mu$m
+respectively. This produces an FCF in units of Jy/beam/pW.
+
+This FCF(beamequiv) and FCF(beam) should agree with each other,
+however this is often not the case when the source is distorted for
+the reasons mentioned above. FCF(beamequiv) has been found to provide
+more consistent results and it is advised to use this value when
+possible, in the same way as FCF(beam). A fourth FCF produced by
+PICARD's SCUBA2\_FCFNEFD recipe is FCF(match) which is calculated
+after running the matched filter recipe on the data. This value should
+be equal to the FCF(equiv) if the matched filter parameters are set to
+normalise to the peak value of the source. It is advised, when running
+the matched filter on data, to use the FCF(equiv) for calibration.
+
+\end{itemize}
+
+\subsection{S2SRO FCFs}
+
+The bulk of calibration observations were undertaken on a series of
+secondary calibrators, which are listed with their SCUBA fluxes in
+Table~\ref{tab1}.
+
+\begin{table}[h]
+\caption{Secondary calibrators used for flux calibration of SCUBA-2. The flux values are sourced from the references noted in the table. }
+\label{tab1}
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+
+\hline
+\rule[-1ex]{0pt}{3.5ex} Source & RA(J2000) & DEC(J2000) & 850$\mu$m flux & 450$\mu$m flux  \\
+\hline
+\rule[-1ex]{0pt}{3.5ex} HL Tau & 04 31 38.4 & +18 13 59.0 & 2.36 $\pm$ 0.24\cite{flux1}  & 9.9 $\pm$ 2.0\cite{flux1}\\
+\hline
+\rule[-1ex]{0pt}{3.5ex} CRL 618	& 04 42 53.60 & +36 06 53.7 & 4.7  $\pm$ 0.37\cite{flux1}  & 12.1 $\pm$ 2.2\cite{flux1} \\
+\hline
+\rule[-1ex]{0pt}{3.5ex} CRL 2688 & 21 02 18.81 & +36 41 37.7 & 6.39  $\pm$ 0.51\cite{flux1}  & 30.9 $\pm$ 3.8\cite{flux1} \\
+\hline
+\rule[-1ex]{0pt}{3.5ex} IRC + 10216 & 09 47 57.38 & +13 16 43.7 & 8.8  $\pm$ 1.1\cite{flux1}   & 17.5$\pm$ 4.5\cite{flux1} \\
+\hline
+\rule[-1ex]{0pt}{3.5ex} V883 Ori &  05 38 19  & -07 02 2.0 & 1.34 $\pm$ 0.01\cite{flux2}  & 7.28 $\pm$ 0.07\cite{flux2}   \\
+\hline
+\rule[-1ex]{0pt}{3.5ex} Alpha Ori & 5 55 10.31 & +07 24 25.4 & 0.628 $\pm$ 0.008\cite{flux2}  & 1.39 $\pm$ 0.04\cite{flux2}  \\
+\hline
+\rule[-1ex]{0pt}{3.5ex} TW Hydrae & 11 01 51.91 & -34 42 17.0 & 1.37 $\pm$ 0.01\cite{flux2}  & 3.9 $\pm$ 0.7\cite{flux2}  \\
+\hline
+\rule[-1ex]{0pt}{3.5ex} Arp 220 & 15 34 57.21 & +23 30 09.5 & 0.668 $\pm$ 0.007\cite{flux2}  & 2.77 $\pm$ 0.06\cite{flux2} \\
+\hline
+
+\end{tabular}
+\end{center}
+\end{table}
+
+
+The observations were reduced with the mapmaker using the config
+dimmconfig\_bright\_compact.lis and post-processed with the PICARD
+recipe SCUBA2\_FCFNEFD. Figure~\ref{fig:fcfs} shows the 850$\mu$m and
+450$\mu$m FCF(equiv) values for all calibrator observations taken
+during the SC2SRO period. The resulting mean FCF's in each waveband
+are as follows:
+\begin{equation}
+FCF_{450} = 400 \pm \text{Jy/beam/pw}
+\end{equation}
+\begin{equation}
+FCF_{850} = 500 \pm \text{Jy/beam/pw}
+\end{equation}
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=\linewidth]{sc19_fcf_hist}
+\caption{Histograms of the 450$\mu$m (left) and 850$\mu$m (right) FCF\_equiv values calculated for the secondary calibrators observed during the S2SRO period.}
+\label{fig:fcfs}
+\end{center}
+\end{figure}
+
+\subsection{Method for calibrating your data}
+
+
+It is the recommendation to use the mean FCF values presented in the
+previous section to calibrate your data. However, if it is desired to
+produce an individual FCF from the night of a particular set of
+science observations, then the method is described here.
+
+\begin{enumerate}
+\item{Reduce the selected calibration observation using the
+dimmconfig\_bright\_compact.lis config file.}
+\item{Use PICARD's recipe SCUBA2\_FCFNEFD on your reduced calibration
+    observation. This will produce information to the screen and a
+    logfile log.fcfnefd with the FCFs as mentioned above, and an NEFD
+    for the observation. PICARD by default uses fixed FCF's to
+    calculate the NEFD. (450$\mu$m: 400 and 850$\mu$m: 500). If you
+    wish to get an NEFD using the FCF calculated for the individual
+    calibrator you are reducing, add USEFCF=1 to your parameter
+    file. }
+\item{Take your selected FCF and multiply your map by it using KAPPA \verb\cmult\.}
+\end{enumerate}
+
 \section{\xlabel{Examples}Examples of Different Reductions}
 \label{sec:eg}
 
@@ -1783,6 +2027,18 @@ Currie~M.~J., 1997, {\it KAPPA --- Kernel Application Package},
 Draper~P.~W., 1997, {\it GAIA -- Graphical Astronomy and Image
 Analysis Tool},
 \xref{Starlink User Note 214}{sun214}{}
+
+\bibitem{archibald}
+Archibald,~E.~N., et~al, 2002, \textit{On the atmospheric limitations of ground-based submillimetre astronomy using array receivers},
+\xref{MNRAS, 336, 1-13}{}
+.
+\bibitem{flux1}
+Jenness~T., et~al, 2002, \textit{Towards the automated reduction and calibration of SCUBA data from the James Clerk Maxwell Telescope},
+\xref{MNRAS, 336, 14-21}{}
+
+\bibitem{flux2}
+Barnard,~V.~E., 2005,\textit{A summary of the search for new Submillimetre Secondary Calibrators},
+\xref{Tech. Rep.SCD/SN/011, Joint Astronomy Centre}{}
 
 \end{thebibliography}
 
