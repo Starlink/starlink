@@ -58,7 +58,8 @@
 {Copyright \copyright\ 2009-2010 University of British Columbia \\
  Copyright \copyright\ 2009-2010 Science \& Technology Facilities Council}
 \newcommand{\stardocnumber}    {19.3}
-\newcommand{\stardocauthors}   {Edward Chapin, Douglas Scott \& Tim Jenness}
+\newcommand{\stardocauthors}   {Edward Chapin, Douglas Scott, Jessica
+  Dempsey, Holly Thomas \& Tim Jenness}
 \newcommand{\stardocdate}      {1 August 2010}
 \newcommand{\stardoctitle}     {The SMURF SCUBA-2 Data Analysis Cookbook}
 \newcommand{\stardocversion}   {1.1}
@@ -66,9 +67,10 @@
 \newcommand{\stardocabstract}  {
 
   This guide provides a short introduction to \starlink\ facilities
-  for displaying SCUBA-2 total power data (i.e.~not POL or FTS), and
-  producing maps.
-
+  for reducing and displaying SCUBA-2 total power data. We describe
+  some of the data artefacts present in SCUBA-2 time series and
+  methods we employ to fix thos artefacts. This guide does not cover
+  the ancillary instruments POL-2 or FTS-2.
 }
 % ? End of document identification
 % +
@@ -276,6 +278,7 @@
 \newcommand{\stats}{\xref{\task{stats}}{sun95}{STATS}}
 \newcommand{\thresh}{\xref{\task{thresh}}{sun95}{THRESH}}
 \newcommand{\setbb}{\xref{\task{setbb}}{sun95}{SETBB}}
+\newcommand{\beamfit}{\xref{\task{beamfit}}{sun95}{BEAMFIT}}
 
 \newcommand{\fitslist}{\xref{\task{fitslist}}{sun95}{FITSLIST}}
 \newcommand{\fitsedit}{\xref{\task{fitsedit}}{sun95}{FITSEDIT}}
@@ -1499,26 +1502,27 @@ extinction correction should be cancelled out in the calibration.
 Primary and secondary calibrator observations have been reduced using
 the specifically designed dimmconfig\_bright\_compact.lis. The
 pipeline and the PICARD recipes produce a set of different FCF
-values. Details of the PICARD recipes can be found at
-http://www.oracdr.org/oracdr/PICARD.
+values. Details of the PICARD recipes can be found on
+\htmladdnormallink{the ORAC-DR web page}{http://www.oracdr.org/oracdr/PICARD}.
 
 
-For calibration of primary and secondary calibrators, the FCFs and NEFD's have been calculated as follows:
+For calibration of primary and secondary calibrators, the FCFs and
+NEFD's have been calculated as follows:
 \begin{enumerate}
 \item{The PICARD recipe SCUBA2\_FCFNEFD takes the reduced map, crops
     it and runs background removal. Surface fitting parameters are
     changable in the parameter file.}
-\item{It then runs the Kappa \verb\beamfit\ program on the specified
+\item{It then runs the Kappa \beamfit\ program on the specified
     point source. Calibrators such as CRL618, HLTAU, Uranus and Mars
     are already hard-coded into the recipe. If a source of known flux
     is not included in the recipe, then you can add a line to your
     parameter file with the known flux: FLUX\_450 = 0.050 or FLUX\_850
-    = 0.005 for example. Beamfit will calculate the peak flux, the
+    = 0.005 for example. \beamfit\ will calculate the peak flux, the
     integrated flux over a requested aperture (30 arcsec radius
     default), and the FWHM etc.}
 
-
-An example of a PICARD parameter file (used for reduction of the 850$\mu$m calibrators) is shown here:
+  An example of a PICARD parameter file (used for reduction of the
+  850$\mu$m calibrators) is shown here:
 
 \begin{myquote}
 \begin{verbatim}
@@ -1570,7 +1574,7 @@ FCF_{arcsec} = \frac{S_{peak}}{P_{int} \times A}
 producing an FCF in units of Jy/beam/pW.
 
 The Measured peak flux here is derived from the Gaussian fit applied
-by beamfit. The peak value is susceptible to pointing and focus
+by \beamfit. The peak value is susceptible to pointing and focus
 errors, and we have found this number to be somewhat unreliable,
 particularly at 450$\mu$m. This FCF(beam) is the number to multiply
 your map by when you wish to measure absolute peak fluxes of discrete
@@ -1653,16 +1657,18 @@ recipe SCUBA2\_FCFNEFD. Figure~\ref{fig:fcfs} shows the 850$\mu$m and
 during the SC2SRO period. The resulting mean FCF's in each waveband
 are as follows:
 \begin{equation}
-FCF_{450} = 400 \pm \text{Jy/beam/pw}
+FCF_{450} = 400 \pm \text{Jy/beam/pW}
 \end{equation}
 \begin{equation}
-FCF_{850} = 500 \pm \text{Jy/beam/pw}
+FCF_{850} = 500 \pm \text{Jy/beam/pW}
 \end{equation}
 
 \begin{figure}
 \begin{center}
 \includegraphics[width=\linewidth]{sc19_fcf_hist}
-\caption{Histograms of the 450$\mu$m (left) and 850$\mu$m (right) FCF\_equiv values calculated for the secondary calibrators observed during the S2SRO period.}
+\caption{Histograms of the 450$\mu$m (left) and 850$\mu$m (right)
+  FCF\_equiv values calculated for the secondary calibrators observed
+  during the S2SRO period.}
 \label{fig:fcfs}
 \end{center}
 \end{figure}
@@ -1940,11 +1946,25 @@ PI's should consider undertaking:
 
 \subsection{\xlabel{Galactic}Extended Galactic Sources}
 \label{sec:galactic}
-In this section we shall focus on the reduction of extended, Galactic sources. In the following example we produce a map of the Orion nebula from two observations (\#22 \& \#23) taken on 16th February 2010; this reduction is carried out using the DIMM method followed by a series of post processing steps. 
+In this section we shall focus on the reduction of extended, Galactic
+sources. In the following example we produce a map of the Orion nebula
+from two observations (\#22 \& \#23) taken on 16th February 2010; this
+reduction is carried out using the DIMM method followed by a series of
+post processing steps.
 
-If as in this case you have multiple observations contributing to your final map there are two possible routes for reduction. The first is to provide the mapmaker with a list of $all$ your files and let it process and coadd them in a single run.  The second approach is to reduce each observation separately then to combine the individual maps afterwards. Currently there is no advantage in terms of data quality to either route however the latter does allow the option of assessing the individual maps before coadding and is the method followed in this example.
+If as in this case you have multiple observations contributing to your
+final map there are two possible routes for reduction. The first is to
+provide the mapmaker with a list of \textit{all} your files and let it
+process and coadd them in a single run.  The second approach is to
+reduce each observation separately then to combine the individual maps
+afterwards. Currently there is no advantage in terms of data quality
+to either route however the latter does allow the option of assessing
+the individual maps before coadding and is the method followed in this
+example.
 
-When running the DIMM  we select the default configuration file 'dimmconfig.lis,' the individual parameters are described in the DIMM section of this cookbook.
+When running the DIMM we select the default configuration file
+'dimmconfig.lis,' the individual parameters are described in section
+\ref{sec:maps}.
 
 \begin{myquote}
 \begin{verbatim}
@@ -1962,13 +1982,31 @@ method=iterate config=^$STARLINK_DIR/share/smurf/dimmconfig.lis
 \includegraphics[width=0.49\hsize]{sc19_map23.eps}
 \includegraphics[width=0.49\hsize]{sc19_map22_back.eps}
 \includegraphics[width=0.49\hsize]{sc19_map23_back.eps}
-\caption{Top row: Orion22.sdf (left) and Orion23.sdf (right) maps from the mapmaker with no post processing. A patchy background and negative bowling around the strong sources is apparent. Bottom row: Orion22\_back.sdf (left) and Orion23\_back.sdf (right). The top row maps following processing with the PICARD script REMOVE\_BACKGROUND using findback with a box size of 30$''$.}
+\caption{Top row: Orion22.sdf (left) and Orion23.sdf (right) maps from
+  the mapmaker with no post processing. A patchy background and
+  negative bowling around the strong sources is apparent. Bottom row:
+  Orion22\_back.sdf (left) and Orion23\_back.sdf (right). The top row
+  maps following processing with the PICARD script REMOVE\_BACKGROUND
+  using findback with a box size of 30$''$.}
 \label{fig:orionmakemap}
 \end{center}
 \end{figure}
-The map from each observation is shown on the top row of Fig.~\ref{fig:orionmakemap}. Note that these maps were observed as a series of rotating pong patterns hence their distinctive shape.
+The map from each observation is shown on the top row of
+Fig.~\ref{fig:orionmakemap}. Note that these maps were observed as a
+series of rotating pong patterns hence their distinctive shape.
 
-The default configuration file is designed to preserve maximum flux, however the difficulty of distinguishing between low frequency noise associated with the instrumentation and extended source emission inevitably means that some low frequency noise ends up in the final map. The maps  show that although extended emission has been recovered the background is far from flat, displaying large scale patchiness in addition to deep negative bowling surrounding the strongest sources. Fortunately both of these effects can be mitigated by post-processing using the PICARD recipe REMOVE\_BACKGROUND. In this example we have modified the parameter file (params.ini) as shown below to set the fit method to findback and the findback box size to 30$''$:
+The default configuration file is designed to preserve maximum flux,
+however the difficulty of distinguishing between low frequency noise
+associated with the instrumentation and extended source emission
+inevitably means that some low frequency noise ends up in the final
+map. The maps show that although extended emission has been recovered
+the background is far from flat, displaying large scale patchiness in
+addition to deep negative bowling surrounding the strongest
+sources. Fortunately both of these effects can be mitigated by
+post-processing using the PICARD recipe REMOVE\_BACKGROUND. In this
+example we have modified the parameter file (params.ini) as shown
+below to set the fit method to findback and the findback box size to
+30$''$:
 \begin{myquote}
 \begin{verbatim}
 [REMOVE_BACKGROUND]
@@ -1976,7 +2014,10 @@ BACKGROUND_FITMETHOD = findback
 FINDBACK_BOX = 30
 \end{verbatim}
 \end{myquote}
-Caution is advised when selecting the box size, with a smaller box giving a flatter background but at the expense of source flux. This is of particular importance to extended sources where the recovery of faint emission is paramount.
+Caution is advised when selecting the box size, with a smaller box
+giving a flatter background but at the expense of source flux. This is
+of particular importance to extended sources where the recovery of
+faint emission is paramount.
 
 \begin{myquote}
 \begin{verbatim}
@@ -1984,7 +2025,11 @@ Caution is advised when selecting the box size, with a smaller box giving a flat
 % picard -recpars params.ini REMOVE_BACKGROUND Orion23.sdf
 \end{verbatim}
 \end{myquote}
-The resulting maps are shown on the bottom row of Fig.~\ref{fig:orionmakemap} where both the bowling and uneven background have been significantly improved. Before we combine the maps we will first crop them to their originally requested size using the PICARD recipe CROP\_JCMT\_IMAGES. 
+The resulting maps are shown on the bottom row of
+Fig.~\ref{fig:orionmakemap} where both the bowling and uneven
+background have been significantly improved. Before we combine the
+maps we will first crop them to their originally requested size using
+the PICARD recipe CROP\_JCMT\_IMAGES.
 \begin{myquote}
 \begin{verbatim}
 % picard CROP_JCMT_IMAGES Orion22_back.sdf
@@ -1992,7 +2037,9 @@ The resulting maps are shown on the bottom row of Fig.~\ref{fig:orionmakemap} wh
 \end{verbatim}
 \end{myquote}
 
-These cropped maps are then coadded using MOSAIC\_JCMT\_IMAGES. This example utilises the default parameters where wcsmosaic with variance weighting is used for the mosaicking method.
+These cropped maps are then coadded using MOSAIC\_JCMT\_IMAGES. This
+example utilises the default parameters where wcsmosaic with variance
+weighting is used for the mosaicking method.
 \begin{myquote}
 \begin{verbatim}
 % picard MOSAIC_JCMT_IMAGES Orion2*_back_crop.sdf
@@ -2004,7 +2051,9 @@ The final, coadded map is shown in Fig.~\ref{fig:orionmosaic}.
 \begin{figure}
 \begin{center}
 \includegraphics[width=\linewidth]{sc19_map22+23_back_crop_wcsmos.eps}
-\caption{Orion23\_back\_crop\_mos.sdf. The final map following the post processing steps of background removal, cropping and coadding with wcsmosaic.}
+\caption{Orion23\_back\_crop\_mos.sdf. The final map following the
+  post processing steps of background removal, cropping and coadding
+  with wcsmosaic.}
 \label{fig:orionmosaic}
 \end{center}
 \end{figure}
