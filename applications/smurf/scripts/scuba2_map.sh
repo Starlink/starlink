@@ -31,7 +31,7 @@
 
 
 SCRATCHDIR=/staging/$LOGNAME
-PERSISTDIR=/data/1/$LOGNAME
+PERSISTDIR=/staging/1/$LOGNAME
 
 if [ ! -d $SCRATCHDIR ]
 then
