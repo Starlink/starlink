@@ -67,10 +67,9 @@
 \newcommand{\stardocabstract}  {
 
   This guide provides a short introduction to \starlink\ facilities
-  for reducing and displaying SCUBA-2 total power data. We describe
+  for reducing and displaying SCUBA-2 data. We describe
   some of the data artefacts present in SCUBA-2 time series and
-  methods we employ to fix thos artefacts. This guide does not cover
-  the ancillary instruments POL-2 or FTS-2.
+  methods we employ to fix those artefacts.
 }
 % ? End of document identification
 % +
@@ -376,8 +375,8 @@
 %  Latex document header.
 %  ======================
 \begin{latexonly}
-   \textsc{University of British Columbia} \hfill \textbf{\stardocname}\\
-   {\large Science \& Technology Facilities Council}\\
+   \textsc{University of British Columbia \&} \hfill \textbf{\stardocname}\\
+   {\textsc{Science \& Technology Facilities Council}}\\
    {\large Starlink Project\\}
    {\large \stardoccategory\ \stardocnumber}
    \begin{flushright}
@@ -500,8 +499,7 @@ The purpose of this guide is to help SCUBA-2 users become familiar
 with the basic facilities for analyzing and visualizing data using
 \smurf\ \cite{smurf}, and the \starlink\ packages \Kappa \cite{kappa},
 and \gaia \cite{gaia}.  This guide is {\em not} aimed at users of the
-polarimeter (POL-2) or Fourier transform spectrometer (FTS-2), neither of
-which are operational at the time of writing.
+polarimeter (POL-2) or Fourier transform spectrometer (FTS-2).
 
 A brief description of raw SCUBA-2 data is given in
 Section~\ref{sec:data}. Section~\ref{sec:visual} demonstrates how to
@@ -510,13 +508,17 @@ of interactive data-reduction techniques. The end goal of this section
 is {\em not} to produce a final science-grade map; rather to give the
 user a feel for the types of artifacts and data reduction steps
 required to make a useful image. The best way to make an image from
-SCUBA-2 data is to use the Dynamic Iterative Map-Maker. This one-line
-command and a subset of its control parameters are described in
-Section~\ref{sec:maps}. For the user that wishes only to produce maps
-in as little time as possible, jump straight to this latter section.
+SCUBA-2 data is to use the Dynamic Iterative Map-Maker (DIMM). This
+one-line command and a subset of its control parameters are described
+in Section~\ref{sec:maps}. We then discuss data calibration
+(\S\ref{sec:calib}) and provide worked examples of cosmology
+(\S\ref{sec:cosmology}) and Galactic (\S\ref{sec:galactic}) data
+reduction. For the user that wishes only to produce maps in as little
+time as possible, jump straight to these later sections.
 
 Note that a number of the examples in this document use real data that
-are distributed with this \starlink\ release. They may be found in
+are distributed with this \starlink\ release. The small Uranus example
+is distributed as part of SMURF and can be found in:
 
 \begin{myquote}
 \begin{verbatim}
@@ -524,6 +526,9 @@ $STARLINK_DIR/share/smurf/s4a20091214_00015_000*.sdf
 \end{verbatim}
 \end{myquote}
 
+The more detailed examples use larger data sets which, because of
+their size, can be downloaded separately via the URL
+\htmladdnormallink{http://www.jach.hawaii.edu/JCMT/blahblah}{http://www.jach.hawaii.edu/JCMT/blahblah}.
 If you wish to use these data for scientific purposes, explicit
 permission must be obtained from the Director of the James Clerk
 Maxwell Telescope.
@@ -548,7 +553,8 @@ type:
 %
 
 For a more detailed description refer to the comprehensive Starlink
-User Note (\xref{\textbf{SUN/258}}{sun258}{}).
+User Note (\xref{\textbf{SUN/258}}{sun258}{})\footnote{currently
+  SUN/258 is not completely up to date}.
 
 
 \section{\xlabel{data_files}SCUBA-2 Data Files}
@@ -556,10 +562,10 @@ User Note (\xref{\textbf{SUN/258}}{sun258}{}).
 
 The SCUBA-2 data acquisition (DA) system writes data files every
 30\,s, one file for each of the $40\times32$ pixel subarrays. In
-addition, each observation is preceded and followed by dark
-observations. For example, observation 15 on 2009-12-14 of Uranus
-produced the following 16 files with the 450\,\micron\ array that was
-operational at the time (s4a):
+addition, each observation can be preceded or followed by calibration
+frames such as darks or flatfield ramps. For example, observation 15
+on 2009-12-14 of Uranus produced the following 16 files with the
+450\,\micron\ array that was operational at the time (s4a):
 
 \begin{myquote}
 \begin{verbatim}
@@ -583,7 +589,8 @@ operational at the time (s4a):
 \end{myquote}
 
 As noted in the introduction, the first two files containing data from
-the actual scan of Uranus are included with this \starlink\ release in:
+the actual scan of Uranus (numbers 2 and 3) are included with this
+\starlink\ release in:
 \begin{verbatim}
 $STARLINK_DIR/share/smurf/s4a20091214_00015_000*.sdf
 \end{verbatim}
@@ -596,10 +603,13 @@ of each file are cubes, with the first two dimensions enumerating
 columns and rows, and the third time slices (sampled at 200\,Hz).
 
 Raw SCUBA-2 data are stored as integers (uncalibrated digitized
-units). The \smurf\ task \flatfield\ can be used to scale raw data to
-units of pW (double precision floating points) using the results of
-measurements of calibrated loads that are stored internally (the HDS
-extension is MORE.SCUBA2.FLATCAL). Use the command
+units known as ``DAC units''). The \smurf\ task \flatfield\ can be used to scale raw data to
+units proportional to pW (double precision floating points) using the results of
+measurements of a flatfield calibration. The calibration can be stored
+internally in the data file (see the HDS extension in
+MORE.SCUBA2.FLATCAL) or can be calculated dynamically from the
+flatfield ramps bracketing each science observation. The map-maker
+will always use a flatfield ramp if available. Use the command
 
 \begin{myquote}
 \begin{verbatim}
@@ -609,7 +619,10 @@ extension is MORE.SCUBA2.FLATCAL). Use the command
 %
 to produce flat-fielded versions of the files that contain bolometer
 data taken during the scan across Uranus, with the dark observations
-(1 and 16) automatically filtered out. Note that the single quotes
+(1 and 16 in this example) automatically filtered out. Other
+non-science files will also be ignored\footnote{Use the SEQ\_TYPE FITS
+  header to determine whether a file is part of the main data
+  acquisition sequence or a support file}. Note that the single quotes
 around the wildcards for the input and output files are necessary
 since \starlink\ routines expand them internally, rather than using
 the shell. However, it is not generally necessary to use \flatfield\
@@ -645,7 +658,10 @@ s4a20091214\_00015\_0002\_con.sdf. \concat\ will automatically filter
 out any dark observations, so that the concatenated file contains only
 the data taken during the scan across Uranus with the shutter open. It
 also applies the flatfield by default, although it can be disabled using
-the `noflat' option on the command-line.
+the `noflat' option on the command-line. Be careful when concatenating
+a very long observation since the output file may be too large to
+handle sanely. Fifteen minute chunks (30 files) should be more than
+big enough. 
 
 \subsection{\xlabel{display_scan}Displaying scan patterns}
 
@@ -656,7 +672,7 @@ information into a simple ASCII tab separated table:
 
 \begin{myquote}
 \begin{verbatim}
-% jcmtstate2cat s4d20090107_00007_0002_concat > state.tst
+% jcmtstate2cat s4d20090107_00007_0002_con > state.tst
 \end{verbatim}
 \end{myquote}
 
@@ -687,7 +703,11 @@ that \topcat\ is told that the TST format is to be used for reading.
 \end{myquote}
 
 An example plot of the scan pattern for this observation generated by
-\topcat\ can be seen in Fig.~\ref{fig:topcat}.
+\topcat\ can be seen in Fig.~\ref{fig:topcat}. All the time varying
+header values are available for plotting. In particular DRA and DDEC
+will show the RA/Dec offset of the telescope, DAZ and DEL will show
+the AZEL offset and the WVM tau values are also calculated from the
+raw measurements.
 
 \subsection{\xlabel{display_cube}Displaying data cubes}
 
@@ -772,10 +792,11 @@ concatenated data by re-gridding it into a pixelated map:
 The \makemap\ task automatically scales the bounds of the image to
 encompass all of the data. The output map here is called `uranus.sdf',
 and the pixel scale is 2~arcsec on a side by default at 450\,\micron\
-(although this can be changed using the `pixsize=$x$' option on the
-command-line, where $x$ is in arcsec). Since we already know that
-relative detector offsets are large in these data, it is unsurprising
-that nothing can really be seen in the resulting image with \gaia.
+and 4~arcsec at 850\,\micron\ (although this can be changed using the
+`pixsize=$x$' option on the command-line, where $x$ is in
+arcsec). Since we already know that relative detector offsets are
+large in these data, it is unsurprising that nothing can really be
+seen in the resulting image with \gaia.
 
 \begin{figure}
 \begin{center}
@@ -845,12 +866,12 @@ be identified and repaired using some extra parameters to \clean:
 \end{myquote}
 
 The parameters starting with `dc' indicate that \clean\ should look
-for steps in the data in excess of 200-$\sigma$ comparing two
-consecutive boxcar averages of length 50 samples.  Finally,
+for steps in the data in excess of 5-$\sigma$ comparing two
+consecutive boxcar averages of length 400 samples.  Finally,
 `fillgaps' indicates that the data range around the identified steps
-($\pm 50$ samples in this case) should be replaced with a constrained
+($\pm 400$ samples in this case) should be replaced with a constrained
 (smooth) realization of noise to avoid introducing spikes into the
-data stream (these short ranges are ultimately ignored when producing
+data stream (these ranges are ultimately ignored when producing
 final maps). A map produced from `clean2.sdf' is shown in
 Fig.~\ref{fig:map_dc_mean}.
 
@@ -876,13 +897,13 @@ for CONFIG using the standard group notation:
 \end{myquote}
 
 An example config file containing the default values for each item
-can be found in \verb|${SMURF_DIR}/smurf_sc2clean.def|.
+can be found in \texttt{\${SMURF\_DIR}/smurf\_sc2clean.def}.
 
 \subsubsection{\xlabel{movie}Watching a movie}
 
 \gaia\ has the ability to animate the display of a data cube. We will
 use this feature to make a `movie' of the array data. Load
-`clean2.sdf' from the previous step into \gaia\. In the `Display image
+`clean2.sdf' from the previous step into \gaia. In the `Display image
 sections of a cube' dialogue, switch from the `Spectrum' to the
 `Animation' tab approximately half-way down.  Set `Delay' to 10
 milliseconds (the smallest value), `Step' to 5 (such that it only
@@ -900,11 +921,11 @@ array scans.
 
 \clean\ can also perform frequency domain filtering on the
 detectors. In order for this to work properly, the data must first be
-apodized (smoothly rolled-off to 0 at the beginning and end), and some
-padding added to the beginning and end, to avoid ringing. The
-following steps will concatenate the raw data files together adding
-padding at the beginning and end, and then apodize and filter the
-single large file.
+apodized (smoothly rolled-off to 0 at the beginning and end),
+step-corrected and some padding added to the beginning and end, to
+avoid ringing. The following steps will concatenate the raw data files
+together adding padding at the beginning and end, and then apodize and
+filter the single large file.
 
 \begin{figure}
 \begin{center}
@@ -917,8 +938,8 @@ single large file.
   Uranus are now much more apparent. {\bf Bottom:} a map produced from
   these cleaned and filtered data. The brightness of Uranus compared
   to the noise is now much more significant than in
-  Fig.~\ref{fig:map_dc_mean}, but the filtering has caused negative
-  ringing around source crossing in the time series which appear as
+  Fig.~\ref{fig:map_dc_mean}, but the filtering has caused
+  ringing around source in the time series which appear as
   negative dips in the map along the scan directions (negative cross
   around the source).}
 \label{fig:highpass}
@@ -945,7 +966,7 @@ following observation  :
 \end{verbatim}
 \end{myquote}
 
-where the text file contains the following configuration options:
+where the text file, \texttt{sc19\_clean3.lis}, contains the following configuration options:
 
 \begin{myquote}
 \begin{verbatim}
@@ -970,7 +991,7 @@ Fig.~\ref{fig:highpass} shows the filtered bolometer signal for
 (13,23), as well as a map produced from the data. The filtering has
 significantly improved the noise properties of the map compared with
 Fig.~\ref{fig:map_dc_mean}, but the filtering has now introduced
-negative ringing around the source which results in a negative cross
+ringing around the source which results in a negative cross
 pattern along the scan directions.
 
 \subsection{\xlabel{pspec}Detector power-spectra}
@@ -1038,7 +1059,7 @@ just below 1\,Hz.
 \begin{center}
 \includegraphics[width=\linewidth]{sc19_pspec}
 \caption{The power spectrum of bolometer (13,23) produced by the
-  \smurf\ task \fft. In this particular case the noise looks white
+  \smurf\ task \fft. In this particular case the noise looks flat
   above a $1/f$ knee just below 1\,Hz. The red line simply indicates
   the frequency slice currently being displayed in the main \gaia\
   window (not shown).}
@@ -1088,8 +1109,8 @@ flagged `\texttt{BADDA}' by the data acquisition system. Since each
 bolometer produced about 14000 samples (including 2000 for padding),
 this corresponds to 4416000/12000 $\sim$ 368 detectors that were not
 operational (out of 1280). Similarly, $1280 \,\mathrm{bolometers} \times 2000 =
-2560000$ samples flagged as padding, \texttt{ PAD}. Finally, the
-apodization (\texttt{ APOD}) is flagged over the same sample length as
+2560000$ samples flagged as padding, \texttt{PAD}. Finally, the
+apodization (\texttt{APOD}) is flagged over the same sample length as
 the padding, but then that same amount again is flagged beyond this
 region to avoid including any ringing in the final map (i.e. $2560000
 \times 2 = 5120000$).
@@ -1105,7 +1126,9 @@ command to enable a particular flag or turn them all off.
 \end{verbatim}
 \end{myquote}
 
-will disable quality and make visible all the underlying data.
+will disable quality and make visible all the underlying data. Using a
+value of 255 will turn all bits back on and so any non-zero quality will be
+treated as bad data.
 
 Additionally, the \Kappa\ task \qualtobad\ may be used to
 permanently convert samples with given quality bits to a {\em magic\/} or {\em
@@ -1117,9 +1140,9 @@ permanently convert samples with given quality bits to a {\em magic\/} or {\em
 \end{verbatim}
 \end{myquote}
 %
-will set all of the samples during the first and last 1000 time
-slices, where the data were padded, to the magic value.  If
-`badmasked' is subsequently viewed with \gaia, none of those portions
+will set all of the samples flagged with quality \texttt{PAD} to the
+magic value. This corresponds to the first and last 1000 time
+slices. `badmasked' is subsequently viewed with \gaia, none of those portions
 of the data will be visible.
 
 \section{\xlabel{maps}Dynamic Iterative Map-Making}
@@ -2090,6 +2113,16 @@ Barnard,~V.~E., 2005,\textit{A summary of the search for new Submillimetre Secon
 \xref{Tech. Rep.SCD/SN/011, Joint Astronomy Centre}{}
 
 \end{thebibliography}
+
+\appendix
+
+\section{Library of data anomalies}
+
+\section{Notes on Shared Risk Observing}
+
+\subsection{Flux Conversion Factors}
+
+\subsection{Significant Events}
 
 \end{document}
 
