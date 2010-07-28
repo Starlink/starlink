@@ -1,0 +1,39 @@
+^$STARLINK_DIR/share/smurf/dimmconfig.lis
+
+# *** Specialized config for short scans of bright source ***
+
+# The main features of this config file is that we we remove the FLT
+# model component (as well as the padding/apodization) as they are
+# unnecessary -- the assumption is that low-frequency baseline drifts
+# are going to be very small for a short scan of order 10
+# seconds. Also, with so little data to work with any padding
+# etc. will remove significant amounts of data.
+#
+# Assumes any compact source is not extremely bright.
+# ***********************************************************
+
+# Use lots of iterations because they won't take a long time
+numiter=-10
+
+# Don't do any filtering
+modelorder = (com,gai,ext,ast,noi)
+
+# ----------------------------------------------------------------------------
+# The following parameters control data-cleaning before iterations start
+# ----------------------------------------------------------------------------
+
+# No apodization
+apod = 0
+
+# ----------------------------------------------------------------------------
+# These parameters control the iterative model components
+# ----------------------------------------------------------------------------
+
+# weaker bolo rejection
+com.corr_tol = 7
+com.gain_tol = 7
+com.gain_abstol = 5
+
+# No apodisation
+flt.apod = 0
+
