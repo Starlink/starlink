@@ -306,8 +306,8 @@ ext.taumethod =adaptive
 # large-scale noise is not as important, but keeping as much data around the
 # edges of the map is.
 
-ast.zero_lowhits = 0.1
-# ast.zero_notlast = 1
+#ast.zero_lowhits = 0.1
+#ast.zero_notlast = 1
 
 # Smooth the time series
 
