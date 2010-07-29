@@ -1860,7 +1860,7 @@ Both of the maps are shown in Fig.~\ref{fig:cosmomap}. Clearly the
 specialized configuration yields a flatter map, although the white
 noise level is still quite large (no obvious sources are visible), and
 there is some residual structure in the map caused by low-frequency
-noise that is not effectively modelled/removed by the map-maker
+noise that is not effectively modeled/removed by the map-maker
 (vertical stripes that are aligned with the map edges).
 
 \begin{figure}
@@ -1899,7 +1899,7 @@ operator. Similarly, the variance map would be calculated as
 %
 This operation is equivalent to calculating the maximum-likelihood fit
 of the PSF centered over every pixel in the map, taking into account
-the noise. Presently $P$ is simply modelled as an ideal Gaussian
+the noise. Presently $P$ is simply modeled as an ideal Gaussian
 with a FWHM set to the diffraction limit of the telescope.
 
 However, since there is large-scale (and therefore correlated from
@@ -1957,10 +1957,10 @@ is generally flatter than the raw output of \makemap, and the noise
 level is significantly reduced. However, the price that we pay for
 suppressing signal on scales larger that $15''$ is visible as the
 large negative ring around the source. For this particular case the
-dip is about 10\% of the peak signal, and corresponds to attenuation
-of the peak signal. However, the normalization applies a positive
-correction to preserve peak flux densities, which results in an
-increased noise level.
+dip is about 10\% of the peak signal. In addition to ringing, the
+filter attenuates the peak flux density of point sources. However, the
+normalization applies a positive correction to preserve peak flux
+densities, which results in an increased noise level.
 
 Now that we know what this procedure does to a bright point source, we
 proceed to filter the map of MS0451:
@@ -1989,7 +1989,7 @@ task \makesnr:
 The resulting map, \texttt{map450\_mf\_snr}, is shown in
 Fig.~\ref{fig:cosmo_snr}. Compared to Fig.~\ref{fig:cosmo_filt} the
 edges no longer appear as noisy because they have been down-weighted
-by the larger noise where there was less data.
+by the larger noise values where there were less data.
 
 \begin{figure}
 \begin{center}
@@ -2042,6 +2042,16 @@ As a parting word on this subject, we mention some other tests that
 PIs should consider undertaking:
 
 \begin{itemize}
+
+\item Experiment with the size of the background suppression filter,
+  as the large-scale noise depends on the scan pattern and state of
+  the instrument when the data were taken. In this example, 15\,arcsec
+  was chosen in order to remove the bulk of the stripes parallel to
+  the edges of the map. A smaller filter will cause more ringing, and
+  more attenuation of the peak value (as mentioned above this is
+  corrected for in terms of absolute calibration, but the S/N is
+  reduced). On the other hand, a larger filter will leave more of the
+  large-scale noise features.
 
 \item Split your data into mutually-exclusive subsets and produce
   independent maps. Are the highest S/N peaks detected in each of
