@@ -76,7 +76,7 @@ void sc2sim_getexternal
 (
  char external[80],   /* the name of the external observation */
  int *scancount,      /* number of positions in pattern (returned) */
- double *posptr,     /* list of positions (returned) */
+ double **posptr,     /* list of positions (returned) */
  int *status          /* global status (given and returned) */
  )
 
@@ -104,7 +104,7 @@ void sc2sim_getexternal
   *scancount = data->hdr->nframes;
 
   /* Allocate memory for the list of positions */
-  posptr = astCalloc( (*scancount)*2, sizeof(*posptr), 1 );
+  *posptr = astCalloc( (*scancount)*2, sizeof(**posptr), 1 );
  
  
   /* Get the scan positions */
@@ -118,22 +118,26 @@ void sc2sim_getexternal
                          "CLON-TAN", "CLAT-TAN", fc, status );
     astClear( fc, "Card" );
     fs = astRead( fc );
-    printf("Base coordinates: %f   %f\n", data->hdr->allState[frame].tcs_az_bc1,
-            data->hdr->allState[frame].tcs_az_bc2);  
 
     /* Get the azimulthal and elevation coordinates */
     temp1a = data->hdr->allState[frame].tcs_az_ac1;
     temp2a = data->hdr->allState[frame].tcs_az_ac2;
-    printf("pointing:         %f   %f\n", temp1a, temp2a);  
 
     /* Get the offsets from the base coordinates */
     astTran2( fs, 1, &temp1a, &temp2a, 0, &temp1b, &temp2b );
-    printf("offset:           %e   %e\n", &temp1b, &temp2b);
 
     /* Copy the coordinates to the position array */
-    posptr[frame*2]= temp1b / DAS2R;
-    posptr[frame*2+1]= temp2b / DAS2R;
+    (*posptr)[frame*2]= temp1b / DAS2R;
+    (*posptr)[frame*2+1]= temp2b / DAS2R;
 
+//    if( frame == 0 ) 
+//    {
+//      printf("Base coordinates: %f   %f\n", data->hdr->allState[frame].tcs_az_bc1,
+//            data->hdr->allState[frame].tcs_az_bc2);  
+//      printf("pointing:         %f   %f\n", temp1a, temp2a);  
+//      astShow( fs );
+//      printf("offset:           %e   %e\n", (*posptr)[frame*2], (*posptr)[frame*2+1]);
+//    }
 
     /* Annul sc2 frameset for this time slice */
     if( fs ) fs = astAnnul( fs );
