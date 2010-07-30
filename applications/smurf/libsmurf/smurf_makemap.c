@@ -1117,36 +1117,41 @@ void smurf_makemap( int *status ) {
   parChoic( "METHOD", "REBIN", "REBIN, ITERATE.", 1,
             method, LEN__METHOD, status);
 
-  if( strncmp( method, "REBIN", 5 ) == 0 ) {
-    rebin = 1;
-    iterate = 0;
-  } else if ( strncmp( method, "ITERATE", 7 ) == 0 ) {
-    rebin = 0;
-    iterate = 1;
-  }
-
-  /* Get remaining parameters so errors are caught early */
-  if( rebin ) {
-    /* Obtain desired pixel-spreading scheme */
-    parChoic( "SPREAD", "NEAREST", "NEAREST,LINEAR,SINC,"
-              "SINCSINC,SINCCOS,SINCGAUSS,SOMB,SOMBCOS,GAUSS",
-              1, pabuf, 10, status );
-
-    smf_get_spread( pabuf, &spread, &nparam, status );
-
-    /* Get an additional parameter vector if required. */
-    if( nparam>0 ) {
-      parExacd( "PARAMS", nparam, params, status );
+  if( *status == SAI__OK ) {
+    if( strncmp( method, "REBIN", 5 ) == 0 ) {
+      rebin = 1;
+      iterate = 0;
+    } else if ( strncmp( method, "ITERATE", 7 ) == 0 ) {
+      rebin = 0;
+      iterate = 1;
     }
 
-  } else if ( iterate ) {
-    /* Read a group of configuration settings into keymap using defaults
-       and typo checking. Also need to know which subinstrument we are actively
-       interested in for merging purposes. We need to open a representative
-       file for that. */
-    AstKeyMap * sub_instruments = smf_subinst_keymap( NULL, igrp, 1, status );
-    keymap = kpg1Config( "CONFIG", "$SMURF_DIR/smurf_makemap.def", sub_instruments, status );
-    sub_instruments = astAnnul( sub_instruments );
+
+    /* Get remaining parameters so errors are caught early */
+    if( rebin ) {
+      /* Obtain desired pixel-spreading scheme */
+      parChoic( "SPREAD", "NEAREST", "NEAREST,LINEAR,SINC,"
+                "SINCSINC,SINCCOS,SINCGAUSS,SOMB,SOMBCOS,GAUSS",
+                1, pabuf, 10, status );
+
+      smf_get_spread( pabuf, &spread, &nparam, status );
+
+      /* Get an additional parameter vector if required. */
+      if( nparam>0 ) {
+        parExacd( "PARAMS", nparam, params, status );
+      }
+
+    } else if ( iterate ) {
+      /* Read a group of configuration settings into keymap using
+         defaults and typo checking. Also need to know which
+         subinstrument we are actively interested in for merging
+         purposes. We need to open a representative file for that. */
+
+      AstKeyMap * sub_instruments = smf_subinst_keymap( NULL, igrp, 1, status );
+      keymap = kpg1Config( "CONFIG", "$SMURF_DIR/smurf_makemap.def",
+                           sub_instruments, status );
+      sub_instruments = astAnnul( sub_instruments );
+    }
   }
 
   /* Calculate the map bounds */
