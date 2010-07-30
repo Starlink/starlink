@@ -678,7 +678,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         if( strtol(modelnames,NULL,10) == 1 ) {
           /* Export all of the model components */
           exportNDF = 1;
-          for( i=0; (*status==SAI__OK)&&(i<nmodels); i++ ) {
+          for( i=0; (*status==SAI__OK)&&(i<=nmodels); i++ ) {
             exportNDF_which[i] = 1;
           }
         }
