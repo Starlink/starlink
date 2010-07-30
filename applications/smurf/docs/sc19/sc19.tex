@@ -618,12 +618,12 @@ columns and rows, and the third time slices (sampled at 200\,Hz).
 
 Raw SCUBA-2 data are stored as integers (uncalibrated digitized units
 known as ``DAC units''). The \smurf\ task \flatfield\ can be used to
-scale raw data to units proportional to pW (double precision floating
-points) using the results of measurements of a flatfield
-calibration. The calibration can be stored internally in the data file
-(see the HDS extension in MORE.SCUBA2.FLATCAL) or can be calculated
-dynamically from the flatfield ramps bracketing each science
-observation. The DIMM will always use a flatfield ramp if
+scale raw data to units proportional to picowatts (pW, as double
+precision floating points) using the results of measurements of a
+flatfield calibration. The calibration can be stored internally in the
+data file (see the HDS extension in MORE.SCUBA2.FLATCAL) or can be
+calculated dynamically from the flatfield ramps bracketing each
+science observation. The DIMM will always use a flatfield ramp if
 available. Use the command
 
 \begin{myquote}
@@ -1610,100 +1610,102 @@ project:
 
 Analysis of the SCUBA-2 skydips and heater-tracking data from the
 S2SRO data has allowed calculation of the opacity factors for the
-SCUBA-2 450$\mu$m and 850$\mu$m filters to be determined.
+SCUBA-2 450\,\micron\ and 850\,\micron\ filters to be determined.
 
-The Archibald et al (2002)~\cite{archibald} paper describes how the
-CSO(225GHz) opacity, $\tau_{225}$, to SCUBA opacity terms were
-determined for the different SCUBA filters. It was assumed for
-commissioning and S2SRO that the new SCUBA-2 filters were sufficiently
-similar to the wide-band SCUBA filters that these terms could be used
-for extinction correction. In the form $\tau_{\lambda} = a \times
-(\tau_{225} - b)$, the original SCUBA corrections were:
+The Archibald et al. (2002)~\cite{archibald} paper describes how the
+Caltech Submillimeter Observatory (CSO) 225\,GHz opacity,
+$\tau_{225}$, relates to SCUBA opacity terms in each band,
+$\tau_{450}$ and $\tau_{850}$. It was assumed for commissioning and
+S2SRO that the new SCUBA-2 filters are sufficiently similar to the
+wide-band SCUBA filters that these terms could be used for extinction
+correction. In the form $\tau_{\lambda} = a \times (\tau_{225} - b)$,
+the original SCUBA corrections were:
 \begin{equation}
-\tau_{450} = 26.2 \times (\tau_{225} - 0.014)
+\tau_{450} = 26.2 \times (\tau_{225} - 0.014);
 \end{equation}
 and
 \begin{equation}
-\tau_{850} = 4.02 \times (\tau_{225} - 0.001)
+\tau_{850} = 4.02 \times (\tau_{225} - 0.001).
 \end{equation}
 
-The JCMT water vapour radiometer (WVM) now is calibrated to provide a
+The JCMT water vapour radiometer (WVM) is now calibrated to provide a
 higher-frequency opacity value which has been scaled to
-$\tau_{225}$. The WVM (not the CSO 225GHz tipper) data was used for
+$\tau_{225}$. The WVM (not the CSO 225GHz tipper) data were used for
 this analysis.
 
-The new filter opacities as determined by the skydip data are as follows:
+The new filter opacities as determined from skydip data are as
+follows:
 
 \begin{equation}
-\tau_{450} = 19.04 \times (\tau_{225} - 0.018)
+\tau_{450} = 19.04 \times (\tau_{225} - 0.018);
 \end{equation}
 and
 \begin{equation}
-\tau_{850} = 5.36 \times (\tau_{225} - 0.006)
+\tau_{850} = 5.36 \times (\tau_{225} - 0.006).
 \end{equation}
 
 The SCUBA-2 filters are different to the SCUBA filters, with the
-450$\mu$m filter, in particular, significantly narrower than its SCUBA
-counterpart. The SCUBA-2 filter characteristics are described in
+450\,\micron\ filter, in particular, significantly narrower than its
+SCUBA counterpart. The SCUBA-2 filter characteristics are described in
 detail at
 \htmladdnormallink{http://www.jach.hawaii.edu/JCMT/continuum/scuba2/filter/}{http://www.jach.hawaii.edu/JCMT/continuum/scuba2/filter/}.
 
-The extinction correction parameters that scale from CSO to the
-relevant filter have been added to the mapmaker code. You can override
-these values by setting \verb|ext.taurelation.filtname| in your
-map-maker config files to the two coefficients `(a,b)' that you want
-to use (where filtname is the name of the filter). The defaults are
-listed in \verb|$SMURF_DIR/smurf_extinction.def|. We have also
-added a slight calibration tweak to WVM-derived values to correct them
-to the CSO scale. It is worth noting that if an individual science map
-and corresponding calibrator observation is already reduced with the
-old factors (and your source and calibrator are at about the same
-airmass and if the tau did not change appreciably), any errors in
-extinction correction should be cancelled out in the calibration.
+The extinction correction parameters that scale from $\tau_{225}$ to
+the relevant filter have been added to the map-maker code. You can
+override these values by setting \verb|ext.taurelation.filtname| in
+your map-maker config files to the two coefficients `(a,b)' that you
+want to use (where `\texttt{filtname}' is the name of the filter). The
+defaults are listed in \verb|$SMURF_DIR/smurf_extinction.def|. We have
+also added a slight calibration tweak to WVM-derived values to correct
+them to the CSO scale. It is worth noting that if an individual
+science map and corresponding calibrator observation has already been
+reduced with the old factors (and your source and calibrator are at
+about the same airmass and if the tau did not change appreciably), any
+errors in extinction correction should cancel out in the calibration.
 
 
 \subsection{Flux conversion factors}
+\label{sec:fcf}
 
 Primary and secondary calibrator observations have been reduced using
-the specifically designed dimmconfig\_bright\_compact.lis. The maps
-produced from this are then analysed using tailor-made PICARD
-recipes. PICARD is a post-processing and data combination tool that
-using the same infrastructure as ORAC-DR, but is designed to be used
-after the initial reduction with the DIMM is complete. Details of the
-PICARD recipes and how to use them can be found on
-\htmladdnormallinkfoot{the ORAC-DR web
-  page}{http://www.oracdr.org/oracdr/PICARD}.
-
+the specifically designed
+\texttt{dimmconfig\_bright\_compact.lis}. The maps produced from this
+are then analysed using tailor-made PICARD recipes. PICARD is a
+post-processing and data combination tool that uses the same
+infrastructure as ORAC-DR, but is designed to be used after the
+initial reduction with the DIMM is complete. Details of the PICARD
+recipes and how to use them can be found on \htmladdnormallinkfoot{the
+  ORAC-DR web page}{http://www.oracdr.org/oracdr/PICARD}.
 
 A map reduced by the mapmaker has units of pW. To calibrate the data
-into units of Janskys, a set of bright, point-source objects with well
-known flux properties are observed regularly to provide a flux
+into units of Janskys (Jy), a set of bright, point-source objects with
+well known flux densities are observed regularly to provide a flux
 conversion factor (FCF). The data (pW) can be multiplied by this FCF
 to obtain a calibrated map, and the FCF can also be used to assess the
 relative performance of the instrument from night to night. The noise
 equivalent flux density (NEFD) is a measure of the instrument
 sensitivity, and while not discussed here, is also produced by the
 PICARD recipe shown here. For calibration of primary and secondary
-calibrators, the FCFs and NEFD's have been calculated as follows:
+calibrators, the FCFs and NEFDs have been calculated as follows:
 \begin{enumerate}
-\item{The PICARD recipe SCUBA2\_FCFNEFD takes the reduced map, crops
-    it and runs background removal. Surface fitting parameters are
-    changable in the PICARD parameter file.}
-\item{It then runs the Kappa \beamfit\ program on the specified
-    point source. Fluxes for calibrators such as CRL618, HLTAU, Uranus and Mars
-    are already hard-coded into the recipe. If a source of known flux
-    is not included in the recipe, then you can add a line to your
-    parameter file with the known flux: FLUX\_450 = 0.050 (Jy) or FLUX\_850
-    = 0.005 (Jy) for example. \beamfit\ will calculate the peak flux, the
-    integrated flux over a requested aperture (30 arcsec radius
-    default), and the FWHM etc.}
+\item{The PICARD recipe \texttt{SCUBA2\_FCFNEFD} takes the reduced
+  map, crops it, and runs background removal. Surface fitting
+  parameters are changeable in the PICARD parameter file.}
+\item{It then runs the \Kappa\ \beamfit\ task on the specified point
+  source. Flux densities for calibrators such as CRL618, HLTau, Uranus
+  and Mars are already hard-coded into the recipe. If a source of
+  known flux density is not included in the recipe, then you can add a
+  line to your parameter file with its value: \texttt{FLUX\_450 =
+    0.050} and \texttt{FLUX\_850 = 0.005} (where the values are in Jy)
+  for example. The \beamfit\ task will calculate the peak flux
+  density, the integrated flux density over a requested aperture
+  (30\,arcsec radius default), and the FWHM etc.}
 
   An example of a PICARD parameter file (used for reduction of the
-  850$\mu$m calibrators) is shown here:
+  850\,\micron\ calibrators) is shown here:
 
 \begin{myquote}
 \begin{verbatim}
-
 [SCUBA2_FCFNEFD]
 APERTURE_RADIUS=30.0
 AUTOPHOTOM=1
@@ -1724,68 +1726,79 @@ LOGFILE=1
 \end{verbatim}
 \end{myquote}
 
-\item {It then uses the above to calculate the FCF terms described below.}
+\item {It then uses the above procedure to calculate the three
+  alternative FCF values described below.}
 \end{enumerate}
 
 \begin{itemize}
 
-\item {\textbf{$FCF_{arcsec}$}}
+\item{\textbf{$\mathrm{FCF_{arcsec}}$} (surface brightness calibration)}
 
 \begin{equation}
 \label{eq:fcf_arcsec}
-FCF_{arcsec} = \frac{S_{tot}}{P_{int} \times A_{pix}}
+\mathrm{FCF_{arcsec}} = \frac{S_\mathrm{tot}}{P_\mathrm{int} \times
+  A_\mathrm{pix}},
 \end{equation}
 
-where $S_{tot}$ is the total flux of the calibrator, $P_{int}$ is the
-integrated sum of the source in the map (in pW) and $A_{pix}$ is the pixel
-area in arcsec$^2$, producing an FCF in Jy/arcsec$^2$/pW. This
-$FCF_{arcsec}$ is the number to multiply your map by when you wish to use
-the calibrated map to do aperture photometry.
+where $S_\mathrm{tot}$ is the total flux density of the calibrator,
+$P_\mathrm{int}$ is the integrated sum of the source in the map (in
+pW) and $A_\mathrm{pix}$ is the pixel area in arcsec$^2$, producing an
+FCF in Jy/arcsec$^2$/pW. This $\mathrm{FCF_{arcsec}}$ is the number to
+multiply your map by when you wish to have surface brightness units,
+and to be able to carry out aperture photometry.
 
-\item{\textbf{$FCF_{beam}$}}
+\item{\textbf{$\mathrm{FCF_{beam}}$} (point source calibration)}
 
 \begin{equation}
 \label{eq:fcf_beam}
-FCF_{beam} = \frac{S_{peak}}{P_{peak}}
+\mathrm{FCF_{beam}} = \frac{S_\mathrm{{peak}}}{P_\mathrm{peak}}
 \end{equation}
 producing an FCF in units of Jy/beam/pW.
 
-The measured peak signal here is derived from the Gaussian fit applied
-by \beamfit. The peak value is susceptible to pointing and focus
-errors, and we have found this number to be somewhat unreliable,
-particularly at 450$\mu$m. $FCF_{beam}$ is the number to multiply your
-map by when you wish to measure absolute peak fluxes of discrete
-sources. The peak value in the map is then the total flux of the point
-source. You should not integrate over the source after calibrating in
-this fashion, as this will give an overestimate of the flux.
+The measured peak signal here is derived from the Gaussian fit of
+\beamfit. The peak value is susceptible to pointing and focus errors,
+and we have found this number to be somewhat unreliable, particularly
+at 450\,\micron. $\mathrm{FCF_{beam}}$ is the number to multiply your
+map by when you wish to measure absolute peak flux densities of
+discrete un-resolved point sources. The peak value in the map is then
+the total flux density of the point source. You should not integrate
+over the source after calibrating in this fashion, as this will give
+an overestimate of the flux density.
 
 To overcome the problems encountered as a result of the peak errors, a
-third FCF method has been derived, where the $FCF_{arcsec}$ is taken and
-modeled with a Gaussian beam with a FWHM equivalent to that of the
-JCMT beam at each wavelength. The resulting FCF calculates a
-'equivalent peak' FCF from the integrated value assuming that the
-point source is a perfect Gaussian.
+third FCF method has been derived, where the $\mathrm{FCF_{arcsec}}$
+is modeled with a Gaussian beam, with a FWHM equivalent to that of the
+theoretical JCMT diffraction-limited beam at each wavelength. In
+effect, the resulting FCF gives an `equivalent peak' FCF from the
+integrated value, assuming that the point source is a perfect
+Gaussian.
 
-\item{\textbf{$FCF_{beamequiv}$}}
+\item{\textbf{$F\mathrm{CF_{beamequiv}}$} (improved point source calibration)}
 \begin{equation}
 \label{eq:fcf_beamequiv}
-FCF_{beamequiv}  = \frac{S_{tot} \times 1.133 \times {FWHM_{beam}}^2}{P_{int} \times A_{pix}}
+\mathrm{FCF_{beamequiv}} = \frac{S_\mathrm{tot} \times 1.133 \times
+  {\mathrm{FWHM_{beam}}}^2}{P_\mathrm{int} \times A_\mathrm{pix}},
 \end{equation}
 
  or more conveniently:
 
 \begin{equation}
-FCF_{beamequiv} = FCF_{arcsec} \times 1.133 \times {FWHM_{beam}}^2
+\mathrm{FCF_{beamequiv}} = \mathrm{FCF_{arcsec}} \times 1.133 \times
+\mathrm{FWHM_{beam}}^2,
 \end{equation}
-where FWHM is 7.5'' and 14.0'' for the 450$\mu$m and 850$\mu$m
-respectively. This produces an FCF in units of Jy/beam/pW.
+where FWHM is 7.5\,arcsec and 14.0\,arcsec at 450\,\micron\ and
+850\,\micron, respectively. This produces an FCF in units of
+Jy/beam/pW.
 
-The $FCF_{beamequiv}$ and $FCF_{beam}$ should agree with each other,
-however this is often not the case when the source is distorted for
-the reasons mentioned above. $FCF_{beamequiv}$ has been found to provide
-more consistent results and it is advised to use this value when
-possible, in the same way as $FCF_{beam}$. It is advised, when running
-the matched filter on data, to use the $FCF_{beamequiv}$ for calibration.
+The $\mathrm{FCF_{beamequiv}}$ and $\mathrm{FCF_{beam}}$ should agree
+with each other. However, this is often not the case when the source
+is distorted, for the reasons mentioned
+above. $\mathrm{FCF_{beamequiv}}$ has been found to provide more
+consistent results and it is advisable to use this value when
+available, instead of $\mathrm{FCF_{beam}}$. It is also advisable,
+when running the matched filter on data (see
+Section~\ref{sec:cosmology}), to use the $\mathrm{FCF_{beamequiv}}$
+for calibration.
 
 \end{itemize}
 
@@ -1878,7 +1891,8 @@ noise that is not effectively modeled/removed by the map-maker
 
 In order to optimally find sources that are the size of the telescope
 beam, and suppress this residual large-scale noise, we provide a
-PICARD recipe called \texttt{SCUBA2\_MATCHED\_FILTER}.
+PICARD recipe (see Section~\ref{sec:fcf}) called
+\texttt{SCUBA2\_MATCHED\_FILTER}.
 
 If there were no large-scale noise in the map, the filtered signal map
 would be calculated as follows:
