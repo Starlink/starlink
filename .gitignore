@@ -766,6 +766,14 @@ applications/obsolete/starbench/starbench.csh
 applications/obsolete/starbench/starbench.icl
 applications/obsolete/starbench/starbench.sh
 
+docs/sc/005/changetype.lis
+docs/sc/005/clipim.lis
+docs/sc/005/doapp.lis
+docs/sc/005/dostats.lis
+docs/sc/005/fitsinfo.lis
+docs/sc/005/saodisp.lis
+docs/sc/005/scaledisp.lis
+
 docs/sc/003/sc3-scripts.tex
 docs/sc/005/sc5.htx_tar.extras
 docs/sc/013/VERSION
