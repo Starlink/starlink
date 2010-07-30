@@ -37,12 +37,20 @@
 
 
 % Add any \newcommand or \newenvironment commands here
+
+%% Upright micron (code stolen from http://www.superstrate.net/useful/useful.html)
+\DeclareFontFamily{U}{euc}{}% I chose euc because the chart is called Euler cursive
+\DeclareFontShape{U}{euc}{m}{n}{<-6>eurm5<6-8>eurm7<8->eurm10}{}%
+\DeclareSymbolFont{AMSc}{U}{euc}{m}{n} % I chose AMSc because AMSa and AMSb are defined in the amsfonts-package
+\DeclareMathSymbol{\umu}{\mathord}{AMSc}{"16}
+
 \newcommand{\about}{$\sim$}
 \newcommand{\eg}{{\it e.g.}}
 \newcommand{\ie}{{\it i.e.}}
-\newcommand{\micron}{\mbox{\,${\mu}$m}}            % microns
+\newcommand{\micron}{\mbox{\,${\umu}$m}}            % microns
 \newcommand{\arcmin}{{$^\prime$}}
 \newcommand{\degr}{\mbox{\,$^\circ$}}               % degrees sign
+
 % ------------------------------------------------------------------------
 
 
@@ -215,9 +223,12 @@
 % Environment for indenting and using a small font.
 \newenvironment{myquote}{\begin{quote}\begin{small}}{\end{small}\end{quote}}
 
-
-
 \newcommand{\text}[1]{{\small \texttt{#1}}}
+
+% Typographical shortcuts
+\newcommand{\fcfbe}{$\mathrm{FCF_{beamequiv}}$}
+\newcommand{\fcfb}{$\mathrm{FCF_{beam}}$}
+\newcommand{\fcfa}{$\mathrm{FCF_{arcsec}}$}
 
 % SCUBA reference
 %\newcommand{\scuba}{\htmladdnormallink{SCUBA}{http://www.jach.hawaii.edu/JCMT/}}
@@ -243,9 +254,12 @@
 \newcommand{\ESP}{\xref{ESP}{sun180}{}}
 \newcommand{\GKS}{\xref{GKS}{sun83}{}}
 \newcommand{\oracdr}{\xref{\textsc{orac-dr}}{sun231}{}}
+\newcommand{\picard}{\xref{\textsc{Picard}}{sun231}{}}
 \newcommand{\smurf}{\xref{\textsc{Smurf}}{sun258}{}}
 \newcommand{\topcat}{\xref{\textsc{Topcat}}{sun253}{}}
 
+% DR recipe names
+\newcommand{\drrecipe}[1]{\texttt{#1}}
 
 % Application tasks
 \newcommand{\task}[1]{\textsf{#1}}
@@ -334,6 +348,7 @@
 \newcommand{\fitsval}{\xref{\task{fitsval}}{sun95}{NDFTRACE}}
 
 \newcommand{\makesnr}{\xref{\task{makesnr}}{sun95}{MAKESNR}}
+\newcommand{\wcsmosaic}{\xref{\task{wcsmosaic}}{sun95}{WCSMOSAIC}}
 
 % Convert
 \newcommand{\ndffits}{\xref{\task{ndf2fits}}{sun55}{NDF2FITS}}
@@ -498,7 +513,7 @@
 The Submillimetre Common User Bolometer Array-2 (SCUBA-2) is a
 large-format bolometer camera for the 15-m James Clerk Maxwell
 Telescope, designed to produce simultaneous continuum images with
-central wavelengths at 450 and 850\,\micron.
+central wavelengths at 450 and 850\micron.
 
 The purpose of this guide is to help SCUBA-2 users become familiar
 with the basic facilities for analysing and visualising data using
@@ -574,7 +589,7 @@ The SCUBA-2 data acquisition (DA) system writes data files every
 addition, each observation can be preceded or followed by calibration
 frames such as darks or flatfield ramps. For example, observation 15
 on 2009-12-14 of Uranus produced the following 16 files with the
-450\,\micron\ array that was operational at the time (s4a):
+450\micron\ array that was operational at the time (s4a):
 
 \begin{myquote}
 \begin{verbatim}
@@ -621,7 +636,7 @@ known as ``DAC units''). The \smurf\ task \flatfield\ can be used to
 scale raw data to units proportional to picowatts (pW, as double
 precision floating points) using the results of measurements of a
 flatfield calibration. The calibration can be stored internally in the
-data file (see the HDS extension in MORE.SCUBA2.FLATCAL) or can be
+data file (see the HDS extension in \texttt{MORE.SCUBA2.FLATCAL}) or can be
 calculated dynamically from the flatfield ramps bracketing each
 science observation. The DIMM will always use a flatfield ramp if
 available. Use the command
@@ -642,7 +657,7 @@ around the wildcards for the input and output files are necessary
 since \starlink\ routines expand them internally, rather than using
 the shell. However, it is not generally necessary to use \flatfield\
 before proceeding with map-making. \smurf\ will flatfield the data
-internally as needed.
+internally as by default.
 
 \section{\xlabel{time_series}Visualising data}
 \label{sec:visual}
@@ -816,7 +831,7 @@ concatenated data by re-gridding it into a pixelated map:
 The \makemap\ task automatically scales the bounds of the image to
 encompass all of the data. The output map here is called `uranus.sdf',
 and the pixel scale is 2~arcsec on a side by default at
-450\,\micron\ and 4~arcsec at 850\,\micron\ (although this can be
+450\micron\ and 4~arcsec at 850\micron\ (although this can be
 changed using the `pixsize=$x$' option on the command-line, where $x$
 is in arcsec). Since we already know that relative detector offsets
 are large in these data, it is unsurprising that no astronomical
@@ -1210,8 +1225,7 @@ all at the end, we can instead do everything in one go using the
 The DIMM is enabled using the \texttt{method=iterate} switch to the
 \makemap\ task. In the following example we will produce a map of
 Uranus using the test data supplied with this \starlink\ distribution
-in \texttt{
-  \$STARLINK\_DIR/share/smurf/s4a20091214\_00015\_000*.sdf}. All of
+in \texttt{\$STARLINK\_DIR/share/smurf/s4a20091214\_00015\_000*.sdf}. All of
 the settings for the DIMM are stored in configuration files.  In this
 example we will use one of the examples that are installed in the
 \starlink\ tree, `\texttt{dimmconfig.lis}'. For an overview of the
@@ -1340,7 +1354,7 @@ Total samples available from all chunks: 7606521 (830.406 bolos)
 
 Note that compared to the first iteration, the total number of samples
 with good QUALITY has dropped from 7664503 to 7606521 (about 0.8\%) as
-additional samples were flagged in each iteration. 
+additional samples were flagged in each iteration.
 
 \begin{figure}
 \begin{center}
@@ -1502,7 +1516,7 @@ project:
   solution. \texttt{EXT} applies the extinction correction (derived
   from the water vapour radiomete by default), and then \texttt{FLT}
   applies a high-pass filter to the data,above 0.1\,Hz and 0.3\,Hz at
-  450\,\micron\ and 850\,\micron, respectively. These cutoff
+  450\micron\ and 850\micron, respectively. These cutoff
   frequencies were chosen through trial and error, but appear to give
   good results under a wide variety of situations. Finally,
   \texttt{AST} estimates the astronomical signal contribution to the
@@ -1517,8 +1531,8 @@ project:
   iteratively applying a high-pass filter (\texttt{FLT}), which can
   result in convergence problems when there is little signal in the
   map, a single, harsher high-pass filter is applied as a
-  pre-processing step (0.2\, and 0.6\,Hz at 450\,\micron\ and
-  850\,\micron, respectively). There are also more conservative cuts
+  pre-processing step (0.2\, and 0.6\,Hz at 450\micron\ and
+  850\micron, respectively). There are also more conservative cuts
   to remove noisy/problematic detectors. Finally, the parameters
   \texttt{ast.zero\_lowhits} and \texttt{ast.zero\_notlast} are set to
   constrain much of the map to precisely zero for all but the last of
@@ -1610,7 +1624,7 @@ project:
 
 Analysis of the SCUBA-2 skydips and heater-tracking data from the
 S2SRO data has allowed calculation of the opacity factors for the
-SCUBA-2 450\,\micron\ and 850\,\micron\ filters to be determined.
+SCUBA-2 450\micron\ and 850\micron\ filters to be determined.
 
 The Archibald et al. (2002)~\cite{archibald} paper describes how the
 Caltech Submillimeter Observatory (CSO) 225\,GHz opacity,
@@ -1645,17 +1659,17 @@ and
 \end{equation}
 
 The SCUBA-2 filters are different to the SCUBA filters, with the
-450\,\micron\ filter, in particular, significantly narrower than its
+450\micron\ filter, in particular, significantly narrower than its
 SCUBA counterpart. The SCUBA-2 filter characteristics are described in
 detail at
-\htmladdnormallink{http://www.jach.hawaii.edu/JCMT/continuum/scuba2/filter/}{http://www.jach.hawaii.edu/JCMT/continuum/scuba2/filter/}.
+\htmladdnormallinkfoot{on the JCMT website}{http://www.jach.hawaii.edu/JCMT/continuum/scuba2/filter/}.
 
 The extinction correction parameters that scale from $\tau_{225}$ to
 the relevant filter have been added to the map-maker code. You can
-override these values by setting \verb|ext.taurelation.filtname| in
+override these values by setting \param{ext.taurelation.filtname} in
 your map-maker config files to the two coefficients `(a,b)' that you
 want to use (where `\texttt{filtname}' is the name of the filter). The
-defaults are listed in \verb|$SMURF_DIR/smurf_extinction.def|. We have
+defaults are listed in \texttt{\$SMURF\_DIR/smurf\_extinction.def}. We have
 also added a slight calibration tweak to WVM-derived values to correct
 them to the CSO scale. It is worth noting that if an individual
 science map and corresponding calibrator observation has already been
@@ -1670,29 +1684,29 @@ errors in extinction correction should cancel out in the calibration.
 Primary and secondary calibrator observations have been reduced using
 the specifically designed
 \texttt{dimmconfig\_bright\_compact.lis}. The maps produced from this
-are then analysed using tailor-made PICARD recipes. PICARD is a
+are then analysed using tailor-made \picard\ recipes. \picard\ is a
 post-processing and data combination tool that uses the same
 infrastructure as ORAC-DR, but is designed to be used after the
-initial reduction with the DIMM is complete. Details of the PICARD
+initial reduction with the DIMM is complete. Details of the \picard\
 recipes and how to use them can be found on \htmladdnormallinkfoot{the
   ORAC-DR web page}{http://www.oracdr.org/oracdr/PICARD}.
 
 A map reduced by the mapmaker has units of pW. To calibrate the data
-into units of Janskys (Jy), a set of bright, point-source objects with
+into units of janskys (Jy), a set of bright, point-source objects with
 well known flux densities are observed regularly to provide a flux
 conversion factor (FCF). The data (pW) can be multiplied by this FCF
 to obtain a calibrated map, and the FCF can also be used to assess the
 relative performance of the instrument from night to night. The noise
 equivalent flux density (NEFD) is a measure of the instrument
 sensitivity, and while not discussed here, is also produced by the
-PICARD recipe shown here. For calibration of primary and secondary
+\picard\ recipe shown here. For calibration of primary and secondary
 calibrators, the FCFs and NEFDs have been calculated as follows:
 \begin{enumerate}
-\item{The PICARD recipe \texttt{SCUBA2\_FCFNEFD} takes the reduced
+\item{The \picard\ recipe \drrecipe{SCUBA2\_FCFNEFD} takes the reduced
   map, crops it, and runs background removal. Surface fitting
-  parameters are changeable in the PICARD parameter file.}
+  parameters are changeable in the \picard\ parameter file.}
 \item{It then runs the \Kappa\ \beamfit\ task on the specified point
-  source. Flux densities for calibrators such as CRL618, HLTau, Uranus
+  source. Flux densities for calibrators such as CRL\,618, HL\,Tau, Uranus
   and Mars are already hard-coded into the recipe. If a source of
   known flux density is not included in the recipe, then you can add a
   line to your parameter file with its value: \texttt{FLUX\_450 =
@@ -1701,8 +1715,8 @@ calibrators, the FCFs and NEFDs have been calculated as follows:
   density, the integrated flux density over a requested aperture
   (30\,arcsec radius default), and the FWHM etc.}
 
-  An example of a PICARD parameter file (used for reduction of the
-  850\,\micron\ calibrators) is shown here:
+  An example of a \picard\ parameter file (used for reduction of the
+  850\micron\ calibrators) is shown here:
 
 \begin{myquote}
 \begin{verbatim}
@@ -1732,7 +1746,7 @@ LOGFILE=1
 
 \begin{itemize}
 
-\item{\textbf{$\mathrm{FCF_{arcsec}}$} (surface brightness calibration)}
+\item{\textbf{\fcfa} (surface brightness calibration)}
 
 \begin{equation}
 \label{eq:fcf_arcsec}
@@ -1743,11 +1757,11 @@ LOGFILE=1
 where $S_\mathrm{tot}$ is the total flux density of the calibrator,
 $P_\mathrm{int}$ is the integrated sum of the source in the map (in
 pW) and $A_\mathrm{pix}$ is the pixel area in arcsec$^2$, producing an
-FCF in Jy/arcsec$^2$/pW. This $\mathrm{FCF_{arcsec}}$ is the number to
+FCF in Jy/arcsec$^2$/pW. This \fcfa\ is the number to
 multiply your map by when you wish to have surface brightness units,
 and to be able to carry out aperture photometry.
 
-\item{\textbf{$\mathrm{FCF_{beam}}$} (point source calibration)}
+\item{\textbf{\fcfb} (point source calibration)}
 
 \begin{equation}
 \label{eq:fcf_beam}
@@ -1758,7 +1772,7 @@ producing an FCF in units of Jy/beam/pW.
 The measured peak signal here is derived from the Gaussian fit of
 \beamfit. The peak value is susceptible to pointing and focus errors,
 and we have found this number to be somewhat unreliable, particularly
-at 450\,\micron. $\mathrm{FCF_{beam}}$ is the number to multiply your
+at 450\micron. \fcfb\ is the number to multiply your
 map by when you wish to measure absolute peak flux densities of
 discrete un-resolved point sources. The peak value in the map is then
 the total flux density of the point source. You should not integrate
@@ -1766,14 +1780,14 @@ over the source after calibrating in this fashion, as this will give
 an overestimate of the flux density.
 
 To overcome the problems encountered as a result of the peak errors, a
-third FCF method has been derived, where the $\mathrm{FCF_{arcsec}}$
+third FCF method has been derived, where the \fcfa\
 is modeled with a Gaussian beam, with a FWHM equivalent to that of the
 theoretical JCMT diffraction-limited beam at each wavelength. In
 effect, the resulting FCF gives an `equivalent peak' FCF from the
 integrated value, assuming that the point source is a perfect
 Gaussian.
 
-\item{\textbf{$\mathrm{FCF_{beamequiv}}$} (improved point source calibration)}
+\item{\textbf{\fcfbe} (improved point source calibration)}
 \begin{equation}
 \label{eq:fcf_beamequiv}
 \mathrm{FCF_{beamequiv}} = \frac{S_\mathrm{tot} \times 1.133 \times
@@ -1786,18 +1800,18 @@ Gaussian.
 \mathrm{FCF_{beamequiv}} = \mathrm{FCF_{arcsec}} \times 1.133 \times
 \mathrm{FWHM_{beam}}^2,
 \end{equation}
-where FWHM is 7.5\,arcsec and 14.0\,arcsec at 450\,\micron\ and
-850\,\micron, respectively. This produces an FCF in units of
+where FWHM is 7.5\,arcsec and 14.0\,arcsec at 450\micron\ and
+850\micron, respectively. This produces an FCF in units of
 Jy/beam/pW.
 
-The $\mathrm{FCF_{beamequiv}}$ and $\mathrm{FCF_{beam}}$ should agree
+The \fcfbe\ and \fcfb\ should agree
 with each other. However, this is often not the case when the source
 is distorted, for the reasons mentioned
-above. $\mathrm{FCF_{beamequiv}}$ has been found to provide more
+above. \fcfbe\ has been found to provide more
 consistent results and it is advisable to use this value when
-available, instead of $\mathrm{FCF_{beam}}$. It is also advisable,
+available, instead of \fcfb. It is also advisable,
 when running the matched filter on data (see
-Section~\ref{sec:cosmology}), to use the $\mathrm{FCF_{beamequiv}}$
+Section~\ref{sec:cosmology}), to use the \fcfbe\
 for calibration.
 
 \end{itemize}
@@ -1842,7 +1856,7 @@ basic steps:
 
 \end{enumerate}
 
-For this example we will reduce a 13 minute, 450\,\micron, $6' \times
+For this example we will reduce a 13 minute, 450\micron, $6' \times
 6'$ CURVY\_PONG map towards the galaxy cluster MS0451 (see
 Section~\ref{sec:intro} for instructions on obtaining the data for
 this tutorial and the usage policy). Although not deep enough to
@@ -1881,7 +1895,7 @@ noise that is not effectively modeled/removed by the map-maker
 \includegraphics[width=0.49\linewidth]{sc19_cosmo_map}
 \includegraphics[width=0.49\linewidth]{sc19_cosmo_map_default} \\
 \caption{Maps of a deep cosmology field towards the cluster MS0451, at
-  450\,\micron. {\bf Left:} map using the specialized
+  450\micron. {\bf Left:} map using the specialized
   \texttt{dimmconfig\_blank\_field.lis} which gives a significantly
   flatter result than {\bf Right:} map using the default
   \texttt{dimmconfig.lis}.}
@@ -1891,8 +1905,8 @@ noise that is not effectively modeled/removed by the map-maker
 
 In order to optimally find sources that are the size of the telescope
 beam, and suppress this residual large-scale noise, we provide a
-PICARD recipe (see Section~\ref{sec:fcf}) called
-\\ \texttt{SCUBA2\_MATCHED\_FILTER}.
+\picard\ recipe (see Section~\ref{sec:fcf}) called
+\\ \drrecipe{SCUBA2\_MATCHED\_FILTER}.
 
 If there were no large-scale noise in the map, the filtered signal map
 would be calculated as follows:
@@ -1949,15 +1963,15 @@ normalizes the output such that the peak flux densities of point
 sources are conserved. Note that the accuracy of this normalization
 depends on how closely the real PSF matches the 7.5\,arcsec and
 14\,arcsec full-width at half-maximum (FWHM) Gaussian shapes assumed
-at 450\,\micron\ and 850\,\micron, respectively (an explicit PSF can
-also be supplied using the \texttt{PSF\_MATCHFILTER} recipe
+at 450\micron\ and 850\micron, respectively (an explicit PSF can
+also be supplied using the \param{PSF\_MATCHFILTER} recipe
 parameter).
 
 \begin{figure}
 \begin{center}
 \includegraphics[width=0.46\linewidth]{sc19_uranus_filt}
 \includegraphics[width=0.525\linewidth]{sc19_cosmo_map_filt}
-\caption{450\,\micron\ maps processed with the PICARD recipe
+\caption{450\micron\ maps processed with the \picard\ recipe
   \texttt{SCUBA2\_MATCHED\_FILTER}, suppressing scales larger than
   $15''$. {\bf Left:} filtered map of Uranus from
   Fig.~\ref{fig:itermap}. {\bf Right:} filtered version of deep
@@ -2126,7 +2140,7 @@ method=iterate config=^$STARLINK_DIR/share/smurf/dimmconfig.lis
   the mapmaker with no post processing. A patchy background and
   negative bowling around the strong sources is apparent. Bottom row:
   Orion22\_back.sdf (left) and Orion23\_back.sdf (right). The top row
-  maps following processing with the PICARD script REMOVE\_BACKGROUND
+  maps following processing with the \picard\ recipe \drrecipe{REMOVE\_BACKGROUND}
   using findback with a box size of 30$''$.}
 \label{fig:orionmakemap}
 \end{center}
@@ -2143,7 +2157,7 @@ map. The maps show that although extended emission has been recovered
 the background is far from flat, displaying large scale patchiness in
 addition to deep negative bowling surrounding the strongest
 sources. Fortunately both of these effects can be mitigated by
-post-processing using the PICARD recipe REMOVE\_BACKGROUND. In this
+post-processing using the \picard\ recipe \drrecipe{REMOVE\_BACKGROUND}. In this
 example we have modified the parameter file (params.ini) as shown
 below to set the fit method to findback and the findback box size to
 30$''$:
@@ -2169,7 +2183,7 @@ The resulting maps are shown on the bottom row of
 Fig.~\ref{fig:orionmakemap} where both the bowling and uneven
 background have been significantly improved. Before we combine the
 maps we will first crop them to their originally requested size using
-the PICARD recipe CROP\_JCMT\_IMAGES.
+the \picard\ recipe CROP\_JCMT\_IMAGES.
 \begin{myquote}
 \begin{verbatim}
 % picard CROP_JCMT_IMAGES Orion22_back.sdf
@@ -2177,14 +2191,19 @@ the PICARD recipe CROP\_JCMT\_IMAGES.
 \end{verbatim}
 \end{myquote}
 
-These cropped maps are then coadded using MOSAIC\_JCMT\_IMAGES. This
-example utilises the default parameters where wcsmosaic with variance
-weighting is used for the mosaicking method.
+These cropped maps are then coadded using \drrecipe{MOSAIC\_JCMT\_IMAGES}. This
+example utilises the default parameters where \wcsmosaic\ with variance
+weighting is used for the mosaicking method although it can be
+configured to use \makemos.
 \begin{myquote}
 \begin{verbatim}
 % picard MOSAIC_JCMT_IMAGES Orion2*_back_crop.sdf
 \end{verbatim}
 \end{myquote}
+
+The key advantage to using the \picard\ recipe over standalone \Kappa\
+commands is that the exposure time image is also propagated correctly
+to the output mosaic (it is stored in the \texttt{.MORE.SMURF.EXP\_TIME} extension).
 
 The final, coadded map is shown in Fig.~\ref{fig:orionmosaic}.
 
@@ -2256,15 +2275,16 @@ the 23rd of February and the 14th of March, 2010.
 \begin{tabular}{|c|c|c|c|c|c|}
 
 \hline
-\rule[-1ex]{0pt}{3.5ex} Source & RA(J2000) & DEC(J2000) & 850$\mu$m flux & 450$\mu$m flux & Ref  \\
+\rule[-1ex]{0pt}{3.5ex} Source & RA(J2000) & DEC(J2000) & 850\micron\
+flux / Jy & 450\micron\ flux / Jy & Ref  \\
 \hline
-\rule[-1ex]{0pt}{3.5ex} HL Tau & 04 31 38.4 & +18 13 59.0 & 2.36 $\pm$ 0.24     & 9.9 $\pm$ 2.0 & \cite{flux1}\\
+\rule[-1ex]{0pt}{3.5ex} HL\,Tau & 04 31 38.4 & +18 13 59.0 & 2.36 $\pm$ 0.24     & 9.9 $\pm$ 2.0 & \cite{flux1}\\
 \hline
-\rule[-1ex]{0pt}{3.5ex} CRL 618	& 04 42 53.60 & +36 06 53.7 & 4.7  $\pm$ 0.37   & 12.1 $\pm$ 2.2 & \cite{flux1} \\
+\rule[-1ex]{0pt}{3.5ex} CRL\,618	& 04 42 53.60 & +36 06 53.7 & 4.7  $\pm$ 0.37   & 12.1 $\pm$ 2.2 & \cite{flux1} \\
 \hline
-\rule[-1ex]{0pt}{3.5ex} CRL 2688 & 21 02 18.81 & +36 41 37.7 & 6.39  $\pm$ 0.51  & 30.9 $\pm$ 3.8 & \cite{flux1} \\
+\rule[-1ex]{0pt}{3.5ex} CRL\,2688 & 21 02 18.81 & +36 41 37.7 & 6.39  $\pm$ 0.51  & 30.9 $\pm$ 3.8 & \cite{flux1} \\
 \hline
-\rule[-1ex]{0pt}{3.5ex} IRC + 10216 & 09 47 57.38 & +13 16 43.7 & 8.8  $\pm$ 1.1  & 17.5$\pm$ 4.5 & \cite{flux1} \\
+\rule[-1ex]{0pt}{3.5ex} IRC+10216 & 09 47 57.38 & +13 16 43.7 & 8.8  $\pm$ 1.1  & 17.5$\pm$ 4.5 & \cite{flux1} \\
 \hline
 \rule[-1ex]{0pt}{3.5ex} V883 Ori &  05 38 19  & -07 02 2.0 & 1.34 $\pm$ 0.01     & 7.28 $\pm$ 0.07 & \cite{flux2}   \\
 \hline
@@ -2272,7 +2292,7 @@ the 23rd of February and the 14th of March, 2010.
 \hline
 \rule[-1ex]{0pt}{3.5ex} TW Hydrae & 11 01 51.91 & -34 42 17.0 & 1.37 $\pm$ 0.01 & 3.9 $\pm$ 0.7 & \cite{flux2}  \\
 \hline
-\rule[-1ex]{0pt}{3.5ex} Arp 220 & 15 34 57.21 & +23 30 09.5 & 0.668 $\pm$ 0.007  & 2.77 $\pm$ 0.06 & \cite{flux2} \\
+\rule[-1ex]{0pt}{3.5ex} Arp\,220 & 15 34 57.21 & +23 30 09.5 & 0.668 $\pm$ 0.007  & 2.77 $\pm$ 0.06 & \cite{flux2} \\
 \hline
 
 \end{tabular}
@@ -2281,24 +2301,24 @@ the 23rd of February and the 14th of March, 2010.
 
 
 The observations were reduced with the mapmaker using the config
-dimmconfig\_bright\_compact.lis and post-processed with the PICARD
-recipe SCUBA2\_FCFNEFD. Figure~\ref{fig:fcfs} shows the 850$\mu$m and
-450$\mu$m $FCF_{beamequiv}$ values for all calibrator observations taken
+dimmconfig\_bright\_compact.lis and post-processed with the \picard\
+recipe \drrecipe{SCUBA2\_FCFNEFD}. Figure~\ref{fig:fcfs} shows the 850\micron\ and
+450\micron\ \fcfbe\ values for all calibrator observations taken
 during the S2SRO period. The resulting mean FCF's in each waveband
 are as follows:
 
 \begin{equation}
-FCF_{450} = 400 \pm 90 ~\text{Jy/beam/pW}
+\mathrm{FCF}_{450} = 400 \pm 90 ~\mathrm{Jy/beam/pW}
 \end{equation}
 \begin{equation}
-FCF_{850} = 500 \pm 90 ~\text{Jy/beam/pW}
+\mathrm{FCF}_{850} = 500 \pm 90 ~\mathrm{Jy/beam/pW}
 \end{equation}
 
 \begin{figure}
 \begin{center}
 \includegraphics[width=7cm,angle=90]{sc19_fcf_hist}
-\caption{Histograms of the 450$\mu$m (left) and 850$\mu$m (right)
-  $FCF_{beamequiv}$ values calculated for the secondary calibrators observed
+\caption{Histograms of the 450\micron\ (left) and 850\micron\ (right)
+  \fcfbe\ values calculated for the secondary calibrators observed
   during the S2SRO period.}
 \label{fig:fcfs}
 \end{center}
@@ -2335,7 +2355,7 @@ and using that FCF to calibrate your data.
 \subsection{Method for calibrating your data}
 
 
-It is the recommendation to use the mean $FCF_{beamequiv}$ values
+It is the recommendation to use the mean \fcfbe\ values
 presented in the previous section to calibrate your data. However, if
 it is desired to produce an individual FCF from the night of a
 particular set of science observations, then the method is described
@@ -2344,15 +2364,15 @@ here.
 \begin{enumerate}
 \item{Reduce the selected calibration observation using the
 dimmconfig\_bright\_compact.lis config file.}
-\item{Use PICARD's recipe SCUBA2\_FCFNEFD on your reduced calibration
+\item{Use \picard's recipe \drrecipe{SCUBA2\_FCFNEFD} on your reduced calibration
     observation. This will produce information to the screen and a
-    logfile log.fcfnefd with the FCFs as mentioned above, and an NEFD
-    for the observation. PICARD by default uses fixed FCF's to
-    calculate the NEFD. (450$\mu$m: 400 Jy/beam/pW and 850$\mu$m: 500
+    logfile \texttt{log.fcfnefd} with the FCFs as mentioned above, and an NEFD
+    for the observation. \picard\ by default uses fixed FCF's to
+    calculate the NEFD. (450\micron: 400 Jy/beam/pW and 850\micron: 500
     Jy/beam/pW). If you wish to get an NEFD using the FCF calculated
-    for the individual calibrator you are reducing, add USEFCF=1 to
+    for the individual calibrator you are reducing, add \texttt{USEFCF=1} to
     your parameter file. }
-\item{Take your selected FCF and multiply your map by it using KAPPA
+\item{Take your selected FCF and multiply your map by it using \Kappa\
     \cmult.}
 \end{enumerate}
 
@@ -2379,7 +2399,8 @@ dimmconfig\_bright\_compact.lis config file.}
 
 \item[PSF]\quad Point Spread Function
 
-\item[S2SRO]\quad SCUBA-2 Shared Risk Observing
+\item[S2SRO]\quad SCUBA-2 Shared Risk Observing which took place in
+  February and March 2010.
 
 \item[SCUBA]\quad Submillimetre Common User Bolometer Array
 
