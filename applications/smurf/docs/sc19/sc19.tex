@@ -598,13 +598,13 @@ on 2009-12-14 of Uranus produced the following 16 files with the
 \end{myquote}
 
 The fifth column gives the file sizes in bytes, and shows that the
-first and last observations, which were dark observations, have nearly
+first and last files, which were dark observations, have nearly
 identical lengths. Similarly files 2 to 14 also have identical sizes
-as they each contain 30\,s worth of the on-source integration. File 15
-is shorter as the end of the integration was shorter than 30\,s.  As
-noted in the introduction, the first two files containing data from
-the actual scan of Uranus (numbers 2 and 3) are included with this
-\starlink\ release in:
+as they each contain precisely 30\,s worth of the on-source
+integration. File 15 is shorter, as the end of the integration lasted
+less than 30\,s.  As noted in the introduction, the first two files
+containing data from the actual scan of Uranus (numbers 2 and 3) are
+included with this \starlink\ release in:
 \begin{verbatim}
 $STARLINK_DIR/share/smurf/s4a20091214_00015_000*.sdf
 \end{verbatim}
@@ -1500,7 +1500,7 @@ project:
   templates from each detector. They also identify outlier detectors
   that do not resemble the template and remove them from the final
   solution. \texttt{EXT} applies the extinction correction (derived
-  from the water vapour monitor by default), and then \texttt{FLT}
+  from the water vapour radiomete by default), and then \texttt{FLT}
   applies a high-pass filter to the data,above 0.1\,Hz and 0.3\,Hz at
   450\,\micron\ and 850\,\micron, respectively. These cutoff
   frequencies were chosen through trial and error, but appear to give
@@ -1773,7 +1773,7 @@ effect, the resulting FCF gives an `equivalent peak' FCF from the
 integrated value, assuming that the point source is a perfect
 Gaussian.
 
-\item{\textbf{$F\mathrm{CF_{beamequiv}}$} (improved point source calibration)}
+\item{\textbf{$\mathrm{FCF_{beamequiv}}$} (improved point source calibration)}
 \begin{equation}
 \label{eq:fcf_beamequiv}
 \mathrm{FCF_{beamequiv}} = \frac{S_\mathrm{tot} \times 1.133 \times
@@ -1892,7 +1892,7 @@ noise that is not effectively modeled/removed by the map-maker
 In order to optimally find sources that are the size of the telescope
 beam, and suppress this residual large-scale noise, we provide a
 PICARD recipe (see Section~\ref{sec:fcf}) called
-\texttt{SCUBA2\_MATCHED\_FILTER}.
+\\ \texttt{SCUBA2\_MATCHED\_FILTER}.
 
 If there were no large-scale noise in the map, the filtered signal map
 would be calculated as follows:
@@ -2356,7 +2356,43 @@ dimmconfig\_bright\_compact.lis config file.}
     \cmult.}
 \end{enumerate}
 
-\subsection{Significant Events}
+\section{\xlabel{events}Significant Events}
+
+
+\section{\xlabel{acronyms}List of acronyms}
+
+\begin{description}
+
+\item[CSO]\quad Caltech Submillimetre Observatory
+
+\item[DIMM]\quad Dynamic Iterative Map-Maker
+
+\item[FCF]\quad Flux Conversion Factor
+
+\item[FWHM]\quad Full-Width at Half-Maximum
+
+\item[GAIA]\quad Graphical Astronomy and Image Analysis Tool
+
+\item[JCMT]\quad James Clerk Maxwell Telescope
+
+\item[NEFD]\quad Noise Equivalent Flux Density
+
+\item[PSF]\quad Point Spread Function
+
+\item[S2SRO]\quad SCUBA-2 Shared Risk Observing
+
+\item[SCUBA]\quad Submillimetre Common User Bolometer Array
+
+\item[SCUBA-2]\quad Submillimetre Common User Bolometer Array-2
+
+\item[SMURF]\quad Sub-Millimetre User Reduction Facility
+
+\item[S/N]\quad Signal-to-Noise ratio
+
+\item[WVM]\quad Water Vapour radioMeter
+
+
+\end{description}
 
 \end{document}
 
