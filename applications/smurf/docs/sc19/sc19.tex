@@ -239,6 +239,7 @@
 
 % set up some common package names
 \newcommand{\Kappa}{\xref{\textsc{Kappa}}{sun95}{}}
+\newcommand{\cupid}{\xref{\textsc{Cupid}}{sun255}{}}
 \newcommand{\Figaro}{\xref{\textsc{Figaro}}{sun86}{}}
 \newcommand{\gaia}{\xref{\textsc{Gaia}}{sun214}{}}
 \newcommand{\convert}{\xref{\textsc{Convert}}{sun55}{}}
@@ -374,6 +375,8 @@
 \newcommand{\skygrid}{\xref{\task{skygrid}}{sun163}{SKYGRID}}
 \newcommand{\skyphot}{\xref{\task{skyphot}}{sun163}{SKYPHOT}}
 
+% CUPID
+\newcommand{\findback}{\xref{\task{findback}}{sun255}{FINDBACK}}
 
 % Misc
 \newcommand{\hdstrace}{\xref{\task{hdstrace}}{sun102}{}}
@@ -2143,7 +2146,7 @@ method=iterate config=^$STARLINK_DIR/share/smurf/dimmconfig.lis
   negative bowling around the strong sources is apparent. Bottom row:
   Orion22\_back.sdf (left) and Orion23\_back.sdf (right). The top row
   maps following processing with the \picard\ recipe \drrecipe{REMOVE\_BACKGROUND}
-  using findback with a box size of 30$''$.}
+  using \findback\ with a box size of 30$''$.}
 \label{fig:orionmakemap}
 \end{center}
 \end{figure}
@@ -2159,9 +2162,11 @@ map. The maps show that although extended emission has been recovered
 the background is far from flat, displaying large scale patchiness in
 addition to deep negative bowling surrounding the strongest
 sources. Fortunately both of these effects can be mitigated by
-post-processing using the \picard\ recipe \drrecipe{REMOVE\_BACKGROUND}. In this
+post-processing using the \picard\ recipe
+\drrecipe{REMOVE\_BACKGROUND}. A number of different techniques are
+available in this recipe to control how the background is removed.  In this
 example we have modified the parameter file (params.ini) as shown
-below to set the fit method to findback and the findback box size to
+below to set the fit method to use \cupid\ \findback\ and the \findback\ box size to
 30$''$:
 \begin{myquote}
 \begin{verbatim}
@@ -2185,7 +2190,7 @@ The resulting maps are shown on the bottom row of
 Fig.~\ref{fig:orionmakemap} where both the bowling and uneven
 background have been significantly improved. Before we combine the
 maps we will first crop them to their originally requested size using
-the \picard\ recipe CROP\_JCMT\_IMAGES.
+the \picard\ recipe \drrecipe{CROP\_JCMT\_IMAGES}.
 \begin{myquote}
 \begin{verbatim}
 % picard CROP_JCMT_IMAGES Orion22_back.sdf
