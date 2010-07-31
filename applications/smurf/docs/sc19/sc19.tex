@@ -268,6 +268,8 @@
 \newcommand{\param}[1]{\texttt{#1}}
 
 % SMURF tasks
+\newcommand{\copyflat}{\xref{\task{copyflat}}{sun258}{COPYFLAT}}
+\newcommand{\calcflat}{\xref{\task{calcflat}}{sun258}{CALCFLAT}}
 \newcommand{\concat}{\xref{\task{sc2concat}}{sun258}{SC2CONCAT}}
 \newcommand{\fft}{\xref{\task{sc2fft}}{sun258}{SC2FFT}}
 \newcommand{\clean}{\xref{\task{sc2clean}}{sun258}{SC2CLEAN}}
@@ -2384,6 +2386,139 @@ observations. During February and March 2010 a number of events
 occurred that will possibly affect the data quality in a good or a bad
 way. This section documents these changes to aid in interpreting
 unexpected results that may come out of the data reduction process.
+
+\textit{Note:} all dates listed below are UT and are inclusive, and
+although setup changes should not affect the calibration they will
+affect the number and quality of functioning bolometers.
+
+\subsubsection{Data Files}
+
+Up to 20100219 the first and last file in a scan are dark frames for
+science, pointing\footnote{ Pointings also have dark frames between
+  the data frames in a scan for most of the SRO period.} and focus
+observations. From 20100220 to 20100302 the first and last file are
+fast flatfield ramps. From 20100303 the first file is a dark frame and
+the second and last file are fast ramps. Note noise and discrete flat
+fields are different.
+
+\subsubsection{Flatfields}
+
+\begin{description}
+
+\item[Beginning of S2SRO -- 20100211] \mbox{}
+
+  Until scan \#17 on 20100211 discrete flatfields were reduced using
+  the \param{TABLE} method.
+
+\item[20100211 -- End of S2SRO] \mbox{}
+
+  From scan \#18 on 20100211 discrete flatfields were reduced using
+  the \param{POLYNOMIAL} meth. \textit{Note:} the stand alone
+  flatfield observations are not used after the fast ramp flatfield
+  was implemented 20100223. The fast flatfields are done as part of
+  the observations.
+
+\item[20100213 -- 20100215] \mbox{}
+
+  Until scan \#45 the heater step in the discrete flatfield was
+  smaller leading to failure of the flatfield on the sky, particular
+  at 450. Hence a lot of the flatfields on these dates were in the dark.
+  This means less accurate flatfields.
+
+\item[20100220 -- 20100222] \mbox{}
+
+  Fast ramp flatfield used implemented but done in the dark. \smurf\
+  uses the discrete flatfields for these dates.
+
+\item[20100223 -- 20100302] \mbox{}
+
+  Fast ramp flatfield on the sky.  \textit{Note:} on 20100223 the data header
+  claims the ramp was in the dark but from notes and the heater value
+  it was on the sky i.e.\ the dark shutter header was wrong this
+  night. \smurf\ knows about this and uses the fast ramp flatfield.
+
+\item[20100303 -- end of S2SRO] \mbox{}
+
+  Fast ramp flatfield used with an initial dark in the
+  observations. This dark was used as a sanity check and is not used
+  by the map-maker.
+
+\end{description}
+
+Explanatory Notes:
+
+\begin{itemize}
+\item Discrete flatfields step through a number of heater values
+  rather slowly. The slow speed make the flatfield accuracy and
+  quality susceptible to thermal drifts, 1/f noise and weather
+  changes. Discrete flatfields was used for flatfielding until
+  20100223. Thereafter fast flatfield ramps are part
+
+\item Fast ramp flatfield uses a fast heater ramp repeated several
+  times - this improves the flatfield accuracy and quality.
+
+\item \param{TABLE} and \param{POLYNOMINAL} are two reduction methods
+  used for discrete flatfields (fast ramp always uses a polynomial
+  method). Due to the lack of dark frame subtraction the \param{TABLE}
+  flatfield only used 2 points of the \about10 heater settings in a
+  discrete flatfield. Further, the slope from these two points were
+  extrapolated far away.  Obviously this affects the flatfield
+  accuracy and quality. The flat field calculation should be redone
+  using the \param{POLYNOMIAL} method for data taken before
+  20100211\footnote{Re-reduce the relevant flatfields using \calcflat\
+    and then use \copyflat\ to copy the flatfield into the data files
+    before using the map-maker.}.
+
+\end{itemize}
+
+\subsubsection{Setup}
+
+\begin{description}
+
+\item[20100216 -- 20100218] \mbox{}
+
+  s4a detector bias set to 40000 - during the S2SRO the normal s4a value
+  was 65000.
+
+\item[20100304 -- end of S2SRO] \mbox{}
+
+  The heater tracking was changed such that the heater is returned to
+  the default value each time the shutter was closed. This was done to
+  prevents drifts in the heater setting. Such drift affect the
+  setup. However, noise observations also reset the heater. Thus the
+  heater drift before this adjutment were small and is not belived to
+  have affected the data.
+
+\end{description}
+
+\subsubsection{Electronics}
+
+\begin{description}
+
+\item[Beginning of S2SRO -- 20100217] \mbox{}
+
+  A large number of spikes in the s4a array data.
+
+\item[20100218 -- end of S2SRO] \mbox{}
+
+  The MCE was changed on the s4a array significatly decreasing the
+  number of spikes in the s4a data.
+
+\end{description}
+
+\subsubsection{Weather}
+
+\begin{description}
+
+\item[20100310] \mbox{}
+
+  Very bad seeing: data severely affected
+
+\item[20100311 early evening] \mbox{}
+  Bad seeing: data affected
+
+\end{description}
+
 
 \section{\xlabel{acronyms}List of acronyms}
 
