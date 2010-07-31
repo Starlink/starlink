@@ -135,12 +135,12 @@
 *  Status:
       INTEGER STATUS             ! Global inherited status
 
-*  Local constants:
+*  Local Constants:
       INTEGER MAXDIM             ! Only two-dimensional polynomials can
                                  ! be handled
       PARAMETER ( MAXDIM = 2 )
 
-*  Local variables:
+*  Local Variables:
       INTEGER DIM( MAXDIM )      ! Actual dimensions of coefficients
                                  ! array
       INTEGER DIMX( MAXDIM )     ! Declared dimensions of coefficients

@@ -135,7 +135,7 @@
 *  Status:
       INTEGER STATUS             ! Global inherited status
 
-*  Local constants:
+*  Local Constants:
       INTEGER MAXDIM             ! Only two-dimensional polynomials can
                                  ! be handled
       PARAMETER ( MAXDIM = 2 )
