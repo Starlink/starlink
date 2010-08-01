@@ -115,7 +115,9 @@
 *     30-NOV-2001 (DSB):
 *        Original NDF version.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2010 August 1 (MJC):
+*        Fix bug: DIAM was setting a radius not a diameter.
 *     {enter_further_changes_here}
 
 *-
@@ -232,8 +234,8 @@
      :                IAT )
       CALL CHR_APPND( ',', TEXT, IAT )
       IAT = IAT + 1
-      CALL CHR_APPND( AST_FORMAT( CURFRM, DAX, DIAM, STATUS ), TEXT,
-     :                IAT )
+      CALL CHR_APPND( AST_FORMAT( CURFRM, DAX, 0.5D0 * DIAM, STATUS ), 
+     :                TEXT, IAT )
       CALL CHR_APPND( ' )', TEXT, IAT )
 
 *  Put this text into a GRP group.
