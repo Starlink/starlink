@@ -385,16 +385,16 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int havegai=0;                /* Set if GAI is one of the models */
   int havenoi=0;                /* Set if NOI is one of the models */
   smfData *refdata=NULL;        /* Pointer to reference smfData */
-  dim_t i;                      /* Loop counter */
+  size_t i;                     /* Loop counter */
   int ii;                       /* Loop counter */
-  dim_t idx=0;                  /* index within subgroup */
+  size_t idx=0;                 /* index within subgroup */
   smfGroup *igroup=NULL;        /* smfGroup corresponding to igrp */
   int isize;                    /* Number of files in input group */
   int iter;                     /* Iteration number */
   int itermap=0;                /* If set, produce maps each iteration */
-  dim_t j;                      /* Loop counter */
-  dim_t k;                      /* Loop counter */
-  dim_t l;                      /* Loop counter */
+  size_t j;                     /* Loop counter */
+  size_t k;                     /* Loop counter */
+  size_t l;                     /* Loop counter */
   double *lastchisquared=NULL;  /* chisquared for last iter */
   smfArray **lut=NULL;          /* Pointing LUT for each file */
   int *lut_data=NULL;           /* Pointer to DATA component of lut */
@@ -1664,7 +1664,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                   col = (k % res[0]->sdata[idx]->dims[1])+1;
                   row = (k / res[0]->sdata[idx]->dims[1])+1;
 
-                  sprintf( thisbol, "C%02luR%02lu",
+                  sprintf( thisbol, "C%02zuR%02zu",
                            col,   /* x-coord */
                            row ); /* y-coord */
 
