@@ -111,7 +111,10 @@
 *  History:
 *     2010 July 21 (MJC):
 *        Original version.
-*     {enter_changes_here}
+*     2010 August 4 (MJC):
+*        Check the second moment is not zero when computing the
+*        skewness and kurtosis.
+*     {enter_further_changes_here}
  
 *  Bugs:
 *     {note_any_bugs_here}
@@ -325,11 +328,14 @@
 
 *  Evaluate the skewness and kurtosis from the moments.  Note the
 *  kurtosis is not the pure kurtosis, but the excess kurtosis.  This
-*  evaluates to zero for a Gaussian.
-            SKEW = SQRT( DBLE( NGOOD ) / MOMENT( 2 ) ) *
-     :                   MOMENT( 3 ) / MOMENT( 2 )
-            KURT = DBLE( NGOOD ) * MOMENT( 4 ) / 
-     :             ( MOMENT( 2 ) * MOMENT( 2 ) ) - 3.0D0
+*  evaluates to zero for a Gaussian.  Protect against a zero second
+*  moment with some tolerance for rounding.
+            IF ( ABS( MOMENT( 2 ) ) .GT. 10.0D0 * VAL__EPSD ) THEN
+               SKEW = SQRT( DBLE( NGOOD ) / MOMENT( 2 ) ) *
+     :                      MOMENT( 3 ) / MOMENT( 2 )
+               KURT = DBLE( NGOOD ) * MOMENT( 4 ) /
+     :                ( MOMENT( 2 ) * MOMENT( 2 ) ) - 3.0D0
+            END IF
          END IF
  
 *  Store the statistics in the returned arrays.  If no clipping was
