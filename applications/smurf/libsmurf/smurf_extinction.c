@@ -168,6 +168,8 @@
 *        Add AUTO option.
 *     2010-03-11 (TIMJ):
 *        Support flatfield ramps.
+*     2010-08-03 (TIMJ):
+*        Extract correct part of EXT keymap
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -279,7 +281,11 @@ void smurf_extinction( int * status ) {
   /* Read the tau relations from config file or group. We do not
      allow sub instrument overloading because these are all values
      based on filter name. */
-  extpars = kpg1Config( "TAUREL", "$SMURF_DIR/smurf_extinction.def", NULL, status );
+  keymap = kpg1Config( "TAUREL", "$SMURF_DIR/smurf_extinction.def", NULL, status );
+
+  /* and we need to use the EXT entry */
+  astMapGet0A( keymap, "EXT", &extpars );
+  keymap = astAnnul( keymap );
 
   /* Get tau source */
   parChoic( "TAUSRC", "Auto",
