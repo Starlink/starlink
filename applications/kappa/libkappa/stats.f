@@ -489,6 +489,7 @@
      :                            STATUS )
 
 *  Obtain the numeric type of the NDF array component to be analysed.
+      TYPE = '_REAL'
       CALL NDF_MTYPE( '_BYTE,_WORD,_INTEGER,_REAL,_DOUBLE', NDF, NDF,
      :                COMP, TYPE, DTYPE, STATUS )
 
