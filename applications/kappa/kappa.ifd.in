@@ -16300,6 +16300,14 @@ iraf! {
             helpkey *
          }
 
+         parameter kurtosis {
+            type _DOUBLE
+            access WRITE
+            vpath DEFAULT
+            default 0.0D0
+            helpkey *
+         }
+
          parameter logfile {
             position 4
             type FILENAME
@@ -16453,6 +16461,14 @@ iraf! {
           }
 
          parameter sigma {
+            type _DOUBLE
+            access WRITE
+            vpath DEFAULT
+            default 0.0D0
+            helpkey *
+         }
+
+         parameter skewness {
             type _DOUBLE
             access WRITE
             vpath DEFAULT

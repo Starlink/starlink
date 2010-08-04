@@ -25,7 +25,8 @@
 *     statistics available are:
 *     -  the pixel sum,
 *     -  the pixel mean,
-*     -  the pixel standard deviation,
+*     -  the pixel population standard deviation,
+*     -  the pixel population skewness and excess kurtosis,
 *     -  the value and position of the minimum- and maximum-valued
 *     pixels,
 *     -  the total number of pixels in the NDF,
@@ -69,6 +70,11 @@
 *        statistics).  If "Quality" is specified, then the quality
 *        values are treated as numerical values (in the range 0 to
 *        255).  ["Data"]
+*     KURTOSIS = _DOUBLE (Write)
+*        The population excess kurtosis of all the valid pixels in the
+*        NDF array.  This is the normal kurtosis minus 3, such that a
+*        Gaussian distribution of values would generate an excess
+*        kurtosis of 0.
 *     LOGFILE = FILENAME (Write)
 *        A text file into which the results should be logged.  If a null
 *        value is supplied (the default), then no logging of results
@@ -131,7 +137,11 @@
 *         array.  This parameter is only written when one or more
 *         percentiles have been requested.
 *     SIGMA = _DOUBLE (Write)
-*        The standard deviation of the pixel values in the NDF array.
+*        The population standard deviation of the pixel values in the 
+*        NDF array.
+*     SKEWNESS = _DOUBLE (Write)
+*        The population skewness of all the valid pixels in the NDF
+*        array.
 *     TOTAL = _DOUBLE (Write)
 *        The sum of the pixel values in the NDF array.
 
@@ -178,7 +188,8 @@
 *  Copyright:
 *     Copyright (C) 1991-1992 Science & Engineering Research Council.
 *     Copyright (C) 2004 Central Laboratory of the Research Councils.
-*     Copyright (C) 2007, 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2009, 2010 Science & Technology Facilities 
+*     Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -229,6 +240,12 @@
 *        Do not map signed integer types directly to enable the ordered
 *        statistics to be calculated with KPG_STOSx now restricted to
 *        BDIRW instantiations.
+*     2010 July 22 (MJC):
+*        Uses a recursive algorithm.  It calculates the population
+*        skewness and kurtosis.  The standard deviation is now a
+*        population statistic, rather than the sample statistic
+*        formerly.  In practice this will only make a significant
+*        difference for small NDF arrays. 
 *     {enter_further_changes_here}
 
 *-
@@ -270,6 +287,10 @@
       DOUBLE PRECISION DMAXC     ! Max. pixel value after clipping
       DOUBLE PRECISION DMIN      ! Min. value of pixels in array
       DOUBLE PRECISION DMINC     ! Min. pixel value after clipping
+      DOUBLE PRECISION DSTAT( 7 ) ! Array of floating-point  statistics
+      DOUBLE PRECISION DSTATC( 7 ) ! Array of clipped f.p. statistics
+      DOUBLE PRECISION KURT      ! Kurtosis
+      DOUBLE PRECISION KURTC     ! Kurtosis (after clipping)
       DOUBLE PRECISION MAXC( NDF__MXDIM ) ! Co-ordinates of max. pixel
       DOUBLE PRECISION MAXCC( NDF__MXDIM ) ! Max. pixel coords (clipped)
       DOUBLE PRECISION MEAN      ! Mean of pixels in array
@@ -279,6 +300,8 @@
       DOUBLE PRECISION MINCC( NDF__MXDIM ) ! Min. pixel coords (clipped)
       DOUBLE PRECISION MODE      ! Mode of pixels in array (dummy)
       DOUBLE PRECISION PERVAL( NPRCTL ) ! Values at the percentiles
+      DOUBLE PRECISION SKEW      ! Skewness
+      DOUBLE PRECISION SKEWC     ! Skewness (after clipping)
       DOUBLE PRECISION STDEV     ! Standard devn. of pixels in array
       DOUBLE PRECISION STDEVC    ! Std. devn. of pixels after clipping
       DOUBLE PRECISION SUM       ! Sum of pixels in array
@@ -293,6 +316,8 @@
       INTEGER IMIN( 1 )          ! Vector index of min. pixel
       INTEGER IMINC( 1 )         ! Vector index of min. clipped pixel
       INTEGER IQUANT( NPRCTL )   ! Integer quantile values
+      INTEGER ISTAT( 3 )         ! Array of integer statistics
+      INTEGER ISTATC( 3 )        ! Array of clipped integer statistics
       INTEGER IWCS               ! Pointer to WCS FrameSet
       INTEGER LBND( NDF__MXDIM ) ! NDF lower bounds
       INTEGER MAXP( NDF__MXDIM ) ! Indices of maximum-valued pixel
@@ -477,45 +502,53 @@
 
 *  Call the appropriate routine to compute the statistics.
       IF ( TYPE .EQ. '_BYTE' ) THEN
-         CALL KPG1_STATB( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                    NCLIP, CLIP,
-     :                    NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ),
-     :                    DMAX, SUM, MEAN, STDEV, NGOODC,
-     :                    IMINC( 1 ), DMINC, IMAXC( 1 ), DMAXC, SUMC,
-     :                    MEANC, STDEVC, STATUS )
+         CALL KPG_OSTAB( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                   NCLIP, CLIP, ISTAT, DSTAT,
+     :                   ISTATC, DSTATC, STATUS )
 
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPG1_STATD( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                    NCLIP, CLIP,
-     :                    NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ),
-     :                    DMAX, SUM, MEAN, STDEV, NGOODC,
-     :                    IMINC( 1 ), DMINC, IMAXC( 1 ), DMAXC, SUMC,
-     :                    MEANC, STDEVC, STATUS )
+         CALL KPG_OSTAD( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                   NCLIP, CLIP, ISTAT, DSTAT,
+     :                   ISTATC, DSTATC, STATUS )
 
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-         CALL KPG1_STATI( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                    NCLIP, CLIP,
-     :                    NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ),
-     :                    DMAX, SUM, MEAN, STDEV, NGOODC,
-     :                    IMINC( 1 ), DMINC, IMAXC( 1 ), DMAXC, SUMC,
-     :                    MEANC, STDEVC, STATUS )
+         CALL KPG_OSTAI( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                   NCLIP, CLIP, ISTAT, DSTAT,
+     :                   ISTATC, DSTATC, STATUS )
 
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-         CALL KPG1_STATR( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                    NCLIP, CLIP,
-     :                    NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ),
-     :                    DMAX, SUM, MEAN, STDEV, NGOODC,
-     :                    IMINC( 1 ), DMINC, IMAXC( 1 ), DMAXC, SUMC,
-     :                    MEANC, STDEVC, STATUS )
+         CALL KPG_OSTAR( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                   NCLIP, CLIP, ISTAT, DSTAT,
+     :                   ISTATC, DSTATC, STATUS )
 
       ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-         CALL KPG1_STATW( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                    NCLIP, CLIP,
-     :                    NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ),
-     :                    DMAX, SUM, MEAN, STDEV, NGOODC,
-     :                    IMINC( 1 ), DMINC, IMAXC( 1 ), DMAXC, SUMC,
-     :                    MEANC, STDEVC, STATUS )
+         CALL KPG_OSTAW( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                   NCLIP, CLIP, ISTAT, DSTAT,
+     :                   ISTATC, DSTATC, STATUS )
       END IF
+
+*  Extract the individual statistics from the arrays.
+      NGOOD = ISTAT( 1 )
+      IMIN( 1 ) = ISTAT( 2 )
+      IMAX( 1 ) = ISTAT( 3 )
+      DMIN = DSTAT( 1 )
+      DMAX = DSTAT( 2 )
+      SUM = DSTAT( 3 )
+      MEAN = DSTAT( 4 )
+      STDEV = DSTAT( 5 )
+      SKEW = DSTAT( 6 )
+      KURT = DSTAT( 7 )
+
+      NGOODC = ISTATC( 1 )
+      IMINC( 1 ) = ISTATC( 2 )
+      IMAXC( 1 ) = ISTATC( 3 )
+      DMINC = DSTATC( 1 )
+      DMAXC = DSTATC( 2 )
+      SUMC = DSTATC( 3 )
+      MEANC = DSTATC( 4 )
+      STDEVC = DSTATC( 5 )
+      SKEWC = DSTATC( 6 )
+      KURTC = DSTATC( 7 )
 
 *  Obtain the NDF bounds and initialise the indices of the minimum and
 *  maximim pixel positions and co-ordinates.
@@ -595,13 +628,13 @@
 *  precision.
       IF ( TYPE .EQ. '_DOUBLE' ) THEN
          CALL KPG1_STDSD( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
-     :                    DMAX, MAXP, MAXC, SUM, MEAN, STDEV,
-     :                    MEDIAN, MODE, MAX( 1, NUMPER ), PERCNT,
+     :                    DMAX, MAXP, MAXC, SUM, MEAN, STDEV, SKEW,
+     :                    KURT, MEDIAN, MODE, MAX( 1, NUMPER ), PERCNT,
      :                    PERVAL, MAXWCS, MINWCS, STATUS )
       ELSE
          CALL KPG1_STDSR( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
-     :                    DMAX, MAXP, MAXC, SUM, MEAN, STDEV,
-     :                    MEDIAN, MODE, MAX( 1, NUMPER ), PERCNT,
+     :                    DMAX, MAXP, MAXC, SUM, MEAN, STDEV, SKEW,
+     :                    KURT, MEDIAN, MODE, MAX( 1, NUMPER ), PERCNT,
      :                    PERVAL, MAXWCS, MINWCS, STATUS )
       END IF
 
@@ -609,14 +642,14 @@
       IF ( LOGFIL ) THEN
          IF ( TYPE .EQ. '_DOUBLE' ) THEN
             CALL KPG1_STFLD( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
-     :                       DMAX, MAXP, MAXC, SUM, MEAN, STDEV,
-     :                       MEDIAN, MODE, MAX( 1, NUMPER ), PERCNT,
-     :                       PERVAL, IFIL, STATUS )
+     :                       DMAX, MAXP, MAXC, SUM, MEAN, STDEV, SKEW,
+     :                       KURT, MEDIAN, MODE, MAX( 1, NUMPER ), 
+     :                       PERCNT, PERVAL, IFIL, STATUS )
          ELSE
             CALL KPG1_STFLR( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
-     :                       DMAX, MAXP, MAXC, SUM, MEAN, STDEV,
-     :                       MEDIAN, MODE, MAX( 1, NUMPER ), PERCNT,
-     :                       PERVAL, IFIL, STATUS )
+     :                       DMAX, MAXP, MAXC, SUM, MEAN, STDEV, SKEW,
+     :                       KURT, MEDIAN, MODE, MAX( 1, NUMPER ), 
+     :                       PERCNT, PERVAL, IFIL, STATUS )
          END IF
       END IF
 
@@ -651,13 +684,15 @@
          IF ( TYPE .EQ. '_DOUBLE' ) THEN
             CALL KPG1_STDSD( IWCS, NDIM, EL, NGOODC, DMINC, MINPC,
      :                       MINCC, DMAXC, MAXPC, MAXCC, SUMC, MEANC,
-     :                       STDEVC, MEDIAN, MODE, MAX( 1, NUMPER ),
-     :                       PERCNT, PERVAL, MAXWCS, MINWCS, STATUS )
+     :                       STDEVC, SKEWC, KURTC, MEDIAN, MODE, 
+     :                       MAX( 1, NUMPER ), PERCNT, PERVAL, MAXWCS, 
+     :                       MINWCS, STATUS )
          ELSE
             CALL KPG1_STDSR( IWCS, NDIM, EL, NGOODC, DMINC, MINPC,
      :                       MINCC, DMAXC, MAXPC, MAXCC, SUMC, MEANC,
-     :                       STDEVC, MEDIAN, MODE, MAX( 1, NUMPER ),
-     :                       PERCNT, PERVAL, MAXWCS, MINWCS, STATUS )
+     :                       STDEVC, SKEWC, KURTC, MEDIAN, MODE, 
+     *                       MAX( 1, NUMPER ), PERCNT, PERVAL, MAXWCS, 
+     :                       MINWCS, STATUS )
          END IF
 
 *  Also write the statistics to the log file, if used.
@@ -666,13 +701,15 @@
             IF ( TYPE .EQ. '_DOUBLE' ) THEN
                CALL KPG1_STFLD( IWCS, NDIM, EL, NGOODC, DMINC, MINPC,
      :                          MINCC, DMAXC, MAXPC, MAXCC, SUMC, MEANC,
-     :                          STDEVC, MEDIAN, MODE, MAX( 1, NUMPER ),
-     :                          PERCNT, PERVAL, IFIL, STATUS )
+     :                          STDEVC, SKEWC, KURTC, MEDIAN, MODE, 
+     :                          MAX( 1, NUMPER ), PERCNT, PERVAL, IFIL,
+     :                          STATUS )
             ELSE
                CALL KPG1_STFLR( IWCS, NDIM, EL, NGOODC, DMINC, MINPC,
      :                          MINCC, DMAXC, MAXPC, MAXCC, SUMC, MEANC,
-     :                          STDEVC, MEDIAN, MODE, MAX( 1, NUMPER ),
-     :                          PERCNT, PERVAL, IFIL, STATUS )
+     :                          STDEVC, SKEWC, KURTC, MEDIAN, MODE,
+     :                          MAX( 1, NUMPER ), PERCNT, PERVAL, IFIL,
+     :                          STATUS )
             END IF
          END IF
       END IF
@@ -684,6 +721,8 @@
       CALL PAR_PUT0D( 'MEAN', MEANC, STATUS )
       CALL PAR_PUT0D( 'MINIMUM', DMINC, STATUS )
       CALL PAR_PUT0D( 'SIGMA', STDEVC, STATUS )
+      CALL PAR_PUT0D( 'SKEWNESS', SKEWC, STATUS )
+      CALL PAR_PUT0D( 'KURTOSIS', KURTC, STATUS )
       CALL PAR_PUT0D( 'TOTAL', SUMC, STATUS )
       CALL PAR_PUT0I( 'NUMBAD', EL - NGOODC, STATUS )
       CALL PAR_PUT0I( 'NUMGOOD', NGOODC, STATUS )

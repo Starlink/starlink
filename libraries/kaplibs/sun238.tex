@@ -799,6 +799,23 @@ related items to be removed.
 \newpage
 \appendix
 
+\section{Changes in Version 3.1}
+\begin{itemize}
+\item Remove FTS1\_TREAD since the MAG library has now been removed
+      from the main Starlink source tree.
+\item New C function kpg1Config gets a KeyMap containing configuration
+      parameters from the user, with name checking and default values
+      supplied.
+\item KPG\_OSTAx added.  It uses recurrence formulae to calculate
+      simple statistics robustly.  It also extends KPG1\_STATx by
+      deriving the skewness and kurtosis.
+\item KPG1\_STDSx and KPG1\_STFLx can respectively report or log the
+      skewness and kurtosis via two additional arguments.  Users of
+      these routines will need to modify calling routines accordingly;
+      without skewness or kurtosis values to document supply
+      VAL\_\_BADD for each undefined statistic.
+\end{itemize}
+
 \section{Changes in Version 3.0}
 \begin{itemize}
 \item \xref{CTG}{sun262}{}, \xref{IRQ}{sun261}{}, and \xref{LPG}{sun263}{}
@@ -8975,71 +8992,6 @@ related items to be removed.
    }
 }
 \sstroutine{
-   FTS1\_NDFCM
-}{
-   Create the title, units, axes, wcs, and FITS extension in an NDF
-   from the FITS headers
-}{
-   \sstdescription{
-      This routine adds the character components, axis structure, WCS
-      component and FITS extension to an NDF.  It searches a buffer
-      containing the FITS header card images for the OBJECT keyword
-      whose value, if present, becomes the NDF title.  Similarly BUNIT
-      is mapped to the NDF units.  The supplied header structure is
-      copied to the FITS extension.
-   }
-   \sstinvocation{
-      CALL FTS1\_NDFCM( NCARD, HEADER, SCARD, NDF, NENCOD, ENCODS,
-                       STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         NCARD = INTEGER (Given)
-      }{
-         The number of cards in the array of headers, from the start of
-         the first header section to the end of the current one.
-      }
-      \sstsubsection{
-         HEADER( NCARD ) = CHARACTER $*$ 80 (Given)
-      }{
-         The buffer containing the header card images.
-      }
-      \sstsubsection{
-         SCARD = INTEGER (Given)
-      }{
-         The number of the card from where searches will begin, and
-         copying of the headers to the FITS extension.   Therefore
-         NCARD - SCARD $+$ 1 headers will appear in the extension. This
-         argument is needed because the headers make contain a dummy
-         header prior to an extension.
-      }
-      \sstsubsection{
-         NDF = INTEGER (Given)
-      }{
-         Identifier of the NDF to which to write the additional
-         components and the FITS extension.
-      }
-      \sstsubsection{
-         NENCOD = INTEGER (Given)
-      }{
-         The number of AST encodings supplied in ENCODS.
-      }
-      \sstsubsection{
-         ENCODS( NENCOD ) = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         The user{\tt '}s preferred AST encodings.  If NENCOD is zero, then
-         this is ignored, and an intelligent guess is made as to which
-         encoding to use.  The encoding determines which FITS headers
-         are used to create the NDF WCS component.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given)
-      }{
-         Global status value.
-      }
-   }
-}
-\sstroutine{
    FTS1\_NDF
 }{
    Makes an NDF from a simple or group-format FITS file
@@ -9340,6 +9292,71 @@ related items to be removed.
       }
       \sstsubsection{
          STATUS  = INTEGER (Given and Returned)
+      }{
+         Global status value.
+      }
+   }
+}
+\sstroutine{
+   FTS1\_NDFCM
+}{
+   Create the title, units, axes, wcs, and FITS extension in an NDF
+   from the FITS headers
+}{
+   \sstdescription{
+      This routine adds the character components, axis structure, WCS
+      component and FITS extension to an NDF.  It searches a buffer
+      containing the FITS header card images for the OBJECT keyword
+      whose value, if present, becomes the NDF title.  Similarly BUNIT
+      is mapped to the NDF units.  The supplied header structure is
+      copied to the FITS extension.
+   }
+   \sstinvocation{
+      CALL FTS1\_NDFCM( NCARD, HEADER, SCARD, NDF, NENCOD, ENCODS,
+                       STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NCARD = INTEGER (Given)
+      }{
+         The number of cards in the array of headers, from the start of
+         the first header section to the end of the current one.
+      }
+      \sstsubsection{
+         HEADER( NCARD ) = CHARACTER $*$ 80 (Given)
+      }{
+         The buffer containing the header card images.
+      }
+      \sstsubsection{
+         SCARD = INTEGER (Given)
+      }{
+         The number of the card from where searches will begin, and
+         copying of the headers to the FITS extension.   Therefore
+         NCARD - SCARD $+$ 1 headers will appear in the extension. This
+         argument is needed because the headers make contain a dummy
+         header prior to an extension.
+      }
+      \sstsubsection{
+         NDF = INTEGER (Given)
+      }{
+         Identifier of the NDF to which to write the additional
+         components and the FITS extension.
+      }
+      \sstsubsection{
+         NENCOD = INTEGER (Given)
+      }{
+         The number of AST encodings supplied in ENCODS.
+      }
+      \sstsubsection{
+         ENCODS( NENCOD ) = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The user{\tt '}s preferred AST encodings.  If NENCOD is zero, then
+         this is ignored, and an intelligent guess is made as to which
+         encoding to use.  The encoding determines which FITS headers
+         are used to create the NDF WCS component.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given)
       }{
          Global status value.
       }
@@ -11915,64 +11932,6 @@ related items to be removed.
    }
 }
 \sstroutine{
-   IRA\_CTOD1
-}{
-   Converts a single formatted sky coordinate value into a double
-   precision value
-}{
-   \sstdescription{
-      The input string is presumed to hold a sky coordinate value in
-      character form. If NC is 1, the string is interpreted as a
-      longitude value. If NC is 2, the string is interpreted as a
-      latitude value.  This routine reads the string and produces a
-      double precision value holding the coordinate value in radians.
-      The value is not shifted into the first order range (eg if an
-      angular value equivalent to 3$*$PI is given, the value 3$*$PI will be
-      returned, not 1$*$PI). If the input string is blank the output
-      value is set to the Starlink {\tt "}BAD{\tt "} value (VAL\_\_BADD). Refer to
-      IRA\_CTOD for details of the allowed format for the input string.
-   }
-   \sstinvocation{
-      CALL IRA\_CTOD1( TEXT, SCS, NC, VALUE, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         TEXT = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         The string containing the formatted version of the sky
-         coordinate value. If this string is blank, VALUE is returned
-         with the {\tt "}BAD{\tt "} value (VAL\_\_BADD), but no error report is
-         made.
-      }
-      \sstsubsection{
-         SCS = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         The sky coordinate system (see ID2 section {\tt "}Sky Coordinates{\tt "}).
-         Any unambiguous abbreviation will do.
-      }
-      \sstsubsection{
-         NC = INTEGER (Given)
-      }{
-         Determines which sky coordinate is to be used. If a value of 1
-         is supplied, the string is interpreted as a longitude value
-         (eg RA if an equatorial system is being used). If a value of 2
-         is supplied, the string is interpreted as a latitude value.
-         Any other value results in an error being reported.
-      }
-      \sstsubsection{
-         VALUE = DOUBLE PRECISION (Returned)
-      }{
-         The numerical value of the sky coordinate represented by the
-         string in TEXT. The value is in radians.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
    IRA\_CTOD
 }{
    Converts formatted sky coordinate values into double precision
@@ -12087,64 +12046,55 @@ related items to be removed.
    }
 }
 \sstroutine{
-   IRA\_DTOC1
+   IRA\_CTOD1
 }{
-   Convert a single floating point sky coordinate value to
-   character form
+   Converts a single formatted sky coordinate value into a double
+   precision value
 }{
    \sstdescription{
-      This routine creates a text string containing a formatted version
-      of the given sky coordinate value. The value is assumed to be a
-      longitude value if NC is 1, and a latitude if NC is 2. The
-      formats of the output string are as described in routine
-      IRA\_DTOC. Longitude values are shifted into the range 0 - 2$*$PI
-      before being used.  Latitude values are shifted into the range
-      $+$/- PI before being used. An error is reported if a latitude
-      value then has an absolute value greater than PI/2 (this differs
-      from the behaviour of IRA\_NORM which always reduces the latitude
-      value to $+$/- PI/2).
+      The input string is presumed to hold a sky coordinate value in
+      character form. If NC is 1, the string is interpreted as a
+      longitude value. If NC is 2, the string is interpreted as a
+      latitude value.  This routine reads the string and produces a
+      double precision value holding the coordinate value in radians.
+      The value is not shifted into the first order range (eg if an
+      angular value equivalent to 3$*$PI is given, the value 3$*$PI will be
+      returned, not 1$*$PI). If the input string is blank the output
+      value is set to the Starlink {\tt "}BAD{\tt "} value (VAL\_\_BADD). Refer to
+      IRA\_CTOD for details of the allowed format for the input string.
    }
    \sstinvocation{
-      CALL IRA\_DTOC1( VALUE, SCS, NC, STYLE, TEXT, STATUS )
+      CALL IRA\_CTOD1( TEXT, SCS, NC, VALUE, STATUS )
    }
    \sstarguments{
       \sstsubsection{
-         VALUE = DOUBLE PRECISION (Given)
+         TEXT = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         The value of the sky coordinate to be formatted, in radians.
-         If VALUE has the Starlink {\tt "}BAD{\tt "} value (VAL\_\_BADD) then the
-         output string TEXT is set blank.
+         The string containing the formatted version of the sky
+         coordinate value. If this string is blank, VALUE is returned
+         with the {\tt "}BAD{\tt "} value (VAL\_\_BADD), but no error report is
+         made.
       }
       \sstsubsection{
          SCS = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         The sky coordinate system in use (see ID2 section {\tt "}Sky
-         Coordinates{\tt "}). Any unambiguous abbreviation will do.
+         The sky coordinate system (see ID2 section {\tt "}Sky Coordinates{\tt "}).
+         Any unambiguous abbreviation will do.
       }
       \sstsubsection{
          NC = INTEGER (Given)
       }{
-         Determines which sky coordinate is given. If a value of 1 is
-         supplied, VALUE is interpreted as a longitude value (eg RA if
-         an equatorial system is being used).  If a value of 2 is
-         supplied, VALUE is interpreted as a latitude value. Any other
-         value causes an error to be reported.
+         Determines which sky coordinate is to be used. If a value of 1
+         is supplied, the string is interpreted as a longitude value
+         (eg RA if an equatorial system is being used). If a value of 2
+         is supplied, the string is interpreted as a latitude value.
+         Any other value results in an error being reported.
       }
       \sstsubsection{
-         STYLE = INTEGER (Given)
+         VALUE = DOUBLE PRECISION (Returned)
       }{
-         A value in the range 1 to 5 which specifies the style of
-         output formatting required. In addition a value of zero can be
-         specified which causes a default style to be used dependant on
-         the value of SCS. See routine IRA\_DTOC for a description of
-         the styles and defaults.
-      }
-      \sstsubsection{
-         TEXT = CHARACTER $*$ ( $*$ ) (Returned)
-      }{
-         The string containing the formatted description of the sky
-         coordinate value. The variable supplied for TEXT should have a
-         declared length equal to the value of parameter IRA\_\_SZFSC.
+         The numerical value of the sky coordinate represented by the
+         string in TEXT. The value is in radians.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -12307,6 +12257,73 @@ related items to be removed.
 
             {\tt "}12.050006{\tt "} and {\tt "}-33.383333{\tt "} (eg fractional values in
                                          degrees )
+   }
+}
+\sstroutine{
+   IRA\_DTOC1
+}{
+   Convert a single floating point sky coordinate value to
+   character form
+}{
+   \sstdescription{
+      This routine creates a text string containing a formatted version
+      of the given sky coordinate value. The value is assumed to be a
+      longitude value if NC is 1, and a latitude if NC is 2. The
+      formats of the output string are as described in routine
+      IRA\_DTOC. Longitude values are shifted into the range 0 - 2$*$PI
+      before being used.  Latitude values are shifted into the range
+      $+$/- PI before being used. An error is reported if a latitude
+      value then has an absolute value greater than PI/2 (this differs
+      from the behaviour of IRA\_NORM which always reduces the latitude
+      value to $+$/- PI/2).
+   }
+   \sstinvocation{
+      CALL IRA\_DTOC1( VALUE, SCS, NC, STYLE, TEXT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         VALUE = DOUBLE PRECISION (Given)
+      }{
+         The value of the sky coordinate to be formatted, in radians.
+         If VALUE has the Starlink {\tt "}BAD{\tt "} value (VAL\_\_BADD) then the
+         output string TEXT is set blank.
+      }
+      \sstsubsection{
+         SCS = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The sky coordinate system in use (see ID2 section {\tt "}Sky
+         Coordinates{\tt "}). Any unambiguous abbreviation will do.
+      }
+      \sstsubsection{
+         NC = INTEGER (Given)
+      }{
+         Determines which sky coordinate is given. If a value of 1 is
+         supplied, VALUE is interpreted as a longitude value (eg RA if
+         an equatorial system is being used).  If a value of 2 is
+         supplied, VALUE is interpreted as a latitude value. Any other
+         value causes an error to be reported.
+      }
+      \sstsubsection{
+         STYLE = INTEGER (Given)
+      }{
+         A value in the range 1 to 5 which specifies the style of
+         output formatting required. In addition a value of zero can be
+         specified which causes a default style to be used dependant on
+         the value of SCS. See routine IRA\_DTOC for a description of
+         the styles and defaults.
+      }
+      \sstsubsection{
+         TEXT = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The string containing the formatted description of the sky
+         coordinate value. The variable supplied for TEXT should have a
+         declared length equal to the value of parameter IRA\_\_SZFSC.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
    }
 }
 \sstroutine{
@@ -17205,40 +17222,6 @@ related items to be removed.
    }
 }
 \sstroutine{
-   KPG1\_COPYC
-}{
-   Copy a 1D array of character strings
-}{
-   \sstdescription{
-      This routine copies a 1D array of character strings.
-   }
-   \sstinvocation{
-      CALL KPG1\_COPYC( NEL, IN, OUT, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         NEL = INTEGER (Given)
-      }{
-         The length of the array.
-      }
-      \sstsubsection{
-         IN = CHARACTER( NEL ) $*$ ( $*$ ) (Given)
-      }{
-         The input array.
-      }
-      \sstsubsection{
-         OUT = CHARACTER( NEL ) $*$ ( $*$ ) (Returned)
-      }{
-         The output array.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-}
-\sstroutine{
    KPG1\_COPY
 }{
    To copy an array of a given type to another array of the same
@@ -17287,6 +17270,40 @@ related items to be removed.
 
          \sstitem
          Uses array pointers.
+      }
+   }
+}
+\sstroutine{
+   KPG1\_COPYC
+}{
+   Copy a 1D array of character strings
+}{
+   \sstdescription{
+      This routine copies a 1D array of character strings.
+   }
+   \sstinvocation{
+      CALL KPG1\_COPYC( NEL, IN, OUT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NEL = INTEGER (Given)
+      }{
+         The length of the array.
+      }
+      \sstsubsection{
+         IN = CHARACTER( NEL ) $*$ ( $*$ ) (Given)
+      }{
+         The input array.
+      }
+      \sstsubsection{
+         OUT = CHARACTER( NEL ) $*$ ( $*$ ) (Returned)
+      }{
+         The output array.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
       }
    }
 }
@@ -24691,133 +24708,6 @@ related items to be removed.
    }
 }
 \sstroutine{
-   KPG1\_PLOTA
-}{
-   Opens the graphics device and see if there is an existing DATA
-   picture with which the new DATA picture could be aligned
-}{
-   \sstdescription{
-      This routine opens a graphics device, clearing it or not as
-      specified by the user. If it is not cleared an attempt is made to
-      find a DATA picture within the current picture. If found it becomes
-      the current AGI picture, the corresponding PGPLOT viewport is
-      established as the current PGPLOT viewport, and an AST Plot is
-      returned for it in which the Base (GRAPHICS) Frame corresponds to
-      PGPLOT world co-ordinates. If no DATA picture is found, or if the
-      device was not cleared on opening, the current AGI picture and
-      PGPLOT viewport are unchanged on exit and no Plot is returned.
-
-      Various environment parameters are used to obtain options, etc. The
-      names of these parameters are hard-wired into this subroutine in
-      order to ensure conformity between applications.
-   }
-   \sstinvocation{
-      CALL KPG1\_PLOTA( IWCS, STAT, DOMAIN, IPIC0, IPICD, IPLOT, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         IWCS = INTEGER (Given)
-      }{
-         An AST pointer to a FrameSet. This may be AST\_\_NULL. The Current
-         and Base Frames are unchanged on exit. If an existing DATA picture
-         was created by a non-AST application it will not have a Plot
-         stored with it. A default Plot will be created in this case,
-         containing two Frames; a GRAPHICS Frame corresponding to millimetres
-         from the bottom-left corner of the view surface, and a Frame
-         corresponding to AGI world co-ordinates. The AGI database does not
-         contain any information describing world co-ordinates and so such
-         information must be supplied by the calling application, on some
-         assumption such as {\tt "}AGI world co-ordinates are PIXEL co-ordinates{\tt "}.
-         This information is provided through a FrameSet (IWCS) and a Domain
-         name (DOMAIN). DOMAIN specifies the Domain in which AGI world
-         co-ordinates are assumed to live. A FrameSet may then be supplied
-         using argument IWCS containing a Frame with the same Domain which
-         will be used to describe AGI world co-ordinates in the returned
-         Plot (a default 2-D Frame with the specified Domain is used if no
-         FrameSet is supplied or if it does not contain a Frame with the
-         specified Domain). If DOMAIN is supplied Blank, a default 2-D Frame
-         with Domain AGI\_WORLD will be used to describe AGI world co-ordinates.
-
-         If the existing DATA picture was created by an AST application,
-         it will have a Plot stored with it which means that AGI world
-         co-ordinates will be ignored. Consequently, the values supplied
-         for IWCS and DOMAIN will also be ignored.
-      }
-      \sstsubsection{
-         STAT = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         Determines whether or not the new DATA picture creted by the
-         calling application is to be aligned with an existing DATA
-         picture:
-
-         {\tt '}NEW{\tt '}: no attempt is made to align the new DATA picture with an
-                existing DATA picture, even if the CLEAR parameter is
-                given a FALSE value.
-         {\tt '}OLD{\tt '}: the new DATA picture is always aligned with an existing
-                DATA picture. The CLEAR parameter is not accessed (it is
-                assumed to have a FALSE value) and an error is reported
-                if no DATA picture is available.
-         {\tt '}UNKNOWN{\tt '}: If CLEAR is given a FALSE value then the new DATA
-                picture is aligned with any existing DATA picture, but no
-                error is reported if no DATA picture exists.
-      }
-      \sstsubsection{
-         DOMAIN = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         The Domain for AGI world co-ordinates. Only used if a FrameSet is
-         supplied (IWCS). If a blank value is supplied then {\tt "}AGI\_WORLD{\tt "}
-         will be used. See description of argument IWCS above for more
-         details.
-      }
-      \sstsubsection{
-         IPIC0 = INTEGER (Returned)
-      }{
-         An AGI identifier for the original current picture.
-      }
-      \sstsubsection{
-         IPICD = INTEGER (Returned)
-      }{
-         An AGI identifier for the existing DATA picture. Returned equal
-         to -1 if there is no existing DATA picture or if the device was
-         cleared on opening.
-      }
-      \sstsubsection{
-         IPLOT = INTEGER (Returned)
-      }{
-         An AST pointer to a Plot associated with an existing DATA picture.
-         Returned equal to AST\_\_NULL if an error occurs, or if there is no
-         existing DATA picture, or if the device was cleared on opening.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         Close down AGI and PGPLOT using KPG1\_PGCLS.
-      }
-   }
-   \sstdiylist{
-      Environment Parameters
-   }{
-      \sstsubsection{
-         CLEAR = \_LOGICAL (Read)
-      }{
-         TRUE if the graphics device is to be cleared on opening. See
-         argument STAT.
-      }
-      \sstsubsection{
-         DEVICE = DEVICE (Read)
-      }{
-         The plotting device.
-      }
-   }
-}
-\sstroutine{
    KPG1\_PLOT
 }{
    Prepares for graphics output
@@ -25081,6 +24971,133 @@ related items to be removed.
          form {\tt "}name=value{\tt "}, where {\tt "}name{\tt "} is an AST Plot attribute name
          (or synonym recognised by this application - see KPG1\_ASPSY), and
          {\tt "}value{\tt "} is the value to assign to the attribute.
+      }
+   }
+}
+\sstroutine{
+   KPG1\_PLOTA
+}{
+   Opens the graphics device and see if there is an existing DATA
+   picture with which the new DATA picture could be aligned
+}{
+   \sstdescription{
+      This routine opens a graphics device, clearing it or not as
+      specified by the user. If it is not cleared an attempt is made to
+      find a DATA picture within the current picture. If found it becomes
+      the current AGI picture, the corresponding PGPLOT viewport is
+      established as the current PGPLOT viewport, and an AST Plot is
+      returned for it in which the Base (GRAPHICS) Frame corresponds to
+      PGPLOT world co-ordinates. If no DATA picture is found, or if the
+      device was not cleared on opening, the current AGI picture and
+      PGPLOT viewport are unchanged on exit and no Plot is returned.
+
+      Various environment parameters are used to obtain options, etc. The
+      names of these parameters are hard-wired into this subroutine in
+      order to ensure conformity between applications.
+   }
+   \sstinvocation{
+      CALL KPG1\_PLOTA( IWCS, STAT, DOMAIN, IPIC0, IPICD, IPLOT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IWCS = INTEGER (Given)
+      }{
+         An AST pointer to a FrameSet. This may be AST\_\_NULL. The Current
+         and Base Frames are unchanged on exit. If an existing DATA picture
+         was created by a non-AST application it will not have a Plot
+         stored with it. A default Plot will be created in this case,
+         containing two Frames; a GRAPHICS Frame corresponding to millimetres
+         from the bottom-left corner of the view surface, and a Frame
+         corresponding to AGI world co-ordinates. The AGI database does not
+         contain any information describing world co-ordinates and so such
+         information must be supplied by the calling application, on some
+         assumption such as {\tt "}AGI world co-ordinates are PIXEL co-ordinates{\tt "}.
+         This information is provided through a FrameSet (IWCS) and a Domain
+         name (DOMAIN). DOMAIN specifies the Domain in which AGI world
+         co-ordinates are assumed to live. A FrameSet may then be supplied
+         using argument IWCS containing a Frame with the same Domain which
+         will be used to describe AGI world co-ordinates in the returned
+         Plot (a default 2-D Frame with the specified Domain is used if no
+         FrameSet is supplied or if it does not contain a Frame with the
+         specified Domain). If DOMAIN is supplied Blank, a default 2-D Frame
+         with Domain AGI\_WORLD will be used to describe AGI world co-ordinates.
+
+         If the existing DATA picture was created by an AST application,
+         it will have a Plot stored with it which means that AGI world
+         co-ordinates will be ignored. Consequently, the values supplied
+         for IWCS and DOMAIN will also be ignored.
+      }
+      \sstsubsection{
+         STAT = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Determines whether or not the new DATA picture creted by the
+         calling application is to be aligned with an existing DATA
+         picture:
+
+         {\tt '}NEW{\tt '}: no attempt is made to align the new DATA picture with an
+                existing DATA picture, even if the CLEAR parameter is
+                given a FALSE value.
+         {\tt '}OLD{\tt '}: the new DATA picture is always aligned with an existing
+                DATA picture. The CLEAR parameter is not accessed (it is
+                assumed to have a FALSE value) and an error is reported
+                if no DATA picture is available.
+         {\tt '}UNKNOWN{\tt '}: If CLEAR is given a FALSE value then the new DATA
+                picture is aligned with any existing DATA picture, but no
+                error is reported if no DATA picture exists.
+      }
+      \sstsubsection{
+         DOMAIN = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The Domain for AGI world co-ordinates. Only used if a FrameSet is
+         supplied (IWCS). If a blank value is supplied then {\tt "}AGI\_WORLD{\tt "}
+         will be used. See description of argument IWCS above for more
+         details.
+      }
+      \sstsubsection{
+         IPIC0 = INTEGER (Returned)
+      }{
+         An AGI identifier for the original current picture.
+      }
+      \sstsubsection{
+         IPICD = INTEGER (Returned)
+      }{
+         An AGI identifier for the existing DATA picture. Returned equal
+         to -1 if there is no existing DATA picture or if the device was
+         cleared on opening.
+      }
+      \sstsubsection{
+         IPLOT = INTEGER (Returned)
+      }{
+         An AST pointer to a Plot associated with an existing DATA picture.
+         Returned equal to AST\_\_NULL if an error occurs, or if there is no
+         existing DATA picture, or if the device was cleared on opening.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Close down AGI and PGPLOT using KPG1\_PGCLS.
+      }
+   }
+   \sstdiylist{
+      Environment Parameters
+   }{
+      \sstsubsection{
+         CLEAR = \_LOGICAL (Read)
+      }{
+         TRUE if the graphics device is to be cleared on opening. See
+         argument STAT.
+      }
+      \sstsubsection{
+         DEVICE = DEVICE (Read)
+      }{
+         The plotting device.
       }
    }
 }
@@ -37352,16 +37369,17 @@ related items to be removed.
 \sstroutine{
    KPG1\_STDSx
 }{
-   Displays statistics generated by KPG1\_STATx and KPG1\_HSTAx
+   Displays statistics generated by KPG1\_STATx, KPG\_OSTAx, and
+   KPG1\_HSTAx
 }{
    \sstdescription{
       This routine diplays the statistics of pixel data as generated by
-      the routines KPG1\_STATx and KPG1\_HSTAx.
+      the routines KPG1\_STATx, KPG\_OSTAx, and KPG1\_HSTAx.
    }
    \sstinvocation{
       CALL KPG1\_STDSx( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
-                       DMAX, MAXP, MAXC, SUM, MEAN, STDEV,
-                       MEDIAN, MODE, NUMPER, PERCNT, PERVAL,
+                       DMAX, MAXP, MAXC, SUM, MEAN, STDEV, SKEW,
+                       KURTOS, MEDIAN, MODE, NUMPER, PERCNT, PERVAL,
                        MAXWCS, MINWCS, STATUS )
    }
    \sstarguments{
@@ -37373,7 +37391,7 @@ related items to be removed.
       \sstsubsection{
          NDIM = INTEGER (Given)
       }{
-         Number of dimensions of the array whose ststistics are being
+         Number of dimensions of the array whose statistics are being
          displayed.
       }
       \sstsubsection{
@@ -37432,6 +37450,16 @@ related items to be removed.
          STDEV = DOUBLE PRECISION (Given)
       }{
          Pixel standard deviation value.
+      }
+      \sstsubsection{
+         SKEW = DOUBLE PRECISION (Given)
+      }{
+         Skewness of the pixel values.
+      }
+      \sstsubsection{
+         KURTOS = DOUBLE PRECISION (Given)
+      }{
+         Pixel kurtosis.
       }
       \sstsubsection{
          MEDIAN = DOUBLE PRECISION (Given)
@@ -37505,17 +37533,17 @@ related items to be removed.
 \sstroutine{
    KPG1\_STFLx
 }{
-   Write statistics generated by KPG1\_STATx and KPG1\_HSTAx to a
-   text file
+   Write statistics generated by KPG1\_STATx, KPG\_OSTAx, and
+   KPG1\_HSTAx to a text file
 }{
    \sstdescription{
       This routine writes the statistics of pixel data as generated by
-      the routines KPG1\_STATx and KPG1\_HSTAx to a text file.
+      the routines KPG1\_STATx, KPG\_OSTAx, and KPG1\_HSTAx to a text file.
    }
    \sstinvocation{
       CALL KPG1\_STFLx( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
-                       DMAX, MAXP, MAXC, SUM, MEAN, STDEV,
-                       MEDIAN, MODE, NUMPER, PERCNT, PERVAL,
+                       DMAX, MAXP, MAXC, SUM, MEAN, STDEV, SKEW,
+                       KURTOS, MEDIAN, MODE, NUMPER, PERCNT, PERVAL,
                        IFIL, STATUS )
    }
    \sstarguments{
@@ -37586,6 +37614,16 @@ related items to be removed.
          STDEV = DOUBLE PRECISION (Given)
       }{
          Pixel standard deviation value.
+      }
+      \sstsubsection{
+         SKEW = DOUBLE PRECISION (Given)
+      }{
+         Skewness of the pixel values.
+      }
+      \sstsubsection{
+         KURTOS = DOUBLE PRECISION (Given)
+      }{
+         Pixel kurtosis.
       }
       \sstsubsection{
          MEDIAN = DOUBLE PRECISION (Given)
@@ -38958,6 +38996,150 @@ related items to be removed.
    }
 }
 \sstroutine{
+   KPG\_OSTAx
+}{
+   Compute simple statistics for an array
+}{
+   \sstdescription{
+      This routine computes simple statistics for an array, namely: the
+      number of valid pixels; the minimum and maximum pixel values (and
+      their positions); the pixel sum; the mean; and the population
+      standard deviation, skewness, and excess kurtosis.  Iterative
+      K-sigma clipping may also be optionally applied.
+
+      It uses a one-pass recursive algorithm for efficiency using the
+      formulae of Terriberry (2007).
+   }
+   \sstinvocation{
+      CALL KPG\_OSTAx( BAD, EL, DATA, NCLIP, CLIP, ISTAT, DSTAT,
+                      ISTATC, DSTATC, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         BAD = LOGICAL (Given)
+      }{
+         Whether checks for bad pixels should be performed on the array
+         being analysed.
+      }
+      \sstsubsection{
+         EL = INTEGER (Given)
+      }{
+         Number of pixels in the array.
+      }
+      \sstsubsection{
+         DATA( EL ) = ? (Given)
+      }{
+         Array to be analysed.
+      }
+      \sstsubsection{
+         NCLIP = INTEGER (Given)
+      }{
+         Number of K-sigma clipping iterations to apply (may be zero).
+      }
+      \sstsubsection{
+         CLIP( NCLIP ) = REAL (Given)
+      }{
+         Array of clipping limits for successive iterations, expressed
+         as standard deviations.
+      }
+      \sstsubsection{
+         ISTAT( 3 ) = INTEGER (Returned)
+      }{
+         The integer statistics before clipping.  The meanings of the
+         elements in order are as follows.
+         \sstitemlist{
+
+            \sstitem
+            Number of valid pixels
+
+            \sstitem
+            Index where the pixel with the lowest value was (first)
+            found
+
+            \sstitem
+            Index where the pixel with the highest value was (first)
+            found
+         }
+      }
+      \sstsubsection{
+         DSTAT( 7 ) = DOUBLE PRECISION (Returned)
+      }{
+         The floating-point statistics before clipping derived from the
+         valid pixel values in DATA.  The meanings of the elements in
+         order are as follows.
+         \sstitemlist{
+
+            \sstitem
+            Minimum value
+
+            \sstitem
+            Maximum value
+
+            \sstitem
+            Sum
+
+            \sstitem
+            Mean
+
+            \sstitem
+            Population standard deviation
+
+            \sstitem
+            Population skewness
+
+            \sstitem
+            Population excess kurtosis.  This is zero for a Gaussian.
+         }
+      }
+      \sstsubsection{
+         ISTATC( 3 ) = INTEGER (Returned)
+      }{
+         The integer statistics after clipping derived from the valid
+         pixel values in DATA.  The attributions of the elements are
+         the same as for argument DSTAT.
+      }
+      \sstsubsection{
+         DSTATC( 7 ) = DOUBLE PRECISION (Returned)
+      }{
+         The floating-point statistics after clipping derived from the
+         valid pixel values in DATA.  The attributions of the elements
+         are the same as for argument DSTAT.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each of the standard numeric types.
+         Replace {\tt "}x{\tt "} in the routine name by D, R, I, W, UW, B or UB as
+         appropriate. The data type of the array being analysed must match
+         the particular routine used.
+
+         \sstitem
+         If no clipping is performed (i.e. if NCLIP = 0) then the values
+         of arguments which return results after clipping will be the same
+         as for those returning results before clipping.
+
+         \sstitem
+         If ISTAT(1) or ISTATC(1) is zero, then the values of all the
+         derived statistics will be undefined and will be set to the {\tt "}bad{\tt "}
+         value appropriate to their data type (except for the pixel sum,
+         which will be zero).
+      }
+   }
+   \sstdiytopic{
+      References
+   }{
+      Terriberry, T.B., 2007, Computing Higher-order Moments Online,
+      http://people.xiph.org/$\sim$tterribe/notes/homs.html.
+   }
+}
+\sstroutine{
    KPG\_STOSx
 }{
    Calculates accurate order statistics by sorting an array
@@ -39403,6 +39585,11 @@ related items to be removed.
       that the KeyMap does not contain a value for keyword {\tt "}method{\tt "}. The
       calling application should then usually use a default value for
       {\tt "}method{\tt "}.
+
+      Assigning the value {\tt "}$<$undef$>${\tt "} (case insensitive) to a keyword
+      has the effect of forcing the value to be undefined. This can
+      be useful in defining defaults where the keymap is locked
+      after being populated.
    }
    \sstinvocation{
       CALL KPG1\_KYMAP( IGRP, KEYMAP, STATUS )

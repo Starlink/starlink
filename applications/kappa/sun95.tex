@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.37}
 \newcommand{\stardocnumber}    {95.37}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2010 May 26}
+\newcommand{\stardocdate}      {2010 August 4}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.12}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -46797,7 +46797,10 @@ KAPPA: \htmlref{REGRID}{REGRID},
          the pixel mean,
 
          \sstitem
-         the pixel standard deviation,
+         the pixel population standard deviation,
+
+         \sstitem
+         the pixel population skewness and excess kurtosis,
 
          \sstitem
          the value and position of the minimum- and maximum-valued
@@ -46886,6 +46889,14 @@ KAPPA: \htmlref{REGRID}{REGRID},
       }
    }
    \sstresparameters{
+      \sstsubsection{
+         KURTOSIS = \_DOUBLE (Write)
+      }{
+         The population excess kurtosis of all the valid pixels in the
+         NDF array.  This is the normal kurtosis minus 3, such that a
+         Gaussian distribution of values would generate an excess
+         kurtosis of 0.
+      }
       \sstsubsection{
          MAXCOORD( ) = \_DOUBLE (Write)
       }{
@@ -46978,7 +46989,14 @@ KAPPA: \htmlref{REGRID}{REGRID},
       \sstsubsection{
          SIGMA = \_DOUBLE (Write)
       }{
-         The standard deviation of the pixel values in the NDF array.
+         The population standard deviation of the pixel values in the
+         NDF array.
+      }
+      \sstsubsection{
+         SKEWNESS = \_DOUBLE (Write)
+      }{
+         The population skewness of all the valid pixels in the NDF
+         array.
       }
       \sstsubsection{
          TOTAL = \_DOUBLE (Write)
@@ -57225,6 +57243,23 @@ The following applications have been modified:
         \item A bug has fixed that could cause incorrect normalisation of
         the fit in cases where both the NORM and GAUSS parameters are set
         FALSE.
+      \end{itemize}
+
+   \item [\htmlref{STATS}{STATS}]\mbox{}
+      \begin{itemize}
+        \item This now derives and reports the population skewness and
+        kurtosis, which are also written to new SKEWNESS and KURTOSIS
+        output parameters.  The standard deviation reported is now the
+        population statistic, not the sample statistic as previously.
+        For most practical uses the difference will be negligible.  To
+        obtain the sample standard deviation, if appropriate, scale by
+        $\sqrt{N/(N-1)}$, where $N$ is the number of values used to
+        derive the statistics (accessed through Parameter NUMGOOD).
+
+        \item It now uses a recursive algorithm less susceptible to
+	rounding errors for very large datasets or where data values
+	are concentrated in a narrow range coupled with extreme
+	outliers.
       \end{itemize}
 
    \item [\htmlref{WCSSLIDE}{WCSSLIDE}]\mbox{}

@@ -799,6 +799,23 @@ related items to be removed.
 \newpage
 \appendix
 
+\section{Changes in Version 3.1}
+\begin{itemize}
+\item Remove FTS1\_TREAD since the MAG library has now been removed
+      from the main Starlink source tree.
+\item New C function kpg1Config gets a KeyMap containing configuration
+      parameters from the user, with name checking and default values
+      supplied.
+\item KPG\_OSTAx added.  It uses recurrence formulae to calculate
+      simple statistics robustly.  It also extends KPG1\_STATx by
+      deriving the skewness and kurtosis.
+\item KPG1\_STDSx and KPG1\_STFLx can respectively report or log the
+      skewness and kurtosis via two additional arguments.  Users of
+      these routines will need to modify calling routines accordingly;
+      without skewness or kurtosis values to document supply
+      VAL\_\_BADD for each undefined statistic.
+\end{itemize}
+
 \section{Changes in Version 3.0}
 \begin{itemize}
 \item \xref{CTG}{sun262}{}, \xref{IRQ}{sun261}{}, and \xref{LPG}{sun263}{}

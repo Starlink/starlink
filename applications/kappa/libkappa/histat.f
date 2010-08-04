@@ -215,7 +215,8 @@
 *     Copyright (C) 1991, 1994 Science & Engineering Research Council.
 *     Copyright (C) 2000, 2004 Central Laboratory of the Research
 *     Councils.
-*     Copyright (C) 2007, 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2009, 2010 Science & Technology Facilities
+*     Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -266,6 +267,8 @@
 *     15-APR-2010 (DSB):
 *        Ensure that bad percentile values introduced by KPS1_HMSO<x> are
 *        not included in the value written to output parameter PERVAL.
+*     2010 August 4 (MJC):
+*        Use extended APIs for KPG1_STDSx and KPG1_STFLx.
 *     {enter_further_changes_here}
 
 *-
@@ -654,13 +657,13 @@
       IF ( TYPE .EQ. '_DOUBLE' ) THEN
          CALL KPG1_STDSD( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
      :                    DMAX, MAXP, MAXC, SUM, MEAN, STDEV,
-     :                    MEDIAN, MODE, NUMPER, PERCNT, PERVAL,
-     :                    MAXWCS, MINWCS, STATUS )
+     :                    VAL__BADD, VAL__BADD, MEDIAN, MODE, NUMPER,
+     :                    PERCNT, PERVAL, MAXWCS, MINWCS, STATUS )
       ELSE
          CALL KPG1_STDSR( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
      :                    DMAX, MAXP, MAXC, SUM, MEAN, STDEV,
-     :                    MEDIAN, MODE, NUMPER, PERCNT, PERVAL,
-     :                    MAXWCS, MINWCS, STATUS )
+     :                    VAL__BADD, VAL__BADD, MEDIAN, MODE, NUMPER,
+     :                    PERCNT, PERVAL, MAXWCS, MINWCS, STATUS )
       END IF
 
 *  Also write the statistics to the logfile, if used.
@@ -668,13 +671,13 @@
          IF ( TYPE .EQ. '_DOUBLE' ) THEN
             CALL KPG1_STFLD( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
      :                       DMAX, MAXP, MAXC, SUM, MEAN, STDEV,
-     :                       MEDIAN, MODE, NUMPER, PERCNT, PERVAL,
-     :                       IFIL, STATUS )
+     :                       VAL__BADD, VAL__BADD, MEDIAN, MODE,
+     :                       NUMPER, PERCNT, PERVAL, IFIL, STATUS )
          ELSE
             CALL KPG1_STFLR( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
      :                       DMAX, MAXP, MAXC, SUM, MEAN, STDEV,
-     :                       MEDIAN, MODE, NUMPER, PERCNT, PERVAL,
-     :                       IFIL, STATUS )
+     :                       VAL__BADD, VAL__BADD, MEDIAN, MODE,
+     :                       NUMPER, PERCNT, PERVAL, IFIL, STATUS )
          END IF
       END IF
 

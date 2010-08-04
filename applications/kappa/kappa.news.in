@@ -47,7 +47,22 @@
       -  A bug has fixed in the normalisation of the fit in cases
       where both the NORM and GAUSS parameters are set FALSE.
 
-   o  WCSSLIDE
+   o  STATS
+
+      -  This now derives and reports the population skewness and
+      kurtosis, which are also written to new SKEWNESS and KURTOSIS
+      output parameters.  The standard deviation reported is now the
+      population statistic, not the sample statistic as previously.
+      For most practical uses the difference will be negligible.  To 
+      obtain the sample standard deviation, if appropriate, scale by
+      (N/(N-1))**0.5, where N is the number of values used to derive
+      the statistics (accessed through Parameter NUMGOOD). 
+
+      -  It now uses a recursive algorithm less susceptible to 
+      rounding errors for very large datasets or where data values are
+      concentrated in a narrow range coupled with extreme outliers.
+
+    o  WCSSLIDE
 
       -  A bug has been fixed that could lead to incorrect shifts 
       when using the ABS parameter.

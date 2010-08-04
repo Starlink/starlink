@@ -7,10 +7,19 @@ and which may be of use to anyone developing their own KAPPA-like
 applications (see SUN/238).
 
 Version 3.1
-   - Remove FTS1_TREAD since the MAG library has now been removed from the
-     main Starlink source tree.
-   - New C function kpg1Config gets a KeyMap containing configuration 
-     parameters from the user, with name checking and default values supplied.
+   - Remove FTS1_TREAD since the MAG library has now been removed
+     from the main Starlink source tree.
+   - New C function kpg1Config gets a KeyMap containing configuration
+     parameters from the user, with name checking and default values
+     supplied.
+   - KPG_OSTAx added.  It uses recurrence formulae to calculate
+     simple statistics robustly.  It also extends KPG1_STATx by
+     deriving the skewness and kurtosis.
+   - KPG1_STDSx and KPG1_STFLx can respectively report or log the
+     skewness and kurtosis via two additional arguments.  Users of
+     these routines will need to modify calling routines accordingly;
+     without skewness or kurtosis values to document supply
+     VAL__BADD for each undefined statistic.
 
 Version 3.0
    - CCG routines' NBAD argument excludes bad elements not attributable
