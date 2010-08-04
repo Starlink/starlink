@@ -66,8 +66,8 @@
 {Copyright \copyright\ 2009-2010 University of British Columbia \\
  Copyright \copyright\ 2009-2010 Science \& Technology Facilities Council}
 \newcommand{\stardocnumber}    {19.3}
-\newcommand{\stardocauthors}   {Edward Chapin, Jessica Dempsey, Tim Jenness, Douglas Scott \& Holly Thomas}
-\newcommand{\stardocdate}      {1 August 2010}
+\newcommand{\stardocauthors}   {Edward Chapin, Jessica Dempsey, Tim Jenness, Douglas Scott, Holly Thomas \& Remo Tilanus}
+\newcommand{\stardocdate}      {3 August 2010}
 \newcommand{\stardoctitle}     {The SMURF SCUBA-2 Data Reduction Cookbook}
 \newcommand{\stardocversion}   {1.1}
 \newcommand{\stardocmanual}    {\ }
@@ -449,11 +449,11 @@
 \includegraphics[width=2.0in]{sc19_logo}
 % ? End of picture
 
-   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \begin{rawhtml} <P> {\sl  \end{rawhtml}
    \stardoccategory\ \stardocnumber \\
    \stardocauthors \\
    \stardocdate
-   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+   \begin{rawhtml} } </P> <H3> \end{rawhtml}
       \htmladdnormallink{University of British Columbia}
                         {http://www.ubc.ca} \\
       \htmladdnormallink{Science \& Technology Facilities Council}
@@ -2249,7 +2249,6 @@ filename.
 \end{figure}
 
 
-
 \begin{thebibliography}{}
 \addcontentsline{toc}{section}{References}
 
@@ -2285,10 +2284,651 @@ Barnard,~V.~E., 2005,\textit{A summary of the search for new Submillimetre Secon
 
 \end{thebibliography}
 
+\newpage
 \appendix
 
-\section{Library of data anomalies}
+\section{\xlabel{Dataissues}Data Characteristics and Issues}
+\label{sec:Issues}
 
+S2SRO data, due to our changing understanding of the instrument during
+shared risks observing, presents some particular challenges.
+
+In order to illustrate in more detail some characteristics and issues
+associated with the SCUBA-2 data taken for the S2SRO, we will walk
+through an attempt to manually reduce a 850$\mu$m observation on CRL618
+taken as observation 28 on 20100217.
+
+\subsection{\xlabel{intro2}Introduction data issues}
+\label{sec:intro2}
+
+There is no recommended procedure for manually reducing SCUBA-2 data,
+hence what follows is mainly intended to show the data issues rather
+than deliver a science product. Typically manual processing will
+remain inferior to the output of the iterative mapmaker. {\bf Note:}
+a number of measures will be taken to address some of the issues seen
+during the S2SRO when upgrading SCUBA-2 to its full complement of 8
+arrays. In particular in connection to the 30-sec fridge cycle, which
+dominates the common-mode signal, and a thermal gradient across the
+array that prevented the use of bolometers around the edge.
+
+A listing of the observation directory shows the following:
+
+\begin{myquote}
+\begin{verbatim}
+ 6956 s8d20100223_00017_0001.sdf
+34140 s8d20100223_00017_0002.sdf
+34140 s8d20100223_00017_0003.sdf
+34140 s8d20100223_00017_0004.sdf
+34140 s8d20100223_00017_0005.sdf
+34140 s8d20100223_00017_0006.sdf
+ 6956 s8d20100223_00017_0007.sdf
+\end{verbatim}
+\end{myquote}
+
+As explained in the main section of the manual, the first and last
+files typically are `dark' or `flatfield ramp' observations. The
+remaining files can all be concatenated without resulting in too large
+a data set (which for science observations often will not be true
+unfortunately).
+
+\begin{myquote}
+\begin{verbatim}
+% cp (raw data dir)/*.sdf .
+% sc2concat in=s8d\*.sdf out=sc17_con
+\end{verbatim}
+\end{myquote}
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.45\linewidth]{sc19_tracking_actual}
+\hspace{0.03\linewidth}
+\includegraphics[width=0.45\linewidth]{sc19_tracking_demand}
+\caption{{\sl left:} Actual tracking; {\sl Right:} Demanded tracking }
+\label{fig:tracking}
+\end{center}
+\end{figure}
+
+\subsection{\xlabel{Tracking}Telescope tracking}
+\label{sec:tracking}
+
+A first inspection can be made of the tracking of the telescope by
+inspecting the JCMT state structure in the headers:
+
+\begin{myquote}
+\begin{verbatim}
+% jcmtstate2cat sc17_con > sc17_con.cat
+% topcat -f tst sc17_con.cat
+\end{verbatim}
+\end{myquote}
+
+Select a 2-D image panel and the columns \texttt{x = TCS\_TR\_AC1, y =
+TCS\_TR\_AC2} to show the actual tracking on the sky.  Each point
+marks the position of tracking center for each of the 200~Hz samples.
+By contrast the demanded tracking can be plotted using
+\texttt{x~=~TCS\_TR\_DC1, y~=~TCS\_TR\_DC2}. The resulting figures are
+shown in Fig.~\ref{fig:tracking}.
+
+Obviously, for this observation the telescope failed to follow the
+demanded daisy pattern due to its acceleration limits. This failure to
+follow the demanded daisy pattern is often seen at higher elevations
+(this observation was at EL~=~72~deg). The demanded daisy is 120"
+across, i.e.\ even for the failed pattern a 3-arcmin field was almost
+always covered by the footprint of the bolometer array.
+
+Hence, although in general not disastrous for compact daisy fields,
+the distribution of the tracking points may result in more systematics
+across the field. In particular the diagonal pattern can result in a
+`groove' in the final image when using the standard configuration file
+in \texttt{DIMM}. Switching to \texttt{dimmconfig\_bright\_compact.lis}
+can help.
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.45\linewidth]{sc19_con_collapse}
+\caption{ Mean signal in time-series }
+\label{fig:concollapse}
+\end{center}
+\end{figure}
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.45\linewidth]{sc19_conbsl_collapse}
+\hspace{0.03\linewidth}
+\includegraphics[width=0.45\linewidth]{sc19_bsl_histogram}
+\caption{{\sl left:} Mean signal in DC-removed time-series; 
+         {\sl Right:} Histogram of values in DC-removed time series }
+\label{fig:conbslcollapse}
+\end{center}
+\end{figure}
+
+\subsection{\xlabel{flatfield2}Flat field}
+\label{sec:flatfield2}
+
+[ Note: observations taken after 20100223UT include a fast flatfield
+ramp at their start and end. \smurf will use these to calculate the
+flatfield dynamically. Earlier observations have a flatfield in their
+headers calculated by the online system from an explicit flatfield
+observation taken some time prior to the observation. These flatfields
+are less reliable due to the variability of flatfields and the
+observations should be treated with caution. At the least, \flatfield\ 
+and \copyflat\  should be used to re-calculate and re-insert the
+flatfield using the, now default, better ramp-fitting techniques. ]
+
+The above \concat\  command applies the flatfield to the data (it
+does so by default). Collapsing the time series of the concatenated
+and flatfielded file to calculate the mean signal for each bolometer
+results in Fig.~\ref{fig:concollapse} showing the bolometer map for
+the s8d array used during the S2SRO: a number of {\sl dead} columns
+can be seen as well as regions around the perimeter where the thermal
+gradient caused problems biasing bolometers.
+
+The range of the mean value in the map is very large: from $-$28 to
+30. An inspection of the cube shows that much of this is cwaused by 
+differing DC levels across the bolometers. The DC term can be removed
+using \clean\  (mfittrend can be used as well). In general, for
+relatively compact sources it should be safe to remove a first order
+baseline to also account for a monotonic drift component in the time
+series.
+
+\begin{myquote}
+my\_sc2clean\_bsl.def:
+\begin{verbatim}
+order=1
+dcfitbox = 0
+dclimcorr = 0
+spikethresh = 0
+
+% sc2clean sc17_con sc17_conbsl config=^my_sc2clean_bsl.def
+\end{verbatim}
+\end{myquote}
+
+
+Collapsing the time-series cube again now results in a mean in a range
+of $-$3.0e-13 to 2.4e-13 as shown in Fig.~\ref{fig:conbslcollapse}. A
+histogram of the DC-removed data shows that the majority of the
+time-series data now are in a range of $-$0.1 to 0.1.
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=1.0\linewidth]{sc19_timeseries}
+\caption{Example time series in the DC-corrected data set showing
+spikes, steps, and noisy bolometers. The dominant common-mode signal is
+a variation due to a 30-sec temperature cycle in the dilution fridge.
+{\sl Top-left:} a bolometer with a typical time
+series. Variations due to the 30-sec fridge oscillation are
+obvious. Since all bolometers share this oscillation it is a
+`common-mode' signal, but the amplitude may vary for different
+bolometers.
+{\sl Top-right:} a bolometer with spikes in the time
+series. {\sl Middle-left:} a bolometer with a moderate `step'. Steps
+can be introduced by the bias for that bolometer `rolling-over' as it
+reaches its limit. During the S2SRO the instrument software that flags
+these events was not active.
+{\sl Middle-right:} a bolometer with a large step.
+{\sl Bottom-left:} a bolometer with multiple steps and
+spikes.
+{\sl Bottom-right:} a `noisy' bolometer. }
+\label{fig:timeseries}
+\end{center}
+\end{figure}
+
+\subsection{\xlabel{spikesteps}Spikes and Steps}
+\label{sec:spikesteps}
+
+However, there are still significant outliers: the minimum and maximum
+pixel values are $-$8.1 and 3.4, respectively. Using GAIA to examine 
+the time series in the DC-subtracted cube reveals remaining data issues as
+shown in the Fig.~\ref{fig:timeseries}.
+
+\clean\  is quite efficient in finding steps, but its spike removal is
+of limited effectiveness in the presence of a strong common-mode
+signal.  As an example \clean\  was re-run with the following
+configuration file: 
+
+\begin{myquote}
+my\_sc2clean.def
+\begin{verbatim}
+order = 1
+dcfitbox = 400
+dcthresh = 5.0
+fillgaps = 1
+dcmedianwidth = 40
+dclimcorr = 0
+flagstat = 0
+spikethresh = 5
+spikeiter = 0
+noiseclip = 4.0
+\end{verbatim}
+\end{myquote}
+
+
+(These parameters are explained in \texttt{SUN/258} (or run
+\texttt{`smurfhelp makemap config'} or \texttt{`smurfhelp sc2clean
+config'}).
+
+\begin{myquote}
+\begin{verbatim}
+% sc2clean sc17_con sc17_concln config=^my_sc2clean.def
+\end{verbatim}
+\end{myquote}
+
+The results were that sc2clean left the time series of the top two
+plots in the above Fig.~\ref{fig:timeseries} unchanged. I.e.\ the
+common-mode variation was too large to cause the spikes in the right
+time series to be flagged. \clean\  completely flagged the two time
+series on the bottom row as bad. It did an excellent job correcting
+for the steps in the middle row time series:
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.45\linewidth]{sc19_sc2clean_13_31}
+\hspace{0.03\linewidth}
+\includegraphics[width=0.45\linewidth]{sc19_sc2clean_16_33}
+\caption{Original (white) and sc2clean step-corrected (red) time series.}
+\label{fig:conbslcollapse}
+\end{center}
+\end{figure}
+
+\subsection{\xlabel{commonmode}Common Mode Signal}
+\label{sec:commonmode}
+
+To investigate features of the time series further one needs to get
+rid of the dominant common-mode signal. Most of the variation seen is
+due to a 30-sec temperature cycle of the dilution fridge. This cycle
+affects the biasing of the bolometers and, in effect, varies the
+zero-level of each on that time-scale. There are various ways to
+remove this signal for quick inspection of the data, but here are two.
+Again, please be reminded that the aim here is not to reduce the data
+for map-making, but to illustrate characteristics of the data set.
+
+{\sl Method 1:} The simplest method is to mimic the action of the SMO module
+of the \texttt{DIMM}: subtract the median in a sliding box from the time
+series. 
+
+{\sl Method 2:} Use the \texttt{DIMM} to subtract the common-mode
+signal and export the models for further inspection. The common-mode
+is captured by the \texttt{COM, GAI, and FLT} models as \texttt{GAI*COM+FLT}.
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=1.0\linewidth]{sc19_timeseries2}
+\caption{Example time series in the block-median common-mode
+subtracted data set high-lighting intrinsic noise issues that can be
+seen in bolometers. The top-left time series is the same as the
+top-left time series in figure Fig.~\ref{fig:timeseries}}
+\label{fig:timeseries2}
+\end{center}
+\end{figure}
+
+\subsubsection{\xlabel{method1}Method 1}
+\label{sec:method1}
+
+The first method can be implemented rather simply using `block'
+although the calculation of the sliding medians will take quite
+long. Since the time series corresponds to a path across the sky, this
+obviously suppresses any structures larger than the path corresponding
+to the box. However, it is a very efficient method to flatten the time
+series (including steps which can change into spikes) to allow an easy
+statistical analysis of the intrinsic noise characteristics of
+bolometers.  This `harsh selection' method may have merits for the
+analysis of point-source fields, but be aware that the \texttt{DIMM}
+in general will leave significantly more `baseline' systematics in the
+time-series.
+
+\begin{myquote}
+\begin{verbatim}
+(csh)
+set file = sc17_conbsl
+echo "Subtract time-series block median"
+block estimator=median in=${file} out=${file}_block \
+      wlim=0 box='[1,1,200]'
+sub ${file} ${file}_block ${file}_subblk
+\end{verbatim}
+\end{myquote}
+
+A block-size of 200 corresponds to 1 sec of data, which can be related
+to a spatial size through the maximum scanning speed
+e.g.\ 120"/sec. Remember though that the telescope spends a large
+fraction of the time at lower speeds either accelerating or
+decelerating. In fact, a block-size of 200 largely removed the signal
+from CRL618 from this data set!
+
+An inspection of resulting file shows very flat time series. The
+top-left panel in the Fig.~\ref{fig:timeseries2} shows a typical
+time-series after removal of a sliding median. The next two panel show
+time-series with negative and positive spikes. The middle-right panel
+shows a bolometer with an increased noise during part of the scan. The
+next two panels show bolometers with an uneven noise performance. Note
+that the \texttt{DIMM} will {\sl not} specifically handle these
+issues, apart from de-spiking and an iterative clip of bolometers
+based on their overall noise level.  It also is the case the residual
+variations remaining after a common-mode subtraction often are of a
+similar or larger level: the sliding-median method allows one to zoom
+in on the noise characteristics of individual bolometers and possibly
+derive a bad-bolometer map for use with the \texttt{DIMM} (many scuba2
+tasks accept a `bbm').
+
+A word of caution: at the high scanning speeds, point-like sources
+will look as spikes in the time series. At 120"/sec it takes the
+telescope at least 10 samples to cross the 450${mu}$m beam. However, at
+600"/sec (as may be used for large scan maps), the crossing happens in
+barely more than 2 samples!
+
+One can attempt to further identify problematic bolometers by
+e.g.\ calculating the rms of each time series, but that falls outside
+the scope of this document:
+
+\begin{myquote}
+\begin{verbatim}
+collapse ${file}_block ${file}_block_rms estimator=rms \
+         axis=3 variance=false wlim=0.0
+\end{verbatim}
+\end{myquote}
+
+\subsubsection{\xlabel{method2}Method 2}
+\label{sec:method2}
+
+Method 2 is to use the \texttt{DIMM} to derive the common mode signal. The
+common-mode signal will be \texttt{GAI*COM+FLT}. There are a few gotchas to
+keep in mind though (note that some of these may change as the program
+gets further optimized):
+
+\begin{itemize}
+\item The \texttt{DIMM} will do a \clean\  in a preprocessing step
+which makes it hard to compare the models to the original file. At the
+least do an external DC removal first (as outlined above).  Or do the
+\clean\  as an external step and switch off all sc2clean parameters in
+the dimmconfig file submitted to the \texttt{DIMM}.
+
+\item The \texttt{DIMM} will add padding on either side of the time
+series but not remove it from the models before writing them
+out. There currently is a bug that requires one to use `setorigin' to
+properly align these cubes with the original one.
+
+\item The current \texttt{FLT} model will apodize (i.e.\ smoothly
+reduce the ends of the time series to zero; these ends are not used
+for the mapmaking). The apodization is needed for \texttt{FLT's}
+current fft, but a non-apodizing fft method is under development.
+
+\item Com.notfirst regulates whether the \texttt{COM} model is run
+during the first iteration. If set to 1, most of the dominant
+fridge-related variations will end up in the \texttt{FLT} model. A
+priori this is not a problem as far as removing the signal is
+concerned, but the FLT model works on each time series individually
+i.e.\ does not really derive a common-mode.
+
+\item Related to the previous point, if the fridge variations end up
+in the \texttt{FLT} model, the \texttt{GAI} model will not really show
+the gain variation across the bolometers, since the \texttt{COM} model
+in that case will only contain the residual common-mode variation
+(often dominated by ringing artefacts from \texttt{FLT's} fft). i.e.\
+for this exercise we want to make sure that \texttt{com.notfirst=0}.
+
+\item The first plane of the \texttt{GAI} model has the multiplicative
+term but it is distributed around the median (or mean) gain rather
+than a value of 1 due to the way that the \texttt{GAI} and
+\texttt{COM} models have been implemented. i.e.\ divide the gain map
+by its median in order to get a value distributed around 1. However,
+note a subtlety: the gain of each bolometer in principle should have
+been fitted and accounted for by the flat field.  Any gain differing
+from 1 in the \texttt{GAI} model can be interpreted as either a poor
+flat-field fit, the gain being variable, or some basic bolometers
+characteristics, e.g.\ their individual resistances, not (yet) being
+accounted for sufficiently.
+\end{itemize}
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.45\linewidth]{sc19_dimm_common_mode}
+\caption{ Example time series (white) and the derived
+common-mode signal (red).  This time series is the same as the
+top-left time serie in Figs.~\ref{fig:timeseries} and \ref{fig:timeseries2}}
+\label{fig:dimmcommonmode}
+\end{center}
+\end{figure}
+
+E.g.\ for these observations of CRL618 modify the
+dimmconfig\_bright\_compact.lis configuration file as follows. Given
+that, at the time of writing, the FLT model apodizes, it has been left
+out.
+
+{\sl A reminder: this exercise aims at showing data features and {\bf
+not} at showing how well the \texttt{DIMM} can handle these. For the
+latter one would want to run the \texttt{DIMM} with all its features
+enabled.}
+
+\begin{myquote}
+\begin{verbatim}
+^$STARLINK_DIR/share/smurf/dimmconfig_bright_compact.lis
+
+numiter = 3                        # Just run a few iterations
+modelorder = (com,gai,ast)         # Just do common mode part
+exportndf = (com,gai,ast,res)      # Write models out
+itermap = 1                        # Create map for each iteration
+com.gain_box = 600000              # Single gain map for whole spectrum
+com.boxcar = 200                   # Smooth common mode time series over 1 sec
+order = 0                          # Allow for DC level adjustments
+dclimcorr = 0                      # No correlated step detection/correction
+com.notfirst=0                     # Make sure that COM is run before FLT
+\end{verbatim}
+\end{myquote}
+
+The above file exports all relevant models. It produces a moderately
+smoothed common mode time series and a single gain component for the
+whole observation. A script that handles combines the output models
+into a common-mode and common-mode subtracted cube is appended at the
+end of the document. It actually gives us three useful files to look
+at: the derived common-mode signal \texttt{(\_commode)}, the relative
+gains of the bolometers \texttt{(\_gain)}, as well as a common-mode
+subtracted cube \texttt{(\_astres)}.
+
+\begin{myquote}
+{\sl The common-mode reduction script is appended at the end of this document}
+\end{myquote}
+
+Fig.~\ref{fig:dimmcommonmode} shows a typical time series with the
+fitted common-mode signal.
+
+The input cube to makemap had 812 `good' bolometers, the derived gain
+map 651: makemap has flagged an additional 161 bolometers as bad.  A
+quick inspection of the masked bolometers shows that the majority have
+steps, increased noise, or multiple spikes.  The gain map itself
+ranges from 0.44 to 1.89 and a histogram shows that of the 651
+unflagged bolometers 593 (\~90\%) are within a range of [0.75,1.25] and
+622 within [0.65,1.35]. To some degree this range indicates that for
+the S2SRO data the flat field {\sl in practice} was in general not
+very accurate or stable probably due to one or more of the
+aforementioned reasons.
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.45\linewidth]{sc19_gain_histogram}
+\caption{ Histogram of the bolometer gains as derived by the \texttt{DIMM}
+based on their response to the common-mode signal. Note that these
+gains are, by default, only used for the subtraction of the common
+mode and not for the subsequent gridding into a map.}
+\label{fig:gainhistogram}
+\end{center}
+\end{figure}
+
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.30\linewidth]{sc19_conbsl_gainmsk}
+\hspace{0.03\linewidth}
+\includegraphics[width=0.30\linewidth]{sc19_conbsl_astres_medianmsk}
+\hspace{0.03\linewidth}
+\includegraphics[width=0.30\linewidth]{sc19_conbsl_astres_rmsmsk}
+\caption{{\sl Left:} Gain image: black $<$ 0.75, white $>$ 1.25; 
+{\sl Middle:} Common-mode subtracted median: black $< -$5e-04, white $>$ 5e-04
+{\sl Right:} Common-mode subtracted rms: white $>$ 6e-03 (twice the median).}
+\label{fig:masks}
+\end{center}
+\end{figure}
+
+
+For a further analysis one can also e.g.\ collapse the common-mode
+subtracted cube over the time-series to calculate the median and rms:
+
+\begin{myquote}
+\begin{verbatim}
+% collapse ${file}_astres ${file}_astres_median estimator=median \
+           axis=3 variance=false wlim=0.0
+% collapse ${file}_astres ${file}_astres_rms estimator=rms \
+           axis=3 variance=false wlim=0.0
+\end{verbatim}
+\end{myquote}
+
+The median {\sl signal} ranges from $-$33e-04 to 30e-04, with 582
+bolometers falling within a range of $-$5e-04 to 5e-04. The median
+{\sl rms} is 3e-03 with a maximum of 14e-03 and 578 bolometers
+below a rms of 6e-03 (twice the median).  The three panels in
+Fig.~\ref{fig:masks} summarize this information.
+
+\begin{myquote}
+\begin{verbatim}
+% thresh ${file}_gain'(,,~1)' temp \
+         thrlo=0.75 thrhi=1.25 newlo=0.0 newhi=2.0
+% thresh temp ${file}_gainmsk \
+         thrlo=1.5 thrhi=0.5 newlo=1.0 newhi=1.0
+% thresh ${file}_astres_median'(,,~1)' temp \
+         thrlo=-5e-04 thrhi=5e-04 newlo=-1.0 newhi=1.0
+% thresh temp ${file}_astres_medianmsk \
+         thrlo=5e-04 thrhi=-5e-04 newlo=0.0 newhi=0.0
+% thresh ${file}_astres_rms'(,,~1)' temp \
+         thrlo=0 thrhi=6e-03 newlo=-1.0 newhi=1.0
+% thresh temp ${file}_astres_rmsmsk \
+         thrlo=6e-03 thrhi=0 newlo=0 newhi=0
+\end{verbatim}
+\end{myquote}
+
+The three maps have a significant subset of `flagged' bolometers in
+common.  An inspection of the common-mode subtracted data \texttt{(\_astres)}
+shows that many of these bolometers have (multiple) steps that were
+not removed by \clean.  Another subset shows variations that don't
+seem well modeled by the common-mode signal, although one has be
+careful not to mark the signature from CRL618 as bad. But even for
+bolometers that pass through all the selection `filters' there are
+quite a few that still have spikes, steps, or baseline ripples.
+Although the mapmaker was deliberately crippled for the above
+presentation, further development of the mapping algorithms will be
+needed to optimally handle SCUBA-2 data and produce the best possible
+maps.
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.30\linewidth]{sc19_conbsl_astres_19_19}
+\hspace{0.03\linewidth}
+\includegraphics[width=0.30\linewidth]{sc19_conbsl_astres_13_12}
+\hspace{0.03\linewidth}
+\includegraphics[width=0.30\linewidth]{sc19_conbsl_astres_13_26}
+\caption{Sample time-series with a simplecommon-mode subtracted.}
+\label{fig:sampleastres}
+\end{center}
+\end{figure}
+\subsection{\xlabel{samplemaps}Maps}
+\label{sec:samplemaps}
+
+Although somewhat outside the scope of this document, after all this
+one might wonder what the maps from the various techniques looks like.
+Bear in mind that both a manual reduction as well as the mapmaker can
+be optimized better than is presented here. Apart from the first map,
+all the maps are presented with the same grey-scale stretch and show a
+180" $\times$ 180" region around CRL618.
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.45\linewidth]{sc19_con_smallmap}
+\hspace{0.03\linewidth}
+\includegraphics[width=0.45\linewidth]{sc19_conbsl_smallmap}
+\includegraphics[width=0.45\linewidth]{sc19_conbsl_smallmap}
+\hspace{0.03\linewidth}
+\includegraphics[width=0.45\linewidth]
+           {sc19_dimmconfig_bright_compact_smallmap}
+\caption{
+{\sl Top left:} Map of the concatinated data; 
+{\sl Top right:} After removing a linear baseline from the time series;
+{\sl Bottom left:} After linear baseline, steps, and spike removal;
+{\sl Bottom right:} Iterative map maker with dimmconfig\_bright\_compact.lis
+}
+\label{fig:sampleastres}
+\end{center}
+\end{figure}
+
+
+\newpage
+\subsection{\xlabel{script}Sample Common-mode script}
+\label{sec:script}
+
+\begin{myquote}
+\begin{verbatim}
+(csh)
+echo "Remove linear baseline for easy comparison displays"
+sc2clean sc17_con sc17_conbsl config=^my_sc2clean_bsl.def
+
+set file = sc17_conbsl
+
+echo "run the DIMM models"
+makemap method=iter config=^my_dimmconfig_bright_compact.lis \
+        in=${file} out=${file}_map
+
+echo "# Get dimensions"
+ndftrace ${file} >& /dev/null
+set lbnds = `parget lbound ndftrace | head -1`
+set ubnds = `parget ubound ndftrace | head -1`
+
+set xlo =  $lbnds[1]
+set xhi =  $ubnds[1]
+set ylo =  $lbnds[2]
+set yhi =  $ubnds[2]
+set zlo =  $lbnds[3]
+set zhi =  $ubnds[3]
+
+echo "Find out padding in AST file
+ndftrace ${file}_con_ast >& /dev/null
+set lbnds = `parget lbound ndftrace | head -1`
+set ubnds = `parget ubound ndftrace | head -1`
+
+set zlo2 =  $lbnds[3]
+set zhi2 =  $ubnds[3]
+set pad = `calc "(${zhi2}-${zhi})/2"`
+echo "$pad"
+set zlo2 = `calc "${pad}+1"`
+set zhi2 = `calc "${zhi}+${pad}"`
+
+echo "Add unpadded part of ast and res model"
+add ${file}_con_ast'(,,'${zlo2}':'${zhi2}')' \
+    ${file}_con_res'(,,'${zlo2}':'${zhi2}')' ${file}_astres
+setorigin ${file}_astres '[0,0,1]'
+wcscopy ${file}_astres like=${file} ok=y
+
+echo "Grow the COM back into a cube"
+ndfcopy ${file}_con_com'(,,'${zlo2}':'${zhi2}')' \
+        temp1 trim
+manic  temp1  temp2  axes='[0,1]' \
+       lbound=${xlo} ubound=${xhi}
+manic temp2 temp_commode axes='[1,0,2]' \
+       lbound=${ylo} ubound=${yhi}
+setorigin temp_commode  '[0,0,1]'
+wcscopy temp_commode like=${file} ok=y
+
+echo "Grow the GAI back into a cube"
+manic  ${file}_con_gai'(,,1)'  temp_gain \
+       axes='[1,2,0]' lbound=${zlo} ubound=${zhi}
+wcscopy temp_gain like=${file} ok=y
+
+echo "Multiply GAI and COM to get the full common-mode cube"
+mult temp_gain temp_commode ${file}_commode
+
+echo "Derive 1-centered gain map"
+histat ${file}_con_gai'(,,1)'
+set median = `parget median histat | head -1`
+cdiv  ${file}_con_gai'(,,1)' $median ${file}_gain 
+\rm temp?.sdf >& /dev/null
+\end{verbatim}
+\end{myquote}
+
+\newpage
 \section{Notes on Shared Risk Observing}
 
 \subsection{S2SRO FCFs}
@@ -2394,7 +3034,7 @@ here.
 
 \begin{enumerate}
 \item{Reduce the selected calibration observation using the
-dimmconfig\_bright\_compact.lis config file.}
+\texttt{dimmconfig\_bright\_compact.lis config file}.}
 \item{Use \picard's recipe \drrecipe{SCUBA2\_FCFNEFD} on your reduced calibration
     observation. This will produce information to the screen and a
     logfile \texttt{log.fcfnefd} with the FCFs as mentioned above, and an NEFD
