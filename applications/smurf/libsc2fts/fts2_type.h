@@ -18,9 +18,14 @@
 
 *  Authors:
 *     Coskun (Josh) OBA (UoL)
+*     Tim Jenness (JAC, Hawaii)
 
 *  History :
-*     Created: July 9, 2010
+*     2010-07-09 (OBA):
+*        Created
+*     2010-08-04 (TIMJ):
+*        Remove boolean enum for the time being because some compilers
+*        define FALSE and TRUE themselves and this breaks the build.
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -47,14 +52,11 @@
 *-
 */
 
-// 
-// BOOLEAN TYPE
-//
-typedef enum boolean
-{
-  FALSE = 0,
-  TRUE = 1
-} bool;
+/*
+ * Boolean
+ */
+
+typedef int bool;
 
 //
 // FTS-2 SCAN MODES

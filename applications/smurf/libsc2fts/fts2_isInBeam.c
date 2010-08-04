@@ -71,10 +71,10 @@ bool fts2_isInBeam(smfData* data, int* status)
 
   if(strncmp(upperCase, "FTS", 3) == 0 )
   {
-    return TRUE;
+    return 1;
   }
   else
   {
-    return FALSE;
+    return 0;
   }
 }
