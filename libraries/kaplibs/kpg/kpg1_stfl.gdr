@@ -179,17 +179,17 @@
       INTEGER  STATUS
  
 *  Local Variables:
-      CHARACTER * ( 5 ) PCENT    ! Buffer for formatting percentages
-      CHARACTER * ( 80 ) BUF1    ! Text buffer
-      CHARACTER * ( 80 ) BUF2    ! Text buffer
-      DOUBLE PRECISION POSIN( NDF__MXDIM ) ! Input pixel coords
-      DOUBLE PRECISION POS( NDF__MXDIM ) ! Ouput WCS coords
+      CHARACTER*80 BUF1          ! Text buffer
+      CHARACTER*80 BUF2          ! Text buffer
       INTEGER I                  ! Loop counter for dimensions
       INTEGER IPIX               ! Index of PIXEL Frame in IWCS
-      INTEGER MAP                ! Mapping from PIXEL to current coords
-      INTEGER NWCS               ! Number of current Frame coords
-      INTEGER NC1                ! No. of characters in BUF1
-      INTEGER NC2                ! No. of characters in BUF2
+      INTEGER MAP                ! Mapping from PIXEL to current co-ords
+      INTEGER NC1                ! Number of characters in BUF1
+      INTEGER NC2                ! Number of characters in BUF2
+      INTEGER NWCS               ! Number of current Frame co-ords
+      CHARACTER*5 PCENT          ! Buffer for formatting percentages
+      DOUBLE PRECISION POS( NDF__MXDIM ) ! Ouput WCS co-ords
+      DOUBLE PRECISION POSIN( NDF__MXDIM ) ! Input pixel co-ords
  
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversion functions

@@ -27,7 +27,7 @@
 *     IWCS = INTEGER (Given)
 *        Pointer to WCS FrameSet.
 *     NDIM = INTEGER (Given)
-*        Number of dimensions of the array whose ststistics are being
+*        Number of dimensions of the array whose statistics are being
 *        displayed.
 *     EL = INTEGER (Given)
 *        Total number of pixels in the array.
@@ -205,7 +205,7 @@
       INTEGER IPIX               ! Index of PIXEL Frame in IWCS
       INTEGER MAP                ! Mapping from PIXEL to current co-ords
       INTEGER NWCS               ! Number of current Frame co-ordinates
-      INTEGER NC1                ! No. of characters in BUF1
+      INTEGER NC1                ! Number of characters in BUF1
       INTEGER NC2                ! No. of characters in WCS text string
  
 *  Internal References:
