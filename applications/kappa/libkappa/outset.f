@@ -4,7 +4,8 @@
 *     OUTSET
 
 *  Purpose:
-*     Mask pixels inside or outside a specified circle in a 2-d NDF.
+*     Mask pixels inside or outside a specified circle in a
+*     two-dimensional NDF.
 
 *  Language:
 *     Starlink Fortran 77
@@ -19,7 +20,7 @@
 *  Description:
 *     This routine assigns a specified value (which may be "bad") to
 *     either the outside or inside of a specified circle within a
-*     specified component of a given 2-dimensional NDF.
+*     specified component of a given two-dimensional NDF.
 
 *  Usage:
 *     outset in out centre diam
@@ -234,7 +235,7 @@
      :                IAT )
       CALL CHR_APPND( ',', TEXT, IAT )
       IAT = IAT + 1
-      CALL CHR_APPND( AST_FORMAT( CURFRM, DAX, 0.5D0 * DIAM, STATUS ), 
+      CALL CHR_APPND( AST_FORMAT( CURFRM, DAX, 0.5D0 * DIAM, STATUS ),
      :                TEXT, IAT )
       CALL CHR_APPND( ' )', TEXT, IAT )
 
@@ -340,7 +341,8 @@
 *  Add a context report if anything went wrong.
       IF( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'OUTSET_ERR', 'OUTSET: Failed to apply a '//
-     :                 'circular mask to a 2-dimensional NDF.', STATUS )
+     :                 'circular mask to a two-dimensional NDF.',
+     :                 STATUS )
       END IF
 
       END

@@ -265,7 +265,7 @@
 *     2009 June 25 (MJC):
 *        Initialise PERVAL for valgrind.
 *     15-APR-2010 (DSB):
-*        Ensure that bad percentile values introduced by KPS1_HMSO<x> are
+*        Ensure that bad percentile values introduced by KPS1_HMSOx are
 *        not included in the value written to output parameter PERVAL.
 *     2010 August 4 (MJC):
 *        Use extended APIs for KPG1_STDSx and KPG1_STFLx.
@@ -542,8 +542,8 @@
 
          END IF
 
-*  Shuffle the percentile values down to remove the bad values introduced
-*  by KPS1_HSMO<x>
+*  Shuffle the percentile values down to remove the bad values
+*  introduced by KPS1_HSMOx.
          J = 1
          DO I = 1, NUMPER
             IF( PERVAL( I ) .NE. VAL__BADD ) THEN

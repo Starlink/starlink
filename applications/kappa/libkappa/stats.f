@@ -48,7 +48,7 @@
 
 *  ADAM Parameters:
 *     CLIP( ) = _REAL (Read)
-*        An optional 1-dimensional array of clipping levels to be
+*        An optional one-dimensional array of clipping levels to be
 *        applied, expressed as standard deviations.  If a null value is
 *        supplied for this parameter (the default), then no iterative
 *        clipping will take place and the statistics computed will
@@ -80,16 +80,16 @@
 *        value is supplied (the default), then no logging of results
 *        will take place. [!]
 *     MAXCOORD( ) = _DOUBLE (Write)
-*        A 1-dimensional array of values giving the WCS co-ordinates of
-*        the centre of the (first) maximum-valued pixel found in the
+*        A one-dimensional array of values giving the WCS co-ordinates
+*        of the centre of the (first) maximum-valued pixel found in the
 *        NDF array.  The number of co-ordinates is equal to the number
 *        of NDF dimensions.
 *     MAXIMUM = _DOUBLE (Write)
 *        The maximum pixel value found in the NDF array.
 *     MAXPOS( ) = _INTEGER (Write)
-*        A 1-dimensional array of pixel indices identifying the (first)
-*        maximum-valued pixel found in the NDF array.  The number of
-*        indices is equal to the number of NDF dimensions.
+*        A one-dimensional array of pixel indices identifying the
+*        (first) maximum-valued pixel found in the NDF array.  The
+*        number of indices is equal to the number of NDF dimensions.
 *     MAXWCS = LITERAL (Write)
 *        The formatted WCS co-ordinates at the maximum pixel value.  The
 *        individual axis values are comma separated.
@@ -99,16 +99,16 @@
 *        The median value of all the valid pixels in the NDF array when
 *        ORDER is TRUE.
 *     MINCOORD( ) = _DOUBLE (Write)
-*        A 1-dimensional array of values giving the WCS co-ordinates of
-*        the centre of the (first) minimum-valued pixel found in the
+*        A one-dimensional array of values giving the WCS co-ordinates
+*        of the centre of the (first) minimum-valued pixel found in the
 *        NDF array.  The number of co-ordinates is equal to the number
 *        of NDF dimensions.
 *     MINIMUM = _DOUBLE (Write)
 *        The minimum pixel value found in the NDF array.
 *     MINPOS( ) = _INTEGER (Write)
-*        A 1-dimensional array of pixel indices identifying the (first)
-*        minimum-valued pixel found in the NDF array.  The number of
-*        indices is equal to the number of NDF dimensions.
+*        A one-dimensional array of pixel indices identifying the
+*        (first) minimum-valued pixel found in the NDF array.  The
+*        number of indices is equal to the number of NDF dimensions.
 *     MINWCS = LITERAL (Write)
 *        The formatted WCS co-ordinates at the minimum pixel value.  The
 *        individual axis values are comma separated.
@@ -225,7 +225,8 @@
 *        Replaced AIF parameter-system calls by the extended PAR
 *        library.
 *     6-AUG-2004 (DSB):
-*        Display current Frame WCS coords at max and min pixel positions.
+*        Display current Frame WCS coords at max and min pixel
+*        positions.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL.
 *     18-MAY-2007 (DSB):
