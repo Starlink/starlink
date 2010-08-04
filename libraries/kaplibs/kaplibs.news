@@ -50,12 +50,12 @@ Version 3.0
       + Generates new histogram between the narrowed limits to yield
         more-accurate statistics.
    - KPG1_FIT1D re-written in C (kpg1Fit1d) for thread-safety.
-   - KPG1_GRAPH: The IPLOT argument is now "Given and Returned" and must
-     be initialised before calling KPG1_GRAPH.
+   - KPG1_GRAPH: The IPLOT argument is now "Given and Returned" and
+     must be initialised before calling KPG1_GRAPH.
    - KPG1_MVBDx added. It modifies an array index (such as produced by
      PDA_QSIAx) to exclude indices that refer to bad data values.
-   - KPG1_SAXAX added. It sets the attributes of an axis in an AST Frame
-     so that they describe an array component of an NDF.
+   - KPG1_SAXAX added. It sets the attributes of an axis in an AST
+     Frame so that they describe an array component of an NDF.
    - KPG_STOSx added.  It calculates accurate order statistics by
      sorting an array by means of an index, returning the median and
      optionally percentiles.
@@ -66,17 +66,18 @@ Version 2.8
    - KPG1_ELGAU added from KAPPA routine KPS1_ELGAU. It finds ellipse
      parameters given the ellipse width in four different directions.
    - KPG1_RDCAT added. It reads a catalogue, exactly like KPG1_RDTAB,
-     except that it allows an arbitrary set of extra columns to be returned,
-     specified via an AST KeyMap.
+     except that it allows an arbitrary set of extra columns to be
+     returned, specified via an AST KeyMap.
    - KPG1_WRCAT added. It writes a catalogue, exactly like KPG1_WRTAB,
-     except that it allows an arbitrary set of extra columns to be supplied,
-     specified via an AST KeyMap.
-   - KPG1_BADBX added. It returns an NDF identifier for the smallest section
-     of a supplied NDF that encloses all the good data values in the NDF.
-   - KPG1_BBOXx added. It obtains the pixel bounding box of a given value
-     within an N-dimensional data array.
-   - KPG1_LIKE added. It obtains a section of an NDF that matches either
-     the pixel or WCS shape of a given template NDF.
+     except that it allows an arbitrary set of extra columns to be
+     supplied, specified via an AST KeyMap.
+   - KPG1_BADBX added. It returns an NDF identifier for the smallest
+     section of a supplied NDF that encloses all the good data values
+     in the NDF.
+   - KPG1_BBOXx added. It obtains the pixel bounding box of a given
+     value within an N-dimensional data array.
+   - KPG1_LIKE added. It obtains a section of an NDF that matches
+     either the pixel or WCS shape of a given template NDF.
    - KPG1_KYMAP can read vectors as well as scalars from a GRP
      group into an AST keyMap.
    - Added KPG1_MXMNX, which provides a single interface to the
@@ -86,7 +87,8 @@ Version 2.8
    - The kaplibs_link script now works without attempting to load ADAM
      symbols.
    - Can now be built as a shared library.
-   - Added KPG1_ASTCMN to provide access to KPG_AST private common block
+   - Added KPG1_ASTCMN to provide access to KPG_AST private common
+     block.
    - The HLP helper routines are no longer part of kaplibs. Use SHL
      library instead.
    - KPG1_SCRSZ no longer present.  Please use ONE_SCRSZ instead.
@@ -99,7 +101,7 @@ Version 2.8
 
 Version 2.7. includes the following changes:
 
-   - New routine LPG_REPLA controls a new option which allows a single NDF
-   to be used as both input and output for an adam task. The default is
-   for this option to be disabled.
+   - New routine LPG_REPLA controls a new option which allows a
+   single NDF to be used as both input and output for an ADAM task.
+   The default is for this option to be disabled.
 
