@@ -928,6 +928,12 @@ libraries/jpl/jplstate
 libraries/jpl/runtesteph
 libraries/jpl/shorteph
 
+libraries/kaplibs/aif/notes
+libraries/kaplibs/ccg/notes
+libraries/kaplibs/fts/notes
+libraries/kaplibs/ira/notes
+libraries/kaplibs/kpg/notes
+
 libraries/kaplibs/ccg/ccg_ad1.f
 libraries/kaplibs/ccg/ccg_ad3.f
 libraries/kaplibs/ccg/ccg_bm1.f
@@ -1090,6 +1096,7 @@ libraries/kaplibs/kpg/kpg1_nbad.f
 libraries/kaplibs/kpg/kpg1_nois.f
 libraries/kaplibs/kpg/kpg1_nthm.f
 libraries/kaplibs/kpg/kpg1_numb.f
+libraries/kaplibs/kpg/kpg_osta.f
 libraries/kaplibs/kpg/kpg1_past.f
 libraries/kaplibs/kpg/kpg1_pois.f
 libraries/kaplibs/kpg/kpg1_pow.f
