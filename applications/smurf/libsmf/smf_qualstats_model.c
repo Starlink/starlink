@@ -80,6 +80,8 @@
 *     2010-07-16 (TIMJ):
 *        Support "nopad" parameter so that we can calculate quality
 *        stats ignoring padding.
+*     2010-08-05 (TIMJ):
+*        Fix nopad logic when more than one subarray is being used.
 
 *  Copyright:
 *     Copyright (C) 2010 University of British Columbia.
@@ -119,7 +121,7 @@
 #include "libsmf/smf.h"
 #include "libsmf/smf_err.h"
 
-#define FUNC_NAME "smf_qualstats_report"
+#define FUNC_NAME "smf_qualstats_model"
 
 void
 smf_qualstats_model( smf_qfam_t qfamily, int nopad, const smfArray *qua, size_t qcount[SMF__NQBITS],
@@ -189,18 +191,20 @@ smf_qualstats_model( smf_qfam_t qfamily, int nopad, const smfArray *qua, size_t 
       smf_qualstats( qfamily, nopad, qual, nbolo, bstride, nslices, tstride, subqcount,
                      NULL, &subnmap, &subnmax, &tpadslices, status );
 
+      /* Remove padding from this number if nopad is true */
+      if (nopad) {
+        nslices -= tpadslices;
+      }
+
       /* add to total number of bolometers and check for length consistency */
       nbolo_tot += nbolo;
       if( !ntslice_ref ) {
-        /* Remove padding from this number if nopad is true */
-        if (nopad) {
-          nslices -= tpadslices;
-        }
         ntslice_ref = nslices;
       } else if( nslices != ntslice_ref ) {
         *status = SAI__ERROR;
-        errRep(" ", FUNC_NAME
-               ": Different subarrays have mismatch in number of time slices.", status);
+        errRepf(" ", FUNC_NAME
+               ": Different subarrays have mismatch in number of time slices (%"
+               DIM_T_FMT " (current) vs %" DIM_T_FMT " (previous))", status, nslices, ntslice_ref);
       }
 
       if (!tpad_ref) {
