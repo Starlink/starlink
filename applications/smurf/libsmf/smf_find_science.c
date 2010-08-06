@@ -141,6 +141,9 @@
 *        API change for smf_flat_calcflat
 *     2010-07-23 (TIMJ):
 *        Trap bad flatfield ramps.
+*     2010-08-05 (TIMJ):
+*        Trap bad flatfields (at least flatfields with less than SMF__MINSTATSAMP
+*        working bolometers).
 
 *  Copyright:
 *     Copyright (C) 2008-2010 Science and Technology Facilities Council.
@@ -385,14 +388,32 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
           }
 
           if (outfile) {
+            /* Cache the filename since it will not be associated with
+               the responsivity image */
+            int oplen = 0;
+            char thisfile[MSG__SZMSG];
+            smf_smfFile_msg( infile->file, "F", 1, "<unknown file>", status );
+            msgLoad( "", "^F", thisfile, sizeof(thisfile), &oplen, status );
+
             smf_close_file( &infile, status );
             infile = outfile;
 
             if (calcflat) {
+              size_t ngood = 0;
               smfData * curresp = NULL;
-              (void)smf_flat_calcflat( MSG__VERB, NULL, "RESIST",
+              ngood = smf_flat_calcflat( MSG__VERB, NULL, "RESIST",
                                        "FLATMETH", "FLATORDER", NULL, "RESPMASK",
                                        "FLATSNR", NULL, infile, &curresp, status );
+
+              if (ngood < SMF__MINSTATSAMP) {
+                smf_smfFile_msg( NULL, "F", 1, thisfile, status );
+                msgOutif( MSG__QUIET, "",
+                          "Flatfield ramp file ^F had no good bolometers. Ignoring.",
+                          status );
+                ffcount--;
+                if (curresp) smf_close_file( &curresp, status );
+                continue;
+              }
 
               /* See if we need to compare responsivity images */
               if ( prevresp && curresp &&
@@ -403,7 +424,6 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
                 double *in2 = NULL;
                 double mean = VAL__BADD;
                 size_t nbolo = (prevresp->dims)[0] * (prevresp->dims)[1];
-                size_t ngood = 0;
                 double *out = NULL;
                 double sigma = VAL__BADD;
                 float clips[] = { 5.0, 5.0 }; /* 5.0 sigma iterative clip */
@@ -431,10 +451,14 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
                 smf_clipped_stats1D( out, 2, clips, 1, nbolo, NULL, 0, 0, &mean, &sigma,
                                      &ngood, status );
 
-                msgOutiff( MSG__DEBUG, "", "Flatfield fast ramp ratio mean = %g +/- %g (%zu bolometers)",
-                           status, mean, sigma, ngood);
+                if (*status == SMF__INSMP) {
+                  errAnnul(status);
+                  smf_smfFile_msg( NULL, "F", 1, thisfile, status );
+                  msgOutiff( MSG__QUIET, "",
+                            "Flatfield ramp ratio with second file ^F had too few bolometers (%zu < %d). Not clipping ratio.",
+                             status, ngood, SMF__MINSTATSAMP );
 
-                if (*status == SAI__OK && mean != VAL__BADD && sigma != VAL__BADD && prevflat->da) {
+                } else if (*status == SAI__OK && mean != VAL__BADD && sigma != VAL__BADD && prevflat->da) {
                   /* Now flag the flatfield as bad for bolometers that have changed
                      more than N sigma from the mean (the mean should be 1.0 within errors) */
                   double sigclip = 3.0 * sigma;  /* 3 sigma clip */
@@ -442,6 +466,9 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
                   double thrhi = mean + sigclip;
                   size_t nmasked = 0;
                   double *flatcal = prevflat->da->flatcal;
+
+                  msgOutiff( MSG__DEBUG, "", "Flatfield fast ramp ratio mean = %g +/- %g (%zu bolometers)",
+                             status, mean, sigma, ngood);
 
                   /* we can just set the first slice of the flatcal to bad. That should
                      be enough to disable the entire bolometer. We have just read these
