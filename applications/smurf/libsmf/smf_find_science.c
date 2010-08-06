@@ -379,6 +379,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
           smf_flat_fastflat( infile, &outfile, status );
           if (*status == SMF__BADFLAT) {
             errAnnul( status );
+            if (outfile) smf_close_file( &outfile, status );
             smf_smfFile_msg( infile->file, "F", 1, "<unknown file>", status );
             msgOutif( MSG__QUIET, "",
                       "Flatfield ramp file ^F could not be processed. Ignoring.",
@@ -412,6 +413,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
                           status );
                 ffcount--;
                 if (curresp) smf_close_file( &curresp, status );
+                if (infile) smf_close_file( &infile, status );
                 continue;
               }
 
