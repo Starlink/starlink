@@ -59,11 +59,13 @@
 *     ISTATC( 3 ) = INTEGER (Returned)
 *        The integer statistics after clipping derived from the valid
 *        pixel values in DATA.  The attributions of the elements are
-*        the same as for argument DSTAT.
+*        the same as for argument ISTAT.  If NCLIP is zero, the
+*        array will contain the same values as ISTAT.
 *     DSTATC( 7 ) = DOUBLE PRECISION (Returned)
 *        The floating-point statistics after clipping derived from the
 *        valid pixel values in DATA.  The attributions of the elements
-*        are the same as for argument DSTAT.
+*        are the same as for argument DSTAT.  If NCLIP is zero, the
+*        array will contain the same values as DSTAT.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
  
@@ -114,6 +116,9 @@
 *     2010 August 4 (MJC):
 *        Check the second moment is not zero when computing the
 *        skewness and kurtosis.
+*     2010 August 6 (MJC):
+*        Always store statistics to the returned clipped-statistics 
+*        arrays.
 *     {enter_further_changes_here}
  
 *  Bugs:
@@ -352,18 +357,18 @@
             DSTAT( 5 ) = STDEV
             DSTAT( 6 ) = SKEW
             DSTAT( 7 ) = KURT
-         ELSE
-            ISTATC( 1 ) = NGOOD
-            ISTATC( 2 ) = IMIN
-            DSTATC( 1 ) = DMIN
-            ISTATC( 3 ) = IMAX
-            DSTATC( 2 ) = DMAX
-            DSTATC( 3 ) = SUM
-            DSTATC( 4 ) = MOMENT( 1 )
-            DSTATC( 5 ) = STDEV
-            DSTATC( 6 ) = SKEW
-            DSTATC( 7 ) = KURT
          END IF
+
+         ISTATC( 1 ) = NGOOD
+         ISTATC( 2 ) = IMIN
+         DSTATC( 1 ) = DMIN
+         ISTATC( 3 ) = IMAX
+         DSTATC( 2 ) = DMAX
+         DSTATC( 3 ) = SUM
+         DSTATC( 4 ) = MOMENT( 1 )
+         DSTATC( 5 ) = STDEV
+         DSTATC( 6 ) = SKEW
+         DSTATC( 7 ) = KURT
  
 *  Quit performing clipping iterations if there are no valid pixels
 *  left.
