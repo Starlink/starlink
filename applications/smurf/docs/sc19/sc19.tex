@@ -2353,16 +2353,6 @@ unfortunately).
 \end{verbatim}
 \end{myquote}
 
-\begin{figure}
-\begin{center}
-\includegraphics[width=0.45\linewidth]{sc19_tracking_actual}
-\hspace{0.03\linewidth}
-\includegraphics[width=0.45\linewidth]{sc19_tracking_demand}
-\caption{\textsl{left:} Actual tracking; \textsl{Right:} Demanded tracking }
-\label{fig:tracking}
-\end{center}
-\end{figure}
-
 \subsection{\xlabel{Tracking}Telescope tracking}
 \label{sec:tracking}
 
@@ -2383,6 +2373,16 @@ By contrast the demanded tracking can be plotted using
 \texttt{x~=~TCS\_TR\_DC1, y~=~TCS\_TR\_DC2}. The resulting figures are
 shown in Fig.~\ref{fig:tracking}.
 
+\begin{figure}[ht]
+\begin{center}
+\includegraphics[width=0.45\linewidth]{sc19_tracking_actual}
+\hspace{0.03\linewidth}
+\includegraphics[width=0.45\linewidth]{sc19_tracking_demand}
+\caption{\textsl{left:} Actual tracking; \textsl{Right:} Demanded tracking }
+\label{fig:tracking}
+\end{center}
+\end{figure}
+
 Obviously, for this observation the telescope failed to follow the
 demanded daisy pattern due to its acceleration limits. This failure to
 follow the demanded daisy pattern is often seen at higher elevations
@@ -2398,24 +2398,6 @@ across the field. In particular the diagonal pattern can result in a
 in DIMM. Switching to \texttt{dimmconfig\_bright\_compact.lis}
 can help.
 
-\begin{figure}
-\begin{center}
-\includegraphics[width=0.45\linewidth]{sc19_con_collapse}
-\caption{Mean signal in time-series }
-\label{fig:concollapse}
-\end{center}
-\end{figure}
-
-\begin{figure}
-\begin{center}
-\includegraphics[width=0.45\linewidth]{sc19_conbsl_collapse}
-\hspace{0.03\linewidth}
-\includegraphics[width=0.45\linewidth]{sc19_bsl_histogram}
-\caption{\textsl{left:} Mean signal in DC-removed time-series;
-         \textsl{Right:} Histogram of values in DC-removed time series }
-\label{fig:conbslcollapse}
-\end{center}
-\end{figure}
 
 \subsection{\xlabel{flatfield2}Flat field}
 \label{sec:flatfield2}
@@ -2439,6 +2421,14 @@ the s8d array used during the S2SRO: a number of \textsl{dead} columns
 can be seen as well as regions around the perimeter where the thermal
 gradient caused problems biasing bolometers.
 
+\begin{figure}[ht]
+\begin{center}
+\includegraphics[width=0.45\linewidth]{sc19_con_collapse}
+\caption{Mean signal in time-series }
+\label{fig:concollapse}
+\end{center}
+\end{figure}
+
 The range of the mean value in the map is very large: from $-$28 to
 30. An inspection of the cube shows that much of this is cwaused by
 differing DC levels across the bolometers. The DC term can be removed
@@ -2459,13 +2449,31 @@ spikethresh = 0
 \end{verbatim}
 \end{myquote}
 
-
 Collapsing the time-series cube again now results in a mean in a range
 of $-$3.0e-13 to 2.4e-13 as shown in Fig.~\ref{fig:conbslcollapse}. A
 histogram of the DC-removed data shows that the majority of the
 time-series data now are in a range of $-$0.1 to 0.1.
 
-\begin{figure}
+\begin{figure}[ht]
+\begin{center}
+\includegraphics[width=0.45\linewidth]{sc19_conbsl_collapse}
+\hspace{0.03\linewidth}
+\includegraphics[width=0.45\linewidth]{sc19_bsl_histogram}
+\caption{\textsl{left:} Mean signal in DC-removed time-series;
+         \textsl{Right:} Histogram of values in DC-removed time series }
+\label{fig:conbslcollapse}
+\end{center}
+\end{figure}
+
+\subsection{\xlabel{spikesteps}Spikes and Steps}
+\label{sec:spikesteps}
+
+However, there are still significant outliers: the minimum and maximum
+pixel values are \about8.1 and 3.4, respectively. Using \gaia\ to examine
+the time series in the DC-subtracted cube reveals remaining data issues as
+shown in the Fig.~\ref{fig:timeseries}.
+
+\begin{figure}[ht]
 \begin{center}
 \includegraphics[width=1.0\linewidth]{sc19_timeseries}
 \caption{Example time series in the DC-corrected data set showing
@@ -2488,14 +2496,6 @@ spikes.
 \label{fig:timeseries}
 \end{center}
 \end{figure}
-
-\subsection{\xlabel{spikesteps}Spikes and Steps}
-\label{sec:spikesteps}
-
-However, there are still significant outliers: the minimum and maximum
-pixel values are \about8.1 and 3.4, respectively. Using \gaia\ to examine
-the time series in the DC-subtracted cube reveals remaining data issues as
-shown in the Fig.~\ref{fig:timeseries}.
 
 \clean\ is quite efficient in finding steps, but its spike removal is
 of limited effectiveness in the presence of a strong common-mode
@@ -2529,7 +2529,7 @@ to be flagged. \clean\ completely flagged the two time series on the
 bottom row as bad. It did an excellent job correcting for the steps in
 the middle row time series, as shown in Fig.\ \ref{fig:stepcorrectcf}.
 
-\begin{figure}
+\begin{figure}[ht]
 \begin{center}
 \includegraphics[width=0.45\linewidth]{sc19_sc2clean_13_31}
 \hspace{0.03\linewidth}
@@ -2559,17 +2559,6 @@ series.
 export the models for further inspection. The common-mode is captured
 by the \texttt{COM}, \texttt{GAI}, and \texttt{FLT} models as
 \texttt{GAI*COM+FLT}.
-
-\begin{figure}
-\begin{center}
-\includegraphics[width=1.0\linewidth]{sc19_timeseries2}
-\caption{Example time series in the block-median common-mode
-subtracted data set high-lighting intrinsic noise issues that can be
-seen in bolometers. The top-left time series is the same as the
-top-left time series in figure Fig.~\ref{fig:timeseries}}
-\label{fig:timeseries2}
-\end{center}
-\end{figure}
 
 \subsubsection{\xlabel{method1}Method 1}
 \label{sec:method1}
@@ -2603,6 +2592,17 @@ e.g.\ 120\,arcsec/sec. Remember though that the telescope spends a large
 fraction of the time at lower speeds either accelerating or
 decelerating. In fact, a block-size of 200 largely removed the signal
 from CRL\,618 from this data set!
+
+\begin{figure}[ht]
+\begin{center}
+\includegraphics[width=1.0\linewidth]{sc19_timeseries2}
+\caption{Example time series in the block-median common-mode
+subtracted data set high-lighting intrinsic noise issues that can be
+seen in bolometers. The top-left time series is the same as the
+top-left time series in figure Fig.~\ref{fig:timeseries}}
+\label{fig:timeseries2}
+\end{center}
+\end{figure}
 
 An inspection of resulting file shows very flat time series. The
 top-left panel in the Fig.~\ref{fig:timeseries2} shows a typical
@@ -2689,16 +2689,6 @@ gets further optimized):
   accounted for sufficiently.
 \end{itemize}
 
-\begin{figure}
-\begin{center}
-\includegraphics[width=0.45\linewidth]{sc19_dimm_common_mode}
-\caption{Example time series (white) and the derived
-common-mode signal (red).  This time series is the same as the
-top-left time serie in Figs.~\ref{fig:timeseries} and \ref{fig:timeseries2}}
-\label{fig:dimmcommonmode}
-\end{center}
-\end{figure}
-
 For example, for these observations of CRL\,618 modify the
 \texttt{dimmconfig\_bright\_compact.lis} configuration file as
 follows. Given that, at the time of writing, the FLT model apodizes,
@@ -2738,6 +2728,16 @@ subtracted cube \texttt{(\_astres)}.
 \textsl{The common-mode reduction script is appended at the end of this document.}
 \end{myquote}
 
+\begin{figure}[ht]
+\begin{center}
+\includegraphics[width=0.45\linewidth]{sc19_dimm_common_mode}
+\caption{Example time series (white) and the derived
+common-mode signal (red).  This time series is the same as the
+top-left time serie in Figs.~\ref{fig:timeseries} and \ref{fig:timeseries2}}
+\label{fig:dimmcommonmode}
+\end{center}
+\end{figure}
+
 Fig.~\ref{fig:dimmcommonmode} shows a typical time series with the
 fitted common-mode signal.
 
@@ -2752,7 +2752,7 @@ indicates that for the S2SRO data the flat field \textsl{in practice}
 was in general not very accurate or stable probably due to one or more
 of the aforementioned reasons.
 
-\begin{figure}
+\begin{figure}[ht]
 \begin{center}
 \includegraphics[width=0.45\linewidth]{sc19_gain_histogram}
 \caption{Histogram of the bolometer gains as derived by the DIMM
@@ -2762,22 +2762,6 @@ mode and not for the subsequent gridding into a map.}
 \label{fig:gainhistogram}
 \end{center}
 \end{figure}
-
-
-\begin{figure}
-\begin{center}
-\includegraphics[width=0.30\linewidth]{sc19_conbsl_gainmsk}
-\hspace{0.03\linewidth}
-\includegraphics[width=0.30\linewidth]{sc19_conbsl_astres_medianmsk}
-\hspace{0.03\linewidth}
-\includegraphics[width=0.30\linewidth]{sc19_conbsl_astres_rmsmsk}
-\caption{\textsl{Left:} Gain image: black $<$ 0.75, white $>$ 1.25;
-\textsl{Middle:} Common-mode subtracted median: black $< -$5e-04, white $>$ 5e-04
-\textsl{Right:} Common-mode subtracted rms: white $>$ 6e-03 (twice the median).}
-\label{fig:masks}
-\end{center}
-\end{figure}
-
 
 For a further analysis one can also e.g.\ collapse the common-mode
 subtracted cube over the time-series to calculate the median and rms:
@@ -2796,6 +2780,20 @@ bolometers falling within a range of $-$5e-04 to 5e-04. The median
 \textsl{rms} is 3e-03 with a maximum of 14e-03 and 578 bolometers
 below a rms of 6e-03 (twice the median).  The three panels in
 Fig.~\ref{fig:masks} summarize this information.
+
+\begin{figure}[ht]
+\begin{center}
+\includegraphics[width=0.30\linewidth]{sc19_conbsl_gainmsk}
+\hspace{0.03\linewidth}
+\includegraphics[width=0.30\linewidth]{sc19_conbsl_astres_medianmsk}
+\hspace{0.03\linewidth}
+\includegraphics[width=0.30\linewidth]{sc19_conbsl_astres_rmsmsk}
+\caption{\textsl{Left:} Gain image: black $<$ 0.75, white $>$ 1.25;
+\textsl{Middle:} Common-mode subtracted median: black $< -$5e-04, white $>$ 5e-04
+\textsl{Right:} Common-mode subtracted rms: white $>$ 6e-03 (twice the median).}
+\label{fig:masks}
+\end{center}
+\end{figure}
 
 \begin{myquote}
 \begin{verbatim}
@@ -2827,7 +2825,7 @@ presentation, further development of the mapping algorithms will be
 needed to optimally handle SCUBA-2 data and produce the best possible
 maps.
 
-\begin{figure}
+\begin{figure}[ht]
 \begin{center}
 \includegraphics[width=0.30\linewidth]{sc19_conbsl_astres_19_19}
 \hspace{0.03\linewidth}
@@ -2849,7 +2847,7 @@ all the maps in Fig.\ \ref{fig:samplemaps} are presented with the same
 grey-scale stretch and show a 180 $\times$ 180 arcsec region around
 CRL\,618.
 
-\begin{figure}
+\begin{figure}[ht]
 \begin{center}
 \includegraphics[width=0.45\linewidth]{sc19_con_smallmap}
 \hspace{0.03\linewidth}
