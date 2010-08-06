@@ -299,6 +299,7 @@
 \newcommand{\thresh}{\xref{\task{thresh}}{sun95}{THRESH}}
 \newcommand{\setbb}{\xref{\task{setbb}}{sun95}{SETBB}}
 \newcommand{\beamfit}{\xref{\task{beamfit}}{sun95}{BEAMFIT}}
+\newcommand{\autophotom}{\xref{\task{autophotom}}{sun95}{AUTOPHOTOM}}
 
 \newcommand{\fitslist}{\xref{\task{fitslist}}{sun95}{FITSLIST}}
 \newcommand{\fitsedit}{\xref{\task{fitsedit}}{sun95}{FITSEDIT}}
@@ -1044,7 +1045,7 @@ frequency of 0.5\,Hz.
 For the purpose of viewing the full effects of the apodization,
 padding and filtering, we also disable the QUALITY flags (see
 Section~\ref{sec:quality} for further details) using the \Kappa\ task
-\setbb),
+\setbb,
 
 \begin{myquote}
 \begin{verbatim}
@@ -1141,12 +1142,12 @@ close to 1\,Hz.
 \label{sec:quality}
 
 NDF files manipulated by \smurf\ use the standard \starlink\ named
-Quality mechanism (see discussion in \xref{Masking, Bad Values, and
-  Quality}{sun95}{se_masking}). Quality itself is stored as an 8-bit
-integer for each sample in a data file, and each bit can reflect a
-different condition. For example, the following will indicate the
-number of samples flagged by \clean\ when producing `clean4.sdf' in
-the previous example:
+Quality mechanism (see discussion of \xref{Masking, Bad Values, and
+  Quality}{sun95}{se_masking} in \xref{SUN/95}{sun95}{}). Quality
+itself is stored as an 8-bit integer for each sample in a data file,
+and each bit can reflect a different condition. For example, the
+following will indicate the number of samples flagged by \clean\ when
+producing `clean4.sdf' in the previous example:
 
 \begin{myquote}
 \begin{verbatim}
@@ -1225,8 +1226,8 @@ permanently convert samples with given quality bits to a {\em magic\/} or {\em
 %
 will set all of the samples flagged with quality \texttt{PAD} to the
 magic value. This corresponds to the first and last 1000 time
-slices. `badmasked' is subsequently viewed with \gaia, none of those portions
-of the data will be visible.
+slices. When `badmasked.sdf' is subsequently viewed with \gaia, none
+of those portions of the data will be visible.
 
 \section{\xlabel{maps}Dynamic Iterative Map-Making}
 \label{sec:maps}
@@ -1238,7 +1239,7 @@ the end, we can instead do everything at once using the
 The DIMM is enabled using the \texttt{method=iterate} switch to the
 \makemap\ task. In the following example we will produce a map of
 Uranus using the test data supplied with this \starlink\
-distribution. All off the settings for the DIMM are stored in
+distribution. All of the settings for the DIMM are stored in
 configuration files.  In this example we will use one of the examples
 that are installed in the \starlink\ tree,
 `\texttt{dimmconfig.lis}'. For an overview of the different default
@@ -1367,8 +1368,9 @@ Total samples available from all chunks: 7606521 (830.406 bolos)
 \end{myquote}
 
 Note that compared to the first iteration, the total number of samples
-with good QUALITY has dropped from 7664503 to 7606521 (about 0.8 per cent) as
-additional samples were flagged in each iteration.
+with good QUALITY has dropped from 7664503 to 7606521 (about an 0.8
+per cent decrease) as additional samples were flagged in each
+iteration.
 
 \begin{figure}
 \begin{center}
@@ -1551,12 +1553,12 @@ project:
   constrain much of the map to precisely zero for all but the last of
   5 iterations. This helps with map convergence, and is a reasonable
   prior for a blank-field. Normally the map would then be processed
-  using a matched-filter (see Section~\ref{sec:cosmology}).
+  using a matched filter (see Section~\ref{sec:cosmology}).
 
 \item[\texttt{dimmconfig\_bright\_compact.lis}]\quad This
   configuration is aimed at reducing maps of bright, compact sources
   that are isolated near the centre of the map. The number of
-  iterations are increased, and as in
+  iterations is increased, and as in
   \texttt{dimmconfig\_blank\_field.lis}, the
   \texttt{ast.zero\_lowhits} and \texttt{ast.zero\_notlast} parameters
   are used to constrain the map edges to zero for all but the final
@@ -1665,7 +1667,7 @@ and
 
 The JCMT water vapour radiometer (WVM) is now calibrated to provide a
 higher-frequency opacity value which has been scaled to
-$\tau_{225}$. The WVM (not the CSO 225GHz tipper) data were used for
+$\tau_{225}$. The WVM (not the CSO 225\,GHz tipper) data were used for
 this analysis.
 
 The new filter opacities as determined from skydip data are as
@@ -1727,14 +1729,16 @@ calibrators, the FCFs and NEFDs have been calculated as follows:
   map, crops it, and runs background removal. Surface fitting
   parameters are changeable in the \picard\ parameter file.}
 \item{It then runs the \Kappa\ \beamfit\ task on the specified point
-  source. Flux densities for calibrators such as CRL\,618, HL\,Tau, Uranus
-  and Mars are already hard-coded into the recipe. If a source of
-  known flux density is not included in the recipe, then you can add a
-  line to your parameter file with its value: \texttt{FLUX\_450 =
-    0.050} and \texttt{FLUX\_850 = 0.005} (where the values are in Jy)
-  for example. The \beamfit\ task will calculate the peak flux
-  density, the integrated flux density over a requested aperture
-  (30\,arcsec radius default), and the FWHM etc.}
+  source. The \beamfit\ task will estimate the peak (uncalibrated)
+  flux density and the FWHM. The integrated flux density within a
+  given aperture (30\,arcsec radius default) is calculated using
+  \Kappa\ \autophotom. Flux densities for calibrators such as Uranus,
+  Mars, CRL\,618, CRL\,2688 and HL\,Tau are already known to
+  \picard. To derive an FCF for other sources of known flux densities,
+  the fluxes can be added to the parameter file with the source name
+  (in upper case, spaces removed): \texttt{FLUX\_450.MYSRC = 0.050}
+  and \texttt{FLUX\_850.MYSRC = 0.005} (where the values are in Jy),
+  for example. }
 
   An example of a \picard\ parameter file (used for reduction of the
   850\micron\ calibrators) is shown here:
@@ -1744,15 +1748,11 @@ calibrators, the FCFs and NEFDs have been calculated as follows:
 [SCUBA2_FCFNEFD]
 APERTURE_RADIUS=30.0
 AUTOPHOTOM=1
-BACKGROUND_FITMETHOD=fitsurface
 MASK_SOURCE=1
+BACKGROUND_FITMETHOD=fitsurface
 FITSURFACE_FITTYPE=spline
 FITSURFACE_FITPAR=4
-FITSURFACE_KEEPSURFACE=1
 USEFCF=1
-VERBOSE=1
-FLUX_850.HLTAU=2.36
-FLUX_850.CRL2688=6.4
 FLUX_850.ARP220=0.688
 FLUX_850.ALPHAORI=0.629
 FLUX_850.TWHYDRAE=1.37
@@ -1795,7 +1795,7 @@ The measured peak signal here is derived from the Gaussian fit of
 and we have found this number to be somewhat unreliable, particularly
 at 450\micron. \fcfb\ is the number to multiply your
 map by when you wish to measure absolute peak flux densities of
-discrete un-resolved point sources. The peak value in the map is then
+discrete unresolved point sources. The peak value in the map is then
 the total flux density of the point source. You should not integrate
 over the source after calibrating in this fashion, as this will give
 an overestimate of the flux density.
@@ -1845,11 +1845,11 @@ for calibration.
 \subsection{\xlabel{Cosmology}Deep point source maps}
 \label{sec:cosmology}
 
-Many deep SCUBA-2 observations are designed to detect un-resolved
+Many deep SCUBA-2 observations are designed to detect unresolved
 point sources. In this example we work through the reduction of a
 cosmology survey, in which targets are high-redshift star-forming
 galaxies (although the procedure is applicable to any observation of
-faint, un-resolved objects).  Since the surface density of these
+faint, unresolved objects).  Since the surface density of these
 distant sources falls rapidly with increasing brightness, most objects
 are, on average, only slightly brighter than the extra-galactic
 confusion limit -- the flux density below which the surface density of
@@ -1953,7 +1953,7 @@ the noise. Presently $P$ is simply modeled as an ideal Gaussian
 with a FWHM set to the diffraction limit of the telescope.
 
 However, since there is large-scale (and therefore correlated from
-pixel to pixel) noise, the script also has an additional step. It
+pixel to pixel) noise, the recipe also has an additional step. It
 first smooths the map by cross-correlating with a larger Gaussian
 kernel to estimate the background, and then subtracts it from the
 image. The same operation is also applied to the PSF to estimate the
@@ -1971,7 +1971,7 @@ SMOOTH_FWHM = 15
 %
 where \texttt{SMOOTH\_FWHM = 15} indicates that the background should
 be estimated by first smoothing the map and PSF with a 15\,arcsec FWHM
-Gaussian. Next, the script is executed as follows:
+Gaussian. Next, the recipe is executed as follows:
 %
 \begin{myquote}
 \begin{verbatim}
@@ -1980,7 +1980,7 @@ Gaussian. Next, the script is executed as follows:
 \end{myquote}
 %
 The output of this operation is a smoothed image called
-\texttt{uranus\_mf.sdf}. By default, the script automatically
+\texttt{uranus\_mf.sdf}. By default, the recipe automatically
 normalizes the output such that the peak flux densities of point
 sources are conserved. Note that the accuracy of this normalization
 depends on how closely the real PSF matches the 7.5\,arcsec and
@@ -1997,7 +1997,7 @@ parameter).
   \texttt{SCUBA2\_MATCHED\_FILTER}, suppressing scales larger than
   15\,arcsec. \textbf{Left:} filtered map of Uranus from
   Fig.~\ref{fig:itermap}. \textbf{Right:} filtered version of deep
-  Cosmology map from left-hand panel of Fig.~\ref{fig:cosmomap}.}
+  cosmology map from left-hand panel of Fig.~\ref{fig:cosmomap}.}
 \label{fig:cosmo_filt}
 \end{center}
 \end{figure}
@@ -2163,7 +2163,7 @@ method=iterate config=^$STARLINK_DIR/share/smurf/dimmconfig.lis
   negative bowling around the strong sources is apparent. \textbf{Bottom row:}
   Orion22\_back.sdf (left) and Orion23\_back.sdf (right). The top row
   maps following processing with the \picard\ recipe \drrecipe{REMOVE\_BACKGROUND}
-  using \findback\ with a box size of 30\,arcsec.}
+  using \findback\ with a box size of 30 pixels (120\,arcsec).}
 \label{fig:orionmakemap}
 \end{center}
 \end{figure}
