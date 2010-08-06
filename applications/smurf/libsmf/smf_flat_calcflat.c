@@ -56,6 +56,9 @@
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
+*  Returned Value:
+*     size_t = number of bolometers with good flatfields.
+
 *  Description:
 *     Calculate the flatfield from the supplied data. The parameter names are provided
 *     along with the merged flatfield data. Some parameters can be NULL.
