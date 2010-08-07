@@ -22,8 +22,9 @@
 *     indata = const smfData * (Given)
 *        Reference science observation to choose flatfield.
 *     flatidx = size_t * (Returned)
-*        Index in smfArray for the closest previous flatfield that could be
-*        associated with indata. SMF__BADIDX if none can be found.
+*        Index in smfArray for the closest previous (or later)
+*        flatfield that could be associated with indata.
+*        SMF__BADIDX if none can be found.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -35,7 +36,8 @@
 *     Uses the OBSIDSS and SUBARRAY information to associate a flatfield ramp with
 *     the science data. Does not yet use discrete flatfields from previous
 *     observations. Assumes that the flatfield at the start of the observation
-*     is the relevant one and does not use the ending flatfield ramp.
+*     is the relevant one but if one can not be find it will use a ramp that
+*     immediately follows the sequence.
 
 *  Authors:
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -44,6 +46,8 @@
 *  History:
 *     2010-03-15 (TIMJ):
 *        Initial version.
+*     2010-08-06 (TIMJ):
+*        Allow following flatfield ramps to be used.
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -97,7 +101,9 @@ void smf_choose_flat( const smfArray *flats, const smfData *indata,
   smf_find_subarray( indata->hdr, NULL, (size_t)0, &refsubnum, status );
 
   /* Loop through all the flats looking for ones that match
-     subarray and have an earlier sequence counter. */
+     subarray and have an earlier sequence counter. If we only find a
+     later sequence we use that but only if it is adjacent.
+     Assume that the flatfields are in date order. */
   for (i=0; i< flats->ndat; i++) {
     smfData *thisflat = (flats->sdata)[i];
     int thissubnum;
@@ -115,7 +121,10 @@ void smf_choose_flat( const smfArray *flats, const smfData *indata,
         /* Valid previous flat */
         *flatidx = i;
       } else if (seqdiff < 0 ) {
-        /* Valid next flat but we do not want it */
+        /* Valid next flat which we will want to use if we could not
+           find a previous match. Only select it if it is from the
+           sequence that follows immediately afterwards. */
+        if (seqdiff == -1) *flatidx = i;
       } else if (seqdiff == 0) {
         /* should not be possible */
         if (*status == SAI__OK) {
