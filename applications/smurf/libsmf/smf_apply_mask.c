@@ -292,7 +292,7 @@ void smf_apply_mask( smfData *indata,
 
   } else {
     msgOutif(MSG__QUIET, " ",
-             "Warning: File ^FILE has no suitable dark frame",
+             "Warning: File ^FILE has no suitable bad bolometer mask",
              status);
   }
 
