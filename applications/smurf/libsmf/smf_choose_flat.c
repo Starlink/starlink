@@ -100,6 +100,9 @@ void smf_choose_flat( const smfArray *flats, const smfData *indata,
   smf_find_seqcount( indata->hdr, &refseq, status );
   smf_find_subarray( indata->hdr, NULL, (size_t)0, &refsubnum, status );
 
+  msgOutiff( MSG__DEBUG, "", "Looking for a flatfield for %s subarray %d (seq=%d)",
+             status, indata->hdr->obsidss, refsubnum, refseq);
+
   /* Loop through all the flats looking for ones that match
      subarray and have an earlier sequence counter. If we only find a
      later sequence we use that but only if it is adjacent.
@@ -109,6 +112,9 @@ void smf_choose_flat( const smfArray *flats, const smfData *indata,
     int thissubnum;
     smf_find_subarray( thisflat->hdr, NULL, (size_t)0, &thissubnum, status );
 
+    msgOutiff( MSG__DEBUG, "", "Checking against flatfield %s subarray %d",
+               status, thisflat->hdr->obsidss, thissubnum);
+
     /* see if we even need to look at the obsidss */
     if (thissubnum == refsubnum &&
         strcmp( indata->hdr->obsidss, thisflat->hdr->obsidss ) == 0 ) {
@@ -116,6 +122,9 @@ void smf_choose_flat( const smfArray *flats, const smfData *indata,
       int seqdiff;
       smf_find_seqcount( thisflat->hdr, &thisseq, status );
       seqdiff = refseq - thisseq;
+
+      msgOutiff( MSG__DEBUG, "", "Matching flatfield has sequence count %d cf %d",
+                 status, thisseq, refseq );
 
       if ( seqdiff > 0 ) {
         /* Valid previous flat */
@@ -142,7 +151,8 @@ void smf_choose_flat( const smfArray *flats, const smfData *indata,
   }
 
   if (*flatidx == SMF__BADIDX) {
-    msgOutif( MSG__VERB, " ","Unable to find any prior flatfield", status );
+    msgOutiff( MSG__VERB, " ","Unable to find any prior flatfield for %s",
+               status, indata->hdr->obsidss );
   }
 
 }
