@@ -81,7 +81,7 @@
 void smf_lock_data( smfData *data, int lock, int *status ){
 
 /* Local Variables */
-   int subnum;
+   sc2ast_subarray_t subnum;
    smfHead *hdr = NULL;
    sc2astCache *cache1 = NULL;
    smfCreateLutwcsCache *cache2 = NULL;
@@ -104,7 +104,7 @@ void smf_lock_data( smfData *data, int lock, int *status ){
 /* Cache used by sc2ast_createwcs */
          cache1 = hdr->cache1;
          if( cache1 ) {
-            for( subnum = 0; subnum < 8; subnum++ ) {
+            for( subnum = 0; subnum < SC2AST__NSUB; subnum++ ) {
                if( cache1->map[ subnum ] ) astLock( cache1->map[ subnum ], 0 );
                if( cache1->frameset[ subnum ] ) astLock( cache1->frameset[ subnum ], 0 );
             }
@@ -144,7 +144,7 @@ void smf_lock_data( smfData *data, int lock, int *status ){
 /* Cache used by sc2ast_createwcs */
          cache1 = hdr->cache1;
          if( cache1 ) {
-            for( subnum = 0; subnum < 8; subnum++ ) {
+            for( subnum = 0; subnum < SC2AST__NSUB; subnum++ ) {
                if( cache1->map[ subnum ] ) astUnlock( cache1->map[ subnum ], 1 );
                if( cache1->frameset[ subnum ] ) astUnlock( cache1->frameset[ subnum ], 1 );
             }

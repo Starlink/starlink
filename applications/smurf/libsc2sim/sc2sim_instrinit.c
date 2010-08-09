@@ -170,7 +170,7 @@ void sc2sim_instrinit( struct sc2sim_obs_struct *inx,
   double samptime;               /* sample time in sec */
   double startatm;               /* mean expected atmospheric signal (pW) */
   JCMTState state;               /* Telescope state at one time slice */
-  int subnum;                    /* subarray number */
+  sc2ast_subarray_t subnum;      /* subarray number */
   double telpos[3];              /* Geodetic location of the telescope */
 
   /* Check status */

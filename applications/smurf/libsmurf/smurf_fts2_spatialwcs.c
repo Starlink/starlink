@@ -136,11 +136,11 @@ void smurf_fts2_spatialwcs(int *status)
     astBegin;
 
     // Create a 2-D WCS
-    int subnum;
+    sc2ast_subarray_t subnum;
     smf_find_subarray(srcData->hdr, NULL, 0, &subnum, status);
 
     AstFrameSet* gridfset = NULL;
-    if(subnum == s8c || subnum == s8d || subnum == s4a || subnum == s4b)
+    if(subnum == S8C || subnum == S8D || subnum == S4A || subnum == S4B)
     {
       fts2ast_createwcs(subnum, srcData->hdr->state, srcData->hdr->instap, srcData->hdr->telpos, &gridfset, status);
     }

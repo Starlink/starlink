@@ -372,7 +372,7 @@ void sc2sim_ndfwrdata
                                      observation */
   int seqstart;                   /* RTS index of first frame in output image */
   JCMTState state;                /* Dummy JCMT state structure for creating WCS */
-  int subnum;                     /* sub array index */
+  sc2ast_subarray_t subnum;       /* sub array index */
   AstFrameSet *wcs;               /* WCS frameset for output image */
   char weightsname[SZFITSCARD];   /* Name of weights file for DREAM
                                      reconstruction */

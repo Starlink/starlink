@@ -3364,7 +3364,7 @@ int *status                 /* global status (given and returned) */
 void sc2store_wrtstream
 (
 const char filename[],      /* output file name (given) */
-int subnum,                 /* Sub-array number (given) */
+sc2ast_subarray_t subnum,   /* Sub-array number (given) */
 size_t nrec,                /* number of FITS header records (given) */
 const char *fitsrec,        /* contiguous 80-byte FITS records (given) */
 size_t colsize,             /* number of bolometers in column (given) */
@@ -3584,7 +3584,7 @@ int *status                 /* global status (given and returned) */
 
 /*+ sc2store_timeWcs:  Calculate frameset for time series. */
 
-AstFrameSet *sc2store_timeWcs( int subnum, int ntime, int use_tlut,
+AstFrameSet *sc2store_timeWcs( sc2ast_subarray_t subnum, int ntime, int use_tlut,
                                const SC2STORETelpar* telpar,
                                const double times[], int * status ){
 
@@ -3596,7 +3596,7 @@ AstFrameSet *sc2store_timeWcs( int subnum, int ntime, int use_tlut,
 *     Calculate frameset for time series.
 
 *  Prototype:
-*     AstFrameSet *sc2store_timeWcs( int subnum, int ntime,
+*     AstFrameSet *sc2store_timeWcs( sc2ast_subarray_t subnum, int ntime,
 *                const SC2STORETelpar * telpar,const double times[],
 *                int * status );
 
@@ -3610,7 +3610,7 @@ AstFrameSet *sc2store_timeWcs( int subnum, int ntime, int use_tlut,
 *     containing the Mapping from pixel to focal plane arcsecond offsets.
 
 *  Parameters:
-*     subnum = int (Given)
+*     subnum = sc2ast_subarray_t (Given)
 *        Subarray index
 *     ntime = int (Given)
 *        The number of time values supplied in "times".

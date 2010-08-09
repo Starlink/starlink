@@ -87,7 +87,7 @@ void smf_create_tswcs( smfHead *hdr, AstFrameSet **frameset, int *status ){
   int i;                        /* loop counter */
   double *instap=NULL;          /* pointer to 2-element instrument aperture */
   int ntime;                    /* number of time slices */
-  int subnum;                   /* Subarray number */
+  sc2ast_subarray_t subnum;     /* Subarray number */
   SC2STORETelpar telpar;        /* Additional telescope information */
   double *telpos=NULL;          /* telescope position pointer */
   double *times=NULL;           /* pointer to a time array */

@@ -42,7 +42,7 @@ const double RAD2DEG = 90.0 / PIBY2;   /* Convert Radians to degrees */
 
 void sc2ast_createwcs
 (
-int subnum,             /* subarray number, 0-7 (given). If -1 is
+sc2ast_subarray_t subnum, /* subarray number, 0-7 (given). If SC2AST__NULLSUB is
                            supplied the cached AST objects will be freed. */
 const JCMTState *state, /* Current telescope state (time, pointing etc.) */
 const double instap[2], /* Offset of subarray in the focal plane */
@@ -56,11 +56,11 @@ int *status             /* global status (given and returned) */
      includes the rotations and reflections relevant to each subarray and
      the distortion imposed by the SCUBA-2 optics.
 
-     This function allocates static resources (AST object pointers) which
-     should be freed when no longer needed by calling this function with
-     "subnum" set to -1. In this is done, the cached resources are freed
-     and this function returns without further action, returning a NULL
-     pointer in "*fset".
+     This function allocates static resources (AST object pointers)
+     which should be freed when no longer needed by calling this
+     function with "subnum" set to SC2AST__NULLSUB. In this is done,
+     the cached resources are freed and this function returns without
+     further action, returning a NULL pointer in "*fset".
 
      If telescope state is NULL, a focal plane frameset will be returned.
 
@@ -82,7 +82,7 @@ int *status             /* global status (given and returned) */
      specific to the SCUBA-2 instrument, observatory location etc. If you
      wish to subsequently calculate framesets for a different instrument
      or observatory location ensure that you first clear the cache by
-     setting subnum=-1.
+     setting subnum=SC2AST__NULLSUB.
 
    Authors :
      B.D.Kelly (bdk@roe.ac.uk)
@@ -147,7 +147,7 @@ int *status             /* global status (given and returned) */
 
 sc2astCache *sc2ast_createwcs2
 (
-int subnum,             /* subarray number, 0-7 (given). If -1 is
+sc2ast_subarray_t subnum, /* subarray number, 0-7 (given). If SC2AST__NULLSUB is
                            supplied the cached AST objects will be freed. */
 const JCMTState *state, /* Current telescope state (time, pointing etc.) */
 double dut1,            /* UT1-UTC (seconds) */
@@ -169,10 +169,11 @@ int *status             /* global status (given and returned) */
      a pointer to it is returned. The contents of the returned structure
      should not be changed outside this function.
 
-     The cache should be freed by calling this function with "subnum" set
-     to -1. In this is done, the cached resources are freed and this
-     function returns without further action, returning a NULL pointer in
-     "*fset", and a NULL pointer for the function value.
+     The cache should be freed by calling this function with "subnum"
+     set to SC2AST__NULLSUB. In this is done, the cached resources
+     are freed and this function returns without further action,
+     returning a NULL pointer in "*fset", and a NULL pointer for the
+     function value.
 
      If telescope state is NULL, a focal plane frameset will be returned.
 
@@ -190,7 +191,7 @@ int *status             /* global status (given and returned) */
      specific to the SCUBA-2 instrument, observatory location etc. If you
      wish to subsequently calculate framesets for a different instrument
      or observatory location ensure that you first clear the cache by
-     setting subnum=-1.
+     setting subnum=SC2AST__NULLSUB.
 
    Authors :
      B.D.Kelly (bdk@roe.ac.uk)
@@ -703,13 +704,14 @@ int *status             /* global status (given and returned) */
 
 
 
-/* Check the sub-array number. If it is -1, free the cached AST objects and
-   the cache structure itself, and then return. Otherwise, report an error
-   if the value is illegal. We do this before checking the inherited status
-   so that the memory is freed even if an error has occurred. */
-   if( subnum == -1 ) {
+/* Check the sub-array number. If it is -SC2AST__NULLSUB, free the
+   cached AST objects and the cache structure itself, and then
+   return. Otherwise, report an error if the value is illegal. We do
+   this before checking the inherited status so that the memory is
+   freed even if an error has occurred. */
+   if( subnum == SC2AST__NULLSUB ) {
       if( cache ) {
-         for( subnum = 0; subnum < 8; subnum++ ) {
+         for( subnum = 0; subnum < SC2AST__NSUB; subnum++ ) {
             if( cache->map[ subnum ] ) {
                cache->map[ subnum ] = astAnnul( cache->map[ subnum ] );
             }
@@ -728,7 +730,7 @@ int *status             /* global status (given and returned) */
 
       return NULL;
 
-   } else if ( subnum < 0 || subnum > 7 ) {
+   } else if ( subnum < 0 || subnum >= SC2AST__NSUB ) {
      *status = SAI__ERROR;
      sprintf( errmess, "Sub array number '%d' out of range\n", subnum );
      ErsRep( 0, status, errmess );
@@ -841,7 +843,7 @@ int *status             /* global status (given and returned) */
 /* The mm coords now have to be rotated through an angle approximating
    a multiple of 90 degrees */
       r = rotangle[ subnum ];
-      if( subnum < 4 ) {
+      if( subnum < S4A ) {
         /* 850 arrays */
         rot[ 0 ] =  cos( r );
         rot[ 1 ] = -sin( r );
@@ -997,9 +999,10 @@ int *status             /* global status (given and returned) */
       cache->map[ subnum ] = astSimplify( cache->map[ subnum ] );
 
 /* Exempt the cached AST objects from AST context handling. This means
-   that the pointers will not be annulled as a result of calling astEnd.
-   Therefore the objects need to be annulled explicitly when no longer
-   needed. This is done by calling this function with "subnum" set to -1. */
+   that the pointers will not be annulled as a result of calling
+   astEnd.  Therefore the objects need to be annulled explicitly when
+   no longer needed. This is done by calling this function with
+   "subnum" set to SC2AST__NULLSUB. */
       astExempt( cache->map[ subnum ] );
       astExempt( cache->frameset[ subnum ] );
 
@@ -1294,8 +1297,8 @@ int *status               /* global status (given and returned) */
 void sc2ast_name2num
 (
 const char *name,             /* subarray name s8a-d, s4a-d (given) */
-int *subnum,            /* subarray number, 0-7 (returned) */
-int *status             /* global status (given and returned) */
+sc2ast_subarray_t *subnum,    /* subarray number, 0-7 (returned) */
+int *status                   /* global status (given and returned) */
 )
 /* Method :
     Convert the SCUBA-2 standard name of a subarray into its
@@ -1309,46 +1312,47 @@ int *status             /* global status (given and returned) */
      27Jan2006 : use strncmp rather than strcmp (timj)
                  Associate error message with error condition (timj)
      20Mar2007 : const "name" argument (timj)
+     9Aug2010  : use enum rather than int for subnum (timj)
 */
 
 {
 
-   *subnum = 0; /* force initialisation */
+   *subnum = SC2AST__NULLSUB; /* force initialisation */
 
    if ( *status != SAI__OK ) return;
 
 
    if ( strncmp ( name, "s8a", 3 ) == 0 )
    {
-      *subnum = 0;
+      *subnum = S8A;
    }
    else if ( strncmp ( name, "s8b", 3 ) == 0 )
    {
-      *subnum = 1;
+      *subnum = S8B;
    }
    else if ( strncmp ( name, "s8c", 3 ) == 0 )
    {
-      *subnum = 2;
+      *subnum = S8C;
    }
    else if ( strncmp ( name, "s8d", 3 ) == 0 )
    {
-      *subnum = 3;
+      *subnum = S8D;
    }
    else if ( strncmp ( name, "s4a", 3 ) == 0 )
    {
-      *subnum = 4;
+      *subnum = S4A;
    }
    else if ( strncmp ( name, "s4b", 3 ) == 0 )
    {
-      *subnum = 5;
+      *subnum = S4B;
    }
    else if ( strncmp ( name, "s4c", 3 ) == 0 )
    {
-      *subnum = 6;
+      *subnum = S4C;
    }
    else if ( strncmp ( name, "s4d", 3 ) == 0 )
    {
-      *subnum = 7;
+      *subnum = S4D;
    }
    else
    {

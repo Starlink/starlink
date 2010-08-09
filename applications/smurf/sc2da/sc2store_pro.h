@@ -345,7 +345,7 @@ int *status           /* global status (given and returned) */
 
 AstFrameSet *sc2store_timeWcs
 (
-int subnum,                   /* Subarray index */
+sc2ast_subarray_t subnum,     /* Subarray index */
 int ntime,                    /* The number of time values supplied */
 int use_tlut,                 /* Use a LutMap else use WinMap */
 const SC2STORETelpar* telpar, /* Additional telescope information */
@@ -441,7 +441,7 @@ int *status                 /* global status (given and returned) */
 void sc2store_wrtstream
 (
 const char filename[],      /* output file name (given) */
-int subnum,                 /* Sub-array number (given) */
+sc2ast_subarray_t subnum,   /* Sub-array number (given) */
 size_t nrec,                /* number of FITS header records (given) */
 const char *fitsrec,        /* contiguous 80-byte FITS records (given) */
 size_t colsize,             /* number of bolometers in column (given) */

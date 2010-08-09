@@ -377,7 +377,7 @@ smfCreateLutwcsCache *smf_create_lutwcs( int clearcache, const double *fplane_x,
          that the pointers will not be annulled as a result of calling astEnd.
          Therefore the objects need to be annulled explicitly when no longer
          needed. this is done by calling this function with "subnum" set to
-         -1.*/
+         SC2AST__NULLSUB.*/
       astExempt( cache->map );
       astExempt( cache->frameset );
 

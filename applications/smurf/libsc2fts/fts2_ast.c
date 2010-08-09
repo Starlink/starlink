@@ -73,7 +73,7 @@ static char errmess[132];              /* For DRAMA error messages */
 
 void fts2ast_createwcs
 (
-  int subnum,
+  sc2ast_subarray_t subnum,
   const JCMTState *state,
   const double instap[2],
   const double telpos[3],
@@ -87,7 +87,7 @@ void fts2ast_createwcs
 
 sc2astCache *fts2ast_createwcs2
 (
-  int subnum,             /* subarray number, 0-7 (given). If -1 is
+  sc2ast_subarray_t subnum, /* subarray number, 0-7 (given). If SC2AST__NULLSUB is
                              supplied the cached AST objects will be freed. */
   const JCMTState *state, /* Current telescope state (time, pointing etc.) */
   double dut1,            /* UT1-UTC (seconds) */
@@ -132,11 +132,11 @@ sc2astCache *fts2ast_createwcs2
    * if the value is illegal. We do this before checking the inherited status
    * so that the memory is freed even if an error has occurred.
    */
-  if( subnum == -1 )
+  if( subnum == SC2AST__NULLSUB )
   {
     if( cache )
     {
-      for( subnum = 0; subnum < 8; subnum++ )
+      for( subnum = 0; subnum < SC2AST__NSUB; subnum++ )
       {
         if( cache->map[ subnum ] )
         {
@@ -157,7 +157,7 @@ sc2astCache *fts2ast_createwcs2
 
     return NULL;
    }
-  else if ( subnum < 0 || subnum > 7 )
+  else if ( subnum < 0 || subnum >= SC2AST__NSUB )
   {
     *status = SAI__ERROR;
     sprintf( errmess, "Sub array number '%d' out of range\n", subnum );
@@ -311,7 +311,7 @@ sc2astCache *fts2ast_createwcs2
      */
 
     // Port 1
-    if (subnum == 3 || subnum == 4)
+    if (subnum == S8D || subnum == S4A)
 	{
 	  // Forward coeffs from FRAME850 to Nasmyth
 
@@ -403,7 +403,7 @@ sc2astCache *fts2ast_createwcs2
 	  cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], polymap, 1, " " );
 	}
 	// Port 2
-	else if (subnum == 2 || subnum == 5)
+	else if (subnum == S8C || subnum == S4B)
 	{
       // Forward coeffs -- real to ideal
       const double fts2poly_f[] =
@@ -524,7 +524,7 @@ sc2astCache *fts2ast_createwcs2
     /* Exempt the cached AST objects from AST context handling.
      * This means that the pointers will not be annulled as a result of calling astEnd.
      * Therefore the objects need to be annulled explicitly when no longer needed.
-     * This is done by calling this function with "subnum" set to -1.
+     * This is done by calling this function with "subnum" set to SC2AST__NULLSUB.
      */
     astExempt( cache->map[ subnum ] );
     astExempt( cache->frameset[ subnum ] );

@@ -155,7 +155,7 @@ void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim,
   int seqstart;                    /* Starting index */
   int slice;                       /* Index of current time slice */
   int strnum;                      /* Structure element number */
-  int subnum;                      /* Subarray index number */
+  sc2ast_subarray_t subnum;        /* Subarray index number */
   int ubnd[2];                     /* Upper dimension bounds */
   int uindf;                       /* NDF identifier */
   AstFrameSet *wcs = NULL;         /* WCS info */

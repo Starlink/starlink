@@ -203,7 +203,7 @@ void smurf_calcflat( int *status ) {
 
   size_t size;               /* Number of files in input group */
   char subarray[9];          /* subarray name */
-  int subnum;                /* subarray number */
+  sc2ast_subarray_t subnum;  /* subarray number */
   int utdate;                /* UTdate of observation */
 
   /* Main routine */

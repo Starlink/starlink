@@ -67,7 +67,7 @@
  */
 void fts2ast_createwcs
 (
-  int subnum,             /* subarray number, 0-7 (given). If -1 is
+  sc2ast_subarray_t subnum, /* subarray number, 0-7 (given). If SC2AST__NULLSUB is
                              supplied the cached AST objects will be freed. */
   const JCMTState *state, /* Current telescope state (time, pointing etc.) */
   const double instap[2], /* Offset of subarray in the focal plane */
@@ -82,7 +82,7 @@ void fts2ast_createwcs
  */
 sc2astCache *fts2ast_createwcs2
 (
-  int subnum,             /* subarray number, 0-7 (given). If -1 is
+  sc2ast_subarray_t subnum, /* subarray number, 0-7 (given). If SC2AST__NULLSUB is
                              supplied the cached AST objects will be freed. */
   const JCMTState *state, /* Current telescope state (time, pointing etc.) */
   double dut1,            /* UT1-UTC (seconds) */

@@ -415,6 +415,7 @@
 #include "msg_par.h"
 #include "star/irq.h"
 #include "star/kaplibs.h"
+#include "sc2da/sc2ast_typ.h"
 
 /* Handle GCC __attribute__ */
 #ifndef __GNUC__
@@ -915,7 +916,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
 void smf_find_seqcount( const smfHead * hdr, int *seqcount, int *status );
 
 void smf_find_subarray ( const smfHead * hdr, char subarray[],
-                         size_t buflen, int *subnum, int *status );
+                         size_t buflen, sc2ast_subarray_t *subnum, int *status );
 
 void smf_fit_poly( const smfData *data,
                    const size_t order, double *poly, int *status);

@@ -542,7 +542,7 @@ void smurf_dsutils( int *status ) {
 /* We now need the PolyMap  specified by the current setting of
    environment variable SMURF_DISTORTION. Get the whole GRID-> FP (in
    rads) Mapping for the first sub array, and extract the PolyMap from it. */
-    sc2ast_createwcs( 0, NULL, NULL, NULL, &fp_fset, status );
+    sc2ast_createwcs( S8A, NULL, NULL, NULL, &fp_fset, status );
     polymap = FindPolyMap( astGetMapping( fp_fset, AST__BASE, AST__CURRENT ),
                            status );
 /* If no PolyMap was found, use a UnitMap instead. */
@@ -1624,7 +1624,7 @@ static AstFrameSet *GetFPFrameSet( const char *name, int *status ){
   double rot[ 4 ];
   double shift[ 2 ];
   double zshift[ 2 ];
-  int subnum;
+  sc2ast_subarray_t subnum;
 
   const double rotangle[ 8 ] =
     { 0.0, PIBY2, 2*PIBY2, 3*PIBY2, 3*PIBY2, 2*PIBY2, PIBY2, 0.0 };
@@ -1678,7 +1678,7 @@ static AstFrameSet *GetFPFrameSet( const char *name, int *status ){
   r = rotangle[ subnum ];
 
 /* 850 arrays */
-  if( subnum < 4 ) {
+  if( subnum < S4A ) {
     rot[ 0 ] =  cos( r );
     rot[ 1 ] = -sin( r );
     rot[ 2 ] =  sin( r );

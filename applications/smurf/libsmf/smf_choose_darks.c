@@ -91,7 +91,7 @@ void smf_choose_darks( const smfArray *darks, const smfData *indata,
                        size_t *dark1, size_t *dark2, int * status ) {
   size_t i;          /* loop counter */
   int refseq;        /* Sequence count of input science data */
-  int refsubnum;     /* Subarray number of science data */
+  sc2ast_subarray_t refsubnum;     /* Subarray number of science data */
 
   *dark1 = SMF__BADIDX;
   *dark2 = SMF__BADIDX;
@@ -108,7 +108,7 @@ void smf_choose_darks( const smfArray *darks, const smfData *indata,
      from the reference sequence counter by 1 */
   for (i=0; i< darks->ndat; i++) {
     smfData *thisdark = (darks->sdata)[i];
-    int thissubnum;
+    sc2ast_subarray_t thissubnum;
     smf_find_subarray( thisdark->hdr, NULL, (size_t)0, &thissubnum, status );
 
     /* see if we even need to look at the sequence counter */

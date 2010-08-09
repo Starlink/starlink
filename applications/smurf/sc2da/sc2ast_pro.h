@@ -6,7 +6,7 @@
 
 void sc2ast_createwcs
 (
-int subnum,             /* subarray number, 0-7 (given). If -1 is
+sc2ast_subarray_t subnum,  /* subarray number, 0-7 (given). If SC2AST__NULLSUB is
                            supplied the cached AST objects will be freed. */
 const JCMTState *state, /* Current telescope state (time, pointing etc.) */
 const double instap[2], /* Offset of subarray in the focal plane */
@@ -19,7 +19,7 @@ int *status             /* global status (given and returned) */
 
 sc2astCache *sc2ast_createwcs2
 (
-int subnum,             /* subarray number, 0-7 (given). If -1 is
+sc2ast_subarray_t subnum,  /* subarray number, 0-7 (given). If SC2AST__NULLSUB is
                            supplied the cached AST objects will be freed. */
 const JCMTState *state, /* Current telescope state (time, pointing etc.) */
 double dut1,            /* UT1-UTC (seconds) */
@@ -69,9 +69,9 @@ int *status               /* global status (given and returned) */
 
 void sc2ast_name2num
 (
-const char *name,             /* subarray name s8a-d, s4a-d (given) */
-int *subnum,            /* subarray number, 0-7 (returned) */
-int *status             /* global status (given and returned) */
+const char *name,          /* subarray name s8a-d, s4a-d (given) */
+sc2ast_subarray_t *subnum, /* subarray number, 0-7 (returned) */
+int *status                /* global status (given and returned) */
 );
 
 /*+ sc2ast_polframest - create a frameset for polarimetry */

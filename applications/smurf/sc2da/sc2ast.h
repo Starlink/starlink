@@ -75,6 +75,9 @@
 /* Include AST definitions */
 #include "ast.h"
 
+/* sc2ast enums */
+#include "sc2ast_typ.h"
+
 /* Define a structure used to hold information cached by sc2ast_createwcs. */
 typedef struct sc2astCache {
 
@@ -84,9 +87,9 @@ typedef struct sc2astCache {
    Cartesian (i.e. in the tangent plane) Nasmyth coords in rads. The
    AST pointers in this cache are exempted from AST context handling, and
    so need to be released explicitly using astAnnul. This is done by
-   calling this function with the sub-frame number set to -1. */
-   AstMapping *map[ 8 ];
-   AstFrameSet *frameset[ 8 ];
+   calling this function with the sub-frame number set to SC2AST__NULLSUB. */
+   AstMapping *map[ SC2AST__NSUB ];
+   AstFrameSet *frameset[ SC2AST__NSUB ];
 
 /* Cache the SkyFrame used to represent final spherical (Az,El) coords */
    AstSkyFrame *skyframe;
@@ -97,8 +100,8 @@ typedef struct sc2astCache {
 
 /* Cache used to hold the instap values which were hatrd-wired into the
    cached Mapping for each subarray. */
-   double instap_x[ 8 ];
-   double instap_y[ 8 ];
+   double instap_x[ SC2AST__NSUB ];
+   double instap_y[ SC2AST__NSUB ];
 
 } sc2astCache;
 

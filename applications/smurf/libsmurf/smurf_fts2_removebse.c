@@ -240,11 +240,11 @@ void smurf_fts2_removebse(int* status)
         {
           index = pixelIndex + pixelCount * k;
           
-          if(srcSubarray == s8c || srcSubarray == s8d)
+          if(srcSubarray == S8C || srcSubarray == S8D)
           {
             srcCube[index] -= bseIFGNew[k];
           }
-          else if(srcSubarray == s4a || srcSubarray == s4b)
+          else if(srcSubarray == S4A || srcSubarray == S4B)
           {
             srcCube[index] += bseIFGNew[k];
           }

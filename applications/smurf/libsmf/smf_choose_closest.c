@@ -100,7 +100,7 @@ void smf_choose_closest( const smfArray *alldata, const smfData *indata,
                        size_t *previdx, size_t *nextidx, int * status ) {
   size_t i;          /* loop counter */
   double reftime;    /* MJD of input science data */
-  int refsubnum;     /* Subarray number of science data */
+  sc2ast_subarray_t refsubnum; /* Subarray number of science data */
 
   smf_timediff prev; /* information on closest previous */
   smf_timediff next; /* information on closest next */
@@ -125,7 +125,7 @@ void smf_choose_closest( const smfArray *alldata, const smfData *indata,
      with the correct subarray number */
   for (i=0; (*status==SAI__OK)&&(i<alldata->ndat); i++) {
     smfData *thisfile = (alldata->sdata)[i];
-    int thissubnum;
+    sc2ast_subarray_t thissubnum;
     smf_find_subarray( thisfile->hdr, NULL, 0, &thissubnum, status );
 
     /* see if we even need to look at the time */

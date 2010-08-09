@@ -161,7 +161,7 @@ void sc2sim_ndfwrheat
   char fitsrec[SC2STORE__MAXFITS*80+1]; /* Store for FITS records */
   int jigvert[SC2SIM__MXVERT][2]; /* Temp array to jig_vert */
   size_t nrec = 0;                 /* number of FITS header records */
-  int subnum;                      /* subarray index */
+  sc2ast_subarray_t subnum;        /* subarray index */
   size_t i, j;
 
   /* Check status */

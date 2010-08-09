@@ -1,39 +1,31 @@
 /*
 *+
 *  Name:
-*     fts2_type.h
+*     sc2ast_typ.h
 
 *  Purpose:
-*     Definitions of general purpose types needed by FTS2.
+*     Type definitions required for the sc2ast DA code
 
 *  Language:
 *     Starlink ANSI C
 
 *  Type of Module:
-
-*  Invocation:
-
-*  Description:
-*     Definitions of general purpose types needed by FTS2.
+*     Include File
 
 *  Authors:
-*     Coskun (Josh) OBA (UoL)
-*     Tim Jenness (JAC, Hawaii)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+*     {enter_new_authors_here}
 
-*  History :
-*     2010-07-09 (OBA):
-*        Created
-*     2010-08-04 (TIMJ):
-*        Remove boolean enum for the time being because some compilers
-*        define FALSE and TRUE themselves and this breaks the build.
-*     2010-08-09 (TIMJ):
-*        Move subarray definitions to sc2ast
+*  History:
+*     2010-08-06 (TIMJ):
+*        Initial version
+*     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
-*     Copyright (C) 2010 University of Lethbridge. All Rights Reserved.
+*     All Rights Reserved.
 
-*  License:
+*  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 3 of
@@ -54,18 +46,24 @@
 *-
 */
 
-/*
- * Boolean
- */
+#ifndef SC2AST_TYP_H
+#define SC2AST_TYP_H
 
-typedef int bool;
+/* Define a special type for subarray number rather than using
+   an integer. These values must match the indices in the LUT
+   arrays in sc2ast.c */
 
-//
-// FTS-2 SCAN MODES
-//
-typedef enum SMF__FTS_Mode
-{
-  UNKNOWN = -1, // Undefined or Unknown
-  FSCAN = 0,    // Fast Scan
-  STEPINT = 1   // Step-and-Integrate
-} FTSMode;
+typedef enum {
+  SC2AST__NULLSUB = -1, /* No subarray */
+  S8A = 0,
+  S8B = 1,
+  S8C = 2,
+  S8D = 3,
+  S4A = 4,
+  S4B = 5,
+  S4C = 6,
+  S4D = 7,
+  SC2AST__NSUB = 8  /* Total number of subarrays */
+} sc2ast_subarray_t;
+
+#endif

@@ -88,7 +88,7 @@ void smf_choose_flat( const smfArray *flats, const smfData *indata,
                        size_t *flatidx, int * status ) {
   size_t i;          /* loop counter */
   int refseq;        /* Sequence count of input science data */
-  int refsubnum;     /* Subarray number of science data */
+  sc2ast_subarray_t refsubnum; /* Subarray number of science data */
 
   *flatidx = SMF__BADIDX;
 
@@ -109,7 +109,7 @@ void smf_choose_flat( const smfArray *flats, const smfData *indata,
      Assume that the flatfields are in date order. */
   for (i=0; i< flats->ndat; i++) {
     smfData *thisflat = (flats->sdata)[i];
-    int thissubnum;
+    sc2ast_subarray_t thissubnum;
     smf_find_subarray( thisflat->hdr, NULL, (size_t)0, &thissubnum, status );
 
     msgOutiff( MSG__DEBUG, "", "Checking against flatfield %s subarray %d",

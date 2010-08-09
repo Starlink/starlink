@@ -167,7 +167,7 @@ void smf_create_bolfile( const Grp * bgrp, size_t index,
   if (*status == SAI__OK) {
     char subarray[9];          /* subarray name */
     int frnum = AST__NOFRAME;  /* Index of BOLO frame */
-    int subnum;                /* subarray number */
+    sc2ast_subarray_t subnum;  /* subarray number */
     char buffer[30];
     AstFrameSet *wcs = NULL;
 

@@ -124,7 +124,7 @@ void sc2fts_addwcs
   AstSkyFrame *gridframe;       // Current Frame for 2-D sky
   AstFrameSet *speccubewcs;     // WCS for 3-D spectrum cube
   double ftswn_factor;          // Factor for FTS spectrum
-  int subnum;                   // Subarray index number
+  sc2ast_subarray_t subnum;     // Subarray index number
   double refra, refdec;         // Attributes: RefRA, RefDec
 
   char oname[GRP__SZNAM];
@@ -162,7 +162,7 @@ void sc2fts_addwcs
 
   // create 2-D WCS
   smf_find_subarray( data->hdr, NULL, 0, &subnum, status );
-  if (subnum == 2 || subnum == 3 || subnum == 4 || subnum == 5)
+  if (subnum == S8C || subnum == S8D || subnum == S4A || subnum == S4B)
   {
 	  fts2ast_createwcs( subnum, data->hdr->state, data->hdr->instap, data->hdr->telpos, &gridfset, status );
   }

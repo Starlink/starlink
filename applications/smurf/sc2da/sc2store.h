@@ -65,6 +65,8 @@
 /* Following include is for JCMTState definition */
 #include "jcmt/state.h"
 
+/* Subnum definition */
+#include "sc2ast_typ.h"
 
 struct SC2STORETelpar
 {

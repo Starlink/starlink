@@ -140,7 +140,7 @@ void smf_flat_write( smf_flatmeth flatmeth, const char * flatname,
   int place = NDF__NOPL;       /* Dummy placeholder for NDF */
   size_t rowsize;              /* number of rows */
   JCMTState *state = NULL;     /* State for this flatfield */
-  int subnum;                  /* subarray number */
+  sc2ast_subarray_t subnum;    /* subarray number */
 
   AstFrameSet *result, *spacefset;
   AstLutMap *heatmap;
