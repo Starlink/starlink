@@ -229,12 +229,14 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
     for (i = 0; i < nheat; i++ ) {
       int h;
       const char * key = astMapKey( heatmap, i );
+      char * endptr = NULL;
       /* this must work, we can miss this step if we had another
          keymap that had this key and an integer value ! */
-      h = strtol( key, NULL, 0 );
+      h = strtol( key, &endptr, 0 );
 
-      /* should never get a 0 for heater value */
-       if ( h == 0 ) {
+      /* should never get a 0 for heater value but some buggy files
+         do have it so we use the correct test */
+       if ( endptr == key ) {
         *status = SAI__ERROR;
         errRepf("", "Unexpected failure to parse '%s' to a integer", status,
                 key );
