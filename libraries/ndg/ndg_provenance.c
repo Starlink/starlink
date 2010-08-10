@@ -157,6 +157,9 @@
 *         when the list of parents in the Prov is changed.
 *      212-JUN-2010 (DSB):
 *         Fix loop termination bug in ndg1Rmprv.
+*      10-AUG-2010 (DSB):
+*          The old hash function (Bernstein) was creating collisions. Swap to 
+*          FNV which seems to work better.
 */
 
 
@@ -195,6 +198,10 @@
    represent a NdgProvenance pointer. */
 #define ID_KEY  "NDG_PROV"
 
+/* Constants for the Fowler/Noll/Vo hash function. */
+#define FNV1_32_INIT ( (unsigned int) 0x811c9dc5 )
+#define FNV_32_PRIME ( (unsigned int) 0x01000193 )
+
 /* Include files. */
 /* -------------- */
 /* Starlink packages. */
@@ -221,7 +228,7 @@
    ndfHout. The NDF library is written in Fortran and so is not
    thread-safe. So this module cannot be thread-safe, so there is no
    reason not to use global variables. */
-static int history_hash;
+static unsigned int history_hash;
 static char *history_text = NULL;
 static int history_length = 0;
 
@@ -304,7 +311,7 @@ static int ndg1CheckSameParents( Prov *, Prov *, int * );
 static int ndg1FindAncestorIndex( Prov *, Provenance *, int * );
 static int ndg1GetLogicalComp( HDSLoc *, const char *, int, int * );
 static int ndg1GetProvId( Prov *, int * );
-static int ndg1HashFun( const char *, int * );
+static unsigned int ndg1HashFun( const char *,  unsigned int, int * );
 static int ndg1IntCmp( const void *, const void * );
 static int ndg1IsWanted( AstXmlElement *, int * );
 static int ndg1TheSame( Prov *, Prov *, int * );
@@ -334,8 +341,6 @@ static const char *static_badpath = NULL;
 static Provenance *static_provenance = NULL;
 static int static_provid1 = -2;
 static int static_provid2 = -2;
-
-
 
 /* Public F77 wrapper functions. */
 /* ============================= */
@@ -3313,6 +3318,9 @@ static Prov *ndg1CopyProv( Prov *prov, int *status ){
          for( i = 0; i < prov->nchild; i++ ) result->children[ i ] = NULL;
       }
 
+/* Since the parents are not currently known, clear the provid value. */
+      ndg1ClearProvId( result, status );
+
 /* Create an array of history records. */
       result->hist_recs = astMalloc( sizeof( HistRec )*( prov->nhrec ) );
       if( result->hist_recs ) {
@@ -4266,27 +4274,27 @@ static int ndg1GetProvId( Prov *prov, int *status ) {
 */
 
 /* Local Variables: */
-   int ihash;
+   unsigned int ihash;
    int iparent;
 
-/* Initialise */
-   ihash = 0;
+/* A union used for converting between signed and unsigned ints. */
+   union Tmp {
+      int signed_val;
+      unsigned int unsigned_val;
+   } tmp;
 
 /* Check the local error status. */
-   if ( !astOK ) return ihash;
+   if ( *status != SAI__OK ) return 0;
 
-/* Get any existing hash code from the Prov structure. */
-   ihash = prov->provid;
-
-/* We only need to calculate a new one if the existing one is invalid. */
-   if( ihash == 0 ) {
+/* We only need to calculate a new hash code if the existing one is invalid. */
+   if( prov->provid == 0 ) {
 
 /* For each text item in the Prov structure, create a hash code and then
    combine it with the existing hash code using a bit-wise exclusive-OR
    operation. */
-      if( prov->path ) ihash ^= ndg1HashFun( prov->path, status );
-      if( prov->date ) ihash ^= ndg1HashFun( prov->date, status );
-      if( prov->creator ) ihash ^= ndg1HashFun( prov->creator, status );
+      if( prov->path ) ihash = ndg1HashFun( prov->path, FNV1_32_INIT, status );
+      if( prov->date ) ihash = ndg1HashFun( prov->date, ihash, status );
+      if( prov->creator ) ihash = ndg1HashFun( prov->creator, ihash, status );
 
 /* Obtain a hash code for each parent Prov, and combine it with the
    existing hash code using a bit-wise exclusive-OR operation. */
@@ -4295,12 +4303,14 @@ static int ndg1GetProvId( Prov *prov, int *status ) {
       }
 
 /* For efficiency, store the hash code in the Prov structure so that it
-   does not need to be recalculated next time it is required. */
-      prov->provid = ihash;
+   does not need to be recalculated next time it is required. Convert
+   from unsigned to signed. */
+      tmp.unsigned_val = ihash;
+      prov->provid = tmp.signed_val;
    }
 
 /* Return the hash code. */
-   return ihash;
+   return prov->provid;
 }
 
 static char *ndg1GetTextComp( HDSLoc *loc, const char *comp, char *buf,
@@ -4530,7 +4540,7 @@ static void ndg1H2a( HDSLoc *loc, AstKeyMap *keymap, int *status ){
 
 }
 
-static int ndg1HashFun( const char *text, int *status ){
+static unsigned int ndg1HashFun( const char *str,  unsigned int hval, int *status ){
 /*
 *  Name:
 *     ndg1HashFun
@@ -4539,15 +4549,20 @@ static int ndg1HashFun( const char *text, int *status ){
 *     Returns an integer hash code for a text string
 
 *  Invocation:
-*     int ndg1HashFun( const char *text, int *status )
+*     unsigned int ndg1HashFun( const char *str,  unsigned int hval, int *status )
 
 *  Description:
 *     This function returns an integer hash code for the supplied text
-*     string.
+*     string, using the FNV hash function. See the "Fowler-Noll-Vo hash
+*     function" wikipedia entry for details.
 
 *  Parameters:
-*     text
+*     str
 *        Pointer to the text string. Trailing spaces are ignored.
+*     hval
+*        The previous calculated hash value. Used as the basis for the
+*        next hash value in order to spread them out. Supply FNV1_32_INIT
+*        on the first call.
 *     status
 *        Pointer to the inherited status variable.
 
@@ -4557,23 +4572,24 @@ static int ndg1HashFun( const char *text, int *status ){
 */
 
 /* Local Variables: */
-   int c;
-   unsigned long ihash;
+   unsigned char *s;
 
 /* Check the local error status. */
-   if ( !astOK ) return 0;
+   if( *status != SAI__OK ) return 0;
 
-/* djb2: This hash function was first reported by Dan Bernstein many years
-   ago in comp.lang.c Each pass through the "while" loop corresponds to
-   "hash = hash*33 + c ". Ignore spaces so that trailing spaces used to
-   pad F77 character variables will be ignored. */
-   ihash = 5381;
-   while( (c = *text++) ) {
-      if( c != ' ' ) {
-         ihash = ((ihash << 5) + ihash) + c;
-      }
+/* FNV-1 hash each character in the string. */
+   s = (unsigned char *) str;
+   while( *s ) {
+
+/* Multiply by the 32 bit FNV magic prime mod 2^32. */
+      hval *= FNV_32_PRIME;
+
+/* XOR the bottom with the current char. */
+      hval ^= (unsigned int) *s++;
    }
-   return ( ihash & 0xffffffff );
+
+/* Return our new hash value */
+   return hval;
 }
 
 static void ndg1Hout1( int nlines, char *const text[], int *status ){
@@ -4623,7 +4639,8 @@ static void ndg1Hout1( int nlines, char *const text[], int *status ){
    }
 
 /* If required, form a hash code from the concatenated text. */
-   if( history_hash ) history_hash = ndg1HashFun( history_text, status );
+   if( history_hash ) history_hash = ndg1HashFun( history_text,
+                                                  history_hash, status );
 
 }
 
@@ -5387,6 +5404,12 @@ static void ndg1ReadHistRec( Prov *prov, int indf, int irec, int *hash,
    char text[ TEXT_LEN ];
    HistRec *histrec = NULL;
 
+/* A union used for converting between signed and unsigned ints. */
+   union Tmp {
+      int signed_val;
+      unsigned int unsigned_val;
+   } tmp;
+
 /* Initialise */
    if( hash ) *hash = 0;
 
@@ -5412,7 +5435,7 @@ static void ndg1ReadHistRec( Prov *prov, int indf, int irec, int *hash,
    is returned in global variable "history_hash" (the hash code is
    only calculated if "history_hash" initially contains a non-zero
    value, so initialise it using "hash"). */
-      history_hash = ( hash != NULL );
+      history_hash = ( hash != NULL ) ? FNV1_32_INIT : 0;
       ndfHout( indf, irec, ndg1Hout1, status );
 
 /* If we are creating a new HistRec structure, store the text
@@ -5441,36 +5464,36 @@ static void ndg1ReadHistRec( Prov *prov, int indf, int irec, int *hash,
                                     (strlen( text ) + 1)*sizeof( char ) );
 
 /* If we are creating a hash code, create a hash code for the
-   APPLICATION text and then combine it with the existing hash code
-   using a bit-wise exclusive-OR operation. */
-      if( hash ) history_hash ^= ndg1HashFun( text, status );
+   APPLICATION text, combining it with the existing hash code. */
+      if( hash ) history_hash = ndg1HashFun( text, history_hash, status );
 
 /* Do the same for the other items of the HistRec structure. */
       ndfHinfo( indf, "DATE", irec, text, TEXT_LEN, status );
       if( histrec ) histrec->date = astStore( NULL, text,
                                     (strlen( text ) + 1)*sizeof( char ) );
-      if( hash ) history_hash ^= ndg1HashFun( text, status );
+      if( hash ) history_hash = ndg1HashFun( text, history_hash, status );
 
       ndfHinfo( indf, "USER", irec, text, TEXT_LEN, status );
       if( histrec ) histrec->user = astStore( NULL, text,
                                     (strlen( text ) + 1)*sizeof( char ) );
-      if( hash ) history_hash ^= ndg1HashFun( text, status );
+      if( hash ) history_hash = ndg1HashFun( text, history_hash, status );
 
 /* The remaining items of history information are not stored in
    the HistRec structure, but we include them in the hash code if
    required. */
       if( hash ) {
          ndfHinfo( indf, "HOST", irec, text, TEXT_LEN, status );
-         history_hash ^= ndg1HashFun( text, status );
+         history_hash = ndg1HashFun( text, history_hash, status );
 
          ndfHinfo( indf, "NLINES", irec, text, TEXT_LEN, status );
-         history_hash ^= ndg1HashFun( text, status );
+         history_hash = ndg1HashFun( text, history_hash, status );
 
          ndfHinfo( indf, "REFERENCE", irec, text, TEXT_LEN, status );
-         history_hash ^= ndg1HashFun( text, status );
+         history_hash = ndg1HashFun( text, history_hash, status );
 
-/* Return the hash code. */
-         *hash = history_hash;
+/* Return the hash code, converting from unsigned to signed. */
+         tmp.unsigned_val = history_hash;
+         *hash = tmp.signed_val;
       }
    }
 
@@ -6362,7 +6385,10 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance,
       if( path ) {
          len = astChrLen( path );
          if( len ) {
-            path[ len ] = 0;
+            if( path[ len ] != 0 ) {
+               path[ len ] = 0;
+               ndg1ClearProvId( prov, status );
+            }
             ndg1PutTextComp( cloc, PATH_NAME, path, status );
          }
       }
@@ -6385,7 +6411,10 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance,
       if( prov->creator ) {
          len = astChrLen( prov->creator );
          if( len ) {
-            prov->creator[ len ] = 0;
+            if( prov->creator[ len ] != 0 ) {
+               prov->creator[ len ] = 0;
+               ndg1ClearProvId( prov, status );
+            }
             ndg1PutTextComp( cloc, CREATOR_NAME, prov->creator, status );
          }
       }
