@@ -99,6 +99,10 @@
 *        - Check for unit plurals ("Angstroms" instead of "Angstrom")
 *     29-SEP-2004 (DSB):
 *        Use CNF_PVAL
+*     10-AUG-2010 (DSB):
+*        Simplify ASMAP so that equal, inverted, non-monotonic, AXIS LutMaps
+*        cancel out. Otherwise, such LutMaps prevent the Mapping being defined
+*        in either direction.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -646,7 +650,8 @@
 
 *  Concatenate this with the GRID->SPECTRUM Mapping to get the
 *  AXIS->SPECTRUM Mapping.
-         ASMAP = AST_CMPMAP( AGMAP, GSMAP, .TRUE., ' ', STATUS )
+         ASMAP = AST_SIMPLIFY( AST_CMPMAP( AGMAP, GSMAP, .TRUE., ' ',
+     :                                     STATUS ), STATUS )
 
 *  Unmap the NDF AXIS array (since we need double precision access to it
 *  and we currently only have single precision).
