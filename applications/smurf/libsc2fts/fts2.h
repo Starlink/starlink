@@ -18,9 +18,13 @@
 
 *  Authors:
 *     Coskun (Josh) OBA (UoL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 
 *  History :
-*     Created: July 9, 2010
+*     2010-07-09 (OBA):
+*        Original.
+*     2010-08-09 (TIMJ):
+*        Remove fts2_isInBeam.
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -51,7 +55,6 @@
 #include "fts2_type.h"
 #include "libsmf/smf_typ.h"
 
-bool    fts2_isInBeam(smfData* data, int* status);
 double  fts2_getMirrorPosition(smfData* data, int* status);
 double  fts2_getScanVelocity(smfData* data, int* status);
 double* fts2_getPositions(smfData* data, int* status);

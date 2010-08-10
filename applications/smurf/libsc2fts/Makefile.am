@@ -4,7 +4,6 @@ noinst_LTLIBRARIES = libsc2fts.la
 libsc2fts_la_SOURCES = $(C_ROUTINES)
 
 C_ROUTINES =  \
-              fts2_isInBeam.c \
               fts2_getMirrorPosition.c \
               fts2_getPositions.c \
               fts2_getScanMode.c \
