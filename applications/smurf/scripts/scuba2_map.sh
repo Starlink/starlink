@@ -30,8 +30,8 @@
 #
 
 
-SCRATCHDIR=/staging/$LOGNAME
-PERSISTDIR=/staging/1/$LOGNAME
+SCRATCHDIR=/staging/scratch
+PERSISTDIR=/staging/persist
 
 if [ ! -d $SCRATCHDIR ]
 then
@@ -39,6 +39,10 @@ then
   mkdir $SCRATCHDIR
 fi
 
+if [ ! -d $PERSISTDIR ]
+then
+  mkdir $PERSISTDIR
+fi
 
 if [ ! -d $PERSISTDIR/$2 ]
 then
@@ -48,13 +52,21 @@ fi
 echo "Job started at" >> $PERSISTDIR/$2/scuba2_map.log
 date >> $PERSISTDIR/$2/scuba2_map.log
 
-if [ ! -d $OUTDIR ]
-then
-  echo "Error! Output directory $OUTDIR does not exist"
-else
-  /stardev/Perl/bin/jsawrapdr --inputs=$1 --id=$2 -persist --outdir=$SCRATCHDIR --transdir=$PERSISTDIR --mode=public --drparameters "-verbose -recpar $3" --canfar --cleanup all
-fi 
+#if [ ! -d $OUTDIR ]
+#then
+#  echo "Error! Output directory $OUTDIR does not exist"
+#else
+/stardev/Perl/bin/jsawrapdr --inputs=$1 --id=$2 -persist --outdir=$SCRATCHDIR --transdir=$PERSISTDIR --mode=public --drparameters "-verbose -recpar $3" --canfar --cleanup all
+#fi 
 
 echo "Job finished at" >> $PERSISTDIR/$2/scuba2_map.log
 date >> $PERSISTDIR/$2/scuba2_map.log
+
+
+# copy data to login host
+
+ssh canfar.dao.nrc.ca "mkdir /data/1/$LOGNAME/$2"
+
+scp $PERSISTDIR/$2/*.log canfar.dao.nrc.ca:/data/1/$LOGNAME/$2/
+scp $PERSISTDIR/$2/*.fits canfar.dao.nrc.ca:/data/1/$LOGNAME/$2/
 
