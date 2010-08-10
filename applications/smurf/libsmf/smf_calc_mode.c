@@ -124,7 +124,6 @@ void smf_calc_mode ( smfHead * hdr, int * status ) {
     /* INBEAM can be undef */
     inbeamstr[0] = '\0';
     smf_getfitss( hdr, "INBEAM", inbeamstr, sizeof(inbeamstr), status );
-    printf(" INBEAM = '%s'\n", inbeamstr);
 
     /* SEQ_TYPE is "new" */
     if ( *status == SAI__OK ) {
@@ -191,7 +190,6 @@ void smf_calc_mode ( smfHead * hdr, int * status ) {
       inbeam |= SMF__INBEAM_BLACKBODY;
       /* We could consider ensuring FTS is not set in this case */
     }
-    printf("INBEAM = %d\n",inbeam);
   }
 
   hdr->obstype = type;
