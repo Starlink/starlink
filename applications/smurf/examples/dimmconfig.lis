@@ -89,12 +89,23 @@ exportndf = 0
 # The following parameters control data-cleaning before iterations start
 # ----------------------------------------------------------------------------
 
+# set this to 0 to turn off all of the pre-mapmaking data cleaning
+
+#doclean = 0
+
+# Export the data immediately after data cleaning / before map-making?
+# The file name will be the same as model components, except with the
+# suffix "_cln". Even if doclean=0, the data will be exported immediately
+# before map-making.
+
+#exportclean = 1
+
 # --- Mean subtraction is fairly useful ---
 
 # subtract a baseline polynomial of this order
 order = 0
 
-# Use default apodisation based on filter frequency. This over-rides the default 
+# Use default apodisation based on filter frequency. This over-rides the default
 # of zero in smurf_sc2clean.def. Keep the <undef> default for PAD which is set up
 # in smurf_makemap.def.
 apod = <undef>

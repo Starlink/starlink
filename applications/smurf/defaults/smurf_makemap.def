@@ -60,6 +60,12 @@ exportndf = 0
 # Load the cleaning defaults
 ^$SMURF_DIR/smurf_sc2clean.def
 
+# can turn off initial cleaning by setting this to 0
+doclean = 1
+
+# export raw data immediately after cleaning?
+exportclean = 0
+
 # smf_model_create
 
 # TSTEP is read in two locations.

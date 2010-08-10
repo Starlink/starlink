@@ -293,6 +293,8 @@
 *        step times.
 *     2010-07-22 (DSB):
 *        Use smf_get_padding to get padding with a dynamic default value.
+*     2010-08-10 (EC):
+*        Added "doclean" and "exportclean" config parameters
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -374,9 +376,11 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int deldimm=0;                /* Delete temporary .DIMM files */
   int tstep = 0;                /* Time step between full WCS calculations */
   int dimmflags;                /* Control flags for DIMM model components */
+  int doclean=1;                /* Are we doing data pre-processing? */
   dim_t dsize;                  /* Size of data arrays in containers */
   double dtemp;                 /* temporary double */
   int ensureflat=1;             /* flatfield data as they are loaded */
+  int exportclean=0;            /* Are we doing to export clean data? */
   int exportNDF=0;              /* If set export DIMM files to NDF at end */
   int *exportNDF_which=NULL;    /* Which models in modelorder will be exported*/
   int noexportsetbad=0;         /* Don't set bad values in exported models */
@@ -547,6 +551,12 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       /* Are we going to set bad values in exported models? */
       astMapGet0I( keymap, "NOEXPORTSETBAD", &noexportsetbad );
+
+      /* Flag for performing data pre-processing */
+      astMapGet0I( keymap, "DOCLEAN", &doclean );
+
+      /* Flag for exporting data right after ckeaning */
+      astMapGet0I( keymap, "EXPORTCLEAN", &exportclean );
 
       /* Method to use for calculating the variance map */
       astMapGet0I( keymap, "VARMAPMETHOD", &varmapmethod );
@@ -1142,10 +1152,16 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
               ast[i]->sdata[idx]->sidequal = thisqua;
             }
 
-            msgOut(" ", FUNC_NAME ": Pre-conditioning chunk", status);
-            for( idx=0; idx<res[i]->ndat; idx++ ) {
-              data = res[i]->sdata[idx];
-              smf_clean_smfData( wf, data, keymap, status );
+            if( doclean ) {
+              msgOut(" ", FUNC_NAME ": Pre-conditioning chunk", status);
+              for( idx=0; idx<res[i]->ndat; idx++ ) {
+                data = res[i]->sdata[idx];
+                smf_clean_smfData( wf, data, keymap, status );
+              }
+            } else {
+              msgOut( "", FUNC_NAME ": *** Warning *** doclean=0, "
+                      "so not pre-conditioning data before map-making",
+                      status );
             }
 
             /* initial quality report */
@@ -1163,6 +1179,42 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             msgOutiff( MSG__DEBUG, "", FUNC_NAME
                        ": ** %f s pre-conditioning data",
                        status, smf_timerupdate(&tv1,&tv2,status) );
+
+            /* Export the cleaned data here if desired */
+            if( exportclean ) {
+              msgOut( "", FUNC_NAME
+                      ": Writing out clean data prior to map-making.",
+                      status );
+
+              for( idx=0; idx<res[i]->ndat; idx++ ) {
+                int oldorder;
+                data = res[i]->sdata[idx];
+
+                /* create a file name with "_res_cln" suffix */
+                smf_model_stripsuffix( res[i]->sdata[idx]->file->name,
+                                       name, status );
+
+                if( memiter ) {
+                  /* if memiter=1, need to append "_res" to the name */
+                  one_strlcat( name, "_res", SMF_PATH_MAX+1, status );
+                }
+
+                one_strlcat( name, "_cln", SMF_PATH_MAX+1, status );
+
+                /* Use the correct order */
+                oldorder = res[i]->sdata[idx]->isTordered;
+                smf_dataOrder( res[i]->sdata[idx], 1, status );
+                smf_dataOrder( qua[i]->sdata[idx], 1, status );
+
+                smf_write_smfData( res[i]->sdata[idx], NULL,
+                                   name, NULL, 0, NDF__NOID,
+                                   status );
+
+                /* Revert the order */
+                smf_dataOrder( res[i]->sdata[idx], oldorder, status );
+                smf_dataOrder( qua[i]->sdata[idx], oldorder, status );
+              }
+            }
           }
 
           msgOut(" ",
