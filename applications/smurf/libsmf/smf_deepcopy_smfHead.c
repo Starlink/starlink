@@ -217,7 +217,7 @@ smf_deepcopy_smfHead( const smfHead *old, int * status ) {
   new = smf_construct_smfHead( new, instrument, wcs, tswcs, fitshdr,
                                allState, curframe, instap, nframes,
                                old->steptime, old->obsmode, old->swmode, old->obstype,
-                               old->seqtype, ndet,
+                               old->seqtype, old->inbeam, ndet,
                                fplanex, fplaney, detpos,detname, old->dpazel,
                                tsys, old->title, old->dlabel, old->units,
                                old->telpos, ocsconfig, old->obsidss, status );

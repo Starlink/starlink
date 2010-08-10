@@ -214,6 +214,9 @@
 #include "smurf_par.h"
 #include "fftw3.h"
 
+/* Macro to convert a bit position to an integer value */
+#define BIT_TO_VAL(bit) (1<<bit)
+
 #define SMF_PATH_MAX GRP__SZNAM
 #define SMF_NAME_MAX GRP__SZFNM
 #define SMF_MODEL_MAX 64   /* Maximum model components for iterative map maker*/
@@ -301,6 +304,14 @@ typedef enum smf_obstype {
   SMF__TYP_FASTFLAT
 } smf_obstype;
 
+typedef enum {
+  SMF__INBEAM_NOTHING = 0,
+  SMF__INBEAM_POL = BIT_TO_VAL(0),
+  SMF__INBEAM_FTS = BIT_TO_VAL(1),
+  SMF__INBEAM_BLACKBODY = BIT_TO_VAL(2)
+} smf_inbeam_t;
+
+
 /* Source of tau for extinction correction */
 typedef enum smf_tausrc {
   SMF__TAUSRC_NULL,     /* No correction */
@@ -362,9 +373,6 @@ static const size_t SMF__BADIDX = (size_t)-1;
 
 /* Name of SMURF history component */
 #define SMURF__HISTEXT "SMURFHIST"
-
-/* Macro to convert a bit position to an integer value */
-#define BIT_TO_VAL(bit) (1<<bit)
 
 /* Bit flags for smf_calcmodel* model component calculations */
 typedef enum {
@@ -541,6 +549,7 @@ typedef struct smfHead {
   smf_obsmode obsmode;      /* observing mode */
   smf_swmode swmode;        /* switching mode */
   smf_obstype seqtype;      /* Sequence type */
+  smf_inbeam_t inbeam;      /* What is in the beam (bitmask) */
   int isCloned;             /* If false, allState is owned by this
                                struct, if true it should not be freed */
   JCMTState *allState;     /* Array of STATE for every time slice */

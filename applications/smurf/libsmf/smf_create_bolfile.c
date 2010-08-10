@@ -192,7 +192,7 @@ void smf_create_bolfile( const Grp * bgrp, size_t index,
                                              NULL, 0, refdata->hdr->instap, 1,
                                              refdata->hdr->steptime, refdata->hdr->obsmode,
                                              refdata->hdr->swmode, refdata->hdr->obstype,
-                                             refdata->hdr->seqtype, 0, NULL, NULL,
+                                             refdata->hdr->seqtype, refdata->hdr->inbeam, 0, NULL, NULL,
                                              NULL, NULL, 0, NULL, buffer, datalabel,
                                              units, refdata->hdr->telpos, NULL, refdata->hdr->obsidss, status );
 

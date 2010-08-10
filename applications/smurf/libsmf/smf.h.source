@@ -715,7 +715,8 @@ smfHead *smf_construct_smfHead( smfHead * tofill, inst_t instrument,
                                 dim_t curframe, const double instap[],
                                 dim_t nframes, double steptime,
                                 smf_obsmode obsmode, smf_swmode swmode, smf_obstype obstype,
-                                smf_obstype seqtype, unsigned int ndet, double fplanex[],
+                                smf_obstype seqtype, smf_inbeam_t inbeam,
+                                unsigned int ndet, double fplanex[],
                                 double fplaney[], double detpos[],
                                 char *detname, int rpazel, double tsys[],
                                 const char title[], const char dlabel[],
@@ -1144,6 +1145,9 @@ int smf_history_check( const smfData* data, const char * appl, int *status);
 void smf_history_read( smfData* data, int *status);
 
 void smf_history_write( const smfData* data, int *status);
+
+void
+smf_inbeam_str ( smf_inbeam_t inbeam, char *inbeamstr, size_t lenstr, int * status );
 
 void smf_insert_tslice ( smfData **idata, smfData *tdata, int index,
                          int *status );

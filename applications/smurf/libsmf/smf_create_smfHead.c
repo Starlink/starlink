@@ -167,6 +167,7 @@ smf_create_smfHead( int * status ) {
   hdr->obstype = SMF__TYP_NULL;
   hdr->seqtype = SMF__TYP_NULL;
   hdr->swmode = SMF__SWM_NULL;
+  hdr->inbeam = SMF__INBEAM_NOTHING;
   hdr->steptime = VAL__BADD;
   hdr->ocsconfig = NULL;
   (hdr->units)[0] = '\0';

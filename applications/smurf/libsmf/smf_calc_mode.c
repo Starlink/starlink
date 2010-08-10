@@ -17,14 +17,14 @@
 
 *  Arguments:
 *     hdr = smfHead * (Given and Returned)
-*        Header. obsmode and obstype entries are updated.
+*        Header. obsmode, obstype, swmode, seqtyp and inbeam entries are updated.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
 *  Description:
-*     This function examines the FITS header to determine the observing mode
-*     and observation type. If the instrument is INST__NONE they are set to
-*     SMF__TYP_NULL and SMF__OBS_NULL.
+*     This function examines the FITS header to determine the natuve of the
+*     observing mode. Determines the observing mode, switching mode, the observation type,
+*     sequence type and whether anything is in the beam.
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
@@ -40,6 +40,8 @@
 *        Add ACSIS observing modes.
 *     2010-02-19 (TIMJ):
 *        Recognize fast flatfields.
+*     2010-08-09 (TIMJ):
+*        Add INBEAM support.
 
 *  Notes:
 *     This function relies on an accurate hdr->instrument. i.e. call
@@ -95,11 +97,13 @@ void smf_calc_mode ( smfHead * hdr, int * status ) {
   char obs_type[SZFITSCARD+1];   /* value of OBS_TYPE header */
   char sw_mode[SZFITSCARD+1];    /* value of SW_MODE header */
   char seq_type[SZFITSCARD+1];   /* value of SEQ_TYPE header */
+  char inbeamstr[SZFITSCARD+1];  /* value of INBEAM header */
 
   smf_obstype type = SMF__TYP_NULL;   /* temporary type */
   smf_obstype stype = SMF__TYP_NULL;   /* temporary seq type */
   smf_obsmode mode = SMF__OBS_NULL;   /* temporary mode */
   smf_swmode  swmode = SMF__SWM_NULL; /* Switching mode */
+  smf_inbeam_t inbeam = SMF__INBEAM_NOTHING; /* what is in beam? */
 
   if (*status != SAI__OK) return;
 
@@ -116,6 +120,11 @@ void smf_calc_mode ( smfHead * hdr, int * status ) {
     smf_fits_getS( hdr, "SAM_MODE", sam_mode, sizeof(sam_mode), status );
     smf_fits_getS( hdr, "SW_MODE", sw_mode, sizeof(sw_mode), status );
     smf_fits_getS( hdr, "OBS_TYPE", obs_type, sizeof(obs_type), status );
+
+    /* INBEAM can be undef */
+    inbeamstr[0] = '\0';
+    smf_getfitss( hdr, "INBEAM", inbeamstr, sizeof(inbeamstr), status );
+    printf(" INBEAM = '%s'\n", inbeamstr);
 
     /* SEQ_TYPE is "new" */
     if ( *status == SAI__OK ) {
@@ -171,12 +180,25 @@ void smf_calc_mode ( smfHead * hdr, int * status ) {
     type = smf__parse_obstype( obs_type, status );
     stype = smf__parse_obstype( seq_type, status );
 
+    /* in beam */
+    if ( smf_pattern_extract( inbeamstr, "(POL)", NULL, NULL, 0, status ) ) {
+      inbeam |= SMF__INBEAM_POL;
+    }
+    if ( smf_pattern_extract( inbeamstr, "(FTS)", NULL, NULL, 0, status ) ) {
+      inbeam |= SMF__INBEAM_FTS;
+    }
+    if ( smf_pattern_extract( inbeamstr, "(BODY)", NULL, NULL, 0, status ) ) {
+      inbeam |= SMF__INBEAM_BLACKBODY;
+      /* We could consider ensuring FTS is not set in this case */
+    }
+    printf("INBEAM = %d\n",inbeam);
   }
 
   hdr->obstype = type;
   hdr->seqtype = stype;
   hdr->obsmode = mode;
   hdr->swmode = swmode;
+  hdr->inbeam = inbeam;
 
 }
 

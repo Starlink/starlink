@@ -62,6 +62,8 @@
 *        Add Quality family.
 *     2010-07-01 (TIMJ):
 *        Include dark squid smfData in dump if present
+*     2010-08-09 (TIMJ):
+*        Report INBEAM
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -327,6 +329,11 @@ void smf_dump_smfData( const smfData *data, int showflags __attribute__((unused)
       msgSetc( "SEQ", "<NULL>" );
     }
     msgOut(" ", "    obsmode=^MOD / switch mode=^SW / obstype=^TYP (^SEQ)", status );
+
+    /* INBEAM */
+    smf_inbeam_str( hdr->inbeam, string, sizeof(string), status );
+    msgSetc( "INB", string );
+    msgOut( " ", "    inbeam = ^INB", status );
 
     /* Step time */
     msgSetd( "ST", hdr->steptime );

@@ -17,8 +17,8 @@
 *              AstFrameSet * wcs, AstFrameSet * tswcs,
 *              AstFitsChan * fitshdr, const JCMTState * allState,
 *              dim_t curframe, smf_obsmode obsmode, smf_swmode swmode,
-*              smf_obstype obstype, smf_obstype seqtype, unsigned int ndet,
-*              const double fplanex[], const double fplaney[],
+*              smf_obstype obstype, smf_obstype seqtype, smf_inbeam_t inbeam,
+*              unsigned int ndet, const double fplanex[], const double fplaney[],
 *              const double detpos[], const char *detname, int dpazel,
 *              const double tsys[],
 *              const char title[], const char dlabel[], const char units[],
@@ -56,6 +56,8 @@
 *        Observation type
 *     seqtype = smf_obstype (Given)
 *        Sequence type
+*     inbeam = smf_inbeam_t (Given)
+*        What is in the beam
 *     ndet = unsigned int (Given)
 *        Number of positions in fplanex, fplaney arrays. Number of detectors.
 *     fplanex = const double[] (Given)
@@ -158,6 +160,8 @@
 *        Add seqtype and obsidss. Use one_strlcpy
 *     2010-07-09 (TIMJ):
 *        Change default for isCloned to false.
+*     2010-08-09 (TIMJ):
+*        Add INBEAM support
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -210,7 +214,8 @@ smf_construct_smfHead( smfHead * tofill, inst_t instrument,
                        JCMTState * allState, dim_t curframe,
                        const double instap[], dim_t nframes, double steptime,
                        smf_obsmode obsmode, smf_swmode swmode, smf_obstype obstype,
-                       smf_obstype seqtype, unsigned int ndet, double fplanex[],
+                       smf_obstype seqtype, smf_inbeam_t inbeam,
+                       unsigned int ndet, double fplanex[],
                        double fplaney[], double detpos[], char *detname,
                        int dpazel, double tsys[], const char title[],
                        const char dlabel[], const char units[],
@@ -253,6 +258,7 @@ smf_construct_smfHead( smfHead * tofill, inst_t instrument,
     hdr->obstype = obstype;
     hdr->seqtype = seqtype;
     hdr->steptime= steptime;
+    hdr->inbeam  = inbeam;
     hdr->ocsconfig = ocsconfig;
 
     /* Have to copy the string items in since the struct has a slot for them */
