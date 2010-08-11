@@ -20,7 +20,7 @@
 *     This routine produces a graphical representation of a set of
 *     points in two-dimensional space (e.g. a data value and a position,
 *     or two data values).  Errors in both data values may be
-*     represented by error bars. No annotated asxes are drawn. The
+*     represented by error bars. No annotated axes are drawn. The
 *     calling routine should do this if required by passing the supplied
 *     Plot (IPLOT) to routine KPG1_ASGRD.
 *
@@ -563,8 +563,6 @@
             GOODY = ( Y( I ) .NE. AST__BAD )
             IF( GOODY ) THEN
                RY = REAL( Y( I ) )
-            ELSE IF ( MODE .EQ. 6 ) THEN
-               RY = RY0 
             ELSE
                RY = WY1
             END IF
@@ -602,21 +600,27 @@
                DOWN = .FALSE.
             END IF
 
-*  Draw line B) so long as the mid X position is known. Bad Y values are
-*  considered to be coincident with the bottom axis unless oin Gapped
-*  mode.
-            IF( MIDX ) THEN
+*  See if the mid Y value is defined. In Mode 1, bad values are drawn at
+*  the bottom Y value, but in Mode 6 they are not drawn at all.
+            MIDY = MODE .EQ. 1 .OR. ( GOODY .AND. GOODY0 )
+
+*  Draw line B) so long as the mid X position is known. In Mode 1, bad Y
+*  values are considered to be coincident with the bottom axis. In 
+*  Mode 6, bad Y values cause line B) to be omitted.
+            IF( MIDX .AND. MIDY ) THEN
 
 *  If the pen is now down, put it down at the mid x position.
-               IF ( GOODY .AND. MODE .NE. 6 ) THEN
-                  IF( .NOT. DOWN ) THEN
-                     CALL PGMOVE( RXC, RY0 )
-                     DOWN = .TRUE.
-                  END IF
+               IF( .NOT. DOWN ) THEN
+                  CALL PGMOVE( RXC, RY0 )
+                  DOWN = .TRUE.
                END IF
  
 *  Draw line B.
-               IF ( DOWN ) CALL PGDRAW( RXC, RY )
+               CALL PGDRAW( RXC, RY )
+
+*  If we cannot draw line B), pick up the pen.
+            ELSE
+               DOWN = .FALSE.
             END IF
 
 *  If possible draw line C).
