@@ -18,7 +18,7 @@ F77_SUBROUTINE(makesnr)( INTEGER(STATUS) ){
 *     MAKESNR
 
 *  Purpose:
-*     Create a signal-to-noise array from an NDF with defined variances.
+*     Creates a signal-to-noise array from an NDF with defined variances.
 
 *  Language:
 *     C (designed to be called from Fortran)
@@ -27,7 +27,7 @@ F77_SUBROUTINE(makesnr)( INTEGER(STATUS) ){
 *     ADAM A-task
 
 *  Invocation:
-*     CALL MAKESURFACE( STATUS )
+*     CALL MAKESNR( STATUS )
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -48,7 +48,7 @@ F77_SUBROUTINE(makesnr)( INTEGER(STATUS) ){
 *     makesnr in out minvar
 
 *  ADAM Parameters:
-*     IN = NDF (Update)
+*     IN = NDF (Read)
 *        The input NDF. An error is reported if this NDF does not have a
 *        VARIANCE component.
 *     MINVAR = _REAL (Read)
@@ -74,7 +74,7 @@ F77_SUBROUTINE(makesnr)( INTEGER(STATUS) ){
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -84,8 +84,8 @@ F77_SUBROUTINE(makesnr)( INTEGER(STATUS) ){
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. Berry
@@ -151,7 +151,7 @@ F77_SUBROUTINE(makesnr)( INTEGER(STATUS) ){
    ndgNdfas( grp, 1, "READ", &indf, STATUS );
    grpDelet( &grp, STATUS );
 
-/* Map the input Variance component as an array of doubles. */
+/* Map the input VARIANCE component as an array of doubles. */
    ndfMap( indf, "Variance", "_DOUBLE", "READ", (void *) &ipvin, &el, STATUS );
 
 /* If a value for MINVAR was supplied on the command line, we do not need
@@ -239,12 +239,12 @@ F77_SUBROUTINE(makesnr)( INTEGER(STATUS) ){
    Variance arrays. */
    ndfProp( indf, "AXIS,WCS,QUALITY", "OUT", &indf2, STATUS );
 
-/* Map the input Data component, and the output Data and Variance components. */
+/* Map the input DATA component, and the output DATA and VARIANCE components. */
    ndfMap( indf, "Data", "_DOUBLE", "READ", (void *) &ipdin, &el, STATUS );
    ndfMap( indf2, "Data", "_DOUBLE", "WRITE", (void *) &ipdout, &el, STATUS );
    ndfMap( indf2, "Variance", "_DOUBLE", "WRITE", (void *) &ipvout, &el, STATUS );
 
-/* Store appropriate values in the output Data and Variance components. */
+/* Store appropriate values in the output DATA and VARIANCE components. */
    if( *STATUS == SAI__OK ) {
       din = ipdin;
       dout = ipdout;
