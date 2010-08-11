@@ -83,7 +83,8 @@
 *        left corner of the PGPLOT view surface). The Current Frame should
 *        be the Frame in which annotation is required.
 *     MODE = INTEGER (Given)
-*        Determines the way in which the data points are represented:
+*        Determines the way in which the data points are represented.
+*        The options are as follows.
 *           1 - A "staircase" histogram, in which each horizontal line is
 *               centred on the X position. Bad values are flanked by vertical
 *               lines drawn down to the lower edge of the viewport.
@@ -93,8 +94,8 @@
 *               XW.
 *           5 - A "chain" in which each point is marker by a marker and also
 *               join by straight lines to its neighbouring points.
-*           6 - Exactly the same as mode 1, except that bad values are not
-*               flanked by vertical lines to be drawn down to the lower edge
+*           6 - The same as Mode 1, except that bad values are not
+*               flanked by vertical lines drawn down to the lower edge
 *               of the viewport (a simple gap is left instead).
 *     MTYPE = INTEGER (Given)
 *        The PGPLOT marker type to use if MODE is 3 or 5.
@@ -126,6 +127,7 @@
 *  Copyright:
 *     Copyright (C) 1998, 1999, 2001 Central Laboratory of the Research Councils.
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -146,6 +148,7 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -170,9 +173,11 @@
 *        Free resources used to hold attribute synonyms before returning.
 *     20-MAR-2007 (DSB):
 *        Allow more than one style parameter to be given via argument "PARAM".
+*     2010 August 10 (MJC):
+*        Added Mode=6.
 *     11-AUG-2010 (DSB):
 *        Added mode 6.
-*     {enter_changes_here}
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -557,6 +562,8 @@
             GOODY = ( Y( I ) .NE. AST__BAD )
             IF( GOODY ) THEN
                RY = REAL( Y( I ) )
+            ELSE IF ( MODE .EQ. 6 ) THEN
+               RY = RY0 
             ELSE
                RY = WY1
             END IF
@@ -594,27 +601,21 @@
                DOWN = .FALSE.
             END IF
 
-*  See if the mid Y value is defined. In mode 1, bad values are drawn at
-*  the bottom Y value, but in mode 6 they are not drawn at all.
-            MIDY = MODE .EQ. 1 .OR. ( GOODY .AND. GOODY0 )
-
-*  Draw line B) so long as the mid X position is know. In mode 1, bad Y
-*  values are considered to be coincident with the bottom axis. In mode
-*  6, bad Y values cause line B) to be omitted.
-            IF( MIDX .AND. MIDY ) THEN
+*  Draw line B) so long as the mid X position is known. Bad Y values are
+*  considered to be coincident with the bottom axis unless oin Gapped
+*  mode.
+            IF( MIDX ) THEN
 
 *  If the pen is now down, put it down at the mid x position.
-               IF( .NOT. DOWN ) THEN
-                  CALL PGMOVE( RXC, RY0 )
-                  DOWN = .TRUE.
+               IF ( GOODY .AND. MODE .NE. 6 ) THEN
+                  IF( .NOT. DOWN ) THEN
+                     CALL PGMOVE( RXC, RY0 )
+                     DOWN = .TRUE.
+                  END IF
                END IF
-
+ 
 *  Draw line B.
-               CALL PGDRAW( RXC, RY )
-
-*  If we cannot draw line B), pick up the pen.
-            ELSE
-               DOWN = .FALSE.
+               IF ( DOWN ) CALL PGDRAW( RXC, RY )
             END IF
 
 *  If possible draw line C).

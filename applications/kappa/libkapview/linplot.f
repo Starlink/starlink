@@ -261,15 +261,15 @@
 *        can take the following values.
 *
 *        - "Histogram" -- An histogram of the points is plotted in the
-*        style of a "staircase" (with vertical lines only joining the y
-*        values and not extending to the base of the plot).  The
-*        vertical lines are placed midway between adjacent x positions.
-*        Bad values are flanked by vertical lines to the lower edge of
-*        the plot.
+*        style of a "staircase" (with vertical lines only joining the
+*        y-axis values and not extending to the base of the plot).  The
+*        vertical lines are placed midway between adjacent x-axis
+*        positions.  Bad values are flanked by vertical lines to the
+*        lower edge of the plot.
 *
-*        - "Ihistogram" -- Exactly the same as "Histogram" except bad
+*        - "Gapped" -- The same as the "Histogram" option except bad 
 *        values are not flanked by vertical lines to the lower edge of
-*        the plot.
+*        the plot, leaving a gap.
 *
 *        - "Line" -- The points are joined by straight lines.
 *
@@ -594,8 +594,11 @@
 
 *  Copyright:
 *     Copyright (C) 1998-2000, 2003-2004 Central Laboratory of the
-*     Research Councils. Copyright (C) 2006 Particle Physics &
-*     Astronomy Research Council. All Rights Reserved.
+*     Research Councils.
+*     Copyright (C) 2006-2007 Particle Physics & Astronomy Research
+*     Council. 
+*     Copyright (C) 2008, 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -660,8 +663,8 @@
 *        KPG1_PLTLN that plots the data curve.
 *     29-OCT-2008 (DSB):
 *        Ignore negative or zero values if an axis map is set to LOG.
-*     11-AUG-2010 (DSB):
-*        Added MODE value "Ihistogram".
+*     2010 August 10 (MJC):
+*        Added Gapped MODE.
 *     {enter_further_changes_here}
 
 *-
@@ -1021,12 +1024,14 @@
 
 *  Get the plotting mode.
       CALL PAR_CHOIC( 'MODE', 'Line',
-     :                'Histogram,Ihistogram,Line,Point,Mark,Step,Chain',
+     :                'Histogram,Gapped,Line,Point,Mark,Step,Chain',
      :                .FALSE., TEXT, STATUS )
 
 *  Get an identifier for the mode, and get the marker type if required.
       IF( TEXT .EQ. 'HISTOGRAM' ) THEN
          IMODE = 1
+      ELSE IF( TEXT .EQ. 'GAPPED' ) THEN
+         IMODE = 6
       ELSE IF( TEXT .EQ. 'LINE' ) THEN
          IMODE = 2
       ELSE IF( TEXT .EQ. 'POINT' ) THEN

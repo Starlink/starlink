@@ -251,9 +251,15 @@
 *        can take the following values.
 *
 *        - "Histogram" -- An histogram of the points is plotted in the
-*        style of a "staircase" (with vertical lines only joining the Y
-*        values and not extending to the base of the plot).  The
-*        vertical lines are placed midway between adjacent X positions.
+*        style of a "staircase" (with vertical lines only joining the
+*        y-axis values and not extending to the base of the plot).  The
+*        vertical lines are placed midway between adjacent x-axis
+*        positions.  Bad values are flanked by vertical lines to the
+*        lower edge of the plot.
+*
+*        - "Gapped" -- The same as the "Histogram" option except bad 
+*        values are not flanked by vertical lines to the lower edge of
+*        the plot, leaving a gap.
 *
 *        - "Line" -- The points are joined by straight lines.
 *
@@ -435,7 +441,7 @@
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics & Astronomy Research
-*     Council.  (C) 2008 Science & Technology Facilities Council.
+*     Council.  (C) 2008-2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -473,6 +479,8 @@
 *        be set for each cell.
 *     17-JUL-2009 (DSB):
 *        Added ALIGN and SPECAXES parameters.
+*     2010 August 10 (MJC):
+*        Added Gapped MODE.
 *     {enter_further_changes_here}
 
 *-
@@ -869,12 +877,14 @@
 
 *  Get the plotting mode.
       CALL PAR_CHOIC( 'MODE', 'Line',
-     :                'Histogram,Line,Point,Mark,Chain',
+     :                'Histogram,Gapped,Line,Point,Mark,Chain',
      :                .FALSE., TEXT, STATUS )
 
 *  Get an identifier for the mode, and get the marker type if required.
       IF( TEXT .EQ. 'HISTOGRAM' ) THEN
          MODE = 1
+      ELSE IF( TEXT .EQ. 'GAPPED' ) THEN
+         MODE = 6
       ELSE IF( TEXT .EQ. 'LINE' ) THEN
          MODE = 2
       ELSE IF( TEXT .EQ. 'POINT' ) THEN

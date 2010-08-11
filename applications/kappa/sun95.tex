@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.37}
 \newcommand{\stardocnumber}    {95.37}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2010 August 11}
+\newcommand{\stardocdate}      {2010 August 10}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.12}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -17627,11 +17627,17 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
 
          \ssthitemlist{
 
-            \sstitem
             {\tt "Histogram"} --- An histogram of the points is plotted in the
-            style of a `staircase' (with vertical lines only joining the \textit{y}
-            values and not extending to the base of the plot).  The vertical
-            lines are placed midway between adjacent \textit{x} positions.
+            style of a `staircase' (with vertical lines only joining the
+            \textit{y}-axis values and not extending to the base of the plot).  The
+            vertical lines are placed midway between adjacent \textit{x}-axis
+            positions.  Bad values are flanked by vertical lines to the
+            lower edge of the plot.
+
+            \sstitem 
+            {\tt "Gapped"} -- The same as the {\tt "Histogram"} option except bad 
+            values are not flanked by vertical lines to the lower edge of
+            the plot, leaving a gap.
 
             \sstitem
             {\tt "Line"} --- The points are joined by straight lines.
@@ -29385,16 +29391,16 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
 
             \sstitem
             {\tt "Histogram"} --- An histogram of the points is plotted in the
-            style of a `staircase' (with vertical lines only joining the \textit{y}
-            values and not extending to the base of the plot).  The vertical
-            lines are placed midway between adjacent \textit{x} positions.
-            Bad values are flanked by vertical lines to the lower edge of
-            the plot.
+            style of a `staircase' (with vertical lines only joining the
+            \textit{y}-axis values and not extending to the base of the plot).  The
+            vertical lines are placed midway between adjacent \textit{x}-axis
+            positions.  Bad values are flanked by vertical lines to the
+            lower edge of the plot.
 
-            \sstitem
-            {\tt "Ihistogram"} --- Exactly the same as ``Histogram'' except bad
+            \sstitem 
+            {\tt "Gapped"} -- The same as the {\tt "Histogram"} option except bad 
             values are not flanked by vertical lines to the lower edge of
-            the plot.
+            the plot, leaving a gap.
 
             \sstitem
             {\tt "Line"} --- The points are joined by straight lines.
@@ -57215,7 +57221,14 @@ The following applications have been modified:
         beam.
       \end{itemize}
 
-   \item [\htmlref{CONVOLVE}{CONVOLVE}]\mbox{}
+   \item [\htmlref{CLINPLOT}{CLINPLOT}]\mbox{}
+      \begin{itemize}
+        \item Parameter MODE has a new option {\tt "Gapped"}, which
+        behaves as {\tt "Histogram"} except no flanking vertical lines 
+        are drawn either side of a bad value.
+      \end{itemize}
+
+      \item [\htmlref{CONVOLVE}{CONVOLVE}]\mbox{}
       \begin{itemize}
         \item A new parameter NORM determines how the output NDF is
         normalised to take account of the total data sum in the PSF,
@@ -57231,10 +57244,9 @@ The following applications have been modified:
 
    \item [\htmlref{LINPLOT}{LINPLOT}]\mbox{}
       \begin{itemize}
-        \item The MODE parameter can now be set to ``Ihistogram'', which
-        produces a histogram plot exactly like "Histogram", except that
-        bad values are not flanked by vertical lines to the lower edge of
-        the plot.
+        \item Parameter MODE has a new option {\tt "Gapped"}, which
+        behaves as {\tt "Histogram"} except no flanking vertical lines
+        are drawn either side of a bad value.
       \end{itemize}
 
    \item [\htmlref{LISTSHOW}{LISTSHOW}]\mbox{}

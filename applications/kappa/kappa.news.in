@@ -16,6 +16,12 @@
       is a new GAMMA output parameter to record the shape exponent
       of the primary beam.
 
+   o  CLINPLOT
+
+      -  Parameter MODE has a new option "Gapped", which behaves
+      as "Histogram" except no flanking vertical lines are drawn 
+      either side of a bad value.
+
    o  CONVOLVE
    
       -  A new parameter NORM determines how the output NDF is
@@ -27,6 +33,12 @@
 
       -  Bad percentile values are no longer written to the PERVAL
       output parameter.
+
+   o  LINPLOT
+
+      -  Parameter MODE has a new option "Gapped", which behaves
+      as "Histogram" except no flanking vertical lines are drawn
+      either side of a bad value.
 
    o  LISTSHOW
 
