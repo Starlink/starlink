@@ -809,6 +809,9 @@ related items to be removed.
 \item KPG\_OSTAx added.  It uses recurrence formulae to calculate
       simple statistics robustly.  It also extends KPG1\_STATx by
       deriving the skewness and kurtosis.
+\item The MODE argument of KPG1\_PLTLN has an additional option of
+      {\tt "Gapped"} that is the same as {\tt "Histogram"} except
+      bad values are not flanked by vertical lines, leaving a gap.
 \item KPG1\_STDSx and KPG1\_STFLx can respectively report or log the
       skewness and kurtosis via two additional arguments.  Users of
       these routines will need to modify calling routines accordingly;
