@@ -278,17 +278,17 @@
 *        are greater than 1.
 *     NX = _INTEGER (Read)
 *        The number of spectra to draw in each row. The spectra will
-*        be equally spaced over the bounds of the X pixel axis. The
-*        dynamic default is the number of pixels along the X axis of
-*        the NDF, so long as this value is no more than 30. If the X
+*        be equally spaced over the bounds of the x pixel axis. The
+*        dynamic default is the number of pixels along the x axis of
+*        the NDF, so long as this value is no more than 30. If the x
 *        axis spans more than 30 pixels, then the dynamic default is
 *        30 (meaning that some spatial pixels will be ignored).  []
 *     NY = _INTEGER (Read)
 *        The number of spectra to draw in each column. The spectra
-*        will be equally spaced over the bounds of the Y pixel axis.
-*        The dynamic default is the number of pixels along the Y axis
+*        will be equally spaced over the bounds of the y pixel axis.
+*        The dynamic default is the number of pixels along the y axis
 *        of the NDF, so long as this value is no more than 30. If the
-*        Y axis spans more than 30 pixels, then the dynamic default is
+*        y axis spans more than 30 pixels, then the dynamic default is
 *        30 (meaning that some spatial pixels will be ignored).  []
 *     REFLABEL = _LOGICAL (Read)
 *        If TRUE then the first line plot (i.e. the lower left
@@ -407,7 +407,7 @@
 *        printer and the data are plotted in histogram form.
 *     clinplot nearc v style="'title=Ne Arc variance'" useaxis=1
 *               reflabel=f
-*        Plots variance values versus position along axis 1, for each
+*        Plots variance values versus position along Axis 1, for each
 *        spatial position in dimensions two and three, for the three
 *        dimensional NDF called nearc on the current graphics device.
 *        The plot has a title of "Ne Arc variance".  No labels are
@@ -461,7 +461,7 @@
 *     02111-1307, USA.
 
 *  Authors:
-*     MJC: Malcolm J.Currie (RAL)
+*     MJC: Malcolm J. Currie (RAL)
 *     DSB: David S. Berry (JAC)
 *     {enter_new_authors_here}
 

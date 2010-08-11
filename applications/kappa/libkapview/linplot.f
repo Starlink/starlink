@@ -291,7 +291,7 @@
 *        can take the following values.
 *
 *        - "Bars" -- Bars with serifs (i.e. cross pieces at each end)
-*        are drawn joining the x error limits and the y error limits.
+*        are drawn joining the x-error limits and the y-error limits.
 *        The plotting attribute "Size(ErrBars)" (see parameter STYLE)
 *        can be used to control the size of these serifs (the attribute
 *        value should be a magnification factor; 1.0 gives default
@@ -542,7 +542,7 @@
 *        plots are different.
 *     linplot spectrum system="'system(1)=freq,unit(1)=GHz'"
 *        This example assumes that the current co-ordinate Frame of NDF
-*        spectrum is a SpecFrame.  The horizontal axis (axis "1") is
+*        spectrum is a SpecFrame.  The horizontal axis (Axis "1") is
 *        labelled with frequency values, in units of GHz.  If the
 *        SpecFrame represents some other system (such as wavelength,
 *        velocity, energy), or has some other units, then the
@@ -596,14 +596,14 @@
 *     Copyright (C) 1998-2000, 2003-2004 Central Laboratory of the
 *     Research Councils.
 *     Copyright (C) 2006-2007 Particle Physics & Astronomy Research
-*     Council. 
+*     Council.
 *     Copyright (C) 2008, 2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -613,8 +613,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm Currie (STARLINK)

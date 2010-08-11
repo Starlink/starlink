@@ -8388,7 +8388,7 @@ attribute of the sky Frame, we could say:
       \sstexamplesubsection{
          wcsattrib my\_data set format(1) \%10.5G
       }{
-         This sets the {\att Format} attribute for axis 1 in the current
+         This sets the {\att Format} attribute for Axis 1 in the current
          co-ordinate Frame in the NDF called {\tt my\_data}, so that axis values
          are formatted as floating point values using a minimum field
          width of ten characters, and displaying five significant figures.  An
@@ -8397,7 +8397,7 @@ attribute of the sky Frame, we could say:
       \sstexamplesubsection{
          wcsattrib ngc5128 set format(2) bdms.2
       }{
-         This sets the {\att Format} attribute for axis 2 in the current
+         This sets the {\att Format} attribute for Axis 2 in the current
          co-ordinate Frame in the NDF called {\tt ngc5128}, so that axis
          values are formatted as separate degrees, minutes and seconds field,
          separated by blanks.  The seconds field has two decimal places.
@@ -8505,7 +8505,7 @@ attribute of the sky Frame, we could say:
       \sstexamplesubsection{
          wcsattrib my\_data set label(2) "IRAS data (marked in white)"
       }{
-         This sets the {\att Label} for axis 2 in the current Frame in the NDF
+         This sets the {\att Label} for Axis 2 in the current Frame in the NDF
          called {\tt my\_data}, to the string {\tt "IRAS data (marked in white)"}.
       }
    }
@@ -8808,7 +8808,7 @@ attribute of the sky Frame, we could say:
       \sstexamplesubsection{
          wcsattrib my\_data set symbol(2)  AR
       }{
-         This sets the {\att Symbol} for axis 2 in the current Frame in the NDF
+         This sets the {\att Symbol} for Axis 2 in the current Frame in the NDF
          called {\tt my\_data}, to the string {\tt "AR"}.
       }
    }
@@ -14953,8 +14953,8 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          SKY current WCS Frame, position angle follows the standard
          convention of North through East.  For other Frames the angle
          is measured from the second axis anticlockwise, \emph{e.g.} for a
-         PIXEL Frame it would be from $Y$ through negative $X$, not the
-         standard $X$ through $Y$.
+         PIXEL Frame it would be from \textit{y} through negative \textit{x}, not the
+         standard \textit{x} through \textit{y}.
 
          If {\tt FALSE}, the co-ordinates are the regular axis co-ordinates
          in the current Frame.
@@ -15106,7 +15106,7 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          The primary beam position's orientation and its error, measured
          in degrees.  If the \htmlref{current WCS Frame}{se:curframe}~ is a SKY Frame,
          the angle is measured from North through East.  For other Frames the
-         angle is from the $X$-axis through $Y$.
+         angle is from the \textit{x}-axis through \textit{y}.
       }
       \sstsubsection{
          PA() = \_REAL (Write)
@@ -15114,7 +15114,7 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          The position angle and its errors of each secondary beam
          feature with respect to the primary beam.  They are measured in
          the current Frame of the NDF from North through East if that is
-         a SKY Domain, or anticlockwise from the $Y$ axis otherwise.  The
+         a SKY Domain, or anticlockwise from the \textit{y} axis otherwise.  The
          number of values stored is twice the number of beams.  The
          array alternates a position angle, then its corresponding
          error, appearing in beam order starting with the first
@@ -16004,11 +16004,11 @@ KAPPA: \htmlref{VECPLOT}{VECPLOT};
       {\em carpet plot} of the image (the iso-surface at value zero represents
       the input image data values).
 
-      The first two pixel axes ($X$ and $Y$) in the output cube correspond to the
-      pixel axes in the input image. The third pixel axis ($Z$) in the output
+      The first two pixel axes (\textit{x} and \textit{y}) in the output cube correspond to the
+      pixel axes in the input image. The third pixel axis (\textit{z}) in the output
       cube is proportional to data value in the input image. The value of
       a pixel in the output cube measures the difference between the data
-      value implied by its $Z$-axis position, and the data value of the
+      value implied by its \textit{z}-axis position, and the data value of the
       corresponding pixel in the input image. Two schemes are available
       (see Parameter MODE): the output pixel values can be either simply
       the difference between these two data values, or the difference
@@ -17359,9 +17359,10 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
       can also be displayed, and references to `spectral' and
       `spatial' axes should be interpreted appropriately.
 
-      A rectangular grid of $NX$ by $NY$ points (see Parameters NX and NY)
-      is defined over the spatial extent of the cube, and a spectrum
-      is drawn at each such point.  If $NX$ and $NY$ equal the spatial
+      A rectangular grid of \textit{NX} by \textit{NY} points (see
+      Parameters NX and NY) is defined over the spatial extent of the
+      cube, and a spectrum is drawn at each such point.  If \textit{NX}
+      and \textit{NY} equal the spatial
       dimensions of the cube (which is the default for spatial axes of
       fewer than 31 pixels), then one spectrum is drawn for every
       spatial pixel in the cube.  For speed, the spectrum will be
@@ -17666,9 +17667,9 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          NX = \_INTEGER (Read)
       }{
          The number of spectra to draw in each row.  The spectra will
-         be equally spaced over the bounds of the $X$ pixel axis. The
-         dynamic default is the number of pixels along the $X$ axis of
-         the NDF, so long as this value is no more than 30.  If the $X$
+         be equally spaced over the bounds of the \textit{x} pixel axis. The
+         dynamic default is the number of pixels along the \textit{x} axis of
+         the NDF, so long as this value is no more than 30.  If the \textit{x}
          axis spans more than 30 pixels, then the dynamic default is
          30 (meaning that some spatial pixels will be ignored).  {\tt []}
       }
@@ -17676,10 +17677,10 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          NY = \_INTEGER (Read)
       }{
          The number of spectra to draw in each column.  The spectra
-         will be equally spaced over the bounds of the $Y$ pixel axis.
-         The dynamic default is the number of pixels along the $Y$ axis
+         will be equally spaced over the bounds of the \textit{y} pixel axis.
+         The dynamic default is the number of pixels along the \textit{y} axis
          of the NDF, so long as this value is no more than 30.  If the
-         $Y$ axis spans more than 30 pixels, then the dynamic default is
+         \textit{y} axis spans more than 30 pixels, then the dynamic default is
          30 (meaning that some spatial pixels will be ignored).  {\tt []}
       }
       \sstsubsection{
@@ -17846,7 +17847,7 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
       \sstexamplesubsection{
          clinplot nearc v style="title=Ne Arc variance" useaxis=1 reflabel=f
       }{
-         Plots variance values versus position along axis 1, for each
+         Plots variance values versus position along Axis 1, for each
          spatial position in dimensions two and three, for the three
          dimensional NDF called nearc on the current graphics device.
          The plot has a title of {\tt "Ne Arc variance"}.  No labels are
@@ -27023,25 +27024,25 @@ KAPPA: \htmlref{GDSET}{GDSET},
       \sstsubsection{
          X1 = LITERAL (Write)
       }{
-         The lowest value found within the current picture for axis 1 of the
+         The lowest value found within the current picture for Axis 1 of the
          requested co-ordinate Frame (see Parameter FRAME).
       }
       \sstsubsection{
          X2 = LITERAL (Write)
       }{
-         The highest value found within the current picture for axis 1 of the
+         The highest value found within the current picture for Axis 1 of the
          requested co-ordinate Frame (see Parameter FRAME).
       }
       \sstsubsection{
          Y1 = LITERAL (Write)
       }{
-         The lowest value found within the current picture for axis 2 of the
+         The lowest value found within the current picture for Axis 2 of the
          requested co-ordinate Frame (see Parameter FRAME).
       }
       \sstsubsection{
          Y2 = LITERAL (Write)
       }{
-         The highest value found within the current picture for axis 2 of the
+         The highest value found within the current picture for Axis 2 of the
          requested co-ordinate Frame (see Parameter FRAME).
       }
    }
@@ -29437,13 +29438,13 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
 
             \sstitem
             {\tt "Bars"} --- Bars with serifs (\emph{i.e.} cross pieces at each end) are
-            drawn joining the \textit{x} error limits and the \textit{y} error limits.  The plotting
+            drawn joining the \textit{x}-error limits and the \textit{y}-error limits.  The plotting
             attribute \htmlattref{Size(ErrBars)}{Size(element)}~ (see Parameter STYLE) can be used to
             control the size of these serifs (the attribute value should be
             a magnification factor; 1.0 gives default serifs).
 
             \sstitem
-            {\tt "Cross"} --- San-serif bars are drawn joining the \textit{x}0-error limits and
+            {\tt "Cross"} --- San-serif bars are drawn joining the \textit{x}-error limits and
             the \textit{y}-error limits.
 
             \sstitem
@@ -29694,7 +29695,7 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          one-dimensional NDF called spectrum on the current graphics
          device.  If the current co-ordinate Frame of the NDF is also
          one-dimensional, then the horizontal axis will be labelled with
-         values on axis 1 of the current co-ordinate Frame.  Otherwise, it
+         values on Axis 1 of the current co-ordinate Frame.  Otherwise, it
          will be labelled with offset from the first element.
       }
       \sstexamplesubsection{
@@ -29747,7 +29748,7 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          edge(2)=right}.  These cause the error bars to be drawn in
          pink, the points to be drawn in red, tick marks to be
          restricted to the labelled edges of the plot, and the
-         vertical axis (axis 2) to be annotated on the right-hand edge
+         vertical axis (Axis 2) to be annotated on the right-hand edge
          of the plot.   The plotting style specified in file
          {\tt my\_sty} becomes the default plotting style for future
          invocations of LINPLOT.
@@ -29774,7 +29775,7 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
       }{
          This example assumes that the current co-ordinate Frame of NDF
          {\tt "spectrum"} is a \xref{SpecFrame}{sun210}{SpecFrame}.  The
-         horizontal axis (axis {\tt "1"}) is labelled
+         horizontal axis ({\tt "Axis 1"}) is labelled
          with frequency values, in units of GHz.  If the SpecFrame represents
          some other system (such as wavelength, velocity, energy)
          or has some other units, then the conversion is done automatically.
@@ -33058,8 +33059,8 @@ KAPPA: \htmlref{FITSURFACE}{FITSURFACE},
          of the axes within the \htmlref{current WCS Frame}{se:curframe}~ will only
          be changed if the \htmlref{Domain}{se:domains} of the
          \htmlref{current Frame}{se:curframe}~ is PIXEL or AXES.  For instance,
-         if the current Frame has Domain {\tt "SKY"}, with axis 1 being RA and
-         axis 2 being DEC, then these will be unchanged in the output NDF.
+         if the current Frame has Domain {\tt "SKY"}, with Axis 1 being RA and
+         Axis 2 being DEC, then these will be unchanged in the output NDF.
          However, the Mapping which is used to relate (RA,DEC) positions
          to pixel positions will be modified to take the permutation of
          the pixel axes into account.
@@ -33086,8 +33087,8 @@ KAPPA: \htmlref{FITSURFACE}{FITSURFACE},
       }{
          This does the same as the last example except that the output
          NDF is transposed.  That is, the input NDF is copied into the
-         output NDF so that it is parallel to pixel axis 1 (\textit{x}) in the
-         output NDF, instead of pixel axis 2 (\textit{y}) as before.
+         output NDF so that it is parallel to pixel Axis 1 (\textit{x}) in the
+         output NDF, instead of pixel Axis 2 (\textit{y}) as before.
       }
       \sstexamplesubsection{
          manic cube hyper [1,0,0,0,0,0,3] ubound=[2,4,2,2,1] accept
@@ -37566,7 +37567,7 @@ KAPPA: \htmlref{WCSFRAME}{WCSFRAME},
          {\tt "10.2"} means 10.2 arcseconds, {\tt "30:0"} would mean 30 arcminutes,
          and {\tt "1:0:0"} would mean 1 degree.  If the current co-ordinate
          Frame is not a SKY Frame, then the diameter should be specified
-         as an increment along axis 1 of the current co-ordinate Frame.
+         as an increment along Axis 1 of the current co-ordinate Frame.
          Thus, if the current Frame is PIXEL, the value should be given
          simply as a number of pixels.
       }
@@ -38219,9 +38220,9 @@ KAPPA: \htmlref{PALDEF}{PALDEF},
          A list of integers defining how the pixel axes are to be permuted.
          The list must contain one element for each pixel axis in the NDF.
          The first element is the index of the pixel axis within the input
-         NDF which is to become axis 1 in the output NDF.  The second element
+         NDF which is to become Axis 1 in the output NDF.  The second element
          is the index of the pixel axis within the input NDF which is to
-         become axis 2 in the output NDF, \emph{etc}.  Axes are numbered from 1.
+         become Axis 2 in the output NDF, \emph{etc}.  Axes are numbered from 1.
       }
       \sstsubsection{
          TITLE = LITERAL (Read)
@@ -38240,10 +38241,10 @@ KAPPA: \htmlref{PALDEF}{PALDEF},
       \sstexamplesubsection{
          permaxes a b [3,1,2]
       }{
-         Creates a new three-dimensional NDF called b in which axis 1
-         corresponds to axis 3 in the input three-dimensional NDF called a,
-         axis 2 corresponds to input axis 1, axis 3 corresponds to input
-         axis 2.
+         Creates a new three-dimensional NDF called b in which Axis 1
+         corresponds to Axis 3 in the input three-dimensional NDF called a,
+         Axis 2 corresponds to input Axis 1, Axis 3 corresponds to input
+         Axis 2.
       }
    }
    \sstnotes{
@@ -39162,25 +39163,25 @@ KAPPA: \htmlref{PICCUR}{PICCUR},
       \sstsubsection{
          X1 = LITERAL (Write)
       }{
-         The lowest value found within the  picture for axis 1 of the
+         The lowest value found within the  picture for Axis 1 of the
          requested co-ordinate Frame (see Parameter FRAME).
       }
       \sstsubsection{
          X2 = LITERAL (Write)
       }{
-         The highest value found within the  picture for axis 1 of the
+         The highest value found within the  picture for Axis 1 of the
          requested co-ordinate Frame (see Parameter FRAME).
       }
       \sstsubsection{
          Y1 = LITERAL (Write)
       }{
-         The lowest value found within the  picture for axis 2 of the
+         The lowest value found within the  picture for Axis 2 of the
          requested co-ordinate Frame (see Parameter FRAME).
       }
       \sstsubsection{
          Y2 = LITERAL (Write)
       }{
-         The highest value found within the  picture for axis 2 of the
+         The highest value found within the  picture for Axis 2 of the
          requested co-ordinate Frame (see Parameter FRAME).
       }
    }
@@ -48937,10 +48938,10 @@ plot (7k).
          and is a copy of an existing Frame with domain DIST-LUM.  The first
          axis in the new Frame is derived from the first axis in the basis
          Frame but is in different units (AU instead of parsecs).  This
-         change of units is achieved by multiplying the old Frame axis 1
+         change of units is achieved by multiplying the old Frame Axis 1
          values by 2.0626E5.  The values on the second axis are copied
          without change.  You could then use application WCSATTRIB to set
-         the \htmlattref{Unit}{Unit(axis)}~ attribute for axis 1 of the
+         the \htmlattref{Unit}{Unit(axis)}~ attribute for Axis 1 of the
          new Frame to {\tt "AU"}.
       }
       \sstexamplesubsection{
@@ -49700,7 +49701,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       \sstexamplesubsection{
          wcsattrib my\_data set format(1) "\%10.5G"
       }{
-         This sets the \htmlattref{Format}{Format(axis)}~ attribute for axis 1 in
+         This sets the \htmlattref{Format}{Format(axis)}~ attribute for Axis 1 in
          the current co-ordinate Frame in the NDF called my\_data, so
          that axis values are formatted as floating-point values using
          a minimum field width of ten characters, and displaying five
@@ -49709,7 +49710,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       \sstexamplesubsection{
          wcsattrib ngc5128 set format(2) bdms.2
       }{
-         This sets the \htmlattref{Format}{Format(axis)}~ attribute for axis 2 in
+         This sets the \htmlattref{Format}{Format(axis)}~ attribute for Axis 2 in
          the current co-ordinate Frame in the NDF called ngc5128, so that axis
          values are formatted as separate degrees, minutes and seconds
          fields, separated by blanks.  The seconds field has two decimal places.
@@ -49829,7 +49830,7 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          transformation from pixel co-ordinates in the reference NDF given
          for Parameter LIKE, to pixel co-ordinates in the input NDF given
          for Parameter NDF.  For instance, if a feature has pixel co-ordinates
-         ($X$,$Y$,$Z$,\dots) in the reference NDF, and pixel co-ordinates
+         (\textit{X},\textit{Y},\textit{Z},\dots) in the reference NDF, and pixel co-ordinates
          ($U$,$V$,$W$,\dots) in the input NDF, then the following transformations
          would be used, depending on how many axes each NDF has:
 
@@ -51295,7 +51296,7 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          All columns between the supplied values will be replaced.  This
          parameter is only accessed if Parameter LINCOL is set to
          {\tt "Columns"} or {\tt "Region"}, and Parameter MODE is set to {\tt "Interface"}.
-         Each \textit{x} value should be given as a formatted value for axis 1
+         Each \textit{x} value should be given as a formatted value for Axis 1
          of the current co-ordinate Frame of the input NDF.  The two values
          should be separated by a comma, or by one or more spaces.
       }
@@ -51347,7 +51348,7 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          All lines between the supplied values will be replaced.  This
          parameter is only accessed if Parameter LINCOL is set to
          {\tt "Lines"} or {\tt "Region"}, and Parameter MODE is set to {\tt "Interface"}.
-         Each \textit{y} value should be given as a formatted value for axis 2
+         Each \textit{y} value should be given as a formatted value for Axis 2
          of the current co-ordinate Frame of the input NDF.  The two values
          should be separated by a comma, or by one or more spaces.
       }
@@ -54740,7 +54741,7 @@ The following applications have been modified:
 
                   \item[RADUNITS] --- Use application WCSFRAME to set the required
                                   co-ordinate Frame first, or set the Unit
-                                  attribute for axis 1 of the input NDF
+                                  attribute for Axis 1 of the input NDF
                                   using application \htmlref{WCSATTRIB}{WCSATTRIB}.
 
                   \item[SCALE] --- Use application WCSFRAME to set the required
@@ -57084,12 +57085,12 @@ The following applications have been modified:
 
    \item [\htmlref{HISTOGRAM}{HISTOGRAM}]\mbox{}
       \begin{itemize}
-        \item This now displays an improved $X$-axis label on its plot.
+        \item This now displays an improved \textit{x}-axis label on its plot.
       \end{itemize}
 
-   \item [\htmlref{LINPLOT}{lLINPLOT}]\mbox{}
+   \item [\htmlref{LINPLOT}{LINPLOT}]\mbox{}
       \begin{itemize}
-        \item The $Y$-axis Symbol has changed from the NDF's label to
+        \item The \textit{y}-axis Symbol has changed from the NDF's label to
 	the name of its plotted array component.  A long Symbol
 	including spaces caused issues in other tasks like CURSOR,
 	where the Symbol is used as a column name in the output

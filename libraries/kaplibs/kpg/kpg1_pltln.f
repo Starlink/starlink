@@ -17,16 +17,17 @@
 *                      APP, STATUS )
 
 *  Description:
-*     This routine produces a graphical representation of a set of points
-*     in 2-D space (e.g. a data value and a position, or two data values).
-*     Errors in both data values may be represented by error bars. No
-*     annotated asxes are drawn. The calling routine should do this if
-*     required by passing the supplied Plot (IPLOT) to routine KPG1_ASGRD.
+*     This routine produces a graphical representation of a set of
+*     points in two-dimensional space (e.g. a data value and a position,
+*     or two data values).  Errors in both data values may be
+*     represented by error bars. No annotated asxes are drawn. The
+*     calling routine should do this if required by passing the supplied
+*     Plot (IPLOT) to routine KPG1_ASGRD.
 *
 *     PGPLOT should be active, and the viewport should correspond to the
 *     DATA picture in which the plot is to be drawn. PGPLOT world co-ordinates
 *     within the viewport should be GRAPHICS co-ordinates (millimetres from the
-*     bottom left corner of the view surface).
+*     bottom-left corner of the view surface).
 *
 *     The Plotting style is accessed using one or more environment parameters
 *     specified by PARAM, and may include the following synonyms for graphical
@@ -34,9 +35,9 @@
 *        "Err(Bars)" - Specifies colour, etc for error bars. Size(errbars)
 *                      scales the size of the serifs used if ERSHAP=1 (i.e.
 *                      a size value of 1.0 produces a default size).
-*        "Sym(bols)" - Specifies colour, etc for markers (used in modes 3
+*        "Sym(bols)" - Specifies colour, etc for markers (used in Modes 3
 *                      and 5).
-*        "Lin(es)" - Specifies colour, etc for lines (used in modes 1, 2,
+*        "Lin(es)" - Specifies colour, etc. for lines (used in Modes 1, 2,
 *                    4 and 5).
 
 *  Arguments:
@@ -48,28 +49,28 @@
 *        The index of the last grid point to be used.
 *     X( N ) = DOUBLE PRECISION (Given)
 *        The X value at each point, in PGPLOT world co-ordinate (i.e.
-*        millimetres from the bottom left corner of the view surface).
+*        millimetres from the bottom-left corner of the view surface).
 *     Y( N ) = DOUBLE PRECISION (Given)
 *        The Y value at each point, in PGPLOT world co-ordinate (i.e.
-*        millimetres from the bottom left corner of the view surface).
+*        millimetres from the bottom-left corner of the view surface).
 *     XERROR = LOGICAL (Given)
 *        Display X error bars?
 *     YERROR = LOGICAL (Given)
 *        Display Y error bars?
 *     XBAR( N, 2 ) = DOUBLE PRECISION (Given)
-*        Row 1 contains the lower limit and row 2 contains the upper limit
+*        Row 1 contains the lower limit and Row 2 contains the upper limit
 *        for each horizontal error bar, in PGPLOT world co-ordinate (i.e.
 *        millimetres from the bottom left corner of the view surface). Only
 *        accessed if XERROR is .TRUE.
 *     YBAR( N, 2 ) = DOUBLE PRECISION (Given)
-*        Row 1 contains the lower limit and row 2 contains the upper limit
+*        Row 1 contains the lower limit and Row 2 contains the upper limit
 *        for each vertical error bar, in PGPLOT world co-ordinate (i.e.
-*        millimetres from the bottom left corner of the view surface). Only
+*        millimetres from the bottom-left corner of the view surface). Only
 *        accessed if YERROR is .TRUE.
 *     XSTEP( N, 2 ) = DOUBLE PRECISION (Given)
-*        Row 1 contains the lower limit and row 2 contains the upper limit
+*        Row 1 contains the lower limit and Row 2 contains the upper limit
 *        for each horizontal step, in PGPLOT world co-ordinate (i.e.
-*        millimetres from the bottom left corner of the view surface). Only
+*        millimetres from the bottom-left corner of the view surface). Only
 *        accessed if MODE is 4.
 *     PARAM = CHARACTER * ( * ) (Given)
 *        The names of one or more style parameters to be used when obtaining
@@ -79,7 +80,7 @@
 *        attributes obtained via earlier parameters to be assigned new values.
 *     IPLOT = INTEGER (Given)
 *        An AST Plot which can be used to do the drawing. The Base Frame
-*        should be GRAPHICS co-ordinates (millimetres from the bottom
+*        should be GRAPHICS co-ordinates (millimetres from the bottom-
 *        left corner of the PGPLOT view surface). The Current Frame should
 *        be the Frame in which annotation is required.
 *     MODE = INTEGER (Given)
@@ -133,7 +134,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -143,8 +144,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
@@ -160,7 +161,7 @@
 *     17-JUN-1999 (DSB):
 *        Call to PGEBUF added to end the PGPLOT buffering context.
 *     1-MAR-2001 (DSB):
-*        Change mode 1 so that vertical lines are drawn at the boundaries
+*        Change Mode 1 so that vertical lines are drawn at the boundaries
 *        of bad cells
 *     10-JUL-2001 (DSB):
 *        Corrected data type of ERR from REAL to DOUBLE PRECISION.
@@ -288,7 +289,7 @@
      :          REAL( Y( I ) ) .LT. WY2 ) THEN
                OK = .TRUE.
                GO TO 10
-            ENDIF
+            END IF
 
          END IF
       END DO
@@ -455,7 +456,7 @@
                END IF
 
 *  If ERSHAP specifies a diagonal cross, draw a poly line from bottom left
-*  to centre, to top right corner of the error box,
+*  to centre, to top-right corner of the error box,
                IF( ERSHAP .EQ. 2 ) THEN
                   IF( XERROR ) THEN
                      CALL PGMOVE( XLO, YLO )
@@ -554,7 +555,7 @@
 *  Loop round each X/Y position in the given range.
          DO I = ILO, IHI
 
-*  Save the single precision version of the current position. Set flags
+*  Save the single-precision version of the current position. Set flags
 *  indicating if they are good.
             GOODX = ( X( I ) .NE. AST__BAD )
             IF( GOODX ) RX = REAL( X( I ) )
