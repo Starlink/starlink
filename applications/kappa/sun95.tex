@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.37}
 \newcommand{\stardocnumber}    {95.37}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2010 August 4}
+\newcommand{\stardocdate}      {2010 August 11}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.12}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -14827,7 +14827,7 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
       }{
          If {\tt TRUE}, the shape exponent is fixed to be 2; in other words
          the beams are modelled as two-dimensional normal distributions.
-         If {\tt FALSE}, the shape exponent is a free parameter in each fit. 
+         If {\tt FALSE}, the shape exponent is a free parameter in each fit.
          {\tt [TRUE]}
       }
       \sstsubsection{
@@ -29388,6 +29388,13 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
             style of a `staircase' (with vertical lines only joining the \textit{y}
             values and not extending to the base of the plot).  The vertical
             lines are placed midway between adjacent \textit{x} positions.
+            Bad values are flanked by vertical lines to the lower edge of
+            the plot.
+
+            \sstitem
+            {\tt "Ihistogram"} --- Exactly the same as ``Histogram'' except bad
+            values are not flanked by vertical lines to the lower edge of
+            the plot.
 
             \sstitem
             {\tt "Line"} --- The points are joined by straight lines.
@@ -57220,6 +57227,14 @@ The following applications have been modified:
       \begin{itemize}
         \item Bad percentile values are no longer written to the PERVAL
         output parameter.
+      \end{itemize}
+
+   \item [\htmlref{LINPLOT}{LINPLOT}]\mbox{}
+      \begin{itemize}
+        \item The MODE parameter can now be set to ``Ihistogram'', which
+        produces a histogram plot exactly like "Histogram", except that
+        bad values are not flanked by vertical lines to the lower edge of
+        the plot.
       \end{itemize}
 
    \item [\htmlref{LISTSHOW}{LISTSHOW}]\mbox{}

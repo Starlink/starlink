@@ -85,13 +85,17 @@
 *     MODE = INTEGER (Given)
 *        Determines the way in which the data points are represented:
 *           1 - A "staircase" histogram, in which each horizontal line is
-*               centred on the X position.
+*               centred on the X position. Bad values are flanked by vertical
+*               lines drawn down to the lower edge of the viewport.
 *           2 - The points are joined by straight lines.
 *           3 - A marker is placed at each point (see MTYPE).
 *           4 - Mark each point with a horizontal line of width given by
 *               XW.
 *           5 - A "chain" in which each point is marker by a marker and also
 *               join by straight lines to its neighbouring points.
+*           6 - Exactly the same as mode 1, except that bad values are not
+*               flanked by vertical lines to be drawn down to the lower edge
+*               of the viewport (a simple gap is left instead).
 *     MTYPE = INTEGER (Given)
 *        The PGPLOT marker type to use if MODE is 3 or 5.
 *     ERSHAP = INTEGER (Given)
@@ -166,6 +170,8 @@
 *        Free resources used to hold attribute synonyms before returning.
 *     20-MAR-2007 (DSB):
 *        Allow more than one style parameter to be given via argument "PARAM".
+*     11-AUG-2010 (DSB):
+*        Added mode 6.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -223,6 +229,7 @@
       LOGICAL GOODY              ! Is current Y value good?
       LOGICAL GOODY0             ! Was previous Y value good?
       LOGICAL MIDX               ! Is middle X value good?
+      LOGICAL MIDY               ! Is middle Y value good?
       LOGICAL MORE               ! Continue looping?
       LOGICAL OK                 ! Are there any points within the window?
       REAL AXWID0                ! Original Axis line width
@@ -496,7 +503,7 @@
                   CALL PGDRAW( RX, YLO )
                   CALL PGDRAW( XLO, RY )
 
-*  Report an error if the MODE value was illegal.
+*  Report an error if the ERSHAP value was illegal.
                ELSE IF( STATUS .EQ. SAI__OK ) THEN
                   STATUS = SAI__ERROR
                   CALL MSG_SETI( 'SHAP', ERSHAP )
@@ -526,7 +533,7 @@
 
 *  First deal with "staircase" histograms.
 *  =======================================
-      IF( MODE .EQ. 1 ) THEN
+      IF( MODE .EQ. 1 .OR. MODE .EQ. 6 ) THEN
 
 *  Set PGPLOT attributes to match the plotting style used by the Plot for
 *  drawing Curves. Save the current PGPLOT attribute values in ATTR.
@@ -582,11 +589,19 @@
 *  Draw to the mid position.
                CALL PGDRAW( RXC, RY0 )
 
+*  If we cannot draw line A), pick up the pen.
+            ELSE
+               DOWN = .FALSE.
             END IF
 
-*  Draw line B) so long as the mid X position is know. Bad Y values are
-*  considered to be coincident with the bottom axis.
-            IF( MIDX ) THEN
+*  See if the mid Y value is defined. In mode 1, bad values are drawn at
+*  the bottom Y value, but in mode 6 they are not drawn at all.
+            MIDY = MODE .EQ. 1 .OR. ( GOODY .AND. GOODY0 )
+
+*  Draw line B) so long as the mid X position is know. In mode 1, bad Y
+*  values are considered to be coincident with the bottom axis. In mode
+*  6, bad Y values cause line B) to be omitted.
+            IF( MIDX .AND. MIDY ) THEN
 
 *  If the pen is now down, put it down at the mid x position.
                IF( .NOT. DOWN ) THEN
@@ -597,6 +612,9 @@
 *  Draw line B.
                CALL PGDRAW( RXC, RY )
 
+*  If we cannot draw line B), pick up the pen.
+            ELSE
+               DOWN = .FALSE.
             END IF
 
 *  If possible draw line C).
@@ -611,7 +629,7 @@
 *  Draw from the mid position to the current position.
                CALL PGDRAW( RX, RY )
 
-*  If we cannot draw line C), pick the pen up.
+*  If we cannot draw line C), pick up the pen.
             ELSE
                DOWN = .FALSE.
             END IF

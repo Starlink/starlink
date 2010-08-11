@@ -264,6 +264,12 @@
 *        style of a "staircase" (with vertical lines only joining the y
 *        values and not extending to the base of the plot).  The
 *        vertical lines are placed midway between adjacent x positions.
+*        Bad values are flanked by vertical lines to the lower edge of
+*        the plot.
+*
+*        - "Ihistogram" -- Exactly the same as "Histogram" except bad
+*        values are not flanked by vertical lines to the lower edge of
+*        the plot.
 *
 *        - "Line" -- The points are joined by straight lines.
 *
@@ -654,6 +660,8 @@
 *        KPG1_PLTLN that plots the data curve.
 *     29-OCT-2008 (DSB):
 *        Ignore negative or zero values if an axis map is set to LOG.
+*     11-AUG-2010 (DSB):
+*        Added MODE value "Ihistogram".
 *     {enter_further_changes_here}
 
 *-
@@ -1013,7 +1021,7 @@
 
 *  Get the plotting mode.
       CALL PAR_CHOIC( 'MODE', 'Line',
-     :                'Histogram,Line,Point,Mark,Step,Chain',
+     :                'Histogram,Ihistogram,Line,Point,Mark,Step,Chain',
      :                .FALSE., TEXT, STATUS )
 
 *  Get an identifier for the mode, and get the marker type if required.
@@ -1029,9 +1037,11 @@
          CALL PAR_GET0I( 'MARKER', MTYPE, STATUS )
       ELSE IF( TEXT .EQ. 'STEP' ) THEN
          IMODE = 4
-      ELSE
+      ELSE IF( TEXT .EQ. 'CHAIN' ) THEN
          IMODE = 5
          CALL PAR_GET0I( 'MARKER', MTYPE, STATUS )
+      ELSE
+         IMODE = 6
       ENDIF
 
 *  Ensure marker type (if used) is legal.
