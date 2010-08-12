@@ -158,8 +158,12 @@
 *      212-JUN-2010 (DSB):
 *         Fix loop termination bug in ndg1Rmprv.
 *      10-AUG-2010 (DSB):
-*          The old hash function (Bernstein) was creating collisions. Swap to 
+*          The old hash function (Bernstein) was creating collisions. Swap to
 *          FNV which seems to work better.
+*      12-AUG-2010 (DSB):
+*          Guard against using NULL Prov structures in ndg1ClearProvId
+*          and ndg1GetProvId (NULL parent or child pointers can occur in
+*          partially constructed Prov structure).
 */
 
 
@@ -3170,8 +3174,10 @@ static void ndg1ClearProvId( Prov *prov, int *status ) {
 /* Local Variables: */
    int ichild;
 
-/* Check the local error status. */
-   if ( !astOK ) return;
+/* Check the local error status. Partially constructed Prov striuctures
+   can contain NULL parent or child pointers, so also return if the Prov
+   pointer is NULL. */
+   if( *status != SAI__OK || ! prov ) return;
 
 /* Clear the hash code in the supplied Prov.*/
    prov->provid = 0;
@@ -4283,8 +4289,10 @@ static int ndg1GetProvId( Prov *prov, int *status ) {
       unsigned int unsigned_val;
    } tmp;
 
-/* Check the local error status. */
-   if ( *status != SAI__OK ) return 0;
+/* Check the local error status. Partially constructed Prov striuctures
+   can contain NULL parent or child pointers, so also return if the Prov
+   pointer is NULL. */
+   if( *status != SAI__OK || ! prov ) return 0;
 
 /* We only need to calculate a new hash code if the existing one is invalid. */
    if( prov->provid == 0 ) {
