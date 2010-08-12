@@ -153,6 +153,8 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map
 *         - Added astMapPutU method and AST__UNDEFTYPE data type.
 *     11-AUG-2010 (DSB):
 *        Added SortBy attribute.
+*     12-AUG-2010 (DSB):
+*        Speed up access to large KeyMaps.
 *class--
 */
 
@@ -239,6 +241,8 @@ typedef struct Entry0C {
 typedef struct Entry0A {
    struct AstMapEntry entry; /* The parent Entry information */
    AstObject *value;         /* The Object pointer */
+   struct AstMapEntry *next; /* Pointer to next AST Object entry */
+   struct AstMapEntry *prev; /* Pointer to previous AST Object entry */
 } Entry0A;
 
 /* This structure is a AstMapEntry holding a scalar void pointer */
@@ -275,6 +279,8 @@ typedef struct Entry1C {
 typedef struct Entry1A {
    struct AstMapEntry entry; /* The parent Entry information */
    AstObject **value;        /* The Object pointers */
+   struct AstMapEntry *next; /* Pointer to next AST Object entry */
+   struct AstMapEntry *prev; /* Pointer to previous AST Object entry */
 } Entry1A;
 
 /* This structure is a AstMapEntry holding a 1D array of void pointers. */
@@ -415,6 +421,7 @@ static int MapType( AstKeyMap *, const char *, int * );
 static int RemoveTableEntry( AstKeyMap *, int, const char *, int * );
 static int SortByInt( const char *, const char *, int * );
 static size_t SizeOfEntry( AstMapEntry *, int * );
+static void AddToObjectList( AstKeyMap *, AstMapEntry *, int * );
 static void AddToSortedList( AstKeyMap *, AstMapEntry *, int * );
 static void CheckCircle( AstKeyMap *, AstObject *, const char *, int * );
 static void Copy( const AstObject *, AstObject *, int * );
@@ -424,7 +431,7 @@ static void DoubleTableSize( AstKeyMap *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
 static void DumpEntry( AstMapEntry *, AstChannel *, int, int * );
 static void FreeTableEntry( AstKeyMap *, int itab, int * );
-static void InitMapEntry( AstMapEntry *, int * );
+static void InitMapEntry( AstMapEntry *, int, int, int * );
 static void MapCopy( AstKeyMap *, AstKeyMap *, int * );
 static void MapPut0A( AstKeyMap *, const char *, AstObject *, const char *, int * );
 static void MapPut0C( AstKeyMap *, const char *, const char *, const char *, int * );
@@ -448,6 +455,7 @@ static void MapPutU( AstKeyMap *, const char *, const char *, int * );
 static void MapRemove( AstKeyMap *, const char *, int * );
 static void NewTable( AstKeyMap *, int, int * );
 static void RemoveFromSortedList( AstKeyMap *, AstMapEntry *, int * );
+static void RemoveFromObjectList( AstKeyMap *, AstMapEntry *, int * );
 static void SortEntries( AstKeyMap *, int * );
 
 static const char *GetAttrib( AstObject *, const char *, int * );
@@ -542,6 +550,10 @@ static AstMapEntry *AddTableEntry( AstKeyMap *this, int itab, AstMapEntry *entry
 /* Insert the supplied MapEntry into a list sorted by key. */
    AddToSortedList( this, entry, status );
 
+/* If the entry is of type AST__OBJECTTYPE, add it to the head of the
+   list of AST__OBJECTTYPE entries in the KeyMap. */
+   AddToObjectList( this, entry, status );
+
 /* If the population of this table entry is now too large, double the size
    of the table, moving the table entries to appropriate places in the
    new larger table. */
@@ -551,6 +563,92 @@ static AstMapEntry *AddTableEntry( AstKeyMap *this, int itab, AstMapEntry *entry
 
 /* Return a NULL pointer. */
    return NULL;
+}
+
+static void AddToObjectList( AstKeyMap *this, AstMapEntry *entry, int *status ){
+/*
+*  Name:
+*     AddToObjectList
+
+*  Purpose:
+*     Add AST__OBJECTTYPE entries into a linked-list of such entries.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "keymap.h"
+*     void AddToObjectList( AstKeyMap *this, AstMapEntry *entry, int *status )
+
+*  Class Membership:
+*     KeyMap member function.
+
+*  Description:
+*     If the supplied MapEntry holds one or more pointers to AST Objects,
+*     then the entry is added to a linked list of such entries.
+
+*  Parameters:
+*     this
+*        Pointer to the KeyMap.
+*     entry
+*        Pointer to the MapEntry to be added.
+*     status
+*        Pointer to the inherited status variable.
+
+*/
+
+/* Local Variables: */
+   Entry0A *scalar;         /* Pointer to a scalar AST__OBJECTTYPE entry */
+   Entry1A *vector;         /* Pointer to a vector AST__OBJECTTYPE entry */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Do nothing if the entry does not hold AST Object pointers. */
+   if( entry->type == AST__OBJECTTYPE ) {
+
+/* If the list is not currently empty, add the new entry into the list. */
+      if( this->firstA ) {
+
+/* Store a pointer to the new entry as the previous link in the current
+   first entry in the list. */
+         if( this->firstA->nel == 0 ) {
+            scalar = (Entry0A *) this->firstA;
+            scalar->prev = entry;
+         } else {
+            vector = (Entry1A *) this->firstA;
+            vector->prev = entry;
+         }
+
+/* Store a pointer to the current first entry as the next link in the new
+   entry, and nullify the previus link. */
+         if( entry->nel == 0 ) {
+            scalar = (Entry0A *) entry;
+            scalar->next = this->firstA;
+            scalar->prev = NULL;
+         } else {
+            vector = (Entry1A *) entry;
+            vector->next = this->firstA;
+            vector->prev = NULL;
+         }
+
+/* If the list is currently empty, nullify both links in the entry. */
+      } else {
+         if( entry->nel == 0 ) {
+            scalar = (Entry0A *) entry;
+            scalar->next = NULL;
+            scalar->prev = NULL;
+         } else {
+            vector = (Entry1A *) entry;
+            vector->next = NULL;
+            vector->prev = NULL;
+         }
+
+      }
+
+/* Store the new entry as the first entry. */
+      this->firstA = entry;
+   }
 }
 
 static void AddToSortedList( AstKeyMap *this, AstMapEntry *entry, int *status ){
@@ -1726,6 +1824,8 @@ static AstMapEntry *CopyMapEntry( AstMapEntry *in, int *status ){
       if( nel == 0 ) {
          obj = ( (Entry0A *) in )->value;
          ( (Entry0A *) result )->value = obj ? astCopy( obj ) : NULL;
+         ( (Entry0A *) result )->next = NULL;
+         ( (Entry0A *) result )->prev = NULL;
       } else {
          alist = astMalloc( sizeof(AstObject *)*(size_t)nel );
          ( (Entry1A *) result )->value = alist;
@@ -1734,6 +1834,8 @@ static AstMapEntry *CopyMapEntry( AstMapEntry *in, int *status ){
                obj = ( (Entry1A *) in )->value[ i ];
                alist[ i ] = obj ? astCopy( obj ) : NULL;
             }
+            ( (Entry1A *) result )->next = NULL;
+            ( (Entry1A *) result )->prev = NULL;
          }
       }
 
@@ -1847,6 +1949,10 @@ static void CopyTableEntry( AstKeyMap *in, AstKeyMap *out, int itab, int *status
 /* Copy the next entry, storing the resulting pointer at the position
    indicated by "link". */
          *link = CopyMapEntry( next, status );
+
+/* If the entry is of type AST__OBJECTTYPE, add it to the head of the
+   list of AST__OBJECTTYPE entries in the output KeyMap. */
+         AddToObjectList( out, *link, status );
 
 /* Update "link" and "next" */
          next = next->next;
@@ -2239,6 +2345,8 @@ static AstMapEntry *FreeMapEntry( AstMapEntry *in, int *status ){
       if( nel == 0 ) {
          obj = ( (Entry0A *) in )->value;
          if( obj ) ( (Entry0A *) in )->value = astAnnul( obj );
+         ( (Entry0A *) in )->next = NULL;
+         ( (Entry0A *) in )->prev = NULL;
       } else {
          alist = ( (Entry1A *) in )->value;
          if( alist ) {
@@ -2246,6 +2354,8 @@ static AstMapEntry *FreeMapEntry( AstMapEntry *in, int *status ){
                if( alist[ i ] ) alist[ i ] = astAnnul( alist[ i ] );
             }
             ( (Entry1A *) in )->value = astFree( alist );
+            ( (Entry1A *) in )->next = NULL;
+            ( (Entry1A *) in )->prev = NULL;
          }
       }
 
@@ -3002,7 +3112,7 @@ void astInitKeyMapVtab_(  AstKeyMapVtab *vtab, const char *name, int *status ) {
    }
 }
 
-static void InitMapEntry( AstMapEntry *entry, int *status ){
+static void InitMapEntry( AstMapEntry *entry, int type, int nel, int *status ){
 /*
 *  Name:
 *     InitMapEntry
@@ -3015,7 +3125,7 @@ static void InitMapEntry( AstMapEntry *entry, int *status ){
 
 *  Synopsis:
 *     #include "keymap.h"
-*     void InitMapEntry( AstMapEntry *entry, int *status )
+*     void InitMapEntry( AstMapEntry *entry, int type, int nel, int *status )
 
 *  Class Membership:
 *     KeyMap member function.
@@ -3026,6 +3136,10 @@ static void InitMapEntry( AstMapEntry *entry, int *status ){
 *  Parameters:
 *     this
 *        Pointer to the MapEntry.
+*     type
+*        The type of the MapEntry.
+*     nel
+*        The number of elements in the entry: 0 = scalar, >0 = vector.
 *     status
 *        Pointer to the inherited status variable.
 
@@ -3038,14 +3152,24 @@ static void InitMapEntry( AstMapEntry *entry, int *status ){
    entry->next = NULL;
    entry->key = NULL;
    entry->hash = 0;
-   entry->type = AST__BADTYPE;
-   entry->nel = 0;
+   entry->type = type;
+   entry->nel = nel;
    entry->comment = NULL;
    entry->defined = 0;
    entry->snext = NULL;
    entry->sprev = NULL;
    entry->member = 0;
    entry->sortby = SORTBY_NONE;
+
+   if( type == AST__OBJECTTYPE ) {
+      if( nel == 0 ) {
+         ( (Entry0A *) entry )->next = NULL;
+         ( (Entry0A *) entry )->prev = NULL;
+      } else {
+         ( (Entry1A *) entry )->next = NULL;
+         ( (Entry1A *) entry )->prev = NULL;
+      }
+   }
 
 }
 
@@ -3197,7 +3321,6 @@ static int ManageLock( AstObject *this_object, int mode, int extra,
    AstObject **alist;     /* Pointer to list of AST object pointers */
    AstObject *obj;        /* Pointer to AST object */
    int i;                 /* Loop count */
-   int itab;              /* Table entry index */
    int nel;               /* No. of values in entry vector (0 => scalar) */
    int result;            /* Returned status value */
 
@@ -3216,25 +3339,23 @@ static int ManageLock( AstObject *this_object, int mode, int extra,
 
 /* Invoke the astManageLock method on any Objects contained within
    the supplied Object. */
-   for( itab = 0; itab < this->mapsize; itab++ ) {
-      next = this->table[ itab ];
-      while( next ) {
-         if( next->type == AST__OBJECTTYPE ) {
-            nel = next->nel;
-            if( nel == 0 ) {
-               obj = ( (Entry0A *) next )->value;
-               if( !result ) result = astManageLock( obj, mode, extra, fail );
-            } else {
-               alist = ( (Entry1A *) next )->value;
-               if( alist ) {
-                  for( i = 0; i < nel; i++ ) {
-                     if( !result ) result = astManageLock( alist[ i ], mode,
-                                                           extra, fail );
-                  }
-               }
+
+   next = this->firstA;
+   while( next ) {
+      nel = next->nel;
+      if( nel == 0 ) {
+         obj = ( (Entry0A *) next )->value;
+         if( !result ) result = astManageLock( obj, mode, extra, fail );
+         next = ( (Entry0A *) next)->next;
+      } else {
+         alist = ( (Entry1A *) next )->value;
+         if( alist ) {
+            for( i = 0; i < nel; i++ ) {
+               if( !result ) result = astManageLock( alist[ i ], mode,
+                                                     extra, fail );
             }
          }
-         next = next->next;
+         next = ( (Entry1A *) next)->next;
       }
    }
 
@@ -3641,14 +3762,12 @@ static void MapPut0##X( AstKeyMap *this, const char *key, Xtype value, \
 \
 /* Initialise the new structure.*/ \
       mapentry = (AstMapEntry *) entry; \
-      InitMapEntry( mapentry, status ); \
+      InitMapEntry( mapentry, Itype, 0, status ); \
 \
 /* Now store the new values. */ \
       keylen = strlen( key ); \
       mapentry->key = astStore( NULL, key, keylen + 1 ); \
       if( comment ) mapentry->comment = astStore( NULL, comment, strlen( comment ) + 1 ); \
-      mapentry->type = Itype; \
-      mapentry->nel = 0; \
       mapentry->defined = 1; \
       entry->value = ValExp; \
 \
@@ -3842,14 +3961,12 @@ static void MapPut1##X( AstKeyMap *this, const char *key, int size, \
 \
 /* Initialise the new structure.*/ \
       mapentry = (AstMapEntry *) entry; \
-      InitMapEntry( mapentry, status ); \
+      InitMapEntry( mapentry, Itype, size, status ); \
 \
 /* Now store the new values. */ \
       keylen = strlen( key ); \
       mapentry->key = astStore( NULL, key, keylen + 1 ); \
       if( comment ) mapentry->comment = astStore( NULL, comment, strlen( comment ) + 1 ); \
-      mapentry->type = Itype; \
-      mapentry->nel = size; \
       mapentry->defined = 1; \
       entry->value = astMalloc( sizeof( Xtype )*(size_t)size ); \
 \
@@ -3977,14 +4094,12 @@ void astMapPut1AId_( AstKeyMap *this, const char *key, int size,
 
 /* Initialise the new structure.*/
       mapentry = (AstMapEntry *) entry;
-      InitMapEntry( mapentry, status );
+      InitMapEntry( mapentry, AST__OBJECTTYPE, size, status );
 
 /* Now store the new values. */
       keylen = strlen( key );
       mapentry->key = astStore( NULL, key, keylen + 1 );
       if( comment ) mapentry->comment = astStore( NULL, comment, strlen( comment ) + 1 );
-      mapentry->type = AST__OBJECTTYPE;
-      mapentry->nel = size;
       mapentry->defined = 1;
       entry->value = astMalloc( sizeof( AstObject * )*(size_t)size );
 
@@ -4106,14 +4221,12 @@ f        The global status.
    if( astOK ) {
 
 /* Initialise the new structure.*/
-      InitMapEntry( mapentry, status );
+      InitMapEntry( mapentry, AST__UNDEFTYPE, 0, status );
 
 /* Now store the new values. */
       keylen = strlen( key );
       mapentry->key = astStore( NULL, key, keylen + 1 );
       if( comment ) mapentry->comment = astStore( NULL, comment, strlen( comment ) + 1 );
-      mapentry->type = AST__UNDEFTYPE;
-      mapentry->nel = 0;
       mapentry->defined = 0;
 
 /* Terminate the key string to exclude any trailing spaces. */
@@ -6690,6 +6803,96 @@ static void NewTable( AstKeyMap *this, int size, int *status ){
    }
 }
 
+static void RemoveFromObjectList( AstKeyMap *this, AstMapEntry *entry,
+                                  int *status ){
+/*
+*  Name:
+*     RemoveFromObjectList
+
+*  Purpose:
+*     Remove an entry from the linked-list of AST__OBJECTTYPE entries.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "keymap.h"
+*     void RemoveFromObjectList( AstKeyMap *this, AstMapEntry *entry,
+*                                int *status )
+
+*  Class Membership:
+*     KeyMap member function.
+
+*  Description:
+*     This function removes the supplied MapEntry from the linked list of
+*     AST__OBJECTTYPE entries.
+
+*  Parameters:
+*     this
+*        Pointer to the KeyMap.
+*     entry
+*        Pointer to the MapEntry to be removed.
+*     status
+*        Pointer to the inherited status variable.
+
+*/
+
+/* Local Variables: */
+   AstMapEntry *a;          /* Previous entry */
+   AstMapEntry *b;          /* Next entry */
+   Entry0A *scalar;         /* Pointer to a scalar AST__OBJECTTYPE entry */
+   Entry1A *vector;         /* Pointer to a vector AST__OBJECTTYPE entry */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Do nothing if the entry does not hold AST Object pointers. */
+   if( entry->type == AST__OBJECTTYPE ) {
+
+/* Get pointers to the MapEntries before and after the entry being
+   removed. At the same time, nullify both pointers in the entry itself. */
+      if( entry->nel == 0 ) {
+         scalar = (Entry0A *) entry;
+         a = scalar->prev;
+         b = scalar->next;
+         scalar->prev = NULL;
+         scalar->next = NULL;
+      } else {
+         vector = (Entry1A *) entry;
+         a = vector->prev;
+         b = vector->next;
+         vector->prev = NULL;
+         vector->next = NULL;
+      }
+
+/* Set the forward link in the previous entry. */
+      if( a ) {
+         if( a->nel == 0 ) {
+            scalar = (Entry0A *) a;
+            scalar->next = b;
+         } else {
+            vector = (Entry1A *) a;
+            vector->next = b;
+         }
+
+/* If we are removing the list head, store the following entry as the new head. */
+      } else {
+         this->firstA = b;
+      }
+
+/* Set the backward link in the next entry. */
+      if( b ) {
+         if( b->nel == 0 ) {
+            scalar = (Entry0A *) b;
+            scalar->prev = a;
+         } else {
+            vector = (Entry1A *) b;
+            vector->prev = a;
+         }
+      }
+   }
+}
+
 static void RemoveFromSortedList( AstKeyMap *this, AstMapEntry *entry,
                                   int *status ){
 /*
@@ -6828,6 +7031,10 @@ static int RemoveTableEntry( AstKeyMap *this, int itab, const char *key, int *st
 
 /* Remove the MapEntry from the list sorted by key. */
          RemoveFromSortedList( this, next, status );
+
+/* If the entry is of type AST__OBJECTTYPE, remove it from the
+   list of AST__OBJECTTYPE entries. */
+         RemoveFromObjectList( this, next, status );
 
 /* Store a pointer to the next MapEntry in the list, replacing the
    original pointer to the MapEntry which is being deleted. */
@@ -8014,6 +8221,7 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
    out->table = NULL;
    out->nentry = NULL;
    out->first = NULL;
+   out->firstA = NULL;
 
 /* Make copies of the table entries. */
    out->table = astMalloc( sizeof( AstMapEntry * )*( out->mapsize ) );
@@ -8081,6 +8289,7 @@ static void Delete( AstObject *obj, int *status ) {
 
 /* Nullify other pointers. */
    this->first = NULL;
+   this->firstA = NULL;
 }
 
 /* Dump function. */
@@ -8472,6 +8681,7 @@ AstKeyMap *astInitKeyMap_( void *mem, size_t size, int init, AstKeyMapVtab *vtab
       new->first = NULL;
       new->nsorted = 0;
       new->member_count = 0;
+      new->firstA = NULL;
 
       NewTable( new, MIN_TABLE_SIZE, status );
 
@@ -8614,6 +8824,7 @@ AstKeyMap *astLoadKeyMap_( void *mem, size_t size, AstKeyMapVtab *vtab,
       new->mapsize = 0;
       new->table = NULL;
       new->nentry = NULL;
+      new->firstA = NULL;
 
 /* Read input data. */
 /* ================ */

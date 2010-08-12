@@ -133,6 +133,7 @@ typedef struct AstKeyMap {
    AstMapEntry *first;                 /* Pointer to first structure in sorted list. */
    int nsorted;                        /* Length of sorted list */
    int member_count;                   /* Total no. of entries ever added to keyMap */
+   AstMapEntry *firstA;                /* Pointer to first "AST object"-type entry */
 } AstKeyMap;
 
 /* Virtual function table. */

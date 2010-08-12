@@ -24,6 +24,9 @@ read by astRead.
 the order in which keys are returned by the astMapKey (AST_MAPKEY) function.
 Keys can be sorted alphabetically or by age, or left unsorted.
 
+- Access to KeyMaps holding thousands of entries is now significantly
+faster.
+
 Main Changes in V5.3-1
 -----------------------
 
