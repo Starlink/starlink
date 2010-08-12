@@ -20,6 +20,9 @@ Main Changes in this Version
 FITS-WCS headers to be mis-interpreted, resulting in no FrameSet being
 read by astRead.
 
+- The KeyMap class has a new attribute called "SortBy". It controls
+the order in which keys are returned by the astMapKey (AST_MAPKEY) function.
+Keys can be sorted alphabetically or by age, or left unsorted.
 
 Main Changes in V5.3-1
 -----------------------

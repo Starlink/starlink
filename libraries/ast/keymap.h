@@ -99,13 +99,17 @@
    specific data types. */
 
 typedef struct AstMapEntry {
-   struct AstMapEntry *next; /* Pointer to next structure in list. */
+   struct AstMapEntry *next; /* Pointer to next structure in unsorted list. */
    const char *key;          /* The name used to identify the entry */
    unsigned long hash;       /* The full width hash value */
    int type;                 /* Data type. */
    int nel;                  /* 0 => scalar, >0 => array with "nel" elements */
    const char *comment;      /* Pointer to a comment for the entry */
    int defined;              /* Non-zero if the entry value is defined */
+   struct AstMapEntry *snext; /* Pointer to next structure in sorted list. */
+   struct AstMapEntry *sprev; /* Pointer to previous structure in sorted list. */
+   int member;               /* No. of entries added to KeyMap prior to this one  */
+   int sortby;               /* Used for comunnication with qsort function */
 } AstMapEntry;
 
 /* KeyMap structure. */
@@ -125,6 +129,10 @@ typedef struct AstKeyMap {
    int mapsize;                        /* Length of table */
    int keyerror;                       /* Report error if no key? */
    int maplocked;                      /* Prevent addition of new entries? */
+   int sortby;                         /* How the keys should be sorted */
+   AstMapEntry *first;                 /* Pointer to first structure in sorted list. */
+   int nsorted;                        /* Length of sorted list */
+   int member_count;                   /* Total no. of entries ever added to keyMap */
 } AstKeyMap;
 
 /* Virtual function table. */
@@ -201,6 +209,11 @@ typedef struct AstKeyMapVtab {
    int (* TestKeyError)( AstKeyMap *, int * );
    void (* ClearKeyError)( AstKeyMap *, int * );
    void (* SetKeyError)( AstKeyMap *, int, int * );
+
+   int (* GetSortBy)( AstKeyMap *, int * );
+   int (* TestSortBy)( AstKeyMap *, int * );
+   void (* ClearSortBy)( AstKeyMap *, int * );
+   void (* SetSortBy)( AstKeyMap *, int, int * );
 
 } AstKeyMapVtab;
 
@@ -325,6 +338,11 @@ int astTestKeyError_( AstKeyMap *, int * );
 void astSetKeyError_( AstKeyMap *, int, int * );
 void astClearKeyError_( AstKeyMap *, int * );
 
+int astGetSortBy_( AstKeyMap *, int * );
+int astTestSortBy_( AstKeyMap *, int * );
+void astSetSortBy_( AstKeyMap *, int, int * );
+void astClearSortBy_( AstKeyMap *, int * );
+
 int astGetMapLocked_( AstKeyMap *, int * );
 int astTestMapLocked_( AstKeyMap *, int * );
 void astSetMapLocked_( AstKeyMap *, int, int * );
@@ -440,6 +458,15 @@ astINVOKE(V,astGetKeyError_(astCheckKeyMap(this),STATUS_PTR))
 astINVOKE(V,astSetKeyError_(astCheckKeyMap(this),keyerror,STATUS_PTR))
 #define astTestKeyError(this) \
 astINVOKE(V,astTestKeyError_(astCheckKeyMap(this),STATUS_PTR))
+
+#define astClearSortBy(this) \
+astINVOKE(V,astClearSortBy_(astCheckKeyMap(this),STATUS_PTR))
+#define astGetSortBy(this) \
+astINVOKE(V,astGetSortBy_(astCheckKeyMap(this),STATUS_PTR))
+#define astSetSortBy(this,sortby) \
+astINVOKE(V,astSetSortBy_(astCheckKeyMap(this),sortby,STATUS_PTR))
+#define astTestSortBy(this) \
+astINVOKE(V,astTestSortBy_(astCheckKeyMap(this),STATUS_PTR))
 
 #define astClearMapLocked(this) \
 astINVOKE(V,astClearMapLocked_(astCheckKeyMap(this),STATUS_PTR))

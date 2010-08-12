@@ -34,6 +34,7 @@ c     void pointer,
 *
 *     - KeyError: Report an error if the requested key does not exist?
 *     - SizeGuess: The expected size of the KeyMap.
+*     - SortBy: Determines how keys are sorted in a KeyMap.
 *     - MapLocked: Prevent new entries being added to the KeyMap?
 
 *  Functions:
@@ -150,6 +151,8 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map
 *         KeyMaps.
 *         - Added astMapCopy method.
 *         - Added astMapPutU method and AST__UNDEFTYPE data type.
+*     11-AUG-2010 (DSB):
+*        Added SortBy attribute.
 *class--
 */
 
@@ -169,6 +172,14 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map
 
 /* String used to represent the formatetd version of AST__BAD. */
 #define BAD_STRING "<bad>"
+
+/* Integer values to represent the different values of the SortBy attribute. */
+#define SORTBY_NONE 0
+#define SORTBY_AGEUP 1
+#define SORTBY_AGEDOWN 2
+#define SORTBY_KEYUP 3
+#define SORTBY_KEYDOWN 4
+
 
 /* Include files. */
 /* ============== */
@@ -195,6 +206,7 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 /* Type Definitions */
 /* ================ */
@@ -371,41 +383,39 @@ static AstMapEntry *FreeMapEntry( AstMapEntry *, int * );
 static AstMapEntry *SearchTableEntry( AstKeyMap *, int, const char *, int * );
 static const char *GetKey( AstKeyMap *, int index, int * );
 static const char *MapKey( AstKeyMap *, int index, int * );
+static const char *SortByString( int, const char *, int * );
+static int CompareEntries( const void *, const void * );
 static int ConvertValue( void *, int, void *, int, int * );
 static int GetObjSize( AstObject *, int * );
 static int HashFun( const char *, int, unsigned long *, int * );
-static int KeyCmp( const char *, const char *, int * );
-static int MapGet0P( AstKeyMap *, const char *, void **, int * );
+static int KeyCmp( const char *, const char * );
 static int MapGet0A( AstKeyMap *, const char *, AstObject **, int * );
 static int MapGet0C( AstKeyMap *, const char *, const char **, int * );
 static int MapGet0D( AstKeyMap *, const char *, double *, int * );
 static int MapGet0F( AstKeyMap *, const char *, float *, int * );
 static int MapGet0I( AstKeyMap *, const char *, int *, int * );
+static int MapGet0P( AstKeyMap *, const char *, void **, int * );
 static int MapGet1A( AstKeyMap *, const char *, int, int *, AstObject **, int * );
-static int MapGet1P( AstKeyMap *, const char *, int, int *, void **, int * );
 static int MapGet1C( AstKeyMap *, const char *, int, int, int *, char *, int * );
 static int MapGet1D( AstKeyMap *, const char *, int, int *, double *, int * );
 static int MapGet1F( AstKeyMap *, const char *, int, int *, float *, int * );
 static int MapGet1I( AstKeyMap *, const char *, int, int *, int *, int * );
+static int MapGet1P( AstKeyMap *, const char *, int, int *, void **, int * );
 static int MapGetElemA( AstKeyMap *, const char *, int, AstObject **, int * );
-static int MapGetElemP( AstKeyMap *, const char *, int, void **, int * );
 static int MapGetElemC( AstKeyMap *, const char *, int, int, char *, int * );
 static int MapGetElemD( AstKeyMap *, const char *, int, double *, int * );
 static int MapGetElemF( AstKeyMap *, const char *, int, float *, int * );
 static int MapGetElemI( AstKeyMap *, const char *, int, int *, int * );
-static void MapPutElemA( AstKeyMap *, const char *, int, AstObject *, int * );
-static void MapPutElemP( AstKeyMap *, const char *, int, void *, int * );
-static void MapPutElemC( AstKeyMap *, const char *, int, const char *, int * );
-static void MapPutElemD( AstKeyMap *, const char *, int, double, int * );
-static void MapPutElemF( AstKeyMap *, const char *, int, float, int * );
-static void MapPutElemI( AstKeyMap *, const char *, int, int, int * );
+static int MapGetElemP( AstKeyMap *, const char *, int, void **, int * );
 static int MapHasKey( AstKeyMap *, const char *, int * );
 static int MapLenC( AstKeyMap *, const char *, int * );
 static int MapLength( AstKeyMap *, const char *, int * );
 static int MapSize( AstKeyMap *, int * );
 static int MapType( AstKeyMap *, const char *, int * );
 static int RemoveTableEntry( AstKeyMap *, int, const char *, int * );
+static int SortByInt( const char *, const char *, int * );
 static size_t SizeOfEntry( AstMapEntry *, int * );
+static void AddToSortedList( AstKeyMap *, AstMapEntry *, int * );
 static void CheckCircle( AstKeyMap *, AstObject *, const char *, int * );
 static void Copy( const AstObject *, AstObject *, int * );
 static void CopyTableEntry( AstKeyMap *, AstKeyMap *, int, int * );
@@ -414,22 +424,31 @@ static void DoubleTableSize( AstKeyMap *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
 static void DumpEntry( AstMapEntry *, AstChannel *, int, int * );
 static void FreeTableEntry( AstKeyMap *, int itab, int * );
+static void InitMapEntry( AstMapEntry *, int * );
+static void MapCopy( AstKeyMap *, AstKeyMap *, int * );
 static void MapPut0A( AstKeyMap *, const char *, AstObject *, const char *, int * );
-static void MapPut0P( AstKeyMap *, const char *, void *, const char *, int * );
 static void MapPut0C( AstKeyMap *, const char *, const char *, const char *, int * );
 static void MapPut0D( AstKeyMap *, const char *, double, const char *, int * );
 static void MapPut0F( AstKeyMap *, const char *, float, const char *, int * );
 static void MapPut0I( AstKeyMap *, const char *, int, const char *, int * );
-static void MapPut1P( AstKeyMap *, const char *, int, void *const [], const char *, int * );
+static void MapPut0P( AstKeyMap *, const char *, void *, const char *, int * );
 static void MapPut1A( AstKeyMap *, const char *, int, AstObject *const [], const char *, int * );
 static void MapPut1C( AstKeyMap *, const char *, int, const char *const [], const char *, int * );
 static void MapPut1D( AstKeyMap *, const char *, int, const double *, const char *, int * );
 static void MapPut1F( AstKeyMap *, const char *, int, const float *, const char *, int * );
 static void MapPut1I( AstKeyMap *, const char *, int, const int *, const char *, int * );
+static void MapPut1P( AstKeyMap *, const char *, int, void *const [], const char *, int * );
+static void MapPutElemA( AstKeyMap *, const char *, int, AstObject *, int * );
+static void MapPutElemC( AstKeyMap *, const char *, int, const char *, int * );
+static void MapPutElemD( AstKeyMap *, const char *, int, double, int * );
+static void MapPutElemF( AstKeyMap *, const char *, int, float, int * );
+static void MapPutElemI( AstKeyMap *, const char *, int, int, int * );
+static void MapPutElemP( AstKeyMap *, const char *, int, void *, int * );
 static void MapPutU( AstKeyMap *, const char *, const char *, int * );
 static void MapRemove( AstKeyMap *, const char *, int * );
 static void NewTable( AstKeyMap *, int, int * );
-static void MapCopy( AstKeyMap *, AstKeyMap *, int * );
+static void RemoveFromSortedList( AstKeyMap *, AstMapEntry *, int * );
+static void SortEntries( AstKeyMap *, int * );
 
 static const char *GetAttrib( AstObject *, const char *, int * );
 static int TestAttrib( AstObject *, const char *, int * );
@@ -440,6 +459,11 @@ static int GetSizeGuess( AstKeyMap *, int * );
 static int TestSizeGuess( AstKeyMap *, int * );
 static void ClearSizeGuess( AstKeyMap *, int * );
 static void SetSizeGuess( AstKeyMap *, int, int * );
+
+static int GetSortBy( AstKeyMap *, int * );
+static int TestSortBy( AstKeyMap *, int * );
+static void ClearSortBy( AstKeyMap *, int * );
+static void SetSortBy( AstKeyMap *, int, int * );
 
 static int GetKeyError( AstKeyMap *, int * );
 static int TestKeyError( AstKeyMap *, int * );
@@ -511,7 +535,14 @@ static AstMapEntry *AddTableEntry( AstKeyMap *this, int itab, AstMapEntry *entry
 /* Increment the length of linked list. */
    this->nentry[ itab ]++;
 
-/* If the population of this table entry is now too large, duble the size
+/* Each entry added to the KeyMap has a unique member index that is
+   never re-used. */
+   entry->member = (this->member_count)++;
+
+/* Insert the supplied MapEntry into a list sorted by key. */
+   AddToSortedList( this, entry, status );
+
+/* If the population of this table entry is now too large, double the size
    of the table, moving the table entries to appropriate places in the
    new larger table. */
    if( this->nentry[ itab ] > MAX_ENTRIES_PER_TABLE_ENTRY ) {
@@ -520,6 +551,155 @@ static AstMapEntry *AddTableEntry( AstKeyMap *this, int itab, AstMapEntry *entry
 
 /* Return a NULL pointer. */
    return NULL;
+}
+
+static void AddToSortedList( AstKeyMap *this, AstMapEntry *entry, int *status ){
+/*
+*  Name:
+*     AddToSortedList
+
+*  Purpose:
+*     Add an entry into the linked-list of sorted KeyMap entries.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "keymap.h"
+*     void AddToSortedList( AstKeyMap *this, AstMapEntry *entry, int *status )
+
+*  Class Membership:
+*     KeyMap member function.
+
+*  Description:
+*     This function adds the supplied MapEntry into the linked list of
+*     sorted MapEntries at a position that maintains the sorted order.
+
+*  Parameters:
+*     this
+*        Pointer to the KeyMap.
+*     entry
+*        Pointer to the MapEntry to be added.
+*     status
+*        Pointer to the inherited status variable.
+
+*/
+
+/* Local Variables: */
+   AstMapEntry *hi;         /* MapEntry at high end of current range */
+   AstMapEntry *lo;         /* MapEntry at low end of current range */
+   AstMapEntry *mid;        /* MapEntry at middle of current range */
+   int cmp;                 /* Result of comparing two entries */
+   int istep;               /* Step counter */
+   int nstep;               /* Number of entries in current range */
+   int sortby;              /* How to sort the keys */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Get the SortBy value. */
+   sortby = astGetSortBy( this );
+
+/* Do nothing if no sorting is required. */
+   if( sortby != SORTBY_NONE ) {
+
+/* Get pointers to the entries at the start and end of the sorted list. */
+      lo = this->first;
+      hi = lo ? lo->sprev : NULL;
+
+/* Store sortby value in the mapentry structures. */
+      if( lo ) lo->sortby = sortby;
+      if( hi ) hi->sortby = sortby;
+      entry->sortby = sortby;
+
+/* If the sorted list is empty, just store the supplied entry at the
+   head, and set the links to point back to itself. */
+      if( !lo ) {
+         this->first = entry;
+         entry->sprev = entry;
+         entry->snext = entry;
+
+/* If the new entry comes before the first entry or is equal to the first
+   entry, record it as the new first entry, and insert it into the linked
+   list before the original first entry. */
+      } else if( CompareEntries( &entry, &lo ) <= 0 ) {
+         this->first = entry;
+         entry->snext = lo;
+         entry->sprev = hi;
+         lo->sprev = entry;
+         hi->snext = entry;
+
+/* If the new entry comes after the last entry or is equal to the last
+   entry, insert it into the linked list after the last entry. */
+      } else if( CompareEntries( &entry, &hi ) >= 0 ) {
+         entry->snext = lo;
+         entry->sprev = hi;
+         lo->sprev = entry;
+         hi->snext = entry;
+
+/* If the list only contains two values, insert the new entry into the linked
+   list between the existing two entries. */
+      } else if( lo->snext == hi ) {
+         entry->snext = hi;
+         entry->sprev = lo;
+         lo->snext = entry;
+         hi->sprev = entry;
+
+/* Otherwise we do a binary chop within the existing sorted list to find the
+   correct position for the new entry. */
+      } else {
+
+/* Get a pointer to the entry mid way between the hi and lo entries. The
+   mid entry will be on the upper side of half way if there are an even
+   number of entries. */
+         nstep = this->nsorted/2;
+         mid = lo;
+         for( istep = 0; istep < nstep; istep++ ) mid = mid->snext;
+
+/* Loop until we have a pointer to the first entry which is equal to or
+   higher than the new entry. */
+         while( lo->snext != hi ) {
+
+/* The next step will be half the length of the previous step. Do not
+   allow the step size to fall to zero. */
+            nstep = ( nstep > 1 ) ? nstep/2 : 1;
+
+/* Compare the new entry with the current mid-way entry. */
+            mid->sortby = sortby;
+            cmp = CompareEntries( &entry, &mid );
+
+/* If the new entry comes before the mid entry, use the mid entry as the
+   next hi entry, and go down the list by the new step size to find the
+   new mid-way entry. */
+            if( cmp < 0 ) {
+               hi = mid;
+               for( istep = 0; istep < nstep; istep++ ) mid = mid->sprev;
+
+/* If the new entry comes after the mid entry, use the mid entry as the
+   next lo entry, and go up the list by the new step size to find the
+   new mid-way entry. */
+            } else if( cmp > 0 ) {
+               lo = mid;
+               for( istep = 0; istep < nstep; istep++ ) mid = mid->snext;
+
+/* If the new entry is equal to the mid entry, use the mid entry as hi
+   and set lo to the previous entry. This causes the loop to quit. */
+            } else {
+               hi = mid;
+               lo = mid->sprev;
+            }
+         }
+
+/* Insert the new entry into the list between lo and hi. */
+         entry->sprev = lo;
+         entry->snext = hi;
+         lo->snext = entry;
+         hi->sprev = entry;
+      }
+
+/* Increment the number of entries in the sorted list. */
+      (this->nsorted)++;
+   }
 }
 
 static void CheckCircle( AstKeyMap *this, AstObject *obj, const char *method, int *status ) {
@@ -685,6 +865,11 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
 /* --------- */
    } else if ( !strcmp( attrib, "maplocked" ) ) {
       astClearMapLocked( this );
+
+/* SortBy. */
+/* ------- */
+   } else if ( !strcmp( attrib, "sortby" ) ) {
+      astClearSortBy( this );
 
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
@@ -912,6 +1097,139 @@ static void ClearSizeGuess( AstKeyMap *this, int *status ) {
       this->sizeguess = INT_MAX;
       NewTable( this, MIN_TABLE_SIZE, status );
    }
+}
+
+static void ClearSortBy( AstKeyMap *this, int *status ) {
+/*
+*+
+*  Name:
+*     astClearSortBy
+
+*  Purpose:
+*     Clear the value of the SortBy attribute for a KeyMap.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "keymap.h"
+*     void astClearSortBy( AstKeyMap *this )
+
+*  Class Membership:
+*     KeyMap method.
+
+*  Description:
+*     This function clears the value of the SortBy attribute for a
+*     KeyMap.
+
+*  Parameters:
+*     this
+*        Pointer to the KeyMap.
+
+*-
+*/
+
+/* Local Variables: */
+   int oldval;            /* The old sortby value */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Get the original SortBy value. */
+   oldval = astGetSortBy( this );
+
+/* Clear the SortBy value in the supplied KeyMap. */
+   this->sortby = -INT_MAX;
+
+/* If the value has changed, re-sort the keys. */
+   if( oldval != astGetSortBy( this ) ) SortEntries( this, status );
+}
+
+static int CompareEntries( const void *first_void, const void *second_void ) {
+/*
+*  Name:
+*     CompareEntries
+
+*  Purpose:
+*     Determine the sorting order of two mapEntries.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "keymap.h"
+*     int CompareEntries( const void *first, const void *second )
+
+*  Class Membership:
+*     KeyMap member function.
+
+*  Description:
+*     This function returns a value indicating if the first MapEntry
+*     is less than, equal to, or greater than the second MapEntry using
+*     the indicated sorting method. It is designed for use with the
+*     "qsort" function, and therefore must used "void *" pointers.
+
+*  Parameters:
+*     first
+*        Pointer to the address of the first MapEntry.
+*     second
+*        Pointer to the address of the second MapEntry.
+
+*  Returned Value:
+*     -1 if "first" is less than "second". This implies that "first"
+*     should come before "second" in the sorted list.
+*
+*     0 if "first" is equal to "second".
+*
+*     +1 if "first" is greater than "second". This implies that "first"
+*     should come after "second" in the sorted list.
+
+*/
+
+/* Local Variables: */
+   AstMapEntry *first;   /* Pointer to first MapEntry structure */
+   AstMapEntry *second;  /* Pointer to second MapEntry structure */
+   int result;           /* Returned value */
+   int sortby;           /* Sorting method */
+
+/* Get pointers to the MapEntry structures, and get the sorting method. */
+   first = *( (AstMapEntry **) first_void );
+   second = *( (AstMapEntry **) second_void );
+   sortby = first->sortby;
+
+/* First handle sorting by increasing age */
+   if( sortby == SORTBY_AGEUP ) {
+      if( first->member < second->member ) {
+         result = 1;
+      } else if( first->member > second->member ) {
+         result = -1;
+      } else {
+         result = 0;
+      }
+
+/* Next handle sorting by decreasing age */
+   } else if( sortby == SORTBY_AGEDOWN ) {
+      if( first->member < second->member ) {
+         result = -1;
+      } else if( first->member > second->member ) {
+         result = 1;
+      } else {
+         result = 0;
+      }
+
+/* Next handle sorting by increasing alphabetical position. */
+   } else if( sortby == SORTBY_KEYUP ) {
+      result = KeyCmp( first->key, second->key );
+
+/* Next handle sorting by decreasing alphabetical position. */
+   } else if( sortby == SORTBY_KEYDOWN ) {
+      result = KeyCmp( second->key, first->key );
+
+   }
+
+/* Return the result. */
+   return result;
+
 }
 
 static int ConvertValue( void *raw, int raw_type, void *out, int out_type, int *status ) {
@@ -1367,6 +1685,8 @@ static AstMapEntry *CopyMapEntry( AstMapEntry *in, int *status ){
 
 /* Copy or nullify pointers in the AstMapEntry structure. */
    result->next = NULL;
+   result->snext = NULL;
+   result->sprev = NULL;
    text = in->key;
    result->key = text ? astStore( NULL, text, strlen( text ) + 1 ) : NULL;
    text = in->comment;
@@ -1647,6 +1967,9 @@ static void DoubleTableSize( AstKeyMap *this, int *status ) {
 
       (void) astFree( this->nentry );
       this->nentry = newnentry;
+
+/* Set up the required sorted list for the new table. */
+      SortEntries( this, status );
 
 /* If not OK, delete the new table. */
    } else {
@@ -1955,6 +2278,8 @@ static AstMapEntry *FreeMapEntry( AstMapEntry *in, int *status ){
 
 /* Free or nullify pointers in the AstMapEntry structure. */
    in->next = NULL;
+   in->snext = NULL;
+   in->sprev = NULL;
    in->key = astFree( (void *) in->key );
    in->comment = astFree( (void *) in->comment );
 
@@ -2132,6 +2457,14 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
          result = getattrib_buff;
       }
 
+/* SortBy. */
+/* --------- */
+   } else if ( !strcmp( attrib, "sortby" ) ) {
+      ival = astGetSortBy( this );
+      if ( astOK ) {
+         result = SortByString( ival, "astGetAttrib", status );
+      }
+
 /* If the attribute name was not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
@@ -2294,7 +2627,8 @@ static const char *GetKey( AstKeyMap *this, int index, int *status ) {
 
 *  Description:
 *     This function returns a string holding the key for the entry with
-*     the given index within the KeyMap.
+*     the given index within the KeyMap. The index associated with a
+*     given key is determined by the current setting of the SortBy attribute.
 
 *  Parameters:
 *     this
@@ -2324,6 +2658,7 @@ static const char *GetKey( AstKeyMap *this, int index, int *status ) {
    int istep;                  /* Entry count */
    int itab;                   /* Index into hash table */
    int nstep;                  /* No. of entries to skip */
+   int sortby;                 /* The value of the SortBy attribute */
 
 /* Initialise. */
    result = NULL;
@@ -2331,32 +2666,51 @@ static const char *GetKey( AstKeyMap *this, int index, int *status ) {
 /* Check the global error status. */
    if ( !astOK ) return result;
 
+/* Get the SortBy value. */
+   sortby = astGetSortBy( this );
+
+/* First deal with unsorted keys. */
+   if( sortby == SORTBY_NONE ) {
+
 /* Loop round each entry in the hash table. */
-   ilast = -1;
-   for( itab = 0; itab < this->mapsize; itab++ ) {
+      ilast = -1;
+      for( itab = 0; itab < this->mapsize; itab++ ) {
 
 /* Find the index of the first and the last Entry in the linked list associated
    with this element of the hash table. */
-      ifirst = ilast + 1;
-      ilast += this->nentry[ itab ];
+         ifirst = ilast + 1;
+         ilast += this->nentry[ itab ];
 
 /* Pass on if we have not yet reached the element containing the required
    key. */
-      if( ilast >= index ) {
+         if( ilast >= index ) {
 
 /* Find how many steps we need to proceed down the linked list to reach
    the required index. */
-         nstep = index - ifirst;
+            nstep = index - ifirst;
 
 /* Make this many steps down the linked list.*/
-         entry = this->table[ itab ];
-         for( istep = 0; entry && istep < nstep; istep++ ) entry = entry->next;
+            entry = this->table[ itab ];
+            for( istep = 0; entry && istep < nstep; istep++ ) entry = entry->next;
 
 /* Return a pointer to the key string, and break out of the loop. */
-         if( entry ) result = entry->key;
-         break;
+            if( entry ) result = entry->key;
+            break;
 
+         }
       }
+
+/* Now deal with sorted keys. */
+   } else {
+
+/* Get a pointer to the first entry in the sorted list. */
+      entry = this->first;
+
+/* Move up the sorted list by the required number of entries. */
+      for( istep = 0; entry && istep < index; istep++ ) entry = entry->snext;
+
+/* Return a pointer to the key string. */
+      if( entry ) result = entry->key;
    }
 
 /* Report an error if the element was not found. */
@@ -2596,6 +2950,11 @@ void astInitKeyMapVtab_(  AstKeyMapVtab *vtab, const char *name, int *status ) {
    vtab->GetSizeGuess = GetSizeGuess;
    vtab->TestSizeGuess = TestSizeGuess;
 
+   vtab->ClearSortBy = ClearSortBy;
+   vtab->SetSortBy = SetSortBy;
+   vtab->GetSortBy = GetSortBy;
+   vtab->TestSortBy = TestSortBy;
+
    vtab->ClearKeyError = ClearKeyError;
    vtab->SetKeyError = SetKeyError;
    vtab->GetKeyError = GetKeyError;
@@ -2643,7 +3002,54 @@ void astInitKeyMapVtab_(  AstKeyMapVtab *vtab, const char *name, int *status ) {
    }
 }
 
-static int KeyCmp( const char *key1, const char *key2, int *status ) {
+static void InitMapEntry( AstMapEntry *entry, int *status ){
+/*
+*  Name:
+*     InitMapEntry
+
+*  Purpose:
+*     initialise a MapEntry structure to null values.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "keymap.h"
+*     void InitMapEntry( AstMapEntry *entry, int *status )
+
+*  Class Membership:
+*     KeyMap member function.
+
+*  Description:
+*     This function initialises the contents of a MapEntry to null values.
+
+*  Parameters:
+*     this
+*        Pointer to the MapEntry.
+*     status
+*        Pointer to the inherited status variable.
+
+*/
+
+/* Check the global error status. */
+   if( !astOK ) return;
+
+/* Initialise all elements with in the MapEntry structure. */
+   entry->next = NULL;
+   entry->key = NULL;
+   entry->hash = 0;
+   entry->type = AST__BADTYPE;
+   entry->nel = 0;
+   entry->comment = NULL;
+   entry->defined = 0;
+   entry->snext = NULL;
+   entry->sprev = NULL;
+   entry->member = 0;
+   entry->sortby = SORTBY_NONE;
+
+}
+
+static int KeyCmp( const char *key1, const char *key2 ) {
 /*
 *  Name:
 *     KeyCmp
@@ -2656,7 +3062,7 @@ static int KeyCmp( const char *key1, const char *key2, int *status ) {
 
 *  Synopsis:
 *     #include "keymap.h"
-*     int KeyCmp( const char *key1, const char *key2, int *status )
+*     int KeyCmp( const char *key1, const char *key2 )
 
 *  Class Membership:
 *     KeyMap member function.
@@ -2670,16 +3076,11 @@ static int KeyCmp( const char *key1, const char *key2, int *status ) {
 *        Pointer to first string.
 *     key2
 *        Pointer to second string.
-*     status
-*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if the keys differ. Zero if they are identical (except for
 *     trailing spaces).
 
-*  Notes:
-*     - Zero will be returned if this function is invoked with the global
-*     error status set, or if it should fail for any reason.
 */
 
 /* Local Variables: */
@@ -2687,8 +3088,8 @@ static int KeyCmp( const char *key1, const char *key2, int *status ) {
    const char *k2;               /* Pointer to next "key2" character */
    int result;                   /* Returned flag */
 
-/* Check the global error status. */
-   if ( !astOK ) return 0;
+/* Check the strings are deifned. */
+   if ( !key1 || !key2 ) return 0;
 
 /* Get pointers to the first characters to differ, or to the first null
    character, which ever comes first. */
@@ -2704,7 +3105,7 @@ static int KeyCmp( const char *key1, const char *key2, int *status ) {
    other one only has spaces to the end of the string. */
    if( *k1 ) {
       if( *k2 ) {
-         result = 1;
+         result = ( *k1 > *k2 ) ? 1 : -1;
       } else {
          while( *k1 == ' ' ) k1++;
          result = ( *k1 == 0 ) ? 0 : 1;
@@ -2712,7 +3113,7 @@ static int KeyCmp( const char *key1, const char *key2, int *status ) {
    } else {
       if( *k2 ) {
          while( *k2 == ' ' ) k2++;
-         result = ( *k2 == 0 ) ? 0 : 1;
+         result = ( *k2 == 0 ) ? 0 : -1;
       } else {
          result = 0;
       }
@@ -3023,9 +3424,8 @@ f     AST_MAPSIZE
 *     value going from
 c     zero to one less than the size of the KeyMap.
 f     one to the size of the KeyMap.
-*     The index associated with a given entry is not, in general, related to
-*     the order in which the entries are added to the KeyMap, and may change
-*     if other entries are added to or removed from the KeyMap.
+*     The index associated with a given entry is determined by the SortBy
+*     attribute.
 
 *  Parameters:
 c     this
@@ -3239,12 +3639,9 @@ static void MapPut0##X( AstKeyMap *this, const char *key, Xtype value, \
    entry = astMalloc( sizeof( Entry0##X ) ); \
    if( astOK ) { \
 \
-/* Initialise pointers in the new structure.*/ \
+/* Initialise the new structure.*/ \
       mapentry = (AstMapEntry *) entry; \
-      mapentry->next = NULL; \
-      mapentry->key = NULL; \
-      mapentry->hash = 0; \
-      mapentry->comment = NULL; \
+      InitMapEntry( mapentry, status ); \
 \
 /* Now store the new values. */ \
       keylen = strlen( key ); \
@@ -3443,12 +3840,9 @@ static void MapPut1##X( AstKeyMap *this, const char *key, int size, \
    entry = astMalloc( sizeof( Entry1##X ) ); \
    if( astOK ) { \
 \
-/* Initialise pointers in the new structure.*/ \
+/* Initialise the new structure.*/ \
       mapentry = (AstMapEntry *) entry; \
-      mapentry->next = NULL; \
-      mapentry->hash = 0; \
-      mapentry->key = NULL; \
-      mapentry->comment = NULL; \
+      InitMapEntry( mapentry, status ); \
 \
 /* Now store the new values. */ \
       keylen = strlen( key ); \
@@ -3581,12 +3975,9 @@ void astMapPut1AId_( AstKeyMap *this, const char *key, int size,
    entry = astMalloc( sizeof( Entry1A ) );
    if( astOK ) {
 
-/* Initialise pointers in the new structure.*/
+/* Initialise the new structure.*/
       mapentry = (AstMapEntry *) entry;
-      mapentry->next = NULL;
-      mapentry->hash = 0;
-      mapentry->key = NULL;
-      mapentry->comment = NULL;
+      InitMapEntry( mapentry, status );
 
 /* Now store the new values. */
       keylen = strlen( key );
@@ -3714,11 +4105,8 @@ f        The global status.
    mapentry = astMalloc( sizeof( AstMapEntry ) );
    if( astOK ) {
 
-/* Initialise pointers in the new structure.*/
-      mapentry->next = NULL;
-      mapentry->key = NULL;
-      mapentry->hash = 0;
-      mapentry->comment = NULL;
+/* Initialise the new structure.*/
+      InitMapEntry( mapentry, status );
 
 /* Now store the new values. */
       keylen = strlen( key );
@@ -6302,6 +6690,76 @@ static void NewTable( AstKeyMap *this, int size, int *status ){
    }
 }
 
+static void RemoveFromSortedList( AstKeyMap *this, AstMapEntry *entry,
+                                  int *status ){
+/*
+*  Name:
+*     RemoveFromSortedList
+
+*  Purpose:
+*     Remove an entry from the linked-list of sorted KeyMap entries.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "keymap.h"
+*     void RemoveFromSortedList( AstKeyMap *this, AstMapEntry *entry,
+*                                int *status )
+
+*  Class Membership:
+*     KeyMap member function.
+
+*  Description:
+*     This function removes the supplied MapEntry from the linked list of
+*     sorted MapEntries.
+
+*  Parameters:
+*     this
+*        Pointer to the KeyMap.
+*     entry
+*        Pointer to the MapEntry to be removed.
+*     status
+*        Pointer to the inherited status variable.
+
+*/
+
+/* Local Variables: */
+   AstMapEntry *next;       /* Next higher MapEntry */
+   AstMapEntry *prev;       /* Next lower MapEntry */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Get pointers to the entries on either side of the entry to be removed. */
+   next = entry->snext;
+   prev = entry->sprev;
+
+/* If the entry is not in the sorted list, abort. */
+   if( next && prev ) {
+
+/* Connect the previous to the next, bypassing the entry being removed. */
+      next->sprev = prev;
+      prev->snext = next;
+
+/* NULLify the next and previous entries stored in the entry being
+   removed. */
+      entry->snext = NULL;
+      entry->sprev = NULL;
+
+/* Decrement the number of entries in the sorted list. */
+      (this->nsorted)--;
+
+/* If the entry being removed is the first entry, store a pointer to the new
+   first entry. */
+      if( this->nsorted == 0 ) {
+         this->first = NULL;
+      } else if( entry == this->first ) {
+         this->first = next;
+      }
+   }
+}
+
 static int RemoveTableEntry( AstKeyMap *this, int itab, const char *key, int *status ){
 /*
 *  Name:
@@ -6354,19 +6812,22 @@ static int RemoveTableEntry( AstKeyMap *this, int itab, const char *key, int *st
 
 /* The "next" variable holds the address of the next MapEntry to be
    checked. Initialise this to the MapEntry at the head of the linked
-   list associated with the supplied element of he hash table. */
+   list associated with the supplied element of the hash table. */
    next = this->table[ itab ];
 
 /* The "link" variable holds the address of the location at which the
    pointer to the MapEntry following the removed MapEntry should be stored.
-   Initialise this to be the adress of the hash table element. */
+   Initialise this to be the address of the hash table element. */
    link = &( this->table[ itab ] );
 
 /* Loop round until we have checked all entries. */
    while( next && astOK ) {
 
 /* If the key for the current entry macthes the supplied key... */
-      if( !KeyCmp( next->key, key, status ) ) {
+      if( !KeyCmp( next->key, key ) ) {
+
+/* Remove the MapEntry from the list sorted by key. */
+         RemoveFromSortedList( this, next, status );
 
 /* Store a pointer to the next MapEntry in the list, replacing the
    original pointer to the MapEntry which is being deleted. */
@@ -6459,7 +6920,7 @@ static AstMapEntry *SearchTableEntry( AstKeyMap *this, int itab, const char *key
 
 /* If the key for the current entry matches the supplied key, store the
    MapEntry pointer and break. */
-      if( !KeyCmp( next->key, key, status ) ) {
+      if( !KeyCmp( next->key, key ) ) {
          result = next;
          break;
       }
@@ -6555,6 +7016,13 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
         ( 1 == astSscanf( setting, "maplocked= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
       astSetMapLocked( this, ival );
+
+/* SortBy. */
+/* ------- */
+   } else if ( nc = 0,
+        ( 0 == astSscanf( setting, "sortby= %n%*s %n", &ival, &nc ) )
+        && ( nc >= len ) ) {
+      astSetSortBy( this, SortByInt( setting + ival, "astSetAttrib", status ) );
 
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
@@ -6788,6 +7256,54 @@ static void SetSizeGuess( AstKeyMap *this, int sizeguess, int *status ) {
    }
 }
 
+static void SetSortBy( AstKeyMap *this, int sortby, int *status ) {
+/*
+*+
+*  Name:
+*     astSetSortBy
+
+*  Purpose:
+*     Set the value of the SortBy attribute for a KeyMap.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "keymap.h"
+*     void astSetSortBy( AstKeyMap *this, int sortby )
+
+*  Class Membership:
+*     KeyMap method.
+
+*  Description:
+*     This function sets the value of the SortBy attribute for a
+*     KeyMap.
+
+*  Parameters:
+*     this
+*        Pointer to the KeyMap.
+*     sortby
+*        The new value for the attribute.
+*-
+*/
+
+/* Local Variables: */
+   int oldval;            /* The old sortby value */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Get the old SortBy value. */
+   oldval = astGetSortBy( this );
+
+/* Set the new SortBy value. */
+   this->sortby = sortby;
+
+/* If the value has changed, re-sort the keys. */
+   if( oldval != sortby ) SortEntries( this, status );
+
+}
+
 static size_t SizeOfEntry( AstMapEntry *entry, int *status ){
 /*
 *  Name:
@@ -6873,6 +7389,275 @@ static size_t SizeOfEntry( AstMapEntry *entry, int *status ){
    return result;
 }
 
+static int SortByInt( const char *sortby, const char *method, int *status ){
+/*
+*  Name:
+*     SortByInt
+
+*  Purpose:
+*     Get the integer associated with a string SortBy value.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "keymap.h"
+*     int SortByInt( const char *sortby, const char *method, int *status )
+
+*  Class Membership:
+*     KeyMap member function.
+
+*  Description:
+*     This function returns the integer associated with the supplied
+*     string SortBy value.
+
+*  Parameters:
+*     sortby
+*        Pointer to the string SortBy value (case insensitive).
+*     method
+*        Pointer to a string holding the name of the calling method for
+*        inclusion in error messages.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     The associated SortBy integer.
+
+*/
+
+/* Local Variables: */
+   int result;             /* The returned integer */
+
+/* Initialise. */
+   result = SORTBY_NONE;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Check each known value. */
+   if( astChrMatch( sortby, "None" ) ) {
+      result = SORTBY_NONE;
+
+   } else if( astChrMatch( sortby, "AgeUp" ) ) {
+      result = SORTBY_AGEUP;
+
+   } else if( astChrMatch( sortby, "AgeDown" ) ) {
+      result = SORTBY_AGEDOWN;
+
+   } else if( astChrMatch( sortby, "KeyUp" ) ) {
+      result = SORTBY_KEYUP;
+
+   } else if( astChrMatch( sortby, "KeyDown" ) ) {
+      result = SORTBY_KEYDOWN;
+
+   } else {
+      astError( AST__INTER, "%s(KeyMap): Illegal SortBy value %s "
+                "encountered.", status, method, sortby );
+   }
+
+/* Return the result. */
+   return result;
+}
+
+static const char *SortByString( int sortby, const char *method, int *status ){
+/*
+*  Name:
+*     SortByString
+
+*  Purpose:
+*     Get the string associated with an integer SortBy value.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "keymap.h"
+*     const char *SortByString( int sortby, const char *method, int *status )
+
+*  Class Membership:
+*     KeyMap member function.
+
+*  Description:
+*     This function returns the string associated with the supplied
+*     integer SortBy value.
+
+*  Parameters:
+*     sortby
+*        The integer SortBy value.
+*     method
+*        Pointer to a string holding the name of the calling method for
+*        inclusion in error messages.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     Pointer to the associated SortBy string.
+
+*/
+
+/* Local Variables: */
+   const char *result;    /* The returned string */
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Check each value. */
+   if( sortby == SORTBY_NONE ) {
+      result = "None";
+
+   } else if( sortby == SORTBY_AGEUP ) {
+      result = "AgeUp";
+
+   } else if( sortby == SORTBY_AGEDOWN ) {
+      result = "AgeDown";
+
+   } else if( sortby == SORTBY_KEYUP ) {
+      result = "KeyUp";
+
+   } else if( sortby == SORTBY_KEYDOWN ) {
+      result = "KeyDown";
+
+   } else {
+      astError( AST__INTER, "%s(KeyMap): Illegal integer SortBy value %d "
+                "encountered (internal AST programming error).", status,
+                method, sortby );
+   }
+
+/* Return the result. */
+   return result;
+}
+
+static void SortEntries( AstKeyMap *this, int *status ){
+/*
+*  Name:
+*     SortEntries
+
+*  Purpose:
+*     Ensure the entries in a KeyMap are sorted correctly.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "keymap.h"
+*     void SortEntries( AstKeyMap *this, int *status )
+
+*  Class Membership:
+*     KeyMap member function.
+
+*  Description:
+*     This function sorts all the entries in the supplied KeyMap in
+*     the manner indicated by the SortBy attribute value in the KeyMap.
+*     A double linked list is maintained indicating the ordering, with
+*     the first entry in the sorted list being pointed to by "this->first".
+*     Each entry contains "snext" and "sprev" pointers that point to the
+*     next and previous entries in the sorted list. The number of entries
+*     in the sorted list (which should usually equal the total number of
+*     entries currently in the KeyMap), is stored in "this->nsorted".
+
+*  Parameters:
+*     this
+*        Pointer to the KeyMap.
+*     status
+*        Pointer to the inherited status variable.
+
+*/
+
+/* Local Variables: */
+   AstMapEntry **ents;
+   AstMapEntry **pent;
+   AstMapEntry **a;
+   AstMapEntry **b;
+   AstMapEntry *entry;
+   int i;
+   int nent;
+   int sortby;
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Empty the sorted list. */
+   this->nsorted = 0;
+   this->first = NULL;
+
+/* Get the SortBy value. */
+   sortby = astGetSortBy( this );
+
+/* Do nothing more if no sorting is required. */
+   if( sortby != SORTBY_NONE ) {
+
+/* Get the number of entries in the keyMap. */
+      nent = astMapSize( this );
+
+/* Only sort if the KeyMap is not empty. */
+      if( nent > 0 ) {
+
+/* Allocate an array with one element for each entry. Each element is a
+   pointer to a MapEntry structure. */
+         ents = astMalloc( sizeof( *ents )*nent );
+         if( astOK ) {
+
+/* Loop round all entries in the hash table. */
+            pent = ents;
+            for( i = 0; i < this->mapsize; i++ ) {
+
+/* Get a pointer to the next KeyMap entry. */
+               entry = this->table[ i ];
+
+/* Loop round all entries in this element of the hash table. */
+               while( entry ) {
+
+/* Store the sorting method in the MapEntry. */
+                  entry->sortby = sortby;
+
+/* Put a pointer to the MapEntry into the array. */
+                  *(pent++) = entry;
+
+/* Update the address of the next MapEntry in the source. */
+                  entry = entry->next;
+               }
+            }
+
+/* No need for sorting if there is only one entry. */
+            if( nent == 1 ) {
+               ents[ 0 ]->snext = ents[ 0 ];
+               ents[ 0 ]->sprev = ents[ 0 ];
+
+/* Sort the array of pointers if there is more than one entry... */
+            } else {
+               qsort( ents, nent, sizeof( *ents ), CompareEntries );
+
+/* Establish the double linked list. */
+               a = ents;
+               b = ents + 1;
+               for( i = 1; i < nent; i++ ) {
+                  (*b)->sprev = *a;
+                  (*a)->snext = *b;
+                  a = b++;
+               }
+
+               b = ents;
+               (*b)->sprev = *a;
+               (*a)->snext = *b;
+
+            }
+
+/* Store a pointer to the first entry in the sorted list. */
+            this->first = ents[ 0 ];
+
+/* Store the number of entrie sin the sorted list. */
+            this->nsorted = nent;
+         }
+
+/* Free resources. */
+         ents = astFree( ents );
+      }
+   }
+}
+
 static int TestAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
@@ -6943,6 +7728,11 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
 /* --------- */
    } else if ( !strcmp( attrib, "maplocked" ) ) {
       result = astTestMapLocked( this );
+
+/* SortBy. */
+/* ------- */
+   } else if ( !strcmp( attrib, "sortby" ) ) {
+      result = astTestSortBy( this );
 
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
@@ -7123,6 +7913,56 @@ astMAKE_GET(KeyMap,MapLocked,int,0,( ( this->maplocked != -INT_MAX ) ?
                                    this->maplocked : 0 ))
 astMAKE_TEST(KeyMap,MapLocked,( this->maplocked != -INT_MAX ))
 
+/*
+*att++
+*  Name:
+*     SortBy
+
+*  Purpose:
+*     Determines how keys are sorted in a KeyMap.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     String.
+
+*  Description:
+*     This attribute determines the order in which keys are returned by the
+c     astMapKey
+f     AST_MAPKEY
+*     function. It may take the following values (the default is "None"):
+*
+*     - "None": The keys are returned in an arbitrary order. This is the
+*     fastest method as it avoids the need for a sorted list of keys to
+*     be maintained and used.
+*
+*     - "AgeDown": The keys are returned in the order in which they were
+*     stored in the KeyMap, with the most recent key being returned last.
+*
+*     - "AgeUp": The keys are returned in the order in which they were
+*     stored in the KeyMap, with the most recent key being returned first.
+*
+*     - "KeyDown": The keys are returned in alphabetical order, with "A..."
+*     being returned last.
+*
+*     - "KeyUp": The keys are returned in alphabetical order, with "A..."
+*     being returned first.
+
+*  Notes:
+*     - If a new value is assigned to SortBy (or if SortBy is cleared),
+*     all entries currently in the KeyMap are re-sorted according to the
+*     new SortBy value.
+
+*  Applicability:
+*     KeyMap
+*        All KeyMaps have this attribute.
+*att--
+*/
+astMAKE_GET(KeyMap,SortBy,int,SORTBY_NONE,( ( this->sortby != -INT_MAX ) ?
+                                           this->sortby : SORTBY_NONE ))
+astMAKE_TEST(KeyMap,SortBy,( this->sortby != -INT_MAX ))
+
 /* Copy constructor. */
 /* ----------------- */
 static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
@@ -7173,12 +8013,16 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
    the output KeyMap. */
    out->table = NULL;
    out->nentry = NULL;
+   out->first = NULL;
 
 /* Make copies of the table entries. */
    out->table = astMalloc( sizeof( AstMapEntry * )*( out->mapsize ) );
    out->nentry = astMalloc( sizeof( int )*( out->mapsize ) );
 
    for( i = 0; i < out->mapsize; i++ ) CopyTableEntry( in, out, i, status );
+
+/* Create the required sorted key list in the new KeyMap. */
+   SortEntries( out, status );
 
 /* If an error occurred, clean up by freeing all memory allocated above. */
    if ( !astOK ) {
@@ -7234,6 +8078,9 @@ static void Delete( AstObject *obj, int *status ) {
 /* Free memory used to hold tables. */
    this->table = astFree( this->table );
    this->nentry = astFree( this->nentry );
+
+/* Nullify other pointers. */
+   this->first = NULL;
 }
 
 /* Dump function. */
@@ -7288,6 +8135,14 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
    ival = set ? GetSizeGuess( this, status ) : astGetSizeGuess( this );
    astWriteInt( channel, "SzGss", set, 0, ival, "Guess at KeyMap size" );
 
+/* SortBy. */
+/* ------- */
+   set = TestSortBy( this, status );
+   ival = set ? GetSortBy( this, status ) : astGetSortBy( this );
+   astWriteString( channel, "SortBy", set, 0, SortByString( ival, "astDump",
+                                                            status ),
+                   "Sorting scheme for keys" );
+
 /* KeyError. */
 /* --------- */
    set = TestKeyError( this, status );
@@ -7303,6 +8158,9 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /* MapSize. */
 /* -------- */
    astWriteInt( channel, "MapSz", 1, 1, this->mapsize, "Size of hash table" );
+
+/* member count. */
+   astWriteInt( channel, "MemCnt", 1, 1, this->member_count, "Total member count" );
 
 /* Loop round each entry in the hash table. */
    for( i = 0; i < this->mapsize; i++ ) {
@@ -7610,6 +8468,10 @@ AstKeyMap *astInitKeyMap_( void *mem, size_t size, int init, AstKeyMapVtab *vtab
       new->nentry = NULL;
       new->keyerror = -INT_MAX;
       new->maplocked = -INT_MAX;
+      new->sortby = SORTBY_NONE;
+      new->first = NULL;
+      new->nsorted = 0;
+      new->member_count = 0;
 
       NewTable( new, MIN_TABLE_SIZE, status );
 
@@ -7772,11 +8634,21 @@ AstKeyMap *astLoadKeyMap_( void *mem, size_t size, AstKeyMapVtab *vtab,
       new->keyerror = astReadInt( channel, "kyerr", -INT_MAX );
       if ( TestKeyError( new, status ) ) SetKeyError( new, new->keyerror, status );
 
-
 /* MapLocked. */
 /* --------- */
       new->maplocked = astReadInt( channel, "mplck", -INT_MAX );
       if ( TestMapLocked( new, status ) ) SetMapLocked( new, new->maplocked, status );
+
+/* SortBy. */
+/* ------- */
+      sval = astReadString( channel, "sortby", " " );
+      if( astOK && strcmp( sval, " " ) ) {
+         new->sortby = SortByInt( sval, "astRead", status );
+      } else {
+         new->sortby = SORTBY_NONE;
+      }
+      if( TestSortBy( new, status ) ) SetSortBy( new, new->sortby, status );
+      sval = astFree( sval );
 
 /* MapSize. */
 /* -------- */
@@ -7817,6 +8689,12 @@ AstKeyMap *astLoadKeyMap_( void *mem, size_t size, AstKeyMapVtab *vtab,
 /* Get the vector length. */
          (void) sprintf( buff, "nel%d", nentry );
          nel = astReadInt( channel, buff, 0 );
+
+/* Get the entry member number. Set the KeyMap member count to this value
+   so that the next entry added to the KeyMap will get this value as its
+   member index. */
+         (void) sprintf( buff, "mem%d", nentry );
+         new->member_count = astReadInt( channel, buff, 0 );
 
 /* First deal with integer entries. */
          if( type == AST__INTTYPE ) {
@@ -7925,12 +8803,14 @@ AstKeyMap *astLoadKeyMap_( void *mem, size_t size, AstKeyMapVtab *vtab,
                       "(%d) encountered whilst reading a %s.", status, name, type,
                       name );
          }
-
 /* Free resources. */
          key = astFree( key );
          if( com ) com = astFree( com );
 
       }
+
+/* Set the final member count for the KeyMap. */
+      new->member_count = astReadInt( channel, "memcnt", 0 );
 
 /* If an error occurred, clean up by deleting the new KeyMap. */
       if ( !astOK ) new = astDelete( new );
@@ -8055,72 +8935,77 @@ void astMapPutU_( AstKeyMap *this, const char *key, const char *comment, int *st
 
 void astMapRemove_( AstKeyMap *this, const char *key, int *status ){
    if ( !astOK ) return;
-   (**astMEMBER(this,KeyMap,MapRemove))(this,key, status );
+   (**astMEMBER(this,KeyMap,MapRemove))(this,key,status);
 }
 void astMapCopy_( AstKeyMap *this, AstKeyMap *that, int *status ){
    if ( !astOK ) return;
-   (**astMEMBER(this,KeyMap,MapCopy))(this, that, status );
+   (**astMEMBER(this,KeyMap,MapCopy))(this,that,status);
 }
 int astMapSize_( AstKeyMap *this, int *status ){
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,KeyMap,MapSize))(this, status );
+   return (**astMEMBER(this,KeyMap,MapSize))(this,status);
 }
 int astMapLenC_( AstKeyMap *this, const char *key, int *status ){
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,KeyMap,MapLenC))(this,key, status );
+   return (**astMEMBER(this,KeyMap,MapLenC))(this,key,status);
 }
 int astMapLength_( AstKeyMap *this, const char *key, int *status ){
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,KeyMap,MapLength))(this,key, status );
+   return (**astMEMBER(this,KeyMap,MapLength))(this,key,status);
 }
 int astMapType_( AstKeyMap *this, const char *key, int *status ){
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,KeyMap,MapType))(this,key, status );
+   return (**astMEMBER(this,KeyMap,MapType))(this,key,status);
 }
 int astMapHasKey_( AstKeyMap *this, const char *key, int *status ){
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,KeyMap,MapHasKey))(this,key, status );
+   return (**astMEMBER(this,KeyMap,MapHasKey))(this,key,status);
 }
 const char *astMapKey_( AstKeyMap *this, int index, int *status ){
    if ( !astOK ) return NULL;
-   return (**astMEMBER(this,KeyMap,MapKey))(this,index, status );
+   return (**astMEMBER(this,KeyMap,MapKey))(this,index,status);
 }
 int astGetSizeGuess_( AstKeyMap *this, int *status ){
    if( !astOK ) return 0;
-   return (**astMEMBER(this,KeyMap,GetSizeGuess))(this, status );
+   return (**astMEMBER(this,KeyMap,GetSizeGuess))(this,status);
 }
 int astTestSizeGuess_( AstKeyMap *this, int *status ){
    if( !astOK ) return 0;
-   return (**astMEMBER(this,KeyMap,TestSizeGuess))(this, status );
+   return (**astMEMBER(this,KeyMap,TestSizeGuess))(this,status);
 }
 void astClearSizeGuess_( AstKeyMap *this, int *status ){
    if( !astOK ) return;
-   (**astMEMBER(this,KeyMap,ClearSizeGuess))(this, status );
+   (**astMEMBER(this,KeyMap,ClearSizeGuess))(this,status);
 }
 void astSetSizeGuess_( AstKeyMap *this, int sizeguess, int *status ){
    if( !astOK ) return;
-   (**astMEMBER(this,KeyMap,SetSizeGuess))(this,sizeguess, status );
+   (**astMEMBER(this,KeyMap,SetSizeGuess))(this,sizeguess,status);
 }
 
 void astClearMapLocked_( AstKeyMap *this, int *status ){
    if( !astOK ) return;
-   (**astMEMBER(this,KeyMap,ClearMapLocked))(this, status );
+   (**astMEMBER(this,KeyMap,ClearMapLocked))(this,status);
 }
 void astSetMapLocked_( AstKeyMap *this, int maplocked, int *status ){
    if( !astOK ) return;
-   (**astMEMBER(this,KeyMap,SetMapLocked))(this,maplocked, status );
+   (**astMEMBER(this,KeyMap,SetMapLocked))(this,maplocked,status);
 }
 
 void astClearKeyError_( AstKeyMap *this, int *status ){
    if( !astOK ) return;
-   (**astMEMBER(this,KeyMap,ClearKeyError))(this, status );
+   (**astMEMBER(this,KeyMap,ClearKeyError))(this,status);
 }
 void astSetKeyError_( AstKeyMap *this, int keyerror, int *status ){
    if( !astOK ) return;
-   (**astMEMBER(this,KeyMap,SetKeyError))(this,keyerror, status );
+   (**astMEMBER(this,KeyMap,SetKeyError))(this,keyerror,status);
 }
 
-
-
-
+void astClearSortBy_( AstKeyMap *this, int *status ){
+   if( !astOK ) return;
+   (**astMEMBER(this,KeyMap,ClearSortBy))(this,status);
+}
+void astSetSortBy_( AstKeyMap *this, int sortby, int *status ){
+   if( !astOK ) return;
+   (**astMEMBER(this,KeyMap,SetSortBy))(this,sortby,status);
+}
 

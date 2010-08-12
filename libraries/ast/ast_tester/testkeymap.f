@@ -16,6 +16,8 @@
 
 c      call ast_watchmemory( 29286 )
 
+      call testsorting( status )
+
       map = ast_keymap( ' ', status )
 
       call ast_MapPut0i( map, 'Fredi', 1999, 'com 1', status )
@@ -1056,19 +1058,93 @@ C  Test AST_MAPPUTU and undefined values
 
 
 
+      subroutine testsorting( status )
+      implicit none
+      include 'SAE_PAR'
+      include 'AST_PAR'
+
+      integer status, km, i
+      character keys(5)*15
+      character skeys(5)*15
+      character key*( AST__SZCHR )
+
+
+      data keys / 'ABC', 'zzzzzzzzzzz', 'this_is_a_key', 'HE-HE', 'A' /
+      data skeys / 'A', 'ABC', 'HE-HE', 'this_is_a_key', 'zzzzzzzzzzz' /
+
+
+      if( status .ne. sai__ok ) return
+
+C  Age sorting...
+
+C  First test adding entries into an already sorted KeyMap
+
+      km = ast_keymap( 'Sortby=AgeDown', status )
+
+      do i = 1, 5
+         call ast_mapput0i( km, keys(i), i, ' ', status )
+      end do
+
+      do i = 1, 5
+         key = ast_mapkey( km, i, status )
+         if( key .ne. keys(i) .and. status .eq. SAI__OK ) then
+            write(*,*) 'Key ',i,' is ',key,' (should be ',keys(i),')'
+            call stopit( status, 'Error Sort 1' )
+            return
+         end if
+      end do
+
+C  Now test sorting existing entries in a KeyMap.
+      call ast_set( km, 'Sortby=AgeUp', status )
+
+      do i = 1, 5
+         key = ast_mapkey( km, i, status )
+         if( key .ne. keys(6-i) .and. status .eq. SAI__OK ) then
+            write(*,*) 'Key ',i,' is ',key,' (should be ',keys(6-i),')'
+            call stopit( status, 'Error Sort 2' )
+            return
+         end if
+      end do
+
+      call ast_annul( km, status )
+
+C  Key sorting...
+
+C  First test adding entries into an already sorted KeyMap
+
+      km = ast_keymap( 'Sortby=KeyUp', status )
+
+      do i = 1, 5
+         call ast_mapput0i( km, keys(i), i, ' ', status )
+      end do
+
+      do i = 1, 5
+         key = ast_mapkey( km, i, status )
+         if( key .ne. skeys(i) .and. status .eq. SAI__OK ) then
+            write(*,*) 'Key ',i,' is ',key,' (should be ',skeys(i),')'
+            call stopit( status, 'Error Sort 3' )
+            return
+         end if
+      end do
+
+C  Now test sorting existing entries in a KeyMap.
+      call ast_set( km, 'Sortby=KeyDown', status )
+
+      do i = 1, 5
+         key = ast_mapkey( km, i, status )
+         if( key .ne. skeys(6-i) .and. status .eq. SAI__OK ) then
+            write(*,*) 'Key ',i,' is ',key,' (should be ',skeys(6-i),')'
+            call stopit( status, 'Error Sort 4' )
+            return
+         end if
+      end do
+
+      call ast_annul( km, status )
 
 
 
 
-
-
-
-
-
-
-
-
-
+      end
 
 
 
