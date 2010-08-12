@@ -50,8 +50,10 @@ void kpg1Kygp1( AstKeyMap *keymap, Grp **igrp, const char *prefix,
 *  Notes:
 *     - This function provides a private implementation for the public
 *     KPG1_KYGRP Fortran routine and kpg1Kygrp C function.
+*     - Entries will be stored in the group in alphabetical order
 
 *  Copyright:
+*     Copyright (C) 2008,2010 Science & Technology Facilities Council.
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -83,6 +85,8 @@ void kpg1Kygp1( AstKeyMap *keymap, Grp **igrp, const char *prefix,
 *        Tweak to GRP C API.
 *     2010-07-19 (TIMJ):
 *        Handle vector keymap entries.
+*     2010-08-12 (TIMJ):
+*        Store entries in group in alphabetical order.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -115,6 +119,9 @@ void kpg1Kygp1( AstKeyMap *keymap, Grp **igrp, const char *prefix,
 /* Create a new GRP group if required. */
    valid = grpValid( *igrp, status );
    if( !valid ) *igrp = grpNew( "Created by kpg1_Kygp1", status );
+
+/* Ensure alphabetical sorting */
+   astSet( keymap, "SortBy=KeyUp" );
 
 /* Get the number of entries in the KeyMap. */
    n = astMapSize( keymap );
