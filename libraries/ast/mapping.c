@@ -290,6 +290,9 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *     7-JUN-2010 (DSB):
 *        In the KERNEL_<x>D rebinning macros, correct the test for the
 *        central point being outside the bounds of the output image.
+*     13-AUG-2010 (DSB):
+*        In astRebinSeq<X>, scale WLIM to take account of weighting by
+*        input variances.
 *class--
 */
 
@@ -12187,26 +12190,27 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
 /* Ensure "wlim" is not zero. */ \
       if( wlim < 1.0E-10 ) wlim = 1.0E-10; \
 \
+/* Find the average weight per input pixel, if we do not already know it \
+   to be 1.0. Also scale "wlim" by the mean weight. */ \
+      if( flags & AST__VARWGT ) { \
+         if( *nused > 0 ) { \
+            sw = 0.0; \
+            for( i = 0; i < npix_out; i++ ) { \
+               sw += weights[ i ]; \
+            } \
+            mwpip = sw/( *nused ); \
+         } else { \
+            mwpip = AST__BAD; \
+         } \
+         wlim *= mwpip; \
+\
+      } else { \
+         mwpip = 1.0; \
+      } \
+\
 /* If required set the output variances so that they are estimates of \
    the variance on the mean of the distribution of input values. */ \
       if( ( flags & AST__GENVAR ) && !( flags & AST__DISVAR ) ) { \
-\
-/* Find the average weight per input pixel, if we do not already know it \
-   to be 1.0. */ \
-         if( flags & AST__VARWGT ) { \
-            if( *nused > 0 ) { \
-               sw = 0.0; \
-               for( i = 0; i < npix_out; i++ ) { \
-                  sw += weights[ i ]; \
-               } \
-               mwpip = sw/( *nused ); \
-            } else { \
-               mwpip = AST__BAD; \
-            } \
-\
-         } else { \
-            mwpip = 1.0; \
-         } \
 \
 /* Calculate the variance. We apply a factor that accounts for the \
    reduction in the number of degrees of freedom when finding the \
