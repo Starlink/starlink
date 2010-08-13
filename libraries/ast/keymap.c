@@ -156,9 +156,11 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map
 *     12-AUG-2010 (DSB):
 *        Speed up access to large KeyMaps.
 *     13-AUG-2010 (DSB):
-*        No need to sort all entries when doubling the table size since
+*        - No need to sort all entries when doubling the table size since
 *        changing the table size does not change the linked list of sorted
 *        entries.
+*        - Initialise the sortby attribute to the cleared value, rather
+*        than the default value.
 *class--
 */
 
@@ -8678,7 +8680,7 @@ AstKeyMap *astInitKeyMap_( void *mem, size_t size, int init, AstKeyMapVtab *vtab
       new->nentry = NULL;
       new->keyerror = -INT_MAX;
       new->maplocked = -INT_MAX;
-      new->sortby = SORTBY_NONE;
+      new->sortby = -INT_MAX;
       new->first = NULL;
       new->nsorted = 0;
       new->member_count = 0;
@@ -8854,10 +8856,9 @@ AstKeyMap *astLoadKeyMap_( void *mem, size_t size, AstKeyMapVtab *vtab,
 /* SortBy. */
 /* ------- */
       sval = astReadString( channel, "sortby", " " );
+      new->sortby = -INT_MAX;
       if( astOK && strcmp( sval, " " ) ) {
          new->sortby = SortByInt( sval, "astRead", status );
-      } else {
-         new->sortby = SORTBY_NONE;
       }
       if( TestSortBy( new, status ) ) SetSortBy( new, new->sortby, status );
       sval = astFree( sval );
