@@ -155,6 +155,10 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map
 *        Added SortBy attribute.
 *     12-AUG-2010 (DSB):
 *        Speed up access to large KeyMaps.
+*     13-AUG-2010 (DSB):
+*        No need to sort all entries when doubling the table size since
+*        changing the table size does not change the linked list of sorted
+*        entries.
 *class--
 */
 
@@ -2073,9 +2077,6 @@ static void DoubleTableSize( AstKeyMap *this, int *status ) {
 
       (void) astFree( this->nentry );
       this->nentry = newnentry;
-
-/* Set up the required sorted list for the new table. */
-      SortEntries( this, status );
 
 /* If not OK, delete the new table. */
    } else {
