@@ -18,9 +18,9 @@
 
    o  CLINPLOT
 
-      -  Parameter MODE has a new option "Gapped", which behaves
-      as "Histogram" except no flanking vertical lines are drawn 
-      either side of a bad value.
+      -  Parameter MODE has a new option "GapHistogram", which
+      behaves as "Histogram" except no flanking vertical lines are
+      drawn either side of a bad value.
 
    o  CONVOLVE
    
@@ -36,9 +36,9 @@
 
    o  LINPLOT
 
-      -  Parameter MODE has a new option "Gapped", which behaves
-      as "Histogram" except no flanking vertical lines are drawn
-      either side of a bad value.
+      -  Parameter MODE has a new option "GapHistogram", which
+      behaves as "Histogram" except no flanking vertical lines are
+      drawn either side of a bad value.
 
    o  LISTSHOW
 

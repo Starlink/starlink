@@ -257,9 +257,9 @@
 *        positions.  Bad values are flanked by vertical lines to the
 *        lower edge of the plot.
 *
-*        - "Gapped" -- The same as the "Histogram" option except bad 
-*        values are not flanked by vertical lines to the lower edge of
-*        the plot, leaving a gap.
+*        - "GapHistogram" -- The same as the "Histogram" option except
+*        bad values are not flanked by vertical lines to the lower edge
+*        of the plot, leaving a gap.
 *
 *        - "Line" -- The points are joined by straight lines.
 *
@@ -481,6 +481,8 @@
 *        Added ALIGN and SPECAXES parameters.
 *     2010 August 10 (MJC):
 *        Added Gapped MODE.
+*     2010 August 13 (MJC):
+*        The new mode renamed to GapHistogram.
 *     {enter_further_changes_here}
 
 *-
@@ -877,13 +879,13 @@
 
 *  Get the plotting mode.
       CALL PAR_CHOIC( 'MODE', 'Line',
-     :                'Histogram,Gapped,Line,Point,Mark,Chain',
-     :                .FALSE., TEXT, STATUS )
+     :                'Histogram,GapHistogram,Line,Point,Mark,Step,'/
+     :                /'Chain', .FALSE., TEXT, STATUS )
 
 *  Get an identifier for the mode, and get the marker type if required.
       IF( TEXT .EQ. 'HISTOGRAM' ) THEN
          MODE = 1
-      ELSE IF( TEXT .EQ. 'GAPPED' ) THEN
+      ELSE IF( TEXT .EQ. 'GAPHISTOGRAM' ) THEN
          MODE = 6
       ELSE IF( TEXT .EQ. 'LINE' ) THEN
          MODE = 2

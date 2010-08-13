@@ -32,7 +32,7 @@
 *     parameter MODE).  Errors on both the data values and the data
 *     positions may be represented in several different ways (see
 *     parameters ERRBAR and SHAPE).  The plotting style (colour, fonts,
-*     text size, etc) may be specified in detail using parameter STYLE.
+*     text size, etc.) may be specified in detail using parameter STYLE.
 *
 *     The bounds of the plot on both axes can be specified using
 *     parameters XLEFT, XRIGHT, YBOT and YTOP.  If not specified they
@@ -267,9 +267,9 @@
 *        positions.  Bad values are flanked by vertical lines to the
 *        lower edge of the plot.
 *
-*        - "Gapped" -- The same as the "Histogram" option except bad 
-*        values are not flanked by vertical lines to the lower edge of
-*        the plot, leaving a gap.
+*        - "GapHistogram" -- The same as the "Histogram" option except
+*        bad values are not flanked by vertical lines to the lower edge
+*        of the plot, leaving a gap.
 *
 *        - "Line" -- The points are joined by straight lines.
 *
@@ -665,6 +665,8 @@
 *        Ignore negative or zero values if an axis map is set to LOG.
 *     2010 August 10 (MJC):
 *        Added Gapped MODE.
+*     2010 August 13 (MJC):
+*        The new mode renamed to GapHistogram.
 *     {enter_further_changes_here}
 
 *-
@@ -1024,13 +1026,13 @@
 
 *  Get the plotting mode.
       CALL PAR_CHOIC( 'MODE', 'Line',
-     :                'Histogram,Gapped,Line,Point,Mark,Step,Chain',
-     :                .FALSE., TEXT, STATUS )
+     :                'Histogram,GapHistogram,Line,Point,Mark,Step,'/
+     :                /'Chain', .FALSE., TEXT, STATUS )
 
 *  Get an identifier for the mode, and get the marker type if required.
       IF( TEXT .EQ. 'HISTOGRAM' ) THEN
          IMODE = 1
-      ELSE IF( TEXT .EQ. 'GAPPED' ) THEN
+      ELSE IF( TEXT .EQ. 'GAPHISTOGRAM' ) THEN
          IMODE = 6
       ELSE IF( TEXT .EQ. 'LINE' ) THEN
          IMODE = 2
