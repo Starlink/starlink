@@ -87,6 +87,8 @@ void kpg1Kygp1( AstKeyMap *keymap, Grp **igrp, const char *prefix,
 *        Handle vector keymap entries.
 *     2010-08-12 (TIMJ):
 *        Store entries in group in alphabetical order.
+*     13-AUG-2010 (DSB):
+*        Re-instate the original SortBy value before exiting.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -97,6 +99,7 @@ void kpg1Kygp1( AstKeyMap *keymap, Grp **igrp, const char *prefix,
 
 /* Local Variables: */
    AstObject *obj;              /* Pointer to nested AST Object */
+   char *oldsortby;             /* The old value of the KeyMap's SortBy attribute */
    char *text;                  /* Sum of concatenated strings */
    const char *key;             /* Key string for current entry in KeyMap */
    const char *value;           /* Value of current entry in KeyMap */
@@ -120,7 +123,15 @@ void kpg1Kygp1( AstKeyMap *keymap, Grp **igrp, const char *prefix,
    valid = grpValid( *igrp, status );
    if( !valid ) *igrp = grpNew( "Created by kpg1_Kygp1", status );
 
-/* Ensure alphabetical sorting */
+/* If set, save the old SortBy value and then ensure alphabetical sorting.
+   We need to take a copy of the original string since the buffer in which
+   the string is stored may be re-used by subsequent incocations of astGetC.  */
+   if( astTest( keymap, "SortBy" ) ) {
+      nc = 0;
+      oldsortby = astAppendString( NULL, &nc, astGetC( keymap, "SortBy" ) );
+   } else {
+      oldsortby = NULL;
+   }
    astSet( keymap, "SortBy=KeyUp" );
 
 /* Get the number of entries in the KeyMap. */
@@ -197,6 +208,15 @@ void kpg1Kygp1( AstKeyMap *keymap, Grp **igrp, const char *prefix,
             text = astFree( text );
          }
       }
+   }
+
+/* If it was originally set, re-instate the old SortBy value in the KeyMap,
+   then free the memory. Otherwise, clear the SortBy attribute. */
+   if( oldsortby ) {
+      astSetC( keymap, "SortBy", oldsortby );
+      oldsortby = astFree( oldsortby );
+   } else {
+      astClear( keymap, "SortBy" );
    }
 
 /* Make AST use its original status variable. */
