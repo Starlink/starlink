@@ -1179,6 +1179,7 @@
 *  to clear it.  If it is not cleared, the AGI identifier for any
 *  existing DATA picture (within the current picture) is returned in
 *  IPICD, and the corresponding AST Plot is returned in IPLOT.
+*  This uses the Parameters DEVICE and CLEAR.
       CALL KPG1_PLOTA( AST__NULL, 'UNKNOWN', ' ', IPIC0, IPICD0, IPLOT,
      :                 STATUS )
 
