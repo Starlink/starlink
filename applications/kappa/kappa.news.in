@@ -77,19 +77,21 @@
       the statistics (accessed through Parameter NUMGOOD).
 
       -  It now uses a recursive algorithm less susceptible to
-      rounding errors for very large datasets or where data values are
-      concentrated in a narrow range coupled with extreme outliers.
+      rounding errors for very large datasets or where data values
+      are concentrated in a narrow range coupled with extreme
+      outliers.
 
-    o  WCSMOSAIC
+   o  WCSMOSAIC
 
-      -  A bug in the use of the WLIM parameter has been fixed. If
-      the VARIANCE parameter was set to YES, this bug resulted in WLIM
-      being scaled by an arbitrary amount, causing the bad pixels in the
-      output NDF to be wrong. For instance, the entire output NDF could
-      be filled with bad values as a result of this bug. The bug did not
-      occur if the VARIANCE parameter was set to NO.
+      -  A bug in the use of the WLIM parameter has been fixed.
+      If the VARIANCE parameter was set to YES, this bug resulted
+      in WLIM being scaled by an arbitrary amount, causing the bad
+      pixels in the output NDF to be wrong.  For instance, the
+      entire output NDF could be filled with bad values as a
+      result of this bug.  The bug did not occur if the VARIANCE
+      parameter was set to NO.
 
-    o  WCSSLIDE
+   o  WCSSLIDE
 
       -  A bug has been fixed that could lead to incorrect shifts
       when using the ABS parameter.
