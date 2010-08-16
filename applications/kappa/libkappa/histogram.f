@@ -32,8 +32,8 @@
 *     AXES = _LOGICAL (Read)
 *        TRUE if labelled and annotated axes are to be drawn around the
 *        plot.  The width of the margins left for the annotation may be
-*        controlled using parameter MARGIN.  The appearance of the axes
-*        (colours, fonts, etc.) can be controlled using the parameter
+*        controlled using Parameter MARGIN.  The appearance of the axes
+*        (colours, fonts, etc.) can be controlled using the Parameter
 *        STYLE.  [TRUE]
 *     CLEAR = _LOGICAL (Read)
 *        If TRUE the current picture is cleared before the plot is
@@ -122,7 +122,7 @@
 *        that all but a small number of values lie within a few
 *        histogram bins.
 *
-*        The extreme values are reported unless parameter RANGE is
+*        The extreme values are reported unless Parameter RANGE is
 *        specified on the command line.  In this case extreme values
 *        are only calculated where necessary for the chosen method.
 *
@@ -307,7 +307,7 @@
 *        Converted graphics to AST/PGPLOT
 *     17-SEP-1999 (DSB):
 *        Tidied up. NDF calls changed to LPG to use auto-looping.
-*        Dynamicdefault parameters changed to use null default.
+*        Dynamic default parameters changed to use null default.
 *     26-OCT-1999 (DSB):
 *        Made MARGIN a fraction of the current picture, not the DATA
 *        picture.
@@ -323,7 +323,7 @@
 *     15-APR-2005 (PWD):
 *        Parameterise use of backslash to improve portability.
 *     23-FEB-2006 (DSB):
-*        Added parameter CUMUL.
+*        Added Parameter CUMUL.
 *     2006 April 12 (MJC):
 *        Remove unused variable and wrapped long lines.
 *     2008 June 17 (MJC):
@@ -757,12 +757,12 @@
 *  Ensure the Title attribute of the Frame has a useful value.
       CALL KPG1_ASTTL( FRAME, IWCS, NDFI, STATUS )
 
-*  Set the Label, Units and Symbol attributes for the X axis so that they
-*  describe the required NDF array component.
+*  Set the Label, Units and Symbol attributes for the X axis so that
+*  they describe the required NDF array component.
       CALL KPG1_SAXAT( NDFI, MCOMP, 1, XLOG, FRAME, STATUS )
 
-*  Store the default Y axis Label and Symbol in the Frame, and clear the
-*  Units attribute
+*  Store the default Y-axis Label and Symbol in the Frame, and clear the
+*  Units attribute.
       IF ( YLOG ) THEN
          TEXT = 'Log'//BCKSLH//'d10'//BCKSLH//'u(Count)'
       ELSE

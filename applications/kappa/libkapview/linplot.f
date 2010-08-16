@@ -24,24 +24,24 @@
 *     for a one-dimensional NDF.  The vertical axis of the plot
 *     represents array value, and the horizontal axis represents
 *     position.  These can be mapped in various ways on to the graphics
-*     surface (e.g. linearly, logarithmically); see parameters
+*     surface (e.g. linearly, logarithmically); see Parameters
 *     XMAP and YMAP).
 *
 *     The plot may take several different forms such as a
 *     "join-the-dots" plot, a "staircase" plot, a "chain" plot (see
 *     parameter MODE).  Errors on both the data values and the data
 *     positions may be represented in several different ways (see
-*     parameters ERRBAR and SHAPE).  The plotting style (colour, fonts,
-*     text size, etc.) may be specified in detail using parameter STYLE.
+*     Parameters ERRBAR and SHAPE).  The plotting style (colour, fonts,
+*     text size, etc.) may be specified in detail using Parameter STYLE.
 *
 *     The bounds of the plot on both axes can be specified using
-*     parameters XLEFT, XRIGHT, YBOT and YTOP.  If not specified they
+*     Parameters XLEFT, XRIGHT, YBOT and YTOP.  If not specified they
 *     take default values which encompass the entire supplied data set.
 *     The current picture is usually cleared before plotting the new
-*     picture, but parameter CLEAR can be used to prevent this, allowing
+*     picture, but Parameter CLEAR can be used to prevent this, allowing
 *     several plots to be "stacked" together.  If a new plot is drawn
 *     over an existing plot, then there is an option to allow the new
-*     plot to be aligned with the existing plot (see parameter ALIGN).
+*     plot to be aligned with the existing plot (see Parameter ALIGN).
 *
 *     The input NDF may, for instance, contain a spectrum of data values
 *     against wavelength, or it may contain data values along a
@@ -57,7 +57,7 @@
 *     be annotated with RA, or DEC, or offset from the first
 *     element (in arc-minutes, degrees, etc.).  This offset is measured
 *     along the path of the profile.  The choice of annotation for the
-*     horizontal axis is controlled by parameter USEAXIS.
+*     horizontal axis is controlled by Parameter USEAXIS.
 
 *  Usage:
 *     linplot ndf [comp] [mode] [xleft] [xright] [ybot] [ytop] [device]
@@ -72,16 +72,16 @@
 *        XLEFT,  XRIGHT, YBOT, and YTOP parameters are ignored and the
 *        bounds of the existing plot are used instead.  If ALIGN is
 *        FALSE, the new X axis values are used without change.  The
-*        bounds of the new plot are specified using parameters XLEFT,
+*        bounds of the new plot are specified using Parameters XLEFT,
 *        XRIGHT, YBOT, and YTOP as usual, and these bounds are mapped
 *        to the edges of the existing picture.  The ALIGN parameter is
-*        only accessed if parameter CLEAR is FALSE, and if there is
+*        only accessed if Parameter CLEAR is FALSE, and if there is
 *        another line plot within the current picture.  If a null (!)
 *        value is supplied, a value of TRUE will be used if and only if
 *        a mapping can be found between the existing and the new plots.
 *        A value of FALSE will be used otherwise.  [!]
 *     ALIGNSYS = LITERAL (Read)
-*        Only used if a TRUE value is supplied for parameter ALIGN.
+*        Only used if a TRUE value is supplied for Parameter ALIGN.
 *        It specifies the co-ordinate system in which the new plot and
 *        the existing plot are aligned (for further details see the
 *        description of the AlignSystem attribute in SUN/211). The supplied
@@ -96,17 +96,17 @@
 *        TRUE if labelled and annotated axes are to be drawn around the
 *        plot.  If a null (!) value is supplied, the value used is
 *        FALSE if the plot is being aligned with an existing plot (see
-*        parameter ALIGN), and TRUE otherwise.  Parameter USEAXIS
+*        Parameter ALIGN), and TRUE otherwise.  Parameter USEAXIS
 *        determines the quantity used to annotated the horizontal axis.
 *        The width of the margins left for the annotation may be
-*        controlled using parameter MARGIN.  The appearance of the axes
-*        (colours, founts, etc.) can be controlled using the parameter
+*        controlled using Parameter MARGIN.  The appearance of the axes
+*        (colours, founts, etc.) can be controlled using the Parameter
 *        STYLE.  [!]
 *     CLEAR = _LOGICAL (Read)
 *        If TRUE the current picture is cleared before the plot is
 *        drawn.  If CLEAR is FALSE not only is the existing plot
 *        retained, but also the previous plot can be used to specify the
-*        axis limits (see parameter ALIGN).  Thus you can generate a
+*        axis limits (see Parameter ALIGN).  Thus you can generate a
 *        composite plot within a single set of axes, say using different
 *        colours or modes to distinguish data from different datasets.
 *        Note, alignment between the two plots is controlled by the
@@ -138,20 +138,20 @@
 *        TRUE if error bars are to be drawn.  The error bars can
 *        comprise either or both of the data and axis-centre errors,
 *        depending on what is available in the supplied dataset.  The
-*        parameter SHAPE controls the appearance of the error bars, and
+*        Parameter SHAPE controls the appearance of the error bars, and
 *        XSIGMA and YSIGMA control their lengths.  The ERRBAR parameter
-*        is ignored unless the parameter COMP is set to "Data".  [FALSE]
+*        is ignored unless the Parameter COMP is set to "Data".  [FALSE]
 *     FREQ = _INTEGER (Read)
 *        The frequency at which error bars are to be plotted.  For
 *        instance, a value of 2 would mean that alternate points have
 *        error bars plotted.  This lets some plots be less cluttered.
 *        FREQ must lie in the range 1 to half of the number of points
-*        to be plotted.  FREQ is only accessed when parameter ERRBAR is
+*        to be plotted.  FREQ is only accessed when Parameter ERRBAR is
 *        TRUE.  [1]
 *     KEY = _LOGICAL (Read)
 *        TRUE if a key is to be plotted below the horizontal axis giving
 *        the positions at the start and end of the plot, within the
-*        current co-ordinate Frame of the NDF.  If parameter USEAXIS is
+*        current co-ordinate Frame of the NDF.  If Parameter USEAXIS is
 *        zero (i.e. if the horizontal axis is annotated with offset from
 *        the first array element), then the positions refer to the
 *        centres of the first and last elements in the supplied NDF,
@@ -161,13 +161,13 @@
 *        current co-ordinate Frame), then the displayed positions
 *        correspond to the two ends of the visible section of the
 *        horizontal axis.  The appearance of the key can be controlled
-*        using parameter KEYSTYLE.  If a null (!) value is supplied, a
+*        using Parameter KEYSTYLE.  If a null (!) value is supplied, a
 *        key is produced if the current co-ordinate Frame of the
 *        supplied NDF has two or more axes, but no key is produced if it
 *        only has one axis.  [!]
 *     KEYSTYLE = LITERAL (Read)
 *        A group of attribute settings describing the plotting style to
-*        use for the key (see parameter KEY).
+*        use for the key (see Parameter KEY).
 *
 *        A comma-separated list of strings should be given in which each
 *        string is either an attribute setting, or the name of a text
@@ -190,7 +190,7 @@
 *        available attributes.  Any unrecognised attributes are ignored
 *        (no error is reported).  [current value]
 *     LMODE = LITERAL (Read)
-*        LMODE specifies how the defaults for parameters YBOT and YTOP
+*        LMODE specifies how the defaults for Parameters YBOT and YTOP
 *        (the  lower and upper limit of the vertical axis of the plot)
 *        should be found.  The supplied string should consist of up to
 *        three sub-strings, separated by commas.  The first sub-string
@@ -250,7 +250,7 @@
 *        edges) if either annotated axes or a key are produced, and
 *        zero otherwise.  [current value]
 *     MARKER = _INTEGER (Read)
-*        This parameter is only accessed if parameter MODE is set to
+*        This parameter is only accessed if Parameter MODE is set to
 *        "Chain" or "Mark".  It specifies the symbol with which each
 *        position should be marked, and should be given as an integer
 *        PGPLOT marker type.  For instance, 0 gives a box, 1 gives a
@@ -276,7 +276,7 @@
 *        - "Point" -- A dot is plotted at each point.
 *
 *        - "Mark" -- Each point is marker with a symbol specified by
-*        parameter MARKER.
+*        Parameter MARKER.
 *
 *        - "Chain" -- A combination of "Line" and "Mark".
 *
@@ -292,7 +292,7 @@
 *
 *        - "Bars" -- Bars with serifs (i.e. cross pieces at each end)
 *        are drawn joining the x-error limits and the y-error limits.
-*        The plotting attribute "Size(ErrBars)" (see parameter STYLE)
+*        The plotting attribute "Size(ErrBars)" (see Parameter STYLE)
 *        can be used to control the size of these serifs (the attribute
 *        value should be a magnification factor; 1.0 gives default
 *        serifs).
@@ -303,11 +303,11 @@
 *        - "Diamond" -- Adjacent error limits are joined to form an
 *        error diamond.
 *
-*        The length of the error bars can be controlled using parameters
+*        The length of the error bars can be controlled using Parameters
 *        XSIGMA and YSIGMA.  The colour, line width and line style used
 *        to draw them can be controlled using the plotting attributes
 *        "Colour(ErrBars)", "Width(ErrBars)" and "Style(ErrBars)" (see
-*        parameter STYLE).  SHAPE is only accessed when parameter ERRBAR
+*        Parameter STYLE).  SHAPE is only accessed when Parameter ERRBAR
 *        is TRUE.  [current value]
 *     STYLE = GROUP (Read)
 *        A group of attribute settings describing the plotting style to
@@ -316,7 +316,7 @@
 *        and so any value supplied for this parameter persists for all
 *        future invocations of this application until a new value is
 *        supplied.  If you want to make temporary changes to the
-*        plotting style thatdo not persist then use the TEMPSTYLE
+*        plotting style that do not persist then use the TEMPSTYLE
 *        parameter.
 *
 *        A comma-separated list of strings should be given in which each
@@ -343,11 +343,11 @@
 *        The appearance of the data values is controlled by the
 *        attributes Colour(Curves), Width(Curves), etc. (the synonym
 *        Lines may be used in place of Curves).  The appearance of
-*        markers used if parameter MODE is set to "Point", "Mark" or
+*        markers used if Parameter MODE is set to "Point", "Mark" or
 *        "Chain" is controlled by Colour(Markers), Width(Markers), etc.
 *        (the synonym Symbols may be used in place of Markers).  The
 *        appearance of the error symbols is controlled using
-*        Colour(ErrBars), Width(ErrBars), etc. (see parameter SHAPE).
+*        Colour(ErrBars), Width(ErrBars), etc. (see Parameter SHAPE).
 *        [current value]
 *     TEMPSTYLE = GROUP (Read)
 *        A group of extra attribute settings which modify the plotting
@@ -362,8 +362,8 @@
 *        See the description of the STYLE parameter for more information
 *        about values that can be assigned to this parameter.  [!]
 *     USEAXIS = LITERAL (Read)
-*        Specifies the quantity to be used to annotate the horizontal axis
-*        of the plot using one of the following options.
+*        Specifies the quantity to be used to annotate the horizontal
+*        axis of the plot using one of the following options.
 *
 *        - An integer index of an axis within the current Frame of the
 *        input NDF (in the range 1 to the number of axes in the current
@@ -396,8 +396,8 @@
 *        value for the first element in the supplied NDF (with a margin
 *        to include any horizontal error bar).  The value supplied may
 *        be greater than or less than the value supplied for XRIGHT.  A
-*        formatted value for the quantity specified by parameter USEAXIS
-*        should be supplied.  See also parameter ALIGN.  [!]
+*        formatted value for the quantity specified by Parameter USEAXIS
+*        should be supplied.  See also Parameter ALIGN.  [!]
 *     XMAP = LITERAL (Read)
 *        Specifies how the quantity represented by the X axis is mapped
 *        on to the plot.  The options are as follows
@@ -428,20 +428,20 @@
 *        value for the last element in the supplied NDF (with a margin
 *        to include any horizontal error bar).  The value supplied may
 *        be greater than or less than the value supplied for XLEFT.  A
-*        formatted value for the quantity specified by parameter USEAXIS
-*        should be supplied.  See also parameter ALIGN.  [!]
+*        formatted value for the quantity specified by Parameter USEAXIS
+*        should be supplied.  See also Parameter ALIGN.  [!]
 *     XSIGMA = LITERAL (Read)
-*        If horizontal error bars are produced (see parameter ERRBAR),
+*        If horizontal error bars are produced (see Parameter ERRBAR),
 *        then XSIGMA gives the number of standard deviations that the
 *        error bars are to represent.  [current value]
 *     YBOT = LITERAL (Read)
 *        The axis value to place at the bottom end of the vertical
 *        axis.  If a null (!) value is supplied, the value used is
-*        determined by parameter LMODE.  The value of YBOT may be
+*        determined by Parameter LMODE.  The value of YBOT may be
 *        greater than or less than the value supplied for YTOP.  If
-*        parameter YMAP is set to "ValueLog", then the supplied value
+*        Parameter YMAP is set to "ValueLog", then the supplied value
 *        should be the logarithm (base 10) of the bottom data value.
-*        See also parameter ALIGN.  [!]
+*        See also Parameter ALIGN.  [!]
 *     YMAP = LITERAL (Read)
 *        Specifies how the quantity represented by the Y axis is mapped
 *        on to the screen.  The options are as follows.
@@ -453,7 +453,7 @@
 *        screen.  An error will be reported if the dynamic range of
 *        the axis is less than 100, or if the range specified by YTOP
 *        and YBOT encompasses the value zero.  For this reason, care
-*        should be taken over the choice of value for parameter LMODE,
+*        should be taken over the choice of value for Parameter LMODE,
 *        since some choices could result in the Y range being extended
 *        so far that it encompasses zero.
 *
@@ -461,21 +461,21 @@
 *        of mapping the data values logarithmically on to the screen,
 *        this option maps the log (base 10) of the data values linearly
 *        on to the screen.  If this option is selected, the values
-*        supplied for parameters YTOP and YBOT should be values for the
+*        supplied for Parameters YTOP and YBOT should be values for the
 *        logarithm of the data value, not the data value itself.
 *        ["Linear"]
 *     YSIGMA = LITERAL (Read)
-*        If vertical error bars are produced (see parameter ERRBAR),
+*        If vertical error bars are produced (see Parameter ERRBAR),
 *        then YSIGMA gives the number of standard deviations that the
 *        error bars are to represent.  [current value]
 *     YTOP = LITERAL (Read)
 *        The axis value to place at the top end of the vertical
 *        axis.  If a null (!) value is supplied, the value used is
-*        determined by parameter LMODE.  The value of LTOP may be
+*        determined by Parameter LMODE.  The value of LTOP may be
 *        greater than or less than the value supplied for YBOT.  If
-*        parameter YMAP is set to "ValueLog", then the supplied value
+*        Parameter YMAP is set to "ValueLog", then the supplied value
 *        should be the logarithm (base 10) of the bottom data value.
-*        See also parameter ALIGN.  [!]
+*        See also Parameter ALIGN.  [!]
 
 *  Examples:
 *     linplot spectrum
@@ -572,7 +572,7 @@
 *     store the key if present; and a DATA picture containing just the
 *     data plot.  Note, the FRAME picture is only created if annotated
 *     axes or a key has been drawn, or if non-zero margins were
-*     specified using parameter MARGIN.  The world co-ordinates in the
+*     specified using Parameter MARGIN.  The world co-ordinates in the
 *     DATA picture will correspond to offset along the profile on the
 *     horizontal axis, and data value (or logarithm of data value) on
 *     the vertical axis.  On exit the current database picture for the
@@ -632,7 +632,7 @@
 *        USEAXIS changed so that "use offset" is indicated by supplying
 *        zero rather than a null value.
 *     28-SEP-1999 (DSB):
-*        Added parameter LMODE.
+*        Added pParameter LMODE.
 *     26-OCT-1999 (DSB):
 *        Change MARGIN to be a fraction of the current picture, not of
 *        the DATA picture.
@@ -984,7 +984,7 @@
 *  corresponds to "what we want to see" and is given the Domain
 *  "DATAPLOT".  Frame 2 (the Base Frame) is spanned by the axes which
 *  are to be mapped linearly or logarithmically on to the graphics
-*  surface.  Axis 1 will be determined by the setting of parameter XMAP,
+*  surface.  Axis 1 will be determined by the setting of Parameter XMAP,
 *  and axis 2 by the setting of YMAP.  This Frame corresponds to the
 *  "uniform" co-ordinate system, and is given the Domain AGI_WORLD.  A
 *  flag is returned if any of the required Mappings do not have an
@@ -1200,8 +1200,8 @@
          IF( IDP .NE. AST__NOFRAME ) THEN
             CALL AST_SETI( IPLOT, 'Current', IDP, STATUS )
 
-*  Not set the coordinate system in which alignment is to occur. This is
-*  stored in the AlignSystem attribute of the current Frame in FSET.
+*  Not set the co-ordinate system in which alignment is to occur. This
+*  is stored in the AlignSystem attribute of the current Frame in FSET.
             CALL KPG1_ALSYS( 'ALIGNSYS', FSET, IPLOT, 1, STATUS )
 
 *  Attempt to find a Mapping from the DATAPLOT Frame in the existing
@@ -1563,10 +1563,10 @@
             IF( TR( 2 )*BL( 2 ) .LE. 0.0 ) THEN
                CALL MSG_BLANK( STATUS )
                CALL MSG_OUT( ' ', '  Cannot use logarithmic mapping '//
-     :                       'for the Y axis (parameter YMAP) since '//
+     :                       'for the Y axis (Parameter YMAP) since '//
      :                       'the axis range specified by YTOP and '//
      :                       'YBOT includes zero. Try a different '//
-     :                       'value for parameter LMODE?', STATUS )
+     :                       'value for Parameter LMODE?', STATUS )
             END IF
          END IF
 
