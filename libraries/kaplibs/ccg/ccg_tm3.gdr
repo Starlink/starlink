@@ -91,11 +91,14 @@
 *     11-OCT-2004 (BRADC):
 *        No longer use NUM_CMN.
 *     2009 July 2 (MJC):
-*         Converted to generic and renamed from CCG_TMR3R.  Added NBAD 
-*         argument.  Moved STACK to the normal order in the API.
+*        Converted to generic and renamed from CCG_TMR3R.  Added NBAD 
+*        argument.  Moved STACK to the normal order in the API.
 *     2009 July 4 (MJC):
-*         Made NCON Returned and therefore it is initialised.  Move NCON
-*         to just before NBAD in API for consistency.
+*        Made NCON Returned and therefore it is initialised.  Move NCON
+*        to just before NBAD in API for consistency.
+*     2009 July 17 (MJC):
+*        Do not include collapsed data comprising only bad values
+*        in argument NBAD.
 *     {enter_further_changes_here}
 
 *-
