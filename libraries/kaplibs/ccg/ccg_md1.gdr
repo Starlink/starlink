@@ -45,7 +45,7 @@
 *     COVEC( NMAT, NLINES ) = DOUBLE PRECISION (Given)
 *        The packed variance-covariance matrix of the order statistics
 *        from a normal distribution of sizes up to NLINES, produced by
-*        CCD1_ORVAR. Not used if CALCMV is .FALSE.
+*        CCG_ORVAR. Not used if CALCMV is .FALSE.
 *     RESULT( NPIX ) = ? (Returned)
 *        The output line of data.
 *     RESVAR( NPIX ) = ? (Returned)

@@ -61,7 +61,7 @@
 *     COVEC( * ) = DOUBLE PRECISION (Given)
 *        The packed variance-covariance matrix of the order statistics
 *        from a normal distribution of size EL, produced by
-*        CCD1_ORVAR.
+*        CCG_ORVAR.
 *     XMODE = DOUBLE PRECISION (Returned)
 *        The estimate of the uncorrupted mean.
 *     FVAR = DOUBLE PRECISION (Returned)
