@@ -198,7 +198,7 @@
 *        The output catalogue in which to store the centroided
 *        positions.  If a null value (!) is supplied, no output
 *        catalogue is produced.  See also parameter CATFRAME.  [!]
-*     PLOTSTYLE = LITERAL (Read)
+*     PLOTSTYLE = GROUP (Read)
 *        A group of attribute settings describing the style to use when
 *        drawing the graphics markers specified by parameter MARK.
 *

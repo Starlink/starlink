@@ -277,7 +277,7 @@
 *        comma-separated lists which will be read and interpreted in the
 *        same manner. Note, strings within text files can be separated by
 *        new lines as well as commas.
-*     STYLE = LITERAL (Read)
+*     STYLE = GROUP (Read)
 *        A group of attribute settings describing the plotting style to use
 *        when drawing the graphics specified by Parameter PLOT. The format
 *        of the positions reported on the screen may also be controlled.

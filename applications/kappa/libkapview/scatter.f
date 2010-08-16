@@ -111,7 +111,7 @@
 *        highest 5% of the data value in IN2 being excluded from the plot
 *        if the default values are accepted for YBOT and YTOP.
 *        [current value]
-*     STYLE = LITERAL (Read)
+*     STYLE = GROUP (Read)
 *        A group of attribute settings describing the plotting style to use
 *        when drawing the annotated axes, and markers.
 *

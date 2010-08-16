@@ -14915,7 +14915,7 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          value.   {\tt []}
       }
       \sstsubsection{
-         PLOTSTYLE = LITERAL (Read)
+         PLOTSTYLE = \htmlref{GROUP}{se:groups} (Read)
       }{
          A group of attribute settings describing the style to use when
          drawing the graphics markers specified by Parameter MARK.
@@ -16498,7 +16498,7 @@ KAPPA: \htmlref{ADD}{ADD},
          See also Parameter CATFRAME.  {\tt [!]}
       }
       \sstsubsection{
-         PLOTSTYLE = LITERAL (Read)
+         PLOTSTYLE = \htmlref{GROUP}{se:groups} (Read)
       }{
          A group of attribute settings describing the style to use when
          drawing the graphics markers specified by Parameter MARK.
@@ -17701,7 +17701,7 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          parameter.  {\tt [TRUE]}
       }
       \sstsubsection{
-         SPECSTYLE = LITERAL (Read)
+         SPECSTYLE = \htmlref{GROUP}{se:groups} (Read)
       }{
          A group of attribute settings describing the plotting style
          to use when drawing the axes and data values in the spectrum
@@ -20948,7 +20948,7 @@ KAPPA: \htmlref{HISTOGRAM}{HISTOGRAM}.
          new lines as well as commas.
       }
       \sstsubsection{
-         STYLE = LITERAL (Read)
+         STYLE = \htmlref{GROUP}{se:groups} (Read)
       }{
          A group of attribute settings describing the plotting style to use
          when drawing the graphics specified by Parameter PLOT.  The format
@@ -26957,7 +26957,7 @@ KAPPA: \htmlref{GDSET}{GDSET},
          parameters.  It is intended for use within procedures.  {\tt [TRUE]}
       }
       \sstsubsection{
-         STYLE = LITERAL (Read)
+         STYLE = \htmlref{GROUP}{se:groups} (Read)
       }{
          A group of attribute settings describing the plotting style to use
          when drawing the outline (see Parameter OUTLINE).  The format
@@ -29307,7 +29307,7 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          only has one axis.  {\tt [!]}
       }
       \sstsubsection{
-         KEYSTYLE = LITERAL (Read)
+         KEYSTYLE = GROUP (Read)
       }{
          A group of attribute settings describing the plotting style to use
          for the key (see Parameter KEY).
@@ -29491,7 +29491,7 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          is {\tt TRUE}.    {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
-         STYLE = LITERAL (Read)
+         STYLE = \htmlref{GROUP}{se:groups} (Read)
       }{
          A group of attribute settings describing the plotting style to
          use when drawing the annotated axes, data values, and error
@@ -29536,7 +29536,7 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          Parameter SHAPE).   {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
-         TEMPSTYLE = LITERAL (Read)
+         TEMPSTYLE = GROUP (Read)
       }{
          A group of extra attribute settings which modify the plotting
          style specified by the STYLE parameter.  The default for this
@@ -30592,7 +30592,7 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
          new lines as well as commas.
       }
       \sstsubsection{
-         STYLE = LITERAL (Read)
+         STYLE = \htmlref{GROUP}{se:groups} (Read)
       }{
          A group of attribute settings describing the style to use when
          formatting the co-ordinate values displayed on the screen, and
@@ -35167,7 +35167,7 @@ KAPPA: \htmlref{SETBAD}{SETBAD}.
          is case insensitive.  {\tt ["Average"]}
       }
       \sstsubsection{
-         STYLE = LITERAL (Read)
+         STYLE = \htmlref{GROUP}{se:groups} (Read)
       }{
          A group of attribute settings describing the plotting style to use
          when drawing the annotated axes, data curves, error bars, zero
@@ -37027,7 +37027,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          YTOP.  {\tt [2,98]}
       }
       \sstsubsection{
-         STYLE = LITERAL (Read)
+         STYLE = \htmlref{GROUP}{se:groups} (Read)
       }{
          A group of attribute settings describing the plotting style to use
          when drawing the annotated axes, data values, error bars, and
@@ -43446,7 +43446,7 @@ KAPPA: \htmlref{FLIP}{FLIP},
          {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
-         STYLE = LITERAL (Read)
+         STYLE = \htmlref{GROUP}{se:groups} (Read)
       }{
          A group of attribute settings describing the plotting style to use
          when drawing the annotated axes, and markers.
@@ -43821,7 +43821,7 @@ KAPPA: \htmlref{NORMALIZE}{NORMALIZE}.
          corresponding output QUALITY values are set to zero.  {\tt [TRUE]}
       }
       \sstsubsection{
-         STYLE = LITERAL (Read)
+         STYLE = \htmlref{GROUP}{se:groups} (Read)
       }{
          A group of attribute settings describing the style to use when
          drawing the graphics specified by Parameter PLOT.
@@ -51480,7 +51480,7 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
-         STYLE = LITERAL (Read)
+         STYLE = \htmlref{GROUP}{se:groups} (Read)
       }{
          A group of attribute settings describing the style to use when
          drawing the graphics specified by Parameter PLOT.
@@ -57235,6 +57235,13 @@ The following applications have been modified:
 
 
 \section{\xlabel{se_changes}Release Notes---V1.12\label{se:changes}}
+
+\subsection{General Changes}
+\begin{itemize}
+
+   \item Style parameters are consistently documented as type GROUP.
+
+\end{itemize}
 
 \subsection{Modified Commands}
 The following applications have been modified:

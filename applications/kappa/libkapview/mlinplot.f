@@ -287,7 +287,7 @@
 *
 *        The input can be abbreviated to an unambiguous length and
 *        is case insensitive.  ["Average"]
-*     STYLE = LITERAL (Read)
+*     STYLE = GROUP (Read)
 *        A group of attribute settings describing the plotting style to
 *        use when drawing the annotated axes, data curves, error bars,
 *        zero markers, and curve labels.

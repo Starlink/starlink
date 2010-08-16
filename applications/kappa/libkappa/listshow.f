@@ -301,7 +301,7 @@
 *        further comma-separated lists which will be read and
 *        interpreted in the same manner.  Note, strings within text
 *        files can be separated by new lines as well as commas.
-*     STYLE = LITERAL (Read)
+*     STYLE = GROUP (Read)
 *        A group of attribute settings describing the style to use when
 *        formatting the co-ordinate values displayed on the screen, and
 *        when drawing the graphics specified by Parameter PLOT.

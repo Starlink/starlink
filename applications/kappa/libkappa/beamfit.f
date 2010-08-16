@@ -253,7 +253,7 @@
 *        array alternates a position angle, then its corresponding
 *        error, appearing in beam order starting with the first
 *        secondary beam.
-*     PLOTSTYLE = LITERAL (Read)
+*     PLOTSTYLE = GROUP (Read)
 *        A group of attribute settings describing the style to use when
 *        drawing the graphics markers specified by Parameter MARK.
 *

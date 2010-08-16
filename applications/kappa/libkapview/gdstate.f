@@ -95,7 +95,7 @@
 *        If this is FALSE the state of the graphics device is not
 *        reported, merely the results are written to the output
 *        parameters.  It is intended for use within procedures. [TRUE]
-*     STYLE = LITERAL (Read)
+*     STYLE = GROUP (Read)
 *        A group of attribute settings describing the plotting style to use
 *        when drawing the outline (see parameter OUTLINE). The format
 *        of the axis values reported on the screen may also be controlled.

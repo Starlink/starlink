@@ -309,7 +309,7 @@
 *        "Colour(ErrBars)", "Width(ErrBars)" and "Style(ErrBars)" (see
 *        parameter STYLE).  SHAPE is only accessed when parameter ERRBAR
 *        is TRUE.  [current value]
-*     STYLE = LITERAL (Read)
+*     STYLE = GROUP (Read)
 *        A group of attribute settings describing the plotting style to
 *        use when drawing the annotated axes, data values, and error
 *        markers.  The default for this parameter is its current value,
@@ -349,7 +349,7 @@
 *        appearance of the error symbols is controlled using
 *        Colour(ErrBars), Width(ErrBars), etc. (see parameter SHAPE).
 *        [current value]
-*     TEMPSTYLE = LITERAL (Read)
+*     TEMPSTYLE = GROUP (Read)
 *        A group of extra attribute settings which modify the plotting
 *        style specified by the STYLE parameter.  The default for this
 *        parameter is a null (!) value, which causes the plotting style

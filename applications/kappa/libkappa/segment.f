@@ -208,7 +208,7 @@
 *        do not have defined QUALITY components, then no quality is
 *        copied.  Note, if a null input NDF is given then the
 *        corresponding output QUALITY values are set to zero.  [TRUE]
-*     STYLE = LITERAL (Read)
+*     STYLE = GROUP (Read)
 *        A group of attribute settings describing the style to use when
 *        drawing the graphics specified by parameter PLOT.
 *

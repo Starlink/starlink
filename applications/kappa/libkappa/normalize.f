@@ -134,7 +134,7 @@
 *     SLOPE = _REAL (Write)
 *        An output parameter giving the slope of the linear
 *        normalisation expression: IN1 = SLOPE * IN2 + OFFSET.
-*     STYLE = LITERAL (Read)
+*     STYLE = GROUP (Read)
 *        A group of attribute settings describing the plotting style to
 *        use when drawing the annotated axes, data values, error bars,
 *        and best-fitting line.
