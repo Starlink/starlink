@@ -28,9 +28,9 @@
 *       CALL AST_ANNUL( IPLOT, STATUS )
 *       CALL KPG_PGCLS( 'DEVICE', .FALSE., STATUS )
 *
-*     Various environment parameters are used to obtain options, etc. The
-*     names of these parameters are hard-wired into this subroutine in
-*     order to ensure conformity between applications.
+*     Various environment parameters are used to obtain options, etc.
+*     The names of these parameters are hard-wired into this subroutine
+*     in order to ensure conformity between applications.
 
 *  Environment Parameters:
 *        AXES = _LOGICAL (Read)
@@ -50,70 +50,81 @@
 *           used (including error bars).
 *
 *           - "Extended" -- The lowest and highest supplied data values
-*           are used (including error bars), extended to give a margin of
-*           2.5% of the total data range at each end.
+*           are used (including error bars), extended to give a margin
+*           of 2.5% of the total data range at each end.
 *
-*           - "Extended,10,5" -- Like "Extended", except the margins at the
-*           two ends are specified as a pair of numerical value in the second
-*           and third elements of the array. These values are percentages of
-*           the total data range. So, "Extended,10,5" includes a margin of 10%
-*           of the total data range in YBOT, and 5% in YTOP. If only one
-*           numerical value is given, the same value is used for both limits.
-*           If no value is given, both limits default to 2.5. "Range" is
-*           equivalent to "Extended,0,0".
+*           - "Extended,10,5" -- Like "Extended", except the margins at
+*           the two ends are specified as a pair of numerical value in
+*           the second and third elements of the array. These values are
+*           percentages of the total data range. So, "Extended,10,5"
+*           includes a margin of 10% of the total data range in YBOT,
+*           and 5% in YTOP. If only one numerical value is given, the
+*           same value is used for both limits. If no value is given, 
+*           both limits default to 2.5. "Range" is equivalent to 
+*           "Extended,0,0".
 *
-*           - "Percentiles,5,95" -- The second and third elements of the array
-*           are interpreted as percentiles. For instance, "Perc,5,95" causes
-*           5% of the data points (ignoring error bars) to be below YBOT, and
-*           10% to be above the YTOP. If only 1 value (p1) is supplied, the
-*           other one, p2, defaults to (100 - p1). If no values are supplied,
-*           p1 and p2 default to 5 and 95.
+*           - "Percentiles,5,95" -- The second and third elements of the
+*           array are interpreted as percentiles. For instance,
+*           "Perc,5,95" causes 5% of the data points (ignoring error
+*           bars) to be below YBOT, and 10% to be above the YTOP. If
+*           only one value (p1) is supplied, the other one, p2, defaults
+*           to (100 - p1). If no values are supplied, p1 and p2 default
+*           to 5 and 95.
 *
-*           - "Sigma,2,3" -- The second and third elements of the array are
-*           interpreted as multiples of the standard deviation of the data
-*           values (ignoring error bars). For instance, "S,2,3" causes the
-*           YBOT to be the mean of the data values, minus two sigma, and YTOP
-*           to be the mean plus three sigma. If only 1 value is supplied, the
-*           same value is used for both limits. If no values are supplied,
-*           both values default to 3.0.
+*           - "Sigma,2,3" -- The second and third elements of the array
+*           are interpreted as multiples of the standard deviation of
+*           the data values (ignoring error bars). For instance, "S,2,3"
+*           causes the YBOT to be the mean of the data values, minus two
+*           sigma, and YTOP to be the mean plus three sigma. If only one
+*           value is supplied, the same value is used for both limits.
+*           If no values are supplied, both values default to 3.0.
 *
 *           The above strings can be abbreviated to one character.
 *        MARGIN( 4 ) = _REAL (Read)
-*           The widths of the margins to leave for axis annotation, given
-*           as fractions of the corresponding dimension of the current picture.
-*           Four values may be given, in the order - bottom, right, top, left.
-*           If less than four values are given, extra values are used equal to
-*           the first supplied value. If these margins are too narrow any axis
-*           annotation may be clipped. The dynamic default is 0.15 (for all
-*           edges) if either annotated axes or a key are produced, and zero
-*           otherwise.
+*           The widths of the margins to leave for axis annotation,
+*           given as fractions of the corresponding dimension of the
+*           current picture. Four values may be given in the order
+*           bottom, right, top, left.  If fewer than four values are 
+*           given, extra values are used equal to the first supplied
+*           value. If these margins are too narrow any axis
+*           annotation may be clipped. The dynamic default is 0.15 (for
+*           all edges) if either annotated axes or a key are produced,
+*           and zero otherwise.
 *        MARKER = _INTEGER (Read)
-*           The PGPLOT marker type to use. Only accessed if MODE is 3 or 5.
+*           The PGPLOT marker type to use. Only accessed if MODE is 3 or
+*           5.
 *        STYLE = GROUP (Read)
 *           A description of the plotting style required. The following
-*           synonyms for graphical elements may be used:
-*           "Err(Bars)" - Specifies colour, etc for error bars. Size(errbars)
-*                         scales the size of the serifs (i.e. a size value of
-*                         1.0 produces a default size).
-*           "Sym(bols)" - Specifies colour, etc for markers (used in modes 3
-*                         and 5).
-*           "Lin(es)"   - Specifies colour, etc for lines (used in modes 1, 2
-*                         and 5).
+*           synonyms for graphical elements may be used.
+*
+*           - "Err(Bars)" -- Specifies colour, etc. for error bars.
+*           Size(errbars) scales the size of the serifs (i.e. a size
+*           value of 1.0 produces a default size).
+*
+*           - "Sym(bols)" -- Specifies colour, etc. for markers (used
+*           in Modes 3 and 5).
+*
+*           - "Lin(es)" -- Specifies colour, etc. for lines (used in
+*           Modes 1, 2, and 5).
+*        TEMPSTYLE = GROUP (Read)
+*           A description of plotting style required in addition to that
+*           define by STYLE.  See STYLE for allowed synonyms.  Unlike
+*           STYLE its values are not persistent between invocations.
 *        XLEFT = _REAL (Read)
-*           The axis value to place at the left hand end of the horizontal
-*           axis. The dynamic default is specified by argument XL. The value
-*           supplied may be greater than or less than the value supplied for
-*           XRIGHT.
+*           The axis value to place at the left-hand end of the
+*           horizontal axis. The dynamic default is specified by
+*           argument XL. The value supplied may be greater than or less
+*           than the value supplied for XRIGHT.
 *        XRIGHT = _REAL (Read)
-*           The axis value to place at the right hand end of the horizontal
-*           axis. The dynamic default is specified by argument XR. The value
-*           supplied may be greater than or less than the value supplied for
-*           XLEFT.
+*           The axis value to place at the right-hand end of the
+*           horizontal axis. The dynamic default is specified by
+*           argument XR. The value supplied may be greater than or less
+*           than the value supplied for XLEFT.
 *        YBOT = _REAL (Read)
 *           The axis value to place at the bottom end of the vertical
-*           axis. The dynamic default is specified by argument YB. The value
-*           supplied may be greater than or less than the value supplied for
-*           YTOP.
+*           axis. The dynamic default is specified by argument YB. The
+*           value supplied may be greater than or less than the value
+*           supplied for YTOP.
 *        YTOP = _REAL (Read)
 *           The axis value to place at the top end of the vertical axis.
 *           The dynamic default is specified by argument YT. The value
@@ -122,61 +133,65 @@
 
 *  Arguments:
 *     N = INTEGER (Given)
-*        No. of points
+*        Nuumber of points
 *     X( N ) = REAL (Given)
 *        X value at each point.
 *     Y( N ) = REAL (Given)
 *        Y value at each point.
 *     NSIGMA = REAL (Given)
 *        Controls the length of the vertical error bars. A value of zero
-*        suppresses error bars. Otherwise error bars are drawn which extend
-*        by from Y - NSIGMA*YSIGMA to Y + NSIGMA*YSIGMA.
+*        suppresses error bars. Otherwise error bars are drawn that 
+*        extend from Y - NSIGMA*YSIGMA to Y + NSIGMA*YSIGMA.
 *     YSIGMA( N ) = REAL (Given)
 *        The standard deviation associated with each Y value. Not
 *        accessed if NSIGMA is zero.
 *     XLAB = CHARACTER * ( * ) (Given)
 *        A default label for the X axis. Only used if the user does not
-*        supply an alternative. Trailing spaces are ignored. If a Plot is
-*        supplied via IPLOT, then the "Label(1)" attribute in the Plot is
-*        used as the default in preference to XLAB.
+*        supply an alternative. Trailing spaces are ignored. If a Plot
+*        is supplied via IPLOT, then the "Label(1)" attribute in the
+*        Plot is used as the default in preference to XLAB.
 *     YLAB = CHARACTER * ( * ) (Given)
 *        A default label for the Y axis. Only used if the user does not
-*        supply an alternative. Trailing spaces are ignored. If a Plot is
-*        supplied via IPLOT, then the "Label(2)" attribute in the Plot is
-*        used as the default in preference to YLAB.
+*        supply an alternative. Trailing spaces are ignored. If a Plot
+*        is supplied via IPLOT, then the "Label(2)" attribute in the
+*        Plot is used as the default in preference to YLAB.
 *     TTL = CHARACTER * ( * ) (Given)
 *        A default title for the plot. Only used if the user does not
-*        supply an alternative. If a Plot is supplied via IPLOT, then the
-*        "Title" attribute in the Plot is used as the default in preference
-*        to TTL.
+*        supply an alternative. If a Plot is supplied via IPLOT, then
+*        the "Title" attribute in the Plot is used as the default in
+*        preference to TTL.
 *     XSYM = CHARACTER * ( * ) (Given)
-*        The default symbol for the horizontal axis. Only used if the user
-*        does not supply an alternative. This will be stored with the Plot
-*        in the AGI database and (for instance) used by CURSOR as axis
-*        symbols when displaying the cursor positions on the screen. If
-*        a Plot is supplied via IPLOT, then the "Symbol(1)" attribute in
-*        the Plot is used as the default in preference to XSYM.
+*        The default symbol for the horizontal axis. Only used if the
+*        user does not supply an alternative. This will be stored with
+*        the Plot in the AGI database and (for instance) used by
+*        KAPPA:CURSOR as axis symbols when displaying the cursor
+*        positions on the screen. If a Plot is supplied via IPLOT, then
+*        the "Symbol(1)" attribute in the Plot is used as the default
+*        in preference to XSYM. 
 *     YSYM = CHARACTER * ( * ) (Given)
-*        The default symbol for the horizontal axis. Only used if the user
-*        does not supply an alternative. This will be stored with the Plot
-*        in the AGI database and (for instance) used by CURSOR as axis
-*        symbols when displaying the cursor positions on the screen. If
-*        a Plot is supplied via IPLOT, then the "Symbol(2)" attribute in
-*        the Plot is used as the default in preference to XSYM.
+*        The default symbol for the horizontal axis. Only used if the
+*        user does not supply an alternative. This will be stored with
+*        the Plot in the AGI database and (for instance) used by
+*        KAPPA:CURSOR as axis symbols when displaying the cursor
+*        positions on the screen. If a Plot is supplied via IPLOT, then
+*        the "Symbol(2)" attribute in the Plot is used as the default
+*        in preference to YSYM.
 *     MODE = INTEGER (Given)
-*        Determines the way in which the data points are represented:
-*            1 - A "staircase" histogram, in which each horizontal line is
-*                centred on the X position.
-*            2 - The points are joined by straight lines.
-*            3 - A marker is placed at each point.
-*            4 - (not used)
-*            5 - A "chain" in which each point is marker by a marker and also
-*                join by straight lines to its neighbouring points.
+*        Determines the way in which the data points are represented.
+*           1 -- A "staircase" histogram, in which each horizontal line
+*                is centred on the X position.
+*           2 -- The points are joined by straight lines.
+*           3 -- A marker is placed at each point.
+*           4 -- (not used)
+*           5 -- A "chain" in which each point is indicated by a marker
+*                and also join by straight lines to its neighbouring
+*                points.
 *     NULL = LOGICAL (Given)
-*        If .TRUE., then the user may supply a null (!) value for most of the
-*        parameters accessed by this routine to indicate that nothing is to
-*        be plotted. In this case, no error is returned. Otherwise, a
-*        PAR__NULL error status is returned if a null value is supplied.
+*        If .TRUE., then the user may supply a null (!) value for most
+*        of the parameters accessed by this routine to indicate that
+*        nothing is to be plotted. In this case, no error is returned.
+*        Otherwise, a PAR__NULL error status is returned if a null
+*        value is supplied.
 *     XL = REAL (Given)
 *        The default value for the XLEFT parameter. If VAL__BADR is
 *        supplied, the minimum of the X values is used (plus a small
@@ -194,8 +209,8 @@
 *        supplied, the maximum of the high end of the Y error bars is
 *        used (plus a small margin).
 *     APP = CHARACTER * ( * ) (Given)
-*        The name of the application in the form "<package>_<application>".
-*        E.g. "KAPPA_NORMALIZE".
+*        The name of the application in the form
+*        "<package>_<application>", for instance "KAPPA_NORMALIZE".
 *     QUIET = LOGICAL (Given)
 *        If .FALSE., a message is displayed indicating the number of
 *        points which were plotted. If .TRUE., nothing is displayed on
@@ -204,7 +219,7 @@
 *        If .TRUE., then the user is given the chance to specify the
 *        default vertical bounds for the plot using parameter LMODE. If
 *        .FALSE., the supplied bounds (YB, YT ) are used, and the
-*        eqivalent of "Extended" LMODE is used for any bounds which are
+*        equivalent of "Extended" LMODE is used for any bounds that are
 *        not supplied.
 *     DX( N ) = DOUBLE PRECISION (Given and Returned)
 *        Work space.
@@ -215,19 +230,19 @@
 *     IPLOT = INTEGER (Given and Returned)
 *        On entry, this can either be AST_NULL or a pointer to a 2D
 *        Frame. If AST__NULL, the supplied values for the XLAB, YLAB,
-*        TTL, XSYM and YSYM arguments are used without change. If a Frame
-*        is supplied, the Label, Title, Units and Symbol attributes of
-*        the Frame are used in preference to XLAB, YLAB, TTL, XSYM and
-*        YSYM (which are then ignored). Any supplied Frame pointer is
-*        annulled before returning, and a pointer to the Plot used to
-*        draw the axes is returned.
+*        TTL, XSYM and YSYM arguments are used without change. If a
+*        Frame is supplied, the Label, Title, Units and Symbol
+*        attributes of the Frame are used in preference to XLAB, YLAB,
+*        TTL, XSYM and YSYM (which are then ignored). Any supplied
+*        Frame pointer is annulled before returning, and a pointer to
+*        the Plot used to draw the axes is returned.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Notes:
 *     - If an error occurs, or if no graphics is produced because the
-*     user supplied a null value for a parameter, IPLOT is returned equal
-*     to AST__NULL, and PGPLOT is shut down.
+*     user supplied a null value for a parameter, IPLOT is returned
+*     equal to AST__NULL, and PGPLOT is shut down.
 
 *  Copyright:
 *     Copyright (C) 1999, 2001 Central Laboratory of the Research
@@ -238,7 +253,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -262,12 +277,12 @@
 *     17-SEP-1999 (DSB):
 *        Modified to shutdown PGPLOT and return IPLOT=AST__NULL if
 *        an error occurs. Swapped the order of drawing so that the axes
-*        are drawn last (this looks better for instance, if a histogram is
-*        drawn in which may bins have value zero and are therefore drawn
-*        on the bottom axis).
+*        are drawn last (this looks better for instance, if a histogram
+*        is drawn in which may bins have value zero and are therefore
+*        drawn on the bottom axis).
 *     1-OCT-1999 (DSB):
-*        Added argument LMODE. Attempt to draw all points, including ones
-*        which are outside the plot.
+*        Added argument LMODE. Attempt to draw all points, including
+*        ones which are outside the plot.
 *     26-OCT-1999 (DSB):
 *        Made MARGIN a fraction of the current picture, not the DATA
 *        picture.
@@ -559,8 +574,8 @@
      :                IVAL, IPLOT, IVAL, LVAL, STATUS )
 
 *  If a null value was supplied for any graphics parameter, annul the
-*  Plot, shut down PGPLOT and annull the error if allowed, and do not plot
-*  anything.
+*  Plot, shut down PGPLOT and annul the error if allowed, and do not
+*  plot anything.
       IF( STATUS .EQ. PAR__NULL ) THEN
          IF( NULL ) THEN
             CALL AST_ANNUL( IPLOT, STATUS )
@@ -568,7 +583,7 @@
             CALL ERR_ANNUL( STATUS )
          END IF
 
-*  Otherwise, if the device was opened succesfully...
+*  Otherwise, if the device was opened successfully...
       ELSE IF( STATUS .EQ. SAI__OK ) THEN
 
 *  Get the 1-D mappings which transform each of the Current Frame axes
@@ -618,9 +633,9 @@
 
       END IF
 
-*  Export any Plot pointer from the current AST context in case the calling
-*  routine wants to add anything else to the plot. This means the pointer
-*  will not be annulled by the following call to AST_END.
+*  Export any Plot pointer from the current AST context in case the
+*  calling routine wants to add anything else to the plot. This means
+*  the pointer will not be annulled by the following call to AST_END.
       IF( IPLOT .NE. AST__NULL ) CALL AST_EXPORT( IPLOT, STATUS )
 
 *  Tidy up.

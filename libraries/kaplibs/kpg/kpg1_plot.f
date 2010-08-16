@@ -21,49 +21,52 @@
 *     output using PGPLOT within a new DATA picture. Optional ancillary
 *     pictures around the DATA picture may also be created. A FRAME
 *     picture enclosing the DATA picture and any ancillary pictures is
-*     created if any ancillary pictures or non-zero margins were requested.
+*     created if any ancillary pictures or non-zero margins were
+*     requested.
 *
 *     An AST Plot is returned which allows plotting within the DATA
 *     picture. The Base (GRAPHICS) Frame in this Plot corresponds to
 *     millimetres from the botttom left corner of the view surface.
-*     The Current Frame in the Plot is inherited from the supplied FrameSet
-*     (IWCS).
+*     The Current Frame in the Plot is inherited from the supplied
+*     FrameSet (IWCS).
 *
-*     If there is an existing DATA picture on the device, then the new DATA
-*     picture can optionally be aligned with the existing DATA picture. In
-*     this case, the returned Plot is formed by adding any supplied FrameSet
-*     (IWCS) into the Plot stored with the existing DATA picture in the AGI
-*     database (a default Plot is used if the database does not contain a
-*     Plot). The FrameSet is added into the Plot by aligning them in the
-*     Current Frame of the FrameSet if possible. If this is not possible,
-*     they are aligned in the world co-ordinate system of the picture
-*     (stored in the AGI database). The Domain of the AGI world
-*     co-ordinate system is not stored in the database and must be
-*     supplied by the calling application using argument DOMAIN (this will
-*     usually be "PIXEL"). If alignment is not possible in AGI world
-*     co-ordinates, then they are aligned in the GRID domain. If this is
-*     not possible, they are aligned in any suitable Frame.
+*     If there is an existing DATA picture on the device, then the new
+*     DATA picture can optionally be aligned with the existing DATA
+*     picture. In this case, the returned Plot is formed by adding any
+*     supplied FrameSet (IWCS) into the Plot stored with the existing
+*     DATA picture in the AGI database (a default Plot is used if the
+*     database does not contain a Plot). The FrameSet is added into the
+*     Plot by aligning them in the Current Frame of the FrameSet if
+*     possible. If this is not possible, they are aligned in the world
+*     co-ordinate system of the picture (stored in the AGI database).
+*     The Domain of the AGI world co-ordinate system is not stored in
+*     the database and must be supplied by the calling application using
+*     argument DOMAIN (this will usually be "PIXEL"). If alignment is
+*     not possible in AGI world co-ordinates, then they are aligned in
+*     the GRID domain. If this is also not possible, they are aligned in
+*     any suitable Frame.
 *
-*     On exit, the current PGPLOT viewport corresponds to area occupied by
-*     the new DATA picture. The bounds of the PGPLOT window produce a
+*     On exit, the current PGPLOT viewport corresponds to area occupied
+*     by the new DATA picture. The bounds of the PGPLOT window produce a
 *     world co-ordinate system within the viewport corresponding to the
-*     Base Frame in the returned Plot (i.e. millimetres from the bottom-left
-*     corner of the view surface - NOT pixel co-ordinates). Note, this is
-*     different to the world co-ordinate system stored in the AGI database
-*     with the new DATA picture.
+*     Base Frame in the returned Plot (i.e. millimetres from the
+*     bottom-left corner of the view surface - NOT pixel co-ordinates).
+*     Note, this is different from the world co-ordinate system stored
+*     in the AGI database with the new DATA picture.
 *
 *     If the returned Plot contains an AXIS Frame in which the axes are
-*     scaled and shifted versions of the axes of the AGI world co-ordinate
-*     Frame (specified by argument DOMAIN), then a TRANSFORM structure is
-*     stored with the new DATA picture which defines AGI Data co-ordinates.
-*     This is purely for the benefit of non-AST based applications which
-*     may use AGI Data co-ordinates (AST-based applications should always
-*     use the Plot stored with the picture in preference to the TRANSFORM
-*     structure stored in the AGI database).
+*     scaled and shifted versions of the axes of the AGI world
+*     co-ordinate Frame (specified by argument DOMAIN), then a
+*     TRANSFORM structure is stored with the new DATA picture that
+*     defines AGI Data co-ordinates. This is purely for the benefit of
+*     non-AST based applications which may use AGI Data co-ordinates
+*     (AST-based applications should always use the Plot stored with the
+*     picture in preference to the TRANSFORM structure stored in the AGI
+*     database).
 *
-*     Various environment parameters are used to obtain options, etc. The
-*     names of these parameters are hard-wired into this subroutine in
-*     order to ensure conformity between applications.
+*     Various environment parameters are used to obtain options, etc.
+*     The names of these parameters are hard-wired into this subroutine
+*     in order to ensure conformity between applications.
 
 *  Environment Parameters:
 *     CLEAR = _LOGICAL (Read)
@@ -72,138 +75,155 @@
 *     DEVICE = DEVICE (Read)
 *        The plotting device.
 *     FILL = _LOGICAL (Read)
-*        TRUE if the supplied aspect ratio is to be ignored, creating the
-*        largest possible DATA picture within the current picture.  When
-*        FILL is FALSE, the DATA picture is created with the supplied
-*        aspect ratio. Only used when creating a new DATA picture.
+*        TRUE if the supplied aspect ratio is to be ignored, creating
+*        the largest possible DATA picture within the current picture.
+*        When FILL is FALSE, the DATA picture is created with the
+*        supplied aspect ratio. Only used when creating a new DATA
+*        picture.
 *     STYLE = GROUP (Read)
-*        A description of the plotting style required. This the name of a
-*        text file containing an AST attribute setting on each line, of
-*        form "name=value", where "name" is an AST Plot attribute name
-*        (or synonym recognised by this application - see KPG1_ASPSY), and
-*        "value" is the value to assign to the attribute.
+*        A description of the plotting style required. This the name of
+*        a text file containing an AST attribute setting on each line,
+*        of the form "name=value", where "name" is an AST Plot
+*        attribute name (or synonym recognised by this application--see
+*        KPG1_ASPSY), and "value" is the value to assign to the
+*        attribute.
+*     TEMPSTYLE = GROUP (Read)
+*        A group of extra attribute settings which modify the plotting
+*        style specified by the STYLE parameter.  This parameter has the
+*        same value options as STYLE, however style changes specified
+*        using TEMPSTYLE do not persist between invocations of this
+*        routine.
 
 *  Arguments:
 *     IWCS = INTEGER (Given)
-*        An AST pointer to a FrameSet. This may be AST__NULL. The Current
-*        and Base Frames are unchanged on exit.
+*        An AST pointer to a FrameSet. This may be AST__NULL. The
+*        Current and Base Frames are unchanged on exit.
 *     STAT = CHARACTER * ( * ) (Given)
-*        Determines whether or not the new DATA picture should be aligned
-*        with an existing DATA picture.
-*        'NEW': no attempt is made to align the new DATA picture with an
-*               existing DATA picture, even if the CLEAR parameter is
-*               given a FALSE value.
-*        'OLD': the new DATA picture is always aligned with an existing
-*               DATA picture. The CLEAR parameter is not accessed (it is
-*               assumed to have a FALSE value) and an error is reported
-*               if no DATA picture is available.
-*        'UNKNOWN': If CLEAR is given a FALSE value then the new DATA
-*               picture is aligned with any existing DATA picture, but no
-*               error is reported if no DATA picture exists.
+*        Determines whether or not the new DATA picture should be
+*        aligned with an existing DATA picture.
+*
+*        - "NEW" -- no attempt is made to align the new DATA picture
+*        with an existing DATA picture, even if the CLEAR parameter is
+*        given a FALSE value.
+*
+*        - "OLD" -- the new DATA picture is always aligned with an
+*        existing DATA picture. The CLEAR parameter is not accessed (it
+*        is assumed to have a FALSE value) and an error is reported if
+*        no DATA picture is available.
+*
+*        - "UNKNOWN" -- If CLEAR is given a FALSE value then the new
+*        DATA picture is aligned with any existing DATA picture, but no
+*        error is reported if no DATA picture exists.
 *     APP = CHARACTER * ( * ) (Given)
 *        The name of the calling application, in the form
-*        <package>_<application> (eg "KAPPA_DISPLAY", "POLPACK_POLPLOT",
-*        etc). The supplied string is stored as a comment with all new AGI
-*        pictures.
+*        <package>_<application> (e.g. "KAPPA_DISPLAY",
+*        "POLPACK_POLPLOT", etc.). The supplied string is stored as a
+*        comment with all new AGI pictures.
 *     DATREF = CHARACTER * ( * ) (Given)
 *        A string describing the source of the data being displayed,
 *        which will be stored in the AGI database with the new DATA
 *        picture. It is ignore if blank.
 *     MARGIN( 4 ) = REAL (Given)
-*        The width of the borders to leave round the new DATA picture, given
-*        as fractions of the corresponding dimension of the DATA picture.
-*        These should be supplied in the order bottom, right, top, left.
+*        The width of the borders to leave around the new DATA picture,
+*        given as fractions of the corresponding dimension of the DATA
+*        picture. These should be supplied in the order bottom, right,
+*        top, left.
 *     NP = INTEGER (Given)
-*        The number of extra pictures to be included in the FRAME pictures
-*        (the DATA picture itself is not included in this list). Margins are
-*        left round the DATA picture with widths given by MARGIN. Any extra
-*        pictures are placed outside these margins, in positions described by
-*        PSIDE and PSIZE.
+*        The number of extra pictures to be included in the FRAME
+*        pictures (the DATA picture itself is not included in this
+*        list). Margins are left around the DATA picture with widths
+*        given by MARGIN. Any extra pictures are placed outside these
+*        margins, in positions described by PSIDE and PSIZE.
 *     PNAME( NP ) = CHARACTER * ( * ) (Given)
-*        The names to store in the AGI database with the NP extra pictures.
+*        The names to store in the AGI database with the NP extra
+*        pictures.
 *     PSIDE( NP ) = CHARACTER * 1 (Given)
 *        Each element of this array should be one of L, R, T or B. It
-*        indicates which side of the FRAME picture an extra picture is to be
-*        placed. For Left and Right, the extra picture occupies the full
-*        height of the DATA picture, margins, and any previously created
-*        extra pictures. The picture is placed at the far Left or Right of
-*        all previously created pictures. For Top or Bottom, the extra picture
-*        occupies the full width of the DATA picture, margins, and any
-*        previously created extra pictures. The picture is placed at the top or
-*        bottom of all previously created pictures. Ignored if NP is zero.
+*        indicates which side of the FRAME picture an extra picture is
+*        to be placed. For Left and Right, the extra picture occupies
+*        the full height of the DATA picture, margins, and any
+*        previously created extra pictures. The picture is placed at the
+*        far Left or Right of all previously created pictures. For Top
+*        or Bottom, the extra picture occupies the full width of the
+*        DATA picture, margins, and any previously created extra
+*        pictures. The picture is placed at the top or bottom of all
+*        previously created pictures. Ignored if NP is zero.
 *     PSIZE( NP ) = REAL (Given)
-*        The size of each extra picture. For Left and Right pictures, this is
-*        the width of the picture, and the value is given as a fraction
-*        of the width of the DATA picture. For Top and Bottom pictures, it is
-*        the height of the picture, and it is given as a fraction of the
-*        height of the DATA picture. Ignored if NP is zero.
+*        The size of each extra picture. For Left and Right pictures,
+*        this is the width of the picture, and the value is given as a
+*        fraction of the width of the DATA picture. For Top and Bottom
+*        pictures, it is the height of the picture, and it is given as a
+*        fraction of the height of the DATA picture. Ignored if NP is
+*        zero.
 *     ASPECT = REAL (Given)
-*        The aspect ratio for the DATA picture. This is the height of the
-*        DATA picture (in millimetres)  divided by the width of the DATA
-*        picture (also in millimetres). The new DATA picture is created with
-*        this aspect ratio unless the FILL parameter is given a TRUE value,
-*        in which case the aspect ratio is adjusted to get the largest DATA
-*        picture which can be created within the current picture. If a value
-*        of zero is supplied, then the largest DATA picture is used
-*        irrespective of FILL (which is then not accessed).
+*        The aspect ratio for the DATA picture. This is the height of
+*        the DATA picture (in millimetres) divided by the width of the
+*        DATA picture (also in millimetres). The new DATA picture is
+*        created with this aspect ratio unless the FILL parameter is
+*        given a TRUE value, in which case the aspect ratio is adjusted
+*        to get the largest DATA picture that can be created within the
+*        current picture. If a value of zero is supplied, then the
+*        largest DATA picture is used irrespective of FILL (which is
+*        then not accessed).
 *     DOMAIN = CHARACTER * ( * ) (Given)
-*        The Domain name corresponding to the AGI world co-ordinates. If a
-*        blank value is supplied then "AGI_WORLD" will be used.
+*        The Domain name corresponding to the AGI world co-ordinates. If
+*        a blank value is supplied then "AGI_WORLD" will be used.
 *     BOX( 4 ) = DOUBLE PRECISION (Given)
-*        The co-ordinates to be assigned to the bottom-left, and top-right
-*        corners of the DATA picture in the AGI database (the co-ordinate
-*        system in defined by argument DOMAIN). Only used if the new DATA
-*        picture is NOT being aligned with an existing DATA picture. Supplied
-*        in the order XLEFT, YBOTTOM, XRIGHT, YTOP. Note, the supplied
-*        bounds are stored in the AGI database, but do not effect the PGPLOT
-*        window on exit, which always has a world co-ordinate system of
-*        millimetres from the bottom-left corner of the view surface. If
-*        the supplied box has zero area, then world co-ordinates for the
-*        DATA picture in the AGI database will be centimetres from the
-*        bottom-left corner of the DATA picture.
+*        The co-ordinates to be assigned to the bottom-left, and
+*        top-right corners of the DATA picture in the AGI database (the
+*        co-ordinate system in defined by argument DOMAIN). Only used if
+*        the new DATA picture is NOT being aligned with an existing DATA
+*        picture. Supplied in the order XLEFT, YBOTTOM, XRIGHT, YTOP.
+*        Note, the supplied bounds are stored in the AGI database, but
+*        do not effect the PGPLOT window on exit, which always has a
+*        world co-ordinate system of millimetres from the bottom-left
+*        corner of the view surface. If the supplied box has zero area,
+*        then world co-ordinates for the DATA picture in the AGI
+*        database will be centimetres from the bottom-left corner of
+*        the DATA picture.
 *     IPICD = INTEGER (Returned)
 *        An AGI identifier for the new DATA picture.
 *     IPICF = INTEGER (Returned)
-*        An AGI identifier for the new FRAME picture. World co-ordinate system
-*        is inherited from the current picture on entry. If no FRAME picture
-*        is created then an identifier for the current picture on entry is
-*        returned.
+*        An AGI identifier for the new FRAME picture. World co-ordinate
+*        system is inherited from the current picture on entry. If no
+*        FRAME picture is created then an identifier for the current
+*        picture on entry is returned.
 *     IPIC( NP ) = INTEGER (Returned)
 *        An array of AGI identifiers corresponding to the extra pictures
-*        requested in PSIDE and PSIZE. The world co-ordinate system for each
-*        picture is inherited from the FRAME picture. The actual size of a
-*        picture may be less than the requested size if there is insufficient
-*        room left in the FRAME picture to give it its requested size.
-*        Identifiers for pictures which would have zero size (i.e. fall
-*        completely outside the FRAME picture) are returned equal to -1, but
-*        no error is reported.
+*        requested in PSIDE and PSIZE. The world co-ordinate system for
+*        each picture is inherited from the FRAME picture. The actual
+*        size of a picture may be less than the requested size if there
+*        is insufficient room left in the FRAME picture to give it its
+*        requested size. Identifiers for pictures which would have zero
+*        size (i.e. fall completely outside the FRAME picture) are
+*        returned equal to -1, but no error is reported.
 *     IPLOT = INTEGER (Returned)
 *        An AST pointer to the new Plot. Returned equal to AST__NULL if
 *        an error occurs.
 *     NFRM = INTEGER (Returned)
-*        A  Frame with index I in the supplied FrameSet (IWCS) will have index
-*        ( I + NFRM ) in the returned Plot (IPLOT). Returned equal to zero
-*        if an error occurs.
+*        A  Frame with index I in the supplied FrameSet (IWCS) will have
+*        index ( I + NFRM ) in the returned Plot (IPLOT). Returned equal
+*        to zero if an error occurs.
 *     ALIGN = LOGICAL (Returned)
 *        Was the new DATA picture aligned with an existing DATA picture?
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Notes:
-*     -  Picture identifiers are returned equal to -1 if an error occurs,
-*     or if any pictures cannot be created.
+*     -  Picture identifiers are returned equal to -1 if an error
+*     occurs, or if any pictures cannot be created.
 *     -  Close down AGI and PGPLOT using:
 *           CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils.
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -213,8 +233,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
@@ -336,24 +356,29 @@
       CALL KPG1_PLOTP( IPICD0, APP, MARGIN, NP, PNAME, PSIDE, PSIZE,
      :                 ASPECT, BOX, IPICD, IPICF, IPIC, STATUS )
 
-*  Obtain a Plot for the new DATA picture if we do not yet have one (i.e.
-*  if the new DATA picture was not aligned with an existing DATA picture).
+*  Obtain a Plot for the new DATA picture if we do not yet have one
+*  (i.e. if the new DATA picture was not aligned with an existing DATA
+*  picture).
       IF( .NOT. ALIGN ) CALL KPG1_PLOTN( IWCS, DOMAIN, IPICD, .TRUE.,
      :                                   IPLOT, NFRM, STATUS )
 
 *  Set the attributes of the Plot to give the required Plotting style.
+*  Use both the inherited and temporary styles, using fixed parameter
+*  names for consistency between applicaitons.
       CALL KPG1_ASSET( APP, 'STYLE', IPLOT, STATUS )
+      CALL KPG1_ASSET( APP, 'TEMPSTYLE', IPLOT, STATUS )
 
 *  Unless we are drawing over an existing plot, save the Plot and data
-*  reference with the new DATA picture. If possible, a TRANSFORM structure
-*  is stored with the AGI picture giving "AGI Data" co-ords for the benefit
-*  of non_AST applications. The Data co-ordinates are defined by any AXIS
-*  Frame in the Plot. We do not save WCS with the DATA picture if is is
-*  drawn over the top of an existing data picture. This prevents the
-*  database size from growing (WCS information can be very large). When
-*  aligning subsequent pictures, pictures without WCS are ignored, resulting
-*  in aligment occurring with the original picture (i.e. the one that was
-*  not drawn over the top of another picture).
+*  reference with the new DATA picture. If possible, a TRANSFORM
+*  structure is stored with the AGI picture giving "AGI Data" co-ords
+*  for the benefit of non_AST applications. The Data co-ordinates are
+*  defined by any AXIS Frame in the Plot. We do not save WCS with the
+*  DATA picture if it is drawn over the top of an existing data picture.
+*  This prevents the database size from growing (WCS information can be
+*  very large). When aligning subsequent pictures, pictures without WCS
+*  are ignored, resulting in aligment occurring with the original
+*  picture (i.e. the one that was not drawn over the top of another
+*  picture).
       IF( IPICD0 .EQ. -1 ) THEN
          CALL KPG1_PLOTS( IPLOT, IPICD, DATREF, ICURR0, DOMAIN, 'AXIS',
      :                    STATUS )

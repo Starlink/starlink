@@ -4,7 +4,7 @@
 *     KPG1_ASSET
 
 *  Purpose:
-*     Allow the user to spcify attribute values for an AST Object.
+*     Allows the specification of attribute values for an AST Object.
 
 *  Language:
 *     Starlink Fortran 77
@@ -15,7 +15,7 @@
 *  Description:
 *     This routine allows the user to set attributes for an AST Object (see
 *     SUN/210). The value to which an attribute is set in the returned
-*     Object is determined as follows:
+*     Object is determined as follows.
 *
 *     -  If the user supplies a value for the attribute using the given
 *     parameter, then the Object is returned with the attribute set to the
