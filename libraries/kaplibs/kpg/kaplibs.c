@@ -22,7 +22,7 @@
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2007 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2008, 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2008-2010 Science & Technology Facilities Council.
 *     Copyright (C) 2009 University of British Columbia.
 *     All Rights Reserved.
 
@@ -78,6 +78,8 @@
 *        Add kpg1Loctd.
 *     13-NOV-2009 (TIMJ):
 *        Add kpg1_pixsc
+*     2010 August 6 (MJC):
+*        Add kpg1_filli.
 *     {enter_further_changes_here}
 
 *-
@@ -97,6 +99,36 @@
 
 /* Wrapper function implementations. */
 /* ================================= */
+
+F77_SUBROUTINE(kpg1_filli)( INTEGER(VALUE),
+                            INTEGER(EL),
+                            INTEGER_ARRAY(ARRAY),
+                            INTEGER(STATUS) );
+
+void kpg1Filli( int value, int el, int *array, int *status ){
+   DECLARE_INTEGER(VALUE);
+   DECLARE_INTEGER(EL);
+   DECLARE_INTEGER_ARRAY_DYN(ARRAY);
+   DECLARE_INTEGER(STATUS);
+
+   F77_CREATE_INTEGER_ARRAY( ARRAY, el );
+
+   F77_EXPORT_INTEGER( value, VALUE );
+   F77_EXPORT_INTEGER( el, EL );
+   F77_ASSOC_INTEGER_ARRAY( ARRAY, array );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(kpg1_filli)( INTEGER_ARG(&VALUE),
+                         INTEGER_ARG(&EL),
+                         INTEGER_ARRAY_ARG(ARRAY),
+                         INTEGER_ARG(&STATUS) );
+
+   F77_IMPORT_INTEGER( STATUS, *status );
+   F77_IMPORT_INTEGER_ARRAY( ARRAY, array, el );
+   F77_FREE_INTEGER( ARRAY );
+}
+
+/* ------------------------------- */
 
 F77_SUBROUTINE(kpg1_fillr)( REAL(VALUE),
                             INTEGER(EL),
@@ -122,7 +154,7 @@ void kpg1Fillr( float value, int el, float *array, int *status ){
                          INTEGER_ARG(&STATUS) );
 
    F77_IMPORT_INTEGER( STATUS, *status );
-   F77_IMPORT_REAL_ARRAY( ARRAY, array,el );
+   F77_IMPORT_REAL_ARRAY( ARRAY, array, el );
    F77_FREE_REAL( ARRAY );
 }
 

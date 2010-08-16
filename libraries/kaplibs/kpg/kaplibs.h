@@ -22,7 +22,7 @@
 
 *  Copyright:
 *     Copyright (C) 2005, 2006 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2007-2009 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2010 Science & Technology Facilities Council.
 *     Copyright (C) 2009 University of British Columbia.
 *     All Rights Reserved.
 
@@ -84,6 +84,8 @@
 *        Add kpg1_pixsc
 *     2010-05-05 (TIMJ):
 *        Modify kpg1Config API
+*     2010 August 6 (MJC):
+*        Add kpg1Filli.
 *     {enter_further_changes_here}
 
 *-
@@ -113,6 +115,7 @@ double *kpg1Chcof( int,  HDSLoc **, int *, int *, int * );
 void kpg1Asget( int, int, int, int, int, int *, int *, int *, AstFrameSet **, int * );
 void kpg1Asndf( int, int, int *, int *, AstFrameSet **, int * );
 void kpg1Darad( const char *, int, double *, const char *, int *, double *, double *, int * );
+void kpg1Filli( int, int, int *, int * );
 void kpg1Fillr( float, int, float *, int * );
 void kpg1Gausr( float, int, int, float, int, int, int, int, float *, float *, int *, float *, float *, float *, int * );
 void kpg1Gtgrp( const char *, Grp **, size_t*, int *);
