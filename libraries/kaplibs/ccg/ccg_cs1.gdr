@@ -22,7 +22,7 @@
 *     input column in STACK is then used to estimate the range of
 *     values which represent the required sigma clipping.  Values
 *     outside of this range are then rejected and the resulting output
-*     stasndard deviations are returned in the array RESULT.  The 
+*     standard deviations are returned in the array RESULT.  The 
 *     variances are propagated through the combination process and 
 *     returned in the RESVAR array.
 
@@ -118,7 +118,7 @@
 *        leading to a bad pixel.  
 *     2009 November 3 (MJC):
 *        It was returning clipped variances as documented, but we want 
-*        clipped stansdard deviations.
+*        clipped standard deviations.
 *     {enter_further_changes_here}
 
 *-
