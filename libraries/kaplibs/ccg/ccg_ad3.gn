@@ -190,7 +190,7 @@
 
 *  Not enough contributing pixels, set output invalid.
             RESULT( I ) = VAL__BAD<T>
-            NBAD = NBAD + 1
+            IF ( NGOOD. GT. 0 ) NBAD = NBAD + 1
          END IF
 
     1 CONTINUE
