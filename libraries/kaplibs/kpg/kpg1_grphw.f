@@ -230,8 +230,9 @@
 *     to AST__NULL, and PGPLOT is shut down.
 
 *  Copyright:
-*     Copyright (C) 1999, 2001 Central Laboratory of the Research Councils.
-*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 1999, 2001 Central Laboratory of the Research
+*     Councils.
+*     Copyright (C) 2009, 2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -247,11 +248,12 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: D.S. Berry (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -272,7 +274,10 @@
 *     1-MAR-2001 (DSB):
 *        Retain good axis values if the value on the other axis is bad.
 *     15-OCT-2009 (DSB):
-*        Allow IPLOT to be used to supply default Frame attribute values.
+*        Allow IPLOT to be used to supply default Frame attribute
+*        values.
+*     2010 August 15 (MJC):
+*        Added TEMPSTYLE.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -584,8 +589,8 @@
 
 *  Draw the points.
          CALL KPG1_PLTLN( N, 1, N, DX, DY, .FALSE., ( NSIGMA .GT. 0.0 ),
-     :                    0.0D0, DBAR, 0.0D0, 'STYLE', IPLOT, MODE,
-     :                    IMARK, 1, 1, APP, STATUS )
+     :                    0.0D0, DBAR, 0.0D0, 'STYLE,TEMPSTYLE', IPLOT,
+     :                    MODE, IMARK, 1, 1, APP, STATUS )
 
 *  Draw the axes if required.
          IF( AXES ) CALL KPG1_ASGRD( IPLOT, IPICF, .TRUE., STATUS )

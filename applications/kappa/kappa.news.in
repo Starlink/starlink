@@ -34,6 +34,12 @@
       -  Bad percentile values are no longer written to the PERVAL
       output parameter.
 
+   o  HISTOGRAM
+
+      -  There is a new TEMPSTYLE parameter.  Like STYLE it
+      controls the plotting style, however, its assignments only
+      apply to the current invocation.
+
    o  LINPLOT
 
       -  Parameter MODE has a new option "GapHistogram", which
