@@ -25,10 +25,10 @@
 *     combining the data.  This variant uses a complete variance array
 *     propagates them.
 *
-*     The array NCON holds the actual numbers of pixels that were used in 
-*     deriving the output value plus any values already present in the 
-*     array; thus a cumulative sum of contributing pixel numbers may be
-*     kept.
+*     The array NCON holds the actual numbers of pixels that were used
+*     in deriving the output value plus any values already present in
+*     the array; thus a cumulative sum of contributing pixel numbers may
+*     be kept.
 
 *  Arguments:
 *     NPIX = INTEGER (Given)
