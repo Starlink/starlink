@@ -10,8 +10,8 @@
 
       -  The model has been extended to a generalised Gaussian,
       for which the shape exponent may also be a free parameter of
-      the fit.  This feature is controlled by the new GAUSS 
-      parameter, whose default retains the previous behaviour, 
+      the fit.  This feature is controlled by the new GAUSS
+      parameter, whose default retains the previous behaviour,
       namely fitting to a normal Gaussian (shape exponent=2).  There
       is a new GAMMA output parameter to record the shape exponent
       of the primary beam.
@@ -23,7 +23,7 @@
       drawn either side of a bad value.
 
    o  CONVOLVE
-   
+
       -  A new parameter NORM determines how the output NDF is
       normalised to take account of the total data sum in the PSF,
       and of the presence of bad pixels in the input NDF.
@@ -43,13 +43,13 @@
    o  LISTSHOW
 
       -  A new Parameter STEP has been added that allows a subset
-      of the positions identifiers between FIRST and LAST to be 
+      of the positions identifiers between FIRST and LAST to be
       displayed.
 
    o  MAKESURFACE
 
       -  Output variances can now be created for spline fits.
-      
+
    o  NDFTRACE
 
       -  Writes Parameter FPIXSCALE even if QUIET=TRUE.
@@ -65,18 +65,27 @@
       kurtosis, which are also written to new SKEWNESS and KURTOSIS
       output parameters.  The standard deviation reported is now the
       population statistic, not the sample statistic as previously.
-      For most practical uses the difference will be negligible.  To 
+      For most practical uses the difference will be negligible.  To
       obtain the sample standard deviation, if appropriate, scale by
       (N/(N-1))**0.5, where N is the number of values used to derive
-      the statistics (accessed through Parameter NUMGOOD). 
+      the statistics (accessed through Parameter NUMGOOD).
 
-      -  It now uses a recursive algorithm less susceptible to 
+      -  It now uses a recursive algorithm less susceptible to
       rounding errors for very large datasets or where data values are
       concentrated in a narrow range coupled with extreme outliers.
 
+    o  WCSMOSAIC
+
+      -  A bug in the use of the WLIM parameter has been fixed. If
+      the VARIANCE parameter was set to YES, this bug resulted in WLIM
+      being scaled by an arbitrary amount, causing the bad pixels in the
+      output NDF to be wrong. For instance, the entire output NDF could
+      be filled with bad values as a result of this bug. The bug did not
+      occur if the VARIANCE parameter was set to NO.
+
     o  WCSSLIDE
 
-      -  A bug has been fixed that could lead to incorrect shifts 
+      -  A bug has been fixed that could lead to incorrect shifts
       when using the ABS parameter.
 
 1 KAPPA_Version_1.11
