@@ -648,9 +648,6 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
         /* Determine the instrument - assume that header fixups are not required for this */
         hdr->instrument = smf_inst_get( hdr, status );
 
-        /* and work out the observing mode (again, hope that headers are right) */
-        if (hdr->fitshdr) smf_calc_mode( hdr, status );
-
         /* We always try to read the JCMTSTATE even if we don't expect it to be
            here. This lets us write out map models that have strangely compressed
            data arrays and be able to expand them again */
@@ -734,6 +731,9 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           if ( !(flags & SMF__NOFIX_METADATA) ) smf_fix_metadata( MSG__VERB, *data, status );
 
         }
+
+        /* and work out the observing mode (assumes fixed headers) */
+        if (hdr->fitshdr) smf_calc_mode( hdr, status );
 
         /* Determine and store the telescope location in hdr->telpos */
         smf_telpos_get( hdr, status );
@@ -897,6 +897,13 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           /* Determine the instrument */
           hdr->instrument = smf_inst_get( hdr, status );
 
+          /* We need to assign a number of frames to the header just in case
+             it is needed in the metadata fixup */
+          hdr->nframes = nframes;
+
+          /* Metadata corrections - hide the messages by default */
+          if ( !(flags & SMF__NOFIX_METADATA) ) smf_fix_metadata( MSG__VERB, *data, status );
+
           if (hdr->fitshdr) {
             /* and work out the observing mode */
             smf_calc_mode( hdr, status );
@@ -905,13 +912,6 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
             (void )smf_getobsidss( hdr->fitshdr, NULL, 0, hdr->obsidss,
                                    sizeof(hdr->obsidss), status );
           }
-
-          /* We need to assign a number of frames to the header just in case
-             it is needed in the metadata fixup */
-          hdr->nframes = nframes;
-
-          /* Metadata corrections - hide the messages by default */
-          if ( !(flags & SMF__NOFIX_METADATA) ) smf_fix_metadata( MSG__VERB, *data, status );
 
           /* Store units and label */
           one_strlcpy( hdr->units, units, sizeof(hdr->units), status );
