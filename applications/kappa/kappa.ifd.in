@@ -3614,6 +3614,15 @@ package kappa {
             default !
         }
 
+         parameter tempstyle {
+            type LITERAL
+            ppath DEFAULT
+            vpath DEFAULT
+            prompt {Temporary style changes}
+            helpkey *
+            default !
+         }
+
       }
 
       action clinplot {
@@ -3813,6 +3822,15 @@ package kappa {
             ppath CURRENT DEFAULT
             vpath CURRENT DEFAULT
             prompt {Plotting style for the spatial axes}
+            helpkey *
+            default !
+         }
+
+         parameter tempstyle {
+            type LITERAL
+            ppath DEFAULT
+            vpath DEFAULT
+            prompt {Temporary style changes}
             helpkey *
             default !
          }
@@ -4232,6 +4250,15 @@ package kappa {
             ppath CURRENT DEFAULT
             vpath CURRENT DEFAULT
             prompt {Plotting style for the annotated axes and contours}
+            helpkey *
+            default !
+         }
+
+         parameter tempstyle {
+            type LITERAL
+            ppath DEFAULT
+            vpath DEFAULT
+            prompt {Temporary style changes}
             helpkey *
             default !
          }
@@ -4924,6 +4951,15 @@ package kappa {
             ppath CURRENT DEFAULT
             vpath CURRENT DEFAULT
             prompt {Plotting style for the annotated axes}
+            helpkey *
+            default !
+         }
+
+         parameter tempstyle {
+            type LITERAL
+            ppath DEFAULT
+            vpath DEFAULT
+            prompt {Temporary style changes}
             helpkey *
             default !
          }
@@ -6102,6 +6138,15 @@ package kappa {
             default !
          }
 
+         parameter tempstyle {
+            type LITERAL
+            ppath DEFAULT
+            vpath DEFAULT
+            prompt {Temporary style changes}
+            helpkey *
+            default !
+         }
+
          parameter useaxis {
             type LITERAL
             vpath DEFAULT
@@ -7159,6 +7204,15 @@ package kappa {
             ppath CURRENT DEFAULT
             vpath CURRENT DEFAULT
             prompt {Plotting style for the annotated axes and vectors}
+            helpkey *
+            default !
+         }
+
+         parameter tempstyle {
+            type LITERAL
+            ppath DEFAULT
+            vpath DEFAULT
+            prompt {Temporary style changes}
             helpkey *
             default !
          }
