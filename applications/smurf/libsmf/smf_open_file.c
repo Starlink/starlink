@@ -1103,7 +1103,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
   }
 
   /* Check to see if this is an iterative map-maker model */
-  if( hdr && hdr->fitshdr ) {
+  if( hdr && hdr->fitshdr && *status == SAI__OK ) {
     char mname[73];
 
     smf_getfitss( hdr, "SMFMODEL", mname, sizeof(mname), status );
