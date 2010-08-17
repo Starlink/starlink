@@ -87,12 +87,6 @@
 *        attribute name (or synonym recognised by this application--see
 *        KPG1_ASPSY), and "value" is the value to assign to the
 *        attribute.
-*     TEMPSTYLE = GROUP (Read)
-*        A group of extra attribute settings which modify the plotting
-*        style specified by the STYLE parameter.  This parameter has the
-*        same value options as STYLE, however style changes specified
-*        using TEMPSTYLE do not persist between invocations of this
-*        routine.
 
 *  Arguments:
 *     IWCS = INTEGER (Given)
@@ -217,7 +211,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils.
-*     Copyright (C) 2007, 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2007 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -363,10 +357,7 @@
      :                                   IPLOT, NFRM, STATUS )
 
 *  Set the attributes of the Plot to give the required Plotting style.
-*  Use both the inherited and temporary styles, using fixed parameter
-*  names for consistency between applicaitons.
       CALL KPG1_ASSET( APP, 'STYLE', IPLOT, STATUS )
-      CALL KPG1_ASSET( APP, 'TEMPSTYLE', IPLOT, STATUS )
 
 *  Unless we are drawing over an existing plot, save the Plot and data
 *  reference with the new DATA picture. If possible, a TRANSFORM
