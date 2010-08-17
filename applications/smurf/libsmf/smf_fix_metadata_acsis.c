@@ -404,6 +404,7 @@ int smf_fix_metadata_acsis ( msglev_t msglev, smfData * data, int have_fixed, in
     /* No known POL observations */
     if ( !cardthere || cardisdef ) {
       smf_fits_updateU( hdr, "INBEAM", "Hardware in the beam", status );
+      cardthere = 1;
       have_fixed |= SMF__FIXED_FITSHDR;
     }
   } else if ( fitsvals.utdate < 20090201 ) {
@@ -425,6 +426,7 @@ int smf_fix_metadata_acsis ( msglev_t msglev, smfData * data, int have_fixed, in
       if (strcmp( inbeam, "POL") != 0 ) {
         msgOutif( msglev, "", INDENT "This is a POL observation. Updating INBEAM (was ^PREV).", status );
         smf_fits_updateS( hdr, "INBEAM", "POL", "Hardware in the beam", status );
+        cardthere = 1;
         have_fixed |= SMF__FIXED_FITSHDR;
       }
     } else {
@@ -433,10 +435,16 @@ int smf_fix_metadata_acsis ( msglev_t msglev, smfData * data, int have_fixed, in
         /* should be undef, not defined */
         have_fixed |= SMF__FIXED_FITSHDR;
         smf_fits_updateU( hdr, "INBEAM", "Hardware in the beam", status );
+        cardthere = 1;
         msgOutif( msglev, "",  INDENT "This is not a POL observation. Forcing INBEAM to undef.", status);
       }
     }
 
+  }
+  /* For early ACSIS observations INBEAM was not present so we put one in */
+  if (!cardthere) {
+    smf_fits_updateU( hdr, "INBEAM", "Hardware in the beam", status );
+    have_fixed |= SMF__FIXED_FITSHDR;
   }
 
   /* Print out summary of this observation - this may get repetitive if multiple files come
