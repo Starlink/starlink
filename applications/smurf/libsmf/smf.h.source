@@ -371,6 +371,8 @@
  *        Remove SMURF memory allocation routine prototypes. Use AST
  *        routines natively. Provide debugging fallback using standard
  *        routines.
+ *     2010-08-13 (EC):
+ *        Add smf_write_itermap
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -1591,6 +1593,12 @@ int smf_validate_smfHead( const smfHead * hdr, int hasfits, int hasstate,
                           int *status );
 
 void smf_write_clabels( const smfData* data, int * status );
+
+void smf_write_itermap( const double *map, const double *mapvar, dim_t msize,
+                        const Grp *iterrootgrp, size_t contchunk, int iter,
+                        const int *lbnd_out, const int *ubnd_out,
+                        AstFrameSet *outfset, const smfHead *hdr,
+                        const smfArray *qua, int *status );
 
 void smf_write_smfData ( const smfData *data, const smfData *variance,
                          const char * filename,

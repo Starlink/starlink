@@ -50,8 +50,11 @@
 *        pointing LUT on-the-fly
 *     moving = int (Given)
 *        Is coordinate system tracking moving object? (if outfset specified)
-*     lbnd_out = double* (Given)
+*     lbnd_out = int* (Given)
 *        2-element array pixel coord. for the lower bounds of the output map
+*        (if outfset specified)
+*     ubnd_out = int* (Given)
+*        2-element array pixel coord. for the upper bounds of the output map
 *        (if outfset specified)
 *     maxmem = size_t (Given)
 *        Maximum memory that me be used by smf_iteratemap (bytes)
@@ -295,6 +298,8 @@
 *        Use smf_get_padding to get padding with a dynamic default value.
 *     2010-08-10 (EC):
 *        Added "doclean" and "exportclean" config parameters
+*     2010-08-13 (EC):
+*        Factored out writing of itermap extension to smf_write_itermap
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -1368,92 +1373,11 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                was the last chunk of data to be added */
 
             if( itermap && (i == nchunks-1) ) {
-              Grp *mgrp=NULL;        /* Temporary group to hold map name */
-              smfData *imapdata=NULL;/* smfData for this iteration map */
-              char tmpname[GRP__SZNAM+1]; /* temp name buffer */
-              char tempstr[20];
+              smf_write_itermap( thismap, thisvar, msize, iterrootgrp,
+                                 contchunk, iter, lbnd_out, ubnd_out,
+                                 outfset, res[i]->sdata[0]->hdr, qua[i],
+                                 status );
 
-              /* Create a name for this iteration map, take into
-                 account the chunk number. Only required if we are
-                 using a single output container. */
-
-              pname = tmpname;
-              grpGet( iterrootgrp, 1, 1, &pname, sizeof(tmpname), status );
-              one_strlcpy( name, tmpname, sizeof(name), status );
-              one_strlcat( name, ".", sizeof(name), status );
-              if (ncontchunks > 1) {
-                sprintf(tempstr, "CH%02zd", contchunk);
-                one_strlcat( name, tempstr, sizeof(name), status );
-              }
-              sprintf( tempstr, "I%03i", iter+1 );
-              one_strlcat( name, tempstr, sizeof(name), status );
-              mgrp = grpNew( "itermap", status );
-              grpPut1( mgrp, name, 0, status );
-
-              msgOutf( "", "*** Writing map from this iteration to %s", status,
-                       name );
-
-              smf_open_newfile ( mgrp, 1, SMF__DOUBLE, 2, lbnd_out,
-                                 ubnd_out, SMF__MAP_VAR, &imapdata, status);
-
-              /* Copy over the signal and variance maps */
-              if( *status == SAI__OK ) {
-                memcpy( imapdata->pntr[0], thismap, msize*sizeof(*thismap) );
-                memcpy( imapdata->pntr[1], thisvar, msize*sizeof(*thismap) );
-              }
-
-              /* Write out a FITS header */
-              if( (*status == SAI__OK) && res[0]->sdata[0]->hdr &&
-                  res[0]->sdata[0]->hdr->allState ) {
-                AstFitsChan *fitschan=NULL;
-                JCMTState *allState = res[0]->sdata[0]->hdr->allState;
-                char *obsidss=NULL;
-                char obsidssbuf[SZFITSCARD+1];
-                double iter_nboloeff;
-                size_t nmap;
-                size_t ngood_tslices;
-
-                fitschan = astFitsChan ( NULL, NULL, " " );
-
-                obsidss = smf_getobsidss( res[0]->sdata[0]->hdr->fitshdr,
-                                          NULL, 0, obsidssbuf,
-                                          sizeof(obsidssbuf), status );
-                if( obsidss ) {
-                  atlPtfts( fitschan, "OBSIDSS", obsidss,
-                            "Unique observation subsys identifier", status );
-                }
-                atlPtfti( fitschan, "SEQSTART", allState[0].rts_num,
-                          "RTS index number of first frame", status );
-
-                smf_get_dims( res[0]->sdata[0], NULL, NULL, NULL, &ntslice,
-                              NULL, NULL, NULL, status );
-
-                atlPtfti( fitschan, "SEQEND", allState[ntslice-1].rts_num,
-                          "RTS index number of last frame", status );
-
-                /* calculate the effective number of bolometers for this
-                   iteration */
-                smf_qualstats_model( SMF__QFAM_TSERIES, 1, qua[i], NULL, NULL, &nmap, NULL,
-                                     NULL, &ngood_tslices, NULL, NULL, status );
-
-                iter_nboloeff = (double)nmap / (double)ngood_tslices;
-                atlPtftd( fitschan, "NBOLOEFF", iter_nboloeff,
-                          "Effective bolometer count", status );
-
-                kpgPtfts( imapdata->file->ndfid, fitschan, status );
-
-                if( fitschan ) fitschan = astAnnul( fitschan );
-              }
-
-              /* Write WCS (protecting the pointer dereference) */
-              smf_set_moving(outfset,status);
-              if (*status == SAI__OK && imapdata) {
-                ndfPtwcs( outfset, imapdata->file->ndfid, status );
-              }
-
-              /* Clean up */
-              if( mgrp ) grpDelet( &mgrp, status );
-              smf_close_file( &imapdata, status );
             }
           }
 

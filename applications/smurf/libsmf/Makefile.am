@@ -333,6 +333,7 @@ smf_updateprov.c \
 smf_validate_smfData.c \
 smf_validate_smfHead.c \
 smf_write_clabels.c \
+smf_write_itermap.c \
 smf_write_smfData.c \
 $(BUILT_C_ROUTINES)
 
