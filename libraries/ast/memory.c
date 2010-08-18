@@ -124,6 +124,8 @@
 *        functions.
 *     26-MAY-2010 (DSB):
 *        Added astCalloc.
+*     18-AUG-2010 (DSB):
+*        Added astMemoryStats
 */
 
 /* Configuration results. */
@@ -412,6 +414,12 @@ static int Quiet_Use = 0;
 
 /* Report the ID of every cached block when the cache is emptied? */
 static int List_Cache = 0;
+
+/* Current memory allocated by AST. */
+static size_t Current_Usage = 0;
+
+/* Peak memory allocated by AST. */
+static size_t Peak_Usage = 0;
 
 #ifdef THREAD_SAFE
 static pthread_mutex_t mutex2 = PTHREAD_MUTEX_INITIALIZER;
@@ -4083,6 +4091,50 @@ void astMemoryAlarm_( const char *verb ){
    printf( "astMemoryAlarm: Memory id %d has been %s.\n", Watched_ID, verb );
 }
 
+void astMemoryStats_( int reset, size_t *peak, size_t *current, int *status ) {
+/*
+*+
+*  Name:
+*     astMemoryStats
+
+*  Purpose:
+*     Return the current and peak AST memory usage.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     astMemoryStats( int reset, size_t *peak, size_t *current )
+
+*  Description:
+*     This function returns the current amount of memory allocated
+*     using AST memory management functions, and the peak amount of
+*     simultaneously allocated memory since the last time the peak value
+*     was reset.
+
+*  Parameters:
+*     reset
+*        If non-zero, the peak value is reset to the current usage
+*        upon return.
+*     peak
+*        Address at which to return the peak memory usage since the last
+*        reset, in bytes.
+*     current
+*        Address at which to return the current memory usage, in bytes.
+
+*-
+*/
+
+   LOCK_DEBUG_MUTEX;
+
+   if( peak ) *peak = Peak_Usage;
+   if( current ) *current = Current_Usage;
+   if( reset ) Peak_Usage = Current_Usage;
+
+   UNLOCK_DEBUG_MUTEX;
+}
+
 void astMemoryUse_( const void *ptr, const char *verb, int *status ){
 /*
 *+
@@ -4389,7 +4441,7 @@ static void Issue( Memory *mem, int *status ) {
 
 *  Synopsis:
 *     #include "memory.h"
-*     void Issue( Memeory *mem, int *status );
+*     void Issue( Memory *mem, int *status );
 
 *  Description:
 *     Initialises the extra debug items in the Memory header, and adds the
@@ -4428,6 +4480,10 @@ static void Issue( Memory *mem, int *status ) {
 
 /* Report that the pointer is being issued. */
    astMemoryUse( (void *) mem + SIZEOF_MEMORY, ISSUED );
+
+/* Update the current and peak memory usage. */
+   Current_Usage += mem->size + SIZEOF_MEMORY;
+   if( Current_Usage > Peak_Usage ) Peak_Usage = Current_Usage;
 
    UNLOCK_DEBUG_MUTEX;
 }
@@ -4478,6 +4534,9 @@ static void DeIssue( Memory *mem, int *status ) {
    if( prev ) prev->next = next;
    if( next ) next->prev = prev;
    if( mem == Active_List ) Active_List = next;
+
+/* Update the current memory usage. */
+   Current_Usage -= mem->size + SIZEOF_MEMORY;
 
    UNLOCK_DEBUG_MUTEX;
 }
