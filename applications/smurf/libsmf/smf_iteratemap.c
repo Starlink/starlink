@@ -777,11 +777,22 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
      add in the extra length required for padding. */
 
   if( *status == SAI__OK ) {
+    size_t mapmem;
+
+    /* Add on the padding */
     maxconcat += padStart + padEnd;
 
-    smf_checkmem_dimm( maxconcat, INST__SCUBA2,
-                       igroup->nrelated, modeltyps, nmodels, maxmem,
-                       &memneeded, status );
+    /* First check memory for the map */
+    smf_checkmem_map( lbnd_out, ubnd_out, 0, maxmem, &mapmem, status );
+
+    /* Then the iterative components that are proportional to time */
+    smf_checkmem_dimm( maxconcat, INST__SCUBA2, igroup->nrelated, modeltyps,
+                       nmodels, keymap, maxmem-mapmem, &memneeded,
+                       status );
+
+    msgOutf( "", FUNC_NAME ": map-making requires %zu Mb "
+             "(map=%zu Mb model calc=%zu Mb)", status,
+             (mapmem+memneeded)/SMF__MB, mapmem/SMF__MB, memneeded/SMF__MB );
 
     if( *status == SMF__NOMEM ) {
       /* If we need too much memory, generate a warning message and then try
@@ -801,16 +812,24 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       try = maxconcat / ((size_t) ((double)memneeded/maxmem)+1)+1;
 
       /* Round up to get integral number of files including padding at start,
-         but subtract off one file if it exceeds available memory */
-      try += try - ((try/maxfile)*maxfile + padStart);
+         but subtract off one file if it exceeds available memory. If we
+         don't have enough memory even for one input file we're hooped. */
 
-      if( try > (maxconcat*( (double) maxmem / (double) memneeded )) ) {
+      try = ((try/maxfile)*maxfile + padStart);
+
+      if( (try > (maxconcat*( (double) maxmem / (double) memneeded ))) &&
+          (try > maxfile) ) {
         try -= maxfile;
       }
 
-      msgSeti( "TRY", try );
-      msgOut( " ", "  Will try to re-group data in chunks < ^TRY samples long",
-              status);
+      if( try < (maxfile + padStart) ) {
+        *status = SMF__NOMEM;
+        errRep( "", FUNC_NAME ": not enough memory available to break job "
+                "into smaller pieces.", status );
+      }
+
+      msgOutf( "", "  Will try to re-group data in chunks < %zu samples long",
+               status, try );
       msgOut( " ", FUNC_NAME ": ***************", status );
 
       /* Close igroup if needed before re-running smf_grp_related */

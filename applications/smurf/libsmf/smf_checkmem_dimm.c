@@ -15,7 +15,8 @@
 *  Invocation:
 *     smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
 *                        smf_modeltype *modeltyps, dim_t nmodels,
-*                        size_t available, size_t *necessary, int *status );
+*                        AstKeyMap *keymap, size_t available, size_t *necessary,
+*                        int *status );
 
 *  Arguments:
 *     maxlen = dim_t (Given)
@@ -28,6 +29,8 @@
 *        Array indicating which model components are being solved for
 *     nmodels = dim_t (Given)
 *        Number of elements in modeltyps
+*     keymap = AstKeyMap* (Given)
+*        keymap containing parameters to control map-maker
 *     available = size_t (Given)
 *        Maximum memory in bytes that the mapped arrays may occupy
 *     necessary = size_t * (Returned)
@@ -41,8 +44,10 @@
 *     number of detectors at each time slice from the instrument
 *     type. The estimate is based on all of the requested model
 *     components, and the number of subarrays being processed
-*     simultaneously.  If this amount of memory (necessary) exceeds
-*     available, SMF__NOMEM status is set.
+*     simultaneously. It also uses the keymap containing map-making
+*     parameters to decide if any extra variable amounts of memory are
+*     needed (e.g. for data pre-processing). If the amount of memory
+*     (necessary) exceeds available, SMF__NOMEM status is set.
 
 *  Authors:
 *     Edward Chapin (UBC)
@@ -113,11 +118,17 @@
 
 void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
 			smf_modeltype *modeltyps, dim_t nmodels,
-			size_t available, size_t *necessary, int *status ) {
+                        AstKeyMap *keymap, size_t available, size_t *necessary,
+                        int *status ) {
 
 
- /* Local Variables */
+  /* Local Variables */
+  int dofft=0;                 /* flag if we need temp space for FFTs */
   dim_t i;                     /* Loop counter */
+  int ival;                    /* Temporary integer */
+  dim_t gain_box;              /* Length of blocks for GAI/COM model */
+  AstKeyMap *kmap=NULL;        /* Local keymap */
+  dim_t nblock;                /* Number of blocks for GAI/COM model */
   size_t ncol;                 /* Number of columns */
   size_t ndet;                 /* Number of detectors each time step */
   size_t nrow;                 /* Number of rows */
@@ -175,29 +186,62 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
     }
   }
 
+  /* Number of samples in a full data cube for one subarray */
+  nsamp = ndet*maxlen;
+
+  /* Check to see if we need to do filtering as part of
+     pre-processing. If so, we need an extra nsamp-sized buffer to
+     store the FFT. */
+
+  smf_get_cleanpar( keymap, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+                    NULL, NULL, NULL, NULL, NULL, NULL, &dofft, NULL,
+                    NULL, NULL, NULL, NULL, status );
+
+  if( dofft && (*status==SAI__OK) ) {
+    total += nsamp*smf_dtype_sz(SMF__DOUBLE,status);
+  }
+
+
+  /* Calculate memory usage of static model components: */
   if( *status == SAI__OK ) {
 
-    nsamp = ndet*maxlen;
-
-    /* Calculate memory usage of static model components: */
-
-    total = nsamp*smf_dtype_sz(SMF__DOUBLE,status);     /* RES */
+    total += nsamp*smf_dtype_sz(SMF__DOUBLE,status);    /* RES */
     total += nsamp*smf_dtype_sz(SMF__DOUBLE,status);    /* AST */
     total += nsamp*smf_dtype_sz(SMF__INTEGER,status);   /* LUT */
     total += nsamp*smf_dtype_sz(SMF__QUALTYPE,status);  /* QUA */
-
-    total *= nrelated;  /* All of these get multiplies by # subarrays */
-
   }
 
+  /* Add on memory usage for the JCMTState (one per time slice per array) */
   if( *status == SAI__OK ) {
-    /* Calculate memory usage of dynamic model components:  */
+    total += maxlen*sizeof(JCMTState);
+  }
+
+  /* Multiply per-array memory usage at this stage by the number of subarrays */
+  total *= nrelated;
+
+  if( *status == SAI__OK ) {
+    /* Calculate memory usage of dynamic model components. Most of
+       these will have data arrays associated with each subarray
+       (hence the multiplication by nrelated). An exception is
+       SMF__COM for which a single-common mode is used across all
+       subarrays. */
 
     if( modeltyps ) {
+      double mult;
+
       for( i=0; i<nmodels; i++ ) {
 	switch( modeltyps[i] ) {
 	case SMF__NOI:
-	  total += nsamp*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
+          /* SMF__NOI also estimates the noise in each detector from the
+             power spectra, requiring a temporary buffer to store an FFT. If
+             dofft has not yet been set, add on the temp memory here */
+          if( !dofft ) {
+            dofft = 1;
+            mult = 2.0;
+          } else {
+            mult = 1.0;
+          }
+          total += mult*nsamp*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
 	  break;
 	case SMF__COM:
 	  total += maxlen*smf_dtype_sz(SMF__DOUBLE,status);
@@ -210,15 +254,29 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
             nrelated;
           break;
         case SMF__GAI:
-          total += 3*nrow*ncol*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
+          /* Every COM.GAIN_BOX samples there are 3 planes of data corresponding
+             to each bolometer in the subarray. */
+          astMapGet0A( keymap, "COM", &kmap );
+          astMapGet0I( kmap, "GAIN_BOX", &ival );
+          gain_box = ival;
+          nblock = maxlen/gain_box;
+          if( nblock == 0 ) nblock = 1;
+          total += nblock*3*nrow*ncol*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
+          if( kmap ) kmap = astAnnul( kmap );
           break;
         case SMF__FLT:
           /* Presently the filter temporarily transforms the entire
              data cube into a second array. We therefore need to
              ensure enough memory to temporarily store the data cube
-             twice. In the future it would be better to do the
-             filtering one bolo at a time. */
-          total += 2*nsamp*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
+             twice. Again, we only need to add this space if dofft has
+             not already been set. */
+          if( !dofft ) {
+            dofft = 1;
+            mult = 2.0;
+          } else {
+            mult = 1.0;
+          }
+          total += mult*nsamp*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
           break;
         case SMF__PLN:
           total += nsamp*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
