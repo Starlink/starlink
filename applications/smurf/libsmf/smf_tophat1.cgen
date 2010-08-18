@@ -14,10 +14,10 @@
 *  Invocation:
 *     void smf_tophat1<X>( CGEN_TYPE *data, int nel,
 *                          int box, smf_qual_t *qual,
-*                          smf_qual_t mask, int *status )
+*                          smf_qual_t mask, float wlim, int *status )
 
 *  Arguments:
-*     data = CGEN_TYPE * (Given)
+*     data = CGEN_TYPE * (Given and Returned)
 *        Pointer to the 1D array to be smoothed.
 *     nel = const int (Given)
 *        Number of points in the input data.
@@ -31,6 +31,12 @@
 *     mask = smf_qual_t (Given)
 *        Use with qual to define which bits in quality are relevant to
 *        ignore data in the calculation.
+*     wlim = double (Given)
+*        A value in the range 0.0 to 1.0 that gives the minimum fraction of
+*        valid input values that a filter box must contain in order to
+*        produce a valid output value. If a value smaller than 0.0 or
+*        larger than 1.0 is supplied, then an output value will be bad if
+*        and only if the corresponding input value is bad.
 *     status = int * (Given and Returned)
 *        Pointer to global status.
 
@@ -53,6 +59,8 @@
 *  History:
 *     10-JUN-2010 (DSB):
 *        Initial version.
+*     17-AUG-2010 (DSB):
+*        Added argument wlim.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -88,7 +96,8 @@
 
 void CGEN_FUNCTION(smf_tophat1)( CGEN_TYPE *data, const int nel,
                                  int box, smf_qual_t *qual,
-                                 smf_qual_t mask, int *status) {
+                                 smf_qual_t mask, float wlim,
+                                 int *status) {
 
 /* Local variables */
    CGEN_TYPE *in_data;      /* Copy of the time data */
@@ -96,10 +105,12 @@ void CGEN_FUNCTION(smf_tophat1)( CGEN_TYPE *data, const int nel,
    CGEN_TYPE *pout;         /* Pointer to next output value */
    double sum;              /* Sum of values in the box */
    int count;               /* Number of samples in box */
+   int goodin;              /* Is the central input value good? */
    int hb;                  /* Half width of box */
    int iout;                /* Index of current output element */
    int j;                   /* Offset from central box element */
-   smf_qual_t *qin;      /* Pointer to central input quality */
+   int minin;               /* Min no of valid i/p values for a valid o/p value */
+   smf_qual_t *qin;         /* Pointer to central input quality */
 
 /* Check the inherited status. */
    if (*status != SAI__OK) return;
@@ -115,6 +126,19 @@ void CGEN_FUNCTION(smf_tophat1)( CGEN_TYPE *data, const int nel,
 
 /* Check the above pointer can be used safely. */
    if( *status == SAI__OK ) {
+
+/* Store the minimum number of valid input values that must be present in
+   a filter box to create a valid output value. */
+      if( wlim >= 0 && wlim <= 1.0 ) {
+         minin = wlim*box + 0.5;
+         if( minin == 0 ) {
+            minin = 1;
+         } else if( minin > box ) {
+            minin = box;
+         }
+      } else {
+         minin = 0;
+      }
 
 /* Get the half width of the box. */
       hb = box/2;
@@ -141,9 +165,11 @@ void CGEN_FUNCTION(smf_tophat1)( CGEN_TYPE *data, const int nel,
             if( !( (*qin) & mask ) && *pin != CGEN_BAD ) {
                sum = *pin;
                count = 1;
+               goodin = 1;
             } else {
                sum = 0;
                count = 0;
+               goodin = 0;
             }
 
 /* Loop round input data values in pairs, each element in a pair being an
@@ -161,7 +187,9 @@ void CGEN_FUNCTION(smf_tophat1)( CGEN_TYPE *data, const int nel,
             }
 
 /* Store the output mean value. */
-            if( count > 0 ) {
+            if( minin == 0 ) {
+               *pout = goodin ? sum/count : CGEN_BAD;
+            } else if( count > minin ) {
                *pout = sum/count;
             } else {
                *pout = CGEN_BAD;
@@ -179,9 +207,11 @@ void CGEN_FUNCTION(smf_tophat1)( CGEN_TYPE *data, const int nel,
             if( *pin != CGEN_BAD ) {
                sum = *pin;
                count = 1;
+               goodin = 1;
             } else {
                sum = 0;
                count = 0;
+               goodin = 0;
             }
 
 /* Loop round input data values in pairs, each element in a pair being an
@@ -198,7 +228,9 @@ void CGEN_FUNCTION(smf_tophat1)( CGEN_TYPE *data, const int nel,
             }
 
 /* Store the output mean value. */
-            if( count > 0 ) {
+            if( minin == 0 ) {
+               *pout = goodin ? sum/count : CGEN_BAD;
+            } else if( count > minin ) {
                *pout = sum/count;
             } else {
                *pout = CGEN_BAD;

@@ -424,7 +424,8 @@ static void smf1_calcmodel_smo_job( void *job_data, int *status ) {
                               res_data+boloff, qua_data+boloff, 1, SMF__Q_FIT,
                               boldata, w1, w2, w3, status );
         } else {
-           smf_tophat1D( boldata, ntslice, boxcar, bolqua, SMF__Q_FIT, status );
+           smf_tophat1D( boldata, ntslice, boxcar, bolqua, SMF__Q_FIT,
+                         0.0, status );
         }
 
         /* Remove this model from the residual data and copy the data to the model */

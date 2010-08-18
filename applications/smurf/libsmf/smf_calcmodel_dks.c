@@ -241,7 +241,7 @@ void smf_calcmodel_dks( smfWorkForce *wf __attribute__((unused)),
         /* For the first iteration we need to do some pre-processing */
         if( (flags&SMF__DIMM_FIRSTITER) ) {
           /* boxcar smooth */
-          smf_tophat1D( &dksquid[jt1], ntot, boxcar, NULL, 0, status );
+          smf_tophat1D( &dksquid[jt1], ntot, boxcar, NULL, 0, 0.0, status );
         }
 
         /* Loop over rows */

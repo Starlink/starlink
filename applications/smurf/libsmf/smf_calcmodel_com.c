@@ -949,7 +949,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
     /* boxcar smooth if desired */
     if( do_boxcar ) smf_tophat1D( model_data, ntslice, boxcar, NULL, 0,
-                                  status );
+                                  0.0, status );
 
     /* Now try to fit the remaining bolometer data to the new common mode
        estimate. Each bolometer is split into blocks of "gain_box" time
