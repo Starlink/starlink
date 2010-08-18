@@ -171,7 +171,7 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)),
   /* Main routine */
   if (*status != SAI__OK) return;
 
-  /* Obtain pointer to sub-keymap containing COM parameters */
+  /* Obtain pointer to sub-keymap containing AST parameters */
   astMapGet0A( keymap, "AST", &kmap );
 
   /* Obtain pointers to relevant smfArrays for this chunk */
