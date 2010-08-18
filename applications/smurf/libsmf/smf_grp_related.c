@@ -373,7 +373,7 @@ void smf_grp_related(  const Grp *igrp, const size_t grpsize,
   refnsubscan=0;
   refobsidss[0] = '\0';
 
-  for( i=0; i<ngroups; i++ ) {
+  for( i=0; (i<ngroups)&&(*status==SAI__OK); i++ ) {
 
     /* Open header of the first file at each time */
     smf_open_file( igrp, subgroups[i][0], "READ", SMF__NOCREATE_DATA, &data,
@@ -381,7 +381,9 @@ void smf_grp_related(  const Grp *igrp, const size_t grpsize,
 
 
     /* Read the SEQCOUNT and NSUBSCAN header values */
-    hdr = data->hdr;
+    if( *status == SAI__OK ) {
+      hdr = data->hdr;
+    }
     smf_find_seqcount( hdr, &seqcount, status );
     smf_fits_getI( hdr, "NSUBSCAN", &nsubscan, status );
 
