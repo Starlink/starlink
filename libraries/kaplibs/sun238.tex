@@ -809,6 +809,9 @@ related items to be removed.
 \item KPG\_OSTAx added.  It uses recurrence formulae to calculate
       simple statistics robustly.  It also extends KPG1\_STATx by
       deriving the skewness and kurtosis.
+\item The MODE argument of KPG1\_PLTLN has an additional option of
+      {\tt "Gapped"} that is the same as {\tt "Histogram"} except
+      bad values are not flanked by vertical lines, leaving a gap.
 \item KPG1\_STDSx and KPG1\_STFLx can respectively report or log the
       skewness and kurtosis via two additional arguments.  Users of
       these routines will need to modify calling routines accordingly;
@@ -1642,7 +1645,7 @@ related items to be removed.
       }{
          The packed variance-covariance matrix of the order statistics
          from a normal distribution of sizes up to NLINES, produced by
-         CCD1\_ORVAR.
+         CCG\_ORVAR.
       }
       \sstsubsection{
          RESULT( NPIX ) = ? (Returned)
@@ -1859,10 +1862,10 @@ related items to be removed.
       combining the data.  This variant uses a complete variance array
       propagates them.
 
-      The array NCON holds the actual numbers of pixels that were used in
-      deriving the output value plus any values already present in the
-      array; thus a cumulative sum of contributing pixel numbers may be
-      kept.
+      The array NCON holds the actual numbers of pixels that were used
+      in deriving the output value plus any values already present in
+      the array; thus a cumulative sum of contributing pixel numbers may
+      be kept.
    }
    \sstinvocation{
       CALL CCG\_COMB1x( NPIX, NLINES, STACK, VARS, COORDS, IMETH, MINPIX,
@@ -2278,7 +2281,7 @@ related items to be removed.
       input column in STACK is then used to estimate the range of
       values which represent the required sigma clipping.  Values
       outside of this range are then rejected and the resulting output
-      stasndard deviations are returned in the array RESULT.  The
+      standard deviations are returned in the array RESULT.  The
       variances are propagated through the combination process and
       returned in the RESVAR array.
    }
@@ -2329,7 +2332,7 @@ related items to be removed.
       }{
          The packed variance-covariance matrix of the order statistics
          from a normal distribution of sizes up to NLINES, produced by
-         CCD1\_ORVAR.
+         CCG\_ORVAR.
       }
       \sstsubsection{
          RESULT( NPIX ) = ? (Returned)
@@ -2733,7 +2736,7 @@ related items to be removed.
       }{
          The packed variance-covariance matrix of the order statistics
          from a normal distribution of sizes up to NLINES, produced by
-         CCD1\_ORVAR. This is only used when median is derived from
+         CCG\_ORVAR. This is only used when median is derived from
          the central-2 values.
       }
       \sstsubsection{
@@ -3536,7 +3539,7 @@ related items to be removed.
       }{
          The packed variance-covariance matrix of the order statistics
          from a normal distribution of sizes up to NLINES, produced by
-         CCD1\_ORVAR. Not used if CALCMV is .FALSE.
+         CCG\_ORVAR. Not used if CALCMV is .FALSE.
       }
       \sstsubsection{
          RESULT( NPIX ) = ? (Returned)
@@ -3923,7 +3926,7 @@ related items to be removed.
       }{
          The packed variance-covariance matrix of the order statistics
          from a normal distribution of sizes up to NLINES, produced by
-         CCD1\_ORVAR.
+         CCG\_ORVAR.
       }
       \sstsubsection{
          RESULT( NPIX ) = ? (Returned)
@@ -4313,7 +4316,7 @@ related items to be removed.
       }{
          The packed variance-covariance matrix of the order statistics
          from a normal distribution of sizes up to NLINES, produced by
-         CCD1\_ORVAR.
+         CCG\_ORVAR.
       }
       \sstsubsection{
          RESULT( NPIX ) = ? (Returned)
@@ -4884,7 +4887,7 @@ related items to be removed.
       }{
          The packed variance-covariance matrix of the order statistics
          from a normal distribution of sizes up to NLINES, produced by
-         CCD1\_ORVAR.
+         CCG\_ORVAR.
       }
       \sstsubsection{
          RESULT( NPIX ) = ? (Returned)
@@ -5282,7 +5285,7 @@ related items to be removed.
       }{
          The packed variance-covariance matrix of the order statistics
          from a normal distribution of sizes up to NLINES, produced by
-         CCD1\_ORVAR.
+         CCG\_ORVAR.
       }
       \sstsubsection{
          RESULT( NPIX ) = ? (Returned)
@@ -5907,7 +5910,7 @@ related items to be removed.
       }{
          The packed variance-covariance matrix of the order statistics
          from a normal distribution of sizes up to NLINES, produced by
-         CCD1\_ORVAR.
+         CCG\_ORVAR.
       }
       \sstsubsection{
          RESULT( NPIX ) = ? (Returned)
@@ -6730,7 +6733,7 @@ related items to be removed.
       }{
          The packed variance-covariance matrix of the order statistics
          from a normal distribution of size EL, produced by
-         CCD1\_ORVAR.
+         CCG\_ORVAR.
       }
       \sstsubsection{
          XMODE = DOUBLE PRECISION (Returned)
@@ -15815,12 +15818,12 @@ related items to be removed.
 \sstroutine{
    KPG1\_ASSET
 }{
-   Allow the user to spcify attribute values for an AST Object
+   Allows the specification of attribute values for an AST Object
 }{
    \sstdescription{
       This routine allows the user to set attributes for an AST Object (see
       SUN/210). The value to which an attribute is set in the returned
-      Object is determined as follows:
+      Object is determined as follows.
 
       \sstitemlist{
 
@@ -20177,9 +20180,9 @@ related items to be removed.
         CALL AST\_ANNUL( IPLOT, STATUS )
         CALL KPG\_PGCLS( {\tt '}DEVICE{\tt '}, .FALSE., STATUS )
 
-      Various environment parameters are used to obtain options, etc. The
-      names of these parameters are hard-wired into this subroutine in
-      order to ensure conformity between applications.
+      Various environment parameters are used to obtain options, etc.
+      The names of these parameters are hard-wired into this subroutine
+      in order to ensure conformity between applications.
    }
    \sstinvocation{
       CALL KPG1\_GRPHW( N, X, Y, NSIGMA, YSIGMA, XLAB, YLAB, TTL,
@@ -20190,7 +20193,7 @@ related items to be removed.
       \sstsubsection{
          N = INTEGER (Given)
       }{
-         No. of points
+         Nuumber of points
       }
       \sstsubsection{
          X( N ) = REAL (Given)
@@ -20206,8 +20209,8 @@ related items to be removed.
          NSIGMA = REAL (Given)
       }{
          Controls the length of the vertical error bars. A value of zero
-         suppresses error bars. Otherwise error bars are drawn which extend
-         by from Y - NSIGMA$*$YSIGMA to Y $+$ NSIGMA$*$YSIGMA.
+         suppresses error bars. Otherwise error bars are drawn that
+         extend from Y - NSIGMA$*$YSIGMA to Y $+$ NSIGMA$*$YSIGMA.
       }
       \sstsubsection{
          YSIGMA( N ) = REAL (Given)
@@ -20219,65 +20222,69 @@ related items to be removed.
          XLAB = CHARACTER $*$ ( $*$ ) (Given)
       }{
          A default label for the X axis. Only used if the user does not
-         supply an alternative. Trailing spaces are ignored. If a Plot is
-         supplied via IPLOT, then the {\tt "}Label(1){\tt "} attribute in the Plot is
-         used as the default in preference to XLAB.
+         supply an alternative. Trailing spaces are ignored. If a Plot
+         is supplied via IPLOT, then the {\tt "}Label(1){\tt "} attribute in the
+         Plot is used as the default in preference to XLAB.
       }
       \sstsubsection{
          YLAB = CHARACTER $*$ ( $*$ ) (Given)
       }{
          A default label for the Y axis. Only used if the user does not
-         supply an alternative. Trailing spaces are ignored. If a Plot is
-         supplied via IPLOT, then the {\tt "}Label(2){\tt "} attribute in the Plot is
-         used as the default in preference to YLAB.
+         supply an alternative. Trailing spaces are ignored. If a Plot
+         is supplied via IPLOT, then the {\tt "}Label(2){\tt "} attribute in the
+         Plot is used as the default in preference to YLAB.
       }
       \sstsubsection{
          TTL = CHARACTER $*$ ( $*$ ) (Given)
       }{
          A default title for the plot. Only used if the user does not
-         supply an alternative. If a Plot is supplied via IPLOT, then the
-         {\tt "}Title{\tt "} attribute in the Plot is used as the default in preference
-         to TTL.
+         supply an alternative. If a Plot is supplied via IPLOT, then
+         the {\tt "}Title{\tt "} attribute in the Plot is used as the default in
+         preference to TTL.
       }
       \sstsubsection{
          XSYM = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         The default symbol for the horizontal axis. Only used if the user
-         does not supply an alternative. This will be stored with the Plot
-         in the AGI database and (for instance) used by CURSOR as axis
-         symbols when displaying the cursor positions on the screen. If
-         a Plot is supplied via IPLOT, then the {\tt "}Symbol(1){\tt "} attribute in
-         the Plot is used as the default in preference to XSYM.
+         The default symbol for the horizontal axis. Only used if the
+         user does not supply an alternative. This will be stored with
+         the Plot in the AGI database and (for instance) used by
+         KAPPA:CURSOR as axis symbols when displaying the cursor
+         positions on the screen. If a Plot is supplied via IPLOT, then
+         the {\tt "}Symbol(1){\tt "} attribute in the Plot is used as the default
+         in preference to XSYM.
       }
       \sstsubsection{
          YSYM = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         The default symbol for the horizontal axis. Only used if the user
-         does not supply an alternative. This will be stored with the Plot
-         in the AGI database and (for instance) used by CURSOR as axis
-         symbols when displaying the cursor positions on the screen. If
-         a Plot is supplied via IPLOT, then the {\tt "}Symbol(2){\tt "} attribute in
-         the Plot is used as the default in preference to XSYM.
+         The default symbol for the horizontal axis. Only used if the
+         user does not supply an alternative. This will be stored with
+         the Plot in the AGI database and (for instance) used by
+         KAPPA:CURSOR as axis symbols when displaying the cursor
+         positions on the screen. If a Plot is supplied via IPLOT, then
+         the {\tt "}Symbol(2){\tt "} attribute in the Plot is used as the default
+         in preference to YSYM.
       }
       \sstsubsection{
          MODE = INTEGER (Given)
       }{
-         Determines the way in which the data points are represented:
-             1 - A {\tt "}staircase{\tt "} histogram, in which each horizontal line is
-                 centred on the X position.
-             2 - The points are joined by straight lines.
-             3 - A marker is placed at each point.
-             4 - (not used)
-             5 - A {\tt "}chain{\tt "} in which each point is marker by a marker and also
-                 join by straight lines to its neighbouring points.
+         Determines the way in which the data points are represented.
+            1 -- A {\tt "}staircase{\tt "} histogram, in which each horizontal line
+                 is centred on the X position.
+            2 -- The points are joined by straight lines.
+            3 -- A marker is placed at each point.
+            4 -- (not used)
+            5 -- A {\tt "}chain{\tt "} in which each point is indicated by a marker
+                 and also join by straight lines to its neighbouring
+                 points.
       }
       \sstsubsection{
          NULL = LOGICAL (Given)
       }{
-         If .TRUE., then the user may supply a null (!) value for most of the
-         parameters accessed by this routine to indicate that nothing is to
-         be plotted. In this case, no error is returned. Otherwise, a
-         PAR\_\_NULL error status is returned if a null value is supplied.
+         If .TRUE., then the user may supply a null (!) value for most
+         of the parameters accessed by this routine to indicate that
+         nothing is to be plotted. In this case, no error is returned.
+         Otherwise, a PAR\_\_NULL error status is returned if a null
+         value is supplied.
       }
       \sstsubsection{
          XL = REAL (Given)
@@ -20310,8 +20317,8 @@ related items to be removed.
       \sstsubsection{
          APP = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         The name of the application in the form {\tt "}$<$package$>$\_$<$application$>${\tt "}.
-         E.g. {\tt "}KAPPA\_NORMALIZE{\tt "}.
+         The name of the application in the form
+         {\tt "}$<$package$>$\_$<$application$>${\tt "}, for instance {\tt "}KAPPA\_NORMALIZE{\tt "}.
       }
       \sstsubsection{
          QUIET = LOGICAL (Given)
@@ -20326,7 +20333,7 @@ related items to be removed.
          If .TRUE., then the user is given the chance to specify the
          default vertical bounds for the plot using parameter LMODE. If
          .FALSE., the supplied bounds (YB, YT ) are used, and the
-         eqivalent of {\tt "}Extended{\tt "} LMODE is used for any bounds which are
+         equivalent of {\tt "}Extended{\tt "} LMODE is used for any bounds that are
          not supplied.
       }
       \sstsubsection{
@@ -20349,12 +20356,12 @@ related items to be removed.
       }{
          On entry, this can either be AST\_NULL or a pointer to a 2D
          Frame. If AST\_\_NULL, the supplied values for the XLAB, YLAB,
-         TTL, XSYM and YSYM arguments are used without change. If a Frame
-         is supplied, the Label, Title, Units and Symbol attributes of
-         the Frame are used in preference to XLAB, YLAB, TTL, XSYM and
-         YSYM (which are then ignored). Any supplied Frame pointer is
-         annulled before returning, and a pointer to the Plot used to
-         draw the axes is returned.
+         TTL, XSYM and YSYM arguments are used without change. If a
+         Frame is supplied, the Label, Title, Units and Symbol
+         attributes of the Frame are used in preference to XLAB, YLAB,
+         TTL, XSYM and YSYM (which are then ignored). Any supplied
+         Frame pointer is annulled before returning, and a pointer to
+         the Plot used to draw the axes is returned.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -20367,8 +20374,8 @@ related items to be removed.
 
          \sstitem
          If an error occurs, or if no graphics is produced because the
-         user supplied a null value for a parameter, IPLOT is returned equal
-         to AST\_\_NULL, and PGPLOT is shut down.
+         user supplied a null value for a parameter, IPLOT is returned
+         equal to AST\_\_NULL, and PGPLOT is shut down.
       }
    }
    \sstdiylist{
@@ -20406,35 +20413,37 @@ related items to be removed.
 
             \sstitem
             {\tt "}Extended{\tt "} -- The lowest and highest supplied data values
-            are used (including error bars), extended to give a margin of
-            2.5\% of the total data range at each end.
+            are used (including error bars), extended to give a margin
+            of 2.5\% of the total data range at each end.
 
             \sstitem
-            {\tt "}Extended,10,5{\tt "} -- Like {\tt "}Extended{\tt "}, except the margins at the
-            two ends are specified as a pair of numerical value in the second
-            and third elements of the array. These values are percentages of
-            the total data range. So, {\tt "}Extended,10,5{\tt "} includes a margin of 10\%
-            of the total data range in YBOT, and 5\% in YTOP. If only one
-            numerical value is given, the same value is used for both limits.
-            If no value is given, both limits default to 2.5. {\tt "}Range{\tt "} is
-            equivalent to {\tt "}Extended,0,0{\tt "}.
+            {\tt "}Extended,10,5{\tt "} -- Like {\tt "}Extended{\tt "}, except the margins at
+            the two ends are specified as a pair of numerical value in
+            the second and third elements of the array. These values are
+            percentages of the total data range. So, {\tt "}Extended,10,5{\tt "}
+            includes a margin of 10\% of the total data range in YBOT,
+            and 5\% in YTOP. If only one numerical value is given, the
+            same value is used for both limits. If no value is given,
+            both limits default to 2.5. {\tt "}Range{\tt "} is equivalent to
+            {\tt "}Extended,0,0{\tt "}.
 
             \sstitem
-            {\tt "}Percentiles,5,95{\tt "} -- The second and third elements of the array
-            are interpreted as percentiles. For instance, {\tt "}Perc,5,95{\tt "} causes
-            5\% of the data points (ignoring error bars) to be below YBOT, and
-            10\% to be above the YTOP. If only 1 value (p1) is supplied, the
-            other one, p2, defaults to (100 - p1). If no values are supplied,
-            p1 and p2 default to 5 and 95.
+            {\tt "}Percentiles,5,95{\tt "} -- The second and third elements of the
+            array are interpreted as percentiles. For instance,
+            {\tt "}Perc,5,95{\tt "} causes 5\% of the data points (ignoring error
+            bars) to be below YBOT, and 10\% to be above the YTOP. If
+            only one value (p1) is supplied, the other one, p2, defaults
+            to (100 - p1). If no values are supplied, p1 and p2 default
+            to 5 and 95.
 
             \sstitem
-            {\tt "}Sigma,2,3{\tt "} -- The second and third elements of the array are
-            interpreted as multiples of the standard deviation of the data
-            values (ignoring error bars). For instance, {\tt "}S,2,3{\tt "} causes the
-            YBOT to be the mean of the data values, minus two sigma, and YTOP
-            to be the mean plus three sigma. If only 1 value is supplied, the
-            same value is used for both limits. If no values are supplied,
-            both values default to 3.0.
+            {\tt "}Sigma,2,3{\tt "} -- The second and third elements of the array
+            are interpreted as multiples of the standard deviation of
+            the data values (ignoring error bars). For instance, {\tt "}S,2,3{\tt "}
+            causes the YBOT to be the mean of the data values, minus two
+            sigma, and YTOP to be the mean plus three sigma. If only one
+            value is supplied, the same value is used for both limits.
+            If no values are supplied, both values default to 3.0.
 
          }
          The above strings can be abbreviated to one character.
@@ -20442,56 +20451,74 @@ related items to be removed.
       \sstsubsection{
          MARGIN( 4 ) = \_REAL (Read)
       }{
-         The widths of the margins to leave for axis annotation, given
-         as fractions of the corresponding dimension of the current picture.
-         Four values may be given, in the order - bottom, right, top, left.
-         If less than four values are given, extra values are used equal to
-         the first supplied value. If these margins are too narrow any axis
-         annotation may be clipped. The dynamic default is 0.15 (for all
-         edges) if either annotated axes or a key are produced, and zero
-         otherwise.
+         The widths of the margins to leave for axis annotation,
+         given as fractions of the corresponding dimension of the
+         current picture. Four values may be given in the order
+         bottom, right, top, left.  If fewer than four values are
+         given, extra values are used equal to the first supplied
+         value. If these margins are too narrow any axis
+         annotation may be clipped. The dynamic default is 0.15 (for
+         all edges) if either annotated axes or a key are produced,
+         and zero otherwise.
       }
       \sstsubsection{
          MARKER = \_INTEGER (Read)
       }{
-         The PGPLOT marker type to use. Only accessed if MODE is 3 or 5.
+         The PGPLOT marker type to use. Only accessed if MODE is 3 or
+         5.
       }
       \sstsubsection{
          STYLE = GROUP (Read)
       }{
          A description of the plotting style required. The following
-         synonyms for graphical elements may be used:
-         {\tt "}Err(Bars){\tt "} - Specifies colour, etc for error bars. Size(errbars)
-                       scales the size of the serifs (i.e. a size value of
-                       1.0 produces a default size).
-         {\tt "}Sym(bols){\tt "} - Specifies colour, etc for markers (used in modes 3
-                       and 5).
-         {\tt "}Lin(es){\tt "}   - Specifies colour, etc for lines (used in modes 1, 2
-                       and 5).
+         synonyms for graphical elements may be used.
+
+         \sstitemlist{
+
+            \sstitem
+            {\tt "}Err(Bars){\tt "} -- Specifies colour, etc. for error bars.
+            Size(errbars) scales the size of the serifs (i.e. a size
+            value of 1.0 produces a default size).
+
+            \sstitem
+            {\tt "}Sym(bols){\tt "} -- Specifies colour, etc. for markers (used
+            in Modes 3 and 5).
+
+            \sstitem
+            {\tt "}Lin(es){\tt "} -- Specifies colour, etc. for lines (used in
+            Modes 1, 2, and 5).
+         }
+      }
+      \sstsubsection{
+         TEMPSTYLE = GROUP (Read)
+      }{
+         A description of plotting style required in addition to that
+         define by STYLE.  See STYLE for allowed synonyms.  Unlike
+         STYLE its values are not persistent between invocations.
       }
       \sstsubsection{
          XLEFT = \_REAL (Read)
       }{
-         The axis value to place at the left hand end of the horizontal
-         axis. The dynamic default is specified by argument XL. The value
-         supplied may be greater than or less than the value supplied for
-         XRIGHT.
+         The axis value to place at the left-hand end of the
+         horizontal axis. The dynamic default is specified by
+         argument XL. The value supplied may be greater than or less
+         than the value supplied for XRIGHT.
       }
       \sstsubsection{
          XRIGHT = \_REAL (Read)
       }{
-         The axis value to place at the right hand end of the horizontal
-         axis. The dynamic default is specified by argument XR. The value
-         supplied may be greater than or less than the value supplied for
-         XLEFT.
+         The axis value to place at the right-hand end of the
+         horizontal axis. The dynamic default is specified by
+         argument XR. The value supplied may be greater than or less
+         than the value supplied for XLEFT.
       }
       \sstsubsection{
          YBOT = \_REAL (Read)
       }{
          The axis value to place at the bottom end of the vertical
-         axis. The dynamic default is specified by argument YB. The value
-         supplied may be greater than or less than the value supplied for
-         YTOP.
+         axis. The dynamic default is specified by argument YB. The
+         value supplied may be greater than or less than the value
+         supplied for YTOP.
       }
       \sstsubsection{
          YTOP = \_REAL (Read)
@@ -24716,17 +24743,17 @@ related items to be removed.
    \sstdescription{
       This routine opens a graphics device, clearing it or not as
       specified by the user. If it is not cleared an attempt is made to
-      find a DATA picture within the current picture. If found it becomes
-      the current AGI picture, the corresponding PGPLOT viewport is
-      established as the current PGPLOT viewport, and an AST Plot is
+      find a DATA picture within the current picture. If found it
+      becomes the current AGI picture, the corresponding PGPLOT viewport
+      is established as the current PGPLOT viewport, and an AST Plot is
       returned for it in which the Base (GRAPHICS) Frame corresponds to
       PGPLOT world co-ordinates. If no DATA picture is found, or if the
       device was not cleared on opening, the current AGI picture and
       PGPLOT viewport are unchanged on exit and no Plot is returned.
 
-      Various environment parameters are used to obtain options, etc. The
-      names of these parameters are hard-wired into this subroutine in
-      order to ensure conformity between applications.
+      Various environment parameters are used to obtain options, etc.
+      The names of these parameters are hard-wired into this subroutine
+      in order to ensure conformity between applications.
    }
    \sstinvocation{
       CALL KPG1\_PLOTA( IWCS, STAT, DOMAIN, IPIC0, IPICD, IPLOT, STATUS )
@@ -24735,25 +24762,27 @@ related items to be removed.
       \sstsubsection{
          IWCS = INTEGER (Given)
       }{
-         An AST pointer to a FrameSet. This may be AST\_\_NULL. The Current
-         and Base Frames are unchanged on exit. If an existing DATA picture
-         was created by a non-AST application it will not have a Plot
-         stored with it. A default Plot will be created in this case,
-         containing two Frames; a GRAPHICS Frame corresponding to millimetres
-         from the bottom-left corner of the view surface, and a Frame
-         corresponding to AGI world co-ordinates. The AGI database does not
-         contain any information describing world co-ordinates and so such
-         information must be supplied by the calling application, on some
-         assumption such as {\tt "}AGI world co-ordinates are PIXEL co-ordinates{\tt "}.
-         This information is provided through a FrameSet (IWCS) and a Domain
+         An AST pointer to a FrameSet. This may be AST\_\_NULL. The
+         Current and Base Frames are unchanged on exit. If an existing
+         DATA picture was created by a non-AST application it will not
+         have a Plot stored with it. A default Plot will be created in
+         this case, containing two Frames; a GRAPHICS Frame
+         corresponding to millimetres from the bottom-left corner of the
+         view surface, and a Frame corresponding to AGI world
+         co-ordinates. The AGI database does not contain any information
+         describing world co-ordinates and so such information must be
+         supplied by the calling application, on some assumption such as
+         {\tt "}AGI world co-ordinates are PIXEL co-ordinates{\tt "}. This
+         information is provided through a FrameSet (IWCS) and a Domain
          name (DOMAIN). DOMAIN specifies the Domain in which AGI world
-         co-ordinates are assumed to live. A FrameSet may then be supplied
-         using argument IWCS containing a Frame with the same Domain which
-         will be used to describe AGI world co-ordinates in the returned
-         Plot (a default 2-D Frame with the specified Domain is used if no
-         FrameSet is supplied or if it does not contain a Frame with the
-         specified Domain). If DOMAIN is supplied Blank, a default 2-D Frame
-         with Domain AGI\_WORLD will be used to describe AGI world co-ordinates.
+         co-ordinates are assumed to live. A FrameSet may then be
+         supplied using argument IWCS containing a Frame with the same
+         Domain which will be used to describe AGI world co-ordinates in
+         the returned Plot (a default two-dimensional Frame with the
+         specified Domain is used if no FrameSet is supplied or if it
+         does not contain a Frame with the specified Domain). If DOMAIN
+         is supplied Blank, a default two-dimensional Frame with Domain
+         AGI\_WORLD will be used to describe AGI world co-ordinates.
 
          If the existing DATA picture was created by an AST application,
          it will have a Plot stored with it which means that AGI world
@@ -24765,26 +24794,34 @@ related items to be removed.
       }{
          Determines whether or not the new DATA picture creted by the
          calling application is to be aligned with an existing DATA
-         picture:
+         picture.
 
-         {\tt '}NEW{\tt '}: no attempt is made to align the new DATA picture with an
-                existing DATA picture, even if the CLEAR parameter is
-                given a FALSE value.
-         {\tt '}OLD{\tt '}: the new DATA picture is always aligned with an existing
-                DATA picture. The CLEAR parameter is not accessed (it is
-                assumed to have a FALSE value) and an error is reported
-                if no DATA picture is available.
-         {\tt '}UNKNOWN{\tt '}: If CLEAR is given a FALSE value then the new DATA
-                picture is aligned with any existing DATA picture, but no
-                error is reported if no DATA picture exists.
+         \sstitemlist{
+
+            \sstitem
+            {\tt "}NEW{\tt "} -- no attempt is made to align the new DATA picture
+            with an existing DATA picture, even if the CLEAR parameter is
+            given a FALSE value.
+
+            \sstitem
+            {\tt "}OLD{\tt "} -- the new DATA picture is always aligned with an
+            existing DATA picture. The CLEAR parameter is not accessed (it
+            is assumed to have a FALSE value) and an error is reported if
+            no DATA picture is available.
+
+            \sstitem
+            {\tt "}UNKNOWN{\tt "} -- If CLEAR is given a FALSE value then the new
+            DATA picture is aligned with any existing DATA picture, but no
+            error is reported if no DATA picture exists.
+         }
       }
       \sstsubsection{
          DOMAIN = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         The Domain for AGI world co-ordinates. Only used if a FrameSet is
-         supplied (IWCS). If a blank value is supplied then {\tt "}AGI\_WORLD{\tt "}
-         will be used. See description of argument IWCS above for more
-         details.
+         The Domain for AGI world co-ordinates. Only used if a FrameSet
+         is supplied (IWCS). If a blank value is supplied then
+         {\tt "}AGI\_WORLD{\tt "} will be used. See description of argument IWCS
+         above for more details.
       }
       \sstsubsection{
          IPIC0 = INTEGER (Returned)
@@ -24801,9 +24838,10 @@ related items to be removed.
       \sstsubsection{
          IPLOT = INTEGER (Returned)
       }{
-         An AST pointer to a Plot associated with an existing DATA picture.
-         Returned equal to AST\_\_NULL if an error occurs, or if there is no
-         existing DATA picture, or if the device was cleared on opening.
+         An AST pointer to a Plot associated with an existing DATA
+         picture. Returned equal to AST\_\_NULL if an error occurs, or if
+         there is no existing DATA picture, or if the device was
+         cleared on opening.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -24844,49 +24882,52 @@ related items to be removed.
       output using PGPLOT within a new DATA picture. Optional ancillary
       pictures around the DATA picture may also be created. A FRAME
       picture enclosing the DATA picture and any ancillary pictures is
-      created if any ancillary pictures or non-zero margins were requested.
+      created if any ancillary pictures or non-zero margins were
+      requested.
 
       An AST Plot is returned which allows plotting within the DATA
       picture. The Base (GRAPHICS) Frame in this Plot corresponds to
       millimetres from the botttom left corner of the view surface.
-      The Current Frame in the Plot is inherited from the supplied FrameSet
-      (IWCS).
+      The Current Frame in the Plot is inherited from the supplied
+      FrameSet (IWCS).
 
-      If there is an existing DATA picture on the device, then the new DATA
-      picture can optionally be aligned with the existing DATA picture. In
-      this case, the returned Plot is formed by adding any supplied FrameSet
-      (IWCS) into the Plot stored with the existing DATA picture in the AGI
-      database (a default Plot is used if the database does not contain a
-      Plot). The FrameSet is added into the Plot by aligning them in the
-      Current Frame of the FrameSet if possible. If this is not possible,
-      they are aligned in the world co-ordinate system of the picture
-      (stored in the AGI database). The Domain of the AGI world
-      co-ordinate system is not stored in the database and must be
-      supplied by the calling application using argument DOMAIN (this will
-      usually be {\tt "}PIXEL{\tt "}). If alignment is not possible in AGI world
-      co-ordinates, then they are aligned in the GRID domain. If this is
-      not possible, they are aligned in any suitable Frame.
+      If there is an existing DATA picture on the device, then the new
+      DATA picture can optionally be aligned with the existing DATA
+      picture. In this case, the returned Plot is formed by adding any
+      supplied FrameSet (IWCS) into the Plot stored with the existing
+      DATA picture in the AGI database (a default Plot is used if the
+      database does not contain a Plot). The FrameSet is added into the
+      Plot by aligning them in the Current Frame of the FrameSet if
+      possible. If this is not possible, they are aligned in the world
+      co-ordinate system of the picture (stored in the AGI database).
+      The Domain of the AGI world co-ordinate system is not stored in
+      the database and must be supplied by the calling application using
+      argument DOMAIN (this will usually be {\tt "}PIXEL{\tt "}). If alignment is
+      not possible in AGI world co-ordinates, then they are aligned in
+      the GRID domain. If this is also not possible, they are aligned in
+      any suitable Frame.
 
-      On exit, the current PGPLOT viewport corresponds to area occupied by
-      the new DATA picture. The bounds of the PGPLOT window produce a
+      On exit, the current PGPLOT viewport corresponds to area occupied
+      by the new DATA picture. The bounds of the PGPLOT window produce a
       world co-ordinate system within the viewport corresponding to the
-      Base Frame in the returned Plot (i.e. millimetres from the bottom-left
-      corner of the view surface - NOT pixel co-ordinates). Note, this is
-      different to the world co-ordinate system stored in the AGI database
-      with the new DATA picture.
+      Base Frame in the returned Plot (i.e. millimetres from the
+      bottom-left corner of the view surface - NOT pixel co-ordinates).
+      Note, this is different from the world co-ordinate system stored
+      in the AGI database with the new DATA picture.
 
       If the returned Plot contains an AXIS Frame in which the axes are
-      scaled and shifted versions of the axes of the AGI world co-ordinate
-      Frame (specified by argument DOMAIN), then a TRANSFORM structure is
-      stored with the new DATA picture which defines AGI Data co-ordinates.
-      This is purely for the benefit of non-AST based applications which
-      may use AGI Data co-ordinates (AST-based applications should always
-      use the Plot stored with the picture in preference to the TRANSFORM
-      structure stored in the AGI database).
+      scaled and shifted versions of the axes of the AGI world
+      co-ordinate Frame (specified by argument DOMAIN), then a
+      TRANSFORM structure is stored with the new DATA picture that
+      defines AGI Data co-ordinates. This is purely for the benefit of
+      non-AST based applications which may use AGI Data co-ordinates
+      (AST-based applications should always use the Plot stored with the
+      picture in preference to the TRANSFORM structure stored in the AGI
+      database).
 
-      Various environment parameters are used to obtain options, etc. The
-      names of these parameters are hard-wired into this subroutine in
-      order to ensure conformity between applications.
+      Various environment parameters are used to obtain options, etc.
+      The names of these parameters are hard-wired into this subroutine
+      in order to ensure conformity between applications.
    }
    \sstinvocation{
       CALL KPG1\_PLOT( IWCS, STAT, APP, DATREF, MARGIN, NP, PNAME, PSIDE,
@@ -24897,32 +24938,41 @@ related items to be removed.
       \sstsubsection{
          IWCS = INTEGER (Given)
       }{
-         An AST pointer to a FrameSet. This may be AST\_\_NULL. The Current
-         and Base Frames are unchanged on exit.
+         An AST pointer to a FrameSet. This may be AST\_\_NULL. The
+         Current and Base Frames are unchanged on exit.
       }
       \sstsubsection{
          STAT = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         Determines whether or not the new DATA picture should be aligned
-         with an existing DATA picture.
-         {\tt '}NEW{\tt '}: no attempt is made to align the new DATA picture with an
-                existing DATA picture, even if the CLEAR parameter is
-                given a FALSE value.
-         {\tt '}OLD{\tt '}: the new DATA picture is always aligned with an existing
-                DATA picture. The CLEAR parameter is not accessed (it is
-                assumed to have a FALSE value) and an error is reported
-                if no DATA picture is available.
-         {\tt '}UNKNOWN{\tt '}: If CLEAR is given a FALSE value then the new DATA
-                picture is aligned with any existing DATA picture, but no
-                error is reported if no DATA picture exists.
+         Determines whether or not the new DATA picture should be
+         aligned with an existing DATA picture.
+
+         \sstitemlist{
+
+            \sstitem
+            {\tt "}NEW{\tt "} -- no attempt is made to align the new DATA picture
+            with an existing DATA picture, even if the CLEAR parameter is
+            given a FALSE value.
+
+            \sstitem
+            {\tt "}OLD{\tt "} -- the new DATA picture is always aligned with an
+            existing DATA picture. The CLEAR parameter is not accessed (it
+            is assumed to have a FALSE value) and an error is reported if
+            no DATA picture is available.
+
+            \sstitem
+            {\tt "}UNKNOWN{\tt "} -- If CLEAR is given a FALSE value then the new
+            DATA picture is aligned with any existing DATA picture, but no
+            error is reported if no DATA picture exists.
+         }
       }
       \sstsubsection{
          APP = CHARACTER $*$ ( $*$ ) (Given)
       }{
          The name of the calling application, in the form
-         $<$package$>$\_$<$application$>$ (eg {\tt "}KAPPA\_DISPLAY{\tt "}, {\tt "}POLPACK\_POLPLOT{\tt "},
-         etc). The supplied string is stored as a comment with all new AGI
-         pictures.
+         $<$package$>$\_$<$application$>$ (e.g. {\tt "}KAPPA\_DISPLAY{\tt "},
+         {\tt "}POLPACK\_POLPLOT{\tt "}, etc.). The supplied string is stored as a
+         comment with all new AGI pictures.
       }
       \sstsubsection{
          DATREF = CHARACTER $*$ ( $*$ ) (Given)
@@ -24934,78 +24984,84 @@ related items to be removed.
       \sstsubsection{
          MARGIN( 4 ) = REAL (Given)
       }{
-         The width of the borders to leave round the new DATA picture, given
-         as fractions of the corresponding dimension of the DATA picture.
-         These should be supplied in the order bottom, right, top, left.
+         The width of the borders to leave around the new DATA picture,
+         given as fractions of the corresponding dimension of the DATA
+         picture. These should be supplied in the order bottom, right,
+         top, left.
       }
       \sstsubsection{
          NP = INTEGER (Given)
       }{
-         The number of extra pictures to be included in the FRAME pictures
-         (the DATA picture itself is not included in this list). Margins are
-         left round the DATA picture with widths given by MARGIN. Any extra
-         pictures are placed outside these margins, in positions described by
-         PSIDE and PSIZE.
+         The number of extra pictures to be included in the FRAME
+         pictures (the DATA picture itself is not included in this
+         list). Margins are left around the DATA picture with widths
+         given by MARGIN. Any extra pictures are placed outside these
+         margins, in positions described by PSIDE and PSIZE.
       }
       \sstsubsection{
          PNAME( NP ) = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         The names to store in the AGI database with the NP extra pictures.
+         The names to store in the AGI database with the NP extra
+         pictures.
       }
       \sstsubsection{
          PSIDE( NP ) = CHARACTER $*$ 1 (Given)
       }{
          Each element of this array should be one of L, R, T or B. It
-         indicates which side of the FRAME picture an extra picture is to be
-         placed. For Left and Right, the extra picture occupies the full
-         height of the DATA picture, margins, and any previously created
-         extra pictures. The picture is placed at the far Left or Right of
-         all previously created pictures. For Top or Bottom, the extra picture
-         occupies the full width of the DATA picture, margins, and any
-         previously created extra pictures. The picture is placed at the top or
-         bottom of all previously created pictures. Ignored if NP is zero.
+         indicates which side of the FRAME picture an extra picture is
+         to be placed. For Left and Right, the extra picture occupies
+         the full height of the DATA picture, margins, and any
+         previously created extra pictures. The picture is placed at the
+         far Left or Right of all previously created pictures. For Top
+         or Bottom, the extra picture occupies the full width of the
+         DATA picture, margins, and any previously created extra
+         pictures. The picture is placed at the top or bottom of all
+         previously created pictures. Ignored if NP is zero.
       }
       \sstsubsection{
          PSIZE( NP ) = REAL (Given)
       }{
-         The size of each extra picture. For Left and Right pictures, this is
-         the width of the picture, and the value is given as a fraction
-         of the width of the DATA picture. For Top and Bottom pictures, it is
-         the height of the picture, and it is given as a fraction of the
-         height of the DATA picture. Ignored if NP is zero.
+         The size of each extra picture. For Left and Right pictures,
+         this is the width of the picture, and the value is given as a
+         fraction of the width of the DATA picture. For Top and Bottom
+         pictures, it is the height of the picture, and it is given as a
+         fraction of the height of the DATA picture. Ignored if NP is
+         zero.
       }
       \sstsubsection{
          ASPECT = REAL (Given)
       }{
-         The aspect ratio for the DATA picture. This is the height of the
-         DATA picture (in millimetres)  divided by the width of the DATA
-         picture (also in millimetres). The new DATA picture is created with
-         this aspect ratio unless the FILL parameter is given a TRUE value,
-         in which case the aspect ratio is adjusted to get the largest DATA
-         picture which can be created within the current picture. If a value
-         of zero is supplied, then the largest DATA picture is used
-         irrespective of FILL (which is then not accessed).
+         The aspect ratio for the DATA picture. This is the height of
+         the DATA picture (in millimetres) divided by the width of the
+         DATA picture (also in millimetres). The new DATA picture is
+         created with this aspect ratio unless the FILL parameter is
+         given a TRUE value, in which case the aspect ratio is adjusted
+         to get the largest DATA picture that can be created within the
+         current picture. If a value of zero is supplied, then the
+         largest DATA picture is used irrespective of FILL (which is
+         then not accessed).
       }
       \sstsubsection{
          DOMAIN = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         The Domain name corresponding to the AGI world co-ordinates. If a
-         blank value is supplied then {\tt "}AGI\_WORLD{\tt "} will be used.
+         The Domain name corresponding to the AGI world co-ordinates. If
+         a blank value is supplied then {\tt "}AGI\_WORLD{\tt "} will be used.
       }
       \sstsubsection{
          BOX( 4 ) = DOUBLE PRECISION (Given)
       }{
-         The co-ordinates to be assigned to the bottom-left, and top-right
-         corners of the DATA picture in the AGI database (the co-ordinate
-         system in defined by argument DOMAIN). Only used if the new DATA
-         picture is NOT being aligned with an existing DATA picture. Supplied
-         in the order XLEFT, YBOTTOM, XRIGHT, YTOP. Note, the supplied
-         bounds are stored in the AGI database, but do not effect the PGPLOT
-         window on exit, which always has a world co-ordinate system of
-         millimetres from the bottom-left corner of the view surface. If
-         the supplied box has zero area, then world co-ordinates for the
-         DATA picture in the AGI database will be centimetres from the
-         bottom-left corner of the DATA picture.
+         The co-ordinates to be assigned to the bottom-left, and
+         top-right corners of the DATA picture in the AGI database (the
+         co-ordinate system in defined by argument DOMAIN). Only used if
+         the new DATA picture is NOT being aligned with an existing DATA
+         picture. Supplied in the order XLEFT, YBOTTOM, XRIGHT, YTOP.
+         Note, the supplied bounds are stored in the AGI database, but
+         do not effect the PGPLOT window on exit, which always has a
+         world co-ordinate system of millimetres from the bottom-left
+         corner of the view surface. If the supplied box has zero area,
+         then world co-ordinates for the DATA picture in the AGI
+         database will be centimetres from the bottom-left corner of
+         the DATA picture.
       }
       \sstsubsection{
          IPICD = INTEGER (Returned)
@@ -25015,22 +25071,22 @@ related items to be removed.
       \sstsubsection{
          IPICF = INTEGER (Returned)
       }{
-         An AGI identifier for the new FRAME picture. World co-ordinate system
-         is inherited from the current picture on entry. If no FRAME picture
-         is created then an identifier for the current picture on entry is
-         returned.
+         An AGI identifier for the new FRAME picture. World co-ordinate
+         system is inherited from the current picture on entry. If no
+         FRAME picture is created then an identifier for the current
+         picture on entry is returned.
       }
       \sstsubsection{
          IPIC( NP ) = INTEGER (Returned)
       }{
          An array of AGI identifiers corresponding to the extra pictures
-         requested in PSIDE and PSIZE. The world co-ordinate system for each
-         picture is inherited from the FRAME picture. The actual size of a
-         picture may be less than the requested size if there is insufficient
-         room left in the FRAME picture to give it its requested size.
-         Identifiers for pictures which would have zero size (i.e. fall
-         completely outside the FRAME picture) are returned equal to -1, but
-         no error is reported.
+         requested in PSIDE and PSIZE. The world co-ordinate system for
+         each picture is inherited from the FRAME picture. The actual
+         size of a picture may be less than the requested size if there
+         is insufficient room left in the FRAME picture to give it its
+         requested size. Identifiers for pictures which would have zero
+         size (i.e. fall completely outside the FRAME picture) are
+         returned equal to -1, but no error is reported.
       }
       \sstsubsection{
          IPLOT = INTEGER (Returned)
@@ -25041,9 +25097,9 @@ related items to be removed.
       \sstsubsection{
          NFRM = INTEGER (Returned)
       }{
-         A  Frame with index I in the supplied FrameSet (IWCS) will have index
-         ( I $+$ NFRM ) in the returned Plot (IPLOT). Returned equal to zero
-         if an error occurs.
+         A  Frame with index I in the supplied FrameSet (IWCS) will have
+         index ( I $+$ NFRM ) in the returned Plot (IPLOT). Returned equal
+         to zero if an error occurs.
       }
       \sstsubsection{
          ALIGN = LOGICAL (Returned)
@@ -25060,8 +25116,8 @@ related items to be removed.
       \sstitemlist{
 
          \sstitem
-         Picture identifiers are returned equal to -1 if an error occurs,
-         or if any pictures cannot be created.
+         Picture identifiers are returned equal to -1 if an error
+         occurs, or if any pictures cannot be created.
 
          \sstitem
          Close down AGI and PGPLOT using:
@@ -25085,19 +25141,21 @@ related items to be removed.
       \sstsubsection{
          FILL = \_LOGICAL (Read)
       }{
-         TRUE if the supplied aspect ratio is to be ignored, creating the
-         largest possible DATA picture within the current picture.  When
-         FILL is FALSE, the DATA picture is created with the supplied
-         aspect ratio. Only used when creating a new DATA picture.
+         TRUE if the supplied aspect ratio is to be ignored, creating
+         the largest possible DATA picture within the current picture.
+         When FILL is FALSE, the DATA picture is created with the
+         supplied aspect ratio. Only used when creating a new DATA
+         picture.
       }
       \sstsubsection{
          STYLE = GROUP (Read)
       }{
-         A description of the plotting style required. This the name of a
-         text file containing an AST attribute setting on each line, of
-         form {\tt "}name=value{\tt "}, where {\tt "}name{\tt "} is an AST Plot attribute name
-         (or synonym recognised by this application - see KPG1\_ASPSY), and
-         {\tt "}value{\tt "} is the value to assign to the attribute.
+         A description of the plotting style required. This the name of
+         a text file containing an AST attribute setting on each line,
+         of the form {\tt "}name=value{\tt "}, where {\tt "}name{\tt "} is an AST Plot
+         attribute name (or synonym recognised by this application--see
+         KPG1\_ASPSY), and {\tt "}value{\tt "} is the value to assign to the
+         attribute.
       }
    }
 }
@@ -25528,16 +25586,17 @@ related items to be removed.
    Produces a graphical representation of a set of points in 2-D
 }{
    \sstdescription{
-      This routine produces a graphical representation of a set of points
-      in 2-D space (e.g. a data value and a position, or two data values).
-      Errors in both data values may be represented by error bars. No
-      annotated asxes are drawn. The calling routine should do this if
-      required by passing the supplied Plot (IPLOT) to routine KPG1\_ASGRD.
+      This routine produces a graphical representation of a set of
+      points in two-dimensional space (e.g. a data value and a position,
+      or two data values).  Errors in both data values may be
+      represented by error bars. No annotated axes are drawn. The
+      calling routine should do this if required by passing the supplied
+      Plot (IPLOT) to routine KPG1\_ASGRD.
 
       PGPLOT should be active, and the viewport should correspond to the
       DATA picture in which the plot is to be drawn. PGPLOT world co-ordinates
       within the viewport should be GRAPHICS co-ordinates (millimetres from the
-      bottom left corner of the view surface).
+      bottom-left corner of the view surface).
 
       The Plotting style is accessed using one or more environment parameters
       specified by PARAM, and may include the following synonyms for graphical
@@ -25545,9 +25604,9 @@ related items to be removed.
          {\tt "}Err(Bars){\tt "} - Specifies colour, etc for error bars. Size(errbars)
                        scales the size of the serifs used if ERSHAP=1 (i.e.
                        a size value of 1.0 produces a default size).
-         {\tt "}Sym(bols){\tt "} - Specifies colour, etc for markers (used in modes 3
+         {\tt "}Sym(bols){\tt "} - Specifies colour, etc for markers (used in Modes 3
                        and 5).
-         {\tt "}Lin(es){\tt "} - Specifies colour, etc for lines (used in modes 1, 2,
+         {\tt "}Lin(es){\tt "} - Specifies colour, etc. for lines (used in Modes 1, 2,
                      4 and 5).
    }
    \sstinvocation{
@@ -25575,13 +25634,13 @@ related items to be removed.
          X( N ) = DOUBLE PRECISION (Given)
       }{
          The X value at each point, in PGPLOT world co-ordinate (i.e.
-         millimetres from the bottom left corner of the view surface).
+         millimetres from the bottom-left corner of the view surface).
       }
       \sstsubsection{
          Y( N ) = DOUBLE PRECISION (Given)
       }{
          The Y value at each point, in PGPLOT world co-ordinate (i.e.
-         millimetres from the bottom left corner of the view surface).
+         millimetres from the bottom-left corner of the view surface).
       }
       \sstsubsection{
          XERROR = LOGICAL (Given)
@@ -25596,7 +25655,7 @@ related items to be removed.
       \sstsubsection{
          XBAR( N, 2 ) = DOUBLE PRECISION (Given)
       }{
-         Row 1 contains the lower limit and row 2 contains the upper limit
+         Row 1 contains the lower limit and Row 2 contains the upper limit
          for each horizontal error bar, in PGPLOT world co-ordinate (i.e.
          millimetres from the bottom left corner of the view surface). Only
          accessed if XERROR is .TRUE.
@@ -25604,17 +25663,17 @@ related items to be removed.
       \sstsubsection{
          YBAR( N, 2 ) = DOUBLE PRECISION (Given)
       }{
-         Row 1 contains the lower limit and row 2 contains the upper limit
+         Row 1 contains the lower limit and Row 2 contains the upper limit
          for each vertical error bar, in PGPLOT world co-ordinate (i.e.
-         millimetres from the bottom left corner of the view surface). Only
+         millimetres from the bottom-left corner of the view surface). Only
          accessed if YERROR is .TRUE.
       }
       \sstsubsection{
          XSTEP( N, 2 ) = DOUBLE PRECISION (Given)
       }{
-         Row 1 contains the lower limit and row 2 contains the upper limit
+         Row 1 contains the lower limit and Row 2 contains the upper limit
          for each horizontal step, in PGPLOT world co-ordinate (i.e.
-         millimetres from the bottom left corner of the view surface). Only
+         millimetres from the bottom-left corner of the view surface). Only
          accessed if MODE is 4.
       }
       \sstsubsection{
@@ -25630,26 +25689,27 @@ related items to be removed.
          IPLOT = INTEGER (Given)
       }{
          An AST Plot which can be used to do the drawing. The Base Frame
-         should be GRAPHICS co-ordinates (millimetres from the bottom
+         should be GRAPHICS co-ordinates (millimetres from the bottom-
          left corner of the PGPLOT view surface). The Current Frame should
          be the Frame in which annotation is required.
       }
       \sstsubsection{
          MODE = INTEGER (Given)
       }{
-         Determines the way in which the data points are represented:
+         Determines the way in which the data points are represented.
+         The options are as follows.
             1 - A {\tt "}staircase{\tt "} histogram, in which each horizontal line is
-                centred on the X position. Bad values cause vertical
-                lines to be drawn down to the lower edge of the viewport.
+                centred on the X position. Bad values are flanked by vertical
+                lines drawn down to the lower edge of the viewport.
             2 - The points are joined by straight lines.
             3 - A marker is placed at each point (see MTYPE).
             4 - Mark each point with a horizontal line of width given by
                 XW.
             5 - A {\tt "}chain{\tt "} in which each point is marker by a marker and also
                 join by straight lines to its neighbouring points.
-            6 - Exactly the same as mode 1, except that bad values do not
-                cause vertical lines to be drawn down to the lower edge of
-                the viewport (a simple gap is left instead).
+            6 - The same as Mode 1, except that bad values are not
+                flanked by vertical lines drawn down to the lower edge
+                of the viewport (a simple gap is left instead).
       }
       \sstsubsection{
          MTYPE = INTEGER (Given)
