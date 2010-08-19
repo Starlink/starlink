@@ -66,6 +66,11 @@
 *        Add SMF__SMO model.
 *     2010-06-08 (EC):
 *        Add SMF__TWO model.
+*     2010-08-18 (EC):
+*        -supply keymap to check for FFT temp space
+*        -space for JCMTState
+*     2010-08-19 (EC):
+*        -space for concatenated dark squids
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -215,6 +220,9 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
   if( *status == SAI__OK ) {
     total += maxlen*sizeof(JCMTState);
   }
+
+  /* Add on space for dark squids */
+  total += ncol*maxlen*smf_dtype_sz(SMF__DOUBLE,status);
 
   /* Multiply per-array memory usage at this stage by the number of subarrays */
   total *= nrelated;
