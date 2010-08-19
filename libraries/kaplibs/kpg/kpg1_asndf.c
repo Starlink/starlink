@@ -3,9 +3,9 @@
 #include "ast.h"
 #include "sae_par.h"
 
-F77_SUBROUTINE(kpg1_asndf)( INTEGER(INDF), INTEGER(NDIM), INTEGER_ARRAY(LBND),
-                            INTEGER_ARRAY(UBND), INTEGER(IWCS),
-                            INTEGER(STATUS) ) {
+F77_SUBROUTINE(kpg1_asndf)( INTEGER(INDF), INTEGER(NDIM), INTEGER_ARRAY(DIM),
+                            INTEGER_ARRAY(LBND), INTEGER_ARRAY(UBND),
+                            INTEGER(IWCS), INTEGER(STATUS) ) {
 /*
 *+
 *  Name:
@@ -18,7 +18,7 @@ F77_SUBROUTINE(kpg1_asndf)( INTEGER(INDF), INTEGER(NDIM), INTEGER_ARRAY(LBND),
 *     C, designed to be called from Fortran.
 
 *  Invocation:
-*     CALL KPG1_ASNDF( INDF, NDIM, LBND, UBND, IWCS, STATUS )
+*     CALL KPG1_ASNDF( INDF, NDIM, DIM, LBND, UBND, IWCS, STATUS )
 
 *  Description:
 *     This function creates a FrameSet containing the NDF-special Frames,
@@ -33,6 +33,9 @@ F77_SUBROUTINE(kpg1_asndf)( INTEGER(INDF), INTEGER(NDIM), INTEGER_ARRAY(LBND),
 *        the default AXIS coordinate system (i.e. pixel coords).
 *     NDIM = INTEGER (Given)
 *        The number of pixel axes in the modified FrameSet.
+*     DIM( NDIM ) = INTEGER (Given)
+*        The indices within INDF corresponding to each of the required
+*        NDIM axes.
 *     LBND( NDIM ) = INTEGER (Given)
 *        The lower pixel index bounds in the modified FrameSet.
 *     UBND( NDIM ) = INTEGER (Given)
@@ -71,6 +74,8 @@ F77_SUBROUTINE(kpg1_asndf)( INTEGER(INDF), INTEGER(NDIM), INTEGER_ARRAY(LBND),
 *  History:
 *     22-FEB-2010 (DSB):
 *        Original version.
+*     19-AUG-2010 (DSB):
+*        Added DIM argument.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -79,6 +84,7 @@ F77_SUBROUTINE(kpg1_asndf)( INTEGER(INDF), INTEGER(NDIM), INTEGER_ARRAY(LBND),
 */
    GENPTR_INTEGER(INDF)
    GENPTR_INTEGER(NDIM)
+   GENPTR_INTEGER_ARRAY(DIM)
    GENPTR_INTEGER_ARRAY(LBND)
    GENPTR_INTEGER_ARRAY(UBND)
    GENPTR_INTEGER(IWCS)
@@ -86,7 +92,7 @@ F77_SUBROUTINE(kpg1_asndf)( INTEGER(INDF), INTEGER(NDIM), INTEGER_ARRAY(LBND),
 
    AstFrameSet *iwcs;
 
-   kpg1Asndf( *INDF, *NDIM, LBND, UBND, &iwcs, STATUS );
+   kpg1Asndf( *INDF, *NDIM, DIM, LBND, UBND, &iwcs, STATUS );
    F77_EXPORT_INTEGER( astP2I( iwcs ), *IWCS );
 
 }

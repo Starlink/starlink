@@ -27,7 +27,7 @@ cinclude_HEADERS = $(PUBLIC_C_INCLUDES)
 include_MESSAGES = kpg_err.h KPG_ERR
 
 PUBLIC_C_INCLUDES = kaplibs.h
-PUBLIC_F_INCLUDES = CTM_PAR 
+PUBLIC_F_INCLUDES = CTM_PAR
 PUBLIC_INCLUDES = $(PUBLIC_C_INCLUDES) $(PUBLIC_F_INCLUDES)
 
 PRIVATE_INCLUDES = KPG_PAR KPG_AST CTM_COM kaplibs_private.h
@@ -40,7 +40,7 @@ kpg1_ieeer.c  kpg1_isfinr.c kpg1_kygrp.c kpg1_kygp1.c kpg1_kymp1.c \
 kpg1_kymp2.c kpg1_kymap.c kaplibs.c kpgGtfts.c kpgPtfts.c kpg1Hdsky.c \
 kpg1_hdsky.c kpg1Kyhds.c kpg1_kyhds.c kpg1_ky2hd.c kpg1Ky2hd.c \
 kpg_gtfts.c kpg_ptfts.c kpg1Ch2pm.c kpg1_ch2pm.c kpg1Chcof.c \
-kpg1Fit1d.c kpg1_fit1d.c kpg1_asndf.c kpg1Asndf.c 
+kpg1Fit1d.c kpg1_fit1d.c kpg1_asndf.c kpg1Asndf.c kpg1Axcpy.c
 
 F_ROUTINES = $(KPG_NONGEN) $(GEN_F_ROUTINES)
 
@@ -57,7 +57,7 @@ GEN_F_ROUTINES = $(KPG_N_GEN:.gn=.f) $(KPG_DR_GEN:.gdr=.f) \
 	$(KPG_DIR_GEN:.gdir=.f) $(KPG_NXD_GEN:.gnxd=.f) \
 	$(KPG_BDIRW_GEN:.gbdirw=.f) $(KPG_NXB_GEN:.gnxb=.f) \
 	$(KPG_XC_GEN:.gxc=.f) $(KPG_XL_GEN:.gxl=.f) \
-	$(KPG_BIRW_GEN:.gbirw=.f) $(KPG_IR_GEN:.gir=.f) 
+	$(KPG_BIRW_GEN:.gbirw=.f) $(KPG_IR_GEN:.gir=.f)
 
 GRAPHIC_GEN_F_ROUTINES = $(KPG_GRAPHIC_DR_GEN:.gdr=.f)
 
@@ -325,9 +325,9 @@ kpg1_wrcat.f \
 kpg1_wrlst.f \
 kpg1_wrta2.f
 
-KPG_ADAM_DR_GEN = kpg1_mixv.gdr kpg1_inco.gdr kpg1_flco.gdr 
+KPG_ADAM_DR_GEN = kpg1_mixv.gdr kpg1_inco.gdr kpg1_flco.gdr
 
-KPG_ADAM_N_GEN = kpg1_dara.gn kpg1_cpnt.gn 
+KPG_ADAM_N_GEN = kpg1_dara.gn kpg1_cpnt.gn
 
 # Graphic routines
 KPG_GRAPHIC_NONGEN = \

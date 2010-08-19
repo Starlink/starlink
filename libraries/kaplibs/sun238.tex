@@ -15696,7 +15696,7 @@ related items to be removed.
       information can be propagated from a supplied NDF.
    }
    \sstinvocation{
-      CALL KPG1\_ASNDF( INDF, NDIM, LBND, UBND, IWCS, STATUS )
+      CALL KPG1\_ASNDF( INDF, NDIM, DIM, LBND, UBND, IWCS, STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -15710,6 +15710,12 @@ related items to be removed.
          NDIM = INTEGER (Given)
       }{
          The number of pixel axes in the modified FrameSet.
+      }
+      \sstsubsection{
+         DIM( NDIM ) = INTEGER (Given)
+      }{
+         The indices within INDF corresponding to each of the required
+         NDIM axes.
       }
       \sstsubsection{
          LBND( NDIM ) = INTEGER (Given)
@@ -39821,6 +39827,48 @@ related items to be removed.
 }
 \newpage
 \section{C-only Routine Descriptions}
+\sstroutine{
+   kpg1Axcpy
+}{
+   Copy an NDF AXIS structure from one NDF to another
+}{
+   \sstdescription{
+      This function copies all AXIS information describing axis {\tt "}ax1{\tt "} in
+      {\tt "}indf1{\tt "}, into {\tt "}indf2{\tt "} axis {\tt "}ax2{\tt "}.
+   }
+   \sstinvocation{
+      void kpg1Axcpy( int indf1, int indf2, int ax1, int ax2, int $*$status )
+   }
+   \sstarguments{
+      \sstsubsection{
+         indf1
+      }{
+         The source NDF.
+      }
+      \sstsubsection{
+         indf2
+      }{
+         The destination NDF.
+      }
+      \sstsubsection{
+         ax1
+      }{
+         The one-based index of the axis to be copied within {\tt "}ndf1{\tt "}.
+         Must be less than or equal to the number of pixel axes in {\tt "}ndf1{\tt "}.
+      }
+      \sstsubsection{
+         ax2
+      }{
+         The one-based index of the new axis to create within {\tt "}ndf2{\tt "}.
+         Must be less than or equal to the number of pixel axes in {\tt "}ndf2{\tt "}.
+      }
+      \sstsubsection{
+         status
+      }{
+         The inherited status.
+      }
+   }
+}
 \sstroutine{
    kpg1Config
 }{

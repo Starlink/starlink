@@ -156,6 +156,8 @@
 *        non-monotonic, reset the current Frame to PIXEL.
 *     16-NOV-2006 (PWD):
 *        Stop modfication of NDIM given argument in call to NDF_BOUND.
+*     19-AUG-2010 (DSB):
+*        Add SDIM argument to KPG1_ASNDF.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -286,7 +288,8 @@
 *  containing the NDF-special Frames (GRID, AXIS, PIXEL and FRACTION)
 *  appropriate for an NDF with the returned bounds.
       IF( NBAX .NE. NDIM ) THEN
-         CALL KPG1_ASNDF( INDF, NDIM, SLBND, SUBND, NEWFS, STATUS )
+         CALL KPG1_ASNDF( INDF, NDIM, SDIM, SLBND, SUBND, NEWFS,
+     :                    STATUS )
 
 *  Find the indicies of the NDF special Frames within this FrameSet
          IPIX1 = -1

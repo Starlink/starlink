@@ -1,9 +1,10 @@
 #include "sae_par.h"
 #include "ndf.h"
 #include "ast.h"
+#include "kaplibs.h"
 
-void kpg1Asndf( int indf, int ndim, int *lbnd, int *ubnd, AstFrameSet **iwcs,
-                int *status ){
+void kpg1Asndf( int indf, int ndim, int *dim, int *lbnd, int *ubnd,
+                AstFrameSet **iwcs, int *status ){
 /*
 *  Name:
 *     kpg1Asndf
@@ -15,7 +16,7 @@ void kpg1Asndf( int indf, int ndim, int *lbnd, int *ubnd, AstFrameSet **iwcs,
 *     C.
 
 *  Invocation:
-*     void kpg1Asndf( int indf, int ndim, int *lbnd, int *ubnd,
+*     void kpg1Asndf( int indf, int ndim, int *dim, int *lbnd, int *ubnd,
 *                     AstFrameSet **iwcs, int *status )
 
 *  Description:
@@ -31,6 +32,9 @@ void kpg1Asndf( int indf, int ndim, int *lbnd, int *ubnd, AstFrameSet **iwcs,
 *        the default AXIS coordinate system (i.e. pixel coords).
 *     ndim
 *        The number of pixel axes in the modified FrameSet.
+*     dim
+*        The indices within INDF corresponding to each of the required
+*        ndim axes.
 *     lbnd
 *        The lower pixel index bounds in the modified FrameSet.
 *     ubnd
@@ -69,6 +73,8 @@ void kpg1Asndf( int indf, int ndim, int *lbnd, int *ubnd, AstFrameSet **iwcs,
 *  History:
 *     22-FEB-2010 (DSB):
 *        Original version.
+*     19-AUG-2010 (DSB):
+*        Added DIM argument.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -78,6 +84,7 @@ void kpg1Asndf( int indf, int ndim, int *lbnd, int *ubnd, AstFrameSet **iwcs,
 
 /* Local Variables: */
    int place;         /* Place holder for temporary NDF */
+   int idim;          /* Axis index */
    int indf2;         /* Identifier for temporary NDF */
 
 /* Initialise */
@@ -89,18 +96,15 @@ void kpg1Asndf( int indf, int ndim, int *lbnd, int *ubnd, AstFrameSet **iwcs,
 /* Create a place-holder for a temporary NDF. */
    ndfTemp( &place, status );
 
-/* If an input NDF was supplied, create a copy of it, propagating just
-   the AXIS component, and then set the bounds of the copy to the supplied
-   bounds. */
-   if( indf != NDF__NOID ) {
-      ndfScopy( indf, "AXIS,NOHISTORY,NOLABEL,NOTITLE,NOEXT(*)", &place,
-                &indf2, status );
-      ndfSbnd( ndim, lbnd, ubnd, indf2, status );
+/* Create a new NDF with the required bounds. */
+   ndfNew( "_REAL", ndim, lbnd, ubnd, &place, &indf2, status );
 
-/* If no input NDF was supplied, create a new NDF with the required
-   bounds. */
-   } else {
-      ndfNew( "_REAL", ndim, lbnd, ubnd, &place, &indf2, status );
+/* If an input NDF was supplied, copy the required AXIS structures to the
+   new NDF. */
+   if( indf != NDF__NOID ) {
+      for( idim = 0; idim < ndim; idim++ ) {
+         kpg1Axcpy( indf, indf2, dim[ idim ], idim + 1, status );
+      }
    }
 
 /* Get the WCS FrameSet. */

@@ -113,7 +113,8 @@
 double *kpg1Chcof( int,  HDSLoc **, int *, int *, int * );
 
 void kpg1Asget( int, int, int, int, int, int *, int *, int *, AstFrameSet **, int * );
-void kpg1Asndf( int, int, int *, int *, AstFrameSet **, int * );
+void kpg1Asndf( int, int, int *, int *, int *, AstFrameSet **, int * );
+void kpg1Axcpy( int, int, int, int, int * );
 void kpg1Darad( const char *, int, double *, const char *, int *, double *, double *, int * );
 void kpg1Filli( int, int, int *, int * );
 void kpg1Fillr( float, int, float *, int * );
