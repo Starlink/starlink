@@ -39819,6 +39819,428 @@ related items to be removed.
       }
    }
 }
+\newpage
+\section{C-only Routine Descriptions}
+\sstroutine{
+   kpg1Config
+}{
+   Create an AST KeyMap holding a set of configuration parameter values
+}{
+   \sstdescription{
+      This function first creates a KeyMap by reading the values from a
+      specified text file (argument {\tt "}def{\tt "}). This text files specifies the
+      complete list of all allowed config parameters and their default
+      values. The KeyMap is then locked by setting its MapLocked attribute
+      to a true value. A GRP group is then obtained from the environment
+      using the specified parameter (argument {\tt "}param{\tt "}). The config
+      settings thus obtained are stored in the KeyMap. An error is reported
+      if the user-supplied group refers to any config parameters that were
+      not read earlier from the default file.
+
+      Both the defaults file and the user-supplied configuration may
+      contain several sets of {\tt "}alternate{\tt "} configuration parameter values,
+      and the set to use can be specified by the caller via the supplied
+      {\tt "}nested{\tt "} keymap. For instance, if a basic configuration contains
+      keys {\tt "}par1{\tt "} and {\tt "}par2{\tt "}, the user could supply two alternate sets of
+      values for these keys by prepending each key name with the strings
+      {\tt "}850{\tt "} and {\tt "}450{\tt "} (say). Thus, the user could supply values for any
+      or all of: {\tt "}par1{\tt "}, {\tt "}par2{\tt "}, {\tt "}450.par1{\tt "}, {\tt "}450.par2{\tt "}, {\tt "}850.par1{\tt "},
+      {\tt "}850.par2{\tt "}.
+
+      The {\tt "}nested{\tt "} keymap supplied by the caller serves two functions: 1)
+      it defines the known alternatives, and 2) it specifies which of the
+      aternatives is to be used. Each key in the supplied {\tt "}nested{\tt "} keymap
+      should be the name of an allowed alternative. In the above example,
+      a KeyMap containing keys {\tt "}850{\tt "} and {\tt "}450{\tt "} could be supplied. No
+      error is reported if the user-supplied configuration fails to
+      provide values for one or more of the alternatives. The value
+      associated with each key in the {\tt "}nested{\tt "} keymap should be an
+      integer - the alternative to be used should have a non-zero value,
+      and all other should be zero.
+
+      So first, the configuration parameters specified by the supplied
+      defaults file are examined. Any parameter that starts with the name
+      of the selected alternative (i.e. the key within {\tt "}nested{\tt "} that has
+      an associated value of 1) has the name of the alternative removed.
+      Any parameter that start with the name of any of the other
+      alternatives is simply removed from the configuration. Thus, using
+      the above example, if {\tt "}nested{\tt "} contains two entries - one with key
+      {\tt "}850{\tt "} and value {\tt "}1{\tt "}, and the other with key {\tt "}450{\tt "} and value {\tt "}0{\tt "} -
+      the {\tt "}850.par1{\tt "} and {\tt "}850.par2{\tt "} entries in the defaults file would be
+      renamed as {\tt "}par1{\tt "} and {\tt "}par2{\tt "} (over-writing the original values for
+      {\tt "}par1{\tt "} and {\tt "}par2{\tt "}), and the {\tt "}450.par1{\tt "} and {\tt "}450.par2{\tt "} entries would
+      be deleted.
+
+      Next, the same process is applied to the user-supplied
+      configuration obtained via the specified environment parameter.
+
+      Finally, the values in the user-supplied configuration are used to
+      replace those in the defaults file.
+
+      The beneifts of using this function are that 1) the user gets to
+      know if they mis-spell a config parameter name, and 2) the default
+      parameter values can be defined in a single place, rather than
+      hard-wiring them into application code at each place where the
+      config parameter is used.
+   }
+   \sstinvocation{
+      AstKeyMap $*$kpg1Config( const char $*$param, const char $*$def,
+                             AstKeyMap $*$nested, int $*$status )
+   }
+   \sstarguments{
+      \sstsubsection{
+         paramc = const char $*$ (Given)
+      }{
+         The name of the environment parameter to use.
+      }
+      \sstsubsection{
+         def = const char $*$ (Given)
+      }{
+         The path to a file containing the default value for every allowed config
+         parameter. For instance, {\tt "}\$SMURF\_DIR/dimmconfig.def{\tt "}.
+      }
+      \sstsubsection{
+         nested = AstKeyMap $*$ (Given)
+      }{
+         If non-NULL, used to determine which nested keys might be in the config
+         and which should be merged with the base keymap. The values in the keymap
+         should be non-zero to indicate merging.
+      }
+      \sstsubsection{
+         status = int $*$ (Given \& Returned)
+      }{
+         The inherited status.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         A pointer to the AST KeyMap, or NULL if an error occurrs.
+      }{
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The KeyError attribute is set non-zero in the returned KeyMap so that an error
+         will be reported by astMapGet$<$X$>$ if the requested key does not exist in the KeyMap.
+      }
+   }
+}
+\sstroutine{
+   kpg1Kygp1
+}{
+   Create a GRP group holding keyword/value pairs read from an AST KeyMap
+}{
+   \sstdescription{
+      This function is the inverse of kpg1Kymp1. It extracts the values
+      from the supplied AST KeyMap and creates a set of {\tt "}name=value{\tt "} strings
+      which it appends to a supplied group (or creates a new group). If
+      the KeyMap contains nested KeyMaps, then the {\tt "}name{\tt "} associated with
+      each primitive value stored in the returned group is a hierarchical
+      list of component names separated by dots.
+   }
+   \sstinvocation{
+      void kpg1Kygp1( AstKeyMap $*$keymap, Grp $*$$*$igrp, const char $*$prefix,
+                      int $*$status )
+   }
+   \sstarguments{
+      \sstsubsection{
+         keymap
+      }{
+         A pointer to the KeyMap. Numerical entries which have bad values
+         (VAL\_\_BADI for integer entries or VAL\_\_BADD for floating point
+         entries) are not copied into the group.
+      }
+      \sstsubsection{
+         igrp
+      }{
+         A location at which is stored a pointer to the Grp structure
+         to which the name=value strings are to be appended. A new group is
+         created and a pointer to it is returned if the supplied Grp
+         structure is not valid.
+      }
+      \sstsubsection{
+         prefix
+      }{
+         A string to append to the start of each key extracted from the
+         supplied KeyMap. If NULL, no prefix is used.
+      }
+      \sstsubsection{
+         status
+      }{
+         Pointer to the inherited status value.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This function provides a private implementation for the public
+         KPG1\_KYGRP Fortran routine and kpg1Kygrp C function.
+
+         \sstitem
+         Entries will be stored in the group in alphabetical order
+      }
+   }
+}
+\sstroutine{
+   kpg1Kymp1
+}{
+   Create an AST KeyMap holding keyword/value pairs read from a GRP
+   group
+}{
+   \sstdescription{
+      This function checks each non-comment, non-blank line in the supplied
+      GRP group. An error is reported if any such lines do not have the
+      form {\tt "}keyword = value{\tt "}, where the keyword name can be a hierarchical
+      list of component names separated by dots. The returned KeyMap has
+      an entry for each component name found at the start of any keyword
+      name. The value associated with the entry will either be a
+      primitive value (if the keyword name contained no other components)
+      or another KeyMap (if the keyword name contained other components).
+
+      For example, consider a group containing the following lines:
+
+      gaussclumps.epsilon = (0.001,0.002)
+      gaussclumps.contrast = 2.3
+      clumpfind.naxis = 2
+      clumpfind.deltat = 2.0
+      method = gaussclumps
+
+      The returned KeyMap will contain 3 entries with keys {\tt "}gaussclumps{\tt "},
+      {\tt "}clumpfind{\tt "} and {\tt "}method{\tt "}. The value associated with the {\tt "}gaussclumps{\tt "}
+      entry will be another KeyMap containing keys {\tt "}epsilon{\tt "} (a primitive
+      vector entry containing the values 0.001 and 0.002) and {\tt "}contrast{\tt "}
+      (a primitive scalar entry with value {\tt "}2.3{\tt "}). The value associated with
+      the {\tt "}clumpfind{\tt "} entry will be another KeyMap containing keys {\tt "}naxis{\tt "}
+      and {\tt "}deltat{\tt "}, which will have primitive scalar values {\tt "}2{\tt "} and {\tt "}2.0{\tt "}.
+      The value associated with the {\tt "}method{\tt "} entry will be the primitive
+      scalar value {\tt "}gaussclumps{\tt "}.
+
+      Assigning the value {\tt "}$<$def$>${\tt "} (case insensitive) to a keyword has the
+      effect of removing the keyword from the KeyMap. For example:
+
+      $\wedge$global.lis
+      method = $<$def$>$
+
+      reads keyword values from the file {\tt "}global.lis{\tt "}, and then ensures
+      that the KeyMap does not contain a value for keyword {\tt "}method{\tt "}. The
+      calling application should then usually use a default value for
+      {\tt "}method{\tt "}.
+
+      Assigning the value {\tt "}$<$undef$>${\tt "} (case insensitive) to a keyword
+      has the effect of forcing the value to be undefined. This can
+      be useful in defining defaults where the keymap is locked
+      after being populated.
+   }
+   \sstinvocation{
+      void kpg1Kymp1( const Grp $*$igrp, AstKeyMap $*$$*$keymap, int $*$status )
+   }
+   \sstarguments{
+      \sstsubsection{
+         igrp
+      }{
+         A GRP identifier for the group of text strings to be analysed.
+      }
+      \sstsubsection{
+         keymap
+      }{
+         A location at which to return a pointer to the new KeyMap, or
+         NULL if an error occurs. A valid pointer to an empty KeyMap will be
+         returned if the supplied group contains nothing but comments and
+         blank lines.
+      }
+      \sstsubsection{
+         status
+      }{
+         Pointer to the global status variable.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Vector elements should be separated by commas and enclosed within
+         parentheses (commas and closing parentheses can be included
+         literally in a vector element by preceeding them with a backslash).
+
+         \sstitem
+         This function provides a private implementation for the public
+         KPG1\_KYMAP Fortran routine and kpg1Kymap C function.
+
+         \sstitem
+         Component names must contain only alphanumerical characters,
+         underscores, plus and minus signs [a-zA-Z0-9\_$+$$\backslash$-],
+
+         \sstitem
+         Any lower case characters contained in a component name will be
+         translated to the upper case equivalent.
+
+         \sstitem
+         If the last non-blank character in a value is a backslash ({\tt "}$\backslash${\tt "}),
+         the backslash will be reomved, together with any white space
+         following it, and the entire next line will be appended to the value.
+      }
+   }
+}
+\sstroutine{
+   kpg1Kymp2
+}{
+   Parse a {\tt "}keyword = value{\tt "} string for kpg1Kymp1 and add to a KeyMap
+}{
+   \sstdescription{
+      This is a service function for kps1Kymp1. It parses the supplied
+      {\tt "}keyword = value{\tt "} string into a keyword and value. It then parses the
+      keyword into a list of dot-separated component names. It then adds
+      the value into the supplied KeyMap at the correct point.
+   }
+   \sstinvocation{
+      void kpg1Kymp2( const char $*$string, AstKeyMap $*$keymap, int $*$status );
+   }
+   \sstarguments{
+      \sstsubsection{
+         string
+      }{
+         The null-terminated {\tt "}keyword=value{\tt "} string to be parsed.
+      }
+      \sstsubsection{
+         keymap
+      }{
+         A pointer to the KeyMap in which to store the value.
+      }
+      \sstsubsection{
+         status
+      }{
+         Pointer to the global status variable.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If the value is a comma-separated list of values, enclosed in
+         parentheses, then a vector entry will be added to the KeyMap.
+         Otherwise, a scalar entry will be created.
+
+         \sstitem
+         To include a comma or a closing parenthesis literally in a vector
+         value, preceed it with a backslash.
+
+         \sstitem
+         If the string has the form {\tt "}keyword=$<$def$>${\tt "} (case insensitive), then
+         any entry for the specified keyword is removed from the KeyMap.
+
+         \sstitem
+         Component names must contain only alphanumerical characters,
+         underscores, plus and minus signs [a-zA-Z0-9\_$+$$\backslash$-],
+
+         \sstitem
+         Any lower case characters contained in a component name will be
+         translated to the upper case equivalent.
+      }
+   }
+}
+\sstroutine{
+   kpgGtfts
+}{
+   Obtain FITS header information from an NDF
+}{
+   \sstdescription{
+      The routine reads the FITS extension from an NDF and returns an
+      AST pointer to a FitsChan which contains this information. The
+      information may then be accessed using routines from the AST
+      library (SUN/211).
+   }
+   \sstinvocation{
+      kpgGtfts( int indf, AstFitsChan $*$$*$ fchan, int $*$ status );
+   }
+   \sstarguments{
+      \sstsubsection{
+         indf = int (Given)
+      }{
+         NDF identifier.
+      }
+      \sstsubsection{
+         fchan = AstFitsChan $*$$*$ (Returned)
+      }{
+         An AST pointer to a FitsChan which contains information about
+         the FITS headers associated with the NDF.
+      }
+      \sstsubsection{
+         status = int $*$ (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         It is the caller{\tt '}s responsibility to annul the AST pointer
+         issued by this routine (e.g. by calling AST\_ANNUL) when it is no
+         longer required.
+
+         \sstitem
+         If this routine is called with STATUS set, then a value of
+         AST\_\_NULL will be returned for the FCHAN argument, although no
+         further processing will occur. The same value will also be
+         returned if the routine should fail for any reason.
+
+         \sstitem
+         Status is set to KPG\_\_NOFTS if no FITS extension is found.
+      }
+   }
+   \sstdiytopic{
+      Return Value
+   }{
+      Returns the status.
+   }
+}
+\sstroutine{
+   kpgPtfts
+}{
+   Store FITS header information into an NDF
+}{
+   \sstdescription{
+      The routine stores the contents of an AST FitsChan into an
+      NDF by creating (or replacing) the FITS extension in the NDF.
+   }
+   \sstinvocation{
+      kpgPtfts( int indf, AstFitsChan $*$ fchan, int $*$ status );
+   }
+   \sstarguments{
+      \sstsubsection{
+         indf = int (Given)
+      }{
+         Identifier of NDF to receive the .FITS extension.
+      }
+      \sstsubsection{
+         fchan = const AstFitsChan $*$ (Given)
+      }{
+         An AST pointer to a FitsChan which contains information about
+         the FITS header to be associated with the NDF.
+      }
+      \sstsubsection{
+         status = int $*$ (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If a .MORE.FITS extension already exists it will be completely
+         replaced by this routine.
+      }
+   }
+   \sstdiytopic{
+      Return Value
+   }{
+      Returns the status.
+   }
+}
 
 \normalsize
 

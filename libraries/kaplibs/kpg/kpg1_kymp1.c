@@ -18,7 +18,7 @@ void kpg1Kymp1( const Grp *igrp, AstKeyMap **keymap, int *status ){
 *  Language:
 *     C.
 
-*  Synopsis:
+*  Invocation:
 *     void kpg1Kymp1( const Grp *igrp, AstKeyMap **keymap, int *status )
 
 *  Description:

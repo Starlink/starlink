@@ -19,7 +19,7 @@ void kpg1Kygp1( AstKeyMap *keymap, Grp **igrp, const char *prefix,
 *  Language:
 *     C.
 
-*  Synopsis:
+*  Invocation:
 *     void kpg1Kygp1( AstKeyMap *keymap, Grp **igrp, const char *prefix,
 *                     int *status )
 

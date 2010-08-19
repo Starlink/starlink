@@ -21,7 +21,7 @@ void kpg1Kymp2( const char *string, AstKeyMap *keymap, int *status ){
 *  Language:
 *     C.
 
-*  Synopsis:
+*  Invocation:
 *     void kpg1Kymp2( const char *string, AstKeyMap *keymap, int *status );
 
 *  Description:
