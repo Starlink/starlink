@@ -401,6 +401,17 @@ void smurf_mon( int * status ) {
     errRlse();
   }
 
+  /* configure AST --with--memdebuf, and uncomment the following lines
+     to see how much memory usage SMURF hit at its peak */
+  /*
+  {
+    size_t memcurrent,mempeak;
+    astMemoryStats( 0, &mempeak, &memcurrent );
+    msgOutf( "", "SMURF: === current /peak memory usage: %zu / %zu Mb ===",
+             status, memcurrent/SMF__MB, mempeak/SMF__MB );
+  }
+  */
+
   /* The astFlushMemory function does nothing unless AST has been compiled
    * with the MEM_DEBUG flag. If this is the case, then it frees all AST
    * internal structures, and report the number of memory blocks that have
