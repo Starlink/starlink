@@ -1094,7 +1094,7 @@ int *status                   /* global status (given and returned) */
 	     ((hdsRecords[j].optional & instrument) == 0)) { /* but is not optional */
 	 if (*status == SAI__OK) {
 	   *status = DITS__APP_ERROR;
-	   sprintf( sc2store_errmess, "Mandatory component not present in file. Can't find '%s'",
+	   sprintf( sc2store_errmess, "sc2store_headrmap: Mandatory component not present in file. Can't find '%s'",
 		    hdsRecords[j].name);
 	   ErsRep( 0, status, sc2store_errmess );
 	 }
@@ -1742,7 +1742,7 @@ int *status              /* global status (given and returned) */
    {
       *status = DITS__APP_ERROR;
       sprintf ( sc2store_errmess,
-        "one SCUBA-2 data file already open, can't open %s", filename );
+        "sc2store_rdflatcal: one SCUBA-2 data file already open, can't open %s", filename );
       ErsRep ( 0, status, sc2store_errmess );
       return;
    }
@@ -1753,7 +1753,7 @@ int *status              /* global status (given and returned) */
 
    if ( !StatusOkP(status) )
    {
-      sprintf ( sc2store_errmess, "failed to open %s", filename );
+      sprintf ( sc2store_errmess, "sc2store_rdflatcal: failed to open %s", filename );
       ErsRep ( 0, status, sc2store_errmess );
    }
    else
@@ -1847,7 +1847,7 @@ int *status              /* global status (given and returned) */
    {
       *status = DITS__APP_ERROR;
       sprintf ( sc2store_errmess,
-        "one SCUBA-2 data file already open, can't open %s", filename );
+        "sc2store_rdtstream: one SCUBA-2 data file already open, can't open %s", filename );
       ErsRep ( 0, status, sc2store_errmess );
       return;
    }
@@ -1857,7 +1857,7 @@ int *status              /* global status (given and returned) */
    {
       *status = DITS__APP_ERROR;
       sprintf ( sc2store_errmess,
-        "access mode should be READ or UPDATE, but given as %s", access );
+        "sc2store_rdtstream: access mode should be READ or UPDATE, but given as %s", access );
       ErsRep ( 0, status, sc2store_errmess );
       return;
    }
@@ -3426,7 +3426,7 @@ int *status                 /* global status (given and returned) */
    {
       *status = DITS__APP_ERROR;
       sprintf ( sc2store_errmess,
-        "one SCUBA-2 data file already open, can't open %s", filename );
+        "sc2store_wrtstream: one SCUBA-2 data file already open, can't open %s", filename );
       ErsRep ( 0, status, sc2store_errmess );
       return;
    }
@@ -3440,7 +3440,7 @@ int *status                 /* global status (given and returned) */
 
    if ( !StatusOkP(status) )
    {
-      sprintf ( sc2store_errmess, "failed to open %s", filename );
+      sprintf ( sc2store_errmess, "sc2store_wrtstream: failed to open %s", filename );
       ErsRep ( 0, status, sc2store_errmess );
    }
 
@@ -3522,7 +3522,7 @@ int *status                 /* global status (given and returned) */
    {
       *status = DITS__APP_ERROR;
       sprintf ( sc2store_errmess,
-        "one SCUBA-2 data file already open, can't open %s", filename );
+        "sc2store_updflatcal: one SCUBA-2 data file already open, can't open %s", filename );
       ErsRep ( 0, status, sc2store_errmess );
       return;
    }
@@ -3533,7 +3533,7 @@ int *status                 /* global status (given and returned) */
    if ( ((refcolsize != colsize) || (refrowsize != rowsize)) && StatusOkP(status)) {
      *status = DITS__APP_ERROR;
      sprintf( sc2store_errmess,
-              "Columns and rows in flatfield do not match the file to be updated" );
+              "sc2store_updflatcal: Columns and rows in flatfield do not match the file to be updated" );
      ErsRep( 0, status, sc2store_errmess );
    }
 
