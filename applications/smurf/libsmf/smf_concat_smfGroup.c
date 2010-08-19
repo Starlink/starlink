@@ -334,9 +334,9 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
 
   /* Loop over related elements (number of subarrays) */
   for( i=0; (*status == SAI__OK) && i<nrelated; i++ ) {
-
-    /* Initialize time length of concatenated array. We will add on padding if the
-       first and last files have not already recevied padding */
+    /* Initialize time length of concatenated array. We will add on
+       padding if the first and last files have not already recevied
+       padding */
     tlen = 0;
     padEnd = 0;
     padStart = 0;
@@ -664,7 +664,9 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                   size_t sz = smf_dtype_sz(data->dtype, status );
                   data->pntr[k] = astCalloc( ndata, sz, 1 );
                 }
-              if (havequal) data->qual = astCalloc( ndata, sizeof(*(data->qual)), 1 );
+              if (havequal) {
+                data->qual = astCalloc( ndata, sizeof(*(data->qual)), 1 );
+              }
 
               /* Check to see if havearray for QUALITY is not set,
                  but SMF__NOCREATE_QUALITY is also not set. In this
