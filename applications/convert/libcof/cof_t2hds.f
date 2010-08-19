@@ -22,7 +22,6 @@
 *     LOC = CHARACTER * ( * ) (Given)
 *        The HDS locator of the structure to contain the components
 *        derived from the table.
-*        structure.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -67,7 +66,7 @@
 *     1997 February 28 (MJC):
 *        Original version.
 *     2002 March 13 (AJC):
-*        Adjust dimensions for multi-dimensional CHARACTER arrays
+*        Adjust dimensions for multi-dimensional CHARACTER arrays.
 *     2004 September 9 (TIMJ):
 *        Use CNF_PVAL.
 *     2008 February 12 (MJC):
@@ -187,7 +186,7 @@
             CALL COF_DSTYP( FUNIT, SCAKEY, ZERKEY, CTYPE, STATUS )
 
 *  Obtain the data type of the column, when the type has not been
-*  specificed by the presence of TSCALn and TZEROn keywords.
+*  specified by the presence of TSCALn and TZEROn keywords.
             IF ( CTYPE .EQ. ' ' ) THEN
                CALL FTKEYN( 'TFORM', COLNUM, KEYWRD, FSTAT )
                CALL COF_GKEYC( FUNIT, KEYWRD, THERE, BTYPE, COMENT,
