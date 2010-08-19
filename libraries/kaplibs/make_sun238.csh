@@ -45,7 +45,7 @@ foreach dir (aif ccg fts ira kpg)
    rm -f documented_files >& /dev/null
    touch documented_files
 
-   foreach file (`cat temp-files`)
+   foreach file (`cat temp-files | sort `)
       grep -q $file Makefile.am
       set s1 = $status
 
