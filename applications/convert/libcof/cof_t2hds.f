@@ -37,8 +37,9 @@
 
 *  Copyright:
 *     Copyright (C) 1997, 2002, 2004 Central Laboratory of the Research
-*     Councils. Copyright (C) 2008 Science & Technology Facilities
-*     Council. All Rights Reserved.
+*     Councils.
+*     Copyright (C) 2008, 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -72,6 +73,15 @@
 *     2008 February 12 (MJC):
 *        Ignore the special DUMMY_FOR_STRUC column used to preserve
 *        extension structures containing only NDFs.
+*     2010 August 19 (MJC):
+*        Do not use the dimension for a _CHAR vector produced by FTGTDM.
+*        Instead set the dimension to the previously calculated number
+*        of elements (TFORMn repeat count normalised by its width).
+*
+*        Correct AJC's 2002 March 13 fix to handle vector _CHAR arrays.
+*        While there is no need to use TDIMn for a one-dimensional
+*        character array---most writers would use just TFORMn='rAw'---it
+*        is part of the standard.
 *     {enter_further_changes_here}
 
 *-
@@ -191,7 +201,8 @@
                END IF
             END IF
 
-*  Obtain the count and width if it's a string.
+*  Obtain the count, and if it's a character field also obtain the
+*  width.
             CALL FTGTCL( FUNIT, COLNUM, DATCOD, REPEAT, WIDTH, FSTAT )
 
 *  Check for an error.  Flush the error stack.
@@ -220,14 +231,22 @@
             IF ( REPEAT .GT. 1 ) THEN
                CALL FTGTDM( FUNIT, COLNUM, DAT__MXDIM+1, NDIM, DIMS,
      :                      FSTAT )
-               IF ( ( NDIM .GT. 2 ) .AND.
-     :              ( CTYPE(1:5) .EQ. '_CHAR' ) ) THEN
 
-*  The first dimension is the CHARACTER width - remove it
-                  DO I = 2, NDIM
-                     DIMS(I - 1) = DIMS(I)
-                  END DO
-                  NDIM = NDIM - 1
+*  Character is special case because the repeat count is the total size,
+*  i.e. the actual array dimension divided by the width.
+               IF ( CTYPE( 1:5 ) .EQ. '_CHAR' ) THEN
+                  IF ( NDIM .GE. 2 ) THEN
+
+*  The first dimension is the CHARACTER width - remove it.
+                     DO I = 2, NDIM
+                        DIMS( I - 1 ) = DIMS( I )
+                     END DO
+                     NDIM = NDIM - 1
+
+*  Just a vector of strings.  Use previously calculated dimension.
+                  ELSE IF ( NDIM .EQ. 1 ) THEN
+                     DIMS( 1 ) = REPEAT
+                  END IF
                END IF
 
 *  Dealing with a scalar.
