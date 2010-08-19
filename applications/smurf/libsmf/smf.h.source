@@ -621,8 +621,8 @@ void smf_checkdets( Grp *detgrp, smfData *data, int *status );
 
 void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
 			smf_modeltype *modeltyps, dim_t nmodels,
-                        AstKeyMap *keymap, size_t available, size_t *necessary,
-                        int *status );
+                        AstKeyMap *keymap, size_t available, dim_t maxfilelen,
+                        size_t *necessary, int *status );
 
 void smf_checkmem_map( const int lbnd[2], const int ubnd[2], int rebin,
                        size_t available, size_t *necessary, int *status );

@@ -787,7 +787,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
     /* Then the iterative components that are proportional to time */
     smf_checkmem_dimm( maxconcat, INST__SCUBA2, igroup->nrelated, modeltyps,
-                       nmodels, keymap, maxmem-mapmem, &memneeded,
+                       nmodels, keymap, maxmem-mapmem, maxfile, &memneeded,
                        status );
 
     msgOutf( "", FUNC_NAME ": map-making requires %zu Mb "
