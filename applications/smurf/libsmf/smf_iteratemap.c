@@ -300,6 +300,8 @@
 *        Added "doclean" and "exportclean" config parameters
 *     2010-08-13 (EC):
 *        Factored out writing of itermap extension to smf_write_itermap
+*     2010-08-20 (EC):
+*        Factored out writing of bolomap extension to smf_write_bolomap
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -1591,147 +1593,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           msgOut( "", FUNC_NAME
                   ": *** WARNING *** bolomap=1, but memiter=0", status );
         } else {
-          /* Loop over subgroup index (subarray) */
-          for( idx=0; idx<res[0]->ndat; idx++ ) {
-            smf_qual_t *bolomask = NULL;
-            double *bmapweight = NULL;
-            double *bmapweightsq = NULL;
-            int *bhitsmap = NULL;
-
-            /* Pointers to everything we need */
-            ast_data = (ast[0]->sdata[idx]->pntr)[0];
-            res_data = (res[0]->sdata[idx]->pntr)[0];
-            lut_data = (lut[0]->sdata[idx]->pntr)[0];
-            qua_data = (qua[0]->sdata[idx]->pntr)[0];
-
-            smf_get_dims( res[0]->sdata[idx], NULL, NULL, &nbolo, NULL,
-                          &dsize, &bstride, NULL, status );
-
-            /* Add ast back into res. Mask should match ast_calcmodel_ast. */
-
-            for( k=0; k<dsize; k++ ) {
-              if( !(qua_data[k]&SMF__Q_MOD) && (ast_data[k]!=VAL__BADD) ) {
-                res_data[k] += ast_data[k];
-              }
-            }
-
-            /* Make a copy of the quality at first time slice as a good
-               bolo mask, and then set quality to SMF__Q_BADB. Later we
-               will unset BADB for one bolo at a time to make individual
-               maps. */
-
-            bolomask = astCalloc( nbolo, sizeof(*bolomask), 0 );
-            bmapweight = astCalloc( msize, sizeof(*bmapweight), 0 );
-            bmapweightsq = astCalloc( msize, sizeof(*bmapweightsq), 0 );
-            bhitsmap = astCalloc( msize, sizeof(*bhitsmap), 0 );
-
-            if( *status == SAI__OK ) {
-              for( k=0; k<nbolo; k++ ) {
-                bolomask[k] = qua_data[k*bstride];
-                qua_data[k*bstride] = SMF__Q_BADB;
-              }
-
-              /* Identify good bolos in the copied mask and produce a map */
-              for( k=0; (k<nbolo)&&(*status==SAI__OK); k++ ) {
-                if( !(bolomask[k]&SMF__Q_BADB) ) {
-                  Grp *mgrp=NULL;       /* Temporary group to hold map names */
-                  smfData *mapdata=NULL;/* smfData for new map */
-                  char tmpname[GRP__SZNAM+1]; /* temp name buffer */
-                  char thisbol[20];     /* name particular to this bolometer */
-                  size_t col, row;
-
-                  /* Set the quality back to good for this single bolometer */
-                  qua_data[k*bstride] = bolomask[k];
-
-                  /* Create a name for the new map, take into account the
-                     chunk number. Only required if we are using a single
-                     output container. */
-                  pname = tmpname;
-                  grpGet( bolrootgrp, 1, 1, &pname, sizeof(tmpname), status );
-                  one_strlcpy( name, tmpname, sizeof(name), status );
-                  one_strlcat( name, ".", sizeof(name), status );
-                  if (ncontchunks > 1) {
-                    char tempstr[20];
-                    sprintf(tempstr, "CH%02zd", contchunk);
-                    one_strlcat( name, tempstr, sizeof(name), status );
-                  }
-
-                  col = (k % res[0]->sdata[idx]->dims[1])+1;
-                  row = (k / res[0]->sdata[idx]->dims[1])+1;
-
-                  sprintf( thisbol, "C%02zuR%02zu",
-                           col,   /* x-coord */
-                           row ); /* y-coord */
-
-                  one_strlcat( name, thisbol, sizeof(name), status );
-                  mgrp = grpNew( "bolomap", status );
-                  grpPut1( mgrp, name, 0, status );
-
-                  msgOutf( "", "*** Writing single bolo map %s", status,
-                           name );
-
-                  smf_open_newfile ( mgrp, 1, SMF__DOUBLE, 2, lbnd_out,
-                                     ubnd_out, SMF__MAP_VAR, &mapdata, status);
-
-                  /* Rebin the data for this single bolometer. Don't care
-                     about variance weighting because all samples from
-                     same detector are about the same. */
-
-                  smf_rebinmap1( res[0]->sdata[idx],
-                                 dat.noi ? dat.noi[0]->sdata[idx] : NULL,
-                                 lut_data, 0, 0, 0,
-                                 SMF__Q_GOOD, varmapmethod,
-                                 AST__REBININIT | AST__REBINEND,
-                                 mapdata->pntr[0],
-                                 bmapweight, bmapweightsq, bhitsmap,
-                                 mapdata->pntr[1], msize, NULL, status );
-
-                  /* Write out COLNUM and ROWNUM to FITS header */
-                  if( *status == SAI__OK ) {
-                    AstFitsChan *fitschan=NULL;
-
-                    fitschan = astFitsChan ( NULL, NULL, " " );
-
-                    atlPtfti( fitschan, "COLNUM", col, "bolometer column", status);
-                    atlPtfti( fitschan, "ROWNUM", row, "bolometer row", status );
-                    kpgPtfts( mapdata->file->ndfid, fitschan, status );
-
-                    if( fitschan ) fitschan = astAnnul( fitschan );
-                  }
-
-                  /* Set the bolo to bad quality again */
-                  qua_data[k*bstride] = SMF__Q_BADB;
-
-                  /* Write WCS */
-                  smf_set_moving(outfset,status);
-                  ndfPtwcs( outfset, mapdata->file->ndfid, status );
-
-                  /* Clean up */
-                  if( mgrp ) grpDelet( &mgrp, status );
-                  smf_close_file( &mapdata, status );
-
-                }
-              }
-
-              /* Set quality back to its original state */
-              for( k=0; k<nbolo; k++ ) {
-                qua_data[k*bstride] = bolomask[k];
-              }
-            }
-
-            /* Free up memory */
-            if( bolomask ) bolomask = astFree( bolomask );
-            if( bmapweight ) bmapweight = astFree( bmapweight );
-            if( bmapweightsq ) bmapweightsq = astFree( bmapweightsq );
-            if( bhitsmap ) bhitsmap = astFree( bhitsmap );
-
-            /* Remove ast from res once again */
-            for( k=0; k<dsize; k++ ) {
-              if( !(qua_data[k]&SMF__Q_MOD) && (ast_data[k]!=VAL__BADD) ) {
-                res_data[k] -= ast_data[k];
-              }
-            }
-          }
+          smf_write_bolomap( ast, res, lut, qua, &dat, msize, bolrootgrp,
+                             contchunk, varmapmethod, lbnd_out, ubnd_out,
+                             outfset, status );
         }
       }
 
