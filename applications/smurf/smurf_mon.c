@@ -401,13 +401,13 @@ void smurf_mon( int * status ) {
     errRlse();
   }
 
-  /* configure AST --with--memdebuf, and uncomment the following lines
+  /* configure AST --with--memdebug, and uncomment the following lines
      to see how much memory usage SMURF hit at its peak */
   /*
   {
     size_t memcurrent,mempeak;
     astMemoryStats( 0, &mempeak, &memcurrent );
-    msgOutf( "", "SMURF: === current /peak memory usage: %zu / %zu Mb ===",
+    msgOutf( "", "SMURF: === current /peak memory usage: %zu / %zu MB ===",
              status, memcurrent/SMF__MB, mempeak/SMF__MB );
   }
   */
