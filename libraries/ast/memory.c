@@ -126,6 +126,8 @@
 *        Added astCalloc.
 *     18-AUG-2010 (DSB):
 *        Added astMemoryStats
+*     19-AUG-2010 (DSB):
+*        Added astMemoryWarning
 */
 
 /* Configuration results. */
@@ -414,6 +416,9 @@ static int Quiet_Use = 0;
 
 /* Report the ID of every cached block when the cache is emptied? */
 static int List_Cache = 0;
+
+/* Memory allocation at which to issue a warning. */
+static size_t Warn_Usage = 0;
 
 /* Current memory allocated by AST. */
 static size_t Current_Usage = 0;
@@ -4135,6 +4140,49 @@ void astMemoryStats_( int reset, size_t *peak, size_t *current, int *status ) {
    UNLOCK_DEBUG_MUTEX;
 }
 
+void astMemoryWarning_( size_t threshold, int *status ) {
+/*
+*+
+*  Name:
+*     astMemoryWarning
+
+*  Purpose:
+*     Issues a warning memory goes over a specified threshold.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     astMemoryWarning( size_t threshold )
+
+*  Description:
+*     This function prints a warning message to standard output if the
+*     AST memory usage exceeds the specified threshold.
+
+*  Parameters:
+*     threshold
+*        The memory allocation, in bytes, at which a warning should be issued,
+*        Supply zero to suppress warnings.
+
+*  Notes:
+*     - This function is used to reset the threshold to zero when the first
+*     warning is issued in order to prevent a flood of warnings appearing.
+*     Therefore, setting a debugger breakpoint in this function
+*     ("astMemoryWarning_" - do not forget the trailing underscore)
+*     allows you to locate the point at which memory allocation first
+*     exceeds the threshold.
+
+*-
+*/
+
+   LOCK_DEBUG_MUTEX;
+
+   Warn_Usage = threshold;
+
+   UNLOCK_DEBUG_MUTEX;
+}
+
 void astMemoryUse_( const void *ptr, const char *verb, int *status ){
 /*
 *+
@@ -4484,6 +4532,17 @@ static void Issue( Memory *mem, int *status ) {
 /* Update the current and peak memory usage. */
    Current_Usage += mem->size + SIZEOF_MEMORY;
    if( Current_Usage > Peak_Usage ) Peak_Usage = Current_Usage;
+
+/* If the current allocation is above the threshold set using
+   astMemoryWarning, issue a warning message, and then reset the threshold
+   to zero to prevent further warnings being issued, and to allow a
+   debugger breakpoint to be set. */
+   if( Current_Usage > Warn_Usage &&
+       Warn_Usage > 0 ) {
+      printf( "Warning - AST memory allocation has exceeded %ld bytes\n",
+              Warn_Usage );
+      astMemoryWarning( 0 );
+   }
 
    UNLOCK_DEBUG_MUTEX;
 }

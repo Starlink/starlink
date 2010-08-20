@@ -234,6 +234,7 @@ int astMemoryTune_( const char *, int, int * );
 void *astMemoryPtr_( int );
 void astMemoryAlarm_( const char * );
 void astMemoryStats_( int , size_t *, size_t *, int * );
+void astMemoryWarning_( size_t, int * );
 void astMemoryUse_( const void *, const char *, int * );
 int astMemoryId_( const void *, int * );
 void astBeginPM_( int * );
@@ -296,6 +297,7 @@ void astEndPM_( int * );
 #define astMemoryPtr(id) astERROR_INVOKE(astMemoryPtr_(id))
 #define astMemoryAlarm(text) astERROR_INVOKE(astMemoryAlarm_(text))
 #define astMemoryStats(reset,peak,current) astERROR_INVOKE(astMemoryStats_(reset,peak,current,STATUS_PTR))
+#define astMemoryWarning(threshold) astERROR_INVOKE(astMemoryWarning_(threshold,STATUS_PTR))
 #define astMemoryUse(ptr,text) astERROR_INVOKE(astMemoryUse_(ptr,text,STATUS_PTR))
 #define astMemoryId(ptr) astERROR_INVOKE(astMemoryId_(ptr,STATUS_PTR))
 #else
@@ -311,6 +313,7 @@ void astEndPM_( int * );
 #define astMemoryStats(reset,peak,current)
 #define astMemoryUse(ptr,text)
 #define astMemoryId(ptr)
+#define astMemoryWarning(threshold)
 
 #endif
 
