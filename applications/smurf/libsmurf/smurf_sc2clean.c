@@ -201,6 +201,8 @@
 *        Dark squids now have their own quality.
 *     2010-06-15 (TIMJ):
 *        Add BBM support
+*     2010-08-19 (DSB):
+*        Complete output NDF history by calling smf_puthistory before exiting.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -381,6 +383,11 @@ void smurf_sc2clean( int *status ) {
         smf_close_related( &tmparr, status );
       }
     }
+
+    /* Complete the history iunformation in the output NDF so that it
+       includes group parameters accessed since the default history
+       information was written to the NDF (in smf_open_and_flatfield). */
+    smf_puthistory( ffdata, "SMURF:SC2CLEAN", status );
 
     /* Free resources for output data */
     smf_close_file( &ffdata, status );

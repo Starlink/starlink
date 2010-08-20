@@ -258,6 +258,7 @@ smf_open_related_model.c \
 smf_open_textfile.c \
 smf_pattern_extract.c \
 smf_polext.c \
+smf_puthistory.c \
 smf_qfamily_count.c \
 smf_qfamily_str.c \
 smf_qual_map.c \
