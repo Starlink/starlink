@@ -114,6 +114,8 @@
 *        is being called with rawconvert true.
 *     2010-03-15 (TIMJ):
 *        Assign flatfield overrides.
+*     2010-08-19 (DSB):
+*        Stop default NDF history being written when the output NDF is closed.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -201,7 +203,10 @@ int smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
     /* We need to map this so that the DATA_ARRAY is defined on exit */
     ndfMap( outndf, "DATA", "_DOUBLE", "WRITE", &(outdata[0]), &nout, status );
 
-    /* Close output file */
+    /* Close output file, suppressing the writing of default history
+       information since it will be written again when the application
+       finally closes the completed output NDF. */
+    ndfHsmod( "SKIP", outndf, status );
     ndfAnnul( &outndf, status);
   }
 
