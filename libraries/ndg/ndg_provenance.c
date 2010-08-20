@@ -48,6 +48,7 @@
 *     - ndgReadVotProv: Create a new provenance structure from a VOTABLE.
 *     - ndgRemoveProv: Remove ancestors from a provenance structure.
 *     - ndgRootProv: Identify root ancestors in a provenance structure.
+*     - ndgUnhashProv: Clear the hash code describing the creation of the Provenance.
 *     - ndgUnhideProv: Ensure an ancestor is not hidden.
 *     - ndgWriteProv: Writes a provenance structure out to an NDF.
 *     - ndgWriteVotProv: Writes a provenance structure out to a VOTABLE.
@@ -164,6 +165,8 @@
 *          Guard against using NULL Prov structures in ndg1ClearProvId
 *          and ndg1GetProvId (NULL parent or child pointers can occur in
 *          partially constructed Prov structure).
+*      18-AUG-2010 (DSB):
+*          Added ndgUnhashProv.
 */
 
 
@@ -1056,6 +1059,70 @@ F77_SUBROUTINE(ndg_rootprov)( INTEGER(iprov), INTEGER(km), INTEGER(status) ){
    GENPTR_INTEGER(km)
    GENPTR_INTEGER(status)
    *km = astP2I( ndgRootProv( astI2P( *iprov ), status ) );
+}
+
+F77_SUBROUTINE(ndg_unhashprov)( INTEGER(iprov), INTEGER(status) ){
+/*
+*+
+*  Name:
+*     NDG_UNHASHPROV
+
+*  Purpose:
+*     Clear the hash code describing the creation of the Provenance.
+
+*  Language:
+*     Starlink ANSI C (callable from Fortran)
+
+*  Invocation:
+*     CALL NDG_UNHASHPROV( IPROV, STATUS )
+
+*  Description:
+*     Each ancestor in a Provenance structure may contain a copy of the
+*     History information stored in the associated ancestor NDF. Storing
+*     the complete History component from each ancestor NDF would be very
+*     wastefull since the NDF History component will usually contain not
+*     only records of operations performed on the ancestor NDF, but also
+*     all History records inherited from the "primary" NDF (i.e. the NDF
+*     from which the ancestor was propagated). Since these inherited
+*     History records will already be stored with other ancestors in the
+*     Provenance structure, it is not necessary to store them again.
+*     However, this means that when we add a new parent into a Provenance
+*     structure using NDG_PUTPROV, NDG needs some way of knowing which
+*     records within the new NDF are unique to the NDF (and should thus
+*     be stored in the Provenance structure), and which were inherited
+*     from earlier ancestors (and will thus already be stored in the
+*     Provenance structure). The solution is for each PROVENANCE extension
+*     to include a "creator" hash code for the History record that describes
+*     the creation of the NDF. When an NDF is supplied to NDG_PUTPROV, each
+*     History record, starting with the most recent, is copied from the
+*     NDF into the Provenance structure, until a History record is found
+*     which has a hash code equal to the creator hash code in the NDF. The
+*     copying of history records then stops since all earlier history
+*     records will already be present in the Provenance structure.
+*
+*     This routine clears the creator hash code in the supplied
+*     Provenance structure, so that a new one will be calculated when the
+*     Provenance structure is written to an NDF using NDG_WRITEPROV. This
+*     is useful for instance if the Provenance was written to the NDF
+*     using NDG_WRITEPROV before the NDF History record was completed. In
+*     this case, you would probably want to re-read the Provenance from
+*     the NDF, use this function to clear the creator hash code, and then
+*     re-write the Provenance to the NDF, thus forcing a new creator hash
+*     code to be stored in the NDF.
+
+*  Arguments:
+*     IPROV = INTEGER (Given)
+*        An identifier for a structure holding the provenance information
+*        read from an NDF, as returned by NDG_READPROV.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*-
+*/
+
+   GENPTR_INTEGER(iprov)
+   GENPTR_INTEGER(status)
+   ndgUnhashProv( (NdgProvenance *) astI2P( *iprov ), status );
 }
 
 F77_SUBROUTINE(ndg_unhideprov)( INTEGER(iprov), INTEGER(ianc),
@@ -2485,6 +2552,86 @@ AstKeyMap *ndgRootProv( NdgProvenance *prov, int *status ){
    astWatch( old_status );
 
    return result;
+}
+
+void ndgUnhashProv( NdgProvenance *prov, int *status ){
+/*
+*+
+*  Name:
+*     ndgUnhashProv
+
+*  Purpose:
+*     Clear the hash code describing the creation of the Provenance.
+
+*  Invocation:
+*     void ndgUnhashProv( NdgProvenance *prov, int *status )
+
+*  Description:
+*     Each ancestor in a Provenance structure may contain a copy of the
+*     History information stored in the associated ancestor NDF. Storing
+*     the complete History component from each ancestor NDF would be very
+*     wastefull since the NDF History component will usually contain not
+*     only records of operations performed on the ancestor NDF, but also
+*     all History records inherited from the "primary" NDF (i.e. the NDF
+*     from which the ancestor was propagated). Since these inherited
+*     History records will already be stored with other ancestors in the
+*     Provenance structure, it is not necessary to store them again.
+*     However, this means that when we add a new parent into a Provenance
+*     structure using ndgPutProv, NDG needs some way of knowing which
+*     records within the new NDF are unique to the NDF (and should thus
+*     be stored in the Provenance structure), and which were inherited
+*     from earlier ancestors (and will thus already be stored in the
+*     Provenance structure). The solution is for each PROVENANCE extension
+*     to include a "creator" hash code for the History record that describes
+*     the creation of the NDF. When an NDF is supplied to ndgPutProv, each
+*     History record, starting with the most recent, is copied from the
+*     NDF into the Provenance structure, until a History record is found
+*     which has a hash code equal to the creator hash code in the NDF. The
+*     copying of history records then stops since all earlier history
+*     records will already be present in the Provenance structure.
+*
+*     This routine clears the creator hash code in the supplied
+*     Provenance structure, so that a new one will be calculated when the
+*     Provenance structure is written to an NDF using ndgWriteProv. This
+*     is useful for instance if the Provenance was written to the NDF
+*     using ndgWriteProv before the NDF History record was completed. In
+*     this case, you would probably want to re-read the Provenance from
+*     the NDF, use this function to clear the creator hash code, and then
+*     re-write the Provenance to the NDF, thus forcing a new creator hash
+*     code to be stored in the NDF.
+
+*  Arguments:
+*     prov
+*        An identifier for a structure holding the provenance information
+*        as returned by ndgReadProv or ndgReadVotProv.
+*     status
+*        The global status.
+
+*-
+*/
+
+/* Local variables: */
+   Provenance *provenance = NULL;
+   int *old_status;
+
+/* Check the inherited status. */
+   if( *status != SAI__OK ) return;
+
+/* Ensure AST uses the supplied status variable. */
+   old_status = astWatch( status );
+
+/* Decode the supplied identifier to obtain a pointer to a Provenance
+   structure. */
+   provenance = ndg1Decode( prov, "ndgUnhashProv", status );
+   if( provenance ) {
+
+/* Clear the hash code. */
+      provenance->main->hhash = 0;
+
+   }
+
+/* Re-instate the original AST status variable. */
+   astWatch( old_status );
 }
 
 void ndgUnhideProv( NdgProvenance *prov, int ianc, int *status ){

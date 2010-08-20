@@ -14,8 +14,8 @@
 
 *  Description:
 *     This routine appends a description of each currently registered GRP
-*     group to the current History record in the supplied NDF. See
-*     NDF_ENDGH.
+*     group to the current History record in the supplied NDF. It then
+*     unregisters each group. See NDF_ENDGH.
 
 *  Arguments:
 *     INDF = INTEGER (Given)
@@ -50,6 +50,8 @@
 *  History:
 *     20-OCT-2009 (DSB):
 *        Original version (taken from NDG_ENDGH).
+*     19-AUG-2010 (DSB):
+*        Remove each group from the KeyMap after it has been written out.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -192,6 +194,11 @@
 
                END IF
             END DO
+
+*  Delete the group and remove the entry from the KeyMap so that it cannot
+*  be written out again.
+            CALL GRP_DELET( IGRP, STATUS )
+            CALL AST_MAPREMOVE( GHKMP_COM2, PARAM, STATUS )
          END IF
 
 *  Append the array of lines describing the contents of the expanded group

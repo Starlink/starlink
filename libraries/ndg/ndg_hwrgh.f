@@ -16,8 +16,8 @@
 *     This routine appends a description of each currently registered GRP
 *     group to the current History record in the supplied NDF. See
 *     NDF_ENDGH. It returns without action if 1) the NDF library has not
-*     yet written a default history record to the NDF, or 2) GRP history
-*     has already been written to the NDF.
+*     yet written a default history record to the NDF, or 2) all GRP
+*     history has already been written to the NDF.
 
 *  Arguments:
 *     INDF = INTEGER (Given)
@@ -52,6 +52,10 @@
 *  History:
 *     21-OCT-2009 (DSB):
 *        Original version.
+*     19-AUG-2010 (DSB):
+*        Do not remove the NDF from the KeyMap before exiting as new
+*        groups may be registered subsequently and may need to be written
+*        out by a later call to this function.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -95,9 +99,6 @@
 *  in the NDF.
             CALL NDG1_HWRGH( INDF, STATUS )
 
-*  Remove the path for the supplied NDF form the group, thus preventing
-*  future routines from writing out group contents again.
-            CALL AST_MAPREMOVE( DHKMP_COM2, NDFNAM( : NDFLEN ), STATUS )
          END IF
       END IF
 
