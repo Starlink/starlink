@@ -374,7 +374,7 @@
  *     2010-08-13 (EC):
  *        Add smf_write_itermap
  *     2010-08-20 (EC):
- *        Add smf_write_bolomap
+ *        Add smf_write_bolomap, smf_write_shortmap
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -1611,6 +1611,13 @@ void smf_write_itermap( const double *map, const double *mapvar, dim_t msize,
                         const int *lbnd_out, const int *ubnd_out,
                         AstFrameSet *outfset, const smfHead *hdr,
                         const smfArray *qua, int *status );
+
+void smf_write_shortmap( int shortmap, smfArray **ast, smfArray **res,
+                         smfArray **lut, smfArray **qua, smfDIMMData *dat,
+                         dim_t msize, const Grp *shortrootgrp, size_t contchunk,
+                         int varmapmethod, const int *lbnd_out,
+                         const int *ubnd_out, AstFrameSet *outfset,
+                         int *status );
 
 void smf_write_smfData ( const smfData *data, const smfData *variance,
                          const char * filename,
