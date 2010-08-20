@@ -52,12 +52,12 @@
 *  Description:
 *     After the map has converged, create single-bolometer maps in an
 *     NDF. The root of the name is supplied by bolrootgrp, and the
-*     suffix will be C##R##, where "C" refers to the column, and "R"
-*     refers to the row of the bolometer. The AST and RES data are
-*     temporarily combined in this routine before re-gridding into the
-*     output map for each detector. Upon completion AST is once again
-*     subtracted from RES. No maps will be made for bolometers flaged
-*     as SMF__Q_BADB.
+*     suffix will be CH##C##R##, where "CH" is the continuous chunk
+*     number, "C" refers to the column, and "R" refers to the row of
+*     the bolometer. The AST and RES data are temporarily combined in
+*     this routine before re-gridding into the output map for each
+*     detector. Upon completion AST is once again subtracted from
+*     RES. No maps will be made for bolometers flaged as SMF__Q_BADB.
 
 *  Notes:
 
@@ -130,6 +130,15 @@ void smf_write_bolomap( smfArray **ast, smfArray **res, smfArray **lut,
   smf_qual_t *qua_data=NULL;    /* Pointer to DATA component of qua */
   double *res_data=NULL;        /* Pointer to DATA component of res */
 
+  if( *status != SAI__OK ) return;
+
+  if( !ast || !res || !lut || !qua || !dat || !bolrootgrp ||
+      !lbnd_out || !ubnd_out || !outfset ) {
+    *status = SAI__ERROR;
+    errRep( "", FUNC_NAME ": NULL inputs supplied", status );
+    return;
+  }
+
   /* Loop over subgroup index (subarray) */
   for( idx=0; idx<res[contchunk]->ndat; idx++ ) {
     smf_qual_t *bolomask = NULL;
@@ -175,6 +184,7 @@ void smf_write_bolomap( smfArray **ast, smfArray **res, smfArray **lut,
         if( !(bolomask[k]&SMF__Q_BADB) ) {
           Grp *mgrp=NULL;       /* Temporary group to hold map names */
           smfData *mapdata=NULL;/* smfData for new map */
+          char tempstr[20];     /* Temporary string */
           char tmpname[GRP__SZNAM+1]; /* temp name buffer */
           char thisbol[20];     /* name particular to this bolometer */
           size_t col, row;
@@ -190,6 +200,11 @@ void smf_write_bolomap( smfArray **ast, smfArray **res, smfArray **lut,
           one_strlcpy( name, tmpname, sizeof(name), status );
           one_strlcat( name, ".", sizeof(name), status );
 
+          /* Continuous chunk number */
+          sprintf(tempstr, "CH%02zd", contchunk);
+          one_strlcat( name, tempstr, sizeof(name), status );
+
+          /* Column and row */
           col = (k % res[contchunk]->sdata[idx]->dims[1])+1;
           row = (k / res[contchunk]->sdata[idx]->dims[1])+1;
 
