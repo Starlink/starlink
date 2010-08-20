@@ -142,9 +142,11 @@ void smf_write_itermap( const double *map, const double *mapvar, dim_t msize,
   one_strlcpy( name, tmpname, sizeof(name), status );
   one_strlcat( name, ".", sizeof(name), status );
 
+  /* Continuous chunk number */
   sprintf(tempstr, "CH%02zd", contchunk);
   one_strlcat( name, tempstr, sizeof(name), status );
 
+  /* Iteration number */
   sprintf( tempstr, "I%03i", iter+1 );
   one_strlcat( name, tempstr, sizeof(name), status );
   mgrp = grpNew( "itermap", status );
