@@ -99,6 +99,8 @@
 *        Free ocsconfig
 *     2010-06-18 (TIMJ):
 *        Free file quality as special case.
+*     2010-08-19 (TIMJ):
+*        sc2store no longer uses system malloc in SMURF
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -160,7 +162,6 @@ void smf_close_file( smfData ** data, int * status ) {
   smfHead * hdr;          /* pointer to smfHead in smfData */
   size_t headlen=0;       /* Size of header (mmap'd files) in bytes */
   size_t       i;         /* loop counter */
-  int       isSc2store = 0; /* is this sc2Store data */
   smfDIMMHead *temphead=NULL; /* Pointer to DIMM header */
 
 
@@ -202,10 +203,8 @@ void smf_close_file( smfData ** data, int * status ) {
   if (file != NULL) {
 
     if ( file->isSc2store ) {
-      /* Nothing to free here but we do need to free the data array
-         using free() not smf_free [since sc2store uses native malloc]
-         and also free the hdr->allState */
-      isSc2store = 1;
+      /* Nothing to free here except for data */
+      freedata = 1;
 
     } else if ( file->ndfid != NDF__NOID ) {
 
@@ -280,12 +279,7 @@ void smf_close_file( smfData ** data, int * status ) {
          when we are cloned and the original is freed first? Need
          to think carefully about memory management. */
       if (hdr->allState != NULL) {
-        if (isSc2store) {
-          /* make sure we use free() */
-          free(hdr->allState);
-        } else {
-          hdr->allState = astFree( hdr->allState );
-        }
+        hdr->allState = astFree( hdr->allState );
       }
       if (hdr->fplanex) hdr->fplanex = astFree( hdr->fplanex );
       if (hdr->fplaney) hdr->fplaney = astFree( hdr->fplaney );
@@ -336,9 +330,6 @@ void smf_close_file( smfData ** data, int * status ) {
     if ( (*data)->qual ) {
       (*data)->qual = astFree( (*data)->qual );
     }
-  } else if (isSc2store) {
-    /* just the data array */
-    free( ((*data)->pntr)[0] );
   }
 
   /* finally free smfData */

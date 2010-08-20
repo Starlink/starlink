@@ -27,6 +27,13 @@
 #include "sc2math.h"
 #include "dream_par.h"
 
+/* Enable AST malloc usage for SMURF only */
+#ifdef PACKAGE_UPCASE
+#define malloc astMalloc
+#define free astFree
+#define calloc( count, size )   astCalloc( count, size, 1 )
+#endif
+
 /* The C99 standard does not define M_PI so we have to have a fallback.
    If we are running within SMURF we can include smurf_par.h
  */

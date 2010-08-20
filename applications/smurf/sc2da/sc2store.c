@@ -104,6 +104,13 @@ static int sc2store_zindf = NDF__NOID;       /* NDF identifier for compression z
 #  define SC2STORE_WRITE_HISTORY
 #endif
 
+/* Enable AST malloc usage */
+#ifdef PACKAGE_UPCASE
+#define malloc astMalloc
+#define free astFree
+#define calloc( count, size )   astCalloc( count, size, 1 )
+#endif
+
 /*+ sc2store_compress - compress frame of integers to unsigned short */
 
 void sc2store_compress
@@ -2632,7 +2639,7 @@ int *status           /* global status (given and returned) */
 
 /* Since HDS does not pad the buffer we need to pad it here */
 
-      tempstr = starMalloc ( (nlines * nchars) + 1 );
+      tempstr = malloc ( (nlines * nchars) + 1 );
       fseek ( fd, 0, SEEK_SET );
       fread ( tempstr, sizeof(*tempstr), inlen, fd );
       fclose ( fd );
@@ -2650,7 +2657,7 @@ int *status           /* global status (given and returned) */
       datFind ( xloc, "CONFIG", &temploc, status );
       dims[0] = nlines;
       datPutC ( temploc, 1, dims, tempstr, nchars, status );
-      starFree ( tempstr );
+      free ( tempstr );
 
    }
    else
