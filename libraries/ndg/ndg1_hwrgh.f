@@ -52,6 +52,9 @@
 *        Original version (taken from NDG_ENDGH).
 *     19-AUG-2010 (DSB):
 *        Remove each group from the KeyMap after it has been written out.
+*     21-AUG-2010 (DSB):
+*        Now that entries are removed from the KeyMap, we need to access
+*        keymap entry number 1 every time.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -98,10 +101,8 @@
       INTEGER JAT
       INTEGER NC
       INTEGER NEL
-      INTEGER NGRP
       INTEGER NLEFT
       INTEGER NPAR
-      INTEGER NPATH
       INTEGER NREM
 *.
 
@@ -111,7 +112,11 @@
 *  Loop round every entry in the GRP NDF history keymap.
       NPAR = AST_MAPSIZE( GHKMP_COM2, STATUS )
       DO IPAR = 1, NPAR
-         PARAM = AST_MAPKEY( GHKMP_COM2, IPAR, STATUS )
+
+*  Since the current KeyMap entry is removed at the end of this do loop,
+*  all later entries move down one slot, so we always access entry
+*  number 1.
+         PARAM = AST_MAPKEY( GHKMP_COM2, 1, STATUS )
          IF( AST_MAPGET0I( GHKMP_COM2, PARAM, IGRP, STATUS ) ) THEN
 
 *  Initialise the first line to hold the parameter name.
