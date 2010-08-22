@@ -2,7 +2,7 @@
      :                      MINPIX, RESULT, RESVAR, NCON, NBAD, STATUS )
 *+
 *  Name:
-*     CCG_IWC1<T>
+*     CCG_IWC1x
 
 *  Purpose:
 *     Combines data lines using the intensity-weighted co-ordinate.
