@@ -7,7 +7,7 @@
 *     FTS1_PHEAD
 
 *  Purpose:
-*     Process the headers in a FITS file on tape or disk.
+*     Processes the headers in a FITS file on tape or disk.
 
 *  Language:
 *     Starlink Fortran 77
@@ -235,7 +235,7 @@
 *     1996 November 24 (MJC):
 *        Revised FTS1_GKEYx calls.
 *     2004 September 1 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
 *     2010 April 19 (TIMJ):
 *        No longer allow tape.
 *     {enter_further_changes_here}

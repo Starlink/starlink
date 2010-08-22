@@ -5,7 +5,7 @@
 *     FTS1_FRMT
 
 *  Purpose:
-*     Obtain the input and output data format for a FITS file.
+*     Obtains the input and output data format for a FITS file.
 
 *  Language:
 *     Starlink Fortran 77

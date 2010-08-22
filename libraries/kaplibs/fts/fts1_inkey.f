@@ -5,7 +5,7 @@
 *     FTS1_INKEY
 
 *  Purpose:
-*     Insert keywords to a FITS card array.
+*     Inserts keywords to a FITS card array.
 
 *  Language:
 *     Starlink Fortran 77

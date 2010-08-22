@@ -7,7 +7,7 @@
 *     FTS1_DTYPE
 
 *  Purpose:
-*     Obtain the input data type, scales and offsets for a FITS file.
+*     Obtains the input data type, scales and offsets for a FITS file.
 
 *  Language:
 *     Starlink Fortran 77

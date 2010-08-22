@@ -4,7 +4,7 @@
 *     FTS1_AXIS
 
 *  Purpose:
-*     Create an axis structure within an NDF from FITS header
+*     Creates an axis structure within an NDF from FITS header
 *     information.
 
 *  Language:
@@ -85,7 +85,7 @@
 *     1996 November 24 (MJC):
 *        Modern style.  Revised FTS1_GKEYx calls.
 *     2004 September 1 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
 *     {enter_further_changes_here}
 
 *  Bugs:

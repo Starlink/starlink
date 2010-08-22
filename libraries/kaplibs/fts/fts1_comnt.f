@@ -5,7 +5,7 @@
 *     FTS1_COMNT
 
 *  Purpose:
-*     Get the value of a FITS COMMENT card from a buffer of cards.
+*     Gets the value of a FITS COMMENT card from a buffer of cards.
 
 *  Language:
 *     Starlink Fortran 77

@@ -5,7 +5,7 @@
 *     FTS1_SDSCF
 
 *  Purpose:
-*     Create a SCAR description file from a FITS table-format headers.
+*     Creates a SCAR description file from a FITS table-format headers.
 
 *  Language:
 *     Starlink Fortran 77

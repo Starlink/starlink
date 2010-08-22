@@ -6,7 +6,7 @@
 *     FTS1_RSTAB
 
 *  Purpose:
-*     Read the table format from a FITS file and write to an ASCII file.
+*     Reads the table format from a FITS file and write to a text file.
 
 *  Language:
 *     Starlink Fortran 77

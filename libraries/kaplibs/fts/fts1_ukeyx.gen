@@ -5,8 +5,8 @@
 *     FTS1_UKEYx
 
 *  Purpose:
-*     Writes the value of type <COMM> to the specified keyword from a
-*     buffer of FITS-header card images.
+*     Writes the value to the specified keyword from a buffer of 
+*     FITS-header card images.
 
 *  Language:
 *     Starlink Fortran 77
@@ -18,11 +18,11 @@
 *  Description:
 *     This routine searches a buffer containing the header card images
 *     from a FITS file for card with keyword %NAME; and, if found,
-*     override its original value with the given value %VALUE of type
-*     <COMM>.  The keyword can have a comment string leading by the
-*     character specified by %CMTBGN.  The search ends when the next
-*     end of a header block, marked by the END keyword, is encountered
-*     or the buffer is exhausted.  If the keyword is present %THERE is
+*     override its original value with the given value %VALUE.  The
+*     keyword can have a comment string leading by the character
+*     specified by %CMTBGN.  The search ends when the next end of a
+*     header block, marked by the END keyword, is encountered or the
+*     the buffer is exhausted.  If the keyword is present %THERE is
 *     true, otherwise it is false.  If the parameter is present more
 *     than once in the header, only the first occurence will be used.
 *
@@ -49,7 +49,7 @@
 *        48 characters.  This is to allow for the value, and indentation
 *        into a blank-keyword card (as hierarchical keywords are not
 *        standard and so cannot be part of the standard keyword name).
-*     VALUE = <TYPE> (Given)
+*     VALUE = ? (Given)
 *        The value to be used to override the original value of the
 *        keyword.
 *     CMTBGN = CHARACTER * ( 1 ) (Given)

@@ -6,7 +6,7 @@
 *     FTS1_GPARM
 
 *  Purpose:
-*     Add the group parameters to the FITS header records.
+*     Adds the group parameters to the FITS header records.
 
 *  Language:
 *     Starlink Fortran 77

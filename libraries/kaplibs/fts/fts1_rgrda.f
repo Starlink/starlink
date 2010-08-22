@@ -6,7 +6,7 @@
 *     FTS1_RGRDA
 
 *  Purpose:
-*     Read the data of a FITS file in group format from disk or tape.
+*     Reads the data of a FITS file in group format from disk or tape.
 
 *  Language:
 *     Starlink Fortran 77

@@ -5,8 +5,8 @@
 *     FTS1_GKEYx
 
 *  Purpose:
-*     Gets the value and comment of a named header of type <COMM> from
-*     a buffer of FITS-header card images.
+*     Gets the value and comment of a named header from a buffer of
+*     FITS-header card images.
 
 *  Language:
 *     Starlink Fortran 77

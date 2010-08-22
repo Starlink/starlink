@@ -7,7 +7,7 @@
 *     FTS1_SCTAB
 
 *  Purpose:
-*     Create an ASCII catalogue and description file in SCAR format
+*     Creates an ASCII catalogue and description file in SCAR format
 *     from a FITS tape or disk file.
 
 *  Language:

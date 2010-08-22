@@ -5,7 +5,7 @@
 *     FTS1_MANDH
 
 *  Purpose:
-*     Obtain the values of the mandatory headers in a FITS file.
+*     Obtains the values of the mandatory headers in a FITS file.
 
 *  Language:
 *     Starlink Fortran 77

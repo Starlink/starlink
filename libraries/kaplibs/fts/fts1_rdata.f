@@ -6,7 +6,7 @@
 *     FTS1_RDATA
 
 *  Purpose:
-*     Read the data of a FITS file on disk or tape.
+*     Reads the data of a FITS file on disk or tape.
 
 *  Language:
 *     Starlink Fortran 77

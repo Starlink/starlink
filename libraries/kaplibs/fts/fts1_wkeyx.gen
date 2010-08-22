@@ -5,7 +5,7 @@
 *     FTS1_WKEYx
 
 *  Purpose:
-*     Writes a FITS-header card for a value of type <COMM>.
+*     Writes a FITS-header card.
 
 *  Language:
 *     Starlink Fortran 77
@@ -15,9 +15,8 @@
 
 *  Description:
 *     This routine writes a FITS-header card using the supplied
-*     keyword, value, comment, and comment delimiter.  The value has
-*     data type <COMM>.  The name may be compound to permit writing
-*     of hierarchical keywords.
+*     keyword, value, comment, and comment delimiter.  The name may be
+*     compound to permit writing of hierarchical keywords.
 
 *  Arguments:
 *     NAME = CHARACTER *( * ) (Given)
@@ -31,7 +30,7 @@
 *        value, and indentation into a blank-keyword card (as
 *        hierarchical keywords are not standard and so cannot be part
 *        of the standard keyword name).
-*     VALUE = <TYPE> (Given)
+*     VALUE = ? (Given)
 *        The value of the keyword.
 *     CMTBGN = CHARACTER * ( 1 ) (Given)
 *        The character which indicates the beginning of the comment

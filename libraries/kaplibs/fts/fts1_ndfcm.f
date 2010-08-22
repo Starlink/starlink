@@ -5,7 +5,7 @@
 *     FTS1_NDFCM
 
 *  Purpose:
-*     Create the title, units, axes, wcs, and FITS extension in an NDF
+*     Creates the title, units, axes, WCS, and FITS extension in an NDF
 *     from the FITS headers.
 
 *  Language:

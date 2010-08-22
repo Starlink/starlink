@@ -6,7 +6,7 @@
 *     FTS1_SKIP
 
 *  Purpose:
-*     Skip over the data of a FITS file.
+*     Skips over the data of a FITS file.
 
 *  Language:
 *     Starlink Fortran 77

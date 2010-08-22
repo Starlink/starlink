@@ -5,8 +5,8 @@
 *     FTS1_CRNDF
 
 *  Purpose:
-*     For a FITS data array create an NDF, generating the NDF's name in
-*     some circumstances.
+*     Creates an NDF for a FITS data array, generating the NDF's name
+*     in some circumstances.
 
 *  Language:
 *     Starlink Fortran 77
