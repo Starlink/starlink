@@ -103,6 +103,7 @@
 *  Copyright:
 *     Copyright (C) 1990, 1991, 1992 Science & Engineering Research Council.
 *     Copyright (C) 2004 Central Laboratory of the Research Councils.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -145,7 +146,9 @@
 *     1992 April 23 (MJC):
 *        Allow a null table file, skipping over it.
 *     2004 September 1 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2010 August 22 (MJC):
+*        Modern commenting style.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -163,101 +166,83 @@
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
-      INTEGER
-     :  MD,
-     :  NCARD,
-     :  SCARD,
-     :  NDIM,
-     :  DIMS( NDIM ),
-     :  FD,
-     :  BLKSIZ,
-     :  SUBFIL
-
-      CHARACTER * ( * )
-     :  CFN,
-     :  HEADER( NCARD ) * 80,
-     :  MEDIUM,
-     :  PNDSCF,
-     :  PNTAB,
-     :  PREFIX
-
-      LOGICAL
-     :  LOGHDR,
-     :  AUTO
+      CHARACTER*80  HEADER( NCARD )
+      CHARACTER * ( * ) PNDSCF
+      CHARACTER * ( * ) PNTAB
+      CHARACTER * ( * ) MEDIUM
+      INTEGER MD
+      INTEGER NCARD
+      INTEGER SCARD
+      INTEGER NDIM
+      INTEGER DIMS( NDIM )
+      LOGICAL LOGHDR
+      INTEGER FD
+      CHARACTER * ( * ) CFN
+      INTEGER SUBFIL
+      CHARACTER * ( * ) PREFIX
+      LOGICAL AUTO
+      INTEGER BLKSIZ
 
 *  Arguments Given and Returned:
-      INTEGER
-     :  ACTSIZ,
-     :  OFFSET,
-     :  BFPNTR,
-     :  RCPNTR
-
-      LOGICAL
-     :  CURREC
+      INTEGER ACTSIZ
+      INTEGER BFPNTR
+      INTEGER OFFSET
+      LOGICAL CURREC
+      INTEGER RCPNTR
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  External References:
-      INTEGER
-     :  CHR_LEN                  ! String length less trailing blanks
+      INTEGER CHR_LEN            ! String length less trailing blanks
 
 *  Local Constants:
-      INTEGER RECLEN           ! FITS record length
+      INTEGER RECLEN             ! FITS record length
       PARAMETER ( RECLEN = 2880 )
 
 *  Local Variables:
-      INTEGER
-     :  IBR,                     ! Index of a right-hand bracket
-     :  IEX,                     ! Index of a period (first character in
-                                 ! a file extension)
-     :  NCFILN,                  ! Number of characters in file number
-     :  NCPREF,                  ! Number of characters in file prefix
-     :  NCROOT,                  ! Number of characters in file root
-                                 ! name
-     :  RDISP,                   ! The displacement within the current
-                                 ! FITS record
-     :  WKPNTR( 1 )              ! Pointer to work array
-
-      CHARACTER
-     :  DSCFNM * 204,            ! Description file's name
-     :  DUMMY * 80,              ! Buffer for output of message
-     :  FILNO * 6,               ! Number of file/subfile used to
+      CHARACTER*204 DSCFNM       ! Description file's name
+      CHARACTER*80 DUMMY         ! Buffer for output of message
+      CHARACTER*6 FILNO          ! Number of file/subfile used to
                                  ! generate output file names
-     :  MACHIN * ( 24 ),         ! Machine name
-     :  NODE * ( 20 ),           ! Node name
-     :  RELEAS * ( 10 ),         ! Release of operating system
-     :  SYSNAM * ( 10 ),         ! Operating system
-     :  TABNAM * 200,            ! Table's name
-     :  VERSIO * ( 10 )          ! Sub-version of operating system
-
-      CHARACTER*(DAT__SZLOC)     ! Locators for:
-     :  WKLOC                    !   workspace for data conversion
-
-      LOGICAL                    ! True if:
-     :  OVMS,                    ! The operating system is VMS or RSX
-     :  PATH                     ! There is a path to search through
+      INTEGER IBR                ! Index of a right-hand bracket
+      INTEGER IEX                ! Index of a period (first character in
+                                 ! a file extension)
+      CHARACTER*24 MACHIN        ! Machine name
+      INTEGER NCFILN             ! Number of characters in file number
+      INTEGER NCPREF             ! Number of characters in file prefix
+      INTEGER NCROOT             ! Number of characters in file root
+                                 ! name
+      CHARACTER*20 NODE          ! Node name
+      LOGICAL OVMS               ! The operating system is VMS or RSX?
+      LOGICAL PATH               ! There is a path to search through
+      INTEGER RDISP              ! The displacement within the current
+                                 ! FITS record
+      CHARACTER*10 RELEAS        ! Release of operating system
+      CHARACTER*10 SYSNAM        ! Operating system
+      CHARACTER*20 TABNAM        ! Table's name
+      CHARACTER*50 VERSIO        ! Sub-version of operating system
+      CHARACTER*(DAT__SZLOC) WKLOC ! Locator to workspace for data
+                                 ! conversion
+      INTEGER WKPNTR( 1 )        ! Pointer to work array
 
 *.
 
-*    Check inherited global status.
-
+*  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Initialise the record-displacement pointer.
-*    ===========================================
+*  Initialise the record-displacement pointer.
+*  ===========================================
 
-*    The FITS data must start in a new record.  Now this record may
-*    already be the current FITS record; in this case the record should
-*    be procesed from its start, hence a zero displacement.  The flag
-*    can be switched off as this positioning information is imparted
-*    to the record displacement.  If the current record is not the
-*    first FITS record containing the data, set the the displacement
-*    to the end of the FITS record.  This will cause a new record be
-*    read.  For simple FITS the displacement will be either 0 or 2880.
-*    This is only needed in thisd routine to permit tables to be
-*    skipped.
-
+*  The FITS data must start in a new record.  Now this record may
+*  already be the current FITS record; in this case the record should
+*  be procesed from its start, hence a zero displacement.  The flag
+*  can be switched off as this positioning information is imparted
+*  to the record displacement.  If the current record is not the
+*  first FITS record containing the data, set the the displacement
+*  to the end of the FITS record.  This will cause a new record be
+*  read.  For simple FITS the displacement will be either 0 or 2880.
+*  This is only needed in thisd routine to permit tables to be skipped.
       IF ( CURREC ) THEN
          RDISP = 0
          CURREC = .FALSE.
@@ -265,36 +250,29 @@
          RDISP = RECLEN
       END IF
 
-*    Automatic mode
-*    ==============
+*  Automatic mode
+*  ==============
 
-*    In automatic mode we have to generate a file name for the table.
-
+*  In automatic mode we have to generate a file name for the table.
       IF ( AUTO ) THEN
 
-*       Get the length of the file name or number.
-
+*  Get the length of the file name or number.
          NCFILN = CHR_LEN( CFN )
 
-*       The file is specified by a number for a tape.
-
+*  The file is specified by a number for a tape.
          IF ( MEDIUM .EQ. 'TAPE' ) THEN
 
-*          The table's name is the prefix followed by the file number.
-
+*  The table's name is the prefix followed by the file number.
             NCPREF = CHR_LEN( PREFIX )
             TABNAM = PREFIX( :NCPREF )//CFN( :NCFILN )
 
-*          Find the new length of the name string.
-
+*  Find the new length of the name string.
             NCROOT = NCPREF + NCFILN
 
-*       The file is specified by name for disk file.
-
+*  The file is specified by name for disk file.
          ELSE IF ( MEDIUM .EQ. 'DISK' ) THEN
 
-*          Find the operating system.
-
+*  Find the operating system.
             CALL PSX_UNAME( SYSNAM, NODE, RELEAS, VERSIO, MACHIN,
      :                      STATUS )
             CALL CHR_UCASE( SYSNAM )
@@ -302,25 +280,21 @@
             OVMS = INDEX( SYSNAM, 'VMS' ) .NE. 0 .OR.
      :             INDEX( SYSNAM, 'RSX' ) .NE. 0
 
-*          Extract the filename.
-*          =====================
-*
+*  Extract the filename.
+*  =====================
             IF ( OVMS ) THEN
 
-*             First look for a right bracket for a directory.  The
-*             filename will start one character after that or from the
-*             first character.
-
+*  First look for a right bracket for a directory.  The filename will
+*  start one character after that or from the first character.
                IBR = INDEX( CFN, ']' )
 
-*             Look for the start of the file extension.
-
+*  Look for the start of the file extension.
                IEX = INDEX( CFN( MAX( 1, IBR ): ), '.' )
 
             ELSE
 
-*             It is a UNIX name. Remove any path present in the command
-*             to derive the command name by looking for the last slash.
+*  It is a UNIX name. Remove any path present in the command
+*  to derive the command name by looking for the last slash.
                PATH = .TRUE.
                IEX = 0
                IBR = 0
@@ -330,14 +304,12 @@
                   IBR = IBR + IEX
                END DO
 
-*             Look for the start of the file extension.
-
+*  Look for the start of the file extension.
                IEX = INDEX( CFN( MAX( 1, IBR ): ), '.' )
             END IF
 
-*          The name extends to one character less than the extension.
-*          Find the new length of the name string and extract the name.
-
+*  The name extends to one character less than the extension.
+*  Find the new length of the name string and extract the name.
             IF ( IEX .EQ. 0 ) THEN
                NCROOT = NCFILN
                TABNAM = CFN
@@ -350,9 +322,8 @@
             END IF
          END IF
 
-*       Special case when more than one `data unit' (n-d array, table)
-*       per FITS file so have to distinguish between sub-files.
-
+*  Special case when more than one `data unit' (n-d array, table)
+*  per FITS file so have to distinguish between sub-files.
          IF ( SUBFIL .GT. 1 ) THEN
             CALL CHR_ITOC( SUBFIL, FILNO, NCFILN )
             CALL CHR_APPND( '_'//FILNO( :NCFILN ), TABNAM, NCROOT )
@@ -360,9 +331,8 @@
          END IF
       END IF
 
-*    Generate the FACTS file from the header cards.
-*    ==============================================
-
+*  Generate the FACTS file from the header cards.
+*  ==============================================
       CALL FTS1_SDSCF( NCARD, HEADER, SCARD, PNDSCF, AUTO, TABNAM,
      :                 DSCFNM, NDIM, DIMS, STATUS )
 
@@ -372,8 +342,7 @@
 
          IF ( LOGHDR ) THEN
 
-*          Write output filename to the log file.
-
+*  Write output filename to the log file.
             CALL FIO_WRITE( FD, ' ', STATUS )
             IF ( DSCFNM .EQ. ' ' ) THEN
                DUMMY = 'No description file has been created.'
@@ -383,16 +352,14 @@
             CALL FIO_WRITE( FD, DUMMY, STATUS )
          END IF
 
-*       Create the table file and copy data into it.
-*       ============================================
+*  Create the table file and copy data into it.
+*  ============================================
 
-*       Get some workspace to store a line of the table, and map it.
-
+*  Get some workspace to store a line of the table, and map it.
          CALL AIF_GETVM( '_BYTE', 1, DIMS( 1 ) + 1, WKPNTR( 1 ), WKLOC,
      :                   STATUS)
 
-*       Create a character descriptor to this workspace
-
+*  Create a character descriptor to this workspace
          CALL GRP1_CDESC( DIMS( 1 ) + 1, WKPNTR( 1 ), STATUS )
 
          IF ( STATUS .NE. SAI__OK ) THEN
@@ -403,57 +370,48 @@
             GOTO 999
          END IF
 
-*       Start a new error context.
-
+*  Start a new error context.
          CALL ERR_MARK
 
-*       Create the table file and copy data into it.  Note the dummy
-*       length argument after the status is needed for passing the
-*       mapped character array on UNIX platforms.  It is ignored on VMS.
-
+*  Create the table file and copy data into it.  Note the dummy
+*  length argument after the status is needed for passing the
+*  mapped character array on UNIX platforms.  It is ignored on VMS.
          CALL FTS1_RSTAB( %VAL( CNF_PVAL( WKPNTR( 1 ) ) ),
      :                    MEDIUM, MD, PNTAB,
      :                    TABNAM, AUTO, DIMS( 1 ), DIMS( 2 ), BLKSIZ,
      :                    ACTSIZ, %VAL( CNF_PVAL( BFPNTR ) ),
      :                    OFFSET, CURREC,
      :                    %VAL( CNF_PVAL( RCPNTR ) ), STATUS,
-     :                    %VAL( DIMS( 1 )+1 ) )
+     :                    %VAL( DIMS( 1 ) + 1 ) )
 
-*       Check for option not to create file.
-
+*  Check for option not to create file.
          IF ( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
             CALL MSG_OUT( 'NOOUT',
      :        'Null parameter -- no output file created', STATUS )
 
-*          If there may be extensions following the data in this
-*          FITS sub-file to be processed, so the data in the current
-*          sub-file must be skipped over.  Offset on exit is at the
-*          end of a record.  The size is the number of characters per
-*          line times the number of lines in the table.  There is 1 byte
-*          per value, a GCOUNT of 1, and PCOUNT of 0.
-
+*  If there may be extensions following the data in this FITS sub-file
+*  to be processed, so the data in the current sub-file must be skipped
+*  over.  Offset on exit is at the end of a record.  The size is the
+*  number of characters per line times the number of lines in the table.
+*  There is one byte per value, a GCOUNT of 1, and PCOUNT of 0.
             CALL FTS1_SKIP( MEDIUM, MD, DIMS( 1 ) * DIMS( 2 ), 1, 1, 0,
      :                      BLKSIZ, ACTSIZ, %VAL( CNF_PVAL( BFPNTR ) ),
      :                      OFFSET,
      :                      %VAL( CNF_PVAL( RCPNTR ) ), RDISP, STATUS )
 
-*          Release the error context.
-
+*  Release the error context.
             CALL ERR_RLSE
 
-*          Tidy the workspace.
-
+*  Tidy the workspace.
             CALL AIF_ANTMP( WKLOC, STATUS )
 
             GO TO 999
 
-*       Any errors creating the table?
-
+*  Any errors creating the table?
          ELSE IF ( STATUS .NE. SAI__OK ) THEN
 
-*          Report errors and abort.
-
+*  Report errors and abort.
             IF ( STATUS .NE. PAR__ABORT ) THEN
                CALL ERR_REP( 'FTS1_SCTAB_NOFILE',
      :           'FITSIN: No table file created.', STATUS )
@@ -464,21 +422,18 @@
             GOTO 999
          END IF
 
-*       Release the new error context.
-
+*  Release the new error context.
          CALL ERR_RLSE
 
          IF ( LOGHDR .AND. TABNAM .NE. ' ' ) THEN
 
-*          Write output filename to the log file.
-
+*  Write output filename to the log file.
             CALL FIO_WRITE( FD, ' ', STATUS )
             DUMMY = 'The created table file is '//TABNAM//'.'
             CALL FIO_WRITE( FD, DUMMY, STATUS )
          END IF
 
-*       Tidy the workspace.
-
+*  Tidy the workspace.
          CALL AIF_ANTMP( WKLOC, STATUS )
 
       END IF

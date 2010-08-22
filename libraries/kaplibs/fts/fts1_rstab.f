@@ -98,6 +98,7 @@
 *  Copyright:
 *     Copyright (C) 2010 Science & Technology Facilities Council.
 *     Copyright (C) 1989, 1990, 1992 Science & Engineering Research Council.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -151,6 +152,8 @@
 *        Included extra argument in calls to FTS1_DREAD.
 *     2010 April 19 (TIMJ):
 *        Remove TAPE option.
+*     2010 August 22 (MJC):
+*        Modern commenting style.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -159,86 +162,65 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT  NONE           ! no default typing allowed
+      IMPLICIT  NONE             ! no default typing allowed
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'        ! Standard SAE constants
-      INCLUDE 'PAR_ERR'        ! Parameter-system error constants
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PAR_ERR'          ! Parameter-system error constants
 
 *  Arguments Given:
-      INTEGER
-     :  AXIS1,                 ! Number of characters in a line of the
-                               ! table
-     :  AXIS2,                 ! Number of lines in the table
-     :  BLKSIZ,                ! The maximum allowed blocksize on
-                               ! the FITS tape or disk
-     :  MD                     ! Medium descriptor
-
-      CHARACTER * ( * )
-     :  MEDIUM,                ! Data medium
-     :  PNTABL,                ! Parameter name for the table file
-     :  TABNAM                 ! Suggested name of the table file
-
-      LOGICAL                  ! True if:
-     :  AUTO                   ! Supplied table name is to be used
+      CHARACTER * ( * ) MEDIUM
+      INTEGER MD
+      CHARACTER * ( * ) PNTABL
+      CHARACTER * ( * ) TABNAM
+      LOGICAL AUTO
+      INTEGER AXIS1
+      INTEGER AXIS2
+      INTEGER BLKSIZ
 
 *  Arguments Given and Returned:
-      INTEGER
-     :  ACTSIZ,                ! The actual blocksizes on the FITS tape
-                               ! or disk
-     :  OFFSET                 ! The number of bytes of the input
-                               ! block that must be skipped. Equal to
-                               ! ACTSIZ means read a new block.
-
-      LOGICAL                  ! True if:
-     :  CURREC                 ! The current is to be used immediately
-
-      BYTE
-     :  BUFFER( BLKSIZ ),      ! The input buffer
-     :  RECORD( 2880 )         ! Current FITS record
+      INTEGER ACTSIZ
+      BYTE BUFFER( BLKSIZ )
+      INTEGER OFFSET
+      LOGICAL CURREC
+      BYTE RECORD( 2880 )
 
 *  Arguments Returned:
-      CHARACTER * ( * )
-     :  TABLE                  ! One line in the table
+      CHARACTER * ( * ) TABLE    ! Should appear last but one in API
 
 *  Status:
-      INTEGER STATUS           ! Global status
+      INTEGER STATUS             ! Global status
 
 *  Local Constants:
-      INTEGER RECLEN           ! FITS record length
+      INTEGER RECLEN             ! FITS record length
       PARAMETER ( RECLEN = 2880 )
 
 *  Local Variables:
-      INTEGER
-     :  DISP,                  ! Displacement pointer
-     :  FCH,                   ! Number of the first character in the
-                               ! table's line of data to be copied (for
-                               ! a line spanning two records)
-     :  FD,                    ! Table file description
-     :  I,                     ! Index
-     :  J,                     ! Loop counter
-     :  NBT,                   ! Number of bytes in input buffer
-                               ! to be transferred to the data array
-     :  NBYTES,                ! Number of bytes in data array
-     :  NCTC,                  ! Number of characters to copy from the
-                               ! record
-     :  NREC,                  ! Current number of the line in the table
-     :  RDISP                  ! The displacement within the current
-                               ! FITS record
-
-      LOGICAL                  ! True if:
-     :  OPEN,                  ! Output table file is open
-     :  PRTIAL                 ! Only part of the line of data has been
-                               ! copied from the record
+      INTEGER DISP               ! Displacement pointer
+      INTEGER FCH                ! Number of the first character in the
+                                 ! table's line of data to be copied
+                                 ! (for a line spanning two records)
+      INTEGER FD                 ! Table file description
+      INTEGER I                  ! Index
+      INTEGER J                  ! Loop counter
+      INTEGER NBT                ! Number of bytes in input buffer
+                                 ! to be transferred to the data array
+      INTEGER NBYTES             ! Number of bytes in data array
+      INTEGER NCTC               ! Number of characters to copy from the
+                                 ! record
+      INTEGER NREC               ! Current number of the line in the table
+      LOGICAL OPEN               ! Is output table file open?
+      LOGICAL PRTIAL             ! Only part of the line of data has
+                                 ! been copied from the record?
+      INTEGER RDISP              ! The displacement within the current
+                                 ! FITS record
 
 *.
 
-*    Check for an error on entry.
-
+*  Check for an error on entry.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Make sure the medium is permitted.
-
+*  Make sure the medium is permitted.
       IF ( MEDIUM .NE. 'DISK' ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'MEDIUM', MEDIUM )
@@ -248,10 +230,9 @@
          GOTO 999
       END IF
 
-*    The FITS data must start in a new record, so set the displacement
-*    to the end of the FITS record.  This will cause a new record be
-*    read.  The exception is when the current FITS record is to be used.
-
+*  The FITS data must start in a new record, so set the displacement
+*  to the end of the FITS record.  This will cause a new record be
+*  read.  The exception is when the current FITS record is to be used.
       IF ( CURREC ) THEN
          RDISP = 0
          CURREC = .FALSE.
@@ -259,22 +240,19 @@
          RDISP = RECLEN
       END IF
 
-*    Calculate the number of bytes in the data.
-
+*  Calculate the number of bytes in the data.
       NBYTES = AXIS1 * AXIS2
 
       IF ( AUTO ) THEN
 
-*       Open the table file, since its name is known.
-
+*  Open the table file, since its name is known.
          CALL AIF_OPFIO( TABNAM, 'WRITE', 'FORTRAN', AXIS1 + 1, FD,
      :                   OPEN, STATUS )
 
          IF ( STATUS .NE. SAI__OK .OR. .NOT. OPEN ) GOTO 980
       ELSE
 
-*       Help the user because there is no dynamic default.
-
+*  Help the user because there is no dynamic default.
          CALL MSG_OUT( 'BLANK', ' ', STATUS )
          CALL MSG_OUT( 'TABLEN', 'The name of the table file itself '/
      :     /'should be the name of the FACTS description', STATUS )
@@ -283,8 +261,7 @@
          CALL MSG_SETC( 'TABLENAME', TABNAM )
          CALL MSG_OUT( 'TABLEN2', 'table is ^TABLENAME', STATUS )
 
-*       Attempt to obtain and open a catalogue file.
-
+*  Attempt to obtain and open a catalogue file.
          CALL FIO_ASSOC( PNTABL, 'WRITE', 'FORTRAN', AXIS1 + 1, FD,
      :                   STATUS )
 
@@ -294,8 +271,7 @@
             GOTO 999
          END IF
 
-*       Obtain the file name associated with the parameter.
-
+*  Obtain the file name associated with the parameter.
          CALL AIF_FLNAM( PNTABL, TABNAM, STATUS )
       END IF
 
@@ -303,15 +279,13 @@
       CALL MSG_OUT( 'TABLEINF', 'The table file is being '/
      :  /'written to ^TABLENAME', STATUS )
 
-*    Are there data already read in the last block of header cards,
-*    waiting to be transferred to the array?
-
+*  Are there data already read in the last block of header cards,
+*  waiting to be transferred to the array?
       IF ( RDISP .EQ. RECLEN ) THEN
 
-*       No so must read another record.
+*  No, so must read another record.
 
-*       Read the disk file.
-
+*  Read the disk file.
          CALL FTS1_DREAD( MD, BLKSIZ, ACTSIZ, .FALSE., BUFFER,
      :                    OFFSET, RECORD, STATUS )
 
@@ -322,41 +296,34 @@
             GOTO 980
          END IF
 
-*       Start of a new record so reset the record displacement.
-
+*  Start of a new record so reset the record displacement.
          RDISP = 0
       END IF
 
-*    Initialise the displacement pointer.
-
+*  Initialise the displacement pointer.
       DISP = 0
       PRTIAL = .FALSE.
       FCH = 1
       NREC = 0
 
-*    Read the blocks of data.
-
+*  Read the blocks of data.
       DO WHILE ( DISP .LT. NBYTES )
 
-*       Determine the maximum number of bytes of data in current
-*       record to be transferred to the data array.
-
+*  Determine the maximum number of bytes of data in current
+*  record to be transferred to the data array.
          NBT = RECLEN - RDISP
 
-*       Determine which elements are to be copied.
-
+*  Determine which elements are to be copied.
          IF ( NBT .LT. AXIS1 ) THEN
 
-*          This is the start of a broken line.
-
+*  This is the start of a broken line.
             PRTIAL = .TRUE.
             FCH = 1
             NCTC = NBT
 
          ELSE
 
-*          This is the end of a broken line.
-
+*  This is the end of a broken line.
             IF ( PRTIAL ) THEN
                FCH = NCTC + 1
             ELSE
@@ -367,21 +334,18 @@
             NCTC = AXIS1 + 1 - FCH
          END IF
 
-*       Copy the data from the FITS record to the character buffer.
-
+*  Copy the data from the FITS record to the character buffer.
          DO  J = FCH, NCTC + FCH - 1
             I = RECORD( J + 1 - FCH + RDISP )
             TABLE( J+1:J+1 ) = CHAR( I )
          END DO
 
-*       The line is complete so write it to the catalogue.
-
+*  The line is complete so write it to the catalogue.
          IF ( .NOT. PRTIAL ) THEN
             NREC = NREC + 1
             CALL FIO_WRITE( FD, TABLE, STATUS )
 
-*          Report the error context.
-
+*  Report the error context.
             IF ( STATUS .NE. SAI__OK ) THEN
                CALL MSG_SETI( 'N', NREC )
                CALL ERR_REP( 'FTS1_RSTAB_WRTAB',
@@ -391,34 +355,27 @@
                GOTO 980
             END IF
 
-*          Keep count of the number of bytes of the catalogue read so
-*          far.
-
+*  Keep count of the number of bytes of the catalogue read so far.
             DISP = DISP + AXIS1
 
-*          Update the displacement in bytes within the current record.
-*          The "1 - FCH" term allows for broken lines.  It is zero
-*          normally.
-
+*  Update the displacement in bytes within the current record.  The
+*  "1 - FCH" term allows for broken lines.  It is zero normally.
             RDISP = MOD( RDISP + AXIS1 + 1 - FCH, RECLEN )
             IF ( RDISP .EQ. 0 ) RDISP = RECLEN
          ELSE
 
-*          The remainder of the record is now at the start of the next
-*          line of the table.  Therefore, the record is exhausted, and
-*          so the displacement is adjusted so that a new record is read
-*          immediately.
-
+*  The remainder of the record is now at the start of the next line of
+*  the table.  Therefore, the record is exhausted, and so the
+*  displacement is adjusted so that a new record is read immediately.
             RDISP = RECLEN
          END IF
 
          IF ( NREC .LT. AXIS2 .AND. RDISP .EQ. RECLEN ) THEN
 
-*          The current block is exhausted, so read in the next when
-*          there are more lines of the table to read.
+*  The current block is exhausted, so read in the next when there are
+*  more lines of the table to read.
 
-*          Read the disk file.
-
+*  Read the disk file.
             CALL FTS1_DREAD( MD, BLKSIZ, ACTSIZ, .FALSE., BUFFER,
      :                       OFFSET, RECORD, STATUS )
 
@@ -430,22 +387,19 @@
                GOTO 980
             END IF
 
-*          Start of a new record so reset the record displacement.
-
+*  Start of a new record so reset the record displacement.
             RDISP = 0
 
          END IF
 
       END DO
 
-*    Close the table file.
-
+*  Close the table file.
   980 CONTINUE
       IF ( AUTO ) THEN
          CALL FIO_CLOSE( FD, STATUS )
 
-*    Cancel the table parameter as we may be in a loop.
-
+*  Cancel the table parameter as we may be in a loop.
       ELSE
          CALL FIO_CANCL( PNTABL, STATUS )
       END IF

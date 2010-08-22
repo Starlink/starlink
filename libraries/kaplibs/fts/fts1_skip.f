@@ -1,6 +1,6 @@
-      SUBROUTINE FTS1_SKIP ( MEDIUM, MD, SIZE, BPV, GCOUNT, PCOUNT,
-     :                       BLKSIZ, ACTSIZ, BUFFER, OFFSET, RECORD,
-     :                       RDISP, STATUS )
+      SUBROUTINE FTS1_SKIP( MEDIUM, MD, SIZE, BPV, GCOUNT, PCOUNT,
+     :                      BLKSIZ, ACTSIZ, BUFFER, OFFSET, RECORD,
+     :                      RDISP, STATUS )
 *+
 *  Name:
 *     FTS1_SKIP
@@ -12,8 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL FTS1_SKIP ( MEDIUM, MD, SIZE, BPV, GCOUNT, PCOUNT, BLKSIZ,
-*    :                 ACTSIZ, BUFFER, OFFSET, RECORD, RDISP, STATUS )
+*     CALL FTS1_SKIP( MEDIUM, MD, SIZE, BPV, GCOUNT, PCOUNT, BLKSIZ,
+*    :                ACTSIZ, BUFFER, OFFSET, RECORD, RDISP, STATUS )
 
 *  Description:
 *     This routine skips over the data in a FITS file by reading the
@@ -75,8 +75,8 @@
 *     End
 
 *  Copyright:
-*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     Copyright (C) 1989, 1990, 1992 Science & Engineering Research Council.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -117,6 +117,8 @@
 *        Added extra argument to FTS1_DREAD calls.
 *     2010 April 19 (TIMJ):
 *        Remove TAPE option.
+*     2010 August 22 (MJC):
+*        Modern commenting style.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -125,62 +127,48 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT  NONE           ! no default typing allowed
+      IMPLICIT  NONE             ! no default typing allowed
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'        ! Standard SAE constants
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Arguments Given:
-      INTEGER
-     :  BLKSIZ,                ! The maximum allowed blocksize on
-                               ! the FITS tape
-     :  BPV,                   ! Number of bytes per value
-     :  GCOUNT,                ! Number of groups in the file
-     :  MD,                    ! Medium descriptor
-     :  PCOUNT,                ! Number of parameters per group
-     :  SIZE                   ! Number of elements in the data array
-
-      CHARACTER * ( * )
-     :  MEDIUM                 ! Data medium
+      CHARACTER * ( * ) MEDIUM
+      INTEGER MD
+      INTEGER SIZE
+      INTEGER BPV
+      INTEGER GCOUNT
+      INTEGER PCOUNT
+      INTEGER BLKSIZ
 
 *  Arguments Given and Returned:
-      INTEGER
-     :  ACTSIZ,                ! The actual blocksizes on the FITS tape
-                               ! or disk
-     :  OFFSET,                ! The number of bytes of the input
-                               ! block that must be skipped. Equal to
-                               ! ACTSIZ means read a new block.
-     :  RDISP                  ! The displacement within the current
-                               ! FITS record
-
-      BYTE
-     :  BUFFER( BLKSIZ ),      ! The input buffer
-     :  RECORD( 2880 )         ! Current FITS record
+      INTEGER ACTSIZ
+      BYTE BUFFER( BLKSIZ )
+      INTEGER OFFSET
+      BYTE RECORD( 2880 )
+      INTEGER RDISP
 
 *  Status:
       INTEGER STATUS
 
 *  Local Constants:
-      INTEGER RECLEN           ! FITS record length
+      INTEGER RECLEN             ! FITS record length
       PARAMETER ( RECLEN = 2880 )
 
 *  Local Variables:
-      INTEGER
-     :  ACTNBT,                ! Number of bytes in input buffer
-                               ! actually skipped
-     :  DISP,                  ! Displacement pointer
-     :  NBT,                   ! Maximum number of bytes in input buffer
-                               ! to be skipped
-     :  NBYTES                 ! Number of bytes in the file
+      INTEGER ACTNBT             ! Number of bytes in input buffer
+                                 ! actually skipped
+      INTEGER DISP               ! Displacement pointer
+      INTEGER NBT                ! Maximum number of bytes in input
+                                 ! buffer to be skipped
+      INTEGER NBYTES             ! Number of bytes in the file
 
 *.
 
-*    Check for an error on entry.
-
+*  Check for an error on entry.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Make sure the medium is permitted.
-
+*  Make sure the medium is permitted.
       IF ( MEDIUM .NE. 'DISK' ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'MEDIUM', MEDIUM )
@@ -190,33 +178,27 @@
          GOTO 999
       END IF
 
-*    Calculate the number of bytes in the FITS file.
-
+*  Calculate the number of bytes in the FITS file.
       NBYTES = BPV * GCOUNT * ( PCOUNT + SIZE )
 
-*    Initialise the displacement pointer.
-
+*  Initialise the displacement pointer.
       DISP = 0
 
-*    Read the blocks of data.
-*    ========================
-
+*  Read the blocks of data.
+*  ========================
       DO WHILE ( DISP .LT. NBYTES )
 
-*       Are there data already read in the last block of
-*       header cards, waiting to be transferred to the array?
-
+*  Are there data already read in the last block of
+*  header cards, waiting to be transferred to the array?
          IF ( RDISP .EQ. RECLEN ) THEN
 
-*          No the buffer has been exhausted.
+*  No the buffer has been exhausted.
 
-*          Read the disk file.
-
+*  Read the disk file.
             CALL FTS1_DREAD( MD, BLKSIZ, ACTSIZ, .FALSE., BUFFER,
      :                       OFFSET, RECORD, STATUS )
 
-*          Error reading the FITS file.  Report context and abort.
-
+*  Error reading the FITS file.  Report context and abort.
             IF ( STATUS .NE. SAI__OK ) THEN
                CALL MSG_SETI( 'DISP', DISP )
                CALL ERR_REP( 'FTS1_SKIP_READ',
@@ -225,28 +207,23 @@
                GOTO 999
             END IF
 
-*          Start of a new record so reset the record displacement.
-
+*  Start of a new record so reset the record displacement.
             RDISP = 0
 
          END IF
 
-*       Determine the number of bytes remaining in the current record.
-
+*  Determine the number of bytes remaining in the current record.
          NBT = RECLEN - RDISP
 
-*       Now the actual number to be transferred.
-
+*  Now the actual number to be transferred.
          ACTNBT = MIN( NBT, NBYTES - DISP )
 
-*       Increment the displacement.
-
+*  Increment the displacement.
          DISP = DISP + ACTNBT
 
-*       Compute the offset in the current record for any further data,
-*       both within the primary data array and in any FITS groups.  If
-*       this is equal to RECLEN further data will be in a new record.
-
+*  Compute the offset in the current record for any further data,
+*  both within the primary data array and in any FITS groups.  If
+*  this is equal to RECLEN further data will be in a new record.
          RDISP = RDISP + ACTNBT
       END DO
 
