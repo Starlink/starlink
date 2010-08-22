@@ -2,7 +2,7 @@
      :                     RESULT, RESVAR, NCON, NBAD, STATUS )
 *+
 *  Name:
-*     CCG1_AD1x
+*     CCG_AD1x
 
 *  Purpose:
 *     Combines data lines using absolute deviations from an unweighted
@@ -12,8 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCG1_AD1x( NPIX, NLINES, STACK, MINPIX,
-*                     RESULT, RESVAR, NCON, NBAD, STATUS )
+*     CALL CCG_AD1x( NPIX, NLINES, STACK, MINPIX,
+*                    RESULT, RESVAR, NCON, NBAD, STATUS )
 
 *  Description:
 *     This routine accepts an array consisting of a series of
