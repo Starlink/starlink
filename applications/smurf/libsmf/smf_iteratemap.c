@@ -83,10 +83,31 @@
 *        Pointer to global status.
 
 *  Description:
-*     This function uses an iterative algorithm to separately estimate
-*     the component of the bolometer signals that are astronomical signal,
-*     atmospheric signal, and residual Gaussian noise, and creates a rebinned
-*     map of the astronomical signal.
+*     This function uses an iterative algorithm to estimate a number
+*     of different model signal model components which, when added
+*     together, fit the observed bolometer signals. One of these
+*     models is the astronomical signal which is represented both as a
+*     map (the ultimate goal of map-making), and the signal it would
+*     produce as the bolometers scan across it).
+*
+*     There are two primary loops over that data that one should be
+*     aware of.  The first is the concept of a continuous chunk, or
+*     "contchunk". This is a piece of un-interrupted data, usually
+*     made by concatenating a number of smaller files together. This
+*     operation is necessary because the SCUBA-2 data acquisition
+*     system usually splits up data in to pieces that are 30 s long
+*     and stores them in separate files. The other loop seen
+*     throughout the code is file subgroup, or "filegroup" for
+*     short. For machines with little memory it is not possible to
+*     load all of the data for a given contchunk at once. A single
+*     file subgroup is normally the list of single 30s files for all
+*     SCUBA-2 subarrays at a given instant in time. For this
+*     low-memory usage case the configuration parameter "memiter" must
+*     be set to 0. Then, within each iteration of the map-maker there
+*     will be a loop over "nfilegroups" of these files (i.e. the
+*     number of 30 s files per subarray). For normal, "memiter=1"
+*     usage, nfilegroups is simply set to 1 (i.e. there is no file i/o
+*     within the iteration loop).
 *
 *  Authors:
 *     EC: Edward Chapin (UBC)
@@ -304,6 +325,9 @@
 *        Factored out writing of itermap extension to smf_write_itermap
 *     2010-08-20 (EC):
 *        Factored bolomaps/shortmaps out to smf_write_[bolomap]/[shortmap]
+*     2010-08-23 (EC):
+*        -Re-name chunk --> filegroup throughout for clarity
+*        -Improve commenting of the major blocks in the code
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -379,7 +403,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   size_t bstride;               /* Bolometer stride */
   double *chisquared=NULL;      /* chisquared for each chunk each iter */
   double chitol=0;              /* chisquared change tolerance for stopping */
-  size_t contchunk;             /* Which chunk in outer loop */
+  size_t contchunk;             /* Continuous chunk in outer loop counter */
   int converged=0;              /* Has stopping criteria been met? */
   smfDIMMData dat;              /* Struct passed around to model components */
   smfData *data=NULL;           /* Temporary smfData pointer */
@@ -414,10 +438,10 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int *lut_data=NULL;           /* Pointer to DATA component of lut */
   smfGroup *lutgroup=NULL;      /* smfGroup of lut model files */
   double *mapweightsq=NULL;     /* map weight squared */
-  dim_t maxconcat;              /* Longest continuous chunk length in samples*/
+  dim_t maxconcat;              /* Longest continuous chunk that fits in mem.*/
   dim_t maxfile;                /* Longest file length in time samples*/
   int maxiter=0;                /* Maximum number of iterations */
-  dim_t maxlen=0;               /* Max chunk length in samples */
+  dim_t maxlen=0;               /* Max length in timeslices of cont. chunk */
   int memiter=0;                /* If set iterate completely in memory */
   size_t memneeded;             /* Memory required for map-maker */
   smfArray ***model=NULL;       /* Array of pointers smfArrays for ea. model */
@@ -430,7 +454,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   dim_t msize;                  /* Number of elements in map */
   char name[GRP__SZNAM+1];      /* Buffer for storing exported model names */
   dim_t nbolo;                  /* Number of bolometers */
-  dim_t nchunks=0;              /* Number of chunks within iteration loop */
+  dim_t nfilegroups=0;          /* Number files/subarray within iteration loop*/
   size_t ncontchunks=0;         /* Number continuous chunks outside iter loop*/
   int nm=0;                     /* Signed int version of nmodels */
   dim_t nmodels=0;              /* Number of model components / iteration */
@@ -493,8 +517,22 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   /* Get size of the input group */
   isize = grpGrpsz( igrp, status );
 
-  /* Parse the CONFIG parameters stored in the keymap. We assume that
-     all variables have been given defaults through the .def file. */
+
+
+
+
+
+
+
+
+
+
+  /* ***************************************************************************
+     Parse the CONFIG parameters stored in the keymap, and set up
+     defaults for the map-maker. We assume that all variables have
+     been given defaults through the .def file.
+  **************************************************************************** */
+
   if( *status == SAI__OK ) {
     /* Number of iterations */
     astMapGet0I( keymap, "NUMITER", &numiter );
@@ -679,7 +717,6 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
              status);
     }
 
-
     /* Will we export components to NDF files at the end? */
     if( (*status==SAI__OK) && astMapHasKey( keymap, "EXPORTNDF" ) ){
       /* There are two possibilities: (i) the user specified a "1" or
@@ -765,15 +802,34 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
              " ", "  ^MNAME", status );
   }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+  /* ****************************************************************************
+     Figure out how the data are split up, both in terms of continuous
+     pieces of data in time, and in terms of the number of subarrays. Divide
+     up the chunks, as needed, to fit in the available memory.
+  **************************************************************************** */
+
   /* Create an ordered smfGrp which keeps track of files corresponding
      to different subarrays (observed simultaneously), as well as
      time-ordering the files. Now added "chunk" to smfGroup as well --
-     this is used to concatenate _only_ continuous pieces of data. Maxconcat
-     will be the length of the largest continuous chunk, or maxlen,
-     whichever comes first -- but excluding padding. */
+     this is used later to concatenate _only_ continuous pieces of
+     data. Maxconcat will be the length of the largest continuous
+     chunk, or maxlen, whichever comes first -- but excluding padding. */
 
-  smf_grp_related( igrp, isize, 1, maxlen, &maxconcat, &maxfile, &igroup,
-                   NULL, status );
+  smf_grp_related( igrp, isize, 1, maxlen, &maxconcat, &maxfile,
+                   &igroup, NULL, status );
 
   /* Once we've run smf_grp_related we know how many subarrays there
      are.  We also know the maximum length of a concatenated piece of
@@ -801,7 +857,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
     if( *status == SMF__NOMEM ) {
       /* If we need too much memory, generate a warning message and then try
-         to re-group the files using smaller chunks */
+         to re-group the files using smaller contchunks */
 
       errAnnul( status );
       msgOut( " ", FUNC_NAME ": *** WARNING ***", status );
@@ -812,7 +868,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
               "^NEED Mb > ^AVAIL Mb",
               status );
 
-      /* Try is meant to be the largest chunks of ~equal length that fit in
+      /* Try is meant to be the largest contchunk of ~equal length that fit in
          memory */
       try = maxconcat / ((size_t) ((double)memneeded/maxmem)+1)+1;
 
@@ -851,16 +907,17 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   if( *status == SAI__OK ) {
 
     if( memiter ) {
-      /* only one concatenated chunk within the iteration loop */
-      nchunks = 1;
+      /* Single concatenated conchunk within the iteration loop, so no need
+         to loop over files when memiter=1. */
+      nfilegroups = 1;
 
       /* however, there are multiple large continuous pieces outside the
          iteration loop */
       ncontchunks = igroup->chunk[igroup->ngroups-1]+1;
     } else {
-      /* Otherwise number of chunks is just number of objects in the
+      /* Otherwise number of files/subarray is just number of subbgroups in the
          input group */
-      nchunks = igroup->ngroups;
+      nfilegroups = igroup->ngroups;
 
       /* No looping over larger continuous chunks outside the iteration loop */
       ncontchunks = 1;
@@ -872,21 +929,41 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                FUNC_NAME ": ^NCONTCHUNKS large continuous chunks outside"
                " iteration loop.", status);
     } else {
-      msgSeti( "NCHUNKS", nchunks );
-      msgOutif(MSG__VERB," ",
-               FUNC_NAME ": ^NCHUNKS file chunks inside iteration loop.",
-               status);
+      msgSeti( "NFILEGROUPS", nfilegroups );
+      msgOutif(MSG__VERB, " ", FUNC_NAME
+               ": ^NFILEGROUPS filegroups (files/subarray) inside iteration "
+               "loop.", status);
     }
   }
 
 
-  /* There are two loops over files apart from the iteration. In the
-     memiter=1 case the idea is to concatenate all continuous data
-     into several large chunks, and iterate each one of those to
-     completion without any file i/o. These are called
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  /* ****************************************************************************
+     Start the main outer loop over continuous chunks, or "contchunks".
+
+     There are two loops over files apart from the iteration
+     number. In the memiter=1 case the idea is to concatenate all
+     continuous data into several large chunks, and iterate each one
+     of those to completion without any file i/o. These are called
      "contchunk". Inside the iteration loop, if memiter=0, loop over
-     each input file; those are called "chunk". Lots of file i/o,
-     poorer map solution, but runs with less memory. */
+     each group of files per subarray, per time chunk of the DA
+     machines; those are called "filegroups". In this latter case
+     makemap does lots of file i/o, gives a poorer map solution, but
+     runs with less memory.
+  **************************************************************************** */
 
   for( contchunk=0; contchunk<ncontchunks; contchunk++ ) {
 
@@ -908,7 +985,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       /* Setup the map estimate from the current contchunk. */
       if( contchunk == 0 ) {
-        /* For the first chunk, calculate the map in-place */
+        /* For the first continuous chunk, calculate the map
+           in-place */
         thismap = map;
         thishits = hitsmap;
         thisqual = mapqual;
@@ -917,8 +995,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         mapweightsq = astCalloc( msize, sizeof(*mapweightsq), 0 );
         thisweightsq = mapweightsq;
       } else if( contchunk == 1 ) {
-        /* Subsequent chunks are done in new map arrays and then added to
-           the first */
+        /* Subsequent continuous chunks are done in new map arrays and
+           then added to the first */
         thismap = astCalloc( msize, sizeof(*thismap), 1 );
         thishits = astCalloc( msize, sizeof(*thishits), 1 );
         thisqual = astCalloc( msize, sizeof(*thisqual), 1 );
@@ -939,7 +1017,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                  status);
 
         /* Allocate length 1 array of smfArrays. */
-        res = astCalloc( nchunks, sizeof(*res), 1 );
+        res = astCalloc( nfilegroups, sizeof(*res), 1 );
 
         /* Concatenate (no variance since we calculate it ourselves -- NOI) */
         smf_concat_smfGroup( wf, igroup, darks, bbms, flatramps, contchunk,
@@ -959,9 +1037,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     }
 
     /* Allocate space for the chisquared array */
-    if( havenoi ) {
-      chisquared = astCalloc( nchunks, sizeof(*chisquared), 1 );
-      lastchisquared = astCalloc( nchunks, sizeof(*chisquared), 1 );
+    if( havenoi && (*status == SAI__OK) ) {
+      chisquared = astCalloc( nfilegroups, sizeof(*chisquared), 1 );
+      lastchisquared = astCalloc( nfilegroups, sizeof(*chisquared), 1 );
     }
 
     /* Create containers for time-series model components */
@@ -970,10 +1048,10 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     /* Components that always get made */
     if( igroup && (*status == SAI__OK) ) {
 
-      /* there is one smfArray for LUT, AST and QUA at each chunk */
-      lut = astCalloc( nchunks, sizeof(*lut), 1 );
-      ast = astCalloc( nchunks, sizeof(*ast), 1 );
-      qua = astCalloc( nchunks, sizeof(*qua), 1 );
+      /* there is one smfArray for LUT, AST and QUA for each filegroup */
+      lut = astCalloc( nfilegroups, sizeof(*lut), 1 );
+      ast = astCalloc( nfilegroups, sizeof(*ast), 1 );
+      qua = astCalloc( nfilegroups, sizeof(*qua), 1 );
 
       if( memiter ) {
         /* If iterating in memory then RES has already been created from
@@ -982,19 +1060,19 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
            bolo-ordered data although the work has already been done at
            the concatenation stage. */
 
-        smf_model_create( wf, NULL, res, darks, bbms, flatramps, nchunks,
+        smf_model_create( wf, NULL, res, darks, bbms, flatramps, nfilegroups,
                           SMF__LUT, 0,
                           NULL, 0, NULL, NULL,
                           NULL, memiter,
                           memiter, lut, keymap, status );
 
-        smf_model_create( wf, NULL, res, darks, bbms, flatramps, nchunks,
+        smf_model_create( wf, NULL, res, darks, bbms, flatramps, nfilegroups,
                           SMF__AST, 0,
                           NULL, 0, NULL, NULL,
                           NULL, memiter,
                           memiter, ast, keymap, status );
 
-        smf_model_create( wf, NULL, res, darks, bbms, flatramps, nchunks,
+        smf_model_create( wf, NULL, res, darks, bbms, flatramps, nfilegroups,
                           SMF__QUA, 0,
                           NULL, 0, NULL, NULL,
                           NULL, memiter,
@@ -1008,13 +1086,15 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         }
 
       } else {
-        /* If iterating using disk i/o need to create res and other model
-           components using igroup as template. In this case the pointing
-           LUT probably doesn't exist, so give projection information to
-           smf_model_create. Also assert bolo-ordered template
-           (in this case res). */
 
-        res = astCalloc( nchunks, sizeof(*res), 1 );
+        /* If iterating using disk i/o need to create res and other
+           model components using igroup as template -- which has
+           "nfilegroups" data files per subarray. In this case the
+           pointing LUT probably doesn't exist, so give projection
+           information to smf_model_create. Also assert bolo-ordered
+           template (in this case res). */
+
+        res = astCalloc( nfilegroups, sizeof(*res), 1 );
 
         smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, 0,
                           SMF__RES, 0,
@@ -1058,7 +1138,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     /* Dynamic components */
     if( igroup && (nmodels > 0) && (*status == SAI__OK) ) {
 
-      /* nmodel array of pointers to nchunk smfArray pointers */
+      /* nmodel array of pointers to nfilegroups smfArray pointers */
       model = astCalloc( nmodels, sizeof(*model), 1 );
 
       if( memiter != 1 ) {
@@ -1067,10 +1147,10 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       }
 
       for( i=0; i<nmodels; i++ ) {
-        model[i] = astCalloc( nchunks, sizeof(**model), 1 );
+        model[i] = astCalloc( nfilegroups, sizeof(**model), 1 );
 
         if( memiter ) {
-          smf_model_create( wf, NULL, res, darks, bbms, flatramps, nchunks,
+          smf_model_create( wf, NULL, res, darks, bbms, flatramps, nfilegroups,
                             modeltyps[i], 0,
                             NULL, 0, NULL, NULL,
                             NULL, memiter, memiter, model[i], keymap,
@@ -1090,7 +1170,6 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     msgOutiff( MSG__DEBUG, "", FUNC_NAME ": ** %f s creating dynamic models",
                status, smf_timerupdate(&tv1,&tv2,status) );
 
-    /* Start the main iteration loop */
     if( *status == SAI__OK ) {
 
       /* Stuff pointers into smfDIMMData to pass around to model component
@@ -1124,8 +1203,30 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       } else {
         dat.gai = NULL;
       }
+
+
+
+
+
+
+
+
+
+
+
+      /* ************************************************************************
+         Start the main iteration loop.
+
+         At this stage the full pointing solution for the data in this
+         continuous chunk has been calculated, and all of the model
+         containers have been created. This loop stops either if chi^2
+         has converged, or we did the requested number of iterations,
+         for this continuous chunk.
+      ************************************************************************ */
+
       quit = 0;
       iter = 0;
+
       while( !quit ) {
         msgSeti("ITER", iter+1);
         msgSeti("MAXITER", maxiter);
@@ -1133,19 +1234,29 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                FUNC_NAME ": Iteration ^ITER / ^MAXITER ---------------",
                status);
 
-        /* Assume we've converged until we find a chunk that hasn't */
+        /* Assume we've converged until we find a filegroup that hasn't */
         if( iter > 0 ) {
           converged = 1;
         } else {
           converged = 0;
         }
 
-        for( i=0; i<nchunks; i++ ) {
+
+
+
+        /* **********************************************************************
+           Start the inner loop over filegroups, and the calculation of
+           all the model components up to AST (including models that follow
+           AST in modelorder, and then wrapping back around to the beginning).
+           There is only a single pass through this loop if memiter=1.
+        ********************************************************************** */
+
+        for( i=0; i<nfilegroups; i++ ) {
 
           if( !memiter ) {
-            msgSeti("CHUNK", i+1);
-            msgSeti("NUMCHUNK", nchunks);
-            msgOut(" ", FUNC_NAME ": File chunk ^CHUNK / ^NUMCHUNK",
+            msgSeti("FILEGROUP", i+1);
+            msgSeti("NFILEGROUPS", nfilegroups);
+            msgOut(" ", FUNC_NAME ": File group ^FILEGROUP / ^NFILEGROUPS",
                    status);
           }
 
@@ -1154,7 +1265,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
           if( !memiter ) {
 
-            /* If memiter not set open this chunk here */
+            /* If memiter not set open this filegroup here */
             smf_open_related_model( resgroup, i, "UPDATE", &res[i], status );
             smf_open_related_model( lutgroup, i, "UPDATE", &lut[i], status );
             smf_open_related_model( astgroup, i, "UPDATE", &ast[i], status );
@@ -1182,7 +1293,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             }
 
             if( doclean ) {
-              msgOut(" ", FUNC_NAME ": Pre-conditioning chunk", status);
+              msgOut(" ", FUNC_NAME ": Pre-conditioning data", status);
               for( idx=0; idx<res[i]->ndat; idx++ ) {
                 data = res[i]->sdata[idx];
                 smf_clean_smfData( wf, data, keymap, status );
@@ -1375,7 +1486,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                 rebinflags = rebinflags | AST__REBININIT;
               }
 
-              if( (i == nchunks-1) && (idx == res[i]->ndat-1) ) {
+              if( (i == nfilegroups-1) && (idx == res[i]->ndat-1) ) {
                 /* Final call to rebin re-normalizes */
                 rebinflags = rebinflags | AST__REBINEND;
               }
@@ -1395,9 +1506,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                        status, smf_timerupdate(&tv1,&tv2,status) );
 
             /* If storing each iteration in an extension do it here if this
-               was the last chunk of data to be added */
+               was the last filegroup of data to be added */
 
-            if( itermap && (i == nchunks-1) ) {
+            if( itermap && (i == nfilegroups-1) ) {
               smf_write_itermap( thismap, thisvar, msize, iterrootgrp,
                                  contchunk, iter, lbnd_out, ubnd_out,
                                  outfset, res[i]->sdata[0]->hdr, qua[i],
@@ -1437,11 +1548,11 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                       FUNC_NAME ": Will calculate chi^2 next iteration",
                       status );
             } else {
-              msgSeti("CHUNK",i+1);
+              msgSeti("FILEGROUP",i+1);
               msgSetd("CHISQ",chisquared[i]);
               msgOut( " ",
-                      FUNC_NAME ": *** CHISQUARED = ^CHISQ for chunk "
-                      "^CHUNK", status);
+                      FUNC_NAME ": *** CHISQUARED = ^CHISQ for filegroup "
+                      "^FILEGROUP", status);
 
               if( ((iter > 0)&&(whichnoi<whichast)) ||
                   ((iter > 1)&&(whichnoi>whichast)) ) {
@@ -1481,10 +1592,28 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           }
         }
 
+
+
+
+
+
+
+
+        /* **********************************************************************
+           Calculate the AST model component.
+
+           When we get here we have calculated all of the model components up
+           to, but not including AST (for all filegroups). In addition, the
+           previous iteration of AST has been placed back into the residual,
+           and a map has been estimated. So, we are now in a position to
+           take the current estimate of the map and project it back into
+           the time domain to estimate the new AST.
+        ********************************************************************** */
+
         if( *status == SAI__OK ) {
           msgOut(" ", FUNC_NAME ": Calculate ast", status);
 
-          for( i=0; i<nchunks; i++ ) {
+          for( i=0; i<nfilegroups; i++ ) {
 
             /* Open files if memiter not set - otherwise they are still open
                from earlier call */
@@ -1504,7 +1633,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                because it assumes that the map contains the best current
                estimate of the astronomical sky. It gets called in this
                separate loop since the map estimate gets updated by
-               each chunk in the main model component loop */
+               each filegroup in the main model component loop */
 
             dimmflags=0;
             if( iter==(maxiter-1) ) dimmflags |= SMF__DIMM_LASTITER;
@@ -1537,7 +1666,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                 msgOut( "", FUNC_NAME ": *** Possible programming error! ***",
                         status );
                 msgOutf( "", FUNC_NAME ": %zu QUALITY/DATA inconsistencies "
-                         "chunk %zu subarray %zu", status, nbad, i, idx );
+                         "filegroup %zu subarray %zu", status, nbad, i, idx );
                 msgOut( "", FUNC_NAME ": ***********************************",
                         status );
               }
@@ -1552,7 +1681,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
               /*** TIMER ***/
               msgOutiff( MSG__DEBUG, "", FUNC_NAME
-                         ": ** %f s closing model files",
+                         ": ** %f s closing models files for this filegroup",
                          status, smf_timerupdate(&tv1,&tv2,status) );
             }
           }
@@ -1587,13 +1716,34 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                 status);
       }
 
+
+
+
+
+
+
+
+
+
+      /* ************************************************************************
+         The continous chunk has finished.
+
+         The model components for this continuous chunk have converged.
+
+         We can now do things like write out the bolomap and shortmap
+         extensions, and also export model components (if requested).
+
+         We also add the map estimated from this contchunk to those from
+         previous contchunks if necessary.
+      ************************************************************************ */
+
       /* Create sub-maps for each bolometer if requested. We add AST back
          into the residual, and rebin that single for each detector that
          is flagged as being OK */
 
       if( bolomap && (*status == SAI__OK) ) {
         /* Currently only support memiter=1 case to avoid having to do
-           a separate chunk loop. */
+           a separate filegroup loop. */
         if( !memiter ) {
           msgOut( "", FUNC_NAME
                   ": *** WARNING *** bolomap=1, but memiter=0", status );
@@ -1608,7 +1758,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       if( shortmap && (*status == SAI__OK) ) {
         /* Currently only support memiter=1 case to avoid having to do
-           a separate chunk loop. */
+           a separate filegroup loop. */
         if( !memiter ) {
           msgOut( "", FUNC_NAME
                   ": *** WARNING *** shortmap=1, but memiter=0", status );
@@ -1631,17 +1781,18 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         msgOut(" ", FUNC_NAME ": Export model components to NDF files.",
                status);
 
-        for( i=0; i<nchunks; i++ ) {  /* Chunk loop */
-          msgSeti("CHUNK", i+1);
-          msgSeti("NUMCHUNK", nchunks);
-          msgOutif(MSG__VERB," ", "  Chunk ^CHUNK / ^NUMCHUNK", status);
+        for( i=0; i<nfilegroups; i++ ) {  /* filegroup loop */
+            msgSeti("FILEGROUP", i+1);
+            msgSeti("NFILEGROUPS", nfilegroups);
+            msgOutif(MSG__VERB, "", FUNC_NAME
+                     ": File group ^FILEGROUP / ^NFILEGROUPS", status);
 
-          /* Open each subgroup, loop over smfArray elements and export,
-             then close subgroup. DIMM open/close not needed if memiter set.
-             Note that QUA and NOI get stuffed into the QUALITY and
-             VARIANCE components of the residual. Also notice that
-             everything must be changed to time-ordered data before
-             writing ICD-compliant files. */
+          /* Open each filegroup, loop over smfArray elements and
+             export, then close filegroup. DIMM open/close not needed
+             if memiter set.  Note that QUA and NOI get stuffed into
+             the QUALITY and VARIANCE components of the residual. Also
+             notice that everything must be changed to time-ordered
+             data before writing ICD-compliant files. */
 
           if( !memiter ) { /* Open if we're doing disk i/o */
             /* Fixed components */
@@ -1656,9 +1807,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             }
           }
 
-          /* Loop over subgroup (subarray), re-order, set bad values
-             wherever a SMF__Q_BADB flag is encountered (if requested),
-             and export */
+          /* Loop over subarray, re-order, set bad values wherever a
+             SMF__Q_BADB flag is encountered (if requested), and
+             export */
           for( idx=0; idx<res[i]->ndat; idx++ ) {
             smf_dataOrder( qua[i]->sdata[idx], 1, status );
             smf_dataOrder( res[i]->sdata[idx], 1, status );
@@ -1850,7 +2001,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     }
 
     /* If we get here and there is a SMF__INSMP we probably flagged all
-       of the data as bad for some reason. In a multi-chunk map it is
+       of the data as bad for some reason. In a multi-contchunk map it is
        annoying to have the whole thing die here. So, annul the error,
        warn the user, and then continue on... This will also help us
        to properly free up resources used by this chunk. */
@@ -1859,7 +2010,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       errAnnul( status );
       msgOut("", " ************************* Warning! *************************",
              status );
-      msgOut("", " This data chunk failed due to insufficient good samples.",
+      msgOut("", " This continuous chunk failed due to insufficient samples.",
               status );
       msgOut("", " This is often due to strict bad-bolo flagging.", status );
       msgOut("", " Annuling the bad status and trying to continue...", status);
@@ -1885,6 +2036,14 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       }
     }
 
+
+
+
+    /* **************************************************************************
+       Clean up temporary resources associated with this continuous chunk
+       before continuing in the outer loop.
+    ************************************************************************** */
+
     /* Cleanup things used specifically in this contchunk */
     if( !memiter && deldimm ) {
       msgOutif(MSG__VERB," ",
@@ -1892,7 +2051,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                status);
 
       /* Delete temporary .DIMM files if requested */
-      for( i=0; i<nchunks; i++ ) {               /* Loop over chunk */
+      for( i=0; i<nfilegroups; i++ ) { /* Loop over filegroup */
         pname = name;
 
         /* static model components */
@@ -1949,28 +2108,28 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
     /* fixed model smfArrays */
     if( res ) {
-      for( i=0; i<nchunks; i++ ) {
+      for( i=0; i<nfilegroups; i++ ) {
         if( res[i] ) smf_close_related( &res[i], status );
       }
       res = astFree( res );
     }
 
     if( ast ) {
-      for( i=0; i<nchunks; i++ ) {
+      for( i=0; i<nfilegroups; i++ ) {
         if( ast[i] ) smf_close_related( &ast[i], status );
       }
       ast = astFree( ast );
     }
 
     if( lut ) {
-      for( i=0; i<nchunks; i++ ) {
+      for( i=0; i<nfilegroups; i++ ) {
         if( lut[i] ) smf_close_related( &lut[i], status );
       }
       lut = astFree( lut );
     }
 
     if( qua ) {
-      for( i=0; i<nchunks; i++ ) {
+      for( i=0; i<nfilegroups; i++ ) {
         if( qua[i] ) smf_close_related( &qua[i], status );
       }
       qua = astFree( qua );
@@ -1982,7 +2141,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         if( modelgroups[i] ) smf_close_smfGroup( &modelgroups[i], status );
       }
 
-      /* Free array of smfGroup pointers at this time chunk */
+      /* Free array of smfGroup pointers */
       modelgroups = astFree( modelgroups );
     }
 
@@ -1990,8 +2149,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     if( model ) {
       for( i=0; i<nmodels; i++ ) {
         if( model[i] ) {
-          for( j=0; j<nchunks; j++ ) {
-            /* Close each model component smfArray at each time chunk */
+          for( j=0; j<nfilegroups; j++ ) {
+            /* Close each model component smfArray for each filegroup */
             if( model[i][j] )
               smf_close_related( &(model[i][j]), status );
           }
@@ -2011,6 +2170,26 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     if( chisquared) chisquared = astFree( chisquared );
     if( lastchisquared) lastchisquared = astFree( lastchisquared );
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  /* ****************************************************************************
+     Final cleanup
+
+     We have finished the outermost loop over continuous chunks. Free
+     all of the memory we allocated.
+  **************************************************************************** */
 
   /* Report the total number of effective bolometers */
   if (nboloeff) *nboloeff = 0.0;
