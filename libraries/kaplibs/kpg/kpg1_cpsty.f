@@ -27,10 +27,10 @@
 *     IPLOT = INTEGER (Given)
 *        The AST Plot.
 *     IN = CHARACTER * ( * ) (Returned)
-*        The name of the source element (e.g. "CURVES", "AXIS1", etc.), or
+*        The name of the source element (e.g. "CURVES", "AXIS1"), or
 *        blank.
 *     OUT = CHARACTER * ( * ) (Returned)
-*        The name of the destination element (e.g. "CURVES", "AXIS1", etc.).
+*        The name of the destination element (e.g. "CURVES", "AXIS1").
 *     ATTRS( 5 ) = REAL (Given and Returned)
 *        The entry values are ignored unless IN is blank, in which case
 *        the entry values should be the colour, width, style, size and font
@@ -51,7 +51,7 @@
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *

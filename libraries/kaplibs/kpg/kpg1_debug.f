@@ -25,7 +25,7 @@
 *        error has already occurred, or if this routine should fail for
 *        any reason.
 *     PACK = CHARACTER * ( * ) (Given)
-*        The name of the package (e.g. "KAPPA", "POLPACK", etc.).
+*        The name of the package (e.g. "KAPPA", "POLPACK").
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -44,7 +44,7 @@
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *

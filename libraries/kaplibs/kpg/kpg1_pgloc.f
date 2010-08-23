@@ -32,7 +32,7 @@
 *     corresponds to "xwindows/GWM", or one of the other xwindows sevices).
 *
 *     The component names used are the same as the names uses for the device
-*     within the AGI database (e.g. "AGI_3801_2", etc.).
+*     within the AGI database (e.g. "AGI_3801_2").
 
 *  Arguments:
 *     LOC1 = CHARACTER * ( * ) (Given)
@@ -56,7 +56,7 @@
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *

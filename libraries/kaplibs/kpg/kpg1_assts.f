@@ -46,8 +46,8 @@
 
 *  Notes:
 *     -  Colour attribute values may be supplied in any form recognised
-*     by KPG1_PGCOL (e.g. colour name, MIN, MAX, integer index, etc.), and
-*     the nearest colour in the current KAPPA pallette is used.
+*     by KPG1_PGCOL (e.g. colour name, MIN, MAX, integer index), and the
+*     nearest colour in the current KAPPA pallette is used.
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils.
@@ -61,7 +61,7 @@
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *

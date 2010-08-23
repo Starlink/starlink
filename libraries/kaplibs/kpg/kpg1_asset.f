@@ -83,8 +83,8 @@
 
 *  Notes:
 *     -  Colour attribute values may be supplied in any form recognised
-*     by KPG1_PGCOL (e.g. colour name, MIN, MAX, integer index, etc.),
-*     and the nearest colour in the current KAPPA pallette is used.
+*     by KPG1_PGCOL (e.g. colour name, MIN, MAX, integer index), and the
+*     nearest colour in the current KAPPA pallette is used.
 *     -  If a null value is supplied for the parameter, the error is
 *     annulled and the Object is returned unchanged (except for any
 *     defaults obtained using the usual search path).
@@ -101,7 +101,7 @@
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *
