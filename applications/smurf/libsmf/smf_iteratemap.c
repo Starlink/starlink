@@ -20,8 +20,9 @@
 *                    const smfArray *bbms, const smfArray * flatramps,
 *                    AstFrameSet *outfset, int moving, int *lbnd_out,
 *                    int *ubnd_out, size_t maxmem, double *map, int *hitsmap,
-*                    double *exp_time, double *mapvar, smf_qual_t *mapqual, double *weights,
-*                    char data_units[], double *nboloeff, int *status );
+*                    double *exp_time, double *mapvar, smf_qual_t *mapqual,
+*                    double *weights, char data_units[], double *nboloeff,
+*                    int *status );
 
 *  Arguments:
 *     wf = smfWorkForce * (Given)
@@ -44,7 +45,8 @@
 *     bbms = smfArray * (Given)
 *        Masks for each subarray (e.g. returned by smf_reqest_mask call)
 *     flatramps = const smfArray * (Given)
-*        Collection of flatfield ramps. Will be passed to smf_open_and_flatfield.
+*        Collection of flatfield ramps. Will be passed to
+*        smf_open_and_flatfield.
 *     outfset = AstFrameSet* (Given)
 *        Frameset containing the sky->output map mapping if calculating
 *        pointing LUT on-the-fly
@@ -365,8 +367,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      const smfArray *bbms, const smfArray * flatramps,
                      AstFrameSet *outfset, int moving, int *lbnd_out,
                      int *ubnd_out, size_t maxmem, double *map,
-                     int *hitsmap, double * exp_time, double *mapvar, smf_qual_t *mapqual,
-                     double *weights, char data_units[], double * nboloeff, int *status ) {
+                     int *hitsmap, double * exp_time, double *mapvar,
+                     smf_qual_t *mapqual, double *weights, char data_units[],
+                     double * nboloeff, int *status ) {
 
   /* Local Variables */
   smfArray **ast=NULL;          /* Astronomical signal */
@@ -439,7 +442,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   dim_t padEnd=0;               /* How many samples of padding at the end */
   dim_t padStart=0;             /* How many samples of padding at the start */
   char *pname=NULL;             /* Poiner to name */
-  size_t qcount_last[SMF__NQBITS_TSERIES];/* quality bit counter -- last itertaion */
+  size_t qcount_last[SMF__NQBITS_TSERIES];/* quality bit counter -- last iter */
   smfArray **qua=NULL;          /* Quality flags for each file */
   smf_qual_t *qua_data=NULL; /* Pointer to DATA component of qua */
   smfGroup *quagroup=NULL;      /* smfGroup of quality model files */
@@ -490,8 +493,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   /* Get size of the input group */
   isize = grpGrpsz( igrp, status );
 
-  /* Parse the CONFIG parameters stored in the keymap. We assume that all variables
-     have been given defaults through the .def file. */
+  /* Parse the CONFIG parameters stored in the keymap. We assume that
+     all variables have been given defaults through the .def file. */
   if( *status == SAI__OK ) {
     /* Number of iterations */
     astMapGet0I( keymap, "NUMITER", &numiter );
@@ -1191,12 +1194,13 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             }
 
             /* initial quality report */
-            smf_qualstats_report( MSG__NORM, SMF__QFAM_TSERIES, 1, qua[i], qcount_last, &nsamples,
-                                  1, &ntgood, &numdata, status );
+            smf_qualstats_report( MSG__NORM, SMF__QFAM_TSERIES, 1, qua[i],
+                                  qcount_last, &nsamples, 1, &ntgood, &numdata,
+                                  status );
 
             /* If no good bolos left, set status */
             if( (*status==SAI__OK) &&
-                (qcount_last[smf_qual_to_bit(SMF__Q_BADB,status)] >= numdata) ) {
+                (qcount_last[smf_qual_to_bit(SMF__Q_BADB,status)] >= numdata)) {
               *status = SMF__INSMP;
               errRep("", FUNC_NAME ": All bolos are bad", status );
             }
@@ -1514,12 +1518,13 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
             /* report on the quality flags for this iterations before closing
              the quality */
-            smf_qualstats_report( MSG__NORM, SMF__QFAM_TSERIES, 1, qua[i], qcount_last, &nsamples, 0,
-                                  &ntgood, &numdata, status );
+            smf_qualstats_report( MSG__NORM, SMF__QFAM_TSERIES, 1, qua[i],
+                                  qcount_last, &nsamples, 0, &ntgood, &numdata,
+                                  status );
 
             /* If no good bolos left, set status */
             if( (*status==SAI__OK) &&
-                (qcount_last[smf_qual_to_bit(SMF__Q_BADB, status)] >= numdata) ) {
+                (qcount_last[smf_qual_to_bit(SMF__Q_BADB, status)] >= numdata)){
               *status = SMF__INSMP;
               errRep("", FUNC_NAME ": All bolos are bad", status );
             }
@@ -1786,14 +1791,19 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                   if( modeltyps[j] == SMF__COM && qua_data ) {
                     smf_qual_t *tempqual = NULL;
                     smfData * com = model[j][i]->sdata[idx];
-                    smf_collapse_quality( qua_data, com->qfamily, nbolo, ntslice, bstride,
-                                          tstride, 0, &tempqual, status );
-                    com->sidequal = smf_construct_smfData( NULL, NULL, NULL, NULL,
-                                                           SMF__QUALTYPE, NULL,
-                                                           tempqual, SMF__QFAM_TSERIES,
-                                                           NULL, 1, com->dims, com->lbnd,
-                                                           com->ndims, 0, 0, NULL, NULL,
-                                                           status );
+
+                    smf_collapse_quality( qua_data, com->qfamily, nbolo,
+                                          ntslice, bstride, tstride, 0,
+                                          &tempqual, status );
+
+                    com->sidequal = smf_construct_smfData( NULL, NULL, NULL,
+                                                           NULL, SMF__QUALTYPE,
+                                                           NULL, tempqual,
+                                                           SMF__QFAM_TSERIES,
+                                                           NULL, 1, com->dims,
+                                                           com->lbnd,
+                                                           com->ndims, 0, 0,
+                                                           NULL, NULL, status );
                   }
 
                   smf_write_smfData( model[j][i]->sdata[idx], NULL,
@@ -1801,7 +1811,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
                   /* if we had temporary quality free it */
                   if ( modeltyps[j] == SMF__COM && qua_data ) {
-                    smf_close_file( & (model[j][i]->sdata[idx]->sidequal), status );
+                    smf_close_file( &(model[j][i]->sdata[idx]->sidequal),
+                                    status );
                   }
 
                 } else {
@@ -1846,12 +1857,14 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
     if( *status == SMF__INSMP ) {
       errAnnul( status );
-      msgOut( "", " ************************* Warning! ************************* ", status );
-      msgOut( "", " This data chunk failed due to insufficient good samples.",
+      msgOut("", " ************************* Warning! *************************",
+             status );
+      msgOut("", " This data chunk failed due to insufficient good samples.",
               status );
-      msgOut( "", " This is often due to strict bad-bolo flagging.", status );
-      msgOut( "", " Annuling the bad status and trying to continue...", status);
-      msgOut( "", " ************************************************************ ", status );
+      msgOut("", " This is often due to strict bad-bolo flagging.", status );
+      msgOut("", " Annuling the bad status and trying to continue...", status);
+      msgOut("", " ************************************************************",
+             status );
     } else {
       /* In the multiple contchunk case, add this map to the total if
          we got here with clean status */
@@ -2002,7 +2015,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   /* Report the total number of effective bolometers */
   if (nboloeff) *nboloeff = 0.0;
   if (ntgood_tot > 0) {
-    msgOutiff(MSG__NORM, "", "Total samples available from all chunks: %zu (%g bolos)",
+    msgOutiff(MSG__NORM, "",
+              "Total samples available from all chunks: %zu (%g bolos)",
               status, nsamples_tot, (double)nsamples_tot / (double)ntgood_tot );
     if (nboloeff) *nboloeff = (double)nsamples_tot / (double)ntgood_tot;
 
@@ -2031,5 +2045,4 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
   /* Ensure that FFTW doesn't have any used memory kicking around */
   fftw_cleanup();
-
 }
