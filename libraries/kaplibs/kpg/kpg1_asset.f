@@ -72,7 +72,7 @@
 *  Arguments:
 *     APP = CHARACTER * ( * ) (Given)
 *        The name of the calling application in the form
-*        <package>_<application> (eg "KAPPA_DISPLAY"), for use in messages.
+*        <package>_<application> (e.g. "KAPPA_DISPLAY"), for use in messages.
 *     PARAM = CHARACTER * ( * ) (Given)
 *        The name of the parameter to use for getting the group expression.
 *     IOBJ = INTEGER (Given and Returned)
@@ -83,8 +83,8 @@
 
 *  Notes:
 *     -  Colour attribute values may be supplied in any form recognised
-*     by KPG1_PGCOL (eg colour name, MIN, MAX, integer index, etc), and
-*     the nearest colour in the current KAPPA pallette is used.
+*     by KPG1_PGCOL (e.g. colour name, MIN, MAX, integer index, etc.),
+*     and the nearest colour in the current KAPPA pallette is used.
 *     -  If a null value is supplied for the parameter, the error is
 *     annulled and the Object is returned unchanged (except for any
 *     defaults obtained using the usual search path).
@@ -97,7 +97,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -107,8 +107,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)

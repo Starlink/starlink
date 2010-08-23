@@ -25,13 +25,13 @@
 *     CAXIS = INTEGER (Given)
 *        The index of the array axis corresponding to colour index (1 or 2).
 *     LBND1 = INTEGER (Given)
-*        The lower bound on axis 1.
+*        The lower bound on Axis 1.
 *     UBND1 = INTEGER (Given)
-*        The upper bound on axis 1.
+*        The upper bound on Axis 1.
 *     LBND2 = INTEGER (Given)
-*        The lower bound on axis 2.
+*        The lower bound on Axis 2.
 *     UBND2 = INTEGER (Given)
-*        The upper bound on axis 2.
+*        The upper bound on Axis 2.
 *     HSTDAT( * ) = INTEGER (Given)
 *        A histogram of colour index counts. The length of this vector
 *        should be equal to the length of axis CAXIS.
@@ -50,7 +50,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -60,8 +60,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -132,7 +132,7 @@
             MXPOP = REAL( MAXPOP )
          END IF
 
-*  If axis 1 corresponds to colour index...
+*  If Axis 1 corresponds to colour index...
          IF( CAXIS .EQ. 1 ) THEN
 
 *  Find the pixels per log(count)
@@ -174,7 +174,7 @@
 
             END DO
 
-*  If axis 2 corresponds to colour index...
+*  If Axis 2 corresponds to colour index...
          ELSE
 
 *  Find the pixels per count.
@@ -221,7 +221,7 @@
 *  For ramp keys...
       ELSE IF( FORM .EQ. RAMP ) THEN
 
-*  If axis 1 corresponds to colour index, just assign the axis 1 value
+*  If Axis 1 corresponds to colour index, just assign the Axis-1 value
 *  to all cells of the returned colour index array.
          IF( CAXIS .EQ. 1 ) THEN
             DO J = LBND2, UBND2
@@ -230,7 +230,7 @@
                END DO
             END DO
 
-*  If axis 2 corresponds to colour index, just assign the axis 2 value
+*  If Axis 2 corresponds to colour index, just assign the Axis-2 value
 *  to all cells of the returned colour index array.
          ELSE
             DO J = LBND2, UBND2

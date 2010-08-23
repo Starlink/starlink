@@ -5,7 +5,7 @@
 *     KPG1_ASFIL
 
 *  Purpose:
-*     Read spatial positions from a text file.
+*     Reads spatial positions from a text file.
 
 *  Language:
 *     Starlink Fortran 77
@@ -14,15 +14,16 @@
 *     CALL KPG1_ASFIL( PARAM1, PARAM2, FRM, NP, IPOUT, FNAME, STATUS )
 
 *  Description:
-*     This routine obtains formatted positions from a text file specified by
-*     an environment parameter. The positions are assumed to represent
-*     axis values in the supplied Frame.
+*     This routine obtains formatted positions from a text file
+*     specified by an environment parameter. The positions are assumed
+*     to represent axis values in the supplied Frame.
 *
-*     The file should contain 1 position per line. Each position is given by
-*     a set of strings delimited by comma, space or tab (the first gives the
-*     value for axis 1, the second for axis 2, etc). The number of strings
-*     per line should equal the number of axes in the supplied Frame.
-*     The user can specify the columns to use using parameter PARAM2.
+*     The file should contain one position per line. Each position is
+*     given by a set of strings delimited by comma, space or tab (the
+*     first gives the value for Axis 1, the second for Axis 2, etc.). The
+*     number of strings per line should equal the number of axes in the
+*     supplied Frame.  The user can specify the columns to use using
+*     Parameter PARAM2.
 *
 *     The file may contain blank lines, and comment lines commencing with
 *     "!" or "#".
@@ -57,7 +58,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -67,8 +68,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)

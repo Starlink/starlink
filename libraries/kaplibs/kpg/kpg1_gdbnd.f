@@ -4,7 +4,7 @@
 *     KPG1_GDBND
 
 *  Purpose:
-*     Get the bounds of a new PGPLOT window from the environment.
+*     Gets the bounds of a new PGPLOT window from the environment.
 
 *  Language:
 *     Starlink Fortran 77
@@ -13,8 +13,9 @@
 *     CALL KPG1_GDBND( PNLOW, PNUPP, LBND, UBND, STATUS )
 
 *  Description:
-*     This routine defines a 2-d region in the current PGPLOT window,
-*     getting the bounds of the region from the environment.
+*     This routine defines a two-dimensional region in the current
+*     PGPLOT window, getting the bounds of the region from the
+*     environment.
 
 *  Arguments:
 *     PNLOW = CHARACTER * ( * ) (Given)
@@ -37,7 +38,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -47,8 +48,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)

@@ -4,7 +4,7 @@
 *     KPG1_VEC2N
 
 *  Purpose:
-*     Convert vectorised array indices into N-dimensional form.
+*     Convert vectorised array indices into n-dimensional form.
 
 *  Language:
 *     Starlink Fortran 77
@@ -15,7 +15,7 @@
 *  Description:
 *     This routine converts pixel indices which refer to a pixel in a
 *     vectorised array into sets of indices which identify the same
-*     pixel when the array is regarded as N-dimensional, with specified
+*     pixel when the array is regarded as n-dimensional, with specified
 *     lower and upper pixel-index bounds for each dimension.
 
 *  Arguments:
@@ -46,7 +46,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -56,8 +56,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
@@ -104,7 +104,7 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Loop to find the stride for each dimension of the N-dimensional
+*  Loop to find the stride for each dimension of the n-dimensional
 *  array.
       STRIDE( 1 ) = 1
       DO 1 I = 1, NDIM - 1
@@ -121,7 +121,7 @@
             IDIM( I, J ) = IVEC / STRIDE( I )
             IVEC = IVEC - IDIM( I, J ) * STRIDE( I )
 
-*  Add the lower bound of the N-dimensional array to each result.
+*  Add the lower bound of the n-dimensional array to each result.
             IDIM( I, J ) = IDIM ( I, J ) + LBND( I )
  2       CONTINUE
  3    CONTINUE

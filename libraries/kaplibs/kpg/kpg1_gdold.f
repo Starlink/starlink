@@ -5,7 +5,7 @@
 *     KPG1_GDOLD
 
 *  Purpose:
-*     Create a new DATA picture with ancillary pictures aligned with
+*     Creates a new DATA picture with ancillary pictures aligned with
 *     an existing DATA picture.
 
 *  Language:
@@ -38,7 +38,7 @@
 *     COMMNT = CHARACTER * ( * ) (Given)
 *        A comment to store with the new pictures added to the AGI
 *        database. This will usually by an indication of the application
-*        being run (eg KAPPA_DISPLAY).
+*        being run (e.g. KAPPA_DISPLAY).
 *     NP = INTEGER (Given)
 *        The number of extra pictures to be included in the FRAME picture
 *        (the DATA picture itself is not included in this list). Margins are
@@ -74,7 +74,7 @@
 *        picture is returned.
 *     IPIC( NP ) = INTEGER (Returned)
 *        An array of AGI identifiers corresponding to the extra pictures
-*        requested in ZSIDE and PSIZE. The world coordinate system for each
+*        requested in ZSIDE and PSIZE. The world co-ordinate system for each
 *        picture is inherited from the FRAME picture. The actual size of a
 *        picture may be less than the requested size if there is insufficient
 *        room left in the FRAME picture to give it its requested size.
@@ -95,7 +95,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -105,8 +105,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
@@ -384,7 +384,7 @@
 
 *  Create a PGPLOT viewport with these bounds and save it as a picture
 *  within the FRAME picture (but only if it has non-zero size). The world
-*  coordinate system is inherited from the FRAME picture.
+*  co-ordinate system is inherited from the FRAME picture.
          PXI = PXR - PXL
          PYI = PYT - PYB
          IF( PXI .GT. 0.0 .AND. PYI .GT. 0.0 .AND.

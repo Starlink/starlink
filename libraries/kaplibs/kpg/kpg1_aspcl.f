@@ -4,7 +4,7 @@
 *     KPG1_ASPCL
 
 *  Purpose:
-*     Apply clipping to a Plot so that border and coordinate grid are
+*     Applies clipping to a Plot so that border and co-ordinate grid are
 *     restricted to the well bahaved regions.
 
 *  Language:
@@ -38,7 +38,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -48,8 +48,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
@@ -117,7 +117,7 @@
          NAXP = AST_GETI( MAP, 'Nin', STATUS )
          NAXC = AST_GETI( MAP, 'Nout', STATUS )
 
-*  Convert the pixel index bounds to double precision pixel coordinate
+*  Convert the pixel index bounds to double precision pixel co-ordinate
 *  bounds.
          DO I = 1, NAXP
             DLBND( I ) = DBLE( LBND( I ) ) - 1.0D0

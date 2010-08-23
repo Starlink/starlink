@@ -4,7 +4,7 @@
 *     KPG1_ASFGT
 
 *  Purpose:
-*     Create a new Frame specified through the environment.
+*     Creates a new Frame specified through the environment.
 
 *  Language:
 *     Starlink Fortran 77
@@ -60,7 +60,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -70,8 +70,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -217,7 +217,7 @@
                   IAT = 0
                   CALL CHR_PUTI( I, TEXT, IAT )
                   CALL AST_SETC( FRM, 'Label(' // TEXT( : IAT ) // ')',
-     :                        'Pixel coordinate ' // TEXT( : IAT ),
+     :                        'Pixel co-ordinate ' // TEXT( : IAT ),
      :                        STATUS )
                   CALL AST_SETC( FRM, 'Symbol(' // TEXT( : IAT ) // ')',
      :                        'p' // TEXT( : IAT ), STATUS )
@@ -236,7 +236,7 @@
                   IAT = 0
                   CALL CHR_PUTI( I, TEXT, IAT )
                   CALL AST_SETC( FRM, 'Label(' // TEXT( : IAT ) // ')',
-     :                        'Normalised pixel coordinate ' //
+     :                        'Normalised pixel co-ordinate ' //
      :                        TEXT( : IAT ), STATUS )
                   CALL AST_SETC( FRM, 'Symbol(' // TEXT( : IAT ) // ')',
      :                        'f' // TEXT( : IAT ), STATUS )
@@ -247,7 +247,8 @@
 *  Data grid co-ordinates...
             ELSE IF( DOM .EQ. 'GRID' ) THEN
 
-*  Store a string holding the coordinates at the centre of the first pixel.
+*  Store a string holding the co-ordinates at the centre of the first
+*  pixel.
                TEXT = '('
                IAT = 1
                DO I = 1, NAX
@@ -280,10 +281,10 @@
      :                           'pixel', STATUS )
                END DO
 
-*  Graphical co-ordinates (symbols and labels are not set since these are
-*  not set either by KPG1_GDGET or AST_PLOT)...
+*  Graphical co-ordinates (symbols and labels are not set since these
+*  are not set either by KPG1_GDGET or AST_PLOT)...
             ELSE IF( DOM .EQ. 'GRAPHICS' ) THEN
-               CALL AST_SETC( FRM, 'Title', 'Graphical Coordinates',
+               CALL AST_SETC( FRM, 'Title', 'Graphical co-ordinates',
      :                        STATUS )
                CALL AST_SETC( FRM, 'Unit(1)', 'mm', STATUS )
                CALL AST_SETC( FRM, 'Unit(2)', 'mm', STATUS )
@@ -294,7 +295,7 @@
      :                        'co-ordinates in the AGI BASE picture.',
      :                        STATUS )
 
-*  PGPLOT normalized device coords
+*  PGPLOT normalized device co-ords
             ELSE IF( DOM .EQ. 'NDC' ) THEN
                CALL AST_SETC( FRM, 'Title', 'Normalised device '//
      :                        'co-ordinates.', STATUS )

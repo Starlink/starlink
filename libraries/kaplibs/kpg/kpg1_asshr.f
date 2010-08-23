@@ -5,8 +5,8 @@
 *     KPG1_ASSHR
 
 *  Purpose:
-*     Shrink a Plot so that it covers an area which allows all annotation
-*     to fit within the specified area.
+*     Shrinks a Plot so that it covers an area which allows all
+*     annotation to fit within the specified area.
 
 *  Language:
 *     Starlink Fortran 77
@@ -19,7 +19,7 @@
 *     current PGPLOT window, but thw window is shrunk in GRAPHICS space
 *     so that all the annotation produced by AST_GRID falls within the PGPLOT
 *     viewport which is current on entry. The sizes of annotations, gaps,
-*     etc are shrunk if this is necessary in order to fit the annotations
+*     etc. are shrunk if this is necessary in order to fit the annotations
 *     within the current PGPLOT viewport.
 
 *  Arguments:
@@ -71,7 +71,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -81,8 +81,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
@@ -138,25 +138,25 @@
       PARAMETER ( MXTRY = 6 )
 
 *  Local Variables:
-      CHARACTER EDGE1*6          ! The edge to receive axis 1 labels
-      CHARACTER EDGE2*6          ! The edge to receive axis 2 labels
+      CHARACTER EDGE1*6          ! The edge to receive Axis 1 labels
+      CHARACTER EDGE2*6          ! The edge to receive Axis 2 labels
       DOUBLE PRECISION BBOX( 4 ) ! Bounds of original window
       DOUBLE PRECISION XC        ! Axis 1 value
       DOUBLE PRECISION YC        ! Axis 2 value
       INTEGER I                  ! Current Frame index in old Plot
       INTEGER ICURR              ! Current Frame index in old Plot
-      INTEGER NC1                ! No. of characters in an axis 1 value
-      INTEGER NC2                ! No. of characters in an axis 2 value
+      INTEGER NC1                ! No. of characters in an Axis-1 value
+      INTEGER NC2                ! No. of characters in an Axis-2 value
       INTEGER NCURR              ! Current Frame index in new Plot
       INTEGER NPLOT              ! New Plot
       INTEGER NTRY               ! No of tries to fit it in with smaller text
       LOGICAL EXTLAB             ! Are numerical labels drawn around edge?
       LOGICAL MORE               ! Find another graphics box?
-      LOGICAL NUMLB1             ! Are numerical labels drawn for axis 1
-      LOGICAL NUMLB2             ! Are numerical labels drawn for axis 2
+      LOGICAL NUMLB1             ! Are numerical labels drawn for Axis 1
+      LOGICAL NUMLB2             ! Are numerical labels drawn for Axis 2
       LOGICAL TKALL              ! Draw tick marks on all edges?
-      LOGICAL TXTLB1             ! Are textual labels drawn for axis 1
-      LOGICAL TXTLB2             ! Are textual labels drawn for axis 2
+      LOGICAL TXTLB1             ! Are textual labels drawn for Axis 1
+      LOGICAL TXTLB2             ! Are textual labels drawn for Axis 2
       REAL ASP0                  ! Aspect ratio of supplied area
       REAL CEN                   ! Position of window centre
       REAL GBOX( 4 )             ! Bounds of new window
@@ -173,17 +173,17 @@
       REAL MNTKL2                ! Value of MinTickLen(2)
       REAL MRIGHT                ! Width of margin at right for annotation
       REAL MTOP                  ! Width of margin at top for annotation
-      REAL NLGAP1                ! Gap between axis 1 and numerical labels
-      REAL NLGAP2                ! Gap between axis 2 and numerical labels
+      REAL NLGAP1                ! Gap between Axis 1 and numerical labels
+      REAL NLGAP2                ! Gap between Axis 2 and numerical labels
       REAL NLSIZE                ! Character size for numerical labels
       REAL OBOX( 4 )             ! Bounds of old window
       REAL RF                    ! Reduction factor to fit in available area
       REAL TBOX( 4 )             ! Bounds of total box including annotation
       REAL TKLEN                 ! Max (-ve) length of tick marks
-      REAL TKLEN1                ! Longest exterior tick length for axis 1
-      REAL TKLEN2                ! Longest exterior tick length for axis 2
-      REAL TLGAP1                ! Gap between axis 1 and textual labels
-      REAL TLGAP2                ! Gap between axis 2 and textual labels
+      REAL TKLEN1                ! Longest exterior tick length for Axis 1
+      REAL TKLEN2                ! Longest exterior tick length for Axis 2
+      REAL TLGAP1                ! Gap between Axis 1 and textual labels
+      REAL TLGAP2                ! Gap between Axis 2 and textual labels
       REAL TLSIZE                ! Character size for textual labels
       REAL TTGAP                 ! Value of TitleGap
       REAL TTSIZE                ! Value of Size(Title)
@@ -216,14 +216,14 @@
       CALL AST_TRAN2( IPLOT, 1, 0.5*DBLE( X1 + X2 ),
      :                0.5*DBLE( Y1 + Y2 ), .TRUE., XC, YC, STATUS )
 
-*  Find the number of characters in a formatted axis 1 value. This will
+*  Find the number of characters in a formatted Axis-1 value. This will
 *  not necessarily be the same as the number of digits which actually appear
 *  in the grid annotations, because the Plot Class removes any un-necessary
 *  trailing zeros, for instance. But it will be a conservative estimate
 *  anyway.
       NC1 = CHR_LEN( AST_FORMAT( IPLOT, 1, XC, STATUS ) )
 
-*  Find the number of characters in a formatted axis 2 value.
+*  Find the number of characters in a formatted Axis-2 value.
       NC2 = CHR_LEN( AST_FORMAT( IPLOT, 2, YC, STATUS ) )
 
 *  If required, attributes controlling the size of annotations will be

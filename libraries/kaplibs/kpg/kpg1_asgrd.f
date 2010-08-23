@@ -4,7 +4,7 @@
 *     KPG1_ASGRD
 
 *  Purpose:
-*     Draw a border or an annotated coordinate grid over an AST Plot.
+*     Draws a border or an annotated co-ordinate grid over an AST Plot.
 
 *  Language:
 *     Starlink Fortran 77
@@ -14,7 +14,7 @@
 
 *  Description:
 *     This routine call AST_BORDER to draw a border, or AST_GRID to draw an
-*     annotated coordinate Grid over the supplied Plot. The current pgplot
+*     annotated co-ordinate Grid over the supplied Plot. The current pgplot
 *     viewport can optionally be extended prior to drawing the grid so that
 *     it covers a specified AGI picture. If the pgplot viewport is left
 *     matching the plotting area supplied when the Plot was created, then
@@ -46,7 +46,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -56,8 +56,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)

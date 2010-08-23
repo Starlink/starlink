@@ -4,7 +4,7 @@
 *     KPG1_ASRGN
 
 *  Purpose:
-*     Register all non-graphical AST IntraMaps known by KAPPA.
+*     Registers all non-graphical AST IntraMaps known by KAPPA.
 
 *  Language:
 *     Starlink Fortran 77
@@ -16,7 +16,8 @@
 
 *     This routine registers all non-graphical AST IntraMaps known to
 *     KAPPA. It should be called before any AST routine which may use an
-*     IntraMap (such as a transformation routine, read/write routine, etc).
+*     IntraMap (such as a transformation routine, read/write routine,
+*     etc.).
 
 *  Arguments:
 *     STATUS = INTEGER (Given)
@@ -30,7 +31,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -40,8 +41,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
@@ -86,7 +87,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  "Log10" - Log base 10
-      PURPOSE = 'Take log. (base 10) of each coordinate value'
+      PURPOSE = 'Take log. (base 10) of each co-ordinate value'
       CALL AST_INTRAREG( 'Log10', AST__ANY, AST__ANY, KPG1_ASLOG,
      :                   AST__SIMPIF + AST__SIMPFI, PURPOSE( : 44 ),
      :                   KPG_AUTHOR, KPG_CONTACT, STATUS )

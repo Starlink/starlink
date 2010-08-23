@@ -4,7 +4,7 @@
 *     KPG1_PGSHT
 
 *  Purpose:
-*     Set the PGPLOT character size in world coordinates.
+*     Set the PGPLOT character size in world co-ordinates.
 
 *  Language:
 *     Starlink Fortran 77
@@ -14,20 +14,20 @@
 
 *  Description:
 *     This routine sets the PGPLOT character size to a specified value in
-*     world coordinates. It mimics SGS_SHTX in so far as this is possible.
+*     world co-ordinates. It mimics SGS_SHTX in so far as this is possible.
 *
 *     Note SGS and PGPLOT behave differently if the scales on the X and Y
 *     axes are not equal. SGS keeps the character size constant in world
 *     oordinates, so absolute character size will be different for vertical
 *     and horizontal text. On the other hand, PGPLOT keeps the absolute
 *     character size fixed, resulting in the characters size in world
-*     coordinates varying for horizontal and vertical text. This routine
+*     co-ordinates varying for horizontal and vertical text. This routine
 *     sets the size for horizontal text. If the axis scales are not equal,
-*     vertical text will have have a different size (in world coordinates).
+*     vertical text will have have a different size (in world co-ordinates).
 
 *  Arguments:
 *     HGT = REAL (Given)
-*        The required character height, in world coordinates.
+*        The required character height, in world co-ordinates.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -38,7 +38,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -48,8 +48,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
@@ -86,14 +86,14 @@
 *  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Get the current PGPLOT character heights in world coordinates.
+*  Get the current PGPLOT character heights in world co-ordinates.
       CALL PGQCS( 4, XCH, YCH )
 
 *  Get the current scale factor for character size.
       CALL PGQCH( FACTOR )
 
 *  Set the new scale factor to give the required height in world
-*  coordinates (assuming horizontal text).
+*  co-ordinates (assuming horizontal text).
       IF( YCH .NE. 0.0 ) CALL PGSCH( HGT*FACTOR/YCH )
 
       END

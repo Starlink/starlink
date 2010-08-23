@@ -77,7 +77,7 @@
 *        output co-ordinates.
 *     2006 February 10 (MJC):
 *        Further tidying.  Checked for a 1-1 mapping to avoid n-D to
-*        1-D transformation, preferring to obain just one vector and
+*        one-dimensional transformation, preferring to obain just one vector and
 *        duplicating it.
 *     2006 February 15 (MJC):
 *        Set expansion factors to 1 for unused duimensions up to
@@ -178,7 +178,7 @@
          WORK( I - LBND( JAXIS ) + 1 ) = WPOS( IAXIS )
       END DO
 
-*  Now copy the values into the 1D work array into the 3D CENTRE array.
+*  Now copy the values into the one-dimensional work array into the three-dimensional CENTRE array.
 *  First initialise the pixel indices of the first pixel in the N-d array.
       DO I = 1, NAXPIX
          PIND( I ) = LBND( I )
@@ -187,7 +187,7 @@
 *  Loop round all the pixels in the N-d array
       DO EL = 1, NEL
 
-*  Store the coordinate value.
+*  Store the co-ordinate value.
          CENTRE( EL ) = WORK( PIND( JAXIS ) - LBND( JAXIS ) + 1 )
 
 *  Store the pixel indices of the next pixel in the N-d array.

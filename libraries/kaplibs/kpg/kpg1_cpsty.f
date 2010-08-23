@@ -4,7 +4,8 @@
 *     KPG1_CPSTY
 
 *  Purpose:
-*     Copy the plotting style for an AST element to another AST element.
+*     Copies the plotting style for an AST element to another AST
+*     element.
 
 *  Language:
 *     Starlink Fortran 77
@@ -16,20 +17,20 @@
 *     This routine copies the AST attributes which determine the colour,
 *     style, width, font and size. If IN is non-blank, then the
 *     attributes are copied from the element given by IN, to the
-*     element given by OUT - the original values of these attributes for
+*     element given by OUT--the original values of these attributes for
 *     element OUT are returned in ATTRS. If IN is blank, then the
-*     values supplied in ATTRS are copied to the element given by OUT -
-*     the original values of these attributes for element OUT are again
-*     returned in ATTRS.
+*     values supplied in ATTRS are copied to the element given by
+*     OUT-- the original values of these attributes for element OUT are
+*     again returned in ATTRS.
 
 *  Arguments:
 *     IPLOT = INTEGER (Given)
 *        The AST Plot.
 *     IN = CHARACTER * ( * ) (Returned)
-*        The name of the source element (e.g. "CURVES", "AXIS1", etc), or
+*        The name of the source element (e.g. "CURVES", "AXIS1", etc.), or
 *        blank.
 *     OUT = CHARACTER * ( * ) (Returned)
-*        The name of the destination element (e.g. "CURVES", "AXIS1", etc).
+*        The name of the destination element (e.g. "CURVES", "AXIS1", etc.).
 *     ATTRS( 5 ) = REAL (Given and Returned)
 *        The entry values are ignored unless IN is blank, in which case
 *        the entry values should be the colour, width, style, size and font
@@ -46,7 +47,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -56,8 +57,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)

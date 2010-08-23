@@ -19,7 +19,7 @@
 *     DIM = INTEGER ( READ )
 *           Dimension of the input and output arrays.
 *     ARRIN( DIM ) = <TYPE> ( READ )
-*           1-D array to be copied.
+*           One-dimensional array to be copied.
 *     ARROUT( DIM ) = <TYPE> ( WRITE )
 *           Output array is returned as a copy of the input array.
 *     STATUS = INTEGER (Given and Returned)

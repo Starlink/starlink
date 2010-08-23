@@ -13,8 +13,8 @@
 *     CALL KPG1_LUTK4( LP, UP, WORK, MAP, STATUS )
 
 *  Description:
-*     This routine produces an AST Mapping which maps 1-dimensional pen
-*     number into 3-dimensional RGB intensity within the current PGPLOT
+*     This routine produces an AST Mapping which maps one-dimensional pen
+*     number into three-dimensional RGB intensity within the current PGPLOT
 *     graphics device.
 
 *  Arguments:
@@ -35,7 +35,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -45,8 +45,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -117,7 +117,7 @@
      :                    STATUS )
       CMAP2 = AST_CMPMAP( CMAP1, RGBMAP( 3 ), .FALSE., ' ', STATUS )
 
-*  Create a PermMap which feeds input axis 1 to all three output axes.
+*  Create a PermMap which feeds input Axis 1 to all three output axes.
       PERM( 1 ) = 1
       PERM( 2 ) = 1
       PERM( 3 ) = 1

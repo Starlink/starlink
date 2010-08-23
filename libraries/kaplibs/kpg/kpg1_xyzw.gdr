@@ -6,7 +6,7 @@
 *     KPG1_XYZWx
 
 *  Purpose:
-*     Converts a 2-dimensional array into a list of x-y co-ordinates,
+*     Converts a two-dimensional array into a list of x-y co-ordinates,
 *     values and weights.
 
 *  Language:
@@ -18,8 +18,8 @@
 *                      YMAX, STATUS )
 
 *  Description:
-*     This routine converts a 2-dimensional array into a list of x-y
-*     coordinates, data values and weights for each of the good pixels
+*     This routine converts a two-dimensional array into a list of x-y
+*     co-ordinates, data values and weights for each of the good pixels
 *     in the array.  The x-y co-ordinates come from the axis arrays
 *     supplied.  Bad pixels are ignored if BAD is .TRUE..  If VARWTS is
 *     .TRUE., weights are calculated from the reciprocal of the
@@ -27,9 +27,9 @@
 
 *  Arguments:
 *     DIM1 = INTEGER (Given)
-*        The first dimension of the 2-dimensional array.
+*        The first dimension of the two-dimensional array.
 *     DIM2 = INTEGER (Given)
-*        The second dimension of the 2-dimensional array.
+*        The second dimension of the two-dimensional array.
 *     ARRAY( DIM1, DIM2 ) = ? (Given)
 *        The input data array.
 *     XAXIS( DIM1 ) = DOUBLE PRECISION (Given)

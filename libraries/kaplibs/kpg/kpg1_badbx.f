@@ -4,7 +4,8 @@
 *     KPG1_BADBX
 
 *  Purpose:
-*     Obtain an NDF section containing all good data in the supplied NDF.
+*     Obtains an NDF section containing all good data in the supplied
+*     NDF.
 
 *  Language:
 *     Starlink Fortran 77

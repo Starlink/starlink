@@ -4,8 +4,8 @@
 *     KPG1_UNZ2x
 
 *  Purpose:
-*     Unzips a 2-dimensional co-ordinate array into two 1-dimensional
-*     arrays.
+*     Unzips a two-dimensional co-ordinate array into two
+*     one-dimensional arrays.
 
 *  Language:
 *     Starlink Fortran 77

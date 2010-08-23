@@ -16,7 +16,7 @@
 *     This routine displays a textual description of the supplied AST
 *     Frame.  The displayed information does not include any
 *     axis-specific details that are common to all classes of Frame
-*     (such as axis units, labels, etc).
+*     (such as axis units, labels, etc.).
 
 *  Arguments:
 *     FRM = INTEGER (Given)
@@ -39,7 +39,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -49,8 +49,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)

@@ -98,15 +98,15 @@
 *        displayed so that the position supplied in POS is at the
 *        specified point within the displayed text string.
 *     REGION = INTEGER (Given)
-*        A 2-dimensional AST Region pointer. Only used if PLOT is "REGION".
+*        A two-dimensional AST Region pointer. Only used if PLOT is "REGION".
 *        In order to save time calling AST_CONVERT for every Region, the
 *        first Region to be plotted using this routine defines the
 *        co-ordinate frame for all subsequent Regions draw by later
 *        invocations of this routine. If in fact, later Regions may have a
-*        different coordinate frame, then this routine should be called
+*        different co-ordinate frame, then this routine should be called
 *        with MODE=REGION and REGION=AST__NULL. This will cause the
-*        current Region coordinate frame to be forgotten so that the next
-*        non-NULL Region to be draw will define a new current coordinate
+*        current Region co-ordinate frame to be forgotten so that the next
+*        non-NULL Region to be draw will define a new current co-ordinate
 *        frame for subsequent Regions.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -118,7 +118,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -128,8 +128,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
@@ -733,7 +733,7 @@
 *  parameters should be used instead of STYLE.
 
 c*  If the supplied position is a Current Frame position, map it into a
-c*  (2D GRAPHICS) Base Frame position. Otherwise, just use the 2D GRAPHICS
+c*  (two-dimensional GRAPHICS) Base Frame position. Otherwise, just use the two-dimensional GRAPHICS
 c*  position supplied.
 c         IF( CURR ) THEN
 c            CALL AST_TRANN( IPLOT, 1, NAXC, 1, POS, .FALSE., 2, 1, RPOS,

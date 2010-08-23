@@ -4,7 +4,7 @@
 *     KPG1_AXRNG
 
 *  Purpose:
-*     Calculate the extent of an NDF along an axis.
+*     Calculates the extent of an NDF along an axis.
 
 *  Language:
 *     Starlink Fortran 77

@@ -4,7 +4,7 @@
 *     KPG1_PX2AX
 
 *  Purpose:
-*     Convert a pixel's indices into WCS or axis coordinates.
+*     Convert a pixel's indices into WCS or axis co-ordinates.
 
 *  Language:
 *     Starlink Fortran 77
@@ -14,10 +14,10 @@
 
 *  Description:
 *     This routine converts the pixel indices of an NDF pixel into the
-*     WCS coordinate values of the pixel's centre. If a WCS FrameSet is
+*     WCS co-ordinate values of the pixel's centre. If a WCS FrameSet is
 *     not available, then the pixel indices are converted into the axis
-*     coordinate system. If an axis coordinate system is not defined for
-*     the NDF, then the pixel coordinate system will be used instead.
+*     co-ordinate system. If an axis co-ordinate system is not defined for
+*     the NDF, then the pixel co-ordinate system will be used instead.
 
 *  Arguments:
 *     NDIM = INTEGER (Given)
@@ -27,7 +27,7 @@
 *     INDF = INTEGER (Given)
 *        NDF identifier.
 *     AX( * ) = DOUBLE PRECISION (Returned)
-*        WCS or axis coordinate values for the pixel's centre.
+*        WCS or axis co-ordinate values for the pixel's centre.
 *        There should be enough elements in this array for all the
 *        current frame WCS axes (which need not be the same as NDIM).
 *     STATUS = INTEGER (Given and Returned)
@@ -46,7 +46,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -56,8 +56,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)

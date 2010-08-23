@@ -4,7 +4,7 @@
 *     KPG1_ASCRV
 
 *  Purpose:
-*     Draw a polyline using AST.
+*     Draws a polyline using AST.
 
 *  Language:
 *     Starlink Fortran 77
@@ -14,11 +14,11 @@
 
 *  Description:
 *     This routine draw a polyline between the supplied positions. These
-*     positions are presumed to refer to the (2D) Current coordinate Frame
-*     in the supplied AST Plot.
+*     positions are presumed to refer to the (two-dimensional)) Current
+*     co-ordinate Frame in the supplied AST Plot.
 *
 *     If FAST is .TRUE., the supplied positions are transformed into
-*     graphics coordinates, and the polyline is then drawn as a series
+*     graphics co-ordinates, and the polyline is then drawn as a series
 *     of straight line segments using PGPLOT directly. Drawing performed
 *     with FAST = .TRUE. is buffered to increase efficiency. Call this
 *     routine with N=0 to flush the buffer.
@@ -26,7 +26,7 @@
 *     If FAST is .FALSE., AST_CURVE is used to draw the polyline as a
 *     series of geodesic curves in the Current Frame of the Plot. This
 *     will take into account any discontinuities in the Mapping from
-*     the Current Frame to the graphics coordinate Frame, but will be
+*     the Current Frame to the graphics co-ordinate Frame, but will be
 *     slower.
 
 *  Arguments:
@@ -38,10 +38,10 @@
 *        The number of points in the polyline. Zero to flush the buffer
 *        when drawing in fast mode.
 *     X( N ) = REAL (Given)
-*        The X coordinates at the polyline points, in the Current Frame of
+*        The X co-ordinates at the polyline points, in the Current Frame of
 *        the Plot.
 *     Y( N ) = REAL (Given)
-*        The Y coordinates at the polyline points, in the Current Frame of
+*        The Y co-ordinates at the polyline points, in the Current Frame of
 *        the Plot.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -54,7 +54,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -64,8 +64,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -152,7 +152,7 @@
      :         N .EQ. 0 ) .AND. NPBUF .GT. 0 )  THEN
 
 *  Transform the buffered positions using the inverse of the Plot to get
-*  positions in Graphics coordinates.
+*  positions in Graphics co-ordinates.
             CALL AST_TRANN( IPLOT, NPBUF, 2, MXP, XYDATA, .FALSE.,
      :                      2, MXP, XYDATP, STATUS )
 

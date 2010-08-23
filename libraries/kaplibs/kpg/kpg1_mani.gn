@@ -5,7 +5,7 @@
 *     KPG1_MANI<T>
 
 *  Purpose:
-*     Copy a data array with axis permutation and expansion.
+*     Copies a data array with axis permutation and expansion.
 
 *  Language:
 *     Starlink Fortran 77
@@ -76,7 +76,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *     
 *     This program is distributed in the hope that it will be
@@ -86,8 +86,8 @@
 *     
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
@@ -139,8 +139,8 @@
       INTEGER NCOLL              ! Num input pixels collapsed per base pixel
       INTEGER NEXP               ! Num output pixels expanded per base pixel
       INTEGER NVAL               ! Number of non-bad pixels used for sum
-      INTEGER POSI( NDF__MXDIM ) ! Coordinates of current position in input
-      INTEGER POSO( NDF__MXDIM ) ! Coordinates of current position in output
+      INTEGER POSI( NDF__MXDIM ) ! co-ordinates of current position in input
+      INTEGER POSO( NDF__MXDIM ) ! co-ordinates of current position in output
       INTEGER STRIDI( NDF__MXDIM ) ! Strides through input array dimensions
       INTEGER STRIDO( NDF__MXDIM ) ! Strides through output array dimensions
       LOGICAL USED( NDF__MXDIM ) ! Which axes of input array appear in output?
@@ -285,7 +285,7 @@
      :       + ( POSO( 6 ) - 1 ) * STRIDO( 6 )
      :       + ( POSO( 7 ) - 1 ) * STRIDO( 7 )
 
-*  Get the coordinates of the base input pixel corresponding to this 
+*  Get the co-ordinates of the base input pixel corresponding to this 
 *  output pixel.
          DO I = 1, NDIMO
             IF ( AXES( I ) .GT. 0 ) THEN
@@ -294,7 +294,7 @@
          END DO
 
 *  Get the offset into the array of the base input pixel from its 
-*  coordinates.
+*  co-ordinates.
          IXI = POSI( 1 )
      :       + ( POSI( 2 ) - 1 ) * STRIDI( 2 ) 
      :       + ( POSI( 3 ) - 1 ) * STRIDI( 3 ) 

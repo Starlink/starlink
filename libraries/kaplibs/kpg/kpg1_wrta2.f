@@ -23,7 +23,7 @@
 *     also created for each axis of the Base Frame, with a name equal to
 *     the Symbol attribute of the Axis (AXIS_<n> is used if the Symbol is
 *     blank). The catalogue can be read using KPG1_RDLST (and also XCATVIEW
-*     etc).
+*     etc.).
 
 *  Arguments:
 *     PARAM = CHARACTER * ( * ) (Given)
@@ -95,7 +95,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -105,8 +105,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -654,7 +654,7 @@
 
 *  Add a header to the textual information.
          CALL CAT_PUTXT( CI, 'COMMENT', ' ', STATUS )
-         CALL CAT_PUTXT( CI, 'COMMENT', '      Coordinate system '//
+         CALL CAT_PUTXT( CI, 'COMMENT', '      Co-ordinate system '//
      :                   'information follows, stored ', STATUS )
          CALL CAT_PUTXT( CI, 'COMMENT', '      as an AST FrameSet '//
      :                   '(see Starlink User Note 210).', STATUS )

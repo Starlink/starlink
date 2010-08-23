@@ -5,7 +5,7 @@
 *     KPG1_KER1x
 
 *  Purpose:
-*     Smooths an N-dimensional array using a specified 1D kernel.
+*     Smooths an n-dimensional array using a specified one-dimensional kernel.
 
 *  Language:
 *     Starlink Fortran 77
@@ -15,8 +15,8 @@
 *                        WORK, OUT, STATUS )
 
 *  Description:
-*     The routine smooths the array IN using a specified 1-dimensional
-*     kernel and returns the result in the array OUT. The 1D kernel can
+*     The routine smooths the array IN using a specified one-dimensional
+*     kernel and returns the result in the array OUT. The one-dimensional kernel can
 *     be used to smooth either a single axis or mutiple axes. If multiple
 *     axes are smoothed, the total smoothing kernel is equivalent to the 
 *     product of the kernels used to smooth each individual axis.
@@ -31,12 +31,12 @@
 *     DIMS( NDIM ) = INTEGER (Given)
 *        The length, in pixels, of each dimension of the IN and OUT arrays.
 *     IN( * ) = ? (Given)
-*        The input array, accessed as a 1D vector.
+*        The input array, accessed as a one-dimensional vector.
 *     NAX = INTEGER (Given)
 *        The number of axes along which smoothing should be performed.
 *     AXES( NAX ) = INTEGER (Given)
 *        The indices of the pixel axes along which smoothing should be
-*        performed. The first axis is axis 1.
+*        performed. The first axis is Axis 1.
 *     SIZE = INTEGER (Given)
 *        The number of values in the kernel.
 *     CENTRE = INTEGER (Given)
@@ -48,7 +48,7 @@
 *     WORK( SIZE ) = ? (Given and Returned)
 *        A work array.
 *     OUT( * ) = ? (Returned)
-*        The output array, accessed as a 1D vector.
+*        The output array, accessed as a one-dimensional vector.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -295,7 +295,7 @@
  10         CONTINUE            
 
 *  Update the pixel indices and vector index so that they refer to the
-*  next element on pixel axis 1.
+*  next element on Pixel Axis 1.
             IDIM = 1
             START( 1 ) = START( 1 ) + 1
             ISTART = ISTART + 1

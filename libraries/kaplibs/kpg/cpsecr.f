@@ -5,7 +5,7 @@
 *     CPSECR
 
 *  Purpose:
-*     Copy region of 2-D image.
+*     Copy region of two-dimensional image.
 
 *  Language:
 *     Starlink
@@ -14,16 +14,16 @@
 *     CALL  CPSECR( IMAGE, DIM1, DIM2, X1, Y1, X2, Y2, RXDIM, RYDIM,
 
 *  Description:
-*     This routine copies the 2-D data of a specified region of an
-*     image.
+*     This routine copies the two-dimensional data of a specified region
+*     of an image.
 
 *  Arguments:
 *     IMAGE( DIM1, DIM2 ) = REAL( READ )
 *        The array containing the raw image data.
 *     DIM1 = INTEGER( READ )
-*        The first dimension of the 2-d array.
+*        The first dimension of the two-dimensional array.
 *     DIM2 = INTEGER( READ )
-*        The second dimension of the 2-d array.
+*        The second dimension of the two-dimensional array.
 *     X1 = INTEGER( READ )
 *        The X co-ordinate of the first point from which the region
 *          is determined.
@@ -55,7 +55,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -65,8 +65,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     S.Chan ( RGVAD::KFH )

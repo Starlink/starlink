@@ -23,16 +23,17 @@
 *     is returned in SDIM, and the bounds of the axis are returned in SLBND
 *     and SUBND.  If EXACT is .TRUE., an error is reported if the number of
 *     significant axes is not exactly NDIM.  This mode is intended for case
-*     where (say) the user has supplied a single plane from a 3D data cube
-*     to an application which requires a 2D array.
+*     where (say) the user has supplied a single plane from a
+*     three-dimensional data cube to an application that requires a 
+*     two-dimensional array.
 *
 *     If EXACT is .FALSE. an error is only reported if the number of
 *     significant dimensions is higher than NDIM.  If there are less than
 *     NDIM significant dimensions then the insignificant dimensions are
 *     used (starting from the lowest) to ensure that the required number
 *     of dimensions are returned. This mode is intended for cases where (say)
-*     the user supplies a 1D data stream to an application which requires a
-*     2D array.
+*     the user supplies a one-dimensional data stream to an application 
+*     that requires a two-dimensional array.
 *
 *     The GRID Frame (i.e. the Base Frame) obtained from the NDFs WCS
 *     component is modified so that it has NDIM axes corresponding to the
@@ -115,7 +116,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -125,8 +126,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)

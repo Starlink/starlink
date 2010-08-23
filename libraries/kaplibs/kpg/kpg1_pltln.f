@@ -6,7 +6,8 @@
 *     KPG1_PLTLN
 
 *  Purpose:
-*     Produces a graphical representation of a set of points in 2-D.
+*     Produces a graphical representation of a set of points in two
+*     dimensions
 
 *  Language:
 *     Starlink Fortran 77
@@ -32,10 +33,10 @@
 *     The Plotting style is accessed using one or more environment parameters
 *     specified by PARAM, and may include the following synonyms for graphical
 *     elements:
-*        "Err(Bars)" - Specifies colour, etc for error bars. Size(errbars)
+*        "Err(Bars)" - Specifies colour, etc. for error bars. Size(errbars)
 *                      scales the size of the serifs used if ERSHAP=1 (i.e.
 *                      a size value of 1.0 produces a default size).
-*        "Sym(bols)" - Specifies colour, etc for markers (used in Modes 3
+*        "Sym(bols)" - Specifies colour, etc. for markers (used in Modes 3
 *                      and 5).
 *        "Lin(es)" - Specifies colour, etc. for lines (used in Modes 1, 2,
 *                    4 and 5).

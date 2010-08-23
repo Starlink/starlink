@@ -4,7 +4,7 @@
 *     KPG1_GDQPC
 
 *  Purpose:
-*     Return the extent of the current picture.
+*     Returns the extent of the current picture.
 
 *  Language:
 *     Starlink Fortran 77
@@ -15,17 +15,17 @@
 *  Description:
 *     This routine makes the current PGPLOT bviewport and window match
 *     the current AGI picture, and returns the extent of the picture in
-*     AGI world co-ordinates and physical coordinates (metres).
+*     AGI world co-ordinates and physical co-ordinates (metres).
 
 *  Arguments:
 *     X1 = REAL (Returned)
-*        The X world coordinate of the bottom left corner.
+*        The X world co-ordinate of the bottom left corner.
 *     Y1 = REAL (Returned)
-*        The Y world coordinate of the bottom left corner.
+*        The Y world co-ordinate of the bottom left corner.
 *     X2 = REAL (Returned)
-*        The X world coordinate of the top right corner.
+*        The X world co-ordinate of the top right corner.
 *     Y2 = REAL (Returned)
-*        The Y world coordinate of the top right corner.
+*        The Y world co-ordinate of the top right corner.
 *     XM = REAL (Returned)
 *        The extent of the Y axis in metres.
 *     YM = REAL (Returned)
@@ -46,7 +46,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -56,8 +56,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
@@ -111,7 +111,7 @@
          XM = ( X2 - X1 )/1000.0
          YM = ( Y2 - Y1 )/1000.0
 
-*  Get its bounds in world coordinates.
+*  Get its bounds in world co-ordinates.
          CALL PGQWIN( X1, X2, Y1, Y2 )
       END IF
 

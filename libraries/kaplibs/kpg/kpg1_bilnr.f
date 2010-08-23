@@ -5,7 +5,7 @@
 *     KPG1_BILNR
 
 *  Purpose:
-*     Perform bi-linear interpolation checking for bad values.
+*     Performs bi-linear interpolation checking for bad values.
 
 *  Language:
 *     Starlink Fortran 77
@@ -28,9 +28,9 @@
 
 *  Arguments:
 *     X = REAL (Given)
-*        The pixel X coordinate at which to perform the interpolation.
+*        The pixel X co-ordinate at which to perform the interpolation.
 *     Y = REAL (Given)
-*        The pixel Y coordinate at which to perform the interpolation.
+*        The pixel Y co-ordinate at which to perform the interpolation.
 *     XLO = INTEGER (Given)
 *        The lower bound on the array X axis.
 *     XHI = INTEGER (Given)
@@ -59,7 +59,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -69,8 +69,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)

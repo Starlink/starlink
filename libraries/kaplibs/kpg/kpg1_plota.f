@@ -247,7 +247,7 @@
 *  If the DATA picture does not have a Plot stored with it, KPG1_GDGET
 *  will create a default Plot containing a GRAPHICS Frame, and a Frame
 *  corresponding to AGI world co-ordinates. The AGI world co-ordinate
-*  Frame is normally just a default 2-D Frame with Domain AGI_WORLD, but
+*  Frame is normally just a default two-dimensional Frame with Domain AGI_WORLD, but
 *  we can over-ride this by supplying an alternative Frame containing
 *  more appropriate attribute settings. If we do not know the Domain of
 *  the AGI world co-ordinate system, just use the default Frame. This is
@@ -266,7 +266,7 @@
             END IF
 
 *  If we have a Domain name, but no Frame with this Domain was supplied,
-*  use a default 2-D Frame with the specified Domain name.
+*  use a default two-dimensional Frame with the specified Domain name.
             IF( FRM .EQ. AST__NULL ) THEN
                FRM = AST_FRAME( 2, ' ', STATUS )
                CALL AST_SETC( FRM, 'DOMAIN',

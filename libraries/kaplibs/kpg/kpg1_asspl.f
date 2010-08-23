@@ -4,7 +4,8 @@
 *     KPG1_ASSPL
 
 *  Purpose:
-*     Get a set of 1-d Mappings for each axis in a FrameSet.
+*     Gets a set of one-dimensional Mappings for each axis in a
+*     FrameSet.
 
 *  Language:
 *     Starlink Fortran 77
@@ -14,9 +15,9 @@
 
 *  Description:
 *     This routine returns a set of AST Mapping pointers. Each Mapping
-*     has 1 input and 1 output. The I'th Mapping goes from axis I in the
-*     Base Frame of the supplied FrameSet, to axis I in the Current Frame
-*     of the FrameSet.
+*     has one input and one output. The I'th Mapping goes from Axis I in
+*     the Base Frame of the supplied FrameSet, to Axis I in the Current
+*     Frame of the FrameSet.
 *
 *     There should usually be a one-to-one correspondance between the
 *     axes in the Base and Current Frames in the FrameSet.
@@ -39,7 +40,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -49,8 +50,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -125,7 +126,7 @@
 
 *  Create a PermMap with 1 input and NBAX outputs which feeds the
 *  Base Frame. The 1 input is fed from output axis I (by the inverse
-*  PermMap), and output axis I is fed by input axis 1 (by the forward
+*  PermMap), and output axis I is fed by input Axis 1 (by the forward
 *  PermMap). All other outputs are assigned AST__BAD by the forward
 *  PermMap.
          PMAP = AST_PERMMAP( 1, I, NBAX, PERM, 0.0D0, ' ', STATUS )
@@ -135,7 +136,7 @@
 
 *  Create a second PermMap with NCAX inputs fed by the Current Frame, and
 *  1 output. The 1 output is fed from input axis I (by the forward
-*  PermMap), and input axis I is fed by output axis 1 (by the inverse
+*  PermMap), and input axis I is fed by output Axis 1 (by the inverse
 *  PermMap). All other inputs are assigned AST__BAD by the inverse
 *  PermMap.
          PMAP = AST_PERMMAP( NCAX, PERM, 1, I, 0.0D0, ' ', STATUS )

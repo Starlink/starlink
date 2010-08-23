@@ -23,7 +23,7 @@
 *     the DATA picture. The bounds of the PGPLOT window produce a world
 *     co-ordinate system within the viewport corresponding to the Base
 *     Frame in the returned Plot (i.e. millimetres from the bottom left
-*     corner of the view surface - NOT pixel coordinates). Note, this is
+*     corner of the view surface - NOT pixel co-ordinates). Note, this is
 *     different to the world co-ordinate system stored in the AGI database
 *     with the DATA picture.
 
@@ -57,7 +57,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -67,8 +67,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
@@ -123,7 +123,7 @@
 *  If the DATA picture does not have a Plot stored with it, KPG1_GDGET
 *  will create a default Plot containing a GRAPHIS Frame, and a Frame
 *  corresponding to AGI world co-ordinates. The AGI world co-ordinate
-*  Frame is normally just a default 2-D Frame with Domain AGI_WORLD, but
+*  Frame is normally just a default two-dimensional Frame with Domain AGI_WORLD, but
 *  we can over-ride this by supplying an alternative Frame containing
 *  more appropriate attribute settings. If we do not know the Domain of the
 *  AGI world co-ordinate system, just use the default Frame. This is
@@ -145,7 +145,7 @@
          END IF
 
 *  If we have a Domain name, but no Frame with this Domain was supplied,
-*  use a default 2D Frame with the specified Domain name.
+*  use a default two-dimensional Frame with the specified Domain name.
          IF( FRM .EQ. AST__NULL ) THEN
             FRM = AST_FRAME( 2, ' ', STATUS )
             CALL AST_SETC( FRM, 'DOMAIN', DOMAIN( : CHR_LEN( DOMAIN ) ),

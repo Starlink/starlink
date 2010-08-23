@@ -53,14 +53,14 @@
 *
 *     1) Take the one-dimensional FFT of each row of the original image.
 *     2) Stack all these one-dimensional FFTs into a pair of
-*        2-dimensional images the same size as the original image. One
-*        2-dimensional image ("A") holds the real part and the other
+*        two-dimensional images the same size as the original image. One
+*        two-dimensional image ("A") holds the real part and the other
 *        ("B") holds the imaginary part.  Each row of image A will have
 *        symmetry such that A(J,row) = A(M-J,row) (J goes from 0 to
 *        M-1), while each row of image B will have symmetry such that
 *        B(J,row) = -B(M-J,row).
 *     3) Take the one-dimensional FFT of each column of image A.
-*     4) Stack all these one-dimensional FFTs into a pair of 2D images,
+*     4) Stack all these one-dimensional FFTs into a pair of two-dimensional images,
 *        image AA holds the real part of each FFT, and image BA holds
 *        the imaginary part.  Each column of AA will have symmetry such
 *        that AA(column,K) = AA(column,N-K) (K goes from 0 to N-1),
@@ -68,7 +68,7 @@
 *        -BA(column,N-K).
 *     5) Take the one-dimensional FFT of each column of image B.
 *     6) Stack all these one-dimensional FFTs into a pair of
-*        2-dimensional images, image AB holds the real part of each
+*        two-dimensional images, image AB holds the real part of each
 *        FFT, and image BB holds the imaginary part.  Each column of AB
 *        will have symmetry such that AB(column,K) = AB(column,N-K) (K
 *        goes from 0 to N), each column of BB will have symmetry such

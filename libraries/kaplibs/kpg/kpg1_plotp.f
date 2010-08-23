@@ -48,7 +48,7 @@
 *        DATA picture are set equal to the existing DATA picture.
 *     APP = CHARACTER * ( * ) (Given)
 *        The name of the calling application in the form
-*        <package>_<application> (eg "KAPPA_DISPLAY").
+*        <package>_<application> (eg"KAPPA_DISPLAY").
 *     MARGIN( 4 ) = REAL (Given)
 *        The width of the borders to leave round the new DATA picture, given
 *        as fractions of the corresponding dimension of the DATA picture.
@@ -119,7 +119,7 @@
 
 *  Notes:
 *     -  Picture identifiers are returned equal to -1 if the picture cannot
-*     be created (eg due to lack of room within the current picture).
+*     be created (egdue to lack of room within the current picture).
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils.
@@ -128,7 +128,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -138,8 +138,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)

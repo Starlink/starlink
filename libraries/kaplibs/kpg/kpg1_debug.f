@@ -4,7 +4,8 @@
 *     KPG1_DEBUG
 
 *  Purpose:
-*     Should the speified package report debug diagnostics?
+*     Determine wether the specified package should report debug
+*     diagnostics
 
 *  Language:
 *     Starlink Fortran 77
@@ -24,7 +25,7 @@
 *        error has already occurred, or if this routine should fail for
 *        any reason.
 *     PACK = CHARACTER * ( * ) (Given)
-*        The name of the package (eg "KAPPA", "POLPACK", etc).
+*        The name of the package (e.g. "KAPPA", "POLPACK", etc.).
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -39,7 +40,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -49,8 +50,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)

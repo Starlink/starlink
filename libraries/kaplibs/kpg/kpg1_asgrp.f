@@ -4,7 +4,7 @@
 *     KPG1_ASGRP
 
 *  Purpose:
-*     Read spatial positions from a GRP group.
+*     Reads spatial positions from a GRP group.
 
 *  Language:
 *     Starlink Fortran 77
@@ -17,7 +17,7 @@
 *     positions are assumed to be in the supplied Frame. Each element
 *     in the group should contain 1 position per line. Each position is
 *     given by a set of strings delimited by comma, space or tab (the
-*     first gives the value for axis 1, the second for axis 2, etc). The
+*     first gives the value for Axis 1, the second for Axis 2, etc.). The
 *     number of strings per element in the group should equal the number
 *     of axes in the Base Frame of the supplied FrameSet.
 *
@@ -29,7 +29,7 @@
 *        the columns within the text file which are to be used. If blank,
 *        the file must contain exactly NAX columns, all of which are used.
 *        If a null value is supplied, the dynamic default values will be
-*        used which is [1,2,3... NAX].
+*        used, which is [1,2,3... NAX].
 *     FRM = INTEGER (Given)
 *        A pointer to an AST Frame.
 *     IGRP = INTEGER (Given)
@@ -50,7 +50,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -60,8 +60,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)

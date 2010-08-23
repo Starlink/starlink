@@ -4,7 +4,7 @@
 *     KPG1_ASPLT
 
 *  Purpose:
-*     Create an AST Plot covering the current PGPLOT viewport.
+*     Creates an AST Plot covering the current PGPLOT viewport.
 
 *  Language:
 *     Starlink Fortran 77
@@ -15,10 +15,10 @@
 *  Description:
 *     This routine create a Plot covering the current PGPLOT viewport.
 *     The bounds of the PGPLOT window are changed if necessary to ensure
-*     that the PGPLOT world co-ordinate system corresponds to milliemtres
-*     from the bottom left corner of the view surface. This is the
-*     co-ordinate system used in the Base (GRAPHICS) Frame of the returned
-*     Plot.
+*     that the PGPLOT world co-ordinate system corresponds to
+*     millimetres from the bottom-left corner of the view surface. This
+*     is the co-ordinate system used in the Base (GRAPHICS) Frame of
+*     the returned Plot.
 
 *  Arguments:
 *     IWCS = INTEGER (Given)
@@ -26,10 +26,11 @@
 *     BOX( 4 ) = DOUBLE PRECISION (Given)
 *        An array holding the bounds of the area within the Base Frame of
 *        IWCS which is to be mapped linearly onto the current PGPLOT
-*        viewport. The first pair of values should give the coordinates at
-*        the bottom left corner of the plotting area and the second pair
-*        should give the coordinates at the top right corner. The coordinate
-*        on the horizontal axis should be given first in each pair.
+*        viewport. The first pair of values should give the co-ordinates
+*        at the bottom-left corner of the plotting area and the second
+*        pair should give the co-ordinates at the top-right corner. The
+*        co-ordinate on the horizontal axis should be given first in
+*        each pair.
 *     OPTS = CHARACTER * ( * ) (Given)
 *        A set of Plot attribute settings to be used when creating the
 *        Plot.
@@ -50,7 +51,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -60,8 +61,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
@@ -106,7 +107,7 @@
 *  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Ensure that the current PGPLOT world-coordinate system is millimetres
+*  Ensure that the current PGPLOT world-co-ordinate system is millimetres
 *  from the bottom left corner of the view surface.
       CALL PGQVP( 2, BX( 1 ), BX( 3 ), BX( 2 ), BX( 4 ) )
       CALL PGSWIN( BX( 1 ), BX( 3 ), BX( 2 ), BX( 4 ) )

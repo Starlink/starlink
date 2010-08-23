@@ -16,7 +16,7 @@
 *     This routine reads an AST Object from a component of the supplied
 *     HDS object. The component name is specified by the caller. The
 *     component must have a type of WCS, must be scalar, and must contain
-*     a single 1-D array component with name DATA and type _CHAR.
+*     a single one-dimensional array component with name DATA and type _CHAR.
 *     AST__NULL is returned in IAST, and no error is reported if the
 *     named component does not exist.
 
@@ -40,7 +40,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -50,8 +50,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
@@ -199,7 +199,7 @@
      :                          'of ''^BADTYPE''; it should be of ' //
      :                          'type ''_CHAR''.', STATUS )
 
-*  Check that the DATA component is 1-dimensional and report an error
+*  Check that the DATA component is one-dimensional and report an error
 *  if it is not.
                      ELSE IF ( NDIM .NE. 1 ) THEN
                         STATUS = SAI__ERROR
@@ -209,7 +209,7 @@
      :                          'The DATA component in the HDS ' //
      :                          'object ^WCS is ' //
      :                          '^BADNDIM-dimensional; it should be ' //
-     :                          '1-dimensional.', STATUS )
+     :                          'one-dimensional.', STATUS )
 
                      END IF
                   END IF

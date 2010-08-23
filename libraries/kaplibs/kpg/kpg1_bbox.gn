@@ -185,7 +185,7 @@
          END IF         
 
 *  Update the pixel indices so that they refer to the next element on 
-*  pixel axis 1.
+*  Pixel Axis 1.
          IDIM = 1
          PIX( 1 ) = PIX( 1 ) + 1
 

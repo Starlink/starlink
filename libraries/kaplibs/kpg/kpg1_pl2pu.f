@@ -6,7 +6,7 @@
 *     KPG1_PL2PU
 
 *  Purpose:
-*     Writes 2-dimensional polynomial information to a POLYNOMIAL
+*     Writes two-dimensional polynomial information to a POLYNOMIAL
 *     structure.
 
 *  Language:

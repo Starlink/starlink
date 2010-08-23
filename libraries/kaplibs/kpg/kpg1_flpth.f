@@ -4,7 +4,8 @@
 *     KPG1_FLPTH
 
 *  Purpose:
-*     Get the full path to a file given relative to a specified root directory.
+*     Gets the full path to a file given relative to a specified root
+*     directory.
 
 *  Language:
 *     Starlink Fortran 77
@@ -21,16 +22,17 @@
 *  Arguments:
 *     ROOT = CHARACTER * ( * ) (Given)
 *        An environment variable which is to be translated to get the
-*        full path to the root directory. Eg, HOME, KAPPA_DIR, etc. If a
+*        full path to the root directory, such as HOME, KAPPA_DIR.  If a
 *        blank value is supplied, then the current working directory is
 *        used ($PWD on Unix and $PATH on VMS).
 *     INSTR = CHARACTER * ( * ) (Given)
 *        The file spec relative to the root directory. E.g. fred.dat,
 *        adam/display.sdf, etc.
 *     OUTSTR = CHARACTER * ( * ) (Returned)
-*        The full file path. E.g. /home/dsb/fred.dat (DISK$USER:[DSB]FRED.DAT
-*        on VMS), or /home/dsb/adam/display.sdf (DISK$USER:[DSB.ADAM]DISPLAY.SDF on VMS).
-*        Returned blank if an error occurs.
+*        The full file path. For example /home/dsb/fred.dat
+*        (DISK$USER:[DSB]FRED.DAT on VMS), or /home/dsb/adam/display.sdf
+*        (DISK$USER:[DSB.ADAM]DISPLAY.SDF on VMS).  Returned blank if an
+*        error occurs.
 *     NC = INTEGER (Returned)
 *        Number of characters used in OUTSTR. Returned equal to 0 if an
 *        error occurs.

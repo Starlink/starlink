@@ -4,7 +4,7 @@
 *     COPY1D
 
 *  Purpose:
-*     copy one 1-D array to another.
+*     copy one one-dimensional array to another.
 
 *  Language:
 *     Starlink F77
@@ -13,16 +13,16 @@
 *     CALL COPY1D( DIM, ARRIN, ARROUT, STATUS )
 
 *  Description:
-*     The input 1-D array, ARRIN, of dimension DIM, is copied into the
-*     output 1-D array, ARROUT, of the same dimension.
-*     An immediate return will occur if STATUS has an error value on
-*     entry.
+*     The input one-dimensional array, ARRIN, of dimension DIM, is
+*     copied into the output one-dimensional array, ARROUT, of the
+*     same dimension.  An immediate return will occur if STATUS 
+*     has an error value on entry.
 
 *  Arguments:
 *     DIM = INTEGER( READ )
 *        Dimension of the input and output arrays.
 *     ARRIN( DIM ) = REAL( READ )
-*        1-D array to be copied.
+*        One-dimensional array to be copied.
 *     ARROUT( DIM ) = REAL( WRITE )
 *        Output array is returned as a copy of the input array.
 *     STATUS = INTEGER( READ )
@@ -43,7 +43,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -53,8 +53,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     Dave Baines (ROE::ASOC5)
@@ -74,6 +74,7 @@
 *-
 
 *  Type Definitions:
+
       IMPLICIT NONE
 
 

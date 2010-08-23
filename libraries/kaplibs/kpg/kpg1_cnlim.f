@@ -5,7 +5,7 @@
 *     KPG1_CNLIM
 
 *  Purpose:
-*     Parse a character string into integer bounds.
+*     Parses a character string into integer bounds.
 
 *  Language:
 *     Starlink Fortran 77

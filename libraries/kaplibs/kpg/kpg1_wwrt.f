@@ -15,7 +15,7 @@
 *  Description:
 *     This routine stores a supplied AST Object in a new component of
 *     a supplied HDS object. The new component has type WCS and contains
-*     a single component named DATA, of type _CHAR. DATA is a 1-D array
+*     a single component named DATA, of type _CHAR. DATA is a one-dimensional array
 *     holding lines of text which can be interpreted by a simple AST
 *     Channel.
 
@@ -37,7 +37,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -47,8 +47,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
@@ -114,7 +114,7 @@
       CALL DAT_NEW( LOC, NAME, 'WCS', 0, DIM, STATUS )
 
 *  Obtain a locator to this structure and create a DATA component (a
-*  1-dimensional _CHAR array) within it to hold the information.
+*  one-dimensional _CHAR array) within it to hold the information.
       WCSLOC = DAT__NOLOC
       CALL DAT_FIND( LOC, NAME, WCSLOC, STATUS )
       CALL DAT_NEW1C( WCSLOC, 'DATA', KPG__SZAST, KPG__INAST, STATUS )

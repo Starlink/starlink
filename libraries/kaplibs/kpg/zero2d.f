@@ -4,7 +4,7 @@
 *     ZERO2D
 
 *  Purpose:
-*     sets all elements of a 2-dimensional array to zero.
+*     sets all elements of a two-dimensional array to zero.
 
 *  Language:
 *     Starlink
@@ -13,15 +13,17 @@
 *     CALL ZERO2D( DIM1, DIM2, ARRAY, STATUS )
 
 *  Description:
-*     All elements of the 2-dimensional array, ARRAY, are set equal to
+*     All elements of the two-dimensional array, ARRAY, are set equal to
 *     zero. An immediate return will occur if STATUS has an error value
 *     on entry.
 
 *  Arguments:
 *     DIM1 = INTEGER( READ )
-*        The first dimension of the 2-d array to be set to all zeros.
+*        The first dimension of the two-dimensional array to be set to
+*        all zeros.
 *     DIM2 = INTEGER( READ )
-*        The second dimension of the 2-d array to be set to all zeros.
+*        The second dimension of the two-dimensional array to be set to
+*        all zeros.
 *     ARRAY( DIM1, DIM2 ) = REAL( UPDATE )
 *        All elements of this array will be set to zero.
 *     STATUS = INTEGER( READ )
@@ -44,7 +46,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -54,8 +56,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     Dave Baines (ROE::ASOC5)

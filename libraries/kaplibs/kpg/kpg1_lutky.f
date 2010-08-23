@@ -30,10 +30,10 @@
 *        The name of the style parameter to use (e.g. STYLE, KEYSTYLE,
 *        etc.).
 *     HIGH = REAL (Given)
-*        The X axis value (i.e. pixel value or pen number) corresponding
+*        The X-axis value (i.e. pixel value or pen number) corresponding
 *        to the colour index UP.
 *     LOW = REAL (Given)
-*        The X axis value (i.e. pixel value or pen number) corresponding
+*        The X-axis value (i.e. pixel value or pen number) corresponding
 *        to the colour index LP.
 *     LABEL = CHARACTER * ( * ) (Given)
 *        The default label to put against the data values.
@@ -162,13 +162,13 @@
       PARAMETER ( GRAPH = 2 )
 
 *  Local Variables:
-      CHARACTER CLABEL*80        ! Label to use for axis 2
-      CHARACTER CSYM*10          ! Symbol to use for axis 2
+      CHARACTER CLABEL*80        ! Label to use for Axis 2
+      CHARACTER CSYM*10          ! Symbol to use for Axis 2
       CHARACTER DOM*30           ! Domain name
       CHARACTER EDGE1*6          ! Default edge for data value labels
       CHARACTER EDGE2*6          ! Default edge for other axis labels
-      CHARACTER ULABEL*80        ! Label to use for axis 1
-      CHARACTER USYM*10          ! Symbol to use for axis 1
+      CHARACTER ULABEL*80        ! Label to use for Axis 1
+      CHARACTER USYM*10          ! Symbol to use for Axis 1
       DOUBLE PRECISION INA( 2 )  ! GRAPHICS Frame co-ords at corner A
       DOUBLE PRECISION INB( 2 )  ! GRAPHICS Frame co-ords at corner B
       DOUBLE PRECISION OUTA( 2 ) ! Current Frame co-ords at corner A
@@ -241,7 +241,7 @@
       CALL PGQWIN( X1, X2, Y1, Y2 )
 
 *  Create a new Frame describing the displayed key.  This will be the
-*  "annotation" Frame.  Axis 1 is data value or pen number, and axis 2
+*  "annotation" Frame.  Axis 1 is data value or pen number, and Axis 2
 *  is either count (for histogram keys), intensity (for graph keys), or
 *  offset (for ramp keys).
       FRM5 = AST_FRAME( 2, ' ', STATUS )
@@ -256,12 +256,12 @@
      :                                                  STATUS ),
      :                   FRM5, STATUS )
 
-*  Set the default axis 1 label and symbol.
+*  Set the default Axis 1 label and symbol.
       CALL AST_SETC( IPLOT, 'LABEL(1)', LABEL, STATUS )
       CALL AST_SETC( IPLOT, 'SYMBOL(1)', 'VALUE', STATUS )
 
 *  Set up the default edge for labelling.  If the viewport is short and
-*  wide, axis 1 of the annotation Frame (the data value axis) is
+*  wide, Axis 1 of the annotation Frame (the data value axis) is
 *  displayed horizontally by default.  It is displayed vertically by
 *  default if the  viewport is tall and thin.
       IF( ABS( Y1 - Y2 ) .GT. ABS( X2 - X1 ) ) THEN
@@ -381,7 +381,7 @@
 *  If a graph or ramp key is being produced,
       ELSE
 
-*  Store the axis 2 (intensity or offset) bounds of the key.
+*  Store the Axis 2 (intensity or offset) bounds of the key.
          LBND( 2 ) = 0.0
          UBND( 2 ) = 1.05
 
@@ -415,7 +415,7 @@
          Y1 = MIN( Y2, Y1 + GAP1 )
          Y2 = MAX( Y1, Y2 - GAP2 )
 
-*  Check that the axis 2 labelling edge is not left or right.
+*  Check that the Axis 2 labelling edge is not left or right.
          IF( EDGE2 .EQ. 'LEFT' .OR. EDGE2 .EQ. 'RIGHT' ) THEN
             EDGE2 = 'BOTTOM'
          END IF
@@ -427,7 +427,7 @@
          X1 = MIN( X2, X1 + GAP1 )
          X2 = MAX( X1, X2 - GAP2 )
 
-*  Check that the axis 2 labelling edge is not top or bottom.
+*  Check that the Axis 2 labelling edge is not top or bottom.
          IF( EDGE2 .EQ. 'TOP' .OR. EDGE2 .EQ. 'BOTTOM' ) THEN
             EDGE2 = 'LEFT'
          END IF
@@ -475,8 +475,8 @@
 
       MAP2 = AST_WINMAP( 2, INA, INB, OUTA, OUTB, ' ', STATUS )
 
-*  Create a 2D Frame. Specify a format for axis 1 which results in pen
-*  numbers being displayed as integers.
+*  Create a two-dimensional Frame. Specify a format for Axis 1, which
+*  results in pen numbers being displayed as integers.
       FRM2 = AST_FRAME( 2, 'DOMAIN=PEN-Y,'//
      :                     'FORMAT(1)=%.0f,'//
      :                     'LABEL(1)=Pen Number,'//
@@ -509,7 +509,7 @@
          MAP3A = AST_WINMAP( 1, INA, INB, OUTA, OUTB, ' ', STATUS )
       END IF
 
-*  Create a 1D unit map to propagate the Y axis value.
+*  Create a one-dimensional unit map to propagate the Y-axis value.
       MAP3B = AST_UNITMAP( 1, ' ', STATUS )
 
 *  Compound them in parallel.
@@ -525,7 +525,7 @@
 *  Add it to the parallel compound Mapping.
       CMAP2 = AST_CMPMAP( CMAP1, MAP3C, .FALSE., ' ', STATUS )
 
-*  Create a 1D unit map to propagate the pen number value.
+*  Create a one-dimensional unit map to propagate the pen number value.
       MAP3D = AST_UNITMAP( 1, ' ', STATUS )
 
 *  Add it to the parallel compound Mapping.
@@ -565,7 +565,7 @@
       CALL AST_ADDFRAME( IPLOT, AST__CURRENT,
      :                   AST_SIMPLIFY( MAP3, STATUS ), FRM3, STATUS )
 
-*  The next Frame has 4 axes; X axis value (pen number or pixel value),
+*  The next Frame has 4 axes; X-axis value (pen number or pixel value),
 *  R intensity, G intensity, B intensity. Pick these axes from the
 *  previous Frame to create the new Frame.
       PERM( 1 ) = 1

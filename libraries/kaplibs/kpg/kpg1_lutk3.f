@@ -21,9 +21,9 @@
 *     IPLOT = INTEGER (Given)
 *        The Plot to use.
 *     PARAM = CHARACTER * ( * ) (Given)
-*        The name of the style parameter to use (eg STYLE, KEYSTYLE, etc).
+*        The name of the style parameter to use (egSTYLE, KEYSTYLE, etc).
 *        The appearance of the 3 curves can be set using attribute
-*        qualifiers (R), (G), and (B) (eg "width(r)=10" ).
+*        qualifiers (R), (G), and (B) (eg"width(r)=10" ).
 *     APP = CHARACTER * ( * ) (Given)
 *        The calling application, in the form "KAPPA_LUTVIEW".
 *     LP = INTEGER (Given)
@@ -43,7 +43,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -53,8 +53,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -112,7 +112,7 @@
       NPEN = UP - LP + 1
 
 *  Find the PEN-Y Frame in the Plot. Axis 1 of this Frame is pen number,
-*  and axis 2 is RGB intensity.
+*  and Axis 2 is RGB intensity.
       CALL KPG1_ASFFR( IPLOT, 'PEN-Y', IPENY, STATUS )
 
 *  Get the Mapping from the PEN-Y Frame to the GRAPHICS Frame.

@@ -4,7 +4,7 @@
 *     KPG1_FIGRx
 
 *  Purpose:
-*     Sets each element in a N-dimensional array to its grid 
+*     Sets each element in a n-dimensional array to its grid 
 *     co-ordinate.
 
 *  Language:
@@ -14,7 +14,7 @@
 *     CALL KPG1_FIGRx( NDIMS, DIMS, EL, ARRAY, STATUS )
 
 *  Description:
-*     This routine sets each pixel in an N-dimensional array to its grid
+*     This routine sets each pixel in an n-dimensional array to its grid
 *     co-ordinate.
 
 *  Arguments:
@@ -108,7 +108,7 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Loop to find the stride for each dimension of the N-dimensional
+*  Loop to find the stride for each dimension of the n-dimensional
 *  array.
       STRIDE( 1 ) = 1
       NEL = 1
@@ -128,7 +128,7 @@
             ARRAY( J, I ) = IVEC / STRIDE( I )
             IVEC = IVEC - ARRAY( J, I ) * STRIDE( I )
 
-*  Add the lower bound of the N-dimensional array to each result.
+*  Add the lower bound of the n-dimensional array to each result.
             ARRAY( J, I ) = ARRAY( J, I ) + 1
    2     CONTINUE
    3  CONTINUE

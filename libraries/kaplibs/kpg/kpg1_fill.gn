@@ -13,7 +13,7 @@
 *     CALL KPG1_FILL<T>( VALUE, EL, ARRAY, STATUS )
 
 *  Description:
-*     This routine sets all the pixels in a 1-dimensional array to a
+*     This routine sets all the pixels in a one-dimensional array to a
 *     specified value.
 
 *  Arguments:

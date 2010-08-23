@@ -25,9 +25,9 @@
 *     contains a single SkyFrame (Epoch and Equinox are set from the
 *     EPOCH and EQUINOX catalogue parameters - if they exist). Otherwise,
 *     if the catalogue contains floating point columns named X and Y, then
-*     the default FrameSet contains a single 2D Frame with axis symbols X
+*     the default FrameSet contains a single two-dimensional Frame with axis symbols X
 *     and Y, and Domain GRID. If there is also a column named Z, then
-*     the Frame will be 3D, with a Z axis.
+*     the Frame will be three-dimensional, with a Z axis.
 *
 *     However the FrameSet is obtained, it is assumed that the columns
 *     containing the axis values have CAT names equal to the Symbol
@@ -61,13 +61,13 @@
 *     NAX = INTEGER (Returned)
 *        The number of axes in the Frame requested by CURFRM.
 *     IPPOS = INTEGER (Returned)
-*        A pointer to a 2-dimensional DOUBLE PRECISION array holding the
+*        A pointer to a two-dimensional DOUBLE PRECISION array holding the
 *        returned positions. Element (I,J) of this array gives axis J for
 *        position I. The first axis will have NPOS elements, and the
 *        second will have NAX elements. Should be released using PSX_FREE
 *        when no longer needed.
 *     IPID = INTEGER (Returned)
-*        A pointer to a 1-dimensional INTEGER array holding the integer
+*        A pointer to a one-dimensional INTEGER array holding the integer
 *        identifiers for the returned positions. The array will have NPOS
 *        elements. Should be released using PSX_FREE when no longer needed.
 *     TITLE = CHARACTER * ( * ) (Returned)
@@ -86,7 +86,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -96,8 +96,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)

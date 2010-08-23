@@ -4,7 +4,7 @@
 *     KPG1_ALSYS
 
 *  Purpose:
-*     Allow the user to change the AlignSystem attribute in a Frame/
+*     Allowd the user to change the AlignSystem attribute in a Frame.
 
 *  Language:
 *     Starlink Fortran 77
@@ -14,9 +14,9 @@
 
 *  Description:
 *     This routine obtains a value from the environment that is used to
-*     specify a new value for the AlignSystem attribute of a supplied Frame.
-*     This attribute determines the coordinate system in which the Frame
-*     will align with other similar Frames.
+*     specify a new value for the AlignSystem attribute of a supplied
+*     Frame.  This attribute determines the co-ordinate system in which
+*     the Frame will align with other similar Frames.
 
 *  Arguments:
 *     PARAM = CHARACTER * ( * ) (Given)
@@ -46,7 +46,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -56,8 +56,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)

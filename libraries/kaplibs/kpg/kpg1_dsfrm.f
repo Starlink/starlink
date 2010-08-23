@@ -49,7 +49,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -59,8 +59,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
@@ -197,22 +197,22 @@
             NDIM = AST_GETI( FSET, 'NIN', STATUS )
             IF( NDIM .LE. NDF__MXDIM ) THEN
 
-*  Store the GRID coordinates of the centre of the first pixel. This is
+*  Store the GRID co-ordinates of the centre of the first pixel. This is
 *  defined to be (1.0,1.0,...). This position will be mapped into the
-*  other Frame, to find the coordinates of the first pixel.
+*  other Frame, to find the co-ordinates of the first pixel.
                DO IAXIS = 1, NDIM
                   GFIRST( 1, IAXIS ) = 1.0
                END DO
 
-*  Map the GRID coordinates at the centre of the first pixel to obtain the
-*  corresponding coordinates in the Frame.
+*  Map the GRID co-ordinates at the centre of the first pixel to obtain the
+*  corresponding co-ordinates in the Frame.
                CALL AST_TRANN( FSET, 1, NDIM, 1, GFIRST, .TRUE., FRMNAX,
      :                         1, CFIRST, STATUS )
 
 *  Normalize the positions.
                CALL AST_NORM( FSET, CFIRST, STATUS )
 
-*  Display the resulting coordinates.
+*  Display the resulting co-ordinates.
                CALL MSG_SETC( 'FIRST', AST_FORMAT( FSET, 1,
      :                                             CFIRST( 1, 1 ),
      :                                             STATUS ) )

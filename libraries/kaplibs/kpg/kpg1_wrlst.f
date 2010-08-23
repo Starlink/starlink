@@ -19,7 +19,7 @@
 *     catalogue (see SUN/181). Information describing associated co-ordinate
 *     Frames can also be stored in the file as textual information, allowing
 *     subsequent applications to interpret the positions. Files written with
-*     this routine can be read using KPG1_RDLST (and also XCATVIEW etc).
+*     this routine can be read using KPG1_RDLST (and also XCATVIEW etc.).
 *
 *     The positions are stored in the file in a Frame selected by the
 *     user using hardwired parameters CATFRAME and CATEPOCH. This Frame
@@ -78,7 +78,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -88,8 +88,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -108,7 +108,7 @@
 *        problems when using ICL due to FITS files not being closed
 *        properly.
 *     2004 September 1 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
 *     1-NOV-2005 (DSB):
 *        Allow the calling application to supress the use of the CATEPOCH
 *        and CATFRAME parameters by setting the FrameSet ID attribute to

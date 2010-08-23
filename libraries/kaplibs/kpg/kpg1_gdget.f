@@ -4,7 +4,7 @@
 *     KPG1_GDGET
 
 *  Purpose:
-*     Get the AST Plot associated with an AGI picture.
+*     Gets the AST Plot associated with a graphics-database picture.
 
 *  Language:
 *     Starlink Fortran 77
@@ -13,24 +13,24 @@
 *     CALL KPG1_GDGET( IPIC, WCFRM, MKDATA, IPLOT, STATUS )
 
 *  Description:
-*     This routine makes the specified AGI picture current, creates a
-*     corresponding PGPLOT viewport and window, and returns a Plot
-*     associated with the picture.
+*     This routine makes the specified graphics-database (AGI) picture
+*     current, creates a corresponding PGPLOT viewport and window, and
+*     returns a Plot associated with the picture.
 *
 *     On exit, the PGPLOT viewport corresponds to the area encompassed by
 *     the specified picture. The world co-ordinate bounds within this
 *     viewport are set so that the PGPLOT world co-ordinate system is
-*     millimetres from the bottom left corner of the view surface. This
+*     millimetres from the bottom-left corner of the view surface. This
 *     corresponds to the Base (GRAPHICS) Frame in the returned Plot.
 *
 *     The returned Plot will normally be obtained from the MORE structure
 *     in the graphics database (where it was stored by a previous AST-based
 *     application). The Base Frame will be a GRAPHICS Frame, giving
-*     millimetres from the bottom left corner of the view surface.
+*     millimetres from the bottom-left corner of the view surface.
 *
 *     If no Plot is available in the database, then an initial PLOT is
 *     created containing a Base Frame with Domain GRAPHICS (giving
-*     millimetres from the bottom left corner of the view surface), and
+*     millimetres from the bottom-left corner of the view surface), and
 *     a Current Frame corresponding to AGI world co-ordinates. The Frame
 *     to represent AGI world co-ordinates in the Plot may be supplied by
 *     the calling application (for instance, an application may supply a
@@ -48,19 +48,19 @@
 *     Finally, some other Frames are added to the Plot representing
 *     various normalised co-ordinates:
 *
-*     BASEPIC: The co-ordinates of the bottom left corner of the BASE
+*     BASEPIC: The co-ordinates of the bottom-left corner of the BASE
 *     picture are (0,0). The shorter dimension of the BASE picture has
 *     length 1.0, and the other axis has a length greater than 1.0.
 *
-*     NDC: Normalized device coordinates. The bottom left corner of the
+*     NDC: Normalized device co-ordinates. The bottom-left corner of the
 *     screen is (0,0) and the top-right corner is (1,1).
 *
-*     CURPIC: The co-ordinates of the bottom left corner of the current
+*     CURPIC: The co-ordinates of the bottom-left corner of the current
 *     picture are (0,0). The shorter dimension of the current picture has
 *     length 1.0, and the other axis has a length greater than 1.0.
 *
-*     CURNDC: The co-ordinates of the bottom left corner of the current
-*     picture are (0,0), and the top right corner is (1,1).
+*     CURNDC: The co-ordinates of the bottom-left corner of the current
+*     picture are (0,0), and the top-right corner is (1,1).
 *
 *     If the Plot read from the database already contains any of these
 *     Frames then they are retained and no new Frame is added.
@@ -80,7 +80,7 @@
 *     called to obtain an AST Plot for the new picture. Since the picture
 *     has just been created, it will not as yet have a Plot stored with it
 *     in the database. An initial Plot is created in which the Base Frame
-*     is a GRAPHICS Frame (giving millimetres from the bottom left corner
+*     is a GRAPHICS Frame (giving millimetres from the bottom-left corner
 *     of the view surface), and the Current Frame gives AGI world
 *     co-ordinates (as stored with the picture by AGP_SVIEW). The Frame
 *     specified by argument WCFRM is used for this purpose (a default
@@ -117,7 +117,7 @@
 *        1) The Plot must not be combined with another Plot if the other
 *        Plot may also contain an AGI_DATA Frame.
 *        2) Before using the Plot (or a derived Mapping) to transform
-*        positions (eg using AST_TRAN2), it should be ensured that the
+*        positions (e.g. using AST_TRAN2), it should be ensured that the
 *        picture from which the Plot was created is the current AGI
 *        picture.
 *     Because of these restrictions, the option to create an AGI_DATA
@@ -154,7 +154,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -164,8 +164,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
@@ -311,7 +311,7 @@
       END IF
 
 *  If a Plot was obtained, ensure that the current PGPLOT window corresponds
-*  to millimetres from the bottom left corner of the view surface. This is
+*  to millimetres from the bottom-left corner of the view surface. This is
 *  the co-ordinate system used by the Base (GRAPHICS) Frame in the Plot.
       IF( IPLOT .NE. AST__NULL ) THEN
          CALL PGQVP( 2, BX( 1 ), BX( 3 ), BX( 2 ), BX( 4 ) )
@@ -331,10 +331,10 @@
          DBX( 4 ) = DBLE( BX( 4 ) )
 
 *  Create the Plot. This sets the PGPLOT world co-ordinate system in the
-*  current viewport to millimetres from the bottom left corner.
+*  current viewport to millimetres from the bottom-left corner.
          CALL KPG1_ASPLT( WCFRM, DBX, ' ', IPLOT, STATUS )
 
-*  If no Frame was supplied, a default 2D Frame will have been used. Set
+*  If no Frame was supplied, a default two-dimensional Frame will have been used. Set
 *  its Domain to AGI_WORLD. Also set its Title and axis Symbols.
          IF( WCFRM .EQ. AST__NULL ) THEN
             CALL AST_SETC( IPLOT, 'Domain', 'AGI_WORLD', STATUS )
@@ -432,7 +432,7 @@
       END IF
 
 *  Add a Frame representing normalized device co-ordinates. This picture
-*  has (in general) un-equals scales on each axis. The bottom left corner
+*  has (in general) un-equals scales on each axis. The bottom-left corner
 *  is (0,0) and the top right is (1,1). This Frame is given the Domain NDC.
 *  ====================================================================
 
@@ -541,8 +541,8 @@
       END IF
 
 *  Add a Frame representing another normalised co-ordinate system in the
-*  current picture. This Frame has (0,0) at the bottom left corner of the
-*  current picture, and (1,1) at the top right corner. This Frame is given
+*  current picture. This Frame has (0,0) at the bottom-left corner of the
+*  current picture, and (1,1) at the top-right corner. This Frame is given
 *  the Domain CURNDC.
 *  ====================================================================
 

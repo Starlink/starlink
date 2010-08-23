@@ -40,13 +40,13 @@
 *     N = INTEGER (Given)
 *        The number of supplied positions.
 *     XA( N ) = DOUBLE PRECISION (Given)
-*        The X  coordinates at the first set of positions.
+*        The X  co-ordinates at the first set of positions.
 *     YA( N ) = DOUBLE PRECISION (Given)
-*        The Y  coordinates at the first set of positions.
+*        The Y  co-ordinates at the first set of positions.
 *     XB( N ) = DOUBLE PRECISION (Given)
-*        The X  coordinates at the second set of positions.
+*        The X  co-ordinates at the second set of positions.
 *     YB( N ) = DOUBLE PRECISION (Given)
-*        The Y  coordinates at the second set of positions.
+*        The Y  co-ordinates at the second set of positions.
 *     IFIT = INTEGER (Given and Returned)
 *        The type of fit required. A lower value will be used (and
 *        returned) if a fit of the specified type could not be
@@ -69,7 +69,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -79,8 +79,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)

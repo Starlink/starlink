@@ -4,7 +4,7 @@
 *     KPG1_H2AST
 
 *  Purpose:
-*     Copy AST_ data from an HDS object.
+*     Copies AST_ data from an HDS object.
 
 *  Language:
 *     Starlink Fortran 77
@@ -14,7 +14,7 @@
 
 *  Description:
 *     This routine copies a line of text representing AST_ data from a
-*     specified element of a 1-dimensional character array. It is
+*     specified element of a one-dimensional character array. It is
 *     intended for use when reading AST_ data from an HDS object (i.e
 *     an HDS _CHAR array).
 
@@ -36,7 +36,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -46,8 +46,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)

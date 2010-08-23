@@ -4,7 +4,7 @@
 *     KPG1_HMSG
 
 *  Purpose:
-*     Assign the name of an HDS object to a message token.
+*     Assigns the name of an HDS object to a message token.
 
 *  Language:
 *     Starlink Fortran 77

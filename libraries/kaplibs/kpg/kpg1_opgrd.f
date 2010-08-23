@@ -529,9 +529,9 @@ c      write(*,*) ' Cluster spacing: ',MXWAVE*pixscl*AST__DR2D*3600,
 c     :           ' sample spacing: ', spc*pixscl*AST__DR2D*3600,
 c     :           ' arcsec'
 
-*  Allocate a 1D work array which spans the circle enclosing the
-*  bounding box, but using smaller pixels (one fifth of the current
-*  estimate of the periodicity).
+*  Allocate a one-dimensional work array which spans the circle
+*  enclosing the bounding box, but using smaller pixels (one fifth of
+*  the current estimate of the periodicity).
             SPC = 0.2*MXWAVE
             HISTSZ = DIAM/SPC
             IF( ALLOCD .LT. HISTSZ ) THEN
@@ -560,14 +560,14 @@ c      write(*,*) ' '
 
 *  For the current line orientation, project every initial grid position
 *  onto the line, and record where about the projected point falls on
-*  the line. The 1D work array allocated earlier is used as a histogram
-*  to bin the number of projected points falling on each point of the
-*  line. Once all points have been projected onto the line, at the
-*  current orientation, the amplitude of any periodicity shown in the
-*  array is determined, together with the wavelength of the periodicity
-*  (in units of initial grid pixels). The details of the orientation
-*  with the strongest periodicity are retained in MXAMP, MXANG and
-*  MXWAVE.
+*  the line. The one-dimensional work array allocated earlier is used as
+*  a histogram to bin the number of projected points falling on each
+*  point of the line. Once all points have been projected onto the line,
+*  at the current orientation, the amplitude of any periodicity shown in
+*  the array is determined, together with the wavelength of the
+*  periodicity (in units of initial grid pixels). The details of the
+*  orientation with the strongest periodicity are retained in MXAMP,
+*  MXANG and MXWAVE.
                CALL KPG1_OPGR2( NPOS, XOUT, YOUT, ANG, SPC, XC, YC,
      :                          SPC0, .TRUE., HISTSZ,
      :                          %VAL( CNF_PVAL( IPHIST ) ), MXAMP,
@@ -700,7 +700,7 @@ c      write(*,*)
 *  already be stored in PAR0(3) and PAR0(4) ).
          IF( PAR( 3 ) .EQ. AST__BAD .OR. PAR( 4 ) .EQ. AST__BAD ) THEN
 
-*  Find the celestial coordinates at the centre of the bounding box.
+*  Find the celestial co-ordinates at the centre of the bounding box.
             CALL AST_TRAN2( MAP, 1, XC, YC, .TRUE., XOUT, YOUT, STATUS )
 
 *  Report an error if the celestial coords are bad.
@@ -913,9 +913,9 @@ c      write(*,*)
 *     NPOS = INTEGER (Given)
 *        The number of sky positions.
 *     X( NPOS ) = DOUBLE PRECISION (Given)
-*        The X grid coordinates.
+*        The X grid co-ordinates.
 *     Y( NPOS ) = DOUBLE PRECISION (Given)
-*        The Y grid coordinates.
+*        The Y grid co-ordinates.
 *     ANG = DOUBLE PRECISION (Given)
 *        The angle of the line, in radians. Measured from the grid Y
 *        axis through the grid X axis.
@@ -927,7 +927,7 @@ c      write(*,*)
 *     YC = DOUBLE PRECISION (Given)
 *        The Y grid coord of a point on the line.
 *     SPC0 = DOUBLE PRECISION (Given)
-*        The grid coordinate within the HIST array, onto which the
+*        The grid co-ordinate within the HIST array, onto which the
 *     LIN = LOGICAL (Given)
 *        Should the histogram be formed using nearest neighbour or
 *        linear interpolation?

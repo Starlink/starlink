@@ -4,7 +4,7 @@
 *     COPY2D
 
 *  Purpose:
-*     copy one 2-D array into another.
+*     copy one two-dimensional array into another.
 
 *  Language:
 *     Starlink
@@ -13,16 +13,16 @@
 *     CALL COPY2D( DIM1, DIM2, ARRIN, ARROUT, STATUS )
 
 *  Description:
-*     The input 2-D array, ARRIN, of dimension DIM1, DIM2, is copied
-*     into the output 2-D array, ARROUT, of the same dimensions.
-*     An immediate return will occur if STATUS has an error value on
-*     entry.
+*     The input two-dimensional array, ARRIN, of dimension DIM1, DIM2,
+*     is copied into the output two-dimensional array, ARROUT, of the
+*     same dimensions.  An immediate return will occur if STATUS has
+*     an error value on entry.
 
 *  Arguments:
 *     DIM1 = INTEGER( READ )
-*        The first dimension of the 2-d arrays.
+*        The first dimension of the two-dimensional arrays.
 *     DIM2 = INTEGER( READ )
-*        The second dimension of the 2-d arrays.
+*        The second dimension of the two-dimensional arrays.
 *     ARRIN( DIM1, DIM2 ) = REAL( READ )
 *        Array to be copied.
 *     ARROUT( DIM1, DIM2 ) = REAL( WRITE )
@@ -48,7 +48,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -58,8 +58,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     Dave Baines (ROE::ASOC5)

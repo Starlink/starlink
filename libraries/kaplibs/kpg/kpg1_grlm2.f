@@ -5,7 +5,7 @@
 *     KPG1_GRLM2
 
 *  Purpose:
-*     Find the default limits for a graph axis.
+*     Finds the default limits for a graph axis.
 
 *  Language:
 *     Starlink Fortran 77
@@ -94,7 +94,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -104,8 +104,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: D.S. Berry (STARLINK)
@@ -327,8 +327,8 @@
             END IF
 
 *  Return the required values. First deal with cases where only 1 limit
-*  is required (eg HISTOGRAM always sets the lower limit to zero, so only
-*  the upper limit is required to be found by this routine).
+*  is required (e.g. HISTOGRAM always sets the lower limit to zero, so
+*  only the upper limit is required to be found by this routine).
             IF( NLIM .EQ. 1 ) THEN
 
 *  If the user supplied a percentile value, use it (i.e. PERVAL( 1 )).

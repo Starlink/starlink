@@ -228,14 +228,14 @@
 *     DBAR( N, 2 ) = DOUBLE PRECISION (Given and Returned)
 *        Work space. Not accessed if NSIGMA is zero.
 *     IPLOT = INTEGER (Given and Returned)
-*        On entry, this can either be AST_NULL or a pointer to a 2D
-*        Frame. If AST__NULL, the supplied values for the XLAB, YLAB,
-*        TTL, XSYM and YSYM arguments are used without change. If a
-*        Frame is supplied, the Label, Title, Units and Symbol
-*        attributes of the Frame are used in preference to XLAB, YLAB,
-*        TTL, XSYM and YSYM (which are then ignored). Any supplied
-*        Frame pointer is annulled before returning, and a pointer to
-*        the Plot used to draw the axes is returned.
+*        On entry, this can either be AST_NULL or a pointer to a
+*        two-dimensional Frame. If AST__NULL, the supplied values for
+*        the XLAB, YLAB, TTL, XSYM and YSYM arguments are used without
+*        change. If a Frame is supplied, the Label, Title, Units, and
+*        Symbol attributes of the Frame are used in preference to XLAB,
+*        YLAB, TTL, XSYM and YSYM (which are then ignored). Any
+*        supplied Frame pointer is annulled before returning, and a
+*        pointer to the Plot used to draw the axes is returned.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -347,7 +347,7 @@
 *  Local Variables:
       CHARACTER PLMODE*5      ! LMODE parameter name
       DOUBLE PRECISION BOX( 4 ) ! Bounding box for plot
-      INTEGER AXMAPS( 2 )     ! 1-D Mappings for each axis
+      INTEGER AXMAPS( 2 )     ! one-dimensional Mappings for each axis
       INTEGER FRAME           ! Current Frame for Plot
       INTEGER I               ! Loop index
       INTEGER IFRM            ! Pointer to defaults Frame
@@ -586,7 +586,7 @@
 *  Otherwise, if the device was opened successfully...
       ELSE IF( STATUS .EQ. SAI__OK ) THEN
 
-*  Get the 1-D mappings which transform each of the Current Frame axes
+*  Get the one-dimensional mappings which transform each of the Current Frame axes
 *  onto the corresponding PGPLOT world co-ordinate axis.
          CALL KPG1_ASSPL( IPLOT, 2, AXMAPS, STATUS )
 

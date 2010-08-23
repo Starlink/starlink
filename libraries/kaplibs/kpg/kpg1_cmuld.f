@@ -4,8 +4,8 @@
 *     KPG1_CMULD
 
 *  Purpose:
-*     Multiply each element of a vectorised double precision array by a
-*     constant.
+*     Multiplies each element of a vectorised double precision array by
+*     a constant.
 
 *  Language:
 *     Starlink Fortran 77
@@ -35,7 +35,7 @@
 *        The global status.
 
 *  Notes:
-*     -  This routine is intended for processing double precision data
+*     -  This routine is intended for processing double-precision data
 *     only. There is a related generic routine for processing other data
 *     types.
 *     -  This routine will handle numerical errors (i.e. overflow) by

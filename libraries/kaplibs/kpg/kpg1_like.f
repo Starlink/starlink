@@ -39,7 +39,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -49,8 +49,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
@@ -127,7 +127,7 @@
          CALL KPG1_GTWCS( INDF1, IWCS1, STATUS )
          CALL KPG1_GTWCS( INDF2, IWCS2, STATUS )
 
-*  Align them in some suitable WCS coordinate Frame.
+*  Align them in some suitable WCS co-ordinate Frame.
          CALL AST_INVERT( IWCS1, STATUS )
          CALL AST_INVERT( IWCS2, STATUS )
          FS = AST_CONVERT( IWCS2, IWCS1, ' ', STATUS )

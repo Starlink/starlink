@@ -4,8 +4,7 @@
 *     KPG1_COPY
 
 *  Purpose:
-*     To copy an array of a given type to another array of the same
-*     type.
+*     Copies an array of a given type to another array of the same type.
 
 *  Language:
 *     Starlink Fortran 77
@@ -14,8 +13,8 @@
 *     CALL KPG1_COPY( TYPE, NEL, IPIN, IPOUT, STATUS )
 
 *  Description:
-*     This routine copies a 1-D array of numerical or character values
-*     from an input array to an output array.
+*     This routine copies a one-dimensional array of numerical or
+*     character values from an input array to an output array.
 
 *  Arguments:
 *     TYPE = CHARACTER * ( * ) (Given)
@@ -45,7 +44,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -55,8 +54,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)

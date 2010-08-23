@@ -15,7 +15,7 @@
 *  Description:
 *     This routine associates for read access an NDF that is presumed
 *     to contain a lookup table in its data array.  A series of
-*     validation checks are made: the array must be 2-dimensional, the
+*     validation checks are made: the array must be two-dimensional, the
 *     first dimension must be 3, the range of values must lie in the
 *     range 0.0--1.0.  The last of these requires that the data array
 *     is mapped therefore for convenience and efficiency a pointer and

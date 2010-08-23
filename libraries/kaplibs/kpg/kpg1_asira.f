@@ -44,7 +44,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -54,8 +54,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -164,14 +164,14 @@
       END IF
 
 *  The first step in converting from IRA "image co-ordinates" to "sky
-*  co-ordinates is to convert the input image coordinates to (U,V) coordinates.
-*  (U,V) coordinates are like image (X,Y) coordinates, except that they
+*  co-ordinates is to convert the input image co-ordinates to (U,V) co-ordinates.
+*  (U,V) co-ordinates are like image (X,Y) co-ordinates, except that they
 *  are in units of radians rather than pixels, they are relative to
 *  an origin at the reference point, and they are rotated by an angle
 *  which puts the Y axis at the position angle specified by p(7). The
 *  rotation of the celestial sphere specified by p(8) will result in the
-*  V axis being at a position angle of p(8) in sky coordinates,
-*  therefore, rotating the image coordinates by an angle of P(7)-P(8)
+*  V axis being at a position angle of p(8) in sky co-ordinates,
+*  therefore, rotating the image co-ordinates by an angle of P(7)-P(8)
 *  with respect to (U,V) will put the Y axis at a position angle of
 *  P(7). Create a WinMap to implement the mapping from (X,Y) to (U,V)
 *  (excluding rotation).
@@ -248,7 +248,7 @@
 *  Create a MatrixMap which rotates FITS-WCS "native" co-ordinates
 *  (produced by the inverse WcsMap), into IRA "local" co-ords. The
 *  reference point always has latitude zero in "local" co-ords, but
-*  can be +90 degs in "native" coords. Rotate the 3D cartesian frame
+*  can be +90 degs in "native" coords. Rotate the three-dimensional cartesian frame
 *  by "NatLat" radians clockwise about the Y axis.
       CALL SLA_DEULER( 'Y', -AST_GETD( M3, 'NATLAT', STATUS ), 0.0D0,
      :                 0.0D0, MAT3 )
@@ -270,12 +270,12 @@
 *  Create the MatrixMap.
       M5 = AST_MATRIXMAP( 3, 3, 0, MAT3, ' ', STATUS )
 
-*  Set up a rotation matrix which will convert sky coordinates to a "local"
+*  Set up a rotation matrix which will convert sky co-ordinates to a "local"
 *  longitude/latitude system in which the requested reference point has
-*  a longitude and latitude of zero. This coordinate system is referred to
-*  here as the "local" coordinate system. The matrix also includes the
+*  a longitude and latitude of zero. This co-ordinate system is referred to
+*  here as the "local" co-ordinate system. The matrix also includes the
 *  required rotation (about a radius through the reference point) of the
-*  celestial sphere so that "north" in the local coordinate system is at the
+*  celestial sphere so that "north" in the local co-ordinate system is at the
 *  position angle specified by projection parameter P(8).
       CALL IRA_IDPROJP( IDA, 1, T1, STATUS )
       CALL IRA_IDPROJP( IDA, 2, T2, STATUS )

@@ -65,9 +65,9 @@
 *        for a new %PARAM value. Otherwise, the error is retained, and the
 *        routine exits with STATUS set to SAI__ERROR.
 *     TOKEN = CHARACTER * ( * ) (Given)
-*        A string containing an MSG message token reference (eg "^FRED").
+*        A string containing an MSG message token reference (e.g. "^FRED").
 *        The value of the token is used within error messages and should
-*        describe the object (NDF, catalogue, etc) from which the supplied
+*        describe the object (NDF, catalogue, etc.) from which the supplied
 *        FrameSet is derived. If the token reference string is blank it is
 *        ignored.
 *     STATUS = INTEGER (Given and Returned)
@@ -86,7 +86,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -96,8 +96,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -147,7 +147,7 @@
       CHARACTER DOM*15           ! Domain name
       CHARACTER FRAME*30         ! Co-ordinate Frame specification
       CHARACTER OBJ*255          ! The value of the supplied message TOKEN
-      CHARACTER SCSNAM*(IRA__SZSCS) ! IRAS90 name for sky coordinate system
+      CHARACTER SCSNAM*(IRA__SZSCS) ! IRAS90 name for sky co-ordinate system
       CHARACTER T1*16            ! Terminated domain name
       DOUBLE PRECISION EQU       ! Equinox
       INTEGER FRM                ! Pointer to matching Frame
@@ -278,7 +278,7 @@
                CALL KPG1_ASFFR( IWCS, 'SKY', IFRM, STATUS )
 
 *  If one was found, we need to set its attributes so that they describe
-*  the requested sky coordinate system.
+*  the requested sky co-ordinate system.
                IF( IFRM .NE. AST__NOFRAME ) THEN
 
 *  Get a pointer to the SKY Frame.

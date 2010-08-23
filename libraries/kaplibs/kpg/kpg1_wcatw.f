@@ -4,7 +4,7 @@
 *     KPG1_MKCAT
 
 *  Purpose:
-*     Write an AST Object to a catalogue.
+*     Writes  an AST Object to a catalogue.
 
 *  Language:
 *     Starlink Fortran 77
@@ -20,7 +20,7 @@
 *     single COMMENT are split into several lines. Continuation lines are
 *     marked by having a "+" in the first column. Each line of AST
 *     information is preceeded with the string "!!", which is used to
-*     mark the end of any leading blanks etc added by AST when the string is
+*     mark the end of any leading blanks etc. added by AST when the string is
 *     read back.
 *
 *     Note, at the moment CAT reports errors if textual information is
@@ -49,7 +49,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -59,8 +59,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)

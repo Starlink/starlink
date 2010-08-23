@@ -4,8 +4,8 @@
 *     LD2AR
 
 *  Purpose:
-*     Converts a sparse form of a 2-D array stored in DOUBLE PRECISION
-*     into its REAL 2-D counterpart.
+*     Converts a sparse form of a two-dimensional array stored in DOUBLE PRECISION
+*     into its REAL two-dimensional counterpart.
 
 *  Language:
 *     Starlink Fortran 77

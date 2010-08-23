@@ -1,7 +1,7 @@
       SUBROUTINE KPG1_GTAXM( PARAM, FRAME, MAXAX, AXES, NAX, STATUS )
 *+
 *  Name:
-*     KPG1_GTAXI
+*     KPG1_GTAXM
 
 *  Purpose:
 *     Selects Frame axes using an environment parameter.

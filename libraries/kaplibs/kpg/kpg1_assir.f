@@ -4,7 +4,7 @@
 *     KPG1_ASSIR
 
 *  Purpose:
-*     Set the attributes of a SkyFrame to match an IRAS90 SCS.
+*     Sets the attributes of a SkyFrame to match an IRAS90 SCS.
 
 *  Language:
 *     Starlink Fortran 77
@@ -46,7 +46,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -56,8 +56,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -92,7 +92,7 @@
 
 *  Local Variables:
       CHARACTER BJ*1		 ! B for Besselian, or J for Julian equinox
-      CHARACTER SCSNAM*(IRA__SZSCS) ! IRAS90 name for sky coordinate system
+      CHARACTER SCSNAM*(IRA__SZSCS) ! IRAS90 name for sky co-ordinate system
       CHARACTER TEXT*50          ! Text
       DOUBLE PRECISION DEFEP     ! Epoch of observation
       DOUBLE PRECISION EPOCH     ! Epoch of observation
@@ -135,7 +135,7 @@
             END IF
 
 *  FK4 systems need a qualifying epoch value, and other systems may in
-*  the future (eg when ICRS is accept). To be on the safe side, we always
+*  the future (egwhen ICRS is accept). To be on the safe side, we always
 *  get an EPOCH from the user, using the SkyFrame's current value as a
 *  default.
             DEFEP = AST_GETD( FRM, 'EPOCH', STATUS )

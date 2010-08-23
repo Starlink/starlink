@@ -45,7 +45,7 @@
 *     COMMENT = CHARACTER * ( * ) (Given)
 *        A comment to store with the new pictures added to the AGI
 *        database. This will usually by an indication of the application
-*        being run (eg KAPPA_DISPLAY).
+*        being run (egKAPPA_DISPLAY).
 *     MARGIN( 4 ) = REAL (Given)
 *        The width of the borders to leave round the DATA picture, given
 *        as fractions of the corresponding dimension of the current picture.
@@ -77,17 +77,17 @@
 *     SASPEC = REAL (Given)
 *        The aspect ratio with which a new DATA picture should be created.
 *        This is the height divided by the width of the DATA picture,
-*        assuming equal scales on each axis (eg metres). A value of zero
+*        assuming equal scales on each axis (egmetres). A value of zero
 *        causes the DATA picture to have the aspect ratio which produces
 *        the largest picture. The actual value used will depend on the
 *        value supplied for the FILL parameter (see above).
 *     BOX( 4 ) = DOUBLE PRECISION (Given)
-*        The world coordinate bounds to give to the DATA picture if a new
+*        The world co-ordinate bounds to give to the DATA picture if a new
 *        DATA picture is created. These should normally be pixel
-*        coordinates. The (x,y) coordinates of the bottom left corner should
-*        be given in elements 1 and 2, and the (x,y) coordinates of the top
+*        co-ordinates. The (x,y) co-ordinates of the bottom left corner should
+*        be given in elements 1 and 2, and the (x,y) co-ordinates of the top
 *        right corner should be given in elements 3 and 4. If the box has
-*        zero area, then world coordinates are set to centimetres from the
+*        zero area, then world co-ordinates are set to centimetres from the
 *        bottom left corner of the DATA picture.
 *     IPICD = INTEGER (Returned)
 *        An AGI identifier for the DATA picture.
@@ -98,7 +98,7 @@
 *        picture is returned.
 *     IPIC( NP ) = INTEGER (Returned)
 *        An array of AGI identifiers corresponding to the extra pictures
-*        requested in ZSIDE and PSIZE. The world coordinate system for each
+*        requested in ZSIDE and PSIZE. The world co-ordinate system for each
 *        picture is inherited from the FRAME picture. The actual size of a
 *        picture may be less than the requested size if there is insufficient
 *        room left in the FRAME picture to give it its requested size.
@@ -119,7 +119,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -129,8 +129,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
@@ -499,7 +499,7 @@
 
 *  Create a PGPLOT viewport for this picture and save it as a picture
 *  within the FRAME picture (but only if it has non-zero size). The world
-*  coordinate system is inherited from the FRAME picture.
+*  co-ordinate system is inherited from the FRAME picture.
          PXI = PXR - PXL
          PYI = PYT - PYB
          IF( PXI .GT. 0.0 .AND. PYI .GT. 0.0 .AND.
@@ -526,7 +526,7 @@
       DYT = MIN( CYT - 0.001, DYT )
 
 *  Create a PGPLOT viewport for the DATA picture, and set its world
-*  coordinate bounds to the supplied values. If the box defined by
+*  co-ordinate bounds to the supplied values. If the box defined by
 *  the bounds has zero size, use cm from the bottom left corner.
       IF( STATUS .EQ. SAI__OK ) THEN
 

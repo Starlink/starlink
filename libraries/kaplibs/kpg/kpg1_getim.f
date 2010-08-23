@@ -5,7 +5,7 @@
 *     KPG1_GETIM
 
 *  Purpose:
-*     Get locators to an IMAGE-type structure and structure holding the
+*     Gets locators to an IMAGE-type structure and structure holding the
 *     data array for data input.
 
 *  Language:
