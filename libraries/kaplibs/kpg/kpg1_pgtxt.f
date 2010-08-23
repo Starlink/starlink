@@ -4,7 +4,7 @@
 *     KPG1_PGTXT
 
 *  Purpose:
-*     Draw text using PGPLOT and return concatenation point.
+*     Draws text using PGPLOT and return concatenation point.
 
 *  Language:
 *     Starlink Fortran 77
@@ -25,13 +25,13 @@
 *     TEXT = CHARACTER * ( * ) (Given)
 *        The text to draw. The returned values of X and Y leave room for
 *        any trailing spaces, UNLESS THE ENTIRE STRING IS BLANK, IN WHICH
-**       CASE X AND Y ARE RETURNED UNCHANGED.
+*       CASE X AND Y ARE RETURNED UNCHANGED.
 *     X = REAL (Given and Returned)
-*        The X position for the bottom left corner of the string.
+*        The X position for the bottom-left corner of the string.
 *        On exit, it is the X position at the bottom of the a string
 *        to be concatenated to the one just drawn.
 *     Y = REAL (Given and Returned)
-*        The Y position for the bottom left corner of the string.
+*        The Y position for the bottom-left corner of the string.
 *        On exit, it is the Y position at the bottom of the a string
 *        to be concatenated to the one just drawn.
 *     STATUS = INTEGER (Given and Returned)
@@ -48,7 +48,7 @@
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *

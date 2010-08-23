@@ -4,7 +4,7 @@
 *     KPG1_ORVAR
 
 *  Purpose:
-*     To return the variances and covariances of the order statistics
+*     Returns the variances and covariances of the order statistics
 *     from n to 1, assuming an initially normal distribution.
 
 *  Language:
@@ -50,7 +50,8 @@
 
 *  Copyright:
 *     Copyright (C) 1991, 1992 Science & Engineering Research Council.
-*     Copyright (C) 1996, 1997, 1998, 2000 Central Laboratory of the Research Councils.
+*     Copyright (C) 1996, 1997, 1998, 2000 Central Laboratory of the
+*     Research Councils.
 *     All Rights Reserved.
 
 *  Licence:
@@ -60,7 +61,7 @@
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *

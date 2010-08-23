@@ -4,7 +4,7 @@
 *     KPG1_PLLOD
 
 *  Purpose:
-*     Load the colour palette for the currently open graphics device.
+*     Loads the colour palette for the currently open graphics device.
 
 *  Language:
 *     Starlink Fortran 77
@@ -20,7 +20,7 @@
 *     If the file does not exist, the current colour table is left unchanged.
 *
 *     Each palette in the file is a _REAL array of shape (3,n) where
-*     n is the number of colours in the palette. The first colour (index 1
+*     n is the number of colours in the palette. The first colour (Index 1
 *     in the array) is the background colour and is usually refered to as
 *     colour index zero. Therefore the highest colour index in the array is
 *     (n-1). Each array has a name which identifies the graphics device
@@ -45,7 +45,7 @@
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *

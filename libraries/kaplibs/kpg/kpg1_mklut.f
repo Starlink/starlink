@@ -5,7 +5,7 @@
 *     KPG1_MKLUT
 
 *  Purpose:
-*     Create a Mapping to connect two one-dimensional array of values.
+*     Createa a Mapping to connect two one-dimensional array of values.
 
 *  Language:
 *     Starlink Fortran 77
@@ -14,11 +14,11 @@
 *     CALL KPG1_MKLUT( IX, IY, NPNT, NVAR, FRM, TABLE, MAP, STATUS )
 
 *  Description:
-*     This routine creates a one-dimensional Mapping which translates an X into a Y
-*     value on the basis of supplied tables of corresponding X and Y.
-*     This is like an AST LutMap except that the LutMap class requires Y
-*     to be tabulated at equal X intervals, whereas this routine allows
-*     Y to be tabulated at arbitrary X intervals.
+*     This routine creates a one-dimensional Mapping which translates an
+*     X into a Y value on the basis of supplied tables of corresponding
+*     X and Y. This is like an AST LutMap except that the LutMap class
+*     requires Y to be tabulated at equal X intervals, whereas this
+*     routine allows Y to be tabulated at arbitrary X intervals.
 
 *  Arguments:
 *     IX = INTEGER (Given)
@@ -48,7 +48,7 @@
 *        The global status.
 
 *  Notes:
-*     - It is only possible to create the Mapping if the tabluated X values
+*     - It is only possible to create the Mapping if the tabulated X values
 *     are monotonic increasing or decreasing.
 *     - The returned Mapping will have an inverse Transformation only if Y
 *     increases or decreases monotonically with X.
@@ -64,7 +64,7 @@
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *

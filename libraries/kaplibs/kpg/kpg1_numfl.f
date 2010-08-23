@@ -4,7 +4,7 @@
 *     KPG1_NUMFL
 
 *  Purpose:
-*     This counts the number of lines in a text file.
+*     Counts the number of lines in a text file.
 
 *  Language:
 *     Starlink Fortran 77
@@ -40,7 +40,6 @@
 *  Prior Requirements:
 *     -  The Fortran text file must already be opened.
 
-*  [optional_subroutine_items]...
 *  Copyright:
 *     Copyright (C) 1996 Central Laboratory of the Research Councils.
 *     All Rights Reserved.

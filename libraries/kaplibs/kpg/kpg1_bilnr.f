@@ -63,7 +63,7 @@
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *
@@ -120,14 +120,14 @@
                                  ! and imaginary interpolating pixel.
       REAL EY                    ! Overlap in Y between two upper pixels
                                  ! and imaginary interpolating pixel.
-      INTEGER IX                 ! X index of lower left pixel.
-      INTEGER IY                 ! Y index of lower left pixel.
-      INTEGER JX                 ! X index of upper right pixel.
-      INTEGER JY                 ! Y index of upper right pixel.
-      REAL V1                    ! Lower left pixel value.
-      REAL V2                    ! Upper left pixel value.
-      REAL V3                    ! Lower right pixel value.
-      REAL V4                    ! Upper right pixel value.
+      INTEGER IX                 ! X index of lower-left pixel.
+      INTEGER IY                 ! Y index of lower-left pixel.
+      INTEGER JX                 ! X index of upper-right pixel.
+      INTEGER JY                 ! Y index of upper-right pixel.
+      REAL V1                    ! Lower-left pixel value.
+      REAL V2                    ! Upper-left pixel value.
+      REAL V3                    ! Lower-right pixel value.
+      REAL V4                    ! Upper-right pixel value.
 
 *.
 
@@ -162,7 +162,7 @@
          IF( V1 .NE. VAL__BADR .AND. V2 .NE. VAL__BADR .AND.
      :       V3 .NE. VAL__BADR .AND. V4 .NE. VAL__BADR ) THEN
 
-*  Find the fractions of the lower left pixel X and Y dimensions which
+*  Find the fractions of the lower-left pixel X and Y dimensions which
 *  are included in the area covered by a pixel centred on the required
 *  interpolation point.
             DX = 0.5 - X + IX

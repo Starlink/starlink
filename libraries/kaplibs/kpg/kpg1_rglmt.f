@@ -5,7 +5,7 @@
 *     KPG1_RGLMT
 
 *  Purpose:
-*     Get the range limits of a range specification.
+*     Gets the range limits of a range specification.
 
 *  Language:
 *     Starlink Fortran 77
@@ -22,7 +22,7 @@
 *        String which specifies a range with the range word specified
 *        by argument RNGWRD.
 *     RNAWRD = CHARACTER*(*) (Given)
-*        Gives a range word, such as "TO", "-", etc, which is used in
+*        Gives a range word, such as "TO", "-", which is used in the
 *        range specification.
 *     BERNG = INTEGER (Returned)
 *        Begin limit of the range.
@@ -49,7 +49,7 @@
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *

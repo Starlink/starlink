@@ -4,7 +4,7 @@
 *     KPG1_LUTK4
 
 *  Purpose:
-*     Produce an AST Mapping from pen number to RGB intensity.
+*     Produces an AST Mapping from pen number to RGB intensity.
 
 *  Language:
 *     Starlink Fortran 77
@@ -13,9 +13,9 @@
 *     CALL KPG1_LUTK4( LP, UP, WORK, MAP, STATUS )
 
 *  Description:
-*     This routine produces an AST Mapping which maps one-dimensional pen
-*     number into three-dimensional RGB intensity within the current PGPLOT
-*     graphics device.
+*     This routine produces an AST Mapping which maps one-dimensional
+*     pen number into three-dimensional RGB intensity within the current
+*     PGPLOT graphics device.
 
 *  Arguments:
 *     LP = INTEGER (Given)
@@ -39,7 +39,7 @@
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *

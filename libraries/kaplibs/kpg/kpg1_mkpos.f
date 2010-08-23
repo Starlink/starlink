@@ -6,7 +6,7 @@
 *     KPG1_MKPOS
 
 *  Purpose:
-*     Mark a position on a graphics device.
+*     Marks a position on a graphics device.
 
 *  Language:
 *     Starlink Fortran 77
@@ -44,17 +44,17 @@
 *
 *        - "POLY" -- Causes each position to be joined by a line to the
 *        previous position marked.  These lines may be geodesic (in the
-*        Current Frame of the Plot) or straight (on the screen), as specified
-*        by argument GEO.
+*        Current Frame of the Plot) or straight (on the screen), as
+*        specified by argument GEO.
 *
 *        - "CHAIN" -- This is a combination of "Mark" and "Poly". Each
-*        position is marked by a symbol and joined by a line to the previous
-*        position. Arguments MARKER, GEO, and CLOSE are used to specify
-*        the symbols and lines to use.
+*        position is marked by a symbol and joined by a line to the
+*        previous position. Arguments MARKER, GEO, and CLOSE are used to
+*        specify the symbols and lines to use.
 *
-*        -  "BOX" -- An empty rectangle with edges parallel to the axes is
-*        drawn extending between the supplied position and the previous
-*        position.
+*        -  "BOX" -- An empty rectangle with edges parallel to the axes
+*        is drawn extending between the supplied position and the 
+*        previous position.
 *
 *        -  "VLINE" -- A vertical line is drawn through the position
 *        covering the entire height of the Plot.
@@ -62,8 +62,8 @@
 *        -  "HLINE" -- A horizontal line is drawn through the position
 *        covering the entire height of the Plot.
 *
-*        -  "CROSS" -- A full-screen cross-hair is drawn at the position, i.e.
-*        a combination of Vline and Hline.
+*        -  "CROSS" -- A full-screen cross-hair is drawn at the
+*        position, i.e. a combination of Vline and Hline.
 *
 *        -  "TEXT" -- The text string specified by argument TEXT is
 *        displayed, horizontally, and centred on the supplied position.
@@ -122,7 +122,7 @@
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *

@@ -5,7 +5,7 @@
 *     KPG1_RGNDF
 
 *  Purpose:
-*     Get a group of existing NDFs.
+*     Gets a group of existing NDFs.
 
 *  Language:
 *     Starlink Fortran 77
@@ -25,14 +25,14 @@
 *     expression. The group continues to be expanded in this way until
 *     a group expression is obtained which is not flagged, or a null
 *     value is given, or the limit on the number of NDFs (MAXSIZ) is
-*     reached. If any of the specified NDFs do not exist, the user is
+*     reached. If any of the specified NDFs does not exist, the user is
 *     warned, and re-prompted. If the final group contains more than
 *     MAXSIZ NDFs, then all but the first MAXSIZ NDFs are removed from
 *     the group. The user is warned if this happens. If MAXSIZ is
 *     supplied with the value zero no limit is imposed on the number of
-*     NDFs within the group.  If the final group contains less than the
-*     minimum no. of NDFs specified by argument MINSIZ, then the user is
-*     asked to supply more NDFs. All messages issued by this routine
+*     NDFs within the group.  If the final group contains fewer than the
+*     minimum number of NDFs specified by argument MINSIZ, then the user
+*     is asked to supply more NDFs. All messages issued by this routine
 *     have a priority level of MSG__NORM.
 
 *  Arguments:
@@ -70,7 +70,7 @@
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *

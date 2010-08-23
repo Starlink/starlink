@@ -4,7 +4,7 @@
 *     KPG1_PACOL
 
 *  Purpose:
-*     Obtain a marker colour.
+*     Obtains a marker colour.
 
 *  Language:
 *     Starlink Fortran 77
@@ -14,26 +14,27 @@
 
 *  Description:
 *     This routine obtains a colour index. A string is obtained from the
-*     parameter system.  The interpretation of this string provides a number
-*     of ways to specify the colour index requested.  The options are:
+*     parameter system.  The interpretation of this string provides a
+*     number of ways to specify the colour index requested.  The options
+*     are as follows.
 *
-*       'MAX'          - The maximum (non-reserved) colour index, i.e.
-*                        the highest colour index used for the display
-*                        of an image.
-*       'MIN'          - The minimum non-reserved colour index, i.e. the
-*                        lowest colour index used for the display of an
-*                        image.
-*       An integer     - The actual colour index. It is constrained
-*                        between 0 and the highest colour index.
-*       A named colour - Uses the named colour from the palette, and if
-*                        it is not present, the nearest colour from the
-*                        palette is selected.
-*       An HTML code   - Has the form "#aabbcc" (or "@aabbcc" - for use
-*                        in contexts where "#" is a comment character,
-*                        e.g. kappa style files) where a, b and c are
-*                        hexadecimal digits, and "aa", "bb" and "cc" give
-*                        red, blue and green intensities normalised to a
-*                        maximum of "ff" (256).
+*     - 'MAX'          -- The maximum (non-reserved) colour index, i.e.
+*                         the highest colour index used for the display
+*                         of an image.
+*     - 'MIN'          -- The minimum non-reserved colour index, i.e.
+*                         the lowest colour index used for the display
+*                         of an image.
+*     - An integer     -- The actual colour index. It is constrained
+*                         between 0 and the highest colour index.
+*     - A named colour -- Uses the named colour from the palette, and if
+*                         it is not present, the nearest colour from the
+*                         palette is selected.
+*     - An HTML code   -- Has the form "#aabbcc" (or "@aabbcc" - for use
+*                         in contexts where "#" is a comment character,
+*                         e.g. KAPPA style files) where a, b and c are
+*                         hexadecimal digits, and "aa", "bb" and "cc"
+*                         give red, blue, and green intensities
+*                         normalised to a maximum of "ff" (256).
 
 *  Arguments:
 *     PNCOL = CHARACTER * ( * ) (Given)
@@ -63,7 +64,7 @@
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *

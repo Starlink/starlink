@@ -61,17 +61,17 @@
 *        positions. If KEYS includes neither "X" nor ".", then presses of
 *        "X", "." or the right mouse button are ignored.
 *     X1 = REAL (Given)
-*        World co-ord X at lower left corner of region in which positons
+*        World co-ord X at lower-left corner of region in which positons
 *        may be entered.
 *     X2 = REAL (Given)
-*        World co-ord X at upper right corner of region in which positons
+*        World co-ord X at upper-right corner of region in which positons
 *        may be entered. If X1 and X2 are equal then no restrictions are
 *        placed on the region in which positions may be given.
 *     Y1 = REAL (Given)
-*        World co-ord Y at lower left corner of region in which positons
+*        World co-ord Y at lower-left corner of region in which positons
 *        may be entered.
 *     Y2 = REAL (Given)
-*        World co-ord Y at upper right corner of region in which positons
+*        World co-ord Y at upper-right corner of region in which positons
 *        may be entered. If Y1 and Y2 are equal then no restrictions are
 *        placed on the region in which positions may be given.
 *     EXACT = REAL (Given)
@@ -147,7 +147,7 @@
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *

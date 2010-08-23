@@ -4,7 +4,7 @@
 *     KPG1_WWRT
 
 *  Purpose:
-*     Write WCS information to an HDS object.
+*     Writes WCS information to an HDS object.
 
 *  Language:
 *     Starlink Fortran 77
@@ -15,9 +15,9 @@
 *  Description:
 *     This routine stores a supplied AST Object in a new component of
 *     a supplied HDS object. The new component has type WCS and contains
-*     a single component named DATA, of type _CHAR. DATA is a one-dimensional array
-*     holding lines of text which can be interpreted by a simple AST
-*     Channel.
+*     a single component named DATA, of type _CHAR. DATA is a
+*     one-dimensional array holding lines of text which can be
+*     interpreted by a simple AST Channel.
 
 *  Arguments:
 *     IAST = INTEGER (Given)
@@ -41,7 +41,7 @@
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *

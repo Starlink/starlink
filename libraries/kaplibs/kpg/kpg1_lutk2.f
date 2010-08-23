@@ -5,7 +5,7 @@
 *     KPG1_LUTK2
 
 *  Purpose:
-*     Set up the pixel colour indices which form a LUT key.
+*     Sets up the pixel colour indices which form a LUT key.
 
 *  Language:
 *     Starlink Fortran 77
@@ -54,7 +54,7 @@
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *

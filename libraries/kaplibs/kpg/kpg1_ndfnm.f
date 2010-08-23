@@ -4,7 +4,7 @@
 *     KPG1_NDFNM
 
 *  Purpose:
-*     Return the name of an NDF without a directory path (Unix only).
+*     Returns the name of an NDF without a directory path (Unix only).
 
 *  Language:
 *     Starlink Fortran 77

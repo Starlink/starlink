@@ -5,7 +5,7 @@
 *     KPG1_PLOTN
 
 *  Purpose:
-*     Create a new DATA picture and ensure there is an AST Plot for it.
+*     Creates a new DATA picture and ensure there is an AST Plot for it.
 
 *  Language:
 *     Starlink Fortran 77
@@ -22,8 +22,8 @@
 *     On exit, the current PGPLOT viewport corresponds to area occupied by
 *     the DATA picture. The bounds of the PGPLOT window produce a world
 *     co-ordinate system within the viewport corresponding to the Base
-*     Frame in the returned Plot (i.e. millimetres from the bottom left
-*     corner of the view surface - NOT pixel co-ordinates). Note, this is
+*     Frame in the returned Plot (i.e. millimetres from the bottom-left
+*     corner of the view surface--NOT pixel co-ordinates). Note, this is
 *     different to the world co-ordinate system stored in the AGI database
 *     with the DATA picture.
 
@@ -61,7 +61,7 @@
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *

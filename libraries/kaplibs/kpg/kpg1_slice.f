@@ -4,7 +4,7 @@
 *     KPG1_SLICE
 
 *  Purpose:
-*     Find and remove any NDF slice specification from a name.
+*     Finds and removes any NDF slice specification from a name.
 
 *  Language:
 *     Starlink Fortran 77

@@ -4,7 +4,7 @@
 *     KPG1_PLGET
 
 *  Purpose:
-*     Get the colour palette for the currently open graphics device from
+*     Gets the colour palette for the currently open graphics device from
 *     a supplied array.
 
 *  Language:
@@ -41,7 +41,7 @@
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *

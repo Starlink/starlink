@@ -5,7 +5,7 @@
 *     KPG_NXWRD
 
 *  Purpose:
-*     To find the next word in a string
+*     Finds the next word in a string.
 
 *  Language:
 *     Starlink Fortran 77

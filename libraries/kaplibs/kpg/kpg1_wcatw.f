@@ -1,7 +1,7 @@
       INTEGER FUNCTION KPG1_WCATW( IAST, CI, STATUS )
 *+
 *  Name:
-*     KPG1_MKCAT
+*     KPG1_WCATW
 
 *  Purpose:
 *     Writes  an AST Object to a catalogue.
@@ -53,7 +53,7 @@
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *

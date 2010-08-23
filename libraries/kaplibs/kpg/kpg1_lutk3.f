@@ -4,7 +4,7 @@
 *     KPG1_LUTK3
 
 *  Purpose:
-*     Produce a GRAPH colour table key for KPG1_LUTKY.
+*     Produces a GRAPH colour table key for KPG1_LUTKY.
 
 *  Language:
 *     Starlink Fortran 77
@@ -13,17 +13,17 @@
 *     CALL KPG1_LUTK3( IPLOT, PARAM, APP, LP, UP, X, RGB, STATUS )
 
 *  Description:
-*     This routine produces a colour table key consisting of 1 or 3 line
-*     plots (1 if the colour table is a greyscale, and 3 if it is not).
-*     The line plots are drawn using the supplied Plot.
+*     This routine produces a colour table key consisting of one or
+*     three line plots (1 if the colour table is a greyscale, and 3 if
+*     it is not). The line plots are drawn using the supplied Plot.
 
 *  Arguments:
 *     IPLOT = INTEGER (Given)
 *        The Plot to use.
 *     PARAM = CHARACTER * ( * ) (Given)
-*        The name of the style parameter to use (egSTYLE, KEYSTYLE, etc).
-*        The appearance of the 3 curves can be set using attribute
-*        qualifiers (R), (G), and (B) (eg"width(r)=10" ).
+*        The name of the style parameter to use (e.g. STYLE, KEYSTYLE).
+*        The appearance of the three curves can be set using attribute
+*        qualifiers (R), (G), and (B) (e.g. "width(r)=10").
 *     APP = CHARACTER * ( * ) (Given)
 *        The calling application, in the form "KAPPA_LUTVIEW".
 *     LP = INTEGER (Given)
@@ -47,7 +47,7 @@
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *

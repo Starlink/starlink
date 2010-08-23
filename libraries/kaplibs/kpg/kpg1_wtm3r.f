@@ -5,7 +5,7 @@
 *     KPG1_WTM3R
 
 *  Purpose:
-*     To form the weighted median of a list of ordered data values.
+*     Forms the weighted median of a list of ordered data values.
 
 *  Language:
 *     Starlink Fortran 77
@@ -53,7 +53,7 @@
 *     present.
 
 *  Notes:
-*     - the routine should only be used at real or better precisions.
+*     - Tthe routine should only be used at real or better precisions.
 
 *  Copyright:
 *     Copyright (C) 1991, 1992 Science & Engineering Research Council.
@@ -67,7 +67,7 @@
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *

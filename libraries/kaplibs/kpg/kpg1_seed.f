@@ -4,7 +4,7 @@
 *     KPG1_SEED
 
 *  Purpose:
-*     Obtain a semi-random seed for random-number generation.
+*     Obtains a semi-random seed for random-number generation.
 
 *  Language:
 *     Starlink Fortran 77

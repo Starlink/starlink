@@ -4,7 +4,7 @@
 *     KPG1_SNKTA
 
 *  Purpose:
-*     Write AST_ data as text to a GRP group.
+*     Writes AST_ data as text to a GRP group.
 
 *  Language:
 *     Starlink Fortran 77
@@ -55,7 +55,7 @@
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *

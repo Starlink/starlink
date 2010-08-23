@@ -4,7 +4,8 @@
 *     KPG1_PLPUT
 
 *  Purpose:
-*     Put a section of the current colour palette into the supplied array.
+*     Puts a section of the current colour palette into the supplied
+*     array.
 
 *  Language:
 *     Starlink Fortran 77
@@ -27,7 +28,7 @@
 *     UBND = INTEGER (Given)
 *        The upper bound of the second axis of ARRAY.
 *     ARRAY( 3, LBND : UBND ) = REAL (Given and Returned)
-*        The array to recieved the palette.
+*        The array to receive the palette.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -45,7 +46,7 @@
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *

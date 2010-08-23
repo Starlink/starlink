@@ -4,7 +4,7 @@
 *     KPG1_PGCOL
 
 *  Purpose:
-*     Obtain a marker colour, given a colour specification.
+*     Obtains a marker colour, given a colour specification.
 
 *  Language:
 *     Starlink Fortran 77
@@ -16,19 +16,25 @@
 *     This routine obtains a PGPLOT colour index to be used in an image
 *     display from a supplied string. The interpretation of this string
 *     provides a number of ways to specify the colour index requested.
-*     The options are:
+*     The options are as follows.
 *
-*       'MAX'          - The maximum (non-reserved) colour index, i.e.
-*                        the highest colour index used for the display
-*                        of an image.
-*       'MIN'          - The minimum non-reserved colour index, i.e. the
-*                        lowest colour index used for the display of an
-*                        image.
-*       An integer     - The actual colour index. It is constrained
-*                        between 0 and the highest colour index.
-*       A named colour - Uses the named colour from the palette, and if
-*                        it is not present, the nearest colour from the
-*                        palette is selected.
+*     - 'MAX'          -- The maximum (non-reserved) colour index, i.e.
+*                         the highest colour index used for the display
+*                         of an image.
+*     - 'MIN'          -- The minimum non-reserved colour index, i.e.
+*                         the lowest colour index used for the display
+*                         of an image.
+*     - An integer     -- The actual colour index. It is constrained
+*                         between 0 and the highest colour index.
+*     - A named colour -- Uses the named colour from the palette, and if
+*                         it is not present, the nearest colour from the
+*                         palette is selected.
+*     - An HTML code   -- Has the form "#aabbcc" (or "@aabbcc" - for use
+*                         in contexts where "#" is a comment character,
+*                         e.g. KAPPA style files) where a, b and c are
+*                         hexadecimal digits, and "aa", "bb" and "cc"
+*                         give red, blue, and green intensities
+*                         normalised to a maximum of "ff" (256).
 *
 *     An error is reported if the string does not conform to any of
 *     these formats.

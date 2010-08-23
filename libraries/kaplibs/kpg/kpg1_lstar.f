@@ -5,7 +5,7 @@
 *     KPG1_LSTAR
 
 *  Purpose:
-*     Write a section of a two-dimensional array to a text file.
+*     Writes a section of a two-dimensional array to a text file.
 
 *  Language:
 *     Starlink Fortran 77
@@ -15,28 +15,29 @@
 *                      OPENF, FDI, FILNAM, STATUS )
 
 *  Description:
-*     This routine takes an input 2-d array and lists out a specified
-*     section of that image, as defined by the x-and-y lower-and-upper
-*     bounds to a Fortran file. The file must either be already opened
-*     and specified by the input file descriptor, or be created in this
-*     routine and will be associated with the supplied parameter name.
-*     The first record in the file corresponds to the lowest index row.
+*     This routine takes an input two-dimensional array and lists a
+*     specified section of that image, as defined by the x-and-y
+*     lower-and-upper bounds to a Fortran file. The file must either be
+*     already opened and specified by the input file descriptor, or be
+*     created in this routine and will be associated with the supplied
+*     parameter name.  The first record in the file corresponds to the
+*     lowest index row.
 
 *  Arguments:
 *     DIM1 = INTEGER (Given)
-*         The first dimension of the 2-d array.
+*         The first dimension of the two-dimensional array.
 *     DIM2 = INTEGER (Given)
-*         The second dimension of the 2-d array.
+*         The second dimension of the two-dimensional array.
 *     ARRAY( DIM1, DIM2 )  =  REAL (Given)
-*         The 2-d array to be listed.
+*         The two-dimensional array to be listed.
 *     XLOW = INTEGER (Given)
-*         x co-ord of lower left corner of sub-array to be listed out.
+*         x co-ord of lower-left corner of sub-array to be listed out.
 *     YLOW = INTEGER (Given)
-*         y co-ord of lower left corner of sub-array to be listed out.
+*         y co-ord of lower-left corner of sub-array to be listed out.
 *     XHIGH = INTEGER (Given)
-*         x co-ord of upper right corner of sub-array to be listed out.
+*         x co-ord of upper-right corner of sub-array to be listed out.
 *     YHIGH = INTEGER (Given)
-*         y co-ord of upper right corner of sub-array to be listed out.
+*         y co-ord of upper-right corner of sub-array to be listed out.
 *     OPENF =  LOGICAL (Given)
 *         If true the Fortran file is to be associated with %FILNAM and
 *         opened. Otherwise the file is assumed to have been opened and
@@ -61,7 +62,7 @@
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *
