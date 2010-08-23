@@ -3,8 +3,13 @@
 # This is a script that is used for reducing data using the 
 # Canadian Advanced Network for Astrophysical Research (CANFAR)
 #
-# The first argument for this shell script is the full path to a file
-# containing the scuba-2 data files hosted at CADC that are to be processed.
+# The first argument is the path to the directory containing all of
+# the configiration options. Normally this would be set to ~/config
+# which is rsync'd from the login host (a subdirectory is an
+# alternative).
+#
+# The second argument is the relative path to a file containing the
+# raw scuba-2 data files hosted at CADC that are to be processed.
 # The format of this file is that expected by dpRetrieve, and is easiest
 # to specify using a trailing wildcard expansions, 
 #
@@ -14,11 +19,11 @@
 # is expanded to retrieve 850um s8d data files, from UT date
 # 20100311, observation 79.
 #
-# The second argument is an ID for the reduced data. All of the results will
+# The third argument is an ID for the reduced data. All of the results will
 # be stored in /data/1/username/id/ and will be accessible from the CANFAR
 # login host.
 #
-# The third optional argument is a file containing additional parameters
+# The forth optional argument is a file containing additional parameters
 # for the oracdr script. Presently the only option of interest is a 
 # new dimmconfig file that will be passed on to the iterative map-maker.
 # The following is an example file called "recipepar.txt" that could
@@ -44,29 +49,32 @@ then
   mkdir $PERSISTDIR
 fi
 
-if [ ! -d $PERSISTDIR/$2 ]
+if [ ! -d $PERSISTDIR/$3 ]
 then
-  mkdir $PERSISTDIR/$2
+  mkdir $PERSISTDIR/$3
 fi
 
-echo "Job started at" >> $PERSISTDIR/$2/scuba2_map.log
-date >> $PERSISTDIR/$2/scuba2_map.log
+echo "Job started at" >> $PERSISTDIR/$3/scuba2_map.log
+date >> $PERSISTDIR/$3/scuba2_map.log
 
-#if [ ! -d $OUTDIR ]
-#then
-#  echo "Error! Output directory $OUTDIR does not exist"
-#else
-/stardev/Perl/bin/jsawrapdr --inputs=$1 --id=$2 -persist --outdir=$SCRATCHDIR --transdir=$PERSISTDIR --mode=public --drparameters "-verbose -recpar $3" --canfar --cleanup all
-#fi 
+# rsync config directory from login host, and change to the directory
+# with the config files relevant for this reduction.
 
-echo "Job finished at" >> $PERSISTDIR/$2/scuba2_map.log
-date >> $PERSISTDIR/$2/scuba2_map.log
+rsync -az -e ssh --delete canfar.dao.nrc.ca:config /home/$LOGNAME/
+cd $1
+
+# launch the pipeline
+/stardev/Perl/bin/jsawrapdr --inputs=$2 --id=$3 -persist --outdir=$SCRATCHDIR --transdir=$PERSISTDIR --mode=public --drparameters "-verbose -recpar $4" --canfar --cleanup all
+
+echo "Job finished at" >> $PERSISTDIR/$3/scuba2_map.log
+date >> $PERSISTDIR/$3/scuba2_map.log
 
 
-# copy data to login host
+# copy data products back to login host
 
-ssh canfar.dao.nrc.ca "mkdir /data/1/$LOGNAME/$2"
+ssh canfar.dao.nrc.ca "mkdir /data/1/$LOGNAME/$3"
 
-scp $PERSISTDIR/$2/*.log canfar.dao.nrc.ca:/data/1/$LOGNAME/$2/
-scp $PERSISTDIR/$2/*.fits canfar.dao.nrc.ca:/data/1/$LOGNAME/$2/
-
+scp $PERSISTDIR/$3/*.fits canfar.dao.nrc.ca:/data/1/$LOGNAME/$3/
+scp $PERSISTDIR/$3/*_reduced.sdf canfar.dao.nrc.ca:/data/1/$LOGNAME/$3/
+scp $PERSISTDIR/$3/scuba2_map.log canfar.dao.nrc.ca:/data/1/$LOGNAME/$3/
+scp $PERSISTDIR/$3/.oracdr*.log canfar.dao.nrc.ca:/data/1/$LOGNAME/$3/
