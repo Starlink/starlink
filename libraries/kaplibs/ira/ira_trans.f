@@ -1,11 +1,11 @@
       SUBROUTINE IRA_TRANS( NVAL, IN1, IN2, FORWRD, SCS, IDA,
-     :                        OUT1, OUT2, STATUS )
+     :                      OUT1, OUT2, STATUS )
 *+
 *  Name:
 *     IRA_TRANS
 
 *  Purpose:
-*     Transform coordinate data.
+*     Transforms co-ordinate data.
 
 *  Language:
 *     Starlink Fortran 77
@@ -15,48 +15,48 @@
 *                     OUT1, OUT2, STATUS )
 
 *  Description:
-*     Coordinate data are transformed from sky coordinates to image
-*     coordinates, or vice-versa, using the projection information
+*     Co-ordinate data are transformed from sky co-ordinates to image
+*     co-ordinates, or vice-versa, using the projection information
 *     identified by IDA. The direction of the transformation is
-*     determined by the argument FORWRD.  If any input coordinate
+*     determined by the argument FORWRD.  If any input co-ordinate
 *     values are equal to the Starlink "BAD" value (VAL__BADD) then
 *     both the output values are set to the bad value.
 
 *  Arguments:
 *     NVAL = INTEGER (Given)
-*        The number of coordinate points to be transformed.
+*        The number of co-ordinate points to be transformed.
 *     IN1( NVAL ) = DOUBLE PRECISION (Given)
 *        If FORWRD is true, then IN1 holds values of the first image
-*        coordinate (X), otherwise IN1 holds values of the sky
+*        co-ordinate (X), otherwise IN1 holds values of the sky
 *        longitude.
 *     IN2( NVAL ) = DOUBLE PRECISION (Given)
 *        If FORWRD is true, then IN2 holds values of the second image
-*        coordinate (Y), otherwise IN2 holds values of the sky
+*        co-ordinate (Y), otherwise IN2 holds values of the sky
 *        latitude.
 *     FORWRD = LOGICAL (Given)
-*        If true then the forward mapping is used from image coordinate
-*        to sky coordinate. Otherwise, the inverse mapping from sky
-*        coordinate to image coordinates is used.
+*        If true then the forward mapping is used from image co-ordinate
+*        to sky co-ordinate. Otherwise, the inverse mapping from sky
+*        co-ordinate to image co-ordinates is used.
 *     SCS = CHARACTER * ( * ) (Given)
-*        The name of the sky coordinate system in which sky coordinates
-*        are required (if FORWRD is true), or supplied (if FORWRD is
-*        false). Any unambiguous abbreviation will do. This need not be
-*        the same as the SCS identified by IDA.  See ID2 section "Sky
-*        Coordinates" for more information on Sky Coordinate Systems.
-*        A blank value will cause the system associated with IDA to be
-*        used.
+*        The name of the sky co-ordinate system in which sky
+*        co-ordinates are required (if FORWRD is true), or supplied (if
+*        FORWRD is false). Any unambiguous abbreviation will do. This
+*        need not be the same as the SCS identified by IDA.  See ID2
+*        section "Sky Coordinates" for more information on Sky
+*        Co-ordinate Systems.  A blank value will cause the system
+*        associated with IDA to be used.
 *     IDA = INTEGER (Given)
 *        The IRA identifier for the astrometry information.
 *     OUT1( NVAL ) = DOUBLE PRECISION (Returned)
 *        If FORWRD is true, then OUT1 holds values of the sky longitude
-*        corresponding to the image coordinates given in arrays IN1 and
+*        corresponding to the image co-ordinates given in arrays IN1 and
 *        IN2. Otherwise, OUT1 holds values of the first image
-*        coordinate (X) corresponding to the input sky coordinates.
+*        co-ordinate (X) corresponding to the input sky co-ordinates.
 *     OUT2( NVAL ) = DOUBLE PRECISION (Returned)
 *        If FORWRD is true, then OUT2 holds values of the sky latitude
-*        corresponding to the image coordinates given in arrays IN1 and
+*        corresponding to the image co-ordinates given in arrays IN1 and
 *        IN2. Otherwise, OUT2 holds values of the second image
-*        coordinate (Y) corresponding to the input sky coordinates.
+*        co-ordinate (Y) corresponding to the input sky co-ordinates.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -90,7 +90,8 @@
 *     23-APR-1991 (DSB):
 *        Orthographic projection included (and "flat" removed).
 *     14-FEB-1991 (DSB):
-*        Conversion of input sky coordinates to projection SCS included.
+*        Conversion of input sky co-ordinates to projection SCS
+*        included.
 *     12-FEB-1993 (DSB):
 *        Storage of locators in common removed.
 *     {enter_further_changes_here}
@@ -117,7 +118,7 @@
 *        ACM_PROJP( IRA__MAXP, IRA__MAX ) = DOUBLE PRECISION (Read)
 *           Projection parameter values from the associated AS.
 *        ACM_SCS( IRA__MAX ) = CHARACTER (Read)
-*           Full sky coordinate system (SCS) name from the associated
+*           Full sky co-ordinate system (SCS) name from the associated
 *           AS, with optional equinox specifier.
 
 *  Arguments Given:
@@ -156,14 +157,14 @@
          LSCS = SCS
       END IF
 
-*  If the input values are sky coordinates, convert them to the
-*  sky coordinate system used by the projection, and temporarily
+*  If the input values are sky co-ordinates, convert them to the
+*  sky co-ordinate system used by the projection, and temporarily
 *  store them in the output arrays.
       IF( .NOT. FORWRD ) THEN
          CALL IRA_CONVT( NVAL, IN1, IN2, LSCS, ACM_SCS(IDA),
      :                   ACM_EPOCH(IDA), OUT1, OUT2, STATUS )
 
-*  Otherwise copy the input coordinates to temporary storage in the
+*  Otherwise copy the input co-ordinates to temporary storage in the
 *  output arrays.
       ELSE
 
@@ -181,8 +182,8 @@
       CALL IRA1_IPRJ( NVAL, OUT1, OUT2, FORWRD, PROJ, NPREQ,
      :                ACM_PROJP(1,IDA), OUT1, OUT2, STATUS )
 
-*  If the output values are sky coordinates, convert them to the
-*  requested sky coordinate system.
+*  If the output values are sky co-ordinates, convert them to the
+*  requested sky co-ordinate system.
       IF( FORWRD ) THEN
          CALL IRA_CONVT( NVAL, OUT1, OUT2, ACM_SCS(IDA), LSCS,
      :                   ACM_EPOCH(IDA), OUT1, OUT2, STATUS )
@@ -192,8 +193,8 @@
  999  CONTINUE
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'IRA_TRANS_ERR1',
-     :               'IRA_TRANS: Unable to transform coordinate values',
-     :                 STATUS )
+     :      'IRA_TRANS: Unable to transform co-ordinate values',
+     :      STATUS )
       END IF
 
       END

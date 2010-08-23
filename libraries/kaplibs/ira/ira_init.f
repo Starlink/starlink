@@ -4,7 +4,7 @@
 *     IRA_INIT
 
 *  Purpose:
-*     Initialise the IRA astrometry package.
+*     Initialises the IRA astrometry package.
 
 *  Language:
 *     Starlink Fortran 77
@@ -33,7 +33,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -43,8 +43,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -54,7 +54,7 @@
 *     21-JAN-1991 (DSB):
 *        Original version.
 *     27-APR-1991 (DSB):
-*        Modified fro IRA version 2.
+*        Modified fro IRA Version 2.
 *     11-FEB-1993 (DSB):
 *        Locators removed from common.
 *     {enter_further_changes_here}

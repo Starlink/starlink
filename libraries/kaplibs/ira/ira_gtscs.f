@@ -4,7 +4,7 @@
 *     IRA_GTSCS
 
 *  Purpose:
-*     Get the full name of a Sky Coordinate System (with equinox
+*     Gets the full name of a Sky Co-ordinate System (with equinox
 *     specifier) from the environment.
 
 *  Language:
@@ -17,7 +17,7 @@
 *     The ADAM parameter specified by argument SCSPAR is used to get a
 *     character string from the environment. A check is done to make
 *     sure that the string obtained represents a supported Sky
-*     Coordinate System (SCS). The user may include an equinox
+*     co-ordinate System (SCS). The user may include an equinox
 *     specifier (see IRA_ISCS) in the text string to override the
 *     default reference equinox of B1950. If an illegal SCS name is
 *     entered the user is reprompted. If DEFLT is given true, the value
@@ -35,7 +35,7 @@
 *        expansion) as the run-time default for the parameter.
 *     SCS = CHARACTER * ( * ) (Given and Returned)
 *        On entry, specifies the default value for the parameter. On
-*        exit, contains the full version of the sky coordinate system
+*        exit, contains the full version of the sky co-ordinate system
 *        entered by the user. The supplied variable should have a
 *        declared length given by symbolic constant IRA__SZSCS.
 *     STATUS = INTEGER (Given and Returned)
@@ -48,7 +48,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -58,8 +58,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)

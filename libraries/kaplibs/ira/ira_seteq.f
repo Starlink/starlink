@@ -4,7 +4,7 @@
 *     IRA_SETEQ
 
 *  Purpose:
-*     Encode the epoch of a reference equinox within an SCS name.
+*     Encodes the epoch of a reference equinox within an SCS name.
 
 *  Language:
 *     Starlink Fortran 77
@@ -13,19 +13,19 @@
 *     CALL IRA_SETEQ( EQU, BJ, SCS, STATUS )
 
 *  Description:
-*     On entry, SCS contains the name of a Sky Coordinate System (or an
+*     On entry, SCS contains the name of a Sky Co-ordinate System (or an
 *     unambiguous abbreviation), with or without an equinox specifier
 *     (see routine IRA_ISCS). On exit, SCS contains the full name of
-*     the Sky Coordinate System with an equinox specifier appended,
+*     the Sky Co-ordinate System with an equinox specifier appended,
 *     determined by arguments EQU and BJ. Any old equinox specifier is
-*     first removed. If the Sky Coordinate System is not referred to
-*     the equinox (eg GALACTIC) then no equinox specifier is included
+*     first removed. If the Sky Co-ordinate System is not referred to
+*     the equinox (e.g. GALACTIC) then no equinox specifier is included
 *     in SCS on exit.
 
 *  Arguments:
 *     EQU = DOUBLE PRECISION (Given)
 *        The epoch of the reference equinox. After calling this routine,
-*        the sky coordinates described by SCS are referred to the mean
+*        the sky co-ordinates described by SCS are referred to the mean
 *        equinox of the epoch given by EQU. If EQU has the Starlink
 *        "BAD" value (VAL__BADD) then no equinox specifier is included
 *        in SCS on exit.
@@ -37,12 +37,12 @@
 *        otherwise).
 *     SCS = CHARACTER * ( * ) (Given and Returned)
 *        On entry, SCS should contain an unambiguous abbreviation of a
-*        supported Sky Coordinate System (see routine IRA_ISCS), with or
-*        without an equinox specifier. On exit, SCS contains the full
-*        name of the Sky Coordinate System, appended with an equinox
+*        supported Sky Co-ordinate System (see routine IRA_ISCS), with
+*        or without an equinox specifier. On exit, SCS contains the full
+*        name of the Sky Co-ordinate System, appended with an equinox
 *        specifier determined by arguments EQU and BJ. If the Sky
-*        Coordinate System is not one that is referred to the equinox
-*        (eg GALACTIC) then no equinox specifier is included in SCS on
+*        Co-ordinate System is not one that is referred to the equinox
+*        (e.g. GALACTIC) then no equinox specifier is included in SCS on
 *        exit. SCS should have a declared length equal to the symbolic
 *        constant IRA__SZSCS.
 *     STATUS = INTEGER (Given and Returned)
@@ -56,7 +56,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -66,8 +66,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -141,7 +141,7 @@
       CALL IRA1_CHSCS( SCS, NAME, OLDEQU, OLDBJ, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
-*  If the sky coordinate system is not refered to the equinox, or if
+*  If the sky co-ordinate system is not refered to the equinox, or if
 *  the input value of EQU is bad, just copy the full name to the output
 *  SCS without any equinox specifier.
       IF( OLDBJ .EQ. ' ' .OR. EQU .EQ. VAL__BADD ) THEN

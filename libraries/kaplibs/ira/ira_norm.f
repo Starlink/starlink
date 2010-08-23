@@ -4,7 +4,7 @@
 *     IRA_NORM
 
 *  Purpose:
-*     Convert sky coordinate values to the equivalent first order
+*     Converts sky co-ordinate values to the equivalent first-order
 *     values.
 
 *  Language:
@@ -19,7 +19,7 @@
 *     this). The longitude value is then shifted into the range 0 to
 *     2*PI. If either A or B has the Starlink "BAD" value on entry
 *     (VAL__BADD) then both A and B are left unchanged on exit. Latitude
-*     values which are within 0.01 arc-seconds of either pole are
+*     values which are within 0.01 arcseconds of either pole are
 *     modified to put them exactly at the pole.
 
 *  Arguments:
@@ -39,7 +39,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -49,8 +49,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -62,7 +62,7 @@
 *     27-APR-1991 (DSB):
 *        Modified for IRA version 2.
 *     4-MAR-1992 (DSB):
-*        Latitude values within 0.01 arc-seconds of either pole are
+*        Latitude values within 0.01 arcseconds of either pole are
 *        treated as if at the pole.
 *     {enter_further_changes_here}
 

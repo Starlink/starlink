@@ -5,7 +5,7 @@
 *     IRA_GETCO
 
 *  Purpose:
-*     Obtain a pair of sky coordinates from the ADAM environment.
+*     Obtains a pair of sky co-ordinates from the ADAM environment.
 
 *  Language:
 *     Starlink Fortran 77
@@ -15,8 +15,8 @@
 
 *  Description:
 *     The ADAM parameters specified by arguments APAR and BPAR are used
-*     to acquire values for the first and second sky coordinates
-*     respectively, in the sky coordinate system specified by argument
+*     to acquire values for the first and second sky co-ordinates
+*     respectively, in the sky co-ordinate system specified by argument
 *     SCS. The parameters are obtained as literal character strings and
 *     decoded into floating point values. See routine IRA_CTOD for a
 *     description of the allowed formats of the strings associated with
@@ -25,9 +25,9 @@
 *     The parameter prompt strings contained in the application's
 *     interface file can be overridden by giving a non-blank value for
 *     argument PRMAPP. In this case, the prompts are formed by
-*     appending the value of PRMAPP to the coordinate descriptions
+*     appending the value of PRMAPP to the co-ordinate descriptions
 *     returned by routine IRA_SCNAM. For instance, if PRMAPP = " of the
-*     field centre", and an equatorial sky coordinate system is in use,
+*     field centre", and an equatorial sky co-ordinate system is in use,
 *     then the prompt for APAR will be "Right Ascension of the field
 *     centre", and the prompt for BPAR will be "Declination of the
 *     field centre". Note, the total length of the prompt strings is
@@ -48,7 +48,7 @@
 *        prompt strings are used (i.e. initially set to the values in
 *        the interface file).
 *     SCS = CHARACTER * ( * ) (Given)
-*        The name of the sky coordinate system to use. Any unambiguous
+*        The name of the sky co-ordinate system to use. Any unambiguous
 *        abbreviation will do (see ID2 section "Sky Coordinates").
 *     DEFLT = LOGICAL (Given)
 *        True if the input values of A and B are to be communicated to
@@ -57,9 +57,9 @@
 *        (i.e. equal to VAL__BADD ) then no default is set up for the
 *        corresponding parameter.
 *     A = DOUBLE PRECISION (Given and Returned)
-*        The value of the first sky coordinate. In radians.
+*        The value of the first sky co-ordinate. In radians.
 *     B = DOUBLE PRECISION (Given and Returned)
-*        The value of the second sky coordinate. In radians.
+*        The value of the second sky co-ordinate. In radians.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -70,7 +70,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -80,8 +80,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -122,14 +122,14 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER ABB*(IRA__SZSCA)! Coordinate abbreviation.
+      CHARACTER ABB*(IRA__SZSCA)! Co-ordinate abbreviation.
       CHARACTER APRMPT*80        ! A prompt string.
       CHARACTER BJ*1             ! The type of epoch (Besselian or
                                  ! Julian) held by variable EQU.
       CHARACTER BPRMPT*80        ! B prompt string.
       DOUBLE PRECISION EQU       ! The epoch of the reference equinox
                                  ! specified in argument SCS.
-      CHARACTER DESC*(IRA__SZSCD)! Coordinate description.
+      CHARACTER DESC*(IRA__SZSCD)! Co-ordinate description.
       INTEGER   LABB             ! No. of used characters in ABB.
       INTEGER   LDESC            ! No. of used characters in DESC.
       CHARACTER NAME*(IRA__SZSCS)! Full SCS name (with no equinox
@@ -139,7 +139,7 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Identify the sky coordinate system.
+*  Identify the sky co-ordinate system.
       CALL IRA1_CHSCS( SCS, NAME, EQU, BJ, STATUS )
 
 *  Set up the parameter prompt strings.
@@ -160,10 +160,10 @@
 *  first order ranges.
       IF( DEFLT ) CALL IRA_NORM( A, B, STATUS )
 
-*  Get the first sky coordinate.
+*  Get the first sky co-ordinate.
       CALL IRA1_IGTC1( APAR, APRMPT, NAME, 1, DEFLT, A, STATUS )
 
-*  Get the second sky coordinate.
+*  Get the second sky co-ordinate.
       CALL IRA1_IGTC1( BPAR, BPRMPT, NAME, 2, DEFLT, B, STATUS )
 
 *  If an error occurred give the context.

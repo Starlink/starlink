@@ -4,7 +4,7 @@
 *     IRA_CTOD
 
 *  Purpose:
-*     Converts formatted sky coordinate values into double precision
+*     Converts formatted sky co-ordinate values into double-precision
 *     values.
 
 *  Language:
@@ -14,9 +14,9 @@
 *     CALL IRA_CTOD( ATEXT, BTEXT, SCS, A, B, STATUS )
 
 *  Description:
-*     The input strings are presumed to hold sky coordinate values in
+*     The input strings are presumed to hold sky co-ordinate values in
 *     character form.  This routine reads the strings and produces
-*     double precision values holding the coordinate values, in
+*     double precision values holding the co-ordinate values, in
 *     radians.
 *
 *     Each input string can consist of a set of up to three "fields".
@@ -33,8 +33,8 @@
 *     that the field value is in units of seconds.  The interpretation
 *     of minutes and seconds depends on whether the value is a time
 *     value or an angle value. The longitude value for equatorial sky
-*     coordinate systems (RA) is expected to be a measure of time, all
-*     other coordinate values are expected to be a measure of angle.
+*     co-ordinate systems (RA) is expected to be a measure of time, all
+*     other co-ordinate values are expected to be a measure of angle.
 *     These defaults are overriden if the first field is a "degrees",
 *     "hours" or "radians" field (as indicated by the presence of a d,
 *     h or r terminator character).  The interpretation of fields with
@@ -66,7 +66,7 @@
 *     reported, and the status value IRA__RANGE is returned). The
 *     exception to this is if the string is prefixed with a "*"
 *     character, in which case any numeric value may be supplied. In
-*     this case the supplied value is returned directly (eg if the
+*     this case the supplied value is returned directly (e.g. if the
 *     string "*400D" is given, the radian equivalent of 400 degrees
 *     will be returned, not 40 (=400-360) degrees).  If either of the
 *     input strings are blank the corresponding output value is set to
@@ -82,7 +82,7 @@
 *        value. If this string is blank, B is returned with the "BAD"
 *        value (VAL__BADD), but no error is reported.
 *     SCS = CHARACTER * ( * ) (Given)
-*        The sky coordinate system (see ID2 section "Sky Coordinates").
+*        The sky co-ordinate system (see ID2 section "Sky Coordinates").
 *        Any unambiguous abbreviation will do.
 *     A = DOUBLE PRECISION (Returned)
 *        The longitude value represented by the string ATEXT, in
@@ -100,7 +100,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -110,8 +110,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -165,13 +165,13 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Identify the sky coordinate system.
+*  Identify the sky co-ordinate system.
       CALL IRA1_CHSCS( SCS, NAME, EQU, BJ, STATUS )
 
-*  Convert the first sky coordinate value.
+*  Convert the first sky co-ordinate value.
       CALL IRA1_ICTD1( ATEXT, NAME, 1, A, STATUS )
 
-*  Convert the second sky coordinate value.
+*  Convert the second sky co-ordinate value.
       CALL IRA1_ICTD1( BTEXT, NAME, 2, B, STATUS )
 
 *  If an error occurred, give a contextual message.
@@ -179,8 +179,8 @@
          CALL MSG_SETC( 'AT', ATEXT )
          CALL MSG_SETC( 'BT', BTEXT )
          CALL ERR_REP( 'IRA_CTOD_ERR1',
-     :     'IRA_CTOD: Unable to read sky coordinate value from "^AT" '//
-     :     'or "^BT"', STATUS )
+     :     'IRA_CTOD: Unable to read sky co-ordinate value from '//
+     :     '"^AT" or "^BT"', STATUS )
       END IF
 
       END

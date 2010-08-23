@@ -39,7 +39,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -49,8 +49,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -86,8 +86,8 @@
 *        ACM_PROJP( IRA__MAXP, IRA__MAX ) = DOUBLE PRECISION (Write)
 *           Projection parameters.
 *        ACM_SCS( IRA__MAX ) = CHARACTER (Write)
-*           The full name of the sky coordinate system, with an optional
-*           equinox specifier.
+*           The full name of the sky co-ordinate system, with an
+*           optional equinox specifier.
 *        ACM_STATE = CHARACTER (Read)
 *           Equal to IRA__GOING if IRA has been initialised.
 *        ACM_VALID( IRA__MAX ) = LOGICAL (Write)
@@ -109,7 +109,7 @@
       LOGICAL   DEF              ! True if AS is in a defined state.
       DOUBLE PRECISION EQU       ! The epoch of the reference equinox
                                  ! specified in component SCS.
-      CHARACTER NAME*(IRA__SZSCS)! Name of Sky Coordinate System, with
+      CHARACTER NAME*(IRA__SZSCS)! Name of Sky Co-ordinate System, with
                                   ! no equinox specifier.
       INTEGER   NP               ! Actual number of projection
                                  ! parameters stored in the AS.

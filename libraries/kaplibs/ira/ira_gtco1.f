@@ -5,7 +5,7 @@
 *     IRA_GTCO1
 
 *  Purpose:
-*     Obtain a single sky coordinate value from the ADAM environment.
+*     Obtains a single sky co-ordinate value from the ADAM environment.
 
 *  Language:
 *     Starlink Fortran 77
@@ -15,18 +15,18 @@
 
 *  Description:
 *     The ADAM parameter specified by argument PARAM is used to acquire
-*     a longitude or latitude value in the requested sky coordinate
+*     a longitude or latitude value in the requested sky co-ordinate
 *     system. Argument NC determines which is to be obtained.  The
 *     string is decoded into a double precision number representing the
 *     sky position.  See the documentation for IRA_CTOR for a
-*     description of the allowed formats.  The input sky coordinate
+*     description of the allowed formats.  The input sky co-ordinate
 *     value can optionally be communicated to the environment as a
 *     dynamic default.
 
 *  Arguments:
 *     PARAM = CHARACTER * ( * ) (Given)
 *        The name of the ADAM parameter used to get the sky
-*        coordinate value.
+*        co-ordinate value.
 *     PROMPT = CHARACTER * ( * ) (Given)
 *        A string to override the current prompt for the parameter.
 *        If this is blank, the prompt is left at its current value.
@@ -34,12 +34,12 @@
 *        file. Note, unlike routine IRA_GETCO, the axis name is not
 *        automatically included in the prompt.
 *     SCS = CHARACTER * ( * ) (Given)
-*        The sky coordinate system in use. Any unambiguous abbreviation
+*        The sky co-ordinate system in use. Any unambiguous abbreviation
 *        will do  (see ID2 section "Sky Coordinates").
 *     NC = INTEGER (Given)
-*        Determines which sky coordinate is to be returned. If a value
+*        Determines which sky co-ordinate is to be returned. If a value
 *        of 1 is supplied, the string obtained for the parameter is
-*        interpreted as a longitude value (eg RA if an equatorial
+*        interpreted as a longitude value (e.g. RA if an equatorial
 *        system is being used). If a value of 2 is supplied, the string
 *        is interpreted as a latitude value.  Any other value causes an
 *        error to be reported.
@@ -49,7 +49,7 @@
 *        "BAD" on entry (i.e. equal to VAL__BADD), then no dynamic
 *        default is set up.
 *     VALUE = DOUBLE PRECISION (Given and Returned)
-*        The sky coordinate value. On input it contains the default
+*        The sky co-ordinate value. On input it contains the default
 *        value (in radians) to use if DEFLT is true. On exit it
 *        contains the decoded value obtained from the environment, in
 *        radians.
@@ -145,8 +145,8 @@
 *  If an error occurred, give a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'IRA_GTCO1_ERR2',
-     :             'IRA_GTCO1: Unable to obtain a sky coordinate value',
-     :                 STATUS )
+     :     'IRA_GTCO1: Unable to obtain a sky co-ordinate value',
+     :     STATUS )
       END IF
 
  999  CONTINUE

@@ -4,7 +4,7 @@
 *     IRA_DTOC1
 
 *  Purpose:
-*     Convert a single floating point sky coordinate value to
+*     Convert a single floating=point sky co-ordinate value to
 *     character form.
 
 *  Language:
@@ -15,7 +15,7 @@
 
 *  Description:
 *     This routine creates a text string containing a formatted version
-*     of the given sky coordinate value. The value is assumed to be a
+*     of the given sky co-ordinate value. The value is assumed to be a
 *     longitude value if NC is 1, and a latitude if NC is 2. The
 *     formats of the output string are as described in routine
 *     IRA_DTOC. Longitude values are shifted into the range 0 - 2*PI
@@ -27,15 +27,15 @@
 
 *  Arguments:
 *     VALUE = DOUBLE PRECISION (Given)
-*        The value of the sky coordinate to be formatted, in radians.
+*        The value of the sky co-ordinate to be formatted, in radians.
 *        If VALUE has the Starlink "BAD" value (VAL__BADD) then the
 *        output string TEXT is set blank.
 *     SCS = CHARACTER * ( * ) (Given)
-*        The sky coordinate system in use (see ID2 section "Sky
+*        The sky co-ordinate system in use (see ID2 section "Sky
 *        Coordinates"). Any unambiguous abbreviation will do.
 *     NC = INTEGER (Given)
-*        Determines which sky coordinate is given. If a value of 1 is
-*        supplied, VALUE is interpreted as a longitude value (eg RA if
+*        Determines which sky co-ordinate is given. If a value of 1 is
+*        supplied, VALUE is interpreted as a longitude value (e.g. RA if
 *        an equatorial system is being used).  If a value of 2 is
 *        supplied, VALUE is interpreted as a latitude value. Any other
 *        value causes an error to be reported.
@@ -47,7 +47,7 @@
 *        the styles and defaults.
 *     TEXT = CHARACTER * ( * ) (Returned)
 *        The string containing the formatted description of the sky
-*        coordinate value. The variable supplied for TEXT should have a
+*        co-ordinate value. The variable supplied for TEXT should have a
 *        declared length equal to the value of parameter IRA__SZFSC.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -59,7 +59,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -69,8 +69,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -82,7 +82,7 @@
 *     7-MAR-1991 (DSB):
 *        Style 4 added.
 *     26-APR-1991 (DSB):
-*        Modified for version 2 of IRA
+*        Modified for Version 2 of IRA.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -119,7 +119,7 @@
                                  ! specified in argument SCS.
       DOUBLE PRECISION SLA_DRANGE ! SLALIB function.
       DOUBLE PRECISION SLA_DRANRM ! SLALIB function.
-      DOUBLE PRECISION SVAL       ! The sky coordinate shifted
+      DOUBLE PRECISION SVAL       ! The sky co-ordinate shifted
                                   ! into its first order range.
       CHARACTER NAME*(IRA__SZSCS)! Full name of SCS (with no equinox
                                   ! specifier)
@@ -158,7 +158,7 @@
       CALL IRA1_CHSCS( SCS, NAME, EQU, BJ, STATUS )
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Shift the input sky coordinate value into its first order range.
+*  Shift the input sky co-ordinate value into its first order range.
       IF( VALUE .NE. VAL__BADD ) THEN
          IF( NC .EQ. 1 ) THEN
             SVAL = SLA_DRANRM( VALUE )
@@ -167,13 +167,13 @@
          END IF
       END IF
 
-*  Check that second sky coordinates values have a magnitude less than
+*  Check that second sky co-ordinates values have a magnitude less than
 *  or equal to pi/2.
       IF( NC .EQ. 2 .AND. ABS(SVAL) .GT. IRA__PIBY2 ) THEN
          STATUS = IRA__BAD2V
          CALL ERR_REP( 'IRA_DTOC1_ERR4',
-     :  'IRA_DTOC1: Second sky coordinate has magnitude greater than '//
-     :  '90 degrees', STATUS )
+     :     'IRA_DTOC1: Second sky co-ordinate has magnitude greater '//
+     :     'than 90 degrees', STATUS )
       END IF
 
 *  Call IRA1_IDTC1 to do the work.
@@ -184,8 +184,8 @@
 
       IF( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'IRA_DTOC1_ERR5',
-     :          'IRA_DTOC1: Error formatting a sky coordinate position',
-     :                 STATUS )
+     :     'IRA_DTOC1: Error formatting a sky co-ordinate position',
+     :     STATUS )
       END IF
 
       END

@@ -4,7 +4,7 @@
 *     IRA_DTOC
 
 *  Purpose:
-*     Convert a pair of double precision sky coordinate values to
+*     Converts a pair of double-precision sky co-ordinate values to
 *     character form.
 
 *  Language:
@@ -15,9 +15,9 @@
 
 *  Description:
 *     This routine creates a pair of text strings containing formatted
-*     versions of the given sky coordinate values.  The exact format
-*     depends on the type of sky coordinate system in use and the value
-*     of STYLE (see the "Notes" section below). The input coordinate
+*     versions of the given sky co-ordinate values.  The exact format
+*     depends on the type of sky co-ordinate system in use and the value
+*     of STYLE (see the "Notes" section below). The input co-ordinate
 *     values are shifted into their first order ranges before being used
 *     (see IRA_NORM).
 
@@ -31,7 +31,7 @@
 *        B has the "BAD" value then the output string BTEXT is set
 *        blank.
 *     SCS = CHARACTER * ( * ) (Given)
-*        The sky coordinate system in use (see ID2 section "Sky
+*        The sky co-ordinate system in use (see ID2 section "Sky
 *        Coordinates"). Any unambiguous abbreviation will do.
 *     STYLE = INTEGER (Given)
 *        A value in the range 1 to 5 which specifies the style of
@@ -68,7 +68,7 @@
 *
 *        STYLE = 3:  ( a very brief form readable by IRA_CTOD)
 *
-*           "120300.00" and "-332300.00" ( eg hhmmss.ss and ddmmss.ss )
+*           "120300.00" and "-332300.00" (e.g. hhmmss.ss and ddmmss.ss)
 *
 *        STYLE = 4:  (a brief form readable by IRA_CTOD)
 *
@@ -76,8 +76,8 @@
 *
 *        STYLE = 5:  (a brief form readable by IRA_CTOD)
 *
-*           "12.050006" and "-33.383333" (eg fractional values in
-*                                      hours (RA) and degrees (DEC) )
+*           "12.050006" and "-33.383333" (e.g. fractional values in
+*                                         hours (RA) and degrees (DEC))
 *
 *     - SCS = "GALACTIC"
 *       Default is style 5 (used if argument STYLE is zero on entry).
@@ -92,7 +92,8 @@
 *
 *        STYLE = 3:
 *
-*           "0120300.00" and "-332300.00" (eg dddmmss.ss and ddmmss.ss )
+*           "0120300.00" and "-332300.00" (e.g. dddmmss.ss and 
+*                                          ddmmss.ss )
 *
 *        STYLE = 4:  (a brief form readable by IRA_CTOD)
 *
@@ -100,8 +101,8 @@
 *
 *        STYLE = 5:  (a brief form readable by IRA_CTOD)
 *
-*           "12.050006" and "-33.383333" (eg fractional values in
-*                                        degrees )
+*           "12.050006" and "-33.383333" (e.g. fractional values in
+*                                         degrees )
 *
 *     - SCS = "ECLIPTIC"
 *       Default is style 5 (used if argument STYLE is zero on entry).
@@ -116,7 +117,8 @@
 *
 *        STYLE = 3:
 *
-*           "0120300.00" and "-332300.00" (eg dddmmss.ss and ddmmss.ss )
+*           "0120300.00" and "-332300.00" (e.g. dddmmss.ss and
+*                                          ddmmss.ss)
 *
 *        STYLE = 4:  (a brief form readable by IRA_CTOD)
 *
@@ -124,8 +126,8 @@
 *
 *        STYLE = 5:  (a brief form readable by IRA_CTOD)
 *
-*           "12.050006" and "-33.383333" (eg fractional values in
-*                                        degrees )
+*           "12.050006" and "-33.383333" (e.g. fractional values in
+*                                         degrees)
 
 *  Copyright:
 *     Copyright (C) 1990, 1991, 1992 Science & Engineering Research Council.
@@ -134,7 +136,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -144,8 +146,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -161,7 +163,7 @@
 *     8-JUL-1991 (DSB):
 *        Leading zeros included in style 4 fields.
 *     12-NOV-1992 (DSB):
-*        New abbreviations for GALACTIC and ECLIPTIC coords described.
+*        New abbreviations for GALACTIC and ECLIPTIC co-ords described.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -225,21 +227,21 @@
 *  Identify the SCS.
       CALL IRA1_CHSCS( SCS, NAME, EQU, BJ, STATUS )
 
-*  Shift the input sky coordinate values into their first order ranges.
+*  Shift the input sky co-ordinate values into their first order ranges.
       AA = A
       BB = B
       CALL IRA_NORM( AA, BB, STATUS )
 
-*  Convert the first sky coordinate value.
+*  Convert the first sky co-ordinate value.
       CALL IRA1_IDTC1( AA, NAME, 1, STYLE, ATEXT, STATUS )
 
-*  Convert the second sky coordinate value.
+*  Convert the second sky co-ordinate value.
       CALL IRA1_IDTC1( BB, NAME, 2, STYLE, BTEXT, STATUS )
 
 *  If an error occurred, give a contextual message.
       IF( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'IRA_DTOC_ERR3',
-     :                 'IRA_DTOC: Unable to format sky coordinates',
+     :                 'IRA_DTOC: Unable to format sky co-ordinates',
      :                 STATUS )
       END IF
 

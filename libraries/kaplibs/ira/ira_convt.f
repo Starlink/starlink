@@ -5,7 +5,7 @@
 *     IRA_CONVT
 
 *  Purpose:
-*     Convert sky coordinates from one system to another.
+*     Converts sky co-ordinates from one system to another.
 
 *  Language:
 *     Starlink Fortran 77
@@ -15,33 +15,33 @@
 *                     STATUS )
 
 *  Description:
-*     This routine use SLALIB to convert a list of sky coordinates from
-*     one supported Sky Coordinate System (SCS) to any other supported
+*     This routine use SLALIB to convert a list of sky co-ordinates from
+*     one supported Sky Co-ordinate System (SCS) to any other supported
 *     system.  It is assumed that the observations were made at the
 *     date given by the Julian epoch supplied.  If the input and output
-*     coordinates are referred to different mean equinox, then
-*     precession is applied to convert the input coordinates to the
+*     co-ordinates are referred to different mean equinox, then
+*     precession is applied to convert the input co-ordinates to the
 *     output system.  No correction for nutation is included. If any of
-*     the input coordinate values are equal to the Starlink "BAD" value
+*     the input co-ordinate values are equal to the Starlink "BAD" value
 *     (VAL__BADD) then the corresponding output values will both be set
 *     to the bad value.
 
 *  Arguments:
 *     NVAL = INTEGER (Given)
-*        The number of sky coordinate pairs to be converted.
+*        The number of sky co-ordinate pairs to be converted.
 *     AIN( NVAL ) = DOUBLE PRECISION (Given)
-*        A list of sky longitude coordinate values to be converted, in
+*        A list of sky longitude co-ordinate values to be converted, in
 *        radians.
 *     BIN( NVAL ) = DOUBLE PRECISION (Given)
-*        A list of sky latitude coordinate values to be converted, in
+*        A list of sky latitude co-ordinate values to be converted, in
 *        radians.
 *     SCSIN = CHARACTER * ( * ) (Given)
-*        A string holding the name of the sky coordinate system of the
+*        A string holding the name of the sky co-ordinate system of the
 *        input list. Any unambiguous abbreviation will do. An optional
 *        equinox specifier may be included in the name (see ID2 section
 *        "Sky Coordinates").
 *     SCSOUT = CHARACTER * ( * ) (Given)
-*        A string holding the name of the sky coordinate system
+*        A string holding the name of the sky co-ordinate system
 *        required for the output list. Any unambiguous abbreviation
 *        will do.An optional equinox specifier may be included in the
 *        name.
@@ -51,10 +51,10 @@
 *        be specified. This constant is a Julian epoch suitable for all
 *        IRAS data.
 *     AOUT( NVAL ) = DOUBLE PRECISION (Returned)
-*        The list of converted sky longitude coordinate values, in
+*        The list of converted sky longitude co-ordinate values, in
 *        radians.
 *     BOUT( NVAL ) = DOUBLE PRECISION (Returned)
-*        The list of converted sky latitude coordinate values, in
+*        The list of converted sky latitude co-ordinate values, in
 *        radians.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -66,7 +66,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -76,8 +76,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -153,7 +153,7 @@
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'IRA_CONVT_ERR1',
      :          'IRA_CONVT: Unable to convert a position from one '//
-     :          'sky coordinate system to another.',
+     :          'sky co-ordinate system to another.',
      :                 STATUS )
       END IF
 

@@ -4,7 +4,7 @@
 *     IRA_IDSCS
 
 *  Purpose:
-*     Get the Sky Coordinate System associated with an IRA identifier.
+*     Gets the Sky Co-ordinate System associated with an IRA identifier.
 
 *  Language:
 *     Starlink Fortran 77
@@ -13,14 +13,14 @@
 *     CALL IRA_IDSCS( IDA, SCS, STATUS )
 
 *  Description:
-*     This routine returns the Sky Coordinate System associated with an
+*     This routine returns the Sky Co-ordinate System associated with an
 *     IRA identifier.
 
 *  Arguments:
 *     IDA = INTEGER (Given)
 *        The IRA identifier for the astrometry information.
 *     SCS = CHARACTER * ( * ) (Returned)
-*        On exit, contains the full version of the sky coordinate system
+*        On exit, contains the full version of the sky co-ordinate system
 *        associated with the IRA identifier. The supplied variable should
 *        have a declared length given by symbolic constant IRA__SZSCS.
 *     STATUS = INTEGER (Given and Returned)
@@ -33,7 +33,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -43,8 +43,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)

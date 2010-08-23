@@ -4,8 +4,8 @@
 *     IRA_CTOD1
 
 *  Purpose:
-*     Converts a single formatted sky coordinate value into a double
-*     precision value.
+*     Converts a single formatted sky co-ordinate value into a
+*     double-precision value.
 
 *  Language:
 *     Starlink Fortran 77
@@ -14,11 +14,11 @@
 *     CALL IRA_CTOD1( TEXT, SCS, NC, VALUE, STATUS )
 
 *  Description:
-*     The input string is presumed to hold a sky coordinate value in
+*     The input string is presumed to hold a sky co-ordinate value in
 *     character form. If NC is 1, the string is interpreted as a
 *     longitude value. If NC is 2, the string is interpreted as a
 *     latitude value.  This routine reads the string and produces a
-*     double precision value holding the coordinate value in radians.
+*     double precision value holding the co-ordinate value in radians.
 *     The value is not shifted into the first order range (eg if an
 *     angular value equivalent to 3*PI is given, the value 3*PI will be
 *     returned, not 1*PI). If the input string is blank the output
@@ -28,20 +28,20 @@
 *  Arguments:
 *     TEXT = CHARACTER * ( * ) (Given)
 *        The string containing the formatted version of the sky
-*        coordinate value. If this string is blank, VALUE is returned
+*        co-ordinate value. If this string is blank, VALUE is returned
 *        with the "BAD" value (VAL__BADD), but no error report is
 *        made.
 *     SCS = CHARACTER * ( * ) (Given)
-*        The sky coordinate system (see ID2 section "Sky Coordinates").
+*        The sky co-ordinate system (see ID2 section "Sky Coordinates").
 *        Any unambiguous abbreviation will do.
 *     NC = INTEGER (Given)
-*        Determines which sky coordinate is to be used. If a value of 1
+*        Determines which sky co-ordinate is to be used. If a value of 1
 *        is supplied, the string is interpreted as a longitude value
-*        (eg RA if an equatorial system is being used). If a value of 2
-*        is supplied, the string is interpreted as a latitude value.
+*        (e.g. RA if an equatorial system is being used). If a value of
+*        2 is supplied, the string is interpreted as a latitude value.
 *        Any other value results in an error being reported.
 *     VALUE = DOUBLE PRECISION (Returned)
-*        The numerical value of the sky coordinate represented by the
+*        The numerical value of the sky co-ordinate represented by the
 *        string in TEXT. The value is in radians.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -53,7 +53,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -63,8 +63,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -74,7 +74,7 @@
 *     20-SEP-1990 (DSB):
 *        Original version.
 *     26-APR-1991 (DSB):
-*        Modified for IRA version 2.
+*        Modified for IRA Version 2.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -124,7 +124,7 @@
          GO TO 999
       END IF
 
-*  Identify the sky coordinate system.
+*  Identify the sky co-ordinate system.
       CALL IRA1_CHSCS( SCS, NAME, EQU, BJ, STATUS )
 
 *  Call IRA1_ICTD1 to do the work.
@@ -133,8 +133,8 @@
 *  If any error occurred, give a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'IRA_CTOD1_ERR2',
-     :       'IRA_CTOD1: Unable to read formatted sky coordinate value',
-     :                 STATUS )
+     :     'IRA_CTOD1: Unable to read formatted sky co-ordinate value',
+     :     STATUS )
       END IF
 
  999  CONTINUE
