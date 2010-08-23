@@ -18,7 +18,8 @@
 *     of the diagonals by summing their logarithms to base 10.
 *     Logarithmic calculations are used to prevent overflows. A bad
 *     status is returned when the matrix is singular or the determinant
-*     is too large to store in a <COMM>-number representation.
+*     is too large to store in the chosen data type's number
+*     representation.
  
 *  Arguments:
 *     N = INTEGER (Given)
@@ -46,10 +47,9 @@
 *  Notes:
 *     -  There is a routine for the data types real or double precision:
 *     replace "x" in the routine name by R or D respectively, as
-*     appropriate.  The matrix and the SECOND workspace should have
+*     appropriate.  The matrix ARRAY and the WORK2 workspace should have
 *     this data type as well.
  
-*  [optional_subroutine_items]...
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council.
 *     All Rights Reserved.

@@ -2,17 +2,17 @@
      :                        VOUT, NBAD, STATUS )
 *+
 *  Name:
-*     KPG1_POW<T>
+*     KPG1_POWx
  
 *  Purpose:
-*     Raise each element of a vectorised array to a specified power.
+*     Raises each element of a vectorised array to a specified power.
  
 *  Language:
 *     Starlink Fortran 77
  
 *  Invocation:
-*     CALL KPG1_POW<T>( BAD, VAR, POWER, EL, DIN, VIN, DOUT, VOUT, NBAD, 
-*                      STATUS )
+*     CALL KPG1_POWx( BAD, VAR, POWER, EL, DIN, VIN, DOUT, VOUT, NBAD, 
+*                     STATUS )
  
 *  Description:
 *     The routine raises each element of a vectorised array to a specified 
@@ -32,20 +32,26 @@
 *        The required power.
 *     EL = INTEGER (Given)
 *        Number of array elements to process.
-*     DIN( EL ) = <TYPE> (Given)
+*     DIN( EL ) = ? (Given)
 *        Input data array.
-*     VIN( EL ) = <TYPE> (Given)
+*     VIN( EL ) = ? (Given)
 *        Input variance array. Only accessed if VAR is .TRUE.
-*     DOUT( EL ) = <TYPE> (Given)
+*     DOUT( EL ) = ? (Given)
 *        Output data array.
-*     VOUT( EL ) = <TYPE> (Given)
+*     VOUT( EL ) = ? (Given)
 *        Output variance array. Only accessed if VAR is .TRUE.
 *     NBAD( 2 ) = INTEGER (Returned)
-*        Element 1 has the number of bad values stored in DOUT, and element 
+*        Element 1 has the number of bad values stored in DOUT, and Element 
 *        2 has the number of bad values stored in VOUT.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
- 
+
+*  Notes:
+*     -  There is a routine for processing both real and double
+*     precision data; replace "x" in the routine name by R or D as
+*     appropriate.  The data types of the DIN, VIN, DOUT, and VOUT
+*     arrays should match the routine used.
+
 *  Copyright:
 *     Copyright (C) 2001 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
@@ -57,7 +63,7 @@
 *     the License, or (at your option) any later version.
 *     
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *     

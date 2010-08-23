@@ -5,7 +5,7 @@
 *     KPG1_AKERx
 
 *  Purpose:
-*     Smooth a two-dimensional array using an arbitrary rectangular
+*     Smooths a two-dimensional array using an arbitrary rectangular
 *     kernel.
 
 *  Language:

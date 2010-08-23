@@ -5,14 +5,15 @@
 *     KPG1_SCLUBx
 
 *  Purpose:
-*     Copy array values into a BYTE array, scaling them in the process.
+*     Copies array values into a BYTE array, scaling them in the
+*     process.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation
-*     CALL KPG1_SCLUB<T>( SCALE, ZERO, BAD, EL, IN, OUT, BADOUT, NBAD, 
-*                          STATUS )
+*     CALL KPG1_SCLUBx( SCALE, ZERO, BAD, EL, IN, OUT, BADOUT, NBAD, 
+*                       STATUS )
 
 *  Description:
 *     This routine copies values from one array to another, applying a
@@ -29,7 +30,7 @@
 *        false it is safe not to check for bad values.
 *     EL = INTEGER (Given)
 *        The size of the input array.
-*     IN( EL ) = <TYPE> (Given)
+*     IN( EL ) = ? (Given)
 *        The input array.
 *     OUT( EL ) = BYTE (Returned)
 *        The output array.
@@ -41,6 +42,11 @@
 *        consequently set bad in the output array.
 *     STATUS = INTEGER  (Given and Returned)
 *        Global status value
+
+*  Notes:
+*     -  There is a routine for the all numeric data types: replace "x"
+*     in the routine name by B, D, I, R, UB, UW, or W as appropriate.
+*     The IN argument supplied must have the data type specified.
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.

@@ -5,7 +5,7 @@
 *     KPG1_DIVx
 
 *  Purpose:
-*     Divide two vectorised arrays with optional variance information.
+*     Divides two vectorised arrays with optional variance information.
 
 *  Language:
 *     Starlink Fortran 77

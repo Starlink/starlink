@@ -2,22 +2,22 @@
      :                        VOUT, NBAD, STATUS )
 *+
 *  Name:
-*     KPG1_TRIG<T>
+*     KPG1_TRIGx
  
 *  Purpose:
-*     Apply a trig function to each element of a vectorised array.
+*     Applies a trigonometric function to each element of a vectorised array.
  
 *  Language:
 *     Starlink Fortran 77
  
 *  Invocation:
-*     CALL KPG1_TRIG<T>( BAD, VAR, TRIGFN, EL, DIN, VIN, DOUT, VOUT, NBAD, 
+*     CALL KPG1_TRIGx( BAD, VAR, TRIGFN, EL, DIN, VIN, DOUT, VOUT, NBAD, 
 *                      STATUS )
  
 *  Description:
-*     The routine applied a specified trig function to each element of a
-*     vectorised array. Any associated variance values are also modified 
-*     appropriately.
+*     The routine applies a specified trigonometric function to each
+*     element of a vectorised array. Any associated variance values are
+*     also modified appropriately.
  
 *  Arguments:
 *     BAD = LOGICAL (Given)
@@ -29,20 +29,26 @@
 *        SIND, COSD, TAND, ASIN, ACOS, ATAN, ASIND, ACOSD, ATAND.
 *     EL = INTEGER (Given)
 *        Number of array elements to process.
-*     DIN( EL ) = <TYPE> (Given)
+*     DIN( EL ) = ? (Given)
 *        Input data array.
-*     VIN( EL ) = <TYPE> (Given)
+*     VIN( EL ) = ? (Given)
 *        Input variance array. Only accessed if VAR is .TRUE.
-*     DOUT( EL ) = <TYPE> (Given)
+*     DOUT( EL ) = ? (Given)
 *        Output data array.
-*     VOUT( EL ) = <TYPE> (Given)
+*     VOUT( EL ) = ? (Given)
 *        Output variance array. Only accessed if VAR is .TRUE.
 *     NBAD( 2 ) = INTEGER (Returned)
-*        Element 1 has the number of bad values stored in DOUT, and element 
+*        Element 1 has the number of bad values stored in DOUT, and Element
 *        2 has the number of bad values stored in VOUT.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
- 
+
+*  Notes:
+*     -  There is a routine for real and double-precision data types:
+*     replace "x" in the routine name by R or D respectively.  The input
+*     and output data and variance arrays supplied to the routine must 
+*     have the data type specified.
+
 *  Copyright:
 *     Copyright (C) 2001 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
@@ -54,7 +60,7 @@
 *     the License, or (at your option) any later version.
 *     
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *     

@@ -1,7 +1,7 @@
       SUBROUTINE KPG1_FFTF<T>( M, N, IN, WORK, OUT, STATUS )
 *+
 *  Name:
-*     KPG1_FFTF<T>
+*     KPG1_FFTFx
 
 *  Purpose:
 *     Takes the forward FFT of a real image.
@@ -10,27 +10,27 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_FFTF<T>( M, N, IN, WORK, OUT, STATUS )
+*     CALL KPG1_FFTFx( M, N, IN, WORK, OUT, STATUS )
 
 *  Description:
 *     The Fourier transform of the input (purely real) image is taken 
 *     and returned in OUT.  The returned FT is stored in Hermitian 
 *     format, in which the real and imaginary parts of the FT are 
 *     combined into a single array.  The FT can be inverted using 
-*     KPG1_FFTB<T>, and two Hermitian FTs can be multipled together 
-*     using routine KPG1_HMLT<T>.
+*     KPG1_FFTBx, and two Hermitian FTs can be multipled together 
+*     using routine KPG1_HMLTx.
 
 *  Arguments:
 *     M = INTEGER (Given)
 *        Number of columns in the input image.
 *     N = INTEGER (Given)
 *        Number of rows in the input image.
-*     IN( M, N ) = <COMM> (Given)
+*     IN( M, N ) = ? (Given)
 *        The input image.
-*     WORK( * ) = <COMM> (Given)
+*     WORK( * ) = ? (Given)
 *        Work space.  This must be at least ( 3*MAX( M, N ) + 15 )
 *        elements long.
-*     OUT( M, N ) = <COMM> (Returned)
+*     OUT( M, N ) = ? (Returned)
 *        The FFT in Hermitian form.  Note, the same array can be used
 *        for both input and output, in which case the supplied values
 *        will be over-written.

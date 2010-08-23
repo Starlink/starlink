@@ -4,7 +4,7 @@
 *     KPG1_HCONx
 
 *  Purpose:
-*     Take the complex conjugate of an Hermitian image.
+*     Takes the complex conjugate of an Hermitian image.
 
 *  Language:
 *     Starlink Fortran 77

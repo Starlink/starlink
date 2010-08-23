@@ -47,7 +47,7 @@
 *  Arguments:
 *     EL = INTEGER (Given)
 *        The number of elements of the array to be analysed.
-*     ARRAY( EL ) = <TYPE> (Given)
+*     ARRAY( EL ) = ? (Given)
 *        The array for which the chosen statistics are required.
 *     NFRAC = INTEGER (Given)
 *        Number of fractional positions.

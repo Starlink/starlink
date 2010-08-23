@@ -4,16 +4,16 @@
 *     KPG_NTHMx
 
 *  Purpose:
-*     Returns the n smallest values in a <COMM> array.
+*     Returns the n smallest values in an array.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_NTHM<T>( BAD, ARRAY, DIMS, N, STACK, STATUS )
+*     CALL KPG1_NTHMx( BAD, ARRAY, DIMS, N, STACK, STATUS )
 
 *  Description:
-*     This routine takes an <COMM> array and returns a stack
+*     This routine takes an array and returns a stack
 *     containing the n smallest values in that array.
 
 *     Bad pixels are processed by the magic-value method.
@@ -51,6 +51,12 @@
 *           Endfor
 *        Endif
 *     Endfor
+
+*  Notes:
+*     -  There is a routine for the all numeric data types: replace "x"
+*     in the routine name by B, D, I, R, UB, UW, or W as appropriate.
+*     The ARRAY and STACK arguments supplied must have the data type
+*     specified.
 
 *  Copyright:
 *     Copyright (C) 1986, 1990 Science & Engineering Research Council.

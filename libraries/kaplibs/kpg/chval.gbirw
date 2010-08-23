@@ -1,7 +1,7 @@
       SUBROUTINE CHVAL<T>( DIM, INARR, OLDVAL, NEWVAL, OUTARR, STATUS )
 *+
 *  Name:
-*     CHVAL<T>
+*     CHVALx
 
 *  Purpose:
 *     Replaces a specified pixel value.
@@ -11,18 +11,18 @@
 *     value and returns the old value of the pixel.
 *
 *  Invocation:
-*     CALL CHVAL<T>( DIM, INARR, OLDVAL, NEWVAL, OUTARR, STATUS )
+*     CALL CHVALx( DIM, INARR, OLDVAL, NEWVAL, OUTARR, STATUS )
 
 *  Arguments:
 *     DIM = INTEGER( READ )
 *         The dimension of the input array
-*     INARR( DIM ) = <TYPE> ( READ )
+*     INARR( DIM ) = ? ( READ )
 *         The input data array
-*     OLDVAL = <TYPE> ( READ )
+*     OLDVAL = ? ( READ )
 *         Value to be replaced
-*     NEWVAL = <TYPE> ( READ )
+*     NEWVAL = ? ( READ )
 *         New value to be substituted for the %OLDVAL.
-*     OUTARR( DIM ) = <TYPE> ( READ )
+*     OUTARR( DIM ) = ? ( READ )
 *         The output data array containing the modified pixel values
 *     STATUS  =  INTEGER( READ )
 *         Global status value
@@ -35,9 +35,12 @@
 *        Endif
 *     Endfor
 *     End
-*
-*  Bugs:
-*     None are known at this time.
+
+*  Notes:
+*     -  There is a routine for the all signed numeric data types:
+*     replace "x" in the routine name by B, D, I, R, or W as appropriate.
+*     The INARR, OLDVAL, NEWVAL, and OUTARR arguments supplied must have
+*     the data type specified.
 
 *  Copyright:
 *     Copyright (C) 1988, 1990 Science & Engineering Research Council.

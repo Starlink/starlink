@@ -4,16 +4,16 @@
      :                         DMAXC, SUMC, MEANC, STDEVC, STATUS )
 *+
 *  Name:
-*     KPG1_STATX
+*     KPG1_STATx
  
 *  Purpose:
-*     Compute simple statistics for an array.
+*     Computes simple statistics for an array.
  
 *  Language:
 *     Starlink Fortran 77
  
 *  Invocation:
-*     CALL KPG1_STATX( BAD, EL, DATA, NCLIP, CLIP, NGOOD, IMIN, DMIN,
+*     CALL KPG1_STATx( BAD, EL, DATA, NCLIP, CLIP, NGOOD, IMIN, DMIN,
 *                      IMAX, DMAX, SUM, MEAN, STDEV, NGOODC, IMINC,
 *                      DMINC, IMAXC, DMAXC, SUMC, MEANC, STDEVC,
 *                      STATUS )

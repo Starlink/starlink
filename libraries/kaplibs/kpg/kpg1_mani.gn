@@ -2,7 +2,7 @@
      :                         COLOFF, EXPOFF, OUT, STATUS )
 *+
 *  Name:
-*     KPG1_MANI<T>
+*     KPG1_MANIx
 
 *  Purpose:
 *     Copies a data array with axis permutation and expansion.
@@ -11,8 +11,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_MANI<T>( NDIMI, DIMI, IN, NDIMO, DIMO, AXES, COLOFF,
-*                        EXPOFF, OUT, STATUS )
+*     CALL KPG1_MANIx( NDIMI, DIMI, IN, NDIMO, DIMO, AXES, COLOFF,
+*                      EXPOFF, OUT, STATUS )
 
 *  Description:
 *     An input array is copied to an output array under control of a
@@ -27,7 +27,7 @@
 *        The dimensionality of the input array.
 *     DIMI( NDIMI ) = INTEGER (Given)
 *        The shape of the input array.
-*     IN( * ) = <TYPE> (Given)
+*     IN( * ) = ? (Given)
 *        The input data array, vectorised.  The number of elements is
 *        given by the product of the elements of DIMI.
 *     NDIMO = INTEGER (Given)
@@ -53,13 +53,16 @@
 *        as the product of all the newly expanded dimensions in the
 *        output array; that is the product of each element of DIMO
 *        for which the corresponding element of AXES is zero.
-*     OUT( * ) = <TYPE> (Returned)
+*     OUT( * ) = ? (Returned)
 *        The output array, vectorised.  The number of elements written 
 *        is given by the product of the elements of NDIMO.
 *     STATUS = INTEGER (Given)
 *        The global status
 
 *  Notes:
+*     -  There is a routine for all numeric data types: replace "x" in
+*     the routine name by B, D, I, R, UB, UW, or W as appropriate.  The
+*     IN and OUT arguments must have the data type specified.
 *     - The assumption that NDF__MXDIM = 7 is hard coded into this 
 *     routine.
 *     - A few arithmetic operations could be saved, at the expense of
@@ -80,7 +83,7 @@
 *     the License, or (at your option) any later version.
 *     
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *     

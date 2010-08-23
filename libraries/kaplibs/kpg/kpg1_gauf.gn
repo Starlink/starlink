@@ -5,7 +5,7 @@
 *     KPG1_GAUFx
 
 *  Purpose:
-*     To fit a Gaussian to a one-dimensional array of data.
+*     Fits a Gaussian to a one-dimensional array of data.
 
 *  Language:
 *     Starlink Fortran 77
@@ -15,8 +15,8 @@
 *    :                  SIGMA, BACK, STATUS )
 
 *  Description:
-*     This routine fits a Gaussian to a 1-d array of data.  It finds
-*     the amplitude, centre, sigma and background levels by an
+*     This routine fits a Gaussian to a one-dimensional array of data.
+*     It finds the amplitude, centre, sigma and background levels by an
 *     iterative method.
 
 *  Arguments:

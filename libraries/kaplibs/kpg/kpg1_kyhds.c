@@ -14,7 +14,7 @@ F77_SUBROUTINE(kpg1_kyhds)( INTEGER(KEYMAP), INTEGER_ARRAY(MAP), INTEGER(AXIS),
 *     KPG1_KYHDS
 
 *  Purpose:
-*     Copy values from an AST KeyMap to a primitive HDS object.
+*     Copies values from an AST KeyMap to a primitive HDS object.
 
 *  Language:
 *     C, designed to be called from Fortran.

@@ -5,7 +5,8 @@
 *     KPG1_SCLWx
 
 *  Purpose:
-*     Copy array values into a INTEGER*2 array, scaling them in the process.
+*     Copies array values into a INTEGER*2 array, scaling them in the
+*     process.
 
 *  Language:
 *     Starlink Fortran 77
@@ -29,7 +30,7 @@
 *        false it is safe not to check for bad values.
 *     EL = INTEGER (Given)
 *        The size of the input array.
-*     IN( EL ) = <TYPE> (Given)
+*     IN( EL ) = ? (Given)
 *        The input array.
 *     OUT( EL ) = INTEGER*2 (Returned)
 *        The output array.
@@ -41,6 +42,11 @@
 *        consequently set bad in the output array.
 *     STATUS = INTEGER  (Given and Returned)
 *        Global status value
+
+*  Notes:
+*     -  There is a routine for the all numeric data types: replace "x"
+*     in the routine name by B, D, I, R, UB, UW, or W as appropriate.
+*     The IN argument supplied must have the data type specified.
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.

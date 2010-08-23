@@ -4,13 +4,13 @@
 *     KPG1_MVBDx
  
 *  Purpose:
-*     Move bad data values to the end of an index of array values.
+*     Moves bad data values to the end of an index of array values.
  
 *  Language:
 *     Starlink Fortran 77
  
 *  Invocation:
-*     CALL KPG1_MVBD<T>( ELA, ARRAY, ELI, INDX, NGOOD, STATUS )
+*     CALL KPG1_MVBDx( ELA, ARRAY, ELI, INDX, NGOOD, STATUS )
  
 *  Description:
 *     This routine modifies the supplied index array by removing indicies
@@ -117,7 +117,7 @@
 
 *  If the data value is good, increment the number of good values found, 
 *  and store its index in the corresponding element of INDX (NGOOD will 
-*  always be less than or equal to I and so the value of INDX( NGOOD ) 
+*  always be fewer than or equal to I and so the value of INDX( NGOOD ) 
 *  will already have been used and so can be over-written safely).
             IF( ARRAY( K ) .NE. VAL__BAD<T> ) THEN
                NGOOD = NGOOD + 1

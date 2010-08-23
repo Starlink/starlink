@@ -2,16 +2,17 @@
      :                         LOWER, UPPER, STATUS )
 *+
 *  Name:
-*     KPG1_DARA<T>
+*     KPG1_DARAx
 
 *  Purpose:
-*     Determine the data limits for an array using a variety of methods.
+*     Determines the data limits for an array using a variety of
+*     methods.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_DARA<T>( PARAM, EL, ARRAY, METHDS, BAD, LOWER,
+*     CALL KPG1_DARAx( PARAM, EL, ARRAY, METHDS, BAD, LOWER,
 *                      UPPER, STATUS )
 
 *  Description:
@@ -93,7 +94,7 @@
 *        the default limits for the axis. May be blank.
 *     EL = INTEGER (Given)
 *        The number of elements of the array to be analysed.
-*     ARRAY( EL ) = <TYPE> (Given)
+*     ARRAY( EL ) = ? (Given)
 *        The array for which the chosen statistics are required.
 *     METHDS = CHARACTER * ( * ) (Given)
 *        A comma-separated list of methods by which the data limits may
@@ -109,6 +110,11 @@
 *        The upper limit.
 *     STATUS = INTEGER( Given & Returned )
 *        Global status.
+
+*  Notes:
+*     -  There is a routine for the all numeric data types: replace "x"
+*     in the routine name by B, D, I, R, UB, UW, or W as appropriate.
+*     The ARRAY argument supplied must have the data type specified.
 
 *  Copyright:
 *     Copyright (C) 2000 Central Laboratory of the Research Councils.

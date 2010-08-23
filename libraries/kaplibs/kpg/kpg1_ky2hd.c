@@ -13,7 +13,7 @@ F77_SUBROUTINE(kpg1_ky2hd)( INTEGER(KEYMAP), CHARACTER(LOC), INTEGER(STATUS)
 *     KPG1_KY2HD
 
 *  Purpose:
-*     Convert an AST KeyMap into an HDS structure.
+*     Converts an AST KeyMap into an HDS structure.
 
 *  Language:
 *     C, designed to be called from Fortran.

@@ -4,7 +4,7 @@
 *     KPG1_HMLTx
 
 *  Purpose:
-*     Multiply two Hermitian images.
+*     Multiplies two Hermitian images.
 
 *  Language:
 *     Starlink Fortran 77

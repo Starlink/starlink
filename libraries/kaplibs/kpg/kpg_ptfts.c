@@ -10,7 +10,7 @@ F77_SUBROUTINE(kpg_ptfts)( INTEGER(INDF), INTEGER(FCHAN), INTEGER(STATUS) ) {
 *     KPG_PTFTS
 
 *  Purpose:
-*     Store FITS header information into an NDF
+*     Stores FITS header information into an NDF.
 
 *  Language:
 *     C, designed to be called from Fortran.

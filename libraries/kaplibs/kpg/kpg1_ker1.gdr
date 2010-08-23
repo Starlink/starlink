@@ -11,15 +11,16 @@
 *     Starlink Fortran 77
 
 *  Invocation
-*     CALL KPG1_KER1<T>( NDIM, DIMS, IN, NAX, AXES, SIZE, CENTRE, KERNEL,
-*                        WORK, OUT, STATUS )
+*     CALL KPG1_KER1x( NDIM, DIMS, IN, NAX, AXES, SIZE, CENTRE, KERNEL,
+*                      WORK, OUT, STATUS )
 
 *  Description:
 *     The routine smooths the array IN using a specified one-dimensional
-*     kernel and returns the result in the array OUT. The one-dimensional kernel can
-*     be used to smooth either a single axis or mutiple axes. If multiple
-*     axes are smoothed, the total smoothing kernel is equivalent to the 
-*     product of the kernels used to smooth each individual axis.
+*     kernel and returns the result in the array OUT. The one-dimensional
+*     kernel can be used to smooth either a single axis or mutiple axes.
+*     If multiple axes are smoothed, the total smoothing kernel is
+*     equivalent to the product of the kernels used to smooth each
+*     individual axis.
 *
 *     Any output pixel that is contributed to by a bad pixel, or a pixel
 *     that is over the edge of the input data array, is set bad in the 

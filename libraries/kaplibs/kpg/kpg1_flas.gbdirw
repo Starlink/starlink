@@ -1,4 +1,3 @@
-
       SUBROUTINE KPG1_FLAS<T>( BAD, DIM1, DIM2, INARR, LOWPEN, HIPEN,
      :                        INVERT, POSTIV, OUTARR, STATUS )
 *+
@@ -16,7 +15,7 @@
 *    :                 POSTIV, OUTARR, STATUS )
 
 *  Description:
-*     This subroutine converts a <COMM> 2-d array into an
+*     This subroutine converts a two-dimensional array into an
 *     integer cell array without scaling it.  However, the cell array
 *     is computed by modulo arithmetic between the lowest and highest
 *     colour indices, or the complement of this should a negative
@@ -28,9 +27,9 @@
 *        If true bad pixels will be processed.  This should not be set
 *        to false unless the input array contains no bad pixels.
 *     DIM1 = INTEGER (Given)
-*        The first dimension of the 2-d array.
+*        The first dimension of the two-dimensional array.
 *     DIM2 = INTEGER (Given)
-*        The second dimension of the 2-d array.
+*        The second dimension of the two-dimensional array.
 *     INARR( DIM1, DIM2 ) = ? (Given)
 *        The array of data to be flashed.
 *     LOWPEN = INTEGER (Given)

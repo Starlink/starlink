@@ -50,7 +50,7 @@
 *        dimension.
 *     MAXITE = INTEGER  (Given)
 *        Maximum number of iterations to be used.  At least one
-*        iteration will be performed even if this is less than one.
+*        iteration will be performed even if this is fewer than one.
 *     TOLER = REAL (Given)
 *        Accuracy required in the centroid position.
 *     FINAL( NDIM ) = REAL (Write)

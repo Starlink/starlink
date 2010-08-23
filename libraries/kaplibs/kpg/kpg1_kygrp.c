@@ -10,7 +10,7 @@ F77_SUBROUTINE(kpg1_kygrp)( INTEGER(KEYMAP), INTEGER(IGRP), INTEGER(STATUS) ) {
 *     KPG1_KYGRP
 
 *  Purpose:
-*     Create an GRP group holding keyword/value pairs read from an AST
+*     Creates an GRP group holding keyword/value pairs read from an AST
 *     KeyMap.
 
 *  Language:

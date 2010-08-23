@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_ELNMBx( LBND, UBND, EL, ARRAY, STATUS )
+*     CALL KPG1_ELNMx( LBND, UBND, EL, ARRAY, STATUS )
 
 *  Description:
 *     This routine writes numbers sequentially to a one-dimensional

@@ -25,7 +25,7 @@
 *        Value to be assigned to the borders of the array.
 *     BORWID( 2 ) = INTEGER (Given)
 *        The width in pixels of the borders in each dimension, x then y.
-*        Each must be less than its corresponding dimension.
+*        Each must be fewer than its corresponding dimension.
 *     DIM1 = INTEGER (Given)
 *        The first dimension of the array to have constant-valued
 *        peripheries.

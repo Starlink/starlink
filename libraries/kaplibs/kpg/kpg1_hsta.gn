@@ -6,13 +6,13 @@
 *     KPG1_HSTAx
 
 *  Purpose:
-*     Compute simple ordered statistics for an array via an histogram.
+*     Computes simple ordered statistics for an array via an histogram.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_HSTAX( BAD, EL, DATA, NUMPER, PERCNT, NGOOD, IMIN,
+*     CALL KPG1_HSTAx( BAD, EL, DATA, NUMPER, PERCNT, NGOOD, IMIN,
 *                      DMIN, IMAX, DMAX, SUM, MEAN, MEDIAN, MODE,
 *                      PERVAL, STATUS )
 

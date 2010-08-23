@@ -6,7 +6,7 @@
 *     KPG1_ISCLx
 
 *  Purpose:
-*     Scale image between limits.
+*     Scales image between limits.
 
 *  Language:
 *     Starlink Fortran 77

@@ -22,7 +22,7 @@ F77_SUBROUTINE(kpg1_memry)( INTEGER(MEM), INTEGER(STATUS) ){
 *     kpg1_memry
 
 *  Purpose:
-*     Return memory currently being used by the current process.
+*     Returns memory currently being used by the current process.
 
 *  Language:
 *     C

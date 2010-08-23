@@ -34,14 +34,14 @@
 *     MAXVAL = INTEGER (Given)
 *        The maximum number of values required.  A PAR__ERROR status is
 *        returned when the number of values requested is fewer than one.
-*     VMIN = <TYPE> (Given)
+*     VMIN = ? (Given)
 *        The value immediately above a range wherein the obtained
 *        numeric values cannot lie.  Thus if VMAX is greater than VMIN,
 *        VMIN is the minimum numeric value allowed for the obtained
 *        values.  However, should VMAX be less than VMIN, all numeric
 *        values are acceptable except those between VMAX and VMIN
 *        exclusive.
-*     VMAX = <TYPE> (Given)
+*     VMAX = ? (Given)
 *        The value immediately below a range wherein the obtained
 *        numeric values cannot lie.  Thus if VMAX is greater than VMIN,
 *        VMAX is the maximum numeric value allowed for the obtained

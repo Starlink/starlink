@@ -1,10 +1,10 @@
       SUBROUTINE COPA<T>( DIM, ARRIN, ARROUT, STATUS )
 *+
 *  Name:
-*     COPA<T>
+*     COPAx
 
 *  Purpose:
-*     Copy a one-dimensional array.
+*     Copies a one-dimensional array.
 
 *  Language:
 *     VAX Fortran
@@ -13,15 +13,15 @@
 *     Subroutine
 
 *  Invocation:
-*     CALL COPA<T>( DIM, ARRIN, ARROUT, STATUS )
+*     CALL COPAx( DIM, ARRIN, ARROUT, STATUS )
 
 *  Arguments:
 *     DIM = INTEGER ( READ )
-*           Dimension of the input and output arrays.
-*     ARRIN( DIM ) = <TYPE> ( READ )
-*           One-dimensional array to be copied.
-*     ARROUT( DIM ) = <TYPE> ( WRITE )
-*           Output array is returned as a copy of the input array.
+*        Dimension of the input and output arrays.
+*     ARRIN( DIM ) = ? ( READ )
+*        One-dimensional array to be copied.
+*     ARROUT( DIM ) = ? ( WRITE )
+*        Output array is returned as a copy of the input array.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -30,6 +30,12 @@
 *     copied into the output one-dimensional array, ARROUT, of the same 
 *     dimension.  An immediate return will occur if STATUS has an error
 *     value on entry.
+
+*  Notes:
+*     -  There is a routine for each numerical data type: replace "x" in
+*     the routine name by D or R as appropriate.  The ARRIN and ARROUT
+*     arguments supplied to the routine must have the data type
+*     specified.
 
 *  Copyright:
 *     Copyright (C) 1983, 1984, 1986 Science & Engineering Research

@@ -45,12 +45,12 @@
  
 *  Arguments:
 *     NDIM = INTEGER (Given)
-*        The dimensionality of the n-d array.  It must be greater than
-*        1.
+*        The dimensionality of the n-dimensional array.  It must be
+*        greater than 1.
 *     LBND( NDIM ) = INTEGER (Given)
-*        The lower bounds of the n-d array.
+*        The lower bounds of the n-dimensional array.
 *     UBND( NDIM ) = INTEGER (Given)
-*        The upper bounds of the n-d array.
+*        The upper bounds of the n-dimensional array.
 *     ARRAY( * ) = ? (Given)
 *        The input data array.
 *     INIT( NDIM ) = REAL (Given)
@@ -287,7 +287,7 @@
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'NDIM', NDIM )
          CALL ERR_REP( 'KPG1_LOCTx_SMLDIM',
-     :     'Unable to find centroid of array, a dimension has less '/
+     :     'Unable to find centroid of array, a dimension has fewer '/
      :     /'three elements.', STATUS )
          GOTO 999
       END IF

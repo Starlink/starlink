@@ -5,7 +5,7 @@
 *     KPG_OSTAx
  
 *  Purpose:
-*     Compute simple statistics for an array.
+*     Computes simple statistics for an array.
  
 *  Language:
 *     Starlink Fortran 77

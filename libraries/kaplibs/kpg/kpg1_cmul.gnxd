@@ -4,7 +4,7 @@
 *     KPG1_CMULx
  
 *  Purpose:
-*     Multiply each element of a vectorised array by a constant.
+*     Multiplies each element of a vectorised array by a constant.
  
 *  Language:
 *     Starlink Fortran 77

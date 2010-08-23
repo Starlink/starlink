@@ -10,7 +10,7 @@ F77_SUBROUTINE(kpg1_kymap)( INTEGER(IGRP), INTEGER(KEYMAP), INTEGER(STATUS) ) {
 *     KPG1_KYMAP
 
 *  Purpose:
-*     Create an AST KeyMap holding keyword/value pairs read from a GRP
+*     Creates an AST KeyMap holding keyword/value pairs read from a GRP
 *     group.
 
 *  Language:
@@ -37,7 +37,7 @@ F77_SUBROUTINE(kpg1_kymap)( INTEGER(IGRP), INTEGER(KEYMAP), INTEGER(STATUS) ) {
 *     clumpfind.deltat = 2.0
 *     method = gaussclumps
 *
-*     The returned KeyMap will contain 3 entries with keys "gaussclumps",
+*     The returned KeyMap will contain three entries with keys "gaussclumps",
 *     "clumpfind" and "method". The value associated with the "gaussclumps"
 *     entry will be another KeyMap containing keys "epsilon" (a primitive
 *     vector entry containing the values 0.001 and 0.002) and "contrast"

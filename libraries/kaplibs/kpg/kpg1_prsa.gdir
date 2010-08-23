@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_PRSA<T>( BUFFER, MAXVAL, VALUES, NVAL, STATUS )
+*     CALL KPG1_PRSAx( BUFFER, MAXVAL, VALUES, NVAL, STATUS )
 
 *  Description:
 *     A supplied string is search for words (separated by spaces, tabs
