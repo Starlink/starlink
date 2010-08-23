@@ -25,7 +25,7 @@
 *     TEXT = CHARACTER * ( * ) (Given)
 *        The text to draw. The returned values of X and Y leave room for
 *        any trailing spaces, UNLESS THE ENTIRE STRING IS BLANK, IN WHICH
-*       CASE X AND Y ARE RETURNED UNCHANGED.
+*        CASE X AND Y ARE RETURNED UNCHANGED.
 *     X = REAL (Given and Returned)
 *        The X position for the bottom-left corner of the string.
 *        On exit, it is the X position at the bottom of the a string

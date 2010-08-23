@@ -53,7 +53,7 @@
 *     present.
 
 *  Notes:
-*     - Tthe routine should only be used at real or better precisions.
+*     - The routine should only be used at real or better precisions.
 
 *  Copyright:
 *     Copyright (C) 1991, 1992 Science & Engineering Research Council.
