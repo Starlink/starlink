@@ -37,6 +37,7 @@
 
 SCRATCHDIR=/staging/scratch
 PERSISTDIR=/staging/persist
+export MAKEMAP_CONFIG_DIR=$HOME/$1
 
 if [ ! -d $SCRATCHDIR ]
 then
@@ -64,7 +65,7 @@ rsync -az -e ssh --delete canfar.dao.nrc.ca:config /home/$LOGNAME/
 cd $1
 
 # launch the pipeline
-/stardev/Perl/bin/jsawrapdr --inputs=$2 --id=$3 -persist --outdir=$SCRATCHDIR --transdir=$PERSISTDIR --mode=public --drparameters "-verbose -recpar $4" --canfar --cleanup all
+/stardev/Perl/bin/jsawrapdr --inputs=$2 --id=$3 -persist --outdir=$SCRATCHDIR --transdir=$PERSISTDIR --mode=public --drparameters "-verbose -recpar $HOME/$1/$4" --canfar --cleanup all
 
 echo "Job finished at" >> $PERSISTDIR/$3/scuba2_map.log
 date >> $PERSISTDIR/$3/scuba2_map.log
