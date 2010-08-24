@@ -1061,10 +1061,52 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
            the concatenation stage. */
 
         smf_model_create( wf, NULL, res, darks, bbms, flatramps, nfilegroups,
+                          SMF__QUA, 0,
+                          NULL, 0, NULL, NULL,
+                          NULL, memiter,
+                          memiter, qua, keymap, status );
+
+        /* Associate quality with the res model, and do cleaning
+           before we start using more memory for other things. Note that
+           we are guaranteed to have only one filegroup if memiter=1. If
+           memiter=0 we do the cleaning the first time RES and QUA are
+           opened in the first iteration instead. */
+
+        for( idx=0; idx<res[0]->ndat; idx++ ) {
+          smfData *thisqua = qua[0]->sdata[idx];
+          res[0]->sdata[idx]->sidequal = thisqua;
+        }
+
+        if( doclean ) {
+          msgOut(" ", FUNC_NAME ": Pre-conditioning data", status);
+          for( idx=0; idx<res[0]->ndat; idx++ ) {
+            data = res[0]->sdata[idx];
+            smf_clean_smfData( wf, data, keymap, status );
+          }
+        } else {
+          msgOut( "", FUNC_NAME ": *** Warning *** doclean=0, "
+                  "so not pre-conditioning data before map-making",
+                  status );
+        }
+
+        /*** TIMER ***/
+        msgOutiff( MSG__DEBUG, "", FUNC_NAME ": ** %f s pre-conditioning data",
+                   status, smf_timerupdate(&tv1,&tv2,status) );
+
+        /* Continue with other static model. */
+
+        smf_model_create( wf, NULL, res, darks, bbms, flatramps, nfilegroups,
                           SMF__LUT, 0,
                           NULL, 0, NULL, NULL,
                           NULL, memiter,
                           memiter, lut, keymap, status );
+
+        /* Since a copy of the LUT is still open in res[0] free it up here */
+        for( i=0; i<res[0]->ndat; i++ ) {
+          if( res[0]->sdata[i] ) {
+            smf_close_mapcoord( res[0]->sdata[i], status );
+          }
+        }
 
         smf_model_create( wf, NULL, res, darks, bbms, flatramps, nfilegroups,
                           SMF__AST, 0,
@@ -1072,17 +1114,10 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                           NULL, memiter,
                           memiter, ast, keymap, status );
 
-        smf_model_create( wf, NULL, res, darks, bbms, flatramps, nfilegroups,
-                          SMF__QUA, 0,
-                          NULL, 0, NULL, NULL,
-                          NULL, memiter,
-                          memiter, qua, keymap, status );
-
-        /* Since a copy of the LUT is still open in res[0] free it up here */
-        for( i=0; i<res[0]->ndat; i++ ) {
-          if( res[0]->sdata[i] ) {
-            smf_close_mapcoord( res[0]->sdata[i], status );
-          }
+        /* Also associate quality with AST model. */
+        for( idx=0; idx<ast[0]->ndat; idx++ ) {
+          smfData *thisqua = qua[0]->sdata[idx];
+          ast[0]->sdata[idx]->sidequal = thisqua;
         }
 
       } else {
@@ -1267,9 +1302,48 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
             /* If memiter not set open this filegroup here */
             smf_open_related_model( resgroup, i, "UPDATE", &res[i], status );
+            smf_open_related_model( quagroup, i, "UPDATE", &qua[i], status );
+
+            /* Associate quality model with the res model */
+            for( idx=0; idx<res[i]->ndat; idx++ ) {
+              smfData *thisqua = qua[i]->sdata[idx];
+              res[i]->sdata[idx]->sidequal = thisqua;
+            }
+
+            /* If memiter=0, and if this is the first iteration,
+               pre-condition the data since it hasn't yet been
+               done. Do it before the other models are opened to
+               reduce memory usage. In the memiter=1 case we already
+               did pre-conditioning right after the concatenation. */
+
+            if( iter==0 ) {
+              if( doclean ) {
+                msgOut(" ", FUNC_NAME ": Pre-conditioning data", status);
+                for( idx=0; idx<res[i]->ndat; idx++ ) {
+                  data = res[i]->sdata[idx];
+                  smf_clean_smfData( wf, data, keymap, status );
+                }
+              } else {
+                msgOut( "", FUNC_NAME ": *** Warning *** doclean=0, "
+                        "so not pre-conditioning data before map-making",
+                        status );
+              }
+
+              /*** TIMER ***/
+              msgOutiff( MSG__DEBUG, "", FUNC_NAME
+                         ": ** %f s pre-conditioning data",
+                         status, smf_timerupdate(&tv1,&tv2,status) );
+            }
+
+            /* Continue with other model components */
             smf_open_related_model( lutgroup, i, "UPDATE", &lut[i], status );
             smf_open_related_model( astgroup, i, "UPDATE", &ast[i], status );
-            smf_open_related_model( quagroup, i, "UPDATE", &qua[i], status );
+
+            /* Associate quality model with the ast model */
+            for( idx=0; idx<ast[i]->ndat; idx++ ) {
+              smfData *thisqua = qua[i]->sdata[idx];
+              ast[i]->sdata[idx]->sidequal = thisqua;
+            }
 
             for( j=0; j<nmodels; j++ ) {
               smf_open_related_model( modelgroups[j], i, "UPDATE",
@@ -1282,27 +1356,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                        status, smf_timerupdate(&tv1,&tv2,status) );
           }
 
-          /* If first iteration pre-condition the data */
+          /* If first iteration report on initial stats and write out
+             cleaned data if requested. */
           if( iter == 0 ) {
-
-            /* Associate quality model with the res and ast model */
-            for( idx=0; idx<res[i]->ndat; idx++ ) {
-              smfData *thisqua = qua[i]->sdata[idx];
-              res[i]->sdata[idx]->sidequal = thisqua;
-              ast[i]->sdata[idx]->sidequal = thisqua;
-            }
-
-            if( doclean ) {
-              msgOut(" ", FUNC_NAME ": Pre-conditioning data", status);
-              for( idx=0; idx<res[i]->ndat; idx++ ) {
-                data = res[i]->sdata[idx];
-                smf_clean_smfData( wf, data, keymap, status );
-              }
-            } else {
-              msgOut( "", FUNC_NAME ": *** Warning *** doclean=0, "
-                      "so not pre-conditioning data before map-making",
-                      status );
-            }
 
             /* initial quality report */
             smf_qualstats_report( MSG__NORM, SMF__QFAM_TSERIES, 1, qua[i],
@@ -1315,11 +1371,6 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
               *status = SMF__INSMP;
               errRep("", FUNC_NAME ": All bolos are bad", status );
             }
-
-            /*** TIMER ***/
-            msgOutiff( MSG__DEBUG, "", FUNC_NAME
-                       ": ** %f s pre-conditioning data",
-                       status, smf_timerupdate(&tv1,&tv2,status) );
 
             /* Export the cleaned data here if desired */
             if( exportclean ) {
