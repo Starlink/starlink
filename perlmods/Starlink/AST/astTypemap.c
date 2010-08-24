@@ -81,7 +81,7 @@ static char NAMESPACE[14] = "Starlink::AST";
 
 */
 
-SV* createPerlObject( char * xsntype, AstObject * var ) {
+SV* createPerlObject( const char * xsntype, AstObject * var ) {
   HV * hash_object = newHV();
   SV * rv;
   SV * myobject;
@@ -165,13 +165,17 @@ IV extractAstIntPointer( SV * arg ) {
 
 */
 
-char * ntypeToClass ( char * ntype ) {
+char * ntypeToClass ( const char * ntype ) {
   SV * buffer;
   int len;
-  char * offset;
+  const char * offset;
 
   /* Do we have Starlink::AST in the name already? */
-  if (strstr( ntype, NAMESPACE) != NULL ) return ntype;
+  if (strstr( ntype, NAMESPACE) != NULL ) {
+    buffer = sv_2mortal( newSVpv("",0));
+    sv_catpvn( buffer, ntype, strlen(ntype) );
+    return SvPVX(buffer);
+  }
 
   /* Easy case - we want the default namespace */
   if ( strcmp(ntype, "AstObjectPtr" ) == 0 ) {
@@ -204,7 +208,7 @@ char * ntypeToClass ( char * ntype ) {
    correct type.
 */
 
-SV* getPerlObjectAttr ( SV * myobject, char * attr ) {
+SV* getPerlObjectAttr ( SV * myobject, const char * attr ) {
   SV** elem;
   HV * hash_object;
 
@@ -236,7 +240,7 @@ SV* getPerlObjectAttr ( SV * myobject, char * attr ) {
  * Croaks on error.
  */
 
-void setPerlObjectAttr ( SV * myobject, char * attr, SV * value ) {
+void setPerlObjectAttr ( SV * myobject, const char * attr, SV * value ) {
   SV** retval;
   HV * hash_object;
 
