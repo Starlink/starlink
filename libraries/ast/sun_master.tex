@@ -3995,14 +3995,28 @@ c+
 would set values for both the Zoom attribute and the Report attribute
 (about which more shortly---\secref{ss:transforming}). You don't really
 have to worry about data types with this method, as any character
-representation will do.
+representation will do. Note, when using astSet, a
+literal comma may be included in an attribute value by enclosed the value in
+quotation marks:
+\small
+\begin{verbatim}
+      astSet( skyframe, 'SkyRef="12:13:32,-23:12:44"' );
+\end{verbatim}
+\normalsize
 c-
 f+
 would set values for both the Zoom attribute and the Report attribute
 (about which more shortly---\secref{ss:transforming}). You don't really
 have to worry about data types with this method, as any character
 representation will do (although you must use 0/1 instead of
-.TRUE./.FALSE., which are not supported).
+.TRUE./.FALSE., which are not supported). Note, when using AST\_SET, a
+literal comma may be included in an attribute value by enclosed the value in
+quotation marks:
+\small
+\begin{verbatim}
+      CALL AST_SET( SKYFRAME, 'SkyRef="12:13:32,-23:12:44"', STATUS )
+\end{verbatim}
+\normalsize
 f-
 
 c+
@@ -22080,6 +22094,17 @@ occurred in the AST library between versions V5.3-1 and V5.3-2 (the
 current version):
 
 \begin{enumerate}
+
+\item The
+c+
+astSet function
+c-
+f+
+AST\_SET routine
+f-
+now allows literal commas to be included in string attribute values. String
+attribute values that include a literal comma should be enclosed in quotation
+marks.
 
 \item A bug in FitsChan has been fixed that caused ``-SIN'' projection
 codes within FITS-WCS headers to be mis-interpreted, resulting in no

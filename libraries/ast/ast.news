@@ -16,6 +16,10 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
+- The astSet function (AST_SET) now allows literal commas to be included in
+string attribute values. String attribute values that include a literal
+comma should be enclosed in quotation marks.
+
 - A bug in FitsChan has been fixed that caused "-SIN" projection codes within
 FITS-WCS headers to be mis-interpreted, resulting in no FrameSet being
 read by astRead.

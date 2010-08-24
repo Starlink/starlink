@@ -323,6 +323,7 @@ F77_SUBROUTINE(ast_set)( INTEGER(THIS),
    GENPTR_CHARACTER(SETTING)
    char *setting;
    int i;
+   int quoted;
 
    astAt( "AST_SET", NULL, 0 );
    astWatchSTATUS(
@@ -334,8 +335,17 @@ F77_SUBROUTINE(ast_set)( INTEGER(THIS),
    This avoids interpretation of its contents (e.g. '%') as C format
    specifiers. */
       if ( astOK ) {
+         quoted = 0;
          for ( i = 0; setting[ i ]; i++ ) {
-            if ( setting[ i ] == ',' ) setting[ i ] = '\n';
+            if( !quoted ) {
+               if ( setting[ i ] == ',' ) {
+                  setting[ i ] = '\n';
+               } else if( setting[ i ] == '"' ) {
+                  quoted = 1;
+               }
+            } else if( setting[ i ] == '"' ){
+               quoted = 0;
+            }
          }
       }
       astSet( astI2P( *THIS ), "%s", setting );

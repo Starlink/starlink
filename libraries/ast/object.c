@@ -199,6 +199,9 @@ f     - AST_VERSION: Return the verson of the AST library being used.
 *        checking.
 *     7-APR-2010 (DSB):
 *        Added method astHasAttribute.
+*     24-AUG-2010 (DSB):
+*        Allow commas to be included in attribute values supplied to
+*        astSet or astVSet by putting quotes around the attribute value.
 *class--
 */
 
@@ -2844,17 +2847,14 @@ f        string.
 *     - White space may also surround attribute values, where it will
 *     generally be ignored (except for string-valued attributes where
 *     it is significant and forms part of the value to be assigned).
-c     - It is not possible to include a comma directly in the value
-c     assigned to an attribute via the "settings" string. To achieve
-c     this, you should use "%s" format and supply the value as a
+*     - To include a literal comma in the value assigned to an attribute,
+*     the whole attribute value should be enclosed in quotation markes.
+c     Alternatively, you can use "%s" format and supply the value as a
 c     separate additional argument to astSet (or use the astSetC
 c     function instead).
 c     - The same procedure may be adopted if "%" signs are to be included
 c     and are not to be interpreted as format specifiers (alternatively,
 c     the "printf" convention of writing "%%" may be used).
-f     - It is not possible to include a comma in the value to be
-f     assigned to an attribute using this routine. If such a value is
-f     needed, then AST_SETC should be used instead.
 *     - An error will result if an attempt is made to set a value for
 *     a read-only attribute.
 *--
@@ -3993,7 +3993,9 @@ static void VSet( AstObject *this, const char *settings, char **text,
    int len;                      /* Length of settings string */
    int lo;                       /* Convert next character to lower case? */
    int nc;                       /* Number of vsprintf output characters */
+   int quoted;                   /* Are we in a quoted string? */
    int stat;                     /* Value of errno after an error */
+   int tq;                       /* Test if the next non-space is a quote? */
 
 /* Initialise */
    if( text ) *text = NULL;
@@ -4014,11 +4016,21 @@ static void VSet( AstObject *this, const char *settings, char **text,
    commas initially present from those introduced by the formatting to
    be performed below. We only do this if there is more than one equals
    sign in the setting string, since otherwise any commas are probably
-   characters contained within a string attribute value. */
+   characters contained within a string attribute value. Ignore commas
+   that occur within quoted strings. */
          eq1 = strchr( buff1, '=' );
          if( eq1 && strchr( eq1 + 1, '=' ) ) {
+            quoted = 0;
             for ( i = 0; i < len; i++ ) {
-               if ( buff1[ i ] == ',' ) buff1[ i ] = '\n';
+               if( !quoted ) {
+                  if ( buff1[ i ] == ',' ) {
+                     buff1[ i ] = '\n';
+                  } else if( buff1[ i ] == '"' ) {
+                     quoted = 1;
+                  }
+               } else if( buff1[ i ] == '"' ){
+                  quoted = 0;
+               }
             }
          }
 
@@ -4102,6 +4114,8 @@ static void VSet( AstObject *this, const char *settings, char **text,
 /* Before making the assignment, loop to remove white space and upper
    case characters from the attribute name. */
                   lo = 1;
+                  tq = -1;
+                  quoted = 0;
                   for ( i = j = 0; assign[ i ]; i++ ) {
 
 /* Note when an '=' sign is encountered (this signals the end of the
@@ -4110,16 +4124,41 @@ static void VSet( AstObject *this, const char *settings, char **text,
 
 /* Before the '=' sign, convert all characters to lower case and move
    everything to the left to eliminate white space. Afer the '=' sign,
-   copy all characters to their new location unchanged. astSetC replaces
-   commas in the attribute value by '\r' characters. Reverse this now. */
+   copy all characters to their new location unchanged, except for any
+   delimiting quotes, which are removed. astSetC replaces commas in the
+   attribute value by '\r' characters. Reverse this now. */
                      if ( !lo || !isspace( assign[ i ] ) ) {
                         if( assign[ i ] == '\r' ) {
                            assign[ j++ ] = ',';
+
+                        } else if( lo ) {
+                           assign[ j++ ] = tolower( assign[ i ] );
+
                         } else {
-                           assign[ j++ ] = ( lo ? tolower( assign[ i ] ) :
-                                               assign[ i ] );
+                           assign[ j++ ] = assign[ i ];
+
+                           if( tq > 0 && !isspace( assign[ i ] ) ) {
+                              if( assign[ i ] == '"' ) {
+                                 quoted = 1;
+                                 j--;
+                              }
+                              tq = 0;
+                           }
+
                         }
                      }
+
+/* If the current character is the initial '=' sign, set "tq" positive,
+   meaning "check if the next non-space character is a quote". */
+                     if ( assign[ i ] == '=' && tq == -1 ) tq = 1;
+                  }
+
+/* if the value was quoted. remove the trailing quote. */
+                  if( quoted ) {
+                     j--;
+                     while( isspace( assign[ j ] ) ) j--;
+                     if( assign[ j ] == '"' ) j--;
+                     j++;
                   }
 
 /* Terminate the revised assignment string and pass it to astSetAttrib
