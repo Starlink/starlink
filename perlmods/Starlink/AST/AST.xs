@@ -1533,23 +1533,7 @@ astDESTROY( obj )
     }
   }
 
-MODULE = Starlink::AST   PACKAGE = Starlink::AST::KeyMap PREFIX = ast
-
-AstKeyMap *
-new( class, options )
-  char * class
-  char * options
- CODE:
-#ifndef HASKEYMAP
-  Perl_croak(aTHX_ "AstKeyMap: Please upgrade to AST V3.5 or newer");
-#else
-  ASTCALL(
-   RETVAL = astKeyMap( options );
-  )
-  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
-#endif
- OUTPUT:
-  RETVAL
+MODULE = Starlink::AST   PACKAGE = Starlink::AST::KeyMap
 
 int
 AST__BADTYPE()
@@ -1585,6 +1569,17 @@ AST__DOUBLETYPE()
   RETVAL
 
 int
+AST__FLOATTYPE()
+ CODE:
+#ifdef AST__FLOATTYPE
+    RETVAL = AST__DOUBLETYPE;
+#else
+    Perl_croak(aTHX_ "Constant AST__FLOATTYPE not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+int
 AST__STRINGTYPE()
  CODE:
 #ifdef AST__STRINGTYPE
@@ -1606,7 +1601,48 @@ AST__OBJECTTYPE()
  OUTPUT:
   RETVAL
 
+int
+AST__UNDEFTYPE()
+ CODE:
+#ifdef AST__UNDEFTYPE
+    RETVAL = AST__UNDEFTYPE;
+#else
+    Perl_croak(aTHX_ "Constant AST__UNDEFTYPE not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
 
+MODULE = Starlink::AST   PACKAGE = Starlink::AST::KeyMap PREFIX = ast
+
+AstKeyMap *
+new( class, options )
+  char * class
+  char * options
+ CODE:
+#ifndef HASKEYMAP
+  Perl_croak(aTHX_ "AstKeyMap: Please upgrade to AST V3.5 or newer");
+#else
+  ASTCALL(
+   RETVAL = astKeyMap( options );
+  )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
+#endif
+ OUTPUT:
+  RETVAL
+
+void
+astMapPutU( this, key, comment )
+  AstKeyMap * this
+  char * key
+  char * comment
+ CODE:
+#ifndef HASKEYMAP
+  Perl_croak(aTHX_ "astMapPutU: Please upgrade to AST V3.5 or newer");
+#else
+  ASTCALL(
+   astMapPutU( this, key, comment);
+  )
+#endif
 
 void
 astMapPut0D( this, key, value, comment)
