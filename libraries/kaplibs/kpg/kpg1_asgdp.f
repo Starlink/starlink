@@ -5,7 +5,7 @@
 *     KPG1_ASGDP
 
 *  Purpose:
-*     Find a position with good output co-ordinates within a given input
+*     Finds a position with good output co-ordinates within a given input
 *     region of a supplied Mapping.
 
 *  Language:

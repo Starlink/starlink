@@ -5,7 +5,7 @@
 *     KPG1_CHAXx
 
 *  Purpose:
-*     Check for usable AXIS structures.
+*     Checks for usable AXIS structures.
 
 *  Language:
 *     Starlink Fortran 77

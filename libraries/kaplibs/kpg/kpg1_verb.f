@@ -4,7 +4,7 @@
 *     KPG1_VERB
 
 *  Purpose:
-*     Determine whether the specified package should report verbose
+*     Determines whether the specified package should report verbose
 *     messages.
 
 *  Language:

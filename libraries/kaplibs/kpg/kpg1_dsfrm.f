@@ -4,7 +4,7 @@
 *     KPG1_DSFRM
 
 *  Purpose:
-*     Display a textual description of the Current Frame in a FrameSet.
+*     Displays a textual description of the Current Frame in a FrameSet.
 
 *  Language:
 *     Starlink Fortran 77

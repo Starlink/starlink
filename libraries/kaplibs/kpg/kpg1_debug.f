@@ -4,7 +4,7 @@
 *     KPG1_DEBUG
 
 *  Purpose:
-*     Determine wether the specified package should report debug
+*     Determines whether the specified package should report debug
 *     diagnostics
 
 *  Language:

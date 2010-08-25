@@ -16,7 +16,8 @@ void kpg1Kymp2( const char *string, AstKeyMap *keymap, int *status ){
 *     kpg1Kymp2
 
 *  Purpose:
-*     Parse a "keyword = value" string for kpg1Kymp1 and add to a KeyMap.
+*     Parses a "keyword = value" string for kpg1Kymp1 and add to a
+KeyMap..
 
 *  Language:
 *     C.

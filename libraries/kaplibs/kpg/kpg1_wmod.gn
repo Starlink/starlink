@@ -5,7 +5,7 @@
 *     KPG1_WMODx
 
 *  Purpose:
-*     To estimate the mean of a number of normally distributed data
+*     Estimates the mean of a number of normally distributed data
 *     values, some of which may be corrupt.
 
 *  Language:

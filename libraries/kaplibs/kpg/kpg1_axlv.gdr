@@ -4,7 +4,7 @@
 *     KPG1_AXLVx
 
 *  Purpose:
-*     Finda the first axis centre co-ordinate of an NDF below a 
+*     Finds the first axis centre co-ordinate of an NDF below a 
 *     threshold.
 
 *  Language:

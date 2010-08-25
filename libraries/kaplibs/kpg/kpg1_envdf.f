@@ -4,7 +4,7 @@
 *     KPG1_ENVDF
 
 *  Purpose:
-*     See if an environment variable is defined.
+*     Sees if an environment variable is defined.
 
 *  Language:
 *     Starlink Fortran 77

@@ -9,7 +9,7 @@ F77_SUBROUTINE(kpg1_fit1d)( INTEGER(LBND), INTEGER(UBND), DOUBLE_ARRAY(Y),
 *     KPG1_FIT1D
 
 *  Purpose:
-*     Fit a least squares straight line to supplied data.
+*     Fits a least-squares straight line to supplied data.
 
 *  Language:
 *     Starlink Fortran 77
@@ -19,7 +19,7 @@ F77_SUBROUTINE(kpg1_fit1d)( INTEGER(LBND), INTEGER(UBND), DOUBLE_ARRAY(Y),
 
 *  Description:
 *     A straight line is fitted to the data supplied in X and Y, using
-*     the least squares criterion. The returned values of M and C are
+*     the least-squares criterion. The returned values of M and C are
 *     the gradient and intercept of the fit, so that y = M.x + C. The
 *     RMS residual of the Y data from the fit is returned in RMS.
 *

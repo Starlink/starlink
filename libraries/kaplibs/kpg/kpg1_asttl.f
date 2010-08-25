@@ -4,7 +4,7 @@
 *     KPG1_ASTTL
 
 *  Purpose:
-*     Set the Title attribute of a Plot.
+*     Sets the Title attribute of a Plot.
 
 *  Language:
 *     Starlink Fortran 77

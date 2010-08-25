@@ -12,7 +12,7 @@ void kpg1Kymp1( const Grp *igrp, AstKeyMap **keymap, int *status ){
 *     kpg1Kymp1
 
 *  Purpose:
-*     Create an AST KeyMap holding keyword/value pairs read from a GRP
+*     Creates an AST KeyMap holding keyword/value pairs read from a GRP
 *     group.
 
 *  Language:

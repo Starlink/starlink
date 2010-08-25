@@ -4,7 +4,7 @@
 *     POWARR
 
 *  Purpose:
-*     raise an array, pixel by pixel, to a given power.
+*     Raises an array, pixel by pixel, to a given power.
 
 *  Language:
 *     Starlink

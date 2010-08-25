@@ -15,7 +15,7 @@ double *kpg1Chcof( int nloc,  HDSLoc **loc, int *ncoeff_f, int *nin,
 *     kpg1Chcof
 
 *  Purpose:
-*     Return coefficients for a set of Starlink POLYNOMIAL structures.
+*     Returns coefficients for a set of Starlink POLYNOMIAL structures.
 
 *  Language:
 *     C.
@@ -54,7 +54,7 @@ double *kpg1Chcof( int nloc,  HDSLoc **loc, int *ncoeff_f, int *nin,
 
 *  Notes:
 *     - Both CHEBYSHEV and SIMPLE variants of the POLYNOMIAL structure
-*     are supported. But currently only 1- or 2- dimensional Chebyshev
+*     are supported. But currently only 1- or 2-dimensional Chebyshev
 *     polynomials can be handled. An error is reported for Chebyshev
 *     polynomials of higher dimensionality.
 
@@ -340,16 +340,16 @@ static void kpg1Chpc1( double *c, double *d, int n, int *w0, int *w1,
 *     kpg1Chpc1
 
 *  Purpose:
-*     Convert a 1D Chebyshev polynomial to standard form.
+*     Converts a one-dimensional Chebyshev polynomial to standard form.
 
 *  Invocation:
 *     void kpg1Chpc1( double *c, double *d, int n, int *w0, int *w1,
 *                     int *status )
 
 *  Description:
-*     Given the coefficients of a 1D chebychev polynomial P(u), find the
-*     coefficients of the equivalent standard 1D polynomial Q(u). The
-*     allowed range of u is assumed to be the unit interval.
+*     Given the coefficients of a one-dimensional Chebychev polynomial P(u),
+*     find the coefficients of the equivalent standard 1D polynomial Q(u).
+*     The allowed range of u is assumed to be the unit interval.
 
 *  Arguments:
 *     c
@@ -458,16 +458,16 @@ static void kpg1Shpc1( double xmin, double xmax, int n, double *d, double *w,
 *    kpg1Shpc1
 
 *  Purpose:
-*     Modify a 1D polynomial to scale the polynomial argument.
+*     Modifies a one-dimensional polynomial to scale the polynomial argument.
 
 *  Invocation:
 *     void kpg1Shpc1( double xmin, double xmax, int n, double *d, double *w,
 *                     int *status )
 
 *  Description:
-*    Given the coefficients of a 1D polynomial P(u) defined on a unit
-*    interval (i.e. -1 <= u <= +1 ), find the coefficients of another 1D
-*    polynomial Q(x) where:
+*    Given the coefficients of a one-dimensional polynomial P(u) defined on a 
+*    unit interval (i.e. -1 <= u <= +1 ), find the coefficients of another
+*    one-dimensional polynomial Q(x) where:
 *
 *       Q(x) = P(u)
 *       u = ( 2*x - ( xmax + xmin ) ) / ( xmax - xmin )
@@ -589,18 +589,19 @@ static void kpg1Chpc2( double *c, int nx, int ny, double xmin, double xmax,
 *    kpg1Chpc2
 
 *  Purpose:
-*     Convert a 2D Chebyshev polynomial to standard form and scale the
-*     arguments.
+*     Converts a two-dimensional Chebyshev polynomial to standard form and 
+*     scale the arguments.
 
 *  Invocation:
 *     void kpg1Chpc2( double *c, int nx, int ny, double xmin, double xmax,
 *                     double ymin, double ymax, double *d, int *status )
 
 *  Description:
-*    Given the coefficients of a 2D chebychev polynomial P(u,v), find the
-*    coefficients of the equivalent standard 2D polynomial Q(x,y). The
-*    allowed range of u and v is assumed to be the unit square, and this
-*    maps on to the rectangle in (x,y) given by (xmin:xmax,ymin:ymax).
+*    Given the coefficients of a two-dimensional Chebychev polynomial P(u,v),
+*    find the coefficients of the equivalent standard two-dimensional
+*    polynomial Q(x,y). The allowed range of u and v is assumed to be the
+*    unit square, and this maps on to the rectangle in (x,y) given by
+*    (xmin:xmax,ymin:ymax).
 
 *  Arguments:
 *    c

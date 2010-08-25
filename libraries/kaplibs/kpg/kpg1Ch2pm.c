@@ -9,7 +9,7 @@ void kpg1Ch2pm( HDSLoc *loc, AstPolyMap **polymap, int *status ){
 *     kpg1Ch2pm
 
 *  Purpose:
-*     Create an AST PolyMap describing a Starlink POLYNOMIAL HDS structure.
+*     Creates an AST PolyMap describing a Starlink POLYNOMIAL HDS structure.
 
 *  Language:
 *     C.

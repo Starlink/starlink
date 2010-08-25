@@ -4,7 +4,8 @@
 *     KPG1_SAXAT
 
 *  Purpose:
-*     Set attributes of a Frame axis to describe an NDF array component
+*     Sets attributes of a Frame axis to describe an NDF array
+*     component.
 
 *  Language:
 *     Starlink Fortran 77

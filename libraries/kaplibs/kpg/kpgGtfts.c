@@ -21,7 +21,7 @@
 *     kpgGtfts
 
 *  Purpose:
-*     Obtain FITS header information from an NDF
+*     Obtains FITS header information from an NDF.
 
 *  Language:
 *     Starlink ANSI C

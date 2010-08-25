@@ -23,7 +23,7 @@ AstKeyMap *kpg1Config( const char *param, const char *def,
 *     kpg1Config
 
 *  Purpose:
-*     Create an AST KeyMap holding a set of configuration parameter values.
+*     Creates an AST KeyMap holding a set of configuration parameter values.
 
 *  Language:
 *     C.

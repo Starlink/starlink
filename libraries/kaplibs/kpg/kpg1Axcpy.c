@@ -10,7 +10,7 @@ void kpg1Axcpy( int indf1, int indf2, int ax1, int ax2, int *status ){
 *     kpg1Axcpy
 
 *  Purpose:
-*     Copy an NDF AXIS structure from one NDF to another.
+*     Copies an NDF AXIS structure from one NDF to another.
 
 *  Language:
 *     C.

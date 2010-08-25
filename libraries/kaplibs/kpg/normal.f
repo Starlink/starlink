@@ -4,7 +4,7 @@
 *     NORMAL
 
 *  Purpose:
-*     takes a value and returns a normally distributed noisy.
+*     Takes a value and returns a normally distributed noisy.
 
 *  Language:
 *     Starlink

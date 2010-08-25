@@ -4,7 +4,7 @@
 *     CCG_TRM3x
 
 *  Purpose:
-*     To form the trimmed mean of the given set of ordered data,
+*     Forms the trimmed mean of the given set of ordered data,
 *     returning flags showing which values are used. This variant does
 *     not process variances.
 

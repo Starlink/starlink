@@ -10,7 +10,7 @@ void kpg1Ky2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
 *     kpg1Ky2hd
 
 *  Purpose:
-*     Copy values from an AST KeyMap to a primitive HDS object.
+*     Copies values from an AST KeyMap to a primitive HDS object.
 
 *  Language:
 *     C.

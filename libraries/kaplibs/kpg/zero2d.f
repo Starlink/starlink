@@ -4,7 +4,7 @@
 *     ZERO2D
 
 *  Purpose:
-*     sets all elements of a two-dimensional array to zero.
+*     Sets all elements of a two-dimensional array to zero.
 
 *  Language:
 *     Starlink

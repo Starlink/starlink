@@ -5,7 +5,7 @@
 *     KPG1_MODEx
 
 *  Purpose:
-*     To estimate the mean of a number of normally distributed data
+*     Estimates the mean of a number of normally distributed data
 *     values, some of which may be corrupt.
 
 *  Language:
@@ -84,7 +84,7 @@
 *        Original version.
 *     1990 September 18 (MJC):
 *        Made generic, renamed from MODE, added STATUS , commented
-*        varaibles and converted the prologue.
+*        variables and converted the prologue.
 *     {enter_further_changes_here}
 
 *  Bugs:

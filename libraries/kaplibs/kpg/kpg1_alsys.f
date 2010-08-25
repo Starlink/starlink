@@ -4,7 +4,7 @@
 *     KPG1_ALSYS
 
 *  Purpose:
-*     Allowd the user to change the AlignSystem attribute in a Frame.
+*     Allows the user to change the AlignSystem attribute in a Frame.
 
 *  Language:
 *     Starlink Fortran 77

@@ -4,7 +4,7 @@
 *     KPG1_PGCLR
 
 *  Purpose:
-*     Clear current PGPLOT viewport.
+*     Clears current PGPLOT viewport.
 
 *  Language:
 *     Starlink Fortran 77

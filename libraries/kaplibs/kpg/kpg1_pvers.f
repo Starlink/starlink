@@ -4,7 +4,7 @@
 *     KPG1_PVERS
 
 *  Purpose:
-*     Parse a package version string.
+*     Parses a package version string.
 
 *  Language:
 *     Starlink Fortran 77

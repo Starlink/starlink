@@ -14,7 +14,7 @@ void kpg1Kygp1( AstKeyMap *keymap, Grp **igrp, const char *prefix,
 *     kpg1Kygp1
 
 *  Purpose:
-*     Create a GRP group holding keyword/value pairs read from an AST KeyMap
+*     Creates a GRP group holding keyword/value pairs read from an AST KeyMap.
 
 *  Language:
 *     C.

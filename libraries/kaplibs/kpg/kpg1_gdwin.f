@@ -4,7 +4,7 @@
 *     KPG1_GDWIN
 
 *  Purpose:
-*     Set PGPLOT world co-ordinates to be the world co-ordinates
+*     Sets PGPLOT world co-ordinates to be the world co-ordinates
 *     of the specified AGI picture.
 
 *  Language:

@@ -4,7 +4,7 @@
 *     NXTNAM
 
 *  Purpose:
-*     increments Fnnnn type filename by one.
+*     Increments Fnnnn type filename by one.
 
 *  Language:
 *     Starlink

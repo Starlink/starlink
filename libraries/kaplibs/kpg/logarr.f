@@ -4,7 +4,7 @@
 *     LOGARR
 
 *  Purpose:
-*     take the logarithm of an array, pixel by pixel.
+*     Takes the logarithm of an array, pixel by pixel.
 
 *  Language:
 *     Starlink

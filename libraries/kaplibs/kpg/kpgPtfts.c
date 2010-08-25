@@ -21,7 +21,7 @@
 *     kpgPtfts
 
 *  Purpose:
-*     Store FITS header information into an NDF
+*     Stores FITS header information into an NDF.
 
 *  Language:
 *     Starlink ANSI C

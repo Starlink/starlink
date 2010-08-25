@@ -2,7 +2,7 @@
       SUBROUTINE ELNMB<T>( X1, X2, ODIM, OUTARR, STATUS )
 *+
 *  Name:
-*     KPG1_ELNMB<T>
+*     KPG1_ELNMBx
 
 *  Purpose:
 *     Write a range of element numbers into an array.
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation
-*     CALL KPG1_ELNMBx( X1, X2, ODIM, OUTARR, STATUS )
+*     CALL ELNMBx( X1, X2, ODIM, OUTARR, STATUS )
 
 *  Description:
 *     This routine writes numbers sequentially to a <COMM> 1-d
