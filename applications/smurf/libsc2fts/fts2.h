@@ -25,6 +25,8 @@
 *        Original.
 *     2010-08-09 (TIMJ):
 *        Remove fts2_isInBeam.
+*     2010-08-09 (TIMJ):
+*        Remove fts2_isInBeam.
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -54,6 +56,22 @@
 // SMURF includes
 #include "fts2_type.h"
 #include "libsmf/smf_typ.h"
+
+#ifndef PI
+#define PI 3.14159265358979323
+#endif
+
+#ifndef DEGLITCH_THRESHOLD
+#define DEGLITCH_THRESHOLD 1.0e-30
+#endif
+
+#ifndef DBL_MIN
+#define DBL_MIN -1.0e308
+#endif
+
+#ifndef DBL_MAX
+#define DBL_MAX -DBL_MIN
+#endif
 
 int fts2_getsplineindex(
     double* x, 
@@ -87,4 +105,15 @@ double* fts2_polyfitarray(
     double* x,      /* The array of which the fit is seeked */
     int size);      /* Size of array */
 
+void fts2_deglitch(
+    double* interferogram,              /* The interferogram */
+    int size,                           /* Sample size of the interferogram */
+    int coreClusterSize,                /* Core cluster size */
+    int tailClusterSize,                /* Tail cluster size */
+    double tailCutoffStdDevPercent,     /* Tail cutoff standard deviation (as percentage) */
+    double tailCutoffStdDevMultiplier,  /* Tail cutoff standard deviation multiplier */
+    int zpdIndex,                       /* Index of ZPD */
+    int dsHalfLength,                   /* Size of the double sided interferogram */
+    smf_deglitchmode mode,					    /* Deglitch mode */
+    double threshold);            	    /* Deglitch threshold */
 

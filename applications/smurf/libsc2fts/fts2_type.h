@@ -28,6 +28,8 @@
 *        define FALSE and TRUE themselves and this breaks the build.
 *     2010-08-09 (TIMJ):
 *        Move subarray definitions to sc2ast
+*     2010-08-26 (COBA):
+*        Add smf_deglitchmode
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -60,12 +62,16 @@
 
 typedef int bool;
 
-//
-// FTS-2 SCAN MODES
-//
 typedef enum SMF__FTS_Mode
 {
   UNKNOWN = -1, // Undefined or Unknown
   FSCAN = 0,    // Fast Scan
   STEPINT = 1   // Step-and-Integrate
 } FTSMode;
+
+typedef enum smf_deglitchmode
+{
+  SMF__DEGLITCH_ALL = 0,  /* DEGLITCH BOTH CORE & TAIL */
+  SMF__DEGLITCH_CORE = 1, /* DEGLITCH CORE ONLY */
+  SMF__DEGLITCH_TAIL = 2  /* DEGLITCH TAIL ONLY */
+} smf_deglitchmode;
