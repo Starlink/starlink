@@ -114,15 +114,21 @@ void fts2_deglitch(
       end 	= (coreClusterSize >> 1) + zpdIndex;
       for(i = start; i < end; i++)
       {
-        if(interferogram[i] > max) { max = interferogram[i]; }
-        if(interferogram[i] < min) { min = interferogram[i]; }
+        if(interferogram[i] > max) 
+        { 
+          max = interferogram[i]; 
+        }
+        if(interferogram[i] < min) 
+        { 
+          min = interferogram[i]; 
+        }
       }
       cutoffAmplitude = 0.75 * (max - min);
 
       /* COMPUTE STANDARD DEVIATION */
       numCluster  	= dsHalfLength / coreClusterSize + 1;
-      sigma    		= (double*) malloc(numCluster * sizeof(double));
-      revSigma 		= (double*) malloc(numCluster * sizeof(double));
+      sigma    		= (double*) astMalloc(numCluster * sizeof(double));
+      revSigma 		= (double*) astMmalloc(numCluster * sizeof(double));
       for(i = 0; i < numCluster; i++)
       {
         tForward 	= 0.0;
@@ -181,15 +187,15 @@ void fts2_deglitch(
         }
       }
 
-      free(sigma);
-      free(revSigma);
+      astFree(sigma);
+      astFree(revSigma);
       break;
     case SMF__DEGLITCH_TAIL:
       tailDeglitchStart = dsHalfLength + zpdIndex;
       numCluster = (size - tailDeglitchStart) / tailClusterSize;
 
-      clusterMean  = (double*) malloc(numCluster * sizeof(double));
-      clusterSigma = (double*) malloc(numCluster * sizeof(double));
+      clusterMean  = (double*) astMalloc(numCluster * sizeof(double));
+      clusterSigma = (double*) astMalloc(numCluster * sizeof(double));
 
       for(i = 0; i < numCluster; i++)
       {
@@ -214,7 +220,7 @@ void fts2_deglitch(
         clusterSigma[i] = sqrt(clusterSigma[i] / tailClusterSize);
       }
       /* SORT CLUSTER STANDARD DEVIATIONS IN ASCENDING ORDER */
-      QuicksortD(clusterSigma, numCluster, 0, numCluster - 1, 1);
+      fts2_arrayquicksort(clusterSigma, numCluster, 0, numCluster - 1, 1);
 
       avgSigma = 0;
       start = 0;
@@ -269,8 +275,8 @@ void fts2_deglitch(
           }
         }
       }
-      free(clusterMean);
-      free(clusterSigma);
+      astFree(clusterMean);
+      astFree(clusterSigma);
       break;
     default: /* DEFAULT IS TO DEGLITCH ALL */
         fts2_deglitch( 

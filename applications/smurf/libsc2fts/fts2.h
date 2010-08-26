@@ -117,3 +117,15 @@ void fts2_deglitch(
     smf_deglitchmode mode,					    /* Deglitch mode */
     double threshold);            	    /* Deglitch threshold */
 
+int fts2_phasecorrcetion(
+    double* interferogram,        /* The interferogram */
+    int size,                     /* Sample size of the interferogram */
+    int zpdIndex,                 /* Index of ZPD */
+    int* dsHalfLength,            /* Double-Sided interferogram half-length */
+    int* ssHalfLength,            /* Single-Sided interferogram half-length */
+    int polynomialDegree,     	  /* Degree of the fitting polynomial */
+    int phaseFunctionHalfLength,  /* Phase correction function half-length  */
+    double wnLBoundPercent,   	  /* The lower bound of the wavenumber range (as percentage) */
+    double wnUBoundPercent,   	  /* The upper bound of the wavenumber range (as percentage) */
+    double weightLimit,       	  /* Weight limit */
+    double* sigma); 			        /* Holds the value of the Standard Deviation after performing the Phase Correction */

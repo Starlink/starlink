@@ -7,8 +7,10 @@ C_ROUTINES =  \
               fts2_arraycopy.c \
               fts2_arrayquicksort.c \
               fts2_ast.c \
+              fts2_deglitch.c \
               fts2_getsplineindex.c \
               fts2_naturalcubicsplineinterpolator.c \
+              fts2_phasecorrection.c \
               fts2_polyfitarray.c \
               fts2_polyfit.c \
               fts2_polyfitcoeffs.c 
