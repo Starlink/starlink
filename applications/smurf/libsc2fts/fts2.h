@@ -55,12 +55,36 @@
 #include "fts2_type.h"
 #include "libsmf/smf_typ.h"
 
-double  fts2_getMirrorPosition(smfData* data, int* status);
-double  fts2_getScanVelocity(smfData* data, int* status);
-double* fts2_getPositions(smfData* data, int* status);
-double  fts2_getWaveNumberFactor(smfData* data, int* status);
-FTSMode fts2_getScanMode(smfData* data, int* status);
+int fts2_getsplineindex(
+    double* x, 
+    int m, 
+    double xNew);
+    
+void fts2_naturalcubicsplineinterpolator(
+    double* x, 
+    double* y, 
+    int m, 
+    double* xNew, 
+    double* yNew, 
+    int n);
+    
+double* fts2_polyfitcoeffs(
+    int n,          /* Polynomial degree */
+    double* x,      /* Discrete x-values */
+    double* y,      /* Discrete y-values */
+    double* w,      /* The weights */
+    int size,       /* Size of x, y and w */
+    double* sigma); /* Standard deviation (out) */
 
-int     fts2_getSplineIndex(double* x, int m, double xNew);
-void    fts2_naturalCubicSplineInterpolator(double* x, double* y, int m, double* xNew, double* yNew, int n);
+double fts2_polyfit( 
+    int n,          /* Polynomial degree */
+    double* coeffs, /* Coefficients, pre-computed with fts2_polyfitcoeffs() */
+    double x);      /* The value of which the fit is seeked */
+
+double* fts2_polyfitarray(
+    int n,          /* Polynomial degree */
+    double* coeffs, /* Coefficients, pre-computed with fts2_polyfitcoeffs() */
+    double* x,      /* The array of which the fit is seeked */
+    int size);      /* Size of array */
+
 

@@ -1,28 +1,27 @@
 /*
 *+
 *  Name:
-*     fts2_getsplineindex.c
+*     fts2_polyfitarray.c
 
 *  Purpose:
-*     Finds the spline index of the specified xNew value in the given array.
+*     Computes the polynomial fit for the given array.
 
 *  Language:
 *     Starlink ANSI C
 
 *  Type of Module:
-*     Function
 
 *  Invocation:
 
 *  Description:
-*     Given m number of x-data points returns the spline index of the specified 
-*     xNew value using bisection method.
+*     Computes the polynomial fit for the given array.
 
 *  Authors:
 *     Coskun (Josh) OBA (UoL)
 
 *  History :
-*     Created: July 9, 2010
+*     2010-08-26 (OBA):
+*        Original.
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -49,39 +48,30 @@
 *-
 */
 
+/* STANDARD INCLUDES */
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
 
+// STARLINK INCLUDES
+#include "ast.h"
+
 // SMURF INCLUDES
 #include "fts2.h"
 
-int fts2_getsplineindex(
-    double* x, int m, 
-    double xNew)
+double* fts2_polyfitarray(
+    int n,          /* Polynomial degree */
+    double* coeffs, /* Coefficients, pre-computed with fts2_polyfitcoeffs() */
+    double* x,      /* The array of which the fit is seeked */
+    int size)       /* Size of array */
 {
-  int index = 0;
-  int end   = 0;
-  int start = 0;
-  
-  if( xNew < x[0] || xNew > x[m -1])
-  {
-    return -1;
-  }
-
-  start = 0;
-  end = m - 1;
-  while((end - start) > 1)
-  {
-    index = (start + end) >> 1;
-    if(xNew < x[index])
-    {
-      end = index;
-    }
-    else
-    {
-      start = index;
-    }
-  }
-  return start;
+	int i = 0;
+	double* y = NULL;
+	
+	y = (double*) astMalloc(size * sizeof(double));
+	for(i = 0; i < size; i++)
+	{
+		y[i] = fts2_polyfit(n, coeffs, x[i]);
+	}
+	return y;
 }

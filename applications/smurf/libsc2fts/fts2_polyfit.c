@@ -1,28 +1,27 @@
 /*
 *+
 *  Name:
-*     fts2_getsplineindex.c
+*     fts2_polyfit.c
 
 *  Purpose:
-*     Finds the spline index of the specified xNew value in the given array.
+*     Computes the polynomial fit for the given value.
 
 *  Language:
 *     Starlink ANSI C
 
 *  Type of Module:
-*     Function
 
 *  Invocation:
 
 *  Description:
-*     Given m number of x-data points returns the spline index of the specified 
-*     xNew value using bisection method.
+*     Computes the polynomial fit for the given value.
 
 *  Authors:
 *     Coskun (Josh) OBA (UoL)
 
 *  History :
-*     Created: July 9, 2010
+*     2010-08-26 (OBA):
+*        Original.
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -49,39 +48,31 @@
 *-
 */
 
+/* STANDARD INCLUDES */
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
 
+// STARLINK INCLUDES
+#include "ast.h"
+
 // SMURF INCLUDES
 #include "fts2.h"
 
-int fts2_getsplineindex(
-    double* x, int m, 
-    double xNew)
+double fts2_polyfit( 
+    int n,          /* Polynomial degree */
+    double* coeffs, /* Coefficients, pre-computed with fts2_polyfitcoeffs() */
+    double x)       /* The value of which the fit is seeked */
 {
-  int index = 0;
-  int end   = 0;
-  int start = 0;
-  
-  if( xNew < x[0] || xNew > x[m -1])
-  {
-    return -1;
-  }
+  int i = 0;
+  double y = 0;
+  double xn = 1.0;
 
-  start = 0;
-  end = m - 1;
-  while((end - start) > 1)
+  n++;
+  for(i = 0; i < n; i++)
   {
-    index = (start + end) >> 1;
-    if(xNew < x[index])
-    {
-      end = index;
-    }
-    else
-    {
-      start = index;
-    }
+    y += coeffs[i] * xn;
+    xn *= x;
   }
-  return start;
+	return y;
 }

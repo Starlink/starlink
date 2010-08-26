@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     fts2_naturalCubicSplineInterpolator.c
+*     fts2_naturalcubicsplineinterpolator.c
 
 *  Purpose:
 *     Implementation of natural cubic spline interpolation.
@@ -13,7 +13,6 @@
 *     Function
 
 *  Invocation:
-*     fts2_naturalCubicSplineInterpolator(double* x, double* y, int m, double* xNew, double* yNew, int n)
 
 *  Description:
 *     Given m known (x, y) points, computes the n (xNew, yNew) points
@@ -61,7 +60,13 @@
 // SMURF INCLUDES
 #include "fts2.h"
 
-void fts2_naturalCubicSplineInterpolator(double* x, double* y, int m, double* xNew, double* yNew, int n)
+void fts2_naturalcubicsplineinterpolator(
+    double* x, 
+    double* y, 
+    int m, 
+    double* xNew, 
+    double* yNew, 
+    int n)
 {
   int NSpline = m - 1; // Number of splines
 
@@ -134,7 +139,7 @@ void fts2_naturalCubicSplineInterpolator(double* x, double* y, int m, double* xN
   double X, X2, X3;
   for(int i = 0; i < n; i++)
   {
-    int index = fts2_getSplineIndex(x, m, xNew[i]);
+    int index = fts2_getsplineindex(x, m, xNew[i]);
     if(index < 0)
     {
       yNew[i] = 0;

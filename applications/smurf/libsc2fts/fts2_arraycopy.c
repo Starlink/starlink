@@ -1,28 +1,27 @@
 /*
 *+
 *  Name:
-*     fts2_getsplineindex.c
+*     fts2_arraycopy.c
 
 *  Purpose:
-*     Finds the spline index of the specified xNew value in the given array.
+*     Copies the source into the destination with the specified constraints. 
 
 *  Language:
 *     Starlink ANSI C
 
 *  Type of Module:
-*     Function
 
 *  Invocation:
 
 *  Description:
-*     Given m number of x-data points returns the spline index of the specified 
-*     xNew value using bisection method.
+*     Copies the source into the destination with the specified constraints. 
 
 *  Authors:
 *     Coskun (Josh) OBA (UoL)
 
 *  History :
-*     Created: July 9, 2010
+*     2010-08-26 (OBA):
+*        Original.
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -49,39 +48,49 @@
 *-
 */
 
+/* STANDARD INCLUDES */
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
 
+// STARLINK INCLUDES
+#include "ast.h"
+
 // SMURF INCLUDES
 #include "fts2.h"
 
-int fts2_getsplineindex(
-    double* x, int m, 
-    double xNew)
+void fts2_arraycopy( 
+    double* source,
+    int sourceSize,
+    double* destination,
+    int destinationSize,
+    int sourceStart,
+    int destinationStart,
+    int count)
 {
-  int index = 0;
-  int end   = 0;
-  int start = 0;
+  int i = 0;
+  int j = 0;
+  int k = 0;
   
-  if( xNew < x[0] || xNew > x[m -1])
+  if( source == NULL ||
+      destination == NULL ||
+      sourceSize < 1 ||
+      destinationSize < 1 ||
+      count < 1 ||
+      count > destinationSize
+    )
   {
-    return -1;
+    return;
   }
 
-  start = 0;
-  end = m - 1;
-  while((end - start) > 1)
+  i = sourceStart;
+  j = destinationStart;
+  k = 1;
+  while(i < sourceSize && j < destinationSize && k <= count)
   {
-    index = (start + end) >> 1;
-    if(xNew < x[index])
-    {
-      end = index;
-    }
-    else
-    {
-      start = index;
-    }
+    destination[j] = source[i];
+    i++;
+    j++;
+    k++;
   }
-  return start;
 }
