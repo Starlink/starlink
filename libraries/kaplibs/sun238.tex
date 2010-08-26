@@ -817,6 +817,23 @@ related items to be removed.
       these routines will need to modify calling routines accordingly;
       without skewness or kurtosis values to document supply
       VAL\_\_BADD for each undefined statistic.
+\item A number of long-deprecated old routines without a package prefix
+      have been removed.  These are listed below.  The corresponding 
+      replacement routines appear in the right column.
+
+\begin{tabular}{lcc}
+COPYAx  & \multicolumn{2}{l}{VEC\_xTOx or KPG1\_COPY} \\
+COPY1D  & {\tt "}   & {\tt "}  \\
+COPY2D  & {\tt "}   & {\tt "}  \\
+COPY3D  & {\tt "}   & {\tt "}  \\
+CREOUT  & \multicolumn{2}{l}{NDF\_CREP and NDF\_CPUT} \\
+EXPARR  & \multicolumn{2}{l}{KPG1\_EXPOx} \\
+INSET   & \multicolumn{2}{l}{CHR\_INSET} \\
+LOGARR  & \multicolumn{2}{l}{KPG1\_LOGAx} \\
+NXTNAM  & \multicolumn{2}{l}{CHR\_ITOC and CHR\_CTOI} \\
+POWARR  & \multicolumn{2}{l}{KPG1\_POWx} \\
+ZERO1D  & \multicolumn{2}{l}{KPG1\_FILLx}
+\end{tabular}
 \end{itemize}
 
 \section{Changes in Version 3.0}
@@ -6297,7 +6314,7 @@ related items to be removed.
 \sstroutine{
    CCG\_TRM3x
 }{
-   To form the trimmed mean of the given set of ordered data,
+   Forms the trimmed mean of the given set of ordered data,
    returning flags showing which values are used. This variant does
    not process variances
 }{
@@ -13382,182 +13399,6 @@ related items to be removed.
    }
 }
 \sstroutine{
-   COPAx
-}{
-   Copies a one-dimensional array
-}{
-   \sstdescription{
-      The input one-dimensional array, ARRIN, of dimension DIM, is
-      copied into the output one-dimensional array, ARROUT, of the same
-      dimension.  An immediate return will occur if STATUS has an error
-      value on entry.
-   }
-   \sstinvocation{
-      CALL COPAx( DIM, ARRIN, ARROUT, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         DIM = INTEGER ( READ )
-      }{
-         Dimension of the input and output arrays.
-      }
-      \sstsubsection{
-         ARRIN( DIM ) = ? ( READ )
-      }{
-         One-dimensional array to be copied.
-      }
-      \sstsubsection{
-         ARROUT( DIM ) = ? ( WRITE )
-      }{
-         Output array is returned as a copy of the input array.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         There is a routine for each numerical data type: replace {\tt "}x{\tt "} in
-         the routine name by D or R as appropriate.  The ARRIN and ARROUT
-         arguments supplied to the routine must have the data type
-         specified.
-      }
-   }
-}
-\sstroutine{
-   COPY1D
-}{
-   copy one one-dimensional array to another
-}{
-   \sstdescription{
-      The input one-dimensional array, ARRIN, of dimension DIM, is
-      copied into the output one-dimensional array, ARROUT, of the
-      same dimension.  An immediate return will occur if STATUS
-      has an error value on entry.
-   }
-   \sstinvocation{
-      CALL COPY1D( DIM, ARRIN, ARROUT, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         DIM = INTEGER( READ )
-      }{
-         Dimension of the input and output arrays.
-      }
-      \sstsubsection{
-         ARRIN( DIM ) = REAL( READ )
-      }{
-         One-dimensional array to be copied.
-      }
-      \sstsubsection{
-         ARROUT( DIM ) = REAL( WRITE )
-      }{
-         Output array is returned as a copy of the input array.
-      }
-      \sstsubsection{
-         STATUS = INTEGER( READ )
-      }{
-         This is the global status, if this variable has an error
-         value on entry then an immediate return will occur.
-      }
-   }
-}
-\sstroutine{
-   COPY2D
-}{
-   copy one two-dimensional array into another
-}{
-   \sstdescription{
-      The input two-dimensional array, ARRIN, of dimension DIM1, DIM2,
-      is copied into the output two-dimensional array, ARROUT, of the
-      same dimensions.  An immediate return will occur if STATUS has
-      an error value on entry.
-   }
-   \sstinvocation{
-      CALL COPY2D( DIM1, DIM2, ARRIN, ARROUT, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         DIM1 = INTEGER( READ )
-      }{
-         The first dimension of the two-dimensional arrays.
-      }
-      \sstsubsection{
-         DIM2 = INTEGER( READ )
-      }{
-         The second dimension of the two-dimensional arrays.
-      }
-      \sstsubsection{
-         ARRIN( DIM1, DIM2 ) = REAL( READ )
-      }{
-         Array to be copied.
-      }
-      \sstsubsection{
-         ARROUT( DIM1, DIM2 ) = REAL( WRITE )
-      }{
-         Will be returned containing a copy of the input array.
-      }
-      \sstsubsection{
-         STATUS = INTEGER( READ )
-      }{
-         This is the global status, if this variable has an error
-           value on entry then an immediate return will occur.
-      }
-   }
-}
-\sstroutine{
-   COPY3D
-}{
-   copy one three-dimensional array into another
-}{
-   \sstdescription{
-      The input three-dimensional array, ARRIN, of dimensions in DIM1,
-      DIM2, DIM3, is copied into the output three-dimensional array,
-      ARROUT, of the same dimensions.  An immediate return will occur
-      if STATUS has an error value on entry.
-   }
-   \sstinvocation{
-      CALL COPY3D( DIM1, DIM2, DIM3, ARRIN, ARROUT, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         DIM1 = INTEGER( READ )
-      }{
-         The first dimension of the three-dimensional arrays.
-      }
-      \sstsubsection{
-         DIM2 = INTEGER( READ )
-      }{
-         The second dimension of the three-dimensional arrays.
-      }
-      \sstsubsection{
-         DIM3 = INTEGER( READ )
-      }{
-         The third dimension of the three-dimensional arrays.
-      }
-      \sstsubsection{
-         ARRIN( DIM1, DIM2, DIM3 ) = REAL( READ )
-      }{
-         Array to be copied.
-      }
-      \sstsubsection{
-         ARROUT( DIM1, DIM2, DIM3 ) = REAL( WRITE )
-      }{
-         Will be returned containing a copy of the input array.
-      }
-      \sstsubsection{
-         STATUS = INTEGER( READ )
-      }{
-         This is the global status, if this variable has an error
-           value on entry then an immediate return will occur.
-      }
-   }
-}
-\sstroutine{
    CPSECR
 }{
    Copies region of two-dimensional image
@@ -13629,66 +13470,6 @@ related items to be removed.
    }
 }
 \sstroutine{
-   CREOUT
-}{
-   creates and returns a locator to an IMAGE type structure
-}{
-   \sstdescription{
-      An IMAGE-type data structure, associated with the parameter name
-      in PARNAM, is created. A locator for this structure is returned
-      in LOCAT. A TITLE component, associated with the parameter name in
-      TLENAM, is created within the structure and a character value,
-      up to 72 characters long, is obtained from the parameter system
-      and written to the TITLE component. A DATA\_ARRAY component is
-      created, this has dimensionality NDIM and dimensions DIMS( NDIM )
-      and is of type \_REAL.
-      An immediate return will occur if STATUS has an error value on
-      entry.
-   }
-   \sstinvocation{
-      CALL CREOUT( PARNAM, LABNAM, NDIM, DIMS, LOCAT, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         PARNAM = CHAR$*$($*$)( READ )
-      }{
-         Parameter name associated with the IMAGE type structure to
-         be created.
-      }
-      \sstsubsection{
-         TLENAM = CHAR$*$($*$)( READ )
-      }{
-         Parameter name associated with the TITLE component created
-         in the new IMAGE-type structure.
-      }
-      \sstsubsection{
-         NDIM   = INTEGER( READ )
-      }{
-         Dimensionality of the DATA\_ARRAY component of the new
-         IMAGE-type structure.
-      }
-      \sstsubsection{
-         DIMS( NDIM ) = INTEGER( READ )
-      }{
-         Dimensions of the DATA\_ARRAY component of the new IMAGE-type
-         structure.
-      }
-      \sstsubsection{
-         LOCAT  = CHAR$*$($*$)( WRITE )
-      }{
-         Locator to the new IMAGE-type structure.
-      }
-      \sstsubsection{
-         STATUS = INTEGER( UPDATE )
-      }{
-         This is the global status, if this variable has an error
-         value on entry then an immediate return will occur. If an
-         error occurs during the execution of this routine STATUS
-         will be returned containing the appropriate error value.
-      }
-   }
-}
-\sstroutine{
    DIMLST
 }{
    Writes the dimensions of an array in a shorthand form
@@ -13732,7 +13513,7 @@ related items to be removed.
    }
 }
 \sstroutine{
-   KPG1\_ELNMB$<$T$>$
+   KPG1\_ELNMBx
 }{
    Write a range of element numbers into an array
 }{
@@ -13745,7 +13526,7 @@ related items to be removed.
       array, should the section be larger than this.
    }
    \sstinvocation{
-      CALL KPG1\_ELNMBx( X1, X2, ODIM, OUTARR, STATUS )
+      CALL ELNMBx( X1, X2, ODIM, OUTARR, STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -13777,52 +13558,6 @@ related items to be removed.
       }{
          The status value on entry to this routine.
       }
-   }
-}
-\sstroutine{
-   EXPARR
-}{
-   take the exponential of an array, pixel by pixel
-}{
-   \sstdescription{
-      This routine fills the output array pixels with the results
-      of taking the exponential of the pixels of the input array
-      to the base specified, i.e. New value = Base $*$$*$ Old value.
-      If the result is bigger than the maximum-allowed Vax real,
-      then a bad pixel value is used.
-   }
-   \sstinvocation{
-      CALL EXPARR( INARR, DIMS, BASE, OUTARR, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         INARR( DIMS )  =  REAL( READ )
-      }{
-         Array containing input image data
-      }
-      \sstsubsection{
-         DIMS  =  INTEGER( READ )
-      }{
-         Dimension of input and output arrays
-      }
-      \sstsubsection{
-         BASE  =  REAL( READ )
-      }{
-         Base of exponential to be used - must be a positive number
-      }
-      \sstsubsection{
-         OUTARR( DIMS )  =  REAL( WRITE )
-      }{
-         Array containing results of processing input data
-      }
-      \sstsubsection{
-         STATUS  =  INTEGER( READ )
-      }{
-         Global status value
-      }
-   }
-   \sstbugs{
-      None known.
    }
 }
 \sstroutine{
@@ -13899,46 +13634,6 @@ related items to be removed.
    }
    \sstbugs{
       None known.
-   }
-}
-\sstroutine{
-   INSET
-}{
-   will be .TRUE. if STRING is a member of the {\tt "}set{\tt "} SET
-}{
-   \sstdescription{
-      Checks a character variable, STRING, for being equal to any of a
-      number of possible values given in the pseudo set, SET, which is
-      also a character variable. The possible values can be any length
-      and can differ in length throughout the set. They should be
-      separated by a comma. Upper and lower case are treated as being
-      equivalent.
-   }
-   \sstinvocation{
-      RESULT = INSET( SET, STRING )
-   }
-   \sstarguments{
-      \sstsubsection{
-         SET = CHAR$*$($*$)( READ )
-      }{
-         The pseudo set of possible values for string. This {\tt "}set{\tt "}
-         takes the following form : {\tt '}string1,string2,.......,stringN{\tt '}
-         where each of the substrings string1 up to stringN can be of
-         different lengths.
-      }
-      \sstsubsection{
-         STRING = CHAR$*$($*$)( READ )
-      }{
-         The string to be checked for membership of the pseudo set.
-      }
-   }
-   \sstreturnedvalue{
-      \sstsubsection{
-         INSET = LOGICAL
-      }{
-         .TRUE. if STRING is a member of the {\tt "}set{\tt "} SET, otherwise
-         .FALSE. .
-      }
    }
 }
 \sstroutine{
@@ -14409,7 +14104,7 @@ related items to be removed.
 \sstroutine{
    KPG1\_ALSYS
 }{
-   Allowd the user to change the AlignSystem attribute in a Frame
+   Allows the user to change the AlignSystem attribute in a Frame
 }{
    \sstdescription{
       This routine obtains a value from the environment that is used to
@@ -15208,7 +14903,7 @@ related items to be removed.
 \sstroutine{
    KPG1\_ASGDP
 }{
-   Find a position with good output co-ordinates within a given input
+   Finds a position with good output co-ordinates within a given input
    region of a supplied Mapping
 }{
    \sstdescription{
@@ -16458,8 +16153,8 @@ related items to be removed.
 
          \sstitem
          Colour attribute values may be supplied in any form recognised
-         by KPG1\_PGCOL (e.g. colour name, MIN, MAX, integer index, etc.),
-         and the nearest colour in the current KAPPA pallette is used.
+         by KPG1\_PGCOL (e.g. colour name, MIN, MAX, integer index), and the
+         nearest colour in the current KAPPA pallette is used.
 
          \sstitem
          If a null value is supplied for the parameter, the error is
@@ -16852,8 +16547,8 @@ related items to be removed.
 
          \sstitem
          Colour attribute values may be supplied in any form recognised
-         by KPG1\_PGCOL (e.g. colour name, MIN, MAX, integer index, etc.), and
-         the nearest colour in the current KAPPA pallette is used.
+         by KPG1\_PGCOL (e.g. colour name, MIN, MAX, integer index), and the
+         nearest colour in the current KAPPA pallette is used.
       }
    }
 }
@@ -17116,7 +16811,7 @@ related items to be removed.
 \sstroutine{
    KPG1\_ASTTL
 }{
-   Set the Title attribute of a Plot
+   Sets the Title attribute of a Plot
 }{
    \sstdescription{
       This routine sets the Title attribute of an AST Plot. The Title
@@ -17585,7 +17280,7 @@ related items to be removed.
 \sstroutine{
    KPG1\_AXLVx
 }{
-   Finda the first axis centre co-ordinate of an NDF below a
+   Finds the first axis centre co-ordinate of an NDF below a
    threshold
 }{
    \sstdescription{
@@ -18511,7 +18206,7 @@ related items to be removed.
 \sstroutine{
    KPG1\_CHAXx
 }{
-   Check for usable AXIS structures
+   Checks for usable AXIS structures
 }{
    \sstdescription{
       This routine looks for monotonic AXIS structures within the
@@ -19980,13 +19675,13 @@ related items to be removed.
       \sstsubsection{
          IN = CHARACTER $*$ ( $*$ ) (Returned)
       }{
-         The name of the source element (e.g. {\tt "}CURVES{\tt "}, {\tt "}AXIS1{\tt "}, etc.), or
+         The name of the source element (e.g. {\tt "}CURVES{\tt "}, {\tt "}AXIS1{\tt "}), or
          blank.
       }
       \sstsubsection{
          OUT = CHARACTER $*$ ( $*$ ) (Returned)
       }{
-         The name of the destination element (e.g. {\tt "}CURVES{\tt "}, {\tt "}AXIS1{\tt "}, etc.).
+         The name of the destination element (e.g. {\tt "}CURVES{\tt "}, {\tt "}AXIS1{\tt "}).
       }
       \sstsubsection{
          ATTRS( 5 ) = REAL (Given and Returned)
@@ -20136,7 +19831,7 @@ related items to be removed.
 \sstroutine{
    KPG1\_CSUBx
 }{
-   Subtract a constant from each element of a vectorised array
+   Subtracts a constant from each element of a vectorised array
 }{
    \sstdescription{
       The routine subtracts a constant from each element of a
@@ -20814,7 +20509,7 @@ related items to be removed.
 \sstroutine{
    KPG1\_DEBUG
 }{
-   Determine wether the specified package should report debug
+   Determines whether the specified package should report debug
    diagnostics
 }{
    \sstdescription{
@@ -20837,7 +20532,7 @@ related items to be removed.
       \sstsubsection{
          PACK = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         The name of the package (e.g. {\tt "}KAPPA{\tt "}, {\tt "}POLPACK{\tt "}, etc.).
+         The name of the package (e.g. {\tt "}KAPPA{\tt "}, {\tt "}POLPACK{\tt "}).
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -21097,7 +20792,7 @@ related items to be removed.
 \sstroutine{
    KPG1\_DSFRM
 }{
-   Display a textual description of the Current Frame in a FrameSet
+   Displays a textual description of the Current Frame in a FrameSet
 }{
    \sstdescription{
       This routine displays a textual description of the Current Frame
@@ -21340,7 +21035,7 @@ related items to be removed.
 \sstroutine{
    KPG1\_ENVDF
 }{
-   See if an environment variable is defined
+   Sees if an environment variable is defined
 }{
    \sstdescription{
       This routine returns a logical flag indicating if the specified
@@ -23323,7 +23018,7 @@ related items to be removed.
 \sstroutine{
    KPG1\_GDWIN
 }{
-   Set PGPLOT world co-ordinates to be the world co-ordinates
+   Sets PGPLOT world co-ordinates to be the world co-ordinates
    of the specified AGI picture
 }{
    \sstdescription{
@@ -29321,7 +29016,7 @@ related items to be removed.
 \sstroutine{
    KPG1\_MODEx
 }{
-   To estimate the mean of a number of normally distributed data
+   Estimates the mean of a number of normally distributed data
    values, some of which may be corrupt
 }{
    \sstdescription{
@@ -29605,7 +29300,8 @@ related items to be removed.
 \sstroutine{
    KPG1\_MULx
 }{
-   Multiply two vectorised arrays with optional variance information
+   Multiplies two vectorised arrays with optional variance
+   information
 }{
    \sstdescription{
       The routine forms the product of two vectorised arrays, with
@@ -30875,7 +30571,7 @@ related items to be removed.
 \sstroutine{
    KPG1\_PGCLR
 }{
-   Clear current PGPLOT viewport
+   Clears current PGPLOT viewport
 }{
    \sstdescription{
       This routine clears the current PGPLOT viewport if possible. If it
@@ -31364,7 +31060,7 @@ related items to be removed.
       corresponds to {\tt "}xwindows/GWM{\tt "}, or one of the other xwindows sevices).
 
       The component names used are the same as the names uses for the device
-      within the AGI database (e.g. {\tt "}AGI\_3801\_2{\tt "}, etc.).
+      within the AGI database (e.g. {\tt "}AGI\_3801\_2{\tt "}).
    }
    \sstinvocation{
       CALL KPG1\_PGLOC( LOC1, LOC2, STATUS )
@@ -31669,8 +31365,8 @@ related items to be removed.
       \sstsubsection{
          TEXT = CHARACTER $*$ ( $*$ ) (Given)
       }{
-          The text to draw. The returned values of X and Y leave room for
-          any trailing spaces, UNLESS THE ENTIRE STRING IS BLANK, IN WHICH
+         The text to draw. The returned values of X and Y leave room for
+         any trailing spaces, UNLESS THE ENTIRE STRING IS BLANK, IN WHICH
          CASE X AND Y ARE RETURNED UNCHANGED.
       }
       \sstsubsection{
@@ -33757,7 +33453,7 @@ related items to be removed.
 \sstroutine{
    KPG1\_PVERS
 }{
-   Parse a package version string
+   Parses a package version string
 }{
    \sstdescription{
       This routine splits the supplied package version string (e.g.
@@ -35175,7 +34871,8 @@ related items to be removed.
 \sstroutine{
    KPG1\_SAXAT
 }{
-   Set attributes of a Frame axis to describe an NDF array component
+   Sets attributes of a Frame axis to describe an NDF array
+   component
 }{
    \sstdescription{
       This routine sets the Symbol, Units and Label attributes of a
@@ -37786,7 +37483,7 @@ related items to be removed.
 \sstroutine{
    KPG1\_VERB
 }{
-   Determine whether the specified package should report verbose
+   Determines whether the specified package should report verbose
    messages
 }{
    \sstdescription{
@@ -37809,7 +37506,7 @@ related items to be removed.
       \sstsubsection{
          PACK = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         The name of the package (e.g. {\tt "}KAPPA{\tt "}, {\tt "}POLPACK{\tt "}, etc.).
+         The name of the package (e.g. {\tt "}KAPPA{\tt "}, {\tt "}POLPACK{\tt "}).
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -38073,7 +37770,7 @@ related items to be removed.
 \sstroutine{
    KPG1\_WMODx
 }{
-   To estimate the mean of a number of normally distributed data
+   Estimates the mean of a number of normally distributed data
    values, some of which may be corrupt
 }{
    \sstdescription{
@@ -38865,7 +38562,7 @@ related items to be removed.
       \sstitemlist{
 
          \sstitem
-         Tthe routine should only be used at real or better precisions.
+         The routine should only be used at real or better precisions.
       }
    }
    \sstdiytopic{
@@ -39731,60 +39428,9 @@ related items to be removed.
    }
 }
 \sstroutine{
-   LOGARR
-}{
-   take the logarithm of an array, pixel by pixel
-}{
-   \sstdescription{
-      This routine fills the output array pixels with the results
-      of taking the logarithm of the pixels of the input array
-      to the base specified, i.e. New value = Log    ( Old value ).
-                                                 Base
-      If the input pixel is negative, then a bad pixel value is
-      used for the output value.
-      To find the logarithm to any base, the following algorithm
-      is used, providing the base is positive and not equal to one :
-       New Value  =  Log ( Old Value ) / Log ( Base )
-                        e                   e
-   }
-   \sstinvocation{
-      CALL LOGARR( INARR, DIMS, BASE, OUTARR, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         INARR( DIMS )  =  REAL( READ )
-      }{
-         Array containing input image data
-      }
-      \sstsubsection{
-         DIMS  =  INTEGER( READ )
-      }{
-         Dimensions of input and output arrays
-      }
-      \sstsubsection{
-         BASE  =  REAL( READ )
-      }{
-         Base of logarithm to be used - must be a positive number
-      }
-      \sstsubsection{
-         OUTARR( DIMS )  =  REAL( WRITE )
-      }{
-         Array containing results of processing input data
-      }
-      \sstsubsection{
-         STATUS  =  INTEGER( READ )
-      }{
-         Global status value
-      }
-   }
-   \sstbugs{
-      None known.
-   }
-}
-\sstroutine{
    NORMAL
 }{
-   takes a value and returns a normally distributed noisy
+   Takes a value and returns a normally distributed noisy
 }{
    \sstdescription{
       This routine takes as input a number and returns a number
@@ -39827,126 +39473,9 @@ related items to be removed.
    }
 }
 \sstroutine{
-   NXTNAM
-}{
-   increments Fnnnn type filename by one
-}{
-   \sstdescription{
-      This routine takes the input string CURNAM which should end with
-      an IRCAM type filename Fnnnn (where nnnn is four integers), and
-      returns the string NEXTNM containing the next filename in
-      numerical sequence, i.e. it adds one to the integer nnnn.
-   }
-   \sstinvocation{
-      CALL NXTNAM( CURNAM, NEXTNM, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         CURNAM  =  CHAR$*$($*$)
-      }{
-         Current filename of IRCAM type ending in Fnnnn
-      }
-      \sstsubsection{
-         NEXTNM  =  CHAR$*$($*$)
-      }{
-         Next filename in numerical sequence
-      }
-      \sstsubsection{
-         STATUS  =  INTEGER( READ,WRITE )
-      }{
-         Global status value
-      }
-   }
-   \sstbugs{
-      None known.
-   }
-}
-\sstroutine{
-   POWARR
-}{
-   raise an array, pixel by pixel, to a given power
-}{
-   \sstdescription{
-      This routine fills the output array pixels with the results
-      of raising the pixels of the input array to the power
-      specified, i.e. New value = Old value $*$$*$ Power.
-      If the result is bigger than the maximum allowed Vax real,
-      then a bad pixel value is used. If the result is smaller than
-      minimum allowed real set output pixel to be zero. (This underflow
-      check is not necessary on some machines, e.g. Vax.)
-      Negative input values are also converted to a bad pixel value
-      in the output.
-   }
-   \sstinvocation{
-      CALL POWARR( INARR, DIMS, POWER, OUTARR, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         INARR( DIMS )  =  REAL( READ )
-      }{
-         Array containing input image data
-      }
-      \sstsubsection{
-         DIMS  =  INTEGER( READ )
-      }{
-         Dimension of input and output arrays
-      }
-      \sstsubsection{
-         POWER  =  REAL( READ )
-      }{
-         Power to be used
-      }
-      \sstsubsection{
-         OUTARR( DIMS )  =  REAL( WRITE )
-      }{
-         Array containing results of raising input data to the given power
-      }
-      \sstsubsection{
-         STATUS  =  INTEGER( READ, WRITE )
-      }{
-         Global status value
-      }
-   }
-   \sstbugs{
-      None known.
-   }
-}
-\sstroutine{
-   ZERO1D
-}{
-   Sets all elements of the one-dimensional array to zero
-}{
-   \sstdescription{
-      All elements of the one-dimensional array, ARRAY, are set equal to
-      zero. An immediate return will occur if STATUS has an error value
-      on entry.
-   }
-   \sstinvocation{
-      CALL ZERO1D( SIZE, ARRAY, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         SIZE   = INTEGER( READ )
-      }{
-         Number of elements in the array to be set to all zeros.
-      }
-      \sstsubsection{
-         ARRAY( SIZE ) = REAL( UPDATE )
-      }{
-         All elements of this array will be set to zero.
-      }
-      \sstsubsection{
-         STATUS = INTEGER( READ )
-      }{
-         This is the global status, if this variable has an error
-         value on entry then an immediate return will occur.
-      }
-   }
-}
-\sstroutine{
    ZERO2D
 }{
-   sets all elements of a two-dimensional array to zero
+   Sets all elements of a two-dimensional array to zero
 }{
    \sstdescription{
       All elements of the two-dimensional array, ARRAY, are set equal to
@@ -39987,7 +39516,7 @@ related items to be removed.
 \sstroutine{
    kpg1Axcpy
 }{
-   Copy an NDF AXIS structure from one NDF to another
+   Copies an NDF AXIS structure from one NDF to another
 }{
    \sstdescription{
       This function copies all AXIS information describing axis {\tt "}ax1{\tt "} in
@@ -40029,7 +39558,7 @@ related items to be removed.
 \sstroutine{
    kpg1Config
 }{
-   Create an AST KeyMap holding a set of configuration parameter values
+   Creates an AST KeyMap holding a set of configuration parameter values
 }{
    \sstdescription{
       This function first creates a KeyMap by reading the values from a
@@ -40135,7 +39664,7 @@ related items to be removed.
 \sstroutine{
    kpg1Kygp1
 }{
-   Create a GRP group holding keyword/value pairs read from an AST KeyMap
+   Creates a GRP group holding keyword/value pairs read from an AST KeyMap
 }{
    \sstdescription{
       This function is the inverse of kpg1Kymp1. It extracts the values
@@ -40192,7 +39721,7 @@ related items to be removed.
 \sstroutine{
    kpg1Kymp1
 }{
-   Create an AST KeyMap holding keyword/value pairs read from a GRP
+   Creates an AST KeyMap holding keyword/value pairs read from a GRP
    group
 }{
    \sstdescription{
@@ -40292,7 +39821,7 @@ related items to be removed.
 \sstroutine{
    kpg1Kymp2
 }{
-   Parse a {\tt "}keyword = value{\tt "} string for kpg1Kymp1 and add to a KeyMap
+   Parses a {\tt "}keyword = value{\tt "} string for kpg1Kymp1 and add to a
 }{
    \sstdescription{
       This is a service function for kps1Kymp1. It parses the supplied
@@ -40349,7 +39878,7 @@ related items to be removed.
 \sstroutine{
    kpgGtfts
 }{
-   Obtain FITS header information from an NDF
+   Obtains FITS header information from an NDF
 }{
    \sstdescription{
       The routine reads the FITS extension from an NDF and returns an
@@ -40405,7 +39934,7 @@ related items to be removed.
 \sstroutine{
    kpgPtfts
 }{
-   Store FITS header information into an NDF
+   Stores FITS header information into an NDF
 }{
    \sstdescription{
       The routine stores the contents of an AST FitsChan into an

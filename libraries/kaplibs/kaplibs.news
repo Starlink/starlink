@@ -27,6 +27,21 @@ Version 3.1
      which causes a staircase plot to be produced in which bad values are
      not flanked by vertical lines to the lower edge of the plot (as are
      produced by mode 1).
+   - A number of long-deprecated old routines without a package prefix
+     have been removed.  These are listed below.  The corresponding 
+     replacement routines appear in the right column.
+
+     COPYAx   VEC_xTOx or KPG1_COPY
+     COPY1D      "            "
+     COPY2D      "            "
+     COPY3D      "            "
+     CREOUT   NDF_CREP and NDF_CPUT
+     EXPARR   KPG1_EXPOx
+     INSET    CHR_INSET
+     LOGARR   KPG1_LOGAx
+     NXTNAM   CHR_ITOC and CHR_CTOI
+     POWARR   KPG1_POWx
+     ZERO1D   KPG1_FILLx
 
 Version 3.0
    - CCG routines' NBAD argument excludes bad elements not attributable

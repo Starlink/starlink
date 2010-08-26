@@ -121,7 +121,7 @@ kpg1_xyzw.gdr kpg1_ker1.gdr kpg_blon.gdr  kpg_bmdn.gdr
 
 KPG_DI_GEN = kpg1_ctcp.gdi
 
-KPG_DIR_GEN = copa.gdir kpg1_chel.gdir kpg1_figr.gdir \
+KPG_DIR_GEN = kpg1_chel.gdir kpg1_figr.gdir \
 kpg1_prsa.gdir kpg1_mul.gdir kpg1_sqsu.gdir
 
 KPG_IR_GEN = elnmb.gir
@@ -133,14 +133,9 @@ KPG_NXB_GEN = kpg1_axli.gnxb
 
 # Non-adam non-graphic
 KPG_NONGEN = \
-copy1d.f \
-copy2d.f \
-copy3d.f \
 cpsecr.f \
 dimlst.f \
-exparr.f \
 icmmm.f \
-inset.f \
 kpg_env0c.f \
 kpg1_abset.f \
 kpg1_arcol.f \
@@ -264,11 +259,7 @@ kpg1_wtm3r.f \
 kpg1_wwrt.f \
 kpg1_xyd2w.f \
 ld2ar.f \
-logarr.f \
 normal.f \
-nxtnam.f \
-powarr.f \
-zero1d.f \
 zero2d.f
 
 # All ADAM routines (parameter access)
