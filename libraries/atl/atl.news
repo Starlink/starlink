@@ -4,6 +4,9 @@ An new release (V1.4) of the ATL library is now available. The ATL
 library contains high level AST-related utility functions. See SUN/256
 for details. Changed in the new version include:
 
+- A function atlReadFile has been added, which reads an AST Object from a
+text file containing a dump of an AST Object created by (say) atlShow.
+
 - The function atlMapCopy has been removed. The functionality has been
 moved into the astMapCopy functionin the AST library.
 

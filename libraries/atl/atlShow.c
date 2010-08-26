@@ -22,7 +22,7 @@ void atlShow( AstObject *this, const char *fname, const char *options,
 
 *  Description:
 *     This function dumps the supplied AST Object to a new text file with
-*     the given name.
+*     the given name. It may be read back from the file using astReadFile.
 
 *  Arguments:
 *     this

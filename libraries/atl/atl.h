@@ -70,6 +70,7 @@ enum { ATL__MXDIM  = 7 };
 
 /* Public function prototypes */
 /* -------------------------- */
+AstObject *atlReadFile( const char *, const char *, int * );
 AstRegion *atlMatchRegion( AstRegion *, AstFrame *, int * );
 int atlMapGet1S( AstKeyMap *, const char *, int, int, int *, char *, int * );
 void atlAddWcsAxis( AstFrameSet *, AstMapping *, AstFrame *, int *, int *, int * );
