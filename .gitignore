@@ -928,6 +928,11 @@ libraries/jpl/jplstate
 libraries/jpl/runtesteph
 libraries/jpl/shorteph
 
+libraries/kaplibs/aif/conly-files
+libraries/kaplibs/ccg/conly-files
+libraries/kaplibs/fts/conly-files
+libraries/kaplibs/ira/conly-files
+
 libraries/kaplibs/aif/notes
 libraries/kaplibs/ccg/notes
 libraries/kaplibs/fts/notes
