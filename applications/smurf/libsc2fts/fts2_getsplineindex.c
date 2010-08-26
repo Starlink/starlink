@@ -49,11 +49,15 @@
 *-
 */
 
+/* STANDARD INCLUDES */
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
 
-// SMURF INCLUDES
+/* STARLINK INCLUDES */
+#include "ast.h"
+
+/* SMURF INCLUDES */
 #include "fts2.h"
 
 int fts2_getsplineindex(

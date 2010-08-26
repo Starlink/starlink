@@ -58,10 +58,10 @@
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_linalg.h>
 
-// STARLINK INCLUDES
+/* STARLINK INCLUDES */
 #include "ast.h"
 
-// SMURF INCLUDES
+/* SMURF INCLUDES */
 #include "fts2.h"
 
 double* fts2_polyfitcoeffs(

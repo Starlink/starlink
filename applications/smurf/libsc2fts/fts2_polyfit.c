@@ -53,10 +53,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-// STARLINK INCLUDES
+/* STARLINK INCLUDES */
 #include "ast.h"
 
-// SMURF INCLUDES
+/* SMURF INCLUDES */
 #include "fts2.h"
 
 double fts2_polyfit( 
