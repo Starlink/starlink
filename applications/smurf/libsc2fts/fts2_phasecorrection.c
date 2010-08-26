@@ -221,7 +221,8 @@ int fts2_phasecorrcetion(
   mean = sum / dsLength;
   for(i = 0; i < dsLength; i++) 
   { 
-    sumSquared += (dsInterferogram[i] - mean) * (dsInterferogram[i] - mean); 
+    tempVal = dsInterferogram[i] - mean;
+    sumSquared += tempVal * tempVal; 
   }
   isFlat = sqrt(sumSquared / dsLength) < SMF__FLAT_THRESHOLD;
 
@@ -261,8 +262,12 @@ int fts2_phasecorrcetion(
 	  }
 	  for(i = wnLBound; i <= wnUBound; i++)
 	  {
-	    weights[i] = spectrum[i][0] * spectrum[i][0] + spectrum[i][1] * spectrum[i][1];
-	    if(weights[i] > maxWeight) { maxWeight = weights[i]; }
+	    weights[i] =  spectrum[i][0] * spectrum[i][0] + 
+	                  spectrum[i][1] * spectrum[i][1];
+	    if(weights[i] > maxWeight) 
+	    { 
+	      maxWeight = weights[i]; 
+	    }
 	  }
 	  weights[0] = weights[weightsSize - 1] = 0.0;
 	  if(maxWeight <= 0) 
@@ -279,7 +284,10 @@ int fts2_phasecorrcetion(
 	    if(phase[i] < 0.0)
 	    {
 	      phase[i] += PI;
-	      if(phase[i] < 0.0) { phase[i] += PI; }
+	      if(phase[i] < 0.0) 
+	      { 
+	        phase[i] += PI; 
+	      }
 	    }
 	  }
 	  astFree(tmpPhase); tmpPhase = NULL;
