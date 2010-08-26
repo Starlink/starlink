@@ -201,6 +201,7 @@ kpg1_hrcpr.f \
 kpg1_hsstp.f \
 kpg1_hstlo.f \
 kpg1_imprg.f \
+kpg_iseqn.f \
 kpg1_isscs.f \
 kpg1_kgodr.f \
 kpg1_like.f \

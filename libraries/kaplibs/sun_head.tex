@@ -817,6 +817,9 @@ related items to be removed.
       these routines will need to modify calling routines accordingly;
       without skewness or kurtosis values to document supply
       VAL\_\_BADD for each undefined statistic.
+\item Replace old IRCAM-specific NXTNAM routine with the more-general
+      KPG\_ISEQN.  This increments trailing sequence numbers in
+      strings, most often used to generate a series of filenames.
 \item A number of long-deprecated old routines without a package prefix
       have been removed.  These are listed below.  The corresponding 
       replacement routines appear in the right column.
@@ -830,7 +833,7 @@ CREOUT  & \multicolumn{2}{l}{NDF\_CREP and NDF\_CPUT} \\
 EXPARR  & \multicolumn{2}{l}{KPG1\_EXPOx} \\
 INSET   & \multicolumn{2}{l}{CHR\_INSET} \\
 LOGARR  & \multicolumn{2}{l}{KPG1\_LOGAx} \\
-NXTNAM  & \multicolumn{2}{l}{CHR\_ITOC and CHR\_CTOI} \\
+NXTNAM  & \multicolumn{2}{l}{KPG\_ISEQN} \\
 POWARR  & \multicolumn{2}{l}{KPG1\_POWx} \\
 ZERO1D  & \multicolumn{2}{l}{KPG1\_FILLx}
 \end{tabular}

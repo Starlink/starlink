@@ -817,6 +817,9 @@ related items to be removed.
       these routines will need to modify calling routines accordingly;
       without skewness or kurtosis values to document supply
       VAL\_\_BADD for each undefined statistic.
+\item Replace old IRCAM-specific NXTNAM routine with the more-general
+      KPG\_ISEQN.  This increments trailing sequence numbers in
+      strings, most often used to generate a series of filenames.
 \item A number of long-deprecated old routines without a package prefix
       have been removed.  These are listed below.  The corresponding 
       replacement routines appear in the right column.
@@ -830,7 +833,7 @@ CREOUT  & \multicolumn{2}{l}{NDF\_CREP and NDF\_CPUT} \\
 EXPARR  & \multicolumn{2}{l}{KPG1\_EXPOx} \\
 INSET   & \multicolumn{2}{l}{CHR\_INSET} \\
 LOGARR  & \multicolumn{2}{l}{KPG1\_LOGAx} \\
-NXTNAM  & \multicolumn{2}{l}{CHR\_ITOC and CHR\_CTOI} \\
+NXTNAM  & \multicolumn{2}{l}{KPG\_ISEQN} \\
 POWARR  & \multicolumn{2}{l}{KPG1\_POWx} \\
 ZERO1D  & \multicolumn{2}{l}{KPG1\_FILLx}
 \end{tabular}
@@ -13513,9 +13516,9 @@ ZERO1D  & \multicolumn{2}{l}{KPG1\_FILLx}
    }
 }
 \sstroutine{
-   KPG1\_ELNMBx
+   ELNMBx
 }{
-   Write a range of element numbers into an array
+   Writes a range of element numbers into an array
 }{
    \sstdescription{
       This routine writes numbers sequentially to a $<$COMM$>$ 1-d
@@ -39022,6 +39025,58 @@ ZERO1D  & \multicolumn{2}{l}{KPG1\_FILLx}
          \sstitem
          Status is set to KPG\_\_NOFTS if no FITS extension is found.
       }
+   }
+}
+\sstroutine{
+   KPG\_ISEQN
+}{
+   Increments a sequence string
+}{
+   \sstdescription{
+      This routine takes an input string comprising two parts: an
+      alphanumeric string ending in an non-numeric character; followed
+      by a sequence number of digits, possibly with leading zeroes.  The
+      sequence number is incremented or decremented by a supplied number
+      in a returned string of the same length as the input string.
+      For example, u20100320\_0084 would become u20100320\_0085 for an
+      increment of 1, and u20100320\_0074 for an increment of -10.
+
+      An error results if the supplied string is not of the correct
+      form, or the increment takes the sequence counter beyond its
+      range.  The sequence number cannot be negative or require
+      additional characters.  For example incrementing string DATA999
+      by one would be rejected as it would require an extra character.
+   }
+   \sstinvocation{
+      CALL KPG\_ISEQN( IN, INCREM, OUT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IN = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         String containing a trailing sequence number.
+      }
+      \sstsubsection{
+         INCREM = INTEGER (Given)
+      }{
+         The increment to apply to string IN.  It may be positive or
+         negative.  A value of 0 causes IN to be merely copied to OUT.
+      }
+      \sstsubsection{
+         OUT  = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The supplied string but with its sequence number incremented by
+         INCREM.  It must have at least the length of IN.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         Global status value.  An SAI\_\_ERROR is returned, should any
+         of the errors listed above be detected.
+      }
+   }
+   \sstnotes{
+      The sequence number can have up to twelve digits.
    }
 }
 \sstroutine{
