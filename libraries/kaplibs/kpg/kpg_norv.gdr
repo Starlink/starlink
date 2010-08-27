@@ -1,0 +1,212 @@
+      SUBROUTINE KPG_NORV<T>( BAD, EL, INARR, SIGMA, SEED, OUTARR,
+     :                        STATUS )
+*+
+*  Name:
+*     KPG_NORVx
+
+*  Purpose:
+*     Returns a supplied value with normally distributed noise added.
+
+*  Language:
+*     Starlink
+
+*  Invocation:
+*     CALL KPG_NORVx( BAD, EL, INARR, SIGMA, SEED, OUTARR, STATUS )
+
+*  Description:
+*     This routine takes as input a number and returns a value that is
+*     the input number plus or minus a random amount of normally
+*     distributed noise.  It uses a Box-Mueller algorithm to generate a
+*     fairly good normal distribution.
+
+*  Arguments:
+*     BAD = LOGICAL (Given)
+*        Whether checks for bad pixels should be performed.
+*     EL = INTEGER (Given)
+*        Number of pixels in the array.
+*     INARR( EL ) = ? (Given)
+*        Input array to which noise is to be added to each pixel.
+*     SIGMA = ? (Given)
+*        Standard deviation of the normal distribution.
+*     SEED = REAL (Given & Returned)
+*        Seed for the random-number generator SLA_RANDOM.
+*     OUTARR( EL ) = ? (Returned)
+*        Output array which has random noise added.
+*     STATUS = INTEGER (Given)
+*        Global status value.
+
+*  Notes:
+*     -  There is a routine for each of the standard floating-point
+*     types.  Replace "x" in the routine name by D or R as appropriate.
+*     The data type of the INARR, SIGMA, and OUTARR must match the
+*     particular routine used.
+
+*  Copyright:
+*     Copyright (C) 1986, 1992 Science & Engineering Research Council.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
+*  Authors:
+*     MJM: Mark McCaughrean (University of Edinburgh)
+*     MJC: Malcolm Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-02-1986 (MJM):
+*        First implementation.
+*     1986 August 12 (MJC):
+*        Completed prologue and nearly conformed to Starlink standards.
+*     1986 September 2 (MJC):
+*        Renamed parameter section arguments and tidied.
+*     1992 March 17 (MJC):
+*        Used portable random-number generation.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_new_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing allowed
+
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! SSE global definitions
+      INCLUDE 'PRM_PAR'          ! PRIMDAT public definitions
+
+*  Arguments Given:
+      LOGICAL BAD
+      INTEGER EL
+      <TYPE> INARR( EL )
+      <TYPE> SIGMA
+
+*  Arguments Given and Returned:
+      REAL SEED
+
+*  Arguments Returned:
+      <TYPE> OUTARR( EL )
+
+*  Status:
+      INTEGER STATUS
+
+*  External References:
+      REAL SLA_RANDOM            ! Random-number generator
+
+*  Local Variables:
+      LOGICAL FINSHD             ! Valid random number been generated?
+      INTEGER I                  ! Loop counter
+      DOUBLE PRECISION RA        ! Random number in range 0 to 1
+      DOUBLE PRECISION RB        ! Random number in range 0 to 1
+      DOUBLE PRECISION RR        ! Random number un range 0 to 2
+      DOUBLE PRECISION R         ! Work variable
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversion functions
+      INCLUDE 'NUM_DEF_CVT'
+
+*.
+
+*  Set the returned array.
+      DO I = 1, EL
+         OUTARR( I ) = INARR( I )
+      END DO
+
+*  Check the global inherited status.
+      IF ( STATUS .NE. SAI__OK ) GOTO 999
+
+      IF ( BAD ) THEN
+         DO I = 1, EL
+            IF ( INARR( I ) .EQ. VAL__BAD<T> ) THEN
+               OUTARR( I ) = VAL__BAD<T>
+            ELSE
+
+*  Initialise completion flag.
+               FINSHD = .FALSE.
+
+*  Loop until a valid random number has been generated.
+               DO WHILE ( .NOT. FINSHD )
+
+*  Generate two uncorrelated random numbers between -1 and 1.
+*  SLA_RANDOM returns values in the range 0 to 1.
+                  RA = -1.0D0 + 2.0D0 * DBLE( SLA_RANDOM( SEED ) )
+                  RA = -1.0D0 + 2.0D0 * DBLE( SLA_RANDOM( SEED ) )
+                  RB = -1.0D0 + 2.0D0 * DBLE( SLA_RANDOM( SEED ) )
+                  RB = -1.0D0 + 2.0D0 * DBLE( SLA_RANDOM( SEED ) )
+
+*  Get another from these that will lie between 0 and 2.
+                  RR = RA * RA + RB * RB
+
+*  Accept only those that lie between 0 and 1, otherwise start
+*  again.
+                  IF ( RR .LT. 1.0D0 ) THEN
+
+*  Generate the Box-Mueller transform.
+                     R = SQRT( -2.0D0 * LOG( RR ) / RR )
+                     OUTARR( I ) = NUM_DTO<T>( ABS( SIGMA ) * RA * R ) +
+     :                             INARR( I )
+
+*  Set the finished flag to exit now.
+                     FINSHD = .TRUE.
+                  END IF
+
+               END DO
+            END IF
+         END DO
+
+*  No bad values present.
+      ELSE
+         DO I = 1, EL
+
+*  Initialise completion flag.
+            FINSHD = .FALSE.
+
+*  Loop until a valid random number has been generated.
+            DO WHILE ( .NOT. FINSHD )
+
+*  Generate two uncorrelated random numbers between -1 and 1.
+*  SLA_RANDOM returns values in the range 0 to 1.
+               RA = -1.0D0 + 2.0D0 * DBLE( SLA_RANDOM( SEED ) )
+               RA = -1.0D0 + 2.0D0 * DBLE( SLA_RANDOM( SEED ) )
+               RB = -1.0D0 + 2.0D0 * DBLE( SLA_RANDOM( SEED ) )
+               RB = -1.0D0 + 2.0D0 * DBLE( SLA_RANDOM( SEED ) )
+
+*  Get another from these that will lie between 0 and 2.
+               RR = RA * RA + RB * RB
+
+*  Accept only those that lie between 0 and 1, otherwise start
+*  again.
+               IF ( RR .LT. 1.0D0 ) THEN
+
+*  Generate the Box-Mueller transform.
+                  R = SQRT( -2.0D0 * LOG( RR ) / RR )
+                  OUTARR( I ) = NUM_DTO<T>( ABS( SIGMA ) * RA * R ) +
+     :                          INARR( I )
+
+*  Set the finished flag to exit now.
+                  FINSHD = .TRUE.
+               END IF
+
+            END DO
+         END DO
+      END IF
+
+  999 CONTINUE
+
+      END

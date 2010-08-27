@@ -113,7 +113,7 @@ kpg1_dwso.gdr kpg1_ffr.gdr  kpg1_fftf.gdr kpg1_gaus.gdr \
 kpg1_hcon.gdr kpg1_hmlt.gdr kpg1_hsds.gdr kpg1_hsfl.gdr \
 kpg1_hstf.gdr kpg1_is3.gdr  kpg1_litn.gdr kpg1_ludc.gdr \
 kpg1_mdet.gdr kpg1_mono.gdr kpg1_mthe.gdr kpg1_nbad.gdr \
-kpg1_pow.gdr \
+kpg_norv.gdr  kpg1_pow.gdr \
 kpg1_prow.gdr kpg1_psfs.gdr kpg1_qntl.gdr kpg1_rfco.gdr \
 kpg1_ssaz.gdr kpg1_stds.gdr kpg1_stfl.gdr kpg1_tral.gdr \
 kpg1_trbo.gdr kpg1_trig.gdr kpg1_trpi.gdr kpg1_unz2.gdr \
