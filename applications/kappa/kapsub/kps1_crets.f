@@ -116,7 +116,8 @@
 *        Re-wrote variances estimations.
 *     2010 August 27 (MJC):
 *        Rename ERROR to VARNCE to indicate meaning better and avoid
-*        misdirection.  Tidied.
+*        misdirection.  Tidied.  Substituted call to defunct NORMAL 
+*        with KPG1_NORVR.
 *     {enter_further_changes_here}
 
 *-
@@ -319,10 +320,10 @@
       ELSE IF ( TYPED .EQ. 'GN' ) THEN
 
          VAR = SIGMA * SIGMA
-
          DO  J = 1, DIM2
             DO  I = 1, DIM1
-               CALL NORMAL( MEAN, SIGMA, SEED, DATA, STATUS )
+               CALL KPG_NORVR( .FALSE., 1, MEAN, SIGMA, SEED, DATA,
+     :                         STATUS )
                ARRAY( I, J ) = DATA
 
 *  Populate the variance component if required.
