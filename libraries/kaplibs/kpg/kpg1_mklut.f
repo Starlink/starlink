@@ -5,7 +5,7 @@
 *     KPG1_MKLUT
 
 *  Purpose:
-*     Createa a Mapping to connect two one-dimensional array of values.
+*     Creates a Mapping to connect two one-dimensional array of values.
 
 *  Language:
 *     Starlink Fortran 77

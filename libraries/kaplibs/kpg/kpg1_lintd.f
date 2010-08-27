@@ -5,7 +5,7 @@
 *     KPG1_LINTD
 
 *  Purpose:
-*     Obtains a linear transformation between 2 sets of x,y positions
+*     Obtains a linear transformation between two sets of x,y positions
 *     with least squared error.
 
 *  Language:
