@@ -28,24 +28,31 @@ Version 3.1
      not flanked by vertical lines to the lower edge of the plot (as are
      produced by mode 1).
    - Replace old IRCAM-specific NXTNAM routine with the more-general
-     KPG_ISEQN.  This increments trailing sequence numbers in
+     and new KPG_ISEQN.  This increments trailing sequence numbers in
      strings, most often used to generate a series of filenames.
    - DIMLST has been renamed KPG_DIMLS.
+   - There is a new routine KPG_NORVx to replace the old NORMAL.  It 
+     has the benefits of being generic and can operate on an array.
    - A number of long-deprecated old routines without a package prefix
      have been removed.  These are listed below.  The corresponding 
      replacement routines appear in the right column.
 
-     COPYAx   VEC_xTOx or KPG1_COPY
+     CHVALx   KPG1_CHVAx
+     COPAx    VEC_xTOx or KPG1_COPY
      COPY1D      "            "
      COPY2D      "            "
      COPY3D      "            "
+     CPSECR   KPG1_CPNDx
      CREOUT   NDF_CREP and NDF_CPUT
+     ELNMBx   KPG1_ELNMx 
      EXPARR   KPG1_EXPOx
      INSET    CHR_INSET
      LOGARR   KPG1_LOGAx
      NXTNAM   KPG_ISEQN
+     NORMAL   KPG_NORVx
      POWARR   KPG1_POWx
      ZERO1D   KPG1_FILLx
+     ZERO2D   KPG1_FILLx
 
 Version 3.0
    - CCG routines' NBAD argument excludes bad elements not attributable

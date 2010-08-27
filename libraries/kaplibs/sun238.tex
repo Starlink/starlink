@@ -818,25 +818,32 @@ related items to be removed.
       without skewness or kurtosis values to document supply
       VAL\_\_BADD for each undefined statistic.
 \item Replace old IRCAM-specific NXTNAM routine with the more-general
-      KPG\_ISEQN.  This increments trailing sequence numbers in
-      strings, most often used to generate a series of filenames.
+      and new KPG\_ISEQN.  This increments trailing sequence numbers
+      in strings, most often used to generate a series of filenames.
 \item DIMLST has been renamed KPG\_DIMLS.
+\item There is a new routine KPG\_NORVx to replace the old NORMAL.  It
+      has the benefits of being generic and can operate on an array.
 \item A number of long-deprecated old routines without a package prefix
       have been removed.  These are listed below.  The corresponding 
       replacement routines appear in the right column.
 
 \begin{tabular}{lcc}
-COPYAx  & \multicolumn{2}{l}{VEC\_xTOx or KPG1\_COPY} \\
+CHVALx  & \multicolumn{2}{l}{KPG1\_CHVAx} \\
+COPAx   & \multicolumn{2}{l}{VEC\_xTOx or KPG1\_COPY} \\
 COPY1D  & {\tt "}   & {\tt "}  \\
 COPY2D  & {\tt "}   & {\tt "}  \\
 COPY3D  & {\tt "}   & {\tt "}  \\
+CPSECR  & \multicolumn{2}{l}{KPG1\_CPNDx} \\
 CREOUT  & \multicolumn{2}{l}{NDF\_CREP and NDF\_CPUT} \\
+ELNMBx  & \multicolumn{2}{l}{KPG1\_ELNMx} \\
 EXPARR  & \multicolumn{2}{l}{KPG1\_EXPOx} \\
 INSET   & \multicolumn{2}{l}{CHR\_INSET} \\
 LOGARR  & \multicolumn{2}{l}{KPG1\_LOGAx} \\
+NORMAL  & \multicolumn{2}{l}{KPG\_NORVx} \\
 NXTNAM  & \multicolumn{2}{l}{KPG\_ISEQN} \\
 POWARR  & \multicolumn{2}{l}{KPG1\_POWx} \\
-ZERO1D  & \multicolumn{2}{l}{KPG1\_FILLx}
+ZERO1D  & \multicolumn{2}{l}{KPG1\_FILLx} \\
+ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx}
 \end{tabular}
 \end{itemize}
 
@@ -13333,191 +13340,6 @@ ZERO1D  & \multicolumn{2}{l}{KPG1\_FILLx}
          STATUS = INTEGER (Given)
       }{
          The global status.
-      }
-   }
-}
-\sstroutine{
-   CHVALx
-}{
-   Replaces a specified pixel value
-}{
-   \sstdescription{
-      This routine replaces a specified pixel with an input
-      value and returns the old value of the pixel.
-   }
-   \sstinvocation{
-      CALL CHVALx( DIM, INARR, OLDVAL, NEWVAL, OUTARR, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         DIM = INTEGER( READ )
-      }{
-         The dimension of the input array
-      }
-      \sstsubsection{
-         INARR( DIM ) = ? ( READ )
-      }{
-         The input data array
-      }
-      \sstsubsection{
-         OLDVAL = ? ( READ )
-      }{
-         Value to be replaced
-      }
-      \sstsubsection{
-         NEWVAL = ? ( READ )
-      }{
-         New value to be substituted for the \%OLDVAL.
-      }
-      \sstsubsection{
-         OUTARR( DIM ) = ? ( READ )
-      }{
-         The output data array containing the modified pixel values
-      }
-      \sstsubsection{
-         STATUS  =  INTEGER( READ )
-      }{
-         Global status value
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         There is a routine for the all signed numeric data types:
-         replace {\tt "}x{\tt "} in the routine name by B, D, I, R, or W as appropriate.
-         The INARR, OLDVAL, NEWVAL, and OUTARR arguments supplied must have
-         the data type specified.
-      }
-   }
-   \sstdiytopic{
-      Method
-   }{
-      If global status is ok. then
-      For all pixels
-         If pixel value is the value to be removed then
-            Replace old value in data array with the new value
-         Endif
-      Endfor
-      End
-   }
-}
-\sstroutine{
-   CPSECR
-}{
-   Copies region of two-dimensional image
-}{
-   \sstdescription{
-      This routine copies the two-dimensional data of a specified region
-      of an image.
-   }
-   \sstinvocation{
-      CALL  CPSECR( IMAGE, DIM1, DIM2, X1, Y1, X2, Y2, RXDIM, RYDIM,
-   }
-   \sstarguments{
-      \sstsubsection{
-         IMAGE( DIM1, DIM2 ) = REAL( READ )
-      }{
-         The array containing the raw image data.
-      }
-      \sstsubsection{
-         DIM1 = INTEGER( READ )
-      }{
-         The first dimension of the two-dimensional array.
-      }
-      \sstsubsection{
-         DIM2 = INTEGER( READ )
-      }{
-         The second dimension of the two-dimensional array.
-      }
-      \sstsubsection{
-         X1 = INTEGER( READ )
-      }{
-         The X co-ordinate of the first point from which the region
-           is determined.
-      }
-      \sstsubsection{
-         Y1 = INTEGER( READ )
-      }{
-         The Y co-ordinate of the first point.
-      }
-      \sstsubsection{
-         X2 = INTEGER( READ )
-      }{
-         The X co-ordinate of the second point.
-      }
-      \sstsubsection{
-         Y2 = INTEGER( READ )
-      }{
-         The Y co-ordinate of the second point.
-      }
-      \sstsubsection{
-         RXDIM = INTEGER( READ )
-      }{
-         The X-dimension of the region.
-      }
-      \sstsubsection{
-         RYDIM = INTEGER( READ )
-      }{
-         The Y-dimension of the region.
-      }
-      \sstsubsection{
-         REGION( RXDIM, RYDIM ) = REAL( WRITE )
-      }{
-         The array into which the region is copied.
-      }
-      \sstsubsection{
-         STATUS = INTEGER( READ )
-      }{
-         The status value on entry to this routine.
-      }
-   }
-}
-\sstroutine{
-   ELNMBx
-}{
-   Writes a range of element numbers into an array
-}{
-   \sstdescription{
-      This routine writes numbers sequentially to a $<$COMM$>$ 1-d
-      array, where the numbers are between defined integer limits and
-      are stepped by 1 (or -1) from one pixel to the next.  In other
-      words the array value takes the element number plus an offset.
-      Only the first \%ODIM elements can be accommodated in the output
-      array, should the section be larger than this.
-   }
-   \sstinvocation{
-      CALL ELNMBx( X1, X2, ODIM, OUTARR, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         X1 = INTEGER (Given)
-      }{
-         The first value to be written to the output array.  If this
-         is larger than \%X2 the values will decrease by 1 for each
-         element.
-      }
-      \sstsubsection{
-         X2 = INTEGER (Given)
-      }{
-         The last value to be written to the output array, provided
-         there are sufficient elements to accommodate it.  If not
-         only \%ODIM values will be stored.
-      }
-      \sstsubsection{
-         ODIM = INTEGER (Given)
-      }{
-         The number of elements in the output array.
-      }
-      \sstsubsection{
-         OUTARR( ODIM ) = ? (Returned)
-      }{
-         The array into which the sub-array is copied.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given)
-      }{
-         The status value on entry to this routine.
       }
    }
 }
@@ -26981,7 +26803,7 @@ ZERO1D  & \multicolumn{2}{l}{KPG1\_FILLx}
 \sstroutine{
    KPG1\_LINTD
 }{
-   Obtains a linear transformation between 2 sets of x,y positions
+   Obtains a linear transformation between two sets of x,y positions
    with least squared error
 }{
    \sstdescription{
@@ -28650,7 +28472,7 @@ ZERO1D  & \multicolumn{2}{l}{KPG1\_FILLx}
 \sstroutine{
    KPG1\_MKLUT
 }{
-   Createa a Mapping to connect two one-dimensional array of values
+   Creates a Mapping to connect two one-dimensional array of values
 }{
    \sstdescription{
       This routine creates a one-dimensional Mapping which translates an
@@ -39084,6 +38906,68 @@ ZERO1D  & \multicolumn{2}{l}{KPG1\_FILLx}
    }
 }
 \sstroutine{
+   KPG\_NORVx
+}{
+   Returns a supplied value with normally distributed noise added
+}{
+   \sstdescription{
+      This routine takes as input a number and returns a value that is
+      the input number plus or minus a random amount of normally
+      distributed noise.  It uses a Box-Mueller algorithm to generate a
+      fairly good normal distribution.
+   }
+   \sstinvocation{
+      CALL KPG\_NORVx( BAD, EL, INARR, SIGMA, SEED, OUTARR, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         BAD = LOGICAL (Given)
+      }{
+         Whether checks for bad pixels should be performed.
+      }
+      \sstsubsection{
+         EL = INTEGER (Given)
+      }{
+         Number of pixels in the array.
+      }
+      \sstsubsection{
+         INARR( EL ) = ? (Given)
+      }{
+         Input array to which noise is to be added to each pixel.
+      }
+      \sstsubsection{
+         SIGMA = ? (Given)
+      }{
+         Standard deviation of the normal distribution.
+      }
+      \sstsubsection{
+         SEED = REAL (Given \& Returned)
+      }{
+         Seed for the random-number generator SLA\_RANDOM.
+      }
+      \sstsubsection{
+         OUTARR( EL ) = ? (Returned)
+      }{
+         Output array which has random noise added.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given)
+      }{
+         Global status value.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each of the standard floating-point
+         types.  Replace {\tt "}x{\tt "} in the routine name by D or R as appropriate.
+         The data type of the INARR, SIGMA, and OUTARR must match the
+         particular routine used.
+      }
+   }
+}
+\sstroutine{
    KPG\_NXWRD
 }{
    Finds the next word in a string
@@ -39484,90 +39368,6 @@ ZERO1D  & \multicolumn{2}{l}{KPG1\_FILLx}
    }
    \sstnotes{
       \{routine\_notes\}...
-   }
-}
-\sstroutine{
-   NORMAL
-}{
-   Takes a value and returns a normally distributed noisy
-}{
-   \sstdescription{
-      This routine takes as input a number and returns a number
-      which is the input number plus or minus a random amount
-      of normally distributed noise. Uses a Box-Mueller algorithm
-      to generate a fairly good normal distribution.
-   }
-   \sstinvocation{
-      CALL NORMAL( INVAL, SIGMA, SEED, OUTVAL, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         INVAL  =  REAL( READ )
-      }{
-         Input value to which noise is to be added
-      }
-      \sstsubsection{
-         SIGMA  =  REAL ( READ )
-      }{
-         Standard deviation of  normal distribution
-      }
-      \sstsubsection{
-         SEED  =  REAL ( READ, WRITE )
-      }{
-         Seed for random number generator.
-      }
-      \sstsubsection{
-         OUTVAL  =  REAL ( WRITE )
-      }{
-         Output value which has random noise added
-      }
-      \sstsubsection{
-         STATUS = INTEGER ( READ )
-      }{
-         Global status value
-      }
-   }
-   \sstbugs{
-      None known.
-   }
-}
-\sstroutine{
-   ZERO2D
-}{
-   Sets all elements of a two-dimensional array to zero
-}{
-   \sstdescription{
-      All elements of the two-dimensional array, ARRAY, are set equal to
-      zero. An immediate return will occur if STATUS has an error value
-      on entry.
-   }
-   \sstinvocation{
-      CALL ZERO2D( DIM1, DIM2, ARRAY, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         DIM1 = INTEGER( READ )
-      }{
-         The first dimension of the two-dimensional array to be set to
-         all zeros.
-      }
-      \sstsubsection{
-         DIM2 = INTEGER( READ )
-      }{
-         The second dimension of the two-dimensional array to be set to
-         all zeros.
-      }
-      \sstsubsection{
-         ARRAY( DIM1, DIM2 ) = REAL( UPDATE )
-      }{
-         All elements of this array will be set to zero.
-      }
-      \sstsubsection{
-         STATUS = INTEGER( READ )
-      }{
-         This is the global status, if this variable has an error
-         value on entry then an immediate return will occur.
-      }
    }
 }
 \newpage

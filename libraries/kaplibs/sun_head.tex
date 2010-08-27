@@ -818,25 +818,32 @@ related items to be removed.
       without skewness or kurtosis values to document supply
       VAL\_\_BADD for each undefined statistic.
 \item Replace old IRCAM-specific NXTNAM routine with the more-general
-      KPG\_ISEQN.  This increments trailing sequence numbers in
-      strings, most often used to generate a series of filenames.
+      and new KPG\_ISEQN.  This increments trailing sequence numbers
+      in strings, most often used to generate a series of filenames.
 \item DIMLST has been renamed KPG\_DIMLS.
+\item There is a new routine KPG\_NORVx to replace the old NORMAL.  It
+      has the benefits of being generic and can operate on an array.
 \item A number of long-deprecated old routines without a package prefix
       have been removed.  These are listed below.  The corresponding 
       replacement routines appear in the right column.
 
 \begin{tabular}{lcc}
-COPYAx  & \multicolumn{2}{l}{VEC\_xTOx or KPG1\_COPY} \\
+CHVALx  & \multicolumn{2}{l}{KPG1\_CHVAx} \\
+COPAx   & \multicolumn{2}{l}{VEC\_xTOx or KPG1\_COPY} \\
 COPY1D  & {\tt "}   & {\tt "}  \\
 COPY2D  & {\tt "}   & {\tt "}  \\
 COPY3D  & {\tt "}   & {\tt "}  \\
+CPSECR  & \multicolumn{2}{l}{KPG1\_CPNDx} \\
 CREOUT  & \multicolumn{2}{l}{NDF\_CREP and NDF\_CPUT} \\
+ELNMBx  & \multicolumn{2}{l}{KPG1\_ELNMx} \\
 EXPARR  & \multicolumn{2}{l}{KPG1\_EXPOx} \\
 INSET   & \multicolumn{2}{l}{CHR\_INSET} \\
 LOGARR  & \multicolumn{2}{l}{KPG1\_LOGAx} \\
+NORMAL  & \multicolumn{2}{l}{KPG\_NORVx} \\
 NXTNAM  & \multicolumn{2}{l}{KPG\_ISEQN} \\
 POWARR  & \multicolumn{2}{l}{KPG1\_POWx} \\
-ZERO1D  & \multicolumn{2}{l}{KPG1\_FILLx}
+ZERO1D  & \multicolumn{2}{l}{KPG1\_FILLx} \\
+ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx}
 \end{tabular}
 \end{itemize}
 
