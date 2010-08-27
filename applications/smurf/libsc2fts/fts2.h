@@ -53,12 +53,36 @@
 *-
 */
 
-// SMURF includes
+/* STARLINK INCLUDES */
+#include "jcmt/state.h" 
+#include "sc2da/sc2ast.h"
+
+/* SMURF INCLUDES */
 #include "fts2_type.h"
 #include "libsmf/smf_typ.h"
 
 #ifndef PI
 #define PI 3.14159265358979323
+#endif
+
+#ifndef PIBY2
+#define PIBY2 (0.5 * PI)
+#endif 
+
+#ifndef DBL_MIN
+#define DBL_MIN -1.0e308
+#endif
+
+#ifndef DBL_MAX
+#define DBL_MAX -DBL_MIN
+#endif
+
+#ifndef MM2RAD /* scale at array in radians */
+#define MM2RAD (0.92*2.4945e-5) 
+#endif
+
+#ifndef PIX2MM /* pixel interval in mm */
+#define PIX2MM 1.135                   
 #endif
 
 #ifndef DEGLITCH_THRESHOLD
@@ -69,12 +93,8 @@
 #define SMF__FLAT_THRESHOLD 1.0e-10
 #endif
 
-#ifndef DBL_MIN
-#define DBL_MIN -1.0e308
-#endif
-
-#ifndef DBL_MAX
-#define DBL_MAX -DBL_MIN
+#ifndef FTS2AST_SPD
+#define FTS2AST_SPD 86400.0  /* Seconds per day */
 #endif
 
 void fts2_arraycopy( 
@@ -124,6 +144,32 @@ double* fts2_polyfitarray(
     double* coeffs, /* Coefficients, pre-computed with fts2_polyfitcoeffs() */
     double* x,      /* The array of which the fit is seeked */
     int size);      /* Size of array */
+    
+
+void fts2ast_createwcs
+(
+    sc2ast_subarray_t subnum, /* subarray number, 0-7 (given). If SC2AST__NULLSUB is
+                              *  supplied the cached AST objects will be freed. */
+    const JCMTState *state,   /* Current telescope state (time, pointing etc.) */
+    const double instap[2],   /* Offset of subarray in the focal plane */
+    const double telpos[3],   /* Geodetic W Lon/Lat/Alt of telescope (deg/deg/ign.)*/
+    AstFrameSet **fset,       /* constructed frameset (returned) */
+    int *status               /* global status (given and returned) */
+);
+
+sc2astCache* fts2ast_createwcs2
+(
+    sc2ast_subarray_t subnum, /* subarray number, 0-7 (given). 
+                              *   If SC2AST__NULLSUB is supplied the cached 
+                              *   AST objects will be freed. */
+    const JCMTState *state,   /* Current telescope state (time, pointing etc.) */
+    double dut1,              /* UT1-UTC (seconds) */
+    const double instap[2],   /* Offset of subarray in the focal plane */
+    const double telpos[3],   /* Geodetic W Lon/Lat/Alt of telescope (deg/deg/ign.)*/
+    AstFrameSet **fset,       /* constructed frameset (returned) */
+    sc2astCache *cache,       /* A pointer to a structure holding cached info */
+    int *status               /* global status (given and returned) */
+);
 
 void fts2_deglitch(
     double* interferogram,              /* The interferogram */

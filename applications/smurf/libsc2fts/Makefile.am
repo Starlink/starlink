@@ -18,6 +18,5 @@ C_ROUTINES =  \
 
 noinst_INCLUDES = \
                   fts2.h \
-                  fts2_type.h \
-                  fts2_ast.h
+                  fts2_type.h 
 

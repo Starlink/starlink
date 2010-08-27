@@ -51,25 +51,24 @@
 *     {note_any_bugs_here}
 *-
 */
+
+/* STANDARD INCLUDES */
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
 #include <stdlib.h>
 
+/* STARLINK INCLUDES */
 #include "star/slalib.h"
 #include "sae_par.h"
 #include "ast.h"
 #include "ndf.h"
 #include "sc2da/Ers.h"
 
-#include "fts2_ast.h"
+/* SMURF INCLUDES */
+#include "fts2.h"
 
-static char errmess[132];              /* For DRAMA error messages */
-
-#define MM2RAD (0.92*2.4945e-5)        /* scale at array in radians */
-#define PIBY2 1.57079632679
-#define PI 2*PIBY2
-#define PIX2MM 1.135                   /* pixel interval in mm */
+static char errmess[132];  /* For DRAMA error messages */
 
 void fts2ast_createwcs
 (
