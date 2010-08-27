@@ -123,6 +123,7 @@
 *     Copyright (C) 1990, 1993 Science & Engineering Research Council.
 *     Copyright (C) 1996 Central Laboratory of the Research Councils.
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -157,6 +158,9 @@
 *     2005 September 17 (TIMJ):
 *        - Remake generic routine
 *        - Replace calls to COPAR with calls to VEC_xTOx
+*     2010 August 21 (MJC):
+*        Replace calls: CPSECR with KPG1_CPNDR, and STATV with
+*        KPG1_STATR.
 *     {enter_further_changes_here}
 
 *-
@@ -197,7 +201,9 @@
       INTEGER BX, BY             ! The number of pixels in the x-y
                                  ! directions in the current bin (allows
                                  ! edge effects)
-      CHARACTER * ( 4 ) ESTIM    ! Uppercase version of the estimator
+      DOUBLE PRECISION DMEAN     ! Mean value of the bin values
+      DOUBLE PRECISION DSTDEV    ! Standard deviation of the bin values
+      CHARACTER*4 ESTIM          ! Uppercase version of the estimator
       LOGICAL HITHRS             ! Upper threshold to apply?
       INTEGER I                  ! Loop counter
       INTEGER IERR               ! Error posn for VEC_
@@ -206,16 +212,18 @@
       INTEGER J                  ! Loop counter
       INTEGER K                  ! Loop counter
       INTEGER L                  ! Loop counter
+      INTEGER LBNDI( 2 )         ! Lower bounds of current bin
+      INTEGER LBNDO( 2 )         ! Lower bounds of extracted bin
       LOGICAL LOTHRS             ! Lower threshold to apply?
       INTEGER MAXPCL             ! Index of maximum value after clipping
       INTEGER MAXPOS             ! Index of maximum value
-      REAL MAXMUM                ! Maximum value in bin (not used)
-      REAL MAXCL                 ! Clipped maximum value (not used)
-      REAL MEAN                  ! Mean value of the bin
-      REAL MEANCL                ! Clipped mean value of the bin
+      DOUBLE PRECISION MAXMUM    ! Maximum value in bin (not used)
+      DOUBLE PRECISION MAXCL     ! Clipped maximum value (not used)
+      REAL MEAN                  ! Mean value of the bin (ICMMM)
+      DOUBLE PRECISION MEANCL    ! Clipped mean value of the bin
       REAL MEDIAN                ! Median value of the bin
-      REAL MINMUM                ! Mimimum value in bin (not used)
-      REAL MINCL                 ! Clipped minimum value (not used)
+      DOUBLE PRECISION MINCL     ! Clipped minimum value (not used)
+      DOUBLE PRECISION MINMUM    ! Mimimum value in bin (not used)
       INTEGER MINPCL             ! Index of minimum value after clipping
       INTEGER MINPOS             ! Index of minimum value
       REAL MODE                  ! Mode value of the bin
@@ -225,20 +233,23 @@
       INTEGER NINVAL             ! Number of bad pixels in the bin
       LOGICAL NOSTAT             ! No statistics were obtained due to
                                  ! too few points?
+      INTEGER NPIX               ! Number of good pixels
       INTEGER NPIXCL             ! Number of values used to compute the
                                  ! clipped mean
       INTEGER NPT                ! Number of valid pixels in the bin
-      INTEGER NREPLO             ! Number of pixels below low threshold
       INTEGER NREPHI             ! Number of pixels below high threshold
+      INTEGER NREPLO             ! Number of pixels below low threshold
       INTEGER NSAM               ! Number of values used to compute the
                                  ! median or mode
       LOGICAL ORDERD             ! Mode or median estimator selected?
       REAL SKEW                  ! Skewness of the bin values
       REAL STDDEV                ! Standard deviation of the bin values
-      REAL STDVCL                ! Standard deviation of the bin values
+      DOUBLE PRECISION STDVCL    ! Standard deviation of the bin values
                                  ! after clipping
-      REAL TOTAL                 ! Total value of the bin (not used)
-      REAL TOTCL                 ! Clipped total value (not used)
+      DOUBLE PRECISION TOTAL     ! Total value of the bin (not used)
+      DOUBLE PRECISION TOTCL     ! Clipped total value (not used)
+      INTEGER UBNDI( 2 )         ! Upper bounds of current bin
+      INTEGER UBNDO( 2 )         ! Upper bounds of extracted bin
       INTEGER XMIN, YMIN         ! Pixel numbers of the lower-bound
                                  ! pixel in the current bin
       INTEGER XMAX, YMAX         ! Pixel numbers of the upper-bound
@@ -296,8 +307,17 @@
      :              INT( REAL( BINTOT ) * FRAC ) + 1 ) )
  
 *  Extract the rectangular section of the array.
-            CALL CPSECR( ARRAY, DIM1, DIM2, XMIN, YMIN, XMAX, YMAX,
-     :                   BX, BY, BIN, STATUS )
+            LBNDI( 1 ) = 1
+            LBNDI( 2 ) = 1
+            UBNDI( 1 ) = DIM1
+            UBNDI( 2 ) = DIM2
+            LBNDO( 1 ) = XMIN
+            LBNDO( 2 ) = YMIN
+            UBNDO( 1 ) = XMAX
+            UBNDO( 2 ) = YMAX
+            
+            CALL KPG1_CPNDR( 2, LBNDI, UBNDI, ARRAY, LBNDO, UBNDO, BIN,
+     :                       BINTOT, STATUS )
  
             IF ( STATUS .NE. SAI__OK ) THEN
                CALL MSG_SETI( 'XS', XMIN )
@@ -376,11 +396,12 @@
 *  Obtain the mean and standard deviation before and after clipping.
 *  Note if the number of clips is zero only the unclipped statistics
 *  will be computed.
-               CALL STATV( BIN, BINTOT, NCLIP, CLIP, MAXMUM, MINMUM,
-     :                     TOTAL, MEAN, STDDEV, NINVAL, MAXPOS, MINPOS,
-     :                     MAXCL, MINCL, TOTCL, MEANCL, STDVCL, NPIXCL,
-     :                     MAXPCL, MINPCL, STATUS )
- 
+               CALL KPG1_STATR( .TRUE., BINTOT, BIN, NCLIP, CLIP, NPIX,
+     :                          MINPOS, MINMUM, MAXPOS, MAXMUM, TOTAL,
+     :                          DMEAN, DSTDEV, NPIXCL, MINPCL, MINCL, 
+     :                          MAXPCL, MAXCL, TOTCL, MEANCL, STDVCL,
+     :                          STATUS )
+
 *  Only store the results when there were sufficient points.  Unused
 *  bins are not put in the list.
                NOSTAT = ( ( NPIXCL .LT. NGMIN ) .AND.
@@ -390,11 +411,11 @@
                IF ( STATUS .EQ. SAI__OK .AND. ( .NOT. NOSTAT ) ) THEN
                   NBIN = NBIN + 1
                   IF ( ESTIM .EQ. 'MEAN' ) THEN
-                     Z( NBIN ) = NUM_RTO<T>( MEAN )
-                     W( NBIN ) = NUM_RTO<T>( STDDEV )
+                     Z( NBIN ) = NUM_DTO<T>( DMEAN )
+                     W( NBIN ) = NUM_DTO<T>( DSTDEV )
                   ELSE
-                     Z( NBIN ) = NUM_RTO<T>( MEANCL )
-                     W( NBIN ) = NUM_RTO<T>( STDVCL )
+                     Z( NBIN ) = NUM_DTO<T>( MEANCL )
+                     W( NBIN ) = NUM_DTO<T>( STDVCL )
                   END IF
                END IF
  
