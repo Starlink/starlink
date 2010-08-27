@@ -546,16 +546,16 @@
          IF ( STATUS .NE. SAI__OK ) GO TO 999
    10 CONTINUE
 
-*  Find out which pixel co-ordinate tokens appear in the expression by
-*  attempting to replace each name in turn by itself and seeing if a
+*  Find out which tokens for pixel co-ordinate appear in the expression
+*  by attempting to replace each name in turn by itself and seeing if a
 *  substitution results.
       NPC = 0
       DO 30 I = 1, NDF__MXDIM
          NAME = 'X' // ALPBET( I : I )
          CALL TRN_STOK( NAME, NAME, EXPRS( : NC ), NSUBS, STATUS )
 
-*  If a pixel co-ordinate token appears, count it and put it into the
-*  list of tokens.
+*  If a token for a pixel co-ordinate appears, count it and put it into
+*  the list of tokens.
          IF ( NSUBS .NE. 0 ) THEN
             NPC = NPC + 1
             NINTOT = NINTOT + 1
@@ -564,16 +564,16 @@
          IF ( STATUS .NE. SAI__OK ) GO TO 999
    30 CONTINUE
 
-*  Find out which pixel co-ordinate tokens appear in the expression by
-*  attempting to replace each name in turn by itself and seeing if a
+*  Find out which tokens for data co-ordinate appear in the expression
+*  by attempting to replace each name in turn by itself and seeing if a
 *  substitution results.
       NDC = 0
       DO 40 I = 1, NDF__MXDIM
          NAME = 'C' // ALPBET( I : I )
          CALL TRN_STOK( NAME, NAME, EXPRS( : NC ), NSUBS, STATUS )
 
-*  If a data co-ordinate token appears, count it and put it into the
-*  list of tokens.
+*  If a token for a data co-ordinate appears, count it and put it into
+*  the list of tokens.
          IF ( NSUBS .NE. 0 ) THEN
             NDC = NDC + 1
             NINTOT = NINTOT + 1
