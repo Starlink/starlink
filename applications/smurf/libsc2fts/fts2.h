@@ -85,8 +85,8 @@
 #define PIX2MM 1.135                   
 #endif
 
-#ifndef DEGLITCH_THRESHOLD
-#define DEGLITCH_THRESHOLD 1.0e-30
+#ifndef SMF__DEGLITCH_THRESHOLD
+#define SMF__DEGLITCH_THRESHOLD 1.0e-30
 #endif
 
 #ifndef SMF__FLAT_THRESHOLD
