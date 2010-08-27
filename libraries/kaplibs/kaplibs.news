@@ -30,6 +30,7 @@ Version 3.1
    - Replace old IRCAM-specific NXTNAM routine with the more-general
      KPG_ISEQN.  This increments trailing sequence numbers in
      strings, most often used to generate a series of filenames.
+   - DIMLST has been renamed KPG_DIMLS.
    - A number of long-deprecated old routines without a package prefix
      have been removed.  These are listed below.  The corresponding 
      replacement routines appear in the right column.

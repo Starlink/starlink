@@ -253,12 +253,14 @@
 *  Copyright:
 *     Copyright (C) 1990-1992 Science & Engineering Research Council.
 *     Copyright (C) 1995-1996, 2004 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
-
+*     Councils.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
+*     
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -268,8 +270,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
@@ -295,7 +297,9 @@
 *     1996 November 14 (MJC):
 *        Added a final error report, and improved the documentation.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2010 August 25 (MJC):
+*        Used KPG_DIMLS instead of old DIMLST.
 *     {enter_further_changes_here}
 
 *-
@@ -660,7 +664,7 @@
          END DO
 
 *  Tell user the output array size.
-         CALL DIMLST( NDIMS, ODIMS, NCDIM, DIMSTR, STATUS )
+         CALL KPG_DIMLS( NDIMS, ODIMS, NCDIM, DIMSTR, STATUS )
          CALL MSG_SETC( 'DIMSTR', DIMSTR( 1:NCDIM ) )
          CALL MSG_OUT( 'OUT_DIMS', 'Output array dimensions are '/
      :                 /'^DIMSTR.', STATUS )

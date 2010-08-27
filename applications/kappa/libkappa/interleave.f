@@ -129,12 +129,14 @@
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics & Astronomy Research
-*     Council. All Rights Reserved.
+*     Council.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -144,8 +146,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -162,6 +164,8 @@
 *        avoid non-monotonic axes.
 *     2006 April 12 (MJC):
 *        Remove unused variable.
+*     2010 August 25 (MJC):
+*        Used KPG_DIMLS instead of old DIMLST.
 *     {enter_further_changes_here}
 
 *-
@@ -371,7 +375,7 @@
       END DO
 
 *  Report the new dimensions.
-      CALL DIMLST( NDIM, ODIMS, NCD, DIMSTR, STATUS )
+      CALL KPG_DIMLS( NDIM, ODIMS, NCD, DIMSTR, STATUS )
       CALL MSG_OUTIF( MSG__VERB, 'OUTPUT_DIMS', ' The output NDF will '/
      :  /'have ' // DIMSTR( :NCD ) // ' pixels.', STATUS )
 

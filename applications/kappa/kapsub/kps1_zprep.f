@@ -68,12 +68,13 @@
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
 *     Copyright (C) 1995 Central Laboratory of the Research Councils.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -83,8 +84,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -96,6 +97,8 @@
 *     1995 April 26 (MJC):
 *        Corrected the Purpose, and used modern-style commenting and
 *        variable declarations.
+*     2010 August 25 (MJC):
+*        Used KPG_DIMLS instead of old DIMLST.
 *     {enter_further_changes_here}
 
 *-
@@ -130,9 +133,9 @@
 
 *  Report what is going on by converting the lower and upper bounds to
 *  of the region to strings in (x,y) notation.
-         CALL DIMLST( 2, ZLBND, NC, DIMSTR, STATUS )
+         CALL KPG_DIMLS( 2, ZLBND, NC, DIMSTR, STATUS )
          CALL MSG_SETC( 'START', DIMSTR )
-         CALL DIMLST( 2, ZUBND, NC, DIMSTR, STATUS )
+         CALL KPG_DIMLS( 2, ZUBND, NC, DIMSTR, STATUS )
          CALL MSG_SETC( 'FINISH', DIMSTR )
          CALL MSG_OUT( 'REGION_LIMITS', 'Zapping region '/
      :     /'^START to ^FINISH.', STATUS )

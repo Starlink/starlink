@@ -134,7 +134,6 @@ KPG_NXB_GEN = kpg1_axli.gnxb
 # Non-adam non-graphic
 KPG_NONGEN = \
 cpsecr.f \
-dimlst.f \
 icmmm.f \
 kpg_env0c.f \
 kpg1_abset.f \
@@ -183,6 +182,7 @@ kpg1_danot.f \
 kpg1_datcp.f \
 kpg1_dauni.f \
 kpg1_debug.f \
+kpg_dimls.f \
 kpg1_dnag2r.f \
 kpg1_dr2nag.f \
 kpg1_dsfr1.f \

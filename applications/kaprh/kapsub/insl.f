@@ -932,17 +932,17 @@
 *             region to strings.
 
                CALL ERR_MARK
-               CALL DIMLST( 2, FLIMIT, NCHLIM, DIMSTR, STATUS )
+               CALL KPG_DIMLS( 2, FLIMIT, NCHLIM, DIMSTR, STATUS )
                IF ( STATUS .EQ. SAI__OK ) THEN
                   PTITLE = PLTITL( :10 )//': '/
      :                     /DIMSTR( :NCHLIM )//' to '
                   NCHAR = 16 + NCHLIM
-                  CALL DIMLST( 2, LLIMIT, NCHLIM, DIMSTR, STATUS )
+                  CALL KPG_DIMLS( 2, LLIMIT, NCHLIM, DIMSTR, STATUS )
                   IF ( STATUS .EQ. SAI__OK ) THEN
                      CALL CHR_APPND( DIMSTR( :NCHLIM ), PTITLE, NCHAR )
                   END IF
 
-*                Ignore any error from DIMLST.
+*                Ignore any error from KPG_DIMLS.
 
                   IF ( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
                END IF

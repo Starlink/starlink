@@ -37,6 +37,7 @@
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
 *     Copyright (C) 2004 Central Laboratory of the Research Councils.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -64,8 +65,10 @@
 *     1991 April 15 (MJC):
 *        Original version.
 *     2004 September 1 (TIMJ):
-*        Use CNF_PVAL
-*     {enter_changes_here}
+*        Use CNF_PVAL.
+*     2010 August 26 (MJC):
+*        Call KPG_DIMLS instead of DIMLST.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -159,7 +162,7 @@
 
 *       Construct the token containing the dimensions.
 
-         CALL DIMLST( NDIM, LDIMS, NCDIM, DIMSTR, STATUS )
+         CALL KPG_DIMLS( NDIM, LDIMS, NCDIM, DIMSTR, STATUS )
          CALL MSG_SETC( 'DIMSTR', DIMSTR( 1:NCDIM ) )
 
 *       Report the error.

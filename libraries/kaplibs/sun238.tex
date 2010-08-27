@@ -820,6 +820,7 @@ related items to be removed.
 \item Replace old IRCAM-specific NXTNAM routine with the more-general
       KPG\_ISEQN.  This increments trailing sequence numbers in
       strings, most often used to generate a series of filenames.
+\item DIMLST has been renamed KPG\_DIMLS.
 \item A number of long-deprecated old routines without a package prefix
       have been removed.  These are listed below.  The corresponding 
       replacement routines appear in the right column.
@@ -13469,49 +13470,6 @@ ZERO1D  & \multicolumn{2}{l}{KPG1\_FILLx}
          STATUS = INTEGER( READ )
       }{
          The status value on entry to this routine.
-      }
-   }
-}
-\sstroutine{
-   DIMLST
-}{
-   Writes the dimensions of an array in a shorthand form
-}{
-   \sstdescription{
-      Returns a character variable containing the dimensions of
-      an array separated by commas and bounded by parentheses,
-      unless there is only one dimension when no parentheses and
-      comma are included. This enables the calling routine to require
-      only one message call.
-   }
-   \sstinvocation{
-      CALL DIMLST( NDIMS, DIMS, NCHDIM, DIMSTR, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         NDIMS  =  INTEGER( READ )
-      }{
-         Number of dimensions of array
-      }
-      \sstsubsection{
-         DIMS ( NDIMS )  =  INTEGER( READ )
-      }{
-         Dimensions of the array
-      }
-      \sstsubsection{
-         NCHDIM  =  INTEGER( WRITE )
-      }{
-         Number of characters in DIMSTR less trailing blanks
-      }
-      \sstsubsection{
-         DIMSTR  =  CHARACTER$*$($*$)( WRITE )
-      }{
-         Character string of dimension list enclosed in parentheses
-      }
-      \sstsubsection{
-         STATUS  = INTEGER( READ, WRITE )
-      }{
-         Global status value
       }
    }
 }
@@ -38940,6 +38898,52 @@ ZERO1D  & \multicolumn{2}{l}{KPG1\_FILLx}
          progresses through each position in the current dimension a new
          section is incorporated into the summations, while a section
          leaving the box is subtracted.
+      }
+   }
+}
+\sstroutine{
+   KPG\_DIMLS
+}{
+   Writes the dimensions of an array in standard notation
+}{
+   \sstdescription{
+      This routine returns a character variable containing the
+      dimensions of an array in the usual notation, that is the
+      dimensions separated by commas and bounded by parentheses.
+      There is an exception; if there is only one dimension, no
+      parentheses and comma are included.  This enables calling
+      code to report the dimensions of an array using only one
+      message call.
+   }
+   \sstinvocation{
+      CALL KPG\_DIMLS( NDIMS, DIMS, NCHDIM, DIMSTR, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NDIMS = INTEGER (Given)
+      }{
+         Number of dimensions of the array.
+      }
+      \sstsubsection{
+         DIMS( NDIMS ) = INTEGER (Given)
+      }{
+         The dimensions of the array.
+      }
+      \sstsubsection{
+         NCHDIM  =  INTEGER (Write)
+      }{
+         The number of characters in DIMSTR, excluding trailing blanks.
+      }
+      \sstsubsection{
+         DIMSTR  =  CHARACTER$*$($*$) (Write)
+      }{
+         A character string containing the dimension list enclosed in
+         parentheses.
+      }
+      \sstsubsection{
+         STATUS  = INTEGER (Given)
+      }{
+         Global status value.
       }
    }
 }

@@ -160,12 +160,14 @@
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council.
 *     Copyright (C) 1995, 1999-2000, 2004 Central Laboratory of the
-*     Research Councils. All Rights Reserved.
+*     Research Councils. 
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -175,8 +177,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     SMB: Steven M Beard (ROE)
@@ -207,9 +209,11 @@
 *        non-scalars. Also changed DAT_PUTVL to DAT_PUTVC in the same case.
 *        Also removed references to unused parameter RVALUE.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
 *     30-SEP-2004 (PWD):
 *        Moved CNF_PAR to declaration section.
+*     2010 August 25 (MJC):
+*        Used KPG_DIMLS instead of old DIMLST.
 *     {enter_further_changes_here}
 
 *-
@@ -612,7 +616,7 @@
                   CALL DAT_SHAPE( CLOC, DAT__MXDIM, DIMS, NDIM, STATUS )
 
 *  Create a string of the dimensions.
-                  CALL DIMLST( NDIM, DIMS, CPOS, LINE, STATUS )
+                  CALL KPG_DIMLS( NDIM, DIMS, CPOS, LINE, STATUS )
 
 *  Just put the name, type and dimensions on a line.
                   CALL MSG_SETC( 'TCNAME', CNAME )
