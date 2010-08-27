@@ -111,30 +111,25 @@ void smurf_fts2_removebse(int* status)
   int bseWidth      = 0;  
   int srcSubarray   = 0;
   int srcWidth      = 0; 
-  int srcHeight     = 0; 
-  
+  int srcHeight     = 0;   
+  double* bseCube   = NULL;
+  double* bseX      = NULL;
+  double* srcCube   = NULL;
+  double* srcX      = NULL;  
+  double* bseIFG    = NULL;
+  double* bseIFGNew = NULL;  
   Grp* bsegrp       = NULL;
   Grp* igrp         = NULL;
   Grp* ogrp         = NULL; 
   size_t outsize    = 0;
   size_t size       = 0;
-  size_t count      = 0;
-  
-  double* bseCube   = NULL;
-  double* bseX      = NULL;
-  double* srcCube   = NULL;
-  double* srcX      = NULL;
-  
-  double* bseIFG    = NULL;
-  double* bseIFGNew = NULL;
-  FTSMode srcMode   = UNKNOWN;
-  FTSMode bseMode   = UNKNOWN;
-  
+  size_t count      = 0;  
   smfData* bseData  = NULL;
-  smfData* srcData  = NULL;
-  
+  smfData* srcData  = NULL;  
   HDSLoc* hdsLoc    = NULL;
-  HDSLoc* hdsLocPosition = NULL;
+  HDSLoc* hdsLocPosition = NULL;  
+  smf_fts2scanmode srcMode   = SMF__FTS2_SCANMODE_UNKNOWN;
+  smf_fts2scanmode bseMode   = SMF__FTS2_SCANMODE_UNKNOWN;
   
   float* tmp        = NULL;  
   char ftsMode[SZFITSCARD+1];
@@ -172,8 +167,8 @@ void smurf_fts2_removebse(int* status)
 
   /* GET FTS-2 SCAN MODE */
   smf_fits_getS(bseData->hdr, "FTS_MODE", ftsMode, sizeof(ftsMode), status);
-  if(strncmp(ftsMode, "FSCAN", 5) == 0 ) { bseMode = FSCAN; }
-  if(bseMode != FSCAN)
+  if(strncmp(ftsMode, "FSCAN", 5) == 0 ) { bseMode = SMF__FTS2_SCANMODE_FSCAN; }
+  if(bseMode != SMF__FTS2_SCANMODE_FSCAN)
   {
     *status = SAI__ERROR;
     errRep(FUNC_NAME, "Invalid FTS-2 scan mode in BSE data!", status);
@@ -243,8 +238,8 @@ void smurf_fts2_removebse(int* status)
 
     /* GET FTS-2 SCAN MODE */
     smf_fits_getS(srcData->hdr, "FTS_MODE", ftsMode, sizeof(ftsMode), status);
-    if(strncmp(ftsMode, "FSCAN", 5) == 0 ) { srcMode = FSCAN; }
-    if(srcMode != FSCAN)
+    if(strncmp(ftsMode, "FSCAN", 5) == 0 ) { srcMode = SMF__FTS2_SCANMODE_FSCAN; }
+    if(srcMode != SMF__FTS2_SCANMODE_FSCAN)
     {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Invalid FTS-2 scan mode in source data!", status);

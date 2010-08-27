@@ -30,6 +30,8 @@
 *        Move subarray definitions to sc2ast
 *     2010-08-26 (COBA):
 *        Add smf_deglitchmode
+*     2010-08-27 (COBA):
+*        Rename scan mode enum
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -56,18 +58,12 @@
 *-
 */
 
-/*
- * Boolean
- */
-
-typedef int bool;
-
-typedef enum SMF__FTS_Mode
+typedef enum smf_fts2scanmode
 {
-  UNKNOWN = -1, // Undefined or Unknown
-  FSCAN = 0,    // Fast Scan
-  STEPINT = 1   // Step-and-Integrate
-} FTSMode;
+  SMF__FTS2_SCANMODE_UNKNOWN = -1, // Undefined or Unknown
+  SMF__FTS2_SCANMODE_FSCAN = 0,    // Fast Scan
+  SMF__FTS2_SCANMODE_STEPINT = 1   // Step-and-Integrate
+} smf_fts2scanmode;
 
 typedef enum smf_deglitchmode
 {
