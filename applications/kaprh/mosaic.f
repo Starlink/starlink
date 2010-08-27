@@ -490,12 +490,12 @@
             IF ( STATUS .EQ. SAI__OK ) THEN
 
 *             set all the pixels of both the output array and the array
-*             mask to be zero using ZERO2D
+*             mask to be zero
 
-               CALL ZERO2D( ODIMS( 1 ), ODIMS( 2 ), %VAL( PNTRO ),
-     :                      STATUS )
-               CALL ZERO2D( ODIMS( 1 ), ODIMS( 2 ), %VAL( PNTRT ),
-     :                      STATUS )
+               CALL KPG1_FILLR( 0.0, ODIMS( 1 ) * ODIMS( 2 ),
+     :                          %VAL( PNTRO ), STATUS )
+               CALL KPG1_FILLR( 0.0, ODIMS( 1 ) * ODIMS( 2 ),
+     :                          %VAL( PNTRT ), STATUS )
 
                IF ( STATUS .EQ. SAI__OK ) THEN
 

@@ -381,7 +381,8 @@
      :  NDFO,                   ! NDF identifier for output histogram
      :  NERR,                   ! Number of of conversion errors
                                 ! copying the slice to the output NDF
-     :  NPTS                    ! Number of points in slice data
+     :  NPTS,                   ! Number of points in slice data
+     :  NREP                    ! Number of replacements
 
       INTEGER
      :  SCPNTR,                 ! pointer to the sub-array of data
@@ -971,7 +972,7 @@
 
 *             Create the array of pixel numbers
 
-               CALL ELNMBR( 1, NPTS, NPTS, %VAL( SLPTR1 ), STATUS )
+               CALL KPG1_ELNMR( 1, NPTS, NPTS, %VAL( SLPTR1 ), STATUS )
 
                IF ( STATUS .NE. SAI__OK ) THEN
                   CALL ERR_REP( 'INSL_PIXARR',
@@ -1033,13 +1034,12 @@
 
 *          Substitute the graphics package's null value for any bad
 *          pixels.
-
             IF ( YLOG ) THEN
-               CALL CHVALR( NPTS, %VAL( SNPNTR ), VAL__BADR,
-     :                      NULL, %VAL( SCPNTR ), STATUS )
+               CALL KPG1_CHVAR( NPTS, %VAL( SNPNTR ), VAL__BADR, NULL,
+     :                          %VAL( SCPNTR ), NREP, STATUS )
             ELSE
-               CALL CHVALR( NPTS, %VAL( LIPNTR ), VAL__BADR, NULL,
-     :                      %VAL( SCPNTR ), STATUS )
+               CALL KPG1_CHVAR( NPTS, %VAL( LIPNTR ), VAL__BADR, NULL,
+     :                          %VAL( SCPNTR ), NREP, STATUS )
             END IF
 
 *          Plot the slice.

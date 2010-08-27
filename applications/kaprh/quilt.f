@@ -388,10 +388,10 @@
 
 *                      Zero the output image and workspace
 
-                        CALL ZERO2D( ODIMS( 1 ), ODIMS( 2 ),
-     :                               %VAL( PNTRO ), STATUS )
-                        CALL ZERO2D( ODIMS( 1 ), ODIMS( 2 ),
-     :                               %VAL( PNTRW ), STATUS )
+                        CALL KPG1_FILLR( 0.0, ODIMS( 1 ) * ODIMS( 2 ),
+     :                                   %VAL( PNTRO ), STATUS )
+                        CALL KPG1_FILLR( 0.0, ODIMS( 1 ) * ODIMS( 2 ),
+     :                                   %VAL( PNTRW ), STATUS )
 
 *                      Redefine offsets of central data array to be with
 *                      respect to the lower left corner of the output

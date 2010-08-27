@@ -1113,7 +1113,8 @@
 *           indices.  Omit the reserved pens.  Note this is may not be
 *           the usual number.
 
-             CALL ELNMBI( LP, NINTS-1, ANINTS, %VAL( RAMPTR ), STATUS )
+             CALL KPG1_ELNMI( LP, NINTS-1, ANINTS, %VAL( RAMPTR ),
+     :                        STATUS )
 
          ELSE
 

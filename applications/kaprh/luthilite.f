@@ -938,8 +938,8 @@
 *       Fill the array with element numbers less one to give colour
 *       indices.  Omit the reserved pens.
 
-         CALL ELNMBI( NRESP, NINTS( 1 ) - 1, NLUTE, %VAL( CTPTR ),
-     :                STATUS )
+         CALL KPG1_ELNMI( NRESP, NINTS( 1 ) - 1, NLUTE, %VAL( CTPTR ),
+     :                    STATUS )
 
 *       Draw the colour-table display.
 *       ==============================
