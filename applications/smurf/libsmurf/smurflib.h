@@ -71,6 +71,8 @@
 *     2010-07-19 (COBA):
 #         Add FTS2_FLATFIELD, FTS2_FREQCORR, FTS2_PORTIMBAL, 
 #             FTS2_REMOVEBSE, FTS2_SPATIALWCS, FTS2_TRANSCORR
+*     2010-08-27 (COBA):
+#         Remove smurf_sc2fts( int * )
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -132,7 +134,6 @@ void smurf_sc2clean( int * );
 void smurf_sc2concat( int * );
 void smurf_sc2expandmodel( int * );
 void smurf_sc2fft( int * );
-void smurf_sc2fts( int * );
 void smurf_sc2sim( int * );
 void smurf_sc2threadtest( int * );
 void smurf_skynoise( int * );

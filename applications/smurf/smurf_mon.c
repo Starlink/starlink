@@ -303,8 +303,6 @@ void smurf_mon( int * status ) {
     smurf_sc2expandmodel( status );
   } else if (strcmp( taskname, "SC2FFT" ) == 0 ) {
     smurf_sc2fft( status );
-  } else if (strcmp( taskname, "SC2FTS" ) == 0 ) {
-    smurf_sc2fts( status );
   } else if (strcmp( taskname, "SC2SIM" ) == 0 ) {
     smurf_sc2sim( status );
   } else if (strcmp( taskname, "SC2THREADTEST" ) == 0 ) {

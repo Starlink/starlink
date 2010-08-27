@@ -36,7 +36,6 @@ smurf_sc2clean.c \
 smurf_sc2concat.c \
 smurf_sc2expandmodel.c \
 smurf_sc2fft.c \
-smurf_sc2fts.c \
 smurf_sc2sim.c \
 smurf_sc2threadtest.c \
 smurf_skynoise.c \

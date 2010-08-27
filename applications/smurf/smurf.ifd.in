@@ -3019,39 +3019,6 @@ package @PACKAGE@ {
 
         }
 
-        action sc2fts {
-            helplib {$SMURF_HELP}
-
-            parameter in {
-                position 1
-                type NDF
-                access READ
-                vpath {PROMPT }
-                ppath GLOBAL CURRENT
-                prompt {Input data files}
-                helpkey *
-            }
-
-            parameter out {
-                position 2
-                type NDF
-                access WRITE
-                vpath {PROMPT }
-                ppath GLOBAL CURRENT
-                prompt {Output data file}
-                helpkey *
-            }
-
-            parameter parslist {
-                position 3
-                type _CHAR
-                vpath {PROMPT }
-                prompt {Parameter list: eg. op1.key1=value1, op2.key2=value2, ...}
-                helpkey *
-            }
-
-        }
-
         action sc2sim {
 
             helplib {$SMURF_HELP}

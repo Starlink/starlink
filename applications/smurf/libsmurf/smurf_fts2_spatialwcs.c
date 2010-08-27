@@ -94,7 +94,6 @@
 #include "libsmf/smf_err.h"
 #include "sc2da/sc2store.h"
 #include "libsc2fts/fts2.h"
-#include "libsc2fts/fts2_ast.h"
 
 #define FUNC_NAME "smurf_fts2_spatialwcs"
 #define TASK_NAME "FTS2_SPATIALWCS"
