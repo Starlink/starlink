@@ -263,6 +263,7 @@ ld2ar.f
 # All ADAM routines (parameter access)
 
 KPG_ADAM_NONGEN = \
+creout.f \
 kpg1_alsys.f \
 kpg1_arcog.f \
 kpg1_asfgt.f \
