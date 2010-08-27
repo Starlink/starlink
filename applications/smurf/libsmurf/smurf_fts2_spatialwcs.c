@@ -40,6 +40,8 @@
 *  History :
 *     15-JUL-2010 (COBA):
 *        Original version.
+*     27-AUG-2010 (COBA):
+*        Removed older utility method calls.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -70,10 +72,11 @@
 #include <config.h>
 #endif
 
+/* STANDARD INCLUDES */
 #include <string.h>
 #include <stdio.h>
 
-// STARLINK includes
+/* STARLINK INCLUDES */
 #include "ast.h"
 #include "star/ndg.h"
 #include "star/grp.h"
@@ -84,7 +87,7 @@
 #include "msg_par.h"
 #include "par_err.h"
 
-// SMURF includes
+/* SMURF INCLUDES */
 #include "smurf_par.h"
 #include "libsmf/smf.h"
 #include "smurflib.h"
@@ -98,26 +101,44 @@
 
 void smurf_fts2_spatialwcs(int *status) 
 {
-  // Requirement SUN/104: Do nothing if status is NOT SAI__OK
-  if( *status != SAI__OK ) return;
+  int fIndex                  = 0;
+  double refra                = 0.0;
+  double refdec               = 0.0;
+  double wnFactor             = 0.0;
+  size_t outsize              = 0;
+  size_t size                 = 0;  
+  sc2ast_subarray_t subnum    = 0;  
+  AstCmpFrame* currentfrm3d   = NULL;  
+  AstCmpMap* speccubemapping  = NULL;
+  AstFrame* basefrm3d         = NULL;
+  AstFrameSet* gridfset       = NULL;
+  AstFrameSet* speccubewcs    = NULL;
+  AstMapping* gridmapping     = NULL;
+  AstSkyFrame* gridframe      = NULL;
+  AstSpecFrame* specframe     = NULL;
+  AstZoomMap* specmapping     = NULL;
+  Grp* igrp                   = NULL;
+  Grp* ogrp                   = NULL;  
+  HDSLoc* hdsLoc              = NULL;
+  HDSLoc* hdsLocFactor        = NULL;
+  smfData* srcData            = NULL;    
+  
+  if( *status != SAI__OK ) 
+  {
+    return;
+  }
 
-  // Get input group
-  Grp* igrp = NULL;
-  size_t size;
+  /* Get input group */
   kpg1Rgndf("IN", 0, 1, "", &igrp, &size, status); 
-
-  // Get output group
-  Grp* ogrp = NULL; 
-  size_t outsize;
+  /* Get output group */
   kpg1Wgndf("OUT", ogrp, size, size, "Equal number of input and output files expected!", &ogrp, &outsize, status);
 
   ndfBegin();
 
-  // CORRECT FOR IMAGE DISTORTION & FIELD ROTATION FOR EACH FILE
-  for(int fIndex = 1; fIndex <= size; fIndex++) 
+  /* CORRECT FOR IMAGE DISTORTION & FIELD ROTATION FOR EACH FILE */
+  for(fIndex = 1; fIndex <= size; fIndex++) 
   {
-    // OPEN SOURCE
-    smfData* srcData;
+    /* OPEN SOURCE */
     smf_open_file(ogrp, fIndex, "UPDATE", SMF__NOCREATE_QUALITY, &srcData, status);
     if(*status != SAI__OK)
     {
@@ -125,7 +146,13 @@ void smurf_fts2_spatialwcs(int *status)
       break;
     }
 
-    double wnFactor = fts2_getWaveNumberFactor(srcData, status);
+    /* GET WN_FCATOR */
+    hdsLoc = smf_get_xloc(srcData, "FTS2DR", "EXT", "READ", 0, 0, status);
+    datFind(hdsLoc, "FTS_WN_FACTOR", &hdsLocFactor, status);
+    datGet0D(hdsLocFactor, &wnFactor, status);
+    /* FREE RESOURCES */
+    datAnnul(&hdsLocFactor, status);
+    datAnnul(&hdsLoc, status);  
     if(*status != SAI__OK)
     {
       errRep(FUNC_NAME, "Unable to obtain the wave number factor!", status);
@@ -135,11 +162,9 @@ void smurf_fts2_spatialwcs(int *status)
 
     astBegin;
 
-    // Create a 2-D WCS
-    sc2ast_subarray_t subnum;
+    /* Create a 2-D WCS */
     smf_find_subarray(srcData->hdr, NULL, 0, &subnum, status);
 
-    AstFrameSet* gridfset = NULL;
     if(subnum == S8C || subnum == S8D || subnum == S4A || subnum == S4B)
     {
       fts2ast_createwcs(subnum, srcData->hdr->state, srcData->hdr->instap, srcData->hdr->telpos, &gridfset, status);
@@ -149,14 +174,15 @@ void smurf_fts2_spatialwcs(int *status)
       sc2ast_createwcs(subnum, srcData->hdr->state, srcData->hdr->instap, srcData->hdr->telpos, &gridfset, status);
     }
 
-    // Get frame of 2-D grid WCS, get mapping of 2-D grid WCS
-    // and create a 1-D spectrum frame
-    AstSkyFrame* gridframe = astGetFrame(gridfset, AST__CURRENT);
-    AstMapping* gridmapping = astGetMapping(gridfset, AST__BASE, AST__CURRENT);
-    AstSpecFrame* specframe = astSpecFrame("System=wavenum,Unit=1/mm,StdOfRest=Topocentric");
+    /*
+    * Get frame of 2-D grid WCS, get mapping of 2-D grid WCS
+    * and create a 1-D spectrum frame
+    */
+    gridframe = astGetFrame(gridfset, AST__CURRENT);
+    gridmapping = astGetMapping(gridfset, AST__BASE, AST__CURRENT);
+    specframe = astSpecFrame("System=wavenum,Unit=1/mm,StdOfRest=Topocentric");
 
-    // If gridframe is SkyFrame, set attribute: RefRA, RefDec
-    double refra, refdec;
+    /* If gridframe is SkyFrame, set attribute: RefRA, RefDec */
     if(astIsASkyFrame(gridframe))
     {
       if(astTest( gridframe, "SkyRef"))
@@ -167,16 +193,18 @@ void smurf_fts2_spatialwcs(int *status)
       }
     }
 
-    // Create ZoomMap for 1-D spectrum
-    // Combine 2-D grid mapping and 1-D spectrum mapping to create 3-D mapping for spectrum cube
-    // Create Base Frame for 3-D spectrum cube
-    // Create Current Frame for 3-D spectrum cube
-    AstZoomMap* specmapping = astZoomMap(1, wnFactor, "");
-    AstCmpMap* speccubemapping = astCmpMap(gridmapping, specmapping, 0, "");
-    AstFrame* basefrm3d = astFrame(3, "DOMAIN=GRID");
-    AstCmpFrame* currentfrm3d = astCmpFrame(gridframe, specframe, "");
+    /* 
+    * Create ZoomMap for 1-D spectrum
+    * Combine 2-D grid mapping and 1-D spectrum mapping to create 3-D mapping for spectrum cube
+    * Create Base Frame for 3-D spectrum cube
+    * Create Current Frame for 3-D spectrum cube
+    */
+    specmapping = astZoomMap(1, wnFactor, "");
+    speccubemapping = astCmpMap(gridmapping, specmapping, 0, "");
+    basefrm3d = astFrame(3, "DOMAIN=GRID");
+    currentfrm3d = astCmpFrame(gridframe, specframe, "");
 
-    // Set attributes: Epoch, ObsLon, ObsLat
+    /* Set attributes: Epoch, ObsLon, ObsLat */
     if(astTest(gridframe, "Epoch"))
     {
       astSetD(currentfrm3d, "Epoch", astGetD(gridframe, "Epoch"));
@@ -190,16 +218,16 @@ void smurf_fts2_spatialwcs(int *status)
       astSetD(currentfrm3d, "ObsLat", astGetD( gridframe, "ObsLat"));
     }
 
-    // Create WCS for 3-D spectrum cube
-    AstFrameSet* speccubewcs = astFrameSet(basefrm3d, "");
+    /* Create WCS for 3-D spectrum cube */
+    speccubewcs = astFrameSet(basefrm3d, "");
     astAddFrame(speccubewcs, AST__BASE, speccubemapping, currentfrm3d);
 
-    // Write WCS into the NDF file
+    /* Write WCS into the NDF file */
     ndfPtwcs(speccubewcs, srcData->file->ndfid, status);
 
     astEnd;
 
-    // FREE RESOURCES
+    /* FREE RESOURCES */
     smf_close_file(&srcData, status);
   }
   ndfEnd(status);

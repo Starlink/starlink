@@ -108,6 +108,6 @@
 void smurf_sc2fts ( int *status ) {
 
   /* enter the FTS-2 smurf data reduction */
-  sc2fts_entry( status );
+  // sc2fts_entry( status );
 
 }

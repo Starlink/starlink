@@ -69,10 +69,11 @@
 #include <config.h>
 #endif
 
+/* STANDARD INCLUDES */
 #include <string.h>
 #include <stdio.h>
 
-// STARLINK includes
+/* STARLINK INCLUDES */
 #include "ast.h"
 #include "star/ndg.h"
 #include "star/grp.h"
@@ -83,7 +84,7 @@
 #include "msg_par.h"
 #include "par_err.h"
 
-// SMURF includes
+/* SMURF INCLUDES */
 #include "smurf_par.h"
 #include "libsmf/smf.h"
 #include "smurflib.h"
@@ -96,26 +97,45 @@
 
 void smurf_fts2_freqcorr(int *status) 
 {
-  // Requirement SUN/104: Do nothing if status is NOT SAI__OK
-  if( *status != SAI__OK ) return;
+  int fIndex      = 0;
+  int i           = 0;
+  int index       = 0;
+  int j           = 0;
+  int k           = 0;
+  int pixelCount  = 0;
+  int pixelIndex  = 0;
+  int srcWidth    = 0; 
+  int srcHeight   = 0;   
+  int srcN        = 0;
+  int thetaHeight = 0;   
+  int thetaWidth  = 0; 
+  double* ifg     = NULL;
+  double* ifgNew  = NULL;  
+  double* src     = NULL;
+  double* theta   = NULL;  
+  double* wn      = NULL;
+  double* wnNew   = NULL;  
+  Grp* igrp       = NULL;
+  Grp* ogrp       = NULL; 
+  Grp* thetagrp   = NULL;
+  size_t size     = 0;
+  size_t outsize  = 0;
+  
+  if( *status != SAI__OK ) 
+  {
+    return;
+  }
 
-  // Get input group
-  Grp* igrp = NULL;
-  size_t size;
+  /* Get input group */
   kpg1Rgndf("IN", 0, 1, "", &igrp, &size, status); 
-
-  // Get output group
-  Grp* ogrp = NULL; 
-  size_t outsize;
+  /* Get output group */
   kpg1Wgndf("OUT", ogrp, size, size, "Equal number of input and output files expected!", &ogrp, &outsize, status);
-
-  // Get THETA group
-  Grp* thetagrp = NULL;
+  /* Get THETA group */
   kpg1Gtgrp("THETA", &thetagrp, &size, status);
 
   ndfBegin();
 
-  // OPEN THETA
+  /* OPEN THETA */
   smfData* thetaData;
   smf_open_file(thetagrp, 1, "READ", SMF__NOCREATE_QUALITY, &thetaData, status);
   if(*status != SAI__OK)
@@ -123,14 +143,14 @@ void smurf_fts2_freqcorr(int *status)
     errRep(FUNC_NAME, "Unable to open the THETA file!", status);
     return;
   }
-  double* theta = (double*) (thetaData->pntr[0]);
-  int thetaWidth = thetaData->dims[0]; 
-  int thetaHeight = thetaData->dims[1]; 
+  theta = (double*) (thetaData->pntr[0]);
+  thetaWidth = thetaData->dims[0]; 
+  thetaHeight = thetaData->dims[1]; 
 
-  // PERFORM FREQUENCY CORRECTION FOR EACH SOURCE FILE
-  for(int fIndex = 1; fIndex <= size; fIndex++) 
+  /* PERFORM FREQUENCY CORRECTION FOR EACH SOURCE FILE */
+  for(fIndex = 1; fIndex <= size; fIndex++) 
   {
-    // OPEN SOURCE
+    /* OPEN SOURCE */
     smfData* srcData;
     smf_open_file(ogrp, fIndex, "UPDATE", SMF__NOCREATE_QUALITY, &srcData, status);
     if(*status != SAI__OK)
@@ -138,11 +158,11 @@ void smurf_fts2_freqcorr(int *status)
       errRep(FUNC_NAME, "Unable to open source file!", status);
       break;
     }
-    double* src = (double*) (srcData->pntr[0]);
+    src = (double*) (srcData->pntr[0]);
 
-    // VERIFY THAT THE SOURCE & THETA HAVE COMPATIBLE DIMENSIONS
-    int srcWidth = srcData->dims[0]; 
-    int srcHeight = srcData->dims[1]; 
+    /* VERIFY THAT THE SOURCE & THETA HAVE COMPATIBLE DIMENSIONS */
+    srcWidth = srcData->dims[0]; 
+    srcHeight = srcData->dims[1]; 
     if(srcWidth != thetaWidth || srcHeight != thetaHeight)
     {
       *status = SAI__ERROR;
@@ -152,41 +172,37 @@ void smurf_fts2_freqcorr(int *status)
       break;
     }
 
-    // FREQUENCY CORRECTION
-    int srcN = srcData->dims[2]; // Source sample size
-    double* ifg    = (double*) astMalloc(srcN * sizeof(double));
-    double* ifgNew = (double*) astMalloc(srcN * sizeof(double));
-    double* wn     = (double*) astMalloc(srcN * sizeof(double));
-    double* wnNew  = (double*) astMalloc(srcN * sizeof(double));
-    int pixelCount = srcWidth * srcHeight;
-    int index, pixelIndex;
-    for(int i = 0; i < srcHeight; i++)
+    /* FREQUENCY CORRECTION */
+    srcN = srcData->dims[2]; /* Source sample size */
+    ifg    = (double*) astMalloc(srcN * sizeof(double));
+    ifgNew = (double*) astMalloc(srcN * sizeof(double));
+    wn     = (double*) astMalloc(srcN * sizeof(double));
+    wnNew  = (double*) astMalloc(srcN * sizeof(double));
+    pixelCount = srcWidth * srcHeight;
+    index, pixelIndex;
+    for(i = 0; i < srcHeight; i++)
     {
-      for(int j = 0; j < srcWidth; j++)
+      for(j = 0; j < srcWidth; j++)
       {
         pixelIndex = i + j * srcHeight;
-
-        for(int k = 0; k < srcN; k++)
+        for(k = 0; k < srcN; k++)
         {
           index = pixelIndex + pixelCount * k;
           ifg[k] = src[index];
           wn[k] = k;
           wnNew[k] = k * cos(theta[pixelIndex]);
         }
+        /* FREQUENCY SHIFT BY CUBIC SPLINE */
+        fts2_naturalcubicsplineinterpolator(wn, ifg, srcN, wnNew, ifgNew, srcN);
 
-        // FREQUENCY SHIFT BY CUBIC SPLINE
-        //csi_simplified(ifg, srcN, wn, srcN, ifgNew);
-        fts2_naturalCubicSplineInterpolator(wn, ifg, srcN, wnNew, ifgNew, srcN);
-
-        for(int k = 0; k < srcN; k++)
+        for(k = 0; k < srcN; k++)
         {
           index = pixelIndex + pixelCount * k;
           src[index] = ifgNew[k];
         }
       }
     }
-
-    // FREE RESOURCES
+    /* FREE RESOURCES */
     astFree(ifgNew);
     astFree(ifg);   
     astFree(wn);      
@@ -194,9 +210,8 @@ void smurf_fts2_freqcorr(int *status)
     smf_close_file(&srcData, status);
   }
 
-  // FREE RESOURCES
+  /* FREE RESOURCES */
   smf_close_file(&thetaData, status);
 
-  // END
   ndfEnd(status);
 }

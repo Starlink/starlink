@@ -65,6 +65,10 @@
 #define DEGLITCH_THRESHOLD 1.0e-30
 #endif
 
+#ifndef SMF__FLAT_THRESHOLD
+#define SMF__FLAT_THRESHOLD 1.0e-10
+#endif
+
 #ifndef DBL_MIN
 #define DBL_MIN -1.0e308
 #endif
@@ -72,6 +76,22 @@
 #ifndef DBL_MAX
 #define DBL_MAX -DBL_MIN
 #endif
+
+void fts2_arraycopy( 
+    double* source,
+    int sourceSize,
+    double* destination,
+    int destinationSize,
+    int sourceStart,
+    int destinationStart,
+    int count);
+
+void fts2_arrayquicksort(
+    double* array, 
+    int size, 
+    int start, 
+    int end, 
+    int ascending);
 
 int fts2_getsplineindex(
     double* x, 

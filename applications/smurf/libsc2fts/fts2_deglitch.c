@@ -128,7 +128,7 @@ void fts2_deglitch(
       /* COMPUTE STANDARD DEVIATION */
       numCluster  	= dsHalfLength / coreClusterSize + 1;
       sigma    		= (double*) astMalloc(numCluster * sizeof(double));
-      revSigma 		= (double*) astMmalloc(numCluster * sizeof(double));
+      revSigma 		= (double*) astMalloc(numCluster * sizeof(double));
       for(i = 0; i < numCluster; i++)
       {
         tForward 	= 0.0;
