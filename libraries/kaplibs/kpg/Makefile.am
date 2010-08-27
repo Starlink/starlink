@@ -100,7 +100,7 @@ KPG_BDIRW_GEN = kpg1_iscl.gbdirw kpg1_flas.gbdirw \
                 kpg_stos.gbdirw
 
 # All except unsigned types and double
-KPG_BIRW_GEN = chval.gbirw
+KPG_BIRW_GEN =
 
 # Double and Real
 KPG_DR_GEN = kpg1_ainb.gdr kpg1_aind.gdr kpg1_aker.gdr \
@@ -124,7 +124,7 @@ KPG_DI_GEN = kpg1_ctcp.gdi
 KPG_DIR_GEN = kpg1_chel.gdir kpg1_figr.gdir \
 kpg1_prsa.gdir kpg1_mul.gdir kpg1_sqsu.gdir
 
-KPG_IR_GEN = elnmb.gir
+KPG_IR_GEN =
 
 KPG_GRAPHIC_DR_GEN = kpg1_litr.gdr kpg1_lltr.gdr
 
@@ -133,7 +133,6 @@ KPG_NXB_GEN = kpg1_axli.gnxb
 
 # Non-adam non-graphic
 KPG_NONGEN = \
-cpsecr.f \
 icmmm.f \
 kpg_env0c.f \
 kpg1_abset.f \
@@ -259,9 +258,7 @@ kpg1_wtm3d.f \
 kpg1_wtm3r.f \
 kpg1_wwrt.f \
 kpg1_xyd2w.f \
-ld2ar.f \
-normal.f \
-zero2d.f
+ld2ar.f
 
 # All ADAM routines (parameter access)
 
