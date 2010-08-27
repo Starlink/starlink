@@ -1011,9 +1011,6 @@ libraries/kaplibs/irq/irq1_sbad1.f
 libraries/kaplibs/irq/irq_sbad.f
 
 libraries/kaplibs/kpg/bad2d.f
-libraries/kaplibs/kpg/chval.f
-libraries/kaplibs/kpg/copa.f
-libraries/kaplibs/kpg/elnmb.f
 libraries/kaplibs/kpg/kpg1_ainb.f
 libraries/kaplibs/kpg/kpg1_aind.f
 libraries/kaplibs/kpg/kpg1_aker.f
@@ -1099,6 +1096,7 @@ libraries/kaplibs/kpg/kpg1_mxme.f
 libraries/kaplibs/kpg/kpg1_mxmn.f
 libraries/kaplibs/kpg/kpg1_nbad.f
 libraries/kaplibs/kpg/kpg1_nois.f
+libraries/kaplibs/kpg/kpg_norv.f
 libraries/kaplibs/kpg/kpg1_nthm.f
 libraries/kaplibs/kpg/kpg1_numb.f
 libraries/kaplibs/kpg/kpg_osta.f
