@@ -22,22 +22,22 @@
 
 *  Description:
 *     This routine replaces selected areas within a two-dimensional
-*     input NDF (specified by parameter IN), either by filling the
+*     input NDF (specified by Parameter IN), either by filling the
 *     areas with bad values, or by linear interpolation between
-*     neighbouring data values (see parameter ZAPTYPE).  Each area to be
+*     neighbouring data values (see Parameter ZAPTYPE).  Each area to be
 *     replaced can be either a range of pixel columns extending the
 *     full height of the image, a range of pixel lines extending the
 *     full width of the image, or a rectangular region with edges
-*     parallel to the pixel axes (see parameter LINCOL).
+*     parallel to the pixel axes (see Parameter LINCOL).
 *
 *     The bounds of the area to be replaced can be specified either by
 *     using a graphics cursor, or directly in response to parameter
 *     prompts, or by supplying a text file containing the bounds (see
-*     parameter MODE).  In the first two modes the application loops
+*     Parameter MODE).  In the first two modes the application loops
 *     asking for new areas to zap, until told to quit or an error is
 *     encountered.  In the last mode processing stops when the end of
 *     file is found.  An output text file may be produced containing a
-*     description of the areas replaced (see parameter COLOUT).  This
+*     description of the areas replaced (see Parameter COLOUT).  This
 *     file may be used to specify the regions to be replaced in a
 *     subsequent invocation of ZAPLIN.
 
@@ -50,7 +50,7 @@
 *  ADAM Parameters:
 *     COLIN = FILENAME (Read)
 *        The name of a text file containing the bounds of the areas to
-*        be replaced.  This parameter is only accessed if parameter MODE
+*        be replaced.  This parameter is only accessed if Parameter MODE
 *        is set to "File".  Each record in the file must be either a
 *        blank line, a comment (indicated by a "!" or "#" in column 1 ),
 *        or a definition of an area to be replaced, consisting of three
@@ -70,56 +70,56 @@
 *        The name of an output text file in which to store descriptions
 *        of the areas replaced by the current invocation of this
 *        application.  It has the same format as the input file accessed
-*        using parameter COLIN, and so may be used as input on a
+*        using Parameter COLIN, and so may be used as input on a
 *        subsequent invocation.  This parameter is not accessed if
-*        parameter MODE is set to "File".  If COLOUT is null (!), no
+*        Parameter MODE is set to "File".  If COLOUT is null (!), no
 *        file will be created.  [!]
 *     COLUMNS = LITERAL (Read)
 *        A pair of X values indicating the range of columns to be
 *        replaced.  All columns between the supplied values will be
-*        replaced.  This parameter is only accessed if parameter LINCOL
-*        is set to "Columns" or "Region", and parameter MODE is set to
+*        replaced.  This parameter is only accessed if Parameter LINCOL
+*        is set to "Columns" or "Region", and Parameter MODE is set to
 *        "Interface".  Each X value should be given as a formatted value
 *        for axis 1 of the current co-ordinate Frame of the input NDF.
 *        The two values should be separated by a comma, or by one or
 *        more spaces.
 *     DEVICE = DEVICE (Read)
-*        The graphics device to use if parameter MODE is set to
+*        The graphics device to use if Parameter MODE is set to
 *        "Cursor".  [Current graphics device]
 *     IN = NDF (Read)
 *        The input image.
 *     LINCOL = LITERAL (Read)
-*        The type of area is to be replaced.  This parameter is only
-*        accessed if parameter MODE is set to "Cursor" or "Interface".
+*        The type of area is to be replaced.  This Parameter is only
+*        accessed if Parameter MODE is set to "Cursor" or "Interface".
 *        The options are as follows.
 *
 *        - "Lines" -- Replaces lines of pixels between the Y values
-*        specified by parameter LINES.  Each replaced line extends the
+*        specified by Parameter LINES.  Each replaced line extends the
 *        full width of the image.
 *
 *        - "Columns" -- Replaces columns of pixels between the X values
-*        specified by parameter COLUMNS.  Each replaced column extends
+*        specified by Parameter COLUMNS.  Each replaced column extends
 *        the full height of the image.
 *
 *        - "Region" -- Replaces the rectangular region of pixels within
-*        the X and Y bounds specified by parameters COLUMNS and LINES.
+*        the X and Y bounds specified by Parameters COLUMNS and LINES.
 *        The edges of the box are parallel to the pixel axes.
 *
 *        If this parameter is specified on the command line, and
-*        parameter MODE is set to "Interface", only one area will be
+*        Parameter MODE is set to "Interface", only one area will be
 *        replaced; otherwise a series of areas will be replaced until a
 *        null (!) value is supplied for this parameter.
 *     LINES = LITERAL (Read)
 *        A pair of Y values indicating the range of lines to be
 *        replaced.  All lines between the supplied values will be
-*        replaced.  This parameter is only accessed if parameter LINCOL
-*        is set to "Lines" or "Region", and parameter MODE is set to
+*        replaced.  This parameter is only accessed if Parameter LINCOL
+*        is set to "Lines" or "Region", and Parameter MODE is set to
 *        "Interface".  Each Y value should be given as a formatted
 *        value for axis 2 of the current co-ordinate Frame of the input
 *        NDF.  The two values should be separated by a comma, or by one
 *        or more spaces.
 *     MARKER = INTEGER (Read)
-*        This parameter is only accessed if parameter PLOT is set to
+*        This parameter is only accessed if Parameter PLOT is set to
 *        "Mark".  It specifies the type of marker with which each
 *        cursor position should be marked, and should be given as an
 *        integer PGPLOT marker type.  For instance, 0 gives a box, 1
@@ -131,26 +131,26 @@
 *        replaced.  The supplied string can be one of the following
 *        options.
 *
-*        - "Interface" -- bounds are obtained using parameters COLUMNS,
+*        - "Interface" -- bounds are obtained using Parameters COLUMNS,
 *        and LINES.  The type of area to be replaced is specified using
-*        parameter LINCOL.
+*        Parameter LINCOL.
 *
 *        - "Cursor" -- bounds are obtained using the graphics cursor of
-*        the device specified by parameter DEVICE.  The type of area to
-*        be replaced is specified using parameter LINCOL.  The WCS
+*        the device specified by Parameter DEVICE.  The type of area to
+*        be replaced is specified using Parameter LINCOL.  The WCS
 *        information stored with the picture in the graphics database is
 *        used to map the supplied cursor positions into the pixel
 *        co-ordinate Frame of the input NDF.  A message is displayed
 *        indicating the co-ordinate Frame in which the picture and the
 *        output NDF were aligned.  Graphics may be drawn over the image
-*        indicating the region to be replaced (see parameter PLOT).
+*        indicating the region to be replaced (see Parameter PLOT).
 *
 *        - "File" -- the bounds and type of each area to be replaced
-*        are supplied in the text file specified by parameter COLIN.
+*        are supplied in the text file specified by Parameter COLIN.
 *
 *        [current value]
 *     NOISE = _LOGICAL (Read)
-*        This parameter is only accessed if parameter ZAPTYPE is set to
+*        This parameter is only accessed if Parameter ZAPTYPE is set to
 *        "Linear".  If a TRUE value is supplied, gaussian noise is added
 *        to each interpolated pixel value.  The variance of the noise is
 *        equal to the variance of the data value being replaced.  If the
@@ -175,7 +175,7 @@
 *        positions at opposite corners.
 *
 *        - "Mark" -- Each position is marked by the symbol specified
-*        by parameter MARKER.
+*        by Parameter MARKER.
 *
 *        - "None" -- No graphics are produced.
 *
@@ -188,7 +188,7 @@
 *        [current value]
 *     STYLE = LITERAL (Read)
 *        A group of attribute settings describing the style to use when
-*        drawing the graphics specified by parameter PLOT.
+*        drawing the graphics specified by Parameter PLOT.
 *
 *        A comma-separated list of strings should be given in which each
 *        string is either an attribute setting, or the name of a text
@@ -263,7 +263,7 @@
 
 *  Examples:
 *     zaplin out=cleaned colout=fudge.dat
-*        Assuming the current value of parameter MODE is "Cursor", this
+*        Assuming the current value of Parameter MODE is "Cursor", this
 *        will copy the NDF associated with the last DATA picture to an
 *        NDF called "cleaned", interactively replacing areas using the
 *        current graphics device.  Linear interpolation is used to
