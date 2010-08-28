@@ -1,27 +1,27 @@
-      SUBROUTINE LD2AR( NX, NY, SX, SY, NBIN, X, Y, Z, ARRAY, STATUS )
+      SUBROUTINE KPG_LD2A<T>( NX, NY, SX, SY, NBIN, X, Y, Z, ARRAY, STATUS )
 *+
 *  Name:
-*     LD2AR
+*     KPG_LD2Ax
 
 *  Purpose:
-*     Converts a sparse form of a two-dimensional array stored in DOUBLE PRECISION
-*     into its REAL two-dimensional counterpart.
+*     Converts a sparse form of a two-dimensional array into its
+*     two-dimensional counterpart.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL LD2AR( NX, NY, SX, SY, NBIN, X, Y, Z, ARRAY, STATUS )
+*     CALL KPG_LD2Ax( NX, NY, SX, SY, NBIN, X, Y, Z, ARRAY, STATUS )
 
 *  Description:
 *     A list of x-y positions and values are converted to a complete
-*     2-d array.  Missing elements take the bad value.
+*     two-dimensional array.  Missing elements take the bad value.
 
 *  Arguments:
 *     NX = INTEGER (Given)
-*        The first dimension of the 2-d array.
+*        The first dimension of the two-dimensional array.
 *     NY = INTEGER (Given)
-*        The second dimension of the 2-d array.
+*        The second dimension of the two-dimensional array.
 *     SX = REAL (Given)
 *        The co-ordinate scale factor (i.e. the length of a pixel) in
 *        the x direction.  It is used to determine which pixel a given
@@ -38,16 +38,21 @@
 *        The y position of the pixel in the list.
 *     Z( NBIN ) = DOUBLE PRECISION (Given)
 *        The value of the pixel in the list.
-*     ARRAY( NX, NY ) = REAL (Returned)
-*        The expanded 2-d array formed from the list.
+*     ARRAY( NX, NY ) = ? (Returned)
+*        The expanded two-dimensional array formed from the list.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Notes:
-*     {routine_notes}...
+*     -  There is a routine for each of the standard floating-point
+*     types.  Replace "x" in the routine name by D or R as appropriate.
+*     The data type of the ARRAY argument must match the particular
+*     routine used.
+*     -  It uses eight-byte integers for array addressing.
 
 *  Copyright:
 *     Copyright (C) 1990 Science & Engineering Research Council.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -79,7 +84,9 @@
 *        Use INTEGER*8 to avoid overflow.
 *     2010 JAN 08 (PWD):
 *        Don't use Fortran 90 MIN() intrinsic, stick to Fortran 77.
-*     {enter_changes_here}
+*     2010 August 27 (MJC):
+*        Made generic and renamed from LD2AR to KPG_LD2Ax.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -91,58 +98,57 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'PRM_PAR'          ! Magic-value definitions.
+      INCLUDE 'PRM_PAR'          ! Magic-value definitions
 
 *  Arguments Given:
-      INTEGER
-     :  NX, NY,                  ! Dimensions of the output array
-     :  NBIN                     ! Number of bins in the x-y list.
-
-      REAL
-     :  SX, SY                   ! Pixel sizes
-
-      DOUBLE PRECISION
-     :  X( NBIN ),               ! x positions of the pixel list
-     :  Y( NBIN ),               ! y positions of the pixel list
-     :  Z( NBIN )                ! Values of the pixels in the list
+      INTEGER NX
+      INTEGER NY
+      REAL SX
+      REAL SY
+      INTEGER NBIN
+      DOUBLE PRECISION X( NBIN )
+      DOUBLE PRECISION Y( NBIN )
+      DOUBLE PRECISION Z( NBIN )
 
 *  Arguments Returned:
-      REAL
-     :  ARRAY( NX, NY )
+      REAL ARRAY( NX, NY )
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER * 8
-     :  I, J,                    ! 2-d array indices
-     :  L                        ! Loop counter
+      INTEGER * 8 I              ! X index in 2-d array
+      INTEGER * 8 J              ! Y index in 2-d array
+      INTEGER * 8 L              ! Loop counter
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversion functions
+      INCLUDE 'NUM_DEF_CVT'
 
 *.
 
-*    Check inherited global status.
+*  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    First initialise the array to the magic value.
-
+*  First initialise the array to the magic value.
       DO  J = 1, NY
          DO  I = 1, NX
-            ARRAY( I, J ) = VAL__BADR
+            ARRAY( I, J ) = VAL__BAD<T>
          END DO
       END DO
 
-*    Fill the array with the list of values, by computing which bin a
-*    given x-y position is situated.
+*  Fill the array with the list of values, by computing which bin a
+*  given x-y position is situated.
       DO  L = 1, NBIN
 
-*    Use direct assignment to convert to I*8 from REAL rather than the
-*    INT intrinsic with an f90 kind. Seems to give the correct promotion
-*    and truncation with g77/gfortran/g95/ifort/SUN f95/f77.
+*  Use direct assignment to convert to I*8 from REAL rather than the
+*  INT intrinsic with an f90 kind.  \It seems to give the correct
+*  promotion and truncation with g77/gfortran/g95/ifort/SUN f95/f77.
          I = X( L ) / SX
          I = MIN( I + 1, NX )
          J = Y( L ) / SY
          J = MIN( J + 1, NY )
-         ARRAY( I, J ) = REAL( Z( L ) )
+         ARRAY( I, J ) = NUM_DTO<T>( Z( L ) )
       END DO
 
       END

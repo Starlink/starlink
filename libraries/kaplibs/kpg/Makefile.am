@@ -111,7 +111,8 @@ kpg1_che2.gdr kpg1_cmad.gdr kpg1_cmvd.gdr kpg1_cmvv.gdr \
 kpg1_d2w2.gdr kpg1_dcli.gdr kpg1_div.gdr  \
 kpg1_dwso.gdr kpg1_ffr.gdr  kpg1_fftf.gdr kpg1_gaus.gdr \
 kpg1_hcon.gdr kpg1_hmlt.gdr kpg1_hsds.gdr kpg1_hsfl.gdr \
-kpg1_hstf.gdr kpg1_is3.gdr  kpg1_litn.gdr kpg1_ludc.gdr \
+kpg1_hstf.gdr kpg1_is3.gdr  \
+kpg_ld2a.gdr  kpg1_litn.gdr kpg1_ludc.gdr \
 kpg1_mdet.gdr kpg1_mono.gdr kpg1_mthe.gdr kpg1_nbad.gdr \
 kpg_norv.gdr  kpg1_pow.gdr \
 kpg1_prow.gdr kpg1_psfs.gdr kpg1_qntl.gdr kpg1_rfco.gdr \
@@ -257,8 +258,7 @@ kpg1_wread.f \
 kpg1_wtm3d.f \
 kpg1_wtm3r.f \
 kpg1_wwrt.f \
-kpg1_xyd2w.f \
-ld2ar.f
+kpg1_xyd2w.f
 
 # All ADAM routines (parameter access)
 
