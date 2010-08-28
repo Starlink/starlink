@@ -1010,7 +1010,6 @@ libraries/kaplibs/fts/fts1_wkeyx.f
 libraries/kaplibs/irq/irq1_sbad1.f
 libraries/kaplibs/irq/irq_sbad.f
 
-libraries/kaplibs/kpg/bad2d.f
 libraries/kaplibs/kpg/kpg1_ainb.f
 libraries/kaplibs/kpg/kpg1_aind.f
 libraries/kaplibs/kpg/kpg1_aker.f
@@ -1057,6 +1056,7 @@ libraries/kaplibs/kpg/kpg1_ffr.f
 libraries/kaplibs/kpg/kpg1_fftf.f
 libraries/kaplibs/kpg/kpg1_figr.f
 libraries/kaplibs/kpg/kpg1_fill.f
+libraries/kaplibs/kpg/kpg_fise.f
 libraries/kaplibs/kpg/kpg1_flas.f
 libraries/kaplibs/kpg/kpg1_flco.f
 libraries/kaplibs/kpg/kpg1_flip.f
@@ -1071,6 +1071,7 @@ libraries/kaplibs/kpg/kpg1_hsfl.f
 libraries/kaplibs/kpg/kpg1_hsta.f
 libraries/kaplibs/kpg/kpg1_hstf.f
 libraries/kaplibs/kpg/kpg1_hstq.f
+libraries/kaplibs/kpg/kpg_immm.f
 libraries/kaplibs/kpg/kpg1_inco.f
 libraries/kaplibs/kpg/kpg1_is3.f
 libraries/kaplibs/kpg/kpg1_iscl.f
