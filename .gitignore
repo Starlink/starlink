@@ -1075,6 +1075,7 @@ libraries/kaplibs/kpg/kpg1_inco.f
 libraries/kaplibs/kpg/kpg1_is3.f
 libraries/kaplibs/kpg/kpg1_iscl.f
 libraries/kaplibs/kpg/kpg1_ker1.f
+libraries/kaplibs/kpg/kpg_ld2a.f
 libraries/kaplibs/kpg/kpg1_litn.f
 libraries/kaplibs/kpg/kpg1_litr.f
 libraries/kaplibs/kpg/kpg1_lltr.f
