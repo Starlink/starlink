@@ -821,6 +821,7 @@ related items to be removed.
       and new KPG\_ISEQN.  This increments trailing sequence numbers
       in strings, most often used to generate a series of filenames.
 \item DIMLST has been renamed KPG\_DIMLS.
+\item LD2AR has been renamed KPG\_LD2Ax and made generic.
 \item There is a new routine KPG\_NORVx to replace the old NORMAL.  It
       has the benefits of being generic and can operate on an array.
 \item A number of long-deprecated old routines without a package prefix
@@ -38906,6 +38907,89 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx}
    }
 }
 \sstroutine{
+   KPG\_LD2Ax
+}{
+   Converts a sparse form of a two-dimensional array into its
+   two-dimensional counterpart
+}{
+   \sstdescription{
+      A list of x-y positions and values are converted to a complete
+      two-dimensional array.  Missing elements take the bad value.
+   }
+   \sstinvocation{
+      CALL KPG\_LD2Ax( NX, NY, SX, SY, NBIN, X, Y, Z, ARRAY, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NX = INTEGER (Given)
+      }{
+         The first dimension of the two-dimensional array.
+      }
+      \sstsubsection{
+         NY = INTEGER (Given)
+      }{
+         The second dimension of the two-dimensional array.
+      }
+      \sstsubsection{
+         SX = REAL (Given)
+      }{
+         The co-ordinate scale factor (i.e. the length of a pixel) in
+         the x direction.  It is used to determine which pixel a given
+         x-y position lies.  Normally, it will have the value 1.
+      }
+      \sstsubsection{
+         SY = REAL (Given)
+      }{
+         The co-ordinate scale factor (i.e. the length of a pixel) in
+         the y direction.  It is used to determine which pixel a given
+         x-y position lies.  Normally, it will have the value 1.
+      }
+      \sstsubsection{
+         NBIN = INTEGER (Given)
+      }{
+         The number of bins in the pixel list.
+      }
+      \sstsubsection{
+         X( NBIN ) = DOUBLE PRECISION (Given)
+      }{
+         The x position of the pixel in the list.
+      }
+      \sstsubsection{
+         Y( NBIN ) = DOUBLE PRECISION (Given)
+      }{
+         The y position of the pixel in the list.
+      }
+      \sstsubsection{
+         Z( NBIN ) = DOUBLE PRECISION (Given)
+      }{
+         The value of the pixel in the list.
+      }
+      \sstsubsection{
+         ARRAY( NX, NY ) = ? (Returned)
+      }{
+         The expanded two-dimensional array formed from the list.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each of the standard floating-point
+         types.  Replace {\tt "}x{\tt "} in the routine name by D or R as appropriate.
+         The data type of the ARRAY argument must match the particular
+         routine used.
+
+         \sstitem
+         It uses eight-byte integers for array addressing.
+      }
+   }
+}
+\sstroutine{
    KPG\_NORVx
 }{
    Returns a supplied value with normally distributed noise added
@@ -38962,8 +39046,8 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx}
          \sstitem
          There is a routine for each of the standard floating-point
          types.  Replace {\tt "}x{\tt "} in the routine name by D or R as appropriate.
-         The data type of the INARR, SIGMA, and OUTARR must match the
-         particular routine used.
+         The data type of the INARR, SIGMA, and OUTARR arguments must
+         match the particular routine used.
       }
    }
 }
@@ -39295,79 +39379,6 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx}
          The sorting is recorded in an index leaving the order of the
          supplied array values intact.
       }
-   }
-}
-\sstroutine{
-   LD2AR
-}{
-   Converts a sparse form of a two-dimensional array stored in DOUBLE PRECISION
-   into its REAL two-dimensional counterpart
-}{
-   \sstdescription{
-      A list of x-y positions and values are converted to a complete
-      2-d array.  Missing elements take the bad value.
-   }
-   \sstinvocation{
-      CALL LD2AR( NX, NY, SX, SY, NBIN, X, Y, Z, ARRAY, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         NX = INTEGER (Given)
-      }{
-         The first dimension of the 2-d array.
-      }
-      \sstsubsection{
-         NY = INTEGER (Given)
-      }{
-         The second dimension of the 2-d array.
-      }
-      \sstsubsection{
-         SX = REAL (Given)
-      }{
-         The co-ordinate scale factor (i.e. the length of a pixel) in
-         the x direction.  It is used to determine which pixel a given
-         x-y position lies.  Normally, it will have the value 1.
-      }
-      \sstsubsection{
-         SY = REAL (Given)
-      }{
-         The co-ordinate scale factor (i.e. the length of a pixel) in
-         the y direction.  It is used to determine which pixel a given
-         x-y position lies.  Normally, it will have the value 1.
-      }
-      \sstsubsection{
-         NBIN = INTEGER (Given)
-      }{
-         The number of bins in the pixel list.
-      }
-      \sstsubsection{
-         X( NBIN ) = DOUBLE PRECISION (Given)
-      }{
-         The x position of the pixel in the list.
-      }
-      \sstsubsection{
-         Y( NBIN ) = DOUBLE PRECISION (Given)
-      }{
-         The y position of the pixel in the list.
-      }
-      \sstsubsection{
-         Z( NBIN ) = DOUBLE PRECISION (Given)
-      }{
-         The value of the pixel in the list.
-      }
-      \sstsubsection{
-         ARRAY( NX, NY ) = REAL (Returned)
-      }{
-         The expanded 2-d array formed from the list.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-   \sstnotes{
-      \{routine\_notes\}...
    }
 }
 \newpage

@@ -31,6 +31,7 @@ Version 3.1
      and new KPG_ISEQN.  This increments trailing sequence numbers in
      strings, most often used to generate a series of filenames.
    - DIMLST has been renamed KPG_DIMLS.
+   - LD2AR has been renamed KPG_LD2Ax and made generic.
    - There is a new routine KPG_NORVx to replace the old NORMAL.  It 
      has the benefits of being generic and can operate on an array.
    - A number of long-deprecated old routines without a package prefix
