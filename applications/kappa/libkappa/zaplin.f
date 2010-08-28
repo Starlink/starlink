@@ -327,8 +327,10 @@
 *  Copyright:
 *     Copyright (C) 1985-1993 Science & Engineering Research Council.
 *     Copyright (C) 1995, 1998, 2000, 2004 Central Laboratory of the
-*     Research Councils. Copyright (C) 2006 Particle Physics &
-*     Astronomy Research Council. All Rights Reserved.
+*     Research Councils.
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2010 Science & Facilities Research Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -417,6 +419,8 @@
 *     2006 April 12 (MJC):
 *        Remove unused variables, restored Examples convention, and
 *        wrapped long lines.
+*     2010 August 28 (MJC):
+*        Replace calls to BAD2Dx with KPG_FISEx.
 *     {enter_further_changes_here}
 
 *-
@@ -1248,8 +1252,9 @@
 
 *  Replace the region by bad values, if required.
                IF ( ZBAD ) THEN
-                  CALL BAD2DR( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
-     :                         %VAL( CNF_PVAL( IPOUT( 1 ) ) ), STATUS )
+                  CALL KPG_FISER( VAL__BADR, 2, DIMS, ZLBND, ZUBND,
+     :                            %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
+     :                            STATUS )
 
 *  Or, linearly or bi-linearly interpolate across the pixels to be
 *  zapped.
@@ -1264,8 +1269,9 @@
 *  Do the same for other data types.
             ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
                IF ( ZBAD ) THEN
-                  CALL BAD2DB( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
-     :                         %VAL( CNF_PVAL( IPOUT( 1 ) ) ), STATUS )
+                  CALL KPG_FISEB( VAL__BADB, 2, DIMS, ZLBND, ZUBND,
+     :                            %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
+     :                            STATUS )
                ELSE
                   CALL KPS1_ZPRGB( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
      :                             NOISE,
@@ -1276,8 +1282,9 @@
 
             ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                IF ( ZBAD ) THEN
-                  CALL BAD2DD( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
-     :                         %VAL( CNF_PVAL( IPOUT( 1 ) ) ), STATUS )
+                  CALL KPG_FISED( VAL__BADD, 2, DIMS, ZLBND, ZUBND,
+     :                            %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
+     :                            STATUS )
                ELSE
                   CALL KPS1_ZPRGD( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
      :                             NOISE,
@@ -1288,8 +1295,9 @@
 
             ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                IF ( ZBAD ) THEN
-                  CALL BAD2DI( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
-     :                         %VAL( CNF_PVAL( IPOUT( 1 ) ) ), STATUS )
+                  CALL KPG_FISEI( VAL__BADI, 2, DIMS, ZLBND, ZUBND,
+     :                            %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
+     :                            STATUS )
                ELSE
                   CALL KPS1_ZPRGI( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
      :                             NOISE,
@@ -1300,8 +1308,9 @@
 
             ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
                IF ( ZBAD ) THEN
-                  CALL BAD2DUB( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
-     :                          %VAL( CNF_PVAL( IPOUT( 1 ) ) ), STATUS )
+                  CALL KPG_FISEUB( VAL__BADUB, 2, DIMS, ZLBND, ZUBND,
+     :                             %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
+     :                             STATUS )
                ELSE
                   CALL KPS1_ZPRGUB( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
      :                              NOISE,
@@ -1312,8 +1321,9 @@
 
             ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
                IF ( ZBAD ) THEN
-                  CALL BAD2DUW( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
-     :                          %VAL( CNF_PVAL( IPOUT( 1 ) ) ), STATUS )
+                  CALL KPG_FISEUW( VAL__BADUW, 2, DIMS, ZLBND, ZUBND,
+     :                             %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
+     :                             STATUS )
                ELSE
                   CALL KPS1_ZPRGUW( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
      :                              NOISE,
@@ -1324,8 +1334,9 @@
 
             ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
                IF ( ZBAD ) THEN
-                  CALL BAD2DW( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
-     :                         %VAL( CNF_PVAL( IPOUT( 1 ) ) ), STATUS )
+                  CALL KPG_FISEW( VAL__BADW, 2, DIMS, ZLBND, ZUBND,
+     :                            %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
+     :                            STATUS )
                ELSE
                   CALL KPS1_ZPRGW( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
      :                             NOISE,
