@@ -23,21 +23,29 @@ Version 3.1
      these routines will need to modify calling routines accordingly;
      without skewness or kurtosis values to document supply
      VAL__BADD for each undefined statistic.
-   - The KPG1_PLTLN routine now accepts a value 6 for the MODE argument,
-     which causes a staircase plot to be produced in which bad values are
-     not flanked by vertical lines to the lower edge of the plot (as are
-     produced by mode 1).
+   - The KPG1_PLTLN routine now accepts a value 6 for the MODE
+     argument, which causes a staircase plot to be produced in which
+     bad values are not flanked by vertical lines to the lower edge
+     of the plot (as are produced by Mode 1).
    - Replace old IRCAM-specific NXTNAM routine with the more-general
-     and new KPG_ISEQN.  This increments trailing sequence numbers in
-     strings, most often used to generate a series of filenames.
+     and new KPG_ISEQN.  This increments trailing sequence numbers
+     in strings, most often used to generate a series of filenames.
+   - ICMMM has been renamed KPG_IMMMx and made generic.  The
+     calculations are now in performed double precision.  Note that
+     the API has changed: the first two arguments have been
+     transposed to the standard order, and the returned floating-
+     point statistics are now double precision.
+   - There is a new generic routine KPG_FISEx that fills a section
+     of a multi-dimensional array.
    - DIMLST has been renamed KPG_DIMLS.
    - LD2AR has been renamed KPG_LD2Ax and made generic.
    - There is a new routine KPG_NORVx to replace the old NORMAL.  It 
      has the benefits of being generic and can operate on an array.
-   - A number of long-deprecated old routines without a package prefix
-     have been removed.  These are listed below.  The corresponding 
-     replacement routines appear in the right column.
+   - A number of long-deprecated old routines without a package
+     prefix have been removed.  These are listed below.  The
+     corresponding replacement routines appear in the right column.
 
+     BAD2Dx   KPG_FISEx setting the fill value to VAL__BADx
      CHVALx   KPG1_CHVAx
      COPAx    VEC_xTOx or KPG1_COPY
      COPY1D      "            "
@@ -52,8 +60,8 @@ Version 3.1
      NXTNAM   KPG_ISEQN
      NORMAL   KPG_NORVx
      POWARR   KPG1_POWx
-     ZERO1D   KPG1_FILLx
-     ZERO2D   KPG1_FILLx
+     ZERO1D   KPG1_FILLx setting the fill value to 0.0.
+     ZERO2D   KPG1_FILLx    "         "         "
 
 Version 3.0
    - CCG routines' NBAD argument excludes bad elements not attributable

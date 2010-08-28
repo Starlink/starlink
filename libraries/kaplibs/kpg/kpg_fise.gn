@@ -1,0 +1,229 @@
+      SUBROUTINE KPG_FISE<T>( VALUE, NDIM, DIMS, LBND, UBND, ARRAY,
+     :                        STATUS )
+*+
+*  Name:
+*     KPG_FISEx
+
+*  Purpose:
+*     Substitutes a constant value in a defined section of an array.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPG_FISEx( VALUE, NDIM, DIMS, LBND, UBND, ARRAY, STATUS )
+
+*  Description:
+*     This fills a rectangular section of a multi-dimensional array
+*     with a constant.
+
+*  Arguments:
+*     VALUE = ? (Given)
+*        Value to be substituted in every pixel within the defined
+*        section.
+*     NDIM = INTEGER (Given)
+*        The number of dimensions of the array, up to NDF__MXDIM
+*        (defined in NDF_PAR).
+*     DIMS( NDIM ) = INTEGER (Given)
+*        Dimensions of the array to be edited.
+*     LBND( NDIM ) = INTEGER (Given)
+*        Lower bounds of the section whose elements are assigned to
+*        VALUE.  These are in the range 1 to DIMS( I ) for the Ith
+*        dimension.
+*     UBND( NDIM ) = INTEGER (Given)
+*        Upper bounds of the section whose elements are assigned to
+*        VALUE.  These are in the range LBND( I ) to DIMS( I ) for
+*        the Ith dimension.
+*     ARRAY( * ) = ? (Given and Returned)
+*        The array to be edited.
+*     STATUS = INTEGER (Given)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for each of the standard numeric types.
+*     Replace "x" in the routine name by D, R, I, W, UW, B or UB as
+*     appropriate.  The data type of the arguments VALUE and  ARRAY
+*     must match the particular routine used.
+
+*  Copyright:
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This programme is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE.  See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     2010 August 28 (MJC):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'NDF_PAR'          ! NDF public constants
+      INCLUDE 'PRM_PAR'          ! Bad-value constants
+
+*  Arguments Given:
+      <TYPE> VALUE
+      INTEGER NDIM
+      INTEGER DIMS( NDIM )
+      INTEGER LBND( NDIM )
+      INTEGER UBND( NDIM )
+
+*  Arguments Given and Returned:
+      <TYPE> ARRAY( * )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER I                  ! Array index
+      INTEGER ID                 ! Pointer to the start of a line
+                                 ! segment within the region to fill
+      INTEGER IDIM( NDF__MXDIM ) ! Indices of an array element
+      INTEGER J                  ! Loop counter
+      INTEGER STRID( NDF__MXDIM )! Dimension strides for array
+      LOGICAL VALID              ! Bounds are valid?
+
+*.
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Check the bounds.
+      VALID = .TRUE.
+      DO J = 1, NDIM
+         VALID = VALID .AND. LBND( J ) .LE. UBND( J ) .AND.
+     :           LBND( J ) .GE. 1 .AND. UBND( J ) .LE. DIMS( J )
+      END DO
+
+      IF ( .NOT. VALID ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'KPG_FISE_BNDS',
+     :     'KPG_FISE: Bounds error---probable programming error.', STATUS )
+         GOTO 999
+      END IF
+
+*  Initialise the stride of dimension number 1 for the data array.  
+*  (The stride for a dimension is the amount by which the vectorised 
+*  array index increases when the n-dimensional array index for that
+*  dimension increases by 1.)
+      STRID( 1 ) = 1
+
+*  Calculate the stride for each remaining dimension.
+      DO J = 2, NDIM
+         STRID( J ) = STRID( J - 1 ) * DIMS( J - 1 )
+      END DO
+
+*  Recursive scanning of the array dimensions begins with the highest
+*  dimension.
+      I = NDIM
+      ID = 1
+
+*  Fill the section via recursive invocation starting here.
+*  ========================================================
+
+*  This is quite complicated as the section of the array to be filled
+*  is accessed via pseudo-recursion.  A list of vector pointers is
+*  calculated for a series of sub-sections along the first dimension,
+*  each of length given by the bounds of the section along the first
+*  dimension.
+*
+*  Increment the pointer to the end of the region which lies before the
+*  lower bound of the section being filled (in the current dimension).
+   20 CONTINUE
+      ID = ID + ( LBND( I ) - 1 ) * STRID( I )
+
+*  This is a "DO UNTIL" loop, which starts with the current dimension
+*  set to the lower bound of the region and executes until it goes
+*  beyond the upper bound.
+      IDIM( I ) = LBND( I )
+
+   30 CONTINUE
+      IF ( IDIM( I ) .GT. UBND( I ) ) GOTO 50
+
+*  The algorithm calls itself recursively here.
+*  ============================================
+
+*  The algorithm invokes itself recursively to process the next lower
+*  dimension.  Decrement the current dimension count and branch back to
+*  the start.
+      IF ( I .GT. 1 ) THEN
+         I = I - 1
+         GOTO 20
+      ELSE
+
+*  Fill along the line segment marked by the pointer.
+         DO  J = LBND( 1 ), UBND( 1 )
+
+*  Calculate the offset within the whole array.
+            ARRAY( ID + J - LBND( 1 ) ) = VALUE
+         END DO
+
+*  Update the dimension index to indicate that all of the sub-region in
+*  this dimension has now been processed.
+         IDIM( 1 ) = UBND( 1 )
+
+*  Move the pointer to allow for the pixels within the section along
+*  the line.
+         ID = ID + UBND( 1 ) - LBND( 1 ) + 1
+      END IF
+
+*  The recursively invoked algorithm returns to this point.
+*  =======================================================
+   40 CONTINUE
+
+*  The current dimension count is "popped" back to its previous value
+*  before the recursively invoked algorithm returns, so increment the
+*  dimension index and branch to continue execution of the "DO UNTIL"
+*  loop.
+      IDIM( I ) = IDIM( I ) + 1
+      GOTO 30
+
+   50 CONTINUE
+
+*  Increment pointers to the end of the data region which lies after
+*  the upper bound of the sub-region being filled (in the current
+*  dimension).
+      ID = ID + ( DIMS( I ) - UBND( I ) ) * STRID( I )
+
+*  The recursively invoked algorithm returns from here.
+*  ===================================================
+
+*  "Pop" the current dimension count and make a return from a recursive
+*  invocation of the algorithm (unless this is the top-level
+*  invocation---i.e. the current dimension count is equal to NDIM---in
+*  which case all the data have been filled, so make a final
+*  exit).
+      IF ( I .GE. NDIM ) GOTO 60
+      I = I + 1
+      GOTO 40
+
+   60 CONTINUE
+
+  999 CONTINUE
+      END

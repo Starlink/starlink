@@ -1,0 +1,536 @@
+      SUBROUTINE KPG_IMMM<T>( EL, ARRAY, MEAN, MEDIAN, MODE, SIGMA, SKEW,
+     :                      NSAMP, NINVAL, STATUS )
+*+
+*  Name:
+*     KPG_IMMMx
+
+*  Purpose:
+*     Finds the mean, median and mode iteratively using the Chauvenet
+*     rejection criterion.
+
+*  Language:
+*     Starlink
+
+*  Invocation:
+*     CALL KPG_IMMMx( EL, ARRAY, MEAN, MEDIAN, MODE, SIGMA, SKEW, NSAMP,
+*                     NINVAL, STATUS )
+
+*  Description:
+*     This finds the mean, median, and mode (mmm) of a sample of data
+*     taken from a background region of an astronomical image of the
+*     sky.  It should not be used as a general statistical routine as
+*     there are special features that are peculiar to the problem of
+*     contamination by stars.  The routine also returns the standard 
+*     deviation and the skew of the sample.
+*
+*     It makes a first estimate of the statistics, and then refines
+*     these by including or excluding values at either end of the sorted
+*     values, deciding which values to reject using the Chauvanet
+*     criterion.  Iterations stop once the statistics stabilise; or
+*     there is an oscillation between two states, in which case the
+*     returned statistics are the averages found in these two states;
+*     or there are too few values remaining.
+
+*  Arguments:
+*     EL = INTEGER (Given)
+*        The number of data in the sample.
+*     ARRAY( EL ) = REAL (Given)
+*        Vector of data samples.
+*     MEAN = REAL (Write)
+*        The mean of the sample.
+*     MEDIAN = REAL (Write)
+*        The median of the sample.
+*     MODE = REAL (Write)
+*        The mode of the sample from the 3* median - 2 * mean formula.
+*     SIGMA = REAL (Write)
+*        The standard deviation of the sample.
+*     SKEW = REAL (Write)
+*        The skewness of the sample from the formula MEAN - MODE / SIGMA.
+*     NSAMP = INTEGER (Write)
+*        The population of the sample after the iterative procedure.
+*     NINVAL = INTEGER (Write)
+*        The number of bad pixels in the sample.
+*     STATUS = INTEGER(Given and Returned)
+*        Global status value.
+
+*  Notes:
+*     -  There is a routine for each of the standard numeric types.
+*     Replace "x" in the routine name by D, R, I, W, UW, B or UB as
+*     appropriate.  The data type of the array being analysed must
+*     match the particular routine used.
+*     -  The supplied array need not be sorted.
+*     -  The minimum sample size throughout is five.
+*     -  The magic-value method is used for bad pixels.
+*     -  The initial statistics start from the median and a symmetric
+*     interval about that.  Deviations from that median derive the
+*     initial mean and variance, and a new median.
+*
+*     In the iterations the new symmetric value range is about the mode,
+*     the half width being the Chauvenet number of standard deviations
+*     plus half the average separation of mean and mode.  The median
+*     averages the central nine values to derive a more robust estimate.
+
+*  Copyright:
+*     Copyright (C) 1988, 1990, 1992 Science & Engineering Research
+*     Council.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
+*  Authors:
+*     NE: Nick Eaton (Durham University)
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     10-JAN-1988 (NE):
+*        Original version.  The routine has been adapted from a
+*        similar routine in DAOPHOT.
+*     1990 January 24 (MJC):
+*        First ADAM implementation.  Introduce bad-pixel handling.
+*     1990 June 3 (MJC):
+*        Improved handling of variance for the general case.
+*     1992 June 3 (MJC):
+*        Replaced NAG routine by KAPPA sorting routine.  Although the
+*        latter is slower it is available on Unix.
+*     2010 August 28 (MJC):
+*        Made generic, renaming from ICMMM.  Swapped first two
+*        arguments to give the standard order.  Now uses double
+*        precision for the calculations and returned statistics.
+*        Revised the Description and added Notes.  Added message
+*        tokens to make error messages more enlightening.  Add
+*        heading comments.  Merge original history and author.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_new_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No assumed typing allowed
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! SSE global definitions
+      INCLUDE 'MSG_PAR'          ! Message-system public constants
+      INCLUDE 'PRM_PAR'          ! Bad-value definitions
+
+*  Arguments Given:
+      INTEGER EL
+      <TYPE> ARRAY( EL )
+
+*  Arguments Returned:
+      DOUBLE PRECISION MEAN
+      DOUBLE PRECISION MODE
+      DOUBLE PRECISION MEDIAN
+      DOUBLE PRECISION SIGMA
+      DOUBLE PRECISION SKEW
+      INTEGER NSAMP
+      INTEGER NINVAL
+
+*  Status:
+      INTEGER STATUS
+
+*  External References:
+      CHARACTER*2 CHR_NTH        ! 'st', 'nd', 'rd' or 'th'
+
+*  Local Constants:
+      INTEGER MAXITR             ! Maximum nuber of iterations
+      PARAMETER( MAXITR = 20 )
+
+      INTEGER MIND               ! Minimum permitted number of sample data
+      PARAMETER( MIND = 5 )
+
+*  Local Variables:
+      LOGICAL BPLOOP             ! Continue search for bad pixels?
+      DOUBLE PRECISION CUT1      ! Lower threshold for the partition
+      DOUBLE PRECISION CUT2      ! Upper threshold for the partition
+      DOUBLE PRECISION DELTA     ! Value of element added or subtracted
+      DOUBLE PRECISION HW        ! Half-width of the partition
+      INTEGER I                  ! Loop counter
+      INTEGER ISTEP              ! Direction in which to step through the
+                                 ! array to go from the old partition to
+                                 ! the new one
+      INTEGER JSTEP              ! The number of steps to move an edge
+                                 ! of the partition
+      INTEGER K                  ! Loop counter
+      DOUBLE PRECISION MEDG      ! First guess median
+      LOGICAL MOVE               ! There are more elements to move in or
+                                 ! out of the partition?
+      INTEGER NITER              ! Number of iterations
+      INTEGER PMAX               ! Array index of the maximum value in
+                                 ! the sample after removal of bad pixels
+      INTEGER PMIN               ! Array index of the minimum value in
+                                 ! the sample after removal of bad pixels
+      DOUBLE PRECISION R         ! Chauvenet rejection parameter
+      LOGICAL REDO               ! Continue to loop to re-evaluate the
+                                 ! statistics?
+      DOUBLE PRECISION SAM       ! Number of data elements after removal
+                                 ! of bad pixels before iteration
+      INTEGER SMAX               ! Array index of the maximum value in
+                                 ! the analysis
+      INTEGER SMIN               ! Array index of the minimum value in
+                                 ! the analysis
+      DOUBLE PRECISION STAT( 4 ) ! Previous loop's statistics, when
+                                 ! oscillating about a solution
+      DOUBLE PRECISION SUM       ! Sum of data values
+      DOUBLE PRECISION SUM2      ! Sum of squared data values
+      DOUBLE PRECISION VALUE     ! Value of element
+      DOUBLE PRECISION VARNCE    ! Variance
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversion functions
+      INCLUDE 'NUM_DEF_CVT'
+
+*.
+
+*  Initialise returned statistics.
+      MEAN = VAL__BADD
+      MEDIAN = VAL__BADD
+      MODE = VAL__BADD
+      SIGMA = VAL__BADD
+      SKEW = VAL__BADD
+      NSAMP = VAL__BADI
+      NINVAL = VAL__BADI
+
+*  Check the global inherited status.
+      IF ( STATUS .NE. SAI__OK ) GOTO 999
+
+*  Begin by sorting the data in ascending order.
+      CALL KPG1_QSRTR( EL, 1, EL, ARRAY, STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+         CALL ERR_REP( 'KPG_IMMMx__SORT',
+     :     'Error sorting the data', STATUS )
+         GOTO 999
+      END IF
+
+*  Set the partition sizes.
+*  ========================
+
+*  This is complicated by the need to account for bad pixels.
+      PMAX = EL
+      PMIN = 1
+
+*  Look for and count bad pixels.  Note we cannot assume the value
+*  of bad pixels is large negative, but we do assume that its absolute
+*  value large so the bad pixels will be at one end or other of the
+*  sorted data.
+      IF ( ARRAY( EL ) .EQ. VAL__BAD<T> ) THEN
+         I = EL - 1
+         BPLOOP = .TRUE.
+         DO WHILE ( BPLOOP .AND. I .GT. 1 )
+            BPLOOP = ARRAY( I ) .EQ. VAL__BAD<T>
+            I = I - 1
+         END DO
+         NINVAL = EL - I - 1
+
+*  Adjust the size of the partition accordingly.
+*  Henceforth sample minimum points to the highest value rejected
+*  at the lower end of the vector, and sample maximum points to the
+*  highest value accepted at the upper end of the vector.  Thus their
+*  difference is the number of elements within the acceptance range.
+         PMIN = 0
+         PMAX = I + 1
+
+      ELSE IF ( ARRAY( 1 ) .EQ. VAL__BAD<T> ) THEN
+         I = 2
+         BPLOOP = .TRUE.
+         DO WHILE ( BPLOOP .AND. I .LT. EL )
+            BPLOOP = ARRAY( I ) .EQ. VAL__BAD<T>
+            I = I + 1
+         END DO
+         NINVAL = I - 2
+
+*  Adjust the size of the partition accordingly.
+         PMIN = NINVAL
+         PMAX = EL
+      END IF
+
+      NSAMP = PMAX - PMIN
+      IF ( NSAMP .LT. MIND ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETI( 'N', NSAMP )
+         CALL ERR_REP( 'KPG_IMMMx__TOOFEW',
+     :     'There are too few (^N) data in the sample.', STATUS )
+         GOTO 999
+      END IF
+
+*  Form initial estimates of the mmm statistics.
+*  =============================================
+
+*  Calculate the median value for the whole ensemble of elements.
+*  Note that the following equation is valid whether the number
+*  of data in the sample is odd or even.
+      MEDG = 0.5D0 * ( NUM_<T>TOD( ARRAY( ( PMIN + PMAX + 1 ) / 2 ) ) +
+     :                 NUM_<T>TOD( ARRAY( ( PMIN + PMAX ) / 2 + 1 ) ) )
+
+*  For the first pass consider only elements in a symmetric interval
+*  about the median value.
+      HW = MIN( MEDG - ARRAY( PMIN + 1 ), ARRAY( PMAX ) - MEDG )
+      CUT1 = MEDG - HW
+      CUT2 = MEDG + HW
+
+*  Initialise some variables for the next loop.
+      SUM = 0.0D0
+      SUM2 = 0.0D0
+      SMIN = PMIN
+      SMAX = PMAX
+
+*  Sum for the deviation within this range.
+      DO I = SMIN + 1, SMAX
+         VALUE = NUM_<T>TOD( ARRAY( I ) )
+         IF ( VALUE .LT. CUT1 ) THEN
+            SMIN = I
+         ELSE
+            IF ( VALUE .GT. CUT2 ) GOTO 10
+            DELTA = VALUE - MEDG
+            SUM = SUM + DELTA
+            SUM2 = SUM2 + DELTA * DELTA
+            SMAX = I
+         END IF
+      END DO
+
+  10  CONTINUE
+
+      SAM = DBLE( SMAX - SMIN )
+
+*  Compute the median, mean and sigma of this first pass.  Note the
+*  mean is initially calculated about MEDG to reduce the truncation
+*  errors in sigma.  Also the variance is checked in case it is zero
+*  or negative (due to rounding).
+      MEDIAN = 0.5D0 *( NUM_<T>TOD( ARRAY( ( SMIN + SMAX + 1 ) / 2 ) ) +
+     :                  NUM_<T>TOD( ARRAY( ( SMIN + SMAX ) / 2 + 1 ) ) )
+
+      MEAN = SUM / SAM
+      VARNCE = 1.D0 / ( SAM - 1.D0 ) * ( SUM2 - SAM * MEAN * MEAN )
+      IF ( VARNCE .GT. 0.0D0 ) THEN
+         SIGMA = SQRT( VARNCE )
+      ELSE
+         SIGMA = 0.0
+      END IF
+      MEAN = MEAN + MEDG
+
+*  Now calculate the mode.  If the mean is near the median (and mode),
+*  that means the contamination is slight, and the mean value is what
+*  is really needed. The exact constraint is arbitrary, so this may
+*  cause an underestimate or overestimate of the mode when the
+*  scatter in the peak of the distribution is caused by random
+*  fluctuations rather than by contamination, but this bias is
+*  negligible compared with the problem of contamination.  Otherwise
+*  use the empirical formula to calculate the mode.
+      IF ( SIGMA .LT. VAL__SMLD ) THEN
+         MODE = MEAN
+      ELSE IF ( ABS( MEAN - MEDIAN ) / SIGMA .LT. 0.1D0 ) THEN
+         MODE = MEAN
+      ELSE
+         MODE = 3.0D0 * MEDIAN - 2.0D0 * MEAN
+      END IF
+
+*  Store the initial values in the last-result array.  These are
+*  needed when the fine tuning oscillates.
+      STAT( 1 ) = MEAN
+      STAT( 2 ) = MEDIAN
+      STAT( 3 ) = MODE
+      STAT( 4 ) = SIGMA
+
+*  Iterate to better statistics.
+*  =============================
+
+*  The rest of the routine improves the results by rejection and
+*  recomputation.
+      REDO = .TRUE.
+      NITER = 0
+
+      DO WHILE ( REDO )
+         NITER = NITER + 1
+         IF ( SMAX - SMIN .LT. MIND ) THEN
+            CALL MSG_SETI( 'N', SMAX - SMIN )
+            CALL MSG_SETC( 'NTH', CHR_NTH( I ) )
+            CALL MSG_SETI( 'I', NITER )
+            CALL MSG_OUTIF( MSG__NORM, 'KPG_IMMMx__ITFEWD',
+     :        'Refinement ends at ^I^NTH iteration because there are '/
+     :        /'too few data (^N) in the narrowed data range to '/
+     :        /'compute statistics.', STATUS )
+            GOTO 999
+         END IF
+
+*  Compute the Chauvenet rejection criterion.
+         R = LOG10( DBLE( SMAX - SMIN ) )
+         R = MAX( 2.0, R * ( 1.1695 - 0.1042 * R ) + 0.8895 )
+
+*  Compute rejection limits symmetric about the current mode.
+         HW = R * SIGMA + 0.5D0 * ABS( MEAN - MODE )
+         CUT1 = MODE - HW
+         CUT2 = MODE + HW
+
+*  Recompute the mean and sigma by adding and/or subtracting data values
+*  at both ends of the interval of acceptable values.  Elements are
+*  added or subtracted depending on whether the limit is moving towards
+*  or away from the mode.
+         REDO = .FALSE.
+
+*  Is the lower threshold above or below the currently accepted
+*  minimum value?
+         ISTEP = INT( SIGN( 1.0001D0,
+     :                      CUT1 - NUM_<T>TOD( ARRAY( SMIN + 1 ) ) ) )
+         JSTEP = ( ISTEP + 1 ) / 2
+
+*  If ISTEP = +1, JSTEP = 1.  If ISTEP = -1, JSTEP = 0.  If ISTEP = +1
+*  then there is at least one pixel to be deleted at the low end.
+         MOVE = .TRUE.
+         DO WHILE ( MOVE )
+            IF ( ( ISTEP .LT. 0 ) .AND. ( SMIN .LE. PMIN ) ) THEN
+               MOVE = .FALSE.
+
+*  Quit when the partition is located between the current minimum
+*  element and its lower adjacent element.
+            ELSE IF ( ( NUM_<T>TOD( ARRAY( SMIN ) ) .LE. CUT1 ) .AND.
+     :              ( NUM_<T>TOD( ARRAY( SMIN + 1 ) ) .GE. CUT1 ) ) THEN
+               MOVE = .FALSE.
+            ELSE
+
+*  Subtract the next higher data value below the lower threshold from
+*  the summations, or add the next lower data value above the threshold,
+*  depending on the direction the partition is being moved.
+               DELTA = NUM_<T>TOD( ARRAY( SMIN + JSTEP ) ) - MEDG
+               SUM = SUM - ISTEP * DELTA
+               SUM2 = SUM2 - ISTEP * DELTA * DELTA
+               SMIN = SMIN + ISTEP
+               REDO = .TRUE.
+            END IF
+         END DO
+
+*  Is the upper threshold above or below the current maximum?
+         ISTEP = INT( SIGN( 1.0001D0,
+     :                      CUT2 - NUM_<T>TOD( ARRAY( SMAX ) ) ) )
+         JSTEP = ( ISTEP + 1 ) / 2
+
+*  If ISTEP = +1, JSTEP = 1.  If ISTEP = -1, JSTEP = 0.  If ISTEP = -1
+*  then there is at least one pixel to be subtracted from the high end.
+         MOVE = .TRUE.
+         DO WHILE ( MOVE )
+            IF ( ( ISTEP .GT. 0 ) .AND. ( SMAX .GE. PMAX ) ) THEN
+               MOVE = .FALSE.
+
+*  Quit when the partition is located between the current maximum
+*  element and its higher adjacent element.
+            ELSE IF ( NUM_<T>TOD( ARRAY( SMAX ) ) .LE. CUT2 .AND.
+     :                NUM_<T>TOD( ARRAY( SMAX + 1 ) ) .GE. CUT2 ) THEN
+               MOVE = .FALSE.
+            ELSE
+
+*  Subtract the next higher data value above the upper threshold from
+*  the summations, or add the next upper data value below the threshold,
+*  depending on the direction the partition is being moved.
+               DELTA = ARRAY( SMAX + JSTEP ) - MEDG
+               SUM = SUM + ISTEP * DELTA
+               SUM2 = SUM2 + ISTEP * DELTA * DELTA
+               SMAX = SMAX + ISTEP
+               REDO = .TRUE.
+            END IF
+         END DO
+
+         NSAMP = SMAX - SMIN
+         IF ( NSAMP .LT. MIND ) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETI( 'N', SMAX - SMIN )
+            CALL MSG_SETI( 'I', NITER )
+            CALL ERR_REP( 'KPG_IMMMx__TFEWD',
+     :        'Too few data (^N) to compute statistics at '/
+     :        /'iteration ^I.', STATUS )
+            GOTO 999
+         END IF
+
+*  Compute the mean and sigma from this pass.  Watch for the case
+*  where all the values are equal.
+         MEAN = SUM / DBLE( NSAMP )
+         VARNCE = 1.0D0 / DBLE( NSAMP - 1 ) *
+     :            ( SUM2 - DBLE( NSAMP ) * MEAN * MEAN )
+         IF ( VARNCE .GT. 0.0 ) THEN
+            SIGMA = SQRT( VARNCE )
+         ELSE
+            SIGMA = 0.0D0
+         END IF
+         MEAN = MEAN + MEDG
+
+*  Obtain the median. To first approximation the median is the
+*  value of the sky in the middle pixel of the sorted data (if the
+*  total number is odd) or the mean of the central two pixels (if
+*  the total number of pixels is even).
+*
+*         MEDIAN = 0.5 * ( ARRAY( ( SMIN + SMAX + 1 ) / 2 ) +
+*     :                    ARRAY( ( SMIN + SMAX ) / 2 + 1 ) )
+*
+*  However, this is not good enough.  The estimator for the mode can
+*  change by three units if there is a tiny change in the list of data
+*  values sufficient to alter the median value of the sample by one
+*  unit.  We need something more robust than this.  As a first attempt
+*  try finding the median by calculating the mean of the central nine
+*  or ten values (fewer if there are fewer elements left).
+         MEDIAN = 0.0D0
+         K = 0
+         DO I = MAX( SMIN + 1, ( SMIN + SMAX - 8 ) / 2 ),
+     :          MIN( SMAX, ( SMIN + SMAX + 11 ) / 2 )
+            MEDIAN = MEDIAN + NUM_<T>TOD( ARRAY( I ) )
+            K = K + 1
+         END DO
+
+*  Had earlier check, so number cannot be zero.
+         MEDIAN = MEDIAN / DBLE( K )
+
+*  Now calculate the mode as before.
+         IF ( SIGMA .LT. VAL__SMLD ) THEN
+            MODE = MEAN
+         ELSE IF ( ABS( MEAN - MEDIAN ) / SIGMA .LT. 0.1D0 ) THEN
+            MODE = MEAN
+         ELSE
+            MODE = 3.0D0 * MEDIAN - 2.0D0 * MEAN
+         END IF
+
+*  If the system is oscillating about two states ad infinitum, just
+*  average the two sets of values.  Exit the loop.
+         IF ( NITER .EQ. MAXITR ) THEN
+            MEAN = 0.5D0 * ( MEAN + STAT( 1 ) )
+            MEDIAN = 0.5D0 * ( MEDIAN + STAT( 2 ) )
+            MODE = 0.5D0 * ( MODE + STAT( 3 ) )
+            SIGMA = 0.5D0 * ( SIGMA + STAT( 4 ) )
+            REDO = .FALSE.
+         ELSE
+
+*  Store the current values in the last-result array.  These are
+*  needed when the fine tuning oscillates.
+            STAT( 1 ) = MEAN
+            STAT( 2 ) = MEDIAN
+            STAT( 3 ) = MODE
+            STAT( 4 ) = SIGMA
+         END IF
+
+*  End of iteration loop
+      END DO
+
+*  Calculate the skewness.
+      SKEW = ( MEAN - MODE ) / MAX( 1.0D0, SIGMA )
+
+  999 CONTINUE
+      IF ( STATUS .NE. SAI__OK ) THEN
+         CALL ERR_REP( 'KPG_IMMMx__ERR',
+     :     'Unable to find the mean, median, and mode using the '/
+     :     /'Chauvenet criterion.', STATUS )
+      END IF
+
+      END
