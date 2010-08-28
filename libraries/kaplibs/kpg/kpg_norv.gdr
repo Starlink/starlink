@@ -38,8 +38,8 @@
 *  Notes:
 *     -  There is a routine for each of the standard floating-point
 *     types.  Replace "x" in the routine name by D or R as appropriate.
-*     The data type of the INARR, SIGMA, and OUTARR must match the
-*     particular routine used.
+*     The data type of the INARR, SIGMA, and OUTARR arguments must
+*     match the particular routine used.
 
 *  Copyright:
 *     Copyright (C) 1986, 1992 Science & Engineering Research Council.
@@ -63,20 +63,15 @@
 *     02111-1307, USA.
 
 *  Authors:
-*     MJM: Mark McCaughrean (University of Edinburgh)
 *     MJC: Malcolm Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
-*     14-02-1986 (MJM):
-*        First implementation.
-*     1986 August 12 (MJC):
-*        Completed prologue and nearly conformed to Starlink standards.
-*     1986 September 2 (MJC):
-*        Renamed parameter section arguments and tidied.
-*     1992 March 17 (MJC):
-*        Used portable random-number generation.
-*     {enter_further_changes_here}
+*     2010 August 27 (MJC):
+*        Original version adapted from and replacing NORMAL.  This 
+*        version is generic and supports processing of arrays instead of
+*        only single values.
+*     {enter_changes_here}
 
 *  Bugs:
 *     {note_new_bugs_here}
