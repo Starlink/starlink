@@ -145,7 +145,6 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
-*     DSB: David S Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -162,8 +161,8 @@
 *     2010 August 21 (MJC):
 *        Replace calls: CPSECR with KPG1_CPNDR, and STATV with
 *        KPG1_STATR.
-*     30-AUG-2010 (DSB):
-*        Replace ICMMM with KPG_IMMM.
+*     2010 August 28 (MJC):
+*        Replace ICMMM with KPG_IMMMx.
 *     {enter_further_changes_here}
 
 *-
@@ -205,6 +204,8 @@
                                  ! directions in the current bin (allows
                                  ! edge effects)
       DOUBLE PRECISION DMEAN     ! Mean value of the bin values
+      DOUBLE PRECISION DMEDI     ! Median value of the bin
+      DOUBLE PRECISION DMODE     ! Mode value of the bin
       DOUBLE PRECISION DSTDEV    ! Standard deviation of the bin values
       CHARACTER*4 ESTIM          ! Uppercase version of the estimator
       LOGICAL HITHRS             ! Upper threshold to apply?
@@ -245,7 +246,7 @@
       INTEGER NSAM               ! Number of values used to compute the
                                  ! median or mode
       LOGICAL ORDERD             ! Mode or median estimator selected?
-      REAL SKEW                  ! Skewness of the bin values
+      DOUBLE PRECISION SKEW      ! Skewness of the bin values
       REAL STDDEV                ! Standard deviation of the bin values
       DOUBLE PRECISION STDVCL    ! Standard deviation of the bin values
                                  ! after clipping
@@ -366,10 +367,10 @@
 *  and normal statistics --- mean, mean plus clipping.
             IF ( ORDERD ) THEN
  
-*  KPG_IMMM imposes a minimum of 5 values to derive the ordered
+*  KPG_IMMMx imposes a minimum of five values to derive the ordered
 *  statistics.  It also iterates to a solution, removing the outliers,
 *  so only allow those samples with an adequate sample size to be
-*  passed to KPG_IMMM, otherwise just compute the simple median.
+*  passed to KPG_IMMMx, otherwise just compute the simple median.
                IF ( ESTIM .EQ. 'MEDI' .AND. BINTOT .LT. 12 ) THEN
                   CALL KPG1_MEDUR( .TRUE., BINTOT, BIN, MEDIAN, NSAM,
      :                             STATUS )
@@ -377,8 +378,18 @@
  
 *  The mode and median are obtained and stored.  The mode is reliable
 *  for moderately skew distributions.
-                  CALL KPG_IMMMR( BINTOT, BIN, MEAN, MEDIAN, MODE, STDDEV,
-     :                            SKEW, NSAM, NINVAL, STATUS )
+                  CALL KPG_IMMMR( BINTOT, BIN, DMEAN, DMEDI, DMODE,
+     :                            DSTDEV, SKEW, NSAM, NINVAL, STATUS )
+
+*  This is not ideal now converting back to singe-precision values,
+*  instead of using the double-precision statistics directly whenever
+*  the bins athemselves are also double precision.  However, the
+*  original code was only single precision, as are the data values,
+*  so this avoids too much murky special-case coding.
+                  MEAN = REAL( DMEAN )
+                  MEDIAN = REAL( DMEDI )
+                  MODE = REAL( DMODE )
+                  STDDEV = REAL( DSTDEV )
                END IF
  
 *  Only store the results when there were sufficient points.  Unused
