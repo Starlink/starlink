@@ -145,12 +145,13 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     DSB: David S Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     1990 Jan 24 (MJC):
 *        Original version.
-*     1993 February 17 (MJC):
+*     1993 February 17 (MJC):*    
 *        Uses a new routine to derive medians for bins containing few
 *        pixels.
 *     1996 October 15 (MJC):
@@ -161,6 +162,8 @@
 *     2010 August 21 (MJC):
 *        Replace calls: CPSECR with KPG1_CPNDR, and STATV with
 *        KPG1_STATR.
+*     30-AUG-2010 (DSB):
+*        Replace ICMMM with KPG_IMMM.
 *     {enter_further_changes_here}
 
 *-
@@ -219,7 +222,7 @@
       INTEGER MAXPOS             ! Index of maximum value
       DOUBLE PRECISION MAXMUM    ! Maximum value in bin (not used)
       DOUBLE PRECISION MAXCL     ! Clipped maximum value (not used)
-      REAL MEAN                  ! Mean value of the bin (ICMMM)
+      REAL MEAN                  ! Mean value of the bin (KPG_IMMM)
       DOUBLE PRECISION MEANCL    ! Clipped mean value of the bin
       REAL MEDIAN                ! Median value of the bin
       DOUBLE PRECISION MINCL     ! Clipped minimum value (not used)
@@ -363,10 +366,10 @@
 *  and normal statistics --- mean, mean plus clipping.
             IF ( ORDERD ) THEN
  
-*  ICMMM imposes a minimum of 5 values to derive the ordered
+*  KPG_IMMM imposes a minimum of 5 values to derive the ordered
 *  statistics.  It also iterates to a solution, removing the outliers,
 *  so only allow those samples with an adequate sample size to be
-*  passed to ICMMM, otherwise just compute the simple median.
+*  passed to KPG_IMMM, otherwise just compute the simple median.
                IF ( ESTIM .EQ. 'MEDI' .AND. BINTOT .LT. 12 ) THEN
                   CALL KPG1_MEDUR( .TRUE., BINTOT, BIN, MEDIAN, NSAM,
      :                             STATUS )
@@ -374,8 +377,8 @@
  
 *  The mode and median are obtained and stored.  The mode is reliable
 *  for moderately skew distributions.
-                  CALL ICMMM( BIN, BINTOT, MEAN, MEDIAN, MODE, STDDEV,
-     :                        SKEW, NSAM, NINVAL, STATUS )
+                  CALL KPG_IMMMR( BINTOT, BIN, MEAN, MEDIAN, MODE, STDDEV,
+     :                            SKEW, NSAM, NINVAL, STATUS )
                END IF
  
 *  Only store the results when there were sufficient points.  Unused
