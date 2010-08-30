@@ -6,7 +6,7 @@
 *     CCG_TC1x
 
 *  Purpose:
-*     Combines data lines using a threshold clipped mean.
+*     Combines data lines using a threshold-clipped mean.
 
 *  Language:
 *     Starlink Fortran 77

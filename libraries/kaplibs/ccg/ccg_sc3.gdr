@@ -6,7 +6,7 @@
 *     CCG_SC3x
 
 *  Purpose:
-*     Combines data lines using a sigma clipped mean.
+*     Combines data lines using a sigma-clipped mean.
 
 *  Language:
 *     Starlink Fortran 77

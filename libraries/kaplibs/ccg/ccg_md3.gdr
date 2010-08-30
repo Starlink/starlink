@@ -2,7 +2,7 @@
      :                     WRK1, WRK2, POINT, USED, NCON, NBAD, STATUS )
 *+
 *  Name:
-*     CCG_MDR3x
+*     CCG_MD3x
 
 *  Purpose:
 *     Combines data lines using a weighted median.

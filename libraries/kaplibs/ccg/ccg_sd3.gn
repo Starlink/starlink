@@ -12,7 +12,7 @@
 
 *  Invocation:
 *     CALL CCG_SD3x( NPIX, NLINES, STACK, MINPIX, RESULT, NCON,
-*                    NBAD, NCON, NBAD, NCON, NBAD, STATUS )
+*                    NBAD, STATUS )
 
 *  Description:
 *     This routine accepts an array consisting a series of (vectorised)

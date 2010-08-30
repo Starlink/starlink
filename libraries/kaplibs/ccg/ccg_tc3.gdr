@@ -3,18 +3,18 @@
      :                     NCON, NBAD, STATUS )
 *+
 *  Name:
-*     CCG_TCR3x
+*     CCG_TC3x
 
 *  Purpose:
-*     Combines data lines using a threshold clipped mean.
+*     Combines data lines using a threshold-clipped mean.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCG_TCR3x( VMIN, VMAX, NPIX, NLINES, STACK, VARS, MINPIX,
-*                     RESULT, WRK1, WRK2, POINT, USED, NCON, NBAD,
-*                     STATUS )
+*     CALL CCG_TC3x( VMIN, VMAX, NPIX, NLINES, STACK, VARS, MINPIX,
+*                    RESULT, WRK1, WRK2, POINT, USED, NCON, NBAD,
+*                    STATUS )
 
 *  Description:
 *     This routine accepts an array consisting a series of (vectorised)

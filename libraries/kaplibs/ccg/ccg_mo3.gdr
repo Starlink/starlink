@@ -3,7 +3,7 @@
      :                     NCON, NBAD, STATUS )
 *+
 *  Name:
-*     CCG_MOR3x
+*     CCG_MO3x
 
 *  Purpose:
 *     Combines data lines using a mode.
@@ -12,9 +12,9 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCG_MOR3x( NSIGMA, NITER, NPIX, NLINES, STACK, VARS, MINPIX,
-*                      RESULT, WRK1, WRK2, POINT, USED, NCON, NBAD,
-*                      STATUS )
+*     CALL CCG_MO3x( NSIGMA, NITER, NPIX, NLINES, STACK, VARS, MINPIX,
+*                    RESULT, WRK1, WRK2, POINT, USED, NCON, NBAD,
+*                    STATUS )
 
 *  Description:
 *     This routine accepts an array consisting a series of (vectorised)
