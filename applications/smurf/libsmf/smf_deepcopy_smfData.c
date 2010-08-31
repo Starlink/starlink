@@ -179,7 +179,8 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
   if ( old->history != NULL ) {
     history = astCopy( old->history );
   } else {
-    msgOutif(MSG__DEBUG," ", "No history to copy. Continuing, but this may cause problems later", status);
+    msgOutif(MSG__DEBUG," ", "No history to copy. "
+             "Continuing, but this may cause problems later", status);
   }
 
   /* Set elements of create to reflect SMF__NOCREATE flags */
@@ -232,12 +233,14 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
           } else {
             if ( *status == SAI__OK ) {
               *status = SAI__ERROR;
-              errRep(FUNC_NAME, "Loop counter out of range. Possible programming error?", status);
+              errRep(FUNC_NAME, "Loop counter out of range. "
+                     "Possible programming error?", status);
               return NULL;
             }
           }
           *status = SAI__ERROR;
-          errRep(FUNC_NAME, "Unable to allocate memory for ^C component", status);
+          errRep(FUNC_NAME, "Unable to allocate memory for ^C component",
+                 status);
           return NULL;
         }
         memcpy( pntr[i], (old->pntr)[i], nbytes*npts);
@@ -251,7 +254,8 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
     qual = astCalloc( npts, sizeof(*qual), 0 );
     if ( qual == NULL ) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Unable to allocate memory for Quality component", status);
+      errRep(FUNC_NAME, "Unable to allocate memory for Quality component",
+             status);
       return NULL;
     }
     memcpy( qual, old->qual, npts*sizeof(*qual) );
@@ -274,7 +278,8 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
     }
     memcpy( poly, old->poly, npts*sizeof(double));
   } else {
-    msgOutif(MSG__DEBUG," ", "Skipping copy of SCANFIT coefficients, ncoeff = 0", status);
+    msgOutif(MSG__DEBUG," ",
+             "Skipping copy of SCANFIT coefficients, ncoeff = 0", status);
   }
 
   /* Copy smfHead if desired */
@@ -297,9 +302,10 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
   }
 
   /* Construct the new smfData */
-  new = smf_construct_smfData( new, file, hdr, da, dtype, pntr, qual, old->qfamily,
-                               sidequal, isTordered, dims, old->lbnd, ndims,
-                               virtual, ncoeff, poly, history, status);
+  new = smf_construct_smfData( new, file, hdr, da, dtype, pntr, qual,
+                               old->qfamily, sidequal, isTordered, dims,
+                               old->lbnd, ndims, virtual, ncoeff, poly, history,
+                               status);
 
   return new;
 }
