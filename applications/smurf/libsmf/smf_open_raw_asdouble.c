@@ -117,7 +117,7 @@ smf_open_raw_asdouble( const Grp *igrp, size_t index, const smfArray* darks,
   /* Create a new smfData and copy the data across, converting to _DOUBLE. There shouldn't
      be any variance. */
   flags |= SMF__NOCREATE_FILE;
-  *data = smf_deepcopy_smfData( indata, 1, flags, status );
+  *data = smf_deepcopy_smfData( indata, 1, flags, 0, 0, status );
 
   if ( *status != SAI__OK) {
     errRep( " ", "Unable to allocate enough memory to create _DOUBLE version of smfData",

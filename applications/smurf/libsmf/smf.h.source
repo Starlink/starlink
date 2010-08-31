@@ -375,6 +375,8 @@
  *        Add smf_write_itermap
  *     2010-08-20 (EC):
  *        Add smf_write_bolomap, smf_write_shortmap
+ *     2010-08-31 (EC):
+ *        Add smf_dataOrder_array
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -796,10 +798,17 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 
 int smf_dataOrder( smfData *data, int isTordered, int *status );
 
+void * smf_dataOrder_array( void * oldbuf, smf_dtype dtype, size_t ndata,
+                            size_t ntslice, size_t nbolo,
+                            size_t tstr1, size_t bstr1,
+                            size_t tstr2, size_t bstr2, int inPlace,
+                            int * status );
+
 smfDA * smf_deepcopy_smfDA ( const smfData *old, int cpdks, int * status);
 
 smfData * smf_deepcopy_smfData ( const smfData *old, const int rawconvert,
-                                 const int flags, int * status);
+                                 const int flags, int assertOrder,
+                                 int isTordered, int * status);
 
 smfFile * smf_deepcopy_smfFile ( const smfFile *old, int * status );
 

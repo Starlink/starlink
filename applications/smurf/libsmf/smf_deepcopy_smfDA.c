@@ -165,7 +165,7 @@ smf_deepcopy_smfDA( const smfData *old, int cpdks, int * status ) {
   if (cpdks && oldda->dksquid) {
     dksquid = smf_deepcopy_smfData( oldda->dksquid, 0, SMF__NOCREATE_HEAD |
                                     SMF__NOCREATE_FILE | SMF__NOCREATE_DA,
-                                    status );
+                                    0, 0, status );
   }
 
   /* Construct the new smfData */

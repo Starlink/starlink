@@ -167,7 +167,7 @@ void smf_flatfield ( const smfData *idata, const smfArray * flats, smfData **oda
          (i.e. leave smfFile NULL) */
       /* Allocate space for *odata and all necessary cpts */
       /* Set the rawconvert flag to return doubles in the DATA array */
-      *odata = smf_deepcopy_smfData( idata, 1, flags, status );
+      *odata = smf_deepcopy_smfData( idata, 1, flags, 0, 0, status );
     } else {
       /* OK, *odata exists */
       msgOutif(MSG__DEBUG1," ","Data not flatfielded, output data file exists.", status);

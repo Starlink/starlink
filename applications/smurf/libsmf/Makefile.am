@@ -98,6 +98,7 @@ smf_cso2filt_tau.c \
 smf_cubebounds.c \
 smf_cubegrid.c \
 smf_dataOrder.c \
+smf_dataOrder_array.c \
 smf_deepcopy_smfDA.c \
 smf_deepcopy_smfData.c \
 smf_deepcopy_smfFile.c \

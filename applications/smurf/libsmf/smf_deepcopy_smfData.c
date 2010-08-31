@@ -14,7 +14,8 @@
 
 *  Invocation:
 *     new = smf_deepcopy_smfData( const smfData *old, const int rawconvert,
-*              const int flags,  int * status );
+*                                 const int flags, int assertOrder,
+*                                 int isTordered, int * status );
 
 *  Arguments:
 *     old = const smfData* (Given)
@@ -30,7 +31,13 @@
 *          - SMF__NOCREATE_DATA     Do not copy DATA component
 *          - SMF__NOCREATE_VARIANCE Do not copy VARIANCE component
 *          - SMF__NOCREATE_QUALITY  Do not copy QUALITY or sidequal component
-*
+*     assertOrder = int (Given)
+*        If set, assert the data order to that specified by isTordered in
+*        the copy (if needed). More efficient use of memory than copying
+*        data and then calling smf_dataOrder. Ignored if we are not
+*        dealing with 3d data.
+*     isTordered = int (Given)
+*        Assert this data order if assertOrder set.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -53,6 +60,8 @@
 *       is not owned by the smfData.
 *     - The sidequal pointer is not copied if SMF__NOCREATE_QUALITY flag
 *       is set.
+*     - if rawconvert is set this routine can not re-order data and generates
+*       bad status if assertOrder is also set.
 
 *  Authors:
 *     Tim Jenness (TIMJ)
@@ -88,6 +97,8 @@
 *        Need to trap VAL__BADI
 *     2010-07-07 (TIMJ):
 *        Note sidequal behaviour.
+*     2010-08-31 (EC):
+*        Add ability to do a re-ordering copy
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -135,8 +146,11 @@
 
 smfData *
 smf_deepcopy_smfData( const smfData *old, const int rawconvert,
-                      const int flags, int * status ) {
+                      const int flags, int assertOrder, int isTordered,
+                      int * status ) {
 
+  size_t bstr1=0;             /* bolometer index stride input */
+  size_t bstr2=0;             /* bolometer index stride output */
   int create[3];              /* Flag for copying each component (D,V,Q) */
   smfDA *da = NULL;           /* New smfDA */
   dim_t dims[NDF__MXDIM];     /* Dimensions of each axis of data array */
@@ -144,18 +158,25 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
   smfFile *file = NULL;       /* New smfFile */
   smfHead *hdr = NULL;        /* New smfHead */
   size_t i;                   /* Loop counter */
-  int isTordered;             /* Data order */
+  int oldOrder;               /* Data order in old data buffer */
   size_t j;                   /* Loop counter */
+  int lbnd[NDF__MXDIM];       /* lower bounds of each axis of data array */
+  dim_t nbolo;                /* number of bolometers */
   size_t nbytes;              /* Number of bytes in data type */
   dim_t ncoeff = 0;           /* Number of coefficients */
   size_t ndims;               /* Number of dimensions in data array */
   smfData *new = NULL;        /* New smfData */
+  int newOrder;               /* Data order in new data buffer */
   size_t npts;                /* Number of data points */
+  dim_t ntslice;              /* Number of time slices */
   double *outdata;            /* Pointer to output DATA */
   void *pntr[2];              /* Data and variance arrays */
   double *poly = NULL;        /* Polynomial coefficients */
   smf_qual_t *qual = NULL;    /* Quality array */
+  int reOrder=0;              /* If set we are re-ordering the data */
   smfData * sidequal = NULL;  /* Sidecar quality */
+  size_t tstr1=0;             /* time index stride input */
+  size_t tstr2=0;             /* time index stride output */
   int *tstream;               /* Pointer to raw time series data */
   int virtual;                /* Is it a virtual smfData? */
   AstKeyMap *history = NULL;  /* Pointer to history */
@@ -167,13 +188,59 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
   ncoeff = old->ncoeff;
   virtual = old->virtual;
   dtype = old->dtype;
-  isTordered = old->isTordered;
+  oldOrder = old->isTordered;
+  newOrder = oldOrder;
 
+  /* Dimensions based on old data */
   npts = 1;
   for (i=0; i<ndims; i++) {
+    lbnd[i] = (old->lbnd)[i];
     dims[i] = (old->dims)[i];
     npts *= dims[i];
   }
+
+  /* If we have 3d data and we request data re-ordering, work out
+     whether we need to do re-ordering at all, and the dimensions and
+     strides here */
+  if( assertOrder ) {
+    if( old->ndims == 3 ) {
+      if( old->isTordered != isTordered ) {
+        if( rawconvert ) {
+          *status = SAI__ERROR;
+          errRep( "", FUNC_NAME ": Can't re-order if rawconvert is set.",
+                  status );
+          return NULL;
+        }
+
+        reOrder = 1;
+        newOrder = isTordered;
+        smf_get_dims( old, NULL, NULL, &nbolo, &ntslice, NULL, &bstr1, &tstr1,
+                      status );
+
+        /* What will the dimensions/strides be in the newly-ordered array? */
+        if( isTordered ) {
+          dims[0] = (old->dims)[1];
+          dims[1] = (old->dims)[2];
+          dims[2] = (old->dims)[0];
+          lbnd[0] = (old->lbnd)[1];
+          lbnd[1] = (old->lbnd)[2];
+          lbnd[2] = (old->lbnd)[0];
+          bstr2 = 1;
+          tstr2 = nbolo;
+        } else {
+          dims[0] = (old->dims)[2];
+          dims[1] = (old->dims)[0];
+          dims[2] = (old->dims)[1];
+          lbnd[0] = (old->lbnd)[2];
+          lbnd[1] = (old->lbnd)[0];
+          lbnd[2] = (old->lbnd)[1];
+          bstr2 = ntslice;
+          tstr2 = 1;
+        }
+      }
+    }
+  }
+
 
   /* Copy all history components provided one exists */
   if ( old->history != NULL ) {
@@ -223,27 +290,36 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
         }
         pntr[i] = outdata;
       } else {
-        nbytes = smf_dtype_size(old, status);
-        pntr[i] = astCalloc( npts, nbytes, 0 );
-        if ( pntr[i] == NULL ) {
-          if ( i == 0) {
-            msgSetc("C", "Data");
-          } else if ( i == 1 ) {
-            msgSetc("C", "Variance");
-          } else {
-            if ( *status == SAI__OK ) {
-              *status = SAI__ERROR;
-              errRep(FUNC_NAME, "Loop counter out of range. "
-                     "Possible programming error?", status);
-              return NULL;
+
+        if( reOrder ) {
+          /* Do a re-ordering copy into a new buffer */
+          pntr[i] = smf_dataOrder_array( old->pntr[i], old->dtype, npts,
+                                         ntslice, nbolo, tstr1, bstr1, tstr2,
+                                         bstr2, 0, status );
+        } else {
+          /* Allocate space and memcpy */
+          nbytes = smf_dtype_size(old, status);
+          pntr[i] = astCalloc( npts, nbytes, 0 );
+          if ( pntr[i] == NULL ) {
+            if ( i == 0) {
+              msgSetc("C", "Data");
+            } else if ( i == 1 ) {
+              msgSetc("C", "Variance");
+            } else {
+              if ( *status == SAI__OK ) {
+                *status = SAI__ERROR;
+                errRep(FUNC_NAME, "Loop counter out of range. "
+                       "Possible programming error?", status);
+                return NULL;
+              }
             }
+            *status = SAI__ERROR;
+            errRep(FUNC_NAME, "Unable to allocate memory for ^C component",
+                   status);
+            return NULL;
           }
-          *status = SAI__ERROR;
-          errRep(FUNC_NAME, "Unable to allocate memory for ^C component",
-                 status);
-          return NULL;
+          memcpy( pntr[i], (old->pntr)[i], nbytes*npts);
         }
-        memcpy( pntr[i], (old->pntr)[i], nbytes*npts);
       }
     } else {
       pntr[i] = NULL;
@@ -251,32 +327,41 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
   }
   /* Quality */
   if ( (old->qual != NULL) && create[2] ) {
-    qual = astCalloc( npts, sizeof(*qual), 0 );
-    if ( qual == NULL ) {
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Unable to allocate memory for Quality component",
-             status);
-      return NULL;
+    if( reOrder ) {
+      /* Do a re-ordering copy into a new buffer */
+      pntr[i] = smf_dataOrder_array( old->qual, SMF__QUALTYPE, npts,
+                                     ntslice, nbolo, tstr1, bstr1, tstr2,
+                                     bstr2, 0, status );
+    } else {
+      /* Allocate space and memcpy */
+      qual = astCalloc( npts, sizeof(*qual), 0 );
+      if ( qual == NULL ) {
+        *status = SAI__ERROR;
+        errRep(FUNC_NAME, "Unable to allocate memory for Quality component",
+               status);
+        return NULL;
+      }
     }
     memcpy( qual, old->qual, npts*sizeof(*qual) );
   } else {
     qual = NULL;
   }
 
-  /* Redefine npts for polynomial coefficients */
+  /* Copy over polynomial coefficients */
   if ( ncoeff != 0 ) {
-    if( isTordered ) {
-      npts = dims[0]*dims[1]*ncoeff;
+    size_t npolypts;
+    if( oldOrder ) {
+      npolypts = old->dims[0]*old->dims[1]*ncoeff;
     } else {
-      npts = dims[1]*dims[2]*ncoeff;
+      npolypts = old->dims[1]*old->dims[2]*ncoeff;
     }
-    poly = astCalloc( npts, sizeof(double), 0 );
+    poly = astCalloc( npolypts, sizeof(double), 0 );
     if ( *status != SAI__OK ) {
       errRep(FUNC_NAME,
              "Unable to allocate memory for polynomial coefficients", status);
       return NULL;
     }
-    memcpy( poly, old->poly, npts*sizeof(double));
+    memcpy( poly, old->poly, npolypts*sizeof(double));
   } else {
     msgOutif(MSG__DEBUG," ",
              "Skipping copy of SCANFIT coefficients, ncoeff = 0", status);
@@ -303,8 +388,8 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
 
   /* Construct the new smfData */
   new = smf_construct_smfData( new, file, hdr, da, dtype, pntr, qual,
-                               old->qfamily, sidequal, isTordered, dims,
-                               old->lbnd, ndims, virtual, ncoeff, poly, history,
+                               old->qfamily, sidequal, newOrder, dims,
+                               lbnd, ndims, virtual, ncoeff, poly, history,
                                status);
 
   return new;

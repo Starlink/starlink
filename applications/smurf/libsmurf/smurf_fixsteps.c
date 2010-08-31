@@ -235,7 +235,7 @@ void smurf_fixsteps( int *status ) {
    smf_open_file( igrp, 1, "Read", 0, &indata, status );
 
 /* Since we will be modifying the data values, we need a deep copy. */
-   data = smf_deepcopy_smfData( indata, 0, 0, status );
+   data = smf_deepcopy_smfData( indata, 0, 0, 0, 0, status );
 
 /* Place cleaning parameters into a keymap and set defaults. Note that we
    use the map-maker defaults file here so that we populate the locked

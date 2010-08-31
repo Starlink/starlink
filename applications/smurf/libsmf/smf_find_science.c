@@ -434,7 +434,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
                 /* get some memory for the ratio if we have not already.
                    We could get some memory once assuming each flat has the
                    same number of bolometers... */
-                ratio = smf_deepcopy_smfData( prevresp, 0, 0, status );
+                ratio = smf_deepcopy_smfData( prevresp, 0, 0, 0, 0, status );
 
                 /* divide: smf_divide_smfData ? */
                 in1 = (prevresp->pntr)[0];

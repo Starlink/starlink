@@ -37,7 +37,6 @@
 *     transformed data.
 
 *  Description:
-
 *     Perform the forward or inverse FFT of a smfData. In the time
 *     domain the data are 3-d (either x,y,time or time,x,y depending
 *     on isTordered flag). The frequency domain representation of the
@@ -85,6 +84,8 @@
 *        Make sure that quality in smfData really is used.
 *     2010-07-02 (TIMJ):
 *        Use const quality
+*     2010-08-31 (EC):
+*        Do the re-ordering as part of the deepcopy if needed
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -327,12 +328,13 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
      have quality so we only need quality for apodizing and that
      apodization will not be propagated back to the input
      smfData since we work on the copy. We therefore create
-     a workspace copy of the quality. */
+     a workspace copy of the quality. Re-ordering is also done
+     if needed. */
   data = smf_deepcopy_smfData( indata, 0,
                                SMF__NOCREATE_VARIANCE |
                                SMF__NOCREATE_QUALITY |
                                SMF__NOCREATE_FILE |
-                               SMF__NOCREATE_DA, status );
+                               SMF__NOCREATE_DA, 1, 0, status );
 
   /* Create some quality. We only apodize if we are doing a
      forward FFT. */
@@ -353,11 +355,6 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
     if (data->qual) data->qual = astFree( data->qual );
   }
 
-  /* Re-order a time-domain cube if needed */
-  if( indata->isTordered && (indata->ndims == 3) ) {
-    smf_dataOrder( data, 0, status );
-  }
-
   /* Create a new smfData, copying over everything except for the bolo
      data itself */
 
@@ -365,7 +362,7 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
                                   SMF__NOCREATE_VARIANCE |
                                   SMF__NOCREATE_QUALITY |
                                   SMF__NOCREATE_FILE |
-                                  SMF__NOCREATE_DA, status );
+                                  SMF__NOCREATE_DA, 0, 0, status );
 
   if( *status == SAI__OK ) {
 

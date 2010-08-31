@@ -540,7 +540,8 @@ void smf_calc_mapcoord( smfWorkForce *wf, smfData *data, AstFrameSet *outfset,
                                             SMF__NOCREATE_DA |
                                             SMF__NOCREATE_DATA |
                                             SMF__NOCREATE_VARIANCE |
-                                            SMF__NOCREATE_QUALITY, status );
+                                            SMF__NOCREATE_QUALITY, 0, 0,
+                                            status );
         smf_lock_data( pdata->data, 0, status );
       }
 

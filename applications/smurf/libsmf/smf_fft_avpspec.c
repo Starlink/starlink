@@ -159,7 +159,7 @@ smfData *smf_fft_avpspec( const smfData *pspec, smf_qual_t *quality,
                                   SMF__NOCREATE_VARIANCE |
                                   SMF__NOCREATE_QUALITY |
                                   SMF__NOCREATE_FILE |
-                                  SMF__NOCREATE_DA, status );
+                                  SMF__NOCREATE_DA, 0, 0, status );
   if( *status == SAI__OK ) {
     /* Allocate space for the averaged power spectrum */
     retdata->ndims = 4;
