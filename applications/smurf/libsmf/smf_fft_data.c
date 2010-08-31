@@ -343,7 +343,8 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
        we did a deepcopy without copying it */
     if (inqual) {
       data->qual = astCalloc( nbolo * ntslice, sizeof(*(data->qual)), 0 );
-      if (data->qual) memcpy( data->qual, inqual, nbolo*ntslice * sizeof(*(data->qual)) );
+      if (data->qual) memcpy( data->qual, inqual, nbolo*ntslice *
+                              sizeof(*(data->qual)) );
     }
 
     /* Apodise the data */
@@ -393,7 +394,7 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
       ndata *= retdata->dims[j];
     }
 
-    retdata->pntr[0] = astCalloc( ndata, smf_dtype_sz(retdata->dtype,status), 1 );
+    retdata->pntr[0] = astCalloc(ndata, smf_dtype_sz(retdata->dtype,status), 1);
 
     /* Describe the array dimensions for FFTW guru interface
        - dims describes the length and stepsize of time slices within bolometer
@@ -508,7 +509,7 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
 
 
             curframe3d = astCmpFrame( specframe, curframe2d, " " );
-            curframe1d = astFrame( 1, "Domain=COEFF,label=Real/Imag component"); /* real/imag component*/
+            curframe1d = astFrame( 1, "Domain=COEFF,label=Real/Imag component");
             curframe4d = astCmpFrame( curframe3d, curframe1d, " " );
 
             /* The mapping from 4d grid coordinates to (frequency, x,
