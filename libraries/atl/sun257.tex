@@ -2205,6 +2205,43 @@ higher-level utility tasks.
       }
    }
 }
+\sstroutine{
+   atlShow
+}{
+   Dumps an AST Object to a text file
+}{
+   \sstdescription{
+      This function dumps the supplied AST Object to a new text file with
+      the given name. It may be read back from the file using astReadFile.
+   }
+   \sstinvocation{
+      void atlShow( AstObject $*$this, const char $*$fname, const hcar $*$options,
+                    int $*$status )
+   }
+   \sstarguments{
+      \sstsubsection{
+         this
+      }{
+         A pointer to the Object.
+      }
+      \sstsubsection{
+         fname
+      }{
+         The file name.
+      }
+      \sstsubsection{
+         options
+      }{
+         Optional attribute settings for the Channel used to create the
+         dump.
+      }
+      \sstsubsection{
+         status
+      }{
+         Pointer to the global status variable.
+      }
+   }
+}
 \normalsize
 
 \end{document}

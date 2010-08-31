@@ -21,6 +21,8 @@ while( $line = <IN> ) {
    }
 }
 
+$routines{$name} = "$text\n";
+
 foreach $key (sort keys %routines) {
    print OUT $routines{$key};
 }
