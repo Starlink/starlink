@@ -150,7 +150,7 @@
 *  History:
 *     1990 Jan 24 (MJC):
 *        Original version.
-*     1993 February 17 (MJC):*    
+*     1993 February 17 (MJC):
 *        Uses a new routine to derive medians for bins containing few
 *        pixels.
 *     1996 October 15 (MJC):
@@ -223,7 +223,7 @@
       INTEGER MAXPOS             ! Index of maximum value
       DOUBLE PRECISION MAXMUM    ! Maximum value in bin (not used)
       DOUBLE PRECISION MAXCL     ! Clipped maximum value (not used)
-      REAL MEAN                  ! Mean value of the bin (KPG_IMMM)
+      REAL MEAN                  ! Mean value of the bin (KPG_IMMMx)
       DOUBLE PRECISION MEANCL    ! Clipped mean value of the bin
       REAL MEDIAN                ! Median value of the bin
       DOUBLE PRECISION MINCL     ! Clipped minimum value (not used)
