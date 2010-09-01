@@ -801,36 +801,32 @@ related items to be removed.
 
 \section{Changes in Version 3.1}
 \begin{itemize}
-\item Remove FTS1\_TREAD since the MAG library has now been removed
-      from the main Starlink source tree.
 \item New C function kpg1Config gets a KeyMap containing configuration
       parameters from the user, with name checking and default values
       supplied.
+\item There is a new generic routine KPG\_FISEx that fills a section
+      of a multi-dimensional array.
+\item The new more-general KPG\_ISEQN replaces the old IRCAM-specific
+      NXTNAM routine.  This increments trailing sequence numbers
+      in strings, most often used to generate a series of filenames.
+\item Add new routine KPG\_LR2Ax that is the same as KPG\_LDA2x 
+      (formerly LD2AR) except it processes single-precision sparse data.
+\item There is a new routine KPG\_NORVx to replace the old NORMAL.  It
+      has the benefits of being generic and can operate on an array.
 \item KPG\_OSTAx added.  It uses recurrence formulae to calculate
       simple statistics robustly.  It also extends KPG1\_STATx by
       deriving the skewness and kurtosis.
-\item The MODE argument of KPG1\_PLTLN has an additional option of
-      {\tt "Gapped"} that is the same as {\tt "Histogram"} except
-      bad values are not flanked by vertical lines, leaving a gap.
-\item KPG1\_STDSx and KPG1\_STFLx can respectively report or log the
-      skewness and kurtosis via two additional arguments.  Users of
-      these routines will need to modify calling routines accordingly;
-      without skewness or kurtosis values to document supply
-      VAL\_\_BADD for each undefined statistic.
-\item Replace old IRCAM-specific NXTNAM routine with the more-general
-      and new KPG\_ISEQN.  This increments trailing sequence numbers
-      in strings, most often used to generate a series of filenames.
-\item DIMLST has been renamed KPG\_DIMLS.
+
+\item DIMLST is renamed KPG\_DIMLS.
 \item ICMMM has been renamed KPG\_IMMMx and made generic.  The
       calculations are now in performed double precision.  Note that
       the API has changed: the first two arguments have been transposed
       to the standard order, and the returned floating-point statistics
       are now double precision.
-\item There is a new generic routine KPG\_FISEx that fills a section
-      of a multi-dimensional array.
 \item LD2AR has been renamed KPG\_LD2Ax and made generic.
-\item There is a new routine KPG\_NORVx to replace the old NORMAL.  It
-      has the benefits of being generic and can operate on an array.
+
+\item Remove FTS1\_TREAD since the MAG library has now been removed
+      from the main Starlink source tree.
 \item A number of long-deprecated old routines without a package prefix
       have been removed.  These are listed below.  The corresponding 
       replacement routines appear in the right column.
@@ -854,6 +850,16 @@ POWARR  & \multicolumn{2}{l}{KPG1\_POWx} \\
 ZERO1D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
 ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
 \end{tabular}
+
+\item The KPG1\_PLTLN routine now accepts a value 6 for the MODE
+      argument, which causes a staircase plot to be produced in which
+      bad values are not flanked by vertical lines to the lower edge
+      of the plot (as are produced by Mode 1), leaving a gap.
+\item KPG1\_STDSx and KPG1\_STFLx can respectively report or log the
+      skewness and kurtosis via two additional arguments.  Users of
+      these routines will need to modify calling routines accordingly;
+      without skewness or kurtosis values to document supply
+      VAL\_\_BADD for each undefined statistic.
 \end{itemize}
 
 \section{Changes in Version 3.0}
@@ -3571,7 +3577,7 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
    }
 }
 \sstroutine{
-   CCG\_MDR3x
+   CCG\_MD3x
 }{
    Combines data lines using a weighted median
 }{
@@ -4348,7 +4354,7 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
    }
 }
 \sstroutine{
-   CCG\_MOR3x
+   CCG\_MO3x
 }{
    Combines data lines using a mode
 }{
@@ -4359,9 +4365,9 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
       the array RESULT.
    }
    \sstinvocation{
-      CALL CCG\_MOR3x( NSIGMA, NITER, NPIX, NLINES, STACK, VARS, MINPIX,
-                       RESULT, WRK1, WRK2, POINT, USED, NCON, NBAD,
-                       STATUS )
+      CALL CCG\_MO3x( NSIGMA, NITER, NPIX, NLINES, STACK, VARS, MINPIX,
+                     RESULT, WRK1, WRK2, POINT, USED, NCON, NBAD,
+                     STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -4992,7 +4998,7 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
 \sstroutine{
    CCG\_SC3x
 }{
-   Combines data lines using a sigma clipped mean
+   Combines data lines using a sigma-clipped mean
 }{
    \sstdescription{
       This routine accepts an array consisting a series of
@@ -5198,7 +5204,7 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
    }
    \sstinvocation{
       CALL CCG\_SD3x( NPIX, NLINES, STACK, MINPIX, RESULT, NCON,
-                     NBAD, NCON, NBAD, NCON, NBAD, STATUS )
+                     NBAD, STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -5660,7 +5666,7 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
 \sstroutine{
    CCG\_TC1x
 }{
-   Combines data lines using a threshold clipped mean
+   Combines data lines using a threshold-clipped mean
 }{
    \sstdescription{
       This routine accepts an array consisting a series of (vectorised)
@@ -5786,9 +5792,9 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
    }
 }
 \sstroutine{
-   CCG\_TCR3x
+   CCG\_TC3x
 }{
-   Combines data lines using a threshold clipped mean
+   Combines data lines using a threshold-clipped mean
 }{
    \sstdescription{
       This routine accepts an array consisting a series of (vectorised)
@@ -5797,9 +5803,9 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
       output mean values are returned in the array RESULT.
    }
    \sstinvocation{
-      CALL CCG\_TCR3x( VMIN, VMAX, NPIX, NLINES, STACK, VARS, MINPIX,
-                      RESULT, WRK1, WRK2, POINT, USED, NCON, NBAD,
-                      STATUS )
+      CALL CCG\_TC3x( VMIN, VMAX, NPIX, NLINES, STACK, VARS, MINPIX,
+                     RESULT, WRK1, WRK2, POINT, USED, NCON, NBAD,
+                     STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -38825,9 +38831,10 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
       It makes a first estimate of the statistics, and then refines
       these by including or excluding values at either end of the sorted
       values, deciding which values to reject using the Chauvanet
-      criterion.  Iterations stop once the statistics stabilise, or
+      criterion.  Iterations stop once the statistics stabilise; or
       there is an oscillation between two states, in which case the
-      returned statisitcs are the averages found in these two states.
+      returned statistics are the averages found in these two states;
+      or there are too few values remaining.
    }
    \sstinvocation{
       CALL KPG\_IMMMx( EL, ARRAY, MEAN, MEDIAN, MODE, SIGMA, SKEW, NSAMP,
@@ -38974,8 +38981,9 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
    two-dimensional counterpart
 }{
    \sstdescription{
-      A list of x-y positions and values are converted to a complete
-      two-dimensional array.  Missing elements take the bad value.
+      A list of double-precision x-y positions and values are converted
+      to a complete two-dimensional array.  Missing elements take the
+      bad value.
    }
    \sstinvocation{
       CALL KPG\_LD2Ax( NX, NY, SX, SY, NBIN, X, Y, Z, ARRAY, STATUS )
@@ -39022,6 +39030,90 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
       }
       \sstsubsection{
          Z( NBIN ) = DOUBLE PRECISION (Given)
+      }{
+         The value of the pixel in the list.
+      }
+      \sstsubsection{
+         ARRAY( NX, NY ) = ? (Returned)
+      }{
+         The expanded two-dimensional array formed from the list.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each of the standard floating-point
+         types.  Replace {\tt "}x{\tt "} in the routine name by D or R as appropriate.
+         The data type of the ARRAY argument must match the particular
+         routine used.
+
+         \sstitem
+         It uses eight-byte integers for array addressing.
+      }
+   }
+}
+\sstroutine{
+   KPG\_LR2Ax
+}{
+   Converts a sparse form of a two-dimensional array into its
+   two-dimensional counterpart
+}{
+   \sstdescription{
+      A list of single-precision x-y positions and values are converted
+      to a complete two-dimensional array.  Missing elements take the
+      bad value.
+   }
+   \sstinvocation{
+      CALL KPG\_LR2Ax( NX, NY, SX, SY, NBIN, X, Y, Z, ARRAY, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NX = INTEGER (Given)
+      }{
+         The first dimension of the two-dimensional array.
+      }
+      \sstsubsection{
+         NY = INTEGER (Given)
+      }{
+         The second dimension of the two-dimensional array.
+      }
+      \sstsubsection{
+         SX = REAL (Given)
+      }{
+         The co-ordinate scale factor (i.e. the length of a pixel) in
+         the x direction.  It is used to determine which pixel a given
+         x-y position lies.  Normally, it will have the value 1.
+      }
+      \sstsubsection{
+         SY = REAL (Given)
+      }{
+         The co-ordinate scale factor (i.e. the length of a pixel) in
+         the y direction.  It is used to determine which pixel a given
+         x-y position lies.  Normally, it will have the value 1.
+      }
+      \sstsubsection{
+         NBIN = INTEGER (Given)
+      }{
+         The number of bins in the pixel list.
+      }
+      \sstsubsection{
+         X( NBIN ) = REAL (Given)
+      }{
+         The x position of the pixel in the list.
+      }
+      \sstsubsection{
+         Y( NBIN ) = REAL (Given)
+      }{
+         The y position of the pixel in the list.
+      }
+      \sstsubsection{
+         Z( NBIN ) = REAL (Given)
       }{
          The value of the pixel in the list.
       }

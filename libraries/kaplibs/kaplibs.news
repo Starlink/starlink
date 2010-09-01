@@ -7,40 +7,33 @@ and which may be of use to anyone developing their own KAPPA-like
 applications (see SUN/238).
 
 Version 3.1
-   - Remove FTS1_TREAD since the MAG library has now been removed
-     from the main Starlink source tree.
    - New C function kpg1Config gets a KeyMap containing configuration
      parameters from the user, with name checking and default values
      supplied.
+   - There is a new generic routine KPG_FISEx that fills a section
+     of a multi-dimensional array.
+   - The new more-general KPG_ISEQN replaces the old IRCAM-specific
+     NXTNAM routine.  This increments trailing sequence numbers
+     in strings, most often used to generate a series of filenames.
+   - Added new routine KPG_LR2Ax that is the same as KPG_LDA2x
+     (formerly LD2AR) except it processes single-precision sparse
+     data.
+   - There is a new routine KPG_NORVx to replace the old NORMAL.  It 
+     has the benefits of being generic and can operate on an array.
    - KPG_OSTAx added.  It uses recurrence formulae to calculate
      simple statistics robustly.  It also extends KPG1_STATx by
      deriving the skewness and kurtosis.
-   - The MODE argument of KPG1_PLTLN has an additional option of
-     "Gapped" that is the same as "Histogram" except bad values are
-     not flanked by vertical lines, leaving a gap.
-   - KPG1_STDSx and KPG1_STFLx can respectively report or log the
-     skewness and kurtosis via two additional arguments.  Users of
-     these routines will need to modify calling routines accordingly;
-     without skewness or kurtosis values to document supply
-     VAL__BADD for each undefined statistic.
-   - The KPG1_PLTLN routine now accepts a value 6 for the MODE
-     argument, which causes a staircase plot to be produced in which
-     bad values are not flanked by vertical lines to the lower edge
-     of the plot (as are produced by Mode 1).
-   - Replace old IRCAM-specific NXTNAM routine with the more-general
-     and new KPG_ISEQN.  This increments trailing sequence numbers
-     in strings, most often used to generate a series of filenames.
+     
+   - DIMLST is renamed KPG_DIMLS.
    - ICMMM has been renamed KPG_IMMMx and made generic.  The
      calculations are now in performed double precision.  Note that
      the API has changed: the first two arguments have been
      transposed to the standard order, and the returned floating-
      point statistics are now double precision.
-   - There is a new generic routine KPG_FISEx that fills a section
-     of a multi-dimensional array.
-   - DIMLST has been renamed KPG_DIMLS.
    - LD2AR has been renamed KPG_LD2Ax and made generic.
-   - There is a new routine KPG_NORVx to replace the old NORMAL.  It 
-     has the benefits of being generic and can operate on an array.
+
+   - Remove FTS1_TREAD since the MAG library has now been removed
+     from the main Starlink source tree.
    - A number of long-deprecated old routines without a package
      prefix have been removed.  These are listed below.  The
      corresponding replacement routines appear in the right column.
@@ -62,6 +55,17 @@ Version 3.1
      POWARR   KPG1_POWx
      ZERO1D   KPG1_FILLx setting the fill value to 0.0.
      ZERO2D   KPG1_FILLx    "         "         "
+
+
+   - The KPG1_PLTLN routine now accepts a value 6 for the MODE
+     argument, which causes a staircase plot to be produced in which
+     bad values are not flanked by vertical lines to the lower edge
+     of the plot (as are produced by Mode 1), leaving a gap.
+   - KPG1_STDSx and KPG1_STFLx can respectively report or log the
+     skewness and kurtosis via two additional arguments.  Users of
+     these routines will need to modify calling routines accordingly;
+     without skewness or kurtosis values to document supply
+     VAL__BADD for each undefined statistic.
 
 Version 3.0
    - CCG routines' NBAD argument excludes bad elements not attributable
