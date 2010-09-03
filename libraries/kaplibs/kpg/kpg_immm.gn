@@ -26,10 +26,10 @@
 *     It makes a first estimate of the statistics, and then refines
 *     these by including or excluding values at either end of the sorted
 *     values, deciding which values to reject using the Chauvanet
-*     criterion.  Iterations stop once the statistics stabilise; or
-*     there is an oscillation between two states, in which case the
-*     returned statistics are the averages found in these two states;
-*     or there are too few values remaining.
+*     criterion.  Iterations stop once no more values are rejected; or
+*     the statistics stabilise; or there is an oscillation between two
+*     states, in which case the returned statistics are the averages
+*     found in these two states; or there are too few values remaining.
 
 *  Arguments:
 *     EL = INTEGER (Given)
@@ -115,6 +115,10 @@
 *        Revised the Description and added Notes.  Added message
 *        tokens to make error messages more enlightening.  Add
 *        heading comments.  Merge original history and author.
+*     2010 August 29 (MJC):
+*        Improve the median averaging to 20% if available to obtain
+*        a more-stable median for deriving the mode.  Add tolerance
+*        test to exit iterations.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -156,8 +160,12 @@
       INTEGER MIND               ! Minimum permitted number of sample data
       PARAMETER( MIND = 5 )
 
+      DOUBLE PRECISION TOLMOD
+      PARAMETER( TOLMOD = 1.0D-5 )
+      
 *  Local Variables:
       LOGICAL BPLOOP             ! Continue search for bad pixels?
+      REAL CENTRE                ! Centre used to derive average median
       DOUBLE PRECISION CUT1      ! Lower threshold for the partition
       DOUBLE PRECISION CUT2      ! Upper threshold for the partition
       DOUBLE PRECISION DELTA     ! Value of element added or subtracted
@@ -192,6 +200,7 @@
       DOUBLE PRECISION SUM2      ! Sum of squared data values
       DOUBLE PRECISION VALUE     ! Value of element
       DOUBLE PRECISION VARNCE    ! Variance
+      REAL WIDTH                 ! Half width to derive average median
 
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversion functions
@@ -281,7 +290,8 @@
 
 *  For the first pass consider only elements in a symmetric interval
 *  about the median value.
-      HW = MIN( MEDG - ARRAY( PMIN + 1 ), ARRAY( PMAX ) - MEDG )
+      HW = MIN( MEDG - NUM_<T>TOD( ARRAY( PMIN + 1 ) ),
+     :                 NUM_<T>TOD( ARRAY( PMAX ) ) - MEDG )
       CUT1 = MEDG - HW
       CUT2 = MEDG + HW
 
@@ -291,7 +301,9 @@
       SMIN = PMIN
       SMAX = PMAX
 
-*  Sum for the deviation within this range.
+*  Sum for the deviation within this range.  The shift of origin to
+*  deviations about the median should improve accuracy, but it might
+*  be even better to use Welford on-line method.
       DO I = SMIN + 1, SMAX
          VALUE = NUM_<T>TOD( ARRAY( I ) )
          IF ( VALUE .LT. CUT1 ) THEN
@@ -323,16 +335,21 @@
       ELSE
          SIGMA = 0.0
       END IF
+
+*  Restore the offset applied earlier in the summations.
       MEAN = MEAN + MEDG
 
 *  Now calculate the mode.  If the mean is near the median (and mode),
 *  that means the contamination is slight, and the mean value is what
-*  is really needed. The exact constraint is arbitrary, so this may
-*  cause an underestimate or overestimate of the mode when the
-*  scatter in the peak of the distribution is caused by random
-*  fluctuations rather than by contamination, but this bias is
-*  negligible compared with the problem of contamination.  Otherwise
-*  use the empirical formula to calculate the mode.
+*  is really needed.  The original method assumed a positive skew, not
+*  unreasonable for stars brighter than the background, and hence
+*  tested for the median less than the mean.  The exact constraint
+*  used here is arbitrary, so this may cause an underestimate or
+*  overestimate of the mode when the scatter in the peak of the
+*  distribution is caused by random fluctuations rather than by
+*  contamination, but this bias is negligible compared with the problem
+*  of contamination.  Otherwise use the empirical formula to calculate
+*  the mode.
       IF ( SIGMA .LT. VAL__SMLD ) THEN
          MODE = MEAN
       ELSE IF ( ABS( MEAN - MEDIAN ) / SIGMA .LT. 0.1D0 ) THEN
@@ -355,6 +372,7 @@
 *  recomputation.
       REDO = .TRUE.
       NITER = 0
+
 
       DO WHILE ( REDO )
          NITER = NITER + 1
@@ -480,12 +498,17 @@
 *  change by three units if there is a tiny change in the list of data
 *  values sufficient to alter the median value of the sample by one
 *  unit.  We need something more robust than this.  As a first attempt
-*  try finding the median by calculating the mean of the central nine
-*  or ten values (fewer if there are fewer elements left).
+*  try finding the median by calculating the mean of the central 20
+*  percent or nine or ten values, whichever is greater.  (There may be
+*  fewer if there are fewer elements left.)  Ensure that the range is
+*  symmetric.
          MEDIAN = 0.0D0
+         CENTRE = REAL( SMIN + SMAX + 1 ) / 2.0
+         WIDTH = MAX( 5.0,
+     :                REAL( NINT( 0.2 * ( SMAX - SMIN ) ) * 0.5 + 0.25 ) )
          K = 0
-         DO I = MAX( SMIN + 1, ( SMIN + SMAX - 8 ) / 2 ),
-     :          MIN( SMAX, ( SMIN + SMAX + 11 ) / 2 )
+         DO I = MAX( SMIN + 1, NINT( CENTRE - WIDTH ) ),
+     :          MIN( SMAX, NINT( CENTRE + WIDTH ) )
             MEDIAN = MEDIAN + NUM_<T>TOD( ARRAY( I ) )
             K = K + 1
          END DO
@@ -509,6 +532,13 @@
             MEDIAN = 0.5D0 * ( MEDIAN + STAT( 2 ) )
             MODE = 0.5D0 * ( MODE + STAT( 3 ) )
             SIGMA = 0.5D0 * ( SIGMA + STAT( 4 ) )
+            REDO = .FALSE.
+
+*  Is there is some convergence to end the iterations?  The tolerance
+*  on the mode is a bit arbitrary but it a typical value and should be
+*  adequate for the intended CCD and photographic imagery.
+         ELSE IF ( ABS( MODE - STAT( 3 ) ) .LT.
+     :             ABS( TOLMOD * MODE ) ) THEN
             REDO = .FALSE.
          ELSE
 
