@@ -86,7 +86,7 @@
 *       is 1-dimensional regardless of the shape of the input file.
 *     - This task can also be used to simplify further processing of the
 *       photometry data even if no data is to be concatenated (in this case
-*       the task would be identical to the Kappa task NDFCOPY).
+*       the task would be identical to the kAPPA task NDFCOPY).
 
 *  Implementation Status
 *     - NDF sections can not be used

@@ -4,7 +4,7 @@
 #
 #  - Simple way:
 #     1. Read in NDF name
-#     2. Calculate stats for each bolometer using Kappa Stats
+#     2. Calculate stats for each bolometer using KAPPA STATS
 #     3. Calculate weights relative to Central pixel
 #     4. Write weights to NDF extension
 
@@ -489,7 +489,7 @@ __END__
 *     1. Calculate the statistics for each bolometer then generate the
 *        weights relative to the central pixel. Should not be used when
 *        a strong source is present. The weights are calculated by
-*        using Kappa STATS to calculate the standard deviation of
+*        using KAPPA STATS to calculate the standard deviation of
 *        each bolometer in turn. The weight is defined as the relative
 *        variance between this bolometer and the reference bolometer.
 *

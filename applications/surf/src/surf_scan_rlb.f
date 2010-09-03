@@ -483,7 +483,7 @@
 
 *     Allow for the fit to be stored rather than simply the
 *     data with the fit subtracted. Gives you more flexibility later
-*     since can use the Kappa command SUB to do the subtraction if
+*     since can use the kAPPA command SUB to do the subtraction if
 *     required.
 
       CALL PAR_GET0L('RLB', DORLB, STATUS)

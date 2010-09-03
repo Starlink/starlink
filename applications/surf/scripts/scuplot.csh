@@ -16,7 +16,7 @@
 
 # Check that a STARLINK login has been completed
 # Can do this simply by checking $SURF_DIR exists
-# This will stop us hardwiring path to kappa and surf
+# This will stop us hardwiring path to KAPPA and surf
 
 if ($?SURF_DIR) then
    set sur = ${SURF_DIR}
@@ -26,7 +26,7 @@ else
   exit
 endif
 
-# Check for the new kappa
+# Check for the new KAPPA
 if (-e $KAPPA_DIR/style.def || -e $KAPPA_DIR/kappa_style.def) then
   set newkappa = 1
   # Store the original style before we mangle it
@@ -35,7 +35,7 @@ else
   set newkappa = 0
 endif
 
-# Check for even newer kappa 0.14
+# Check for even newer KAPPA 0.14
 if (-e $KAPPA_DIR/kappa_style.def) then
   set newerkappa = 1
 else
@@ -199,7 +199,7 @@ if !(-e "${sdf}.sdf") then
   exit
 endif
 
-# Now if we are using the new kappa we need to set the WCS of the
+# Now if we are using the new KAPPA we need to set the WCS of the
 # input frame to PIXEL
 if ($newkappa == 1) then
   $kap/wcsframe ${sdf} pixel
@@ -550,7 +550,7 @@ OPTIONS:
 
 
 DETAILS:
-   Scuplot is a wrapper script around a number of kappa utilities. Since it
+   Scuplot is a wrapper script around a number of KAPPA utilities. Since it
    understands the Scuba NDF file format, it hides most of the complicated
    syntax from the user.  Mode = 'p' and 'r' are wrappers around plotting
    utilities and facilitate the inspection of the data of each bolometer.
@@ -560,13 +560,13 @@ DETAILS:
    the note below the description of the menu on the use of the mouse.
 
    Mode = 'p' or pltbol (or any p* link to scuplot) is a wrapper around the
-   Kappa utility linplot. It allows plots  of a whole series of bolometers
+   KAPPA utility linplot. It allows plots  of a whole series of bolometers
    one by one, optionally overlaying them with the same bolometer from a
    second file. Obvious overlays are despiked on non-despiked data or
    data from different exposures to check the noise.
 
    Mode = 'r' or rlinplot (or any r* link to scuplot) is a wrapper around the
-   Kappa utility mlinplot. It provides  plots of sets of bolometers in a single
+   Kappa Utility mlinplot. It provides  plots of sets of bolometers in a single
    window with optionally data from a second file in a second window.
    Obvious files are despiked and non-despiked data or data from different
    exposures to check the noise.
@@ -645,7 +645,7 @@ exit
 *              [bol [bol [bol] ... ]]
 *
 *  Description:
-*    Scuplot is a wrapper script around a number of kappa
+*    Scuplot is a wrapper script around a number of KAPPA
 *    utilities. Since it understands the Scuba NDF file format, it
 *    hides most of the complicated syntax from the user.  Mode = 'p'
 *    and 'r' are wrappers around plotting utilities and facilitate the
@@ -657,14 +657,14 @@ exit
 *    mouse.
 *
 *    Mode = 'p' or pltbol (or any p* link to scuplot) is a wrapper
-*    around the Kappa utility linplot. It allows plots of a whole series
+*    around the kAPPA utility linplot. It allows plots of a whole series
 *    of bolometers one by one, optionally overlaying them with the same
 *    bolometer from a second file. Obvious overlays are despiked on
 *    non-despiked data or data from different exposures to check the
 *    noise.
 *
 *    Mode = 'r' or rlinplot (or any r* link to scuplot) is a wrapper
-*    around the Kappa utility mlinplot. It provides plots of sets of
+*    around the KAPPA utility mlinplot. It provides plots of sets of
 *    bolometers in a single window with optionally data from a second
 *    file in a second window.  Obvious files are despiked and
 *    non-despiked data or data from different exposures to check the
@@ -769,7 +769,7 @@ exit
 *     the 'photom' string appears twice.
 *
 *     Revision 1.8  1999/11/04 04:36:16  timj
-*     Update for Kappa 0.14
+*     Update for KAPPA 0.14
 *
 *     Revision 1.7  1999/08/03 19:32:34  timj
 *     Add copyright message to header.

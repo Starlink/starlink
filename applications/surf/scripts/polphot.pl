@@ -203,7 +203,7 @@ foreach $name (@names) {
     $end = $start + $int_per_wp - 1;
     $end = "" if $end > $npix;
 
-    # Find stats of section (using Kappa for now)
+    # Find stats of section (using KAPPA for now)
     $section = "$file.$name($start:$end)";
     $exstat = system("$kappa/stats '$section' > /dev/null");
 

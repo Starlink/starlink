@@ -37,7 +37,7 @@
 *  ADAM parameters:
 *     DEVICE = DEVICE (Read)
 *        The graphics device on which the bolometers are to be drawn.
-*        The global default (set with Kappa GDSET) will be used unless
+*        The global default (set with KAPPA GDSET) will be used unless
 *        specified otherwise.
 *     EXPOSURE = INTEGER (Read)
 *        Ues the bolometer positions at the specified exposure within the
@@ -1075,7 +1075,7 @@
 *     for textht, we need to calculate the required size relative to
 *     the default PGPLOT TEXT HEIGHT. This is because the standard
 *     font size is defined a 1/40 the height of the view surface!!!!
-*     Luckily, there is a Kappa routine that emulates SGS_SHTX :-)
+*     Luckily, there is a kAPPA routine that emulates SGS_SHTX :-)
 
 *     This is the height of the text in graphics coordinates
 *     We want the text to be readable but still fit inside the

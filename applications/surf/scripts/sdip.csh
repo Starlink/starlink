@@ -36,7 +36,7 @@ endif
 # Switch off messages
 alias echo "echo > /dev/null"
 
-# First start up kappa
+# First start up KAPPA
 
 #kappa
 # use kappa.csh rather than the alias so that we dont have
@@ -64,7 +64,7 @@ else
    skydip out=$out model_out=${out}_m in=$in
 endif
 
-# Work out whether we are using the new (STYLE parameter) kappa
+# Work out whether we are using the new (STYLE parameter) KAPPA
 # or the old (pre 0.13 is old)
 
 if (-e $KAPPA_DIR/style.def || -e $KAPPA_DIR/kappa_style.def) then
@@ -123,8 +123,8 @@ if (-e ${out}.sdf) then
 	# created one here
         if (-e ${out}.eps) \rm ${out}.eps
 
-        # And merge them - for the old kappa we want sdip_p1.eps.1
-	# for the new kappa we can use sdip_p1.eps
+        # And merge them - for the old KAPPA we want sdip_p1.eps.1
+	# for the new KAPPA we can use sdip_p1.eps
 	if ( -x ${starbin}/psmerge) then
 	  if ($newkappa == 0) then
             if (-e sdip_p1.eps.1 && -e sdip_p2.eps) ${starbin}/psmerge -e sdip_p1.eps.1 sdip_p2.eps >! ${out}.eps
@@ -210,7 +210,7 @@ exit
 *  Description:
 *    This script first runs the skydip task in order to fit the sky
 *    parameters to the data. The sky data and model are written to files
-*    and are then displayed using Kappa's linplot. A hardcopy is also
+*    and are then displayed using KAPPA's linplot. A hardcopy is also
 *    written to file sdip.eps
 *
 *  ADAM Parameters:
@@ -223,7 +223,7 @@ exit
 *       Reduce the skydip data in 19970623_dem_008.sdf and plots the result.
 *
 *  Implementation Status:
-*    - Requires Kappa.
+*    - Requires KAPPA.
 *    - All files created by this task are removed.
 *
 *  Related Applications:

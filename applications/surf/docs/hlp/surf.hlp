@@ -18,7 +18,7 @@ CHANGE_POINTING - Change Az and El pointing offsets for map data
 CHANGE_QUALITY  - Change pixel quality
 DESPIKE         - Despike JIGGLE/MAP data
 DESPIKE2        - Despike SCAN/MAP data
-DSPBOL          - Interactive despiking and data inspection (requires Kappa)
+DSPBOL          - Interactive despiking and data inspection (requires KAPPA)
 EXTINCTION      - Correct the data for atmospheric extinction
 EXTRACT_DATA    - Write bolometer positions and data to text file
 EXTRACT_FLAT    - Write flatfield information to a text file
@@ -27,18 +27,18 @@ INTREBIN        - Generate a separate regridded image for each integration
 MAPSUM          - Generate a summary of all map observations
 OBSSUM          - Generate a one-line summary of all observations
 PHOTSUM         - Generate a summary of all photometry observations
-PLTBOL          - Interactive data inspection (requires Kappa)
+PLTBOL          - Interactive data inspection (requires KAPPA)
 POINTSUM        - Generate a summary of all pointing observations
-QDRAW           - Plot photometry data (requires Kappa)
+QDRAW           - Plot photometry data (requires KAPPA)
 REBIN           - Regrid all data onto a rectangular grid.
 REDUCE_NOISE    - Process demodulated noise data.
 REDUCE_SWITCH   - Convert raw demodulated data to standard format and
                   process individual switches.
-REMDBM          - Remove dual beam response from SCAN/MAP images (needs Kappa)
+REMDBM          - Remove dual beam response from SCAN/MAP images (needs KAPPA)
 REMIP           - Remove instrumental polarisation from polarimetry data
 REMSKY          - Remove sky contribution from each jiggle
 RESTORE         - Remove dual-beam response from SCAN/MAP data
-RLINPLOT        - Interactive data inspection via MLINPLOT (requires Kappa)
+RLINPLOT        - Interactive data inspection via MLINPLOT (requires KAPPA)
 SCAN_RLB        - Remove linear baselines from SCAN/MAP data
 SCUBA2MEM       - Calculate bolometer positions including chops
 SCUCAT          - Concatenate photometry results into a single file
@@ -49,15 +49,15 @@ SCULOG          - Provide detailed descriptions of all observation data
 SCUMAKEWT       - Generate fourier weights of chop function
 SCUNOISE        - Display SCUBA noise data
 SCUOVER         - Overlay bolometer array on image
-SCUPA           - Show position angle of array (requires Kappa)
+SCUPA           - Show position angle of array (requires KAPPA)
 SCUPHOT         - Process extinction corrected photometry data
-SCUPLOT         - Interactive despiking and data inspection (requires Kappa)
+SCUPLOT         - Interactive despiking and data inspection (requires KAPPA)
 SCUQUICK        - Script to automate SURF data reduction
 SCUSETENV       - Set SCUBA environment variables (JAC only)
 SCUSHIFT        - Correct for 'data-shift' problem.
-SDIP            - Script to reduce and display skydip data (requires Kappa)
-SETBOLWT        - Calculate and set bolometer weights (requires Kappa)
-SIGCLIP         - Remove spikes from photometry data (requires Kappa)
+SDIP            - Script to reduce and display skydip data (requires KAPPA)
+SETBOLWT        - Calculate and set bolometer weights (requires KAPPA)
+SIGCLIP         - Remove spikes from photometry data (requires KAPPA)
 SKYDIP          - Process SKYDIP data in order to determine atmospheric
                   extinction
 SKYSUM          - Generate a summary of skydip observations
@@ -79,11 +79,11 @@ REDUCE_NOISE    - Process demodulated noise data.
 SCUBA2MEM       - Calculate bolometer positions
 SCUCLKERR       - Determine potential error in SCUBA time headers
 SCUHELP         - This help system
-SCUPA           - Show position angle of array (requires Kappa)
+SCUPA           - Show position angle of array (requires KAPPA)
 SCUQUICK        - Script to automate SURF data reduction
 SCUSETENV       - Set SCUBA environment variables (JAC only)
 SCUSHIFT        - Correct for `data shift' problem
-SDIP            - Script to reduce and display skydip data (requires Kappa)
+SDIP            - Script to reduce and display skydip data (requires KAPPA)
 SKYDIP          - Process SKYDIP data in order to determine atmospheric
                   extinction
 
@@ -105,7 +105,7 @@ SCUCLIP         - Sigma clip photometry data and maps of weak sources
 
 ADD_DBM         - Add dual-beam to single-beam data
 DESPIKE2        - Despike SCAN/MAP data
-REMDBM          - Remove dual-beam response from SCAN/MAP images (needs Kappa)
+REMDBM          - Remove dual-beam response from SCAN/MAP images (needs KAPPA)
 RESTORE         - Remove dual-beam response from SCAN/MAP data (EKH)
 SCAN_RLB        - Remove linear baselines from scans
 SCUMAKEWT       - Generate fourier weights (used by REMDBM)
@@ -116,9 +116,9 @@ REMIP           - Remove instrumental polarisation from polarimetry data
 
 2 Inspection
 
-PLTBOL          - Interactive bolometer display (requires Kappa)
-RLINPLOT        - Interactive display via MLINPLOT (requires Kappa)
-SCUPLOT         - Interactive display and despiking (requires Kappa)
+PLTBOL          - Interactive bolometer display (requires KAPPA)
+RLINPLOT        - Interactive display via MLINPLOT (requires KAPPA)
+SCUPLOT         - Interactive display and despiking (requires KAPPA)
 SCUNOISE        - Plot SCUBA noise data
 
 2 Modification
@@ -128,7 +128,7 @@ CHANGE_FLAT     - Change the stored flatfield information
 CHANGE_NACENTRE - Change Nasmyth coordinates of array centre
 CHANGE_POINTING - Change Az and El pointing offsets for map data
 CHANGE_QUALITY  - Change pixel quality
-DSPBOL          - Interactive despiking (requires Kappa)
+DSPBOL          - Interactive despiking (requires KAPPA)
 
 2 Mapping
 
@@ -137,14 +137,14 @@ BOLREBIN      - Generate a map from each bolometer separately
 INTREBIN      - Generate a map of each integration separately
 EXTRACT_DATA  - Write bolometer positions and data to text file
 SCUOVER       - Overlay bolometer array on image
-SETBOLWT      - Calculate and set bolometer weights (requires Kappa)
+SETBOLWT      - Calculate and set bolometer weights (requires KAPPA)
 
 2 Photometry
 
 SCUPHOT       - Process extinction corrected photometry data
 SCUCAT        - Concatenate photometry results into a single file
-QDRAW         - Kappa script to aid in the plotting of photometry data
-SIGCLIP       - Kappa script to mark spikes in photometry data.
+QDRAW         - KAPPA script to aid in the plotting of photometry data
+SIGCLIP       - KAPPA script to mark spikes in photometry data.
 
 
 
@@ -310,7 +310,7 @@ Minor update.
 
   - ADD_DBM can now be used to addd a triple beam
 
-  - Scripts now compatible with KAPPA version 0.14
+  - Scripts now compatible with KAPPA Version 0.14
 
 3 Bug_fixes
 
@@ -685,7 +685,7 @@ Description:
       method simply puts all data points in an output grid and calculates
       the median of each output cell. Small pixel scales require large
       datasets (since not all cells in a 1 arcsecond grid will contain
-      data points) although the Kappa commands FILLBAD and GLITCH
+      data points) although the KAPPA commands FILLBAD and GLITCH
       can be used to smooth over bad pixels.
 
   A separate map will be made of each bolometer. The output file will
@@ -1690,7 +1690,7 @@ JFL: John Lightfoot (jfl@roe.ac.uk)
 
 1 DSPBOL
 
-Interactive despiking and data inspection (requires Kappa)
+Interactive despiking and data inspection (requires KAPPA)
 
 See SCUPLOT for more information.
 
@@ -1995,7 +1995,7 @@ Description:
       method simply puts all data points in an output grid and calculates
       the median of each output cell. Small pixel scales require large
       datasets (since not all cells in a 1 arcsecond grid will contain
-      data points) although the Kappa commands FILLBAD and GLITCH
+      data points) although the KAPPA commands FILLBAD and GLITCH
       can be used to smooth over bad pixels.
 
    A separate map will be made of each integration. The output file
@@ -2512,7 +2512,7 @@ T. Jenness (JACH)
 
 1 PLTBOL
 
-Interactive data inspection (requires Kappa)
+Interactive data inspection (requires KAPPA)
 
 See SCUPLOT for more information.
 
@@ -2614,15 +2614,15 @@ Usage:
 
 Description:
 
-   This program uses kappa routines to calculate mean and standard
+   This program uses KAPPA routines to calculate mean and standard
    deviation of an NDF. It then uses linplot to display the data with
    a range of plus or minus 5 sigma. Optionally, DRAWSIG can be used
-   to overlay 3 sigma lines.
+   to overlay 3-sigma lines.
 2 Parameters
 For information on individual parameters, select from the list below:
 3 -noline
 -noline
-   A Unix-type switch which controls whether the 3 sigma lines are
+   A Unix-type switch which controls whether the 3-sigma lines are
    displayed or not.
 3 NDF
 NDF (Read)
@@ -2705,7 +2705,7 @@ Description:
       method simply puts all data points in an output grid and calculates
       the median of each output cell. Small pixel scales require large
       datasets (since not all cells in a 1 arcsecond grid will contain
-      data points) although the Kappa commands FILLBAD and GLITCH
+      data points) although the KAPPA commands FILLBAD and GLITCH
       can be used to smooth over bad pixels.
 
 
@@ -3368,7 +3368,7 @@ TIMJ: Tim Jenness (t.jenness@jach.hawaii.edu)
 
 1 RLINPLOT
 
-Interactive data inspection via MLINPLOT (requires Kappa)
+Interactive data inspection via MLINPLOT (requires KAPPA)
 
 See SCUPLOT for more information.
 
@@ -3476,7 +3476,7 @@ scan_rlb method=section rlb section={e1,4}
    each integration.
 
 2 Notes
-   The Kappa SUB command can be used to subtract the baseline from the
+   The KAPPA SUB command can be used to subtract the baseline from the
    input data at a later stage (if RLB is false).
 2 Authors
 JFL: John Lightfoot (jfl@roe.ac.uk)
@@ -3675,7 +3675,7 @@ scucat outfile in=^input.lis noloop method=catall
 
 - This task can also be used to simplify further processing of the
   photometry data even if no data is to be concatenated (in this case
-  the task would be identical to the Kappa task NDFCOPY).
+  the task would be identical to the KAPPA task NDFCOPY).
 2 Related_Applications
    SURF: SCUPHOT;
    KAPPA: NDFCOPY, KSTEST
@@ -3739,7 +3739,7 @@ TIMJ: Tim Jenness (t.jenness@jach.hawaii.edu)
 2 Implementation_Status
    The despiking routine sets QUALITY bit 5 to bad. It does not affect
    the data. The effects of despiking can be removed by using the
-   Kappa task SETBB to unset quality bit 5.
+   KAPPA task SETBB to unset quality bit 5.
 
 
 1 SCUCLKERR
@@ -4072,7 +4072,7 @@ COL = LITERAL (Read)
 3 DEVICE
 DEVICE = DEVICE (Read)
    The graphics device on which the bolometers are to be drawn.
-   The global default (set with Kappa GDSET) will be used unless
+   The global default (set with KAPPA GDSET) will be used unless
    specified otherwise.
 3 EXPOSURE
 EXPOSURE = INTEGER (Read)
@@ -4249,14 +4249,14 @@ Description:
    mouse.
 
    Mode = `p' or pltbol (or any p* link to scuplot) is a wrapper
-   around the Kappa utility linplot. It allows plots of a whole series
+   around the KAPPA utility LINPLOT. It allows plots of a whole series
    of bolometers one by one, optionally overlaying them with the same
    bolometer from a second file. Obvious overlays are despiked on
    non-despiked data or data from different exposures to check the
    noise.
 
    Mode = `r' or rlinplot (or any r* link to scuplot) is a wrapper
-   around the Kappa utility mlinplot. It provides plots of sets of
+   around the KAPPA utility MLINPLOT. It provides plots of sets of
    bolometers in a single window with optionally data from a second
    file in a second window.  Obvious files are despiked and
    non-despiked data or data from different exposures to check the
@@ -4598,7 +4598,7 @@ Description:
 
    This script first runs the skydip task in order to fit the sky
    parameters to the data. The sky data and model are written to files
-   and are then displayed using Kappa's linplot.
+   and are then displayed using KAPPA's LINPLOT.
 2 Parameters
 For information on individual parameters, select from the list below:
 3 NDF
@@ -4616,7 +4616,7 @@ sdip 19970623_dem_0008
 Tim Jenness (JACH)
 
 2 Implementation_Status
-   - Requires Kappa.
+   - Requires KAPPA.
 
    - All files created by this task are removed.
 
@@ -4636,7 +4636,7 @@ Description:
     1. Calculate the statistics for each bolometer then generate the
        weights relative to the central pixel. Should not be used when
        a strong source is present. The weights are calculated by
-       using Kappa STATS to calculate the standard deviation of
+       using KAPPA STATS to calculate the standard deviation of
        each bolometer in turn. The weight is defined as the relative
        variance between this bolometer and the reference bolometer.
 
@@ -4713,8 +4713,8 @@ Usage:
 
 Description:
 
-   This program uses kappa STATS to calculate mean and standard
-   deviation of an NDF. It then uses kappa THRESH to set the values at +/-
+   This program uses KAPPA STATS to calculate mean and standard
+   deviation of an NDF. It then uses KAPPA THRESH to set the values at +/-
    n-sigma to BAD. The clipped data are written to NDF_clip.sdf.
 2 Parameters
 For information on individual parameters, select from the list below:
