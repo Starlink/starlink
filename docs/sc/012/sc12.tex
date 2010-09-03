@@ -1164,7 +1164,7 @@ noting the change in the library you're linking your code to. Try running
 the application and compare its performance with the one that used the IMG
 library. You shouldn't notice any difference.
 
-{\bf Note that you can still access GIF, IRAF, ASCII etc formats just as
+{\bf Note that you can still access GIF, IRAF, ASCII etc. formats just as
 you could with the IMG library. All you have to remember is to start
 ``Convert'' first. The NDF library is more versatile in terms of available
 file formats than its name would suggest.}
@@ -1490,10 +1490,6 @@ This is done purely by mapping them:
 *
        CALL NDF_CINP('TITLE',INDF,'Title',STATUS)
 *
-* Work out the number of pixels
-*
-       NPIX = (ABS(UBND-LBND))**2
-*
 * Map data and variance arrays to force them into existence
 *
        CALL NDF_MAP(INDF,'Data','_REAL','WRITE',IPNTR,NPIX,STATUS)
@@ -1664,7 +1660,6 @@ Code:
 * Create a new output NDF. Model it on the old one. Propagate and
 * DATA information. The variances will NOT be propagated.
 *
-
       CALL NDF_PROP(INDF,'Data,NoVariance','OUT',ONDF,STATUS)
 *
 * Map the data arrays in both the input and the output files
