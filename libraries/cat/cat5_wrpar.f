@@ -17,8 +17,8 @@
 *        Fortran unit number for writing to the description file.
 *     KFLAG  =  LOGICAL
 *        Flag indicating whether the catalogue is to be written as in
-*        'Kappa format' or as a standard STL, coded as follows:
-*        .TRUE.  -  Kappa format,
+*        'KAPPA format' or as a standard STL, coded as follows:
+*        .TRUE.  -  KAPPA format,
 *        .FALSE. -  standard.
 *     QNAME  =  CHARACTER*(*) (Given)
 *        Name of the parameter.
@@ -63,7 +63,7 @@
 *  History:
 *     19/7/96  (ACD): Original version.
 *     28/8/96  (ACD): First stable version.
-*     10/12/96 (ACD): Added writing 'Kappa format' STLs.
+*     10/12/96 (ACD): Added writing 'KAPPA format' STLs.
 *     6/6/98   (ACD): Correct mistake in the prologue comments.
 *     22/12/99 (ACD): Improved the handling of long CHARACTER parameters.
 *  Bugs:

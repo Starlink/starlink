@@ -383,11 +383,11 @@ its name in capitals.
 \subsection{Additional Programs}
 \label{se:addi}
 
-The Kappa package has general purpose image processing programs,
-and these are useful. [Remember that Kappa can mainly only deal with
+The KAPPA package has general purpose image processing programs,
+and these are useful. [Remember that KAPPA can mainly only deal with
 32-bit 'real' images.]
 
- In the Kappa set of programs, these are quite useful:-
+ In the KAPPA set of programs, these are quite useful:-
 
 \begin{tabular}{ll}
 {\bf  Fitsin:} &          Read data off tape device to disk NDF file \\
@@ -425,14 +425,14 @@ You can also run the programs from inside the Starlink ICL environment.
 
 The programs have been written in the Starlink {\bf ADAM} Environment. This
 has the advantage that there are a number of useful programs in the {\bf
-Kappa} packages which supplement \starman, and that some of the \starman
+KAPPA} packages which supplement \starman, and that some of the \starman
 programs in turn are useful for current users of such packages.
 
 Particularly, the standard data format NDF is used. (You can see
 this as all data files have the '.sdf' suffixes.)
 
 Users wishing to know more about the {\bf ADAM} Environment and the
-{\bf Kappa} programs should read the relevant documents
+{\bf KAPPA} programs should read the relevant documents
 SG~4 and SUN~95.
 
 
@@ -1888,9 +1888,9 @@ to convert them to the .SDF format used by {\it Starman}.
 \hspace{4ex} \begin{tabular}[c]{|l|l|} \hline
    Format              &   Conversion program \\ \hline FITS
    (disk)         &   \verb|imfits_dr| \\ ADAM (=HDS/NDF/SDF) &
-   \verb|import| \\ Figaro (=DST)       &   \verb|dst2ndf| in Kappa,
+   \verb|import| \\ Figaro (=DST)       &   \verb|dst2ndf| in KAPPA,
    then \verb|import| \\ FITS                &   \verb|fitsin| in
-   Kappa, then \verb|import| \\ \hline \end{tabular}
+   KAPPA, then \verb|import| \\ \hline \end{tabular}
 
 As the ADAM and Figaro conversion programs usually give you `Real'
 images, you can then use \verb|imtype| to convert them to the 16-bit
@@ -1902,7 +1902,7 @@ image, you can use the \verb|imcube| program to extract the desired 2-D
 plane out of the image, before using \verb|i,type|.
 
 If you are in real trouble, use those packages to write a FITS tape and
-read the files in with \verb|fitsin| in Kappa.
+read the files in with \verb|fitsin| in KAPPA.
 
 \subsection{Conversion to other systems}
 
@@ -1913,9 +1913,9 @@ from the .SDF format used by {\it Starman}.
 \hspace{4ex} \begin{tabular}[c]{|l|l|} \hline
    Format              &   Conversion program \\ \hline ADAM
   (=HDS/NDF/SDF)  &  import in \starman (converts descriptors) \\
-  Figaro (=DST)        &  dst2ndf2dst in Kappa, after import \\
-  FITS                 &  fitsout in Kappa, after import \\ FITS
-  (disk)          &  dfitsout in Kappa, after import \\ \hline
+  Figaro (=DST)        &  dst2ndf2dst in KAPPA, after import \\
+  FITS                 &  fitsout in KAPPA, after import \\ FITS
+  (disk)          &  dfitsout in KAPPA, after import \\ \hline
 \end{tabular}
 
 If your \starman images are in the `short' format, then as the ADAM and
@@ -2106,21 +2106,21 @@ EDRS table system, copyright R.F.Warren-Smith.
 
 
 
-\section{Using Kappa } \label{se:packs}
-\ajhsect{\arabic{section}}{Using Kappa }
+\section{Using KAPPA } \label{se:packs}
+\ajhsect{\arabic{section}}{Using KAPPA }
 
 \subsection{Access}
 
 The additional useful programs which back up \starman are those already
-existing in the Kappa package which are listed in
+existing in the KAPPA package which are listed in
 Section~\ref{se:addi}.
 
-To use these, you must add the Kappa package. Do:-
+To use these, you must add the KAPPA package. Do:-
 
 \begin{verbatim}
      > kappa \end{verbatim}
 
-To access help on Kappa programs, do:-
+To access help on KAPPA programs, do:-
 
 \begin{verbatim}
      > kaphelp \end{verbatim}

@@ -19,7 +19,7 @@
 *     EXTRA  =  CHARACTER*(*) (Given)
 *        Any extra information needed to write the catalogue.  If the
 *        argument contains a string starting with a 'K' (in either
-*        case) then the catalogue is written in 'Kappa format',
+*        case) then the catalogue is written in 'KAPPA format',
 *        otherwise it is written as a standard format STL.
 *     CI  =  INTEGER (Returned)
 *        Identifier to the catalogue.
@@ -30,7 +30,7 @@
 *     If ok then
 *       Add the details for the catalogue to the common block, including
 *       setting the number of rows to zero.
-*       Determine whether the catalogue is to be written in 'Kappa
+*       Determine whether the catalogue is to be written in 'KAPPA
 *       format' or as a standard STL.
 *       Attempt to create the file to hold the FITS binary table.
 *       Report any error creating this file.
@@ -60,7 +60,7 @@
 *  History:
 *     18/7/96  (ACD): Original version.
 *     24/7/96  (ACD): First stable version.
-*     10/12/96 (ACD): Added writing 'Kappa format' STLs.
+*     10/12/96 (ACD): Added writing 'KAPPA format' STLs.
 *     6/6/98   (ACD): Modified the handling of the catalogue file name.
 *     18/11/98 (ACD): Improved the error reporting.
 *     16/6/99  (ACD): Removed unused parametric constant.
@@ -99,7 +99,7 @@
       DOUBLE PRECISION
      :  CDATE      ! Catalogue modification date.
       LOGICAL
-     :  KFLAG      ! Flag; is STL in 'Kappa format' or standard.
+     :  KFLAG      ! Flag; is STL in 'KAPPA format' or standard.
       CHARACTER
      :  ERRBUF*75   ! Error message text.
 *.
@@ -139,7 +139,7 @@
             FINSH__CAT1(CIELM) = .FALSE.
 
 *
-*          Determine whether the catalogue is to be written in 'Kappa
+*          Determine whether the catalogue is to be written in 'KAPPA
 *          format' or as a standard STL.
 
             IF (EXTRA(1 : 1) .EQ. 'K'  .OR.
@@ -189,7 +189,7 @@
      :              '# +++' /
      :              '#  Catalogue: ', A /
      :              '#' /
-     :              '#  This catalogue is formatted as a Kappa format ',
+     :              '#  This catalogue is formatted as a KAPPA format ',
      :                 'CURSA small text list (STL).' /
      :              '#  For a description of this format see Starlink ',
      :                'User Note 190 or URL' /

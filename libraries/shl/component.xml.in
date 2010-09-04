@@ -6,20 +6,20 @@
   <version>@PACKAGE_VERSION@</version>
   <path>libraries/shl</path>
   <description>SHL -- Support for HLP Library access</description>
-  <abstract><p>The Starlink HLP system allows an application program
-      to retrieve named items from a hierarchically-arranged library
-      of text.  The facility resembles VAX/VMS HELP.  It consists of a
-      library plus utility programs for creating, listing and reading
-      help libraries.</p>
+  <abstract><p>The Starlink HLP system allows an application to 
+     retrieve named items from a hierarchically-arranged library
+     of text.  The facility resembles VAX/VMS HELP.  It consists of a
+     library plus utility programs for creating, listing and reading
+     help libraries.</p>
      <p>Since each application needs its own help system, it made little
      sense to rewrite a help browser for each application independently.
      Over the years Starlink applications have switched to using the
      standard KAPPA help application code. Implemented by copying
-     the kappa files to each application in turn. Now that all the
-     applications are in a single location, the kappa help infrastructure
+     the KAPPA files to each application in turn. Now that all the
+     applications are in a single location, the KAPPA help infrastructure
      has been factored out into the SHL library.</p>
-     <p>In addition to the KAPPA fortran infrastructure, a C implementation
-     of a help browser has also been integrated (from figaro) into
+     <p>In addition to the KAPPA Fortran infrastructure, a C implementation
+     of a help browser has also been integrated (from Figaro) into
      SHL.</p>
   </abstract>
   <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>

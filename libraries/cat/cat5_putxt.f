@@ -27,7 +27,7 @@
 *       Get the array element for the catalogue.
 *       Get the Fortran unit number for the table.
 *       Determine whether the catalogue is a standard STL or a
-*       Kappa-format one.
+*       KAPPA-format one.
 *       Attempt to write the line to the description file.
 *       Report any error.
 *     else
@@ -57,7 +57,7 @@
 *     ACD: A C Davenhall (Edinburgh)
 *  History:
 *     26/7/96  (ACD): Original version.
-*     10/12/96 (ACD): Added writing 'Kappa format' STLs.
+*     10/12/96 (ACD): Added writing 'KAPPA format' STLs.
 *  Bugs:
 *     None known
 *-
@@ -89,7 +89,7 @@
       CHARACTER
      :  ERRTXT*75     ! Error message text.
       LOGICAL
-     :  KFLAG    ! Flag; is STL in 'Kappa format' or standard.
+     :  KFLAG    ! Flag; is STL in 'KAPPA format' or standard.
 *.
 
       IF (STATUS .EQ. CAT__OK) THEN
@@ -110,7 +110,7 @@
 
 *
 *          Determine whether the catalogue is a standard STL or a
-*          Kappa-format one.
+*          KAPPA-format one.
 
             KFLAG = KFLAG__CAT5(CIELM)
 

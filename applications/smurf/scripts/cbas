@@ -23,7 +23,7 @@ if( $# < 1 ) then
    echo "   60 arc-sec circular aperture (bad pixels are replaced using"
    echo "   prior to finding the sum), but if the -p option is"
    echo "   it will be the integral of the model star profile found"
-   echo "   the kappa:psf command."
+   echo "   the KAPPA:PSF command."
    echo
    echo "   By default, smurf:makemap uses the configuration parameters"
    echo "   in file dimmconfig_distortionmap.lis, but an alternative "

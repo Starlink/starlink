@@ -922,7 +922,7 @@ of the more complicated behavour of instrument control tasks.
 \subsubsection{The OBEY message}
 
 An adam task supports one or more commands, normally referred to as
-{\em actions}, ({\em{e.g.}} the kappa task supports ``add'', ``cadd'',
+{\em actions}, ({\em{e.g.}} the KAPPA task supports ``add'', ``cadd'',
 ``stats'' etc.) and is instructed to execute one of them by sending it
 an ``OBEY'' message. The message contains the action name ({\em{e.g.}} ``add'')
 and a command line which can contain parameter values and any of the
@@ -1037,7 +1037,7 @@ For example:
 \begin{tquote}{\tt
 adamtask kappa /star/bin/kappa/kappa\_mon
 }\end{tquote}
-will start the kappa monolith and create a \Tcl\ command called {\bf kappa}
+will start the KAPPA monolith and create a \Tcl\ command called {\bf kappa}
 which can be used to send messages to the task.
 The first argument to this new command is the type of Adam message to
 send to the task and is one of {\tt set}, {\tt get}, {\tt obey}, {\tt
@@ -1047,7 +1047,7 @@ The format of the command to send a task an {\bf obey} message is:
 \begin{quote}{\tt
 <taskname> obey <action> <command-line>
 }\end{quote}
-So, for example, we can instruct kappa to execute the add command with:
+So, for example, we can instruct KAPPA to execute the add command with:
 \begin{tquote}{\tt
 kappa obey add "in1=image1 in2=image2 out=result"
 }\end{tquote}
@@ -1206,7 +1206,7 @@ while {[kappa path] == 0} {
 \end{verbatim}
 \end{quote}
 
-loads kappa and tries 100 times at 100 millisecond intervals to establish
+loads KAPPA and tries 100 times at 100 millisecond intervals to establish
 a message system path.
 \end{description}
 

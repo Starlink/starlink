@@ -431,7 +431,7 @@
             CALL PGSVP( 0., 1., 0., 1. )
 
 *        Now, the picture will first of all have world co-ordinates.
-*        These are free, but must be linear and increasing. Kappa
+*        These are free, but must be linear and increasing. KAPPA
 *        DISPLAY, for example uses NDF pixel indices to set a picture's
 *        world co-ordinates. Then, the picture may have a
 *        transformation. The forward function transforms our world

@@ -4237,7 +4237,7 @@ Usage:
 
 Description:
 
-   Scuplot is a wrapper script around a number of kappa
+   Scuplot is a wrapper script around a number of KAPPA
    utilities. Since it understands the Scuba NDF file format, it
    hides most of the complicated syntax from the user.  Mode = `p'
    and `r' are wrappers around plotting utilities and facilitate the

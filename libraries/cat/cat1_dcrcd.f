@@ -99,7 +99,7 @@
 *  History:
 *     3/7/96  (ACD): Original version.
 *     30/7/96 (ACD): First stable version.
-*     6/12/96 (ACD): Added support for 'Kappa format' small text lists.
+*     6/12/96 (ACD): Added support for 'KAPPA format' small text lists.
 *     6/11/97 (ACD): Added proper initialisation of the in-line
 *        comments.
 *  Bugs:
@@ -178,7 +178,7 @@
      :          BUFFER(1 : 2) .NE. '#t')  THEN
 
 *
-*             Trap and remove the '#' used in Kappa format STLs.
+*             Trap and remove the '#' used in KAPPA format STLs.
 
                WRKBUF = BUFFER
 

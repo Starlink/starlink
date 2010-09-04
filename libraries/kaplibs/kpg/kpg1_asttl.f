@@ -153,7 +153,7 @@
 
 *  If the NDF path has not been used as the title, see if the NDF path
 *  should be added to the title. The user can control this by including
-*  the kappa pseudo-attribute FileInTitle within the value supplied for
+*  the KAPPA pseudo-attribute FileInTitle within the value supplied for
 *  STYLE.
       IF( .NOT. PATH ) THEN
          IF( KPG1_GETASTFIT() ) THEN

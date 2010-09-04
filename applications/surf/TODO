@@ -88,7 +88,7 @@ SURF TODO list
 
 
 6. Change SCUOVER to PGPLOT and extract into a separate monolith.
-     - difficult to remove SGS without dropping the Kappa 
+     - difficult to remove SGS without dropping the KAPPA 
        routines (which contain a couple of SGS calls)
        Essentially the colour index code is the problem.
        Other than that SGS could be removed from surf_scuover.f

@@ -17,8 +17,8 @@
 *        Fortran unit number for writing to the description file.
 *     KFLAG  =  LOGICAL
 *        Flag indicating whether the catalogue is to be written as in
-*        'Kappa format' or as a standard STL, coded as follows:
-*        .TRUE.  -  Kappa format,
+*        'KAPPA format' or as a standard STL, coded as follows:
+*        .TRUE.  -  KAPPA format,
 *        .FALSE. -  standard.
 *     FNAME  =  CHARACTER*(*) (Given)
 *        Name of the column.
@@ -69,7 +69,7 @@
 *  History:
 *     18/7/96  (ACD): Original version.
 *     19/7/96  (ACD): First stable version.
-*     10/12/96 (ACD): Added writing 'Kappa format' STLs.
+*     10/12/96 (ACD): Added writing 'KAPPA format' STLs.
 *  Bugs:
 *     None known
 *-

@@ -24,7 +24,7 @@ endif
 # Switch off messages
 alias echo "echo > /dev/null"
 
-# First start up kappa
+# First start up KAPPA
 source $KAPPA_DIR/kappa.csh
 
 # Second start up surf

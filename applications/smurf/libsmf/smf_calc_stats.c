@@ -49,7 +49,7 @@
 
 *  Description:
 *     This routine calculates the mean and standard deviation of a
-*     sample of points specified by three indices. The Kappa routine
+*     sample of points specified by three indices. The KAPPA routine
 *     kpgStatx is used. The first index is which bolometer or
 *     timeslice we are interest in, the second and third mark the
 *     range of values to include in the sample. If both lo and hi are

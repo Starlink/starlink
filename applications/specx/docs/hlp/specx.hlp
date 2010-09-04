@@ -1813,7 +1813,7 @@ Spectral data version 4.0 and up: These are portable binary formats
    (Unix "cp" or "ftp" in binary mode). The file can be used straight
    away. Optionally you can convert it to the native flavour of the HDS
    format on the destination machine. Use the command "native" in the
-   Kappa package. This should speed up data access somewhat.
+   KAPPA package. This should speed up data access somewhat.
 
    Version 4.x spectral data cannot be imported back into Specx 6.2 or 
    6.3.
@@ -1841,7 +1841,7 @@ Map files version 4.1 and up: This is a portable binary format based on
    "ftp" in binary mode). The file can be used straight away.
    Optionally you can convert it to the native flavour of the HDS
    format on the destination machine. Use the command "native" in the
-   Kappa package. This should speed up data access somewhat.
+   KAPPA package. This should speed up data access somewhat.
 
    Version 4.x map files cannot be imported back into Specx 6.2 or 6.3.
 

@@ -69,7 +69,7 @@
 *  History:
 *     18/7/96  (ACD): Original version.
 *     14/8/96  (ACD): First stable version.
-*     10/12/96 (ACD): Added writing 'Kappa format' STLs.
+*     10/12/96 (ACD): Added writing 'KAPPA format' STLs.
 *     28/3/97  (ACD): Changed the definition of column and parameter
 *        names to use the correct parametric contstant (CAT__SZCMP).
 *     6/6/98   (ACD): Changed the way column details are manipulated.
@@ -119,7 +119,7 @@
      :  TYPE*(CAT__SZTYP),   ! Character repn. of current data type.
      :  ENAME*(CAT__SZCMP)   ! Name of the current vector element.
       LOGICAL
-     :  KFLAG,   ! Flag; is STL in 'Kappa format' or standard.
+     :  KFLAG,   ! Flag; is STL in 'KAPPA format' or standard.
      :  MORE     ! Flag; more columns to be processed?
 
 *

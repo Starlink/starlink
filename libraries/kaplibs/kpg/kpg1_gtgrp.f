@@ -139,7 +139,7 @@
 *  If a null identifier was supplied, create a new group with default
 *  control characters.
       IF( IGRP .EQ. GRP__NOID) THEN
-         CALL GRP_NEW( 'Kappa group', IGRP, STATUS )
+         CALL GRP_NEW( 'kAPPA group', IGRP, STATUS )
 
 *  Otherwise, ensure the supplied group is empty.
       ELSE

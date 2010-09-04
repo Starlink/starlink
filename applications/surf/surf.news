@@ -98,7 +98,7 @@
 
   - Update remdbm to support KAPPA 0.18
 
-  - Use kappa libraries rather than private copies
+  - Use KAPPA libraries rather than private copies
 
 2 New_in_version_1_6_7
 

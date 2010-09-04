@@ -21,9 +21,9 @@ if( $# < 1 ) then
    echo "source in each bolometer map, and the other (with prefix '_sum')"
    echo "the total data sum in the source in each bolometer map. By default,"
    echo "this total data sum is the sum of the pixel values in a 60 arc-sec"
-   echo "circular aperture (bad pixels are replaced using kappa:fillbad prior"
+   echo "circular aperture (bad pixels are replaced using KAPPA:FILLBAD prior"
    echo "to finding the sum), but if the -p option is supplied it will be the"
-   echo "integral of the model star profile found by the kappa:psf command."
+   echo "integral of the model star profile found by the KAPPA:PSF command."
    echo
    exit
 endif

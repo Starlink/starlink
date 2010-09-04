@@ -1,5 +1,5 @@
 # +++
-#  This example is Kappa format CAT small text list (STL).
+#  This example is KAPPA format CAT small text list (STL).
 #
 #  A.C. Davenahall (Edinburgh)  24/1/97.
 # ---

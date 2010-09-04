@@ -9,7 +9,7 @@
  Running programs      'running'        Batch Jobs         'batch'
  How to do Photometry  'photometry'     Image handling     'images'
  Run through           'run_through'    Table handling     'tables'
- Photometry Run        'phot_run_thru'  Using Kappa        'kappa'
+ Photometry Run        'phot_run_thru'  Using KAPPA        'kappa'
  Demonstration         'demo'           Programming guide  'programmer'
  Getting started       'starting'       Source Code        'source'
  Examples              'examples'       Author/version     'author/version'
@@ -3972,15 +3972,15 @@
 2 Conversion_from_other_systems
 
  If you have images in the FITS, FIGARO, or non-Starman ADAM formats, 
- there are programs in Starman and Kappa which you can use to convert 
+ there are programs in Starman and KAPPA which you can use to convert 
  them to the .SDF format used by Starman. 
 
   Format                 Conversion Program
   ------                 --------------------
   FITS (disk)            imfits_dr 
   ADAM (=HDS/NDF/SDF)    import 
-  Figaro (=DST)          dst2ndf in Kappa, then import
-  FITS                   fitsin in Kappa, then import
+  Figaro (=DST)          dst2ndf in KAPPA, then import
+  FITS                   fitsin in KAPPA, then import
 
  As the ADAM and Figaro conversion programs usually give you `Real'
  images, you can then use IMTYPE to convert them to the 16-bit
@@ -3991,7 +3991,7 @@
  'imcube' to extract the desired 2-D plane out of the image.
     
  If you are in real trouble, use those packages to write a FITS tape
- and read the files in with FITSIN in Kappa.
+ and read the files in with FITSIN in KAPPA.
 
 2 Conversion_to_other_systems
 
@@ -4002,9 +4002,9 @@
   Format                 Conversion Program
   ------                 --------------------
   ADAM (=HDS/NDF/SDF)    import in Starman (converts descriptors)
-  Figaro (=DST)          dst2ndf2dst in Kappa, after import
-  FITS                   fitsout in Kappa, after import
-  FITS (disk)            dfitsout in Kappa, after import
+  Figaro (=DST)          dst2ndf2dst in KAPPA, after import
+  FITS                   fitsout in KAPPA, after import
+  FITS (disk)            dfitsout in KAPPA, after import
 
  If your Starman images are in the 'short' format', then as the ADAM 
  and Figaro conversion programs usually work with `Real'
@@ -4046,18 +4046,18 @@
  These are thus useful in other, non-stellar-photometry, astronomical data
  reduction studies.
  
-2 Kappa
+2 KAPPA
 
- Using Kappa
+ Using KAPPA
 
  The additional useful programs which back up Starman are those already
- existing in the Kappa package which are listed elsewhere.
+ existing in the KAPPA package which are listed elsewhere.
 
-To use these, you must add the Kappa package. Do:-
+To use these, you must add the KAPPA package. Do:-
 
      > kappa
 
- To access help on Kappa programs, do:-
+ To access help on KAPPA programs, do:-
 
      > kaphelp
 1 Menu
@@ -4122,7 +4122,7 @@ To use these, you must add the Kappa package. Do:-
                  - Scrutinise the output of MEASURE 
  tbplot         Plot table graph/histogram - image picture/contour
 
- There are other programs in Kappa which handle images. 
+ There are other programs in KAPPA which handle images. 
 
 2 Table_handling_programs
 
@@ -4993,14 +4993,14 @@ To use these, you must add the Kappa package. Do:-
 
  The programs have been written in the Starlink ADAM Environment. This
  has the advantage that there are a number of useful programs in the 
- Kappa packages which supplement Starman, and that some of the Starman
+ KAPPA packages which supplement Starman, and that some of the Starman
  programs in turn are useful for current users of such packages.
 
  Particularly, the standard data format NDF is used. (You can see
  this as all data files have the '.sdf' suffixes.)
  
  Users wishing to know more about the  ADAM Environment and the
- Kappa programs should read the relevant documents
+ KAPPA programs should read the relevant documents
  SG~4 and SUN~95.
 1 Screen
 
@@ -5451,7 +5451,7 @@ To use these, you must add the Kappa package. Do:-
 
 2 Other_programs
 
-  There are no other useful programs in Kappa.
+  There are no other useful programs in KAPPA.
 1 Version
 
   Version 2.0       1995 January

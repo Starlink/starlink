@@ -12,7 +12,7 @@
 #
 # !!emph{whtdiv} divides AUX port and red and blue arm data from ISIS. It
 # expects these to be in sdf format and to have had 'fixhead' run on them.
-# It then uses hdstrace to list  It uses kappa's 'fitshead' to spot
+# It then uses hdstrace to list  It uses KAPPA's 'fitshead' to spot
 # the type of data and then sends off the files to sub-directories aux,
 # blue and red (!!emph{which should have been created beforehand!}).
 #

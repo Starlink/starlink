@@ -62,7 +62,7 @@
 *  History:
 *     9/7/96  (ACD): Original version.
 *     28/8/96 (ACD): First stable version.
-*     6/12/96 (ACD): Added support for 'Kappa format' small text lists.
+*     6/12/96 (ACD): Added support for 'KAPPA format' small text lists.
 *  Bugs:
 *     None known
 *-

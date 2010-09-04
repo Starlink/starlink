@@ -19,7 +19,7 @@
 *     EXTRA  =  CHARACTER*(*) (Given)
 *        Any extra information needed to write the catalogue.  If the
 *        argument contains a string starting with a 'K' (in either
-*        case) then the catalogue is written in 'Kappa format',
+*        case) then the catalogue is written in 'KAPPA format',
 *        otherwise it is written as a standard format STL.
 *     CI  =  INTEGER (Returned)
 *        Identifier to the catalogue.

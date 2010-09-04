@@ -34,7 +34,7 @@
 *        The global status.
 
 *  Notes:
-*     - uses kappa internal routine KPG1_CSUB<T>
+*     - uses KAPPA internal routine KPG1_CSUB<T>
 
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council. All

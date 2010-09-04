@@ -24,7 +24,7 @@
 *     or array. In theory it is possible to build up a complete NDF or
 *     Figaro DST data file. This is not recommended because the risk of
 *     creating an illegal hierarchy of HDS structures - i.e. one not
-*     accepted by Kappa, Figaro, etc. - is very high. This routine is
+*     accepted by KAPPA, Figaro, etc. - is very high. This routine is
 *     intended only for minor repairs to such files, or in emergencies
 *     to create a very simple, minimal, data file.
 

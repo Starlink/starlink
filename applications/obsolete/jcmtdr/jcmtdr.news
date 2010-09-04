@@ -40,7 +40,7 @@
  Since the previous version (1.1), GSD support has been added.
 
   o GSD files can be converted with "makemap" into NDF format for (i)
-    further use in JCMTDR, (ii) use in Figaro, (iii) use in Kappa and
+    further use in JCMTDR, (ii) use in Figaro, (iii) use in KAPPA and
     associated packages.
 
   o GSD files can be inspected with "gsd_print". The name of the GSD

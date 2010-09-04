@@ -38,7 +38,7 @@ alias echo "echo > /dev/null"
 
 # First start up KAPPA
 
-#kappa
+# KAPPA
 # use kappa.csh rather than the alias so that we dont have
 # to source /star/etc/cshrc
 source $KAPPA_DIR/kappa.csh

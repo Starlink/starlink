@@ -101,8 +101,8 @@ __END__
 *    Perl 5 script
 
 *  Description:
-*    This program uses kappa STATS to calculate mean and standard 
-*    deviation of an NDF. It then uses kappa THRESH to set the values at +/-
+*    This program uses KAPPA STATS to calculate mean and standard 
+*    deviation of an NDF. It then uses KAPPA THRESH to set the values at +/-
 *    n-sigma to BAD. The clipped data are written to NDF_clip.sdf.
 
 *  Usage:

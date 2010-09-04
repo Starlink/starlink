@@ -13,7 +13,7 @@
 * want more sky to be brought in following a large shift.
 *
 * If you there are particular bad pixels fixed in position then these are best applied
-* using kappa's ardmask to mask them.
+* using KAPPA'S ardmask to mask them.
 *
 * Parameters:
 *

@@ -21,7 +21,7 @@
 *     If ok then
 *       Obtain the Fortran unit number for the STL file.
 *       Determine whether the catalogue is a standard STL or a
-*       Kappa-format one.
+*       KAPPA-format one.
 *       If the catalogue is being created then
 *         If creation of the catalogue is finished then
 *           Set the total number of rows.
@@ -70,7 +70,7 @@
 *  History:
 *     19/7/96  (ACD): Original version.
 *     29/8/96  (ACD): First stable version.
-*     10/12/96 (ACD): Added writing 'Kappa format' STLs.
+*     10/12/96 (ACD): Added writing 'KAPPA format' STLs.
 *     28/3/97  (ACD): Changed the definition of column and parameter
 *        names to use the correct parametric contstant (CAT__SZCMP).
 *     6/6/98   (ACD): Changed the way that column identifiers are
@@ -106,7 +106,7 @@
      :  LQXFMT, ! Length of FXFMT (excl. trail. blanks).
      :  LOOP    ! Loop index.
       LOGICAL
-     :  KFLAG,  ! Flag; is STL in 'Kappa format' or standard.
+     :  KFLAG,  ! Flag; is STL in 'KAPPA format' or standard.
      :  MORE    ! Flag; more parameters to process?
 
 *
@@ -145,7 +145,7 @@
 
 *
 *          Determine whether the catalogue is a standard STL or a
-*          Kappa-format one.
+*          KAPPA-format one.
 
             KFLAG = KFLAG__CAT5(CIELM)
 

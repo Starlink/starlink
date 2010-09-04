@@ -566,7 +566,7 @@ DETAILS:
    data from different exposures to check the noise.
 
    Mode = 'r' or rlinplot (or any r* link to scuplot) is a wrapper around the
-   Kappa Utility mlinplot. It provides  plots of sets of bolometers in a single
+   KAPPA Utility mlinplot. It provides  plots of sets of bolometers in a single
    window with optionally data from a second file in a second window.
    Obvious files are despiked and non-despiked data or data from different
    exposures to check the noise.

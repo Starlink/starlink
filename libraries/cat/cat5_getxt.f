@@ -81,7 +81,7 @@
 *     ACD: A C Davenhall (Edinburgh)
 *  History:
 *     26/7/96  (ACD): Original version.
-*     10/12/96 (ACD): Added reading 'Kappa format' STLs.
+*     10/12/96 (ACD): Added reading 'KAPPA format' STLs.
 *  Bugs:
 *     None known
 *-

@@ -64,7 +64,7 @@
 *     29/9/94  (ACD): First stable version.
 *     26/8/96  (ACD): Added option to copy either all the header text
 *        or just the genuine comments.
-*     10/12/96 (ACD): Modified to handle Kappa format STLs.
+*     10/12/96 (ACD): Modified to handle KAPPA format STLs.
 *     11/11/97 (ACD): Fixed a bug in copying blank comments.
 *     11/10/99 (ACD): Modified to handle the AST class.
 *     17/3/00  (ACD): Reset access to the input catalogues textual

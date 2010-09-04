@@ -107,7 +107,7 @@
 *          in the selected output WCS Frame. The values are calculated
 *          even if no output cube is created. Celestial axis values will
 *          be in units of radians.  The parameter is named to be
-*          consistent with KAPPA NDFTRACE output.
+*          consistent with KAPPA:NDFTRACE output.
 *     FTL( ) = _DOUBLE (Write)
 *          Sky coordinates (radians) of the top left corner of the
 *          output map (the corner with the smallest PIXEL dimension for
@@ -125,7 +125,7 @@
 *          in the selected output WCS Frame. The values are calculated
 *          even if no output cube is created. Celestial axis values will
 *          be in units of radians.  The parameter is named to be
-*          consistent with KAPPA NDFTRACE output.
+*          consistent with KAPPA:NDFTRACE output.
 *     IN = NDF (Read)
 *          Input file(s).
 *     LBND( 2 ) = _INTEGER (Read)
@@ -145,7 +145,7 @@
 *          technique assumes that the data have previously had
 *          atmosphere and instrument signatures removed. It makes use
 *          of the standard AST library rebinning algorithms (see also
-*          KAPPA WCSMOSAIC). It is an excellent choice for obtaining an
+*          KAPPA:WCSMOSAIC). It is an excellent choice for obtaining an
 *          image quickly, especially of a bright source.
 *          - "ITERATE" -- Use the iterative map maker. This map maker
 *          is much slower than the REBIN algorithm because it
@@ -395,7 +395,7 @@
 *       filename]_[model component].dimm", but will be deleted upon
 *       completion of the map if DELDIMM is set. Set EXPORTNDF
 *       to produce Starlink ".sdf" files that can be viewed using
-*       tools such as Kappa and Gaia regardless of the value of MEMITER.
+*       tools such as KAPPA and Gaia regardless of the value of MEMITER.
 *     NOEXPORTSETBAD = LOGICAL
 *       If true, the output models from the map-maker will not be modified
 *       to use bad values wherever the bolometer is known to be bad. Default

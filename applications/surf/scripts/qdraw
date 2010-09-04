@@ -20,7 +20,7 @@ if (defined $ENV{"KAPPA_DIR"}) {
   die "Can not start - The KAPPA_DIR environment variable is not set\n";
 }
 
-# Check the kappa version number (important since from v0.13)
+# Check the KAPPA version number (important since from v0.13)
 # the parameters for linplot changed.
 # Do this by checking for a new file in $KAPPA_DIR that is only
 # there in the new release.

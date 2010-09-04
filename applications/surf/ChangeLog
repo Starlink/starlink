@@ -127,7 +127,7 @@
 
 	* starlink/surf.news: Update for 1.6-8
 
-	* scripts/remdbm.pl: Support ARDMASK from kappa 0.18
+	* scripts/remdbm.pl: Support ARDMASK from KAPPA 0.18
 
 	* makefile: Now link against KAPLIBS
 
@@ -310,7 +310,7 @@
 
 2000-06-02  Tim Jenness  <timj@jach.hawaii.edu>
 
-	* surf_kap/makefile: Include new Kappa routines from V0.14-5
+	* surf_kap/makefile: Include new KAPPA routines from V0.14-5
 
 	* src/surf_scuover.f (SURF_SCUOVER): AST-ify. Remove SGS.
 
@@ -393,9 +393,9 @@
 	
 	* scripts/scuplot.csh: Update for new mlinplot.
 
-	* scripts/sdip.csh: Recognise kappa 0.14
+	* scripts/sdip.csh: Recognise KAPPA 0.14
 
-	* scripts/qdraw: Convert to kappa 0.14 support
+	* scripts/qdraw: Convert to KAPPA 0.14 support
 
 1999-09-24  Tim Jenness  <timj@jach.hawaii.edu>
 
@@ -966,7 +966,7 @@
 
 	* remdbm.pl: Add messaging support if it is available (for the
 	Starlink version). Add -noams flag.
-	Replace 0 with 0.00001 to fool Kappa DIV
+	Replace 0 with 0.00001 to fool KAPPA div
 
 1998-06-17  Tim Jenness  <timj@jach.hawaii.edu>
 
@@ -1253,7 +1253,7 @@
 	* sculib_statd.f (SCULIB_STATD): Create.
 
 	* sculib_statr.f (SCULIB_STATR): Add some D0 to 0.0. Change
-	comment about Kappa sort routine (now is PDA)
+	comment about KAPPA sort routine (now is PDA)
 
 1998-02-05  Tim Jenness  <timj@jach.hawaii.edu>
 

@@ -275,7 +275,7 @@ with its centre at (0.5,0.5).
  
  
 If you have images in the FITS/FIGARO formats, there are programs in
-Starman and Kappa which you can use to convert them to the .SDF format used
+Starman and KAPPA which you can use to convert them to the .SDF format used
 by Starman.
 <p>
 
@@ -284,8 +284,8 @@ by Starman.
   ------                 --------------------
   FITS (disk)            imfits_dr
   ADAM (=HDS/NDF/SDF)    import 
-  Figaro (=DST)          dst2ndf in Kappa, then import
-  FITS                   fitsin in Kappa, then import
+  Figaro (=DST)          dst2ndf in KAPPA, then import
+  FITS                   fitsin in KAPPA, then import
 </pre> 
 <p>
 
@@ -300,7 +300,7 @@ The image made from Figaro or HDS may be 3-D or 4-D. You can use
 <p>
  
 If you are in real trouble, use those packages to write a FITS tape
-and read the files in with \verb|fitsin| in Kappa.
+and read the files in with \verb|fitsin| in KAPPA.
 <p>
  
 <hr>
@@ -317,9 +317,9 @@ the desired format from the .SDF format used by Starman.
   Format                 Conversion program
   ------                 --------------------
   ADAM (=HDS/NDF/SDF)    import in Starman (converts descriptors)
-  Figaro (=DST)          dst2ndf2dst in Kappa, after import
-  FITS                   fitsout in Kappa, after import
-  FITS (disk)            dfitsout in Kappa, after import
+  Figaro (=DST)          dst2ndf2dst in KAPPA, after import
+  FITS                   fitsout in KAPPA, after import
+  FITS (disk)            dfitsout in KAPPA, after import
 </pre> 
 <p>
  

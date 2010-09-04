@@ -25,7 +25,7 @@
 *        input RGB colour.  Note at least eighteen characters are
 *        required to avoid truncation. This string may also be an HTML
 *        code of the form "#aabbcc" (or "@aabbcc" - for use in contexts
-*        where "#" is a comment character, e.g. kappa style files) where
+*        where "#" is a comment character, e.g. KAPPA style files) where
 *        a, b and c are hexadecimal digits, and "aa", "bb" and "cc" give
 *        red, blue and green intensities normalised to a maximum of "ff"
 *        (256).

@@ -49,7 +49,7 @@ ffield.f
 
 pscont
   - not ported to use kaprh for plotting
-    [since turbocont is now obsolete, should be using kappa contour]
+    [since turbocont is now obsolete, should be using KAPPA contour]
 
 NDG
   - Now uses standalone NDG rather than private NDG.

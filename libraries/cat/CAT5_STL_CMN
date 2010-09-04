@@ -82,9 +82,9 @@
 
 *
 *    Flag indicating whether or not the description file for an output
-*    catalogue is to be written in 'Kappa format' or as a standard STL.
+*    catalogue is to be written in 'KAPPA format' or as a standard STL.
 *    The coding is as follows:
-*     .TRUE.  -  write as 'Kappa format',
+*     .TRUE.  -  write as 'KAPPA format',
 *     .FALSE. -  write as standard STL.
 
       LOGICAL

@@ -83,7 +83,7 @@
   endif 
 
 #  Run KAPPA and IRAS90 file
-   echo"just about to run kappa"
+   echo"just about to run KAPPA"
    kappa
    iras90
    
