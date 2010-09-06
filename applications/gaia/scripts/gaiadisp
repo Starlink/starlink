@@ -9,11 +9,11 @@ exec $GAIA_DIR/gaia_tcl $0 ${1+"$@"}
 #      Display images in a GAIA tool.
 
 #   Usage:
-#         gaiadisp [-p value] [-c component] image
+#         gaiadisp [-p value] [-l low -h high] [-c component] image
 #      or
-#         gaiadisp [-p value] [-c component] image clone_number
+#         gaiadisp [-p value] [-l low -h high] [-c component] image clone_number
 #      or
-#         gaiadisp [-p value] [-c component] image1 image2 image3 ...
+#         gaiadisp [-p value] [-l low -h high] [-c component] image1 image2 image3 ...
 
 #   Description:
 #      This command displays images in GAIA. It has two basic modes
@@ -73,6 +73,8 @@ exec $GAIA_DIR/gaia_tcl $0 ${1+"$@"}
 package require cmdline
 set options {
    {p.arg  -1     "percentile cut for display (50-100)"}
+   {l.arg  "NULL" "low intensity cut for display"}
+   {h.arg  "NULL" "high intensity cut for display"}
    {c.arg  "DATA" "NDF component, DATA, VARIANCE, ERROR or QUALITY"}
 }
 
@@ -84,6 +86,8 @@ options:"
 array set params [::cmdline::getoptions argv $options $usage]
 
 set percentile "$params(p)"
+set low "$params(l)"
+set high "$params(h)"
 set component "$params(c)"
 set clone -1
 
@@ -192,9 +196,10 @@ foreach image $argv {
       puts stderr "Failed to display image: ($gaianame)"
    }
 
-   #  If have a percentile cut apply that. Note this applies to the clone
+   #  If have any cuts apply those. Note this applies to the clone
    #  not the base gaia, unless this is the first image.
-   if { $percentile >= 50.0 && $percentile <= 100.0 } {
+   if { ( $percentile >= 50.0 && $percentile <= 100.0 ) || 
+        ( $low != "NULL" && $high != "NULL" ) } {
       if { $gaianame == "" } {
          set cmd "$gaia get_image"
       } else {
@@ -203,8 +208,18 @@ foreach image $argv {
       set gaiaimage [send_to_gaia $gaia_fd remotetcl $cmd]
       set cmd "$gaiaimage get_image"
       set image [send_to_gaia $gaia_fd remotetcl $cmd]
-      set cmd "$image autocut -percent $percentile"
-      send_to_gaia $gaia_fd remotetcl $cmd
+
+      #  Apply percentile.
+      if { $percentile >= 50.0 && $percentile <= 100.0 } {
+         set cmd "$image autocut -percent $percentile"
+         send_to_gaia $gaia_fd remotetcl $cmd
+      }
+
+      #  Apply cuts.
+      if { $low != "NULL" && $high != "NULL" } {
+         set cmd "$image cut $low $high"
+         send_to_gaia $gaia_fd remotetcl $cmd
+      }
    }
 }
 close $gaia_fd

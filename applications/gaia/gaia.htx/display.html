@@ -3,7 +3,7 @@
 <head>
     <title>Displaying images</title>
 </head>
-  
+
 <body>
     <a name="xref_display"></a>
     <h2 align="center"><font color=red>Displaying images</font></h2>
@@ -28,9 +28,16 @@
     <pre>
    % gaiadisp my_image
     </pre>
-    (actually this command will also start GAIA if it fails to
-    connect to an existing instance).</p>
-    
+    (actually this command will also start GAIA if it fails to connect to an
+    existing instance). This command also (unlike the "gaia" command) accepts
+    options that control the data display range. These use the "-p" or "-l"
+    and "-h" options.
+    <pre>
+   % gaiadisp -p 98 my_image
+   % gaiadisp -l 100 -h 200 my_image
+    </pre>
+    </p>
+
     <h3>Displaying more than one image at the same time</h3>
     <p>
       To do this you need to create a completely new main window (but which
@@ -54,6 +61,7 @@
    % gaiadisp my_image 2
     </pre>
   </p>
+
     <p>
       Popup windows (like analysis and catalogue windows) tend to be
       associated with the clone that created them. When this is true the
@@ -61,7 +69,7 @@
       in parenthesis, e.g. a window with title "Image regions (1)" would be
       associated with the main window, "Image regions (2)" with the first
       clone created etc.).
-      
+
     <h3>Make best use of my display area</h3>
     <p>
       You can resize the main window by dragging its edges, just like any
@@ -76,9 +84,9 @@
     </p>
     For the ultimate in control you can also remove any of the pan, zoom
     or color ramp windows permanently:
-    <pre> 
+    <pre>
   % gaia -with_zoom_window 0
-  % gaia -with_pan_window 0 
+  % gaia -with_pan_window 0
   % gaia -with_colorramp 0
     </pre>
     or get rid of them all with:
@@ -87,17 +95,17 @@
     </pre>
     Finally you can put the control panel in a window of its own:
     <pre>
-  % gaia -float_panel 1 
+  % gaia -float_panel 1
     </pre>
     This option is designed for very restricted size monitors.
   </p>
-    
+
     <h3>Displaying spectra and image planes from cubes</h3>
     <p>
       See <a href="cubes.html>here</a> which describes how GAIA handles
         data-cubes.
       </p>
     </p>
-    
+
   </body>
 </html>

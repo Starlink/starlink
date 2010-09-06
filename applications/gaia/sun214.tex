@@ -16,15 +16,15 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {214.38}
+\newcommand{\stardocnumber}    {214.39}
 \newcommand{\stardocauthors}   {Peter W. Draper,
                                 Norman Gray,
                                 David S. Berry \&
                                 Mark Taylor }
-\newcommand{\stardocdate}      {14th August 2009}
+\newcommand{\stardocdate}      {6th September 2010}
 \newcommand{\stardoctitle}     {GAIA --
                                 Graphical Astronomy and Image Analysis Tool}
-\newcommand{\stardocversion}   {4.4-0}
+\newcommand{\stardocversion}   {4.4-1}
 \newcommand{\stardocmanual}    {User's Manual}
 
 \newcommand{\stardocabstract} {GAIA is an image and data-cube display
@@ -384,10 +384,14 @@ A list of images can be displayed in GAIA using the command:
 \begin{quote}
 \mytt{\% gaiadisp image\_name1 image\_name2 image\_name3 ...}
 \end{quote}
-These will be displayed in separate clones. Finally a percentile cut
-can be applied using the \mytt{-p} option:
+These will be displayed in separate clones. Finally percentile or
+data cuts can be applied using the \mytt{-p} option or \mytt{-l} and 
+\mytt{-h} options:
 \begin{quote}
 \mytt{\% gaiadisp -p 98 image\_name1 image\_name2 image\_name3 ...}
+\end{quote}
+\begin{quote}
+\mytt{\% gaiadisp -l 100 -h 200 image\_name1 image\_name2 image\_name3 ...}
 \end{quote}
 (works for the single image case too).
 

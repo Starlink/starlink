@@ -40,6 +40,9 @@
     A bug in the overlay grid graphics handler has been fixed. Previously
     use of a lot of fonts could cause GAIA to crash.
 
+    The "gaiadisp" command now accepts the options "-l" and "-h". These
+    set the data limits to use when displaying the image.
+
   Hawaiki release
   ===============
 
