@@ -624,7 +624,7 @@ void smf_check_units( int count, char current[], smfHead* hdr, int *status );
 void smf_checkdets( Grp *detgrp, smfData *data, int *status );
 
 void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
-			smf_modeltype *modeltyps, dim_t nmodels,
+			smf_modeltype *modeltyps, dim_t nmodels, dim_t msize,
                         AstKeyMap *keymap, size_t available, dim_t maxfilelen,
                         size_t *necessary, int *status );
 

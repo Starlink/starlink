@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
-*                        smf_modeltype *modeltyps, dim_t nmodels,
+*                        smf_modeltype *modeltyps, dim_t nmodels, dim_t msize,
 *                        AstKeyMap *keymap, size_t available,
 *                        dim_t maxfilelen, size_t *necessary,
 *                        int *status );
@@ -30,12 +30,14 @@
 *        Array indicating which model components are being solved for
 *     nmodels = dim_t (Given)
 *        Number of elements in modeltyps
+*     msize = dim_t (Given)
+*        Number of elements in the map
 *     keymap = AstKeyMap* (Given)
 *        keymap containing parameters to control map-maker
 *     available = size_t (Given)
 *        Maximum memory in bytes that the mapped arrays may occupy
- *     maxfilelen = dim_t (Given)
- *        Max length in time samples of an individual data file.
+*     maxfilelen = dim_t (Given)
+*        Max length in time samples of an individual data file.
 *     necessary = size_t * (Returned)
 *        If non-null return estimate of the actual amount of memory required
 *     status = int* (Given and Returned)
@@ -77,6 +79,8 @@
 *        -space for initial data read (uses new maxfilelen parameter)
 *        -added fudge factor for static model memory usage (empirical)
 *        -added rough estimate for data cleaning (empirical)
+*     2010-09-09 (EC):
+*        Add msize to interface so we can add space for ast.zero_circle
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -130,7 +134,7 @@
 #define CHECKMEM_FUDGE 1.2 /* Fudge estimate by this empirical factor */
 
 void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
-			smf_modeltype *modeltyps, dim_t nmodels,
+			smf_modeltype *modeltyps, dim_t nmodels, dim_t msize,
                         AstKeyMap *keymap, size_t available, dim_t maxfilelen,
                         size_t *necessary, int *status ) {
 
@@ -292,7 +296,19 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
           total += 2*(ndet+maxlen)*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
           break;
         case SMF__AST:
-          /* Already accounted for as static memory usage above */
+          /* Mostly accounted for as static memory usage above, but add space
+             for zeromask if required */
+          {
+             int zero_c_n;
+             double zero_circle[3];
+
+             astMapGet0A( keymap, "AST", &kmap );
+             astMapGet1D(kmap, "ZERO_CIRCLE", 3, &zero_c_n, zero_circle);
+             if( zero_c_n == 3 ) {
+               total += msize*sizeof(unsigned char);
+             }
+             if( kmap ) kmap = astAnnul( kmap );
+          }
           break;
 	default:
 	  *status = SAI__ERROR;

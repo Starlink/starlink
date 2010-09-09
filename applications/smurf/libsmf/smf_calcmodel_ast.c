@@ -82,6 +82,8 @@
 *        and we ensure all keys have corresponding defaults.
 *     2010-05-18 (TIMJ):
 *        Ensure that all models have the same ordering.
+*     2010-09-09 (EC):
+*        Add circular region zero masking (ast.zero_circle)
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -191,58 +193,129 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)),
 
   /* Parse parameters */
 
-  /* Will we apply boundary condition to map? */
+  /* Will we apply lowhits boundary condition to map? */
   astMapGet0D( kmap, "ZERO_LOWHITS", &zero_lowhits );
   if( zero_lowhits < 0 ) {
     *status = SAI__ERROR;
     errRep( "", FUNC_NAME ": AST.ZERO_LOWHITS cannot be < 0.", status );
   }
 
+  /* Will we apply a circular boundary condition? Initialize the mask
+     if it has not been previously set. */
+
+  if( (astMapType( kmap, "ZERO_CIRCLE" ) != AST__BADTYPE) &&
+      (dat->zeromask == NULL) ) {
+
+    double centre[2];
+    AstCircle *circle=NULL;
+    int docirc;
+    int lbnd_grid[2];
+    int ubnd_grid[2];
+    double radius[1];
+    int zero_c_n;                 /* Number of zero circle parameters read */
+    double zero_circle[3];        /* LON/LAT/Radius of circular mask */
+
+    docirc = astMapGet1D( kmap, "ZERO_CIRCLE", 3, &zero_c_n, zero_circle );
+
+    if( docirc && (zero_c_n==3) ) {
+      /* Allocate space for the zeromask */
+      dat->zeromask = astCalloc( dat->msize, sizeof(*dat->zeromask), 1 );
+
+      /* The supplied bounds are for pixel coordinates... we need bounds
+         for grid coordinates which have an offset */
+      lbnd_grid[0] = 1;
+      lbnd_grid[1] = 1;
+      ubnd_grid[0] = dat->ubnd_out[0] - dat->lbnd_out[0] + 1;
+      ubnd_grid[1] = dat->ubnd_out[1] - dat->lbnd_out[1] + 1;
+
+      /* Coordinates & radius of the circular region converted from degrees
+         to radians */
+      centre[0] = zero_circle[0]*AST__DD2R;
+      centre[1] = zero_circle[1]*AST__DD2R;
+      radius[0] = zero_circle[2]*AST__DD2R;
+
+      /* Last frame is the sky frame, where the circle is defined */
+      circle = astCircle( astGetFrame(dat->outfset, AST__CURRENT), 1, centre,
+                          radius, NULL, " " );
+
+      /* Get the mapping from the sky frame (last) to the grid frame (first),
+         and then set the zeromask to 1 for all of the values outside of
+         this circle */
+
+      astMaskUB(circle, astGetMapping(dat->outfset, AST__CURRENT, AST__BASE),
+                0, 2, lbnd_grid, ubnd_grid, dat->zeromask, 1);
+
+      circle = astAnnul( circle );
+    }
+  }
+
+  /* Will we apply boundary conditions on last iteration ? */
   astMapGet0I( kmap, "ZERO_NOTLAST", &zero_notlast );
 
   if( *status != SAI__OK ) {
     return;
   }
 
-  dozero = 0;
-  if( zero_lowhits ) {
-    if( zero_notlast && (flags&SMF__DIMM_LASTITER) ) dozero = 0;
-    else dozero = 1;
-  }
+  if( zero_notlast && (flags&SMF__DIMM_LASTITER) ) dozero = 0;
+  else dozero = 1;
 
-  /* Constrain map to zero around the edge? We don't if this is the very last
-     iteration if zero_notlast is set. */
-  if( (*status == SAI__OK) && (zero_lowhits) && dozero ) {
-    /* Set hits pixels with 0 hits to VAL__BADI so that stats1 ignores them */
-    for( i=0; i<dat->msize; i++ ) {
-      if( hitsmap[i] == 0 ) {
-        hitsmap[i] = VAL__BADI;
+  /* Constrain map. We don't if this is the very last iteration, and
+     if zero_notlast is set. */
+
+  if( (*status == SAI__OK) && dozero ) {
+
+    /* Zero regions of low hits around the edges (this can change each
+       iteration as samples are dropped) */
+
+    if( zero_lowhits ) {
+      /* Set hits pixels with 0 hits to VAL__BADI so that stats1 ignores them */
+      for( i=0; i<dat->msize; i++ ) {
+        if( hitsmap[i] == 0 ) {
+          hitsmap[i] = VAL__BADI;
+        }
+      }
+
+      /* Find the mean hits in the map */
+      smf_stats1I( hitsmap, 1, dat->msize, NULL, 0, 0, &meanhits, NULL, &ngood,
+                   status );
+
+      msgOutiff( MSG__DEBUG, "", FUNC_NAME
+                 ": mean hits = %lf, ngood = %zd", status, meanhits, ngood );
+
+      /* Apply boundary condition */
+      newzero = 0;
+      for( i=0; i<dat->msize; i++ ) {
+        if((hitsmap[i] != VAL__BADI) && (hitsmap[i] < meanhits*zero_lowhits)) {
+          map[i] = 0;
+          mapweight[i] = VAL__BADD;
+          mapweightsq[i] = VAL__BADD;
+          mapvar[i] = VAL__BADD;
+          mapqual[i] |= SMF__MAPQ_ZERO;
+          newzero ++;
+        }
       }
     }
 
-    /* Find the mean hits in the map */
-    smf_stats1I( hitsmap, 1, dat->msize, NULL, 0, 0, &meanhits, NULL, &ngood,
-                 status );
+    /* Any other boundary constraints are static. We just check for the
+       existence of zeromask */
+    if( dat->zeromask ) {
 
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME
-               ": mean hits = %lf, ngood = %zd", status, meanhits, ngood );
-
-    /* Apply boundary condition */
-    newzero = 0;
-    for( i=0; i<dat->msize; i++ ) {
-      if( (hitsmap[i] != VAL__BADI) && (hitsmap[i] < meanhits*zero_lowhits) ) {
-        map[i] = 0;
-        mapweight[i] = VAL__BADD;
-        mapweightsq[i] = VAL__BADD;
-        mapvar[i] = VAL__BADD;
-        mapqual[i] |= SMF__MAPQ_ZERO;
-        newzero ++;
+      printf("applying zeromask\n");
+      for( i=0; i<dat->msize; i++ ) {
+        if( dat->zeromask[i]) {
+          map[i] = 0;
+          mapweight[i] = VAL__BADD;
+          mapweightsq[i] = VAL__BADD;
+          mapvar[i] = VAL__BADD;
+          mapqual[i] |= SMF__MAPQ_ZERO;
+          newzero ++;
+        }
       }
     }
   }
 
   /* Ensure everything is in the same data order */
-  smf_model_dataOrder( dat, allmodel, chunk, SMF__LUT|SMF__RES|SMF__QUA|SMF__NOI,
+  smf_model_dataOrder( dat, allmodel, chunk,SMF__LUT|SMF__RES|SMF__QUA|SMF__NOI,
                        lut->sdata[0]->isTordered, status );
 
   /* Loop over index in subgrp (subarray) */

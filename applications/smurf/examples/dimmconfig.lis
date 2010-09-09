@@ -310,13 +310,23 @@ ext.taumethod =adaptive
 
 #gai.flatfield = 1
 
-# Constrain boundary regions with low hit count to 0. The threshold is where
-# the hits are this fraction lower than the mean. If ast.zero_notlast is set,
-# on the final iteration this boundary condition will not be applied. This
-# will probably be useful for deep point-source observations for which the
-# large-scale noise is not as important, but keeping as much data around the
-# edges of the map is.
+# Constrain regions of the map to 0.
+#
+# Using ast.zero_lowhits will set a threshold region where
+# the hits are this fraction lower than the mean.
+#
+# Using ast.zero_circle defines a circle on the map outside of which
+# the map will be constrained to zero. The 3 parameters are:
+# Longitude, Latitude, Radius of the circle, in decimal degrees, in
+# the coordinate system of the map (e.g., RA and Dec.).
+#
+# If ast.zero_notlast is set, on the final iteration this boundary
+# condition will not be applied. This feature will probably be useful
+# for deep point-source observations for which the large-scale noise
+# is not as important, but keeping as much data around the edges of
+# the map is.
 
+#ast.zero_circle = (70.72333,36.115,0.0083333)
 #ast.zero_lowhits = 0.1
 #ast.zero_notlast = 1
 

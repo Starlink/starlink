@@ -672,6 +672,10 @@ typedef struct smfDIMMData {
   dim_t mdims[2];            /* dimensions of map */
   dim_t msize;               /* number of elements in map */
   double *chisquared;        /* total chisquared at each chunk */
+  AstFrameSet *outfset;      /* contains map->sky transformation */
+  int *lbnd_out;             /* map lower bounds */
+  int *ubnd_out;             /* map upper bounds */
+  unsigned char *zeromask;   /* Map indicating region to be masked in ast */
 } smfDIMMData;
 
 

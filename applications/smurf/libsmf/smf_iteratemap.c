@@ -514,6 +514,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   mdims[1] = ubnd_out[1] - lbnd_out[1] + 1;
   msize = mdims[0] * mdims[1];
 
+  /* Always need to initialize this zeromask */
+  dat.zeromask = NULL;
+
   /* Get size of the input group */
   isize = grpGrpsz( igrp, status );
 
@@ -848,8 +851,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
     /* Then the iterative components that are proportional to time */
     smf_checkmem_dimm( maxconcat, INST__SCUBA2, igroup->nrelated, modeltyps,
-                       nmodels, keymap, maxmem-mapmem, maxfile, &memneeded,
-                       status );
+                       nmodels, msize, keymap, maxmem-mapmem, maxfile,
+                       &memneeded, status );
 
     msgOutf( "", FUNC_NAME ": map-making requires %zu Mb "
              "(map=%zu Mb model calc=%zu Mb)", status,
@@ -1222,6 +1225,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       dat.mdims[0] = mdims[0];
       dat.mdims[1] = mdims[1];
       dat.msize = msize;
+      dat.outfset = outfset;
+      dat.lbnd_out = lbnd_out;
+      dat.ubnd_out = ubnd_out;
       dat.chisquared = chisquared;
       if( havenoi ) {
         dat.noi = model[whichnoi];
@@ -2273,6 +2279,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     smf_close_smfGroup( &igroup, status );
   }
 
+  if( dat.zeromask ) dat.zeromask = astFree( dat.zeromask );
   /* Ensure that FFTW doesn't have any used memory kicking around */
   fftw_cleanup();
 }

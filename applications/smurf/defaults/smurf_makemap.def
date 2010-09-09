@@ -93,6 +93,7 @@ ext.taumethod = adaptive
 
 ast.zero_lowhits = 0
 ast.zero_notlast = 0
+ast.zero_circle = <undef>
 
 # smf_calcmodel_com
 
