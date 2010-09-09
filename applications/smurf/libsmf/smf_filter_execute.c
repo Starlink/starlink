@@ -75,6 +75,9 @@
 *     2010-06-25 (DSB):
 *        Doing apodisation here, each time the filter is applied,
 *        rather than as a pre-processing step.
+*     2010-09-9 (DSB):
+*        Apodise all data regardless of quality, and report an error if a
+*        bad value is encountered.
 
 *  Copyright:
 *     Copyright (C) 2007-2009 University of British Columbia.
@@ -339,19 +342,18 @@ void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
       base = data->pntr[0];
       base += i*bstride;
 
-      /* Apodise the data with a Hanning window to avoid ringing. Not needed
-         if using the new algorithm (i.e. using a mask). */
-      if( qbase ) {
-        for( j = 0; j < apod_length; j++ ) {
-          ap = 0.5 - 0.5*cos( AST__DPI * (double) j / apod_length );
-          if( !(qbase[ first + j ] & SMF__Q_MOD )) base[ first + j ] *= ap;
-          if( !(qbase[ last - j ] & SMF__Q_MOD )) base[ last - j ] *= ap;
-        }
-      } else {
-        for( j = 0; j < apod_length; j++ ) {
-          ap = 0.5 - 0.5*cos( AST__DPI * (double) j / apod_length );
-          if( base[ first + j ] != VAL__BADD ) base[ first + j ] *= ap;
-          if( base[ last - j ] != VAL__BADD ) base[ last - j ] *= ap;
+      /* Apodise the data with a Hanning window to avoid ringing. This is
+         probably not needed if using the new algorithm (i.e. using a mask). */
+      for( j = 0; j < apod_length; j++ ) {
+        if( base[ first + j ] != VAL__BADD && base[ last - j ] != VAL__BADD ) {
+           ap = 0.5 - 0.5*cos( AST__DPI * (double) j / apod_length );
+           base[ first + j ] *= ap;
+           base[ last - j ] *= ap;
+        } else if( *status == SAI__OK ){
+           *status = SAI__ERROR;
+           errRep( "", "VAL__BADD value encountered in smf_filter_execute "
+                   "(programming error).", status );
+           break;
         }
       }
 
@@ -361,15 +363,25 @@ void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
          multiplying the original data array by this mask. */
       if( newalg ) {
          for( j = 0; j < ntslice; j++ ){
-            if( base[ j ] != VAL__BADD &&
-                ( !qbase || !( qbase[ j ] & SMF__Q_GOOD ) ) ) {
+
+            if( base[ j ] == VAL__BADD ){
+               if( *status == SAI__OK ){
+                  *status = SAI__ERROR;
+                  errRep( "", "VAL__BADD value encountered in smf_filter_execute "
+                          "(programming error).", status );
+               }
+               break;
+
+            } else if( !qbase || !( qbase[ j ] & SMF__Q_GOOD ) ) {
                mask[ j ] = 1.0;
                dmask[ j ] = base[ j ];
+
             } else {
                mask[ j ] = 0.0;
                dmask[ j ] = 0.0;
             }
          }
+
       } else {
          dmask = base;
       }
