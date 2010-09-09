@@ -5,22 +5,36 @@
   the commands "showme sun237".  The main changes are:
 
 2 New_Commands
- The following script has been added:
+ The following scripts have been added:
+
+   o  mapbyvel
+      Form a new image from a cube's voxels using all the data
+      values of a supplied image as the Z co-ordinate in the cube.
+      The supplied image must span the same X-Y region as the cube.
+      In practice the cube has RA, Dec, velocity axes and the input
+      image is a velocity map.
 
    o  pvslice
-      Extracts and displays position-velocity slice from a 
+      Extracts and displays position-velocity slice from a
       (RA,Dec,vel) cube.  The slice need not be parallel to either
-      spatial pixel axis, and it is defined using the graphics 
+      spatial pixel axis, and it is defined using the graphics
       cursor.
 
 2 Modified_Commands
 The following applications have been modified:
 
    o  Internal script checkndf--used in all of the public
-      scripts--now has a -q option to prevent the reporting of the
-      filename and its vital statistics.  It has also has an 
-      improved NDF-validation method, which allows for NDFs within 
-      a container file or NDF extension. 
+      scripts--now has new options:
+
+      +  -d to set the required dimensionality, 2 or 3, where previously
+         only cubes where tested;
+      +  -p to set the prompt string for the required NDF (that may
+         include spaces);
+      +  -q (for quiet) to prevent the reporting of the filename and its
+         vital statistics.
+
+      It has also has an improved NDF-validation method, which allows for
+      NDFs within a container file or NDF extension.
 
 1 DATACUBE_Version_1.2
 

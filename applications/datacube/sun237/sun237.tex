@@ -17,7 +17,7 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {237.4}
 \newcommand{\stardocauthors}   {A.~Allan \& Malcolm J. Currie}
-\newcommand{\stardocdate}      {2010 July 13}
+\newcommand{\stardocdate}      {2010 September 7}
 \newcommand{\stardoctitle}     {DATACUBE --- An IFS datacube manipulation package}
 \newcommand{\stardocversion}   {Version 1.3}
 \newcommand{\stardocmanual}    {User's Manual}
@@ -651,7 +651,7 @@ features using the cursor.
 \item to view a grid of channel maps of defined spectral width
       (\htmlref{{\bf step}}{step});
 \item to extract individual spectra (\htmlref{{\bf ripper}}{ripper});
-\item to extract an arbitrary position-spectral slice 
+\item to extract an arbitrary position-spectral slice
       (\htmlref{{\bf pvslice}}{pvslice});
 \item to compare spectra (\htmlref{{\bf compare}}{compare},
       \htmlref{{\bf stacker}}{stacker});
@@ -660,9 +660,11 @@ features using the cursor.
 \item to plot a grid of spectra with spatial averaging
       (\htmlref{{\bf gridspec}}{gridspec});
 \item to build a velocity map from an emission line by line
-      fitting (\htmlref{{\bf velmap}}{velmap}) or by intensity-weighted
-      moments (\htmlref{{\bf velmoment}}{velmoment});
-\item to build an emmision-line strength map
+      fitting (\htmlref{{\bf velmap}}{velmap}), or by intensity-weighted
+      moments (\htmlref{{\bf velmoment}}{velmoment}), or by selecting
+      a cube's voxels using the values of another velocity map
+      as spectral co-ordinates (\htmlref{{\bf mapbyvel}}{mapbyvel});
+\item to build an emission-line strength map
       (\htmlref{{\bf peakmap}}{peakmap}); and
 \item to plot multiple spectra from a cube overlaying fitted baselines
       and spectral feature mask (\htmlref{{\bf trendview}}{trendview}).
@@ -874,6 +876,84 @@ co-operation and contributions.
          with another compressed dataset.  See
          \xref{KAPPA:COMPAVE}{sun95}{COMPAVE} parameter ALIGN for more
          details.
+      }
+   }
+   \sstimplementationstatus{
+      This script invokes a collection of A-tasks from the \KAPPAref\ package.
+   }
+}
+\newpage
+\sstroutine{
+   mapbyvel
+}{
+   Uses a velocity map to extract values from a velocity cube forming a
+   new map
+}{
+   \sstdescription{
+      This shell script uses a velocity map of a spatial region to create
+      a new velocity map.  The spatial co-ordinates and velocity value at
+      each pixel specify the co-ordinates of voxels in a spectral cube.
+      The data value in the cube at this voxel becomes the data value in
+      the output map.
+
+      While creating velocity maps is the expected usage for the script,
+      it makes no specific tests that the $Z$ co-ordinate is velocity, or
+      even that the image value is velocity.  In mathematical form the
+      output image values are given by the following expression.
+
+      \[ {\rm Output}(x,y) = {\rm Cube}(x,y,{\rm Image}(x,y)) \]
+
+      One application is multi-spectral imaging in complex molecular clouds,
+      where one optically thin spectral line provides a clearer mapping of
+      the cloud and system velocities.  Using this specie's velocity map
+      traces the varying velocity, and thus data observed through different
+      spectral lines can be compared, enabling the calculation of cloud
+      parameters such as opacity.
+   }
+   \sstusage{
+      mapbyvel [-i filename] [-m filename] [-o filename]
+   }
+   \sstdiytopic{
+      Command-line Arguments
+   }{
+      \ssthitemlist{
+         \sstitem
+         {\bf{\tt{-i}}} {\em filename}\\
+           A three-dimensional NDF with spatial axes and a third velocity axis
+           By default the script will prompt for the input cube.
+
+         \sstitem
+         {\bf{\tt{-m}}} {\em filename}\\
+           The name of a two-dimensional velocity map, where the data values
+           are velocities.  It should have the same spatial co-ordinates as
+           the supplied cube.  Such a map can be created using
+           \htmlref{{\bf velmap}}{velmap} or \xref{KAPPA:COLLAPSE}{sun95}{COLLAPSE}
+           with the Iwc or Comax estimators.  By default the script will
+           prompt for the input cube.
+
+         \sstitem
+         {\bf{\tt{-o}}} {\em filename}\\
+            The filename for the output NDF velocity map.
+      }
+   }
+   \sstnotes{
+      \ssthitemlist{
+
+         \sstitem
+         The script assumes $X$ and $Y$ axes are spatial and $Z$ is spectral.
+         Use \xref{KAPPA:PERMAXES}{sun95}{PERMAXES} to re-orient
+         the cube if that is not the case.
+
+         \sstitem
+         A further assumption is the cube's $Z$-axis co-ordinate matches the
+         data values in the supplied image.  If that is not the case, change
+         the co-ordinate system with \xref{KAPPA:WCSFRAME}{sun95}{WCSFRAME}
+         and/or \xref{KAPPA:WCSATTRIB}{sun95}{WCSATTRIB}.
+
+         \sstitem
+         It propagates the original variances from the cube, but does not
+         account for errors in the input velocity map affecting the values
+         extracted from the cube.
       }
    }
    \sstimplementationstatus{
@@ -1176,7 +1256,7 @@ co-operation and contributions.
          degenerate pixel axis and a degenerate WCS axis. These could be
          removed using {\tt ndfcopy trim}, but this would result in a WCS
          with no inverse transformation (from current to pixel), which gives
-         problems when displaying it, \emph{etc.} Alternatively, the AXIS frame 
+         problems when displaying it, \emph{etc.} Alternatively, the AXIS frame
          can be used by doing {\tt wcsframe frame=axis}.
 
          \sstitem
@@ -1191,7 +1271,7 @@ co-operation and contributions.
          \sstitem
          The script clears the graphics database for the current device.
          It then creates two FRAME pictures with labels a1 and a2.  Within each
-         of these \xref{DISPLAY}{sun95}{DISPLAY} creates FRAME and DATA pictures, 
+         of these \xref{DISPLAY}{sun95}{DISPLAY} creates FRAME and DATA pictures,
          the former holding annotated axes.  On exit a2 is the current picture.
 
          \sstitem
@@ -2010,13 +2090,20 @@ Frames is disentangled enabling DSBSPECTRUM data to be used.
 \section{\xlabel{se_changes}Release Notes---V1.3\label{se:changes}}
 
 \subsection{New Commands}
-The following new script has been added:
+The following new scripts have been added:
 
 \begin{description}
+   \item [\htmlref{{\bf mapbyvel}}{mapbyvel}] \mbox{}
+     Form a new image from a cube's voxels using all the data
+     values of a supplied image as the $Z$ co-ordinate in the cube.
+     The supplied image must span the same $X$-$Y$ region as the cube.
+     In practice the cube has RA, Dec, velocity axes and the input
+     image is a velocity map.
+
    \item [\htmlref{{\bf pvslice}}{pvslice}] \mbox{}
-     Extracts and displays position-velocity slice from a 
+     Extracts and displays position-velocity slice from a
      (RA,Dec,vel) cube.  The slice need not be parallel to either
-     spatial pixel axis, and it is defined using the graphics 
+     spatial pixel axis, and it is defined using the graphics
      cursor.
 \end{description}
 
@@ -2026,10 +2113,19 @@ The following applications have been modified:
 \begin{itemize}
 
 \item Internal script {\bf checkndf}---used in all of the public
-scripts---now has a {\tt -q} option to prevent the reporting of the
-filename and its vital statistics.  It has also has an improved 
-NDF-validation method, which allows for NDFs within a container file or NDF
-extension. 
+scripts---now has new options:
+
+\begin{itemize}
+\item {\tt -d} to set the required dimensionality, 2 or 3, where
+previously only cubes where tested;
+\item {\tt -p} to set the prompt string for the required NDF (that may
+include spaces);
+\item {\tt -q} (for quiet) to prevent the reporting of the filename and its
+vital statistics.
+\end{itemize}
+
+\item It has also has an improved NDF-validation method, which allows for
+NDFs within a container file or NDF extension.
 
 \end{itemize}
 
