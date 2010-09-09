@@ -10,20 +10,26 @@
 #     C-shell script.
 #
 #  Usage:
-#     source ${DATACUBE_DIR}/checkndf.csh [-s script]
+#     source ${DATACUBE_DIR}/checkndf.csh [-d dimensionality] [-q]
+#            [-p prompt_string] [-s script]
 #
 #  Description:
 #     This shell script serves various DATACUBE application scripts.
 #     If first checks whether the input NDF has been supplied on the
 #     command line, if not it prompts for one.  It then checks whether
-#     or not the file exists, and then confirms that the NDF is a cube.
-#     If either fails, the script is exited with an error report.
+#     or not the file exists, and then confirms that the NDF has the
+#     desired dimensionality (defaulting to a cube).  If either test
+#     fails, the script is exited with an error report.
 #
 #     The name of the file and its vital statistics: dimensionality,
 #     shape, bounds, and total number of pixels are reported, unless
 #     the -q option is present.
 #
 #  Parameters:
+#     -d dimensionality
+#       The required dimensionality.  Allowed values are 2 or 3.  [3]
+#     -p prompt_string
+#       The string to prompt for the file name.  ["NDF input file"]
 #     -q
 #       If present it disables the reporting the file name and its
 #       statistics.
@@ -60,8 +66,10 @@
 #     2006 March 9 (MJC):
 #       Original version.
 #     2010 July 13 (MJC):
-#       Added -q option.  Use DSB's method involving  NDFTRACE to validate
+#       Added -q option.  Use DSB's method involving NDFTRACE to validate
 #       the input NDF.
+#     2010 September 7 (MJC):
+#       Added -d and -p options.
 #     {enter_further_changes_here}
 #
 #  Copyright:
@@ -76,25 +84,57 @@
 # Get command-line options.
 set cn_script = ""
 set quiet = "FALSE"
+set dimens = 3
+set file_prompt = "NDF input file"
 
-set args = ($argv[1-])
-while ( $#args > 0 )
-   switch ($args[1])
-   case -q:    # supress reporting
-      set quiet = "TRUE"
-      shift args
+# Specify the options and whether they expect an argument.  The
+# parentheses are needed because the result of getopt is a list.
+# The q modifier prevents any subsitutions in the command-line list
+# in $argv.
+set opt = ( `getopt -s csh -o d:p:qs: -- $argv:q` )
+if ($? != 0 ) then
+   echo "Problem with getopt parsing options."
+   exit 1
+endif
+
+eval set argv = \( $opt:q \)
+while ( 1 )
+   switch ( $argv[1]:q )
+
+   case -d:    # dimensionality
+      shift argv
+      set dimens = $argv[1]:q
+      if ( $dimens != 2 && $dimens != 3 ) then
+         set dimens = 3
+      endif
+      shift argv
       breaksw
- 
+
+   case -p     # prompt string
+      shift argv
+      set file_prompt = $argv[1]:q
+      shift argv
+      breaksw
+
+   case -q:    # suppress reporting
+      set quiet = "TRUE"
+      shift argv
+      breaksw
+
    case -s:    # calling script name
-      shift args
 
 # Exclude file path and extension.
-      set cn_script = `echo $args[1]:r:t | awk '{print toupper($0)"_"}'`
-      shift args
+      shift argv
+      set cn_script = `echo $argv[1]:r:t:q | awk '{print toupper($0)"_"}'`
+      shift argv
       breaksw
 
+   case --:
+      shift argv
+      break
+
    case *:     # rubbish disposal
-      shift args
+      shift argv
       breaksw
    endsw
 end
@@ -104,7 +144,7 @@ end
 
 # Get the input filename.
 if ( ${gotinfile} == "FALSE" ) then
-   echo -n "NDF input file: "
+   echo -n "${file_prompt}: "
    set infile = $<
 endif
 
@@ -131,25 +171,38 @@ if ( $status == 0 ) then
    exit 1
 endif
 
-# Check that it is a cube.
+# Check the dimensionality matches the requirement.
 $KAPPA_DIR/ndftrace ${infile}${ndf_section} >& /dev/null
 set cn_ndim = `$KAPPA_DIR/parget ndim ndftrace`
 set dims = `$KAPPA_DIR/parget dims ndftrace`
 set cn_lbnd = `$KAPPA_DIR/parget lbound ndftrace`
 set cn_ubnd = `$KAPPA_DIR/parget ubound ndftrace`
 
-if ( $cn_ndim != 3 ) then
-   echo "${cn_script}ERR: ${infile}.sdf is not a datacube."
+if ( $cn_ndim != $dimens ) then
+   if ( $dimens == 3 ) then
+      echo "${cn_script}ERR: ${infile}.sdf is not a datacube."
+   else
+      echo "${cn_script}ERR: ${infile}.sdf is not an image."
+   endif
    exit 1
 
-# Check for a degenerate third axis.
-else if ( $dims[3] == 1 ) then
-   echo "${cn_script}ERR: ${infile}.sdf${ndf_section} is not a datacube."
+# Check for a degenerate final axis.
+else if ( $dims[$dimens] == 1 ) then
+   if ( $dimens == 3 ) then
+      echo "${cn_script}ERR: ${infile}.sdf${ndf_section} is not a datacube."
+   else
+      echo "${cn_script}ERR: ${infile}.sdf${ndf_section} is not an image."
+   endif
    exit 1
 endif
 
-set cn_bounds = "${cn_lbnd[1]}:${cn_ubnd[1]}, ${cn_lbnd[2]}:${cn_ubnd[2]}, ${cn_lbnd[3]}:${cn_ubnd[3]}"
-@ pixnum = $dims[1] * $dims[2] * $dims[3]
+if ( $dimens == 3 ) then
+   set cn_bounds = "${cn_lbnd[1]}:${cn_ubnd[1]}, ${cn_lbnd[2]}:${cn_ubnd[2]}, ${cn_lbnd[3]}:${cn_ubnd[3]}"
+   @ pixnum = $dims[1] * $dims[2] * $dims[3]
+else
+   set cn_bounds = "${cn_lbnd[1]}:${cn_ubnd[1]}, ${cn_lbnd[2]}:${cn_ubnd[2]}"
+   @ pixnum = $dims[1] * $dims[2]
+endif
 
 if ( $quiet == "FALSE" ) then
    echo " "
@@ -158,7 +211,11 @@ if ( $quiet == "FALSE" ) then
 
    echo "      Shape:"
    echo "        No. of dimensions: ${cn_ndim}"
-   echo "        Dimension size(s): ${dims[1]} x ${dims[2]} x ${dims[3]}"
+   if ( $dimens == 3 ) then
+      echo "        Dimension size(s): ${dims[1]} x ${dims[2]} x ${dims[3]}"
+   else
+      echo "        Dimension size(s): ${dims[1]} x ${dims[2]}"
+   endif
    echo "        Pixel bounds     : ${cn_bounds}"
    echo "        Total pixels     : $pixnum"
 endif
