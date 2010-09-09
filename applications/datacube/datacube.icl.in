@@ -64,6 +64,7 @@ defstring mapbyvel    ! ${DATACUBE_DIR}/mapbyvel.csh
 defstring multistack  ! ${DATACUBE_DIR}/multistack.csh
 defstring passband    ! ${DATACUBE_DIR}/passband.csh
 defstring peakmap     ! ${DATACUBE_DIR}/peakmap.csh
+defstring pvslice     ! ${DATACUBE_DIR}/pvslice.csh
 defstring ripper      ! ${DATACUBE_DIR}/ripper.csh
 defstring squash      ! ${DATACUBE_DIR}/squash.csh
 defstring stacker     ! ${DATACUBE_DIR}/stacker.csh
@@ -78,6 +79,7 @@ defhelp mapbyvel      $DATACUBE_HELP
 defhelp multistack    $DATACUBE_HELP
 defhelp passband      $DATACUBE_HELP
 defhelp peakmap       $DATACUBE_HELP
+defhelp pvslice       $DATACUBE_HELP
 defhelp ripper        $DATACUBE_HELP
 defhelp squash        $DATACUBE_HELP
 defhelp stacker       $DATACUBE_HELP
