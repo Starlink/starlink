@@ -17,7 +17,7 @@
 #
 #  Copyright:
 #     Copyright (C) 2000-2005 Central Laboratory of the Research Councils.
-#     Copyright (C) 2008 Science & Technology Facilities Council.
+#     Copyright (C) 2008, 2010 Science & Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -98,6 +98,8 @@ compare () {         csh ${DATACUBE_DIR}/compare.csh ${1+"$@"}; }
 dat_compare () {     csh ${DATACUBE_DIR}/compare.csh ${1+"$@"}; }
 gridspec () {        csh ${DATACUBE_DIR}/gridspec.csh ${1+"$@"}; }
 dat_gridspec () {    csh ${DATACUBE_DIR}/gridspec.csh ${1+"$@"}; }
+mapbyvel () {        csh ${DATACUBE_DIR}/mapbyvel.csh ${1+"$@"}; }
+dat_mapbyvel () {    csh ${DATACUBE_DIR}/mapbyvel.csh ${1+"$@"}; }
 multistack () {      csh ${DATACUBE_DIR}/multistack.csh ${1+"$@"}; }
 dat_multistack () {  csh ${DATACUBE_DIR}/multistack.csh ${1+"$@"}; }
 passband () {        csh ${DATACUBE_DIR}/passband.csh ${1+"$@"}; }
@@ -130,6 +132,8 @@ datacube_test () {   csh ${DATACUBE_DIR}/datacube_demo.csh ${1+"$@"}; }
 add () {             ${KAPPA_DIR}/add ${1+"$@"}; }
 calc () {            ${KAPPA_DIR}/calc ${1+"$@"}; }
 cadd () {            ${KAPPA_DIR}/cadd ${1+"$@"}; }
+calc () {            ${KAPPA_DIR}/calc ${1+"$@"}; }
+carpet () {          ${KAPPA_DIR}/carpet ${1+"$@"}; }
 cdiv () {            ${KAPPA_DIR}/cdiv  ${1+"$@"}; }
 chpix () {           ${KAPPA_DIR}/chpix ${1+"$@"}; }
 collapse () {        ${KAPPA_DIR}/collapse ${1+"$@"}; }

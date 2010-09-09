@@ -86,7 +86,9 @@
 #     2008 June 30 (MJC):
 #        Add settype, sub, and trendview definitions.
 #     2010 July 13 (MJC):
-#        ADD pvslice script.
+#        Add pvslice script.
+#     2010 September 7 (MJC):
+#        Add mapbyvwel script and KAPPA CARPET definition.
 #     {enter_further_changes_here}
 #
 #-
@@ -97,6 +99,8 @@ alias compare         source ${DATACUBE_DIR}/compare.csh
 alias dat_compare     source ${DATACUBE_DIR}/compare.csh
 alias gridspec        source ${DATACUBE_DIR}/gridspec.csh
 alias dat_gridspec    source ${DATACUBE_DIR}/gridspec.csh
+alias mapbyvel        source ${DATACUBE_DIR}/mapbyvel.csh
+alias dat_mapbyvel    source ${DATACUBE_DIR}/mapbyvel.csh
 alias multistack      source ${DATACUBE_DIR}/multistack.csh
 alias dat_multistack  source ${DATACUBE_DIR}/multistack.csh
 alias passband        source ${DATACUBE_DIR}/passband.csh
@@ -129,8 +133,9 @@ alias datacube_test   source ${DATACUBE_DIR}/datacube_demo.csh
 
 #  Define aliases for external applications used by the scripts.
 alias add             ${KAPPA_DIR}/add
-alias calc            ${KAPPA_DIR}/calc
 alias cadd            ${KAPPA_DIR}/cadd
+alias calc            ${KAPPA_DIR}/calc
+alias carpet          ${KAPPA_DIR}/carpet
 alias cdiv            ${KAPPA_DIR}/cdiv
 alias chpix           ${KAPPA_DIR}/chpix
 alias collapse        ${KAPPA_DIR}/collapse

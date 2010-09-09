@@ -16,7 +16,7 @@
 {
 {  Copyright:
 {     Copyright (C) 2000-2005 Central Laboratory of the Research Councils.
-{     Copyright (C) 2008 Science & Technology Facilities Council.
+{     Copyright (C) 2008, 2010 Science & Technology Facilities Council.
 {     All Rights Reserved.
 
 {  Licence:
@@ -46,6 +46,10 @@
 {     2008 June 30 (MJC):
 {        Add the prolgoue, and all the defintions (except ripper that was
 {        already present).
+{     2010 July 13 (MJC):
+{        Add pvslice script.
+{     2010 September 7 (MJC):
+{        Add mapbyvwel script and KAPPA CARPET definition.
 {     {enter_further_changes_here}
 
 {
@@ -56,6 +60,7 @@
 {
 defstring compare     ! ${DATACUBE_DIR}/compare.csh
 defstring gridspec    ! ${DATACUBE_DIR}/gridspec.csh
+defstring mapbyvel    ! ${DATACUBE_DIR}/mapbyvel.csh
 defstring multistack  ! ${DATACUBE_DIR}/multistack.csh
 defstring passband    ! ${DATACUBE_DIR}/passband.csh
 defstring peakmap     ! ${DATACUBE_DIR}/peakmap.csh
@@ -69,6 +74,7 @@ defstring velmoment   ! ${DATACUBE_DIR}/velmoment.csh
 
 defhelp compare       $DATACUBE_HELP
 defhelp gridspec      $DATACUBE_HELP
+defhelp mapbyvel      $DATACUBE_HELP
 defhelp multistack    $DATACUBE_HELP
 defhelp passband      $DATACUBE_HELP
 defhelp peakmap       $DATACUBE_HELP
@@ -89,8 +95,9 @@ defstring datacube_test  ${DATACUBE_DIR}/datacube_demo.csh
 
 {  Define commands for external applications used by the scripts.
 define add            ${KAPPA_DIR}/add
-define calc           ${KAPPA_DIR}/calc
 define cadd           ${KAPPA_DIR}/cadd
+define calc           ${KAPPA_DIR}/calc
+define carpet         ${KAPPA_DIR}/carpet
 define cdiv           ${KAPPA_DIR}/cdiv
 define chpix          ${KAPPA_DIR}/chpix
 define collapse       ${KAPPA_DIR}/collapse
