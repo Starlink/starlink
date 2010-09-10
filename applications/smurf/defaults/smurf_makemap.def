@@ -163,9 +163,8 @@ flt.filt_wlim = <undef>
 
 noi.dcfitbox = 0
 noi.dcmaxsteps = 10
-noi.dcthresh = 6.0
-noi.dcmedianwidth = 40
-noi.dclimcorr = 100
+noi.dcthresh = 25.0
+noi.dcsmooth = 50
 noi.fillgaps = 1
 noi.spikethresh = 0
 noi.spikeiter = 0

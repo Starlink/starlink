@@ -15,8 +15,7 @@
 *  Invocation:
 *     smf_get_cleanpar( AstKeyMap *keymap, double *badfrac,
 *                       dim_t *dcfitbox, int *dcmaxsteps, double *dcthresh,
-*                       dim_t *dcmedianwidth, int *dclimcorr,
-*                       int *dkclean, int *fillgaps,
+*                       dim_t *dcsmooth, int *dkclean, int *fillgaps,
 *                       double *filt_edgelow, double *filt_edgehigh,
 *                       double *filt_notchlow, double *filt_notchhigh,
 *                       int *filt_nnotch, int *dofilt, double *flagstat,
@@ -41,12 +40,8 @@
 *        data stream.
 *     dcthresh = double* (Returned)
 *        N-sigma threshold at which to detect DC steps
-*     dcmedianwidth = dim_t * (Returned)
+*     dcsmooth = dim_t * (Returned)
 *        Width of median filter for DC step detection.
-*     dclimcorr = int * (Returned)
-*        Minimum number of bolometers that must have simultaneous steps
-*        in order to trigger step correction at the same time in all
-*        bolometers.
 *     dkclean = int* (Returned)
 *        If true, clean dark squids from bolos (NULL:-1)
 *     fillgaps = int* (Returned)
@@ -116,6 +111,8 @@
 *        and we ensure all keys have corresponding defaults.
 *     2010-07-06 (TIMJ):
 *        Add noiseclip parameter.
+*     2010-09-10 (DSB):
+*        Remove dclimcorr, and rename dcmedianwidth as dcsmooth.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -164,14 +161,13 @@
 
 #define FUNC_NAME "smf_get_cleanpar"
 
-void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac,
-                       dim_t *dcfitbox, int *dcmaxsteps, double *dcthresh,
-                       dim_t *dcmedianwidth, int *dclimcorr, int *dkclean,
-                       int *fillgaps, double *filt_edgelow, double *filt_edgehigh,
-                       double *filt_notchlow, double *filt_notchhigh,
-                       int *filt_nnotch, int *dofilt, double *flagstat,
-                       int *order, double *spikethresh, size_t *spikeiter,
-                       double * noiseclip, int *status ) {
+void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac, dim_t *dcfitbox,
+                       int *dcmaxsteps, double *dcthresh, dim_t *dcsmooth,
+                       int *dkclean, int *fillgaps, double *filt_edgelow,
+                       double *filt_edgehigh, double *filt_notchlow,
+                       double *filt_notchhigh, int *filt_nnotch, int *dofilt,
+                       double *flagstat, int *order, double *spikethresh,
+                       size_t *spikeiter, double * noiseclip, int *status ) {
 
   int dofft=0;                  /* Flag indicating that filtering is required */
   int f_nnotch=0;               /* Number of notch filters in array */
@@ -232,19 +228,13 @@ void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac,
                *dcthresh );
   }
 
-  if( dcmedianwidth ) {
-    *dcmedianwidth = 0;
-    astMapGet0I( keymap, "DCMEDIANWIDTH", &temp );
-    *dcmedianwidth = temp;
+  if( dcsmooth ) {
+    *dcsmooth = 0;
+    astMapGet0I( keymap, "DCSMOOTH", &temp );
+    *dcsmooth = temp;
 
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCMEDIANWIDTH=%" DIM_T_FMT, status,
-               *dcmedianwidth );
-  }
-
-  if( dclimcorr ) {
-    astMapGet0I( keymap, "DCLIMCORR", dclimcorr );
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCLIMCORR=%d", status,
-               *dclimcorr );
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCSMOOTH=%" DIM_T_FMT, status,
+               *dcsmooth );
   }
 
   if( dkclean ) {

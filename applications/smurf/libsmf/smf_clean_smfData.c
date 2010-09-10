@@ -36,7 +36,7 @@
 *     dimmconfig.lis):
 *
 *     Sync Quality : BADFRAC
-*     DC steps     : DCFITBOX, DCMAXSTEPS, DCTHRESH, DCMEDIANWIDTH, DCLIMCOR
+*     DC steps     : DCFITBOX, DCMAXSTEPS, DCTHRESH, DCSMOOTH
 *     Flag spikes  : SPIKETHRESH, SPIKEITER
 *     Slew speed   : FLAGSTAT
 *     Dark squids  : DKCLEAN
@@ -61,6 +61,8 @@
 *        Initial Version factored out of smurf_sc2clean and smf_iteratemap
 *     2010-06-25 (DSB):
 *        Move apodisation to smf_filter_execute.
+*     2010-09-10 (DSB):
+*        Change smf_fix_steps argument list.
 
 *  Copyright:
 *     Copyright (C) 2010 Univeristy of British Columbia.
@@ -108,9 +110,8 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data,
   size_t aiter;             /* Actual iterations of sigma clipper */
   double badfrac;           /* Fraction of bad samples to flag bad bolo */
   dim_t dcfitbox;           /* width of box for measuring DC steps */
-  int dclimcorr;            /* Min. no. of bolos for a correlated step */
   int dcmaxsteps;           /* number of DC steps/min. to flag bolo bad */
-  dim_t dcmedianwidth;      /* median filter width before finding DC steps */
+  dim_t dcsmooth;           /* median filter width before finding DC steps */
   double dcthresh;          /* n-sigma threshold for primary DC steps */
   int dofft;                /* are we doing a freq.-domain filter? */
   int dkclean;              /* Flag for dark squid cleaning */
@@ -143,7 +144,7 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data,
 
   /* Get cleaning parameters */
   smf_get_cleanpar( keymap, &badfrac, &dcfitbox, &dcmaxsteps,
-                    &dcthresh, &dcmedianwidth, &dclimcorr, &dkclean,
+                    &dcthresh, &dcsmooth, &dkclean,
                     &fillgaps, NULL, NULL, NULL, NULL, NULL, NULL,
                     &flagstat, &order, &spikethresh, &spikeiter, &noiseclip,
                     status );
@@ -158,10 +159,10 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data,
               ": Flagging bolos with %lf-sigma DC steps in %" DIM_T_FMT " "
               "samples as bad, using %" DIM_T_FMT "-sample median filter and max %d "
               "DC steps per min before flagging entire bolo bad...", status,
-              dcthresh, dcfitbox, dcmedianwidth, dcmaxsteps);
+              dcthresh, dcfitbox, dcsmooth, dcmaxsteps);
 
-    smf_fix_steps( wf, data, dcthresh, dcmedianwidth, dcfitbox, dcmaxsteps,
-                   dclimcorr, &nflag, NULL, NULL, status );
+    smf_fix_steps( wf, data, dcthresh, dcsmooth, dcfitbox, dcmaxsteps,
+                   &nflag, NULL, NULL, status );
 
     msgOutiff(MSG__VERB, "", FUNC_NAME": ...%zd flagged\n", status, nflag);
   }

@@ -97,6 +97,8 @@
 *        Do apodization in smf_bolonoise
 *     2010-07-02 (TIMJ):
 *        Use same apodization as used by CALCNOISE.
+*     2010-09-10 (DSB):
+*        Change smf_fix_steps argument list.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -149,9 +151,8 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   size_t bstride;               /* bolometer stride */
   int dcmaxsteps;               /* Maximum allowed number of dc jumps */
   dim_t dcfitbox;               /* Width of box for DC step detection */
-  int dclimcorr;                /* Minimum number of bolos with correlated steps */
   double dcthresh;              /* Threshold for DC step detection */
-  dim_t dcmedianwidth;          /* Width of median filter in DC step detection */
+  dim_t dcsmooth;               /* Width of median filter in DC step detection */
   int fillgaps;                 /* If set perform gap filling */
   dim_t i;                      /* Loop counter */
   dim_t id;                     /* Loop counter */
@@ -197,7 +198,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
     /* Data-cleaning parameters  */
     smf_get_cleanpar( kmap, NULL, &dcfitbox, &dcmaxsteps, &dcthresh,
-                      &dcmedianwidth, &dclimcorr, NULL, &fillgaps, NULL,
+                      &dcsmooth, NULL, &fillgaps, NULL,
                       NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                       &spikethresh, &spikeiter, NULL, status );
   }
@@ -264,8 +265,8 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         }
 
         if( dcthresh && dcfitbox ) {
-          smf_fix_steps( wf, res->sdata[idx], dcthresh, dcmedianwidth,
-                         dcfitbox, dcmaxsteps, dclimcorr, &nflag, NULL, NULL,
+          smf_fix_steps( wf, res->sdata[idx], dcthresh, dcsmooth,
+                         dcfitbox, dcmaxsteps, &nflag, NULL, NULL,
                          status );
           msgOutiff(MSG__VERB, "","   detected %zu bolos with DC steps\n",
                     status, nflag);

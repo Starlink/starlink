@@ -34,7 +34,7 @@
 *     Configuration parameters for the step fixing algorithm can be supplied
 *     either within a "makemap"-style configuration file (see parameter
 *     CONFIG), or via command line environment parameters DCFITBOX,
-*     DCLIMCORR, etc.
+*     DCSMOOTH, etc.
 
 *  ADAM Parameters:
 *     CHANGED = _LOGICAL (Write)
@@ -55,14 +55,6 @@
 *        Number of samples (box size) in which the signal RMS is measured
 *        for the DC step finder. The run time default value is obtained via
 *        the CONFIG parameter. [!]
-*     DCLIMCORR = _INTEGER
-*        The detection threshold for steps that occur at the same time in
-*        many bolometers. Set it to zero to suppress checks for correlated
-*        steps. If dclimcorr is greater than zero, and a step is found at
-*        the same time in more than "dclimcorr" bolometers, then all
-*        bolometers are assumed to have a step at that time, and the step
-*        is fixed no matter how small it is. The run time default value is
-*        obtained via the CONFIG parameter. [!]
 *     DCMAXSTEPS = _INTEGER
 *        The maximum number of steps that can be corrected in each minute of
 *        good data (i.e. per 12000 samples) from a bolometer before the
@@ -70,7 +62,7 @@
 *        bolometer to be rejected if any steps are found in the bolometer
 *        data stream. The run time default value is obtained via the CONFIG
 *        parameter. [!]
-*     DCMEDIANWIDTH = _INTEGER
+*     DCSMOOTH = _INTEGER
 *        The width of the median filter used to smooth a bolometer data
 *        stream prior to finding DC jumps. The run time default value is
 *        obtained via the CONFIG parameter. [!]
@@ -176,13 +168,13 @@ static int smf1_check_steps( const char *param, int first, dim_t nx,
 
 static void smf1_write_steps( FILE *fd, smfData *data, int nstep,
                               smfStepFix *steps, double dcthresh,
-                              dim_t dcmedianwidth, dim_t dcfitbox,
-                              int dcmaxsteps, int dclimcorr, size_t nrej,
+                              dim_t dcsmooth, dim_t dcfitbox,
+                              int dcmaxsteps, size_t nrej,
                               int *status );
 
 static smfStepFix *smf1_read_steps( FILE *fd, double dcthresh0,
-                                    dim_t dcmedianwidth0, dim_t dcfitbox0,
-                                    int dcmaxsteps0, int dclimcorr0,
+                                    dim_t dcsmooth0, dim_t dcfitbox0,
+                                    int dcmaxsteps0,
                                     size_t nrej0, int nstep0, int *nstep,
                                     int *status );
 
@@ -198,12 +190,11 @@ void smurf_fixsteps( int *status ) {
    Grp *igrp = NULL;         /* Input group of files */
    Grp *ogrp = NULL;         /* Output group of files */
    dim_t dcfitbox;           /* DCFITBOX config parameter */
-   dim_t dcmedianwidth;      /* DCMEDIANWIDTH config parameter */
+   dim_t dcsmooth;           /* DCSMOOTH config parameter */
    dim_t nx;                 /* Length of first pixel axis */
    double dcthresh;          /* DCTHRESH config parameter */
    double sizetol;           /* Tolerance allowed on step height */
    int changed;              /* Have any step fixes changed? */
-   int dclimcorr;            /* DCLIMCORR config parameter */
    int dcmaxsteps;           /* DCMAXSTEPS config parameter */
    int first;                /* Index of first change to report */
    int itemp;                /* Intermediate value */
@@ -247,14 +238,11 @@ void smurf_fixsteps( int *status ) {
    sub_instruments = astAnnul( sub_instruments );
 
 /* Set the default for each of the step fixing config parameters. */
-   astMapGet0I( keymap, "DCMEDIANWIDTH", &itemp );
-   parDef0i( "DCMEDIANWIDTH", itemp, status );
+   astMapGet0I( keymap, "DCSMOOTH", &itemp );
+   parDef0i( "DCSMOOTH", itemp, status );
 
    astMapGet0I( keymap, "DCFITBOX", &itemp );
    parDef0i( "DCFITBOX", itemp, status );
-
-   astMapGet0I( keymap, "DCLIMCORR", &itemp );
-   parDef0i( "DCLIMCORR", itemp, status );
 
    astMapGet0I( keymap, "DCMAXSTEPS", &itemp );
    parDef0i( "DCMAXSTEPS", itemp, status );
@@ -263,14 +251,11 @@ void smurf_fixsteps( int *status ) {
    parDef0d( "DCTHRESH", dcthresh, status );
 
 /* Get values for the config params */
-   parGet0i( "DCMEDIANWIDTH", &itemp, status );
-   dcmedianwidth = itemp;
+   parGet0i( "DCSMOOTH", &itemp, status );
+   dcsmooth = itemp;
 
    parGet0i( "DCFITBOX", &itemp, status );
    dcfitbox = itemp;
-
-   parGet0i( "DCLIMCORR", &itemp, status );
-   dclimcorr = itemp;
 
    parGet0i( "DCMAXSTEPS", &itemp, status );
    dcmaxsteps = itemp;
@@ -282,8 +267,8 @@ void smurf_fixsteps( int *status ) {
    wf = smf_create_workforce( smf_get_nthread( status ), status );
 
 /* Fix the steps. */
-   smf_fix_steps( wf, data, dcthresh, dcmedianwidth, dcfitbox,
-                  dcmaxsteps, dclimcorr, &nrej, &newsteps, &nnew,
+   smf_fix_steps( wf, data, dcthresh, dcsmooth, dcfitbox,
+                  dcmaxsteps, &nrej, &newsteps, &nnew,
                   status );
 
 /* Display a summary of what was done by the step fixer. */
@@ -310,8 +295,8 @@ void smurf_fixsteps( int *status ) {
    fixed. */
    fd = smf_open_textfile( "NEWSTEPS", "w", "<none>", status );
    if( fd ) {
-      smf1_write_steps( fd, indata, nnew, newsteps, dcthresh, dcmedianwidth,
-                        dcfitbox, dcmaxsteps, dclimcorr, nrej, status );
+      smf1_write_steps( fd, indata, nnew, newsteps, dcthresh, dcsmooth,
+                        dcfitbox, dcmaxsteps, nrej, status );
       fclose( fd );
    }
 
@@ -322,7 +307,7 @@ void smurf_fixsteps( int *status ) {
    }
 
 /* Save the length of the first pixel axis. */
-   nx = data->dims[ 0 ];
+   nx = data ? data->dims[ 0 ] : 0;
 
 /* Close the NDFs. */
    smf_close_file( &data, status );
@@ -340,8 +325,8 @@ void smurf_fixsteps( int *status ) {
    properties read from the file (e.g. parameters used, no. of steps
    found, etc) differ from those of the current invocation. */
       msgBlank( status );
-      oldsteps = smf1_read_steps( fd, dcthresh, dcmedianwidth,
-                                  dcfitbox, dcmaxsteps, dclimcorr,
+      oldsteps = smf1_read_steps( fd, dcthresh, dcsmooth,
+                                  dcfitbox, dcmaxsteps,
                                   nrej, nnew, &nold, status );
 
 /* Get the index of the first change to report. */
@@ -384,10 +369,9 @@ void smurf_fixsteps( int *status ) {
 
 
 static smfStepFix *smf1_read_steps( FILE *fd, double dcthresh0,
-                                    dim_t dcmedianwidth0, dim_t dcfitbox0,
-                                    int dcmaxsteps0, int dclimcorr0,
-                                    size_t nrej0, int nstep0, int *nstep,
-                                    int *status ) {
+                                    dim_t dcsmooth0, dim_t dcfitbox0,
+                                    int dcmaxsteps0, size_t nrej0,
+                                    int nstep0, int *nstep, int *status ) {
 /*
 *  Name:
 *     smf1_read_steps
@@ -397,10 +381,9 @@ static smfStepFix *smf1_read_steps( FILE *fd, double dcthresh0,
 
 *  Invocation:
 *     smfStepFix *smf1_read_steps( FILE *fd, double dcthresh0,
-*                                  dim_t dcmedianwidth0, dim_t dcfitbox0,
-*                                  int dcmaxsteps0, int dclimcorr0,
-*                                  size_t nrej0, int nstep0, int *nstep,
-*                                  int *status )
+*                                  dim_t dcsmooth0, dim_t dcfitbox0,
+*                                  int dcmaxsteps0, size_t nrej0,
+*                                  int nstep0, int *nstep, int *status )
 
 *  Arguments:
 *     fd = FILE * (Given)
@@ -408,14 +391,12 @@ static smfStepFix *smf1_read_steps( FILE *fd, double dcthresh0,
 *        steps.
 *     dcthresh0 = double (Given)
 *        Expected value of DCTHRESH.
-*     dcmedianwidth0 = dim_t (Given)
-*        Expected value of DCMEDIANWIDTH.
+*     dcsmooth0 = dim_t (Given)
+*        Expected value of DCSMOOTH.
 *     dcfitbox0 = dim_t (Given)
 *        Expected value of DCFITBOX.
 *     dcmaxsteps0 = int (Given)
 *        Expected value of DCMAXSTEPS.
-*     dclimcorr0 = int (Given)
-*        Expected value of DCLIMCORR.
 *     nrej0 = size_t (Given)
 *        The expected number of bolometers rejected.
 *     nstep0 = int (Given)
@@ -523,13 +504,6 @@ static smfStepFix *smf1_read_steps( FILE *fd, double dcthresh0,
                msgOut( "", "Warning: DCFITBOX changed from ^O to ^N", status );
             }
 
-         } else if( sscanf( buf, "# DCLIMCORR = %d%n", &ival, &nc ) && nc > 14 ) {
-            if( ival != dclimcorr0 ) {
-               msgSeti( "O", ival );
-               msgSeti( "N", dclimcorr0 );
-               msgOut( "", "Warning: DCLIMCORR changed from ^O to ^N", status );
-            }
-
          } else if( sscanf( buf, "# DCMAXSTEPS = %d%n", &ival, &nc ) && nc > 14 ) {
             if( ival != dcmaxsteps0 ) {
                msgSeti( "O", ival );
@@ -537,12 +511,12 @@ static smfStepFix *smf1_read_steps( FILE *fd, double dcthresh0,
                msgOut( "", "Warning: DCMAXSTEPS changed from ^O to ^N", status );
             }
 
-         } else if( sscanf( buf, "# DCMEDIANWIDTH = %d%n", &ival, &nc )
+         } else if( sscanf( buf, "# DCSMOOTH = %d%n", &ival, &nc )
                     && nc > 18 ) {
-            if( ival != (int) dcmedianwidth0 ) {
+            if( ival != (int) dcsmooth0 ) {
                msgSeti( "O", ival );
-               msgSeti( "N", dcmedianwidth0 );
-               msgOut( "", "Warning: DCMEDIANWIDTH changed from ^O to ^N", status );
+               msgSeti( "N", dcsmooth0 );
+               msgOut( "", "Warning: DCSMOOTH changed from ^O to ^N", status );
             }
 
          } else if( sscanf( buf, "# DCTHRESH = %lg%n", &dval, &nc ) && nc > 13 ) {
@@ -909,9 +883,8 @@ static int smf1_check_steps( const char *param, int first, dim_t nx,
 
 static void smf1_write_steps( FILE *fd, smfData *data, int nstep,
                               smfStepFix *steps, double dcthresh,
-                              dim_t dcmedianwidth, dim_t dcfitbox,
-                              int dcmaxsteps, int dclimcorr, size_t nrej,
-                              int *status ) {
+                              dim_t dcsmooth, dim_t dcfitbox,
+                              int dcmaxsteps, size_t nrej, int *status ) {
 /*
 *  Name:
 *     smf1_write_steps
@@ -922,9 +895,8 @@ static void smf1_write_steps( FILE *fd, smfData *data, int nstep,
 *  Invocation:
 *     void smf1_write_steps( FILE *fd, smfData *data, int nstep,
 *                            smfStepFix *steps, double dcthresh,
-*                            dim_t dcmedianwidth, dim_t dcfitbox,
-*                            int dcmaxsteps, int dclimcorr, size_t nrej,
-*                            int *status )
+*                            dim_t dcsmooth, dim_t dcfitbox,
+*                            int dcmaxsteps, size_t nrej, int *status )
 
 *  Arguments:
 *     fd = FILE * (Given)
@@ -940,14 +912,12 @@ static void smf1_write_steps( FILE *fd, smfData *data, int nstep,
 *        "nstep" elements.
 *     dcthresh = double (Given)
 *        Value of DCTHRESH used to create the step fixes.
-*     dcmedianwidth = dim_t (Given)
-*        Value of DCMEDIANWIDTH used to create the step fixes.
+*     dcsmooth = dim_t (Given)
+*        Value of DCSMOOTH used to create the step fixes.
 *     dcfitbox = dim_t (Given)
 *        Value of DCFITBOX used to create the step fixes.
 *     dcmaxsteps = int (Given)
 *        Value of DCMAXSTEPS used to create the step fixes.
-*     dclimcorr = int (Given)
-*        Value of DCLIMCORR used to create the step fixes.
 *     nrej = size_t (Given)
 *        The number of bolometers rejected.
 *     status = int* (Given and Returned)
@@ -973,9 +943,8 @@ static void smf1_write_steps( FILE *fd, smfData *data, int nstep,
    fprintf( fd, "# Number of bolometers rejected = %d\n", (int) nrej );
    fprintf( fd, "#\n" );
    fprintf( fd, "# DCFITBOX = %d\n", (int) dcfitbox );
-   fprintf( fd, "# DCLIMCORR = %d\n", dclimcorr );
    fprintf( fd, "# DCMAXSTEPS = %d\n", dcmaxsteps );
-   fprintf( fd, "# DCMEDIANWIDTH = %d\n", (int) dcmedianwidth );
+   fprintf( fd, "# DCSMOOTH = %d\n", (int) dcsmooth );
    fprintf( fd, "# DCTHRESH = %g\n", dcthresh );
    fprintf( fd, "#\n" );
 
