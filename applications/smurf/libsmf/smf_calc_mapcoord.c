@@ -231,7 +231,7 @@ void smfCalcMapcoordPar( void *job_data_ptr, int *status ) {
   astUnlock( abskyfrm, 1 );
   astUnlock( sky2map, 1 );
 
-  msgOutiff( MSG__DEBUG, "",
+  msgOutiff( SMF__TIMER_MSG, "",
              "smfCalcMapcoordPar: thread finishing tslices %zu -- %zu (%.3f sec)",
              status, pdata->t1, pdata->t2, smf_timerupdate(&tv1, &tv2, status) );
 }

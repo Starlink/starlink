@@ -236,6 +236,9 @@
 /* Define the size of strings defining NDF char components (Units, label) */
 #define SMF__CHARLABEL  80
 
+/* Define the message reporting level to see timer messages */
+#define SMF__TIMER_MSG MSG__DEBUG
+
 /* Different data types supported by SMURF */
 typedef enum smf_dtype {
   SMF__NULL,

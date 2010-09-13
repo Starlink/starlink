@@ -485,7 +485,7 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
     woff = astFree( woff );
     wg = astFree( wg );
 
-    msgOutiff( MSG__DEBUG, "",
+    msgOutiff( SMF__TIMER_MSG, "",
                "smfCalcmodelComPar(%i): thread finishing tslices %zu -- %zu (%.3f sec)",
                status, pdata->operation, pdata->t1, pdata->t2,
                smf_timerupdate(&tv1, &tv2, status) );

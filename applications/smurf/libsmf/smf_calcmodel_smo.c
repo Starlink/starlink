@@ -459,7 +459,8 @@ static void smf1_calcmodel_smo_job( void *job_data, int *status ) {
       bolqua = astFree( bolqua );
 
 /* Report the time taken in this thread. */
-      msgOutiff( MSG__DEBUG, "", "smf_calcmodel_smo: thread finishing bolos %" DIM_T_FMT
+      msgOutiff( SMF__TIMER_MSG, "",
+                 "smf_calcmodel_smo: thread finishing bolos %" DIM_T_FMT
                  " -- %" DIM_T_FMT "(%.3f sec)",
                  status, b1, b2, smf_timerupdate( &tv1, &tv2, status ) );
    }

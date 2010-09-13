@@ -1030,7 +1030,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                              SMF__NOCREATE_VARIANCE, tstep, &res[0], status );
 
         /*** TIMER ***/
-        msgOutiff( MSG__DEBUG, "", FUNC_NAME ": ** %f s concatenating data",
+        msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ": ** %f s concatenating data",
                    status, smf_timerupdate(&tv1,&tv2,status) );
       } else {
         if( !ensureflat ) {
@@ -1094,7 +1094,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         }
 
         /*** TIMER ***/
-        msgOutiff( MSG__DEBUG, "", FUNC_NAME ": ** %f s pre-conditioning data",
+        msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+                   ": ** %f s pre-conditioning data",
                    status, smf_timerupdate(&tv1,&tv2,status) );
 
         /* Continue with other static model. */
@@ -1171,7 +1172,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     }
 
     /*** TIMER ***/
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": ** %f s creating static models",
+    msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ": ** %f s creating static models",
                status, smf_timerupdate(&tv1,&tv2,status) );
 
     /* Dynamic components */
@@ -1206,7 +1207,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     }
 
     /*** TIMER ***/
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": ** %f s creating dynamic models",
+    msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ": ** %f s creating dynamic models",
                status, smf_timerupdate(&tv1,&tv2,status) );
 
     if( *status == SAI__OK ) {
@@ -1337,7 +1338,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
               }
 
               /*** TIMER ***/
-              msgOutiff( MSG__DEBUG, "", FUNC_NAME
+              msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
                          ": ** %f s pre-conditioning data",
                          status, smf_timerupdate(&tv1,&tv2,status) );
             }
@@ -1358,7 +1359,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             }
 
             /*** TIMER ***/
-            msgOutiff( MSG__DEBUG, "", FUNC_NAME
+            msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
                        ": ** %f s opening model files",
                        status, smf_timerupdate(&tv1,&tv2,status) );
           }
@@ -1452,7 +1453,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                 }
 
                 /*** TIMER ***/
-                msgOutiff( MSG__DEBUG, "", FUNC_NAME
+                msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
                            ": ** %f s undoing EXT",
                            status, smf_timerupdate(&tv1,&tv2,status) );
 
@@ -1465,7 +1466,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                 }
 
                 /*** TIMER ***/
-                msgOutiff( MSG__DEBUG, "", FUNC_NAME
+                msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
                            ": ** %f s undoing GAI",
                            status, smf_timerupdate(&tv1,&tv2,status) );
               }
@@ -1492,7 +1493,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
               }
 
               /*** TIMER ***/
-              msgOutiff( MSG__DEBUG, "", FUNC_NAME
+              msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
                          ": ** %f s calculating model",
                          status, smf_timerupdate(&tv1,&tv2,status) );
             }
@@ -1559,7 +1560,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             }
 
             /*** TIMER ***/
-            msgOutiff( MSG__DEBUG, "", FUNC_NAME
+            msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
                        ": ** %f s rebinning map",
                        status, smf_timerupdate(&tv1,&tv2,status) );
 
@@ -1588,7 +1589,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             }
 
             /*** TIMER ***/
-            msgOutiff( MSG__DEBUG, "", FUNC_NAME
+            msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
                        ": ** %f s closing model files",
                        status, smf_timerupdate(&tv1,&tv2,status) );
           }
@@ -1682,7 +1683,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
               smf_open_related_model( quagroup, i, "UPDATE", &qua[i], status );
 
               /*** TIMER ***/
-              msgOutiff( MSG__DEBUG, "", FUNC_NAME
+              msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
                          ": ** %f s opening model files",
                          status, smf_timerupdate(&tv1,&tv2,status) );
             }
@@ -1698,7 +1699,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             smf_calcmodel_ast( wf, &dat, i, keymap, ast, dimmflags, status );
 
             /*** TIMER ***/
-            msgOutiff( MSG__DEBUG, "", FUNC_NAME
+            msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
                        ": ** %f s calculating AST",
                        status, smf_timerupdate(&tv1,&tv2,status) );
 
@@ -1738,7 +1739,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
               smf_close_related( &qua[i], status );
 
               /*** TIMER ***/
-              msgOutiff( MSG__DEBUG, "", FUNC_NAME
+              msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
                          ": ** %f s closing models files for this filegroup",
                          status, smf_timerupdate(&tv1,&tv2,status) );
             }
@@ -2050,7 +2051,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         }
 
         /*** TIMER ***/
-        msgOutiff( MSG__DEBUG, "", FUNC_NAME
+        msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
                    ": ** %f s Exporting models",
                    status, smf_timerupdate(&tv1,&tv2,status) );
 

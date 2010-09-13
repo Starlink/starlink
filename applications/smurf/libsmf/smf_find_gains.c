@@ -1012,7 +1012,8 @@ static void smf1_find_gains_job( void *job_data, int *status ) {
       }
 
 /* Report the time taken in this thread. */
-      msgOutiff( MSG__DEBUG, "", "smfFindGains: thread finishing bolos %zu -- %zu (%.3f sec)",
+      msgOutiff( SMF__TIMER_MSG, "",
+                 "smfFindGains: thread finishing bolos %zu -- %zu (%.3f sec)",
                  status, b1, b2, smf_timerupdate( &tv1, &tv2, status ) );
    }
 }

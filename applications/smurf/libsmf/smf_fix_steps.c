@@ -1245,8 +1245,8 @@ static void smf1_fix_steps_job( void *job_data, int *status ) {
       mw3 = astFree( mw3 );
 
 /* Report the time taken in this thread. */
-      msgOutiff( MSG__DEBUG, "", "smfFixSteps: thread finishing bolos %zu "
-                                 "-- %zu (%.3f sec)",
+      msgOutiff( SMF__TIMER_MSG, "",
+                 "smfFixSteps: thread finishing bolos %zu -- %zu (%.3f sec)",
                  status, b1, b2, smf_timerupdate( &tv1, &tv2, status ) );
 
 
