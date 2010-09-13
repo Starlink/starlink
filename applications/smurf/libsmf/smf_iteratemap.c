@@ -514,7 +514,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   mdims[1] = ubnd_out[1] - lbnd_out[1] + 1;
   msize = mdims[0] * mdims[1];
 
-  /* Always need to initialize this zeromask */
+  /* Always need to initialize this zeromask. The buffer will get
+     allocated in smf_calcmodel_ast if ast.zero_circle was set. */
   dat.zeromask = NULL;
 
   /* Get size of the input group */
