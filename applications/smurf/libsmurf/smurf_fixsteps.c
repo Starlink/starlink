@@ -269,7 +269,7 @@ void smurf_fixsteps( int *status ) {
 /* Fix the steps. */
    smf_fix_steps( wf, data, dcthresh, dcsmooth, dcfitbox,
                   dcmaxsteps, &nrej, &newsteps, &nnew,
-                  status );
+                  NULL, status );
 
 /* Display a summary of what was done by the step fixer. */
    msgBlank( status );

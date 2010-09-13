@@ -162,7 +162,7 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data,
               dcthresh, dcfitbox, dcsmooth, dcmaxsteps);
 
     smf_fix_steps( wf, data, dcthresh, dcsmooth, dcfitbox, dcmaxsteps,
-                   &nflag, NULL, NULL, status );
+                   &nflag, NULL, NULL, NULL, status );
 
     msgOutiff(MSG__VERB, "", FUNC_NAME": ...%zd flagged\n", status, nflag);
   }

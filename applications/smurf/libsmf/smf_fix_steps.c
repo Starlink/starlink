@@ -16,7 +16,7 @@
 *     void smf_fix_steps( smfWorkForce *wf, smfData *data, double dcthresh,
 *                         dim_t dcsmooth, dim_t dcfitbox, int dcmaxsteps,
 *                         size_t *nrej, smfStepFix **steps, int *nsteps,
-*                         int *status )
+*                         int *bcount, int *status )
 
 *  Arguments:
 *     wf = smfWorkForce * (Given)
@@ -57,6 +57,11 @@
 *        structure that describes a single fixed step.
 *     nstep = int * (Returned)
 *        The number of fixed steps.
+*     bcount = int * (Returned)
+*        A pointer to an array with an element for each time slice. On
+*        exit, each element is set to the number of bolometers found to have
+*        a step at the corresponding time slice. A NULL pointer may be
+*        supplied.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -173,11 +178,13 @@
 *     6-JUL-2010 (DSB):
 *        - Rename old "nstep" argument as "nrej".
 *        - Added arguments "steps" and "nstep".
-*     27-AUG2010 (DSB):
+*     27-AUG-2010 (DSB):
 *        Complete re-write. The main difference is that the jumps are now
 *        detected and measured in the median s,moothed bolometer data,
 *        rather than the original bolometer data. But there are manu
 *        other less significant changes too.
+*     13-SEP-2010 (DSB):
+*        Added argument "bcount".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -230,6 +237,7 @@ typedef struct smfFixStepsJobData {
    double dcthresh2;
    double dcthresh3;
    double dcthresh;
+   int *bcount;
    int dcfill;
    int dcmaxsteps;
    int dcmaxwidth;
@@ -272,7 +280,7 @@ typedef struct Step {
 
 #ifdef DEBUG_STEPS
 
-#define RECORD_BOLO (ibolo==98)
+#define RECORD_BOLO (ibolo==853)
 #define RECORD_BOLO2 (1)
 
 #define TOPCAT(fd, x) \
@@ -315,7 +323,8 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
                                dim_t dcfitbox, double dcthresh2,
                                int nbstep, Step *bsteps, int ibolo,
                                smfStepFix **steps, int *nsteps,
-                               double *grad, double *off, int *status );
+                               double *grad, double *off, int *bcount,
+                               int *status );
 
 static void smf1_fix_steps_job( void *job_data, int *status );
 
@@ -328,9 +337,10 @@ static void smf1_fix_steps_job( void *job_data, int *status );
 void smf_fix_steps( smfWorkForce *wf, smfData *data, double dcthresh,
                     dim_t dcsmooth, dim_t dcfitbox, int dcmaxsteps,
                     size_t *nrej, smfStepFix **steps, int *nstep,
-                    int *status ) {
+                    int *bcount, int *status ) {
 
 /* Local Variables */
+   dim_t itime;
    dim_t nbolo;
    dim_t ntslice;
    double *dat = NULL;
@@ -341,8 +351,8 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, double dcthresh,
    int nworker;
    size_t bstride;
    size_t tstride;
-   smfFixStepsJobData *job_data = NULL;
    smfFixStepsJobData *pdata = NULL;
+   smfFixStepsJobData *job_data = NULL;
    smf_qual_t *qua = NULL;
 
 /* The minimum number of samples between steps. Large differences that
@@ -478,10 +488,19 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, double dcthresh,
          pdata->tstride = tstride;
          pdata->nstep = ( steps && nstep ) ? 1 : 0;
 
+/* Allocate work array to hold, for each time slice, the total number of
+   bolometers found to be in a jump at that time slice. Initialise it to
+   hold zero at every element. */
+         pdata->bcount = bcount ?
+                         astCalloc( ntslice, sizeof( *(pdata->bcount) ), 1 ) :
+                         NULL;
 
+/* Pass the job to the workforce for execution. */
          smf_add_job( wf, SMF__REPORT_JOB, pdata, smf1_fix_steps_job, NULL,
                       status );
       }
+
+/* Wait for the workforce to complete all jobs. */
       smf_wait( wf, status );
 
 /* Accumuate the returned values from each thread. */
@@ -503,6 +522,20 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, double dcthresh,
          }
 
          pdata->steps = astFree( pdata->steps );
+
+         if( bcount ) {
+            if( iworker == 0 ) {
+               for( itime = 0; itime < ntslice; itime++ ) {
+                  bcount[ itime ] = pdata->bcount[ itime ];
+               }
+            } else if( pdata->bcount ) {
+               for( itime = 0; itime < ntslice; itime++ ) {
+                  bcount[ itime ] += pdata->bcount[ itime ];
+               }
+            }
+            pdata->bcount = astFree( pdata->bcount );
+         }
+
       }
    }
 
@@ -521,7 +554,6 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, double dcthresh,
 
 /* Free resources. */
    job_data = astFree( job_data );
-
 }
 
 
@@ -591,6 +623,7 @@ static void smf1_fix_steps_job( void *job_data, int *status ) {
    double total;
    double vlo;
    int *mw3;
+   int *bcount;
    int allequal;
    int dcfill;
    int dcmaxsteps;
@@ -638,6 +671,7 @@ static void smf1_fix_steps_job( void *job_data, int *status ) {
    b1 = pdata->b1;
    b2 = pdata->b2;
    bstride = pdata->bstride;
+   bcount = pdata->bcount;
    dat = pdata->dat;
    dccut = pdata->dccut;
    dcfill = pdata->dcfill;
@@ -1116,7 +1150,7 @@ static void smf1_fix_steps_job( void *job_data, int *status ) {
                                          nbstep, bsteps, ibolo,
                                          (pdata->nstep)?&steps:NULL,
                                          (pdata->nstep)?&nstep:NULL,
-                                         w4, w5, status );
+                                         w4, w5, bcount, status );
 
 #ifdef DEBUG_STEPS
    if( RECORD_BOLO2 ) {
@@ -1257,7 +1291,8 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
                                dim_t dcfitbox, double dcthresh2,
                                int nbstep, Step *bsteps, int ibolo,
                                smfStepFix **steps, int *nsteps,
-                               double *grad, double *off, int *status ){
+                               double *grad, double *off, int *bcount,
+                               int *status ){
 /*
 *  Name:
 *     smf1_correct_steps
@@ -1272,7 +1307,7 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
 *                             dim_t dcfitbox, double dcthresh2,
 *                             int nbstep, Step *bsteps, int ibolo,
 *                             smfStepFix **steps, int *nsteps, double *grad,
-*                             double *off, int *status )
+*                             double *off, int *bcount, int *status )
 
 *  Arguments:
 *     ntslice = dim_t (Given)
@@ -1319,6 +1354,10 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
 *        Pointer to a work array with at least dcfitbox elements.
 *     off = double * (Given and Returned)
 *        Pointer to a work array with at least dcfitbox elements.
+*     bcount = int * (Given and Returned)
+*        Pointer to a work array with one element for each time slice.
+*        Each element holds the number of bolometers found to be within a
+*        step at the corresponding time slice. May be NULL.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -1526,8 +1565,6 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
       step->jump = VAL__BADD;
       step->ok = 0;
       step->ibolo = ibolo;
-      step->start = step_start;
-      step->end = step_end;
       step->vlo = vlo;
       step->vlo_mean = vlo_mean;
       step->vlo_sigma = ( vlo_var != VAL__BADD ) ? sqrt( vlo_var ) : VAL__BADD;
@@ -1590,6 +1627,13 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
             for( jtime = step_start; jtime <= (int) step_end; jtime++ ) {
                 *pq2 |= SMF__Q_JUMP;
                 pq2 += tstride;
+            }
+
+/* Increment the number of bolometers that have a step at each time slice. */
+            if( bcount ) {
+               for( jtime = step->start; jtime <= (int) step->end; jtime++ ) {
+                  bcount[ jtime ]++;
+               }
             }
 
 /* If required, store details of the step in the returned structure. */
