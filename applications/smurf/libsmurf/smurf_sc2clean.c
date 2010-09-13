@@ -101,23 +101,16 @@
 *       Flag entire bolometer as dead if at least this fraction of the samples
 *       in a detector time series were flagged as bad by the DA system.
 *     DCFITBOX = REAL
-*       Number of samples (box size) in which the signal RMS is measured for
-*       the DC step finder.
-*     DCLIMCORR = INTEGER
-*       The detection threshold for steps that occur at the same time in
-*       many bolometers. Set it to zero to suppress checks for correlated
-*       steps. If dclimcorr is greater than zero, and a step is found at
-*       the same time in more than "dclimcorr" bolometers, then all
-*       bolometers are assumed to have a step at that time, and the step
-*       is fixed no matter how small it is.
+*       Number of samples (box size) used on either side of a DC step to
+*       estimate the height of the step.
 *     DCMAXSTEPS = INTEGER
 *       The maximum number of steps that can be corrected in each minute of
 *       good data (i.e. per 12000 samples) from a bolometer before the entire
 *       bolometer is flagged as bad. A value of zero will cause a bolometer to
 *       be rejected if any steps are found in the bolometer data stream.
-*     DCMEDIANWIDTH = INTEGER
+*     DCSMOOTH = INTEGER
 *       The width of the median filter used to smooth a bolometer data stream
-*       prior to finding DC jumps.
+*       prior to finding DC steps.
 *     DCTHRESH = REAL
 *       Threshold S/N to detect and flag DC (baseline) steps.
 *     DKCLEAN = LOGICAL

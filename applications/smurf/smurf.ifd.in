@@ -215,7 +215,7 @@
 #     2010-07-15 (TIMJ):
 #         Remove REFRES parameters since now included in RESIST config file.
 #     2010-07-19 (COBA):
-#         Add FTS2_FLATFIELD, FTS2_FREQCORR, FTS2_PORTIMBAL, 
+#         Add FTS2_FLATFIELD, FTS2_FREQCORR, FTS2_PORTIMBAL,
 #             FTS2_REMOVEBSE, FTS2_SPATIALWCS, FTS2_TRANSCORR
 #     {enter_changes_here}
 
@@ -1103,14 +1103,6 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter dclimcorr {
-                type _INTEGER
-                prompt {Min. no. of steps at one time to trigger a fix in all bolos}
-                ppath DYNAMIC
-                vpath DYNAMIC
-                helpkey *
-            }
-
             parameter dcmaxsteps {
                 type _INTEGER
                 prompt {Max. no. of steps before bolo is flagged as bad}
@@ -1119,7 +1111,7 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter dcmedianwidth {
+            parameter dcsmooth {
                 type _INTEGER
                 prompt {Width of median filter used to smooth data}
                 ppath DYNAMIC
