@@ -13,10 +13,11 @@
 *     Subroutine
 
 *  Invocation:
-*     void smf_fit_poly1d ( size_t order, size_t nelem, double clip, const double x[],
-*                           const double y[], const double vary[], double coeffs[],
-*                           double varcoeffs[], double polydata[], size_t *nused,
-*                           int * status );
+*     void smf_fit_poly1d ( size_t order, size_t nelem, double clip,
+*                           const double x[], const double y[],
+*                           const double vary[], double coeffs[],
+*                           double varcoeffs[], double polydata[],
+*                           size_t *nused, int * status );
 
 *  Arguments:
 *     order = size_t (Given)
@@ -24,11 +25,12 @@
 *     nelem = size_t (Given)
 *        Number of elements in x, y and dy.
 *     clip = double (Given)
-*        Sigma clipping level. The fit is calculated and then the standard deviation
-*        of the residual is calculated. If there are any points greater than the
-*        supplied clip level the points are removed and the polynomial refitted. This
-*        continues until no points are removed. A value less than or equal to
-*        zero disables clipping.
+*        Sigma clipping level. The fit is calculated and then the
+*        standard deviation of the residual is calculated. If there
+*        are any points greater than the supplied clip level the
+*        points are removed and the polynomial refitted. This
+*        continues until no points are removed. A value less than or
+*        equal to zero disables clipping.
 *     x = const double [] (Given)
 *        X coordinates. If NULL the array index will be used.
 *     y = const double [] (Given)
@@ -51,8 +53,8 @@
 *        Pointer to global status.
 
 *  Description:
-*     Fit a simple polynomial to a 1 dimensional dataset. The fit will be weighted
-*     if variance is supplied.
+*     Fit a simple polynomial to a 1 dimensional dataset. The fit will
+*     be weighted if variance is supplied.
 
 *  Notes:
 *     o Can handle bad values. A bad variance will result in zero weight.
@@ -65,7 +67,8 @@
 *     2010-01-29 (TIMJ):
 *        First version.
 *     2010-02-04 (TIMJ):
-*        Add better debugging reports for fits. Initialise all returned arrays to bad.
+*        Add better debugging reports for fits.
+*        Initialise all returned arrays to bad.
 *        Handle NaN before returning.
 *     2010-02-05 (TIMJ):
 *        Add iterative sigma-clipping.
@@ -108,9 +111,10 @@
 #include "gsl/gsl_fit.h"
 #include "gsl/gsl_multifit.h"
 
-void smf__fit_poly1d ( size_t order, size_t nelem, const double x[], const double y[],
-                       const double vary[], double coeffs[], double varcoeffs[],
-                       double polydata[], size_t * nused, double * rchisq, int *status );
+void smf__fit_poly1d ( size_t order, size_t nelem, const double x[],
+                       const double y[], const double vary[], double coeffs[],
+                       double varcoeffs[], double polydata[], size_t *nused,
+                       double * rchisq, int *status );
 
 
 
@@ -132,7 +136,8 @@ void smf_fit_poly1d ( size_t order, size_t nelem, double clip, const double x[],
 
   if ( clip <= 0.0 ) {
 
-    smf__fit_poly1d ( order, nelem, x, y, vary, coeffs, varcoeffs, polydata, nused, &rchisq, status);
+    smf__fit_poly1d ( order, nelem, x, y, vary, coeffs, varcoeffs, polydata,
+                      nused, &rchisq, status);
 
   } else {
     int iterating = 1;
@@ -181,7 +186,8 @@ void smf_fit_poly1d ( size_t order, size_t nelem, double clip, const double x[],
       double prevchisq = VAL__BADD;
 
       /* calculate the fit */
-      smf__fit_poly1d ( order, nelem, x, y, varptr, coeffs, varcoeffs, pptr, nused, &rchisq, status);
+      smf__fit_poly1d ( order, nelem, x, y, varptr, coeffs, varcoeffs, pptr,
+                        nused, &rchisq, status);
 
       if (*nused == 0) {
         iterating = 0;
@@ -220,7 +226,6 @@ void smf_fit_poly1d ( size_t order, size_t nelem, double clip, const double x[],
       thresh = clip * stdev;
       nclipped = 0;
       for ( i=0; i<nelem; i++) {
-        //      if (resid[i] != VAL__BADD) printf("Resid[%zd] = %g\n",i, resid[i]);
         if (resid[i] != VAL__BADD && fabs(resid[i]) > thresh) {
           varptr[i] = VAL__BADD;
           nclipped++;
@@ -242,9 +247,10 @@ void smf_fit_poly1d ( size_t order, size_t nelem, double clip, const double x[],
 
 /* internal implementation to simplify the iterative clipping routine */
 
-void smf__fit_poly1d ( size_t order, size_t nelem, const double x[], const double y[],
-                       const double vary[], double coeffs[], double varcoeffs[],
-                       double polydata[], size_t * nused, double * rchisq, int *status ) {
+void smf__fit_poly1d ( size_t order, size_t nelem, const double x[],
+                       const double y[], const double vary[], double coeffs[],
+                       double varcoeffs[], double polydata[], size_t *nused,
+                       double * rchisq, int *status ) {
 
   const double * xx = NULL;
   double * xptr = NULL;
@@ -263,8 +269,8 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[], const doubl
 
   if (order >= nelem) {
     *status = SAI__ERROR;
-    errRepf( "", "Only %zd data points used for fitting, please use a smaller order than %zd",
-             status, nelem, order);
+    errRepf( "", "Only %zd data points used for fitting, please use a smaller "
+             "order than %zd", status, nelem, order);
     return;
   }
 
@@ -299,13 +305,14 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[], const doubl
         }
       }
 
-      gsl_fit_wlinear( xx, 1, w, 1, y, 1, nelem,  &c0, &c1, &cov00, &cov01, &cov11, &chisq );
+      gsl_fit_wlinear( xx, 1, w, 1, y, 1, nelem,  &c0, &c1, &cov00, &cov01,
+                       &cov11, &chisq );
 
       w = astFree( w );
 
     } else {
-      /* We need some space to copy the data because we are worried about bad values
-         for x and y */
+      /* We need some space to copy the data because we are worried about bad
+         values for x and y */
       double * fx = astCalloc( nelem, sizeof(*fx), 0 );
       double * fy = astCalloc( nelem, sizeof(*fy), 0 );
 
@@ -317,7 +324,8 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[], const doubl
         }
       }
 
-      gsl_fit_linear( fx, 1, fy, 1, nrgood, &c0, &c1, &cov00, &cov01, &cov11, &chisq );
+      gsl_fit_linear( fx, 1, fy, 1, nrgood, &c0, &c1, &cov00, &cov01, &cov11,
+                      &chisq );
 
       fx = astFree( fx );
       fy = astFree( fy );
@@ -336,7 +344,8 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[], const doubl
     if (polydata) {
       double y_err;
       for (i = 0; i<nelem; i++) {
-        gsl_fit_linear_est( xx[i], c0, c1, cov00, cov01, cov11, &(polydata[i]), &y_err);
+        gsl_fit_linear_est( xx[i], c0, c1, cov00, cov01, cov11, &(polydata[i]),
+                            &y_err);
         if (isnan(polydata[i])) polydata[i] = VAL__BADD;
       }
     }
@@ -350,7 +359,8 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[], const doubl
       } else {
         msgFmt( "NVAL", "%zd/%zd", nrgood, nelem);
       }
-      msgOutiff( MSG__DEBUG2, "", "Fit (%s) = %g + %g X Red. chisq = %f (^NVAL pnts)",
+      msgOutiff( MSG__DEBUG2, "",
+                 "Fit (%s) = %g + %g X Red. chisq = %f (^NVAL pnts)",
                  status, (vary ? "weighted" : "unweighted"), c0, c1, *rchisq );
     }
 
@@ -444,8 +454,10 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[], const doubl
           }
           if (k<ncoeff-1) msgSetc( "POLY", " +");
         }
-        msgOutiff( MSG__DEBUG2, "", "Fit (%s) = ^POLY  Red. chisq = %f (%zd/%zd pnts)",
-                   status, (vary ? "weighted" : "unweighted"), *rchisq, nrgood, nelem );
+        msgOutiff( MSG__DEBUG2, "",
+                   "Fit (%s) = ^POLY  Red. chisq = %f (%zd/%zd pnts)",
+                   status, (vary ? "weighted" : "unweighted"), *rchisq, nrgood,
+                   nelem );
       }
 
       if (nused) *nused = nrgood;
