@@ -13,12 +13,14 @@
 *     Library routine
 
 *  Invocation:
-*     smf_flag_spikes( smfData *data, double *bolovar,
+*     smf_flag_spikes( smfWorkForce *wf, smfData *data, double *bolovar,
 *                      smf_qual_t mask, double thresh, size_t niter,
 *                      size_t maxiter, size_t *aiter, size_t *nflagged,
 *                      int *status )
 
 *  Arguments:
+*     wf = smfWorkForce * (Given)
+*        Pointer to a pool of worker threads
 *     data = smfData * (Given and Returned)
 *        The data that will be flagged. Locations of spikes
 *        will have bit SMF__Q_SPIKE set.
@@ -128,7 +130,7 @@
 
 #define FUNC_NAME "smf_flag_spikes"
 
-void smf_flag_spikes( smfData *data, double *bolovar,
+void smf_flag_spikes( smfWorkForce *wf, smfData *data, double *bolovar,
                       smf_qual_t mask, double thresh, size_t niter,
                       size_t maxiter, size_t *aiter, size_t *nflagged,
                       int *status ) {
@@ -154,7 +156,7 @@ void smf_flag_spikes( smfData *data, double *bolovar,
 
   /* If requested, use the alternative spike flagger. */
   if( niter > 10000 ) {
-     smf_flag_spikes2( data, mask, thresh, niter-10000, nflagged,
+     smf_flag_spikes2( wf, data, mask, thresh, niter-10000, nflagged,
                        status );
      /* Set aiter to something since smf_flag_spikes2 doesn't */
      if( aiter ) {

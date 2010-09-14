@@ -182,7 +182,7 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data,
   /* Flag Spikes */
   if( spikethresh ) {
     msgOutif(MSG__VERB," ", FUNC_NAME ": flag spikes...", status);
-    smf_flag_spikes( data, NULL, SMF__Q_FIT, spikethresh, spikeiter,
+    smf_flag_spikes( wf, data, NULL, SMF__Q_FIT, spikethresh, spikeiter,
                      100, &aiter, &nflag, status );
     msgOutiff(MSG__VERB,"", FUNC_NAME ": ...found %zd in %zd iterations",
               status, nflag, aiter );

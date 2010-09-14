@@ -256,7 +256,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         /* Flag spikes in the residual after first iteration */
         if( spikethresh && !(flags&SMF__DIMM_FIRSTITER) ) {
           /* Now re-flag */
-          smf_flag_spikes( res->sdata[idx], var, SMF__Q_MOD,
+          smf_flag_spikes( wf, res->sdata[idx], var, SMF__Q_MOD,
                            spikethresh, spikeiter,
                            100, &aiter, &nflag, status );
 

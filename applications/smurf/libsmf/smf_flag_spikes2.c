@@ -13,10 +13,13 @@
 *     Library routine
 
 *  Invocation:
-*     smf_flag_spikes2( smfData *data, smf_qual_t mask, double thresh,
-*                       size_t box, size_t *nflagged, int *status )
+*     smf_flag_spikes2( smfWorkForce *wf, smfData *data, smf_qual_t mask,
+*                       double thresh, size_t box, size_t *nflagged,
+*                       int *status )
 
 *  Arguments:
+*     wf = smfWorkForce * (Given)
+*        Pointer to a pool of worker threads
 *     data = smfData * (Given and Returned)
 *        The data that will be flagged. Locations of spikes
 *        will have bit SMF__Q_SPIKE set on exit.
@@ -59,14 +62,18 @@
 
 *  Authors:
 *     David Berry (JAC, Hawaii)
+*     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
 *     2010-01-10 (DSB):
 *        Initial Version
+*     2010-09-14 (EC):
+*        Parallelize over blocks of bolometers
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
+*     Copyright (C) 2010 Univeristy of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -101,107 +108,93 @@
 /* Other includes */
 #include <gsl/gsl_sort.h>
 
-#define FUNC_NAME "smf_flag_spikes2"
+/* ------------------------------------------------------------------------ */
+/* Local variables and functions */
 
-void smf_flag_spikes2( smfData *data, smf_qual_t mask, double thresh,
-                       size_t box, size_t *nflagged, int *status ){
+/* Structure containing information about blocks of bolos that each
+   thread will process */
+typedef struct smfFlagSpikes2Data {
+  size_t b1;               /* Index of first bolometer of block */
+  size_t b2;               /* Index of last bolometer of block */
+  size_t box;              /* box size */
+  size_t bstride;          /* bolometer stride for res/qua */
+  double *dat;             /* pointer to the bolometer data */
+  int ijob;                /* Job identifier */
+  smf_qual_t mask;         /* quality bit mask */
+  dim_t nbolo;             /* number of bolometers */
+  size_t nflag;            /* number of spikes flagged in this block */
+  dim_t ntime;             /* number of time slices */
+  smf_qual_t *qua;         /* pointer to the quality array */
+  double thresh;           /* threshold for spikes */
+  size_t tstride;          /* time stride for res/qua */
+} smfFlagSpikes2Data;
 
-/* Local Variables */
+/* Function to be executed in thread: find spikes in block of bolos */
+
+void smfFlagSpikes2Par( void *job_data_ptr, int *status );
+
+void smfFlagSpikes2Par( void *job_data_ptr, int *status ) {
+   size_t box;                 /* Box size */
+   size_t bstride;             /* Vector stride between bolometer samples */
+   double *dat = NULL;         /* Pointer to bolo data */
+   double dnew;                /* Data value being added into the filter box */
+   double dold;                /* Data value being removed from the filter box*/
+   int iadd;                   /* Index within box at which to store new value*/
    dim_t ibolo;                /* Bolometer index */
    dim_t ibox;                 /* Index within box */
-   dim_t inbox;                /* Number of values in current filter box */
    dim_t iold;                 /* Index of oldest value in "w2" */
+   dim_t inbox;                /* Number of values in current filter box */
+   int inoise;                 /* Index within noisebox element to be removed */
+   int iremove;                /* Index within box of element to be removed */
    dim_t itime;                /* Time-slice index */
    dim_t lasttime;             /* Last time-slice index to check for spikes */
+   double lmedian;             /* Median value in previous filter box */
+   smf_qual_t mask;            /* quality bit mask */
+   double median;              /* Median value in current filter box */
    dim_t nbolo;                /* Number of bolometers */
-   dim_t ntime;                /* Number of time-slices */
-   double *dat = NULL;         /* Pointer to bolo data */
+   size_t newstride;           /* Vector stride to new time sample */
+   size_t nflag;               /* Number of samples flagged */
+   int nn;                     /* Number of good values in noise box */
+   double noise;               /* Local noise estimate */
    double *noisebox = NULL;    /* Pointer to array holding values for
                                   calculating local noise */
+   double nsum;                /* Sum of values in noise box */
+   double nsum2;               /* Sum of squared values in noise box */
+   dim_t ntime;                /* Number of time-slices */
    double *pdat = NULL;        /* Pointer to next bolo data value */
    double *pdat0 = NULL;       /* Pointer to first bolo data value */
    double *pdat1 = NULL;       /* Pointer to last bolo data value */
+   smfFlagSpikes2Data *pdata=NULL;
    double *pn = NULL;          /* Pointer to next "noisebox" value */
+   smf_qual_t *pqua = NULL;    /* Pointer to next quality flag */
+   smf_qual_t *pqua0 = NULL;   /* Pointer to first bolo quality value */
+   smf_qual_t *pqua1 = NULL;   /* Pointer to last bolo quality value */
    double *pw1 = NULL;         /* Pointer to next "w1" value */
    double *pw2 = NULL;         /* Pointer to next "w2" value */
+   smf_qual_t *qua = NULL;     /* Pointer to quality flags */
+   int spike;                  /* Is current time slice a spike? */
+   double thresh;              /* threshold for spikes */
+   size_t tstride;             /* Vector stride between time samples */
+   double umedian;             /* Lagged median value */
    double *w1 = NULL;          /* Array holding sorted data values */
    double *w2 = NULL;          /* Array holding un-sorted data values */
-   double dnew;                /* Data value being added into the filter box */
-   double dold;                /* Data value being removed from the filter box*/
-   double lmedian;             /* Median value in previous filter box */
-   double median;              /* Median value in current filter box */
-   double noise;               /* Local noise estimate */
-   double nsum2;               /* Sum of squared values in noise box */
-   double nsum;                /* Sum of values in noise box */
-   double umedian;             /* Lagged median value */
-   int iadd;                   /* Index within box at which to store new value*/
-   int inoise;                 /* Index within noisebox element to be removed */
-   int iremove;                /* Index within box of element to be removed */
-   int nn;                     /* Number of good values in noise box */
-   int spike;                  /* Is current time slice a spike? */
-   size_t bstride;             /* Vector stride between bolometer samples */
-   size_t newstride;           /* Vector stride to new time sample */
-   size_t nflag;               /* Number of samples flagged */
-   size_t tstride;             /* Vector stride between time samples */
-   smf_qual_t *pqua = NULL; /* Pointer to next quality flag */
-   smf_qual_t *pqua0 = NULL;/* Pointer to first bolo quality value */
-   smf_qual_t *pqua1 = NULL;/* Pointer to last bolo quality value */
-   smf_qual_t *qua = NULL;  /* Pointer to quality flags */
 
-/* Check inherited status */
-   if( *status != SAI__OK ) return;
+/* Retrieve job data */
+   pdata = job_data_ptr;
+   box = pdata->box;
+   bstride = pdata->bstride;
+   dat = pdata->dat;
+   mask = pdata->mask;
+   nbolo = pdata->nbolo;
+   ntime = pdata->ntime;
+   qua = pdata->qua;
+   thresh = pdata->thresh;
+   tstride = pdata->tstride;
 
-/* Check we have double precision data. */
-   smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status );
-
-/* Get a pointer to the quality array to use. */
-   qua = smf_select_qualpntr( data, NULL, status );
-
-/* Report an error if we have no quality array. */
-   if( !qua && *status == SAI__OK ) {
-     *status = SAI__ERROR;
-     errRep( " ", FUNC_NAME ": No valid QUALITY array was provided", status );
-   }
-
-/* Get a pointer to the data array to use. Report an error if we have
-   no data array. */
-   dat = data->pntr[0];
-   if( !dat && *status == SAI__OK ) {
-     *status = SAI__ERROR;
-     errRep( " ", FUNC_NAME ": smfData does not contain a DATA component",
-             status);
-   }
-
-/* Check the supplied thresh value is valid. */
-   if( thresh <= 0 && *status == SAI__OK ) {
-      *status = SAI__ERROR;
-      msgSetd( "THRESH", thresh );
-      errRep( " ", FUNC_NAME ": Can't find spikes: thresh=^THRESH, must be > 0",
-              status);
-   }
-
-/* Check the supplied box value is valid. */
-   if( box <= 2 && *status == SAI__OK ) {
-      *status = SAI__ERROR;
-      msgSeti( "BOX", box );
-      errRep( " ", FUNC_NAME ": Can't find spikes: box=^BOX, must be > 2",
-              status);
-   }
-
-/* Obtain data dimensions, and the stride between adjacent elements on
-   each axis (bolometer and time). Use the existing data order to avoid
-   the cost of re-ordering. */
-   smf_get_dims( data,  NULL, NULL, &nbolo, &ntime, NULL, &bstride, &tstride,
-                 status );
-
-/* Check we have room for at least 3 boxes along the time axis. */
-   if( 3*box > ntime && *status == SAI__OK ) {
-      *status = SAI__ERROR;
-      msgSeti( "BOX", box );
-      msgSeti( "MAX", ntime/3 - 1 );
-      errRep( " ", FUNC_NAME ": Can't find spikes: box=^BOX is too large, "
-              " must be < ^MAX.", status);
-   }
+/* Debugging message indicating thread started work */
+   msgOutiff( MSG__DEBUG, "",
+              "smfFlagSpikes2Par: thread starting on bolos %zu -- %zu",
+              status, pdata->b1, pdata->b2 );
 
 /* Initialise the number of spikes found. */
    nflag = 0;
@@ -229,8 +222,8 @@ void smf_flag_spikes2( smfData *data, smf_qual_t mask, double thresh,
    pdat1 = dat + ( ntime - 1 )*tstride;
    pqua1 = qua + ( ntime - 1 )*tstride;
 
-/* We process each bolometer in turn. */
-   for( ibolo = 0; ibolo < nbolo && *status == SAI__OK; ibolo++ ) {
+/* We process each bolometer in turn for this block. */
+   for( ibolo=pdata->b1; ibolo<=pdata->b2 && *status == SAI__OK; ibolo++ ) {
 
 /* Ignore bad bolometers. */
       if( !( *pqua0 & SMF__Q_BADB ) ) {
@@ -556,6 +549,163 @@ void smf_flag_spikes2( smfData *data, smf_qual_t mask, double thresh,
    w2 = astFree( w2 );
    noisebox = astFree( noisebox );
 
+/* Store number of flagged samples */
+   pdata->nflag = nflag;
+
+/* Debugging message indicating thread finished work */
+   msgOutiff( MSG__DEBUG, "",
+              "smfFlagSpikes2Par: thread finishing bolos %zu -- %zu",
+              status, pdata->b1, pdata->b2 );
+}
+
+/* ------------------------------------------------------------------------ */
+
+#define FUNC_NAME "smf_flag_spikes2"
+
+void smf_flag_spikes2( smfWorkForce *wf, smfData *data, smf_qual_t mask,
+                       double thresh, size_t box, size_t *nflagged,
+                       int *status ){
+
+/* Local Variables */
+   int i;                      /* Loop counter */
+   smfFlagSpikes2Data *job_data=NULL;/* Array of job data for each thread */
+   dim_t nbolo;                /* Number of bolometers */
+   dim_t ntime;                /* Number of time-slices */
+   double *dat = NULL;         /* Pointer to bolo data */
+   smfFlagSpikes2Data *pdata=NULL;/* Pointer to job data */
+   int nw;                     /* Number of worker threads */
+   size_t bstride;             /* Vector stride between bolometer samples */
+   size_t nflag;               /* Number of samples flagged */
+   size_t tstride;             /* Vector stride between time samples */
+   smf_qual_t *qua = NULL;     /* Pointer to quality flags */
+   size_t step;                /* step size for dividing up work */
+   int njobs=0;                /* Number of jobs to be processed */
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* How many threads do we get to play with */
+   nw = wf ? wf->nworker : 1;
+
+/* Check we have double precision data. */
+   smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status );
+
+/* Get a pointer to the quality array to use. */
+   qua = smf_select_qualpntr( data, NULL, status );
+
+/* Report an error if we have no quality array. */
+   if( !qua && *status == SAI__OK ) {
+     *status = SAI__ERROR;
+     errRep( " ", FUNC_NAME ": No valid QUALITY array was provided", status );
+   }
+
+/* Get a pointer to the data array to use. Report an error if we have
+   no data array. */
+   dat = data->pntr[0];
+   if( !dat && *status == SAI__OK ) {
+     *status = SAI__ERROR;
+     errRep( " ", FUNC_NAME ": smfData does not contain a DATA component",
+             status);
+   }
+
+/* Check the supplied thresh value is valid. */
+   if( thresh <= 0 && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      msgSetd( "THRESH", thresh );
+      errRep( " ", FUNC_NAME ": Can't find spikes: thresh=^THRESH, must be > 0",
+              status);
+   }
+
+/* Check the supplied box value is valid. */
+   if( box <= 2 && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      msgSeti( "BOX", box );
+      errRep( " ", FUNC_NAME ": Can't find spikes: box=^BOX, must be > 2",
+              status);
+   }
+
+/* Obtain data dimensions, and the stride between adjacent elements on
+   each axis (bolometer and time). Use the existing data order to avoid
+   the cost of re-ordering. */
+   smf_get_dims( data,  NULL, NULL, &nbolo, &ntime, NULL, &bstride, &tstride,
+                 status );
+
+/* Check we have room for at least 3 boxes along the time axis. */
+   if( 3*box > ntime && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      msgSeti( "BOX", box );
+      msgSeti( "MAX", ntime/3 - 1 );
+      errRep( " ", FUNC_NAME ": Can't find spikes: box=^BOX is too large, "
+              " must be < ^MAX.", status);
+   }
+
+/* Set up the job data */
+
+   if( nw > (int) nbolo ) {
+     step = 1;
+   } else {
+     step = nbolo/nw;
+     if( !step ) {
+       step = 1;
+     }
+   }
+
+   job_data = astCalloc( nw, sizeof(*job_data), 1 );
+
+   for( i=0; (*status==SAI__OK)&&i<nw; i++ ) {
+     pdata = job_data + i;
+
+     pdata->b1 = i*step;
+     pdata->b2 = (i+1)*step-1;
+
+/* if b1 is greater than the number of bolometers, we've run out of jobs... */
+     if( pdata->b1 >= nbolo ) {
+       break;
+     }
+
+/* increase the jobs counter */
+     njobs++;
+
+/* Ensure that the last thread picks up any left-over bolometers */
+     if( (i==(nw-1)) && (pdata->b1<(nbolo-1)) ) {
+       pdata->b2=nbolo-1;
+     }
+
+     pdata->ijob = -1;   /* Flag job as ready to start */
+     pdata->box = box;
+     pdata->bstride = bstride;
+     pdata->dat = dat;
+     pdata->mask = mask;
+     pdata->thresh = thresh;
+     pdata->nbolo = nbolo;
+     pdata->ntime = ntime;
+     pdata->qua = qua;
+     pdata->tstride = tstride;
+   }
+
+/* Submit jobs to find spikes in each block of bolos */
+   smf_begin_job_context( wf, status );
+   for( i=0; (*status==SAI__OK)&&i<njobs; i++ ) {
+     pdata = job_data + i;
+     pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata,
+                                smfFlagSpikes2Par, NULL, status );
+   }
+
+/* Wait until all of the submitted jobs have completed */
+   smf_wait( wf, status );
+   smf_end_job_context( wf, status );
+
+/* Count flagged samples from all of the jobs and free resources */
+   nflag=0;
+   if( job_data ) {
+     for( i=0; i<njobs; i++ ) {
+       pdata = job_data + i;
+       nflag += pdata->nflag;
+     }
+     job_data = astFree( job_data );
+   }
+
 /* Return the number of flagged samples, if requested */
    if( nflagged ) *nflagged = nflag;
+
 }
