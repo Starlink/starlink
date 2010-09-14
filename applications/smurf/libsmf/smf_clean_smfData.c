@@ -123,9 +123,13 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data,
   int order;                /* Order of polynomial for baseline fitting */
   double spikethresh;       /* Threshold for finding spikes */
   size_t spikeiter=0;       /* Number of iterations for spike finder */
+  struct timeval tv1, tv2;  /* Timers */
 
   /* Main routine */
   if (*status != SAI__OK) return;
+
+    /*** TIMER ***/
+    smf_timerinit( &tv1, &tv2, status );
 
   /* Check for valid inputs */
 
@@ -153,6 +157,10 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data,
   msgOutif(MSG__VERB,"", FUNC_NAME ": update quality", status);
   smf_update_quality( data, 1, NULL, 0, badfrac, status );
 
+  /*** TIMER ***/
+  msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ":   ** %f s updating quality",
+             status, smf_timerupdate(&tv1,&tv2,status) );
+
   /* Fix DC steps */
   if( dcthresh && dcfitbox ) {
     msgOutiff(MSG__VERB, "", FUNC_NAME
@@ -165,6 +173,10 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data,
                    &nflag, NULL, NULL, NULL, status );
 
     msgOutiff(MSG__VERB, "", FUNC_NAME": ...%zd flagged\n", status, nflag);
+
+    /*** TIMER ***/
+    msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ":   ** %f s fixing DC steps",
+               status, smf_timerupdate(&tv1,&tv2,status) );
   }
 
   /* Flag Spikes */
@@ -174,6 +186,10 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data,
                      100, &aiter, &nflag, status );
     msgOutiff(MSG__VERB,"", FUNC_NAME ": ...found %zd in %zd iterations",
               status, nflag, aiter );
+
+    /*** TIMER ***/
+    msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ":   ** %f s flagging spikes",
+               status, smf_timerupdate(&tv1,&tv2,status) );
   }
 
   /*  Flag periods of stationary pointing */
@@ -184,6 +200,11 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data,
                  flagstat );
       smf_flag_stationary( data, flagstat, &nflag, status );
       msgOutiff( MSG__VERB,"", "%zu new time slices flagged", status, nflag);
+
+      /*** TIMER ***/
+      msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+                 ":   ** %f s flagging stationary",
+                 status, smf_timerupdate(&tv1,&tv2,status) );
     } else {
       msgOutif( MSG__DEBUG, "", FUNC_NAME
                 ": Skipping flagstat because no header present", status );
@@ -195,12 +216,20 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data,
     msgOutif(MSG__VERB, "", FUNC_NAME ": Cleaning dark squid signals from data.",
              status);
     smf_clean_dksquid( data, 0, 100, NULL, 0, 0, 0, status );
+
+    /*** TIMER ***/
+    msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ":   ** %f s DKSquid cleaning",
+               status, smf_timerupdate(&tv1,&tv2,status) );
   }
 
   /* Gap filling */
   if( fillgaps ) {
     msgOutif(MSG__VERB, "", FUNC_NAME ": Gap filling.", status);
     smf_fillgaps( wf, data, SMF__Q_GAP, status );
+
+    /*** TIMER ***/
+    msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ":   ** %f s gap filling",
+               status, smf_timerupdate(&tv1,&tv2,status) );
   }
 
   /* Remove baselines */
@@ -210,6 +239,11 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data,
                status, order );
     smf_scanfit( data, order, status );
     smf_subtract_poly( data, 0, status );
+
+    /*** TIMER ***/
+    msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+               ":   ** %f s removing poly baseline",
+               status, smf_timerupdate(&tv1,&tv2,status) );
   }
 
   /* filter the data */
@@ -218,10 +252,19 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data,
   if( dofft ) {
     msgOutif( MSG__VERB, "", FUNC_NAME ": frequency domain filter", status );
     smf_filter_execute( wf, data, filt, status );
+
+    /*** TIMER ***/
+    msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ":   ** %f s filtering data",
+               status, smf_timerupdate(&tv1,&tv2,status) );
   }
   filt = smf_free_smfFilter( filt, status );
 
   /* Noise mask */
-  if (noiseclip > 0.0) smf_mask_noisy( wf, data, noiseclip, status );
+  if (noiseclip > 0.0) {
+    smf_mask_noisy( wf, data, noiseclip, status );
 
+    /*** TIMER ***/
+    msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ":   ** %f s masking noisy",
+               status, smf_timerupdate(&tv1,&tv2,status) );
+  }
 }
