@@ -152,7 +152,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   int dcmaxsteps;               /* Maximum allowed number of dc jumps */
   dim_t dcfitbox;               /* Width of box for DC step detection */
   double dcthresh;              /* Threshold for DC step detection */
-  dim_t dcsmooth;               /* Width of median filter in DC step detection */
+  dim_t dcsmooth;               /* Width of median filter in DC step detection*/
   int fillgaps;                 /* If set perform gap filling */
   dim_t i;                      /* Loop counter */
   dim_t id;                     /* Loop counter */
@@ -237,7 +237,8 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
       if( flags & SMF__DIMM_FIRSTITER ) {
         /* Measure the noise from power spectra */
         smf_bolonoise( wf, res->sdata[idx], 0, 0.5, SMF__F_WHITELO,
-                       SMF__F_WHITEHI, 0, 0, SMF__MAXAPLEN, var, NULL, NULL, status );
+                       SMF__F_WHITEHI, 0, 0, SMF__MAXAPLEN, var, NULL, NULL,
+                       status );
 
         for( i=0; i<nbolo; i++ ) if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {
             /* Loop over time and store the variance for each sample */
