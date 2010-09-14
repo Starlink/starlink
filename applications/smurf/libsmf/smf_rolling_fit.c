@@ -77,6 +77,8 @@
 *  History:
 *     23-AUG-2010 (DSB):
 *        Original version.
+*     14-NOV-2010 (DSB):
+*        Avoid integer truncation in sums.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -185,7 +187,7 @@ void smf_rolling_fit( dim_t box, float wlim, dim_t el, dim_t start,
          sy += *pnew;
          sx += i;
          sxy += i*( *pnew );
-         sxx += i*i;
+         sxx += ( (double) i )*( (double) i );
          syy += ( *pnew )*( *pnew );
          pop++;
       }
@@ -272,7 +274,7 @@ void smf_rolling_fit( dim_t box, float wlim, dim_t el, dim_t start,
             sy += *pnew;
             sx += inew;
             sxy += inew*( *pnew );
-            sxx += inew*inew;
+            sxx += ( (double) inew )*( (double) inew );
             syy += ( *pnew )*( *pnew );
             pop++;
          }
@@ -283,7 +285,7 @@ void smf_rolling_fit( dim_t box, float wlim, dim_t el, dim_t start,
             sy -= *pold;
             sx -= iold;
             sxy -= iold*( *pold );
-            sxx -= iold*iold;
+            sxx -= ( (double) iold )*( (double) iold );
             syy -= ( *pold )*( *pold );
             pop--;
          }
