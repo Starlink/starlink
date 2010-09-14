@@ -116,7 +116,8 @@ void smf_flag_spikes2( smfData *data, smf_qual_t mask, double thresh,
    dim_t nbolo;                /* Number of bolometers */
    dim_t ntime;                /* Number of time-slices */
    double *dat = NULL;         /* Pointer to bolo data */
-   double *noisebox = NULL;    /* Pointer to array holding values for calculating local noise */
+   double *noisebox = NULL;    /* Pointer to array holding values for
+                                  calculating local noise */
    double *pdat = NULL;        /* Pointer to next bolo data value */
    double *pdat0 = NULL;       /* Pointer to first bolo data value */
    double *pdat1 = NULL;       /* Pointer to last bolo data value */
@@ -126,15 +127,15 @@ void smf_flag_spikes2( smfData *data, smf_qual_t mask, double thresh,
    double *w1 = NULL;          /* Array holding sorted data values */
    double *w2 = NULL;          /* Array holding un-sorted data values */
    double dnew;                /* Data value being added into the filter box */
-   double dold;                /* Data value being removed from the filter box */
+   double dold;                /* Data value being removed from the filter box*/
    double lmedian;             /* Median value in previous filter box */
    double median;              /* Median value in current filter box */
    double noise;               /* Local noise estimate */
    double nsum2;               /* Sum of squared values in noise box */
    double nsum;                /* Sum of values in noise box */
    double umedian;             /* Lagged median value */
-   int iadd;                   /* Index within box at which to store new value */
-   int inoise;                 /* Index within noisebox of element to be removed */
+   int iadd;                   /* Index within box at which to store new value*/
+   int inoise;                 /* Index within noisebox element to be removed */
    int iremove;                /* Index within box of element to be removed */
    int nn;                     /* Number of good values in noise box */
    int spike;                  /* Is current time slice a spike? */
@@ -167,7 +168,8 @@ void smf_flag_spikes2( smfData *data, smf_qual_t mask, double thresh,
    dat = data->pntr[0];
    if( !dat && *status == SAI__OK ) {
      *status = SAI__ERROR;
-     errRep( " ", FUNC_NAME ": smfData does not contain a DATA component",status);
+     errRep( " ", FUNC_NAME ": smfData does not contain a DATA component",
+             status);
    }
 
 /* Check the supplied thresh value is valid. */
