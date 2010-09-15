@@ -183,7 +183,7 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data,
   /* Flag Spikes */
   if( spikethresh ) {
     msgOutif(MSG__VERB," ", FUNC_NAME ": flag spikes...", status);
-    smf_flag_spikes2( wf, data, SMF__Q_FIT, spikethresh, spikebox,
+    smf_flag_spikes( wf, data, SMF__Q_FIT, spikethresh, spikebox,
                      &nflag, status );
     msgOutiff(MSG__VERB,"", FUNC_NAME ": ...found %zd", status, nflag );
 
