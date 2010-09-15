@@ -1107,7 +1107,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                           memiter, lut, keymap, status );
 
         /* Since a copy of the LUT is still open in res[0] free it up here */
-        for( i=0; i<res[0]->ndat; i++ ) {
+        for( i=0; (*status==SAI__OK)&&(i<res[0]->ndat); i++ ) {
           if( res[0]->sdata[i] ) {
             smf_close_mapcoord( res[0]->sdata[i], status );
           }
@@ -1120,7 +1120,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                           memiter, ast, keymap, status );
 
         /* Also associate quality with AST model. */
-        for( idx=0; idx<ast[0]->ndat; idx++ ) {
+        for( idx=0; (*status==SAI__OK)&&(idx<ast[0]->ndat); idx++ ) {
           smfData *thisqua = qua[0]->sdata[idx];
           ast[0]->sdata[idx]->sidequal = thisqua;
         }
