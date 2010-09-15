@@ -61,6 +61,7 @@
 
 *  Authors:
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     EC: Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -72,10 +73,13 @@
 *        Handle NaN before returning.
 *     2010-02-05 (TIMJ):
 *        Add iterative sigma-clipping.
+*     2010-09-15 (EC):
+*        Added special-case code for 0th order polynomial
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
+*     Copyright (C) 2010 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -261,11 +265,13 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[],
   /* initialise to bad in smf_fit_poly1d itself*/
   if (*status != SAI__OK) return;
 
+  /*
   if (order == 0) {
     *status = SAI__ERROR;
     errRep( "", "smf_fit_poly1d does not calculate a simple mean", status );
     return;
   }
+  */
 
   if (order >= nelem) {
     *status = SAI__ERROR;
@@ -285,8 +291,103 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[],
     xx = xptr;
   }
 
-  /* Special case a first order linear regression */
-  if (order == 1 ) {
+  if (order == 0 ) {
+    /* Special case: a simple mean ********************************************/
+    size_t nrgood = 0;
+    double res_sq = 0;
+
+    if (vary) {
+      double mean=VAL__BADD;
+      double sumweight=0;
+      double sumweight_valsq=0;
+      double sumweight_val=0;
+      double variance=VAL__BADD;
+      double w=0;
+
+      /* weighted average */
+      for (i = 0; i < nelem; i++) {
+        if ( vary[i] != VAL__BADD && y[i] != VAL__BADD && vary[i] != 0.0 ) {
+          w = 1.0 / vary[i];
+          sumweight += w;
+          sumweight_valsq += w*y[i]*y[i];
+          sumweight_val += w*y[i];
+
+          nrgood++;
+        }
+      }
+
+      if( sumweight != 0 ) {
+        mean = sumweight_val / sumweight;
+        variance = (sumweight*sumweight_valsq - (sumweight_val*sumweight_val)) /
+          ( nrgood * (sumweight*sumweight) );
+
+        /* Calculate sum of residuals^2 */
+        for (i = 0; i < nelem; i++) {
+          if ( vary[i] != VAL__BADD && y[i] != VAL__BADD && vary[i] != 0.0 ){
+            res_sq += (y[i]-mean)*(y[i]-mean)/vary[i];
+          }
+        }
+      }
+
+      coeffs[0] = (isnan(mean) ? VAL__BADD : mean );
+      if( varcoeffs) varcoeffs[0] = (isnan(variance) ? VAL__BADD : variance );
+    } else {
+      double mean;
+      double meanvariance;
+      double sigma;
+      double variance;
+
+      /* simple average */
+      smf_stats1D( y, 1, nelem, NULL, 1, 0, &mean, &sigma, &nrgood, status );
+
+      if( (*status == SAI__OK) && (nrgood > 0) ) {
+        /* Convert population error to variance on the mean */
+        variance = sigma*sigma;
+        meanvariance = variance/nrgood;
+
+        coeffs[0] = mean;
+        if( varcoeffs ) varcoeffs[0] = meanvariance;
+
+        /* Calculate sum of residuals^2 */
+        for( i=0; i<nelem; i++ ) {
+          if( y[i] != VAL__BADD ) {
+            res_sq += (y[i]-mean)*(y[i]-mean)/variance;
+          }
+        }
+      } else {
+        coeffs[0] = VAL__BADD;
+        if( varcoeffs ) varcoeffs[0] = VAL__BADD;
+      }
+    }
+
+    /* Normalize and return chisq */
+    if( rchisq ) *rchisq = res_sq / ( nrgood - order );
+
+    /* Evaluated polynomial is constant */
+    if( polydata ) {
+      for( i=0; i<nelem; i++ ) {
+        polydata[i] = coeffs[0];
+      }
+    }
+
+    /* Report the fit details */
+    if (msgFlevok( MSG__DEBUG2, status ) ) {
+      if (nrgood == nelem) {
+        msgSeti( "NVAL", nrgood);
+      } else {
+        msgFmt( "NVAL", "%zd/%zd", nrgood, nelem);
+      }
+      msgOutiff( MSG__DEBUG2, "",
+                 "Fit (%s) = %g Red. chisq = %f (^NVAL pnts)",
+                 status, (vary ? "weighted" : "unweighted"), coeffs[0],
+                 res_sq / ( nrgood - order ) );
+    }
+
+
+    if( nused ) *nused = nrgood;
+
+  } else if (order == 1 ) {
+    /* Special case: a first order linear regression **************************/
     double c0, c1, cov00, cov01, cov11, chisq;
     size_t nrgood = 0;
 
@@ -350,7 +451,7 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[],
       }
     }
 
-    *rchisq = chisq / ( nrgood - order );
+    if( rchisq ) *rchisq = chisq / ( nrgood - order );
 
     /* Report the fit details */
     if (msgFlevok( MSG__DEBUG2, status ) ) {
@@ -361,12 +462,14 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[],
       }
       msgOutiff( MSG__DEBUG2, "",
                  "Fit (%s) = %g + %g X Red. chisq = %f (^NVAL pnts)",
-                 status, (vary ? "weighted" : "unweighted"), c0, c1, *rchisq );
+                 status, (vary ? "weighted" : "unweighted"), c0, c1,
+                 chisq/(nrgood-order) );
     }
 
     if (nused) *nused = nrgood;
 
   } else {
+    /* All higher-order fits **************************************************/
     const int use_sc2math = 0;
 
     if ( use_sc2math && order == 3 ) {
@@ -440,7 +543,7 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[],
       /* Carry out fit */
       gsl_multifit_wlinear( X, W, Y, mcoeffs, mcov, &chisq, work );
 
-      *rchisq = chisq / ( nrgood - order );
+      if( rchisq ) *rchisq = chisq / ( nrgood - order );
 
       /* Report the fit details */
       if (msgFlevok( MSG__DEBUG2, status ) ) {
@@ -456,7 +559,8 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[],
         }
         msgOutiff( MSG__DEBUG2, "",
                    "Fit (%s) = ^POLY  Red. chisq = %f (%zd/%zd pnts)",
-                   status, (vary ? "weighted" : "unweighted"), *rchisq, nrgood,
+                   status, (vary ? "weighted" : "unweighted"),
+                   chisq/(nrgood-order), nrgood,
                    nelem );
       }
 
