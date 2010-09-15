@@ -82,7 +82,6 @@ smf_convert_bad.c \
 smf_coords_lut.c \
 smf_copytime.c \
 smf_correct_extinction.c \
-smf_correct_steps.c \
 smf_create_bolfile.c \
 smf_create_lutwcs.c \
 smf_create_qualname.c \

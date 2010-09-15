@@ -746,10 +746,6 @@ void smf_correct_extinction( smfData *data, smf_tausrc tausrc,
                              smf_extmeth method, AstKeyMap * extpars, double tau,
                              double *allextcorr, int *status);
 
-void smf_correct_steps( smfWorkForce *wf, smfData *data,
-                        double dcthresh, double dcthresh2, dim_t dcbox,
-                        int dcflag, size_t *nsteps, int *status );
-
 void smf_create_bolfile( const Grp * rgrp, size_t index,
                          const smfData* refdata, const char * datalabel,
                          const char *units, int hasqual, smfData **respmap, int *status );
