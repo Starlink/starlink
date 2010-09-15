@@ -4,7 +4,7 @@
 *     smf_fit_poly
 
 *  Purpose:
-*     Low-level polynomial sky fitting routine
+*     Low-level polynomial fitting routine for bolometer data
 
 *  Language:
 *     Starlink ANSI C
@@ -13,7 +13,7 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_fit_poly( const smfData *data, const int order, double * poly,
+*     smf_fit_poly( const smfData *data, const int order, double *poly,
 *                   int *status )
 
 *  Arguments:
@@ -29,10 +29,8 @@
 *  Description:
 *     This routine fits a polynomial of arbitrary order to each
 *     bolometer time stream of N timeslices. Execution is halted with
-*     an error if the polynomial order is greater than N-1. The GSL
-*     library is used to carry out the fit. The fitted polynomial
-*     coefficients are stored in the poly pointer in the supplied
-*     smfData.
+*     an error if the polynomial order is greater than N-1. Fitting
+*     itself is done with smf_fit_poly1d.
 
 *  Notes:
 *     This routine will fail if there is no associated QUALITY component.
@@ -43,6 +41,7 @@
 *  Authors:
 *     Andy Gibb (UBC)
 *     Ed Chapin (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -57,12 +56,14 @@
 *        - Added quality to interface
 *     2008-12-03 (TIMJ):
 *        Use smf_get_dims
+*     2010-09-15 (EC):
+*        Switch to using smf_fit_poly1d for fitting each bolo
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
-*     Copyright (C) 2006-2008 University of British Columbia. All Rights
-*     Reserved.
+*     Copyright (C) 2006-2008,2010 University of British Columbia.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -114,22 +115,19 @@ void smf_fit_poly( const smfData *data,
                    const size_t order, double *poly, int *status) {
 
   /* Local variables */
-  double chisq;            /* Chi-squared from the linear regression fit */
-  gsl_vector *coeffs=NULL; /* Solution vector */
-  dim_t i;                 /* Loop counter */
-  double *indata=NULL;     /* Pointer to data array */
-  dim_t j;                 /* Loop counter */
-  dim_t k;                 /* Loop counter */
-  gsl_matrix *mcov=NULL;   /* Covariance matrix */
-  dim_t nbol=0;           /* Number of bolometers */
-  size_t ncoeff = 2;       /* Number of coefficients to fit for; def. line */
-  dim_t nframes = 0;      /* Number of frames */
-  gsl_vector *psky=NULL;   /* Vector containing sky brightness */
+  size_t bstride;             /* bolo strides */
+  double *curbolo=NULL;       /* pointer to current bolo data */
+  double *curpoly=NULL;       /* pointer to poly coeffs fit to curbolo */
+  dim_t i;                    /* Loop counter */
+  double *indata=NULL;        /* Pointer to data array */
+  dim_t j;                    /* Loop counter */
+  dim_t k;                    /* Loop counter */
+  dim_t nbolo=0;              /* Number of bolometers */
+  size_t ncoeff = 2;          /* Number of coefficients to fit for; def. line */
+  dim_t ntslice = 0;          /* Number of time slices */
+  size_t nused;               /* Number of samples used in fit */
   const smf_qual_t *qual=NULL;/* Pointer to QUALITY component */
-  double xik;              /* */
-  gsl_matrix *X=NULL;      /* Matrix of input positions */
-  gsl_multifit_linear_workspace *work=NULL; /* Workspace */
-  gsl_vector *weight=NULL; /* Weights for sky brightness vector */
+  size_t tstride;             /* time strides */
 
 
   /* Check status */
@@ -147,7 +145,8 @@ void smf_fit_poly( const smfData *data,
   }
 
   /* Get the dimensions */
-  smf_get_dims( data,  NULL, NULL, &nbol, &nframes, NULL, NULL, NULL, status);
+  smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, NULL, &bstride,
+                &tstride, status);
 
   /* Check that poly is not a NULL pointer */
   if ( poly == NULL ) {
@@ -174,10 +173,10 @@ void smf_fit_poly( const smfData *data,
 
   /* Return with error if order is greater than the number of data
      points */
-  if ( order >= nframes ) {
+  if ( order >= ntslice ) {
     if ( *status == SAI__OK) {
       msgSeti("O",order);
-      msgSeti("NF",nframes);
+      msgSeti("NF",ntslice);
       *status = SAI__ERROR;
       errRep( FUNC_NAME, "Requested polynomial order, ^O, greater than or "
               "equal to the number of points, ^NF. Unable to fit polynomial.",
@@ -188,73 +187,41 @@ void smf_fit_poly( const smfData *data,
 
   ncoeff = order + 1;
 
-  /* Allocate workspace */
-  work = gsl_multifit_linear_alloc( nframes, ncoeff );
-  X = gsl_matrix_alloc( nframes, ncoeff );
-  psky = gsl_vector_alloc( nframes );
-  weight = gsl_vector_alloc( nframes );
-  coeffs = gsl_vector_alloc( ncoeff );
-  mcov = gsl_matrix_alloc( ncoeff, ncoeff );
+  /* If time-ordered need to copy bolometer into contiguous arrays.
+     Otherwise we can use the bolometer data in-place. Polynomial
+     data per-bolo also needs to be re-ordered so allocate a temp array. */
+
+  if( data->isTordered ) {
+    curbolo = astCalloc( ntslice, sizeof(*curbolo), 0 );
+  }
+  curpoly = astCalloc( ncoeff, sizeof(*curpoly), 0 );
 
   /* Loop over bolometers. Only fit this bolometer if it is not
      flagged SMF__Q_BADB */
-  for ( j=0; j<nbol; j++)
-    if( (data->isTordered && !(qual[j] & SMF__Q_BADB) ) ||
-        (!data->isTordered && !(qual[j*nframes] & SMF__Q_BADB)) ) {
+  for ( j=0; (j<nbolo) && (*status==SAI__OK); j++) {
+    if( !(qual[j*bstride] & SMF__Q_BADB) ) {
 
-      /* Fill the matrix, vectors and weights arrays */
-      for ( i=0; i<nframes; i++) {
-        /* Matrix elements */
-        for ( k=0; k<ncoeff; k++) {
-          xik = (double)pow(i,k);
-          gsl_matrix_set( X, i, k, xik );
+      /* Pointer to current bolometer data */
+      if( data->isTordered ) {
+        for( i=0; i<ntslice; i++ ) {
+          curbolo[i] = indata[i*tstride + j*bstride];
         }
-
-        /* Fill vectors for fitting */
-
-        if( data->isTordered ) { /* ICD time-ordered data */
-
-          /* data */
-          gsl_vector_set( psky, i, indata[j + nbol*i] );
-
-          /* weights */
-          if( !(qual[nbol*i + j]&SMF__Q_FIT) && (indata[j + nbol*i]
-                                                 != VAL__BADD) ) {
-            gsl_vector_set( weight, i, 1.0); /* Good QUALITY */
-          } else {
-            gsl_vector_set( weight, i, 0.0); /* Bad QUALITY */
-          }
-
-        } else {                 /* bolo-ordered */
-
-          /* data */
-          gsl_vector_set( psky, i, indata[j*nframes + i] );
-
-          /* weights */
-          if( !(qual[j*nframes + i]&SMF__Q_FIT) && (indata[j*nframes + i] !=
-                                                    VAL__BADD) ) {
-            gsl_vector_set( weight, i, 1.0); /* Good QUALITY */
-          } else {
-            gsl_vector_set( weight, i, 0.0); /* Bad QUALITY */
-          }
-        }
+      } else {
+        curbolo = indata + j*bstride;
       }
 
-      /* Carry out fit */
-      gsl_multifit_wlinear( X, weight, psky, coeffs, mcov, &chisq, work );
+      smf_fit_poly1d( order, ntslice, 0, NULL, curbolo, NULL, curpoly, NULL,
+                      NULL, &nused, status );
 
-      /* Store coefficients in the polynomial array */
+      /* Copy the poly coefficients for this bolometer into poly */
       for ( k=0; k<ncoeff; k++) {
-        poly[j + k*nbol] = gsl_vector_get ( coeffs, k );
+        poly[j + k*nbolo] = curpoly[k];
       }
-
     }
-  /* Free up workspace */
-  gsl_multifit_linear_free( work );
-  gsl_matrix_free( X );
-  gsl_vector_free( psky );
-  gsl_vector_free( weight );
-  gsl_vector_free( coeffs );
-  gsl_matrix_free( mcov );
+  }
+
+  /* Free up temp space */
+  if( data->isTordered ) curbolo = astFree( curbolo );
+  curpoly = astFree( curpoly );
 
 }

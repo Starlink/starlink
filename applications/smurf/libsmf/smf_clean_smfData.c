@@ -65,6 +65,8 @@
 *        Change smf_fix_steps argument list.
 *     2010-09-15 (DSB):
 *        Call smf_flag_spikes2 instead of smf_flag_spikes.
+*     2010-09-15 (EC):
+*        Use smf_fit_poly directly instead of smf_scanfit
 
 *  Copyright:
 *     Copyright (C) 2010 Univeristy of British Columbia.
@@ -234,11 +236,29 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data,
 
   /* Remove baselines */
   if( order >= 0 ) {
+    dim_t nbolo;
+    size_t ncoeff;
+    double *poly=NULL;
+
     msgOutiff( MSG__VERB,"", FUNC_NAME
                ": Fitting and removing %i-order polynomial baselines",
                status, order );
-    smf_scanfit( data, order, status );
+
+    ncoeff = order+1;
+    smf_get_dims( data,  NULL, NULL, &nbolo, NULL, NULL, NULL, NULL,
+                  status );
+
+    poly = astCalloc( nbolo*ncoeff, sizeof(*poly), 1 );
+    data->ncoeff = ncoeff;
+    data->poly = poly;
+
+    smf_fit_poly( data, order, poly, status );
     smf_subtract_poly( data, 0, status );
+
+    data->ncoeff=0;
+    data->poly = NULL;
+
+    poly = astFree( poly );
 
     /*** TIMER ***/
     msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
@@ -249,7 +269,7 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data,
   /* filter the data */
   filt = smf_create_smfFilter( data, status );
   smf_filter_fromkeymap( filt, keymap, &dofft, status );
-  if( dofft ) {
+  if( (*status == SAI__OK) && dofft ) {
     msgOutif( MSG__VERB, "", FUNC_NAME ": frequency domain filter", status );
     smf_filter_execute( wf, data, filt, status );
 
@@ -260,7 +280,7 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data,
   filt = smf_free_smfFilter( filt, status );
 
   /* Noise mask */
-  if (noiseclip > 0.0) {
+  if( (*status == SAI__OK) && (noiseclip > 0.0) ) {
     smf_mask_noisy( wf, data, noiseclip, status );
 
     /*** TIMER ***/
