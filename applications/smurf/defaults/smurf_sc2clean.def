@@ -45,7 +45,7 @@ filt_wlim = <undef>
 flagstat = 0
 order = -1
 spikethresh = 0
-spikeiter = 0
+spikebox = 50
 noiseclip = 0.0
 
 # these are analogous cleaning parameters for dark squids
@@ -66,7 +66,7 @@ cleandk.filt_notchlow = <undef>
 cleandk.filt_notchhigh = <undef>
 cleandk.order = 0
 cleandk.spikethresh = 0
-cleandk.spikeiter = 0
+cleandk.spikebox = 50
 cleandk.noiseclip = 0.0
 cleandk.filt_wlim = <undef>
 

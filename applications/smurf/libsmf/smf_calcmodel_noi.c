@@ -99,6 +99,8 @@
 *        Use same apodization as used by CALCNOISE.
 *     2010-09-10 (DSB):
 *        Change smf_fix_steps argument list.
+*     2010-09-15 (DSB):
+*        Call smf_flag_spikes2 instead of smf_flag_spikes.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -147,7 +149,6 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
                         int *status) {
 
   /* Local Variables */
-  size_t aiter;                 /* Actual iterations of sigma clipper */
   size_t bstride;               /* bolometer stride */
   int dcmaxsteps;               /* Maximum allowed number of dc jumps */
   dim_t dcfitbox;               /* Width of box for DC step detection */
@@ -174,7 +175,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   smf_qual_t *qua_data=NULL; /* Pointer to RES at chunk */
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
-  size_t spikeiter=0;           /* Number of iterations for spike detection */
+  size_t spikebox=0;            /* Box size for spike detection */
   double spikethresh=0;         /* Threshold for spike detection */
   size_t tstride;               /* time slice stride */
   double *var=NULL;             /* Sample variance */
@@ -200,7 +201,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     smf_get_cleanpar( kmap, NULL, &dcfitbox, &dcmaxsteps, &dcthresh,
                       &dcsmooth, NULL, &fillgaps, NULL,
                       NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-                      &spikethresh, &spikeiter, NULL, status );
+                      &spikethresh, &spikebox, NULL, status );
   }
 
   /* Initialize chisquared */
@@ -256,13 +257,10 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         /* Flag spikes in the residual after first iteration */
         if( spikethresh && !(flags&SMF__DIMM_FIRSTITER) ) {
           /* Now re-flag */
-          smf_flag_spikes( wf, res->sdata[idx], var, SMF__Q_MOD,
-                           spikethresh, spikeiter,
-                           100, &aiter, &nflag, status );
-
-          msgOutiff(MSG__VERB," ",
-                    "   flagged %zu new %lf-sig spikes in %zu "
-                    "iterations", status, nflag, spikethresh, aiter);
+          smf_flag_spikes2( wf, res->sdata[idx], SMF__Q_MOD,
+                           spikethresh, spikebox, &nflag, status );
+          msgOutiff(MSG__VERB," ", "   flagged %zu new %lf-sig spikes",
+                    status, nflag, spikethresh );
         }
 
         if( dcthresh && dcfitbox ) {

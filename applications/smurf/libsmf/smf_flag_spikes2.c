@@ -581,8 +581,9 @@ void smf_flag_spikes2( smfWorkForce *wf, smfData *data, smf_qual_t mask,
    size_t step;                /* step size for dividing up work */
    int njobs=0;                /* Number of jobs to be processed */
 
-/* Check inherited status */
-   if( *status != SAI__OK ) return;
+/* Check inherited status. Also return immediately if no spike flagging
+   is to be performed. */
+   if( *status != SAI__OK || thresh == 0.0 ) return;
 
 /* How many threads do we get to play with */
    nw = wf ? wf->nworker : 1;

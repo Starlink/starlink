@@ -473,8 +473,8 @@
 *       Number of samples of padding to add to end before filtering.
 *     SPIKETHRESH = REAL
 *       Threshold S/N to flag spikes using sigma-clipper.
-*     SPIKEITER = INTEGER
-*       Number of iterations for sigma-clipper (0=repeat to convergence).
+*     SPIKEBOX = INTEGER
+*       The size of the sigma-clipper filter box.
 *
 *     iii) Parameters controlling the calculation of model components.
 *
@@ -616,10 +616,10 @@
 *       If NOI specified, flag new spikes in the residual after each iteration
 *       before measuring noise. This is the S/N threshold for detecting
 *       spikes with sigma-clipper.
-*     NOI.SPIKEITER = INTEGER
+*     NOI.SPIKEBOX = INTEGER
 *       If NOI specified, flag new spikes in the residual after each iteration
-*       before measuring noise. This value gives the number of iterations for
-*       the sigma clipper, or 0 to iterate to convergence.
+*       before measuring noise. This value gives the size of the filter
+*       box for the sigma clipper.
 *     PLN.NOTFIRST = LOGICAL
 *       If true the PLN model will not be executed in the first iteration.
 *     SMO.BOXCAR = INTEGER

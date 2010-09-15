@@ -70,7 +70,7 @@ com.offset_is_zero = 1
 
 # weaker spike detection
 noi.spikethresh = 50
-noi.spikeiter = 0
+noi.spikebox = 50
 
 # Switch off apodisation in the FLT model
 flt.apod = 0

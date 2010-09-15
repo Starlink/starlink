@@ -134,8 +134,8 @@
 *       below which the telescope is considered to be stationary.
 *     ORDER = INTEGER
 *       Subtract a fitted baseline polynomial of this order (0 to remove mean).
-*     SPIKEITER = INTEGER
-*       Number of iterations for sigma-clipper (0=repeat to convergence).
+*     SPIKEBOX = INTEGER
+*       The size of the filter box for the sigma-clipper.
 *     SPIKETHRESH = REAL
 *       Threshold S/N to flag spikes using sigma-clipper.
 

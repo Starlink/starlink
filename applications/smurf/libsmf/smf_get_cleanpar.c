@@ -19,7 +19,7 @@
 *                       double *filt_edgelow, double *filt_edgehigh,
 *                       double *filt_notchlow, double *filt_notchhigh,
 *                       int *filt_nnotch, int *dofilt, double *flagstat,
-*                       int *order, double *spikethresh, size_t *spikeiter,
+*                       int *order, double *spikethresh, size_t *spikebox,
 *                       double * noiseclip, int *status )
 
 *  Arguments:
@@ -67,9 +67,8 @@
 *        Fit and remove polynomial baselines of this order (NULL:-1)
 *     spikethresh = double* (Returned)
 *        Flag spikes SPIKETHRESH-sigma away from mean (NULL:0)
-*     spikeiter = size_t* (Returned)
-*        If 0 iteratively find spikes until convergence. Otherwise
-*        execute precisely this many iterations (NULL:0)
+*     spikebox = size_t* (Returned)
+*        The size of the filter box used for flagging spikes.
 *     noiseclip = double * (Returned)
 *        Number of standard deviations to clip the upper bound
 *        of a noise distribution in order to generate a bad bolometer
@@ -113,6 +112,8 @@
 *        Add noiseclip parameter.
 *     2010-09-10 (DSB):
 *        Remove dclimcorr, and rename dcmedianwidth as dcsmooth.
+*     2010-09-15 (DSB):
+*        Change spikeiter argument to spikebox.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -167,7 +168,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac, dim_t *dcfitbox,
                        double *filt_edgehigh, double *filt_notchlow,
                        double *filt_notchhigh, int *filt_nnotch, int *dofilt,
                        double *flagstat, int *order, double *spikethresh,
-                       size_t *spikeiter, double * noiseclip, int *status ) {
+                       size_t *spikebox, double * noiseclip, int *status ) {
 
   int dofft=0;                  /* Flag indicating that filtering is required */
   int f_nnotch=0;               /* Number of notch filters in array */
@@ -375,18 +376,18 @@ void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac, dim_t *dcfitbox,
                *spikethresh );
   }
 
-  if( spikeiter ) {
-    *spikeiter = 0;
-    if( astMapGet0I( keymap, "SPIKEITER", &temp ) ) {
+  if( spikebox ) {
+    *spikebox = 0;
+    if( astMapGet0I( keymap, "SPIKEBOX", &temp ) ) {
       if( temp < 0 ) {
         *status = SAI__ERROR;
-        errRep(FUNC_NAME, "spikeiter cannot be < 0.", status );
+        errRep(FUNC_NAME, "spikebox cannot be < 0.", status );
       } else {
-        *spikeiter = (size_t) temp;
+        *spikebox = (size_t) temp;
       }
     }
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": SPIKEITER=%zu", status,
-               *spikeiter );
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": SPIKEBOX=%zu", status,
+               *spikebox );
   }
 
   if( noiseclip ) {

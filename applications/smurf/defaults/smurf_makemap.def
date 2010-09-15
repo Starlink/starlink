@@ -167,7 +167,7 @@ noi.dcthresh = 25.0
 noi.dcsmooth = 50
 noi.fillgaps = 1
 noi.spikethresh = 0
-noi.spikeiter = 0
+noi.spikebox = 50
 
 # Plane fitting
 

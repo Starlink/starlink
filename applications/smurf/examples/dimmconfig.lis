@@ -145,8 +145,8 @@ dcsmooth = 50
 # S/N ratio to flag spikes with sigma-clipper
 # spikethresh = 5
 
-# Number of iterations for sigma-clipper (0=until convergence)
-# spikeiter = 0
+# Size of filter box for sigma-clipper
+# spikebox = 50
 
 # Fill vicinity of spikes / DC steps with constrained realization of
 # noise
@@ -197,7 +197,7 @@ cleandk.fillgaps = 1
 #cleandk.filt_notchhigh = <undef>
 cleandk.order = 0
 #cleandk.spikethresh = 0
-#cleandk.spikeiter = 0
+#cleandk.spikebox = 50
 
 # ----------------------------------------------------------------------------
 # These parameters control the iterative model components
@@ -253,14 +253,10 @@ dks.boxcar = 100
 dks.replacebad = 0
 
 # additional despiking / DC step finding after each iteration within noi
-# calculation. Setting noi.spikeiter to 10050 will check for excursions
-# from a rolling median filter in a box length (10050-10000 = 50) samples
-# long. If we instead set noi.spikeiter to something < 10000 it will
-# look for excursions from the mean, where the value is the number of
-# iterations to use when identifying spikes (0 means repeat until
-# convergence...).
+# calculation. Setting noi.spikebox to 50 will check for excursions
+# from a rolling median filter in a box of length 50 samples.
 noi.spikethresh = 10
-noi.spikeiter = 10050
+noi.spikebox = 50
 noi.fillgaps = 1
 
 # explicitly turn off iterative DC step finding for now

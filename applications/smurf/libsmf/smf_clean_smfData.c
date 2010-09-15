@@ -37,7 +37,7 @@
 *
 *     Sync Quality : BADFRAC
 *     DC steps     : DCFITBOX, DCMAXSTEPS, DCTHRESH, DCSMOOTH
-*     Flag spikes  : SPIKETHRESH, SPIKEITER
+*     Flag spikes  : SPIKETHRESH, SPIKEBOX
 *     Slew speed   : FLAGSTAT
 *     Dark squids  : DKCLEAN
 *     Gap filling  : FILLGAPS
@@ -63,6 +63,8 @@
 *        Move apodisation to smf_filter_execute.
 *     2010-09-10 (DSB):
 *        Change smf_fix_steps argument list.
+*     2010-09-15 (DSB):
+*        Call smf_flag_spikes2 instead of smf_flag_spikes.
 
 *  Copyright:
 *     Copyright (C) 2010 Univeristy of British Columbia.
@@ -107,7 +109,6 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data,
                         AstKeyMap *keymap, int *status ) {
 
   /* Local Variables */
-  size_t aiter;             /* Actual iterations of sigma clipper */
   double badfrac;           /* Fraction of bad samples to flag bad bolo */
   dim_t dcfitbox;           /* width of box for measuring DC steps */
   int dcmaxsteps;           /* number of DC steps/min. to flag bolo bad */
@@ -122,7 +123,7 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data,
   double noiseclip = 0;     /* Sigma clipping based on noise */
   int order;                /* Order of polynomial for baseline fitting */
   double spikethresh;       /* Threshold for finding spikes */
-  size_t spikeiter=0;       /* Number of iterations for spike finder */
+  size_t spikebox=0;        /* Box size for spike finder */
   struct timeval tv1, tv2;  /* Timers */
 
   /* Main routine */
@@ -150,7 +151,7 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data,
   smf_get_cleanpar( keymap, &badfrac, &dcfitbox, &dcmaxsteps,
                     &dcthresh, &dcsmooth, &dkclean,
                     &fillgaps, NULL, NULL, NULL, NULL, NULL, NULL,
-                    &flagstat, &order, &spikethresh, &spikeiter, &noiseclip,
+                    &flagstat, &order, &spikethresh, &spikebox, &noiseclip,
                     status );
 
   /* Update quality by synchronizing to the data array VAL__BADD values */
@@ -182,10 +183,9 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data,
   /* Flag Spikes */
   if( spikethresh ) {
     msgOutif(MSG__VERB," ", FUNC_NAME ": flag spikes...", status);
-    smf_flag_spikes( wf, data, NULL, SMF__Q_FIT, spikethresh, spikeiter,
-                     100, &aiter, &nflag, status );
-    msgOutiff(MSG__VERB,"", FUNC_NAME ": ...found %zd in %zd iterations",
-              status, nflag, aiter );
+    smf_flag_spikes2( wf, data, SMF__Q_FIT, spikethresh, spikebox,
+                     &nflag, status );
+    msgOutiff(MSG__VERB,"", FUNC_NAME ": ...found %zd", status, nflag );
 
     /*** TIMER ***/
     msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ":   ** %f s flagging spikes",

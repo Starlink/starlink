@@ -60,6 +60,6 @@ com.gain_box = 600000
 
 # Don't do any extra de-spiking / step finding iteratively
 noi.spikethresh = 0
-noi.spikeiter = 0
+noi.spikebox = 0
 noi.dcfitbox = 0
 noi.fillgaps = 0

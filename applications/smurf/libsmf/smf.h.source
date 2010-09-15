@@ -377,6 +377,8 @@
  *        Add smf_write_bolomap, smf_write_shortmap
  *     2010-08-31 (EC):
  *        Add smf_dataOrder_array
+ *     2010-09-15 (DSB):
+ *        Remove  smf_flag_spikes.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -981,11 +983,6 @@ int smf_fix_metadata_acsis( msglev_t msglev, smfData * data, int have_fixed,
 
 int smf_fix_metadata_scuba2( msglev_t msglev, smfData * data, int have_fixed,
                              int *ncards, int * status );
-
-void smf_flag_spikes( smfWorkForce *wf, smfData *data, double *bolovar,
-                      smf_qual_t mask, double thresh, size_t niter,
-                      size_t maxiter, size_t *aiter, size_t *nflagged,
-                      int *status );
 
 void smf_flag_spikes2( smfWorkForce *wf, smfData *data, smf_qual_t mask,
                        double thresh, size_t box, size_t *nflagged,
