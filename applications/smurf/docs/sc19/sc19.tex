@@ -29,6 +29,8 @@
 %        observing
 %    2010-07-13 (TJ):
 %        New sc2clean interface.
+%    2010-09-16 (DSB):
+%        Update to describe new step finder.
 %     {Add further history here}
 %
 % -
@@ -913,19 +915,22 @@ be identified and repaired using some extra parameters to \clean:
 \begin{myquote}
 \begin{verbatim}
 % sc2clean s4a20091214_00015_0002_con.sdf clean2 \
-   config='"order=0,dcfitbox=400,dcthresh=5,fillgaps=1"'
+   config='"order=0,dcfitbox=30,dcthresh=25,dcsmooth=50,fillgaps=1"'
 \end{verbatim}
 \end{myquote}
 
 In addition to removing the mean as in the previous example, the extra
-parameters starting with `dc' instruct \clean\ to look for steps in
-the data in excess of 5-$\sigma$, comparing two consecutive boxcar
-averages of length 400 samples.  Finally, `fillgaps' indicates that
-the data range around the identified steps ($\pm 400$ samples in this
-case) should be replaced with a constrained (smooth) realisation of
-noise to avoid introducing spikes into the data stream (these ranges
-are ultimately ignored when producing final maps). A map produced from
-`clean2.sdf' is shown in Fig.~\ref{fig:map_dc_mean}.
+parameters starting with `dc' instruct \clean\ to smooth the data with a
+median filter of width 50 samples, and then look for steps in the
+smoothed data in excess of 25-$\sigma$. The heights of steps found in
+this way are measured by fitting straight lines to the smoothed data on
+either side of the jump using 30 samples in each fit. The corrections
+thus determiend are applied to the original bolometer data.  Finally,
+`fillgaps' indicates that the data range around the identified steps
+($\pm 400$ samples in this case) should be replaced with a constrained
+(smooth) realisation of noise to avoid introducing spikes into the data
+stream (these ranges are ultimately ignored when producing final maps). A
+map produced from `clean2.sdf' is shown in Fig.~\ref{fig:map_dc_mean}.
 
 \begin{figure}
 \begin{center}
@@ -1026,9 +1031,9 @@ configuration options:
 \begin{myquote}
 \begin{verbatim}
 order=0
-dcfitbox=400
-dcthresh=5
-dcmedianwidth=40
+dcfitbox=30
+dcthresh=25
+dcsmooth=50
 fillgaps=1
 apod=1000
 filt_edgehigh=0.5
@@ -2430,7 +2435,7 @@ gradient caused problems biasing bolometers.
 \end{figure}
 
 The range of the mean value in the map is very large: from $-$28 to
-30. An inspection of the cube shows that much of this is cwaused by
+30. An inspection of the cube shows that much of this is caused by
 differing DC levels across the bolometers. The DC term can be removed
 using \clean\  (\mfittrend\ can be used as well). In general, for
 relatively compact sources it should be safe to remove a first order
@@ -2442,7 +2447,6 @@ series.
 % cat my_sc2clean_bsl.def
 order=1
 dcfitbox = 0
-dclimcorr = 0
 spikethresh = 0
 
 % sc2clean sc17_con sc17_conbsl config=^my_sc2clean_bsl.def
@@ -2508,10 +2512,10 @@ configuration file:\footnote{(These parameters are explained in
 \begin{verbatim}
 % cat my_sc2clean.def
 order = 1
-dcfitbox = 400
-dcthresh = 5.0
+dcfitbox = 30
+dcthresh = 25.0
 fillgaps = 1
-dcmedianwidth = 40
+dcsmooth = 50
 dclimcorr = 0
 flagstat = 0
 spikethresh = 5
