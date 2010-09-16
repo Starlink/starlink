@@ -67,6 +67,8 @@
 *        Call smf_flag_spikes2 instead of smf_flag_spikes.
 *     2010-09-15 (EC):
 *        Use smf_fit_poly directly instead of smf_scanfit
+*     2010-09-16 (EC):
+*        Further simplification since smf_fit_poly can remove the poly as well
 
 *  Copyright:
 *     Copyright (C) 2010 Univeristy of British Columbia.
@@ -236,29 +238,11 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data,
 
   /* Remove baselines */
   if( order >= 0 ) {
-    dim_t nbolo;
-    size_t ncoeff;
-    double *poly=NULL;
-
     msgOutiff( MSG__VERB,"", FUNC_NAME
                ": Fitting and removing %i-order polynomial baselines",
                status, order );
 
-    ncoeff = order+1;
-    smf_get_dims( data,  NULL, NULL, &nbolo, NULL, NULL, NULL, NULL,
-                  status );
-
-    poly = astCalloc( nbolo*ncoeff, sizeof(*poly), 1 );
-    data->ncoeff = ncoeff;
-    data->poly = poly;
-
-    smf_fit_poly( data, order, poly, status );
-    smf_subtract_poly( data, 0, status );
-
-    data->ncoeff=0;
-    data->poly = NULL;
-
-    poly = astFree( poly );
+    smf_fit_poly( data, order, 1, NULL, status );
 
     /*** TIMER ***/
     msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME

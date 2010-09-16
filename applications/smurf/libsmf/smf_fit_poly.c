@@ -13,16 +13,18 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_fit_poly( const smfData *data, const int order, double *poly,
-*                   int *status )
+*     smf_fit_poly( smfData *data, const int order, int remove,
+*                   double *poly, int *status )
 
 *  Arguments:
 *     data = smfData* (Given and Returned)
 *        Pointer to input data struct
 *     order = int (Given)
 *        Order of polynomial fit
+*     remove = int (Given)
+*        If set, remove the fitted polynomial for the data
 *     poly = double * (Returned)
-*        Polynomial fit coefficients.
+*        Buffer to store polynomial fit coefficients for all bolos. Can be NULL.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -30,7 +32,10 @@
 *     This routine fits a polynomial of arbitrary order to each
 *     bolometer time stream of N timeslices. Execution is halted with
 *     an error if the polynomial order is greater than N-1. Fitting
-*     itself is done with smf_fit_poly1d.
+*     itself is done with smf_fit_poly1d. If remove is set, the polynomial
+*     will be evaluated and removed from the input data. In this case
+*     poly may also be set to NULL in which case the coefficients are
+*     only stored in a temporary buffer long enough to remove the fit.
 
 *  Notes:
 *     This routine will fail if there is no associated QUALITY component.
@@ -58,6 +63,8 @@
 *        Use smf_get_dims
 *     2010-09-15 (EC):
 *        Switch to using smf_fit_poly1d for fitting each bolo
+*     2010-09-16 (EC):
+*        Add remove flag to remove fitted polynomials
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -111,24 +118,25 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_fit_poly"
 
-void smf_fit_poly( const smfData *data,
-                   const size_t order, double *poly, int *status) {
+void smf_fit_poly( smfData *data, const size_t order, int remove,
+                   double *poly, int *status) {
 
   /* Local variables */
   size_t bstride;             /* bolo strides */
   double *curbolo=NULL;       /* pointer to current bolo data */
   double *curpoly=NULL;       /* pointer to poly coeffs fit to curbolo */
-  dim_t i;                    /* Loop counter */
+  double *curpolydata=NULL;   /* evaluated poly for curbolo */
+  smf_qual_t *curqual=NULL;   /* pointer to current bolo quality */
+  size_t i;                   /* Loop counter */
   double *indata=NULL;        /* Pointer to data array */
-  dim_t j;                    /* Loop counter */
-  dim_t k;                    /* Loop counter */
+  size_t j;                   /* Loop counter */
+  size_t k;                   /* Loop counter */
   dim_t nbolo=0;              /* Number of bolometers */
   size_t ncoeff = 2;          /* Number of coefficients to fit for; def. line */
   dim_t ntslice = 0;          /* Number of time slices */
   size_t nused;               /* Number of samples used in fit */
   const smf_qual_t *qual=NULL;/* Pointer to QUALITY component */
   size_t tstride;             /* time strides */
-
 
   /* Check status */
   if (*status != SAI__OK) return;
@@ -147,16 +155,6 @@ void smf_fit_poly( const smfData *data,
   /* Get the dimensions */
   smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, NULL, &bstride,
                 &tstride, status);
-
-  /* Check that poly is not a NULL pointer */
-  if ( poly == NULL ) {
-    if ( *status == SAI__OK) {
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Input pointer for storing coefficients is NULL. "
-             "Possible programming error.", status);
-    }
-    return;
-  }
 
   /* Assign pointer to input data array */
   /* of course, check status on return... */
@@ -193,8 +191,16 @@ void smf_fit_poly( const smfData *data,
 
   if( data->isTordered ) {
     curbolo = astCalloc( ntslice, sizeof(*curbolo), 0 );
+    curqual = astCalloc( ntslice, sizeof(*curqual), 0 );
   }
   curpoly = astCalloc( ncoeff, sizeof(*curpoly), 0 );
+
+  /* If removing the fit from the data, allocate space for evaluated
+     polynomial here */
+
+  if( remove ) {
+    curpolydata = astCalloc( ntslice, sizeof(*curpolydata), 0 );
+  }
 
   /* Loop over bolometers. Only fit this bolometer if it is not
      flagged SMF__Q_BADB */
@@ -205,23 +211,43 @@ void smf_fit_poly( const smfData *data,
       if( data->isTordered ) {
         for( i=0; i<ntslice; i++ ) {
           curbolo[i] = indata[i*tstride + j*bstride];
+          curqual[i] = qual[i*tstride + j*bstride];
         }
       } else {
         curbolo = indata + j*bstride;
+        curqual = (smf_qual_t *) qual + j*bstride;
       }
 
-      smf_fit_poly1d( order, ntslice, 0, NULL, curbolo, NULL, curpoly, NULL,
-                      NULL, &nused, status );
+      smf_fit_poly1d( order, ntslice, 0, NULL, curbolo, NULL, curqual, curpoly,
+                      NULL, curpolydata, &nused, status );
 
-      /* Copy the poly coefficients for this bolometer into poly */
-      for ( k=0; k<ncoeff; k++) {
-        poly[j + k*nbolo] = curpoly[k];
+      if( *status == SAI__OK ) {
+        /* Remove fit from data */
+        if( remove ) {
+          for( i=0; i<ntslice; i++ ) {
+            if( (indata[i*tstride + j*bstride] != VAL__BADD) &&
+                !(qual[j*bstride + i*tstride]&SMF__Q_MOD) ) {
+              indata[i*tstride + j*bstride] -= curpolydata[i];
+            }
+          }
+        }
+
+        /* Copy the poly coefficients for this bolometer into poly */
+        if( poly ) {
+          for ( k=0; k<ncoeff; k++) {
+            poly[j + k*nbolo] = curpoly[k];
+          }
+        }
       }
+
     }
   }
 
   /* Free up temp space */
-  if( data->isTordered ) curbolo = astFree( curbolo );
-  curpoly = astFree( curpoly );
-
+  if( data->isTordered ) {
+    if( curbolo ) curbolo = astFree( curbolo );
+    if( curqual ) curqual = astFree( curqual );
+  }
+  if( curpoly ) curpoly = astFree( curpoly );
+  if( curpolydata ) curpolydata = astFree( curpolydata );
 }

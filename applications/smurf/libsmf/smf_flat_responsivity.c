@@ -242,7 +242,8 @@ size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snr
         size_t nused;
 
         /* Now fit a polynomial */
-        smf_fit_poly1d( order, nrgood, 5.0, powv, bolv, bolvv, coeffs, varcoeffs, poly, &nused, status );
+        smf_fit_poly1d( order, nrgood, 5.0, powv, bolv, bolvv, NULL, coeffs,
+                        varcoeffs, poly, &nused, status );
 
         /* we take the responsivity to be the gradient at the middle heater setting */
         for (k=1; k<order+1; k++) {

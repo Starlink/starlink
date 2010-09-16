@@ -15,9 +15,10 @@
 *  Invocation:
 *     void smf_fit_poly1d ( size_t order, size_t nelem, double clip,
 *                           const double x[], const double y[],
-*                           const double vary[], double coeffs[],
-*                           double varcoeffs[], double polydata[],
-*                           size_t *nused, int * status );
+*                           const double vary[], const smf_qual_t qual[],
+*                           double coeffs[], double varcoeffs[],
+*                           double polydata[], size_t *nused,
+*                           int *status );
 
 *  Arguments:
 *     order = size_t (Given)
@@ -37,6 +38,8 @@
 *        The data to fit. Must be of size nelem.
 *     vary = const double [] (Given)
 *        Variance of supplied data. Can be NULL for unweighted fit.
+*     qual = const smf_qual_t [] (Given)
+*        Optional array of quality with nelem elements. Can be NULL.
 *     coeffs = double [] (Given & Returned)
 *        Buffer of size order+1 to receive the coefficients of the fit.
 *     varcoeffs = double [] (Given & Returned)
@@ -58,6 +61,7 @@
 
 *  Notes:
 *     o Can handle bad values. A bad variance will result in zero weight.
+*     o If qual supplied, will use SMF__Q_FIT as a bitmask.
 
 *  Authors:
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -74,7 +78,8 @@
 *     2010-02-05 (TIMJ):
 *        Add iterative sigma-clipping.
 *     2010-09-15 (EC):
-*        Added special-case code for 0th order polynomial
+*        -Added special-case code for 0th order polynomial
+*        -Added quality to interface
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -116,14 +121,16 @@
 #include "gsl/gsl_multifit.h"
 
 void smf__fit_poly1d ( size_t order, size_t nelem, const double x[],
-                       const double y[], const double vary[], double coeffs[],
+                       const double y[], const double vary[],
+                       const smf_qual_t qual[], double coeffs[],
                        double varcoeffs[], double polydata[], size_t *nused,
                        double * rchisq, int *status );
 
 
 
 void smf_fit_poly1d ( size_t order, size_t nelem, double clip, const double x[],
-                      const double y[], const double vary[], double coeffs[],
+                      const double y[], const double vary[],
+                      const smf_qual_t qual[], double coeffs[],
                       double varcoeffs[], double polydata[], size_t * nused,
                       int *status ) {
   size_t i;
@@ -140,8 +147,8 @@ void smf_fit_poly1d ( size_t order, size_t nelem, double clip, const double x[],
 
   if ( clip <= 0.0 ) {
 
-    smf__fit_poly1d ( order, nelem, x, y, vary, coeffs, varcoeffs, polydata,
-                      nused, &rchisq, status);
+    smf__fit_poly1d ( order, nelem, x, y, vary, qual, coeffs, varcoeffs,
+                      polydata, nused, &rchisq, status);
 
   } else {
     int iterating = 1;
@@ -190,8 +197,8 @@ void smf_fit_poly1d ( size_t order, size_t nelem, double clip, const double x[],
       double prevchisq = VAL__BADD;
 
       /* calculate the fit */
-      smf__fit_poly1d ( order, nelem, x, y, varptr, coeffs, varcoeffs, pptr,
-                        nused, &rchisq, status);
+      smf__fit_poly1d ( order, nelem, x, y, varptr, qual, coeffs, varcoeffs,
+                        pptr, nused, &rchisq, status);
 
       if (*nused == 0) {
         iterating = 0;
@@ -204,7 +211,7 @@ void smf_fit_poly1d ( size_t order, size_t nelem, double clip, const double x[],
       maxidx = VAL__BADI;
       for (i=0; i<nelem; i++) {
         if ( y[i] != VAL__BADD && pptr[i] != VAL__BADD && varptr[i] != VAL__BADD
-             && varptr[i] != 0.0 ) {
+             && varptr[i] != 0.0 && (qual ? !(qual[i]&SMF__Q_FIT) : 1) ) {
           resid[i] = y[i] - pptr[i];
           ngood++;
           if (resid[i] > maxresid) {
@@ -223,14 +230,16 @@ void smf_fit_poly1d ( size_t order, size_t nelem, double clip, const double x[],
         break;
       }
 
-      /* calculate the standard deviation */
-      smf_stats1D( resid, 1, nelem, NULL, 0, 0, &mean, &stdev, &ngood, status );
+      /* calculate the standard deviation. Don't need quality here because
+         resid is already VAL__BADD wherever there was bad quality */
+      smf_stats1D( resid, 1, nelem, NULL, 0, 0, &mean, &stdev, &ngood,
+                   status );
 
       /* see if any points are outside the clip range */
       thresh = clip * stdev;
       nclipped = 0;
       for ( i=0; i<nelem; i++) {
-        if (resid[i] != VAL__BADD && fabs(resid[i]) > thresh) {
+        if (resid[i] != VAL__BADD && fabs(resid[i]) > thresh ) {
           varptr[i] = VAL__BADD;
           nclipped++;
         }
@@ -252,7 +261,8 @@ void smf_fit_poly1d ( size_t order, size_t nelem, double clip, const double x[],
 /* internal implementation to simplify the iterative clipping routine */
 
 void smf__fit_poly1d ( size_t order, size_t nelem, const double x[],
-                       const double y[], const double vary[], double coeffs[],
+                       const double y[], const double vary[],
+                       const smf_qual_t qual[], double coeffs[],
                        double varcoeffs[], double polydata[], size_t *nused,
                        double * rchisq, int *status ) {
 
@@ -264,14 +274,6 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[],
 
   /* initialise to bad in smf_fit_poly1d itself*/
   if (*status != SAI__OK) return;
-
-  /*
-  if (order == 0) {
-    *status = SAI__ERROR;
-    errRep( "", "smf_fit_poly1d does not calculate a simple mean", status );
-    return;
-  }
-  */
 
   if (order >= nelem) {
     *status = SAI__ERROR;
@@ -306,7 +308,8 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[],
 
       /* weighted average */
       for (i = 0; i < nelem; i++) {
-        if ( vary[i] != VAL__BADD && y[i] != VAL__BADD && vary[i] != 0.0 ) {
+        if ( vary[i] != VAL__BADD && y[i] != VAL__BADD && vary[i] != 0.0 &&
+             (qual ? !(qual[i]&SMF__Q_FIT) : 1) ) {
           w = 1.0 / vary[i];
           sumweight += w;
           sumweight_valsq += w*y[i]*y[i];
@@ -323,7 +326,8 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[],
 
         /* Calculate sum of residuals^2 */
         for (i = 0; i < nelem; i++) {
-          if ( vary[i] != VAL__BADD && y[i] != VAL__BADD && vary[i] != 0.0 ){
+          if ( vary[i] != VAL__BADD && y[i] != VAL__BADD && vary[i] != 0.0 &&
+               (qual ? !(qual[i]&SMF__Q_FIT) : 1) ) {
             res_sq += (y[i]-mean)*(y[i]-mean)/vary[i];
           }
         }
@@ -338,7 +342,8 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[],
       double variance;
 
       /* simple average */
-      smf_stats1D( y, 1, nelem, NULL, 1, 0, &mean, &sigma, &nrgood, status );
+      smf_stats1D( y, 1, nelem, qual, 1, SMF__Q_FIT, &mean, &sigma, &nrgood,
+                   status );
 
       if( (*status == SAI__OK) && (nrgood > 0) ) {
         /* Convert population error to variance on the mean */
@@ -350,7 +355,7 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[],
 
         /* Calculate sum of residuals^2 */
         for( i=0; i<nelem; i++ ) {
-          if( y[i] != VAL__BADD ) {
+          if( y[i] != VAL__BADD && (qual ? !(qual[i]&SMF__Q_FIT) : 1) ) {
             res_sq += (y[i]-mean)*(y[i]-mean)/variance;
           }
         }
@@ -398,7 +403,7 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[],
       /* weighted fit */
       for (i = 0; i < nelem; i++) {
         if ( vary[i] == VAL__BADD || y[i] == VAL__BADD || xx[i] == VAL__BADD ||
-             vary[i] == 0.0 ) {
+             vary[i] == 0.0 || (qual ? (qual[i]&SMF__Q_FIT) : 0) ) {
           w[i] = 0.0;
         } else {
           w[i] = 1.0 / vary[i];
@@ -418,7 +423,8 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[],
       double * fy = astCalloc( nelem, sizeof(*fy), 0 );
 
       for (i = 0; i < nelem; i++) {
-        if ( xx[i] != VAL__BADD && y[i] != VAL__BADD ) {
+        if ( xx[i] != VAL__BADD && y[i] != VAL__BADD &&
+             (qual ? !(qual[i]&SMF__Q_FIT) : 1) ) {
           fx[nrgood] = xx[i];
           fy[nrgood] = y[i];
           nrgood++;
@@ -523,7 +529,9 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[],
         gsl_vector_set( Y, i, y[i] );
 
         /* weight - this is where we handle bad values */
-        if (y[i] == VAL__BADD || xx[i] == VAL__BADD) {
+        if( qual ? (qual[i]&SMF__Q_FIT) : 0 ) {
+          w = 0.0;
+        } else if (y[i] == VAL__BADD || xx[i] == VAL__BADD) {
           w = 0.0;
         } else if (vary) {
           if ( vary[i] == VAL__BADD || vary[i] == 0.0 ) {

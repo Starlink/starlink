@@ -230,7 +230,7 @@ void smf_scanfit( smfData *data, size_t order, int *status ) {
   /*    sc2math_fitsky ( cliptype, nbol, nframes, ncoeff, (data->pntr)[0],
 	poly, status );*/
 
-  smf_fit_poly ( data, order, poly, status );
+  smf_fit_poly ( data, order, 0, poly, status );
   if ( *status != SAI__OK ) {
     errRep(FUNC_NAME, "Unable to carry out scanfit", status);
   }
