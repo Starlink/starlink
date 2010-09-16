@@ -242,7 +242,7 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data,
                ": Fitting and removing %i-order polynomial baselines",
                status, order );
 
-    smf_fit_poly( data, order, 1, NULL, status );
+    smf_fit_poly( wf, data, order, 1, NULL, status );
 
     /*** TIMER ***/
     msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
