@@ -125,7 +125,13 @@ flagstat = 2
 
 # --- Many of the following may not be useful ---
 
-# S/N threshold to detect DC steps
+# S/N threshold to detect DC steps. Note, this refers to the noise level
+# in the bolometer data after it has been smoothed with a median filter of
+# width given by DCSMOOTH. In order to find the equivalent threshold in
+# the unsmoothed data, multiply the DCTHRESH value by # 1.25/sqrt(DCSMOOTH).
+# For instance, the default values for DCSMOOTH (50) and DCTHRESH (25)
+# correspond to a threshold of 25*1.25/sqrt(50) = 4.4 sigma in the
+# unsmoothed data.
 dcthresh = 25.0
 
 # box size over which to fit data with a straight line on either side of
