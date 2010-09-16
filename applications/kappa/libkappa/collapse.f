@@ -1161,6 +1161,8 @@
 *  (in which case no work space is needed).
             IF ( HIGHER ) THEN
                CALL PSX_CALLOC( EL2 * AEL, ITYPE, IPW3, STATUS )
+            ELSE
+               IPW3 = IPIN( 1 )              	
             END IF
 
 *  Obtain the double-precision co-ordinate centres along the collapse
