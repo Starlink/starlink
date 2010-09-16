@@ -76,6 +76,7 @@ smf_construct_smfDA.c \
 smf_construct_smfData.c \
 smf_construct_smfDream.c \
 smf_construct_smfFile.c \
+smf_construct_smfFts.c \
 smf_construct_smfGroup.c \
 smf_construct_smfHead.c \
 smf_convert_bad.c \
@@ -91,6 +92,7 @@ smf_create_smfData.c \
 smf_create_smfDream.c \
 smf_create_smfFile.c \
 smf_create_smfFilter.c \
+smf_create_smfFts.c \
 smf_create_smfHead.c \
 smf_create_tswcs.c \
 smf_cso2filt_tau.c \
@@ -102,6 +104,7 @@ smf_deepcopy_smfDA.c \
 smf_deepcopy_smfData.c \
 smf_deepcopy_smfFile.c \
 smf_deepcopy_smfHead.c \
+smf_deepcopy_smfFts.c \
 smf_detmask.c \
 smf_detpos_wcs.c \
 smf_difftime.c \

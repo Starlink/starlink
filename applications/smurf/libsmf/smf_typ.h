@@ -23,6 +23,7 @@
  *     Tim Jenness (JAC)
  *     Ed Chapin (UBC)
  *     David Berry (JAC, UCLan)
+ *     Coskun Oba (COBA, UoL)
  *     {enter_new_authors_here}
 
  *  History:
@@ -169,6 +170,10 @@
  *        Add SMF__SMO model.
 *     2010-06-08 (EC):
 *        Add SMF__TWO model.
+*     2010-09-16 (COBA):
+*        - Add smfFts
+*        - Create SMF__NOCREATE_FTS
+*        - Update smfData
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -397,7 +402,8 @@ typedef enum {
   SMF__NOCREATE_QUALITY  = BIT_TO_VAL(5),  /* If !SMF__NOCREATE_DATA don't map QUALITY */
   SMF__NOCREATE_LUT      = BIT_TO_VAL(6),  /* Don't open pointing LUT */
   SMF__NOFIX_METADATA    = BIT_TO_VAL(7),  /* Do not fix up metadata */
-  SMF__NOTTSERIES        = BIT_TO_VAL(8)   /* File is not time series data */
+  SMF__NOTTSERIES        = BIT_TO_VAL(8),  /* File is not time series data */
+  SMF__NOCREATE_FTS      = BIT_TO_VAL(9)   /* Don't open FTS data */
 } smf_open_file_flags;
 
 /* Flags for smf_open_newfile
@@ -591,6 +597,16 @@ typedef struct smfDA {
   struct smfData *dksquid;   /* dark squid for each column */
 } smfDA;
 
+/* Structure containing data computed by FTS2 pipeline operations */
+typedef struct smfFts
+{
+  struct smfData* fpm;       /* Coefficitients of the fitting polynomial for 
+                              * each bolometer in the subarray, 
+                              * [m x n x p] dimensional data */
+  struct smfData* sigma;     /* Standard deviations obtained for each bolometer
+                              * in the subarray, [m x n] dimensional data */
+} smfFts;
+
 /* This struct stores DREAM parameters */
 typedef struct smfDream {
   size_t nvert;              /* Number of jiggle vertices */
@@ -617,6 +633,7 @@ typedef struct smfData {
   smfHead * hdr;             /* Header information */
   smfDA * da;                /* If sc2store, associated data arrays */
   smfDream *dream;           /* DREAM parameters */
+  smfFts* fts;               /* FTS2 specific information */
   smf_dtype dtype;           /* Data type of DATA and VARIANCE arrays */
   void * pntr[2];            /* Array of pointers to DATA/VARIANCE/QUALITY */
   smf_qual_t * qual;         /* Pointer for quality information */
