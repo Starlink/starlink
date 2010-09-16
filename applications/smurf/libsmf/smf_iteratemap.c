@@ -538,7 +538,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
      Parse the CONFIG parameters stored in the keymap, and set up
      defaults for the map-maker. We assume that all variables have
      been given defaults through the .def file.
-  **************************************************************************** */
+  *************************************************************************** */
 
   if( *status == SAI__OK ) {
     /* Number of iterations */
@@ -822,11 +822,11 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
 
 
-  /* ****************************************************************************
+  /* ***************************************************************************
      Figure out how the data are split up, both in terms of continuous
      pieces of data in time, and in terms of the number of subarrays. Divide
      up the chunks, as needed, to fit in the available memory.
-  **************************************************************************** */
+  *************************************************************************** */
 
   /* Create an ordered smfGrp which keeps track of files corresponding
      to different subarrays (observed simultaneously), as well as
@@ -958,7 +958,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
 
 
-  /* ****************************************************************************
+  /* ***************************************************************************
      Start the main outer loop over continuous chunks, or "contchunks".
 
      There are two loops over files apart from the iteration
@@ -970,7 +970,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
      machines; those are called "filegroups". In this latter case
      makemap does lots of file i/o, gives a poorer map solution, but
      runs with less memory.
-  **************************************************************************** */
+  *************************************************************************** */
 
   for( contchunk=0; contchunk<ncontchunks; contchunk++ ) {
 
@@ -1210,7 +1210,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     }
 
     /*** TIMER ***/
-    msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ": ** %f s creating dynamic models",
+    msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME": ** %f s creating dynamic models",
                status, smf_timerupdate(&tv1,&tv2,status) );
 
     if( *status == SAI__OK ) {
@@ -1260,7 +1260,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
 
 
-      /* ************************************************************************
+      /* ***********************************************************************
          Start the main iteration loop.
 
          At this stage the full pointing solution for the data in this
@@ -1268,7 +1268,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
          containers have been created. This loop stops either if chi^2
          has converged, or we did the requested number of iterations,
          for this continuous chunk.
-      ************************************************************************ */
+      *********************************************************************** */
 
       quit = 0;
       iter = 0;
@@ -1290,12 +1290,12 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
 
 
-        /* **********************************************************************
+        /* *********************************************************************
            Start the inner loop over filegroups, and the calculation of
            all the model components up to AST (including models that follow
            AST in modelorder, and then wrapping back around to the beginning).
            There is only a single pass through this loop if memiter=1.
-        ********************************************************************** */
+        ********************************************************************* */
 
         for( i=0; i<nfilegroups; i++ ) {
 
@@ -1661,7 +1661,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
 
 
-        /* **********************************************************************
+        /* *********************************************************************
            Calculate the AST model component.
 
            When we get here we have calculated all of the model components up
@@ -1670,7 +1670,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
            and a map has been estimated. So, we are now in a position to
            take the current estimate of the map and project it back into
            the time domain to estimate the new AST.
-        ********************************************************************** */
+        ********************************************************************* */
 
         if( *status == SAI__OK ) {
           msgOut(" ", FUNC_NAME ": Calculate ast", status);
@@ -1787,7 +1787,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
 
 
-      /* ************************************************************************
+      /* ***********************************************************************
          The continous chunk has finished.
 
          The model components for this continuous chunk have converged.
@@ -1797,7 +1797,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
          We also add the map estimated from this contchunk to those from
          previous contchunks if necessary.
-      ************************************************************************ */
+      *********************************************************************** */
 
       /* Create sub-maps for each bolometer if requested. We add AST back
          into the residual, and rebin that single for each detector that
@@ -2070,13 +2070,13 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
     if( *status == SMF__INSMP ) {
       errAnnul( status );
-      msgOut("", " ************************* Warning! *************************",
+      msgOut(""," ************************* Warning! *************************",
              status );
-      msgOut("", " This continuous chunk failed due to insufficient samples.",
+      msgOut(""," This continuous chunk failed due to insufficient samples.",
               status );
-      msgOut("", " This is often due to strict bad-bolo flagging.", status );
-      msgOut("", " Annuling the bad status and trying to continue...", status);
-      msgOut("", " ************************************************************",
+      msgOut(""," This is often due to strict bad-bolo flagging.", status );
+      msgOut(""," Annuling the bad status and trying to continue...", status);
+      msgOut(""," ************************************************************",
              status );
     } else {
       /* In the multiple contchunk case, add this map to the total if
@@ -2101,10 +2101,10 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
 
 
-    /* **************************************************************************
+    /* *************************************************************************
        Clean up temporary resources associated with this continuous chunk
        before continuing in the outer loop.
-    ************************************************************************** */
+    ************************************************************************* */
 
     /* Cleanup things used specifically in this contchunk */
     if( !memiter && deldimm ) {
@@ -2246,12 +2246,12 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
 
 
-  /* ****************************************************************************
+  /* ***************************************************************************
      Final cleanup
 
      We have finished the outermost loop over continuous chunks. Free
      all of the memory we allocated.
-  **************************************************************************** */
+  *************************************************************************** */
 
   /* Report the total number of effective bolometers */
   if (nboloeff) *nboloeff = 0.0;
