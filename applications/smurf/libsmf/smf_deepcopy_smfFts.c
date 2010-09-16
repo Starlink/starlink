@@ -106,7 +106,7 @@ smf_deepcopy_smfFts(const smfData* old, int* status)
               SMF__NOCREATE_FILE |
               SMF__NOCREATE_DA |
               SMF__NOCREATE_FTS, 
-              status);
+              0, 0, status);
   }
   if(oldFts->sigma) {
     sigma = smf_deepcopy_smfData(
@@ -116,7 +116,7 @@ smf_deepcopy_smfFts(const smfData* old, int* status)
               SMF__NOCREATE_FILE |
               SMF__NOCREATE_DA |
               SMF__NOCREATE_FTS,  
-              status);
+              0, 0, status);
   }
   
   newFts = smf_construct_smfFts(newFts, fpm, sigma, status);
