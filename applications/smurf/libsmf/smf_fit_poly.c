@@ -360,7 +360,7 @@ void smf_fit_poly( smfWorkForce *wf, smfData *data, const size_t order,
      pdata->tstride = tstride;
    }
 
-  /* Submit jobs to find spikes in each block of bolos */
+  /* Submit jobs to fit polynomial baselines to block of bolos */
   smf_begin_job_context( wf, status );
   for( i=0; (*status==SAI__OK)&&i<njobs; i++ ) {
     pdata = job_data + i;
