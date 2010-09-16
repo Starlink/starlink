@@ -131,6 +131,8 @@
 *        Add SC2EXPANDMODEL
 *     2010-07-19 (COBA):
 *        Add FTS2_FREQCORR, FTS2_REMOVEBSE, FTS2_SPATIALWCS
+*     2010-09-16 (EC):
+*        SCANFIT deprecated in favour of SC2CLEAN and KAPPA:MFITTREND
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -307,8 +309,6 @@ void smurf_mon( int * status ) {
     smurf_sc2sim( status );
   } else if (strcmp( taskname, "SC2THREADTEST" ) == 0 ) {
     smurf_sc2threadtest( status );
-  } else if (strcmp( taskname, "SCANFIT" ) == 0 ) {
-    smurf_scanfit( status );
   } else if (strcmp( taskname, "SKYNOISE" ) == 0 ) {
     smurf_skynoise( status );
   } else if (strcmp( taskname, "SMURFCOPY" ) == 0 ) {

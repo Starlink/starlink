@@ -49,7 +49,6 @@ sc2fft \
 sc2fts \
 sc2sim \
 sc2threadtest \
-scanfit \
 skynoise \
 smurfcopy \
 smurfhelp \

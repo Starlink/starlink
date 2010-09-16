@@ -135,7 +135,6 @@ void smurf_sc2fft( int * );
 void smurf_sc2fts( int * );
 void smurf_sc2sim( int * );
 void smurf_sc2threadtest( int * );
-void smurf_scanfit( int * );
 void smurf_skynoise( int * );
 void smurf_smurfcopy( int * );
 void smurf_smurfhelp( int * );

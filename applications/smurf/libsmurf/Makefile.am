@@ -39,7 +39,6 @@ smurf_sc2fft.c \
 smurf_sc2fts.c \
 smurf_sc2sim.c \
 smurf_sc2threadtest.c \
-smurf_scanfit.c \
 smurf_skynoise.c \
 smurf_smurfcopy.c \
 smurf_smurfhelp.c \
