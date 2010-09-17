@@ -321,6 +321,10 @@ ext.taumethod =adaptive
 # Longitude, Latitude, Radius of the circle, in decimal degrees, in
 # the coordinate system of the map (e.g., RA and Dec.).
 #
+# The ast.zero_snr parameter will create a mask based on map SNR. For
+# example, if it is set to 5, after each iteration all pixels with a
+# SNR below this threshold will be set to 0.
+#
 # If ast.zero_notlast is set, on the final iteration this boundary
 # condition will not be applied. This feature will probably be useful
 # for deep point-source observations for which the large-scale noise
@@ -330,6 +334,7 @@ ext.taumethod =adaptive
 #ast.zero_circle = (70.72333,36.115,0.0083333)
 #ast.zero_lowhits = 0.1
 #ast.zero_notlast = 1
+#ast.zero_snr = 5
 
 # Smooth the time series
 

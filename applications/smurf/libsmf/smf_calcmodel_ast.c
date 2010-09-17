@@ -84,6 +84,8 @@
 *        Ensure that all models have the same ordering.
 *     2010-09-09 (EC):
 *        Add circular region zero masking (ast.zero_circle)
+*      2010-09-17 (EC):
+*        Add map SNR-based zero masking (ast.zero_snr)
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -169,6 +171,7 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)),
   double *mapweightsq = NULL;   /* Weight map squared */
   double zero_lowhits=0;        /* Zero regions with low hit count? */
   int zero_notlast=0;           /* Don't zero on last iteration? */
+  double zero_snr=0;            /* Zero regions with low SNR */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -202,7 +205,6 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)),
 
   /* Will we apply a circular boundary condition? Initialize the mask
      if it has not been previously set. */
-
   if( (astMapType( kmap, "ZERO_CIRCLE" ) != AST__BADTYPE) &&
       (dat->zeromask == NULL) ) {
 
@@ -248,6 +250,10 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)),
       circle = astAnnul( circle );
     }
   }
+
+  /* Will we apply a boundary condition based on map pixels that lie below
+     some threshold? */
+  astMapGet0D( kmap, "ZERO_SNR", &zero_snr );
 
   /* Will we apply boundary conditions on last iteration ? */
   astMapGet0I( kmap, "ZERO_NOTLAST", &zero_notlast );
@@ -296,11 +302,26 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)),
       }
     }
 
+    /* Zero regions below the cut in SNR */
+
+    if( zero_snr ) {
+      for( i=0; i<dat->msize; i++ ) {
+        if( (map[i] != VAL__BADD) && (mapvar[i] != VAL__BADD) &&
+            (mapvar[i] > 0) && (map[i]/sqrt(mapvar[i]) < zero_snr) ) {
+          map[i] = 0;
+          mapweight[i] = VAL__BADD;
+          mapweightsq[i] = VAL__BADD;
+          mapvar[i] = VAL__BADD;
+          mapqual[i] |= SMF__MAPQ_ZERO;
+          newzero ++;
+        }
+      }
+    }
+
     /* Any other boundary constraints are static. We just check for the
        existence of zeromask */
     if( dat->zeromask ) {
 
-      printf("applying zeromask\n");
       for( i=0; i<dat->msize; i++ ) {
         if( dat->zeromask[i]) {
           map[i] = 0;
