@@ -811,7 +811,7 @@ void * smf_dataOrder_array( void * oldbuf, smf_dtype dtype, size_t ndata,
                             size_t ntslice, size_t nbolo,
                             size_t tstr1, size_t bstr1,
                             size_t tstr2, size_t bstr2, int inPlace,
-                            int * status );
+                            int freeOld, int * status );
 
 smfDA * smf_deepcopy_smfDA ( const smfData *old, int cpdks, int * status);
 

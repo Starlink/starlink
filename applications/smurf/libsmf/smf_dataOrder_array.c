@@ -18,7 +18,7 @@
 *                                   size_t ndata, size_t ntslice,
 *                                   size_t nbolo, size_t tstr1, size_t bstr1,
 *                                   size_t tstr2, size_t bstr2, int inPlace,
-*                                   int * status )
+*                                   int freeOld, int * status )
 
 *  Arguments:
 *     oldbuf = void * (Given and Returned)
@@ -42,6 +42,8 @@
 *        Bolo stride of re-ordered buffer
 *     inPlace = int (Given)
 *        If set replace the contents of oldbuf with the re-ordered data.
+*     freeOld = int (Given)
+*        If set, and inPlace=0, free oldbuf before returning.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -63,6 +65,8 @@
 *  History:
 *     2010-08-31 (EC):
 *        Move private routine written by TIMJ out of smf_dataOrder.c
+*     2010-09-17 (EC):
+*        Add freeOrder flag in case routine is being used for copy
 
 *  Notes:
 
@@ -111,7 +115,7 @@ void * smf_dataOrder_array( void * oldbuf, smf_dtype dtype, size_t ndata,
                             size_t ntslice, size_t nbolo,
                             size_t tstr1, size_t bstr1,
                             size_t tstr2, size_t bstr2, int inPlace,
-                            int * status ) {
+                            int freeOld, int * status ) {
   size_t sz = 0;        /* Size of data type */
   void * newbuf = NULL; /* Space to do the reordering */
   void * retval = NULL; /* Return value with reordered buffer */
@@ -192,8 +196,12 @@ void * smf_dataOrder_array( void * oldbuf, smf_dtype dtype, size_t ndata,
 
       retval = oldbuf;
     } else {
-      /* Free oldbuf */
-      oldbuf = astFree( oldbuf );
+
+      if( freeOld ) {
+        /* Free oldbuf */
+        oldbuf = astFree( oldbuf );
+      }
+
       /* Set pntr to newbuf */
       retval = newbuf;
     }

@@ -277,7 +277,9 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
 
   /* DATA and VARIANCE */
   for (i=0; i<2; i++) {
+
     if ( ((old->pntr)[i] != NULL) && create[i] ) {
+
       /* Check if we are converting from integer to double */
       if (rawconvert && (old->dtype == SMF__INTEGER) ) {
         nbytes = sizeof(double);
@@ -300,7 +302,7 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
           /* Do a re-ordering copy into a new buffer */
           pntr[i] = smf_dataOrder_array( old->pntr[i], old->dtype, npts,
                                          ntslice, nbolo, tstr1, bstr1, tstr2,
-                                         bstr2, 0, status );
+                                         bstr2, 0, 0, status );
         } else {
           /* Allocate space and memcpy */
           nbytes = smf_dtype_size(old, status);
@@ -336,7 +338,7 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
       /* Do a re-ordering copy into a new buffer */
       pntr[i] = smf_dataOrder_array( old->qual, SMF__QUALTYPE, npts,
                                      ntslice, nbolo, tstr1, bstr1, tstr2,
-                                     bstr2, 0, status );
+                                     bstr2, 0, 0, status );
     } else {
       /* Allocate space and memcpy */
       qual = astCalloc( npts, sizeof(*qual), 0 );
