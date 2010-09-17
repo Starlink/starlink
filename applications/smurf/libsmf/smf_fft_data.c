@@ -352,7 +352,7 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
     /* Apodise the data */
     smf_apodize( data, len, status );
 
-    if (data->qual) data->qual = astFree( data->qual );
+    if (data && data->qual) data->qual = astFree( data->qual );
   }
 
   /* Create a new smfData, copying over everything except for the bolo
