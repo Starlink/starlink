@@ -45,6 +45,7 @@
 
 *  Authors:
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     COBA: Coskun Oba (UoL)
 *     {enter_new_authors_here}
 
 *  History:
@@ -64,6 +65,8 @@
 *        New API for smf_construct_smfHead
 *     2010-07-02 (TIMJ):
 *        Work with any data order for refdata.
+*     2010-09-17 (COBA):
+*        Updated smf_construct_smfData which now contains smfFts
 
 *  Notes:
 *     - Does not propogate provenance or history from refdata.
@@ -157,7 +160,7 @@ void smf_create_bolfile( const Grp * bgrp, size_t index,
     pntr[1] = astCalloc( nbols, sizeof(double), 0 );
     if (hasqual) qual = astCalloc( nbols, sizeof(*qual), 0 );
 
-    *bolmap = smf_construct_smfData( NULL, NULL, NULL, NULL, SMF__DOUBLE,
+    *bolmap = smf_construct_smfData( NULL, NULL, NULL, NULL, NULL, SMF__DOUBLE,
                                      pntr, qual, SMF__QFAM_TSERIES, NULL, 0,
                                      mydims, mylbnd, 2, 0, 0, NULL,
                                      NULL, status );

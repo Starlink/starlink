@@ -49,6 +49,7 @@
 *     Tim Jenness (TIMJ)
 *     Andy Gibb (UBC)
 *     Ed Chapin (UBC)
+*     Coskun Oba (COBA, UoL)
 *     {enter_new_authors_here}
 
 *  History:
@@ -72,6 +73,8 @@
 *        Initialise new QUAL element
 *     2010-06-18 (TIMJ):
 *        Initialise qfamily element
+*     2010-09-17 (COBA):
+*        Add smfFts
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -125,6 +128,7 @@ smf_create_smfData( int flags, int * status ) {
   smfHead * hdr = NULL;    /* Data header */
   smfFile * file = NULL;   /* File components */
   smfDA * da = NULL;       /* Data Acquisition information */
+  smfFts* fts = NULL;      /* FTS2 information */
   int i;
 
   if (*status != SAI__OK) return NULL;
@@ -136,6 +140,8 @@ smf_create_smfData( int flags, int * status ) {
     hdr  = smf_create_smfHead( status );
   if (! (flags & SMF__NOCREATE_DA) )
     da   = smf_create_smfDA( status );
+  if(!(flags & SMF__NOCREATE_FTS))
+    fts = smf_create_smfFts(status);
 
   if (*status != SAI__OK) {
     /* Add our own message to the stack */
@@ -148,6 +154,7 @@ smf_create_smfData( int flags, int * status ) {
   data->file = file;
   data->hdr  = hdr;
   data->da   = da;
+  data->fts  = fts;
   /* Set the DREAM to NULL as we only create it later */
   data->dream = NULL;
 
@@ -181,6 +188,7 @@ smf_create_smfData( int flags, int * status ) {
   file = astFree( file );
   hdr = astFree( hdr );
   da = astFree( da );
+  fts = astFree( fts );
 
   return NULL;
 }

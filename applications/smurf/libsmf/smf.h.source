@@ -23,6 +23,7 @@
  *     Tim Jenness (JAC, Hawaii)
  *     Edward Chapin (UBC)
  *     Malcolm J. Currie (Starlink)
+ *     Coskun Oba (COBA, UoL)
  *     {enter_new_authors_here}
 
  *  History:
@@ -379,6 +380,11 @@
  *        Add smf_dataOrder_array
  *     2010-09-15 (DSB):
  *        Remove  smf_flag_spikes.
+ *     2010-09-17 (COBA):
+ *        - Add smf_create_smfFts
+ *        - Add smf_construct_smfFts
+ *        - Add smf_deepcopy_smfFts
+ *        - Update smf_construct_smfData
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -700,7 +706,7 @@ smfDA *smf_construct_smfDA( smfDA * tofill, smfData *dksquid, double * flatcal,
                             int nflat, double * heatval, int nheat, int * status );
 
 smfData *smf_construct_smfData( smfData * tofill, smfFile * file,
-                                smfHead * hdr, smfDA * da, smf_dtype dtype,
+                                smfHead * hdr, smfDA * da, smfFts* fts, smf_dtype dtype,
                                 void * pntr[2], smf_qual_t * qual, smf_qfam_t qfamily,
                                 smfData * sidequal, int isTordered, const dim_t dims[],
                                 const int lbnd[], int ndims, int virtual, int ncoeff,
@@ -713,6 +719,9 @@ smfDream *smf_construct_smfDream( smfData *data, size_t nvert,
 smfFile *smf_construct_smfFile(smfFile * tofill, int ndfid, int isSc2store,
                                int isTstream, const char * name,
                                int * status );
+
+smfFts* smf_construct_smfFts( smfFts* tofill, smfData* fpm, smfData* sigma, 
+                              int* status); 
 
 smfGroup *smf_construct_smfGroup( const Grp *igrp, dim_t **subgroups, size_t *chunk,
                                   const dim_t ngroups, const dim_t nrelated,
@@ -776,6 +785,8 @@ smfFile* smf_create_smfFile( int * status );
 
 smfFilter *smf_create_smfFilter( smfData *template, int *status );
 
+smfFts* smf_create_smfFts(int* status);
+
 smfHead* smf_create_smfHead( int * status );
 
 void smf_create_tswcs( smfHead *hdr, AstFrameSet **frameset, int *status );
@@ -809,6 +820,8 @@ smfData * smf_deepcopy_smfData ( const smfData *old, const int rawconvert,
                                  int isTordered, int * status);
 
 smfFile * smf_deepcopy_smfFile ( const smfFile *old, int * status );
+
+smfFts* smf_deepcopy_smfFts(const smfData* old, int* status);
 
 smfHead * smf_deepcopy_smfHead ( const smfHead *old, int * status);
 

@@ -113,6 +113,7 @@
 *     EC: Edward Chapin (UBC)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 *     DSB: David Berry (JAC, Hawaii)
+*     COBA: Coskun Oba (UoL)
 *     {enter_new_authors_here}
 
 *  History:
@@ -328,6 +329,8 @@
 *     2010-08-23 (EC):
 *        -Re-name chunk --> filegroup throughout for clarity
 *        -Improve commenting of the major blocks in the code
+*     2010-09-17 (COBA):
+*        Updated smf_construct_smfData which now contains smfFts
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -2006,7 +2009,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                                           ntslice, bstride, tstride, 0,
                                           &tempqual, status );
 
-                    com->sidequal = smf_construct_smfData( NULL, NULL, NULL,
+                    com->sidequal = smf_construct_smfData( NULL, NULL, NULL, NULL,
                                                            NULL, SMF__QUALTYPE,
                                                            NULL, tempqual,
                                                            SMF__QFAM_TSERIES,

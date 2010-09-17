@@ -52,6 +52,7 @@
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
+*     COBA: Coskun Oba (UoL)
 *     {enter_new_authors_here}
 
 *  History:
@@ -59,6 +60,8 @@
 *        Initial version
 *     2008-08-25 (TIMJ):
 *        Should write variance not standard deviation.
+*     2010-09-17 (COBA):
+*        Updated smf_construct_smfData which now contains smfFts
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -222,7 +225,7 @@ void smf_collapse_tseries( const smfData *indata, int nclip, const float clip[],
   hdr = smf_deepcopy_smfHead( indata->hdr, status );
   if (indata->history) history = astCopy( indata->history );
 
-  *outdata = smf_construct_smfData( NULL, NULL,  hdr, NULL,
+  *outdata = smf_construct_smfData( NULL, NULL,  hdr, NULL, NULL,
                                     dtype, pntr, NULL, SMF__QFAM_TSERIES,
                                     NULL, 1, dims, indata->lbnd, 2, 0, 0,
                                     NULL, history, status );

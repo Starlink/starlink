@@ -70,6 +70,7 @@
 *  Authors:
 *     BDK: Dennis Kelly (UKATC)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     COBA: Coskun Oba (UoL)
 *     {enter_new_authors_here}
 
 *  History:
@@ -95,6 +96,8 @@
 *        Add method argument and handle POLYNOMIAL flatfield solutions.
 *     2010-03-05 (TIMJ):
 *        Change type of method to an enum
+*     2010-09-17 (COBA):
+*        Updated smf_construct_smfData which now contains smfFts
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -352,7 +355,7 @@ size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snr
       void *pntr[2];
       pntr[0] = polybol;
       pntr[1] = NULL;
-      *polyfit = smf_construct_smfData( NULL, NULL, NULL, NULL, SMF__DOUBLE,
+      *polyfit = smf_construct_smfData( NULL, NULL, NULL, NULL, NULL, SMF__DOUBLE,
                                         pntr, NULL, SMF__QFAM_TSERIES, NULL, 1,
                                         bolvald->dims, bolvald->lbnd, 3, 0, 0, NULL,
                                         NULL, status );

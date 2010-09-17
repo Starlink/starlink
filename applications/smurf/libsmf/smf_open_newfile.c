@@ -64,6 +64,7 @@
 *  Authors:
 *     Andy Gibb (UBC)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     COBA: Coskun Oba (UoL)
 *     {enter_new_authors_here}
 
 *  History:
@@ -85,6 +86,9 @@
 *        Initialize history component
 *     2008-07-23 (EC):
 *        Allow 4-dimensional data to store FFTs
+*     2010-09-17 (COBA):
+*        - Updated smf_construct_smfData which now contains smfFts
+*        - Updated flags with SMF__NOCREATE_FTS
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -160,7 +164,7 @@ void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, const int n
   }
 
   /* Create empty smfData with no extra components */
-  flags |= SMF__NOCREATE_DA | SMF__NOCREATE_HEAD | SMF__NOCREATE_FILE;
+  flags |= SMF__NOCREATE_DA | SMF__NOCREATE_FTS | SMF__NOCREATE_HEAD | SMF__NOCREATE_FILE;
   *data = smf_create_smfData( flags, status);
 
   /* Set the requested data type */
@@ -259,7 +263,7 @@ void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, const int n
   }
 
   /* Fill the smfData */
-  *data = smf_construct_smfData( *data, file, NULL, NULL, dtype, pntr, qual, SMF__QFAM_NULL,
+  *data = smf_construct_smfData( *data, file, NULL, NULL, NULL, dtype, pntr, qual, SMF__QFAM_NULL,
                                  NULL, 1, (*data)->dims, (*data)->lbnd, ndims, 0, 0, NULL, NULL,
                                  status);
 

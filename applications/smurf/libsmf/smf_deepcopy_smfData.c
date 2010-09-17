@@ -28,6 +28,7 @@
 *          - SMF__NOCREATE_HEAD     Do not copy the smfHead
 *          - SMF__NOCREATE_FILE     Do not copy the smfFile
 *          - SMF__NOCREATE_DA       Do not copy the smfDA
+*          - SMF__NOCREATE_FTS      Do not copy the smfFts
 *          - SMF__NOCREATE_DATA     Do not copy DATA component
 *          - SMF__NOCREATE_VARIANCE Do not copy VARIANCE component
 *          - SMF__NOCREATE_QUALITY  Do not copy QUALITY or sidequal component
@@ -67,6 +68,7 @@
 *     Tim Jenness (TIMJ)
 *     Andy Gibb (UBC)
 *     Ed Chapin (UBC)
+*     Coskun Oba (COBA, UoL)
 *     {enter_new_authors_here}
 
 *  History:
@@ -99,6 +101,8 @@
 *        Note sidequal behaviour.
 *     2010-08-31 (EC):
 *        Add ability to do a re-ordering copy
+*     2010-09-17 (COBA):
+*        Add smfFts
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -153,6 +157,7 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
   size_t bstr2=0;             /* bolometer index stride output */
   int create[3];              /* Flag for copying each component (D,V,Q) */
   smfDA *da = NULL;           /* New smfDA */
+  smfFts* fts = NULL;         /* FTS2 data */
   dim_t dims[NDF__MXDIM];     /* Dimensions of each axis of data array */
   smf_dtype dtype;            /* Data type */
   smfFile *file = NULL;       /* New smfFile */
@@ -380,6 +385,11 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
   /* Copy smfDA if desired */
   if (! (flags & SMF__NOCREATE_DA) )
     da = smf_deepcopy_smfDA( old, 1, status );
+    
+  /* Copy smfFts if desired */
+  if(!(flags & SMF__NOCREATE_FTS)) {
+    fts = smf_deepcopy_smfFts(old, status );
+  }
 
   /* Sidecar quality */
   if ( ! (flags & SMF__NOCREATE_QUALITY) ) {
@@ -387,7 +397,7 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
   }
 
   /* Construct the new smfData */
-  new = smf_construct_smfData( new, file, hdr, da, dtype, pntr, qual,
+  new = smf_construct_smfData( new, file, hdr, da, fts, dtype, pntr, qual,
                                old->qfamily, sidequal, newOrder, dims,
                                lbnd, ndims, virtual, ncoeff, poly, history,
                                status);

@@ -37,6 +37,7 @@
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
+*     COBA: Coskun Oba (UoL)
 *     {enter_new_authors_here}
 
 *  Notes:
@@ -46,6 +47,8 @@
 *  History:
 *     2010-03-03 (TIMJ):
 *        Initial version
+*     2010-09-17 (COBA):
+*        Updated smf_construct_smfData which now contains smfFts
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -133,7 +136,7 @@ void smf_flat_malloc( size_t nheat, const smfData * refdata,
     pntr[0] = powval;
     pntr[1] = NULL;
     dims[0] = nheat;
-    *powvald = smf_construct_smfData( NULL, NULL, NULL, NULL, SMF__DOUBLE,
+    *powvald = smf_construct_smfData( NULL, NULL, NULL, NULL, NULL, SMF__DOUBLE,
                                       pntr, NULL, SMF__QFAM_NULL, NULL, 1,
                                       dims, NULL, 1, 0, 0, NULL,
                                       NULL, status );
@@ -161,7 +164,7 @@ void smf_flat_malloc( size_t nheat, const smfData * refdata,
                                  "Flatfield measurement", "Response", oldhdr->units, oldhdr->telpos,
                                  NULL, oldhdr->obsidss, status );
 
-    *bolvald = smf_construct_smfData( NULL, NULL, hdr, NULL, SMF__DOUBLE,
+    *bolvald = smf_construct_smfData( NULL, NULL, hdr, NULL, NULL, SMF__DOUBLE,
                                       pntr, NULL, SMF__QFAM_TSERIES, NULL, 1, dims, lbnd,
                                       3, 0, 0, NULL, NULL, status );
   }

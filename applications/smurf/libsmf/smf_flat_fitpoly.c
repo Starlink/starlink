@@ -49,6 +49,7 @@
 *  Authors:
 *     BDK: Dennis Kelly (UKATC)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     COBA: Coskun Oba (UoL)
 *     {enter_new_authors_here}
 
 *  History:
@@ -64,6 +65,8 @@
 *        really look like the fitted function. The issue is that the error
 *        bars are large enough in some cases that a curvy flatfield can be
 *        fit by a straight line with a reasonable signal-to-noise.
+*     2010-09-17 (COBA):
+*        Updated smf_construct_smfData which now contains smfFts
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -176,7 +179,7 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
     lbnd[1] = (bolvald->lbnd)[1];
     lbnd[2] = 1;
 
-    *coeffs = smf_construct_smfData( NULL, NULL, NULL, NULL, SMF__DOUBLE,
+    *coeffs = smf_construct_smfData( NULL, NULL, NULL, NULL, NULL, SMF__DOUBLE,
                                      pntr, NULL, SMF__QFAM_TSERIES, NULL, 1, dims, lbnd,
                                      3, 0, 0, NULL, NULL, status);
   }
@@ -418,7 +421,7 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
       void *pntr[2];
       pntr[0] = polybol;
       pntr[1] = NULL;
-      *polyfit = smf_construct_smfData( NULL, NULL, NULL, NULL, SMF__DOUBLE,
+      *polyfit = smf_construct_smfData( NULL, NULL, NULL, NULL, NULL, SMF__DOUBLE,
                                         pntr, NULL, SMF__QFAM_TSERIES, NULL, 1,
                                         bolvald->dims, bolvald->lbnd, 3, 0, 0, NULL,
                                         NULL, status );

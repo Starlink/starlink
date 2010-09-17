@@ -43,6 +43,7 @@
 *  Authors:
 *     Andy Gibb (UBC)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     COBA: Coskun Oba (UoL)
 *     {enter_new_authors_here}
 
 *  History:
@@ -52,6 +53,9 @@
 *        Can not treat dim_t and int interchangeably.
 *     2009-09-29 (TIMJ):
 *        Read lower bounds of NDF and store in smfData
+*     2010-09-17 (COBA):
+*        - Updated smf_construct_smfData which now contains smfFts
+*        - Updated flags with SMF__NOCREATE_FTS
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -133,6 +137,7 @@ void smf_open_ndf( const int newndf, const char accmode[],
 
   /* First step is to create an empty smfData with no extra components */
   flags |= SMF__NOCREATE_DA;
+  flags |= SMF__NOCREATE_FTS;
   flags |= SMF__NOCREATE_HEAD;
   flags |= SMF__NOCREATE_FILE;
   *ndfdata = smf_create_smfData( flags, status);
@@ -175,7 +180,7 @@ void smf_open_ndf( const int newndf, const char accmode[],
   }
 
   /* And populate the new smfData */
-  *ndfdata = smf_construct_smfData( *ndfdata, newfile, NULL, NULL, dtype,
+  *ndfdata = smf_construct_smfData( *ndfdata, newfile, NULL, NULL, NULL, dtype,
                                     datarr, NULL, SMF__QFAM_NULL, NULL, 1,
                                     (*ndfdata)->dims, (*ndfdata)->lbnd, ndims, 0, 0,
                                     NULL, NULL, status );

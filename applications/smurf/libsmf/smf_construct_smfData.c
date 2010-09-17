@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     pntr = smf_construct_smfData( smfData * tofill, smfFile * file,
-*                      smfHead * hdr, smfDA * da, smf_dtype dtype,
+*                      smfHead * hdr, smfDA * da, smfFts* fts, smf_dtype dtype,
 *                      void * pntr[2], smf_qual_t qual, smf_qfam_t qfamily,
 *                      smfData * sidequal, int isTordered, const dim_t dims[],
 *                      const int lbnd[], int ndims, int virtual, int ncoeff,
@@ -35,6 +35,8 @@
 *        "file" for rules on when this will be assigned.
 *     da = smfDA * (Given)
 *        Pointer to smfDa. Same behaviour as "hdr" and "file".
+*     da = smfFts * (Given)
+*        Pointer to smfFts. Same behaviour as "hdr" and "file".
 *     dtype = smf_dtype (Given)
 *        Data type of this smfData.
 *     pntr[2] = void* (Given)
@@ -93,6 +95,7 @@
 *     Tim Jenness (TIMJ)
 *     Andy Gibb (UBC)
 *     Edward Chapin (UBC)
+*     Coskun Oba (COBA, UoL)
 *     {enter_new_authors_here}
 
 *  History:
@@ -116,6 +119,8 @@
 *        Add sidequal
 *     2010-07-09 (TIMJ):
 *        Do not crash if pntr[] is NULL.
+*     2010-09-17 (COBA):
+*        Add smfFts
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -163,7 +168,7 @@
 
 smfData *
 smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr,
-                       smfDA * da, smf_dtype dtype, void * pntr[2],
+                       smfDA * da, smfFts* fts, smf_dtype dtype, void * pntr[2],
                        smf_qual_t * qual, smf_qfam_t qfamily, smfData * sidequal,
                        int isTordered, const dim_t dims[], const int lbnd[], int ndims,
                         int virtual, int ncoeff, double *poly, AstKeyMap *history,
@@ -181,7 +186,8 @@ smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr,
     /* Create a smfData without the extensions */
     data = smf_create_smfData( SMF__NOCREATE_FILE |
                                SMF__NOCREATE_HEAD |
-                               SMF__NOCREATE_DA, status );
+                               SMF__NOCREATE_DA |
+                               SMF__NOCREATE_FTS, status );
   }
 
   if (*status == SAI__OK) {
@@ -207,6 +213,12 @@ smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr,
       errRep(FUNC_NAME, "Attempt to overwrite pre-existing smfDA struct"
              " (possible programming error)",
              status);
+    }   
+    if (*status == SAI__OK &&  data->fts != NULL && fts != NULL) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "Attempt to overwrite pre-existing smfFts struct"
+             " (possible programming error)",
+             status);
     }
 
     if ( *status == SAI__OK ) {
@@ -215,6 +227,7 @@ smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr,
       if (file != NULL) data->file = file;
       if (hdr != NULL) data->hdr = hdr;
       if (da != NULL) data->da = da;
+      if (fts != NULL) data->fts = fts;
 
       /* Fill in other bits */
       data->dtype = dtype;
