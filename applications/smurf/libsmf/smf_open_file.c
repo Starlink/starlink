@@ -54,6 +54,7 @@
  *     Edward Chapin (UBC)
  *     David Berry (JAC, UCLan)
  *     Malcolm J. Currie (Starlink)
+ *     COBA: Coskun Oba (UoL)
  *     {enter_new_authors_here}
 
  *  History:
@@ -214,6 +215,8 @@
  *     2010-06-18 (TIMJ):
  *        Use smf_qual_map to map QUALITY information and store quality family
  *        in smfData.
+ *     2010-09-17 (COBA):
+ *        Read smfFts
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -306,6 +309,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
   smfFile *file = NULL;      /* pointer to smfFile struct */
   smfHead *hdr = NULL;       /* pointer to smfHead struct */
   smfDA *da = NULL;          /* pointer to smfDA struct, initialize to NULL */
+  smfFts* fts = NULL;        /* pointer to smfFts struct, initialize to NULL */
 
   HDSLoc *tloc = NULL;       /* Locator to the NDF JCMTSTATE extension */
   HDSLoc *xloc = NULL;       /* Locator to time series headers,
@@ -443,6 +447,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
   /* Now we need to create some structures */
   if (flags & SMF__NOCREATE_HEAD) createflags |= SMF__NOCREATE_HEAD;
   if (flags & SMF__NOCREATE_DA) createflags |= SMF__NOCREATE_DA;
+  if (flags & SMF__NOCREATE_FTS) createflags |= SMF__NOCREATE_FTS;
 
   /* Allocate memory for the smfData */
   *data = smf_create_smfData( createflags, status );
@@ -625,6 +630,73 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
             dkfile->isSc2store = 0;
             dkfile->isTstream = 1;
           }
+        }
+      }
+      
+      /* Map the FTS information */
+      fts = (*data)->fts;
+      if(!(flags & SMF__NOCREATE_FTS) && fts) {
+        int nmap;
+        int ndfFTS;
+        int placeFTS;
+        int dimsFTS[NDF__MXDIM];
+        int ndimsFTS;
+        HDSLoc* ftsLoc = NULL;
+        void *dpntr[] = {NULL, NULL};
+
+        ndfXstat(indf, "FTS2DR", &itexists, status);
+        if(itexists) {
+          ndfXloc(indf, "FTS2DR", mode, &ftsLoc, status);
+          if((*status != SAI__OK) || (!ftsLoc)) {
+            *status = SAI__ERROR;
+            errRep("", FUNC_NAME ": Unable to obtain an HDS locator to the "
+                "MORE extension, despite its existence", status);
+          }
+          /* GET FPM */
+          ndfOpen(ftsLoc, "FPM", mode, "UNKNOWN", &ndfFTS, &placeFTS, status);
+          if((*status != SAI__OK) || (ndfFTS == NDF__NOID)) {
+            *status = SAI__ERROR;
+            errRep("", FUNC_NAME ": Unable to obtain an NDF identifier for FPM", status);
+          }
+          ndfDim(ndfFTS, NDF__MXDIM, dimsFTS, &ndimsFTS, status);
+          if(*status != SAI__OK) {
+            errRepf("", FUNC_NAME ": Unable to obtain FPM dimensions!", status, ndimsFTS);
+          }
+          if(ndimsFTS != 3) {
+            *status = SAI__ERROR;
+            errRepf("", FUNC_NAME ": FPM has %i dimensions, should be 3!", status, ndimsFTS);
+          }
+          ndfMap(ndfFTS, "DATA", "_DOUBLE", mode, &dpntr[0], &nmap, status);
+          if(*status == SAI__OK) {
+            fts->fpm = smf_create_smfData(SMF__NOCREATE_HEAD | SMF__NOCREATE_DA | SMF__NOCREATE_FTS, status);
+            fts->fpm->pntr[0] = dpntr[0];
+            fts->fpm->dtype = SMF__DOUBLE;
+            fts->fpm->ndims = 3;
+            fts->fpm->dims[0] = dimsFTS[0];
+          }
+          /* GET SIGMA */
+          ndfOpen(ftsLoc, "SIGMA", mode, "UNKNOWN", &ndfFTS, &placeFTS, status);
+          if((*status != SAI__OK) || (ndfFTS == NDF__NOID)) {
+            *status = SAI__ERROR;
+            errRep("", FUNC_NAME ": Unable to obtain an NDF identifier for SIGMA", status);
+          }
+          ndfDim(ndfFTS, NDF__MXDIM, dimsFTS, &ndimsFTS, status);
+          if(*status != SAI__OK) {
+            errRepf("", FUNC_NAME ": Unable to obtain SIGMA dimensions!", status, ndimsFTS);
+          }
+          if(ndimsFTS != 3) {
+            *status = SAI__ERROR;
+            errRepf("", FUNC_NAME ": SIGMA has %i dimensions, should be 2!", status, ndimsFTS);
+          }
+          ndfMap(ndfFTS, "DATA", "_DOUBLE", mode, &dpntr[0], &nmap, status);
+          if(*status == SAI__OK) {
+            fts->sigma = smf_create_smfData(SMF__NOCREATE_HEAD | SMF__NOCREATE_DA | SMF__NOCREATE_FTS, status);
+            fts->sigma->pntr[0] = dpntr[0];
+            fts->sigma->dtype = SMF__DOUBLE;
+            fts->sigma->ndims = 2;
+            fts->sigma->dims[0] = dimsFTS[0];
+          }
+          if(ftsLoc) { datAnnul(&ftsLoc, status); }
         }
       }
 
@@ -851,7 +923,8 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
         if (dksquid) {
           da->dksquid = smf_create_smfData(SMF__NOCREATE_FILE |
                                            SMF__NOCREATE_HEAD |
-                                           SMF__NOCREATE_DA, status );
+                                           SMF__NOCREATE_DA | 
+                                           SMF__NOCREATE_FTS, status );
           da->dksquid->dtype = SMF__DOUBLE;
           da->dksquid->isTordered = 1;
           da->dksquid->ndims = 3;

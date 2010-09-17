@@ -35,6 +35,7 @@
 *     Tim Jenness (JAC, Hawaii)
 *     Edward Chapin (UBC)
 *     David Berry (JAC, UCLan)
+*     COBA: Coskun Oba (UoL)
 *     {enter_new_authors_here}
 
 *  Notes:
@@ -101,6 +102,8 @@
 *        Free file quality as special case.
 *     2010-08-19 (TIMJ):
 *        sc2store no longer uses system malloc in SMURF
+*     2010-09-17 (COBA):
+*        Free smfFts
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -155,6 +158,7 @@ void smf_close_file( smfData ** data, int * status ) {
   void *buf=NULL;         /* Buffer pointer */
   size_t buflen=0;        /* Size of buffer */
   smfDA   * da;           /* pointer to smfDA in smfData */
+  smfFts* fts;            /* pointer to smfFts in smfData */
   size_t datalen=0;       /* Size of data buffer in bytes */
   smfDream *dream = NULL; /* Pointer to smfDream in smfData */
   smfFile * file;         /* pointer to smfFile in smfData */
@@ -299,6 +303,14 @@ void smf_close_file( smfData ** data, int * status ) {
     if( da->dksquid) smf_close_file( &da->dksquid, status );
     da->heatval = astFree( da->heatval );
     da = astFree( da );
+  }
+
+  /* Free smfFts */
+  fts = (*data)->fts;
+  if(fts) {
+    if(fts->fpm) { smf_close_file(&(fts->fpm), status); }
+    if(fts->sigma) { smf_close_file(&(fts->sigma), status); }
+    fts = astFree(fts);
   }
 
   /* Free smfDream */

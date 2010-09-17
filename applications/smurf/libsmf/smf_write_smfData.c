@@ -59,6 +59,7 @@
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
 *     Ed Chapin (UBC)
+*     COBA: Coskun Oba (UoL)
 *     {enter_new_authors_here}
 
 *  History:
@@ -86,6 +87,8 @@
 *        Fix writing of 3d variance for 3d data
 *     2010-06-10 (EC):
 *        Write dark squid quality
+*     2010-09-17 (COBA):
+*        Write FTS2 data
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -400,6 +403,58 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
         ndfAnnul( &id, status );
         datAnnul( &loc, status );
       }
+    }
+    
+    /* FTS2 */
+    if( *status == SAI__OK &&
+        data->fts &&
+        outdata &&
+        outdata->file &&
+        outdata->file->ndfid &&
+        (outdata->file->ndfid != NDF__NOID) ) {
+      int id            = 0;
+      int nmap          = 0;
+      void *pntr[]      = {NULL, NULL};
+      double* outfpm    = NULL;
+      double* outsigma  = NULL;
+      smfFts* fts       = data->fts;
+      smfHead* inHdr    = data->hdr;
+      HDSLoc* loc       = smf_get_xloc(outdata, "FTS2DR", "FTS2DR", "UPDATE", 0, 0, status);
+
+      /* WRITE FPM */
+      if(fts->fpm && fts->fpm->pntr[0]) {
+        lbnd[0] = 0;
+        lbnd[1] = 0;
+        lbnd[2] = 1;
+        ubnd[0] = lbnd[0] + fts->fpm->dims[0] - 1;
+        ubnd[1] = lbnd[1] + fts->fpm->dims[1] - 1;
+        ubnd[2] = lbnd[2] + fts->fpm->dims[2] - 1;
+
+        id = smf_get_ndfid( loc, "FPM", "WRITE", "UNKNOWN", "_DOUBLE", 
+                            fts->fpm->ndims, lbnd, ubnd, status);
+        ndfMap(id, "DATA", "_DOUBLE", "WRITE", &pntr[0], &nmap, status);
+        outfpm = pntr[0];
+        if((*status == SAI__OK) && outfpm) {
+          memcpy(outfpm, fts->fpm->pntr[0], nmap * sizeof(*outfpm));
+        }
+      }
+      /* WRITE STANDARD DEVIATION, SIGMA */
+      if(fts->sigma && fts->sigma->pntr[0]) {
+        lbnd[0] = 0;
+        lbnd[1] = 0;
+        ubnd[0] = lbnd[0] + fts->sigma->dims[0] - 1;
+        ubnd[1] = lbnd[1] + fts->sigma->dims[1] - 1;
+
+        id = smf_get_ndfid( loc, "SIGMA", "WRITE", "UNKNOWN", "_DOUBLE", 
+                            fts->sigma->ndims, lbnd, ubnd, status);
+        ndfMap(id, "DATA", "_DOUBLE", "WRITE", &pntr[0], &nmap, status);
+        outsigma = pntr[0];
+        if((*status == SAI__OK) && outsigma) {
+          memcpy(outsigma, fts->sigma->pntr[0], nmap * sizeof(*outsigma));
+        }
+      }
+      ndfAnnul(&id, status);
+      datAnnul(&loc, status);
     }
   }
 
