@@ -270,6 +270,11 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)),
 
   if( (*status == SAI__OK) && dozero ) {
 
+    /* Reset the SMF__MAPQ_ZERO bit */
+    for( i=0; i<dat->msize; i++ ) {
+      mapqual[i] &= ~SMF__MAPQ_ZERO;
+    }
+
     /* Zero regions of low hits around the edges (this can change each
        iteration as samples are dropped) */
 
