@@ -33,7 +33,7 @@
 *     David Berry (JAC, UCLan)
 *     Andy Gibb (UBC)
 *     Ed Chapin (UBC)
-*     Coskun (Josh) Oba (University of Lethbridge)
+*     COBA: Coskun Oba (UoL)
 *     {enter_new_authors_here}
 
 *  History:
@@ -133,6 +133,8 @@
 *        Add FTS2_FREQCORR, FTS2_REMOVEBSE, FTS2_SPATIALWCS
 *     2010-09-16 (EC):
 *        SCANFIT deprecated in favour of SC2CLEAN and KAPPA:MFITTREND
+*     2010-09-17 (EC):
+*        Add FTS2_DEGLITCH
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -271,6 +273,8 @@ void smurf_mon( int * status ) {
     smurf_fixsteps( status );
   } else if (strcmp( taskname, "FLATFIELD" ) == 0 ) {
     smurf_flatfield( status );
+  } else if (strcmp( taskname, "FTS2_DEGLITCH" ) == 0 ) {
+    smurf_fts2_deglitch( status );
   } else if (strcmp( taskname, "FTS2_FREQCORR" ) == 0 ) {
     smurf_fts2_freqcorr( status );
   } else if (strcmp( taskname, "FTS2_REMOVEBSE" ) == 0 ) {
@@ -421,4 +425,3 @@ void smurf_mon( int * status ) {
   /* astActiveMemory("Exit:"); */
   astFlushMemory( 1 );
 }
-

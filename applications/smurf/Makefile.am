@@ -33,6 +33,7 @@ dsutils \
 extinction \
 fixsteps \
 flatfield \
+fts2_deglitch \
 gsd2acsis \
 gsdshow \
 impaztec \

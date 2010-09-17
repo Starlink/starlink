@@ -4,7 +4,7 @@
 *     fts2_deglitch.c
 
 *  Purpose:
-*     Removes the glitches (if any) from the given interferogram. 
+*     Removes the glitches (if any) from the given interferogram.
 
 *  Language:
 *     Starlink ANSI C
@@ -12,6 +12,31 @@
 *  Type of Module:
 
 *  Invocation:
+*   void fts2_deglitch( interferogram, size, coreClusterSize, tailClusterSize,
+                        tailCutoffStdDevPercent, tailCutoffStdDevMultiplier,
+                        zpdIndex, dsHalfLength, mode, threshold)
+
+*  Arguments:
+*     interferogram = double* (Given and Returned)
+*       Pointer to interferogram
+*     size = int (Given)
+*       Sample size of the interferogram
+*     coreClusterSize = int (Given)
+*       Core cluster size
+*     tailClusterSize = int (Given)
+*       Tail cluster size
+*     tailCutoffStdDevPercent = double (Given)
+*       Tail cutoff standard deviation (as percentage)
+*     tailCutoffStdDevMultiplier = double (Given)
+*       Tail cutoff standard deviation multiplier
+*     zpdIndex = int (Given)
+*       Index of ZPD
+*     dsHalfLength = int (Given)
+*       Size of the double sided interferogram
+*     mode = smf_deglitchmode (Given)
+*       Deglitch mode
+*     threshold = double (Given)
+*       Deglitch threshold
 
 *  Description:
 *    Removes the glitches (if any) from the given interferogram.
@@ -22,6 +47,8 @@
 *  History :
 *     2010-08-26 (COBA):
 *        Original.
+*     2010-09-17 (COBA):
+*        Updated prologue and minor changes to code blocks.
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -71,40 +98,40 @@ void fts2_deglitch(
     smf_deglitchmode mode,			        /* Deglitch mode */
     double threshold)             	    /* Deglitch threshold */
 {
-  int end                 = 0;
-  int i                   = 0;
-  int j                   = 0;
-  int numCluster          = 0;
-  int start               = 0;
-  int tailDeglitchStart   = 0;
-  double avgSigma         = 0.0;
-  double coreLength       = 0.0;
-  double cutoffAmplitude  = 0.0;
-  double cutoffFreq       = 0.0;
-  double cutoffSigma      = 0.0;
-  double error            = 0.0;
-  double max              = DBL_MAX;
-  double maxSigma         = 0.0;
-  double mean             = 0.0;
-  double min              = DBL_MIN;
-  double tForward         = 0.0;
-  double tReverse         = 0.0;
-  double tmp              = 0.0;
-  double revCoreLength    = 0.0;
-  double y                = 0.0;
-  double* clusterMean     = NULL;
-  double* clusterSigma    = NULL;
-  double* sigma           = NULL;
-  double* revSigma        = NULL;
+  int end                 = 0;    /* Loop end index */
+  int i                   = 0;    /* Loop counter */
+  int j                   = 0;    /* Loop counter */
+  int numCluster          = 0;    /* Number of clusters */
+  int start               = 0;    /* Loop start index */
+  int tailDeglitchStart   = 0;    /* Tail deglitch start index */
+  double avgSigma         = 0.0;  /* Average standard deviation */
+  double coreLength       = 0.0;  /* Core length */
+  double cutoffAmplitude  = 0.0;  /* Cutoff amplitude */
+  double cutoffFreq       = 0.0;  /* Cutoff frequency */
+  double cutoffSigma      = 0.0;  /* Cutoff standard deviation */
+  double error            = 0.0;  /* Error */
+  double max              = 0.0;  /* Maximum value */
+  double maxSigma         = 0.0;  /* Maximum standard deviation */
+  double mean             = 0.0;  /* Mean */
+  double min              = 0.0;  /* Minimum value */
+  double tForward         = 0.0;  /* Temporary value for forward computation */
+  double tReverse         = 0.0;  /* Temporary value for backward computation */
+  double tmp              = 0.0;  /*Temporary value */
+  double revCoreLength    = 0.0;  /* Backward core length */
+  double y                = 0.0;  /* The value */
+  double* clusterMean     = NULL; /* Cluster mean */
+  double* clusterSigma    = NULL; /* Cluster standard deviation */
+  double* sigma           = NULL; /* Pointer to array of standard deviations */
+  double* revSigma        = NULL; /* Pointer to array of backward standard deviations */
 
-  switch(mode)
-  {
+  max = NUM__MAXD;
+  min = NUM__MIND;
+  switch(mode) {
     case SMF__DEGLITCH_CORE:
       /* COMPUTE MEAN */
       start = -dsHalfLength + zpdIndex + 1;
       end = dsHalfLength + zpdIndex;
-      for(i = start; i < end; i++)
-      {
+      for(i = start; i < end; i++) {
         mean += interferogram[i];
       }
       mean /= (end - start);
@@ -112,16 +139,9 @@ void fts2_deglitch(
       /* COMPUTE CUTOFF AMPLITUDE */
       start = -(coreClusterSize >> 1) + zpdIndex + 1;
       end 	= (coreClusterSize >> 1) + zpdIndex;
-      for(i = start; i < end; i++)
-      {
-        if(interferogram[i] > max) 
-        { 
-          max = interferogram[i]; 
-        }
-        if(interferogram[i] < min) 
-        { 
-          min = interferogram[i]; 
-        }
+      for(i = start; i < end; i++) {
+        if(interferogram[i] > max) { max = interferogram[i]; }
+        if(interferogram[i] < min) { min = interferogram[i]; }
       }
       cutoffAmplitude = 0.75 * (max - min);
 
@@ -129,16 +149,17 @@ void fts2_deglitch(
       numCluster  	= dsHalfLength / coreClusterSize + 1;
       sigma    		= (double*) astMalloc(numCluster * sizeof(double));
       revSigma 		= (double*) astMalloc(numCluster * sizeof(double));
-      for(i = 0; i < numCluster; i++)
-      {
+      for(i = 0; i < numCluster; i++) {
         tForward 	= 0.0;
         tReverse	= 0.0;
         start 		= (i - 1) * coreClusterSize;
         end 		= i * coreClusterSize;
-        for(j = start; j < end; j++)
-        {
-          tForward += (interferogram[zpdIndex + j] - mean) * (interferogram[zpdIndex + j] - mean);
-          tReverse += (interferogram[zpdIndex - j] - mean) * (interferogram[zpdIndex - j] - mean);
+        for(j = start; j < end; j++) {
+          tmp = (interferogram[zpdIndex + j] - mean);
+          tForward += tmp * tmp;
+
+          tmp = (interferogram[zpdIndex - j] - mean);
+          tReverse += tmp * tmp;
         }
         sigma[i] 	= sqrt(tForward / coreClusterSize);
         revSigma[i] = sqrt(tReverse / coreClusterSize);
@@ -148,10 +169,8 @@ void fts2_deglitch(
 
       /* CORE LENGTH */
       coreLength = (numCluster - 1) * coreClusterSize;
-      for(i = 2; i < numCluster; i++)
-      {
-        if(sigma[i] < 0.1 * maxSigma)
-        {
+      for(i = 2; i < numCluster; i++) {
+        if(sigma[i] < 0.1 * maxSigma) {
           coreLength = (i - 1) * coreClusterSize;
           break;
         }
@@ -159,10 +178,8 @@ void fts2_deglitch(
 
       /* REVERSE CORE LENGTH */
       revCoreLength = (numCluster - 1) * coreClusterSize;
-      for(i = 2; i < numCluster; i++)
-      {
-        if(revSigma[i] < 0.1 * maxSigma)
-        {
+      for(i = 2; i < numCluster; i++) {
+        if(revSigma[i] < 0.1 * maxSigma) {
           revCoreLength = (i - 1) * coreClusterSize;
           break;
         }
@@ -173,47 +190,39 @@ void fts2_deglitch(
 
       start = -dsHalfLength + zpdIndex + 1;
       end 	= dsHalfLength + zpdIndex;
-      for(i = start; i < end; i++)
-      {
+      for(i = start; i < end; i++) {
         tmp = abs((i - zpdIndex) * cutoffFreq);
         y = (tmp < (0.5 * PI)) ?
         		((tmp > threshold) ? cutoffAmplitude * sin(tmp) / tmp : cutoffAmplitude) :
         		cutoffAmplitude / tmp;
 
         error = interferogram[i] - mean;
-        if(abs(error) > (2.0 * y))
-        {
+        if(abs(error) > (2.0 * y)) {
         	interferogram[i] = (error > 0) ? mean + y : mean - y;
         }
       }
-
       astFree(sigma);
       astFree(revSigma);
       break;
     case SMF__DEGLITCH_TAIL:
       tailDeglitchStart = dsHalfLength + zpdIndex;
       numCluster = (size - tailDeglitchStart) / tailClusterSize;
-
       clusterMean  = (double*) astMalloc(numCluster * sizeof(double));
       clusterSigma = (double*) astMalloc(numCluster * sizeof(double));
-
-      for(i = 0; i < numCluster; i++)
-      {
+      for(i = 0; i < numCluster; i++) {
         start = tailDeglitchStart + i * tailClusterSize;
         end   = start + tailClusterSize;
 
         /* CLUSTER MEAN */
         clusterMean[i] = 0;
-        for(j = start; j < end; j++)
-        {
+        for(j = start; j < end; j++) {
         	clusterMean[i] += interferogram[j];
         }
         clusterMean[i] /= tailClusterSize;
 
         /* CLUSTER STANDARD DEVIATION, SIGMA */
         clusterSigma[i] = 0.0;
-        for(j = start; j < end; j++)
-        {
+        for(j = start; j < end; j++) {
           tmp = (interferogram[j] - clusterMean[i]);
           clusterSigma[i] += tmp * tmp;
         }
@@ -225,8 +234,7 @@ void fts2_deglitch(
       avgSigma = 0;
       start = 0;
       end = numCluster * tailCutoffStdDevPercent;
-      for(i = start; i < end; i++)
-      {
+      for(i = start; i < end; i++) {
         avgSigma += clusterSigma[i];
       }
       avgSigma /= (end - start);
@@ -234,19 +242,15 @@ void fts2_deglitch(
       cutoffSigma = avgSigma * tailCutoffStdDevMultiplier;
       start = 0;
       mean = 0;
-      for(i = 0; i < numCluster; i++)
-      {
+      for(i = 0; i < numCluster; i++) {
         mean = clusterMean[i];
         start = tailDeglitchStart + i * tailClusterSize;
         end = start + tailClusterSize;
-        for(j = start; j < end; j++)
-        {
-          if(interferogram[j] > (mean + cutoffSigma))
-          {
+        for(j = start; j < end; j++) {
+          if(interferogram[j] > (mean + cutoffSigma)) {
             interferogram[j] = mean + cutoffSigma;
           }
-          if(interferogram[j] < (mean - cutoffSigma))
-          {
+          if(interferogram[j] < (mean - cutoffSigma)) {
             interferogram[j] = mean - cutoffSigma;
           }
         }
@@ -254,23 +258,16 @@ void fts2_deglitch(
 
       start = tailDeglitchStart + numCluster * tailClusterSize;
       end = size;
-      if(start < end)
-      {
+      if(start < end) {
         mean = 0.0;
-        for(j = start; j < end; j++)
-        {
-          mean += interferogram[j];
-        }
+        for(j = start; j < end; j++) { mean += interferogram[j]; }
         mean /= (end - start);
 
-        for(j= start; j < end; j++)
-        {
-          if(interferogram[j] > (mean + cutoffSigma))
-          {
+        for(j= start; j < end; j++) {
+          if(interferogram[j] > (mean + cutoffSigma)) {
             interferogram[j] = mean + cutoffSigma;
           }
-          if(interferogram[j] < (mean - cutoffSigma))
-          {
+          if(interferogram[j] < (mean - cutoffSigma)) {
             interferogram[j] = mean - cutoffSigma;
           }
         }
@@ -279,29 +276,12 @@ void fts2_deglitch(
       astFree(clusterSigma);
       break;
     default: /* DEFAULT IS TO DEGLITCH ALL */
-        fts2_deglitch( 
-            interferogram,
-            size,
-            coreClusterSize,
-            tailClusterSize,
-            tailCutoffStdDevPercent,
-            tailCutoffStdDevMultiplier,
-            zpdIndex,
-            dsHalfLength,
-            SMF__DEGLITCH_CORE,
-            threshold);
-
-        fts2_deglitch( 
-            interferogram,
-            size,
-            coreClusterSize,
-            tailClusterSize,
-            tailCutoffStdDevPercent,
-            tailCutoffStdDevMultiplier,
-            zpdIndex,
-            dsHalfLength,
-            SMF__DEGLITCH_TAIL,
-            threshold);
+        fts2_deglitch( interferogram, size, coreClusterSize, tailClusterSize,
+                       tailCutoffStdDevPercent, tailCutoffStdDevMultiplier,
+                       zpdIndex, dsHalfLength, SMF__DEGLITCH_CORE, threshold);
+        fts2_deglitch( interferogram, size, coreClusterSize, tailClusterSize,
+                       tailCutoffStdDevPercent, tailCutoffStdDevMultiplier,
+                       zpdIndex, dsHalfLength, SMF__DEGLITCH_TAIL, threshold);
         break;
   }
 }

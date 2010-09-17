@@ -217,6 +217,8 @@
 #     2010-07-19 (COBA):
 #         Add FTS2_FLATFIELD, FTS2_FREQCORR, FTS2_PORTIMBAL,
 #             FTS2_REMOVEBSE, FTS2_SPATIALWCS, FTS2_TRANSCORR
+#     2010-09-17 (COBA):
+#         Add FTS2_DEGLITCH
 #     {enter_changes_here}
 
 #  Bugs:
@@ -1287,6 +1289,91 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+        }
+
+        action fts2_deglitch {
+
+            helplib {$SMURF_HELP}
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                prompt {Input data files}
+                helpkey *
+            }
+
+            parameter out {
+                position 2
+                type NDF
+                access WRITE
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                prompt {Output data files}
+                helpkey *
+            }
+
+            parameter ccsize {
+                type _INTEGER
+                access READ
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Core cluster size}
+                default 20
+                helpkey *
+            }
+
+            parameter tcsize {
+                type _INTEGER
+                access READ
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Tail cluster size}
+                default 60
+                helpkey *
+            }
+
+            parameter tcsigma {
+                type _DOUBLE
+                access READ
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Tail cutoff standard deviation as percentage}
+                default 0.80
+                helpkey *
+            }
+
+            parameter tcsigmamul {
+                type _DOUBLE
+                access READ
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Tail cutoff standard deviation multiplier}
+                default 4
+                helpkey *
+            }
+
+            parameter zpdindex {
+                type _INTEGER
+                access READ
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Tail cluster size}
+                default 200
+                helpkey *
+            }
+
+            parameter dshalflength {
+                type _INTEGER
+                access READ
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Tail cluster size}
+                default 400
+                helpkey *
+            }
         }
 
         action fts2_flatfield {
