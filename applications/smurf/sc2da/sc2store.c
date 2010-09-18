@@ -3591,9 +3591,15 @@ int *status                 /* global status (given and returned) */
 
 /*+ sc2store_timeWcs:  Calculate frameset for time series. */
 
-AstFrameSet *sc2store_timeWcs( sc2ast_subarray_t subnum, int ntime, int use_tlut,
-                               const SC2STORETelpar* telpar,
-                               const double times[], int * status ){
+AstFrameSet *sc2store_timeWcs
+(
+ sc2ast_subarray_t subnum, 
+ int ntime, 
+ int use_tlut,
+ const SC2STORETelpar* telpar,
+ const double times[], 
+ int * status 
+)
 
 /*
 *  Name:
@@ -3661,6 +3667,7 @@ AstFrameSet *sc2store_timeWcs( sc2ast_subarray_t subnum, int ntime, int use_tlut
 
 */
 
+{
 /* Local Variables: */
    AstFrameSet *fset;
    AstFrameSet *result;

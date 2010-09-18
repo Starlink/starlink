@@ -1,7 +1,7 @@
 #ifndef HEADGEN____sc2store_pro_h
-#define HEADGEN____sc2store_pro_h
-
-
+#define HEADGEN____sc2store_pro_h 
+ 
+ 
 /*+ sc2store_compress - compress frame of integers to unsigned short */
 
 void sc2store_compress
@@ -341,18 +341,6 @@ int compflag,         /* value to be set, 1=>compress 0=>don't (given) */
 int *status           /* global status (given and returned) */
 );
 
-/*+ sc2store_timeWcs:  Calculate frameset for time series. */
-
-AstFrameSet *sc2store_timeWcs
-(
-sc2ast_subarray_t subnum,     /* Subarray index */
-int ntime,                    /* The number of time values supplied */
-int use_tlut,                 /* Use a LutMap else use WinMap */
-const SC2STORETelpar* telpar, /* Additional telescope information */
-const double times[],         /* ntime MJD values (TAI timescale) */
-int * status                  /* global status (given and returned) */
- );
-
 /*+ sc2store_unmapwts - unmap and close a DREAM weights file */
 
 void sc2store_unmapwts
@@ -468,6 +456,8 @@ const char *xmlfile,        /* name of CONFIGURE XML file (given) */
 int *status                 /* global status (given and returned) */
 );
 
+/*+ sc2store_updflatcal - update flatfield calibration in SCUBA-2 NDF */
+
 void sc2store_updflatcal
 (
 const char filename[],      /* name of file to update (given) */
@@ -480,7 +470,6 @@ const double *flatpar,      /* flat-field parameters (given) */
 int *status                 /* global status (given and returned) */
 );
 
-
 /*+ sc2store_force_initialised - indicate that we have already initialised */
 
 void sc2store_force_initialised
@@ -488,6 +477,18 @@ void sc2store_force_initialised
 int *status                 /* global status (given and returned) */
 );
 
+/*+ sc2store_timeWcs:  Calculate frameset for time series. */
 
+AstFrameSet *sc2store_timeWcs
+(
+ sc2ast_subarray_t subnum, 
+ int ntime, 
+ int use_tlut,
+ const SC2STORETelpar* telpar,
+ const double times[], 
+ int * status 
+);
 
+ 
+ 
 #endif
