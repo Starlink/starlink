@@ -259,6 +259,7 @@
 \newcommand{\oracdr}{\xref{\textsc{orac-dr}}{sun231}{}}
 \newcommand{\picard}{\xref{\textsc{Picard}}{sun231}{}}
 \newcommand{\smurf}{\xref{\textsc{Smurf}}{sun258}{}}
+\newcommand{\photom}{\xref{\textsc{Photom}}{sun45}{}}
 \newcommand{\topcat}{\htmladdnormallink{\textsc{Topcat}}{http://www.starlink.ac.uk/topcat}}
 
 % DR recipe names
@@ -301,7 +302,7 @@
 \newcommand{\thresh}{\xref{\task{thresh}}{sun95}{THRESH}}
 \newcommand{\setbb}{\xref{\task{setbb}}{sun95}{SETBB}}
 \newcommand{\beamfit}{\xref{\task{beamfit}}{sun95}{BEAMFIT}}
-\newcommand{\autophotom}{\xref{\task{autophotom}}{sun95}{AUTOPHOTOM}}
+\newcommand{\autophotom}{\xref{\task{autophotom}}{sun45}{AUTOPHOTOM}}
 
 \newcommand{\fitslist}{\xref{\task{fitslist}}{sun95}{FITSLIST}}
 \newcommand{\fitsedit}{\xref{\task{fitsedit}}{sun95}{FITSEDIT}}
@@ -1737,7 +1738,7 @@ calibrators, the FCFs and NEFDs have been calculated as follows:
   source. The \beamfit\ task will estimate the peak (uncalibrated)
   flux density and the FWHM. The integrated flux density within a
   given aperture (30\,arcsec radius default) is calculated using
-  \Kappa\ \autophotom. Flux densities for calibrators such as Uranus,
+  \photom\ \autophotom. Flux densities for calibrators such as Uranus,
   Mars, CRL\,618, CRL\,2688 and HL\,Tau are already known to
   \picard. To derive an FCF for other sources of known flux densities,
   the fluxes can be added to the parameter file with the source name
