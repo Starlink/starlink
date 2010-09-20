@@ -2,11 +2,16 @@
 
 # *** Specialized config for scans of bright/extended structure ***
 #
-# For bright extended regions we simply increase the number of
-# iterations. This is required because we have not yet implemented
-# an automatic convergence test for the larger-scale structures
-# in the map.
+# For bright extended regions we increase the number of
+# iterations. This is required because we have not yet implemented an
+# automatic convergence test for the larger-scale structures in the
+# map. We also turn on zero-masking based on a map pixel SNR threshold
+# of 5-sigma. This prefents ringing a round bright sources, but will
+# completely flatten the map in low-SNR regions.
 #
 # ****************************************************************
 
 numiter = 20
+
+ast.zero_notlast = 1
+ast.zero_snr = 5
