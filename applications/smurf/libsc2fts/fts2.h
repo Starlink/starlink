@@ -17,7 +17,7 @@
 *     Definitions of FTS2 utility methods.
 
 *  Authors:
-*     Coskun (Josh) OBA (UoL)
+*     COBA: Coskun OBA (UoL)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 
 *  History :
@@ -117,26 +117,6 @@ void fts2_naturalcubicsplineinterpolator(
     double* xNew,
     double* yNew,
     int n);
-
-double* fts2_polyfitcoeffs(
-    int n,
-    double* x,
-    double* y,
-    double* w,
-    int size,
-    double* sigma);
-
-double fts2_polyfit(
-    int n,
-    double* coeffs,
-    double x);
-
-double* fts2_polyfitarray(
-    int n,
-    double* coeffs,
-    double* x,
-    int size);
-
 
 void fts2ast_createwcs(
     sc2ast_subarray_t subnum,

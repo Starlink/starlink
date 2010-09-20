@@ -10,13 +10,9 @@ C_ROUTINES =  \
               fts2_deglitch.c \
               fts2_getsplineindex.c \
               fts2_naturalcubicsplineinterpolator.c \
-              fts2_phasecorrection.c \
-              fts2_polyfitarray.c \
-              fts2_polyfit.c \
-              fts2_polyfitcoeffs.c 
+              fts2_phasecorrection.c
 
 
 noinst_INCLUDES = \
                   fts2.h \
-                  fts2_type.h 
-
+                  fts2_type.h
