@@ -277,6 +277,8 @@ void smurf_mon( int * status ) {
     smurf_fts2_deglitch( status );
   } else if (strcmp( taskname, "FTS2_FREQCORR" ) == 0 ) {
     smurf_fts2_freqcorr( status );
+  } else if (strcmp( taskname, "FTS2_PHASECORR" ) == 0 ) {
+    smurf_fts2_phasecorr( status );
   } else if (strcmp( taskname, "FTS2_REMOVEBSE" ) == 0 ) {
     smurf_fts2_removebse( status );
   } else if (strcmp( taskname, "FTS2_SPATIALWCS" ) == 0 ) {

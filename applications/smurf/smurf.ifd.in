@@ -69,6 +69,7 @@
 #     AGG: Andy Gibb (UBC)
 #     EC: Ed Chapin (UBC)
 #     JB: Jennifer Balfour (UBC)
+#     COBA: Coskun Oba (UoL)
 #     {enter_new_authors_here}
 
 #  History:
@@ -1430,6 +1431,111 @@ package @PACKAGE@ {
                 type _CHAR
                 vpath {PROMPT}
                 prompt {THETA: The data file which stores the off-axis angles of pixels...}
+                helpkey *
+            }
+        }
+
+        action fts2_phasecorr {
+
+            helplib {$SMURF_HELP}
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                prompt {Input data files}
+                helpkey *
+            }
+
+            parameter out {
+                position 2
+                type NDF
+                access WRITE
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                prompt {Output data files}
+                helpkey *
+            }
+
+            parameter zpdindex {
+                type _INTEGER
+                access READ
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Index of the ZPD}
+                default 400
+                helpkey *
+            }
+
+            parameter sshalflength {
+                type _INTEGER
+                access READ
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Half-Length of Single-Sided Interferogram}
+                default 6000
+                helpkey *
+            }
+
+            parameter dshalflength {
+                type _INTEGER
+                access READ
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Half-Length of Double-Sided Interferogram}
+                default 300
+                helpkey *
+            }
+
+            parameter degree {
+                type _INTEGER
+                access READ
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Polynomial Degree}
+                default 2
+                helpkey *
+            }
+
+            parameter pfhalflength {
+                type _INTEGER
+                access READ
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Phase Function Half-Length}
+                default 80
+                helpkey *
+            }
+
+            parameter wnlbound {
+                type _DOUBLE
+                access READ
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {The lower bound of the wavenumber range (as percentage)}
+                default 0.05
+                helpkey *
+            }
+
+            parameter wnubound {
+                type _DOUBLE
+                access READ
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {The upper bound of the wavenumber range (as percentage)}
+                default 0.8
+                helpkey *
+            }
+
+            parameter weightlimit {
+                type _DOUBLE
+                access READ
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Weight Limit}
+                default 0.1
                 helpkey *
             }
         }

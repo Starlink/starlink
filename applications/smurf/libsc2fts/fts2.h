@@ -54,7 +54,7 @@
 */
 
 /* STARLINK INCLUDES */
-#include "jcmt/state.h" 
+#include "jcmt/state.h"
 #include "sc2da/sc2ast.h"
 
 /* SMURF INCLUDES */
@@ -67,22 +67,14 @@
 
 #ifndef PIBY2
 #define PIBY2 (0.5 * PI)
-#endif 
-
-#ifndef DBL_MIN
-#define DBL_MIN -1.0e308
-#endif
-
-#ifndef DBL_MAX
-#define DBL_MAX -DBL_MIN
 #endif
 
 #ifndef MM2RAD /* scale at array in radians */
-#define MM2RAD (0.92*2.4945e-5) 
+#define MM2RAD (0.92*2.4945e-5)
 #endif
 
 #ifndef PIX2MM /* pixel interval in mm */
-#define PIX2MM 1.135                   
+#define PIX2MM 1.135
 #endif
 
 #ifndef SMF__DEGLITCH_THRESHOLD
@@ -97,7 +89,7 @@
 #define FTS2AST_SPD 86400.0  /* Seconds per day */
 #endif
 
-void fts2_arraycopy( 
+void fts2_arraycopy(
     double* source,
     int sourceSize,
     double* destination,
@@ -107,91 +99,89 @@ void fts2_arraycopy(
     int count);
 
 void fts2_arrayquicksort(
-    double* array, 
-    int size, 
-    int start, 
-    int end, 
+    double* array,
+    int size,
+    int start,
+    int end,
     int ascending);
 
 int fts2_getsplineindex(
-    double* x, 
-    int m, 
+    double* x,
+    int m,
     double xNew);
-    
-void fts2_naturalcubicsplineinterpolator(
-    double* x, 
-    double* y, 
-    int m, 
-    double* xNew, 
-    double* yNew, 
-    int n);
-    
-double* fts2_polyfitcoeffs(
-    int n,          /* Polynomial degree */
-    double* x,      /* Discrete x-values */
-    double* y,      /* Discrete y-values */
-    double* w,      /* The weights */
-    int size,       /* Size of x, y and w */
-    double* sigma); /* Standard deviation (out) */
 
-double fts2_polyfit( 
-    int n,          /* Polynomial degree */
-    double* coeffs, /* Coefficients, pre-computed with fts2_polyfitcoeffs() */
-    double x);      /* The value of which the fit is seeked */
+void fts2_naturalcubicsplineinterpolator(
+    double* x,
+    double* y,
+    int m,
+    double* xNew,
+    double* yNew,
+    int n);
+
+double* fts2_polyfitcoeffs(
+    int n,
+    double* x,
+    double* y,
+    double* w,
+    int size,
+    double* sigma);
+
+double fts2_polyfit(
+    int n,
+    double* coeffs,
+    double x);
 
 double* fts2_polyfitarray(
-    int n,          /* Polynomial degree */
-    double* coeffs, /* Coefficients, pre-computed with fts2_polyfitcoeffs() */
-    double* x,      /* The array of which the fit is seeked */
-    int size);      /* Size of array */
-    
+    int n,
+    double* coeffs,
+    double* x,
+    int size);
 
-void fts2ast_createwcs
-(
-    sc2ast_subarray_t subnum, /* subarray number, 0-7 (given). If SC2AST__NULLSUB is
-                              *  supplied the cached AST objects will be freed. */
-    const JCMTState *state,   /* Current telescope state (time, pointing etc.) */
-    const double instap[2],   /* Offset of subarray in the focal plane */
-    const double telpos[3],   /* Geodetic W Lon/Lat/Alt of telescope (deg/deg/ign.)*/
-    AstFrameSet **fset,       /* constructed frameset (returned) */
-    int *status               /* global status (given and returned) */
-);
 
-sc2astCache* fts2ast_createwcs2
-(
-    sc2ast_subarray_t subnum, /* subarray number, 0-7 (given). 
-                              *   If SC2AST__NULLSUB is supplied the cached 
-                              *   AST objects will be freed. */
-    const JCMTState *state,   /* Current telescope state (time, pointing etc.) */
-    double dut1,              /* UT1-UTC (seconds) */
-    const double instap[2],   /* Offset of subarray in the focal plane */
-    const double telpos[3],   /* Geodetic W Lon/Lat/Alt of telescope (deg/deg/ign.)*/
-    AstFrameSet **fset,       /* constructed frameset (returned) */
-    sc2astCache *cache,       /* A pointer to a structure holding cached info */
-    int *status               /* global status (given and returned) */
-);
+void fts2ast_createwcs(
+    sc2ast_subarray_t subnum,
+    const JCMTState *state,
+    const double instap[2],
+    const double telpos[3],
+    AstFrameSet **fset,
+    int *status);
+
+sc2astCache* fts2ast_createwcs2(
+    sc2ast_subarray_t subnum,
+    const JCMTState *state,
+    double dut1,
+    const double instap[2],
+    const double telpos[3],
+    AstFrameSet **fset,
+    sc2astCache *cache,
+    int *status);
 
 void fts2_deglitch(
-    double* interferogram,              /* The interferogram */
-    int size,                           /* Sample size of the interferogram */
-    int coreClusterSize,                /* Core cluster size */
-    int tailClusterSize,                /* Tail cluster size */
-    double tailCutoffStdDevPercent,     /* Tail cutoff standard deviation (as percentage) */
-    double tailCutoffStdDevMultiplier,  /* Tail cutoff standard deviation multiplier */
-    int zpdIndex,                       /* Index of ZPD */
-    int dsHalfLength,                   /* Size of the double sided interferogram */
-    smf_deglitchmode mode,					    /* Deglitch mode */
-    double threshold);            	    /* Deglitch threshold */
+    double* interferogram,
+    int size,
+    int coreClusterSize,
+    int tailClusterSize,
+    double tailCutoffStdDevPercent,
+    double tailCutoffStdDevMultiplier,
+    int zpdIndex,
+    int dsHalfLength,
+    smf_deglitchmode mode,
+    double threshold);
 
-int fts2_phasecorrcetion(
-    double* interferogram,        /* The interferogram */
-    int size,                     /* Sample size of the interferogram */
-    int zpdIndex,                 /* Index of ZPD */
-    int* dsHalfLength,            /* Double-Sided interferogram half-length */
-    int* ssHalfLength,            /* Single-Sided interferogram half-length */
-    int polynomialDegree,     	  /* Degree of the fitting polynomial */
-    int phaseFunctionHalfLength,  /* Phase correction function half-length  */
-    double wnLBoundPercent,   	  /* The lower bound of the wavenumber range (as percentage) */
-    double wnUBoundPercent,   	  /* The upper bound of the wavenumber range (as percentage) */
-    double weightLimit,       	  /* Weight limit */
-    double* sigma); 			        /* Holds the value of the Standard Deviation after performing the Phase Correction */
+void fts2_phasecorrection(
+    double* interferogram,
+    int size,
+    int zpdIndex,
+    int dsHalfLength,
+    int ssHalfLength,
+    int polynomialDegree,
+    int phaseFunctionHalfLength,
+    double wnLBoundPercent,
+    double wnUBoundPercent,
+    double weightLimit,
+    double* sigma,
+    double* coefficients,
+    double* phase,
+    double* phaseCorrectionFunction,
+    double* phaseCorrectedInterferogram,
+    int* status);
