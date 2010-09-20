@@ -13,13 +13,15 @@
 *     Library routine
 
 *  Invocation:
-*     smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarray,
-*                       const smfArray *darks, const smfArray *bbms,
-*                       const smfArray* flatramps, dim_t nchunks, smf_modeltype mtype,
-*                       int isTordered, AstFrameSet *outfset, int moving,
-*                       int *lbnd_out, int *ubnd_out, smfGroup **mgroup,
-*                       int nofile, int leaveopen, smfArray **mdata,
-*                       AstKeyMap *keymap, int *status )
+*     smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
+*                       smfArray **iarray, const smfArray *darks,
+*                       const smfArray *bbms, const smfArray* flatramps,
+*                       const smfArray *noisemaps, dim_t nchunks,
+*                       smf_modeltype mtype, int isTordered,
+*                       AstFrameSet *outfset, int moving, int *lbnd_out,
+*                       int *ubnd_out, smfGroup **mgroup, int nofile,
+*                       int leaveopen, smfArray **mdata, AstKeyMap *keymap,
+*                       int *status )
 
 *  Arguments:
 *     wf = smfWorkForce * (Given)
@@ -35,7 +37,10 @@
 *     bbms = const smfArray * (Given)
 *        Masks for each subarray (e.g. returned by smf_reqest_mask call)
 *     flatramps = const smfArray * (Given)
-*        Collection of flatfield ramps. Will be passed to smf_open_and_flatfield.
+*        Collection of flatfield ramps. Passed to smf_open_and_flatfield.
+*     noisemaps = const smfArray * (Given)
+*        smfArray of 2d smfData's containing externally-calculated noise maps
+*        which, if supplied, are ued to initialize the NOI model.
 *     nchunks = dim_t (Given)
 *        If iarray specified instead of igroup, nchunks gives number of
 *        smfArrays in iarray (otherwise it is derived from igroup).
@@ -190,6 +195,8 @@
 *        Add dark squid cleaning
 *     2010-06-28 (AGG):
 *        Update POSIX version to 200809L to build on Fedora 13
+*     2010-09-20 (EC):
+*        Optionally initialize NOI using externally-supplied array
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -245,10 +252,12 @@
 
 #define FUNC_NAME "smf_model_create"
 
-void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarray,
-                       const smfArray *darks, const smfArray *bbms,
-                       const smfArray * flatramps, dim_t nchunks, smf_modeltype mtype,
-                       int isTordered, AstFrameSet *outfset, int moving,
+void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
+                       smfArray **iarray, const smfArray *darks,
+                       const smfArray *bbms, const smfArray *flatramps,
+                       const smfArray *noisemaps,dim_t nchunks,
+                       smf_modeltype mtype, int isTordered,
+                       AstFrameSet *outfset, int moving,
                        int *lbnd_out, int *ubnd_out, smfGroup **mgroup,
                        int nofile, int leaveopen, smfArray **mdata,
                        AstKeyMap *keymap, int *status ) {
@@ -381,8 +390,8 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
   if( mtype == SMF__RES ) {
     /* Propagate input if RES */
     copyinput = 1;
-  } else if( mtype != SMF__DKS ) {
-    /* For all remaining types (other than DKS) don't need data array */
+  } else if( (mtype != SMF__DKS) && (mtype != SMF__NOI) ) {
+    /* For types other than DKS/NOI don't need data array */
     oflag |= SMF__NOCREATE_DATA;
   }
 
@@ -874,21 +883,50 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
               }
 
             } else if( mtype == SMF__NOI ) {
-              /* If this is a NOI, set to 1, avoid divide-by-zero */
-              if( head.data.dtype == SMF__DOUBLE ) {
+              int calcfirst;
+
+              astMapGet0A( keymap, "NOI", &kmap );
+              astMapGet0I( kmap, "CALCFIRST", &calcfirst );
+              kmap = astAnnul( kmap );
 
               smf_get_dims( &(head.data), NULL, NULL, NULL, NULL, &ndata,
-                             NULL, NULL, status);
+                            NULL, NULL, status);
 
-                for( l=0; l<ndata; l++ ) {
-                  ((double *) dataptr)[l] = 1;
+              if( calcfirst ) {
+                /* If calcfirst flag is set, initialize NOI using noise
+                   measured in the bolometer now (i.e. before the first
+                   iteration). Use externally-supplied noise values
+                   if provided */
+
+                if( noisemaps ) {
+                  memcpy( dataptr, noisemaps->sdata[j]->pntr[0],
+                          ndata*smf_dtype_size(noisemaps->sdata[j], status) );
+                } else {
+                  if( idata && idata->pntr[0] ) {
+                    smf_bolonoise( wf, idata, 0, 0.5, SMF__F_WHITELO,
+                                   SMF__F_WHITEHI, 0, 0, SMF__MAXAPLEN,
+                                   dataptr, NULL, NULL, status );
+                  } else {
+                    *status = SAI__ERROR;
+                    errRep(FUNC_NAME,
+                           "Possible programming error. No bolo data.",
+                           status);
+                  }
                 }
+
               } else {
-                /* Generate error message if NOI is not double... */
-                *status = SAI__ERROR;
-                errRep(FUNC_NAME,
-                       "Possible programming error. NOI should be DOUBLE.",
-                       status);
+                /* Otherwise initialize values to 1, avoid divide-by-zero */
+                if( head.data.dtype == SMF__DOUBLE ) {
+                  for( l=0; l<ndata; l++ ) {
+                    ((double *) dataptr)[l] = 1;
+                  }
+                } else {
+                  /* Generate error message if NOI is not double... */
+                  *status = SAI__ERROR;
+                  errRep(FUNC_NAME,
+                         "Possible programming error. NOI should be DOUBLE.",
+                         status);
+                }
               }
 
             } else if( mtype == SMF__QUA ) {
@@ -955,7 +993,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarr
 
                 /* clean darks using cleandk.* parameters */
                 astMapGet0A( keymap, "CLEANDK", &kmap );
-                smf_clean_smfData( wf, dksquid, kmap, status );
+                smf_clean_smfData( wf, dksquid, NULL, kmap, status );
                 if( kmap ) kmap = astAnnul( kmap );
 
                 /* Unset hdr pointer so that we don't accidentally close it */

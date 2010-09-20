@@ -331,6 +331,8 @@
 *        -Improve commenting of the major blocks in the code
 *     2010-09-17 (COBA):
 *        Updated smf_construct_smfData which now contains smfFts
+*     2010-09-20 (EC):
+*        If noise map generated in smf_clean_smfData, use to initialize NOI
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -974,8 +976,10 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
   for( contchunk=0; contchunk<ncontchunks; contchunk++ ) {
 
-    size_t ntgood = 0;    /* Number of good time slices in this chunk */
-    size_t nsamples = 0;  /* Number of good samples in this chunk */
+    size_t ntgood = 0;       /* Number of good time slices in this chunk */
+    size_t nsamples = 0;     /* Number of good samples in this chunk */
+
+    smfArray *noisemaps=NULL;/* Array of noise maps for current chunk */
 
     if( memiter ) {
       msgSeti("CHUNK", contchunk+1);
@@ -1067,11 +1071,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
            bolo-ordered data although the work has already been done at
            the concatenation stage. */
 
-        smf_model_create( wf, NULL, res, darks, bbms, flatramps, nfilegroups,
-                          SMF__QUA, 0,
-                          NULL, 0, NULL, NULL,
-                          NULL, memiter,
-                          memiter, qua, keymap, status );
+        smf_model_create( wf, NULL, res, darks, bbms, flatramps, NULL,
+                          nfilegroups, SMF__QUA, 0, NULL, 0, NULL, NULL,
+                          NULL, memiter, memiter, qua, keymap, status );
 
         /* Associate quality with the res model, and do cleaning
            before we start using more memory for other things. Note that
@@ -1085,10 +1087,19 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         }
 
         if( doclean ) {
+          smfData *thisnoisemap=NULL;
+
           msgOut(" ", FUNC_NAME ": Pre-conditioning data", status);
           for( idx=0; idx<res[0]->ndat; idx++ ) {
             data = res[0]->sdata[idx];
-            smf_clean_smfData( wf, data, keymap, status );
+            smf_clean_smfData( wf, data, &thisnoisemap, keymap, status );
+
+            /* If we end up calculating a noise map store it here as we
+               can use it to save time initializing NOI later */
+            if( thisnoisemap ) {
+              if( !noisemaps ) noisemaps = smf_create_smfArray( status );
+              smf_addto_smfArray( noisemaps, thisnoisemap, status );
+            }
           }
         } else {
           msgOut( "", FUNC_NAME ": *** Warning *** doclean=0, "
@@ -1103,11 +1114,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
         /* Continue with other static model. */
 
-        smf_model_create( wf, NULL, res, darks, bbms, flatramps, nfilegroups,
-                          SMF__LUT, 0,
-                          NULL, 0, NULL, NULL,
-                          NULL, memiter,
-                          memiter, lut, keymap, status );
+        smf_model_create( wf, NULL, res, darks, bbms, flatramps, NULL,
+                          nfilegroups, SMF__LUT, 0, NULL, 0, NULL, NULL,
+                          NULL, memiter, memiter, lut, keymap, status );
 
         /* Since a copy of the LUT is still open in res[0] free it up here */
         for( i=0; (*status==SAI__OK)&&(i<res[0]->ndat); i++ ) {
@@ -1116,11 +1125,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           }
         }
 
-        smf_model_create( wf, NULL, res, darks, bbms, flatramps, nfilegroups,
-                          SMF__AST, 0,
-                          NULL, 0, NULL, NULL,
-                          NULL, memiter,
-                          memiter, ast, keymap, status );
+        smf_model_create( wf, NULL, res, darks, bbms, flatramps, NULL,
+                          nfilegroups, SMF__AST, 0, NULL, 0, NULL, NULL,
+                          NULL, memiter, memiter, ast, keymap, status );
 
         /* Also associate quality with AST model. */
         for( idx=0; (*status==SAI__OK)&&(idx<ast[0]->ndat); idx++ ) {
@@ -1139,29 +1146,21 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
         res = astCalloc( nfilegroups, sizeof(*res), 1 );
 
-        smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, 0,
-                          SMF__RES, 0,
-                          NULL, 0, NULL, NULL,
-                          &resgroup, memiter,
-                          memiter, res, keymap, status );
+        smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, NULL, 0,
+                          SMF__RES, 0, NULL, 0, NULL, NULL,
+                          &resgroup, memiter, memiter, res, keymap, status );
 
-        smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, 0,
-                          SMF__LUT, 0,
-                          outfset, moving, lbnd_out, ubnd_out,
-                          &lutgroup, memiter,
-                          memiter, lut, keymap, status );
+        smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, NULL, 0,
+                          SMF__LUT, 0, outfset, moving, lbnd_out, ubnd_out,
+                          &lutgroup, memiter, memiter, lut, keymap, status );
 
-        smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, 0,
-                          SMF__AST, 0,
-                          NULL, 0, NULL, NULL,
-                          &astgroup, memiter,
-                          memiter, ast, keymap, status );
+        smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, NULL, 0,
+                          SMF__AST, 0, NULL, 0, NULL, NULL,
+                          &astgroup, memiter, memiter, ast, keymap, status );
 
-        smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, 0,
-                          SMF__QUA, 0,
-                          NULL, 0, NULL, NULL,
-                          &quagroup, memiter,
-                          memiter, qua, keymap, status );
+        smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, NULL, 0,
+                          SMF__QUA, 0, NULL, 0, NULL, NULL,
+                          &quagroup, memiter, memiter, qua, keymap, status );
       }
     }
 
@@ -1193,17 +1192,14 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         model[i] = astCalloc( nfilegroups, sizeof(**model), 1 );
 
         if( memiter ) {
-          smf_model_create( wf, NULL, res, darks, bbms, flatramps, nfilegroups,
-                            modeltyps[i], 0,
-                            NULL, 0, NULL, NULL,
-                            NULL, memiter, memiter, model[i], keymap,
-                            status );
+          smf_model_create( wf, NULL, res, darks, bbms, flatramps, noisemaps,
+                            nfilegroups, modeltyps[i], 0, NULL, 0, NULL, NULL,
+                            NULL, memiter, memiter, model[i], keymap, status );
 
         } else {
-          smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, 0,
-                            modeltyps[i], 0,
-                            NULL, 0, NULL, NULL, &modelgroups[i],
-                            memiter, memiter, model[i], keymap,
+          smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, noisemaps,
+                            0, modeltyps[i], 0, NULL, 0, NULL, NULL,
+                            &modelgroups[i], memiter, memiter, model[i], keymap,
                             status );
         }
       }
@@ -1250,7 +1246,10 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         dat.gai = NULL;
       }
 
+      /* We can close noisemaps here because they will already have
+         been used to initialize the NOI model if needed. */
 
+      if( noisemaps ) smf_close_related( &noisemaps, status );
 
 
 
@@ -1332,7 +1331,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                 msgOut(" ", FUNC_NAME ": Pre-conditioning data", status);
                 for( idx=0; idx<res[i]->ndat; idx++ ) {
                   data = res[i]->sdata[idx];
-                  smf_clean_smfData( wf, data, keymap, status );
+                  smf_clean_smfData( wf, data, NULL, keymap, status );
                 }
               } else {
                 msgOut( "", FUNC_NAME ": *** Warning *** doclean=0, "

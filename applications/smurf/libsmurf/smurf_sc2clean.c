@@ -349,7 +349,7 @@ void smurf_sc2clean( int *status ) {
 
         /* clean darks using cleandk.* parameters */
         astMapGet0A( keymap, "CLEANDK", &kmap );
-        smf_clean_smfData( wf, dksquid, kmap, status );
+        smf_clean_smfData( wf, dksquid, NULL, kmap, status );
         if( kmap ) kmap = astAnnul( kmap );
 
         /* Unset hdr pointer so that we don't accidentally close it */
@@ -359,7 +359,7 @@ void smurf_sc2clean( int *status ) {
       msgOut("", TASK_NAME ": cleaning bolometer data", status );
 
       /* Clean the data */
-      smf_clean_smfData( wf, ffdata, keymap, status );
+      smf_clean_smfData( wf, ffdata, NULL, keymap, status );
 
       /* Ensure that the data is ICD ordered before closing */
       smf_dataOrder( ffdata, 1, status );

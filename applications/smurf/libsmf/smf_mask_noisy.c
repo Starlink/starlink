@@ -13,7 +13,7 @@
 *     Library routine
 
 *  Invocation:
-*     smf_mask_noisy( smfWorkForce *wf, smfData *data,
+*     smf_mask_noisy( smfWorkForce *wf, smfData *data, smfData **noise,
 *                       double sigclip, int * status );
 
 *  Arguments:
@@ -21,6 +21,8 @@
 *        Pointer to a pool of worker threads. Can be NULL.
 *     data = smfData * (Given and Returned)
 *        The data that will be flagged
+*     noise = smfData ** (Returned)
+*        Optionally return pointer to smfData containing noise map. Can be NULL.
 *     sigclip = double (Given)
 *        Number of standard deviations above the mean to clip noisy bolometers.
 *        Returns immediately unless this value is greater than zero.
@@ -34,6 +36,7 @@
 
 *  Authors:
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     EC: Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  Notes:
@@ -46,10 +49,13 @@
 *        Initial version
 *     2010-07-07 (TIMJ):
 *        Use new quality scheme.
+*     2010-09-16 (EC):
+*        Optionally return noisemap
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
+*     Copyright (C) 2010 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -78,7 +84,7 @@
 #include "sae_par.h"
 #include "mers.h"
 
-void smf_mask_noisy( smfWorkForce *wf, smfData *data,
+void smf_mask_noisy( smfWorkForce *wf, smfData *data, smfData **noise,
                        double sigclip, int * status ) {
 
   const float clips[] = { 5, 5, 5, 5, 5 };  /* Clip levels for noise data */
@@ -155,6 +161,11 @@ void smf_mask_noisy( smfWorkForce *wf, smfData *data,
     smf_close_related( &masks, status );
   }
 
-  smf_close_file( &noisemap, status );
+  /* Give noisemap back to caller if requested, or close it */
+  if( noise ) {
+    *noise = noisemap;
+  } else {
+    smf_close_file( &noisemap, status );
+  }
 
 }

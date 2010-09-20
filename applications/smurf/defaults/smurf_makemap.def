@@ -160,6 +160,8 @@ flt.filt_notchhigh = <undef>
 flt.filt_wlim = <undef>
 
 # smf_calcmodel_noi
+noi.calcfirst = 0
+
 # these are a subset of smf_get_cleanpar options
 
 noi.dcfitbox = 0

@@ -13,7 +13,7 @@
 *     Library routine
 
 *  Invocation:
-*     smf_clean_smfData( smfWorkForce *wf, smfData *data,
+*     smf_clean_smfData( smfWorkForce *wf, smfData *data, smfData **noisemap,
 *                        AstKeyMap *keymap, int *status )
 
 *  Arguments:
@@ -21,6 +21,9 @@
 *        Pointer to a pool of worker threads. Can be NULL.
 *     data = smfData * (Given and Returned)
 *        The data that will be flagged
+*     noisemap = smfData ** (Returned)
+*        Optionally return bolo noise map if noiseclipping is specified.
+*        Can be NULL.
 *     keymap = AstKeyMap* (Given)
 *        keymap containing parameters to control cleaning
 *     status = int* (Given and Returned)
@@ -69,6 +72,8 @@
 *        Use smf_fit_poly directly instead of smf_scanfit
 *     2010-09-16 (EC):
 *        Further simplification since smf_fit_poly can remove the poly as well
+*     2010-09-20 (EC):
+*        Optionally return noise map
 
 *  Copyright:
 *     Copyright (C) 2010 Univeristy of British Columbia.
@@ -109,7 +114,7 @@
 
 #define FUNC_NAME "smf_clean_smfData"
 
-void smf_clean_smfData( smfWorkForce *wf, smfData *data,
+void smf_clean_smfData( smfWorkForce *wf, smfData *data, smfData **noisemap,
                         AstKeyMap *keymap, int *status ) {
 
   /* Local Variables */
@@ -265,7 +270,7 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data,
 
   /* Noise mask */
   if( (*status == SAI__OK) && (noiseclip > 0.0) ) {
-    smf_mask_noisy( wf, data, noiseclip, status );
+    smf_mask_noisy( wf, data, noisemap, noiseclip, status );
 
     /*** TIMER ***/
     msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ":   ** %f s masking noisy",

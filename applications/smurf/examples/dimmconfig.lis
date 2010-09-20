@@ -258,6 +258,12 @@ dks.boxcar = 100
 # if set, replace dead dark squids with average of working dark squids
 dks.replacebad = 0
 
+# do we want to calculate noise weights immediately after pre-conditioning,
+# or wait until we have the first iteration of the residual? The former can
+# reduce execution time if noiseclip is also set since both operations
+# share a single FFT.
+#noi.calcfirst = 1
+
 # additional despiking / DC step finding after each iteration within noi
 # calculation. Setting noi.spikebox to 50 will check for excursions
 # from a rolling median filter in a box of length 50 samples.

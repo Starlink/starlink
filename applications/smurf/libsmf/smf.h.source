@@ -667,7 +667,7 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
 void smf_clean_dksquid( smfData *indata, smf_qual_t mask, size_t window,  smfData *model,
                         int calcdk, int nofit, int replacebad, int *status );
 
-void smf_clean_smfData( smfWorkForce *wf, smfData *data,
+void smf_clean_smfData( smfWorkForce *wf, smfData *data, smfData **noisemap,
                         AstKeyMap *keymap, int *status );
 
 void smf_clone_data ( const smfData *idata, smfData **odata, int *status );
@@ -1230,7 +1230,7 @@ void smf_mapbounds_approx( Grp *igrp, size_t index, char *system,
                            AstFrameSet **outframeset, int *moving,
                            int *status );
 
-void smf_mask_noisy( smfWorkForce *wf, smfData *data,
+void smf_mask_noisy( smfWorkForce *wf, smfData *data, smfData **noise,
                      double sigclip, int * status );
 
 void smf_maskacsis( int indf, int *mask, int *status );
@@ -1241,10 +1241,12 @@ void smf_median_smooth( dim_t box, smf_filt_t filter_type, float wlim,
                         smf_qual_t mask, double *out, double *w1,
                         size_t *w2, int *w3, int *status );
 
-void smf_model_create( smfWorkForce *wf, const smfGroup *igroup, smfArray **iarray,
-                       const smfArray *darks, const smfArray *bbms,
-                       const smfArray *flatramps, dim_t nchunks, smf_modeltype mtype,
-                       int isTordered, AstFrameSet *outfset, int moving,
+void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
+                       smfArray **iarray, const smfArray *darks,
+                       const smfArray *bbms, const smfArray *flatramps,
+                       const smfArray *noisemaps,dim_t nchunks,
+                       smf_modeltype mtype, int isTordered,
+                       AstFrameSet *outfset, int moving,
                        int *lbnd_out, int *ubnd_out, smfGroup **mgroup,
                        int nofile, int leaveopen, smfArray **mdata,
                        AstKeyMap *keymap, int *status );

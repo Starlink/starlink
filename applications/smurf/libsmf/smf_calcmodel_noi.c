@@ -101,6 +101,8 @@
 *        Change smf_fix_steps argument list.
 *     2010-09-15 (DSB):
 *        Call smf_flag_spikes2 instead of smf_flag_spikes.
+*     2010-09-20 (EC):
+*        Optionally calculate noise weights in advance with NOI.CALCFIRST
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -150,6 +152,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
   /* Local Variables */
   size_t bstride;               /* bolometer stride */
+  int calcfirst=0;              /* Were bolo noises already measured? */
   int dcmaxsteps;               /* Maximum allowed number of dc jumps */
   dim_t dcfitbox;               /* Width of box for DC step detection */
   double dcthresh;              /* Threshold for DC step detection */
@@ -195,14 +198,15 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   model = allmodel[chunk];
 
   /* Obtain parameters for NOI */
-  if( kmap ) {
 
-    /* Data-cleaning parameters  */
-    smf_get_cleanpar( kmap, NULL, &dcfitbox, &dcmaxsteps, &dcthresh,
-                      &dcsmooth, NULL, &fillgaps, NULL,
-                      NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-                      &spikethresh, &spikebox, NULL, status );
-  }
+  /* Data-cleaning parameters  */
+  smf_get_cleanpar( kmap, NULL, &dcfitbox, &dcmaxsteps, &dcthresh,
+                    &dcsmooth, NULL, &fillgaps, NULL,
+                    NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+                    &spikethresh, &spikebox, NULL, status );
+
+  /* Did we already calculate the noise on each detector? */
+  astMapGet0I( kmap, "CALCFIRST", &calcfirst );
 
   /* Initialize chisquared */
   dat->chisquared[chunk] = 0;
@@ -231,11 +235,14 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
       /* Only estimate the white noise level once at the beginning - the
          reason for this is to make measurements of the convergence
-         easier. */
+         easier. We either do it prior to the start of iterations (in which
+         case the relative weights will be influeced by low-frequency noise,
+         this is initialized in smf_model_create), or else we calculate
+         the noise after the first iteration. */
 
       var = astCalloc( nbolo, sizeof(*var), 0 );
 
-      if( flags & SMF__DIMM_FIRSTITER ) {
+      if( (flags & SMF__DIMM_FIRSTITER) && (!calcfirst) ) {
         /* Measure the noise from power spectra */
         smf_bolonoise( wf, res->sdata[idx], 0, 0.5, SMF__F_WHITELO,
                        SMF__F_WHITEHI, 0, 0, SMF__MAXAPLEN, var, NULL, NULL,
