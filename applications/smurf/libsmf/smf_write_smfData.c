@@ -404,7 +404,7 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
         datAnnul( &loc, status );
       }
     }
-    
+
     /* FTS2 */
     if( *status == SAI__OK &&
         data->fts &&
@@ -430,13 +430,14 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
         ubnd[1] = lbnd[1] + fts->fpm->dims[1] - 1;
         ubnd[2] = lbnd[2] + fts->fpm->dims[2] - 1;
 
-        id = smf_get_ndfid( loc, "FPM", "WRITE", "UNKNOWN", "_DOUBLE", 
+        id = smf_get_ndfid( loc, "FPM", "WRITE", "UNKNOWN", "_DOUBLE",
                             fts->fpm->ndims, lbnd, ubnd, status);
         ndfMap(id, "DATA", "_DOUBLE", "WRITE", &pntr[0], &nmap, status);
         outfpm = pntr[0];
         if((*status == SAI__OK) && outfpm) {
           memcpy(outfpm, fts->fpm->pntr[0], nmap * sizeof(*outfpm));
         }
+        ndfAnnul(&id, status);
       }
       /* WRITE STANDARD DEVIATION, SIGMA */
       if(fts->sigma && fts->sigma->pntr[0]) {
@@ -445,15 +446,16 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
         ubnd[0] = lbnd[0] + fts->sigma->dims[0] - 1;
         ubnd[1] = lbnd[1] + fts->sigma->dims[1] - 1;
 
-        id = smf_get_ndfid( loc, "SIGMA", "WRITE", "UNKNOWN", "_DOUBLE", 
+        id = smf_get_ndfid( loc, "SIGMA", "WRITE", "UNKNOWN", "_DOUBLE",
                             fts->sigma->ndims, lbnd, ubnd, status);
         ndfMap(id, "DATA", "_DOUBLE", "WRITE", &pntr[0], &nmap, status);
         outsigma = pntr[0];
         if((*status == SAI__OK) && outsigma) {
           memcpy(outsigma, fts->sigma->pntr[0], nmap * sizeof(*outsigma));
         }
+        ndfAnnul(&id, status);
       }
-      ndfAnnul(&id, status);
+
       datAnnul(&loc, status);
     }
   }
