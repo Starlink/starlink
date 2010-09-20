@@ -27,6 +27,13 @@
 *        Remove fts2_isInBeam.
 *     2010-08-09 (TIMJ):
 *        Remove fts2_isInBeam.
+*     2010-09-20 (COBA):
+*        - Remove fts2_polyfitarray
+*        - Remove fts2_polyfit
+*        - Remove fts2_polyfitcoeffs
+*        - Remove PI
+*        - Remove PIBY2
+*        - Remove FTS2AST_SPD
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -61,16 +68,8 @@
 #include "fts2_type.h"
 #include "libsmf/smf_typ.h"
 
-#ifndef PI
-#define PI 3.14159265358979323
-#endif
-
-#ifndef PIBY2
-#define PIBY2 (0.5 * PI)
-#endif
-
 #ifndef MM2RAD /* scale at array in radians */
-#define MM2RAD (0.92*2.4945e-5)
+#define MM2RAD (0.92 * 2.4945e-5)
 #endif
 
 #ifndef PIX2MM /* pixel interval in mm */
@@ -83,10 +82,6 @@
 
 #ifndef SMF__FLAT_THRESHOLD
 #define SMF__FLAT_THRESHOLD 1.0e-10
-#endif
-
-#ifndef FTS2AST_SPD
-#define FTS2AST_SPD 86400.0  /* Seconds per day */
 #endif
 
 void fts2_arraycopy(

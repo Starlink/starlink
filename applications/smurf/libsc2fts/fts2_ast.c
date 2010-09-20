@@ -23,9 +23,12 @@
 
 *  Authors:
 *     Tanner Heggie (UoL)
+*     COBA: Coskun Oba (UoL)
 
 *  History :
 *     Created: May 17, 2010
+*     2010-09-20 (COBA):
+*       Replaced PI and PIBY2 with AST__DPI and AST__DPIBY2
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -113,7 +116,10 @@ sc2astCache *fts2ast_createwcs2
 
   double r;                       // subarray angle
   double rot[4];                  // rotation matrix
-  const double rotangle[8] = { 0.0, PIBY2, 2*PIBY2, 3*PIBY2, 3*PIBY2, 2*PIBY2, PIBY2, 0.0 };
+  const double rotangle[8] = { 0.0,
+                               AST__DPIBY2, 2 * AST__DPIBY2, 3 * AST__DPIBY2,
+                               3 * AST__DPIBY2, 2 * AST__DPIBY2, AST__DPIBY2,
+                               0.0 };
   double shift[2];
   double zshift[2];
   double flip[4] = {1, 0, 0, -1};
@@ -605,7 +611,7 @@ sc2astCache *fts2ast_createwcs2
    */
   astSet( cache->skyframe,
            "Epoch=MJD %.*g,SkyRef(1)=%.*g, SkyRef(2)=%.*g,dut1=%.*g",
-           DBL_DIG, state->tcs_tai + 32.184/FTS2AST_SPD,
+           DBL_DIG, state->tcs_tai + 32.184 / SPD,
            DBL_DIG, state->tcs_az_bc1,
            DBL_DIG, state->tcs_az_bc2,
            DBL_DIG, dut1 );

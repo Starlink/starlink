@@ -65,6 +65,8 @@
 *  History :
 *     2010-08-26 (COBA):
 *        Original version.
+*     2010-09-20 (COBA):
+*        Replaced PI with AST__DPI
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -241,11 +243,11 @@ void fts2_phasecorrection(
 	  phaseSize = dsHalfLength;
 	  for(i = 0; i < phaseSize; i++) {
 	    phase[i] = atan2(spectrum[i][1], spectrum[i][0]);
-	    phase[i] -= PI / (phaseSize - 1) * i;
+	    phase[i] -= AST__DPI / (phaseSize - 1) * i;
 	    if(phase[i] < 0.0) {
-	      phase[i] += PI;
+	      phase[i] += AST__DPI;
 	      if(phase[i] < 0.0) {
-	        phase[i] += PI;
+	        phase[i] += AST__DPI;
 	      }
 	    }
 	  }
@@ -255,12 +257,12 @@ void fts2_phasecorrection(
 	  jitter[0] = 0;
 	  for(i = 1; i < phaseSize; i++) {
 	    jitter[i] = jitter[i - 1];
-	    if(abs(phase[i] - phase[i - 1]) > (2.0 * PI / 3.0)) {
+	    if(abs(phase[i] - phase[i - 1]) > (2.0 * AST__DPI / 3.0)) {
 	      jitter[i] = (phase[i] > phase[i - 1]) ? jitter[i]-- : jitter[i]++;
 	    }
 	  }
 	  for(i = 0; i < phaseSize; i++) {
-	    phase[i] += (PI * jitter[i]);
+	    phase[i] += (AST__DPI * jitter[i]);
 	  }
 	  astFree(jitter);
 
@@ -324,11 +326,11 @@ void fts2_phasecorrection(
 	      interval = 0;
 	      index = i << 1;
 	      if(midPhase[index] > midPhase[index - 1]) {
-	        interval = (int) ((midPhase[index] - midPhase[index - 1]) / PI + 0.4444);
+	        interval = (int) ((midPhase[index] - midPhase[index - 1]) / AST__DPI + 0.4444);
 	      } else {
-	        interval = (int) ((midPhase[index] - midPhase[index - 1]) / PI - 0.4444);
+	        interval = (int) ((midPhase[index] - midPhase[index - 1]) / AST__DPI - 0.4444);
 	      }
-	      bandPhaseInc[i] = bandPhaseInc[i - 1] - interval * PI;
+	      bandPhaseInc[i] = bandPhaseInc[i - 1] - interval * AST__DPI;
 	    }
 	    for(i = 0; i < bandNumber; i++) {
 	      for(k = bandIndex[i]; k < bandIndex[i + 1]; k++) {

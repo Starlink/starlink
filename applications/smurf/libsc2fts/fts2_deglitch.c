@@ -42,13 +42,16 @@
 *    Removes the glitches (if any) from the given interferogram.
 
 *  Authors:
-*     Coskun (Josh) OBA (UoL)
+*     COBA: Coskun OBA (UoL)
 
 *  History :
 *     2010-08-26 (COBA):
 *        Original.
 *     2010-09-17 (COBA):
 *        Updated prologue and minor changes to code blocks.
+*     2010-09-20 (COBA):
+*        Replaced PI with AST__DPI
+*        Removed explicit casting from astMallocs
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -146,9 +149,9 @@ void fts2_deglitch(
       cutoffAmplitude = 0.75 * (max - min);
 
       /* COMPUTE STANDARD DEVIATION */
-      numCluster  	= dsHalfLength / coreClusterSize + 1;
-      sigma    		= (double*) astMalloc(numCluster * sizeof(double));
-      revSigma 		= (double*) astMalloc(numCluster * sizeof(double));
+      numCluster  = dsHalfLength / coreClusterSize + 1;
+      sigma    		= astMalloc(numCluster * sizeof(*sigma));
+      revSigma 		= astMalloc(numCluster * sizeof(*revSigma));
       for(i = 0; i < numCluster; i++) {
         tForward 	= 0.0;
         tReverse	= 0.0;
@@ -192,7 +195,7 @@ void fts2_deglitch(
       end 	= dsHalfLength + zpdIndex;
       for(i = start; i < end; i++) {
         tmp = abs((i - zpdIndex) * cutoffFreq);
-        y = (tmp < (0.5 * PI)) ?
+        y = (tmp < (0.5 * AST__DPI)) ?
         		((tmp > threshold) ? cutoffAmplitude * sin(tmp) / tmp : cutoffAmplitude) :
         		cutoffAmplitude / tmp;
 
@@ -207,8 +210,8 @@ void fts2_deglitch(
     case SMF__DEGLITCH_TAIL:
       tailDeglitchStart = dsHalfLength + zpdIndex;
       numCluster = (size - tailDeglitchStart) / tailClusterSize;
-      clusterMean  = (double*) astMalloc(numCluster * sizeof(double));
-      clusterSigma = (double*) astMalloc(numCluster * sizeof(double));
+      clusterMean  = astMalloc(numCluster * sizeof(*clusterMean));
+      clusterSigma = astMalloc(numCluster * sizeof(*clusterSigma));
       for(i = 0; i < numCluster; i++) {
         start = tailDeglitchStart + i * tailClusterSize;
         end   = start + tailClusterSize;
