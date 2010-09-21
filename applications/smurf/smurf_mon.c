@@ -411,8 +411,8 @@ void smurf_mon( int * status ) {
   {
     size_t memcurrent,mempeak;
     astMemoryStats( 0, &mempeak, &memcurrent );
-    msgOutf( "", "SMURF: === current /peak memory usage: %zu / %zu MB ===",
-             status, memcurrent/SMF__MB, mempeak/SMF__MB );
+    msgOutf( "", "SMURF: === current /peak memory usage: %zu / %zu MiB ===",
+             status, memcurrent/SMF__MIB, mempeak/SMF__MIB );
   }
   */
 

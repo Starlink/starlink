@@ -81,6 +81,8 @@
 *        -added rough estimate for data cleaning (empirical)
 *     2010-09-09 (EC):
 *        Add msize to interface so we can add space for ast.zero_circle
+*     2010-09-20 (TIMJ):
+*        We are using MiB not Mb (or MB)
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -371,10 +373,10 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
     /* Set bad status if too big */
     if( (*status == SAI__OK) && (total > available) ) {
       *status = SMF__NOMEM;
-      msgSeti("REQ",total/SMF__MB);
-      msgSeti("AVAIL",available/SMF__MB);
+      msgSeti("REQ",total/SMF__MIB);
+      msgSeti("AVAIL",available/SMF__MIB);
       errRep("", FUNC_NAME
-	     ": Requested memory ^REQ Mb for map exceeds available ^AVAIL Mb",
+	     ": Requested memory ^REQ MiB for map exceeds available ^AVAIL MiB",
 	     status);
     }
 

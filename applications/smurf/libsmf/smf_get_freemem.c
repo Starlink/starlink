@@ -143,9 +143,9 @@ size_t smf_get_freemem ( double *mbytes, size_t * pagesize,
 
 
   if (mem_free > 0) {
-    freembytes = (double) mem_free / (double)SMF__MB;
+    freembytes = (double) mem_free / (double)SMF__MIB;
     msgOutiff( MSG__DEBUG, "", "Free memory: %g MB Used Memory: %g MB  Total Memory: %g MB", status,
-               freembytes, (double)mem_used/(double)SMF__MB, (double)mem_total/(double)SMF__MB
+               freembytes, (double)mem_used/(double)SMF__MIB, (double)mem_total/(double)SMF__MIB
                );
   } else {
     msgOutif( MSG__DEBUG,"", "Unable to determine free memory", status );

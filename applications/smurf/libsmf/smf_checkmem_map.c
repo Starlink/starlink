@@ -47,6 +47,8 @@
 *        Extra memory for quality array if iteratemap.
 *     2010-05-31 (EC):
 *        Extra space required for mapweight^2 array in iteratemap
+*     2010-09-20 (TIMJ):
+*        We are using MiB not Mb
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -155,10 +157,10 @@ void smf_checkmem_map( const int lbnd[], const int ubnd[], int rebin,
     /* Set bad status if too big */
     if( total > available ) {
       *status = SMF__NOMEM;
-      msgSeti("REQ",total/SMF__MB);
-      msgSeti("AVAIL",available/SMF__MB);
+      msgSeti("REQ",total/SMF__MIB);
+      msgSeti("AVAIL",available/SMF__MIB);
       errRep("FUNC_NAME",
-	     "Requested memory ^REQ Mb for map exceeds available ^AVAIL Mb",
+	     "Requested memory ^REQ MiB for map exceeds available ^AVAIL MiB",
 	     status);
     }
 

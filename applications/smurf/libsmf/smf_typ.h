@@ -119,7 +119,7 @@
  *        -Added chisquared to smfDIMMData
  *        -Added SMF__MINCHUNKSAMP and SMF__MINSTATSAMP
  *     2008-04-24 (EC):
- *        -Added SMF__MB definition
+ *        -Added SMF__MIB definition
  *     2008-04-30 (EC):
  *        -Added EXT to smfDIMMData
  *     2008-06-06 (EC):
@@ -174,6 +174,8 @@
 *        - Add smfFts
 *        - Create SMF__NOCREATE_FTS
 *        - Update smfData
+*     2010-09-20 (TIMJ):
+*        We are using MiB not MB
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -226,7 +228,7 @@
 #define SMF_NAME_MAX GRP__SZFNM
 #define SMF_MODEL_MAX 64   /* Maximum model components for iterative map maker*/
 #define SMF__MXSMF 8       /* Maximum number of smfDatas in a smfArray */
-#define SMF__MB 1048576    /* SMURF definition of a megabyte = 2^20 */
+#define SMF__MIB 1048576   /* SMURF uses a Mebibyte = 2^20 */
 #define SMF__MXNOTCH 64    /* Arbitrary maximum number of notch filters */
 #define SMF__F_WHITELO 2   /* Lower freq. over which to calculate NEP/NEFD */
 #define SMF__F_WHITEHI 10  /* Upper freq. over which to calculate NEP/NEFD */

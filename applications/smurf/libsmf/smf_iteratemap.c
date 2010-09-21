@@ -858,9 +858,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                        nmodels, msize, keymap, maxmem-mapmem, maxfile,
                        &memneeded, status );
 
-    msgOutf( "", FUNC_NAME ": map-making requires %zu Mb "
-             "(map=%zu Mb model calc=%zu Mb)", status,
-             (mapmem+memneeded)/SMF__MB, mapmem/SMF__MB, memneeded/SMF__MB );
+    msgOutf( "", FUNC_NAME ": map-making requires %zu MiB "
+             "(map=%zu MiB model calc=%zu MiB)", status,
+             (mapmem+memneeded)/SMF__MIB, mapmem/SMF__MIB, memneeded/SMF__MIB );
 
     if( *status == SMF__NOMEM ) {
       /* If we need too much memory, generate a warning message and then try
@@ -869,10 +869,10 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       errAnnul( status );
       msgOut( " ", FUNC_NAME ": *** WARNING ***", status );
       msgSeti( "LEN", maxconcat );
-      msgSeti( "AVAIL", maxmem/SMF__MB );
-      msgSeti( "NEED", memneeded/SMF__MB );
+      msgSeti( "AVAIL", maxmem/SMF__MIB );
+      msgSeti( "NEED", memneeded/SMF__MIB );
       msgOut( " ", "  ^LEN continuous samples (including padding) require "
-              "^NEED Mb > ^AVAIL Mb",
+              "^NEED MiB > ^AVAIL MiB",
               status );
 
       /* Try is meant to be the largest contchunk of ~equal length that fit in

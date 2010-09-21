@@ -137,7 +137,7 @@
 *          written to this output parameter even if a null value is supplied
 *          for parameter OUT.
 *     MAXMEM = _INTEGER (Read)
-*          Maximum memory available for map-making in Mb.
+*          Maximum memory available for map-making in MiB (mebibytes).
 *     METHOD = LITERAL (Read)
 *          Specify which map-maker should be used to construct the
 *          map. The parameter can take the following values:
@@ -962,7 +962,7 @@ void smurf_makemap( int *status ) {
   size_t mapmem=0;           /* Memory needed for output map */
   smf_qual_t *mapqual=NULL;  /* Map quality */
   size_t maxmem=0;           /* Max memory usage in bytes */
-  int maxmem_mb;             /* Max memory usage in Mb */
+  int maxmem_mib;             /* Max memory usage in MiB */
   int maxmem_default = 1000; /* Default value for maxmem */
   double maxtexp = 0.0;      /* Maximum exposure time */
   double meanstep = 0.0;     /* Mean steptime for output map */
@@ -1061,7 +1061,7 @@ void smurf_makemap( int *status ) {
     (void)smf_get_freemem( NULL, NULL, &physsize, status );
 
     /* Convert physical memory to MB */
-    freemem = physsize / SMF__MB;
+    freemem = physsize / SMF__MIB;
 
     if (physsize > 0 ) {
       const int min_mem = 512;
@@ -1072,32 +1072,32 @@ void smurf_makemap( int *status ) {
       /* Generate warning if this seems too small... */
       if( maxmem_default <= min_mem ) {
         *status = SAI__ERROR;
-        errRepf( "", TASK_NAME ": Available memory estimated to be %d MB but recommend at least %d MB! You may wish to set MAXMEM manually.",
+        errRepf( "", TASK_NAME ": Available memory estimated to be %d MiB but recommend at least %d MiB! You may wish to set MAXMEM manually.",
                  status, maxmem_default, min_mem );
       }
 
       msgOutiff( MSG__VERB, "", TASK_NAME
-                 ": Default MAXMEM is %i MBytes (80%% of physical memory)",
+                 ": Default MAXMEM is %i MiB (80%% of physical memory)",
                  status, maxmem_default );
     } else {
       /* If smf_get_freemem can't tell us, try something safe...*/
       maxmem_default = 1000;
 
       msgOutiff( MSG__VERB, "", TASK_NAME
-                 ": Can't determine memory, setting to %i MBytes. You may wish to set MAXMEM manually.",
+                 ": Can't determine memory, setting to %i MiB. You may wish to set MAXMEM manually.",
                  status, maxmem_default );
     }
   }
 
   /* Set dynamic default before querying the parameter */
   parDef0i( "MAXMEM", maxmem_default, status );
-  parGdr0i( "MAXMEM", maxmem_default, 1, VAL__MAXI, 1, &maxmem_mb, status );
+  parGdr0i( "MAXMEM", maxmem_default, 1, VAL__MAXI, 1, &maxmem_mib, status );
   if( *status==SAI__OK ) {
-    maxmem = (size_t) maxmem_mb * SMF__MB;
+    maxmem = (size_t) maxmem_mib * SMF__MIB;
   }
   msgOutiff( MSG__NORM, "", TASK_NAME
-             ": Map-maker will use %i MBytes of memory",
-             status, maxmem_mb );
+             ": Map-maker will use no more than %i MiB of memory",
+             status, maxmem_mib );
 
   /* Get METHOD - set rebin/iterate flags */
   parChoic( "METHOD", "REBIN", "REBIN, ITERATE.", 1,
