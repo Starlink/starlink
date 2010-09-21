@@ -284,7 +284,7 @@ typedef struct Step {
 
 #ifdef DEBUG_STEPS
 
-#define RECORD_BOLO (ibolo==818)
+#define RECORD_BOLO (ibolo==355)
 #define RECORD_BOLO2 (1)
 
 #define TOPCAT(fd, x) \
@@ -1511,6 +1511,8 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
          }
       }
 
+      if( flat_width  > dcflatwidth )  bad = 1;
+
 /* Now work upwards from the supplied step step end until we have found
    "dcnlow" consecutive samples that are below "dcsiglow" sigma. */
       psnr = snr + step->end;
@@ -1558,6 +1560,8 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
             }
          }
       }
+
+      if( flat_width  > dcflatwidth )  bad = 1;
 
 #ifdef DEBUG_STEPS
    if( RECORD_BOLO2 ) {
