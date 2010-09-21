@@ -21,23 +21,23 @@
 
 *  Description:
 *     Removes the Beam splitter Self Emission (BSE) from the source.
-*     
-*     Calibration Data:
-*        Beam splitter Self Emission Interferogram, BSE
-*      
-*        BSE <NDF>
-*           DATA_ARRAY     <ARRAY>         {structure}
-*           DATA(32, 40, M)    <_DOUBLE>     0,0.001,0.002,0.003,0.004,0.005,
-*                                        ... 3.926,3.927,3.928,3.929,3.93,3.931
-*
-*           where M is the sample size for the BSE interferogram.
+
+*  ADAM Parameters:
+*     BSE = CHAR (Read)
+*          Beam Splitter Self Emission filepath.
+*     IN = NDF (Read)
+*          Input files to be transformed.
+*     OUT = NDF (Write)
+*          Output files.
 
 *  Authors:
-*     COBA: Coskun (Josh) Oba, University of Lethbridge
+*     COBA: Coskun Oba (UoL)
 
 *  History :
-*     13-JUN-2010 (COBA):
+*     2010-06-13 (COBA):
 *        Original version.
+*     2010-09-21 (COBA):
+*        Updated prologue with ADAM params
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -95,52 +95,52 @@
 #define FUNC_NAME "smurf_fts2_removebse"
 #define TASK_NAME "FTS2_REMOVEBSE"
 
-void smurf_fts2_removebse(int* status) 
+void smurf_fts2_removebse(int* status)
 {
   int i             = 0;
   int j             = 0;
   int k             = 0;
-  int srcN          = 0; 
+  int srcN          = 0;
   int pixelCount    = 0;
   int index         = 0;
   int pixelIndex    = 0;
-  int bseHeight     = 0; 
-  int bseN          = 0;     
-  int bseSubarray   = 0; 
+  int bseHeight     = 0;
+  int bseN          = 0;
+  int bseSubarray   = 0;
   int fIndex        = 0;
-  int bseWidth      = 0;  
+  int bseWidth      = 0;
   int srcSubarray   = 0;
-  int srcWidth      = 0; 
-  int srcHeight     = 0;   
+  int srcWidth      = 0;
+  int srcHeight     = 0;
   double* bseCube   = NULL;
   double* bseX      = NULL;
   double* srcCube   = NULL;
-  double* srcX      = NULL;  
+  double* srcX      = NULL;
   double* bseIFG    = NULL;
-  double* bseIFGNew = NULL;  
+  double* bseIFGNew = NULL;
   Grp* bsegrp       = NULL;
   Grp* igrp         = NULL;
-  Grp* ogrp         = NULL; 
+  Grp* ogrp         = NULL;
   size_t outsize    = 0;
   size_t size       = 0;
-  size_t count      = 0;  
+  size_t count      = 0;
   smfData* bseData  = NULL;
-  smfData* srcData  = NULL;  
+  smfData* srcData  = NULL;
   HDSLoc* hdsLoc    = NULL;
-  HDSLoc* hdsLocPosition = NULL;  
+  HDSLoc* hdsLocPosition = NULL;
   smf_fts2scanmode srcMode   = SMF__FTS2_SCANMODE_UNKNOWN;
   smf_fts2scanmode bseMode   = SMF__FTS2_SCANMODE_UNKNOWN;
-  
-  float* tmp        = NULL;  
+
+  float* tmp        = NULL;
   char ftsMode[SZFITSCARD+1];
-  
-  if(*status != SAI__OK) 
+
+  if(*status != SAI__OK)
   {
     return;
   }
 
   /* Get input group */
-  kpg1Rgndf("IN", 0, 1, "", &igrp, &size, status); 
+  kpg1Rgndf("IN", 0, 1, "", &igrp, &size, status);
   /* Get output group */
   kpg1Wgndf("OUT", ogrp, size, size, "Equal number of input and output files expected!", &ogrp, &outsize, status);
   /* Get BSE group */
@@ -148,7 +148,7 @@ void smurf_fts2_removebse(int* status)
 
   ndfBegin();
 
-  /* 
+  /*
   * BEAMSPLITTER SELF EMISSION, BSE
   */
   smf_open_file(bsegrp, 1, "READ", SMF__NOCREATE_QUALITY, &bseData, status);
@@ -157,11 +157,11 @@ void smurf_fts2_removebse(int* status)
     errRep(FUNC_NAME, "Unable to open Beamsplitter Self Emission file!", status);
     return;
   }
-  bseCube = (double*) (bseData->pntr[0]); 
-  bseWidth = bseData->dims[0];  
-  bseHeight = bseData->dims[1]; 
-  bseN = bseData->dims[2];      
-  
+  bseCube = (double*) (bseData->pntr[0]);
+  bseWidth = bseData->dims[0];
+  bseHeight = bseData->dims[1];
+  bseN = bseData->dims[2];
+
   /* GET SUBARRAY ID */
   smf_find_subarray(bseData->hdr, NULL, 0, &bseSubarray, status);
 
@@ -190,7 +190,7 @@ void smurf_fts2_removebse(int* status)
   /* FREE RESOURCES */
   astFree(tmp);
   datAnnul(&hdsLoc, status);
-  datAnnul(&hdsLocPosition, status);  
+  datAnnul(&hdsLocPosition, status);
   if(bseX == NULL)
   {
     *status = SAI__ERROR;
@@ -202,7 +202,7 @@ void smurf_fts2_removebse(int* status)
   /*
   * REMOVE BSE FROM EACH SOURCE FILE
   */
-  for(fIndex = 1; fIndex <= size; fIndex++) 
+  for(fIndex = 1; fIndex <= size; fIndex++)
   {
     /* OPEN SOURCE */
     smf_open_file(ogrp, fIndex, "UPDATE", SMF__NOCREATE_QUALITY, &srcData, status);
@@ -226,8 +226,8 @@ void smurf_fts2_removebse(int* status)
     }
 
     /* VERIFY THAT THE SOURCE & BSE HAVE COMPATIBLE DIMENSIONS */
-    srcWidth = srcData->dims[0]; 
-    srcHeight = srcData->dims[1]; 
+    srcWidth = srcData->dims[0];
+    srcHeight = srcData->dims[1];
     if(srcWidth != bseWidth || srcHeight != bseHeight)
     {
       *status = SAI__ERROR;
@@ -261,7 +261,7 @@ void smurf_fts2_removebse(int* status)
     /* FREE RESOURCES */
     astFree(tmp);
     datAnnul(&hdsLoc, status);
-    datAnnul(&hdsLocPosition, status);  
+    datAnnul(&hdsLocPosition, status);
     if(srcX == NULL)
     {
       *status = SAI__ERROR;
@@ -292,7 +292,7 @@ void smurf_fts2_removebse(int* status)
         /* REMOVE INTERPOLATED BSE INTERFEROGRAM FROM SOURCE INTERFEROGRAM AT INDEX (i, j) */
         for(k = 0; k < srcN; k++)
         {
-          index = pixelIndex + pixelCount * k;          
+          index = pixelIndex + pixelCount * k;
           if(srcSubarray == S8C || srcSubarray == S8D)
           {
             srcCube[index] -= bseIFGNew[k];
@@ -307,7 +307,7 @@ void smurf_fts2_removebse(int* status)
 
     /* FREE RESOURCES */
     astFree(bseIFGNew);
-    astFree(bseIFG);   
+    astFree(bseIFG);
     astFree(bseX);
     astFree(srcX);
     smf_close_file(&srcData, status);

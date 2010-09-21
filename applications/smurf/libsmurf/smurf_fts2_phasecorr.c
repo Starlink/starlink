@@ -22,12 +22,36 @@
 *  Description:
 *     Applies phase correction to the source interferograms.
 
+*  ADAM Parameters:
+*     DEGREE = _INTEGER (Read)
+*          Order of the fitting polynomial.
+*     DSHALFLENGTH = _INTEGER (Read)
+*          Double-Sided interferogram half length.
+*     IN = NDF (Read)
+*          Input files to be transformed.
+*     OUT = NDF (Write)
+*          Output files.
+*     PFHALFLENGTH = _INTEGER (Read)
+*          Phase function half length.
+*     SSHALFLENGTH = _INTEGER (Read)
+*          Single-Sided interferogram half length.
+*     WEIGHTLIMIT = _DOUBLE (Read)
+*          Weighting factor limit.
+*     WNLBOUND = _DOUBLE (Read)
+*          The lower bound of the wavenumber range (as percentage)
+*     WNUBOUND = _DOUBLE (Read)
+*          The upper bound of the wavenumber range (as percentage)
+*     ZPDINDEX = _INTEGER (Read)
+*          ZPD index.
+
 *  Authors:
 *     COBA: Coskun Oba (UoL)
 
 *  History :
 *     2010-09-17 (COBA):
 *        Original version.
+*     2010-09-21 (COBA):
+*        Updated prologue with ADAM params
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
