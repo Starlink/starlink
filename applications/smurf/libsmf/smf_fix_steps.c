@@ -185,6 +185,10 @@
 *        other less significant changes too.
 *     13-SEP-2010 (DSB):
 *        Added argument "bcount".
+*     21-SEP-2010 (DSB):
+*        Ignore steps that occur close to bright sources. Such sources
+*        cause flat sections in the median smoothed data that give the
+*        appearance of a step in the residual differences.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -254,7 +258,6 @@ typedef struct smfFixStepsJobData {
 
 /* Define macro DEBUG_STEPS here, if debugging info is needed. NOTE, only
    use debugging facilities in SINGLE THREADED mode.
-
 #define DEBUG_STEPS 1
 */
 
@@ -268,6 +271,7 @@ typedef struct Step {
    double jump;
    int ok;
    int ibolo;
+   int flat;
    double vlo;
    double vlo_mean;
    double vlo_sigma;
@@ -280,7 +284,7 @@ typedef struct Step {
 
 #ifdef DEBUG_STEPS
 
-#define RECORD_BOLO (ibolo==853)
+#define RECORD_BOLO (ibolo==818)
 #define RECORD_BOLO2 (1)
 
 #define TOPCAT(fd, x) \
@@ -710,7 +714,7 @@ static void smf1_fix_steps_job( void *job_data, int *status ) {
 
    FILE *fd3 = fopen( "stepdata.asc", "w" );
    fprintf( fd3, "# ibstep start end minjump error jump ok ibolo "
-            "jump vlo vlo_mean vlo_sigma vhi vhi_mean vhi_sigma\n" );
+            "jump flat vlo vlo_mean vlo_sigma vhi vhi_mean vhi_sigma\n" );
 
    TimeData *timedata = astMalloc( ntslice*sizeof( *timedata ) );
 #endif
@@ -1164,6 +1168,7 @@ static void smf1_fix_steps_job( void *job_data, int *status ) {
          fprintf( fd3, "%d ", bsteps[ibstep].ok );
          fprintf( fd3, "%d ", bsteps[ibstep].ibolo );
          TOPCAT( fd3, bsteps[ibstep].jump );
+         fprintf( fd3, "%d ", bsteps[ibstep].flat );
          TOPCAT( fd3, bsteps[ibstep].vlo );
          TOPCAT( fd3, bsteps[ibstep].vlo_mean );
          TOPCAT( fd3, bsteps[ibstep].vlo_sigma );
@@ -1422,9 +1427,15 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
    int result;
    smf_qual_t *pq2;
    smf_qual_t *pq;
+   double *pw;
+   double flat_val;
+   int flat_width;
+   double tol;
+   int bad;
 
    int dcnlow = 5;
    double dcsiglow = 8.0;
+   int dcflatwidth = 10;
 
 /* Initialise result prior to checking status. */
    result = 0;
@@ -1444,7 +1455,6 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
 /* Loop round each candidate step. */
    step = bsteps;
    for( ibstep = 0; ibstep  < nbstep; ibstep++,step++ ) {
-
 
 /* Note the step centre for later use. */
       step_centre = ( step->start + step->end )/2;
@@ -1468,6 +1478,39 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
 
       step_start = jtime + dcnlow;
 
+/* Check that the data prior to the start of the step does not contain
+   large sections of identical values in the median-smoothed data. These
+   can be caused by sources, and indicate that he step cannot be trusted.  */
+      jtime = step_start - 2*dcfitbox;
+      if( jtime < 0 ) jtime = 0;
+      pw = median + jtime;
+      flat_val = VAL__BADD;
+      flat_width = 0;
+      tol = 0.0;
+      bad = 0;
+
+      for( ; jtime < (int) step_start; jtime++,pw++ ){
+         if( *pw != VAL__BADD ) {
+            if( flat_val == VAL__BADD ){
+               flat_val = *pw;
+               flat_width = 0;
+               tol = 1.0E-10*flat_val;
+
+            } else if( fabs( *pw - flat_val ) > tol ) {
+               if( flat_width  > dcflatwidth ) {
+                  bad = 1;
+                  break;
+               }
+               flat_val = *pw;
+               flat_width = 0;
+               tol = 1.0E-10*flat_val;
+
+            } else {
+               flat_width++;
+            }
+         }
+      }
+
 /* Now work upwards from the supplied step step end until we have found
    "dcnlow" consecutive samples that are below "dcsiglow" sigma. */
       psnr = snr + step->end;
@@ -1485,78 +1528,117 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
 
       step_end = jtime - dcnlow;
 
+/* Check that the data after the end of the step does not contain
+   large sections of identical values in the median-smoothed data. These
+   can be caused by sources, and indicate that he step cannot be trusted.  */
+      jtime = step_end + 2*dcfitbox;
+      if( jtime >= (int) ntslice ) jtime = ntslice - 1;
+      pw = median + jtime;
+      flat_val = VAL__BADD;
+      bad = 0;
+
+      for( ; jtime > (int) step_end; jtime--,pw-- ){
+         if( *pw != VAL__BADD ) {
+            if( flat_val == VAL__BADD ){
+               flat_val = *pw;
+               flat_width = 0;
+               tol = 1.0E-10*flat_val;
+
+            } else if( fabs( *pw - flat_val ) > tol ) {
+               if( flat_width  > dcflatwidth ) {
+                  bad = 1;
+                  break;
+               }
+               flat_val = *pw;
+               flat_width = 0;
+               tol = 1.0E-10*flat_val;
+
+            } else {
+               flat_width++;
+            }
+         }
+      }
+
+#ifdef DEBUG_STEPS
+   if( RECORD_BOLO2 ) {
+      step->flat = bad;
+   }
+#endif
+
+      if( !bad ) {
+
 /* Perform linear least squares fits to the median-smoothed data for a
    range of adjacent samples prior to the start of the step found above. */
-      jhi = step_start - dcfitbox;
-      jlo = jhi - 3*dcfitbox;
-      smf_rolling_fit( dcfitbox, 0.1, ntslice, jlo, jhi, median, grad,
-                       off, NULL, status );
+         jhi = step_start - dcfitbox;
+         jlo = jhi - 3*dcfitbox;
+         smf_rolling_fit( dcfitbox, 0.1, ntslice, jlo, jhi, median, grad,
+                          off, NULL, status );
 
 /* Use each of the fits created above to estimate the data value at the
    centre of the jump, and find the the mean and variance of these
    estimates. */
-      sum1 = 0.0;
-      sum2 = 0.0;
-      nsum = 0;
+         sum1 = 0.0;
+         sum2 = 0.0;
+         nsum = 0;
 
-      pg = grad;
-      po = off;
-      for( jtime = jlo; jtime <= jhi; jtime++,po++,pg++ ) {
-         if( *pg != VAL__BADD && *po != VAL__BADD ) {
-            v = ( (int) step_centre - jtime )*( *pg ) + ( *po );
-            sum1 += v;
-            sum2 += v*v;
-            nsum++;
-            vlo = v;
+         pg = grad;
+         po = off;
+         for( jtime = jlo; jtime <= jhi; jtime++,po++,pg++ ) {
+            if( *pg != VAL__BADD && *po != VAL__BADD ) {
+               v = ( (int) step_centre - jtime )*( *pg ) + ( *po );
+               sum1 += v;
+               sum2 += v*v;
+               nsum++;
+               vlo = v;
+            }
          }
-      }
 
-      if( nsum > 0 ) {
-         vlo_mean = sum1/nsum;
-         vlo_var = sum2/nsum - vlo_mean*vlo_mean;
-         err0 = vlo - vlo_mean;
-         vlo_var += err0*err0;
-      } else {
-         vlo_mean = VAL__BADD;
-         vlo_var = VAL__BADD;
-      }
+         if( nsum > 0 ) {
+            vlo_mean = sum1/nsum;
+            vlo_var = sum2/nsum - vlo_mean*vlo_mean;
+            err0 = vlo - vlo_mean;
+            vlo_var += err0*err0;
+         } else {
+            vlo_mean = VAL__BADD;
+            vlo_var = VAL__BADD;
+         }
 
 /* Perform linear least squares fits to the median-smoothed data for a
    range of adjacent samples after to the step. */
-      jlo = step_end + dcfitbox;
-      jhi = jlo + 3*dcfitbox;
-      smf_rolling_fit( dcfitbox, 0.1, ntslice, jlo, jhi, median, grad,
-                       off, NULL, status );
+         jlo = step_end + dcfitbox;
+         jhi = jlo + 3*dcfitbox;
+         smf_rolling_fit( dcfitbox, 0.1, ntslice, jlo, jhi, median, grad,
+                          off, NULL, status );
 
 /* Use each of the fits created above to estimate the data value at the
    centre of the jump, and find the the mean and variance of these
    estimates. */
-      sum1 = 0.0;
-      sum2 = 0.0;
-      nsum = 0;
-      vhi = VAL__BADD;
+         sum1 = 0.0;
+         sum2 = 0.0;
+         nsum = 0;
+         vhi = VAL__BADD;
 
-      pg = grad;
-      po = off;
-      for( jtime = jlo; jtime <= jhi; jtime++,po++,pg++ ) {
-         if( *pg != VAL__BADD && *po != VAL__BADD ) {
-            v = ( (int) step_centre - jtime )*( *pg ) + ( *po );
-            sum1 += v;
-            sum2 += v*v;
-            nsum++;
-            if( vhi == VAL__BADD ) vhi = v;
+         pg = grad;
+         po = off;
+         for( jtime = jlo; jtime <= jhi; jtime++,po++,pg++ ) {
+            if( *pg != VAL__BADD && *po != VAL__BADD ) {
+               v = ( (int) step_centre - jtime )*( *pg ) + ( *po );
+               sum1 += v;
+               sum2 += v*v;
+               nsum++;
+               if( vhi == VAL__BADD ) vhi = v;
+            }
          }
-      }
 
-      if( nsum > 0 ) {
-         vhi_mean = sum1/nsum;
-         vhi_var = sum2/nsum - vhi_mean*vhi_mean;
-         err0 = vhi - vhi_mean;
-         vhi_var += err0*err0;
-      } else {
-         vhi_mean = VAL__BADD;
-         vhi_var = VAL__BADD;
-      }
+         if( nsum > 0 ) {
+            vhi_mean = sum1/nsum;
+            vhi_var = sum2/nsum - vhi_mean*vhi_mean;
+            err0 = vhi - vhi_mean;
+            vhi_var += err0*err0;
+         } else {
+            vhi_mean = VAL__BADD;
+            vhi_var = VAL__BADD;
+         }
 
 
 #ifdef DEBUG_STEPS
@@ -1575,13 +1657,13 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
 #endif
 
 /* Form the total sigma in the jump size. */
-      if( vlo_var != VAL__BADD && vhi_var != VAL__BADD ) {
-         error = vhi_var + vlo_var;
-         error = ( error > 0.0 ) ? sqrt( error ) : 0.0;
+         if( vlo_var != VAL__BADD && vhi_var != VAL__BADD ) {
+            error = vhi_var + vlo_var;
+            error = ( error > 0.0 ) ? sqrt( error ) : 0.0;
 
 /* We prefer the jump estimated from data closer to the step, so get the
    jump height from the closest fit boxes used above. */
-         jump = vhi - vlo;
+            jump = vhi - vlo;
 
 #ifdef DEBUG_STEPS
    if( RECORD_BOLO2 ) {
@@ -1594,8 +1676,8 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
    caused by the variation of the gradient in the neighbourhood of the
    jump. Also check the absolute size of the jump is large enough to be
    usable. */
-         if( fabs( jump ) >= dcthresh2*fabs( error ) &&
-             fabs( jump ) > step->minjump ) {
+            if( fabs( jump ) >= dcthresh2*fabs( error ) &&
+                fabs( jump ) > step->minjump ) {
 
 #ifdef DEBUG_STEPS
    if( RECORD_BOLO2 ) {
@@ -1604,50 +1686,50 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
 #endif
 
 /* Increment the number of fixed steps. */
-            result++;
+               result++;
 
 /* Add the current correction onto all data samples since the centre of
    the previous step, up to the centre of the current step. Also
    increment running sums needed to find the mean correction. */
-            for( ; itime < step_centre; itime++ ) {
-               if( !(*pq & SMF__Q_MOD )) {
-                  *pd += corr;
-                  scorr += corr;
-                  ncorr++;
+               for( ; itime < step_centre; itime++ ) {
+                  if( !(*pq & SMF__Q_MOD )) {
+                     *pd += corr;
+                     scorr += corr;
+                     ncorr++;
+                  }
+                  pd += tstride;
+                  pq += tstride;
                }
-               pd += tstride;
-               pq += tstride;
-            }
 
 /* Set the correction to use up to the next step. */
-            corr -= jump;
+               corr -= jump;
 
 /* Flag the samples with high SNR. */
-            pq2 = qua + step_start*tstride;
-            for( jtime = step_start; jtime <= (int) step_end; jtime++ ) {
-                *pq2 |= SMF__Q_JUMP;
-                pq2 += tstride;
-            }
+               pq2 = qua + step_start*tstride;
+               for( jtime = step_start; jtime <= (int) step_end; jtime++ ) {
+                   *pq2 |= SMF__Q_JUMP;
+                   pq2 += tstride;
+               }
 
 /* Increment the number of bolometers that have a step at each time slice. */
-            if( bcount ) {
-               for( jtime = step->start; jtime <= (int) step->end; jtime++ ) {
-                  bcount[ jtime ]++;
+               if( bcount ) {
+                  for( jtime = step->start; jtime <= (int) step->end; jtime++ ) {
+                     bcount[ jtime ]++;
+                  }
                }
-            }
 
 /* If required, store details of the step in the returned structure. */
-            if( steps ) {
-               *steps = astGrow( *steps, ++(*nsteps), sizeof( **steps ) );
-               if( *status == SAI__OK ) {
-                  (*steps)[ *nsteps - 1 ].start = step_start;
-                  (*steps)[ *nsteps - 1 ].end = step_end;
-                  (*steps)[ *nsteps - 1 ].ibolo = ibolo;
-                  (*steps)[ *nsteps - 1 ].size = jump;
-                  (*steps)[ *nsteps - 1 ].id = *nsteps - 1;
-                  (*steps)[ *nsteps - 1 ].corr = 0;
+               if( steps ) {
+                  *steps = astGrow( *steps, ++(*nsteps), sizeof( **steps ) );
+                  if( *status == SAI__OK ) {
+                     (*steps)[ *nsteps - 1 ].start = step_start;
+                     (*steps)[ *nsteps - 1 ].end = step_end;
+                     (*steps)[ *nsteps - 1 ].ibolo = ibolo;
+                     (*steps)[ *nsteps - 1 ].size = jump;
+                     (*steps)[ *nsteps - 1 ].id = *nsteps - 1;
+                     (*steps)[ *nsteps - 1 ].corr = 0;
+                  }
                }
-            }
 
 #ifdef DEBUG_STEPS
    if( RECORD_BOLO2 ) {
@@ -1655,6 +1737,7 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
    }
 #endif
 
+            }
          }
       }
    }
