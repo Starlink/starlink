@@ -284,7 +284,7 @@ typedef struct Step {
 
 #ifdef DEBUG_STEPS
 
-#define RECORD_BOLO (ibolo==355)
+#define RECORD_BOLO (ibolo==545)
 #define RECORD_BOLO2 (1)
 
 #define TOPCAT(fd, x) \
@@ -1537,7 +1537,6 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
       if( jtime >= (int) ntslice ) jtime = ntslice - 1;
       pw = median + jtime;
       flat_val = VAL__BADD;
-      bad = 0;
 
       for( ; jtime > (int) step_end; jtime--,pw-- ){
          if( *pw != VAL__BADD ) {
