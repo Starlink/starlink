@@ -18,11 +18,13 @@
 *                         dim_t msize, const Grp *shortrootgrp,size_t contchunk,
 *                         int varmapmethod, const int *lbnd_out,
 *                         const int *ubnd_out, AstFrameSet *outfset,
-*                         int *status ) {
+*                         int *status );
 
 *  Arguments:
 *     shortmap = int (Given)
-*        Number of time slices per short map.
+*        Number of time slices per short map, or if set to -1, create a map
+*        each time TCS_INDEX is incremented (i.e., produce a map each time
+*        a full pass through the scan pattern is completed).
 *     ast = smfArray* (Given)
 *        AST model array of smfArrays
 *     res = smfArray* (Given)
@@ -78,6 +80,8 @@
 *  History:
 *     2010-08-20 (EC):
 *        Initial version factored out of smf_iteratemap.
+*     2010-09-22 (EC):
+*        If shortmap=0, create map each time TCS_INDEX increments
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -130,6 +134,7 @@ void smf_write_shortmap( int shortmap, smfArray **ast, smfArray **res,
 
   double *ast_data=NULL;        /* Pointer to DATA component of ast */
   dim_t dsize;                  /* Size of data arrays in containers */
+  size_t i;                     /* loop counter */
   size_t idx=0;                 /* index within subgroup */
   size_t istart;                /* First useful timeslice */
   size_t iend;                  /* Last useful timeslice */
@@ -145,14 +150,25 @@ void smf_write_shortmap( int shortmap, smfArray **ast, smfArray **res,
   double *shortmapweight=NULL;  /* buffer for shotmap weights */
   double *shortmapweightsq=NULL;/* buffer for shotmap weights squared */
   int *shorthitsmap=NULL;       /* buffer for shotmap hits */
+  size_t shortstart;            /* first time slice of short map */
+  size_t shortend;              /* last time slice of short map */
   size_t tstride;               /* Time stride */
 
   if( *status != SAI__OK ) return;
 
   if( !ast || !res || !lut || !qua || !dat || !shortrootgrp ||
-      !lbnd_out || !ubnd_out || !outfset ) {
+      !lbnd_out || !ubnd_out || !outfset || !shortmap ) {
     *status = SAI__ERROR;
     errRep( "", FUNC_NAME ": NULL inputs supplied", status );
+    return;
+  }
+
+
+  if( !res[contchunk] || !res[contchunk]->sdata ||
+      !res[contchunk]->sdata[idx] || !res[contchunk]->sdata[idx]->hdr ||
+      !res[contchunk]->sdata[idx]->hdr->allState ) {
+    *status = SAI__ERROR;
+    errRep( "", FUNC_NAME ": RES does not contain JCMTState", status );
     return;
   }
 
@@ -173,19 +189,30 @@ void smf_write_shortmap( int shortmap, smfArray **ast, smfArray **res,
   smf_get_goodrange( qua_data, ntslice, tstride, SMF__Q_BOUND,
                      &istart, &iend, status );
 
-  if( *status == SAI__OK ) {
-    nshort = (iend-istart+1)/shortmap;
+  shortstart = istart;
 
-    if( nshort ) {
+  if( *status == SAI__OK ) {
+    if( shortmap == -1 ) {
+      nshort = res[contchunk]->sdata[idx]->hdr->allState[iend].tcs_index -
+        res[contchunk]->sdata[idx]->hdr->allState[istart].tcs_index + 1;
+
       msgOutf( "", FUNC_NAME
-               ": writing %zu short maps of length %i time slices.",
-               status, nshort, shortmap );
+               ": writing %zu short maps, once each time TCS_INDEX increments",
+               status, nshort );
     } else {
-      /* Generate warning message if requested short maps are too long*/
-      msgOutf( "", FUNC_NAME
-               ": Warning! short maps of lengths %i requested, but "
-               "data only %zu time slices.", status, shortmap,
-               iend-istart+1 );
+      nshort = (iend-istart+1)/shortmap;
+
+      if( nshort ) {
+        msgOutf( "", FUNC_NAME
+                 ": writing %zu short maps of length %i time slices.",
+                 status, nshort, shortmap );
+      } else {
+        /* Generate warning message if requested short maps are too long*/
+        msgOutf( "", FUNC_NAME
+                 ": Warning! short maps of lengths %i requested, but "
+                 "data only %zu time slices.", status, shortmap,
+                 iend-istart+1 );
+      }
     }
   }
 
@@ -225,10 +252,10 @@ void smf_write_shortmap( int shortmap, smfArray **ast, smfArray **res,
 
     /* Loop over subgroup index (subarray) -- only continue if
        nshort > 0! */
+
     for( idx=0; (idx<res[contchunk]->ndat)&&(nshort)&&(*status==SAI__OK);
          idx++ ){
       int rebinflag = 0;
-      size_t shortstart, shortend;
 
       /* Pointers to everything we need */
       ast_data = (ast[contchunk]->sdata[idx]->pntr)[0];
@@ -256,8 +283,18 @@ void smf_write_shortmap( int shortmap, smfArray **ast, smfArray **res,
       }
 
       /* Time slices indices for start and end of short map */
-      shortstart = istart+sc*shortmap;
-      shortend = istart+(sc+1)*shortmap-1;
+      if( shortmap > 0) {
+        /* Evenly-spaced shortmaps in time */
+        shortstart = istart+sc*shortmap;
+        shortend = istart+(sc+1)*shortmap-1;
+      } else {
+        /* One map each time TCS_INDEX increments */
+        for(i=shortstart+1; (i<=iend) &&
+              (res[contchunk]->sdata[idx]->hdr->allState[i].tcs_index ==
+               res[contchunk]->sdata[idx]->hdr->allState[shortstart].tcs_index);
+            i++ );
+        shortend = i-1;
+      }
 
       smf_rebinmap1( res[contchunk]->sdata[idx],
                      dat->noi ? dat->noi[contchunk]->sdata[idx] : NULL,
@@ -292,12 +329,19 @@ void smf_write_shortmap( int shortmap, smfArray **ast, smfArray **res,
                   "Average MJD of this map", status );
         atlPtfts( fitschan, "TIMESYS", "TAI", "Time system for MJD-AVG",
                   status );
+        atlPtfti( fitschan, "TCSINDST", allState[shortstart].tcs_index,
+                  "TCS index of first frame", status );
+        atlPtfti( fitschan, "TCSINDEN", allState[shortend].tcs_index,
+                  "TCS index of last frame", status );
+
 
         kpgPtfts( mapdata->file->ndfid, fitschan, status );
 
         if( fitschan ) fitschan = astAnnul( fitschan );
       }
 
+      /* Update shortstart in case we are counting steps in TCS_INDEX */
+      shortstart = shortend+1;
     }
 
     /* Write WCS */

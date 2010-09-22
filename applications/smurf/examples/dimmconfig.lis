@@ -65,7 +65,9 @@ exportndf = 0
 #bolomap = 1
 
 # Create .MORE.SMURF.SHORTMAPS extensions containing maps of every "shortmap"
-# time slices?
+# time slices? Alternatively, set to -1 to produce a map each time TCS_INDEX
+# is incremented (i.e., each time a full pass through the scan pattern has
+# been completed).
 #shortmap=1000
 
 # Apply the flatfield if loading raw data? Default is 1 (true) -- you must
