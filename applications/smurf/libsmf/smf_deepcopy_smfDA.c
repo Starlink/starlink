@@ -42,6 +42,7 @@
 *     Ed Chapin (UBC)
 *     Tim Jenness (JAC, Hawaii)
 *     David Berry (JAC, Hawaii)
+*     COBA: Coskun Oba (UoL)
 *     {enter_new_authors_here}
 
 *  History:
@@ -64,7 +65,9 @@
 *        Allow for the dark squid copy to be disabled.
 *     2010-07-06 (DSB):
 *        Get dimensions using smf_get_dims so that bolo-ordered data
-*        can be handled. 
+*        can be handled.
+*     2010-09-21 (COBA):
+*        Add SMF__NOCREATE_FTS
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -164,8 +167,8 @@ smf_deepcopy_smfDA( const smfData *old, int cpdks, int * status ) {
 
   if (cpdks && oldda->dksquid) {
     dksquid = smf_deepcopy_smfData( oldda->dksquid, 0, SMF__NOCREATE_HEAD |
-                                    SMF__NOCREATE_FILE | SMF__NOCREATE_DA,
-                                    0, 0, status );
+                                    SMF__NOCREATE_FILE | SMF__NOCREATE_DA |
+                                    SMF__NOCREATE_FTS, 0, 0, status );
   }
 
   /* Construct the new smfData */

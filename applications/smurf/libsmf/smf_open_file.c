@@ -45,6 +45,7 @@
  *     - The following bit flags defined in smf_typ.h are used for "flags" par:
  *       SMF__NOCREATE_HEAD: Do not allocate smfHead
  *       SMF__NOCREATE_DATA: Do not map DATA/VARIANCE/QUALITY
+ *       SMF__NOCREATE_FTS: Do not allocate smfFts
  *       SMF__NOFIX_METADATA: Do not fix metadata using smf_fix_metadata
  *       SMF__NOTTSERIES: File is not a time series file even if 3d
 
@@ -217,6 +218,8 @@
  *        in smfData.
  *     2010-09-17 (COBA):
  *        Read smfFts
+*     2010-09-21 (COBA):
+*        Add SMF__NOCREATE_FTS
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -610,7 +613,8 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           if(*status == SAI__OK) {
             da = (*data)->da;
             da->dksquid = smf_create_smfData( SMF__NOCREATE_HEAD |
-                                              SMF__NOCREATE_DA, status );
+                                              SMF__NOCREATE_DA |
+                                              SMF__NOCREATE_FTS, status );
             da->dksquid->pntr[0] = dpntr[0];
             da->dksquid->qual = qpntr;
             da->dksquid->qfamily = SMF__QFAM_TSERIES;
@@ -632,7 +636,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           }
         }
       }
-      
+
       /* Map the FTS information */
       fts = (*data)->fts;
       if(!(flags & SMF__NOCREATE_FTS) && fts) {
@@ -923,7 +927,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
         if (dksquid) {
           da->dksquid = smf_create_smfData(SMF__NOCREATE_FILE |
                                            SMF__NOCREATE_HEAD |
-                                           SMF__NOCREATE_DA | 
+                                           SMF__NOCREATE_DA |
                                            SMF__NOCREATE_FTS, status );
           da->dksquid->dtype = SMF__DOUBLE;
           da->dksquid->isTordered = 1;

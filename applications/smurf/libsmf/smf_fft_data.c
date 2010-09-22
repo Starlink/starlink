@@ -51,6 +51,7 @@
 
 *  Authors:
 *     Ed Chapin (UBC)
+*     COBA: Coskun Oba (UoL)
 *     {enter_new_authors_here}
 
 *  History:
@@ -86,6 +87,8 @@
 *        Use const quality
 *     2010-08-31 (EC):
 *        Do the re-ordering as part of the deepcopy if needed
+*     2010-09-21 (COBA):
+*        Add SMF__NOCREATE_FTS
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -334,7 +337,8 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
                                SMF__NOCREATE_VARIANCE |
                                SMF__NOCREATE_QUALITY |
                                SMF__NOCREATE_FILE |
-                               SMF__NOCREATE_DA, 1, 0, status );
+                               SMF__NOCREATE_DA |
+                               SMF__NOCREATE_FTS, 1, 0, status );
 
   /* Create some quality. We only apodize if we are doing a
      forward FFT. */
@@ -362,7 +366,8 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
                                   SMF__NOCREATE_VARIANCE |
                                   SMF__NOCREATE_QUALITY |
                                   SMF__NOCREATE_FILE |
-                                  SMF__NOCREATE_DA, 0, 0, status );
+                                  SMF__NOCREATE_DA |
+                                  SMF__NOCREATE_FTS, 0, 0, status );
 
   if( *status == SAI__OK ) {
 

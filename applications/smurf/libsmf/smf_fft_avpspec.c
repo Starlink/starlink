@@ -47,6 +47,7 @@
 *  Authors:
 *     Ed Chapin (UBC)
 *     Tim Jenness (JAC, Hawaii)
+*     COBA: Coskun Oba (UoL)
 *     {enter_new_authors_here}
 
 *  History:
@@ -54,6 +55,8 @@
 *        Initial version
 *     2010-02-25 (TIMJ):
 *        Fix 32-bit incompatibility.
+*     2010-09-21 (COBA):
+*        Add SMF__NOCREATE_FTS
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -159,7 +162,8 @@ smfData *smf_fft_avpspec( const smfData *pspec, smf_qual_t *quality,
                                   SMF__NOCREATE_VARIANCE |
                                   SMF__NOCREATE_QUALITY |
                                   SMF__NOCREATE_FILE |
-                                  SMF__NOCREATE_DA, 0, 0, status );
+                                  SMF__NOCREATE_DA |
+                                  SMF__NOCREATE_FTS, 0, 0, status );
   if( *status == SAI__OK ) {
     /* Allocate space for the averaged power spectrum */
     retdata->ndims = 4;

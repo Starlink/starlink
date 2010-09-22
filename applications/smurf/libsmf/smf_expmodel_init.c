@@ -38,11 +38,14 @@
 
 *  Authors:
 *     Edward Chapin (UBC)
+*     COBA: Coskun Oba (UoL)
 *     {enter_new_authors_here}
 
 *  History:
 *     2010-05-27 (EC)
 *        Initial version -- factored out of smf_expmodel_dks.c
+*     2010-09-21 (COBA):
+*        Add SMF__NOCREATE_FTS
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -135,7 +138,8 @@ void smf_expmodel_init( const smfData *indata, smfData **outdata, int *status) {
 
   data = smf_deepcopy_smfData( indata, 0, SMF__NOCREATE_DATA |
                                SMF__NOCREATE_VARIANCE | SMF__NOCREATE_QUALITY |
-                               SMF__NOCREATE_FILE | SMF__NOCREATE_DA, 0, 0,
+                               SMF__NOCREATE_FILE | SMF__NOCREATE_DA |
+                               SMF__NOCREATE_FTS, 0, 0,
                                status );
 
   if (!data) return;

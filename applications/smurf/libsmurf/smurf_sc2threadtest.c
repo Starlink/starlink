@@ -39,6 +39,7 @@
 
 *  Authors:
 *     Edward Chapin (UBC)
+*     COBA: Coskun Oba (UoL)
 *     {enter_new_authors_here}
 
 *  History:
@@ -46,6 +47,8 @@
 *        Initial version -- copy thread infrastructure from makemap
 *     2010-01-15 (EC):
 *        Add test for merging status from several threads
+*     2010-09-21 (COBA):
+*        Add SMF__NOCREATE_FTS
 
 *  Copyright:
 *     Copyright (C) 2008-2010 University of British Columbia.
@@ -298,7 +301,8 @@ void smurf_sc2threadtest( int *status ) {
     for( i=0; (*status==SAI__OK)&&(i<nsub); i++ ) {
       /* Create individual smfDatas and add to array */
       data = smf_create_smfData( SMF__NOCREATE_FILE |
-                                 SMF__NOCREATE_DA, status );
+                                 SMF__NOCREATE_DA |
+                                 SMF__NOCREATE_FTS, status );
 
       if( *status==SAI__OK ) {
         data->dtype=SMF__DOUBLE;

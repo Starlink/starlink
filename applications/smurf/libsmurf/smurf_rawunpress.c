@@ -40,6 +40,7 @@
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
 *     Andy Gibb (UBC)
+*     COBA: Coskun Oba (UoL)
 *     {enter_new_authors_here}
 
 *  History:
@@ -55,6 +56,8 @@
 *        Use kaplibs for param IN/OUT
 *     2009-10-20 (TIMJ):
 *        Write units and label from smfData to output file.
+*     2010-09-21 (COBA):
+*        Add SMF__NOCREATE_FTS
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -149,7 +152,7 @@ void smurf_rawunpress( int *status ) {
     ndfMap( outndf, "DATA", "_INTEGER", "WRITE", &(outdata[0]), &nout, status );
 
     /* Open the input file using standard routine */
-    smf_open_file( igrp, i, "READ", SMF__NOCREATE_DA, &data, status );
+    smf_open_file( igrp, i, "READ", SMF__NOCREATE_DA | SMF__NOCREATE_FTS, &data, status );
 
     /* Quick sanity check to make sure we are raw data */
     if (*status == SAI__OK && data->da == NULL && data->dtype == SMF__INTEGER) {
@@ -182,4 +185,3 @@ void smurf_rawunpress( int *status ) {
 
   ndfEnd( status );
 }
-

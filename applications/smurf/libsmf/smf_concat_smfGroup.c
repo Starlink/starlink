@@ -84,6 +84,7 @@
  *  Authors:
  *     EC: Edward Chapin (UBC)
  *     TIMJ: Tim Jenness (JAC, Hawaii)
+ *     COBA: Coskun Oba (UoL)
  *     {enter_new_authors_here}
 
  *  History:
@@ -159,6 +160,8 @@
  *        Propagate quality that was in flatfielded data even if not in raw
  *     2010-07-16 (TIMJ):
  *        Only pad if the data have not already been padded.
+ *     2010-09-21 (COBA):
+ *        Add SMF__NOCREATE_FTS
 
  *  Notes:
  *     If projection information supplied, pointing LUT will not be
@@ -530,7 +533,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
             /* Allocate memory for empty smfData with a smfHead. Create
                a DA struct only if the input file has one. Create it as
                a clone rather than creating an empty smfDa. */
-            data = smf_create_smfData( SMF__NOCREATE_DA, status );
+            data = smf_create_smfData( SMF__NOCREATE_DA | SMF__NOCREATE_FTS, status );
             if (refdata->da && data) {
               /* do not copy dark squids. We do that below */
               data->da = smf_deepcopy_smfDA( refdata, 0, status );
@@ -624,7 +627,8 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
               if( da && refdata->da && refdata->da->dksquid ) {
                 da->dksquid = smf_create_smfData(SMF__NOCREATE_FILE |
                                                  SMF__NOCREATE_HEAD |
-                                                 SMF__NOCREATE_DA, status );
+                                                 SMF__NOCREATE_DA |
+                                                 SMF__NOCREATE_FTS, status );
 
                 /* Dimensions */
                 da->dksquid->dtype = SMF__DOUBLE;
@@ -900,4 +904,3 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
     smf_addto_smfArray( *concat, data, status );
   }
 }
-

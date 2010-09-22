@@ -38,6 +38,7 @@
 *  Authors:
 *     Ed Chapin (UBC)
 *     Tim Jenness (JAC, Hawaii)
+*     COBA: Coskun Oba (UoL)
 *     {enter_new_authors_here}
 
 *  History:
@@ -55,6 +56,8 @@
 *        -Include isTordered flag stored in DIMM files
 *     2010-03-16 (TIMJ):
 *        Use one_strlcpy instead of strncpy.
+*     2010-09-21 (COBA):
+*        Add SMF__NOCREATE_FTS
 
 *  Notes:
 
@@ -168,7 +171,7 @@ void smf_open_model( const Grp *igrp, int index, const char *mode,
   }
 
   /* Allocate memory for empty smfdata and fill relevant parts */
-  *data = smf_create_smfData( SMF__NOCREATE_DA, status );
+  *data = smf_create_smfData( SMF__NOCREATE_DA | SMF__NOCREATE_FTS, status );
 
   if( *status == SAI__OK ) {
     /* Data from file header */

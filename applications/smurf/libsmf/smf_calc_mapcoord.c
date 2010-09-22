@@ -53,6 +53,7 @@
 *     EC: Edward Chapin (UBC)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 *     DSB: David S Berry (JAC, Hawaii)
+*     COBA: Coskun Oba (UoL)
 
 *  History:
 *     2006-05-16 (EC):
@@ -86,6 +87,8 @@
 *        Skip bad bolo2map mappings.
 *     2010-02-25 (DSB):
 *        Only perform full Mapping calculations periodically.
+*     2010-09-21 (COBA):
+*        Add SMF__NOCREATE_FTS
 
 *  Notes:
 *     This routines asserts ICD data order.
@@ -538,6 +541,7 @@ void smf_calc_mapcoord( smfWorkForce *wf, smfData *data, AstFrameSet *outfset,
 
         pdata->data = smf_deepcopy_smfData( data, 0, SMF__NOCREATE_FILE |
                                             SMF__NOCREATE_DA |
+                                            SMF__NOCREATE_FTS |
                                             SMF__NOCREATE_DATA |
                                             SMF__NOCREATE_VARIANCE |
                                             SMF__NOCREATE_QUALITY, 0, 0,
