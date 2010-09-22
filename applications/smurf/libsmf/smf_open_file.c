@@ -220,6 +220,8 @@
  *        Read smfFts
 *     2010-09-21 (COBA):
 *        Add SMF__NOCREATE_FTS
+*     2010-09-22 (COBA):
+*        Add check for status in FTS2 segment
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -649,7 +651,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
         void *dpntr[] = {NULL, NULL};
 
         ndfXstat(indf, "FTS2DR", &itexists, status);
-        if(itexists) {
+        if(*status == SAI__OK && itexists) {
           ndfXloc(indf, "FTS2DR", mode, &ftsLoc, status);
           if((*status != SAI__OK) || (!ftsLoc)) {
             *status = SAI__ERROR;

@@ -89,6 +89,8 @@
 *        Write dark squid quality
 *     2010-09-17 (COBA):
 *        Write FTS2 data
+*     2010-09-22 (COBA):
+*        Validate FTS2 data before writing
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -406,8 +408,9 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
     }
 
     /* FTS2 */
+    smfFts* fts = data->fts;
     if( *status == SAI__OK &&
-        data->fts &&
+        fts &&
         outdata &&
         outdata->file &&
         outdata->file->ndfid &&
@@ -417,19 +420,22 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
       void *pntr[]      = {NULL, NULL};
       double* outfpm    = NULL;
       double* outsigma  = NULL;
-      smfFts* fts       = data->fts;
+      HDSLoc* loc       = NULL;
       smfHead* inHdr    = data->hdr;
-      HDSLoc* loc       = smf_get_xloc(outdata, "FTS2DR", "FTS2DR", "UPDATE", 0, 0, status);
 
-      /* WRITE FPM */
-      if(fts->fpm && fts->fpm->pntr[0]) {
+      if( (fts->fpm && fts->fpm->pntr[0]) &&
+          (fts->sigma && fts->sigma->pntr[0])) {
+        loc = smf_get_xloc(outdata, "FTS2DR", "FTS2DR", "UPDATE", 0, 0, status);
+      }
+
+      if(*status == SAI__OK && loc != NULL) {
+        /* WRITE FPM */
         lbnd[0] = 0;
         lbnd[1] = 0;
         lbnd[2] = 1;
         ubnd[0] = lbnd[0] + fts->fpm->dims[0] - 1;
         ubnd[1] = lbnd[1] + fts->fpm->dims[1] - 1;
         ubnd[2] = lbnd[2] + fts->fpm->dims[2] - 1;
-
         id = smf_get_ndfid( loc, "FPM", "WRITE", "UNKNOWN", "_DOUBLE",
                             fts->fpm->ndims, lbnd, ubnd, status);
         ndfMap(id, "DATA", "_DOUBLE", "WRITE", &pntr[0], &nmap, status);
@@ -438,14 +444,12 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
           memcpy(outfpm, fts->fpm->pntr[0], nmap * sizeof(*outfpm));
         }
         ndfAnnul(&id, status);
-      }
-      /* WRITE STANDARD DEVIATION, SIGMA */
-      if(fts->sigma && fts->sigma->pntr[0]) {
+
+        /* WRITE STANDARD DEVIATION, SIGMA */
         lbnd[0] = 0;
         lbnd[1] = 0;
         ubnd[0] = lbnd[0] + fts->sigma->dims[0] - 1;
         ubnd[1] = lbnd[1] + fts->sigma->dims[1] - 1;
-
         id = smf_get_ndfid( loc, "SIGMA", "WRITE", "UNKNOWN", "_DOUBLE",
                             fts->sigma->ndims, lbnd, ubnd, status);
         ndfMap(id, "DATA", "_DOUBLE", "WRITE", &pntr[0], &nmap, status);
@@ -454,9 +458,9 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
           memcpy(outsigma, fts->sigma->pntr[0], nmap * sizeof(*outsigma));
         }
         ndfAnnul(&id, status);
-      }
 
-      datAnnul(&loc, status);
+        datAnnul(&loc, status);
+      }
     }
   }
 
