@@ -325,7 +325,10 @@ ext.taumethod =adaptive
 # Using ast.zero_circle defines a circle on the map outside of which
 # the map will be constrained to zero. The 3 parameters are:
 # Longitude, Latitude, Radius of the circle, in decimal degrees, in
-# the coordinate system of the map (e.g., RA and Dec.).
+# the coordinate system of the map (e.g., RA and Dec.). Alternatively
+# a single parameter may be given (the radius), and then the centre
+# of the circle will default to the reference coordinates for the
+# centre of the map (e.g. the tangent point).
 #
 # The ast.zero_snr parameter will create a mask based on map SNR. For
 # example, if it is set to 5, after each iteration all pixels with a

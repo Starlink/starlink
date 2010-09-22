@@ -84,8 +84,11 @@
 *        Ensure that all models have the same ordering.
 *     2010-09-09 (EC):
 *        Add circular region zero masking (ast.zero_circle)
-*      2010-09-17 (EC):
+*     2010-09-17 (EC):
 *        Add map SNR-based zero masking (ast.zero_snr)
+*     2010-09-21 (EC):
+*        ast.zero_circle can contain only a single value (radius), then
+*        the centre defaults to reference coordinates for map projection
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -219,35 +222,52 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)),
 
     docirc = astMapGet1D( kmap, "ZERO_CIRCLE", 3, &zero_c_n, zero_circle );
 
-    if( docirc && (zero_c_n==3) ) {
-      /* Allocate space for the zeromask */
-      dat->zeromask = astCalloc( dat->msize, sizeof(*dat->zeromask), 1 );
+    if( docirc ) {
 
-      /* The supplied bounds are for pixel coordinates... we need bounds
-         for grid coordinates which have an offset */
-      lbnd_grid[0] = 1;
-      lbnd_grid[1] = 1;
-      ubnd_grid[0] = dat->ubnd_out[0] - dat->lbnd_out[0] + 1;
-      ubnd_grid[1] = dat->ubnd_out[1] - dat->lbnd_out[1] + 1;
+      /* If only one parameter supplied it is radius, assume reference
+         LON/LAT from the frameset to get the centre */
+      if( zero_c_n == 1 ) {
+        zero_circle[2] = zero_circle[0];
 
-      /* Coordinates & radius of the circular region converted from degrees
-         to radians */
-      centre[0] = zero_circle[0]*AST__DD2R;
-      centre[1] = zero_circle[1]*AST__DD2R;
-      radius[0] = zero_circle[2]*AST__DD2R;
+        zero_circle[0] = astGetD( dat->outfset, "SkyRef(1)" );
+        zero_circle[1] = astGetD( dat->outfset, "SkyRef(2)" );
 
-      /* Last frame is the sky frame, where the circle is defined */
-      circle = astCircle( astGetFrame(dat->outfset, AST__CURRENT), 1, centre,
-                          radius, NULL, " " );
+        zero_circle[0] *= AST__DR2D;
+        zero_circle[1] *= AST__DR2D;
 
-      /* Get the mapping from the sky frame (last) to the grid frame (first),
-         and then set the zeromask to 1 for all of the values outside of
-         this circle */
+        zero_c_n = 3;
+      }
 
-      astMaskUB(circle, astGetMapping(dat->outfset, AST__CURRENT, AST__BASE),
-                0, 2, lbnd_grid, ubnd_grid, dat->zeromask, 1);
+      if( zero_c_n==3 ) {
+        /* Allocate space for the zeromask */
+        dat->zeromask = astCalloc( dat->msize, sizeof(*dat->zeromask), 1 );
 
-      circle = astAnnul( circle );
+        /* The supplied bounds are for pixel coordinates... we need bounds
+           for grid coordinates which have an offset */
+        lbnd_grid[0] = 1;
+        lbnd_grid[1] = 1;
+        ubnd_grid[0] = dat->ubnd_out[0] - dat->lbnd_out[0] + 1;
+        ubnd_grid[1] = dat->ubnd_out[1] - dat->lbnd_out[1] + 1;
+
+        /* Coordinates & radius of the circular region converted from degrees
+           to radians */
+        centre[0] = zero_circle[0]*AST__DD2R;
+        centre[1] = zero_circle[1]*AST__DD2R;
+        radius[0] = zero_circle[2]*AST__DD2R;
+
+        /* Last frame is the sky frame, where the circle is defined */
+        circle = astCircle( astGetFrame(dat->outfset, AST__CURRENT), 1, centre,
+                            radius, NULL, " " );
+
+        /* Get the mapping from the sky frame (last) to the grid frame (first),
+           and then set the zeromask to 1 for all of the values outside of
+           this circle */
+
+        astMaskUB(circle, astGetMapping(dat->outfset, AST__CURRENT, AST__BASE),
+                  0, 2, lbnd_grid, ubnd_grid, dat->zeromask, 1);
+
+        circle = astAnnul( circle );
+      }
     }
   }
 
@@ -262,8 +282,9 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)),
     return;
   }
 
+  /* Proceed if we need to do masking */
   if( zero_notlast && (flags&SMF__DIMM_LASTITER) ) dozero = 0;
-  else dozero = 1;
+  else if( zero_snr || zero_lowhits || dat->zeromask ) dozero = 1;
 
   /* Constrain map. We don't if this is the very last iteration, and
      if zero_notlast is set. */
