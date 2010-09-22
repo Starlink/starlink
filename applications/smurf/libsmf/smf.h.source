@@ -999,7 +999,7 @@ void smf_flag_spikes( smfWorkForce *wf, smfData *data, smf_qual_t mask,
                       int *status );
 
 void smf_flag_stationary( smfData *data, double sthresh, size_t *nflagged,
-                          int *status );
+                          double *average_speed, int *status );
 
 void smf_fix_steps( smfWorkForce *wf, smfData *data, double dcthresh,
                     dim_t dcsmooth, dim_t dcfitbox, int dcmaxsteps,

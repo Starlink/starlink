@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_flag_stationary( smfData *data, double sthresh, size_t *nflagged,
-*                          int *status )
+*                          double *average_speed, int *status )
 
 *  Arguments:
 *     data = smfData * (Given and Returned)
@@ -23,6 +23,9 @@
 *        Speed threshold (arcsec/sec) below which data are flagged.
 *     nflagged = size_t * (Returned)
 *        The number of new time samples that were flagged. May be NULL.
+*     average_speed = double * (Returned)
+*        Average speed of the telescope in arcsec/sec in non-flagegd region.
+*        May be NULL.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -43,6 +46,8 @@
 *        Initial Version
 *     2010-03-31 (EC):
 *        Don't flag regions of padding
+*     2010-09-21 (EC):
+*        Add average_speed to interface
 
 *  Copyright:
 *     Copyright (C) 2009-2010 University of British Columbia.
@@ -88,13 +93,14 @@
 #define FUNC_NAME "smf_flag_stationary"
 
 void smf_flag_stationary( smfData *data, double sthresh, size_t *nflagged,
-                          int *status ) {
+                          double *average_speed, int *status ) {
 
   /* Local Variables */
   double accel;                 /* Current acceleration */
   JCMTState *allState=NULL;     /* JCMT state information */
+  double avspeed=0;             /* average speed in arcsec/sec */
   size_t bstride;               /* Bolometers stride */
-  smf_qual_t *flag=NULL;     /* Array indicating which samples to flag */
+  smf_qual_t *flag=NULL;        /* Array indicating which samples to flag */
   dim_t i;                      /* Loop Counter */
   dim_t j;                      /* Loop Counter */
   double pos1_ac1=0;            /* Coordinates in 3-sample neighbourhood */
@@ -103,10 +109,11 @@ void smf_flag_stationary( smfData *data, double sthresh, size_t *nflagged,
   double pos2_ac2=0;            /* "                                     */
   double pos3_ac1;              /* "                                     */
   double pos3_ac2;              /* "                                     */
+  size_t navspeed=0;            /* Number of samples to calc avspeed */
   dim_t nbolo=0;                /* Number of bolometers */
   size_t nflag=0;               /* Number of new flagged samples */
   dim_t ntslice=0;              /* Number of time slices */
-  smf_qual_t *qua=NULL;      /* Pointer to quality flags */
+  smf_qual_t *qua=NULL;         /* Pointer to quality flags */
   double sep1;                  /* Angular separation between samples */
   double sep2;                  /* Angular separation between samples */
   double speed;                 /* Current speed */
@@ -185,8 +192,15 @@ void smf_flag_stationary( smfData *data, double sthresh, size_t *nflagged,
     /* Acceleration magnitude in arcsec/sec^2 (currently ignored) */
     accel = fabs( (sep2-sep1)/(steptime*steptime) );
 
-    /* Does this time step need to be flagged? */
-    if( speed <= sthresh ) flag[i] = 1;
+
+    if( speed <= sthresh ) {
+      /* Does this time step need to be flagged? */
+      flag[i] = 1;
+
+      /* Update measurement of avspeed */
+      avspeed += speed;
+      navspeed ++;
+    }
 
     /* Update first two positions */
     pos1_ac1 = pos2_ac1;
@@ -216,6 +230,15 @@ void smf_flag_stationary( smfData *data, double sthresh, size_t *nflagged,
 
   /* Return nflagged */
   if( nflagged ) *nflagged = nflag;
+
+  /* Return average_speed */
+  if( navspeed ) {
+    avspeed /= navspeed;
+  } else {
+    avspeed = VAL__BADD;
+  }
+
+  if( average_speed ) *average_speed = avspeed;
 
   /* Clean up */
   if( flag ) flag = astFree( flag );

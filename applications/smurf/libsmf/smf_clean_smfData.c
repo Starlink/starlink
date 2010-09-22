@@ -201,14 +201,19 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data, smfData **noisemap,
                status, smf_timerupdate(&tv1,&tv2,status) );
   }
 
-  /*  Flag periods of stationary pointing */
+  /*  Flag periods of stationary pointing, and update scanspeed to more
+      accurate value */
   if( flagstat ) {
     if( data->hdr && data->hdr->allState ) {
+      double scanvel=0;
+
       msgOutiff( MSG__VERB, "", FUNC_NAME
                  ": Flagging regions with slew speeds < %lf arcsec/sec", status,
                  flagstat );
-      smf_flag_stationary( data, flagstat, &nflag, status );
+      smf_flag_stationary( data, flagstat, &nflag, &scanvel, status );
       msgOutiff( MSG__VERB,"", "%zu new time slices flagged", status, nflag);
+
+      data->hdr->scanvel = scanvel;
 
       /*** TIMER ***/
       msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME

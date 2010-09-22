@@ -1160,13 +1160,20 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
   /* Read and store history */
   smf_history_read( *data, status );
 
-  /* Store the STEPTIME in the hdr - assumes that smf_fix_metadata has fixed things
-     up or complained. */
   if ( hdr &&  (hdr->instrument!=INST__NONE) ) {
     double steptime = VAL__BADD;
+    double scanvel = VAL__BADD;
+
+    /* Store the STEPTIME in the hdr - assumes that smf_fix_metadata has
+       fixed things up or complained. */
     smf_getfitsd( hdr, "STEPTIME", &steptime, status );
     hdr->steptime = steptime;
+
+    /* Similarly get the SCAN_VEL (in arcsec/sec) from the header */
+    smf_getfitsd( hdr, "SCAN_VEL", &steptime, status );
+    hdr->scanvel = scanvel;
   }
+
 
   /* report data units */
   if (hdr) {

@@ -176,6 +176,8 @@
 *        - Update smfData
 *     2010-09-20 (TIMJ):
 *        We are using MiB not MB
+*     2010-09-21 (EC):
+*        Add scanvel to smfHead
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -573,6 +575,7 @@ typedef struct smfHead {
   int dpazel;               /* Flag: does "detpos" hold AZEL values? */
   double instap[2];         /* instrument aperture (focal plane offsets)  */
   double telpos[3];         /* West LON/LAT/Alt of telescope (deg/deg/m) */
+  double scanvel;           /* Scan velocity in arcsec/sec */
   double steptime;          /* Steptime in seconds */
   char * ocsconfig;           /* Configuration XML */
   char units[SMF__CHARLABEL]; /* Data units */
