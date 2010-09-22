@@ -16,21 +16,14 @@
 # example, for focus (as short as 10 seconds).
 # *** CURRENTLY NOT TRUE, HAVE REVERTED TO OLD METHOD FOR NOW ***
 #
-# We constrain the edges of the map to zero using ast.zero_lowhits=1.0
-# (all pixels with the mean number of hits or less set to zero), and
-# ast.zero_notlast=1. We also set the iterations to a higher value
-# than the defaults. Together these settings enable us to produce
-# reasonable maps of bright calibrators even if there is poor
-# cross-linking. A word of warning: if the source is near the edge of
-# the map this configuration may give odd results due to the value of
-# ast.zero_lowhits! If you suspect a problem, compare the location of
+# We constrain the edges of the map using ast.zero_circle=(0.0055555),
+# which sets all pixels beyond 20 arcsec to zero until the last
+# iteration.  A word of warning: if the source is near the edge of the
+# map this configuration may give odd results due to the value of
+# ast.zero_lowhits!  If you suspect a problem, compare the location of
 # the source to the zero-masked pixels (see QUALITY component of the
-# resulting map). If the mask overlaps with the source, the value of
-# ast.zero_notlast will have to be reduced. In addition, you may run
-# into problems if the map is poorly sampled (e.g. only a single pass
-# across the field, or not many working detectors) as the coverage will
-# be highly non-uniform, again, potentially setting good pixels where
-# the source is located to zero.
+# resulting map). If the mask overlaps with the source, try modifying
+# the radius.
 #
 # Finally, we delay calculation of the common-mode (and associated
 # bolometer rejection) until after the first iteration. For short
@@ -46,5 +39,5 @@ numiter = 20
 com.notfirst = 1
 
 # use boundary constraints since the source is assumed to be isolated
-ast.zero_lowhits = 1.0
+ast.zero_circle = (0.0055555)
 ast.zero_notlast = 1
