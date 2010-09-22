@@ -1,0 +1,14 @@
+# Special configuration for pointing observations
+# Similar to bright_compact except that we use the
+# non-apodising filter since pointings tend to be short.
+# We also use COM on the first pass.
+
+^$STARLINK_DIR/share/smurf/dimmconfig_newfilt.lis
+
+# In case of poor crosslinking. For pointings this won't
+# take very long
+numiter=20
+
+# Circular boundary constraints
+ast.zero_circle = (0.016666666)
+ast.zero_notlast = 1

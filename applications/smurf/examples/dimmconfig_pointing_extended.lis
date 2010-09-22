@@ -1,0 +1,11 @@
+# This config can be used for pointing observations that have
+# bright extended structure. Slightly anomalous for pointing
+# observations but OMC-1 has been known to be observed
+
+# This is more or less the same as dimmconfig_bright_extended
+# but with the non-apodising filter.
+
+^$STARLINK_DIR/share/smurf/dimmconfig_pointing.lis
+
+ast.zero_circle = <undef>
+ast.zero_snr = 5.0

@@ -78,6 +78,8 @@ examples/dimmconfig_distortionmap.lis \
 examples/dimmconfig_faint_extended.lis \
 examples/dimmconfig_fridgeflat.lis \
 examples/dimmconfig_newfilt.lis \
+examples/dimmconfig_pointing.lis \
+examples/dimmconfig_pointing_extended.lis \
 examples/dimmconfig_veryshort.lis \
 examples/dreamobs.lis \
 examples/dreamsim.lis \
