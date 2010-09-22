@@ -39,5 +39,5 @@ numiter = 20
 com.notfirst = 1
 
 # use boundary constraints since the source is assumed to be isolated
-ast.zero_circle = (0.0055555)
+ast.zero_circle = (0.0166666666)
 ast.zero_notlast = 1
