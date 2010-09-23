@@ -141,7 +141,7 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap,
                    status, f_edgelow, f_edgesmall );
       }
 
-      if( f_edgesmall ) {
+      if( f_edgelarge ) {
         f_edgehigh = hdr->scanvel / f_edgelarge;
         msgOutiff( MSG__VERB, "", FUNC_NAME
                    ": FILT_EDGEHIGH = %.3lf Hz (< %.1lf arcsec scales)",
@@ -149,8 +149,6 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap,
       }
     }
   }
-
-
 
   /* Return dofilt if requested */
   if( dofilt ) {
