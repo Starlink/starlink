@@ -13,8 +13,8 @@
 *     Library routine
 
 *  Invocation:
-*     smf_write_bolomap( smfArray **ast, smfArray **res, smfArray **lut,
-*                        smfArray **qua, smfDIMMData *dat, dim_t msize,
+*     smf_write_bolomap( smfArray *ast, smfArray *res, smfArray *lut,
+*                        smfArray *qua, smfDIMMData *dat, dim_t msize,
 *                        const Grp *bolrootgrp, size_t contchunk,
 *                        int varmapmethod, const int *lbnd_out,
 *                        const int *ubnd_out, AstFrameSet *outfset,
@@ -22,13 +22,13 @@
 
 *  Arguments:
 *     ast = smfArray* (Given)
-*        AST model array of smfArrays
+*        AST model smfArray
 *     res = smfArray* (Given)
-*        RES model array of smfArrays
+*        RES model smfArray
 *     lut = smfArray* (Given)
-*        LUT model array of smfArrays
+*        LUT model smfArray
 *     qua = smfArray* (Given)
-*        QUA model array of smfArrays
+*        QUA model smfArray
 *     dat = smfDIMMData* (Given)
 *        Pointer to additional map-making data passed around in a struct
 *     msize = dim_t (Given)
@@ -111,8 +111,8 @@
 
 #define FUNC_NAME "smf_write_bolomap"
 
-void smf_write_bolomap( smfArray **ast, smfArray **res, smfArray **lut,
-                        smfArray **qua, smfDIMMData *dat, dim_t msize,
+void smf_write_bolomap( smfArray *ast, smfArray *res, smfArray *lut,
+                        smfArray *qua, smfDIMMData *dat, dim_t msize,
                         const Grp *bolrootgrp, size_t contchunk,
                         int varmapmethod, const int *lbnd_out,
                         const int *ubnd_out, AstFrameSet *outfset,
@@ -140,19 +140,19 @@ void smf_write_bolomap( smfArray **ast, smfArray **res, smfArray **lut,
   }
 
   /* Loop over subgroup index (subarray) */
-  for( idx=0; idx<res[contchunk]->ndat; idx++ ) {
+  for( idx=0; idx<res->ndat; idx++ ) {
     smf_qual_t *bolomask = NULL;
     double *bmapweight = NULL;
     double *bmapweightsq = NULL;
     int *bhitsmap = NULL;
 
     /* Pointers to everything we need */
-    ast_data = ast[contchunk]->sdata[idx]->pntr[0];
-    res_data = res[contchunk]->sdata[idx]->pntr[0];
-    lut_data = lut[contchunk]->sdata[idx]->pntr[0];
-    qua_data = qua[contchunk]->sdata[idx]->pntr[0];
+    ast_data = ast->sdata[idx]->pntr[0];
+    res_data = res->sdata[idx]->pntr[0];
+    lut_data = lut->sdata[idx]->pntr[0];
+    qua_data = qua->sdata[idx]->pntr[0];
 
-    smf_get_dims( res[contchunk]->sdata[idx], NULL, NULL, &nbolo, NULL,
+    smf_get_dims( res->sdata[idx], NULL, NULL, &nbolo, NULL,
                   &dsize, &bstride, NULL, status );
 
     /* Add ast back into res. Mask should match ast_calcmodel_ast. */
@@ -205,8 +205,8 @@ void smf_write_bolomap( smfArray **ast, smfArray **res, smfArray **lut,
           one_strlcat( name, tempstr, sizeof(name), status );
 
           /* Column and row */
-          col = (k % res[contchunk]->sdata[idx]->dims[1])+1;
-          row = (k / res[contchunk]->sdata[idx]->dims[1])+1;
+          col = (k % res->sdata[idx]->dims[1])+1;
+          row = (k / res->sdata[idx]->dims[1])+1;
 
           sprintf( thisbol, "C%02zuR%02zu",
                    col,   /* x-coord */
@@ -226,8 +226,8 @@ void smf_write_bolomap( smfArray **ast, smfArray **res, smfArray **lut,
              about variance weighting because all samples from
              same detector are about the same. */
 
-          smf_rebinmap1( res[contchunk]->sdata[idx],
-                         dat->noi ? dat->noi[contchunk]->sdata[idx] : NULL,
+          smf_rebinmap1( res->sdata[idx],
+                         dat->noi ? dat->noi[0]->sdata[idx] : NULL,
                          lut_data, 0, 0, 0,
                          SMF__Q_GOOD, varmapmethod,
                          AST__REBININIT | AST__REBINEND,

@@ -13,8 +13,8 @@
 *     Library routine
 
 *  Invocation:
-*     smf_write_shortmap( int shortmap, smfArray **ast, smfArray **res,
-*                         smfArray **lut, smfArray **qua, smfDIMMData *dat,
+*     smf_write_shortmap( int shortmap, smfArray *ast, smfArray *res,
+*                         smfArray *lut, smfArray *qua, smfDIMMData *dat,
 *                         dim_t msize, const Grp *shortrootgrp,size_t contchunk,
 *                         int varmapmethod, const int *lbnd_out,
 *                         const int *ubnd_out, AstFrameSet *outfset,
@@ -26,13 +26,13 @@
 *        each time TCS_INDEX is incremented (i.e., produce a map each time
 *        a full pass through the scan pattern is completed).
 *     ast = smfArray* (Given)
-*        AST model array of smfArrays
+*        AST model smfArray
 *     res = smfArray* (Given)
-*        RES model array of smfArrays
+*        RES model smfArray
 *     lut = smfArray* (Given)
-*        LUT model array of smfArrays
+*        LUT model smfArray
 *     qua = smfArray* (Given)
-*        QUA model array of smfArrays
+*        QUA model smfArray
 *     dat = smfDIMMData* (Given)
 *        Pointer to additional map-making data passed around in a struct
 *     msize = dim_t (Given)
@@ -125,8 +125,8 @@
 
 #define FUNC_NAME "smf_write_shortmap"
 
-void smf_write_shortmap( int shortmap, smfArray **ast, smfArray **res,
-                         smfArray **lut, smfArray **qua, smfDIMMData *dat,
+void smf_write_shortmap( int shortmap, smfArray *ast, smfArray *res,
+                         smfArray *lut, smfArray *qua, smfDIMMData *dat,
                          dim_t msize, const Grp *shortrootgrp, size_t contchunk,
                          int varmapmethod, const int *lbnd_out,
                          const int *ubnd_out, AstFrameSet *outfset,
@@ -164,9 +164,8 @@ void smf_write_shortmap( int shortmap, smfArray **ast, smfArray **res,
   }
 
 
-  if( !res[contchunk] || !res[contchunk]->sdata ||
-      !res[contchunk]->sdata[idx] || !res[contchunk]->sdata[idx]->hdr ||
-      !res[contchunk]->sdata[idx]->hdr->allState ) {
+  if( !res || !res->sdata || !res->sdata[idx] || !res->sdata[idx]->hdr ||
+      !res->sdata[idx]->hdr->allState ) {
     *status = SAI__ERROR;
     errRep( "", FUNC_NAME ": RES does not contain JCMTState", status );
     return;
@@ -182,10 +181,10 @@ void smf_write_shortmap( int shortmap, smfArray **ast, smfArray **res,
      determine "nshort" -- the number of complete blocks of
      shortmap time slices in the useful range. */
 
-  smf_get_dims( qua[contchunk]->sdata[0], NULL, NULL, NULL, &ntslice,
+  smf_get_dims( qua->sdata[0], NULL, NULL, NULL, &ntslice,
                 NULL, NULL, &tstride, status );
 
-  qua_data = (qua[contchunk]->sdata[0]->pntr)[0];
+  qua_data = (qua->sdata[0]->pntr)[0];
   smf_get_goodrange( qua_data, ntslice, tstride, SMF__Q_BOUND,
                      &istart, &iend, status );
 
@@ -193,8 +192,8 @@ void smf_write_shortmap( int shortmap, smfArray **ast, smfArray **res,
 
   if( *status == SAI__OK ) {
     if( shortmap == -1 ) {
-      nshort = res[contchunk]->sdata[idx]->hdr->allState[iend].tcs_index -
-        res[contchunk]->sdata[idx]->hdr->allState[istart].tcs_index + 1;
+      nshort = res->sdata[idx]->hdr->allState[iend].tcs_index -
+        res->sdata[idx]->hdr->allState[istart].tcs_index + 1;
 
       msgOutf( "", FUNC_NAME
                ": writing %zu short maps, once each time TCS_INDEX increments",
@@ -253,17 +252,17 @@ void smf_write_shortmap( int shortmap, smfArray **ast, smfArray **res,
     /* Loop over subgroup index (subarray) -- only continue if
        nshort > 0! */
 
-    for( idx=0; (idx<res[contchunk]->ndat)&&(nshort)&&(*status==SAI__OK);
+    for( idx=0; (idx<res->ndat)&&(nshort)&&(*status==SAI__OK);
          idx++ ){
       int rebinflag = 0;
 
       /* Pointers to everything we need */
-      ast_data = (ast[contchunk]->sdata[idx]->pntr)[0];
-      res_data = (res[contchunk]->sdata[idx]->pntr)[0];
-      lut_data = (lut[contchunk]->sdata[idx]->pntr)[0];
-      qua_data = (qua[contchunk]->sdata[idx]->pntr)[0];
+      ast_data = (ast->sdata[idx]->pntr)[0];
+      res_data = (res->sdata[idx]->pntr)[0];
+      lut_data = (lut->sdata[idx]->pntr)[0];
+      qua_data = (qua->sdata[idx]->pntr)[0];
 
-      smf_get_dims( res[contchunk]->sdata[idx], NULL, NULL, NULL, &ntslice,
+      smf_get_dims( res->sdata[idx], NULL, NULL, NULL, &ntslice,
                     &dsize, NULL, &tstride, status );
 
       /* Add ast back into res. Mask should match ast_calcmodel_ast. */
@@ -278,7 +277,7 @@ void smf_write_shortmap( int shortmap, smfArray **ast, smfArray **res,
         rebinflag |= AST__REBININIT;
       }
 
-      if( idx == (res[contchunk]->ndat-1) ) {
+      if( idx == (res->ndat-1) ) {
         rebinflag |= AST__REBINEND;
       }
 
@@ -290,14 +289,14 @@ void smf_write_shortmap( int shortmap, smfArray **ast, smfArray **res,
       } else {
         /* One map each time TCS_INDEX increments */
         for(i=shortstart+1; (i<=iend) &&
-              (res[contchunk]->sdata[idx]->hdr->allState[i].tcs_index ==
-               res[contchunk]->sdata[idx]->hdr->allState[shortstart].tcs_index);
+              (res->sdata[idx]->hdr->allState[i].tcs_index ==
+               res->sdata[idx]->hdr->allState[shortstart].tcs_index);
             i++ );
         shortend = i-1;
       }
 
-      smf_rebinmap1( res[contchunk]->sdata[idx],
-                     dat->noi ? dat->noi[contchunk]->sdata[idx] : NULL,
+      smf_rebinmap1( res->sdata[idx],
+                     dat->noi ? dat->noi[0]->sdata[idx] : NULL,
                      lut_data, shortstart, shortend, 1,
                      SMF__Q_GOOD, varmapmethod,
                      rebinflag,
@@ -313,10 +312,10 @@ void smf_write_shortmap( int shortmap, smfArray **ast, smfArray **res,
       }
 
       /* Write out FITS header */
-      if( (*status == SAI__OK) && res[contchunk]->sdata[idx]->hdr &&
-          res[contchunk]->sdata[idx]->hdr->allState ) {
+      if( (*status == SAI__OK) && res->sdata[idx]->hdr &&
+          res->sdata[idx]->hdr->allState ) {
         AstFitsChan *fitschan=NULL;
-        JCMTState *allState = res[contchunk]->sdata[idx]->hdr->allState;
+        JCMTState *allState = res->sdata[idx]->hdr->allState;
         size_t midpnt = (shortstart + shortend) / 2;
 
         fitschan = astFitsChan ( NULL, NULL, " " );

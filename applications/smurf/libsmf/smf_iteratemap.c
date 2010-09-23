@@ -1809,9 +1809,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           msgOut( "", FUNC_NAME
                   ": *** WARNING *** bolomap=1, but memiter=0", status );
         } else {
-          smf_write_bolomap( ast, res, lut, qua, &dat, msize, bolrootgrp,
-                             contchunk, varmapmethod, lbnd_out, ubnd_out,
-                             outfset, status );
+          smf_write_bolomap( ast[0], res[0], lut[0], qua[0], &dat, msize,
+                             bolrootgrp, contchunk, varmapmethod, lbnd_out,
+                             ubnd_out, outfset, status );
         }
       }
 
@@ -1824,9 +1824,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           msgOut( "", FUNC_NAME
                   ": *** WARNING *** shortmap=1, but memiter=0", status );
         } else {
-          smf_write_shortmap( shortmap, ast, res, lut, qua, &dat, msize,
-                              shortrootgrp, contchunk, varmapmethod, lbnd_out,
-                              ubnd_out, outfset, status );
+          smf_write_shortmap( shortmap, ast[0], res[0], lut[0], qua[0], &dat,
+                              msize, shortrootgrp, contchunk, varmapmethod,
+                              lbnd_out, ubnd_out, outfset, status );
         }
       }
 
