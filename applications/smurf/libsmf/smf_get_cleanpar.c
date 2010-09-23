@@ -18,9 +18,9 @@
 *                       dim_t *dcsmooth, int *dkclean, int *fillgaps,
 *                       double *filt_edgelow, double *filt_edgehigh,
 *                       double *filt_notchlow, double *filt_notchhigh,
-*                       int *filt_nnotch, int *dofilt, double *flagstat,
-*                       int *order, double *spikethresh, size_t *spikebox,
-*                       double * noiseclip, int *status )
+*                       int *filt_nnotch, int *dofilt, double *flagslow,
+*                       double *flagfast, int *order, double *spikethresh,
+*                       size_t *spikebox, double * noiseclip, int *status )
 
 *  Arguments:
 *     keymap = AstKeyMap* (Given)
@@ -61,8 +61,10 @@
 *        Number of notches in notch filter (NULL:0)
 *     dofilt = int* (Returned)
 *        If true, frequency-domain filtering is required (NULL:0)
-*     flagstat = double* (Returned)
-*        Flag data during slew speeds less than FLAGSTAT (arcsec/sec) (NULL:0)
+*     flagslow = double* (Returned)
+*        Flag data during slew speeds less than FLAGSLOW (arcsec/sec) (NULL:0)
+*     flagfast = double* (Returned)
+*        Flag data during slew speeds greater than FLAGFAST (arcsec/sec)(NULL:0)
 *     order = int* (Returned)
 *        Fit and remove polynomial baselines of this order (NULL:-1)
 *     spikethresh = double* (Returned)
@@ -114,6 +116,9 @@
 *        Remove dclimcorr, and rename dcmedianwidth as dcsmooth.
 *     2010-09-15 (DSB):
 *        Change spikeiter argument to spikebox.
+*     2010-09-23 (EC):
+*        -Rename FLAGSTAT to FLAGSLOW
+*        -Add FLAGFAST
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -167,8 +172,9 @@ void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac, dim_t *dcfitbox,
                        int *dkclean, int *fillgaps, double *filt_edgelow,
                        double *filt_edgehigh, double *filt_notchlow,
                        double *filt_notchhigh, int *filt_nnotch, int *dofilt,
-                       double *flagstat, int *order, double *spikethresh,
-                       size_t *spikebox, double * noiseclip, int *status ) {
+                       double *flagslow, double *flagfast, int *order,
+                       double *spikethresh, size_t *spikebox,
+                       double *noiseclip, int *status ) {
 
   int dofft=0;                  /* Flag indicating that filtering is required */
   int f_nnotch=0;               /* Number of notch filters in array */
@@ -341,16 +347,28 @@ void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac, dim_t *dcfitbox,
                *dofilt );
   }
 
-  if( flagstat ) {
-    *flagstat = 0;
-    astMapGet0D( keymap, "FLAGSTAT", flagstat );
-    if( *flagstat < 0 ) {
+  if( flagslow ) {
+    *flagslow = 0;
+    astMapGet0D( keymap, "FLAGSLOW", flagslow );
+    if( *flagslow < 0 ) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "FLAGSTAT cannot be < 0.", status );
+      errRep(FUNC_NAME, "FLAGSLOW cannot be < 0.", status );
     }
 
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": FLAGSTAT=%f", status,
-               *flagstat );
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": FLAGSLOW=%f", status,
+               *flagslow );
+  }
+
+  if( flagfast ) {
+    *flagfast = 0;
+    astMapGet0D( keymap, "FLAGFAST", flagfast );
+    if( *flagfast < 0 ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "FLAGFAST cannot be < 0.", status );
+    }
+
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": FLAGFAST=%f", status,
+               *flagfast );
   }
 
   if( order ) {

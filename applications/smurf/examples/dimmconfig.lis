@@ -118,12 +118,24 @@ apod = <undef>
 badfrac = 0.05
 
 
-# --- flag data when we're stationary because insensitive to sky signal ---
+# --- flag data when we're moving either too slow or too fast ---
 
-# Flag data taken while telescope was stationary (value is a threshold
-# slew velocity (arcsec/sec) measured in tracking coordinates
-flagstat = 2
+# Flag data taken while telescope was moving to slow such that sources
+# are buried in 1/f noise, or too fast such that sources are smeared
+# (value is a threshold slew velocity (arcsec/sec) measured in
+# tracking coordinates). Assuming we would like to be able to sample
+# scales of at least 30 arcsec (at least two 15 arcsec beams at
+# 850), and assuming a typical 1/f knee of 1 Hz, the telescope needs
+# to slew at least 30 arcsec/sec to place sources in the signal band
+# above the knee. Also, assuming a sample rate of 200 Hz, we want to
+# be able to fully-sample the 450 and 850 beams, leading to rough upper
+# limits of 300 and 600 arcsec/sec in each band respectively.
 
+flagslow = 30
+450.flagfast = 300
+850.flagfast = 600
+
+# Alternatively, specify a minimum spatial scale that should be
 
 # --- Many of the following may not be useful ---
 
@@ -183,6 +195,8 @@ fillgaps = 1
 # any bolometers noisier than noiseclip standard deviations above
 # the mean.
 noiseclip = 4.0
+
+
 
 # ----------------------------------------------------------------------------
 # A number of analagous parameters to clean dark squid signals before fitting

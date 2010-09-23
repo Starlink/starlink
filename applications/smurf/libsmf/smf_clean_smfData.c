@@ -41,7 +41,7 @@
 *     Sync Quality : BADFRAC
 *     DC steps     : DCFITBOX, DCMAXSTEPS, DCTHRESH, DCSMOOTH
 *     Flag spikes  : SPIKETHRESH, SPIKEBOX
-*     Slew speed   : FLAGSTAT
+*     Slew speed   : FLAGSLOW, FLAGFAST
 *     Dark squids  : DKCLEAN
 *     Gap filling  : FILLGAPS
 *     Baselines    : ORDER
@@ -127,7 +127,8 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data, smfData **noisemap,
   int dkclean;              /* Flag for dark squid cleaning */
   int fillgaps;             /* Flag to do gap filling */
   smfFilter *filt=NULL;     /* Frequency domain filter */
-  double flagstat;          /* Threshold for flagging stationary regions */
+  double flagfast;          /* Threshold for flagging slow slews */
+  double flagslow;          /* Threshold for flagging slow slews */
   size_t nflag;             /* Number of elements flagged */
   double noiseclip = 0;     /* Sigma clipping based on noise */
   int order;                /* Order of polynomial for baseline fitting */
@@ -160,8 +161,8 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data, smfData **noisemap,
   smf_get_cleanpar( keymap, &badfrac, &dcfitbox, &dcmaxsteps,
                     &dcthresh, &dcsmooth, &dkclean,
                     &fillgaps, NULL, NULL, NULL, NULL, NULL, NULL,
-                    &flagstat, &order, &spikethresh, &spikebox, &noiseclip,
-                    status );
+                    &flagslow, &flagfast, &order, &spikethresh, &spikebox,
+                    &noiseclip, status );
 
   /* Update quality by synchronizing to the data array VAL__BADD values */
   msgOutif(MSG__VERB,"", FUNC_NAME ": update quality", status);
@@ -203,25 +204,35 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data, smfData **noisemap,
 
   /*  Flag periods of stationary pointing, and update scanspeed to more
       accurate value */
-  if( flagstat ) {
+  if( flagslow || flagfast ) {
     if( data->hdr && data->hdr->allState ) {
       double scanvel=0;
 
-      msgOutiff( MSG__VERB, "", FUNC_NAME
-                 ": Flagging regions with slew speeds < %lf arcsec/sec", status,
-                 flagstat );
-      smf_flag_stationary( data, flagstat, &nflag, &scanvel, status );
+      if( flagslow ) {
+        msgOutiff( MSG__VERB, "", FUNC_NAME
+                   ": Flagging regions with slew speeds < %lf arcsec/sec",
+                   status, flagslow );
+      }
+
+      if( flagfast ) {
+        msgOutiff( MSG__VERB, "", FUNC_NAME
+                   ": Flagging regions with slew speeds > %lf arcsec/sec",
+                   status, flagfast );
+      }
+
+      smf_flag_slewspeed( data, flagslow, flagfast, &nflag, &scanvel, status );
       msgOutiff( MSG__VERB,"", "%zu new time slices flagged", status, nflag);
 
       data->hdr->scanvel = scanvel;
 
       /*** TIMER ***/
       msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
-                 ":   ** %f s flagging stationary",
+                 ":   ** %f s flagging outlier slew speeds",
                  status, smf_timerupdate(&tv1,&tv2,status) );
     } else {
       msgOutif( MSG__DEBUG, "", FUNC_NAME
-                ": Skipping flagstat because no header present", status );
+                ": Skipping flagslow/flagfast because no header present",
+                status );
     }
   }
 

@@ -385,6 +385,8 @@
  *        - Add smf_construct_smfFts
  *        - Add smf_deepcopy_smfFts
  *        - Update smf_construct_smfData
+ *     2010-09-23 (EC):
+ *        Rename smf_flag_stationary to smf_flag_slewspeed
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -720,8 +722,8 @@ smfFile *smf_construct_smfFile(smfFile * tofill, int ndfid, int isSc2store,
                                int isTstream, const char * name,
                                int * status );
 
-smfFts* smf_construct_smfFts( smfFts* tofill, smfData* fpm, smfData* sigma, 
-                              int* status); 
+smfFts* smf_construct_smfFts( smfFts* tofill, smfData* fpm, smfData* sigma,
+                              int* status);
 
 smfGroup *smf_construct_smfGroup( const Grp *igrp, dim_t **subgroups, size_t *chunk,
                                   const dim_t ngroups, const dim_t nrelated,
@@ -994,12 +996,13 @@ int smf_fix_metadata_acsis( msglev_t msglev, smfData * data, int have_fixed,
 int smf_fix_metadata_scuba2( msglev_t msglev, smfData * data, int have_fixed,
                              int *ncards, int * status );
 
+void smf_flag_slewspeed( smfData *data, double smin, double smax,
+                         size_t *nflagged, double *average_speed,
+                         int *status );
+
 void smf_flag_spikes( smfWorkForce *wf, smfData *data, smf_qual_t mask,
                       double thresh, size_t box, size_t *nflagged,
                       int *status );
-
-void smf_flag_stationary( smfData *data, double sthresh, size_t *nflagged,
-                          double *average_speed, int *status );
 
 void smf_fix_steps( smfWorkForce *wf, smfData *data, double dcthresh,
                     dim_t dcsmooth, dim_t dcfitbox, int dcmaxsteps,
@@ -1085,9 +1088,9 @@ void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac,
                        dim_t *dcsmooth, int *dkclean, int *fillgaps,
                        double *filt_edgelow, double *filt_edgehigh,
                        double *filt_notchlow, double *filt_notchhigh,
-                       int *filt_nnotch, int *dofilt, double *flagstat,
-                       int *order, double *spikethresh, size_t *spikeiter,
-                       double * noiseclip, int *status );
+                       int *filt_nnotch, int *dofilt, double *flagslow,
+                       double *flagfast, int *order, double *spikethresh,
+                       size_t *spikeiter, double *noiseclip, int *status );
 
 void smf_get_dims( const smfData *data, dim_t *nrows, dim_t *ncols,
                    dim_t *nbolo, dim_t *ntslice, dim_t *ndata,

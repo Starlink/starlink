@@ -202,7 +202,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   /* Data-cleaning parameters  */
   smf_get_cleanpar( kmap, NULL, &dcfitbox, &dcmaxsteps, &dcthresh,
                     &dcsmooth, NULL, &fillgaps, NULL,
-                    NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+                    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                     &spikethresh, &spikebox, NULL, status );
 
   /* Did we already calculate the noise on each detector? */
