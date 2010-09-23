@@ -18,6 +18,7 @@
     11Nov2007 : store compressed data as short, not unsigned short (bdk)
     19Jun2008 : ifdef out kaplibs code not used by DA (timj)
     24Jun2008 : Add tcs_percent_cmp. Some const warnings.
+    22Sep2010 : Add sc2_bias and sc2_fputemp (timj)
 */
 
 #define _POSIX_C_SOURCE 200112L
@@ -803,7 +804,9 @@ int *status                   /* global status (given and returned) */
    RETRIEVE_STATE( wvm_time, WVM_TIME, double, VAL__BADD );
 
    RETRIEVE_STATE( sc2_heat, SC2_HEAT, int, VAL__BADI );
+   RETRIEVE_STATE( sc2_bias, SC2_BIAS, int, VAL__BADI );
    RETRIEVE_STATE( sc2_mixtemp, SC2_MIXTEMP, float, VAL__BADR );
+   RETRIEVE_STATE( sc2_fputemp, SC2_FPUTEMP, float, VAL__BADR );
 
    RETRIEVE_STATE( acs_exposure, ACS_EXPOSURE, float, VAL__BADR );
    RETRIEVE_STATE( acs_offexposure, ACS_OFFEXPOSURE, float, VAL__BADR );
@@ -1020,7 +1023,9 @@ int *status                   /* global status (given and returned) */
 
    /* SCUBA-2 specific */
    STORE_STATE( sc2_heat, SC2_HEAT, int );
+   STORE_STATE( sc2_bias, SC2_BIAS, int );
    STORE_STATE( sc2_mixtemp, SC2_MIXTEMP, float );
+   STORE_STATE( sc2_fputemp, SC2_FPUTEMP, float );
 
    /* FTS and polarimeter */
    STORE_STATE( fts_pos, FTS_POS, float );

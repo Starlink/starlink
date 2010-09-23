@@ -52,6 +52,8 @@
 *        Add new JCMTSTATE items (Dome and Encoder)
 *     2009-11-18 (TIMJ):
 *        Add SC2_MIXTEMP
+*     2010-09-22 (TIMJ):
+*        Add SC2_BIAS and SC2_FPUTEMP
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -184,7 +186,9 @@ void smf_extracols( smfHead *hdr, Grp *colgrp, void **cols_info,
                CHECK_ITEM("RTS_NUM",AST__INTTYPE,sizeof(int),rts_num)
                CHECK_ITEM("RTS_TASKS",AST__STRINGTYPE,sizeof(char)*JCMT__SZRTS_TASKS+1,rts_tasks)
                CHECK_ITEM("SC2_HEAT",AST__INTTYPE,sizeof(int),sc2_heat)
-               CHECK_ITEM("SC2_MIXTEMP",AST__INTTYPE,sizeof(float),sc2_mixtemp)
+               CHECK_ITEM("SC2_BIAS",AST__INTTYPE,sizeof(int),sc2_bias)
+               CHECK_ITEM("SC2_MIXTEMP",AST__FLOATTYPE,sizeof(float),sc2_mixtemp)
+               CHECK_ITEM("SC2_FPUTEMP",AST__FLOATTYPE,sizeof(float),sc2_fputemp)
                CHECK_ITEM("SMU_AZ_CHOP_X",AST__DOUBLETYPE,sizeof(double),smu_az_chop_x)
                CHECK_ITEM("SMU_AZ_CHOP_Y",AST__DOUBLETYPE,sizeof(double),smu_az_chop_y)
                CHECK_ITEM("SMU_AZ_JIG_X",AST__DOUBLETYPE,sizeof(double),smu_az_jig_x)

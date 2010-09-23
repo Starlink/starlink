@@ -73,6 +73,8 @@
 *        Add DOME and ENCODER positions.
 *     2009-11-18 (TIMJ):
 *        Add SC2_MIXTEMP in kelvin
+*     2010-09-22 (TIMJ):
+*        Add SC2_BIAS and SC2_FPUTEMP
 
 *  Copyright:
 *     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
@@ -179,7 +181,9 @@ typedef struct JCMTState {
   float  wvm_t78;
   double wvm_time;
   int    sc2_heat;
+  int    sc2_bias;
   float  sc2_mixtemp;
+  float  sc2_fputemp;
   float  acs_exposure;
   float  acs_offexposure;
   int    acs_no_prev_ref;
@@ -250,7 +254,9 @@ typedef enum
    WVM_T78,
    WVM_TIME,
    SC2_HEAT,
+   SC2_BIAS,
    SC2_MIXTEMP,
+   SC2_FPUTEMP,
    ACS_EXPOSURE,
    ACS_OFFEXPOSURE,
    ACS_NO_PREV_REF,
@@ -341,7 +347,9 @@ static const HDSdataRecord hdsRecords[JCMT_COMP_NUM] =
     { WVM_T78, "_REAL", "WVM_T78", INST__SCUBA2, INST__NONE },
     { WVM_TIME, "_DOUBLE", "WVM_TIME", INST__SCUBA2, INST__NONE },
     { SC2_HEAT, "_INTEGER", "SC2_HEAT", INST__SCUBA2, INST__NONE },
+    { SC2_BIAS, "_INTEGER", "SC2_BIAS", INST__SCUBA2, INST__SCUBA2 }, /* Old data did not have it */
     { SC2_MIXTEMP, "_REAL", "SC2_MIXTEMP", INST__SCUBA2, INST__SCUBA2 }, /* Old data did not have it */
+    { SC2_FPUTEMP, "_REAL", "SC2_FPUTEMP", INST__SCUBA2, INST__SCUBA2 }, /* Old data did not have it */
     { ACS_SOURCE_RO, CHARTYP(JCMT__SZACS_SOURCE_RO), "ACS_SOURCE_RO", INST__ACSIS, INST__NONE },
     { ACS_NO_PREV_REF, "_INTEGER", "ACS_NO_PREV_REF", INST__ACSIS, INST__NONE },
     { ACS_NO_NEXT_REF, "_INTEGER", "ACS_NO_NEXT_REF", INST__ACSIS, INST__NONE },
