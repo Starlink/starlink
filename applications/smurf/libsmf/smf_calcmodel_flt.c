@@ -138,8 +138,8 @@ void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   /* Main routine */
   if (*status != SAI__OK) return;
 
-  /* Obtain pointer to sub-keymap containing FLT filter parameters. Something will
-     always be available.*/
+  /* Obtain pointer to sub-keymap containing FLT filter
+     parameters. Something will always be available.*/
   astMapGet0A( keymap, "FLT", &kmap );
 
   /* Are we skipping the first iteration? */
@@ -152,7 +152,8 @@ void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   }
 
   /* Assert bolo-ordered data */
-  smf_model_dataOrder( dat, allmodel, chunk, SMF__RES|SMF__QUA|SMF__NOI, 0, status );
+  smf_model_dataOrder( dat, allmodel, chunk, SMF__RES|SMF__QUA|SMF__NOI, 0,
+                       status );
 
   /* Obtain pointers to relevant smfArrays for this chunk */
   res = dat->res[chunk];
