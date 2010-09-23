@@ -94,6 +94,8 @@
 *        Use common block accessor
 *     10-SEP-2008 (TIMJ):
 *        Call msgOutif
+*     2010-09-23 (TIMJ):
+*        cnfImpn requires the size without the trailing nul.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -114,8 +116,8 @@ F77_SUBROUTINE(msg_outif)( INTEGER(PRIOR),
                            INTEGER(STATUS)
                            TRAIL(PARAM)
                            TRAIL(TEXT) ) {
-  char param[ERR__SZPAR];
-  char text[MSG__SZMSG];
+  char param[ERR__SZPAR+1];
+  char text[MSG__SZMSG+1];
   int prior;
   int status;
 

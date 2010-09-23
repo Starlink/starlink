@@ -101,6 +101,8 @@
 *        Use EMS_REP not EMS1_ESTOR
 *     31-JUL-2008 (TIMJ):
 *        Use common accessor rather than COMMON directly.
+*     2010-09-23 (TIMJ):
+*        cnfImpn requires the size without the trailing nul.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -116,8 +118,8 @@
 
 F77_SUBROUTINE(err_rep)( CHARACTER(PARAM), CHARACTER(TEXT),
                          INTEGER(STATUS) TRAIL(PARAM) TRAIL(TEXT) ) {
-  char param[ERR__SZPAR];
-  char text[ERR__SZMSG];
+  char param[ERR__SZPAR+1];
+  char text[ERR__SZMSG+1];
   int status;
 
   GENPTR_CHARACTER(PARAM);

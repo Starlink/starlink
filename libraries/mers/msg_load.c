@@ -97,6 +97,8 @@
 *     4-MAR-2009 (TIMJ):
 *        Do not import Fortran strings if input status is bad. Stopping this
 *        prevents possible warnings from valgrind in cnfImpn.
+*     2010-09-23 (TIMJ):
+*        cnfImpn requires the size without the trailing nul.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -122,8 +124,8 @@ F77_SUBROUTINE(msg_load)( CHARACTER(PARAM),
                           TRAIL(TEXT)
                           TRAIL(OPSTR) ) {
 
-  char param[ERR__SZPAR];
-  char text[MSG__SZMSG];
+  char param[ERR__SZPAR+1];
+  char text[MSG__SZMSG+1];
   char * opstr;
   int oplen = 0;
   int status;

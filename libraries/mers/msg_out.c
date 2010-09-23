@@ -83,6 +83,8 @@
 *        Replace EMS1_KTOK with MSG1_KTOK
 *     10-SEP-2008 (TIMJ):
 *        Call msgOut.
+*     2010-09-23 (TIMJ):
+*        cnfImpn requires the size without the trailing nul.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -102,8 +104,8 @@ F77_SUBROUTINE(msg_out)( CHARACTER(PARAM),
                            INTEGER(STATUS)
                            TRAIL(PARAM)
                            TRAIL(TEXT) ) {
-  char param[ERR__SZPAR];
-  char text[MSG__SZMSG];
+  char param[ERR__SZPAR+1];
+  char text[MSG__SZMSG+1];
   int status;
 
   cnfImpn( PARAM, PARAM_length, ERR__SZPAR, param );

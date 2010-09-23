@@ -87,6 +87,8 @@
 *         and MSG to PARAM in prologue.
 *     11-SEP-2008 (TIMJ):
 *        Call errOut. Rewrite in C.
+*     2010-09-23 (TIMJ):
+*        cnfImpn requires the size without the trailing nul.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -102,8 +104,8 @@
 
 F77_SUBROUTINE(err_out)( CHARACTER(PARAM), CHARACTER(TEXT),
                          INTEGER(STATUS) TRAIL(PARAM) TRAIL(TEXT) ) {
-  char param[ERR__SZPAR];
-  char text[ERR__SZMSG];
+  char param[ERR__SZPAR+1];
+  char text[ERR__SZMSG+1];
   int status;
 
   GENPTR_CHARACTER(PARAM);
