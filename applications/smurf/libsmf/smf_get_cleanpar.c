@@ -17,6 +17,8 @@
 *                       dim_t *dcfitbox, int *dcmaxsteps, double *dcthresh,
 *                       dim_t *dcsmooth, int *dkclean, int *fillgaps,
 *                       double *filt_edgelow, double *filt_edgehigh,
+*                       double *filt_edge_smallscale,
+*                       double *filt_edge_largescale,
 *                       double *filt_notchlow, double *filt_notchhigh,
 *                       int *filt_nnotch, int *dofilt, double *flagslow,
 *                       double *flagfast, int *order, double *spikethresh,
@@ -51,6 +53,10 @@
 *        Apply a hard-edged low-pass filter at this frequency (Hz) (NULL:0)
 *     filt_edgehigh = double* (Returned)
 *        Apply a hard-edged high-pass filter at this frequency (Hz) (NULL:0)
+*     filt_edge_smallscale* (Returned)
+*        Apply low-pass filter that preserves this scale (arcsec) (NULL:0)
+*     filt_edge_largescale* (Returned)
+*        Apply high-pass filter that preserves this scale (arcsec) (NULL:0)
 *     filt_notchlow = double* (Returned)
 *        Array of lower-frequency edges for hard notch filters (Hz). The
 *        maximum length of this array is SMF__MXNOTCH.
@@ -119,6 +125,7 @@
 *     2010-09-23 (EC):
 *        -Rename FLAGSTAT to FLAGSLOW
 *        -Add FLAGFAST
+*        -Add filt_edge_largescale and filt_edge_smallscale
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -170,7 +177,8 @@
 void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac, dim_t *dcfitbox,
                        int *dcmaxsteps, double *dcthresh, dim_t *dcsmooth,
                        int *dkclean, int *fillgaps, double *filt_edgelow,
-                       double *filt_edgehigh, double *filt_notchlow,
+                       double *filt_edgehigh, double *filt_edge_smallscale,
+                       double *filt_edge_largescale, double *filt_notchlow,
                        double *filt_notchhigh, int *filt_nnotch, int *dofilt,
                        double *flagslow, double *flagfast, int *order,
                        double *spikethresh, size_t *spikebox,
@@ -294,6 +302,30 @@ void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac, dim_t *dcfitbox,
 
     msgOutiff( MSG__DEBUG, "", FUNC_NAME ": FILT_EDGEHIGH=%f", status,
                *filt_edgehigh );
+  }
+
+  if( filt_edge_largescale ) {
+    *filt_edge_largescale = 0;
+    astMapGet0D( keymap, "FILT_EDGE_LARGESCALE", filt_edge_largescale );
+
+    if( *filt_edge_largescale ) {
+      dofft = 1;
+    }
+
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": FILT_EDGE_LARGESCALE=%f", status,
+               *filt_edge_largescale );
+  }
+
+  if( filt_edge_smallscale ) {
+    *filt_edge_smallscale = 0;
+    astMapGet0D( keymap, "FILT_EDGE_SMALLSCALE", filt_edge_smallscale );
+
+    if( *filt_edge_smallscale ) {
+      dofft = 1;
+    }
+
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": FILT_EDGE_SMALLSCALE=%f", status,
+               *filt_edge_smallscale );
   }
 
 

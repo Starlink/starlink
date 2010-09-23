@@ -13,14 +13,17 @@
 *     C function
 
 *  Invocation:
-*     smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap, int *dofilt,
-*                            int *status )
+*     smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap, smfHead *hdr,
+*                            int *dofilt, int *status )
 
 *  Arguments:
 *     filt = smfFilter * (Given and Returned)
 *        Pointer to smfFilter to be modified
 *     keymap = AstKeyMap* (Given)
 *        keymap containing parameters
+*     hdr = smfHead *(Given)
+*        Required if filt_edge_smallscale/largscale requested, otherwise can
+*        be NULL.
 *     dofilt = int* (Returned)
 *        If true, frequency-domain filtering is required
 *     status = int* (Given and Returned)
@@ -47,12 +50,14 @@
 *        Store a value for the "apod_length" component of the filter structure.
 *     2010-07-22 (DSB):
 *        Use a dynamic default for APOD based on frequency.
+*    2010-09-23 (EC):
+*        Choose filter edges based on scanvel (stored in hdr)
 *     {enter_further_changes_here}
 
 *  Notes:
 
 *  Copyright:
-*     Copyright (C) 2009 University of British Columbia
+*     Copyright (C) 2009-2010 University of British Columbia
 *     All Rights Reserved.
 
 *  Licence:
@@ -92,12 +97,14 @@
 
 #define FUNC_NAME "smf_filter_fromkeymap"
 
-void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap, int *dofilt,
-                            int *status ) {
+void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap,
+                            const smfHead *hdr, int *dofilt, int *status ) {
 
   int dofft=0;              /* Set if freq. domain filtering the data */
   double f_edgelow;         /* Freq. cutoff for low-pass edge filter */
   double f_edgehigh;        /* Freq. cutoff for high-pass edge filter */
+  double f_edgesmall;       /* Select low-pass based on spatial scale */
+  double f_edgelarge;       /* Select high-pass based on spatial scale */
   double f_low;             /* Lowest edge frequency */
   double f_notchlow[SMF__MXNOTCH]; /* Array low-freq. edges of notch filters */
   double f_notchhigh[SMF__MXNOTCH];/* Array high-freq. edges of notch filters */
@@ -110,13 +117,48 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap, int *dofilt,
 
   /* Search for filtering parameters in the keymap */
   smf_get_cleanpar( keymap, NULL, NULL, NULL, NULL, NULL, NULL,
-                    NULL, &f_edgelow, &f_edgehigh, f_notchlow,
-                    f_notchhigh, &f_nnotch, &dofft, NULL, NULL, NULL, NULL,
-                    NULL, NULL, status );
+                    NULL, &f_edgelow, &f_edgehigh, &f_edgesmall,
+                    &f_edgelarge, f_notchlow, f_notchhigh, &f_nnotch, &dofft,
+                    NULL, NULL, NULL, NULL, NULL, NULL, status );
+
+  /* Modify edge filters if spacial scales were requested */
+  if( f_edgesmall || f_edgelarge ) {
+    if( !hdr || (hdr->scanvel<=0) ) {
+      *status = SAI__ERROR;
+      errRep( "", FUNC_NAME
+              ": FILT_EDGE_SMALLSCALE or FILT_EDGE_LARGESCALE, but "
+              "no smfHead supplied or invalid smfHead->scanvel", status );
+      return;
+    } else {
+      msgOutiff( MSG__VERB, "", FUNC_NAME
+                 ": Based on a slew speed of %.1lf arcsec/sec, setting:",
+                 status, hdr->scanvel );
+
+      if( f_edgesmall ) {
+        f_edgelow = hdr->scanvel / f_edgesmall;
+        msgOutiff( MSG__VERB, "", FUNC_NAME
+                   ": FILT_EDGELOW = %.3lf Hz (> %.1lf arcsec scales)",
+                   status, f_edgelow, f_edgesmall );
+      }
+
+      if( f_edgesmall ) {
+        f_edgehigh = hdr->scanvel / f_edgelarge;
+        msgOutiff( MSG__VERB, "", FUNC_NAME
+                   ": FILT_EDGEHIGH = %.3lf Hz (< %.1lf arcsec scales)",
+                   status, f_edgehigh, f_edgelarge );
+      }
+    }
+  }
+
+
 
   /* Return dofilt if requested */
   if( dofilt ) {
     *dofilt = dofft;
+  }
+
+  if( f_edgelarge ) {
+
   }
 
   /* If filtering parameters given, create filter  */

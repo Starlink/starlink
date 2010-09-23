@@ -334,9 +334,9 @@ void smurf_sc2clean( int *status ) {
       /* clean the dark squids now since we might need to use them
          to clean the bolometer data */
 
-      smf_get_cleanpar( keymap, NULL, NULL, NULL, NULL, NULL,
-                        &dkclean, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-                        NULL, NULL, NULL, NULL, NULL, NULL, status );
+      smf_get_cleanpar( keymap, NULL, NULL, NULL, NULL, NULL, &dkclean, NULL,
+                        NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+                        NULL, NULL, NULL, NULL, NULL, status );
 
       if( dkclean && ffdata && ffdata->da && ffdata->da->dksquid ) {
         smfData *dksquid = ffdata->da->dksquid;

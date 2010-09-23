@@ -193,7 +193,7 @@ void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
       /* Create a filter */
       filt = smf_create_smfFilter( res->sdata[idx], status );
-      smf_filter_fromkeymap( filt, kmap, &dofft, status );
+      smf_filter_fromkeymap( filt, kmap, res->sdata[idx]->hdr, &dofft, status );
 
       if( *status == SMF__INFREQ ) {
         /* If a bad frequency was specified just annul the error and

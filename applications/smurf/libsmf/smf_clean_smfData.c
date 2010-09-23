@@ -159,8 +159,8 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data, smfData **noisemap,
 
   /* Get cleaning parameters */
   smf_get_cleanpar( keymap, &badfrac, &dcfitbox, &dcmaxsteps,
-                    &dcthresh, &dcsmooth, &dkclean,
-                    &fillgaps, NULL, NULL, NULL, NULL, NULL, NULL,
+                    &dcthresh, &dcsmooth, &dkclean, &fillgaps,
+                    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                     &flagslow, &flagfast, &order, &spikethresh, &spikebox,
                     &noiseclip, status );
 
@@ -210,18 +210,23 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data, smfData **noisemap,
 
       if( flagslow ) {
         msgOutiff( MSG__VERB, "", FUNC_NAME
-                   ": Flagging regions with slew speeds < %lf arcsec/sec",
+                   ": Flagging regions with slew speeds < %.2lf arcsec/sec",
                    status, flagslow );
       }
 
       if( flagfast ) {
         msgOutiff( MSG__VERB, "", FUNC_NAME
-                   ": Flagging regions with slew speeds > %lf arcsec/sec",
+                   ": Flagging regions with slew speeds > %.2lf arcsec/sec",
                    status, flagfast );
       }
 
       smf_flag_slewspeed( data, flagslow, flagfast, &nflag, &scanvel, status );
       msgOutiff( MSG__VERB,"", "%zu new time slices flagged", status, nflag);
+
+      if( msgIflev( NULL, status ) >= MSG__VERB ) {
+        msgOutf( "", FUNC_NAME ": mean SCANVEL=%.2lf arcsec/sec"
+                 " (was %.2lf)", status, scanvel, data->hdr->scanvel, scanvel);
+      }
 
       data->hdr->scanvel = scanvel;
 
@@ -273,7 +278,7 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data, smfData **noisemap,
 
   /* filter the data */
   filt = smf_create_smfFilter( data, status );
-  smf_filter_fromkeymap( filt, keymap, &dofft, status );
+  smf_filter_fromkeymap( filt, keymap, data->hdr, &dofft, status );
   if( (*status == SAI__OK) && dofft ) {
     msgOutif( MSG__VERB, "", FUNC_NAME ": frequency domain filter", status );
     smf_filter_execute( wf, data, filt, status );

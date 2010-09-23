@@ -176,13 +176,30 @@ fillgaps = 1
 # probably a better idea in general to do filtering with the 'flt'
 # model component as described in the next section.
 
-# Hard-edge high-pass frequency-domain filter
-#   e.g. keep only frequencies >= 0.1 Hz
-# filt_edgehigh = 0.1
+# Hard-edge high- and low-pass frequency-domain filter
+#   e.g. keep only frequencies >= 0.1 Hz, and <= 90Hz
 
-# Hard-edge low-pass frequency-domain filter
-#   e.g. keep only frequencies <= 90 Hz
+# filt_edgehigh = 0.1
 # filt_edgelow = 90
+
+# Alternatively, determine filter edges based on a range of requested
+# spatial scales (arcsec), and using internal measurements of the
+# average slew speed. These will override filt_edgehigh/filt_edgelow.
+# For example, suppose the slew speed is 100 arcsec/sec. We want to
+# ensure that the beam is fully sampled, say 2 arcsec at 450um. That
+# scale is crossed in 2/100 = 0.02 s, so we don't need frequencies in
+# the data above 1/0.02 = 50 Hz in this case (i.e. internally it will
+# set filt_edgelow to 50Hz if filt_edge_smallscale is set to 2
+# arcsec). Similarly, if we would like to attempt to preserve scales
+# of 10 arcmin = 600 arcsec, we would want to keep frequencies that
+# are greater than 1/(600/100.) = 0.17 Hz (i.e. setting
+# filt_edge_largescale=600 would translate into filt_edgehigh = 0.17
+# Hz).
+
+# filt_edge_largescale = 600.
+# 450.filt_edge_smallscale = 2.
+# 850.filt_edge_smallscale = 4.
+
 
 # Hard-edge band-cut frequency-domain notch filters.
 # filt_notchlow gives lower edges of frequencies to cut in Hz

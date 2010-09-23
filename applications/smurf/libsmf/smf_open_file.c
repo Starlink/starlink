@@ -1176,7 +1176,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
     hdr->steptime = steptime;
 
     /* Similarly get the SCAN_VEL (in arcsec/sec) from the header */
-    smf_getfitsd( hdr, "SCAN_VEL", &steptime, status );
+    smf_getfitsd( hdr, "SCAN_VEL", &scanvel, status );
     hdr->scanvel = scanvel;
   }
 

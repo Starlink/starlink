@@ -548,6 +548,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
               hdr = data->hdr;
               refhdr = refdata->hdr;
               hdr->instrument = refhdr->instrument;
+              hdr->scanvel = refhdr->scanvel;
               hdr->steptime = refhdr->steptime;
               hdr->obsmode = refhdr->obsmode;
               hdr->obstype = refhdr->obstype;

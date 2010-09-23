@@ -144,6 +144,8 @@ flt.notfirst = 0
 flt.apod = 0
 flt.filt_edgelow = 0
 flt.filt_edgehigh = 0
+flt.filt_edge_smallscale = 0
+flt.filt_edge_largescale = 0
 flt.filt_notchlow = <undef>
 flt.filt_notchhigh = <undef>
 

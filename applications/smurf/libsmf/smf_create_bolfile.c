@@ -191,13 +191,20 @@ void smf_create_bolfile( const Grp * bgrp, size_t index,
     if (frnum != AST__NOFRAME) astSetI( wcs, "CURRENT", frnum );
 
     (*bolmap)->hdr = smf_construct_smfHead( NULL, refdata->hdr->instrument,
-                                             wcs, NULL, astCopy( refdata->hdr->fitshdr ),
-                                             NULL, 0, refdata->hdr->instap, 1,
-                                             refdata->hdr->steptime, refdata->hdr->obsmode,
-                                             refdata->hdr->swmode, refdata->hdr->obstype,
-                                             refdata->hdr->seqtype, refdata->hdr->inbeam, 0, NULL, NULL,
-                                             NULL, NULL, 0, NULL, buffer, datalabel,
-                                             units, refdata->hdr->telpos, NULL, refdata->hdr->obsidss, status );
+                                            wcs, NULL,
+                                            astCopy( refdata->hdr->fitshdr ),
+                                            NULL, 0, refdata->hdr->instap, 1,
+                                            refdata->hdr->steptime,
+                                            refdata->hdr->scanvel,
+                                            refdata->hdr->obsmode,
+                                            refdata->hdr->swmode,
+                                            refdata->hdr->obstype,
+                                            refdata->hdr->seqtype,
+                                            refdata->hdr->inbeam, 0, NULL, NULL,
+                                            NULL, NULL, 0, NULL, buffer,
+                                            datalabel, units,
+                                            refdata->hdr->telpos, NULL,
+                                            refdata->hdr->obsidss, status );
 
     /* write WCS and FITS information to file and sync other information */
     if (bgrp) {

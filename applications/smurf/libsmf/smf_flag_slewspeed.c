@@ -208,7 +208,7 @@ void smf_flag_slewspeed( smfData *data, double smin, double smax,
     if( (smin && (speed < smin)) || (smax && (speed > smax)) ) {
       /* Does this time step need to be flagged? */
       flag[i] = 1;
-
+    } else {
       /* Update measurement of avspeed */
       avspeed += speed;
       navspeed ++;

@@ -14,16 +14,21 @@
 
 *  Invocation:
 *     pntr = smf_construct_smfHead( smfHead * tofill, inst_t instrument,
-*              AstFrameSet * wcs, AstFrameSet * tswcs,
-*              AstFitsChan * fitshdr, const JCMTState * allState,
-*              dim_t curframe, smf_obsmode obsmode, smf_swmode swmode,
-*              smf_obstype obstype, smf_obstype seqtype, smf_inbeam_t inbeam,
-*              unsigned int ndet, const double fplanex[], const double fplaney[],
-*              const double detpos[], const char *detname, int dpazel,
-*              const double tsys[],
-*              const char title[], const char dlabel[], const char units[],
-*              const double telpos[], char *ocsconfig,
-*              const char obsidss[], int * status );
+*                                   AstFrameSet * wcs, AstFrameSet * tswcs,
+*                                   AstFitsChan * fitshdr,
+*                                   JCMTState * allState, dim_t curframe,
+*                                   const double instap[], dim_t nframes,
+*                                   double steptime, double scanvel,
+*                                   smf_obsmode obsmode, smf_swmode swmode,
+*                                   smf_obstype obstype, smf_obstype seqtype,
+*                                   smf_inbeam_t inbeam, unsigned int ndet,
+*                                   double fplanex[], double fplaney[],
+*                                   double detpos[], char *detname,
+*                                   int dpazel, double tsys[],
+*                                   const char title[], const char dlabel[],
+*                                   const char units[], const double telpos[],
+*                                   char * ocsconfig, const char obsidss[],
+*                                   int * status );
 
 *  Arguments:
 *     tofill = smfHead* (Given)
@@ -48,6 +53,10 @@
 *        will be set to this location.
 *     nframes = dim_t (Given)
 *        Number of frames (timeslices) in data.
+*     steptime = double (Given)
+*        Length of a sample in seconds
+*     scanvel = double (Given)
+*        Scan velocity in arcsec/sec
 *     obsmode = smf_obsmode (Given)
 *        Observing mode.
 *     swmode = smf_swmode (Given)
@@ -162,12 +171,14 @@
 *        Change default for isCloned to false.
 *     2010-08-09 (TIMJ):
 *        Add INBEAM support
+*     2010-09-23 (EC):
+*        Add SCANVEL support
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008-2010 Science and Technology Facilities Council.
-*     Copyright (C) 2006 Particle Physics and Astronomy Research
-*     Council. Copyright (C) 2006-2007 University of British Columbia.
+*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2006-2007,2010 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -213,14 +224,14 @@ smf_construct_smfHead( smfHead * tofill, inst_t instrument,
                        AstFitsChan * fitshdr,
                        JCMTState * allState, dim_t curframe,
                        const double instap[], dim_t nframes, double steptime,
-                       smf_obsmode obsmode, smf_swmode swmode, smf_obstype obstype,
-                       smf_obstype seqtype, smf_inbeam_t inbeam,
-                       unsigned int ndet, double fplanex[],
+                       double scanvel, smf_obsmode obsmode, smf_swmode swmode,
+                       smf_obstype obstype, smf_obstype seqtype,
+                       smf_inbeam_t inbeam, unsigned int ndet, double fplanex[],
                        double fplaney[], double detpos[], char *detname,
                        int dpazel, double tsys[], const char title[],
                        const char dlabel[], const char units[],
-                       const double telpos[], char * ocsconfig, const char obsidss[],
-                       int * status ) {
+                       const double telpos[], char * ocsconfig,
+                       const char obsidss[], int * status ) {
 
   smfHead * hdr = NULL;   /* Header components */
 
@@ -257,6 +268,7 @@ smf_construct_smfHead( smfHead * tofill, inst_t instrument,
     hdr->swmode = swmode;
     hdr->obstype = obstype;
     hdr->seqtype = seqtype;
+    hdr->scanvel = scanvel;
     hdr->steptime= steptime;
     hdr->inbeam  = inbeam;
     hdr->ocsconfig = ocsconfig;

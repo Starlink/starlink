@@ -733,14 +733,15 @@ smfHead *smf_construct_smfHead( smfHead * tofill, inst_t instrument,
                                 AstFrameSet * wcs, AstFrameSet * tswcs,
                                 AstFitsChan * fitshdr, JCMTState * allState,
                                 dim_t curframe, const double instap[],
-                                dim_t nframes, double steptime,
-                                smf_obsmode obsmode, smf_swmode swmode, smf_obstype obstype,
-                                smf_obstype seqtype, smf_inbeam_t inbeam,
-                                unsigned int ndet, double fplanex[],
-                                double fplaney[], double detpos[],
-                                char *detname, int rpazel, double tsys[],
-                                const char title[], const char dlabel[],
-                                const char units[], const double telpos[], char * ocsconfig,
+                                dim_t nframes, double steptime, double scanvel,
+                                smf_obsmode obsmode, smf_swmode swmode,
+                                smf_obstype obstype, smf_obstype seqtype,
+                                smf_inbeam_t inbeam, unsigned int ndet,
+                                double fplanex[], double fplaney[],
+                                double detpos[], char *detname, int rpazel,
+                                double tsys[], const char title[],
+                                const char dlabel[], const char units[],
+                                const double telpos[], char * ocsconfig,
                                 const char obsidss[], int * status );
 
 void smf_convert_bad( smfData *data, int *status );
@@ -906,8 +907,8 @@ void smf_filter_edge( smfFilter *filt, double f, int lowpass, int *status );
 void smf_filter_execute( smfWorkForce *wf, smfData *data,
                          smfFilter *filt, int *status );
 
-void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap, int *dofft,
-                            int *status );
+void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap,
+                            const smfHead *hdr, int *dofft, int *status );
 
 void smf_filter_ident( smfFilter *filt, int complex, int *status );
 
@@ -1087,6 +1088,8 @@ void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac,
                        dim_t *dcbox, int *dcbad, double *dcthresh,
                        dim_t *dcsmooth, int *dkclean, int *fillgaps,
                        double *filt_edgelow, double *filt_edgehigh,
+                       double *filt_edge_smallscale,
+                       double *filt_edge_largescale,
                        double *filt_notchlow, double *filt_notchhigh,
                        int *filt_nnotch, int *dofilt, double *flagslow,
                        double *flagfast, int *order, double *spikethresh,
