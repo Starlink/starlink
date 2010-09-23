@@ -7,7 +7,7 @@
 
 # In case of poor crosslinking. For pointings this won't
 # take very long
-numiter=20
+numiter=10
 
 # Circular boundary constraints
 ast.zero_circle = (0.016666666)
