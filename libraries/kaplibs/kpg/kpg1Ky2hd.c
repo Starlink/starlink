@@ -3,6 +3,7 @@
 #include "ast.h"
 #include "mers.h"
 #include "sae_par.h"
+#include "kaplibs.h"
 
 void kpg1Ky2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
 /*
@@ -58,6 +59,8 @@ void kpg1Ky2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
 *  History:
 *     29-APR-2008 (DSB):
 *        Original version.
+*     2010-09-23 (TIMJ):
+*        Fix arrays of strings.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -215,7 +218,7 @@ void kpg1Ky2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
          } else {
             datNew1C( loc, key, lenc, veclen, status );
             datFind( loc, key, &cloc, status );
-            datMapV( cloc, "_REAL", "WRITE", &pntr, &el, status );
+            datMapV( cloc, "_CHAR", "WRITE", &pntr, &el, status );
             (void) atlMapGet1S( keymap, key, veclen*lenc, lenc, &nval,
                                 (char *) pntr, status );
             datUnmap( cloc, status );
