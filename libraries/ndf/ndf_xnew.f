@@ -75,6 +75,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -82,6 +83,8 @@
 *        Original version.
 *     26-SEP-1989 (RFWS):
 *        Initialise LOC to DAT__NOLOC.
+*     24-SEP-2010 (TIMJ):
+*        Include the name of the extension in the error message.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -194,8 +197,10 @@
 *  If an error occurred, then report context information and call the
 *  error tracing routine.
       IF ( STATUS .NE. SAI__OK ) THEN
+         CALL MSG_SETC( 'XNAME', XNAME )
          CALL ERR_REP( 'NDF_XNEW_ERR',
-     :   'NDF_XNEW: Error creating a new extension in an NDF.', STATUS )
+     :        'NDF_XNEW: Error creating a new extension named ^XNAME '//
+     :        'in an NDF.', STATUS )
          CALL NDF1_TRACE( 'NDF_XNEW', STATUS )
       END IF
 
