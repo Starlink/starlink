@@ -297,7 +297,7 @@ typedef struct Step {
 
 #ifdef DEBUG_STEPS
 
-#define RECORD_BOLO (ibolo==1074)
+#define RECORD_BOLO (ibolo==779)
 #define RECORD_BOLO2 (1)
 
 #define TOPCAT(fd, x) \
@@ -696,6 +696,7 @@ static void smf1_fix_steps_job( void *job_data, int *status ) {
    int jlo;
    int jtime;
    int lbad;
+   int maxsteps;
    int mbstep;
    int msize;
    int nbstep;
@@ -1245,7 +1246,10 @@ static void smf1_fix_steps_job( void *job_data, int *status ) {
 
 
 /* Reject the whole bolometer if too many steps were fixed. */
-            if( dcmaxsteps > 0 && mbstep > dcmaxsteps*nsum/12000.0 ) {
+            maxsteps = dcmaxsteps*nsum/12000.0;
+            if( maxsteps < 4 ) maxsteps = 4;
+
+            if( dcmaxsteps > 0 && mbstep > maxsteps ) {
                pq = qua + base;
                for( itime = 0; itime < ntslice; itime++ ) {
                   *pq |= SMF__Q_BADB;
