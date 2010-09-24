@@ -384,6 +384,14 @@ ext.taumethod =adaptive
 #ast.zero_notlast = 1
 #ast.zero_snr = 5
 
+# The AST model can also perform map-based de-spiking after the first
+# iteration provided that there is also a NOI model present. The value
+# of ast.mapspike indicates a SNR threshold sigma-clip based on the
+# scatter of the samples that contribute to a given pixel value about
+# the map value.
+
+#ast.mapspike = 5
+
 # Smooth the time series
 
 # don't smooth on the first iteration

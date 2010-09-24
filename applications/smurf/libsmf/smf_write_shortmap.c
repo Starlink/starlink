@@ -302,7 +302,7 @@ void smf_write_shortmap( int shortmap, smfArray *ast, smfArray *res,
                      rebinflag,
                      mapdata->pntr[0],
                      shortmapweight, shortmapweightsq, shorthitsmap,
-                     mapdata->pntr[1], msize, NULL, status );
+                     mapdata->pntr[1], msize, NULL, NULL, status );
 
       /* Remove ast from res once again */
       for( k=0; k<dsize; k++ ) {

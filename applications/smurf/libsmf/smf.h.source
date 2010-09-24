@@ -1223,10 +1223,9 @@ AstMapping *smf_maketanmap( double lon, double lat, AstMapping *cache[ 2 ],
 void * smf_map_or_malloc( size_t nelem, smf_dtype type, int zero, int indf,
                           const char * comp, int * status );
 
-void smf_map_spikes( smfData *data, smfData *variance, int *lut,
-                     smf_qual_t mask, double *map,
-                     int *hitsmap, double *mapvar,
-                     dim_t msize, double thresh, size_t *nflagged,
+void smf_map_spikes( smfData *data, smfData *variance, double weightnorm,
+                     int *lut, smf_qual_t mask, double *map, int *hitsmap,
+                     double *mapvar, double thresh, size_t *nflagged,
                      int *status );
 
 void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
@@ -1470,8 +1469,8 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
                     size_t tslice1, size_t tslice2,
                     int trange, smf_qual_t mask, int sampvar,
                     int flags, double *map, double *mapweight,
-                    double *mapweightsq, int *hitsmap,
-                    double *mapvar, dim_t msize, double *scalevariance,
+                    double *mapweightsq, int *hitsmap, double *mapvar,
+                    dim_t msize, double *scalevariance, double *weightnorm,
                     int *status );
 
 void smf_rebinseq_thread( void *data_ptr, int *status );

@@ -91,6 +91,8 @@
 *        the centre defaults to reference coordinates for map projection
 *     2010-09-24 (DSB):
 *        The circular region should have centre (0,0) for moving sources.
+*     2010-09-24 (EC):
+*        Add map-based despiker
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -151,6 +153,7 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)),
   int *lut_data=NULL;           /* Pointer to DATA component of lut */
   double m;                     /* Hold temporary value of m */
   double *map;                  /* Pointer to map data */
+  double mapspike;              /* Threshold SNR to detect map spikes */
   double meanhits;              /* Mean hits in the map */
   smfArray *model=NULL;         /* Pointer to model at chunk */
   double *model_data=NULL;      /* Pointer to DATA component of model */
@@ -293,6 +296,28 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)),
     return;
   }
 
+
+  /* Before applying boundary conditions, removing AST signal from residuals
+     etc., flag spikes using map */
+
+  astMapGet0D( kmap, "MAPSPIKE", &mapspike );
+
+  if( mapspike < 0 ) {
+    msgOut("", FUNC_NAME
+           ": WARNING: ignoring negative value for ast.mapspike", status );
+  }
+
+  if( (mapspike > 0) && noi && !(flags&SMF__DIMM_FIRSTITER) ) {
+    size_t nflagged;
+    smf_map_spikes( res->sdata[idx], noi->sdata[idx], dat->weightnorm,
+                    lut->sdata[idx]->pntr[0], SMF__Q_GOOD,
+                    map, hitsmap, mapvar, mapspike, &nflagged,
+                    status );
+
+    msgOutiff(MSG__VERB, "","   detected %zu new spikes relative to map\n",
+              status, nflagged);
+  }
+
   /* Proceed if we need to do masking */
   if( zero_notlast && (flags&SMF__DIMM_LASTITER) ) dozero = 0;
   else if( zero_snr || zero_lowhits || dat->zeromask ) dozero = 1;
@@ -409,7 +434,7 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)),
 	if( (lut_data[ii] != VAL__BADI) && (model_data[ii] != VAL__BADD) ) {
 
 	  /* calculate new model value using the map/LUT */
-          m = dat->map[lut_data[ii]];
+          m = map[lut_data[ii]];
 
           if( m==VAL__BADD ){
             /* We can get here if no data we regridded into the map at

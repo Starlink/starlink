@@ -233,7 +233,7 @@ void smf_write_bolomap( smfArray *ast, smfArray *res, smfArray *lut,
                          AST__REBININIT | AST__REBINEND,
                          mapdata->pntr[0],
                          bmapweight, bmapweightsq, bhitsmap,
-                         mapdata->pntr[1], msize, NULL, status );
+                         mapdata->pntr[1], msize, NULL, NULL, status );
 
           /* Write out COLNUM and ROWNUM to FITS header */
           if( *status == SAI__OK ) {

@@ -18,7 +18,7 @@
 *                    int trange, smf_qual_t mask, int sampvar, int flags,
 *                    double *map, double *mapweight, double *mapweightsq,
 *                    int *hitsmap, double *mapvar, dim_t msize,
-*                    double *scalevariance, int *status )
+*                    double *scalevariance, double *weightnorm, int *status )
 
 *  Arguments:
 *     data = smfData* (Given)
@@ -63,6 +63,8 @@
 *        to input variances such that error propagation would give the
 *        same variance as that calculated from the sample scatter in
 *        each pixel.
+*     weightnorm = double* (Returned)
+*        Return the typical weight normalization if requested.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -97,6 +99,8 @@
 *     2010-05-28 (EC):
 *        Keep track of sum(weights^2) for test code using alternative sample
 *        variance formula (#define __SMF_REBINMAP__SAMPLE_STANDARD_DEVIATION)
+*     2010-09-24 (EC):
+*        Add weightnorm to interface
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -166,7 +170,7 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
                     int flags, double *map, double *mapweight,
                     double *mapweightsq, int *hitsmap,
                     double *mapvar, dim_t msize, double *scalevariance,
-                    int *status ) {
+                    double *weightnorm, int *status ) {
 
   /* Local Variables */
   double *dat=NULL;          /* Pointer to data array */
@@ -389,6 +393,26 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
 
   /* If this is the last data to be accumulated re-normalize */
   if( flags & AST__REBINEND ) {
+
+    /* First thing we do is work out the average normalization of the
+       weights if requested */
+    if( weightnorm ) {
+      double totnorm = 0;
+      size_t numnorm = 0;
+
+      for( i=0; i<msize; i++ ) {
+        if( mapweight[i] ) {
+          totnorm += hitsmap[i] / mapweight[i];
+          numnorm++;
+        }
+      }
+
+      if( numnorm ) {
+        *weightnorm = totnorm / numnorm;
+      } else {
+        *weightnorm = VAL__BADD;
+      }
+    }
 
     if( sampvar || !var ) {
       /* Variance also needs re-normalization in sampvar case */

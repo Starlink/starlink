@@ -13,10 +13,9 @@
 *     C function
 
 *  Invocation:
-*     smf_map_spikes( smfData *data, smfData *variance, int *lut,
-*                     smf_qual_t mask,
-*                     double *map, int *hitsmap, double *mapvar,
-*                     dim_t msize, double thresh, size_t *nflagged,
+*     smf_map_spikes( smfData *data, smfData *variance, double weightnorm,
+*                     int *lut, smf_qual_t mask, double *map, int *hitsmap,
+*                     double *mapvar, double thresh, size_t *nflagged,
 *                     int *status )
 
 *  Arguments:
@@ -28,19 +27,19 @@
 *        (time-varying for each bolo). In the former case ndims should
 *        still be 3, but the length of the time dimension should be 0
 *        (e.g. a NOI model component created by smf_model_create).
+*     weightnorm = double (Given)
+*        Normalization for data weights
 *     lut = int* (Given)
 *        1-d LUT for indices of data points in map (same dimensions as data)
 *     mask = smf_qual_t (Given)
 *        Define which bits in quality are relevant to ignore data in
 *        the calculation.
 *     map = double* (Given)
-*        The current map estimate
+*        The current map estimate (can be NULL).
 *     hitsmap = int* (Given)
 *        Number of samples that land in a pixel.
 *     mapvar = double* (Given)
 *        Variance of each pixel in map
-*     msize = dim_t (Given)
-*        Number of pixels in map
 *     thresh = doublge (Given)
 *        N-sigma threshold for spike detection
 *     nflagged = size_t * (Returned)
@@ -49,9 +48,26 @@
 *        Pointer to global status.
 
 *  Description:
-*     This routine flags data points that are thresh-sigma away from the value
-*     of the map in each pixel.
+*     This routine flags data points that are thresh-sigma away from
+*     the value of the map in each pixel. After running smf_rebinmap1,
+*     we have an estimated uncertainty in the weighted mean of each
+*     map pixel, sigma_m, and we also know the number of hits,
+*     N. Therefore we can estimate the population variance of weighted
+*     data points that went into each map pixel as
 *
+*                   sigma^2 = sigma_m^2 * sqrt(N)
+*
+*     The population we are considering are weighted data points, where
+*     each weight, w_i = norm/var^2, i.e. inverse variance weighting times
+*     a normalization, weightnorm, for which we also have an average value
+*     calculated by smf_rebinmap1. We simply check to see if the difference
+*     between the data point and the mean (stored in the map), multiplied
+*     by this weight, exceeds the requested threshold beyond the population
+*     variance.
+*
+*     If map is NULL, it is assumed that the data have already had the
+*     map value subtracted, and are assumed to be scattered about zero.
+
 *  Authors:
 *     Edward Chapin (UBC)
 *     {enter_new_authors_here}
@@ -59,11 +75,13 @@
 *  History:
 *     2009-08-06 (EC):
 *        Initial version.
+*     2010-09-24 (EC):
+*        Finish and get it working properly.
 
 *  Notes:
 
 *  Copyright:
-*     Copyright (C) 2009 University of British Columbia
+*     Copyright (C) 2009-2010 University of British Columbia
 *     All Rights Reserved.
 
 *  Licence:
@@ -102,11 +120,10 @@
 
 #define FUNC_NAME "smf_map_spikes"
 
-void smf_map_spikes( smfData *data, smfData *variance, int *lut,
-                     smf_qual_t mask, double *map,
-                     int *hitsmap, double *mapvar,
-                     dim_t msize __attribute__((unused)), double thresh,
-                     size_t *nflagged, int *status ) {
+void smf_map_spikes( smfData *data, smfData *variance, double weightnorm,
+                     int *lut, smf_qual_t mask, double *map, int *hitsmap,
+                     double *mapvar, double thresh, size_t *nflagged,
+                     int *status ) {
 
   /* Local Variables */
   double *dat=NULL;          /* Pointer to data array */
@@ -119,8 +136,11 @@ void smf_map_spikes( smfData *data, smfData *variance, int *lut,
   dim_t nbolo;               /* number of bolos */
   size_t nflag=0;            /* Number of samples flagged */
   dim_t ntslice;             /* number of time slices */
+  double popvar;             /* estimate of population variance */
   smf_qual_t * qual = NULL;  /* Quality to update for flagging */
+  double thisweight;
   double threshsq;           /* square of thresh */
+  double val;                /* weighted offset value */
   double *var=NULL;          /* Pointer to variance array */
   size_t vbstride;           /* bolo stride of variance */
   dim_t vi;                  /* variance array index */
@@ -133,7 +153,7 @@ void smf_map_spikes( smfData *data, smfData *variance, int *lut,
   if (*status != SAI__OK) return;
 
   /* Check inputs */
-  if( !data || !variance || !lut || !qual || !map || !mapvar || !hitsmap ) {
+  if( !data || !variance || !lut || !mapvar || !hitsmap ) {
     *status = SAI__ERROR;
     errRep(" ", FUNC_NAME ": Null inputs", status );
     return;
@@ -172,15 +192,28 @@ void smf_map_spikes( smfData *data, smfData *variance, int *lut,
 
   /* Loop over data points and flag outliers */
   for( i=0; i<nbolo; i++ ) {
+
     if( !(qual[i*dbstride]&SMF__Q_BADB) ) for( j=0; j<ntslice; j++ ) {
 
       di = i*dbstride + j*dtstride;
       vi = i*vbstride + (j%vntslice)*vtstride;
 
-      /* Check that the LUT, data and variance values are valid */
-      if( (lut[di] != VAL__BADI) && !(qual[di]&mask) && (var[vi] != 0) ) {
+      if( (lut[di] != VAL__BADI) && !(qual[di]&mask) && (var[vi] != 0) &&
+        (mapvar[lut[di]] != VAL__BADD) ) {
 
-        if( (dat[di]-map[lut[di]])*(dat[di]-map[lut[di]]) > threshsq*var[i] ) {
+        /* What is the weighted offset of this data point from the mean */
+        thisweight = (1/var[vi])*weightnorm;
+
+        if( map ) val = (dat[di] - map[lut[di]]);
+        else val = dat[di];
+
+        val *= thisweight;
+
+        /* What is the estimated population variance? */
+        popvar = mapvar[lut[di]]*hitsmap[lut[di]];
+
+        /* Flag it if it's an outlier */
+        if( val*val > threshsq*popvar ) {
           qual[di] |= SMF__Q_SPIKE;
           nflag++;
         }

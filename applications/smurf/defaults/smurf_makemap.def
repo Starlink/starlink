@@ -95,6 +95,7 @@ ast.zero_lowhits = 0
 ast.zero_notlast = 0
 ast.zero_circle = <undef>
 ast.zero_snr = <undef>
+ast.mapspike = 0
 
 # smf_calcmodel_com
 
