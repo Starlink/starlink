@@ -155,7 +155,7 @@ void smurf_rawunpress( int *status ) {
     smf_open_file( igrp, i, "READ", SMF__NOCREATE_DA | SMF__NOCREATE_FTS, &data, status );
 
     /* Quick sanity check to make sure we are raw data */
-    if (*status == SAI__OK && data->da == NULL && data->dtype == SMF__INTEGER) {
+    if (*status == SAI__OK && data->dtype != SMF__INTEGER ) {
       *status = SAI__ERROR;
       errRep(" ", "Can only uncompress raw data file(s)", status);
     }
