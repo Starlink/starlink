@@ -59,10 +59,13 @@
 *     2010-05-04 (TIMJ):
 *        Simplify KeyMap access. We now trigger an error if a key is missing
 *        and we ensure all keys have corresponding defaults.
+*     2010-09-23 (EC):
+*        Calculate model as complementary filter applied to residual, rather
+*        than as the residual minus the filtered residual.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2009 University of British Columbia.
+*     Copyright (C) 2009-2010 University of British Columbia.
 *     Copyright (C) 2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -230,19 +233,25 @@ void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
                 ndata*smf_dtype_size(res->sdata[idx],status) );
       }
 
-      /* Apply the filter to the residual */
+      /* Apply the complementary filter to the copy of the
+         residual+old model stored in the model. So, for example, if
+         the goal is to remove low-frequency noise with a high-pass filter,
+         this operation will place the low-frequencies into the model (and
+         we can then subtract it from the residual).
+      */
       if( dofft ) {
-        smf_filter_execute( wf, res->sdata[idx], filt, status );
+        smf_filter_complement( filt, status );
+        smf_filter_execute( wf, model->sdata[idx], filt, status );
       }
 
-      /* Store the difference between the filtered signal and the residual
-         in the model container */
+      /* Now remove the filtered signals from the residual by subtracting
+         off the new iteration of the model. */
       if( *status == SAI__OK ) {
         for( i=0; i<nbolo; i++ ) if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {
           for( j=0; j<ntslice; j++ ) {
 
             ii = i*bstride+j*tstride;
-            model_data[ii] -= res_data[ii];
+            res_data[ii] -= model_data[ii];
 
             /* also measure contribution to dchisq */
             if( noi && !(qua_data[i*bstride]&SMF__Q_GOOD) ) {

@@ -1196,6 +1196,14 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                             nfilegroups, modeltyps[i], 0, NULL, 0, NULL, NULL,
                             NULL, memiter, memiter, model[i], keymap, status );
 
+          /* Associate quality with some models */
+          if( modeltyps[i] == SMF__FLT ) {
+            for( idx=0; idx<res[0]->ndat; idx++ ) {
+              smfData *thisqua = qua[0]->sdata[idx];
+              model[i][0]->sdata[idx]->sidequal = thisqua;
+            }
+          }
+
         } else {
           smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, noisemaps,
                             0, modeltyps[i], 0, NULL, 0, NULL, NULL,
