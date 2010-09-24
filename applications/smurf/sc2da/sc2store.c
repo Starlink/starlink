@@ -3328,9 +3328,7 @@ int *status              /* global status (given and returned) */
 
 void sc2store_wrmcehead
 (
-size_t numsamples,          /* number of samples (given) */
-size_t mceheadsz,           /* number of values per MCE header (given) */
-const int *mcehead,         /* MCE header for each sample (given) */
+AstKeyMap *mcehead,         /* MCE header (given) */
 int *status                 /* global status (given and returned) */
 )
 /* Description :
@@ -3339,33 +3337,20 @@ int *status                 /* global status (given and returned) */
    History :
     25Oct2007 : original (bdk)
     03Nov2007 : do nothing if mceheadsz = 0 (timj)
+    23Sep2010 : change to use AST Keymap (timj)
 */
 {
-   int *headptr;                          /* pointer to HDS store */
    HDSLoc *xloc = NULL;                   /* locator to NDF extension */
-   HDSLoc *temploc = NULL;                /* HDS locator */
-   hdsdim dims[2];                        /* dimensions to be written */
 
    if ( *status != SAI__OK ) return;
-   if ( mceheadsz == 0 ) return;
+   if ( !mcehead ) return;
 
-/* create the extension and array component */
-
-   dims[0] = mceheadsz;
-   dims[1] = numsamples;
-   ndfXnew ( sc2store_indf, "MCEHEADS", "MCEHEAD", 0, NULL, &xloc, status );
-   datNew ( xloc, "MCEHEAD", "_INTEGER", 2, dims, status );
-   datFind ( xloc, "MCEHEAD", &temploc, status );
-
-   datMap ( temploc, "_INTEGER", "WRITE", 2, dims, (void **)(&headptr),
-     status );
-
-   memcpy ( headptr, mcehead, mceheadsz*numsamples*sizeof(*mcehead) );
+/* Create the extension and write the contents of the AST key map */
+   ndfXnew ( sc2store_indf, "MCEHEAD", "MCEHEAD", 0, NULL, &xloc, status );
+   kpg1Ky2hd( mcehead, xloc, status );
 
 /* tidy up */
 
-   datUnmap ( temploc, status );
-   datAnnul ( &temploc, status );
    datAnnul ( &xloc, status );
 
    sc2store_errconv ( status );
@@ -3392,9 +3377,8 @@ const int *dksquid,         /* dark SQUID time stream data (given) */
 const double *flatcal,      /* flat-field calibration (given) */
 const double *flatpar,      /* flat-field parameters (given) */
 const char *obsmode,        /* Observing mode (given) */
-const int *mcehead,         /* MCE header for each sample (given) */
+AstKeyMap *mcehead,         /* MCE header (given) */
 const int *trackinfo,       /* 3xntrack int array with (col,row,heat) groups (given) */
-size_t mceheadsz,           /* number of values per MCE header (given) */
 int jigvert[][2],           /* Array of jiggle vertices (given) */
 size_t nvert,               /* Number of jiggle vertices (given) */
 double jigpath[][2],        /* Path of SMU during jiggle cycle (given) */
@@ -3486,7 +3470,7 @@ int *status                 /* global status (given and returned) */
 
 /* Store the MCE headers for each frame */
 
-   sc2store_wrmcehead ( nframes, mceheadsz, mcehead, status );
+   sc2store_wrmcehead ( mcehead, status );
 
 /* The file is open */
 

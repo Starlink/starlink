@@ -213,7 +213,7 @@ void sc2sim_ndfwrheat
   sc2store_wrtstream ( file_name, subnum, nrec, fitsrec, inx->colsize,
                        inx->rowsize, numsamples, nflat, 0, flatname, head, NULL,
                        dbuf, dksquid, fcal, fpar, inx->obsmode,
-                       NULL, NULL, 0, jigvert, inx->nvert, NULL, 0,
+                       NULL, NULL, jigvert, inx->nvert, NULL, 0,
                        NULL, status );
 
   /* Close the file */

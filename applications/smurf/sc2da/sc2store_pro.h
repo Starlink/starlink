@@ -418,9 +418,7 @@ int *status              /* global status (given and returned) */
 
 void sc2store_wrmcehead
 (
-size_t numsamples,          /* number of samples (given) */
-size_t mceheadsz,           /* number of values per MCE header (given) */
-const int *mcehead,         /* MCE header for each sample (given) */
+AstKeyMap *mcehead,         /* MCE header (given) */
 int *status                 /* global status (given and returned) */
 );
 
@@ -445,9 +443,8 @@ const int *dksquid,         /* dark SQUID time stream data (given) */
 const double *flatcal,      /* flat-field calibration (given) */
 const double *flatpar,      /* flat-field parameters (given) */
 const char *obsmode,        /* Observing mode (given) */
-const int *mcehead,         /* MCE header for each sample (given) */
+AstKeyMap *mcehead,         /* MCE header (given) */
 const int *trackinfo,       /* 3xntrack int array with (col,row,heat) groups (given) */
-size_t mceheadsz,           /* number of values per MCE header (given) */
 int jigvert[][2],           /* Array of jiggle vertices (given) */
 size_t nvert,               /* Number of jiggle vertices (given) */
 double jigpath[][2],        /* Path of SMU during jiggle cycle (given) */

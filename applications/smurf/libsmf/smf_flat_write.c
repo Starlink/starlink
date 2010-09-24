@@ -151,8 +151,6 @@ void smf_flat_write( smf_flatmeth flatmeth, const char * flatname,
   size_t j;               /* loop counter */
   int jig_vert[1][2];     /* dummy jiggle vertices */
   double jig_path[1][2];  /* dummy jiggle path */
-  int *mcehead = NULL;    /* dummy mce header */
-  size_t mceheadsz = 0;   /* dummy mce header size */
   size_t nframes = 0;     /* Number of frames in bolval */
   int npath = 0;          /* size of jiggle path */
   int nvert = 0;          /* number of jiggle vertices */
@@ -230,7 +228,7 @@ void smf_flat_write( smf_flatmeth flatmeth, const char * flatname,
                        (bolref->dims)[2], 0, smf_flat_methstring( flatmeth, status ),
                        bolval->hdr->allState, NULL,
                        ibuf, dksquid, (bolref->pntr)[0], (powref->pntr)[0],
-                       "FLATCAL", mcehead, NULL, mceheadsz, jig_vert,
+                       "FLATCAL", NULL, NULL, jig_vert,
                        nvert, jig_path, npath, xmlfile, status );
 
   sc2store_free ( status );
