@@ -349,6 +349,10 @@
 *        parameter.
 *     4-AUG-2009 (DSB):
 *        Add FRACTION Frame.
+*     2010-09-24 (TIMJ):
+*        Increase size of ESTIMO variable to allow all estimators to
+*        be selected. 78 characters was too small to hold the full
+*        list.
 *     {enter_further_changes_here}
 
 *-
@@ -433,7 +437,7 @@
                                  ! mapped array
       CHARACTER ESTIM*( 6 )      ! Method to use to estimate collapsed
                                  ! values
-      CHARACTER ESTIMO*( 78 )    ! List of available estimators
+      CHARACTER ESTIMO*( 132 )   ! List of available estimators
       INTEGER GFRMO              ! Output GRID Frame pointer
       INTEGER GMAP               ! Pointer to Mapping from GRID Frame
                                  ! to Current Frame, input NDF
