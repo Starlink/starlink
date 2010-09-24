@@ -15,8 +15,8 @@
 *  Invocation:
 *     smf_get_cleanpar( AstKeyMap *keymap, double *badfrac,
 *                       dim_t *dcfitbox, int *dcmaxsteps, double *dcthresh,
-*                       dim_t *dcsmooth, int *dkclean, int *fillgaps,
-*                       double *filt_edgelow, double *filt_edgehigh,
+*                       dim_t *dcsmooth, int *dclimcorr, int *dkclean,
+*                       int *fillgaps, double *filt_edgelow, double *filt_edgehigh,
 *                       double *filt_edge_smallscale,
 *                       double *filt_edge_largescale,
 *                       double *filt_notchlow, double *filt_notchhigh,
@@ -44,6 +44,13 @@
 *        N-sigma threshold at which to detect DC steps
 *     dcsmooth = dim_t * (Returned)
 *        Width of median filter for DC step detection.
+*     dclimcorr = int * (Returned)
+*        The detection threshold for steps that occur at the same time in
+*        many bolometers. Set it to zero to suppress checks for correlated
+*        steps. If dclimcorr is greater than zero, and a step is found at
+*        the same time in more than "dclimcorr" bolometers, then all
+*        bolometers are assumed to have a step at that time, and the step
+*        is fixed no matter how small it is.
 *     dkclean = int* (Returned)
 *        If true, clean dark squids from bolos (NULL:-1)
 *     fillgaps = int* (Returned)
@@ -125,7 +132,6 @@
 *     2010-09-23 (EC):
 *        -Rename FLAGSTAT to FLAGSLOW
 *        -Add FLAGFAST
-*        -Add filt_edge_largescale and filt_edge_smallscale
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -176,7 +182,7 @@
 
 void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac, dim_t *dcfitbox,
                        int *dcmaxsteps, double *dcthresh, dim_t *dcsmooth,
-                       int *dkclean, int *fillgaps, double *filt_edgelow,
+                       int *dclimcorr, int *dkclean, int *fillgaps, double *filt_edgelow,
                        double *filt_edgehigh, double *filt_edge_smallscale,
                        double *filt_edge_largescale, double *filt_notchlow,
                        double *filt_notchhigh, int *filt_nnotch, int *dofilt,
@@ -225,6 +231,18 @@ void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac, dim_t *dcfitbox,
       errRep(FUNC_NAME, "DCMAXSTEPS must be 0 or more.", status );
     } else {
       *dcmaxsteps = temp;
+    }
+
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCMAXSTEPS=%i", status,
+               *dcmaxsteps );
+  }
+
+  if( dclimcorr ) {
+    *dclimcorr = 0;
+    astMapGet0I( keymap, "DCLIMCORR", dclimcorr );
+    if( *dclimcorr < 0 ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "DCMAXSTEPS must be 0 or more.", status );
     }
 
     msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCMAXSTEPS=%i", status,

@@ -158,6 +158,12 @@ dcfitbox = 30
 # be rejected if any steps are found in the bolometer data stream.
 dcmaxsteps = 10
 
+#  If more than DCLIMCORR bolometer have a step at a given time, then all
+#  bolometers are corrected for a step at that time, using lower thresholds.
+#  Setting it to zero here switches off the correction of correlated
+#  steps. Removing this line causes the default value of 10 to be used.
+dclimcorr = 0
+
 # The width of the median filter used to smooth a bolometer data stream
 # prior to finding DC jumps
 dcsmooth = 50

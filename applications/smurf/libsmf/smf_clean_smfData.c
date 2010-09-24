@@ -39,7 +39,7 @@
 *     dimmconfig.lis):
 *
 *     Sync Quality : BADFRAC
-*     DC steps     : DCFITBOX, DCMAXSTEPS, DCTHRESH, DCSMOOTH
+*     DC steps     : DCFITBOX, DCMAXSTEPS, DCTHRESH, DCSMOOTH, DCLIMCORR
 *     Flag spikes  : SPIKETHRESH, SPIKEBOX
 *     Slew speed   : FLAGSLOW, FLAGFAST
 *     Dark squids  : DKCLEAN
@@ -120,6 +120,7 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data, smfData **noisemap,
   /* Local Variables */
   double badfrac;           /* Fraction of bad samples to flag bad bolo */
   dim_t dcfitbox;           /* width of box for measuring DC steps */
+  int dclimcorr;            /* Min number of correlated steps */
   int dcmaxsteps;           /* number of DC steps/min. to flag bolo bad */
   dim_t dcsmooth;           /* median filter width before finding DC steps */
   double dcthresh;          /* n-sigma threshold for primary DC steps */
@@ -159,10 +160,10 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data, smfData **noisemap,
 
   /* Get cleaning parameters */
   smf_get_cleanpar( keymap, &badfrac, &dcfitbox, &dcmaxsteps,
-                    &dcthresh, &dcsmooth, &dkclean, &fillgaps,
-                    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-                    &flagslow, &flagfast, &order, &spikethresh, &spikebox,
-                    &noiseclip, status );
+                    &dcthresh, &dcsmooth, &dclimcorr, &dkclean,
+                    &fillgaps, NULL, NULL, NULL, NULL, NULL, NULL,
+                    NULL, NULL, &flagslow, &flagfast, &order,
+                    &spikethresh, &spikebox, &noiseclip, status );
 
   /* Update quality by synchronizing to the data array VAL__BADD values */
   msgOutif(MSG__VERB,"", FUNC_NAME ": update quality", status);
@@ -181,7 +182,7 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data, smfData **noisemap,
               dcthresh, dcfitbox, dcsmooth, dcmaxsteps);
 
     smf_fix_steps( wf, data, dcthresh, dcsmooth, dcfitbox, dcmaxsteps,
-                   &nflag, NULL, NULL, NULL, status );
+                   dclimcorr, &nflag, NULL, NULL, status );
 
     msgOutiff(MSG__VERB, "", FUNC_NAME": ...%zd flagged\n", status, nflag);
 

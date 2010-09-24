@@ -170,6 +170,7 @@ noi.dcfitbox = 0
 noi.dcmaxsteps = 10
 noi.dcthresh = 25.0
 noi.dcsmooth = 50
+noi.dclimcorr = 10
 noi.fillgaps = 1
 noi.spikethresh = 0
 noi.spikebox = 50

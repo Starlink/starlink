@@ -15,8 +15,8 @@
 *  Invocation:
 *     void smf_fix_steps( smfWorkForce *wf, smfData *data, double dcthresh,
 *                         dim_t dcsmooth, dim_t dcfitbox, int dcmaxsteps,
-*                         size_t *nrej, smfStepFix **steps, int *nsteps,
-*                         int *bcount, int *status )
+*                         int dclimcorr, size_t *nrej, smfStepFix **steps,
+*                         int *nsteps, int *status )
 
 *  Arguments:
 *     wf = smfWorkForce * (Given)
@@ -42,6 +42,13 @@
 *        entire bolometer is flagged as bad. A value of zero will cause a
 *        bolometer to be rejected if any steps are found in the bolometer
 *        data stream.
+*     dclimcorr = int (Given)
+*        The detection threshold for steps that occur at the same time in
+*        many bolometers. Set it to zero to suppress checks for correlated
+*        steps. If dclimcorr is greater than zero, and a step is found at
+*        the same time in more than "dclimcorr" bolometers, then all
+*        bolometers are assumed to have a step at that time, and the step
+*        is fixed no matter how small it is.
 *     nrej = size_t * (Returned)
 *        The number of bolometers rejected due to having too many steps.
 *     steps = smfStepFix ** (Returned)
@@ -57,11 +64,6 @@
 *        structure that describes a single fixed step.
 *     nstep = int * (Returned)
 *        The number of fixed steps.
-*     bcount = int * (Returned)
-*        A pointer to an array with an element for each time slice. On
-*        exit, each element is set to the number of bolometers found to have
-*        a step at the corresponding time slice. A NULL pointer may be
-*        supplied.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -190,9 +192,11 @@
 *        cause flat sections in the median smoothed data that give the
 *        appearance of a step in the residual differences.
 *     23-SEP-2010 (DSB):
-*        Flat sections in the median smoothed data can be caused by
+*        - Flat sections in the median smoothed data can be caused by
 *        things other than bright sources, so change the test for
 *        proximity to a bright source.
+*        - Removed argument "bcount".
+*        - Re-instate DCLIMCORR and correction of correlated steps.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -240,6 +244,7 @@ typedef struct smfFixStepsJobData {
    dim_t dcsmooth;
    dim_t nbolo;
    dim_t ntslice;
+   double *bolonoise;
    double *dat;
    double dccut;
    double dcthresh2;
@@ -247,6 +252,7 @@ typedef struct smfFixStepsJobData {
    double dcthresh;
    int *bcount;
    int dcfill;
+   int dclimcorr;
    int dcmaxsteps;
    int dcmaxwidth;
    int dcsmooth2;
@@ -338,20 +344,24 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
                                int *status );
 
 static void smf1_fix_steps_job( void *job_data, int *status );
+static void smf1_fix_correlated_steps_job( void *job_data, int *status );
+
 
 
 /* Main entry point. */
 
 void smf_fix_steps( smfWorkForce *wf, smfData *data, double dcthresh,
                     dim_t dcsmooth, dim_t dcfitbox, int dcmaxsteps,
-                    size_t *nrej, smfStepFix **steps, int *nstep,
-                    int *bcount, int *status ) {
+                    int dclimcorr, size_t *nrej, smfStepFix **steps,
+                    int *nstep, int *status ) {
 
 /* Local Variables */
    dim_t itime;
    dim_t nbolo;
    dim_t ntslice;
+   double *bolonoise = NULL;
    double *dat = NULL;
+   int *bcount;
    int bstep;
    int istep;
    int iworker;
@@ -359,8 +369,8 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, double dcthresh,
    int nworker;
    size_t bstride;
    size_t tstride;
-   smfFixStepsJobData *pdata = NULL;
    smfFixStepsJobData *job_data = NULL;
+   smfFixStepsJobData *pdata = NULL;
    smf_qual_t *qua = NULL;
 
 /* The minimum number of samples between steps. Large differences that
@@ -448,6 +458,13 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, double dcthresh,
               "(^dcthresh) must be > 0", status );
    }
 
+/* Allocate a work array to hold the noise level in each bolometer. */
+   bolonoise = astMalloc( nbolo*sizeof( *bolonoise ) );
+
+/* Allocate a work array to hold the number of bolometers that show a
+   jump at each time slice. */
+   bcount = ( dclimcorr > 0 ) ? astCalloc( ntslice, sizeof( *bcount ), 1 ) : NULL;
+
 /* Create structures used to pass information to the worker threads. */
    nworker = wf ? wf->nworker : 1;
 
@@ -479,12 +496,14 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, double dcthresh,
          pdata = job_data + iworker;
 
          pdata->bstride = bstride;
+         pdata->bolonoise = bolonoise;
          pdata->dat = dat;
          pdata->dccut = dccut;
          pdata->dcfill = dcfill;
          pdata->dcfitbox = dcfitbox;
          pdata->dcmaxsteps = dcmaxsteps;
          pdata->dcmaxwidth = dcmaxwidth;
+         pdata->dclimcorr = dclimcorr;
          pdata->dcsmooth = dcsmooth;
          pdata->dcthresh = dcthresh;
          pdata->dcsmooth2 = dcsmooth2;
@@ -532,18 +551,49 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, double dcthresh,
          pdata->steps = astFree( pdata->steps );
 
          if( bcount ) {
-            if( iworker == 0 ) {
-               for( itime = 0; itime < ntslice; itime++ ) {
-                  bcount[ itime ] = pdata->bcount[ itime ];
-               }
-            } else if( pdata->bcount ) {
-               for( itime = 0; itime < ntslice; itime++ ) {
-                  bcount[ itime ] += pdata->bcount[ itime ];
-               }
+            for( itime = 0; itime < ntslice; itime++ ) {
+               bcount[ itime ] += pdata->bcount[ itime ];
             }
             pdata->bcount = astFree( pdata->bcount );
          }
 
+      }
+
+/* If required, fix correlated steps. */
+      if( dclimcorr > 0 ) {
+
+/* Update the info needed by the worker threads, and submit the jobs to
+   fix the correlated steps in each bolo, and then wait for them to
+   complete. */
+         for( iworker = 0; iworker < nworker; iworker++ ) {
+            pdata = job_data + iworker;
+            pdata->bcount = bcount;
+            smf_add_job( wf, SMF__REPORT_JOB, pdata,
+                         smf1_fix_correlated_steps_job, NULL, status );
+         }
+
+/* Wait for the workforce to complete all jobs. */
+         smf_wait( wf, status );
+
+/* Accumuate the returned values from each thread. */
+         for( iworker = 0; iworker < nworker; iworker++ ) {
+            pdata = job_data + iworker;
+
+            nfixed += pdata->nfixed;
+            if( nrej ) *nrej += pdata->nrej;
+
+            if( steps && nstep ) {
+               istep = *nstep;
+               *nstep += pdata->nstep;
+               *steps = astGrow( *steps, *nstep, sizeof( **steps ) );
+
+               if( *status == SAI__OK ) {
+                  memcpy( *steps + istep, pdata->steps,
+                          pdata->nstep*sizeof( **steps ) );
+               }
+            }
+            pdata->steps = astFree( pdata->steps );
+         }
       }
    }
 
@@ -562,6 +612,8 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, double dcthresh,
 
 /* Free resources. */
    job_data = astFree( job_data );
+   bolonoise = astFree( bolonoise );
+   bcount = astFree( bcount );
 }
 
 
@@ -612,7 +664,7 @@ static void smf1_fix_steps_job( void *job_data, int *status ) {
    double *w3;
    double *w4;
    double *w5;
-   double bolonoise;
+   double *bolonoise;
    double dccut;
    double dcthresh2;
    double dcthresh3;
@@ -695,6 +747,7 @@ static void smf1_fix_steps_job( void *job_data, int *status ) {
    ntslice = pdata->ntslice;
    qua = pdata->qua;
    tstride = pdata->tstride;
+   bolonoise = pdata->bolonoise;
 
 /* Initialise the returned values. */
    nrej = 0;
@@ -977,7 +1030,7 @@ static void smf1_fix_steps_job( void *job_data, int *status ) {
                continue;
             }
 
-            bolonoise = 0.707*sqrt( sum2/nsum );
+            bolonoise[ ibolo ] = 0.707*sqrt( sum2/nsum );
 
 /* Smooth the clipped differences with a mean tophat filter to get an
    estimate of the underlying local gradient. */
@@ -1123,7 +1176,7 @@ static void smf1_fix_steps_job( void *job_data, int *status ) {
                         if( *status == SAI__OK ) {
                            bsteps[ ibstep ].start = step_start;
                            bsteps[ ibstep ].end = step_end;
-                           bsteps[ ibstep ].minjump = dcthresh3*bolonoise;
+                           bsteps[ ibstep ].minjump = dcthresh3*bolonoise[ ibolo ];
 
 
 #ifdef DEBUG_STEPS
@@ -1929,3 +1982,376 @@ static int smf1_correct_steps( dim_t ntslice, double *dat, smf_qual_t *qua,
    return result;
 }
 
+static void smf1_fix_correlated_steps_job( void *job_data, int *status ) {
+/*
+*  Name:
+*     smf1_fix_correlated_steps_job
+
+*  Purpose:
+*     Fix correlated steps for a block of bolometers.
+
+*  Invocation:
+*     void smf1_fix_correlated_steps_job( void *job_data, int *status )
+
+*  Arguments:
+*     job_data = void * (Given)
+*        Pointer to the data needed by the job. Should be a pointer to a
+*        smfFixStepsJobData structure.
+*     status = int * (Given and Returned)
+*        Pointer to global status.
+
+*  Description:
+*     This routine finds and fixes correlated steps in a block of bolometers.
+*     It runs within a thread instigated by smf_fix_steps.
+
+*/
+
+/* Local Variables: */
+   Step *bsteps = NULL;
+   dim_t b1;
+   dim_t b2;
+   dim_t dcfitbox;
+   dim_t dcsmooth;
+   dim_t ibolo;
+   dim_t itime;
+   dim_t nbolo;
+   dim_t ntslice;
+   double *bolonoise;
+   double *dat = NULL;
+   double *mw1;
+   double *w1;
+   double *w4;
+   double *w5;
+   double dcthresh2;
+   double dcthresh3;
+   int *bcount;
+   int *mw3;
+   int *pbc;
+   int dcfill;
+   int dclimcorr;
+   int dcmaxwidth;
+   int ibstep;
+   int mbstep;
+   int msize;
+   int nbstep;
+   int nfixed;
+   int nstep;
+   int old_jump;
+   int step_end;
+   int step_limit;
+   int step_start;
+   int step_width;
+   size_t *mw2;
+   size_t base;
+   size_t bstride;
+   size_t tstride;
+   smfFixStepsJobData *pdata;
+   smfStepFix *steps;
+   smf_qual_t *pq;
+   smf_qual_t *qua = NULL;
+
+   double dcgaincorr = 5.0;
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* Get a pointer to the job data, and then extract its contents into a
+   set of local variables. */
+   pdata = (smfFixStepsJobData *) job_data;
+
+   b1 = pdata->b1;
+   b2 = pdata->b2;
+   bcount = pdata->bcount;
+   bolonoise = pdata->bolonoise;
+   bstride = pdata->bstride;
+   dat = pdata->dat;
+   dcfill = pdata->dcfill;
+   dcfitbox = pdata->dcfitbox;
+   dclimcorr = pdata->dclimcorr;
+   dcmaxwidth = pdata->dcmaxwidth;
+   dcsmooth = pdata->dcsmooth;
+   dcthresh2 = 0.2*pdata->dcthresh2;
+   dcthresh3 = 0.2*pdata->dcthresh3;
+   nbolo = pdata->nbolo;
+   ntslice = pdata->ntslice;
+   qua = pdata->qua;
+   tstride = pdata->tstride;
+
+/* Initialise the returned values. */
+   bsteps = NULL;
+   steps = NULL;
+   nstep = 0;
+   nfixed = 0;
+
+#ifdef DEBUG_STEPS
+   FILE *fd2 = fopen( "timedata_c.asc", "w" );
+   fprintf( fd2, "# itime indata inquality outdata outquality ibolo median "
+            "diff thresh sdiff rdiff mdiff mdiff2 diff2 rms instep step_width total snr\n");
+
+   FILE *fd3 = fopen( "stepdata_c.asc", "w" );
+   fprintf( fd3, "# ibstep start end minjump error jump ok ibolo "
+            "jump vlo vlo_mean vlo_sigma vhi vhi_mean vhi_sigma\n" );
+
+   TimeData *timedata = astMalloc( ntslice*sizeof( *timedata ) );
+#endif
+
+/* Check we have something to do. */
+   if( b1 < nbolo ) {
+
+/* Ensure dcfitbox is odd. */
+      dcfitbox = 2*( dcfitbox/2 ) + 1;
+
+/* Relax the criteria for accepting correlated steps, compared to primary
+   steps. */
+      dcthresh2 /= dcgaincorr;
+      dcthresh3 /= dcgaincorr;
+
+/* Allocate work arrays. */
+      msize = 3*dcfitbox;
+      if( (int) ntslice > msize ) msize = ntslice;
+      w1 = astMalloc( sizeof( *w1 )*msize );
+      w4 = astMalloc( sizeof( *w4 )*msize );
+      w5 = astMalloc( sizeof( *w5 )*msize );
+
+      mw1 = astMalloc( sizeof( *mw1 )*dcsmooth );
+      mw2 = astMalloc( sizeof( *mw2 )*dcsmooth );
+      mw3 = astMalloc( sizeof( *mw3 )*dcsmooth );
+
+/* Loop round all bolometers to be processed by this thread. "base" holds the
+   offset to the start of the data for the bolometer.  */
+      for( ibolo = b1; ibolo <= b2 && *status==SAI__OK; ibolo++ ) {
+         base = ibolo*bstride;
+         pq = qua + base;
+         if( !(*pq & SMF__Q_BADB) ) {
+
+#ifdef DEBUG_STEPS
+
+   if( RECORD_BOLO ) {
+      dim_t kk;
+      double *pd = dat + base;
+      pq = qua + base;
+      for( kk = 0; kk < ntslice; kk++ ) {
+         timedata[ kk ].indata = *pd;
+         timedata[ kk ].inquality = (int) *pq;
+         timedata[ kk ].outdata = VAL__BADD;
+         timedata[ kk ].outquality = 0;
+         timedata[ kk ].ibolo = ibolo;
+         timedata[ kk ].median = VAL__BADD;
+         timedata[ kk ].diff = VAL__BADD;
+         timedata[ kk ].thresh = VAL__BADD;
+         timedata[ kk ].sdiff = VAL__BADD;
+         timedata[ kk ].rdiff = VAL__BADD;
+         timedata[ kk ].mdiff = VAL__BADD;
+         timedata[ kk ].mdiff2 = VAL__BADD;
+         timedata[ kk ].diff2 = VAL__BADD;
+         timedata[ kk ].rms = VAL__BADD;
+         timedata[ kk ].instep = 0;
+         timedata[ kk ].step_width = 0;
+         timedata[ kk ].total = VAL__BADD;
+         timedata[ kk ].snr = VAL__BADD;
+
+         pd += tstride;
+         pq += tstride;
+      };
+      pq = qua + base;
+   }
+
+#endif
+
+/* Median smooth the input data, putting the results in w1. */
+            smf_median_smooth( dcsmooth, SMF__FILT_MEDIAN, -1.0, ntslice,
+                               dat + base, qua + base, tstride, SMF__Q_GOOD,
+                               w1, mw1, mw2, mw3, status );
+
+
+#ifdef DEBUG_STEPS
+   if( RECORD_BOLO ) {
+      for( itime = 0; itime < ntslice; itime++ ) {
+         timedata[ itime ].median = w1[itime];
+      }
+   }
+#endif
+
+
+
+/* Find the start and end of each block of contiguous high bolometer
+   counts in the supplied "bcount" array. This array holds the number of
+   bolometers found to have a step at each time slice. */
+            nbstep = 0;
+            step_start = -1;
+            step_end = 0;
+            step_limit = -1;
+            old_jump = 0;
+
+            pbc = bcount;
+            pq = qua + base;
+            for( itime = 0; itime < ntslice; itime++,pbc++,pq++ ) {
+
+#ifdef DEBUG_STEPS
+   if( RECORD_BOLO ) {
+      timedata[ itime ].snr = *pbc;
+   }
+#endif
+
+/* If the bcount value at the current time slice is larger than the
+   threshold, it is considered to be in a jump. */
+               if( *pbc > dclimcorr ) {
+
+/* A jump may extend over more than 1 sample, so we group localised clumps
+   of high bcount together. If we are not currently within such a
+   group, record the current time index as the start of a new group. */
+                  if( step_start == -1 ) {
+                     step_start = itime;
+                     old_jump = 0;
+                  }
+
+/* Set a flag if a previous jump is encountered within the new step. */
+                  if( (*pq & SMF__Q_JUMP ) ) old_jump = 1;
+
+/* The group extends at least as far as the current sample. */
+                  step_end = itime;
+
+/* Do not consider the group to be finished until we have found "dcfill"
+   small differences following the last large difference. */
+                  step_limit = itime + dcfill;
+
+/* If the current bcount value is small, and we have had "dcfill" small
+   values since the end of the last group, we now know where the last
+   group ended so we can go on to process the group. */
+               } else if( (int) itime == step_limit ) {
+
+/* Check the group is not too wide, and that it does not include a
+   previously corrected jump. */
+                  step_width = step_end - step_start + 1;
+
+#ifdef DEBUG_STEPS
+   if( RECORD_BOLO ) {
+      int jtime;
+      for( jtime = step_start; jtime <= step_end; jtime++ ) {
+         timedata[ jtime ].step_width = step_width;
+      }
+   }
+#endif
+
+                  if( step_width <= dcmaxwidth && ! old_jump ){
+
+/* Create a new structure to describe the group, and add it to the array
+   of such groups. */
+                     ibstep = nbstep++;
+                     bsteps = astGrow( bsteps, nbstep, sizeof( *bsteps ) );
+                     if( *status == SAI__OK ) {
+                        bsteps[ ibstep ].start = step_start;
+                        bsteps[ ibstep ].end = step_end;
+                        bsteps[ ibstep ].minjump = dcthresh3*bolonoise[ ibolo ];
+
+#ifdef DEBUG_STEPS
+   if( RECORD_BOLO ) {
+      int jtime;
+      for( jtime = step_start; jtime <= step_end; jtime++ ) {
+         timedata[ jtime ].instep = 1;
+      }
+   }
+#endif
+
+                     }
+                  }
+
+/* We can now start looking for a new step. */
+                  step_start = -1;
+               }
+            }
+
+/* We now have the starting and ending times for all the candidate
+   correlated jumps in the current bolometer. Attempt to measure each
+   candidate correlated step, and correct the bolometer data for each
+   succesfully measured step. */
+            mbstep = smf1_correct_steps( ntslice, dat + base, qua + base,
+                                         tstride, w1, NULL, dcfitbox,
+                                         dcthresh2, nbstep, bsteps, ibolo,
+                                         (pdata->nstep)?&steps:NULL,
+                                         (pdata->nstep)?&nstep:NULL,
+                                         w4, w5, bcount, status );
+
+#ifdef DEBUG_STEPS
+   if( RECORD_BOLO2 ) {
+      for( ibstep = 0; ibstep < nbstep; ibstep++ ) {
+         fprintf( fd3, "%d ", ibstep);
+         fprintf( fd3, "%d ", bsteps[ibstep].start );
+         fprintf( fd3, "%d ", bsteps[ibstep].end );
+         TOPCAT( fd3, bsteps[ibstep].minjump );
+         TOPCAT( fd3, bsteps[ibstep].error );
+         TOPCAT( fd3, bsteps[ibstep].jump );
+         fprintf( fd3, "%d ", bsteps[ibstep].ok );
+         fprintf( fd3, "%d ", bsteps[ibstep].ibolo );
+         TOPCAT( fd3, bsteps[ibstep].jump );
+         TOPCAT( fd3, bsteps[ibstep].vlo );
+         TOPCAT( fd3, bsteps[ibstep].vlo_mean );
+         TOPCAT( fd3, bsteps[ibstep].vlo_sigma );
+         TOPCAT( fd3, bsteps[ibstep].vhi );
+         TOPCAT( fd3, bsteps[ibstep].vhi_mean );
+         TOPCAT( fd3, bsteps[ibstep].vhi_sigma );
+         fprintf( fd3, "\n" );
+      }
+   }
+
+   if( RECORD_BOLO ) {
+      double *pd = dat + base;
+      pq = qua + base;
+
+      for( itime = 0; itime < ntslice; itime++ ) {
+         timedata[ itime ].outdata = *pd;
+         timedata[ itime ].outquality = (int) *pq;
+         pd += tstride;
+         pq += tstride;
+
+         fprintf( fd2, "%d ", itime);
+         TOPCAT( fd2, timedata[itime].indata );
+         fprintf( fd2, "%d ", timedata[itime].inquality);
+         TOPCAT( fd2, timedata[itime].outdata );
+         fprintf( fd2, "%d ", timedata[itime].outquality);
+         fprintf( fd2, "%d ", timedata[itime].ibolo);
+         TOPCAT( fd2, timedata[ itime ].median );
+         TOPCAT( fd2, timedata[ itime ].diff );
+         TOPCAT( fd2, timedata[ itime ].thresh );
+         TOPCAT( fd2, timedata[ itime ].sdiff );
+         TOPCAT( fd2, timedata[ itime ].rdiff );
+         TOPCAT( fd2, timedata[ itime ].mdiff );
+         TOPCAT( fd2, timedata[ itime ].mdiff2 );
+         TOPCAT( fd2, timedata[ itime ].diff2 );
+         TOPCAT( fd2, timedata[ itime ].rms );
+         fprintf( fd2, "%d ", timedata[itime].instep );
+         fprintf( fd2, "%d ", timedata[itime].step_width );
+         TOPCAT( fd2, timedata[ itime ].total );
+         TOPCAT( fd2, timedata[ itime ].snr );
+         fprintf( fd2, "\n" );
+      }
+   }
+#endif
+
+/* Increment the total number of steps that have been fixed. */
+            nfixed += mbstep;
+         }
+      }
+
+/* Free workspace */
+      w1 = astFree( w1 );
+      w4 = astFree( w4 );
+      w5 = astFree( w5 );
+      bsteps = astFree( bsteps );
+      mw1 = astFree( mw1 );
+      mw2 = astFree( mw2 );
+      mw3 = astFree( mw3 );
+   }
+
+#ifdef DEBUG_STEPS
+   fclose( fd2 );
+   fclose( fd3 );
+#endif
+
+/* Return values. */
+   pdata->nrej = 0;
+   pdata->steps = steps;
+   pdata->nstep = nstep;
+   pdata->nfixed = nfixed;
+
+}

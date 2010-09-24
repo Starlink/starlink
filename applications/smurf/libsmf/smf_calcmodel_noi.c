@@ -153,6 +153,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   /* Local Variables */
   size_t bstride;               /* bolometer stride */
   int calcfirst=0;              /* Were bolo noises already measured? */
+  int dclimcorr;                /* Min number of correlated steps */
   int dcmaxsteps;               /* Maximum allowed number of dc jumps */
   dim_t dcfitbox;               /* Width of box for DC step detection */
   double dcthresh;              /* Threshold for DC step detection */
@@ -201,8 +202,8 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
   /* Data-cleaning parameters  */
   smf_get_cleanpar( kmap, NULL, &dcfitbox, &dcmaxsteps, &dcthresh,
-                    &dcsmooth, NULL, &fillgaps, NULL, NULL, NULL,
-                    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+                    &dcsmooth, &dclimcorr, NULL, &fillgaps, NULL, NULL,
+                    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                     &spikethresh, &spikebox, NULL, status );
 
   /* Did we already calculate the noise on each detector? */
@@ -272,7 +273,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
         if( dcthresh && dcfitbox ) {
           smf_fix_steps( wf, res->sdata[idx], dcthresh, dcsmooth,
-                         dcfitbox, dcmaxsteps, &nflag, NULL, NULL,
+                         dcfitbox, dcmaxsteps, dclimcorr, &nflag, NULL,
                          NULL, status );
           msgOutiff(MSG__VERB, "","   detected %zu bolos with DC steps\n",
                     status, nflag);

@@ -1010,8 +1010,8 @@ void smf_flag_spikes( smfWorkForce *wf, smfData *data, smf_qual_t mask,
 
 void smf_fix_steps( smfWorkForce *wf, smfData *data, double dcthresh,
                     dim_t dcsmooth, dim_t dcfitbox, int dcmaxsteps,
-                    size_t *nrej, smfStepFix **steps, int *nstep,
-                    int *bcount, int *status );
+                    int dclimcorr, size_t *nrej, smfStepFix **steps,
+                    int *nstep, int *status );
 
 void smf_flat_assign ( int use_da, smf_flatmeth inflatmeth, const smfData * powval,
                        const smfData * bolval, smfData * updata, int *status );
@@ -1089,14 +1089,14 @@ void smf_geod( const double pos[3], double *phi, double *h, double *lambda );
 
 void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac,
                        dim_t *dcbox, int *dcbad, double *dcthresh,
-                       dim_t *dcsmooth, int *dkclean, int *fillgaps,
-                       double *filt_edgelow, double *filt_edgehigh,
-                       double *filt_edge_smallscale,
-                       double *filt_edge_largescale,
-                       double *filt_notchlow, double *filt_notchhigh,
-                       int *filt_nnotch, int *dofilt, double *flagslow,
-                       double *flagfast, int *order, double *spikethresh,
-                       size_t *spikeiter, double *noiseclip, int *status );
+                       dim_t *dcsmooth, int *dclimcorr, int *dkclean,
+                       int *fillgaps, double *filt_edgelow,
+                       double *filt_edgehigh, double *filt_edge_smallscale,
+                       double *filt_edge_largescale, double *filt_notchlow,
+                       double *filt_notchhigh, int *filt_nnotch,
+                       int *dofilt, double *flagslow, double *flagfast,
+                       int *order, double *spikethresh, size_t *spikeiter,
+                       double *noiseclip, int *status );
 
 void smf_get_dims( const smfData *data, dim_t *nrows, dim_t *ncols,
                    dim_t *nbolo, dim_t *ntslice, dim_t *ndata,
