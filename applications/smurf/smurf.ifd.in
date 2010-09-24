@@ -1110,6 +1110,14 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter dclimcorr {
+                type _INTEGER
+                prompt {Threshold for correction of correlated steps}
+                ppath DYNAMIC
+                vpath DYNAMIC
+                helpkey *
+            }
+
             parameter dcmaxsteps {
                 type _INTEGER
                 prompt {Max. no. of steps before bolo is flagged as bad}

@@ -253,6 +253,9 @@ void smurf_fixsteps( int *status ) {
    astMapGet0I( keymap, "DCFITBOX", &itemp );
    parDef0i( "DCFITBOX", itemp, status );
 
+   astMapGet0I( keymap, "DCMAXSTEPS", &itemp );
+   parDef0i( "DCMAXSTEPS", itemp, status );
+
    astMapGet0I( keymap, "DCLIMCORR", &itemp );
    parDef0i( "DCLIMCORR", itemp, status );
 
