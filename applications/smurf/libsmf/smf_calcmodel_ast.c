@@ -89,6 +89,8 @@
 *     2010-09-21 (EC):
 *        ast.zero_circle can contain only a single value (radius), then
 *        the centre defaults to reference coordinates for map projection
+*     2010-09-24 (DSB):
+*        The circular region should have centre (0,0) for moving sources.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -167,6 +169,7 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)),
   smf_qual_t *qua_data=NULL; /* Pointer to quality data */
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
+  const char *skyrefis;         /* Pointer to SkyRefIs attribute value */
   size_t tstride;               /* Time slice stride in data array */
   smf_qual_t *mapqual = NULL;/* Quality map */
   double *mapvar = NULL;        /* Variance map */
@@ -225,12 +228,20 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)),
     if( docirc ) {
 
       /* If only one parameter supplied it is radius, assume reference
-         LON/LAT from the frameset to get the centre */
+         LON/LAT from the frameset to get the centre. If the SkyFrame
+         represents offsets from the reference position (i.e. the source
+         is moving), assume the circle is to be centred on the origin.  */
       if( zero_c_n == 1 ) {
         zero_circle[2] = zero_circle[0];
 
-        zero_circle[0] = astGetD( dat->outfset, "SkyRef(1)" );
-        zero_circle[1] = astGetD( dat->outfset, "SkyRef(2)" );
+        skyrefis = astGetC( dat->outfset, "SkyRefIs" );
+        if( skyrefis && !strcmp( skyrefis, "Origin" ) ) {
+           zero_circle[0] = 0.0;
+           zero_circle[1] = 0.0;
+        } else {
+           zero_circle[0] = astGetD( dat->outfset, "SkyRef(1)" );
+           zero_circle[1] = astGetD( dat->outfset, "SkyRef(2)" );
+        }
 
         zero_circle[0] *= AST__DR2D;
         zero_circle[1] *= AST__DR2D;
