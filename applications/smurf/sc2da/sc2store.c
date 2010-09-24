@@ -2723,6 +2723,7 @@ int *status           /* global status (given and returned) */
 
 
    if ( *status != SAI__OK ) return;
+   if ( nrec == 0 ) return;
 
 /* Create and write FITS headers.
    Note Xnew and MapV require different signedness of their count
@@ -2774,6 +2775,8 @@ int *status              /* global status (given and returned) */
 
    if ( *status != SAI__OK ) return;
 
+   /* if nflat is zero we assume that flatfield writing is disabled */
+   if (nflat == 0) return;
 
 /* Create an NDF containing flat-field calibration */
 
@@ -2844,6 +2847,7 @@ int *status                 /* global status (given and returned) */
 
    if ( !StatusOkP(status) ) return;
 
+   if ( !head ) return; /* disable JCMTSTATE writing if null pointer */
 
 /* Create storage for Header values for each frame - store in JCMTSTATE */
 
@@ -3292,27 +3296,28 @@ int *status              /* global status (given and returned) */
 
 /* Dark SQUID values for each frame */
 
-   ubnd[0] = rowsize + SC2STORE__BOL_LBND - 1;
-   lbnd[0] = SC2STORE__BOL_LBND;
-   ubnd[1] = nframes;
-   lbnd[1] = 1;
+   if (dksquid) {
+     ubnd[0] = rowsize + SC2STORE__BOL_LBND - 1;
+     lbnd[0] = SC2STORE__BOL_LBND;
+     ubnd[1] = nframes;
+     lbnd[1] = 1;
 
-   ndfPlace ( sc2store_scuba2loc, "DKSQUID", &place, status );
-   ndfNew ( "_INTEGER", 2, lbnd, ubnd, &place, &sc2store_dindf, status );
+     ndfPlace ( sc2store_scuba2loc, "DKSQUID", &place, status );
+     ndfNew ( "_INTEGER", 2, lbnd, ubnd, &place, &sc2store_dindf, status );
 
-   ndfMap ( sc2store_dindf, "DATA", "_INTEGER", "WRITE", (void *)(&darksquid),
-     &el, status );
+     ndfMap ( sc2store_dindf, "DATA", "_INTEGER", "WRITE", (void *)(&darksquid),
+              &el, status );
 
 /* Copy the dark SQUID values */
 
-   if (*status == SAI__OK)
-     {
-       for ( j=0; j<nframes*rowsize; j++ )
-         {
-           darksquid[j] = dksquid[j];
-         }
-     }
-
+     if (*status == SAI__OK)
+       {
+         for ( j=0; j<nframes*rowsize; j++ )
+           {
+             darksquid[j] = dksquid[j];
+           }
+       }
+   }
 
    if ( StatusOkP(status) )
    {
@@ -3460,8 +3465,10 @@ int *status                 /* global status (given and returned) */
    oldstat = astWatch( status );
    wcs = sc2store_timeWcs ( subnum, nframes, 1, telpar,
                             ((double*)sc2store_ptr[RTS_END]), status );
-   ndfPtwcs ( wcs, sc2store_indf, status );
-   wcs = astAnnul ( wcs );
+   if (wcs) {
+     ndfPtwcs ( wcs, sc2store_indf, status );
+     wcs = astAnnul ( wcs );
+   }
    astWatch( oldstat );
 
 /* Store the CONFIGURE XML */
@@ -3669,6 +3676,7 @@ AstFrameSet *sc2store_timeWcs
 
 /* Check the global error status. */
    if( *status != SAI__OK ) return result;
+   if (!times) return result;
 
 /* Start an AST context so we do not need to annul AST pointers explicitly. */
    astBegin;
