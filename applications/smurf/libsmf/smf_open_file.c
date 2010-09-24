@@ -668,7 +668,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           }
           ndfDim(ndfFTS, NDF__MXDIM, dimsFTS, &ndimsFTS, status);
           if(*status != SAI__OK) {
-            errRepf("", FUNC_NAME ": Unable to obtain FPM dimensions!", status, ndimsFTS);
+            errRepf("", FUNC_NAME ": Unable to obtain FPM dimensions!", status);
           }
           if(ndimsFTS != 3) {
             *status = SAI__ERROR;
@@ -690,7 +690,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           }
           ndfDim(ndfFTS, NDF__MXDIM, dimsFTS, &ndimsFTS, status);
           if(*status != SAI__OK) {
-            errRepf("", FUNC_NAME ": Unable to obtain SIGMA dimensions!", status, ndimsFTS);
+            errRepf("", FUNC_NAME ": Unable to obtain SIGMA dimensions!", status);
           }
           if(ndimsFTS != 3) {
             *status = SAI__ERROR;
