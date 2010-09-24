@@ -222,6 +222,8 @@
 *        Add SMF__NOCREATE_FTS
 *     2010-09-22 (COBA):
 *        Add check for status in FTS2 segment
+*     2010-09-23 (TIMJ):
+*        Allow raw data to be read even if NOCREATE_DA is being used
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -852,6 +854,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
       char units[SC2STORE_UNITLEN];
       char dlabel[SC2STORE_LABLEN];
       char flatname[SC2STORE_FLATLEN];
+      size_t nflat = 0;
 
       /* Get the time series WCS if header exists */
       if( hdr ) {
@@ -867,7 +870,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 
       /* Read time series data from file */
       da = (*data)->da;
-      if (*status == SAI__OK && da == NULL) {
+      if (*status == SAI__OK && !(flags & SMF__NOCREATE_DA) && da == NULL) {
         *status = SAI__ERROR;
         errRep("", FUNC_NAME ": Internal programming error. Status good but "
                "no DA struct allocated", status);
@@ -891,13 +894,14 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
       sc2store_rdtstream( pname, "READ", SC2STORE_FLATLEN,
                           SC2STORE__MAXFITS,
                           &nfits, fitsrec, units, dlabel, &colsize, &rowsize,
-                          &nframes, &(da->nflat), flatname,
+                          &nframes, &nflat, flatname,
                           &tmpState, ptdata, pdksquid,
                           &flatcal, &flatpar, &jigvert, &nvert, &jigpath,
                           &nsampcycle, status);
       if (ptdata) outdata[0] = rawts;
 
-      da->flatmeth = smf_flat_methcode( flatname, status );
+      if (da) da->flatmeth = smf_flat_methcode( flatname, status );
+      if (da) da->nflat = nflat;
 
       if (*status == SAI__OK) {
         /* Free header info if no longer needed */
@@ -909,54 +913,57 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           hdr->allState = tmpState;
         }
 
-        /* Malloc local copies of the flatfield information.
-           This allows us to close the file immediately so that
-           we do not need to worry about sc2store only allowing
-           a single file at a time */
-        da->flatcal = astCalloc( colsize * rowsize * da->nflat,
-                                 sizeof(*(da->flatcal)), 0 );
-        da->flatpar = astCalloc( da->nflat, sizeof(*(da->flatpar)), 0 );
+        /* Populate the DA struct if we have one */
+        if (da) {
+          /* Malloc local copies of the flatfield information.
+             This allows us to close the file immediately so that
+             we do not need to worry about sc2store only allowing
+             a single file at a time */
+          da->flatcal = astCalloc( colsize * rowsize * da->nflat,
+                                   sizeof(*(da->flatcal)), 0 );
+          da->flatpar = astCalloc( da->nflat, sizeof(*(da->flatpar)), 0 );
 
-        /* Now copy across from the mapped version */
-        if (da->flatcal != NULL) memcpy(da->flatcal, flatcal,
-                                        sizeof(*(da->flatcal))*colsize*
-                                        rowsize* da->nflat);
-        if (da->flatpar != NULL) memcpy(da->flatpar, flatpar,
-                                        sizeof(*(da->flatpar))* da->nflat);
+          /* Now copy across from the mapped version */
+          if (da->flatcal != NULL) memcpy(da->flatcal, flatcal,
+                                          sizeof(*(da->flatcal))*colsize*
+                                          rowsize* da->nflat);
+          if (da->flatpar != NULL) memcpy(da->flatpar, flatpar,
+                                          sizeof(*(da->flatpar))* da->nflat);
 
-        /* and dark squids -- we typecast here as a double and store
-           in a 3d smfData with the row axis having length 1. */
-        if (dksquid) {
-          da->dksquid = smf_create_smfData(SMF__NOCREATE_FILE |
-                                           SMF__NOCREATE_HEAD |
-                                           SMF__NOCREATE_DA |
-                                           SMF__NOCREATE_FTS, status );
-          da->dksquid->dtype = SMF__DOUBLE;
-          da->dksquid->isTordered = 1;
-          da->dksquid->ndims = 3;
-          da->dksquid->dims[0] = rowsize;
-          da->dksquid->dims[1] = 1;
-          da->dksquid->dims[2] = nframes;
-          da->dksquid->lbnd[0] = 0;
-          da->dksquid->lbnd[1] = 0;
-          da->dksquid->lbnd[2] = 1;
+          /* and dark squids -- we typecast here as a double and store
+             in a 3d smfData with the row axis having length 1. */
+          if (dksquid) {
+            da->dksquid = smf_create_smfData(SMF__NOCREATE_FILE |
+                                             SMF__NOCREATE_HEAD |
+                                             SMF__NOCREATE_DA |
+                                             SMF__NOCREATE_FTS, status );
+            da->dksquid->dtype = SMF__DOUBLE;
+            da->dksquid->isTordered = 1;
+            da->dksquid->ndims = 3;
+            da->dksquid->dims[0] = rowsize;
+            da->dksquid->dims[1] = 1;
+            da->dksquid->dims[2] = nframes;
+            da->dksquid->lbnd[0] = 0;
+            da->dksquid->lbnd[1] = 0;
+            da->dksquid->lbnd[2] = 1;
 
-          da->dksquid->pntr[0] = astCalloc( rowsize*nframes,
-                                            smf_dtype_size(da->dksquid,
-                                                           status), 0 );
+            da->dksquid->pntr[0] = astCalloc( rowsize*nframes,
+                                              smf_dtype_size(da->dksquid,
+                                                             status), 0 );
 
-          /* Convert to double precision when we copy into da->dksquid */
-          if( *status == SAI__OK ) {
-            double *ptr = da->dksquid->pntr[0];
-            for( i=0; i<(rowsize*nframes); i++ ) {
-              ptr[i] = (double) dksquid[i];
+            /* Convert to double precision when we copy into da->dksquid */
+            if( *status == SAI__OK ) {
+              double *ptr = da->dksquid->pntr[0];
+              for( i=0; i<(rowsize*nframes); i++ ) {
+                ptr[i] = (double) dksquid[i];
+              }
             }
-          }
 
-          /* Create an empty QUALITY array */
-          da->dksquid->qual = astCalloc( rowsize*nframes,
-                                         sizeof(*(da->dksquid->qual)),1);
-          da->dksquid->qfamily = SMF__QFAM_TSERIES;
+            /* Create an empty QUALITY array */
+            da->dksquid->qual = astCalloc( rowsize*nframes,
+                                           sizeof(*(da->dksquid->qual)),1);
+            da->dksquid->qfamily = SMF__QFAM_TSERIES;
+          }
         }
 
         /* Create a FitsChan from the FITS headers */
