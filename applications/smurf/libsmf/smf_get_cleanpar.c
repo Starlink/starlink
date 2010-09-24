@@ -242,11 +242,11 @@ void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac, dim_t *dcfitbox,
     astMapGet0I( keymap, "DCLIMCORR", dclimcorr );
     if( *dclimcorr < 0 ) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "DCMAXSTEPS must be 0 or more.", status );
+      errRep(FUNC_NAME, "DCMLIMCORR must be 0 or more.", status );
     }
 
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCMAXSTEPS=%i", status,
-               *dcmaxsteps );
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCLIMCORR=%i", status,
+               *dclimcorr );
   }
 
   if( dcthresh ) {
