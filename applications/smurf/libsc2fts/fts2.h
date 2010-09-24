@@ -157,6 +157,6 @@ void fts2_phasecorrection(
     double* sigma,
     double* coefficients,
     double* phase,
-    double* phaseCorrectionFunction,
-    double* phaseCorrectedInterferogram,
+    double* phaseFunction,
+    double* newInterferogram,
     int* status);

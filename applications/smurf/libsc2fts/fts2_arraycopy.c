@@ -4,7 +4,7 @@
 *     fts2_arraycopy.c
 
 *  Purpose:
-*     Copies the source into the destination with the specified constraints. 
+*     Copies the source into the destination with the specified constraints.
 
 *  Language:
 *     Starlink ANSI C
@@ -14,7 +14,7 @@
 *  Invocation:
 
 *  Description:
-*     Copies the source into the destination with the specified constraints. 
+*     Copies the source into the destination with the specified constraints.
 
 *  Authors:
 *     Coskun (Josh) OBA (UoL)
@@ -59,7 +59,7 @@
 /* SMURF INCLUDES */
 #include "fts2.h"
 
-void fts2_arraycopy( 
+void fts2_arraycopy(
     double* source,
     int sourceSize,
     double* destination,
@@ -71,26 +71,16 @@ void fts2_arraycopy(
   int i = 0;
   int j = 0;
   int k = 0;
-  
-  if( source == NULL ||
-      destination == NULL ||
-      sourceSize < 1 ||
-      destinationSize < 1 ||
-      count < 1 ||
-      count > destinationSize
-    )
-  {
-    return;
-  }
 
-  i = sourceStart;
-  j = destinationStart;
-  k = 1;
-  while(i < sourceSize && j < destinationSize && k <= count)
-  {
-    destination[j] = source[i];
-    i++;
-    j++;
-    k++;
+  if( source && destination &&
+      sourceSize > 0 && destinationSize > 0 &&
+      count > 0) {
+    i = sourceStart;
+    j = destinationStart;
+    k = 1;
+    while(i < sourceSize && j < destinationSize && k <= count) {
+      destination[j++] = source[i++];
+      k++;
+    }
   }
 }
