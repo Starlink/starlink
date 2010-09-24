@@ -132,8 +132,8 @@ badfrac = 0.05
 # limits of 300 and 600 arcsec/sec in each band respectively.
 
 flagslow = 30
-450.flagfast = 300
-850.flagfast = 600
+450.flagfast = 600
+850.flagfast = 980
 
 # Alternatively, specify a minimum spatial scale that should be
 
