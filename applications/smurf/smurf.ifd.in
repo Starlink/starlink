@@ -2642,6 +2642,32 @@ package @PACKAGE@ {
 
         }
 
+        action rawpress {
+
+            helplib {$SMURF_HELP}
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT }
+                association <-GLOBAL.DATA_ARRAY
+                prompt {Input timeseries}
+                helpkey *
+            }
+
+            parameter out {
+                position 2
+                type NDF
+                access WRITE
+                vpath {PROMPT }
+                association ->GLOBAL.DATA_ARRAY
+                prompt {Compressed timeseries}
+                helpkey *
+            }
+
+        }
+
         action rawunpress {
 
             helplib {$SMURF_HELP}

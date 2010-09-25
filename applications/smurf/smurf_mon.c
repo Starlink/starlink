@@ -297,6 +297,8 @@ void smurf_mon( int * status ) {
     smurf_qlmakemap( status );
   } else if (strcmp( taskname, "RAWFIXMETA" ) == 0 ) {
     smurf_rawfixmeta( status );
+  } else if (strcmp( taskname, "RAWPRESS" ) == 0 ) {
+    smurf_rawpress( status );
   } else if (strcmp( taskname, "RAWUNPRESS" ) == 0 ) {
     smurf_rawunpress( status );
   } else if (strcmp( taskname, "REMSKY" ) == 0 ) {

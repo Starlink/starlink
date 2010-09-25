@@ -42,6 +42,7 @@ makecube \
 makemap \
 qlmakemap \
 rawfixmeta \
+rawpress \
 rawunpress \
 remsky \
 sc2clean \
