@@ -3351,7 +3351,8 @@ int *status                 /* global status (given and returned) */
    if ( !mcehead ) return;
 
 /* Create the extension and write the contents of the AST key map */
-   ndfXnew ( sc2store_indf, "MCEHEAD", "MCEHEAD", 0, NULL, &xloc, status );
+   datNew( sc2store_scuba2loc, "MCEHEAD", "KEYMAP_ENTRY", 0, 0, status );
+   datFind( sc2store_scuba2loc, "MCEHEAD", &xloc,status );
    kpg1Ky2hd( mcehead, xloc, status );
 
 /* tidy up */
