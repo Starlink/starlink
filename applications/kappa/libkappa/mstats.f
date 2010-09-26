@@ -369,7 +369,7 @@
       INTEGER ELO                ! Number of elements in output NDF
       CHARACTER*6 ESTIM          ! Method to use to estimate combined
                                  ! values
-      CHARACTER*78 ESTIMO        ! List of available estimators
+      CHARACTER*90 ESTIMO        ! List of available estimators
       LOGICAL HIGHER             ! Significant dimensions above collapse
                                  ! axis?
       INTEGER I                  ! Loop variable

@@ -437,7 +437,7 @@
                                  ! mapped array
       CHARACTER ESTIM*( 6 )      ! Method to use to estimate collapsed
                                  ! values
-      CHARACTER ESTIMO*( 132 )   ! List of available estimators
+      CHARACTER ESTIMO*( 90 )    ! List of available estimators
       INTEGER GFRMO              ! Output GRID Frame pointer
       INTEGER GMAP               ! Pointer to Mapping from GRID Frame
                                  ! to Current Frame, input NDF
