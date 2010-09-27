@@ -171,6 +171,16 @@ void smurf_fts2_phasecorr(int* status)
   parGet0d("WNUBOUND", &wnUBoundPercent, status);
   parGet0d("WEIGHTLIMIT", &weightLimit, status);
 
+  /* VERIFY WAVE NUMBER RANGES */
+  wnLBoundPercent = (wnLBoundPercent < 0.0) ? 0.0 :
+                        (wnLBoundPercent > 1.0) ? 1.0 : wnLBoundPercent;
+  wnUBoundPercent = (wnUBoundPercent < 0.0) ? 0.0 :
+                        (wnUBoundPercent > 1.0) ? 1.0 : wnUBoundPercent;
+  if(wnUBoundPercent <= wnLBoundPercent) {
+    wnLBoundPercent = 0.0;
+    wnUBoundPercent = 1.0;
+  }
+
   coeffLength = polynomialDegree + 1;
 
   /* DOUBLE-SIDED INTERFEROGRAM HALF-LENGTH */
