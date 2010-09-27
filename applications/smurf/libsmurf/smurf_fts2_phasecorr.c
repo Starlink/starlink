@@ -174,28 +174,15 @@ void smurf_fts2_phasecorr(int* status)
   coeffLength = polynomialDegree + 1;
 
   /* DOUBLE-SIDED INTERFEROGRAM HALF-LENGTH */
-  if((zpdIndex + 1) < dsHalfLength) {
-    tmp = zpdIndex + 1;
-    dsHalfLength = 1;
-    for(i = tmp; i >= 1; i--) {
-      num = i;
-      while(num % 2 == 0) { num /= 2; }
-      while(num % 3 == 0) { num /= 3; }
-      while(num % 5 == 0) { num /= 5; }
-      while(num % 7 == 0) { num /= 7; }
-      if(num == 1) { dsHalfLength = i; break; }
-    }
-  } else {
-    tmp = dsHalfLength;
-    dsHalfLength = 1;
-    for(i = tmp; i >= 1; i--) {
-      num = i;
-      while(num % 2 == 0) { num /= 2; }
-      while(num % 3 == 0) { num /= 3; }
-      while(num % 5 == 0) { num /= 5; }
-      while(num % 7 == 0) { num /= 7; }
-      if(num == 1) { dsHalfLength = i; break; }
-    }
+  tmp = ((zpdIndex + 1) < dsHalfLength) ? (zpdIndex + 1) : dsHalfLength;
+  dsHalfLength = 1;
+  for(i = tmp; i >= 1; i--) {
+    num = i;
+    while(num % 2 == 0) { num /= 2; }
+    while(num % 3 == 0) { num /= 3; }
+    while(num % 5 == 0) { num /= 5; }
+    while(num % 7 == 0) { num /= 7; }
+    if(num == 1) { dsHalfLength = i; break; }
   }
 
   ndfBegin();
@@ -231,28 +218,15 @@ void smurf_fts2_phasecorr(int* status)
 
     /* SINGLE-SIDED INTERFEROGRAM HALF-LENGTH */
     ssHalfLengthInit = srcN - zpdIndex - phaseFunctionHalfLength;
-    if(ssHalfLengthInit < ssHalfLength) {
-      tmp = ssHalfLengthInit;
-      ssHalfLength = 1;
-      for(i = tmp; i >= 1; i--) {
-        num = i;
-        while(num % 2 == 0) { num /= 2; }
-        while(num % 3 == 0) { num /= 3; }
-        while(num % 5 == 0) { num /= 5; }
-        while(num % 7 == 0) { num /= 7; }
-        if(num == 1) { ssHalfLength = i; break; }
-      }
-    } else {
-      tmp = ssHalfLength;
-      ssHalfLength = 1;
-      for(i = tmp; i >= 1; i--) {
-        num = i;
-        while(num % 2 == 0) { num /= 2; }
-        while(num % 3 == 0) { num /= 3; }
-        while(num % 5 == 0) { num /= 5; }
-        while(num % 7 == 0) { num /= 7; }
-        if(num == 1) { ssHalfLength = i; break; }
-      }
+    tmp = (ssHalfLengthInit < ssHalfLength) ? ssHalfLengthInit : ssHalfLength;
+    ssHalfLength = 1;
+    for(i = tmp; i >= 1; i--) {
+      num = i;
+      while(num % 2 == 0) { num /= 2; }
+      while(num % 3 == 0) { num /= 3; }
+      while(num % 5 == 0) { num /= 5; }
+      while(num % 7 == 0) { num /= 7; }
+      if(num == 1) { ssHalfLength = i; break; }
     }
 
     /* WAVENUMBER FACTOR */
