@@ -67,6 +67,10 @@
 *        Original version.
 *     2010-09-20 (COBA):
 *        Replaced PI with AST__DPI
+*     2010-09-27 (COBA):
+*        - Add FUNC_NAME
+*        - Add error message
+*        - Remove fftw_cleanup() which significantly severed the performance
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -109,6 +113,8 @@
 /* SMURF INCLUDES */
 #include "libsmf/smf.h"
 #include "fts2.h"
+
+#define FUNC_NAME "fts2_phasecorrection"
 
 void fts2_phasecorrection(
     double* interferogram,
@@ -200,12 +206,11 @@ void fts2_phasecorrection(
     sumSquared += (tmpVal * tmpVal);
   }
 
+  /* GET PHASE */
   if(sqrt(sumSquared / dsLength) < SMF__FLAT_THRESHOLD) { // IF FLAT
     *sigma = 0.0;
     phaseLength = dsHalfLength + 1;
-    for(i = 0; i < phaseLength; i++) {
-      phase[i] = 0.0;
-    }
+    for(i = 0; i < phaseLength; i++) { phase[i] = 0.0; }
   } else { /* IF THE DOUBLE-SIDED INTERFEROGRAM IS NOT FLAT */
 	  spectrum  = fftw_malloc(dsLength * sizeof(*spectrum));
 	  plan = fftw_plan_dft_r2c_1d(dsLength, dsInterferogram, spectrum, FFTW_ESTIMATE);
@@ -291,8 +296,8 @@ void fts2_phasecorrection(
 	      fts2_arraycopy(wavenumber, phaseLength, bandWavenumber, numPoints, bandIndex[i], 0, numPoints);
 
 	      smf_fit_poly1d( polynomialDegree, numPoints, CLIP,
-	      	              bandWavenumber, bandPhase, bandWeights, NULL, coefficients,
-	      	              NULL, NULL, &nused, status);
+	      	              bandWavenumber, bandPhase, bandWeights, NULL,
+	      	              coefficients, NULL, NULL, &nused, status);
 
 	      index = i << 1;
 	      EVALPOLY(midPhase[index], midPoints[i], polynomialDegree, coefficients);
@@ -351,7 +356,7 @@ void fts2_phasecorrection(
   }
   astFree(dsInterferogram);
 
-  /* PHASE FUNCTION */
+  /* GET PHASE CORRECTION FUNCTION */
   cosLength = dsHalfLength + 1;
   cosPhase = fftw_malloc(cosLength * sizeof(*cosPhase));
   for(i = 0; i < cosLength; i++) {
@@ -397,6 +402,7 @@ void fts2_phasecorrection(
   offset = dsHalfLength + phaseFunctionHalfLength - 2;
   if(tmpLength < offset) {
     *status != SAI__ERROR;
+    errRep(FUNC_NAME, "Unable to perform phase correction!", status);
     return;
   }
   size = ssHalfLength + 1;
@@ -419,12 +425,4 @@ void fts2_phasecorrection(
 	if(spectrum) fftw_free(spectrum);
   if(cosPhase) fftw_free(cosPhase);
   if(sinPhase) fftw_free(sinPhase);
-  /* Call to fftw_cleanup ensures that memory allocated by fftw is freed properly
-   * However, if there are multiple calls to this routine and, fftw_cleanup
-   * is NOT called, the routine produces different results for the same input.
-   * In order to produce same results for the same input make sure fftw_cleanup
-   * is called. This significantly reduces the processing speed.
-   * More advanced features of FFTW may need to be utilized to gain performance.
-   */
-	fftw_cleanup();
 }
