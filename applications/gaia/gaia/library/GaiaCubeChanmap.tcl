@@ -201,7 +201,8 @@ itcl::class gaia::GaiaCubeChanmap {
       set tmpimage_ [gaia::GaiaTempName::make_name \
                         "GaiaTempChanmap" $count_ ".sdf"]
       $maintask_ runwiths "in=$ndfname out=$tmpimage_ axis=$axis \
-                          low=$lb high=$ub estimator=$combination_type_ \
+                          low=\"$lb\" high=\"$ub\" \
+                          estimator=$combination_type_ \
                           nchan=$itk_option(-nchan) \
                           shape=$itk_option(-shape) accept"
 
@@ -265,6 +266,7 @@ itcl::class gaia::GaiaCubeChanmap {
       #  Visit all frames in the image frameset and check for the "ORIGSKY"
       #  Ident.
       set nframes [$rtdimage_ astget "nframe"]
+
       for { set i 1 } { $i <= $nframes } { incr i } {
          $rtdimage_ astset current $i
          set ident [$rtdimage_ astget "Ident"]
