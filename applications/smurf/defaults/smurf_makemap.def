@@ -47,6 +47,7 @@ deldimm = 1
 bolomap = 0
 itermap = 0
 shortmap = 0
+flagmap = <undef>
 
 ensureflat = 1
 noexportsetbad = 0

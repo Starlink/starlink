@@ -1606,6 +1606,7 @@ void smurf_makemap( int *status ) {
 
   } else if ( iterate ) {
     Grp *bolrootgrp = NULL;
+    Grp *flagrootgrp = NULL;
     Grp *iterrootgrp = NULL;
     Grp *shortrootgrp = NULL;
     char tempfile[GRP__SZNAM+1];
@@ -1647,6 +1648,12 @@ void smurf_makemap( int *status ) {
     one_strlcat( tempfile, ".MORE.SMURF.SHORTMAPS", sizeof(tempfile), status);
     shortrootgrp = grpNew( "shortmap root", status );
     grpPut1( shortrootgrp, tempfile, 0, status );
+
+    /* Work out the name for the root file path if flagmaps are being created*/
+    grpGet( ogrp, 1, 1, &pname, sizeof(tempfile), status );
+    one_strlcat( tempfile, ".MORE.SMURF.FLAGMAPS", sizeof(tempfile), status);
+    flagrootgrp = grpNew( "flagmap root", status );
+    grpPut1( flagrootgrp, tempfile, 0, status );
 
     /* Compute number of pixels in output map */
     nxy = (ubnd_out[0] - lbnd_out[0] + 1) * (ubnd_out[1] - lbnd_out[1] + 1);
@@ -1707,9 +1714,9 @@ void smurf_makemap( int *status ) {
     /* Call the low-level iterative map-maker */
 
     smf_iteratemap( wf, igrp, iterrootgrp, bolrootgrp, shortrootgrp,
-                    keymap, NULL, bbms, flatramps, outfset, moving, lbnd_out,
-                    ubnd_out, maxmem-mapmem, map, hitsmap, exp_time, variance, mapqual,
-                    weights, data_units, &nboloeff, status );
+                    flagrootgrp, keymap, NULL, bbms, flatramps, outfset, moving,
+                    lbnd_out, ubnd_out, maxmem-mapmem, map, hitsmap, exp_time,
+                    variance, mapqual, weights, data_units, &nboloeff, status );
 
     if( bolrootgrp ) grpDelet( &bolrootgrp, status );
     if( iterrootgrp ) grpDelet( &iterrootgrp, status );

@@ -37,7 +37,8 @@
 *     {enter_new_authors_here}
 
 *  Notes:
-*     Must keep in sync with smf_qual_str and smf_typ.h
+*     Must keep in sync with smf_qual_str and smf_typ.h, and ensure that
+*     the string representations do not exceed SMF_QSTR_MAX characters.
 
 *  History:
 *     2010-06-17 (TIMJ):

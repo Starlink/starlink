@@ -16,13 +16,13 @@
 
 *     smf_iteratemap(smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 *                    const Grp *bolrootgrp, const Grp *shortrootgrp,
-*                    AstKeyMap *keymap, const smfArray * darks,
-*                    const smfArray *bbms, const smfArray * flatramps,
-*                    AstFrameSet *outfset, int moving, int *lbnd_out,
-*                    int *ubnd_out, size_t maxmem, double *map, int *hitsmap,
-*                    double *exp_time, double *mapvar, smf_qual_t *mapqual,
-*                    double *weights, char data_units[], double *nboloeff,
-*                    int *status );
+*                    const Grp *flagrootgrp, AstKeyMap *keymap,
+*                    const smfArray * darks, const smfArray *bbms,
+*                    const smfArray * flatramps, AstFrameSet *outfset,
+*                    int moving, int *lbnd_out, int *ubnd_out, size_t maxmem,
+*                    double *map, int *hitsmap, double *exp_time,
+*                    double *mapvar, smf_qual_t *mapqual, double *weights,
+*                    char data_units[], double *nboloeff, int *status );
 
 *  Arguments:
 *     wf = smfWorkForce * (Given)
@@ -37,6 +37,9 @@
 *        path to an HDS container.
 *     shortrootgrp = const Grp * (Given)
 *        Root name to use for short output maps (if required). Can be a
+*        path to an HDS container.
+*     flagrootgrp = const Grp * (Given)
+*        Root name to use for flag output maps (if required). Can be a
 *        path to an HDS container.
 *     keymap = AstKeyMap* (Given)
 *        keymap containing parameters to control map-maker
@@ -333,6 +336,8 @@
 *        Updated smf_construct_smfData which now contains smfFts
 *     2010-09-20 (EC):
 *        If noise map generated in smf_clean_smfData, use to initialize NOI
+*     2010-09-28 (EC):
+*        Added .MORE.SMURF.FLAGMAPS extension
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -392,13 +397,13 @@
 /* Main routine */
 void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      const Grp *bolrootgrp, const Grp *shortrootgrp,
-                     AstKeyMap *keymap, const smfArray *darks,
-                     const smfArray *bbms, const smfArray * flatramps,
-                     AstFrameSet *outfset, int moving, int *lbnd_out,
-                     int *ubnd_out, size_t maxmem, double *map,
-                     int *hitsmap, double * exp_time, double *mapvar,
-                     smf_qual_t *mapqual, double *weights, char data_units[],
-                     double * nboloeff, int *status ) {
+                     const Grp *flagrootgrp, AstKeyMap *keymap,
+                     const smfArray *darks, const smfArray *bbms,
+                     const smfArray * flatramps, AstFrameSet *outfset,
+                     int moving, int *lbnd_out, int *ubnd_out, size_t maxmem,
+                     double *map, int *hitsmap, double * exp_time,
+                     double *mapvar, smf_qual_t *mapqual, double *weights,
+                     char data_units[], double * nboloeff, int *status ) {
 
   /* Local Variables */
   smfArray **ast=NULL;          /* Astronomical signal */
@@ -422,6 +427,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int exportclean=0;            /* Are we doing to export clean data? */
   int exportNDF=0;              /* If set export DIMM files to NDF at end */
   int *exportNDF_which=NULL;    /* Which models in modelorder will be exported*/
+  smf_qual_t flagmap=0;         /* bit mask for flagmaps */
   int noexportsetbad=0;         /* Don't set bad values in exported models */
   int haveast=0;                /* Set if AST is one of the models */
   int haveext=0;                /* Set if EXT is one of the models */
@@ -579,6 +585,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
     /* Do iterations completely in memory - minimize disk I/O */
     if( *status == SAI__OK ) {
+      int nflags;
+      char flagnames[SMF__NQBITS*SMF_QSTR_MAX];
+      char *flagname;
 
       astMapGet0I( keymap, "MEMITER", &memiter );
 
@@ -603,6 +612,17 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       /* Are we going to produce short maps every SHORTMAP time slices? */
       astMapGet0I( keymap, "SHORTMAP", &shortmap );
+
+      /* Are we going to produce flagmaps? */
+      if( astMapGet1C(keymap, "FLAGMAP", SMF_QSTR_MAX, SMF__NQBITS, &nflags,
+                      flagnames) ) {
+
+        /* Convert each string into a bit, and OR them together */
+        for( i=0; i<nflags; i++ ) {
+          flagname = flagnames+i*SMF_QSTR_MAX;
+          flagmap |= smf_qual_str_to_val( flagname, NULL, status );
+        }
+      }
 
       /* Are we going to apply the flatfield when we load data? */
       astMapGet0I( keymap, "ENSUREFLAT", &ensureflat );
@@ -1817,7 +1837,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
          into the residual, and rebin that single for each detector that
          is flagged as being OK */
 
-      if( bolomap && (*status == SAI__OK) ) {
+      if( bolomap ) {
         /* Currently only support memiter=1 case to avoid having to do
            a separate filegroup loop. */
         if( !memiter ) {
@@ -1832,7 +1852,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       /* Create short maps using every SHORTMAP samples if requested */
 
-      if( shortmap && (*status == SAI__OK) ) {
+      if( shortmap ) {
         /* Currently only support memiter=1 case to avoid having to do
            a separate filegroup loop. */
         if( !memiter ) {
@@ -1842,6 +1862,20 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           smf_write_shortmap( shortmap, ast[0], res[0], lut[0], qua[0], &dat,
                               msize, shortrootgrp, contchunk, varmapmethod,
                               lbnd_out, ubnd_out, outfset, status );
+        }
+      }
+
+      /* Create maps indicating locations of flags matching bitmask */
+
+      if( flagmap ) {
+        /* Currently only support memiter=1 case to avoid having to do
+           a separate filegroup loop. */
+        if( !memiter ) {
+          msgOut( "", FUNC_NAME
+                  ": *** WARNING *** shortmap=1, but memiter=0", status );
+        } else {
+          smf_write_flagmap( flagmap, lut[0], qua[0], &dat, flagrootgrp,
+                             contchunk, lbnd_out, ubnd_out, outfset, status );
         }
       }
 

@@ -388,6 +388,8 @@
  *     2010-09-23 (EC):
  *        - Rename smf_flag_stationary to smf_flag_slewspeed
  *        - add smf_filter_complement
+ *     2010-09-27 (EC):
+ *        Add smf_write_flagmap
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -1193,12 +1195,13 @@ int smf_isfft( const smfData *indata, dim_t *ntslice, dim_t *nbolo,
 
 void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      const Grp *bolrootgrp, const Grp *shortrootgrp,
-                     AstKeyMap *keymap, const smfArray *darks,
-                     const smfArray *bbms, const smfArray * flatramps,
-                     AstFrameSet *outfset, int moving, int *lbnd_out,
-                     int *ubnd_out, size_t maxmem, double *map,
-                     int *hitsmap, double * exp_time, double *mapvar, smf_qual_t *mapqual,
-                     double *weights, char data_units[], double * nboloeff, int *status );
+                     const Grp *flagrootgrp, AstKeyMap *keymap,
+                     const smfArray *darks, const smfArray *bbms,
+                     const smfArray * flatramps, AstFrameSet *outfset,
+                     int moving, int *lbnd_out, int *ubnd_out, size_t maxmem,
+                     double *map, int *hitsmap, double * exp_time,
+                     double *mapvar, smf_qual_t *mapqual, double *weights,
+                     char data_units[], double * nboloeff, int *status );
 
 void smf_km2ext( int indf, const char *xname, AstKeyMap *keymap,
                  int *timeout, int *status );
@@ -1633,6 +1636,12 @@ void smf_write_bolomap( smfArray *ast, smfArray *res, smfArray *lut,
                         int *status );
 
 void smf_write_clabels( const smfData* data, int * status );
+
+void smf_write_flagmap( smf_qual_t mask, smfArray *lut, smfArray *qua,
+                        smfDIMMData *dat, const Grp *flagrootgrp,
+                        size_t contchunk, const int *lbnd_out,
+                        const int *ubnd_out, AstFrameSet *outfset,
+                        int *status );
 
 void smf_write_itermap( const double *map, const double *mapvar, dim_t msize,
                         const Grp *iterrootgrp, size_t contchunk, int iter,

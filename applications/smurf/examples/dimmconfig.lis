@@ -70,6 +70,29 @@ exportndf = 0
 # been completed).
 #shortmap=1000
 
+# Create .MORE.SMURF.FLAGMAPS extensions? To enable this feature set flagmap
+# to an array containing a subset of the following bit flags. Each flagmap
+# will then contain a count of the number of samples with a quality bit
+# matching at least one of these flags, for each continuous chunk:
+#
+# BADDA   : flagged bad by the DA system
+# *BADBOL : entire bolometer is turned off
+# SPIKE   : flagged as a spike
+# DCJUMP  : location of a DC level step
+# STAT    : telescope was not moving within flagslow to flagfast
+# COM     : portion of data did not match the common-mode
+# FILT    : filtered data did not have sufficient contributions from good data
+# NOISE   : bolometer was flagged as being too noisy in general
+#
+# *Note: If BADBOL is set the behaviour is slightly different than expected;
+#        the bolometer will be completely ignored when creating the flag map.
+#
+# The flagmap is mostly useful to verify whether the spike, jump, and
+# common-mode rejection is correlated with features in the map (e.g. bright
+# sources), for all of the detectors that were used to produce the map, e.g.
+#
+#flagmap = (BADBOL,SPIKE,DCJUMP,COM)
+
 # Apply the flatfield if loading raw data? Default is 1 (true) -- you must
 # explicitly set this to 0 if you want to produce a map in raw DAC units (and
 # also supply raw data).

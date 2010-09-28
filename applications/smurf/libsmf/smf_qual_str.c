@@ -48,6 +48,10 @@
 *     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
+*  Notes:
+*     Must keep in sync with smf_qual_str_to_val and smf_typ.h, and ensure that
+*     the string representations do not exceed SMF_QSTR_MAX characters.
+
 *  History:
 *     2010-03-18 (EC):
 *        Initial version, copied from smf_dtype_str.c

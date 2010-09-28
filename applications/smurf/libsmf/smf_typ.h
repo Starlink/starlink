@@ -229,6 +229,7 @@
 #define SMF_PATH_MAX GRP__SZNAM
 #define SMF_NAME_MAX GRP__SZFNM
 #define SMF_MODEL_MAX 64   /* Maximum model components for iterative map maker*/
+#define SMF_QSTR_MAX 64    /* Maximum chars in quality bit string names */
 #define SMF__MXSMF 8       /* Maximum number of smfDatas in a smfArray */
 #define SMF__MIB 1048576   /* SMURF uses a Mebibyte = 2^20 */
 #define SMF__MXNOTCH 64    /* Arbitrary maximum number of notch filters */
@@ -429,6 +430,7 @@ typedef enum {
       if required)
    3. Add quality to smf_qual_str_to_val
    4. Add quality to smf_qual_str
+   5. Ensure that string quality names are smaller than SMF_QSTR_MAX
 
    If you have more than 8 bits in the quality family you now need to modify
    smf_qual_map and smf_qual_unmap to indicate how the new bit maps to the
