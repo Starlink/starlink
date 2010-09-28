@@ -103,6 +103,8 @@
 *        Call smf_flag_spikes2 instead of smf_flag_spikes.
 *     2010-09-20 (EC):
 *        Optionally calculate noise weights in advance with NOI.CALCFIRST
+*     2010-09-23 (DSB):
+*        Allow data to be padded with artificial data rather than zeros.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -183,6 +185,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   double spikethresh=0;         /* Threshold for spike detection */
   size_t tstride;               /* time slice stride */
   double *var=NULL;             /* Sample variance */
+  int zeropad;                  /* Pad with zeros? */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -202,9 +205,9 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
   /* Data-cleaning parameters  */
   smf_get_cleanpar( kmap, NULL, &dcfitbox, &dcmaxsteps, &dcthresh,
-                    &dcsmooth, &dclimcorr, NULL, &fillgaps, NULL, NULL,
+                    &dcsmooth, &dclimcorr, NULL, &fillgaps, &zeropad, NULL,
                     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-                    &spikethresh, &spikebox, NULL, status );
+                    NULL, &spikethresh, &spikebox, NULL, status );
 
   /* Did we already calculate the noise on each detector? */
   astMapGet0I( kmap, "CALCFIRST", &calcfirst );
@@ -281,7 +284,9 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
         if( fillgaps ) {
           msgOutif(MSG__VERB," ", "   gap filling", status);
-          smf_fillgaps( wf, res->sdata[idx], SMF__Q_GAP, status );
+          smf_fillgaps( wf, res->sdata[idx],
+                        zeropad ? SMF__Q_GAP : SMF__Q_GAP | SMF__Q_PAD,
+                        status );
         }
       }
 

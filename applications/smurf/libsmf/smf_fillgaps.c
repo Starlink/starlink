@@ -23,6 +23,10 @@
 *        The data that will be flagged
 *     mask = smf_qual_t (Given)
 *        Define which bits in quality indicate locations of gaps to be filled.
+*        Note, if this mask includes SMF__Q_PAD, then the padding at the
+*        start and end of each bolometer time series will be replaced by
+*        artifical noisey data that connects the first and last non-padding
+*        samples smoothly.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -59,6 +63,8 @@
 *     2010-02-18 (DSB):
 *        Gaps at start or end were using the offset at time zero, rather
 *        than the offset at the boundary of the good data.
+*     2010-09-28 (DSB):
+*        Replace padding if "mask" includes SMF__Q_PAD.
 
 *  Copyright:
 *     Copyright (C) 2010 Univeristy of British Columbia.
@@ -118,8 +124,10 @@ typedef struct smfFillGapsData {
   size_t b2;                    /* Index of last bolometer to be filledd */
   size_t bstride;               /* bolo stride */
   size_t tstride;               /* time slice stride */
-  smf_qual_t *qua;           /* Pointer to quality array */
-  smf_qual_t mask;           /* Quality mask for bad samples */
+  size_t pend;                  /* Last non-PAD sample */
+  size_t pstart;                /* First non-PAD sample */
+  smf_qual_t *qua;              /* Pointer to quality array */
+  smf_qual_t mask;              /* Quality mask for bad samples */
 } smfFillGapsData;
 
 
@@ -141,10 +149,12 @@ void  smf_fillgaps( smfWorkForce *wf, smfData *data,
   double *dat=NULL;             /* Pointer to bolo data */
   gsl_rng *r;                   /* GSL random number generator */
   size_t bstride;               /* bolo stride */
+  size_t pend;                  /* Last non-PAD sample */
+  size_t pstart;                /* First non-PAD sample */
   size_t tstride;               /* time slice stride */
   smfFillGapsData *job_data;    /* Structures holding data for worker threads */
   smfFillGapsData *pdata;       /* Pointer to data for next worker thread */
-  smf_qual_t *qua=NULL;      /* Pointer to quality array */
+  smf_qual_t *qua=NULL;         /* Pointer to quality array */
 
 /* Main routine */
   if (*status != SAI__OK) return;
@@ -189,6 +199,21 @@ void  smf_fillgaps( smfWorkForce *wf, smfData *data,
   type = gsl_rng_default;
   r = gsl_rng_alloc (type);
 
+  /* If the supplied "mask" value includes SMF__Q_PAD, then we will be
+  replacing the zero-padded region at the start and end of each time series
+  with artificial noisey data that connects the first and last data values
+  smoothly. Remove SMF__Q_PAD from the mask, and find the indices of the
+  first and last non-PAD sample. If we are not replacing zero-padded samples,
+  set pstart and pend to indicate this. */
+  if( mask & SMF__Q_PAD ) {
+     mask &= ~SMF__Q_PAD;
+     smf_get_goodrange( qua, ntslice, tstride, SMF__Q_PAD, &pstart, &pend,
+                        status );
+  } else {
+     pstart = 0;
+     pend = ntslice - 1;
+  }
+
   /* Begin a job context. */
   smf_begin_job_context( wf, status );
 
@@ -204,6 +229,8 @@ void  smf_fillgaps( smfWorkForce *wf, smfData *data,
     pdata->r = r;
     pdata->b1 = i;
     pdata->b2 = i + bpt - 1;
+    pdata->pend = pend;
+    pdata->pstart = pstart;
     if( pdata->b2 >= nbolo ) pdata->b2 = nbolo - 1;
     pdata->bstride = bstride;
     pdata->tstride = tstride;
@@ -238,8 +265,15 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
   dim_t nbolo;                  /* Number of bolos */
   dim_t ntslice;                /* Number of time slices */
   double *dat = NULL;           /* Pointer to bolo data */
+  double a;                     /* Cubic interpolation coefficient */
+  double b;                     /* Cubic interpolation coefficient */
+  double c;                     /* Cubic interpolation coefficient */
   double cl;                    /* Offset of fit at left end of block */
   double cr;                    /* Offset of fit at right end of block */
+  double d;                     /* Cubic interpolation coefficient */
+  double dlen;                  /* Total number of samples being interpolated */
+  double e;                     /* Linear interpolation coefficient */
+  double f;                     /* Linear interpolation coefficient */
   double grad;                  /* Gradient of line joining patch mid-points */
   double meanl;                 /* Mean value in left patch */
   double meanr;                 /* Mean value in right patch */
@@ -249,6 +283,8 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
   double sigma;                 /* Mean standard deviation */
   double sigmal;                /* Standard deviation in left patch */
   double sigmar;                /* Standard deviation in right patch */
+  double nx2;                   /* nx squared */
+  double nx;                    /* Normalised distance into interpolation */
   double x[ BOX ];              /* Array of sample positions */
   double y[ BOX ];              /* Array of sample values */
   gsl_rng *r;                   /* GSL random number generator */
@@ -267,10 +303,12 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
   size_t b1;                    /* Index of first bolometer to be filledd */
   size_t b2;                    /* Index of last bolometer to be filledd */
   size_t bstride;               /* bolo stride */
+  size_t pend;                  /* Last non-PAD sample */
+  size_t pstart;                /* First non-PAD sample */
   size_t tstride;               /* time slice stride */
   smfFillGapsData *pdata = NULL;/* Pointer to job data */
-  smf_qual_t mask;           /* Quality mask for bad samples */
-  smf_qual_t *qua = NULL;    /* Pointer to quality array */
+  smf_qual_t *qua = NULL;       /* Pointer to quality array */
+  smf_qual_t mask;              /* Quality mask for bad samples */
 
   /* Pointer to the structure holding information needed by this thread. */
   pdata = (smfFillGapsData *) job_data_ptr;
@@ -286,6 +324,8 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
   r = pdata->r;
   tstride = pdata->tstride;
   mask = pdata->mask;
+  pend = pdata->pend;
+  pstart = pdata->pstart;
 
    /* Pre-calculate a useful constant - the final used value of "j". */
   jfinal = ntslice - 1;
@@ -307,7 +347,9 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
     jstart = 0;
     jend = -1;
 
-    /* Loop over time series */
+    /* Loop over time series. In this loop we fill gaps within the body
+       of the time series. Filling of the padded regions at start and end
+       is left until the loop has ended. */
     for( j=0; j<ntslice; j++ ) {
 
       /* Is this sample flagged? Always condsider the last sample to be
@@ -466,6 +508,70 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
           }
         }
       }
+    }
+
+   /* Replace the padding at the start and end of the bolometer time series
+      with a noisey curve that connects the first and last data samples
+      smoothly. First, fit a straight line to the BOX samples at the end of
+      the time stream. The above filling of gaps ensures the data values
+      will not be bad. */
+    if( pstart > 0 && pend < ntslice - 1 ) {
+      leftstart = pend - BOX + 1;
+      leftend = pend;
+      k = 0;
+      for( jj = leftstart; jj <= leftend; jj++,k++ ) {
+        x[ k ] = jj;
+        y[ k ] = dat[ i*bstride + jj*tstride ];
+      }
+
+      kpg1Fit1d( 1, k, y, x, &ml, &cl, &sigmal, status );
+
+      /* If possible fit a straight line to the BOX samples at the start of
+         the time series. */
+      rightstart = pstart;
+      rightend = pstart + BOX - 1;
+      k = 0;
+      for( jj = rightstart; jj <= rightend; jj++,k++ ) {
+        x[ k ] = jj;
+        y[ k ] = dat[ i*bstride + jj*tstride ];
+      }
+      kpg1Fit1d( 1, k, y, x, &mr, &cr, &sigmar, status );
+
+      /* Form the coefficients needed for cubic interpolation between the
+      end and the start. Cubic interpolation produces continuity in the
+      gradients as well as the values. */
+      meanl = ml*( pend + 1 ) + cl;
+      meanr = mr*( pstart - 1 ) + cr;
+
+      dlen = pstart - pend + ntslice;
+
+      a = 2*( meanl - meanr ) + dlen*( ml + mr );
+      b = 3*( meanr - meanl ) - dlen*( 2*ml + mr );
+      c = ml*dlen;
+      d = meanl;
+
+
+      /* Form the coefficients needed for linear interpolation of the
+      noise levels. */
+      e = sigmal;
+      f = sigmar - sigmal;
+
+      /* Replace the padding at the end of the time stream. */
+      for( jj = pend + 1; jj < (int) ntslice; jj++ ) {
+         nx = ( jj - pend )/dlen;
+         nx2 = nx*nx;
+         dat[ i*bstride + jj*tstride ] = a*nx2*nx + b*nx2 + c*nx + d +
+                                         gsl_ran_gaussian( r, e + nx*f );
+      }
+
+      /* Replace the padding at the start of the time stream. */
+      for( jj = 0; jj < (int) pstart; jj++ ) {
+         nx = ( jj - pend + ntslice )/dlen;
+         nx2 = nx*nx;
+         dat[ i*bstride + jj*tstride ] = a*nx2*nx + b*nx2 + c*nx + d +
+                                         gsl_ran_gaussian( r, e + nx*f );
+      }
+
     }
   }
 }

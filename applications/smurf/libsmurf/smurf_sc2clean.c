@@ -335,7 +335,7 @@ void smurf_sc2clean( int *status ) {
          to clean the bolometer data */
 
       smf_get_cleanpar( keymap, NULL, NULL, NULL, NULL, NULL, NULL, &dkclean, NULL,
-                        NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+                        NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                         NULL, NULL, NULL, NULL, NULL, status );
 
       if( dkclean && ffdata && ffdata->da && ffdata->da->dksquid ) {

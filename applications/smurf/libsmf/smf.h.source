@@ -1090,7 +1090,7 @@ void smf_geod( const double pos[3], double *phi, double *h, double *lambda );
 void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac,
                        dim_t *dcbox, int *dcbad, double *dcthresh,
                        dim_t *dcsmooth, int *dclimcorr, int *dkclean,
-                       int *fillgaps, double *filt_edgelow,
+                       int *fillgaps, int *zeropad, double *filt_edgelow,
                        double *filt_edgehigh, double *filt_edge_smallscale,
                        double *filt_edge_largescale, double *filt_notchlow,
                        double *filt_notchhigh, int *filt_nnotch,

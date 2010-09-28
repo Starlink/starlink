@@ -16,8 +16,8 @@
 *     smf_get_cleanpar( AstKeyMap *keymap, double *badfrac,
 *                       dim_t *dcfitbox, int *dcmaxsteps, double *dcthresh,
 *                       dim_t *dcsmooth, int *dclimcorr, int *dkclean,
-*                       int *fillgaps, double *filt_edgelow, double *filt_edgehigh,
-*                       double *filt_edge_smallscale,
+*                       int *fillgaps, int *zeropad, double *filt_edgelow,
+*                       double *filt_edgehigh, double *filt_edge_smallscale,
 *                       double *filt_edge_largescale,
 *                       double *filt_notchlow, double *filt_notchhigh,
 *                       int *filt_nnotch, int *dofilt, double *flagslow,
@@ -56,6 +56,10 @@
 *     fillgaps = int* (Returned)
 *        If true, fill regions of data flagged with spikes, DC steps, bad
 *        samples with constrained realization of noise.
+*     zeropad = int* (Returned)
+*        If true, each time stream is padded with zeros at start and end.
+*        Otherwise, artificial data that retains continuity between start
+*        and end of the data stream is used.
 *     filt_edgelow = double* (Returned)
 *        Apply a hard-edged low-pass filter at this frequency (Hz) (NULL:0)
 *     filt_edgehigh = double* (Returned)
@@ -132,6 +136,8 @@
 *     2010-09-23 (EC):
 *        -Rename FLAGSTAT to FLAGSLOW
 *        -Add FLAGFAST
+*     2010-09-28 (DSB):
+*        Added zeropad.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -182,7 +188,8 @@
 
 void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac, dim_t *dcfitbox,
                        int *dcmaxsteps, double *dcthresh, dim_t *dcsmooth,
-                       int *dclimcorr, int *dkclean, int *fillgaps, double *filt_edgelow,
+                       int *dclimcorr, int *dkclean, int *fillgaps,
+                       int *zeropad, double *filt_edgelow,
                        double *filt_edgehigh, double *filt_edge_smallscale,
                        double *filt_edge_largescale, double *filt_notchlow,
                        double *filt_notchhigh, int *filt_nnotch, int *dofilt,
@@ -296,6 +303,20 @@ void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac, dim_t *dcfitbox,
 
     msgOutiff( MSG__DEBUG, "", FUNC_NAME ": FILLGAPS is %s", status,
                (*fillgaps ? "enabled" : "disabled" ) );
+  }
+
+  if( zeropad ) {
+    *zeropad = 1;
+    astMapGet0I( keymap, "ZEROPAD", &temp );
+    if( (temp != 0) && (temp != 1) ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "ZEROPAD must be either 0 or 1.", status );
+    } else {
+      *zeropad = temp;
+    }
+
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": ZEROPAD is %s", status,
+               (*zeropad ? "enabled" : "disabled" ) );
   }
 
   if( filt_edgelow ) {

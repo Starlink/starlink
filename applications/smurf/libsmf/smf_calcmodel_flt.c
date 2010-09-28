@@ -62,6 +62,9 @@
 *     2010-09-23 (EC):
 *        Calculate model as complementary filter applied to residual, rather
 *        than as the residual minus the filtered residual.
+*     2010-09-28 (DSB):
+*        Fill gaps, allowing padded regions to be replaced with artifical
+*        data.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -137,6 +140,7 @@ void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
   size_t tstride;               /* Time slice stride in data array */
+  int zeropad;                  /* Pad with zeros? */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -153,6 +157,9 @@ void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
               ": skipping FLT this iteration", status );
     return;
   }
+
+  /* Are we padding with zeros or artifical data? */
+  astMapGet0I( kmap, "ZEROPAD", &zeropad );
 
   /* Assert bolo-ordered data */
   smf_model_dataOrder( dat, allmodel, chunk, SMF__RES|SMF__QUA|SMF__NOI, 0,
@@ -194,6 +201,11 @@ void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
       *status = SAI__ERROR;
       errRep( "", FUNC_NAME ": Null data in inputs", status);
     } else {
+
+      /* Fill gaps. Replace padded regiosn with artifical data if
+      required. */
+      smf_fillgaps( wf, res->sdata[idx],
+                    zeropad ? SMF__Q_GAP : SMF__Q_GAP | SMF__Q_PAD, status );
 
       /* Create a filter */
       filt = smf_create_smfFilter( res->sdata[idx], status );

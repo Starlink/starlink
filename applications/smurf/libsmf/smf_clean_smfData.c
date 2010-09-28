@@ -43,7 +43,7 @@
 *     Flag spikes  : SPIKETHRESH, SPIKEBOX
 *     Slew speed   : FLAGSLOW, FLAGFAST
 *     Dark squids  : DKCLEAN
-*     Gap filling  : FILLGAPS
+*     Gap filling  : FILLGAPS, ZEROPAD
 *     Baselines    : ORDER
 *     Filtering    : FILT_EDGELOW, FILT_EDGEHIGH, FILT_NOTCHLOW, FILT_NOTCHHIGH,
 *                    APOD, FILT_WLIM
@@ -74,6 +74,8 @@
 *        Further simplification since smf_fit_poly can remove the poly as well
 *     2010-09-20 (EC):
 *        Optionally return noise map
+*     2010-09-28 (DSB):
+*        Allow data to be padded with artifical data rather than zeros.
 
 *  Copyright:
 *     Copyright (C) 2010 Univeristy of British Columbia.
@@ -136,6 +138,7 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data, smfData **noisemap,
   double spikethresh;       /* Threshold for finding spikes */
   size_t spikebox=0;        /* Box size for spike finder */
   struct timeval tv1, tv2;  /* Timers */
+  int zeropad;              /* Pad with zeros? */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -161,8 +164,8 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data, smfData **noisemap,
   /* Get cleaning parameters */
   smf_get_cleanpar( keymap, &badfrac, &dcfitbox, &dcmaxsteps,
                     &dcthresh, &dcsmooth, &dclimcorr, &dkclean,
-                    &fillgaps, NULL, NULL, NULL, NULL, NULL, NULL,
-                    NULL, NULL, &flagslow, &flagfast, &order,
+                    &fillgaps, &zeropad, NULL, NULL, NULL, NULL, NULL,
+                    NULL, NULL, NULL, &flagslow, &flagfast, &order,
                     &spikethresh, &spikebox, &noiseclip, status );
 
   /* Update quality by synchronizing to the data array VAL__BADD values */
@@ -256,7 +259,8 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data, smfData **noisemap,
   /* Gap filling */
   if( fillgaps ) {
     msgOutif(MSG__VERB, "", FUNC_NAME ": Gap filling.", status);
-    smf_fillgaps( wf, data, SMF__Q_GAP, status );
+    smf_fillgaps( wf, data, zeropad ? SMF__Q_GAP : SMF__Q_GAP | SMF__Q_PAD,
+                  status );
 
     /*** TIMER ***/
     msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ":   ** %f s gap filling",
