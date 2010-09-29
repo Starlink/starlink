@@ -43,7 +43,9 @@
 *        SMF__MAXAPLEN in which case the routine will automatically apodize
 *        the entire data stream (maximum valid value of len). Set it to
 *        zero to prevent apodisation (e.g. if the data has already been
-*        apodised).
+*        apodised). Set it to SMF__BADSZT to cause the paddded regions
+*        to be filled with artificial data based on the current contents
+*        of the smfData (no apodising is performed in this case).
 *     whitenoise = double* (Returned)
 *        Externally allocated array (nbolos) that will hold estimates of
 *        the mean-square variances in bolo signals produced by white noise.

@@ -296,7 +296,7 @@ void smf_clean_smfData( smfWorkForce *wf, smfData *data, smfData **noisemap,
 
   /* Noise mask */
   if( (*status == SAI__OK) && (noiseclip > 0.0) ) {
-    smf_mask_noisy( wf, data, noisemap, noiseclip, status );
+    smf_mask_noisy( wf, data, noisemap, noiseclip, zeropad, status );
 
     /*** TIMER ***/
     msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ":   ** %f s masking noisy",

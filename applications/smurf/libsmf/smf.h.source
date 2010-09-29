@@ -1242,7 +1242,7 @@ void smf_mapbounds_approx( Grp *igrp, size_t index, char *system,
                            int *status );
 
 void smf_mask_noisy( smfWorkForce *wf, smfData *data, smfData **noise,
-                     double sigclip, int * status );
+                     double sigclip, int zeropad, int * status );
 
 void smf_maskacsis( int indf, int *mask, int *status );
 

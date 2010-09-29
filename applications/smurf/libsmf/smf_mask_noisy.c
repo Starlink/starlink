@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_mask_noisy( smfWorkForce *wf, smfData *data, smfData **noise,
-*                       double sigclip, int * status );
+*                     double sigclip, int zeropad, int * status );
 
 *  Arguments:
 *     wf = smfWorkForce * (Given)
@@ -26,6 +26,9 @@
 *     sigclip = double (Given)
 *        Number of standard deviations above the mean to clip noisy bolometers.
 *        Returns immediately unless this value is greater than zero.
+*     zeropad = int (Given)
+*        Pad with zeros instead of with artificial data prior to doing
+*        the FFTs?
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -37,6 +40,7 @@
 *  Authors:
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 *     EC: Ed Chapin (UBC)
+*     DSB: David Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  Notes:
@@ -51,6 +55,8 @@
 *        Use new quality scheme.
 *     2010-09-16 (EC):
 *        Optionally return noisemap
+*     2010-09-28 (DSB):
+*        Added zeropad argument.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -85,7 +91,7 @@
 #include "mers.h"
 
 void smf_mask_noisy( smfWorkForce *wf, smfData *data, smfData **noise,
-                       double sigclip, int * status ) {
+                     double sigclip, int zeropad, int * status ) {
 
   const float clips[] = { 5, 5, 5, 5, 5 };  /* Clip levels for noise data */
   size_t i;
@@ -112,7 +118,7 @@ void smf_mask_noisy( smfWorkForce *wf, smfData *data, smfData **noise,
 
   /* Calculate the noise on each bolometer */
   smf_bolonoise( wf, data, 0, 0.5, SMF__F_WHITELO,
-                 SMF__F_WHITEHI, 0, 0, SMF__MAXAPLEN,
+                 SMF__F_WHITEHI, 0, 0, zeropad ? SMF__MAXAPLEN : SMF__BADSZT,
                  (noisemap->pntr)[0], NULL, NULL, status );
 
   /* Now need to convert this to noise by square rooting */

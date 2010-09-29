@@ -28,7 +28,9 @@
 *        SMF__MAXAPLEN in which case the routine will automatically apodize
 *        the entire data stream (maximum valid value of len). Set it to
 *        zero to prevent apodisation (e.g. if the data has already been
-*        apodised).
+*        apodised). Set it to SMF__BADSZT to cause the paddded regions
+*        to be filled with artificial data based on the current contents
+*        of the smfData (no apodising is performed in this case).
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -89,6 +91,8 @@
 *        Do the re-ordering as part of the deepcopy if needed
 *     2010-09-21 (COBA):
 *        Add SMF__NOCREATE_FTS
+*     2010-09-29 (DSB):
+*        Allow padding with artificial data.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -340,9 +344,9 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
                                SMF__NOCREATE_DA |
                                SMF__NOCREATE_FTS, 1, 0, status );
 
-  /* Create some quality. We only apodize if we are doing a
+  /* Create some quality. We only apodize or pad if we are doing a
      forward FFT. */
-  if (len && !inverse) {
+  if( !inverse ) {
     const smf_qual_t *inqual = smf_select_cqualpntr( indata, NULL, status );
 
     /* we know that "data" does not have a quality component because
@@ -353,8 +357,16 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
                               sizeof(*(data->qual)) );
     }
 
-    /* Apodise the data */
-    smf_apodize( data, len, status );
+
+   /* If we are padding with artificial data, we must not apodise.
+      Re-create the padding based on the current contents of the smfData. */
+    if( len == SMF__BADSZT ) {
+      smf_fillgaps( wf, data, SMF__Q_PAD | SMF__Q_GAP, status );
+
+    /* If required, apodise the data */
+    } else if( len > 0 ) {
+      smf_apodize( data, len, status );
+    }
 
     if (data && data->qual) data->qual = astFree( data->qual );
   }

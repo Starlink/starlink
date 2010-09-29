@@ -306,6 +306,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
   smf_tausrc tausrc;            /* Type of tau monitor */
   dim_t thisnrel;               /* Number of related items for this model */
   size_t tstride;               /* Time slice stride in data array */
+  int zeropad;                  /* Pad with zeros instead of artificial data? */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -887,6 +888,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
 
               astMapGet0A( keymap, "NOI", &kmap );
               astMapGet0I( kmap, "CALCFIRST", &calcfirst );
+              astMapGet0I( kmap, "ZEROPAD", &zeropad );
               kmap = astAnnul( kmap );
 
               smf_get_dims( &(head.data), NULL, NULL, NULL, NULL, &ndata,
@@ -904,7 +906,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
                 } else {
                   if( idata && idata->pntr[0] ) {
                     smf_bolonoise( wf, idata, 0, 0.5, SMF__F_WHITELO,
-                                   SMF__F_WHITEHI, 0, 0, SMF__MAXAPLEN,
+                                   SMF__F_WHITEHI, 0, 0, zeropad ? SMF__MAXAPLEN : SMF__BADSZT,
                                    dataptr, NULL, NULL, status );
                   } else {
                     *status = SAI__ERROR;

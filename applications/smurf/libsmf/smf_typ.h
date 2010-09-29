@@ -267,6 +267,9 @@ typedef enum smf_dtype {
 typedef unsigned short smf_qual_t;
 #define VAL__BADQ VAL__BADUW
 
+/* Define a bad size_t value - the wrap-around equivalent of -1 */
+#define SMF__BADSZT ((size_t) -1)
+
 /* Different types of model components used by iterative map-maker. These are
    powers of 2 so they can be used in bit masks. */
 typedef enum smf_modeltype {
@@ -607,8 +610,8 @@ typedef struct smfDA {
 /* Structure containing data computed by FTS2 pipeline operations */
 typedef struct smfFts
 {
-  struct smfData* fpm;       /* Coefficitients of the fitting polynomial for 
-                              * each bolometer in the subarray, 
+  struct smfData* fpm;       /* Coefficitients of the fitting polynomial for
+                              * each bolometer in the subarray,
                               * [m x n x p] dimensional data */
   struct smfData* sigma;     /* Standard deviations obtained for each bolometer
                               * in the subarray, [m x n] dimensional data */
