@@ -53,9 +53,11 @@
 *        Include instrument information in report.
 *     2009-09-25 (TIMJ):
 *        Move sort routine externally.
+*     2010-09-28 (TIMJ):
+*        Handle null pointers explicitly rather than letting MERS write <null>.
 
 *  Copyright:
-*     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -112,6 +114,7 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
   size_t nsim = 0;    /* number of simulated observations */
   AstKeyMap * obsinfo = NULL; /* observation information */
   smfSortInfo * obslist = NULL; /* Sorted struct array */
+  const char * str = NULL; /* temp string pointer */
 
   if (*status != SAI__OK) return;
 
@@ -202,9 +205,14 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
         /* do not display "SCIENCE" as it is the default */
         astMapGet0I( obsinfo, "OBSTYPE", &itemp );
         if (itemp != SMF__TYP_SCIENCE) {
-          msgSetc( "OT", "(");
-          msgSetc( "OT", smf_obstype_str( itemp, status) );
-          msgSetc( "OT", ")");
+          str = smf_obstype_str( itemp, status );
+          if (str) {
+            msgSetc( "OT", "(");
+            msgSetc( "OT", smf_obstype_str( itemp, status) );
+            msgSetc( "OT", ")");
+          } else {
+            msgSetc( "OT", " ");
+          }
         } else {
           msgSetc( "OT", " ");
         }
@@ -213,8 +221,13 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
            no useful information over the obs mode */
         astMapGet0I( obsinfo, "SWMODE", &itemp );
         if (itemp != SMF__SWM_NULL && itemp != SMF__SWM_SELF) {
-          msgSetc( "SW", "/");
-          msgSetc( "SW", smf_swmode_str( itemp, status ) );
+          str = smf_swmode_str( itemp, status );
+          if (str) {
+            msgSetc( "SW", "/");
+            msgSetc( "SW", str );
+          } else {
+            msgSetc( "SW", " ");
+          }
         } else {
           msgSetc( "SW", " " );
         }
@@ -241,7 +254,12 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
 
 
         astMapGet0I( obsinfo, "OBSMODE", &itemp );
-        msgSetc( "OM", smf_obsmode_str( itemp, status) );
+        str = smf_obsmode_str( itemp, status);
+        if (str) {
+          msgSetc( "OM", str );
+        } else {
+          msgSetc( "OM", " " );
+        }
         astMapGet0I( obsinfo, "OBSNUM", &itemp );
         msgSeti( "ON", itemp);
         astMapGet0I( obsinfo, "UTDATE", &itemp );
