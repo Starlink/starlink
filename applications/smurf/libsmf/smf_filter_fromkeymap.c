@@ -190,11 +190,6 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap,
 
        } else {
 
-       if( astMapGet0I( keymap, "APOD", &ival ) ) {
-          filt->apod_length = ival;
-
-       } else {
-
          f_low = ( f_edgehigh > 0.0 ) ? f_edgehigh : VAL__MAXD;
          if( f_edgelow > 0.0 && f_edgelow < f_low ) f_low = f_edgelow;
          for( i = 0; i < f_nnotch; i++ ) {
