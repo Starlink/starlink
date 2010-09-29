@@ -144,7 +144,7 @@ flt.notfirst = 0
 # which calls smf_filter_fromkeymap which calls smf_get_cleanpar
 
 flt.apod = 0
-flt.zeropad = 1
+flt.zeropad = 0
 flt.filt_edgelow = 0
 flt.filt_edgehigh = 0
 flt.filt_edge_smallscale = 0
@@ -175,7 +175,7 @@ noi.dcthresh = 25.0
 noi.dcsmooth = 50
 noi.dclimcorr = 10
 noi.fillgaps = 1
-noi.zeropad = 1
+noi.zeropad = 0
 noi.spikethresh = 0
 noi.spikebox = 50
 

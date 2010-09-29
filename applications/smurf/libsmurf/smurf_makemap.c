@@ -429,7 +429,8 @@
 *
 *     APOD = INTEGER
 *       Apodize signals (smoothly roll-off) using sine/cosine functions at
-*       start and end of the signal across this many samples.
+*       start and end of the signal across this many samples. The supplied
+*       APOD value is ignored and a value of zero is used if ZEROPAD is set to 0.
 *     BADFRAC = REAL
 *       Flag entire bolometer as dead if at least this fraction of the samples
 *       in a detector time series were flagged as bad by the DA system.
@@ -455,7 +456,9 @@
 *       below which the telescope is considered to be stationary.
 *     FILLGAPS = LOGICAL
 *       Fill vicinity of spikes / DC steps with constrained realization of
-*       noise. You almost always want to do this.
+*       noise. Also (unless ZEROPAD is 1), fill the padded region at the start 
+*       and end of each time stream with artificial data. You almost always 
+*       want to do this.
 *     FILT_EDGEHIGH = REAL
 *       Hard-edge high-pass frequency-domain filter (Hz).
 *     FILT_EDGELOW = REAL
@@ -467,14 +470,29 @@
 *       Array of lower-edge frequencies corresponding to FILT_NOTCHHIGH.
 *     ORDER = INTEGER
 *       Subtract a fitted baseline polynomial of this order (0 to remove mean).
-*     PADSTART = INTEGER
-*       Number of samples of padding to add to start before filtering.
-*     PADEND = INTEGER
-*       Number of samples of padding to add to end before filtering.
+*     PAD = INTEGER
+*       Number of samples of padding to add to start and end before filtering.
+*       The nature of this padding is determined by ZEROPAD.
 *     SPIKETHRESH = REAL
 *       Threshold S/N to flag spikes using sigma-clipper.
 *     SPIKEBOX = INTEGER
 *       The size of the sigma-clipper filter box.
+*     ZEROPAD = LOGICAL
+*       Determines the nature of the padding added to the start and end of
+*       each bolometer time stream (see PAD). Padding is needed to avoid
+*       interaction between the data values at the start and end of each
+*       bolometer time stream, due to the cyclic wrap-around nature of the
+*       FFTs used to filter each time stream. If ZEROPAD is set to 1, the
+*       padded sections will be filled with zeros. This requires that the
+*       data also be apodised (see APOD) to avoid ringing due the sudden
+*       steps down to zero at the start and end of each time stream). If
+*       ZEROPAD is set to 0, then the padded regions will be filled with
+*       artificial data that links the data values at the start and end of
+*       the time stream smoothly. In this case, no apodisation is
+*       performed, and the value of the APOD parameter is ignored. The
+*       default for ZEROPAD is 0 (i.e. pad with artificial data rather
+*       than zeros) unless FILLGAPS is zero, in which case the supplied 
+*       ZEROPAD value is ignored and a value of 1 is always used.
 *
 *     iii) Parameters controlling the calculation of model components.
 *

@@ -1813,9 +1813,9 @@ below:
   controlled by the \cparam{MEMITER} and \cparam{MAXLEN} configuration
   file parameters, as well as the \makemap\ parameter
   \aparam{MAXMEM}. When the files are concatenated, it is also
-  possible to add extra zero-padding at the beginning and end of the
-  data streams to facilitate filtering (see the \cparam{PADSTART} and
-  \cparam{PADEND} configuration file parameters). This operation is
+  possible to add extra padding at the beginning and end of the
+  data streams to facilitate filtering (see the \cparam{PAD} and
+  \cparam{ZEROPAD} configuration file parameters). This operation is
   equivalent to using the \concat\ task.
 
   Whether concatenation is requested or not, it is also worth noting
@@ -2033,9 +2033,9 @@ exportndf        & An option to export DIMM model components as NDF files. It   
 \hline
                  & \multicolumn{2}{l}{\em Pre-processing Data Cleaning Options} \\
 \hline
-padstart         & Pad beginning of each chunk of data with this many samples          & 1000 \\
-padend           & Pad end of each chunk of data with this many samples                & 1000 \\
+pad              & Pad beginning and end of each chunk of data with this many samples          & 1000 \\
 apod             & Apodize data at start and end over this many samples                & 1000 \\
+zeropad          & Chooses how to pad - with zeros (1) or with artificial data (0)     & 0 \\
 order            & Remove baseline polynomial of this order (0 = remove mean)          & 0 \\
 badfrac          & If this fraction (or greater) of samples are bad, ignore entire bolometer            & 0.05 \\
 flagstat         & Ignore data while telescope moving slower than this (arcsec/sec)    & 2 \\

@@ -50,8 +50,10 @@
 *        Store a value for the "apod_length" component of the filter structure.
 *     2010-07-22 (DSB):
 *        Use a dynamic default for APOD based on frequency.
-*    2010-09-23 (EC):
+*     2010-09-23 (EC):
 *        Choose filter edges based on scanvel (stored in hdr)
+*     2010-09-29 (DSB):
+*        Switch off apodisation unless the data is to be padded with zeros.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -180,28 +182,40 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap,
 
     /* If no apodisation length has been given, use a default of
        1/(steptime*freq) where freq is the lowest edge or notch
-       frequency. */
+       frequency. We only apodise if we are padding data with zeros. */
+    astMapGet0I( keymap, "ZEROPAD", &ival );
+    if( ival ) {
+       if( astMapGet0I( keymap, "APOD", &ival ) ) {
+          filt->apod_length = ival;
 
-    if( astMapGet0I( keymap, "APOD", &ival ) ) {
-       filt->apod_length = ival;
+       } else {
+
+       if( astMapGet0I( keymap, "APOD", &ival ) ) {
+          filt->apod_length = ival;
+
+       } else {
+
+         f_low = ( f_edgehigh > 0.0 ) ? f_edgehigh : VAL__MAXD;
+         if( f_edgelow > 0.0 && f_edgelow < f_low ) f_low = f_edgelow;
+         for( i = 0; i < f_nnotch; i++ ) {
+           if( f_notchlow[ i ] > 0.0 && f_notchlow[ i ] < f_low ) f_low = f_notchlow[ i ];
+         }
+
+         if( f_low != VAL__MAXD ) {
+            filt->apod_length = 0.5*filt->df*filt->ntslice/f_low;
+         } else {
+            filt->apod_length = 0;
+         }
+
+         msgSeti( "P", (int) filt->apod_length );
+         msgOutif( MSG__VERB, "", "Apodising ^P samples at start and end of "
+                   "each time stream.", status );
+      }
 
     } else {
-
-      f_low = ( f_edgehigh > 0.0 ) ? f_edgehigh : VAL__MAXD;
-      if( f_edgelow > 0.0 && f_edgelow < f_low ) f_low = f_edgelow;
-      for( i = 0; i < f_nnotch; i++ ) {
-        if( f_notchlow[ i ] > 0.0 && f_notchlow[ i ] < f_low ) f_low = f_notchlow[ i ];
-      }
-
-      if( f_low != VAL__MAXD ) {
-         filt->apod_length = 0.5*filt->df*filt->ntslice/f_low;
-      } else {
-         filt->apod_length = 0;
-      }
-
-      msgSeti( "P", (int) filt->apod_length );
-      msgOutif( MSG__VERB, "", "Apodising ^P samples at start and end of "
-                "each time stream.", status );
+      filt->apod_length = 0;
+      msgOutif( MSG__VERB, "", " Data will not be apodised since time streams "
+                "are being padded with artificial data rather than zeros.", status );
     }
   }
 }
