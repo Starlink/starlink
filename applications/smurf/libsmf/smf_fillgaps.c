@@ -65,6 +65,8 @@
 *        than the offset at the boundary of the good data.
 *     2010-09-28 (DSB):
 *        Replace padding if "mask" includes SMF__Q_PAD.
+*     2010-09-30 (DSB):
+*        Do not look for gaps within the padding. 
 
 *  Copyright:
 *     Copyright (C) 2010 Univeristy of British Columbia.
@@ -120,6 +122,7 @@ typedef struct smfFillGapsData {
   dim_t ntslice;                /* Number of time slices */
   double *dat;                  /* Pointer to bolo data */
   gsl_rng *r;                   /* GSL random number generator */
+  int fillpad;                  /* Fill PAD samples? */
   size_t b1;                    /* Index of first bolometer to be filledd */
   size_t b2;                    /* Index of last bolometer to be filledd */
   size_t bstride;               /* bolo stride */
@@ -148,6 +151,7 @@ void  smf_fillgaps( smfWorkForce *wf, smfData *data,
   dim_t ntslice;                /* Number of time slices */
   double *dat=NULL;             /* Pointer to bolo data */
   gsl_rng *r;                   /* GSL random number generator */
+  int fillpad;                  /* Fill PAD samples? */
   size_t bstride;               /* bolo stride */
   size_t pend;                  /* Last non-PAD sample */
   size_t pstart;                /* First non-PAD sample */
@@ -199,19 +203,19 @@ void  smf_fillgaps( smfWorkForce *wf, smfData *data,
   type = gsl_rng_default;
   r = gsl_rng_alloc (type);
 
+  /* Find the indices of the first and last non-PAD sample. */
+  smf_get_goodrange( qua, ntslice, tstride, SMF__Q_PAD, &pstart, &pend,
+                     status );
+
   /* If the supplied "mask" value includes SMF__Q_PAD, then we will be
   replacing the zero-padded region at the start and end of each time series
   with artificial noisey data that connects the first and last data values
-  smoothly. Remove SMF__Q_PAD from the mask, and find the indices of the
-  first and last non-PAD sample. If we are not replacing zero-padded samples,
-  set pstart and pend to indicate this. */
+  smoothly. Remove SMF__Q_PAD from the mask. */
   if( mask & SMF__Q_PAD ) {
      mask &= ~SMF__Q_PAD;
-     smf_get_goodrange( qua, ntslice, tstride, SMF__Q_PAD, &pstart, &pend,
-                        status );
+     fillpad = 1;
   } else {
-     pstart = 0;
-     pend = ntslice - 1;
+     fillpad = 0;
   }
 
   /* Begin a job context. */
@@ -230,6 +234,7 @@ void  smf_fillgaps( smfWorkForce *wf, smfData *data,
     pdata->b1 = i;
     pdata->b2 = i + bpt - 1;
     pdata->pend = pend;
+    pdata->fillpad = fillpad;
     pdata->pstart = pstart;
     if( pdata->b2 >= nbolo ) pdata->b2 = nbolo - 1;
     pdata->bstride = bstride;
@@ -289,10 +294,10 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
   double y[ BOX ];              /* Array of sample values */
   gsl_rng *r;                   /* GSL random number generator */
   int count;                    /* No. of unflagged since last flagged sample */
+  int fillpad;                  /* Fill PAD samples ? */
   int flagged;                  /* Is the current sample flagged? */
   int inside;                   /* Was previous sample flagged? */
   int jend;                     /* Index of last flagged sample in block */
-  int jfinal;                   /* Final time-slice index */
   int jj;                       /* Time-slice index */
   int jstart;                   /* Index of first flagged sample in block */
   int k;                        /* Loop count */
@@ -326,9 +331,7 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
   mask = pdata->mask;
   pend = pdata->pend;
   pstart = pdata->pstart;
-
-   /* Pre-calculate a useful constant - the final used value of "j". */
-  jfinal = ntslice - 1;
+  fillpad = pdata->fillpad;
 
   /* Loop over bolometer */
   for( i = b1; i <= b2; i++ ) if( !(qua[ i*bstride ] & SMF__Q_BADB) ) {
@@ -350,7 +353,7 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
     /* Loop over time series. In this loop we fill gaps within the body
        of the time series. Filling of the padded regions at start and end
        is left until the loop has ended. */
-    for( j=0; j<ntslice; j++ ) {
+    for( j = pstart; j <= pend; j++ ) {
 
       /* Is this sample flagged? Always condsider the last sample to be
          unflagged, so that any block of flagged samples at the end of
@@ -359,7 +362,7 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
       flagged = ( qua[ i*bstride + j*tstride ] & mask ) ||
                 ( dat[ i*bstride + j*tstride ] == VAL__BADD );
 
-      if( flagged && (int) j < jfinal ) {
+      if( flagged && (int) j < (int) pend ) {
 
         /* If this is the first flagged sample in a new block of flagged
            samples, set "inside" to indicate that we are now inside a
@@ -409,7 +412,7 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
            the previous block of flagged samples, we can replace the block.
            Also replace the block if we have reached the end of the time
            series. */
-        if( ( count == BOX || (int) j == jfinal ) && jend >= jstart ) {
+        if( ( count == BOX || (int) j == (int) pend ) && jend >= jstart ) {
 
           /* If the block is only a single pixel wide, just replace it
              with the mean of the two neighbouring sample values. */
@@ -417,7 +420,7 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
               if( jend == 0 ) {
                  dat[ i*bstride + jend*tstride ] =
                          dat[ i*bstride + ( jend + 1 )*tstride ];
-              } else if( jend == jfinal ) {
+              } else if( jend == (int) pend ) {
                  dat[ i*bstride + jend*tstride ] =
                          dat[ i*bstride + ( jend - 1 )*tstride ];
               } else {
@@ -434,7 +437,7 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
                the end of the flagged block. */
             rightstart = jend + 1;
             rightend = jend + BOX;
-            if( rightend >= (int) ntslice ) rightend = ntslice - 1;
+            if( rightend > (int) pend ) rightend = pend;
             if( rightend - rightstart > BOX/2 ) {
               k = 0;
               for( jj = rightstart; jj <= rightend; jj++,k++ ) {
@@ -483,7 +486,7 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
               grad = 0.0;
               offset = mr*( jend + 1 ) + cr;
 
-            } else if( jend >= jfinal || mr == VAL__BADD || cr == VAL__BADD  ) {
+            } else if( jend >= (int) pend || mr == VAL__BADD || cr == VAL__BADD  ) {
               grad = 0.0;
               offset = ml*( jstart - 1 ) + cl;
 
@@ -515,7 +518,7 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
       smoothly. First, fit a straight line to the BOX samples at the end of
       the time stream. The above filling of gaps ensures the data values
       will not be bad. */
-    if( pstart > 0 && pend < ntslice - 1 ) {
+    if( fillpad ) {
       leftstart = pend - BOX + 1;
       leftend = pend;
       k = 0;
