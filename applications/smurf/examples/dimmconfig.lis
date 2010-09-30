@@ -135,6 +135,14 @@ order = 0
 # for PAD which is set up in smurf_makemap.def.
 apod = <undef>
 
+# If zeropad is set, the padded regions are set to 0, and apodization
+# is used to slowly roll-off the ends of the time series to 0. If zeropad
+# is not set, a cubic is used to smoothly interpolate the end of the time
+# series with the beginning (ensuring continuity in both the value and
+# first derivative). In both cases, the purpose is to remove sharp edges
+# that may cause ringing in the later FFT filtering steps.
+zeropad = 1
+
 # --- badfrac ensures that bad data from DA system are ignored ---
 
 # fraction of samples to be bad to flag entire bolo as dead
@@ -329,8 +337,8 @@ dks.replacebad = 0
 # additional despiking / DC step finding after each iteration within noi
 # calculation. Setting noi.spikebox to 50 will check for excursions
 # from a rolling median filter in a box of length 50 samples.
-noi.spikethresh = 10
-noi.spikebox = 50
+#noi.spikethresh = 10
+#noi.spikebox = 50
 noi.fillgaps = 1
 
 # explicitly turn off iterative DC step finding for now
@@ -340,12 +348,14 @@ noi.dcfitbox = 0
 flt.apod = <undef>
 
 # iterative filter.
-450.flt.filt_edgehigh = 0.1
-850.flt.filt_edgehigh = 0.3
-
+#450.flt.filt_edgehigh = 0.1
+#850.flt.filt_edgehigh = 0.3
 #flt.filt_edgelow = 90
 #flt.filt_notchlow  = (25,55)
 #flt.filt_notchhigh = (35,65)
+
+450.flt.filt_edge_largescale=600
+850.flt.filt_edge_largescale=300
 
 # delay calculation of FLT until after the first iteration? May help
 # with negative structure around bright sources
@@ -412,8 +422,7 @@ ext.taumethod =adaptive
 # of ast.mapspike indicates a SNR threshold sigma-clip based on the
 # scatter of the samples that contribute to a given pixel value about
 # the map value.
-
-#ast.mapspike = 5
+ast.mapspike = 10
 
 # Smooth the time series
 
