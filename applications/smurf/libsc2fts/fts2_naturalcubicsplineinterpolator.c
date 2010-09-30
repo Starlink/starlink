@@ -44,6 +44,7 @@
 *        - Replaced a missed malloc with astMalloc
 *        - Removed explicit casting from astMalloc calls
 *        - Adapted coding style to SMURF
+*        - Fixed the bug due to indexing
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -176,7 +177,7 @@ void fts2_naturalcubicsplineinterpolator(
       X = xNew[i] - x[index];
       X2 = X * X;
       X3 = X * X2;
-      yNew[i] = A[i] * X3 + B[i] * X2 + C[i] * X + D[i];
+      yNew[i] = A[index] * X3 + B[index] * X2 + C[index] * X + D[index];
     }
   }
   astFree(A);
