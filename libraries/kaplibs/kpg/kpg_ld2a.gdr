@@ -14,8 +14,9 @@
 *     CALL KPG_LD2Ax( NX, NY, SX, SY, NBIN, X, Y, Z, ARRAY, STATUS )
 
 *  Description:
-*     A list of x-y positions and values are converted to a complete
-*     two-dimensional array.  Missing elements take the bad value.
+*     A list of double-precision x-y positions and values are converted
+*     to a complete two-dimensional array.  Missing elements take the
+*     bad value.
 
 *  Arguments:
 *     NX = INTEGER (Given)
@@ -78,11 +79,11 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     1990 Feb 22 (MJC):
+*     1990 February 22 (MJC):
 *        Original version.
-*     2009 DEC 30 (BRADC):
+*     2009 December 30 (BRADC):
 *        Use INTEGER*8 to avoid overflow.
-*     2010 JAN 08 (PWD):
+*     2010 January 8 (PWD):
 *        Don't use Fortran 90 MIN() intrinsic, stick to Fortran 77.
 *     2010 August 27 (MJC):
 *        Made generic and renamed from LD2AR to KPG_LD2Ax.
@@ -111,7 +112,7 @@
       DOUBLE PRECISION Z( NBIN )
 
 *  Arguments Returned:
-      REAL ARRAY( NX, NY )
+      <TYPE> ARRAY( NX, NY )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -142,11 +143,11 @@
       DO  L = 1, NBIN
 
 *  Use direct assignment to convert to I*8 from REAL rather than the
-*  INT intrinsic with an f90 kind.  \It seems to give the correct
+*  INT intrinsic with an f90 kind.  It seems to give the correct
 *  promotion and truncation with g77/gfortran/g95/ifort/SUN f95/f77.
-         I = X( L ) / SX
+         I = X( L ) / DBLE( SX )
          I = MIN( I + 1, NX )
-         J = Y( L ) / SY
+         J = Y( L ) / DBLE( SY )
          J = MIN( J + 1, NY )
          ARRAY( I, J ) = NUM_DTO<T>( Z( L ) )
       END DO
