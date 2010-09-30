@@ -33,8 +33,11 @@
 # you can identify the input files from the FITS header of the
 # extension, and remove them.
 #
+# Setting shortmap=1 will give similar information, except now writing
+# out a map each time a single time around the scan pattern has been
+# completed.
+#
 # ***********************************************************
-
 
 numiter = 5
 
@@ -50,19 +53,19 @@ com.gain_abstol = 3
 # comes after all the other model components, the data should be
 # fairly flat, so this is less dangerous.
 
-noi.spikethresh = 5
+ast.spikethresh = 5
 
-# heavier high-pass filtering. Note that the default padding/apodization
+# Heavier high-pass filtering. Note that the default padding/apodization
 # that will be used is the number of samples that corresponds to the
 # period of the knee frequency in the high-pass filter (i.e. 200*(1/freq) )
 
-450.filt_edgehigh = 0.2
-450.flt.filt_edgehigh = 0.2
-450.cleandk.filt_edgehigh = 0.2
+450.filt_edge_largescale = 150
+450.flt.filt_edge_largescale = 150
+450.cleandk.filt_edge_largescale = 150
 
-850.filt_edgehigh = 0.6
-850.flt.filt_edgehigh = 0.6
-850.cleandk.filt_edgehigh = 0.6
+850.filt_edge_largescale = 150
+850.flt.filt_edge_largescale = 150
+850.cleandk.filt_edge_largescale = 150
 
 # can constrain much of the map to be zero until the final iteration
 # since the structure is very low S/N and we are after point sources,
