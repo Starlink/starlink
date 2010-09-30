@@ -13,16 +13,28 @@
 *     Function
 
 *  Invocation:
+*     fts2_getsplineindex(x, m, xNew);
+
+*  Arguments:
+*     x = double* (Given)
+*        x-array.
+*     m = int (Given)
+*        Number of x points.
+*     xNew = double (Given)
+*        The x-value of which interval index is seeked.
 
 *  Description:
-*     Given m number of x-data points returns the spline index of the specified 
+*     Given m number of x-data points returns the spline index of the specified
 *     xNew value using bisection method.
 
 *  Authors:
-*     Coskun (Josh) OBA (UoL)
+*     COBA: Coskun OBA (UoL)
 
 *  History :
-*     Created: July 9, 2010
+*     2010-07-09
+*        Original version
+*     2010-09-30
+*        - Adapted coding style to SMURF
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -61,31 +73,27 @@
 #include "fts2.h"
 
 int fts2_getsplineindex(
-    double* x, int m, 
+    double* x,
+    int m,
     double xNew)
 {
-  int index = 0;
-  int end   = 0;
-  int start = 0;
-  
-  if( xNew < x[0] || xNew > x[m -1])
-  {
+  int index = 0;  /* Current index */
+  int ni    = 0;  /* Initial index */
+  int nf    = 0;  /* Final index */
+
+  if( xNew < x[0] || xNew > x[m -1]) {
     return -1;
   }
 
-  start = 0;
-  end = m - 1;
-  while((end - start) > 1)
-  {
-    index = (start + end) >> 1;
-    if(xNew < x[index])
-    {
-      end = index;
-    }
-    else
-    {
-      start = index;
+  ni = 0;
+  nf = m - 1;
+  while(nf - ni > 1) {
+    index = (ni + nf) >> 1;
+    if(xNew > x[index]) {
+      ni = index;
+    } else {
+      nf = index;
     }
   }
-  return start;
+  return ni;
 }
