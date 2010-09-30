@@ -21,9 +21,12 @@ void kpg1Fit1d( int lbnd, int ubnd, const double *y, const double *x,
 
 *  Description:
 *     A straight line is fitted to the data supplied in X and Y, using
-*     the least-squares criterion. The returned values of M and C are
-*     the gradient and intercept of the fit, so that y = M.x + C. The
-*     RMS residual of the Y data from the fit is returned in RMS.
+*     the least-squares criterion. Data points lying further than three
+*     standard deviations from the the fitted line are rejected and the
+*     gradient and intercept are updated to exclude the rejected points.
+*     The returned values of M and C are the gradient and intercept of
+*     the fit, so that y = M.x + C. The RMS residual of the Y data from
+*     the fit, excluding rejected points, is returned in RMS.
 *
 *     An error is reported if there are less than two good data values
 *     in Y, or if the X values cover a range of zero.
@@ -78,6 +81,8 @@ void kpg1Fit1d( int lbnd, int ubnd, const double *y, const double *x,
 *  History:
 *     8-JAN-2010 (DSB):
 *        Original version (transliterated form kpg1_fit1d.f).
+*     30-SEP-2010 (DSB):
+*        Do a single 3 sigma clip.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -92,6 +97,8 @@ void kpg1Fit1d( int lbnd, int ubnd, const double *y, const double *x,
    double sxy;       /* Sum of X*Y values */
    double sy;        /* Sum of Y values */
    double syy;       /* Sum of Y squared values */
+   double fitval;    /* The value of the fitted line */
+   double thresh;    /* Rejection threshold */
    double xval;      /* X value */
    double yval;      /* Y value */
    int i;            /* Loop count */
@@ -161,6 +168,62 @@ void kpg1Fit1d( int lbnd, int ubnd, const double *y, const double *x,
          *rms = 0.0;
       } else {
          *rms = sqrt( *rms );
+      }
+
+/* Get the rejection threshold. */
+      thresh = 3.0*( *rms );
+
+/* For each point that is tto far from the line, remove the point from
+   the running sums */
+      for( i = 0; i < nel; i++ ) {
+         xval = x[ i ];
+         yval = y[ i ];
+         if( xval != VAL__BADD && yval != VAL__BADD ) {
+            fitval = ( *m )*xval + ( *c );
+            if( fabs( yval - fitval ) > thresh ) {
+               sy -= yval;
+               sx -= xval;
+               sxy -= xval*yval;
+               sxx -= xval*xval;
+               syy -= yval*yval;
+               n--;
+            }
+         }
+      }
+
+/* Report an error if there are less than 2 good data values. */
+      if( n == 0 ) {
+         *status = SAI__ERROR;
+         errRep( " ", "kpg1Fit1d: No good data values suupplied", status );
+
+      } else if( n == 1 ) {
+         *status = SAI__ERROR;
+         errRep( " ", "kpg1Fit1d: Only 1 good data value found", status );
+      }
+
+/* Form the denominator used to calculate the returned values. */
+      denom =  n*sxx - sx*sx;
+
+/* Report an error if the denominator is zero. */
+      if( denom == 0 ) {
+         *status = SAI__ERROR;
+         errRep( " ", "kpg1Fit1d: All supplied X values are equal", status );
+      }
+
+/* Form the gradient. */
+      if( *status == SAI__OK ) {
+         *m =  ( n*sxy - sx*sy )/denom;
+
+/* Form the intercept. */
+         *c =  ( sxx*sy - sx*sxy ) /denom;
+
+/* Form the RMS residual. */
+         *rms =  ( syy + ( 2.0*sx*sy*sxy - sy*sy*sxx - sxy*sxy*n )/denom)/n;
+         if( *rms <= 0.0 ) {
+            *rms = 0.0;
+         } else {
+            *rms = sqrt( *rms );
+         }
       }
    }
 }
