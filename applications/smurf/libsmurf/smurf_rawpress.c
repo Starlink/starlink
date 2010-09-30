@@ -127,7 +127,7 @@ void smurf_rawpress( int *status ) {
              &ogrp, &outsize, status );
 
   for (i=1; i<=size; i++ ) {
-    size_t colsize;
+    dim_t colsize;
     smfData *data = NULL;     /* Pointer to input data struct */
     char filename[GRP__SZNAM+1]; /* Input filename, derived from GRP */
     char fitsrec[SC2STORE__MAXFITS*80+1];
@@ -137,10 +137,10 @@ void smurf_rawpress( int *status ) {
     int indf;                 /* Input NDF identifier */
     int isthere = 0;
     size_t ncards = 0;
-    size_t nframes;
+    dim_t nframes;
     int outndf;               /* Output NDF identifier */
     char *pname;              /* Pointer to input filename */
-    size_t rowsize;
+    dim_t rowsize;
     sc2ast_subarray_t subnum;
 
     /* This is an experimental routine so we just use wrtstream
