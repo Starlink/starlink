@@ -264,6 +264,10 @@
 *        single-precision in PDA when finiding the maximum residual.
 *     2010 August 27 (MJC):
 *        Use renamed KPG_LD2AR calls (previously LD2AR).
+*     2010 August 29 (MJC):
+*        Fixed bug logging spline-fit binned values by introducing
+*        calls to the new KPG_LR2Ax that takes single-precision binned
+*        data.
 *     {enter_further_changes_here}
 
 *-
@@ -1227,11 +1231,19 @@
          CALL FIO_WRITE( FDL, 'The binned data are:', STATUS )
          CALL FIO_WRITE( FDL, ' ', STATUS )
 
-*  First convert the x-y list of binned values into a full array.
-         CALL KPG_LD2AR( MXBIN, NY, REAL( IX ), REAL( IY ),
-     :                   NBIN, %VAL( CNF_PVAL( XPTR ) ),
-     :                   %VAL( CNF_PVAL( YPTR ) ),
-     :                   %VAL( CNF_PVAL( ZPTR ) ), BINNED, STATUS )
+*  Convert the x-y list of binned values into a full array, using the
+*  appropriate routine for the bins.
+         IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+            CALL KPG_LD2AR( MXBIN, NY, REAL( IX ), REAL( IY ),
+     :                      NBIN, %VAL( CNF_PVAL( XPTR ) ),
+     :                      %VAL( CNF_PVAL( YPTR ) ),
+     :                      %VAL( CNF_PVAL( ZPTR ) ), BINNED, STATUS )
+         ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
+            CALL KPG_LR2AR( MXBIN, NY, REAL( IX ), REAL( IY ),
+     :                      NBIN, %VAL( CNF_PVAL( XPTR ) ),
+     :                      %VAL( CNF_PVAL( YPTR ) ),
+     :                      %VAL( CNF_PVAL( ZPTR ) ), BINNED, STATUS )
+         END IF
 
 *  Write it out to the log file, already opened, hence the junk name.
          CALL LISTSB( BINNED, MXBIN, MXBIN, 1, 1, NX, NY,
@@ -1243,11 +1255,19 @@
      :                   STATUS )
          CALL FIO_WRITE( FDL, ' ', STATUS )
 
-*  First convert the x-y list of binned values into a full array.
-         CALL KPG_LD2AR( MXBIN, NY, REAL( IX ), REAL( IY ),
-     :                   NBIN, %VAL( CNF_PVAL( XPTR ) ),
-     :                   %VAL( CNF_PVAL( YPTR ) ),
-     :                   %VAL( CNF_PVAL( WPTR ) ), BINNED, STATUS )
+*  Convert the x-y list of binned values into a full array, using the
+*  appropriate routine for the bins.
+         IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+            CALL KPG_LD2AR( MXBIN, NY, REAL( IX ), REAL( IY ),
+     :                      NBIN, %VAL( CNF_PVAL( XPTR ) ),
+     :                      %VAL( CNF_PVAL( YPTR ) ),
+     :                      %VAL( CNF_PVAL( WPTR ) ), BINNED, STATUS )
+         ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
+            CALL KPG_LR2AR( MXBIN, NY, REAL( IX ), REAL( IY ),
+     :                      NBIN, %VAL( CNF_PVAL( XPTR ) ),
+     :                      %VAL( CNF_PVAL( YPTR ) ),
+     :                      %VAL( CNF_PVAL( WPTR ) ), BINNED, STATUS )
+         END IF
 
 *  Write it out to the log file, already opened, hence the junk name.
          CALL LISTSB( BINNED, MXBIN, MXBIN, 1, 1, NX, NY,
@@ -1568,12 +1588,21 @@
          CALL FIO_WRITE( FDL, 'The fitted binned data are:', STATUS )
          CALL FIO_WRITE( FDL, ' ', STATUS )
 
-*  First convert the x-y list of binned values into a full array.
-         CALL KPG_LD2AR( MXBIN, NY, REAL( IX ), REAL( IY ), NBIN,
-     :                   %VAL( CNF_PVAL( XPTR ) ),
-     :                   %VAL( CNF_PVAL( YPTR ) ),
-     :                   %VAL( CNF_PVAL( FITPTR ) ),
-     :                   BINNED, STATUS )
+*  Convert the x-y list of binned values into a full array, using the
+*  appropriate routine for the bins.
+         IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+            CALL KPG_LD2AR( MXBIN, NY, REAL( IX ), REAL( IY ), NBIN,
+     :                      %VAL( CNF_PVAL( XPTR ) ),
+     :                      %VAL( CNF_PVAL( YPTR ) ),
+     :                      %VAL( CNF_PVAL( FITPTR ) ),
+     :                      BINNED, STATUS )
+         ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
+            CALL KPG_LR2AR( MXBIN, NY, REAL( IX ), REAL( IY ), NBIN,
+     :                      %VAL( CNF_PVAL( XPTR ) ),
+     :                      %VAL( CNF_PVAL( YPTR ) ),
+     :                      %VAL( CNF_PVAL( FITPTR ) ),
+     :                      BINNED, STATUS )
+         END IF
 
 *  Write it out to the log file, already opened, hence the junk name.
          CALL LISTSB( BINNED, MXBIN, MXBIN, 1, 1, NX, NY,
@@ -1585,12 +1614,21 @@
      :                   /'are:', STATUS )
          CALL FIO_WRITE( FDL, ' ', STATUS )
 
-*  First convert the x-y list of binned values into a full array.
-         CALL KPG_LD2AR( MXBIN, NY, REAL( IX ), REAL( IY ), NBIN,
-     :                   %VAL( CNF_PVAL( XPTR ) ),
-     :                   %VAL( CNF_PVAL( YPTR ) ),
-     :                   %VAL( CNF_PVAL( RESPTR ) ),
-     :                   BINNED, STATUS )
+*  Convert the x-y list of binned values into a full array, using the
+*  appropriate routine for the bins.
+         IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+            CALL KPG_LD2AR( MXBIN, NY, REAL( IX ), REAL( IY ), NBIN,
+     :                      %VAL( CNF_PVAL( XPTR ) ),
+     :                      %VAL( CNF_PVAL( YPTR ) ),
+     :                      %VAL( CNF_PVAL( RESPTR ) ),
+     :                      BINNED, STATUS )
+         ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
+            CALL KPG_LR2AR( MXBIN, NY, REAL( IX ), REAL( IY ), NBIN,
+     :                      %VAL( CNF_PVAL( XPTR ) ),
+     :                      %VAL( CNF_PVAL( YPTR ) ),
+     :                      %VAL( CNF_PVAL( RESPTR ) ),
+     :                      BINNED, STATUS )
+         END IF
 
 *  Write it out to the log file, already opened, hence the junk name.
          CALL LISTSB( BINNED, MXBIN, MXBIN, 1, 1, NX, NY,
