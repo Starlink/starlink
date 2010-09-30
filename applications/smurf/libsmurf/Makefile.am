@@ -18,6 +18,7 @@ smurf_extinction.c \
 smurf_fixsteps.c \
 smurf_flatfield.c \
 smurf_fts2_deglitch.c \
+smurf_fts2_eqsliced.c \
 smurf_fts2_flatfield.c \
 smurf_fts2_freqcorr.c \
 smurf_fts2_phasecorr.c \

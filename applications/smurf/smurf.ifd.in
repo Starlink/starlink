@@ -224,6 +224,8 @@
 #         Add FTS2_PHASECORR
 #     2010-09-21 (COBA):
 #         FTS2 ADAM params are alphabetically ordered
+#     2010-09-30 (COBA):
+#         Add FTS2_EQSLICED
 #     {enter_changes_here}
 
 #  Bugs:
@@ -1385,6 +1387,31 @@ package @PACKAGE@ {
                 ppath CURRENT DEFAULT
                 prompt {ZPD index}
                 default 200
+                helpkey *
+            }
+        }
+
+        action fts2_eqsliced {
+
+            helplib {$SMURF_HELP}
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                prompt {Input data files}
+                helpkey *
+            }
+
+            parameter out {
+                position 2
+                type NDF
+                access WRITE
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                prompt {Output data files}
                 helpkey *
             }
         }

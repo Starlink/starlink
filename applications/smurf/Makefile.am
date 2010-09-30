@@ -34,6 +34,7 @@ extinction \
 fixsteps \
 flatfield \
 fts2_deglitch \
+fts2_eqsliced \
 fts2_phasecorr \
 gsd2acsis \
 gsdshow \

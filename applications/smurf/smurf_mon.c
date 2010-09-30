@@ -133,8 +133,10 @@
 *        Add FTS2_FREQCORR, FTS2_REMOVEBSE, FTS2_SPATIALWCS
 *     2010-09-16 (EC):
 *        SCANFIT deprecated in favour of SC2CLEAN and KAPPA:MFITTREND
-*     2010-09-17 (EC):
+*     2010-09-17 (COBA):
 *        Add FTS2_DEGLITCH
+*     2010-09-30 (COBA):
+*        Add FTS2_EQSLICED
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -275,6 +277,8 @@ void smurf_mon( int * status ) {
     smurf_flatfield( status );
   } else if (strcmp( taskname, "FTS2_DEGLITCH" ) == 0 ) {
     smurf_fts2_deglitch( status );
+  } else if (strcmp( taskname, "FTS2_EQSLICED" ) == 0 ) {
+    smurf_fts2_eqsliced( status );
   } else if (strcmp( taskname, "FTS2_FREQCORR" ) == 0 ) {
     smurf_fts2_freqcorr( status );
   } else if (strcmp( taskname, "FTS2_PHASECORR" ) == 0 ) {
