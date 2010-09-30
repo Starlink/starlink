@@ -130,9 +130,9 @@ exportndf = 0
 # subtract a baseline polynomial of this order
 order = 0
 
-# Use default apodisation based on filter frequency. This over-rides the default
-# of zero in smurf_sc2clean.def. Keep the <undef> default for PAD which is set up
-# in smurf_makemap.def.
+# Use default apodisation based on filter frequency. This over-rides
+# the default of zero in smurf_sc2clean.def. Keep the <undef> default
+# for PAD which is set up in smurf_makemap.def.
 apod = <undef>
 
 # --- badfrac ensures that bad data from DA system are ignored ---
