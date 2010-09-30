@@ -1,4 +1,4 @@
-^$STARLINK_DIR/share/smurf/dimmconfig.lis
+^$STARLINK_DIR/share/smurf/dimmconfig_bright.lis
 
 # *** Specialized config for bright, isolated compact sources ***
 #
@@ -6,37 +6,16 @@
 # particular the strategy is aimed at short scans of calibrators (which
 # may be quite bright).
 #
-# The template for this configuration is dimmconfig_newfilt which is
-# identical to the default dimmconfig, except that it uses a window
-# function to handle gaps in the data, rather than gap-filling with a
-# noise realization. This method is slightly slower and uses more
-# memory, but enables us to use all of the available data, including
-# the ends of the data stream that would normally be apodized. This is
-# particularly useful for some of the very short scans used, for
-# example, for focus (as short as 10 seconds).
-# *** CURRENTLY NOT TRUE, HAVE REVERTED TO OLD METHOD FOR NOW ***
-#
-# We constrain the edges of the map using ast.zero_circle=(0.0055555),
-# which sets all pixels beyond 20 arcsec to zero until the last
-# iteration.  A word of warning: if the source is near the edge of the
-# map this configuration may give odd results due to the value of
-# ast.zero_lowhits!  If you suspect a problem, compare the location of
-# the source to the zero-masked pixels (see QUALITY component of the
-# resulting map). If the mask overlaps with the source, try modifying
-# the radius.
-#
-# Finally, we delay calculation of the common-mode (and associated
-# bolometer rejection) until after the first iteration. For short
-# scans this can be important as the astronomical signal may dominate.
+# We constrain the map using ast.zero_circle=(0.01666), which sets all
+# pixels beyond 60 arcsec to zero until the last iteration.  A word of
+# warning: if the source is near the edge of the map (or has an extent
+# large than the size of this mask!) this configuration may give odd
+# results due to the value of ast.zero_lowhits!  If you suspect a
+# problem, compare the location of the source to the zero-masked
+# pixels (see QUALITY component of the resulting map). If the mask
+# overlaps with the source, try modifying the radius.
 #
 # ***********************************************************
-
-# more iterations in case there is poor cross-linking
-numiter = 20
-
-# delay calculation of COM until after the first iteration since the source
-# may be brighter than the common-mode signal.
-com.notfirst = 1
 
 # use boundary constraints since the source is assumed to be isolated
 ast.zero_circle = (0.0166666666)

@@ -1,0 +1,30 @@
+^$STARLINK_DIR/share/smurf/dimmconfig.lis
+
+# *** Specialized config for bright sources ***
+#
+# Maps of bright sources, regardless of their physical extent,
+# generally require less aggressive rejection of bad data due to the
+# presence of strong astronomical signals (which may accidentally be
+# identified as steps, throw-off the common-mode bolometer rejection,
+# contaminate noise estimates etc.). They also generally require a
+# larger number of iterations to maximize the sensitivty to large
+# dynamic signal ranges in the map.
+#
+# ***********************************************************
+
+numiter = 20
+
+# Much weaker bolometer noise clip
+noiseclip = 10.0
+
+# Less aggressive DC step finder to avoid problems with bright sources
+dcthresh = 100
+
+# Less aggressive bolo flagging. Also, handle bolos in entire
+# chunks. Even if we get chunked common-mode flagging to work much
+# better, these maps of bright point sources may cause problems.
+
+com.corr_tol = 7
+com.gain_tol = 7
+com.gain_abstol = 5
+#com.gain_box = 600000

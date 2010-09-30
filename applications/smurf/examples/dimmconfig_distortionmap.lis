@@ -1,13 +1,11 @@
-^$STARLINK_DIR/share/smurf/dimmconfig.lis
+^$STARLINK_DIR/share/smurf/dimmconfig_bright_compact.lis
 
 # *** Specialized config for finely-spaced scans of bright sources ***
 #
 # To produce focal plane distortion maps we produce very finely-spaced
 # maps of bright calibrators so that we can produce fully-sampled images
-# for each bolometer. Bright sources can easily be confused as steps/spikes,
-# so the thresholds have been set quite high. S/N is
-# also very high, so a fairly weak high-pass filter is applied (0.1 Hz) at
-# both wavelengths.
+# for each bolometer. We start with the bright_compact config as a
+# a template.
 #
 # The bolomap=1 flag has been set. This will produce a series of
 # extensions (.MORE.SMURF.BOLOMAPS) in the main map for working
@@ -39,27 +37,7 @@ bolomap = 1
 # Do not flatfield data so that the maps are in DAC units.
 ensureflat=0
 
-# Much weaker noise clip
-noiseclip = 10.0
-
-# Less aggressive DC step finder to avoid problems with bright sources
-dcthresh = 100
-
-# ----------------------------------------------------------------------------
-# The following parameters control data-cleaning before iterations start
-# ----------------------------------------------------------------------------
-
-# Less aggressive bolo flagging. Also, handle bolos in entire
-# chunks. Even if we get chunked common-mode flagging to work much
-# better, these maps of bright point sources may cause problems.
-
-com.corr_tol = 7
-com.gain_tol = 7
-com.gain_abstol = 5
-com.gain_box = 600000
-
-# Don't do any extra de-spiking / step finding iteratively
-noi.spikethresh = 0
-noi.spikebox = 0
-noi.dcfitbox = 0
-noi.fillgaps = 0
+# map-based despiking will have a harded time since the calculation is
+# theoretical, and we also haven't flat-fielded. Back off on the threshold
+# so that we don't accidentally flag the source!
+ast.mapspike=100
