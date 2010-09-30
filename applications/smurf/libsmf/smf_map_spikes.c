@@ -55,7 +55,7 @@
 *     N. Therefore we can estimate the population variance of weighted
 *     data points that went into each map pixel as
 *
-*                   sigma^2 = sigma_m^2 * sqrt(N)
+*                          sigma^2 = N *sigma_m^2
 *
 *     The population we are considering are weighted data points, where
 *     each weight, w_i = norm/var^2, i.e. inverse variance weighting times
