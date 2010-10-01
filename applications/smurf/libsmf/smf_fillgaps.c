@@ -66,7 +66,9 @@
 *     2010-09-28 (DSB):
 *        Replace padding if "mask" includes SMF__Q_PAD.
 *     2010-09-30 (DSB):
-*        Do not look for gaps within the padding. 
+*        Do not look for gaps within the padding.
+*     2010-10-1 (DSB):
+*        Correct use of pstart and pend.
 
 *  Copyright:
 *     Copyright (C) 2010 Univeristy of British Columbia.
@@ -347,7 +349,7 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
     /* Initialise the index of the first sample to be replaced. This
        initial value is only used if there are fewer than BOX unflagged
        samples before the first block of flagged samples. */
-    jstart = 0;
+    jstart = pstart;
     jend = -1;
 
     /* Loop over time series. In this loop we fill gaps within the body
@@ -417,7 +419,7 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
           /* If the block is only a single pixel wide, just replace it
              with the mean of the two neighbouring sample values. */
           if( jend == jstart ) {
-              if( jend == 0 ) {
+              if( jend == pstart ) {
                  dat[ i*bstride + jend*tstride ] =
                          dat[ i*bstride + ( jend + 1 )*tstride ];
               } else if( jend == (int) pend ) {
@@ -457,7 +459,7 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
                the start of the flagged block. */
             leftend = jstart - 1;
             leftstart = jstart - BOX;
-            if( leftstart < 0 ) leftstart = 0;
+            if( leftstart < pstart ) leftstart = pstart;
             if( leftend - leftstart > BOX/2 ) {
               k = 0;
               for( jj = leftstart; jj <= leftend; jj++,k++ ) {
@@ -482,7 +484,7 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
 
             /* Find the gradient and offset for the straight line used to
                create the replacement values for the flagged block. */
-            if( jstart <= 0 || ml == VAL__BADD || cl == VAL__BADD  ) {
+            if( jstart <= pstart || ml == VAL__BADD || cl == VAL__BADD  ) {
               grad = 0.0;
               offset = mr*( jend + 1 ) + cr;
 
