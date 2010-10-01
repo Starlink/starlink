@@ -83,6 +83,8 @@ void kpg1Fit1d( int lbnd, int ubnd, const double *y, const double *x,
 *        Original version (transliterated form kpg1_fit1d.f).
 *     30-SEP-2010 (DSB):
 *        Do a single 3 sigma clip.
+*     1-OCT-2010 (DSB):
+*        Re-form the expressions for *rms to avoid heavy rounding errors.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -163,7 +165,7 @@ void kpg1Fit1d( int lbnd, int ubnd, const double *y, const double *x,
       *c =  ( sxx*sy - sx*sxy ) /denom;
 
 /* Form the RMS residual. */
-      *rms =  ( syy + ( 2.0*sx*sy*sxy - sy*sy*sxx - sxy*sxy*n )/denom)/n;
+      *rms = (syy - sy*sy/n - (*m)*(sxy - sx*sy/n))/n;
       if( *rms <= 0.0 ) {
          *rms = 0.0;
       } else {
@@ -218,7 +220,7 @@ void kpg1Fit1d( int lbnd, int ubnd, const double *y, const double *x,
          *c =  ( sxx*sy - sx*sxy ) /denom;
 
 /* Form the RMS residual. */
-         *rms =  ( syy + ( 2.0*sx*sy*sxy - sy*sy*sxx - sxy*sxy*n )/denom)/n;
+         *rms = (syy - sy*sy/n - (*m)*(sxy - sx*sy/n))/n;
          if( *rms <= 0.0 ) {
             *rms = 0.0;
          } else {
