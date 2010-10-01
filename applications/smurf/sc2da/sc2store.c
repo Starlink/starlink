@@ -3229,7 +3229,7 @@ int *status              /* global status (given and returned) */
        if (colnum > ubnd[SC2STORE__COL_INDEX]) ubnd[SC2STORE__COL_INDEX] = colnum;
        if (rownum > ubnd[SC2STORE__ROW_INDEX]) ubnd[SC2STORE__ROW_INDEX] = rownum;
        if (colnum < lbnd[SC2STORE__COL_INDEX]) lbnd[SC2STORE__COL_INDEX] = colnum;
-       if (colnum < lbnd[SC2STORE__ROW_INDEX]) lbnd[SC2STORE__ROW_INDEX] = rownum;
+       if (rownum < lbnd[SC2STORE__ROW_INDEX]) lbnd[SC2STORE__ROW_INDEX] = rownum;
        thistrack += 3;
      }
 
