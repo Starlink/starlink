@@ -84,7 +84,8 @@ void kpg1Fit1d( int lbnd, int ubnd, const double *y, const double *x,
 *     30-SEP-2010 (DSB):
 *        Do a single 3 sigma clip.
 *     1-OCT-2010 (DSB):
-*        Re-form the expressions for *rms to avoid heavy rounding errors.
+*        - Re-form the expressions for *rms to avoid heavy rounding errors.
+*        - Handle perfect straight lines.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -166,65 +167,71 @@ void kpg1Fit1d( int lbnd, int ubnd, const double *y, const double *x,
 
 /* Form the RMS residual. */
       *rms = (syy - sy*sy/n - (*m)*(sxy - sx*sy/n))/n;
+
+/* Do not reject any points if the RMS is zero (e.g. if the supplied data
+   is a perfect straight line). */
       if( *rms <= 0.0 ) {
          *rms = 0.0;
+
+/* If the data is not a perfect straight line, rejected 3.sigma outliers
+   and recalculate the fit. */
       } else {
          *rms = sqrt( *rms );
-      }
 
 /* Get the rejection threshold. */
-      thresh = 3.0*( *rms );
+         thresh = 3.0*( *rms );
 
 /* For each point that is tto far from the line, remove the point from
    the running sums */
-      for( i = 0; i < nel; i++ ) {
-         xval = x[ i ];
-         yval = y[ i ];
-         if( xval != VAL__BADD && yval != VAL__BADD ) {
-            fitval = ( *m )*xval + ( *c );
-            if( fabs( yval - fitval ) > thresh ) {
-               sy -= yval;
-               sx -= xval;
-               sxy -= xval*yval;
-               sxx -= xval*xval;
-               syy -= yval*yval;
-               n--;
+         for( i = 0; i < nel; i++ ) {
+            xval = x[ i ];
+            yval = y[ i ];
+            if( xval != VAL__BADD && yval != VAL__BADD ) {
+               fitval = ( *m )*xval + ( *c );
+               if( fabs( yval - fitval ) > thresh ) {
+                  sy -= yval;
+                  sx -= xval;
+                  sxy -= xval*yval;
+                  sxx -= xval*xval;
+                  syy -= yval*yval;
+                  n--;
+               }
             }
          }
-      }
 
 /* Report an error if there are less than 2 good data values. */
-      if( n == 0 ) {
-         *status = SAI__ERROR;
-         errRep( " ", "kpg1Fit1d: No good data values suupplied", status );
+         if( n == 0 ) {
+            *status = SAI__ERROR;
+            errRep( " ", "kpg1Fit1d: No good data values suupplied", status );
 
-      } else if( n == 1 ) {
-         *status = SAI__ERROR;
-         errRep( " ", "kpg1Fit1d: Only 1 good data value found", status );
-      }
+         } else if( n == 1 ) {
+            *status = SAI__ERROR;
+            errRep( " ", "kpg1Fit1d: Only 1 good data value found", status );
+         }
 
 /* Form the denominator used to calculate the returned values. */
-      denom =  n*sxx - sx*sx;
+         denom =  n*sxx - sx*sx;
 
 /* Report an error if the denominator is zero. */
-      if( denom == 0 ) {
-         *status = SAI__ERROR;
-         errRep( " ", "kpg1Fit1d: All supplied X values are equal", status );
-      }
+         if( denom == 0 ) {
+            *status = SAI__ERROR;
+            errRep( " ", "kpg1Fit1d: All supplied X values are equal", status );
+         }
 
 /* Form the gradient. */
-      if( *status == SAI__OK ) {
-         *m =  ( n*sxy - sx*sy )/denom;
+         if( *status == SAI__OK ) {
+            *m =  ( n*sxy - sx*sy )/denom;
 
 /* Form the intercept. */
-         *c =  ( sxx*sy - sx*sxy ) /denom;
+            *c =  ( sxx*sy - sx*sxy ) /denom;
 
 /* Form the RMS residual. */
-         *rms = (syy - sy*sy/n - (*m)*(sxy - sx*sy/n))/n;
-         if( *rms <= 0.0 ) {
-            *rms = 0.0;
-         } else {
-            *rms = sqrt( *rms );
+            *rms = (syy - sy*sy/n - (*m)*(sxy - sx*sy/n))/n;
+            if( *rms <= 0.0 ) {
+               *rms = 0.0;
+            } else {
+               *rms = sqrt( *rms );
+            }
          }
       }
    }
