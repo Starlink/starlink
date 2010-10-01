@@ -1739,6 +1739,7 @@ void smurf_makemap( int *status ) {
     if( bolrootgrp ) grpDelet( &bolrootgrp, status );
     if( iterrootgrp ) grpDelet( &iterrootgrp, status );
     if( shortrootgrp ) grpDelet( &shortrootgrp, status );
+    if( flagrootgrp ) grpDelet( &flagrootgrp, status );
 
     /* free the hits map */
     hitsmap = astFree( hitsmap );
