@@ -61,6 +61,8 @@ void kpg1Ky2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
 *        Original version.
 *     2010-09-23 (TIMJ):
 *        Fix arrays of strings.
+*     2010-09-30 (TIMJ):
+*        Make sure that we are using the correct status pointer in AST.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -81,6 +83,7 @@ void kpg1Ky2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
    int j;
    int lenc;
    int nval;
+   int *oldstat = NULL;
    int size;
    int type;
    int veclen;
@@ -90,9 +93,14 @@ void kpg1Ky2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
 /* Check inherited status */
    if( *status != SAI__OK ) return;
 
+/* Make sure that we are checking AST status */
+   oldstat = astWatch( status );
+
 /* Loop round each entry in the KeyMap. */
    size = astMapSize( keymap );
    for( i = 0; i < size; i++ ) {
+
+     if (*status != SAI__OK) break;
 
 /*  Get the key. the data type and the vector length for the current
    KeyMap entry. */
@@ -232,6 +240,10 @@ void kpg1Ky2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
                  "unusable data type (^T) (programming error).", status );
       }
    }
+
+/* Reset AST status */
+   astWatch( oldstat );
+
 }
 
 
