@@ -142,12 +142,18 @@ void kpg1Fit1d( int lbnd, int ubnd, const double y[], const double x[],
 
 /* Report an error if there are less than 2 good data values. */
    if( n == 0 ) {
-      *status = SAI__ERROR;
-      errRep( " ", "kpg1Fit1d: No good data values suupplied", status );
+     if( *status == SAI__OK ) {
+       *status = SAI__ERROR;
+       errRepf( " ", "kpg1Fit1d: Out of %d data values supplied none were good", status, nel );
+     }
+     return;
 
    } else if( n == 1 ) {
-      *status = SAI__ERROR;
-      errRep( " ", "kpg1Fit1d: Only 1 good data value found", status );
+     if( *status == SAI__OK ) {
+       *status = SAI__ERROR;
+       errRepf( " ", "kpg1Fit1d: Out of %d data values supplied only 1 was good", status, nel );
+     }
+     return;
    }
 
 /* Form the denominator used to calculate the returned values. */
@@ -155,8 +161,11 @@ void kpg1Fit1d( int lbnd, int ubnd, const double y[], const double x[],
 
 /* Report an error if the denominator is zero. */
    if( denom == 0 ) {
-      *status = SAI__ERROR;
-      errRep( " ", "kpg1Fit1d: All supplied X values are equal", status );
+     if( *status == SAI__OK ) {
+       *status = SAI__ERROR;
+       errRepf( " ", "kpg1Fit1d: All %d supplied X values are equal", status, nel );
+     }
+     return;
    }
 
 /* Form the gradient. */
@@ -202,12 +211,15 @@ void kpg1Fit1d( int lbnd, int ubnd, const double y[], const double x[],
 
 /* Report an error if there are less than 2 good data values. */
          if( n == 0 ) {
-            *status = SAI__ERROR;
-            errRep( " ", "kpg1Fit1d: No good data values suupplied", status );
-
+           if( *status == SAI__OK ) {
+             *status = SAI__ERROR;
+             errRep( " ", "kpg1Fit1d: No good data values supplied after sigma clipping", status );
+           }
          } else if( n == 1 ) {
-            *status = SAI__ERROR;
-            errRep( " ", "kpg1Fit1d: Only 1 good data value found", status );
+           if( *status == SAI__OK ) {
+             *status = SAI__ERROR;
+             errRep( " ", "kpg1Fit1d: Only 1 good data value found afte sigma clipping", status );
+           }
          }
 
 /* Form the denominator used to calculate the returned values. */
@@ -215,8 +227,10 @@ void kpg1Fit1d( int lbnd, int ubnd, const double y[], const double x[],
 
 /* Report an error if the denominator is zero. */
          if( denom == 0 ) {
-            *status = SAI__ERROR;
-            errRep( " ", "kpg1Fit1d: All supplied X values are equal", status );
+           if( *status == SAI__OK ) {
+             *status = SAI__ERROR;
+             errRep( " ", "kpg1Fit1d: All supplied X values are equal after sigma clipping", status );
+           }
          }
 
 /* Form the gradient. */
