@@ -33,7 +33,7 @@ void kpg1Ky2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
 *        The inherited status.
 
 *  Copyright:
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2008, 2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -54,6 +54,7 @@ void kpg1Ky2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
 
 *  Authors:
 *     DSB: David S. Berry
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -63,6 +64,8 @@ void kpg1Ky2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
 *        Fix arrays of strings.
 *     2010-09-30 (TIMJ):
 *        Make sure that we are using the correct status pointer in AST.
+*     2010-10-01 (TIMJ):
+*        Sort the keys when writing to HDS structured.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -83,6 +86,7 @@ void kpg1Ky2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
    int j;
    int lenc;
    int nval;
+   char *oldsortby;
    int *oldstat = NULL;
    int size;
    int type;
@@ -95,6 +99,18 @@ void kpg1Ky2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
 
 /* Make sure that we are checking AST status */
    oldstat = astWatch( status );
+
+/* If set, save the old SortBy value and then ensure alphabetical sorting.
+   We need to take a copy of the original string since the buffer in which
+   the string is stored may be re-used by subsequent incocations of astGetC.  */
+   if( astTest( keymap, "SortBy" ) ) {
+      int nc = 0;
+      oldsortby = astAppendString( NULL, &nc, astGetC( keymap, "SortBy" ) );
+   } else {
+      oldsortby = NULL;
+   }
+   astSet( keymap, "SortBy=KeyUp" );
+
 
 /* Loop round each entry in the KeyMap. */
    size = astMapSize( keymap );
@@ -239,6 +255,15 @@ void kpg1Ky2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
          errRep( "", "kpg1Ky2hd: Supplied KeyMap contains entries with "
                  "unusable data type (^T) (programming error).", status );
       }
+   }
+
+/* If it was originally set, re-instate the old SortBy value in the KeyMap,
+   then free the memory. Otherwise, clear the SortBy attribute. */
+   if( oldsortby ) {
+      astSetC( keymap, "SortBy", oldsortby );
+      oldsortby = astFree( oldsortby );
+   } else {
+      astClear( keymap, "SortBy" );
    }
 
 /* Reset AST status */
