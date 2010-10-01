@@ -1,9 +1,10 @@
 #include "mers.h"
 #include "sae_par.h"
 #include "prm_par.h"
+#include "kaplibs.h"
 #include <math.h>
 
-void kpg1Fit1d( int lbnd, int ubnd, const double *y, const double *x,
+void kpg1Fit1d( int lbnd, int ubnd, const double y[], const double x[],
                 double *m, double *c, double *rms, int *status ){
 /*
 *  Name:
