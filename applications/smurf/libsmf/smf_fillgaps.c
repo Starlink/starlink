@@ -121,7 +121,7 @@
    filled by each thread. */
 typedef struct smfFillGapsData {
   dim_t nbolo;                  /* Number of bolos */
-  dim_t ntslice;                /* Number of time slices */
+  int ntslice;                  /* Number of time slices */
   double *dat;                  /* Pointer to bolo data */
   gsl_rng *r;                   /* GSL random number generator */
   int fillpad;                  /* Fill PAD samples? */
@@ -129,8 +129,8 @@ typedef struct smfFillGapsData {
   size_t b2;                    /* Index of last bolometer to be filledd */
   size_t bstride;               /* bolo stride */
   size_t tstride;               /* time slice stride */
-  size_t pend;                  /* Last non-PAD sample */
-  size_t pstart;                /* First non-PAD sample */
+  int pend;                     /* Last non-PAD sample */
+  int pstart;                   /* First non-PAD sample */
   smf_qual_t *qua;              /* Pointer to quality array */
   smf_qual_t mask;              /* Quality mask for bad samples */
 } smfFillGapsData;
@@ -268,9 +268,9 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
 
 /* Local Variables */
   dim_t i;                      /* Bolometer index */
-  dim_t j;                      /* Time-slice index */
+  int j;                        /* Time-slice index */
   dim_t nbolo;                  /* Number of bolos */
-  dim_t ntslice;                /* Number of time slices */
+  int ntslice;                /* Number of time slices */
   double *dat = NULL;           /* Pointer to bolo data */
   double a;                     /* Cubic interpolation coefficient */
   double b;                     /* Cubic interpolation coefficient */
@@ -310,8 +310,8 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
   size_t b1;                    /* Index of first bolometer to be filledd */
   size_t b2;                    /* Index of last bolometer to be filledd */
   size_t bstride;               /* bolo stride */
-  size_t pend;                  /* Last non-PAD sample */
-  size_t pstart;                /* First non-PAD sample */
+  int pend;                  /* Last non-PAD sample */
+  int pstart;                /* First non-PAD sample */
   size_t tstride;               /* time slice stride */
   smfFillGapsData *pdata = NULL;/* Pointer to job data */
   smf_qual_t *qua = NULL;       /* Pointer to quality array */
@@ -364,7 +364,7 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
       flagged = ( qua[ i*bstride + j*tstride ] & mask ) ||
                 ( dat[ i*bstride + j*tstride ] == VAL__BADD );
 
-      if( flagged && (int) j < (int) pend ) {
+      if( flagged && j <  pend ) {
 
         /* If this is the first flagged sample in a new block of flagged
            samples, set "inside" to indicate that we are now inside a
@@ -414,7 +414,7 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
            the previous block of flagged samples, we can replace the block.
            Also replace the block if we have reached the end of the time
            series. */
-        if( ( count == BOX || (int) j == (int) pend ) && jend >= jstart ) {
+        if( ( count == BOX || j == pend ) && jend >= jstart ) {
 
           /* If the block is only a single pixel wide, just replace it
              with the mean of the two neighbouring sample values. */
@@ -422,7 +422,7 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
               if( jend == pstart ) {
                  dat[ i*bstride + jend*tstride ] =
                          dat[ i*bstride + ( jend + 1 )*tstride ];
-              } else if( jend == (int) pend ) {
+              } else if( jend == pend ) {
                  dat[ i*bstride + jend*tstride ] =
                          dat[ i*bstride + ( jend - 1 )*tstride ];
               } else {
@@ -439,7 +439,7 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
                the end of the flagged block. */
             rightstart = jend + 1;
             rightend = jend + BOX;
-            if( rightend > (int) pend ) rightend = pend;
+            if( rightend > pend ) rightend = pend;
             if( rightend - rightstart > BOX/2 ) {
               k = 0;
               for( jj = rightstart; jj <= rightend; jj++,k++ ) {
@@ -488,7 +488,7 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
               grad = 0.0;
               offset = mr*( jend + 1 ) + cr;
 
-            } else if( jend >= (int) pend || mr == VAL__BADD || cr == VAL__BADD  ) {
+            } else if( jend >= pend || mr == VAL__BADD || cr == VAL__BADD  ) {
               grad = 0.0;
               offset = ml*( jstart - 1 ) + cl;
 
@@ -562,7 +562,7 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
       f = sigmar - sigmal;
 
       /* Replace the padding at the end of the time stream. */
-      for( jj = pend + 1; jj < (int) ntslice; jj++ ) {
+      for( jj = pend + 1; jj < ntslice; jj++ ) {
          nx = ( jj - pend )/dlen;
          nx2 = nx*nx;
          dat[ i*bstride + jj*tstride ] = a*nx2*nx + b*nx2 + c*nx + d +
@@ -570,7 +570,7 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
       }
 
       /* Replace the padding at the start of the time stream. */
-      for( jj = 0; jj < (int) pstart; jj++ ) {
+      for( jj = 0; jj < pstart; jj++ ) {
          nx = ( jj - pend + ntslice )/dlen;
          nx2 = nx*nx;
          dat[ i*bstride + jj*tstride ] = a*nx2*nx + b*nx2 + c*nx + d +
