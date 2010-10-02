@@ -9,7 +9,7 @@
       double precision dval, dvec(2)
       logical gota, gotc, gotd, goti, gotr, gotw, lval
       real rval
-      integer*2 wval,wvec(2)
+      integer*2 sval,svec(2)
 
       status = sai__ok
       call err_mark( status )
@@ -21,7 +21,7 @@ c      call ast_watchmemory( 29286 )
 
       map = ast_keymap( ' ', status )
 
-      call ast_MapPut0w( map, 'Fredw', 1999, 'com 1', status )
+      call ast_MapPut0s( map, 'Freds', 1999, 'com 1', status )
       call ast_MapPut0i( map, 'Fredi', 1999, 'com 1', status )
       call ast_MapPut0d( map, 'Fredd', 1999.9D0, 'com2 ', status )
       call ast_MapPut0r( map, 'Fredr', 1999.9, 'com2 ', status )
@@ -97,7 +97,7 @@ c      call ast_watchmemory( 29286 )
             goti = .true.
          else if( .not. gotd .and. key .eq. 'Fredd' ) then
             gotd = .true.
-         else if( .not. gotw .and. key .eq. 'Fredw' ) then
+         else if( .not. gotw .and. key .eq. 'Freds' ) then
             gotw = .true.
          else if( .not. gotr .and. key .eq. 'Fredr' ) then
             gotr = .true.
@@ -127,9 +127,9 @@ c      call ast_watchmemory( 29286 )
          call stopit( status, 'Error 2' )
       end if
 
-      if( .not. ast_mapget0w( map2, 'Fredw', wval, status ) ) then
+      if( .not. ast_mapget0s( map2, 'Freds', sval, status ) ) then
          call stopit( status, 'Error 1' )
-      else if( wval .ne. 1999 ) then
+      else if( sval .ne. 1999 ) then
          write(*,*) ival
          call stopit( status, 'Error 2B' )
       end if
@@ -194,10 +194,10 @@ c      call ast_watchmemory( 29286 )
          call stopit( status, 'Error 15' )
       end if
 
-      if( .not. ast_mapget0w( map2, 'Fredd', wval, status ) ) then
+      if( .not. ast_mapget0s( map2, 'Fredd', sval, status ) ) then
          call stopit( status, 'Error 14b' )
-      else if( wval .ne. 2000.0 ) then
-         write(*,*) wval
+      else if( sval .ne. 2000.0 ) then
+         write(*,*) sval
          call stopit( status, 'Error 15b' )
       end if
 
@@ -272,12 +272,12 @@ c      call ast_watchmemory( 29286 )
 
       end if
 
-      wvec(1)=1999
-      wvec(2)=0
-      call ast_mapput1w( map, 'Fredw', 2, wvec, 'com 1', STATUS )
+      svec(1)=1999
+      svec(2)=0
+      call ast_mapput1s( map, 'Freds', 2, svec, 'com 1', STATUS )
 
-      if( ast_maplength( map, 'Fredw', status ) .ne. 2 ) then
-         write(*,*) ast_maplength( map, 'Fredw', status )
+      if( ast_maplength( map, 'Freds', status ) .ne. 2 ) then
+         write(*,*) ast_maplength( map, 'Freds', status )
          call stopit( status, 'Error 29c' )
 
       end if
@@ -894,7 +894,7 @@ C  Test AST_MAPPUTU and undefined values
 
       if( ast_mapget0i( map, 'GG', ival, status ) ) then
          call stopit( status, 'Error UNDEF_1' )
-      else if( ast_mapget0w( map, 'GG', wval, status ) ) then
+      else if( ast_mapget0s( map, 'GG', sval, status ) ) then
          call stopit( status, 'Error UNDEF_1B' )
       else if( ast_mapget0c( map, 'GG', cval, l, status ) ) then
          call stopit( status, 'Error UNDEF_2' )

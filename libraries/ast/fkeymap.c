@@ -182,7 +182,7 @@ F77_SUBROUTINE(ast_mapput0i)( INTEGER(THIS),
    )
 }
 
-F77_SUBROUTINE(ast_mapput0w)( INTEGER(THIS),
+F77_SUBROUTINE(ast_mapput0s)( INTEGER(THIS),
                               CHARACTER(KEY),
                               WORD(VALUE),
                               CHARACTER(COMMENT),
@@ -199,7 +199,7 @@ F77_SUBROUTINE(ast_mapput0w)( INTEGER(THIS),
    astWatchSTATUS(
       key = astString( KEY, KEY_length );
       comment = astString( COMMENT, COMMENT_length );
-      astMapPut0W( astI2P( *THIS ), key, *VALUE, comment );
+      astMapPut0S( astI2P( *THIS ), key, *VALUE, comment );
       astFree( key );
       astFree( comment );
    )
@@ -356,7 +356,7 @@ F77_SUBROUTINE(ast_mapput1i)( INTEGER(THIS),
 }
 
 
-F77_SUBROUTINE(ast_mapput1w)( INTEGER(THIS),
+F77_SUBROUTINE(ast_mapput1s)( INTEGER(THIS),
                               CHARACTER(KEY),
                               INTEGER(SIZE),
                               WORD_ARRAY(VALUE),
@@ -375,7 +375,7 @@ F77_SUBROUTINE(ast_mapput1w)( INTEGER(THIS),
    astWatchSTATUS(
       key = astString( KEY, KEY_length );
       comment = astString( COMMENT, COMMENT_length );
-      astMapPut1W( astI2P( *THIS ), key, *SIZE, VALUE, comment );
+      astMapPut1S( astI2P( *THIS ), key, *SIZE, VALUE, comment );
       astFree( key );
       astFree( comment );
    )
@@ -473,7 +473,7 @@ F77_LOGICAL_FUNCTION(ast_mapget0i)( INTEGER(THIS),
    return RESULT;
 }
 
-F77_LOGICAL_FUNCTION(ast_mapget0w)( INTEGER(THIS),
+F77_LOGICAL_FUNCTION(ast_mapget0s)( INTEGER(THIS),
                                     CHARACTER(KEY),
                                     WORD(VALUE),
                                     INTEGER(STATUS)
@@ -487,7 +487,7 @@ F77_LOGICAL_FUNCTION(ast_mapget0w)( INTEGER(THIS),
    astAt( "AST_MAPGET0W", NULL, 0 );
    astWatchSTATUS(
       key = astString( KEY, KEY_length );
-      RESULT = astMapGet0W( astI2P( *THIS ), key, VALUE ) ? F77_TRUE : F77_FALSE;
+      RESULT = astMapGet0S( astI2P( *THIS ), key, VALUE ) ? F77_TRUE : F77_FALSE;
       astFree( key );
    )
    return RESULT;
@@ -645,7 +645,7 @@ F77_LOGICAL_FUNCTION(ast_mapget1d)( INTEGER(THIS),
    return RESULT;
 }
 
-F77_LOGICAL_FUNCTION(ast_mapget1w)( INTEGER(THIS),
+F77_LOGICAL_FUNCTION(ast_mapget1s)( INTEGER(THIS),
                                     CHARACTER(KEY),
                                     INTEGER(MXVAL),
                                     INTEGER(NVAL),
@@ -663,7 +663,7 @@ F77_LOGICAL_FUNCTION(ast_mapget1w)( INTEGER(THIS),
    astAt( "AST_MAPGET1W", NULL, 0 );
    astWatchSTATUS(
       key = astString( KEY, KEY_length );
-      RESULT = astMapGet1W( astI2P( *THIS ), key, *MXVAL, NVAL, VALUE ) ? F77_TRUE : F77_FALSE;
+      RESULT = astMapGet1S( astI2P( *THIS ), key, *MXVAL, NVAL, VALUE ) ? F77_TRUE : F77_FALSE;
       astFree( key );
    )
    return RESULT;
@@ -978,7 +978,7 @@ F77_LOGICAL_FUNCTION(ast_mapgetelemd)( INTEGER(THIS),
    return RESULT;
 }
 
-F77_LOGICAL_FUNCTION(ast_mapgetelemw)( INTEGER(THIS),
+F77_LOGICAL_FUNCTION(ast_mapgetelems)( INTEGER(THIS),
                                        CHARACTER(KEY),
                                        INTEGER(ELEM),
                                        WORD_ARRAY(VALUE),
@@ -994,7 +994,7 @@ F77_LOGICAL_FUNCTION(ast_mapgetelemw)( INTEGER(THIS),
    astAt( "AST_MAPGETELEMW", NULL, 0 );
    astWatchSTATUS(
       key = astString( KEY, KEY_length );
-      RESULT = astMapGetElemW( astI2P( *THIS ), key, *ELEM - 1, VALUE ) ? F77_TRUE : F77_FALSE;
+      RESULT = astMapGetElemS( astI2P( *THIS ), key, *ELEM - 1, VALUE ) ? F77_TRUE : F77_FALSE;
       astFree( key );
    )
    return RESULT;
@@ -1116,7 +1116,7 @@ F77_SUBROUTINE(ast_mapputelemi)( INTEGER(THIS),
 }
 
 
-F77_SUBROUTINE(ast_mapputelemw)( INTEGER(THIS),
+F77_SUBROUTINE(ast_mapputelems)( INTEGER(THIS),
                                  CHARACTER(KEY),
                                  INTEGER(ELEM),
                                  WORD(VALUE),
@@ -1131,7 +1131,7 @@ F77_SUBROUTINE(ast_mapputelemw)( INTEGER(THIS),
    astAt( "AST_MAPPUTELEMW", NULL, 0 );
    astWatchSTATUS(
       key = astString( KEY, KEY_length );
-      astMapPutElemW( astI2P( *THIS ), key, *ELEM - 1, *VALUE );
+      astMapPutElemS( astI2P( *THIS ), key, *ELEM - 1, *VALUE );
       astFree( key );
    )
 }

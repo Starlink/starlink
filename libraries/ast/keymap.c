@@ -162,7 +162,7 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map
 *        - Initialise the sortby attribute to the cleared value, rather
 *        than the default value.
 *     2-OCT-2010 (DSB):
-*        Added support for word-valued entries.
+*        Added support for short int valued entries.
 *class--
 */
 
@@ -233,11 +233,11 @@ typedef struct Entry0D {
    double value;             /* The floating point value */
 } Entry0D;
 
-/* This structure is a AstMapEntry holding a scalar word */
-typedef struct Entry0W {
+/* This structure is a AstMapEntry holding a scalar short int */
+typedef struct Entry0S {
    struct AstMapEntry entry; /* The parent Entry information */
    short int value;          /* The short int value */
-} Entry0W;
+} Entry0S;
 
 /* This structure is a AstMapEntry holding a scalar float */
 typedef struct Entry0F {
@@ -277,11 +277,11 @@ typedef struct Entry1D {
    double *value;            /* The floating point values */
 } Entry1D;
 
-/* This structure is a AstMapEntry holding a 1D array of words */
-typedef struct Entry1W {
+/* This structure is a AstMapEntry holding a 1D array of short ints */
+typedef struct Entry1S {
    struct AstMapEntry entry; /* The parent Entry information */
    short int *value;         /* The short int values */
-} Entry1W;
+} Entry1S;
 
 /* This structure is a AstMapEntry holding a 1D array of floats */
 typedef struct Entry1F {
@@ -418,21 +418,21 @@ static int KeyCmp( const char *, const char * );
 static int MapGet0A( AstKeyMap *, const char *, AstObject **, int * );
 static int MapGet0C( AstKeyMap *, const char *, const char **, int * );
 static int MapGet0D( AstKeyMap *, const char *, double *, int * );
-static int MapGet0W( AstKeyMap *, const char *, short int *, int * );
+static int MapGet0S( AstKeyMap *, const char *, short int *, int * );
 static int MapGet0F( AstKeyMap *, const char *, float *, int * );
 static int MapGet0I( AstKeyMap *, const char *, int *, int * );
 static int MapGet0P( AstKeyMap *, const char *, void **, int * );
 static int MapGet1A( AstKeyMap *, const char *, int, int *, AstObject **, int * );
 static int MapGet1C( AstKeyMap *, const char *, int, int, int *, char *, int * );
 static int MapGet1D( AstKeyMap *, const char *, int, int *, double *, int * );
-static int MapGet1W( AstKeyMap *, const char *, int, int *, short int *, int * );
+static int MapGet1S( AstKeyMap *, const char *, int, int *, short int *, int * );
 static int MapGet1F( AstKeyMap *, const char *, int, int *, float *, int * );
 static int MapGet1I( AstKeyMap *, const char *, int, int *, int *, int * );
 static int MapGet1P( AstKeyMap *, const char *, int, int *, void **, int * );
 static int MapGetElemA( AstKeyMap *, const char *, int, AstObject **, int * );
 static int MapGetElemC( AstKeyMap *, const char *, int, int, char *, int * );
 static int MapGetElemD( AstKeyMap *, const char *, int, double *, int * );
-static int MapGetElemW( AstKeyMap *, const char *, int, short int *, int * );
+static int MapGetElemS( AstKeyMap *, const char *, int, short int *, int * );
 static int MapGetElemF( AstKeyMap *, const char *, int, float *, int * );
 static int MapGetElemI( AstKeyMap *, const char *, int, int *, int * );
 static int MapGetElemP( AstKeyMap *, const char *, int, void **, int * );
@@ -459,21 +459,21 @@ static void MapCopy( AstKeyMap *, AstKeyMap *, int * );
 static void MapPut0A( AstKeyMap *, const char *, AstObject *, const char *, int * );
 static void MapPut0C( AstKeyMap *, const char *, const char *, const char *, int * );
 static void MapPut0D( AstKeyMap *, const char *, double, const char *, int * );
-static void MapPut0W( AstKeyMap *, const char *, short int, const char *, int * );
+static void MapPut0S( AstKeyMap *, const char *, short int, const char *, int * );
 static void MapPut0F( AstKeyMap *, const char *, float, const char *, int * );
 static void MapPut0I( AstKeyMap *, const char *, int, const char *, int * );
 static void MapPut0P( AstKeyMap *, const char *, void *, const char *, int * );
 static void MapPut1A( AstKeyMap *, const char *, int, AstObject *const [], const char *, int * );
 static void MapPut1C( AstKeyMap *, const char *, int, const char *const [], const char *, int * );
 static void MapPut1D( AstKeyMap *, const char *, int, const double *, const char *, int * );
-static void MapPut1W( AstKeyMap *, const char *, int, const short int *, const char *, int * );
+static void MapPut1S( AstKeyMap *, const char *, int, const short int *, const char *, int * );
 static void MapPut1F( AstKeyMap *, const char *, int, const float *, const char *, int * );
 static void MapPut1I( AstKeyMap *, const char *, int, const int *, const char *, int * );
 static void MapPut1P( AstKeyMap *, const char *, int, void *const [], const char *, int * );
 static void MapPutElemA( AstKeyMap *, const char *, int, AstObject *, int * );
 static void MapPutElemC( AstKeyMap *, const char *, int, const char *, int * );
 static void MapPutElemD( AstKeyMap *, const char *, int, double, int * );
-static void MapPutElemW( AstKeyMap *, const char *, int, short int, int * );
+static void MapPutElemS( AstKeyMap *, const char *, int, short int, int * );
 static void MapPutElemF( AstKeyMap *, const char *, int, float, int * );
 static void MapPutElemI( AstKeyMap *, const char *, int, int, int * );
 static void MapPutElemP( AstKeyMap *, const char *, int, void *, int * );
@@ -1418,7 +1418,7 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type, int *
    int nc;                       /* Number of characters read from string */
    int nval;                     /* Number of values read from string */
    int result;                   /* Returned flag */
-   short int wval;               /* Word value */
+   short int sval;               /* Short int value */
 
 /* Initialise. */
    result = 0;
@@ -1456,8 +1456,8 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type, int *
       if( out_type == AST__INTTYPE ) {
          if( out ) *( (int *) out ) = ival;
 
-/* Consider conversion to "word". */
-      } else if( out_type == AST__WORDTYPE ) {
+/* Consider conversion to "short int". */
+      } else if( out_type == AST__SINTTYPE ) {
          if( out ) *( (short int *) out ) = (short int) ival;
 
 /* Consider conversion to "float". */
@@ -1489,29 +1489,29 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type, int *
                    out_type );
       }
 
-/* Otherwise, consider conversion from "word". */
-    } else if( raw_type == AST__WORDTYPE ) {
-      wval = *( (short int *) raw );
+/* Otherwise, consider conversion from "short int". */
+    } else if( raw_type == AST__SINTTYPE ) {
+      sval = *( (short int *) raw );
 
 /* Consider conversion to "int". */
       if( out_type == AST__INTTYPE ) {
-         if( out ) *( (int *) out ) = wval;
+         if( out ) *( (int *) out ) = sval;
 
-/* Consider conversion to "word". */
-      } else if( out_type == AST__WORDTYPE ) {
-         if( out ) *( (short int *) out ) = wval;
+/* Consider conversion to "short int". */
+      } else if( out_type == AST__SINTTYPE ) {
+         if( out ) *( (short int *) out ) = sval;
 
 /* Consider conversion to "float". */
       } else if( out_type == AST__FLOATTYPE ) {
-         if( out ) *( (float *) out ) = (float) wval;
+         if( out ) *( (float *) out ) = (float) sval;
 
 /* Consider conversion to "double". */
       } else if( out_type == AST__DOUBLETYPE ) {
-         if( out ) *( (double *) out ) = (double) wval;
+         if( out ) *( (double *) out ) = (double) sval;
 
 /* Consider conversion to "const char *". */
       } else if( out_type == AST__STRINGTYPE ) {
-         (void) sprintf( convertvalue_buff, "%d", (int) wval );
+         (void) sprintf( convertvalue_buff, "%d", (int) sval );
          cvalue = convertvalue_buff;
 
 /* Consider conversion to "AstObject *". */
@@ -1538,8 +1538,8 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type, int *
       if( out_type == AST__INTTYPE ) {
          if( out ) *( (int *) out ) = (int)( dval + 0.5 );
 
-/* Consider conversion to "word". */
-      } else if( out_type == AST__WORDTYPE ) {
+/* Consider conversion to "short int". */
+      } else if( out_type == AST__SINTTYPE ) {
          if( out ) *( (short int *) out ) = (int)( dval + 0.5 );
 
 /* Consider conversion to "double". */
@@ -1589,8 +1589,8 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type, int *
       if( out_type == AST__INTTYPE ) {
          if( out ) *( (int *) out ) = (int)( fval + 0.5 );
 
-/* Consider conversion to "word". */
-      } else if( out_type == AST__WORDTYPE ) {
+/* Consider conversion to "short int". */
+      } else if( out_type == AST__SINTTYPE ) {
          if( out ) *( (short int *) out ) = (int)( fval + 0.5 );
 
 /* Consider conversion to "double". */
@@ -1643,7 +1643,7 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type, int *
          }
 
 /* Consider conversion to "short int". */
-      } else if( out_type == AST__WORDTYPE ) {
+      } else if( out_type == AST__SINTTYPE ) {
          nc = 0;
          nval = astSscanf( cval, " %d %n", &ival, &nc );
          if( ( nval == 1 ) && ( nc >= (int) strlen( cval ) ) ) {
@@ -1711,8 +1711,8 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type, int *
       if( out_type == AST__INTTYPE ) {
          result = 0;
 
-/* Consider conversion to "word". */
-      } else if( out_type == AST__WORDTYPE ) {
+/* Consider conversion to "short int". */
+      } else if( out_type == AST__SINTTYPE ) {
          result = 0;
 
 /* Consider conversion to "double". */
@@ -1751,8 +1751,8 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type, int *
       if( out_type == AST__INTTYPE ) {
          result = 0;
 
-/* Consider conversion to "word". */
-      } else if( out_type == AST__WORDTYPE ) {
+/* Consider conversion to "short int". */
+      } else if( out_type == AST__SINTTYPE ) {
          result = 0;
 
 /* Consider conversion to "double". */
@@ -1952,12 +1952,12 @@ static AstMapEntry *CopyMapEntry( AstMapEntry *in, int *status ){
                                                   sizeof( int )*(size_t)nel );
       }
 
-/* Now deal with word entries. Scalar entries do not need any further
+/* Now deal with short int entries. Scalar entries do not need any further
    action. If this is a vector entry copy the values array. */
-   } else if( type == AST__WORDTYPE ) {
+   } else if( type == AST__SINTTYPE ) {
       if( nel > 0 ) {
-         ( (Entry1W *) result )->value = astStore( NULL,
-                                            ( (Entry1W *) in )->value,
+         ( (Entry1S *) result )->value = astStore( NULL,
+                                            ( (Entry1S *) in )->value,
                                             sizeof( short int )*(size_t)nel );
       }
 
@@ -2255,8 +2255,8 @@ static void DumpEntry( AstMapEntry *entry, AstChannel *channel, int nentry, int 
    } else if( type == AST__INTTYPE ) {
       com = "Item data type (int)";
 
-   } else if( type == AST__WORDTYPE ) {
-      com = "Item data type (word)";
+   } else if( type == AST__SINTTYPE ) {
+      com = "Item data type (short int)";
 
    } else if( type == AST__DOUBLETYPE ) {
       com = "Item data type (double)";
@@ -2299,16 +2299,16 @@ static void DumpEntry( AstMapEntry *entry, AstChannel *channel, int nentry, int 
          }
       }
 
-/* Similarly, deal with word entries. */
-   } else if( type == AST__WORDTYPE ) {
+/* Similarly, deal with short int entries. */
+   } else if( type == AST__SINTTYPE ) {
       if( entry->nel == 0 ) {
          (void) sprintf( buff, "Val%d", nentry );
-         astWriteInt( channel, buff, 1, 1, (int) ((Entry0W *)entry)->value, "Item value" );
+         astWriteInt( channel, buff, 1, 1, (int) ((Entry0S *)entry)->value, "Item value" );
       } else {
          com = "Item values";
          for( index = 0; index < nel; index++ ){
             (void) sprintf( buff, "V%d_%d", nentry, index + 1 );
-            astWriteInt( channel, buff, 1, 1, (int) ((Entry1W *)entry)->value[ index ], com );
+            astWriteInt( channel, buff, 1, 1, (int) ((Entry1S *)entry)->value[ index ], com );
             com = "";
          }
       }
@@ -2491,10 +2491,10 @@ static AstMapEntry *FreeMapEntry( AstMapEntry *in, int *status ){
    } else if( type == AST__INTTYPE ) {
       if( nel > 0 ) ( (Entry1I *) in )->value = astFree( ( (Entry1I *) in )->value );
 
-/* Now deal with word entries. Scalar entries do not need any further
+/* Now deal with short int entries. Scalar entries do not need any further
    action. If this is a vector entry free the values array. */
-   } else if( type == AST__WORDTYPE ) {
-      if( nel > 0 ) ( (Entry1W *) in )->value = astFree( ( (Entry1W *) in )->value );
+   } else if( type == AST__SINTTYPE ) {
+      if( nel > 0 ) ( (Entry1S *) in )->value = astFree( ( (Entry1S *) in )->value );
 
 /* Similarly deal with void * pointer entries. */
    } else if( type == AST__POINTERTYPE ) {
@@ -2820,8 +2820,8 @@ static int GetObjSize( AstObject *this_object, int *status ) {
          } else if( type == AST__INTTYPE ) {
             if( nel > 0 ) result += astTSizeOf( ( (Entry1I *) next )->value );
 
-         } else if( type == AST__WORDTYPE ) {
-            if( nel > 0 ) result += astTSizeOf( ( (Entry1W *) next )->value );
+         } else if( type == AST__SINTTYPE ) {
+            if( nel > 0 ) result += astTSizeOf( ( (Entry1S *) next )->value );
 
          } else if( type == AST__DOUBLETYPE ) {
             if( nel > 0 ) result += astTSizeOf( ( (Entry1D *) next )->value );
@@ -3150,42 +3150,42 @@ void astInitKeyMapVtab_(  AstKeyMapVtab *vtab, const char *name, int *status ) {
    vtab->MapGet0D = MapGet0D;
    vtab->MapGet0F = MapGet0F;
    vtab->MapGet0I = MapGet0I;
-   vtab->MapGet0W = MapGet0W;
+   vtab->MapGet0S = MapGet0S;
    vtab->MapGet1P = MapGet1P;
    vtab->MapGet1A = MapGet1A;
    vtab->MapGet1C = MapGet1C;
    vtab->MapGet1D = MapGet1D;
    vtab->MapGet1F = MapGet1F;
    vtab->MapGet1I = MapGet1I;
-   vtab->MapGet1W = MapGet1W;
+   vtab->MapGet1S = MapGet1S;
    vtab->MapGetElemP = MapGetElemP;
    vtab->MapGetElemA = MapGetElemA;
    vtab->MapGetElemC = MapGetElemC;
    vtab->MapGetElemD = MapGetElemD;
    vtab->MapGetElemF = MapGetElemF;
    vtab->MapGetElemI = MapGetElemI;
-   vtab->MapGetElemW = MapGetElemW;
+   vtab->MapGetElemS = MapGetElemS;
    vtab->MapPutElemP = MapPutElemP;
    vtab->MapPutElemA = MapPutElemA;
    vtab->MapPutElemC = MapPutElemC;
    vtab->MapPutElemD = MapPutElemD;
    vtab->MapPutElemF = MapPutElemF;
    vtab->MapPutElemI = MapPutElemI;
-   vtab->MapPutElemW = MapPutElemW;
+   vtab->MapPutElemS = MapPutElemS;
    vtab->MapPut0A = MapPut0A;
    vtab->MapPut0P = MapPut0P;
    vtab->MapPut0C = MapPut0C;
    vtab->MapPut0D = MapPut0D;
    vtab->MapPut0F = MapPut0F;
    vtab->MapPut0I = MapPut0I;
-   vtab->MapPut0W = MapPut0W;
+   vtab->MapPut0S = MapPut0S;
    vtab->MapPut1P = MapPut1P;
    vtab->MapPut1A = MapPut1A;
    vtab->MapPut1C = MapPut1C;
    vtab->MapPut1D = MapPut1D;
    vtab->MapPut1F = MapPut1F;
    vtab->MapPut1I = MapPut1I;
-   vtab->MapPut1W = MapPut1W;
+   vtab->MapPut1S = MapPut1S;
    vtab->MapPutU = MapPutU;
    vtab->MapRemove = MapRemove;
    vtab->MapCopy = MapCopy;
@@ -3862,13 +3862,13 @@ c     - I: int
 c     - C: "const" pointer to null terminated character string
 c     - A: Pointer to AstObject
 c     - P: Generic "void *" pointer
-c     - W: word (i.e. short int)
+c     - S: short int
 f     - D: DOUBLE PRECISION
 f     - R: REAL
 f     - I: INTEGER
 f     - C: CHARACTER
 f     - A: INTEGER used to identify an AstObject
-f     - W: word (i.e. INTEGER*2)
+f     - S: INTEGER*2 (short integer)
 *
 c     For example, astMapPut0D would be used to store a "double" value,
 c     while astMapPut0I would be used to store an "int", etc.
@@ -3962,7 +3962,7 @@ static void MapPut0##X( AstKeyMap *this, const char *key, Xtype value, \
 #define CHECK_F
 #define CHECK_C
 #define CHECK_P
-#define CHECK_W
+#define CHECK_S
 
 /* Expand the above macro to generate a function for each required
    data type. */
@@ -3972,13 +3972,13 @@ MAKE_MAPPUT0(F,float,AST__FLOATTYPE,value)
 MAKE_MAPPUT0(C,const char *,AST__STRINGTYPE,astStore(NULL,value,strlen(value)+1))
 MAKE_MAPPUT0(A,AstObject *,AST__OBJECTTYPE,(value?astClone(value):NULL))
 MAKE_MAPPUT0(P,void *,AST__POINTERTYPE,value)
-MAKE_MAPPUT0(W,short int,AST__WORDTYPE,value)
+MAKE_MAPPUT0(S,short int,AST__SINTTYPE,value)
 
 /* Undefine the macro. */
 #undef MAKE_MAPPUT0
 #undef CHECK_A
 #undef CHECK_I
-#undef CHECK_W
+#undef CHECK_S
 #undef CHECK_D
 #undef CHECK_F
 #undef CHECK_C
@@ -4064,13 +4064,13 @@ c     - I: int
 c     - C: "const" pointer to null terminated character string
 c     - A: Pointer to AstObject
 c     - P: Generic "void *" pointer
-c     - W: word (i.e. short int)
+c     - S: short int
 f     - D: DOUBLE PRECISION
 f     - R: REAL
 f     - I: INTEGER
 f     - C: CHARACTER
 f     - A: INTEGER used to identify an AstObject
-f     - W: word (i.e. INTEGER*2)
+f     - S: INTEGER*2 (short integer)
 *
 c     For example, astMapPut1D would be used to store "double" values,
 c     while astMapPut1I would be used to store "int", etc.
@@ -4169,7 +4169,7 @@ for( i = 0; i < size; i++ ) { \
    CheckCircle( this, value[ i ], "astMapPut1A", status ); \
 }
 #define CHECK_I
-#define CHECK_W
+#define CHECK_S
 #define CHECK_D
 #define CHECK_F
 #define CHECK_C
@@ -4183,13 +4183,13 @@ MAKE_MAPPUT1(I,const int,AST__INTTYPE,value[i])
 MAKE_MAPPUT1(C,const char *const,AST__STRINGTYPE,astStore(NULL,value[i],strlen(value[i])+1))
 MAKE_MAPPUT1(A,AstObject *const,AST__OBJECTTYPE,(value[i]?astClone(value[i]):NULL))
 MAKE_MAPPUT1(P,void *const,AST__POINTERTYPE,value[i])
-MAKE_MAPPUT1(W,const short int,AST__WORDTYPE,value[i])
+MAKE_MAPPUT1(S,const short int,AST__SINTTYPE,value[i])
 
 /* Undefine the macro. */
 #undef MAKE_MAPPUT1
 #undef CHECK_A
 #undef CHECK_I
-#undef CHECK_W
+#undef CHECK_S
 #undef CHECK_D
 #undef CHECK_F
 #undef CHECK_C
@@ -4530,13 +4530,13 @@ c     - I: int
 c     - C: "const" pointer to null terminated character string
 c     - A: Pointer to AstObject
 c     - P: Generic "void *" pointer
-c     - W: word (i.e. short int)
+c     - S: short int
 f     - D: DOUBLE PRECISION
 f     - R: REAL
 f     - I: INTEGER
 f     - C: CHARACTER
 f     - A: INTEGER used to identify an AstObject
-f     - W: word (i.e. INTEGER*2)
+f     - S: INTEGER*2 (short integer)
 *
 c     For example, astMapGet0D would be used to get a "double" value,
 c     while astMapGet0I would be used to get an "int", etc.
@@ -4581,11 +4581,11 @@ static int MapGet0##X( AstKeyMap *this, const char *key, Xtype *value, int *stat
             raw = ((Entry1I *)mapentry)->value; \
          } \
 \
-      } else if( raw_type == AST__WORDTYPE ){ \
+      } else if( raw_type == AST__SINTTYPE ){ \
          if( mapentry->nel == 0 ) { \
-            raw = &( ((Entry0W *)mapentry)->value ); \
+            raw = &( ((Entry0S *)mapentry)->value ); \
          } else { \
-            raw = ((Entry1W *)mapentry)->value; \
+            raw = ((Entry1S *)mapentry)->value; \
          } \
 \
       } else if( raw_type == AST__DOUBLETYPE ){ \
@@ -4670,7 +4670,7 @@ MAKE_MAPGET0(F,float,AST__FLOATTYPE)
 MAKE_MAPGET0(C,const char *,AST__STRINGTYPE)
 MAKE_MAPGET0(A,AstObject *,AST__OBJECTTYPE)
 MAKE_MAPGET0(P,void *,AST__POINTERTYPE)
-MAKE_MAPGET0(W,short int,AST__WORDTYPE)
+MAKE_MAPGET0(S,short int,AST__SINTTYPE)
 
 /* Undefine the macro. */
 #undef MAKE_MAPGET0
@@ -4745,11 +4745,11 @@ int astMapGet0AId_( AstKeyMap *this, const char *key, AstObject **value, int *st
             raw = ((Entry1P *)mapentry)->value;
          }
 
-      } else if( raw_type == AST__WORDTYPE ){
+      } else if( raw_type == AST__SINTTYPE ){
          if( mapentry->nel == 0 ) {
-            raw = &( ((Entry0W *)mapentry)->value );
+            raw = &( ((Entry0S *)mapentry)->value );
          } else {
-            raw = ((Entry1W *)mapentry)->value;
+            raw = ((Entry1S *)mapentry)->value;
          }
 
       } else if( raw_type == AST__DOUBLETYPE ){
@@ -4935,13 +4935,13 @@ c     - I: int
 c     - C: "const" pointer to null terminated character string
 c     - A: Pointer to AstObject
 c     - P: Generic "void *" pointer
-c     - W: word (i.e. short int)
+c     - S: short int
 f     - D: DOUBLE PRECISION
 f     - R: REAL
 f     - I: INTEGER
 f     - C: CHARACTER
 f     - A: INTEGER used to identify an AstObject
-f     - W: word (i.e. INTEGER*2)
+f     - S: INTEGER*2 (short integer)
 *
 c     For example, astMapGet1D would be used to get "double" values, while
 c     astMapGet1I would be used to get "int" values, etc. For D or I, the
@@ -5009,12 +5009,12 @@ static int MapGet1##X( AstKeyMap *this, const char *key, int mxval, int *nval, X
             raw = ((Entry1D *)mapentry)->value; \
          } \
 \
-      } else if( raw_type == AST__WORDTYPE ){ \
+      } else if( raw_type == AST__SINTTYPE ){ \
          raw_size = sizeof( short int ); \
          if( nel == 0 ) { \
-            raw = &( ((Entry0W *)mapentry)->value ); \
+            raw = &( ((Entry0S *)mapentry)->value ); \
          } else { \
-            raw = ((Entry1W *)mapentry)->value; \
+            raw = ((Entry1S *)mapentry)->value; \
          } \
 \
       } else if( raw_type == AST__POINTERTYPE ){ \
@@ -5110,7 +5110,7 @@ MAKE_MAPGET1(D,double,AST__DOUBLETYPE)
 MAKE_MAPGET1(F,float,AST__FLOATTYPE)
 MAKE_MAPGET1(A,AstObject *,AST__OBJECTTYPE)
 MAKE_MAPGET1(P,void *,AST__POINTERTYPE)
-MAKE_MAPGET1(W,short int,AST__WORDTYPE)
+MAKE_MAPGET1(S,short int,AST__SINTTYPE)
 
 /* Undefine the macro. */
 #undef MAKE_MAPGET1
@@ -5205,12 +5205,12 @@ static int MapGet1C( AstKeyMap *this, const char *key, int l, int mxval,
             raw = ((Entry1D *)mapentry)->value;
          }
 
-      } else if( raw_type == AST__WORDTYPE ){
+      } else if( raw_type == AST__SINTTYPE ){
          raw_size = sizeof( short int );
          if( nel == 0 ) {
-            raw = &( ((Entry0W *)mapentry)->value );
+            raw = &( ((Entry0S *)mapentry)->value );
          } else {
-            raw = ((Entry1W *)mapentry)->value;
+            raw = ((Entry1S *)mapentry)->value;
          }
 
       } else if( raw_type == AST__FLOATTYPE ){
@@ -5382,12 +5382,12 @@ int astMapGet1AId_( AstKeyMap *this, const char *key, int mxval, int *nval,
             raw = ((Entry1D *)mapentry)->value;
          }
 
-      } else if( raw_type == AST__WORDTYPE ){
+      } else if( raw_type == AST__SINTTYPE ){
          raw_size = sizeof( short int );
          if( nel == 0 ) {
-            raw = &( ((Entry0W *)mapentry)->value );
+            raw = &( ((Entry0S *)mapentry)->value );
          } else {
-            raw = ((Entry1W *)mapentry)->value;
+            raw = ((Entry1S *)mapentry)->value;
          }
 
       } else if( raw_type == AST__POINTERTYPE ){
@@ -5588,13 +5588,13 @@ c     - I: int
 c     - C: "const" pointer to null terminated character string
 c     - A: Pointer to AstObject
 c     - P: Generic "void *" pointer
-c     - W: word (i.e. short int)
+c     - S: short int
 f     - D: DOUBLE PRECISION
 f     - R: REAL
 f     - I: INTEGER
 f     - C: CHARACTER
 f     - A: INTEGER used to identify an AstObject
-f     - W: word (i.e. INTEGER*2)
+f     - S: INTEGER*2 (short integer)
 *
 c     For example, astMapGetElemD would be used to get a "double" value, while
 c     astMapGetElemI would be used to get an "int" value, etc. For D or I, the
@@ -5660,12 +5660,12 @@ static int MapGetElem##X( AstKeyMap *this, const char *key, int elem, \
             raw = ((Entry1D *)mapentry)->value; \
          } \
 \
-      } else if( raw_type == AST__WORDTYPE ){ \
+      } else if( raw_type == AST__SINTTYPE ){ \
          raw_size = sizeof( short int ); \
          if( nel == 0 ) { \
-            raw = &( ((Entry0W *)mapentry)->value ); \
+            raw = &( ((Entry0S *)mapentry)->value ); \
          } else { \
-            raw = ((Entry1W *)mapentry)->value; \
+            raw = ((Entry1S *)mapentry)->value; \
          } \
 \
       } else if( raw_type == AST__POINTERTYPE ){ \
@@ -5759,7 +5759,7 @@ MAKE_MAPGETELEM(D,double,AST__DOUBLETYPE)
 MAKE_MAPGETELEM(F,float,AST__FLOATTYPE)
 MAKE_MAPGETELEM(A,AstObject *,AST__OBJECTTYPE)
 MAKE_MAPGETELEM(P,void *,AST__POINTERTYPE)
-MAKE_MAPGETELEM(W,short int,AST__WORDTYPE)
+MAKE_MAPGETELEM(S,short int,AST__SINTTYPE)
 
 /* Undefine the macro. */
 #undef MAKE_MAPGETELEM
@@ -5851,12 +5851,12 @@ static int MapGetElemC( AstKeyMap *this, const char *key, int l, int elem,
             raw = ((Entry1D *)mapentry)->value;
          }
 
-      } else if( raw_type == AST__WORDTYPE ){
+      } else if( raw_type == AST__SINTTYPE ){
          raw_size = sizeof( short int );
          if( nel == 0 ) {
-            raw = &( ((Entry0W *)mapentry)->value );
+            raw = &( ((Entry0S *)mapentry)->value );
          } else {
-            raw = ((Entry1W *)mapentry)->value;
+            raw = ((Entry1S *)mapentry)->value;
          }
 
       } else if( raw_type == AST__FLOATTYPE ){
@@ -6012,12 +6012,12 @@ int astMapGetElemAId_( AstKeyMap *this, const char *key, int elem,
             raw = ((Entry1I *)mapentry)->value;
          }
 
-      } else if( raw_type == AST__WORDTYPE ){
+      } else if( raw_type == AST__SINTTYPE ){
          raw_size = sizeof( short int );
          if( nel == 0 ) {
-            raw = &( ((Entry0W *)mapentry)->value );
+            raw = &( ((Entry0S *)mapentry)->value );
          } else {
-            raw = ((Entry1W *)mapentry)->value;
+            raw = ((Entry1S *)mapentry)->value;
          }
 
       } else if( raw_type == AST__DOUBLETYPE ){
@@ -6430,12 +6430,12 @@ c        This does not include the trailing null character.
             raw = ((Entry1D *)mapentry)->value;
          }
 
-      } else if( raw_type == AST__WORDTYPE ){
+      } else if( raw_type == AST__SINTTYPE ){
          raw_size = sizeof( short int );
          if( nel == 0 ) {
-            raw = &( ((Entry0W *)mapentry)->value );
+            raw = &( ((Entry0S *)mapentry)->value );
          } else {
-            raw = ((Entry1W *)mapentry)->value;
+            raw = ((Entry1S *)mapentry)->value;
          }
 
       } else if( raw_type == AST__FLOATTYPE ){
@@ -6674,13 +6674,13 @@ c     - I: int
 c     - C: "const" pointer to null terminated character string
 c     - A: Pointer to AstObject
 c     - P: Generic "void *" pointer
-c     - W: word (i.e. short int)
+c     - S: short int
 f     - D: DOUBLE PRECISION
 f     - R: REAL
 f     - I: INTEGER
 f     - C: CHARACTER
 f     - A: INTEGER used to identify an AstObject
-f     - W: word (i.e. INTEGER*2)
+f     - S: INTEGER*2 (short integer)
 *
 c     For example, astMapPutElemD would be used to put a "double" value, while
 c     astMapPutElemI would be used to put an "int" value, etc. For D or I, the
@@ -6753,14 +6753,14 @@ static void MapPutElem##X( AstKeyMap *this, const char *key, int elem, \
          raw_size = sizeof( int ); \
 \
 /* Handle other data type in the same way. */ \
-      } else if( raw_type == AST__WORDTYPE ){ \
+      } else if( raw_type == AST__SINTTYPE ){ \
          if( nel == 0 ) { \
-            astMapPut1W( this, key, 1, &( ((Entry0W *)mapentry)->value ), \
+            astMapPut1S( this, key, 1, &( ((Entry0S *)mapentry)->value ), \
                          mapentry->comment ); \
             mapentry = SearchTableEntry( this, itab, key, status ); \
             nel = 1; \
          } \
-         raw = ((Entry1W *)mapentry)->value; \
+         raw = ((Entry1S *)mapentry)->value; \
          raw_size = sizeof( short int ); \
 \
       } else if( raw_type == AST__DOUBLETYPE ){ \
@@ -6830,8 +6830,8 @@ static void MapPutElem##X( AstKeyMap *this, const char *key, int elem, \
             mapentry->nel = nel; \
             if( raw_type == AST__INTTYPE ){ \
                ((Entry1I *)mapentry)->value = (int *) raw; \
-            } else if( raw_type == AST__WORDTYPE ){ \
-               ((Entry1W *)mapentry)->value = (short int *) raw; \
+            } else if( raw_type == AST__SINTTYPE ){ \
+               ((Entry1S *)mapentry)->value = (short int *) raw; \
             } else if( raw_type == AST__DOUBLETYPE ){ \
                ((Entry1D *)mapentry)->value = (double *) raw; \
             } else if( raw_type == AST__POINTERTYPE ){ \
@@ -6868,7 +6868,7 @@ static void MapPutElem##X( AstKeyMap *this, const char *key, int elem, \
    Other types do not need any checks. */
 #define CHECK_A CheckCircle( this, value, "astMapPutElemA", status );
 #define CHECK_I
-#define CHECK_W
+#define CHECK_S
 #define CHECK_D
 #define CHECK_F
 #define CHECK_C
@@ -6882,13 +6882,13 @@ MAKE_MAPPUTELEM(F,float,AST__FLOATTYPE)
 MAKE_MAPPUTELEM(A,AstObject *,AST__OBJECTTYPE)
 MAKE_MAPPUTELEM(P,void *,AST__POINTERTYPE)
 MAKE_MAPPUTELEM(C,const char *,AST__STRINGTYPE)
-MAKE_MAPPUTELEM(W,short int,AST__WORDTYPE)
+MAKE_MAPPUTELEM(S,short int,AST__SINTTYPE)
 
 /* Undefine the macro. */
 #undef MAKE_MAPPUTELEM
 #undef CHECK_A
 #undef CHECK_I
-#undef CHECK_W
+#undef CHECK_S
 #undef CHECK_D
 #undef CHECK_F
 #undef CHECK_C
@@ -6935,7 +6935,7 @@ f        The global status.
 *  Returned Value:
 c     astMapType()
 f     AST_MAPTYPE = INTEGER
-*        One of AST__INTTYPE (for integer), AST__WORDTYPE (for word - i.e.
+*        One of AST__INTTYPE (for integer), AST__SINTTYPE (for
 c        short int),
 c        INTEGER*2),
 *        AST__DOUBLETYPE (for double
@@ -7826,8 +7826,8 @@ static size_t SizeOfEntry( AstMapEntry *entry, int *status ){
    } else if( type == AST__POINTERTYPE ) {
       result = ( nel == 0 ) ? sizeof( Entry0P ) : sizeof( Entry1P );
 
-   } else if( type == AST__WORDTYPE ) {
-      result = ( nel == 0 ) ? sizeof( Entry0W ) : sizeof( Entry1W );
+   } else if( type == AST__SINTTYPE ) {
+      result = ( nel == 0 ) ? sizeof( Entry0S ) : sizeof( Entry1S );
 
    } else if( type == AST__DOUBLETYPE ) {
       result = ( nel == 0 ) ? sizeof( Entry0D ) : sizeof( Entry1D );
@@ -9041,7 +9041,7 @@ AstKeyMap *astLoadKeyMap_( void *mem, size_t size, AstKeyMapVtab *vtab,
    int nentry;               /* Number of KeyMap entries read so far */
    int type;                 /* Data type for an entry */
    short int *wlist;         /* Pointer to vector of entry values */
-   short int wval;           /* SHort int value for an entry */
+   short int wval;           /* Short int value for an entry */
 
 /* Get a pointer to the thread specific global data structure. */
    astGET_GLOBALS(channel);
@@ -9190,19 +9190,19 @@ AstKeyMap *astLoadKeyMap_( void *mem, size_t size, AstKeyMapVtab *vtab,
                ilist = astFree( ilist );
             }
 
-/* Do the same for word values. */
-         } else if( type == AST__WORDTYPE ) {
+/* Do the same for short int values. */
+         } else if( type == AST__SINTTYPE ) {
             if( nel == 0 ) {
                (void) sprintf( buff, "val%d", nentry );
                wval = (short int) astReadInt( channel, buff, 0 );
-               astMapPut0W( new, key, wval, com );
+               astMapPut0S( new, key, wval, com );
             } else {
                wlist = astMalloc( sizeof(short int)*nel );
                for( index = 0; astOK && index < nel; index++ ) {
                   (void) sprintf( buff, "v%d_%d", nentry, index + 1 );
                   wlist[ index ] = (short int) astReadInt( channel, buff, 0 );
                }
-               astMapPut1W( new, key, nel, wlist, com );
+               astMapPut1S( new, key, nel, wlist, com );
                wlist = astFree( wlist );
             }
 
@@ -9325,7 +9325,7 @@ MAKE_MAPPUT0_(I,int)
 MAKE_MAPPUT0_(C,const char *)
 MAKE_MAPPUT0_(A,AstObject *)
 MAKE_MAPPUT0_(P,void *)
-MAKE_MAPPUT0_(W,short int)
+MAKE_MAPPUT0_(S,short int)
 #undef MAKE_MAPPUT0_
 
 
@@ -9336,7 +9336,7 @@ void astMapPut1##X##_( AstKeyMap *this, const char *key, int size, \
    if ( !astOK ) return; \
    (**astMEMBER(this,KeyMap,MapPut1##X))(this,key,size,value,comment, status ); \
 }
-MAKE_MAPPUT1_(W,const short int)
+MAKE_MAPPUT1_(S,const short int)
 MAKE_MAPPUT1_(D,const double)
 MAKE_MAPPUT1_(F,const float)
 MAKE_MAPPUT1_(I,const int)
@@ -9351,7 +9351,7 @@ int astMapGet0##X##_( AstKeyMap *this, const char *key, Xtype *value, int *statu
    return (**astMEMBER(this,KeyMap,MapGet0##X))(this,key,value, status ); \
 }
 MAKE_MAPGET0_(D,double)
-MAKE_MAPGET0_(W,short int)
+MAKE_MAPGET0_(S,short int)
 MAKE_MAPGET0_(F,float)
 MAKE_MAPGET0_(I,int)
 MAKE_MAPGET0_(C,const char *)
@@ -9366,7 +9366,7 @@ int astMapGet1##X##_( AstKeyMap *this, const char *key, int mxval, int *nval, \
    if ( !astOK ) return 0; \
    return (**astMEMBER(this,KeyMap,MapGet1##X))(this,key,mxval,nval,value,status); \
 }
-MAKE_MAPGET1_(W,short int)
+MAKE_MAPGET1_(S,short int)
 MAKE_MAPGET1_(D,double)
 MAKE_MAPGET1_(F,float)
 MAKE_MAPGET1_(I,int)
@@ -9380,7 +9380,7 @@ int astMapGetElem##X##_( AstKeyMap *this, const char *key, int elem, \
    if ( !astOK ) return 0; \
    return (**astMEMBER(this,KeyMap,MapGetElem##X))(this,key,elem,value,status); \
 }
-MAKE_MAPGETELEM_(W,short int)
+MAKE_MAPGETELEM_(S,short int)
 MAKE_MAPGETELEM_(D,double)
 MAKE_MAPGETELEM_(F,float)
 MAKE_MAPGETELEM_(I,int)
@@ -9406,7 +9406,7 @@ void astMapPutElem##X##_( AstKeyMap *this, const char *key, int elem, \
    if ( !astOK ) return; \
    (**astMEMBER(this,KeyMap,MapPutElem##X))(this,key,elem,value,status); \
 }
-MAKE_MAPPUTELEM_(W,short int)
+MAKE_MAPPUTELEM_(S,short int)
 MAKE_MAPPUTELEM_(D,double)
 MAKE_MAPPUTELEM_(F,float)
 MAKE_MAPPUTELEM_(I,int)
