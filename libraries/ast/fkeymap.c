@@ -182,6 +182,29 @@ F77_SUBROUTINE(ast_mapput0i)( INTEGER(THIS),
    )
 }
 
+F77_SUBROUTINE(ast_mapput0w)( INTEGER(THIS),
+                              CHARACTER(KEY),
+                              WORD(VALUE),
+                              CHARACTER(COMMENT),
+                              INTEGER(STATUS)
+                              TRAIL(KEY)
+                              TRAIL(COMMENT) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(KEY)
+   GENPTR_WORD(VALUE)
+   GENPTR_CHARACTER(COMMENT)
+   char *comment, *key;
+
+   astAt( "AST_MAPPUT0W", NULL, 0 );
+   astWatchSTATUS(
+      key = astString( KEY, KEY_length );
+      comment = astString( COMMENT, COMMENT_length );
+      astMapPut0W( astI2P( *THIS ), key, *VALUE, comment );
+      astFree( key );
+      astFree( comment );
+   )
+}
+
 F77_SUBROUTINE(ast_mapput0d)( INTEGER(THIS),
                               CHARACTER(KEY),
                               DOUBLE(VALUE),
@@ -333,6 +356,32 @@ F77_SUBROUTINE(ast_mapput1i)( INTEGER(THIS),
 }
 
 
+F77_SUBROUTINE(ast_mapput1w)( INTEGER(THIS),
+                              CHARACTER(KEY),
+                              INTEGER(SIZE),
+                              WORD_ARRAY(VALUE),
+                              CHARACTER(COMMENT),
+                              INTEGER(STATUS)
+                              TRAIL(KEY)
+                              TRAIL(COMMENT) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(KEY)
+   GENPTR_INTEGER(SIZE)
+   GENPTR_WORD_ARRAY(VALUE)
+   GENPTR_CHARACTER(COMMENT)
+   char *comment, *key;
+
+   astAt( "AST_MAPPUT1W", NULL, 0 );
+   astWatchSTATUS(
+      key = astString( KEY, KEY_length );
+      comment = astString( COMMENT, COMMENT_length );
+      astMapPut1W( astI2P( *THIS ), key, *SIZE, VALUE, comment );
+      astFree( key );
+      astFree( comment );
+   )
+}
+
+
 F77_SUBROUTINE(ast_mapput1d)( INTEGER(THIS),
                               CHARACTER(KEY),
                               INTEGER(SIZE),
@@ -419,6 +468,26 @@ F77_LOGICAL_FUNCTION(ast_mapget0i)( INTEGER(THIS),
    astWatchSTATUS(
       key = astString( KEY, KEY_length );
       RESULT = astMapGet0I( astI2P( *THIS ), key, VALUE ) ? F77_TRUE : F77_FALSE;
+      astFree( key );
+   )
+   return RESULT;
+}
+
+F77_LOGICAL_FUNCTION(ast_mapget0w)( INTEGER(THIS),
+                                    CHARACTER(KEY),
+                                    WORD(VALUE),
+                                    INTEGER(STATUS)
+                                    TRAIL(KEY) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(KEY)
+   GENPTR_WORD(VALUE)
+   F77_LOGICAL_TYPE(RESULT);
+   char *key;
+
+   astAt( "AST_MAPGET0W", NULL, 0 );
+   astWatchSTATUS(
+      key = astString( KEY, KEY_length );
+      RESULT = astMapGet0W( astI2P( *THIS ), key, VALUE ) ? F77_TRUE : F77_FALSE;
       astFree( key );
    )
    return RESULT;
@@ -571,6 +640,30 @@ F77_LOGICAL_FUNCTION(ast_mapget1d)( INTEGER(THIS),
    astWatchSTATUS(
       key = astString( KEY, KEY_length );
       RESULT = astMapGet1D( astI2P( *THIS ), key, *MXVAL, NVAL, VALUE ) ? F77_TRUE : F77_FALSE;
+      astFree( key );
+   )
+   return RESULT;
+}
+
+F77_LOGICAL_FUNCTION(ast_mapget1w)( INTEGER(THIS),
+                                    CHARACTER(KEY),
+                                    INTEGER(MXVAL),
+                                    INTEGER(NVAL),
+                                    WORD_ARRAY(VALUE),
+                                    INTEGER(STATUS)
+                                    TRAIL(KEY) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(KEY)
+   GENPTR_INTEGER(MXVAL)
+   GENPTR_INTEGER(NVAL)
+   GENPTR_WORD_ARRAY(VALUE)
+   F77_LOGICAL_TYPE(RESULT);
+   char *key;
+
+   astAt( "AST_MAPGET1W", NULL, 0 );
+   astWatchSTATUS(
+      key = astString( KEY, KEY_length );
+      RESULT = astMapGet1W( astI2P( *THIS ), key, *MXVAL, NVAL, VALUE ) ? F77_TRUE : F77_FALSE;
       astFree( key );
    )
    return RESULT;
@@ -885,6 +978,28 @@ F77_LOGICAL_FUNCTION(ast_mapgetelemd)( INTEGER(THIS),
    return RESULT;
 }
 
+F77_LOGICAL_FUNCTION(ast_mapgetelemw)( INTEGER(THIS),
+                                       CHARACTER(KEY),
+                                       INTEGER(ELEM),
+                                       WORD_ARRAY(VALUE),
+                                       INTEGER(STATUS)
+                                       TRAIL(KEY) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(KEY)
+   GENPTR_INTEGER(ELEM)
+   GENPTR_WORD_ARRAY(VALUE)
+   F77_LOGICAL_TYPE(RESULT);
+   char *key;
+
+   astAt( "AST_MAPGETELEMW", NULL, 0 );
+   astWatchSTATUS(
+      key = astString( KEY, KEY_length );
+      RESULT = astMapGetElemW( astI2P( *THIS ), key, *ELEM - 1, VALUE ) ? F77_TRUE : F77_FALSE;
+      astFree( key );
+   )
+   return RESULT;
+}
+
 F77_LOGICAL_FUNCTION(ast_mapgetelemr)( INTEGER(THIS),
                                        CHARACTER(KEY),
                                        INTEGER(ELEM),
@@ -1001,6 +1116,26 @@ F77_SUBROUTINE(ast_mapputelemi)( INTEGER(THIS),
 }
 
 
+F77_SUBROUTINE(ast_mapputelemw)( INTEGER(THIS),
+                                 CHARACTER(KEY),
+                                 INTEGER(ELEM),
+                                 WORD(VALUE),
+                                 INTEGER(STATUS)
+                                 TRAIL(KEY) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(KEY)
+   GENPTR_INTEGER(ELEM)
+   GENPTR_WORD(VALUE)
+   char *key;
+
+   astAt( "AST_MAPPUTELEMW", NULL, 0 );
+   astWatchSTATUS(
+      key = astString( KEY, KEY_length );
+      astMapPutElemW( astI2P( *THIS ), key, *ELEM - 1, *VALUE );
+      astFree( key );
+   )
+}
+
 F77_SUBROUTINE(ast_mapputelemd)( INTEGER(THIS),
                                  CHARACTER(KEY),
                                  INTEGER(ELEM),
@@ -1086,5 +1221,4 @@ F77_SUBROUTINE(ast_mapputelemc)( INTEGER(THIS),
       astFree( value );
    )
 }
-
 

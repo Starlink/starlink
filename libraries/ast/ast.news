@@ -31,6 +31,8 @@ Keys can be sorted alphabetically or by age, or left unsorted.
 - Access to KeyMaps holding thousands of entries is now significantly
 faster.
 
+- KeyMaps can now hold word (i.e. "short int" or INTEGER*2) values.
+
 Main Changes in V5.3-1
 -----------------------
 

@@ -7,8 +7,9 @@
      :        map1, map3, km2
       character cval*20,cvec(3)*10,key*20,cval0*40
       double precision dval, dvec(2)
-      logical gota, gotc, gotd, goti, gotr,lval
+      logical gota, gotc, gotd, goti, gotr, gotw, lval
       real rval
+      integer*2 wval,wvec(2)
 
       status = sai__ok
       call err_mark( status )
@@ -20,6 +21,7 @@ c      call ast_watchmemory( 29286 )
 
       map = ast_keymap( ' ', status )
 
+      call ast_MapPut0w( map, 'Fredw', 1999, 'com 1', status )
       call ast_MapPut0i( map, 'Fredi', 1999, 'com 1', status )
       call ast_MapPut0d( map, 'Fredd', 1999.9D0, 'com2 ', status )
       call ast_MapPut0r( map, 'Fredr', 1999.9, 'com2 ', status )
@@ -77,7 +79,7 @@ c      call ast_watchmemory( 29286 )
       map2 = ast_copy( map, status )
 
 
-      if( ast_mapsize( map2, status ) .ne. 5 ) then
+      if( ast_mapsize( map2, status ) .ne. 6 ) then
          write(*,*) ast_mapsize( map2, status )
          call stopit( status, 'Error 0' )
       end if
@@ -87,6 +89,7 @@ c      call ast_watchmemory( 29286 )
       gotr = .false.
       gotc = .false.
       gota = .false.
+      gotw = .false.
 
       do i = 1, ast_mapsize( map2, status )
          key = ast_mapkey( map2, i, status )
@@ -94,6 +97,8 @@ c      call ast_watchmemory( 29286 )
             goti = .true.
          else if( .not. gotd .and. key .eq. 'Fredd' ) then
             gotd = .true.
+         else if( .not. gotw .and. key .eq. 'Fredw' ) then
+            gotw = .true.
          else if( .not. gotr .and. key .eq. 'Fredr' ) then
             gotr = .true.
          else if( .not. gotc .and. key .eq. 'Fredc' ) then
@@ -106,7 +111,7 @@ c      call ast_watchmemory( 29286 )
       end do
 
       if( .not. ( goti .AND. gotd .AND. gotc
-     :            .AND. gota .and. gotr) ) then
+     :            .AND. gota .and. gotr .and. gotw) ) then
          call stopit( status, 'Error nokey' )
       endif
 
@@ -120,6 +125,13 @@ c      call ast_watchmemory( 29286 )
       else if( ival .ne. 1999 ) then
          write(*,*) ival
          call stopit( status, 'Error 2' )
+      end if
+
+      if( .not. ast_mapget0w( map2, 'Fredw', wval, status ) ) then
+         call stopit( status, 'Error 1' )
+      else if( wval .ne. 1999 ) then
+         write(*,*) ival
+         call stopit( status, 'Error 2B' )
       end if
 
       if( .not. ast_mapget0d( map2, 'Fredd', dval, status ) ) then
@@ -180,6 +192,13 @@ c      call ast_watchmemory( 29286 )
       else if( ival .ne. 2000.0 ) then
          write(*,*) ival
          call stopit( status, 'Error 15' )
+      end if
+
+      if( .not. ast_mapget0w( map2, 'Fredd', wval, status ) ) then
+         call stopit( status, 'Error 14b' )
+      else if( wval .ne. 2000.0 ) then
+         write(*,*) wval
+         call stopit( status, 'Error 15b' )
       end if
 
       if( .not. ast_mapget0c( map2, 'Fredd', cval, l, status ) ) then
@@ -250,6 +269,16 @@ c      call ast_watchmemory( 29286 )
       if( ast_maplength( map, 'Fredi', status ) .ne. 2 ) then
          write(*,*) ast_maplength( map, 'Fredi', status )
          call stopit( status, 'Error 29b' )
+
+      end if
+
+      wvec(1)=1999
+      wvec(2)=0
+      call ast_mapput1w( map, 'Fredw', 2, wvec, 'com 1', STATUS )
+
+      if( ast_maplength( map, 'Fredw', status ) .ne. 2 ) then
+         write(*,*) ast_maplength( map, 'Fredw', status )
+         call stopit( status, 'Error 29c' )
 
       end if
 
@@ -865,6 +894,8 @@ C  Test AST_MAPPUTU and undefined values
 
       if( ast_mapget0i( map, 'GG', ival, status ) ) then
          call stopit( status, 'Error UNDEF_1' )
+      else if( ast_mapget0w( map, 'GG', wval, status ) ) then
+         call stopit( status, 'Error UNDEF_1B' )
       else if( ast_mapget0c( map, 'GG', cval, l, status ) ) then
          call stopit( status, 'Error UNDEF_2' )
       else if( ast_mapget0a( map, 'GG', aval, status ) ) then
@@ -879,6 +910,7 @@ C  Test AST_MAPPUTU and undefined values
       end if
 
       if( ast_maptype( map, 'GG', status ) .ne. AST__UNDEFTYPE ) then
+         write(*,*) ast_maptype( map, 'GG', status )
          call stopit( status, 'Error UNDEF_7' )
       else if( ast_mapsize( map, status ) .ne. 1 ) then
          call stopit( status, 'Error UNDEF_8' )
