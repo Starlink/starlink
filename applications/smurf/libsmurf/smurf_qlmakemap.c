@@ -335,6 +335,7 @@ void smurf_qlmakemap( int *status ) {
 				variances in output image */
   dim_t i;                   /* Loop counter */
   Grp *igrp = NULL;          /* Group of input files */
+  AstKeyMap *keymap=NULL;    /* Keymap for storing parameters */
   int lbnd_out[2];           /* Lower pixel bounds for output map */
   double *map = NULL;        /* Pointer to the rebinned map data */
   size_t mapsize;            /* Number of pixels in output image */
@@ -404,7 +405,11 @@ void smurf_qlmakemap( int *status ) {
   /* Read the tau relations from config file or group. We do not
      allow sub instrument overloading because these are all values
      based on filter name. */
-  extpars = kpg1Config( "TAUREL", "$SMURF_DIR/smurf_extinction.def", NULL, status );
+  keymap = kpg1Config( "TAUREL", "$SMURF_DIR/smurf_extinction.def", NULL, status );
+
+  /* and we need to use the EXT entry */
+  astMapGet0A( keymap, "EXT", &extpars );
+  keymap = astAnnul( keymap );
 
   /* Get the celestial coordinate system for the output image. */
   parChoic( "SYSTEM", "TRACKING", "TRACKING,FK5,ICRS,AZEL,GALACTIC,"
@@ -609,6 +614,7 @@ void smurf_qlmakemap( int *status ) {
   if( bbms ) smf_close_related( &bbms, status );
   grpDelet( &igrp, status );
   if( wf ) wf = smf_destroy_workforce( wf );
+  if (extpars) extpars = astAnnul( extpars );
 
   ndfEnd( status );
 
