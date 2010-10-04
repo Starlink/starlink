@@ -52,6 +52,9 @@
 *        Original version.
 *     2010-09-21 (COBA):
 *        Updated prologue with ADAM params
+*     2010-10-01 (COBA):
+*        - Replaced single ZPD value input with 2D ZPD array input
+*        - FFTW does NOT need suitable ssHalfLength and dsHalfLength lengths
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -107,19 +110,23 @@ void smurf_fts2_phasecorr(int* status)
 {
   if(*status != SAI__OK) { return; }
 
-  char datatype[DAT__SZNAM + 1];  /* String for DATA/VARIANCE type */
+  char datatype[DAT__SZNAM + 1];    /* String for DATA/VARIANCE type */
   int coeffLength           = 0;    /* Number of polynomial coefficients */
   int dsHalfLength          = 0;    /* Size of the double sided interferogram */
   int fIndex                = 0;    /* File loop counter */
   int index                 = 0;    /* Index */
   int i                     = 0;    /* Loop counter */
+  int ii                    = 0;    /* Loop counter */
   int j                     = 0;    /* Loop counter */
+  int jj                    = 0;    /* Loop counter */
   int k                     = 0;    /* Loop counter */
+  int kk                    = 0;    /* Loop counter */
   int newN                  = 0;    /* Time series length of the output data */
   int num                   = 0;    /* Temporary place holder */
   int pixelCount            = 0;    /* Number of bolometers in the subarray */
   int phaseFunctionHalfLength = 0;  /* Half-length of phase function */
   int polynomialDegree      = 0;    /* Degree of the polynomial used to fit */
+  int srcSubarray           = 0;    /* Source sub-array */
   int ssHalfLength          = 0;    /* Size of the single sided interferogram */
   int phaseFunctionLength   = 0;    /* Phase correction function size */
   int phaseLength           = 0;    /* Phase length */
@@ -127,14 +134,17 @@ void smurf_fts2_phasecorr(int* status)
   int srcHeight             = 0;    /* Height of the subarray */
   int srcWidth              = 0;    /* Width of the subarray */
   int srcN                  = 0;    /* Time series length of the input data */
-  int ssHalfLengthInit      = 0;    /* Initial half-length of the single-sided interferogram */
   int tmp                   = 0;    /* Temporary place holder */
+  int zpdHeight             = 0;    /* Height of the ZPD array */
   int zpdIndex              = 0;    /* Index of ZPD */
+  int zpdSubarray           = 0;    /* ZPD sub-array */
+  int zpdWidth              = 0;    /* Width of the ZPD array */
   double stddev             = 0.0;  /* Standard deviation */
-  double weightLimit        = 0.0;  /* Determines whether a point needs to be taken into consideration for phase correction */
+  double weightLimit        = 0.0;  /* Weighting factor limit */
   double wnFact             = 0.0;  /* Wavenumber factor */
-  double wnLBoundPercent    = 0.0;  /* The lower bound (%) of wave number range */
-  double wnUBoundPercent    = 0.0;  /* The upper bound (%) of wave number range */
+  double wnLBoundPercent    = 0.0;  /* Lower bound(%) of wave number range */
+  double wnUBoundPercent    = 0.0;  /* Upper bound(%) of wave number range */
+  double zpdValue           = 0.0;  /* ZPD value */
   double* coefficients      = NULL; /* Coefficients of the polynomial */
   double* interferogram     = NULL; /* Single bolometer interferogram */
   float* fPositions         = NULL; /* Mirror positions */
@@ -143,16 +153,20 @@ void smurf_fts2_phasecorr(int* status)
   double* phaseFunction     = NULL; /* Phase correction function */
   Grp* igrp                 = NULL; /* Input group */
   Grp* ogrp                 = NULL; /* Output group */
+  Grp* zpdgrp               = NULL; /* Output group */
   size_t count              = 0;    /* Mirror positions count */
   size_t insize             = 0;    /* Size of the input group */
   size_t outsize            = 0;    /* Size of the output group */
+  size_t zpdsize            = 0;    /* Size of the ZPD group */
   smfData* fpm              = NULL; /* Fitting params data */
   smfData* sigma            = NULL; /* smfFts standard deviation */
   smfData* srcData          = NULL; /* Pointer to input data */
   smfData* newSrcData       = NULL; /* Pointer to output data */
+  smfData* zpdData          = NULL; /* Pointer to ZPD data */
   HDSLoc* hdsLoc            = NULL; /* Pointer to HDS location */
-  HDSLoc* hdsLocPosition    = NULL; /* Pointer to HDS location for mirror positions */
+  HDSLoc* hdsLocPosition    = NULL; /* Pointer to mirror positions */
   void* srcCube             = NULL; /* Pointer to the input data cube */
+  void* zpdArray            = NULL; /* Pointer to 2D ZPD data values */
 
   /* GET INPUT GROUP */
   kpg1Rgndf("IN", 0, 1, "", &igrp, &insize, status);
@@ -160,9 +174,10 @@ void smurf_fts2_phasecorr(int* status)
   kpg1Wgndf("OUT", ogrp, insize, insize,
             "Equal number of input and output files expected!",
             &ogrp, &outsize, status);
+  /* GET ZPD GROUP */
+  kpg1Gtgrp("ZPD", &zpdgrp, &zpdsize, status);
 
   /* GET PARAMS */
-  parGet0i("ZPDINDEX", &zpdIndex, status);
   parGet0i("DSHALFLENGTH", &dsHalfLength, status);
   parGet0i("SSHALFLENGTH", &ssHalfLength, status);
   parGet0i("DEGREE", &polynomialDegree, status);
@@ -183,19 +198,35 @@ void smurf_fts2_phasecorr(int* status)
 
   coeffLength = polynomialDegree + 1;
 
-  /* DOUBLE-SIDED INTERFEROGRAM HALF-LENGTH */
-  tmp = ((zpdIndex + 1) < dsHalfLength) ? (zpdIndex + 1) : dsHalfLength;
-  dsHalfLength = 1;
-  for(i = tmp; i >= 1; i--) {
-    num = i;
-    while(num % 2 == 0) { num /= 2; }
-    while(num % 3 == 0) { num /= 3; }
-    while(num % 5 == 0) { num /= 5; }
-    while(num % 7 == 0) { num /= 7; }
-    if(num == 1) { dsHalfLength = i; break; }
+  ndfBegin();
+
+  /* GET ZPD */
+  smf_open_file(zpdgrp, 1, "READ", SMF__NOCREATE_QUALITY, &zpdData, status);
+  if(*status != SAI__OK) {
+    *status = SAI__ERROR;
+    errRep(FUNC_NAME, "Unable to open the ZPD file!", status);
+    goto CLEANUP;
+  }
+  if(zpdData->dtype == SMF__FLOAT) {
+    zpdArray = (float*) (zpdData->pntr[0]);
+  } else if(zpdData->dtype == SMF__DOUBLE) {
+    zpdArray = (double*) (zpdData->pntr[0]);
+  } else {
+    *status = SAI__ERROR;
+    errRep(FUNC_NAME, "Invalid data type found!", status);
+    smf_close_file(&zpdData, status);
+    goto CLEANUP;
+  }
+  zpdWidth   = zpdData->dims[0];
+  zpdHeight  = zpdData->dims[1];
+  smf_find_subarray(zpdData->hdr, NULL, 0, &zpdSubarray, status);
+  if(*status != SAI__OK) {
+    *status = SAI__ERROR;
+    errRep(FUNC_NAME, "Unable to determine the ZPD subarray ID!", status);
+    smf_close_file(&zpdData, status);
+    goto CLEANUP;
   }
 
-  ndfBegin();
   /* LOOP THROUGH EACH NDF FILE IN THE GROUP */
   for(fIndex = 1; fIndex <= insize; fIndex++) {
     smf_open_file( ogrp, fIndex, "UPDATE",
@@ -205,6 +236,7 @@ void smurf_fts2_phasecorr(int* status)
                    SMF__NOCREATE_FTS,
                    &srcData, status);
     if(*status != SAI__OK) {
+      *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unable to open source file!", status);
       break;
     }
@@ -213,7 +245,9 @@ void smurf_fts2_phasecorr(int* status)
     } else if(srcData->dtype == SMF__DOUBLE) {
       srcCube = (double*) (srcData->pntr[0]);
     } else {
+      *status = SAI__ERROR;
       errRep(FUNC_NAME, "Invalid data type found!", status);
+      smf_close_file(&srcData, status);
       break;
     }
     srcWidth   = srcData->dims[0];
@@ -221,22 +255,19 @@ void smurf_fts2_phasecorr(int* status)
     srcN       = srcData->dims[2];
     pixelCount = srcWidth * srcHeight;
 
-    phaseLength = dsHalfLength + 1;
-    phaseFunctionLength = (dsHalfLength <= phaseFunctionHalfLength) ?
-                              dsHalfLength << 1 : phaseFunctionHalfLength << 1;
-    phaseFunctionHalfLength = phaseFunctionLength >> 1;
-
-    /* SINGLE-SIDED INTERFEROGRAM HALF-LENGTH */
-    ssHalfLengthInit = srcN - zpdIndex - phaseFunctionHalfLength;
-    tmp = (ssHalfLengthInit < ssHalfLength) ? ssHalfLengthInit : ssHalfLength;
-    ssHalfLength = 1;
-    for(i = tmp; i >= 1; i--) {
-      num = i;
-      while(num % 2 == 0) { num /= 2; }
-      while(num % 3 == 0) { num /= 3; }
-      while(num % 5 == 0) { num /= 5; }
-      while(num % 7 == 0) { num /= 7; }
-      if(num == 1) { ssHalfLength = i; break; }
+    smf_find_subarray(srcData->hdr, NULL, 0, &srcSubarray, status);
+    if(*status != SAI__OK) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "Unable to determine the source subarray ID!", status);
+      smf_close_file(&srcData, status);
+      break;
+    }
+    if( zpdSubarray != srcSubarray ||
+        zpdWidth != srcWidth || zpdHeight != srcHeight) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "Incompatible subarray found!", status);
+      smf_close_file(&srcData, status);
+      break;
     }
 
     /* WAVENUMBER FACTOR */
@@ -246,12 +277,17 @@ void smurf_fts2_phasecorr(int* status)
     fPositions = astMalloc(count * sizeof(*fPositions));
     datGetVR(hdsLocPosition, count, fPositions, &count, status);
     wnFact = 1.0 / (fPositions[1] - fPositions[0]) / (2.0 * ssHalfLength);
-    smf_fits_updateD(srcData->hdr, "WNFACT", wnFact, "Wavenumber factor", status);
-    astFree(fPositions);
+    smf_fits_updateD( srcData->hdr, "WNFACT", wnFact,
+                      "Wavenumber factor", status);
     if(hdsLoc) { datAnnul(&hdsLoc, status); }
     if(hdsLocPosition) { datAnnul(&hdsLocPosition, status); }
 
-    /* DATA CUBE SIZE WILL CHANGE MAKE A DEEP COPY OF srcData */
+    phaseLength = dsHalfLength + 1;
+    phaseFunctionLength = (dsHalfLength <= phaseFunctionHalfLength) ?
+                              dsHalfLength << 1 : phaseFunctionHalfLength << 1;
+    phaseFunctionHalfLength = phaseFunctionLength >> 1;
+
+    /* DATA CUBE SIZE WILL CHANGE, MAKE A DEEP COPY OF srcData */
     newN = ssHalfLength + 1;
     newSrcData = smf_deepcopy_smfData( srcData, 0,
                                        SMF__NOCREATE_DATA |
@@ -261,7 +297,8 @@ void smurf_fts2_phasecorr(int* status)
     newSrcData->dims[0] = srcWidth;
     newSrcData->dims[1] = srcHeight;
     newSrcData->dims[2] = newN;
-    newSrcData->pntr[0] = (double*) astMalloc((srcWidth * srcHeight * newN) * sizeof(double));
+    newSrcData->pntr[0] = (double*) astMalloc( pixelCount * newN *
+                                               sizeof(double));
 
     /* FPM (Polynomial Fit Coefficients) */
     fpm = smf_create_smfData( SMF__NOCREATE_DA |
@@ -271,7 +308,8 @@ void smurf_fts2_phasecorr(int* status)
     fpm->dims[0] = srcWidth;
     fpm->dims[1] = srcHeight;
     fpm->dims[2] = coeffLength;
-    fpm->pntr[0] = (double*) astMalloc((srcWidth * srcHeight * coeffLength) * sizeof(double));
+    fpm->pntr[0] = (double*) astMalloc( pixelCount * coeffLength *
+                                        sizeof(double));
 
     /* SIGMA (Standard Deviations) */
     sigma = smf_create_smfData( SMF__NOCREATE_DA |
@@ -280,7 +318,8 @@ void smurf_fts2_phasecorr(int* status)
     sigma->ndims   = 2;
     sigma->dims[0] = srcWidth;
     sigma->dims[1] = srcHeight;
-    sigma->pntr[0] = (double*) astMalloc((srcWidth * srcHeight) * sizeof(double));
+    sigma->pntr[0] = (double*) astMalloc( pixelCount *
+                                          sizeof(double));
 
     /* APPLY PHASE CORRECTION TO EACH BOLOMETER INTERFEROGRAM */
     interferogram = astMalloc(srcN * sizeof(*interferogram));
@@ -292,7 +331,7 @@ void smurf_fts2_phasecorr(int* status)
       for(j = 0; j < srcWidth; j++) {
         pixelIndex = i + j * srcHeight;
 
-        // INTERFEROGRAM
+        /* GET INTERFEROGRAM */
         for(k = 0; k < srcN; k++) {
           index = pixelIndex + pixelCount * k;
           if(srcData->dtype == SMF__FLOAT) {
@@ -302,7 +341,25 @@ void smurf_fts2_phasecorr(int* status)
           }
         }
 
-        // APPLY PHASE CORRECTION
+        /* GET ZPD VALUE & DETERMINE ZPD INDEX */
+        if(zpdData->dtype == SMF__FLOAT) {
+          zpdValue = (double)(*((float*)zpdArray + pixelIndex));
+        } else {
+          zpdValue = *((double*)zpdArray + pixelIndex);
+        }
+        jj = 0;
+        kk = srcN - 1;
+        while(kk - jj > 1) {
+          ii = (kk + jj) >> 1;
+          if(zpdValue < fPositions[ii]) {
+            kk = ii;
+          } else {
+            jj = ii;
+          }
+        }
+        zpdIndex = jj + 1;
+
+        /* APPLY PHASE CORRECTION */
         fts2_phasecorrection( interferogram, srcN, zpdIndex, dsHalfLength,
                               ssHalfLength, polynomialDegree,
                               phaseFunctionHalfLength,
@@ -316,7 +373,7 @@ void smurf_fts2_phasecorr(int* status)
           *((double*) (newSrcData->pntr[0]) + index) = newInterferogram[k];
         }
 
-        // INSERT FTS2 SPECIFIC DATA
+        /* INSERT FTS2 SPECIFIC DATA */
         *((double*)(sigma->pntr[0]) + pixelIndex) = stddev;
         for(k = 0; k <= polynomialDegree; k++) {
           index = pixelIndex + pixelCount * k;
@@ -329,15 +386,13 @@ void smurf_fts2_phasecorr(int* status)
     astFree(coefficients);
     astFree(phase);
     astFree(phaseFunction);
-
+    astFree(fPositions);
     smf_close_file(&srcData, status);
 
     newSrcData->fts = smf_construct_smfFts(NULL, fpm, sigma, status);
     smf_write_smfData(newSrcData, NULL, NULL, ogrp, fIndex, 0, status);
-
     smf_close_file(&newSrcData, status);
   }
-  ndfEnd(status);
 
   // ===========================================================================
   // UPDATE MIRROR POSITIONS
@@ -346,14 +401,16 @@ void smurf_fts2_phasecorr(int* status)
   int exist = 0;
   int offset = 0;
   float* fNewPositions = NULL;
-  ndfBegin();
   // LOOP THROUGH EACH NDF FILE IN THE GROUP
   for(fIndex = 1; fIndex <= insize; fIndex++) {
     smf_open_file( ogrp, fIndex, "UPDATE",
-                   SMF__NOCREATE_QUALITY | SMF__NOCREATE_FTS, &srcData, status);
-    if(*status != SAI__OK) {
-      break;
-    }
+                   SMF__NOCREATE_QUALITY |
+                   SMF__NOCREATE_VARIANCE |
+                   SMF__NOCREATE_DA |
+                   SMF__NOCREATE_FTS,
+                   &srcData, status);
+
+    if(*status != SAI__OK) { break; }
 
     srcN = srcData->dims[2];
     dims[0] = srcN;
@@ -382,9 +439,11 @@ void smurf_fts2_phasecorr(int* status)
     if(hdsLocPosition) { datAnnul(&hdsLocPosition, status); }
     smf_close_file(&srcData, status);
   }
-  ndfEnd(status);
   // ===========================================================================
 
-  grpDelet(&igrp, status);
-  grpDelet(&ogrp, status);
+  CLEANUP:
+    ndfEnd(status);
+    grpDelet(&igrp, status);
+    grpDelet(&ogrp, status);
+    grpDelet(&zpdgrp, status);
 }

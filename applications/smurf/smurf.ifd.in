@@ -226,6 +226,8 @@
 #         FTS2 ADAM params are alphabetically ordered
 #     2010-09-30 (COBA):
 #         Add FTS2_EQSLICED
+#     2010-10-04 (COBA):
+#         Replace zpdIndex with 2D zpd array ndf for FTS2_PHASECORR
 #     {enter_changes_here}
 
 #  Bugs:
@@ -1568,13 +1570,11 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter zpdindex {
-                type _INTEGER
-                access READ
-                vpath CURRENT DEFAULT
-                ppath CURRENT DEFAULT
-                prompt {Index of the ZPD}
-                default 400
+            parameter zpd {
+                position 3
+                type _CHAR
+                vpath {PROMPT}
+                prompt {ZPD values}
                 helpkey *
             }
         }
