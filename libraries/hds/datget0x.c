@@ -31,6 +31,7 @@
  *        datGet0D    DOUBLE PRECISION
  *        datGet0R    REAL / FLOAT
  *        datGet0I    INTEGER
+ *        datGet0W    WORD / SHORT
  *        datGet0L    LOGICAL
  *        datGet0C    CHARACTER[*n]
  *
@@ -164,6 +165,18 @@ int datGet0I ( const HDSLoc * loc, int * value, int * status ) {
   if ( *status != DAT__OK ) return *status;
 
   datGetI( loc, ndims, dim, value, status );
+
+  return *status;
+}
+
+int datGet0W ( const HDSLoc * loc, short * value, int * status ) {
+
+  int ndims = 0;
+  hdsdim dim[] = { 0 };
+
+  if ( *status != DAT__OK ) return *status;
+
+  datGetW( loc, ndims, dim, value, status );
 
   return *status;
 }

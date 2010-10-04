@@ -202,6 +202,17 @@ datGetI(const HDSLoc    *locator,
         int       values[],
         int       *status);
 
+/*===================================*/
+/* datGetW - Read _WORD primitive(s) */
+/*===================================*/
+
+int
+datGetW(const HDSLoc    *locator,
+        int       ndim,
+        const hdsdim    dims[],
+        short     values[],
+        int       *status);
+
 /*======================================*/
 /* datGetL - Read _LOGICAL primitive(s) */
 /*======================================*/
@@ -252,6 +263,13 @@ datGet0R( const HDSLoc * loc, float * value, int * status );
 int
 datGet0I( const HDSLoc * loc, int * value, int * status );
 
+/*=============================================*/
+/* datGet0W - Read scalar short integer value  */
+/*=============================================*/
+
+int
+datGet0W( const HDSLoc * loc, short * value, int * status );
+
 /*=======================================*/
 /* datGet0L - Read scalar logical value  */
 /*=======================================*/
@@ -291,6 +309,17 @@ int
 datGet1I( const HDSLoc * locator,
 	  size_t maxval,
 	  int values[],
+	  size_t *actval,
+	  int * status );
+
+/*=========================================*/
+/* DAT_GET1W - Read 1D Short Integer array */
+/*=========================================*/
+
+int
+datGet1W( const HDSLoc * locator,
+	  size_t maxval,
+	  short values[],
 	  size_t *actval,
 	  int * status );
 
@@ -592,6 +621,15 @@ datNew0I( const HDSLoc    *locator,
         const char      *name_str,
         int       *status);
 
+/*======================================================*/
+/* datNew0W - Create new scalar short integer component */
+/*======================================================*/
+
+int
+datNew0W( const HDSLoc    *locator,
+        const char      *name_str,
+        int       *status);
+
 /*=============================================*/
 /* datNew0R - Create new scalar real component */
 /*=============================================*/
@@ -660,6 +698,16 @@ datNew1D( const HDSLoc    *locator,
 
 int
 datNew1I( const HDSLoc    *locator,
+	 const char      *name_str,
+	 size_t          len,
+	 int       *status);
+
+/*=============================================*/
+/* datNew1W - Create new vector short integer  */
+/*=============================================*/
+
+int
+datNew1W( const HDSLoc    *locator,
 	 const char      *name_str,
 	 size_t          len,
 	 int       *status);
@@ -756,6 +804,17 @@ datPutI( const HDSLoc *locator,
          const int     values[],
          int     *status);
 
+/*=====================================*/
+/* datPutW - Write _WORD primitives */
+/*=====================================*/
+
+int
+datPutW( const HDSLoc *locator,
+         int     ndim,
+         const hdsdim dims[],
+         const short     values[],
+         int     *status);
+
 /*==================================*/
 /* datPutR - Write _REAL primitives */
 /*==================================*/
@@ -818,6 +877,13 @@ datPut0R( const HDSLoc * loc, float value, int * status );
 int
 datPut0I( const HDSLoc * loc, int value, int * status );
 
+/*==============================================*/
+/* datPut0W - Write scalar short integer value  */
+/*===============================================*/
+
+int
+datPut0W( const HDSLoc * loc, short value, int * status );
+
 /*========================================*/
 /* datPut0L - Write scalar logical value  */
 /*========================================*/
@@ -853,6 +919,16 @@ int
 datPut1I( const HDSLoc * loc,
 	  size_t nval,
 	  const int values[],
+	  int * status );
+
+/*===========================================*/
+/* datPut1W - Write 1D short int array       */
+/*===========================================*/
+
+int
+datPut1W( const HDSLoc * loc,
+	  size_t nval,
+	  const short values[],
 	  int * status );
 
 /*========================================*/

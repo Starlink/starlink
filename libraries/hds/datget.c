@@ -223,6 +223,28 @@ datGetI(const HDSLoc    *locator,
    return hds_gl_status;
 }
 
+/*====================================*/
+/* DAT_GETW - Read Short Integer data */
+/*====================================*/
+int
+datGetW(const HDSLoc    *locator,
+        int       ndim,
+        const HDS_PTYPE dims[],
+        short       values[],
+        int       *status)
+{
+#undef context_name
+#undef context_message
+#define context_name "DAT_GETW_ERR"
+#define context_message\
+        "DAT_GETW: Error reading short integer value(s) from an HDS primitive."
+
+   datGet(locator, "_WORD", ndim, dims,
+                     values, status );
+
+   return hds_gl_status;
+}
+
 /*===========================*/
 /* DAT_GETR - Read REAL data */
 /*===========================*/
