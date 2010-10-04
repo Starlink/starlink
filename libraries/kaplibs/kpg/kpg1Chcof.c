@@ -2,6 +2,7 @@
 #include "ast.h"
 #include "mers.h"
 #include "sae_par.h"
+#include "kaplibs.h"
 #include <string.h>
 
 static void kpg1Chpc1( double *, double *, int, int *, int *, int * );
