@@ -1128,7 +1128,8 @@ int smf_get_ndfid ( const HDSLoc *loc, const char *name, const char *accmode,
 
 int smf_get_nthread( int *status );
 
-dim_t smf_get_padding( AstKeyMap *keymap, double steptime, int report, int *status );
+dim_t smf_get_padding( AstKeyMap *keymap, double steptime, int report,
+                       const smfHead *hdr, int *status );
 
 void smf_get_projpar( AstSkyFrame *skyframe, const double skyref[2],
                       int moving, int autogrid,
@@ -1165,9 +1166,9 @@ AstKeyMap *smf_groupscans( Grp *igrp,  int size, int *maxsyspop,
                            int *conform, Grp **ogrp, int *status );
 
 void smf_grp_related(  const Grp *igrp, const size_t grpsize,
-                       const int grpbywave, dim_t maxlen,
+                       const int grpbywave, dim_t maxlen, AstKeyMap *keymap,
                        dim_t *maxconcatlen, dim_t *maxfilelen, smfGroup **group,
-                       Grp **basegrp, int *status );
+                       Grp **basegrp, dim_t *pad, int *status );
 
 void smf_history_add( smfData* data, const char * appl,
                       int *status);
@@ -1532,6 +1533,9 @@ void smf_rolling_fit( dim_t box, float wlim, dim_t el, dim_t start,
 
 int smf_samedims_smfData( const smfData *data1, const smfData *data2,
                           int *status );
+
+void smf_scale2freq( double f_edgesmall, double f_edgelarge, const smfHead *hdr,
+                     double *f_edgelow, double *f_edgehigh, int *status );
 
 void smf_scalar_multiply( smfData * data, double dscalar, int * status );
 

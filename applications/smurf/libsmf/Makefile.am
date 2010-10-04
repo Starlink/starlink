@@ -303,6 +303,7 @@ smf_reshapendf.c \
 smf_rolling_fit.c \
 smf_samedims_smfData.c \
 smf_scalar_multiply.c \
+smf_scale2freq.c \
 smf_select_pntr.c \
 smf_select_cqualpntr.c \
 smf_select_qualpntr.c \

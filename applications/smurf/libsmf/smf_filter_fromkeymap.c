@@ -54,6 +54,8 @@
 *        Choose filter edges based on scanvel (stored in hdr)
 *     2010-09-29 (DSB):
 *        Switch off apodisation unless the data is to be padded with zeros.
+*     2010-10-4 (DSB):
+*        Call smf_scale2freq to convert spatial scales to frequencies.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -124,33 +126,8 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap,
                     NULL, NULL, NULL, NULL, NULL, NULL, status );
 
   /* Modify edge filters if spacial scales were requested */
-  if( f_edgesmall || f_edgelarge ) {
-    if( !hdr || (hdr->scanvel<=0) ) {
-      *status = SAI__ERROR;
-      errRep( "", FUNC_NAME
-              ": FILT_EDGE_SMALLSCALE or FILT_EDGE_LARGESCALE, but "
-              "no smfHead supplied or invalid smfHead->scanvel", status );
-      return;
-    } else {
-      msgOutiff( MSG__VERB, "", FUNC_NAME
-                 ": Based on a slew speed of %.1lf arcsec/sec, setting:",
-                 status, hdr->scanvel );
-
-      if( f_edgesmall ) {
-        f_edgelow = hdr->scanvel / f_edgesmall;
-        msgOutiff( MSG__VERB, "", FUNC_NAME
-                   ": FILT_EDGELOW = %.3lf Hz (> %.1lf arcsec scales)",
-                   status, f_edgelow, f_edgesmall );
-      }
-
-      if( f_edgelarge ) {
-        f_edgehigh = hdr->scanvel / f_edgelarge;
-        msgOutiff( MSG__VERB, "", FUNC_NAME
-                   ": FILT_EDGEHIGH = %.3lf Hz (< %.1lf arcsec scales)",
-                   status, f_edgehigh, f_edgelarge );
-      }
-    }
-  }
+  smf_scale2freq( f_edgesmall, f_edgelarge, hdr, &f_edgelow, &f_edgehigh,
+                  status );
 
   /* Return dofilt if requested */
   if( dofilt ) {

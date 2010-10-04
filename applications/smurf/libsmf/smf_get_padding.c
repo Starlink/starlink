@@ -15,7 +15,7 @@
 
 *  Invocation:
 *     result = smf_get_padding( AstKeyMap *keymap, double steptime,
-*                               int report, int *status )
+*                               int report, const smfHead *hdr, int *status )
 
 *  Arguments:
 *     keymap = AstKeyMap* (Given)
@@ -24,6 +24,9 @@
 *        Length of a sample in seconds,
 *     report = int (Given)
 *        If non-zero, report the default value if it is used.
+*     hdr = smfHead *(Given)
+*        Used to determine the scan velocity when converting spatial
+*        scales to frequencies.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -52,8 +55,10 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     21-JUL-2010 (EC):
+*     21-JUL-2010 (DSB):
 *        Initial version.
+*     4-OCT-2010 (DSB):
+*        Add support for spatial filter scales.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -93,17 +98,19 @@
 #include "libsmf/smf.h"
 
 dim_t smf_get_padding( AstKeyMap *keymap, double steptime, int report,
-                       int *status ) {
+                       const smfHead *hdr, int *status ) {
 
 /* Local Variables: */
    AstObject *obj;
    const char *key;
    dim_t pad;
    dim_t result;
-   double filt_notchlow[ SMF__MXNOTCH ];
-   double filt_edgelow;
-   double filt_edgehigh;
    double f_low;
+   double filt_edgehigh;
+   double filt_edgelarge;
+   double filt_edgelow;
+   double filt_edgesmall;
+   double filt_notchlow[ SMF__MXNOTCH ];
    int f_nnotch;
    int iel;
    int nel;
@@ -135,67 +142,67 @@ dim_t smf_get_padding( AstKeyMap *keymap, double steptime, int report,
    values that can be used to calculate a default PAD value. */
       if( *status == AST__MPKER ) errAnnul( status );
 
-/* Get any low pass filter edge. */
-      if( !astMapGet0D( keymap, "FILT_EDGELOW", &filt_edgelow ) ) {
-         filt_edgelow = VAL__MAXD;
-         if( *status == AST__MPKER ) errAnnul( status );
-      }
+/* Search for filtering parameters in the keymap */
+      smf_get_cleanpar( keymap, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+                        NULL, &filt_edgelow, &filt_edgehigh, &filt_edgesmall,
+                        &filt_edgelarge, filt_notchlow, NULL,
+                        &f_nnotch, NULL, NULL, NULL, NULL, NULL, NULL,
+                        NULL, status );
 
-/* Get any high pass filter edge. */
-      if( !astMapGet0D( keymap, "FILT_EDGEHIGH", &filt_edgehigh ) ){
-         filt_edgehigh = VAL__MAXD;
-         if( *status == AST__MPKER ) errAnnul( status );
-      }
+/* If none were found, annul the error and return a padding length of
+   zero. */
+      if( *status == AST__MPKER ) {
+         errAnnul( status );
+      } else {
 
-/* Get the low edges of any notch filters. */
-      if( !astMapGet1D( keymap, "FILT_NOTCHLOW", SMF__MXNOTCH, &f_nnotch,
-                        filt_notchlow ) ) {
-         f_nnotch = 0;
-         if( *status == AST__MPKER ) errAnnul( status );
-      }
+/* Modify edge filters if spatial scales were requested */
+         smf_scale2freq( filt_edgesmall, filt_edgelarge, hdr, &filt_edgelow,
+                         &filt_edgehigh, status );
 
 /* Find the lowest of these frequencies. The lowest frequency will give
    the greatest padding. */
-      f_low = ( filt_edgehigh > 0.0 ) ? filt_edgehigh : VAL__MAXD;
-      if( filt_edgelow > 0.0 && filt_edgelow < f_low ) f_low = filt_edgelow;
-      for( iel = 0; iel < f_nnotch; iel++ ) {
-        if( filt_notchlow[ iel ] > 0.0 && filt_notchlow[ iel ] < f_low ) f_low = filt_notchlow[ iel ];
-      }
+         f_low = ( filt_edgehigh > 0.0 ) ? filt_edgehigh : VAL__MAXD;
+         if( filt_edgelow > 0.0 && filt_edgelow < f_low ) f_low = filt_edgelow;
+         for( iel = 0; iel < f_nnotch; iel++ ) {
+           if( filt_notchlow[ iel ] > 0.0 && filt_notchlow[ iel ] < f_low ) f_low = filt_notchlow[ iel ];
+         }
 
 /* Find the corresponding padding. */
-      if( f_low != VAL__MAXD ) {
-         result = 1.0/( steptime * f_low );
-      } else {
-         result = 0;
-      }
+         if( f_low != VAL__MAXD ) {
+            result = 1.0/( steptime * f_low );
+         } else {
+            result = 0;
+         }
 
 /* Now check the supplied keymap for any nested keymaps. Assumes that each
    entry in the supplied KeyMap contain either a primitive value or a scalar
    KeyMap pointer. */
-      nel = astMapSize( keymap );
-      for( iel = 0; iel < nel; iel++ ) {
-         key = astMapKey( keymap, iel );
+         nel = astMapSize( keymap );
+         for( iel = 0; iel < nel; iel++ ) {
+            key = astMapKey( keymap, iel );
 
 /* If this entry is a KeyMap (assuming no other class of AST object is
    stored in the KeyMap)... */
-         if( astMapType( keymap, key ) == AST__OBJECTTYPE ) {
+            if( astMapType( keymap, key ) == AST__OBJECTTYPE ) {
 
 /* Get a pointer to the KeyMap. */
-            (void) astMapGet0A( keymap, key, &obj );
+               (void) astMapGet0A( keymap, key, &obj );
 
 /* Call this function to get the padding implied by the sub-KeyMap. */
-            pad = smf_get_padding( (AstKeyMap *) obj, steptime, 0, status );
+               pad = smf_get_padding( (AstKeyMap *) obj, steptime, 0, hdr,
+                                      status );
 
 /* Use the larger of the two paddings. */
-            if( pad > result ) result = pad;
+               if( pad > result ) result = pad;
+            }
          }
-      }
 
 /* If required, report the default value. */
-      if( report ) {
-         msgSeti( "P", (int) result );
-         msgOutif( MSG__VERB, "", "Padding each time stream with ^P zero "
-                   "values at start and end.", status );
+         if( report ) {
+            msgSeti( "P", (int) result );
+            msgOutif( MSG__VERB, "", "Padding each time stream with ^P zero "
+                      "values at start and end.", status );
+         }
       }
    }
 

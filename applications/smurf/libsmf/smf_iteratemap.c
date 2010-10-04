@@ -338,6 +338,9 @@
 *        If noise map generated in smf_clean_smfData, use to initialize NOI
 *     2010-09-28 (EC):
 *        Added .MORE.SMURF.FLAGMAPS extension
+*     2010-10-04 (DSB):
+*        Move estimation of required padding into smf_get_related, to avoid
+*        opening all the input files an extra time.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -474,8 +477,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   dim_t ntslice;                /* Number of time slices */
   size_t numdata;               /* Total number of samples in chunk */
   int numiter=0;                /* Total number iterations */
-  dim_t padEnd=0;               /* How many samples of padding at the end */
-  dim_t padStart=0;             /* How many samples of padding at the start */
+  dim_t pad=0;                  /* How many samples of padding at both ends */
   char *pname=NULL;             /* Poiner to name */
   size_t qcount_last[SMF__NQBITS_TSERIES];/* quality bit counter -- last iter */
   smfArray **qua=NULL;          /* Quality flags for each file */
@@ -679,9 +681,6 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       }
     }
 
-    /* Padding */
-    padStart = padEnd = smf_get_padding( keymap, steptime, 1, status );
-
     /* Type and order of models to fit from MODELORDER keyword */
     havenoi = 0;
     haveext = 0;
@@ -858,8 +857,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
      data. Maxconcat will be the length of the largest continuous
      chunk, or maxlen, whichever comes first -- but excluding padding. */
 
-  smf_grp_related( igrp, isize, 1, maxlen, &maxconcat, &maxfile,
-                   &igroup, NULL, status );
+  smf_grp_related( igrp, isize, 1, maxlen, keymap, &maxconcat, &maxfile,
+                   &igroup, NULL, &pad, status );
 
   /* Once we've run smf_grp_related we know how many subarrays there
      are.  We also know the maximum length of a concatenated piece of
@@ -871,7 +870,10 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     size_t mapmem;
 
     /* Add on the padding */
-    maxconcat += padStart + padEnd;
+    maxconcat += 2*pad;
+    msgSeti( "P", pad );
+    msgOutif( MSG__VERB," ", FUNC_NAME ": Each time stream will be padded "
+              "with ^P samples at start and end.", status );
 
     /* First check memory for the map */
     smf_checkmem_map( lbnd_out, ubnd_out, 0, maxmem, &mapmem, status );
@@ -906,14 +908,14 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
          but subtract off one file if it exceeds available memory. If we
          don't have enough memory even for one input file we're hooped. */
 
-      try = ((try/maxfile)*maxfile + padStart);
+      try = ((try/maxfile)*maxfile + pad);
 
       if( (try > (maxconcat*( (double) maxmem / (double) memneeded ))) &&
           (try > maxfile) ) {
         try -= maxfile;
       }
 
-      if( try < (maxfile + padStart) ) {
+      if( try < (maxfile + pad) ) {
         *status = SMF__NOMEM;
         errRep( "", FUNC_NAME ": not enough memory available to break job "
                 "into smaller pieces.", status );
@@ -929,8 +931,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         smf_close_smfGroup( &igroup, status );
       }
 
-      smf_grp_related( igrp, isize, 1, try, &maxconcat, NULL, &igroup, NULL,
-                       status );
+      smf_grp_related( igrp, isize, 1, try, NULL, &maxconcat, NULL, &igroup,
+                       NULL, NULL, status );
     }
   }
 
@@ -1054,7 +1056,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         /* Concatenate (no variance since we calculate it ourselves -- NOI) */
         smf_concat_smfGroup( wf, igroup, darks, bbms, flatramps, contchunk,
                              ensureflat, 0, outfset, moving, lbnd_out,
-                             ubnd_out, padStart, padEnd,
+                             ubnd_out, pad, pad,
                              SMF__NOCREATE_VARIANCE, tstep, &res[0], status );
 
         /*** TIMER ***/

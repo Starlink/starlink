@@ -223,8 +223,8 @@ void smurf_calcnoise( int *status ) {
 
   /* We now need to combine files from the same subarray and same sequence
      to form a continuous time series */
-  smf_grp_related( igrp, size, 1, 0, &maxconcat, NULL, &igroup,
-                   &basegrp, status );
+  smf_grp_related( igrp, size, 1, 0, NULL, &maxconcat, NULL, &igroup,
+                   &basegrp, NULL, status );
 
   /* Get output file(s) */
   size = grpGrpsz( basegrp, status );

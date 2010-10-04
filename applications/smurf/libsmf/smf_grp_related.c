@@ -13,20 +13,24 @@
  *     SMURF subroutine
 
  *  Invocation:
- *     smf_grp_related( const Grp *igrp, const int grpsize, const int grpbywave,
- *                      dim_t maxlen, dim_t *maxconcatlen, dim_t *maxfilelen,
- *                      smfGroup **group, Grp **basegrp, int *status );
+ *     smf_grp_related( const Grp *igrp, const size_t grpsize, const int grpbywave,
+ *                      dim_t maxlen, AstKeyMap *keymap, dim_t *maxconcatlen,
+ *                      dim_t *maxfilelen, smfGroup **group, Grp **basegrp,
+ *                      dim_t *pad, int *status );
 
  *  Arguments:
  *     igrp = const Grp* (Given)
  *        Input Grp
- *     grpsize = const int (Given)
+ *     grpsize = const size_t (Given)
  *        Size of input Grp
  *     grpbywave = const int (Given)
  *        Flag to denote whether to group files by common wavelength
  *     maxlen = dim_t (Given)
  *        If set, maximum length of a continuous chunk in time samples. If 0
  *        don't enforce a maximum length.
+ *     keymap = AstKeyMap * (Given)
+ *        A pointer to a KeyMap holding the configuration parameters. Only
+ *        needed if "pad" is not NULL.
  *     maxconcatlen = dim_t* (Returned)
  *        The actual length in time samples of the longest continuous chunk.
  *        Can be NULL.
@@ -40,6 +44,10 @@
  *        be used as a basis group for requesting output files that
  *        could be derived from the smfGroup. Can be NULL if this information
  *        is not required.
+ *     pad = dim_t * (Returned)
+ *        The number of samples of padding to add to the start and end of
+ *        each time stream to avoid wrap-around efffects and ringing when
+ *        filtering. May be NULL.
  *     status = int* (Given and Returned)
  *        Pointer to global status.
 
@@ -115,6 +123,8 @@
  *        Add basegrp argument.
  *     2010-03-02 (EC):
  *        Added maxfilelen to interface.
+ *     2010-10-04 (DSB):
+ *        Added pad and keymap to interface.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -171,10 +181,10 @@
 
 #define FUNC_NAME "smf_grp_related"
 
-void smf_grp_related(  const Grp *igrp, const size_t grpsize,
-                       const int grpbywave, dim_t maxlen,
-                       dim_t *maxconcatlen, dim_t *maxfilelen, smfGroup **group,
-                       Grp **basegrp, int *status ) {
+void smf_grp_related( const Grp *igrp, const size_t grpsize, const int grpbywave,
+                      dim_t maxlen, AstKeyMap *keymap, dim_t *maxconcatlen,
+                      dim_t *maxfilelen, smfGroup **group, Grp **basegrp,
+                      dim_t *pad, int *status ){
 
   /* Local variables */
   dim_t *all_len = NULL;      /* Lengths of each chunk */
@@ -199,6 +209,7 @@ void smf_grp_related(  const Grp *igrp, const size_t grpsize,
   dim_t maxconcat=0;          /* Longest continuous chunk length */
   dim_t maxflen=0;            /* Max file length in time steps */
   dim_t maxnelem=0;           /* Max elem (subarrays) encountered */
+  dim_t maxpad=0;             /* Maximum padding neeed for any input file */
   dim_t *nbolx = NULL;        /* Number of bolometers in X direction */
   dim_t *nboly = NULL;        /* Number of bolometers in Y direction */
   dim_t nelem;                /* Number of elements in index array */
@@ -210,6 +221,7 @@ void smf_grp_related(  const Grp *igrp, const size_t grpsize,
   dim_t ny;                   /* (data->dims)[1] */
   double obslam;              /* Observed wavelength from FITS header (m) */
   double opentime;            /* RTS_END value at beginning of written data */
+  dim_t thispad;              /* Padding neeed for current input file */
   int refnsubscan;            /* reference subscan file counter */
   char refobsidss[SZFITSCARD];/* reference obsidss */
   int refseqcount;            /* reference sequence counter */
@@ -281,6 +293,11 @@ void smf_grp_related(  const Grp *igrp, const size_t grpsize,
       smf_fits_getD(hdr, "WAVELEN", &obslam, status );
     }
     if ( *status != SAI__OK ) goto CLEANUP;
+
+    /* Get the padding to filter this data, and find the maximum padding
+       needed by any of the input files. */
+    thispad = smf_get_padding( keymap, hdr->steptime, 0, hdr, status );
+    if( thispad > maxpad ) maxpad = thispad;
 
     /* Now get data dimensions */
     nx = (data->dims)[0];
@@ -682,4 +699,6 @@ void smf_grp_related(  const Grp *igrp, const size_t grpsize,
 
   }
 
+/* Return the maximum padding if required. */
+  if( pad ) *pad = maxpad;
 }

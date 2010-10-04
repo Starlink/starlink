@@ -230,7 +230,8 @@ void smurf_remsky( int * status ) {
       smf_close_file( &odata, status);
     }
     /* Group output files together now that they exist */
-    smf_grp_related( ogrp, outsize, 1, 0, NULL, NULL, &ogroup, NULL, status );
+    smf_grp_related( ogrp, outsize, 1, 0, NULL, NULL, NULL, &ogroup, NULL,
+                     NULL, status );
     if ( *status == SAI__OK ) {
       /* Open and process related files */
       for (i=0; i<ogroup->ngroups; i++) {

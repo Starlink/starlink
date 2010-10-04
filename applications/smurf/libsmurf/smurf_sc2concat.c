@@ -225,8 +225,8 @@ void smurf_sc2concat( int *status ) {
   parGet0l( "FLAT", &ensureflat, status );
 
   /* Group the input files by subarray and continuity */
-  smf_grp_related( igrp, isize, 1, maxlen-padStart-padEnd, &maxconcat, NULL,
-                   &igroup, &basegrp, status );
+  smf_grp_related( igrp, isize, 1, maxlen-padStart-padEnd, NULL, &maxconcat,
+                   NULL, &igroup, &basegrp, NULL, status );
 
   /* Obtain the number of continuous chunks and subarrays */
   if( *status == SAI__OK ) {
