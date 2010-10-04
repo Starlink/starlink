@@ -53,7 +53,7 @@ com.gain_abstol = 3
 # comes after all the other model components, the data should be
 # fairly flat, so this is less dangerous.
 
-ast.spikethresh = 5
+ast.mapspike = 5
 
 # Heavier high-pass filtering. Note that the default padding/apodization
 # that will be used is the number of samples that corresponds to the
