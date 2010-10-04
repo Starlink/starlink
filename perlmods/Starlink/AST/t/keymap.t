@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use constant NTESTS => 57;
+use constant NTESTS => 70;
 use Test::More tests => NTESTS;
 
 require_ok( "Starlink::AST");
@@ -26,6 +26,7 @@ my $map = new Starlink::AST::KeyMap( "" );
 my %TYPES = (
 	     "D" => &Starlink::AST::KeyMap::AST__DOUBLETYPE(),
 	     "I" => &Starlink::AST::KeyMap::AST__INTTYPE(),
+	     "S" => &Starlink::AST::KeyMap::AST__SINTTYPE(),
 	     "C" => &Starlink::AST::KeyMap::AST__STRINGTYPE(),
 	     "A" => &Starlink::AST::KeyMap::AST__OBJECTTYPE(),
 	    );
@@ -33,12 +34,14 @@ my %TYPES = (
 # Test hash
 my %TESTS = (
 	     "DOUBLE" => [ "0D", 5.4, "comment" ],
-	     "INTEGER" => [ "0I", 42, "" ],
+	     "INTEGER" => [ "0I", 100_000, "" ],
+             "SHORT"  => [ "0S", 30000, "" ],
 	     "STRING" => [ "0C", "hello again", "comment2" ],
 	     "OBJECT" => [ "0A", new Starlink::AST::UnitMap(2,""),
 			   "comment3" ],
 	     "DARR" => [ "1D", [2.3,-1.3], ""],
-	     "IARR" => [ "1I", [22,-13], ""],
+	     "IARR" => [ "1I", [22e6,-13], ""],
+	     "SARR" => [ "1S", [22,-30000], ""],
 	     "STRARR" => [ "1C", ["hello","goodbye","yo"], ""],
 	     "DOBJ" => [ "1A", [
 				new Starlink::AST::UnitMap(2, ""),

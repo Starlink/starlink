@@ -466,7 +466,8 @@ sub FETCH {
     } elsif ($type == Starlink::AST::KeyMap::AST__DOUBLETYPE() ||
             $type == Starlink::AST::KeyMap::AST__FLOATTYPE() ) {
       @results = $km->MapGet1D( $key );
-    } elsif ($type == Starlink::AST::KeyMap::AST__INTTYPE() ) {
+    } elsif ($type == Starlink::AST::KeyMap::AST__INTTYPE() ||
+             $type == Starlink::AST::KeyMap::AST__SINTTYPE() ) {
       @results = $km->MapGet1I( $key );
     } elsif ($type == Starlink::AST::KeyMap::AST__STRINGTYPE() ) {
       @results = $km->MapGet1C( $key );
@@ -498,7 +499,9 @@ sub STORE {
     if (defined $val) {
       if (looks_like_number($val)) {
         if (int($val) - $val == 0) {
-          $km->MapPut0I( $key, $val, "Stored by Perl Tie interface [SCALARINT]" );
+          my $itype = _intrange( $val );
+          my $method = "MapPut0" . $itype;
+          $km->$method( $key, $val, "Stored by Perl Tie interface [SCALARINT($itype)]" );
         } else {
           $km->MapPut0D( $key, $val, "Stored by Perl Tie interface [SCALARDBL]" );
         }
@@ -573,7 +576,9 @@ sub STORE {
       } elsif ($has_numbers && !$has_strings) {
         # Store as doubles
         if ($has_floats == 0) {
-          $km->MapPut1I( $key, $val, "Stored by Perl Tie Interface [INTARR]" );
+          my $itype = _intrange( @$val );
+          my $method = "MapPut1" . $itype;
+          $km->$method( $key, $val, "Stored by Perl Tie Interface [INTARR($itype)]" );
         } else {
           $km->MapPut1D( $key, $val, "Stored by Perl Tie Interface [DBLARR]" );
         }
@@ -589,6 +594,25 @@ sub STORE {
     croak "Do not know how to store $val into a tied AST KeyMap";
   }
 
+}
+
+# _intrange determines the type ("I"nt or "S"hort) to use for storing
+# the integers based on range.
+# Currently we do not check for unsigned short or 64-bit int.
+
+sub _intrange {
+  # Default to the smallest size
+  my $type = "S";
+  use constant NUM__MINW => (-32767 - 1);
+  use constant NUM__MAXW => 32767;
+  for my $i (@_) {
+    # SHORT/WORD range is defined in prm_par.h but won't be changing
+    if ($i < NUM__MINW || $i > NUM__MAXW) {
+      $type = "I";
+      last;
+    }
+  }
+  return $type;
 }
 
 sub FIRSTKEY {

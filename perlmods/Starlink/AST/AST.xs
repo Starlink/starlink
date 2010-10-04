@@ -44,6 +44,7 @@ extern "C" {
 typedef int StatusType;
 typedef int WcsMapType;
 
+#include "prm_par.h"
 #include "ast.h"
 #include "grf.h"
 
@@ -144,6 +145,10 @@ typedef void AstTimeMap;
 #else
 #endif
 
+#if ( (AST_MAJOR_VERS == 5 && AST_MINOR_VERS >= 4) || AST_MAJOR_VERS >= 6 )
+#define HASKEYMAPSHORT
+#else
+#endif
 
 
 /* Helper functions */
@@ -1558,6 +1563,17 @@ AST__INTTYPE()
   RETVAL
 
 int
+AST__SINTTYPE()
+ CODE:
+#ifdef AST__SINTTYPE
+    RETVAL = AST__SINTTYPE;
+#else
+    Perl_croak(aTHX_ "Constant AST__SINTTYPE not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+int
 AST__DOUBLETYPE()
  CODE:
 #ifdef AST__DOUBLETYPE
@@ -1675,6 +1691,25 @@ astMapPut0I( this, key, value, comment)
 #endif
 
 void
+astMapPut0S( this, key, value, comment)
+  AstKeyMap * this
+  char * key
+  int value
+  char * comment
+ CODE:
+#ifndef HASKEYMAPSHORT
+  Perl_croak(aTHX_ "astMapPut0S: Please upgrade to AST V5.4 or newer");
+#else
+  if ( value < NUM__MINW || value > NUM__MAXW ) {
+    Perl_croak( aTHX_ "astMapPut0S: Supplied short value (%d) is out of range",
+                value );
+  }
+  ASTCALL(
+   astMapPut0S( this, key, value, comment);
+  )
+#endif
+
+void
 astMapPut0C( this, key, value, comment)
   AstKeyMap * this
   char * key
@@ -1745,6 +1780,41 @@ astMapPut1I( this, key, values, comment)
 #endif
 
 void
+astMapPut1S( this, key, values, comment)
+  AstKeyMap * this
+  char * key
+  AV * values
+  char * comment
+ PREINIT:
+  int size;
+  int i;
+  short * val;
+ CODE:
+#ifndef HASKEYMAPSHORT
+  Perl_croak(aTHX_ "astMapPut1S: Please upgrade to AST V5.4 or newer");
+#else
+  size = av_len(values) + 1;
+  for (i=0; i<size;i++) {
+     SV ** element = av_fetch( values, i, 0 );
+     if (element) {
+        IV ival = 0;
+        if (SvROK(*element)) {
+          Perl_croak( aTHX_ "Can not store reference in short keymap" );
+        }
+        ival = SvIV(*element);
+        if (ival < NUM__MINW || ival > NUM__MAXW) {
+          Perl_croak( aTHX_ "MapPut1S: Value of element %d (%d) is out of range for a short",
+                      i, ival );
+        }
+     }
+  }
+  val = pack1D( newRV_noinc((SV*)values),'s');
+  ASTCALL(
+   astMapPut1S( this, key, size, val, comment);
+  )
+#endif
+
+void
 astMapPut1C( this, key, values, comment)
   AstKeyMap * this
   char * key
@@ -1805,6 +1875,9 @@ astMapGet0D( this, key )
   }
 #endif
 
+# Short ints are handled by "I" interface because Perl will always
+# convert the short to an IV.
+
 void
 astMapGet0I( this, key )
   AstKeyMap * this
@@ -1812,6 +1885,8 @@ astMapGet0I( this, key )
  PREINIT:
   int RETVAL;
   int status;
+ ALIAS:
+   MapGet0S = 1
  PPCODE:
 #ifndef HASKEYMAP
   Perl_croak(aTHX_ "astMapGet0I: Please upgrade to AST V3.5 or newer");
@@ -1911,6 +1986,11 @@ astMapGet1D( this, key )
   }
 #endif
 
+# The short int version does not need a separate implementation
+# because perl doesn't care and will end up reading it in as an IV
+# anyhow. The only reason to implement the "S" routine separately
+# is for the smaller memory requirement.
+
 void
 astMapGet1I( this, key )
   AstKeyMap * this
@@ -1920,6 +2000,8 @@ astMapGet1I( this, key )
   int status;
   int * outarr;
   int nelems;
+ ALIAS:
+  MapGet1S = 1
  PPCODE:
 #ifndef HASKEYMAP
   Perl_croak(aTHX_ "astMapGet1I: Please upgrade to AST V3.5 or newer");
