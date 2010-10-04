@@ -41,8 +41,8 @@
 *          The lower bound of the wavenumber range (as percentage)
 *     WNUBOUND = _DOUBLE (Read)
 *          The upper bound of the wavenumber range (as percentage)
-*     ZPDINDEX = _INTEGER (Read)
-*          ZPD index.
+*     ZPD = _CHAR (Read)
+*          2D ZPD calibration file.
 
 *  Authors:
 *     COBA: Coskun Oba (UoL)

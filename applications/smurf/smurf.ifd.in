@@ -1342,6 +1342,16 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter deglitchmode {
+                type _INTEGER
+                access READ
+                vpath CURRENT DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Deglitching mode: 1=CORE, 2=TAIL and 0=ALL}
+                default 0
+                helpkey *
+            }
+
             parameter out {
                 position 2
                 type NDF
@@ -1382,13 +1392,11 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter zpdindex {
-                type _INTEGER
-                access READ
-                vpath CURRENT DEFAULT
-                ppath CURRENT DEFAULT
-                prompt {ZPD index}
-                default 200
+            parameter zpd {
+                position 3
+                type _CHAR
+                vpath {PROMPT}
+                prompt {ZPD values}
                 helpkey *
             }
         }
@@ -2155,6 +2163,7 @@ package @PACKAGE@ {
                 ppath DYNAMIC
                 prompt {Upper pixel index bounds for output spatial axes}
                 helpkey *
+                type _INTEGER
             }
 
             parameter ubound {
