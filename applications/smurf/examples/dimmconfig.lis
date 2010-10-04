@@ -141,7 +141,7 @@ apod = <undef>
 # series with the beginning (ensuring continuity in both the value and
 # first derivative). In both cases, the purpose is to remove sharp edges
 # that may cause ringing in the later FFT filtering steps.
-zeropad = 1
+#zeropad = 1
 
 # --- badfrac ensures that bad data from DA system are ignored ---
 
@@ -274,6 +274,7 @@ cleandk.fillgaps = 1
 cleandk.order = 0
 #cleandk.spikethresh = 0
 #cleandk.spikebox = 50
+#cleandk.zeropad = 1
 
 # ----------------------------------------------------------------------------
 # These parameters control the iterative model components
@@ -353,6 +354,7 @@ flt.apod = <undef>
 #flt.filt_edgelow = 90
 #flt.filt_notchlow  = (25,55)
 #flt.filt_notchhigh = (35,65)
+#flt.zeropad = 1
 
 450.flt.filt_edge_largescale=600
 850.flt.filt_edge_largescale=300
