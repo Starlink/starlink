@@ -66,6 +66,8 @@ void kpg1Ky2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
 *        Make sure that we are using the correct status pointer in AST.
 *     2010-10-01 (TIMJ):
 *        Sort the keys when writing to HDS structured.
+*     2010-10-04 (TIMJ):
+*        Support Short ints in keymap
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -194,6 +196,23 @@ void kpg1Ky2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
             datAnnul( &cloc, status );
          }
 
+      } else if( type == AST__SINTTYPE ){
+         short sval = 0;
+         if( veclen == 1 ) {
+            datNew0W( loc, key, status );
+            datFind( loc, key, &cloc, status );
+            (void) astMapGet0S( keymap, key, &sval );
+            datPut0W( cloc, sval, status );
+            datAnnul( &cloc, status );
+
+         } else {
+            datNew1W( loc, key, veclen, status );
+            datFind( loc, key, &cloc, status );
+            datMapV( cloc, "_WORD", "WRITE", &pntr, &el, status );
+            (void) astMapGet1S( keymap, key, veclen, &nval, (short *) pntr );
+            datUnmap( cloc, status );
+            datAnnul( &cloc, status );
+         }
 
       } else if( type == AST__DOUBLETYPE ){
          if( veclen == 1 ) {
