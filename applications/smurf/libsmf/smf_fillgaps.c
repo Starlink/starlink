@@ -69,6 +69,13 @@
 *        Do not look for gaps within the padding.
 *     2010-10-1 (DSB):
 *        Correct use of pstart and pend.
+*     2010-10-4 (DSB):
+*        Fill the end-padding samples with artifical data if "mask"
+*        contains "SMF__Q_PAD" - this now rolls the gradient off to zero
+*        over 100 samples at start and end before using a cubic
+*        interpolation. This prevents unusually high gradients at the
+*        start or end of the time stream producing unrealisatically high
+*        values in the cubic interpolation.
 
 *  Copyright:
 *     Copyright (C) 2010 Univeristy of British Columbia.
@@ -278,6 +285,7 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
   double cl;                    /* Offset of fit at left end of block */
   double cr;                    /* Offset of fit at right end of block */
   double d;                     /* Cubic interpolation coefficient */
+  double dg;                    /* Gradient to remove  per sample */
   double dlen;                  /* Total number of samples being interpolated */
   double e;                     /* Linear interpolation coefficient */
   double f;                     /* Linear interpolation coefficient */
@@ -292,8 +300,8 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
   double sigmar;                /* Standard deviation in right patch */
   double nx2;                   /* nx squared */
   double nx;                    /* Normalised distance into interpolation */
-  double x[ BOX ];              /* Array of sample positions */
-  double y[ BOX ];              /* Array of sample values */
+  double x[ 2*BOX ];            /* Array of sample positions */
+  double y[ 2*BOX ];            /* Array of sample values */
   gsl_rng *r;                   /* GSL random number generator */
   int count;                    /* No. of unflagged since last flagged sample */
   int fillpad;                  /* Fill PAD samples ? */
@@ -517,11 +525,12 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
 
    /* Replace the padding at the start and end of the bolometer time series
       with a noisey curve that connects the first and last data samples
-      smoothly. First, fit a straight line to the BOX samples at the end of
-      the time stream. The above filling of gaps ensures the data values
-      will not be bad. */
+      smoothly. First, fit a straight line to the 2*BOX samples at the end
+      of the time stream (i.e. the left end of the interpolated
+      wrapped-around section). The above filling of gaps ensures the data
+      values will not be bad. */
     if( fillpad ) {
-      leftstart = pend - BOX + 1;
+      leftstart = pend - 2*BOX + 1;
       leftend = pend;
       k = 0;
       for( jj = leftstart; jj <= leftend; jj++,k++ ) {
@@ -531,10 +540,38 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
 
       kpg1Fit1d( 1, k, y, x, &ml, &cl, &sigmal, status );
 
-      /* If possible fit a straight line to the BOX samples at the start of
+      /* The main interpolation is performed using a single cubic curve
+         that produces continuous values and gradients at the start and
+	 end of the interpolation. However, an unconstrained cubic can
+	 result in wild behaviour if there is a short sharp upturn in the
+	 data values at the beginning or end of the data strea. In order
+	 to contrain the cubic curve, the start and end of the data
+	 stream are first padded with short sections that roll the
+	 graient smoothly off to zero within a short length. The cubic
+	 curve then joins the ends of the rolled-off sections (i.e. the
+	 cubic has zero gardient at start and end). So roll the gradient
+	 off to zero over 2*BOX samples at the end of the data stream, so
+	 long as the padding area is big enough (we omit this gradient
+	 roll off and just use the cubic interpolation otherwise). */
+      meanl = ml*( pend + 1 ) + cl;
+      leftstart = pend + 1;
+      leftend = leftstart + 2*BOX;
+      if( leftend < ntslice - 2*BOX ) {
+         dg = ml/(2*BOX);
+         for( jj = leftstart; jj <= leftend; jj++ ) {
+            dat[ i*bstride + jj*tstride ] = meanl +
+                                            gsl_ran_gaussian( r, sigmal );
+            ml -= dg;
+            meanl += ml;
+         }
+      } else {
+         leftend = pend;
+      }
+
+      /* If possible fit a straight line to the 2*BOX samples at the start of
          the time series. */
       rightstart = pstart;
-      rightend = pstart + BOX - 1;
+      rightend = pstart + 2*BOX - 1;
       k = 0;
       for( jj = rightstart; jj <= rightend; jj++,k++ ) {
         x[ k ] = jj;
@@ -542,36 +579,51 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
       }
       kpg1Fit1d( 1, k, y, x, &mr, &cr, &sigmar, status );
 
-      /* Form the coefficients needed for cubic interpolation between the
-      end and the start. Cubic interpolation produces continuity in the
-      gradients as well as the values. */
-      meanl = ml*( pend + 1 ) + cl;
+      /* Roll the gradient off to zero over 2*BOX samples at the start of the
+         data stream, so long as the padding area is big enough (we omit this
+         gradient roll off and just use the cubic interpolation otherwise). */
       meanr = mr*( pstart - 1 ) + cr;
+      rightend = pstart - 1;
+      rightstart = rightend - 2*BOX;
+      if( rightstart > 2*BOX ) {
+         dg = mr/(2*BOX);
+         for( jj = rightend; jj >= rightstart; jj-- ) {
+            dat[ i*bstride + jj*tstride ] = meanr +
+                                            gsl_ran_gaussian( r, sigmar );
+            mr -= dg;
+            meanr -= mr;
+         }
+      } else {
+         rightstart = pstart;
+      }
 
-      dlen = pstart - pend + ntslice;
+      /* Form the coefficients needed for cubic interpolation between the
+         end and the start. Cubic interpolation produces continuity in the
+         gradients as well as the values. */
+
+      dlen = ntslice - leftend + rightstart - 1;
 
       a = 2*( meanl - meanr ) + dlen*( ml + mr );
       b = 3*( meanr - meanl ) - dlen*( 2*ml + mr );
       c = ml*dlen;
       d = meanl;
 
-
       /* Form the coefficients needed for linear interpolation of the
-      noise levels. */
+         noise levels. */
       e = sigmal;
       f = sigmar - sigmal;
 
       /* Replace the padding at the end of the time stream. */
-      for( jj = pend + 1; jj < ntslice; jj++ ) {
-         nx = ( jj - pend )/dlen;
+      for( jj = leftend + 1; jj < ntslice; jj++ ) {
+         nx = ( jj - leftend )/dlen;
          nx2 = nx*nx;
          dat[ i*bstride + jj*tstride ] = a*nx2*nx + b*nx2 + c*nx + d +
                                          gsl_ran_gaussian( r, e + nx*f );
       }
 
       /* Replace the padding at the start of the time stream. */
-      for( jj = 0; jj < pstart; jj++ ) {
-         nx = ( jj - pend + ntslice )/dlen;
+      for( jj = 0; jj < rightstart; jj++ ) {
+         nx = ( jj - leftend + ntslice )/dlen;
          nx2 = nx*nx;
          dat[ i*bstride + jj*tstride ] = a*nx2*nx + b*nx2 + c*nx + d +
                                          gsl_ran_gaussian( r, e + nx*f );
