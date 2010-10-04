@@ -573,7 +573,7 @@ sub STORE {
       } elsif ($has_numbers && !$has_strings) {
         # Store as doubles
         if ($has_floats == 0) {
-          $km->MapPut1I( $key, $val, "Stored by Perl Tie Interface [DBLARR]" );
+          $km->MapPut1I( $key, $val, "Stored by Perl Tie Interface [INTARR]" );
         } else {
           $km->MapPut1D( $key, $val, "Stored by Perl Tie Interface [DBLARR]" );
         }
