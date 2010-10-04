@@ -143,6 +143,7 @@ dim_t smf_get_padding( AstKeyMap *keymap, double steptime, int report,
       if( *status == AST__MPKER ) errAnnul( status );
 
 /* Search for filtering parameters in the keymap */
+      f_nnotch = 0;
       smf_get_cleanpar( keymap, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                         NULL, &filt_edgelow, &filt_edgehigh, &filt_edgesmall,
                         &filt_edgelarge, filt_notchlow, NULL,
