@@ -296,8 +296,12 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize, const int grpbywave
 
     /* Get the padding to filter this data, and find the maximum padding
        needed by any of the input files. */
-    thispad = smf_get_padding( keymap, hdr->steptime, 0, hdr, status );
-    if( thispad > maxpad ) maxpad = thispad;
+    if( keymap ) {
+      thispad = smf_get_padding( keymap, hdr->steptime, 0, hdr, status );
+      if( thispad > maxpad ) maxpad = thispad;
+    } else {
+      thispad = 0;
+    }
 
     /* Now get data dimensions */
     nx = (data->dims)[0];
