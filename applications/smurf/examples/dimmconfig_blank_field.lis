@@ -43,15 +43,14 @@ numiter = 5
 
 modelorder = (com,gai,ext,ast,noi)
 
-# be more aggressive about rejecting bad detectors
+# Use time-domain spiker first because we are only doing a single FFT-based
+# high-pass filter before the iterations start.
 
-com.corr_tol = 3.5
-com.gain_tol = 3.5
-com.gain_abstol = 3
+spikethresh = 10
+spikebox = 50
 
-# Lower spike threshold.  Since the signal is small, and since this
-# comes after all the other model components, the data should be
-# fairly flat, so this is less dangerous.
+# Lower map-basedspike threshold.  Since the astronomical signal is
+# small this is not dangerous.
 
 ast.mapspike = 5
 
@@ -60,12 +59,7 @@ ast.mapspike = 5
 # period of the knee frequency in the high-pass filter (i.e. 200*(1/freq) )
 
 450.filt_edge_largescale = 150
-450.flt.filt_edge_largescale = 150
-450.cleandk.filt_edge_largescale = 150
-
 850.filt_edge_largescale = 150
-850.flt.filt_edge_largescale = 150
-850.cleandk.filt_edge_largescale = 150
 
 # can constrain much of the map to be zero until the final iteration
 # since the structure is very low S/N and we are after point sources,
