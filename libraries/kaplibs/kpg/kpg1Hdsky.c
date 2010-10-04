@@ -3,6 +3,7 @@
 #include "f77.h"
 #include "ast.h"
 #include "mers.h"
+#include "kaplibs.h"
 #include "sae_par.h"
 
 void kpg1Hdsky( const HDSLoc *loc, AstKeyMap *keymap, int old, int new,

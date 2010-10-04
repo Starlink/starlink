@@ -1,6 +1,8 @@
 #include "sae_par.h"
 #include "ndf.h"
 #include "prm_par.h"
+#include "kaplibs.h"
+#include "mers.h"
 #include <string.h>
 
 void kpg1Axcpy( int indf1, int indf2, int ax1, int ax2, int *status ){

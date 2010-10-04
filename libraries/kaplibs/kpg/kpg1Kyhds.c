@@ -4,6 +4,7 @@
 #include "ast.h"
 #include "ndf.h"
 #include "mers.h"
+#include "kaplibs.h"
 #include "sae_par.h"
 
 void kpg1Kyhds( AstKeyMap *keymap, const int *map, int axis, int mode,
