@@ -4,6 +4,10 @@ An new release (V1.4) of the ATL library is now available. The ATL
 library contains high level AST-related utility functions. See SUN/256
 for details. Changed in the new version include:
 
+- The functions atlMapGet1S and atlMapPut1S have been renamed as
+atlMapGet1C and atlMapPut1C to avoid name clashes with the new support for
+short ints in the AST KeyMap class.
+
 - A function atlReadFile has been added, which reads an AST Object from a
 text file containing a dump of an AST Object created by (say) atlShow.
 

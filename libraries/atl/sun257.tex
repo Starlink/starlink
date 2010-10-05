@@ -1907,7 +1907,7 @@ higher-level utility tasks.
    }
 }
 \sstroutine{
-   atlMapGet1S
+   atlMapGet1C
 }{
    Retrieve a vector of strings from an AST KeyMap entry as a list
    of fixed length strings
@@ -1918,7 +1918,7 @@ higher-level utility tasks.
       length strings, each padded with spaces.
    }
    \sstinvocation{
-      int atlMapGet1S( AstKeyMap $*$this, const char $*$key, int bufsize,
+      int atlMapGet1C( AstKeyMap $*$this, const char $*$key, int bufsize,
                        int len, int $*$nval, char $*$buf, int $*$status )
    }
    \sstarguments{
@@ -1974,7 +1974,7 @@ higher-level utility tasks.
    }
 }
 \sstroutine{
-   atlMapPut1S
+   atlMapPut1C
 }{
    Create a vector character string entry in an AST KeyMap from a list
    of fixed length strings
@@ -1985,7 +1985,7 @@ higher-level utility tasks.
       as a character vector in a KeyMap. See also atlMapGet1S.
    }
    \sstinvocation{
-      void atlMapPut1S( AstKeyMap $*$this, const char $*$key, const char $*$value,
+      void atlMapPut1C( AstKeyMap $*$this, const char $*$key, const char $*$value,
                         int len, int size, const char $*$comment, int $*$status );
    }
    \sstarguments{

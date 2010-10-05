@@ -242,7 +242,7 @@ void kpg1Kyhds( AstKeyMap *keymap, const int *map, int axis, int mode,
          (void) astMapGet1F( keymap, name, veclen, &veclen, (float *) data );
 
       } else {
-         (void) atlMapGet1S( keymap, name, elsize*veclen, elsize, &veclen,
+         (void) atlMapGet1C( keymap, name, elsize*veclen, elsize, &veclen,
                              (char *) data, status );
       }
 

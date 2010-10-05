@@ -310,11 +310,11 @@ void kpg1Hdsky( const HDSLoc *loc, AstKeyMap *keymap, int old, int new,
    convert to and fro between concatenated fixed length strings and
    null-terminated strings. */
          } else {
-            if( oldlen ) (void) atlMapGet1S( keymap, name, elsize*oldlen,
+            if( oldlen ) (void) atlMapGet1C( keymap, name, elsize*oldlen,
                                              elsize, &oldlen, (char *) data,
                                              status );
             memcpy( ( (char *) data ) + elsize*oldlen, pntr, el*elsize );
-            atlMapPut1S( keymap, name, (char *) data, elsize, newlen, NULL,
+            atlMapPut1C( keymap, name, (char *) data, elsize, newlen, NULL,
                          status );
 
          }

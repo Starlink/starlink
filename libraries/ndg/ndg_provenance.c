@@ -2996,7 +2996,7 @@ static void ndg1A2h( AstKeyMap *keymap, HDSLoc *loc, int *status ){
                datNew1C( loc, key, lenc, veclen, status );
                datFind( loc, key, &cloc, status );
                datMapV( cloc, "_CHAR", "WRITE", &pntr, &el, status );
-               (void) atlMapGet1S( keymap, key, veclen*lenc, lenc, &nval,
+               (void) atlMapGet1C( keymap, key, veclen*lenc, lenc, &nval,
                                    (char *) pntr, status );
                datUnmap( cloc, status );
                datAnnul( &cloc, status );
@@ -4688,7 +4688,7 @@ static void ndg1H2a( HDSLoc *loc, AstKeyMap *keymap, int *status ){
          if( !strncmp( type, "_CHAR", 5 ) ) {
             datMapV( cloc, "_CHAR", "READ", &pntr, &el, status );
             datLen( cloc, &elsize, status );
-            atlMapPut1S( keymap, name, (char *) pntr, elsize, el, NULL,
+            atlMapPut1C( keymap, name, (char *) pntr, elsize, el, NULL,
                          status );
 
          } else if( !strcmp( type, "_REAL" ) ) {

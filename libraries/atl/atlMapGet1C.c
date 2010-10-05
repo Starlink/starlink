@@ -1,12 +1,12 @@
 #include "ast.h"
 #include "sae_par.h"
 
-int atlMapGet1S( AstKeyMap *this, const char *key, int bufsize, int len,
+int atlMapGet1C( AstKeyMap *this, const char *key, int bufsize, int len,
                  int *nval, char *buf, int *status ) {
 /*
 *+
 *  Name:
-*     atlMapGet1S
+*     atlMapGet1C
 
 *  Purpose:
 *     Retrieve a vector of strings from an AST KeyMap entry as a list
@@ -16,7 +16,7 @@ int atlMapGet1S( AstKeyMap *this, const char *key, int bufsize, int len,
 *     C.
 
 *  Invocation:
-*     int atlMapGet1S( AstKeyMap *this, const char *key, int bufsize,
+*     int atlMapGet1C( AstKeyMap *this, const char *key, int bufsize,
 *                      int len, int *nval, char *buf, int *status )
 
 *  Description:
@@ -75,6 +75,9 @@ int atlMapGet1S( AstKeyMap *this, const char *key, int bufsize, int len,
 *  History:
 *     10-MAR-2008 (DSB):
 *        Original version.
+*     5-OCT-2010 (DSB):
+*        Renamed from atlMapGet1S to atlMapGet1C to avoid clash with
+*        astMapGet1S.
 *     {enter_further_changes_here}
 
 *  Bugs:

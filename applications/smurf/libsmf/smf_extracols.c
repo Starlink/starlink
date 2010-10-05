@@ -309,7 +309,7 @@ void smf_extracols( smfHead *hdr, Grp *colgrp, void **cols_info,
                             (double *) (store->data)[ icol ], NULL );
 
             } else {
-               atlMapPut1S( *km, (store->name)[ icol ], (store->data)[ icol ],
+               atlMapPut1C( *km, (store->name)[ icol ], (store->data)[ icol ],
                             (store->size)[ icol ], store->nrow, NULL, status );
             }
          }

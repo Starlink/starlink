@@ -2,12 +2,12 @@
 #include "sae_par.h"
 #include <string.h>
 
-void atlMapPut1S( AstKeyMap *this, const char *key, const char *value,
+void atlMapPut1C( AstKeyMap *this, const char *key, const char *value,
                   int len, int size, const char *comment, int *status ){
 /*
 *+
 *  Name:
-*     atlMapPut1S
+*     atlMapPut1C
 
 *  Purpose:
 *     Create a vector character string entry in an AST KeyMap from a list
@@ -17,7 +17,7 @@ void atlMapPut1S( AstKeyMap *this, const char *key, const char *value,
 *     C.
 
 *  Invocation:
-*     void atlMapPut1S( AstKeyMap *this, const char *key, const char *value,
+*     void atlMapPut1C( AstKeyMap *this, const char *key, const char *value,
 *                       int len, int size, const char *comment, int *status );
 
 *  Description:
@@ -67,6 +67,9 @@ void atlMapPut1S( AstKeyMap *this, const char *key, const char *value,
 *  History:
 *     10-MAR-2008 (DSB):
 *        Original version.
+*     5-OCT-2010 (DSB):
+*        Renamed from atlMapPut1S to atlMapPut1C to avoid clash with
+*        astMapPut1S.
 *     {enter_further_changes_here}
 
 *  Bugs:

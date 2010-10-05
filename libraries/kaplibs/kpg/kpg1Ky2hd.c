@@ -262,7 +262,7 @@ void kpg1Ky2hd( AstKeyMap *keymap, HDSLoc *loc, int *status ){
             datNew1C( loc, key, lenc, veclen, status );
             datFind( loc, key, &cloc, status );
             datMapV( cloc, "_CHAR", "WRITE", &pntr, &el, status );
-            (void) atlMapGet1S( keymap, key, veclen*lenc, lenc, &nval,
+            (void) atlMapGet1C( keymap, key, veclen*lenc, lenc, &nval,
                                 (char *) pntr, status );
             datUnmap( cloc, status );
             datAnnul( &cloc, status );
