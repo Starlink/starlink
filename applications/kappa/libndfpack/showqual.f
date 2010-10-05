@@ -50,6 +50,7 @@
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
 *     Copyright (C) 2002 Central Laboratory of the Research Councils.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -70,6 +71,7 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -77,6 +79,8 @@
 *        Original version.
 *     17-JAN-2002 (DSB):
 *        Brought into KAPPA.
+*     2010-10-04 (TIMJ):
+*        SHOWQUAL has no reason to open the input file in UPDATE mode.
 *     {enter_further_changes_here}
 
 *-
@@ -141,7 +145,7 @@
       CALL NDF_BEGIN
 
 *  Get the input NDF.
-      CALL LPG_ASSOC( 'NDF', 'UPDATE', NDFIN, STATUS )
+      CALL LPG_ASSOC( 'NDF', 'READ', NDFIN, STATUS )
 
 *  See if the numbers of pixels which hold each quality are to be
 *  displayed.
