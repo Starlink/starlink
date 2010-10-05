@@ -92,11 +92,14 @@ void kpg1Hdsky( const HDSLoc *loc, AstKeyMap *keymap, int old, int new,
 
 *  Authors:
 *     DSB: David S. Berry
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     10-MAR-2008 (DSB):
 *        Original version.
+*     2010-10-04 (TIMJ):
+*        Add support for Short/Word
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -194,6 +197,9 @@ void kpg1Hdsky( const HDSLoc *loc, AstKeyMap *keymap, int old, int new,
          if( kmtype == AST__INTTYPE ) {
             hdstype = "_INTEGER";
 
+         } else if( kmtype == AST__SINTTYPE ) {
+            hdstype = "_WORD";
+
          } else if( kmtype == AST__DOUBLETYPE ) {
             hdstype = "_DOUBLE";
 
@@ -210,6 +216,10 @@ void kpg1Hdsky( const HDSLoc *loc, AstKeyMap *keymap, int old, int new,
                     "entry \"^N\" - KeyMap data type has no HDS equivalent.",
                     status );
          }
+
+      } else if( !strcmp( type, "_WORD" ) ) {
+         kmtype = AST__SINTTYPE;
+         hdstype = "_WORD";
 
       } else if( !strcmp( type, "_REAL" ) ) {
          kmtype = AST__FLOATTYPE;
@@ -231,6 +241,9 @@ void kpg1Hdsky( const HDSLoc *loc, AstKeyMap *keymap, int old, int new,
 /* Get the number of bytes needed to store a single value. */
       if( kmtype == AST__INTTYPE ) {
          elsize = sizeof( int );
+
+      } else if( kmtype == AST__SINTTYPE ) {
+         elsize = sizeof( short );
 
       } else if( kmtype == AST__DOUBLETYPE ) {
          elsize = sizeof( double );
@@ -274,6 +287,12 @@ void kpg1Hdsky( const HDSLoc *loc, AstKeyMap *keymap, int old, int new,
             astMapPut1I( keymap, name, newlen, (int *) data, NULL );
 
 /* Do the same for the other numerical types. */
+         } else if( kmtype == AST__SINTTYPE ) {
+            if( oldlen ) (void) astMapGet1S( keymap, name, oldlen, &oldlen,
+                                             (short *) data );
+            memcpy( ( (short *) data ) + oldlen, pntr, el*elsize );
+            astMapPut1S( keymap, name, newlen, (short *) data, NULL );
+
          } else if( kmtype == AST__FLOATTYPE ) {
             if( oldlen ) (void) astMapGet1F( keymap, name, oldlen, &oldlen,
                                              (float *) data );

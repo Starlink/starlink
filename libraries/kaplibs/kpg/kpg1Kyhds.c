@@ -69,7 +69,7 @@ void kpg1Kyhds( AstKeyMap *keymap, const int *map, int axis, int mode,
 *     - An error is reported if the supplied HDS object is a structure.
 
 *  Copyright:
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2008,2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -90,11 +90,14 @@ void kpg1Kyhds( AstKeyMap *keymap, const int *map, int axis, int mode,
 
 *  Authors:
 *     DSB: David S. Berry
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     10-MAR-2008 (DSB):
 *        Original version.
+*     2010-10-04 (TIMJ):
+*        Add support for short/word keymap entries.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -185,6 +188,9 @@ void kpg1Kyhds( AstKeyMap *keymap, const int *map, int axis, int mode,
       if( kmtype == AST__INTTYPE ) {
          hdstype = "_INTEGER";
 
+      } else if( kmtype == AST__SINTTYPE ) {
+         hdstype = "_WORD";
+
       } else if( kmtype == AST__DOUBLETYPE ) {
          hdstype = "_DOUBLE";
 
@@ -205,6 +211,9 @@ void kpg1Kyhds( AstKeyMap *keymap, const int *map, int axis, int mode,
       if( kmtype == AST__INTTYPE ) {
          elsize = sizeof( int );
 
+      } else if( kmtype == AST__SINTTYPE ) {
+         elsize = sizeof( short );
+
       } else if( kmtype == AST__DOUBLETYPE ) {
          elsize = sizeof( double );
 
@@ -222,6 +231,9 @@ void kpg1Kyhds( AstKeyMap *keymap, const int *map, int axis, int mode,
 /* Get the entire vector from the KeyMap. */
       if( kmtype == AST__INTTYPE ) {
          (void) astMapGet1I( keymap, name, veclen, &veclen, (int *) data );
+
+      } else if( kmtype == AST__SINTTYPE ) {
+         (void) astMapGet1S( keymap, name, veclen, &veclen, (short *) data );
 
       } else if( kmtype == AST__DOUBLETYPE ) {
          (void) astMapGet1D( keymap, name, veclen, &veclen, (double *) data );

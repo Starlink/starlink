@@ -2908,7 +2908,8 @@ static void ndg1A2h( AstKeyMap *keymap, HDSLoc *loc, int *status ){
 
 /* Check that the KeyMap entry holds primitive values. */
       if( type == AST__INTTYPE || type == AST__DOUBLETYPE ||
-          type == AST__FLOATTYPE || type == AST__STRINGTYPE ){
+          type == AST__FLOATTYPE || type == AST__SINTTYPE ||
+          type == AST__STRINGTYPE ){
 
 /* Erase any pre-existing component with the same name. */
          datThere( loc, key, &there, status );
@@ -2928,6 +2929,24 @@ static void ndg1A2h( AstKeyMap *keymap, HDSLoc *loc, int *status ){
                datFind( loc, key, &cloc, status );
                datMapV( cloc, "_INTEGER", "WRITE", &pntr, &el, status );
                (void) astMapGet1I( keymap, key, veclen, &nval, (int *) pntr );
+               datUnmap( cloc, status );
+               datAnnul( &cloc, status );
+            }
+
+         } else if( type == AST__SINTTYPE ){
+            if( veclen == 1 ) {
+               short sval = 0;
+               datNew0W( loc, key, status );
+               datFind( loc, key, &cloc, status );
+               (void) astMapGet0S( keymap, key, &sval );
+               datPut0W( cloc, sval, status );
+               datAnnul( &cloc, status );
+
+            } else {
+               datNew1W( loc, key, veclen, status );
+               datFind( loc, key, &cloc, status );
+               datMapV( cloc, "_WORD", "WRITE", &pntr, &el, status );
+               (void) astMapGet1S( keymap, key, veclen, &nval, (short *) pntr );
                datUnmap( cloc, status );
                datAnnul( &cloc, status );
             }

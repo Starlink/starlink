@@ -74,6 +74,7 @@
 
 *  Authors:
 *     David S Berry (JAC, UCLan)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -89,10 +90,12 @@
 *        Re-written to process all time slices in a single call. Processing
 *        each time slice in a separate call was hugely expensive in terms
 *        of time spent accessing elements of KeyMap vector entries.
+*     2010-10-04 (TIMJ):
+*        Add support for short/word
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008-2009 Science & Technology Facilities Council.
+*     Copyright (C) 2008-2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -326,6 +329,9 @@ void smf_kmmerge( const char *xname, AstKeyMap *keymap, int *index,
    float *pfromR = NULL;
    float *pintoR = NULL;
    float *valuesR = NULL;
+   short *pfromW = NULL;
+   short *pintoW = NULL;
+   short *valuesW = NULL;
    int *pfromI = NULL;
    int *pintoI = NULL;
    int *valuesI = NULL;
@@ -369,6 +375,9 @@ void smf_kmmerge( const char *xname, AstKeyMap *keymap, int *index,
       if( type == AST__INTTYPE ){
          DOTYPE(int,I,i,I);
 
+      } else if( type == AST__SINTTYPE ){
+         DOTYPE(short,S,i,W);
+
       } else if( type == AST__FLOATTYPE ){
          DOTYPE(float,F,r,R);
 
@@ -382,5 +391,6 @@ void smf_kmmerge( const char *xname, AstKeyMap *keymap, int *index,
    valuesD = astFree( valuesD );
    valuesR = astFree( valuesR );
    valuesI = astFree( valuesI );
+   valuesW = astFree( valuesW );
 }
 

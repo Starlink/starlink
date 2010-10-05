@@ -89,7 +89,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998, 2003 Central Laboratory of the Research Councils.
-*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2009-2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -110,6 +110,7 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -130,6 +131,8 @@
 *     28-APR-2009 (DSB):
 *        Add a second scheme for holding column values in a KeyMap,
 *        based on the use of scalar entries rather than vector entries.
+*     2010-10-04 (TIMJ):
+*        Add SINTTYPE keymap support
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -444,6 +447,9 @@
                ELSE IF( TYPE .EQ . AST__INTTYPE ) THEN
                   CATYPE = CAT__TYPEI
 
+               ELSE IF( TYPE .EQ . AST__SINTTYPE ) THEN
+                  CATYPE = CAT__TYPEW
+
                ELSE IF( TYPE .EQ . AST__DOUBLETYPE ) THEN
                   CATYPE = CAT__TYPED
 
@@ -509,6 +515,9 @@
 
                IF( TYPE .EQ . AST__INTTYPE ) THEN
                   CATYPE = CAT__TYPEI
+
+               ELSE IF( TYPE .EQ . AST__SINTTYPE ) THEN
+                  CATYPE = CAT__TYPEW
 
                ELSE IF( TYPE .EQ . AST__DOUBLETYPE ) THEN
                   CATYPE = CAT__TYPED
