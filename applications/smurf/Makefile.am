@@ -76,6 +76,7 @@ examples/dimmconfig.lis \
 examples/dimmconfig_blank_field.lis \
 examples/dimmconfig_bright.lis \
 examples/dimmconfig_bright_compact.lis \
+examples/dimmconfig_bright_compact_veryshort.lis \
 examples/dimmconfig_bright_extended.lis \
 examples/dimmconfig_distortionmap.lis \
 examples/dimmconfig_faint_extended.lis \
