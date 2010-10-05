@@ -341,6 +341,11 @@
 *     2010-10-04 (DSB):
 *        Move estimation of required padding into smf_get_related, to avoid
 *        opening all the input files an extra time.
+*     2010-10-05 (EC):
+*        Modified use of quit flag to exit from iterations: init to -1, set to
+*        0 and do one more pass if exit criterion met, then set to 1 last time
+*        through. This enables correct usage of SMF__DIMM_LASTITER even when
+*        iterating to convergence.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -587,6 +592,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
     /* Do iterations completely in memory - minimize disk I/O */
     if( *status == SAI__OK ) {
+      int fcount;
       int nflags;
       char flagnames[SMF__NQBITS*SMF_QSTR_MAX];
       char *flagname;
@@ -620,8 +626,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                       flagnames) ) {
 
         /* Convert each string into a bit, and OR them together */
-        for( i=0; i<nflags; i++ ) {
-          flagname = flagnames+i*SMF_QSTR_MAX;
+        for( fcount=0; fcount<nflags; fcount++ ) {
+          flagname = flagnames+fcount*SMF_QSTR_MAX;
           flagmap |= smf_qual_str_to_val( flagname, NULL, status );
         }
       }
@@ -1301,10 +1307,13 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
          for this continuous chunk.
       *********************************************************************** */
 
-      quit = 0;
+      /* Initialize quit to -1. Once one of the stopping criterion have
+         been met set to 0 and do one final loop, then set to 1 at the
+         end of the last loop to exit. */
+      quit = -1;
       iter = 0;
 
-      while( !quit ) {
+      while( quit < 1 ) {
         msgSeti("ITER", iter+1);
         msgSeti("MAXITER", maxiter);
         msgOut(" ",
@@ -1734,7 +1743,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                each filegroup in the main model component loop */
 
             dimmflags=0;
-            if( iter==(maxiter-1) ) dimmflags |= SMF__DIMM_LASTITER;
+            if( quit == 0 ) dimmflags |= SMF__DIMM_LASTITER;
             smf_calcmodel_ast( wf, &dat, i, keymap, ast, dimmflags, status );
 
             /*** TIMER ***/
@@ -1790,14 +1799,20 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
         if( *status == SAI__OK ) {
 
-          /* Check that we've exceeded maxiter */
-          if( iter >= maxiter ) {
+          /* If quit was set to 0 last time through we can now exit the
+             loop */
+          if( quit == 0 ) {
             quit = 1;
-          }
+          } else {
+            /* Check that we will exceed maxiter next time through */
+            if( iter >= (maxiter-1) ) {
+              quit = 0;
+            }
 
-          /* Check for convergence */
-          if( untilconverge && converged ) {
-            quit = 1;
+            /* Check for convergence */
+            if( untilconverge && converged ) {
+              quit = 0;
+            }
           }
 
         } else {
@@ -1808,10 +1823,17 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       msgSeti("ITER",iter);
       msgOut( " ",
               FUNC_NAME ": ****** Completed in ^ITER iterations", status);
-      if( untilconverge && converged ) {
-        msgOut( " ",
-                FUNC_NAME ": ****** Solution CONVERGED",
-                status);
+      if( untilconverge ) {
+        if( converged ) {
+          msgOut( " ",
+                  FUNC_NAME ": ****** Solution CONVERGED",
+                  status);
+        } else {
+          msgOut( " ",
+                  FUNC_NAME ": ****** Solution did NOT converge",
+                  status);
+
+        }
       }
 
 
