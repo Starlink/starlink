@@ -95,7 +95,7 @@
 
 #define FUNC_NAME "smf_calc_meantau"
 
-double
+static double
 smf__calc_meantau_from_fits( const smfHead * hdr, double refmjd, double threshold,
                              const char datecard[], const char startcard[],
                              const char endcard[], int *status );
@@ -131,7 +131,7 @@ double smf_calc_meantau ( const smfHead * hdr, int *status ) {
   return retval;
 }
 
-double
+static double
 smf__calc_meantau_from_fits( const smfHead * hdr, double refmjd, double threshold,
                              const char datecard[], const char startcard[],
                              const char endcard[], int *status ) {
