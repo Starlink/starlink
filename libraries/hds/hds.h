@@ -213,6 +213,17 @@ datGetW(const HDSLoc    *locator,
         short     values[],
         int       *status);
 
+/*===================================*/
+/* datGetUW - Read _UWORD primitive(s) */
+/*===================================*/
+
+int
+datGetUW(const HDSLoc    *locator,
+        int       ndim,
+        const hdsdim    dims[],
+        unsigned short  values[],
+        int       *status);
+
 /*======================================*/
 /* datGetL - Read _LOGICAL primitive(s) */
 /*======================================*/
@@ -320,6 +331,17 @@ int
 datGet1W( const HDSLoc * locator,
 	  size_t maxval,
 	  short values[],
+	  size_t *actval,
+	  int * status );
+
+/*===================================================*/
+/* DAT_GET1UW - Read 1D Unsigned Short Integer array */
+/*===================================================*/
+
+int
+datGet1UW( const HDSLoc * locator,
+	  size_t maxval,
+	  unsigned short values[],
 	  size_t *actval,
 	  int * status );
 
@@ -630,6 +652,15 @@ datNew0W( const HDSLoc    *locator,
         const char      *name_str,
         int       *status);
 
+/*================================================================*/
+/* datNew0UW - Create new scalar unsigned short integer component */
+/*================================================================*/
+
+int
+datNew0UW( const HDSLoc    *locator,
+           const char      *name_str,
+           int       *status);
+
 /*=============================================*/
 /* datNew0R - Create new scalar real component */
 /*=============================================*/
@@ -711,6 +742,16 @@ datNew1W( const HDSLoc    *locator,
 	 const char      *name_str,
 	 size_t          len,
 	 int       *status);
+
+/*=======================================================*/
+/* datNew1UW - Create new vector unsigned short integer  */
+/*=======================================================*/
+
+int
+datNew1UW( const HDSLoc    *locator,
+	   const char      *name_str,
+	   size_t          len,
+	   int       *status);
 
 /*=======================================*/
 /* datNew1L - Create new vector logical   */
@@ -815,6 +856,17 @@ datPutW( const HDSLoc *locator,
          const short     values[],
          int     *status);
 
+/*====================================*/
+/* datPutUW - Write _UWORD primitives */
+/*====================================*/
+
+int
+datPutUW( const HDSLoc *locator,
+         int     ndim,
+         const hdsdim dims[],
+         const unsigned short values[],
+         int     *status);
+
 /*==================================*/
 /* datPutR - Write _REAL primitives */
 /*==================================*/
@@ -884,6 +936,13 @@ datPut0I( const HDSLoc * loc, int value, int * status );
 int
 datPut0W( const HDSLoc * loc, short value, int * status );
 
+/*========================================================*/
+/* datPut0UW - Write scalar unsigned short integer value  */
+/*========================================================*/
+
+int
+datPut0UW( const HDSLoc * loc, unsigned short value, int * status );
+
 /*========================================*/
 /* datPut0L - Write scalar logical value  */
 /*========================================*/
@@ -930,6 +989,16 @@ datPut1W( const HDSLoc * loc,
 	  size_t nval,
 	  const short values[],
 	  int * status );
+
+/*===============================================*/
+/* datPut1UW - Write 1D unsigned short int array */
+/*===============================================*/
+
+int
+datPut1UW( const HDSLoc * loc,
+           size_t nval,
+           const unsigned short values[],
+           int * status );
 
 /*========================================*/
 /* datPut1R - Write 1D double array       */

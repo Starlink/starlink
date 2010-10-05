@@ -32,6 +32,7 @@
  *        datGet0R    REAL / FLOAT
  *        datGet0I    INTEGER
  *        datGet0W    WORD / SHORT
+ *        datGet0UW   UWORD / unsigned short
  *        datGet0L    LOGICAL
  *        datGet0C    CHARACTER[*n]
  *
@@ -177,6 +178,18 @@ int datGet0W ( const HDSLoc * loc, short * value, int * status ) {
   if ( *status != DAT__OK ) return *status;
 
   datGetW( loc, ndims, dim, value, status );
+
+  return *status;
+}
+
+int datGet0UW ( const HDSLoc * loc, unsigned short * value, int * status ) {
+
+  int ndims = 0;
+  hdsdim dim[] = { 0 };
+
+  if ( *status != DAT__OK ) return *status;
+
+  datGetUW( loc, ndims, dim, value, status );
 
   return *status;
 }

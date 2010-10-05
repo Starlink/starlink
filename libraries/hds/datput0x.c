@@ -30,6 +30,7 @@
  *        datPut0R    REAL / FLOAT
  *        datPut0I    INTEGER
  *        datPut0W    WORD / SHORT
+ *        datPut0UW   UWORD / unsigned short
  *        datPut0L    LOGICAL
  *        datPut0C    CHARACTER[*n]
  *
@@ -148,6 +149,18 @@ int datPut0W ( const HDSLoc * loc, short value, int * status ) {
   if ( *status != DAT__OK ) return *status;
 
   datPutW( loc, ndims, dim, &value, status );
+
+  return *status;
+}
+
+int datPut0UW ( const HDSLoc * loc, unsigned short value, int * status ) {
+
+  int ndims = 0;
+  hdsdim dim[] = { 0 };
+
+  if ( *status != DAT__OK ) return *status;
+
+  datPutUW( loc, ndims, dim, &value, status );
 
   return *status;
 }

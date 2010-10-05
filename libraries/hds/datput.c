@@ -221,6 +221,31 @@ datPutW(const HDSLoc   *locator,
    return hds_gl_status;
 }
 
+/*===============================================*/
+/* DAT_PUTUW - Write Unsigned Short Integer data */
+/*===============================================*/
+int
+datPutUW(const HDSLoc   *locator,
+         int     ndim,
+         const HDS_PTYPE dims[],
+         const unsigned short values[],
+         int     *status)
+{
+#undef context_name
+#undef context_message
+#define context_name "DAT_PUTUW_ERR"
+#define context_message\
+        "DAT_PUTUW: Error writing unsigned short integer values to an HDS primitive."
+
+   datPut(locator,
+          "_UWORD",
+          ndim,
+          dims,
+          values,
+          status);
+   return hds_gl_status;
+}
+
 /*============================*/
 /* DAT_PUTR - Write Real data */
 /*============================*/
@@ -413,6 +438,32 @@ datPut1W( const HDSLoc * locator,
   } else {
     dim[0] = (hdsdim)size;
     datPutW( locator, 1, dim, values, status );
+  }
+  return *status;
+}
+
+/*================================================*/
+/* DAT_PUT1UW - Write 1D unsigned short int array */
+/*================================================*/
+
+int
+datPut1UW( const HDSLoc * locator,
+	   size_t nval,
+	   const unsigned short values[],
+	   int * status ) {
+  size_t size;
+  hdsdim dim[1];
+
+  if ( *status != DAT__OK ) return *status;
+  datSize( locator, &size, status );
+  if ( *status == DAT__OK && size != nval ) {
+    *status = DAT__BOUND;
+    emsSeti( "IN", (int)nval );
+    emsSeti( "SZ", (int)size );
+    emsRep( "DAT_PUT1UW_ERR", "Bounds mismatch: ^IN != ^SZ", status);
+  } else {
+    dim[0] = (hdsdim)size;
+    datPutUW( locator, 1, dim, values, status );
   }
   return *status;
 }

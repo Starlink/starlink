@@ -245,6 +245,28 @@ datGetW(const HDSLoc    *locator,
    return hds_gl_status;
 }
 
+/*==============================================*/
+/* DAT_GETUW - Read Unsigned Short Integer data */
+/*==============================================*/
+int
+datGetUW(const HDSLoc    *locator,
+        int       ndim,
+        const HDS_PTYPE dims[],
+        unsigned short  values[],
+        int       *status)
+{
+#undef context_name
+#undef context_message
+#define context_name "DAT_GETUW_ERR"
+#define context_message\
+        "DAT_GETW: Error reading unsigned short integer value(s) from an HDS primitive."
+
+   datGet(locator, "_UWORD", ndim, dims,
+                     values, status );
+
+   return hds_gl_status;
+}
+
 /*===========================*/
 /* DAT_GETR - Read REAL data */
 /*===========================*/

@@ -302,6 +302,21 @@ datNew1W( const HDSLoc * locator,
   return *status;
 }
 
+/*================================================================*/
+/* DAT_NEW1UW - Create a vector unsigned short integer  component */
+/*================================================================*/
+
+int
+datNew1UW( const HDSLoc * locator,
+	 const char * name,
+	 size_t len,
+	 int * status )
+{
+  if (*status != DAT__OK) return *status;
+  datNew1( locator, name, "_UWORD", len, status );
+  return *status;
+}
+
 /*================================================*/
 /* DAT_NEW1L - Create a vector logical component */
 /*================================================*/
