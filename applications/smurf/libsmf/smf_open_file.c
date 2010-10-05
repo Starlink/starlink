@@ -780,7 +780,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
             errAnnul( status );
             msgOutif( MSG__DEBUG, "",
                       FUNC_NAME
-                      ": File has not JCMTState information continuing anyways",
+                      ": File has no JCMTState information continuing anyways",
                       status );
           }
 
@@ -808,7 +808,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           /* Metadata corrections - hide the messages by default.
              Only correct time series data at the moment.
           */
-          if ( !(flags & SMF__NOFIX_METADATA) ) smf_fix_metadata( MSG__VERB, *data, status );
+          if ( !(flags & SMF__NOFIX_METADATA) && isTseries ) smf_fix_metadata( MSG__VERB, *data, status );
 
         }
 
@@ -829,7 +829,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
         */
         switch ( hdr->instrument ) {
         case INST__ACSIS:
-          acs_fill_smfHead( hdr, indf, status );
+          if (isTseries) acs_fill_smfHead( hdr, indf, status );
           break;
         case INST__AZTEC:
           aztec_fill_smfHead( hdr, NDF__NOID, status );
