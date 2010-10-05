@@ -63,6 +63,10 @@
 *     2010-07-08 (TIMJ):
 *        Enable quality in output file using ndfSbb.
 *        Except for map family.
+*     2010-10-04 (TIMJ):
+*        If we do not know the family just copy the quality
+*        to the output without using quality names and just
+*        assuming a simple cast to unsigned char will be enough.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -136,13 +140,31 @@ smf_qual_t * smf_qual_unmap( int indf, smf_qfam_t family, smf_qual_t * qual, int
     ndfMsg( "FILE", indf );
     msgOutif( MSG__DEBUG, "", "Finalising quality for file ^FILE", status);
 
-    if (family == SMF__QFAM_TCOMP || family == SMF__QFAM_NULL) {
+    if (family == SMF__QFAM_TCOMP ) {
       /* note that TCOMP is not an allowed quality because SMURF should not be
          using it anywhere in a permanent way. */
       *status = SAI__ERROR;
       ndfMsg( "NDF", indf );
       errRepf( "", "Unsupported quality family '%s' for quality unmapping of "
                "file ^NDF", status, smf_qfamily_str(family,status) );
+      goto CLEANUP;
+    } else if (family == SMF__QFAM_NULL) {
+      /* In this case we have to assume that we just cast the quality
+         to UBYTE and copy it without changing anything or naming the
+         entries. Use a simple type conversion. */
+      ndfMap( indf, "QUALITY", "_UBYTE", "WRITE", &qpntr[0], &itemp, status );
+      qmap = qpntr[0];
+      nout = itemp;
+
+      for (i = 0; i<nout; i++) {
+        qmap[i] = qual[i];
+      }
+      ndfUnmap( indf, "QUALITY", status );
+
+      /* Turn on all quality */
+      ndfSbb( 255, indf, status );
+
+      /* we are finished so jump to tidy up */
       goto CLEANUP;
     }
 
