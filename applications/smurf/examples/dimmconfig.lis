@@ -140,7 +140,8 @@ apod = <undef>
 # is not set, a cubic is used to smoothly interpolate the end of the time
 # series with the beginning (ensuring continuity in both the value and
 # first derivative). In both cases, the purpose is to remove sharp edges
-# that may cause ringing in the later FFT filtering steps.
+# that may cause ringing in the later FFT filtering steps. There are
+# similar flags for DKS cleaning, and the FLT model.
 #zeropad = 1
 
 # --- badfrac ensures that bad data from DA system are ignored ---
