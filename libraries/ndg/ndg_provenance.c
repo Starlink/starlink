@@ -4446,7 +4446,7 @@ static int ndg1GetProvId( Prov *prov, int *status ) {
 */
 
 /* Local Variables: */
-   unsigned int ihash;
+   unsigned int ihash = 0;
    int iparent;
 
 /* A union used for converting between signed and unsigned ints. */
