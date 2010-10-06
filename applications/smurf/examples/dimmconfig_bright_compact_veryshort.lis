@@ -1,17 +1,12 @@
 ^$STARLINK_DIR/share/smurf/dimmconfig_bright_compact.lis
 
-# For very short scans of things like planet don't filter
-# and back off on bad data flagging even more.
+# This is the normal bright compact configuration with
+# SMO used instead of FLT because the FLT processing
+# can damage very short time series
 
-modelorder = (com,gai,ext,ast,noi)
+modelorder = (com,gai,smo,ext,ast,noi)
 
-noiseclip=20
+apod = 0
+flt.apod = 0
 
-ast.mapspike=100
-
-com.corr_tol = 20
-com.corr_abstol = 0.01
-com.gain_tol = 20
-com.gain_abstol = 20
-com.gain_rat = 100
-
+smo.type = mean

@@ -85,6 +85,7 @@ examples/dimmconfig_newfilt.lis \
 examples/dimmconfig_pointing.lis \
 examples/dimmconfig_pointing_extended.lis \
 examples/dimmconfig_veryshort.lis \
+examples/dimmconfig_veryshort_planet.lis \
 examples/dreamobs.lis \
 examples/dreamsim.lis \
 examples/heatrunobs.lis \

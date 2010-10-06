@@ -9,14 +9,19 @@
 # seconds. Also, with so little data to work with any padding
 # etc. will remove significant amounts of data.
 #
+# We do add SMO though since it does seem to make a difference to the
+# quality of the maps in many cases despite the notion that 1/f
+# should not be a problem in 15 seconds.
+
 # Assumes any compact source is not extremely bright.
+# Use dimmconfig_veryshort_planet.lis for planets.
 # ***********************************************************
 
 # Use lots of iterations because they won't take a long time
 numiter=-10
 
 # Don't do any filtering
-modelorder = (com,gai,ext,ast,noi)
+modelorder = (com,gai,smo,ext,ast,noi)
 
 # ----------------------------------------------------------------------------
 # The following parameters control data-cleaning before iterations start
@@ -37,3 +42,4 @@ com.gain_abstol = 5
 # No apodisation
 flt.apod = 0
 
+smo.type = mean
