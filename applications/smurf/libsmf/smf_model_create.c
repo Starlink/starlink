@@ -985,6 +985,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
 
               /* Apply basic DKS cleaning parameters */
               if( idata->da && idata->da->dksquid ) {
+                smfArray *array=NULL;
                 smfData *dksquid = idata->da->dksquid;
 
                 msgOutif( MSG__VERB, "", FUNC_NAME ": cleaning dark squids",
@@ -995,7 +996,13 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
 
                 /* clean darks using cleandk.* parameters */
                 astMapGet0A( keymap, "CLEANDK", &kmap );
-                smf_clean_smfData( wf, dksquid, NULL, kmap, status );
+                array = smf_create_smfArray( status );
+                smf_addto_smfArray( array, dksquid, status );
+                smf_clean_smfArray( wf, array, NULL, kmap, status );
+                if( array ) {
+                  array->owndata = 0;
+                  smf_close_related( &array, status );
+                }
                 if( kmap ) kmap = astAnnul( kmap );
 
                 /* Unset hdr pointer so that we don't accidentally close it */

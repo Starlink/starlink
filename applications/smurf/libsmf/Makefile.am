@@ -62,7 +62,7 @@ smf_choosepolbins.c \
 smf_choosetiles.c \
 smf_clipped_stats1D.c \
 smf_clean_dksquid.c \
-smf_clean_smfData.c \
+smf_clean_smfArray.c \
 smf_clone_data.c \
 smf_close_file.c \
 smf_close_mapcoord.c \

@@ -272,6 +272,7 @@
 #define TASK_NAME "SC2CLEAN"
 
 void smurf_sc2clean( int *status ) {
+  smfArray *array = NULL;   /* Data to be cleaned */
   smfArray *bbms = NULL;    /* Bad bolometer masks */
   smfArray *darks = NULL;   /* Dark data */
   smfArray *flatramps = NULL;/* Flatfield ramps */
@@ -368,7 +369,13 @@ void smurf_sc2clean( int *status ) {
 
         /* clean darks using cleandk.* parameters */
         astMapGet0A( keymap, "CLEANDK", &kmap );
-        smf_clean_smfData( wf, dksquid, NULL, kmap, status );
+        array = smf_create_smfArray( status );
+        smf_addto_smfArray( array, dksquid, status );
+        smf_clean_smfArray( wf, array, NULL, kmap, status );
+        if( array ) {
+          array->owndata = 0;
+          smf_close_related( &array, status );
+        }
         if( kmap ) kmap = astAnnul( kmap );
 
         /* Unset hdr pointer so that we don't accidentally close it */
@@ -378,7 +385,13 @@ void smurf_sc2clean( int *status ) {
       msgOut("", TASK_NAME ": cleaning bolometer data", status );
 
       /* Clean the data */
-      smf_clean_smfData( wf, ffdata, NULL, keymap, status );
+      array = smf_create_smfArray( status );
+      smf_addto_smfArray( array, ffdata, status );
+      smf_clean_smfArray( wf, array, NULL, keymap, status );
+      if( array ) {
+        array->owndata = 0;
+        smf_close_related( &array, status );
+      }
 
       /* Ensure that the data is ICD ordered before closing */
       smf_dataOrder( ffdata, 1, status );

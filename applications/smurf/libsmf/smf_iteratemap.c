@@ -1116,20 +1116,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         }
 
         if( doclean ) {
-          smfData *thisnoisemap=NULL;
-
-          msgOut(" ", FUNC_NAME ": Pre-conditioning data", status);
-          for( idx=0; idx<res[0]->ndat; idx++ ) {
-            data = res[0]->sdata[idx];
-            smf_clean_smfData( wf, data, &thisnoisemap, keymap, status );
-
-            /* If we end up calculating a noise map store it here as we
-               can use it to save time initializing NOI later */
-            if( thisnoisemap ) {
-              if( !noisemaps ) noisemaps = smf_create_smfArray( status );
-              smf_addto_smfArray( noisemaps, thisnoisemap, status );
-            }
-          }
+          smf_clean_smfArray( wf, res[0], &noisemaps, keymap, status );
         } else {
           msgOut( "", FUNC_NAME ": *** Warning *** doclean=0, "
                   "so not pre-conditioning data before map-making",
@@ -1370,10 +1357,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             if( iter==0 ) {
               if( doclean ) {
                 msgOut(" ", FUNC_NAME ": Pre-conditioning data", status);
-                for( idx=0; idx<res[i]->ndat; idx++ ) {
-                  data = res[i]->sdata[idx];
-                  smf_clean_smfData( wf, data, NULL, keymap, status );
-                }
+                smf_clean_smfArray( wf, res[i], NULL, keymap, status );
               } else {
                 msgOut( "", FUNC_NAME ": *** Warning *** doclean=0, "
                         "so not pre-conditioning data before map-making",
