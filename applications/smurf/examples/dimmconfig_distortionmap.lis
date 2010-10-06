@@ -38,6 +38,16 @@ bolomap = 1
 ensureflat=0
 
 # map-based despiking will have a harded time since the calculation is
-# theoretical, and we also haven't flat-fielded. Back off on the threshold
-# so that we don't accidentally flag the source!
-ast.mapspike=100
+# theoretical, and we also haven't flat-fielded.
+ast.mapspike=0
+
+# zero padding should be fine because this is a long time series
+zeropad = 1
+
+# back off even further on bad data rejection
+noiseclip=20
+com.corr_tol = 20
+com.corr_abstol = 0.01
+com.gain_tol = 20
+com.gain_abstol = 20
+com.gain_rat = 100
