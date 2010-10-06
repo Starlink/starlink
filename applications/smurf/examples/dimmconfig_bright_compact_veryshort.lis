@@ -1,12 +1,5 @@
-^$STARLINK_DIR/share/smurf/dimmconfig_bright_compact.lis
+^$STARLINK_DIR/share/smurf/dimmconfig_veryshort.lis
 
-# This is the normal bright compact configuration with
-# SMO used instead of FLT because the FLT processing
-# can damage very short time series
-
-modelorder = (com,gai,smo,ext,ast,noi)
-
-apod = 0
-flt.apod = 0
-
-smo.type = mean
+# use boundary constraints since the source is assumed to be isolated
+ast.zero_circle = (0.0166666666)
+ast.zero_notlast = 1
