@@ -1,5 +1,3 @@
-/* -*- C -*- */
-
 #include "sae_par.h"
 #include "cupid.h"
 #include "ast.h"
@@ -9,7 +7,7 @@
 
 int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
                                 int dims[ 3 ], int skip[ 3 ], int slbnd[ 3 ],
-                                double rms, AstKeyMap *config, int *ipa, 
+                                double rms, AstKeyMap *config, int *ipa,
                                 int perspectrum, int *status ){
 /*
 *+
@@ -23,47 +21,47 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 *     Starlink C
 
 *  Synopsis:
-*     int cupidFWMain<X>( CGEN_TYPE *array, int nel, int ndim, int dims[ 3 ], 
-*                         int skip[ 3 ], int slbnd[ 3 ], double rms, 
-*                         AstKeyMap *config, int *ipa, 
+*     int cupidFWMain<X>( CGEN_TYPE *array, int nel, int ndim, int dims[ 3 ],
+*                         int skip[ 3 ], int slbnd[ 3 ], double rms,
+*                         AstKeyMap *config, int *ipa,
 *                         int perspectrum, int *status )
 
 *  Description:
-*     This function decide which clump each data pixel belongs to and fills 
+*     This function decide which clump each data pixel belongs to and fills
 *     an array with the index of the clump to which each pixel belongs. The
 *     algorithm loops over every data pixel above a nominated threshold level
-*     which has not already been assigned to a clump. For each such pixel, a 
-*     route to the nearest peak in the data value is found by moving from 
-*     pixel to pixel along the line of greatest gradient. When this route 
-*     arrives at a peak (i.e. a local maximum), all pixels within some 
-*     small neighbourhood are checked to see if there is a higher data value. 
-*     If there is, the route recommences from the highest pixel in the 
-*     neighbourhood, again moving up the line of greatest gradient. When a 
-*     peak is reached which is the highest data value within its 
-*     neighbourhood, a check is made to see if this peak pixel has already 
-*     been assigned to a clump. If it has, then all pixels which were 
-*     traversed in following the route to this peak are assigned to that same 
-*     clump. If the peak has not yet been assigned to a clump, then it, and 
-*     all the traversed pixels, are assigned to a new clump. If the route 
-*     commences at "sea level" and starts with a low gradient section (average 
-*     gradient lower than a given value) then the initial section of the route 
-*     (up to the point where the gradient exceeds the low gradient limit) is 
-*     not assigned to the clump, but is instead flag as "unusable" to prevent 
+*     which has not already been assigned to a clump. For each such pixel, a
+*     route to the nearest peak in the data value is found by moving from
+*     pixel to pixel along the line of greatest gradient. When this route
+*     arrives at a peak (i.e. a local maximum), all pixels within some
+*     small neighbourhood are checked to see if there is a higher data value.
+*     If there is, the route recommences from the highest pixel in the
+*     neighbourhood, again moving up the line of greatest gradient. When a
+*     peak is reached which is the highest data value within its
+*     neighbourhood, a check is made to see if this peak pixel has already
+*     been assigned to a clump. If it has, then all pixels which were
+*     traversed in following the route to this peak are assigned to that same
+*     clump. If the peak has not yet been assigned to a clump, then it, and
+*     all the traversed pixels, are assigned to a new clump. If the route
+*     commences at "sea level" and starts with a low gradient section (average
+*     gradient lower than a given value) then the initial section of the route
+*     (up to the point where the gradient exceeds the low gradient limit) is
+*     not assigned to the clump, but is instead flag as "unusable" to prevent
 *     other routes using them.
 
 *  Parameters:
 *     array
 *        The array containing the data to be scanned. The elements should
-*        be ordered according to Fortran order (first axis varying most 
-*        rapidly). 
-*     nel 
+*        be ordered according to Fortran order (first axis varying most
+*        rapidly).
+*     nel
 *        The number of elements in "array".
 *     ndim
 *        The number of significant pixel axes.
 *     dims
 *        The number of pixels on each pixel axis of the array.
 *     skip
-*        The increment in 1D vector index required to move a distance of 1 
+*        The increment in 1D vector index required to move a distance of 1
 *        pixel along each axis. This allows conversion between indexing
 *        the array using a single 1D vector index and using nD coords. This
 *        array should have 3 elements even if "ndim" is less than 3, and
@@ -81,7 +79,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 *        not in a clump are assigned -1.
 *     perspectrum
 *        If non-zero, then each spectrum is processed independently of its
-*        neighbours. A clump that extends across several spectra will be 
+*        neighbours. A clump that extends across several spectra will be
 *        split into multiple clumps, each restricted to a single spectrum.
 *        The non-zero value supplied should be the 1-based axis index of
 *        the spectral pixel axis. Should be supplied as zero if "ndim" is
@@ -93,10 +91,10 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 *     The largest clump index stored in "ipa" on return.
 
 *  Notes:
-*     - This function can be invoked using the generic cupidFWMain macro 
-*     defined in cupid.h. This macro has the same parameter list as 
-*     cupidFWMain<X> except that an extra parameter is added to the start 
-*     of the parameter list indicating the data type of the specific 
+*     - This function can be invoked using the generic cupidFWMain macro
+*     defined in cupid.h. This macro has the same parameter list as
+*     cupidFWMain<X> except that an extra parameter is added to the start
+*     of the parameter list indicating the data type of the specific
 *     cupidFWMain... function to be invoked. This extra parameter should
 *     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.
 
@@ -222,8 +220,8 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    int zlim;       /* Number of z planes in 3x3x3 neighbourhood */
    int zon;        /* Is the current Z plane within the bounds of the array? */
 
-/* The distance from a central pixel centre to the centre of a neighbouring 
-   pixel, indexed by the number of axes (0, 1, 2 or 3) on which the two 
+/* The distance from a central pixel centre to the centre of a neighbouring
+   pixel, indexed by the number of axes (0, 1, 2 or 3) on which the two
    pixels have zero displacement  (sqrt(3), sqrt(2), sqrt(1), 0). */
    static double dist[ 4 ] = { 1.7320508, 1.4142136, 1.0, 0.0 };
 
@@ -236,13 +234,13 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 /* Get the lowest data value to be considered. */
    noise = cupidConfigRMS( config, "NOISE", rms, 2.0*rms, status );
 
-/* Get the largest jump (in pixels) which can be made from a local maximum 
+/* Get the largest jump (in pixels) which can be made from a local maximum
    to a higher maximum in the neighbourhood of the first maximum. */
    maxjump = cupidConfigI( config, "MAXJUMP", 4, status );
 
 /* Get the difference in data value between adjacent pixels which marks
    the start of a walk. Any initial section of the walk which has an
-   average gradient (measured over 4 steps) less than this value is not 
+   average gradient (measured over 4 steps) less than this value is not
    assigned to any clump. */
    flat_slope = cupidConfigRMS( config, "FLATSLOPE", rms, rms, status );
 
@@ -253,7 +251,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    sea_level = noise + 2*rms;
 
 /* Fill the supplied "ipa" array with -1 for all pixels which are below the
-   threshold, or are bad. Fill all other pixels with zero to indicate that 
+   threshold, or are bad. Fill all other pixels with zero to indicate that
    the pixel is "usable but not yet checked". */
    pa = ipa;
    pd = array;
@@ -274,13 +272,13 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    }
 
 /* If required, dump the mask indicating which pixel are below the threshold. */
-   if (msgFlevok(MSG__DEBUG2, status)) {
-     cupidDumpI( ipa, ndim, dims, slbnd, "initial mask", status );
+   if( msgFlevok( MSG__DEBUG2, status ) ) {
+      cupidDumpI( ipa, ndim, dims, slbnd, "initial mask", status );
    }
 
 /* Use a cellular automata to remove small isolated groups of usable
-   pixels from the above "ipa" array. This allocates new memory for the 
-   cleaned up array. */ 	 
+   pixels from the above "ipa" array. This allocates new memory for the
+   cleaned up array. */
    msgOutif( MSG__VERB, "", "Removing isolated pixels\n", status );
 
    if( ndim == 1 ) {
@@ -289,18 +287,18 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
       frac = 0.25;
    } else {
       frac = 0.1;
-   }    
+   }
 
    work = cupidRCA( ipa, NULL, nel, dims, skip, frac, VAL__MAXI, 0, -1, 1, status );
 
 /* If required, dump the mask resulting from the above cleaning. */
-   if (msgFlevok(MSG__DEBUG2, status)) {
-     cupidDumpI( work, ndim, dims, slbnd, "cleaned initial mask", status );
+   if( msgFlevok( MSG__DEBUG2, status ) ) {
+      cupidDumpI( work, ndim, dims, slbnd, "cleaned initial mask", status );
    }
 
 /* Initialise the pointer to an array holding the peak value in every clump. */
    peak_values = NULL;
-      
+
 /* Pre-allocate some memory for the route array which holds the 1D vector
    indices of the pixels traversed in the route from the initial pixel to
    the clump peak. */
@@ -379,36 +377,36 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
                   iiy = iy;
                   iiz = iz;
 
-/* We now start walking away from this pixel up hill (up the steepest 
-   gradient). We store the vector index of all pixels visited on this walk 
-   in the route array. Put the current pixel in it and initialise its length 
-   to one, and then loop until we have reached the peak. Whilst walking, we 
-   initially keep a record of the average gradient over the last 4 steps. 
-   We count how many steps we travel before we encounter an average gradient 
+/* We now start walking away from this pixel up hill (up the steepest
+   gradient). We store the vector index of all pixels visited on this walk
+   in the route array. Put the current pixel in it and initialise its length
+   to one, and then loop until we have reached the peak. Whilst walking, we
+   initially keep a record of the average gradient over the last 4 steps.
+   We count how many steps we travel before we encounter an average gradient
    above the gradient limit. However, this initial flat section is only
    ignored if the walk starts from "sea level". Walks which start at a
    higher altitude are used in their entirety. */
                   route[ 0 ] = iv;
                   route_length = 1;
 
-                  nflat = 0;                  
+                  nflat = 0;
                   iflat = 0;
 
                   got_flat = ( (double) array[ iv ] > sea_level );
 
-                  while( clump_index == -1 ) {         
+                  while( clump_index == -1 ) {
 
 /* Note the data value at the current central position. */
                      h = (double) array[ iv ];
 
 /* If we have not yet determined the length of the initial section of the
    route which is below the gradient limit, check the current average
-   gradient (taken over the previous 4 steps). We skip this section once 
+   gradient (taken over the previous 4 steps). We skip this section once
    we have found the first "steep" section in the route. */
                      if( !got_flat ) {
 
-/* Find the average gradient, if possible, over the last 4 steps, assuming 
-   each step is the same length. If it is above the user-supplied limit, 
+/* Find the average gradient, if possible, over the last 4 steps, assuming
+   each step is the same length. If it is above the user-supplied limit,
    indicate we have got the length of the initial flat section of the
    route. */
                         if( route_length > 3 ) {
@@ -430,19 +428,19 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 
 /* We will now examine the 3x3x3 cube of neighbouring pixels to determine
    where we step to next. We will choose the neighbour with the greatest
-   gradient. Initialise the maximum gradient found so far to a large -ve 
+   gradient. Initialise the maximum gradient found so far to a large -ve
    value. */
                      maxg = VAL__MIND;
 
-/* Calculating the gradient to each of the neighbouring pixel centres 
-   requires the distance between the cell centres. This will be either 1, 
-   sqrt(2) or sqrt(3) pixels, and can be determined from the number of axes 
-   (0, 1, 2 or 3) on which the neighbouring pixel has zero displacement from 
+/* Calculating the gradient to each of the neighbouring pixel centres
+   requires the distance between the cell centres. This will be either 1,
+   sqrt(2) or sqrt(3) pixels, and can be determined from the number of axes
+   (0, 1, 2 or 3) on which the neighbouring pixel has zero displacement from
    the central test pixel. "nzero" counts the number of such axes. */
                      nzero = perspectrum ? 2 : 3 - ndim;
 
 /* Check the 3x3x3 cube of neighbouring pixels, and determine the one
-   with the highest gradient. We check them in "fortran order". Initialise 
+   with the highest gradient. We check them in "fortran order". Initialise
    the grid indices at the first ("bottom left") pixel of the 3x3x3 cube. */
                      ixoff = iix - xlim/2;
                      iyoff = iiy - ylim/2;
@@ -469,8 +467,8 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    array. */
                         zon = ( miz >= 1 && miz <= dims[ 2 ] );
 
-/* Initialise the vector index, and the grid index on the 2nd axis, of the 
-   first pixel in the current Z plane. Then loop round all Y rows in the 
+/* Initialise the vector index, and the grid index on the 2nd axis, of the
+   first pixel in the current Z plane. Then loop round all Y rows in the
    current Z plane. */
                         jvy = jvz;
                         miy = iyoff;
@@ -480,8 +478,8 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    array. */
                            yon = zon && ( miy >= 1 && miy <= dims[ 1 ] );
 
-/* Initialise the vector index, and the grid index on the 1st, of the 
-   first column in the current Y row. Then loop round all X columns in the 
+/* Initialise the vector index, and the grid index on the 1st, of the
+   first column in the current Y row. Then loop round all X columns in the
    current Y row. */
                            jvx = jvy;
                            mix = ixoff;
@@ -490,27 +488,27 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 /* Ignore pixels that are not within the bounds of the data array. */
                               if( yon && mix >= 1 && mix <= dims[ 0 ] ) {
 
-/* Ignore unusable pixels but not pixels which have already been assigned 
-   to another clump. Also skip the central pixel (for which nzero is 3). 
-   Find the gradient to this neighbour. If it is the largest found so far, 
+/* Ignore unusable pixels but not pixels which have already been assigned
+   to another clump. Also skip the central pixel (for which nzero is 3).
+   Find the gradient to this neighbour. If it is the largest found so far,
    record its vector index and GRID coords. */
                                  if( work[ jvx ] >= 0 && nzero < 3 ) {
                                     g = ( (double) array[ jvx ] - h )/dist[ nzero ];
                                     if( g > maxg ) {
                                        maxg = g;
                                        nv = jvx;
-   
+
                                        nix = mix;
                                        niy = miy;
                                        niz = miz;
-   
+
                                     }
                                  }
                               }
 
 /* Move on to consider the next neighbour, and update the number of axes
    which have zero displacement from the current pixel to the central pixel. */
-                              jvx++;                               
+                              jvx++;
                               if( jx == 0 ) {
                                  nzero++;
                               } else if( jx == 1 ){
@@ -525,20 +523,20 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
                            } else if( jy == 1 ){
                               nzero--;
                            }
-      
+
                         }
                         jvz += skip[ 2 ];
-      
+
                         if( jz == 0 ) {
                            nzero++;
                         } else if( jz == 1 ){
                            nzero--;
                         }
-      
+
                      }
 
 /* If there is no upward route from the current pixel, (i.e. if it is a
-   local maximum), we check the slightly more extended neighbourhood for 
+   local maximum), we check the slightly more extended neighbourhood for
    a higher pixel. We do this because a local maximum could be just a
    noise spike. */
                      if( maxg <= 0 ) {
@@ -591,7 +589,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
                                        }
 
 /* Move on to consider the next pixel in the neighbourhood. */
-                                       jvx++;                               
+                                       jvx++;
                                     }
                                  }
                                  jvy += skip[ 1 ];
@@ -647,7 +645,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
                                   status );
 
 /* Otherwise, if the next pixel on the route is already assigned to a
-   clump, we now know what peak we are heading towards so use that clump 
+   clump, we now know what peak we are heading towards so use that clump
    index for the route so far, and abandon the rest of the walk. */
                      } else if( work[ nv ] > 0 ) {
                         clump_index = work[ nv ];
@@ -659,15 +657,15 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    the array as necessary. */
                         iv = nv;
                         istep = route_length++;
-                        route = astGrow( route, route_length, sizeof( int ) );       
+                        route = astGrow( route, route_length, sizeof( int ) );
                         if( route ) route[ istep ] = iv;
                      }
                   }
 
 /* The walk has now finished because we have either reached a peak which
    is the highest point in its neighbourhood, or we have joined an earlier
-   route and thus know which peak we would get to if we were to carry on. 
-   We now assign the clump index found above to all the pixels visited on 
+   route and thus know which peak we would get to if we were to carry on.
+   We now assign the clump index found above to all the pixels visited on
    the route, except for any low gradient section at the start of the route,
    which is set unusable (-1). */
                   for( istep = 0; istep < route_length;istep++ ) {
@@ -700,26 +698,26 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    msgBlankif( MSG__VERB, status );
 
 /* If required, dump the unmerged clump mask. */
-   if (msgFlevok(MSG__DEBUG2, status)) {
-     cupidDumpI( work, ndim, dims, slbnd, "raw clump mask", status );
+   if( msgFlevok( MSG__DEBUG2, status ) ) {
+      cupidDumpI( work, ndim, dims, slbnd, "raw clump mask", status );
    }
 
 /* Amalgamate adjoining clumps if there is no significant dip between the
    clumps. */
    msgOutif( MSG__VERB, "", "Merging adjoining clumps", status );
-   CGEN_FUNCTION(cupidFWJoin)( array, nel, ndim, dims, skip, rms, config, 
+   CGEN_FUNCTION(cupidFWJoin)( array, nel, ndim, dims, skip, rms, config,
                                work, peak_values, &ret, perspectrum,
                                status );
    msgOutif( MSG__VERB, "", "Merging completed", status );
 
 /* If required, dump the merged clump mask. */
-   if (msgFlevok(MSG__DEBUG2, status)) {
-     cupidDumpI( work, ndim, dims, slbnd, "merged but uncleaned clump mask", 
-                 status );
+   if( msgFlevok( MSG__DEBUG2, status ) ) {
+      cupidDumpI( work, ndim, dims, slbnd, "merged but uncleaned clump mask",
+                  status );
    }
 
-/* Smooth the boundaries between the clumps. This cellular automata replaces 
-   each output pixels by the most commonly occuring value within a 3x3x3 
+/* Smooth the boundaries between the clumps. This cellular automata replaces
+   each output pixels by the most commonly occuring value within a 3x3x3
    cube of input pixels centred on the output pixel. Repeat this process
    a number of times as given by configuration parameter CleanIter. */
    if( ! perspectrum ) {
@@ -747,8 +745,8 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    if( m1 != ipa ) memcpy( ipa, work, sizeof( int )*nel );
 
 /* If required, dump the cleaned clump mask. */
-   if (msgFlevok(MSG__DEBUG2, status)) {
-     cupidDumpI( ipa, ndim, dims, slbnd, "cleaned clump mask", status );
+   if( msgFlevok( MSG__DEBUG2, status ) ) {
+      cupidDumpI( ipa, ndim, dims, slbnd, "cleaned clump mask", status );
    }
 
 /* Free resources. */

@@ -1,5 +1,3 @@
-/* -*- C -*- */
-
 #include "sae_par.h"
 #include "cupid.h"
 #include "ast.h"
@@ -8,7 +6,7 @@
 #include <math.h>
 
 void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
-                                 int dims[ 3 ], int skip[ 3 ], double rms, 
+                                 int dims[ 3 ], int skip[ 3 ], double rms,
                                  AstKeyMap *config, int *ipa, double *peakvals,
                                  int *npeak, int perspectrum,
                                  int *status ){
@@ -25,19 +23,19 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
 
 *  Synopsis:
 *     void cupidFWJoin<X>( CGEN_TYPE *array, int nel, int ndim,
-*                          int dims[ 3 ], int skip[ 3 ], double rms, 
+*                          int dims[ 3 ], int skip[ 3 ], double rms,
 *                          AstKeyMap *config, int *ipa, double *peakvals,
-*                          int *npeak, int perspectrum, 
+*                          int *npeak, int perspectrum,
 *                          int *status )
 
 *  Description:
 *     This function identifies groups of adjoining clumps which have no
 *     significant dips between them, and merges them into a single clump.
 *     For instance, if a single clump has a flat plateau, on which are
-*     two small noise spikes separated by more than MaxJump, the basic 
-*     FellWalker algorithm would have created two clumps, one centred on 
-*     each of the two noise spikes. In reality, these two clumps are not 
-*     significantly different and should be considered part of the same 
+*     two small noise spikes separated by more than MaxJump, the basic
+*     FellWalker algorithm would have created two clumps, one centred on
+*     each of the two noise spikes. In reality, these two clumps are not
+*     significantly different and should be considered part of the same
 *     clump. This tendency for noise spikes to be interpreted as clumps is
 *     made worse if pixel-to-pixel noise is correlated over a distance
 *     comporable to or larger than MaxJump.
@@ -48,26 +46,26 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
 *     the pixel assignment index. The data value at each boundary pixel
 *     is noted, and the hightest data value on the boundary between any two
 *     adjoining clumps is thus found. This highest data value corresponds
-*     to the bottom of the "dip" between the two adjoining peaks. If the 
-*     bottom of the dip is not significantly lower than the peak values in 
+*     to the bottom of the "dip" between the two adjoining peaks. If the
+*     bottom of the dip is not significantly lower than the peak values in
 *     both of the two adjoining peaks, then the two clumps are merged
 *     into one. Here, "significantly lower" means that the data value at
-*     the dip is more than "MinDip" lower than the lowest of the two clump 
+*     the dip is more than "MinDip" lower than the lowest of the two clump
 *     peak values ("MinDip" is a configuration parameter).
 
 *  Parameters:
 *     array
 *        The array containing the data to be scanned. The elements should
-*        be ordered according to Fortran order (first axis varying most 
-*        rapidly). 
-*     nel 
+*        be ordered according to Fortran order (first axis varying most
+*        rapidly).
+*     nel
 *        The number of elements in "array".
 *     ndim
 *        The number of significant pixel axes.
 *     dims
 *        The number of pixels on each pixel axis of the array.
 *     skip
-*        The increment in 1D vector index required to move a distance of 1 
+*        The increment in 1D vector index required to move a distance of 1
 *        pixel along each axis. This allows conversion between indexing
 *        the array using a single 1D vector index and using nD coords. This
 *        array should have 3 elements even if "ndim" is less than 3, and
@@ -87,11 +85,11 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
 *        on exit if any of the clumps were merged.
 *     npeak
 *        The address of an integer holding the highest clump index value
-*        in "ipa". On exit, the supplied value will be reduced if any of 
+*        in "ipa". On exit, the supplied value will be reduced if any of
 *        the clumps were merged.
 *     perspectrum
 *        If non-zero, then each spectrum is processed independently of its
-*        neighbours. A clump that extends across several spectra will be 
+*        neighbours. A clump that extends across several spectra will be
 *        split into multiple clumps, each restricted to a single spectrum.
 *        The non-zero value supplied should be the 1-based axis index of
 *        the spectral pixel axis. Should be supplied as zero if "ndim" is
@@ -100,10 +98,10 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
 *        Pointer to the inherited status value.
 
 *  Notes:
-*     - This function can be invoked using the generic cupidFWJoin macro 
-*     defined in cupid.h. This macro has the same parameter list as 
-*     cupidFWJoin<X> except that an extra parameter is added to the start 
-*     of the parameter list indicating the data type of the specific 
+*     - This function can be invoked using the generic cupidFWJoin macro
+*     defined in cupid.h. This macro has the same parameter list as
+*     cupidFWJoin<X> except that an extra parameter is added to the start
+*     of the parameter list indicating the data type of the specific
 *     cupidFWJoin... function to be invoked. This extra parameter should
 *     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.
 
@@ -214,7 +212,7 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
    spectra, we only scan the array once, along the spectral axis. */
       if( perspectrum && perspectrum != scanax + 1 ) continue;
 
-/* Store the skip in 1D vector index between adjacent samples along the scan 
+/* Store the skip in 1D vector index between adjacent samples along the scan
    line, and the number of samples along the scan line. */
       iiskip = skip[ scanax ];
       iidim = dims[ scanax ];
@@ -250,9 +248,9 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
                      newclump = ipa[ iv ];
                      newv = (double) array[ iv ];
 
-/* If the scan line has passed from one clump to an adjoining clump, check the 
-   depth of the dip between the two peak values. */              
-                     if( oldclump != newclump && 
+/* If the scan line has passed from one clump to an adjoining clump, check the
+   depth of the dip between the two peak values. */
+                     if( oldclump != newclump &&
                          oldclump != -1 && newclump != -1 ) {
 
 /* Find the mean of the two data values on either side of the boundary. */
@@ -271,7 +269,7 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
                         if( peakvals[ lowclump ] - v < mindip ) {
                            ipair = npair++;
                            pairs = astGrow( pairs, npair, 2*sizeof( int ) );
-                           if( astOK ) {                           
+                           if( astOK ) {
                               p = pairs + 2*ipair;
                               p[ 0 ] = oldclump;
                               p[ 1 ] = newclump;
@@ -301,13 +299,13 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
       table1 = astMalloc( sizeof( int )*( *npeak + 1 ) );
       table2 = astMalloc( sizeof( int )*( *npeak + 1 ) );
       if( astOK ) {
-   
+
 /* Initialise the 1st table to indicate that all clumps retain their initial
    identifiers. */
          for( ipeak = 0; ipeak <= *npeak; ipeak++ ) table1[ ipeak ] = ipeak;
-   
-/* Now loop through each of the pairs of clumps which are to be merged. Find 
-   the clump index that is being used in place of the lower clump index in 
+
+/* Now loop through each of the pairs of clumps which are to be merged. Find
+   the clump index that is being used in place of the lower clump index in
    the pair, and use it also for the other clump in the pair. These give
    the intermediate clump assignments. */
          p = pairs;
@@ -333,12 +331,12 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
 
             }
          }
-   
+
 /* Initialise the 2nd table to indicate that no clumps indices are used. */
          for( ipeak = 0; ipeak <= *npeak; ipeak++ ) table2[ ipeak ] = 0;
-   
+
 /* Now map the intermediate clump identifiers onto a contiguous set of
-   final clump identifiers starting at 1. Set a flag ("trans") that 
+   final clump identifiers starting at 1. Set a flag ("trans") that
    indicates if any clump index is to be changed. */
          trans = 0;
          new_npeak = 0;
@@ -351,7 +349,7 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
             table2[ ipeak ] = kpeak;
             if( ipeak != kpeak ) trans = 1;
          }
-   
+
 /* If necesaary, translate all the values in "ipa" using the above table. */
          if( trans ) {
 
@@ -368,12 +366,12 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
             for( iv = 0; iv < nel; iv++, pa++ ) {
                if( *pa != -1 ) *pa = table2[ *pa ];
             }
-   
+
 /* Save the new highest clump index in the returned "ip" array. */
             *npeak = new_npeak;
          }
       }
-   
+
 /* Free resources. */
       pairs = astFree( pairs );
       table1 = astFree( table1 );

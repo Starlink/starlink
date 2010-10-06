@@ -39,9 +39,9 @@ AM_CFLAGS = -I..
 
 $(C_ROUTINES:.c=.o): ../cupid.h
 
-# Create the .c file which defines type-specific code generated from each 
+# Create the .c file which defines type-specific code generated from each
 # .cgen file.
-$(CGENERIC_ROUTINES:.cgen=.c): 
+$(CGENERIC_ROUTINES:.cgen=.c):
 	echo "/*" > $@
 	echo "*  Name:" >> $@
 	echo "*    $@" >> $@

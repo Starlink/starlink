@@ -1,5 +1,3 @@
-/* -*- C -*- */
-
 /*
 *+
 *  Name:
@@ -98,14 +96,14 @@ typedef struct CupidBoxIter {
 } CupidBoxIter;
 
 
-/* A structure holding the global parameters of the GaussClump algorithm 
+/* A structure holding the global parameters of the GaussClump algorithm
    needed by service functions. */
 typedef struct CupidGC  {
    double *data;           /* Pointer to copy of data section being fitted */
    double *res;            /* Pointer to array to receive scale residuals */
    double *resu;           /* Pointer to array to receive unscale residuals */
    double *weight;         /* Pointer to weights for section being fitted */
-   double beam_sq;         /* Square of spatial beam FWHM in pixels */   
+   double beam_sq;         /* Square of spatial beam FWHM in pixels */
    double lbnd[ 3 ];       /* Lower grid bounds of section being fitted */
    double maxwf;           /* Maximum factor for modifying weights */
    double minwf;           /* Minimum factor for modifying weights */
@@ -114,7 +112,7 @@ typedef struct CupidGC  {
    double sb;              /* Chi-square stiffness parameter sb */
    double sc4;             /* Four times chi-square stiffness parameter sc */
    double ubnd[ 3 ];       /* Upper grid bounds of section being fitted */
-   double velres_sq;       /* Square of velocity resolution in pixels */   
+   double velres_sq;       /* Square of velocity resolution in pixels */
    double wsum;            /* Sum of values in "weight" array */
    double x_max[ 3 ];      /* Grid coords of "ymax" value */
    double ymax;            /* Largest data value in section being fitted */
@@ -134,7 +132,7 @@ typedef struct CupidGC  {
    double *resids;
    double chisq;
    int slbnd[3];           /* Lower pixel bounds of user supplied NDF */
-   
+
 } CupidGC;
 
 /* Structure used to describe a set of contiguous pixels in the ClumpFind
@@ -157,8 +155,8 @@ typedef struct CupidPixelSet {
 typedef struct CupidClumpInfo {
    int init;           /* Has the structure been initialised? */
    AstFrameSet *iwcs;  /* WCS FrameSet from main NDF */
-   int lbnd[ 3 ];      /* Lower pixel index bounds of bounding box */      
-   int ubnd[ 3 ];      /* Upper pixel index bounds of bounding box */      
+   int lbnd[ 3 ];      /* Lower pixel index bounds of bounding box */
+   int ubnd[ 3 ];      /* Upper pixel index bounds of bounding box */
    int npix;           /* Number of pixel axes */
    int nwcs;           /* Number of WCS axes */
 } CupidClumpInfo;
@@ -215,7 +213,7 @@ typedef struct CupidClumpInfo {
 /* A set of macros which invoke the corresponding AST memory management
    functions, but which specify the size of a data element using a cupid
    data type rather than a C data type. The "fun" macro parameter should
-   be a quoted string holding the name of the function to be included in 
+   be a quoted string holding the name of the function to be included in
    any error messages. */
 
 #define cupidStore( mem, ptr, nel, type, fun ) \
@@ -227,7 +225,7 @@ typedef struct CupidClumpInfo {
 /* Pointer to an array holding a list of PixelSet pointers. The PixelSet
    structures in this list have been created previously by cupidCFMakePS
    but have subsequently been freed (using cupidCFFreePS) and are
-   currently not being used for anything, and so can be re-issued by 
+   currently not being used for anything, and so can be re-issued by
    cupidCFMakePS, thus avoiding the overhead of frequenct memory
    allocation. */
 extern CupidPixelSet **cupid_ps_cache;
