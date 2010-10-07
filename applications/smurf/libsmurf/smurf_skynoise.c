@@ -159,6 +159,7 @@
 #include "sae_par.h"
 #include "star/grp.h"
 #include "star/kaplibs.h"
+#include "star/one.h"
 
 /* SMURF includes */
 #include "smurflib.h"
@@ -227,7 +228,7 @@ void smurf_skynoise ( int *status ) {
    sc2sim_getsimpar ( simkeymap, &sinx, status );
 
    /* Get the file_name from the simfile */
-   strcpy ( file_name, sinx.atmname );
+   one_strlcpy( file_name, sinx.atmname, sizeof(file_name) , status );
 
    /* Check to see if the file already exists.  Warn the user if the file
       is being overwritten */

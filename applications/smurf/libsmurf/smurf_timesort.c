@@ -1263,7 +1263,7 @@ void smurf_timesort( int *status ) {
                                      "a\\d{8}_\\d{5}_\\d{2}_(\\d{4})_?",
                                      (const char **) &pname, 1 );
                   if( match ) {
-                     strcpy( fullname, match );
+                     one_strlcpy( fullname, match, sizeof(fullname), status );
                      match = astFree( match );
 
 /* If the basename supplied by the user does not use the ACSIS file
