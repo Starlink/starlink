@@ -96,13 +96,13 @@ void smurf_fts2_transcorr(int *status)
   int width = 0;
   int height = 0;
   int pixelCount = 0;
-  int fIndex = 0;
   double airMass = 0;
   double PWV = 0;
   double tauFactor = 0.0;  
   double* dryData = NULL;
   size_t dryCount = 0;
-  
+  size_t fIndex = 0;
+
   double* src = NULL;
   double wnFactor = 0.0;
   int nwn = 0;

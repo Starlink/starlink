@@ -205,7 +205,6 @@ void smf_update_valbad( smfData *data, smf_modeltype mtype, const smf_qual_t *qu
                 ": Don't currently handle COM model components.",
                 status );
       goto CLEANUP;
-      break;
 
     case SMF__DKS:
       /* Each columns dark squid signal followed by gain, offset and
@@ -218,7 +217,6 @@ void smf_update_valbad( smfData *data, smf_modeltype mtype, const smf_qual_t *qu
                 ": Don't currently handle DKS model components.",
               status );
       goto CLEANUP;
-      break;
 
     case SMF__GAI:
       /* 3d array so we can used smf_get_dims: 3 planes of bolo data
@@ -239,7 +237,6 @@ void smf_update_valbad( smfData *data, smf_modeltype mtype, const smf_qual_t *qu
               status );
 
       goto CLEANUP;
-      break;
 
     default:
       /* Otherwise assume a 3-d model. While the time axes may not

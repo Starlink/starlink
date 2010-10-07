@@ -107,7 +107,6 @@ void smurf_fts2_removebse(int* status)
   int bseHeight     = 0;
   int bseN          = 0;
   int bseSubarray   = 0;
-  int fIndex        = 0;
   int bseWidth      = 0;
   int srcSubarray   = 0;
   int srcWidth      = 0;
@@ -121,6 +120,7 @@ void smurf_fts2_removebse(int* status)
   Grp* bsegrp       = NULL;
   Grp* igrp         = NULL;
   Grp* ogrp         = NULL;
+  size_t fIndex     = 0;
   size_t outsize    = 0;
   size_t size       = 0;
   size_t count      = 0;
@@ -185,7 +185,7 @@ void smurf_fts2_removebse(int* status)
   datGetVR(hdsLocPosition, count, tmp, &count, status);
   if(*status == SAI__OK)
   {
-    for(int i = 0; i < (int) count; i++) { bseX[i] = (double) tmp[i]; }
+    for(i = 0; i < (int) count; i++) { bseX[i] = (double) tmp[i]; }
   }
   /* FREE RESOURCES */
   astFree(tmp);
@@ -256,7 +256,7 @@ void smurf_fts2_removebse(int* status)
     datGetVR(hdsLocPosition, count, tmp, &count, status);
     if(*status == SAI__OK)
     {
-      for(int i = 0; i < (int) count; i++) { srcX[i] = (double) tmp[i]; }
+      for(i = 0; i < (int) count; i++) { srcX[i] = (double) tmp[i]; }
     }
     /* FREE RESOURCES */
     astFree(tmp);

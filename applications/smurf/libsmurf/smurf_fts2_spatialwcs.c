@@ -100,10 +100,10 @@
 
 void smurf_fts2_spatialwcs(int *status) 
 {
-  int fIndex                  = 0;
   double refra                = 0.0;
   double refdec               = 0.0;
   double wnFactor             = 0.0;
+  size_t fIndex               = 0;
   size_t outsize              = 0;
   size_t size                 = 0;  
   sc2ast_subarray_t subnum    = 0;  

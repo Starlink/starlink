@@ -421,7 +421,6 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
       double* outfpm    = NULL;
       double* outsigma  = NULL;
       HDSLoc* loc       = NULL;
-      smfHead* inHdr    = data->hdr;
 
       if( (fts->fpm && fts->fpm->pntr[0]) &&
           (fts->sigma && fts->sigma->pntr[0])) {

@@ -108,12 +108,8 @@
 
 void smurf_fts2_phasecorr(int* status)
 {
-  if(*status != SAI__OK) { return; }
-
-  char datatype[DAT__SZNAM + 1];    /* String for DATA/VARIANCE type */
   int coeffLength           = 0;    /* Number of polynomial coefficients */
   int dsHalfLength          = 0;    /* Size of the double sided interferogram */
-  int fIndex                = 0;    /* File loop counter */
   int index                 = 0;    /* Index */
   int i                     = 0;    /* Loop counter */
   int ii                    = 0;    /* Loop counter */
@@ -122,7 +118,6 @@ void smurf_fts2_phasecorr(int* status)
   int k                     = 0;    /* Loop counter */
   int kk                    = 0;    /* Loop counter */
   int newN                  = 0;    /* Time series length of the output data */
-  int num                   = 0;    /* Temporary place holder */
   int pixelCount            = 0;    /* Number of bolometers in the subarray */
   int phaseFunctionHalfLength = 0;  /* Half-length of phase function */
   int polynomialDegree      = 0;    /* Degree of the polynomial used to fit */
@@ -155,6 +150,7 @@ void smurf_fts2_phasecorr(int* status)
   Grp* ogrp                 = NULL; /* Output group */
   Grp* zpdgrp               = NULL; /* Output group */
   size_t count              = 0;    /* Mirror positions count */
+  size_t fIndex             = 0;    /* File loop counter */
   size_t insize             = 0;    /* Size of the input group */
   size_t outsize            = 0;    /* Size of the output group */
   size_t zpdsize            = 0;    /* Size of the ZPD group */
@@ -167,6 +163,8 @@ void smurf_fts2_phasecorr(int* status)
   HDSLoc* hdsLocPosition    = NULL; /* Pointer to mirror positions */
   void* srcCube             = NULL; /* Pointer to the input data cube */
   void* zpdArray            = NULL; /* Pointer to 2D ZPD data values */
+
+  if(*status != SAI__OK) { return; }
 
   /* GET INPUT GROUP */
   kpg1Rgndf("IN", 0, 1, "", &igrp, &insize, status);
