@@ -1,0 +1,316 @@
+#include "sae_par.h"
+#include "prm_par.h"
+#include "ast.h"
+#include "cupid.h"
+
+CupidPixelSet **CGEN_FUNCTION(cupidFWPixelSets)( CGEN_TYPE *array, int nel,
+                              int ndim, int dims[ 3 ], int skip[ 3 ],
+                              int *ipa, int npeak, int perspectrum,
+                              int *status ){
+/*
+*+
+*  Name:
+*     cupidFWPixelSets<X>
+
+*  Purpose:
+*     Create an array of PixelSet structures describing FellWalker clumps.
+
+*  Language:
+*     Starlink C
+
+*  Synopsis:
+*     CupidPixelSet **cupidFWPixelSets<X>( CGEN_TYPE *array, int nel, int ndim,
+*                                          int dims[ 3 ], int skip[ 3 ],
+*                                          int *ipa, int npeak, int perspectrum,
+*                                          int *status )
+
+*  Description:
+*     For each clump of equal values in the "ipa" array, this function creates
+*     a PixelSet structure describing the clump.
+
+*  Parameters:
+*     array
+*        The array containing the data to be scanned. The elements should
+*        be ordered according to Fortran order (first axis varying most
+*        rapidly).
+*     nel
+*        The number of elements in "array".
+*     ndim
+*        The number of significant pixel axes.
+*     dims
+*        The number of pixels on each pixel axis of the array.
+*     skip
+*        The increment in 1D vector index required to move a distance of 1
+*        pixel along each axis. This allows conversion between indexing
+*        the array using a single 1D vector index and using nD coords. This
+*        array should have 3 elements even if "ndim" is less than 3, and
+*        the extra elements should be filled with zero's.
+*     ipa
+*        Pointer to the array to receive the index of the clump to which
+*        each data pixel is assigned. The lowest clump index is 0. Pixels
+*        not in a clump are assigned -1.
+*     npeak
+*        The highest clump index value in "ipa".
+*     perspectrum
+*        If non-zero, then each spectrum is processed independently of its
+*        neighbours. A clump that extends across several spectra will be
+*        split into multiple clumps, each restricted to a single spectrum.
+*        The non-zero value supplied should be the 1-based axis index of
+*        the spectral pixel axis. Should be supplied as zero if "ndim" is
+*        not 3.
+*     status
+*        Pointer to the inherited status value.
+
+*  Returned Value:
+*     A pointer to a newly allocated array of PixelSet pointers. This
+*     array, together with the PixelSets themselves, should be freed when
+*     no longer needed.
+
+*  Copyright:
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     DSB: David S. Berry
+*     {enter_new_authors_here}
+
+*  History:
+*     5-OCT-2010 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+*/
+
+/* Local Variables: */
+   CupidPixelSet **result; /* Returned pointer */
+   CupidPixelSet *ps;  /* Pointer to current PointSet */
+   double dvalo;       /* Central array value */
+   double dvali;       /* Neighbouring array value */
+   double col;         /* Data value at col between two neighbouring peaks */
+   int ivalo;          /* Central clump index */
+   int ivali;          /* Neighbouring clump index */
+   int ineb;           /* Index of neighbour within "nebs" and "cols" arrays */
+   int *pin0;          /* Pointer to ipa pixel [0,0,0] */
+   int *pin;           /* Pointer to input pixel */
+   int *piny;          /* Pointer to input pixel at start of row */
+   int *pinz;          /* Pointer to input pixel at start of plane */
+   int iv;             /* Vector index into input array */
+   int ix;             /* Input pixel GRID index on axis 1 */
+   int iy;             /* Input pixel GRID index on axis 2 */
+   int iz;             /* Input pixel GRID index on axis 3 */
+   int ox;             /* Output pixel GRID index on axis 1 */
+   int oy;             /* Output pixel GRID index on axis 2 */
+   int oz;             /* Output pixel GRID index on axis 3 */
+
+/* Initialise */
+   result = NULL;
+
+/* Abort if an error has already occurred. */
+   if( *status != SAI__OK ) return result;
+
+/* Allocate the returned array to have an element for each clump index in
+   "ipa", initialising the contents of the array to zero (i.e. NULL
+   pointers). */
+   result = astCalloc( npeak + 1, sizeof( *result ), 1 );
+
+/* Check the memory was allocated. */
+   if( result ) {
+
+/* Get a pointer to the "ipa" pixels which would have GRID indices [0,0,0]
+   if the input array extended that far (in fact the first pixel in the
+   input array has GRID indices [1,1,1]). */
+      pin0 = ipa - skip[ 0 ] - skip[ 1 ] - skip[ 2 ];
+
+/* Loop round all elements of the array. */
+      iv = 0;
+      for( oz = 1; oz <= dims[ 2 ]; oz++ ) {
+         for( oy = 1; oy <= dims[ 1 ]; oy++ ) {
+            for( ox = 1; ox <= dims[ 0 ]; ox++, iv++ ) {
+
+/* Note the clump index at the current array element and pass on to the
+   next pixel if it is not part of a clump. */
+               ivalo = ipa[ iv ];
+               if( ivalo >= 0 ) {
+
+/* Note the data value at the current array element. */
+                  dvalo = (double) array[ iv ];
+
+/* If the clump to which the current pixel belongs does not yet have a
+   PixelSet structure to describe it, create one now. */
+                  ps = result[ ivalo ];
+                  if( !ps ) {
+                     result[ ivalo ] = cupidCFMakePS( ivalo, status );
+                     ps = result[ ivalo ];
+                     if( ps ) {
+                        ps->lbnd[ 0 ] = ox;
+                        ps->lbnd[ 1 ] = oy;
+                        ps->lbnd[ 2 ] = oz;
+                        ps->ubnd[ 0 ] = ox;
+                        ps->ubnd[ 1 ] = oy;
+                        ps->ubnd[ 2 ] = oz;
+                        ps->vpeak = dvalo;
+                        ps->peak[ 0 ] = ox;
+                        ps->peak[ 1 ] = oy;
+                        ps->peak[ 2 ] = oz;
+                        ps->pop = 1;
+                        ps->edge = ( ox == 1 || ox == dims[ 0 ] ||
+                                     oy == 1 || oy == dims[ 1 ] ||
+                                     oz == 1 || oz == dims[ 2 ] );
+                     }
+
+/* If the clump to which the current pixel belongs already has a PixelSet
+   structure describing it, update the contents of the PixelSet. */
+                  } else {
+
+                     if( ox < ps->lbnd[ 0 ] ) {
+                        ps->lbnd[ 0 ] = ox;
+                     } else if( ox > ps->ubnd[ 0 ] ) {
+                        ps->ubnd[ 0 ] = ox;
+                     }
+
+                     if( oy < ps->lbnd[ 1 ] ) {
+                        ps->lbnd[ 1 ] = oy;
+                     } else if( oy > ps->ubnd[ 1 ] ) {
+                        ps->ubnd[ 1 ] = oy;
+                     }
+
+                     if( oz < ps->lbnd[ 2 ] ) {
+                        ps->lbnd[ 2 ] = oz;
+                     } else if( oz > ps->ubnd[ 2 ] ) {
+                        ps->ubnd[ 2 ] = oz;
+                     }
+
+                     if( dvalo > ps->vpeak ) {
+                        ps->vpeak = dvalo;
+                        ps->peak[ 0 ] = ox;
+                        ps->peak[ 1 ] = oy;
+                        ps->peak[ 2 ] = oz;
+                     }
+
+                     ps->pop++;
+
+                     if( ! ps->edge ) {
+                        ps->edge = ( ox == 1 || ox == dims[ 0 ] ||
+                                     oy == 1 || oy == dims[ 1 ] ||
+                                     oz == 1 || oz == dims[ 2 ] );
+                     }
+
+                  }
+
+/* Check the PixelSet pointer can be used safely. */
+                  if( *status == SAI__OK  ) {
+
+/* Loop round all pixels in the neighbourhood of the current pixel. This is
+   a cube of 3x3x3 pixels, centred on the current pixel. */
+                     pinz = pin0 + iv;
+                     for( iz = oz - 1; iz <= oz + 1 ; iz++ ) {
+                        if( iz >= 1 && iz <= dims[ 2 ] ) {
+                           piny = pinz;
+                           for( iy = oy - 1; iy <= oy + 1; iy++ ) {
+                              if( iy >= 1 && iy <= dims[ 1 ] ) {
+                                 pin = piny;
+                                 for( ix = ox - 1; ix <= ox + 1; ix++ ) {
+                                    if( ix >= 1 && ix <= dims[ 0 ] ) {
+
+/* If we are processing spectra indepently of each other, only consider the
+   (two) neighbouring pixels on the spectral axis. */
+                                       if( perspectrum == 1 ) {
+                                          if( iy != oy || iz != oz ) continue;
+                                       } else if( perspectrum == 2 ) {
+                                          if( ix != ox || iz != oz ) continue;
+                                       } else if( perspectrum == 3 ) {
+                                          if( ix != ox || iy != oy ) continue;
+                                       }
+
+/* Note the clump index at the current neighbouring pixel. */
+                                       ivali = *pin;
+
+/* If the current neighbouring pixel is in a different clump than the current
+   central pixel, we need to update the height of the col between the two
+   clump peaks stored in the PixelSet. */
+                                       if( ivali != ivalo && ivali != -1 ) {
+
+/* Find the index of the neigbouring clump within the "nebs" and "cols"
+   arrays of the current clump. First check to see if the neighbour is
+   the same as last time (this saves us the job of searching through the
+   "nebs" array). */
+                                          if( ivali == ps->lneb ) {
+                                             ineb = ps->lnebi;
+
+/* Otherwise, search the "nebs" array, and then update the cached values. */
+                                          } else {
+
+                                             for( ineb = 0; ineb < ps->nneb; ineb++ ) {
+                                                if( (ps->nebs)[ ineb ] == ivali ) {
+                                                   break;
+                                                }
+                                             }
+
+                                             ps->lneb = ivali;
+                                             ps->lnebi = ineb;
+
+/* If this is the first time this neighbour has been seen, add it to the
+   "nebs" and "cols" lists in the PointSet. */
+                                             if( ineb == ps->nneb ) {
+                                                ps->nebs = astGrow( ps->nebs,
+                                                                    ++(ps->nneb),
+                                                                    sizeof( *(ps->nebs) ) );
+                                                ps->cols = astGrow( ps->cols,
+                                                                    ps->nneb,
+                                                                    sizeof( *(ps->cols) ) );
+                                                if( *status == SAI__OK ) {
+                                                   ps->nebs[ ineb ] = ivali;
+                                                   ps->cols[ ineb ] = VAL__MIND;
+                                                }
+                                             }
+
+                                          }
+
+/* Update the height of the col between the two peaks. */
+                                          dvali = (double) array[ pin - ipa ];
+                                          col = 0.5*( dvali + dvalo );
+                                          if( col > ps->cols[ ineb ] ) ps->cols[ ineb ] = col;
+                                       }
+
+/* Move on to the next neighbouring pixel. */
+                                    }
+                                    pin++;
+                                 }
+                              }
+                              piny = piny + skip[ 1 ];
+                           }
+                        }
+                        pinz = pinz + skip[ 2 ];
+                     }
+                  }
+
+/* Move on to the next central pixel. */
+               }
+            }
+         }
+      }
+   }
+
+/* Return the pointer to the array of PixelSet pointers. */
+   return result;
+}
