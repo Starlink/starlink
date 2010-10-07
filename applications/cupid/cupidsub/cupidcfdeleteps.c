@@ -66,13 +66,16 @@ CupidPixelSet *cupidCFDeletePS( CupidPixelSet *ps, int *status ){
 *-
 */
 
-/* Local Variables: */
-
-/* (none) */
+/* Check a pointer was supplied. */
+   if( !ps ) return NULL;
 
 /* Free the memory used to hold the list of the indices of neighbouring
    clumps. */
    ps->nebs = astFree( ps->nebs );
+
+/* Free the memory used to hold the list of the heights of the cols
+   between neighbouring peaks. */
+   ps->cols = astFree( ps->cols );
 
 /* Free the memory holding the PixelSet itself, and return a NULL pointer. */
    return astFree( ps );

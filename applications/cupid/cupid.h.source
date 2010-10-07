@@ -136,7 +136,7 @@ typedef struct CupidGC  {
 } CupidGC;
 
 /* Structure used to describe a set of contiguous pixels in the ClumpFind
-   algorithm. */
+   and FellWalker algorithms. */
 typedef struct CupidPixelSet {
    int index;          /* The index used to identify pixels in the set */
    int lbnd[ 3 ];      /* Lower GRID bounds of the set bounding box */
@@ -147,6 +147,9 @@ typedef struct CupidPixelSet {
    int edge;           /* Does the PixelSet touch an edge of the data array? */
    int *nebs;          /* List of indices of neighbouring clumps */
    int nneb;           /* Length of "nebs" list */
+   double *cols;       /* FW: data value at the "col" between two neigbours */
+   int lneb;           /* Cached clump index */
+   int lnebi;          /* Index of cached clump index within "nebs" and "cols" */
 } CupidPixelSet;
 
 

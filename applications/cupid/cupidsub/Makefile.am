@@ -7,6 +7,7 @@ cupidgcprofwidth.cgen cupidgcdump.cgen cupidsumclumps.cgen \
 cupidcfscan.cgen cupidcfclump.cgen \
 cupidrcheckface.cgen cupidrcopyline.cgen cupidrinitedges.cgen \
 cupidfwmain.cgen cupidndfclump.cgen cupidfwjoin.cgen \
+cupidfwpixelsets.cgen \
 cupidfindback1.cgen cupidfindback2.cgen cupidfindback3.cgen \
 cupidfindback4.cgen cupidfindback10.cgen
 

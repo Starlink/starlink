@@ -93,6 +93,9 @@ CupidPixelSet *cupidCFMakePS( int index, int *status ){
          ret->index = index;
          ret->nebs = NULL;
          ret->nneb = 0;
+         ret->cols = NULL;
+         ret->lneb = -1;
+         ret->lnebi = -1;
       }
 
 /* Otherwise, return a pointer to the PixelSet at the end of the cache
@@ -102,7 +105,10 @@ CupidPixelSet *cupidCFMakePS( int index, int *status ){
       cupid_ps_cache[ cupid_ps_cache_size ] = NULL;
       ret->index = index;
       ret->nebs = NULL;
+      ret->cols = NULL;
       ret->nneb = 0;
+      ret->lneb = -1;
+      ret->lnebi = -1;
    }
 
 /* Return the PixelSet pointer. */

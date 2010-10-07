@@ -6,6 +6,13 @@
  and  analyse clumps of emission within 2- or 3- dimensional
  data arrays.
 
+Changes introduced at V1.3
+
+   - A serious error in the use of the FellWalker.MinDip parameter has been
+   corrected. Previously, many clumps were being merged that should not have
+   been merged (i.e. clumps separated by a dip of more than MinDip).
+   Consequently, this fix causes FellWalker to report more clumps.
+
 Changes introduced at V1.2
 
    - MAKECLUMPS now allows clump parameters to be distributed

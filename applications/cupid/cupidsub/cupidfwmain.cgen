@@ -151,7 +151,6 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 
 /* Local Variables: */
    CGEN_TYPE *pd;  /* Pointer to next "array" value */
-   double *peak_values; /* Pointer to array holding peak value in each clump */
    double flat[ 4 ];/* Array containing most recent data values along route */
    double flat_slope;/* Lowest gradient which marks the start of the walk */
    double frac;    /* Min fraction of neighbouring good pixels */
@@ -295,9 +294,6 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    if( msgFlevok( MSG__DEBUG2, status ) ) {
       cupidDumpI( work, ndim, dims, slbnd, "cleaned initial mask", status );
    }
-
-/* Initialise the pointer to an array holding the peak value in every clump. */
-   peak_values = NULL;
 
 /* Pre-allocate some memory for the route array which holds the 1D vector
    indices of the pixels traversed in the route from the initial pixel to
@@ -626,16 +622,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    the new clump index. */
                      if( iv == nv ) {
                         clump_index = work[ iv ];
-                        if( clump_index < 1 ) {
-                           clump_index = ++ret;
-                           peak_values = astGrow( peak_values, ret + 1,
-                                                  sizeof( *peak_values ) );
-                        }
-
-/* Update the peak value in the clump */
-                        if( astOK ) {
-                           peak_values[ clump_index ] = (double) array[ iv ];
-                        }
+                        if( clump_index < 1 ) clump_index = ++ret;
 
 /* Report new peak. */
                         msgSeti( "I", clump_index );
@@ -706,8 +693,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    clumps. */
    msgOutif( MSG__VERB, "", "Merging adjoining clumps", status );
    CGEN_FUNCTION(cupidFWJoin)( array, nel, ndim, dims, skip, rms, config,
-                               work, peak_values, &ret, perspectrum,
-                               status );
+                               work, &ret, perspectrum, status );
    msgOutif( MSG__VERB, "", "Merging completed", status );
 
 /* If required, dump the merged clump mask. */
@@ -750,7 +736,6 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    }
 
 /* Free resources. */
-   peak_values = astFree( peak_values );
    work = astFree( work );
    route = astFree( route );
 

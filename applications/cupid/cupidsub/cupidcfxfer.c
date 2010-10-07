@@ -29,7 +29,7 @@ void cupidCFXfer( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
 *  Parameters:
 *     ps1
 *        Pointer to the source PixelSet structure containing the pixels to
-*        be moved.
+*        be moved. The contents of "ps1" are left unchanged.
 *     ps2
 *        Pointer to the destination PixelSet structure to receive the pixels
 *        moved from "ps1".
@@ -81,15 +81,21 @@ void cupidCFXfer( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
 */
 
 /* Local Variables: */
-
    int *v1;         /* Pointer to element at start of this row */
    int *v2;         /* Pointer to element at start of this plane */
    int *v;          /* Pointer to next array element */
    int i;           /* GRID axis 1 value of next array element */
+   int ineb;        /* Index of neighbour in source PixelSet */
    int j;           /* GRID axis 2 value of next array element */
+   int jneb;        /* Index of neighbour in destination PixelSet */
    int k;           /* GRID axis 3 value of next array element */
+   int kneb;        /* Index of neighbour in destination PixelSet */
+   int ncol;        /* Max number of col heights in merged clump */
+   int neb;         /* Neighbour clump index */
    int new_index;   /* Index value to assign to the transferred pixels */
+   int nneb;        /* Max number of neighbours in merged clump */
    int old_index;   /* Original index value of the transferred pixels */
+   int there;       /* Does the destination already have this neighbour? */
 
 /* Check inherited status. Also return without action if the two
    PointSets are the same.  */
@@ -136,9 +142,8 @@ void cupidCFXfer( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
    if( ps1->ubnd[ 1 ] > ps2->ubnd[ 1 ] ) ps2->ubnd[ 1 ] = ps1->ubnd[ 1 ];
    if( ps1->ubnd[ 2 ] > ps2->ubnd[ 2 ] ) ps2->ubnd[ 2 ] = ps1->ubnd[ 2 ];
 
-/* Update the populations of the two PixelSets. */
+/* Update the populations of the destination PixelSet. */
    ps2->pop += ps1->pop;
-   ps1->pop = 0;
 
 /* If the source PixelSet touches the edge, then so does the destination
    PixelSet. */
@@ -154,17 +159,39 @@ void cupidCFXfer( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
       ps2->peak[ 2 ] = ps1->peak[ 2 ];
    }
 
-/* Add an list of neigbours contained in the source PixelSet into the
-   list of neighbours in the destination pixelet. */
+/* Add the lists of *new* neigbours and col heights (i.e. ones that are
+   not already in the destination PixelSet) contained in the source
+   PixelSet into the destination PixelSet. Ensure we do not make a PixelSet
+   a neighbour of itself. */
    if( ps1->nneb > 0 ) {
-      ps2->nebs = astGrow( ps2->nebs, ps1->nneb + ps2->nneb, sizeof( int ) );
+      nneb = ps1->nneb + ps2->nneb;
+      ncol = ( ps1->cols && ps2->cols ) ? nneb : 0;
+      ps2->nebs = astGrow( ps2->nebs, nneb, sizeof( int ) );
+      ps2->cols = astGrow( ps2->cols, ncol, sizeof( double ) );
       if( astOK ) {
-         memcpy( ps2->nebs + ps2->nneb,
-                 ps1->nebs, ps1->nneb*sizeof( int ) );
-         ps2->nneb += ps1->nneb;
+         jneb = ps2->nneb;
+         for( ineb = 0; ineb < ps1->nneb; ineb++ ) {
+            neb = ps1->nebs[ ineb ];
+            if( neb != old_index && neb != new_index ) {
+
+               there = 0;
+               for( kneb = 0; kneb < ps2->nneb; kneb++ ) {
+                  if( ps2->nebs[ kneb ] == neb ) {
+                     there = 1;
+                     break;
+                  }
+               }
+
+               if( ! there ) {
+                  ps2->nebs[ jneb ] = neb;
+                  if( ncol ) ps2->cols[ jneb ] = ps1->cols[ ineb ];
+                  jneb++;
+               }
+            }
+         }
       }
-      ps1->nebs = astFree( ps1->nebs );
-      ps1->nneb = 0;
+
+      ps2->nneb = jneb;
    }
 
 }

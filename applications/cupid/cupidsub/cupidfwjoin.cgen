@@ -7,9 +7,8 @@
 
 void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
                                  int dims[ 3 ], int skip[ 3 ], double rms,
-                                 AstKeyMap *config, int *ipa, double *peakvals,
-                                 int *npeak, int perspectrum,
-                                 int *status ){
+                                 AstKeyMap *config, int *ipa, int *npeak,
+                                 int perspectrum, int *status ){
 /*
 *+
 *  Name:
@@ -24,9 +23,8 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
 *  Synopsis:
 *     void cupidFWJoin<X>( CGEN_TYPE *array, int nel, int ndim,
 *                          int dims[ 3 ], int skip[ 3 ], double rms,
-*                          AstKeyMap *config, int *ipa, double *peakvals,
-*                          int *npeak, int perspectrum,
-*                          int *status )
+*                          AstKeyMap *config, int *ipa, int *npeak,
+*                          int perspectrum, int *status )
 
 *  Description:
 *     This function identifies groups of adjoining clumps which have no
@@ -40,18 +38,11 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
 *     made worse if pixel-to-pixel noise is correlated over a distance
 *     comporable to or larger than MaxJump.
 *
-*     This function scans the pixel assigment array twice; the first scan
-*     is row-by-row and the second is column-by-column. On each scan, the
-*     boundary between adjoining clumps is found by looking for a change in
-*     the pixel assignment index. The data value at each boundary pixel
-*     is noted, and the hightest data value on the boundary between any two
-*     adjoining clumps is thus found. This highest data value corresponds
-*     to the bottom of the "dip" between the two adjoining peaks. If the
-*     bottom of the dip is not significantly lower than the peak values in
-*     both of the two adjoining peaks, then the two clumps are merged
-*     into one. Here, "significantly lower" means that the data value at
-*     the dip is more than "MinDip" lower than the lowest of the two clump
-*     peak values ("MinDip" is a configuration parameter).
+*     For each clump, this function finds the height of the "col" between
+*     the clump and each of its neighbours, and identifies the "best"
+*     neighbour - that is, the neighbour with the highest col. If the peak 
+*     of the clump being considered is less than "MinDip" above the col, then
+*     we merge the clump into its best neighbour.
 
 *  Parameters:
 *     array
@@ -79,10 +70,6 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
 *        Pointer to the array to receive the index of the clump to which
 *        each data pixel is assigned. The lowest clump index is 0. Pixels
 *        not in a clump are assigned -1.
-*     peakvals
-*        Pointer to an array in which element "i" holds the peak data
-*        value in the clump with index "i". The values will be modified
-*        on exit if any of the clumps were merged.
 *     npeak
 *        The address of an integer holding the highest clump index value
 *        in "ipa". On exit, the supplied value will be reduced if any of
@@ -97,17 +84,9 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
 *     status
 *        Pointer to the inherited status value.
 
-*  Notes:
-*     - This function can be invoked using the generic cupidFWJoin macro
-*     defined in cupid.h. This macro has the same parameter list as
-*     cupidFWJoin<X> except that an extra parameter is added to the start
-*     of the parameter list indicating the data type of the specific
-*     cupidFWJoin... function to be invoked. This extra parameter should
-*     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.
-
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2007, 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -142,6 +121,8 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
 *        Added "perspectrum" parameter.
 *     14-JAN-2009 (TIMJ):
 *        Use MERS for message filtering.
+*     5-OCT-2010 (DSB):
+*        Major re-write of the algorithm.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -151,37 +132,20 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
 */
 
 /* Local Variables: */
-   double mindip;  /* Minimum dip between distinct peaks */
-   double newv;    /* Data value at current scan line sample */
-   double oldv;    /* Data value at previous scan line sample */
-   double v;       /* Mean data value at clump boundary */
-   int *pairs;     /* Array holding indices of clumps to be merged */
-   int *p;         /* Pointer to the lower of a pair of clumps to be merged */
-   int *pa;        /* Pointer to next "ipa" value */
-   int *table1;    /* Translates orginal clump index into intermediate clump index */
-   int *table2;    /* Translates orginal clump index into final clump index */
-   int ii;         /* Index of current scan line sample */
-   int iidim;      /* Length of current scan line */
-   int iiskip;     /* Skip between samples on current scan line */
-   int ipair;      /* Index for a pair of clumps to be merged */
-   int ipeak;      /* Original clump index */
-   int iv0;        /* Vector index at start of scan line */
-   int iv;         /* Vector index at current scan line sample */
-   int ix;         /* GRID index on 1st axis at starting pixel */
-   int iy;         /* GRID index on 2nd axis at starting pixel */
-   int iz;         /* GRID index on 3rd axis at starting pixel */
-   int jpeak;      /* Intermediate clump index */
-   int kpeak;      /* Final clump index */
-   int lowclump;   /* Index of the clump with lower peak value */
-   int new_npeak;   /* Highest final clump index used so far */
-   int newclump;   /* Clump index of current sample in scan line */
-   int npair;      /* No. of pairs of adjoining clumps to be merged */
-   int oldclump;   /* Clump index of previous sample in scan line */
-   int peak0;      /* Index of first peak to be merged */
-   int peak1;      /* Index of second peak to be merged */
-   int scanax;     /* Index of pixel axis being scanned */
-   int trans;      /* Do any clump indices need to be translated? */
-   int x[ 3 ];     /* GRID indices at starting pixel */
+   CupidPixelSet **pslist; /* Pointer to array of PixelSet pointers */
+   CupidPixelSet *ps1;     /* Describes clump to move */
+   CupidPixelSet *ps2;     /* Describes clump to be exapneded */
+   double mindip;          /* Minimum dip between distinct peaks */
+   double newcol;          /* The col height for the new border */
+   double topcol;          /* Height of highest col between neighbours */
+   int hasnew;             /* Has the new clump index already been found? */
+   int iclump1;            /* Index of clump to move */
+   int iclump2;            /* Index of clump to be expanded */
+   int ineb;               /* Neighbour index */
+   int jneb;               /* Neighbour index */
+   int jnew;               /* Neighbour index at which new border is stored */
+   int nmerged;            /* Number of clumps merged this iteration. */
+   int npeak0;             /* Original number of clumps in "ipa" */
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
@@ -193,188 +157,112 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
 /* Return without action if merging of clumps is not required. */
    if( mindip <= 0.0 ) return;
 
-/* This first section identifies pairs of adjoining clumps between which
-   there is no significant intervening dip. */
-/* ---------------------------------------------------------------------- */
+/* Note the original number of clumps. */
+   npeak0 = *npeak;
 
-/* Initialise things to avoid compiler warnings. */
-   oldv = 0.0;
+/* Create a set of PixelSet structures describing all the clumps in the
+   supplied ipa array. */
+   pslist = CGEN_FUNCTION(cupidFWPixelSets)( array, nel, ndim, dims, skip, ipa,
+                                             npeak0, perspectrum, status );
 
-/* Indicate that we have not as yet found any pair of adjoining clumps
-   that have no significant intervening dip. */
-   npair = 0;
-   pairs = NULL;
+/* Enter an iterative loop in which we join clumps that have a small dip
+   between them. Quit when an interation fails to merge any more clumps. */
+   nmerged = 1;
+   while( nmerged && *status == SAI__OK ) {
 
-/* We scan the "ipa" array "ndim" times, once along each pixel axis. */
-   for( scanax = 0; scanax < ndim; scanax++ ) {
+/* Loop round all clumps. For each one, we consider moving all the clump
+   pixels out of clump "iclump1", into another clump that adjoins iclump1
+   and is separated by a dip of less than MinDip. */
+      nmerged = 0;
+      for( iclump1 = 0; iclump1 <= npeak0; iclump1++ ) {
 
-/* If we are processing spectra independently of the neioghbouring
-   spectra, we only scan the array once, along the spectral axis. */
-      if( perspectrum && perspectrum != scanax + 1 ) continue;
+/* Get a pointer to the PixelSet describing the clump with index "iclump1".
+   Pass on if no clump with this index exists, or if it has no neighbours. */
+         ps1 = pslist[ iclump1 ];
+         if( ps1 && ps1->nneb ) {
 
-/* Store the skip in 1D vector index between adjacent samples along the scan
-   line, and the number of samples along the scan line. */
-      iiskip = skip[ scanax ];
-      iidim = dims[ scanax ];
+/* Check all the clumps that adjoin clump "iclump1", and find the one
+   that is separated from "iclump1" by the smallest dip (i.e. has the
+   highest "col" ). */
+            topcol = VAL__MIND;
+            iclump2 = -1;
 
-/* Consider every pixel in the data cube as a candidate for the start of
-   a scan line. */
-      iv0 = 0;
-      for( iz = 1; iz <= dims[ 2 ]; iz++ ) {
-         x[ 2 ] = iz;
+            for( ineb = 0; ineb < ps1->nneb; ineb++ ) {
+               if( ps1->nebs[ ineb ] != -1 && ps1->cols[ ineb ] > topcol ) {
+                  topcol = ps1->cols[ ineb ];
+                  iclump2 = ps1->nebs[ ineb ];
+               }
+            }
 
-         for( iy = 1; iy <= dims[ 1 ]; iy++ ) {
-            x[ 1 ] = iy;
+/* If the peak value in iclump1 is less than "mindip" above the col
+   between iclump1 and iclump2, then we merge the clumps. */
+            if( iclump2 != -1 && ps1->vpeak < topcol + mindip ) {
+               nmerged++;
+               msgSeti( "P0", iclump1 );
+               msgSeti( "P1", iclump2 );
+               msgOutif( MSG__DEBUG, "",
+                         "Moving clump ^P0 into clump ^P1", status );
 
-            for( ix = 1; ix <= dims[ 0 ]; ix++, iv0++ ) {
-               x[ 0 ] = ix;
-
-/* Scan lines start at pixels which have a value of one on the axis
-   currently being scanned. */
-               if( x[ scanax ] == 1 ) {
-
-/* Initialise the index of the clump to which the current sample in the
-   scan line is assigned. */
-                  oldclump = -1;
-
-/* Initialise the 1D vector index of the current sample. */
-                  iv = iv0;
-
-/* Loop round every sample in the scan line. */
-                  for( ii = 0; ii < iidim; ii++ ) {
-
-/* Note the index of the clump to which the current sample belongs, and
-   its data value. */
-                     newclump = ipa[ iv ];
-                     newv = (double) array[ iv ];
-
-/* If the scan line has passed from one clump to an adjoining clump, check the
-   depth of the dip between the two peak values. */
-                     if( oldclump != newclump &&
-                         oldclump != -1 && newclump != -1 ) {
-
-/* Find the mean of the two data values on either side of the boundary. */
-                        v = 0.5*( oldv + newv );
-
-/* Find the index of the clump with the lower peak. */
-                        if( peakvals[ newclump ] < peakvals[ oldclump ] ) {
-                           lowclump = newclump;
+/* Tell the neighbours of clump1 that they are now neighbours of clump2
+   instead. But only do this if they are not already neighbours of clump2. */
+               for( ineb = 0; ineb < ps1->nneb; ineb++ ) {
+                  jneb = ps1->nebs[ ineb ];
+                  if( jneb != -1 ) {
+                     ps2 = pslist[ jneb ];
+                     if( ps2 ) {
+                        if( jneb != iclump2 ) {
+                           hasnew = 0;
+                           newcol = 0.0;
                         } else {
-                           lowclump = oldclump;
+                           hasnew = 1;
+                           newcol = VAL__MAXD;
                         }
-
-/* If the dip between the lower of the two adjoining peaks and the current
-   sample is less than "MinDip" note that the two clumps need to be
-   merged together because there is no significant dip between them. */
-                        if( peakvals[ lowclump ] - v < mindip ) {
-                           ipair = npair++;
-                           pairs = astGrow( pairs, npair, 2*sizeof( int ) );
-                           if( astOK ) {
-                              p = pairs + 2*ipair;
-                              p[ 0 ] = oldclump;
-                              p[ 1 ] = newclump;
+                        for( jneb = 0; jneb < ps2->nneb; jneb++ ) {
+                           if( ps2->nebs[ jneb ] == iclump1 ||
+                               ps2->nebs[ jneb ] == iclump2 ) {
+                              if( hasnew ) {
+                                 ps2->nebs[ jneb ] = -1;
+                                 if( ps2->cols[ jneb ] > newcol ) {
+                                    newcol = ps2->cols[ jneb ];
+                                    ps2->cols[ jnew ] = newcol;
+                                 }
+                              } else {
+                                 ps2->nebs[ jneb ] = iclump2;
+                                 newcol = ps2->cols[ jneb ];
+                                 jnew = jneb;
+                                 hasnew = 1;
+                              }
                            }
                         }
                      }
-
-/* Same the clump index and data value at the current sample. */
-                     oldclump = newclump;
-                     oldv = newv;
-
-/* Move on to the next sample. */
-                     iv += iiskip;
                   }
                }
+
+/* Transfer the "iclump1" pixels into "iclump2". */
+               cupidCFXfer( ps1, pslist[ iclump2 ], ipa, skip, status );
+
+/* Free the old clump PixelSet. */
+               pslist[ iclump1 ] = cupidCFDeletePS( ps1, status );
             }
          }
       }
    }
 
-/* This next section merges the pairs of clumps found above. */
-/* --------------------------------------------------------- */
-   if( npair ) {
-
-/* Allocate memory to hold two translation tables from old clump indices to
-   new clump indicies. */
-      table1 = astMalloc( sizeof( int )*( *npeak + 1 ) );
-      table2 = astMalloc( sizeof( int )*( *npeak + 1 ) );
-      if( astOK ) {
-
-/* Initialise the 1st table to indicate that all clumps retain their initial
-   identifiers. */
-         for( ipeak = 0; ipeak <= *npeak; ipeak++ ) table1[ ipeak ] = ipeak;
-
-/* Now loop through each of the pairs of clumps which are to be merged. Find
-   the clump index that is being used in place of the lower clump index in
-   the pair, and use it also for the other clump in the pair. These give
-   the intermediate clump assignments. */
-         p = pairs;
-         for( ipair = 0; ipair < npair; ipair++, p += 2 ) {
-            peak0 = table1[ p[ 0 ] ];
-            peak1 = table1[ p[ 1 ] ];
-
-            if( peak1 > peak0 ){
-
-               for( ipeak = 0; ipeak <= *npeak; ipeak++ ) {
-                  if( table1[ ipeak ] == peak1 ) {
-                     table1[ ipeak ] = peak0;
-                  }
-               }
-
-            } else {
-
-               for( ipeak = 0; ipeak <= *npeak; ipeak++ ) {
-                  if( table1[ ipeak ] == peak0 ) {
-                     table1[ ipeak ] = peak1;
-                  }
-               }
-
-            }
-         }
-
-/* Initialise the 2nd table to indicate that no clumps indices are used. */
-         for( ipeak = 0; ipeak <= *npeak; ipeak++ ) table2[ ipeak ] = 0;
-
-/* Now map the intermediate clump identifiers onto a contiguous set of
-   final clump identifiers starting at 1. Set a flag ("trans") that
-   indicates if any clump index is to be changed. */
-         trans = 0;
-         new_npeak = 0;
-         for( ipeak = 0; ipeak <= *npeak; ipeak++ ) {
-            jpeak = table1[ ipeak ];
-            kpeak = table2[ jpeak ];
-            if( kpeak == 0 ){
-               kpeak = ( table2[ jpeak ] = ++new_npeak );
-            }
-            table2[ ipeak ] = kpeak;
-            if( ipeak != kpeak ) trans = 1;
-         }
-
-/* If necesaary, translate all the values in "ipa" using the above table. */
-         if( trans ) {
-
-            for( ipeak = 0; ipeak <= *npeak; ipeak++ ) {
-              if( ipeak != table2[ ipeak ] ) {
-                msgSeti( "P0", ipeak );
-                msgSeti( "P1", table2[ ipeak ] );
-                msgOutif( MSG__DEBUG, "",
-                          "Moving clump ^P0 into clump ^P1", status );
-              }
-            }
-
-            pa = ipa;
-            for( iv = 0; iv < nel; iv++, pa++ ) {
-               if( *pa != -1 ) *pa = table2[ *pa ];
-            }
-
-/* Save the new highest clump index in the returned "ip" array. */
-            *npeak = new_npeak;
-         }
+/* Find the highest remaining peak index. */
+   *npeak = 0;
+   for( iclump1 = npeak0; iclump1 >= 0; iclump1-- ) {
+      if( pslist[ iclump1 ] ) {
+         *npeak = iclump1;
+         break;
       }
+   }
 
-/* Free resources. */
-      pairs = astFree( pairs );
-      table1 = astFree( table1 );
-      table2 = astFree( table2 );
+/* Free the PixelSets. */
+   if( pslist ) {
+      for( iclump1 = 0; iclump1 <= npeak0; iclump1++ ) {
+         pslist[ iclump1 ] = cupidCFDeletePS( pslist[ iclump1 ], status );
+      }
+      pslist = astFree( pslist );
    }
 }
+

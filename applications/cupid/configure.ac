@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(cupid, 1.2, ussc@star.rl.ac.uk)
+AC_INIT(cupid, 1.3, ussc@star.rl.ac.uk)
 PACKAGE_UPCASE='CUPID'
 AC_DEFINE( [PACKAGE_UPCASE], "CUPID", [Upper cased package name] )
 AC_SUBST(PACKAGE_UPCASE)
@@ -29,7 +29,7 @@ AC_PROG_LIBTOOL
 dnl    Setup for creating a monolith.
 STAR_MONOLITHS
 
-dnl CUPID source files depend on include files from the following components  
+dnl CUPID source files depend on include files from the following components
 STAR_DECLARE_DEPENDENCIES([build], [mers cnf ifd irq ndf sae pda])
 
 dnl The CUPID link script links against the following components

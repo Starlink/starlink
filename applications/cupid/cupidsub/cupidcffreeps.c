@@ -112,11 +112,14 @@ CupidPixelSet *cupidCFFreePS( CupidPixelSet *ps, int *ipa, int nel,
 /* Put all scalar fields back to their initial values in prepreation for
    the PixelSet pointer being re-issued by cupidMakePS. */
    ps->nebs = astFree( ps->nebs );
+   ps->cols = astFree( ps->cols );
    ps->nneb = 0;
    ps->pop = 0;
    ps->edge = 0;
    ps->vpeak = -DBL_MAX;
    ps->index = CUPID__CFNULL;
+   ps->lneb = -1;
+   ps->lnebi = -1;
 
 /* Move the supplied PixelSet structure to the end of the cache so that
    it can be re-used. */
