@@ -808,7 +808,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           /* Metadata corrections - hide the messages by default.
              Only correct time series data at the moment.
           */
-          if ( !(flags & SMF__NOFIX_METADATA) && isTseries ) smf_fix_metadata( MSG__VERB, *data, status );
+          if ( !(flags & SMF__NOFIX_METADATA) && isTseries ) smf_fix_metadata( MSG__DEBUG, *data, status );
 
         }
 
@@ -988,7 +988,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           hdr->nframes = nframes;
 
           /* Metadata corrections - hide the messages by default */
-          if ( !(flags & SMF__NOFIX_METADATA) ) smf_fix_metadata( MSG__VERB, *data, status );
+          if ( !(flags & SMF__NOFIX_METADATA) ) smf_fix_metadata( MSG__DEBUG, *data, status );
 
           if (hdr->fitshdr) {
             /* and work out the observing mode */
