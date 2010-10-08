@@ -903,13 +903,19 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
                 /* If calcfirst flag is set, initialize NOI using noise
                    measured in the bolometer now (i.e. before the first
                    iteration). Use externally-supplied noise values
-                   if provided */
+                   if provided. */
 
                 if( noisemaps ) {
                   memcpy( dataptr, noisemaps->sdata[j]->pntr[0],
                           ndata*smf_dtype_size(noisemaps->sdata[j], status) );
                 } else {
                   if( idata && idata->pntr[0] ) {
+
+                    /* Need to gap fill first to ensure data padding is ok */
+                    smf_fillgaps( wf, idata,
+                                  zeropad ? SMF__Q_GAP : SMF__Q_GAP | SMF__Q_PAD,
+                                  status );
+
                     smf_bolonoise( wf, idata, 0, 0.5, SMF__F_WHITELO,
                                    SMF__F_WHITEHI, 0, 0, zeropad ? SMF__MAXAPLEN : SMF__BADSZT,
                                    dataptr, NULL, NULL, status );

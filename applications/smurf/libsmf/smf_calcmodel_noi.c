@@ -105,6 +105,9 @@
 *        Optionally calculate noise weights in advance with NOI.CALCFIRST
 *     2010-09-23 (DSB):
 *        Allow data to be padded with artificial data rather than zeros.
+*     2010-10-08 (DSB):
+*        Move gap filling to before smf_bolonoise in preparation for the
+*        FFT performed within smf_bolonoise.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -247,6 +250,16 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
       var = astCalloc( nbolo, sizeof(*var), 0 );
 
       if( (flags & SMF__DIMM_FIRSTITER) && (!calcfirst) ) {
+
+        /* Fill gaps and (maybe) pad with artificial data so that the FFT
+           can be taken safely within smf_bolonoise. */
+        if( fillgaps ) {
+          msgOutif(MSG__VERB," ", "   gap filling", status);
+          smf_fillgaps( wf, res->sdata[idx],
+                        zeropad ? SMF__Q_GAP : SMF__Q_GAP | SMF__Q_PAD,
+                        status );
+        }
+
         /* Measure the noise from power spectra */
         smf_bolonoise( wf, res->sdata[idx], 0, 0.5, SMF__F_WHITELO,
                        SMF__F_WHITEHI, 0, 0, zeropad ? SMF__MAXAPLEN : SMF__BADSZT,
@@ -282,12 +295,6 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
                     status, nflag);
         }
 
-        if( fillgaps ) {
-          msgOutif(MSG__VERB," ", "   gap filling", status);
-          smf_fillgaps( wf, res->sdata[idx],
-                        zeropad ? SMF__Q_GAP : SMF__Q_GAP | SMF__Q_PAD,
-                        status );
-        }
       }
 
       /* Now calculate contribution to chi^2 */

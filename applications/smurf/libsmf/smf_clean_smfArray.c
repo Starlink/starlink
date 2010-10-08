@@ -79,6 +79,9 @@
 *     2010-10-06 (EC):
 *        Renamed to smf_clean_smfArray from smf_clean_smfData to reflect change
 *        in interface.
+*     2010-10-08 (DSB):
+*        Move gap filling so that it is done immediately before the
+*        filtering.
 
 *  Copyright:
 *     Copyright (C) 2010 Univeristy of British Columbia.
@@ -273,17 +276,6 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
                  status, smf_timerupdate(&tv1,&tv2,status) );
     }
 
-    /* Gap filling */
-    if( fillgaps ) {
-      msgOutif(MSG__VERB, "", FUNC_NAME ": Gap filling.", status);
-      smf_fillgaps( wf, data, zeropad ? SMF__Q_GAP : SMF__Q_GAP | SMF__Q_PAD,
-                    status );
-
-      /*** TIMER ***/
-      msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ":   ** %f s gap filling",
-                 status, smf_timerupdate(&tv1,&tv2,status) );
-    }
-
     /* Remove baselines */
     if( order >= 0 ) {
       msgOutiff( MSG__VERB,"", FUNC_NAME
@@ -316,6 +308,17 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
 
   for( idx=0; (idx<array->ndat)&&(*status==SAI__OK); idx++ ) {
     data = array->sdata[idx];
+
+    /* Gap filling */
+    if( fillgaps ) {
+      msgOutif(MSG__VERB, "", FUNC_NAME ": Gap filling.", status);
+      smf_fillgaps( wf, data, zeropad ? SMF__Q_GAP : SMF__Q_GAP | SMF__Q_PAD,
+                    status );
+
+      /*** TIMER ***/
+      msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ":   ** %f s gap filling",
+                 status, smf_timerupdate(&tv1,&tv2,status) );
+    }
 
     /* filter the data */
     filt = smf_create_smfFilter( data, status );
