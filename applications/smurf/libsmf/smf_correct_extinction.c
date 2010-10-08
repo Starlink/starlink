@@ -237,7 +237,7 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
   size_t ndims;            /* Number of dimensions in input data */
   size_t newtau = 0;       /* Flag to denote whether to calculate a
                               new tau from the WVM data */
-  double newtwvm[3];       /* Array of WVM temperatures */
+  float newtwvm[3];        /* Array of WVM temperatures */
   dim_t nframes = 0;       /* Number of frames */
   dim_t npts = 0;          /* Number of data points */
   dim_t nx = 0;            /* # pixels in x-direction */
