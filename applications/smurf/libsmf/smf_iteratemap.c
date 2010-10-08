@@ -1521,8 +1521,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
               /*** TIMER ***/
               msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
-                         ": ** %f s calculating model",
-                         status, smf_timerupdate(&tv1,&tv2,status) );
+                         ": ** %f s calculating model %s",
+                         status, smf_timerupdate(&tv1,&tv2,status),
+                         smf_model_getname(modeltyps[j], status) );
             }
           }
 
