@@ -197,6 +197,9 @@
 *        Update POSIX version to 200809L to build on Fedora 13
 *     2010-09-20 (EC):
 *        Optionally initialize NOI using externally-supplied array
+*     2010-10-08 (TIMJ):
+*        Use astCalloc to initialise the big data buffers rather than memset.
+*        memset is very slow for large buffers.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -282,7 +285,9 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
   dim_t ibase;                  /* Base offset */
   smfData *idata=NULL;          /* Pointer to input smfdata data */
   int idx=0;                    /* Index within subgroup */
+  int init_mem = 0;             /* Do we initialise the memory ? */
   size_t isize=0;               /* Number of files in input group */
+  int is_initialised = 0;       /* Is buffer initialised ? */
   int ival;                     /* Integer value */
   dim_t j;                      /* Loop counter */
   size_t k;                     /* Loop counter */
@@ -296,7 +301,6 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
   dim_t nblock=0;               /* Number of time blocks */
   dim_t nbolo;                  /* Number of bolometers */
   dim_t ndata=0;                /* Number of elements in data array */
-  size_t nflag;                 /* Number of flagged samples */
   dim_t nrel=0;                 /* Number of related elements (subarrays) */
   dim_t ntslice=0;              /* Number of time slices */
   int oflag=0;                  /* Flags for opening template file */
@@ -825,12 +829,41 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
             one_strlcat( name, mname, len, status );
           }
 
-          if( nofile ) {
-            /* If there is no file associated with the data, use malloc
-               to allocate memory but don't initialize since we do that
-               later */
+          /* decide whether we need to initialise the memory buffer or
+             whether we are going to be copying data in to it. Repeat
+             the logic below but if a new model is added and we forget we
+             will be defaulting to the safe initialise option. It's not
+             entirely clear that this extra logic is worth it as calloc is
+             very fast anyhow. */
+          init_mem = 1;
+          if (copyinput) {
+            init_mem = 0;
+          } else {
+            switch (mtype) {
+            case SMF__LUT:
+            case SMF__NOI:
+            case SMF__QUA:
+            case SMF__EXT:
+            case SMF__GAI:
+            case SMF__TWO:
+              init_mem = 0;
+              break;
+            default:
+              init_mem = 1;
+            }
+          }
 
-            dataptr = astCalloc( datalen, 1, 0 );
+          /* indicate that we have not initialised the buffer yet. This is
+             important for the mmap case */
+          is_initialised = 0;
+
+          if( nofile ) {
+            /* If there is no file associated with the data, use calloc
+               to allocate memory. It's much faster than malloc+memset
+               for very large blocks so we initialise here rather than
+               later. */
+            dataptr = astCalloc( datalen, 1, init_mem );
+            is_initialised = init_mem;
 
           } else {
             /* If we are writing a file create and map it here */
@@ -992,7 +1025,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
               int replacebad;
 
               /* First set the entire buffer to 0 */
-              memset( dataptr, 0, datalen );
+              if (!is_initialised) memset( dataptr, 0, datalen );
 
               /* Apply basic DKS cleaning parameters */
               if( idata->da && idata->da->dksquid ) {
@@ -1109,7 +1142,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
               grpDelet( &ggrp, status );
             } else {
               /* otherwise zero the buffer */
-              memset( dataptr, 0, datalen );
+              if (!is_initialised) memset( dataptr, 0, datalen );
             }
           }
 
