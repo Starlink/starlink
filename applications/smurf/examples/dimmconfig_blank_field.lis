@@ -13,9 +13,7 @@
 # expected. Similarly, ast.zero_lowhits and ast.zero_notlast are used
 # to help constrain the solution to a flat map until the final
 # iteration.  Harsher bad-bolo rejection is implemented, and a lower
-# threshold on spikes is also used. The number of iterations is
-# hard-wired to 5, and seems to do a good job on the test data that
-# has been looked at.
+# threshold on spikes is also used.
 #
 # When reducing a large data set it might be useful to write out the
 # maps from each iteration/chunk by setting itermap=1.  This will
@@ -39,9 +37,9 @@
 #
 # ***********************************************************
 
-numiter = 5
+numiter = -5
 
-modelorder = (com,gai,ext,ast,noi)
+modelorder = (com,ext,ast,noi)
 
 # Use time-domain spiker first because we are only doing a single FFT-based
 # high-pass filter before the iterations start.
@@ -49,21 +47,19 @@ modelorder = (com,gai,ext,ast,noi)
 spikethresh = 10
 spikebox = 50
 
-# Lower map-basedspike threshold.  Since the astronomical signal is
-# small this is not dangerous.
-
-ast.mapspike = 5
-
 # Heavier high-pass filtering. Note that the default padding/apodization
 # that will be used is the number of samples that corresponds to the
 # period of the knee frequency in the high-pass filter (i.e. 200*(1/freq) )
 
-450.filt_edge_largescale = 150
-850.filt_edge_largescale = 150
+450.filt_edge_largescale = 200
+850.filt_edge_largescale = 200
 
 # can constrain much of the map to be zero until the final iteration
 # since the structure is very low S/N and we are after point sources,
 # not extended structure.
 
-ast.zero_lowhits = 1.5
+ast.zero_lowhits = 1
 ast.zero_notlast = 1
+
+# pad ends with zeros / use apodization to avoid ringing in some cases
+zeropad = 1
