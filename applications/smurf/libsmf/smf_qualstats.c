@@ -73,6 +73,8 @@
 *        Add quality family support.
 *     2010-07-16 (TIMJ):
 *        Add ability to not include padded data. Add tpad parameter.
+*     2010-10-08 (TIMJ):
+*        Handle common cases with special code.
 
 *  Copyright:
 *     Copyright (C) 2010 University of British Columbia.
@@ -180,10 +182,34 @@ void smf_qualstats( smf_qfam_t qfamily, int nopad, const smf_qual_t *qual, dim_t
         nummax++;
       }
 
-      /* Loop over bits */
-      for( k=0; k<nqbits; k++ ) {
-        if( qual[offset] & BIT_TO_VAL(k) ) {
-          qcount[k]++;
+      /* if the quality is 0 then we already know the
+         answer without looping over all the bits */
+      if ( qual[offset] != 0) {
+        /* Handle some of the simplest cases explicitly to prevent
+           a loop over all bits. In cases where only a single bit
+           is set this saves a lot of time. BADDA+BADBOL is also
+           very common */
+        switch( qual[offset] ) {
+        case BIT_TO_VAL(0):
+          qcount[0]++;
+          break;
+        case BIT_TO_VAL(1):
+          /* we do not need to worry about exceeding qcount bounds
+             since we will only be accessing it if the case statement
+             is true */
+          qcount[1]++;
+          break;
+        case (BIT_TO_VAL(0)|BIT_TO_VAL(1)):
+          qcount[0]++;
+          qcount[1]++;
+          break;
+        default:
+          /* Loop over bits */
+          for( k=0; k<nqbits; k++ ) {
+            if( qual[offset] & BIT_TO_VAL(k) ) {
+              qcount[k]++;
+            }
+          }
         }
       }
     }
