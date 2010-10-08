@@ -237,6 +237,8 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
   dim_t textreme[4];           /* Time index corresponding to minmax TCS posn */
   AstFrame *skyin = NULL;      /* Sky Frame in input FrameSet */
   double skyref[ 2 ];          /* Values for output SkyFrame SkyRef attribute */
+  struct timeval tv1;          /* Timer */
+  struct timeval tv2;          /* Timer */
   int ubnd0[ 2 ];              /* Defaults for UBND parameter */
   double x_array_corners[4];   /* X-Indices for corner bolos in array */
   double x_map[4];             /* Projected X-coordinates of corner bolos */
@@ -245,6 +247,9 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
 
   /* Main routine */
   if (*status != SAI__OK) return;
+
+  /* Start a timer to see how long this takes */
+  smf_timerinit( &tv1, &tv2, status );
 
   /* Initialize pointer to output FrameSet and moving-source flag */
   *outframeset = NULL;
@@ -696,6 +701,10 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
   } else {
     *outframeset = astAnnul( *outframeset );
   }
+
+  msgOutiff( SMF__TIMER_MSG, "",
+             "Took %.3f s to calculate map bounds",
+             status, smf_timerupdate( &tv1, &tv2, status ) );
 
   /* Clean Up */
  CLEANUP:

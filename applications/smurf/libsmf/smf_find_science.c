@@ -230,6 +230,8 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
   AstKeyMap * objmap = NULL; /* All the object names used */
   Grp *ogrp = NULL;   /* local copy of output group */
   size_t sccount = 0; /* Number of accepted science files */
+  struct timeval tv1;  /* Timer */
+  struct timeval tv2;  /* Timer */
 
   if (meanstep) *meanstep = VAL__BADD;
   if (outgrp) *outgrp = NULL;
@@ -246,6 +248,9 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
             " (possible programming error)", status);
     return;
   }
+
+  /* Start a timer to see how long this takes */
+  smf_timerinit( &tv1, &tv2, status );
 
   /* Create new group for output files */
   ogrp = grpNew( "Science", status );
@@ -656,6 +661,10 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
 
   obsmap = astAnnul( obsmap );
   objmap = astAnnul( objmap );
+
+  msgOutiff( SMF__TIMER_MSG, "",
+             "Took %.3f s to find science observations",
+             status, smf_timerupdate( &tv1, &tv2, status ) );
 
   return;
 }

@@ -306,10 +306,15 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
   smf_tausrc tausrc;            /* Type of tau monitor */
   dim_t thisnrel;               /* Number of related items for this model */
   size_t tstride;               /* Time slice stride in data array */
+  struct timeval tv1;           /* Timer */
+  struct timeval tv2;           /* Timer */
   int zeropad;                  /* Pad with zeros instead of artificial data? */
 
   /* Main routine */
   if (*status != SAI__OK) return;
+
+  /* Start a timer to see how long this takes */
+  smf_timerinit( &tv1, &tv2, status );
 
   /* Check to see if igroup or iarray is being used for template */
   if( igroup == NULL ) {
@@ -1186,4 +1191,9 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
         i = nchunks;
       }
     }
+
+  msgOutiff( SMF__TIMER_MSG, "",
+             "Created model %s in %.3f s",
+             status, smf_model_getname( mtype, status), smf_timerupdate( &tv1, &tv2, status ) );
+
 }
