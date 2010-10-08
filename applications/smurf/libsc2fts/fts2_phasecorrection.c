@@ -134,8 +134,6 @@ void fts2_phasecorrection(
     double* newInterferogram,
     int* status)
 {
-  if(*status != SAI__OK) { return; }
-
   int bandNumber			        = 0;  /* Number of bands */
   int coeffLength             = 0;  /* Number of polynomial coefficients */
   int cosLength      		      = 0;  /* Size of the cos phase */
@@ -185,6 +183,8 @@ void fts2_phasecorrection(
   fftw_plan planSine		      = NULL; /* fftw plan for sine */
   fftw_plan plan			        = NULL; /* fftw plan */
   size_t nused;                       /* Number of used data points */
+
+  if(*status != SAI__OK) return;
 
   coeffLength = polynomialDegree + 1;
   dsLength = dsHalfLength << 1;
@@ -401,9 +401,11 @@ void fts2_phasecorrection(
   fts2_arraycopy(interferogram, size, tmpInterferogram, tmpLength, leftShift, 0, tmpLength);
   offset = dsHalfLength + phaseFunctionHalfLength - 2;
   if(tmpLength < offset) {
-    *status != SAI__ERROR;
-    errRep(FUNC_NAME, "Unable to perform phase correction!", status);
-    return;
+    if (*status != SAI__OK) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "Unable to perform phase correction!", status);
+      goto CLEANUP;
+    }
   }
   size = ssHalfLength + 1;
   tmp = ssHalfLength + offset + 1;
@@ -419,6 +421,7 @@ void fts2_phasecorrection(
   astFree(tmpInterferogram);
 
   /* CLEAN UP FFTW */
+ CLEANUP:
 	if(plan) fftw_destroy_plan(plan);
   if(planSine) fftw_destroy_plan(planSine);
   if(planCosine) fftw_destroy_plan(planCosine);
