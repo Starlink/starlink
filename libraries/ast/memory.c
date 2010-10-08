@@ -16,7 +16,7 @@
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
 *     Research Councils
-*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2009-2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -128,6 +128,9 @@
 *        Added astMemoryStats
 *     19-AUG-2010 (DSB):
 *        Added astMemoryWarning
+*     8-OCT-2010 (DSB):
+*        Modify memory allocation to use "calloc" directly, rather than
+*        using "malloc+memset".
 */
 
 /* Configuration results. */
@@ -148,16 +151,18 @@
 #define PM_STACK_MAXSIZE 20
 
 /* Select the appropriate memory management functions. These will be the
-   system's malloc, free and realloc unless AST was configured with the
-   "--with-starmem" option, in which case they will be the starmem
-   malloc, free and realloc. */
+   system's malloc, calloc, free and realloc unless AST was configured with
+   the "--with-starmem" option, in which case they will be the starmem
+   malloc, calloc, free and realloc. */
 #ifdef HAVE_STAR_MEM_H
 #  include <star/mem.h>
 #  define MALLOC starMalloc
+#  define CALLOC starCalloc
 #  define FREE starFree
 #  define REALLOC starRealloc
 #else
 #  define MALLOC malloc
+#  define CALLOC calloc
 #  define FREE free
 #  define REALLOC realloc
 #endif
@@ -650,8 +655,13 @@ void *astCalloc_( size_t nmemb, size_t size, int init, int *status ) {
 /* Check the global error status. */
    if ( !astOK ) return result;
 
-/* Attempt to allocate the required amount of memory. */
-   result = astMalloc( nmemb*size );
+/* Attempt to allocate and optionally initialise the required amount of
+   memory. */
+   if( init ) {
+      result = astMallocInit( nmemb*size );
+   } else {
+      result = astMalloc( nmemb*size );
+   }
 
 /* If the above call failed due to failure of the system malloc function,
    issue an extra error giving the number of elements and element size. */
@@ -659,10 +669,6 @@ void *astCalloc_( size_t nmemb, size_t size, int init, int *status ) {
       astError( AST__NOMEM, "(%lu elements, each of %lu bytes).", status,
                 (unsigned long) nmemb, (unsigned long) size );
    }
-
-/* If the memory was allocated succesfuly, fill it with zeros if
-   required. */
-   if( result && init ) (void) memset( result, 0, nmemb*size );
 
 /* Return the result. */
    return result;
@@ -2036,7 +2042,7 @@ int astIsDynamic_( const void *ptr, int *status ) {
    return ( isdynmem->magic == MAGIC( isdynmem, isdynmem->size ) );
 }
 
-void *astMalloc_( size_t size, int *status ) {
+void *astMalloc_( size_t size, int init, int *status ) {
 /*
 *++
 *  Name:
@@ -2074,6 +2080,17 @@ void *astMalloc_( size_t size, int *status ) {
 *     invoked with the global error status set or if it fails for any
 *     reason.
 *--
+
+*  astMallocInit:
+*     - This function can be invoked using either the public astMalloc
+*     macro documented above, or the private astMallocInit macro.
+*     astMallocInit has the same interface as astMalloc, but calls calloc
+*     rather than malloc so that the allocated memory is filled with zeros.
+*     Ideally, we should use an extra layer in the calling heirarchy to
+*     remove the hidden "init" argument in the astMalloc_ interface, but
+*     astMalloc is time-critical in many situations and so it is included
+*     as a "hidden" argument.
+
 */
 
 /* Local Constants: */
@@ -2115,9 +2132,16 @@ void *astMalloc_( size_t size, int *status ) {
          mem->next = NULL;
          mem->size = (size_t) size;
 
-/* Otherwise, allocate a new memory block using "malloc". */
+/* Initialise the memory (but not the header) if required. */
+         if( init ) (void) memset( (char *) mem + SIZEOF_MEMORY, 0, size );
+
+/* Otherwise, allocate a new memory block using "malloc" or "calloc". */
       } else {
-         mem = MALLOC( SIZEOF_MEMORY + size );
+         if( init ) {
+            mem = CALLOC( 1, SIZEOF_MEMORY + size );
+         } else {
+            mem = MALLOC( SIZEOF_MEMORY + size );
+         }
 
 /* Report an error if malloc failed. */
          if ( !mem ) {

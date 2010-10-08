@@ -210,7 +210,7 @@ size_t astTSizeOf_( const void *, int * );
 void *astFree_( void *, int * );
 void *astGrow_( void *, int, size_t, int * );
 void *astCalloc_( size_t, size_t, int, int * );
-void *astMalloc_( size_t, int * );
+void *astMalloc_( size_t, int, int * );
 void *astRealloc_( void *, size_t, int * );
 void *astStore_( void *, const void *, size_t, int * );
 size_t astChrLen_( const char *, int * );
@@ -252,7 +252,7 @@ void astEndPM_( int * );
 #define astChrMatchN(str1,str2,n) astERROR_INVOKE(astChrMatchN_(str1,str2,n,STATUS_PTR))
 #define astFree(ptr) astERROR_INVOKE(astFree_(ptr,STATUS_PTR))
 #define astGrow(ptr,n,size) astERROR_INVOKE(astGrow_(ptr,n,size,STATUS_PTR))
-#define astMalloc(size) astERROR_INVOKE(astMalloc_(size,STATUS_PTR))
+#define astMalloc(size) astERROR_INVOKE(astMalloc_(size,0,STATUS_PTR))
 #define astMemCaching(flag) astERROR_INVOKE(astMemCaching_(flag,STATUS_PTR))
 #define astRealloc(ptr,size) astERROR_INVOKE(astRealloc_(ptr,size,STATUS_PTR))
 #define astSizeOf(ptr) astERROR_INVOKE(astSizeOf_(ptr,STATUS_PTR))
@@ -267,6 +267,10 @@ void astEndPM_( int * );
 #define astChr2Double(string) astERROR_INVOKE(astChr2Double_(string,STATUS_PTR))
 #define astRemoveLeadingBlanks(string) astERROR_INVOKE(astRemoveLeadingBlanks_(string,STATUS_PTR))
 #define astChrSub(test,template,subs,nsub) astERROR_INVOKE(astChrSub_(test,template,subs,nsub,STATUS_PTR))
+
+#if defined(astCLASS) /* Protected */
+#define astMallocInit(size) astMalloc_(size,1,STATUS_PTR)
+#endif
 
 #ifdef HAVE_NONANSI_SSCANF
 #define astSscanf astERROR_INVOKE(astSscanf_)
