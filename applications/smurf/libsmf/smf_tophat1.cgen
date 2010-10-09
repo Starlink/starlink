@@ -129,7 +129,7 @@ void CGEN_FUNCTION(smf_tophat1)( CGEN_TYPE *data, const int nel,
 
 /* Store the minimum number of valid input values that must be present in
    a filter box to create a valid output value. */
-      if( wlim >= 0 && wlim <= 1.0 ) {
+      if( wlim >= 0.0f && wlim <= 1.0f ) {
          minin = wlim*box + 0.5;
          if( minin == 0 ) {
             minin = 1;
