@@ -47,6 +47,10 @@
 *  History:
 *     2010-03-31 (EC):
 *        Initial version.
+*     2010-10-08 (TIMJ):
+*        Make 3 times faster:
+*         - loop over a single index rather than over bolos and time slices
+*         - chain if tests rather than doing all 3 every time
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -90,18 +94,20 @@
 
 #define FUNC_NAME "smf_check_quality"
 
+static void smf__index_to_tbol( size_t bstride, size_t tstride, size_t bufpos,
+                                size_t *bolnum, size_t *tslice, int *status );
+
 size_t smf_check_quality( smfData *data, int showbad, int *status ) {
 
   int badqual;                  /* Bad quality at this sample? */
+  size_t bolnum;                /* Bolometer number */
   double *d=NULL;               /* Pointer to data array */
   size_t i;                     /* loop counter */
   int isbad;                    /* inconsistency found */
-  size_t j;                     /* loop counter */
   size_t nbad=0;                /* inconsistency counter */
-  dim_t nbolo;                  /* Number of bolometers */
   dim_t ndata;                  /* Number of data points */
-  dim_t ntslice;                /* Number of time slices */
   size_t bstride;               /* bol stride */
+  size_t tslice;                /* Time slice */
   size_t tstride;               /* time slice stride */
   smf_qual_t *qual=NULL;     /* Pointer to the QUALITY array */
   double val;                   /* Value from DATA array */
@@ -141,49 +147,95 @@ size_t smf_check_quality( smfData *data, int showbad, int *status ) {
 
 
   /* Calculate data dimensions */
-  smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, &ndata, &bstride,
+  smf_get_dims( data,  NULL, NULL, NULL, NULL, &ndata, &bstride,
                 &tstride, status );
 
   if( *status == SAI__OK ) {
+    for (i = 0; i < ndata; i++) {
+     isbad = 0;
 
-    /* Traverse array checking for inconsistencies */
-    for( i=0; i<nbolo; i++ ) {
-      for( j=0; j<ntslice; j++ ) {
-        isbad = 0;
+     badqual = qual[i]&SMF__Q_BADDA;
+     val = d[i];
 
-        badqual = qual[i*bstride+j*tstride]&SMF__Q_BADDA;
-        val = d[i*bstride+j*tstride];
+     /* Do the finite test first since if it is not finite
+        there is no point testing if it is BADD as well */
+     if( !isfinite(val) ) {
+       isbad = 1;
+       if( showbad ) {
+         smf__index_to_tbol( bstride, tstride, i, &bolnum, &tslice,
+                             status );
+         msgOutf( "", "b%zu t%zu: non-finite value encountered",
+                  status, bolnum, tslice );
+       }
+     } else if( (val==VAL__BADD) && !badqual ) {
+       isbad = 1;
+       if( showbad ) {
+         smf__index_to_tbol( bstride, tstride, i, &bolnum, &tslice,
+                             status );
+         msgOutf( "", "b%zu t%zu: VAL__BADD without SMF__Q_BADDA",
+                  status, bolnum, tslice );
+       }
+     } else if( badqual && (val!=VAL__BADD) ) {
+       isbad = 1;
+       if( showbad ) {
+         smf__index_to_tbol( bstride, tstride, i, &bolnum, &tslice,
+                             status );
+         msgOutf( "", "b%zu t%zu: SMF__Q_BADDA without VAL__BADD",
+                  status, bolnum, tslice );
+       }
+     }
 
-        if( (val==VAL__BADD) && !badqual ) {
-          isbad = 1;
-          if( showbad ) {
-            msgOutf( "", "b%zu t%zu: VAL__BADD without SMF__Q_BADDA",
-                     status, i, j );
-          }
-        }
-
-        if( badqual && (val!=VAL__BADD) ) {
-          isbad = 1;
-          if( showbad ) {
-            msgOutf( "", "b%zu t%zu: SMF__Q_BADDA without VAL__BADD",
-                     status, i, j );
-          }
-        }
-
-        if( !isfinite(val) ) {
-          isbad = 1;
-          if( showbad ) {
-            msgOutf( "", "b%zu t%zu: non-finite value encountered",
-                     status, i, j );
-          }
-        }
-
-        if( isbad ) {
-          nbad++;
-        }
-      }
+     if( isbad ) {
+       nbad++;
+     }
     }
   }
 
   return nbad;
+}
+
+
+static void smf__index_to_tbol( size_t bstride, size_t tstride, size_t bufpos,
+                                size_t *bolnum, size_t *tslice, int *status ) {
+
+  size_t bol = 0;
+  size_t tpos = 0;
+
+  if (bolnum) *bolnum = 0;
+  if (tslice) *tslice = 0;
+  if (*status != SAI__OK) return;
+
+  if (tstride == 1) {
+
+    /* integer arithmetic - truncate the int */
+    bol  = bufpos / bstride;
+    tpos = bufpos - ( bol * bstride );
+
+
+  } else if (bstride == 1) {
+
+    tpos = bufpos / tstride;
+    bol  = bufpos - ( tpos * tstride );
+
+  } else {
+    *status = SAI__ERROR;
+    errRep( "", "One of bstride and tstride must be 1", status );
+  }
+
+  /* Sanity check */
+  if (*status == SAI__OK) {
+    size_t ij;
+    ij = bol * bstride + tpos * tstride;
+
+    if (ij != bufpos) {
+      *status = SAI__ERROR;
+      errRepf("", "Internal error calculating bolometer and time slice from index "
+              " (%zu != %zu from bstride of %zu and tstride of %zu)",
+              status, bufpos, ij, bstride, tstride );
+    }
+  }
+
+  if (bolnum) *bolnum = bol;
+  if (tslice) *tslice = tpos;
+
 }
