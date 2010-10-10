@@ -67,6 +67,9 @@
 *     2010-06-02 (TIMJ):
 *        Calculate STEPTIME from the RTS_END values. The actual steptime
 *        is slightly longer than the requested step time.
+*     2010-10-09 (TIMJ):
+*        Make sure we have two sequence steps when calculating
+*        step time (eg s8d20100112_00055_0008)
 
 *  Copyright:
 *     Copyright (C) 2009-2010 Science & Technology Facilities Council.
@@ -162,15 +165,30 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
     double newstep;
 
     smf_getfitsd( hdr, "STEPTIME", &steptime, status );
+    newstep = steptime;
 
-    /* duration of file in days */
-    newstep = end_time - start_time;
+    /* it is possible for a file to contain only one step since
+       the DA just dumps every N-steps. We can not recalculate the
+       step time in that case. */
+    if (nframes > 1) {
 
-    /* convert to seconds */
-    newstep *= SPD;
+      /* duration of file in days */
+      newstep = end_time - start_time;
 
-    /* Convert to step time */
-    newstep /= (nframes - 1);
+      /* convert to seconds */
+      newstep *= SPD;
+
+      /* Convert to step time */
+      newstep /= (nframes - 1);
+    } else {
+      /* work it out from RTS_END and TCS_TAI */
+      JCMTState * onlystate = &((hdr->allState)[0]);
+      if ( onlystate->tcs_tai != VAL__BADD &&
+           onlystate->tcs_tai != onlystate->rts_end) {
+        /* TCS_TAI is in the middle of the step */
+        newstep = 2.0 * ( onlystate->rts_end - onlystate->tcs_tai ) * SPD;
+      }
+    }
 
     if (steptime != newstep) {
       msgOutiff( msglev, "", INDENT "Recalculated step time as %g sec from JCMTSTATE (was %g sec)",
