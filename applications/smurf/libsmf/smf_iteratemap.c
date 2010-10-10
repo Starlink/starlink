@@ -877,9 +877,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
     /* Add on the padding */
     maxconcat += 2*pad;
-    msgSeti( "P", pad );
-    msgOutif( MSG__VERB," ", FUNC_NAME ": Each time stream will be padded "
-              "with ^P samples at start and end.", status );
+    msgOutiff( MSG__VERB," ", FUNC_NAME ": Each time stream will be padded "
+              "with %" DIM_T_FMT "  samples at start and end.", status, pad );
 
     /* First check memory for the map */
     smf_checkmem_map( lbnd_out, ubnd_out, 0, maxmem, &mapmem, status );
