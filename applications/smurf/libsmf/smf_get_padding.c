@@ -190,7 +190,7 @@ dim_t smf_get_padding( AstKeyMap *keymap, double steptime, int report,
                (void) astMapGet0A( keymap, key, &obj );
 
 /* Call this function to get the padding implied by the sub-KeyMap. */
-               pad = smf_get_padding( (AstKeyMap *) obj, steptime, 0, hdr,
+               pad = smf_get_padding( (AstKeyMap *) obj, steptime, report, hdr,
                                       status );
 
 /* Use the larger of the two paddings. */
