@@ -35971,7 +35971,7 @@ KAPPA: \htmlref{ADD}{ADD},
          with METHOD set to SCALE. If a null ({\tt{!}}) value is supplied for
          DSCALE or DZERO, default values will be used for both that cause
          the scaled data values to occupy 96\% of the available range of the
-         data type selected using Parameter SCALETYPE.  {\tt [!]}
+         data type selected using Parameter SCALEDTYPE.  {\tt [!]}
       }
       \sstsubsection{
          DZERO = \_DOUBLE (Read)
@@ -35980,7 +35980,7 @@ KAPPA: \htmlref{ADD}{ADD},
          with METHOD set to SCALE. If a null ({\tt{!}}) value is supplied for
          DSCALE or DZERO, default values will be used for both that cause
          the scaled data values to occupy 96\% of the available range of the
-         data type selected using Parameter SCALETYPE.  {\tt [!]}
+         data type selected using Parameter SCALEDTYPE.  {\tt [!]}
       }
       \sstsubsection{
          IN = NDF (Read)
@@ -35999,7 +35999,7 @@ KAPPA: \htmlref{ADD}{ADD},
          The output NDF.
       }
       \sstsubsection{
-         SCALETYPE = \htmlref{LITERAL}{se:parmenu} (Read)
+         SCALEDTYPE = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
          The \htmlref{data type}{ap:HDStypes} to use for the scaled data
          values.  This is only used if METHOD is {\tt "SCALED"}.  It can be
@@ -36035,7 +36035,7 @@ KAPPA: \htmlref{ADD}{ADD},
          supplied for VSCALE or VZERO, default values will be used for
          both that cause the scaled variance values to occupy 96\% of
          the available range of the data type selected using Parameter
-         SCALETYPE.  {\tt [!]}
+         SCALEDTYPE.  {\tt [!]}
       }
       \sstsubsection{
          VZERO = \_DOUBLE (Read)
@@ -36045,12 +36045,12 @@ KAPPA: \htmlref{ADD}{ADD},
          supplied for VSCALE or VZERO, default values will be used for
          both that cause the scaled variance values to occupy 96\% of
          the available range of the data type selected using Parameter
-         SCALETYPE.  {\tt [!]}
+         SCALEDTYPE.  {\tt [!]}
       }
    }
    \sstexamples{
       \sstexamplesubsection{
-         ndfcompress infile outfile scale scaletype=\_uword
+         ndfcompress infile outfile scale scaledtype=\_uword
       }{
          Copies the contents of the NDF structure infile to the new
          structure outfile, scaling the values so that they fit into

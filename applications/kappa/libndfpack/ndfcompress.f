@@ -41,13 +41,13 @@
 *        supplied for DSCALE or DZERO, default values will be used for
 *        both that cause the scaled data values to occupy 96% of the
 *        available range of the data type selected using parameter
-*        SCALETYPE.  [!]
+*        SCALEDTYPE.  [!]
 *     DZERO = _DOUBLE (Read)
 *        The zero offset to use for the DATA component, when compressing
 *        with METHOD set to SCALE.  If a null (!) value is supplied for
 *        DSCALE or DZERO, default values will be used for both that
 *        cause the scaled data values to occupy 96% of the available
-*        range of the data type selected using parameter SCALETYPE.  [!]
+*        range of the data type selected using parameter SCALEDTYPE.  [!]
 *     IN = NDF (Read)
 *        The input NDF.
 *     METHOD = LITERAL (Read)
@@ -55,7 +55,7 @@
 *        value is "SCALE".
 *     OUT = NDF (Write)
 *        The output NDF.
-*     SCALETYPE = LITERAL (Read)
+*     SCALEDTYPE = LITERAL (Read)
 *        The data type to use for the scaled data values.  It is only
 *        used if METHOD is "SCALED".  It can be one of the following
 *        options.
@@ -79,17 +79,17 @@
 *        supplied for VSCALE or VZERO, default values will be used for
 *        both that cause the scaled variance values to occupy 96% of
 *        the available range of the data type selected using parameter
-*        SCALETYPE.  [!]
+*        SCALEDTYPE.  [!]
 *     VZERO = _DOUBLE (Read)
 *        The zero factor to use for the VARIANCE component, when
 *        compressing with METHOD set to SCALE.  If a null (!) value is
 *        supplied for VSCALE or VZERO, default values will be used for
 *        both that cause the scaled variance values to occupy 96% of
 *        the available range of the data type selected using parameter
-*        SCALETYPE.  [!]
+*        SCALEDTYPE.  [!]
 
 *  Examples:
-*     ndfcompress infile outfile scale scaletype=_uword
+*     ndfcompress infile outfile scale scaledtype=_uword
 *        Copies the contents of the NDF structure infile to the new
 *        structure outfile, scaling the values so that they fit into
 *        unsigned 2-byte integers. The scale and zero values used are
@@ -130,6 +130,9 @@
 *  History:
 *     12-JUL-2006 (DSB):
 *        Original version.
+*     12-OCT-2010 (DSB):
+*        Change docs to use correct parameter name SCALEDTYPE, rather
+*        than SCALETYPE.
 *     {enter_further_changes_here}
 
 *-
