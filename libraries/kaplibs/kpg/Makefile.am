@@ -293,6 +293,7 @@ kpg1_gtaxi.f \
 kpg1_gtaxm.f \
 kpg1_gtaxv.f \
 kpg1_gtchv.f \
+kpg1_gtgpt.f \
 kpg1_gtgrp.f \
 kpg1_gtmor.f \
 kpg1_gtndf.f \
