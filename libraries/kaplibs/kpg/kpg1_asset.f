@@ -18,9 +18,15 @@
 *     Object is determined as follows.
 *
 *     -  If the user supplies a value for the attribute using the given
-*     parameter, then the Object is returned with the attribute set to the
-*     supplied value. The user supplies the attribute values as a GRP
-*     group expression in which each element is an AST attribute setting.
+*     parameter, then the Object is returned with the attribute set to
+*     the supplied value. The user supplies the attribute values as a
+*     GRP group expression in which each element is an AST attribute
+*     setting. The group expression may comprise persistent and/or
+*     temporary attributes, the former preceding the latter separated by
+*     a delimiting string (see argument PARAM).  Persistent values are
+*     recorded in the parameter's current value and so can be re-used,
+*     whereas temporary attributes are not recorded and only apply to the
+*     current invocation of a task.
 *
 *     -  Otherwise, if the Object already had an explicit value set for the
 *     attribute on entry (i.e. if AST_TEST returns .TRUE. for the
@@ -74,7 +80,20 @@
 *        The name of the calling application in the form
 *        <package>_<application> (e.g. "KAPPA_DISPLAY"), for use in messages.
 *     PARAM = CHARACTER * ( * ) (Given)
-*        The name of the parameter to use for getting the group expression.
+*        The name of the parameter to use for getting the group
+*        expression.
+*
+*        A non-alphanumeric prefix may prepend the actual parameter
+*        name.  If present, this signifies the delimiter to separate
+*        persistent from temporary attributes, otherwise all attributes
+*        are regarded as persistent.  The prefix may be one to three
+*        characters long.  Underscore is regarded as alphanumeric.  The
+*        standard delimiter is the plus sign.
+*
+*        The same non-alphanumeric delimiter may also appear as a suffix.
+*        Its presence indicates that this routine is being called more
+*        than once in an application for the same parameter.  The
+*        suffix should appear in all but the last invocation.
 *     IOBJ = INTEGER (Given and Returned)
 *        An AST pointer to the Object to be modified. Returned unchanged if
 *        an error occurs.
@@ -92,6 +111,7 @@
 *  Copyright:
 *     Copyright (C) 1998, 1999 Central Laboratory of the Research Councils.
 *     Copyright (C) 2005, 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2007, 2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -112,6 +132,7 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     MJC: Malcolm J. Currie  (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -131,7 +152,15 @@
 *     13-JUL-2007 (DSB):
 *        Prevent KAPPA pseudo-attributes being reset when overlaying a
 *        temporary style on top of a previously established style.
-*     {enter_changes_here}
+*     2010 October 8 (MJC):
+*        Allow a non-alphanumeric prefix in PARAM to permit access to
+*        both persistent and temporary attributes via a variant of
+*        KPG1_GTGRP called KPG1_GTGPT.
+*     2010 October 11 (MJC):
+*        Allow a non-alphanumeric prefix in PARAM to permit repeated
+*        calls to KPG1_GTGPT to write the appropriate expression to the
+*        parameter file.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -158,25 +187,38 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  External References:
+      LOGICAL CHR_ISALM          ! Is a character alphanumeric?
+      INTEGER CHR_LEN            ! Char. length ignoring trailing blanks
+
+*  Local Constants:
+      INTEGER MAXDEL             ! Maximum length of p-t delimiter
+      PARAMETER ( MAXDEL = 3 )
+
 *  Local Variables:
       CHARACTER CLASS*20         ! Object class name
-      CHARACTER GRPEXP*(GRP__SZGEX)! Group expression to read file
-      CHARACTER DFILE*(GRP__SZFNM)! Defaults file name
-      CHARACTER TEXT*(GRP__SZNAM)! Gerenal character string
+      CHARACTER DFILE*(GRP__SZFNM) ! Defaults file name
+      CHARACTER GRPEXP*(GRP__SZGEX) ! Group expression to read file
+      CHARACTER PREFIX*(MAXDEL)  ! Parameter name prefix
+      CHARACTER TEXT*(GRP__SZNAM) ! Gerenal character string
       INTEGER ADDED              ! No. of elements added to group
       INTEGER DSIZE              ! Size of defaults group
       INTEGER I                  ! String index
-      INTEGER LEXP               ! String length
       INTEGER IAT                ! Length of a string
-      INTEGER IGRP1              ! GRP identifier for user-supplied strings
-      INTEGER IGRP2              ! GRP identifier for default strings
+      INTEGER IE                 ! Character index to true parameter end
+      INTEGER IGRP1              ! GRP identifier: user-supplied strings
+      INTEGER IGRP2              ! GRP identifier: default strings
       INTEGER IOBJ2              ! AST pointer to modified Object
+      INTEGER IS                 ! Character index true parameter start
       INTEGER ISTART             ! Index of 1st user-supplied string to use
+      INTEGER LEXP               ! String length
+      INTEGER PARLEN             ! Number of characters in PARAM
       INTEGER SIZE               ! No. of strings in group
       LOGICAL BADAT              ! Is error related to an invalid setting?
       LOGICAL CHNGED             ! Has supplied Object been changed?
       LOGICAL CLEAR              ! Should defaults be cleared?
       LOGICAL FLAG               ! Was group ewxpression flagged?
+      LOGICAL PANDT              ! Persistent-temporary prefix present?
       LOGICAL VERB               ! Issue warnings about bad attributes?
 *.
 
@@ -188,10 +230,31 @@
       CLASS = AST_GETC( IOBJ, 'CLASS', STATUS )
       IF( STATUS .NE. SAI__OK ) CLASS = 'AST Object'
 
+*  Does the parameter name have a prefix?
+      IS = 1
+      DO WHILE ( .NOT. CHR_ISALM( PARAM( IS : IS ) ) .AND.
+     :           IS .LE. MAXDEL )
+         IS = IS + 1
+      END DO
+      PANDT = IS .GT. 1
+
+*  Does the parameter name have a suffix?  Although any suffix should
+*  match the prefix, we can permit any non-alphanumeric suffix.  The
+*  suffix is only relevant and should only appear if there is a
+*  bracketing prefix.
+      PARLEN = CHR_LEN( PARAM )
+      IE = IS
+      DO WHILE ( CHR_ISALM( PARAM( IE : IE ) ) .AND.
+     :           IE .LE. PARLEN )
+         IE = IE + 1
+      END DO
+      IE = IE - 1
+
 *  If the Object is a Plot, reset KAPPA pseudo-attributes to default
 *  values. Do not do this if overlaying a temporary style onto of a
 *  previously defined style.
-      IF( CLASS .EQ. 'Plot' .AND. PARAM .NE. 'TEMPSTYLE' ) THEN
+      IF( CLASS .EQ. 'Plot' .AND.
+     :     PARAM( IS : IE ) .NE. 'TEMPSTYLE' ) THEN
          CALL GRF_SETTBG( 0 )
          CALL KPG1_SETASTDSB( .TRUE. )
          CALL KPG1_SETASTFIT( .FALSE. )
@@ -210,7 +273,12 @@
 
 *  Get a group of Object attributes.
       IGRP1 = GRP__NOID
-      CALL KPG1_GTGRP( PARAM, IGRP1, SIZE, STATUS )
+      IF ( PANDT ) THEN
+         CALL KPG1_GTGPT( PARAM( IS : IE ), PARAM( 1 : IS - 1 ), IGRP1,
+     :                    SIZE, STATUS )
+      ELSE
+         CALL KPG1_GTGRP( PARAM( IS : IE ), IGRP1, SIZE, STATUS )
+      END IF
 
 *  Assume defaults are to be used.
       CLEAR = .FALSE.
@@ -235,7 +303,7 @@
 *  Display the parameter name in verbose mode.
       IF( VERB ) THEN
          CALL MSG_BLANK( STATUS )
-         CALL MSG_SETC( 'P', PARAM )
+         CALL MSG_SETC( 'P', PARAM( IS : IE ) )
          CALL MSG_OUT( 'KPG1_ASSET_MSG1', 'Attribute settings '//
      :                 'obtained using parameter ^P:', STATUS )
       END IF
@@ -256,7 +324,7 @@
          IAT = 0
          CALL CHR_APPND( APP, TEXT, IAT )
          CALL CHR_APPND( '_', TEXT, IAT )
-         CALL CHR_APPND( PARAM, TEXT, IAT )
+         CALL CHR_APPND( PARAM( IS : IE ), TEXT, IAT )
          CALL CHR_UCASE( TEXT ( : IAT ) )
          CALL CHR_RMBLK( TEXT ( : IAT ) )
          CALL PSX_GETENV( TEXT( : IAT ), DFILE, STATUS )
@@ -334,7 +402,7 @@
 *  Is the environment variable "KAPPA_<PARAM>" defined?
                   TEXT = 'KAPPA_'
                   IAT = 6
-                  CALL CHR_APPND( PARAM, TEXT, IAT )
+                  CALL CHR_APPND( PARAM( IS : IE ), TEXT, IAT )
                   CALL CHR_UCASE( TEXT ( : IAT ) )
                   CALL CHR_RMBLK( TEXT ( : IAT ) )
                   CALL PSX_GETENV( TEXT( : IAT ), DFILE, STATUS )
@@ -511,7 +579,7 @@
          CALL ERR_ANNUL( STATUS )
          STATUS = PAR__ABORT
 
-         CALL MSG_SETC( 'PARAM', PARAM )
+         CALL MSG_SETC( 'PARAM', PARAM( IS : IE ) )
          CALL MSG_SETC( 'CLASS', CLASS )
          IF( INDEX( 'AEIOUaeiou', CLASS( 1 : 1 ) ) .GT. 0 ) THEN
             CALL MSG_SETC( 'ART', 'an' )
@@ -526,7 +594,7 @@
 *  Add a context message to any other error.
       ELSE IF( STATUS .NE. SAI__OK ) THEN
 
-         CALL MSG_SETC( 'PARAM', PARAM )
+         CALL MSG_SETC( 'PARAM', PARAM( IS : IE ) )
          CALL MSG_SETC( 'CLASS', CLASS )
          IF( INDEX( 'AEIOUaeiou', CLASS( 1 : 1 ) ) .GT. 0 ) THEN
             CALL MSG_SETC( 'ART', 'an' )
