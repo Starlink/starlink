@@ -59,8 +59,8 @@
 *           percentages of the total data range. So, "Extended,10,5"
 *           includes a margin of 10% of the total data range in YBOT,
 *           and 5% in YTOP. If only one numerical value is given, the
-*           same value is used for both limits. If no value is given, 
-*           both limits default to 2.5. "Range" is equivalent to 
+*           same value is used for both limits. If no value is given,
+*           both limits default to 2.5. "Range" is equivalent to
 *           "Extended,0,0".
 *
 *           - "Percentiles,5,95" -- The second and third elements of the
@@ -84,7 +84,7 @@
 *           The widths of the margins to leave for axis annotation,
 *           given as fractions of the corresponding dimension of the
 *           current picture. Four values may be given in the order
-*           bottom, right, top, left.  If fewer than four values are 
+*           bottom, right, top, left.  If fewer than four values are
 *           given, extra values are used equal to the first supplied
 *           value. If these margins are too narrow any axis
 *           annotation may be clipped. The dynamic default is 0.15 (for
@@ -140,7 +140,7 @@
 *        Y value at each point.
 *     NSIGMA = REAL (Given)
 *        Controls the length of the vertical error bars. A value of zero
-*        suppresses error bars. Otherwise error bars are drawn that 
+*        suppresses error bars. Otherwise error bars are drawn that
 *        extend from Y - NSIGMA*YSIGMA to Y + NSIGMA*YSIGMA.
 *     YSIGMA( N ) = REAL (Given)
 *        The standard deviation associated with each Y value. Not
@@ -167,7 +167,7 @@
 *        KAPPA:CURSOR as axis symbols when displaying the cursor
 *        positions on the screen. If a Plot is supplied via IPLOT, then
 *        the "Symbol(1)" attribute in the Plot is used as the default
-*        in preference to XSYM. 
+*        in preference to XSYM.
 *     YSYM = CHARACTER * ( * ) (Given)
 *        The default symbol for the horizontal axis. Only used if the
 *        user does not supply an alternative. This will be stored with
@@ -293,6 +293,9 @@
 *        values.
 *     2010 August 15 (MJC):
 *        Added TEMPSTYLE.
+*     2010 October 11 (MJC):
+*        Removed TEMPSTYLE, instead use STYLE for temporary attributes
+*        via the + prefix notation.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -602,9 +605,10 @@
 *  Start a PGPLOT buffering context.
          CALL PGBBUF
 
-*  Draw the points.
+*  Draw the points with the STYLE parameter used to obtained the
+*  persistent and/or temporary plotting attributes.
          CALL KPG1_PLTLN( N, 1, N, DX, DY, .FALSE., ( NSIGMA .GT. 0.0 ),
-     :                    0.0D0, DBAR, 0.0D0, 'STYLE,TEMPSTYLE', IPLOT,
+     :                    0.0D0, DBAR, 0.0D0, '+STYLE', IPLOT,
      :                    MODE, IMARK, 1, 1, APP, STATUS )
 
 *  Draw the axes if required.
