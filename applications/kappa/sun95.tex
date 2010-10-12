@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.37}
 \newcommand{\stardocnumber}    {95.37}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2010 August 15}
+\newcommand{\stardocdate}      {2010 October 12}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.12}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -3703,6 +3703,65 @@ application as follows:
 Again, the contents of {\tt style.dat} would be read, followed by the
 contents of {\tt style2.dat}, over-writing any settings for the same
 attributes included in {\tt style.dat}.
+
+\subsubsection{\xlabel{se_temp_attr}Temporary Attributes\label{se:temp_attr}}
+
+Sometimes you need to effect a change of style that only lasts for a
+single invocation of a task.  For example, plotting data from
+different NDFs or NDF sections in different colours.  This is available
+at the cost of a little further syntax to learn.  The temporary
+attributes should be preceded by a plus sign.
+
+In the following example, three histograms are plotted on a single
+graphic.
+
+\latex{\small}
+\begin{verbatim}
+   % histogram ndf1 \\
+   % histogram ndf2 style="+colour(curve)=yellow" noclear noaxes \\
+   % histogram ndf3 style="+width(curve)=4" noclear noaxes \\
+\end{verbatim}
+\latex{\normalsize}
+
+The first uses the current attributes including line colour to plot
+the histogram for NDF ndf1.  (Recall \verb+\\+ is a synonym for the
+accept keyword, so other defaults are used for the likes of the data
+range and number of bins omitted for clarity.)  The second NDF's
+histogram is plotted in yellow.  For the third NDF the locus is again
+in the colour of the first plot, since the yellow was only temporary
+but has thickness four times normal.  If you ran
+\htmlref{HISTOGRAM}{HISTOGRAM} again, the line thickness would return
+to its original value used in the first graph.
+
+You are not limited to just one temporary attribute.  You can supply
+a list that can include indirection to text files.
+
+\latex{\small}
+\begin{verbatim}
+   % linplot spectrum style="'+style(curve)=2,grid,^temp.sty,colour(textlab)=green'"
+\end{verbatim}
+\latex{\normalsize}
+
+Here \htmlref{LINPLOT}{LINPLOT} uses three temporary attributes plus
+whatever is defined in the text file file {\tt temp.sty}.  Note for a
+list the string requires an extra set of enclosing quotes to protect
+these from being misinterpreted by the UNIX shell.  The experimental
+method that used a second parameter called TEMPSTYLE will be
+withdrawn.
+
+It is also possible to combine persistent and temporary attributes.
+Persistent style attributes must be supplied first, then after a plus
+sign comes the list of temporary attributes. 
+
+\latex{\small}
+\begin{verbatim}
+   % linplot spectrum style="'colour(line)=red,width=3+style(curve)=2'"
+\end{verbatim}
+\latex{\normalsize}
+
+Literal plus signs should be avoided if using both temporary and
+persistent attributes in a group expression.
+
 
 \subsubsection{Synonyms for Attribute Names}
 
