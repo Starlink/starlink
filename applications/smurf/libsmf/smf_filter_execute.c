@@ -405,8 +405,7 @@ void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
             normalization here if we're not applying a smfFilter to the
             data */
          if( (iloop==0) && (pdata->whiten) ) {
-           double scale = (use_filt_r && use_filt_i) ? 0 :
-             1. / (double ) filt->ntslice;
+           double scale = use_filt_r ? 0 : 1. / (double ) filt->ntslice;
 
            smf_whiten( data_fft_r, data_fft_i, filt->df, filt->dim, 50,
                        scale, status );
@@ -414,7 +413,7 @@ void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
 
          /* Apply the frequency-domain filter. Skip this step if the
             filter values are NULL (i.e. if we are only whitening) */
-         if( use_filt_r && use_filt_i && (*status==SAI__OK) ) {
+         if( use_filt_r && (*status==SAI__OK) ) {
            if( filt->isComplex ) {
              for( j=0; j<filt->dim; j++ ) {
                /* Complex times complex, using only 3 multiplies */
