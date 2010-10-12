@@ -78,7 +78,8 @@
 *  Arguments:
 *     APP = CHARACTER * ( * ) (Given)
 *        The name of the calling application in the form
-*        <package>_<application> (e.g. "KAPPA_DISPLAY"), for use in messages.
+*        <package>_<application> (e.g. "KAPPA_DISPLAY"), for use in
+*        messages.
 *     PARAM = CHARACTER * ( * ) (Given)
 *        The name of the parameter to use for getting the group
 *        expression.
@@ -103,7 +104,7 @@
 *  Notes:
 *     -  Colour attribute values may be supplied in any form recognised
 *     by KPG1_PGCOL (e.g. colour name, MIN, MAX, integer index), and the
-*     nearest colour in the current KAPPA pallette is used.
+*     nearest colour in the current KAPPA palette is used.
 *     -  If a null value is supplied for the parameter, the error is
 *     annulled and the Object is returned unchanged (except for any
 *     defaults obtained using the usual search path).
@@ -214,7 +215,7 @@
       INTEGER LEXP               ! String length
       INTEGER PARLEN             ! Number of characters in PARAM
       INTEGER SIZE               ! No. of strings in group
-      LOGICAL BADAT              ! Is error related to an invalid setting?
+      LOGICAL BADAT              ! Error related to an invalid setting?
       LOGICAL CHNGED             ! Has supplied Object been changed?
       LOGICAL CLEAR              ! Should defaults be cleared?
       LOGICAL FLAG               ! Was group ewxpression flagged?
@@ -289,7 +290,7 @@
          CALL ERR_ANNUL( STATUS )
          SIZE = 0
 
-*  Otherwise, if some elements were supplied, see if element 1 was "CLEAR"
+*  Otherwise, if some elements were supplied, see if Element 1 was "CLEAR"
 *  and set the starting index to 2 so that the first element is ignored
 *  from now on.
       ELSE IF( SIZE .GT. 0 ) THEN
