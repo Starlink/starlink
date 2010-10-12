@@ -46,6 +46,7 @@ filt_edge_largescale = 0
 filt_notchlow = <undef>
 filt_notchhigh = <undef>
 filt_wlim = <undef>
+whiten = 0
 flagslow = 0
 flagfast = 0
 order = -1
@@ -78,6 +79,7 @@ cleandk.spikethresh = 0
 cleandk.spikebox = 50
 cleandk.noiseclip = 0.0
 cleandk.filt_wlim = <undef>
+cleandk.whiten = 0
 
 # the following two parameters are included because the same
 # code is used to clean bolometers and the dark squids. However,

@@ -115,6 +115,7 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap,
   int f_nnotch=0;           /* Number of notch filters in array */
   int i;                    /* Loop count */
   int ival;                 /* Dummy integer argument */
+  int whiten;               /* Will we apply a whitening filter? */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -123,7 +124,7 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap,
   smf_get_cleanpar( keymap, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                     NULL, NULL, &f_edgelow, &f_edgehigh, &f_edgesmall,
                     &f_edgelarge, f_notchlow, f_notchhigh, &f_nnotch, &dofft,
-                    NULL, NULL, NULL, NULL, NULL, NULL, status );
+                    NULL, NULL, NULL, NULL, NULL, NULL, &whiten, status );
 
   /* Modify edge filters if spacial scales were requested */
   smf_scale2freq( f_edgesmall, f_edgelarge, hdr, &f_edgelow, &f_edgehigh,

@@ -15,16 +15,18 @@
 *  Invocation:
 
 *     smf_filter_execute( smfWorkForce *wf, smfData *data,
-*                         smfFilter *filt, int *status )
+*                         smfFilter *filt, int whiten, int *status )
 
 *  Arguments:
 *     wf = smfWorkForce * (Given)
 *        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData * (Given and Returned)
 *        The data to be filtered (performed in-place)
-*     srate = double (Given)
-*        If nonzero specifies sample rate of data in Hz (otherwise taken
-*        from JCMTState associated with data).
+*     filter = smfFilter* (Given)
+*        A smfFilter to apply to the supplied data
+*     whiten = int (Given)
+*        If set, prior to applying the supplied filter, apply a whitening
+*        filter.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -75,9 +77,12 @@
 *     2010-06-25 (DSB):
 *        Doing apodisation here, each time the filter is applied,
 *        rather than as a pre-processing step.
-*     2010-09-9 (DSB):
+*     2010-09-09 (DSB):
 *        Apodise all data regardless of quality, and report an error if a
 *        bad value is encountered.
+*     2010-10-12 (EC):
+*        Optionally apply bolo-specific whitening filters before the
+*        smfFilter
 
 *  Copyright:
 *     Copyright (C) 2007-2009 University of British Columbia.
@@ -144,6 +149,7 @@ typedef struct smfFilterExecuteData {
   fftw_plan plan_forward;  /* for forward transformation */
   fftw_plan plan_inverse;  /* for inverse transformation */
   smf_qual_t *qua;         /* quality pointer */
+  int whiten;              /* should the data be whitened? */
 } smfFilterExecuteData;
 
 /* Function to be executed in thread: filter all of the bolos from b1 to b2
@@ -395,24 +401,38 @@ void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
          fftw_execute_split_dft_r2c( pdata->plan_forward, base,
                                      data_fft_r, data_fft_i );
 
-         /* Apply the frequency-domain filter */
-         if( filt->isComplex ) {
-           for( j=0; j<filt->dim; j++ ) {
-             /* Complex times complex, using only 3 multiplies */
-             ac = data_fft_r[j] * use_filt_r[j];
-             bd = data_fft_i[j] * use_filt_i[j];
+         /* Whiten the power spectrum if requested. Also do 1/ntslice
+            normalization here if we're not applying a smfFilter to the
+            data */
+         if( (iloop==0) && (pdata->whiten) ) {
+           double scale = (use_filt_r && use_filt_i) ? 0 :
+             1. / (double ) filt->ntslice;
 
-             aPb = data_fft_r[j] + data_fft_i[j];
-             cPd = use_filt_r[j] + use_filt_i[j];
+           smf_whiten( data_fft_r, data_fft_i, filt->df, filt->dim, 50,
+                       scale, status );
+         }
 
-             data_fft_r[j] = ac - bd;
-             data_fft_i[j] = aPb*cPd - ac - bd;
-           }
-         } else {
-           for( j=0; j<filt->dim; j++ ) {
-             /* Complex times real */
-             data_fft_r[j] *= use_filt_r[j];
-             data_fft_i[j] *= use_filt_r[j];
+         /* Apply the frequency-domain filter. Skip this step if the
+            filter values are NULL (i.e. if we are only whitening) */
+         if( use_filt_r && use_filt_i && (*status==SAI__OK) ) {
+           if( filt->isComplex ) {
+             for( j=0; j<filt->dim; j++ ) {
+               /* Complex times complex, using only 3 multiplies */
+               ac = data_fft_r[j] * use_filt_r[j];
+               bd = data_fft_i[j] * use_filt_i[j];
+
+               aPb = data_fft_r[j] + data_fft_i[j];
+               cPd = use_filt_r[j] + use_filt_i[j];
+
+               data_fft_r[j] = ac - bd;
+               data_fft_i[j] = aPb*cPd - ac - bd;
+             }
+           } else {
+             for( j=0; j<filt->dim; j++ ) {
+               /* Complex times real */
+               data_fft_r[j] *= use_filt_r[j];
+               data_fft_i[j] *= use_filt_r[j];
+             }
            }
          }
 
@@ -497,7 +517,7 @@ void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
 #define FUNC_NAME "smf_filter_execute"
 
 void smf_filter_execute( smfWorkForce *wf, smfData *data,
-                         smfFilter *filt, int *status ) {
+                         smfFilter *filt, int whiten, int *status ) {
 
   /* Local Variables */
   size_t apod_length=0;           /* apodization length */
@@ -625,8 +645,8 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data,
     pdata->first = first;
     pdata->apod_length = apod_length;
     pdata->last = last;
+    pdata->whiten = whiten;
     pdata->ijob = -1;   /* Flag job as ready to start */
-
 
     /* Setup forward FFT plan using guru interface. Requires protection
        with a mutex */

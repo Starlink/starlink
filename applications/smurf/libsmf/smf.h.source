@@ -390,6 +390,8 @@
  *        - add smf_filter_complement
  *     2010-09-27 (EC):
  *        Add smf_write_flagmap
+ *     2010-10-12 (EC):
+ *        Add smf_whiten
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -910,8 +912,8 @@ void smf_filter_complement( smfFilter *filt, int *status );
 
 void smf_filter_edge( smfFilter *filt, double f, int lowpass, int *status );
 
-void smf_filter_execute( smfWorkForce *wf, smfData *data,
-                         smfFilter *filt, int *status );
+void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
+                         int whiten, int *status );
 
 void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap,
                             const smfHead *hdr, int *dofft, int *status );
@@ -1099,7 +1101,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac,
                        double *filt_notchhigh, int *filt_nnotch,
                        int *dofilt, double *flagslow, double *flagfast,
                        int *order, double *spikethresh, size_t *spikeiter,
-                       double *noiseclip, int *status );
+                       double *noiseclip, int *whiten, int *status );
 
 void smf_get_dims( const smfData *data, dim_t *nrows, dim_t *ncols,
                    dim_t *nbolo, dim_t *ntslice, dim_t *ndata,
@@ -1632,6 +1634,9 @@ int smf_validate_smfData( const smfData * data, int hashdr, int hasfile,
 
 int smf_validate_smfHead( const smfHead * hdr, int hasfits, int hasstate,
                           int *status );
+
+void smf_whiten( double *re, double *im, double df, dim_t nf, size_t box,
+                 double scale, int *status );
 
 void smf_write_bolomap( smfArray *ast, smfArray *res, smfArray *lut,
                         smfArray *qua, smfDIMMData *dat, dim_t msize,

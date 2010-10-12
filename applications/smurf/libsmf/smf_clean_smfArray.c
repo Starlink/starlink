@@ -46,7 +46,7 @@
 *     Gap filling  : FILLGAPS, ZEROPAD
 *     Baselines    : ORDER
 *     Filtering    : FILT_EDGELOW, FILT_EDGEHIGH, FILT_NOTCHLOW, FILT_NOTCHHIGH,
-*                    APOD, FILT_WLIM
+*                    APOD, FILT_WLIM, WHITEN
 *     Noisy Bolos  : NOISECLIP
 
 *  Notes:
@@ -147,6 +147,7 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
   double spikethresh;       /* Threshold for finding spikes */
   size_t spikebox=0;        /* Box size for spike finder */
   struct timeval tv1, tv2;  /* Timers */
+  int whiten;               /* Apply whitening filter? */
   int zeropad;              /* Pad with zeros? */
 
   /* Main routine */
@@ -180,7 +181,7 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
                     &dcthresh, &dcsmooth, &dclimcorr, &dkclean,
                     &fillgaps, &zeropad, NULL, NULL, NULL, NULL, NULL,
                     NULL, NULL, NULL, &flagslow, &flagfast, &order,
-                    &spikethresh, &spikebox, &noiseclip, status );
+                    &spikethresh, &spikebox, &noiseclip, &whiten, status );
 
   /* Loop over subarray */
   for( idx=0; (idx<array->ndat)&&(*status==SAI__OK); idx++ ) {
@@ -320,12 +321,19 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
                  status, smf_timerupdate(&tv1,&tv2,status) );
     }
 
-    /* filter the data */
+    /* Filter the data. Note that we call smf_filter_execute to apply
+       a per-bolometer whitening filter even if there is no
+       explicitly requested smfFilter (in which case the
+       smf_filter_fromkeymap call will leave the real/imaginary parts
+       of the filter as NULL pointers and they will get ignored inside
+       smf_filter_execute). */
+
     filt = smf_create_smfFilter( data, status );
     smf_filter_fromkeymap( filt, keymap, data->hdr, &dofft, status );
+
     if( (*status == SAI__OK) && dofft ) {
       msgOutif( MSG__VERB, "", FUNC_NAME ": frequency domain filter", status );
-      smf_filter_execute( wf, data, filt, status );
+      smf_filter_execute( wf, data, filt, whiten, status );
 
       /*** TIMER ***/
       msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ":   ** %f s filtering data",

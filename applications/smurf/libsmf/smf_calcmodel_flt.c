@@ -253,7 +253,7 @@ void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
       */
       if( dofft ) {
         smf_filter_complement( filt, status );
-        smf_filter_execute( wf, model->sdata[idx], filt, status );
+        smf_filter_execute( wf, model->sdata[idx], filt, 0, status );
       }
 
       /* Now remove the filtered signals from the residual by subtracting

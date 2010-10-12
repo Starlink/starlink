@@ -22,7 +22,8 @@
 *                       double *filt_notchlow, double *filt_notchhigh,
 *                       int *filt_nnotch, int *dofilt, double *flagslow,
 *                       double *flagfast, int *order, double *spikethresh,
-*                       size_t *spikebox, double * noiseclip, int *status )
+*                       size_t *spikebox, double * noiseclip,
+*                       int *whiten, int *status )
 
 *  Arguments:
 *     keymap = AstKeyMap* (Given)
@@ -92,6 +93,8 @@
 *        Number of standard deviations to clip the upper bound
 *        of a noise distribution in order to generate a bad bolometer
 *        mask.
+*     whiten = int * (Returned)
+*        Apply a whitening filter to the data?
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -138,6 +141,8 @@
 *        -Add FLAGFAST
 *     2010-09-28 (DSB):
 *        Added zeropad.
+*     2010-10-12 (EC):
+*        Add whiten
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -195,7 +200,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac, dim_t *dcfitbox,
                        double *filt_notchhigh, int *filt_nnotch, int *dofilt,
                        double *flagslow, double *flagfast, int *order,
                        double *spikethresh, size_t *spikebox,
-                       double *noiseclip, int *status ) {
+                       double *noiseclip, int *whiten, int *status ) {
 
   int dofft=0;                  /* Flag indicating that filtering is required */
   int f_nnotch=0;               /* Number of notch filters in array */
@@ -412,6 +417,16 @@ void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac, dim_t *dcfitbox,
     }
   }
 
+  if( whiten ) {
+    astMapGet0I( keymap, "WHITEN", whiten );
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": WHITEN is %s", status,
+               (*whiten ? "enabled" : "disabled") );
+
+    if( *whiten ) {
+      dofft = 1;
+    }
+  }
+
   if( dofilt ) {
     *dofilt = dofft;
     msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DOFILT=%i", status,
@@ -484,6 +499,5 @@ void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac, dim_t *dcfitbox,
     msgOutiff( MSG__DEBUG, "", FUNC_NAME ": NOISECLIP=%g", status,
                *noiseclip );
   }
-
 
 }
