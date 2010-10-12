@@ -69,6 +69,7 @@
  *     NXG: Norman Gray (Starlink, Glasgow)
  *     PWD: Peter Draper (University of Durham)
  *     TIMJ: Tim Jenness (JAC, Hawaii)
+ *     DSB: David Berry (JAC, Hawaii)
  *     {enter_new_authors_here}
 
  *  History:
@@ -88,9 +89,12 @@
  *        support from the compiler so that integer overflows are permitted.
  *        When compiler support is needed the various values may as well be
  *        written as plain integers (and floating point).
+ *     12-OCT-2010 (DSB):
+ *        Added VAL__NAM<X> constants which hold character strings "_DOUBLE",
+ *        "_REAL" etc.
 
  *  Copyright:
- *     Copyright (C) 2009 Science and Technology Facilities Council.
+ *     Copyright (C) 2009-2010 Science and Technology Facilities Council.
  *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
  *     Copyright (C) 2004-2005 Council for the Central Laboratory of the Research Councils
 
@@ -329,6 +333,7 @@ void par_i(const int size, const char* name, int val);
 void par_fp(const int size, const char* name, void* val);
 void par_f(const char* name, float val);
 void par_d(const char* name, double val);
+void par_c(const char* name, const char* val);
 
 /* Helper functions */
 const char* todaysdate(void);
@@ -628,6 +633,14 @@ int main (int argc, char **argv)
     }
 #endif /* TEST_CODE */
 
+    comment("HDS data type codes.");
+    par_c( "VAL__NAMB",  "_BYTE" );
+    par_c( "VAL__NAMUB",  "_UBYTE" );
+    par_c( "VAL__NAMW",  "_WORD" );
+    par_c( "VAL__NAMUW",  "_UWORD" );
+    par_c( "VAL__NAMI",  "_INTEGER" );
+    par_c( "VAL__NAMR",  "_REAL" );
+    par_c( "VAL__NAMD",  "_DOUBLE" );
 
     comment("Bad values, used for flagging undefined data.");
     par_i(+1, "VAL__BADUB",  UINT8_MAX);
@@ -753,6 +766,20 @@ void comment(const char* comment)
         fprintf(TestOutput, "\n*  %s\n", comment);
     if (COutput) {
         fprintf(COutput, "\n/* %s */\n", comment);
+    }
+}
+
+void par_c(const char* name, const char* val)
+{
+    if (FortranOutput) {
+       fprintf(FortranOutput,
+               FLINE("CHARACTER*%d %s")
+               FLINE("PARAMETER ( %s = '%s' )"),
+                    strlen(val), name, name, val);
+    }
+
+    if (COutput) {
+        fprintf(COutput, "#define %s \"%s\"\n", name, val);
     }
 }
 
