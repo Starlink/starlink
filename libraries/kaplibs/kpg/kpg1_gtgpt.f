@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_GTGPT( PARAM, DELIM, IGRP, SIZE, STATUS )
+      SUBROUTINE KPG1_GTGPT( PARAM, DELIM, LAST, IGRP, SIZE, STATUS )
 *+
 *  Name:
 *     KPG1_GTGPT
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_GTGPT( PARAM, DELIM, IGRP, SIZE, STATUS )
+*     CALL KPG1_GTGPT( PARAM, DELIM, LAST, IGRP, SIZE, STATUS )
 
 *  Description:
 *     This routine obtains group of strings using the specified
@@ -58,13 +58,7 @@
 
 *  Arguments:
 *     PARAM = CHARACTER * ( * ) (Given)
-*        The name of the parameter to use.  If PARAM is terminated with
-*        the DELIM delimiter, it requests that the full concatenated
-*        expression supplied by the user be stored in the parameter's
-*        current value, rather than just the persistent-attribute list.
-*        This is needed whenever this routine is called more than once
-*        for the same parameter in a task, and should appear in all but
-*        the last invocation.
+*        The name of the parameter to use.
 *     DELIM = CHARACTER * ( * ) (Given)
 *        The delimiter string used to indicator where the temporary
 *        part of a value begins.  Any text before the delimiter behaves
@@ -73,13 +67,21 @@
 *        and is never incorporated into the parameter's current value.
 *        The delimiter should not be an alphanumeric character or
 *        underscore.
+*     LAST = LOGICAL (Given)
+*        If this is the last or only invocation of this routine for a
+*        given parameter in a task, set this TRUE.  For multiple
+*        invocations except the last, set this FALSE.  Setting to FALSE
+*        causes the full concatenated expression supplied by the user to
+*        be stored in the parameter's current value, rather than just
+*        the persistent-attribute list a TRUE value generates needed
+*        when the task ends.
 *     IGRP = INTEGER (Given and Returned)
 *        The group to use.  If this is GRP__NOID then a new group is
 *        created with default control characters and its identifier is
 *        returned.  If the group already exists, its contents are
 *        discarded before adding new strings.
 *     SIZE = INTEGER (Returned)
-*        The total size of the returned group. Returned equal to zero
+*        The total size of the returned group.  Returned equal to zero
 *        if an error occurs.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -133,9 +135,12 @@
 *        persistent and temporary attributes.  Add two further messages
 *        for verbose mode.  Erase the current-value object if it is
 *        undefined, say because a null value was supplied.
-*     2010 October 11 (MJC)
+*     2010 October 11 (MJC):
 *        Some restructuring to simplify, and allow for continuation
 *        via a DELIM suffix to PARAM.
+*     2010 October 12 (MJC):
+*        Add LAST argument instead of testing the parameter name for a
+*        delimiter suffix.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -155,6 +160,9 @@
 *  Arguments Given:
       CHARACTER PARAM*(*)
       CHARACTER*(*) DELIM
+      LOGICAL LAST
+
+*  Arguments Given and Returned:
       INTEGER IGRP
 
 *  Arguments Returned:
@@ -183,7 +191,6 @@
       INTEGER ADDED              ! No. of strings added to group
       LOGICAL CFLAG              ! More strings remain to be given?
       INTEGER CLEN               ! Length of current value
-      LOGICAL CONTIN             ! Will there be another invocation?
       INTEGER CPLEN              ! Length of current value parameter
       LOGICAL CREATE             ! Create new CV object?
       CHARACTER*(CHARSZ) CURVAL  ! Current value on entry to the task
@@ -234,8 +241,6 @@
 *  the end of parameter name.
       DELLEN = LEN( DELIM )
       PARLEN = CHR_LEN( PARAM )
-      CONTIN = PARAM( PARLEN - DELLEN + 1 : PARLEN ) .EQ. DELIM
-      IF ( CONTIN ) PARLEN = PARLEN - DELLEN
 
 *  Form name of the object that will store a copy of the current value
 *  of the parameter in the parameter file.  In virtually all cases
@@ -516,7 +521,7 @@
 *  component to the list (see below).  Do not record a total group
 *  expression merely comprising a single flag character.
       IF ( GRPEXP( : NC ) .NE. FC .OR.
-     :     ( CONTIN .AND. TLEN .GT. 0 ) ) THEN
+     :     ( .NOT. LAST .AND. TLEN .GT. 0 ) ) THEN
          GRPEXP = ' '
          NC = 0
          CALL CHR_APPND( PVALUE, GRPEXP, NC )
@@ -528,7 +533,7 @@
 *  above for the subsequent invocation.  For the final invocation,
 *  only the persistent value should be stored.  Note this division
 *  does not affect the group attributes stored in IGRP.
-         IF ( CONTIN .AND. TLEN .GT. 0 ) THEN
+         IF ( .NOT. LAST .AND. TLEN .GT. 0 ) THEN
             CALL CHR_APPND( DELIM, GRPEXP, NC )
             CALL CHR_APPND( TVALUE, GRPEXP, NC )
             CALL SUBPAR_PUTNAME( IPAR, GRPEXP( : NC ), STATUS )

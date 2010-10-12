@@ -161,6 +161,8 @@
 *        Allow a non-alphanumeric prefix in PARAM to permit repeated
 *        calls to KPG1_GTGPT to write the appropriate expression to the
 *        parameter file.
+*     2010 October 12 (MJC):
+*        Adapt for revised API of KPG1_GTGPT.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -219,6 +221,7 @@
       LOGICAL CHNGED             ! Has supplied Object been changed?
       LOGICAL CLEAR              ! Should defaults be cleared?
       LOGICAL FLAG               ! Was group ewxpression flagged?
+      LOGICAL LAST               ! Last routine call for same param?
       LOGICAL PANDT              ! Persistent-temporary prefix present?
       LOGICAL VERB               ! Issue warnings about bad attributes?
 *.
@@ -242,7 +245,8 @@
 *  Does the parameter name have a suffix?  Although any suffix should
 *  match the prefix, we can permit any non-alphanumeric suffix.  The
 *  suffix is only relevant and should only appear if there is a
-*  bracketing prefix.
+*  bracketing prefix, however a user might just put a trailing
+*  delimiter, so apply the test even if there is no prefix.
       PARLEN = CHR_LEN( PARAM )
       IE = IS
       DO WHILE ( CHR_ISALM( PARAM( IE : IE ) ) .AND.
@@ -250,6 +254,7 @@
          IE = IE + 1
       END DO
       IE = IE - 1
+      LAST = IE .EQ. PARLEN
 
 *  If the Object is a Plot, reset KAPPA pseudo-attributes to default
 *  values. Do not do this if overlaying a temporary style onto of a
@@ -274,9 +279,9 @@
 
 *  Get a group of Object attributes.
       IGRP1 = GRP__NOID
-      IF ( PANDT ) THEN
-         CALL KPG1_GTGPT( PARAM( IS : IE ), PARAM( 1 : IS - 1 ), IGRP1,
-     :                    SIZE, STATUS )
+      IF ( PANDT .OR. .NOT. LAST ) THEN
+         CALL KPG1_GTGPT( PARAM( IS : IE ), PARAM( 1 : IS - 1 ), LAST,
+     :                    IGRP1, SIZE, STATUS )
       ELSE
          CALL KPG1_GTGRP( PARAM( IS : IE ), IGRP1, SIZE, STATUS )
       END IF
