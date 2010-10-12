@@ -151,6 +151,7 @@ flt.filt_edge_smallscale = 0
 flt.filt_edge_largescale = 0
 flt.filt_notchlow = <undef>
 flt.filt_notchhigh = <undef>
+flt.whiten = 0
 
 # Specifies the minimum fraction of good values that must contribute to a
 # filtered value. For instance, if wlim is 0.9 then a filtered data value
