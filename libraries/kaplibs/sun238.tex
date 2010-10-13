@@ -806,10 +806,14 @@ related items to be removed.
       supplied.
 \item There is a new generic routine KPG\_FISEx that fills a section
       of a multi-dimensional array.
+\item The new KPG1\_GTGPT routine is a variant of KPG1\_GTGRP to obtain
+      groups of strings.  KPG1\_GTGPT supports group members that are not
+      `sticky', in other words the strings only last for the current
+      invocation of an application.
 \item The new more-general KPG\_ISEQN replaces the old IRCAM-specific
       NXTNAM routine.  This increments trailing sequence numbers
       in strings, most often used to generate a series of filenames.
-\item Add new routine KPG\_LR2Ax that is the same as KPG\_LDA2x 
+\item Add new routine KPG\_LR2Ax that is the same as KPG\_LDA2x
       (formerly LD2AR) except it processes single-precision sparse data.
 \item There is a new routine KPG\_NORVx to replace the old NORMAL.  It
       has the benefits of being generic and can operate on an array.
@@ -828,7 +832,7 @@ related items to be removed.
 \item Remove FTS1\_TREAD since the MAG library has now been removed
       from the main Starlink source tree.
 \item A number of long-deprecated old routines without a package prefix
-      have been removed.  These are listed below.  The corresponding 
+      have been removed.  These are listed below.  The corresponding
       replacement routines appear in the right column.
 
 \begin{tabular}{lcc}
@@ -851,6 +855,12 @@ ZERO1D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
 ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
 \end{tabular}
 
+\item KPG1\_ASSET now parses the supplied parameter name for a
+      non-alphanumeric prefix and suffix to determine whether or not
+      temporary attributes are supported via the new KPG1\_GTGPT
+      routine.  A suffix indicates that KPG1\_ASSET will be called
+      again for the same parameter, affecting the value to write to
+      the parameter file.
 \item The KPG1\_PLTLN routine now accepts a value 6 for the MODE
       argument, which causes a staircase plot to be produced in which
       bad values are not flanked by vertical lines to the lower edge
@@ -15745,9 +15755,15 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
 
          \sstitem
          If the user supplies a value for the attribute using the given
-         parameter, then the Object is returned with the attribute set to the
-         supplied value. The user supplies the attribute values as a GRP
-         group expression in which each element is an AST attribute setting.
+         parameter, then the Object is returned with the attribute set to
+         the supplied value. The user supplies the attribute values as a
+         GRP group expression in which each element is an AST attribute
+         setting. The group expression may comprise persistent and/or
+         temporary attributes, the former preceding the latter separated by
+         a delimiting string (see argument PARAM).  Persistent values are
+         recorded in the parameter{\tt '}s current value and so can be re-used,
+         whereas temporary attributes are not recorded and only apply to the
+         current invocation of a task.
 
          \sstitem
          Otherwise, if the Object already had an explicit value set for the
@@ -15807,12 +15823,26 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
          APP = CHARACTER $*$ ( $*$ ) (Given)
       }{
          The name of the calling application in the form
-         $<$package$>$\_$<$application$>$ (e.g. {\tt "}KAPPA\_DISPLAY{\tt "}), for use in messages.
+         $<$package$>$\_$<$application$>$ (e.g. {\tt "}KAPPA\_DISPLAY{\tt "}), for use in
+         messages.
       }
       \sstsubsection{
          PARAM = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         The name of the parameter to use for getting the group expression.
+         The name of the parameter to use for getting the group
+         expression.
+
+         A non-alphanumeric prefix may prepend the actual parameter
+         name.  If present, this signifies the delimiter to separate
+         persistent from temporary attributes, otherwise all attributes
+         are regarded as persistent.  The prefix may be one to three
+         characters long.  Underscore is regarded as alphanumeric.  The
+         standard delimiter is the plus sign.
+
+         The same non-alphanumeric delimiter may also appear as a suffix.
+         Its presence indicates that this routine is being called more
+         than once in an application for the same parameter.  The
+         suffix should appear in all but the last invocation.
       }
       \sstsubsection{
          IOBJ = INTEGER (Given and Returned)
@@ -15832,7 +15862,7 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
          \sstitem
          Colour attribute values may be supplied in any form recognised
          by KPG1\_PGCOL (e.g. colour name, MIN, MAX, integer index), and the
-         nearest colour in the current KAPPA pallette is used.
+         nearest colour in the current KAPPA palette is used.
 
          \sstitem
          If a null value is supplied for the parameter, the error is
@@ -24424,6 +24454,134 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
          A dynamic default is set for the parameter before accessing it if
          IDEF supplied suitable defaults. The default consists of a
          comma-separated list of the default options.
+      }
+   }
+}
+\sstroutine{
+   KPG1\_GTGPT
+}{
+   Obtains a group of strings from the environment including some
+   that are transient
+}{
+   \sstdescription{
+      This routine obtains group of strings using the specified
+      parameter, and returns them in a GRP group (see SUN/150).
+
+      The user specifies the strings by supplying a GRP group expression
+      for the parameter value.  If the final character in the supplied
+      string is the group {\tt "}flag character{\tt "} (a minus sign by default),
+      then the user is re-prompted for another group expression, and the
+      strings specified by the second group expression are appended to
+      the returned group.  This continues until a group expression is
+      supplied that does not end with the continuation character, or a
+      null value is supplied (which is annulled).
+
+      The group comprises an optional persistent part that will be
+      written as the parameter{\tt '}s current value, and an optional
+      temporary component that only exists for the duration of the
+      current application.  The division is determined by the first
+      appearance within the string supplied of a delimiter string or
+      character (the DELIM argument).  For instance, assume the
+      delimiter is {\tt '}$+${\tt '}.  If the supplied value is
+      {\tt '}smooth,box=5$+$filter=gauss{\tt '}, the persistent value would be
+      {\tt '}smooth,box=5{\tt '} and the temporary value {\tt '}filter=gauss{\tt '}.  Supplying
+      merely the temporary value, such as {\tt '}$+$filter=gauss{\tt '} would return
+      the existing current value of the parameter as the persistent
+      component, and the temporary component is as before.
+
+      Normally, the {\tt "}current value{\tt "} for the parameter on exit would be
+      the final group expression.  If more than one group expression was
+      supplied, then this will not represent the entire group.  For this
+      reason, this routine concatenates all the group expressions
+      supplied, and stores the total group expression as the parameter
+      value before exiting.  It also stores the concatenated persistent
+      components and writes this as the current value.  Since a new
+      value is stored for the parameter, the parameter should not be
+      given an access mode of READ in the interface file.
+
+      If a null value is supplied the first time the parameter value is
+      obtained, then the PAR\_\_NULL status is returned, and SIZE is
+      returned as zero (a valid GRP identifier is still returned
+      however).  If a null value is supplied on a subsequent access to
+      the parameter, then the PAR\_\_NULL status is annulled, and the
+      group is returned containing any values obtained earlier.
+   }
+   \sstinvocation{
+      CALL KPG1\_GTGPT( PARAM, DELIM, LAST, IGRP, SIZE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The name of the parameter to use.
+      }
+      \sstsubsection{
+         DELIM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The delimiter string used to indicator where the temporary
+         part of a value begins.  Any text before the delimiter behaves
+         as if it were obtained using PAR\_GET0C.  After, and not
+         including, the delimiter the value is deemed to be temporary
+         and is never incorporated into the parameter{\tt '}s current value.
+         The delimiter should not be an alphanumeric character or
+         underscore.
+      }
+      \sstsubsection{
+         LAST = LOGICAL (Given)
+      }{
+         If this is the last or only invocation of this routine for a
+         given parameter in a task, set this TRUE.  For multiple
+         invocations except the last, set this FALSE.  Setting to FALSE
+         causes the full concatenated expression supplied by the user to
+         be stored in the parameter{\tt '}s current value, rather than just
+         the persistent-attribute list a TRUE value generates needed
+         when the task ends.
+      }
+      \sstsubsection{
+         IGRP = INTEGER (Given and Returned)
+      }{
+         The group to use.  If this is GRP\_\_NOID then a new group is
+         created with default control characters and its identifier is
+         returned.  If the group already exists, its contents are
+         discarded before adding new strings.
+      }
+      \sstsubsection{
+         SIZE = INTEGER (Returned)
+      }{
+         The total size of the returned group.  Returned equal to zero
+         if an error occurs.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This routine subverts the parameter system in that it uses an
+         additional component in the parameter file to store the current
+         value.  This enables the current value to be accessed regardless
+         of the value for the parameter supplied on the command line that
+         would otherwise replace the previous current value with the full
+         new value including the delimiter and temporary value.
+
+         \sstitem
+         The additional component{\tt '}s name is the parameter name (up to 13
+         characters) followed by CV (for current value).  In practice
+         truncation should not be an issue.
+
+         \sstitem
+         This routine should not be used with multiple parameters in the
+         same task whose new current-value component in the parameter file
+         would be the same.  Again in practice this is extremely unlikely.
+
+         \sstitem
+         It has not been proven to work if invoked more than twice for
+         the same parameter, as there are no known occurrences of this in
+         Starlink applications.
       }
    }
 }

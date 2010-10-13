@@ -806,10 +806,14 @@ related items to be removed.
       supplied.
 \item There is a new generic routine KPG\_FISEx that fills a section
       of a multi-dimensional array.
+\item The new KPG1\_GTGPT routine is a variant of KPG1\_GTGRP to obtain
+      groups of strings.  KPG1\_GTGPT supports group members that are not
+      `sticky', in other words the strings only last for the current
+      invocation of an application.
 \item The new more-general KPG\_ISEQN replaces the old IRCAM-specific
       NXTNAM routine.  This increments trailing sequence numbers
       in strings, most often used to generate a series of filenames.
-\item Add new routine KPG\_LR2Ax that is the same as KPG\_LDA2x 
+\item Add new routine KPG\_LR2Ax that is the same as KPG\_LDA2x
       (formerly LD2AR) except it processes single-precision sparse data.
 \item There is a new routine KPG\_NORVx to replace the old NORMAL.  It
       has the benefits of being generic and can operate on an array.
@@ -828,7 +832,7 @@ related items to be removed.
 \item Remove FTS1\_TREAD since the MAG library has now been removed
       from the main Starlink source tree.
 \item A number of long-deprecated old routines without a package prefix
-      have been removed.  These are listed below.  The corresponding 
+      have been removed.  These are listed below.  The corresponding
       replacement routines appear in the right column.
 
 \begin{tabular}{lcc}
@@ -851,6 +855,12 @@ ZERO1D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
 ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
 \end{tabular}
 
+\item KPG1\_ASSET now parses the supplied parameter name for a
+      non-alphanumeric prefix and suffix to determine whether or not
+      temporary attributes are supported via the new KPG1\_GTGPT
+      routine.  A suffix indicates that KPG1\_ASSET will be called
+      again for the same parameter, affecting the value to write to
+      the parameter file.
 \item The KPG1\_PLTLN routine now accepts a value 6 for the MODE
       argument, which causes a staircase plot to be produced in which
       bad values are not flanked by vertical lines to the lower edge
