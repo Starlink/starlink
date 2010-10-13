@@ -20,10 +20,10 @@
 *        The global status.
 
 *  Description:
-*     This application produces a contour map of a 2-dimensional NDF on
-*     the current graphics device, with single-pixel resolution.
+*     This application produces a contour map of a two-dimensional NDF
+*     on the current graphics device, with single-pixel resolution.
 *     Contour levels can be chosen automatically in various ways, or
-*     specified explicitly (see parameter MODE).  In addition, this
+*     specified explicitly (see Parameter MODE).  In addition, this
 *     application can also draw an outline around either the whole data
 *      array, or around the good pixels in the data array (set MODE to
 *     "Bounds" or "Good").
@@ -31,21 +31,21 @@
 *     The plot is produced within the current graphics database picture,
 *     and may be aligned with an existing DATA picture if the existing
 *     picture contains suitable co-ordinate Frame information (see
-*     parameter CLEAR).
+*     Parameter CLEAR).
 *
 *     The appearance of each contour can be controlled in several ways.
-*     The pens used can be rotated automatically (see parameter PENROT).
+*     The pens used can be rotated automatically (see Parameter PENROT).
 *     Contours below a given threshold value can be drawn dashed (see
-*     parameter DASHED).  Alternatively, the appearance of each contour
-*     can be set explicitly (see parameter PENS).
+*     Parameter DASHED).  Alternatively, the appearance of each contour
+*     can be set explicitly (see Parameter PENS).
 *
-*     Annotated axes can be produced (see parameter AXES), and the
-*     appearance of the axes can be controlled in detail (see parameter
+*     Annotated axes can be produced (see Parameter AXES), and the
+*     appearance of the axes can be controlled in detail (see Parameter
 *     STYLE).  The axes show co-ordinates in the current co-ordinate
 *     Frame of the supplied NDF.
 *
 *     A list of the contour levels can be displayed to the right of the
-*     contour map (see parameter KEY).  The appearance and position of
+*     contour map (see Parameter KEY).  The appearance and position of
 *     this key may be controlled using parameters KEYSTYLE and KEYPOS.
 
 *  Usage:
@@ -117,8 +117,8 @@
 *     KEY = _LOGICAL (Read)
 *        TRUE if a key of the contour level versus pixel value is to be
 *        produced. The appearance of this key can be controlled using
-*        parameter KEYSTYLE, and its position can be controlled using
-*        parameter KEYPOS. [TRUE]
+*        Parameter KEYSTYLE, and its position can be controlled using
+*        Parameter KEYPOS.  [TRUE]
 *     KEYPOS() = _REAL (Read)
 *        Two values giving the position of the key.  The first value
 *        gives the gap between the right-hand edge of the contour map
@@ -170,7 +170,7 @@
 *        attributes Format(2), etc. (the synonym Value can be used in
 *        place of the value 2).  [current value]
 *     LABPOS() = _REAL (Read)
-*        Only used if parameter MODE is set to "Good" or "Bounds".  It
+*        Only used if Parameter MODE is set to "Good" or "Bounds".  It
 *        specifies the position at which to place a label identifying
 *        the input NDF within the plot.  The label is drawn parallel to
 *        the first pixel axis.  Two values should be supplied for
@@ -180,13 +180,13 @@
 *        specifies the distance in millimetres along the second pixel
 *        axis from the centre of the bottom-left pixel to the baseline
 *        of the label.  If a null (!) value is given, no label is
-*        produced.  The appearance of the label
-*        can be set by using the STYLE parameter (for instance
-*        "Size(strings)=2"). [current value]
+*        produced.  The appearance of the label can be set by using the
+*        STYLE parameter (for instance "Size(strings)=2").
+*        [current value]
 *     LENGTH() = _REAL (Write)
 *        On exit this holds the total length in pixels of the contours
 *        at each selected height.  These values are only computed when
-*        parameter STATS is TRUE.
+*        Parameter STATS is TRUE.
 *     MARGIN( 4 ) = _REAL (Read)
 *        The widths of the margins to leave around the contour map for
 *        axis annotation.  The widths should be given as fractions of
@@ -198,7 +198,7 @@
 *        these margins are too narrow any axis annotation may be
 *        clipped.  If a null (!) value is supplied, the value used is
 *        0.15 (for all edges) if annotated axes are being produced, and
-*        zero otherwise. See also parameter KEYPOS.  [current value]
+*        zero otherwise. See also Parameter KEYPOS.  [current value]
 *     MODE = LITERAL (Read)
 *        The method used to select the contour levels. The options are:
 *
@@ -212,7 +212,7 @@
 *
 *          - "Bounds" -- A single "contour" is drawn representing the
 *          bounds of the input array. A label may also be added (see
-*          parameter LABPOS).
+*          Parameter LABPOS).
 *
 *          - "Equalised" -- You define the number of equally spaced
 *          percentiles.
@@ -239,7 +239,7 @@
 *          number of contour levels, which must be at least two.
 *
 *        If the contour map is aligned with an existing DATA picture
-*        (see parameter CLEAR), then only part of the supplied NDF may
+*        (see Parameter CLEAR), then only part of the supplied NDF may
 *        be displayed.  In this case, the choice of contour levels is
 *        based on the data within a rectangular section of the input NDF
 *        enclosing the existing DATA picture.  Data values outside this
@@ -256,13 +256,13 @@
 *        On exit this holds the number of closed contours at each
 *        selected height.  Contours are not closed if they intersect a
 *        bad pixel or the edge of the image.  These values are only
-*        computed when parameter STATS is TRUE.
+*        computed when Parameter STATS is TRUE.
 *     PENROT = _LOGICAL (Read)
 *        If TRUE, the plotting pens are cycled through the contours to
 *        aid identification of the contour heights.  Only accessed if
-*        pen definitions are not supplied using parameter PENS.  [FALSE]
+*        pen definitions are not supplied using Parameter PENS.  [FALSE]
 *     PENS = GROUP (Read)
-*        A group of strings, separated by semi-colons, each of which
+*        A group of strings, separated by semicolons, each of which
 *        specifies the appearance of a pen to be used to draw a contour.
 *        The first string in the group describes the pen to use for the
 *        first contour, the second string describes the pen for the
@@ -272,7 +272,7 @@
 *        plotting attributes to be used when drawing the contour.  For
 *        instance, the string "width=10.0,colour=red,style=2" produces a
 *        thick, red, dashed contour.  Attributes that are unspecified in
-*        a string default to the values implied by parameter STYLE.  If
+*        a string default to the values implied by Parameter STYLE.  If
 *        a null value (!) is given for PENS, then the pens implied by
 *        parameters PENROT, DASHED and STYLE are used.  [!]
 *     PERCENTILES() = _REAL (Read)
@@ -409,7 +409,7 @@
 *     the key if present; and a DATA picture containing just the
 *     contours.  Note, the FRAME picture is only created if annotated
 *     axes or a key has been drawn, or if non-zero margins were
-*     specified using parameter MARGIN.  The world co-ordinates in the
+*     specified using Parameter MARGIN.  The world co-ordinates in the
 *     DATA picture will be pixel co-ordinates.  A reference to the
 *     supplied NDF, together with a copy of the WCS information in the
 *     NDF are stored in the DATA picture.  On exit the current database
@@ -553,7 +553,7 @@
 *        Margin changed to be a fraction of the current picture instead
 *        of the DATA picture.
 *     6-FEB-2001 (DSB):
-*        Added modes Good and Bounds, and parameter LABPOS.
+*        Added modes Good and Bounds, and Parameter LABPOS.
 *     20-AUG-2001 (DSB):
 *        Change default Format (to "%g") and Colour (to the colour used
 *        to draw the contour) for the contour indices in the key.
@@ -562,7 +562,7 @@
 *     2006 January 23 (MJC):
 *        Added "Scale" mode.
 *     27-JAN-2006 (DSB):
-*        - Use a runtime default of ".NOT.CLEAR" for parameter AXIS.
+*        - Use a runtime default of ".NOT.CLEAR" for Parameter AXIS.
 *        - Ignore blank titles supplied in STYLE.
 *     6-FEB-2006 (DSB):
 *        Use KPG1_ASTTL to get the title.
@@ -1050,7 +1050,7 @@
       IF ( KEY .AND. MODE .NE. 'GOOD' .AND. MODE .NE. 'BOUNDS' ) THEN
 
 *  If no value was supplied for the vertical position of the KEY using
-*  parameter KEYPOS, find the value which puts the top of the key level
+*  Parameter KEYPOS, find the value which puts the top of the key level
 *  with the top of the DATA picture.
          IF ( NKP .LT. 2 ) THEN
 
@@ -1082,7 +1082,7 @@
             CALL PGQVP( 2, DUMMY, DUMMY, Y1, Y2 )
             KEYOFF = ( KEYOFF - Y1 )/( Y2 - Y1 )
 
-*  If the horizontal positions was given using parameter KEYPOS, just
+*  If the horizontal positions was given using Parameter KEYPOS, just
 *  activate the KEY picture.
          ELSE
             KEYOFF = KEYPOS( 2 )
