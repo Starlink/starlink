@@ -147,10 +147,16 @@
 *        where <name> is the name of a plotting attribute, and <value>
 *        is the value to assign to the attribute.  Default values will
 *        be used for any unspecified attributes.  All attributes will be
-*        defaulted if a null value (!) is supplied.  See section
-*        "Plotting Attributes" in SUN/95 for a description of the
-*        available attributes.  Any unrecognised attributes are ignored
-*        (no error is reported).
+*        defaulted if a null value (!)---the initial default---is
+*        supplied.  To apply changes of style to only the current
+*        invocation, begin these attributes with a plus sign.  A mixture
+*        of persistent and temporary style changes is achieved by
+*        listing all the persistent attributes followed by a plus sign
+*        then the list temporary attributes.
+*
+*        See section "Plotting Attributes" in SUN/95 for a description
+*        of the available attributes.  Any unrecognised attributes are
+*        ignored (no error is reported).
 *
 *        The heading in the key can be changed by setting a value for
 *        the Title attribute (the supplied heading is split into lines
@@ -308,10 +314,16 @@
 *        where <name> is the name of a plotting attribute, and <value>
 *        is the value to assign to the attribute.  Default values will
 *        be used for any unspecified attributes.  All attributes will be
-*        defaulted if a null value (!) is supplied.  See section
-*        "Plotting Attributes" in SUN/95 for a description of the
-*        available attributes.  Any unrecognised attributes are ignored
-*        (no error is reported).
+*        defaulted if a null value (!)---the initial default---is
+*        supplied.  To apply changes of style to only the current
+*        invocation, begin these attributes with a plus sign.  A mixture
+*        of persistent and temporary style changes is achieved by
+*        listing all the persistent attributes followed by a plus sign
+*        then the list temporary attributes.
+
+*        See section "Plotting Attributes" in SUN/95 for a description
+*        of the available attributes.  Any unrecognised attributes are
+*        ignored (no error is reported).
 *
 *        The appearance of the data curves is controlled by the
 *        attributes Colour(Curves), Width(Curves), etc. (the synonym
@@ -408,6 +420,14 @@
 *     mlinplot rcw3_b1 lnindx=* \
 *        Plot all rows of the two-dimensional NDF file, rcw3_b1, on the
 *        current graphics device.
+*     mlinplot rcw3_b1 lnindx=* style="colour(curve)=red+width(curve)=4" \
+*        As the previous example, but the rows are drawn in red at four
+*        times normal thickness.  The change of line coluor persists
+*        to the next invocation, but not the temporary widening of the
+*        lines.
+*     mlinplot rcw3_b1 lnindx=* style="+width(curve)=4" \
+*        As the previous example, but now the the rows are drawn in
+*        current line colour.
 *     mlinplot rcw3_b1 absaxs=2 lnindx="20:25,30,31" \
 *        Plot columns 20, 21, 22, 23, 24, 25, 30 and 31 of the
 *        two-dimensional NDF file, rcw3_b1, on the current graphics
@@ -505,6 +525,8 @@
 *        corrected punctuation, and wrapped long lines.
 *     20-JUL-2006 (TIMJ):
 *        Fix valgrind warning with IPVIN.
+*     2010 October 6 (MJC):
+*        Permit temporary style attributes.
 *     {enter_further_changes_here}
 
 *-
@@ -1005,14 +1027,16 @@ c         IMODE = 4
 
       END DO
 
-*  Produce the data curves.
+*  Produce the data curves.  The plus requests support of temporary
+*  STYLE attributes.  Also allow for more than one call to KPG1_ASSET
+*  for STYLE by using the delimiter suffix.
       CALL KPS1_MLPML( NDISP, USE, ABSDIM, 1, ABSDIM,
      :                 %VAL( CNF_PVAL( IPNOM ) ),
      :                 %VAL( CNF_PVAL( IPDAT ) ), .FALSE., ERRBAR,
      :                 %VAL( CNF_PVAL( IPBAR ) ),
      :                 %VAL( CNF_PVAL( IPBAR ) ),
      :                 %VAL( CNF_PVAL( IPBAR ) ),
-     :                 'STYLE', 'PENS', IPLOT, IMODE, MTYPE, 1, FREQ,
+     :                 '+STYLE+', 'PENS', IPLOT, IMODE, MTYPE, 1, FREQ,
      :                 'KAPPA_MLINPLOT', STATUS )
 
 *  Transform the curve offsets into GRAPHICS Frame axis-2 values.
@@ -1020,9 +1044,10 @@ c         IMODE = 4
      :                STATUS )
 
 *  Add annotation to the plot (zero point markers and curve labels).
+*  The plus requests support of temporary STYLE attributes.
       CALL KPS1_MLPLB( NDISP, USE, ABSDIM, %VAL( CNF_PVAL( IPNOM ) ),
-     :                 %VAL( CNF_PVAL( IPDAT ) ),
-     :                 GOFF, IPLOT, 'STYLE', 'PENS', 'LABELS', 'LINLAB',
+     :                 %VAL( CNF_PVAL( IPDAT ) ), GOFF,
+     :                 IPLOT, '+STYLE', 'PENS', 'LABELS', 'LINLAB',
      :                 'KAPPA_MLINPLOT', LNINDX, KEY, IGRP, STATUS )
 
 *  Plot the key if necessary.
@@ -1086,7 +1111,8 @@ c         IMODE = 4
          CALL KPG1_ASPSY( '(OFF*SET)', '(NUMLAB)', STATUS )
          CALL KPG1_ASPSY( '(TEXT)', '(TITLE)', STATUS )
 
-         CALL KPG1_ASSET( 'KAPPA_MLINPLOT', 'KEYSTYLE', IPLOTK, STATUS )
+         CALL KPG1_ASSET( 'KAPPA_MLINPLOT', '+KEYSTYLE', IPLOTK,
+     :                    STATUS )
 
 *  Draw the key to the right of the plot and aligned with the top axis.
          CALL KPS1_MLPKY( IPLOTK, NDISP, OFFSET, IGRP, USE, KEYOFF,
