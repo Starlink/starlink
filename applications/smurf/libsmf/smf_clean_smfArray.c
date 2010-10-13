@@ -318,11 +318,11 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
     smfArray *gaidata = NULL;
     smfGroup *gaigroup = NULL;
     smfArray *quadata = NULL;
-    smfGroup *quagroup = NULL;
+    smfData *thisqua=NULL;
 
     msgOutif(MSG__VERB," ", FUNC_NAME ": Remove common-mode", status);
 
-    /* Create model containers for COM, GAI and QUA */
+    /* Create model containers for COM, GAI */
     smf_model_create( wf, NULL, &array, NULL, NULL, NULL, NULL, 1, SMF__COM,
                       0, NULL, 0, NULL, NULL, &comgroup, 1, 1, &comdata, keymap,
                       status );
@@ -331,12 +331,29 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
                       0, NULL, 0, NULL, NULL, &gaigroup, 1, 1, &gaidata, keymap,
                       status );
 
-    smf_model_create( wf, NULL, &array, NULL, NULL, NULL, NULL, 1, SMF__QUA,
-                      0, NULL, 0, NULL, NULL, &quagroup, 1, 1, &quadata, keymap,
-                      status );
+    /* Manually create quadata to share memory with the quality already
+       stored in array */
+
+    quadata = smf_create_smfArray( status );
+    for( idx=0; (*status==SAI__OK) && (idx<array->ndat); idx++ ) {
+      /* Create several new smfDatas, but they will all be freed
+         properly when we close quadata */
+      thisqua = smf_create_smfData( SMF__NOCREATE_DA | SMF__NOCREATE_HEAD |
+                                    SMF__NOCREATE_FILE, status );
+
+      /* Probably only need pntr->[0], but fill in the dimensionality
+         information to be on the safe side */
+      thisqua->dtype = SMF__QUALTYPE;
+      thisqua->ndims = array->sdata[idx]->ndims;
+      thisqua->isTordered = array->sdata[idx]->isTordered;
+      memcpy( thisqua->dims, array->sdata[idx]->dims, sizeof(thisqua->dims) );
+      memcpy( thisqua->lbnd, array->sdata[idx]->lbnd, sizeof(thisqua->lbnd) );
+      thisqua->pntr[0] = array->sdata[idx]->qual;
+
+      smf_addto_smfArray( quadata, thisqua, status );
+    }
 
     /* Set up the smfDIMMData and call smf_calcmodel_com */
-
     memset( &dat, 0, sizeof(dat) );
     dat.res = &array;
     dat.gai = &gaidata;
@@ -356,10 +373,15 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
     if( comgroup ) smf_close_smfGroup( &comgroup, status );
     if( gaidata ) smf_close_related( &gaidata, status );
     if( gaigroup ) smf_close_smfGroup( &gaigroup, status );
-    if( quadata ) smf_close_related( &quadata, status );
-    if( quagroup ) smf_close_smfGroup( &quagroup, status );
 
-
+    /* Before closing quadata unset all the pntr[0] since this is shared
+       memory with the quality associated with array */
+    if( quadata ) {
+      for( idx=0; idx<quadata->ndat; idx++ ) {
+        quadata->sdata[idx]->pntr[0] = NULL;
+      }
+      if( quadata ) smf_close_related( &quadata, status );
+    }
   }
 
 
