@@ -128,32 +128,38 @@
 *        lowest).  If the second value is not given, the top of the key
 *        is placed level with the top of the contour map.  Both values
 *        should be in the range 0.0 to 1.0.  If a key is produced, then
-*        the right-hand margin specified by parameter MARGIN is ignored.
+*        the right-hand margin specified by Parameter MARGIN is ignored.
 *        [current value]
 *     KEYSTYLE = GROUP (Read)
 *        A group of attribute settings describing the plotting style to
-*        use for the key (see parameter KEY).
+*        use for the key (see Parameter KEY).
 *
 *        A comma-separated list of strings should be given in which each
 *        string is either an attribute setting, or the name of a text
 *        file preceded by an up-arrow character "^".  Such text files
-*        should contain further comma-separated lists which will be
-*        read and interpreted in the same manner.  Attribute settings
-*        are applied in the order in which they occur within the list,
-*        with later settings overriding any earlier settings given for
-*        the same attribute.
+*        should contain further comma-separated lists which will be read
+*        and interpreted in the same manner.  Attribute settings are
+*        applied in the order in which they occur within the list, with
+*        later settings overriding any earlier settings given for the
+*        same attribute.
 *
 *        Each individual attribute setting should be of the form:
 *
 *           <name>=<value>
 *
 *        where <name> is the name of a plotting attribute, and <value>
-*        is the value to assign to the attribute. Default values will be
-*        used for any unspecified attributes. All attributes will be
-*        defaulted if a null value (!) is supplied.  See section
-*        "Plotting Attributes" in SUN/95 for a description of the
-*        available attributes.  Any unrecognised attributes are ignored
-*        (no error is reported).
+*        is the value to assign to the attribute.  Default values will
+*        be used for any unspecified attributes.  All attributes will be
+*        defaulted if a null value (!)---the initial default---is
+*        supplied.  To apply changes of style to only the current
+*        invocation, begin these attributes with a plus sign.  A mixture
+*        of persistent and temporary style changes is achieved by
+*        listing all the persistent attributes followed by a plus sign
+*        then the list temporary attributes.
+*
+*        See section "Plotting Attributes" in SUN/95 for a description
+*        of the available attributes.  Any unrecognised attributes are
+*        ignored (no error is reported).
 *
 *        The heading in the key can be changed by setting a value for
 *        the Title attribute (the supplied heading is split into lines
@@ -302,12 +308,18 @@
 *           <name>=<value>
 *
 *        where <name> is the name of a plotting attribute, and <value>
-*        is the value to assign to the attribute. Default values will be
-*        used for any unspecified attributes.  All attributes will be
-*        defaulted if a null value (!) is supplied.  See section
-*        "Plotting Attributes" in SUN/95 for a description of the
-*        available attributes.  Any unrecognised attributes are ignored
-*        (no error is reported).
+*        is the value to assign to the attribute.  Default values will
+*        be used for any unspecified attributes.  All attributes will be
+*        defaulted if a null value (!)---the initial default---is
+*        supplied.  To apply changes of style to only the current
+*        invocation, begin these attributes with a plus sign.  A mixture
+*        of persistent and temporary style changes is achieved by
+*        listing all the persistent attributes followed by a plus sign
+*        then the list temporary attributes.
+*
+*        See section "Plotting Attributes" in SUN/95 for a description
+*        of the available attributes.  Any unrecognised attributes are
+*        ignored (no error is reported).
 *
 *        The appearance of the contours is controlled by the attributes
 *        Colour(Curves), Width(Curves), etc (the synonym Contours may be
@@ -582,6 +594,8 @@
 *        are present.
 *     2-JUN-2006 (DSB):
 *        Modified to use ATL_PLROI.
+*     2010 October 13 (MJC):
+*        Permit temporary style attributes.
 *     {enter_further_changes_here}
 
 *-
@@ -1110,8 +1124,9 @@
          CALL KPG1_ASPSY( '(VAL*UE)', '(NUMLAB)', STATUS )
          CALL KPG1_ASPSY( '(TEXT)', '(TITLE)', STATUS )
 
-*  Set the style for plotting in the key picture.
-         CALL KPG1_ASSET( 'KAPPA_CONTOUR', 'KEYSTYLE', IPLOTK, STATUS )
+*  Set the style for plotting in the key picture.  The plus requests
+*  support of temporary attributes.
+         CALL KPG1_ASSET( 'KAPPA_CONTOUR', '+KEYSTYLE', IPLOTK, STATUS )
 
 *  Draw the key to the right of the contour plot and aligned with
 *  the top axis.
