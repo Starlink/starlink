@@ -29,7 +29,7 @@
 *     The lines extend the full width or height of the plot's data
 *     area.  Up to five different multiples of the standard deviation
 *     may be presented in this fashion. Each line can be drawn with a
-*     different style (see parameter STYLE).
+*     different style (see Parameter STYLE).
 *
 *     The application also computes statistics for those array values
 *     that lie between each pair of plotted lines.  In other words it
@@ -71,7 +71,7 @@
 *        thereby causing the statistics to be derived from the dataset
 *        used to draw the plot.  If, however, you had plotted a section
 *        of a dataset but wanted to plot the statistics from the whole
-*        dataset, you would specify the full dataset with parameter NDF.
+*        dataset, you would specify the full dataset with Parameter NDF.
 *        [The dataset used to create the existing plot.]
 *     NSIGMA() = _REAL (Read)
 *        Number of standard deviations about the mean at which the
@@ -162,7 +162,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -172,23 +172,22 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
-*     TIMJ: Tim Jenness (JACH)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
-*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     1996 October 14 (TIMJ):
-*        Original version
+*        Original version.
 *     1996 October 16 (MJC):
 *        Expanded the documentation.  Fixed a bug that caused the final
 *        line always to be solid.  Added AXIS parameter.  Standardised
-*        the code style.  Renamed parameter LINSTYLE to LINESTYLE.
+*        the code style.  Renamed Parameter LINSTYLE to LINESTYLE.
 *     6-MAY-1998 (DSB):
 *        Update the GKS workstation after changing polyline
 *        representations, and do not re-instate original representations
