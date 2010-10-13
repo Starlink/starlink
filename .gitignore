@@ -343,6 +343,7 @@ applications/cupid/cupidsub/cupidfindback10.c
 applications/cupid/cupidsub/cupidfindback2.c
 applications/cupid/cupidsub/cupidfindback3.c
 applications/cupid/cupidsub/cupidfindback4.c
+applications/cupid/cupidsub/cupidfwpixelsets.c
 applications/cupid/cupidsub/cupidfwjoin.c
 applications/cupid/cupidsub/cupidfwmain.c
 applications/cupid/cupidsub/cupidgcdump.c
