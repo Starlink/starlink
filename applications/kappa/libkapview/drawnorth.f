@@ -23,13 +23,13 @@
 *     This application draws a pair of arrows on top of a previously
 *     displayed DATA picture which indicate the directions of the
 *     labelled axes in the underlying picture, at the position specified
-*     by parameter ORIGIN.  For instance, if the underlying picture has
+*     by Parameter ORIGIN.  For instance, if the underlying picture has
 *     axes labelled with celestial co-ordinates, then the arrows will
 *     by default indicate the directions of north and east.  The
 *     appearance of the arrows, including the labels attached to each
 *     arrow, may be controlled using the STYLE parameter.  The picture
 *     area behind the arrows may optionally be cleared before drawing
-*     the arrows (see parameter BLANK).
+*     the arrows (see Parameter BLANK).
 
 *  Usage:
 *     drawnorth [device] [length] [origin]
@@ -46,9 +46,9 @@
 *        arrows are drawn. This is done by drawing a rectangle filled
 *        with the current background colour of the selected graphics
 *        device.  The size of the blanked area can be controlled using
-*        parameter BLANKSIZE.  [FALSE]
+*        Parameter BLANKSIZE.  [FALSE]
 *     BLANKSIZE = _REAL (Read)
-*        Specifies the size of the blanked area (see parameter BLANK).
+*        Specifies the size of the blanked area (see Parameter BLANK).
 *        A value of 1.0 results in the blanked area being just large
 *        enough to contain the drawn arrows and labels.  Values larger
 *        than 1.0 introduce a blank margin around the drawn arrows and
@@ -74,7 +74,7 @@
 *
 *        An error will be reported if a co-ordinate Frame is requested
 *        which is not available in the previously displayed picture.  If
-*        the selected Frame has more than two axes, the parameter
+*        the selected Frame has more than two axes, the Parameter
 *        USEAXIS will determine the two axes which are to be used.  [!]
 *     LENGTH( 2 ) = _REAL (Read)
 *        The lengths of the arrows, expressed as fractions of the
@@ -84,7 +84,7 @@
 *        a single arrow is required.  [current value]
 *     OFRAME = LITERAL (Read)
 *        Specifies the co-ordinate Frame in which the position of the
-*        arrows will be supplied (see parameter ORIGIN).  The following
+*        arrows will be supplied (see Parameter ORIGIN).  The following
 *        Frames will always be available.
 *
 *        - "GRAPHICS" -- gives positions in millimetres from the
@@ -118,7 +118,7 @@
 *        co-ordinate Frame).  ["CURNDC"]
 *     ORIGIN = LITERAL (Read)
 *        The co-ordinates at which to place the origin of the arrows,
-*        in the Frame specified by parameter OFRAME.  If a null (!)
+*        in the Frame specified by Parameter OFRAME.  If a null (!)
 *        value is supplied, OFRAME is ignored and the arrows are
 *        situated at a default position near one of the corners, or at
 *        the centre.  The supplied position can be anywhere within the
@@ -163,7 +163,7 @@
 *        can be suppressed using attribute TextLab. [current value]
 *     USEAXIS = GROUP (Read)
 *        USEAXIS is only accessed if the co-ordinate Frame selected
-*        using parameter FRAME has more than two axes.  A group of two
+*        using Parameter FRAME has more than two axes.  A group of two
 *        strings should be supplied specifying the two axes to which
 *        the two drawn arrows should refer.  Each axis can be specified
 *        using one of the following options.
