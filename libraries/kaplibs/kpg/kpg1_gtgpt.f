@@ -141,6 +141,10 @@
 *     2010 October 12 (MJC):
 *        Add LAST argument instead of testing the parameter name for a
 *        delimiter suffix.
+*     2010 October 13 (MJC):
+*        Allow for the case where the first value for the parameter
+*        comprises only temporary attributes, by setting the parameter
+*        value to null.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -546,6 +550,9 @@
          ELSE IF ( NC .GT. 0 ) THEN
             CALL SUBPAR_CURSAV( IPAR, GRPEXP( : NC ), STATUS )
 
+*  Allow for a null persistent value by removing the current value.
+         ELSE
+            CALL SUBPAR_CURSAV( IPAR, '!', STATUS )
          END IF
       END IF
 
