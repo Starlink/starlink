@@ -144,10 +144,16 @@
 *        where <name> is the name of a plotting attribute, and <value>
 *        is the value to assign to the attribute.  Default values will
 *        be used for any unspecified attributes.  All attributes will be
-*        defaulted if a null value (!) is supplied. See section
-*        "Plotting Attributes" in SUN/95 for a description of the
-*        available attributes.  Any unrecognised attributes are ignored
-*        (no error is reported).
+*        defaulted if a null value (!)---the initial default---is
+*        supplied.  To apply changes of style to only the current
+*        invocation, begin these attributes with a plus sign.  A mixture
+*        of persistent and temporary style changes is achieved by
+*        listing all the persistent attributes followed by a plus sign
+*        then the list temporary attributes.
+*
+*        See section "Plotting Attributes" in SUN/95 for a description
+*        of the available attributes.  Any unrecognised attributes are
+*        ignored (no error is reported).
 *
 *        The appearance of the arrows is controlled by the attributes
 *        Colour(Axes), Width(Axes), etc. (the synonym Arrows may be
@@ -222,7 +228,9 @@
 
 *  Copyright:
 *     Copyright (C) 2002, 2004 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -242,6 +250,7 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -252,6 +261,8 @@
 *        current picture.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL.
+*     2010 October 13 (MJC):
+*        Permit temporary style attributes.
 *     {enter_further_changes_here}
 
 *-
@@ -474,7 +485,8 @@
       CALL KPG1_ASPSY( '(ARROW2)', '(AXIS2)', STATUS )
 
 *  Set the attributes of the Plot to give the required plotting style.
-      CALL KPG1_ASSET( 'KAPPA_DRAWNORTH', 'STYLE', IPLOTC, STATUS )
+*  The plus requests support of temporary attributes.
+      CALL KPG1_ASSET( 'KAPPA_DRAWNORTH', '+STYLE', IPLOTC, STATUS )
 
 *  If we are to find a default origin, first try a position near the top
 *  left corner of the underlying DATA picture. This first guess will
