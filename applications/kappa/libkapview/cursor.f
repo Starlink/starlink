@@ -31,14 +31,14 @@
 *
 *     Positions may be reported in several different co-ordinate Frames
 *     (see Parameter FRAME). Optionally, the corresponding pixel
-*     co-ordinates at each position may also be reported (see parameter
+*     co-ordinates at each position may also be reported (see Parameter
 *     SHOWPIXEL).
 *
 *     The picture or pictures within which positions are required can be
-*     selected in several ways (see parameters MODE and NAME).
+*     selected in several ways (see Parameters MODE and NAME).
 *
 *     Restrictions can be made on the number of positions to be given (see
-*     parameters MAXPOS and MINPOS), and screen output can be suppressed
+*     Parameters MAXPOS and MINPOS), and screen output can be suppressed
 *     (see the Notes).
 
 *  Usage:
@@ -139,7 +139,7 @@
 *        "C" or "T", meaning bottom, centre or top. The second should be
 *        "L", "C" or "R", meaning left, centre or right. The text is
 *        displayed so that the supplied position is at the specified
-*        point within the displayed text string. [CC]
+*        point within the displayed text string.  [CC]
 *     LASTDIM = _INTEGER (Write)
 *        The number of axis values written to Parameter LASTPOS.
 *     LASTPOS() = _DOUBLE (Write)
@@ -159,7 +159,7 @@
 *        position should be marked, and should be given as an integer
 *        PGPLOT marker type. For instance, 0 gives a box, 1 gives a dot,
 *        2 gives a cross, 3 gives an asterisk, 7 gives a triangle. The
-*        value must be larger than or equal to -31. [current value]
+*        value must be larger than or equal to -31.  [current value]
 *     MAXPOS = _INTEGER (Read)
 *        The maximum number of positions which may be supplied before the
 *        application terminates. The number must be in the range 1 to 200.
@@ -167,7 +167,7 @@
 *     MINPOS = _INTEGER (Read)
 *        The minimum number of positions which may be supplied. The user
 *        is asked to supply more if necessary. The number must be in the
-*        range 0 to the value of Parameter MAXPOS. [0]
+*        range 0 to the value of Parameter MAXPOS.  [0]
 *     MODE = LITERAL (Read)
 *        The method used to select the pictures in which cursor positions are
 *        to be reported. There are three options:
@@ -191,7 +191,7 @@
 *        you want positions in a DATA picture which is covered by a
 *        transparent FRAME picture, then you could specify NAME=DATA.
 *        A null (!) or blank string means that pictures of all names may
-*        be selected. NAME is ignored when MODE = "Current". [!]
+*        be selected. NAME is ignored when MODE = "Current".  [!]
 *     NUMBER = _INTEGER (Write)
 *        The number of positions selected with the cursor (excluding
 *        invalid positions).
@@ -303,11 +303,12 @@
 *        reported).
 *
 *        In addition to the attributes which control the appearance of
-*        the graphics (Colour, Font, etc), the following attributes may
+*        the graphics (Colour, Fount, etc), the following attributes may
 *        be set in order to control the appearance of the formatted axis
-*        values reported on the screen: Format, Digits, Symbol, Unit. These
-*        may be suffixed with an axis number (eg "Digits(2)") to refer to
-*        the values displayed for a specific axis. [current value]
+*        values reported on the screen: Format, Digits, Symbol, Unit.
+*        These may be suffixed with an axis number (e.g. "Digits(2)") to
+*        refer to the values displayed for a specific axis.
+*        [current value]
 
 *  Examples:
 *     cursor frame=pixel
@@ -342,7 +343,7 @@
 *        This obtains co-ordinates within any visible DATA picture on
 *        the current graphics device.  The style to use is read from
 *        text file mystyle, but is then modified so that 5 digits are used
-*        to format axis 1 values, and 7 to format axis 2 values.
+*        to format Axis-1 values, and 7 to format Axis-2 values.
 *     cursor plot=box style="width=3,colour=red" maxpos=2 minpos=2
 *        Exactly two positions must be given using the cursor, and a red box
 *        is drawn joining the two positions. The lines making up the box
