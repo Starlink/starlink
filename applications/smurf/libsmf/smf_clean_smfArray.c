@@ -45,6 +45,7 @@
 *     Dark squids  : DKCLEAN
 *     Gap filling  : FILLGAPS, ZEROPAD
 *     Baselines    : ORDER
+*     Common-Mode  : COMPREPROCESS
 *     Filtering    : FILT_EDGELOW, FILT_EDGEHIGH, FILT_NOTCHLOW, FILT_NOTCHHIGH,
 *                    APOD, FILT_WLIM, WHITEN
 *     Noisy Bolos  : NOISECLIP
@@ -82,6 +83,9 @@
 *     2010-10-08 (DSB):
 *        Move gap filling so that it is done immediately before the
 *        filtering.
+*     2010-10-13 (EC):
+*        Add "compreprocess" option to do common-mode subtraction as an
+*        optional pre-processing step.
 
 *  Copyright:
 *     Copyright (C) 2010 Univeristy of British Columbia.
@@ -128,6 +132,7 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
   /* Local Variables */
   double badfrac;           /* Fraction of bad samples to flag bad bolo */
   smfData *data=NULL;       /* Pointer to individual smfData */
+  int compreprocess;        /* COMmon-mode cleaning as pre-processing step */
   dim_t dcfitbox;           /* width of box for measuring DC steps */
   int dclimcorr;            /* Min number of correlated steps */
   int dcmaxsteps;           /* number of DC steps/min. to flag bolo bad */
@@ -181,7 +186,8 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
                     &dcthresh, &dcsmooth, &dclimcorr, &dkclean,
                     &fillgaps, &zeropad, NULL, NULL, NULL, NULL, NULL,
                     NULL, NULL, NULL, &flagslow, &flagfast, &order,
-                    &spikethresh, &spikebox, &noiseclip, &whiten, status );
+                    &spikethresh, &spikebox, &noiseclip, &whiten,
+                    &compreprocess, status );
 
   /* Loop over subarray */
   for( idx=0; (idx<array->ndat)&&(*status==SAI__OK); idx++ ) {
@@ -292,11 +298,69 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
     }
   }
 
+  /* Optionally call smf_calcmodel_com to perform a subset of the following
+     tasks as a pre-processing step:
+
+       - remove the common-mode
+       - flag outlier data using common-mode rejection
+       - determine relative flatfields using amplitude of common-mode
+
+     In order to do this we need to set up some temporary model container
+     files so that the routine can be called properly. All of the same
+     COMmon-mode and GAIn model parameters (e.g. com.* and gai.*) will be
+     used here. However, in addition the "compreprocess" flag must be set
+     for this operation to be performed. */
+
+  if( compreprocess ) {
+    smfArray *comdata = NULL;
+    smfGroup *comgroup = NULL;
+    smfDIMMData dat;
+    smfArray *gaidata = NULL;
+    smfGroup *gaigroup = NULL;
+    smfArray *quadata = NULL;
+    smfGroup *quagroup = NULL;
+
+    msgOutif(MSG__VERB," ", FUNC_NAME ": Remove common-mode", status);
+
+    /* Create model containers for COM, GAI and QUA */
+    smf_model_create( wf, NULL, &array, NULL, NULL, NULL, NULL, 1, SMF__COM,
+                      0, NULL, 0, NULL, NULL, &comgroup, 1, 1, &comdata, keymap,
+                      status );
+
+    smf_model_create( wf, NULL, &array, NULL, NULL, NULL, NULL, 1, SMF__GAI,
+                      0, NULL, 0, NULL, NULL, &gaigroup, 1, 1, &gaidata, keymap,
+                      status );
+
+    smf_model_create( wf, NULL, &array, NULL, NULL, NULL, NULL, 1, SMF__QUA,
+                      0, NULL, 0, NULL, NULL, &quagroup, 1, 1, &quadata, keymap,
+                      status );
+
+    /* Set up the smfDIMMData and call smf_calcmodel_com */
+
+    memset( &dat, 0, sizeof(dat) );
+    dat.res = &array;
+    dat.gai = &gaidata;
+    dat.qua = &quadata;
+    dat.noi = NULL;
+
+    smf_calcmodel_com( wf, &dat, 0, keymap, &comdata, SMF__DIMM_FIRSTITER,
+                       status );
+
+    /*** TIMER ***/
+    msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+               ":   ** %f s removing common-mode",
+               status, smf_timerupdate(&tv1,&tv2,status) );
+
+    /* Clean up */
+    if( comdata ) smf_close_related( &comdata, status );
+    if( comgroup ) smf_close_smfGroup( &comgroup, status );
+    if( gaidata ) smf_close_related( &gaidata, status );
+    if( gaigroup ) smf_close_smfGroup( &gaigroup, status );
+    if( quadata ) smf_close_related( &quadata, status );
+    if( quagroup ) smf_close_smfGroup( &quagroup, status );
 
 
-  /* *** This is where we should remove the common-mode, and also use ***
-     *** common-mode rejection of outlier data                        *** */
-
+  }
 
 
   /* Allocate space for noisemaps if required */

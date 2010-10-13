@@ -171,6 +171,15 @@ flagslow = 30
 
 # --- Many of the following may not be useful ---
 
+# If this flag is set, the common-mode calculation will be performed
+# additionally as a pre-processing step. All parameters com.* and gai.*
+# below are parsed and used (e.g., to also flag bad data and optionally
+# flatfield off the relative response to the common-mode signal). If this
+# pre-processing step is chosen, it is still possible to specify COM/GAI
+# as model components in the iterative solution
+
+#compreprocess=1
+
 # S/N threshold to detect DC steps. Note, this refers to the noise level
 # in the bolometer data after it has been smoothed with a median filter of
 # width given by DCSMOOTH. In order to find the equivalent threshold in

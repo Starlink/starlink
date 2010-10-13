@@ -23,7 +23,7 @@
 *                       int *filt_nnotch, int *dofilt, double *flagslow,
 *                       double *flagfast, int *order, double *spikethresh,
 *                       size_t *spikebox, double * noiseclip,
-*                       int *whiten, int *status )
+*                       int *whiten, int compreprocess, int *status )
 
 *  Arguments:
 *     keymap = AstKeyMap* (Given)
@@ -95,6 +95,8 @@
 *        mask.
 *     whiten = int * (Returned)
 *        Apply a whitening filter to the data?
+*     compreprocess = int * (Returned)
+*        If set do common-mode rejection and bad-data rejection.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -143,6 +145,8 @@
 *        Added zeropad.
 *     2010-10-12 (EC):
 *        Add whiten
+*     2010-10-13 (EC):
+*        Add compreprocess
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -200,7 +204,8 @@ void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac, dim_t *dcfitbox,
                        double *filt_notchhigh, int *filt_nnotch, int *dofilt,
                        double *flagslow, double *flagfast, int *order,
                        double *spikethresh, size_t *spikebox,
-                       double *noiseclip, int *whiten, int *status ) {
+                       double *noiseclip, int *whiten, int *compreprocess,
+                       int *status ) {
 
   int dofft=0;                  /* Flag indicating that filtering is required */
   int f_nnotch=0;               /* Number of notch filters in array */
@@ -500,4 +505,9 @@ void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac, dim_t *dcfitbox,
                *noiseclip );
   }
 
+  if( compreprocess ) {
+    astMapGet0I( keymap, "COMPREPROCESS", compreprocess );
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": COMPREPROCESS is %s", status,
+               (*compreprocess ? "enabled" : "disabled") );
+  }
 }

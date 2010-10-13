@@ -88,3 +88,40 @@ cleandk.whiten = 0
 
 cleandk.dkclean = 0
 cleandk.flagstat = 0
+
+# -------------------------------------------------------------------------
+# we can use smf_calcmodel_com to remove the common-mode as a
+# pre-processing step, so we have the com.* and gai.* parameter
+# defaults here
+
+# set this parameter to remove common-mode as a pre-processing step.
+# In this case it is still possible to use COM/GAI as model parameters
+# in the iterative solution.
+compreprocess = 0
+
+com.boxcar = 0
+com.boxcard = 0
+com.boxfact = 0
+com.boxmin = 0
+
+com.corr_tol = 5
+com.corr_abstol = 0.2
+com.gain_tol = 5
+com.gain_fgood = 0.25
+com.gain_rat = 4
+com.gain_abstol = 3
+com.gain_box = 6000
+com.fit_box = <undef>
+com.notfirst = 0
+
+# Setting com.gain_is_one non-zero causes all bolometer gains to be
+# forced to 1.0. Setting com.offset_is_zero non-zero causes all
+# bolometer offsets to be forced to 0.0. The correlation coefficients
+# are retained so that bad bolometer blocks are still identified and
+# rejected.
+
+com.gain_is_one = 0
+com.offset_is_zero = 0
+
+gai.flatfield = 0
+# -------------------------------------------------------------------------

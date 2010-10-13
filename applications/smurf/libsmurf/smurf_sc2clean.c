@@ -357,7 +357,7 @@ void smurf_sc2clean( int *status ) {
       smf_get_cleanpar( keymap, NULL, NULL, NULL, NULL, NULL, NULL, &dkclean,
                         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-                        status );
+                        NULL, status );
 
       if( dkclean && ffdata && ffdata->da && ffdata->da->dksquid ) {
         smfData *dksquid = ffdata->da->dksquid;
