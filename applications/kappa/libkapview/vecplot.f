@@ -148,10 +148,16 @@
 *        where <name> is the name of a plotting attribute, and <value>
 *        is the value to assign to the attribute.  Default values will
 *        be used for any unspecified attributes.  All attributes will be
-*        defaulted if a null value (!) is supplied.  See section
-*        "Plotting Attributes" in SUN/95 for a description of the
-*        available attributes.  Any unrecognised attributes are ignored
-*        (no error is reported).
+*        defaulted if a null value (!)---the initial default---is
+*        supplied.  To apply changes of style to only the current
+*        invocation, begin these attributes with a plus sign.  A mixture
+*        of persistent and temporary style changes is achieved by
+*        listing all the persistent attributes followed by a plus sign
+*        then the list temporary attributes.
+*
+*        See section "Plotting Attributes" in SUN/95 for a description
+*        of the available attributes.  Any unrecognised attributes are
+*        ignored (no error is reported).
 *
 *        The appearance of the text in the key is controlled using
 *        "String" attributes (e.g. Colour(Strings), Font(Strings),
@@ -225,10 +231,16 @@
 *        where <name> is the name of a plotting attribute, and <value>
 *        is the value to assign to the attribute.  Default values will
 *        be used for any unspecified attributes.  All attributes will be
-*        defaulted if a null value (!) is supplied.  See section
-*        "Plotting Attributes" in SUN/95 for a description of the
-*        available attributes.  Any unrecognised attributes are ignored
-*        (no error is reported).
+*        defaulted if a null value (!)---the initial default---is
+*        supplied.  To apply changes of style to only the current
+*        invocation, begin these attributes with a plus sign.  A mixture
+*        of persistent and temporary style changes is achieved by
+*        listing all the persistent attributes followed by a plus sign
+*        then the list temporary attributes.
+*
+*        See section "Plotting Attributes" in SUN/95 for a description
+*        of the available attributes.  Any unrecognised attributes are
+*        ignored (no error is reported).
 *
 *        The appearance of the vectors is controlled by the attributes
 *        Colour(Curves), Width(Curves), etc. (the synonym Vectors may be
@@ -313,12 +325,13 @@
 *     Copyright (C) 1993 Science & Engineering Research Council.
 *     Copyright (C) 1995, 1999, 2004 Central Laboratory of the Research
 *     Councils. Copyright (C) 2006 Particle Physics & Astronomy
-*     Research Council. All Rights Reserved.
+*     Research Council.  Copyright (C) 2010 Science & Technology
+*     Facilities Council.  All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -328,8 +341,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -368,6 +381,8 @@
 *     2006 April 12 (MJC):
 *        Remove unused variables, correct punctuation, remove references
 *        to a contour map, and wrapped long lines.
+*     2010 October 13 (MJC):
+*        Permit temporary style attributes.
 *     {enter_further_changes_here}
 
 *-
@@ -866,8 +881,9 @@
          CALL KPG1_ASPSY( '(VEC*TOR)', '(CURVES)', STATUS )
          CALL KPG1_ASPSY( '(TEXT)', '(STRINGS)', STATUS )
 
-*  Set the style for plotting in the key picture.
-         CALL KPG1_ASSET( 'KAPPA_VECPLOT', 'KEYSTYLE', IPLOTK,
+*  Set the style for plotting in the key picture.  The plus requests
+*  support of temporary attributes.
+         CALL KPG1_ASSET( 'KAPPA_VECPLOT', '+KEYSTYLE', IPLOTK,
      :                    STATUS )
 
 *  Now produce the key.
