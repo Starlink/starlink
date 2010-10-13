@@ -278,29 +278,33 @@
 *        same manner. Note, strings within text files can be separated by
 *        new lines as well as commas.
 *     STYLE = GROUP (Read)
-*        A group of attribute settings describing the plotting style to use
-*        when drawing the graphics specified by Parameter PLOT. The format
-*        of the positions reported on the screen may also be controlled.
+*        A group of attribute settings describing the plotting style to
+*        use when drawing the graphics specified by Parameter PLOT.  The
+*        format of the positions reported on the screen may also be
+*        controlled.
 *
 *        A comma-separated list of strings should be given in which each
-*        string is either an attribute setting, or the name of a text file
-*        preceded by an up-arrow character "^". Such text files should
-*        contain further comma-separated lists which will be read and
-*        interpreted in the same manner. Attribute settings are applied in
-*        the order in which they occur within the list, with later settings
-*        over-riding any earlier settings given for the same attribute.
+*        string is either an attribute setting, or the name of a text
+*        file preceded by an up-arrow character "^".  Such text files
+*        should contain further comma-separated lists which will be read
+*        and interpreted in the same manner.  Attribute settings are
+*        applied in the order in which they occur within the list, with
+*        later settings overriding any earlier settings given for the
+*        same attribute.
 *
 *        Each individual attribute setting should be of the form:
 *
 *           <name>=<value>
 *
-*        where <name> is the name of a plotting attribute, and <value> is
-*        the value to assign to the attribute. Default values will be
-*        used for any unspecified attributes. All attributes will be
-*        defaulted if a null value (!) is supplied. See section "Plotting
-*        Attributes" in SUN/95 for a description of the available
-*        attributes. Any unrecognised attributes are ignored (no error is
-*        reported).
+*        where <name> is the name of a plotting attribute, and <value>
+*        is the value to assign to the attribute.  Default values will
+*        be used for any unspecified attributes.  All attributes will be
+*        defaulted if a null value (!)---the initial default---is
+*        supplied.  To apply changes of style to only the current
+*        invocation, begin these attributes with a plus sign.  A mixture
+*        of persistent and temporary style changes is achieved by
+*        listing all the persistent attributes followed by a plus sign
+*        then the list temporary attributes.
 *
 *        In addition to the attributes which control the appearance of
 *        the graphics (Colour, Fount, etc), the following attributes may
@@ -386,7 +390,7 @@
 *     Copyright (C) 1995-2001 Central Laboratory of the Research
 *     Councils. Copyright (C) 2006 Particle Physics & Astronomy
 *     Research Council.
-*     Copyright (C) 2009 Science and Technology Facilities Council.
+*     Copyright (C) 2009-2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -496,6 +500,8 @@
 *     2009 July 24 (MJC):
 *        Remove QUIET parameter and use the current reporting level
 *        instead (set by the global MSG_FILTER environment variable).
+*     2010 October 13 (MJC):
+*        Permit temporary style attributes.
 *     {enter_further_changes_here}
 
 *-
@@ -782,9 +788,11 @@
 *  the BASE picture.
       BMAP = AST_GETMAPPING( IPLOTB, AST__BASE, AST__CURRENT, STATUS )
 
-*  If we are producing graphics, set its style.
+*  If we are producing graphics, set its style.  The plus requests
+*  support of temporary STYLE attributes.  Also allow for more than
+*  one call to KPG1_ASSET for STYLE by using the delimiter suffix.
       IF( PLOT .NE. 'NONE' ) THEN
-         CALL KPG1_ASSET( 'KAPPA_CURSOR', 'STYLE', IPLOTB, STATUS )
+         CALL KPG1_ASSET( 'KAPPA_CURSOR', '+STYLE+', IPLOTB, STATUS )
       END IF
 
 *  Set the PGPLOT viewport and AST Plot for the initially selected picture.
@@ -1130,10 +1138,13 @@
 *  If the requested Frame was not available, annul the error.
                IF( STATUS .EQ. SAI__ERROR ) CALL ERR_ANNUL( STATUS )
 
-*  Set the Style of the Plot using the STYLE parameter. This is done so
+*  Set the Style of the Plot using the STYLE parameter.  This is done so
 *  that the Format of each axis value (for instance) can be controlled
-*  using STYLE.
-               CALL KPG1_ASSET( 'KAPPA_CURSOR', 'STYLE', IPLOT, STATUS )
+*  using STYLE.  The plus requests support of temporary STYLE
+*  attributes.  Also allow for more than one call to KPG1_ASSET for
+*  SPECSTYLE by using the delimiter suffix.
+               CALL KPG1_ASSET( 'KAPPA_CURSOR', '+STYLE+', IPLOT,
+     :                          STATUS )
 
 *  Get the number of axes in the selected Frame.
                NAX = AST_GETI( IPLOT, 'NAXES', STATUS )
@@ -1542,6 +1553,10 @@
          END IF
 
       END IF
+
+*  Ensure that only persistent attributes are written to the parameter
+*  file.
+      CALL KPG1_ASSET( 'KAPPA_CURSOR', '+STYLE', IPLOT, STATUS )
 
 *  Shutdown procedure.
 *  ===================
