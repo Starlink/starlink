@@ -211,7 +211,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils.
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -232,6 +232,7 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -244,7 +245,9 @@
 *        Only store WCS information in the AGI database if the device is
 *        cleared upon opening. This stops the database file growing too
 *        large.
-*     {enter_changes_here}
+*     2010 October 13 (MJC):
+*        Allow temporary style attributes.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -357,7 +360,8 @@
      :                                   IPLOT, NFRM, STATUS )
 
 *  Set the attributes of the Plot to give the required Plotting style.
-      CALL KPG1_ASSET( APP, 'STYLE', IPLOT, STATUS )
+*  The plus prefix requests that temporary attributes be recognised.
+      CALL KPG1_ASSET( APP, '+STYLE', IPLOT, STATUS )
 
 *  Unless we are drawing over an existing plot, save the Plot and data
 *  reference with the new DATA picture. If possible, a TRANSFORM
