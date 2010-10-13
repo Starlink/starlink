@@ -102,6 +102,9 @@ void smf_filter_complement( smfFilter *filt, int *status ) {
     return;
   }
 
+  /* If this is an un-initialized filter simply return */
+  if( !filt->real ) return;
+
   /* The reference values are normalized to 1/ntslice -- by FFTW convention */
   ref = 1./ (double) filt->ntslice;
 
