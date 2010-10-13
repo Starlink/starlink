@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_whiten( double *re, double *im, double df, dim_t nf, size_t box,
-*                 double scale, int *status );
+*                 double scale, int complement, int *status );
 
 *  Arguments:
 *     re = double * (Given and Returned)
@@ -31,6 +31,9 @@
 *        If non-zero apply this scale factor to the amplitude of each element
 *        in the FFT (e.g. the 1/ntslice normalization required if no smfFilter
 *        is being applied to the data.)
+*     complement = int (Given)
+*        If set, apply the complement of the whitening filter, where the
+*        reference value is taken to be the value of scale (1 otherwise).
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -52,6 +55,8 @@
 *  History:
 *     2010-10-12 (EC):
 *        Initial version
+*     2010-10-13 (EC):
+*        Add complement to interface
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -102,7 +107,7 @@
 #define FUNC_NAME "smf_whiten"
 
 void smf_whiten( double *re, double *im, double df, dim_t nf, size_t box,
-                 double scale, int *status ) {
+                 double scale, int complement, int *status ) {
 
   int converged;         /* Has white noise level calc converged? */
   double fit[2];         /* fit coefficients */
@@ -273,10 +278,20 @@ void smf_whiten( double *re, double *im, double df, dim_t nf, size_t box,
 
       if( scale ) thescale = scale;
 
-      for( i=1; i<nf; i++ ) {
-        amp = thescale / (1. + A * pow( (double) i, B ));
-        re[i] *= amp;
-        im[i] *= amp;
+      if( complement ) {
+        /* Applying the complement of the whitening filter */
+        for( i=1; i<nf; i++ ) {
+          amp = thescale * ( 1. - 1. / (1. + A * pow( (double) i, B )) );
+          re[i] *= amp;
+          im[i] *= amp;
+        }
+      } else {
+        /* Applying the whitening filter */
+        for( i=1; i<nf; i++ ) {
+          amp = thescale / (1. + A * pow( (double) i, B ));
+          re[i] *= amp;
+          im[i] *= amp;
+        }
       }
 
     }

@@ -65,6 +65,8 @@
 *     2010-09-28 (DSB):
 *        Fill gaps, allowing padded regions to be replaced with artifical
 *        data.
+*     2010-10-13 (EC):
+*        Move calculation of complementary filter into smf_filter_execute
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -140,6 +142,7 @@ void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
   size_t tstride;               /* Time slice stride in data array */
+  int whiten;                   /* Applying whitening filter? */
   int zeropad;                  /* Pad with zeros? */
 
   /* Main routine */
@@ -209,7 +212,8 @@ void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
       /* Create a filter */
       filt = smf_create_smfFilter( res->sdata[idx], status );
-      smf_filter_fromkeymap( filt, kmap, res->sdata[idx]->hdr, &dofft, status );
+      smf_filter_fromkeymap( filt, kmap, res->sdata[idx]->hdr, &dofft,
+                             &whiten, status );
 
       if( *status == SMF__INFREQ ) {
         /* If a bad frequency was specified just annul the error and
@@ -252,8 +256,7 @@ void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
          we can then subtract it from the residual).
       */
       if( dofft ) {
-        smf_filter_complement( filt, status );
-        smf_filter_execute( wf, model->sdata[idx], filt, 0, status );
+        smf_filter_execute( wf, model->sdata[idx], filt, 1, whiten, status );
       }
 
       /* Now remove the filtered signals from the residual by subtracting

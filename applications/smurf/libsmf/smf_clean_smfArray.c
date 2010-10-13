@@ -14,7 +14,8 @@
 
 *  Invocation:
 *     smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
-*                         smfArray **noisemaps, AstKeyMap *keymap, int *status )
+*                         smfArray **noisemaps, AstKeyMap *keymap,
+*                         int *status )
 
 *  Arguments:
 *     wf = smfWorkForce * (Given)
@@ -46,8 +47,8 @@
 *     Gap filling  : FILLGAPS, ZEROPAD
 *     Baselines    : ORDER
 *     Common-Mode  : COMPREPROCESS
-*     Filtering    : FILT_EDGELOW, FILT_EDGEHIGH, FILT_NOTCHLOW, FILT_NOTCHHIGH,
-*                    APOD, FILT_WLIM, WHITEN
+*     Filtering    : FILT_EDGELOW, FILT_EDGEHIGH, FILT_NOTCHLOW,
+*                    FILT_NOTCHHIGH, APOD, FILT_WLIM, WHITEN
 *     Noisy Bolos  : NOISECLIP
 
 *  Notes:
@@ -127,7 +128,8 @@
 #define FUNC_NAME "smf_clean_smfArray"
 
 void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
-                         smfArray **noisemaps, AstKeyMap *keymap, int *status ){
+                         smfArray **noisemaps, AstKeyMap *keymap,
+                         int *status ){
 
   /* Local Variables */
   double badfrac;           /* Fraction of bad samples to flag bad bolo */
@@ -186,7 +188,7 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
                     &dcthresh, &dcsmooth, &dclimcorr, &dkclean,
                     &fillgaps, &zeropad, NULL, NULL, NULL, NULL, NULL,
                     NULL, NULL, NULL, &flagslow, &flagfast, &order,
-                    &spikethresh, &spikebox, &noiseclip, &whiten,
+                    &spikethresh, &spikebox, &noiseclip, NULL,
                     &compreprocess, status );
 
   /* Loop over subarray */
@@ -415,11 +417,11 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
        smf_filter_execute). */
 
     filt = smf_create_smfFilter( data, status );
-    smf_filter_fromkeymap( filt, keymap, data->hdr, &dofft, status );
+    smf_filter_fromkeymap( filt, keymap, data->hdr, &dofft, &whiten, status );
 
     if( (*status == SAI__OK) && dofft ) {
       msgOutif( MSG__VERB, "", FUNC_NAME ": frequency domain filter", status );
-      smf_filter_execute( wf, data, filt, whiten, status );
+      smf_filter_execute( wf, data, filt, 0, whiten, status );
 
       /*** TIMER ***/
       msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ":   ** %f s filtering data",

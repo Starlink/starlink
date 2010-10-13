@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap, smfHead *hdr,
-*                            int *dofilt, int *status )
+*                            int *dofilt, int *whiten, int *status )
 
 *  Arguments:
 *     filt = smfFilter * (Given and Returned)
@@ -26,6 +26,8 @@
 *        be NULL.
 *     dofilt = int* (Returned)
 *        If true, frequency-domain filtering is required
+*     whiten = int * (Returned)
+*        Set if whitening filter was also requested
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -54,8 +56,10 @@
 *        Choose filter edges based on scanvel (stored in hdr)
 *     2010-09-29 (DSB):
 *        Switch off apodisation unless the data is to be padded with zeros.
-*     2010-10-4 (DSB):
+*     2010-10-04 (DSB):
 *        Call smf_scale2freq to convert spatial scales to frequencies.
+*     2010-10-13 (EC):
+*        Add whiten flag to interface
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -102,7 +106,8 @@
 #define FUNC_NAME "smf_filter_fromkeymap"
 
 void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap,
-                            const smfHead *hdr, int *dofilt, int *status ) {
+                            const smfHead *hdr, int *dofilt, int *whiten,
+                            int *status ) {
 
   int dofft=0;              /* Set if freq. domain filtering the data */
   double f_edgelow;         /* Freq. cutoff for low-pass edge filter */
@@ -115,7 +120,7 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap,
   int f_nnotch=0;           /* Number of notch filters in array */
   int i;                    /* Loop count */
   int ival;                 /* Dummy integer argument */
-  int whiten;               /* Will we apply a whitening filter? */
+  int whitening;            /* Will we apply a whitening filter? */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -124,7 +129,8 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap,
   smf_get_cleanpar( keymap, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                     NULL, NULL, &f_edgelow, &f_edgehigh, &f_edgesmall,
                     &f_edgelarge, f_notchlow, f_notchhigh, &f_nnotch, &dofft,
-                    NULL, NULL, NULL, NULL, NULL, NULL, &whiten, NULL, status );
+                    NULL, NULL, NULL, NULL, NULL, NULL, &whitening, NULL,
+                    status );
 
   /* Modify edge filters if spacial scales were requested */
   smf_scale2freq( f_edgesmall, f_edgelarge, hdr, &f_edgelow, &f_edgehigh,
@@ -191,4 +197,7 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap,
                 "are being padded with artificial data rather than zeros.", status );
     }
   }
+
+  /* Return whiten if requested */
+  if( whiten ) *whiten = whitening;
 }

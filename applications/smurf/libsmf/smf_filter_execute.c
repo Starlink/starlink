@@ -14,16 +14,20 @@
 
 *  Invocation:
 
-*     smf_filter_execute( smfWorkForce *wf, smfData *data,
-*                         smfFilter *filt, int whiten, int *status )
+*     smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
+*                         int complement, int whiten, int *status )
 
 *  Arguments:
 *     wf = smfWorkForce * (Given)
 *        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData * (Given and Returned)
 *        The data to be filtered (performed in-place)
-*     filter = smfFilter* (Given)
+*     filter = smfFilter* (Given and Returned)
 *        A smfFilter to apply to the supplied data
+*     complement = int (Given)
+*        If 1 apply the complement of the filter (and whitening filter).
+*        If -1 apply the complement of the filter, and also set it back
+*        to its original state before returning.
 *     whiten = int (Given)
 *        If set, prior to applying the supplied filter, apply a whitening
 *        filter.
@@ -83,6 +87,9 @@
 *     2010-10-12 (EC):
 *        Optionally apply bolo-specific whitening filters before the
 *        smfFilter
+*     2010-10-13 (EC):
+*        If complement set, apply complement of both the supplied and
+*        whitening filters.
 
 *  Copyright:
 *     Copyright (C) 2007-2009 University of British Columbia.
@@ -139,6 +146,7 @@ typedef struct smfFilterExecuteData {
   size_t apod_length;      /* apodization length */
   size_t b1;               /* Index of first bolometer to be filtered */
   size_t b2;               /* Index of last bolometer to be filtered */
+  int complement;          /* Using complementary filter */
   smfData *data;           /* Pointer to master smfData */
   double *data_fft_r;      /* Real part of the data FFT (1-bolo) */
   double *data_fft_i;      /* Imaginary part of the data FFT (1-bolo)*/
@@ -408,7 +416,7 @@ void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
            double scale = use_filt_r ? 0 : 1. / (double ) filt->ntslice;
 
            smf_whiten( data_fft_r, data_fft_i, filt->df, filt->dim, 50,
-                       scale, status );
+                       scale, pdata->complement, status );
          }
 
          /* Apply the frequency-domain filter. Skip this step if the
@@ -515,8 +523,8 @@ void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
 
 #define FUNC_NAME "smf_filter_execute"
 
-void smf_filter_execute( smfWorkForce *wf, smfData *data,
-                         smfFilter *filt, int whiten, int *status ) {
+void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
+                         int complement, int whiten, int *status ) {
 
   /* Local Variables */
   size_t apod_length=0;           /* apodization length */
@@ -585,6 +593,9 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data,
 
   if( *status != SAI__OK ) return;
 
+  /* Using complement of the filter? */
+  if( complement ) smf_filter_complement( filt, status );
+
   /* Pointers to quality */
   qua = smf_select_qualpntr( data, NULL, status );
 
@@ -645,6 +656,7 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data,
     pdata->apod_length = apod_length;
     pdata->last = last;
     pdata->whiten = whiten;
+    pdata->complement = complement;
     pdata->ijob = -1;   /* Flag job as ready to start */
 
     /* Setup forward FFT plan using guru interface. Requires protection
@@ -722,4 +734,6 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data,
     job_data = astFree( job_data );
   }
 
+  /* Return the filter to its original state if required */
+  if( complement == -1 ) smf_filter_complement( filt, status );
 }

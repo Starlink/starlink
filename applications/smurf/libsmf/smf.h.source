@@ -913,10 +913,11 @@ void smf_filter_complement( smfFilter *filt, int *status );
 void smf_filter_edge( smfFilter *filt, double f, int lowpass, int *status );
 
 void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
-                         int whiten, int *status );
+                         int complement, int whiten, int *status );
 
 void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap,
-                            const smfHead *hdr, int *dofft, int *status );
+                            const smfHead *hdr, int *dofft, int *whiten,
+                            int *status );
 
 void smf_filter_ident( smfFilter *filt, int complex, int *status );
 
@@ -1637,7 +1638,7 @@ int smf_validate_smfHead( const smfHead * hdr, int hasfits, int hasstate,
                           int *status );
 
 void smf_whiten( double *re, double *im, double df, dim_t nf, size_t box,
-                 double scale, int *status );
+                 double scale, int complement, int *status );
 
 void smf_write_bolomap( smfArray *ast, smfArray *res, smfArray *lut,
                         smfArray *qua, smfDIMMData *dat, dim_t msize,
