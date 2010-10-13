@@ -26,36 +26,36 @@
 *     within a single set of annotated axes.  Each curve is displaced
 *     vertically by a specified offset to minimise overlap between the
 *     curves.  These offsets may be chosen automatically or specified by
-*     the user (see parameter SPACE).  The curves may be drawn in
+*     the user (see Parameter SPACE).  The curves may be drawn in
 *     several different ways such as a "join-the-dots" plot, a
-*     "staircase" plot, a "chain" plot, etc., (see parameter MODE).
+*     "staircase" plot, a "chain" plot, etc., (see Parameter MODE).
 *
 *     The data represented by each curve can be either a row or column
-*     (chosen using parameter ABSAXS) of any array component within the
-*     supplied NDF (see parameter COMP).  Vertical error bars may be
-*     drawn if the NDF contains a VARIANCE component (see parameter
+*     (chosen using Parameter ABSAXS) of any array component within the
+*     supplied NDF (see Parameter COMP).  Vertical error bars may be
+*     drawn if the NDF contains a VARIANCE component (see Parameter
 *     ERRBAR).  The vertical axis of the plot represents array value
-*     (or the logarithm of the array value---see parameter YLOG).  The
+*     (or the logarithm of the array value---see Parameter YLOG).  The
 *     horizontal axis represents position, and may be annotated using an
-*     axis selected from the Current Frame of the NDF (see parameter
+*     axis selected from the Current Frame of the NDF (see Parameter
 *     USEAXIS).
 *
 *     Each curve may be labelled using its pixel index or a label
-*     specified by the user (see parameters LINLAB and LABELS).  The
+*     specified by the user (see Parameters LINLAB and LABELS).  The
 *     appearance of these labels (size, colour, fount, horizontal
-*     position, etc.) can be controlled using parameter STYLE.  A key
+*     position, etc.) can be controlled using Parameter STYLE.  A key
 *     may be produced to the left of the main plot listing the vertical
-*     offsets of the curves (see parameter KEY).  The appearance of the
-*     key may be controlled using parameter KEYSTYLE.  Its position may
-*     be controlled using parameter KEYOFF.  Markers indicating the zero
+*     offsets of the curves (see Parameter KEY).  The appearance of the
+*     key may be controlled using Parameter KEYSTYLE.  Its position may
+*     be controlled using Parameter KEYOFF.  Markers indicating the zero
 *     point for each curve may also be drawn within the main plot (see
-*     parameter ZMARK).
+*     Parameter ZMARK).
 *
 *     The bounds of the plot on both axes can be specified using
 *     parameters XLEFT, XRIGHT, YBOT and YTOP.  If not specified they
 *     take default values which encompass the entire supplied data set.
 *     The current picture is usually cleared before plotting the new
-*     picture, but parameter CLEAR can be used to prevent this, allowing
+*     picture, but Parameter CLEAR can be used to prevent this, allowing
 *     several plots to be "stacked" together.  If a new plot is drawn
 *     over an existing plot, then the bounds of the new plot are set
 *     automatically to the bounds of the existing plot (XLEFT, XRIGHT,
@@ -75,13 +75,13 @@
 *     AXES = _LOGICAL (Read)
 *        TRUE if labelled and annotated axes are to be drawn around the
 *        plot.  If a null (!) value is supplied, FALSE is used if the
-*        plot is being aligned with an existing plot (see parameter
+*        plot is being aligned with an existing plot (see Parameter
 *        CLEAR), and TRUE is used otherwise.  Parameters USEAXIS and
 *        YLOG determine the quantities used to annotated the horizontal
 *        and vertical axes respectively.  The width of the margins left
-*        for the annotation may be controlled using parameter MARGIN.
+*        for the annotation may be controlled using Parameter MARGIN.
 *        The appearance of the axes (colours, founts, etc.) can be
-*        controlled using the parameter STYLE.  [!]
+*        controlled using the Parameter STYLE.  [!]
 *     CLEAR = _LOGICAL (Read)
 *        If TRUE the current picture is cleared before the plot is
 *        drawn.  If CLEAR is FALSE not only is the existing plot
@@ -99,23 +99,23 @@
 *     ERRBAR = _LOGICAL (Read)
 *        TRUE if vertical error bars are to be drawn.  This is only
 *        possible if the NDF contains a VARIANCE component, and
-*        parameter COMP is set to "Data".  The length of the error bars
-*        (in terms of standard deviations) is set by parameter SIGMA.
+*        Parameter COMP is set to "Data".  The length of the error bars
+*        (in terms of standard deviations) is set by Parameter SIGMA.
 *        The appearance of the error bars (width, colour, etc.) can be
-*        controlled using parameter STYLE.  See also parameter FREQ.
+*        controlled using Parameter STYLE.  See also Parameter FREQ.
 *        [FALSE]
 *     FREQ = _INTEGER (Read)
 *        The frequency at which error bars are to be plotted.  For
 *        instance, a value of 2 would mean that alternate points have
 *        error bars plotted.  This lets some plots be less cluttered.
 *        FREQ must lie in the range 1 to half of the number of points
-*        to be plotted.  FREQ is only accessed when parameter ERRBAR is
+*        to be plotted.  FREQ is only accessed when Parameter ERRBAR is
 *        TRUE.  [1]
 *     KEY = _LOGICAL (Read)
 *        TRUE if a key giving the offset of each curve is to be
 *        produced.  The appearance of this key can be controlled using
-*        parameter KEYSTYLE, and its position can be controlled using
-*        parameter KEYPOS.  [TRUE]
+*        Parameter KEYSTYLE, and its position can be controlled using
+*        Parameter KEYPOS.  [TRUE]
 *     KEYPOS() = _REAL (Read)
 *        Two values giving the position of the key.  The first value
 *        gives the gap between the right-hand edge of the multiple-line
@@ -129,7 +129,7 @@
 *        MARGIN is ignored.  [current value]
 *     KEYSTYLE = GROUP (Read)
 *        A group of attribute settings describing the plotting style to
-*        use for the key (see parameter KEY).
+*        use for the key (see Parameter KEY).
 *
 *        A comma-separated list of strings should be given in which each
 *        string is either an attribute setting, or the name of a text
@@ -137,8 +137,8 @@
 *        should contain further comma-separated lists which will be read
 *        and interpreted in the same manner.  Attribute settings are
 *        applied in the order in which they occur within the list, with
-*        later settings
-*        overriding any earlier settings given for the same attribute.
+*        later settings overriding any earlier settings given for the
+*        same attribute.
 *
 *        Each individual attribute setting should be of the form:
 *
@@ -171,7 +171,7 @@
 *        text files should contain further comma-separated lists which
 *        will be read and interpreted in the same manner.  The first
 *        string obtained is used as the label for the first curve
-*        requested using parameter LNINDX, the second string is used as
+*        requested using Parameter LNINDX, the second string is used as
 *        the label for the second curve, etc.  If the number of supplied
 *        strings is fewer than the number of curves requested using
 *        LNINDX, then extra default labels are used.  These are equal to
@@ -180,13 +180,13 @@
 *        then default labels are used for all curves.  [!]
 *     LINLAB = _LOGICAL (Read)
 *        If TRUE, the curves in the plot will be labelled using the
-*        labels specified by parameter LABELS.  A single label is placed
+*        labels specified by Parameter LABELS.  A single label is placed
 *        in-line with the curve.  The horizontal position and appearance
-*        of these labels can be controlled using parameter STYLE.
+*        of these labels can be controlled using Parameter STYLE.
 *        [TRUE]
 *     LNINDX = LITERAL (Read)
 *        Specifies the NDF pixel indices of the rows or columns to be
-*        displayed (see parameter ABSAXS).  A maximum of 100 lines may
+*        displayed (see Parameter ABSAXS).  A maximum of 100 lines may
 *        be selected.  It can take any of the following values.
 *
 *        - "ALL" or "*" --  All lines (rows or columns).
@@ -209,9 +209,9 @@
 *        right, top, left.  If fewer than four values are given, extra
 *        values are used equal to the first supplied value.  If these
 *        margins are too narrow any axis annotation may be clipped.  See
-*        also parameter KEYPOS.  [current value]
+*        also Parameter KEYPOS.  [current value]
 *     MARKER = _INTEGER (Read)
-*        This parameter is only accessed if parameter MODE is set to
+*        This parameter is only accessed if Parameter MODE is set to
 *        "Chain" or "Mark".  It specifies the symbol with which each
 *        position should be marked, and should be given as an integer
 *        PGPLOT marker type.  For instance, 0 gives a box, 1 gives a
@@ -231,7 +231,7 @@
 *        - "Point" -- A dot is plotted at each point.
 *
 *        - "Mark" -- Each point is marker with a symbol specified by
-*        parameter MARKER.
+*        Parameter MARKER.
 *
 *        - "Chain" -- A combination of "Line" and "Mark".
 *
@@ -240,7 +240,7 @@
 *        NDF structure containing the array to be plotted.
 *     OFFSET() = _DOUBLE (Read)
 *        This parameter is used to obtain the vertical offsets for the
-*        data curve when parameter SPACE is given the value "Free".  The
+*        data curve when Parameter SPACE is given the value "Free".  The
 *        number of values supplied should equal the number of curves
 *        being drawn.
 *     PENS = GROUP (Read)
@@ -254,11 +254,11 @@
 *        plotting attributes to be used when drawing the curve.  For
 *        instance, the string "width=0.02,colour=red,style=2" produces a
 *        thick, red, dashed curve.  Attributes which are unspecified in
-*        a string default to the values implied by parameter STYLE.  If
+*        a string default to the values implied by Parameter STYLE.  If
 *        a null value (!) is given for PENS, then the pen attributes
-*        implied by parameter STYLE are used.  [!]
+*        implied by Parameter STYLE are used.  [!]
 *     SIGMA = LITERAL (Read)
-*        If vertical error bars are produced (see parameter ERRBAR),
+*        If vertical error bars are produced (see Parameter ERRBAR),
 *        then SIGMA gives the number of standard deviations that the
 *        error bars are to represent.  [current value]
 *     SPACE = LITERAL (Read)
@@ -280,7 +280,7 @@
 *        point is so large that it overlaps another curve.
 *
 *        - "Free" -- The offsets to use are obtained explicitly using
-*        parameter OFFSET.
+*        Parameter OFFSET.
 *
 *        - "None" -- No vertical offsets are used.  All curves are
 *        displayed with the same zero point.
@@ -316,22 +316,22 @@
 *        The appearance of the data curves is controlled by the
 *        attributes Colour(Curves), Width(Curves), etc. (the synonym
 *        Lines may be used in place of Curves).  The appearance of
-*        markers used if parameter MODE is set to "Point", "Mark" or
+*        markers used if Parameter MODE is set to "Point", "Mark" or
 *        "Chain" is controlled by Colour(Markers), Width(Markers), etc.
 *        (the synonym Symbols may be used in place of Markers).  The
 *        appearance of the error bars is controlled using
-*        Colour(ErrBars), Width(ErrBars), etc.  (see parameter ERRBAR).
+*        Colour(ErrBars), Width(ErrBars), etc.  (see Parameter ERRBAR).
 *        The appearance of the zero-point markers is controlled using
 *        Colour(ZeroMark), Size(ZeroMark), etc.  The appearance of the
 *        curve labels is controlled using Colour(Labels), Size(Labels),
 *        etc.  LabPos(Left) controls the horizontal position of the
-*        in-line curve label (see parameter LINLAB), and LabPos(Right)
+*        in-line curve label (see Parameter LINLAB), and LabPos(Right)
 *        controls the horizontal position of the curve label associated
-*        with the right-hand zero-point marker (see parameter ZMARK).
+*        with the right-hand zero-point marker (see Parameter ZMARK).
 *        LabPos without any qualifier is equivalent to LabPos(Left).
 *        LabPos values are floating point, with 0.0 meaning the left
 *        edge of the plotting area, and 1.0 the right edge.  Values
-*        outside the range 0 to 1 may be used.  [current value]
+*        outside the range 0 to 1 may be used.   [current value]
 *     USEAXIS = LITERAL (Read)
 *        The quantity to be used to annotate the horizontal axis
 *        of the plot specified by using one of the following options.
@@ -354,7 +354,7 @@
 *        reported if the profile passes through RA=0 because it will
 *        introduce a non-monotonic jump in axis value (from 0h to 24h,
 *        or 24h to 0h).  If a null (!) value is supplied, the value of
-*        parameter ABSAXS is used.  [!]
+*        Parameter ABSAXS is used.  [!]
 *     XLEFT = LITERAL (Read)
 *        The axis value to place at the left-hand end of the horizontal
 *        axis.  If a null (!) value is supplied, the value used is the
@@ -392,9 +392,9 @@
 *        left and right edges of the main plot for each curve.  The
 *        vertical position of these lines corresponds to the zero point
 *        for the corresponding curve.  The right-hand marker is
-*        annotated with the curve label (see parameter LABELS).  The
+*        annotated with the curve label (see Parameter LABELS).  The
 *        appearance of these markers can be controlled using the
-*        parameter STYLE.  [TRUE]
+*        Parameter STYLE.  [TRUE]
 
 *  Examples:
 *     mlinplot rcw3_b1 reset \
@@ -443,7 +443,7 @@
 *     store the key if present; and a DATA picture containing just the
 *     data plot.  Note, the FRAME picture is only created if annotated
 *     axes or a key has been drawn, or if non-zero margins were
-*     specified using parameter MARGIN.
+*     specified using Parameter MARGIN.
 
 *  Related Applications:
 *     KAPPA: LINPLOT; Figaro: ESPLOT, IPLOTS, MSPLOT, SPLOT, SPECGRID;
@@ -590,7 +590,7 @@
       INTEGER NFRM               ! Frame index increment between IWCS
                                  ! and IPLOT
       INTEGER NKP                ! Number  of values supplied for
-                                 ! parameter KEYPOS
+                                 ! Parameter KEYPOS
       INTEGER NLONUM             ! Used length of string CLONUM
       INTEGER NMARG              ! No.  of margin values given
       INTEGER NUPNUM             ! Used length of string CUPNUM
@@ -1029,7 +1029,7 @@ c         IMODE = 4
       IF ( KEY ) THEN
 
 *  If no value was supplied for the vertical position of the KEY using
-*  parameter KEYPOS, find the value which puts the top of the key level
+*  Parameter KEYPOS, find the value which puts the top of the key level
 *  with the top of the DATA picture.
          IF ( NKP .LT. 2 ) THEN
 
@@ -1061,7 +1061,7 @@ c         IMODE = 4
             CALL PGQVP( 2, DUMMY, DUMMY, Y1, Y2 )
             KEYOFF = ( KEYOFF - Y1 )/( Y2 - Y1 )
 
-*  If the horizontal positions was given using parameter KEYPOS, just
+*  If the horizontal positions was given using Parameter KEYPOS, just
 *  activate the KEY picture.
          ELSE
             KEYOFF = KEYPOS( 2 )
