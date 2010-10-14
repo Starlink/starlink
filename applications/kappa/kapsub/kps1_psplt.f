@@ -83,7 +83,7 @@
 *     Copyright (C) 1999-2001, 2004 Central Laboratory of the Research
 *     Councils.
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2008 Science and Technology Faciities Council.
+*     Copyright (C) 2008, 2010 Science and Technology Faciities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -137,6 +137,8 @@
 *        Free resources allocated by KPG1_ASPSY.
 *     2008 June 17 (MJC):
 *        Trim trailing blanks from output NDF character components.
+*     2010 October 14 (MJC):
+*        Permit temporary style attributes.
 *     {enter_further_changes_here}
 
 *-
@@ -362,7 +364,7 @@
 
 *  Set up the plotting characteristics to use when drawing the line.
          CALL KPG1_ASPSY( '(LIN*ES)', '(CURVES)', STATUS )
-         CALL KPG1_ASSET( 'KAPPA_PSF', 'STYLE', IPLOT, STATUS )
+         CALL KPG1_ASSET( 'KAPPA_PSF', '+STYLE', IPLOT, STATUS )
 
 *  Plot the fitted function.
          CALL AST_POLYCURVE( IPLOT, NBIN, 2, NBIN, WORK, STATUS )

@@ -215,10 +215,16 @@
 *        where <name> is the name of a plotting attribute, and <value>
 *        is the value to assign to the attribute.  Default values will
 *        be used for any unspecified attributes.  All attributes will be
-*        defaulted if a null value (!) is supplied.  See section
-*        "Plotting Attributes" in SUN/95 for a description of the
-*        available attributes.  Any unrecognised attributes are ignored
-*        (no error is reported).
+*        defaulted if a null value (!)---the initial default---is
+*        supplied.  To apply changes of style to only the current
+*        invocation, begin these attributes with a plus sign.  A mixture
+*        of persistent and temporary style changes is achieved by
+*        listing all the persistent attributes followed by a plus sign
+*        then the list temporary attributes.
+*
+*        See section "Plotting Attributes" in SUN/95 for a description
+*        of the available attributes.  Any unrecognised attributes are
+*        ignored (no error is reported).
 *
 *        The appearance of the model curve is controlled by the
 *        attributes Colour(Curves), Width(Curves), etc. (the synonym
@@ -375,7 +381,7 @@
 *     Copyright (C) 1990-1993 Science & Engineering Research Council.
 *     Copyright (C) 1998-2001, 2004, 2006 Particle Physics & Astronomy
 *     Research Council.
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -473,6 +479,8 @@
 *        is normalised to the peak value in the final, potentially
 *        *non-Gaussian*, fit to the first star (i.e. the fit that may
 *        have a gamma value different to 2.0).
+*     2010 October 14 (MJC):
+*        Document temporary style attributes.
 *     {enter_further_changes_here}
 *-
 
