@@ -31,16 +31,16 @@
 *
 *     By default, numerical data values are displayed along the long
 *     edge of the key.  The values corresponding to the maximum and
-*     minimum colour index are supplied using parameters HIGH and LOW.
+*     minimum colour index are supplied using Parameters HIGH and LOW.
 *     Intermediate colour indices are labelled with values which are
 *     linearly interpolated between these two extreme values.
 *
 *     The rectangular area in which the key (plus annotations) is drawn
 *     may be specified either using a graphics cursor, or by specifying
-*     the co-ordinates of two corners using parameters LBOUND and
+*     the co-ordinates of two corners using Parameters LBOUND and
 *     UBOUND.  Additionally, there is an option to make the key fill the
-*     current picture.  See parameter MODE.  The key may be constrained
-*     to the current picture using parameter CURPIC.
+*     current picture.  See Parameter MODE.  The key may be constrained
+*     to the current picture using Parameter CURPIC.
 *
 *     The appearance of the annotation my be controlled in detail using
 *     the STYLE parameter.
@@ -50,30 +50,30 @@
 
 *  ADAM Parameters:
 *     COMP = LITERAL (Read)
-*        The component (within the NDF given by parameter NDF) which is
+*        The component (within the NDF given by Parameter NDF) which is
 *        currently displayed.  It may be "Data", "Quality", "Variance",
 *        or "Error" (where "Error" is an alternative to "Variance" and
 *        causes the square root of the variance values to be used).  If
 *        "Quality" is specified, then the quality values are treated as
 *        numerical values (in the range 0 to 255).  The dynamic default
-*        is obtained from global parameter COMP which is set by
-*        applications such as KAPPA:DISPLAY. []
+*        is obtained from global Parameter COMP which is set by
+*        applications such as KAPPA:DISPLAY.  []
 *     CURPIC = _LOGICAL (Read)
 *        If CURPIC is TRUE, the colour table key is to lie within the
 *        current picture, otherwise the new picture can lie anywhere
 *        within the BASE picture.  This parameter ignored if the
-*        current-picture mode is selected. [FALSE]
+*        current-picture mode is selected.  [FALSE]
 *     DEVICE = DEVICE (Read)
 *        The image-display device on which the colour table is to be
 *        drawn.  The device must be in one of the following GNS
 *        categories: IMAGE_DISPLAY, IMAGE_OVERLAY, MATRIX_PRINTER, or
 *        WINDOW, and have at least 24 greyscale intensities or colour
 *        indices.  It must also not reset when the device is opened
-*        (since the colour table would be lost) unless parameter LUT
+*        (since the colour table would be lost) unless Parameter LUT
 *        does not have the null value.  [Current image-display device]
 *     FRAME = LITERAL (Read)
 *        Specifies the co-ordinate Frame of the positions supplied using
-*        parameters LBOUND and UBOUND.  The following Frames will always
+*        Parameters LBOUND and UBOUND.  The following Frames will always
 *        be available.
 *
 *        - "GRAPHICS" -- gives positions in millimetres from the
@@ -100,7 +100,7 @@
 *        There may be additional Frames available, describing previously
 *        displayed data. If a null value is supplied, the current Frame
 *        associated with the displayed data (if any) is used.  This
-*        parameter is only accessed if parameter MODE is set to "XY".
+*        parameter is only accessed if Parameter MODE is set to "XY".
 *        ["BASEPIC"]
 *     HIGH = _REAL (Read)
 *        The value corresponding to the maximum colour index.  It is
@@ -111,7 +111,7 @@
 *     LBOUND = LITERAL (Read)
 *        Co-ordinates of the lower-left corner of the rectangular region
 *        containing the colour ramp and annotation, in the co-ordinate
-*        Frame specified by parameter FRAME (supplying a colon ":" will
+*        Frame specified by Parameter FRAME (supplying a colon ":" will
 *        display details of the selected co-ordinate Frame).  The
 *        position should be supplied as a list of formatted axis values
 *        separated by spaces or commas.  A null (!) value causes the
@@ -139,8 +139,8 @@
 *        being 3, and the second being arbitrary.  The method used to
 *        compress or expand the colour table if the second dimension is
 *        different from the number of unreserved colour indices is
-*        controlled by parameter NN.  Also the LUT's values must lie in
-*        the range 0.0--1.0. [!]
+*        controlled by Parameter NN.  Also the LUT's values must lie in
+*        the range 0.0--1.0.  [!]
 *     MODE = LITERAL (Read)
 *        Method for defining the position, size and shape of the
 *        rectangular region containing the colour ramp and annotation.
@@ -149,7 +149,7 @@
 *        - "Cursor" --  The graphics cursor is used to supply two
 *        diametrically opposite corners or the region.
 *
-*        - "XY" -- The parameters LBOUND and UBOUND are used to get the
+*        - "XY" -- The Parameters LBOUND and UBOUND are used to get the
 *        limits.
 *
 *        - "Picture" -- The whole of the current picture is used.
@@ -218,7 +218,7 @@
 *     UBOUND = LITERAL (Read)
 *        Co-ordinates of the upper-right corner of the rectangular
 *        region containing the colour ramp and annotation, in the
-*        co-ordinate Frame specified by parameter FRAME (supplying a
+*        co-ordinate Frame specified by Parameter FRAME (supplying a
 *        colon ":" will display details of the selected co-ordinate
 *        Frame).  The position should be supplied as a list of formatted
 *        axis values separated by spaces or commas.  A null (!) value
@@ -632,8 +632,8 @@
       END IF
 
 *  Set the PGPLOT viewport to these bounds.
-      CALL  KPG1_PGCUT( REAL( C1( 1 ) ), REAL( C2( 1 ) ),
-     :                  REAL( C1( 2 ) ), REAL( C2( 2 ) ), STATUS )
+      CALL KPG1_PGCUT( REAL( C1( 1 ) ), REAL( C2( 1 ) ),
+     :                 REAL( C1( 2 ) ), REAL( C2( 2 ) ), STATUS )
 
 *  Save the current viewport as a new KEY picture in the graphics database.
       CALL AGP_SVIEW( 'KEY', 'KAPPA_LUTVIEW', IPICK, STATUS )
