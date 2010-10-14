@@ -21,10 +21,10 @@
 
 *  Description:
 *     This application draws the outlines of regions described in
-*     a supplied 2-dimensional ARD file (an `ARD Description' - see
+*     a supplied two-dimensional ARD file (an `ARD Description'--see
 *     SUN/183). The outlines are drawn over the top of a previously
-*     displayed picture, aligned (if possible) in the current coordinate
-*     Frame of the previously drawn picture.
+*     displayed picture, aligned (if possible) in the current
+*     co-ordinate Frame of the previously drawn picture.
 
 *  Usage:
 *     ardplot ardfile [device] [regval]
@@ -41,14 +41,14 @@
 *        are specified in RA/DEC (FK5,J2000). The statement "COFRAME(PIXEL)"
 *        indicates explicitly that positions are specified in pixel
 *        co-ordinates. The ARDFILE parameter is only accessed if
-*        parameter REGION is given a null (!) value.
+*        Parameter REGION is given a null (!) value.
 *     DEVICE = DEVICE (Read)
-*        The plotting device. [Current graphics device]
+*        The plotting device.  [Current graphics device]
 *     REGION = FILENAME (Read)
 *        The name of a file containing an AST Region to be outlined, or
-*        null (!) if the ARD region defined by parameter ARDFILE is to be
+*        null (!) if the ARD region defined by Parameter ARDFILE is to be
 *        outlined. Suitable files can be created using the ATOOLS
-*        package. [!]
+*        package.  [!]
 *     REGVAL = _INTEGER (Read)
 *        Indicates which regions within the ARD description are to be
 *        outlined. If zero (the default) is supplied, then the plotted
@@ -60,7 +60,7 @@
 *        to the absolute value of the supplied index are outlined. See
 *        SUN/183 for further information on the numbering of regions
 *        within an ARD description. The REGVAL parameter is only accessed
-*        if parameter REGION is given a null (!) value. [0]
+*        if Parameter REGION is given a null (!) value.   [0]
 *     STYLE = GROUP (Read)
 *        A group of attribute settings describing the plotting style to use
 *        for the curves.
@@ -115,7 +115,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -125,8 +125,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -136,7 +136,8 @@
 *     13-SEP-2001 (DSB):
 *        Original version.
 *     25-OCT-2001 (DSB):
-*        Make pixel coords the default coord system for the ard file.
+*        Make pixel co-ordimnates the default coord system for the ARD
+*        file.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
 *     15-NOV-2005 (DSB):
@@ -254,7 +255,7 @@
          CALL PGQWIN( GBOX( 1 ), GBOX( 3 ), GBOX( 2 ), GBOX( 4 ) )
 
 *  Select the PIXEL Frame as the current Frame in the Plot so that
-*  pixel coords become the default coord system for the ARD file.
+*  pixel co-ordinates become the default coord system for the ARD file.
          CALL KPG1_ASFFR( IPLOT, 'PIXEL', IPIX, STATUS )
          CALL AST_SETI( IPLOT, 'CURRENT', IPIX, STATUS )
 
