@@ -55,8 +55,8 @@
 *     AXES = _LOGICAL (Read)
 *        TRUE if labelled and annotated axes are to be drawn around the
 *        plot.  The width of the margins left for the annotation may be
-*        controlled using parameter MARGIN.  The appearance of the axes
-*        (colours, founts, etc,) can be controlled using the parameter
+*        controlled using Parameter MARGIN.  The appearance of the axes
+*        (colours, founts, etc,) can be controlled using the Parameter
 *        STYLE.  [TRUE]
 *     CLEAR = _LOGICAL (Read)
 *        If TRUE the current picture is cleared before the plot is
@@ -74,7 +74,7 @@
 *        the value of PCRANGE. Note, this parameter controls the range
 *        of data used in the fitting algorithm.  The range of data
 *        displayed in the plot can be specified separately using
-*        parameters XLEFT, XRIGHT, YBOT, and YTOP. [!]
+*        Parameters XLEFT, XRIGHT, YBOT, and YTOP. [!]
 *     DEVICE = DEVICE (Read)
 *        The graphics workstation on which to produce the plot.  If a
 *        null value (!) is supplied no plot will be made.
@@ -129,7 +129,7 @@
 *        pixels that lie in the lower and upper two-percent intensity
 *        range of IN2.  Note, this parameter controls the range of data
 *        used in the fitting algorithm.  The range of data displayed in
-*        the plot can be specified separately using parameters XLEFT,
+*        the plot can be specified separately using Parameters XLEFT,
 *        XRIGHT, YBOT, and YTOP.  [2,98]
 *     SLOPE = _REAL (Write)
 *        An output parameter giving the slope of the linear
@@ -172,7 +172,7 @@
 *        [current value]
 *     TITLE = LITERAL (Read)
 *        Value for the title of the output NDF.  A null value will cause
-*        the title of the NDF supplied for parameter IN1 to be used
+*        the title of the NDF supplied for Parameter IN1 to be used
 *        instead.  [!]
 *     XLEFT = _REAL (Read)
 *        The axis value to place at the left hand end of the horizontal
@@ -238,7 +238,7 @@
 *     axes and data plot, and a DATA picture containing just the data
 *     plot.  Note, the FRAME picture is only created if annotated axes
 *     have been drawn, or if non-zero margins were specified using
-*     parameter MARGIN.  The world co-ordinates in the DATA picture will
+*     Parameter MARGIN.  The world co-ordinates in the DATA picture will
 *     correspond to data values in the two NDFs.
 
 *  Related Applications:
@@ -280,7 +280,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -290,8 +290,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -568,7 +568,7 @@
       CALL NDF_UNMAP( NDF2S, '*', STATUS )
 
 *  Write the values of the gradient and offset of the final fit to the
-*  parameters SLOPE and OFFSET.
+*  Parameters SLOPE and OFFSET.
       CALL PAR_PUT0R( 'SLOPE', SLOPE, STATUS )
       CALL PAR_PUT0R( 'OFFSET', OFFSET, STATUS )
 
