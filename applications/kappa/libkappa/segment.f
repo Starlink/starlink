@@ -228,10 +228,16 @@
 *        where <name> is the name of a plotting attribute, and <value>
 *        is the value to assign to the attribute.  Default values will
 *        be used for any unspecified attributes.  All attributes will be
-*        defaulted if a null value (!) is supplied.  See section
-*        "Plotting Attributes" in SUN/95 for a description of the
-*        available attributes.  Any unrecognised attributes are ignored
-*        (no error is reported).
+*        defaulted if a null value (!)---the initial default---is
+*        supplied.  To apply changes of style to only the current
+*        invocation, begin these attributes with a plus sign.  A mixture
+*        of persistent and temporary style changes is achieved by
+*        listing all the persistent attributes followed by a plus sign
+*        then the list temporary attributes.
+*
+*        See section "Plotting Attributes" in SUN/95 for a description
+*        of the available attributes.  Any unrecognised attributes are
+*        ignored (no error is reported).
 *
 *        The appearance of the lines forming the edges of each polygon
 *        is controlled by the attributes Colour(Curves), Width(Curves),
@@ -327,7 +333,9 @@
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council.
 *     Copyright (C) 1995, 1997-1998, 2000, 2004 Central Laboratory of
-*     the Research Councils. All Rights Reserved.
+*     the Research Councils.
+*     Copyright (C) 2010 Science & Facilities Research Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -376,6 +384,8 @@
 *        specified in the current Frame of the output NDF.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL.
+*     2010 October 14 (MJC):
+*        Allow temporary style attributes.
 *     {enter_further_changes_here}
 
 *-
@@ -764,12 +774,14 @@
             LINES = 0
          END IF
 
-*  Set the plotting style if anything is to be drawn.
+*  Set the plotting style if anything is to be drawn.  The plus prefix
+*  before the parameter name requests support of temporary STYLE
+*  attributes.
          IF( PLOT .NE. 'NONE' ) THEN
             CALL KPG1_ASPSY( '(LIN*ES)', '(CURVES)', STATUS )
             CALL KPG1_ASPSY( '(EDGE*S)', '(CURVES)', STATUS )
             CALL KPG1_ASPSY( '(VERT*ICES)', '(MARKERS)', STATUS )
-            CALL KPG1_ASSET( 'KAPPA_SEGMENT', 'STYLE', IPLOT, STATUS )
+            CALL KPG1_ASSET( 'KAPPA_SEGMENT', '+STYLE', IPLOT, STATUS )
             CALL KPG1_ASPSY( ' ', ' ', STATUS )
          END IF
 
