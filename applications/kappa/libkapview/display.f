@@ -105,11 +105,11 @@
 *        A comma-separated list of strings should be given in which each
 *        string is either an attribute setting, or the name of a text
 *        file preceded by an up-arrow character "^".  Such text files
-*        should contain further comma-separated lists which will be
-*        read and interpreted in the same manner.  Attribute settings
-*        are applied in the order in which they occur within the list,
-*        with later settings overriding any earlier settings given for
-*        the same attribute.
+*        should contain further comma-separated lists which will be read
+*        and interpreted in the same manner.  Attribute settings are
+*        applied in the order in which they occur within the list, with
+*        later settings overriding any earlier settings given for the
+*        same attribute.
 *
 *        Each individual attribute setting should be of the form:
 *
@@ -118,10 +118,16 @@
 *        where <name> is the name of a plotting attribute, and <value>
 *        is the value to assign to the attribute.  Default values will
 *        be used for any unspecified attributes.  All attributes will be
-*        defaulted if a null value (!) is supplied.  See section
-*        "Plotting Attributes" in SUN/95 for a description of the
-*        available attributes.  Any unrecognised attributes are ignored
-*        (no error is reported).  [current value]
+*        defaulted if a null value (!)---the initial default---is
+*        supplied.  To apply changes of style to only the current
+*        invocation, begin these attributes with a plus sign.  A mixture
+*        of persistent and temporary style changes is achieved by
+*        listing all the persistent attributes followed by a plus sign
+*        then the list temporary attributes.
+*
+*        See section "Plotting Attributes" in SUN/95 for a description
+*        of the available attributes.  Any unrecognised attributes are
+*        ignored (no error is reported).  [current value]
 *     CENTRE = LITERAL (Read)
 *        The co-ordinates of the data pixel to be placed at the centre
 *        of the image, in the current co-ordinate Frame of the NDF
@@ -186,11 +192,11 @@
 *        A comma-separated list of strings should be given in which each
 *        string is either an attribute setting, or the name of a text
 *        file preceded by an up-arrow character "^".  Such text files
-*        should contain further comma-separated lists which will be
-*        read and interpreted in the same manner.  Attribute settings
-*        are applied in the order in which they occur within the list,
-*        with later settings overriding any earlier settings given for
-*        the same attribute.
+*        should contain further comma-separated lists which will be read
+*        and interpreted in the same manner.  Attribute settings are
+*        applied in the order in which they occur within the list, with
+*        later settings overriding any earlier settings given for the
+*        same attribute.
 *
 *        Each individual attribute setting should be of the form:
 *
@@ -199,10 +205,16 @@
 *        where <name> is the name of a plotting attribute, and <value>
 *        is the value to assign to the attribute.  Default values will
 *        be used for any unspecified attributes.  All attributes will be
-*        defaulted if a null value (!) is supplied.  See section
-*        "Plotting Attributes" in SUN/95 for a description of the
-*        available attributes.  Any unrecognised attributes are ignored
-*        (no error is reported).
+*        defaulted if a null value (!)---the initial default---is
+*        supplied.  To apply changes of style to only the current
+*        invocation, begin these attributes with a plus sign.  A mixture
+*        of persistent and temporary style changes is achieved by
+*        listing all the persistent attributes followed by a plus sign
+*        then the list temporary attributes.
+*
+*        See section "Plotting Attributes" in SUN/95 for a description
+*        of the available attributes.  Any unrecognised attributes are
+*        ignored (no error is reported).
 *
 *        Axis 1 is always the "data value" axis.  So for instance, to
 *        set the label for the data-value axis, assign a value to
@@ -347,11 +359,11 @@
 *        A comma-separated list of strings should be given in which each
 *        string is either an attribute setting, or the name of a text
 *        file preceded by an up-arrow character "^".  Such text files
-*        should contain further comma-separated lists which will be
-*        read and interpreted in the same manner.  Attribute settings
-*        are applied in the order in which they occur within the list,
-*        with later settings overriding any earlier settings given for
-*        the same attribute.
+*        should contain further comma-separated lists which will be read
+*        and interpreted in the same manner.  Attribute settings are
+*        applied in the order in which they occur within the list, with
+*        later settings overriding any earlier settings given for the
+*        same attribute.
 *
 *        Each individual attribute setting should be of the form:
 *
@@ -514,10 +526,11 @@
 *  Copyright:
 *     Copyright (C) 1990-1992 Science & Engineering Research Council.
 *     Copyright (C) 1995, 1997-1999, 2001, 2004 Central Laboratory of
-*     the Research Councils. Copyright (C) 2006 Particle Physics &
-*     Astronomy Research Council. All Rights Reserved.
-*     Copyright (C) 2007 Science & Technology Facilties Council. All
-*     Rights Reserved.
+*     the Research Councils.
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2007, 2009, 2010 Science & Technology Facilities
+*     Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -638,6 +651,8 @@
 *        Use NINT instead of KPG1_FLOOR/CEIL when calculating WILBND and
 *        WIUBND. This avoids slight numerical inaccuracies introduced by
 *        complex WCS Mappings producing shifts of whole pixels.
+*     2010 October 14 (MJC):
+*        Permit temporary style attributes.
 *     {enter_further_changes_here}
 
 *-
@@ -1470,13 +1485,14 @@
          END IF
 
 *  If a border is required, do the whole thing again, ensuring that the
-*  relevant Plot attributes are cleared first.
+*  relevant Plot attributes are cleared first.  The plus sign requests
+*  support of temporary attributes.
          IF( BORDER ) THEN
 
             CALL AST_CLEAR( IPLOT, 'COLOUR', STATUS )
             CALL AST_CLEAR( IPLOT, 'WIDTH', STATUS )
             CALL AST_CLEAR( IPLOT, 'STYLE', STATUS )
-            CALL KPG1_ASSET( 'KAPPA_DISPLAY', 'BORSTYLE', IPLOT,
+            CALL KPG1_ASSET( 'KAPPA_DISPLAY', '+BORSTYLE', IPLOT,
      :                        STATUS )
 
             DO IREG = 1, AST_MAPSIZE( RPLOTS, STATUS )
@@ -1505,12 +1521,13 @@
          IF( AXES ) CALL KPG1_ASGRD( IPLOT, IPICF, .TRUE., STATUS )
 
 *  If a border is required, ensure that the relevant Plot attributes are
-*  cleared, set the new style, and draw it.
+*  cleared, set the new style, and draw it.  The plus sign requests
+*  support of temporary attributes.
          IF( BORDER ) THEN
             CALL AST_CLEAR( IPLOT, 'COLOUR', STATUS )
             CALL AST_CLEAR( IPLOT, 'WIDTH', STATUS )
             CALL AST_CLEAR( IPLOT, 'STYLE', STATUS )
-            CALL KPG1_ASSET( 'KAPPA_DISPLAY', 'BORSTYLE', IPLOT,
+            CALL KPG1_ASSET( 'KAPPA_DISPLAY', '+BORSTYLE', IPLOT,
      :                       STATUS )
             CALL KPG1_ASGRD( IPLOT, IPICF, .FALSE., STATUS )
          END IF
@@ -1533,10 +1550,11 @@
 *  Allocate a work array.
          CALL PSX_CALLOC( UP - LP + 1, '_INTEGER', IPWORK, STATUS )
 
-*  Create the key.
-         CALL KPG1_LUTKY( IPICK, 'KEYSTYLE', REAL( DHI ), REAL( DLO ),
+*  Create the key.  The plus sign before the KEYSTYLE requests that
+*  temporary attributes be recognised.
+         CALL KPG1_LUTKY( IPICK, '+KEYSTYLE', REAL( DHI ), REAL( DLO ),
      :                    LABEL( : NC ), 'KAPPA_DISPLAY', LP, UP, 0.1,
-     :                    ( Y2 - Y1 )*0.1, ( Y2 - Y1 )*0.1, 'CL',
+     :                    ( Y2 - Y1 ) * 0.1, ( Y2 - Y1 ) * 0.1, 'CL',
      :                    NX*NY, %VAL( CNF_PVAL( IPCOL ) ), STATUS )
 
 *  Report a context message if anything went wrong.
