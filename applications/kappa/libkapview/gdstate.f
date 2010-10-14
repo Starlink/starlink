@@ -22,11 +22,11 @@
 *  Description:
 *     This application displays information about the current graphics
 *     database picture on a graphics device, including the extreme axis
-*     values in any requested co-ordinate Frame (see parameter FRAME).
+*     values in any requested co-ordinate Frame (see Parameter FRAME).
 *     Information is written to various output parameters for use by
 *     other applications, and is also written to the screen by default
-*     (see parameter REPORT). An outline may be drawn around the current
-*     picture if required (see parameter OUTLINE).
+*     (see Parameter REPORT). An outline may be drawn around the current
+*     picture if required (see Parameter OUTLINE).
 *
 *     A list of the colours in the current palette is also produced.
 
@@ -39,17 +39,17 @@
 *        will be written.
 *     DESCRIBE = _LOGICAL (Read)
 *        If TRUE, a detailed description is displayed of the co-ordinate
-*        Frame in which the picture bounds are reported (see parameter
-*        FRAME). [current value]
+*        Frame in which the picture bounds are reported (see Parameter
+*        FRAME).  [current value]
 *     DEVICE = DEVICE (Read)
 *        Name of the graphics device about which information is
-*        required. [Current graphics device]
+*        required.  [Current graphics device]
 *     DOMAIN = LITERAL (Write)
 *        The Domain name of the current co-ordinate Frame for the current
 *        picture.
 *     EPOCH = _DOUBLE (Read)
 *        If a "Sky Co-ordinate System" specification is supplied (using
-*        parameter FRAME) for a celestial co-ordinate system, then an
+*        Parameter FRAME) for a celestial co-ordinate system, then an
 *        epoch value is needed to qualify it. This is the epoch at
 *        which the displayed sky co-ordinates were determined. It should
 *        be given as a decimal years value, with or without decimal places
@@ -86,7 +86,7 @@
 *        The name of the current picture.
 *     OUTLINE = _LOGICAL (Read)
 *        If OUTLINE is TRUE, then an outline will be drawn around the
-*        current picture to indicate its position. [FALSE]
+*        current picture to indicate its position.  [FALSE]
 *     REFNAM = LITERAL (Write)
 *        The reference object associated with the current picture.  It
 *        is blank if there is no reference object.  Up to 132 characters
@@ -94,10 +94,10 @@
 *     REPORT = _LOGICAL (Read)
 *        If this is FALSE the state of the graphics device is not
 *        reported, merely the results are written to the output
-*        parameters.  It is intended for use within procedures. [TRUE]
+*        parameters.  It is intended for use within procedures.  [TRUE]
 *     STYLE = GROUP (Read)
-*        A group of attribute settings describing the plotting style to use
-*        when drawing the outline (see parameter OUTLINE). The format
+*        A group of attribute settings describing the plotting style to
+*        use when drawing the outline (see Parameter OUTLINE). The format
 *        of the axis values reported on the screen may also be controlled.
 *
 *        A comma-separated list of strings should be given in which each
@@ -126,19 +126,19 @@
 *        may be set in order to control the appearance of the formatted axis
 *        values reported on the screen: Format, Digits, Symbol, Unit. These
 *        may be suffixed with an axis number (e.g. "Digits(2)") to refer to
-*        the values displayed for a specific axis. [current value]
+*        the values displayed for a specific axis.  [current value]
 *     X1 = LITERAL (Write)
 *        The lowest value found within the current picture for axis 1 of the
-*        requested co-ordinate Frame (see parameter FRAME).
+*        requested co-ordinate Frame (see Parameter FRAME).
 *     X2 = LITERAL (Write)
 *        The highest value found within the current picture for axis 1 of the
-*        requested co-ordinate Frame (see parameter FRAME).
+*        requested co-ordinate Frame (see Parameter FRAME).
 *     Y1 = LITERAL (Write)
 *        The lowest value found within the current picture for axis 2 of the
-*        requested co-ordinate Frame (see parameter FRAME).
+*        requested co-ordinate Frame (see Parameter FRAME).
 *     Y2 = LITERAL (Write)
 *        The highest value found within the current picture for axis 2 of the
-*        requested co-ordinate Frame (see parameter FRAME).
+*        requested co-ordinate Frame (see Parameter FRAME).
 
 *  Examples:
 *     gdstate
@@ -174,7 +174,7 @@
 *     whilst the RA limits will be 0 hours and (close to) 24 hours.
 *     -  Previous versions of this application reported bounds in
 *     "Normalised Device Co-ordinates". Similar functionality is now
-*     provided by setting parameter FRAME to "BASEPIC". Be aware though,
+*     provided by setting Parameter FRAME to "BASEPIC". Be aware though,
 *     that "Normalised Device Co-ordinates" were normalised so that the
 *     longer of the two axes had a length of 1.0, but BASEPIC co-ordinates
 *     are normalised so that the shorter of the two axes has length 1.0.
@@ -359,7 +359,7 @@
 
 *  If required, draw the outline. Make it a bit smaller than the picture
 *  to avoid PGPLOT clipping.
-      IF( OUTLIN ) THEN
+      IF ( OUTLIN ) THEN
 
 *  Get an AGI identifier for the BASE picture.
          CALL AGI_IBASE( IPICB, STATUS )
@@ -466,14 +466,14 @@
       END IF
 
 *  If required, report a description of the Frame being used.
-      IF( REPORT ) THEN
+      IF ( REPORT ) THEN
 
 *  See if a description of the Frame being used is required.
          CALL PAR_GET0L( 'DESCRIBE', DESC, STATUS )
 
 *  Display the Domain of the original Current Frame unless this will be
 *  done below.
-         IF( .NOT. ( DESC .AND. USECUR ) ) THEN
+         IF ( .NOT. ( DESC .AND. USECUR ) ) THEN
             CALL MSG_SETC( 'DOM', DOM0 )
             CALL MSG_OUT( 'GDSTATE_MSG6', '   Current co-ordinate '//
      :                    'Frame: ^DOM', STATUS )
@@ -481,8 +481,8 @@
 
 *  If so, display it, indicating if this is the pictures current Frame or
 *  not.
-         IF( DESC ) THEN
-            IF( USECUR ) THEN
+         IF ( DESC ) THEN
+            IF ( USECUR ) THEN
                CALL KPG1_DSFRM( IPLOT, '   Current co-ordinate Frame:',
      :                          .TRUE., STATUS )
             ELSE
@@ -506,7 +506,7 @@
      :                    STATUS )
 
 *  Give a heading for the axis bounds.
-      IF( REPORT ) THEN
+      IF ( REPORT ) THEN
          CALL MSG_SETC( 'DOM', AST_GETC( IPLOT, 'DOMAIN', STATUS ) )
          CALL MSG_OUT( 'GDSTATE_MSG7', '   Picture bounds in the '//
      :                 '^DOM Frame:', STATUS )
@@ -539,7 +539,7 @@
          CALL KPG1_PGESC( SYM, STATUS )
 
 *  Add the axis symbol in parenthesise to the output text if not blank.
-         IF( SYM .NE. ' ' ) THEN
+         IF ( SYM .NE. ' ' ) THEN
             CALL CHR_APPND( ' (', TEXT, IAT )
             CALL CHR_APPND( SYM, TEXT, IAT )
             CALL CHR_APPND( ') :', TEXT, IAT )
@@ -562,15 +562,15 @@
          CALL CHR_APPND( UFMT, TEXT, IAT )
 
 *  Display the text for this axis, if required.
-         IF( REPORT ) CALL MSG_OUT( 'GDSTATE_MSG8', TEXT( : IAT ),
+         IF ( REPORT ) CALL MSG_OUT( 'GDSTATE_MSG8', TEXT( : IAT ),
      :                              STATUS )
 
 *  Store the first two axis values in the output parameters.
-         IF( IAXIS .EQ. 1 ) THEN
+         IF ( IAXIS .EQ. 1 ) THEN
             CALL PAR_PUT0C( 'X1', LFMT, STATUS )
             CALL PAR_PUT0C( 'X2', UFMT, STATUS )
 
-         ELSE IF( IAXIS .EQ. 2 ) THEN
+         ELSE IF ( IAXIS .EQ. 2 ) THEN
             CALL PAR_PUT0C( 'Y1', LFMT, STATUS )
             CALL PAR_PUT0C( 'Y2', UFMT, STATUS )
 
@@ -579,10 +579,10 @@
       END DO
 
 *  Add a blank line to the report.
-      IF( REPORT ) CALL MSG_BLANK( STATUS )
+      IF ( REPORT ) CALL MSG_BLANK( STATUS )
 
 *  Produce a list of the available Domain names.
-      IF( REPORT ) THEN
+      IF ( REPORT ) THEN
          TEXT = ' '
          IAT = 0
          CALL CHR_APPND( '   The following Frames are available:', TEXT,
@@ -590,7 +590,7 @@
          DO I = 1, AST_GETI( IPLOT, 'NFRAME', STATUS )
             DOM = AST_GETC( AST_GETFRAME( IPLOT, I, STATUS ), 'Domain',
      :                      STATUS )
-            IF( DOM .NE. ' ' ) THEN
+            IF ( DOM .NE. ' ' ) THEN
                IAT = IAT + 1
                CALL CHR_APPND( DOM, TEXT, IAT )
             END IF
@@ -608,7 +608,7 @@
       END IF
 
 *  If required, display a list of the palette colours.
-      IF( REPORT .AND. STATUS .EQ. SAI__OK ) THEN
+      IF ( REPORT .AND. STATUS .EQ. SAI__OK ) THEN
          CALL MSG_OUT( ' ', '   The palette contains the following '//
      :                 'colours:', STATUS )
          CALL MSG_BLANK( STATUS )
@@ -639,7 +639,7 @@
       CALL AST_END( STATUS )
 
 *  Give a contextual error message if anything went wrong.
-      IF( STATUS .NE. SAI__OK ) THEN
+      IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'GDSTATE_ERR', 'GDSTATE: Failed to display '//
      :                 'information about the current graphics '//
      :                 'database picture.', STATUS )
