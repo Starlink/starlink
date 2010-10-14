@@ -20,18 +20,18 @@
 *        The global status.
 
 *  Description:
-*     This application displays a 2-dimensional plot in which the
+*     This application displays a two-dimensional plot in which the
 *     horizontal axis corresponds to the data value in the NDF given
-*     by parameter IN1, and the vertical axis corresponds to the data
-*     value in the NDF given by parameter IN2. Optionally, the variance,
+*     by Parameter IN1, and the vertical axis corresponds to the data
+*     value in the NDF given by Parameter IN2. Optionally, the variance,
 *     standard deviation or quality may be used instead of the data value for
-*     either axis (see parameters COMP1 and COMP2). A symbol is displayed
+*     either axis (see Parameters COMP1 and COMP2). A symbol is displayed
 *     at an appropriate position in the plot for each pixel which has a
 *     good value in both NDFs, and falls within the bounds specified by
-*     parameter XLEFT, XRIGHT, YBOT and YTOP. The type of symbol may be
-*     specified using parameter MARKER.
+*     Parameter XLEFT, XRIGHT, YBOT and YTOP. The type of symbol may be
+*     specified using Parameter MARKER.
 *
-*     The supplied arrays may be compressed prior to display (see parameter
+*     The supplied arrays may be compressed prior to display (see Parameter
 *     COMPRESS). This reduces the number of points in the scatter plot, and
 *     also reduces the noise in the data.
 
@@ -42,30 +42,30 @@
 *     AXES = _LOGICAL (Read)
 *        TRUE if labelled and annotated axes are to be drawn around the
 *        plot. The width of the margins left for the annotation may be
-*        controlled using parameter MARGIN. The appearance of the axes
-*        (colours, fonts, etc) can be controlled using the parameter
-*        STYLE. [TRUE]
+*        controlled using Parameter MARGIN. The appearance of the axes
+*        (colours, founts, etc.) can be controlled using the Parameter
+*        STYLE.  [TRUE]
 *     CLEAR = _LOGICAL (Read)
 *        If TRUE the current picture is cleared before the plot is
 *        drawn. If CLEAR is FALSE not only is the existing plot retained,
 *        but also an attempt is made to align the new picture with the
 *        existing picture. Thus you can generate a composite plot within
 *        a single set of axes, say using different colours or modes to
-*        distinguish data from different datasets. [TRUE]
+*        distinguish data from different datasets.  [TRUE]
 *     COMP1 = LITERAL (Read)
 *        The NDF array component to be displayed on the horizontal axis.
 *        It may be "Data", "Quality", "Variance", or "Error" (where "Error"
 *        is an alternative to "Variance" and causes the square root of the
 *        variance values to be displayed).  If "Quality" is specified,
 *        then the quality values are treated as numerical values (in
-*        the range 0 to 255). ["Data"]
+*        the range 0 to 255).  ["Data"]
 *     COMP2 = LITERAL (Read)
 *        The NDF array component to be displayed on the vertical axis.
 *        It may be "Data", "Quality", "Variance", or "Error" (where "Error"
 *        is an alternative to "Variance" and causes the square root of the
 *        variance values to be displayed).  If "Quality" is specified,
 *        then the quality values are treated as numerical values (in
-*        the range 0 to 255). ["Data"]
+*        the range 0 to 255).  ["Data"]
 *     COMPRESS() = _INTEGER (Read)
 *        The compression factors to be used when compressing the supplied
 *        arrays prior to display. If any of the supplied values are greater
@@ -75,7 +75,7 @@
 *        is given by the compression factors. No compression occurs if all
 *        values supplied for this parameter are 1. If the number of values
 *        supplied is smaller than the number of axes, the final value
-*        supplied is duplicated for the remaining axes. [1]
+*        supplied is duplicated for the remaining axes.  [1]
 *     DEVICE = DEVICE (Read)
 *        The graphics workstation on which to produce the plot.  If a
 *        null value (!) is supplied no plot will be made. [Current graphics
@@ -92,13 +92,13 @@
 *        the first supplied value. If these margins are too narrow any axis
 *        annotation may be clipped. If a null (!) value is supplied, the
 *        used value is 0.15 (for all edges) if annotated axes are produced,
-*        and zero otherwise. [current value]
+*        and zero otherwise.  [current value]
 *     MARKER = _INTEGER (Read)
 *        Specifies the symbol with which each position should be marked in
 *        the plot. It should be given as an integer PGPLOT marker type. For
 *        instance, 0 gives a box, 1 gives a dot, 2 gives a cross, 3 gives
 *        an asterisk, 7 gives a triangle. The value must be larger than or
-*        equal to -31. [current value]
+*        equal to -31.  [current value]
 *     PERC1( 2 ) = _REAL (Read)
 *        The percentiles that define the default values for XLEFT and
 *        XRIGHT. For example, [5,95] would result in the lowest and
@@ -136,28 +136,28 @@
 *        reported).
 *
 *        The appearance of markers is controlled by Colour(Markers),
-*        Width(Markers), etc (the synonym Symbols may be used in place
-*        of Markers). [current value]
+*        Width(Markers), etc. (the synonym Symbols may be used in place
+*        of Markers).  [current value]
 *     XLEFT = _REAL (Read)
 *        The axis value to place at the left hand end of the horizontal
 *        axis. If a null (!) value is suplied, the value used is determined
-*        by parameter PERC1. The value supplied may be greater than or less
-*        than the value supplied for XRIGHT. [!]
+*        by Parameter PERC1. The value supplied may be greater than or less
+*        than the value supplied for XRIGHT.  [!]
 *     XRIGHT = _REAL (Read)
 *        The axis value to place at the right hand end of the horizontal
 *        axis. If a null (!) value is suplied, the value used is determined
-*        by parameter PERC1. The value supplied may be greater than or less
-*        than the value supplied for XLEFT. [!]
+*        by Parameter PERC1. The value supplied may be greater than or less
+*        than the value supplied for XLEFT.  [!]
 *     YBOT = _REAL (Read)
 *        The axis value to place at the bottom end of the vertical axis.
 *        If a null (!) value is suplied, the value used is determined
-*        by parameter PERC2. The value supplied may be greater than or less
-*        than the value supplied for YTOP. [!]
+*        by Parameter PERC2. The value supplied may be greater than or less
+*        than the value supplied for YTOP.  [!]
 *     YTOP = _REAL (Read)
 *        The axis value to place at the top end of the vertical axis.
 *        If a null (!) value is suplied, the value used is determined
-*        by parameter PERC2. The value supplied may be greater than or less
-*        than the value supplied for YBOT. [!]
+*        by Parameter PERC2. The value supplied may be greater than or less
+*        than the value supplied for YBOT.  [!]
 
 *  Examples:
 *     scatter cl123a cl123b
@@ -178,7 +178,7 @@
 *     the following order: a FRAME picture containing the annotated axes
 *     and data plot, and a DATA picture containing just the data plot.
 *     Note, the FRAME picture is only created if annotated axes have been
-*     drawn, or if non-zero margins were specified using parameter
+*     drawn, or if non-zero margins were specified using Parameter
 *     MARGIN. The world co-ordinates in the DATA picture will correspond
 *     to data value in the two NDFs.
 
@@ -200,7 +200,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -210,8 +210,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
