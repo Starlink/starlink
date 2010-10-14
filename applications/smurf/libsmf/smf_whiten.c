@@ -47,6 +47,9 @@
 *     spectrum.
 
 *  Notes:
+*     If the 1/f spectrum appears to extend into the white-noise band,
+*     or returns an exponent < 0 (i.e. increasing instead of decreasing),
+*     the function will simply return without doing anything to the data.
 
 *  Authors:
 *     Ed Chapin (UBC)
@@ -56,7 +59,8 @@
 *     2010-10-12 (EC):
 *        Initial version
 *     2010-10-13 (EC):
-*        Add complement to interface
+*        - add complement to interface
+*        - add sanity checks for 1/f fitting frequencies and exponent
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -120,6 +124,8 @@ void smf_whiten( double *re, double *im, double df, dim_t nf, size_t box,
   double sigma;          /* Uncertainty in white noise level */
   size_t thisnbad;       /* Outliers in white noise calc, this iteration */
   double white;          /* White noise level */
+  double *x=NULL;
+  double *y=NULL;
 
   if (*status != SAI__OK) return;
 
@@ -202,8 +208,6 @@ void smf_whiten( double *re, double *im, double df, dim_t nf, size_t box,
     size_t ngood = 0;
     size_t nused;
     double thresh = white + SMF__WHITEN_KNEESNR*sigma;
-    double *x=NULL;
-    double *y=NULL;
 
     /* Initialize ngood -- skip the DC term in the FFT */
     for( i=1; i<(1+box); i++ ) {
@@ -239,9 +243,15 @@ void smf_whiten( double *re, double *im, double df, dim_t nf, size_t box,
 
     nfit = i+box/2;
 
+    /* If we've entered the white-noise band in order to fit the 1/f
+       noise give up */
+    if( i >= i_wlo ) {
+      goto CLEANUP;
+    }
+
     /* Now fit a straight line to the log of the two axes */
     x = astCalloc( nfit-1, sizeof(*x), 0 );
-    y = astCalloc( nfit-1, sizeof(*x), 0 );
+    y = astCalloc( nfit-1, sizeof(*y), 0 );
 
     if( *status == SAI__OK ) {
       for( i=0; i<(nfit-1); i++ ) {
@@ -259,6 +269,12 @@ void smf_whiten( double *re, double *im, double df, dim_t nf, size_t box,
 
       A = (exp(fit[0]));
       B = fit[1];
+
+      /* if B isn't negative the fit might be garbage, or else there just
+         isn't very much low frequency noise. In this case bail out. */
+      if( B >= 0 ) {
+        goto CLEANUP;
+      }
 
       /* When we divide the power spectrum by the whitening filter we
          want it to result in the white noise level, so we divide A by
@@ -293,14 +309,13 @@ void smf_whiten( double *re, double *im, double df, dim_t nf, size_t box,
           im[i] *= amp;
         }
       }
-
     }
-
-    if( x ) x = astFree( x );
-    if( y ) y = astFree( y );
   }
 
   /* Clean up */
+ CLEANUP:
   if( pspec ) pspec = astFree( pspec );
   if( qual ) qual = astFree( qual );
+  if( x ) x = astFree( x );
+  if( y ) y = astFree( y );
 }
