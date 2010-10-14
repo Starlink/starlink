@@ -59,8 +59,8 @@
 *     AXES = _LOGICAL (Read)
 *        TRUE if labelled and annotated axes are to be drawn around the
 *        plot. The width of the margins left for the annotation may be
-*        controlled using parameter MARGIN.  The appearance of the axes
-*        (colours, fonts, etc) can be controlled using the parameter
+*        controlled using Parameter MARGIN.  The appearance of the axes
+*        (colours, fonts, etc) can be controlled using the Parameter
 *        STYLE. [TRUE]
 *     AXISR = _REAL (Write)
 *        The axis ratio of the star images: the ratio of the major
@@ -77,14 +77,14 @@
 *        or modes to distinguish data from different datasets.  [TRUE]
 *     COFILE = FILENAME (Read)
 *        Name of a text file containing the co-ordinates of the stars
-*        to be used.  It is only accessed if parameter INCAT is given a
+*        to be used.  It is only accessed if Parameter INCAT is given a
 *        null (!) value.  Each line should contain the formatted axis
 *        values for a single position, in the current Frame of the NDF.
 *        Columns can be separated by spaces, tabs or commas.  The file
 *        may contain comment lines with the first character # or !.
 *        Other columns may be included in the file, in which case the
 *        columns holding the required co-ordinates should be specified
-*        using parameter POSCOLS.
+*        using Parameter POSCOLS.
 *     CUT = _REAL (Read)
 *        This parameter controls the size of the output NDF.  If it is
 *        null, !, the dimension of the square NDF will be the size of
@@ -115,13 +115,13 @@
 *        If TRUE, the gamma coefficient is fixed to be 2; in other words
 *        the best-fitting two-dimensional Gaussian is evaluated.  If
 *        FALSE, gamma is a free parameter of the fit, and the derived
-*        value is returned in parameter GAMMA.  [FALSE]
+*        value is returned in Parameter GAMMA.  [FALSE]
 *     IN = NDF (Read)
 *        The NDF containing the star images to be fitted.
 *     INCAT = FILENAME (Read)
 *        A catalogue containing a positions list (such as produced by
 *        applications CURSOR, LISTMAKE, etc.) giving the star positions
-*        to use.  If a null (!) value is supplied parameter COFILE will
+*        to use.  If a null (!) value is supplied Parameter COFILE will
 *        be used to get the star positions from a simple text file.
 *     ISIZE = _INTEGER (Read)
 *        The side of the square area to be used when forming the
@@ -166,7 +166,7 @@
 *        The NDF containing the fitted point-spread function evaluated
 *        at each pixel.  If null, !, is entered no output NDF will be
 *        created.  The dimensions of the array are controlled by
-*        parameter CUT.  The pixel origin is chosen to align the model
+*        Parameter CUT.  The pixel origin is chosen to align the model
 *        PSF with the fitted star in pixel co-ordinates, thus allowing
 *        the NDF holding the model PSF to be compared directly with the
 *        input NDF.  A WCS component is stored in the output NDF holding
@@ -176,7 +176,7 @@
 *        units in which the FWHM is reported.  [!]
 *     POSCOLS = _INTEGER (Read)
 *        Column positions of the co-ordinates (x then y) in an input
-*        record of the file specified by parameter COFILE.  The columns
+*        record of the file specified by Parameter COFILE.  The columns
 *        must be different amongst themselves.  If there is duplication
 *        new values will be requested.  Only accessed if INCAT is given
 *        a null (!) value.  If a null (!) value is supplied for POSCOLS,
@@ -412,7 +412,7 @@
 *        An output NDF containing the PSF may now be created.  There are
 *        three new parameters: CUT, OUT and TITLE.
 *     1991 July 12 (MJC):
-*        Support for data co-ordinates added via new parameter COSYS.
+*        Support for data co-ordinates added via new Parameter COSYS.
 *     1991 August 20 (MJC):
 *        Added FONT parameter.
 *     1992 March 3 (MJC):
@@ -437,13 +437,13 @@
 *        fatal error.
 *     20-SEP-1999 (DSB):
 *        Modified to expect input positions in the current WCS Frame of
-*        the NDF. Removed parameter COSYS, RADUNITS, SCALE. Added INCAT.
-*        USEAXIS.
+*        the NDF. Removed Parameters COSYS, RADUNITS, SCALE. Added
+*        INCAT and USEAXIS.
 *     26-OCT-1999 (DSB):
 *        Made MARGIN a fraction of the current picture, not the DATA
 *        picture.
 *     2-MAY-2000 (DSB):
-*        Added parameters AMP1 and NORM.
+*        Added Parameters AMP1 and NORM.
 *     17-MAY-2000 (DSB):
 *        Added data units to Y axis label of the plot if NORM is FALSE.
 *     22-MAY-2000 (DSB):
@@ -453,7 +453,7 @@
 *        (eg if MAP2 was a UnitMap), and so subsequently re-inverting
 *        MAP1 would also invert MAP3.
 *     10-JUL-2001 (DSB):
-*        Added parameter PROFOUT.
+*        Added Parameter PROFOUT.
 *     13-AUG-2001 (DSB):
 *        Corrected size of work arrays IPW3 and IPW4 so that no segvio
 *        occurs if the OUT image is not square.
@@ -685,7 +685,7 @@
      :                        STATUS )
 
 *  If a null value was supplied for INCAT, annul the error and try to
-*  get a list of star positions using parameter COFILE.
+*  get a list of star positions using Parameter COFILE.
       ELSE IF ( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          GOTID = .FALSE.
