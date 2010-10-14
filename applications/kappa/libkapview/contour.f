@@ -46,7 +46,7 @@
 *
 *     A list of the contour levels can be displayed to the right of the
 *     contour map (see Parameter KEY).  The appearance and position of
-*     this key may be controlled using parameters KEYSTYLE and KEYPOS.
+*     this key may be controlled using Parameters KEYSTYLE and KEYPOS.
 
 *  Usage:
 *     contour ndf [comp] mode ncont [key] [device]
@@ -89,7 +89,7 @@
 *     DASHED = _REAL (Read)
 *        The height below which the contours will be drawn with dashed
 *        lines (if possible).  A null value (!) results in contours
-*        being drawn with the styles specified by parameters PENS,
+*        being drawn with the styles specified by Parameters PENS,
 *        PENROT, and STYLE.  [!]
 *     DEVICE = DEVICE (Read)
 *        The plotting device. [current image-display device]
@@ -227,7 +227,7 @@
 *          explicitly.
 *
 *          - "Good" -- A single "contour" is drawn outlining the good
-*          pixel values.  A label may also be added (see parameter
+*          pixel values.  A label may also be added (see Parameter
 *          LABPOS).
 *
 *          - "Linear" -- You define the number of contours, the start
@@ -280,7 +280,7 @@
 *        thick, red, dashed contour.  Attributes that are unspecified in
 *        a string default to the values implied by Parameter STYLE.  If
 *        a null value (!) is given for PENS, then the pens implied by
-*        parameters PENROT, DASHED and STYLE are used.  [!]
+*        Parameters PENROT, DASHED and STYLE are used.  [!]
 *     PERCENTILES() = _REAL (Read)
 *        Contour levels given as percentiles.  The values must lie
 *        between 0.0 and 100.0. (Percentiles mode).
@@ -324,7 +324,7 @@
 *        The appearance of the contours is controlled by the attributes
 *        Colour(Curves), Width(Curves), etc (the synonym Contours may be
 *        used in place of Curves). The contour appearance established in
-*        this way may be modified using parameters PENS, PENROT and
+*        this way may be modified using Parameters PENS, PENROT and
 *        DASHED.  [current value]
 *     USEAXIS = GROUP (Read)
 *        USEAXIS is only accessed if the current co-ordinate Frame of
@@ -442,13 +442,15 @@
 *  Copyright:
 *     Copyright (C) 1988-1993 Science & Engineering Research Council.
 *     Copyright (C) 1995, 1997-1999, 2001, 2004 Central Laboratory of
-*     the Research Councils. Copyright (C) 2006 Particle Physics &
-*     Astronomy Research Council. All Rights Reserved.
+*     the Research Councils.
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -458,8 +460,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
@@ -1124,8 +1126,8 @@
          CALL KPG1_ASPSY( '(VAL*UE)', '(NUMLAB)', STATUS )
          CALL KPG1_ASPSY( '(TEXT)', '(TITLE)', STATUS )
 
-*  Set the style for plotting in the key picture.  The plus requests
-*  support of temporary attributes.
+*  Set the style for plotting in the key picture.  The plus sign
+*  requests support of temporary attributes.
          CALL KPG1_ASSET( 'KAPPA_CONTOUR', '+KEYSTYLE', IPLOTK, STATUS )
 
 *  Draw the key to the right of the contour plot and aligned with
