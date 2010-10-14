@@ -210,6 +210,42 @@
 *     STARTUP = LITERAL (Read)
 *        Determines if the application starts up in "Multi" or "Single"
 *        mode (see Parameter OPTION). ["Multi"]
+*     STYLE = GROUP (Read)
+*        A group of attribute settings describing the plotting style to
+*        use when drawing the regions.
+*
+*        A comma-separated list of strings should be given in which each
+*        string is either an attribute setting, or the name of a text
+*        file preceded by an up-arrow character "^".  Such text files
+*        should contain further comma-separated lists which will be read
+*        and interpreted in the same manner.  Attribute settings are
+*        applied in the order in which they occur within the list, with
+*        later settings overriding any earlier settings given for the
+*        same attribute.
+*
+*        Each individual attribute setting should be of the form:
+*
+*           <name>=<value>
+*
+*        where <name> is the name of a plotting attribute, and <value>
+*        is the value to assign to the attribute.  Default values will
+*        be used for any unspecified attributes.  All attributes will be
+*        defaulted if a null value (!)---the initial default---is
+*        supplied.  To apply changes of style to only the current
+*        invocation, begin these attributes with a plus sign.  A mixture
+*        of persistent and temporary style changes is achieved by
+*        listing all the persistent attributes followed by a plus sign
+*        then the list temporary attributes.
+*
+*        See section "Plotting Attributes" in SUN/95 for a description
+*        of the available attributes.  Any unrecognised attributes are
+*        ignored (no error is reported).
+*
+*        The appearance of the lines forming the edges of each region
+*        is controlled by the attributes Colour(Curves), Width(Curves),
+*        etc.  The appearance of the vertex markers is controlled by the
+*        attributes Colour(Markers), Size(Markers), etc.
+*        [current value]
 *     UNDO = _LOGICAL (Read)
 *        Used to confirm that it is OK to proceed with an "Undo" option.
 *        The consequences of proceeding are described before the
@@ -277,7 +313,9 @@
 *  Copyright:
 *     Copyright (C) 1994 Science & Engineering Research Council.
 *     Copyright (C) 1995, 1999, 2001 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -326,6 +364,9 @@
 *        Modify to use AST/PGPLOT and ARD V2. Added options Draw.
 *     18-JUL-2006 (DSB):
 *        Ensure all GRP groups are deleted before returning.
+*     2010 October 14 (MJC):
+*        Added documentation of Parameter STYLE, and permit temporary
+*        style attributes.
 *     {enter_further_changes_here}
 
 *-
@@ -424,8 +465,9 @@
       XIN = 0.5 * ( X1 + X2 )
       YIN = 0.5 * ( Y1 + Y2 )
 
-*  Set the plotting style.
-      CALL KPG1_ASSET( 'KAPPA_ARDGEN', 'STYLE', IPLOT, STATUS )
+*  Set the plotting style.  The plus prefix requests support of
+*  temporary STYLE attributes.
+      CALL KPG1_ASSET( 'KAPPA_ARDGEN', '+STYLE', IPLOT, STATUS )
 
 *  Obtain a group, and initial option and shape.
 *  =============================================
@@ -665,9 +707,14 @@
             READY = .TRUE.
 
 *  If user wants to change the drawing style...
-         ELSE IF( OPTION .EQ. 'STYLE' ) THEN
+*  --------------------------------------------
+
+*  The plus prefix requests support of temporary STYLE attributes.
+*  As the parameter is cancelled there is no need to write the full
+*  current value to the parameter file.
+         ELSE IF ( OPTION .EQ. 'STYLE' ) THEN
             CALL PAR_CANCL( 'STYLE', STATUS )
-            CALL KPG1_ASSET( 'KAPPA_ARDGEN', 'STYLE', IPLOT, STATUS )
+            CALL KPG1_ASSET( 'KAPPA_ARDGEN', '+STYLE', IPLOT, STATUS )
             READY = .TRUE.
 
 *  If user wants to exit the program...
