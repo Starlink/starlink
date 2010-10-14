@@ -83,6 +83,7 @@
 *     Copyright (C) 1990 Science & Engineering Research Council.
 *     Copyright (C) 1999 Central Laboratory of the Research Councils.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -123,6 +124,8 @@
 *        Use AST/PGPLOT for graphics.
 *     2006 April 12 (MJC):
 *        Remove unused variables and wrapped long lines.
+*     2010 October 14 (MJC):
+*        Permit temporary style attributes.
 *     {enter_further_changes_here}
 
 *-
@@ -423,8 +426,11 @@
                FINISH( 2 ) = DBLE( SLOPE * ASUM( NDATA ) + OFFSET )
 
 *  Set up the plotting characteristics to use when drawing the line.
+*  The plus-sign prefix requests that temporary attributes be allowed.
+*  Ensure that only the persistent attributes stored by making this
+*  the last access to STYLE.
                CALL KPG1_ASPSY( '(LIN*ES)', '(CURVES)', STATUS )
-               CALL KPG1_ASSET( 'KAPPA_NORMALIZE', 'STYLE', IPLOT,
+               CALL KPG1_ASSET( 'KAPPA_NORMALIZE', '+STYLE', IPLOT,
      :                          STATUS )
 
 *  Draw the line.
