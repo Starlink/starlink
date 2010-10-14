@@ -351,45 +351,45 @@
       INTEGER NDIM               ! Array dimensionality
       PARAMETER ( NDIM = 2 )     ! 2-d arrays only
 
-      INTEGER MXGRP              ! Max. no. of undo operations
+      INTEGER MXGRP              ! Maximum number of undo operations
       PARAMETER ( MXGRP = 30 )
 
       INTEGER MXPOL              ! Max. no. of vertices in a polygon
       PARAMETER ( MXPOL = 200 )
 
 *  Local Variables:
-      CHARACTER OPTION*7         ! User selected option
-      CHARACTER SHAPE*128        ! Current region shape
-      CHARACTER UNDOTX*80        ! Text describing undo operation
-      CHARACTER OPTS( MXGRP )*80 ! Text describing all undo operations
-      DOUBLE PRECISION XP( MXPOL ) ! Current Frame Axis 1 cursor positions
-      DOUBLE PRECISION YP( MXPOL ) ! Current Frame Axis 2 cursor positions
+      LOGICAL CHANGE             ! Has the group changed?
       INTEGER GRPS( MXGRP )      ! The undo list of groups
       INTEGER I                  ! Loop count
       INTEGER IGRP               ! ID. for GRP group holding ARD desc
+      LOGICAL INFO               ! Display user information?
       INTEGER IPIC               ! AGI identifier for DATA picture
       INTEGER IPIC0              ! AGI identifier for current picture
       INTEGER IPLOT              ! Plot associated with current DATA picture
+      LOGICAL MORE               ! Should another option be obtained?
       INTEGER NP                 ! No. of points obtained by the cursor
       INTEGER NPTS               ! Number of x-y points to be measured
       INTEGER NREG0              ! Original no. of regions in the group
       INTEGER NREG               ! No. of regions in the group
       INTEGER NREGS( MXGRP )     ! No. of regions in all groups on the undo list
-      INTEGER TOPGRP             ! Index of most recent group in undo list
-      INTEGER UNDOI              ! Length of UNDOTX
-      LOGICAL CHANGE             ! Has the group changed?
-      LOGICAL INFO               ! Display user information?
-      LOGICAL MORE               ! Should another option be obtained?
+      CHARACTER*7 OPTION         ! User selected option
+      CHARACTER*80 OPTS( MXGRP ) ! Text describing all undo operations
       LOGICAL READY              ! Has current option been performed?
       LOGICAL REGION             ! Another region to be defined?
+      CHARACTER*128 SHAPE        ! Current region shape
+      INTEGER TOPGRP             ! Index of most recent group in undo list
       LOGICAL UNDO               ! Undo the previous action?
+      CHARACTER*80 UNDOTX        ! Text describing undo operation
+      INTEGER UNDOI              ! Length of UNDOTX
       REAL X1, X2, Y1, Y2        ! World co-ordinates bounds of PGPLOT window
       REAL XIN, YIN              ! Initial cursor position
+      DOUBLE PRECISION XP( MXPOL ) ! Current Frame Axis-1 cursor positions
+      DOUBLE PRECISION YP( MXPOL ) ! Current Frame Axis-2 cursor positions
 
 *.
 
 *  Check the inherited global status.
-      IF( STATUS .NE. SAI__OK ) RETURN
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Start a new AST context.
       CALL AST_BEGIN( STATUS )
@@ -397,8 +397,9 @@
 *  Begin an NDF context.
       CALL NDF_BEGIN
 
-*  Start up the graphics device and get information about the NDF
-*  ==============================================================
+*  Start up the graphics device and get information about the NDF.
+*  ===============================================================
+*
 *  Open the graphics device for plotting with PGPLOT, obtaining an
 *  identifier for the current AGI picture.
       CALL KPG1_PGOPN( 'DEVICE', 'UPDATE', IPIC0, STATUS )
@@ -420,14 +421,15 @@
       CALL PGQWIN( X1, X2, Y1, Y2 )
 
 *  Save the mid point.
-      XIN = 0.5*( X1 + X2 )
-      YIN = 0.5*( Y1 + Y2 )
+      XIN = 0.5 * ( X1 + X2 )
+      YIN = 0.5 * ( Y1 + Y2 )
 
 *  Set the plotting style.
       CALL KPG1_ASSET( 'KAPPA_ARDGEN', 'STYLE', IPLOT, STATUS )
 
 *  Obtain a group, and initial option and shape.
 *  =============================================
+*
 *  Create a GRP group in which to store the ARD description.
       CALL GRP_NEW( 'ARDGEN output', IGRP, STATUS )
 
@@ -442,8 +444,9 @@
      :                OPTION, STATUS )
       READY = .FALSE.
 
-*  Main loop.
-*  ==========
+*  Main loop
+*  =========
+
 *  Indicate that currently there are no groups in the undo list.
       TOPGRP = 0
       DO I = 1, MXGRP
@@ -454,31 +457,32 @@
       NREG = 0
       INFO = .TRUE.
       MORE = .TRUE.
-      DO WHILE( MORE .AND. STATUS .EQ. SAI__OK )
+      DO WHILE ( MORE .AND. STATUS .EQ. SAI__OK )
 
-* Initialise the undo text for this action.
+*  Initialise the undo text for this action.
          UNDOTX = ' '
          UNDOI = 0
 
 *  If we are ready for the next action, see what the user wants to do
 *  next.  Otherwise, perform the action required by the current
 *  contents of the variable "Option".
-         IF( READY ) THEN
+         IF ( READY ) THEN
             CALL MSG_BLANK( STATUS )
-            CALL PAR_CHOIC( 'OPTION', 'SHAPE', 'Multi,Single,Shape,'//
-     :                      'Delete,List,Combine,Draw,Exit,Quit,'//
-     :                      'Style,Undo', .FALSE., OPTION, STATUS )
+            CALL PAR_CHOIC( 'OPTION', 'SHAPE', 'Multi,Single,Shape,'/
+     :                      /'Delete,List,Combine,Draw,Exit,Quit,'/
+     :                      /'Style,Undo', .FALSE., OPTION, STATUS )
             CALL PAR_CANCL( 'OPTION', STATUS )
             READY = .FALSE.
-            IF( STATUS .EQ. PAR__NULL ) OPTION = 'QUIT'
+            IF ( STATUS .EQ. PAR__NULL ) OPTION = 'QUIT'
          END IF
 
 *  If user wants to define more regions of the current shape...
-         IF( OPTION .EQ. 'SINGLE' .OR.
+*  ------------------------------------------------------------
+         IF ( OPTION .EQ. 'SINGLE' .OR.
      :        OPTION .EQ. 'MULTI' ) THEN
 
 *  Save the original number of regions in the group.
-             NREG0 = NREG
+            NREG0 = NREG
 
 *  Tell the user how to specify the region, and also find out how many
 *  positions are needed.
@@ -490,7 +494,7 @@
 *  end of a single polygon and so can't also be used to mark the end of
 *  a series of multiple polygons), or WHOLE or FRAME (because users
 *  won't want to give multiple regions of these types).
-            IF( OPTION .EQ. 'MULTI' .AND. (
+            IF ( OPTION .EQ. 'MULTI' .AND. (
      :           SHAPE .EQ. 'POLYGON' .OR.
      :           SHAPE .EQ. 'WHOLE' .OR.
      :           SHAPE .EQ. 'FRAME' ) ) OPTION = 'SINGLE'
@@ -508,12 +512,12 @@
                CALL KPS1_AGNCP( IPLOT, SHAPE, MXPOL, NPTS, X1, X2, Y1,
      :                          Y2, INFO, XIN, YIN, NP, XP, YP, STATUS )
 
-*  If the required number of positions were obtained (or at least 1
+*  If the required number of positions were obtained (or at least one
 *  position was obtained in the case of shapes with variable number
 *  of defining positions), store the ARD description for the region in
 *  the GRP group.
-               IF( ( NP .EQ. NPTS ) .OR.
-     :             ( NPTS .LT. 0 .AND. NP .GT. 0 ) ) THEN
+               IF ( ( NP .EQ. NPTS ) .OR.
+     :              ( NPTS .LT. 0 .AND. NP .GT. 0 ) ) THEN
 
 *  Now append the ARD description for this region to the end of the
 *  group.
@@ -526,11 +530,11 @@
 *  Issue a warning if sufficient positions were not obtained. Only do
 *  this if the user is giving a single region.  Otherwise take it as an
 *  indication that the user doesn't want to give any more regions.
-               ELSE IF( OPTION .EQ. 'SINGLE' ) THEN
+               ELSE IF ( OPTION .EQ. 'SINGLE' ) THEN
                   CALL MSG_SETC( 'SH', SHAPE )
                   CALL MSG_SETI( 'NPTS', NPTS )
-                  CALL MSG_OUT( 'ARDGEN_MSG', '^NPTS positions '//
-     :                          'required to define a "^SH" region!',
+                  CALL MSG_OUT( 'ARDGEN_MSG', '^NPTS positions '/
+     :                          /'required to define a "^SH" region!',
      :                          STATUS )
                END IF
 
@@ -543,8 +547,8 @@
 *  If another region is to be defined, tell the user.
                ELSE
                   CALL MSG_SETC( 'SH', SHAPE )
-                  CALL MSG_OUT( 'ARDGEN_MSG', 'Region completed. '//
-     :                          'Identify another ''^SH'' region...',
+                  CALL MSG_OUT( 'ARDGEN_MSG', 'Region completed. '/
+     :                          /'Identify another ''^SH'' region...',
      :                          STATUS )
                END IF
 
@@ -559,11 +563,12 @@
             CALL CHR_APPND( SHAPE, UNDOTX, UNDOI )
             UNDOI = UNDOI + 1
             CALL CHR_APPND( 'region', UNDOTX, UNDOI )
-            IF( NREG - NREG0 .GT. 1 ) CALL CHR_APPND( 's', UNDOTX,
-     :                                                UNDOI )
+            IF ( NREG - NREG0 .GT. 1 ) CALL CHR_APPND( 's', UNDOTX,
+     :                                                 UNDOI )
 
 *  If user wants to change the current shape...
-         ELSE IF( OPTION .EQ. 'SHAPE' ) THEN
+*  --------------------------------------------
+         ELSE IF ( OPTION .EQ. 'SHAPE' ) THEN
 
 *  Cancel the SHAPE parameter value.
             CALL PAR_CANCL( 'SHAPE', STATUS )
@@ -574,7 +579,7 @@
      :                      /'Column,Ellipse,Line,Rectangle,Whole,'/
      :                      /'Frame,Rotbox,Polygon,Quit', .FALSE.,
      :                      SHAPE, STATUS )
-            IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
+            IF ( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
             CALL ERR_RLSE
 
 *  The user must now identify multiple regions.  Change the value of
@@ -583,7 +588,8 @@
             OPTION = 'MULTI'
 
 *  If user wants to delete an identified region...
-         ELSE IF( OPTION .EQ. 'DELETE' ) THEN
+*  -----------------------------------------------
+         ELSE IF ( OPTION .EQ. 'DELETE' ) THEN
             NREG0 = NREG
             CALL KPS1_AGNDL( 'REGIONS', IGRP, NREG, STATUS )
             READY = .TRUE.
@@ -593,37 +599,46 @@
             CALL CHR_PUTI( NREG - NREG0, UNDOTX, UNDOI )
             UNDOI = UNDOI + 1
             CALL CHR_APPND( 'deleted region', UNDOTX, UNDOI )
-            IF( NREG - NREG0 .GT. 1 ) CALL CHR_APPND( 's', UNDOTX,
-     :                                                UNDOI )
+            IF ( NREG - NREG0 .GT. 1 ) CALL CHR_APPND( 's', UNDOTX,
+     :                                                 UNDOI )
 
 *  If user wants to draw a region...
-         ELSE IF( OPTION .EQ. 'DRAW' ) THEN
+*  ---------------------------------
+         ELSE IF ( OPTION .EQ. 'DRAW' ) THEN
             CALL KPS1_AGNDW( 'REGIONS', IPLOT, IGRP, NREG, STATUS )
             READY = .TRUE.
 
 *  If user wants to list the currently defined region...
-         ELSE IF( OPTION .EQ. 'LIST' ) THEN
+*  -----------------------------------------------------
+         ELSE IF ( OPTION .EQ. 'LIST' ) THEN
             CALL KPS1_AGNLS( IGRP, STATUS )
             READY = .TRUE.
 
 *  If user wants to combined regions together...
-         ELSE IF( OPTION .EQ. 'COMBINE' ) THEN
+*  ---------------------------------------------
+         ELSE IF ( OPTION .EQ. 'COMBINE' ) THEN
             CALL ERR_MARK
             CALL KPS1_AGNCM( 'OPERATOR', 'OPERANDS', IGRP, NREG,
      :                       STATUS )
-            IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
+            IF ( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
             CALL ERR_RLSE
             READY = .TRUE.
             UNDOTX = 'undo the effects of the previous COMBINE option'
 
 *  If user wants to undo the previous change...
-         ELSE IF( OPTION .EQ. 'UNDO' ) THEN
-            IF( TOPGRP .GT. 0 .AND. GRPS( TOPGRP ) .NE. GRP__NOID ) THEN
+*  --------------------------------------------
+         ELSE IF ( OPTION .EQ. 'UNDO' ) THEN
+            IF ( TOPGRP .GT. 0 .AND.
+     :           GRPS( TOPGRP ) .NE. GRP__NOID ) THEN
+
+*  Obtain confirmation.
                CALL MSG_SETC( 'ACTION', OPTS( TOPGRP ) )
                CALL MSG_OUT( ' ', 'This will ^ACTION.', STATUS )
                CALL PAR_CANCL( 'UNDO', STATUS )
                CALL PAR_GET0L( 'UNDO', UNDO, STATUS )
-               IF( UNDO .AND. STATUS .EQ. SAI__OK ) THEN
+
+*  Form new groups.
+               IF ( UNDO .AND. STATUS .EQ. SAI__OK ) THEN
                   CALL GRP_DELET( IGRP, STATUS )
                   CALL GRP_DELET( GRPS( TOPGRP ), STATUS )
                   GRPS( TOPGRP ) = GRP__NOID
@@ -631,8 +646,8 @@
                   NREGS( TOPGRP ) = 0
 
                   TOPGRP = TOPGRP - 1
-                  IF( TOPGRP .EQ. 0 ) TOPGRP = MXGRP
-                  IF( GRPS( TOPGRP ) .NE. GRP__NOID ) THEN
+                  IF ( TOPGRP .EQ. 0 ) TOPGRP = MXGRP
+                  IF ( GRPS( TOPGRP ) .NE. GRP__NOID ) THEN
                      CALL GRP_COPY( GRPS( TOPGRP ), 0, 0, .FALSE., IGRP,
      :                              STATUS )
                      NREG = NREGS( TOPGRP )
@@ -656,32 +671,38 @@
             READY = .TRUE.
 
 *  If user wants to exit the program...
-         ELSE IF( OPTION .EQ. 'EXIT' ) THEN
+*  ------------------------------------
+         ELSE IF ( OPTION .EQ. 'EXIT' ) THEN
             MORE = .FALSE.
 
-*  If user wants to quit the program, throwing away the current
-*  regions...
-         ELSE IF( OPTION .EQ. 'QUIT' ) THEN
+*  If user wants to quit the program...
+*  ------------------------------------
+
+*  Quitting throws away the current regions.
+         ELSE IF ( OPTION .EQ. 'QUIT' ) THEN
             NREG = 0
             MORE = .FALSE.
 
          END IF
 
+*  Update the group.
+*  -----------------
+
 *  If the contents of the group has changed (except for the action of an
 *  UNDO option), add a copy of the group into the undo list.
          CALL KPS1_AGNCH( IGRP, MXGRP, GRPS, TOPGRP, CHANGE, STATUS )
-         IF( CHANGE .AND. OPTION .NE. 'UNDO' ) THEN
+         IF ( CHANGE .AND. OPTION .NE. 'UNDO' ) THEN
 
 *  Find the index at which to store the new group. Go back to the
 *  beginning when the end is reached.
-            IF( TOPGRP .EQ. MXGRP ) THEN
+            IF ( TOPGRP .EQ. MXGRP ) THEN
                TOPGRP = 1
             ELSE
                TOPGRP = TOPGRP + 1
             END IF
 
 *  If this array slot already has a group, delete it.
-            IF( GRPS( TOPGRP ) .NE. GRP__NOID ) THEN
+            IF ( GRPS( TOPGRP ) .NE. GRP__NOID ) THEN
                CALL GRP_DELET( GRPS( TOPGRP ), STATUS )
             END IF
 
@@ -699,14 +720,14 @@
 
 *  If the ARD description is not of zero size, write it out to a text
 *  file.
-      IF( NREG .GT. 0 ) THEN
+      IF ( NREG .GT. 0 ) THEN
 
 *  Add a WCS statement to the start of the group.
          CALL KPS1_AGNWC( IPLOT, IGRP, STATUS )
 
 *  Write this new group out.
-         CALL GRP_LIST( 'ARDOUT', 0, 0, '   ARD description generated'//
-     :                  ' by ARDGEN', IGRP, STATUS )
+         CALL GRP_LIST( 'ARDOUT', 0, 0, '   ARD description generated '/
+     :                  /'by ARDGEN', IGRP, STATUS )
 
 *  Otherwise, issue a warning message.
       ELSE
@@ -722,7 +743,7 @@
 
 *  Delete all groups.
       DO I = 1, MXGRP
-         IF( GRPS( I ) .NE. GRP__NOID ) THEN
+         IF ( GRPS( I ) .NE. GRP__NOID ) THEN
             CALL GRP_DELET( GRPS( I ), STATUS )
          END IF
       END DO
@@ -739,8 +760,8 @@
 
 *  Give a contextual error message if anything went wrong.
       IF( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'ARDGEN_ERR', 'ARDGEN: Failed to create an ARD'//
-     :                 ' description file.', STATUS )
+         CALL ERR_REP( 'ARDGEN_ERR', 'ARDGEN: Failed to create an ARD '/
+     :                 /'description file.', STATUS )
       END IF
 
       END
