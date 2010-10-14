@@ -101,24 +101,31 @@
 *        of the axis values reported on the screen may also be controlled.
 *
 *        A comma-separated list of strings should be given in which each
-*        string is either an attribute setting, or the name of a text file
-*        preceded by an up-arrow character "^". Such text files should
-*        contain further comma-separated lists which will be read and
-*        interpreted in the same manner. Attribute settings are applied in
-*        the order in which they occur within the list, with later settings
-*        over-riding any earlier settings given for the same attribute.
+*        string is either an attribute setting, or the name of a text
+*        file preceded by an up-arrow character "^".  Such text files
+*        should contain further comma-separated lists which will be read
+*        and interpreted in the same manner.  Attribute settings are
+*        applied in the order in which they occur within the list, with
+*        later settings overriding any earlier settings given for the
+*        same attribute.
 *
 *        Each individual attribute setting should be of the form:
 *
 *           <name>=<value>
 *
-*        where <name> is the name of a plotting attribute, and <value> is
-*        the value to assign to the attribute. Default values will be
-*        used for any unspecified attributes. All attributes will be
-*        defaulted if a null value (!) is supplied. See section "Plotting
-*        Attributes" in SUN/95 for a description of the available
-*        attributes. Any unrecognised attributes are ignored (no error is
-*        reported).
+*        where <name> is the name of a plotting attribute, and <value>
+*        is the value to assign to the attribute.  Default values will
+*        be used for any unspecified attributes.  All attributes will be
+*        defaulted if a null value (!)---the initial default---is
+*        supplied.  To apply changes of style to only the current
+*        invocation, begin these attributes with a plus sign.  A mixture
+*        of persistent and temporary style changes is achieved by
+*        listing all the persistent attributes followed by a plus sign
+*        then the list temporary attributes.
+*
+*        See section "Plotting Attributes" in SUN/95 for a description
+*        of the available attributes.  Any unrecognised attributes are
+*        ignored (no error is reported).
 *
 *        The appearance of the outline is controlled by the attributes
 *        Colour(Border), Width(Border), etc (the synonym "Outline" may be
@@ -188,7 +195,9 @@
 *  Copyright:
 *     Copyright (C) 1989-1991 Science & Engineering Research Council.
 *     Copyright (C) 2000, 2002, 2004 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -237,7 +246,9 @@
 *     10-DEC-2002 (DSB):
 *        Added display of colour palette.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2010 October 14 (MJC):
+*        Allow temporary style attributes.
 *     {enter_further_changes_here}
 
 *-
@@ -338,7 +349,7 @@
       CALL KPG1_ASPSY( '(OUT*LINE)', '(BORDER)', STATUS )
 
 *  Set the plotting and formatting attributes.
-      CALL KPG1_ASSET( 'KAPPA_GDSTATE', 'STYLE', IPLOT, STATUS )
+      CALL KPG1_ASSET( 'KAPPA_GDSTATE', '+STYLE', IPLOT, STATUS )
 
 *  Set a flag indicating whether the required Frame is the original
 *  Current Frame.
