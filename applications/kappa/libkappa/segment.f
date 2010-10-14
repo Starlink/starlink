@@ -21,8 +21,8 @@
 
 *  Description:
 *     This routine copies one or more polygonal segments from the first
-*     input NDF (parameter IN1), and pastes them into the second input
-*     NDF (parameter IN2) at the same pixel co-ordinates.  The resulting
+*     input NDF (Parameter IN1), and pastes them into the second input
+*     NDF (Parameter IN2) at the same pixel co-ordinates.  The resulting
 *     mosaic is stored in the output NDF (see OUT).  Either input NDF
 *     may be supplied as null ("!") in which case the corresponding
 *     areas of the output NDF are filled with bad values.  For instance,
@@ -35,7 +35,7 @@
 *     vertices. This may be done using a graphics cursor, by supplying
 *     a positions list or text file containing the positions, or by
 *     supplying the positions in response to a parameter prompt. The
-*     choice is made by parameter MODE.
+*     choice is made by Parameter MODE.
 *
 *     This application may also be used to cut and paste cylinders with
 *     polygonal cross-sections from NDFs with more than two dimensions.
@@ -50,21 +50,21 @@
 *  ADAM Parameters:
 *     COORDS = LITERAL (Read)
 *        The co-ordinates of a single vertex for the current polygon.
-*        If parameter MODE is set to "Interface", this parameter is
+*        If Parameter MODE is set to "Interface", this parameter is
 *        accessed repeatedly to obtain the co-ordinates of all vertices
 *        in the polygon.  A null value should be given when the final
 *        vertex has been specified.  Each position should be supplied
 *        within the current co-ordinate Frame of the output NDF (see
-*        parameter OUT).  Supplying a colon ":" will display details of
+*        Parameter OUT).  Supplying a colon ":" will display details of
 *        the required co-ordinate Frame.  No more than two formatted
 *        axis values (separated by a comma or space) may be supplied.
 *        If the co-ordinate Frame being used has more than two axes,
-*        then the two axes to use must be specified using parameter
+*        then the two axes to use must be specified using Parameter
 *        USEAXIS.
 *     DEVICE = DEVICE (Read)
 *        The name of the graphics device on which an image is displayed.
-*        Only used if parameter MODE is given the value "Cursor".  Any
-*        graphics specified by parameter PLOT will be produced on this
+*        Only used if Parameter MODE is given the value "Cursor".  Any
+*        graphics specified by Parameter PLOT will be produced on this
 *        device.  This device must support cursor interaction.  [Current
 *        graphics device]
 *     IN1 = NDF (Read)
@@ -78,7 +78,7 @@
 *        supplied, the outside of the polygonal segments will be filled
 *        with bad values.
 *     INCAT1-INCAT20 = FILENAME (Read)
-*        If MODE is "Catalogue", each of the parameters INCAT1 to
+*        If MODE is "Catalogue", each of the Parameters INCAT1 to
 *        INCAT20 are used to access catalogues containing the
 *        co-ordinates of the vertices of a single polygon.  Suitable
 *        catalogues may be created using CURSOR, LISTMAKE, etc.  If a
@@ -98,7 +98,7 @@
 *        polygon vertices are to be stored.  A null value (!) means that
 *        no file is created.  [!]
 *     MARKER = INTEGER (Read)
-*        This parameter is only accessed if parameter PLOT is set to
+*        This parameter is only accessed if Parameter PLOT is set to
 *        "Chain" or "Mark". It specifies the type of marker with which
 *        each cursor position should be marked, and should be given as
 *        an integer PGPLOT marker type. For instance, 0 gives a box, 1
@@ -110,12 +110,12 @@
 *        to be obtained.  The supplied string can be one of the
 *        following selection.
 *
-*        - "Interface" -- positions are obtained using parameter COORDS.
+*        - "Interface" -- positions are obtained using Parameter COORDS.
 *        These positions must be supplied in the current co-ordinate
-*        Frame of the output NDF (see parameter OUT).
+*        Frame of the output NDF (see Parameter OUT).
 *
 *        - "Cursor" -- positions are obtained using the graphics cursor
-*        of the device specified by parameter DEVICE.  The WCS
+*        of the device specified by Parameter DEVICE.  The WCS
 *        information stored with the picture in the graphics database is
 *        used to map the supplied cursor positions into the pixel
 *        co-ordinate Frame of the output NDF.  A message is displayed
@@ -123,7 +123,7 @@
 *        output NDF were aligned.
 *
 *        - "Catalogue" -- positions are obtained from positions lists
-*        using parameters INCAT1 to INCAT20. Each catalogue defines a
+*        using Parameters INCAT1 to INCAT20. Each catalogue defines a
 *        single polygon. The WCS information in each catalogue is used
 *        to map the positions in the catalogue into the pixel
 *        co-ordinate Frame of the output NDF.  A message is displayed
@@ -131,10 +131,10 @@
 *        the catalogue and the output NDF were aligned.
 *
 *        - "File" -- positions are obtained from text files using
-*        parameters POLY1 to POLY20.  Each file defines a single
+*        Parameters POLY1 to POLY20.  Each file defines a single
 *        polygon.  Each line in a file must contain two formatted axis
 *        values in the current co-ordinate Frame of the output NDF (see
-*        parameter OUT), separated by white space or a comma.
+*        Parameter OUT), separated by white space or a comma.
 *
 *        [current value]
 *     MAXPOLY = _INTEGER (Read)
@@ -162,10 +162,10 @@
 *        supplied, then the shape and size of the output NDF
 *        corresponds to the area of overlap between the two input NDFs
 *        (in pixel space), and the WCS information and current Frame
-*        are inherited from the NDF associated with parameter IN1.
+*        are inherited from the NDF associated with Parameter IN1.
 *     PLOT = LITERAL (Read)
 *        The type of graphics to be used to mark the position of each
-*        selected vertex.  It is only used if parameter MODE is given
+*        selected vertex.  It is only used if Parameter MODE is given
 *        the value "Cursor".  The appearance of these graphics (colour,
 *        size, etc ) is controlled by the STYLE parameter.  PLOT can
 *        take any of the following values.
@@ -173,7 +173,7 @@
 *        - "None" -- No graphics are produced.
 *
 *        - "Mark" -- Each position is marked with a marker of type
-*        specified by parameter MARKER.
+*        specified by Parameter MARKER.
 *
 *        - "Poly" -- Causes each position to be joined by a line to the
 *        previous position.  Each polygon is closed by joining the last
@@ -184,7 +184,7 @@
 *        previous position.  Parameter MARKER is used to specify the
 *        marker  to use.  [current value]
 *     POLY1-POLY20 = FILENAME (Read)
-*        If MODE is "File", each of the parameters POLY1 to POLY20 are
+*        If MODE is "File", each of the Parameters POLY1 to POLY20 are
 *        used to access text files containing the co-ordinates of the
 *        vertices of a single polygon.  If a value is assigned to POLY1
 *        on the command line, you are not prompted for any of the
@@ -194,13 +194,13 @@
 *        given or POLY20 is reached.
 *
 *        Each position should be supplied within the current
-*        co-ordinate Frame of the output NDF (see parameter OUT).  No
+*        co-ordinate Frame of the output NDF (see Parameter OUT).  No
 *        more than two formatted axis values (separated by a comma or
 *        space) may be supplied on each line.  If the co-ordinate Frame
 *        being used has more than two axes, then the two axes to use
-*        must be specified using parameter USEAXIS.
+*        must be specified using Parameter USEAXIS.
 *     QUALITY = _LOGICAL (Read)
-*        If a TRUE value is supplied for parameter QUALITY then quality
+*        If a TRUE value is supplied for Parameter QUALITY then quality
 *        information is copied from the input NDFs to the output NDFs.
 *        Otherwise, the quality information is not copied.  This
 *        parameter is only accessed if all supplied input NDFs have
@@ -210,7 +210,7 @@
 *        corresponding output QUALITY values are set to zero.  [TRUE]
 *     STYLE = GROUP (Read)
 *        A group of attribute settings describing the style to use when
-*        drawing the graphics specified by parameter PLOT.
+*        drawing the graphics specified by Parameter PLOT.
 *
 *        A comma-separated list of strings should be given in which each
 *        string is either an attribute setting, or the name of a text
@@ -263,7 +263,7 @@
 *        same indices as the first two significant NDF pixel axes are
 *        used.  [!]
 *     VARIANCE = _LOGICAL (Read)
-*        If a TRUE value is supplied for parameter VARIANCE then
+*        If a TRUE value is supplied for Parameter VARIANCE then
 *        variance information is copied from the input NDFs to the
 *        output NDFs.  Otherwise, the variance information is not
 *        copied.  This parameter is only accessed if all supplied input
@@ -299,7 +299,7 @@
 *     NDF pixel arrays are processed in the same way, that is the same
 *     polygonal regions are extracted from each plane and copied to the
 *     corresponding plane of the output NDF.  The plane containing the
-*     polygons must be defined using parameter USEAXIS.  This plane is a
+*     polygons must be defined using Parameter USEAXIS.  This plane is a
 *     plane within the current co-ordinate Frame of the output NDF
 *     (which is inherited from the first supplied input NDF).  This
 *     scheme will only work correctly if the selected plane in the
@@ -313,10 +313,10 @@
 *  Implementation Status:
 *     -  This routine will propagate VARIANCE component values so long
 *     as all supplied input NDFs have defined VARIANCE components, and
-*     parameter VARIANCE is not FALSE.
+*     Parameter VARIANCE is not FALSE.
 *     -  This routine will propagate QUALITY component values so long
 *     as all supplied input NDFs have defined QUALITY components, and
-*     parameter QUALITY is not FALSE.
+*     Parameter QUALITY is not FALSE.
 *     -  The UNITS, AXIS, LABEL, TITLE, WCS and HISTORY components are
 *     propagated from the first supplied input NDF, together with all
 *     extensions.
@@ -359,7 +359,7 @@
 *        Added Notes and Related Applications, and more examples.
 *        Moved old Notes to Implementation Status.  Made Examples and
 *        Usage lowercase.  Various tidying and stylistic changes, and
-*        typo's corrected.  Renamed parameter XY to COORDS.  Revised
+*        typo's corrected.  Renamed Parameter XY to COORDS.  Revised
 *        call to various routines for obtaining the co-ordinates
 *        and KPG1_XYD2W.  Used modern-style variable declarations.
 *        Added headings to the commentary.  Made the non-warning
@@ -367,7 +367,7 @@
 *        processing.
 *     1997 July 11 (MJC):
 *        When POLY1 is given on the command line in file mode, it is
-*        now possible to supply additional polygons through parameters
+*        now possible to supply additional polygons through Parameters
 *        POLY2-POLY20 also given on the command line.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
@@ -1009,7 +1009,7 @@
                      CALL MSG_SETI( 'M', MXVERT )
                      CALL MSG_SETC( 'P', PNAME( : LPNAME ) )
                      CALL ERR_REP( 'SEGMENT_ERR4', 'Too many vertices'//
-     :                             ' (^N) specified by parameter ^P. '//
+     :                             ' (^N) specified by Parameter ^P. '//
      :                             'Each polygon must contain no more'//
      :                             ' than ^M vertices.', STATUS )
                   END IF
@@ -1078,7 +1078,7 @@
                      CALL MSG_SETI( 'M', MXVERT )
                      CALL MSG_SETC( 'P', PNAME( : LPNAME ) )
                      CALL ERR_REP( 'SEGMENT_ERR5', 'Too many vertices'//
-     :                             ' (^N) specified by parameter ^P. '//
+     :                             ' (^N) specified by Parameter ^P. '//
      :                             'Each polygon must contain no more'//
      :                             ' than ^M vertices.', STATUS )
                   END IF
@@ -1151,7 +1151,7 @@
                STATUS = SAI__ERROR
                CALL ERR_REP( 'SEGMENT_ERR6', 'Cannot determine which '//
      :                       'pixel axes correspond to the current '//
-     :                       'Frame axes specified by parameter '//
+     :                       'Frame axes specified by Parameter '//
      :                       'USEAXIS.', STATUS )
                GO TO 999
             END IF
