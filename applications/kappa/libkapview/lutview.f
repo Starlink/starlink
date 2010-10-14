@@ -193,12 +193,18 @@
 *           <name>=<value>
 *
 *        where <name> is the name of a plotting attribute, and <value>
-*        is the value to assign to the attribute. Default values will be
-*        used for any unspecified attributes. All attributes will be
-*        defaulted if a null value (!) is supplied.  See section
-*        "Plotting Attributes" in SUN/95 for a description of the
-*        available attributes.  Any unrecognised attributes are ignored
-*        (no error is reported).
+*        is the value to assign to the attribute.  Default values will
+*        be used for any unspecified attributes.  All attributes will be
+*        defaulted if a null value (!)---the initial default---is
+*        supplied.  To apply changes of style to only the current
+*        invocation, begin these attributes with a plus sign.  A mixture
+*        of persistent and temporary style changes is achieved by
+*        listing all the persistent attributes followed by a plus sign
+*        then the list temporary attributes.
+*
+*        See section "Plotting Attributes" in SUN/95 for a description
+*        of the available attributes.  Any unrecognised attributes are
+*        ignored (no error is reported).
 *
 *        Axis 1 is always the "data value" axis, whether it is displayed
 *        horizontally or vertically.  So for instance, to set the label
@@ -268,7 +274,9 @@
 
 *  Copyright:
 *     Copyright (C) 1999-2002, 2004 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -305,7 +313,9 @@
 *     13-AUG-2002 (DSB):
 *        Added CURNDC Frame.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2010 October 14 (MJC):
+*        Permit temporary style attributes.
 *     {enter_further_changes_here}
 
 *-
@@ -669,8 +679,9 @@
 
       END IF
 
-*  Create the LUT key within the KEY Picture.
-      CALL KPG1_LUTKY( IPICK, 'STYLE', HIGH, LOW, LABEL,
+*  Create the LUT key within the KEY Picture.  The plus sign requests
+*  that temporary attributes be recognised.
+      CALL KPG1_LUTKY( IPICK, '+STYLE', HIGH, LOW, LABEL,
      :                 'KAPPA_LUTVIEW', LP, UP, 0.0, 0.0, 0.0, 'CC',
      :                 NCOL, %VAL( CNF_PVAL( IPCOL ) ), STATUS )
 
