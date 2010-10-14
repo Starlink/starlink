@@ -132,12 +132,7 @@
 *        not exist.  [current value]
 *     STYLE = GROUP (Read)
 *        A group of attribute settings describing the plotting style to
-*        use when drawing the annotated axes and data values.  The
-*        default for this parameter is its current value, and so any
-*        value supplied for this parameter persists for all future
-*        invocations of this application until a new value is supplied.
-*        If you want to make temporary changes to the plotting style
-*        that do not persist then use the TEMPSTYLE parameter.
+*        use when drawing the annotated axes and data values.
 *
 *        A comma-separated list of strings should be given in which each
 *        string is either an attribute setting, or the name of a text
@@ -153,28 +148,22 @@
 *           <name>=<value>
 *
 *        where <name> is the name of a plotting attribute, and <value>
-*        is the value to assign to the attribute. Default values will be
-*        used for any unspecified attributes.  All attributes will be
-*        defaulted if a null value (!) is supplied.  See Section
-*        "Plotting Attributes" in SUN/95 for a description of the
-*        available attributes.  Any unrecognised attributes are ignored
-*        (no error is reported).
+*        is the value to assign to the attribute.  Default values will
+*        be used for any unspecified attributes.  All attributes will be
+*        defaulted if a null value (!)---the initial default---is
+*        supplied.  To apply changes of style to only the current
+*        invocation, begin these attributes with a plus sign.  A mixture
+*        of persistent and temporary style changes is achieved by
+*        listing all the persistent attributes followed by a plus sign
+*        then the list temporary attributes.
+*
+*        See section "Plotting Attributes" in SUN/95 for a description
+*        of the available attributes.  Any unrecognised attributes are
+*        ignored (no error is reported).
 *
 *        The appearance of the histogram curve is controlled by the
 *        attributes Colour(Curves), Width(Curves), etc.  (The synonym
 *        Line may be used in place of Curves.)  [current value]
-*     TEMPSTYLE = GROUP (Read)
-*        A group of extra attribute settings which modify the plotting
-*        style specified by the STYLE parameter.  The default for this
-*        parameter is a null (!) value, which causes the plotting style
-*        specified by STYLE to be used without any changes.  Style
-*        changes specified using TEMPSTYLE do not persist between
-*        invocations of this application.  If you want to make permanent
-*        changes to the default plotting style then use the STYLE
-*        parameter.
-*
-*        See the description of the STYLE parameter for more information
-*        about values that can be assigned to this parameter.  [!]
 *     TITLE = LITERAL (Read)
 *        Title for the histogram NDF.  ["KAPPA - Histogram"]
 *     XLEFT = _REAL (Read)
@@ -263,8 +252,7 @@
 *     Research Councils.
 *     Copyright (C) 2005-2006 Particle Physics & Astronomy Research
 *     Council.
-*     Copyright (C) 2008, 2010 Science and Technology Facilities
-*     Council.
+*     Copyright (C) 2008-2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -332,6 +320,8 @@
 *        Make use of KPG1_SAXAT and KPG1_ASTTL.
 *     2010 August 15 (MJC):
 *        Add Parameter TEMPSTYLE.
+*     2010 October 14 (MJC):
+*        Permit temporary style attributes.  Withdraw TEMPSTYLE.
 *     {enter_further_changes_here}
 
 *-
@@ -809,7 +799,7 @@
 *  Plot the locus just computed within annotated axes.  Both axes'
 *  limits are defined. Use a default value of 0.0 for the bottom of the
 *  vertical axis.  This accesses Parameters AXES, CLEAR, DEVICE,
-*  MARGIN, STYLE, TEMPSTYLE, XLEFT, XRIGHT, YBOT, and YLEFT.
+*  MARGIN, STYLE, XLEFT, XRIGHT, YBOT, and YLEFT.
          CALL KPG1_GRAPH( NUMBIN, %VAL( CNF_PVAL( HPPTR1 ) ),
      :                    %VAL( CNF_PVAL( HPPTR2 ) ),
      :                    0.0, 0.0,  XL, YL, ' ', ' ',
