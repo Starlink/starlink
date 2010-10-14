@@ -29,8 +29,8 @@
 *     Parameter KEY).
 *
 *     Annotated axes or a simple border can be drawn around the image
-*     (see  parameters AXES and BORDER).  The appearance of these may be
-*     controlled in detail (see parameters STYLE and BORSTYLE).
+*     (see Parameters AXES and BORDER).  The appearance of these may be
+*     controlled in detail (see Parameters STYLE and BORSTYLE).
 *
 *     A specified colour lookup table may optionally be loaded prior to
 *     displaying the image (see Parameter LUT). For devices which reset
@@ -39,7 +39,7 @@
 *
 *     The image is produced within the current graphics database
 *     picture.  The co-ordinates at the centre of the image, and the
-*     scale of the image can be controlled using parameters CENTRE,
+*     scale of the image can be controlled using Parameters CENTRE,
 *     XMAGN and YMAGN.  Only the parts of the image that lie within the
 *     current picture are visible; the rest is clipped.  The image is
 *     padded with bad pixels if necessary.
@@ -217,7 +217,7 @@
 *        "logpop=1".  To get a linear population axis, specify
 *        "logpop=0" (the default).  To annotate the long axis with pen
 *        numbers instead of pixel value, specify "pennums=1" (the
-*        default, "pennums=0", shows pixel values). [current value]
+*        default, "pennums=0", shows pixel values).  [current value]
 *     LOW = _DOUBLE (Read)
 *        The data value corresponding to the lowest pen in the colour
 *        table.  All smaller data values are set to the lowest colour
@@ -360,15 +360,21 @@
 *        where <name> is the name of a plotting attribute, and <value>
 *        is the value to assign to the attribute.  Default values will
 *        be used for any unspecified attributes.  All attributes will be
-*        defaulted if a null value (!) is supplied.  See section
-*        "Plotting Attributes" in SUN/95 for a description of the
-*        available attributes.  Any unrecognised attributes are ignored
-*        (no error is reported).  [current value]
+*        defaulted if a null value (!)---the initial default---is
+*        supplied.  To apply changes of style to only the current
+*        invocation, begin these attributes with a plus sign.  A mixture
+*        of persistent and temporary style changes is achieved by
+*        listing all the persistent attributes followed by a plus sign
+*        then the list temporary attributes.
+*
+*        See section "Plotting Attributes" in SUN/95 for a description
+*        of the available attributes.  Any unrecognised attributes are
+*        ignored (no error is reported).  [current value]
 *     USEAXIS = GROUP (Read)
 *        USEAXIS is only accessed if the current co-ordinate Frame of
 *        the NDF has more than two axes.  A group of two strings should
 *        be supplied specifying the two axes which are to be used when
-*        annotating the image, and when supplying a value for parameter
+*        annotating the image, and when supplying a value for Parameter
 *        CENTRE.  Each axis can be specified using one of the following
 *        options.
 *
@@ -461,7 +467,7 @@
 *     Therefore, large images will be compressed by block averaging when
 *     this can be done without loss of resolution in the displayed
 *     image.  This saves time scaling the data and transmitting them to
-*     the image display.  Note that the default values for parameters
+*     the image display.  Note that the default values for Parameters
 *     LOW and HIGH are the minimum and maximum values in the compressed
 *     floating-point data.
 *     -  If no Title is specified via the STYLE parameter, then the
@@ -516,7 +522,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -526,8 +532,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -591,7 +597,7 @@
 *     3-SEP-1999 (DSB):
 *        Added NULL argument to KPG1_GTPOS call.
 *     18-OCT-1999 (DSB):
-*        Added parameters KEY, KEYPOS and KEYSTYLE.
+*        Added Parameters KEY, KEYPOS and KEYSTYLE.
 *     26-OCT-1999 (DSB):
 *        Made MARGIN give margins as fraction of current picture instead
 *        of DATA picture.
@@ -1012,7 +1018,7 @@
          IF( KEY ) THEN
             CALL ERR_REP( 'DISPLAY_ERR1', 'No room left for the DATA '//
      :                    'picture (try reducing the size of the '//
-     :                    'margins or key - see parameters MARGIN '//
+     :                    'margins or key - see Parameters MARGIN '//
      :                    'and KEYPOS).', STATUS )
          ELSE
             CALL ERR_REP( 'DISPLAY_ERR2', 'No room left for the DATA '//
@@ -1275,7 +1281,7 @@
      :    .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'DISPLAY_5', 'The values supplied for '//
-     :                 'parameters %CENTRE, %XMAGN and %YMAGN would '//
+     :                 'Parameters %CENTRE, %XMAGN and %YMAGN would '//
      :                 'result in no part of the image being '//
      :                 'displayed.', STATUS )
       END IF
@@ -1661,4 +1667,3 @@
       END IF
 
       END
-
