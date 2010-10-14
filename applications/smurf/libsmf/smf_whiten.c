@@ -48,7 +48,7 @@
 
 *  Notes:
 *     If the 1/f spectrum appears to extend into the white-noise band,
-*     or returns an exponent < 0 (i.e. increasing instead of decreasing),
+*     or returns an exponent >= 0 (i.e. increasing instead of decreasing),
 *     the function will simply return without doing anything to the data.
 
 *  Authors:
