@@ -1019,6 +1019,7 @@ void smurf_makemap( int *status ) {
   int tndf = NDF__NOID;      /* NDF identifier for 3D output NDF */
   int trimtiles;             /* Trim the border tiles to exclude bad pixels? */
   AstMapping *tskymap = NULL;/* GRID->SkyFrame Mapping from output tile WCS */
+  struct timeval tv1, tv2;   /* Timers */
   int ubnd_out[2];           /* Upper pixel bounds for output map */
   void *variance=NULL;       /* Pointer to the variance map */
   smfData *wdata=NULL;       /* Pointer to SCUBA2 data struct for weights */
@@ -1028,12 +1029,13 @@ void smurf_makemap( int *status ) {
   int wndf = NDF__NOID;      /* NDF identifier for WEIGHTS */
   smfWorkForce *wf = NULL;   /* Pointer to a pool of worker threads */
 
-  struct timeval tv1, tv2;
-
   if (*status != SAI__OK) return;
 
   /* initialisation */
   data_units[0] = '\0';
+
+  /*** TIMER ***/
+  smf_timerinit( &tv1, &tv2, status );
 
   /* Main routine */
   ndfBegin();
@@ -1048,6 +1050,10 @@ void smurf_makemap( int *status ) {
   /* Filter out darks */
   smf_find_science( igrp, &fgrp, 0, NULL, NULL, 1, 1, SMF__NULL, &darks,
                     &flatramps, &meanstep, status );
+
+  /*** TIMER ***/
+  msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ": %f s finding science obs",
+             status, smf_timerupdate(&tv1,&tv2,status) );
 
   /* input group is now the filtered group so we can use that and
      free the old input group */
@@ -1074,7 +1080,6 @@ void smurf_makemap( int *status ) {
   if( *status == SAI__OK ) {
     double freemem = 0.0;
     physsize = 0;
-
 
     (void)smf_get_freemem( NULL, NULL, &physsize, status );
 
@@ -1168,14 +1173,15 @@ void smurf_makemap( int *status ) {
   parGet0l( "ALIGNSYS", &alignsys, status );
 
   msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Determine map bounds", status);
-  gettimeofday( &tv1, NULL );
+
   smf_mapbounds( 1, igrp, size, system, spacerefwcs, alignsys,
                  lbnd_out, ubnd_out, &outfset, &moving, &boxes, status );
-  gettimeofday( &tv2, NULL );
+
   msgBlank( status );
 
-  msgSetd("TDIFF", smf_difftime(&tv1,&tv2,status));
-  msgOutif( MSG__DEBUG, " ", "Mapbounds took ^TDIFF s", status);
+  /*** TIMER ***/
+  msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ": Mapbounds took %f s",
+             status, smf_timerupdate(&tv1,&tv2,status) );
 
   /* Write WCS bounds */
   smf_store_outputbounds(1, lbnd_out, ubnd_out, outfset, NULL, NULL,
@@ -1701,6 +1707,10 @@ void smurf_makemap( int *status ) {
     /* Free the extension locator */
     datAnnul( &smurfloc, status );
 
+    /*** TIMER ***/
+    msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ": %f s on initial setup",
+               status, smf_timerupdate(&tv1,&tv2,status) );
+
     /* Iterative map-maker */
     msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Make map using ITERATE method",
              status);
@@ -1728,6 +1738,10 @@ void smurf_makemap( int *status ) {
       /* close the input file */
       smf_close_file( &data, status );
     }
+
+    /*** TIMER ***/
+    msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ": %f s setting up provenance",
+               status, smf_timerupdate(&tv1,&tv2,status) );
 
     /* Call the low-level iterative map-maker */
 
