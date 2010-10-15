@@ -172,11 +172,11 @@
 *        A comma-separated list of strings should be given in which each
 *        string is either an attribute setting, or the name of a text
 *        file preceded by an up-arrow character "^".  Such text files
-*        should contain further comma-separated lists which will be
-*        read and interpreted in the same manner.  Attribute settings
-*        are applied in the order in which they occur within the list,
-*        with later settings overriding any earlier settings given for
-*        the same attribute.
+*        should contain further comma-separated lists which will be read
+*        and interpreted in the same manner.  Attribute settings are
+*        applied in the order in which they occur within the list, with
+*        later settings overriding any earlier settings given for the
+*        same attribute.
 *
 *        Each individual attribute setting should be of the form:
 *
@@ -185,10 +185,16 @@
 *        where <name> is the name of a plotting attribute, and <value>
 *        is the value to assign to the attribute.  Default values will
 *        be used for any unspecified attributes.  All attributes will be
-*        defaulted if a null value (!) is supplied.  See section
-*        "Plotting Attributes" in SUN/95 for a description of the
-*        available attributes.  Any unrecognised attributes are ignored
-*        (no error is reported).  [current value]
+*        defaulted if a null value (!)---the initial default---is
+*        supplied.  To apply changes of style to only the current
+*        invocation, begin these attributes with a plus sign.  A mixture
+*        of persistent and temporary style changes is achieved by
+*        listing all the persistent attributes followed by a plus sign
+*        then the list temporary attributes.
+*
+*        See section "Plotting Attributes" in SUN/95 for a description
+*        of the available attributes.  Any unrecognised attributes are
+*        ignored (no error is reported).  [current value]
 *     LMODE = LITERAL (Read)
 *        LMODE specifies how the defaults for Parameters YBOT and YTOP
 *        (the  lower and upper limit of the vertical axis of the plot)
@@ -312,12 +318,7 @@
 *     STYLE = GROUP (Read)
 *        A group of attribute settings describing the plotting style to
 *        use when drawing the annotated axes, data values, and error
-*        markers.  The default for this parameter is its current value,
-*        and so any value supplied for this parameter persists for all
-*        future invocations of this application until a new value is
-*        supplied.  If you want to make temporary changes to the
-*        plotting style that do not persist then use the TEMPSTYLE
-*        parameter.
+*        markers.
 *
 *        A comma-separated list of strings should be given in which each
 *        string is either an attribute setting, or the name of a text
@@ -333,12 +334,18 @@
 *           <name>=<value>
 *
 *        where <name> is the name of a plotting attribute, and <value>
-*        is the value to assign to the attribute. Default values will be
-*        used for any unspecified attributes.  All attributes will be
-*        defaulted if a null value (!) is supplied.  See section
-*        "Plotting Attributes" in SUN/95 for a description of the
-*        available attributes.  Any unrecognised attributes are ignored
-*        (no error is reported).
+*        is the value to assign to the attribute.  Default values will
+*        be used for any unspecified attributes.  All attributes will be
+*        defaulted if a null value (!)---the initial default---is
+*        supplied.  To apply changes of style to only the current
+*        invocation, begin these attributes with a plus sign.  A mixture
+*        of persistent and temporary style changes is achieved by
+*        listing all the persistent attributes followed by a plus sign
+*        then the list temporary attributes.
+*
+*        See section "Plotting Attributes" in SUN/95 for a description
+*        of the available attributes.  Any unrecognised attributes are
+*        ignored (no error is reported).
 *
 *        The appearance of the data values is controlled by the
 *        attributes Colour(Curves), Width(Curves), etc. (the synonym
@@ -349,18 +356,6 @@
 *        appearance of the error symbols is controlled using
 *        Colour(ErrBars), Width(ErrBars), etc. (see Parameter SHAPE).
 *        [current value]
-*     TEMPSTYLE = GROUP (Read)
-*        A group of extra attribute settings which modify the plotting
-*        style specified by the STYLE parameter.  The default for this
-*        parameter is a null (!) value, which causes the plotting style
-*        specified by STYLE to be used without any changes.  Style
-*        changes specified using TEMPSTYLE do not persist between
-*        invocations of this application.  If you want to make permanent
-*        changes to the default plotting style then use the STYLE
-*        parameter.
-*
-*        See the description of the STYLE parameter for more information
-*        about values that can be assigned to this parameter.  [!]
 *     USEAXIS = LITERAL (Read)
 *        Specifies the quantity to be used to annotate the horizontal
 *        axis of the plot using one of the following options.
@@ -529,7 +524,7 @@
 *        file my_sty becomes the default plotting style for future
 *        invocations of LINPLOT.
 *     linplot xspec mode=p errbar xsigma=3 ysigma=3 shape=d
-*             tempstyle=^my_sty
+*             style=+^my_sty
 *        This is the same as the previous example, except that the style
 *        specified in file my_sty does not become the default style for
 *        future invocations of LINPLOT.
@@ -667,6 +662,8 @@
 *        Added Gapped MODE.
 *     2010 August 13 (MJC):
 *        The new mode renamed to GapHistogram.
+*     2010 October 14 (MJC):
+*        Permit temporary style attributes without using TEMPSTYLE.
 *     {enter_further_changes_here}
 
 *-
@@ -1705,7 +1702,10 @@
       CALL AST_SETACTIVEUNIT( IPLOT, .TRUE., STATUS )
 
 *  Set the attributes of the Plot to give the required Plotting style.
-      CALL KPG1_ASSET( 'KAPPA_LINPLOT', 'STYLE', IPLOT, STATUS )
+*  The plus sign requests support of temporary attributes.  Leave the
+*  TEMPSTYLE for backwards compatibility until users embrace the
+*  generic system.
+      CALL KPG1_ASSET( 'KAPPA_LINPLOT', '+STYLE', IPLOT, STATUS )
       CALL KPG1_ASSET( 'KAPPA_LINPLOT', 'TEMPSTYLE', IPLOT, STATUS )
 
 *  Generate a reference for the NDF to be stored in the graphics
@@ -1745,13 +1745,14 @@
 *  Draw the grid if required.
       IF( AXES ) CALL KPG1_ASGRD( IPLOT, IPICF, .TRUE., STATUS )
 
-*  Produce the data plot.
+*  Produce the data plot.  The plus sign requests support of
+*  temporary STYLE attributes.
       CALL KPG1_PLTLN( DIM, ILO, IHI, %VAL( CNF_PVAL( IPXCEN ) ),
      :                 %VAL( CNF_PVAL( IPYCEN ) ),
      :                 XVAR, YVAR, %VAL( CNF_PVAL( IPXBAR ) ),
      :                 %VAL( CNF_PVAL( IPYBAR ) ),
      :                 %VAL( CNF_PVAL( IPSTEP ) ),
-     :                 'STYLE,TEMPSTYLE', IPLOT, IMODE, MTYPE,
+     :                 '+STYLE,TEMPSTYLE', IPLOT, IMODE, MTYPE,
      :                 ISHAPE, FREQ, 'KAPPA_LINPLOT', STATUS )
 
 *  Produce the Key.
@@ -1830,8 +1831,9 @@
      :                      AST_GETFRAME( IWCS, AST__CURRENT, STATUS ),
      :                      STATUS )
 
-*  Set the style for plotting in the key picture.
-         CALL KPG1_ASSET( 'KAPPA_LINPLOT', 'KEYSTYLE', IPLOTK, STATUS )
+*  Set the style for plotting in the key picture.  The plus sign
+*  requests support of temporary SPECSTYLE attributes.
+         CALL KPG1_ASSET( 'KAPPA_LINPLOT', '+KEYSTYLE', IPLOTK, STATUS )
 
 *  Format the text for the first line of the key.
          KEYLN1 = 'From:  '
