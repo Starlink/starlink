@@ -1662,7 +1662,7 @@ void smurf_makecube( int *status ) {
 /* Update the provenance for the output NDF to include the input NDF as
    an ancestor. */
                smf_updateprov( ondf, data, NDF__NOID, "SMURF:MAKECUBE",
-                               status );
+                               NULL, status );
 
 /* Check that the input data type is single precision. */
                if( data->dtype != SMF__FLOAT ) {

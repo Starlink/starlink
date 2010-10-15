@@ -27,6 +27,14 @@
 *        is NULL.
 *     creator = const char * (Given)
 *        A string such as "SMURF:MAKECUBE" indicating the calling app.
+*     modprov = NdgProvenance ** (Given & Returned)
+*        If NULL the provenance will be read by this routine and the
+*        file will be immediately updated. The provenance will then
+*        be freed. If a pointer is provided and points to a NULL
+*        provenance the provenance will be read and modified but the
+*        file will not be updated. If the pointer is provided and
+*        points to a provenance then that provenance will be modified
+*        without reading the output NDF.
 *     status = int * (Given and Returned)
 *        Inherited status value.
 
@@ -36,9 +44,11 @@
 *     provenance information.
 
 *  Notes:
-*     Always propagates provenance if we have OBSIDSS available or if
+*     - Always propagates provenance if we have OBSIDSS available or if
 *     we have ancestors in the input provenance. Does not propagate if
 *     we have no ancestors and no OBSIDSS.
+*     - If an external provenance pointer is provided the caller
+*     is responsible for writing the provenance to the output file.
 
 *  Authors:
 *     David S Berry (JAC, UCLan)
@@ -64,6 +74,8 @@
 *        Only store provenance if we are a root (OBSIDSS is available)
 *        or we have provenance to propagate. Allow there to be no
 *        fits header at all.
+*     2010-10-15 (TIMJ):
+*        Allow provenance structure to be retained between calls.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -101,13 +113,12 @@
 #include <string.h>
 
 void smf_updateprov( int ondf, const smfData *data, int indf,
-                     const char *creator, int *status ){
+                     const char *creator, NdgProvenance **modprov, int *status ){
 
 /* Local Variables */
    AstFitsChan *fc = NULL;      /* AST FitsChan holding input FITS header */
    AstKeyMap *anc = NULL;       /* KeyMap holding ancestor info */
    AstKeyMap *tkm = NULL;       /* KeyMap holding contents of MORE */
-   NdgProvenance *oprov = NULL; /* Pointer to output provenance structure */
    NdgProvenance *prov = NULL;  /* Pointer to input provenance structure */
    char *obsidss = NULL;        /* Pointer to OBSIDSS buffer */
    char obsidssbuf[SZFITSCARD]; /* OBSIDSS value in input file */
@@ -176,10 +187,21 @@ void smf_updateprov( int ondf, const smfData *data, int indf,
    parents). Do nothing if we have no provenance to propagate, unless
    we have root information and are propagating that. */
    if ( ndgCountProv( prov, status ) > 0 || tkm) {
-     oprov = ndgReadProv( ondf, creator, status );
+     NdgProvenance *oprov = NULL;
+     if (modprov && *modprov) {
+       oprov = *modprov;
+     } else {
+       oprov = ndgReadProv( ondf, creator, status );
+       if (modprov) *modprov = oprov;
+     }
      ndgPutProv( oprov, indf, NULL, tkm, isroot, status );
-     ndgWriteProv( oprov, ondf, 1, status );
-     oprov = ndgFreeProv( oprov, status );
+     /* do not update the file or free provenance if we
+        are using an external provenance struct or returning
+        it to the caller */
+     if (!modprov) {
+       ndgWriteProv( oprov, ondf, 1, status );
+       oprov = ndgFreeProv( oprov, status );
+     }
    }
 
 /* Free resources. */

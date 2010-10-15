@@ -143,7 +143,7 @@ void smurf_rawunpress( int *status ) {
     /* Update provenance in the output before we close the input
        because sc2store will not give us access to an NDF identifier
        from the raw time series */
-    smf_updateprov( outndf, NULL, indf, "SMURF:RAWUNPRESS", status );
+    smf_updateprov( outndf, NULL, indf, "SMURF:RAWUNPRESS", NULL, status );
     ndfAnnul( &indf, status);
 
     /* Set parameters of the DATA array in the output file */

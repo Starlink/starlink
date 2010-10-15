@@ -281,7 +281,8 @@ smf_flat_calcflat( msglev_t msglev, const char flatname[],
   if (respmap) {
     /* write the provenance at the end since we have some problems with A-tasks
        in the pipeline causing trouble if the OUT parameter has not yet been set */
-    if (respmap->file) smf_accumulate_prov( NULL, prvgrp, 1, respmap->file->ndfid, "SMURF:CALCFLAT", status );
+    if (respmap->file) smf_accumulate_prov( NULL, prvgrp, 1, respmap->file->ndfid, "SMURF:CALCFLAT",
+                                            NULL, status );
 
     if ( respmapout ) {
       *respmapout = respmap;

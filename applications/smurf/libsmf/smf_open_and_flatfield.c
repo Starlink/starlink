@@ -238,7 +238,7 @@ int smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
     if (ogrp != NULL) {
       /* need an ndfid */
       smf_accumulate_prov( data, igrp, index, (*ffdata)->file->ndfid,
-                           prvname, status );
+                           prvname, NULL, status );
     }
 
   }

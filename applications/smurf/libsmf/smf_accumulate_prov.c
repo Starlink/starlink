@@ -14,7 +14,8 @@
 
 *  Invocation:
 *     smf_accumulate_prov( const smfData * data, const Grp * igrp,
-*                    size_t index, int ondf, const char * creator, int * status );
+*                    size_t index, int ondf, const char * creator,
+*                    NdgProvenance * modprov, int * status );
 
 *  Arguments:
 *     data = const smfData* (Given)
@@ -29,6 +30,11 @@
 *        Output NDF identifier.
 *     creator = const char * (Given)
 *        String to associate with the provenance entry. Usually SMURF:TASKNAME
+*     modprov = NdgProvenance ** (Given & Returned)
+*        Pointer to NdgProvenance information. If NULL the provenance will be updated
+*        in the output ndf and the file updated. If non-NULL the provenance
+*        will be returned and the file will not be updated. The caller must free
+*        the structure.
 *     status = int* (Given and Returned)
 *        Pointer to inherited status.
 
@@ -51,6 +57,8 @@
 *        Strip path from filename
 *     2008-05-28 (TIMJ):
 *        Now a wrapper around smf_updateprov
+*     2010-10-15 (TIMJ):
+*        Add modprov parameter
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -85,7 +93,8 @@
 
 void
 smf_accumulate_prov( const smfData * data, const Grp* igrp, size_t index,
-                     int ondf, const char *creator, int * status ) {
+                     int ondf, const char *creator, NdgProvenance ** modprov,
+                     int * status ) {
 
   int indf = NDF__NOID;  /* input NDF identifier */
   int opened = 0;  /* We had to open the file */
@@ -103,7 +112,7 @@ smf_accumulate_prov( const smfData * data, const Grp* igrp, size_t index,
     opened = 1;
   }
 
-  smf_updateprov( ondf, data, indf, creator,status );
+  smf_updateprov( ondf, data, indf, creator, modprov, status );
 
   if (opened) {
     ndfAnnul( &indf, status );

@@ -213,7 +213,7 @@ void smurf_rawpress( int *status ) {
     ndgNdfas( ogrp, i, "UPDATE", &outndf, status );
 
     /* Provenance updating */
-    smf_updateprov( outndf, NULL, indf, "SMURF:" TASK_NAME, status );
+    smf_updateprov( outndf, NULL, indf, "SMURF:" TASK_NAME, NULL, status );
 
     /* Need to copy some missing extensions:
           .MORE.SCUBA2.MCEHEAD

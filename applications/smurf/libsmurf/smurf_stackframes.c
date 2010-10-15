@@ -378,7 +378,7 @@ void smurf_stackframes( int *status ) {
     }
     /* output metadata */
     smf_accumulate_prov( data, igrp, sortinfo[i-1].index, outdata->file->ndfid,
-                         "SMURF:" TASK_NAME, status );
+                         "SMURF:" TASK_NAME, NULL, status );
 
     smf_close_file( &data, status );
   }

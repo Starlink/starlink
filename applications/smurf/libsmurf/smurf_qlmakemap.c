@@ -548,7 +548,7 @@ void smurf_qlmakemap( int *status ) {
 
     /* Propagate provenace */
     smf_accumulate_prov( data, igrp, i, odata->file->ndfid,
-                         "SMURF:QLMAKEMAP", status );
+                         "SMURF:QLMAKEMAP", NULL, status );
 
     msgOutif(MSG__VERB, " ", "SMURF_QLMAKEMAP: Beginning the REBIN step",
              status);

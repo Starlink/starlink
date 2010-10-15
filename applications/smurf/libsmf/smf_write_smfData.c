@@ -282,7 +282,7 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
     if ( (data->file && data->file->ndfid && data->file->ndfid != NDF__NOID) ||
          (provid != NDF__NOID) ) {
       smf_get_taskname( NULL, prvname, status );
-      smf_updateprov( outfile->ndfid, data, provid, prvname, status );
+      smf_updateprov( outfile->ndfid, data, provid, prvname, NULL, status );
     }
 
     /* number of bytes per element */

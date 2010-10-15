@@ -286,7 +286,7 @@ void smf_flat_write( smf_flatmeth flatmeth, const char * flatname,
 
     smf_get_taskname( NULL, prvname, status );
     for (j=1; j<=size; j++) {
-      smf_accumulate_prov( NULL, prvgrp, j, indf, prvname, status );
+      smf_accumulate_prov( NULL, prvgrp, j, indf, prvname, NULL, status );
     }
 
   }

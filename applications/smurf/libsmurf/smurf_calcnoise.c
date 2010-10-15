@@ -392,7 +392,7 @@ void smurf_calcnoise( int *status ) {
             }
             if (*status == SAI__OK && nepdata->file) {
               smf_accumulate_prov( NULL, basegrp, 1, nepdata->file->ndfid,
-                                   CREATOR, status );
+                                   CREATOR, NULL, status );
             }
             if (nepdata) smf_close_file( &nepdata, status );
           }
@@ -428,12 +428,12 @@ void smurf_calcnoise( int *status ) {
 
         if (*status == SAI__OK && outdata->file) {
           smf_accumulate_prov( NULL, basegrp, 1, outdata->file->ndfid,
-                               CREATOR, status );
+                               CREATOR, NULL, status );
         }
         if (outdata) smf_close_file( &outdata, status );
         if (*status == SAI__OK && ratdata && ratdata->file) {
           smf_accumulate_prov( NULL, basegrp, 1, ratdata->file->ndfid,
-                               CREATOR, status );
+                               CREATOR, NULL, status );
         }
         if (ratdata) smf_close_file( &ratdata, status );
 

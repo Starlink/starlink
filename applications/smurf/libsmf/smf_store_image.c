@@ -211,7 +211,7 @@ void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim,
 
   /* Sort out provenance. */
   smf_get_taskname( NULL, prvname, status );
-  smf_updateprov( uindf, data, NDF__NOID, prvname, status );
+  smf_updateprov( uindf, data, NDF__NOID, prvname, NULL, status );
 
   /* Store world coordinate transformations */
   ndfPtwcs ( wcs, uindf, status );

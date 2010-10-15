@@ -432,6 +432,7 @@
 #include "smf_threads.h"
 #include "smurf_par.h"
 #include "star/grp.h"
+#include "star/ndg.h"
 #include "smf_typ.h"
 #include "msg_par.h"
 #include "star/irq.h"
@@ -508,7 +509,8 @@ static inline void * debug_astStore( void * ptr, const void * data, size_t size 
 /* Function Prototypes */
 
 void smf_accumulate_prov( const smfData * data, const Grp* igrp, size_t index,
-                          int ondf, const char *creator, int * status );
+                          int ondf, const char *creator,
+                          NdgProvenance ** modprov, int * status );
 
 void smf_add_spectral_axis( int indf, AstFitsChan *fc, int *status );
 
@@ -1629,7 +1631,7 @@ void smf_update_valbad( smfData *data, smf_modeltype mtype, const smf_qual_t *qu
                         int *status );
 
 void smf_updateprov( int ondf, const smfData *data, int indf,
-                     const char *creator, int *status );
+                     const char *creator, NdgProvenance ** modprov, int *status );
 
 int smf_validate_smfData( const smfData * data, int hashdr, int hasfile,
                           int *status );

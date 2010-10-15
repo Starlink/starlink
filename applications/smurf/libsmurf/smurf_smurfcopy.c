@@ -208,7 +208,7 @@ void smurf_smurfcopy ( int * status ) {
 
       /* sort out provenance */
       smf_accumulate_prov( data, igrp, i, ofile->ndfid,
-                           "SMURF:SMURFCOPY", status );
+                           "SMURF:SMURFCOPY", NULL, status );
 
       /* copy the slice in */
       dtypsz = smf_dtype_size( odata, status );

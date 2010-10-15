@@ -1460,7 +1460,7 @@ void smurf_makemap( int *status ) {
 
           /* Propagate provenance to the output file */
           smf_accumulate_prov( data, tile->grp, ifile, ondf, "SMURF:MAKEMAP(REBIN)",
-                               status);
+                               NULL, status);
 
           /* Handle output FITS header creation */
           if (*status == SAI__OK)
@@ -1729,7 +1729,7 @@ void smurf_makemap( int *status ) {
 
       /* Propagate provenance to the output file */
       smf_accumulate_prov( data, igrp, i, ondf, "SMURF:MAKEMAP(ITER)",
-                           status);
+                           NULL, status);
 
       /* Handle output FITS header creation (since the file is open and
          the header is available) */
