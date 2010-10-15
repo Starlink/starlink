@@ -16,6 +16,10 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
+- A bug has been fixed in the FitsChan class that could cause wavelength
+axes to be assigned the units "m/s" when reading WCS information from a
+FITS header.
+
 - The astSet function (AST_SET) now allows literal commas to be included in
 string attribute values. String attribute values that include a literal
 comma should be enclosed in quotation marks.
