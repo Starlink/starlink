@@ -40,7 +40,7 @@
 *        DEVICE = DEVICE (Read)
 *           The plotting device.
 *        LMODE = LITERAL (Read)
-*           If the subroutine argument LMODE is .TRUE., then parameter
+*           If the subroutine argument LMODE is .TRUE., then Parameter
 *           LMODE is used to specify how the default values for YBOT and
 *           YTOP are found. If argument LMODE is .FALSE. then "Extended"
 *           mode is always used. This parameter can take the following
@@ -217,7 +217,7 @@
 *        the alpha screen.
 *     LMODE = LOGICAL (Given)
 *        If .TRUE., then the user is given the chance to specify the
-*        default vertical bounds for the plot using parameter LMODE. If
+*        default vertical bounds for the plot using Parameter LMODE. If
 *        .FALSE., the supplied bounds (YB, YT ) are used, and the
 *        equivalent of "Extended" LMODE is used for any bounds that are
 *        not supplied.
@@ -382,14 +382,14 @@
 *  Start and AST context.
       CALL AST_BEGIN( STATUS )
 
-*  Find the default values for parameters XLEFT and XRIGHT. These are
+*  Find the default values for Parameters XLEFT and XRIGHT. These are
 *  the whole range extended by 2.5% at each end.
       XLEFT = XL
       XRIGHT = XR
       CALL KPG1_GRLM1( ' ', N, X, Y, 0.0, 0.0, XLEFT, XRIGHT,
      :                 STATUS )
 
-*  Find the default values for parameters YBOT and YTOP. Use parameter
+*  Find the default values for Parameters YBOT and YTOP. Use Parameter
 *  LMODE to determine the method to use if argument LMODE is .TRUE.,
 *  otherwise a blank parameter name is used which results in "Extended"
 *  mode being used.
@@ -570,7 +570,7 @@
 *  the IPLOT argument).
       CALL AST_ANNUL( FRAME, STATUS )
 
-*  Atempt to open a graphics workstation, obtaining an AST Plot for
+*  Attempt to open a graphics workstation, obtaining an AST Plot for
 *  drawing in a new DATA picture using PGPLOT.
       CALL KPG1_PLOT( IFRM, 'UNKNOWN', APP, ' ', MARGIN, 0, ' ',
      :                ' ', 0.0, 0.0, 'DATAPLOT', BOX, IPICD, IPICF,
