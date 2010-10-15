@@ -896,7 +896,9 @@ f     - AST_TESTFITS: Test if a keyword has a defined value in a FitsChan
 *     20-JUL-2010 (DSB):
 *        Correct interpretation of NCP projection code.
 *     14-OCT-2010 (DSB):
-*        Correct loading of FitsChans that contain UNDEF keywords.
+*        - Correct loading of FitsChans that contain UNDEF keywords.
+*        - Correct translation of spectral units with non-standard
+*        capitalisation in SpecTrans.
 *class--
 */
 
@@ -25611,13 +25613,13 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
                size_t nc = astChrLen( cval );
                if( nc == 0 ) {
                   cval = NULL;
-               } else if( !Ustrncmp( cval, "Hz", nc, status ) ) {
+               } else if( !Ustrcmp( cval, "Hz", status ) ) {
                   cval = "Hz";
-               } else if( !Ustrncmp( cval, "Angstrom", nc, status ) ) {
+               } else if( !Ustrcmp( cval, "Angstrom", status ) ) {
                   cval = "Angstrom";
-               } else if( !Ustrncmp( cval, "km/s", nc, status ) ) {
+               } else if( !Ustrcmp( cval, "km/s", status ) ) {
                   cval = "km/s";
-               } else if( !Ustrncmp( cval, "m/s", nc, status ) ) {
+               } else if( !Ustrcmp( cval, "m/s", status ) ) {
                   cval = "m/s";
                } else {
                   cval = NULL;
