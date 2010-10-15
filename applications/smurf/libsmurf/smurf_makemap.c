@@ -871,6 +871,8 @@
 *        Write out NBOLOEFF information.
 *     2010-06-28 (TIMJ):
 *        Properly support varying step time.
+*     2010-10-15 (TIMJ):
+*        Slight speed up in provenance loop.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -1635,6 +1637,7 @@ void smurf_makemap( int *status ) {
     Grp *shortrootgrp = NULL;
     char tempfile[GRP__SZNAM+1];
     double nboloeff = 0.0;
+    NdgProvenance * oprov = NULL;
 
     /************************* I T E R A T E *************************************/
 
@@ -1729,7 +1732,7 @@ void smurf_makemap( int *status ) {
 
       /* Propagate provenance to the output file */
       smf_accumulate_prov( data, igrp, i, ondf, "SMURF:MAKEMAP(ITER)",
-                           NULL, status);
+                           &oprov, status);
 
       /* Handle output FITS header creation (since the file is open and
          the header is available) */
@@ -1737,6 +1740,12 @@ void smurf_makemap( int *status ) {
 
       /* close the input file */
       smf_close_file( &data, status );
+    }
+
+    /* Flush the provenance */
+    if (oprov) {
+      ndgWriteProv( oprov, ondf, 1, status );
+      oprov = ndgFreeProv( oprov, status );
     }
 
     /*** TIMER ***/
