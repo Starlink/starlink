@@ -16,9 +16,6 @@ Version 3.1
      groups of strings.  KPG1_GTGPT supports group members that are
      not `sticky', in other words the strings only last for the
      current invocation of an application.
-   - The new KPG1_GTGPT routine is a variant of KPG1_GTGRP that
-     supports attribute settings that are not `sticky', in other words
-     only last for the current invocation of an application.
    - The new more-general KPG_ISEQN replaces the old IRCAM-specific
      NXTNAM routine.  This increments trailing sequence numbers
      in strings, most often used to generate a series of filenames.
