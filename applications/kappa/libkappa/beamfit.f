@@ -168,7 +168,7 @@
 *     GAUSS = _LOGICAL (Read)
 *        If TRUE, the shape exponent is fixed to be 2; in other words
 *        the beams are modelled as two-dimensional normal distributions.
-*        If FALSE, the shape exponent is a free parameter in each fit. 
+*        If FALSE, the shape exponent is a free parameter in each fit.
 *        [TRUE]
 *     INCAT = FILENAME (Read)
 *        A catalogue containing a positions list giving the initial
@@ -260,11 +260,11 @@
 *        A comma-separated list of strings should be given in which each
 *        string is either an attribute setting, or the name of a text
 *        file preceded by an up-arrow character "^".  Such text files
-*        should contain further comma-separated lists which will be
-*        read and interpreted in the same manner.  Attribute settings
-*        are applied in the order in which they occur within the list,
-*        with later settings overriding any earlier settings given for
-*        the same attribute.
+*        should contain further comma-separated lists which will be read
+*        and interpreted in the same manner.  Attribute settings are
+*        applied in the order in which they occur within the list, with
+*        later settings overriding any earlier settings given for the
+*        same attribute.
 *
 *        Each individual attribute setting should be of the form:
 *
@@ -273,10 +273,16 @@
 *        where <name> is the name of a plotting attribute, and <value>
 *        is the value to assign to the attribute.  Default values will
 *        be used for any unspecified attributes.  All attributes will be
-*        defaulted if a null value (!) is supplied.  See section
-*        "Plotting Attributes" in SUN/95 for a description of the
-*        available attributes.  Any unrecognised attributes are ignored
-*        (no error is reported).  [current value]
+*        defaulted if a null value (!)---the initial default---is
+*        supplied.  To apply changes of style to only the current
+*        invocation, begin these attributes with a plus sign.  A mixture
+*        of persistent and temporary style changes is achieved by
+*        listing all the persistent attributes followed by a plus sign
+*        then the list temporary attributes.
+*
+*        See section "Plotting Attributes" in SUN/95 for a description
+*        of the available attributes.  Any unrecognised attributes are
+*        ignored (no error is reported).  [current value]
 *     POLAR = _LOGICAL (Read)
 *        If TRUE, the co-ordinates supplied through POS2--POS5 are
 *        interpreted in polar co-ordinates (offset, position angle)
@@ -553,6 +559,8 @@
 *        through the new defaulted GAUSS parameter.  Removed unnecessary
 *        constant, and moved the initialisation of some variables to
 *        keep valgrind happy.
+*     2010 October 14 (MJC):
+*        Permit temporary style attributes.
 *     {enter_further_changes_here}
 
 *-
@@ -784,10 +792,11 @@
      :                   .FALSE., MARK, STATUS )
 
 *  If so, get the marker type, and set the plotting style.
+*  The plus sign requests support of temporary attributes.
          IF ( MARK .NE.  'NONE' ) THEN
             CALL PAR_GDR0I( 'MARKER', 2, -31, 10000, .FALSE., IMARK,
      :                      STATUS )
-            CALL KPG1_ASSET( 'KAPPA_BEAMFIT', 'PLOTSTYLE', IPLOT,
+            CALL KPG1_ASSET( 'KAPPA_BEAMFIT', '+PLOTSTYLE', IPLOT,
      :                       STATUS )
 
 *  Set the current PGPLOT marker attributes (size, colour, etc.) so
