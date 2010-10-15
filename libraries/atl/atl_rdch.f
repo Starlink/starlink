@@ -23,6 +23,19 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
+*  Notes:
+*     - If the group contains the dump of a Channel (of any class),
+*     then the Object returned via IAST will be the Channel itself. The
+*     exception to this is that if the "Begin " line at the start of
+*     the dump ends with the string "(Read)", then the returned IAST
+*     Object will be the Object read from the Channel, rather than the
+*     Channel itself. For instance, if the group contains the dump of a
+*     FitsChan, and the first line of the dump is "Begin FitsChan(Read)",
+*     then the returned IAST object will be the Object read from the
+*     FitsChan, rather than the FitsChan itself. This facility is only
+*     available for top level objects (e.g. FitsChans contained within
+*     FitsChans cannot be read in this way).
+
 *  Copyright:
 *     Copyright (C) 2001 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
@@ -50,6 +63,11 @@
 *  History:
 *     12-JAN-2001 (DSB):
 *        Original version.
+*     15-OCT-2010 (DSB):
+*        If the Object read from the dump is itself a Channel, and the
+*        "Begin" line for the Channel ends with "(Read)", then read an
+*        Object from the Channel and return it rather than returning the
+*        Channel itself. Only one level of Channel nesting is allowed.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -77,13 +95,16 @@
       INTEGER IGRPC
       INTEGER NEXT
       INTEGER SIZE
-      COMMON /ATLSRC/ IGRPC, NEXT, SIZE
+      LOGICAL READCH
+      LOGICAL BEGIN
+      COMMON /ATLSRC/ IGRPC, NEXT, SIZE, READCH, BEGIN
 
 *  External References:
       EXTERNAL ATL_SRC1
 
 *  Local Variables:
       INTEGER CHAN
+      INTEGER NEWCHAN
 *.
 
 *  Initialise.
@@ -98,6 +119,14 @@
 *  Store the group identifer in common so that the source function can
 *  get at it.
       IGRPC = IGRP
+
+*  Indicate we have not yet read a "Begin " line from the group.
+      BEGIN = .FALSE.
+
+*  If the object in the group is a dump of a Channel or any class, then
+*  READCH indicates whether the object returned by this function should
+*  be the Channel itself or the object contained within the channel
+      READCH = .FALSE.
 
 *  Initialise the next group element to be read.
       NEXT = 1
@@ -115,6 +144,21 @@
          STATUS = SAI__ERROR
          CALL ERR_REP( 'ATL_RDCH_ERR1', 'No AST Object could be '//
      :                 'read from the supplied file.', STATUS )
+      END IF
+
+*  If the object read from the Channel is itself a Channel, and the
+*  READCH flag is set, then read an Object from the Channel, and return
+*  it in place of the original Channel.
+      IF( READCH .AND. AST_ISACHANNEL( IAST ) ) THEN
+         NEWCHAN = IAST
+         IAST = AST_READ( NEWCHAN, STATUS )
+         IF( IAST .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETC( 'C', AST_GETC( NEWCHAN, 'Class', STATUS ) )
+            CALL ERR_REP( 'ATL_RDCH_ERR2', 'No AST Object could be '//
+     :                    'read from the ^C read from the supplied '//
+     :                    'file.', STATUS )
+         END IF
       END IF
 
 *  Export the returned Object from the current AST context so that it is
@@ -179,13 +223,16 @@
       INTEGER IGRPC
       INTEGER NEXT
       INTEGER SIZE
-      COMMON /ATLSRC/ IGRPC, NEXT, SIZE
+      LOGICAL READCH
+      LOGICAL BEGIN
+      COMMON /ATLSRC/ IGRPC, NEXT, SIZE, READCH, BEGIN
 
 *  External References:
       INTEGER CHR_LEN
 
 *  Local Variables:
       CHARACTER BUF*(GRP__SZNAM)
+      INTEGER BLEN
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -194,11 +241,57 @@
       IF( NEXT .GT. SIZE ) THEN
          CALL AST_PUTLINE( ' ', -1, STATUS )
 
-*  Otherwise, get the element from the group, store it in the channel,
-*  and increment the index of the next element to be read from the group.
+*  Otherwise, get the element from the group.
       ELSE
          CALL GRP_GET( IGRPC, NEXT, 1, BUF, STATUS )
-         CALL AST_PUTLINE( BUF, CHR_LEN( BUF ), STATUS )
+
+*  Remove leading spaces and get its used length.
+         CALL CHR_LDBLK( BUF )
+         BLEN = CHR_LEN( BUF )
+
+*  If we have not yet read a "Begin " line, and the current line
+*  starts with "Begin ", indicate we have now read a "Begin " line
+*  and go on to see if it is a Channel of any class that is to be read.
+         IF( .NOT. BEGIN .AND. BUF( : 6 ) .EQ. 'Begin ' ) THEN
+            BEGIN = .TRUE.
+
+*  Ensure "Begin" is followed by only a single space, and get the
+*  potentially modified length.
+            CALL CHR_LDBLK( BUF( 7 : ) )
+            BLEN = CHR_LEN( BUF )
+
+*  If the line is now "Begin <class>(Read)...", where <class> is
+*  the name of a Channel class, then strip off the (Read) and set a
+*  flag in common that indicates that the object returned by ATL_RDCH
+*  should be the object read from the Channel, rather than the Channel
+*  itself. Note, we drop any comment at the end of the line.
+            IF( BUF( 7 : 19 ) .EQ. 'Channel(Read)' ) THEN
+               BUF = 'Begin Channel'
+               BLEN = 13
+               READCH = .TRUE.
+
+            ELSE IF( BUF( 7 : 20 ) .EQ. 'FitsChan(Read)' ) THEN
+               BUF = 'Begin FitsChan'
+               BLEN = 14
+               READCH = .TRUE.
+
+            ELSE IF( BUF( 7 : 20 ) .EQ. 'StcsChan(Read)' ) THEN
+               BUF = 'Begin StcsChan'
+               BLEN = 14
+               READCH = .TRUE.
+
+            ELSE IF( BUF( 7 : 19 ) .EQ. 'XmlChan(Read)' ) THEN
+               BUF = 'Begin XmlChan'
+               BLEN = 13
+               READCH = .TRUE.
+
+            END IF
+
+         END IF
+
+*  Store the line in the channel, and increment the index of the next
+*  element to be read from the group.
+         CALL AST_PUTLINE( BUF, BLEN, STATUS )
          NEXT = NEXT + 1
       END IF
 

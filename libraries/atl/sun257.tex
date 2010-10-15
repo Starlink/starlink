@@ -1446,6 +1446,23 @@ higher-level utility tasks.
          The global status.
       }
    }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If the group contains the dump of a Channel (of any class),
+         then the Object returned via IAST will be the Channel itself. The
+         exception to this is that if the {\tt "}Begin {\tt "} line at the start of
+         the dump ends with the string {\tt "}(Read){\tt "}, then the returned IAST
+         Object will be the Object read from the Channel, rather than the
+         Channel itself. For instance, if the group contains the dump of a
+         FitsChan, and the first line of the dump is {\tt "}Begin FitsChan(Read){\tt "},
+         then the returned IAST object will be the Object read from the
+         FitsChan, rather than the FitsChan itself. This facility is only
+         available for top level objects (e.g. FitsChans contained within
+         FitsChans cannot be read in this way).
+      }
+   }
 }
 \sstroutine{
    ATL\_RDFCH
@@ -1504,6 +1521,23 @@ higher-level utility tasks.
          STATUS = INTEGER (Given and Returned)
       }{
          The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If the group contains the AST dump of a Channel (of any class),
+         then the Object returned via IAST will be the Channel itself. The
+         exception to this is that if the {\tt "}Begin {\tt "} line at the start of
+         the dump ends with the string {\tt "}(Read){\tt "}, then the returned IAST
+         Object will be the Object read from the Channel, rather than the
+         Channel itself. For instance, if the group contains the AST dump of
+         a FitsChan, and the first line of the dump is {\tt "}Begin FitsChan(Read){\tt "},
+         then the returned IAST object will be the Object read from the
+         FitsChan, rather than the FitsChan itself. This facility is only
+         available for top level objects (e.g. FitsChans contained within
+         FitsChans cannot be read in this way).
       }
    }
 }

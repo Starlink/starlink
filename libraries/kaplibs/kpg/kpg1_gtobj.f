@@ -12,8 +12,8 @@
 *
 *     First, attempt to interpret the parameter value as an HDS path. The
 *     HDS object must have a type of WCS, must be scalar, and must contain
-*     a single one-dimensional array component with name DATA and type _CHAR. This is
-*     the scheme used for HDS structures created by KPG1_WWRT.
+*     a single one-dimensional array component with name DATA and type _CHAR.
+*     This is the scheme used for HDS structures created by KPG1_WWRT.
 *
 *     If the above attempt fails, attempt to interpret the parameter
 *     value as an NDF name. If the NDF is opened succesfully, its WCS
@@ -50,6 +50,19 @@
 *        The AST Object, or AST__NULL.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
+
+*  Notes:
+*     - If the group contains the AST dump of a Channel (of any class),
+*     then the Object returned via IAST will be the Channel itself. The
+*     exception to this is that if the "Begin " line at the start of
+*     the dump ends with the string "(Read)", then the returned IAST
+*     Object will be the Object read from the Channel, rather than the
+*     Channel itself. For instance, if the group contains the AST dump of
+*     a FitsChan, and the first line of the dump is "Begin FitsChan(Read)",
+*     then the returned IAST object will be the Object read from the
+*     FitsChan, rather than the FitsChan itself. This facility is only
+*     available for top level objects (e.g. FitsChans contained within
+*     FitsChans cannot be read in this way).
 
 *  Copyright:
 *     Copyright (C) 2001 Central Laboratory of the Research Councils.

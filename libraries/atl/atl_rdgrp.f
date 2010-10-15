@@ -25,6 +25,19 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
+*  Notes:
+*     - If the group contains the AST dump of a Channel (of any class),
+*     then the Object returned via IAST will be the Channel itself. The
+*     exception to this is that if the "Begin " line at the start of
+*     the dump ends with the string "(Read)", then the returned IAST
+*     Object will be the Object read from the Channel, rather than the
+*     Channel itself. For instance, if the group contains the AST dump of
+*     a FitsChan, and the first line of the dump is "Begin FitsChan(Read)",
+*     then the returned IAST object will be the Object read from the
+*     FitsChan, rather than the FitsChan itself. This facility is only
+*     available for top level objects (e.g. FitsChans contained within
+*     FitsChans cannot be read in this way).
+
 *  Copyright:
 *     Copyright (C) 2001 Central Laboratory of the Research Councils.
 *     Copyright (C) 2009 Science & Technology Facilities Council.
