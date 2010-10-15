@@ -25,7 +25,7 @@
 *     for instance, by applications LISTMAKE and CURSOR.  By default all
 *     positions in the catalogue are reported, but a subset may be
 *     reported by specifying a range of "position identifiers" (see
-*     parameters FIRST, LAST and STEP).
+*     Parameters FIRST, LAST and STEP).
 *
 *     Positions may be reported in a range of co-ordinate Frames
 *     dependent on the information stored in the supplied positions
@@ -37,7 +37,7 @@
 *     using Parameter STYLE.
 *
 *     Graphics may also be drawn marking the selected positions (see
-*     parameters PLOT and LABEL).  The supplied positions are aligned
+*     Parameters PLOT and LABEL).  The supplied positions are aligned
 *     with the picture specified by Parameter NAME.  If possible, this
 *     alignment occurs  within the co-ordinate Frame specified using
 *     Parameter FRAME.  If this is not possible, alignment may occur in
@@ -93,7 +93,7 @@
 *     FIRST = INTEGER (Read)
 *        The identifier for the first position to be displayed.
 *        Positions are only displayed which have identifiers in the
-*        range given by parameters FIRST and LAST.  If a null (!) value
+*        range given by Parameters FIRST and LAST.  If a null (!) value
 *        is supplied, the value used is the lowest identifier value in
 *        the positions list.  [!]
 *     FRAME = LITERAL (Read)
@@ -166,7 +166,7 @@
 *     LAST = INTEGER (Read)
 *        The identifier for the last position to be displayed.
 *        Positions are only displayed which have identifiers in the
-*        range given by parameters FIRST and LAST.  If a null (!) value
+*        range given by Parameters FIRST and LAST.  If a null (!) value
 *        is supplied, the value used is the highest identifier value
 *        in the positions list.  [!]
 *     LOGFILE = FILENAME (Write)
@@ -254,11 +254,11 @@
 *        ["None"]
 *     POSNS() = _DOUBLE (Write)
 *        The unformatted co-ordinates of the positions selected by
-*        parameters FIRST and LAST, in the co-ordinate Frame selected by
+*        Parameters FIRST and LAST, in the co-ordinate Frame selected by
 *        FRAME.  The axis values are stored as a 1-dimensional vector.
 *        All the axis-1 values for the selected positions are stored
 *        first, followed by the axis-2 values, etc.  The number of
-*        positions in the vector is written to the output parameter
+*        positions in the vector is written to the output Parameter
 *        NUMBER, and the number of axes per position is written to the
 *        output Parameter DIM.  The axis values may not be in the same
 *        units as the formatted values shown on the screen.  For
@@ -421,7 +421,7 @@
 *     25-AUG-1999 (DSB):
 *        Add TOKEN arg in call to KPG1_ASFRM.
 *     13-DEC-2001 (DSB):
-*        Added parameters CATFRAME and CATEPOCH.
+*        Added {arameters CATFRAME and CATEPOCH.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
 *     31-MAR-2006 (DSB):
