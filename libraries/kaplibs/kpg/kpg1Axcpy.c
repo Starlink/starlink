@@ -99,6 +99,7 @@ void kpg1Axcpy( int indf1, int indf2, int ax1, int ax2, int *status ){
    if( *status != SAI__OK ) return;
 
 /* First copy all the character components. */
+   cval[ 0 ] = 0;
    for( icomp = 0; icomp < NCCOMP; icomp++ ) {
       ndfAcget( indf1, ccomp[ icomp ], ax1, cval, CHARSIZE, status );
       ndfAcput( cval, indf2, ccomp[ icomp ], ax2, status );
