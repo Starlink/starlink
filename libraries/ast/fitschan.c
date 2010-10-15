@@ -895,6 +895,8 @@ f     - AST_TESTFITS: Test if a keyword has a defined value in a FitsChan
 *        with the spectral projection code.
 *     20-JUL-2010 (DSB):
 *        Correct interpretation of NCP projection code.
+*     14-OCT-2010 (DSB):
+*        Correct loading of FitsChans that contain UNDEF keywords.
 *class--
 */
 
@@ -1193,7 +1195,7 @@ static int (* parent_managelock)( AstObject *, int, int, AstObject **, int * );
 
 /* Strings to describe each data type. These should be in the order implied
    by the corresponding macros (eg AST__FLOAT, etc). */
-static const char *type_names[] = {"comment", "integer", "floating point",
+static const char *type_names[9] = {"comment", "integer", "floating point",
                                     "string", "complex floating point",
                                     "complex integer", "logical",
                                     "continuation string", "undef" };
@@ -35695,7 +35697,7 @@ AstFitsChan *astLoadFitsChan_( void *mem, size_t size,
          text = astReadString( channel, buff, " " );
 
          if( strcmp( text, " " ) ) {
-            type = FindString( 8, type_names, text,
+            type = FindString( 9, type_names, text,
                                "a FitsChan keyword data type",
                                "astRead", astGetClass( channel ), status );
          } else {
