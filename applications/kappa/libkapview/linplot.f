@@ -29,9 +29,9 @@
 *
 *     The plot may take several different forms such as a
 *     "join-the-dots" plot, a "staircase" plot, a "chain" plot (see
-*     parameter MODE).  Errors on both the data values and the data
+*     Parameter MODE).  Errors on both the data values and the data
 *     positions may be represented in several different ways (see
-*     Parameters ERRBAR and SHAPE).  The plotting style (colour, fonts,
+*     Parameters ERRBAR and SHAPE).  The plotting style (colour, founts,
 *     text size, etc.) may be specified in detail using Parameter STYLE.
 *
 *     The bounds of the plot on both axes can be specified using
