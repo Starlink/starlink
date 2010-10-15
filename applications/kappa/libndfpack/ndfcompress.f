@@ -40,14 +40,14 @@
 *        compressing with METHOD set to "SCALE".  If a null (!) value is
 *        supplied for DSCALE or DZERO, default values will be used for
 *        both that cause the scaled data values to occupy 96% of the
-*        available range of the data type selected using parameter
+*        available range of the data type selected using Parameter
 *        SCALEDTYPE.  [!]
 *     DZERO = _DOUBLE (Read)
 *        The zero offset to use for the DATA component, when compressing
 *        with METHOD set to SCALE.  If a null (!) value is supplied for
 *        DSCALE or DZERO, default values will be used for both that
 *        cause the scaled data values to occupy 96% of the available
-*        range of the data type selected using parameter SCALEDTYPE.  [!]
+*        range of the data type selected using Parameter SCALEDTYPE.  [!]
 *     IN = NDF (Read)
 *        The input NDF.
 *     METHOD = LITERAL (Read)
@@ -60,15 +60,15 @@
 *        used if METHOD is "SCALED".  It can be one of the following
 *        options.
 *
-*        - "_INTEGER" -- 4 byte signed integers
+*        - "_INTEGER" -- four-byte signed integers
 *
-*        - "_WORD" -- 2 byte signed integers
+*        - "_WORD" -- two-byte signed integers
 *
-*        - "_UWORD" -- 2 byte unsigned integers
+*        - "_UWORD" -- two-byte unsigned integers
 *
-*        - "_BYTE" -- 1 byte signed integers
+*        - "_BYTE" -- one-byte signed integers
 *
-*        - "_UBYTE" -- 1 byte unsigned integers
+*        - "_UBYTE" -- one-byte unsigned integers
 *
 *        The same data type is used for both DATA and (if required)
 *        VARIANCE components of the output NDF.  The initial default
@@ -78,21 +78,21 @@
 *        compressing with METHOD set to SCALE. If a null (!) value is
 *        supplied for VSCALE or VZERO, default values will be used for
 *        both that cause the scaled variance values to occupy 96% of
-*        the available range of the data type selected using parameter
+*        the available range of the data type selected using Parameter
 *        SCALEDTYPE.  [!]
 *     VZERO = _DOUBLE (Read)
 *        The zero factor to use for the VARIANCE component, when
 *        compressing with METHOD set to SCALE.  If a null (!) value is
 *        supplied for VSCALE or VZERO, default values will be used for
 *        both that cause the scaled variance values to occupy 96% of
-*        the available range of the data type selected using parameter
+*        the available range of the data type selected using Parameter
 *        SCALEDTYPE.  [!]
 
 *  Examples:
 *     ndfcompress infile outfile scale scaledtype=_uword
 *        Copies the contents of the NDF structure infile to the new
 *        structure outfile, scaling the values so that they fit into
-*        unsigned 2-byte integers. The scale and zero values used are
+*        unsigned two-byte integers. The scale and zero values used are
 *        chosen automatically.
 
 *  Related Applications:
@@ -105,12 +105,13 @@
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -120,8 +121,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
@@ -181,7 +182,7 @@
       INTEGER MAXPOS             ! Index of elements with max value
       INTEGER MINPOS             ! Index of elements with min value
       INTEGER NINVAL             ! Number of bad values found
-      INTEGER NBAD               ! Number of unaccomodated input pixels
+      INTEGER NBAD               ! Number of unaccommodated input pixels
       LOGICAL BAD                ! Bad values in input array component?
       LOGICAL BADOUT             ! Bad values in output array component?
       LOGICAL THERE              ! Does object exists?
