@@ -1,0 +1,238 @@
+/* -*- C -*-
+*+
+*  Name:
+*     smf_downsamp1
+
+*  Purpose:
+*     Low-level routine for downsampling data.
+
+*  Language:
+*     Starlink ANSI C
+
+*  Type of Module:
+*     Subroutine
+
+*  Invocation:
+*     void smf_downsamp1<X>( const CGEN_TYPE *in, size_t instride,
+*                            size_t inlen, void *out, size_t outstride,
+*                            size_t outlen, int todouble, int *status )
+
+*  Arguments:
+*     in = const CGEN_TYPE* (Given)
+*        Pointer to input data array
+*     instride = size_t (Given)
+*        Index stride between elements in the input data
+*     inlen = size_t (Given)
+*        Number of elements in the input data
+*     out = const CGEN_TYPE* (Given)
+*        Pointer to output re-sampled data array. Has the same data type
+*        as in unless todouble is specified, in which case it is is
+*        converted to double.
+*     outstride = size_t (Given)
+*        Index stride between elements in the output data
+*     outlen = size_t (Given)
+*        Number of elements in the output data
+*     todouble = int (Given)
+*        If set the output is typecast to double
+*     status = int* (Given and Returned)
+*        Pointer to global status.
+
+*  Description:
+*     Down-samples the data from in to out using simple averages.
+
+*  Notes:
+*     - No checks for VAL__BAD* are done.
+*     - Bad status is set if outlen is larger than inlen
+*     - out should be initialized to 0 before calling this function
+*     - fixed-point versions may suffer bad roundoff problems if values
+*       are small. In future re-write to do everything in double and then
+*       typecast once at the end?
+*     - If type is double probably good idea to set "todouble" anyways
+*       since the non-todouble version may be slower in the future.
+
+*  Authors:
+*     Edward Chapin (UBC)
+*     {enter_new_authors_here}
+
+*  History:
+*     2010-10-15 (EC):
+*        Initial version
+*     {enter_further_changes_here}
+
+*  Copyright:
+*     Copyright (C) 2010 University of British Columbia.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 3 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
+
+*  Bugs:
+*     {note_any_bugs_here}
+*-
+*/
+
+/* Standard includes */
+#include <math.h>
+
+/* Starlink includes */
+#include "sae_par.h"
+#include "ast.h"
+#include "mers.h"
+#include "msg_par.h"
+#include "prm_par.h"
+
+/* SMURF includes */
+#include "smf.h"
+#include "smurf_par.h"
+#include "smurf_typ.h"
+#include "libsmf/smf_err.h"
+
+/* Simple default string for errRep */
+#define FUNC_NAME "smf_downsamp1"
+
+void CGEN_FUNCTION(smf_downsamp1)( const CGEN_TYPE *in, size_t instride,
+                                   size_t inlen, void *out, size_t outstride,
+                                   size_t outlen, int todouble, int *status ) {
+
+  /* Local variables */
+  size_t i;                   /* High-res index */
+  double j1;                  /* Fractional low-res index lower edge */
+  double j2;                  /* Fractional high-res index lower edge */
+  size_t jf1;                 /* low-res index lower edge */
+  size_t jf2;                 /* high-res index lower edge */
+  CGEN_TYPE *outbuf=NULL;     /* output same type as the input */
+  double *outbufd=NULL;       /* double precision output */
+  double s;                   /* current sample */
+  double s1;                  /* part of s that goes at location jf1 */
+  double s2;                  /* part of s that goes at location jf2 */
+  double step;                /* Number of low-res samples per high-res samp */
+
+  /* Check status */
+  if (*status != SAI__OK) return;
+
+  if( !in || !instride || !inlen || !out || !outstride || !outlen ) {
+    *status = SAI__ERROR;
+    errRep( "", FUNC_NAME ": invalid input supplied", status );
+    return;
+  }
+
+  if( outlen > inlen ) {
+    *status = SAI__ERROR;
+    errRep( "", FUNC_NAME ": outlen must be shorter than inlen to downsample!",
+            status );
+    return;
+  }
+
+  /* Output same as input or double precision? */
+  if( todouble ) {
+    outbufd = out;
+  } else {
+    outbuf = out;
+  }
+
+  /* Calculate step size */
+  step = (double) outlen / (double) inlen;
+
+
+
+  if( outbuf ) {
+  /* **************************************************************************
+     In this first version the output has the same type as the input
+     *************************************************************************/
+
+    /* The first high-res sample definately goes into the first low-res
+       sample, and the last high-res sample definately goes into the last
+       low-res sample */
+
+    outbuf[0] += in[0];
+    outbuf[(outlen-1)*outstride] += in[(inlen-1)*instride];
+
+    /* loop over remaining high-res samples and add them to the
+       appropriate low-res output samples */
+    j1 = 0;
+    for( i=1; i<(inlen-1); i++ ) {
+
+      j2 = j1 + step;
+
+      /* integer indices */
+      jf1 = floor(j1);
+      jf2 = floor(j2);
+
+      s = (double) in[i*instride];
+
+      if( jf1 == jf2 ) {
+        /* If same integer indices, this entire high-res sample goes in one
+           low-res sample */
+        outbuf[jf1*outstride] += s;
+      } else {
+        /* if not the same integer index, need to split the sample between two
+           bins */
+        s1 = (jf2 - j1)*s/step;  /* portion of s in jf1 */
+        s2 = s - s1;             /* portion of s in jf2 */
+        outbuf[jf1*outstride] += (CGEN_TYPE) s1;
+        outbuf[jf2*outstride] += (CGEN_TYPE) s2;
+      }
+    }
+
+    /* Normalize the output */
+    for( i=0; i<outlen; i++ ) {
+      outbuf[i*outstride] = (CGEN_TYPE) ((double) outbuf[i*outstride] * step);
+    }
+
+
+
+
+
+  } else {
+  /* **************************************************************************
+     In this one the output is double
+     *************************************************************************/
+
+    outbufd[0] += in[0];
+    outbufd[(outlen-1)*outstride] += in[(inlen-1)*instride];
+
+    j1 = 0;
+    for( i=1; i<(inlen-1); i++ ) {
+
+      j2 = j1 + step;
+
+      /* integer indices */
+      jf1 = floor(j1);
+      jf2 = floor(j2);
+
+      s = (double) in[i*instride];
+
+      if( jf1 == jf2 ) {
+        /* If same integer indices, this entire high-res sample goes in one
+           low-res sample */
+        outbufd[jf1*outstride] += s;
+      } else {
+        /* if not the same integer index, need to split the sample between two
+           bins */
+        s1 = (jf2 - j1)*s/step;  /* portion of s in jf1 */
+        s2 = s - s1;             /* portion of s in jf2 */
+        outbufd[jf1*outstride] += s1;
+        outbufd[jf2*outstride] += s2;
+      }
+    }
+
+    /* Normalize the output */
+    for( i=0; i<outlen; i++ ) {
+      outbufd[i*outstride] *= step;
+    }
+  }
+
+}

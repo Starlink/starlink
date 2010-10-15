@@ -6,7 +6,8 @@ noinst_LTLIBRARIES = libsmf.la
 libsmf_la_SOURCES = $(C_ROUTINES)
 
 CGENERIC_ROUTINES = smf_boxcar1.cgen smf_templateFit1.cgen smf_sort.cgen \
-	smf_average_data.cgen smf_stats1.cgen smf_tophat1.cgen
+	smf_average_data.cgen smf_stats1.cgen smf_tophat1.cgen \
+	smf_downsamp1.cgen
 
 # The .c files which are built from the above .cgen files.
 BUILT_C_ROUTINES = $(CGENERIC_ROUTINES:.cgen=.c)
