@@ -309,11 +309,11 @@
 *        A comma-separated list of strings should be given in which each
 *        string is either an attribute setting, or the name of a text
 *        file preceded by an up-arrow character "^".  Such text files
-*        should contain further comma-separated lists which will be
-*        read and interpreted in the same manner.  Attribute settings
-*        are applied in the order in which they occur within the list,
-*        with later settings overriding any earlier settings given for
-*        the same attribute.
+*        should contain further comma-separated lists which will be read
+*        and interpreted in the same manner.  Attribute settings are
+*        applied in the order in which they occur within the list, with
+*        later settings overriding any earlier settings given for the
+*        same attribute.
 *
 *        Each individual attribute setting should be of the form:
 *
@@ -322,18 +322,24 @@
 *        where <name> is the name of a plotting attribute, and <value>
 *        is the value to assign to the attribute.  Default values will
 *        be used for any unspecified attributes.  All attributes will be
-*        defaulted if a null value (!) is supplied.  See section
-*        "Plotting Attributes" in SUN/95 for a description of the
-*        available attributes.  Any unrecognised attributes are ignored
-*        (no error is reported).
+*        defaulted if a null value (!)---the initial default---is
+*        supplied.  To apply changes of style to only the current
+*        invocation, begin these attributes with a plus sign.  A mixture
+*        of persistent and temporary style changes is achieved by
+*        listing all the persistent attributes followed by a plus sign
+*        then the list temporary attributes.
+*
+*        See section "Plotting Attributes" in SUN/95 for a description
+*        of the available attributes.  Any unrecognised attributes are
+*        ignored (no error is reported).
 *
 *        In addition to the attributes which control the appearance of
-*        the graphics (Colour, Font, etc), the following attributes may
-*        be set in order to control the appearance of the formatted axis
-*        values reported on the screen: Format, Digits, Symbol, Unit.
-*        These may be suffixed with an axis number (e.g. "Digits(2)") to
-*        refer to the values displayed for a specific axis.
-*        [current value]
+*        the graphics (Colour, Fount, etc.), the following attributes
+*        may be set in order to control the appearance of the formatted
+*        axis values reported on the screen: Format, Digits, Symbol,
+*        Unit.  These may be suffixed with an axis number (e.g.
+*        "Digits(2)") to refer to the values displayed for a specific
+*        axis.  [current value]
 
 *  Examples:
 *     listshow stars pixel
@@ -388,7 +394,7 @@
 *     Copyright (C) 1998-1999, 2001, 2004 Central Laboratory of the
 *     Research Councils. Copyright (C) 2006 Particle Physics &
 *     Astronomy Research Council.
-*     Copyright (C) 2009 Science and Technology Facilities Council.
+*     Copyright (C) 2009-2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -438,7 +444,9 @@
 *        Remove QUIET parameter and use the current reporting level
 *        instead (set by the global MSG_FILTER environment variable).
 *     18-FEB-2010 (DSB):
-*        Added parameter STEP.
+*        Added Parameter STEP.
+*     2010 October 14 (MJC):
+*        Permit temporary style attributes.
 *     {enter_further_changes_here}
 
 *-
@@ -863,7 +871,8 @@
       CALL PAR_PUT0I( 'DIM', NRAX, STATUS )
 
 *  Set the Style of the FrameSet or Plot using the STYLE parameter.
-      CALL KPG1_ASSET( 'LISTSHOW', 'STYLE', IWCS, STATUS )
+*  The plus sign requests support of temporary attributes.
+      CALL KPG1_ASSET( 'LISTSHOW', '+STYLE', IWCS, STATUS )
 
 *  See if Frame descriptions are required.
       CALL PAR_GET0L( 'DESCRIBE', DESC, STATUS )
