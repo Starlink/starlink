@@ -3762,7 +3762,6 @@ sign comes the list of temporary attributes.
 Literal plus signs should be avoided if using both temporary and
 persistent attributes in a group expression.
 
-
 \subsubsection{Synonyms for Attribute Names}
 
 The available plotting attributes and their names are defined by the
@@ -14439,25 +14438,31 @@ KAPPA: \htmlref{ARDGEN}{ARDGEN},
          for the curves.
 
          A comma-separated list of strings should be given in which each
-         string is either an attribute setting, or the name of a text file
-         preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files should
-         contain further comma-separated lists which will be read and
-         interpreted in the same manner.  Attribute settings are applied in
-         the order in which they occur within the list, with later settings
-         overriding any earlier settings given for the same attribute.
+         string is either an attribute setting, or the name of a text
+         file preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files
+         should contain further comma-separated lists which will be
+         read and interpreted in the same manner.  Attribute settings
+         are applied in the order in which they occur within the list,
+         with later settings overriding any earlier settings given for
+         the same attribute.
 
          Each individual attribute setting should be of the form:
 
             $<$name$>$=$<$value$>$
 
-         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
-         the value to assign to the attribute.  Default values will be
+
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$
+         is the value to assign to the attribute.  Default values will be
          used for any unspecified attributes.  All attributes will be
-         defaulted if a null value ({\tt{!}}) is supplied.  See
-         \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
-         for a description of the available
-         attributes.  Any unrecognised attributes are ignored (no error is
-         reported).
+         defaulted if a null value ({\tt{!}})---the initial default---is supplied.
+         To apply changes of style to only the current invocation, begin these
+         attributes with a plus sign.  A mixture of persistent and temporary
+         style changes is achieved by listing all the persistent attributes
+         followed by a plus sign then the list of temporary attributes.
+
+         See \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         for a description of the available attributes.  Any unrecognised
+         attributes are ignored (no error is reported).
 
          The appearance of the plotted curves is controlled by the attributes
          \htmlattref{Colour(Curves)}{Colour(element)},
@@ -14995,11 +15000,17 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
 
             $<$name$>$=$<$value$>$
 
+
          where $<$name$>$ is the name of a plotting attribute, and $<$value$>$
-         is the value to assign to the attribute.  Default values will
-         be used for any unspecified attributes.  All attributes will be
-         defaulted if a null value ({\tt{!}}) is supplied.  See section
-         \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         is the value to assign to the attribute.  Default values will be
+         used for any unspecified attributes.  All attributes will be
+         defaulted if a null value ({\tt{!}})---the initial default---is supplied.
+         To apply changes of style to only the current invocation, begin these
+         attributes with a plus sign.  A mixture of persistent and temporary
+         style changes is achieved by listing all the persistent attributes
+         followed by a plus sign then the list of temporary attributes.
+
+         See \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
          for a description of the available attributes.  Any unrecognised
          attributes are ignored (no error is reported).  {\tt [}current value{\tt{]}}
       }
@@ -16566,25 +16577,32 @@ KAPPA: \htmlref{ADD}{ADD},
          drawing the graphics markers specified by Parameter MARK.
 
          A comma-separated list of strings should be given in which each
-         string is either an attribute setting, or the name of a text file
-         preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files should
-         contain further comma-separated lists which will be read and
-         interpreted in the same manner.  Attribute settings are applied in
-         the order in which they occur within the list, with later settings
-         overriding any earlier settings given for the same attribute.
+         string is either an attribute setting, or the name of a text
+         file preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files
+         should contain further comma-separated lists which will be
+         read and interpreted in the same manner.  Attribute settings
+         are applied in the order in which they occur within the list,
+         with later settings overriding any earlier settings given for
+         the same attribute.
 
          Each individual attribute setting should be of the form:
 
             $<$name$>$=$<$value$>$
 
-         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
-         the value to assign to the attribute.  Default values will be
+
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$
+         is the value to assign to the attribute.  Default values will be
          used for any unspecified attributes.  All attributes will be
-         defaulted if a null value ({\tt{!}}) is supplied.  See
-         \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
-         for a description of the available
-         attributes.  Any unrecognised attributes are ignored (no error is
-         reported).  {\tt [}current value{\tt{]}}
+         defaulted if a null value ({\tt{!}})---the initial default---is supplied.
+         To apply changes of style to only the current invocation, begin these
+         attributes with a plus sign.  A mixture of persistent and temporary
+         style changes is achieved by listing all the persistent attributes
+         followed by a plus sign then the list of temporary attributes.
+
+         See \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         for a description of the available attributes.  Any unrecognised
+         attributes are ignored (no error is reported).
+         {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
          POSITIVE = \_LOGICAL (Read)
@@ -17584,14 +17602,19 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
 
             $<$name$>$=$<$value$>$
 
-         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
-         the value to assign to the attribute.  Default values will be
+
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$
+         is the value to assign to the attribute.  Default values will be
          used for any unspecified attributes.  All attributes will be
-         defaulted if a null value ({\tt{!}}) is supplied.  See
-         \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
-         for a description of the available
-         attributes.  Any unrecognised attributes are ignored (no error is
-         reported).
+         defaulted if a null value ({\tt{!}})---the initial default---is supplied.
+         To apply changes of style to only the current invocation, begin these
+         attributes with a plus sign.  A mixture of persistent and temporary
+         style changes is achieved by listing all the persistent attributes
+         followed by a plus sign then the list of temporary attributes.
+
+         See \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         for a description of the available attributes.  Any unrecognised
+         attributes are ignored (no error is reported).
 
          The appearance of the text in the key can be changed by
          setting new values for the attributes
@@ -17769,27 +17792,32 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          to use when drawing the axes and data values in the spectrum
          line plots.
 
-         A comma-separated list of strings should be given in which
-         each string is either an attribute setting, or the name of a
-         text file preceded by an up-arrow character {\tt "$\wedge$"}.
-         Such text files should contain further comma-separated lists
-         which will be read and interpreted in the same manner.
-         Attribute settings are applied in the order in which they
-         occur within the list, with later settings overriding any
-         earlier settings given for the same attribute.
+         A comma-separated list of strings should be given in which each
+         string is either an attribute setting, or the name of a text
+         file preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files
+         should contain further comma-separated lists which will be
+         read and interpreted in the same manner.  Attribute settings
+         are applied in the order in which they occur within the list,
+         with later settings overriding any earlier settings given for
+         the same attribute.
 
          Each individual attribute setting should be of the form:
 
-              $<$name$>$=$<$value$>$
+            $<$name$>$=$<$value$>$
 
-         where $<$name$>$ is the name of a plotting attribute, and
-         $<$value$>$ is the value to assign to the attribute.  Default
-         values will be used for any unspecified attributes.  All
-         attributes will be defaulted if a null value ({\tt{!}}) is
-         supplied.  See \hyperref{Plotting
-         Attributes}{Section~}{}{se:plotting_attr} for a description
-         of the available attributes.  Any unrecognised attributes are
-         ignored (no error is reported).
+
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$
+         is the value to assign to the attribute.  Default values will be
+         used for any unspecified attributes.  All attributes will be
+         defaulted if a null value ({\tt{!}})---the initial default---is supplied.
+         To apply changes of style to only the current invocation, begin these
+         attributes with a plus sign.  A mixture of persistent and temporary
+         style changes is achieved by listing all the persistent attributes
+         followed by a plus sign then the list of temporary attributes.
+
+         See \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         for a description of the available attributes.  Any unrecognised
+         attributes are ignored (no error is reported).
 
          By default the axes have interior tick marks, and are without
          labels and a title to avoid overprinting on adjacent plots.
@@ -17806,27 +17834,33 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          A group of attribute settings describing the plotting style to
          use for the annotated outer spatial axes (see Parameter AXES).
 
-         A comma-separated list of strings should be given in which
-         each string is either an attribute setting, or the name of a
-         text file preceded by an up-arrow character {\tt "$\wedge$"}.
-         Such text files should contain further comma-separated lists
-         which will be read and interpreted in the same manner.
-         Attribute settings are applied in the order in which they
-         occur within the list, with later settings overriding any
-         earlier settings given for the same attribute.
+         A comma-separated list of strings should be given in which each
+         string is either an attribute setting, or the name of a text
+         file preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files
+         should contain further comma-separated lists which will be
+         read and interpreted in the same manner.  Attribute settings
+         are applied in the order in which they occur within the list,
+         with later settings overriding any earlier settings given for
+         the same attribute.
 
          Each individual attribute setting should be of the form:
 
             $<$name$>$=$<$value$>$
 
-         where $<$name$>$ is the name of a plotting attribute, and
-         $<$value$>$ is the value to assign to the attribute.  Default
-         values will be used for any unspecified attributes.  All
-         attributes will be defaulted if a null value ({\tt{!}}) is
-         supplied.  See \hyperref{Plotting
-         Attributes}{Section~}{}{se:plotting_attr} for a description
-         of the available attributes.  Any unrecognised attributes are
-         ignored (no error is reported).  {\tt [}current value{\tt{]}}
+
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$
+         is the value to assign to the attribute.  Default values will be
+         used for any unspecified attributes.  All attributes will be
+         defaulted if a null value ({\tt{!}})---the initial default---is supplied.
+         To apply changes of style to only the current invocation, begin these
+         attributes with a plus sign.  A mixture of persistent and temporary
+         style changes is achieved by listing all the persistent attributes
+         followed by a plus sign then the list of temporary attributes.
+
+         See \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         for a description of the available attributes.  Any unrecognised
+         attributes are ignored (no error is reported).
+         {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
          USEAXIS = LITERAL (Read)
@@ -19548,25 +19582,31 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          for the key (see Parameter KEY).
 
          A comma-separated list of strings should be given in which each
-         string is either an attribute setting, or the name of a text file
-         preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files should
-         contain further comma-separated lists which will be read and
-         interpreted in the same manner.  Attribute settings are applied in
-         the order in which they occur within the list, with later settings
-         overriding any earlier settings given for the same attribute.
+         string is either an attribute setting, or the name of a text
+         file preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files
+         should contain further comma-separated lists which will be
+         read and interpreted in the same manner.  Attribute settings
+         are applied in the order in which they occur within the list,
+         with later settings overriding any earlier settings given for
+         the same attribute.
 
          Each individual attribute setting should be of the form:
 
             $<$name$>$=$<$value$>$
 
-         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
-         the value to assign to the attribute.  Default values will be
+
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$
+         is the value to assign to the attribute.  Default values will be
          used for any unspecified attributes.  All attributes will be
-         defaulted if a null value ({\tt{!}}) is supplied.  See
-         \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
-         for a description of the available
-         attributes.  Any unrecognised attributes are ignored (no error is
-         reported).
+         defaulted if a null value ({\tt{!}})---the initial default---is supplied.
+         To apply changes of style to only the current invocation, begin these
+         attributes with a plus sign.  A mixture of persistent and temporary
+         style changes is achieved by listing all the persistent attributes
+         followed by a plus sign then the list of temporary attributes.
+
+         See \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         for a description of the available attributes.  Any unrecognised
+         attributes are ignored (no error is reported).
 
          The heading in the key can be changed by setting a value for
          the Title attribute (the supplied heading is split into lines
@@ -19590,7 +19630,6 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          Contour values are formatted using attributes {\att
          Format(2)}, \emph{etc.} (the synonym {\att Value} can be used
          in place of the value 2).  {\tt [}current value{\tt{]}}
-
       }
       \sstsubsection{
          LABPOS = \_REAL() (Read)
@@ -19742,25 +19781,31 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          for the contours and annotated axes.
 
          A comma-separated list of strings should be given in which each
-         string is either an attribute setting, or the name of a text file
-         preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files should
-         contain further comma-separated lists which will be read and
-         interpreted in the same manner.  Attribute settings are applied in
-         the order in which they occur within the list, with later settings
-         overriding any earlier settings given for the same attribute.
+         string is either an attribute setting, or the name of a text
+         file preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files
+         should contain further comma-separated lists which will be
+         read and interpreted in the same manner.  Attribute settings
+         are applied in the order in which they occur within the list,
+         with later settings overriding any earlier settings given for
+         the same attribute.
 
          Each individual attribute setting should be of the form:
 
             $<$name$>$=$<$value$>$
 
-         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
-         the value to assign to the attribute.  Default values will be
+
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$
+         is the value to assign to the attribute.  Default values will be
          used for any unspecified attributes.  All attributes will be
-         defaulted if a null value ({\tt{!}}) is supplied.  See
-         \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
-         for a description of the available
-         attributes.  Any unrecognised attributes are ignored (no error is
-         reported).
+         defaulted if a null value ({\tt{!}})---the initial default---is supplied.
+         To apply changes of style to only the current invocation, begin these
+         attributes with a plus sign.  A mixture of persistent and temporary
+         style changes is achieved by listing all the persistent attributes
+         followed by a plus sign then the list of temporary attributes.
+
+         See \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         for a description of the available attributes.  Any unrecognised
+         attributes are ignored (no error is reported).
 
          The appearance of the contours is controlled by the attributes
          \htmlattref{Colour(Curves)}{Colour(element)},
@@ -21017,25 +21062,31 @@ KAPPA: \htmlref{HISTOGRAM}{HISTOGRAM}.
          of the positions reported on the screen may also be controlled.
 
          A comma-separated list of strings should be given in which each
-         string is either an attribute setting, or the name of a text file
-         preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files should
-         contain further comma-separated lists which will be read and
-         interpreted in the same manner.  Attribute settings are applied in
-         the order in which they occur within the list, with later settings
-         overriding any earlier settings given for the same attribute.
+         string is either an attribute setting, or the name of a text
+         file preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files
+         should contain further comma-separated lists which will be
+         read and interpreted in the same manner.  Attribute settings
+         are applied in the order in which they occur within the list,
+         with later settings overriding any earlier settings given for
+         the same attribute.
 
          Each individual attribute setting should be of the form:
 
             $<$name$>$=$<$value$>$
 
-         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
-         the value to assign to the attribute.  Default values will be
+
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$
+         is the value to assign to the attribute.  Default values will be
          used for any unspecified attributes.  All attributes will be
-         defaulted if a null value ({\tt{!}}) is supplied.  See
-         \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
-         for a description of the available
-         attributes.  Any unrecognised attributes are ignored (no error is
-         reported).
+         defaulted if a null value ({\tt{!}})---the initial default---is supplied.
+         To apply changes of style to only the current invocation, begin these
+         attributes with a plus sign.  A mixture of persistent and temporary
+         style changes is achieved by listing all the persistent attributes
+         followed by a plus sign then the list of temporary attributes.
+
+         See \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         for a description of the available attributes.  Any unrecognised
+         attributes are ignored (no error is reported).
 
          In addition to the attributes which control the appearance of
          the graphics (\htmlattref{Colour}{Colour(element)}, \htmlattref{Font}{Font(element)}, \emph{etc.}), the following attributes may
@@ -21292,25 +21343,32 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
          for the border (see Parameter BORDER).
 
          A comma-separated list of strings should be given in which each
-         string is either an attribute setting, or the name of a text file
-         preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files should
-         contain further comma-separated lists which will be read and
-         interpreted in the same manner.  Attribute settings are applied in
-         the order in which they occur within the list, with later settings
-         overriding any earlier settings given for the same attribute.
+         string is either an attribute setting, or the name of a text
+         file preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files
+         should contain further comma-separated lists which will be
+         read and interpreted in the same manner.  Attribute settings
+         are applied in the order in which they occur within the list,
+         with later settings overriding any earlier settings given for
+         the same attribute.
 
          Each individual attribute setting should be of the form:
 
             $<$name$>$=$<$value$>$
 
-         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
-         the value to assign to the attribute.  Default values will be
+
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$
+         is the value to assign to the attribute.  Default values will be
          used for any unspecified attributes.  All attributes will be
-         defaulted if a null value ({\tt{!}}) is supplied.  See
-         \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
-         for a description of the available
-         attributes.  Any unrecognised attributes are ignored (no error is
-         reported).  {\tt [}current value{\tt{]}}
+         defaulted if a null value ({\tt{!}})---the initial default---is supplied.
+         To apply changes of style to only the current invocation, begin these
+         attributes with a plus sign.  A mixture of persistent and temporary
+         style changes is achieved by listing all the persistent attributes
+         followed by a plus sign then the list of temporary attributes.
+
+         See \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         for a description of the available attributes.  Any unrecognised
+         attributes are ignored (no error is reported).
+         {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
          CENTRE = LITERAL (Read)
@@ -21400,25 +21458,31 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
          for the key (see Parameter KEY).
 
          A comma-separated list of strings should be given in which each
-         string is either an attribute setting, or the name of a text file
-         preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files should
-         contain further comma-separated lists which will be read and
-         interpreted in the same manner.  Attribute settings are applied in
-         the order in which they occur within the list, with later settings
-         overriding any earlier settings given for the same attribute.
+         string is either an attribute setting, or the name of a text
+         file preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files
+         should contain further comma-separated lists which will be
+         read and interpreted in the same manner.  Attribute settings
+         are applied in the order in which they occur within the list,
+         with later settings overriding any earlier settings given for
+         the same attribute.
 
          Each individual attribute setting should be of the form:
 
             $<$name$>$=$<$value$>$
 
-         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
-         the value to assign to the attribute.  Default values will be
+
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$
+         is the value to assign to the attribute.  Default values will be
          used for any unspecified attributes.  All attributes will be
-         defaulted if a null value ({\tt{!}}) is supplied.  See
-         \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
-         for a description of the available
-         attributes.  Any unrecognised attributes are ignored (no error is
-         reported).
+         defaulted if a null value ({\tt{!}})---the initial default---is supplied.
+         To apply changes of style to only the current invocation, begin these
+         attributes with a plus sign.  A mixture of persistent and temporary
+         style changes is achieved by listing all the persistent attributes
+         followed by a plus sign then the list of temporary attributes.
+
+         See \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         for a description of the available attributes.  Any unrecognised
+         attributes are ignored (no error is reported).
 
          Axis 1 is always the \emph{data value} axis.  So for instance, to set
          the label for the data-value axis, assign a value to {\tt "Label(1)"}
@@ -21595,25 +21659,32 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
          for the annotated axes (see Parameter AXES).
 
          A comma-separated list of strings should be given in which each
-         string is either an attribute setting, or the name of a text file
-         preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files should
-         contain further comma-separated lists which will be read and
-         interpreted in the same manner.  Attribute settings are applied in
-         the order in which they occur within the list, with later settings
-         overriding any earlier settings given for the same attribute.
+         string is either an attribute setting, or the name of a text
+         file preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files
+         should contain further comma-separated lists which will be
+         read and interpreted in the same manner.  Attribute settings
+         are applied in the order in which they occur within the list,
+         with later settings overriding any earlier settings given for
+         the same attribute.
 
          Each individual attribute setting should be of the form:
 
             $<$name$>$=$<$value$>$
 
-         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
-         the value to assign to the attribute.  Default values will be
+
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$
+         is the value to assign to the attribute.  Default values will be
          used for any unspecified attributes.  All attributes will be
-         defaulted if a null value ({\tt{!}}) is supplied.  See
-         \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
-         for a description of the available
-         attributes.  Any unrecognised attributes are ignored (no error is
-         reported).  {\tt [}current value{\tt{]}}
+         defaulted if a null value ({\tt{!}})---the initial default---is supplied.
+         To apply changes of style to only the current invocation, begin these
+         attributes with a plus sign.  A mixture of persistent and temporary
+         style changes is achieved by listing all the persistent attributes
+         followed by a plus sign then the list of temporary attributes.
+
+         See \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         for a description of the available attributes.  Any unrecognised
+         attributes are ignored (no error is reported).
+         {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
          USEAXIS = GROUP (Read)
@@ -22095,25 +22166,30 @@ KAPPA: \htmlref{ADD}{ADD},
          for the vectors and annotated axes.
 
          A comma-separated list of strings should be given in which each
-         string is either an attribute setting, or the name of a text file
-         preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files should
-         contain further comma-separated lists which will be read and
-         interpreted in the same manner.  Attribute settings are applied in
-         the order in which they occur within the list, with later settings
-         overriding any earlier settings given for the same attribute.
+         string is either an attribute setting, or the name of a text
+         file preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files
+         should contain further comma-separated lists which will be
+         read and interpreted in the same manner.  Attribute settings
+         are applied in the order in which they occur within the list,
+         with later settings overriding any earlier settings given for
+         the same attribute.
 
          Each individual attribute setting should be of the form:
 
             $<$name$>$=$<$value$>$
 
-         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
-         the value to assign to the attribute.  Default values will be
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$
+         is the value to assign to the attribute.  Default values will be
          used for any unspecified attributes.  All attributes will be
-         defaulted if a null value ({\tt{!}}) is supplied.  See
-         \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
-         for a description of the available
-         attributes.  Any unrecognised attributes are ignored (no error is
-         reported).
+         defaulted if a null value ({\tt{!}})---the initial default---is supplied.
+         To apply changes of style to only the current invocation, begin these
+         attributes with a plus sign.  A mixture of persistent and temporary
+         style changes is achieved by listing all the persistent attributes
+         followed by a plus sign then the list of temporary attributes.
+
+         See \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         for a description of the available attributes.  Any unrecognised
+         attributes are ignored (no error is reported).
 
          The appearance of the arrows is controlled by the attributes
          \htmlattref{Colour(Axes)}{Colour(element)},
@@ -22312,25 +22388,30 @@ KAPPA: \htmlref{ADD}{ADD},
          for the lines.
 
          A comma-separated list of strings should be given in which each
-         string is either an attribute setting, or the name of a text file
-         preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files should
-         contain further comma-separated lists which will be read and
-         interpreted in the same manner.  Attribute settings are applied in
-         the order in which they occur within the list, with later settings
-         overriding any earlier settings given for the same attribute.
+         string is either an attribute setting, or the name of a text
+         file preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files
+         should contain further comma-separated lists which will be
+         read and interpreted in the same manner.  Attribute settings
+         are applied in the order in which they occur within the list,
+         with later settings overriding any earlier settings given for
+         the same attribute.
 
          Each individual attribute setting should be of the form:
 
             $<$name$>$=$<$value$>$
 
-         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
-         the value to assign to the attribute.  Default values will be
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$
+         is the value to assign to the attribute.  Default values will be
          used for any unspecified attributes.  All attributes will be
-         defaulted if a null value ({\tt{!}}) is supplied.  See
-         \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
-         for a description of the available
-         attributes.  Any unrecognised attributes are ignored (no error is
-         reported).
+         defaulted if a null value ({\tt{!}})---the initial default---is supplied.
+         To apply changes of style to only the current invocation, begin these
+         attributes with a plus sign.  A mixture of persistent and temporary
+         style changes is achieved by listing all the persistent attributes
+         followed by a plus sign then the list of temporary attributes.
+
+         See \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         for a description of the available attributes.  Any unrecognised
+         attributes are ignored (no error is reported).
 
          The attributes \htmlattref{Colour(Curves)}{Colour(element)},
          \htmlattref{Width(Curves)}{Width(element)}, \emph{etc.}, can be used
@@ -27026,25 +27107,30 @@ KAPPA: \htmlref{GDSET}{GDSET},
          of the axis values reported on the screen may also be controlled.
 
          A comma-separated list of strings should be given in which each
-         string is either an attribute setting, or the name of a text file
-         preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files should
-         contain further comma-separated lists which will be read and
-         interpreted in the same manner.  Attribute settings are applied in
-         the order in which they occur within the list, with later settings
-         overriding any earlier settings given for the same attribute.
+         string is either an attribute setting, or the name of a text
+         file preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files
+         should contain further comma-separated lists which will be
+         read and interpreted in the same manner.  Attribute settings
+         are applied in the order in which they occur within the list,
+         with later settings overriding any earlier settings given for
+         the same attribute.
 
          Each individual attribute setting should be of the form:
 
             $<$name$>$=$<$value$>$
 
-         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
-         the value to assign to the attribute.  Default values will be
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$
+         is the value to assign to the attribute.  Default values will be
          used for any unspecified attributes.  All attributes will be
-         defaulted if a null value ({\tt{!}}) is supplied.  See
-         \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
-         for a description of the available
-         attributes.  Any unrecognised attributes are ignored (no error is
-         reported).
+         defaulted if a null value ({\tt{!}})---the initial default---is supplied.
+         To apply changes of style to only the current invocation, begin these
+         attributes with a plus sign.  A mixture of persistent and temporary
+         style changes is achieved by listing all the persistent attributes
+         followed by a plus sign then the list of temporary attributes.
+
+         See \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         for a description of the available attributes.  Any unrecognised
+         attributes are ignored (no error is reported).
 
          The appearance of the outline is controlled by the attributes
          \htmlattref{Colour(Border)}{Colour(element)}, \latex{\goodbreak}
@@ -28303,21 +28389,16 @@ scaling limits are used for both images.
          STYLE = \htmlref{GROUP}{se:groups} (Read)
       }{
          A group of attribute settings describing the plotting style to
-         use when drawing the annotated axes and data values.  The
-         default for this parameter is its current value, and so any
-         value supplied for this parameter persists for all future
-         invocations of this application until a new value is supplied.
-         If you want to make temporary changes to the plotting style
-         that do not persist then use the TEMPSTYLE parameter.
+         use when drawing the annotated axes and data values.
 
          A comma-separated list of strings should be given in which each
          string is either an attribute setting, or the name of a text
          file preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files
-         should contain further comma-separated lists which will be read
-         and interpreted in the same manner.  Attribute settings are
-         applied in the order in which they occur within the list, with
-         later settings overriding any earlier settings given for the
-         same attribute.
+         should contain further comma-separated lists which will be
+         read and interpreted in the same manner.  Attribute settings
+         are applied in the order in which they occur within the list,
+         with later settings overriding any earlier settings given for
+         the same attribute.
 
          Each individual attribute setting should be of the form:
 
@@ -28326,32 +28407,21 @@ scaling limits are used for both images.
          where $<$name$>$ is the name of a plotting attribute, and $<$value$>$
          is the value to assign to the attribute.  Default values will be
          used for any unspecified attributes.  All attributes will be
-         defaulted if a null value ({\tt{!}}) is supplied.  See
-         \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
-         for a description of the
-         available attributes.  Any unrecognised attributes are ignored
-         (no error is reported).
+         defaulted if a null value ({\tt{!}})---the initial default---is supplied.
+         To apply changes of style to only the current invocation, begin these
+         attributes with a plus sign.  A mixture of persistent and temporary
+         style changes is achieved by listing all the persistent attributes
+         followed by a plus sign then the list of temporary attributes.
+
+         See \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         for a description of the available attributes.  Any unrecognised
+         attributes are ignored (no error is reported).
 
          The appearance of the histogram curve is controlled by the
          attributes \htmlattref{Colour(Curves)}{Colour(element)},
          \htmlattref{Width(Curves)}{Width(element)}, {\em{etc}}.  (The
          synonym {\att Line} may be used in place of {\att Curves}.)
          {\tt [}current value{\tt{]}}
-      }
-      \sstsubsection{
-         TEMPSTYLE = GROUP (Read)
-      }{
-         A group of extra attribute settings which modify the plotting
-         style specified by the STYLE parameter.  The default for this
-         parameter is a null ({\tt{!}}) value, which causes the plotting
-         style specified by STYLE to be used without any changes.  Style
-         changes specified using TEMPSTYLE do not persist between
-         invocations of this application.  If you want to make permanent
-         changes to the default plotting style then use the STYLE
-         parameter.
-
-         See the description of the STYLE parameter for more information
-         about values that can be assigned to this parameter.  {\tt [!]}
       }
       \sstsubsection{
          TITLE = LITERAL (Read)
@@ -29375,25 +29445,32 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          for the key (see Parameter KEY).
 
          A comma-separated list of strings should be given in which each
-         string is either an attribute setting, or the name of a text file
-         preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files should
-         contain further comma-separated lists which will be read and
-         interpreted in the same manner.  Attribute settings are applied in
-         the order in which they occur within the list, with later settings
-         overriding any earlier settings given for the same attribute.
+         string is either an attribute setting, or the name of a text
+         file preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files
+         should contain further comma-separated lists which will be
+         read and interpreted in the same manner.  Attribute settings
+         are applied in the order in which they occur within the list,
+         with later settings overriding any earlier settings given for
+         the same attribute.
 
          Each individual attribute setting should be of the form:
 
             $<$name$>$=$<$value$>$
 
-         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
-         the value to assign to the attribute.  Default values will be
+
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$
+         is the value to assign to the attribute.  Default values will be
          used for any unspecified attributes.  All attributes will be
-         defaulted if a null value ({\tt{!}}) is supplied.  See
-         \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
-         for a description of the available
-         attributes.  Any unrecognised attributes are ignored (no error is
-         reported).   {\tt [}current value{\tt{]}}
+         defaulted if a null value ({\tt{!}})---the initial default---is supplied.
+         To apply changes of style to only the current invocation, begin these
+         attributes with a plus sign.  A mixture of persistent and temporary
+         style changes is achieved by listing all the persistent attributes
+         followed by a plus sign then the list of temporary attributes.
+
+         See \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         for a description of the available attributes.  Any unrecognised
+         attributes are ignored (no error is reported).
+         {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
          LMODE = \htmlref{LITERAL}{se:parmenu} (Read)
@@ -29557,33 +29634,33 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
       }{
          A group of attribute settings describing the plotting style to
          use when drawing the annotated axes, data values, and error
-         markers.  The default for this parameter is its current value,
-         and so any value supplied for this parameter persists for all
-         future invocations of this application until a new value is
-         supplied.  If you want to make temporary changes to the
-         plotting style that do not persist then use the TEMPSTYLE
-         parameter.
+         markers.
 
          A comma-separated list of strings should be given in which each
-         string is either an attribute setting, or the name of a text file
-         preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files should
-         contain further comma-separated lists which will be read and
-         interpreted in the same manner.  Attribute settings are applied in
-         the order in which they occur within the list, with later settings
-         overriding any earlier settings given for the same attribute.
+         string is either an attribute setting, or the name of a text
+         file preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files
+         should contain further comma-separated lists which will be
+         read and interpreted in the same manner.  Attribute settings
+         are applied in the order in which they occur within the list,
+         with later settings overriding any earlier settings given for
+         the same attribute.
 
          Each individual attribute setting should be of the form:
 
             $<$name$>$=$<$value$>$
 
-         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
-         the value to assign to the attribute.  Default values will be
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$
+         is the value to assign to the attribute.  Default values will be
          used for any unspecified attributes.  All attributes will be
-         defaulted if a null value ({\tt{!}}) is supplied.  See
-         \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
-         for a description of the available
-         attributes.  Any unrecognised attributes are ignored (no error is
-         reported).
+         defaulted if a null value ({\tt{!}})---the initial default---is supplied.
+         To apply changes of style to only the current invocation, begin these
+         attributes with a plus sign.  A mixture of persistent and temporary
+         style changes is achieved by listing all the persistent attributes
+         followed by a plus sign then the list of temporary attributes.
+
+         See \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         for a description of the available attributes.  Any unrecognised
+         attributes are ignored (no error is reported).
 
          The appearance of the data values is controlled by the attributes
          \htmlattref{Colour(Curves)}{Colour(element)},
@@ -29598,21 +29675,6 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          Parameter SHAPE).   {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
-         TEMPSTYLE = GROUP (Read)
-      }{
-         A group of extra attribute settings which modify the plotting
-         style specified by the STYLE parameter.  The default for this
-         parameter is a null ({\tt{!}}) value, which causes the plotting style
-         specified by STYLE to be used without any changes.  Style
-         changes specified using TEMPSTYLE do not persist between
-         invocations of this application.  If you want to make permanent
-         changes to the default plotting style then use the STYLE
-         parameter.
-
-         See the description of the STYLE parameter for more information
-         about values that can be assigned to this parameter.  {\tt [!]}
-     }
-     \sstsubsection{
          USEAXIS = LITERAL (Read)
       }{
          Specifies the quantity to be used to annotate the horizontal axis
@@ -29846,7 +29908,7 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          invocations of LINPLOT.
       }
       \sstexamplesubsection{
-         linplot xspec mode=p errbar xsigma=3 ysigma=3 shape=d tempstyle=$\wedge$my\_sty
+         linplot xspec mode=p errbar xsigma=3 ysigma=3 shape=d style=+$\wedge$my\_sty
       }{
          This is the same as the previous example, except that the style
          specified in file {\tt my\_sty} does not become the default
@@ -30661,25 +30723,31 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
          when drawing the graphics specified by Parameter PLOT.
 
          A comma-separated list of strings should be given in which each
-         string is either an attribute setting, or the name of a text file
-         preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files should
-         contain further comma-separated lists which will be read and
-         interpreted in the same manner.  Attribute settings are applied in
-         the order in which they occur within the list, with later settings
-         overriding any earlier settings given for the same attribute.
+         string is either an attribute setting, or the name of a text
+         file preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files
+         should contain further comma-separated lists which will be
+         read and interpreted in the same manner.  Attribute settings
+         are applied in the order in which they occur within the list,
+         with later settings overriding any earlier settings given for
+         the same attribute.
 
          Each individual attribute setting should be of the form:
 
             $<$name$>$=$<$value$>$
 
-         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
-         the value to assign to the attribute.  Default values will be
+
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$
+         is the value to assign to the attribute.  Default values will be
          used for any unspecified attributes.  All attributes will be
-         defaulted if a null value ({\tt{!}}) is supplied.  See
-         \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
-         for a description of the available
-         attributes.  Any unrecognised attributes are ignored (no error is
-         reported).
+         defaulted if a null value ({\tt{!}})---the initial default---is supplied.
+         To apply changes of style to only the current invocation, begin these
+         attributes with a plus sign.  A mixture of persistent and temporary
+         style changes is achieved by listing all the persistent attributes
+         followed by a plus sign then the list of temporary attributes.
+
+         See \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         for a description of the available attributes.  Any unrecognised
+         attributes are ignored (no error is reported).
 
          In addition to the attributes which control the appearance of
          the graphics (\htmlattref{Colour}{Colour(element)}, \htmlattref{Font}{Font(element)}, \emph{etc.}), the following attributes may
@@ -31223,25 +31291,30 @@ KAPPA: \htmlref{LOG10}{LOG10},
          for individual data values.
 
          A comma-separated list of strings should be given in which each
-         string is either an attribute setting, or the name of a text file
-         preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files should
-         contain further comma-separated lists which will be read and
-         interpreted in the same manner.  Attribute settings are applied in
-         the order in which they occur within the list, with later settings
-         overriding any earlier settings given for the same attribute.
+         string is either an attribute setting, or the name of a text
+         file preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files
+         should contain further comma-separated lists which will be
+         read and interpreted in the same manner.  Attribute settings
+         are applied in the order in which they occur within the list,
+         with later settings overriding any earlier settings given for
+         the same attribute.
 
          Each individual attribute setting should be of the form:
 
             $<$name$>$=$<$value$>$
 
-         where $<$name$>$ is the name of a Frame attribute, and $<$value$>$ is
-         the value to assign to the attribute.  Default values will be
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$
+         is the value to assign to the attribute.  Default values will be
          used for any unspecified attributes.  All attributes will be
-         defaulted if a null value ({\tt{!}}) is supplied.  See
-         \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
-         for a description of the available
-         attributes.  Any unrecognised attributes are ignored (no error is
-         reported).
+         defaulted if a null value ({\tt{!}})---the initial default---is supplied.
+         To apply changes of style to only the current invocation, begin these
+         attributes with a plus sign.  A mixture of persistent and temporary
+         style changes is achieved by listing all the persistent attributes
+         followed by a plus sign then the list of temporary attributes.
+
+         See \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         for a description of the available attributes.  Any unrecognised
+         attributes are ignored (no error is reported).
 
          Data values are formatted using attributes \htmlattref{Format(1)}{Format(axis)}
          and  \htmlattref{Digits(1)}{Digits/Digits(axis)}.  {\tt [}current value{\tt{]}}
@@ -32642,25 +32715,30 @@ KAPPA: \htmlref{LUTEDIT}{LUTEDIT},
          for the annotation.
 
          A comma-separated list of strings should be given in which each
-         string is either an attribute setting, or the name of a text file
-         preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files should
-         contain further comma-separated lists which will be read and
-         interpreted in the same manner.  Attribute settings are applied in
-         the order in which they occur within the list, with later settings
-         overriding any earlier settings given for the same attribute.
+         string is either an attribute setting, or the name of a text
+         file preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files
+         should contain further comma-separated lists which will be
+         read and interpreted in the same manner.  Attribute settings
+         are applied in the order in which they occur within the list,
+         with later settings overriding any earlier settings given for
+         the same attribute.
 
          Each individual attribute setting should be of the form:
 
             $<$name$>$=$<$value$>$
 
-         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
-         the value to assign to the attribute.  Default values will be
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$
+         is the value to assign to the attribute.  Default values will be
          used for any unspecified attributes.  All attributes will be
-         defaulted if a null value ({\tt{!}}) is supplied.  See
-         \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
-         for a description of the available
-         attributes.  Any unrecognised attributes are ignored (no error is
-         reported).
+         defaulted if a null value ({\tt{!}})---the initial default---is supplied.
+         To apply changes of style to only the current invocation, begin these
+         attributes with a plus sign.  A mixture of persistent and temporary
+         style changes is achieved by listing all the persistent attributes
+         followed by a plus sign then the list of temporary attributes.
+
+         See \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         for a description of the available attributes.  Any unrecognised
+         attributes are ignored (no error is reported).
 
          Axis 1 is always the \emph{data value} axis, whether it is displayed
          horizontally or vertically.  So for instance, to set the label
@@ -35017,25 +35095,30 @@ KAPPA: \htmlref{SETBAD}{SETBAD}.
          for the key (see Parameter KEY).
 
          A comma-separated list of strings should be given in which each
-         string is either an attribute setting, or the name of a text file
-         preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files should
-         contain further comma-separated lists which will be read and
-         interpreted in the same manner.  Attribute settings are applied in
-         the order in which they occur within the list, with later settings
-         overriding any earlier settings given for the same attribute.
+         string is either an attribute setting, or the name of a text
+         file preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files
+         should contain further comma-separated lists which will be
+         read and interpreted in the same manner.  Attribute settings
+         are applied in the order in which they occur within the list,
+         with later settings overriding any earlier settings given for
+         the same attribute.
 
          Each individual attribute setting should be of the form:
 
             $<$name$>$=$<$value$>$
 
-         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
-         the value to assign to the attribute.  Default values will be
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$
+         is the value to assign to the attribute.  Default values will be
          used for any unspecified attributes.  All attributes will be
-         defaulted if a null value ({\tt{!}}) is supplied.  See
-         \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
-         for a description of the available
-         attributes.  Any unrecognised attributes are ignored (no error is
-         reported).
+         defaulted if a null value ({\tt{!}})---the initial default---is supplied.
+         To apply changes of style to only the current invocation, begin these
+         attributes with a plus sign.  A mixture of persistent and temporary
+         style changes is achieved by listing all the persistent attributes
+         followed by a plus sign then the list of temporary attributes.
+
+         See \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         for a description of the available attributes.  Any unrecognised
+         attributes are ignored (no error is reported).
 
          The heading in the key can be changed by setting a value for the
          Title attribute (the supplied heading is split into lines of no more
@@ -35236,25 +35319,30 @@ KAPPA: \htmlref{SETBAD}{SETBAD}.
          markers, and curve labels.
 
          A comma-separated list of strings should be given in which each
-         string is either an attribute setting, or the name of a text file
-         preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files should
-         contain further comma-separated lists which will be read and
-         interpreted in the same manner.  Attribute settings are applied in
-         the order in which they occur within the list, with later settings
-         overriding any earlier settings given for the same attribute.
+         string is either an attribute setting, or the name of a text
+         file preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files
+         should contain further comma-separated lists which will be
+         read and interpreted in the same manner.  Attribute settings
+         are applied in the order in which they occur within the list,
+         with later settings overriding any earlier settings given for
+         the same attribute.
 
          Each individual attribute setting should be of the form:
 
             $<$name$>$=$<$value$>$
 
-         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
-         the value to assign to the attribute.  Default values will be
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$
+         is the value to assign to the attribute.  Default values will be
          used for any unspecified attributes.  All attributes will be
-         defaulted if a null value ({\tt{!}}) is supplied.  See
-         \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
-         for a description of the available
-         attributes.  Any unrecognised attributes are ignored (no error is
-         reported).
+         defaulted if a null value ({\tt{!}})---the initial default---is supplied.
+         To apply changes of style to only the current invocation, begin these
+         attributes with a plus sign.  A mixture of persistent and temporary
+         style changes is achieved by listing all the persistent attributes
+         followed by a plus sign then the list of temporary attributes.
+
+         See \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         for a description of the available attributes.  Any unrecognised
+         attributes are ignored (no error is reported).
 
          The appearance of the data curves is controlled by the attributes
          \htmlattref{Colour(Curves)}{Colour(element)},
@@ -35390,6 +35478,20 @@ KAPPA: \htmlref{SETBAD}{SETBAD}.
       }{
          Plot all rows of the two-dimensional NDF file, rcw3\_b1, on the
          current graphics device.
+      }
+      \sstexamplesubsection{
+         mlinplot rcw3\_b1 lnindx=* style="colour(curve)=red+width(curve)=4" \
+      }{
+         As the previous example, but the rows are drawn in red at four
+         times normal thickness.  The change of line coluor persists
+         to the next invocation, but not the temporary widening of the
+         lines.
+      }
+      \sstexamplesubsection{
+         mlinplot rcw3\_b1 lnindx=* style="+width(curve)=4" \
+      }{
+         As the previous example, but now the the rows are drawn in
+         current line colour.
       }
       \sstexamplesubsection{
          mlinplot rcw3\_b1 absaxs=2 lnindx="20:25,30,31" $\backslash$
@@ -37096,25 +37198,31 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          best-fitting line.
 
          A comma-separated list of strings should be given in which each
-         string is either an attribute setting, or the name of a text file
-         preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files should
-         contain further comma-separated lists which will be read and
-         interpreted in the same manner.  Attribute settings are applied in
-         the order in which they occur within the list, with later settings
-         overriding any earlier settings given for the same attribute.
+         string is either an attribute setting, or the name of a text
+         file preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files
+         should contain further comma-separated lists which will be
+         read and interpreted in the same manner.  Attribute settings
+         are applied in the order in which they occur within the list,
+         with later settings overriding any earlier settings given for
+         the same attribute.
 
          Each individual attribute setting should be of the form:
 
             $<$name$>$=$<$value$>$
 
-         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
-         the value to assign to the attribute.  Default values will be
+
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$
+         is the value to assign to the attribute.  Default values will be
          used for any unspecified attributes.  All attributes will be
-         defaulted if a null value ({\tt{!}}) is supplied.  See
-         \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
-         for a description of the available
-         attributes.  Any unrecognised attributes are ignored (no error is
-         reported).
+         defaulted if a null value ({\tt{!}})---the initial default---is supplied.
+         To apply changes of style to only the current invocation, begin these
+         attributes with a plus sign.  A mixture of persistent and temporary
+         style changes is achieved by listing all the persistent attributes
+         followed by a plus sign then the list of temporary attributes.
+
+         See \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         for a description of the available attributes.  Any unrecognised
+         attributes are ignored (no error is reported).
 
          The appearance of the best-fitting straight line is controlled by
          the attributes \latex{\goodbreak} \htmlattref{Colour(Curves)}{Colour(element)},
@@ -37577,25 +37685,31 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          for the outline and annotated axes.
 
          A comma-separated list of strings should be given in which each
-         string is either an attribute setting, or the name of a text file
-         preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files should
-         contain further comma-separated lists which will be read and
-         interpreted in the same manner.  Attribute settings are applied in
-         the order in which they occur within the list, with later settings
-         overriding any earlier settings given for the same attribute.
+         string is either an attribute setting, or the name of a text
+         file preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files
+         should contain further comma-separated lists which will be
+         read and interpreted in the same manner.  Attribute settings
+         are applied in the order in which they occur within the list,
+         with later settings overriding any earlier settings given for
+         the same attribute.
 
          Each individual attribute setting should be of the form:
 
             $<$name$>$=$<$value$>$
 
-         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
-         the value to assign to the attribute.  Default values will be
+
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$
+         is the value to assign to the attribute.  Default values will be
          used for any unspecified attributes.  All attributes will be
-         defaulted if a null value ({\tt{!}}) is supplied.  See
-         \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
-         for a description of the available
-         attributes.  Any unrecognised attributes are ignored (no error is
-         reported).
+         defaulted if a null value ({\tt{!}})---the initial default---is supplied.
+         To apply changes of style to only the current invocation, begin these
+         attributes with a plus sign.  A mixture of persistent and temporary
+         style changes is achieved by listing all the persistent attributes
+         followed by a plus sign then the list of temporary attributes.
+
+         See \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         for a description of the available attributes.  Any unrecognised
+         attributes are ignored (no error is reported).
 
          The appearance of the outline is controlled by the attributes
          \htmlattref{Colour(Curves)}{Colour(element)}, \goodbreak
@@ -41903,26 +42017,30 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          when drawing the annotated axes, data values, and the model profile.
 
          A comma-separated list of strings should be given in which each
-         string is either an attribute setting, or the name of a text file
-         preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files should
-         contain further comma-separated lists which will be read and
-         interpreted in the same manner.  Attribute settings are applied in
-         the order in which they occur within the list, with later settings
-         overriding any earlier settings given for the same attribute.
+         string is either an attribute setting, or the name of a text
+         file preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files
+         should contain further comma-separated lists which will be
+         read and interpreted in the same manner.  Attribute settings
+         are applied in the order in which they occur within the list,
+         with later settings overriding any earlier settings given for
+         the same attribute.
 
          Each individual attribute setting should be of the form:
 
             $<$name$>$=$<$value$>$
 
-         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
-         the value to assign to the attribute.  Default values will be
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$
+         is the value to assign to the attribute.  Default values will be
          used for any unspecified attributes.  All attributes will be
-         defaulted if a null value ({\tt{!}}) is supplied.  See
-         \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
-         for a description of the available
-         attributes.  Any unrecognised attributes are ignored (no error is
-         reported).
+         defaulted if a null value ({\tt{!}})---the initial default---is supplied.
+         To apply changes of style to only the current invocation, begin these
+         attributes with a plus sign.  A mixture of persistent and temporary
+         style changes is achieved by listing all the persistent attributes
+         followed by a plus sign then the list of temporary attributes.
 
+         See \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         for a description of the available attributes.  Any unrecognised
+         attributes are ignored (no error is reported).
          The appearance of the model curve is controlled by the attributes
          \htmlattref{Colour(Curves)}{Colour(element)},
          \htmlattref{Width(Curves)}{Width(element)}, \emph{etc.} (the synonym
@@ -43514,25 +43632,30 @@ KAPPA: \htmlref{FLIP}{FLIP},
          when drawing the annotated axes, and markers.
 
          A comma-separated list of strings should be given in which each
-         string is either an attribute setting, or the name of a text file
-         preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files should
-         contain further comma-separated lists which will be read and
-         interpreted in the same manner.  Attribute settings are applied in
-         the order in which they occur within the list, with later settings
-         overriding any earlier settings given for the same attribute.
+         string is either an attribute setting, or the name of a text
+         file preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files
+         should contain further comma-separated lists which will be
+         read and interpreted in the same manner.  Attribute settings
+         are applied in the order in which they occur within the list,
+         with later settings overriding any earlier settings given for
+         the same attribute.
 
          Each individual attribute setting should be of the form:
 
             $<$name$>$=$<$value$>$
 
-         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
-         the value to assign to the attribute.  Default values will be
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$
+         is the value to assign to the attribute.  Default values will be
          used for any unspecified attributes.  All attributes will be
-         defaulted if a null value ({\tt{!}}) is supplied.  See
-         \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
-         for a description of the available
-         attributes.  Any unrecognised attributes are ignored (no error is
-         reported).
+         defaulted if a null value ({\tt{!}})---the initial default---is supplied.
+         To apply changes of style to only the current invocation, begin these
+         attributes with a plus sign.  A mixture of persistent and temporary
+         style changes is achieved by listing all the persistent attributes
+         followed by a plus sign then the list of temporary attributes.
+
+         See \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         for a description of the available attributes.  Any unrecognised
+         attributes are ignored (no error is reported).
 
          The appearance of markers is controlled by
          \htmlattref{Colour(Markers)}{Colour(element)},
@@ -43889,25 +44012,30 @@ KAPPA: \htmlref{NORMALIZE}{NORMALIZE}.
          drawing the graphics specified by Parameter PLOT.
 
          A comma-separated list of strings should be given in which each
-         string is either an attribute setting, or the name of a text file
-         preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files should
-         contain further comma-separated lists which will be read and
-         interpreted in the same manner.  Attribute settings are applied in
-         the order in which they occur within the list, with later settings
-         overriding any earlier settings given for the same attribute.
+         string is either an attribute setting, or the name of a text
+         file preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files
+         should contain further comma-separated lists which will be
+         read and interpreted in the same manner.  Attribute settings
+         are applied in the order in which they occur within the list,
+         with later settings overriding any earlier settings given for
+         the same attribute.
 
          Each individual attribute setting should be of the form:
 
             $<$name$>$=$<$value$>$
 
-         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
-         the value to assign to the attribute.  Default values will be
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$
+         is the value to assign to the attribute.  Default values will be
          used for any unspecified attributes.  All attributes will be
-         defaulted if a null value ({\tt{!}}) is supplied.  See
-         \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
-         for a description of the available
-         attributes.  Any unrecognised attributes are ignored (no error is
-         reported).
+         defaulted if a null value ({\tt{!}})---the initial default---is supplied.
+         To apply changes of style to only the current invocation, begin these
+         attributes with a plus sign.  A mixture of persistent and temporary
+         style changes is achieved by listing all the persistent attributes
+         followed by a plus sign then the list of temporary attributes.
+
+         See \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         for a description of the available attributes.  Any unrecognised
+         attributes are ignored (no error is reported).
 
          The appearance of the lines forming the edges of each polygon is
          controlled by the attributes \htmlattref{Colour(Curves)}{Colour(element)},
@@ -48428,25 +48556,30 @@ KAPPA: \htmlref{ADD}{ADD},
          for the key (see Parameter KEY).
 
          A comma-separated list of strings should be given in which each
-         string is either an attribute setting, or the name of a text file
-         preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files should
-         contain further comma-separated lists which will be read and
-         interpreted in the same manner.  Attribute settings are applied in
-         the order in which they occur within the list, with later settings
-         overriding any earlier settings given for the same attribute.
+         string is either an attribute setting, or the name of a text
+         file preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files
+         should contain further comma-separated lists which will be
+         read and interpreted in the same manner.  Attribute settings
+         are applied in the order in which they occur within the list,
+         with later settings overriding any earlier settings given for
+         the same attribute.
 
          Each individual attribute setting should be of the form:
 
             $<$name$>$=$<$value$>$
 
-         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
-         the value to assign to the attribute.  Default values will be
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$
+         is the value to assign to the attribute.  Default values will be
          used for any unspecified attributes.  All attributes will be
-         defaulted if a null value ({\tt{!}}) is supplied.  See
-         \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
-         for a description of the available
-         attributes.  Any unrecognised attributes are ignored (no error is
-         reported).
+         defaulted if a null value ({\tt{!}})---the initial default---is supplied.
+         To apply changes of style to only the current invocation, begin these
+         attributes with a plus sign.  A mixture of persistent and temporary
+         style changes is achieved by listing all the persistent attributes
+         followed by a plus sign then the list of temporary attributes.
+
+         See \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         for a description of the available attributes.  Any unrecognised
+         attributes are ignored (no error is reported).
 
          The appearance of the text in the key is controlled using {\att String}
          attributes (\emph{e.g.} {\att Colour(Strings)},
@@ -48524,25 +48657,30 @@ KAPPA: \htmlref{ADD}{ADD},
          for the vectors and annotated axes.
 
          A comma-separated list of strings should be given in which each
-         string is either an attribute setting, or the name of a text file
-         preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files should
-         contain further comma-separated lists which will be read and
-         interpreted in the same manner.  Attribute settings are applied in
-         the order in which they occur within the list, with later settings
-         overriding any earlier settings given for the same attribute.
+         string is either an attribute setting, or the name of a text
+         file preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files
+         should contain further comma-separated lists which will be
+         read and interpreted in the same manner.  Attribute settings
+         are applied in the order in which they occur within the list,
+         with later settings overriding any earlier settings given for
+         the same attribute.
 
          Each individual attribute setting should be of the form:
 
             $<$name$>$=$<$value$>$
 
-         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
-         the value to assign to the attribute.  Default values will be
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$
+         is the value to assign to the attribute.  Default values will be
          used for any unspecified attributes.  All attributes will be
-         defaulted if a null value ({\tt{!}}) is supplied.  See
-         \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
-         for a description of the available
-         attributes.  Any unrecognised attributes are ignored (no error is
-         reported).
+         defaulted if a null value ({\tt{!}})---the initial default---is supplied.
+         To apply changes of style to only the current invocation, begin these
+         attributes with a plus sign.  A mixture of persistent and temporary
+         style changes is achieved by listing all the persistent attributes
+         followed by a plus sign then the list of temporary attributes.
+
+         See \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         for a description of the available attributes.  Any unrecognised
+         attributes are ignored (no error is reported).
 
          The appearance of the vectors is controlled by the attributes
          \htmlattref{Colour(Curves)}{Colour(element)},
@@ -51548,25 +51686,30 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          drawing the graphics specified by Parameter PLOT.
 
          A comma-separated list of strings should be given in which each
-         string is either an attribute setting, or the name of a text file
-         preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files should
-         contain further comma-separated lists which will be read and
-         interpreted in the same manner.  Attribute settings are applied in
-         the order in which they occur within the list, with later settings
-         overriding any earlier settings given for the same attribute.
+         string is either an attribute setting, or the name of a text
+         file preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files
+         should contain further comma-separated lists which will be
+         read and interpreted in the same manner.  Attribute settings
+         are applied in the order in which they occur within the list,
+         with later settings overriding any earlier settings given for
+         the same attribute.
 
          Each individual attribute setting should be of the form:
 
             $<$name$>$=$<$value$>$
 
-         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
-         the value to assign to the attribute.  Default values will be
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$
+         is the value to assign to the attribute.  Default values will be
          used for any unspecified attributes.  All attributes will be
-         defaulted if a null value ({\tt{!}}) is supplied.  See
-         \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
-         for a description of the available
-         attributes.  Any unrecognised attributes are ignored (no error is
-         reported).
+         defaulted if a null value ({\tt{!}})---the initial default---is supplied.
+         To apply changes of style to only the current invocation, begin these
+         attributes with a plus sign.  A mixture of persistent and temporary
+         style changes is achieved by listing all the persistent attributes
+         followed by a plus sign then the list of temporary attributes.
+
+         See \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         for a description of the available attributes.  Any unrecognised
+         attributes are ignored (no error is reported).
 
          The appearance of vertical and horizontal lines is controlled by
          the attributes \latex{\goodbreak} \htmlattref{Colour(Curves)}{Colour(element)},
@@ -57301,6 +57444,12 @@ The following applications have been modified:
 \subsection{General Changes}
 \begin{itemize}
 
+   \item Parameters that set the plotting style can now recognise
+   temporary attributes that only last for the duration of a
+   single task, rather than persist until changed or reset.  The
+   list of temporary attributes begin with a plus sign.  See
+   \htmlref{Temporary Attributes}{se:temp_attr} for examples.
+
    \item Style parameters are consistently documented as type GROUP.
 
 \end{itemize}
@@ -57342,18 +57491,12 @@ The following applications have been modified:
         output parameter.
       \end{itemize}
 
-   \item [\htmlref{HISTOGRAM}{HISTOGRAM}]\mbox{}
-      \begin{itemize}
-         \item There is a new TEMPSTYLE parameter.  Like STYLE it
-         controls the plotting style, however, its assignments only
-         apply to the current invocation.
-      \end{itemize}
-
    \item [\htmlref{LINPLOT}{LINPLOT}]\mbox{}
       \begin{itemize}
         \item Parameter MODE has a new option {\tt "GapHistogram"}, which
         behaves as {\tt "Histogram"} except no flanking vertical lines
         are drawn either side of a bad value.
+        \item Parameter TEMPSTYLE is deprecated.
       \end{itemize}
 
    \item [\htmlref{LISTSHOW}{LISTSHOW}]\mbox{}

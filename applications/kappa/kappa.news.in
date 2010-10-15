@@ -4,6 +4,15 @@
    changes so far are listed below.  For complete details of all
    changes, see the "Release Notes" appendix in SUN/95.
 
+2 General_changes
+   o  Parameters that set the plotting style can now recognise
+   temporary attributes that only last for the duration of a
+   single task, rather than persist until changed or reset.  The
+   list of temporary attributes begin with a plus sign.  See
+   "Temporary Attributes" in SUN/95 for examples.
+
+   o  Style parameters are consistently documented as type GROUP.
+
 2 Modified_applications
 
    o  BEAMFIT
@@ -34,17 +43,12 @@
       -  Bad percentile values are no longer written to the PERVAL
       output parameter.
 
-   o  HISTOGRAM
-
-      -  There is a new TEMPSTYLE parameter.  Like STYLE it
-      controls the plotting style, however, its assignments only
-      apply to the current invocation.
-
    o  LINPLOT
 
       -  Parameter MODE has a new option "GapHistogram", which
       behaves as "Histogram" except no flanking vertical lines are
       drawn either side of a bad value.
+      -  Parameter TEMPSTYLE is deprecated.
 
    o  LISTSHOW
 
