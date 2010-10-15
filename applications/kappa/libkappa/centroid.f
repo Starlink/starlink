@@ -218,10 +218,16 @@
 *        where <name> is the name of a plotting attribute, and <value>
 *        is the value to assign to the attribute.  Default values will
 *        be used for any unspecified attributes.  All attributes will be
-*        defaulted if a null value (!) is supplied.  See section
-*        "Plotting Attributes" in SUN/95 for a description of the
-*        available attributes.  Any unrecognised attributes are ignored
-*        (no error is reported).  [current value]
+*        defaulted if a null value (!)---the initial default---is
+*        supplied.  To apply changes of style to only the current
+*        invocation, begin these attributes with a plus sign.  A mixture
+*        of persistent and temporary style changes is achieved by
+*        listing all the persistent attributes followed by a plus sign
+*        then the list temporary attributes.
+*
+*        See section "Plotting Attributes" in SUN/95 for a description
+*        of the available attributes.  Any unrecognised attributes are
+*        ignored (no error is reported).  [current value]
 *     POSITIVE = _LOGICAL (Read)
 *        TRUE, if array features are positive above the background.
 *        [TRUE]
@@ -342,7 +348,7 @@
 *         the Research Councils
 *     Copyright (C) 2004-2006 Particle Physics and Astronomy Research
 *     Council.
-*     Copyright (C) 2009 Science and Technology Facilities Council.
+*     Copyright (C) 2009-2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -395,6 +401,8 @@
 *     2009 July 24 (MJC):
 *        Remove QUIET parameter and use the current reporting level
 *        instead (set by the global MSG_FILTER environment variable).
+*     2010 October 14 (MJC):
+*        Permit temporary style attributes.
 *     {enter_further_changes_here}
 
 *-
@@ -614,10 +622,11 @@
      :                   .FALSE., MARK, STATUS )
 
 *  If so, get the marker type, and set the plotting style.
+*  The plus sign requests support of temporary attributes.
          IF( MARK .NE. 'NONE' ) THEN
             CALL PAR_GDR0I( 'MARKER', 2, -31, 10000, .FALSE., IMARK,
      :                      STATUS )
-            CALL KPG1_ASSET( 'KAPPA_CENTROID', 'PLOTSTYLE', IPLOT,
+            CALL KPG1_ASSET( 'KAPPA_CENTROID', '+PLOTSTYLE', IPLOT,
      :                       STATUS )
 
 *  Set the current PGPLOT marker attributes (size, colour, etc) so that
@@ -819,7 +828,7 @@
             STATUS = SAI__ERROR
             CALL MSG_SETI( 'S', SEARCH( I ) )
             CALL ERR_REP( 'CENTROID_EVN', 'CENTROID: Even value ^S '//
-     :                    'supplied for parameter %SEARCH - must '//
+     :                    'supplied for Parameter %SEARCH - must '//
      :                    'be odd.', STATUS )
             GO TO 999
          END IF
