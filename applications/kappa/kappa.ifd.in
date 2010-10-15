@@ -6959,15 +6959,6 @@ package kappa {
             default !
          }
 
-         parameter tempstyle {
-            type LITERAL
-            ppath DEFAULT
-            vpath DEFAULT
-            prompt {Temporary style changes}
-            helpkey *
-            default !
-         }
-
          parameter xleft {
             type _REAL
             prompt {Axis value at left end of horizontal axis}
@@ -11381,15 +11372,6 @@ package kappa {
             default !
          }
 
-         parameter tempstyle {
-            type LITERAL
-            ppath DEFAULT
-            vpath DEFAULT
-            prompt {Temporary style changes}
-            helpkey *
-            default !
-         }
-
          parameter title {
             type LITERAL
             vpath DEFAULT
@@ -14017,15 +13999,6 @@ iraf! {
             default !
          }
 
-         parameter tempstyle {
-            type LITERAL
-            ppath DEFAULT
-            vpath DEFAULT
-            prompt {Temporary style changes}
-            helpkey *
-            default !
-         }
-
          parameter title {
             type LITERAL
             vpath DEFAULT
@@ -15095,15 +15068,6 @@ iraf! {
             ppath CURRENT DEFAULT
             vpath CURRENT DEFAULT
             prompt {Plotting style}
-            helpkey *
-            default !
-         }
-
-         parameter tempstyle {
-            type LITERAL
-            ppath DEFAULT
-            vpath DEFAULT
-            prompt {Temporary style changes}
             helpkey *
             default !
          }
