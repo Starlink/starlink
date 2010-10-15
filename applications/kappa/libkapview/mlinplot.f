@@ -152,7 +152,7 @@
 *        invocation, begin these attributes with a plus sign.  A mixture
 *        of persistent and temporary style changes is achieved by
 *        listing all the persistent attributes followed by a plus sign
-*        then the list temporary attributes.
+*        then the list of temporary attributes.
 *
 *        See section "Plotting Attributes" in SUN/95 for a description
 *        of the available attributes.  Any unrecognised attributes are
@@ -319,7 +319,7 @@
 *        invocation, begin these attributes with a plus sign.  A mixture
 *        of persistent and temporary style changes is achieved by
 *        listing all the persistent attributes followed by a plus sign
-*        then the list temporary attributes.
+*        then the list of temporary attributes.
 
 *        See section "Plotting Attributes" in SUN/95 for a description
 *        of the available attributes.  Any unrecognised attributes are

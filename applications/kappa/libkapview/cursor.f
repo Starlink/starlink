@@ -304,7 +304,7 @@
 *        invocation, begin these attributes with a plus sign.  A mixture
 *        of persistent and temporary style changes is achieved by
 *        listing all the persistent attributes followed by a plus sign
-*        then the list temporary attributes.
+*        then the list of temporary attributes.
 *
 *        In addition to the attributes which control the appearance of
 *        the graphics (Colour, Fount, etc), the following attributes may
