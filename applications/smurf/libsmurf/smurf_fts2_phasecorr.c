@@ -55,6 +55,8 @@
 *     2010-10-01 (COBA):
 *        - Replaced single ZPD value input with 2D ZPD array input
 *        - FFTW does NOT need suitable ssHalfLength and dsHalfLength lengths
+*     2010-10-15 (COBA):
+*        - Removed explicit casts
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -108,6 +110,8 @@
 
 void smurf_fts2_phasecorr(int* status)
 {
+  if(*status != SAI__OK) { return; }
+
   int coeffLength           = 0;    /* Number of polynomial coefficients */
   int dsHalfLength          = 0;    /* Size of the double sided interferogram */
   int index                 = 0;    /* Index */
@@ -164,8 +168,6 @@ void smurf_fts2_phasecorr(int* status)
   void* srcCube             = NULL; /* Pointer to the input data cube */
   void* zpdArray            = NULL; /* Pointer to 2D ZPD data values */
 
-  if(*status != SAI__OK) { return; }
-
   /* GET INPUT GROUP */
   kpg1Rgndf("IN", 0, 1, "", &igrp, &insize, status);
   /* GET OUTPUT GROUP */
@@ -205,16 +207,8 @@ void smurf_fts2_phasecorr(int* status)
     errRep(FUNC_NAME, "Unable to open the ZPD file!", status);
     goto CLEANUP;
   }
-  if(zpdData->dtype == SMF__FLOAT) {
-    zpdArray = (float*) (zpdData->pntr[0]);
-  } else if(zpdData->dtype == SMF__DOUBLE) {
-    zpdArray = (double*) (zpdData->pntr[0]);
-  } else {
-    *status = SAI__ERROR;
-    errRep(FUNC_NAME, "Invalid data type found!", status);
-    smf_close_file(&zpdData, status);
-    goto CLEANUP;
-  }
+  zpdArray = zpdData->pntr[0];
+
   zpdWidth   = zpdData->dims[0];
   zpdHeight  = zpdData->dims[1];
   smf_find_subarray(zpdData->hdr, NULL, 0, &zpdSubarray, status);
@@ -238,16 +232,8 @@ void smurf_fts2_phasecorr(int* status)
       errRep(FUNC_NAME, "Unable to open source file!", status);
       break;
     }
-    if(srcData->dtype == SMF__FLOAT) {
-      srcCube = (float*) (srcData->pntr[0]);
-    } else if(srcData->dtype == SMF__DOUBLE) {
-      srcCube = (double*) (srcData->pntr[0]);
-    } else {
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Invalid data type found!", status);
-      smf_close_file(&srcData, status);
-      break;
-    }
+    srcCube = srcData->pntr[0];
+
     srcWidth   = srcData->dims[0];
     srcHeight  = srcData->dims[1];
     srcN       = srcData->dims[2];

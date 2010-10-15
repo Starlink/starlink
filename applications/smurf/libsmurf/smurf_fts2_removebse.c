@@ -42,6 +42,8 @@
 *        - Handle single/double precison data
 *        - Adapted to SMURF coding style
 *        - Handle invalid subarrays
+*     2010-10-15 (COBA):
+*        - Removed explicit casts
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -165,16 +167,8 @@ void smurf_fts2_removebse(int* status)
             status);
     goto CLEANUP;
   }
-  if(bseData->dtype == SMF__FLOAT) {
-    bseCube = (float*) (bseData->pntr[0]);
-  } else if(bseData->dtype == SMF__DOUBLE) {
-    bseCube = (double*) (bseData->pntr[0]);
-  } else {
-    *status = SAI__ERROR;
-    errRep(FUNC_NAME, "Invalid data type found!", status);
-    smf_close_file(&bseData, status);
-    goto CLEANUP;
-  }
+  bseCube = bseData->pntr[0];
+
   bseWidth  = bseData->dims[0];
   bseHeight = bseData->dims[1];
   bseN      = bseData->dims[2];
@@ -239,16 +233,8 @@ void smurf_fts2_removebse(int* status)
       errRep(FUNC_NAME, "Unable to open source file!", status);
       break;
     }
-    if(srcData->dtype == SMF__FLOAT) {
-      srcCube = (float*) (srcData->pntr[0]);
-    } else if(srcData->dtype == SMF__DOUBLE) {
-      srcCube = (double*) (srcData->pntr[0]);
-    } else {
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Invalid data type found!", status);
-      smf_close_file(&srcData, status);
-      break;
-    }
+    srcCube = srcData->pntr[0];
+
     srcWidth  = srcData->dims[0];
     srcHeight = srcData->dims[1];
     srcN      = srcData->dims[2];
