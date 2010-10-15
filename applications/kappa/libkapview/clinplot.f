@@ -179,7 +179,7 @@
 *
 *        The appearance of the text in the key can be changed by
 *        setting new values for the attributes Colour(Strings),
-*        Font(Strings), etc. [current value]
+*        Font(Strings), etc.  [current value]
 *     LMODE = LITERAL (Read)
 *        LMODE specifies how the defaults for Parameters YBOT and YTOP
 *        (the lower and upper limit of the vertical axis of each line
@@ -342,7 +342,7 @@
 *        should contain further comma-separated lists which will be
 *        read and interpreted in the same manner.  Attribute settings
 *        are applied in the order in which they occur within the list,
-*        with later settings over-riding any earlier settings given for
+*        with later settings overriding any earlier settings given for
 *        the same attribute.
 *
 *        Each individual attribute setting should be of the form:
@@ -991,7 +991,7 @@
 
 *  Get the bounds of the current PGPLOT window (this is the same as the
 *  bounds of the Plot in the GRAPHICS Frame).
-      IF( STATUS  .EQ. SAI__OK ) THEN
+      IF( STATUS .EQ. SAI__OK ) THEN
          CALL PGQWIN( X1, X2, Y1, Y2 )
 
 *  Find the width and height of each spectrum's cell in the GRAPHICS
