@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     smurf_fts2_removebse.c
+*     FTS2REMOVEBSE
 
 *  Purpose:
 *     Removes the Beam splitter Self Emission (BSE) from the source.
@@ -38,6 +38,10 @@
 *        Original version.
 *     2010-09-21 (COBA):
 *        Updated prologue with ADAM params
+*     2010-10-13 (COBA):
+*        - Handle single/double precison data
+*        - Adapted to SMURF coding style
+*        - Handle invalid subarrays
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -97,139 +101,182 @@
 
 void smurf_fts2_removebse(int* status)
 {
-  int i             = 0;
-  int j             = 0;
-  int k             = 0;
-  int srcN          = 0;
-  int pixelCount    = 0;
-  int index         = 0;
-  int pixelIndex    = 0;
-  int bseHeight     = 0;
-  int bseN          = 0;
-  int bseSubarray   = 0;
-  int bseWidth      = 0;
-  int srcSubarray   = 0;
-  int srcWidth      = 0;
-  int srcHeight     = 0;
-  double* bseCube   = NULL;
-  double* bseX      = NULL;
-  double* srcCube   = NULL;
-  double* srcX      = NULL;
-  double* bseIFG    = NULL;
-  double* bseIFGNew = NULL;
-  Grp* bsegrp       = NULL;
-  Grp* igrp         = NULL;
-  Grp* ogrp         = NULL;
-  size_t fIndex     = 0;
-  size_t outsize    = 0;
-  size_t size       = 0;
-  size_t count      = 0;
-  smfData* bseData  = NULL;
-  smfData* srcData  = NULL;
-  HDSLoc* hdsLoc    = NULL;
-  HDSLoc* hdsLocPosition = NULL;
-  smf_fts2scanmode srcMode   = SMF__FTS2_SCANMODE_UNKNOWN;
-  smf_fts2scanmode bseMode   = SMF__FTS2_SCANMODE_UNKNOWN;
+  if(*status != SAI__OK) { return; }
 
-  float* tmp        = NULL;
   char ftsMode[SZFITSCARD+1];
+  int bseHeight     = 0; /* Height of the BSE calibration array */
+  int bseN          = 0; /* Sample size of BSE */
+  sc2ast_subarray_t bseSubnum   = 0; /* BSE subarray ID */
+  int bseWidth      = 0; /* Width of the BSE calibration array */
+  int fIndex        = 0; /* File counter */
+  int i             = 0; /* Loop counter */
+  int index         = 0; /* Index */
+  int j             = 0; /* Loop counter */
+  int k             = 0; /* Loop counter */
+  int pixelCount    = 0; /* Number of bolometers in the subarray */
+  int pixelIndex    = 0; /* Pixel index */
+  int srcHeight     = 0; /* Height of the source array */
+  int srcN          = 0; /* Sample size */
+  sc2ast_subarray_t srcSubnum   = 0; /* Source subarray ID */
+  int srcWidth      = 0; /* Width of the source array */
+  double* bseIFG    = NULL; /* BSE interferogram */
+  double* bseIFGNew = NULL; /* New BSE interferogram */
+  double* bseX      = NULL; /* BSE mirror positions */
+  double* srcX      = NULL; /* Source mirror positions */
+  float* tmp        = NULL; /* Temporary value */
+  Grp* bsegrp       = NULL; /* BSE group */
+  Grp* igrp         = NULL; /* Input group */
+  Grp* ogrp         = NULL; /* Output group */
+  size_t bsesize    = 0; /* BSE size */
+  size_t outsize    = 0; /* Output size */
+  size_t size       = 0; /* Input size */
+  size_t count      = 0; /* Size */
+  smfData* bseData  = NULL; /* Pointer to BSE data */
+  smfData* srcData  = NULL; /* Pointer to source data */
+  HDSLoc* hdsLoc    = NULL; /* Pointer to HDS location */
+  HDSLoc* hdsLocPosition   = NULL; /* Pointer to mirror positions */
+  smf_fts2scanmode srcMode = SMF__FTS2_SCANMODE_UNKNOWN; /* Source scan mode*/
+  smf_fts2scanmode bseMode = SMF__FTS2_SCANMODE_UNKNOWN; /* BSE scan mode */
+  void* bseCube     = NULL; /* Pointer to the BSE data cube */
+  void* srcCube     = NULL; /* Pointer to the input data cube */
 
-  if(*status != SAI__OK)
-  {
-    return;
-  }
-
-  /* Get input group */
+  /* GET INPUT GROUP */
   kpg1Rgndf("IN", 0, 1, "", &igrp, &size, status);
-  /* Get output group */
-  kpg1Wgndf("OUT", ogrp, size, size, "Equal number of input and output files expected!", &ogrp, &outsize, status);
-  /* Get BSE group */
-  kpg1Gtgrp("BSE", &bsegrp, &size, status);
+  /* GET OUTPUT GROUP */
+  kpg1Wgndf( "OUT", ogrp, size, size,
+             "Equal number of input and output files expected!",
+             &ogrp, &outsize, status);
+  /* GET BSE GROUP */
+  kpg1Gtgrp("BSE", &bsegrp, &bsesize, status);
 
   ndfBegin();
 
-  /*
-  * BEAMSPLITTER SELF EMISSION, BSE
-  */
-  smf_open_file(bsegrp, 1, "READ", SMF__NOCREATE_QUALITY, &bseData, status);
-  if(*status != SAI__OK)
-  {
-    errRep(FUNC_NAME, "Unable to open Beamsplitter Self Emission file!", status);
-    return;
+  /* BEAMSPLITTER SELF EMISSION, BSE */
+  smf_open_file( bsegrp, 1, "READ",
+                 SMF__NOCREATE_QUALITY |
+                 SMF__NOCREATE_VARIANCE |
+                 SMF__NOCREATE_DA |
+                 SMF__NOCREATE_FTS,
+                 &bseData, status);
+  if(*status != SAI__OK) {
+    *status = SAI__ERROR;
+    errRep( FUNC_NAME,
+            "Unable to open Beamsplitter Self Emission calibration file!",
+            status);
+    goto CLEANUP;
   }
-  bseCube = (double*) (bseData->pntr[0]);
-  bseWidth = bseData->dims[0];
+  if(bseData->dtype == SMF__FLOAT) {
+    bseCube = (float*) (bseData->pntr[0]);
+  } else if(bseData->dtype == SMF__DOUBLE) {
+    bseCube = (double*) (bseData->pntr[0]);
+  } else {
+    *status = SAI__ERROR;
+    errRep(FUNC_NAME, "Invalid data type found!", status);
+    smf_close_file(&bseData, status);
+    goto CLEANUP;
+  }
+  bseWidth  = bseData->dims[0];
   bseHeight = bseData->dims[1];
-  bseN = bseData->dims[2];
+  bseN      = bseData->dims[2];
 
   /* GET SUBARRAY ID */
-  smf_find_subarray(bseData->hdr, NULL, 0, &bseSubarray, status);
+  smf_find_subarray(bseData->hdr, NULL, 0, &bseSubnum, status);
+  if( bseSubnum == SC2AST__NULLSUB ||
+      bseSubnum == S8A || bseSubnum == S8B ||
+      bseSubnum == S4C || bseSubnum == S4D) {
+    *status = SAI__ERROR;
+    errRep(FUNC_NAME, "BSE has invalid subarray ID!", status);
+    smf_close_file(&bseData, status);
+    goto CLEANUP;
+  }
 
   /* GET FTS-2 SCAN MODE */
   smf_fits_getS(bseData->hdr, "FTS_MODE", ftsMode, sizeof(ftsMode), status);
-  if(strncmp(ftsMode, "FSCAN", 5) == 0 ) { bseMode = SMF__FTS2_SCANMODE_FSCAN; }
-  if(bseMode != SMF__FTS2_SCANMODE_FSCAN)
-  {
+  if(strncmp(ftsMode, "FSCAN", 5) == 0 ) {
+    bseMode = SMF__FTS2_SCANMODE_FSCAN;
+  }
+  if(bseMode != SMF__FTS2_SCANMODE_FSCAN) {
     *status = SAI__ERROR;
     errRep(FUNC_NAME, "Invalid FTS-2 scan mode in BSE data!", status);
     smf_close_file(&bseData, status);
-    return;
+    goto CLEANUP;
   }
 
   /* GET MIRROR POSITIONS */
   hdsLoc = smf_get_xloc(bseData, "JCMTSTATE", "EXT", "READ", 0, 0, status);
   datFind(hdsLoc, "FTS_POS", &hdsLocPosition, status);
   datSize(hdsLocPosition, &count, status);
-  bseX = (double*) astMalloc(count * sizeof(double));
-  tmp = (float*) astMalloc(count * sizeof(float));
+  bseX = astMalloc(count * sizeof(*bseX));
+  tmp  = astMalloc(count * sizeof(*tmp));
   datGetVR(hdsLocPosition, count, tmp, &count, status);
-  if(*status == SAI__OK)
-  {
-    for(i = 0; i < (int) count; i++) { bseX[i] = (double) tmp[i]; }
-  }
-  /* FREE RESOURCES */
-  astFree(tmp);
-  datAnnul(&hdsLoc, status);
-  datAnnul(&hdsLocPosition, status);
-  if(bseX == NULL)
-  {
+  if(*status != SAI__OK) {
     *status = SAI__ERROR;
     errRep(FUNC_NAME, "Unable to obtain BSE mirror positions!", status);
+    astFree(tmp);
+    astFree(bseX);
+    if(hdsLoc) { datAnnul(&hdsLoc, status); }
+    if(hdsLocPosition) { datAnnul(&hdsLocPosition, status); }
     smf_close_file(&bseData, status);
-    return;
+    goto CLEANUP;
   }
+  for(int i = 0; i < (int) count; i++) {
+    bseX[i] = (double) tmp[i];
+  }
+  astFree(tmp);
+  if(hdsLoc) { datAnnul(&hdsLoc, status); }
+  if(hdsLocPosition) { datAnnul(&hdsLocPosition, status); }
 
-  /*
-  * REMOVE BSE FROM EACH SOURCE FILE
-  */
-  for(fIndex = 1; fIndex <= size; fIndex++)
-  {
-    /* OPEN SOURCE */
-    smf_open_file(ogrp, fIndex, "UPDATE", SMF__NOCREATE_QUALITY, &srcData, status);
-    if(*status != SAI__OK)
-    {
+  /* LOOP THROUGH EACH NDF FILE IN THE GROUP */
+  for(fIndex = 1; fIndex <= size; fIndex++) {
+    smf_open_file( ogrp, fIndex, "UPDATE",
+                   SMF__NOCREATE_QUALITY |
+                   SMF__NOCREATE_VARIANCE |
+                   SMF__NOCREATE_DA |
+                   SMF__NOCREATE_FTS,
+                   &srcData, status);
+    if(*status != SAI__OK) {
+      *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unable to open source file!", status);
       break;
     }
-    srcCube = (double*) (srcData->pntr[0]);
+    if(srcData->dtype == SMF__FLOAT) {
+      srcCube = (float*) (srcData->pntr[0]);
+    } else if(srcData->dtype == SMF__DOUBLE) {
+      srcCube = (double*) (srcData->pntr[0]);
+    } else {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "Invalid data type found!", status);
+      smf_close_file(&srcData, status);
+      break;
+    }
+    srcWidth  = srcData->dims[0];
+    srcHeight = srcData->dims[1];
+    srcN      = srcData->dims[2];
+    pixelCount = srcWidth * srcHeight;
 
     /* GET SUBARRAY ID */
-    smf_find_subarray(bseData->hdr, NULL, 0, &srcSubarray, status);
-
-    /* VERIFY THAT THE CORRECT BSE INTERFEROGRAM IS BEING USED */
-    if(bseSubarray != srcSubarray)
-    {
+    smf_find_subarray(srcData->hdr, NULL, 0, &srcSubnum, status);
+    if( srcSubnum == SC2AST__NULLSUB ||
+        srcSubnum == S8A || srcSubnum == S8B ||
+        srcSubnum == S4C || srcSubnum == S4D) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Incompatible BSE interferogram cube! BSE and source must have the same subarray ID.", status);
+      errRep(FUNC_NAME, "Source has invalid subarray ID!", status);
+      smf_close_file(&srcData, status);
+      break;
+    }
+
+    /* VERIFY THAT THE CORRECT BSE INTERFEROGRAM IS USED */
+    if(bseSubnum != srcSubnum) {
+      *status = SAI__ERROR;
+      errRep( FUNC_NAME,
+              "Incompatible BSE interferogram cube!"
+              "BSE and source must have the same subarray ID.", status);
       smf_close_file(&srcData, status);
       break;
     }
 
     /* VERIFY THAT THE SOURCE & BSE HAVE COMPATIBLE DIMENSIONS */
-    srcWidth = srcData->dims[0];
-    srcHeight = srcData->dims[1];
-    if(srcWidth != bseWidth || srcHeight != bseHeight)
-    {
+    if(srcWidth != bseWidth || srcHeight != bseHeight) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Incompatible BSE dimensions!", status);
       smf_close_file(&srcData, status);
@@ -238,9 +285,10 @@ void smurf_fts2_removebse(int* status)
 
     /* GET FTS-2 SCAN MODE */
     smf_fits_getS(srcData->hdr, "FTS_MODE", ftsMode, sizeof(ftsMode), status);
-    if(strncmp(ftsMode, "FSCAN", 5) == 0 ) { srcMode = SMF__FTS2_SCANMODE_FSCAN; }
-    if(srcMode != SMF__FTS2_SCANMODE_FSCAN)
-    {
+    if(strncmp(ftsMode, "FSCAN", 5) == 0 ) {
+      srcMode = SMF__FTS2_SCANMODE_FSCAN;
+    }
+    if(srcMode != SMF__FTS2_SCANMODE_FSCAN) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Invalid FTS-2 scan mode in source data!", status);
       smf_close_file(&srcData, status);
@@ -251,70 +299,77 @@ void smurf_fts2_removebse(int* status)
     hdsLoc = smf_get_xloc(srcData, "JCMTSTATE", "EXT", "READ", 0, 0, status);
     datFind(hdsLoc, "FTS_POS", &hdsLocPosition, status);
     datSize(hdsLocPosition, &count, status);
-    srcX = (double*) astMalloc(count * sizeof(double));
-    tmp = (float*) astMalloc(count * sizeof(float));
+    srcX = astMalloc(count * sizeof(*srcX));
+    tmp  = astMalloc(count * sizeof(*tmp));
     datGetVR(hdsLocPosition, count, tmp, &count, status);
-    if(*status == SAI__OK)
-    {
-      for(i = 0; i < (int) count; i++) { srcX[i] = (double) tmp[i]; }
-    }
-    /* FREE RESOURCES */
-    astFree(tmp);
-    datAnnul(&hdsLoc, status);
-    datAnnul(&hdsLocPosition, status);
-    if(srcX == NULL)
-    {
+    if(*status != SAI__OK) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unable to obtain source mirror positions!", status);
+      astFree(tmp);
+      astFree(srcX);
+      if(hdsLoc) { datAnnul(&hdsLoc, status); }
+      if(hdsLocPosition) { datAnnul(&hdsLocPosition, status); }
       smf_close_file(&srcData, status);
       break;
     }
+    for(i = 0; i < (int) count; i++) {
+      srcX[i] = (double) tmp[i];
+    }
+    astFree(tmp);
+    if(hdsLoc) { datAnnul(&hdsLoc, status); }
+    if(hdsLocPosition) { datAnnul(&hdsLocPosition, status); }
 
-    /* REMOVE BSE FROM SOURCE */
-    srcN = srcData->dims[2]; // Source sample size
-    bseIFG    = (double*) astMalloc(bseN * sizeof(double));
-    bseIFGNew = (double*) astMalloc(srcN * sizeof(double));
-
-    pixelCount = srcWidth * srcHeight;
-    for(i = 0; i < srcHeight; i++)
-    {
-      for(j = 0; j < srcWidth; j++)
-      {
+    /* REMOVE EACH BSE INTEREFROGRAM FROM CORRESPONDING SOURCE INTERFEROGRAM */
+    bseIFG    = astMalloc(bseN * sizeof(*bseIFG));
+    bseIFGNew = astMalloc(srcN * sizeof(*bseIFGNew));
+    for(i = 0; i < srcHeight; i++) {
+      for(j = 0; j < srcWidth; j++) {
         pixelIndex = i + j * srcHeight;
-        /* GET BSE INTERFEROGRAM AT INDEX (i, j) */
-        for(k = 0; k < bseN; k++)
-        {
+
+        /* GET BSE INTERFEROGRAM */
+        for(k = 0; k < bseN; k++) {
           index = pixelIndex + pixelCount * k;
-          bseIFG[k] = bseCube[index];
-        }
-        /* INTERPOLATE BSE INTERFEROGRAM AT SOURCE MIRROR POSITIONS */
-        fts2_naturalcubicsplineinterpolator(bseX, bseIFG, bseN, srcX, bseIFGNew, srcN);
-        /* REMOVE INTERPOLATED BSE INTERFEROGRAM FROM SOURCE INTERFEROGRAM AT INDEX (i, j) */
-        for(k = 0; k < srcN; k++)
-        {
-          index = pixelIndex + pixelCount * k;
-          if(srcSubarray == S8C || srcSubarray == S8D)
-          {
-            srcCube[index] -= bseIFGNew[k];
+          if(bseData->dtype == SMF__FLOAT) {
+            bseIFG[k] = (double)(*((float*)bseCube + index));
+          } else {
+            bseIFG[k] = *((double*)bseCube + index);
           }
-          else if(srcSubarray == S4A || srcSubarray == S4B)
-          {
-            srcCube[index] += bseIFGNew[k];
+        }
+
+        /* INTERPOLATE BSE INTERFEROGRAM AT SOURCE MIRROR POSITIONS */
+        fts2_naturalcubicsplineinterpolator( bseX, bseIFG, bseN,
+                                             srcX, bseIFGNew, srcN);
+
+        /* ADD/REMOVE BSE FROM SOURCE */
+        for(k = 0; k < srcN; k++) {
+          index = pixelIndex + pixelCount * k;
+          if(srcSubnum == S8C || srcSubnum == S8D) {
+            if(srcData->dtype == SMF__FLOAT) {
+              *((float*)srcCube + index) -= bseIFGNew[k];
+            } else {
+              *((double*)srcCube + index) -= bseIFGNew[k];
+            }
+          } else if(srcSubnum == S4A || srcSubnum == S4B) {
+            if(srcData->dtype == SMF__FLOAT) {
+              *((float*)srcCube + index) += bseIFGNew[k];
+            } else {
+              *((double*)srcCube + index) += bseIFGNew[k];
+            }
           }
         }
       }
     }
-
-    /* FREE RESOURCES */
     astFree(bseIFGNew);
     astFree(bseIFG);
     astFree(bseX);
     astFree(srcX);
     smf_close_file(&srcData, status);
   }
-
-  /* FREE RESOURCES */
   smf_close_file(&bseData, status);
 
-  ndfEnd(status);
+  CLEANUP:
+    ndfEnd(status);
+    grpDelet(&igrp, status);
+    grpDelet(&ogrp, status);
+    grpDelet(&bsegrp, status);
 }
