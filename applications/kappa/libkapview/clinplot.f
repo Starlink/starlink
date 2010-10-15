@@ -159,23 +159,29 @@
 *        A comma-separated list of strings should be given in which each
 *        string is either an attribute setting, or the name of a text
 *        file preceded by an up-arrow character "^".  Such text files
-*        should contain further comma-separated lists which will be
-*        read and interpreted in the same manner.  Attribute settings
-*        are applied in the order in which they occur within the list,
-*        with later settings overriding any earlier settings given for
-*        the same attribute.
+*        should contain further comma-separated lists which will be read
+*        and interpreted in the same manner.  Attribute settings are
+*        applied in the order in which they occur within the list, with
+*        later settings overriding any earlier settings given for the
+*        same attribute.
 *
 *        Each individual attribute setting should be of the form:
 *
 *           <name>=<value>
 *
 *        where <name> is the name of a plotting attribute, and <value>
-*        is the value to assign to the attribute. Default values will be
-*        used for any unspecified attributes.  All attributes will be
-*        defaulted if a null value (!) is supplied.  See section
-*        "Plotting Attributes" in SUN/95 for a description of the
-*        available attributes.  Any unrecognised attributes are ignored
-*        (no error is reported).
+*        is the value to assign to the attribute.  Default values will
+*        be used for any unspecified attributes.  All attributes will be
+*        defaulted if a null value (!)---the initial default---is
+*        supplied.  To apply changes of style to only the current
+*        invocation, begin these attributes with a plus sign.  A mixture
+*        of persistent and temporary style changes is achieved by
+*        listing all the persistent attributes followed by a plus sign
+*        then the list temporary attributes.
+*
+*        See section "Plotting Attributes" in SUN/95 for a description
+*        of the available attributes.  Any unrecognised attributes are
+*        ignored (no error is reported).
 *
 *        The appearance of the text in the key can be changed by
 *        setting new values for the attributes Colour(Strings),
@@ -305,26 +311,32 @@
 *        to use when drawing the axes and data values in the spectrum
 *        line plots.
 *
-*        A comma-separated list of strings should be given in which
-*        each string is either an attribute setting, or the name of a
-*        text file preceded by an up-arrow character "^".  Such text
-*        files should contain further comma-separated lists which will
-*        be read and interpreted in the same manner.  Attribute
-*        settings are applied in the order in which they occur within
-*        the list, with later settings overriding any earlier settings
-*        given for the same attribute.
+*        A comma-separated list of strings should be given in which each
+*        string is either an attribute setting, or the name of a text
+*        file preceded by an up-arrow character "^".  Such text files
+*        should contain further comma-separated lists which will be read
+*        and interpreted in the same manner.  Attribute settings are
+*        applied in the order in which they occur within the list, with
+*        later settings overriding any earlier settings given for the
+*        same attribute.
 *
 *        Each individual attribute setting should be of the form:
 *
-*             <name>=<value>
+*           <name>=<value>
 *
 *        where <name> is the name of a plotting attribute, and <value>
 *        is the value to assign to the attribute.  Default values will
-*        be used for any unspecified attributes.  All attributes will
-*        be defaulted if a null value (!)---the initial default---is
-*        supplied.  See section "Plotting Attributes" in SUN/95 for a
-*        description of the available attributes.  Any unrecognised
-*        attributes are ignored (no error is reported).
+*        be used for any unspecified attributes.  All attributes will be
+*        defaulted if a null value (!)---the initial default---is
+*        supplied.  To apply changes of style to only the current
+*        invocation, begin these attributes with a plus sign.  A mixture
+*        of persistent and temporary style changes is achieved by
+*        listing all the persistent attributes followed by a plus sign
+*        then the list temporary attributes.
+*
+*        See section "Plotting Attributes" in SUN/95 for a description
+*        of the available attributes.  Any unrecognised attributes are
+*        ignored (no error is reported).
 *
 *        By default the axes have interior tick marks, and are without
 *        labels and a title to avoid overprinting on adjacent plots.
@@ -351,10 +363,16 @@
 *
 *        where <name> is the name of a plotting attribute, and <value>
 *        is the value to assign to the attribute.  Default values will
-*        be used for any unspecified attributes.  All attributes will
-*        be defaulted if a null value (!) is supplied.  See section
-*        "Plotting Attributes" in SUN/95 for a description of the
-*        available attributes.  Any unrecognised attributes are
+*        be used for any unspecified attributes.  All attributes will be
+*        defaulted if a null value (!)---the initial default---is
+*        supplied.  To apply changes of style to only the current
+*        invocation, begin these attributes with a plus sign.  A mixture
+*        of persistent and temporary style changes is achieved by
+*        listing all the persistent attributes followed by a plus sign
+*        then the list temporary attributes.
+*
+*        See section "Plotting Attributes" in SUN/95 for a description
+*        of the available attributes.  Any unrecognised attributes are
 *        ignored (no error is reported).  [current value]
 *     USEAXIS = LITERAL (Read)
 *        The WCS axis that will appear along the horizontal axis of
@@ -483,6 +501,8 @@
 *        Added Gapped MODE.
 *     2010 August 13 (MJC):
 *        The new mode renamed to GapHistogram.
+*     2010 October 13 (MJC):
+*        Permit temporary style attributes.
 *     {enter_further_changes_here}
 
 *-
@@ -1133,13 +1153,15 @@
      :                          %VAL( CNF_PVAL( IPW2 ) ),
      :                          %VAL( CNF_PVAL( IPW3 ) ), STATUS )
 
-*  Draw the curve if it contains any good values.
+*  Draw the curve if it contains any good values.  The plus requests
+*  support of temporary SPECSTYLE attributes.  Also allow for more than
+*  one call to KPG1_ASSET for SPECSTYLE by using the delimiter suffix.
                IF( CGOOD( IX, IY ) ) THEN
                   CALL KPG1_PLTLN( NSAMP, 1, NSAMP ,
      :                            %VAL( CNF_PVAL( IPW1 ) ),
      :                            %VAL( CNF_PVAL( IPW2 ) ),
      :                            .FALSE., .FALSE., 0.0D0, 0.0D0, 0.0D0,
-     :                            'SPECSTYLE', IPLOT3, MODE, MTYPE, 0,
+     :                            '+SPECSTYLE+', IPLOT3, MODE, MTYPE, 0,
      :                            0, 'KAPPA_CLINPLOT', STATUS )
 
 *  Increment the number of cells done so far.
@@ -1302,8 +1324,10 @@
                      DPMAP = AST_GETMAPPING( IPLOT2, AST__BASE,
      :                                       AST__CURRENT, STATUS )
 
-*  Set the style for plotting in the line plot.
-                     CALL KPG1_ASSET( 'KAPPA_CLINPLOT', 'SPECSTYLE',
+*  Set the style for plotting in the line plot.  The plus requests
+*  support of temporary SPECSTYLE attributes.  This the final attribute
+*  setting for SPECSTYLE hence there is no plus-sign suffix.
+                     CALL KPG1_ASSET( 'KAPPA_CLINPLOT', '+SPECSTYLE',
      :                                 IPLOT2, STATUS )
 
 *  Ensure no title or minor tick marks are produced.
@@ -1535,8 +1559,9 @@
                IF ( STATUS .NE. SAI__OK ) GO TO 999
             END IF
 
-*  Set the style for plotting in the key picture.
-            CALL KPG1_ASSET( 'KAPPA_CLINPLOT', 'KEYSTYLE', IPLOTK,
+*  Set the style for plotting in the key picture.  The plus requests
+*  support of temporary KEYSTYLE attributes.
+            CALL KPG1_ASSET( 'KAPPA_CLINPLOT', '+KEYSTYLE', IPLOTK,
      :                       STATUS )
 
 *  Draw the key to the right of the grid plot and aligned with
