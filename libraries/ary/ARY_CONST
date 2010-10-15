@@ -30,12 +30,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -44,6 +44,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     MBT: M.B. Taylor (STARLINK)
+*     EC: Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -55,6 +56,8 @@
 *        Increased array sizes to allow more array identifiers.
 *     31-AUG-2004 (MBT):
 *        Increased control block size limits by a factor of 4.
+*     15-OCT-2010 (EC)
+*        Doubled ARY__MXACB, ARY__MXDCB, ARY__MXMCB
 *     {enter_further_changes_here}
 
 *-
@@ -66,15 +69,15 @@
 
 *  Maximum number of entries in the Access Control Block.
       INTEGER ARY__MXACB
-      PARAMETER ( ARY__MXACB = 4096 )
+      PARAMETER ( ARY__MXACB = 8192 )
 
 *  Maximum number of entries in the Data Control Block.
       INTEGER ARY__MXDCB
-      PARAMETER ( ARY__MXDCB = 2048)
+      PARAMETER ( ARY__MXDCB = 4096)
 
 *  Maximum number of entries in the Mapping Control Block.
       INTEGER ARY__MXMCB
-      PARAMETER ( ARY__MXMCB = 1024 )
+      PARAMETER ( ARY__MXMCB = 2048 )
 
 *  Maximum number of entries in the Placeholder Control Block.
       INTEGER ARY__MXPCB
