@@ -692,7 +692,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           if(*status != SAI__OK) {
             errRepf("", FUNC_NAME ": Unable to obtain SIGMA dimensions!", status);
           }
-          if(ndimsFTS != 3) {
+          if(ndimsFTS != 2) {
             *status = SAI__ERROR;
             errRepf("", FUNC_NAME ": SIGMA has %i dimensions, should be 2!", status, ndimsFTS);
           }
