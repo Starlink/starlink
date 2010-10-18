@@ -392,6 +392,8 @@
  *        Add smf_write_flagmap
  *     2010-10-12 (EC):
  *        Add smf_whiten
+ *     2010-10-18 (COBA):
+ *        Add smf_check_smfFts
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -633,6 +635,8 @@ void smf_check_smfData ( const smfData *idata, smfData *odata, const int flags,
                          int *status );
 
 void smf_check_smfFile ( const smfData *idata, smfData *odata, int *status );
+
+void smf_check_smfFts ( const smfData *idata, smfData *odata, int *status );
 
 void smf_check_smfHead ( const smfData *idata, smfData *odata, int *status );
 

@@ -39,6 +39,7 @@
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     COBA: Coskun Oba (UoL)
 *     {enter_new_authors_here}
 
 *  History:
@@ -58,6 +59,8 @@
 *        Separate QUALITY logic from DATA,VARIANCE logic.
 *     2008-08-26 (TIMJ):
 *        Need to trap VAL__BADI
+*     2010-10-18 (COBA):
+*        Add check for smfFts
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -107,6 +110,7 @@
 void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, int * status ) {
 
   smfDA *da = NULL;       /* New smfDA */
+  smfFts *fts = NULL;     /* New smfFts */
   smfFile *file = NULL;   /* New smfFile */
   smfHead *hdr = NULL;    /* New smfHead */
   size_t i;               /* Loop counter */
@@ -310,6 +314,20 @@ void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, i
       }
     } else {
       smf_check_smfDA( idata, odata, status );
+    }
+  }
+
+  /* Check FTS if desired */
+  if(!(flags & SMF__NOCREATE_FTS)) {
+    if(odata->fts == NULL && idata->fts != NULL) {
+      fts = smf_deepcopy_smfFts(idata, status);
+      if(*status == SAI__OK) {
+        odata->fts = fts;
+      } else {
+        errRep(FUNC_NAME, "Unable to allocate memory for new smfFts", status);
+      }
+    } else {
+      smf_check_smfFts(idata, odata, status);
     }
   }
 

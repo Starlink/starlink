@@ -51,6 +51,7 @@ smf_check_quality.c \
 smf_check_smfDA.c \
 smf_check_smfData.c \
 smf_check_smfFile.c \
+smf_check_smfFts.c \
 smf_check_smfHead.c \
 smf_check_units.c \
 smf_checkdets.c \
