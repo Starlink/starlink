@@ -140,15 +140,8 @@ void smurf_fts2_eqsliced(int* status)
       errRep(FUNC_NAME, "Unable to open source file!", status);
       break;
     }
+    srcCube = srcData->pntr[0];
 
-    /* GET DATA CUBE */
-    if(srcData->dtype == SMF__FLOAT) {
-      srcCube = (float*) (srcData->pntr[0]);
-    } else if(srcData->dtype == SMF__DOUBLE) {
-      srcCube = (double*) (srcData->pntr[0]);
-    } else {
-      errRep(FUNC_NAME, "Invalid data type found - source!", status); break;
-    }
     srcWidth    = srcData->dims[0];
     srcHeight   = srcData->dims[1];
     srcN        = srcData->dims[2];
