@@ -76,6 +76,8 @@
 *        interpolation. This prevents unusually high gradients at the
 *        start or end of the time stream producing unrealisatically high
 *        values in the cubic interpolation.
+*     2010-10-19 (DSB):
+*        Do not attempt to fill the padded area if the bolometer has no good values.
 
 *  Copyright:
 *     Copyright (C) 2010 Univeristy of British Columbia.
@@ -306,6 +308,7 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
   int count;                    /* No. of unflagged since last flagged sample */
   int fillpad;                  /* Fill PAD samples ? */
   int flagged;                  /* Is the current sample flagged? */
+  int good;                     /* Were any usable input values found? */
   int inside;                   /* Was previous sample flagged? */
   int jend;                     /* Index of last flagged sample in block */
   int jj;                       /* Time-slice index */
@@ -353,6 +356,10 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
     /* Initialise the count of unflagged samples following the previous
        block of flagged samples. */
     count = 0;
+
+    /* Initialise a flag to indicate that no good values have yet been
+       encountered in the input time stream for this bolometer. */
+    good = 0;
 
     /* Initialise the index of the first sample to be replaced. This
        initial value is only used if there are fewer than BOX unflagged
@@ -521,6 +528,10 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
           }
         }
       }
+
+/* If the sample is not flagged indicate some usable samples have been
+   found. */
+      if( !flagged ) good = 1;
     }
 
    /* Replace the padding at the start and end of the bolometer time series
@@ -528,8 +539,8 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
       smoothly. First, fit a straight line to the 2*BOX samples at the end
       of the time stream (i.e. the left end of the interpolated
       wrapped-around section). The above filling of gaps ensures the data
-      values will not be bad. */
-    if( fillpad ) {
+      values will not be bad, unless the whole bolometer is bad. */
+    if( fillpad && good ) {
       leftstart = pend - 2*BOX + 1;
       leftend = pend;
       k = 0;
