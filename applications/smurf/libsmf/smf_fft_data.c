@@ -93,6 +93,8 @@
 *        Add SMF__NOCREATE_FTS
 *     2010-09-29 (DSB):
 *        Allow padding with artificial data.
+*     2010-10-19 (COBA):
+*        Removed SMF__NOCREATE_FTS in order to propagate the smfFts data.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -341,8 +343,8 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
                                SMF__NOCREATE_VARIANCE |
                                SMF__NOCREATE_QUALITY |
                                SMF__NOCREATE_FILE |
-                               SMF__NOCREATE_DA |
-                               SMF__NOCREATE_FTS, 1, 0, status );
+                               SMF__NOCREATE_DA,
+                               1, 0, status );
 
   /* Create some quality. We only apodize or pad if we are doing a
      forward FFT. */
@@ -374,12 +376,13 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
   /* Create a new smfData, copying over everything except for the bolo
      data itself */
 
-  retdata = smf_deepcopy_smfData( data, 0, SMF__NOCREATE_DATA |
+  retdata = smf_deepcopy_smfData( data, 0,
+                                  SMF__NOCREATE_DATA |
                                   SMF__NOCREATE_VARIANCE |
                                   SMF__NOCREATE_QUALITY |
                                   SMF__NOCREATE_FILE |
-                                  SMF__NOCREATE_DA |
-                                  SMF__NOCREATE_FTS, 0, 0, status );
+                                  SMF__NOCREATE_DA,
+                                  0, 0, status );
 
   if( *status == SAI__OK ) {
 
