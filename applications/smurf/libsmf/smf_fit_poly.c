@@ -49,6 +49,7 @@
 *     Andy Gibb (UBC)
 *     Ed Chapin (UBC)
 *     Tim Jenness (JAC, Hawaii)
+*     David Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -68,10 +69,12 @@
 *     2010-09-16 (EC):
 *        -Add remove flag to remove fitted polynomials
 *        -Parallelize over blocks of bolometers
+*     2010-10-19 (DSB):
+*        Free job_data before returning.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2010 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2008,2010 University of British Columbia.
 *     All Rights Reserved.
 
@@ -371,5 +374,8 @@ void smf_fit_poly( smfWorkForce *wf, smfData *data, const size_t order,
   /* Wait until all of the submitted jobs have completed */
   smf_wait( wf, status );
   smf_end_job_context( wf, status );
+
+  /* Free local resources. */
+  job_data = astFree( job_data );
 
 }
