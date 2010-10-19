@@ -98,7 +98,7 @@ void smf_check_smfFts(const smfData* idata, smfData* odata, int* status)
     if(ofts == NULL) {
       *status = SAI__ERROR;
       errRep( FUNC_NAME,
-              "Unable to allocate memory for new smfFts",
+              "Unable to allocate memory for new smfFts structure!",
               status);
     } else {
       odata->fts = ofts;

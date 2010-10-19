@@ -82,14 +82,16 @@
 #define FUNC_NAME "smf_create_smfFts"
 
 smfFts*
-smf_create_smfFts(int * status) 
+smf_create_smfFts(int* status)
 {
   if(*status != SAI__OK) { return NULL; }
-  
-  smfFts* fts = NULL;
-  fts = astCalloc(1, sizeof(smfFts), 0);
-  if(*status != SAI__OK) {
-    errRep(FUNC_NAME, "Unable to allocate memory for smfFts structure", status);
+
+  smfFts* fts = astCalloc(1, sizeof(*fts), 0);
+  if(!fts) {
+    *status = SAI__ERROR;
+    errRep( FUNC_NAME,
+            "Unable to create smfFts structure!",
+            status);
     return NULL;
   }
 

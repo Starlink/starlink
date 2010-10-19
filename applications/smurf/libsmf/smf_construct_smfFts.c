@@ -14,10 +14,10 @@
 
 *  Invocation:
 *     pntr = smf_construct_smfFts(
-                smfFts* tofill, 
+                smfFts* tofill,
                 smfData* fpm,
                 smfData* sigma,
-                double wnFactor, 
+                double wnFactor,
                 int * status );
 
 *  Arguments:
@@ -95,24 +95,24 @@
 #define FUNC_NAME "smf_construct_smfFts"
 
 smfFts*
-smf_construct_smfFts(
-    smfFts* tofill, 
-    smfData* fpm, 
-    smfData* sigma, 
-    int* status) 
-{  
-  smfFts* fts = tofill;  
-  if(*status != SAI__OK) { return fts; }
-  
-  if(tofill == NULL) { fts = smf_create_smfFts(status); }  
-  if(*status == SAI__OK) {
-    fts->fpm = fpm;
-    fts->sigma = sigma;
-  } 
-  else {
-    msgOutif(MSG__VERB," ", "Unable to allocate memory for new smfFts", status);
-    return NULL;
+smf_construct_smfFts(smfFts* tofill, smfData* fpm, smfData* sigma, int* status)
+{
+  if(*status != SAI__OK) { return NULL; }
+
+  if(tofill == NULL) {
+    smfFts* fts = smf_create_smfFts(status);
+    if(*status == SAI__OK) {
+      fts->fpm = fpm;
+      fts->sigma = sigma;
+      return fts;
+    } else {
+      msgOutif( MSG__VERB,
+                " ",
+                "Unable to construct smfFts structure!",
+                status);
+      return NULL;
+    }
   }
 
-  return fts;
+  return tofill;
 }
