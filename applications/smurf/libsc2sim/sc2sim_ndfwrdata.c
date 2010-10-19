@@ -479,6 +479,15 @@ void sc2sim_ndfwrdata
   /* Warning: KLUDGE alert!!! DATE-END needs to be calculated properly */
   astSetFitsS ( fitschan, "DATE-END", dateobs,
                 "Date and time (UTC) of end of sub-scan", 0 );
+  astSetFitsS ( fitschan, "WVMDATST", dateobs,
+                "Fudged date and time to make simulator work with makemap (UTC)", 0 );
+  astSetFitsS ( fitschan, "WVMDATEN", dateobs,
+                "Fudged date and time to make simulator work with makemap (UTC)", 0 );
+  astSetFitsS ( fitschan, "INBEAM", "",
+                "Fudged to make simulator work with makemap", 0 );
+  astSetFitsS ( fitschan, "SEQ_TYPE", "SCIENCE",
+                "Fudged to make simulator work with makemap", 0 );
+
   astSetFitsF ( fitschan, "DUT1", inx->dut1, "[d] UT1 - UTC correction", 0 );
   astSetFitsS ( fitschan, "INSTAP", inx->instap, "Instrument aperture", 0 );
   astSetFitsF ( fitschan, "INSTAP_X", inx->instap_x,
