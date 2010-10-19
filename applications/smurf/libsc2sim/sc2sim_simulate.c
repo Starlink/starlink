@@ -1615,19 +1615,19 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
   /* Release memory */
   /* Free buffers that get allocated for each subarray */
-  for ( k = 0; k < sinx->nsubarrays; k++ ) {
-
-    if( flatcal[k] ) {
-      free( flatcal[k] );
-      flatcal[k] = NULL;
-    }
-
-    if( flatpar[k] ) {
-      free( flatpar[k] );
-      flatpar[k] = NULL;
-    }
-
-  }/* for all subarrays */
+//  for ( k = 0; k < sinx->nsubarrays; k++ ) {
+//
+//   if( flatcal[k] ) {
+//      free( flatcal[k] );
+//      flatcal[k] = NULL;
+//    }
+//
+//    if( flatpar[k] ) {
+//      free( flatpar[k] );
+//      flatpar[k] = NULL;
+//    }
+//
+//  }/* for all subarrays */
 
  CLEANUP:
 
