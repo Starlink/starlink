@@ -61,5 +61,10 @@ spikebox = 50
 ast.zero_lowhits = 1
 ast.zero_notlast = 1
 
-# pad ends with zeros / use apodization to avoid ringing in some cases
-zeropad = 1
+# Deal with 4 min. of data at a time. This gives a slightly smaller
+# RMS, probably because the noise level in the detectors changes over
+# time; by handling smaller pieces a more accurate weighting will be
+# used. 4 min. should be plenty of time to complete at least a few
+# maps for all of the deep blank-field SRO projects.
+
+maxlen = 240
