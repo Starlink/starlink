@@ -86,7 +86,8 @@ smf_create_smfFts(int* status)
 {
   if(*status != SAI__OK) { return NULL; }
 
-  smfFts* fts = astCalloc(1, sizeof(*fts), 0);
+  smfFts* fts = NULL;
+  fts = astCalloc(1, sizeof(*fts), 0);
   if(!fts) {
     *status = SAI__ERROR;
     errRep( FUNC_NAME,
@@ -95,8 +96,8 @@ smf_create_smfFts(int* status)
     return NULL;
   }
 
-  fts->fpm      = NULL;
-  fts->sigma    = NULL;
+  fts->fpm = NULL;
+  fts->sigma = NULL;
 
   return fts;
 }

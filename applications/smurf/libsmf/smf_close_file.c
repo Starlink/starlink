@@ -104,6 +104,8 @@
 *        sc2store no longer uses system malloc in SMURF
 *     2010-09-17 (COBA):
 *        Free smfFts
+*     2010-10-19 (COBA):
+*        Reformat smfFts cleanup
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -306,10 +308,10 @@ void smf_close_file( smfData ** data, int * status ) {
   }
 
   /* Free smfFts */
-  fts = (*data)->fts;
-  if(fts) {
-    if(fts->fpm) { smf_close_file(&(fts->fpm), status); }
-    if(fts->sigma) { smf_close_file(&(fts->sigma), status); }
+  if((*data)->fts != NULL) {
+    fts = (*data)->fts;
+    if(fts->fpm) { smf_close_file(&fts->fpm, status); }
+    if(fts->sigma) { smf_close_file(&fts->sigma, status); }
     fts = astFree(fts);
   }
 
