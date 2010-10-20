@@ -155,9 +155,9 @@ void smurf_fts2_phasecorr(int* status)
   Grp* zpdgrp               = NULL; /* Output group */
   size_t count              = 0;    /* Mirror positions count */
   size_t fIndex             = 0;    /* File loop counter */
-  size_t insize             = 0;    /* Size of the input group */
-  size_t outsize            = 0;    /* Size of the output group */
-  size_t zpdsize            = 0;    /* Size of the ZPD group */
+  size_t inSize             = 0;    /* Size of the input group */
+  size_t outSize            = 0;    /* Size of the output group */
+  size_t zpdSize            = 0;    /* Size of the ZPD group */
   smfData* fpm              = NULL; /* Fitting params data */
   smfData* sigma            = NULL; /* smfFts standard deviation */
   smfData* srcData          = NULL; /* Pointer to input data */
@@ -169,13 +169,13 @@ void smurf_fts2_phasecorr(int* status)
   void* zpdArray            = NULL; /* Pointer to 2D ZPD data values */
 
   /* GET INPUT GROUP */
-  kpg1Rgndf("IN", 0, 1, "", &igrp, &insize, status);
+  kpg1Rgndf("IN", 0, 1, "", &igrp, &inSize, status);
   /* GET OUTPUT GROUP */
-  kpg1Wgndf("OUT", ogrp, insize, insize,
+  kpg1Wgndf("OUT", ogrp, inSize, inSize,
             "Equal number of input and output files expected!",
-            &ogrp, &outsize, status);
+            &ogrp, &outSize, status);
   /* GET ZPD GROUP */
-  kpg1Gtgrp("ZPD", &zpdgrp, &zpdsize, status);
+  kpg1Gtgrp("ZPD", &zpdgrp, &zpdSize, status);
 
   /* GET PARAMS */
   parGet0i("DSHALFLENGTH", &dsHalfLength, status);
@@ -201,7 +201,12 @@ void smurf_fts2_phasecorr(int* status)
   ndfBegin();
 
   /* GET ZPD */
-  smf_open_file(zpdgrp, 1, "READ", SMF__NOCREATE_QUALITY, &zpdData, status);
+  smf_open_file( zpdgrp, 1, "READ",
+                 SMF__NOCREATE_VARIANCE |
+                 SMF__NOCREATE_QUALITY |
+                 SMF__NOCREATE_DA |
+                 SMF__NOCREATE_FTS,
+                 &zpdData, status);
   if(*status != SAI__OK) {
     *status = SAI__ERROR;
     errRep(FUNC_NAME, "Unable to open the ZPD file!", status);
@@ -220,13 +225,8 @@ void smurf_fts2_phasecorr(int* status)
   }
 
   /* LOOP THROUGH EACH NDF FILE IN THE GROUP */
-  for(fIndex = 1; fIndex <= insize; fIndex++) {
-    smf_open_file( ogrp, fIndex, "UPDATE",
-                   SMF__NOCREATE_QUALITY |
-                   SMF__NOCREATE_VARIANCE |
-                   SMF__NOCREATE_DA |
-                   SMF__NOCREATE_FTS,
-                   &srcData, status);
+  for(fIndex = 1; fIndex <= inSize; fIndex++) {
+    smf_open_and_flatfield(igrp, ogrp, fIndex, NULL, NULL, &srcData, status);
     if(*status != SAI__OK) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unable to open source file!", status);
@@ -386,10 +386,10 @@ void smurf_fts2_phasecorr(int* status)
   int offset = 0;
   float* fNewPositions = NULL;
   // LOOP THROUGH EACH NDF FILE IN THE GROUP
-  for(fIndex = 1; fIndex <= insize; fIndex++) {
+  for(fIndex = 1; fIndex <= inSize; fIndex++) {
     smf_open_file( ogrp, fIndex, "UPDATE",
-                   SMF__NOCREATE_QUALITY |
                    SMF__NOCREATE_VARIANCE |
+                   SMF__NOCREATE_QUALITY |
                    SMF__NOCREATE_DA |
                    SMF__NOCREATE_FTS,
                    &srcData, status);

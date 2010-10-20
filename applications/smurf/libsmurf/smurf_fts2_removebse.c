@@ -120,7 +120,7 @@ void smurf_fts2_removebse(int* status)
   int srcHeight     = 0; /* Height of the source array */
   int srcN          = 0; /* Sample size */
   sc2ast_subarray_t srcSubnum   = 0; /* Source subarray ID */
-  int srcWidth      = 0; /* Width of the source array */
+  int srcWidth      = 0;    /* Width of the source array */
   double* bseIFG    = NULL; /* BSE interferogram */
   double* bseIFGNew = NULL; /* New BSE interferogram */
   double* bseX      = NULL; /* BSE mirror positions */
@@ -129,10 +129,10 @@ void smurf_fts2_removebse(int* status)
   Grp* bsegrp       = NULL; /* BSE group */
   Grp* igrp         = NULL; /* Input group */
   Grp* ogrp         = NULL; /* Output group */
-  size_t bsesize    = 0; /* BSE size */
-  size_t outsize    = 0; /* Output size */
-  size_t size       = 0; /* Input size */
-  size_t count      = 0; /* Size */
+  size_t bseSize    = 0;    /* BSE size */
+  size_t inSize       = 0;  /* Input size */
+  size_t outSize    = 0;    /* Output size */
+  size_t count      = 0;    /* Size */
   smfData* bseData  = NULL; /* Pointer to BSE data */
   smfData* srcData  = NULL; /* Pointer to source data */
   HDSLoc* hdsLoc    = NULL; /* Pointer to HDS location */
@@ -143,13 +143,13 @@ void smurf_fts2_removebse(int* status)
   void* srcCube     = NULL; /* Pointer to the input data cube */
 
   /* GET INPUT GROUP */
-  kpg1Rgndf("IN", 0, 1, "", &igrp, &size, status);
+  kpg1Rgndf("IN", 0, 1, "", &igrp, &inSize, status);
   /* GET OUTPUT GROUP */
-  kpg1Wgndf( "OUT", ogrp, size, size,
+  kpg1Wgndf( "OUT", ogrp, inSize, inSize,
              "Equal number of input and output files expected!",
-             &ogrp, &outsize, status);
+             &ogrp, &outSize, status);
   /* GET BSE GROUP */
-  kpg1Gtgrp("BSE", &bsegrp, &bsesize, status);
+  kpg1Gtgrp("BSE", &bsegrp, &bseSize, status);
 
   ndfBegin();
 
@@ -221,13 +221,8 @@ void smurf_fts2_removebse(int* status)
   if(hdsLocPosition) { datAnnul(&hdsLocPosition, status); }
 
   /* LOOP THROUGH EACH NDF FILE IN THE GROUP */
-  for(fIndex = 1; fIndex <= size; fIndex++) {
-    smf_open_file( ogrp, fIndex, "UPDATE",
-                   SMF__NOCREATE_QUALITY |
-                   SMF__NOCREATE_VARIANCE |
-                   SMF__NOCREATE_DA |
-                   SMF__NOCREATE_FTS,
-                   &srcData, status);
+  for(fIndex = 1; fIndex <= inSize; fIndex++) {
+    smf_open_and_flatfield(igrp, ogrp, fIndex, NULL, NULL, &srcData, status);
     if(*status != SAI__OK) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unable to open source file!", status);

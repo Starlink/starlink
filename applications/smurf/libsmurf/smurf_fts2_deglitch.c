@@ -141,22 +141,22 @@ void smurf_fts2_deglitch(int* status)
   HDSLoc* hdsLoc            = NULL; /* Pointer to HDS location */
   HDSLoc* hdsLocPosition    = NULL; /* Pointer to mirror positions */
   size_t count              = 0;    /* Mirror positions count */
-  size_t insize             = 0;    /* Size of the input group */
-  size_t outsize            = 0;    /* Size of the output group */
-  size_t zpdsize            = 0;    /* Size of the ZPD group */
+  size_t inSize             = 0;    /* Size of the input group */
+  size_t outSize            = 0;    /* Size of the output group */
+  size_t zpdSize            = 0;    /* Size of the ZPD group */
   smfData* srcData          = NULL; /* Pointer to input data */
   smfData* zpdData          = NULL; /* Pointer to ZPD data */
   void* srcCube             = NULL; /* Pointer to the input data cube */
   void* zpdArray            = NULL; /* Pointer to 2D ZPD data values */
 
   /* GET INPUT GROUP */
-  kpg1Rgndf("IN", 0, 1, "", &igrp, &insize, status);
+  kpg1Rgndf("IN", 0, 1, "", &igrp, &inSize, status);
   /* GET OUTPUT GROUP */
-  kpg1Wgndf("OUT", ogrp, insize, insize,
+  kpg1Wgndf("OUT", ogrp, inSize, inSize,
             "Equal number of input and output files expected!",
-            &ogrp, &outsize, status);
+            &ogrp, &outSize, status);
   /* GET ZPD GROUP */
-  kpg1Gtgrp("ZPD", &zpdgrp, &zpdsize, status);
+  kpg1Gtgrp("ZPD", &zpdgrp, &zpdSize, status);
 
   /* GET PARAMS */
   parGet0i("CCSIZE", &coreClusterSize, status);
@@ -196,12 +196,8 @@ void smurf_fts2_deglitch(int* status)
   }
 
   /* LOOP THROUGH EACH NDF FILE  */
-  for(fIndex = 1; fIndex <= insize; fIndex++) {
-    /* OPEN THE FILE */
-    smf_open_file( ogrp, fIndex, "UPDATE",
-                   SMF__NOCREATE_VARIANCE | SMF__NOCREATE_QUALITY |
-                   SMF__NOCREATE_DA | SMF__NOCREATE_FTS,
-                   &srcData, status);
+  for(fIndex = 1; fIndex <= inSize; fIndex++) {
+    smf_open_and_flatfield(igrp, ogrp, fIndex, NULL, NULL, &srcData, status);
     if(*status != SAI__OK) {
       errRep(FUNC_NAME, "Unable to open source file!", status);
       break;
