@@ -5,8 +5,8 @@
 #    cexpand
 
 #  Purpose:
-#    Expand a C source file using the C pre-processor and re-format it 
-#    into a readable form. The output is written to a file with the same 
+#    Expand a C source file using the C pre-processor and re-format it
+#    into a readable form. The output is written to a file with the same
 #    base-name as the input file, but with a file type of ".cpp".
 
 #  Usage:
@@ -20,9 +20,12 @@ if( "$1" == "" ) then
 endif
 
 set file = `basename $1 .c`
-cpp -C -P $file.c -DTHREAD_SAFE -DHAVE_CONFIG_H -I. -I.. -I/star/include > aaxx
-indent aaxx -kr -o $file.cpp
-rm aaxx
+cpp -CC -P $file.c -DTHREAD_SAFE -DHAVE_CONFIG_H -I. -I.. -I/star/include > aaxx
+indent aaxx -kr -o bbxx
+cat bbxx | sed -e 's#/\*#\n/\*#g' > ccxx
+cat ccxx | cexpand.pl > ddxx
+indent ddxx -kr -o $file.cpp
+rm aaxx bbxx ccxx ddxx
 
 echo "Output in $file.cpp"
 echo ""
