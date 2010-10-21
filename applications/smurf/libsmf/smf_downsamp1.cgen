@@ -41,11 +41,11 @@
 *     Down-samples the data from in to out using simple averages.
 
 *  Notes:
-*     - No checks for VAL__BAD* are done.
+*     - Checks for VAL__BAD* are done.
 *     - Bad status is set if outlen is larger than inlen
 *     - out should be initialized to 0 before calling this function
 *     - fixed-point versions may suffer bad roundoff problems if values
-*       are small. In future re-write to do everything in double and then
+*       are small. In future re-write should do everything in double and then
 *       typecast once at the end?
 *     - If type is double probably good idea to set "todouble" anyways
 *       since the non-todouble version may be slower in the future.
@@ -57,6 +57,8 @@
 *  History:
 *     2010-10-15 (EC):
 *        Initial version
+*     2010-10-21 (EC):
+*        Check for VAL__BAD*
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -113,12 +115,14 @@ void CGEN_FUNCTION(smf_downsamp1)( const CGEN_TYPE *in, size_t instride,
   double j2;                  /* Fractional high-res index lower edge */
   size_t jf1;                 /* low-res index lower edge */
   size_t jf2;                 /* high-res index lower edge */
+  dim_t index;                /* index into array */
   CGEN_TYPE *outbuf=NULL;     /* output same type as the input */
   double *outbufd=NULL;       /* double precision output */
   double s;                   /* current sample */
   double s1;                  /* part of s that goes at location jf1 */
   double s2;                  /* part of s that goes at location jf2 */
   double step;                /* Number of low-res samples per high-res samp */
+  CGEN_TYPE val;              /* current value from in */
 
   /* Check status */
   if (*status != SAI__OK) return;
@@ -172,19 +176,26 @@ void CGEN_FUNCTION(smf_downsamp1)( const CGEN_TYPE *in, size_t instride,
       jf1 = floor(j1);
       jf2 = floor(j2);
 
-      s = (double) in[i*instride];
-
-      if( jf1 == jf2 ) {
-        /* If same integer indices, this entire high-res sample goes in one
-           low-res sample */
-        outbuf[jf1*outstride] += s;
+      val = in[i*instride];
+      if( val == CGEN_BAD ) {
+        /* If this input value is bad, propagate to output buffer */
+        outbufd[jf1*outstride] = CGEN_BAD;
+        outbufd[jf2*outstride] = CGEN_BAD;
       } else {
-        /* if not the same integer index, need to split the sample between two
-           bins */
-        s1 = (jf2 - j1)*s/step;  /* portion of s in jf1 */
-        s2 = s - s1;             /* portion of s in jf2 */
-        outbuf[jf1*outstride] += (CGEN_TYPE) s1;
-        outbuf[jf2*outstride] += (CGEN_TYPE) s2;
+        s = (double) val;
+
+        if( jf1 == jf2 ) {
+          /* If same integer indices, this entire high-res sample goes in one
+             low-res sample */
+          outbuf[jf1*outstride] += s;
+        } else {
+          /* if not the same integer index, need to split the sample between two
+             bins */
+          s1 = (jf2 - j1)*s/step;  /* portion of s in jf1 */
+          s2 = s - s1;             /* portion of s in jf2 */
+          outbuf[jf1*outstride] += (CGEN_TYPE) s1;
+          outbuf[jf2*outstride] += (CGEN_TYPE) s2;
+        }
       }
 
       /* Update lower edge */
@@ -193,7 +204,10 @@ void CGEN_FUNCTION(smf_downsamp1)( const CGEN_TYPE *in, size_t instride,
 
     /* Normalize the output */
     for( i=0; i<outlen; i++ ) {
-      outbuf[i*outstride] = (CGEN_TYPE) ((double) outbuf[i*outstride] * step);
+      index = i*outstride;
+      if( outbuf[index] != CGEN_BAD ) {
+        outbuf[i*outstride] = (CGEN_TYPE) ((double) outbuf[i*outstride] * step);
+      }
     }
 
 
@@ -218,19 +232,26 @@ void CGEN_FUNCTION(smf_downsamp1)( const CGEN_TYPE *in, size_t instride,
       jf1 = floor(j1);
       jf2 = floor(j2);
 
-      s = (double) in[i*instride];
-
-      if( jf1 == jf2 ) {
-        /* If same integer indices, this entire high-res sample goes in one
-           low-res sample */
-        outbufd[jf1*outstride] += s;
+      val = in[i*instride];
+      if( val == CGEN_BAD ) {
+        /* If this input value is bad, propagate to output buffer */
+        outbufd[jf1*outstride] = VAL__BADD;
+        outbufd[jf2*outstride] = VAL__BADD;
       } else {
-        /* if not the same integer index, need to split the sample between two
-           bins */
-        s1 = (jf2 - j1)*s/step;  /* portion of s in jf1 */
-        s2 = s - s1;             /* portion of s in jf2 */
-        outbufd[jf1*outstride] += s1;
-        outbufd[jf2*outstride] += s2;
+        s = (double) val;
+
+        if( jf1 == jf2 ) {
+          /* If same integer indices, this entire high-res sample goes in one
+             low-res sample */
+          outbufd[jf1*outstride] += s;
+        } else {
+          /* if not the same integer index, need to split the sample between two
+             bins */
+          s1 = (jf2 - j1)*s/step;  /* portion of s in jf1 */
+          s2 = s - s1;             /* portion of s in jf2 */
+          outbufd[jf1*outstride] += s1;
+          outbufd[jf2*outstride] += s2;
+        }
       }
 
       /* Update lower edge */
@@ -239,7 +260,10 @@ void CGEN_FUNCTION(smf_downsamp1)( const CGEN_TYPE *in, size_t instride,
 
     /* Normalize the output */
     for( i=0; i<outlen; i++ ) {
-      outbufd[i*outstride] *= step;
+      index = i*outstride;
+      if( outbufd[index] != VAL__BADD ) {
+        outbufd[i*outstride] *= step;
+      }
     }
   }
 
