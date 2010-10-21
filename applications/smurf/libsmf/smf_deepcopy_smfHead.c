@@ -144,6 +144,8 @@ smf_deepcopy_smfHead( const smfHead *old, int * status ) {
 
   if (*status != SAI__OK) return NULL;
 
+  if (!old) return NULL;
+
   /* Copy elements */
   nframes = old->nframes;
   curframe = old->curframe;
