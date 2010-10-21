@@ -111,6 +111,7 @@ smf_detmask.c \
 smf_detpos_wcs.c \
 smf_difftime.c \
 smf_display_projpars.c \
+smf_downsamp_smfData.c \
 smf_dream_calcweights.c \
 smf_dream_getgrid.c \
 smf_dream_setjig.c \

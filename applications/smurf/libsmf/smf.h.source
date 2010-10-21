@@ -394,6 +394,8 @@
  *        Add smf_whiten
  *     2010-10-18 (COBA):
  *        Add smf_check_smfFts
+ *     2010-10-20 (EC):
+ *        Add smf_downsamp_smfData
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -856,6 +858,9 @@ double smf_difftime( struct timeval *tv1, struct timeval *tv2, int *status);
 
 void smf_display_projpars( AstSkyFrame * skyframe, double par[7],
                            int *status);
+
+void smf_downsamp_smfData( const smfData *idata, smfData **odata,
+                           dim_t ontslice, int *status );
 
 void smf_dream_calcweights ( smfData *data, const Grp *ogrp, const int index,
                              const double gridstep, const int ngrid,
