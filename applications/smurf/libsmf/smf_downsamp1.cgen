@@ -162,9 +162,10 @@ void CGEN_FUNCTION(smf_downsamp1)( const CGEN_TYPE *in, size_t instride,
 
     /* loop over remaining high-res samples and add them to the
        appropriate low-res output samples */
-    j1 = 0;
+    j1 = step;
     for( i=1; i<(inlen-1); i++ ) {
 
+      /* Update upper edge */
       j2 = j1 + step;
 
       /* integer indices */
@@ -185,6 +186,9 @@ void CGEN_FUNCTION(smf_downsamp1)( const CGEN_TYPE *in, size_t instride,
         outbuf[jf1*outstride] += (CGEN_TYPE) s1;
         outbuf[jf2*outstride] += (CGEN_TYPE) s2;
       }
+
+      /* Update lower edge */
+      j1 = j2;
     }
 
     /* Normalize the output */
@@ -204,9 +208,10 @@ void CGEN_FUNCTION(smf_downsamp1)( const CGEN_TYPE *in, size_t instride,
     outbufd[0] += in[0];
     outbufd[(outlen-1)*outstride] += in[(inlen-1)*instride];
 
-    j1 = 0;
+    j1 = step;
     for( i=1; i<(inlen-1); i++ ) {
 
+      /* Update upper edge */
       j2 = j1 + step;
 
       /* integer indices */
@@ -227,6 +232,9 @@ void CGEN_FUNCTION(smf_downsamp1)( const CGEN_TYPE *in, size_t instride,
         outbufd[jf1*outstride] += s1;
         outbufd[jf2*outstride] += s2;
       }
+
+      /* Update lower edge */
+      j1 = j2;
     }
 
     /* Normalize the output */
