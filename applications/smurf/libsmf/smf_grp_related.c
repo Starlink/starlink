@@ -13,10 +13,11 @@
  *     SMURF subroutine
 
  *  Invocation:
- *     smf_grp_related( const Grp *igrp, const size_t grpsize, const int grpbywave,
- *                      dim_t maxlen, AstKeyMap *keymap, dim_t *maxconcatlen,
- *                      dim_t *maxfilelen, smfGroup **group, Grp **basegrp,
- *                      dim_t *pad, int *status );
+ *     smf_grp_related( const Grp *igrp, const size_t grpsize,
+ *                      const int grpbywave, dim_t maxlen, AstKeyMap *keymap,
+ *                      dim_t *maxconcatlen, dim_t *maxfilelen,
+ *                      smfGroup **group, Grp **basegrp, dim_t *pad,
+ *                      int *status );
 
  *  Arguments:
  *     igrp = const Grp* (Given)
@@ -181,10 +182,11 @@
 
 #define FUNC_NAME "smf_grp_related"
 
-void smf_grp_related( const Grp *igrp, const size_t grpsize, const int grpbywave,
-                      dim_t maxlen, AstKeyMap *keymap, dim_t *maxconcatlen,
-                      dim_t *maxfilelen, smfGroup **group, Grp **basegrp,
-                      dim_t *pad, int *status ){
+void smf_grp_related( const Grp *igrp, const size_t grpsize,
+                      const int grpbywave, dim_t maxlen, AstKeyMap *keymap,
+                      dim_t *maxconcatlen, dim_t *maxfilelen,
+                      smfGroup **group, Grp **basegrp, dim_t *pad,
+                      int *status ) {
 
   /* Local variables */
   dim_t *all_len = NULL;      /* Lengths of each chunk */
@@ -332,8 +334,8 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize, const int grpbywave
               }
             } else {
               msgOutif(MSG__VERB," ",
-                       "Start and end times match but data arrays are of different size",
-                       status);
+                       "Start and end times match but data arrays are of "
+                       "different size", status);
             }
           }
         } /* Close if allOK */
@@ -343,7 +345,8 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize, const int grpbywave
         indices = astCalloc( nelem, sizeof(*indices), 1 );
         /* Initialize the pointers to NULL */
         if ( *status != SAI__OK ) {
-          errRep(FUNC_NAME, "Unable to allocate memory to store index array", status);
+          errRep(FUNC_NAME, "Unable to allocate memory to store index array",
+                 status);
           goto CLEANUP;
         }
         indices[0] = i;
@@ -371,8 +374,8 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize, const int grpbywave
       msgSeti("G",grpsize);
       msgSeti("S",ngroups);
       errRep(FUNC_NAME,
-             "Number of subgroups, ^S, exceeds grpsize, ^G. Possible programming error",
-             status);
+             "Number of subgroups, ^S, exceeds grpsize, ^G. Possible "
+             "programming error", status);
     }
   }
 
@@ -664,7 +667,8 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize, const int grpbywave
       for( idx=0; idx<(*group)->nrelated; idx++ ) {
         /* Check for new continuous chunk */
         if( i==0 || ( (*group)->chunk[i] != (*group)->chunk[i-1]) ) {
-          ndgCpsup( (*group)->grp, (*group)->subgroups[i][idx], *basegrp, status );
+          ndgCpsup( (*group)->grp, (*group)->subgroups[i][idx], *basegrp,
+                    status );
         }
       }
     }
