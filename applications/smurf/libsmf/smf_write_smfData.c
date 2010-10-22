@@ -424,7 +424,7 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
 
       if( (fts->fpm && fts->fpm->pntr[0]) &&
           (fts->sigma && fts->sigma->pntr[0])) {
-        loc = smf_get_xloc(outdata, "FTS2DR", "FTS2DR", "UPDATE", 0, 0, status);
+        loc = smf_get_xloc(outdata, "FTS2", "FTS2", "UPDATE", 0, 0, status);
       }
 
       if(*status == SAI__OK && loc != NULL) {

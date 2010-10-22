@@ -658,10 +658,10 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           void* dpntr[] = {NULL, NULL};
 
           itexists = 0;
-          ndfXstat(indf, "FTS2DR", &itexists, status);
+          ndfXstat(indf, "FTS2", &itexists, status);
           if(*status == SAI__OK && itexists) {
             // GET FTS2DR LOCATION
-            ndfXloc(indf, "FTS2DR", mode, &ftsLoc, status);
+            ndfXloc(indf, "FTS2", mode, &ftsLoc, status);
             if(*status == SAI__OK && ftsLoc != NULL) {
               // READ IN SMFFTS->FPM
               ndfOpen( ftsLoc, "FPM", mode, "UNKNOWN", &ndfFTS, &placeFTS,
