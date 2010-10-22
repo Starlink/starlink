@@ -14,14 +14,19 @@
 
 *  Invocation:
 *     void smf_downsamp1<X>( const CGEN_TYPE *in, size_t instride,
-*                            size_t inlen, void *out, size_t outstride,
-*                            size_t outlen, int todouble, int *status )
+*                            int inbytestride, size_t inlen, void *out,
+*                            size_t outstride, int outbytestride,
+*                            size_t outlen, int todouble, int init,
+*                            int *status )
 
 *  Arguments:
 *     in = const CGEN_TYPE* (Given)
 *        Pointer to input data array
 *     instride = size_t (Given)
 *        Index stride between elements in the input data
+*     inbytestride = int (Given)
+*        If set, assume instride is in bytes, rather than array elements of
+*        CGEN_TYPE
 *     inlen = size_t (Given)
 *        Number of elements in the input data
 *     out = const CGEN_TYPE* (Given)
@@ -30,22 +35,40 @@
 *        converted to double.
 *     outstride = size_t (Given)
 *        Index stride between elements in the output data
+*     outbytestride = int (Given)
+*        If set, assume outstride is in bytes, rather than array elements of
+*        the same type as out
 *     outlen = size_t (Given)
 *        Number of elements in the output data
 *     todouble = int (Given)
 *        If set the output is typecast to double
+*     init = int (Given)
+*        If set out needs to be initialized to 0.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
 *  Description:
-*     Down-samples the data from in to out using simple averages.
+*     Down-samples the data from in to out using simple averages. You
+*     can either specify normal array strides (instride/outstride) OR
+*     supply strides as a number of bytes (by setting
+*     inbytestride/outbytestride). This is useful if your input data
+*     are elements in an array of structs. For example, if you wished
+*     to downsample JCMTState.rts_end from JCMTState *state1 to
+*     JCMTState *state2 you could do it like this:
+*
+*        smf_downsamp1D( &(state1->rts_end), sizeof(*state1), 1, inlen,
+*                        &(state2->rts_end), sizeof(*state2), 1, outlen, 1,
+*                        1, status );
+*
+*     We achieve the desired effect by specifying the strides in bytes (size
+*     of a JCMTState struct) rather than the size of the structure member
+*     type (size of a double).
 
 *  Notes:
 *     - Checks for VAL__BAD* are done.
 *     - Bad status is set if outlen is larger than inlen
-*     - out should be initialized to 0 before calling this function
 *     - fixed-point versions may suffer bad roundoff problems if values
-*       are small. In future re-write should do everything in double and then
+*       are small. In future re-write, should do everything in double and then
 *       typecast once at the end?
 *     - If type is double probably good idea to set "todouble" anyways
 *       since the non-todouble version may be slower in the future.
@@ -58,7 +81,9 @@
 *     2010-10-15 (EC):
 *        Initial version
 *     2010-10-21 (EC):
-*        Check for VAL__BAD*
+*        -Check for VAL__BAD*
+*        -optional strides in bytes to enable resample of JCMTState arrays
+*        -optionally initialize buffer to 0 if needed
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -102,20 +127,38 @@
 #include "smurf_typ.h"
 #include "libsmf/smf_err.h"
 
+/* A couple of macros to simplify our pointer math. Since we're using
+   a base pointer with offset indices multiplied by strides in bytes
+   we need to do a bunch of typecasting that can make the code hard to
+   read. PTROFF returns a CGEN_TYPE* pointer to the byte at base +
+   offset*stride. PTROFFD is the same except casting the return
+   pointer as as double*. */
+
+#define PTROFF(base,offset,stride) ((CGEN_TYPE *) (((char *) base) + (offset)*(stride)))
+
+#define PTROFFD(base,offset,stride) ((double *) (((char *) base) + (offset)*(stride)))
+
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_downsamp1"
 
 void CGEN_FUNCTION(smf_downsamp1)( const CGEN_TYPE *in, size_t instride,
-                                   size_t inlen, void *out, size_t outstride,
-                                   size_t outlen, int todouble, int *status ) {
+                                   int inbytestride, size_t inlen, void *out,
+                                   size_t outstride, int outbytestride,
+                                   size_t outlen, int todouble, int init,
+                                   int *status ) {
 
   /* Local variables */
   size_t i;                   /* High-res index */
+  size_t ibstride;            /* input strides in bytes */
   double j1;                  /* Fractional low-res index lower edge */
   double j2;                  /* Fractional high-res index lower edge */
   size_t jf1;                 /* low-res index lower edge */
   size_t jf2;                 /* high-res index lower edge */
   dim_t index;                /* index into array */
+  CGEN_TYPE *pi=NULL;         /* pointer to current input value */
+  CGEN_TYPE *po=NULL;         /* pointer to current output value */
+  double *pod=NULL;           /* pointer to current double output value */
+  size_t obstride;            /* output strides in bytes */
   CGEN_TYPE *outbuf=NULL;     /* output same type as the input */
   double *outbufd=NULL;       /* double precision output */
   double s;                   /* current sample */
@@ -150,6 +193,13 @@ void CGEN_FUNCTION(smf_downsamp1)( const CGEN_TYPE *in, size_t instride,
   /* Calculate step size */
   step = (double) outlen / (double) inlen;
 
+  /* Sort out input buffer byte strides */
+  if( inbytestride ) {
+    ibstride = instride;
+  } else {
+    ibstride = instride*sizeof(*in);
+  }
+
 
 
   if( outbuf ) {
@@ -157,12 +207,36 @@ void CGEN_FUNCTION(smf_downsamp1)( const CGEN_TYPE *in, size_t instride,
      In this first version the output has the same type as the input
      *************************************************************************/
 
+    /* Sort out output buffer byte strides and initialize to 0 */
+    if( outbytestride ) {
+      obstride = outstride;
+    } else {
+      obstride = outstride*sizeof(*outbuf);
+    }
+
+    if( init ) {
+      for( i=0; i<outlen; i++ ) {
+        po = PTROFF(outbuf,i,obstride);
+        *po = 0;
+      }
+    }
+
     /* The first high-res sample definately goes into the first low-res
        sample, and the last high-res sample definately goes into the last
        low-res sample */
 
-    outbuf[0] += in[0];
-    outbuf[(outlen-1)*outstride] += in[(inlen-1)*instride];
+    outbuf[0] = in[0];
+
+    /*outbuf[(outlen-1)*outstride] += in[(inlen-1)*instride];*/
+
+    po = PTROFF(outbuf,outlen-1,obstride);
+    pi = PTROFF(in,inlen-1,ibstride);
+
+    if( *pi == CGEN_BAD ) {
+      *po = CGEN_BAD;
+    } else {
+      *po += *pi;
+    }
 
     /* loop over remaining high-res samples and add them to the
        appropriate low-res output samples */
@@ -176,25 +250,48 @@ void CGEN_FUNCTION(smf_downsamp1)( const CGEN_TYPE *in, size_t instride,
       jf1 = floor(j1);
       jf2 = floor(j2);
 
-      val = in[i*instride];
+      /* val = in[i*instride]; */
+      pi = PTROFF(in,i,ibstride);
+      val = *pi;
+
       if( val == CGEN_BAD ) {
         /* If this input value is bad, propagate to output buffer */
-        outbufd[jf1*outstride] = CGEN_BAD;
-        outbufd[jf2*outstride] = CGEN_BAD;
+
+        /* outbuf[jf1*outstride] = CGEN_BAD;
+           outbuf[jf2*outstride] = CGEN_BAD; */
+
+        po = PTROFF(outbuf,jf1,obstride);
+        *po = CGEN_BAD;
+
+        po = PTROFF(outbuf,jf2,obstride);
+        *po = CGEN_BAD;
+
       } else {
         s = (double) val;
 
         if( jf1 == jf2 ) {
           /* If same integer indices, this entire high-res sample goes in one
              low-res sample */
-          outbuf[jf1*outstride] += s;
+
+          /* outbuf[jf1*outstride] += s; */
+
+          po = PTROFF(outbuf,jf1,obstride);
+          *po += s;
+
         } else {
           /* if not the same integer index, need to split the sample between two
              bins */
           s1 = (jf2 - j1)*s/step;  /* portion of s in jf1 */
           s2 = s - s1;             /* portion of s in jf2 */
-          outbuf[jf1*outstride] += (CGEN_TYPE) s1;
-          outbuf[jf2*outstride] += (CGEN_TYPE) s2;
+
+          /* outbuf[jf1*outstride] += (CGEN_TYPE) s1;
+             outbuf[jf2*outstride] += (CGEN_TYPE) s2; */
+
+          po = PTROFF(outbuf,jf1,obstride);
+          *po += s1;
+
+          po = PTROFF(outbuf,jf2,obstride);
+          *po += s2;
         }
       }
 
@@ -204,9 +301,15 @@ void CGEN_FUNCTION(smf_downsamp1)( const CGEN_TYPE *in, size_t instride,
 
     /* Normalize the output */
     for( i=0; i<outlen; i++ ) {
-      index = i*outstride;
-      if( outbuf[index] != CGEN_BAD ) {
-        outbuf[i*outstride] = (CGEN_TYPE) ((double) outbuf[i*outstride] * step);
+      /* index = i*outstride;
+         if( outbuf[index] != CGEN_BAD ) {
+         outbuf[i*outstride] = (CGEN_TYPE) ((double) outbuf[i*outstride]*step);
+         } */
+
+      po = PTROFF(outbuf,i,obstride);
+
+      if( *po != CGEN_BAD ) {
+        *po *= step;
       }
     }
 
@@ -219,8 +322,32 @@ void CGEN_FUNCTION(smf_downsamp1)( const CGEN_TYPE *in, size_t instride,
      In this one the output is double
      *************************************************************************/
 
-    outbufd[0] += in[0];
-    outbufd[(outlen-1)*outstride] += in[(inlen-1)*instride];
+    /* Sort out output buffer byte strides and initialize to 0 */
+    if( outbytestride ) {
+      obstride = outstride;
+    } else {
+      obstride = outstride*sizeof(*outbufd);
+    }
+
+    if( init ) {
+      for( i=0; i<outlen; i++ ) {
+        pod = PTROFFD(outbufd,i,obstride);
+        *pod = 0;
+      }
+    }
+
+    outbufd[0] = in[0];
+
+    /*outbufd[(outlen-1)*outstride] += in[(inlen-1)*instride];*/
+
+    pod = PTROFFD(outbufd,outlen-1,obstride);
+    pi = PTROFF(in,inlen-1,ibstride);
+
+    if( *pi == CGEN_BAD ) {
+      *pod = VAL__BADD;
+    } else {
+      *pod += *pi;
+    }
 
     j1 = step;
     for( i=1; i<(inlen-1); i++ ) {
@@ -232,27 +359,53 @@ void CGEN_FUNCTION(smf_downsamp1)( const CGEN_TYPE *in, size_t instride,
       jf1 = floor(j1);
       jf2 = floor(j2);
 
-      val = in[i*instride];
+      /*val = in[i*instride];*/
+      pi = PTROFF(in,i,ibstride);
+      val = *pi;
+
       if( val == CGEN_BAD ) {
         /* If this input value is bad, propagate to output buffer */
-        outbufd[jf1*outstride] = VAL__BADD;
-        outbufd[jf2*outstride] = VAL__BADD;
+
+        /* outbufd[jf1*outstride] = VAL__BADD;
+           outbufd[jf2*outstride] = VAL__BADD; */
+
+        pod = PTROFFD(outbufd,jf1,obstride);
+        *pod = VAL__BADD;
+
+        pod = PTROFFD(outbufd,jf2,obstride);
+        *pod = VAL__BADD;
+
       } else {
         s = (double) val;
 
         if( jf1 == jf2 ) {
           /* If same integer indices, this entire high-res sample goes in one
              low-res sample */
-          outbufd[jf1*outstride] += s;
+
+          /* outbufd[jf1*outstride] += s; */
+
+          pod = PTROFFD(outbufd,jf1,obstride);
+          *pod += s;
+
         } else {
           /* if not the same integer index, need to split the sample between two
              bins */
           s1 = (jf2 - j1)*s/step;  /* portion of s in jf1 */
           s2 = s - s1;             /* portion of s in jf2 */
-          outbufd[jf1*outstride] += s1;
-          outbufd[jf2*outstride] += s2;
+
+          /* outbufd[jf1*outstride] += s1;
+             outbufd[jf2*outstride] += s2; */
+
+          pod = PTROFFD(outbufd,jf1,obstride);
+          *pod += s1;
+
+          pod = PTROFFD(outbufd,jf2,obstride);
+          *pod += s2;
+
         }
       }
+
+      pod = PTROFFD(outbufd,jf1,obstride);
 
       /* Update lower edge */
       j1 = j2;
@@ -260,9 +413,15 @@ void CGEN_FUNCTION(smf_downsamp1)( const CGEN_TYPE *in, size_t instride,
 
     /* Normalize the output */
     for( i=0; i<outlen; i++ ) {
-      index = i*outstride;
-      if( outbufd[index] != VAL__BADD ) {
-        outbufd[i*outstride] *= step;
+      /* index = i*outstride;
+         if( outbufd[index] != VAL__BADD ) {
+         outbufd[i*outstride] *= step;
+         } */
+
+      pod = PTROFFD(outbufd,i,obstride);
+
+      if( *pod != VAL__BADD ) {
+        *pod *= step;
       }
     }
   }

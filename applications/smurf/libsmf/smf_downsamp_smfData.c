@@ -28,13 +28,13 @@
 *        Pointer to global status.
 
 *  Description:
-
 *     This routine produces a copy of a smfData at a lower sample rate.
 *     All bolometer and dark squid data are downsampled using smf_downsamp1
 *     which uses simple averages. JCMTState information is propagated
 *     using a nearest-neighbour resampling.
 
 *  Notes:
+*     This routine does not downsample the NOISE or QUALITY components.
 
 *  Authors:
 *     Ed Chapin (UBC)
@@ -42,7 +42,10 @@
 
 *  History:
 *     2010-10-20 (EC):
-*        Initial version.
+*        Initial version
+*     2010-10-21 (EC):
+*        Nearest-neighbour for most of JCMTState, but do proper resampling
+*        for important fast-changing fields.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -86,6 +89,10 @@
 #include "smurf_typ.h"
 #include "libsmf/smf_err.h"
 
+/* Macro to simplify resampling of individual JCMTState fields */
+
+#define RESAMPSTATE(in,out,member,intslice,ontslice) smf_downsamp1D( &(in->member),sizeof(JCMTState),1,intslice,&(out->member), sizeof(JCMTState),1,ontslice,1,1,status );
+
 #define FUNC_NAME "smf_downsamp_smfData"
 
 void smf_downsamp_smfData( const smfData *idata, smfData **odata,
@@ -101,6 +108,7 @@ void smf_downsamp_smfData( const smfData *idata, smfData **odata,
   size_t obstride;         /* bstride of odata */
   dim_t ondata;            /* ndata of odata */
   size_t otstride;         /* tstride of odata */
+  JCMTState *outstate=NULL;/* Pointer to output JCMTState */
   double scale;            /* how much longer new samples are */
 
   if( *status != SAI__OK ) return;
@@ -184,16 +192,16 @@ void smf_downsamp_smfData( const smfData *idata, smfData **odata,
       double *odat = (*odata)->pntr[0];
 
       for( i=0; (*status==SAI__OK) && i<nbolo; i++ ) {
-        smf_downsamp1D( idat+i*ibstride, itstride, intslice,
-                        odat+i*obstride, otstride, ontslice, 1, status );
+        smf_downsamp1D( idat+i*ibstride, itstride, 0, intslice,
+                        odat+i*obstride, otstride, 0, ontslice, 1, 0, status );
       }
     } else if( (*odata)->dtype == SMF__INTEGER ) {
       int *idat = idata->pntr[0];
       int *odat = (*odata)->pntr[0];
 
       for( i=0; (*status==SAI__OK) && i<nbolo; i++ ) {
-        smf_downsamp1I( idat+i*ibstride, itstride, intslice,
-                        odat+i*obstride, otstride, ontslice, 0, status );
+        smf_downsamp1I( idat+i*ibstride, itstride, 0, intslice,
+                        odat+i*obstride, otstride, 0, ontslice, 0, 0, status );
       }
     } else {
       *status = SAI__ERROR;
@@ -201,7 +209,7 @@ void smf_downsamp_smfData( const smfData *idata, smfData **odata,
     }
   }
 
-  /* Update the smfHead */
+  /* Down-sample the smfHead */
   if( (*status==SAI__OK) && (*odata) && (*odata)->hdr ) {
     smfHead *hdr = (*odata)->hdr;
 
@@ -209,23 +217,67 @@ void smf_downsamp_smfData( const smfData *idata, smfData **odata,
     hdr->nframes = ontslice;
     hdr->steptime *= scale;
 
-    /* Down-sample the JCMTState values using nearest neighbours */
     if( instate ) {
+      /* Down-sample all the JCMTState values using nearest neighbours */
+
       hdr->allState = astCalloc( ontslice, sizeof(*instate), 1 );
+      outstate = hdr->allState;
 
       if( *status == SAI__OK ) {
         size_t frame;  /* index of nearest neighbour JCMTState */
 
         for( i=0; i<ontslice; i++ ) {
           frame = (size_t) round(((double) i + 0.5)*scale);
-
-          memcpy( hdr->allState + i, instate + frame, sizeof(*instate) );
+          memcpy( outstate + i, instate + frame, sizeof(*instate) );
         }
+
+        /* Then go back and properly down-sample the more important
+           fast-changing fields like pointing. Note that since there
+           are approximate values there already we need to explicitly
+           re-initialize to 0. */
+
+        RESAMPSTATE(instate, outstate, rts_end, intslice, ontslice);
+
+        RESAMPSTATE(instate, outstate, smu_az_jig_x, intslice, ontslice);
+        RESAMPSTATE(instate, outstate, smu_az_jig_y, intslice, ontslice);
+        RESAMPSTATE(instate, outstate, smu_az_chop_x, intslice, ontslice);
+        RESAMPSTATE(instate, outstate, smu_az_chop_y, intslice, ontslice);
+        RESAMPSTATE(instate, outstate, smu_tr_jig_x, intslice, ontslice);
+        RESAMPSTATE(instate, outstate, smu_tr_jig_y, intslice, ontslice);
+        RESAMPSTATE(instate, outstate, smu_tr_chop_x, intslice, ontslice);
+        RESAMPSTATE(instate, outstate, smu_tr_chop_y, intslice, ontslice);
+
+        RESAMPSTATE(instate, outstate, tcs_tai, intslice, ontslice);
+        RESAMPSTATE(instate, outstate, tcs_airmass, intslice, ontslice);
+
+        RESAMPSTATE(instate, outstate, tcs_az_ang, intslice, ontslice);
+        RESAMPSTATE(instate, outstate, tcs_az_ac1, intslice, ontslice);
+        RESAMPSTATE(instate, outstate, tcs_az_ac2, intslice, ontslice);
+        RESAMPSTATE(instate, outstate, tcs_az_dc1, intslice, ontslice);
+        RESAMPSTATE(instate, outstate, tcs_az_dc2, intslice, ontslice);
+        RESAMPSTATE(instate, outstate, tcs_az_bc1, intslice, ontslice);
+        RESAMPSTATE(instate, outstate, tcs_az_bc2, intslice, ontslice);
+
+        RESAMPSTATE(instate, outstate, tcs_tr_ang, intslice, ontslice);
+        RESAMPSTATE(instate, outstate, tcs_tr_ac1, intslice, ontslice);
+        RESAMPSTATE(instate, outstate, tcs_tr_ac2, intslice, ontslice);
+        RESAMPSTATE(instate, outstate, tcs_tr_dc1, intslice, ontslice);
+        RESAMPSTATE(instate, outstate, tcs_tr_dc2, intslice, ontslice);
+        RESAMPSTATE(instate, outstate, tcs_tr_bc1, intslice, ontslice);
+        RESAMPSTATE(instate, outstate, tcs_tr_bc2, intslice, ontslice);
+
+        RESAMPSTATE(instate, outstate, tcs_en_dc1, intslice, ontslice);
+        RESAMPSTATE(instate, outstate, tcs_en_dc2, intslice, ontslice);
+
+        RESAMPSTATE(instate, outstate, tcs_dm_abs, intslice, ontslice);
+        RESAMPSTATE(instate, outstate, tcs_dm_rel, intslice, ontslice);
+
       }
+
     }
   }
 
-  /* Update the smfDA */
+  /* Down-sample the smfDA */
   if( (*status==SAI__OK) && (*odata) && (*odata)->da ) {
     smfDA *da = (*odata)->da;
 
