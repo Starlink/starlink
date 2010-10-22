@@ -25,7 +25,7 @@
 *     co-ordinates.  A feature is a set of connected pixels which are
 *     above or below the surrounding background region.  For example, a
 *     feature could be a star or galaxy on the sky, although the
-*     applications is not restricted to 2-dimensional NDFs.
+*     applications is not restricted to two-dimensional NDFs.
 *
 *     Four methods are available for obtaining the initial positions,
 *     selected using Parameter MODE:
@@ -272,7 +272,7 @@
 *        NDF called cluster around the current Frame co-ordinate
 *        (21.7,5007.1).
 *     centroid arp244(6,,) i "40,30" toler=0.01
-*        This finds the 2-dimensional centroid of the feature near
+*        This finds the two-dimensional centroid of the feature near
 *        pixel (6,40,30) in the three-dimensional NDF called arp244
 *        (assuming the current co-ordinate Frame of the NDF is PIXEL).
 *        The centroid must be found to 0.01 pixels.
