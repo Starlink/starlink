@@ -70,8 +70,12 @@
  *      can cause real problems later on.
  *    23-FEB-2006 (TIMJ):
  *      Use starmem
+ *    22-OCT-2010 (DSB):
+ *      Return a NULL pointer without error if the supplied pointer is
+ *      DAT__NOLOC.
 
  *  Notes:
+ *    - A NULL pointer is returne dif the supplied locator is DAT__NOLOC.
  *    - Does not check the contents of the locator for validity.
  *    - The expectation is that this routine is used solely for C
  *      interfaces to Fortran library routines.
@@ -80,6 +84,8 @@
  *    - datExportFloc
 
  *  Copyright:
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
  *    Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
  *    All Rights Reserved.
 
@@ -118,42 +124,46 @@ void datImportFloc ( const char flocator[DAT__SZLOC], int loc_length, HDSLoc ** 
     return;
   }
 
+/* Return the NULL pointer unchanged if the supplied locator is DAT__NOLOC. */
+  if( strncmp( DAT__NOLOC, flocator, loc_length ) ) {
+
   /* See if we need to allocate memory for the locator struct */
   /* Allocate some memory to hold the C structure */
 
-  *clocator = starMalloc( sizeof( struct LOC ) );
+     *clocator = starMalloc( sizeof( struct LOC ) );
 
-  if (*clocator == NULL ) {
-    if( *status == DAT__OK ) {
-       *status = DAT__NOMEM;
-       emsRep( "datImportFloc", "datImportFloc: No memory for C locator struct",
- 	       status);
-    }
-    return;
+     if (*clocator == NULL ) {
+       if( *status == DAT__OK ) {
+          *status = DAT__NOMEM;
+          emsRep( "datImportFloc", "datImportFloc: No memory for C locator struct",
+                  status);
+       }
+       return;
+     }
+
+     /* Now import the Fortran locator - this will work even if status
+        is bad on entry but it is possible for this routine to set status
+        as well. We need to be able to determine whether the status was
+        set bad by this routine, since that will result in garbage in the
+        HDS locator. */
+     emsMark();
+     lstat = DAT__OK;
+     dat1_import_floc( flocator, loc_length, *clocator, &lstat);
+     if (lstat != DAT__OK) {
+       /* free the memory and trigger a NULL pointer */
+       dat1_free_hdsloc( clocator );
+
+       /* Annul all this if status was already bad, since we do not
+          want the extra meaningless messages on the stack. If status
+          was good, we retain everything */
+       if (*status == DAT__OK) {
+         *status = lstat;
+       } else {
+         emsAnnul(&lstat);
+       }
+     }
+     emsRlse();
   }
-
-  /* Now import the Fortran locator - this will work even if status
-     is bad on entry but it is possible for this routine to set status
-     as well. We need to be able to determine whether the status was
-     set bad by this routine, since that will result in garbage in the
-     HDS locator. */
-  emsMark();
-  lstat = DAT__OK;
-  dat1_import_floc( flocator, loc_length, *clocator, &lstat);
-  if (lstat != DAT__OK) {
-    /* free the memory and trigger a NULL pointer */
-    dat1_free_hdsloc( clocator );
-
-    /* Annul all this if status was already bad, since we do not
-       want the extra meaningless messages on the stack. If status
-       was good, we retain everything */
-    if (*status == DAT__OK) {
-      *status = lstat;
-    } else {
-      emsAnnul(&lstat);
-    }
-  }
-  emsRlse();
 
   return;
 }
