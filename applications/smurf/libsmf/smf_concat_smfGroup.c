@@ -20,7 +20,8 @@
  *                          AstFrameSet *outfset, int moving,
  *                          int *lbnd_out, int *ubnd_out, dim_t req_padStart,
  *                          dim_t req_padEnd, int flags, int tstep,
- *                          smfArray **concat, int *status )
+ *                          double downsampscale, smfArray **concat,
+ *                          int *status )
 
  *  Arguments:
  *     wf = smfWorkForce * (Given)
@@ -33,7 +34,7 @@
  *     bbms = const smfArray * (Given)
  *        Masks for each subarray (e.g. returned by smf_reqest_mask call)
  *     flatramps = const smfArray * (Given)
- *        Collection of flatfield ramps. Will be passed to smf_open_and_flatfield.
+ *        Collection of flatfield ramps. Passed to smf_open_and_flatfield.
  *     whichchunk = size_t (Given)
  *        Which continuous subset of igrp will get concatenated?
  *     ensureflat = int (Given)
@@ -66,6 +67,9 @@
  *     tstep = int (Given)
  *        The increment in time slices between full Mapping calculations.
  *        The Mapping for intermediate time slices will be approximated.
+ *     downsampscale = double (Given)
+ *        If set, downsample the data such that this scale (in arcsec) is
+ *        retained
  *     concat = smfArray ** (Returned)
  *        smfArray containing concatenated data for each subarray
  *     status = int* (Given and Returned)
@@ -162,6 +166,8 @@
  *        Only pad if the data have not already been padded.
  *     2010-09-21 (COBA):
  *        Add SMF__NOCREATE_FTS
+ *     2010-10-22 (EC):
+ *        Add downsampscale
 
  *  Notes:
  *     If projection information supplied, pointing LUT will not be
@@ -209,6 +215,7 @@
  */
 
 #include <stdio.h>
+#include <math.h>
 
 /* Starlink includes */
 #include "ast.h"
@@ -223,6 +230,7 @@
 
 /* SMURF includes */
 #include "libsmf/smf.h"
+#include "libsmf/smf_err.h"
 #include "libaztec/aztec.h"
 
 #define FUNC_NAME "smf_concat_smfGroup"
@@ -234,12 +242,14 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                           AstFrameSet *outfset, int moving,
                           int *lbnd_out, int *ubnd_out, dim_t req_padStart,
                           dim_t req_padEnd, int flags, int tstep,
-                          smfArray **concat, int *status ) {
+                          double downsampscale, smfArray **concat,
+                          int *status ) {
 
   /* Local Variables */
   size_t bstr;                  /* Concatenated bolo stride */
   smfDA *da=NULL;               /* Pointer to smfDA struct */
   smfData *data=NULL;           /* Concatenated smfData */
+  int *dslen=NULL;              /* Array of down-sampled lengths each file */
   int flag;                     /* Flag */
   char filename[GRP__SZNAM+1];  /* Input filename, derived from GRP */
   dim_t firstpiece = 0;         /* index to start of whichchunk */
@@ -273,7 +283,8 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
   dim_t refncol=0;              /* reference number of rows */
   dim_t refndata;               /* Number data points in reference file */
   dim_t refnrow=0;              /* reference number of rows */
-  dim_t reftlen;                /* Number of time slices in reference file */
+  dim_t reftlen;                /* Effective time slices in reference file */
+  dim_t reftlenr;               /* real time slices in ref (before downsamp) */
   size_t rbstr;                 /* Reference bolo stride */
   size_t rtstr;                 /* Reference time slice stride */
   JCMTState *sourceState=NULL;  /* temporary JCMTState pointer */
@@ -335,6 +346,11 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
     }
   }
 
+  /* Allocate space for array of downsampled lengths for each file */
+  if( downsampscale ) {
+    dslen = astCalloc( lastpiece-firstpiece+1, sizeof(*dslen), 1 );
+  }
+
   /* Loop over related elements (number of subarrays) */
   for( i=0; (*status == SAI__OK) && i<nrelated; i++ ) {
     /* Initialize time length of concatenated array. We will add on
@@ -380,7 +396,27 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
 
       /* Get data dimensions */
       smf_get_dims( refdata, &nrow, &ncol,
-                    NULL, &reftlen, &refndata, NULL, NULL, status );
+                    NULL, &reftlenr, &refndata, NULL, NULL, status );
+
+      /* Calculate down-sampled lengths */
+      if( dslen && refdata->hdr ) {
+        double oldscale = (refdata->hdr->steptime * refdata->hdr->scanvel);
+        double scalelen = oldscale / downsampscale;
+
+        /* only down-sample if it will be at least a factor of 20% */
+
+        if( scalelen <= 0.8 ) {
+          msgOutiff( MSG__VERB, "", FUNC_NAME
+                     ": down-sampling from %5.1lf Hz to %5.1lf Hz", status,
+                     (1./refdata->hdr->steptime),
+                     (scalelen/refdata->hdr->steptime) ); 
+
+          dslen[j-firstpiece] = round(reftlenr * scalelen);
+          reftlen = dslen[j-firstpiece];
+        } else reftlen = reftlenr;
+      } else {
+        reftlen = reftlenr;
+      }
 
       if( *status == SAI__OK ) {
         if( j == firstpiece ) {
@@ -474,25 +510,81 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
 
       /* Second pass copy data over to new array */
       if( *status == SAI__OK ) {
-        /* Open the file corresponding to this chunk. Data may
-           require flat-fielding. */
-        if (ensureflat) {
-          smf_open_and_flatfield( igrp->grp, NULL, igrp->subgroups[j][i],
-                                  darks, flatramps, &refdata, status );
+
+        if( dslen && dslen[j-firstpiece] ) {
+          /* We're down-sampling the data, so break down the way we do
+             things differently.  First open the file and down-sample
+             it. Then do the dark masking and flatfield corrections
+             ourselves (normally handled by smf_open_and_flatfield) */
+
+          smfData *tmpdata = NULL; /* for the original data before resamp */
+          int doflat=1;
+
+          smf_open_file( igrp->grp, igrp->subgroups[j][i], "READ", 0,
+                         &tmpdata, status );
+
+          /* See if data are flatfielded */
+          smf_check_flat( tmpdata, status );
+          if( *status == SMF__FLATN ) {
+            doflat = 0;
+            errAnnul( status );
+          }
+
+          /* downsample and convert to double precision */
+          smf_downsamp_smfData( tmpdata, &refdata, dslen[j-firstpiece],
+                                1, status );
+
+          /* handle darks */
+          smf_apply_dark( refdata, darks, status );
+
+          /* apply flatfield -- duplicated part of smf_flatfield */
+          if( doflat ) {
+            size_t flatidx = SMF__BADIDX;
+
+            /* See if we have an override flatfield. */
+            smf_choose_flat( flatramps, refdata, &flatidx, status );
+
+            if( (flatidx != SMF__BADIDX) && (refdata->file) ) {
+              const smfData *flatdata = (flatramps->sdata)[flatidx];
+
+              smf_smfFile_msg( refdata->file, "INF", 1, "<unknown>", status );
+              smf_smfFile_msg( flatdata->file, "FLAT", 1, "<unknown>", status );
+              msgOutif( MSG__VERB, "", FUNC_NAME ": Override flatfield of ^INF"
+                        " using ^FLAT", status );
+              smf_flat_assign( 1, SMF__FLATMETH_NULL, NULL, flatdata,
+                               refdata, status );
+            }
+
+            /* OK now apply flatfield calibration */
+            smf_flatten( refdata, status);
+
+            /* Write history entry to file */
+            smf_history_add( refdata, FUNC_NAME, status);
+          }
+
+          smf_close_file( &tmpdata, status );
         } else {
-          /* open as raw if raw else just open as whatever we have */
-          smfData * tmpdata = NULL;
-          smf_open_file( igrp->grp, igrp->subgroups[j][i], "READ",
-                         SMF__NOCREATE_DATA, &tmpdata, status );
-          if (tmpdata && tmpdata->file && tmpdata->file->isSc2store) {
-            smf_open_raw_asdouble( igrp->grp, igrp->subgroups[j][i],
-                                   darks, &refdata, status );
-          } else {
+          /* Open the file corresponding to this chunk. Data may
+             require flat-fielding. */
+          if (ensureflat) {
             smf_open_and_flatfield( igrp->grp, NULL, igrp->subgroups[j][i],
                                     darks, flatramps, &refdata, status );
+          } else {
+            /* open as raw if raw else just open as whatever we have */
+            smfData *tmpdata = NULL;
+            smf_open_file( igrp->grp, igrp->subgroups[j][i], "READ",
+                           SMF__NOCREATE_DATA, &tmpdata, status );
+            if (tmpdata && tmpdata->file && tmpdata->file->isSc2store) {
+              smf_open_raw_asdouble( igrp->grp, igrp->subgroups[j][i],
+                                     darks, &refdata, status );
+            } else {
+              smf_open_and_flatfield( igrp->grp, NULL, igrp->subgroups[j][i],
+                                      darks, flatramps, &refdata, status );
+            }
+            smf_close_file( &tmpdata, status );
           }
-          smf_close_file( &tmpdata, status );
         }
+
 
         /* Set havequal flag based on first file. This is required
            because the initial pass through for dimensions only looked
@@ -520,8 +612,14 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
         }
 
         /* Get reference dimensions/strides */
-        smf_get_dims( refdata, NULL, NULL, &nbolo, &reftlen, &refndata,
+        smf_get_dims( refdata, NULL, NULL, &nbolo, &reftlenr, &refndata,
                       &rbstr, &rtstr, status );
+
+        if( dslen && dslen[j-firstpiece] ) {
+          reftlen = dslen[j-firstpiece];
+        } else {
+          reftlen = reftlenr;
+        }
 
         if( *status == SAI__OK ) {
           /* If first chunk initialize the concatenated array */
@@ -533,7 +631,8 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
             /* Allocate memory for empty smfData with a smfHead. Create
                a DA struct only if the input file has one. Create it as
                a clone rather than creating an empty smfDa. */
-            data = smf_create_smfData( SMF__NOCREATE_DA | SMF__NOCREATE_FTS, status );
+            data = smf_create_smfData( SMF__NOCREATE_DA | SMF__NOCREATE_FTS,
+                                       status );
             if (refdata->da && data) {
               /* do not copy dark squids. We do that below */
               data->da = smf_deepcopy_smfDA( refdata, 0, status );
@@ -904,4 +1003,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
     /* Put this concatenated subarray into the smfArray */
     smf_addto_smfArray( *concat, data, status );
   }
+
+  /* Clean up */
+  if( dslen ) dslen = astFree( dslen );
 }

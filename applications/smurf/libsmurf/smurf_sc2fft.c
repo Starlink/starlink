@@ -276,8 +276,9 @@ void smurf_sc2fft( int *status ) {
 
     /* Concatenate this continuous chunk but forcing a raw data read.
        We will need quality. */
-    smf_concat_smfGroup( wf, igroup, darks, NULL, flatramps, contchunk, ensureflat, 1,
-                         NULL, 0, NULL, NULL, 0, 0, 0, 1, &concat, status );
+    smf_concat_smfGroup( wf, igroup, darks, NULL, flatramps, contchunk,
+                         ensureflat, 1, NULL, 0, NULL, NULL, 0, 0, 0, 1, 0,
+                         &concat, status );
 
     /* Now loop over each subarray */
     /* Export concatenated data for each subarray to NDF file */

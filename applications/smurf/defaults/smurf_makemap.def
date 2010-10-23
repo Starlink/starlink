@@ -55,6 +55,8 @@ varmapmethod = 0
 maxlen = 0
 pad = <undef>
 
+downsampscale = 0
+
 modelorder = (com,gai,ext,flt,ast,noi)
 exportndf = 0
 

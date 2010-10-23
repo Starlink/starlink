@@ -110,6 +110,16 @@ exportndf = 0
 # without any approximation.
 #tstep = 100
 
+# If the telescope is scanning slowly the data may be safely down-sampled
+# to save memory and time. This parameter controls the minimum angular
+# scale on the sky. The new sample frequency is chosen such that this
+# scale will be preserved taking into account the average slew speed and
+# the sample rate of the input files. The following defaults are for
+# the approximate FWHM/3:
+
+#450.downsampscale = 2.7
+#850.downsampscale = 4.7
+
 # ----------------------------------------------------------------------------
 # The following parameters control data-cleaning before iterations start
 # ----------------------------------------------------------------------------

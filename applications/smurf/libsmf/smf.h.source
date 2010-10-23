@@ -715,7 +715,8 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                           AstFrameSet *outfset, int moving,
                           int *lbnd_out, int *ubnd_out, dim_t padStart,
                           dim_t padEnd, int flags,  int tstep,
-                          smfArray **concat, int *status );
+                          double downsampscale, smfArray **concat,
+                          int *status );
 
 smfDA *smf_construct_smfDA( smfDA * tofill, smfData *dksquid, double * flatcal,
                             double * flatpar, smf_flatmeth flatmeth,
@@ -860,7 +861,7 @@ void smf_display_projpars( AstSkyFrame * skyframe, double par[7],
                            int *status);
 
 void smf_downsamp_smfData( const smfData *idata, smfData **odata,
-                           dim_t ontslice, int *status );
+                           dim_t ontslice, int todouble, int *status );
 
 void smf_dream_calcweights ( smfData *data, const Grp *ogrp, const int index,
                              const double gridstep, const int ngrid,

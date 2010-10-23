@@ -346,6 +346,8 @@
 *        0 and do one more pass if exit criterion met, then set to 1 last time
 *        through. This enables correct usage of SMF__DIMM_LASTITER even when
 *        iterating to convergence.
+*     2010-10-22 (EC):
+*        Add downsampling capability
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -426,6 +428,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   smfDIMMData dat;              /* Struct passed around to model components */
   smfData *data=NULL;           /* Temporary smfData pointer */
   int deldimm=0;                /* Delete temporary .DIMM files */
+  double downsampscale;         /* Downsample factor to preserve this scale */
   int tstep = 0;                /* Time step between full WCS calculations */
   int dimmflags;                /* Control flags for DIMM model components */
   int doclean=1;                /* Are we doing data pre-processing? */
@@ -646,6 +649,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       /* Method to use for calculating the variance map */
       astMapGet0I( keymap, "VARMAPMETHOD", &varmapmethod );
+
+      /* Are we downsampling the data? */
+      astMapGet0D( keymap, "DOWNSAMPSCALE", &downsampscale );
 
       if( varmapmethod ) {
         msgOutif(MSG__VERB, " ",
@@ -1061,8 +1067,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         /* Concatenate (no variance since we calculate it ourselves -- NOI) */
         smf_concat_smfGroup( wf, igroup, darks, bbms, flatramps, contchunk,
                              ensureflat, 0, outfset, moving, lbnd_out,
-                             ubnd_out, pad, pad,
-                             SMF__NOCREATE_VARIANCE, tstep, &res[0], status );
+                             ubnd_out, pad, pad, SMF__NOCREATE_VARIANCE, tstep,
+                             downsampscale, &res[0], status );
 
         /*** TIMER ***/
         msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ": ** %f s concatenating data",

@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_downsamp_smfData( smfData *idata, smfData **odata, dim_t ontslice,
-*                           int *status );
+*                           int todouble, int *status );
 
 *  Arguments:
 *     idata = smfData* (Given)
@@ -24,6 +24,9 @@
 *     ontslice = dim_t (Given)
 *        Length in time slices of odata (must be less than or equal to
 *        length of idata)
+*     todouble = int (Given)
+*        If set, odata will be converted to SMF__DOUBLE even if the input
+*        has a fixed-point data type.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -46,6 +49,8 @@
 *     2010-10-21 (EC):
 *        Nearest-neighbour for most of JCMTState, but do proper resampling
 *        for important fast-changing fields.
+*     2010-10-22 (EC)
+*        Add todouble flag
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -96,7 +101,7 @@
 #define FUNC_NAME "smf_downsamp_smfData"
 
 void smf_downsamp_smfData( const smfData *idata, smfData **odata,
-                           dim_t ontslice, int *status ) {
+                           dim_t ontslice, int todouble, int *status ) {
 
   size_t i;                /* loop counter */
   size_t ibstride;         /* bstride of idata */
@@ -183,11 +188,19 @@ void smf_downsamp_smfData( const smfData *idata, smfData **odata,
                 &otstride, status );
 
   if( *status == SAI__OK ) {
-    (*odata)->pntr[0] = astCalloc( ondata, smf_dtype_size(*odata,status), 1 );
+    int size;
+
+    if( todouble ) size = sizeof(double);
+    else size = smf_dtype_size(*odata,status);
+
+    (*odata)->pntr[0] = astCalloc( ondata, size, 1 );
   }
 
   if( (*status==SAI__OK) && (*odata) ) {
+
     if( (*odata)->dtype == SMF__DOUBLE ) {
+      /* Input data are doubles */
+
       double *idat = idata->pntr[0];
       double *odat = (*odata)->pntr[0];
 
@@ -196,12 +209,28 @@ void smf_downsamp_smfData( const smfData *idata, smfData **odata,
                         odat+i*obstride, otstride, 0, ontslice, 1, 0, status );
       }
     } else if( (*odata)->dtype == SMF__INTEGER ) {
-      int *idat = idata->pntr[0];
-      int *odat = (*odata)->pntr[0];
+      /* Input data are integers */
 
-      for( i=0; (*status==SAI__OK) && i<nbolo; i++ ) {
-        smf_downsamp1I( idat+i*ibstride, itstride, 0, intslice,
-                        odat+i*obstride, otstride, 0, ontslice, 0, 0, status );
+      int *idat = idata->pntr[0];
+
+      if( todouble ) {
+        /* converting int to double */
+        double *odat = (*odata)->pntr[0];
+
+        (*odata)->dtype = SMF__DOUBLE;
+
+        for( i=0; (*status==SAI__OK) && i<nbolo; i++ ) {
+          smf_downsamp1I( idat+i*ibstride, itstride, 0, intslice,
+                          odat+i*obstride, otstride, 0, ontslice, 1, 0, status);
+        }
+      } else {
+        /* output will also be int */
+        int *odat = (*odata)->pntr[0];
+
+        for( i=0; (*status==SAI__OK) && i<nbolo; i++ ) {
+          smf_downsamp1I( idat+i*ibstride, itstride, 0, intslice,
+                          odat+i*obstride, otstride, 0, ontslice, 0, 0, status);
+        }
       }
     } else {
       *status = SAI__ERROR;
@@ -283,7 +312,8 @@ void smf_downsamp_smfData( const smfData *idata, smfData **odata,
 
     /* Down-sample the dark squids */
     if( indksquid ) {
-      smf_downsamp_smfData( indksquid, &da->dksquid, ontslice, status );
+      smf_downsamp_smfData( indksquid, &da->dksquid, ontslice, todouble,
+                            status );
     }
   }
 
