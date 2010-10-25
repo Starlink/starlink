@@ -40,10 +40,12 @@
  *        Free resources even if status is bad
  *     2008-04-16 (EC):
  *        Free chunk
+ *     2010-10-25 (EC):
+ *        Add tlen to smfGroup
 
  *  Copyright:
- *     Copyright (C) 2006-2008 University of British Columbia.  All
- *     Rights Reserved.
+ *     Copyright (C) 2006-2008,2010 University of British Columbia.
+ *     All Rights Reserved.
 
  *  Licence:
  *     This program is free software; you can redistribute it and/or
@@ -119,6 +121,16 @@ void smf_close_smfGroup ( smfGroup **group, int *status ) {
       *status = SAI__ERROR;
       errRep( FUNC_NAME,
               "Input smfGroup has no chunk (possible programming error)",
+              status );
+    }
+
+    /* Free tlen */
+    if( (*group)->tlen ) {
+      (*group)->tlen = astFree( (*group)->tlen );
+    } else {
+      *status = SAI__ERROR;
+      errRep( FUNC_NAME,
+              "Input smfGroup has no tlen (possible programming error)",
               status );
     }
 

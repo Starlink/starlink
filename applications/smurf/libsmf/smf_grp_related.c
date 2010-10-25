@@ -15,9 +15,9 @@
  *  Invocation:
  *     smf_grp_related( const Grp *igrp, const size_t grpsize,
  *                      const int grpbywave, dim_t maxlen, AstKeyMap *keymap,
- *                      dim_t *maxconcatlen, dim_t *maxfilelen,
- *                      smfGroup **group, Grp **basegrp, dim_t *pad,
- *                      int *status );
+ *                      double downsampscale, dim_t *maxconcatlen,
+ *                      dim_t *maxfilelen, smfGroup **group, Grp **basegrp,
+ *                      dim_t *pad, int *status );
 
  *  Arguments:
  *     igrp = const Grp* (Given)
@@ -32,6 +32,10 @@
  *     keymap = AstKeyMap * (Given)
  *        A pointer to a KeyMap holding the configuration parameters. Only
  *        needed if "pad" is not NULL.
+ *     downsampscale = double (Given)
+ *        If set, downsample the data such that this scale (in arcsec) is
+ *        retained. This factor will be used to calculate maxconcatlen and
+ *        at maxfilelen.
  *     maxconcatlen = dim_t* (Returned)
  *        The actual length in time samples of the longest continuous chunk.
  *        Can be NULL.
@@ -126,6 +130,8 @@
  *        Added maxfilelen to interface.
  *     2010-10-04 (DSB):
  *        Added pad and keymap to interface.
+ *     2010-10-25 (EC):
+ *        Move down-sampling length calc here from smf_concat_smfGroup
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -184,12 +190,12 @@
 
 void smf_grp_related( const Grp *igrp, const size_t grpsize,
                       const int grpbywave, dim_t maxlen, AstKeyMap *keymap,
-                      dim_t *maxconcatlen, dim_t *maxfilelen,
-                      smfGroup **group, Grp **basegrp, dim_t *pad,
-                      int *status ) {
+                      double downsampscale, dim_t *maxconcatlen,
+                      dim_t *maxfilelen, smfGroup **group, Grp **basegrp,
+                      dim_t *pad, int *status ) {
 
   /* Local variables */
-  dim_t *all_len = NULL;      /* Lengths of each chunk */
+  dim_t *all_tlen = NULL;     /* Lengths of each chunk */
   size_t allOK = 1;           /* Flag to determine whether to continue */
   size_t *chunk=NULL;         /* Array of flags for continuous chunks */
   dim_t chunkend;             /* Index to end of chunk */
@@ -217,6 +223,7 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
   dim_t nelem;                /* Number of elements in index array */
   size_t *new_chunk=NULL;     /* chunks associated with new_subgroups */
   dim_t new_ngroups=0;        /* counter for new_subgroups */
+  dim_t *new_tlen=NULL;       /* tlens for new_subgroup */
   dim_t **new_subgroups=NULL; /* subgroups that are long enough */
   size_t ngroups = 0;         /* Counter for subgroups to be stored */
   dim_t nx;                   /* (data->dims)[0] */
@@ -235,7 +242,7 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
   dim_t **subgroups = NULL;   /* Array containing index arrays to parent Grp */
   int subsysnum;              /* Subsystem numeric id. 0 - 8 */
   size_t thischunk;           /* Current chunk that we're on */
-  dim_t thislen;              /* Length of current time chunk */
+  dim_t thistlen;              /* Length of current time chunk */
   dim_t thisnelem;            /* Number of elements (subarrays) at this chunk*/
   dim_t totlen;               /* Total length of continuous time chunk */
   double writetime;           /* RTS_END value at end of written data */
@@ -252,6 +259,7 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
   chunk = astCalloc( grpsize, sizeof(*chunk), 1 );
   new_subgroups = astCalloc( grpsize, sizeof(*new_subgroups), 1 );
   new_chunk = astCalloc( grpsize, sizeof(*new_chunk) , 1 );
+  new_tlen = astCalloc( grpsize, sizeof(*new_tlen) , 1 );
 
   if ( *status != SAI__OK ) goto CLEANUP;
 
@@ -387,9 +395,9 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
      are present in subsequent chunks flagged "continuous". */
 
   refsubsys = astCalloc( nelem, sizeof(*refsubsys), 0 );
-  all_len = astCalloc( grpsize, sizeof(*all_len), 1 );
+  all_tlen = astCalloc( grpsize, sizeof(*all_tlen), 1 );
 
-  thislen = 0;
+  thistlen = 0;
   totlen = 0;
   thischunk = 0;
   maxconcat = 0;
@@ -403,7 +411,6 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
     smf_open_file( igrp, subgroups[i][0], "READ", SMF__NOCREATE_DATA, &data,
                    status );
 
-
     /* Read the SEQCOUNT and NSUBSCAN header values */
     if( *status == SAI__OK ) {
       hdr = data->hdr;
@@ -414,31 +421,44 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
     if( *status == SAI__OK ) {
 
       /* Length of chunk */
-      if( data->isTordered ) {
-        thislen = data->dims[2];
-      } else {
-        thislen = data->dims[0];
+      smf_get_dims( data, NULL, NULL, NULL, &thistlen, NULL, NULL, NULL,
+                    status );
+
+      /* Find length of down-sampled data */
+      if( downsampscale && data->hdr && (*status==SAI__OK) ) {
+        double oldscale = (data->hdr->steptime * data->hdr->scanvel);
+        double scalelen = oldscale / downsampscale;
+
+        /* only down-sample if it will be at least a factor of 20% */
+        if( scalelen <= 0.8 ) {
+          msgOutiff( MSG__VERB, "", FUNC_NAME
+                     ": will down-sample from %5.1lf Hz to %5.1lf Hz", status,
+                     (1./data->hdr->steptime),
+                     (scalelen/data->hdr->steptime) );
+
+          thistlen = round(thistlen * scalelen);
+        }
       }
 
       /* Store length to check chunk lengths later */
-      all_len[i] = thislen;
+      all_tlen[i] = thistlen;
 
       /* Check that an individual file is too long */
-      if( maxlen && (thislen > maxlen) ) {
+      if( maxlen && (thistlen > maxlen) ) {
         *status = SAI__ERROR;
-        msgSeti("THISLEN",thislen);
+        msgSeti("THISTLEN",thistlen);
         msgSeti("MAXLEN",maxlen);
         errRep(FUNC_NAME,
-               "Length of file time steps exceeds maximum (^THISLEN>^MAXLEN)",
+               "Length of file time steps exceeds maximum (^THISTLEN>^MAXLEN)",
                status);
       }
 
       /* Add length to running total */
-      totlen += thislen;
+      totlen += thistlen;
 
       /* Update maxflen */
-      if( thislen > maxflen ) {
-        maxflen = thislen;
+      if( thistlen > maxflen ) {
+        maxflen = thistlen;
       }
 
       /* Update maxconcat */
@@ -506,7 +526,7 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
 
           /* Since this piece puts us over the limit, it is now the initial
              total length for the next chunk. */
-          totlen = thislen;
+          totlen = thistlen;
         }
       }
 
@@ -572,7 +592,7 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
       keepchunk[i] = 1;
     }
 
-    totlen = all_len[0];
+    totlen = all_tlen[0];
     chunkstart = 0;
 
     for( i=1; i<=ngroups; i++ ) {
@@ -601,7 +621,7 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
       }
 
       /* Add to the length of the current chunk if we're not at the end */
-      if( i<ngroups ) totlen += all_len[i];
+      if( i<ngroups ) totlen += all_tlen[i];
     }
 
     /* Determine max subarrays */
@@ -633,6 +653,7 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
           memcpy( indices, subgroups[i], maxnelem*sizeof(*indices) );
           new_subgroups[new_ngroups] = indices;
           new_chunk[new_ngroups] = chunk[i];
+          new_tlen[new_ngroups] = all_tlen[i];
           new_ngroups++;
         }
       }
@@ -641,9 +662,8 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
 
 
   /* Create the smfGroup */
-
-  *group = smf_construct_smfGroup( igrp, new_subgroups, new_chunk, new_ngroups,
-                                   maxnelem, 0, status );
+  *group = smf_construct_smfGroup( igrp, new_subgroups, new_chunk, new_tlen,
+                                   new_ngroups, maxnelem, 0, status );
 
   /* Return maxfilelen if requested */
   if( maxfilelen ) {
@@ -684,7 +704,7 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
   refsubsys = astFree( refsubsys );
   keepchunk = astFree( keepchunk );
   chunk = astFree( chunk );
-  all_len = astFree( all_len );
+  all_tlen = astFree( all_tlen );
   lambda = astFree( lambda );
   if (data) smf_close_file( &data, status );
 

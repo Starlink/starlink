@@ -20,8 +20,7 @@
  *                          AstFrameSet *outfset, int moving,
  *                          int *lbnd_out, int *ubnd_out, dim_t req_padStart,
  *                          dim_t req_padEnd, int flags, int tstep,
- *                          double downsampscale, smfArray **concat,
- *                          int *status )
+ *                          smfArray **concat, int *status )
 
  *  Arguments:
  *     wf = smfWorkForce * (Given)
@@ -67,9 +66,6 @@
  *     tstep = int (Given)
  *        The increment in time slices between full Mapping calculations.
  *        The Mapping for intermediate time slices will be approximated.
- *     downsampscale = double (Given)
- *        If set, downsample the data such that this scale (in arcsec) is
- *        retained
  *     concat = smfArray ** (Returned)
  *        smfArray containing concatenated data for each subarray
  *     status = int* (Given and Returned)
@@ -168,6 +164,8 @@
  *        Add SMF__NOCREATE_FTS
  *     2010-10-22 (EC):
  *        Add downsampscale
+ *     2010-10-25 (EC):
+ *        Move down-sampling length calc from here to smf_grp_related
 
  *  Notes:
  *     If projection information supplied, pointing LUT will not be
@@ -242,14 +240,13 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                           AstFrameSet *outfset, int moving,
                           int *lbnd_out, int *ubnd_out, dim_t req_padStart,
                           dim_t req_padEnd, int flags, int tstep,
-                          double downsampscale, smfArray **concat,
-                          int *status ) {
+                          smfArray **concat, int *status ) {
 
   /* Local Variables */
   size_t bstr;                  /* Concatenated bolo stride */
   smfDA *da=NULL;               /* Pointer to smfDA struct */
   smfData *data=NULL;           /* Concatenated smfData */
-  int *dslen=NULL;              /* Array of down-sampled lengths each file */
+  dim_t *dslen=NULL;            /* Down-sampled lengths */
   int flag;                     /* Flag */
   char filename[GRP__SZNAM+1];  /* Input filename, derived from GRP */
   dim_t firstpiece = 0;         /* index to start of whichchunk */
@@ -347,9 +344,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
   }
 
   /* Allocate space for array of downsampled lengths for each file */
-  if( downsampscale ) {
-    dslen = astCalloc( lastpiece-firstpiece+1, sizeof(*dslen), 1 );
-  }
+  dslen = astCalloc( lastpiece-firstpiece+1, sizeof(*dslen), 1 );
 
   /* Loop over related elements (number of subarrays) */
   for( i=0; (*status == SAI__OK) && i<nrelated; i++ ) {
@@ -398,24 +393,14 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
       smf_get_dims( refdata, &nrow, &ncol,
                     NULL, &reftlenr, &refndata, NULL, NULL, status );
 
-      /* Calculate down-sampled lengths */
-      if( dslen && refdata->hdr ) {
-        double oldscale = (refdata->hdr->steptime * refdata->hdr->scanvel);
-        double scalelen = oldscale / downsampscale;
+      /* Data may be down-sampled so use the value calculated in
+         smf_grp_related for the length in time slices */
+      reftlen = igrp->tlen[j];
 
-        /* only down-sample if it will be at least a factor of 20% */
-
-        if( scalelen <= 0.8 ) {
-          msgOutiff( MSG__VERB, "", FUNC_NAME
-                     ": down-sampling from %5.1lf Hz to %5.1lf Hz", status,
-                     (1./refdata->hdr->steptime),
-                     (scalelen/refdata->hdr->steptime) ); 
-
-          dslen[j-firstpiece] = round(reftlenr * scalelen);
-          reftlen = dslen[j-firstpiece];
-        } else reftlen = reftlenr;
-      } else {
-        reftlen = reftlenr;
+      if( reftlenr != reftlen ) {
+        /* dslen is 0 if we're not down-sampling, and igrp->tlen[j] if
+           we are */
+        dslen[j-firstpiece] = reftlen;
       }
 
       if( *status == SAI__OK ) {

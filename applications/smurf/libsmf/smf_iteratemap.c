@@ -869,8 +869,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
      data. Maxconcat will be the length of the largest continuous
      chunk, or maxlen, whichever comes first -- but excluding padding. */
 
-  smf_grp_related( igrp, isize, 1, maxlen, keymap, &maxconcat, &maxfile,
-                   &igroup, NULL, &pad, status );
+  smf_grp_related( igrp, isize, 1, maxlen, keymap, downsampscale, &maxconcat,
+                   &maxfile, &igroup, NULL, &pad, status );
 
   /* Once we've run smf_grp_related we know how many subarrays there
      are.  We also know the maximum length of a concatenated piece of
@@ -942,8 +942,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         smf_close_smfGroup( &igroup, status );
       }
 
-      smf_grp_related( igrp, isize, 1, try, NULL, &maxconcat, NULL, &igroup,
-                       NULL, NULL, status );
+      smf_grp_related( igrp, isize, 1, try, NULL, downsampscale, &maxconcat,
+                       NULL, &igroup, NULL, NULL, status );
     }
   }
 
@@ -1068,7 +1068,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         smf_concat_smfGroup( wf, igroup, darks, bbms, flatramps, contchunk,
                              ensureflat, 0, outfset, moving, lbnd_out,
                              ubnd_out, pad, pad, SMF__NOCREATE_VARIANCE, tstep,
-                             downsampscale, &res[0], status );
+                             &res[0], status );
 
         /*** TIMER ***/
         msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ": ** %f s concatenating data",

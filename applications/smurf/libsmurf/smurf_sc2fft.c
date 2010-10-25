@@ -217,7 +217,7 @@ void smurf_sc2fft( int *status ) {
 
   /* We now need to combine files from the same subarray and same sequence
      to form a continuous time series */
-  smf_grp_related( igrp, size, 1, 0, NULL, &maxconcat, NULL, &igroup,
+  smf_grp_related( igrp, size, 1, 0, NULL, 0, &maxconcat, NULL, &igroup,
                    &basegrp, NULL, status );
 
   /* Get output file(s) */
@@ -277,7 +277,7 @@ void smurf_sc2fft( int *status ) {
     /* Concatenate this continuous chunk but forcing a raw data read.
        We will need quality. */
     smf_concat_smfGroup( wf, igroup, darks, NULL, flatramps, contchunk,
-                         ensureflat, 1, NULL, 0, NULL, NULL, 0, 0, 0, 1, 0,
+                         ensureflat, 1, NULL, 0, NULL, NULL, 0, 0, 0, 1,
                          &concat, status );
 
     /* Now loop over each subarray */

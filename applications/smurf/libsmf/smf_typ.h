@@ -178,7 +178,9 @@
 *        We are using MiB not MB
 *     2010-09-21 (EC):
 *        Add scanvel to smfHead
- *     {enter_further_changes_here}
+*     2010-10-25 (EC):
+*        Add tlen to smfGroup
+*     {enter_further_changes_here}
 
  *  Copyright:
  *     Copyright (C) 2008-2010 Science and Technology Facilities Council.
@@ -680,6 +682,7 @@ typedef struct smfGroup {
   Grp *grp;                  /* Copy of input Grp */
   dim_t **subgroups;         /* Indices into Grp [ngroups][nrelated] */
   size_t *chunk;             /* Flag for continuous chunks in time [ngroups]*/
+  dim_t *tlen;               /* Length in time slices each chunk [ngroups]*/
   dim_t ngroups;             /* Number of subgroups */
   dim_t nrelated;            /* Maximum number of related files */
 } smfGroup;

@@ -380,8 +380,8 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
        mgrp afterward. */
 
     *mgroup = smf_construct_smfGroup( mgrp, igroup->subgroups, igroup->chunk,
-                                      igroup->ngroups, igroup->nrelated, 1,
-                                      status );
+                                      igroup->tlen, igroup->ngroups,
+                                      igroup->nrelated, 1, status );
 
     if( mgrp ) grpDelet( &mgrp, status );
   }

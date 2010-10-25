@@ -225,7 +225,7 @@ void smurf_sc2concat( int *status ) {
   parGet0l( "FLAT", &ensureflat, status );
 
   /* Group the input files by subarray and continuity */
-  smf_grp_related( igrp, isize, 1, maxlen-padStart-padEnd, NULL, &maxconcat,
+  smf_grp_related( igrp, isize, 1, maxlen-padStart-padEnd, NULL, 0, &maxconcat,
                    NULL, &igroup, &basegrp, NULL, status );
 
   /* Obtain the number of continuous chunks and subarrays */
@@ -247,7 +247,7 @@ void smurf_sc2concat( int *status ) {
     /* Concatenate this continuous chunk */
     smf_concat_smfGroup( wf, igroup, usedarks ? darks:NULL, NULL, flatramps,
                          contchunk, ensureflat, 1, NULL, 0, NULL, NULL,
-                         padStart, padEnd, 0, 1, 0, &concat, status );
+                         padStart, padEnd, 0, 1, &concat, status );
 
     /* Export concatenated data for each subarray to NDF file */
     for( idx=0; (*status==SAI__OK)&&idx<concat->ndat; idx++ ) {

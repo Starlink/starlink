@@ -15,6 +15,7 @@
  *  Invocation:
  *     smfGroup* = smf_construct_smfGroup( const Grp *igrp, int **subgroups,
  *                                         size_t *chunk,
+ *                                         dim_t *tlen,
  *                                         const dim_t ngroups,
  *                                         const dim_t nrelated,
  *                                         const int copy,
@@ -27,6 +28,8 @@
  *        Pointer to array of pointers to arrays of indices into Grp
  *     chunk = size_t* (Given)
  *        Array of length ngroups flagging which subgroups are continuous
+ *     tlen = dim_t* (Given)
+ *        Length of each subgroup in time slices
  *     ngroups = dim_t (Given)
  *        Number of subgroups in the smfGroup
  *     nrelated = dim_t (Given)
@@ -67,11 +70,13 @@
  *        Changed ngroups/nrelated to dim_t
  *     2009-09-29 (TIMJ):
  *        Use ndgCopy rather than smf_grpCopy
+ *     2010-10-25 (EC):
+ *        Add tlen to smfGroup
 
  *  Copyright:
  *     Copyright (C) 2009 Science & Technology Facilities Council.
- *     Copyright (C) 2006-2008 University of British Columbia.  All Rights
- *     Reserved.
+ *     Copyright (C) 2006-2008,2010 University of British Columbia.
+ *     All Rights Reserved.
 
  *  Licence:
  *     This program is free software; you can redistribute it and/or
@@ -118,7 +123,8 @@
 
 #define FUNC_NAME "smf_construct_smfGroup"
 
-smfGroup *smf_construct_smfGroup( const Grp *igrp, dim_t **subgroups, size_t *chunk,
+smfGroup *smf_construct_smfGroup( const Grp *igrp, dim_t **subgroups,
+                                  size_t *chunk, dim_t *tlen,
                                   const dim_t ngroups,  const dim_t nrelated,
                                   const int copy, int *status ) {
 
@@ -148,12 +154,14 @@ smfGroup *smf_construct_smfGroup( const Grp *igrp, dim_t **subgroups, size_t *ch
   /* Copy subgroups and chunk if requested */
   if( copy ) {
     /* subgroups */
-    newsubgroups = astCalloc( ngroups, sizeof(*newsubgroups), 1 );
-    for( i=0; i<ngroups; i++ ) {
-      newsubgroups[i] = astCalloc( nrelated, sizeof(**newsubgroups), 0 );
-      if( *status == SAI__OK ) {
-        memcpy( newsubgroups[i], subgroups[i],
-                sizeof(**newsubgroups)*nrelated );
+    if( subgroups ) {
+      newsubgroups = astCalloc( ngroups, sizeof(*newsubgroups), 1 );
+      for( i=0; i<ngroups; i++ ) {
+        newsubgroups[i] = astCalloc( nrelated, sizeof(**newsubgroups), 0 );
+        if( *status == SAI__OK ) {
+          memcpy( newsubgroups[i], subgroups[i],
+                  sizeof(**newsubgroups)*nrelated );
+        }
       }
     }
 
@@ -162,15 +170,26 @@ smfGroup *smf_construct_smfGroup( const Grp *igrp, dim_t **subgroups, size_t *ch
     }
 
     /* chunk */
-    group->chunk = astCalloc( ngroups, sizeof(*chunk), 0 );
-    if( *status == SAI__OK ) {
-      memcpy( group->chunk, chunk, sizeof(*chunk)*ngroups );
+    if( chunk ) {
+      group->chunk = astCalloc( ngroups, sizeof(*chunk), 0 );
+      if( *status == SAI__OK ) {
+        memcpy( group->chunk, chunk, sizeof(*chunk)*ngroups );
+      }
+    }
+
+    /* tlen */
+    if( tlen ) {
+      group->tlen = astCalloc( ngroups, sizeof(*tlen), 0 );
+      if( *status == SAI__OK ) {
+        memcpy( group->tlen, tlen, sizeof(*tlen)*ngroups );
+      }
     }
 
   } else {
     /* Otherwise use the inputs in-place */
     group->subgroups = subgroups;
     group->chunk = chunk;
+    group->tlen = tlen;
   }
 
   if( *status == SAI__OK ) {

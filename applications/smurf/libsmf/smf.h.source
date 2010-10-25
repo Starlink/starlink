@@ -715,8 +715,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                           AstFrameSet *outfset, int moving,
                           int *lbnd_out, int *ubnd_out, dim_t padStart,
                           dim_t padEnd, int flags,  int tstep,
-                          double downsampscale, smfArray **concat,
-                          int *status );
+                          smfArray **concat, int *status );
 
 smfDA *smf_construct_smfDA( smfDA * tofill, smfData *dksquid, double * flatcal,
                             double * flatpar, smf_flatmeth flatmeth,
@@ -740,7 +739,8 @@ smfFile *smf_construct_smfFile(smfFile * tofill, int ndfid, int isSc2store,
 smfFts* smf_construct_smfFts( smfFts* tofill, smfData* fpm, smfData* sigma,
                               int* status);
 
-smfGroup *smf_construct_smfGroup( const Grp *igrp, dim_t **subgroups, size_t *chunk,
+smfGroup *smf_construct_smfGroup( const Grp *igrp, dim_t **subgroups,
+                                  size_t *chunk, dim_t *tlen,
                                   const dim_t ngroups, const dim_t nrelated,
                                   const int copysubgroups, int *status );
 
@@ -1182,10 +1182,11 @@ void smf_getrefwcs( const char *param, AstFrameSet **specwcs,
 AstKeyMap *smf_groupscans( Grp *igrp,  int size, int *maxsyspop,
                            int *conform, Grp **ogrp, int *status );
 
-void smf_grp_related(  const Grp *igrp, const size_t grpsize,
-                       const int grpbywave, dim_t maxlen, AstKeyMap *keymap,
-                       dim_t *maxconcatlen, dim_t *maxfilelen, smfGroup **group,
-                       Grp **basegrp, dim_t *pad, int *status );
+void smf_grp_related( const Grp *igrp, const size_t grpsize,
+                      const int grpbywave, dim_t maxlen, AstKeyMap *keymap,
+                      double downsampscale, dim_t *maxconcatlen,
+                      dim_t *maxfilelen, smfGroup **group, Grp **basegrp,
+                      dim_t *pad, int *status );
 
 void smf_history_add( smfData* data, const char * appl,
                       int *status);

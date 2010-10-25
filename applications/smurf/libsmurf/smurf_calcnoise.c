@@ -223,7 +223,7 @@ void smurf_calcnoise( int *status ) {
 
   /* We now need to combine files from the same subarray and same sequence
      to form a continuous time series */
-  smf_grp_related( igrp, size, 1, 0, NULL, &maxconcat, NULL, &igroup,
+  smf_grp_related( igrp, size, 1, 0, NULL, 0, &maxconcat, NULL, &igroup,
                    &basegrp, NULL, status );
 
   /* Get output file(s) */
@@ -255,7 +255,7 @@ void smurf_calcnoise( int *status ) {
     /* Concatenate this continuous chunk but forcing a raw data read.
        We will need quality. */
     smf_concat_smfGroup( wf, igroup, NULL, NULL, flatramps, contchunk, 0, 1,
-                         NULL, 0, NULL, NULL, 0, 0, 0, 1, 0, &concat, status );
+                         NULL, 0, NULL, NULL, 0, 0, 0, 1, &concat, status );
 
     /* Now loop over each subarray */
     /* Export concatenated data for each subarray to NDF file */
