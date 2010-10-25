@@ -138,7 +138,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -148,8 +148,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -163,7 +163,7 @@
 *        Retain error messages if only a single position is being
 *        centroided.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
 *     {enter_further_changes_here}
 
 *-
@@ -291,7 +291,7 @@
       END DO
 
 *  Get workspace for sorting pixel values in each box.
-      CALL PSX_CALLOC( SEL*51*NDIMS, '_REAL', IPW2, STATUS )
+      CALL PSX_CALLOC( SEL * 51 * NDIMS, '_REAL', IPW2, STATUS )
 
 *  Transform the supplied positions to the PIXEL Frame of the NDF.
       CALL AST_TRANN( MAP1, NPOS, NAXIN, NPOS, INPOS, .TRUE., NDIMS,
