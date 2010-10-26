@@ -5,7 +5,7 @@
 *     KPS1_BFFT
 
 *  Purpose:
-*     Finds two-dimensional generalised Gaussian parameter values that 
+*     Finds two-dimensional generalised Gaussian parameter values that
 *     are consistent with a supplied set of data values.
 
 *  Language:
@@ -86,6 +86,12 @@
 *     amplitude.  The mean in the same region indicates which to use and
 *     to discover whether the beam is positive or negative with respect
 *     to the background.
+*     -  If the fitting fails, the most common error code returned is
+*     translated into a KAPPA code KAP__LMFOJ.  This code can be tested
+*     and appropriate action taken in scripts.  The error arises when the
+*     fitted functions from the Levenberg-Marquardt minimisation are
+*     orthogonal to the Jacobian's columns (usually indicating that the
+*     fitting area is too small).
 
 *  Copyright:
 *     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
@@ -140,6 +146,9 @@
 *     2010 July 5 (MJC):
 *        Switched to generalised Gaussian fit by the introduction of
 *        the shape exponent.
+*     2010 October 26 (MJC):
+*        Create a special error message for IFAIL=4, setting status to
+*        the new error code.
 *     {enter_further_changes_here}
 
 *-
@@ -153,6 +162,7 @@
       INCLUDE 'DAT_PAR'          ! Data-system constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
       INCLUDE 'BF_PAR'           ! BEAMFIT constants
+      INCLUDE 'KAP_ERR'          ! KAPPA error constants
 
 *  Global Variables:
       INCLUDE 'BF_COM'           ! Used for communicating with PDA
@@ -514,12 +524,20 @@
       ELSE
 
 *  Report an error if the PDA routine could not find an answer.
-         IF ( IFAIL .EQ. 0 .OR. IFAIL .GE. 4 ) THEN
+         IF ( IFAIL .EQ. 0 .OR. IFAIL .GT. 4 ) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETI( 'IFAIL', IFAIL )
             CALL ERR_REP( 'KPS1_BFFT_ERR3', 'Routine '/
      :         /'PDA_LMDIF1 returned INFO = ^IFAIL.', STATUS )
             GO TO 999
+
+*  Try to be more helpful with the most-common error.
+         ELSE IF ( IFAIL .EQ. 4 ) THEN
+            STATUS = KAP__LMFOJ
+            CALL ERR_REP( 'KPS1_BFFT_ERR3', 'The returned fitted '/
+     :         /'function from the Levenberg-Marquardt minimisation  '/
+     :         /'is orthogonal to the columns of the Jacobian.  Try '/
+     :         /'enlarging the fitting area.', STATUS )
          END IF
       END IF
 

@@ -25,6 +25,9 @@
       is a new GAMMA output parameter to record the shape exponent
       of the primary beam.
 
+      -  Added error code KAP__LMFOJ for the most-common failure
+      of the fitting.
+
    o  CLINPLOT
 
       -  Parameter MODE has a new option "GapHistogram", which

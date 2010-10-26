@@ -120,11 +120,12 @@
 *        multiplied by the AMPRATIO.  A null value indicates that
 *        the amplitude should be fitted.  [!]
 *     FITAREA() = _INTEGER (Read)
-*        Size in pixels of the fitting area to be used.  If only a
-*        single value is given, then it will be duplicated to all
-*        dimensions so that a square region is fitted.  Each value must
-*        be at least 9.  A null value requests that the full data
-*        array is used.  [!]
+*        Size in pixels of the fitting area to be used.  This should
+*        fully encompass the beam and also include some background
+*        signal. If only a single value is given, then it will be
+*        duplicated to all dimensions so that a square region is fitted.
+*        Each value must be at least 9.  A null value requests that the
+*        full data array is used.  [!]
 *     FIXBACK = _DOUBLE (Read)
 *        If a non-null value is supplied then the model fit will use
 *        that value as the constant background level otherwise the
@@ -470,6 +471,12 @@
 *     determined by a forward-difference approximation.
 *     -  The fit parameters are not displayed on the screen when the
 *     message filter environment variable MSG_FILTER is set to QUIET.
+*     -  If the fitting fails there are specific error codes that can be
+*     tested and appropriate action taken in scripts: PDA__FICMX when it
+*     is impossible to derive fit errors, and KAP__LMFOJ when the fitted
+*     functions from the Levenberg-Marquardt minimisation are orthogonal
+*     to the Jacobian's columns (usually indicating that FITAREA is too
+*     small).
 
 *  Related Applications:
 *     KAPPA: PSF, CENTROID, CURSOR, LISTSHOW, LISTMAKE; ESP: GAUFIT;

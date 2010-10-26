@@ -14829,8 +14829,9 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
       \sstsubsection{
          FITAREA() = \_INTEGER (Read)
       }{
-         Size in pixels of the fitting area to be used.  If only a
-         single value is given, then it will be duplicated to all
+         Size in pixels of the fitting area to be used.  This should
+         fully encompass the beam and also include some background signal.
+         If only a single value is given, then it will be duplicated to all
          dimensions so that a square region is fitted.  Each value must
          be at least 9.  A null value requests that the full data
          array is used.  {\tt [!]}
@@ -15350,6 +15351,14 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          message filter environment variable MSG\_FILTER is set to
          {\tt QUIET}.
 
+         \sstitem
+         If the fitting fails there are specific error codes that can be
+         tested and appropriate action taken in scripts: {\tt PDA\_\_FICMX} when
+         it is impossible to derive fit errors, and {\tt KAP\_\_LMFOJ} when the fitted
+         functions from the Levenberg-Marquardt minimisation are orthogonal
+         to the Jacobian's columns (usually indicating that FITAREA is too
+         small).
+
       }
    }
    \sstdiytopic{
@@ -15794,8 +15803,7 @@ KAPPA: \htmlref{ADD}{ADD},
       \sstexamplesubsection{
          calc "sind(pa/fa)$*$fa" fa="log(abs(pb$+$pc))" pa=2.0e-4 pb=-1 pc=\$x
       }{
-         This evaluates
-sind(0.0002/log(abs(\${\tt{x}}$-$1)))$*$log(abs(\${\tt{x}}$-$1)) where
+         This evaluates sind(0.0002/log(abs(\${\tt{x}}$-$1)))$*$log(abs(\${\tt{x}}$-$1)) where
          {\tt \$x} is the value of the shell variable x.
       }
       \sstexamplesubsection{
@@ -57468,6 +57476,8 @@ The following applications have been modified:
         a normal Gaussian (shape exponent=2).  There is a new GAMMA
         output parameter to record the shape exponent of the primary
         beam.
+        \item Added error code {\tt KAP\_\_LMFOJ} for the most-common failure
+        of the fitting.
       \end{itemize}
 
    \item [\htmlref{CLINPLOT}{CLINPLOT}]\mbox{}
