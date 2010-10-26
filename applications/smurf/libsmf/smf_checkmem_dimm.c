@@ -83,6 +83,8 @@
 *        Add msize to interface so we can add space for ast.zero_circle
 *     2010-09-20 (TIMJ):
 *        We are using MiB not Mb (or MB)
+*     2010-10-26 (EC):
+*        Add memory for fakemaps
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -153,6 +155,7 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
   size_t ndks;                 /* dksquid samples in a subarray, ncol*maxlen */
   size_t nrow;                 /* Number of rows */
   size_t nsamp;                /* bolo samples in a subarray, ndet*maxlen */
+  const char *tempstr=NULL;    /* Temporary pointer to static char buffer */
   size_t total = 0;            /* Total bytes required */
 
   /* Main routine */
@@ -234,6 +237,12 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
   /* Add on space for dark squids */
   ndks = ncol*maxlen;
   total += ndks*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
+
+  /* Add on space for fakemap */
+  astMapGet0C( keymap, "FAKEMAP", &tempstr );
+  if( tempstr ) {
+    total += msize*sizeof(double);
+  }
 
   /* Apply fudge factor */
   total *= CHECKMEM_FUDGE;

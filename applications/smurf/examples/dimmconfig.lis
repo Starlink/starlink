@@ -121,6 +121,18 @@ exportndf = 0
 #450.downsampscale = 2
 #850.downsampscale = 4
 
+# To test the response of the map-maker to different known
+# astronomical sources, an external "fakemap" can be specified to
+# provide an image of the sky that will produce additional astronomical
+# signal to the time series. At present, the dimensions of this map must
+# be identical to that of the real map. If the pixel ranges are not the
+# same makemap will hault. A typical procedure may involve: (i) produce
+# a map withe makemap; (ii) make a copy of the map, and then replace it
+# with an image of a known source; (iii) specify this new map for the
+# fakemap parameter below:
+
+# fakemap = fakesky.sdf
+
 # ----------------------------------------------------------------------------
 # The following parameters control data-cleaning before iterations start
 # ----------------------------------------------------------------------------
