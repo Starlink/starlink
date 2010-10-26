@@ -1,10 +1,10 @@
 /*
 *+
 *  Name:
-*     smurf_fts2_flatfield.c
+*     FTS2FLATFIELD
 
 *  Purpose:
-*     Corrects for the pixel-to-pixel variation in spectral responsivity, 
+*     Corrects for the pixel-to-pixel variation in spectral responsivity,
 *     due to detector characteristics.
 
 *  Language:
@@ -14,30 +14,18 @@
 *     ADAM TASK
 
 *  Invocation:
-*     smurf_fts2_flatfield(int *status)
+*     smurf_fts2_flatfield(status);
 
 *  Arguments:
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
 *  Description:
-*     Corrects for the pixel-to-pixel variation in spectral responsivity, 
+*     Corrects for the pixel-to-pixel variation in spectral responsivity,
 *     due to detector characteristics.
-*     
-*     Calibration Data:
-*        Measured Spectral Flatfield, RESPONSIVITY
-*
-*        RESPONSIVITY  <NDF>
-*           DATA_ARRAY     <ARRAY>         {structure}
-*           DATA(40,32,6000)  <_DOUBLE>    -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
-*                                        ... 0.3931,0.3931,0.3931,0.3931,0.3931
-*
-*           MORE           <EXT>           {structure}
-*              UNIT           <_CHAR*4>       '1/mm'
-*              FACTOR         <_DOUBLE>       0.001
 
 *  Authors:
-*     COBA: Coskun (Josh) Oba, University of Lethbridge
+*     COBA: Coskun Oba (UoL)
 
 *  History :
 *     15-JUL-2010 (COBA):
@@ -94,13 +82,11 @@
 #include "sc2da/sc2store.h"
 
 #define FUNC_NAME "smurf_fts2_flatfield"
-#define TASK_NAME "FTS2_FLATFIELD"
+#define TASK_NAME "FTS2FLATFIELD"
 
-void smurf_fts2_flatfield(int *status) 
+void smurf_fts2_flatfield(int* status)
 {
-  // Requirement SUN/104: Do nothing if status is NOT SAI__OK
-  if( *status != SAI__OK ) return;
+  printf("FTS2FLATFIELD...: NOT IMPLEMENTED YET!\n");
 
-  // TODO 
-  // Place Holder
+  if( *status != SAI__OK ) return;
 }

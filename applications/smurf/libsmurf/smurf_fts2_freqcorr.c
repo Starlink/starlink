@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     smurf_fts2_freqcorr.c
+*     FTS2FREQCORR
 
 *  Purpose:
 *     Off-Axis frequency correction.
@@ -13,7 +13,7 @@
 *     ADAM TASK
 
 *  Invocation:
-*     smurf_fts2_freqcorr(int *status)
+*     smurf_fts2_freqcorr(status);
 
 *  Arguments:
 *     status = int* (Given and Returned)
@@ -23,18 +23,9 @@
 *     Off-Axis Frequency Correction which scales the frequency grid according
 *     to the different path difference that off-axis rays travel through the
 *     interferometer.
-*     
-*     Calibration Data:
-*        Frequency Scale Factor Image, THETA
-*
-*        THETA  <NDF>
-*           DATA_ARRAY     <ARRAY>         {structure}
-*           DATA(40,32)    <_DOUBLE>       0,0.001,0.002,0.003,0.004,0.005,
-*                                     ... 3.926,3.927,3.928,3.929,3.93,3.931
-*        
 
 *  Authors:
-*     COBA: Coskun (Josh) Oba, University of Lethbridge
+*     COBA: Coskun Oba (UoL)
 
 *  History :
 *     15-JUL-2010 (COBA):
@@ -93,10 +84,15 @@
 #include "libsc2fts/fts2.h"
 
 #define FUNC_NAME "smurf_fts2_freqcorr"
-#define TASK_NAME "FTS2_FREQCORR"
+#define TASK_NAME "FTS2FREQCORR"
 
-void smurf_fts2_freqcorr(int *status) 
+void smurf_fts2_freqcorr(int* status)
 {
+  printf("FTS2FREQCORR...: NOT IMPLEMENTED YET!\n");
+
+  if( *status != SAI__OK ) { return; }
+
+/*
   int fIndex      = 0;
   int i           = 0;
   int index       = 0;
@@ -104,38 +100,33 @@ void smurf_fts2_freqcorr(int *status)
   int k           = 0;
   int pixelCount  = 0;
   int pixelIndex  = 0;
-  int srcWidth    = 0; 
-  int srcHeight   = 0;   
+  int srcWidth    = 0;
+  int srcHeight   = 0;
   int srcN        = 0;
-  int thetaHeight = 0;   
-  int thetaWidth  = 0; 
+  int thetaHeight = 0;
+  int thetaWidth  = 0;
   double* ifg     = NULL;
-  double* ifgNew  = NULL;  
+  double* ifgNew  = NULL;
   double* src     = NULL;
-  double* theta   = NULL;  
+  double* theta   = NULL;
   double* wn      = NULL;
-  double* wnNew   = NULL;  
+  double* wnNew   = NULL;
   Grp* igrp       = NULL;
-  Grp* ogrp       = NULL; 
+  Grp* ogrp       = NULL;
   Grp* thetagrp   = NULL;
   size_t size     = 0;
   size_t outsize  = 0;
-  
-  if( *status != SAI__OK ) 
-  {
-    return;
-  }
 
-  /* Get input group */
-  kpg1Rgndf("IN", 0, 1, "", &igrp, &size, status); 
-  /* Get output group */
+  // Get input group
+  kpg1Rgndf("IN", 0, 1, "", &igrp, &size, status);
+  // Get output group
   kpg1Wgndf("OUT", ogrp, size, size, "Equal number of input and output files expected!", &ogrp, &outsize, status);
-  /* Get THETA group */
+  // Get THETA group
   kpg1Gtgrp("THETA", &thetagrp, &size, status);
 
   ndfBegin();
 
-  /* OPEN THETA */
+  // OPEN THETA
   smfData* thetaData;
   smf_open_file(thetagrp, 1, "READ", SMF__NOCREATE_QUALITY, &thetaData, status);
   if(*status != SAI__OK)
@@ -144,13 +135,13 @@ void smurf_fts2_freqcorr(int *status)
     return;
   }
   theta = (double*) (thetaData->pntr[0]);
-  thetaWidth = thetaData->dims[0]; 
-  thetaHeight = thetaData->dims[1]; 
+  thetaWidth = thetaData->dims[0];
+  thetaHeight = thetaData->dims[1];
 
-  /* PERFORM FREQUENCY CORRECTION FOR EACH SOURCE FILE */
-  for(fIndex = 1; fIndex <= size; fIndex++) 
+  // PERFORM FREQUENCY CORRECTION FOR EACH SOURCE FILE
+  for(fIndex = 1; fIndex <= size; fIndex++)
   {
-    /* OPEN SOURCE */
+    // OPEN SOURCE
     smfData* srcData;
     smf_open_file(ogrp, fIndex, "UPDATE", SMF__NOCREATE_QUALITY, &srcData, status);
     if(*status != SAI__OK)
@@ -160,9 +151,9 @@ void smurf_fts2_freqcorr(int *status)
     }
     src = (double*) (srcData->pntr[0]);
 
-    /* VERIFY THAT THE SOURCE & THETA HAVE COMPATIBLE DIMENSIONS */
-    srcWidth = srcData->dims[0]; 
-    srcHeight = srcData->dims[1]; 
+    // VERIFY THAT THE SOURCE & THETA HAVE COMPATIBLE DIMENSIONS
+    srcWidth = srcData->dims[0];
+    srcHeight = srcData->dims[1];
     if(srcWidth != thetaWidth || srcHeight != thetaHeight)
     {
       *status = SAI__ERROR;
@@ -172,8 +163,8 @@ void smurf_fts2_freqcorr(int *status)
       break;
     }
 
-    /* FREQUENCY CORRECTION */
-    srcN = srcData->dims[2]; /* Source sample size */
+    // FREQUENCY CORRECTION
+    srcN = srcData->dims[2];
     ifg    = (double*) astMalloc(srcN * sizeof(double));
     ifgNew = (double*) astMalloc(srcN * sizeof(double));
     wn     = (double*) astMalloc(srcN * sizeof(double));
@@ -192,7 +183,7 @@ void smurf_fts2_freqcorr(int *status)
           wn[k] = k;
           wnNew[k] = k * cos(theta[pixelIndex]);
         }
-        /* FREQUENCY SHIFT BY CUBIC SPLINE */
+        // FREQUENCY SHIFT BY CUBIC SPLINE
         fts2_naturalcubicsplineinterpolator(wn, ifg, srcN, wnNew, ifgNew, srcN);
 
         for(k = 0; k < srcN; k++)
@@ -202,16 +193,15 @@ void smurf_fts2_freqcorr(int *status)
         }
       }
     }
-    /* FREE RESOURCES */
     astFree(ifgNew);
-    astFree(ifg);   
-    astFree(wn);      
-    astFree(wnNew);  
+    astFree(ifg);
+    astFree(wn);
+    astFree(wnNew);
     smf_close_file(&srcData, status);
   }
 
-  /* FREE RESOURCES */
   smf_close_file(&thetaData, status);
 
   ndfEnd(status);
+  */
 }

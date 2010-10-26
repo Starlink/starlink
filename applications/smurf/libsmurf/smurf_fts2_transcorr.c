@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     smurf_fts2_transcorr.c
+*     FTS2TRANSCORR
 
 *  Purpose:
 *     Corrects for atmospheric transmission across the spectral dimension.
@@ -13,7 +13,7 @@
 *     ADAM TASK
 
 *  Invocation:
-*     smurf_fts2_transcorr(int *status)
+*     smurf_fts2_transcorr(status);
 
 *  Arguments:
 *     status = int* (Given and Returned)
@@ -25,7 +25,7 @@
 *     form of a wet and dry Tau vs frequency table in the calibration database.
 
 *  Authors:
-*     COBA: Coskun (Josh) Oba, University of Lethbridge
+*     COBA: Coskun Oba (UoL)
 
 *  History :
 *     15-JUL-2010 (COBA):
@@ -84,10 +84,15 @@
 #include "libsc2fts/fts2.h"
 
 #define FUNC_NAME "smurf_fts2_transcorr"
-#define TASK_NAME "FTS2_TRANSCORR"
+#define TASK_NAME "FTS2TRANSCORR"
 
-void smurf_fts2_transcorr(int *status) 
+void smurf_fts2_transcorr(int* status)
 {
+  printf("FTS2TRANSCORR...: NOT IMPLEMENTED YET!\n");
+
+  if( *status != SAI__OK ) { return; }
+
+/*
   int i = 0;
   int j = 0;
   int k = 0;
@@ -98,7 +103,7 @@ void smurf_fts2_transcorr(int *status)
   int pixelCount = 0;
   double airMass = 0;
   double PWV = 0;
-  double tauFactor = 0.0;  
+  double tauFactor = 0.0;
   double* dryData = NULL;
   size_t dryCount = 0;
   size_t fIndex = 0;
@@ -108,38 +113,33 @@ void smurf_fts2_transcorr(int *status)
   int nwn = 0;
   double* tsm = NULL;
   double* ftsWNRel = NULL;
-  
+
   double* wetData = NULL;
   size_t wetCount = 0;
-  
+
   double* tau = NULL;
-  
+
   HDSLoc* hdsLoc        = NULL;
   HDSLoc* hdsLocFactor  = NULL;
   HDSLoc* hdsLocMore    = NULL;
-  
+
   Grp* igrp = NULL;
-  Grp* ogrp = NULL; 
+  Grp* ogrp = NULL;
   Grp* taugrp = NULL;
   size_t size;
   size_t outsize;
-  
+
   smfData* tauData = NULL;
   smfData* srcData = NULL;
-  
-  if( *status != SAI__OK ) 
-  {
-    return;
-  }
 
   // Get input group
-  kpg1Rgndf("IN", 0, 1, "", &igrp, &size, status); 
+  kpg1Rgndf("IN", 0, 1, "", &igrp, &size, status);
   // Get output group
   kpg1Wgndf("OUT", ogrp, size, size, "Equal number of input and output files expected!", &ogrp, &outsize, status);
   // Get TAU group
   kpg1Gtgrp("TAU", &taugrp, &size, status);
 
-  parGet0d( "AM", &airMass, status ); // GET AIR MASS  
+  parGet0d( "AM", &airMass, status ); // GET AIR MASS
   parGet0d( "PWV", &PWV, status ); // GET PWV
 
   ndfBegin();
@@ -151,7 +151,7 @@ void smurf_fts2_transcorr(int *status)
     errRep(FUNC_NAME, "Unable to open the TAU file!", status);
     return;
   }
-  
+
   //
   // READ IN TAU INFO
   //
@@ -163,7 +163,7 @@ void smurf_fts2_transcorr(int *status)
   datFind(hdsLocMore, "DRY", &hdsLoc, status);
   datSize(hdsLoc, &dryCount, status);
   dryData = (double*) astMalloc(dryCount * sizeof(double));
-  datGetVD(hdsLoc, dryCount, dryData, &dryCount, status);  
+  datGetVD(hdsLoc, dryCount, dryData, &dryCount, status);
   // WET DATA
   datFind(hdsLocMore, "WET", &hdsLoc, status);
   datSize(hdsLoc, &wetCount, status);
@@ -183,7 +183,7 @@ void smurf_fts2_transcorr(int *status)
   datAnnul(&hdsLoc, status);
 
   // APPLY TRANSMISSION CORRECTION FOR EACH SPECTRUM FILE
-  for(fIndex = 1; fIndex <= size; fIndex++) 
+  for(fIndex = 1; fIndex <= size; fIndex++)
   {
     // OPEN SOURCE
     smf_open_file(ogrp, fIndex, "UPDATE", SMF__NOCREATE_QUALITY, &srcData, status);
@@ -198,7 +198,7 @@ void smurf_fts2_transcorr(int *status)
     datFind(hdsLoc, "FTS_WN_FACTOR", &hdsLocFactor, status);
     datGet0D(hdsLocFactor, &wnFactor, status);
     datAnnul(&hdsLocFactor, status);
-    datAnnul(&hdsLoc, status);  
+    datAnnul(&hdsLoc, status);
 
     nwn = srcData->dims[2];
     tsm = (double*) astMalloc(nwn * sizeof(double));
@@ -239,4 +239,5 @@ void smurf_fts2_transcorr(int *status)
 
   // END
   ndfEnd(status);
+  */
 }

@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     smurf_fts2_deglitch.c
+*     FTS2DEGLITCH
 
 *  Purpose:
 *     Removes the glitches from the source.
@@ -102,7 +102,7 @@
 #include "libsc2fts/fts2.h"
 
 #define FUNC_NAME "smurf_fts2_deglitch"
-#define TASK_NAME "FTS2_DEGLITCH"
+#define TASK_NAME "FTS2DEGLITCH"
 
 void smurf_fts2_deglitch(int* status)
 {
@@ -175,18 +175,9 @@ void smurf_fts2_deglitch(int* status)
     errRep(FUNC_NAME, "Unable to open the ZPD file!", status);
     goto CLEANUP;
   }
-  if(zpdData->dtype == SMF__FLOAT) {
-    zpdArray = (float*) (zpdData->pntr[0]);
-  } else if(zpdData->dtype == SMF__DOUBLE) {
-    zpdArray = (double*) (zpdData->pntr[0]);
-  } else {
-    *status = SAI__ERROR;
-    errRep(FUNC_NAME, "Invalid data type found!", status);
-    smf_close_file(&zpdData, status);
-    goto CLEANUP;
-  }
-  zpdWidth   = zpdData->dims[0];
-  zpdHeight  = zpdData->dims[1];
+  zpdArray  = zpdData->pntr[0];
+  zpdWidth  = zpdData->dims[0];
+  zpdHeight = zpdData->dims[1];
   smf_find_subarray(zpdData->hdr, NULL, 0, &zpdSubarray, status);
   if(*status != SAI__OK) {
     *status = SAI__ERROR;
@@ -204,18 +195,11 @@ void smurf_fts2_deglitch(int* status)
     }
 
     /* GET DATA CUBE */
-    if(srcData->dtype == SMF__FLOAT) {
-      srcCube = (float*) (srcData->pntr[0]);
-    } else if(srcData->dtype == SMF__DOUBLE) {
-      srcCube = (double*) (srcData->pntr[0]);
-    } else {
-      errRep(FUNC_NAME, "Invalid data type found!", status);
-      break;
-    }
-    srcWidth    = srcData->dims[0];
-    srcHeight   = srcData->dims[1];
-    srcN        = srcData->dims[2];
-    pixelCount  = srcWidth * srcHeight;
+    srcCube    = srcData->pntr[0];
+    srcWidth   = srcData->dims[0];
+    srcHeight  = srcData->dims[1];
+    srcN       = srcData->dims[2];
+    pixelCount = srcWidth * srcHeight;
 
     smf_find_subarray(srcData->hdr, NULL, 0, &srcSubarray, status);
     if(*status != SAI__OK) {

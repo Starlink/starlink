@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     smurf_fts2_phasecorr.c
+*     FTS2PHASECORR
 
 *  Purpose:
 *     Applies phase correction to the source interferograms.
@@ -106,7 +106,7 @@
 #include "libsc2fts/fts2.h"
 
 #define FUNC_NAME "smurf_fts2_phasecorr"
-#define TASK_NAME "FTS2_PHASECORR"
+#define TASK_NAME "FTS2PHASECORR"
 
 void smurf_fts2_phasecorr(int* status)
 {

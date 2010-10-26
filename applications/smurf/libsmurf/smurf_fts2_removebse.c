@@ -99,7 +99,7 @@
 #include "libsc2fts/fts2.h"
 
 #define FUNC_NAME "smurf_fts2_removebse"
-#define TASK_NAME "FTS2_REMOVEBSE"
+#define TASK_NAME "FTS2REMOVEBSE"
 
 void smurf_fts2_removebse(int* status)
 {

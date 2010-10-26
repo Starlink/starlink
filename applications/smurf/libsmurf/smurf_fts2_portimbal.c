@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     smurf_fts2_portimbal.c
+*     FTS2PORTIMBAL
 
 *  Purpose:
 *     Corrects for atmospheric transmission across the spectral dimension.
@@ -13,7 +13,7 @@
 *     ADAM TASK
 
 *  Invocation:
-*     smurf_fts2_portimbal(int *status)
+*     smurf_fts2_portimbal(status);
 
 *  Arguments:
 *     status = int* (Given and Returned)
@@ -25,7 +25,7 @@
 *     form of a wet and dry Tau vs frequency table in the calibration database.
 
 *  Authors:
-*     COBA: Coskun (Josh) Oba, University of Lethbridge
+*     COBA: Coskun Oba (UoL)
 
 *  History :
 *     20-JUL-2010 (COBA):
@@ -82,13 +82,11 @@
 #include "sc2da/sc2store.h"
 
 #define FUNC_NAME "smurf_fts2_portimbal"
-#define TASK_NAME "FTS2_PORTIMBAL"
+#define TASK_NAME "FTS2PORTIMBAL"
 
-void smurf_fts2_portimbal(int *status) 
+void smurf_fts2_portimbal(int* status)
 {
-  // Requirement SUN/104: Do nothing if status is NOT SAI__OK
-  if( *status != SAI__OK ) return;
+  printf("FTS2PORTIMBAL...: NOT IMPLEMENTED YET!\n");
 
-  // TODO 
-  // Place Holder
+  if( *status != SAI__OK ) return;
 }

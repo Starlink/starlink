@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     smurf_fts2_eqsliced.c
+*     FTS2EQSLICED
 
 *  Purpose:
 *     Interpolates the input source cube at evenly spaced mirror positions.
@@ -83,7 +83,7 @@
 #include "libsc2fts/fts2.h"
 
 #define FUNC_NAME "smurf_fts2_eqsliced"
-#define TASK_NAME "FTS2_EQSLICED"
+#define TASK_NAME "FTS2EQSLICED"
 
 void smurf_fts2_eqsliced(int* status)
 {
@@ -135,12 +135,11 @@ void smurf_fts2_eqsliced(int* status)
       errRep(FUNC_NAME, "Unable to open source file!", status);
       break;
     }
-    srcCube = srcData->pntr[0];
-
-    srcWidth    = srcData->dims[0];
-    srcHeight   = srcData->dims[1];
-    srcN        = srcData->dims[2];
-    pixelCount  = srcWidth * srcHeight;
+    srcCube    = srcData->pntr[0];
+    srcWidth   = srcData->dims[0];
+    srcHeight  = srcData->dims[1];
+    srcN       = srcData->dims[2];
+    pixelCount = srcWidth * srcHeight;
 
     /* MIRROR POSITIONS */
     hdsLoc = smf_get_xloc(srcData, "JCMTSTATE", "EXT", "UPDATE", 0, 0, status);

@@ -275,18 +275,24 @@ void smurf_mon( int * status ) {
     smurf_fixsteps( status );
   } else if (strcmp( taskname, "FLATFIELD" ) == 0 ) {
     smurf_flatfield( status );
-  } else if (strcmp( taskname, "FTS2_DEGLITCH" ) == 0 ) {
+  } else if (strcmp( taskname, "FTS2DEGLITCH" ) == 0 ) {
     smurf_fts2_deglitch( status );
-  } else if (strcmp( taskname, "FTS2_EQSLICED" ) == 0 ) {
+  } else if (strcmp( taskname, "FTS2EQSLICED" ) == 0 ) {
     smurf_fts2_eqsliced( status );
-  } else if (strcmp( taskname, "FTS2_FREQCORR" ) == 0 ) {
+  } else if (strcmp( taskname, "FTS2FLATFIELD" ) == 0 ) {
+    smurf_fts2_flatfield( status );
+  } else if (strcmp( taskname, "FTS2FREQCORR" ) == 0 ) {
     smurf_fts2_freqcorr( status );
-  } else if (strcmp( taskname, "FTS2_PHASECORR" ) == 0 ) {
-    smurf_fts2_phasecorr( status );
-  } else if (strcmp( taskname, "FTS2_REMOVEBSE" ) == 0 ) {
-    smurf_fts2_removebse( status );
-  } else if (strcmp( taskname, "FTS2_SPATIALWCS" ) == 0 ) {
+  } else if (strcmp( taskname, "FTS2OPCORR" ) == 0 ) {
     smurf_fts2_spatialwcs( status );
+  } else if (strcmp( taskname, "FTS2PHASECORR" ) == 0 ) {
+    smurf_fts2_phasecorr( status );
+  } else if (strcmp( taskname, "FTS2PORTIMBAL" ) == 0 ) {
+    smurf_fts2_portimbal( status );
+  } else if (strcmp( taskname, "FTS2REMOVEBSE" ) == 0 ) {
+    smurf_fts2_removebse( status );
+  } else if (strcmp( taskname, "FTS2TRANSCORR" ) == 0 ) {
+    smurf_fts2_transcorr( status );
   } else if (strcmp( taskname, "GSD2ACSIS" ) == 0 ) {
     smurf_gsd2acsis( status );
   } else if (strcmp( taskname, "GSDSHOW" ) == 0 ) {
