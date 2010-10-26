@@ -134,6 +134,9 @@
 *     12-OCT-2010 (DSB):
 *        Change docs to use correct parameter name SCALEDTYPE, rather
 *        than SCALETYPE.
+*     26-OCT-2010 (DSB):
+*        If integer trunction would result in a scale factor of zero being used, 
+*        use unity instead.   
 *     {enter_further_changes_here}
 
 *-
@@ -305,6 +308,7 @@
 
                ELSE IF( TYPE .EQ. '_REAL' ) THEN
                   SCALE = REAL( SCALE )
+                  IF( SCALE .EQ. 0.0 ) SCALE = 1.0
                   ZERO = REAL( ZERO )
                   CALL MSG_SETR( 'S', REAL( SCALE ) )
                   CALL MSG_SETR( 'Z', REAL( ZERO ) )
@@ -312,6 +316,7 @@
                ELSE
                   SCALE = NINT( SCALE )
                   ZERO = NINT( ZERO )
+                  IF( SCALE .EQ. 0 ) SCALE = 1
                   CALL MSG_SETI( 'S', NINT( SCALE ) )
                   CALL MSG_SETI( 'Z', NINT( ZERO ) )
 
