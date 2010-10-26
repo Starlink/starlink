@@ -455,8 +455,9 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 
   /* Now we need to create some structures */
   if (flags & SMF__NOCREATE_HEAD) createflags |= SMF__NOCREATE_HEAD;
-  if (flags & SMF__NOCREATE_DA) createflags |= SMF__NOCREATE_DA;
-  if (flags & SMF__NOCREATE_FTS) createflags |= SMF__NOCREATE_FTS;
+  if (flags & SMF__NOCREATE_FILE) createflags |= SMF__NOCREATE_FILE;
+  if (flags & SMF__NOCREATE_DA)   createflags |= SMF__NOCREATE_DA;
+  if (flags & SMF__NOCREATE_FTS)  createflags |= SMF__NOCREATE_FTS;
 
   /* Allocate memory for the smfData */
   *data = smf_create_smfData( createflags, status );
@@ -516,6 +517,166 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
                  "File has no SCU2RED extension: no DA-processed data present",
                  status);
       }
+    }
+
+    // READ IN FTS2 DATA IF EXISTS
+    if(!(flags & SMF__NOCREATE_FTS)) {
+      int dimsFTS[NDF__MXDIM];
+      int ftsExists = 0;
+      int ndimsFTS;
+      int ndfFTS;
+      int nmapFTS;
+      int placeFTS;
+      HDSLoc* ftsLoc = NULL;
+      void* dpntr[] = {NULL, NULL};
+
+      ndfXstat(indf, "FTS2", &ftsExists, status);
+      if(*status == SAI__OK && ftsExists) {
+        // GET FTS2DR LOCATION
+        ndfXloc(indf, "FTS2", mode, &ftsLoc, status);
+        if(*status == SAI__OK && ftsLoc != NULL) {
+          fts = (*data)->fts;
+          // READ IN SMFFTS->FPM
+          ndfOpen(ftsLoc, "FPM", mode, "UNKNOWN", &ndfFTS, &placeFTS, status);
+          if(*status == SAI__OK && ndfFTS != NDF__NOID) {
+            ndfDim(ndfFTS, NDF__MXDIM, dimsFTS, &ndimsFTS, status);
+            if(*status == SAI__OK) {
+              if(ndimsFTS == 3) {
+                ndfMap( ndfFTS, "DATA", "_DOUBLE", mode, &dpntr[0], &nmapFTS,
+                        status);
+                if(*status == SAI__OK) {
+                  fts->fpm = smf_create_smfData( SMF__NOCREATE_HEAD |
+                                                 SMF__NOCREATE_FILE |
+                                                 SMF__NOCREATE_DA |
+                                                 SMF__NOCREATE_FTS,
+                                                 status);
+                  if(*status == SAI__OK) {
+                    fts->fpm->dtype   = SMF__DOUBLE;
+                    fts->fpm->ndims   = ndimsFTS;
+                    fts->fpm->dims[0] = dimsFTS[0];
+                    fts->fpm->dims[1] = dimsFTS[1];
+                    fts->fpm->dims[2] = dimsFTS[2];
+                    fts->fpm->lbnd[0] = 0;
+                    fts->fpm->lbnd[1] = 0;
+                    fts->fpm->lbnd[2] = 1;
+
+                    // MAKE A DEEP COPY
+                    int index, count;
+                    count = dimsFTS[0] * dimsFTS[1] * dimsFTS[2];
+                    fts->fpm->pntr[0] = astCalloc(count, sizeof(double), 0);
+                    for(index = 0; index < count; index++) {
+                      *((double*) (fts->fpm->pntr[0]) + index) = *((double*) (dpntr[0]) + index);
+                    }
+                  } else {
+                    *status = SAI__ERROR;
+                    errRep( "",
+                             FUNC_NAME
+                             ": Unable to create FPM!",
+                             status);
+                  }
+                } else {
+                  *status = SAI__ERROR;
+                  errRep( "",
+                          FUNC_NAME
+                          ": Unable to map FPM!",
+                          status);
+                }
+              } else {
+                *status = SAI__ERROR;
+                errRepf( "",
+                         FUNC_NAME
+                         ": FPM has %i dimensions, should be 3!",
+                         status, ndimsFTS);
+              }
+            } else {
+              *status = SAI__ERROR;
+              errRep( "",
+                      FUNC_NAME
+                      ": Unable to obtain FPM dimensions!",
+                      status);
+            }
+          } else {
+            *status = SAI__ERROR;
+            errRep( "",
+                    FUNC_NAME
+                    ": Unable to obtain an NDF identifier for FPM!",
+                    status);
+          }
+
+          // READ IN SMFFTS->SIGMA
+          ndfOpen(ftsLoc, "SIGMA", mode, "UNKNOWN", &ndfFTS, &placeFTS, status);
+          if(*status == SAI__OK && ndfFTS != NDF__NOID) {
+            ndfDim(ndfFTS, NDF__MXDIM, dimsFTS, &ndimsFTS, status);
+            if(*status == SAI__OK) {
+              if(ndimsFTS == 2) {
+                ndfMap( ndfFTS, "DATA", "_DOUBLE", mode, &dpntr[0], &nmapFTS,
+                        status);
+                if(*status == SAI__OK) {
+                  fts->sigma = smf_create_smfData( SMF__NOCREATE_HEAD |
+                                                   SMF__NOCREATE_FILE |
+                                                   SMF__NOCREATE_DA |
+                                                   SMF__NOCREATE_FTS,
+                                                   status);
+                  if(*status == SAI__OK) {
+                    fts->sigma->dtype   = SMF__DOUBLE;
+                    fts->sigma->ndims   = ndimsFTS;
+                    fts->sigma->dims[0] = dimsFTS[0];
+                    fts->sigma->dims[1] = dimsFTS[1];
+                    fts->sigma->lbnd[0] = 0;
+                    fts->sigma->lbnd[1] = 0;
+
+                    // MAKE A DEEP COPY
+                    int index, count;
+                    count = dimsFTS[0] * dimsFTS[1];
+                    fts->sigma->pntr[0] = astCalloc(count, sizeof(double), 0);
+                    for(index = 0; index < count; index++) {
+                      *((double*) (fts->sigma->pntr[0]) + index) = *((double*) (dpntr[0]) + index);
+                    }
+                  } else {
+                    *status = SAI__ERROR;
+                    errRep( "",
+                             FUNC_NAME
+                             ": Unable to create SIGMA!",
+                             status);
+                  }
+                } else {
+                  *status = SAI__ERROR;
+                  errRep( "",
+                          FUNC_NAME
+                          ": Unable to map SIGMA!",
+                          status);
+                }
+              } else {
+                *status = SAI__ERROR;
+                errRepf( "",
+                         FUNC_NAME
+                         ": SIGMA has %i dimensions, should be 2!",
+                         status, ndimsFTS);
+              }
+            } else {
+              *status = SAI__ERROR;
+              errRep( "",
+                      FUNC_NAME
+                      ": Unable to obtain SIGMA dimensions!",
+                      status);
+            }
+          } else {
+            *status = SAI__ERROR;
+            errRep( "",
+                    FUNC_NAME
+                    ": Unable to obtain an NDF identifier for SIGMA!",
+                    status);
+          }
+
+          if(ftsLoc) { datAnnul(&ftsLoc, status); }
+        } else {
+          (*data)->fts = NULL;
+        }
+      } else {
+        (*data)->fts = NULL;
+      }
+    } else {
+      (*data)->fts = NULL;
     }
 
     if (isFlat) {
@@ -639,133 +800,6 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
             dkfile->ndfid = dkndf;
             dkfile->isSc2store = 0;
             dkfile->isTstream = 1;
-          }
-        }
-      }
-
-      // MAP FTS2 DATA
-      fts = (*data)->fts;
-      if(fts) {
-        if(flags & SMF__NOCREATE_FTS) {
-          fts = astFree(fts);
-        } else {
-          int nmap;
-          int ndfFTS;
-          int placeFTS;
-          int dimsFTS[NDF__MXDIM];
-          int ndimsFTS;
-          HDSLoc* ftsLoc = NULL;
-          void* dpntr[] = {NULL, NULL};
-
-          itexists = 0;
-          ndfXstat(indf, "FTS2", &itexists, status);
-          if(*status == SAI__OK && itexists) {
-            // GET FTS2DR LOCATION
-            ndfXloc(indf, "FTS2", mode, &ftsLoc, status);
-            if(*status == SAI__OK && ftsLoc != NULL) {
-              // READ IN SMFFTS->FPM
-              ndfOpen( ftsLoc, "FPM", mode, "UNKNOWN", &ndfFTS, &placeFTS,
-                       status);
-              if(*status == SAI__OK && ndfFTS != NDF__NOID) {
-                ndfDim(ndfFTS, NDF__MXDIM, dimsFTS, &ndimsFTS, status);
-                if(*status == SAI__OK) {
-                  if(ndimsFTS == 3) {
-                    ndfMap( ndfFTS, "DATA", "_DOUBLE", mode, &dpntr[0], &nmap,
-                            status);
-                    if(*status == SAI__OK) {
-                      fts->fpm = smf_create_smfData( SMF__NOCREATE_HEAD |
-                                                     SMF__NOCREATE_DA |
-                                                     SMF__NOCREATE_FTS,
-                                                     status);
-                      if(*status == SAI__OK) {
-                        fts->fpm->pntr[0] = dpntr[0];
-                        fts->fpm->dtype   = SMF__DOUBLE;
-                        fts->fpm->ndims   = ndimsFTS;
-                        fts->fpm->dims[0] = dimsFTS[0];
-                        fts->fpm->dims[1] = dimsFTS[1];
-                        fts->fpm->dims[2] = dimsFTS[2];
-                        fts->fpm->lbnd[0] = 0;
-                        fts->fpm->lbnd[1] = 0;
-                        fts->fpm->lbnd[2] = 1;
-                      }
-                    }
-                  } else {
-                    *status = SAI__ERROR;
-                    errRepf( "",
-                             FUNC_NAME
-                             ": FPM has %i dimensions, should be 3!",
-                             status, ndimsFTS);
-                  }
-                } else {
-                  *status = SAI__ERROR;
-                  errRep( "",
-                          FUNC_NAME
-                          ": Unable to obtain FPM dimensions!",
-                          status);
-                }
-              } else {
-                *status = SAI__ERROR;
-                errRep( "",
-                        FUNC_NAME
-                        ": Unable to obtain an NDF identifier for FPM!",
-                        status);
-              }
-
-              // READ IN SMFFTS->SIGMA
-              ndfOpen( ftsLoc, "SIGMA", mode, "UNKNOWN", &ndfFTS, &placeFTS,
-                       status);
-              if(*status == SAI__OK && ndfFTS != NDF__NOID) {
-                ndfDim(ndfFTS, NDF__MXDIM, dimsFTS, &ndimsFTS, status);
-                if(*status == SAI__OK) {
-                  if(ndimsFTS == 2) {
-                    ndfMap( ndfFTS, "DATA", "_DOUBLE", mode, &dpntr[0], &nmap,
-                            status);
-                    if(*status == SAI__OK) {
-                      fts->sigma = smf_create_smfData( SMF__NOCREATE_HEAD |
-                                                       SMF__NOCREATE_DA |
-                                                       SMF__NOCREATE_FTS,
-                                                       status);
-                      if(*status == SAI__OK) {
-                        fts->sigma->pntr[0] = dpntr[0];
-                        fts->sigma->dtype   = SMF__DOUBLE;
-                        fts->sigma->ndims   = ndimsFTS;
-                        fts->sigma->dims[0] = dimsFTS[0];
-                        fts->sigma->dims[1] = dimsFTS[1];
-                        fts->sigma->lbnd[0] = 0;
-                        fts->sigma->lbnd[1] = 0;
-                      }
-                    }
-                  } else {
-                    *status = SAI__ERROR;
-                    errRepf( "",
-                             FUNC_NAME
-                             ": SIGMA has %i dimensions, should be 2!",
-                             status, ndimsFTS);
-                  }
-                } else {
-                  *status = SAI__ERROR;
-                  errRep( "",
-                          FUNC_NAME
-                          ": Unable to obtain SIGMA dimensions!",
-                          status);
-                }
-              } else {
-                *status = SAI__ERROR;
-                errRep( "",
-                        FUNC_NAME
-                        ": Unable to obtain an NDF identifier for SIGMA!",
-                        status);
-              }
-
-              // FREE FTSLOC
-              if(ftsLoc) { datAnnul(&ftsLoc, status); }
-            } else {
-              *status = SAI__ERROR;
-              errRep( "",
-                      FUNC_NAME
-                      ": Unable to obtain an HDS locator to FTS2DR extension!",
-                      status);
-            }
           }
         }
       }
