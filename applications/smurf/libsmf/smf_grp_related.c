@@ -27,8 +27,9 @@
  *     grpbywave = const int (Given)
  *        Flag to denote whether to group files by common wavelength
  *     maxlen = dim_t (Given)
- *        If set, maximum length of a continuous chunk in time samples. If 0
- *        don't enforce a maximum length.
+ *        If set, maximum length of a continuous chunk in time samples
+ *        (prior to applying the downsampling factor). If 0 don't enforce a
+ *        maximum length.
  *     keymap = AstKeyMap * (Given)
  *        A pointer to a KeyMap holding the configuration parameters. Only
  *        needed if "pad" is not NULL.
@@ -132,6 +133,8 @@
  *        Added pad and keymap to interface.
  *     2010-10-25 (EC):
  *        Move down-sampling length calc here from smf_concat_smfGroup
+ *     2010-10-26 (EC):
+ *        Account for down-sampling in maxlen
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -215,6 +218,7 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
   double *lambda = NULL;      /* Wavelength - only used if grpbywave is true */
   int matchsubsys;            /* Flag for matched subarrays */
   dim_t maxconcat=0;          /* Longest continuous chunk length */
+  dim_t maxlends=0;           /* Maxlen after applying downsampling factor */
   dim_t maxflen=0;            /* Max file length in time steps */
   dim_t maxnelem=0;           /* Max elem (subarrays) encountered */
   dim_t maxpad=0;             /* Maximum padding neeed for any input file */
@@ -424,6 +428,9 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
       smf_get_dims( data, NULL, NULL, NULL, &thistlen, NULL, NULL, NULL,
                     status );
 
+      /* Assume there is no downsampling to beging with */
+      maxlends = maxlen;
+
       /* Find length of down-sampled data */
       if( downsampscale && data->hdr && (*status==SAI__OK) ) {
         double oldscale = (data->hdr->steptime * data->hdr->scanvel);
@@ -437,6 +444,9 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
                      (scalelen/data->hdr->steptime) );
 
           thistlen = round(thistlen * scalelen);
+
+          /* update maxlends */
+          maxlends = round(maxlen * scalelen);
         }
       }
 
@@ -444,13 +454,13 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
       all_tlen[i] = thistlen;
 
       /* Check that an individual file is too long */
-      if( maxlen && (thistlen > maxlen) ) {
+      if( maxlends && (thistlen > maxlends) ) {
         *status = SAI__ERROR;
         msgSeti("THISTLEN",thistlen);
-        msgSeti("MAXLEN",maxlen);
+        msgSeti("MAXLENDS",maxlends);
         errRep(FUNC_NAME,
-               "Length of file time steps exceeds maximum (^THISTLEN>^MAXLEN)",
-               status);
+               "Length of file time steps exceeds maximum "
+               "(^THISTLEN>^MAXLENDS)", status);
       }
 
       /* Add length to running total */
@@ -515,11 +525,11 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
 
         /* check against writetime from the last file to see if we're on the
            same chunk. Also check that the subsystems match, and that the
-           continuous chunk doesn't exceed maxlen */
+           continuous chunk doesn't exceed maxlends */
 
         if( !( !strncmp(refobsidss, hdr->obsidss, sizeof(refobsidss)) &&
                (seqcount==refseqcount) && ((nsubscan-refnsubscan)==1) ) ||
-            !matchsubsys || (maxlen && (totlen > maxlen)) ) {
+            !matchsubsys || (maxlends && (totlen > maxlends)) ) {
 
           /* Found a discontinuity */
           thischunk++;
