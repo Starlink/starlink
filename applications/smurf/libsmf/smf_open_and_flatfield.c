@@ -280,6 +280,7 @@ int smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
     smf_apply_dark( data, darks, status );
 
     /* Flatfield the data */
+    flags |= SMF__NOCREATE_FTS;
     smf_flatfield( data, flatramps, ffdata, flags, status );
 
     if (*status == SAI__OK) retval = 1;
