@@ -123,7 +123,7 @@
 *        Size in pixels of the fitting area to be used.  If only a
 *        single value is given, then it will be duplicated to all
 *        dimensions so that a square region is fitted.  Each value must
-*        be greater than 9.  A null value requests that the full data
+*        be at least 9.  A null value requests that the full data
 *        array is used.  [!]
 *     FIXBACK = _DOUBLE (Read)
 *        If a non-null value is supplied then the model fit will use
