@@ -673,6 +673,12 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       if( tempstr ) {
         fakemap = astCalloc( 255, 1, 1 );
         one_strlcpy( fakemap, tempstr, 255, status );
+
+        if( !memiter ) {
+          *status = SAI__ERROR;
+          errRep( "", FUNC_NAME ": fakemap not supported if memiter=0!",
+                  status );
+        }
       }
 
     }
@@ -869,6 +875,11 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
 
 
+
+
+
+
+
   /* ***************************************************************************
      Figure out how the data are split up, both in terms of continuous
      pieces of data in time, and in terms of the number of subarrays. Divide
@@ -1044,6 +1055,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
 
 
+
+
   /* ***************************************************************************
      Start the main outer loop over continuous chunks, or "contchunks".
 
@@ -1137,8 +1150,28 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       lastchisquared = astCalloc( nfilegroups, sizeof(*chisquared), 1 );
     }
 
-    /* Create containers for time-series model components */
+    /* Create containers for time-series model components******************* */
+
     msgOutif(MSG__VERB," ", FUNC_NAME ": Create model containers", status);
+
+
+    /* Allocate pointers to dynamically created models */
+    if( igroup && (nmodels > 0) && (*status == SAI__OK) ) {
+
+      /* nmodel array of pointers to nfilegroups smfArray pointers */
+      model = astCalloc( nmodels, sizeof(*model), 1 );
+
+      if( memiter != 1 ) {
+        /* Array of smfgroups (one for each dynamic model component) */
+        modelgroups = astCalloc( nmodels, sizeof(*modelgroups), 1 );
+      }
+
+      for( i=0; i<nmodels; i++ ) {
+        model[i] = astCalloc( nfilegroups, sizeof(**model), 1 );
+      }
+
+    }
+
 
     /* Components that always get made */
     if( igroup && (*status == SAI__OK) ) {
@@ -1170,6 +1203,87 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           res[0]->sdata[idx]->sidequal = thisqua;
         }
 
+
+        /* Since a copy of the LUT is open in res[0], use it to initialize
+           the LUT model and then free it */
+
+        smf_model_create( wf, NULL, res, darks, bbms, flatramps, NULL,
+                          nfilegroups, SMF__LUT, 0, NULL, 0, NULL, NULL,
+                          NULL, memiter, memiter, lut, keymap, status );
+
+        for( i=0; (*status==SAI__OK)&&(i<res[0]->ndat); i++ ) {
+          if( res[0]->sdata[i] ) {
+            smf_close_mapcoord( res[0]->sdata[i], status );
+          }
+        }
+
+        /* Even though EXT would normally be handled in the dynamic memory
+           allocation, do it here explicitly so that we can add the fakemap
+           signal to RES before cleaning */
+
+        if( haveext ) {
+          smf_model_create( wf, NULL, res, darks, bbms, flatramps, noisemaps,
+                            nfilegroups, modeltyps[whichext], 0, NULL, 0, NULL,
+                            NULL, NULL, memiter, memiter, model[whichext],
+                            keymap, status);
+        }
+
+        /*** TIMER ***/
+        msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+                   ": ** %f s creating first set of static models",
+                   status, smf_timerupdate(&tv1,&tv2,status) );
+
+        /* We now have RES, LUT, and EXT loaded into memory. Add fake
+           astronomical signal to RES at this stage if requested */
+
+        if( fakemap && fmapdata && (*status==SAI__OK) ) {
+          double *fmap=NULL;
+          double *resptr=NULL;
+          int *lutptr=NULL;
+          double *extptr=NULL;
+
+          /* Add in the signal from the map */
+          msgOutf( "", FUNC_NAME ": adding signal from external map %s to "
+                   "time series", status, fakemap );
+
+          fmap = fmapdata->pntr[0];
+
+          for( idx=0; idx<res[0]->ndat; idx++ ) {
+            smf_get_dims( res[0]->sdata[idx], NULL, NULL, NULL, NULL, &dsize,
+                          NULL, NULL, status );
+
+            resptr = res[0]->sdata[idx]->pntr[0];
+            lutptr = lut[0]->sdata[idx]->pntr[0];
+
+            if( haveext ) {
+              /* Version in which we are applying extinction correction */
+
+              extptr = model[whichext][0]->sdata[idx]->pntr[0];
+
+              for( k=0; k<dsize; k++ ) {
+                if( (resptr[k] != VAL__BADD) && (lutptr[k] != VAL__BADI) &&
+                    (extptr[k] > 0) ) {
+                  resptr[k] += fmap[lutptr[k]] / extptr[k];
+                }
+              }
+            } else {
+              /* No extinction correction */
+
+              for( k=0; k<dsize; k++ ) {
+                if( (resptr[k] != VAL__BADD) && (lutptr[k] != VAL__BADI) ) {
+                  resptr[k] += fmap[lutptr[k]];
+                }
+              }
+            }
+          }
+        }
+
+        /*** TIMER ***/
+        msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+                   ": ** %f s adding fakemap signal to residual",
+                   status, smf_timerupdate(&tv1,&tv2,status) );
+
+        /* Do data cleaning */
         if( doclean ) {
           smf_clean_smfArray( wf, res[0], &noisemaps, keymap, status );
         } else {
@@ -1184,18 +1298,6 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                    status, smf_timerupdate(&tv1,&tv2,status) );
 
         /* Continue with other static model. */
-
-        smf_model_create( wf, NULL, res, darks, bbms, flatramps, NULL,
-                          nfilegroups, SMF__LUT, 0, NULL, 0, NULL, NULL,
-                          NULL, memiter, memiter, lut, keymap, status );
-
-        /* Since a copy of the LUT is still open in res[0] free it up here */
-        for( i=0; (*status==SAI__OK)&&(i<res[0]->ndat); i++ ) {
-          if( res[0]->sdata[i] ) {
-            smf_close_mapcoord( res[0]->sdata[i], status );
-          }
-        }
-
         smf_model_create( wf, NULL, res, darks, bbms, flatramps, NULL,
                           nfilegroups, SMF__AST, 0, NULL, 0, NULL, NULL,
                           NULL, memiter, memiter, ast, keymap, status );
@@ -1205,6 +1307,11 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           smfData *thisqua = qua[0]->sdata[idx];
           ast[0]->sdata[idx]->sidequal = thisqua;
         }
+
+        /*** TIMER ***/
+        msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+                   ": ** %f s creating last set of static models",
+                   status, smf_timerupdate(&tv1,&tv2,status) );
 
       } else {
 
@@ -1232,6 +1339,11 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, NULL, 0,
                           SMF__QUA, 0, NULL, 0, NULL, NULL,
                           &quagroup, memiter, memiter, qua, keymap, status );
+
+        /*** TIMER ***/
+        msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+                   ": ** %f s creating static models",
+                   status, smf_timerupdate(&tv1,&tv2,status) );
       }
     }
 
@@ -1244,28 +1356,18 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       }
     }
 
-    /*** TIMER ***/
-    msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ": ** %f s creating static models",
-               status, smf_timerupdate(&tv1,&tv2,status) );
-
     /* Dynamic components */
     if( igroup && (nmodels > 0) && (*status == SAI__OK) ) {
 
-      /* nmodel array of pointers to nfilegroups smfArray pointers */
-      model = astCalloc( nmodels, sizeof(*model), 1 );
-
-      if( memiter != 1 ) {
-        /* Array of smfgroups (one for each dynamic model component) */
-        modelgroups = astCalloc( nmodels, sizeof(*modelgroups), 1 );
-      }
-
       for( i=0; i<nmodels; i++ ) {
-        model[i] = astCalloc( nfilegroups, sizeof(**model), 1 );
 
         if( memiter ) {
-          smf_model_create( wf, NULL, res, darks, bbms, flatramps, noisemaps,
-                            nfilegroups, modeltyps[i], 0, NULL, 0, NULL, NULL,
-                            NULL, memiter, memiter, model[i], keymap, status );
+          /* Don't do SMF__LUT as it was handled earlier */
+          if( modeltyps[i] != SMF__LUT ) {
+            smf_model_create( wf, NULL, res, darks, bbms, flatramps, noisemaps,
+                              nfilegroups, modeltyps[i], 0, NULL, 0, NULL, NULL,
+                              NULL, memiter, memiter, model[i], keymap, status);
+          }
 
           /* Associate quality with some models */
           if( modeltyps[i] == SMF__FLT ) {
@@ -1341,76 +1443,6 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
 
 
-      /* ***********************************************************************
-         Add fake astronomical signal into the time-series
-
-         If we are adding signal into the time series, do it here because
-         we have the data concatenated, and the extinction correction has
-         been calculated (if EXT model specified). Only works in memiter=1
-         case at the moment.
-      *********************************************************************** */
-
-      if( fakemap && fmapdata && (*status==SAI__OK) ) {
-        double *fmap=NULL;
-        double *resptr=NULL;
-        int *lutptr=NULL;
-        double *extptr=NULL;
-
-        /* Currently only support memiter=1 case to avoid having to do
-           a separate filegroup loop. */
-        if( !memiter ) {
-          *status = SAI__ERROR;
-          errRep( "", FUNC_NAME
-                  ": Don't support fakemap if memiter==0!", status );
-        } else {
-
-          /* Add in the signal from the map */
-          msgOutf( "", FUNC_NAME ": adding signal from external map %s to "
-                   "time series", status, fakemap );
-
-          fmap = fmapdata->pntr[0];
-
-          for( idx=0; idx<res[0]->ndat; idx++ ) {
-            smf_get_dims( res[0]->sdata[idx], NULL, NULL, NULL, NULL, &dsize,
-                          NULL, NULL, status );
-
-            resptr = res[0]->sdata[idx]->pntr[0];
-            lutptr = lut[0]->sdata[idx]->pntr[0];
-            extptr = (dat.ext)[0]->sdata[idx]->pntr[0];
-
-            if( extptr ) {
-              /* Version in which we are applying extinction correction */
-
-              for( k=0; k<dsize; k++ ) {
-                if( (resptr[k] != VAL__BADD) && (lutptr[k] != VAL__BADI) &&
-                    (extptr[k] > 0) ) {
-                  resptr[k] += fmap[lutptr[k]] / extptr[k];
-                }
-              }
-            } else {
-              /* No extinction correction */
-
-              for( k=0; k<dsize; k++ ) {
-                if( (resptr[k] != VAL__BADD) && (lutptr[k] != VAL__BADI) ) {
-                  resptr[k] += fmap[lutptr[k]];
-                }
-              }
-            }
-          }
-        }
-      }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1446,6 +1478,19 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         } else {
           converged = 0;
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
