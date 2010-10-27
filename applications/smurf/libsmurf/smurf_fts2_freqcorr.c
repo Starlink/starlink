@@ -88,120 +88,152 @@
 
 void smurf_fts2_freqcorr(int* status)
 {
-  printf("FTS2FREQCORR...: NOT IMPLEMENTED YET!\n");
-
   if( *status != SAI__OK ) { return; }
 
-/*
-  int fIndex      = 0;
-  int i           = 0;
-  int index       = 0;
-  int j           = 0;
-  int k           = 0;
-  int pixelCount  = 0;
-  int pixelIndex  = 0;
-  int srcWidth    = 0;
-  int srcHeight   = 0;
-  int srcN        = 0;
-  int thetaHeight = 0;
-  int thetaWidth  = 0;
-  double* ifg     = NULL;
-  double* ifgNew  = NULL;
-  double* src     = NULL;
-  double* theta   = NULL;
-  double* wn      = NULL;
-  double* wnNew   = NULL;
-  Grp* igrp       = NULL;
-  Grp* ogrp       = NULL;
-  Grp* thetagrp   = NULL;
-  size_t size     = 0;
-  size_t outsize  = 0;
+  int fIndex         = 0; /* File loop counter */
+  int i              = 0; /*Loop counter */
+  int index          = 0; /* Index */
+  int j              = 0; /*Loop counter */
+  int k              = 0; /*Loop counter */
+  int pixelCount     = 0; /* Number of bolometers */
+  int pixelIndex     = 0; /* Bolometer index */
+  int srcHeight      = 0; /* Height of the source subarray */
+  int srcN           = 0; /* Sample count */
+  int srcWidth       = 0; /* Width of the source subarray */
+  int thetaHeight    = 0; /* Height of the theta */
+  int thetaWidth     = 0;  /* Width of the theta */
+  double* specIm     = NULL; /* Spectrum (imaginary component) */
+  double* specImNew  = NULL; /* New spectrum (imaginary component) */
+  double* specRe     = NULL; /* Spectrum (real component) */
+  double* specReNew  = NULL; /* New spectrum (real component) */
+  double* wn         = NULL; /* Wavenumbers */
+  double* wnNew      = NULL; /* New wave numbers */
+  Grp* igrp          = NULL; /* Input group */
+  Grp* ogrp          = NULL; /* Output group */
+  Grp* thetagrp      = NULL; /* Theta group */
+  size_t outSize     = 0;    /* Output group size */
+  size_t inSize      = 0;    /* Input group size */
+  size_t thetaSize   = 0;    /* Theta group size */
+  smfData* srcData   = NULL; /* Pointer to source data */
+  smfData* thetaData = NULL; /* Pointer to theta data */
+  void* src4D        = NULL; /* Pointer to the input data (4D data array) */
+  void* theta2D      = NULL; /* Pointer to the THETA data */
 
-  // Get input group
-  kpg1Rgndf("IN", 0, 1, "", &igrp, &size, status);
-  // Get output group
-  kpg1Wgndf("OUT", ogrp, size, size, "Equal number of input and output files expected!", &ogrp, &outsize, status);
-  // Get THETA group
-  kpg1Gtgrp("THETA", &thetagrp, &size, status);
+  /* GET INPUT GROUP */
+  kpg1Rgndf("IN", 0, 1, "", &igrp, &inSize, status);
+  /* GET OUTPUT GROUP */
+  kpg1Wgndf( "OUT", ogrp, inSize, inSize,
+             "Equal number of input and output files expected!",
+             &ogrp, &outSize, status);
+  /* GET THETA GROUP */
+  kpg1Gtgrp("THETA", &thetagrp, &thetaSize, status);
 
   ndfBegin();
 
-  // OPEN THETA
-  smfData* thetaData;
-  smf_open_file(thetagrp, 1, "READ", SMF__NOCREATE_QUALITY, &thetaData, status);
-  if(*status != SAI__OK)
-  {
+  /* OPEN THETA */
+  smf_open_file( thetagrp, 1, "READ",
+                 SMF__NOCREATE_HEAD |
+                 SMF__NOCREATE_FILE |
+                 SMF__NOCREATE_DA |
+                 SMF__NOCREATE_FTS,
+                 &thetaData, status);
+  if(*status != SAI__OK) {
+    *status = SAI__ERROR;
     errRep(FUNC_NAME, "Unable to open the THETA file!", status);
-    return;
+    goto CLEANUP;
   }
-  theta = (double*) (thetaData->pntr[0]);
-  thetaWidth = thetaData->dims[0];
+  theta2D     = thetaData->pntr[0];
+  thetaWidth  = thetaData->dims[0];
   thetaHeight = thetaData->dims[1];
 
-  // PERFORM FREQUENCY CORRECTION FOR EACH SOURCE FILE
-  for(fIndex = 1; fIndex <= size; fIndex++)
-  {
-    // OPEN SOURCE
-    smfData* srcData;
-    smf_open_file(ogrp, fIndex, "UPDATE", SMF__NOCREATE_QUALITY, &srcData, status);
-    if(*status != SAI__OK)
-    {
+  /* LOOP THROUGH EACH NDF FILE IN THE GROUP */
+  for(fIndex = 1; fIndex <= inSize; fIndex++) {
+    smf_open_and_flatfield(igrp, ogrp, fIndex, NULL, NULL, &srcData, status);
+    if(*status != SAI__OK) {
+      *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unable to open source file!", status);
       break;
     }
-    src = (double*) (srcData->pntr[0]);
+    src4D      = srcData->pntr[0];
+    srcWidth   = srcData->dims[0];
+    srcHeight  = srcData->dims[1];
+    srcN       = srcData->dims[2];
+    pixelCount = srcWidth * srcHeight;
 
-    // VERIFY THAT THE SOURCE & THETA HAVE COMPATIBLE DIMENSIONS
-    srcWidth = srcData->dims[0];
-    srcHeight = srcData->dims[1];
-    if(srcWidth != thetaWidth || srcHeight != thetaHeight)
-    {
+    /* VERIFY THAT THE SOURCE & THETA HAVE COMPATIBLE DIMENSIONS */
+    if(srcWidth != thetaWidth || srcHeight != thetaHeight) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Incompatible Theta file!", status);
-      smf_close_file(&thetaData, status);
       smf_close_file(&srcData, status);
       break;
     }
 
-    // FREQUENCY CORRECTION
-    srcN = srcData->dims[2];
-    ifg    = (double*) astMalloc(srcN * sizeof(double));
-    ifgNew = (double*) astMalloc(srcN * sizeof(double));
-    wn     = (double*) astMalloc(srcN * sizeof(double));
-    wnNew  = (double*) astMalloc(srcN * sizeof(double));
-    pixelCount = srcWidth * srcHeight;
-    index, pixelIndex;
-    for(i = 0; i < srcHeight; i++)
-    {
-      for(j = 0; j < srcWidth; j++)
-      {
+    /* APPLY FREQUENCY CORRECTION */
+    specRe    = astMalloc(srcN * sizeof(*specRe));
+    specIm    = astMalloc(srcN * sizeof(*specIm));
+    specReNew = astMalloc(srcN * sizeof(*specReNew));
+    specImNew = astMalloc(srcN * sizeof(*specImNew));
+    wn        = astMalloc(srcN * sizeof(*wn));
+    wnNew     = astMalloc(srcN * sizeof(*wnNew));
+    for(i = 0; i < srcHeight; i++) {
+      for(j = 0; j < srcWidth; j++) {
         pixelIndex = i + j * srcHeight;
-        for(k = 0; k < srcN; k++)
-        {
-          index = pixelIndex + pixelCount * k;
-          ifg[k] = src[index];
-          wn[k] = k;
-          wnNew[k] = k * cos(theta[pixelIndex]);
-        }
-        // FREQUENCY SHIFT BY CUBIC SPLINE
-        fts2_naturalcubicsplineinterpolator(wn, ifg, srcN, wnNew, ifgNew, srcN);
 
-        for(k = 0; k < srcN; k++)
-        {
+        /* GET SPECTRUM & WAVENUMBERS */
+        for(k = 0; k < srcN; k++) {
           index = pixelIndex + pixelCount * k;
-          src[index] = ifgNew[k];
+
+          if(srcData->dtype == SMF__FLOAT) {
+            specRe[k] = *((float*)src4D + index);
+            specIm[k] = *((float*)src4D + index + 1);
+          } else {
+            specRe[k] = *((double*)src4D + index);
+            specIm[k] = *((double*)src4D + index + 1);
+          }
+
+          wn[k] = k;
+
+          /* NOTES:
+           * If the theta file contains the cosine values already,
+           * remove the cosine below and multiply k with the argument of cosine.
+           * i.e, wnNew[k] = k * (*((double*)theta2D + pixelIndex));
+           */
+          wnNew[k] = k * cos(*((double*)theta2D + pixelIndex));
+        }
+
+        /* FREQUENCY(REAL & IMAGINARY) SHIFT BY CUBIC SPLINE */
+        fts2_naturalcubicsplineinterpolator( wn, specRe, srcN,
+                                             wnNew, specReNew, srcN);
+        fts2_naturalcubicsplineinterpolator( wn, specIm, srcN,
+                                             wnNew, specImNew, srcN);
+
+        /* APPLY FREQUENCY CORRECTION */
+        for(k = 0; k < srcN; k++) {
+          index = pixelIndex + pixelCount * k;
+
+          if(srcData->dtype == SMF__FLOAT) {
+            *((float*)src4D + index) = (float) specReNew[k];
+            *((float*)src4D + index + 1) = (float) specImNew[k];
+          } else {
+            *((double*)src4D + index) = specReNew[k];
+            *((double*)src4D + index + 1) = specImNew[k];
+          }
         }
       }
     }
-    astFree(ifgNew);
-    astFree(ifg);
+    astFree(specRe);
+    astFree(specIm);
     astFree(wn);
+    astFree(specReNew);
+    astFree(specImNew);
     astFree(wnNew);
     smf_close_file(&srcData, status);
   }
-
   smf_close_file(&thetaData, status);
 
-  ndfEnd(status);
-  */
+  CLEANUP:
+    ndfEnd(status);
+    grpDelet(&igrp, status);
+    grpDelet(&ogrp, status);
+    grpDelet(&thetagrp, status);
 }
