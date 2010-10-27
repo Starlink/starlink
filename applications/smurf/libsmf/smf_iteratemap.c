@@ -442,6 +442,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int *exportNDF_which=NULL;    /* Which models in modelorder will be exported*/
   char *fakemap=NULL;           /* Name of external map with fake sources */
   int fakendf=NDF__NOID;        /* NDF id for fakemap */
+  double fakescale;             /* Scale factor for fakemap */
   smf_qual_t flagmap=0;         /* bit mask for flagmaps */
   double *fmapdata=NULL;        /* fakemap for adding external ast signal */
   int noexportsetbad=0;         /* Don't set bad values in exported models */
@@ -682,6 +683,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         }
       }
 
+      astMapGet0D( keymap, "FAKESCALE", &fakescale );
     }
 
     /* Obtain sample length from header of first file in igrp */
@@ -1245,8 +1247,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           double *extptr=NULL;
 
           /* Add in the signal from the map */
-          msgOutf( "", FUNC_NAME ": adding signal from external map %s to "
-                   "time series", status, fakemap );
+          msgOutf( "", FUNC_NAME ": adding signal from external map %s "
+                   "(* %lf) to time series", status, fakemap,
+                   fakescale );
 
           for( idx=0; idx<res[0]->ndat; idx++ ) {
             smf_get_dims( res[0]->sdata[idx], NULL, NULL, NULL, NULL, &dsize,
@@ -1264,7 +1267,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                 if( (resptr[k] != VAL__BADD) && (lutptr[k] != VAL__BADI) &&
                     (extptr[k] > 0) && (fmapdata[lutptr[k]] != VAL__BADD) &&
                     (resptr[k] != VAL__BADD) ) {
-                  resptr[k] += fmapdata[lutptr[k]] / extptr[k];
+                  resptr[k] += fakescale*fmapdata[lutptr[k]] / extptr[k];
                 }
               }
             } else {
@@ -1274,7 +1277,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                 if( (resptr[k] != VAL__BADD) && (lutptr[k] != VAL__BADI) &&
                     (fmapdata[lutptr[k]] != VAL__BADD) &&
                     (resptr[k] != VAL__BADD) ) {
-                  resptr[k] += fmapdata[lutptr[k]];
+                  resptr[k] += fakescale*fmapdata[lutptr[k]];
                 }
               }
             }

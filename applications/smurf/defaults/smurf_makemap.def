@@ -71,6 +71,7 @@ exportclean = 0
 
 # add fake astronomical signal to the time series?
 fakemap = <undef>
+fakescale = 1
 
 # smf_model_create
 

@@ -123,15 +123,23 @@ exportndf = 0
 
 # To test the response of the map-maker to different known
 # astronomical sources, an external "fakemap" can be specified to
-# provide an image of the sky that will produce additional astronomical
-# signal to the time series. At present, the dimensions of this map must
-# be identical to that of the real map. If the pixel ranges are not the
-# same makemap will hault. A typical procedure may involve: (i) produce
-# a map withe makemap; (ii) make a copy of the map, and then replace it
-# with an image of a known source; (iii) specify this new map for the
-# fakemap parameter below:
-
+# provide an image of the sky that will produce additional
+# astronomical signal to the time series. At present, the dimensions
+# of this map must be identical to that of the real map. If the pixel
+# ranges are not the same makemap will hault. A typical procedure may
+# involve: (i) produce a map withe makemap; (ii) produce an image with
+# simulated data with the same pixel dimensions; (iii) specify this
+# new map for the "fakemap" parameter below. Note that this is a
+# fully-parsed ndf identifier, so you can do things like:
+#
 # fakemap = fakesky.sdf
+# fakemap = fakesky[1:300,100:450]
+#
+# Additionally, you can specify a scalar scale factor, "fakescale", by
+# which each pixel in the fakemap will be multiplied before adding to
+# the data.
+#
+# fakescale = 23.5
 
 # ----------------------------------------------------------------------------
 # The following parameters control data-cleaning before iterations start
