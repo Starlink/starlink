@@ -2530,7 +2530,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   if( dat.zeromask ) dat.zeromask = astFree( dat.zeromask );
 
   if( fakemap ) fakemap = astFree( fakemap );
-  ndfAnnul( &fakendf, status );
+  if( fakendf != NDF__NOID ) ndfAnnul( &fakendf, status );
 
   /* Ensure that FFTW doesn't have any used memory kicking around */
   fftw_cleanup();
