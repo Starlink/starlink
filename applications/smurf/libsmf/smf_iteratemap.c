@@ -441,8 +441,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int exportNDF=0;              /* If set export DIMM files to NDF at end */
   int *exportNDF_which=NULL;    /* Which models in modelorder will be exported*/
   char *fakemap=NULL;           /* Name of external map with fake sources */
+  int fakendf=NDF__NOID;        /* NDF id for fakemap */
   smf_qual_t flagmap=0;         /* bit mask for flagmaps */
-  smfData *fmapdata=NULL;       /* fakemap for adding external ast signal */
+  double *fmapdata=NULL;        /* fakemap for adding external ast signal */
   int noexportsetbad=0;         /* Don't set bad values in exported models */
   int haveast=0;                /* Set if AST is one of the models */
   int haveext=0;                /* Set if EXT is one of the models */
@@ -1007,37 +1008,39 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   /* Load in the fakemap */
   if( fakemap && (*status==SAI__OK) ) {
     Grp *fname=NULL;
+    int nfdims;
+    int fdims[NDF__MXDIM];
+    int nmap;
+    void *ptr;
 
     msgOutf( "", FUNC_NAME ": loading external fakemap `%s'", status, fakemap );
 
     fname = grpNew( "fakemapfilename", status );
     grpPut1( fname, fakemap, 0, status );
 
-    smf_open_file( fname, 1, "READ", SMF__NOCREATE_HEAD |
-                   SMF__NOCREATE_FTS | SMF__NOFIX_METADATA |
-                   SMF__NOTTSERIES, &fmapdata, status );
+    ndgNdfas( fname, 1, "READ", &fakendf, status );
+    ndfDim( fakendf, NDF__MXDIM, fdims, &nfdims, status );
 
-    /* Ensure that the map dimensions and data type are correct */
-    if( (*status==SAI__OK) && fmapdata ) {
-      if( !((fmapdata->ndims == 2) ||
-            ((fmapdata->ndims == 3) && (fmapdata->dims[2] == 1))) ) {
+    /* Ensure that the map dimensions are correct */
+    if( *status == SAI__OK ) {
+      if( !((nfdims == 2) ||
+            ((nfdims == 3) && (fdims[2] == 1))) ) {
         *status = SAI__ERROR;
         errRepf( "", FUNC_NAME
                  ": supplied fakemap %s is not 2-dimensional!",
                  status, fakemap );
-      } else if((fmapdata->dims[0] != (dim_t)(ubnd_out[0]-lbnd_out[0]+1)) ||
-                (fmapdata->dims[1] != (dim_t) (ubnd_out[1]-lbnd_out[1]+1))){
+      } else if((fdims[0] != (ubnd_out[0]-lbnd_out[0]+1)) ||
+                (fdims[1] != (ubnd_out[1]-lbnd_out[1]+1))) {
         *status = SAI__ERROR;
         errRepf( "", FUNC_NAME ": supplied fakemap %s does not have the "
                  "required dimensions %i x %i", status, fakemap,
                  ubnd_out[0]-lbnd_out[0]+1, ubnd_out[1]-lbnd_out[1]+1 );
-      } else if( fmapdata->dtype != SMF__DOUBLE ) {
-        *status = SAI__ERROR;
-        errRepf( "", FUNC_NAME
-                 ": supplied fakemap %s is not double-precision", status,
-                 fakemap );
       }
     }
+
+    /* Map the data as double precision */
+    ndfMap( fakendf, "DATA", "_DOUBLE", "READ", &ptr, &nmap, status );
+    fmapdata = ptr;
 
     if( fname ) grpDelet( &fname, status );
   }
@@ -1237,7 +1240,6 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
            astronomical signal to RES at this stage if requested */
 
         if( fakemap && fmapdata && (*status==SAI__OK) ) {
-          double *fmap=NULL;
           double *resptr=NULL;
           int *lutptr=NULL;
           double *extptr=NULL;
@@ -1245,8 +1247,6 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           /* Add in the signal from the map */
           msgOutf( "", FUNC_NAME ": adding signal from external map %s to "
                    "time series", status, fakemap );
-
-          fmap = fmapdata->pntr[0];
 
           for( idx=0; idx<res[0]->ndat; idx++ ) {
             smf_get_dims( res[0]->sdata[idx], NULL, NULL, NULL, NULL, &dsize,
@@ -1262,16 +1262,19 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
               for( k=0; k<dsize; k++ ) {
                 if( (resptr[k] != VAL__BADD) && (lutptr[k] != VAL__BADI) &&
-                    (extptr[k] > 0) ) {
-                  resptr[k] += fmap[lutptr[k]] / extptr[k];
+                    (extptr[k] > 0) && (fmapdata[lutptr[k]] != VAL__BADD) &&
+                    (resptr[k] != VAL__BADD) ) {
+                  resptr[k] += fmapdata[lutptr[k]] / extptr[k];
                 }
               }
             } else {
               /* No extinction correction */
 
               for( k=0; k<dsize; k++ ) {
-                if( (resptr[k] != VAL__BADD) && (lutptr[k] != VAL__BADI) ) {
-                  resptr[k] += fmap[lutptr[k]];
+                if( (resptr[k] != VAL__BADD) && (lutptr[k] != VAL__BADI) &&
+                    (fmapdata[lutptr[k]] != VAL__BADD) &&
+                    (resptr[k] != VAL__BADD) ) {
+                  resptr[k] += fmapdata[lutptr[k]];
                 }
               }
             }
@@ -2523,8 +2526,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
   if( dat.zeromask ) dat.zeromask = astFree( dat.zeromask );
 
-  if( fmapdata ) smf_close_file( &fmapdata, status );
   if( fakemap ) fakemap = astFree( fakemap );
+  ndfAnnul( &fakendf, status );
 
   /* Ensure that FFTW doesn't have any used memory kicking around */
   fftw_cleanup();
