@@ -155,8 +155,6 @@ void smurf_fts2_removebse(int* status)
 
   /* BEAMSPLITTER SELF EMISSION, BSE */
   smf_open_file( bsegrp, 1, "READ",
-                 SMF__NOCREATE_HEAD |
-                 SMF__NOCREATE_FILE |
                  SMF__NOCREATE_DA |
                  SMF__NOCREATE_FTS,
                  &bseData, status);
