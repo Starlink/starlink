@@ -135,6 +135,8 @@
  *        Move down-sampling length calc here from smf_concat_smfGroup
  *     2010-10-26 (EC):
  *        Account for down-sampling in maxlen
+ *     2010-10-28 (EC):
+ *        Account for down-sampling in pad
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -308,15 +310,6 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
     }
     if ( *status != SAI__OK ) goto CLEANUP;
 
-    /* Get the padding to filter this data, and find the maximum padding
-       needed by any of the input files. */
-    if( keymap ) {
-      thispad = smf_get_padding( keymap, hdr->steptime, 0, hdr, status );
-      if( thispad > maxpad ) maxpad = thispad;
-    } else {
-      thispad = 0;
-    }
-
     /* Now get data dimensions */
     nx = (data->dims)[0];
     ny = (data->dims)[1];
@@ -418,6 +411,10 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
     /* Read the SEQCOUNT and NSUBSCAN header values */
     if( *status == SAI__OK ) {
       hdr = data->hdr;
+
+      if( hdr ) {
+        steptime = hdr->steptime;
+      }
     }
     smf_find_seqcount( hdr, &seqcount, status );
     smf_fits_getI( hdr, "NSUBSCAN", &nsubscan, status );
@@ -432,21 +429,24 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
       maxlends = maxlen;
 
       /* Find length of down-sampled data */
-      if( downsampscale && data->hdr && (*status==SAI__OK) ) {
-        double oldscale = (data->hdr->steptime * data->hdr->scanvel);
+      if( downsampscale && hdr && (*status==SAI__OK) ) {
+        double oldscale = (hdr->steptime * hdr->scanvel);
         double scalelen = oldscale / downsampscale;
 
         /* only down-sample if it will be at least a factor of 20% */
         if( scalelen <= 0.8 ) {
           msgOutiff( MSG__VERB, "", FUNC_NAME
                      ": will down-sample from %5.1lf Hz to %5.1lf Hz", status,
-                     (1./data->hdr->steptime),
-                     (scalelen/data->hdr->steptime) );
+                     (1./hdr->steptime),
+                     (scalelen/hdr->steptime) );
 
           thistlen = round(thistlen * scalelen);
 
           /* update maxlends */
           maxlends = round(maxlen * scalelen);
+
+          /* update steptime to include down-sample factor */
+          steptime = hdr->steptime / scalelen;
         }
       }
 
@@ -463,6 +463,17 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
                "(^THISTLEN>^MAXLENDS)", status);
       }
 
+      /* Get the padding to filter this data, and find the maximum
+         padding needed by any of the input files. We do it here to
+         catch steptime after it has been potentially modified by a
+         downsampling factor. */
+      if( keymap ) {
+        thispad = smf_get_padding( keymap, steptime, 0, data->hdr, status );
+        if( thispad > maxpad ) maxpad = thispad;
+      } else {
+        thispad = 0;
+      }
+
       /* Add length to running total */
       totlen += thistlen;
 
@@ -475,11 +486,6 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
       if( totlen > maxconcat ) {
         maxconcat = totlen;
       }
-    }
-
-    if( i == 0 ) {
-      /* length of a sample */
-      steptime = hdr->steptime;
     }
 
     /* Set header to first time slice and obtain RTS_END */
@@ -737,6 +743,6 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
 
   }
 
-/* Return the maximum padding if required. */
+  /* Return the maximum padding if required. */
   if( pad ) *pad = maxpad;
 }
