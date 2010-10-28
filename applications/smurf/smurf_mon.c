@@ -417,7 +417,7 @@ void smurf_mon( int * status ) {
     errRlse();
   }
 
-  /* configure AST --with--memdebug, and uncomment the following lines
+  /* configure AST --with-memdebug, and uncomment the following lines
      to see how much memory usage SMURF hit at its peak */
   /*
   {
