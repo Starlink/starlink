@@ -2315,7 +2315,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
              status );
       msgOut(""," This continuous chunk failed due to insufficient samples.",
               status );
-      msgOut(""," This is often due to strict bad-bolo flagging.", status );
+      msgOut(""," This can be due to strict bad-bolo flagging.", status );
+      msgOut(""," Another possibility is that the data are bad.", status );
       msgOut(""," Annuling the bad status and trying to continue...", status);
       msgOut(""," ************************************************************",
              status );
