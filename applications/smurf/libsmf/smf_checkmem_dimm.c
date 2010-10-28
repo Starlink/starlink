@@ -135,7 +135,7 @@
 
 #define FUNC_NAME "smf_checkmem_dimm"
 
-#define CHECKMEM_FUDGE 1.2 /* Fudge estimate by this empirical factor */
+#define CHECKMEM_FUDGE 1.5 /* Fudge estimate by this empirical factor */
 
 void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
 			smf_modeltype *modeltyps, dim_t nmodels, dim_t msize,
