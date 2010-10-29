@@ -4,7 +4,7 @@
 *     smf_get_dims
 
 *  Purpose:
-*     Calculate nbolo, ntslice and other dimensional properties for 3-d smfData
+*     Calculate nbolo, ntslice and other dimensional properties for a smfData
 
 *  Language:
 *     Starlink ANSI C
@@ -42,13 +42,22 @@
 *  Returned Value:
 
 *  Description:
-*     Depending on the data order of a smfData the time axis is either the
-*     first or last dimension. Check the order and calculate total numbers
-*     of detectors, the number of time slices, and the total number of
-*     data points. This routine will also set SMF__WDIM if the input smfData
-*     are not 3-dimensional. The bstride and tstride parameters can be used to
-*     help index the data array. To index the i'th bolometer and the j'th
-*     tslice: value = data[i*bstride + j*tstride]
+*     Depending on the data order of a smfData the time axis is either
+*     the first or last dimension. Check the order and calculate total
+*     numbers of detectors, the number of time slices, and the total
+*     number of data points.
+*
+*     The bstride and tstride parameters can be used to help index the
+*     data array. To index the i'th bolometer and the j'th tslice:
+*     value = data[i*bstride + j*tstride].
+*
+*     4-dimensional data can also be handled if they contain FFT data,
+*     which is verified through a call to smf_isfft. In this case the
+*     bolometer and time strides refer to a single component (real
+*     or imaginary).
+*
+*     This routine will set SMF__WDIM if the input smfData are not 3-
+*     or 4-dimensional.
 
 *  Authors:
 *     Edward Chapin (UBC)
@@ -59,10 +68,12 @@
 *        Initial version.
 *     2008-12-03 (EC):
 *        Add stride to API
+*     2010-10-29 (EC):
+*        Handle 4d FFT data
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2008,2010 University of British Columbia
 *     All Rights Reserved.
 
 *  Licence:
@@ -99,42 +110,54 @@ void smf_get_dims( const smfData *data, dim_t *nrows, dim_t *ncols,
                    size_t *bstride, size_t *tstride, int *status ) {
 
   size_t bs;
+  size_t i;
   dim_t nb;
   dim_t nt;
   dim_t nd;
   size_t ts;
   dim_t nr;
   dim_t nc;
+  dim_t nf;
 
    /* Check the inherited status */
    if ( *status != SAI__OK ) return;
 
-   /* Check for 3-d data */
-   if( data->ndims != 3 ) {
+   if( data->ndims == 3 ) {
+     /* Calculate Dimensions */
+     if( data->isTordered ) {
+       nr = (data->dims)[SC2STORE__ROW_INDEX];
+       nc = (data->dims)[SC2STORE__COL_INDEX];
+       nb = (data->dims)[0]*(data->dims)[1];
+       nt = (data->dims)[2];
+       bs = 1;
+       ts = nb;
+     } else {
+       nr = (data->dims)[SC2STORE__ROW_INDEX+1];
+       nc = (data->dims)[SC2STORE__COL_INDEX+1];
+       nt = (data->dims)[0];
+       nb = (data->dims)[1]*(data->dims)[2];
+       bs=nt;
+       ts=1;
+     }
+     nd = nb*nt;
+   } else if( smf_isfft( data, &nt, &nb, &nf, status ) ) {
+     /* FFT data are basically two consecutive blocks of bolo-ordered
+        data, each of length nf frequencies * nbolos, for the real and
+        imaginary parts respectively */
+     nr = (data->dims)[SC2STORE__ROW_INDEX+1];
+     nc = (data->dims)[SC2STORE__COL_INDEX+1];
+     bs = nf;
+     ts = 1;
+
+     nd = 1;
+     for( i=0; i<data->ndims; i++ ) nd *= data->dims[i];
+   } else {
      *status = SMF__WDIM;
      msgSeti("NDIMS",data->ndims);
      errRep(" ", FUNC_NAME
-            ": Input data have ^NDIMS dimensions, should be 3.", status);
+            ": Couldn't figure out dimensionality of smfData", status);
     return;
    }
-
-   /* Calculate Dimensions */
-   if( data->isTordered ) {
-     nr = (data->dims)[SC2STORE__ROW_INDEX];
-     nc = (data->dims)[SC2STORE__COL_INDEX];
-     nb = (data->dims)[0]*(data->dims)[1];
-     nt = (data->dims)[2];
-     bs = 1;
-     ts = nb;
-   } else {
-     nr = (data->dims)[SC2STORE__ROW_INDEX+1];
-     nc = (data->dims)[SC2STORE__COL_INDEX+1];
-     nt = (data->dims)[0];
-     nb = (data->dims)[1]*(data->dims)[2];
-     bs=nt;
-     ts=1;
-   }
-   nd = nb*nt;
 
    if( nrows ) *nrows = nr;
    if( ncols ) *ncols = nc;

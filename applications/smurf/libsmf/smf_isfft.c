@@ -59,6 +59,8 @@
 *        Initial version copied from smf_isfft.
 *     2008-07-28 (EC):
 *        Calculate ntslice.
+*     2010-10-29 (EC):
+*        Better job of figuring out ntslice
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -148,23 +150,38 @@ int smf_isfft( const smfData *indata, dim_t *ntslice, dim_t *nbolo,
       /* Frequency is always the first dimension */
       nf0 = indata->dims[0];
 
-      /* Check for a real value at the Nyquist frequency to decide if the
-         number of time slices is even or odd */
+      /* Try to figure out ntslices */
+      if( ntslice ) {
+        if( indata->hdr && indata->hdr->nframes) {
+        /* If we have a header we can try to figure out the length of the
+           time axis there */
 
-      val = indata->pntr[0];     /* Init pointer to last imag. of 1st bolo */
-      val += nf0*nbolo0 + (nf0-1);
+          *ntslice = indata->hdr->nframes;
+        } else if( indata->pntr[0] ) {
+          /* Otherwise check for a real value at the Nyquist frequency to
+             decide if the number of time slices is even or odd. */
 
-      for( i=0; isreal && (i<nbolo0); i++ ) {
-        if( *val ) {
-          /* If complex-valued the input array had an odd length */
-          isreal = 0;
+          val = indata->pntr[0];   /* Init pointer to last imag. of 1st bolo */
+          val += nf0*nbolo0 + (nf0-1);
+
+          for( i=0; isreal && (i<nbolo0); i++ ) {
+            if( *val ) {
+              /* If complex-valued the input array had an odd length */
+              isreal = 0;
+            }
+
+            /* Increment pointer to end of next bolo */
+            val += nf0;
+          }
+
+          *ntslice = nf0*2 - 1 - isreal;
+        } else {
+          *status = SAI__ERROR;
+          errRep( "", FUNC_NAME ": couldn't establish ntslices", status );
         }
-
-        /* Increment pointer to end of next bolo */
-        val += nf0;
       }
 
-      if( ntslice ) *ntslice = nf0*2 - 1 - isreal;
+      /* Then do nbolo and nf */
       if( nbolo ) *nbolo = nbolo0;
       if( nf ) *nf = nf0;
 
