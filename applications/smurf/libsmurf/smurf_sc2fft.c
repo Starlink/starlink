@@ -44,6 +44,9 @@
 *          mask the closest following will be used. It is not an error for
 *          no mask to match. A NULL parameter indicates no mask files to be
 *          supplied. [!]
+*     FLAT = _LOGICAL (Read)
+*          If set ensure data are flatfielded. If not set do not scale the
+*          data in any way (but convert to DOUBLE). [TRUE]
 *     IN = NDF (Read)
 *          Input files to be transformed.
 *     INVERSE = _LOGICAL (Read)
@@ -167,6 +170,7 @@ void smurf_sc2fft( int *status ) {
   double avpspecthresh=0;   /* Threshold noise for detectors in avpspec */
   smfArray *bbms = NULL;    /* Bad bolometer masks */
   smfArray *darks = NULL;   /* dark frames */
+  int ensureflat;           /* Flag for flatfielding data */
   Grp *fgrp = NULL;         /* Filtered group, no darks */
   smfArray *flatramps = NULL;/* Flatfield ramps */
   size_t i,j;               /* Loop counter */
@@ -217,6 +221,9 @@ void smurf_sc2fft( int *status ) {
   /* Get group of bolometer masks and read them into a smfArray */
   smf_request_mask( "BBM", &bbms, status );
 
+  /* Are we flatfielding? */
+  parGet0l( "FLAT", &ensureflat, status );
+
   /* Are we doing an inverse transform? */
   parGet0l( "INVERSE", &inverse, status );
 
@@ -250,8 +257,22 @@ void smurf_sc2fft( int *status ) {
     dim_t nbolo;                /* Number of detectors  */
     dim_t ndata;                /* Number of data points */
 
-    /* Open and flatfield in case we're using raw data */
-    smf_open_and_flatfield(igrp, NULL, j, darks, flatramps, &idata, status);
+    /* Open the data as double, flatfielding if necessary */
+    if( ensureflat ) {
+      smf_open_and_flatfield(igrp, NULL, j, darks, flatramps, &idata, status);
+    } else {
+      smfData *tmpdata = NULL;
+
+      smf_open_file( igrp, j, "READ", SMF__NOCREATE_DATA, &tmpdata, status );
+
+      if (tmpdata && tmpdata->file && tmpdata->file->isSc2store) {
+        smf_open_raw_asdouble( igrp, j, darks, &idata, status );
+      } else {
+        smf_open_and_flatfield( igrp, NULL, j, darks, flatramps, &idata,
+                                status );
+      }
+      smf_close_file( &tmpdata, status );
+    }
 
     /* Apply a mask to the quality array and data array */
     smf_apply_mask( idata, bbms, SMF__BBM_QUAL|SMF__BBM_DATA, 0, status );
