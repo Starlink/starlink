@@ -81,6 +81,27 @@
  *     as data is being loaded, specify outfset, moving, lbnd_out and
  *     ubnd_out. Otherwise set outfset to NULL.
  *
+ *     In the case of 4D FFT data, no concatenation is performed. Each input
+ *     file (subarray) at the given "whichchunk" is propagated as-is to concat.
+
+ *  Notes:
+ *     If projection information supplied, pointing LUT will not be
+ *     concatenated if SMF__NOCREATE_LUT is specified. By default, a
+ *     QUALITY array is created even if one is not present in the
+ *     template file. This behaviour can be avoided by setting flag
+ *     bit SMF__NOCREATE_QUALITY. Additionally, if VARIANCE and/or
+ *     QUALITY is present in the template, prevent propagation to the
+ *     concatenated file by setting SMF__NOCREATE_VARIANCE /
+ *     SMF__NOCREATE_QUALITY. Specifying padStart and/or padEnd will
+ *     pad the data with the specified number of samples unless the data
+ *     have already been padded. Also note that the new padded region will have:
+ *       - DATA and VARIANCE values set to 0
+ *       - QUALITY set to SMF__Q_PAD
+ *       - QUALITY also set to SMF__Q_BADB if the BADB flag was set at the
+ *         start of the real data
+ *       - LUT is set to VAL__BADI
+ *       - the JCMTState values all set to 0
+
  *  Authors:
  *     EC: Edward Chapin (UBC)
  *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -166,24 +187,9 @@
  *        Add downsampscale
  *     2010-10-25 (EC):
  *        Move down-sampling length calc from here to smf_grp_related
-
- *  Notes:
- *     If projection information supplied, pointing LUT will not be
- *     concatenated if SMF__NOCREATE_LUT is specified. By default, a
- *     QUALITY array is created even if one is not present in the
- *     template file. This behaviour can be avoided by setting flag
- *     bit SMF__NOCREATE_QUALITY. Additionally, if VARIANCE and/or
- *     QUALITY is present in the template, prevent propagation to the
- *     concatenated file by setting SMF__NOCREATE_VARIANCE /
- *     SMF__NOCREATE_QUALITY. Specifying padStart and/or padEnd will
- *     pad the data with the specified number of samples unless the data
- *     have already been padded. Also note that the new padded region will have:
- *       - DATA and VARIANCE values set to 0
- *       - QUALITY set to SMF__Q_PAD
- *       - QUALITY also set to SMF__Q_BADB if the BADB flag was set at the
- *         start of the real data
- *       - LUT is set to VAL__BADI
- *       - the JCMTState values all set to 0
+ *     2010-11-01 (EC):
+ *        Handle 4D FFT data
+ *     {enter_further_changes_here}
 
  *  Copyright:
  *     Copyright (C) 2007-2010 University of British Columbia.
@@ -258,6 +264,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
   smfHead *hdr;                 /* pointer to smfHead in concat data */
   dim_t i;                      /* Loop counter */
   Grp *ingrp=NULL;              /* Pointer to 1-element input group */
+  int isFFT=-1;                 /* Data are 4d FFTs */
   dim_t j;                      /* Loop counter */
   dim_t k;                      /* Loop counter */
   dim_t l;                      /* Loop counter */
@@ -367,9 +374,19 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
       smf_open_file( igrp->grp, igrp->subgroups[j][i], "READ",
                      flags, &refdata, status );
 
+      if( isFFT == -1 ) {
+        isFFT = smf_isfft( refdata, NULL, NULL, NULL, status );
+      } else if( smf_isfft( refdata, NULL, NULL, NULL, status ) != isFFT ) {
+        *status = SAI__ERROR;
+        errRep( "", FUNC_NAME
+                ": mixture of time-series and FFT data encountered!",
+                status );
+      }
+
       /* Verify that the array is 3-dimensional and compatible with the
-         reference array dimensions. */
-      if( *status == SAI__OK ) {
+         reference array dimensions if we aren't working with 4d FFT
+          data */
+      if( (*status == SAI__OK) && (!isFFT) ) {
         smf_smfFile_msg( refdata->file, "FILE", 1, "<unknown file", status );
 
         if( refdata->ndims != 3 ) {
@@ -378,15 +395,16 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                   ": ^FILE does not contain 3-dimensional data!",
                   status );
         }
-      }
 
-      /* If data order is 0 (bolo-ordered) then fail since that case
-         is not currently handled. */
-      if( (*status == SAI__OK) && (refdata->isTordered == 0) ) {
-        *status = SAI__ERROR;
-        errRep( "", FUNC_NAME
-                ": ^FILE contains bolo-ordered data (unsupported)",
-                status);
+
+        /* If data order is 0 (bolo-ordered) then fail since that case
+           is not currently handled. */
+        if( (*status == SAI__OK) && (refdata->isTordered == 0) ) {
+          *status = SAI__ERROR;
+          errRep( "", FUNC_NAME
+                  ": ^FILE contains bolo-ordered data (unsupported)",
+                  status);
+        }
       }
 
       /* Get data dimensions */
@@ -487,15 +505,40 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
       smf_close_file( &refdata, status );
     }
 
-    /* Add any padding to the length */
-    tlen += padStart + padEnd;
+    if( isFFT ) {
+      /* **********************************************************************
+         Are we working with FFTs? If so, no concatenation or downsampling
+         will happen. Each file is placed as-is into the smfArray
+         **********************************************************************/
 
-    /* Loop over subgroups (number of time chunks), continuing only
-       if the chunk is equal to whichchunk */
-    for( j=firstpiece; j<=lastpiece; j++ ) {
-
-      /* Second pass copy data over to new array */
       if( *status == SAI__OK ) {
+        smfData *tmpdata = NULL; /* for the original data before resamp */
+
+        /* Loop over subgroups (number of time chunks). j is really only
+           going to take on a single value in this loop (whichchunk) */
+        for( j=firstpiece; j<=lastpiece; j++ ) {
+          smf_open_file( igrp->grp, igrp->subgroups[j][i], "READ", 0,
+                         &tmpdata, status );
+
+          /* Make a deepcopy since we are going to close the memory-mapped
+             tmpdata. */
+          data = smf_deepcopy_smfData( tmpdata, 0, 0, 0, 0, status );
+        }
+      }
+
+    } else {
+      /* **********************************************************************
+         Otherwise proceed with concatenation
+         **********************************************************************/
+
+      /* Add any padding to the length */
+      tlen += padStart + padEnd;
+
+      /* Loop over subgroups (number of time chunks), continuing only
+         if the chunk is equal to whichchunk */
+      for( j=firstpiece; (*status==SAI__OK) && (j<=lastpiece); j++ ) {
+
+        /* Second pass copy data over to new array */
 
         if( dslen && dslen[j-firstpiece] ) {
           /* We're down-sampling the data, so break down the way we do
@@ -534,9 +577,10 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
               const smfData *flatdata = (flatramps->sdata)[flatidx];
 
               smf_smfFile_msg( refdata->file, "INF", 1, "<unknown>", status );
-              smf_smfFile_msg( flatdata->file, "FLAT", 1, "<unknown>", status );
-              msgOutif( MSG__VERB, "", FUNC_NAME ": Override flatfield of ^INF"
-                        " using ^FLAT", status );
+              smf_smfFile_msg( flatdata->file, "FLAT", 1, "<unknown>",
+                                 status );
+              msgOutif( MSG__VERB, "", FUNC_NAME
+                        ": Override flatfield of ^INF using ^FLAT", status );
               smf_flat_assign( 1, SMF__FLATMETH_NULL, NULL, flatdata,
                                refdata, status );
             }
@@ -618,7 +662,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                a DA struct only if the input file has one. Create it as
                a clone rather than creating an empty smfDa. */
             data = smf_create_smfData( SMF__NOCREATE_DA | SMF__NOCREATE_FTS,
-                                       status );
+                                         status );
             if (refdata->da && data) {
               /* do not copy dark squids. We do that below */
               data->da = smf_deepcopy_smfDA( refdata, 0, status );
@@ -706,8 +750,8 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
               ndata = nbolo*tlen;
 
               /* get the strides */
-              smf_get_dims( data, NULL, NULL, NULL, NULL, NULL,
-                            &bstr, &tstr, status );
+              smf_get_dims( data, NULL, NULL, NULL, NULL, NULL, &bstr, &tstr,
+                            status );
 
               /* Allocate space for enlarged dksquid array. */
               if( da && refdata->da && refdata->da->dksquid ) {
@@ -736,7 +780,8 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                 if( !(flags&SMF__NOCREATE_QUALITY) ) {
                   da->dksquid->qfamily = refdata->da->dksquid->qfamily;
                   da->dksquid->qual = astCalloc(ncol*tlen,
-                                                sizeof(*(da->dksquid->qual)),1);
+                                                sizeof(*(da->dksquid->qual)),
+                                                1);
                   if( *status == SAI__OK ) {
                     memset( da->dksquid->qual, 0,
                             ncol*tlen*sizeof(*(da->dksquid->qual)) );
@@ -856,138 +901,142 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
         smf_close_file( &refdata, status );
       }
 
-    }
+      /* Full subarray is now concatenated. Finish up by filling the padded
+         regions of the data with something intelligent.  */
 
-    /* Full subarray is now concatenated. Finish up by filling the padded
-       regions of the data with something intelligent.  */
-
-    for( j=0; (*status==SAI__OK)&&(j<2); j++ ) { /* Loop padded region */
-      tstart = 0;
-      tend = 0;
-
-      if( (j==0) && padStart ) {
+      for( j=0; (*status==SAI__OK)&&(j<2); j++ ) { /* Loop padded region */
         tstart = 0;
-        tend = padStart-1;
-      }
+        tend = 0;
 
-      if( (j==1) && padEnd ) {
-        tstart = tlen-padEnd;
-        tend = tlen-1;
-      }
-
-      /* Clean up padded region if nonzero length */
-      if( tend != tstart ) {
-
-        /* If QUALITY present, set SMF__Q_BADB as needed and SMF__Q_PAD */
-        if( data->qual ) {
-          /* Loop over bolometer */
-          for( k=0; k<nbolo; k++ ) {
-            /* SMF__Q_PAD always set */
-            smf_qual_t qual = SMF__Q_PAD;
-
-            /* Check for SMF__Q_BADB in first sample of this bolo */
-            qual |= (data->qual)[padStart*tstr+k*bstr]&SMF__Q_BADB;
-
-            /* Loop over relevant time slices at set quality */
-            for( l=tstart; l<=tend; l++ ) {
-              (data->qual)[l*tstr+k*bstr] |=  qual;
-            }
-          }
+        if( (j==0) && padStart ) {
+          tstart = 0;
+          tend = padStart-1;
         }
 
-        /* Similarly handle QUALITY for dark squids */
-        if( da && da->dksquid && da->dksquid->qual ) {
-          dim_t dnbolo;
-          size_t dbstr, dtstr;
-
-          smf_get_dims( da->dksquid, NULL, NULL, &dnbolo, NULL, NULL, &dbstr,
-                        &dtstr, status );
-
-          /* Loop over bolometer (column for dark squids) */
-          for( k=0; k<dnbolo; k++ ) {
-            /* SMF__Q_PAD always set */
-            smf_qual_t qual = SMF__Q_PAD;
-
-            /* Check for SMF__Q_BADB in first sample of this column */
-            qual |= (da->dksquid->qual)[padStart*dtstr+k*dbstr] & SMF__Q_BADB;
-
-            /* Loop over relevant time slices at set quality */
-            for( l=tstart; l<=tend; l++ ) {
-              (da->dksquid->qual)[l*dtstr+k*dbstr] |=  qual;
-            }
-          }
+        if( (j==1) && padEnd ) {
+          tstart = tlen-padEnd;
+          tend = tlen-1;
         }
 
-        /* If LUT present, set data to VAL__BADI */
-        if( data->lut ) {
-          for( l=tstart; l<=tend; l++ ) {
+        /* Clean up padded region if nonzero length */
+        if( tend != tstart ) {
+
+          /* If QUALITY present, set SMF__Q_BADB as needed and SMF__Q_PAD */
+          if( data->qual ) {
+            /* Loop over bolometer */
             for( k=0; k<nbolo; k++ ) {
-              data->lut[l*tstr + k*bstr] = VAL__BADI;
+              /* SMF__Q_PAD always set */
+              smf_qual_t qual = SMF__Q_PAD;
+
+              /* Check for SMF__Q_BADB in first sample of this bolo */
+              qual |= (data->qual)[padStart*tstr+k*bstr]&SMF__Q_BADB;
+
+              /* Loop over relevant time slices at set quality */
+              for( l=tstart; l<=tend; l++ ) {
+                (data->qual)[l*tstr+k*bstr] |=  qual;
+              }
             }
           }
-        }
 
-        /* If smfHead->allState present, pad with start/finish values, except
-           for the RTS_END which we will linearly extrapolate in order to
-           making plotting easier on us (since the time axis is implemented
-           with a LutMap in the tswcs frameset) */
-        if( (data->hdr) && (data->hdr->allState) ) {
-          JCMTState *allState = data->hdr->allState;
-          double step_rts;
-          double ref_rts;
+          /* Similarly handle QUALITY for dark squids */
+          if( da && da->dksquid && da->dksquid->qual ) {
+            dim_t dnbolo;
+            size_t dbstr, dtstr;
 
-          /* average step size in RTS_END */
-          step_rts = (allState[tlen-padEnd-1].rts_end -
-                      allState[padStart].rts_end) / (tlen-padStart-padEnd);
+            smf_get_dims( da->dksquid, NULL, NULL, &dnbolo, NULL, NULL, &dbstr,
+                          &dtstr, status );
 
-          if( step_rts <= 0 ) {
-            *status = SAI__ERROR;
-            errRep( "", FUNC_NAME ": Error calculating average RTS_END step!",
-                    status );
-          } else {
-            /* Pointer to first/last real JCMTState, and reference RTS_END
-               for linear extrapolation. */
-            if( j==0 ) {
-              sourceState = allState + padStart;
-              ref_rts = sourceState->rts_end - padStart*step_rts;
-            } else {
-              sourceState = allState + tlen - padEnd - 1;
-              ref_rts = sourceState->rts_end + step_rts;
+            /* Loop over bolometer (column for dark squids) */
+            for( k=0; k<dnbolo; k++ ) {
+              /* SMF__Q_PAD always set */
+              smf_qual_t qual = SMF__Q_PAD;
+
+              /* Check for SMF__Q_BADB in first sample of this column */
+              qual |= (da->dksquid->qual)[padStart*dtstr+k*dbstr] & SMF__Q_BADB;
+
+              /* Loop over relevant time slices at set quality */
+              for( l=tstart; l<=tend; l++ ) {
+                (da->dksquid->qual)[l*dtstr+k*dbstr] |=  qual;
+              }
             }
+          }
 
-            /* Loop Over Time slice */
+          /* If LUT present, set data to VAL__BADI */
+          if( data->lut ) {
             for( l=tstart; l<=tend; l++ ) {
-              memcpy( &(allState[l]), sourceState, sizeof(*sourceState) );
+              for( k=0; k<nbolo; k++ ) {
+                data->lut[l*tstr + k*bstr] = VAL__BADI;
+              }
+            }
+          }
 
-              /* Extrapolated rts_end into padded region */
-              allState[l].rts_end = ref_rts + (l-tstart)*step_rts;
+          /* If smfHead->allState present, pad with start/finish values, except
+             for the RTS_END which we will linearly extrapolate in order to
+             making plotting easier on us (since the time axis is implemented
+             with a LutMap in the tswcs frameset) */
+          if( (data->hdr) && (data->hdr->allState) ) {
+            JCMTState *allState = data->hdr->allState;
+            double step_rts;
+            double ref_rts;
+
+            /* average step size in RTS_END */
+            step_rts = (allState[tlen-padEnd-1].rts_end -
+                        allState[padStart].rts_end) / (tlen-padStart-padEnd);
+
+            if( step_rts <= 0 ) {
+              *status = SAI__ERROR;
+              errRep( "", FUNC_NAME ": Error calculating average RTS_END step!",
+                      status );
+            } else {
+              /* Pointer to first/last real JCMTState, and reference RTS_END
+                 for linear extrapolation. */
+              if( j==0 ) {
+                sourceState = allState + padStart;
+                ref_rts = sourceState->rts_end - padStart*step_rts;
+              } else {
+                sourceState = allState + tlen - padEnd - 1;
+                ref_rts = sourceState->rts_end + step_rts;
+              }
+
+              /* Loop Over Time slice */
+              for( l=tstart; l<=tend; l++ ) {
+                memcpy( &(allState[l]), sourceState, sizeof(*sourceState) );
+
+                /* Extrapolated rts_end into padded region */
+                allState[l].rts_end = ref_rts + (l-tstart)*step_rts;
+              }
             }
           }
         }
       }
-    }
 
-    /* Calculate a new tswcs using the concatenated JCMTState */
-    if( (*status==SAI__OK) && data->hdr && data->hdr->allState ) {
+      /* Calculate a new tswcs using the concatenated JCMTState */
+      if( (*status==SAI__OK) && data->hdr && data->hdr->allState ) {
 
-      if( data->hdr->tswcs ) data->hdr->tswcs = astAnnul( data->hdr->tswcs );
-
-      smf_create_tswcs( data->hdr, &data->hdr->tswcs, status );
-
-      /* If we couldn't make the tswcs just annul error and continue... we
-         don't really need it for anything */
-      if( *status != SAI__OK ) {
-        errAnnul(status);
-        msgOut( "", FUNC_NAME ": Warning, Couldn't create TSWCS for data cube",
-                status );
-
-        /* Annul just in case it got made */
         if( data->hdr->tswcs ) data->hdr->tswcs = astAnnul( data->hdr->tswcs );
-      }
 
+        smf_create_tswcs( data->hdr, &data->hdr->tswcs, status );
+
+        /* If we couldn't make the tswcs just annul error and continue... we
+           don't really need it for anything */
+        if( *status != SAI__OK ) {
+          errAnnul(status);
+          msgOut( "", FUNC_NAME
+                  ": Warning, Couldn't create TSWCS for data cube", status );
+
+          /* Annul just in case it got made */
+          if(data->hdr->tswcs) data->hdr->tswcs = astAnnul( data->hdr->tswcs );
+        }
+
+      }
     }
 
-    /* Put this concatenated subarray into the smfArray */
+
+
+
+
+    /* Put this concatenated subarray (or directly copied subarray in the
+       case of an FFT) into the smfArray */
     smf_addto_smfArray( *concat, data, status );
   }
 

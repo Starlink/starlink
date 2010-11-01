@@ -71,6 +71,9 @@
  *     this case, the length of each continuously flagged region is truncated
  *     to the minimum complete set of files that does not exceed the limit
  *     (e.g. files are not broken up into several smaller pieces).
+ *
+ *     If the input files are 4D FFT data, each file appears in a single time
+ *     chunk (i.e. checking for continuity does not make sense in this case).
 
  *  Notes:
  *     Resources allocated with this routine should be freed by calling
@@ -137,6 +140,8 @@
  *        Account for down-sampling in maxlen
  *     2010-10-28 (EC):
  *        Account for down-sampling in pad
+ *     2010-11-01 (EC):
+ *        Handle 4d FFT data by placing each file in its own time chunk
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -212,6 +217,7 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
   smfHead *hdr=NULL;          /* Header for current file */
   smfHead *hdr2=NULL;         /* Second header */
   size_t i;                   /* Loop counter for index into Grp */
+  int isFFT=0;                /* Set if data are 4d FFT */
   dim_t isub;                 /* loop counter over subgroup */
   dim_t *indices = NULL;      /* Array of indices to be stored in subgroup */
   size_t j;                   /* Loop counter */
@@ -248,7 +254,8 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
   dim_t **subgroups = NULL;   /* Array containing index arrays to parent Grp */
   int subsysnum;              /* Subsystem numeric id. 0 - 8 */
   size_t thischunk;           /* Current chunk that we're on */
-  dim_t thistlen;              /* Length of current time chunk */
+  dim_t thistlen;             /* Length of current time chunk */
+  dim_t thistlenr;            /* Length of current time chunk, no downsample */
   dim_t thisnelem;            /* Number of elements (subarrays) at this chunk*/
   dim_t totlen;               /* Total length of continuous time chunk */
   double writetime;           /* RTS_END value at end of written data */
@@ -285,8 +292,26 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
   for (i=1; i<=grpsize; i++) {
     /* First step: open file and read start/end RTS_END values */
     smf_open_file( igrp, i, "READ", SMF__NOCREATE_DATA, &data, status );
+
+    if( !data->hdr ) {
+      *status = SAI__ERROR;
+      errRep( "", FUNC_NAME ": data do not have a header, cannot continue.",
+              status );
+    }
+
+    if( i==1 ) {
+      isFFT = smf_isfft( data, NULL, NULL, NULL, status );
+    } else if( smf_isfft(data, NULL, NULL, NULL, status) != isFFT ) {
+      *status = SAI__ERROR;
+      errRep( "", FUNC_NAME
+              ": mixture of time-series and FFT data encountered!",
+              status );
+    }
+
     if (*status != SAI__OK) goto CLEANUP;
-    hdr = data->hdr;
+
+    /* Get dimensions */
+    smf_get_dims( data, &ny, &nx, NULL, &thistlenr, NULL, NULL, NULL, status );
 
     /* Set header for first time slice */
     frame = 0;
@@ -295,9 +320,11 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
       errRep(FUNC_NAME, "Unable to retrieve first timeslice", status);
       goto CLEANUP;
     }
+    hdr = data->hdr;
     opentime = hdr->state->rts_end;
+
     /* Set header for last time slice */
-    frame = (data->dims)[2] - 1;
+    frame = thistlenr - 1;
     smf_tslice_ast( data, frame, 0, status );
     if ( *status != SAI__OK ) {
       errRep(FUNC_NAME, "Unable to retrieve final timeslice", status);
@@ -310,11 +337,9 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
     }
     if ( *status != SAI__OK ) goto CLEANUP;
 
-    /* Now get data dimensions */
-    nx = (data->dims)[0];
-    ny = (data->dims)[1];
     /* Now to check if it's a related file... */
     for ( j=0; j<grpsize; j++ ) {
+
       /* Does the subgroup exist? */
       if ( subgroups[j] != 0 ) {
         /* If yes, are we grouping by wavelength? */
@@ -408,188 +433,205 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
     smf_open_file( igrp, subgroups[i][0], "READ", SMF__NOCREATE_DATA, &data,
                    status );
 
-    /* Read the SEQCOUNT and NSUBSCAN header values */
-    if( *status == SAI__OK ) {
-      hdr = data->hdr;
+    /* Length of chunk */
+    smf_get_dims( data, NULL, NULL, NULL, &thistlenr, NULL, NULL, NULL,
+                  status );
 
-      if( hdr ) {
-        steptime = hdr->steptime;
+    if( isFFT ) {
+      /* **********************************************************************
+         Are we working with FFTs? If so, no concatenation or downsampling
+         will happen. Each file is indicated as a new chunk.
+         **********************************************************************/
+
+      chunk[i] = i;
+      all_tlen[i] = thistlenr;
+
+    } else {
+      /* **********************************************************************
+         Otherwise proceed with continuity checks etc.
+         **********************************************************************/
+
+      /* Read the SEQCOUNT and NSUBSCAN header values */
+      if( *status == SAI__OK ) {
+        hdr = data->hdr;
+
+        if( hdr ) {
+          steptime = hdr->steptime;
+        }
       }
-    }
-    smf_find_seqcount( hdr, &seqcount, status );
-    smf_fits_getI( hdr, "NSUBSCAN", &nsubscan, status );
+      smf_find_seqcount( hdr, &seqcount, status );
+      smf_fits_getI( hdr, "NSUBSCAN", &nsubscan, status );
 
-    if( *status == SAI__OK ) {
+      if( *status == SAI__OK ) {
 
-      /* Length of chunk */
-      smf_get_dims( data, NULL, NULL, NULL, &thistlen, NULL, NULL, NULL,
-                    status );
+        thistlen = thistlenr;
 
-      /* Assume there is no downsampling to beging with */
-      maxlends = maxlen;
+        /* Assume there is no downsampling to beging with */
+        maxlends = maxlen;
 
-      /* Find length of down-sampled data */
-      if( downsampscale && hdr && (*status==SAI__OK) ) {
-        double oldscale = (hdr->steptime * hdr->scanvel);
-        double scalelen = oldscale / downsampscale;
+        /* Find length of down-sampled data */
+        if( downsampscale && hdr && (*status==SAI__OK) ) {
+          double oldscale = (hdr->steptime * hdr->scanvel);
+          double scalelen = oldscale / downsampscale;
 
-        /* only down-sample if it will be at least a factor of 20% */
-        if( scalelen <= 0.8 ) {
-          msgOutiff( MSG__VERB, "", FUNC_NAME
-                     ": will down-sample from %5.1lf Hz to %5.1lf Hz", status,
-                     (1./hdr->steptime),
-                     (scalelen/hdr->steptime) );
+          /* only down-sample if it will be at least a factor of 20% */
+          if( scalelen <= 0.8 ) {
+            msgOutiff( MSG__VERB, "", FUNC_NAME
+                       ": will down-sample from %5.1lf Hz to %5.1lf Hz", status,
+                       (1./hdr->steptime),
+                       (scalelen/hdr->steptime) );
 
-          thistlen = round(thistlen * scalelen);
+            thistlen = round(thistlen * scalelen);
 
-          /* update maxlends */
-          maxlends = round(maxlen * scalelen);
+            /* update maxlends */
+            maxlends = round(maxlen * scalelen);
 
-          /* update steptime to include down-sample factor */
-          steptime = hdr->steptime / scalelen;
+            /* update steptime to include down-sample factor */
+            steptime = hdr->steptime / scalelen;
+          }
+        }
+
+        /* Store length (including downsampling) to check chunk lengths later */
+        all_tlen[i] = thistlen;
+
+        /* Check that an individual file is too long */
+        if( maxlends && (thistlen > maxlends) ) {
+          *status = SAI__ERROR;
+          msgSeti("THISTLEN",thistlen);
+          msgSeti("MAXLENDS",maxlends);
+          errRep(FUNC_NAME,
+                 "Length of file time steps exceeds maximum "
+                 "(^THISTLEN>^MAXLENDS)", status);
+        }
+
+        /* Get the padding to filter this data, and find the maximum
+           padding needed by any of the input files. We do it here to
+           catch steptime after it has been potentially modified by a
+           downsampling factor. */
+        if( keymap ) {
+          thispad = smf_get_padding( keymap, steptime, 0, data->hdr, status );
+          if( thispad > maxpad ) maxpad = thispad;
+        } else {
+          thispad = 0;
+        }
+
+        /* Add length to running total */
+        totlen += thistlen;
+
+        /* Update maxflen */
+        if( thistlen > maxflen ) {
+          maxflen = thistlen;
+        }
+
+        /* Update maxconcat */
+        if( totlen > maxconcat ) {
+          maxconcat = totlen;
         }
       }
 
-      /* Store length to check chunk lengths later */
-      all_tlen[i] = thistlen;
+      /* Set header to first time slice and obtain RTS_END */
+      frame = 0;
+      smf_tslice_ast( data, frame, 0, status );
 
-      /* Check that an individual file is too long */
-      if( maxlends && (thistlen > maxlends) ) {
-        *status = SAI__ERROR;
-        msgSeti("THISTLEN",thistlen);
-        msgSeti("MAXLENDS",maxlends);
-        errRep(FUNC_NAME,
-               "Length of file time steps exceeds maximum "
-               "(^THISTLEN>^MAXLENDS)", status);
+      if( *status == SAI__OK ) {
+        if( i > 0 ) {
+          /* check that we have the same subarrays */
+          matchsubsys = 1;
+
+          for( j=0; j<nelem; j++ ) {
+            if( subgroups[i][j] > 0 ) {
+              /* Increment subarray counter */
+              thisnelem++;
+
+              if( j==0 ) {
+                /* Look at header of file that is already opened */
+                smf_find_subarray( hdr, NULL, 0, &subsysnum, status );
+              } else {
+                /* Otherwise open header in new file */
+                smf_open_file( igrp, subgroups[i][j], "READ",
+                               SMF__NOCREATE_DATA, &data2, status );
+                if( *status == SAI__OK ) {
+                  hdr2 = data2->hdr;
+                  smf_find_subarray( hdr2, NULL, 0, &subsysnum, status );
+                }
+              }
+
+              /* Close the new file that we've opened */
+              if( j>0 ) {
+                smf_close_file( &data2, status );
+              }
+            } else {
+              /* Flag this subsystem spot as empty */
+              subsysnum = -1;
+            }
+
+            if( subsysnum != refsubsys[j] ) {
+              matchsubsys = 0;
+            }
+          }
+
+          /* check against writetime from the last file to see if we're on the
+             same chunk. Also check that the subsystems match, and that the
+             continuous chunk doesn't exceed maxlends */
+
+          if( !( !strncmp(refobsidss, hdr->obsidss, sizeof(refobsidss)) &&
+                 (seqcount==refseqcount) && ((nsubscan-refnsubscan)==1) ) ||
+              !matchsubsys || (maxlends && (totlen > maxlends)) ) {
+
+            /* Found a discontinuity */
+            thischunk++;
+
+            /* Since this piece puts us over the limit, it is now the initial
+               total length for the next chunk. */
+            totlen = thistlen;
+          }
+        }
+
+        /* update refobsidss, refseqcount, refnsubscan */
+        one_strlcpy( refobsidss, hdr->obsidss, sizeof(refobsidss), status );
+        refseqcount = seqcount;
+        refnsubscan = nsubscan;
       }
 
-      /* Get the padding to filter this data, and find the maximum
-         padding needed by any of the input files. We do it here to
-         catch steptime after it has been potentially modified by a
-         downsampling factor. */
-      if( keymap ) {
-        thispad = smf_get_padding( keymap, steptime, 0, data->hdr, status );
-        if( thispad > maxpad ) maxpad = thispad;
-      } else {
-        thispad = 0;
+      /* Obtain the last RTS_END from this file */
+      if( *status == SAI__OK ) {
+        frame = thistlenr - 1;
       }
 
-      /* Add length to running total */
-      totlen += thistlen;
+      smf_tslice_ast( data, frame, 0, status );
 
-      /* Update maxflen */
-      if( thistlen > maxflen ) {
-        maxflen = thistlen;
-      }
-
-      /* Update maxconcat */
-      if( totlen > maxconcat ) {
-        maxconcat = totlen;
-      }
-    }
-
-    /* Set header to first time slice and obtain RTS_END */
-    frame = 0;
-    smf_tslice_ast( data, frame, 0, status );
-
-    if( *status == SAI__OK ) {
-      if( i > 0 ) {
-        /* check that we have the same subarrays */
-        matchsubsys = 1;
-
+      if( *status == SAI__OK ) {
+        /* Populate the reference subsystem array */
         for( j=0; j<nelem; j++ ) {
           if( subgroups[i][j] > 0 ) {
-            /* Increment subarray counter */
-            thisnelem++;
-
             if( j==0 ) {
               /* Look at header of file that is already opened */
               smf_find_subarray( hdr, NULL, 0, &subsysnum, status );
             } else {
               /* Otherwise open header in new file */
-              smf_open_file( igrp, subgroups[i][j], "READ",
-                             SMF__NOCREATE_DATA, &data2, status );
-              if( *status == SAI__OK ) {
+              smf_open_file( igrp, subgroups[i][j], "READ", SMF__NOCREATE_DATA,
+                             &data2, status );
+              if (*status == SAI__OK) {
                 hdr2 = data2->hdr;
                 smf_find_subarray( hdr2, NULL, 0, &subsysnum, status );
               }
             }
-
+            if( *status == SAI__OK ) {
+              refsubsys[j] = subsysnum;
+            }
             /* Close the new file that we've opened */
             if( j>0 ) {
               smf_close_file( &data2, status );
             }
-          } else {
-            /* Flag this subsystem spot as empty */
-            subsysnum = -1;
-          }
-
-          if( subsysnum != refsubsys[j] ) {
-            matchsubsys = 0;
+          } else if( *status == SAI__OK ) {
+            /* Flag this subsystem slot as empty */
+            refsubsys[j] = -1;
           }
         }
 
-        /* check against writetime from the last file to see if we're on the
-           same chunk. Also check that the subsystems match, and that the
-           continuous chunk doesn't exceed maxlends */
-
-        if( !( !strncmp(refobsidss, hdr->obsidss, sizeof(refobsidss)) &&
-               (seqcount==refseqcount) && ((nsubscan-refnsubscan)==1) ) ||
-            !matchsubsys || (maxlends && (totlen > maxlends)) ) {
-
-          /* Found a discontinuity */
-          thischunk++;
-
-          /* Since this piece puts us over the limit, it is now the initial
-             total length for the next chunk. */
-          totlen = thistlen;
-        }
+        /* Store thischunk in chunk */
+        chunk[i] = thischunk;
       }
-
-      /* update refobsidss, refseqcount, refnsubscan */
-      one_strlcpy( refobsidss, hdr->obsidss, sizeof(refobsidss), status );
-      refseqcount = seqcount;
-      refnsubscan = nsubscan;
-    }
-
-    /* Obtain the last RTS_END from this file */
-    if( *status == SAI__OK ) {
-      frame = (data->dims)[2] - 1;
-    }
-
-    smf_tslice_ast( data, frame, 0, status );
-
-    if( *status == SAI__OK ) {
-      /* Populate the reference subsystem array */
-      for( j=0; j<nelem; j++ ) {
-        if( subgroups[i][j] > 0 ) {
-          if( j==0 ) {
-            /* Look at header of file that is already opened */
-            smf_find_subarray( hdr, NULL, 0, &subsysnum, status );
-          } else {
-            /* Otherwise open header in new file */
-            smf_open_file( igrp, subgroups[i][j], "READ", SMF__NOCREATE_DATA,
-                           &data2, status );
-            if (*status == SAI__OK) {
-              hdr2 = data2->hdr;
-              smf_find_subarray( hdr2, NULL, 0, &subsysnum, status );
-            }
-          }
-          if( *status == SAI__OK ) {
-            refsubsys[j] = subsysnum;
-          }
-          /* Close the new file that we've opened */
-          if( j>0 ) {
-            smf_close_file( &data2, status );
-          }
-        } else if( *status == SAI__OK ) {
-          /* Flag this subsystem slot as empty */
-          refsubsys[j] = -1;
-        }
-      }
-
-      /* Store thischunk in chunk */
-      chunk[i] = thischunk;
     }
 
     /* Close file */
@@ -644,20 +686,20 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
 
     maxnelem = 0;
     if( *status == SAI__OK ) for( i=0; i<ngroups; i++ ) {
-        thisnelem = 0;
+      thisnelem = 0;
 
-        for( j=0; j<nelem; j++ ) {
-          if( subgroups[i][j] > 0 ) {
-            /* Increment subarray counter */
-            thisnelem++;
-          }
-        }
-
-        /* update maxnelem based on this chunk */
-        if( thisnelem > maxnelem ) {
-          maxnelem = thisnelem;
+      for( j=0; j<nelem; j++ ) {
+        if( subgroups[i][j] > 0 ) {
+          /* Increment subarray counter */
+          thisnelem++;
         }
       }
+
+      /* update maxnelem based on this chunk */
+      if( thisnelem > maxnelem ) {
+        maxnelem = thisnelem;
+      }
+    }
 
     /* Create the new subgroups array from the chunks that we're keeping */
     new_ngroups=0;
