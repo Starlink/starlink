@@ -4,29 +4,25 @@
 
 #  Purpose:
 #     An example of a file containing a description of a coloured
-#     plotting style which can be used for day-to-day work by KAPPA 
+#     plotting style which can be used for day-to-day work by KAPPA
 #     graphical application.
 
 #  Description:
 #     KAPPA graphical applications such as CONTOUR, DISPLAY, etc, allow
 #     the appearance of certain parts of the plot (annotated axes,
-#     contours, keys, etc) to be specified using a text file containing 
+#     contours, keys, etc) to be specified using a text file containing
 #     settings for plotting attributes. The name of such a file can be
 #     supplied for the relevant application parameter. For instance, the
 #     STYLE parameter is usually used to specify the appearance of
 #     annotated axes.
 #
 #     This file is an example of the way in which this facility can be
-#     used. It contains general settings which could be applicable for 
+#     used. It contains general settings which could be applicable for
 #     any data plot. Data-specific versions could be produced by editing
 #     copies of this file to include such things as the title to be
-#     displayed at the top of the plot (using the Title attribute), or 
+#     displayed at the top of the plot (using the Title attribute), or
 #     the format for numerical axis labels (using the Format or Digits
 #     attributes).
-#
-#     This file produces a coloued plotting style suitable for day-to-day
-#     work. The file $KAPPA_DE/pub.sty produces a plotting style more 
-#     suited to publications.
 
 #  Example:
 #     display style=$KAPPA_DIR/style.def
@@ -48,6 +44,8 @@
 #     18-AUG-1999 (DSB):
 #        Added MLINPLOT attributes. Moved application-specific attributes
 #        to the top.
+#     1-NOV-2010 (DSB):
+#        Remove comment about the (non-existant) pub.sty file.
 #-
 
 
@@ -64,7 +62,7 @@
       colour(labels)=red
       labpos(left)=0.05
       labpos(right)=1.01
-      
+
 
 #  Set values for general attributes recognised by all applications:
 #  =================================================================
