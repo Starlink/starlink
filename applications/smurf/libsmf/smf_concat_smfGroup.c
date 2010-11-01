@@ -468,7 +468,8 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
 
         /* Check padding at end */
         if (j == lastpiece) {
-          if (refdata && refdata->qual && (refdata->qual)[refndata-1] & SMF__Q_PAD ) {
+          if (refdata && refdata->qual && (refdata->qual)[refndata-1] &
+              SMF__Q_PAD ) {
             padEnd = 0;
           } else {
             padEnd = req_padEnd;
@@ -734,7 +735,8 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                 /* QUALITY too if requested */
                 if( !(flags&SMF__NOCREATE_QUALITY) ) {
                   da->dksquid->qfamily = refdata->da->dksquid->qfamily;
-                  da->dksquid->qual = astCalloc(ncol*tlen, sizeof(*(da->dksquid->qual)), 1);
+                  da->dksquid->qual = astCalloc(ncol*tlen,
+                                                sizeof(*(da->dksquid->qual)),1);
                   if( *status == SAI__OK ) {
                     memset( da->dksquid->qual, 0,
                             ncol*tlen*sizeof(*(da->dksquid->qual)) );
