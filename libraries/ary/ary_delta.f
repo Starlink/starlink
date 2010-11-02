@@ -96,6 +96,8 @@
 *        The global status.
 
 *  Notes:
+*     - The compression axis and compressed data type actually used can
+*     be determined by passing the returned array to ARY_GTDLT.
 *     -  This routine may only be used to compress a base array. If it is
 *     called with an array which is not a base array, then it will return
 *     without action. No error will result.

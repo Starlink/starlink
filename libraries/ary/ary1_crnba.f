@@ -201,7 +201,8 @@
 
 *  Initialise the access control flags according to whether the data
 *  object can be modified or not. For DELTA compressed arrays, the only
-*  chnage that can be made is tpo delete the whole array.
+*  changes that can be made are to delete the whole array, or shift the
+*  origin.
          IF( DCB_FRM( IDCB ) .NE. 'DELTA' ) THEN
             DO IACC = 1, ARY__MXACC
                ACB_ACC( IACC, IACB ) = DCB_MOD( IDCB ) .EQ. 'UPDATE'
@@ -211,6 +212,7 @@
                ACB_ACC( IACC, IACB ) = .FALSE.
             END DO
             ACB_ACC( ARY__DELET, IACB ) = DCB_MOD( IDCB ) .EQ. 'UPDATE'
+            ACB_ACC( ARY__SHIFT, IACB ) = DCB_MOD( IDCB ) .EQ. 'UPDATE'
          END IF
 
 *  Enter the bad pixel flag value from the DCB.
