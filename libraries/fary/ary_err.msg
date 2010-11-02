@@ -30,4 +30,6 @@ XSDIM	<too many array dimensions>
 FRMCV	<storage form conversion error>
 NOTSP	<facility not yet supported>
 SCLIN	<invalid scaling information in scaled array>
+DLTIN	<invalid compression information in delta array>
+AXINV	<invalid axis index>
 .END

@@ -49,7 +49,8 @@
 *        The global status.
 
 *  Notes:
-*     -  This routine may also be used to map scaled and primitive arrays.
+*     -  This routine may also be used to map scaled, delta and primitive
+*     arrays.
 
 *  Prior requirements:
 *     -  Appropriate entries relating to the region of data to be mapped
@@ -80,6 +81,8 @@
 *     All Rights Reserved.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
 *     Council. All Rights Reserved.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -112,6 +115,8 @@
 *        and mapped array) to ARY1_GTN.
 *     24-APR-2006 (DSB):
 *        Add support for scaled arrays.
+*     1-NOV-2010 (DSB):
+*        Include support for delta compressed arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -184,6 +189,7 @@
       LOGICAL CHR_SIMLR          ! Case insensitive string comparison
 
 *  Local variables:
+      CHARACTER TLOC*(DAT__SZLOC)! Locator for temporary uncompressed values
       INTEGER DIM( ARY__MXDIM )  ! Dimensions of mapping region
       INTEGER DIML( ARY__MXDIM ) ! Lower bounds of slice
       INTEGER DIMU( ARY__MXDIM ) ! Upper bounds of slice
@@ -193,6 +199,8 @@
       INTEGER IMCB               ! Index to entry in MCB
       INTEGER NDIMA              ! Number of access dimensions
       INTEGER NDIMD              ! Number of data object dimensions
+      INTEGER TPNTR              ! Pointer to temporary uncompressed values
+      LOGICAL NEWBAD             ! Bad values present in section?
 *.
 
 *  Set an initial value for the MLOC argument.
@@ -219,12 +227,13 @@
 1     CONTINUE
 
 *  If the mapping region (and mapping transfer region) comprises the
-*  whole data object and no data type conversion or scaling is required, then
-*  clone a locator to the entire data component and map it for access directly
-*  using HDS.
+*  whole data object and no data type conversion, uncompression or scaling
+*  is required, then clone a locator to the entire data component and map
+*  it for access directly using HDS.
       IF ( MCB_WHOLE( IMCB ) .AND.
      :     CHR_SIMLR( TYPE, DCB_TYP( IDCB ) ) .AND.
-     :     DCB_FRM( IDCB ) .NE. 'SCALED' ) THEN
+     :     DCB_FRM( IDCB ) .NE. 'SCALED' .AND.
+     :     DCB_FRM( IDCB ) .NE. 'DELTA' ) THEN
          CALL DAT_CLONE( LOC, MLOC, STATUS )
          CALL DAT_MAP( MLOC, TYPE, MODE, NDIMD, DIM, PNTR, STATUS )
          COPY = .FALSE.
@@ -237,7 +246,8 @@
       ELSE IF ( MCB_MRFUL( IMCB ) .AND.
      :          ( NDIMD .LE. ARY__MXHSL ) .AND.
      :          CHR_SIMLR( TYPE, DCB_TYP( IDCB ) ) .AND.
-     :          DCB_FRM( IDCB ) .NE. 'SCALED' ) THEN
+     :          DCB_FRM( IDCB ) .NE. 'SCALED' .AND.
+     :          DCB_FRM( IDCB ) .NE. 'DELTA' ) THEN
 
 *  Calculate the bounds of the data component slice required.
          DO 2 I = 1, NDIMD
@@ -251,23 +261,97 @@
          COPY = .FALSE.
          DCE = .FALSE.
 
+*  Otherwise, if the mapping transfer region fills the mapping region
+*  and the data is stored as a delta compressed array, and there is no
+*  change of dimensionality, and no change of data type, then we can
+*  uncompress the required section.
+      ELSE IF ( MCB_MRFUL( IMCB ) .AND.
+     :          DCB_FRM( IDCB ) .EQ. 'DELTA' .AND.
+     :          CHR_SIMLR( TYPE, DCB_TYP( IDCB ) ) .AND.
+     :          NDIMA .EQ. NDIMD ) THEN
+
+*  Create and map a temporary object.
+         CALL ARY1_CMTMP( TYPE, NDIMD, DIM, MLOC, PNTR, STATUS )
+
+*  Get the bounds of the MRB in the grid indices of the whole
+*  uncompressed array.
+         DO I = 1, NDIMD
+            DIML( I ) = MCB_LMRB( I, IMCB ) - DCB_LBND( I, IDCB ) + 1
+            DIMU( I ) = MCB_UMRB( I, IMCB ) - DCB_LBND( I, IDCB ) + 1
+         END DO
+
+*  Uncompress the required section.
+         CALL ARY1_UNDLT( DCB_LOC( IDCB ), NDIMD, DIML, DIMU, PNTR,
+     :                    NEWBAD, STATUS )
+         COPY = .TRUE.
+
 *  Otherwise, if the mapping transfer region doesn't fill the mapping
 *  region, but it nevertheless exists, then the mapped data will be
 *  surrounded by "bad" values, so a copy must be made.
       ELSE IF ( MCB_MTREX( IMCB ) ) THEN
 
+*  Create and map a temporary object to hold the output values.
+         CALL ARY1_CMTMP( TYPE, NDIMA, DIM, MLOC, PNTR, STATUS )
+
+*  If the array is delta compressed, we first uncompress the required
+*  section into another temporary array before copying it into the
+*  returned array.
+         IF( DCB_FRM( IDCB ) .EQ. 'DELTA' ) THEN
+
+*  Get the bounds of the MTR in the grid indicies of the whole
+*  uncompressed array.
+            DO I = 1, NDIMD
+               DIML( I ) = MCB_LMTR( I, IMCB ) - DCB_LBND( I, IDCB ) + 1
+               DIMU( I ) = MCB_UMTR( I, IMCB ) - DCB_LBND( I, IDCB ) + 1
+               DIM( I ) = DIMU( I ) - DIML( I ) + 1
+            END DO
+
+*  Create and map a temporary HDS array to hold the uncompressed values.
+            CALL ARY1_CMTMP( DCB_TYP( IDCB ), NDIMD, DIM, TLOC, TPNTR,
+     :                       STATUS )
+
+*  Uncompress the values in the MTR, storing them in the above temporary
+*  HDS array.
+            CALL ARY1_UNDLT( DCB_LOC( IDCB ), NDIMD, DIML, DIMU, TPNTR,
+     :                       NEWBAD, STATUS )
+
+*  Unmap the temporary array so that the values written into it by
+*  ARY1_UNDLT will be available when the array is mapped again within
+*  ARY1_GTN.
+            CALL DAT_UNMAP( TLOC, STATUS )
+
+*  Copy the uncompressed values into the returned array, doing type
+*  conversion and padding with bad values as necessary.
+            CALL ARY1_GTN( BAD, DCB_TYP( IDCB ), TLOC,
+     :                     MAX( NDIMA, NDIMD ), MCB_LMTR( 1, IMCB ),
+     :                     MCB_UMTR( 1, IMCB ), MCB_LMTR( 1, IMCB ),
+     :                     MCB_UMTR( 1, IMCB ), TYPE,
+     :                     MCB_LMRB( 1, IMCB ), MCB_UMRB( 1, IMCB ),
+     :                     .TRUE., DCB_SCLOC( IDCB ), PNTR, DCE,
+     :                     STATUS )
+
+*  Annul the temporary array holding the uncompressed values.
+            CALL ARY1_ANTMP( TLOC, STATUS )
+
+* Now handle non DELTA arrays.
+         ELSE
+
 *  Ensure any required scale and zero terms are available.
-         CALL ARY1_DSCL( IDCB, STATUS )
+            CALL ARY1_DSCL( IDCB, STATUS )
 
 *  Create and map a temporary object, then read the data in the mapping
 *  transfer region into it, padding the rest of the mapped array with
 *  "bad" values.
-         CALL ARY1_CMTMP( TYPE, NDIMA, DIM, MLOC, PNTR, STATUS )
-         CALL ARY1_GTN( BAD, DCB_TYP( IDCB ), LOC, MAX( NDIMA, NDIMD ),
-     :                  DCB_LBND( 1, IDCB ), DCB_UBND( 1, IDCB ),
-     :                  MCB_LMTR( 1, IMCB ), MCB_UMTR( 1, IMCB ),
-     :                  TYPE, MCB_LMRB( 1, IMCB ), MCB_UMRB( 1, IMCB ),
-     :                  .TRUE., DCB_SCLOC( IDCB ), PNTR, DCE, STATUS )
+            CALL ARY1_CMTMP( TYPE, NDIMA, DIM, MLOC, PNTR, STATUS )
+            CALL ARY1_GTN( BAD, DCB_TYP( IDCB ), LOC,
+     :                     MAX( NDIMA, NDIMD ), DCB_LBND( 1, IDCB ),
+     :                     DCB_UBND( 1, IDCB ), MCB_LMTR( 1, IMCB ),
+     :                     MCB_UMTR( 1, IMCB ), TYPE,
+     :                     MCB_LMRB( 1, IMCB ), MCB_UMRB( 1, IMCB ),
+     :                     .TRUE., DCB_SCLOC( IDCB ), PNTR, DCE,
+     :                     STATUS )
+         END IF
+
          COPY = .TRUE.
 
 *  In all other cases, there is no data to be transferred, so simply
@@ -283,3 +367,4 @@
       IF ( STATUS .NE. SAI__OK ) CALL ARY1_TRACE( 'ARY1_MPSR', STATUS )
 
       END
+

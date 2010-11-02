@@ -40,6 +40,8 @@
 *     -  Restore the error context.
 
 *  Copyright:
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 *     Copyright (C) 1989, 1990 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -75,6 +77,8 @@
 *        now done at a lower level.
 *     4-JULY-2006 (DSB):
 *        Add support for scaled arrays.
+*     1-NOV-2010 (DSB):
+*        Include support for delta compressed arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -124,11 +128,12 @@
 *  Handle each form of array in turn, calling the appropriate routine to
 *  unmap it.
 
-*  Primitive, simple and scaled arrays.
-*  ===========================
+*  Primitive, simple, delta and scaled arrays.
+*  ===========================================
       IF ( ( DCB_FRM( IDCB ) .EQ. 'PRIMITIVE' ) .OR.
      :     ( DCB_FRM( IDCB ) .EQ. 'SIMPLE' ) .OR.
-     :     ( DCB_FRM( IDCB ) .EQ. 'SCALED' ) ) THEN
+     :     ( DCB_FRM( IDCB ) .EQ. 'SCALED' ) .OR.
+     :     ( DCB_FRM( IDCB ) .EQ. 'DELTA' ) ) THEN
          CALL ARY1_UMPS( IACB, STATUS )
 
 *  If the form entry in the DCB was not recognised, then report an

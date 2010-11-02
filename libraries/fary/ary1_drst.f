@@ -38,6 +38,8 @@
 *     is valid.
 
 *  Copyright:
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 *     Copyright (C) 1989, 1990 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -81,6 +83,8 @@
 *     17-JUL-2006 (DSB):
 *        Check for deferred arrays (which have ARY__NOLOC for their
 *        DCB_DLOC locator).
+*     1-NOV-2010 (DSB):
+*        Include support for delta compressed arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -162,6 +166,18 @@
                      CALL DAT_RESET( DCB_ILOC( IDCB ), STATUS )
                   END IF
                END IF
+            END IF
+
+*  Delta arrays.
+*  =============
+         ELSE IF ( DCB_FRM( IDCB ) .EQ. 'DELTA' ) THEN
+            IF( STATUS .EQ. SAI__OK ) THEN
+               STATUS = ARY__FATIN
+               CALL ERR_REP( ' ', 'ARY1_DRST: Input array is stored '//
+     :                       'in DELTA form, but DELTA arrays should '//
+     :                       'never be reset because they are '//
+     :                       'read-only (internal programming error).',
+     :                       STATUS )
             END IF
 
 *  If the array form was not recognised, then report an error.

@@ -85,6 +85,8 @@
 *     input array's DCB entry if appropriate.
 
 *  Copyright:
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 *     Copyright (C) 1989, 1990 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -137,6 +139,8 @@
 *        Add support for scaled arrays.
 *     17-JUL-2006 (DSB):
 *        Ensure the data object arrays are available.
+*     1-NOV-2010 (DSB):
+*        Include support for delta compressed arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -237,7 +241,6 @@
       CHARACTER * ( DAT__SZNAM ) NAME ! Object name
       INTEGER I                  ! Loop counter for dimensions
       INTEGER NLEV               ! Levels in HDS path name
-      LOGICAL SCALED             ! Whether array is scaled
 
 *.
 
@@ -259,9 +262,6 @@
 
 *  Ensure that form information is available in the DCB.
          CALL ARY1_DFRM( IDCB1, STATUS )
-
-*  Set a flag if it is scaled.
-         SCALED = ( DCB_FRM( IDCB1 ) .EQ. 'SCALED' )
 
 *  Handle each form of array in turn.
          IF ( STATUS .EQ. SAI__OK ) THEN
@@ -321,7 +321,7 @@
 *  Simple and scaled arrays.
 *  =========================
             ELSE IF ( DCB_FRM( IDCB1 ) .EQ. 'SIMPLE' .OR.
-     :                SCALED ) THEN
+     :                DCB_FRM( IDCB1 ) .EQ. 'SCALED' ) THEN
 
 *  Ensure that data type, bounds and bad pixel flag information are
 *  available in the DCB.
@@ -366,8 +366,14 @@
                CALL ARY1_CPYNC( DCB_LOC( IDCB1 ), 'ORIGIN',
      :                          DCB_LOC( IDCB2 ), STATUS )
 
-*  Transfer the SCALE and ZERO values (if it is a scaled array).
-               IF( SCALED ) CALL ARY1_CPSCL( IDCB1, IDCB2, STATUS )
+*  Transfer the other components of a SCALED array.
+               IF( DCB_FRM( IDCB1 ) .EQ. 'SCALED' ) THEN
+                  CALL ARY1_CPSCL( IDCB1, IDCB2, STATUS )
+
+*  Transfer the other components of a DELTA array.
+               ELSE IF( DCB_FRM( IDCB1 ) .EQ. 'DELTA' ) THEN
+                  CALL ARY1_CPDLT( IDCB1, IDCB2, STATUS )
+               END IF
 
 *  If the form information in the DCB was not recognised, then report an
 *  error.

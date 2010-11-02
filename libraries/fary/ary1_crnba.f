@@ -53,6 +53,8 @@
 *     and set a value of zero for the IACB argument.
 
 *  Copyright:
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 *     Copyright (C) 1989, 1990 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -74,6 +76,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -92,6 +95,8 @@
 *        passed on to the ACB, an incorrect bad pixel flag would be
 *        obtained if the array's values later become defined as a
 *        result of writing new values to it.
+*     1-NOV-2010 (DSB):
+*        Include support for delta compressed arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -178,6 +183,7 @@
 *  Ensure that information about the data object bounds (and number of
 *  dimensions), access mode, bad pixel flag and state are available in
 *  the DCB.
+      CALL ARY1_DFRM( IDCB, STATUS )
       CALL ARY1_DBND( IDCB, STATUS )
       CALL ARY1_DMOD( IDCB, STATUS )
       CALL ARY1_DBAD( IDCB, STATUS )
@@ -194,10 +200,18 @@
          ACB_IMCB( IACB ) = 0
 
 *  Initialise the access control flags according to whether the data
-*  object can be modified or not.
-         DO 1 IACC = 1, ARY__MXACC
-            ACB_ACC( IACC, IACB ) = DCB_MOD( IDCB ) .EQ. 'UPDATE'
-1        CONTINUE
+*  object can be modified or not. For DELTA compressed arrays, the only
+*  chnage that can be made is tpo delete the whole array.
+         IF( DCB_FRM( IDCB ) .NE. 'DELTA' ) THEN
+            DO IACC = 1, ARY__MXACC
+               ACB_ACC( IACC, IACB ) = DCB_MOD( IDCB ) .EQ. 'UPDATE'
+            END DO
+         ELSE
+            DO IACC = 1, ARY__MXACC
+               ACB_ACC( IACC, IACB ) = .FALSE.
+            END DO
+            ACB_ACC( ARY__DELET, IACB ) = DCB_MOD( IDCB ) .EQ. 'UPDATE'
+         END IF
 
 *  Enter the bad pixel flag value from the DCB.
          ACB_BAD( IACB ) = DCB_BAD( IDCB ) .OR.

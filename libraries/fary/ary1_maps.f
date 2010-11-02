@@ -40,7 +40,8 @@
 *        The global status.
 
 *  Notes:
-*     -  This routine may also be used to map a scaled or primitive array.
+*     -  This routine may also be used to map a scaled, delta or
+*     primitive array.
 
 *  Algorithm:
 *     -  Validate the access data type string.

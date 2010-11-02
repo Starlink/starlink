@@ -46,6 +46,8 @@
 *     -  Note whether the data object's values have been initialised.
 
 *  Copyright:
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 *     Copyright (C) 1989, 1990 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -79,6 +81,8 @@
 *        Installed support for primitive arrays.
 *     5-MAY-2006 (DSB):
 *        Installed support for scaled arrays.
+*     29-OCT-2010 (DSB):
+*        Include support for delta compressed arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -140,10 +144,11 @@
 *  Test the state of the non-imaginary component.
             CALL DAT_STATE( DCB_DLOC( IDCB ), DCB_STA( IDCB ), STATUS )
 
-*  Simple and scaled arrays.
-*  =========================
+*  Simple, scaled and delta arrays.
+*  ================================
          ELSE IF ( DCB_FRM( IDCB ) .EQ. 'SIMPLE' .OR.
-     :             DCB_FRM( IDCB ) .EQ. 'SCALED' ) THEN
+     :             DCB_FRM( IDCB ) .EQ. 'SCALED' .OR.
+     :             DCB_FRM( IDCB ) .EQ. 'DELTA' ) THEN
 
 *  Ensure that type (and complexity) information and component locators
 *  are available.

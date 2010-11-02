@@ -209,6 +209,7 @@
 *  and path names and enter them into the DCB.
             IF ( ( DCB_FRM( IDCB ) .EQ. 'PRIMITIVE' ) .OR.
      :           ( DCB_FRM( IDCB ) .EQ. 'SCALED' ) .OR.
+     :           ( DCB_FRM( IDCB ) .EQ. 'DELTA' ) .OR.
      :           ( DCB_FRM( IDCB ) .EQ. 'SIMPLE' ) ) THEN
                CALL HDS_TRACE( DCB_LOC( IDCB ), NLEV, DCB_PATH( IDCB ),
      :                         DCB_FILE( IDCB ), STATUS )

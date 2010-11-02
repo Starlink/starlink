@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="ary" support="S">
-  <version>1.2</version>
+  <version>1.3</version>
   <path>libraries/fary</path>
   <description>A Subroutine Library for Accessing ARRAY Data Structures</description>
   <abstract><p> The ARY library is a set of routines for accessing

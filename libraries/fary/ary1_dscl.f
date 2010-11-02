@@ -27,6 +27,8 @@
 *        The global status.
 
 *  Copyright:
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
 *     Council. All Rights Reserved.
 
@@ -53,6 +55,8 @@
 *  History:
 *     26-APR-2006 (DSB):
 *        Original version.
+*     1-NOV-2010 (DSB):
+*        Include support for delta compressed arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -158,9 +162,10 @@
 *  If OK, indicate that the scaling information is now available.
             IF( STATUS .EQ. SAI__OK ) DCB_KSCL( IDCB ) = .TRUE.
 
-*  Simple and primitive arrays
-*  ===========================
+*  Simple, scaled and primitive arrays
+*  ====================================
          ELSE IF ( DCB_FRM( IDCB ) .EQ. 'SIMPLE' .OR.
+     :             DCB_FRM( IDCB ) .EQ. 'DELTA' .OR.
      :             DCB_FRM( IDCB ) .EQ. 'PRIMITIVE' ) THEN
             DCB_SCLOC( IDCB ) = DAT__NOLOC
 

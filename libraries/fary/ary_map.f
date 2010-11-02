@@ -35,11 +35,13 @@
 
 *  Notes:
 *     -  If the array is a scaled array, the returned mapped values will
-*     the stored array values multiplied by the scale factor and shifted
+*     be the stored array values multiplied by the scale factor and shifted
 *     by the zero term.
-*     -  Currently, only READ access is available for scaled arrays. An
-*     error will be reported if an attempt is made to get WRITE or UPDATE
-*     access to a scaled array.
+*     -  If the array is a delta (i.e. compressed) array, the returned mapped
+*     values will be the uncompressed array values.
+*     -  Currently, only READ access is available for scaled and
+*     compressed arrays. An error will be reported if an attempt is made to
+*     get WRITE or UPDATE access to a scaled or compressed array.
 
 *  Algorithm:
 *     -  Import the array identifier.

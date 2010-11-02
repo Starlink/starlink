@@ -91,6 +91,8 @@
 *  Copyright:
 *     Copyright (C) 1989, 1990 Science & Engineering Research Council.
 *     All Rights Reserved.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -136,6 +138,8 @@
 *        Add support for scaled arrays.
 *     17-JUL-2006 (DSB):
 *        Watch out for deferred arrays that have no data.
+*     29-OCT-2010 (DSB):
+*        Include support for delta compressed arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -232,10 +236,11 @@
                   DCB_DLOC( IDCB ) = ARY__NOLOC
                END IF
 
-*  Simple and scaled arrays.
-*  =========================
+*  Simple, scaled and delta arrays.
+*  ================================
             ELSE IF ( DCB_FRM( IDCB ) .EQ. 'SIMPLE' .OR.
-     :                DCB_FRM( IDCB ) .EQ. 'SCALED' ) THEN
+     :                DCB_FRM( IDCB ) .EQ. 'SCALED' .OR.
+     :                DCB_FRM( IDCB ) .EQ. 'DELTA' ) THEN
 
 *  If data component locators have been acquired for the DCB, then annul
 *  the non-imaginary component locator.

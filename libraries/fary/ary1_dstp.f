@@ -88,6 +88,8 @@
 *     All Rights Reserved.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
 *     Council. All Rights Reserved.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -128,6 +130,8 @@
 *     17-JUL-2006 (DSB):
 *        Cater for arrays in which the creation of the data arrays has
 *        been deferred.
+*     1-NOV-2010 (DSB):
+*        Include support for delta compressed arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -436,6 +440,18 @@
      :                          'arrays are currently unsupported '//
      :                          'by the ARY library.', STATUS )
                END IF
+            END IF
+
+*  delta arrays.
+*  =============
+         ELSE IF ( DCB_FRM( IDCB ) .EQ. 'DELTA' ) THEN
+
+*  Report an error since delta arrays are read-only.
+            IF( STATUS .EQ. SAI__OK ) THEN
+               STATUS = ARY__FATIN
+               CALL ERR_REP( ' ', 'ARY1_DSTP: Input array is stored '//
+     :                       'in DELTA form and so cannot be changed '//
+     :                       '(internal programming error).', STATUS )
             END IF
 
 *  If the form entry in the DCB was not recognised, then report an

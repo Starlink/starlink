@@ -44,6 +44,8 @@
 *  Copyright:
 *     Copyright (C) 1989, 1990 Science & Engineering Research Council.
 *     All Rights Reserved.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -75,6 +77,8 @@
 *        Added annulling of locators associated with DCB flags.
 *     8-MAY-2006 (DSB):
 *        Installed support for scaled arrays.
+*     1-NOV-2010 (DSB):
+*        Include support for delta compressed arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -160,6 +164,7 @@
 *  Simple and scaled arrays.
 *  =========================
          ELSE IF ( DCB_FRM( IDCB ) .EQ. 'SIMPLE' .AND.
+     :             DCB_FRM( IDCB ) .EQ. 'DELTA' .AND.
      :             DCB_FRM( IDCB ) .EQ. 'SCALED' ) THEN
 
 *  Clear all relevant DCB flags and annul associated locators.
@@ -210,9 +215,23 @@
 *  Test the name against all the permitted component names.
                      IF ( ( NAME .NE. 'VARIANT' ) .AND.
      :                    ( NAME .NE. 'DATA' ) .AND.
-     :                    ( NAME .NE. 'IMAGINARY_DATA' ) .AND.
+     :                    ( NAME .NE. 'SCALE' ) .AND.
+     :                    ( NAME .NE. 'ZERO' ) .AND.
      :                    ( NAME .NE. 'ORIGIN' ) .AND.
-     :                    ( NAME .NE. 'BAD_PIXEL' ) ) THEN
+     :                    ( NAME .NE. 'IMAGINARY_DATA' ) .AND.
+     :                    ( NAME .NE. 'BAD_PIXEL' ) .AND. (
+     :                       DCB_FRM( IDCB ) .NE. 'DELTA' .OR. (
+     :
+     :                       ( NAME .NE. 'ZAXIS' ) .AND.
+     :                       ( NAME .NE. 'ZDIM' ) .AND.
+     :                       ( NAME .NE. 'ZRATIO' ) .AND.
+     :                       ( NAME .NE. 'VALUE' ) .AND.
+     :                       ( NAME .NE. 'REPEAT' ) .AND.
+     :                       ( NAME .NE. 'FIRST_DATA' ) .AND.
+     :                       ( NAME .NE. 'FIRST_VALUE' ) .AND.
+     :                       ( NAME .NE. 'FIRST_REPEAT' )
+     :
+     :                                                    ) ) ) THEN
 
 *  Report an error if a rogue component is found.
                         STATUS = ARY__ROGUE

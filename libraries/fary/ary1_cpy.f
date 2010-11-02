@@ -100,6 +100,8 @@
 *     All Rights Reserved.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
 *     Council. All Rights Reserved.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -162,6 +164,8 @@
 *        ever going to be able to change the values in the array.
 *     17-JUL-2006 (DSB):
 *        Add value for DEFER when calling ARY1_DCRE(P).
+*     1-NOV-2010 (DSB):
+*        Include support for delta compressed arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -228,7 +232,6 @@
       INTEGER PNTR2( 2 )         ! Pointer to mapped output data
       LOGICAL BAD                ! Bad pixel flag
       LOGICAL PBND               ! Whether bounds are primitive
-      LOGICAL SCALED             ! Whether array is scaled
 
 *.
 
@@ -244,19 +247,15 @@
 *  Ensure that form information is available for it in the DCB.
       CALL ARY1_DFRM( IDCB1, STATUS )
 
-*  Set a flag if it is scaled.
-      IF( STATUS .EQ. SAI__OK ) THEN
-         SCALED = ( DCB_FRM( IDCB1 ) .EQ. 'SCALED' )
-      ELSE
-         SCALED = .FALSE.
-      END IF
+*  If the input array is a base array, but is not a scaled or delta array,
+*  then check to see that there is no conflicting mapped access for write
+*  or update in effect. Report an error if there is. We exclude scaled and
+*  delta arrays since these need to be converted to simple form, in the
+*  same way that an array section is copied.
+      IF ( .NOT. ACB_CUT( IACB1 ) .AND.
+     :      DCB_FRM( IDCB1 ) .NE. 'SCALED' .AND.
+     :      DCB_FRM( IDCB1 ) .NE. 'DELTA' ) THEN
 
-*  If the input array is a base array, but is not a scaled array, then check
-*  to see that there is no conflicting mapped access for write or update in
-*  effect. Report an error if there is. We exclude scaled arrays since
-*  these need to be converted to simple form, in the same way that an array
-*  section is copied.
-      IF ( .NOT. ACB_CUT( IACB1 ) .AND. .NOT. SCALED ) THEN
          IF ( DCB_NWRIT( IDCB1 ) .NE. 0 ) THEN
             STATUS = ARY__ISMAP
             CALL DAT_MSG( 'ARRAY', DCB_LOC( IDCB1 ) )
@@ -401,16 +400,17 @@
                   END IF
                END IF
 
-*  Simple and scaled arrays.
-*  =========================
+*  Simple, scaled and delta arrays.
+*  ================================
             ELSE IF ( DCB_FRM( IDCB1 ) .EQ. 'SIMPLE' .OR.
-     :                SCALED ) THEN
+     :                DCB_FRM( IDCB1 ) .EQ. 'SCALED' .OR.
+     :                DCB_FRM( IDCB1 ) .EQ. 'DELTA' ) THEN
 
 *  Ensure that data type information is available in the DCB.
                CALL ARY1_DTYP( IDCB1, STATUS )
 
 *  Get the required data type for the new array.
-               IF( SCALED ) THEN
+               IF( DCB_FRM( IDCB1 ) .EQ. 'SCALED' ) THEN
                   CALL CMP_TYPE( DCB_SCLOC( IDCB1 ), 'SCALE', NEWTYP,
      :                           STATUS )
                ELSE
@@ -441,7 +441,8 @@
                      IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Map the input array for reading through the cloned ACB entry and the
-*  output array for writing.
+*  output array for writing. This uncompresses the input array if the
+*  input array is stored in DELTA format.
                         CALL ARY1_MAPS( IACBC, NEWTYP, DCB_CPX( IDCB1 ),
      :                                  'READ', PNTR1( 1 ), PNTR1( 2 ),
      :                                  STATUS )
@@ -534,6 +535,7 @@
 
 *  Annul the cloned ACB entry.
                      CALL ARY1_ANL( IACBC, STATUS )
+
                   END IF
                END IF
 

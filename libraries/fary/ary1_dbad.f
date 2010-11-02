@@ -41,6 +41,8 @@
 *     -  Note whether bad pixel information is now available in the DCB.
 
 *  Copyright:
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 *     Copyright (C) 1989, 1990 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -72,6 +74,8 @@
 *        Changed initialisation of locators to use global constant.
 *     12-FEB-1990 (RFWS):
 *        Installed support for primitive arrays.
+*     1-NOV-2010 (DSB):
+*        Include support for delta compressed arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -130,9 +134,10 @@
          IF ( DCB_FRM( IDCB ) .EQ. 'PRIMITIVE' ) THEN
             DCB_BAD( IDCB ) = .TRUE.
 
-*  Simple and scaled arrays.
-*  =========================
+*  Simple, scaled and delta arrays.
+*  ================================
          ELSE IF ( DCB_FRM( IDCB ) .EQ. 'SIMPLE' .OR.
+     :             DCB_FRM( IDCB ) .EQ. 'DELTA' .OR.
      :             DCB_FRM( IDCB ) .EQ. 'SCALED' ) THEN
 
 *  See if the BAD_PIXEL component is present and supply a default value

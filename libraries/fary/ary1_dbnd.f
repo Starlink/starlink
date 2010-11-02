@@ -52,6 +52,8 @@
 *     fact.
 
 *  Copyright:
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 *     Copyright (C) 1989, 1990 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -87,6 +89,8 @@
 *        Added support for primitive arrays.
 *     26-APR-2006 (DSB):
 *        Added support for scaled arrays.
+*     30-OCT-2010 (DSB):
+*        Include support for delta compressed arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -189,16 +193,26 @@
                DCB_UBND( I, IDCB ) = 1
 2           CONTINUE
 
-*  Simple and scaled arrays.
-*  =========================
+*  Simple, scaled and delta arrays.
+*  ================================
          ELSE IF ( DCB_FRM( IDCB ) .EQ. 'SIMPLE' .OR.
-     :             DCB_FRM( IDCB ) .EQ. 'SCALED' ) THEN
+     :             DCB_FRM( IDCB ) .EQ. 'SCALED' .OR.
+     :             DCB_FRM( IDCB ) .EQ. 'DELTA' ) THEN
 
-*  Ensure that data type information is available, then obtain the shape
-*  of the non-imaginary array component.
+*  Ensure that data type information is available, then for non-DELTA
+*  arrays, obtain the shape of the non-imaginary array component.
             CALL ARY1_DTYP( IDCB, STATUS )
-            CALL DAT_SHAPE( DCB_DLOC( IDCB ), ARY__MXDIM, DIMD, NDIMD,
-     :      STATUS )
+            IF( DCB_FRM( IDCB ) .NE. 'DELTA' ) THEN
+               CALL DAT_SHAPE( DCB_DLOC( IDCB ), ARY__MXDIM, DIMD,
+     :                         NDIMD, STATUS )
+
+*  For delta arrays, the dimensions are defined by the ZAXIS, ZDIM, and
+*  FIRST_DATA components in the data object.
+            ELSE
+               CALL ARY1_DLSHP( DCB_LOC( IDCB ), ARY__MXDIM, DIMD,
+     :                          NDIMD, STATUS )
+            END IF
+
             IF ( STATUS .NE. SAI__OK ) GO TO 9999
 
 *  Check that it is not scalar, and report an error if it is.
