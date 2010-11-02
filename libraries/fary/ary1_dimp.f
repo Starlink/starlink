@@ -53,6 +53,8 @@
 *     All Rights Reserved.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
 *     Council. All Rights Reserved.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -91,6 +93,8 @@
 *        Added support for primitive arrays.
 *     26-APR-2006 (DSB):
 *        Added support for scaled arrays.
+*     1-NOV-2010 (DSB):
+*        Include support for delta compressed arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
