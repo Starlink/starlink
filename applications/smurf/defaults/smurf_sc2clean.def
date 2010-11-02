@@ -80,6 +80,9 @@ cleandk.spikebox = 50
 cleandk.noiseclip = 0.0
 cleandk.filt_wlim = <undef>
 cleandk.whiten = 0
+cleandk.flagslow = 0
+cleandk.flagfast = 0
+cleandk.compreprocess = 0
 
 # the following two parameters are included because the same
 # code is used to clean bolometers and the dark squids. However,
