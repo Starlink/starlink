@@ -16,12 +16,12 @@
 
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {11.4}
-\newcommand{\stardocauthors}   {R.F. Warren-Smith}
-\newcommand{\stardocdate}      {4th July 2006}
+\newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
+\newcommand{\stardocdate}      {2nd November 2010}
 \newcommand{\stardoctitle}     {ARY\\[\latex{2.5ex}]
                                 A Subroutine Library for Accessing\\
                                 ARRAY Data Structures}
-\newcommand{\stardocversion}   {Version 1.2}
+\newcommand{\stardocversion}   {Version 1.3}
 \newcommand{\stardocmanual}    {Reference Manual}
 \newcommand{\stardocabstract}  {%
 The ARY library is a set of routines for accessing Starlink ARRAY data
@@ -596,55 +596,295 @@ Appendix~\ref{ss:routinedescriptions} of this document.
 Note that at present, the ARY\_ system provides full support only for the
 ``primitive'' and ``simple'' forms of the ARRAY data structure.
 
-However, some support is also provided for the ``scaled'' form described
-in SGP/38. This form is the same as the ``simple'' form except that two
+Some support is also provided for two additional forms:
+
+\begin{description}
+\item[SCALED] - the ``scaled'' form described in SGP/38. This form is the
+same as the ``simple'' form except that two
 extra scalar values are included that describe a linear scaling from the
 stored array values to the data values of interest to an external user.
 These two scalars are referred to as SCALE and ZERO. The external
 (unscaled) data values are derived from the stored (scaled) data values
 as follows:
 
-\begin{eqnarray*}
- unscaled & = & SCALE*scaled + ZERO
-\end{eqnarray*}
+unscaled\ =\ SCALE*scaled\ +\ ZERO
+
+\item[DELTA] - this form is not currently described in SGP/38. Delta form
+provides a lossless compression scheme designed for arrays of integers in
+which there is at least one pixel axis along which the array value changes
+only slowly. For further details, see \S\ref{ss:deltaform}.
+
+\end{description}
 
 The following points should be noted:
 
 \begin{enumerate}
 
-\item Scaled arrays are ``read-only''. An error will be reported if an
-attempt is made to map a scaled array for WRITE or UPDATE access. When
-mapped for READ access, the pointer returned by ARY\_MAP provides access
-to the \emph{unscaled} data values - that is, the mapped values are the
-result of applying the scale and zero terms to the stored values.
+\item Scaled and delta arrays are ``read-only''. An error will be reported if
+an attempt is made to map a scaled or delta array for WRITE or UPDATE
+access. When mapped for READ access, the pointer returned by ARY\_MAP
+provides access to the \emph{original} data values - that is, the mapped
+values are the result of (for scaled arrays) applying the scale and zero
+terms to the stored values, or (for delta arrays) uncompressing the
+compressed values.
 
-Currently, the scaled (i.e. stored) data values cannot be accessed
-directly.
+Currently, the internal stored (i.e. scaled or compressed) data values
+cannot be accessed directly.
 
-\item The result of copying a scaled array (using ARY\_COPY) will be an
-equivalent simple array.
+\item The result of copying a scaled or delta array (using ARY\_COPY) will be
+an equivalent simple array.
 
-\item Scaled arrays cannot be created directly. Instead, a simple array must
-first be created (using ARY\_NEW), and this can then be converted to a scaled
-array by assigning scale and zero values to it using ARY\_PTSZ<T>. So a
-typical program could create a simple array, map it for write access,
-store the scaled data values in the mapped simple array, unmap the
-array, and then associate scale and zero values with the array, thus
-converting it to a scaled array.
+\item Scaled and delta arrays cannot be created directly. Instead, a simple
+array must first be created (using ARY\_NEW), and this can then be converted
+to a scaled or delta array as follows:
 
-\item Scaled arrays cannot have complex data types. An error will be
+\begin{description}
+
+\item[SCALED] - storing scale and zero values in the simple array using
+ARY\_PTSZ<T>. A typical program would create a simple array, map it for
+write access, store the scaled data values in the mapped simple array,
+unmap the array, and then associate scale and zero values with the array,
+thus converting it to a scaled array.
+
+\item[DELTA] - copying the simple array using ARY\_DELTA. The copy will
+be a compressed array stored in delta form. A typical program would create
+a simple array, map it for write access, store the uncompressed data
+values in the mapped simple array, unmap the array, and then copy it using
+ARY\_DELTA. The original simple array could then be deleted if it is no
+longer needed.
+
+\end{description}
+
+\item Scaled and delta arrays cannot have complex data types. An error will be
 reported if an attempt is made to to import an HDS structure describing a
-complex scaled array, or to assign scale and zero values to an array with
-complex data values.
+complex scaled or delta array, or to use ARY\_PTSZ<T> or ARY\_DELTA on an
+array with complex data values.
 
-\item When applied to a scaled array, the ARY\_TYPE and ARY\_FTYPE routines
-return information about the data type of the unscaled data values. In
-practice, this means that they return the data type of the SCALE and ZERO
-constants, rather than the data type of the array holding the stored
-(scaled) data values.
+\item When applied to a scaled or delta array, the ARY\_TYPE and ARY\_FTYPE
+routines return the data type of the external (i.e. unscaled or uncompressed)
+values. In practice, this means that for a scaled array they return the data
+type of the SCALE and ZERO constants, rather than the data type of the array
+holding the stored (scaled) data values. For a delta array they return
+the data type of the original uncompressed values.
 
 \end{enumerate}
 
+\subsection{\xlabel{ddelta_form}\label{ss:deltaform}Delta Compressed Array Form}
+
+The DELTA storage form provides lossless compression for integer arrays.
+It uses two methods to achieve compression:
+
+\begin{itemize}
+
+\item Differences between adjacent data values are stored, rather than
+the full data values themselves. For many forms of astronomical data, the
+differences between adjacent data values have a much smaller range than
+the data values themselves. This means that they can be represented in
+fewer bits. For instance, if the data values are \_INTEGER, then the
+differences between adjacent values may fit into the range of a \_WORD
+(-32767 to +32767) or even a \_BYTE (-127 to +127). This use of a shorter
+data type usually provides the majority of the compression. However, it is not
+necessary for all differences to be small - if the difference between two
+adjacent data values is too large for the compressed data type, the
+second of the two data values will be stored explicitly using the full data
+type of the original uncompressed data. Obviously, the more values that
+need to be stored in full in this way, the lower will be the compression.
+
+In the above description, the term ``adjacent'' means ``adjacent along a
+specified pixel axis''. The pixel axis along which differences are taken
+is referred to as the ``compression axis''. It may be specified
+explicitly by the calling application when ARY\_DELTA is called, or it
+may be left unspecified in which case ARY\_DELTA will choose the axis that
+gives the best compression.
+
+\item If the uncompressed array contains runs of more than three identical
+values along the compression axis, then the run of identical values is
+replaced by a single value (stored in full, not as a difference) and a
+repetition count.
+
+\end{itemize}
+
+\subsubsection{Creating a Delta Array}
+
+To create a DELTA array, first store the uncompressed integer values in a
+simple array, and then copy the array using ARY\_DELTA. The copy produced
+by ARY\_DELTA will be stored in DELTA form.
+
+Arrays of floating point values may be compressed by first storing the
+floating point values in a SCALED array, and then using ARY\_DELTA to
+create a delta compressed copy of the scaled array. Note, the scaled
+array must use an integer data type to store the internal (i.e. scaled)
+values. The use of the scaled array means that the compression is not
+lossless, since some information will have been lost in scaling the
+floating point values into integers.
+
+\subsubsection{The HDS Structure of a Delta Array}
+The HDS structure of a DELTA array is similar to the SIMPLE array,
+in that it will contain VARIANT, DATA and ORIGIN components. In
+addition they can contain SCALE and ZERO terms, which, if present,
+are used to scale the uncompressed integers as in a SCALED array.
+Uncompression happens first, producing an array of uncompressed
+integers, which are then unscaled if required using SCALE and ZERO to
+produce the final uncompressed, unscaled, array.
+
+DELTA arrays cannot be used to hold complex values and so no
+IMAGINARY\_DATA component will be present. Also, DELTA arrays have an
+implicit value of .TRUE. for their bad pixel flags, and so no BAD\_PIXEL
+component will be present in the HDS structure.
+
+Information is stored within a DELTA array that allows sub-sections of
+the compressed array to be uncompressed without needing to uncompress the
+whole array.
+
+A DELTA array is stored in an HDS structure with type DELTA\_ARRAY, and
+contains the following components:
+
+\begin{description}
+
+\item[DATA] - This is a one-dimensional integer array holding the differences
+between adjacent uncompressed integer data values along the compression
+axis. Its data type will be eother \_INTEGER, \_WORD or \_BYTE and is
+specified when ARY\_DELTA is called to create the array. A few integer
+values (all near the maximum value allowed by the data type) are reserved
+for use as flags to indicate one of the following conditions (where
+``MAX'' represents the largest positive integer value that can be
+represented using the data type of the DATA array):
+
+\begin{itemize}
+
+\item The value MAX is reserved to indicate that the next element of the
+uncompressed array is good, but could not be expressed as a difference from
+the previous element because the difference would not fit into the
+available data range of the DATA array. Instead, the full uncompressed value
+is stored in the next element of the VALUE array.
+
+\item The value (MAX-1) is reserved to indicate that the next element of
+the uncompressed array is good and is exactly equal to the following (N-1)
+elements. The full uncompressed value is stored in the next element of the
+VALUE array. The value of N is stored in the next element of the REPEAT array.
+
+\item The value (MAX-2) is reserved to indicate that the next element of
+the uncompressed array is bad, as are the following (N-1) elements. The full
+uncompressed value of the next good value following the bad values is stored
+in the next element of the VALUE array. The value of N is stored in the next
+element of the REPEAT array.
+
+\item The value (MAX-3) is reserved to indicate that the next element of
+the uncompressed array is bad, but the following element is good and its
+full uncompressed value is stored in the next element of the VALUE array.
+
+\item The value (MAX-4) is reserved to indicate that the next N elements of
+the uncompressed array are good but cannot be expressed as differences from
+the previous element because the differences would not fit into the available
+data range of the DATA array. Instead, the full uncompressed values are
+stored in the next N elements of the VALUE array. The value of N is
+stored in the next element of the REPEAT array.
+
+\item Any other value is taken to be (NEXT - PREVIOUS) - the difference
+between the next uncompressed value and the previous uncompressed value.
+
+\end{itemize}
+
+Notes:
+
+\begin{enumerate}
+
+\item The ``available data range'' in DATA is reduced to leave room for the
+above flags.
+
+\item The first element in each row of pixels parallel to the compression
+axis is always represented using one of these flag values. This allows
+each row of pixel values to be uncompressed without reference to any
+earlier values.
+
+\item Repeated runs of good or bad value are always contained within a single
+row of pixels parallel to the compression axis. Runs of repeated values
+that cross the boundary between adjacent rows are split into two repeated
+runs - one for each row.
+
+\end{enumerate}
+
+\item[FIRST\_DATA] - This is an \_INTEGER array with (NDIM-1) axes which
+have the same order and size as the axes of the uncompressed array, but
+omitting the compression axis (NDIM is the number of axes in the
+uncompressed array). It holds the zero-based index into the DATA array at
+which the first element of the corresponding row of values is stored.
+
+For instance, if the uncompressed array is a cube with bounds
+(1:10,1:5,1:7), and the compression axis is axis number 2, then the
+FIRST\_DATA array will be two-dimensional with bounds (1:10,1:7). Element
+(2,3) of this array (for instance) will hold the integer index of the
+DATA array element that gives the full value for pixel (2,1,3) in the
+uncompressed array. Elements (2,2,3), (2,3,3), (2,4,3) and (2,5,3) of the
+uncompressed array are then derived from the following values in the DATA
+array.
+
+\item[FIRST\_REPEAT] - This is an array with the same shape as
+the FIRST\_DATA array. It holds the zero-based index of the first value
+of the REPEAT array to be used whilst uncompressing the corresponding
+row of pixels. This component will only be present in the DELTA\_ARRAY
+structure if the REPEAT component is present. The data type of this array
+will be one of \_INTEGER, \_UWORD or \_UBYTE, depending on the largest value
+stored in it.
+
+\item[FIRST\_VALUE] - This is an array with the same shape as
+the FIRST\_DATA array. It holds the zero-based index of the first value
+of the VALUE array to be used whilst uncompressing the corresponding
+row of pixels. The data type of this array will be one of \_INTEGER,
+\_UWORD or \_UBYTE, depending on the largest value stored in it.
+
+\item[ORIGIN] - A one-dimensional \_INTEGER array holding the pixel indices
+of the first element of the uncompressed array. This component is optional
+- an origin of (1,1,1...) is assumed if the component is not present in the
+DELTA\_ARRAY structure.
+
+\item[REPEAT] - A one-dimensional \_INTEGER array holding the number of
+repetitions for each value associated with an occurrence of (MAX-1),
+(MAX-2) or (MAX-4) in the DATA array. The data type of this array will be
+one of \_INTEGER, \_UWORD or \_UBYTE, depending on the largest value stored in
+it. This array will not be present if there are no runs in the uncompressed
+data array.
+
+\item[SCALE] - An optional component giving a scale factor to apply to the
+uncompressed integer values. It can be of any data type. If present the
+uncompressed array is treated like a SCALED array. In particular, the
+data type of the uncompressed array will be the same as the data type of
+the SCALE component, if present. If not present, the data type of the
+uncompressed array is given by the data type of the VALUE array.
+
+\item[VALUE] - A one-dimensional array with the same data type as the
+uncompressed array (\_INTEGER, \_WORD, \_UWORD, \_BYTE or \_UBYTE) prior to
+scaling by SCALE and ZERO. It holds full uncompressed integer values for
+the elements that are flagged with any of the special values listed under
+``DATA'' above. Note, if SCALE and ZERO components are present in the
+DELTA array, the VALUE array holds internal scaled values, rather than
+external unscaled values.
+
+\item[VARIANT] - The storage form of the array. This will always be set to
+``DELTA''.
+
+\item[ZAXIS] - A scalar \_INTEGER value giving the index of the ecompression
+axis - that is, the pixel axis index within the uncompressed array along
+which differences were taken. Care should be taken in the choice of ZAXIS
+since it can affect the degree of compression achieved. If ZAXIS is not
+specified when compressing an array, it defaults to the axis that gives the
+greatest compression. Note, the ZAXIS value is one-based, not zero-based.
+
+\item[ZDIM] - A scalar \_INTEGER holding the length of the compression axis
+within the uncompressed array. The other dimensions of the uncompressed array
+are given by the shape of the FIRST\_DATA array.
+
+\item[ZERO] - An optional component giving a zero offset to add to the
+uncompressed integer values. It can be of any data type. If present the
+uncompressed array is treated like a SCALED array.
+
+\item[ZRATIO] - A scalar \_REAL holding the compression factor - that is, the
+ratio of the uncompressed array size to the compressed array size. This
+is approximate as it does not include the effects of the metadata needed
+to describe the extra components of a DELTA array (i.e. the space needed
+to hold the HDS component names, types, dimensions, etc).
+
+\end{description}
 
 \section{\xlabel{compiling_and_linking}Compiling and Linking}
 \label{compiling_and_linking}
@@ -933,6 +1173,7 @@ Creation and Control of Identifiers}
 \label{routine_descriptions}
 \label{ss:routinedescriptions}
 
+
 \sstroutine{
    ARY\_ANNUL
 }{
@@ -1019,7 +1260,6 @@ Creation and Control of Identifiers}
          The global status.
       }
    }
-%   \newpage
    \sstnotes{
       \sstitemlist{
 
@@ -1278,6 +1518,10 @@ Creation and Control of Identifiers}
       \sstitemlist{
 
          \sstitem
+         The result of copying a scaled or delta array will be an
+         equivalent simple array.
+
+         \sstitem
          If this routine is called with STATUS set, then a value of
          ARY\_\_NOID will be returned for the IARY2 argument, although no
          further processing will occur. The same value will also be
@@ -1303,7 +1547,6 @@ Creation and Control of Identifiers}
    \sstinvocation{
       CALL ARY\_DELET( IARY, STATUS )
    }
-%   \newpage
    \sstarguments{
       \sstsubsection{
          IARY = INTEGER (Given and Returned)
@@ -1329,6 +1572,137 @@ Creation and Control of Identifiers}
          A value of ARY\_\_NOID is always returned for the IARY argument,
          even if the routine should fail. This constant is defined in the
          include file ARY\_PAR.
+      }
+   }
+}
+\sstroutine{
+   ARY\_DELTA
+}{
+   Compress an array using delta compression
+}{
+   \sstdescription{
+      The routine creates a copy of the supplied array stored in DELTA form,
+      which provides a lossless compression scheme for integer data. This
+      scheme assumes that adjacent integer values in the input array tend
+      to be close in value, and so differences between adjacent values can
+      be represented in fewer bits than the absolute values themselves.
+      The differences are taken along a nominated pixel axis within the
+      supplied array (specified by argument ZAXIS).
+
+      In practice, the scheme is limited currently to representing differences
+      between adjacent values using a HDS integer data type (specified by
+      argyument TYPE) - that is, arbitrary bit length is not yet supported.
+      So for instance an \_INTEGER input array can be compressed by storing
+      differences as \_WORD or \_BYTE values, but a \_WORD input array can only
+      be compressed by storing differences as \_BYTE values.
+
+      Any input value that differs from its earlier neighbour by more than
+      the data range of the selected data type is stored explicitly using
+      the data type of the input array.
+
+      Further compression is achieved by replacing runs of equal input values
+      by a single occurrence of the value with a correspsonding repetition
+      count.
+
+      It should be noted that the degree of compression achieved is
+      dependent on the nature of the data, and it is possible for the
+      compressed array to occupy more space than the uncompressed array.
+      The compression factor actually achieved is returned in argument
+      ZRATIO (the ratio of the supplied array size to the compressed
+      array size). A minmum allowed compression ratio may be specified via
+      argument MINRAT. If the compression ratio is less than this value,
+      then the supplied array is left unchanged.
+   }
+   \sstinvocation{
+      CALL ARY\_DELTA( IARY1, ZAXIS, TYPE, MINRAT, PLACE, ZRATIO, IARY2,
+                      STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY1 = INTEGER (Given)
+      }{
+         The input array identifier. An error is reported if the array is
+         already stored in DELTA form. Note, if the array is a SCALED array,
+         the internal integer values are compressed and the scale and zero
+         terms are stored in the compressed array.
+      }
+      \sstsubsection{
+         ZAXIS = INTEGER (Given)
+      }{
+         The index of the pixel axis along which differences are to be
+         taken. If this is zero, a default value will be selected that
+         gives the greatest compression. An error will be reported if a
+         value less than zero or greater than the number of axes in the
+         input array is supplied.
+      }
+      \sstsubsection{
+         TYPE = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The data type in which to store the differences between adjacent
+         input values. This must be one of {\tt '}\_BYTE{\tt '}, {\tt '}\_WORD{\tt '} or
+         {\tt '}\_INTEGER{\tt '}. Additionally, a blank string may be supplied in which
+         case a default value will be selected that gives the greatest
+         compression.
+      }
+      \sstsubsection{
+         MINRAT = REAL (Given)
+      }{
+         The minimum allowed ZRATIO value. If compressing the input array
+         results in a ZRATIO value smaller than or equal to MINRAT, then
+         the supplied array is left unchanged. If the supplied value is
+         zero or negative, then the array will be compressed regardless of
+         the compression ratio.
+      }
+      \sstsubsection{
+         PLACE = INTEGER (Given and Returned)
+      }{
+         An array placeholder (e.g. generated by the ARY\_PLACE routine)
+         which indicates the position in the data system where the new
+         array will reside. The placeholder is annulled by this
+         routine, and a value of ARY\_\_NOPL will be returned (as defined
+         in the include file ARY\_PAR).
+      }
+      \sstsubsection{
+         ZRATIO = REAL (Returned)
+      }{
+         The compression factor actually achieved (the ratio of the
+         supplied array size to the compressed array size). Genuine
+         compressions are represented by values more than 1.0, but values
+         less than 1.0 may be returned if the input data is not suited
+         to delta compression (i.e. if the {\tt "}compression{\tt "} actually expands
+         the array storage). Note, the returned value of ZRATIO may be
+         smaller than MINRAT, in which case the supplied array is left
+         unchanged. The returned compression factor is approximate as it
+         does not take into account the space occupied by the HDS metadata
+         describing the extra components of a DELTA array (i.e. the
+         component names, data types, dimensions, etc). This will only be
+         significant for very small arrays.
+      }
+      \sstsubsection{
+         IARY2 = INTEGER (Returned)
+      }{
+         Identifier for the new DELTA array.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This routine may only be used to compress a base array. If it is
+         called with an array which is not a base array, then it will return
+         without action. No error will result.
+
+         \sstitem
+         An error will result if the array, or any part of it, is
+         currently mapped for access (e.g. through another identifier).
+
+         \sstitem
+         An error will result if the array holds complex values.
       }
    }
 }
@@ -1439,6 +1813,10 @@ Creation and Control of Identifiers}
       \sstitemlist{
 
          \sstitem
+         Duplicating a scaled or delta array produces and equivalent
+         simple array.
+
+         \sstitem
          If this routine is called with STATUS set, then a value of
          ARY\_\_NOID will be returned for the IARY2 argument, although no
          further processing will occur. The same value will also be
@@ -1534,9 +1912,9 @@ Creation and Control of Identifiers}
          array. This constant is defined in the include file ARY\_PAR.
 
          \sstitem
-         At present, the ARY\_ routines only support {\tt "}primitive{\tt "} and
-         {\tt "}simple{\tt "} arrays, so only the values {\tt '}PRIMITIVE{\tt '} and {\tt '}SIMPLE{\tt '} can
-         be returned.
+         At present, the ARY\_ routines only support {\tt "}primitive{\tt "}, {\tt "}scaled{\tt "},
+         {\tt "}simple{\tt "} and {\tt "}delta{\tt "} arrays, so only the values {\tt '}PRIMITIVE{\tt '}, {\tt '}SCALED{\tt '}
+         {\tt '}DELTA{\tt '} and {\tt '}SIMPLE{\tt '} can be returned.
       }
    }
 }
@@ -1576,11 +1954,77 @@ Creation and Control of Identifiers}
          The symbolic constant ARY\_\_SZFTP may be used for declaring the
          length of a character variable to hold the full data type of an
          array. This constant is defined in the include file ARY\_PAR.
+
+         \sstitem
+         For {\tt "}Scaled{\tt "} arrays, the data type returned by this function is
+         the data type of the SCALE and ZERO terms, rather than the data
+         type of the stored array.
       }
    }
 }
 \sstroutine{
-   ARY\_GTSZ$<$T$>$
+   ARY\_GTDLT
+}{
+   Get the compressed axis and data type for a DELTA array
+}{
+   \sstdescription{
+      The routine returns the details of the compression used to produce
+      an array stored in DELTA form. If the array is not stored in
+      DELTA form, then null values are returned as listed below, but no
+      error is reported.
+
+      A DELTA array is compressed by storing only the differences between
+      adjacent array values along a nominated compression axis, rather than
+      the full array values. The differences are stored using a smaller data
+      type than the original absolute values. The compression is lossless
+      because any differences that will not fit into the smaller data type
+      are stored explicitly in an extra array with a larger data type.
+      Additional compression is achieved by replacing runs of equal values
+      by a single value and a repeat count.
+   }
+   \sstinvocation{
+      CALL ARY\_GTDLT( IARY, ZAXIS, ZTYPE, ZRATIO, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         ZAXIS = INTEGER (Returned)
+      }{
+         The index of the pixel axis along which compression occurred.
+         The first axis has index 1. Zero is returned if the array is not
+         stored in DELTA form.
+      }
+      \sstsubsection{
+         ZTYPE = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The data type in which the differences between adjacent array
+         values are stored. This will be one of {\tt '}\_BYTE{\tt '}, {\tt '}\_WORD{\tt '} or
+         {\tt '}\_INTEGER{\tt '}. The data type of the array itself is returned if the
+         supplid array is not stored in DELTA form.
+      }
+      \sstsubsection{
+         ZRATIO = REAL (Returned)
+      }{
+         The compression factor - the ratio of the uncompressed array size
+         to the compressed array size. This is approximate as it does not
+         include the effects of the metadata needed to describe the extra
+         components of a DELTA array (i.e. the space needed to hold the
+         component names, types, dimensions, etc). A value of 1.0 is
+         returned if the supplid array is not stored in DELTA form.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   ARY\_GTSZB
 }{
    Get the scale and zero values for an array
 }{
@@ -1590,7 +2034,7 @@ Creation and Control of Identifiers}
       are returned.
    }
    \sstinvocation{
-      CALL ARY\_GTSZ$<$T$>$( IARY, SCALE, ZERO, STATUS )
+      CALL ARY\_GTSZB( IARY, SCALE, ZERO, STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -1599,12 +2043,12 @@ Creation and Control of Identifiers}
          Array identifier.
       }
       \sstsubsection{
-         SCALE = $<$TYPE$>$ (Returned)
+         SCALE = BYTE (Returned)
       }{
          The scaling factor.
       }
       \sstsubsection{
-         ZERO = $<$TYPE$>$ (Returned)
+         ZERO = BYTE (Returned)
       }{
          The zero offset.
       }
@@ -1819,6 +2263,38 @@ Creation and Control of Identifiers}
    }
 }
 \sstroutine{
+   ARY\_LOC
+}{
+   Obtain an HDS locator for an array
+}{
+   \sstdescription{
+      The routine returns an HDS locator for the data object referred to
+      by the supplied ARY identifier.
+   }
+   \sstinvocation{
+      CALL ARY\_LOC( IARY, LOC, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         LOC = CHARACTER $*$ ( DAT\_\_SZLOC ) (Returned)
+      }{
+         The HDS locator. It should be annulled using DAT\_ANNUL when no
+         longer needed. A value of DAT\_\_NOLOC will be returned if an
+         error occurs.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
    ARY\_MAP
 }{
    Obtain mapped access to an array
@@ -1863,6 +2339,24 @@ Creation and Control of Identifiers}
          STATUS = INTEGER (Given and Returned)
       }{
          The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If the array is a scaled array, the returned mapped values will
+         be the stored array values multiplied by the scale factor and shifted
+         by the zero term.
+
+         \sstitem
+         If the array is a delta (i.e. compressed) array, the returned mapped
+         values will be the uncompressed array values.
+
+         \sstitem
+         Currently, only READ access is available for scaled and
+         compressed arrays. An error will be reported if an attempt is made to
+         get WRITE or UPDATE access to a scaled or compressed array.
       }
    }
 }
@@ -2137,7 +2631,7 @@ Creation and Control of Identifiers}
          ACCESS = CHARACTER $*$ ( $*$ ) (Given)
       }{
          The type of access to be disabled: {\tt '}BOUNDS{\tt '}, {\tt '}DELETE{\tt '},
-         {\tt '}MODIFY{\tt '}, {\tt '}SHIFT{\tt '}, {\tt '}TYPE{\tt '} or {\tt '}WRITE{\tt '}.
+         {\tt '}MODIFY{\tt '}, {\tt '}SCALE{\tt '}, {\tt '}SHIFT{\tt '}, {\tt '}TYPE{\tt '} or {\tt '}WRITE{\tt '}.
       }
       \sstsubsection{
          IARY = INTEGER (Given)
@@ -2165,6 +2659,9 @@ Creation and Control of Identifiers}
          \sstitem
          {\tt '}MODIFY{\tt '} prevents any form of modification to the array (i.e.
          it disables all the other access types).
+
+         \sstitem
+         {\tt '}SCALE{\tt '} prevents the scale and zero values from being changed.
 
          \sstitem
          {\tt '}SHIFT{\tt '} prevents pixel-index shifts from being applied to a
@@ -2296,7 +2793,7 @@ Creation and Control of Identifiers}
    }
 }
 \sstroutine{
-   ARY\_PTSZ$<$T$>$
+   ARY\_PTSZB
 }{
    Set new scale and zero values for a scaled array
 }{
@@ -2306,7 +2803,7 @@ Creation and Control of Identifiers}
       then the storage form is changed to scaled.
    }
    \sstinvocation{
-      CALL ARY\_PTSZ$<$T$>$( IARY, SCALE, ZERO, STATUS )
+      CALL ARY\_PTSZB( IARY, SCALE, ZERO, STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -2315,12 +2812,12 @@ Creation and Control of Identifiers}
          Array identifier.
       }
       \sstsubsection{
-         SCALE = $<$TYPE$>$ (Given)
+         SCALE = BYTE (Given)
       }{
          The new value for the scaling factor.
       }
       \sstsubsection{
-         ZERO = $<$TYPE$>$ (Given)
+         ZERO = BYTE (Given)
       }{
          The new value for the zero offset.
       }
@@ -3156,7 +3653,6 @@ Creation and Control of Identifiers}
    }
 }
 
-
 \newpage
 \section{\xlabel{changes_and_new_features_in_v11}%
 Changes and new features in V1.1}
@@ -3202,6 +3698,27 @@ name, including the full container file name.
 
 No changes to existing applications should be required, neither should any
 re-compilation or re-linking be necessary.
+
+\section{\xlabel{changes_and_new_features_in_v13}%
+Changes and new features in V1.3}
+\label{changes_and_new_features_in_v13}
+The most significant changes in version (V1.3) of the ARY\_ system are
+as follows:
+
+\begin{enumerate}
+
+\item A new array storage form called ``DELTA'' has been introduced. This
+provides lossless compression for integer arrays. The new routine
+ARY\_DELTA creates a copy of a supplied array, stored in DELTA form.
+
+\item A new routine called ARY\_LOC returns a locator for the
+HDS data object referred to by the supplied ARY identifier.
+
+\end{enumerate}
+
+No changes to existing applications should be required, neither should any
+re-compilation or re-linking be necessary (so long as you do not need to
+use any of the new features of course).
 
 % ? End of main text
 \end{document}

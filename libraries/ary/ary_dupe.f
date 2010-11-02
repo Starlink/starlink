@@ -32,7 +32,8 @@
 *        The global status.
 
 *  Notes:
-*     -  Duplicating a scaled array produces and equivalent simple array.
+*     -  Duplicating a scaled or delta array produces and equivalent
+*     simple array.
 *     -  If this routine is called with STATUS set, then a value of
 *     ARY__NOID will be returned for the IARY2 argument, although no
 *     further processing will occur. The same value will also be
@@ -72,6 +73,8 @@
 *     information if appropriate.
 
 *  Copyright:
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 *     Copyright (C) 1989, 1990 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -118,6 +121,8 @@
 *        Changed so that creation of the HDS array is deferred until it
 *        is needed. This prevents arrays being created that are larger
 *        than they need to be.
+*     1-NOV-2010 (DSB):
+*        Include support for delta compressed arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -247,10 +252,11 @@
                      END IF
                   END IF
 
-*  Simple and scaled arrays.
-*  =========================
+*  Simple, delta and scaled arrays.
+*  ================================
                ELSE IF ( DCB_FRM( IDCB1 ) .EQ. 'SIMPLE' .OR.
-     :                   DCB_FRM( IDCB1 ) .EQ. 'SCALED' ) THEN
+     :                   DCB_FRM( IDCB1 ) .EQ. 'SCALED' .OR.
+     :                   DCB_FRM( IDCB1 ) .EQ. 'DELTA' ) THEN
 
 *  Ensure that data type and bounds information is available for the
 *  data object.
@@ -258,8 +264,8 @@
                   CALL ARY1_DBND( IDCB1, STATUS )
 
 *  Create a new data object with the same attributes and an entry in the
-*  DCB. This is a simple array. The act of duplicating a scaled array
-*  creates a simple array.
+*  DCB. This is a simple array. The act of duplicating a scaled or delta
+*  array creates a simple array.
                   CALL ARY1_DCRE( .TRUE., DCB_TYP( IDCB1 ),
      :                            DCB_CPX( IDCB1 ), ACB_NDIM( IACB1 ),
      :                            ACB_LBND( 1, IACB1 ),

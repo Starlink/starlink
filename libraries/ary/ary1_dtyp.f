@@ -51,6 +51,8 @@
 *     -  Note whether type information is now available in the DCB.
 
 *  Copyright:
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 *     Copyright (C) 1989, 1990 Science & Engineering Research Council.
 *     All Rights Reserved.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
@@ -90,6 +92,8 @@
 *        Removed declaration of un-referenced function.
 *     8-MAY-2006 (DSB):
 *        Installed support for scaled arrays.
+*     1-NOV-2010 (DSB):
+*        Include support for delta compressed arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -133,7 +137,9 @@
 
 *  Local variables:
       CHARACTER * ( DAT__SZTYP ) TYPE ! HDS data type
+      CHARACTER * ( DAT__SZLOC ) LOC2 ! Component locator
       LOGICAL NUMER              ! Whether the data type is numeric
+      LOGICAL THERE              ! Does the named component exist?
 
 *.
 
@@ -279,6 +285,60 @@
                   CALL DAT_ANNUL( DCB_ILOC( IDCB ), STATUS )
                   DCB_ILOC( IDCB ) = ARY__NOLOC
                END IF
+
+*  Delta arrays.
+*  =============
+            ELSE IF ( DCB_FRM( IDCB ) .EQ. 'DELTA' ) THEN
+
+*  Find the DATA component, storing a locator to it in the DCB.
+               DCB_DLOC( IDCB ) = ARY__NOLOC
+               DCB_ILOC( IDCB ) = ARY__NOLOC
+               CALL DAT_FIND( DCB_LOC( IDCB ), 'DATA', DCB_DLOC( IDCB ),
+     :                        STATUS )
+
+*  Find the VALUE component, reporting an error if it is not there, and
+*  obtain its type, which is stored in the DCB.
+               CALL DAT_THERE( DCB_LOC( IDCB ), 'VALUE', THERE, STATUS )
+               IF( THERE ) THEN
+                  CALL DAT_FIND( DCB_LOC( IDCB ), 'VALUE', LOC2,
+     :                           STATUS )
+                  CALL DAT_TYPE( LOC2, DCB_TYP( IDCB ), STATUS )
+                  CALL DAT_ANNUL( LOC2, STATUS )
+
+               ELSE IF( STATUS .EQ. SAI__OK ) THEN
+                  STATUS = ARY__DLTIN
+                  CALL DAT_MSG( 'A', DCB_LOC( IDCB ) )
+                  call ERR_REP( ' ', 'The DELTA compressed array '//
+     :                          '''^A'' is invalid - the VALUE '//
+     :                          'component is missing.', STATUS )
+               END IF
+
+*  If the type is not numeric, then report an error.
+               CALL ARY1_INTYP( DCB_TYP( IDCB ), NUMER, STATUS )
+               IF( .NOT. NUMER .AND. STATUS .EQ. SAI__OK ) THEN
+                  STATUS = ARY__TYPIN
+                  CALL DAT_MSG( 'A', DCB_LOC( IDCB ) )
+                  CALL MSG_SETC( 'T', DCB_TYP( IDCB ) )
+                  call ERR_REP( ' ', 'The DELTA compressed array '//
+     :                          '''^A'' is invalid - the VALUE '//
+     :                          'component has an invalid HDS type '//
+     :                          'of ''^T''; it should have a numeric '//
+     :                          'type.', STATUS )
+               END IF
+
+*  See if there is an IMAGINARY_DATA component present. If so, then the
+*  array is complex, so report an error.
+               CALL DAT_THERE( DCB_LOC( IDCB ), 'IMAGINARY_DATA',
+     :                         DCB_CPX( IDCB ), STATUS )
+               IF( DCB_CPX( IDCB ) .AND. STATUS .EQ. SAI__OK ) THEN
+                  STATUS = ARY__USFRM
+                  CALL DAT_MSG( 'A', DCB_LOC( IDCB ) )
+                  call ERR_REP( ' ', 'The DELTA compressed array '//
+     :                          '''^A'' holds complex values but the '//
+     :                          'ARY library does not yet support '//
+     :                          'complex DELTA arrays.', STATUS )
+               END IF
+
 
 *  If the form entry in the DCB is not supported, then report an error.
             ELSE

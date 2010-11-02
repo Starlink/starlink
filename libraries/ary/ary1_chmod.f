@@ -36,6 +36,8 @@
 *     invalid.
 
 *  Copyright:
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 *     Copyright (C) 1989 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -75,6 +77,8 @@
 *        directly.
 *     7-JUL-2006 (DSB):
 *        Prevent UPDATE or WRITE access if the array is a scaled array.
+*     25-OCT-2010 (DSB):
+*        Include support for delta compressed arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -128,20 +132,22 @@
          CALL ARY1_CHACC( IACB, 'WRITE', STATUS )
 
 *  If WRITE access is available, further check that the array is not stored
-*  in scaled format. First ensure that form information is available in the
-*  DCB. Then report an error if the form is SCALED.
+*  in scaled or delta format. First ensure that form information is available
+*  in the DCB. Then report an error if the form is SCALED or DELTA.
          IDCB = ACB_IDCB( IACB )
          CALL ARY1_DFRM( IDCB, STATUS )
          IF ( STATUS .EQ. SAI__OK .AND.
-     :        DCB_FRM( IDCB ) .EQ. 'SCALED' ) THEN
+     :        DCB_FRM( IDCB ) .EQ. 'SCALED' .OR.
+     :        DCB_FRM( IDCB ) .EQ. 'DELTA' ) THEN
             STATUS = ARY__ACDEN
             CALL DAT_MSG( 'ARRAY', DCB_LOC( IDCB ) )
             UMODE = MODE
             CALL CHR_UCASE( UMODE )
             CALL MSG_SETC( 'MODE', UMODE )
+            CALL MSG_SETC( 'F',  DCB_FRM( IDCB ) )
             CALL ERR_REP( 'ARY1_CHMOD_NO', 'The array ^ARRAY cannot '//
      :                    'be mapped for ^MODE access because it is '//
-     :                    'a scaled array (possible programming '//
+     :                    'a ^F array (possible programming '//
      :                    'error).', STATUS )
          END IF
 

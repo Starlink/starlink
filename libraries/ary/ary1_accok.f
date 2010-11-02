@@ -77,7 +77,9 @@
 *        Prevent write access to any scaled array.
 *     7-JUL-2006 (DSB):
 *        Delegate responsibilty for preventing write access to scaled
-*        array to ARY1_CHACC.
+*        array to ARY1_CHMOD.
+*     1-NOV-2010 (DSB):
+*        Remove references to DCB.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -96,17 +98,11 @@
       INCLUDE 'ARY_ERR'          ! ARY_ error codes
 
 *  Global Variables:
-      INCLUDE 'ARY_DCB'          ! ARY_ Data Control Block
-*        DCB_FRM( ARY__MXDCB ) = CHARACTER * ( ARY__SZFRM ) (Read)
-*           Data object form.
-
       INCLUDE 'ARY_ACB'          ! ARY_ Access Control Block
 *        ACB_ACC( ARY__MXACC, ARY_MXACB ) = LOGICAL (Read)
 *           Access control flags.
 *        ACB_CUT( ARY__MXACB ) = LOGICAL (Read )
 *           Whether the array is a cut.
-*        ACB_IDCB( ARY__MXACB ) = INTEGER (Read)
-*           Index to the data object entry in the DCB.
 
 *  Arguments Given:
       INTEGER IACB
@@ -120,9 +116,6 @@
 
 *  External References:
       LOGICAL CHR_SIMLR          ! Case insensitive string comparison
-
-*  Local variables:
-      INTEGER IDCB               ! Index to data object entry in the DCB
 *.
 
 *  Check inherited global status.

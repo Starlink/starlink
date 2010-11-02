@@ -43,6 +43,8 @@
 *     -  Note if form information is now available in the DCB.
 
 *  Copyright:
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 *     Copyright (C) 1989, 1992 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -87,6 +89,8 @@
 *        Include "PRIMITIVE" as a valid Variant value (this variant is
 *        an internal flag used to indicate that the ARRAY structure will
 *        be replaced at some point by a primitive array).
+*     29-OCT-2010 (DSB):
+*        Include support for delta compressed arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -241,6 +245,14 @@
      :                                     %VAL( CNF_CVAL( LENV ) ) ) )
      :                           THEN
                                     DCB_FRM( IDCB ) = 'SCALED'
+
+*  ...delta array.
+                                 ELSE IF ( CHR_SIMLR(
+     :                                     %VAL( CNF_PVAL( PNTR ) ),
+     :                                     'DELTA',
+     :                                     %VAL( CNF_CVAL( LENV ) ) ) )
+     :                           THEN
+                                    DCB_FRM( IDCB ) = 'DELTA'
 
 *  ...spaced array.
                                  ELSE IF ( CHR_SIMLR(

@@ -50,6 +50,8 @@
 *     All Rights Reserved.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
 *     Council. All Rights Reserved.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -79,6 +81,8 @@
 *        Installed support for primitive arrays.
 *     5-MAY-2006 (DSB):
 *        Installed support for primitive arrays.
+*     1-NOV-2010 (DSB):
+*        Include support for delta compressed arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -140,11 +144,12 @@
             CALL ARY1_DFRM( IDCB, STATUS )
             IF ( STATUS .EQ. SAI__OK ) THEN
 
-*  Primitive, scaled and simple arrays.
-*  ====================================
-*  These are both processed here.
+*  Primitive, scaled, delta and simple arrays.
+*  ===========================================
+*  These are all processed here.
                IF ( ( DCB_FRM( IDCB ) .EQ. 'PRIMITIVE' ) .OR.
      :              ( DCB_FRM( IDCB ) .EQ. 'SCALED' ) .OR.
+     :              ( DCB_FRM( IDCB ) .EQ. 'DELTA' ) .OR.
      :              ( DCB_FRM( IDCB ) .EQ. 'SIMPLE' ) ) THEN
 
 *  If the array is primitive, then it must first be converted to

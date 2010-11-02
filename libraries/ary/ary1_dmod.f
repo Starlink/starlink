@@ -49,6 +49,8 @@
 *     DCB.
 
 *  Copyright:
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 *     Copyright (C) 1989, 1990 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -87,6 +89,8 @@
 *        Installed support for primitive arrays.
 *     5-MAY-2006 (DSB):
 *        Installed support for scaled arrays.
+*     1-NOV-2010 (DSB):
+*        Include support for delta compressed arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -132,6 +136,7 @@
       INTEGER DIMCEL( ARY__MXDIM ) ! First pixel position
       INTEGER DUMMY( 1 )         ! Dummy dimension array
       INTEGER I                  ! Loop counter for dimensions
+      INTEGER NCEL               ! Number of dimensions for cell
       INTEGER PNTR               ! Pointer to first pixel
       LOGICAL SET                ! HDS state of component
 
@@ -148,11 +153,12 @@
          CALL ARY1_DFRM( IDCB, STATUS )
          IF ( STATUS .NE. SAI__OK ) GO TO 9999
 
-*  Primitive, scaled and simple arrays.
-*  ====================================
+*  Primitive, scaled, simple and delta arrays.
+*  ===========================================
 *  These are all handled in the same way.
          IF ( ( DCB_FRM( IDCB ) .EQ. 'PRIMITIVE' ) .OR.
      :        ( DCB_FRM( IDCB ) .EQ. 'SCALED' ) .OR.
+     :        ( DCB_FRM( IDCB ) .EQ. 'DELTA' ) .OR.
      :        ( DCB_FRM( IDCB ) .EQ. 'SIMPLE' ) ) THEN
 
 *  Ensure that type (and complexity) information, component locators and
@@ -162,13 +168,21 @@
             IF ( STATUS .NE. SAI__OK ) GO TO 9999
 
 *  Obtain a locator to the first pixel in the non-imaginary array
-*  component.
-            DO 1 I = 1, DCB_NDIM( IDCB )
-               DIMCEL( I ) = 1
-1           CONTINUE
+*  component. Note, the DATA component in a DELTA array is always
+*  one-dimensional.
+            IF( DCB_FRM( IDCB ) .NE. 'DELTA' ) THEN
+               DO I = 1, DCB_NDIM( IDCB )
+                  DIMCEL( I ) = 1
+               END DO
+               NCEL = DCB_NDIM( IDCB )
+            ELSE
+               DIMCEL( 1 ) = 1
+               NCEL = 1
+            END IF
+
             LOCCEL = ARY__NOLOC
-            CALL DAT_CELL( DCB_DLOC( IDCB ), DCB_NDIM( IDCB ), DIMCEL,
-     :                     LOCCEL, STATUS )
+            CALL DAT_CELL( DCB_DLOC( IDCB ), NCEL, DIMCEL, LOCCEL,
+     :                     STATUS )
 
 *  Obtain the component's HDS state and select an access mode for
 *  mapping the first pixel which will not conflict with this.

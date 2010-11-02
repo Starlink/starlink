@@ -14,6 +14,7 @@ libary_la_SOURCES = \
 	$(PUBLIC_INCLUDES) \
 	$(include_MESSAGES) \
 	$(F_ROUTINES) \
+	$(C_ROUTINES) \
 	$(PRIVATE_INCLUDES)
 
 # Make all library code position independent. This is handy for creating
@@ -30,15 +31,17 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 PRIVATE_INCLUDES = ARY_ACB ARY_CONST ARY_DCB ARY_MCB ARY_PCB ARY_TCB
 
 PUBLIC_F_INCLUDES = ARY_PAR
-PUBLIC_C_INCLUDES = 
+PUBLIC_C_INCLUDES =
 PUBLIC_INCLUDES = $(PUBLIC_F_INCLUDES) $(PUBLIC_C_INCLUDES)
 include_MESSAGES = ary_err.h ARY_ERR
 
-GEN_F_ROUTINES = $(ARY_N_GEN:.gn=.f) 
+GEN_F_ROUTINES = $(ARY_N_GEN:.gn=.f)
 
 F_ROUTINES = $(NONGEN_F_ROUTINES) $(GEN_F_ROUTINES)
 
 ARY_N_GEN = ary_ptszx.gn ary_gtszx.gn ary1_gtnx.gn ary1_gt1x.gn
+
+C_ROUTINES = ary1_s2dlt.c ary1_undlt.c
 
 NONGEN_F_ROUTINES = ary1_init.f ary1_accok.f ary1_adiag.f ary1_anl.f   \
 ary1_annpl.f ary1_antmp.f ary1_bad.f ary1_badb.f ary1_badd.f	       \
@@ -75,7 +78,8 @@ ary_mapz.f ary_msg.f ary_ndim.f ary_new.f ary_newp.f ary_noacc.f       \
 ary_offs.f ary_place.f ary_reset.f ary_same.f ary_sbad.f ary_sbnd.f    \
 ary_sect.f ary_shift.f ary_size.f ary_ssect.f ary_state.f ary_stype.f  \
 ary_temp.f ary_trace.f ary_type.f ary_unmap.f ary_valid.f ary_verfy.f \
-ary1_cpscl.f ary1_dscl.f ary1_vscl.f ary_sctyp.f
+ary1_cpscl.f ary1_dscl.f ary1_vscl.f ary_sctyp.f ary1_cpdlt.f \
+ary_loc.f ary_delta.f ary1_dlshp.f ary_gtdlt.f
 
 BUILT_SOURCES = $(include_MESSAGES)
 

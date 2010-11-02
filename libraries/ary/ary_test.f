@@ -74,9 +74,11 @@
       INTEGER PLACE              ! Array placeholder
       INTEGER PNTR               ! Pointer to mapped array
       INTEGER UBND( 2 )          ! Scaled array bounds
+      INTEGER ZAXIS              ! Index of compression axis
       LOGICAL OK                 ! Was error correctly reported?
       REAL SCALE                 ! Scale factor
       REAL ZERO                  ! Zero offset
+      REAL ZRAT                  ! Compression ratio
 
 *  Local Data:
       DATA DIM / 10, 20 /
@@ -269,6 +271,156 @@
 *  Delete the HDS file.
       CALL ARY_ANNUL( IARY, STATUS )
       CALL HDS_ERASE( LOC, STATUS )
+
+
+
+
+*  Do similar tests for delta arrays...
+
+*  Create _INTEGER 2D simple temporary array in it. Fill the array with
+*  integers equal to the element index.
+      CALL ARY_TEMP( PLACE, STATUS )
+      LBND( 1 ) = -100
+      LBND( 2 ) = -200
+      UBND( 1 ) = 100
+      UBND( 2 ) = 0
+      CALL ARY_NEW( '_INTEGER', 2, LBND, UBND, PLACE, IARY2, STATUS )
+      CALL ARY_MAP( IARY2, '_INTEGER', 'WRITE', PNTR, EL, STATUS )
+      CALL FILL( EL, %VAL( CNF_PVAL( PNTR ) ), STATUS )
+      CALL ARY_UNMAP( IARY2, STATUS )
+
+*  Create a delta compressed copy of the array, stroring it in an HDS file.
+      CALL HDS_NEW( 'ary_test3', 'TEST', 'TEST', 0, 0, LOC, STATUS )
+      CALL ARY_PLACE( LOC, 'TEST', PLACE, STATUS )
+      CALL ARY_DELTA( IARY2, 0, ' ', 0.0, PLACE, ZRAT, IARY, STATUS )
+      IF( ABS( ZRAT - 3.827846 ) .GT. 1.0E-4 .AND.
+     :    STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETR( 'Z', ZRAT )
+         CALL ERR_REP( ' ', 'Unexpected compression factor ^Z '//
+     :                 '(should be 3.827846) for delta array', STATUS )
+      END IF
+
+*  Delete the temporary delta compressed array
+      call ARY_ANNUL( IARY2, STATUS )
+
+*  Check the storage form is DELTA
+      CALL ARY_FORM( IARY, FORM, STATUS )
+      IF( FORM .NE. 'DELTA' .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETC( 'F', FORM )
+         CALL ERR_REP( 'ART_TEST_SER1', 'Bad form ^F for delta array',
+     :                  STATUS )
+      END IF
+
+*  Check the compression axis and compressed data type
+      CALL ARY_GTDLT( IARY, ZAXIS, TYPE, ZRAT, STATUS )
+
+      IF( ABS( ZRAT - 3.827846 ) .GT. 1.0E-4 .AND.
+     :    STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETR( 'Z', ZRAT )
+         CALL ERR_REP( ' ', 'Unexpected compression factor ^Z '//
+     :                 '(should be 3.827846) for a delta array',
+     :                 STATUS )
+      END IF
+
+      IF( TYPE .NE. '_BYTE' .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETC( 'T', TYPE )
+         CALL ERR_REP( ' ', 'Unexpected compressed data type ^T '//
+     :                 '(should be _BYTE) for a delta array', STATUS )
+      END IF
+
+      IF( ZAXIS .NE. 1 .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETI( 'A', ZAXIS )
+         CALL ERR_REP( ' ', 'Unexpected compression axis ^A '//
+     :                 '(should be 1) for a delta array', STATUS )
+      END IF
+
+*  Check the uncompressed array data type
+      CALL ARY_TYPE( IARY, TYPE, STATUS )
+      IF( TYPE .NE. '_INTEGER' .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETC( 'T', TYPE )
+         CALL ERR_REP( 'ART_TEST_SER1', 'Bad uncompressed type (^T) '//
+     :                 'for delta array', STATUS )
+      END IF
+
+*  Map the array and check that the mapped values are uncompressed. Do it
+*  first as INTEGER then as REAL.
+      CALL ARY_MAP( IARY, '_INTEGER', 'READ', PNTR, EL, STATUS )
+      CALL UNCOMPI( EL, %VAL( CNF_PVAL( PNTR ) ), STATUS )
+      CALL ARY_UNMAP( IARY, STATUS )
+
+      CALL ARY_MAP( IARY, '_REAL', 'READ', PNTR, EL, STATUS )
+      CALL UNCOMPR( EL, %VAL( CNF_PVAL( PNTR ) ), STATUS )
+      CALL ARY_UNMAP( IARY, STATUS )
+
+*  Close the HDS file and then re-open it.
+      CALL ARY_ANNUL( IARY, STATUS )
+      CALL DAT_ANNUL( LOC, STATUS )
+      CALL HDS_OPEN( 'ary_test3', 'READ', LOC, STATUS )
+
+*  Import the array and check that it has DELTA storage form, and check
+*  the mapped array values are correct.
+      CALL ARY_FIND( LOC, 'TEST', IARY, STATUS )
+      CALL ARY_FORM( IARY, FORM, STATUS )
+      IF( FORM .NE. 'DELTA' .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETC( 'F', FORM )
+         CALL ERR_REP( 'ART_TEST_SER3', 'Bad form ^F for delta array',
+     :                  STATUS )
+      END IF
+
+      CALL ARY_MAP( IARY, '_REAL', 'READ', PNTR, EL, STATUS )
+      CALL UNCOMPR( EL, %VAL( CNF_PVAL( PNTR ) ), STATUS )
+      CALL ARY_UNMAP( IARY, STATUS )
+
+*  Check an "Access denied" error is reported if we try to map a delta
+*  array for update or write access.
+      IF( STATUS .EQ. SAI__OK ) THEN
+         CALL ERR_MARK
+         OK = .TRUE.
+         CALL ARY_MAP( IARY, '_REAL', 'UPDATE', PNTR, EL, STATUS )
+         IF( STATUS .NE. ARY__ACDEN ) THEN
+            OK = .FALSE.
+         ELSE
+            CALL ERR_ANNUL( STATUS )
+         END IF
+
+         CALL ERR_END( STATUS )
+
+         IF( .NOT. OK .AND. STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( 'ART_TEST_SER4', 'No error on modifying a '//
+     :                    'delta array', STATUS )
+         END IF
+      END IF
+
+*  Copy the delta array to a new temporary array.
+      CALL ARY_TEMP( PLACE, STATUS )
+      CALL ARY_COPY( IARY, PLACE, IARY2, STATUS )
+
+*  Check the values in the copied array are correct.
+      CALL ARY_MAP( IARY2, '_REAL', 'READ', PNTR, EL, STATUS )
+      CALL UNCOMPR( EL, %VAL( CNF_PVAL( PNTR ) ), STATUS )
+      CALL ARY_UNMAP( IARY2, STATUS )
+
+*  Check the storage form of the copy.
+      CALL ARY_FORM( IARY2, FORM, STATUS )
+      IF( FORM .NE. 'SIMPLE' .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETC( 'F', FORM )
+         CALL ERR_REP( 'ART_TEST_SER5', 'Bad form ^F for simple array',
+     :                  STATUS )
+      END IF
+
+*  Delete the HDS file.
+      CALL ARY_ANNUL( IARY, STATUS )
+      CALL HDS_ERASE( LOC, STATUS )
+
 
 *  Close down HDS.
       CALL HDS_STOP( STATUS )
@@ -469,5 +621,59 @@
       END DO
 
       END
+
+
+
+
+*  Check the supplied array has values equal to the element indicies _ REAL
+      SUBROUTINE UNCOMPR( EL, ARRAY, STATUS )
+      IMPLICIT NONE
+      INCLUDE 'SAE_PAR'
+      INTEGER I, EL, STATUS
+      REAL ARRAY( EL )
+
+      IF( STATUS .NE. SAI__OK ) RETURN
+
+      DO I = 1, 10
+         IF( ABS( ARRAY( I ) - REAL( I ) ) .GT. 1.0E-6 ) THEN
+      write(*,*) ARRAY( I )
+      write(*,*) REAL( I )
+      write(*,*) ARRAY( I ) - REAL( I )
+
+            STATUS = SAI__ERROR
+            CALL MSG_SETR( 'B', ARRAY( I ) )
+            CALL MSG_SETR( 'SB', REAL( I ) )
+            CALL MSG_SETI( 'I', I )
+            CALL ERR_REP( 'ARY_TEST_E11', 'Bad value (^B) at element '//
+     :                    '^I. Should be ^SB.', STATUS )
+            RETURN
+         END IF
+      END DO
+
+      END
+
+*  Check the supplied array has values equal to the element indicies _ INTEGER
+      SUBROUTINE UNCOMPI( EL, ARRAY, STATUS )
+      IMPLICIT NONE
+      INCLUDE 'SAE_PAR'
+      INTEGER I, EL, STATUS
+      INTEGER ARRAY( EL )
+
+      IF( STATUS .NE. SAI__OK ) RETURN
+
+      DO I = 1, 10
+         IF( ARRAY( I ) .NE. I ) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETI( 'B', ARRAY( I ) )
+            CALL MSG_SETI( 'SB', I )
+            CALL MSG_SETI( 'I', I )
+            CALL ERR_REP( 'ARY_TEST_E11', 'Bad value (^B) at element '//
+     :                    '^I. Should be ^SB.', STATUS )
+            RETURN
+         END IF
+      END DO
+
+      END
+
 
 

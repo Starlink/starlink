@@ -1,7 +1,12 @@
 1 ARY - ARRAY data structure access routines
                                                      Expires: **.**.**
 
- A new release (v1.2) of the ARY library is now available.
+ A new release (v1.3) of the ARY library is now available.
+
+ v1.3
+
+    Add read-only support for delta compressed arrays.
+
 
  v1.2
 

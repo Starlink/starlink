@@ -28,6 +28,8 @@
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
 *     Council. All Rights Reserved.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -52,6 +54,8 @@
 *  History:
 *     17-JUK-2006 (DSB):
 *        Original version.
+*     1-NOV-2010 (DSB):
+*        Include support for delta compressed arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -116,7 +120,7 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Do nothing if the creation of hte arrays is not deferred.
+*  Do nothing if the creation of the arrays is not deferred.
       IF( ARY1_DEFR( IDCB, STATUS ) ) THEN
 
 *  Report an error if required information is not available. The
@@ -203,6 +207,22 @@
      :                       STATUS )
                CALL DAT_FIND( DCB_LOC( IDCB ), 'IMAGINARY_DATA',
      :                        DCB_ILOC( IDCB ), STATUS )
+            END IF
+
+
+*  Delta arrays.
+*  =============
+         ELSE IF ( DCB_FRM( IDCB ) .EQ. 'DELTA' ) THEN
+
+*  Report an error since delta arrays can only be created by converting
+*  a defined simple or scaled array, and so the creation should never be
+*  deferred.
+            IF( STATUS .EQ. SAI__OK ) THEN
+               STATUS = ARY__FATIN
+               CALL ERR_REP( ' ', 'ARY1_DOBJ: Input '//
+     :                       'array is stored in DELTA form, but '//
+     :                       'DELTA arrays should never be deferred '//
+     :                       '(internal programming error).', STATUS )
             END IF
 
 *  If the form information in the DCB was not valid, then report an

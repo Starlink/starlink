@@ -1,49 +1,34 @@
-      SUBROUTINE ARY_FORM( IARY, FORM, STATUS )
+      SUBROUTINE ARY_LOC( IARY, LOC, STATUS )
 *+
 *  Name:
-*     ARY_FORM
+*     ARY_LOC
 
 *  Purpose:
-*     Obtain the storage form of an array.
+*     Obtain an HDS locator for an array.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARY_FORM( IARY, FORM, STATUS )
+*     CALL ARY_LOC( IARY, LOC, STATUS )
 
 *  Description:
-*     The routine returns the storage form of an array as an upper-case
-*     character string (e.g. 'SIMPLE').
+*     The routine returns an HDS locator for the data object referred to
+*     by the supplied ARY identifier.
 
 *  Arguments:
 *     IARY = INTEGER (Given)
 *        Array identifier.
-*     FORM = CHARACTER * ( * ) (Returned)
-*        Storage form of the array.
+*     LOC = CHARACTER * ( DAT__SZLOC ) (Returned)
+*        The HDS locator. It should be annulled using DAT_ANNUL when no
+*        longer needed. A value of DAT__NOLOC will be returned if an
+*        error occurs.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-*  Notes:
-*     -  The symbolic constant ARY__SZFRM may be used for declaring the
-*     length of a character variable to hold the storage form of an
-*     array. This constant is defined in the include file ARY_PAR.
-*     -  At present, the ARY_ routines only support "primitive", "scaled",
-*     "simple" and "delta" arrays, so only the values 'PRIMITIVE', 'SCALED'
-*     'DELTA' and 'SIMPLE' can be returned.
-
-*  Algorithm:
-*     -  Import the array identifier.
-*     -  Obtain the Data Control Block index for the data object.
-*     -  Ensure that form information is available for the data object.
-*     -  Copy the form string to the output argument.
-*     -  If an error occurred, then report context information.
-
 *  Copyright:
-*     Copyright (C) 1989 Science & Engineering Research Council.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
-*     Copyright (C) 2006 Particle Physics and Astronomy Research
-*     Council. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -62,11 +47,11 @@
 *     02111-1307, USA
 
 *  Authors:
-*     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S Berry (JAC)
 *     {enter_new_authors_here}
 
 *  History:
-*     14-JUN-1989 (RFWS):
+*     20-OCT-2010 (DSB):
 *        Original version.
 *     {enter_changes_here}
 
@@ -86,18 +71,18 @@
 
 *  Global Variables:
       INCLUDE 'ARY_DCB'          ! ARY_ Data Control Block
-*        DCB_FRM( ARY_MXDCB ) = CHARACTER * ( ARY__SZFRM ) (Read)
-*           Form string for data object.
+*        DCB_LOC( ACB_MXDCB ) = CHARACTER * ( DAT__SZLOC ) (Read)
+*           Locator for the data object.
 
       INCLUDE 'ARY_ACB'          ! ARY_ Access Control Block
-*        ACB_IDCB( ARY__MXACB = INTEGER (Read)
+*        ACB_IDCB( ARY__MXACB ) = INTEGER (Read)
 *           Index to data object entry in the DCB.
 
 *  Arguments Given:
       INTEGER IARY
 
 *  Arguments Returned:
-      CHARACTER * ( * ) FORM
+      CHARACTER * ( DAT__SZLOC ) LOC
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -108,30 +93,30 @@
 
 *.
 
+*  Initialise
+      LOC = DAT__NOLOC
+
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Import the array indentifier.
+*  Import the array identifier.
       CALL ARY1_IMPID( IARY, IACB, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Get the DCB index for the data object.
          IDCB = ACB_IDCB( IACB )
 
-*  Ensure that form information is available.
-         CALL ARY1_DFRM( IDCB, STATUS )
+*  Clone the data object locator.
+         CALL DAT_CLONE( DCB_LOC( IDCB ), LOC, STATUS )
 
-*  Copy the form string to the output argument.
-         CALL ARY1_CCPY( DCB_FRM( IDCB ), FORM, STATUS )
       END IF
 
 *  If an error occurred, then report context information and call the
 *  error tracing routine.
       IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'ARY_FORM_ERR',
-     :   'ARY_FORM: Error determining the storage form of an array.',
-     :   STATUS )
-         CALL ARY1_TRACE( 'ARY_FORM', STATUS )
+         CALL ERR_REP( 'ARY_LOC_ERR', 'ARY_LOC: Error obtaining an '//
+     :                 'HDS locator for an array.', STATUS )
+         CALL ARY1_TRACE( 'ARY_LOC', STATUS )
       END IF
 
       END

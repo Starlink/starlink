@@ -101,6 +101,8 @@
 *     All Rights Reserved.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
 *     Council. All Rights Reserved.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -143,6 +145,8 @@
 *        Guard against null DCB_DLOC locators.
 *     1-SEP-2006 (DSB):
 *        Add DEFER argument to calls to ARY1_REBND.
+*     1-NOV-2010 (DSB):
+*        Include support for delta compressed arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -412,6 +416,21 @@
                   END IF
                END IF
             END IF
+
+
+*  Delta arrays
+*  ============
+         ELSE IF( DCB_FRM( IDCB ) .EQ. 'DELTA' ) THEN
+
+*  Delta arrays cannot be changed, so report an error if this routine is
+*  called.
+            IF( STATUS .EQ. SAI__OK ) THEN
+               STATUS = ARY__FATIN
+               CALL ERR_REP( 'ARY1_DSBND_CVT', 'Illegal attempt to '//
+     :                       'change the bounds of a DELTA compressed'//
+     :                       ' array (programming error).', STATUS )
+            END IF
+
 
 *  If the DCB form value was not recognised, then report an error.
          ELSE
