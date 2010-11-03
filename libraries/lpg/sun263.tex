@@ -945,6 +945,8 @@ source file {\tt prog.c}, instead of {\tt prog.f}.
    {Create a single new primitive NDF using a specified parameter.}
 \noteroutine{CALL LPG\_CREP( PARAM, FTYPE, NDIM, UBND, INDF, STATUS )}
    {Create a new primitive NDF via the parameter system.}
+\noteroutine{CALL LPG\_CRPL1( PARAM, PLACE, NAME, STATUS )}
+   {Create a single new NDF placeholder using a specified parameter}
 \noteroutine{CALL LPG\_PROP1( INDF1, CLIST, PARAM, INDF2, NAME, STATUS )}
    {Create a single new NDF by propagation using a specified parameter.}
 \noteroutine{CALL LPG\_PROP( INDF1, CLIST, PARAM, INDF2, STATUS )}
@@ -1771,6 +1773,45 @@ source file {\tt prog.c}, instead of {\tt prog.f}.
          \htmlref{LPG\_CATCREAT}{LPG_CATCREAT} make simple
          calls to the corresponding \xref{NDF}{sun33}{} or
          \xref{CAT}{sun181}{} routine.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   LPG\_CRPL1
+}{
+   Create a single new NDF placeholder using a specified parameter
+}{
+   \sstdescription{
+      This routine is equivalent to NDF\_CREPL except that it allows the
+      NDF to be specified using a GRP group expression (for instance, its
+      name may be given within a text file, etc.). The first NDF in the
+      group expression is returned. Any other names in the group
+      expression are ignored. Any modification elements in the supplied
+      group expression will be treated literally.
+   }
+   \sstinvocation{
+      CALL LPG\_CRPL1( PARAM, PLACE, NAME, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Name of the ADAM parameter.
+      }
+      \sstsubsection{
+         PLACE = INTEGER (Returned)
+      }{
+         NDF placeholder.
+      }
+      \sstsubsection{
+         NAME = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The full file specification for the NDF.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
