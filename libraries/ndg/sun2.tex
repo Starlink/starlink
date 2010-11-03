@@ -822,6 +822,11 @@ to add further members.
    Obtain an NDF identifier for a new simple NDF
 }
 \noteroutine{
+      CALL NDG\_NDFPL( IGRP, INDEX, PLACE, STATUS )
+}{
+   Obtain an placeholder for a new NDF
+}
+\noteroutine{
       CALL NDG\_NDFPR( INDF1, CLIST, IGRP, INDEX, INDF2, STATUS )
 }{
    Obtain an NDF identifier for a new NDF created by propagation from
@@ -2015,6 +2020,45 @@ to add further members.
          INDF = INTEGER (Returned)
       }{
          NDF identifier.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   NDG\_NDFPL
+}{
+   Obtain a placeholder for a new NDF
+}{
+   \sstdescription{
+      The routine returns a placeholder for a new NDF. The name of the new
+      NDF is held at a given index within a given group. It is equivalent
+      to NDF\_CREPL.
+   }
+   \sstinvocation{
+      CALL NDG\_NDFPL( IGRP, INDEX, PLACE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP = INTEGER (Given)
+      }{
+         A GRP identifier for a group holding the names of NDFs. This
+         will often be created using NDG\_CREAT, but groups created {\tt "}by
+         hand{\tt "} using GRP directly can also be used.
+      }
+      \sstsubsection{
+         INDEX = INTEGER (Given)
+      }{
+         The index within the group at which the name of the NDF to be
+         created is stored.
+      }
+      \sstsubsection{
+         PLACE = INTEGER (Returned)
+      }{
+         NDF placeholder.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)

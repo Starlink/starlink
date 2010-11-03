@@ -1513,6 +1513,62 @@ source file {\tt prog.c}, instead of {\tt prog.f}.
    }
 }
 \sstroutine{
+   LPG\_CREPL
+}{
+   Create a new NDF placeholder via the parameter system
+}{
+   \sstdescription{
+      This routine should be called in place of NDF\_CREPL within
+      applications that process lists of NDFs.
+
+      On the first invocation of the application, a group of names for
+      some new NDFs will be obtained from the environment using the
+      specified parameter. The first name will be used to create an NDF
+      placeholder with the requested attributes, and an identifier for the
+      placeholder will be returned. If more than one name was supplied for
+      the parameter then the application may be invoked again (see
+      LPG\_AGAIN), in which case this routine will return an identifier
+      for another placeholder with the next name in the group supplied on
+      the first invocation.
+
+      If a modification element is included in the group expression
+      supplied for the parameter on the first invocation of the
+      application, the placeholder are based on the names of the
+      first group of existing data files (NDFs or catalogues) to be
+      accessed by the application.
+
+      If an application attempts to get a new NDF by cancelling the
+      parameter (PAR\_CANCL), the name used to create the returned NDF is
+      NOT the next one in the group, but is obtained by prompting the
+      user for a single new placeholder.
+
+      The monolith routine should arrange to invoke the application
+      repeatedly until one or more of its NDF parameters have been
+      exhausted (i.e. all its values used). See LPG\_AGAIN.
+   }
+   \sstinvocation{
+      CALL LPG\_CREPL( PARAM, PLACE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Name of the parameter.
+      }
+      \sstsubsection{
+         PLACE = INTEGER (Returned)
+      }{
+         NDF placeholder identifying the nominated position in the
+         data system.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
    LPG\_PROP1
 }{
    Create a single new NDF by propagation using a specified parameter

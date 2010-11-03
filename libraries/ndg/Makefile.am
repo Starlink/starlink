@@ -39,7 +39,7 @@ ndg_votutils.c
 BASIC_F_ROUTINES = ndg1_appen.f ndg_asexp.f ndg_crexp.f \
 ndg1_expan.f ndg1_fpars.f ndg1_gtyps.f \
 ndg1_ndfch.f ndg1_hndlr.f ndg1_hwrgh.f \
-ndg1_ndfdl.f ndg1_sdfex.f ndg_ndfco.f \
+ndg1_ndfdl.f ndg1_sdfex.f ndg_ndfco.f ndg_ndfpl.f \
 ndg1_subst.f ndg_gtsup.f ndg_ndfas.f ndg_ndfcp.f ndg_ndfcr.f ndg_ndfpr.f \
 ndg_ptsup.f ndg_setsz.f ndg1_sort.f ndg1_crpth.f ndg1_open.f ndg1_forxt.f \
 ndg_begpv.f ndg_endpv.f ndg_cpsup.f ndg_copy.f ndg_moreg.f \
@@ -53,13 +53,13 @@ ndg_crep1.f ndg_prop1.f
 ADAM_C_WRAPPER = ndg_adam.c
 
 #  Define test programs.
-TESTS = test1 
+TESTS = test1
 check_PROGRAMS = test1
 test1_SOURCES = ndg_test.f
 test1_LDADD = libndg.la `$(srcdir)/ndg_link`
 
 dist_starnews_DATA = ndg.news
 dist_pkgdata_DATA = LICENCE
-CLEANFILES = TOM.sdf DICK.sdf HARRY.sdf 
+CLEANFILES = TOM.sdf DICK.sdf HARRY.sdf
 
 BUILT_SOURCES = NDG_ERR ndg_err.h
