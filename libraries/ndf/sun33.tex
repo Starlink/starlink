@@ -10870,6 +10870,8 @@ The following is an example \xref{ADAM}{sg4}{} interface file
             {Create a new simple NDF via the ADAM parameter system}
 \noteroutine{NDF\_CREP( PARAM, FTYPE, NDIM, UBND, INDF, STATUS )}
             {Create a new primitive NDF via the ADAM parameter system}
+\noteroutine{NDF\_CREPL( PARAM, PLACE, STATUS )}
+            {Create a new NDF placeholder via the ADAM parameter system}
 \noteroutine{NDF\_DELET( INDF, STATUS )}
             {Delete an NDF}
 \noteroutine{NDF\_DIM( INDF, NDIMX, DIM, NDIM, STATUS )}
@@ -11253,6 +11255,8 @@ The following is an example \xref{ADAM}{sg4}{} interface file
             {Create a new simple NDF via the ADAM parameter system}
 \noteroutine{\htmlref{NDF\_CREP}{NDF_CREP}( PARAM, FTYPE, NDIM, UBND, INDF, STATUS )}
             {Create a new primitive NDF via the ADAM parameter system}
+\noteroutine{\htmlref{NDF\_CREPL}{NDF_CREPL}( PARAM, PLACE, STATUS )}
+            {Create a new NDF placeholder via the ADAM parameter system}
 \noteroutine{\htmlref{NDF\_EXIST}{NDF_EXIST}( PARAM, MODE, INDF, STATUS )}
             {See if an existing NDF is associated with an ADAM parameter.}
 \noteroutine{\htmlref{NDF\_PROP}{NDF_PROP}( INDF1, CLIST, PARAM, INDF2, STATUS )}
@@ -11267,6 +11271,8 @@ The following is an example \xref{ADAM}{sg4}{} interface file
 
 \subsection{\xlabel{creating_placeholders}Creating Placeholders}
 
+\noteroutine{\htmlref{NDF\_CREPL}{NDF_CREPL}( PARAM, PLACE, STATUS )}
+            {Create a new NDF placeholder via the ADAM parameter system}
 \noteroutine{\htmlref{NDF\_OPEN}{NDF_OPEN}( LOC, NAME, MODE, STAT, INDF, PLACE, STATUS )}
             {Open an existing or new NDF}
 \noteroutine{\htmlref{NDF\_PLACE}{NDF_PLACE}( LOC, NAME, PLACE, STATUS )}
@@ -13229,6 +13235,59 @@ locator}{sun92}{using_locators}}
          NDF\_\_NOID will be returned for the INDF argument, although no
          further processing will occur. The same value will also be
          returned if the routine should fail for any reason. The NDF\_\_NOID
+         constant is defined in the include file NDF\_PAR.
+      }
+   }
+}
+\sstroutine{
+   NDF\_CREPL
+}{
+   Create a new NDF placeholder via the ADAM parameter system
+}{
+   \sstdescription{
+      The routine creates a new NDF placeholder via the ADAM parameter
+      system, associates it with a parameter, and returns an identifier
+      for it.  A placeholder is used to identify a position in the
+      underlying data system (HDS) and may be passed to other routines
+      (e.g. NDF\_NEW) to indicate where a newly created NDF should be
+      positioned.
+   }
+   \sstinvocation{
+      CALL NDF\_CREPL( PARAM, PLACE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Name of the ADAM parameter.
+      }
+      \sstsubsection{
+         PLACE = INTEGER (Returned)
+      }{
+         NDF placeholder identifying the nominated position in the
+         data system.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Placeholders are intended only for local use within an
+         application and only a limited number of them are available
+         simultaneously. They are always annulled as soon as they are
+         passed to another routine to create a new NDF, where they are
+         effectively exchanged for an NDF identifier.
+
+         \sstitem
+         If this routine is called with STATUS set, then a value of
+         NDF\_\_NOPL will be returned for the PLACE argument, although no
+         further processing will occur. The same value will also be
+         returned if the routine should fail for any reason. The NDF\_\_NOPL
          constant is defined in the include file NDF\_PAR.
       }
    }
@@ -19103,6 +19162,8 @@ Appendix~\ref{ss:cinterface}.\\[1.0ex]
 \noteroutineC{\xlabel{ndfCrep}void \htmlref{ndfCrep}{NDF_CREP}}{( const char $*$param, const char $*$ftype, int ndim, const int ubnd[~], int $*$indf,\argbrk\ int $*$status );}
             {Create a new primitive NDF via the ADAM parameter system}
 \newpage
+\noteroutineC{\xlabel{ndfCrepl}void \htmlref{ndfCrepl}{NDF_CREP}}{( const char $*$param, int $*$place, int $*$status );}
+            {Create a new NDF placeholder via the ADAM parameter system}
 \noteroutineC{\xlabel{ndfDelet}void \htmlref{ndfDelet}{NDF_DELET}}{( int $*$indf, int $*$status );}
             {Delete an NDF}
 \noteroutineC{\xlabel{ndfDim}void \htmlref{ndfDim}{NDF_DIM}}{( int indf, int ndimx, int dim[~], int $*$ndim, int $*$status );}
@@ -19652,6 +19713,9 @@ the NDF\_ system between versions V1.10 and V1.11 (the current version):
 
    \item A new function NDF\_ZSCAL has been added, which creates a SCALED
    copy of an input NDF with SIMPLE or PRIMITIVE array components.
+
+   \item A new function NDF\_CREPL has been added, which allows an NDF
+   placeholder to be created via a specified environment parameter.
 
 \end{enumerate}
 

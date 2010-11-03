@@ -332,6 +332,10 @@ void ndfCrep( const char *param,
               int *indf,
               int *status );
 
+void ndfCrepl( const char *param,
+               int *place,
+               int *status );
+
 void ndfDelet( int *indf,
                int *status );
 

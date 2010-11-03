@@ -123,7 +123,7 @@ STANDALONE_F_ROUTINES = ndf1_hwenv.f
 #  Additional Fortran routines required for the ADAM library.
 
 ADAM_F_ROUTINES = ndf_assoc.f ndf_cinp.f ndf_creat.f ndf_crep.f	\
-ndf_exist.f ndf_prop.f ndf1_getap_a.f ndf1_hwenv_a.f
+ndf_exist.f ndf_prop.f ndf1_getap_a.f ndf1_hwenv_a.f ndf_crepl.f
 
 #  C routines required for both the standalone and ADAM libraries.
 
