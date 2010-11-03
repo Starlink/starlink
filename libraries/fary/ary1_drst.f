@@ -172,12 +172,12 @@
 *  =============
          ELSE IF ( DCB_FRM( IDCB ) .EQ. 'DELTA' ) THEN
             IF( STATUS .EQ. SAI__OK ) THEN
-               STATUS = ARY__FATIN
-               CALL ERR_REP( ' ', 'ARY1_DRST: Input array is stored '//
-     :                       'in DELTA form, but DELTA arrays should '//
-     :                       'never be reset because they are '//
-     :                       'read-only (internal programming error).',
-     :                       STATUS )
+               STATUS = ARY__CMPAC
+               CALL DAT_MSG( 'A', DCB_LOC( IDCB ) )
+               CALL ERR_REP( ' ', 'The array ^A is stored using DELTA'//
+     :                       ' compression and therefore cannot be '//
+     :                       'reset (DELTA compressed arrays are '//
+     :                       'read-only).', STATUS )
             END IF
 
 *  If the array form was not recognised, then report an error.

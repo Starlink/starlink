@@ -139,16 +139,19 @@
          IF ( STATUS .EQ. SAI__OK .AND.
      :        DCB_FRM( IDCB ) .EQ. 'SCALED' .OR.
      :        DCB_FRM( IDCB ) .EQ. 'DELTA' ) THEN
-            STATUS = ARY__ACDEN
-            CALL DAT_MSG( 'ARRAY', DCB_LOC( IDCB ) )
+
             UMODE = MODE
             CALL CHR_UCASE( UMODE )
+
+            STATUS = ARY__CMPAC
+            CALL DAT_MSG( 'A', DCB_LOC( IDCB ) )
             CALL MSG_SETC( 'MODE', UMODE )
             CALL MSG_SETC( 'F',  DCB_FRM( IDCB ) )
-            CALL ERR_REP( 'ARY1_CHMOD_NO', 'The array ^ARRAY cannot '//
-     :                    'be mapped for ^MODE access because it is '//
-     :                    'a ^F array (possible programming '//
-     :                    'error).', STATUS )
+            CALL ERR_REP( ' ', 'The array ^A is stored using ^F '//
+     :                    'compression and therefore cannot be '//
+     :                    'mapped for ^MODE access (^F compressed '//
+     :                    'arrays are read-only).', STATUS )
+
          END IF
 
 *  No action is needed if READ access is requested.

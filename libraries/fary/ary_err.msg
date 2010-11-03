@@ -32,4 +32,5 @@ NOTSP	<facility not yet supported>
 SCLIN	<invalid scaling information in scaled array>
 DLTIN	<invalid compression information in delta array>
 AXINV	<invalid axis index>
+CMPAC   <attempt to change a read-only property of a compressed array>
 .END

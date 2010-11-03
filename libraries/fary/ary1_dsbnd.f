@@ -425,10 +425,12 @@
 *  Delta arrays cannot be changed, so report an error if this routine is
 *  called.
             IF( STATUS .EQ. SAI__OK ) THEN
-               STATUS = ARY__FATIN
-               CALL ERR_REP( 'ARY1_DSBND_CVT', 'Illegal attempt to '//
-     :                       'change the bounds of a DELTA compressed'//
-     :                       ' array (programming error).', STATUS )
+               STATUS = ARY__CMPAC
+               CALL DAT_MSG( 'A', DCB_LOC( IDCB ) )
+               CALL ERR_REP( ' ', 'The array ^A is stored using DELTA'//
+     :                       ' compression and therefore its bounds '//
+     :                       'cannot be changed (DELTA compressed '//
+     :                       'arrays are read-only).', STATUS )
             END IF
 
 

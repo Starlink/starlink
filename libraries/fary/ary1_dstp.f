@@ -448,10 +448,13 @@
 
 *  Report an error since delta arrays are read-only.
             IF( STATUS .EQ. SAI__OK ) THEN
-               STATUS = ARY__FATIN
-               CALL ERR_REP( ' ', 'ARY1_DSTP: Input array is stored '//
-     :                       'in DELTA form and so cannot be changed '//
-     :                       '(internal programming error).', STATUS )
+               STATUS = ARY__CMPAC
+               CALL DAT_MSG( 'A', DCB_LOC( IDCB ) )
+               CALL ERR_REP( ' ', 'The array ^A is stored using DELTA'//
+     :                       ' compression and therefore its data '//
+     :                       'type cannot be changed (DELTA '//
+     :                       'compressed arrays are read-only).',
+     :                       STATUS )
             END IF
 
 *  If the form entry in the DCB was not recognised, then report an
