@@ -274,6 +274,8 @@
 *  the ACB.
                      ELSE
                         CALL ARY_RESET( ACB_DID( IACB ), STATUS )
+                        CALL NDF1_CMPAC( ACB_IDCB( IACB ), 'DATA',
+     :                                   STATUS )
                      END IF
                   END IF
                END IF

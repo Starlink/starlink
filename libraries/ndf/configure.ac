@@ -1,21 +1,21 @@
 dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
- 
+
 dnl    Initialisation: package name and version number
-AC_INIT(ndf, 1.10, ussc@star.rl.ac.uk)
- 
+AC_INIT(ndf, 1.11, ussc@star.rl.ac.uk)
+
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
 dnl    Require Starlink automake
 AM_INIT_AUTOMAKE(1.8.2-starlink)
- 
+
 dnl    Sanity-check: name a file in the source directory -- if this
 dnl    isn't found then configure will complain
 AC_CONFIG_SRCDIR([NDF_PAR])
- 
+
 dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS
- 
+
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
 AC_PROG_LIBTOOL
@@ -23,9 +23,9 @@ AC_PROG_LIBTOOL
 dnl    Need these for determining the time to subsecond accuracy, the
 dnl    gettimeofday function is often available but requires special
 dnl    handling, so make sure we can compile it, otherwise do without
-dnl    (Solaris requires that _POSIX_C_SOURCE is not defined, amongst others, 
+dnl    (Solaris requires that _POSIX_C_SOURCE is not defined, amongst others,
 dnl    Tru64 that _XOPEN_SOURCE=500, Mac OS X doesn't seem to define
-dnl    suseconds_t...) 
+dnl    suseconds_t...)
 AC_CHECK_HEADERS(sys/time.h)
 AC_CACHE_CHECK([gettimeofday compiles],
    [ac_cv_gettimeofday],
@@ -42,7 +42,7 @@ void check() {
         ac_cv_gettimeofday=yes,
         ac_cv_gettimeofday=no)])
 if test $ac_cv_gettimeofday = yes; then
-    AC_DEFINE([HAVE_GETTIMEOFDAY], 1, 
+    AC_DEFINE([HAVE_GETTIMEOFDAY], 1,
        [Define to 1 when gettimeofday can be compiled with <sys/time.h>])
 fi
 

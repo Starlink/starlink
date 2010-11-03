@@ -266,8 +266,10 @@
 
 *  Use the ARY_ system to set a new full data type for the data array.
                         ELSE
-                          CALL ARY_STYPE( FTYPE, ACB_DID( IACB ),
-     :                                    STATUS )
+                           CALL ARY_STYPE( FTYPE, ACB_DID( IACB ),
+     :                                     STATUS )
+                           CALL NDF1_CMPAC( ACB_IDCB( IACB ), 'DATA',
+     :                                      STATUS )
                         END IF
                      END IF
 

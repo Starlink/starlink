@@ -294,6 +294,7 @@
 *  ==============
 *  Set the new bounds for the data component.
          CALL ARY_SBND( NDIM, LBND, UBND, ACB_DID( IACB ), STATUS )
+         CALL NDF1_CMPAC( ACB_IDCB( IACB ), 'DATA', STATUS )
 
 *  QUALITY component:
 *  =================
@@ -306,6 +307,7 @@
             IF ( THERE ) THEN
                CALL ARY_SBND( NDIM, LBND, UBND, ACB_QID( IACB ),
      :                        STATUS )
+               CALL NDF1_CMPAC( ACB_IDCB( IACB ), 'QUALITY', STATUS )
 
 *  Since this may have caused the array's bad pixel flag to be set, a
 *  value of .FALSE. must be re-established. This is not done if the
@@ -338,6 +340,7 @@
             IF ( THERE ) THEN
                CALL ARY_SBND( NDIM, LBND, UBND, ACB_VID( IACB ),
      :                        STATUS )
+               CALL NDF1_CMPAC( ACB_IDCB( IACB ), 'VARIANCE', STATUS )
 
 *  If the array is not defined, and this is a base NDF, then convert its
 *  default storage form to take account of the new bounds, if necessary.

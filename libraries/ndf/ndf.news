@@ -1,10 +1,20 @@
 NDF Library
 -----------
+V1.11
+   - A new function NDF_ZSCAL has been added, which creates a SCALED
+   copy of an input NDF.
 
-   Subsecond accuracy has been restored to history recording
-   (was lost in the switch to Unix)
+   - A new function NDF_ZDELT has been added, which creates a DELTA
+   compressed copy of an input NDF.
+
+   - A new function NDF_GTDLT has been added, which returns details of
+   the compression of a DELTA compressed NDF.
+
 
 V1.10
+   - Subsecond accuracy has been restored to history recording
+   (was lost in the switch to Unix)
+
    - A new function NDF_ISIN has been added, which determines if one NDF
    is contained within another NDF.
 

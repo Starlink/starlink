@@ -309,6 +309,9 @@
          DCB_DEFRM( IDCB2 ) = DCB_DEFRM( IDCB1 )
          CALL NDF1_CBFRM( NDIM, LBND, UBND, DCB_DEFRM( IDCB2 ), STATUS )
 
+*  Store the storage form of the new data array.
+         CALL ARY_FORM( DCB_DID( IDCB2 ), DCB_DFRM( IDCB2 ), STATUS )
+
 *  Note if the DCB data array information is correct.
          DCB_KD( IDCB2 ) = STATUS .EQ. SAI__OK
 

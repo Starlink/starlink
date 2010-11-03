@@ -40,6 +40,8 @@
 *     simple.
 
 *  Copyright:
+*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     All Rights Reserved.
 *     Copyright (C) 1990 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -69,6 +71,8 @@
 *        Original version.
 *     12-JUL-2006 (DSB):
 *        Ensure SCALED arrays are converted to SIMPLE arrays.
+*     3-NOV-2010 (DSB):
+*        Ensure DELTA arrays are converted to SIMPLE arrays.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -119,8 +123,9 @@
  1       CONTINUE
  2       CONTINUE
 
-*  See if the storage form is scaled. If so, convert to simple.
-      ELSE IF ( CHR_SIMLR( FORM, 'SCALED' ) ) THEN
+*  See if the storage form is scaled or delta. If so, convert to simple.
+      ELSE IF ( CHR_SIMLR( FORM, 'SCALED' ) .OR.
+     :          CHR_SIMLR( FORM, 'DELTA' ) ) THEN
          FORM = 'SIMPLE'
 
       END IF

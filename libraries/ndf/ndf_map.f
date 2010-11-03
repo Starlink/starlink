@@ -48,8 +48,11 @@
 *     -  If the array is stored in scaled form, then the mapped values
 *     will be the result of applying the approproate scale and zero terms
 *     to the elements of the underlying array.
-*     -  Scaled arrays are read-only. An error will be reported if the array
-*     is stored in scaled form and the access mode is UPDATE or WRITE.
+*     -  If the array is stored in delta compressed form, then the mapped
+*     values will be the original uncompressed values.
+*     -  Scaled and delta arrays are read-only. An error will be reported
+*     if the array is stored in scaled or delta form and the access mode
+*     is UPDATE or WRITE.
 *     -  If the MMOD argument includes the '/ZERO' option, the bad pixel
 *     flag for the array will be reset to false to indicate that there are
 *     no bad values present in the array (see NDF_BAD). If any bad values

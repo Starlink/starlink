@@ -103,6 +103,8 @@
 *           Default complex value flag for other NDF components.
 *        DCB_DEFRM( NDF__MXDCB ) = CHARACTER * ( NDF__SZFRM ) (Write)
 *           Default storage form for other NDF components.
+*        DCB_DFRM( NDF__MXDCB ) = CHARACTER * ( NDF__SZFRM ) (Write)
+*           Storage form for DATA component.
 *        DCB_DETYP( NDF__MXDCB ) = CHARACTER * ( NDF__SZTYP ) (Write)
 *           Default numeric data type for other NDF components.
 *        DCB_DID( NDF__MXDCB ) = INTEGER (Write)
@@ -151,14 +153,24 @@
                CALL ARY_FIND( DCB_LOC( IDCB ), 'DATA_ARRAY',
      :                        DCB_DID( IDCB ), STATUS )
 
+
+*  Get the storage form of the DATA array.
+               CALL ARY_FORM( DCB_DID( IDCB ), DCB_DFRM( IDCB ),
+     :                        STATUS )
+
 *  Obtain the data array attributes needed as default values for other
 *  NDF components and store them in the DCB.
                CALL ARY_TYPE( DCB_DID( IDCB ), DCB_DETYP( IDCB ),
      :                        STATUS )
                CALL ARY_CMPLX( DCB_DID( IDCB ), DCB_DECPX( IDCB ),
      :                         STATUS )
-               CALL ARY_FORM( DCB_DID( IDCB ), DCB_DEFRM( IDCB ),
-     :                        STATUS )
+
+               IF( DCB_DFRM( IDCB ) .EQ. 'DELTA' .OR.
+     :             DCB_DFRM( IDCB ) .EQ. 'SCALED' ) THEN
+                  DCB_DEFRM( IDCB ) = 'SIMPLE'
+               ELSE
+                  DCB_DEFRM( IDCB ) = DCB_DFRM( IDCB )
+               END IF
 
 *  See if WRITE access to the data array is available and set the data
 *  object access mode accordingly.

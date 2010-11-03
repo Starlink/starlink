@@ -156,7 +156,7 @@ int main( int argc, char *argv[] ) {
    if( status == SAI__OK ) {
       emsMark();
       ndfMap( indf, "Data", "_integer", "update", &pntr, &el, &status );
-      if( status == ARY__ACDEN ) {
+      if( status == NDF__CMPAC ) {
          emsAnnul( &status );
 
       } else if( status == SAI__OK ) {

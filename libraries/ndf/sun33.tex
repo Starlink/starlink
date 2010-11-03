@@ -12,13 +12,13 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {33.9}
+\newcommand{\stardocnumber}    {33.10}
 \newcommand{\stardocauthors}   {R.F.~Warren-Smith \& D.S.~Berry}
-\newcommand{\stardocdate}      {5th January 2009}
+\newcommand{\stardocdate}      {12th October 2010}
 \newcommand{\stardoctitle}     {NDF \\ [\latex{1ex}]
                                 Routines for Accessing the\\
                                 Extensible N-Dimensional Data Format}
-\newcommand{\stardocversion}   {Version 1.10}
+\newcommand{\stardocversion}   {Version 1.11}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -2600,13 +2600,14 @@ attempts involves update or write access, although the same component may be
 accessed any number of times (through different identifiers) for read access
 alone.
 
-In addition, arrays stored in scaled form (rather than primitive
+In addition, arrays stored in scaled or delta form (rather than primitive
 or simple form), are currently read-only. An error will be reported if an
-attempt is made to map a scaled array component for update or write access.
-If you need to modify the values in a scaled array, then you should first
+attempt is made to map a scaled or delta array component for update or write
+access.
+If you need to modify the values in such an array, then you should first
 make a copy of the NDF. Copying an NDF automatically converts all scaled
-arrays into simple arrays, and so the copied array can be mapped for any
-type of access.
+amd delta arrays into simple arrays, and so the copied array can be mapped
+for any type of access.
 
 \section{\xlabel{bad_pixels}\label{ss:badpixels}BAD PIXELS}
 
@@ -3964,7 +3965,8 @@ in an NDF:
 \normalsize
 
 
-\section{\xlabel{array_component_storage_form}\label{ss:storageform}ARRAY COMPONENT STORAGE FORM}
+\section{\xlabel{array_component_storage_form}\label{ss:storageform}ARRAY
+COMPONENT STORAGE FORM AND COMPRESSION}
 
 \subsection{\xlabel{general_storage_form}General}
 
@@ -3982,7 +3984,9 @@ of the building-blocks from which an NDF is constructed.
 In the present document, the terminology has been changed slightly.
 In particular, the term \st{storage form\/} is used in preference to
 \st{variant\/} to avoid possible confusion with \st{variance},
-although the meaning is unchanged.
+although the meaning is unchanged. Also, note that the term \st{storage
+form\/} incorporates what is often referred to as \st{compression\/} -
+different compression algorithms correspond to different storage forms.
 
 \subsection{\xlabel{obtaining_the_storage_form}Obtaining the Storage Form}
 
@@ -4012,8 +4016,8 @@ The storage form is established when an NDF is first created (see
 At present there is no way of explicitly changing it, but in some
 circumstances it may be changed implicitly (see
 \S\ref{ss:implicitformchange}).
-At present, only three storage forms are supported, so only the values
-`SIMPLE', 'SCALED' and `PRIMITIVE' can be returned by NDF\_FORM.
+At present, only four storage forms are supported, so only the values
+`SIMPLE', 'SCALED', 'DELTA' and `PRIMITIVE' can be returned by NDF\_FORM.
 These are described below.
 
 \subsection{\xlabel{simple_storage_form}\label{ss:simpleform}Simple Storage Form}
@@ -4042,6 +4046,13 @@ the external unscaled values via:
 where ZERO and SCALE are two constant values stored with the array. In
 all other respects, a scaled array is exactly like a simple array.
 
+This storage form is commonly used as a means of compressing the data
+into a smaller disk file by selecting a data type for the scaled values
+that uses fewer bytes per value than the unscaled data values (for
+instance, scaling four byte \_REALs into two byte integer \_WORDS). Note,
+information is lost in this process as the original unscaled values
+cannot be recreated exactly from the scaled value.
+
 Support for scaled arrays is currently limited, since it is anticipated
 that they will only be of interest as an archive format. The following
 details should be noted:
@@ -4063,13 +4074,16 @@ array.}.
 \item The result of copying a scaled array (for instance, using
 NDF\_PROP, \emph{etc.}) will be an equivalent simple array.
 
-\item Scaled arrays cannot be created directly. Instead, a simple array
-must first be created (\emph{e.g.} using NDF\_NEW), and this can then be
-converted to a scaled array by assigning scale and zero values to it
-using NDF\_PTSZ<T>. So a typical program could create a simple array, map
-it for write access, store the scaled data values in the mapped simple
-array, unmap the array, and then associate scale and zero values with the
-array, thus converting it to a scaled array.
+\item Scaled arrays cannot be created directly. To create an NDF with
+scaled arrays, first create an NDF with simple arrays, and then copy it
+using NDF\_ZSCAL. The output NDF created by NDF\_ZSCAL is a copy
+of the input NDF, but stored with scaled storage form\footnote{Alternatively,
+an existing simple NDF can be converted to a scaled array by assigning
+scale and zero values to it using NDF\_PTSZ<T> - a typical program
+could create a simple array, map it for write access, store the scaled
+data values in the mapped simple array, unmap the array, and then
+associate scale and zero values with the array, thus converting it to a
+scaled array.}.
 
 \item The NDF\_GTSZx routine can be used to determine the scale and zero
 values of an existing scaled array.
@@ -4085,6 +4099,87 @@ practice, this means that they return the data type of the SCALE and ZERO
 constants, rather than the data type of the array holding the stored
 (scaled) data values. To get the data type of the stored (scaled) values,
 use NDF\_SCTYP.
+
+\end{enumerate}
+
+
+\subsection{\xlabel{delta_storage_form}\label{ss:deltaform}Delta compressed Storage Form}
+
+In this form of storage, the values stored internally within an NDF's array
+component are a compressed form of the external values of interest to
+application code. Delta form provides a lossless compression scheme designed
+for arrays of integers in which there is at least one pixel axis along which
+the array value changes only slowly. It uses two methods to achieve
+compression:
+
+\begin{itemize}
+
+\item Differences between adjacent data values are stored, rather than
+the full data values themselves. For many forms of astronomical data, the
+differences between adjacent data values have a much smaller range than
+the data values themselves. This means that they can be represented in
+fewer bits. For instance, if the data values are \_INTEGER, then the
+differences between adjacent values may fit into the range of a \_WORD
+(-32767 to +32767) or even a \_BYTE (-127 to +127). This use of a shorter
+data type usually provides the majority of the compression. However, it is not
+necessary for all differences to be small - if the difference between two
+adjacent data values is too large for the compressed data type, the
+second of the two data values will be stored explicitly using the full data
+type of the original uncompressed data. Obviously, the more values that
+need to be stored in full in this way, the lower will be the compression.
+
+In the above description, the term ``adjacent'' means ``adjacent along a
+specified pixel axis''. The pixel axis along which differences are taken
+is referred to as the ``compression axis''. It may be specified
+explicitly by the calling application when NDF\_ZDELT is called, or it
+may be left unspecified in which case NDF\_ZDELT will choose the axis that
+gives the best compression.
+
+\item If the uncompressed array contains runs of more than three identical
+values along the compression axis, then the run of identical values is
+replaced by a single value (stored in full, not as a difference) and a
+repetition count.
+
+\end{itemize}
+
+Support for delta arrays is currently limited, since it is anticipated
+that they will only be of interest as an archive format. The following
+details should be noted:
+
+\begin{enumerate}
+
+\item Delta arrays are ``read-only''. An error will be reported if an
+attempt is made to map a delta array for WRITE or UPDATE access. When
+mapped for READ access, the pointer returned by NDF\_MAP provides access
+to the original \emph{uncompressed} data values.
+
+\item The result of copying a delta array (for instance, using
+NDF\_PROP, \emph{etc.}) will be an equivalent simple array.
+
+\item Delta arrays cannot be created directly. To create an NDF with
+delta compressed arrays, first create an NDF with simple arrays, and then
+copy it using NDF\_ZDELT. The output NDF created by NDF\_ZDELT is a copy
+of the input NDF, but stored with delta storage form.
+
+\item Delta form can only be used to store integer data values, but
+NDFs with floating point data values may be compressed indirectly, by
+first storing the floating point values in a scaled NDF, and then using
+NDF\_ZDELT to create a delta compressed copy of the scaled NDF. Note, the
+scaled NDF must use an integer data type to store the internal (i.e.
+scaled) values. The use of the scaled NDF means that the compression is
+not lossless, since some information will have been lost in scaling the
+floating point values into integers.
+
+\item The NDF\_GTDLT routine will return details of the compression
+applied to a delta compressed NDF array component.
+
+\item Delta arrays cannot have complex data types. An error will be
+reported if an attempt is made to to import an HDS structure describing a
+complex delta array.
+
+\item When applied to a delta array, the NDF\_TYPE and NDF\_FTYPE routines
+return information about the data type of the original uncompressed data
+values.
 
 \end{enumerate}
 
@@ -10789,6 +10884,8 @@ The following is an example \xref{ADAM}{sg4}{} interface file
             {Obtain the storage form of an NDF array component}
 \noteroutine{NDF\_FTYPE( INDF, COMP, FTYPE, STATUS )}
             {Obtain the full type of an NDF array component}
+\noteroutine{NDF\_GTDLT( INDF, COMP, ZAXIS, ZTYPE, ZRATIO, STATUS )}
+            {Get compression details for a DELTA compressed NDF array component}
 \noteroutine{NDF\_GTSZx( INDF, COMP, SCALE, ZERO, STATUS )}
             {Get scale and zero factors for a scaled array in an NDF}
 \noteroutine{NDF\_GTUNE( TPAR, VALUE, STATUS )}
@@ -10932,6 +11029,10 @@ The following is an example \xref{ADAM}{sg4}{} interface file
             {Write a scalar value to a component within a named NDF extension}
 \noteroutine{NDF\_XSTAT( INDF, XNAME, THERE, STATUS )}
             {Determine if a named NDF extension exists}
+\noteroutine{NDF\_ZDELT( INDF1, COMP, MINRAT, ZAXIS, TYPE, PLACE, INDF2, ZRATIO, STATUS )}
+            {Create a compressed copy of an NDF using DELTA compression}
+\noteroutine{NDF\_ZSCAL( INDF1, TYPE, SCALE, ZERO, PLACE, INDF2, STATUS )}
+            {Create a compressed copy of an NDF using SCALE compression}
 \normalsize
 \end{latexonly}
 
@@ -11242,6 +11343,23 @@ locator}{sun92}{using_locators}}
             {Obtain the value of an NDF\_ system tuning parameter}
 \noteroutine{\htmlref{NDF\_TUNE}{NDF_TUNE}( VALUE, TPAR, STATUS )}
             {Set an NDF\_ system tuning parameter}
+
+\subsection{\xlabel{compression}Compression}
+
+\noteroutine{\htmlref{NDF\_FORM}{NDF_FORM}( INDF, COMP, FORM, STATUS )}
+            {Obtain the storage form of an NDF array component}
+\noteroutine{NDF\_GTDLT( INDF, COMP, ZAXIS, ZTYPE, ZRATIO, STATUS )}
+            {Get compression details for a DELTA compressed NDF array component}
+\noteroutine{NDF\_GTSZx( INDF, COMP, SCALE, ZERO, STATUS )}
+            {Get scale and zero factors for a scaled array in an NDF}
+\noteroutine{NDF\_PTSZx( SCALE, ZERO, INDF, COMP, STATUS )}
+            {Store new scale and zero factors for a scaled array in an NDF}
+\noteroutine{NDF\_ZDELT( INDF1, COMP, MINRAT, ZAXIS, TYPE, PLACE, INDF2, ZRATIO, STATUS )}
+            {Create a compressed copy of an NDF using DELTA compression}
+\noteroutine{\htmlref{NDF\_ZSCAL}{NDF_ZSCAL}( INDF1, TYPE, SCALE, ZERO, PLACE, INDF2, STATUS )}
+            {Create a compressed copy of an NDF using SCALE compression}
+
+
 
 \newpage
 \section{\xlabel{routine_descriptions}\label{ss:routinedescriptions}FORTRAN ROUTINE DESCRIPTIONS}
@@ -13454,9 +13572,9 @@ locator}{sun92}{using_locators}}
 
          \sstitem
          At present, the NDF\_ routines only support \hi{"}primitive\hi{"},
-         \hi{"}simple\hi{"} and \hi{"}scaled\hi{"} arrays, so only the
-         values \hi{'}PRIMITIVE\hi{'}, \hi{'}SIMPLE\hi{'} and
-         \hi{'}SCALED\hi{'} can be returned.
+         \hi{"}simple\hi{"}, \hi{"}delta\hi{"} and \hi{"}scaled\hi{"} arrays,
+         so only the values \hi{'}PRIMITIVE\hi{'}, \hi{'}SIMPLE\hi{'},
+         \hi{'}DELTA\hi{'} and \hi{'}SCALED\hi{'} can be returned.
       }
    }
 }
@@ -13520,6 +13638,72 @@ locator}{sun92}{using_locators}}
          length of a character variable to hold the full data type of an
          NDF array component. This constant is defined in the include file
          NDF\_PAR.
+      }
+   }
+}
+\sstroutine{
+   NDF\_GTDLT
+}{
+   Get compression details for a DELTA compressed NDF array component
+}{
+   \sstdescription{
+      The routine returns the details of the compression used by an
+      NDF array component stored in DELTA form. If the array is not
+      stored in DELTA form, then null values are returned as listed
+      below, but no error is reported.
+
+      A DELTA array is compressed by storing only the differences between
+      adjacent array values along a nominated compression axis, rather than
+      the full array values. The differences are stored using a smaller data
+      type than the original absolute values. The compression is lossless
+      because any differences that will not fit into the smaller data type
+      are stored explicitly in an extra array with a larger data type.
+      Additional compression is achieved by replacing runs of equal values
+      by a single value and a repeat count.
+   }
+   \sstinvocation{
+      CALL NDF\_GTDLT( INDF, COMP, ZAXIS, ZTYPE, ZRATIO, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         INDF = INTEGER (Given)
+      }{
+         NDF identifier.
+      }
+      \sstsubsection{
+         COMP = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Name of the NDF array component; {\tt '}DATA{\tt '}, {\tt '}QUALITY{\tt '} or {\tt '}VARIANCE{\tt '}.
+      }
+      \sstsubsection{
+         ZAXIS = INTEGER (Returned)
+      }{
+         The index of the pixel axis along which compression occurred.
+         The first axis has index 1. Zero is returned if the array is not
+         stored in DELTA form.
+      }
+      \sstsubsection{
+         ZTYPE = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The data type in which the differences between adjacent array
+         values are stored. This will be one of {\tt '}\_BYTE{\tt '}, {\tt '}\_WORD{\tt '} or
+         {\tt '}\_INTEGER{\tt '}. The data type of the array itself is returned if the
+         supplid array is not stored in DELTA form.
+      }
+      \sstsubsection{
+         ZRATIO = REAL (Returned)
+      }{
+         The compression factor - the ratio of the uncompressed array size
+         to the compressed array size. This is approximate as it does not
+         include the effects of the metadata needed to describe the extra
+         components of a DELTA array (i.e. the space needed to hold the
+         component names, types, dimensions, etc). A value of 1.0 is
+         returned if the supplid array is not stored in DELTA form.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
       }
    }
 }
@@ -14899,9 +15083,13 @@ locator}{sun92}{using_locators}}
          to the elements of the underlying array.
 
          \sstitem
-         Scaled arrays are read-only. An error will be reported if the
-         array is stored in scaled form and the access mode is update or
-         write.
+         If the array is stored in delta compressed form, then the mapped
+         values will be the original uncompressed values.
+
+         \sstitem
+         Scaled and delta arrays are read-only. An error will be reported
+         if the array is stored in scaled or delta form and the access mode
+         is update or write.
 
          \sstitem
          If the MMOD argument includes the \hi{'}/ZERO\hi{'} option, the
@@ -16299,7 +16487,8 @@ locator}{sun92}{using_locators}}
       The routine sets new values for the scale and zero values
       associated with an NDF arraycomponent. If the array is stored
       in simple or primitive form, then the storage form is changed
-      to scaled.
+      to scaled. See also NDF\_ZSCAL which provides a higher level
+      interface for creating SCALED arrays.
    }
    \sstinvocation{
       CALL NDF\_PTSZx( SCALE, ZERO, INDF, COMP, STATUS )
@@ -17321,76 +17510,6 @@ locator}{sun92}{using_locators}}
       }
    }
 }
-
-\sstroutine{
-   NDF\_PTSZx
-}{
-   Set new scale and zero values for an NDF array component
-}{
-   \sstdescription{
-      The routine sets new values for the scale and zero values
-      associated with an NDF arraycomponent. If the array is stored
-      in simple or primitive form, then the storage form is changed
-      to scaled.
-   }
-   \sstinvocation{
-      CALL NDF\_PTSZx( SCALE, ZERO, INDF, COMP, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         SCALE = ? (Given)
-      }{
-         The new value for the scaling factor.
-      }
-      \sstsubsection{
-         ZERO = ? (Given)
-      }{
-         The new value for the zero offset.
-      }
-      \sstsubsection{
-         INDF = INTEGER (Given)
-      }{
-         NDF identifier.
-      }
-      \sstsubsection{
-         COMP = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         Name of the NDF array component; {\tt '}DATA{\tt '} or {\tt '}VARIANCE{\tt '}.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         There is a routine for each of the standard Fortran numerical data
-         types: integer, real and double precision. Replace the (lower case) {\tt "}x{\tt "}
-         in the routine name by I, R or D as appropriate.
-
-         \sstitem
-         A comma-separated list of component names may also be
-         supplied, in which case the same scale and zero values will be
-         used for each component in turn.
-
-         \sstitem
-         This routine may only be used to change the scaling of a base
-         NDF. If it is called with an array which is not a base array,
-         then it will return without action. No error will result.
-
-         \sstitem
-         An error will result if the array component, or any part of it,
-         is currently mapped for access (e.g. through another identifier).
-
-         \sstitem
-         This routine has no effect on components which are in an
-         undefined state.
-      }
-   }
-}
 \sstroutine{
    NDF\_STATE
 }{
@@ -18370,6 +18489,307 @@ locator}{sun92}{using_locators}}
       }
    }
 }
+\sstroutine{
+   NDF\_ZDELT
+}{
+   Create a compressed copy of an NDF using DELTA compression
+}{
+   \sstdescription{
+      The routine creates a new NDF holding {\tt "}delta{\tt "} compressed copies of
+      specified array components within the supplied NDF. This compression
+      is lossless, but only operates on arrays holding integer values. It
+      assumes that adjacent integer values in each input array tend to be
+      close in value, and so differences between adjacent values can be
+      represented in fewer bits than the absolute values themselves. The
+      differences are taken along a nominated pixel axis within the
+      supplied array (specified by argument ZAXIS). Any input value that
+      differs from its earlier neighbour by more than the data range of
+      the selected data type is stored explicitly using the data type of
+      the input array.
+
+      Further compression is achieved by replacing runs of equal input values
+      by a single occurrence of the value with a correspsonding repetition
+      count.
+
+      It should be noted that the degree of compression achieved is
+      dependent on the nature of the data, and it is possible for a
+      compressed array to occupy more space than the uncompressed array.
+      The mean compression factor actually achieved is returned in argument
+      ZRATIO (the ratio of the supplied NDF size to the compressed NDF
+      size).
+   }
+   \sstinvocation{
+      CALL NDF\_ZDELT( INDF1, COMP, MINRAT, ZAXIS, TYPE, PLACE, INDF2,
+                      ZRATIO, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         INDF1 = INTEGER (Given)
+      }{
+         Identifier for the input NDF.
+      }
+      \sstsubsection{
+         COMP = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         A comma-separated list of component names to be compressed.
+         These may be selected from {\tt '}DATA, {\tt '}VARIANCE{\tt '} or {\tt '}QUALITY{\tt '}.
+         Additionally, if {\tt '}$*${\tt '} is supplied all three components will be
+         compressed.
+      }
+      \sstsubsection{
+         MINRAT = REAL (Given)
+      }{
+         The minimum allowed compression ratio for an array (the ratio of
+         the supplied array size to the compressed array size). If compressing
+         an array results in a compression ratio smaller than or equal to
+         MINRAT, then the array is left uncompressed in the returned NDF.
+         If the supplied value is zero or negative, then each array will
+         be compressed regardless of the compression ratio.
+      }
+      \sstsubsection{
+         ZAXIS = INTEGER (Given)
+      }{
+         The index of the pixel axis along which differences are to be
+         taken. If this is zero, a default value will be selected that
+         gives the greatest compression. An error will be reported if a
+         value less than zero or greater than the number of axes in the
+         input array is supplied.
+      }
+      \sstsubsection{
+         TYPE = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The data type in which to store the differences between adjacent
+         array values. This must be one of {\tt '}\_BYTE{\tt '}, {\tt '}\_WORD{\tt '} or {\tt '}\_INTEGER{\tt '}.
+         Additionally, a blank string may be supplied in which casea
+         default value will be selected that gives the greatest compression.
+      }
+      \sstsubsection{
+         PLACE = INTEGER (Given and Returned)
+      }{
+         An NDF placeholder (e.g. generated by the NDF\_PLACE routine)
+         which indicates the position in the data system where the new
+         NDF will reside. The placeholder is annulled by this routine,
+         and a value of NDF\_\_NOPL will be returned (as defined in the
+         include file NDF\_PAR).
+      }
+      \sstsubsection{
+         INDF2 = INTEGER (Returned)
+      }{
+         Identifier for the new NDF.
+      }
+      \sstsubsection{
+         ZRATIO = \_REAL (Returned)
+      }{
+         The mean compression ratio actually achieved for the array
+         components specified by COMP. The compression ratio for an array
+         is the ratio of the number of bytes needed to hold the numerical
+         values in the supplied array, to the number of bytes needed to
+         hold the numerical values in the compressed array. It does not
+         include the small extra overheads associated with the extra
+         labels, etc, needed to store compressed data, and so may be
+         inaccurate for small arrays. Additionally, this ratio only takes
+         the specified array components into account. If the NDF contains
+         significant quantities of data in other components, then the
+         overall compression of the whole NDF will be less.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         An error is reported if any of the arrays to be compressed holds
+         floating point values. The exception is that floating point values
+         that are stored as scaled integers (see NDF\_ZSCAL) are accepted.
+
+         \sstitem
+         The routine may only be used to compress a base NDF. If it is
+         called for an NDF which is not a base NDF, then it will return without
+         action. No error will result.
+
+         \sstitem
+         An error will be reported if the input NDF is already stored in
+         DELTA format.
+
+         \sstitem
+         An error will result if the DATA or VARIANCE component of the
+         input NDF is currently mapped for access.
+
+         \sstitem
+         An error will be reported if either the DATA or VARIANCE component
+         of the input NDF is currently mapped for access.
+
+         \sstitem
+         Complex arrays cannot be compressed using this routine. An error
+         will be reported if the input NDF has a complex type, or if {\tt "}TYPE{\tt "}
+         represents a complex data type.
+
+         \sstitem
+         The resulting NDF will be read-only. An error will be reported if
+         an attempt is made to map it for WRITE or UPDATE access.
+
+         \sstitem
+         When the output NDF is mapped for READ access, uncompression occurs
+         automatically. The pointer returned by NDF\_MAP provides access to the
+         uncompressed array values.
+
+         \sstitem
+         The result of copying a compressed NDF (for instance, using
+         NDF\_PROP, etc.) will be an equivalent uncompressed NDF.
+
+         \sstitem
+         When applied to a compressed NDF, the NDF\_TYPE and NDF\_FTYPE
+         routines return information about the data type of the uncompressed
+         NDF.
+
+         \sstitem
+         If this routine is called with STATUS set, then a value of
+         NDF\_\_NOID will be returned for the INDF2 argument, although no
+         further processing will occur. The same value will also be
+         returned if the routine should fail for any reason. In either
+         event, the placeholder will still be annulled. The NDF\_\_NOID
+         constant is defined in the include file NDF\_PAR.
+      }
+   }
+}
+\sstroutine{
+   NDF\_ZSCAL
+}{
+   Create a compressed copy of an NDF using SCALE compression
+}{
+   \sstdescription{
+      The routine creates a new NDF holding a compressed copy of the
+      supplied NDF. The compression is performed by scaling the DATA
+      and VARIANCE arrays using a simple linear scaling, and then
+      casting the scaled values into the specified data type. The amount
+      of compression, and the amount of information lost, is thus determined
+      by the input and output data types. For instance, if the input NDF is
+      of type \_DOUBLE (eight bytes) and the output is of type \_WORD (two
+      bytes), the compression ratio for each array component will be four
+      to one.
+   }
+   \sstinvocation{
+      CALL NDF\_ZSCAL( INDF1, TYPE, SCALE, ZERO, PLACE, INDF2, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         INDF1 = INTEGER (Given)
+      }{
+         Identifier for the input NDF.
+      }
+      \sstsubsection{
+         TYPE = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Numeric type of the output NDF{\tt '}s DATA component (e.g. {\tt '}\_REAL{\tt '} or
+         {\tt '}\_INTEGER{\tt '}).
+      }
+      \sstsubsection{
+         SCALE( 2 ) = DOUBLE PRECISION (Given and Returned)
+      }{
+         The scale factors to use when compressing the array components in the
+         supplied NDF. The DATA array will be scaled using SCALE( 1 ) and
+         the VARIANCE array - if present - will be scaled using SCALE( 2 ).
+         If either of these is set to VAL\_\_BADD, then a suitable value
+         will be found automatically by inspecting the supplied array
+         values. The values actually used will be returned on exit. See
+         {\tt "}Notes:{\tt "} below. On exit, any supplied values will be rounded to
+         values that can be represented accurately in the data type of
+         the input NDF.
+      }
+      \sstsubsection{
+         ZERO( 2 ) = DOUBLE PRECISION (Given and Returned)
+      }{
+         The zero offsets to use when compressing the array components in the
+         supplied NDF. The DATA array will be offset using ZERO( 1 ) and
+         the VARIANCE array - if present - will be offset using ZERO( 2 ).
+         If either of these is set to VAL\_\_BADD, then a suitable value
+         will be found automatically by inspecting the supplied array
+         values. The values actually used will be returned on exit. See
+         {\tt "}Notes:{\tt "} below. On exit, any supplied values will be rounded to
+         values that can be represented accurately in the data type of
+         the input NDF.
+      }
+      \sstsubsection{
+         PLACE = INTEGER (Given and Returned)
+      }{
+         An NDF placeholder (e.g. generated by the NDF\_PLACE routine)
+         which indicates the position in the data system where the new
+         NDF will reside. The placeholder is annulled by this routine,
+         and a value of NDF\_\_NOPL will be returned (as defined in the
+         include file NDF\_PAR).
+      }
+      \sstsubsection{
+         INDF2 = INTEGER (Returned)
+      }{
+         Identifier for the new NDF.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The compressed data may not be of type \_DOUBLE. An error will be
+         reported if TYPE is {\tt '}\_DOUBLE{\tt '}.
+
+         \sstitem
+         Only arrays that are stored in SIMPLE or PRIMITIVE form can
+         be compressed. An error is reported if any other storage form is
+         encountered whilst compressing the input NDF.
+
+         \sstitem
+         The uncompressed array values are obtained by multiplying the
+         compressed values by SCALE and then adding on ZERO.
+
+         \sstitem
+         The default scale and zero values (used if VAL\_\_BADD values are
+         supplied for SCALE and/or ZERO) are chosen so that the extreme array
+         values will fit into the dynamic range of the output data type,
+         allowing a small safety margin.
+
+         \sstitem
+         Complex arrays cannot be compressed using this routine. An error
+         will be reported if the input NDF has a complex type, or if {\tt "}TYPE{\tt "}
+         represents a complex data type.
+
+         \sstitem
+         The resulting NDF will be read-only. An error will be reported if
+         an attempt is made to map it for WRITE or UPDATE access.
+
+         \sstitem
+         When the output NDF is mapped for READ access, uncompression occurs
+         automatically. The pointer returned by NDF\_MAP provides access to the
+         uncompressed array values.
+
+         \sstitem
+         The result of copying a compressed NDF (for instance, using
+         NDF\_PROP, etc.) will be an equivalent uncompressed NDF.
+         SCALE( 2 ) = DOUBLE PRECISION (Given)
+
+         \sstitem
+         When applied to a compressed NDF, the NDF\_TYPE and NDF\_FTYPE
+         routines return information about the data type of the uncompressed
+         NDF.
+
+         \sstitem
+         If this routine is called with STATUS set, then a value of
+         NDF\_\_NOID will be returned for the INDF2 argument, although no
+         further processing will occur. The same value will also be
+         returned if the routine should fail for any reason. In either
+         event, the placeholder will still be annulled. The NDF\_\_NOID
+         constant is defined in the include file NDF\_PAR.
+      }
+   }
+}
+
 \normalsize
 
 \newpage
@@ -18697,6 +19117,8 @@ Appendix~\ref{ss:cinterface}.\\[1.0ex]
             {Obtain the storage form of an NDF array component}
 \noteroutineC{\xlabel{ndfFtype}void \htmlref{ndfFtype}{NDF_FTYPE}}{( int indf, const char $*$comp, char $*$ftype, int ftype\_length, int $*$status );}
             {Obtain the full type of an NDF array component}
+\noteroutine{\xlabel{ndfGtdlt}void \htmlref{ndfGtdlt}{NDF_GTDLT}( int ndf, const char $*$comp, int $*$zaxis, char $*$ztype, int ztype\_length, float $*$zratio, int $*$status );}
+            {Get compression details for a DELTA compressed NDF array component}
 \noteroutineC{\xlabel{ndfGtszd}void \htmlref{ndfGtszd}{NDF_GTSZx}}{( int indf, const char $*$comp, double $*$scale, double $*$zero, int $*$status );}
             {Get scale and zero factors for a scaled array in an NDF}
 \noteroutineC{\xlabel{ndfGtszi}void \htmlref{ndfGtszi}{NDF_GTSZx}}{( int indf, const char $*$comp, int $*$scale, int $*$zero, int $*$status );}
@@ -18871,7 +19293,9 @@ Appendix~\ref{ss:cinterface}.\\[1.0ex]
 \noteroutineC{\xlabel{ndfXpt0r}void \htmlref{ndfXpt0r}{NDF_XPT0x}}{( float value, int indf, const char $*$xname, const char $*$cmpt, int $*$status );}
             {Write a scalar single precision value to a component within a named NDF extension}
 \noteroutineC{\xlabel{ndfXstat}void \htmlref{ndfXstat}{NDF_XSTAT}}{( int indf, const char $*$xname, int $*$there, int $*$status );}
-     {Determine if a named NDF extension exists}
+            {Determine if a named NDF extension exists}
+\noteroutineC{\xlabel{ndfZscal}void \htmlref{ndfZscal}{NDF_ZSCAL}}{( int indf1,const char $*$type, double scale[ 2 ], double zero[ 2 ], int $*$place, int $*$indf2, int *status );}
+            {Create a compressed copy of an NDF using SCALE compression}
 
 \newpage
 \section{\xlabel{obsolete_routines}\label{ss:obsoleteroutines}OBSOLETE ROUTINES}
@@ -19197,10 +19621,10 @@ the NDF\_ system between versions V1.8 and V1.9:
 
 \end{enumerate}
 
-\subsection{\xlabel{list_of_most_recent_changes}Changes Introduced in V1.10}
+\subsection{Changes Introduced in V1.10}
 
 The following describes the most significant changes which occurred in
-the NDF\_ system between versions V1.9 and V1.10 (the current version):
+the NDF\_ system between versions V1.9 and V1.10:
 
 \begin{enumerate}
 
@@ -19210,6 +19634,24 @@ the NDF\_ system between versions V1.9 and V1.10 (the current version):
    \item The NDF\_SCOPY and NDF\_PROP functions now allow an asterisk to be
    used within the CLIST argument as a wild card to match all extension
    names.
+
+\end{enumerate}
+
+\subsection{\xlabel{list_of_most_recent_changes}Changes Introduced in V1.11}
+
+The following describes the most significant changes which occurred in
+the NDF\_ system between versions V1.10 and V1.11 (the current version):
+
+\begin{enumerate}
+
+   \item Limited support for NDF array components stored in ``delta'
+   compressed form has been introduced. The new routine NDF\_ZDELT will
+   create a delta compressed copy of an input NDF, and the new routine
+   NDF\_GTDLT will return details of the compression of a delta
+   compressed NDF. See \S\ref{ss:deltaform}.
+
+   \item A new function NDF\_ZSCAL has been added, which creates a SCALED
+   copy of an input NDF with SIMPLE or PRIMITIVE array components.
 
 \end{enumerate}
 

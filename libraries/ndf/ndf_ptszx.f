@@ -17,6 +17,9 @@
 *     associated with an NDF arraycomponent. If the array is stored
 *     in simple or primitive form, then the storage form is changed
 *     to scaled.
+*
+*     See also NDF_ZSCAL which provides a higher level interface for
+*     creating scaled arrays.
 
 *  Arguments:
 *     SCALE = REAL (Given)
@@ -370,6 +373,9 @@
 *     The routine sets new values for the scale and zero values
 *     associated with an NDF arraycomponent. If the array is stored in
 *     simple form, then the storage form is changed to scaled.
+*
+*     See also NDF_ZSCAL which provides a higher level interface for
+*     creating scaled arrays.
 
 *  Arguments:
 *     SCALE = INTEGER (Given)
@@ -723,6 +729,9 @@
 *     The routine sets new values for the scale and zero values
 *     associated with an NDF arraycomponent. If the array is stored in
 *     simple form, then the storage form is changed to scaled.
+*
+*     See also NDF_ZSCAL which provides a higher level interface for
+*     creating scaled arrays.
 
 *  Arguments:
 *     SCALE = DOUBLE PRECISION (Given)

@@ -34,12 +34,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
@@ -120,10 +120,11 @@
 *  ==========
 
 *  Data array identifier and whether this information is up to date.
-*  Number of current data array mappings.
+*  Number of current data array mappings. Storage form.
       INTEGER DCB_DID( NDF__MXDCB )
       LOGICAL DCB_KD( NDF__MXDCB )
       INTEGER DCB_NDMAP( NDF__MXDCB )
+      CHARACTER * ( NDF__SZFRM ) DCB_DFRM( NDF__MXDCB )
 
 *  Default.
 *  =======
@@ -167,7 +168,7 @@
 *  axis locator.
       LOGICAL DCB_KA( NDF__MXDCB )
       CHARACTER * ( DAT__SZLOC ) DCB_ALOC( NDF__MXDIM, NDF__MXDCB )
-      
+
 *  Axes (individual).
 *  =================
 
@@ -175,7 +176,7 @@
 *  extension locators.
       LOGICAL DCB_KAX( NDF__MXDIM, NDF__MXDCB )
       CHARACTER * ( DAT__SZLOC ) DCB_AXLOC( NDF__MXDIM, NDF__MXDCB )
-      
+
 *  Whether character axis component name information is available,
 *  names of the character axis components, and character component
 *  locators.
@@ -210,7 +211,7 @@
       CHARACTER * ( NDF__SZTYP ) DCB_AWTYP( NDF__MXDIM, NDF__MXDCB )
       CHARACTER * ( NDF__SZFRM ) DCB_AWFRM( NDF__MXDIM, NDF__MXDCB )
       INTEGER DCB_NAWMP( NDF__MXDIM, NDF__MXDCB )
-      
+
 *  Whether axis normalisation information is available and the
 *  normalisation value.
       LOGICAL DCB_KAN( NDF__MXDIM, NDF__MXDCB )
@@ -248,10 +249,10 @@
 *  by the current application, so that no current record exists.
       INTEGER DCB_HTLEN( NDF__MXDCB )
 
-*  The date/time to attach to the next history record to be created, as 
-*  a UTC Modified Julian Date. If negative, then the current time will be 
+*  The date/time to attach to the next history record to be created, as
+*  a UTC Modified Julian Date. If negative, then the current time will be
 *  used.
-      DOUBLE PRECISION DCB_HTIME( NDF__MXDCB ) 
+      DOUBLE PRECISION DCB_HTIME( NDF__MXDCB )
 
 *  History recording update mode.
       INTEGER DCB_HUMOD( NDF__MXDCB )
@@ -326,7 +327,8 @@
      :   DCB_AXLOC, DCB_CCN, DCB_CLOC, DCB_DEFRM, DCB_DETYP,
      :   DCB_DSP, DCB_FILE, DCB_FORFL, DCB_FORID, DCB_HAPPN,
      :   DCB_HLOC, DCB_HRLOC, DCB_LOC, DCB_MOD, DCB_PATH,
-     :   DCB_QFRM, DCB_QLOC, DCB_VFRM, DCB_VTYP, DCB_XLOC
+     :   DCB_QFRM, DCB_QLOC, DCB_VFRM, DCB_VTYP, DCB_XLOC,
+     :   DCB_DFRM
 
 *  Byte-aligned data.
       COMMON /NDF1_DCB3/ DCB_OVQBB, DCB_QBB

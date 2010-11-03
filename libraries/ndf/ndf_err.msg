@@ -94,4 +94,8 @@ WCSIN	<world coordinate system information invalid>
 ARCIN	<command line argument count invalid>
 ARGIN	<command line argument invalid>
 BDTIM   <date/time string invalid>
+BADSF   <wrong array storage form>
+ZERSC   <zero scale factor supplied>
+BADCP   <incompatible data types for compression>
+CMPAC   <attempt to change a read-only property of a compressed array>
 .END

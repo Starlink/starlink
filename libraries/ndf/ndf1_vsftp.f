@@ -178,6 +178,7 @@
 *  If it exists, then set a new full data type for it.
                   IF ( VALID ) THEN
                      CALL ARY_STYPE( FTYPE, DCB_VID( IDCB ), STATUS )
+                     CALL NDF1_CMPAC( IDCB, 'VARIANCE', STATUS )
 
 *  Otherwise, decompose the full type specification into a numeric type
 *  and a complex value flag and store these in the DCB as default

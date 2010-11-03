@@ -4460,3 +4460,165 @@ DECLARE_INTEGER(fstatus);
 
 
 
+F77_SUBROUTINE(ndf_zscal)( INTEGER(indf1),
+                           CHARACTER(type),
+                           DOUBLE_ARRAY(scale),
+                           DOUBLE_ARRAY(zero),
+                           INTEGER(place),
+                           INTEGER(indf2),
+                           INTEGER(status)
+                           TRAIL(type) );
+
+void ndfZscal( int indf1,
+               const char *type,
+               double scale[ 2 ],
+               double zero[ 2 ],
+               int *place,
+               int *indf2,
+               int *status ) {
+
+DECLARE_INTEGER(findf1);
+DECLARE_CHARACTER_DYN(ftype);
+DECLARE_DOUBLE_ARRAY_DYN(fscale);
+DECLARE_DOUBLE_ARRAY_DYN(fzero);
+DECLARE_INTEGER(fplace);
+DECLARE_INTEGER(findf2);
+DECLARE_INTEGER(fstatus);
+
+   F77_EXPORT_INTEGER( indf1, findf1 );
+   F77_CREATE_EXPORT_CHARACTER( type, ftype );
+   F77_CREATE_DOUBLE_ARRAY( fscale, 2 );
+   F77_EXPORT_DOUBLE_ARRAY( scale, fscale, 2 );
+   F77_CREATE_DOUBLE_ARRAY( fzero, 2 );
+   F77_EXPORT_DOUBLE_ARRAY( zero, fzero, 2 );
+   F77_EXPORT_INTEGER( *place, fplace );
+   F77_EXPORT_INTEGER( *status, fstatus );
+
+   F77_CALL(ndf_zscal)( INTEGER_ARG(&findf1),
+                        CHARACTER_ARG(ftype),
+                        DOUBLE_ARRAY_ARG(fscale),
+                        DOUBLE_ARRAY_ARG(fzero),
+                        INTEGER_ARG(&fplace),
+                        INTEGER_ARG(&findf2),
+                        INTEGER_ARG(&fstatus)
+                        TRAIL_ARG(ftype) );
+
+   F77_FREE_CHARACTER( ftype );
+   F77_FREE_DOUBLE( fscale);
+   F77_FREE_DOUBLE( fzero );
+   F77_IMPORT_INTEGER( fplace, *place );
+   F77_IMPORT_INTEGER( findf2, *indf2 );
+   F77_IMPORT_INTEGER( fstatus, *status );
+
+   return;
+}
+
+
+F77_SUBROUTINE(ndf_zdelt)( INTEGER(indf1),
+                           CHARACTER(comp),
+                           REAL(minrat),
+                           INTEGER(zaxis),
+                           CHARACTER(type),
+                           INTEGER(place),
+                           INTEGER(indf2),
+                           REAL(zratio),
+                           INTEGER(status)
+                           TRAIL(comp) TRAIL(type) );
+
+void ndfZdelt( int indf1,
+               const char *comp,
+               float minrat,
+               int zaxis,
+               const char *type,
+               int *place,
+               int *indf2,
+               float *zratio,
+               int *status ) {
+
+DECLARE_INTEGER(findf1);
+DECLARE_CHARACTER_DYN(fcomp);
+DECLARE_REAL(fminrat);
+DECLARE_INTEGER(fzaxis);
+DECLARE_CHARACTER_DYN(ftype);
+DECLARE_INTEGER(fplace);
+DECLARE_INTEGER(findf2);
+DECLARE_REAL(fzratio);
+DECLARE_INTEGER(fstatus);
+
+   F77_EXPORT_INTEGER( indf1, findf1 );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
+   F77_EXPORT_REAL( minrat, fminrat );
+   F77_EXPORT_INTEGER( zaxis, fzaxis );
+   F77_CREATE_EXPORT_CHARACTER( type, ftype );
+   F77_EXPORT_INTEGER( *place, fplace );
+   F77_EXPORT_INTEGER( *status, fstatus );
+
+   F77_CALL(ndf_zdelt)( INTEGER_ARG(&findf1),
+                        CHARACTER_ARG(fcomp),
+                        REAL_ARG(&fminrat),
+                        INTEGER_ARG(&fzaxis),
+                        CHARACTER_ARG(ftype),
+                        INTEGER_ARG(&fplace),
+                        INTEGER_ARG(&findf2),
+                        REAL_ARG(&fzratio),
+                        INTEGER_ARG(&fstatus)
+                        TRAIL_ARG(fcomp) TRAIL_ARG(ftype) );
+
+   F77_FREE_CHARACTER( fcomp );
+   F77_FREE_CHARACTER( ftype );
+   F77_IMPORT_INTEGER( fplace, *place );
+   F77_IMPORT_INTEGER( findf2, *indf2 );
+   F77_IMPORT_REAL( fzratio, *zratio );
+   F77_IMPORT_INTEGER( fstatus, *status );
+
+   return;
+}
+
+F77_SUBROUTINE(ndf_gtdlt)( INTEGER(indf),
+                           CHARACTER(comp),
+                           INTEGER(zaxis),
+                           CHARACTER(ztype),
+                           REAL(zratio),
+                           INTEGER(status)
+                           TRAIL(comp) TRAIL(ztype) );
+
+void ndfGtdlt( int indf,
+               const char *comp,
+               int *zaxis,
+               char *ztype,
+               int ztype_length,
+               float *zratio,
+               int *status ) {
+
+DECLARE_INTEGER(findf);
+DECLARE_CHARACTER_DYN(fcomp);
+DECLARE_INTEGER(fzaxis);
+DECLARE_CHARACTER_DYN(fztype);
+DECLARE_REAL(fzratio);
+DECLARE_INTEGER(fstatus);
+
+   F77_EXPORT_INTEGER( indf, findf );
+   F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
+   F77_CREATE_CHARACTER( fztype, ztype_length-1 );
+   F77_EXPORT_INTEGER( *status, fstatus );
+
+   F77_CALL(ndf_gtdlt)( INTEGER_ARG(&findf),
+                       CHARACTER_ARG(fcomp),
+                       INTEGER_ARG(&fzaxis),
+                       CHARACTER_ARG(fztype),
+                       REAL_ARG(&fzratio),
+                       INTEGER_ARG(&fstatus)
+                       TRAIL_ARG(fcomp)
+                       TRAIL_ARG(fztype) );
+
+   F77_IMPORT_INTEGER( fzaxis, *zaxis );
+   F77_IMPORT_CHARACTER( fztype, fztype_length, ztype );
+   F77_IMPORT_REAL( fzratio, *zratio );
+   F77_FREE_CHARACTER( fcomp );
+   F77_FREE_CHARACTER( fztype );
+   F77_IMPORT_INTEGER( fstatus, *status );
+
+   return;
+}
+
+

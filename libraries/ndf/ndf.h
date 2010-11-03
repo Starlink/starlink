@@ -828,4 +828,31 @@ void ndfXstat( int indf,
                int *there,
                int *status );
 
+
+void ndfZscal( int indf1,
+               const char *type,
+               double scale[ 2 ],
+               double zero[ 2 ],
+               int *place,
+               int *indf2,
+               int *status );
+
+void ndfZdelt( int indf1,
+               const char *comp,
+               float minrat,
+               int zaxis,
+               const char *type,
+               int *place,
+               int *indf2,
+               float *zratio,
+               int *status );
+
+void ndfGtdlt( int indf,
+               const char *comp,
+               int *zaxis,
+               char *ztype,
+               int ztype_length,
+               float *zratio,
+               int *status );
+
 #endif

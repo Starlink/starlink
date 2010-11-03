@@ -113,6 +113,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -149,6 +150,8 @@
 *        mapped values is obtained if necessary.
 *     16-NOV-1990 (RFWS):
 *        Allow 'ERRORS' as a mis-spelling of 'ERROR'.
+*     3-NOV-2010 (DSB):
+*        Re-report ARY__CMPAC errors in a more NDF friendly way.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -175,6 +178,8 @@
 *           Bad pixel flag for the mapped data values.
 *        ACB_DMBMD( NDF_MXACB ) = LOGICAL (Write)
 *           Whether the ACB_DMBAD value has been modified.
+*        ACB_IDCB( NDF_MXACB ) = INTEGER (Read)
+*           Index to data object entry in the DCB.
 *        ACB_QMF( NDF__MXACB ) = LOGICAL (Read and Write)
 *           Quality masking flag.
 *        ACB_VMBAD( NDF__MXACB ) = LOGICAL (Write)
@@ -426,6 +431,12 @@
      :                             '(possible programming error).',
      :                             STATUS )
                   END IF
+
+*  If an error occurred because WRITE or UPDATE mode was requested for a
+*  compressed array (which are read-only), re-report it in a more
+*  user-friendly way.
+                  CALL NDF1_CMPAC( ACB_IDCB( IACB ), COMP( F : L ),
+     :                             STATUS )
                END IF
             END IF
 
