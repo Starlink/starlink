@@ -97,6 +97,12 @@
 *        result of writing new values to it.
 *     1-NOV-2010 (DSB):
 *        Include support for delta compressed arrays.
+*     3-NOV-2010 (DSB):
+*        Do not restrict access to delta compressed arrays here, as the
+*        NDF library uses a FALSE ACB__WRITE value for the Data array to
+*        mean that nothing at all can be changed in the NDF. . Instead,
+*        restrict access to delta arrays in the routines that perform the
+*        corresponding actions (e.g. ARY_MAP etc).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -200,20 +206,10 @@
          ACB_IMCB( IACB ) = 0
 
 *  Initialise the access control flags according to whether the data
-*  object can be modified or not. For DELTA compressed arrays, the only
-*  changes that can be made are to delete the whole array, or shift the
-*  origin.
-         IF( DCB_FRM( IDCB ) .NE. 'DELTA' ) THEN
-            DO IACC = 1, ARY__MXACC
-               ACB_ACC( IACC, IACB ) = DCB_MOD( IDCB ) .EQ. 'UPDATE'
-            END DO
-         ELSE
-            DO IACC = 1, ARY__MXACC
-               ACB_ACC( IACC, IACB ) = .FALSE.
-            END DO
-            ACB_ACC( ARY__DELET, IACB ) = DCB_MOD( IDCB ) .EQ. 'UPDATE'
-            ACB_ACC( ARY__SHIFT, IACB ) = DCB_MOD( IDCB ) .EQ. 'UPDATE'
-         END IF
+*  object can be modified or not.
+         DO IACC = 1, ARY__MXACC
+            ACB_ACC( IACC, IACB ) = DCB_MOD( IDCB ) .EQ. 'UPDATE'
+         END DO
 
 *  Enter the bad pixel flag value from the DCB.
          ACB_BAD( IACB ) = DCB_BAD( IDCB ) .OR.
