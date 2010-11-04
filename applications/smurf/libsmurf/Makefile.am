@@ -25,6 +25,7 @@ smurf_fts2_phasecorr.c \
 smurf_fts2_portimbal.c \
 smurf_fts2_removebse.c \
 smurf_fts2_spatialwcs.c \
+smurf_fts2_specre.c \
 smurf_fts2_transcorr.c \
 smurf_gsd2acsis.c \
 smurf_gsdshow.c \

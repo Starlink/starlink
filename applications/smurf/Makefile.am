@@ -41,6 +41,7 @@ fts2opcorr \
 fts2phasecorr \
 fts2portimbal \
 fts2removebse \
+fts2specre \
 fts2transcorr \
 gsd2acsis \
 gsdshow \

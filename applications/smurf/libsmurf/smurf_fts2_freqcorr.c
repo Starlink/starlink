@@ -30,6 +30,8 @@
 *  History :
 *     15-JUL-2010 (COBA):
 *        Original version.
+*     04-NOV-2010 (COBA):
+*        Modified to work with 3D spectrum cubes.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.

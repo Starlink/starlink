@@ -137,6 +137,8 @@
 *        Add FTS2_DEGLITCH
 *     2010-09-30 (COBA):
 *        Add FTS2_EQSLICED
+*     2010-11-03 (COBA):
+*        Add FTS2SPECRE
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -291,6 +293,8 @@ void smurf_mon( int * status ) {
     smurf_fts2_portimbal( status );
   } else if (strcmp( taskname, "FTS2REMOVEBSE" ) == 0 ) {
     smurf_fts2_removebse( status );
+  } else if (strcmp( taskname, "FTS2SPECRE" ) == 0 ) {
+    smurf_fts2_specre( status );
   } else if (strcmp( taskname, "FTS2TRANSCORR" ) == 0 ) {
     smurf_fts2_transcorr( status );
   } else if (strcmp( taskname, "GSD2ACSIS" ) == 0 ) {

@@ -228,6 +228,10 @@
 #         Add FTS2_EQSLICED
 #     2010-10-04 (COBA):
 #         Replace zpdIndex with 2D zpd array ndf for FTS2_PHASECORR
+#     2010-10-28 (COBA):
+#         Minor changes to FTS2 interface
+#     2010-11-03 (COBA):
+#         Add FTS2SPECRE
 #     {enter_changes_here}
 
 #  Bugs:
@@ -1312,26 +1316,6 @@ package @PACKAGE@ {
 
             helplib {$SMURF_HELP}
 
-            parameter ccsize {
-                type _INTEGER
-                access READ
-                vpath CURRENT DEFAULT
-                ppath CURRENT DEFAULT
-                prompt {Core cluster size}
-                default 20
-                helpkey *
-            }
-
-            parameter dshalflength {
-                type _INTEGER
-                access READ
-                vpath CURRENT DEFAULT
-                ppath CURRENT DEFAULT
-                prompt {Double-Sided interferogrm half length}
-                default 400
-                helpkey *
-            }
-
             parameter in {
                 position 1
                 type NDF
@@ -1339,16 +1323,6 @@ package @PACKAGE@ {
                 vpath {PROMPT}
                 ppath GLOBAL CURRENT
                 prompt {Input data files}
-                helpkey *
-            }
-
-            parameter deglitchmode {
-                type _INTEGER
-                access READ
-                vpath CURRENT DEFAULT
-                ppath CURRENT DEFAULT
-                prompt {Deglitching mode: 1=CORE, 2=TAIL and 0=ALL}
-                default 0
                 helpkey *
             }
 
@@ -1362,10 +1336,50 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter zpd {
+                position 3
+                type NDF
+                access READ
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                prompt {ZPD file}
+                helpkey *
+            }
+
+            parameter ccsize {
+                type _INTEGER
+                access READ
+                vpath {PROMPT}
+                ppath CURRENT DEFAULT
+                prompt {Core cluster size}
+                default 20
+                helpkey *
+            }
+
+            parameter dshalflength {
+                type _INTEGER
+                access READ
+                vpath {PROMPT}
+                ppath CURRENT DEFAULT
+                prompt {Double-sided interferogrm half-length}
+                default 500
+                helpkey *
+            }
+
+            parameter deglitchmode {
+                type _INTEGER
+                access READ
+                vpath {PROMPT}
+                ppath CURRENT DEFAULT
+                prompt {Deglitching mode: 1=CORE, 2=TAIL and 0=ALL}
+                default 0
+                helpkey *
+            }
+
             parameter tcsigma {
                 type _DOUBLE
                 access READ
-                vpath CURRENT DEFAULT
+                vpath {PROMPT}
                 ppath CURRENT DEFAULT
                 prompt {Tail cutoff standard deviation as percentage}
                 default 0.80
@@ -1375,7 +1389,7 @@ package @PACKAGE@ {
             parameter tcsigmamul {
                 type _DOUBLE
                 access READ
-                vpath CURRENT DEFAULT
+                vpath {PROMPT}
                 ppath CURRENT DEFAULT
                 prompt {Tail cutoff standard deviation multiplier}
                 default 4
@@ -1385,18 +1399,10 @@ package @PACKAGE@ {
             parameter tcsize {
                 type _INTEGER
                 access READ
-                vpath CURRENT DEFAULT
+                vpath {PROMPT}
                 ppath CURRENT DEFAULT
                 prompt {Tail cluster size}
                 default 60
-                helpkey *
-            }
-
-            parameter zpd {
-                position 3
-                type _CHAR
-                vpath {PROMPT}
-                prompt {ZPD values}
                 helpkey *
             }
         }
@@ -1477,9 +1483,11 @@ package @PACKAGE@ {
 
             parameter theta {
                 position 3
-                type _CHAR
+                type NDF
+                access READ
                 vpath {PROMPT}
-                prompt {THETA: The data file which stores the off-axis angles of pixels...}
+                ppath GLOBAL CURRENT
+                prompt {Theta file storing the off-axis angles}
                 helpkey *
             }
         }
@@ -1513,26 +1521,6 @@ package @PACKAGE@ {
 
             helplib {$SMURF_HELP}
 
-            parameter degree {
-                type _INTEGER
-                access READ
-                vpath CURRENT DEFAULT
-                ppath CURRENT DEFAULT
-                prompt {Polynomial Degree}
-                default 2
-                helpkey *
-            }
-
-            parameter dshalflength {
-                type _INTEGER
-                access READ
-                vpath CURRENT DEFAULT
-                ppath CURRENT DEFAULT
-                prompt {Half-Length of Double-Sided Interferogram}
-                default 300
-                helpkey *
-            }
-
             parameter in {
                 position 1
                 type NDF
@@ -1553,32 +1541,62 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter zpd {
+                position 3
+                type NDF
+                access READ
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                prompt {ZPD file}
+                helpkey *
+            }
+
+            parameter degree {
+                type _INTEGER
+                access READ
+                vpath {PROMPT}
+                ppath CURRENT DEFAULT
+                prompt {Fitting polynomial degree}
+                default 2
+                helpkey *
+            }
+
+            parameter dshalflength {
+                type _INTEGER
+                access READ
+                vpath {PROMPT}
+                ppath CURRENT DEFAULT
+                prompt {Double-sided interferogram half-length}
+                default 500
+                helpkey *
+            }
+
             parameter pfhalflength {
                 type _INTEGER
                 access READ
-                vpath CURRENT DEFAULT
+                vpath {PROMPT}
                 ppath CURRENT DEFAULT
-                prompt {Phase Function Half-Length}
-                default 80
+                prompt {Phase function half-length}
+                default 100
                 helpkey *
             }
 
             parameter sshalflength {
                 type _INTEGER
                 access READ
-                vpath CURRENT DEFAULT
+                vpath {PROMPT}
                 ppath CURRENT DEFAULT
-                prompt {Half-Length of Single-Sided Interferogram}
-                default 6000
+                prompt {Single-sided interferogram half-length}
+                default 5000
                 helpkey *
             }
 
             parameter weightlimit {
                 type _DOUBLE
                 access READ
-                vpath CURRENT DEFAULT
+                vpath {PROMPT}
                 ppath CURRENT DEFAULT
-                prompt {Weight Limit}
+                prompt {Weight limit}
                 default 0.1
                 helpkey *
             }
@@ -1586,7 +1604,7 @@ package @PACKAGE@ {
             parameter wnlbound {
                 type _DOUBLE
                 access READ
-                vpath CURRENT DEFAULT
+                vpath {PROMPT}
                 ppath CURRENT DEFAULT
                 prompt {The lower bound of the wavenumber range (as percentage)}
                 default 0.05
@@ -1596,18 +1614,10 @@ package @PACKAGE@ {
             parameter wnubound {
                 type _DOUBLE
                 access READ
-                vpath CURRENT DEFAULT
+                vpath {PROMPT}
                 ppath CURRENT DEFAULT
                 prompt {The upper bound of the wavenumber range (as percentage)}
-                default 0.8
-                helpkey *
-            }
-
-            parameter zpd {
-                position 3
-                type _CHAR
-                vpath {PROMPT}
-                prompt {ZPD values}
+                default 0.80
                 helpkey *
             }
         }
@@ -1641,14 +1651,40 @@ package @PACKAGE@ {
 
             helplib {$SMURF_HELP}
 
-            parameter bse {
-                position 3
-                type _CHAR
+            parameter in {
+                position 1
+                type NDF
+                access READ
                 vpath {PROMPT}
                 ppath GLOBAL CURRENT
-                prompt {The data files which stores the beamsplitter self emission interferogram...}
+                prompt {Input data files}
                 helpkey *
             }
+
+            parameter out {
+                position 2
+                type NDF
+                access WRITE
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                prompt {Output data files}
+                helpkey *
+            }
+
+            parameter bse {
+                position 3
+                type NDF
+                access READ
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                prompt {Beamsplitter self emission file}
+                helpkey *
+            }
+        }
+
+        action fts2specre {
+
+            helplib {$SMURF_HELP}
 
             parameter in {
                 position 1

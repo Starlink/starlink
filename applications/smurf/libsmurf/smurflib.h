@@ -77,6 +77,8 @@
 #         Add FTS2_PHASECORR
 *     2010-09-30 (COBA):
 #         Add FTS2_EQSLICED
+*     2010-11-03 (COBA):
+#         Add smurf_fts2_specre
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -127,6 +129,7 @@ void smurf_fts2_phasecorr( int * );
 void smurf_fts2_portimbal( int * );
 void smurf_fts2_removebse( int * );
 void smurf_fts2_spatialwcs( int * );
+void smurf_fts2_specre( int * );
 void smurf_fts2_transcorr( int * );
 void smurf_gsd2acsis( int * );
 void smurf_gsdshow( int * );
