@@ -90,34 +90,28 @@ void smurf_fts2_freqcorr(int* status)
 {
   if( *status != SAI__OK ) { return; }
 
-  int fIndex         = 0; /* File loop counter */
-  int i              = 0; /*Loop counter */
-  int index          = 0; /* Index */
-  int j              = 0; /*Loop counter */
-  int k              = 0; /*Loop counter */
-  int pixelCount     = 0; /* Number of bolometers */
-  int pixelIndex     = 0; /* Bolometer index */
-  int srcHeight      = 0; /* Height of the source subarray */
-  int srcN           = 0; /* Sample count */
-  int srcWidth       = 0; /* Width of the source subarray */
-  int thetaHeight    = 0; /* Height of the theta */
-  int thetaWidth     = 0;  /* Width of the theta */
-  double* specIm     = NULL; /* Spectrum (imaginary component) */
-  double* specImNew  = NULL; /* New spectrum (imaginary component) */
-  double* specRe     = NULL; /* Spectrum (real component) */
-  double* specReNew  = NULL; /* New spectrum (real component) */
+  int bolCount       = 0;    /* Number of bolometers */
+  int bolIndex       = 0;    /* Bolometer index */
+  int fIndex         = 0;    /* File loop counter */
+  int nbolX          = 0;    /* Width of the source subarray */
+  int nbolY          = 0;    /* Height of the source subarray */
+  int N              = 0;    /* Sample count */
+  double* calPntr    = NULL; /* Pointer to the THETA data */
+  double* inPntr     = NULL; /* Pointer to the input data (4D data array) */
+  double* outPntr    = NULL; /* Pointer to the output data (4D data array) */
+  double* spec       = NULL; /* Spectrum (real component) */
+  double* specNew    = NULL; /* New spectrum (real component) */
   double* wn         = NULL; /* Wavenumbers */
   double* wnNew      = NULL; /* New wave numbers */
+  Grp* calgrp        = NULL; /* Theta group */
   Grp* igrp          = NULL; /* Input group */
   Grp* ogrp          = NULL; /* Output group */
-  Grp* thetagrp      = NULL; /* Theta group */
+  size_t calSize     = 0;    /* Theta group size */
   size_t outSize     = 0;    /* Output group size */
   size_t inSize      = 0;    /* Input group size */
-  size_t thetaSize   = 0;    /* Theta group size */
-  smfData* srcData   = NULL; /* Pointer to source data */
-  smfData* thetaData = NULL; /* Pointer to theta data */
-  void* src4D        = NULL; /* Pointer to the input data (4D data array) */
-  void* theta2D      = NULL; /* Pointer to the THETA data */
+  smfData* calData   = NULL; /* Pointer to theta data */
+  smfData* inData    = NULL; /* Pointer to input data */
+  smfData* outData   = NULL; /* Pointer to output data */
 
   /* GET INPUT GROUP */
   kpg1Rgndf("IN", 0, 1, "", &igrp, &inSize, status);
@@ -126,114 +120,112 @@ void smurf_fts2_freqcorr(int* status)
              "Equal number of input and output files expected!",
              &ogrp, &outSize, status);
   /* GET THETA GROUP */
-  kpg1Gtgrp("THETA", &thetagrp, &thetaSize, status);
+  kpg1Gtgrp("THETA", &calgrp, &calSize, status);
 
   ndfBegin();
 
-  /* OPEN THETA */
-  smf_open_file( thetagrp, 1, "READ",
-                 SMF__NOCREATE_HEAD |
-                 SMF__NOCREATE_FILE |
-                 SMF__NOCREATE_DA |
-                 SMF__NOCREATE_FTS,
-                 &thetaData, status);
+  // OPEN THETA
+  smf_open_file( calgrp, 1, "READ",
+                 SMF__NOCREATE_DA | SMF__NOCREATE_FTS,
+                 &calData, status);
   if(*status != SAI__OK) {
     *status = SAI__ERROR;
     errRep(FUNC_NAME, "Unable to open the THETA file!", status);
     goto CLEANUP;
   }
-  theta2D     = thetaData->pntr[0];
-  thetaWidth  = thetaData->dims[0];
-  thetaHeight = thetaData->dims[1];
 
-  /* LOOP THROUGH EACH NDF FILE IN THE GROUP */
+  calPntr = calData->pntr[0];
+
+  // LOOP THROUGH EACH NDF FILE IN THE GROUP
   for(fIndex = 1; fIndex <= inSize; fIndex++) {
-    smf_open_and_flatfield(igrp, ogrp, fIndex, NULL, NULL, &srcData, status);
+    smf_open_file(igrp, fIndex, "READ", 0, &inData, status);
     if(*status != SAI__OK) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unable to open source file!", status);
       break;
     }
-    src4D      = srcData->pntr[0];
-    srcWidth   = srcData->dims[0];
-    srcHeight  = srcData->dims[1];
-    srcN       = srcData->dims[2];
-    pixelCount = srcWidth * srcHeight;
 
-    /* VERIFY THAT THE SOURCE & THETA HAVE COMPATIBLE DIMENSIONS */
-    if(srcWidth != thetaWidth || srcHeight != thetaHeight) {
+    // VERIFY THAT THE SOURCE & THETA HAVE COMPATIBLE DIMENSIONS
+    if( (inData->dims[0] != calData->dims[0]) ||
+        (inData->dims[1] != calData->dims[1]) ) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Incompatible Theta file!", status);
-      smf_close_file(&srcData, status);
+      smf_close_file(&inData, status);
       break;
     }
 
-    /* APPLY FREQUENCY CORRECTION */
-    specRe    = astMalloc(srcN * sizeof(*specRe));
-    specIm    = astMalloc(srcN * sizeof(*specIm));
-    specReNew = astMalloc(srcN * sizeof(*specReNew));
-    specImNew = astMalloc(srcN * sizeof(*specImNew));
-    wn        = astMalloc(srcN * sizeof(*wn));
-    wnNew     = astMalloc(srcN * sizeof(*wnNew));
-    for(i = 0; i < srcHeight; i++) {
-      for(j = 0; j < srcWidth; j++) {
-        pixelIndex = i + j * srcHeight;
+    outData = smf_deepcopy_smfData( inData, 0,
+                                    SMF__NOCREATE_DATA | SMF__NOCREATE_DA,
+                                    0, 0, status);
 
-        /* GET SPECTRUM & WAVENUMBERS */
-        for(k = 0; k < srcN; k++) {
-          index = pixelIndex + pixelCount * k;
+    if(*status == SAI__OK) {
+      inPntr   = inData->pntr[0];
+      nbolX    = inData->dims[0];
+      nbolY    = inData->dims[1];
+      N        = inData->dims[2];
+      bolCount = nbolX * nbolY;
 
-          if(srcData->dtype == SMF__FLOAT) {
-            specRe[k] = *((float*)src4D + index);
-            specIm[k] = *((float*)src4D + index + 1);
-          } else {
-            specRe[k] = *((double*)src4D + index);
-            specIm[k] = *((double*)src4D + index + 1);
+      outData->dtype   = SMF__DOUBLE;
+      outData->ndims   = 3;
+      outData->dims[0] = inData->dims[0];
+      outData->dims[1] = inData->dims[1];
+      outData->dims[2] = inData->dims[2];
+      outData->lbnd[0] = outData->lbnd[0];
+      outData->lbnd[1] = outData->lbnd[1];
+      outData->lbnd[2] = outData->lbnd[2];
+      outData->pntr[0] = (double*) astCalloc(N * bolCount, sizeof(double), 0);
+      outPntr          = outData->pntr[0];
+
+      // APPLY FREQUENCY CORRECTION
+      wn      = astMalloc(N * sizeof(*wn));
+      spec    = astMalloc(N * sizeof(*spec));
+      wnNew   = astMalloc(N * sizeof(*wnNew));
+      specNew = astMalloc(N * sizeof(*specNew));
+
+      int i = 0, j = 0, k = 0;
+      for(i = 0; i < nbolY; i++) {
+        for(j = 0; j < nbolX; j++) {
+          bolIndex = i + j * nbolY;
+
+          // GET SPECTRUM & WAVENUMBERS
+          for(k = 0; k < N; k++) {
+            wn[k] = k;
+            spec[k] = inPntr[bolIndex + k * bolCount];
+
+            wnNew[k] = k * calPntr[bolIndex];
           }
 
-          wn[k] = k;
+          // FREQUENCY SHIFT BY CUBIC SPLINE
+          fts2_naturalcubicsplineinterpolator(wn, spec, N, wnNew, specNew, N);
 
-          /* NOTES:
-           * If the theta file contains the cosine values already,
-           * remove the cosine below and multiply k with the argument of cosine.
-           * i.e, wnNew[k] = k * (*((double*)theta2D + pixelIndex));
-           */
-          wnNew[k] = k * cos(*((double*)theta2D + pixelIndex));
-        }
-
-        /* FREQUENCY(REAL & IMAGINARY) SHIFT BY CUBIC SPLINE */
-        fts2_naturalcubicsplineinterpolator( wn, specRe, srcN,
-                                             wnNew, specReNew, srcN);
-        fts2_naturalcubicsplineinterpolator( wn, specIm, srcN,
-                                             wnNew, specImNew, srcN);
-
-        /* APPLY FREQUENCY CORRECTION */
-        for(k = 0; k < srcN; k++) {
-          index = pixelIndex + pixelCount * k;
-
-          if(srcData->dtype == SMF__FLOAT) {
-            *((float*)src4D + index) = (float) specReNew[k];
-            *((float*)src4D + index + 1) = (float) specImNew[k];
-          } else {
-            *((double*)src4D + index) = specReNew[k];
-            *((double*)src4D + index + 1) = specImNew[k];
+          // APPLY FREQUENCY CORRECTION
+          for(k = 0; k < N; k++) {
+            outPntr[bolIndex + k * bolCount] = specNew[k];
           }
         }
       }
+
+      astFree(wn);
+      astFree(wnNew);
+      astFree(spec);
+      astFree(specNew);
+
+      smf_write_smfData(outData, NULL, NULL, ogrp, fIndex, 0, status);
+      smf_close_file(&outData, status);
+
+      smf_close_file(&inData, status);
+    } else {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "Unable to deep copy!", status);
+      smf_close_file(&inData, status);
+      break;
     }
-    astFree(specRe);
-    astFree(specIm);
-    astFree(wn);
-    astFree(specReNew);
-    astFree(specImNew);
-    astFree(wnNew);
-    smf_close_file(&srcData, status);
   }
-  smf_close_file(&thetaData, status);
+  smf_close_file(&calData, status);
 
   CLEANUP:
     ndfEnd(status);
     grpDelet(&igrp, status);
     grpDelet(&ogrp, status);
-    grpDelet(&thetagrp, status);
+    grpDelet(&calgrp, status);
 }
