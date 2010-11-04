@@ -133,10 +133,7 @@ void smurf_fts2_specre(int* status)
     nbolY      = src4D->dims[2];
     bolCount   = nbolX * nbolY;
 
-    src3D = smf_deepcopy_smfData( src4D, 0,
-                                  SMF__NOCREATE_DATA |
-                                  SMF__NOCREATE_DA,
-                                  0, 0, status);
+    src3D = smf_deepcopy_smfData(src4D, 0, SMF__NOCREATE_DATA, 0, 0, status);
     if(*status == SAI__OK) {
       int ndata = N * bolCount;
 

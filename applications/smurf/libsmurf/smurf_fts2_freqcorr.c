@@ -156,9 +156,7 @@ void smurf_fts2_freqcorr(int* status)
       break;
     }
 
-    outData = smf_deepcopy_smfData( inData, 0,
-                                    SMF__NOCREATE_DATA | SMF__NOCREATE_DA,
-                                    0, 0, status);
+    outData = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA, 0, 0, status);
 
     if(*status == SAI__OK) {
       inPntr   = inData->pntr[0];
