@@ -45,14 +45,16 @@
 *     ZRATIO (the ratio of the supplied array size to the compressed
 *     array size). A minmum allowed compression ratio may be specified via
 *     argument MINRAT. If the compression ratio is less than this value,
-*     then the supplied array is left unchanged.
+*     then the returned copy is left uncompressed.
 
 *  Arguments:
 *     IARY1 = INTEGER (Given)
-*        The input array identifier. An error is reported if the array is
-*        already stored in DELTA form. Note, if the array is a SCALED array,
-*        the internal integer values are compressed and the scale and zero
-*        terms are stored in the compressed array.
+*        The input array identifier. This can be stored in any form. If
+*        it is already stored in DELTA form, it is uncompressed and then
+*        re-compressed using the supplied compression parameters. If
+*        is is stored in SCALED form, the internal integer values are
+*        compressed and the scale and zero terms are copied into the
+*        DELTA array.
 *     ZAXIS = INTEGER (Given)
 *        The index of the pixel axis along which differences are to be
 *        taken. If this is zero, a default value will be selected that
@@ -68,7 +70,7 @@
 *     MINRAT = REAL (Given)
 *        The minimum allowed ZRATIO value. If compressing the input array
 *        results in a ZRATIO value smaller than or equal to MINRAT, then
-*        the supplied array is left unchanged. If the supplied value is
+*        the returned array is left uncompressed. If the supplied value is
 *        zero or negative, then the array will be compressed regardless of
 *        the compression ratio.
 *     PLACE = INTEGER (Given and Returned)
@@ -96,11 +98,12 @@
 *        The global status.
 
 *  Notes:
+*     - An error will be reported if the supplied array does not hold
+*     integer values. In the case of a SCALED array, the internal
+*     (scaled) values must be integers, but the external (unscaled) values
+*     can be of any data type.
 *     - The compression axis and compressed data type actually used can
 *     be determined by passing the returned array to ARY_GTDLT.
-*     -  This routine may only be used to compress a base array. If it is
-*     called with an array which is not a base array, then it will return
-*     without action. No error will result.
 *     -  An error will result if the array, or any part of it, is
 *     currently mapped for access (e.g. through another identifier).
 *     -  An error will result if the array holds complex values.
@@ -172,11 +175,14 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER CLOC*(DAT__SZLOC)! Locator for component
+      CHARACTER LOCC*(DAT__SZLOC)! Locator for component
+      CHARACTER LOCT*(DAT__SZLOC)! Locator for temporary copy of array
       CHARACTER NAME*(DAT__SZNAM)! Name of component
       CHARACTER TYPES( 3 )*( DAT__SZTYP ) ! Supported compressed data types
+      CHARACTER ZTYOLD*( DAT__SZTYP ) ! Old compressed data type
       INTEGER IACB1              ! Index to input array entry in the ACB
       INTEGER IACB2              ! Index to output array entry in the ACB
+      INTEGER IACBT              ! Index to input copy entry in the ACB
       INTEGER ICOMP              ! Component index
       INTEGER IDCB1              ! Index to input array entry in the DCB
       INTEGER IDCB2              ! Index to output array entry in the DCB
@@ -184,6 +190,7 @@
       INTEGER NCOMP              ! Component count
       INTEGER NDIM               ! Number of axes in supplied array
       INTEGER ZAX                ! Current compression axis
+      INTEGER ZAXOLD             ! Old compression axis
       INTEGER ZAXHI              ! Highest compression axis to test
       INTEGER ZAXLO              ! Lowest compression axis to test
       INTEGER ZAXUSE             ! Best compression axis
@@ -193,6 +200,7 @@
       INTEGER ZTYUSE             ! Best compressed data type
       LOGICAL ERASE              ! Whether to erase placeholder object
       REAL RATIO                 ! Compression ratio for current combination
+      REAL ZRATOLD               ! Old compression ratio
 
       LOGICAL VALID
 
@@ -206,12 +214,23 @@
 *  Import the input array identifier.
       CALL ARY1_IMPID( IARY1, IACB1, STATUS )
 
-*  Check it is safe to index an array.
+*  If the array is not a base array, produce a temporary copy of it.
+      IF( ACB_CUT( IACB1 ) ) THEN
+         CALL ARY1_TEMP( 'ARRAY', 0, 0, LOCT, STATUS )
+         CALL ARY1_CPY( IACB1, .TRUE., LOCT, IACBT, STATUS )
+
+*  If the array is a base array, use it directly.
+      ELSE
+         LOCT = DAT__NOLOC
+         IACBT = IACB1
+      END IF
+
+*  Check it is safe to index arrays using IACBT.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Obtain an index to the input data object entry in the DCB and ensure
 *  that storage form, data type and bounds information is available for it.
-      IDCB1 = ACB_IDCB( IACB1 )
+      IDCB1 = ACB_IDCB( IACBT )
       CALL ARY1_DFRM( IDCB1, STATUS )
       CALL ARY1_DTYP( IDCB1, STATUS )
       CALL ARY1_DBND( IDCB1, STATUS )
@@ -255,9 +274,9 @@
          GO TO 999
       END IF
 
-*  Check if the data object is mapped for access. Report an error if it is.
+*  Check if the data object is mapped. Report an error if it is.
       IF( ( DCB_NWRIT( IDCB1 ) .NE. 0 ) .OR.
-     :     ( DCB_NREAD( IDCB1 ) .NE. 0 ) .AND.
+     :    ( DCB_NREAD( IDCB1 ) .NE. 0 ) .AND.
      :     STATUS .EQ. SAI__OK ) THEN
          STATUS = ARY__ISMAP
          CALL DAT_MSG( 'ARRAY', DCB_LOC( IDCB1 ) )
@@ -268,113 +287,151 @@
          GO TO 999
       END IF
 
-*  If the array is already compressed, report an error.
-      IF( DCB_FRM( IDCB1 ) .EQ. 'DELTA' .AND. STATUS .EQ. SAI__OK ) THEN
-         STATUS = ARY__FRMCV
-         CALL DAT_MSG( 'ARRAY', DCB_LOC( IDCB1 ) )
-         CALL ERR_REP( 'ARY_DELTA_DLT', 'The array ^ARRAY '//
-     :                 'is already compressed.', STATUS )
-         GO TO 999
+*  If required, find the best compression parameters.
+      IF( ZAXIS .EQ. 0 .OR. TYPE .EQ. ' ' ) THEN
+
+*  Determine the range of ZAXIS to test.
+         IF( ZAXIS .EQ. 0 ) THEN
+            ZAXLO = 1
+            ZAXHI = NDIM
+         ELSE
+            ZAXLO = ZAXIS
+            ZAXHI = ZAXIS
+         END IF
+
+*  Determine the list of compressed data types to test.
+         IF( TYPE .EQ. '_BYTE' ) THEN
+            ZTYLO = 1
+            ZTYHI = 1
+         ELSE IF( TYPE .EQ. '_WORD' ) THEN
+            ZTYLO = 2
+            ZTYHI = 2
+         ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
+            ZTYLO = 3
+            ZTYHI = 3
+         ELSE IF( DCB_TYP( IDCB1 ) .EQ. '_INTEGER' ) THEN
+            ZTYLO = 1
+            ZTYHI = 3
+         ELSE IF( DCB_TYP( IDCB1 ) .EQ. '_WORD' ) THEN
+            ZTYLO = 1
+            ZTYHI = 2
+         ELSE
+            ZTYLO = 1
+            ZTYHI = 1
+         END IF
+
+*  Initialise the best compression found so far.
+         ZRATIO = VAL__MINR
+
+*  Loop round all ZAXIS values
+         DO ZAX = ZAXLO, ZAXHI
+
+*  Loop round all compressed data types.
+            DO ZTY = ZTYLO, ZTYHI
+
+*  See how much compression could be expected using this combination of
+*  compression axis and data type.
+               CALL ARY1_S2DLT( DCB_LOC( IDCB1 ), ZAX, TYPES( ZTY ),
+     :                          ARY__NOLOC, RATIO, STATUS )
+
+*  Record the current compresson axis and type if this combination gives
+*  more compression than any other combination tested so far.
+               IF( RATIO .GT. ZRATIO ) THEN
+                  ZRATIO = RATIO
+                  ZAXUSE = ZAX
+                  ZTYUSE = ZTY
+               END IF
+
+            END DO
+         END DO
+
+*  Otherwise, just use the supplied compression values.
+      ELSE
+         ZRATIO = RATIO
+         ZAXUSE = ZAX
+         ZTYUSE = ZTY
       END IF
 
 *  Import the array placeholder, converting it to a PCB index.
       IPCB = 0
       CALL ARY1_IMPPL( PLACE, IPCB, STATUS )
 
-*  Do nothing if the array is not a base array.
-      IF( .NOT. ACB_CUT( IACB1 ) .AND. STATUS .EQ. SAI__OK ) THEN
+*  Indicate we have not yet created the output array.
+      IACB2 = 0
+
+*  If the array is already in delta form, we may be able simply to copy
+*  it to produce the output array. If not, we need to uncompress it
+*  before re-compressing it.
+      IF( DCB_FRM( IDCB1 ) .EQ. 'DELTA' ) THEN
+
+*  If the supplied array was not a base array, then the act of copying it
+*  (above) should have uncompressed any delta array, and so we can re-use
+*  the LOCT locator here. Report an error if copying the array does not
+*  seem to have uncompressed it.
+         IF( LOCT .NE. DAT__NOLOC ) THEN
+            STATUS = ARY__FATIN
+            CALL ERR_REP( ' ', 'ARY_DELTA: Array has delta form '//
+     :                    'after being copied (internal programming '//
+     :                    'error).', STATUS )
+            GO TO 999
+         END IF
+
+*  Get the old compression parameters.
+         CALL ARY1_GTDLT( IDCB1, ZAXOLD, ZTYOLD, ZRATOLD, STATUS )
+
+*  If they are the same as the new ones, just copy the supplied array to
+*  create the output array.
+         IF( ZAXOLD .EQ. ZAXIS .AND. ZTYOLD .EQ. TYPE ) THEN
+            CALL ARY1_CPY( IACB1, PCB_TMP( IPCB ), PCB_LOC( IPCB ),
+     :                     IACB2, STATUS )
+
+*  If they are not the same as the new ones, we need to uncompress the
+*  supplied delta array so that we can re-compress it with the new
+*  parameters. Taking a temporary copy of the supplied array is the
+*  simplest way to uncompress it.
+         ELSE
+            CALL ARY1_TEMP( 'ARRAY', 0, 0, LOCT, STATUS )
+            CALL ARY1_CPY( IACB1, .TRUE., LOCT, IACBT, STATUS )
+         END IF
+      END IF
+
+*  If we have not yet created the output array, create it now using the
+*  compression parameters found above.
+      IF( IACB2 .EQ. 0 ) THEN
 
 *  Create a new simple array structure in place of the placeholder
 *  object, obtaining a DCB entry which refers to it. Creation of the
 *  primitive array is deferred since we do not yet know how big it will need
 *  to be.
          CALL ARY1_DCRE( .TRUE., DCB_TYP( IDCB1 ), DCB_CPX( IDCB1 ),
-     :                   ACB_NDIM( IACB1 ), ACB_LBND( 1, IACB1 ),
-     :                   ACB_UBND( 1, IACB1 ), PCB_TMP( IPCB ),
+     :                   ACB_NDIM( IACBT ), ACB_LBND( 1, IACBT ),
+     :                   ACB_UBND( 1, IACBT ), PCB_TMP( IPCB ),
      :                   PCB_LOC( IPCB ), IDCB2, STATUS )
 
 *  Erase all components within the data object - they will be re-created
 *  in compressed form by ARY1_S2DLT.
          CALL DAT_NCOMP( DCB_LOC( IDCB2 ), NCOMP, STATUS )
          DO ICOMP = 1, NCOMP
-            CALL DAT_INDEX( DCB_LOC( IDCB2 ), ICOMP, CLOC, STATUS )
-            CALL DAT_NAME( CLOC, NAME, STATUS )
-            CALL DAT_ANNUL( CLOC, STATUS )
+            CALL DAT_INDEX( DCB_LOC( IDCB2 ), ICOMP, LOCC, STATUS )
+            CALL DAT_NAME( LOCC, NAME, STATUS )
+            CALL DAT_ANNUL( LOCC, STATUS )
             CALL DAT_ERASE( DCB_LOC( IDCB2 ), NAME, STATUS )
          END DO
 
-*  If explicit values have been supplied for both ZAXIS and TYPE, just do
-*  the conversion.
-         IF( ZAXIS .NE. 0 .AND. TYPE .NE. ' ' ) THEN
-            CALL ARY1_S2DLT( DCB_LOC( IDCB1 ), ZAXIS, TYPE,
-     :                       DCB_LOC( IDCB2 ), ZRATIO, STATUS )
-
-*  Otherwise, we test to see what combination of ZAXIS and TYPE gives the
-*  best compression, and then compress using that ZAXis and TYPE.
-         ELSE
-
-*  Determine the range of ZAXIS to test.
-            IF( ZAXIS .EQ. 0 ) THEN
-               ZAXLO = 1
-               ZAXHI = NDIM
-            ELSE
-               ZAXLO = ZAXIS
-               ZAXHI = ZAXIS
-            END IF
-
-*  Determine the list of compressed data types to test.
-            IF( TYPE .EQ. '_BYTE' ) THEN
-               ZTYLO = 1
-               ZTYHI = 1
-            ELSE IF( TYPE .EQ. '_WORD' ) THEN
-               ZTYLO = 2
-               ZTYHI = 2
-            ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
-               ZTYLO = 3
-               ZTYHI = 3
-            ELSE IF( DCB_TYP( IDCB1 ) .EQ. '_INTEGER' ) THEN
-               ZTYLO = 1
-               ZTYHI = 3
-            ELSE IF( DCB_TYP( IDCB1 ) .EQ. '_WORD' ) THEN
-               ZTYLO = 1
-               ZTYHI = 2
-            ELSE
-               ZTYLO = 1
-               ZTYHI = 1
-            END IF
-
-*  Initialise the best compression found so far.
-            ZRATIO = VAL__MINR
-
-*  Loop round all ZAXIS values
-            DO ZAX = ZAXLO, ZAXHI
-
-*  Loop round all compressed data types.
-               DO ZTY = ZTYLO, ZTYHI
-
-*  See how much compression could be expected using this combination of
-*  compression axis and data type.
-                  CALL ARY1_S2DLT( DCB_LOC( IDCB1 ), ZAX, TYPES( ZTY ),
-     :                             ARY__NOLOC, RATIO, STATUS )
-
-*  Record the current compresson axis and type if this combination gives
-*  more compression than any other combination tested so far.
-                  IF( RATIO .GT. ZRATIO ) THEN
-                     ZRATIO = RATIO
-                     ZAXUSE = ZAX
-                     ZTYUSE = ZTY
-                  END IF
-
-               END DO
-            END DO
-
 *  Now do the compression using the best combination.
-            CALL ARY1_S2DLT( DCB_LOC( IDCB1 ), ZAXUSE, TYPES( ZTYUSE ),
-     :                       DCB_LOC( IDCB2 ), ZRATIO, STATUS )
-         END IF
+         CALL ARY1_S2DLT( DCB_LOC( IDCB1 ), ZAXUSE, TYPES( ZTYUSE ),
+     :                    DCB_LOC( IDCB2 ), ZRATIO, STATUS )
 
-*  If all went well, store the new storage form in the DCB.
-         IF( STATUS .EQ. SAI__OK ) THEN
+*  If the compression ratio is too small, annul the DCB entry created
+*  above and create a copy of the supplied array instead.
+         IF( ZRATIO .LE. MINRAT ) THEN
+            CALL ARY1_DANL( .TRUE., IDCB2, STATUS )
+            CALL ARY1_CPY( IACBT, PCB_TMP( IPCB ), PCB_LOC( IPCB ),
+     :                     IACB2, STATUS )
+
+*  If the compression ratio was high enough, and all went well, store the
+*  new storage form in the DCB.
+         ELSE IF( STATUS .EQ. SAI__OK ) THEN
             DCB_FRM( IDCB2 ) = 'DELTA'
 
 *  Obtain a locator to the non-imaginary data component to the new array.
@@ -387,27 +444,31 @@
 *  Create a base array entry in the ACB to refer to the output DCB entry.
             CALL ARY1_CRNBA( IDCB2, IACB2, STATUS )
 
-*  Export an identifier for the output array.
-            CALL ARY1_EXPID( IACB2, IARY2, STATUS )
-
-*  If an error occurred, then annul the new ACB entry and reset the
-*  IACB2 argument to zero.
-            IF ( ( STATUS .NE. SAI__OK ) .AND. ( IACB2 .NE. 0 ) ) THEN
-               CALL ARY1_ANL( IACB2, STATUS )
-               IACB2 = 0
-            END IF
-
          END IF
       END IF
 
 *  Arrive here if an error occurrs.
  999  CONTINUE
 
+*  If all went well, export an identifier for the output array
+      IF( STATUS .EQ. SAI__OK ) THEN
+         CALL ARY1_EXPID( IACB2, IARY2, STATUS )
+
+*  If an error occurred, then annul the new ACB entry and reset the
+*  IACB2 argument to zero.
+         IF ( ( STATUS .NE. SAI__OK ) .AND. ( IACB2 .NE. 0 ) ) THEN
+            CALL ARY1_ANL( IACB2, STATUS )
+            IACB2 = 0
+         END IF
+      END IF
+
+*  Annul any temporary base copy of the input array.
+      IF( LOCT .NE. DAT__NOLOC ) CALL ARY1_ANTMP( LOCT, STATUS )
+
 *  Annul the placeholder, erasing the associated object if any error has
-*  occurred or if the compression was not high enough.
+*  occurred.
       IF( IPCB .NE. 0 ) THEN
-         ERASE = ( STATUS .NE. SAI__OK ) .OR.
-     :           ( ZRATIO .LE. MINRAT .AND. MINRAT .GT. 0.0 )
+         ERASE = ( STATUS .NE. SAI__OK )
          CALL ARY1_ANNPL( ERASE, IPCB, STATUS )
       END IF
 

@@ -212,7 +212,7 @@
 *  Close the HDS file and then re-open it.
       CALL ARY_ANNUL( IARY, STATUS )
       CALL DAT_ANNUL( LOC, STATUS )
-      CALL HDS_OPEN( 'ary_test2', 'READ', LOC, STATUS )
+      CALL HDS_OPEN( 'ary_test2', 'WRITE', LOC, STATUS )
 
 *  Import the array and check that it has SCALED storage form, and check
 *  the mapped array values are correct.
@@ -235,7 +235,7 @@
          CALL ERR_MARK
          OK = .TRUE.
          CALL ARY_MAP( IARY, '_REAL', 'UPDATE', PNTR, EL, STATUS )
-         IF( STATUS .NE. ARY__ACDEN ) THEN
+         IF( STATUS .NE. ARY__CMPAC ) THEN
             OK = .FALSE.
          ELSE
             CALL ERR_ANNUL( STATUS )
@@ -361,7 +361,7 @@
 *  Close the HDS file and then re-open it.
       CALL ARY_ANNUL( IARY, STATUS )
       CALL DAT_ANNUL( LOC, STATUS )
-      CALL HDS_OPEN( 'ary_test3', 'READ', LOC, STATUS )
+      CALL HDS_OPEN( 'ary_test3', 'WRITE', LOC, STATUS )
 
 *  Import the array and check that it has DELTA storage form, and check
 *  the mapped array values are correct.
@@ -384,7 +384,7 @@
          CALL ERR_MARK
          OK = .TRUE.
          CALL ARY_MAP( IARY, '_REAL', 'UPDATE', PNTR, EL, STATUS )
-         IF( STATUS .NE. ARY__ACDEN ) THEN
+         IF( STATUS .NE. ARY__CMPAC ) THEN
             OK = .FALSE.
          ELSE
             CALL ERR_ANNUL( STATUS )

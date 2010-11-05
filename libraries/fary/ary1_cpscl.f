@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARY1_CPY( IDCB1, IDCB2, STATUS )
+*     CALL ARY1_CPSCL( IDCB1, IDCB2, STATUS )
 
 *  Description:
 *     The routine copies the information describing the scale and zero
