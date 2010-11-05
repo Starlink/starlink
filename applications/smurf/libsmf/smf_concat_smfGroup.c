@@ -189,6 +189,8 @@
  *        Move down-sampling length calc from here to smf_grp_related
  *     2010-11-01 (EC):
  *        Handle 4D FFT data
+ *     2010-11-04 (COBA):
+ *        Propagate FTS2 info
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -661,12 +663,19 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
             /* Allocate memory for empty smfData with a smfHead. Create
                a DA struct only if the input file has one. Create it as
                a clone rather than creating an empty smfDa. */
-            data = smf_create_smfData( SMF__NOCREATE_DA | SMF__NOCREATE_FTS,
-                                         status );
+            data = smf_create_smfData(SMF__NOCREATE_DA, status );
             if (refdata->da && data) {
               /* do not copy dark squids. We do that below */
               data->da = smf_deepcopy_smfDA( refdata, 0, status );
               da = data->da;
+            }
+
+            /* PROPAGATE FTS2 DATA */
+            if ( data &&
+                 refdata->fts &&
+                 refdata->fts->fpm &&
+                 refdata->fts->sigma) {
+              data->fts = smf_deepcopy_smfFts(refdata, status );
             }
 
             if (refdata->history) data->history = astCopy( refdata->history );
