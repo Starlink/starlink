@@ -646,17 +646,14 @@ write access, store the scaled data values in the mapped simple array,
 unmap the array, and then associate scale and zero values with the array,
 thus converting it to a scaled array.
 
-\item[DELTA] - compressing the simple array in-situ using ARY\_DELTA. The
-supplied simple array will be transformed into a compressed array stored in
-delta form. A typical program would create a simple array, map it for write
-access, store the uncompressed data values in the mapped simple array, unmap
-the array, and then compress it using ARY\_DELTA.
+\item[DELTA] - copying the simple array using ARY\_DELTA. The copy will
+be a compressed array stored in delta form. A typical program would create
+a simple array, map it for write access, store the uncompressed data
+values in the mapped simple array, unmap the array, and then copy it using
+ARY\_DELTA. The original simple array could then be deleted if it is no
+longer needed.
 
 \end{description}
-
-\item The ARY\_SIMPLE routine can be used to convert scaled or delta arrays
-back into simple arrays containing the external (i.e. unscaled or
-uncompressed) data values.
 
 \item Scaled and delta arrays cannot have complex data types. An error will be
 reported if an attempt is made to to import an HDS structure describing a
@@ -710,8 +707,8 @@ repetition count.
 \subsubsection{Creating a Delta Array}
 
 To create a DELTA array, first store the uncompressed integer values in a
-simple array, and then compress the array using ARY\_DELTA. The
-compressed array will be stored in DELTA form.
+simple array, and then copy the array using ARY\_DELTA. The copy produced
+by ARY\_DELTA will be stored in DELTA form.
 
 Arrays of floating point values may be compressed by first storing the
 floating point values in a SCALED array, and then using ARY\_DELTA to
@@ -951,8 +948,6 @@ routines.
             {Copy an array to a new location}
 \noteroutine{ARY\_DELET( IARY, STATUS )}
             {Delete an array}
-\noteroutine{ARY\_DELTA( IARY, ZAXIS, TYPE, MINRAT, ZRATIO, STATUS )}
-            {Compress an array using delta compression}
 \noteroutine{ARY\_DIM( IARY, NDIMX, DIM, NDIM, STATUS )}
             {Enquire the dimension sizes of an array}
 \noteroutine{ARY\_DUPE( IARY1, PLACE, IARY2, STATUS )}
@@ -963,8 +958,6 @@ routines.
             {Obtain the storage form of an array}
 \noteroutine{ARY\_FTYPE( IARY, FTYPE, STATUS )}
             {Obtain the full data type of an array}
-\noteroutine{ARY\_GTDLT( IARY, ZAXIS, ZTYPE, ZRATIO, STATUS )}
-            {Get the compressed axis and data type for a DELTA array}
 \noteroutine{ARY\_GTSZx( IARY, SCALE, ZERO, STATUS )}
             {Get the scale and zero values for a scaled array}
 \noteroutine{ARY\_IMPRT( LOC, IARY, STATUS )}
@@ -1013,8 +1006,6 @@ routines.
             {Apply pixel-index shifts to an array}
 \noteroutine{ARY\_SIZE( IARY, NPIX, STATUS )}
             {Determine the size of an array}
-\noteroutine{ARY\_SIMPLE( IARY, STATUS )}
-            {Convert an array in-situ into simple storage form}
 \noteroutine{ARY\_SSECT( IARY1, IARY2, IARY3, STATUS )}
             {Produce a similar array section to an existing one}
 \noteroutine{ARY\_STATE( IARY, STATE, STATUS )}
@@ -1170,19 +1161,6 @@ Creation and Control of Identifiers}
 \noteroutine{ARY\_DUPE( IARY1, PLACE, IARY2, STATUS )}
             {Duplicate an array}
 
-
-\subsection{\xlabel{compression}Compression}
-\label{compression}
-\noteroutine{ARY\_DELTA( IARY, ZAXIS, TYPE, MINRAT, ZRATIO, STATUS )}
-            {Compress an array using delta compression}
-\noteroutine{ARY\_GTDLT( IARY, ZAXIS, ZTYPE, ZRATIO, STATUS )}
-            {Get the compressed axis and data type for a DELTA array}
-\noteroutine{ARY\_GTSZx( IARY, SCALE, ZERO, STATUS )}
-            {Get the scale and zero values for a scaled array}
-\noteroutine{ARY\_PTSZx( IARY, SCALE, ZERO, STATUS )}
-            {Set new scale and zero values for a scaled array}
-\noteroutine{ARY\_SIMPLE( IARY, STATUS )}
-            {Convert an array in-situ into simple storage form}
 
 \subsection{\xlabel{miscellaneous}Miscellaneous}
 \label{miscellaneous}
@@ -1594,6 +1572,141 @@ Creation and Control of Identifiers}
          A value of ARY\_\_NOID is always returned for the IARY argument,
          even if the routine should fail. This constant is defined in the
          include file ARY\_PAR.
+      }
+   }
+}
+\sstroutine{
+   ARY\_DELTA
+}{
+   Compress an array using delta compression
+}{
+   \sstdescription{
+      The routine creates a copy of the supplied array stored in DELTA form,
+      which provides a lossless compression scheme for integer data. This
+      scheme assumes that adjacent integer values in the input array tend
+      to be close in value, and so differences between adjacent values can
+      be represented in fewer bits than the absolute values themselves.
+      The differences are taken along a nominated pixel axis within the
+      supplied array (specified by argument ZAXIS).
+
+      In practice, the scheme is limited currently to representing differences
+      between adjacent values using a HDS integer data type (specified by
+      argyument TYPE) - that is, arbitrary bit length is not yet supported.
+      So for instance an \_INTEGER input array can be compressed by storing
+      differences as \_WORD or \_BYTE values, but a \_WORD input array can only
+      be compressed by storing differences as \_BYTE values.
+
+      Any input value that differs from its earlier neighbour by more than
+      the data range of the selected data type is stored explicitly using
+      the data type of the input array.
+
+      Further compression is achieved by replacing runs of equal input values
+      by a single occurrence of the value with a correspsonding repetition
+      count.
+
+      It should be noted that the degree of compression achieved is
+      dependent on the nature of the data, and it is possible for the
+      compressed array to occupy more space than the uncompressed array.
+      The compression factor actually achieved is returned in argument
+      ZRATIO (the ratio of the supplied array size to the compressed
+      array size). A minmum allowed compression ratio may be specified via
+      argument MINRAT. If the compression ratio is less than this value,
+      then the supplied array is left unchanged.
+   }
+   \sstinvocation{
+      CALL ARY\_DELTA( IARY1, ZAXIS, TYPE, MINRAT, PLACE, ZRATIO, IARY2,
+                      STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY1 = INTEGER (Given)
+      }{
+         The input array identifier. An error is reported if the array is
+         already stored in DELTA form. Note, if the array is a SCALED array,
+         the internal integer values are compressed and the scale and zero
+         terms are stored in the compressed array.
+      }
+      \sstsubsection{
+         ZAXIS = INTEGER (Given)
+      }{
+         The index of the pixel axis along which differences are to be
+         taken. If this is zero, a default value will be selected that
+         gives the greatest compression. An error will be reported if a
+         value less than zero or greater than the number of axes in the
+         input array is supplied.
+      }
+      \sstsubsection{
+         TYPE = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The data type in which to store the differences between adjacent
+         input values. This must be one of {\tt '}\_BYTE{\tt '}, {\tt '}\_WORD{\tt '} or
+         {\tt '}\_INTEGER{\tt '}. Additionally, a blank string may be supplied in which
+         case a default value will be selected that gives the greatest
+         compression.
+      }
+      \sstsubsection{
+         MINRAT = REAL (Given)
+      }{
+         The minimum allowed ZRATIO value. If compressing the input array
+         results in a ZRATIO value smaller than or equal to MINRAT, then
+         the supplied array is left unchanged. If the supplied value is
+         zero or negative, then the array will be compressed regardless of
+         the compression ratio.
+      }
+      \sstsubsection{
+         PLACE = INTEGER (Given and Returned)
+      }{
+         An array placeholder (e.g. generated by the ARY\_PLACE routine)
+         which indicates the position in the data system where the new
+         array will reside. The placeholder is annulled by this
+         routine, and a value of ARY\_\_NOPL will be returned (as defined
+         in the include file ARY\_PAR).
+      }
+      \sstsubsection{
+         ZRATIO = REAL (Returned)
+      }{
+         The compression factor actually achieved (the ratio of the
+         supplied array size to the compressed array size). Genuine
+         compressions are represented by values more than 1.0, but values
+         less than 1.0 may be returned if the input data is not suited
+         to delta compression (i.e. if the {\tt "}compression{\tt "} actually expands
+         the array storage). Note, the returned value of ZRATIO may be
+         smaller than MINRAT, in which case the supplied array is left
+         unchanged. The returned compression factor is approximate as it
+         does not take into account the space occupied by the HDS metadata
+         describing the extra components of a DELTA array (i.e. the
+         component names, data types, dimensions, etc). This will only be
+         significant for very small arrays.
+      }
+      \sstsubsection{
+         IARY2 = INTEGER (Returned)
+      }{
+         Identifier for the new DELTA array.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The compression axis and compressed data type actually used can
+         be determined by passing the returned array to ARY\_GTDLT.
+
+         \sstitem
+         This routine may only be used to compress a base array. If it is
+         called with an array which is not a base array, then it will return
+         without action. No error will result.
+
+         \sstitem
+         An error will result if the array, or any part of it, is
+         currently mapped for access (e.g. through another identifier).
+
+         \sstitem
+         An error will result if the array holds complex values.
       }
    }
 }
@@ -3129,46 +3242,6 @@ Creation and Control of Identifiers}
    }
 }
 \sstroutine{
-   ARY\_SIMPLE
-}{
-   Convert an array in-situ into simple storage form
-}{
-   \sstdescription{
-      This routine changes the storage form of the supplied array to simple
-      form. If the input array is stored in delta form, it is uncompressed.
-      If the input array is scaled form, it is unscaled.
-   }
-   \sstinvocation{
-      CALL ARY\_SIMPLE( IARY, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         IARY = INTEGER (Given)
-      }{
-         The array identifier. No error is reported if the array is
-         already stored in simple form.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         This routine may only be used to convert a base array. If it is
-         called with an array which is not a base array, then it will return
-         without action. No error will result.
-
-         \sstitem
-         An error will result if the array, or any part of it, is
-         currently mapped for access (e.g. through another identifier).
-      }
-   }
-}
-\sstroutine{
    ARY\_SIZE
 }{
    Determine the size of an array
@@ -3409,125 +3482,6 @@ Creation and Control of Identifiers}
    }
 }
 \sstroutine{
-   ARY\_DELTA
-}{
-   Compress an array in-situ using delta compression
-}{
-   \sstdescription{
-      This routine changes the storage form of the supplied array to DELTA
-      form, which provides a lossless compression scheme for integer data.
-      This scheme assumes that adjacent integer values in the input array
-      tend to be close in value, and so differences between adjacent values
-      can be represented in fewer bits than the absolute values themselves.
-      The differences are taken along a nominated pixel axis within the
-      supplied array (specified by argument ZAXIS).
-
-      In practice, the scheme is limited currently to representing differences
-      between adjacent values using a HDS integer data type (specified by
-      argyument TYPE) - that is, arbitrary bit length is not yet supported.
-      So for instance an \_INTEGER input array can be compressed by storing
-      differences as \_WORD or \_BYTE values, but a \_WORD input array can only
-      be compressed by storing differences as \_BYTE values.
-
-      Any input value that differs from its earlier neighbour by more than
-      the data range of the selected data type is stored explicitly using
-      the data type of the input array.
-
-      Further compression is achieved by replacing runs of equal input values
-      by a single occurrence of the value with a correspsonding repetition
-      count.
-
-      It should be noted that the degree of compression achieved is
-      dependent on the nature of the data, and it is possible for the
-      compressed array to occupy more space than the uncompressed array.
-      The compression factor actually achieved is returned in argument
-      ZRATIO (the ratio of the supplied array size to the compressed
-      array size). A minmum allowed compression ratio may be specified via
-      argument MINRAT. If the compression ratio is less than this value,
-      then the supplied array is left unchanged.
-   }
-   \sstinvocation{
-      CALL ARY\_DELTA( IARY, ZAXIS, TYPE, MINRAT, ZRATIO, STATUS )
-   }
-   \sstarguments{
-      \sstsubsection{
-         IARY = INTEGER (Given)
-      }{
-         The array identifier. An error is reported if the array is
-         already stored in DELTA form. Note, if the array is a SCALED array,
-         the internal integer values are compressed and the scale and zero
-         terms are stored in the compressed array.
-      }
-      \sstsubsection{
-         ZAXIS = INTEGER (Given)
-      }{
-         The index of the pixel axis along which differences are to be
-         taken. If this is zero, a default value will be selected that
-         gives the greatest compression. An error will be reported if a
-         value less than zero or greater than the number of axes in the
-         input array is supplied.
-      }
-      \sstsubsection{
-         TYPE = CHARACTER $*$ ( $*$ ) (Given)
-      }{
-         The data type in which to store the differences between adjacent
-         input values. This must be one of {\tt '}\_BYTE{\tt '}, {\tt '}\_WORD{\tt '} or {\tt '}\_INTEGER{\tt '}.
-         Additionally, a blank string may be supplied in which case a
-         default value will be selected that gives the greatest compression.
-      }
-      \sstsubsection{
-         MINRAT = REAL (Given)
-      }{
-         The minimum allowed ZRATIO value. If compressing the input array
-         results in a ZRATIO value smaller than or equal to MINRAT, then
-         the supplied array is left unchanged. If the supplied value is
-         zero or negative, then the array will be compressed regardless of
-         the compression ratio.
-      }
-      \sstsubsection{
-         ZRATIO = REAL (Returned)
-      }{
-         The compression factor actually achieved (the ratio of the
-         supplied array size to the compressed array size). Genuine
-         compressions are represented by values more than 1.0, but values
-         less than 1.0 may be returned if the input data is not suited
-         to delta compression (i.e. if the {\tt "}compression{\tt "} actually expands
-         the array storage). Note, the returned value of ZRATIO may be
-         smaller than MINRAT, in which case the supplied array is left
-         unchanged. The returned compression factor is approximate as it
-         does not take into account the space occupied by the HDS metadata
-         describing the extra components of a DELTA array (i.e. the
-         component names, data types, dimensions, etc). This will only be
-         significant for very small arrays.
-      }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         The compression axis and compressed data type actually used can
-         be determined by passing the returned array to ARY\_GTDLT.
-
-         \sstitem
-         This routine may only be used to compress a base array. If it is
-         called with an array which is not a base array, then it will return
-         without action. No error will result.
-
-         \sstitem
-         An error will result if the array, or any part of it, is
-         currently mapped for access (e.g. through another identifier).
-
-         \sstitem
-         An error will result if the array holds complex values.
-      }
-   }
-}
-\sstroutine{
    ARY\_TRACE
 }{
    Set the internal ARY\_ system error-tracing flag
@@ -3759,8 +3713,7 @@ as follows:
 
 \item A new array storage form called ``DELTA'' has been introduced. This
 provides lossless compression for integer arrays. The new routine
-ARY\_DELTA transforms a supplied array into DELTA form. The new routine
-ARY\_SIMPLE transforms a DELTA or SCALED array into a SIMPLE array.
+ARY\_DELTA creates a copy of a supplied array, stored in DELTA form.
 
 \item A new routine called ARY\_LOC returns a locator for the
 HDS data object referred to by the supplied ARY identifier.
