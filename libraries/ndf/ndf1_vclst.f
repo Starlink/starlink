@@ -157,46 +157,51 @@
      :                       'programming error).', STATUS )
 
 
-*  Otherwise, if the word consists of a single asterisk, set all returned
-*  flags .TRUE.. Continue looping to check any remaining words for
-*  validity.
-            ELSE IF( TEXT( F : L ) .EQ. '*' ) THEN
-               DO ICOMP = 1, NCOMP
-                  CFLAGS( ICOMP ) = .TRUE.
-               END DO
-               NSET = NCOMP
+*  Otherwise, correct the indices so that they refer to the start of the
+*  string.
+            ELSE
+               F = F + START - 1
+               L = L + START - 1
+
+*  If the word consists of a single asterisk, set all returned flags
+*  .TRUE.. Continue looping to check any remaining words for validity.
+               IF( TEXT( F : L ) .EQ. '*' ) THEN
+                  DO ICOMP = 1, NCOMP
+                     CFLAGS( ICOMP ) = .TRUE.
+                  END DO
+                  NSET = NCOMP
 
 *  Otherwise, compare the word to each of the allowed component names
-            ELSE
-               OK = .FALSE.
-               DO ICOMP = 1, NCOMP
-                  IF( NDF1_SIMLR( TEXT( F : L ), CNAMES( ICOMP ),
-     :                            NDF__MINAB ) ) THEN
+               ELSE
+                  OK = .FALSE.
+                  DO ICOMP = 1, NCOMP
+                     IF( NDF1_SIMLR( TEXT( F : L ), CNAMES( ICOMP ),
+     :                               NDF__MINAB ) ) THEN
 
 *  If the current word matches the current component name, set the
 *  returned flag .TRUE. and increment the number of selected components,
 *  so long as the component has not already been selected. Set a flag
 *  indicating that the current word is legal.
-                     IF( .NOT. CFLAGS( ICOMP ) ) THEN
-                        CFLAGS( ICOMP ) = .TRUE.
-                        NSET = NSET + 1
+                        IF( .NOT. CFLAGS( ICOMP ) ) THEN
+                           CFLAGS( ICOMP ) = .TRUE.
+                           NSET = NSET + 1
+                        END IF
+                        OK = .TRUE.
                      END IF
-                     OK = .TRUE.
-                  END IF
-               END DO
+                  END DO
 
 *  Report an error if the current word was not an allowed component name.
-               IF( .NOT. OK ) THEN
-                  STATUS = NDF__CNMIN
-                  CALL MSG_SETC( 'BADCOMP', TEXT( F : L ) )
-                  CALL ERR_REP( 'NDF1_VCLST_COMP', 'Invalid or '//
-     :                          'inappropriate NDF component name '//
-     :                          '''^BADCOMP'' specified (possible '//
-     :                          'programming error).', STATUS )
+                  IF( .NOT. OK ) THEN
+                     STATUS = NDF__CNMIN
+                     CALL MSG_SETC( 'BADCOMP', TEXT( F : L ) )
+                     CALL ERR_REP( 'NDF1_VCLST_COMP', 'Invalid or '//
+     :                             'inappropriate NDF component name '//
+     :                             '''^BADCOMP'' specified (possible '//
+     :                             'programming error).', STATUS )
+                  END IF
+
                END IF
-
             END IF
-
          END IF
 
 *  Move on one character from the end of the current word to reach the
