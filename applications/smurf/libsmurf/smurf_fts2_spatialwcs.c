@@ -41,6 +41,8 @@
 *     28-OCT-2010 (COBA):
 *        - Reading wave number factor from FITS
 *        - Minor changes to coding style
+*     05-NOV-2010 (COBA):
+*        Cleanup group resources
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -218,5 +220,9 @@ void smurf_fts2_spatialwcs(int* status)
     // FREE RESOURCES
     smf_close_file(&srcData, status);
   }
-  ndfEnd(status);
+
+  CLEANUP:
+    ndfEnd(status);
+    grpDelet(&igrp, status);
+    grpDelet(&ogrp, status);
 }
