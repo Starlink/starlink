@@ -1,7 +1,7 @@
-      SUBROUTINE ARY_GTDLT( IARY, ZAXIS, ZTYPE, ZRATIO, STATUS )
+      SUBROUTINE ARY1_GTDLT( IDCB, ZAXIS, ZTYPE, ZRATIO, STATUS )
 *+
 *  Name:
-*     ARY_GTDLT
+*     ARY1_GTDLT
 
 *  Purpose:
 *     Get the compressed axis and data type for a DELTA array.
@@ -10,31 +10,22 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARY_GTDLT( IARY, ZAXIS, ZTYPE, ZRATIO, STATUS )
+*     CALL ARY1_GTDLT( IDCB, ZAXIS, ZTYPE, ZRATIO, STATUS )
 
 *  Description:
 *     The routine returns the details of the compression used to produce
 *     an array stored in DELTA form. If the array is not stored in
 *     DELTA form, then null values are returned as listed below, but no
 *     error is reported.
-*
-*     A DELTA array is compressed by storing only the differences between
-*     adjacent array values along a nominated compression axis, rather than
-*     the full array values. The differences are stored using a smaller data
-*     type than the original absolute values. The compression is lossless
-*     because any differences that will not fit into the smaller data type
-*     are stored explicitly in an extra array with a larger data type.
-*     Additional compression is achieved by replacing runs of equal values
-*     by a single value and a repeat count.
 
 *  Arguments:
-*     IARY = INTEGER (Given)
-*        Array identifier.
+*     IDCB = INTEGER (Given)
+*        Index of the data object entry in the DCB.
 *     ZAXIS = INTEGER (Returned)
 *        The index of the pixel axis along which compression occurred.
 *        The first axis has index 1. Zero is returned if the array is not
 *        stored in DELTA form.
-*     ZTYPE = CHARACTER * ( * ) (Returned)
+*     ZTYPE = CHARACTER * ( DAT__SZTYP ) (Returned)
 *        The data type in which the differences between adjacent array
 *        values are stored. This will be one of '_BYTE', '_WORD' or
 *        '_INTEGER'. The data type of the array itself is returned if the
@@ -95,23 +86,21 @@
 
 *  Global Variables:
       INCLUDE 'ARY_DCB'          ! ARY_ Data Control Block
-      INCLUDE 'ARY_ACB'          ! ARY_ Access Control Block
 
 *  Arguments Given:
-      INTEGER IARY
+      INTEGER IDCB
 
 *  Arguments Returned:
       INTEGER ZAXIS
-      CHARACTER ZTYPE*(*)
+      CHARACTER ZTYPE * ( DAT__SZTYP )
       REAL ZRATIO
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER TY*(DAT__SZTYP)  ! Intermediate data type
-      INTEGER IACB               ! Index to array entry in the ACB
-      INTEGER IDCB               ! Index to array entry in the DCB
+      CHARACTER LOCC*(DAT__SZLOC)! Locator for component
+      LOGICAL THERE              ! Does the component exist?
 *.
 
 *  Initialise returned values
@@ -122,25 +111,61 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Import the array identifier.
-      CALL ARY1_IMPID( IARY, IACB, STATUS )
+*  Ensure that form information is available for the array.
+      CALL ARY1_DFRM( IDCB, STATUS )
 
-*  Get the DCB entry associated with this ACB entry.
-      IDCB = ACB_IDCB( IACB )
+*  If the array is not stored in delta form, return the data type of the
+*  array itself.
+      IF ( DCB_FRM( IDCB ) .NE. 'DELTA' ) THEN
 
-*  Get the compression information form the data object.
-      CALL ARY1_GTDLT( IDCB, ZAXIS, TY, ZRATIO, STATUS )
+         IF( DCB_FRM( IDCB ) .EQ. 'SCALED' ) THEN
+            CALL CMP_TYPE( DCB_SCLOC( IDCB ), 'SCALE', ZTYPE, STATUS )
+         ELSE
+            ZTYPE = DCB_TYP( IDCB )
+         END IF
 
-*  Copy the data type into the supplied character argument.
-      CALL ARY1_CCPY( TY, ZTYPE, STATUS )
+*  For delta arrays, get the required components from the data object.
+      ELSE
 
-*  If an error occurred, then report context information and call the
-*  error tracing routine.
-      IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'ARY_GTDLT_ERR', 'ARY_GTDLT: Error getting '//
-     :                 'information about a delta compressed array.',
-     :                 STATUS )
-         CALL ARY1_TRACE( 'ARY_GTDLT', STATUS )
+         CALL DAT_THERE( DCB_LOC( IDCB ), 'ZAXIS', THERE, STATUS )
+         IF( THERE ) THEN
+            CALL DAT_FIND( DCB_LOC( IDCB ), 'ZAXIS', LOCC, STATUS )
+            CALL DAT_GET0I( LOCC, ZAXIS, STATUS )
+            CALL DAT_ANNUL( LOCC, STATUS )
+         ELSE IF( STATUS .EQ. SAI__OK ) THEN
+            STATUS = ARY__DLTIN
+            CALL DAT_MSG( 'A', DCB_LOC( IDCB ) )
+            call ERR_REP( ' ', 'The DELTA compressed array ''^A'' is '//
+     :                    'invalid - the ZAXIS component is missing.',
+     :                    STATUS )
+         END IF
+
+         CALL DAT_THERE( DCB_LOC( IDCB ), 'ZRATIO', THERE, STATUS )
+         IF( THERE ) THEN
+            CALL DAT_FIND( DCB_LOC( IDCB ), 'ZRATIO', LOCC, STATUS )
+            CALL DAT_GET0R( LOCC, ZRATIO, STATUS )
+            CALL DAT_ANNUL( LOCC, STATUS )
+         ELSE IF( STATUS .EQ. SAI__OK ) THEN
+            STATUS = ARY__DLTIN
+            CALL DAT_MSG( 'A', DCB_LOC( IDCB ) )
+            call ERR_REP( ' ', 'The DELTA compressed array ''^A'' is '//
+     :                    'invalid - the ZRATIO component is missing.',
+     :                    STATUS )
+         END IF
+
+         CALL DAT_THERE( DCB_LOC( IDCB ), 'DATA', THERE, STATUS )
+         IF( THERE ) THEN
+            CALL DAT_FIND( DCB_LOC( IDCB ), 'DATA', LOCC, STATUS )
+            CALL DAT_TYPE( LOCC, ZTYPE, STATUS )
+            CALL DAT_ANNUL( LOCC, STATUS )
+         ELSE IF( STATUS .EQ. SAI__OK ) THEN
+            STATUS = ARY__DLTIN
+            CALL DAT_MSG( 'A', DCB_LOC( IDCB ) )
+            call ERR_REP( ' ', 'The DELTA compressed array ''^A'' is '//
+     :                    'invalid - the DATA component is missing.',
+     :                    STATUS )
+         END IF
+
       END IF
 
       END

@@ -18554,17 +18554,17 @@ locator}{sun92}{using_locators}}
    Create a compressed copy of an NDF using DELTA compression
 }{
    \sstdescription{
-      The routine creates a new NDF holding {\tt "}delta{\tt "} compressed copies of
-      specified array components within the supplied NDF. This compression
-      is lossless, but only operates on arrays holding integer values. It
-      assumes that adjacent integer values in each input array tend to be
-      close in value, and so differences between adjacent values can be
-      represented in fewer bits than the absolute values themselves. The
-      differences are taken along a nominated pixel axis within the
-      supplied array (specified by argument ZAXIS). Any input value that
-      differs from its earlier neighbour by more than the data range of
-      the selected data type is stored explicitly using the data type of
-      the input array.
+      The routine creates a copy of the supplied NDF, and then compresses
+      selected array components within the copy using delta compression.
+      This compression is lossless, but only operates on arrays holding
+      integer values. It assumes that adjacent integer values in each input
+      array tend to be close in value, and so differences between adjacent
+      values can be represented in fewer bits than the absolute values
+      themselves. The differences are taken along a nominated pixel axis
+      within the supplied array (specified by argument ZAXIS). Any input
+      value that differs from its earlier neighbour by more than the data
+      range of the selected data type is stored explicitly using the data
+      type of the input array.
 
       Further compression is achieved by replacing runs of equal input values
       by a single occurrence of the value with a correspsonding repetition
@@ -18609,18 +18609,19 @@ locator}{sun92}{using_locators}}
          ZAXIS = INTEGER (Given)
       }{
          The index of the pixel axis along which differences are to be
-         taken. If this is zero, a default value will be selected that
-         gives the greatest compression. An error will be reported if a
-         value less than zero or greater than the number of axes in the
-         input array is supplied.
+         taken. If this is zero, a default value will be selected for
+         each array that gives the greatest compression. An error will be
+         reported if a value less than zero or greater than the number of
+         axes in the input array is supplied.
       }
       \sstsubsection{
          TYPE = CHARACTER $*$ ( $*$ ) (Given)
       }{
          The data type in which to store the differences between adjacent
          array values. This must be one of {\tt '}\_BYTE{\tt '}, {\tt '}\_WORD{\tt '} or {\tt '}\_INTEGER{\tt '}.
-         Additionally, a blank string may be supplied in which casea
-         default value will be selected that gives the greatest compression.
+         Additionally, a blank string may be supplied in which case a
+         default value will be selected for each array that gives the
+         greatest compression.
       }
       \sstsubsection{
          PLACE = INTEGER (Given and Returned)
@@ -18644,12 +18645,12 @@ locator}{sun92}{using_locators}}
          is the ratio of the number of bytes needed to hold the numerical
          values in the supplied array, to the number of bytes needed to
          hold the numerical values in the compressed array. It does not
-         include the small extra overheads associated with the extra
-         labels, etc, needed to store compressed data, and so may be
-         inaccurate for small arrays. Additionally, this ratio only takes
-         the specified array components into account. If the NDF contains
-         significant quantities of data in other components, then the
-         overall compression of the whole NDF will be less.
+         include the small overheads associated with the extra labels, etc,
+         needed to store compressed data, and so may be inaccurate for
+         small arrays. Additionally, this ratio only takes the specified
+         array components into account. If the NDF contains significant
+         quantities of data in other components, then the overall
+         compression of the whole NDF will be less.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -18666,21 +18667,12 @@ locator}{sun92}{using_locators}}
          that are stored as scaled integers (see NDF\_ZSCAL) are accepted.
 
          \sstitem
-         The routine may only be used to compress a base NDF. If it is
-         called for an NDF which is not a base NDF, then it will return without
-         action. No error will result.
+         If the input NDF is already stored in DELTA format, it will be
+         uncompressed and then recompressed using the supplied parameter values.
 
          \sstitem
-         An error will be reported if the input NDF is already stored in
-         DELTA format.
-
-         \sstitem
-         An error will result if the DATA or VARIANCE component of the
-         input NDF is currently mapped for access.
-
-         \sstitem
-         An error will be reported if either the DATA or VARIANCE component
-         of the input NDF is currently mapped for access.
+         An error will result if any of the specified array components of the
+         input NDF are currently mapped for access.
 
          \sstitem
          Complex arrays cannot be compressed using this routine. An error
@@ -18688,17 +18680,18 @@ locator}{sun92}{using_locators}}
          represents a complex data type.
 
          \sstitem
-         The resulting NDF will be read-only. An error will be reported if
-         an attempt is made to map it for WRITE or UPDATE access.
+         Delta compressed arrays are read-only. An error will be reported if
+         an attempt is made to map a delta compressed array for WRITE or UPDATE
+         access.
 
          \sstitem
-         When the output NDF is mapped for READ access, uncompression occurs
-         automatically. The pointer returned by NDF\_MAP provides access to the
-         uncompressed array values.
+         When delta compressed arrays are mapped for READ access, uncompression
+         occurs automatically. The pointer returned by NDF\_MAP provides access to
+         the uncompressed array values.
 
          \sstitem
-         The result of copying a compressed NDF (for instance, using
-         NDF\_PROP, etc.) will be an equivalent uncompressed NDF.
+         The result of copying a compressed NDF (for instance, using NDF\_PROP,
+         etc.) will be an equivalent uncompressed NDF.
 
          \sstitem
          When applied to a compressed NDF, the NDF\_TYPE and NDF\_FTYPE

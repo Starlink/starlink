@@ -1611,7 +1611,7 @@ Creation and Control of Identifiers}
       ZRATIO (the ratio of the supplied array size to the compressed
       array size). A minmum allowed compression ratio may be specified via
       argument MINRAT. If the compression ratio is less than this value,
-      then the supplied array is left unchanged.
+      then the returned copy is left uncompressed.
    }
    \sstinvocation{
       CALL ARY\_DELTA( IARY1, ZAXIS, TYPE, MINRAT, PLACE, ZRATIO, IARY2,
@@ -1621,10 +1621,12 @@ Creation and Control of Identifiers}
       \sstsubsection{
          IARY1 = INTEGER (Given)
       }{
-         The input array identifier. An error is reported if the array is
-         already stored in DELTA form. Note, if the array is a SCALED array,
-         the internal integer values are compressed and the scale and zero
-         terms are stored in the compressed array.
+         The input array identifier. This can be stored in any form. If
+         it is already stored in DELTA form, it is uncompressed and then
+         re-compressed using the supplied compression parameters. If
+         is is stored in SCALED form, the internal integer values are
+         compressed and the scale and zero terms are copied into the
+         DELTA array.
       }
       \sstsubsection{
          ZAXIS = INTEGER (Given)
@@ -1649,7 +1651,7 @@ Creation and Control of Identifiers}
       }{
          The minimum allowed ZRATIO value. If compressing the input array
          results in a ZRATIO value smaller than or equal to MINRAT, then
-         the supplied array is left unchanged. If the supplied value is
+         the returned array is left uncompressed. If the supplied value is
          zero or negative, then the array will be compressed regardless of
          the compression ratio.
       }
@@ -1693,13 +1695,14 @@ Creation and Control of Identifiers}
       \sstitemlist{
 
          \sstitem
-         The compression axis and compressed data type actually used can
-         be determined by passing the returned array to ARY\_GTDLT.
+         An error will be reported if the supplied array does not hold
+         integer values. In the case of a SCALED array, the internal
+         (scaled) values must be integers, but the external (unscaled) values
+         can be of any data type.
 
          \sstitem
-         This routine may only be used to compress a base array. If it is
-         called with an array which is not a base array, then it will return
-         without action. No error will result.
+         The compression axis and compressed data type actually used can
+         be determined by passing the returned array to ARY\_GTDLT.
 
          \sstitem
          An error will result if the array, or any part of it, is
