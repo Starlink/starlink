@@ -36126,11 +36126,8 @@ KAPPA: \htmlref{ADD}{ADD},
       subsequent application, since all applications will automatically
       uncompress the data.
 
-      Currently the only compression method available is to scale the data
-      values using a linear transformation so that they fit into a smaller
-      data type.  A description of the scaling uses is stored with the output
-      NDF so that later application can reconstruct the original unscaled
-      values.
+      Two compression methods arae available - SCALE or DELTA (see
+      parameter METHOD).
    }
    \sstusage{
       ndfcompress in out method
@@ -36162,8 +36159,19 @@ KAPPA: \htmlref{ADD}{ADD},
       \sstsubsection{
          METHOD = LITERAL (Read)
       }{
-         The compression method to use. Currently the only supported
-         value is {\tt "SCALE"}.
+         The compression method to use:
+         \sstitemlist{
+
+            \sstitem
+            {\tt "}SCALED{\tt "} -- A lossy compression scheme for all data types. See
+            {\tt "}Scaled Compression{\tt "} below, and parameters DSCALE, DZERO, VSCALE,
+            VZERO and SCALEDTYPE.
+
+            \sstitem
+            {\tt "}DELTA{\tt "} -- A lossless compression scheme for integer data types.
+            See {\tt "}Delta Compression{\tt "} below, and parameters ZAXIS, ZMINRAT and
+            ZTYPE.
+         }
       }
       \sstsubsection{
          OUT = NDF (Write)
@@ -36218,6 +36226,34 @@ KAPPA: \htmlref{ADD}{ADD},
          both that cause the scaled variance values to occupy 96\% of
          the available range of the data type selected using Parameter
          SCALEDTYPE.  {\tt [!]}
+      }
+      \sstsubsection{
+         ZAXIS = \_INTEGER (Read)
+      }{
+         The index of the pixel axis along which differences are to be
+         taken, when compressing with METHOD set to {\tt "}DELTA{\tt "}. If this is
+         zero, a default value will be selected that gives the greatest
+         compression. {\tt [0]}
+      }
+      \sstsubsection{
+         ZMINRAT = \_REAL (Read)
+      }{
+         The minimum allowed compression ratio for an array (the ratio
+         of the supplied array size to the compressed array size), when
+         compressing with METHOD set to {\tt "}DELTA{\tt "}. If compressing an array
+         results in a compression ratio smaller than or equal to
+         ZMINRAT, then the array is left uncompressed in the new NDF.
+         If the supplied value is zero or negative, then each array will
+         be compressed regardless of the compression ratio. {\tt [1.0]}
+      }
+      \sstsubsection{
+         ZTYPE = LITERAL (Read)
+      }{
+         The data type to use for storing differences between adjacent
+         uncompressed data values, when compressing with METHOD set to
+         {\tt "}DELTA{\tt "}.  Must be one of \_INTEGER, \_WORD, \_BYTE or blank. If a null
+         (!) value or blank value is supplied, the data type that gives
+         the best compression is determined and used. {\tt [!]}
       }
    }
    \sstexamples{
@@ -36469,6 +36505,54 @@ KAPPA: \htmlref{ADD}{ADD},
          the original, setting the surrounding region to the bad-pixel
          value.
       }
+   }
+   \sstdiytopic{
+      Scaled Compression
+   }{
+      The SCALE compression method scales the supplied data values using a
+      linear transformation so that they fit into a smaller (integer) data
+      type. A description of the scaling uses is stored with the output NDF
+      so that later application can reconstruct the original unscaled values.
+      This method is not lossless, due to the truncation involved in
+      converting floatign point values to integers.
+   }
+   \sstdiytopic{
+      Delta Compression
+   }{
+      DELTA compression is lossless, but can only be used on integer
+      values. It assumes that adjacent integer values in the input tend to
+      be close in value, and so differences between adjacent values can be
+      represented in fewer bits than the absolute values themselves. The
+      differences are taken along a nominated pixel axis within the
+      supplied array (specified by parameter ZAXIS). Any input value that
+      differs from its earlier neighbour by more than the data range of
+      the selected data type is stored explicitly using the data type of
+      the input array.
+
+      Further compression is achieved by replacing runs of equal input
+      values by a single occurrence of the value with a corresponding
+      repetition count.
+
+      It should be noted that the degree of compression achieved is
+      dependent on the nature of the data, and it is possible for a
+      compressed array to occupy more space than the uncompressed array.
+      The mean compression factor actually achieved is displayed (the
+      ratio of the supplied NDF size to the compressed NDF size).
+
+      It is possible to delta compress an NDF that has already been scale
+      compressed. This provides a means of further compressing floating point
+      arrays. However, note that the default values supplied for DSCALE, DZERO,
+      VSCALE and VZERO may not be appropriate as they are chosen to maximise
+      the spread of the scaled integer values in order to minimise the integer
+      truncation error, but delta compression works best on arrays of integers
+      in which the spread of values is small.
+
+      If the input NDF is already DELTA compressed, it will be
+      uncompressed and then recompressed using the supplied parameter values.
+
+      More details of delta compression can be found in SUN/11 ({\tt "}ARY - A
+      Subroutine Library for Accessing ARRAY Data Structures{\tt "}), subsection
+      {\tt "}Delta Compressed Array Form{\tt "}.
    }
    \sstdiytopic{
       Related Applications
@@ -57518,6 +57602,12 @@ The following applications have been modified:
    \item [\htmlref{MAKESURFACE}{MAKESURFACE}]\mbox{}
       \begin{itemize}
         \item Output variances can now be created for spline fits.
+      \end{itemize}
+
+   \item [\htmlref{NDFCOMPRESS}{NDFCOMPRESS}]\mbox{}
+      \begin{itemize}
+        \item Now supports ``delta'' compression - a lossless compression scheme
+        suitable for integer arrays.
       \end{itemize}
 
    \item [\htmlref{NDFTRACE}{NDFTRACE}]\mbox{}

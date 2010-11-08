@@ -946,9 +946,8 @@ package kappa {
             position 3
             type LITERAL
             access READ
-            vpath DEFAULT
             ppath CURRENT DEFAULT
-            default SCALE
+            default DELTA
             prompt {Compression method}
             helpkey *
          }
@@ -991,6 +990,36 @@ package kappa {
             prompt {Zero offset for VARIANCE component}
             helpkey *
             default !
+         }
+
+         parameter zaxis {
+            type _INTEGER
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Index of compression axis}
+            helpkey *
+            default 0
+         }
+
+         parameter zminratio {
+            type _REAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Minimum acceptable compression ratio}
+            helpkey *
+            default 1.0
+         }
+
+         parameter ztype {
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Data type for difference values}
+            helpkey *
          }
 
       }

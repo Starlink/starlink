@@ -25,11 +25,8 @@
 *     subsequent application, since all applications will automatically
 *     uncompress the data.
 
-*     Currently the only compression method available is to scale the
-*     data values using a linear transformation so that they fit into a
-*     smaller data type.  A description of the scaling uses is stored
-*     with the output NDF so that later application can reconstruct the
-*     original unscaled values.
+*     Two compression methods arae available - SCALE or DELTA (see
+*     parameter METHOD).
 
 *  Usage:
 *     ndfcompress in out method
@@ -51,8 +48,16 @@
 *     IN = NDF (Read)
 *        The input NDF.
 *     METHOD = LITERAL (Read)
-*        The compression method to use.  Currently the only supported
-*        value is "SCALE".
+*        The compression method to use:
+*
+*        - "SCALED" -- A lossy compression scheme for all data types. See
+*        "Scaled Compression" below, and parameters DSCALE, DZERO, VSCALE,
+*        VZERO and SCALEDTYPE.
+*
+*        - "DELTA" -- A lossless compression scheme for integer data types.
+*        See "Delta Compression" below, and parameters ZAXIS, ZMINRAT and
+*        ZTYPE.
+*
 *     OUT = NDF (Write)
 *        The output NDF.
 *     SCALEDTYPE = LITERAL (Read)
@@ -87,6 +92,69 @@
 *        both that cause the scaled variance values to occupy 96% of
 *        the available range of the data type selected using Parameter
 *        SCALEDTYPE.  [!]
+*     ZAXIS = _INTEGER (Read)
+*        The index of the pixel axis along which differences are to be
+*        taken, when compressing with METHOD set to "DELTA". If this is
+*        zero, a default value will be selected that gives the greatest
+*        compression. [0]
+*     ZMINRAT = _REAL (Read)
+*        The minimum allowed compression ratio for an array (the ratio
+*        of the supplied array size to the compressed array size), when
+*        compressing with METHOD set to "DELTA". If compressing an array
+*        results in a compression ratio smaller than or equal to
+*        ZMINRAT, then the array is left uncompressed in the new NDF.
+*        If the supplied value is zero or negative, then each array will
+*        be compressed regardless of the compression ratio. [1.0]
+*     ZTYPE = LITERAL (Read)
+*        The data type to use for storing differences between adjacent
+*        uncompressed data values, when compressing with METHOD set to
+*        "DELTA".  Must be one of _INTEGER, _WORD, _BYTE or blank. If a null
+*        (!) value or blank value is supplied, the data type that gives
+*        the best compression is determined and used. [!]
+
+*  Scaled Compression:
+*     The SCALE compression method scales the supplied data values using a
+*     linear transformation so that they fit into a smaller (integer) data
+*     type. A description of the scaling uses is stored with the output NDF
+*     so that later application can reconstruct the original unscaled values.
+*     This method is not lossless, due to the truncation involved in
+*     converting floatign point values to integers.
+
+*  Delta Compression:
+*     DELTA compression is lossless, but can only be used on integer
+*     values. It assumes that adjacent integer values in the input tend to
+*     be close in value, and so differences between adjacent values can be
+*     represented in fewer bits than the absolute values themselves. The
+*     differences are taken along a nominated pixel axis within the
+*     supplied array (specified by parameter ZAXIS). Any input value that
+*     differs from its earlier neighbour by more than the data range of
+*     the selected data type is stored explicitly using the data type of
+*     the input array.
+*
+*     Further compression is achieved by replacing runs of equal input
+*     values by a single occurrence of the value with a corresponding
+*     repetition count.
+*
+*     It should be noted that the degree of compression achieved is
+*     dependent on the nature of the data, and it is possible for a
+*     compressed array to occupy more space than the uncompressed array.
+*     The mean compression factor actually achieved is displayed (the
+*     ratio of the supplied NDF size to the compressed NDF size).
+*
+*     It is possible to delta compress an NDF that has already been scale
+*     compressed. This provides a means of further compressing floating point
+*     arrays. However, note that the default values supplied for DSCALE, DZERO,
+*     VSCALE and VZERO may not be appropriate as they are chosen to maximise
+*     the spread of the scaled integer values in order to minimise the integer
+*     truncation error, but delta compression works best on arrays of integers
+*     in which the spread of values is small.
+*
+*     If the input NDF is already DELTA compressed, it will be
+*     uncompressed and then recompressed using the supplied parameter values.
+*
+*     More details of delta compression can be found in SUN/11 ("ARY - A
+*     Subroutine Library for Accessing ARRAY Data Structures"), subsection
+*     "Delta Compressed Array Form".
 
 *  Examples:
 *     ndfcompress infile outfile scale scaledtype=_uword
@@ -135,8 +203,10 @@
 *        Change docs to use correct parameter name SCALEDTYPE, rather
 *        than SCALETYPE.
 *     26-OCT-2010 (DSB):
-*        If integer trunction would result in a scale factor of zero being used, 
-*        use unity instead.   
+*        If integer trunction would result in a scale factor of zero being
+*        used, use unity instead.
+*     3-NOV-2010 (DSB):
+*        Include support for delta compressed arrays.
 *     {enter_further_changes_here}
 
 *-
@@ -164,33 +234,45 @@
       INTEGER VAL_DTOI
 
 *  Local Variables:
-      CHARACTER COMP(2)*8        ! NDF array component names
+      CHARACTER COMP(3)*8        ! NDF array component names
+      CHARACTER COMPS*30         ! List of NDF components to compress
+      CHARACTER FORM*(NDF__SZFRM)! Array storage form
       CHARACTER METHOD*5         ! Compression method
       CHARACTER SCLPAR(2)*6      ! Parameters for getting scale values
       CHARACTER STYPE*(DAT__SZTYP)! Numerical type of scaled array
       CHARACTER TYPE*(DAT__SZTYP)! Numerical type of input array
       CHARACTER ZERPAR(2)*6      ! Parameters for getting zero values
+      CHARACTER ZTYPE*(DAT__SZTYP)! Numerical type for storing differences
       DOUBLE PRECISION MAXVAL    ! Max value in array
+      DOUBLE PRECISION MINDIF    ! Min abs difference between neighbours
       DOUBLE PRECISION MINVAL    ! Min value in array
       DOUBLE PRECISION SCALE     ! Scale factor
       DOUBLE PRECISION VMN       ! Min value for scaled data type
       DOUBLE PRECISION VMX       ! Max value for scaled data type
       DOUBLE PRECISION ZERO      ! Zero offset
+      INTEGER DIMS( NDF__MXDIM ) ! Input NDF dimensions
       INTEGER EL                 ! No. of elements in mapped array
       INTEGER I                  ! Loop index
+      INTEGER IAT                ! Number of characters in the string
+      INTEGER ICOMP              ! Component index
       INTEGER INDF1              ! Input NDF identifier
       INTEGER INDF2              ! Template NDF identifier
       INTEGER IP1                ! Pointer to mapped input array
       INTEGER IP2                ! Pointer to mapped output array
       INTEGER MAXPOS             ! Index of elements with max value
       INTEGER MINPOS             ! Index of elements with min value
-      INTEGER NINVAL             ! Number of bad values found
       INTEGER NBAD               ! Number of unaccommodated input pixels
+      INTEGER NDIM               ! Number of input NDF dimensions
+      INTEGER NINVAL             ! Number of bad values found
+      INTEGER PLACE              ! NDF Placeholder for output NDF
+      INTEGER ZAXIS              ! Delta compression axis
       LOGICAL BAD                ! Bad values in input array component?
       LOGICAL BADOUT             ! Bad values in output array component?
       LOGICAL THERE              ! Does object exists?
+      REAL MINRAT                ! Min. acceptable compression ratio
+      REAL ZRATIO                ! Compression ratio
 
-      DATA COMP   / 'DATA',   'VARIANCE' /
+      DATA COMP   / 'DATA',   'VARIANCE', 'QUALITY' /
       DATA SCLPAR / 'DSCALE', 'VSCALE' /
       DATA ZERPAR / 'DZERO',  'VZERO' /
 *.
@@ -205,7 +287,7 @@
       CALL LPG_ASSOC( 'IN', 'READ', INDF1, STATUS )
 
 *  Obtain the compression method.
-      CALL PAR_CHOIC( 'METHOD', METHOD, 'SCALE', .TRUE., METHOD,
+      CALL PAR_CHOIC( 'METHOD', METHOD, 'SCALE,DELTA', .TRUE., METHOD,
      :                STATUS )
 
 *  First deal with SCALE compression.
@@ -288,15 +370,18 @@
      :                             '(programming error).', STATUS )
                   END IF
 
-*  Calculate the default scale and zero values so that the scaled values
-*  cover 96% of the available scaled data range.
+*  Calculate the "wide" default scale and zero values so that the scaled
+*  values cover 96% of the available scaled data range.
                   IF( MAXVAL .NE. MINVAL ) THEN
                      SCALE = ( MAXVAL - MINVAL )/( 0.96*( VMX - VMN ) )
                   ELSE
                      SCALE = 1.0D0
                   END IF
 
-                  ZERO = MAXVAL - SCALE*( VMX*0.98 + VMN*0.02 )
+*  Calculate the ZERO that causes the middle input data value to be mapped
+*  onto the mid point of the avilable output data range.
+                  ZERO = 0.5*( MAXVAL + MINVAL ) -
+     :                   SCALE*0.5*( VMX + VMN )
 
                END IF
 
@@ -378,6 +463,104 @@
 
             END IF
          END DO
+         CALL MSG_BLANK( STATUS )
+
+*  Now deal with DELTA compression.
+      ELSE IF( METHOD .EQ. 'DELTA' ) THEN
+
+*  First form a comma-separated list of the components to be compressed.
+*  Loop round each possible array component. Skip components that do no
+*  exist in the NDF or contain floating point data. For scaled arrays,
+*  the data type used is the internal (scaled) data type.
+         COMPS = ' '
+         IAT = 0
+         DO ICOMP = 1, 3
+            CALL NDF_STATE( INDF1, COMP( ICOMP ), THERE, STATUS )
+            IF( THERE ) THEN
+
+               CALL NDF_FORM( INDF1, COMP( ICOMP ), FORM, STATUS )
+               IF( FORM .EQ. 'SCALED' .AND. ICOMP .NE. 3 ) THEN
+                  CALL NDF_SCTYP( INDF1, COMP( ICOMP ), TYPE, STATUS )
+               ELSE
+                  CALL NDF_TYPE( INDF1, COMP( ICOMP ), TYPE, STATUS )
+               END IF
+
+               IF( TYPE .NE. '_REAL' .AND. TYPE .NE. '_DOUBLE' ) THEN
+                  IF( IAT .GT. 0 ) CALL CHR_APPND( ',', COMPS, IAT )
+                  CALL CHR_APPND( COMP( ICOMP ), COMPS, IAT )
+               END IF
+
+            END IF
+         END DO
+
+*  Report an error if there is nothing to compress.
+         IF( IAT .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL NDF_MSG( 'N', INDF1 )
+            CALL ERR_REP( ' ', 'The NDF ''^N'' contains floating '//
+     :                    'point data and so cannot be DELTA '//
+     :                    'compressed.', STATUS )
+            GO TO 999
+         END IF
+
+*  Get a placeholder for the output NDF.
+         CALL LPG_CREPL( 'OUT', PLACE, STATUS )
+
+*  Get the data type in which to store the differences between adjacent
+*  uncompressed data values. Use a blank default which causes NDF_ZSCAL
+*  to choose the best data type.
+         ZTYPE = ' '
+         CALL PAR_CHOIC( 'ZTYPE', ZTYPE, '_INTEGER,_WORD,_BYTE,',
+     :                   .TRUE., ZTYPE, STATUS )
+
+*  Get the minimum acceptable compression ratio.
+         CALL PAR_GET0R( 'ZMINRATIO', MINRAT, STATUS )
+
+*  Get the compression axis. Use a zero default which causes NDF_ZSCAL
+*  to choose the best compression axis.
+         CALL NDF_DIM( INDF1, NDF__MXDIM, DIMS, NDIM, STATUS )
+         CALL PAR_GDR0I( 'ZAXIS', 0, 0, NDIM, .TRUE., ZAXIS, STATUS )
+
+*  Create a copy of the input NDF in which the array components selected
+*  above are delta compressed.
+         CALL NDF_ZDELT( INDF1, COMPS( : IAT ), MINRAT, ZAXIS, ZTYPE,
+     :                   PLACE, INDF2, ZRATIO, STATUS )
+
+*  Report details of the compression applied to each array component in
+*  the output NDF.
+         CALL MSG_BLANK( STATUS )
+         CALL NDF_MSG( 'N', INDF2 )
+         CALL MSG_OUT( ' ', '   Details of delta compression in ^N:',
+     :                 STATUS )
+         CALL MSG_BLANK( STATUS )
+
+         DO ICOMP = 1, 3
+            CALL NDF_STATE( INDF2, COMP( ICOMP ), THERE, STATUS )
+            IF( THERE ) THEN
+
+               CALL CHR_LCASE( COMP( ICOMP )( 2 : ) )
+               CALL MSG_SETC( 'T', COMP( ICOMP ) )
+               CALL MSG_OUT( ' ', '   ^T:', STATUS )
+
+               CALL NDF_GTDLT( INDF2, COMP( ICOMP ), ZAXIS, ZTYPE,
+     :                         ZRATIO, STATUS )
+               IF( ZAXIS .GT. 0 ) THEN
+                  CALL MSG_SETI( 'T', ZAXIS )
+                  CALL MSG_OUT( ' ', '      Compression axis: ^T',
+     :                          STATUS )
+                  CALL MSG_SETC( 'T', ZTYPE )
+                  CALL MSG_OUT( ' ', '      Compressed data type: ^T',
+     :                          STATUS )
+                  CALL MSG_SETR( 'T', ZRATIO )
+                  CALL MSG_OUT( ' ', '      Compression ratio: ^T',
+     :                          STATUS )
+               ELSE
+                  CALL MSG_OUT( ' ', '      Uncompressed', STATUS )
+               END IF
+
+            END IF
+         END DO
+
          CALL MSG_BLANK( STATUS )
 
 *  Report an error if the compression method is not recognised.

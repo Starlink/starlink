@@ -126,7 +126,7 @@
 *        FDIM).  Celestial axis values will be in units of radians.
 *     FORM = LITERAL (Write)
 *        The storage form of the NDF's data array. This will be "SIMPLE",
-*        "PRIMITIVE" or "SCALED".
+*        "PRIMITIVE", "SCALED" or "DELTA".
 *     FPIXSCALE( ) = LITERAL (Write)
 *        The nominal WCS pixel scale for each axis in the current WCS
 *        Frame. For celestial axes, the value stored will be in
@@ -326,6 +326,8 @@
 *     13-APR-2010 (DSB):
 *        Always call KPG1_DSFRM, even if reporting is switched off, since
 *        it writes out the out value for output parameter FPIXSCALE.
+*     8-NOV-2010 (DSB):
+*        Add support for DELTA storage form.
 *     {enter_further_changes_here}
 
 *-
@@ -371,7 +373,7 @@
       CHARACTER CTYPE( NDF__MXDIM )*( NDF__SZTYP )! Axis centre type
       CHARACTER DATE*( NDF__SZHDT ) ! Date of last history update
       CHARACTER FLABEL( NDF__MXDIM )*80 ! WCS axis label
-      CHARACTER FORM*( NDF__SZFRM ) ! Storage form
+      CHARACTER FORM*( NDF__SZFRM) ! Storage form
       CHARACTER FRMDMN*80        ! Frame domain
       CHARACTER FRMTTL*80        ! Frame title
       CHARACTER FTYPE*( NDF__SZFTP )! Full data type
@@ -812,69 +814,26 @@
 
 *  Data component:
 *  ===============
-*  Obtain the data component attributes.
+
+*  Display the component name and data type.
       CALL NDF_FTYPE( INDF, 'Data', FTYPE, STATUS )
-      CALL NDF_FORM( INDF, 'Data', FORM, STATUS )
-
-*  Output the values to parameters.
-      CALL PAR_PUT0C( 'TYPE', FTYPE, STATUS )
-      CALL PAR_PUT0C( 'FORM', FORM, STATUS )
-
-*  Display the data component attributes.
       IF ( REPORT ) THEN
          CALL MSG_BLANK( STATUS )
          CALL MSG_OUT( 'DATA_HEADER', '   Data Component:', STATUS )
          CALL MSG_SETC( 'FTYPE', FTYPE )
          CALL MSG_OUT( 'DATA_TYPE', '      Type        :  ^FTYPE',
      :                 STATUS )
-         CALL MSG_SETC( 'FORM', FORM )
-         CALL MSG_OUT( 'DATA_FORM', '      Storage form:  ^FORM',
-     :                 STATUS )
       END IF
 
-*  Display extra information about scaled arrays.
-      IF( FORM .EQ. 'SCALED' ) THEN
-         CALL NDF_SCTYP( INDF, 'Data', SCTYP, STATUS )
-         CALL NDF_GTSZD( INDF, 'Data', SCALE, ZERO, STATUS )
+*  Obtain and display storage form information.
+      CALL KPG1_DSSFM( INDF, 'Data', REPORT, FORM, SCALE, ZERO,
+     :                 SCTYP, STATUS )
 
+*  Output the values to parameters.
+      CALL PAR_PUT0C( 'TYPE', FTYPE, STATUS )
+      CALL PAR_PUT0C( 'FORM', FORM, STATUS )
 
-         IF ( REPORT ) THEN
-            CALL MSG_SETC( 'SCTY', SCTYP )
-            CALL MSG_OUT( 'DATA_SCTYP', '         Scaled type :  ^SCTY',
-     :                    STATUS )
-
-            IF( FTYPE .EQ. '_DOUBLE' ) THEN
-               CALL MSG_SETD( 'SCAL', SCALE )
-               CALL MSG_OUT( 'DATA_SCALE', '         Scale factor:  '//
-     :                       '^SCAL', STATUS )
-               CALL MSG_SETD( 'ZERO', ZERO )
-               CALL MSG_OUT( 'DATA_ZERO',  '         Zero offset :  '//
-     :                       '^ZERO', STATUS )
-
-            ELSE IF( FTYPE .EQ. '_REAL' ) THEN
-               CALL MSG_SETR( 'SCAL', REAL( SCALE ) )
-               CALL MSG_OUT( 'DATA_SCALE', '         Scale factor:  '//
-     :                       '^SCAL', STATUS )
-               CALL MSG_SETR( 'ZERO', REAL( ZERO ) )
-               CALL MSG_OUT( 'DATA_ZERO',  '         Zero offset :  '//
-     :                       '^ZERO', STATUS )
-
-            ELSE
-               CALL MSG_SETI( 'SCAL', NINT( SCALE ) )
-               CALL MSG_OUT( 'DATA_SCALE', '         Scale factor:  '//
-     :                       '^SCAL', STATUS )
-               CALL MSG_SETI( 'ZERO', NINT( ZERO ) )
-               CALL MSG_OUT( 'DATA_ZERO',  '         Zero offset :  '//
-     :                       '^ZERO', STATUS )
-            END IF
-         END IF
-
-      ELSE
-         SCTYP = FTYPE
-         SCALE = 1.0
-         ZERO = 0.0
-      END IF
-
+      IF( SCTYP .EQ. ' ' ) SCTYP = FTYPE
       CALL PAR_PUT0C( 'SCTYPE', SCTYP, STATUS )
 
       IF( FTYPE .EQ. '_DOUBLE' ) THEN
@@ -942,10 +901,9 @@
       CALL NDF_STATE( INDF, 'Variance', THERE, STATUS )
       CALL PAR_PUT0L( 'VARIANCE', THERE, STATUS )
       IF ( THERE ) THEN
-         CALL NDF_FTYPE( INDF, 'Variance', FTYPE, STATUS )
-         CALL NDF_FORM( INDF, 'Variance', FORM, STATUS )
 
-*  Display the variance component attributes.
+*  Display the component name and data type.
+         CALL NDF_FTYPE( INDF, 'Variance', FTYPE, STATUS )
          IF ( REPORT ) THEN
             CALL MSG_BLANK( STATUS )
             CALL MSG_OUT( 'VAR_HEADER', '   Variance Component:',
@@ -953,47 +911,11 @@
             CALL MSG_SETC( 'FTYPE', FTYPE )
             CALL MSG_OUT( 'VAR_TYPE', '      Type        :  ^FTYPE',
      :                    STATUS )
-            CALL MSG_SETC( 'FORM', FORM )
-            CALL MSG_OUT( 'VAR_FORM', '      Storage form:  ^FORM',
-     :                    STATUS )
          END IF
 
-*  Display extra information about scaled arrays.
-         IF( FORM .EQ. 'SCALED' ) THEN
-            CALL NDF_SCTYP( INDF, 'Variance', SCTYP, STATUS )
-            CALL NDF_GTSZD( INDF, 'Variance', SCALE, ZERO, STATUS )
-
-            IF ( REPORT ) THEN
-               CALL MSG_SETC( 'SCTY', SCTYP )
-               CALL MSG_OUT( 'VAR_SCTYP',
-     :                       '         Scaled type :  ^SCTY', STATUS )
-
-               IF( FTYPE .EQ. '_DOUBLE' ) THEN
-                  CALL MSG_SETD( 'SCAL', SCALE )
-                  CALL MSG_OUT( 'VAR_SCALE', '         Scale factor:'//
-     :                          '  ^SCAL', STATUS )
-                  CALL MSG_SETD( 'ZERO', ZERO )
-                  CALL MSG_OUT( 'VAR_ZERO',  '         Zero offset :'//
-     :                          '  ^ZERO', STATUS )
-
-               ELSE IF( FTYPE .EQ. '_REAL' ) THEN
-                  CALL MSG_SETR( 'SCAL', REAL( SCALE ) )
-                  CALL MSG_OUT( 'VAR_SCALE', '         Scale factor:'//
-     :                          '  ^SCAL', STATUS )
-                  CALL MSG_SETR( 'ZERO', REAL( ZERO ) )
-                  CALL MSG_OUT( 'VAR_ZERO',  '         Zero offset :'//
-     :                          '  ^ZERO', STATUS )
-
-               ELSE
-                  CALL MSG_SETI( 'SCAL', NINT( SCALE ) )
-                  CALL MSG_OUT( 'VAR_SCALE', '         Scale factor:'//
-     :                          '  ^SCAL', STATUS )
-                  CALL MSG_SETI( 'ZERO', NINT( ZERO ) )
-                  CALL MSG_OUT( 'VAR_ZERO',  '         Zero offset :'//
-     :                          '  ^ZERO', STATUS )
-               END IF
-            END IF
-         END IF
+*  Obtain and display storage form information.
+         CALL KPG1_DSSFM( INDF, 'Variance', REPORT, FORM, SCALE, ZERO,
+     :                    SCTYP, STATUS )
 
 *  Disable automatic quality masking and see if the variance component
 *  may contain bad pixels.  If so, then display an appropriate message.
@@ -1030,17 +952,21 @@
       CALL NDF_STATE( INDF, 'Quality', THERE, STATUS )
       CALL PAR_PUT0L( 'QUALITY', THERE, STATUS )
       IF ( THERE ) THEN
-         CALL NDF_FORM( INDF, 'Quality', FORM, STATUS )
 
-*  Display the quality component attributes.
+*  Display the component name and data type.
+         CALL NDF_FTYPE( INDF, 'Quality', FTYPE, STATUS )
          IF ( REPORT ) THEN
             CALL MSG_BLANK( STATUS )
-            CALL MSG_OUT( 'QUALITY_HEADER', '   Quality Component:',
+            CALL MSG_OUT( 'QUAL_HEADER', '   Quality Component:',
      :                    STATUS )
-            CALL MSG_SETC( 'FORM', FORM )
-            CALL MSG_OUT( 'QUALITY_FORM', '      Storage form :  ^FORM',
+            CALL MSG_SETC( 'FTYPE', FTYPE )
+            CALL MSG_OUT( 'QUAL_TYPE', '      Type        :  ^FTYPE',
      :                    STATUS )
          END IF
+
+*  Obtain and display storage form information.
+         CALL KPG1_DSSFM( INDF, 'Quality', REPORT, FORM, SCALE, ZERO,
+     :                    SCTYP, STATUS )
 
 *  Obtain the bad-bits mask value.
          CALL NDF_BB( INDF, BADBIT, STATUS )

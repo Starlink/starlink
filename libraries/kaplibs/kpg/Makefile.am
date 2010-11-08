@@ -277,6 +277,7 @@ kpg1_avlut.f \
 kpg1_ccpro.f \
 kpg1_crout.f \
 kpg1_dsfrm.f \
+kpg1_dssfm.f \
 kpg1_gaxlb.f \
 kpg1_gchmv.f \
 kpg1_getim.f \
