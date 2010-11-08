@@ -354,6 +354,10 @@
                   CALL ARY_DELTA( IARY, ZAXIS, TYPE, MINRAT, APLACE,
      :                            ZRAT, DCB_VID( IDCB2 ), STATUS )
 
+*  Store the new ARY identifier in the ACB.
+                  CALL ARY_CLONE( DCB_VID( IDCB2 ), ACB_VID( IACB2 ),
+     :                            STATUS )
+
 *  Update the storage form of the variance array.
                   DCB_VFRM( IDCB2 ) = 'DELTA'
 
@@ -383,6 +387,10 @@
      :                            APLACE, STATUS )
                   CALL ARY_DELTA( IARY, ZAXIS, TYPE, MINRAT, APLACE,
      :                            ZRAT, DCB_QID( IDCB2 ), STATUS )
+
+*  Store the new ARY identifier in the ACB.
+                  CALL ARY_CLONE( DCB_QID( IDCB2 ), ACB_QID( IACB2 ),
+     :                            STATUS )
 
 *  Update the storage form of the quality array.
                   DCB_QFRM( IDCB2 ) = 'DELTA'
