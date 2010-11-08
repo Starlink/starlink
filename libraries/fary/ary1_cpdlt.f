@@ -94,187 +94,191 @@
 *  Check inherited global status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
-*  Ensure that form information is available for both DCB entries.
+*  Ensure that form information is available for the input DCB entry.
       CALL ARY1_DFRM( IDCB1, STATUS )
-      CALL ARY1_DFRM( IDCB2, STATUS )
       IF( STATUS .EQ. SAI__OK ) THEN
 
 *  If the first DCB entry is a delta array then we copy the compression
 *  information.
          IF( DCB_FRM( IDCB1 ) .EQ. 'DELTA' ) THEN
 
-*  Check the output array is a DELTA array.
-            IF( DCB_FRM( IDCB2 ) .EQ. 'DELTA' ) THEN
-
 *  First do mandatory components. Report an error if any of these does
 *  not exist in the input. Otherwise, copy them to the output.
 
 *  ZAXIS
 *  -----
-               CALL DAT_THERE( DCB_LOC( IDCB1 ), 'ZAXIS', THERE,
-     :                         STATUS )
-               IF( THERE ) THEN
-                  CALL DAT_FIND( DCB_LOC( IDCB1 ), 'ZAXIS', LOC2,
-     :                           STATUS )
-                  CALL DAT_COPY( LOC2,  DCB_LOC( IDCB2 ), 'ZAXIS',
-     :                           STATUS )
-                  CALL DAT_ANNUL( LOC2, STATUS )
+            CALL DAT_THERE( DCB_LOC( IDCB1 ), 'ZAXIS', THERE,
+     :                      STATUS )
+            IF( THERE ) THEN
+               CALL DAT_FIND( DCB_LOC( IDCB1 ), 'ZAXIS', LOC2,
+     :                        STATUS )
+               CALL DAT_COPY( LOC2,  DCB_LOC( IDCB2 ), 'ZAXIS',
+     :                        STATUS )
+               CALL DAT_ANNUL( LOC2, STATUS )
 
-               ELSE IF( STATUS .EQ. SAI__OK ) THEN
-                  STATUS = ARY__DLTIN
-                  CALL DAT_MSG( 'A', DCB_LOC( IDCB1 )  )
-                  CALL ERR_REP( ' ', 'The DELTA compressed array '//
-     :                          '''^A'' is invalid - the ZAXIS '//
-     :                          'component is missing.', STATUS )
-               END IF
+            ELSE IF( STATUS .EQ. SAI__OK ) THEN
+               STATUS = ARY__DLTIN
+               CALL DAT_MSG( 'A', DCB_LOC( IDCB1 )  )
+               CALL ERR_REP( ' ', 'The DELTA compressed array '//
+     :                       '''^A'' is invalid - the ZAXIS '//
+     :                       'component is missing.', STATUS )
+            END IF
 
 *  ZDIM
 *  ----
-               CALL DAT_THERE( DCB_LOC( IDCB1 ), 'ZDIM', THERE,
-     :                         STATUS )
-               IF( THERE ) THEN
-                  CALL DAT_FIND( DCB_LOC( IDCB1 ), 'ZDIM', LOC2,
-     :                           STATUS )
-                  CALL DAT_COPY( LOC2,  DCB_LOC( IDCB2 ), 'ZDIM',
-     :                           STATUS )
-                  CALL DAT_ANNUL( LOC2, STATUS )
+            CALL DAT_THERE( DCB_LOC( IDCB1 ), 'ZDIM', THERE,
+     :                      STATUS )
+            IF( THERE ) THEN
+               CALL DAT_FIND( DCB_LOC( IDCB1 ), 'ZDIM', LOC2,
+     :                        STATUS )
+               CALL DAT_COPY( LOC2,  DCB_LOC( IDCB2 ), 'ZDIM',
+     :                        STATUS )
+               CALL DAT_ANNUL( LOC2, STATUS )
 
-               ELSE IF( STATUS .EQ. SAI__OK ) THEN
-                  STATUS = ARY__DLTIN
-                  CALL DAT_MSG( 'A', DCB_LOC( IDCB1 ) )
-                  CALL ERR_REP( ' ', 'The DELTA compressed array '//
-     :                          '''^A'' is invalid - the ZDIM '//
-     :                          'component is missing.', STATUS )
-               END IF
+            ELSE IF( STATUS .EQ. SAI__OK ) THEN
+               STATUS = ARY__DLTIN
+               CALL DAT_MSG( 'A', DCB_LOC( IDCB1 ) )
+               CALL ERR_REP( ' ', 'The DELTA compressed array '//
+     :                       '''^A'' is invalid - the ZDIM '//
+     :                       'component is missing.', STATUS )
+            END IF
 
 *  VALUE
 *  -----
-               CALL DAT_THERE( DCB_LOC( IDCB1 ), 'VALUE', THERE,
-     :                         STATUS )
-               IF( THERE ) THEN
-                  CALL DAT_FIND( DCB_LOC( IDCB1 ), 'VALUE', LOC2,
-     :                           STATUS )
-                  CALL DAT_COPY( LOC2,  DCB_LOC( IDCB2 ), 'VALUE',
-     :                           STATUS )
-                  CALL DAT_ANNUL( LOC2, STATUS )
+            CALL DAT_THERE( DCB_LOC( IDCB1 ), 'VALUE', THERE,
+     :                      STATUS )
+            IF( THERE ) THEN
+               CALL DAT_FIND( DCB_LOC( IDCB1 ), 'VALUE', LOC2,
+     :                        STATUS )
+               CALL DAT_COPY( LOC2,  DCB_LOC( IDCB2 ), 'VALUE',
+     :                        STATUS )
+               CALL DAT_ANNUL( LOC2, STATUS )
 
-               ELSE IF( STATUS .EQ. SAI__OK ) THEN
-                  STATUS = ARY__DLTIN
-                  CALL DAT_MSG( 'A', DCB_LOC( IDCB1 ) )
-                  CALL ERR_REP( ' ', 'The DELTA compressed array '//
-     :                          '''^A'' is invalid - the VALUE '//
-     :                          'component is missing.', STATUS )
-               END IF
+            ELSE IF( STATUS .EQ. SAI__OK ) THEN
+               STATUS = ARY__DLTIN
+               CALL DAT_MSG( 'A', DCB_LOC( IDCB1 ) )
+               CALL ERR_REP( ' ', 'The DELTA compressed array '//
+     :                       '''^A'' is invalid - the VALUE '//
+     :                       'component is missing.', STATUS )
+            END IF
 
 *  FIRST_DATA
 *  ----------
-               CALL DAT_THERE( DCB_LOC( IDCB1 ), 'FIRST_DATA', THERE,
-     :                         STATUS )
-               IF( THERE ) THEN
-                  CALL DAT_FIND( DCB_LOC( IDCB1 ), 'FIRST_DATA', LOC2,
-     :                           STATUS )
-                  CALL DAT_COPY( LOC2,  DCB_LOC( IDCB2 ), 'FIRST_DATA',
-     :                           STATUS )
-                  CALL DAT_ANNUL( LOC2, STATUS )
+            CALL DAT_THERE( DCB_LOC( IDCB1 ), 'FIRST_DATA', THERE,
+     :                      STATUS )
+            IF( THERE ) THEN
+               CALL DAT_FIND( DCB_LOC( IDCB1 ), 'FIRST_DATA', LOC2,
+     :                        STATUS )
+               CALL DAT_COPY( LOC2,  DCB_LOC( IDCB2 ), 'FIRST_DATA',
+     :                        STATUS )
+               CALL DAT_ANNUL( LOC2, STATUS )
 
-               ELSE IF( STATUS .EQ. SAI__OK ) THEN
-                  STATUS = ARY__DLTIN
-                  CALL DAT_MSG( 'A', DCB_LOC( IDCB1 ) )
-                  CALL ERR_REP( ' ', 'The DELTA compressed array '//
-     :                          '''^A'' is invalid - the FIRST_DATA '//
-     :                          'component is missing.', STATUS )
-               END IF
+            ELSE IF( STATUS .EQ. SAI__OK ) THEN
+               STATUS = ARY__DLTIN
+               CALL DAT_MSG( 'A', DCB_LOC( IDCB1 ) )
+               CALL ERR_REP( ' ', 'The DELTA compressed array '//
+     :                       '''^A'' is invalid - the FIRST_DATA '//
+     :                       'component is missing.', STATUS )
+            END IF
 
 
 *  FIRST_VALUE
 *  ----------
-               CALL DAT_THERE( DCB_LOC( IDCB1 ), 'FIRST_VALUE', THERE,
-     :                         STATUS )
-               IF( THERE ) THEN
-                  CALL DAT_FIND( DCB_LOC( IDCB1 ), 'FIRST_VALUE', LOC2,
-     :                           STATUS )
-                  CALL DAT_COPY( LOC2,  DCB_LOC( IDCB2 ), 'FIRST_VALUE',
-     :                           STATUS )
-                  CALL DAT_ANNUL( LOC2, STATUS )
+            CALL DAT_THERE( DCB_LOC( IDCB1 ), 'FIRST_VALUE', THERE,
+     :                      STATUS )
+            IF( THERE ) THEN
+               CALL DAT_FIND( DCB_LOC( IDCB1 ), 'FIRST_VALUE', LOC2,
+     :                        STATUS )
+               CALL DAT_COPY( LOC2,  DCB_LOC( IDCB2 ), 'FIRST_VALUE',
+     :                        STATUS )
+               CALL DAT_ANNUL( LOC2, STATUS )
 
-               ELSE IF( STATUS .EQ. SAI__OK ) THEN
-                  STATUS = ARY__DLTIN
-                  CALL DAT_MSG( 'A', DCB_LOC( IDCB1 ) )
-                  CALL ERR_REP( ' ', 'The DELTA compressed array '//
-     :                          '''^A'' is invalid - the FIRST_VALUE '//
-     :                          'component is missing.', STATUS )
-               END IF
+            ELSE IF( STATUS .EQ. SAI__OK ) THEN
+               STATUS = ARY__DLTIN
+               CALL DAT_MSG( 'A', DCB_LOC( IDCB1 ) )
+               CALL ERR_REP( ' ', 'The DELTA compressed array '//
+     :                       '''^A'' is invalid - the FIRST_VALUE '//
+     :                       'component is missing.', STATUS )
+            END IF
+
+*  ZRATIO
+*  ------
+            CALL DAT_THERE( DCB_LOC( IDCB1 ), 'ZRATIO', THERE,
+     :                      STATUS )
+            IF( THERE ) THEN
+               CALL DAT_FIND( DCB_LOC( IDCB1 ), 'ZRATIO', LOC2,
+     :                        STATUS )
+               CALL DAT_COPY( LOC2,  DCB_LOC( IDCB2 ), 'ZRATIO',
+     :                        STATUS )
+               CALL DAT_ANNUL( LOC2, STATUS )
+
+            ELSE IF( STATUS .EQ. SAI__OK ) THEN
+               STATUS = ARY__DLTIN
+               CALL DAT_MSG( 'A', DCB_LOC( IDCB1 ) )
+               CALL ERR_REP( ' ', 'The DELTA compressed array '//
+     :                       '''^A'' is invalid - the ZRATIO '//
+     :                       'component is missing.', STATUS )
+            END IF
 
 *  Now do optional components. Copy these if they exist in the input, but
 *  do not report an error if they do not exist.
 
 *  SCALE
 *  -----
-               CALL DAT_THERE( DCB_LOC( IDCB1 ), 'SCALE', THERE,
-     :                         STATUS )
-               IF( THERE ) THEN
-                  CALL DAT_FIND( DCB_LOC( IDCB1 ), 'SCALE', LOC2,
-     :                           STATUS )
-                  CALL DAT_COPY( LOC2,  DCB_LOC( IDCB2 ), 'SCALE',
-     :                           STATUS )
-                  CALL DAT_ANNUL( LOC2, STATUS )
-               END IF
+            CALL DAT_THERE( DCB_LOC( IDCB1 ), 'SCALE', THERE,
+     :                      STATUS )
+            IF( THERE ) THEN
+               CALL DAT_FIND( DCB_LOC( IDCB1 ), 'SCALE', LOC2,
+     :                        STATUS )
+               CALL DAT_COPY( LOC2,  DCB_LOC( IDCB2 ), 'SCALE',
+     :                        STATUS )
+               CALL DAT_ANNUL( LOC2, STATUS )
+            END IF
 
 
 *  ZERO
 *  ----
-               CALL DAT_THERE( DCB_LOC( IDCB1 ), 'ZERO', THERE,
-     :                         STATUS )
-               IF( THERE ) THEN
-                  CALL DAT_FIND( DCB_LOC( IDCB1 ), 'ZERO', LOC2,
-     :                           STATUS )
-                  CALL DAT_COPY( LOC2,  DCB_LOC( IDCB2 ), 'ZERO',
-     :                           STATUS )
-                  CALL DAT_ANNUL( LOC2, STATUS )
-               END IF
+            CALL DAT_THERE( DCB_LOC( IDCB1 ), 'ZERO', THERE,
+     :                      STATUS )
+            IF( THERE ) THEN
+               CALL DAT_FIND( DCB_LOC( IDCB1 ), 'ZERO', LOC2,
+     :                        STATUS )
+               CALL DAT_COPY( LOC2,  DCB_LOC( IDCB2 ), 'ZERO',
+     :                        STATUS )
+               CALL DAT_ANNUL( LOC2, STATUS )
+            END IF
 
 *  REPEAT
 *  ------
-               CALL DAT_THERE( DCB_LOC( IDCB1 ), 'REPEAT', THERE,
-     :                         STATUS )
-               IF( THERE ) THEN
-                  CALL DAT_FIND( DCB_LOC( IDCB1 ), 'REPEAT', LOC2,
-     :                           STATUS )
-                  CALL DAT_COPY( LOC2,  DCB_LOC( IDCB2 ), 'REPEAT',
-     :                           STATUS )
-                  CALL DAT_ANNUL( LOC2, STATUS )
-               END IF
+            CALL DAT_THERE( DCB_LOC( IDCB1 ), 'REPEAT', THERE,
+     :                      STATUS )
+            IF( THERE ) THEN
+               CALL DAT_FIND( DCB_LOC( IDCB1 ), 'REPEAT', LOC2,
+     :                        STATUS )
+               CALL DAT_COPY( LOC2,  DCB_LOC( IDCB2 ), 'REPEAT',
+     :                        STATUS )
+               CALL DAT_ANNUL( LOC2, STATUS )
+            END IF
 
 *  FIRST_REPEAT
 *  ------------
-               CALL DAT_THERE( DCB_LOC( IDCB1 ), 'FIRST_REPEAT', THERE,
-     :                         STATUS )
-               IF( THERE ) THEN
-                  CALL DAT_FIND( DCB_LOC( IDCB1 ), 'FIRST_REPEAT', LOC2,
-     :                           STATUS )
-                  CALL DAT_COPY( LOC2,  DCB_LOC( IDCB2 ),
-     :                           'FIRST_REPEAT', STATUS )
-                  CALL DAT_ANNUL( LOC2, STATUS )
-               END IF
+            CALL DAT_THERE( DCB_LOC( IDCB1 ), 'FIRST_REPEAT', THERE,
+     :                      STATUS )
+            IF( THERE ) THEN
+               CALL DAT_FIND( DCB_LOC( IDCB1 ), 'FIRST_REPEAT', LOC2,
+     :                        STATUS )
+               CALL DAT_COPY( LOC2,  DCB_LOC( IDCB2 ),
+     :                        'FIRST_REPEAT', STATUS )
+               CALL DAT_ANNUL( LOC2, STATUS )
+            END IF
 
 *  Ensure the storage form is now delta in both the data object and the
 *  DCB.
-               IF( STATUS .EQ.SAI__OK ) THEN
-                  CALL CMP_MODC( DCB_LOC( IDCB2 ), 'VARIANT', 6, 0, 0,
-     :                           STATUS )
-                  CALL CMP_PUT0C( DCB_LOC( IDCB2 ), 'VARIANT', 'DELTA',
-     :                            STATUS )
-                  DCB_FRM( IDCB2 ) = 'DELTA'
-               END IF
-
-*  Report an error if the output array is not a DELTA array.
-            ELSE IF( STATUS .EQ. SAI__OK ) THEN
-               STATUS = ARY__FATIN
-               CALL MSG_SETC( 'BADFORM', DCB_FRM( IDCB1 ) )
-               CALL ERR_REP( 'ARY1_CPDLT_FORM', 'Cannot copy a DELTA '//
-     :                       'array to a ^BADFORM array (internal '//
-     :                       'programming error).', STATUS )
-            END IF
+            CALL CMP_MODC( DCB_LOC( IDCB2 ), 'VARIANT', 6, 0, 0,
+     :                     STATUS )
+            CALL CMP_PUT0C( DCB_LOC( IDCB2 ), 'VARIANT', 'DELTA',
+     :                      STATUS )
+            DCB_FRM( IDCB2 ) = 'DELTA'
 
 *  Report an error if the input array is not a DELTA array.
          ELSE IF( STATUS .EQ. SAI__OK ) THEN

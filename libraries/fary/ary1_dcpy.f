@@ -321,7 +321,8 @@
 *  Simple and scaled arrays.
 *  =========================
             ELSE IF ( DCB_FRM( IDCB1 ) .EQ. 'SIMPLE' .OR.
-     :                DCB_FRM( IDCB1 ) .EQ. 'SCALED' ) THEN
+     :                DCB_FRM( IDCB1 ) .EQ. 'SCALED' .OR.
+     :                DCB_FRM( IDCB1 ) .EQ. 'DELTA' ) THEN
 
 *  Ensure that data type, bounds and bad pixel flag information are
 *  available in the DCB.

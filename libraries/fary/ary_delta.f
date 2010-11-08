@@ -180,6 +180,7 @@
       CHARACTER NAME*(DAT__SZNAM)! Name of component
       CHARACTER TYPES( 3 )*( DAT__SZTYP ) ! Supported compressed data types
       CHARACTER ZTYOLD*( DAT__SZTYP ) ! Old compressed data type
+      CHARACTER ZTYUSE*(DAT__SZTYP)   ! Best compressed data type
       INTEGER IACB1              ! Index to input array entry in the ACB
       INTEGER IACB2              ! Index to output array entry in the ACB
       INTEGER IACBT              ! Index to input copy entry in the ACB
@@ -197,7 +198,6 @@
       INTEGER ZTY                ! Current compressed data type
       INTEGER ZTYHI              ! Highest compressed data type to test
       INTEGER ZTYLO              ! Lowest compressed data type to test
-      INTEGER ZTYUSE             ! Best compressed data type
       LOGICAL ERASE              ! Whether to erase placeholder object
       REAL RATIO                 ! Compression ratio for current combination
       REAL ZRATOLD               ! Old compression ratio
@@ -217,7 +217,7 @@
 *  If the array is not a base array, produce a temporary copy of it.
       IF( ACB_CUT( IACB1 ) ) THEN
          CALL ARY1_TEMP( 'ARRAY', 0, 0, LOCT, STATUS )
-         CALL ARY1_CPY( IACB1, .TRUE., LOCT, IACBT, STATUS )
+         CALL ARY1_CPY( IACB1, .TRUE., LOCT, .TRUE., IACBT, STATUS )
 
 *  If the array is a base array, use it directly.
       ELSE
@@ -326,30 +326,34 @@
 *  Loop round all ZAXIS values
          DO ZAX = ZAXLO, ZAXHI
 
+*  Skip this axis if it spans only a single pixel.
+            IF( ACB_UBND( ZAX, IACBT ) .GT.
+     :          ACB_LBND( ZAX, IACBT ) + 1 ) THEN
+
 *  Loop round all compressed data types.
-            DO ZTY = ZTYLO, ZTYHI
+               DO ZTY = ZTYLO, ZTYHI
 
 *  See how much compression could be expected using this combination of
 *  compression axis and data type.
-               CALL ARY1_S2DLT( DCB_LOC( IDCB1 ), ZAX, TYPES( ZTY ),
-     :                          ARY__NOLOC, RATIO, STATUS )
+                  CALL ARY1_S2DLT( DCB_LOC( IDCB1 ), ZAX, TYPES( ZTY ),
+     :                             ARY__NOLOC, RATIO, STATUS )
 
 *  Record the current compresson axis and type if this combination gives
 *  more compression than any other combination tested so far.
-               IF( RATIO .GT. ZRATIO ) THEN
-                  ZRATIO = RATIO
-                  ZAXUSE = ZAX
-                  ZTYUSE = ZTY
-               END IF
+                  IF( RATIO .GT. ZRATIO ) THEN
+                     ZRATIO = RATIO
+                     ZAXUSE = ZAX
+                     ZTYUSE = TYPES( ZTY )
+                  END IF
 
-            END DO
+               END DO
+            END IF
          END DO
 
 *  Otherwise, just use the supplied compression values.
       ELSE
-         ZRATIO = RATIO
-         ZAXUSE = ZAX
-         ZTYUSE = ZTY
+         ZAXUSE = ZAXIS
+         ZTYUSE = TYPE
       END IF
 
 *  Import the array placeholder, converting it to a PCB index.
@@ -380,10 +384,11 @@
          CALL ARY1_GTDLT( IDCB1, ZAXOLD, ZTYOLD, ZRATOLD, STATUS )
 
 *  If they are the same as the new ones, just copy the supplied array to
-*  create the output array.
-         IF( ZAXOLD .EQ. ZAXIS .AND. ZTYOLD .EQ. TYPE ) THEN
+*  create the output array. We want the copy to be a DELTA compressed
+*  array, so do not expand the compressed array.
+         IF( ZAXOLD .EQ. ZAXUSE .AND. ZTYOLD .EQ. ZTYUSE ) THEN
             CALL ARY1_CPY( IACB1, PCB_TMP( IPCB ), PCB_LOC( IPCB ),
-     :                     IACB2, STATUS )
+     :                     .FALSE., IACB2, STATUS )
 
 *  If they are not the same as the new ones, we need to uncompress the
 *  supplied delta array so that we can re-compress it with the new
@@ -391,13 +396,13 @@
 *  simplest way to uncompress it.
          ELSE
             CALL ARY1_TEMP( 'ARRAY', 0, 0, LOCT, STATUS )
-            CALL ARY1_CPY( IACB1, .TRUE., LOCT, IACBT, STATUS )
+            CALL ARY1_CPY( IACB1, .TRUE., LOCT, .TRUE., IACBT, STATUS )
          END IF
       END IF
 
 *  If we have not yet created the output array, create it now using the
 *  compression parameters found above.
-      IF( IACB2 .EQ. 0 ) THEN
+      IF( IACB2 .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN
 
 *  Create a new simple array structure in place of the placeholder
 *  object, obtaining a DCB entry which refers to it. Creation of the
@@ -419,7 +424,7 @@
          END DO
 
 *  Now do the compression using the best combination.
-         CALL ARY1_S2DLT( DCB_LOC( IDCB1 ), ZAXUSE, TYPES( ZTYUSE ),
+         CALL ARY1_S2DLT( DCB_LOC( IDCB1 ), ZAXUSE, ZTYUSE,
      :                    DCB_LOC( IDCB2 ), ZRATIO, STATUS )
 
 *  If the compression ratio is too small, annul the DCB entry created
@@ -427,7 +432,7 @@
          IF( ZRATIO .LE. MINRAT ) THEN
             CALL ARY1_DANL( .TRUE., IDCB2, STATUS )
             CALL ARY1_CPY( IACBT, PCB_TMP( IPCB ), PCB_LOC( IPCB ),
-     :                     IACB2, STATUS )
+     :                     .TRUE., IACB2, STATUS )
 
 *  If the compression ratio was high enough, and all went well, store the
 *  new storage form in the DCB.

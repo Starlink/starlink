@@ -117,12 +117,7 @@
 *  If the array is not stored in delta form, return the data type of the
 *  array itself.
       IF ( DCB_FRM( IDCB ) .NE. 'DELTA' ) THEN
-
-         IF( DCB_FRM( IDCB ) .EQ. 'SCALED' ) THEN
-            CALL CMP_TYPE( DCB_SCLOC( IDCB ), 'SCALE', ZTYPE, STATUS )
-         ELSE
-            ZTYPE = DCB_TYP( IDCB )
-         END IF
+         ZTYPE = DCB_TYP( IDCB )
 
 *  For delta arrays, get the required components from the data object.
       ELSE

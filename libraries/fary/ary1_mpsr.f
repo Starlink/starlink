@@ -189,6 +189,7 @@
       LOGICAL CHR_SIMLR          ! Case insensitive string comparison
 
 *  Local variables:
+      CHARACTER EXTYP*(DAT__SZTYP)! Data type of externally visible data
       CHARACTER TLOC*(DAT__SZLOC)! Locator for temporary uncompressed values
       INTEGER DIM( ARY__MXDIM )  ! Dimensions of mapping region
       INTEGER DIML( ARY__MXDIM ) ! Lower bounds of slice
@@ -226,12 +227,15 @@
          EL = EL * DIM( I )
 1     CONTINUE
 
+*  Get the effective type of the stored data.
+      CALL ARY1_EXTYP( IDCB, EXTYP, STATUS )
+
 *  If the mapping region (and mapping transfer region) comprises the
 *  whole data object and no data type conversion, uncompression or scaling
 *  is required, then clone a locator to the entire data component and map
 *  it for access directly using HDS.
       IF ( MCB_WHOLE( IMCB ) .AND.
-     :     CHR_SIMLR( TYPE, DCB_TYP( IDCB ) ) .AND.
+     :     CHR_SIMLR( TYPE, EXTYP ) .AND.
      :     DCB_FRM( IDCB ) .NE. 'SCALED' .AND.
      :     DCB_FRM( IDCB ) .NE. 'DELTA' ) THEN
          CALL DAT_CLONE( LOC, MLOC, STATUS )
@@ -245,7 +249,7 @@
 *  required, then a slice of the data can be mapped directly using HDS.
       ELSE IF ( MCB_MRFUL( IMCB ) .AND.
      :          ( NDIMD .LE. ARY__MXHSL ) .AND.
-     :          CHR_SIMLR( TYPE, DCB_TYP( IDCB ) ) .AND.
+     :          CHR_SIMLR( TYPE, EXTYP ) .AND.
      :          DCB_FRM( IDCB ) .NE. 'SCALED' .AND.
      :          DCB_FRM( IDCB ) .NE. 'DELTA' ) THEN
 
@@ -267,7 +271,7 @@
 *  uncompress the required section.
       ELSE IF ( MCB_MRFUL( IMCB ) .AND.
      :          DCB_FRM( IDCB ) .EQ. 'DELTA' .AND.
-     :          CHR_SIMLR( TYPE, DCB_TYP( IDCB ) ) .AND.
+     :          CHR_SIMLR( TYPE, EXTYP ) .AND.
      :          NDIMA .EQ. NDIMD ) THEN
 
 *  Create and map a temporary object.
@@ -307,8 +311,7 @@
             END DO
 
 *  Create and map a temporary HDS array to hold the uncompressed values.
-            CALL ARY1_CMTMP( DCB_TYP( IDCB ), NDIMD, DIM, TLOC, TPNTR,
-     :                       STATUS )
+            CALL ARY1_CMTMP( EXTYP, NDIMD, DIM, TLOC, TPNTR, STATUS )
 
 *  Uncompress the values in the MTR, storing them in the above temporary
 *  HDS array.
@@ -322,7 +325,7 @@
 
 *  Copy the uncompressed values into the returned array, doing type
 *  conversion and padding with bad values as necessary.
-            CALL ARY1_GTN( BAD, DCB_TYP( IDCB ), TLOC,
+            CALL ARY1_GTN( BAD, EXTYP, TLOC,
      :                     MAX( NDIMA, NDIMD ), MCB_LMTR( 1, IMCB ),
      :                     MCB_UMTR( 1, IMCB ), MCB_LMTR( 1, IMCB ),
      :                     MCB_UMTR( 1, IMCB ), TYPE,

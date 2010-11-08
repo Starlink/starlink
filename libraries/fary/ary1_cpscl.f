@@ -94,92 +94,61 @@
 *  Check inherited global status.
       IF( STATUS .NE. SAI__OK ) RETURN
 
-*  Ensure that form information is available for both DCB entries.
+*  Ensure that form information is available in the input DCB entry.
       CALL ARY1_DFRM( IDCB1, STATUS )
-      CALL ARY1_DFRM( IDCB2, STATUS )
       IF( STATUS .EQ. SAI__OK ) THEN
 
 *  If the first DCB entry is a scaled array then we copy the scale
 *  information.
          IF( DCB_FRM( IDCB1 ) .EQ. 'SCALED' ) THEN
 
-*  Handle each form of output array in turn...
-
-*  Primitive arrays.
-*  ================
-            IF( DCB_FRM( IDCB2 ) .EQ. 'PRIMITIVE' ) THEN
-               IF( STATUS .EQ. SAI__OK ) THEN
-                  STATUS = ARY__FATIN
-                  CALL MSG_SETC( 'BADFORM', DCB_FRM( IDCB1 ) )
-                  CALL ERR_REP( 'ARY1_CPSCL_FORM', 'Cannot convert '//
-     :                          'a primitive array to a scaled array '//
-     :                          '(internal programming error).',
-     :                          STATUS )
-               END IF
-
-*  Simple and scaled arrays.
-*  =========================
-            ELSE IF( DCB_FRM( IDCB2 ) .EQ. 'SIMPLE' .OR.
-     :               DCB_FRM( IDCB2 ) .EQ. 'SCALED' ) THEN
-
 *  Report an error if we are trying to store scale information in a
 *  complex valued array.
-               CALL ARY1_DTYP( IDCB1, STATUS )
-               IF( DCB_CPX( IDCB1 ) .AND. STATUS .EQ. SAI__OK ) THEN
-                  STATUS = ARY__USFRM
-                  CALL ERR_REP( 'ARY1_DSTP_SCMX', 'Complex scaled '//
-     :                          'arrays are currently unsupported '//
-     :                          'by the ARY library.', STATUS )
-               END IF
+            CALL ARY1_DTYP( IDCB1, STATUS )
+            IF( DCB_CPX( IDCB1 ) .AND. STATUS .EQ. SAI__OK ) THEN
+               STATUS = ARY__USFRM
+               CALL ERR_REP( 'ARY1_DSTP_SCMX', 'Complex scaled '//
+     :                       'arrays are currently unsupported '//
+     :                       'by the ARY library.', STATUS )
+            END IF
 
 *  Ensure scaling information is available for IDCB1.
-               CALL ARY1_DSCL( IDCB1, STATUS )
+            CALL ARY1_DSCL( IDCB1, STATUS )
 
 *  Create a new temporary HDS structure to hold a copy of the scale
 *  information, and store the new locator in the output DCB entry.
-               CALL DAT_TEMP( 'SCZR', 0, 0, DCB_SCLOC( IDCB2 ), STATUS )
+            CALL DAT_TEMP( 'SCZR', 0, 0, DCB_SCLOC( IDCB2 ), STATUS )
 
 *  Get a locator to the input SCALE value and copy it to the temporary
 *  HDS structure created above, and to the data object. Then annul the locator.
-               CALL DAT_FIND( DCB_SCLOC( IDCB1 ), 'SCALE', LOC2,
-     :                        STATUS )
-               CALL DAT_COPY( LOC2, DCB_SCLOC( IDCB2 ), 'SCALE',
-     :                        STATUS )
-               CALL DAT_COPY( LOC2, DCB_LOC( IDCB2 ), 'SCALE',
-     :                        STATUS )
-               CALL DAT_ANNUL( LOC2, STATUS )
+            CALL DAT_FIND( DCB_SCLOC( IDCB1 ), 'SCALE', LOC2,
+     :                     STATUS )
+            CALL DAT_COPY( LOC2, DCB_SCLOC( IDCB2 ), 'SCALE',
+     :                     STATUS )
+            CALL DAT_COPY( LOC2, DCB_LOC( IDCB2 ), 'SCALE',
+     :                     STATUS )
+            CALL DAT_ANNUL( LOC2, STATUS )
 
 *  Do the same for the ZERO value.
-               CALL DAT_FIND( DCB_SCLOC( IDCB1 ), 'ZERO', LOC2,
-     :                        STATUS )
-               CALL DAT_COPY( LOC2, DCB_SCLOC( IDCB2 ), 'ZERO',
-     :                        STATUS )
-               CALL DAT_COPY( LOC2, DCB_LOC( IDCB2 ), 'ZERO',
-     :                        STATUS )
-               CALL DAT_ANNUL( LOC2, STATUS )
+            CALL DAT_FIND( DCB_SCLOC( IDCB1 ), 'ZERO', LOC2,
+     :                     STATUS )
+            CALL DAT_COPY( LOC2, DCB_SCLOC( IDCB2 ), 'ZERO',
+     :                     STATUS )
+            CALL DAT_COPY( LOC2, DCB_LOC( IDCB2 ), 'ZERO',
+     :                     STATUS )
+            CALL DAT_ANNUL( LOC2, STATUS )
 
 *  Indicate that scaling information is now available in the output DCB
 *  entry.
-               IF( STATUS .EQ.SAI__OK ) THEN
-                  DCB_KSCL( IDCB2 ) = .TRUE.
+            DCB_KSCL( IDCB2 ) = .TRUE.
 
 *  Ensure the storage form is now scaled in both the data object and the
 *  DCB.
-                  CALL CMP_MODC( DCB_LOC( IDCB2 ), 'VARIANT', 6, 0, 0,
-     :                           STATUS )
-                  CALL CMP_PUT0C( DCB_LOC( IDCB2 ), 'VARIANT', 'SCALED',
-     :                            STATUS )
-                  DCB_FRM( IDCB2 ) = 'SCALED'
-               END IF
-
-*  If the DCB form entry was not recognised, then report an error.
-            ELSE
-               STATUS = ARY__FATIN
-               CALL MSG_SETC( 'BADFORM', DCB_FRM( IDCB1 ) )
-               CALL ERR_REP( 'ARY1_CPSCL_FORM',
-     :         'Invalid array form ''^BADFORM'' found in Data ' //
-     :         'Control Block (internal programming error).', STATUS )
-            END IF
+            CALL CMP_MODC( DCB_LOC( IDCB2 ), 'VARIANT', 6, 0, 0,
+     :                     STATUS )
+            CALL CMP_PUT0C( DCB_LOC( IDCB2 ), 'VARIANT', 'SCALED',
+     :                      STATUS )
+            DCB_FRM( IDCB2 ) = 'SCALED'
 
 *  If the input DCB entry is not for a scaled array, then ensure the
 *  output DCB entry has no scale information.
