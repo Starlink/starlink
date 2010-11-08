@@ -272,17 +272,17 @@
 
 *  Get information about the array.
             IF( ICOMP .EQ. 1 ) THEN
-               IARY = DCB_DID( IDCB1 )
+               IARY = ACB_DID( IACB1 )
                MAPPED = ACB_DMAP( IACB1 )
                NMAP = DCB_NDMAP( IDCB1 )
 
             ELSE IF( ICOMP .EQ. 2 ) THEN
-               IARY = DCB_VID( IDCB1 )
+               IARY = ACB_VID( IACB1 )
                MAPPED = ACB_VMAP( IACB1 )
                NMAP = DCB_NVMAP( IDCB1 )
 
             ELSE
-               IARY = DCB_QID( IDCB1 )
+               IARY = ACB_QID( IACB1 )
                MAPPED = ACB_QMAP( IACB1 )
                NMAP = DCB_NQMAP( IDCB1 )
             END IF
