@@ -148,8 +148,8 @@
          CALL ARY1_IMPID( IARY1, IACB1, STATUS )
 
 *  Make a copy of the array.
-         CALL ARY1_CPY( IACB1, PCB_TMP( IPCB ), PCB_LOC( IPCB ), IACB2,
-     :                  STATUS )
+         CALL ARY1_CPY( IACB1, PCB_TMP( IPCB ), PCB_LOC( IPCB ),
+     :                  .TRUE., IACB2, STATUS )
 
 *  Export an identifier for the new array.
          CALL ARY1_EXPID( IACB2, IARY2, STATUS )

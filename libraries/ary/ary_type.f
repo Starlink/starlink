@@ -126,12 +126,9 @@
          CALL ARY1_DSCL( IDCB, STATUS )
 
 *  Copy the numeric type string to the output argument.
-         IF( DCB_FRM( IDCB ) .EQ. 'SCALED' ) THEN
-            CALL CMP_TYPE( DCB_SCLOC( IDCB ), 'SCALE', TY, STATUS )
-            CALL ARY1_CCPY( TY, TYPE, STATUS )
-         ELSE
-            CALL ARY1_CCPY( DCB_TYP( IDCB ), TYPE, STATUS )
-         END IF
+         CALL ARY1_EXTYP( IDCB, TY, STATUS )
+         CALL ARY1_CCPY( TY, TYPE, STATUS )
+
       END IF
 
 *  If an error occurred, then report context information and call the

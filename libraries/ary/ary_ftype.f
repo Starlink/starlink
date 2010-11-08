@@ -135,11 +135,7 @@
 
 *  For scaled arrays, return the data type of the scale and zero terms.
 *  For other storage forms, return the data type of the DCB entry.
-         IF( DCB_FRM( IDCB ) .EQ. 'SCALED' ) THEN
-            CALL CMP_TYPE( DCB_SCLOC( IDCB ), 'SCALE', TY, STATUS )
-         ELSE
-            TY = DCB_TYP( IDCB )
-         END IF
+         CALL ARY1_EXTYP( IDCB, TY, STATUS )
 
 *  Construct the full data type string and copy it to the output
 *  argument.

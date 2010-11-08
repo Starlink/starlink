@@ -1,4 +1,4 @@
-      SUBROUTINE ARY1_CPY( IACB1, TEMP, LOC, IACB2, STATUS )
+      SUBROUTINE ARY1_CPY( IACB1, TEMP, LOC, EXPAND, IACB2, STATUS )
 *+
 *  Name:
 *     ARY1_CPY
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARY1_CPY( IACB1, TEMP, LOC, IACB2, STATUS )
+*     CALL ARY1_CPY( IACB1, TEMP, LOC, EXPAND, IACB2, STATUS )
 
 *  Description:
 *     The routine creates a new base array containing a copy of an
@@ -29,6 +29,11 @@
 *     LOC = CHARACTER * ( * ) (Given)
 *        Locator to array placeholder object (a scalar data structure
 *        of type ARRAY).
+*     EXPAND = LOGICAL (Given)
+*        Determines whether base arrays stored in DELTA or SCALED form
+*        should be expanded. Note, this only controls what happens with
+*        base arrays - if the input ACB entry represents a section of an
+*        array the output array will always contain expanded values.
 *     IACB2 = INTEGER (Returned)
 *        Index to the ACB entry of the copy.
 *     STATUS = INTEGER (Given and Returned)
@@ -166,6 +171,8 @@
 *        Add value for DEFER when calling ARY1_DCRE(P).
 *     1-NOV-2010 (DSB):
 *        Include support for delta compressed arrays.
+*     4-NOV-2010 (DSB):
+*        Added EXPAND argument.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -211,6 +218,7 @@
       INTEGER IACB1
       LOGICAL TEMP
       CHARACTER * ( * ) LOC
+      LOGICAL EXPAND
 
 *  Arguments Returned:
       INTEGER IACB2
@@ -253,8 +261,9 @@
 *  delta arrays since these need to be converted to simple form, in the
 *  same way that an array section is copied.
       IF ( .NOT. ACB_CUT( IACB1 ) .AND.
-     :      DCB_FRM( IDCB1 ) .NE. 'SCALED' .AND.
-     :      DCB_FRM( IDCB1 ) .NE. 'DELTA' ) THEN
+     :      ( ( DCB_FRM( IDCB1 ) .NE. 'SCALED' .AND.
+     :          DCB_FRM( IDCB1 ) .NE. 'DELTA' ) .OR.
+     :          (.NOT. EXPAND) ) ) THEN
 
          IF ( DCB_NWRIT( IDCB1 ) .NE. 0 ) THEN
             STATUS = ARY__ISMAP
@@ -410,12 +419,7 @@
                CALL ARY1_DTYP( IDCB1, STATUS )
 
 *  Get the required data type for the new array.
-               IF( DCB_FRM( IDCB1 ) .EQ. 'SCALED' ) THEN
-                  CALL CMP_TYPE( DCB_SCLOC( IDCB1 ), 'SCALE', NEWTYP,
-     :                           STATUS )
-               ELSE
-                  NEWTYP = DCB_TYP( IDCB1 )
-               END IF
+               CALL ARY1_EXTYP( IDCB1, NEWTYP, STATUS )
 
 *  Create a new simple data object (with an entry in the DCB) with the
 *  correct type and bounds to accommodate the copied data.

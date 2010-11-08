@@ -421,6 +421,7 @@ F77_SUBROUTINE(ary1_undlt)( CHARACTER(LOC1), INTEGER(NDIM),
    size_t offset;
    size_t size_intype;
    size_t size_outtype;
+   size_t size_vtype;
    size_t stride_cwhole[ ARY__MXDIM ];
    size_t stride_section[ ARY__MXDIM ];
    size_t zstride;
@@ -446,7 +447,9 @@ F77_SUBROUTINE(ary1_undlt)( CHARACTER(LOC1), INTEGER(NDIM),
    datFind( loc1, "DATA", &loc_data, STATUS );
    datFind( loc1, "VALUE", &loc_value, STATUS );
 
-/* Get the data type of the input (compressed) DATA array. */
+/* Get the data type of the input (compressed) DATA array, and get the
+   number of bytes per DATA value (i.e.the number of bytes used to store the
+   difference between adjacent uncompressed integer values). */
    datType( loc_data, type_data, STATUS );
    size_intype = SIZEOF( type_data );
 
@@ -490,6 +493,13 @@ F77_SUBROUTINE(ary1_undlt)( CHARACTER(LOC1), INTEGER(NDIM),
 
 /* Map the VALUE array since we know we will need it. */
    datMapV( loc_value, type_value, "READ", (void **) &ptr_value, &nel_value, STATUS );
+
+/* Get the size in bytes of a single uncompressed integer value prior to
+   any additional scaling. */
+   size_vtype = SIZEOF( type_value );
+
+/* Get the size in bytes of a single uncompressed value including any additional
+   scaling. */
    size_outtype = SIZEOF( type );
 
 /* If the REPEAT array exists, we will definitely need it. So find it and
@@ -839,7 +849,7 @@ F77_SUBROUTINE(ary1_undlt)( CHARACTER(LOC1), INTEGER(NDIM),
 
 /* Initialise the vector index into the full (i.e. not collapsed) required
    section, at the point where the current row intersects the lower
-   bounds of the section. */
+   bounds of the section. This is an index into the returned output array. */
       iv_section = 0;
 
 /* Evaluate constants to avoid repeated calculation of them in the
@@ -897,7 +907,7 @@ F77_SUBROUTINE(ary1_undlt)( CHARACTER(LOC1), INTEGER(NDIM),
 /* Get a pointer to the first element of the VALUE array that holds data
    for the current row. */
          offset = ptr_firstv[ iv_cwhole ];
-         pvalue = ptr_value + offset*size_outtype;
+         pvalue = ptr_value + offset*size_vtype;
 
 /* Get pointers to the first element of the REPEAT array that holds data for
    the current row. */
