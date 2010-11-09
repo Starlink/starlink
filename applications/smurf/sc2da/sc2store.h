@@ -61,6 +61,12 @@
 #ifndef HEADGEN___src_sc2store_sc2store_h
 #define HEADGEN___src_sc2store_sc2store_h
 
+/* A type that enumerates the available data compression schemes. */
+typedef enum sc2store_cmptype {
+  SC2STORE__NONE,                 /* No compression */
+  SC2STORE__BDK,                  /* Original compression scheme by BDK */
+  SC2STORE__DELTA                 /* NDF "Delta" compression (see SUN/11) */
+} sc2store_cmptype;
 
 /* Following include is for JCMTState definition */
 #include "jcmt/state.h"

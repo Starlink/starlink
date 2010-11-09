@@ -222,7 +222,7 @@ void smf_flat_write( smf_flatmeth flatmeth, const char * flatname,
   jig_path[0][0] = 0.0;
   jig_path[0][1] = 0.0;
 
-  sc2store_setcompflag ( 0, status );
+  sc2store_setcompflag ( SC2STORE__NONE, status );
   sc2store_wrtstream ( flatname, subnum, ncards,
                        fitsrec, colsize, rowsize, nframes,
                        (bolref->dims)[2], 0, smf_flat_methstring( flatmeth, status ),

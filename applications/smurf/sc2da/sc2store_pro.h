@@ -1,7 +1,7 @@
 #ifndef HEADGEN____sc2store_pro_h
-#define HEADGEN____sc2store_pro_h 
- 
- 
+#define HEADGEN____sc2store_pro_h
+
+
 /*+ sc2store_compress - compress frame of integers to unsigned short */
 
 void sc2store_compress
@@ -337,8 +337,11 @@ int *status           /* global status (given and returned) */
 
 void sc2store_setcompflag
 (
-int compflag,         /* value to be set, 1=>compress 0=>don't (given) */
-int *status           /* global status (given and returned) */
+sc2store_cmptype compflag, /* value to be set (Given),
+                              SC2STORE__BDK => original BDK compression scheme
+                              SC2STORE__DELTA => delta compression (see SUN/11)
+                              SC2STORE__NONE => no compression */
+int *status                /* global status (given and returned) */
 );
 
 /*+ sc2store_unmapwts - unmap and close a DREAM weights file */
@@ -478,14 +481,14 @@ int *status                 /* global status (given and returned) */
 
 AstFrameSet *sc2store_timeWcs
 (
- sc2ast_subarray_t subnum, 
- int ntime, 
+ sc2ast_subarray_t subnum,
+ int ntime,
  int use_tlut,
  const SC2STORETelpar* telpar,
- const double times[], 
- int * status 
+ const double times[],
+ int * status
 );
 
- 
- 
+
+
 #endif

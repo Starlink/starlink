@@ -19,6 +19,7 @@
     19Jun2008 : ifdef out kaplibs code not used by DA (timj)
     24Jun2008 : Add tcs_percent_cmp. Some const warnings.
     22Sep2010 : Add sc2_bias and sc2_fputemp (timj)
+    09Nov2010 : Add delta compression option (dsb)
 */
 
 #define _POSIX_C_SOURCE 200112L
@@ -64,7 +65,7 @@ static void sc2store_fillbounds( size_t colsize, size_t rowsize, size_t dim3,
 /* Private globals */
 
 static HDSLoc *sc2store_bscaleloc = NULL;    /* HDS locator to scale factor */
-static int sc2store_compflag = 1;            /* flag enabling data compression */
+static sc2store_cmptype sc2store_compflag = SC2STORE__BDK; /* Type of data compression */
 static int sc2store_dindf = NDF__NOID;       /* NDF identifier for dark SQUID values */
 static int sc2store_htindf = NDF__NOID;      /* NDF identifier for heater track values */
 static HDSLoc *sc2store_dreamwtloc = NULL;   /* HDS locator to DREAM weights */
@@ -2503,15 +2504,19 @@ int *status           /* global status (given and returned) */
 
 void sc2store_setcompflag
 (
-int compflag,         /* value to be set, 1=>compress 0=>don't (given) */
-int *status           /* global status (given and returned) */
+sc2store_cmptype compflag, /* value to be set (Given),
+                              SC2STORE__BDK => original BDK compression scheme
+                              SC2STORE__DELTA => delta compression (see SUN/11)
+                              SC2STORE__NONE => no compression */
+int *status                /* global status (given and returned) */
 )
 /* Description :
-    Store the value of the compression flag which says whether raw data written
-    should be compressed.
+    Store the value of the compression flag which says whether, and how, raw
+    data written should be compressed.
 
    History :
     05Nov2007 : original (bdk)
+    11Nov2010 : "compflag" type changed from int to sc2store_cmptype (dsb)
 */
 {
 
@@ -3054,11 +3059,14 @@ int *status              /* global status (given and returned) */
    size_t npix;                       /* number of incompressible pixels */
    static int pixnum[DREAM__MXBOL];   /* indices of incompressible pixels */
    static int pixval[DREAM__MXBOL];   /* values of incompressible pixels */
-   int place;                  /* NDF placeholder */
+   int place;                  /* Placeholder for final NDF */
    short *sdata;               /* pointer to compressed data array */
    int *stackz;                /* pointer to subtracted frame */
    int tdims[1];               /* temporary dimension store */
+   int tmp_place;              /* Placeholder for temporary NDF */
+   int tmp_indf;               /* Temporary NDF identifier */
    int ubnd[3];                /* upper dimension bounds */
+   float zratio;               /* Compression ratio achieved */
 #ifdef SC2STORE_WRITE_HISTORY
    const char * const history[1] = { "Write raw data." };
 #endif
@@ -3082,10 +3090,10 @@ int *status              /* global status (given and returned) */
 
    sc2store_fillbounds( colsize, rowsize, nframes, lbnd, ubnd, status );
 
-   if ( sc2store_compflag == 1 )
+   if ( sc2store_compflag == SC2STORE__BDK )
    {
 
-/* Create structures to hold compressed data */
+/* Create structures to hold BDK compressed data */
 
       ndfNew ( "_WORD", 3, lbnd, ubnd, &place, &sc2store_indf, status );
       ndfHcre ( sc2store_indf, status );
@@ -3176,9 +3184,39 @@ int *status              /* global status (given and returned) */
    else
    {
 
-/* Create structures to hold data without compression */
+/* Create structures to hold data without compression (delta compression
+   may occur later). If the final NDF will be delta compressed, we start off
+   by creating a temporary NDF and then later copy it, with compression,
+   into the required file. */
 
-      ndfNew ( "_INTEGER", 3, lbnd, ubnd, &place, &sc2store_indf, status );
+      if ( sc2store_compflag == SC2STORE__DELTA ) {
+         ndfTemp( &tmp_place, status );
+      } else {
+         tmp_place = place;
+      }
+
+      ndfNew ( "_INTEGER", 3, lbnd, ubnd, &tmp_place, &sc2store_indf, status );
+
+/* Map the data array and copy in the data values. */
+      ndfMap ( sc2store_indf, "DATA", "_INTEGER", "WRITE", (void *)(&idata),
+        &el, status );
+      if (StatusOkP(status) ) memcpy ( idata, dbuf, el*sizeof(*dbuf) );
+
+/* Unmap the data array. */
+      ndfUnmap( sc2store_indf, "DATA", status );
+
+/* If required, create a copy of the NDF in which the DATA array is
+   stored in delta compressed form. */
+      if ( sc2store_compflag == SC2STORE__DELTA ) {
+         ndfZdelt( sc2store_indf, "DATA", 0.0, 3, "_WORD", &place, &tmp_indf,
+                   &zratio, status );
+
+/* Annul the temporary NDF and use the compressed NDF in its place. */
+         ndfAnnul( &sc2store_indf, status );
+         sc2store_indf = tmp_indf;
+      }
+
+/* Create a history component and a SCUBA2 extension. */
       ndfHcre ( sc2store_indf, status );
       ndfXnew ( sc2store_indf, "SCUBA2", "SCUBA2_FM_PAR", 0, 0,
         &sc2store_scuba2loc, status );
@@ -3186,12 +3224,6 @@ int *status              /* global status (given and returned) */
 /* Labels and units */
       ndfCput( "DAC units", sc2store_indf, "UNITS", status );
       ndfCput( "Signal", sc2store_indf, "LABEL", status );
-
-/* Map the data array */
-
-      ndfMap ( sc2store_indf, "DATA", "_INTEGER", "WRITE", (void *)(&idata),
-        &el, status );
-      if (StatusOkP(status) ) memcpy ( idata, dbuf, el*sizeof(*dbuf) );
    }
 
 /* Write history entry */
@@ -3590,12 +3622,12 @@ int *status                 /* global status (given and returned) */
 
 AstFrameSet *sc2store_timeWcs
 (
- sc2ast_subarray_t subnum, 
- int ntime, 
+ sc2ast_subarray_t subnum,
+ int ntime,
  int use_tlut,
  const SC2STORETelpar* telpar,
- const double times[], 
- int * status 
+ const double times[],
+ int * status
 )
 
 /*

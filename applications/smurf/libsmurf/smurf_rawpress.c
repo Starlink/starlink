@@ -20,16 +20,27 @@
 *        Pointer to global status.
 
 *  Description:
-*     Compress the raw time series data. Currently only a single compression
-*     scheme is used that converts 32-bit integers to 16-bit integers by
-*     calculating a common mode signal at each time slice and a multiplicative
-*     value (BZERO and BSCALE) after removing the first measurement (STACKZERO).
-*
-*     This task is intended to be a test bed of compression algorithms.
+*     Compress the raw time series data. Currently two compression schemes
+*     are available - see parameter "METHOD". This task is intended to be
+*     a test bed of compression algorithms.
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
 *          Input files to be compressed.
+*     METHOD = _CHAR (Read)
+*          The compression scheme to use:
+*
+*          "OLD" - converts 32-bit integers to 16-bit integers
+*          by calculating a common mode signal at each time slice and a
+*          multiplicative value (BZERO and BSCALE) after removing the first
+*          measurement (STACKZERO).
+*
+*          "DELTA" - stores the differences between adjacent bolometer samples
+*          as 16-bit integers. Any values for which the differences are too
+*          big to be stored in 16 bits are stored explicitly in 32 bit
+*          integers (see SUN/11 for full details).
+*
+*          [DELTA]
 *     MSG_FILTER = _CHAR (Read)
 *          Control the verbosity of the application. Values can be
 *          NONE (no messages), QUIET (minimal messages), NORMAL,
@@ -48,11 +59,14 @@
 *     Tim Jenness (JAC, Hawaii)
 *     Andy Gibb (UBC)
 *     COBA: Coskun Oba (UoL)
+*     DSB: David Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     2010-09-23 (TIMJ):
 *        Original version.
+*     2010-10-11 (DSB):
+*        Added delta compression option.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -94,6 +108,7 @@
 #include "prm_par.h"
 #include "sae_par.h"
 #include "msg_par.h"
+#include "par.h"
 
 #include "smurf_par.h"
 #include "libsmf/smf.h"
@@ -106,14 +121,17 @@ static void smf__copy_comp( const HDSLoc * inxloc, HDSLoc * outxloc,
 
 #define FUNC_NAME "smurf_rawpress"
 #define TASK_NAME "RAWPRESS"
+#define LEN_METHOD 6
 
 void smurf_rawpress( int *status ) {
 
   size_t i = 0;             /* Counter, index */
   Grp *igrp = NULL;         /* Input group of files */
+  char method[LEN_METHOD];  /* String for compression method */
   Grp *ogrp = NULL;         /* Output group of files */
   size_t outsize;           /* Total number of NDF names in the output group */
   size_t size;              /* Number of files in input group */
+  sc2store_cmptype cmptype; /* Compression method */
 
   /* Main routine */
   ndfBegin();
@@ -125,6 +143,15 @@ void smurf_rawpress( int *status ) {
   /* Get output file(s) */
   kpg1Wgndf( "OUT", igrp, size, size, "More output files required...",
              &ogrp, &outsize, status );
+
+  /* Get compression method. */
+  parChoic( "METHOD", "DELTA", "OLD, DELTA", 1,  method, LEN_METHOD,
+            status);
+  if( !strcmp( method, "OLD" ) ) {
+     cmptype = SC2STORE__BDK;
+  } else {
+     cmptype = SC2STORE__DELTA;
+  }
 
   for (i=1; i<=size; i++ ) {
     dim_t colsize;
@@ -175,7 +202,7 @@ void smurf_rawpress( int *status ) {
     grpGet( ogrp, i, 1, &pname, SMF_PATH_MAX, status );
 
     /* Use sc2store to write out compressed information to the temp file*/
-    sc2store_setcompflag( 1, status );
+    sc2store_setcompflag( cmptype, status );
     sc2store_wrtstream( filename,       /* Filename */
                         subnum,         /* Sub array number */
                         ncards,         /* Number of fits records */
@@ -200,7 +227,7 @@ void smurf_rawpress( int *status ) {
                         NULL,           /* xmlfile name not the config string */
                         status );
     sc2store_free(status);
-    sc2store_setcompflag( 0, status );
+    sc2store_setcompflag( SC2STORE__NONE, status );
 
     /* We now need to copy over any components that are not
        read by smf_open_file. We now have to deal with NDF identifiers. */

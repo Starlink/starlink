@@ -2728,6 +2728,16 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter method {
+                position 3
+                type LITERAL
+                default DELTA
+                prompt {Compression method}
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                helpkey *
+            }
+
             parameter out {
                 position 2
                 type NDF
