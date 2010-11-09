@@ -425,7 +425,7 @@
 *  in compressed form by ARY1_S2DLT.
          CALL DAT_NCOMP( DCB_LOC( IDCB2 ), NCOMP, STATUS )
          DO ICOMP = 1, NCOMP
-            CALL DAT_INDEX( DCB_LOC( IDCB2 ), ICOMP, LOCC, STATUS )
+            CALL DAT_INDEX( DCB_LOC( IDCB2 ), 1, LOCC, STATUS )
             CALL DAT_NAME( LOCC, NAME, STATUS )
             CALL DAT_ANNUL( LOCC, STATUS )
             CALL DAT_ERASE( DCB_LOC( IDCB2 ), NAME, STATUS )
@@ -438,7 +438,23 @@
 *  If the compression ratio is too small, annul the DCB entry created
 *  above and create a copy of the supplied array instead.
          IF( ZRATIO .LE. MINRAT ) THEN
-            CALL ARY1_DANL( .TRUE., IDCB2, STATUS )
+
+*  The data object locator is needed as a placeholder for the copy, so
+*  take a clone of it now, and then annul the DCB entry, without
+*  disposing of the data object.
+            CALL DAT_CLONE( DCB_LOC( IDCB2 ), PCB_LOC( IPCB ), STATUS )
+            CALL ARY1_DANL( .FALSE., IDCB2, STATUS )
+
+*  Empty the old data object so we can use it as a placeholder for the new
+*  copy.
+            CALL DAT_NCOMP( PCB_LOC( IPCB ), NCOMP, STATUS )
+            DO ICOMP = 1, NCOMP
+               CALL DAT_INDEX( PCB_LOC( IPCB ), 1, LOCC, STATUS )
+               CALL DAT_NAME( LOCC, NAME, STATUS )
+               CALL DAT_ANNUL( LOCC, STATUS )
+               CALL DAT_ERASE( PCB_LOC( IPCB ), NAME, STATUS )
+            END DO
+
             CALL ARY1_CPY( IACBT, PCB_TMP( IPCB ), PCB_LOC( IPCB ),
      :                     .TRUE., IACB2, STATUS )
 
