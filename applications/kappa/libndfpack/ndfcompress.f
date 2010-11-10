@@ -25,8 +25,8 @@
 *     subsequent application, since all applications will automatically
 *     uncompress the data.
 
-*     Two compression methods arae available - SCALE or DELTA (see
-*     parameter METHOD).
+*     Two compression methods are available: SCALE or DELTA (see
+*     Parameter METHOD).
 
 *  Usage:
 *     ndfcompress in out method
@@ -48,16 +48,18 @@
 *     IN = NDF (Read)
 *        The input NDF.
 *     METHOD = LITERAL (Read)
-*        The compression method to use:
+*        The compression method to use.  The options are as follows.
 *
-*        - "SCALED" -- A lossy compression scheme for all data types. See
-*        "Scaled Compression" below, and parameters DSCALE, DZERO, VSCALE,
-*        VZERO and SCALEDTYPE.
+*        - "SCALED" -- A lossy compression scheme for all data types.
+*        See "Scaled Compression" below, and Parameters DSCALE, DZERO,
+*        VSCALE, VZERO, and SCALEDTYPE.
 *
-*        - "DELTA" -- A lossless compression scheme for integer data types.
-*        See "Delta Compression" below, and parameters ZAXIS, ZMINRAT and
-*        ZTYPE.
+*        - "DELTA" -- A lossless compression scheme for integer data
+*        types. See "Delta Compression" below, and Parameters ZAXIS,
+*        ZMINRATIO and ZTYPE.
 *
+*        The current value is the default, which is initially "DELTA".
+*        []
 *     OUT = NDF (Write)
 *        The output NDF.
 *     SCALEDTYPE = LITERAL (Read)
@@ -96,21 +98,21 @@
 *        The index of the pixel axis along which differences are to be
 *        taken, when compressing with METHOD set to "DELTA". If this is
 *        zero, a default value will be selected that gives the greatest
-*        compression. [0]
-*     ZMINRAT = _REAL (Read)
+*        compression.  [0]
+*     ZMINRATIO = _REAL (Read)
 *        The minimum allowed compression ratio for an array (the ratio
 *        of the supplied array size to the compressed array size), when
 *        compressing with METHOD set to "DELTA". If compressing an array
 *        results in a compression ratio smaller than or equal to
-*        ZMINRAT, then the array is left uncompressed in the new NDF.
+*        ZMINRATIO, then the array is left uncompressed in the new NDF.
 *        If the supplied value is zero or negative, then each array will
-*        be compressed regardless of the compression ratio. [1.0]
+*        be compressed regardless of the compression ratio.  [1.0]
 *     ZTYPE = LITERAL (Read)
 *        The data type to use for storing differences between adjacent
 *        uncompressed data values, when compressing with METHOD set to
 *        "DELTA".  Must be one of _INTEGER, _WORD, _BYTE or blank. If a null
 *        (!) value or blank value is supplied, the data type that gives
-*        the best compression is determined and used. [!]
+*        the best compression is determined and used.  [!]
 
 *  Scaled Compression:
 *     The SCALE compression method scales the supplied data values using a
@@ -141,13 +143,14 @@
 *     The mean compression factor actually achieved is displayed (the
 *     ratio of the supplied NDF size to the compressed NDF size).
 *
-*     It is possible to delta compress an NDF that has already been scale
-*     compressed. This provides a means of further compressing floating point
-*     arrays. However, note that the default values supplied for DSCALE, DZERO,
-*     VSCALE and VZERO may not be appropriate as they are chosen to maximise
-*     the spread of the scaled integer values in order to minimise the integer
-*     truncation error, but delta compression works best on arrays of integers
-*     in which the spread of values is small.
+*     It is possible to delta compress an NDF that has already been
+*     scale compressed. This provides a means of further compressing
+*     floating-point arrays. However, note that the default values
+*     supplied for DSCALE, DZERO, VSCALE, and VZERO may not be
+*     appropriate as they are chosen to maximise the spread of the
+*     scaled integer values in order to minimise the integer truncation
+*     error, but delta compression works best on arrays of integers in
+*     which the spread of values is small.
 *
 *     If the input NDF is already DELTA compressed, it will be
 *     uncompressed and then recompressed using the supplied parameter values.

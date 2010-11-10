@@ -63,6 +63,11 @@
 
       -  Output variances can now be created for spline fits.
 
+   o  NDFCOMPRESS
+
+      -  Now supports "delta" compression---a lossless compression
+      scheme suitable for integer arrays.
+
    o  NDFTRACE
 
       -  Writes Parameter FPIXSCALE even if QUIET=TRUE.
