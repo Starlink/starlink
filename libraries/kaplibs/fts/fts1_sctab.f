@@ -166,12 +166,12 @@
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
+      INTEGER NCARD
       CHARACTER*80  HEADER( NCARD )
       CHARACTER * ( * ) PNDSCF
       CHARACTER * ( * ) PNTAB
       CHARACTER * ( * ) MEDIUM
       INTEGER MD
-      INTEGER NCARD
       INTEGER SCARD
       INTEGER NDIM
       INTEGER DIMS( NDIM )
