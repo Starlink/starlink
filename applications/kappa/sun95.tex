@@ -3837,7 +3837,7 @@ Pen~3, which can be set using \htmlref{PALENTRY}{PALENTRY}.
 
 \item A standard X colour name, \emph{e.g.} {\tt "Colour(border)=red"}.
 
-\item A triple of floating point red, green and blue intensity values in
+\item A triple of floating-point red, green and blue intensity values in
 the range zero to one, separated by spaces, \emph{e.g.}
 {\tt Colour(border)=1.0 0.0 0.0}.
 
@@ -5057,7 +5057,7 @@ for efficiency gains.  NATIVE converts the data to the native format of
 the machine on which you issue the command.  If you don't do this, every
 time you access the data in your \NDFref{NDF}, this conversion
 process occurs.  NATIVE also replaces any IEEE
-floating point NaN or Inf values with the appropriate Starlink bad value.
+floating-point NaN or Inf values with the appropriate Starlink bad value.
 The following converts all the HDS files in the current directory.
 
 \latex{\small}
@@ -7184,7 +7184,7 @@ is to use the pixel indices at the corners of the image section to
 define the box corners.  We first need to create a positions list holding
 the pixel co-ordinate bounds of the image section, remembering to reduce
 the lower pixel index bounds by 1.0 in order to convert the integer
-\emph{pixel indices} into floating point \emph{pixel co-ordinates}
+\emph{pixel indices} into floatingpoint \emph{pixel co-ordinates}
 (see \hyperref{here}{Section~}{}{se:pixgrd} for more information about
 pixel co-ordinates and indices):
 
@@ -8448,7 +8448,7 @@ attribute of the sky Frame, we could say:
       }{
          This sets the {\att Format} attribute for Axis 1 in the current
          co-ordinate Frame in the NDF called {\tt my\_data}, so that axis values
-         are formatted as floating point values using a minimum field
+         are formatted as floating-point values using a minimum field
          width of ten characters, and displaying five significant figures.  An
          exponent is used if necessary.
       }
@@ -36077,7 +36077,7 @@ KAPPA: \htmlref{ADD}{ADD},
       machine.  Conversion is performed by modifying the data {\it in situ}.
       No separate output file is produced.
 
-      This application can also be used to replace any IEEE floating point
+      This application can also be used to replace any IEEE floating-point
       NaN or Inf values in an HDS object with the appropriate Starlink
       bad value.  This conversion is performed even if the data values
       within the object are already represented using the appropriate
@@ -52476,7 +52476,7 @@ by applications such as \htmlref{REGRID}{REGRID} which require a mapping.
 
 \subsection{Relational Operators}
       Relational operators return the logical result (0 or 1) of comparing
-      the values of two floating point values for equality or inequality.  The
+      the values of two floating-point values for equality or inequality.  The
       bad value may also be returned if either argument is $<$bad$>$.
 
       The following relational operators are available:
@@ -52533,7 +52533,7 @@ by applications such as \htmlref{REGRID}{REGRID} which require a mapping.
       Bitwise operators are often useful when operating on raw data
       (\emph{e.g.} from instruments), so they are provided for use in MathMap
       expressions.  In this case, however, the values on which they operate
-      are floating point values rather than the more usual pure integers.  In
+      are floating-point values rather than the more usual pure integers.  In
       order to produce results which match the pure integer case, the
       operands are regarded as fixed point binary numbers (\emph{i.e.} with the
       binary equivalent of a decimal point) with negative numbers
@@ -52759,7 +52759,7 @@ by applications such as \htmlref{REGRID}{REGRID} which require a mapping.
 
          \item
          $<$dig$>$: Number of decimal digits of precision available in a
-         floating point (double precision) value.
+         floating-point (double-precision) value.
 
          \item
          $<$e$>$: \htmlref{Base}{Base} of natural logarithms.
@@ -52770,43 +52770,43 @@ by applications such as \htmlref{REGRID}{REGRID} which require a mapping.
 
          \item
          $<$mant\_dig$>$: The number of base $<$radix$>$ digits stored in the
-         mantissa of a floating point (double precision) value.
+         mantissa of a floating-point (double-precision) value.
 
          \item
-         $<$max$>$: Maximum representable floating point (double precision) value.
+         $<$max$>$: Maximum representable floating-point (double-precision) value.
 
          \item
          $<$max\_10\_exp$>$: Maximum integer such that 10 raised to that power
-         can be represented as a floating point (double precision) value.
+         can be represented as a floating-point (double-precision) value.
 
          \item
          $<$max\_exp$>$: Maximum integer such that $<$radix$>$ raised to that
-         power minus 1 can be represented as a floating point (double precision)
+         power minus 1 can be represented as a floating-point (double-precision)
          value.
 
          \item
          $<$min$>$: Smallest positive number which can be represented as a
-         normalised floating point (double precision) value.
+         normalised floating-point (double-precision) value.
 
          \item
          $<$min\_10\_exp$>$: Minimum negative integer such that 10 raised to that
-         power can be represented as a normalised floating point (double
-         precision) value.
+         power can be represented as a normalised floating-point
+         (double-precision) value.
 
          \item
          $<$min\_exp$>$: Minimum negative integer such that $<$radix$>$ raised to
-         that power minus 1 can be represented as a normalised floating point
-         (double precision) value.
+         that power minus 1 can be represented as a normalised floating-point
+         (double-precision) value.
 
          \item
          $<$pi$>$: Ratio of the circumference of a circle to its diameter.
 
          \item
          $<$radix$>$: The radix (number base) used to represent the mantissa of
-         floating point (double precision) values.
+         floating-point (double-precision) values.
 
          \item
-         $<$rounds$>$: The mode used for rounding floating point results after
+         $<$rounds$>$: The mode used for rounding floating-point results after
          addition.  Possible values include: -1 (indeterminate), 0 (toward
          zero), 1 (to nearest), 2 (toward plus infinity) and 3 (toward minus
          infinity).  Other values indicate machine-dependent behaviour.
@@ -54441,7 +54441,7 @@ Styles and Attributes''}{se:style}} relates the use of graphical style parameter
 
       \item [\htmlref{NATIVE}{NATIVE}] \mbox{}
          \begin{itemize}
-            \item Any floating point NaN or Inf values in the supplied
+            \item Any floating-point NaN or Inf values in the supplied
                   HDS object are now converted to the appropriate Starlink
                   bad value.  This occurs even if the object already has
                   the appropriate primitive data representation for the

@@ -75,24 +75,24 @@
 *        the output NDF will therefore match that of the input NDF (or
 *        NDF section).  The shape of the template in either pixel
 *        indices or the current WCS Frame may be used, as selected by
-*        parameter LIKEWCS. [!]
+*        Parameter LIKEWCS. [!]
 *     LIKEWCS = _LOGICAL (Read)
 *        If TRUE, then the WCS bounds of the template supplied via
-*        parameter LIKE are used to decide on the bounds of the output
+*        Parameter LIKE are used to decide on the bounds of the output
 *        NDF.  Otherwise, the pixel bounds of the template are used.
 *        [FALSE]
 *     OUT = NDF (Write)
 *        The output NDF data structure.
 *     TITLE = LITERAL (Read)
 *        A title for the output NDF.  A null value (the default) will
-*        cause the title of the NDF supplied for parameter IN to be
+*        cause the title of the NDF supplied for Parameter IN to be
 *        used instead. [!]
 *     TRIM = _LOGICAL (Read)
 *        If TRUE, then the number of pixel axes in the output NDF will
 *        be reduced if necessary to remove any pixel axes which span
 *        only a single pixel.  For instance if "stokes" is a
 *        three-dimensional data cube with pixel bounds
-*        (1:100,-50:40,1:3), and the parameter IN is given the value
+*        (1:100,-50:40,1:3), and the Parameter IN is given the value
 *        "stokes(,,2)", then the dimensionality of the output depends
 *        on the setting of TRIM: if TRIM=FALSE, the output is
 *        three-dimensional with pixel bounds (1:100,-50:40,2:2), and if
@@ -106,13 +106,13 @@
 *        the output NDF will be the smallest NDF that encloses all good
 *        data values in the input NDF. [FALSE]
 *     TRIMWCS = _LOGICAL (Read)
-*        This parameter is only accessed if parameter TRIM is TRUE.  It
+*        This parameter is only accessed if Parameter TRIM is TRUE.  It
 *        controls the number of axes in the current WCS co-ordinate
 *        Frame of the output NDF.  If TRIMWCS=TRUE, then the current
 *        Frame in the output NDF will have the same number of axes as
 *        there are pixel axes in the output NDF.  If this involves
 *        removing axes, then the axes to retain are specified by
-*        parameter USEAXIS.  If TRIMWCS=FALSE, then all axes are
+*        Parameter USEAXIS.  If TRIMWCS=FALSE, then all axes are
 *        retained in the current WCS Frame of the output NDF.  Using the
 *        example in the description of the TRIM parameter, if the input
 *        NDF "stokes" has a three-dimensional current WCS Frame with
@@ -120,7 +120,7 @@
 *        removed from the current Frame to make it two-dimensional (that
 *        is, to match the number of pixel axes remaining after the
 *        removal of insignificant pixel axes).  The choice of which two
-*        axes to retain is controlled by parameter USEAXIS.  If, on the
+*        axes to retain is controlled by Parameter USEAXIS.  If, on the
 *        other hand, TRIMWCS was set to FALSE, then the output NDF would
 *        still have two pixel axes, but the current WCS Frame would
 *        retain all three axes from the input NDF.  If one or more
@@ -200,7 +200,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -210,8 +210,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
@@ -263,7 +263,7 @@
 *     2009 July 17 (MJC):
 *        Added Parameter COMP.
 *     2009-12-03 (TIMJ):
-*        Allow COMP=ERROR
+*        Allow COMP=ERROR.
 *     {enter_further_changes_here}
 
 *-
