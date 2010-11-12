@@ -106,6 +106,9 @@
 *        - Ensure CURREC is initialised even if an error has occurred.
 *        - Delete any pre-existing HISTORY component before creating a
 *          new one.
+*     12-NOV-2010 (DSB):
+*        Deleting the pre-existing history component using HDS confuses
+*        NDF. So delete it using NDF instead.
 *     {enter_further_changes_here}
 
 *-
@@ -259,19 +262,18 @@
 *  Create HISTORY structure.
 *  =========================
 
+*  If the NDF tuning parameter AUTO_HISTORY is set, the NDF will already
+*  contain a HISTORY structure. So delete any pre-existing HISTORY structure
+*  before creating the new one.
+            CALL NDF_STATE( NDF, 'HISTORY', THERE, STATUS )
+            IF( THERE ) CALL NDF_RESET( NDF, 'HISTORY', STATUS )
+
 *  Obtain a locator for the NDF.
             CALL NDF_LOC( NDF, 'UPDATE', LOC, STATUS )
 
-*  Create the HISTORY structure and obtain a locator to it. If the NDF
-*  tuning parameter AUTO_HISTORY is set, the NDF will already contain
-*  a HISTORY structure. So delete any pre-existing HISTORY structure
-*  before creating the new one.
-            IF ( MAKHIS ) THEN
-               CALL DAT_THERE( LOC, 'HISTORY', THERE, STATUS )
-               IF( THERE ) CALL DAT_ERASE( LOC, 'HISTORY', STATUS )
-               CALL DAT_NEW( LOC, 'HISTORY', 'HISTORY', 0, 0, STATUS )
-            END IF
-
+*  Create the HISTORY structure and obtain a locator to it.
+            IF ( MAKHIS ) CALL DAT_NEW( LOC, 'HISTORY', 'HISTORY', 0, 0,
+     :                                  STATUS )
             CALL DAT_FIND( LOC, 'HISTORY', HLOC, STATUS )
 
 *  Annul the locator to the NDF.
