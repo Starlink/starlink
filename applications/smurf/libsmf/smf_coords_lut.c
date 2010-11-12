@@ -56,7 +56,8 @@
 *        is written to element "(itime_hi - itime_lo + 1)*nbolo - 1".
 *     angle = double * (Returned)
 *        The scan angle for the boresight in GRID coordinates at every time
-*        slice. Can be NULL.
+*        slice. Similar to lut, the first value (at itime_lo) is written to
+*        element 0. Can be NULL.
 *     status = int * (Given and Returned)
 *        Pointer to the inherited status.
 
@@ -351,7 +352,7 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
 
 /* Work out the scan direction based on the GRID offsets between this and
    the previous time slice. Angles are calculated using atan2, with values
-   ranging from -pi to +pi */
+   ranging from -pi to +pi. */
       if( angle ) {
         double theta = AST__BAD;
 
@@ -366,7 +367,7 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
           theta = atan2( dylast, dxlast );
         }
 
-        angle[itime] = theta;
+        angle[itime-itime_lo] = theta;
 
         bsxlast = bsx;
         bsylast = bsy;
@@ -407,6 +408,12 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
             py++;
          }
       }
+   }
+
+/* To obtain a reasonable value for the first entry of angle, we simply
+   duplicate the second value. */
+   if( angle && (itime_hi > itime_lo) ) {
+     angle[0] = angle[1];
    }
 
 /* Free remaining work space. */
