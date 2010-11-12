@@ -149,6 +149,7 @@ typedef struct smfCalcMapcoordData {
   size_t t1;               /* Index of first timeslice of block */
   size_t t2;               /* Index of last timeslice of block */
   int *ubnd_out;
+  double *theta;
   int tstep;
 } smfCalcMapcoordData;
 
@@ -169,6 +170,7 @@ void smfCalcMapcoordPar( void *job_data_ptr, int *status ) {
   dim_t ntslice;           /* number of time slices */
   smfCalcMapcoordData *pdata=NULL; /* Pointer to job data */
   AstMapping *sky2map=NULL;
+  double *theta = NULL;
   struct timeval tv1;      /* Timer */
   struct timeval tv2;      /* Timer */
 
@@ -188,6 +190,7 @@ void smfCalcMapcoordPar( void *job_data_ptr, int *status ) {
   abskyfrm = pdata->abskyfrm;
   data = pdata->data;
   lut = pdata->lut;
+  theta = pdata->theta;
   lbnd_out = pdata->lbnd_out;
   moving = pdata->moving;
   sky2map = pdata->sky2map;
@@ -226,7 +229,7 @@ void smfCalcMapcoordPar( void *job_data_ptr, int *status ) {
      targets. */
   smf_coords_lut( data, pdata->tstep, pdata->t1, pdata->t2,
                   abskyfrm, sky2map, moving, lbnd_out, ubnd_out,
-                  lut + pdata->t1*nbolo, status );
+                  lut + pdata->t1*nbolo, theta + pdata->t1, status );
 
   /* Unlock the supplied AST object pointers so that other threads can use
      them. */
@@ -235,8 +238,9 @@ void smfCalcMapcoordPar( void *job_data_ptr, int *status ) {
   astUnlock( sky2map, 1 );
 
   msgOutiff( SMF__TIMER_MSG, "",
-             "smfCalcMapcoordPar: thread finishing tslices %zu -- %zu (%.3f sec)",
-             status, pdata->t1, pdata->t2, smf_timerupdate(&tv1, &tv2, status) );
+             "smfCalcMapcoordPar: thread finishing tslices %zu -- "
+             "%zu (%.3f sec)", status, pdata->t1, pdata->t2,
+             smf_timerupdate(&tv1, &tv2, status) );
 }
 
 /* ------------------------------------------------------------------------ */
@@ -284,6 +288,7 @@ void smf_calc_mapcoord( smfWorkForce *wf, smfData *data, AstFrameSet *outfset,
   const char *system=NULL;     /* Coordinate system */
   AstCmpMap *testcmpmap=NULL;  /* Combined forward/inverse mapping */
   AstMapping *testsimpmap=NULL;/* Simplified testcmpmap */
+  double *theta = NULL;        /* Scan direction at each time slice */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -462,14 +467,10 @@ void smf_calc_mapcoord( smfWorkForce *wf, smfData *data, AstFrameSet *outfset,
                 status);
       }
     } else {
-      /* malloc the LUT array */
+      /* alloc the LUT and THETA arrays */
       lut = astCalloc( nbolo*ntslice, sizeof(*(data->lut)), 0 );
+      theta = astCalloc( ntslice, sizeof(*(data->theta)), 0 );
     }
-
-    /* Calculate the number of bolometers and allocate space for the
-       x- and y- output map coordinates */
-
-    //outmapcoord = astCalloc( nbolo*2, sizeof(double), 0 );
 
     /* Retrieve the sky2map mapping from the output frameset (actually
        map2sky) */
@@ -522,6 +523,7 @@ void smf_calc_mapcoord( smfWorkForce *wf, smfData *data, AstFrameSet *outfset,
 
         pdata->ijob = -1;
         pdata->lut = lut;
+        pdata->theta = theta;
         pdata->lbnd_out = lbnd_out;
         pdata->moving = moving;
         pdata->ubnd_out = ubnd_out;
@@ -562,6 +564,7 @@ void smf_calc_mapcoord( smfWorkForce *wf, smfData *data, AstFrameSet *outfset,
 
       /* Set the lut pointer in data to the buffer */
       data->lut = lut;
+      data->theta = theta;
 
       /* Write the WCS for the projection to the extension */
       if( doextension ) {

@@ -17,7 +17,8 @@
 *     void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
 *                          dim_t itime_hi, AstSkyFrame *abskyfrm,
 *                          AstMapping *oskymap, int moving, int olbnd[ 2 ],
-*                          int oubnd[ 2 ], int *lut, int *status );
+*                          int oubnd[ 2 ], int *lut, double *angle,
+*                          int *status );
 
 *  Arguments:
 *     data = smfData * (Given)
@@ -53,6 +54,9 @@
 *        output map, of every bolometer sample in the supplied time slice
 *        range. The first value is written to element 0. The last value
 *        is written to element "(itime_hi - itime_lo + 1)*nbolo - 1".
+*     angle = double * (Returned)
+*        The scan angle for the boresight in GRID coordinates at every time
+*        slice. Can be NULL.
 *     status = int * (Given and Returned)
 *        Pointer to the inherited status.
 
@@ -74,6 +78,7 @@
 
 *  Authors:
 *     David S Berry (JAC, Hawaii)
+*     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -81,10 +86,13 @@
 *        Initial version.
 *     10-MAR-2010 (DSB):
 *        Check slice FrameSet is not null before exporting it.
+*     9-NOV-2010 (EC):
+*        Add angle to interface
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2010 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -121,7 +129,7 @@
 void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
                      dim_t itime_hi, AstSkyFrame *abskyfrm,
                      AstMapping *oskymap, int moving, int olbnd[ 2 ],
-                     int oubnd[ 2 ], int *lut, int *status ) {
+                     int oubnd[ 2 ], int *lut, double *angle, int *status ) {
 
 /* Local Variables */
    AstCmpMap *bsmap = NULL;     /* Tracking -> output grid Mapping */
@@ -144,10 +152,14 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
    double *py;           /* Pointer to next output map Y GRID coord */
    double bsx0;          /* Boresight output map GRID X at previous full calc */
    double bsx;           /* Boresight output map GRID X at current time slice */
+   double bsxlast;       /* Boresight output map GRID X at previous time slice*/
    double bsy0;          /* Boresight output map GRID Y at previous full calc */
    double bsy;           /* Boresight output map GRID Y at current time slice */
-   double dx;            /* Offset in GRID X */
-   double dy;            /* Offset in GRID Y */
+   double bsylast;       /* Boresight output map GRID Y at previous time slice*/
+   double dx;            /* Offset in GRID X from previous full calc */
+   double dxlast;        /* Offset in GRID X from previous time slice */
+   double dy;            /* Offset in GRID Y from previous full calc */
+   double dylast;        /* Offset in GRID Y from previous time slice */
    double shift[ 2 ];    /* Shift from PIXEL to GRID in output map */
    double x;             /* Output GRID X at current bolo in current row */
    double xin[ 2 ];      /* Input X values */
@@ -241,6 +253,7 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
 /* Initialise boresight position for the benefit of the tstep == 1 case. */
    bsx = bsy = 0.0;
    bsx0 = bsy0 = AST__BAD;
+   bsxlast = bsylast = AST__BAD;
 
 /* Get the time slice index at which to do the next full calculation. */
    itime0 = itime_lo;
@@ -335,6 +348,29 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
    coords. */
       dx = ( bsx != AST__BAD && bsx0 != AST__BAD ) ? bsx - bsx0 : AST__BAD;
       dy = ( bsy != AST__BAD && bsy0 != AST__BAD ) ? bsy - bsy0 : AST__BAD;
+
+/* Work out the scan direction based on the GRID offsets between this and
+   the previous time slice. Angles are calculated using atan2, with values
+   ranging from -pi to +pi */
+      if( angle ) {
+        double theta = AST__BAD;
+
+        dxlast = ( bsx != AST__BAD && bsxlast != AST__BAD ) ?
+          bsx - bsxlast : AST__BAD;
+
+        dylast = ( bsy != AST__BAD && bsylast != AST__BAD ) ?
+          bsy - bsylast : AST__BAD;
+
+        if( dxlast != AST__BAD && dylast != AST__BAD &&
+            !( !dxlast && !dylast ) ) {
+          theta = atan2( dylast, dxlast );
+        }
+
+        angle[itime] = theta;
+
+        bsxlast = bsx;
+        bsylast = bsy;
+      }
 
 /*   Loop round all bolometers. */
       px = outmapcoord;

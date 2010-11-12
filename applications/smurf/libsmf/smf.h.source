@@ -764,7 +764,7 @@ void smf_convert_bad( smfData *data, int *status );
 void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
                      dim_t itime_hi, AstSkyFrame *abskyfrm,
                      AstMapping *oskymap, int moving, int olbnd[ 2 ],
-                     int oubnd[ 2 ], int *lut, int *status );
+                     int oubnd[ 2 ], int *lut, double *angle, int *status );
 
 void smf_copytime( struct timeval *target, struct timeval *source,
                    int *status);

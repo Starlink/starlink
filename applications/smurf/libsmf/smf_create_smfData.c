@@ -181,6 +181,8 @@ smf_create_smfData( int flags, int * status ) {
   }
 
   data->lut = NULL;
+  data->theta = NULL;
+
   return data;
 
  CLEANUP:

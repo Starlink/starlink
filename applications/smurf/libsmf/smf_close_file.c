@@ -325,12 +325,15 @@ void smf_close_file( smfData ** data, int * status ) {
     dream= astFree( dream );
   }
 
-  /* Free up other pointers in the smfData: poly and lut */
-  if ( (*data)->poly != NULL ) {
+  /* Free up other pointers in the smfData: */
+  if ( (*data)->poly ) {
     (*data)->poly = astFree( (*data)->poly );
   }
-  if ( (*data)->lut != NULL ) {
+  if ( (*data)->lut ) {
     (*data)->lut = astFree( (*data)->lut );
+  }
+  if( (*data)->theta ) {
+    (*data)->theta = astFree( (*data)->theta );
   }
 
   /* Free the data arrays if they are non-null (they should have been

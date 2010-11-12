@@ -180,6 +180,8 @@
 *        Add scanvel to smfHead
 *     2010-10-25 (EC):
 *        Add tlen to smfGroup
+*     2010-11-12 (EC):
+*        Add theta (scan direction each tslice) to smfData
 *     {enter_further_changes_here}
 
  *  Copyright:
@@ -660,6 +662,7 @@ typedef struct smfData {
   double *poly;              /* Polynomial scan fits */
   size_t ncoeff;             /* Number of coefficients in polynomial */
   int * lut;                 /* Pointing lookup table */
+  double * theta;            /* Scan direction each time slice */
   AstKeyMap *history;        /* History entries */
 } smfData;
 
