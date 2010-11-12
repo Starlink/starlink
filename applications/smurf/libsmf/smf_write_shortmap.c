@@ -54,17 +54,15 @@
 *        Pointer to global status.
 
 *  Description:
-
 *     After the map has converged, create "shortmaps", maps of every
 *     shortmap timeslices of data, in an NDF. The root of the name is
-*     supplied by shortrootgrp, and the suffix will be CH##C##R##,
-*     where "CH" is the continuous chunk, "C" refers to the column,
-*     and "R" refers to the row of the bolometer. The AST and RES data
-*     are temporarily combined in this routine before re-gridding into
-*     the output map for each shortmap. Upon completion AST is once
-*     again subtracted from RES. The following FITS keywords are set
-*     to keep track of which portion of the data were used for each
-*     shortmap:
+*     supplied by shortrootgrp, and the suffix will be CH##SH######,
+*     where "CH" is the continuous chunk, and "SH" refers to the
+*     shortmap number. The AST and RES data are temporarily combined
+*     in this routine before re-gridding into the output map for each
+*     shortmap. Upon completion AST is once again subtracted from
+*     RES. The following FITS keywords are set to keep track of which
+*     portion of the data were used for each shortmap:
 *
 *       SEQSTART: the RTS index number of first frame
 *         SEQEND: the RTS index number of last frame
