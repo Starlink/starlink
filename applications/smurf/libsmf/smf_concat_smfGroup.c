@@ -191,6 +191,8 @@
  *        Handle 4D FFT data
  *     2010-11-04 (COBA):
  *        Propagate FTS2 info
+ *     2010-11-15 (EC):
+ *        Concatenate theta
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -821,9 +823,10 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                 data->qual = astCalloc(ndata, sizeof(*(data->qual)), 1);
               }
 
-              /* Allocate space for the pointing LUT if needed */
+              /* Allocate space for the pointing LUT, and theta if needed */
               if( havelut ) {
                 data->lut = astCalloc(ndata, sizeof(*(data->lut)), 1 );
+                data->theta = astCalloc(tlen, sizeof(*(data->theta)), 1 );
               }
 
               /* Copy over the FITS header */
@@ -848,13 +851,18 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
             memcpy( (void *) &(hdr->allState[tchunk]), refhdr->allState,
                     reftlen*sizeof(*hdr->allState) );
 
-            /* Copy LUT */
+            /* Copy LUT and theta */
             if( havelut ) {
               for( l=0; l<nbolo; l++ ) {
                 for( m=0; m<reftlen; m++ ) {
                   data->lut[(tchunk+m)*tstr + l*bstr] =
                     refdata->lut[m*rtstr + l*rbstr];
                 }
+              }
+
+              if( data->theta && refdata->theta ) {
+                memcpy( data->theta + tchunk, refdata->theta,
+                        reftlen*sizeof(*(data->theta)) );
               }
             }
 
@@ -976,6 +984,13 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
               for( k=0; k<nbolo; k++ ) {
                 data->lut[l*tstr + k*bstr] = VAL__BADI;
               }
+            }
+          }
+
+          /* If theta present, set to VAL__BADD */
+          if( data->theta ) {
+            for( l=tstart; l<=tend; l++ ) {
+              data->theta[j] = VAL__BADD;
             }
           }
 
