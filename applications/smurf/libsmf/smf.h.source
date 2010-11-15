@@ -968,6 +968,10 @@ void smf_find_seqcount( const smfHead * hdr, int *seqcount, int *status );
 void smf_find_subarray ( const smfHead * hdr, char subarray[],
                          size_t buflen, sc2ast_subarray_t *subnum, int *status );
 
+void smf_find_thetabins( const smfData *data, int nosign, double **bins,
+                         double **bincen, dim_t *nbin, int **whichbin,
+                         int *status );
+
 void smf_fit_poly( smfWorkForce *wf, smfData *data, const size_t order,
                    int remove, double *poly, int *status);
 

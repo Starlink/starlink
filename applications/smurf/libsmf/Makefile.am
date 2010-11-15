@@ -150,6 +150,7 @@ smf_find_median.c \
 smf_find_science.c \
 smf_find_seqcount.c \
 smf_find_subarray.c \
+smf_find_thetabins.c \
 smf_fit_poly.c \
 smf_fit_poly1d.c \
 smf_fits_crchan.c \
