@@ -43,6 +43,9 @@
     The "gaiadisp" command now accepts the options "-l" and "-h". These
     set the data limits to use when displaying the image.
 
+    The spectral extraction display can now show the coordinate of the 
+    reference line.
+
   Hawaiki release
   ===============
 

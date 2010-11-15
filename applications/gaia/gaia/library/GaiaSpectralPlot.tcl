@@ -231,14 +231,24 @@ itcl::class gaia::GaiaSpectralPlot {
       add_menu_short_help $Options {Positive Y only}  \
          {Only range positive Y coordinates (useful when Log Y axis enabled)}
 
-      #   Display coordinate label.
+      #   Display reference line coordinate.
       $Options add checkbutton \
-         -label {Coordinate label} \
+         -label {Reference coordinate label} \
+         -variable [scope show_ref_label_] \
+         -onvalue 1 \
+         -offvalue 0 \
+         -command [code $this toggle_show_ref_label_]
+      add_menu_short_help $Options {Reference coordinate label}  \
+         {Show the coordinate of the reference line}
+
+      #   Display coordinate label for the extraction position.
+      $Options add checkbutton \
+         -label {Extraction coordinate label} \
          -variable [scope show_label_] \
          -onvalue 1 \
          -offvalue 0 \
          -command [code $this toggle_show_label_]
-      add_menu_short_help $Options {Coordinate label}  \
+      add_menu_short_help $Options {Extraction coordinate label}  \
          {Show the extraction coordinates of the spectrum}
 
       #   Show prefix as part of the coordinate label.
@@ -249,7 +259,7 @@ itcl::class gaia::GaiaSpectralPlot {
          -offvalue 0 \
          -command [code $this toggle_show_label_]
       add_menu_short_help $Options {Full coordinate label}  \
-         {Prefix coordinates of the spectrum with filename}
+         {Prefix extraction coordinates of the spectrum with filename}
 
       #  Reset all saved attributes to their defaults.
       $Options add command -label "Reset" \
@@ -515,10 +525,14 @@ itcl::class gaia::GaiaSpectralPlot {
             unset ref_ranges_
          }
 
-         #  Label.
+         #  Labels.
          if { $label_ != {} } {
             $itk_component(canvas) delete $label_
             set label_ {}
+         }
+         if { $reflabel_ != {} } {
+            $itk_component(canvas) delete $reflabel_
+            set reflabel_ {}
          }
       }
    }
@@ -890,6 +904,9 @@ itcl::class gaia::GaiaSpectralPlot {
             eval $itk_option(-ref_line_changed_cmd) $id $ind $mode
          }
 
+         #  Update coordinate label.
+         update_ref_label_ $id
+
       } elseif { $mode == "delete" } {
          unset ref_lines_($id)
          unset ref_lines_coord_($id)
@@ -916,6 +933,9 @@ itcl::class gaia::GaiaSpectralPlot {
             move_ref_line_ $id
          }
       }
+
+      #  Update coordinate label.
+      update_ref_label_ $id
    }
 
    #  Move reference line to the reference coordinate. Reference coordinate in
@@ -939,6 +959,50 @@ itcl::class gaia::GaiaSpectralPlot {
       }
    }
 
+   #  Remove the coordinate label, if not wanted.
+   protected method toggle_show_ref_label_ {} {
+      if { ! $show_ref_label_ } {
+         if { $ref_label_ != {} } {
+            $itk_component(canvas) delete $ref_label_
+            set ref_label_ {}
+         }
+      }
+      $props_ set_named_property GaiaSpectralPlot \
+         show_ref_label_ $show_ref_label_
+   }
+
+   #  Update the reference coordinate label.
+   protected method update_ref_label_ {id} {
+      if { $show_ref_label_ } {
+         set value $ref_lines_coord_($id)
+         if { $ref_label_ == {} } {
+            $itk_component(draw) set_drawing_mode text \
+               [code $this created_ref_label_ $value]
+            $itk_component(draw) create_object 0 0
+            $itk_component(draw) create_done 0 0
+         } else {
+            $itk_component(canvas) itemconfigure $ref_label_ -text $value
+         }
+      }
+   }
+
+   protected method created_ref_label_ {value id args} {
+      set ref_label_ $id
+      $itk_component(canvas) itemconfigure $ref_label_ -anchor sw -text $value
+      position_ref_label_
+
+      #  Make sure label is deselected after creation (selection is in
+      #  create_done, so use after to call later).
+      after idle "$itk_component(draw) deselect_object $id"
+   }
+
+   #  Position label just below top of plot.
+   protected method position_ref_label_ {} {
+      lassign [$itk_component(canvas) bbox $spectrum_] x0 y0 x1 y1
+      incr x0 4
+      incr y0 8
+      $itk_component(canvas) coords $ref_label_ $x0 $y0
+   }
 
    #===========================================================================
    #  Reference ranges
@@ -1311,9 +1375,11 @@ itcl::class gaia::GaiaSpectralPlot {
       set_refspeccolour "green"
       set_background "black"
       set_ref_line_colour 1 "red"
+      set show_ref_label_ 0
       set show_label_ 0
       set show_full_label_ 0
       toggle_show_label_
+      toggle_show_ref_label_
    }
 
    #  Return the canvas id of the spectral plot.
@@ -1513,6 +1579,12 @@ itcl::class gaia::GaiaSpectralPlot {
 
    #  The font to use when drawing the axes (AST integer).
    protected variable axes_font_ 0
+
+   #  Whether to show the reference label or not.
+   protected variable show_ref_label_ 0
+
+   #  Whether to show reference coordinate label item.
+   protected variable ref_label_ {}
 
    #  All reference line canvas ids, indexed by a user specified number.
    protected variable ref_lines_
