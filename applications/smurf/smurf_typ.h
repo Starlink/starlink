@@ -28,11 +28,13 @@
  *        Initial test version
  *     2005-09-27 (EC):
  *        Fixed format string macro
+ *     2010-11-16 (EC):
+ *        Add SMF__BADDIMT
  *     {enter_further_changes_here}
 
  *  Copyright:
  *     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
- *     University of British Columbia.
+ *     Copyright (C) 2005,2010 University of British Columbia.
  *     All Rights Reserved.
 
  *  Licence:
@@ -60,5 +62,6 @@
 
 #define DIM_T_FMT "lu"
 typedef unsigned long dim_t;
+#define SMF__BADDIMT (((dim_t) 0) - 1)
 
 #endif /* SMURF_TYP_DEFINED */

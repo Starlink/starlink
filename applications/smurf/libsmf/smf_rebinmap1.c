@@ -193,7 +193,7 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
   size_t dtstride;           /* tstride of data */
   size_t i;                  /* Loop counter */
   size_t j;                  /* Loop counter */
-  size_t mapoff=0;           /* Offset to start of map */
+  dim_t mapoff=0;            /* Offset to start of map */
   dim_t mbufsize;            /* Size of full (multi-map) map buffers */
   dim_t nbolo;               /* number of bolos */
   dim_t ntslice;             /* number of time slices */
@@ -303,13 +303,13 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
               if( whichmap[j] != VAL__BADI ) {
                 mapoff = whichmap[j]*msize;
               } else {
-                mapoff = VAL__BADUW;
+                mapoff = SMF__BADDIMT;
               }
             }
 
             /* Check that the LUT, data and variance values are valid */
             if( (lut[di] != VAL__BADI) && !(qual[di]&mask) &&
-                (var[vi] != 0) && (mapoff != VAL__BADUW) ) {
+                (var[vi] != 0) && (mapoff != SMF__BADDIMT) ) {
 
               thisweight = 1/var[vi];
               map[mapoff+lut[di]] += thisweight*dat[di];
@@ -333,14 +333,14 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
               if( whichmap[j] != VAL__BADI ) {
                 mapoff = whichmap[j]*msize;
               } else {
-                mapoff = VAL__BADUW;
+                mapoff = SMF__BADDIMT;
               }
             }
 
             /* Check that the LUT, data and variance values are valid */
             if( (lut[di] != VAL__BADI) && (dat[di] != VAL__BADD) &&
                 (var[vi] != VAL__BADD) && (var[vi] != 0) &&
-                (mapoff != VAL__BADUW) ) {
+                (mapoff != SMF__BADDIMT) ) {
 
               thisweight = 1/var[vi];
               map[mapoff+lut[di]] += thisweight*dat[di];
@@ -369,13 +369,13 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
               if( whichmap[j] != VAL__BADI ) {
                 mapoff = whichmap[j]*msize;
               } else {
-                mapoff = VAL__BADUW;
+                mapoff = SMF__BADDIMT;
               }
             }
 
             /* Check that the LUT, data and variance values are valid */
             if( (lut[di] != VAL__BADI) && !(qual[di]&mask) && (var[vi] != 0) &&
-                (mapoff != VAL__BADUW) ) {
+                (mapoff != SMF__BADDIMT) ) {
 
               thisweight = 1/var[vi];
               map[mapoff+lut[di]] += thisweight*dat[di];
@@ -396,14 +396,14 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
               if( whichmap[j] != VAL__BADI ) {
                 mapoff = whichmap[j]*msize;
               } else {
-                mapoff = VAL__BADUW;
+                mapoff = SMF__BADDIMT;
               }
             }
 
             /* Check that the LUT, data and variance values are valid */
             if( (lut[di] != VAL__BADI) && (dat[di] != VAL__BADD) &&
                 (var[vi] != VAL__BADD) && (var[vi] != 0) &&
-                (mapoff != VAL__BADUW) ) {
+                (mapoff != SMF__BADDIMT) ) {
 
               thisweight = 1/var[vi];
               map[mapoff+lut[di]] += thisweight*dat[di];
@@ -429,13 +429,13 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
             if( whichmap[j] != VAL__BADI ) {
               mapoff = whichmap[j]*msize;
             } else {
-              mapoff = VAL__BADUW;
+              mapoff = SMF__BADDIMT;
             }
           }
 
           /* Check that the LUT, data and variance values are valid */
           if( (lut[di] != VAL__BADI) && !(qual[di]&mask) &&
-              (mapoff != VAL__BADUW) ) {
+              (mapoff != SMF__BADDIMT) ) {
 
             map[mapoff+lut[di]] += dat[di];
             mapweight[mapoff+lut[di]] ++;
@@ -456,13 +456,13 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
             if( whichmap[j] != VAL__BADI ) {
               mapoff = whichmap[j]*msize;
             } else {
-              mapoff = VAL__BADUW;
+              mapoff = SMF__BADDIMT;
             }
           }
 
           /* Check that the LUT and data values are valid */
           if( (lut[di] != VAL__BADI) && (dat[di] != VAL__BADD) &&
-              (mapoff != VAL__BADUW) ) {
+              (mapoff != SMF__BADDIMT) ) {
 
             map[mapoff+lut[di]] += dat[di];
             mapweight[mapoff+lut[di]] ++;
