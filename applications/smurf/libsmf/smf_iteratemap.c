@@ -487,6 +487,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int nm=0;                     /* Signed int version of nmodels */
   dim_t nmodels=0;              /* Number of model components / iteration */
   size_t nsamples_tot = 0;      /* Number of valid samples in all chunks */
+  dim_t nthetabin;              /* Number of scan angle bins */
   size_t ntgood_tot = 0;        /* Number of good time slices in all chunks */
   dim_t ntslice;                /* Number of time slices */
   size_t numdata;               /* Total number of samples in chunk */
@@ -506,6 +507,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int shortmap=0;               /* If set, produce maps every shortmap tslices*/
   double steptime;              /* Length of a sample in seconds */
   const char *tempstr=NULL;     /* Temporary pointer to static char buffer */
+  double *thetabincen=NULL;     /* Bin centres of scan angle */
+  double *thetabins=NULL;       /* Bins of scan angle */
   int *thishits=NULL;           /* Pointer to this hits map */
   double *thismap=NULL;         /* Pointer to this map */
   smf_modeltype thismodel;      /* Type of current model */
@@ -524,6 +527,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   dim_t whichext=0;             /* Model index of EXT if present */
   dim_t whichgai=0;             /* Model index of GAI if present */
   dim_t whichnoi=0;             /* Model index of NOI if present */
+  int *whichthetabin=NULL;      /* Which scan angle bin each time slice */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -1137,6 +1141,10 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                              ensureflat, 0, outfset, moving, lbnd_out,
                              ubnd_out, pad, pad, SMF__NOCREATE_VARIANCE, tstep,
                              &res[0], status );
+
+        /* Assign each time slice to a scan angle bin */
+        smf_find_thetabins( res[0]->sdata[0], 1, &thetabins, &thetabincen,
+                            &nthetabin, &whichthetabin, status );
 
         /*** TIMER ***/
         msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ": ** %f s concatenating data",
@@ -1765,7 +1773,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
               /* Rebin the residual + astronomical signal into a map */
               smf_rebinmap1( res[i]->sdata[idx],
                              dat.noi ? dat.noi[i]->sdata[idx] : NULL,
-                             lut_data, 0, 0, 0, SMF__Q_GOOD,
+                             lut_data, 0, 0, 0, NULL, 0, SMF__Q_GOOD,
                              varmapmethod, rebinflags, thismap, thisweight,
                              thisweightsq, thishits, thisvar, msize, &scalevar,
                              &weightnorm, status );
@@ -2475,6 +2483,11 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     /* Free chisquared array */
     if( chisquared) chisquared = astFree( chisquared );
     if( lastchisquared) lastchisquared = astFree( lastchisquared );
+
+    /* Free scan angle binning arrays */
+    if( thetabincen ) thetabincen = astFree( thetabincen );
+    if( thetabins ) thetabins = astFree( thetabins );
+    if( whichthetabin ) whichthetabin = astFree( whichthetabin );
   }
 
 
