@@ -14,8 +14,8 @@
 
 *  Invocation:
 *     smf_rebinmap1( smfData *data, smfData *variance, int *lut,
-*                    size_t tslice1, size_t tslice2,
-*                    int trange, smf_qual_t mask, int sampvar, int flags,
+*                    size_t tslice1, size_t tslice2, int trange, int *whichmap,
+*                    dim_t nmap, smf_qual_t mask, int sampvar, int flags,
 *                    double *map, double *mapweight, double *mapweightsq,
 *                    int *hitsmap, double *mapvar, dim_t msize,
 *                    double *scalevariance, double *weightnorm, int *status )
@@ -37,6 +37,15 @@
 *        If tslice2 >= tslice1 and trange set, regrid to tslice1 to tslice2
 *     trange = int (Given)
 *        If set, regrid from tslice1 to tslice2
+*     whichmap = int * (Given)
+*        If set, whichmap is a 1d array for each time slice with an integer
+*        index indicating which map the samples at this time slice are
+*        associated with. In this case, map, mapweight, mapweightsq, hitsmap,
+*        and mapvar are all intepreted as containing nmap sequentially allocated
+*        maps of length msize. The starting element for the i'th map indicated
+*        by whichmap therefore occurs at map[i*msize].
+*     nmap = dim_t (Given)
+*        If whichmap is specified, the number of maps being rebinned.
 *     mask = smf_qual_t (Given)
 *        Use with qual to define which bits in quality are relevant to
 *        ignore data in the calculation.
@@ -71,7 +80,10 @@
 *  Description:
 *     This function does a simple regridding of data into a map. If a
 *     variance array is supplied it is used to calculate weights. Optionally
-*     return a hitsmap (number of samples that land in a pixel).
+*     return a hitsmap (number of samples that land in a pixel). Data can
+*     be directed into multiple different maps by specifying "whichmap",
+*     in which case all of the map-sized buffers (map, mapweight, mapweightsq,
+*     hitsmap, and mapvar) are assumed to contain nmap contiguous maps.
 *
 *  Authors:
 *     Edward Chapin (UBC)
@@ -101,6 +113,8 @@
 *        variance formula (#define __SMF_REBINMAP__SAMPLE_STANDARD_DEVIATION)
 *     2010-09-24 (EC):
 *        Add weightnorm to interface
+*     2010-11-15 (EC):
+*        Add whichmap to interface
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -165,8 +179,8 @@
 #define FUNC_NAME "smf_rebinmap1"
 
 void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
-                    size_t tslice1, size_t tslice2,
-                    int trange, smf_qual_t mask, int sampvar,
+                    size_t tslice1, size_t tslice2, int trange,
+                    int *whichmap, dim_t nmap, smf_qual_t mask, int sampvar,
                     int flags, double *map, double *mapweight,
                     double *mapweightsq, int *hitsmap,
                     double *mapvar, dim_t msize, double *scalevariance,
@@ -179,6 +193,8 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
   size_t dtstride;           /* tstride of data */
   size_t i;                  /* Loop counter */
   size_t j;                  /* Loop counter */
+  size_t mapoff=0;           /* Offset to start of map */
+  dim_t mbufsize;            /* Size of full (multi-map) map buffers */
   dim_t nbolo;               /* number of bolos */
   dim_t ntslice;             /* number of time slices */
   smf_qual_t * qual = NULL;  /* Quality pointer */
@@ -215,6 +231,13 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
   qual = smf_select_qualpntr( data, NULL, status );
   smf_get_dims( data, NULL, NULL, &nbolo, &ntslice, NULL, &dbstride,
                 &dtstride, status );
+
+  /* Size of full map buffers */
+  if( whichmap ) {
+    mbufsize = nmap * msize;
+  } else {
+    mbufsize = msize;
+  }
 
   if( variance ) {
     var = variance->pntr[0];
@@ -256,11 +279,11 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
 
   /* If this is the first data to be accumulated zero the arrays */
   if( flags & AST__REBININIT ) {
-    memset( map, 0, msize*sizeof(*map) );
-    memset( mapweight, 0, msize*sizeof(*mapweight) );
-    memset( mapweightsq, 0, msize*sizeof(*mapweightsq) );
-    memset( mapvar, 0, msize*sizeof(*mapvar) );
-    memset( hitsmap, 0, msize*sizeof(*hitsmap) );
+    memset( map, 0, mbufsize*sizeof(*map) );
+    memset( mapweight, 0, mbufsize*sizeof(*mapweight) );
+    memset( mapweightsq, 0, mbufsize*sizeof(*mapweightsq) );
+    memset( mapvar, 0, mbufsize*sizeof(*mapvar) );
+    memset( hitsmap, 0, mbufsize*sizeof(*hitsmap) );
   }
 
   if( var ) {
@@ -269,25 +292,36 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
     if( sampvar ) {
       /* Measure weighted sample variance for varmap */
       if( qual ) {       /* QUALITY checking version */
-	for( i=0; i<nbolo; i++ ) {
+
+        for( i=0; i<nbolo; i++ ) {
           if( !(qual[i*dbstride]&SMF__Q_BADB) ) for( j=t1; j<=t2; j++ ) {
 
             di = i*dbstride + j*dtstride;
             vi = i*vbstride + (j%vntslice)*vtstride;
 
+            if( whichmap ) {
+              if( whichmap[j] != VAL__BADI ) {
+                mapoff = whichmap[j]*msize;
+              } else {
+                mapoff = VAL__BADUW;
+              }
+            }
+
             /* Check that the LUT, data and variance values are valid */
-            if( (lut[di] != VAL__BADI) && !(qual[di]&mask) && (var[vi] != 0) ){
+            if( (lut[di] != VAL__BADI) && !(qual[di]&mask) &&
+                (var[vi] != 0) && (mapoff != VAL__BADUW) ) {
+
               thisweight = 1/var[vi];
-              map[lut[di]] += thisweight*dat[di];
-              mapweight[lut[di]] += thisweight;
-              mapweightsq[lut[di]] += thisweight*thisweight;
-              hitsmap[lut[di]] ++;
+              map[mapoff+lut[di]] += thisweight*dat[di];
+              mapweight[mapoff+lut[di]] += thisweight;
+              mapweightsq[mapoff+lut[di]] += thisweight*thisweight;
+              hitsmap[mapoff+lut[di]] ++;
 
               /* Calculate this sum to estimate E(x^2) */
-              mapvar[lut[di]] += thisweight*dat[di]*dat[di];
+              mapvar[mapoff+lut[di]] += thisweight*dat[di]*dat[di];
             }
           }
-	}
+        }
       } else {           /* VAL__BADD checking version */
 	for( i=0; i<nbolo; i++ ) {
           for( j=t1; j<=t2; j++ ) {
@@ -295,18 +329,27 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
             di = i*dbstride + j*dtstride;
             vi = i*vbstride + (j%vntslice)*vtstride;
 
+            if( whichmap ) {
+              if( whichmap[j] != VAL__BADI ) {
+                mapoff = whichmap[j]*msize;
+              } else {
+                mapoff = VAL__BADUW;
+              }
+            }
+
             /* Check that the LUT, data and variance values are valid */
             if( (lut[di] != VAL__BADI) && (dat[di] != VAL__BADD) &&
-                (var[vi] != VAL__BADD) && (var[vi] != 0) ) {
+                (var[vi] != VAL__BADD) && (var[vi] != 0) &&
+                (mapoff != VAL__BADUW) ) {
 
               thisweight = 1/var[vi];
-              map[lut[di]] += thisweight*dat[di];
-              mapweight[lut[di]] += thisweight;
-              mapweightsq[lut[di]] += thisweight*thisweight;
-              hitsmap[lut[di]] ++;
+              map[mapoff+lut[di]] += thisweight*dat[di];
+              mapweight[mapoff+lut[di]] += thisweight;
+              mapweightsq[mapoff+lut[di]] += thisweight*thisweight;
+              hitsmap[mapoff+lut[di]] ++;
 
               /* Calculate this sum to estimate E(x^2) */
-              mapvar[lut[di]] += thisweight*dat[di]*dat[di];
+              mapvar[mapoff+lut[di]] += thisweight*dat[di]*dat[di];
             }
           }
 	}
@@ -322,13 +365,23 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
             di = i*dbstride + j*dtstride;
             vi = i*vbstride + (j%vntslice)*vtstride;
 
+            if( whichmap ) {
+              if( whichmap[j] != VAL__BADI ) {
+                mapoff = whichmap[j]*msize;
+              } else {
+                mapoff = VAL__BADUW;
+              }
+            }
+
             /* Check that the LUT, data and variance values are valid */
-            if( (lut[di] != VAL__BADI) && !(qual[di]&mask) && (var[vi] != 0) ){
+            if( (lut[di] != VAL__BADI) && !(qual[di]&mask) && (var[vi] != 0) &&
+                (mapoff != VAL__BADUW) ) {
+
               thisweight = 1/var[vi];
-              map[lut[di]] += thisweight*dat[di];
-              mapweight[lut[di]] += thisweight;
-              mapweightsq[lut[di]] += thisweight*thisweight;
-              hitsmap[lut[di]] ++;
+              map[mapoff+lut[di]] += thisweight*dat[di];
+              mapweight[mapoff+lut[di]] += thisweight;
+              mapweightsq[mapoff+lut[di]] += thisweight*thisweight;
+              hitsmap[mapoff+lut[di]] ++;
             }
           }
         }
@@ -339,14 +392,24 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
             di = i*dbstride + j*dtstride;
             vi = i*vbstride + (j%vntslice)*vtstride;
 
+            if( whichmap ) {
+              if( whichmap[j] != VAL__BADI ) {
+                mapoff = whichmap[j]*msize;
+              } else {
+                mapoff = VAL__BADUW;
+              }
+            }
+
             /* Check that the LUT, data and variance values are valid */
             if( (lut[di] != VAL__BADI) && (dat[di] != VAL__BADD) &&
-                (var[vi] != VAL__BADD) && (var[vi] != 0) ) {
+                (var[vi] != VAL__BADD) && (var[vi] != 0) &&
+                (mapoff != VAL__BADUW) ) {
+
               thisweight = 1/var[vi];
-              map[lut[di]] += thisweight*dat[di];
-              mapweight[lut[di]] += thisweight;
-              mapweightsq[lut[di]] += thisweight*thisweight;
-              hitsmap[lut[di]] ++;
+              map[mapoff+lut[di]] += thisweight*dat[di];
+              mapweight[mapoff+lut[di]] += thisweight;
+              mapweightsq[mapoff+lut[di]] += thisweight*thisweight;
+              hitsmap[mapoff+lut[di]] ++;
             }
           }
 	}
@@ -362,15 +425,25 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
 
           di = i*dbstride + j*dtstride;
 
+          if( whichmap ) {
+            if( whichmap[j] != VAL__BADI ) {
+              mapoff = whichmap[j]*msize;
+            } else {
+              mapoff = VAL__BADUW;
+            }
+          }
+
           /* Check that the LUT, data and variance values are valid */
-          if( (lut[di] != VAL__BADI) && !(qual[di]&mask) ) {
-            map[lut[di]] += dat[di];
-            mapweight[lut[di]] ++;
-            mapweightsq[lut[di]] ++;
-            hitsmap[lut[di]] ++;
+          if( (lut[di] != VAL__BADI) && !(qual[di]&mask) &&
+              (mapoff != VAL__BADUW) ) {
+
+            map[mapoff+lut[di]] += dat[di];
+            mapweight[mapoff+lut[di]] ++;
+            mapweightsq[mapoff+lut[di]] ++;
+            hitsmap[mapoff+lut[di]] ++;
 
             /* Calculate this sum to estimate E(x^2) */
-            mapvar[lut[di]] += dat[di]*dat[di];
+            mapvar[mapoff+lut[di]] += dat[di]*dat[di];
           }
         }
       }
@@ -379,13 +452,26 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
         for( j=t1; j<=t2; j++ ) {
           di = i*dbstride + j*dtstride;
 
-          map[lut[di]] += dat[di];
-          mapweight[lut[di]] ++;
-          mapweightsq[lut[di]] ++;
-          hitsmap[lut[di]] ++;
+          if( whichmap ) {
+            if( whichmap[j] != VAL__BADI ) {
+              mapoff = whichmap[j]*msize;
+            } else {
+              mapoff = VAL__BADUW;
+            }
+          }
 
-          /* Calculate this sum to estimate E(x^2) */
-          mapvar[lut[di]] += dat[di]*dat[di];
+          /* Check that the LUT and data values are valid */
+          if( (lut[di] != VAL__BADI) && (dat[di] != VAL__BADD) &&
+              (mapoff != VAL__BADUW) ) {
+
+            map[mapoff+lut[di]] += dat[di];
+            mapweight[mapoff+lut[di]] ++;
+            mapweightsq[mapoff+lut[di]] ++;
+            hitsmap[mapoff+lut[di]] ++;
+
+            /* Calculate this sum to estimate E(x^2) */
+            mapvar[mapoff+lut[di]] += dat[di]*dat[di];
+          }
         }
       }
     }
@@ -400,7 +486,7 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
       double totnorm = 0;
       size_t numnorm = 0;
 
-      for( i=0; i<msize; i++ ) {
+      for( i=0; i<mbufsize; i++ ) {
         if( mapweight[i] ) {
           totnorm += hitsmap[i] / mapweight[i];
           numnorm++;
@@ -420,7 +506,7 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
       scaleweight=0;
       scalevar=0;
 
-      for( i=0; i<msize; i++ ) {
+      for( i=0; i<mbufsize; i++ ) {
         if( !mapweight[i] ) {
           /* If 0 weight set pixels to bad */
           mapweight[i] = VAL__BADD;
@@ -468,7 +554,7 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
     } else {
       /* Re-normalization for error propagation case */
 
-      for( i=0; i<msize; i++ ) {
+      for( i=0; i<mbufsize; i++ ) {
 	if( !mapweight[i] ) {
 	  /* If 0 weight set pixels to bad */
 	  mapweight[i] = VAL__BADD;

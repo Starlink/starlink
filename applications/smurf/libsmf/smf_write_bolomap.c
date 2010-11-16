@@ -228,7 +228,7 @@ void smf_write_bolomap( smfArray *ast, smfArray *res, smfArray *lut,
 
           smf_rebinmap1( res->sdata[idx],
                          dat->noi ? dat->noi[0]->sdata[idx] : NULL,
-                         lut_data, 0, 0, 0,
+                         lut_data, 0, 0, 0, NULL, 0,
                          SMF__Q_GOOD, varmapmethod,
                          AST__REBININIT | AST__REBINEND,
                          mapdata->pntr[0],

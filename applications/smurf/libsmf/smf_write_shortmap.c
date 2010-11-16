@@ -295,7 +295,7 @@ void smf_write_shortmap( int shortmap, smfArray *ast, smfArray *res,
 
       smf_rebinmap1( res->sdata[idx],
                      dat->noi ? dat->noi[0]->sdata[idx] : NULL,
-                     lut_data, shortstart, shortend, 1,
+                     lut_data, shortstart, shortend, 1, NULL, 0,
                      SMF__Q_GOOD, varmapmethod,
                      rebinflag,
                      mapdata->pntr[0],
