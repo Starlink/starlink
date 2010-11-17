@@ -46,6 +46,11 @@
     The spectral extraction display can now show the coordinate of the 
     reference line.
 
+    Some old skycat catalogue server descriptions have been changed so that
+    unused columns, or columns that are no longer fully populated, are
+    removed from the plotting symbols. This will require the skycat.cfg
+    file to be updated.
+
   Hawaiki release
   ===============
 

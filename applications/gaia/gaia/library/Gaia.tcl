@@ -2087,7 +2087,7 @@ itcl::class gaia::Gaia {
    #  The match string should be set to something new in the
    #  default file.
    public proc check_config_file { config_file } {
-      set newmatch "*UCAC3*"
+      set newmatch "*ra is not used in symbol expression*"
 
       #  Search the file for the string match.
       set ok 0
