@@ -975,6 +975,12 @@ itcl::class gaia::GaiaSpectralPlot {
    protected method update_ref_label_ {id} {
       if { $show_ref_label_ } {
          set value $ref_lines_coord_($id)
+
+         #  Format for this axis.
+         set frameset [$itk_component(canvas) itemcget $spectrum_ -frameset]
+         set axis [$itk_component(canvas) itemcget $spectrum_ -axis]
+         set value [gaiautils::astformat $frameset $axis $value]
+
          if { $ref_label_ == {} } {
             $itk_component(draw) set_drawing_mode text \
                [code $this created_ref_label_ $value]
