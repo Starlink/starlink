@@ -2071,6 +2071,7 @@ itcl::class gaia::Gaia {
             file copy -force $config_file ${backupname}
          }
          file copy -force $gaia_library/skycat2.0.cfg $config_file
+         puts "file copy -force $gaia_library/skycat2.0.cfg $config_file"
 
          #  Make a directory entry that accesses the old configs.
          if { $backupname != "" } {
@@ -2087,7 +2088,7 @@ itcl::class gaia::Gaia {
    #  The match string should be set to something new in the
    #  default file.
    public proc check_config_file { config_file } {
-      set newmatch "*ra is not used in symbol expression*"
+      set newmatch {*{} triangle 2*}
 
       #  Search the file for the string match.
       set ok 0
