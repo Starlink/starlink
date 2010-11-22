@@ -37,7 +37,7 @@ Starlink::AST::Begin();
 
 # FITS File
 # ---------
-my $file = File::Spec->catfile( File::Spec->updir(), "data", "m31.fit" );
+my $file = File::Spec->catfile( "data", "m31.fit" );
 
 # Get FITS Header
 # ---------------
@@ -60,8 +60,8 @@ isa_ok( $wcsinfo, "Starlink::AST::FrameSet" );
 # -------------
 my $nx = $header->value("NAXIS1");
 my $ny = $header->value("NAXIS2");
-pgpage();
-pgwnad( 0,1,0,1 );
+PGPLOT::pgpage();
+PGPLOT::pgwnad( 0,1,0,1 );
 
 my ( $x1, $x2, $y1, $y2 ) = (0,1,0,1);
 
@@ -77,7 +77,7 @@ my $ytop    = 0.5 * ( $y1 + $y2 + $ny * $scale );
 # ---------
 my $array = read_file( $file );
 
-pggray( $array, $nx, $ny, 1, $nx, 1, $ny, 10000, 0,
+PGPLOT::pggray( $array, $nx, $ny, 1, $nx, 1, $ny, 10000, 0,
   [ $xleft-0.5*$scale, $scale, 0.0, $ybottom-0.5*$scale, 0.0, $scale ] );
 
 # Change FrameSet
