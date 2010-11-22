@@ -54,6 +54,7 @@ extern "C" {
 #include "arrays.h"
 #include "grf.h"           /* Declare the functions in this module */
 
+static SV * Perl_getPlotAttr ( const char * attr );
 
 /* Have one global hash that contains the SV* reference to the CV */
 
@@ -74,7 +75,7 @@ void Perl_clearGrfObject() {
   CurrentPlot = NULL;
 }
 
-SV * Perl_getPlotAttr ( char * attr ) {
+static SV * Perl_getPlotAttr ( const char * attr ) {
   if (!astOK) return NULL;
 
   if (CurrentPlot == NULL ) {
@@ -382,8 +383,6 @@ int astGText( const char *text, float x, float y, const char *just,
   SV * cb;
   SV * external;
   int retval;
-  int len;
-  int i;
 
   if (!astOK) return 0;
   if (CurrentPlot == NULL ) {
@@ -457,7 +456,7 @@ int astGTxExt( const char *text, float x, float y, const char *just,
   AV * retarr;
   SV ** elem;
   int retval;
-  int len;
+  int len = 0;
   int i;
 
   if (!astOK) return 0;
@@ -734,8 +733,6 @@ int astGCap( int cap, int value ) {
   SV * cb;
   SV * external;
   int retval;
-  int len;
-  int i;
 
   if (!astOK) return 0;
   if (CurrentPlot == NULL ) {
