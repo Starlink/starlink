@@ -477,7 +477,7 @@ fi
 # AUTOASTROM
 
 if test -f ${exec_prefix}/Perl/bin/autoastrom; then
-  autoastrom () { ${STARLINK_DIR}/Perl/bin/perl $AUTOASTROM_DIR/autoastrom; }
+  autoastrom () { ${STARLINK_DIR}/Perl/bin/perl $AUTOASTROM_DIR/autoastrom  ${1+"$@"}; }
 else
   autoastrom () { ${STARLINK_DIR}/etc/notinst autoastrom; }
 fi

@@ -37,7 +37,7 @@ Starlink::AST::Begin();
 
 # FITS File
 # ---------
-my $file = File::Spec->catfile( File::Spec->updir(), "data", "m31.fit" );
+my $file = File::Spec->catfile( "data", "m31.fit" );
 
 # Get FITS Header
 # ---------------
