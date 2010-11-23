@@ -1730,6 +1730,26 @@ package @PACKAGE@ {
                 prompt {Output data files}
                 helpkey *
             }
+
+            parameter tau {
+                position 3
+                type NDF
+                access READ
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                prompt {Atmospheric transmission calibration file}
+                helpkey *
+            }
+
+            parameter debug {
+                type _LOGICAL
+                vpath {DEFAULT }
+                prompt {If debug, does NOT include dry component!}
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                default FALSE
+                helpkey *
+            }
         }
 
         action gsd2acsis {
