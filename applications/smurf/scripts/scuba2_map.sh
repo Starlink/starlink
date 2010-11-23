@@ -67,9 +67,12 @@ cd $1
 # launch the pipeline
 /stardev/Perl/bin/jsawrapdr --inputs=$2 --id=$3 -persist --outdir=$SCRATCHDIR --transdir=$PERSISTDIR --mode=public --drparameters "-verbose -recpar $HOME/$1/$4" --canfar --cleanup all &> $PERSISTDIR/$3/jsawrapdr.log
 
+#/stardev/Perl/bin/jsawrapdr --inputs=$2 --id=$3 -persist --outdir=$SCRATCHDIR --transdir=$PERSISTDIR --mode=public --drparameters "-verbose -recpar $HOME/$1/$4" --canfar --cleanup all
 echo "Job finished at" >> $PERSISTDIR/$3/scuba2_map.log
+
 date >> $PERSISTDIR/$3/scuba2_map.log
 
+cp $SCRATCHDIR/.*log $PERSISTDIR/$3
 
 # copy data products back to login host
 
@@ -77,5 +80,6 @@ ssh canfar.dao.nrc.ca "mkdir /data/1/$LOGNAME/$3"
 
 scp $PERSISTDIR/$3/*.fits canfar.dao.nrc.ca:/data/1/$LOGNAME/$3/
 scp $PERSISTDIR/$3/*_reduced.sdf canfar.dao.nrc.ca:/data/1/$LOGNAME/$3/
-scp $PERSISTDIR/$3/scuba2_map.log canfar.dao.nrc.ca:/data/1/$LOGNAME/$3/
-scp $PERSISTDIR/$3/.oracdr*.log canfar.dao.nrc.ca:/data/1/$LOGNAME/$3/
+scp $PERSISTDIR/$3/*.log canfar.dao.nrc.ca:/data/1/$LOGNAME/$3/
+scp $PERSISTDIR/$3/.*log canfar.dao.nrc.ca:/data/1/$LOGNAME/$3/
+scp $SCRATCHDIR/*fmos.sdf canfar.dao.nrc.ca:/data/1/$LOGNAME/$3/
