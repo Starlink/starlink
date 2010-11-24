@@ -79,6 +79,8 @@
 #         Add FTS2_EQSLICED
 *     2010-11-03 (COBA):
 #         Add smurf_fts2_specre
+*     2010-11-24 (COBA):
+#         Add smurf_fts2_init
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -125,6 +127,7 @@ void smurf_fts2_deglitch( int * );
 void smurf_fts2_eqsliced( int * );
 void smurf_fts2_flatfield( int * );
 void smurf_fts2_freqcorr( int * );
+void smurf_fts2_init( int * );
 void smurf_fts2_phasecorr( int * );
 void smurf_fts2_portimbal( int * );
 void smurf_fts2_removebse( int * );
