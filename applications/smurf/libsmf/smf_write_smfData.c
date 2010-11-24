@@ -418,16 +418,32 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
       int id            = 0;
       int nmap          = 0;
       void *pntr[]      = {NULL, NULL};
+      int* outzpd       = NULL;
       double* outfpm    = NULL;
       double* outsigma  = NULL;
       HDSLoc* loc       = NULL;
 
-      if( (fts->fpm && fts->fpm->pntr[0]) &&
+      if( (fts->zpd && fts->zpd->pntr[0]) ||
+          (fts->fpm && fts->fpm->pntr[0]) ||
           (fts->sigma && fts->sigma->pntr[0])) {
         loc = smf_get_xloc(outdata, "FTS2", "FTS2", "UPDATE", 0, 0, status);
       }
 
       if(*status == SAI__OK && loc != NULL) {
+        /* WRITE ZPD */
+        lbnd[0] = 0;
+        lbnd[1] = 0;
+        ubnd[0] = lbnd[0] + fts->zpd->dims[0] - 1;
+        ubnd[1] = lbnd[1] + fts->zpd->dims[1] - 1;
+        id = smf_get_ndfid( loc, "ZPD", "WRITE", "UNKNOWN", "_INTEGER",
+                            fts->zpd->ndims, lbnd, ubnd, status);
+        ndfMap(id, "DATA", "_INTEGER", "WRITE", &pntr[0], &nmap, status);
+        outzpd = pntr[0];
+        if((*status == SAI__OK) && outsigma) {
+          memcpy(outzpd, fts->zpd->pntr[0], nmap * sizeof(*outzpd));
+        }
+        ndfAnnul(&id, status);
+
         /* WRITE FPM */
         lbnd[0] = 0;
         lbnd[1] = 0;

@@ -285,6 +285,8 @@ void smurf_mon( int * status ) {
     smurf_fts2_flatfield( status );
   } else if (strcmp( taskname, "FTS2FREQCORR" ) == 0 ) {
     smurf_fts2_freqcorr( status );
+  } else if (strcmp( taskname, "FTS2INIT" ) == 0 ) {
+    smurf_fts2_init( status );
   } else if (strcmp( taskname, "FTS2OPCORR" ) == 0 ) {
     smurf_fts2_spatialwcs( status );
   } else if (strcmp( taskname, "FTS2PHASECORR" ) == 0 ) {

@@ -736,7 +736,8 @@ smfFile *smf_construct_smfFile(smfFile * tofill, int ndfid, int isSc2store,
                                int isTstream, const char * name,
                                int * status );
 
-smfFts* smf_construct_smfFts( smfFts* tofill, smfData* fpm, smfData* sigma,
+smfFts* smf_construct_smfFts( smfFts* tofill,
+                              smfData* zpd, smfData* fpm, smfData* sigma,
                               int* status);
 
 smfGroup *smf_construct_smfGroup( const Grp *igrp, dim_t **subgroups,

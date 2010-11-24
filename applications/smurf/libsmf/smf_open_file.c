@@ -536,6 +536,72 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
         ndfXloc(indf, "FTS2", mode, &ftsLoc, status);
         if(*status == SAI__OK && ftsLoc != NULL) {
           fts = (*data)->fts;
+
+          // READ IN SMFFTS->ZPD
+          ndfOpen(ftsLoc, "ZPD", mode, "UNKNOWN", &ndfFTS, &placeFTS, status);
+          if(*status == SAI__OK && ndfFTS != NDF__NOID) {
+            ndfDim(ndfFTS, NDF__MXDIM, dimsFTS, &ndimsFTS, status);
+            if(*status == SAI__OK) {
+              if(ndimsFTS == 2) {
+                ndfMap( ndfFTS, "DATA", "_INTEGER", mode, &dpntr[0], &nmapFTS,
+                        status);
+                if(*status == SAI__OK) {
+                  fts->zpd = smf_create_smfData( SMF__NOCREATE_HEAD |
+                                                 SMF__NOCREATE_FILE |
+                                                 SMF__NOCREATE_DA |
+                                                 SMF__NOCREATE_FTS,
+                                                 status);
+                  if(*status == SAI__OK) {
+                    fts->zpd->dtype   = SMF__INTEGER;
+                    fts->zpd->ndims   = ndimsFTS;
+                    fts->zpd->dims[0] = dimsFTS[0];
+                    fts->zpd->dims[1] = dimsFTS[1];
+                    fts->zpd->lbnd[0] = 0;
+                    fts->zpd->lbnd[1] = 0;
+
+                    // MAKE A DEEP COPY
+                    int index, count;
+                    count = dimsFTS[0] * dimsFTS[1];
+                    fts->zpd->pntr[0] = astCalloc(count, sizeof(int), 0);
+                    for(index = 0; index < count; index++) {
+                      *((int*) (fts->zpd->pntr[0]) + index) = *((int*) (dpntr[0]) + index);
+                    }
+                  } else {
+                    *status = SAI__ERROR;
+                    errRep( "",
+                             FUNC_NAME
+                             ": Unable to create ZPD!",
+                             status);
+                  }
+                } else {
+                  *status = SAI__ERROR;
+                  errRep( "",
+                          FUNC_NAME
+                          ": Unable to map ZPD!",
+                          status);
+                }
+              } else {
+                *status = SAI__ERROR;
+                errRepf( "",
+                         FUNC_NAME
+                         ": ZPD has %i dimensions, should be 2!",
+                         status, ndimsFTS);
+              }
+            } else {
+              *status = SAI__ERROR;
+              errRep( "",
+                      FUNC_NAME
+                      ": Unable to obtain ZPD dimensions!",
+                      status);
+            }
+          } else {
+            *status = SAI__ERROR;
+            errRep( "",
+                    FUNC_NAME
+                    ": Unable to obtain an NDF identifier for ZPD!",
+                    status);
+          }
+
           // READ IN SMFFTS->FPM
           ndfOpen(ftsLoc, "FPM", mode, "UNKNOWN", &ndfFTS, &placeFTS, status);
           if(*status == SAI__OK && ndfFTS != NDF__NOID) {

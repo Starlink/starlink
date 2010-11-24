@@ -158,6 +158,7 @@ void smurf_fts2_phasecorr(int* status)
   size_t inSize             = 0;    /* Size of the input group */
   size_t outSize            = 0;    /* Size of the output group */
   size_t zpdSize            = 0;    /* Size of the ZPD group */
+  smfData* zpd              = NULL; /* ZPD indeces */
   smfData* fpm              = NULL; /* Fitting params data */
   smfData* sigma            = NULL; /* smfFts standard deviation */
   smfData* srcData          = NULL; /* Pointer to input data */
@@ -284,6 +285,10 @@ void smurf_fts2_phasecorr(int* status)
     newSrcData->pntr[0] = (double*) astMalloc( pixelCount * newN *
                                                sizeof(double));
 
+    if(srcData->fts->zpd) {
+      zpd = smf_deepcopy_smfData(srcData->fts->zpd, 0, 0, 0, 0, status);
+    }
+
     /* FPM (Polynomial Fit Coefficients) */
     fpm = smf_create_smfData( SMF__NOCREATE_DA |
                               SMF__NOCREATE_FTS, status);
@@ -373,7 +378,7 @@ void smurf_fts2_phasecorr(int* status)
     astFree(fPositions);
     smf_close_file(&srcData, status);
 
-    newSrcData->fts = smf_construct_smfFts(NULL, fpm, sigma, status);
+    newSrcData->fts = smf_construct_smfFts(NULL, zpd, fpm, sigma, status);
     smf_write_smfData(newSrcData, NULL, NULL, ogrp, fIndex, 0, status);
     smf_close_file(&newSrcData, status);
   }

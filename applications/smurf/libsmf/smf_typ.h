@@ -614,6 +614,7 @@ typedef struct smfDA {
 /* Structure containing data computed by FTS2 pipeline operations */
 typedef struct smfFts
 {
+  struct smfData* zpd;       /* ZPD indeces, [m x n] dimensional data */
   struct smfData* fpm;       /* Coefficitients of the fitting polynomial for
                               * each bolometer in the subarray,
                               * [m x n x p] dimensional data */

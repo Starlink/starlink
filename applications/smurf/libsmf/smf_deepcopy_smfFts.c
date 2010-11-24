@@ -90,6 +90,7 @@ smf_deepcopy_smfFts(const smfData* old, int* status)
   if(*status != SAI__OK) { return NULL; }
   if(old == NULL) { return NULL; }
 
+  smfData* zpd    = NULL; /* Pointer to polynomial coefficients */
   smfData* fpm    = NULL; /* Pointer to polynomial coefficients */
   smfData* sigma  = NULL; /* Pointer to standard deviations */
   smfFts* newFts  = NULL; /* Pointer to new smfFts struct */
@@ -98,10 +99,21 @@ smf_deepcopy_smfFts(const smfData* old, int* status)
   oldFts = old->fts;
   if(oldFts == NULL) { return NULL; }
 
+  if(oldFts->zpd) {
+    zpd = smf_deepcopy_smfData(
+              oldFts->zpd, 0,
+              SMF__NOCREATE_VARIANCE |
+              SMF__NOCREATE_QUALITY |
+              SMF__NOCREATE_HEAD |
+              SMF__NOCREATE_FILE |
+              SMF__NOCREATE_DA |
+              SMF__NOCREATE_FTS,
+              0, 0, status);
+  }
+
   if(oldFts->fpm) {
     fpm = smf_deepcopy_smfData(
-              oldFts->fpm,
-              0,
+              oldFts->fpm, 0,
               SMF__NOCREATE_VARIANCE |
               SMF__NOCREATE_QUALITY |
               SMF__NOCREATE_HEAD |
@@ -112,8 +124,7 @@ smf_deepcopy_smfFts(const smfData* old, int* status)
   }
   if(oldFts->sigma) {
     sigma = smf_deepcopy_smfData(
-              oldFts->sigma,
-              0,
+              oldFts->sigma, 0,
               SMF__NOCREATE_VARIANCE |
               SMF__NOCREATE_QUALITY |
               SMF__NOCREATE_HEAD |
@@ -123,7 +134,7 @@ smf_deepcopy_smfFts(const smfData* old, int* status)
               0, 0, status);
   }
 
-  newFts = smf_construct_smfFts(newFts, fpm, sigma, status);
+  newFts = smf_construct_smfFts(newFts, zpd, fpm, sigma, status);
 
   return newFts;
 }

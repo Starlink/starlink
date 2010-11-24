@@ -96,6 +96,7 @@ smf_create_smfFts(int* status)
     return NULL;
   }
 
+  fts->zpd = NULL;
   fts->fpm = NULL;
   fts->sigma = NULL;
 

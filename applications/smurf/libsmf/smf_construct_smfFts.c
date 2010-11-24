@@ -24,6 +24,8 @@
 *     tofill = smfFts* (Given)
 *        If non-NULL, this is the struct filled by this routine. Else,
 *        a smfFts is allocated and returned.
+*     zpd = smfData* (Given)
+*        2D array of ZPD indices.
 *     fpm = smfData* (Given)
 *        Pointer to coefficients of the fitting polynomial.
 *     sigma = smfData* (Given)
@@ -95,13 +97,18 @@
 #define FUNC_NAME "smf_construct_smfFts"
 
 smfFts*
-smf_construct_smfFts(smfFts* tofill, smfData* fpm, smfData* sigma, int* status)
+smf_construct_smfFts( smfFts* tofill,
+                      smfData* zpd,
+                      smfData* fpm,
+                      smfData* sigma,
+                      int* status)
 {
   if(*status != SAI__OK) { return NULL; }
 
   if(tofill == NULL) {
     smfFts* fts = smf_create_smfFts(status);
     if(*status == SAI__OK) {
+      fts->zpd = zpd;
       fts->fpm = fpm;
       fts->sigma = sigma;
       return fts;

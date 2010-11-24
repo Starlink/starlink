@@ -378,6 +378,7 @@ void smurf_fts2_transcorr(int* status)
     astFree(TAU[0]);
     astFree(TAU[1]);
     astFree(GAUSSIANKERNEL);
+    smf_close_file(&tauData, status);
     if(inGrp) { grpDelet(&inGrp, status); }
     if(outGrp) { grpDelet(&outGrp, status); }
     if(tauGrp) { grpDelet(&tauGrp, status); }
