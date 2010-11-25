@@ -45,8 +45,8 @@ f     AST_ADDCOLUMN
 *     In addition to those attributes common to all KeyMaps, every
 *     Table also has the following attributes:
 *
-*     - NColumn: The number of columns currently in the Table
-*     - NRow: The number of rows currently in the Table
+*     - Ncolumn: The number of columns currently in the Table
+*     - Nrow: The number of rows currently in the Table
 
 *  Functions:
 c     In addition to those functions applicable to all KeyMaps, the
@@ -56,12 +56,14 @@ f     following routines may also be applied to all Tables:
 *
 c     - astAddColumn: Add a new column definition to a Table.
 c     - astColumnName: Return the name of the column with a given index
+c     - astColumnNdim: Return the number of dimensions for a column
 c     - astColumnShape: Return the shape of the values in a named column
 c     - astColumnType: Return the data type of the values in a named column
 c     - astRemoveColumn: Remove a column from a Table.
 c     - astRemoveRow: Remove a row from a Table.
 f     - AST_ADDCOLUMN: Add a new column definition to a Table.
 f     - AST_COLUMNNAME: Return the name of the column with a given index
+f     - AST_COLUMNNDIM: Return the number of dimensions for a column
 f     - AST_COLUMNSHAPE: Return the shape of the values in a named column
 f     - AST_COLUMNTYPE: Return the data type of the values in a named column
 f     - AST_REMOVECOLUMN: Remove a column from a Table.
@@ -107,7 +109,7 @@ f     - AST_REMOVEROW: Remove a row from a Table.
 #define NAME "Name"
 #define TYPE "Type"
 #define SHAPE "Shape"
-#define NROW "NRow"
+#define NROW "Nrow"
 
 /* Maximum length of a column name */
 #define MXCOLNAMLEN 100
@@ -247,7 +249,7 @@ AstTable *astTableId_( const char *, ... );
 static const char *TypeString( int );
 static int Equal( AstObject *, AstObject *, int * );
 static int GetObjSize( AstObject *, int * );
-static int GetNColumn( AstTable *, int * );
+static int GetNcolumn( AstTable *, int * );
 static int MapGet0A( AstKeyMap *, const char *, AstObject **, int * );
 static int MapGet0C( AstKeyMap *, const char *, const char **, int * );
 static int MapGet0D( AstKeyMap *, const char *, double *, int * );
@@ -300,6 +302,7 @@ static void RemoveRow( AstTable *, int, int * );
 static void MapPutU( AstKeyMap *, const char *, const char *, int * );
 static const char *ColumnName( AstTable *, int index, int * );
 static int ColumnType( AstTable *, const char *, int * );
+static int ColumnNdim( AstTable *, const char *, int * );
 static void ColumnShape( AstTable *, const char *, int, int *, int *, int *);
 
 #if defined(THREAD_SAFE)
@@ -311,10 +314,10 @@ static int TestAttrib( AstObject *, const char *, int * );
 static void ClearAttrib( AstObject *, const char *, int * );
 static void SetAttrib( AstObject *, const char *, int * );
 
-static int GetNRow( AstTable *, int * );
-static void SetNRow( AstTable *, int, int * );
+static int GetNrow( AstTable *, int * );
+static void SetNrow( AstTable *, int, int * );
 
-static int GetNColumn( AstTable *, int * );
+static int GetNcolumn( AstTable *, int * );
 
 
 /* Member functions. */
@@ -573,10 +576,10 @@ f     RESULT = AST_COLUMNNAME( THIS, INDEX, STATUS )
 *
 *     This function is intended primarily as a means of iterating round all
 *     the columns in a Table. For this purpose, the number of columns in
-*     the Table is given by the NColumn attribute of the Table. This function
+*     the Table is given by the Ncolumn attribute of the Table. This function
 *     could then be called in a loop, with the index value going from
-c     zero to one less than NColumn.
-f     one to NColumn.
+c     zero to one less than Ncolumn.
+f     one to Ncolumn.
 *
 *     Note, the index associated with each column is not necessarily
 *     related to the order in which the columns are added to the Table.
@@ -590,7 +593,7 @@ f     THIS = INTEGER (Given)
 c     index
 f     INDEX = INTEGER (Given)
 *        The index into the list of columns. The first column has index
-*        one, and the last has index "NColumn".
+*        one, and the last has index "Ncolumn".
 f     STATUS = INTEGER (Given and Returned)
 f        The global status.
 
@@ -628,6 +631,83 @@ f     reason.
 
 /* Return a pointer to the required column name. */
    return astMapKey( this->columns, index - 1 );
+}
+
+static int ColumnNdim( AstTable *this, const char *column, int *status ) {
+/*
+*++
+*  Name:
+c     astColumnNdim
+f     AST_COLUMNNDIM
+
+*  Purpose:
+*     Get the number of dimensions for a column in a Table.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "table.h"
+c     int astColumnNdim( AstTable *this, const char *column )
+f     RESULT = AST_COLUMNNDIM( THIS, COLUMN, STATUS )
+
+*  Class Membership:
+*     Table method.
+
+*  Description:
+*     This function returns the number of dimensions spanned by the
+*     values stored in the cells of a named column in a Table. Scalar
+*     values have zero dimensions, images have two, cubes have three,
+*     etc.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Table.
+c     column
+f     COLUMN = CHARACTER * ( * ) (Given)
+*        The character string holding the name of the column. Trailing
+*        spaces are ignored.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Returned Value:
+c     astColumnNdim()
+f     AST_COLUMNNDIM = INTEGER
+*        The number of dimensions - zero for a scalar.
+
+*  Notes:
+*     - A function value of zero will be returned if an error has
+*     already occurred, or if this function should fail for any reason.
+
+*--
+*/
+
+/* Local Variables: */
+   AstKeyMap *col_km;      /* Pointer to KeyMap holding column info */
+   int result;             /* Returned value */
+
+/* Initialise */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get the KeyMap holding information about the requested column. */
+   if( astMapGet0A( this->columns, column, &col_km ) ) {
+
+/* Get the number of dimensions. */
+      result = astMapLength( col_km, SHAPE );
+
+/* Annul the KeyMap pointer. */
+      col_km = astAnnul( col_km );
+   }
+
+/* Return AST__BADTYPE if an error occurred. */
+   if( !astOK ) result = 0;
+
+/* Return the result. */
+   return result;
 }
 
 static void ColumnShape( AstTable *this, const char *column, int mxdim,
@@ -964,19 +1044,19 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
    the value into "getattrib_buff" as a null terminated string in an
    appropriate format.  Set "result" to point at the result string. */
 
-/* NColumn */
+/* Ncolumn */
 /* ------- */
    if( !strcmp( attrib, "ncolumn" ) ) {
-      ival = astGetNColumn( this );
+      ival = astGetNcolumn( this );
       if ( astOK ) {
          (void) sprintf( getattrib_buff, "%d", ival );
          result = getattrib_buff;
       }
 
-/* NRow */
+/* Nrow */
 /* ---- */
    } else if( !strcmp( attrib, "nrow" ) ) {
-      ival = astGetNRow( this );
+      ival = astGetNrow( this );
       if ( astOK ) {
          (void) sprintf( getattrib_buff, "%d", ival );
          result = getattrib_buff;
@@ -992,11 +1072,11 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
    return result;
 }
 
-static int GetNColumn( AstTable *this, int *status ) {
+static int GetNcolumn( AstTable *this, int *status ) {
 /*
 *+
 *  Name:
-*     astGetNColumn
+*     astGetNcolumn
 
 *  Purpose:
 *     Get the number of columns in a Table.
@@ -1006,7 +1086,7 @@ static int GetNColumn( AstTable *this, int *status ) {
 
 *  Synopsis:
 *     #include "table.h"
-*     int astGetNColumn( AstTable *this )
+*     int astGetNcolumn( AstTable *this )
 
 *  Class Membership:
 *     Table method.
@@ -1163,10 +1243,11 @@ void astInitTableVtab_(  AstTableVtab *vtab, const char *name, int *status ) {
    vtab->AddColumn = AddColumn;
    vtab->RemoveColumn = RemoveColumn;
    vtab->RemoveRow = RemoveRow;
-   vtab->GetNRow = GetNRow;
-   vtab->SetNRow = SetNRow;
-   vtab->GetNColumn = GetNColumn;
+   vtab->GetNrow = GetNrow;
+   vtab->SetNrow = SetNrow;
+   vtab->GetNcolumn = GetNcolumn;
    vtab->ColumnName = ColumnName;
+   vtab->ColumnNdim = ColumnNdim;
    vtab->ColumnType = ColumnType;
    vtab->ColumnShape = ColumnShape;
 
@@ -1439,7 +1520,7 @@ static int MapGet0##X( AstKeyMap *this_keymap, const char *key, Xtype *value, \
 \
 /* If the row index is larger than the current number of rows in the \
    table, do nothing more. */ \
-      if( irow <= astGetNRow( this ) ){ \
+      if( irow <= astGetNrow( this ) ){ \
 \
 /* Use the astMapGet0<X> method in the parent keyMap class to get the \
    cell contents. */ \
@@ -1577,7 +1658,7 @@ static int MapGet1##X( AstKeyMap *this_keymap, const char *key, int mxval, int *
 \
 /* If the row index is larger than the current number of rows in the \
    table, do nothing more. */ \
-      if( irow <= astGetNRow( this ) ){ \
+      if( irow <= astGetNrow( this ) ){ \
 \
 /* Use the astMapGet1<X> method in the parent keyMap class to get the \
    cell contents. */ \
@@ -1660,7 +1741,7 @@ static int MapGet1C( AstKeyMap *this_keymap, const char *key, int l, int mxval,
 
 /* If the row index is larger than the current number of rows in the
    table, do nothing more. */
-      if( irow <= astGetNRow( this ) ){
+      if( irow <= astGetNrow( this ) ){
 
 /* Use the astMapGet1<X> method in the parent keyMap class to get the
    cell contents. */
@@ -1784,7 +1865,7 @@ static int MapGetElem##X( AstKeyMap *this_keymap, const char *key, int elem, \
 \
 /* If the row index is larger than the current number of rows in the \
    table, do nothing more. */ \
-      if( irow <= astGetNRow( this ) ){ \
+      if( irow <= astGetNrow( this ) ){ \
 \
 /* Use the astMapGetElem<X> method in the parent keyMap class to get the \
    cell contents. */ \
@@ -1866,7 +1947,7 @@ static int MapGetElemC( AstKeyMap *this_keymap, const char *key, int l,
 
 /* If the row index is larger than the current number of rows in the
    table, do nothing more. */
-      if( irow <= astGetNRow( this ) ){
+      if( irow <= astGetNrow( this ) ){
 
 /* Use the astMapGetElem<X> method in the parent keyMap class to get the
    cell contents. */
@@ -1987,7 +2068,7 @@ static void MapPut0##X( AstKeyMap *this_keymap, const char *key, Xtype value, \
 \
 /* If the row index is larger than the current number of rows in the \
    table, update the number of rows in the table. */ \
-      if( irow > astGetNRow( this ) ) astSetNRow( this, irow ); \
+      if( irow > astGetNrow( this ) ) astSetNrow( this, irow ); \
 \
 /* Use the astMapPut0<X> method in the parent keyMap class to store the \
    new cell contents. */ \
@@ -2138,7 +2219,7 @@ static void MapPut1##X( AstKeyMap *this_keymap, const char *key, int size, \
 /* If all is OK, update the number of rows in the table if required, and \
    store the vector in the parent KeyMap. */ \
             } else { \
-               if( irow > astGetNRow( this ) ) astSetNRow( this, irow ); \
+               if( irow > astGetNrow( this ) ) astSetNrow( this, irow ); \
                (*parent_mapput1##Xlc)( this_keymap, key, size, value, \
                                        comment, status ); \
             } \
@@ -2297,7 +2378,7 @@ static void MapPutElem##X( AstKeyMap *this_keymap, const char *key, int elem, \
 /* If all is OK, update the number of rows in the table if required, and \
    store the value in the parent KeyMap. */ \
             } else { \
-               if( irow > astGetNRow( this ) ) astSetNRow( this, irow ); \
+               if( irow > astGetNrow( this ) ) astSetNrow( this, irow ); \
                (*parent_mapputelem##Xlc)( this_keymap, key, elem, value, \
                                        status ); \
             } \
@@ -2397,7 +2478,7 @@ static void MapPutU( AstKeyMap *this_keymap, const char *key, const char *commen
 
 /* If the row index is larger than the current number of rows in the
    table, update the number of rows in the table. */
-      if( irow > astGetNRow( this ) ) astSetNRow( this, irow );
+      if( irow > astGetNrow( this ) ) astSetNrow( this, irow );
 
 /* Use the astMapPutU method in the parent keyMap class to store the
    new cell contents. */
@@ -2592,7 +2673,7 @@ f        The global status.
    }
 
 /* Get the number of rows in the table. */
-   nrow = astGetNRow( this );
+   nrow = astGetNrow( this );
 
 /* If there is no column with the given name in the Table, do nothing more. */
    if( astOK && astMapHasKey( this->columns, name ) ) {
@@ -2661,7 +2742,7 @@ f        The global status.
    if ( !astOK ) return;
 
 /* Get the number of rows in the table. */
-   nrow = astGetNRow( this );
+   nrow = astGetNrow( this );
 
 /* Do nothing if the specified row is out of bounds. */
    if( index > 0 && index <= nrow ) {
@@ -2678,7 +2759,7 @@ f        The global status.
 
 /* If the removed row was the last row, reduce the number of rows in the
    Table. */
-      if( index == nrow ) astSetNRow( this, index - 1 );
+      if( index == nrow ) astSetNrow( this, index - 1 );
    }
 }
 
@@ -2918,7 +2999,7 @@ static const char *TypeString( int type ) {
 /*
 *att++
 *  Name:
-*     NRow
+*     Nrow
 
 *  Purpose:
 *     The number of rows in the table.
@@ -2942,13 +3023,13 @@ static const char *TypeString( int type ) {
 
 *att--
 */
-astMAKE_GET(Table,NRow,int,0,this->nrow)
-astMAKE_SET(Table,NRow,int,nrow,value)
+astMAKE_GET(Table,Nrow,int,0,this->nrow)
+astMAKE_SET(Table,Nrow,int,nrow,value)
 
 /*
 *att++
 *  Name:
-*     NColumn
+*     Ncolumn
 
 *  Purpose:
 *     The number of columns in the table.
@@ -3115,7 +3196,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
    extra information held in the Table structure. */
 
 /* Write out the number of rows in the table. */
-   astWriteInt( channel, "NRow", 1, 1, astGetNRow( this ),
+   astWriteInt( channel, "Nrow", 1, 1, astGetNrow( this ),
                 "Number of rows in table" );
 
 /* Write out the KeyMap holding parameters describing each column. */
@@ -3602,9 +3683,9 @@ void astRemoveRow_( AstTable *this, int index, int *status ){
    if ( !astOK ) return;
    return (**astMEMBER(this,Table,RemoveRow))(this,index,status);
 }
-int astGetNColumn_( AstTable *this, int *status ) {
+int astGetNcolumn_( AstTable *this, int *status ) {
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,Table,GetNColumn))( this, status );
+   return (**astMEMBER(this,Table,GetNcolumn))( this, status );
 }
 const char *astColumnName_( AstTable *this, int index, int *status ){
    if ( !astOK ) return NULL;
@@ -3613,6 +3694,10 @@ const char *astColumnName_( AstTable *this, int index, int *status ){
 int astColumnType_( AstTable *this, const char *column, int *status ){
    if ( !astOK ) return 0;
    return (**astMEMBER(this,Table,ColumnType))(this,column,status);
+}
+int astColumnNdim_( AstTable *this, const char *column, int *status ){
+   if ( !astOK ) return 0;
+   return (**astMEMBER(this,Table,ColumnNdim))(this,column,status);
 }
 void astColumnShape_( AstTable *this, const char *column, int mxdim,
                       int *ndim, int *dims, int *status ){

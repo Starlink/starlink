@@ -202,6 +202,25 @@ F77_INTEGER_FUNCTION(ast_columntype)( INTEGER(THIS),
 }
 
 
+F77_INTEGER_FUNCTION(ast_columnndim)( INTEGER(THIS),
+                                      CHARACTER(COLUMNNAME),
+                                      INTEGER(STATUS)
+                                      TRAIL(COLUMNNAME) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(COLUMNNAME)
+   F77_INTEGER_TYPE(RESULT);
+   char *columnname;
+
+   astAt( "AST_COLUMNTYPE", NULL, 0 );
+   astWatchSTATUS(
+      columnname = astString( COLUMNNAME, COLUMNNAME_length );
+      RESULT = astColumnNdim( astI2P( *THIS ), columnname );
+      astFree( columnname );
+   )
+   return RESULT;
+}
+
+
 F77_SUBROUTINE(ast_columnshape)( INTEGER(THIS),
                                  CHARACTER(COLUMN),
                                  INTEGER(MXDIM),

@@ -108,11 +108,12 @@ typedef struct AstTableVtab {
    void (* AddColumn)( AstTable *, const char *, int, int, int *, int * );
    void (* RemoveColumn)( AstTable *, const char *, int * );
    void (* RemoveRow)( AstTable *, int, int * );
-   int (* GetNRow)( AstTable *, int * );
-   int (* GetNColumn)( AstTable *, int * );
-   void (* SetNRow)( AstTable *, int, int * );
+   int (* GetNrow)( AstTable *, int * );
+   int (* GetNcolumn)( AstTable *, int * );
+   void (* SetNrow)( AstTable *, int, int * );
    const char *(* ColumnName)( AstTable *, int, int * );
    int (* ColumnType)( AstTable *, const char *, int * );
+   int (* ColumnNdim)( AstTable *, const char *, int * );
    void (* ColumnShape)( AstTable *, const char *, int, int *, int *, int * );
 } AstTableVtab;
 
@@ -169,11 +170,12 @@ AstTable *astLoadTable_( void *, size_t, AstTableVtab *,
 void astAddColumn_( AstTable *, const char *, int, int, int *, int * );
 void astRemoveColumn_( AstTable *, const char *, int * );
 void astRemoveRow_( AstTable *, int, int * );
-int astGetNRow_( AstTable *, int * );
-int astGetNColumn_( AstTable *, int * );
-void astSetNRow_( AstTable *, int, int * );
+int astGetNrow_( AstTable *, int * );
+int astGetNcolumn_( AstTable *, int * );
+void astSetNrow_( AstTable *, int, int * );
 const char *astColumnName_( AstTable *, int, int * );
 int astColumnType_( AstTable *, const char *, int * );
+int astColumnNdim_( AstTable *, const char *, int * );
 void astColumnShape_( AstTable *, const char *, int, int *, int *, int * );
 
 /* Function interfaces. */
@@ -227,16 +229,17 @@ astINVOKE(O,astLoadTable_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR
 #define astRemoveRow(this,index) astINVOKE(V,astRemoveRow_(astCheckTable(this),index,STATUS_PTR))
 #define astColumnName(this,index) astINVOKE(V,astColumnName_(astCheckTable(this),index,STATUS_PTR))
 #define astColumnType(this,column) astINVOKE(V,astColumnType_(astCheckTable(this),column,STATUS_PTR))
+#define astColumnNdim(this,column) astINVOKE(V,astColumnNdim_(astCheckTable(this),column,STATUS_PTR))
 #define astColumnShape(this,column,mxdim,ndim,dims) astINVOKE(V,astColumnShape_(astCheckTable(this),column,mxdim,ndim,dims,STATUS_PTR))
 
 #if defined(astCLASS)            /* Protected */
 
-#define astGetNColumn(this) \
-astINVOKE(V,astGetNColumn_(astCheckTable(this),STATUS_PTR))
-#define astGetNRow(this) \
-astINVOKE(V,astGetNRow_(astCheckTable(this),STATUS_PTR))
-#define astSetNRow(this,value) \
-astINVOKE(V,astSetNRow_(astCheckTable(this),value,STATUS_PTR))
+#define astGetNcolumn(this) \
+astINVOKE(V,astGetNcolumn_(astCheckTable(this),STATUS_PTR))
+#define astGetNrow(this) \
+astINVOKE(V,astGetNrow_(astCheckTable(this),STATUS_PTR))
+#define astSetNrow(this,value) \
+astINVOKE(V,astSetNrow_(astCheckTable(this),value,STATUS_PTR))
 
 #endif
 #endif
