@@ -163,6 +163,8 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map
 *        than the default value.
 *     2-OCT-2010 (DSB):
 *        Added support for short int valued entries.
+*     24-NOV-2010 (DSB):
+*        Fix memory leak in astMapPutElemC and astMapPutElemA.
 *class--
 */
 
@@ -6703,6 +6705,7 @@ static void MapPutElem##X( AstKeyMap *this, const char *key, int elem, \
    AstMapEntry *mapentry;  /* Pointer to parent MapEntry structure */ \
    int itab;               /* Index of hash table element to use */ \
    int nel;                /* Number of elements in raw vector */ \
+   int new;                /* Was a new uninitialised element created? */ \
    int raw_type;           /* Data type of stored value */ \
    size_t raw_size;        /* Size of a single raw value */ \
    unsigned long hash;     /* Full width hash value */ \
@@ -6823,7 +6826,8 @@ static void MapPutElem##X( AstKeyMap *this, const char *key, int elem, \
 \
 /* If the requested element is outside the bounds of the vector, extend \
    the vector by one element. */ \
-      if( elem >= nel || elem < 0 ) { \
+      new = ( elem >= nel || elem < 0 ); \
+      if( new ) { \
          elem = nel++; \
          raw = astGrow( raw, nel, raw_size ); \
          if( astOK ) { \
@@ -6849,6 +6853,17 @@ static void MapPutElem##X( AstKeyMap *this, const char *key, int elem, \
 /* Get a pointer to the requested element. */ \
       if( astOK ) { \
          raw = (char *) raw + elem*raw_size; \
+\
+/* Free any memory used by the value already in the requested element. */ \
+         if( ! new ) { \
+            if( raw_type == AST__STRINGTYPE ){ \
+               char **cp = (char **) raw; \
+               *cp = astFree( *cp ); \
+            } else if( raw_type == AST__OBJECTTYPE ){ \
+               AstObject **op = (AstObject **) raw; \
+               if( *op ) *op = astAnnul( *op ); \
+            } \
+         } \
 \
 /* Convert the supplied value, storing the result in the requested element. \
    Report an error if conversion is not possible. */ \
@@ -6937,7 +6952,7 @@ c     astMapType()
 f     AST_MAPTYPE = INTEGER
 *        One of AST__INTTYPE (for integer), AST__SINTTYPE (for
 c        short int),
-c        INTEGER*2),
+f        INTEGER*2),
 *        AST__DOUBLETYPE (for double
 *        precision floating point), AST__FLOATTYPE (for single
 *        precision floating point), AST__STRINGTYPE (for character string),
