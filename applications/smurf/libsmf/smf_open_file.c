@@ -521,228 +521,128 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 
     // READ IN FTS2 DATA IF EXISTS
     if(!(flags & SMF__NOCREATE_FTS)) {
+      int CREATEFLAG = 0;
       int dimsFTS[NDF__MXDIM];
-      int ftsExists = 0;
-      int ndimsFTS;
-      int ndfFTS;
-      int nmapFTS;
-      int placeFTS;
-      HDSLoc* ftsLoc = NULL;
-      void* dpntr[] = {NULL, NULL};
+      int hasFTS     = 0;
+      int ndfFTS     = 0;
+      int ndimsFTS   = 0;
+      int nmapFTS    = 0;
+      int placeFTS   = 0;
+      HDSLoc* hdsFTS = NULL;
+      void* pntr     = NULL;
 
-      ndfXstat(indf, "FTS2", &ftsExists, status);
-      if(*status == SAI__OK && ftsExists) {
-        // GET FTS2DR LOCATION
-        ndfXloc(indf, "FTS2", mode, &ftsLoc, status);
-        if(*status == SAI__OK && ftsLoc != NULL) {
+      ndfXstat(indf, "FTS2", &hasFTS, status);
+      if(hasFTS) {
+        ndfXloc(indf, "FTS2", mode, &hdsFTS, status);
+        if(*status == SAI__OK && hdsFTS != NULL) {
+          CREATEFLAG |= SMF__NOCREATE_HEAD;
+          CREATEFLAG |= SMF__NOCREATE_FILE;
+          CREATEFLAG |= SMF__NOCREATE_DA;
+          CREATEFLAG |= SMF__NOCREATE_FTS;
+
           fts = (*data)->fts;
 
           // READ IN SMFFTS->ZPD
-          ndfOpen(ftsLoc, "ZPD", mode, "UNKNOWN", &ndfFTS, &placeFTS, status);
+          ndfOpen(hdsFTS, "ZPD", mode, "UNKNOWN", &ndfFTS, &placeFTS, status);
           if(*status == SAI__OK && ndfFTS != NDF__NOID) {
             ndfDim(ndfFTS, NDF__MXDIM, dimsFTS, &ndimsFTS, status);
             if(*status == SAI__OK) {
-              if(ndimsFTS == 2) {
-                ndfMap( ndfFTS, "DATA", "_INTEGER", mode, &dpntr[0], &nmapFTS,
-                        status);
-                if(*status == SAI__OK) {
-                  fts->zpd = smf_create_smfData( SMF__NOCREATE_HEAD |
-                                                 SMF__NOCREATE_FILE |
-                                                 SMF__NOCREATE_DA |
-                                                 SMF__NOCREATE_FTS,
-                                                 status);
-                  if(*status == SAI__OK) {
-                    fts->zpd->dtype   = SMF__INTEGER;
-                    fts->zpd->ndims   = ndimsFTS;
-                    fts->zpd->dims[0] = dimsFTS[0];
-                    fts->zpd->dims[1] = dimsFTS[1];
-                    fts->zpd->lbnd[0] = 0;
-                    fts->zpd->lbnd[1] = 0;
-
-                    // MAKE A DEEP COPY
-                    int index, count;
-                    count = dimsFTS[0] * dimsFTS[1];
-                    fts->zpd->pntr[0] = astCalloc(count, sizeof(int), 0);
-                    for(index = 0; index < count; index++) {
-                      *((int*) (fts->zpd->pntr[0]) + index) = *((int*) (dpntr[0]) + index);
-                    }
-                  } else {
-                    *status = SAI__ERROR;
-                    errRep( "",
-                             FUNC_NAME
-                             ": Unable to create ZPD!",
-                             status);
-                  }
-                } else {
-                  *status = SAI__ERROR;
-                  errRep( "",
-                          FUNC_NAME
-                          ": Unable to map ZPD!",
-                          status);
-                }
-              } else {
+              if(ndimsFTS != 2) {
                 *status = SAI__ERROR;
-                errRepf( "",
-                         FUNC_NAME
-                         ": ZPD has %i dimensions, should be 2!",
-                         status, ndimsFTS);
+                errRep("", FUNC_NAME ": FTS2->ZPD must be 2-D!", status);
               }
-            } else {
-              *status = SAI__ERROR;
-              errRep( "",
-                      FUNC_NAME
-                      ": Unable to obtain ZPD dimensions!",
-                      status);
+              ndfMap(ndfFTS, "DATA", "_INTEGER", mode, &pntr, &nmapFTS, status);
+              if(*status == SAI__OK) {
+                fts->zpd = smf_create_smfData(CREATEFLAG, status);
+                if(*status == SAI__OK) {
+                  fts->zpd->dtype   = SMF__INTEGER;
+                  fts->zpd->ndims   = ndimsFTS;
+                  fts->zpd->dims[0] = dimsFTS[0];
+                  fts->zpd->dims[1] = dimsFTS[1];
+                  fts->zpd->lbnd[0] = 0;
+                  fts->zpd->lbnd[1] = 0;
+
+                  // MAKE A DEEP COPY
+                  int index, count;
+                  count = dimsFTS[0] * dimsFTS[1];
+                  fts->zpd->pntr[0] = astCalloc(count, sizeof(int), 0);
+                  for(index = 0; index < count; index++) {
+                    *((int*) (fts->zpd->pntr[0]) + index) = *((int*) pntr + index);
+                  }
+                }
+              }
             }
-          } else {
-            *status = SAI__ERROR;
-            errRep( "",
-                    FUNC_NAME
-                    ": Unable to obtain an NDF identifier for ZPD!",
-                    status);
           }
 
           // READ IN SMFFTS->FPM
-          ndfOpen(ftsLoc, "FPM", mode, "UNKNOWN", &ndfFTS, &placeFTS, status);
+          ndfOpen(hdsFTS, "FPM", mode, "UNKNOWN", &ndfFTS, &placeFTS, status);
           if(*status == SAI__OK && ndfFTS != NDF__NOID) {
             ndfDim(ndfFTS, NDF__MXDIM, dimsFTS, &ndimsFTS, status);
             if(*status == SAI__OK) {
-              if(ndimsFTS == 3) {
-                ndfMap( ndfFTS, "DATA", "_DOUBLE", mode, &dpntr[0], &nmapFTS,
-                        status);
-                if(*status == SAI__OK) {
-                  fts->fpm = smf_create_smfData( SMF__NOCREATE_HEAD |
-                                                 SMF__NOCREATE_FILE |
-                                                 SMF__NOCREATE_DA |
-                                                 SMF__NOCREATE_FTS,
-                                                 status);
-                  if(*status == SAI__OK) {
-                    fts->fpm->dtype   = SMF__DOUBLE;
-                    fts->fpm->ndims   = ndimsFTS;
-                    fts->fpm->dims[0] = dimsFTS[0];
-                    fts->fpm->dims[1] = dimsFTS[1];
-                    fts->fpm->dims[2] = dimsFTS[2];
-                    fts->fpm->lbnd[0] = 0;
-                    fts->fpm->lbnd[1] = 0;
-                    fts->fpm->lbnd[2] = 1;
-
-                    // MAKE A DEEP COPY
-                    int index, count;
-                    count = dimsFTS[0] * dimsFTS[1] * dimsFTS[2];
-                    fts->fpm->pntr[0] = astCalloc(count, sizeof(double), 0);
-                    for(index = 0; index < count; index++) {
-                      *((double*) (fts->fpm->pntr[0]) + index) = *((double*) (dpntr[0]) + index);
-                    }
-                  } else {
-                    *status = SAI__ERROR;
-                    errRep( "",
-                             FUNC_NAME
-                             ": Unable to create FPM!",
-                             status);
-                  }
-                } else {
-                  *status = SAI__ERROR;
-                  errRep( "",
-                          FUNC_NAME
-                          ": Unable to map FPM!",
-                          status);
-                }
-              } else {
+              if(ndimsFTS != 3) {
                 *status = SAI__ERROR;
-                errRepf( "",
-                         FUNC_NAME
-                         ": FPM has %i dimensions, should be 3!",
-                         status, ndimsFTS);
+                errRep("", FUNC_NAME ": FTS2->FPM must be 3-D!", status);
               }
-            } else {
-              *status = SAI__ERROR;
-              errRep( "",
-                      FUNC_NAME
-                      ": Unable to obtain FPM dimensions!",
-                      status);
+              ndfMap(ndfFTS, "DATA", "_DOUBLE", mode, &pntr, &nmapFTS, status);
+              if(*status == SAI__OK) {
+                fts->fpm = smf_create_smfData(CREATEFLAG, status);
+                if(*status == SAI__OK) {
+                  fts->fpm->dtype   = SMF__DOUBLE;
+                  fts->fpm->ndims   = ndimsFTS;
+                  fts->fpm->dims[0] = dimsFTS[0];
+                  fts->fpm->dims[1] = dimsFTS[1];
+                  fts->fpm->dims[2] = dimsFTS[2];
+                  fts->fpm->lbnd[0] = 0;
+                  fts->fpm->lbnd[1] = 0;
+                  fts->fpm->lbnd[2] = 1;
+
+                  // MAKE A DEEP COPY
+                  int index, count;
+                  count = dimsFTS[0] * dimsFTS[1] * dimsFTS[2];
+                  fts->fpm->pntr[0] = astCalloc(count, sizeof(double), 0);
+                  for(index = 0; index < count; index++) {
+                    *((double*) (fts->fpm->pntr[0]) + index) = *((double*) pntr + index);
+                  }
+                }
+              }
             }
-          } else {
-            *status = SAI__ERROR;
-            errRep( "",
-                    FUNC_NAME
-                    ": Unable to obtain an NDF identifier for FPM!",
-                    status);
           }
 
           // READ IN SMFFTS->SIGMA
-          ndfOpen(ftsLoc, "SIGMA", mode, "UNKNOWN", &ndfFTS, &placeFTS, status);
+          ndfOpen(hdsFTS, "SIGMA", mode, "UNKNOWN", &ndfFTS, &placeFTS, status);
           if(*status == SAI__OK && ndfFTS != NDF__NOID) {
             ndfDim(ndfFTS, NDF__MXDIM, dimsFTS, &ndimsFTS, status);
             if(*status == SAI__OK) {
-              if(ndimsFTS == 2) {
-                ndfMap( ndfFTS, "DATA", "_DOUBLE", mode, &dpntr[0], &nmapFTS,
-                        status);
-                if(*status == SAI__OK) {
-                  fts->sigma = smf_create_smfData( SMF__NOCREATE_HEAD |
-                                                   SMF__NOCREATE_FILE |
-                                                   SMF__NOCREATE_DA |
-                                                   SMF__NOCREATE_FTS,
-                                                   status);
-                  if(*status == SAI__OK) {
-                    fts->sigma->dtype   = SMF__DOUBLE;
-                    fts->sigma->ndims   = ndimsFTS;
-                    fts->sigma->dims[0] = dimsFTS[0];
-                    fts->sigma->dims[1] = dimsFTS[1];
-                    fts->sigma->lbnd[0] = 0;
-                    fts->sigma->lbnd[1] = 0;
-
-                    // MAKE A DEEP COPY
-                    int index, count;
-                    count = dimsFTS[0] * dimsFTS[1];
-                    fts->sigma->pntr[0] = astCalloc(count, sizeof(double), 0);
-                    for(index = 0; index < count; index++) {
-                      *((double*) (fts->sigma->pntr[0]) + index) = *((double*) (dpntr[0]) + index);
-                    }
-                  } else {
-                    *status = SAI__ERROR;
-                    errRep( "",
-                             FUNC_NAME
-                             ": Unable to create SIGMA!",
-                             status);
-                  }
-                } else {
-                  *status = SAI__ERROR;
-                  errRep( "",
-                          FUNC_NAME
-                          ": Unable to map SIGMA!",
-                          status);
-                }
-              } else {
+              if(ndimsFTS != 2) {
                 *status = SAI__ERROR;
-                errRepf( "",
-                         FUNC_NAME
-                         ": SIGMA has %i dimensions, should be 2!",
-                         status, ndimsFTS);
+                errRep("", FUNC_NAME ": FTS2->SIGMA must be 2-D!", status);
               }
-            } else {
-              *status = SAI__ERROR;
-              errRep( "",
-                      FUNC_NAME
-                      ": Unable to obtain SIGMA dimensions!",
-                      status);
-            }
-          } else {
-            *status = SAI__ERROR;
-            errRep( "",
-                    FUNC_NAME
-                    ": Unable to obtain an NDF identifier for SIGMA!",
-                    status);
-          }
+              ndfMap( ndfFTS, "DATA", "_DOUBLE", mode, &pntr, &nmapFTS, status);
+              if(*status == SAI__OK) {
+                fts->sigma = smf_create_smfData(CREATEFLAG, status);
+                if(*status == SAI__OK) {
+                  fts->sigma->dtype   = SMF__DOUBLE;
+                  fts->sigma->ndims   = ndimsFTS;
+                  fts->sigma->dims[0] = dimsFTS[0];
+                  fts->sigma->dims[1] = dimsFTS[1];
+                  fts->sigma->lbnd[0] = 0;
+                  fts->sigma->lbnd[1] = 0;
 
-          if(ftsLoc) { datAnnul(&ftsLoc, status); }
-        } else {
-          (*data)->fts = NULL;
+                  // MAKE A DEEP COPY
+                  int index, count;
+                  count = dimsFTS[0] * dimsFTS[1];
+                  fts->sigma->pntr[0] = astCalloc(count, sizeof(double), 0);
+                  for(index = 0; index < count; index++) {
+                    *((double*) (fts->sigma->pntr[0]) + index) = *((double*) pntr + index);
+                  }
+                }
+              }
+            }
+          }
+          // CLEANUP FTS2
+          if(hdsFTS) { datAnnul(&hdsFTS, status); }
         }
-      } else {
-        (*data)->fts = NULL;
       }
-    } else {
-      (*data)->fts = NULL;
     }
 
     if (isFlat) {

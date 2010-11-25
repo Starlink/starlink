@@ -119,7 +119,6 @@ void smurf_fts2_init(int* status)
   smfData* inputData    = NULL; /* Pointer to input data */
   smfData* outputData   = NULL; /* Pointer to output data */
   smfData* zpdInData    = NULL; /* Pointer to input zpd data */
-  smfData* zpdOutData   = NULL; /* Pointer to output zpd data */
   void* ptrSRC          = NULL; /* Pointer to 3D input data values */
   void* ptrZPD          = NULL; /* Pointer to 2D ZPD data values */
 
@@ -129,7 +128,6 @@ void smurf_fts2_init(int* status)
             "Equal number of input and output files expected!",
             &grpOutput, &numOutputFile, status);
   kpg1Gtgrp("ZPD", &grpZPD, &numZPDFile, status);
-
 
   ndfBegin();
 
@@ -200,40 +198,56 @@ void smurf_fts2_init(int* status)
     if(hds) { datAnnul(&hds, status); }
     if(hdsPOS) { datAnnul(&hdsPOS, status); }
 
-    // LOOP THROUGH THE SUBARRAY & LOCATE ZPD INDICES
-    zpdOutData = smf_create_smfData(SMF__NOCREATE_DA | SMF__NOCREATE_FTS, status);
-    zpdOutData->dtype   = SMF__INTEGER;
-    zpdOutData->ndims   = 2;
-    zpdOutData->dims[0] = zpdW;
-    zpdOutData->dims[1] = zpdH;
-    zpdOutData->pntr[0] = (int*) astMalloc(numBol * sizeof(int));
+    // CREATE ZPD (2D INDEX ARRAY)
+    smfData* zpd = smf_create_smfData(SMF__NOCREATE_DA | SMF__NOCREATE_FTS, status);
+    zpd->dtype   = SMF__INTEGER;
+    zpd->ndims   = 2;
+    zpd->dims[0] = zpdW;
+    zpd->dims[1] = zpdH;
+    zpd->pntr[0] = (int*) astMalloc(numBol * sizeof(int));
 
     int i = 0, j = 0;
     for(i = 0; i < zpdH; i++) {
       for(j = 0; j < zpdW; j++) {
         bolIndex = i + j * zpdH;
-        double ZPD = *((double*)ptrZPD + bolIndex);
+        double zpdVal = *((double*)ptrZPD + bolIndex);
 
         int ii = 0;
         int jj = 0;
         int kk = srcN - 1;
         while(kk - jj > 1) {
           ii = (kk + jj) >> 1;
-          if(ZPD < posArr[ii]) {
+          if(zpdVal < posArr[ii]) {
             kk = ii;
           } else {
             jj = ii;
           }
         }
-        jj++;
 
-        *((int*) (zpdOutData->pntr[0]) + bolIndex) = jj;
+        *((int*) (zpd->pntr[0]) + bolIndex) = ++jj;
       }
     }
     astFree(posArr);
     smf_close_file(&inputData, status);
 
-    outputData->fts = smf_construct_smfFts(NULL, zpdOutData, NULL, NULL, status);
+    // CREATE EMPTY FPM & SIGMA
+    smfData* fpm = smf_create_smfData(SMF__NOCREATE_DA | SMF__NOCREATE_FTS, status);
+    fpm->dtype   = SMF__DOUBLE;
+    fpm->ndims   = 3;
+    fpm->dims[0] = 1;
+    fpm->dims[1] = 1;
+    fpm->dims[2] = 1;
+    fpm->pntr[0] = (double*) astMalloc(1 * sizeof(double));
+    *((double*) fpm->pntr[0]) = 0;
+    smfData* sigma = smf_create_smfData(SMF__NOCREATE_DA | SMF__NOCREATE_FTS, status);
+    sigma->dtype   = SMF__DOUBLE;
+    sigma->ndims   = 2;
+    sigma->dims[0] = 1;
+    sigma->dims[1] = 1;
+    sigma->pntr[0] = (double*) astMalloc(1 * sizeof(double));
+    *((double*) sigma->pntr[0]) = 0;
+
+    outputData->fts = smf_construct_smfFts(NULL, zpd, fpm, sigma, status);
     smf_write_smfData(outputData, NULL, NULL, grpOutput, fileIndex, 0, status);
     smf_close_file(&outputData, status);
   }
