@@ -310,6 +310,7 @@ void smf_close_file( smfData ** data, int * status ) {
   /* Free smfFts */
   if((*data)->fts != NULL) {
     fts = (*data)->fts;
+    if(fts->zpd) { smf_close_file(&fts->zpd, status); }
     if(fts->fpm) { smf_close_file(&fts->fpm, status); }
     if(fts->sigma) { smf_close_file(&fts->sigma, status); }
     fts = astFree(fts);

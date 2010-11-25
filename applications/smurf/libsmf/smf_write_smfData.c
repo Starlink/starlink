@@ -417,7 +417,7 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
         (outdata->file->ndfid != NDF__NOID) ) {
       int id            = 0;
       int nmap          = 0;
-      void *pntr[]      = {NULL, NULL};
+      void* pntr        = NULL;
       int* outzpd       = NULL;
       double* outfpm    = NULL;
       double* outsigma  = NULL;
@@ -431,48 +431,54 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
 
       if(*status == SAI__OK && loc != NULL) {
         /* WRITE ZPD */
-        lbnd[0] = 0;
-        lbnd[1] = 0;
-        ubnd[0] = lbnd[0] + fts->zpd->dims[0] - 1;
-        ubnd[1] = lbnd[1] + fts->zpd->dims[1] - 1;
-        id = smf_get_ndfid( loc, "ZPD", "WRITE", "UNKNOWN", "_INTEGER",
-                            fts->zpd->ndims, lbnd, ubnd, status);
-        ndfMap(id, "DATA", "_INTEGER", "WRITE", &pntr[0], &nmap, status);
-        outzpd = pntr[0];
-        if((*status == SAI__OK) && outsigma) {
-          memcpy(outzpd, fts->zpd->pntr[0], nmap * sizeof(*outzpd));
+        if(fts->zpd && fts->zpd->pntr[0]) {
+          lbnd[0] = 0;
+          lbnd[1] = 0;
+          ubnd[0] = lbnd[0] + fts->zpd->dims[0] - 1;
+          ubnd[1] = lbnd[1] + fts->zpd->dims[1] - 1;
+          id = smf_get_ndfid( loc, "ZPD", "WRITE", "UNKNOWN", "_INTEGER",
+                              fts->zpd->ndims, lbnd, ubnd, status);
+          ndfMap(id, "DATA", "_INTEGER", "WRITE", &pntr, &nmap, status);
+          outzpd = pntr;
+          if((*status == SAI__OK) && outzpd) {
+            memcpy(outzpd, fts->zpd->pntr[0], nmap * sizeof(*outzpd));
+          }
+          ndfAnnul(&id, status);
         }
-        ndfAnnul(&id, status);
 
         /* WRITE FPM */
-        lbnd[0] = 0;
-        lbnd[1] = 0;
-        lbnd[2] = 1;
-        ubnd[0] = lbnd[0] + fts->fpm->dims[0] - 1;
-        ubnd[1] = lbnd[1] + fts->fpm->dims[1] - 1;
-        ubnd[2] = lbnd[2] + fts->fpm->dims[2] - 1;
-        id = smf_get_ndfid( loc, "FPM", "WRITE", "UNKNOWN", "_DOUBLE",
-                            fts->fpm->ndims, lbnd, ubnd, status);
-        ndfMap(id, "DATA", "_DOUBLE", "WRITE", &pntr[0], &nmap, status);
-        outfpm = pntr[0];
-        if((*status == SAI__OK) && outfpm) {
-          memcpy(outfpm, fts->fpm->pntr[0], nmap * sizeof(*outfpm));
+        if(fts->fpm && fts->fpm->pntr[0]) {
+          lbnd[0] = 0;
+          lbnd[1] = 0;
+          lbnd[2] = 1;
+          ubnd[0] = lbnd[0] + fts->fpm->dims[0] - 1;
+          ubnd[1] = lbnd[1] + fts->fpm->dims[1] - 1;
+          ubnd[2] = lbnd[2] + fts->fpm->dims[2] - 1;
+          id = smf_get_ndfid( loc, "FPM", "WRITE", "UNKNOWN", "_DOUBLE",
+                              fts->fpm->ndims, lbnd, ubnd, status);
+          ndfMap(id, "DATA", "_DOUBLE", "WRITE", &pntr, &nmap, status);
+          outfpm = pntr;
+          if((*status == SAI__OK) && outfpm) {
+            memcpy(outfpm, fts->fpm->pntr[0], nmap * sizeof(*outfpm));
+          }
+          ndfAnnul(&id, status);
         }
-        ndfAnnul(&id, status);
 
         /* WRITE STANDARD DEVIATION, SIGMA */
-        lbnd[0] = 0;
-        lbnd[1] = 0;
-        ubnd[0] = lbnd[0] + fts->sigma->dims[0] - 1;
-        ubnd[1] = lbnd[1] + fts->sigma->dims[1] - 1;
-        id = smf_get_ndfid( loc, "SIGMA", "WRITE", "UNKNOWN", "_DOUBLE",
-                            fts->sigma->ndims, lbnd, ubnd, status);
-        ndfMap(id, "DATA", "_DOUBLE", "WRITE", &pntr[0], &nmap, status);
-        outsigma = pntr[0];
-        if((*status == SAI__OK) && outsigma) {
-          memcpy(outsigma, fts->sigma->pntr[0], nmap * sizeof(*outsigma));
+        if(fts->sigma && fts->sigma->pntr[0]) {
+          lbnd[0] = 0;
+          lbnd[1] = 0;
+          ubnd[0] = lbnd[0] + fts->sigma->dims[0] - 1;
+          ubnd[1] = lbnd[1] + fts->sigma->dims[1] - 1;
+          id = smf_get_ndfid( loc, "SIGMA", "WRITE", "UNKNOWN", "_DOUBLE",
+                              fts->sigma->ndims, lbnd, ubnd, status);
+          ndfMap(id, "DATA", "_DOUBLE", "WRITE", &pntr, &nmap, status);
+          outsigma = pntr;
+          if((*status == SAI__OK) && outsigma) {
+            memcpy(outsigma, fts->sigma->pntr[0], nmap * sizeof(*outsigma));
+          }
+          ndfAnnul(&id, status);
         }
-        ndfAnnul(&id, status);
 
         datAnnul(&loc, status);
       }
