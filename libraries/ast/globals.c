@@ -204,6 +204,7 @@ AstGlobals *astGlobalsInit_( void ) {
       INIT( StcCatalogEntryLocation );
       INIT( StcObsDataLocation );
       INIT( SwitchMap );
+      INIT( Table );
       INIT( TimeMap );
       INIT( TranMap );
       INIT( UnitMap );

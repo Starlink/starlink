@@ -868,7 +868,7 @@ F77_INTEGER_FUNCTION(ast_maptype)( INTEGER(THIS),
    F77_INTEGER_TYPE(RESULT);
    char *key;
 
-   astAt( "AST_MAPLENGTH", NULL, 0 );
+   astAt( "AST_MAPTYPE", NULL, 0 );
    astWatchSTATUS(
       key = astString( KEY, KEY_length );
       RESULT = astMapType( astI2P( *THIS ), key );

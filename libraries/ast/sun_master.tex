@@ -18848,6 +18848,7 @@ Object             - Base class for all AST Objects
       XmlChan      - I/O Channel using XML
       StcsChan     - I/O Channel using IVOA STC-S descriptions
    KeyMap          - Store a set of key/value pairs
+      Table        - Store a 2-dimensional table of values
    Mapping         - Inter-relate two coordinate systems
       CmpMap       - Compound Mapping
       DssMap       - Map points using Digitised Sky Survey plate solution
@@ -22086,12 +22087,10 @@ frequency is less than the absoliute value of the intermediate frequency.
 \end{enumerate}
 
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V5.3-2}
+\subsection{Changes Introduced in V5.3-2}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V5.3-1 and V5.3-2 (the
-current version):
+The following describes the most significant changes which
+occurred in the AST library between versions V5.3-1 and V5.3-2:
 
 \begin{enumerate}
 
@@ -22138,6 +22137,29 @@ values.
 
 \end{enumerate}
 
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V5.4-0}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V5.3-2 and V5.4-0 (the
+current version):
+
+\begin{enumerate}
+
+\item A new class called ``Table'' has been added. A Table is a KeyMap in
+which each entry represents a cell in a two-dimensional table.
+
+\item a memory leak associated with the use of the 
+c+
+astMapPutElem<X>
+c-
+f+
+AST\_MAPPUTELEM<X>
+f-
+functions has been fixed.
+
+\end{enumerate}
 
 Programs which are statically linked will need to be re-linked in
 order to take advantage of these new facilities.

@@ -881,9 +881,10 @@ static void CheckCircle( AstKeyMap *this, AstObject *obj, const char *method, in
 /* First check if the supplied Objects are the same. You cannot store a
    KeyMap as an entry within itself. */
       if( keymap == this ) {
-         astError( AST__KYCIR, "%s(%s): Cannot add a KeyMap into another "
-                   "KeyMap because they are same KeyMap.", status, method,
-                   astGetClass( this ) );
+         astError( AST__KYCIR, "%s(%s): Cannot add a %s into another "
+                   "%s because they are same %s.", status, method,
+                   astGetClass( this ), astGetClass( this ),
+                   astGetClass( this ), astGetClass( this ) );
 
 /* Otherwise, loop through all the entries in the KeyMap looking for AstObject
    entries. */
@@ -6643,14 +6644,29 @@ f     ELEM = INTEGER (Given)
 *        The index of the vector element to modify, starting at
 c        zero.
 f        one.
-*        If the index is outside the range of the vector, the length of
-*        the vector will be increased by one element and the supplied
-*        value will be stored at the end of the vector in the new element.
 c     value
 f     VALUE = <X>type (Given)
 *        The value to store.
 f     STATUS = INTEGER (Given and Returned)
 f        The global status.
+
+*  Applicability:
+*     KeyMap
+*        If the
+c        "elem"
+f        ELEM
+*        index is outside the range of the vector, the length of
+*        the vector will be increased by one element and the supplied
+*        value will be stored at the end of the vector in the new element.
+*     Table
+*        If the
+c        "elem"
+f        ELEM
+*        index is outside the range of the vector, an error will be
+*        reported. The number of elements in each cell of a column is
+*        specified when the column is created using
+c        astAddColumn.
+f        AST_ADDCOLUMN.
 
 *  Notes:
 *     - If the entry originally holds a scalar value, it will be treated
@@ -9184,7 +9200,7 @@ AstKeyMap *astLoadKeyMap_( void *mem, size_t size, AstKeyMapVtab *vtab,
             if( nel == 0 ) {
                (void) sprintf( buff, "val%d", nentry );
                ival = astReadInt( channel, buff, 0 );
-               astMapPut0I( new, key, ival, com );
+               MapPut0I( new, key, ival, com, status );
 
 /* If we must have an array of values... */
             } else {
@@ -9199,7 +9215,7 @@ AstKeyMap *astLoadKeyMap_( void *mem, size_t size, AstKeyMapVtab *vtab,
                }
 
 /* Create the KeyMap entry. */
-               astMapPut1I( new, key, nel, ilist, com );
+               MapPut1I( new, key, nel, ilist, com, status );
 
 /* Free resources. */
                ilist = astFree( ilist );
@@ -9210,14 +9226,14 @@ AstKeyMap *astLoadKeyMap_( void *mem, size_t size, AstKeyMapVtab *vtab,
             if( nel == 0 ) {
                (void) sprintf( buff, "val%d", nentry );
                wval = (short int) astReadInt( channel, buff, 0 );
-               astMapPut0S( new, key, wval, com );
+               MapPut0S( new, key, wval, com, status );
             } else {
                wlist = astMalloc( sizeof(short int)*nel );
                for( index = 0; astOK && index < nel; index++ ) {
                   (void) sprintf( buff, "v%d_%d", nentry, index + 1 );
                   wlist[ index ] = (short int) astReadInt( channel, buff, 0 );
                }
-               astMapPut1S( new, key, nel, wlist, com );
+               MapPut1S( new, key, nel, wlist, com, status );
                wlist = astFree( wlist );
             }
 
@@ -9226,14 +9242,14 @@ AstKeyMap *astLoadKeyMap_( void *mem, size_t size, AstKeyMapVtab *vtab,
             if( nel == 0 ) {
                (void) sprintf( buff, "val%d", nentry );
                dval = astReadDouble( channel, buff, AST__BAD );
-               astMapPut0D( new, key, dval, com );
+               MapPut0D( new, key, dval, com, status );
             } else {
                dlist = astMalloc( sizeof(double)*nel );
                for( index = 0; astOK && index < nel; index++ ) {
                   (void) sprintf( buff, "v%d_%d", nentry, index + 1 );
                   dlist[ index ] = astReadDouble( channel, buff, AST__BAD );
                }
-               astMapPut1D( new, key, nel, dlist, com );
+               MapPut1D( new, key, nel, dlist, com, status );
                dlist = astFree( dlist );
             }
 
@@ -9242,14 +9258,14 @@ AstKeyMap *astLoadKeyMap_( void *mem, size_t size, AstKeyMapVtab *vtab,
             if( nel == 0 ) {
                (void) sprintf( buff, "val%d", nentry );
                dval = astReadDouble( channel, buff, 0.0 );
-               astMapPut0F( new, key, (float) dval, com );
+               MapPut0F( new, key, (float) dval, com, status );
             } else {
                flist = astMalloc( sizeof(float)*nel );
                for( index = 0; astOK && index < nel; index++ ) {
                   (void) sprintf( buff, "v%d_%d", nentry, index + 1 );
                   flist[ index ] = (float) astReadDouble( channel, buff, 0.0 );
                }
-               astMapPut1F( new, key, nel, flist, com );
+               MapPut1F( new, key, nel, flist, com, status );
                flist = astFree( flist );
             }
 
@@ -9258,7 +9274,7 @@ AstKeyMap *astLoadKeyMap_( void *mem, size_t size, AstKeyMapVtab *vtab,
             if( nel == 0 ) {
                (void) sprintf( buff, "val%d", nentry );
                sval = astReadString( channel, buff, "" );
-               astMapPut0C( new, key, sval, com );
+               MapPut0C( new, key, sval, com, status );
                sval = astFree( sval );
             } else {
                slist = astMalloc( sizeof(const char *)*nel );
@@ -9266,7 +9282,7 @@ AstKeyMap *astLoadKeyMap_( void *mem, size_t size, AstKeyMapVtab *vtab,
                   (void) sprintf( buff, "v%d_%d", nentry, index + 1 );
                   slist[ index ] = astReadString( channel, buff, "" );
                }
-               astMapPut1C( new, key, nel, slist, com );
+               MapPut1C( new, key, nel, slist, com, status );
                for( index = 0; astOK && index < nel; index++ ) {
                   slist[ index ] = astFree( (void *) slist[ index ] );
                }
@@ -9278,7 +9294,7 @@ AstKeyMap *astLoadKeyMap_( void *mem, size_t size, AstKeyMapVtab *vtab,
             if( nel == 0 ) {
                (void) sprintf( buff, "val%d", nentry );
                aval = astReadObject( channel, buff, NULL );
-               astMapPut0A( new, key, aval, com );
+               MapPut0A( new, key, aval, com, status );
                if( aval ) aval = astAnnul( aval );
             } else {
                alist = astMalloc( sizeof(AstObject *)*nel );
@@ -9286,7 +9302,7 @@ AstKeyMap *astLoadKeyMap_( void *mem, size_t size, AstKeyMapVtab *vtab,
                   (void) sprintf( buff, "v%d_%d", nentry, index + 1 );
                   alist[ index ] = astReadObject( channel, buff, NULL );
                }
-               astMapPut1A( new, key, nel, alist, com );
+               MapPut1A( new, key, nel, alist, com, status );
                for( index = 0; astOK && index < nel; index++ ) {
                   if( alist[ index ] ) alist[ index ] = astAnnul( alist[ index ] );
                }

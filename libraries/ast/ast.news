@@ -16,6 +16,13 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
+- A new class called "Table" has been added. A Table is a KeyMap in
+which each entry represents a cell in a two-dimensional table.
+
+
+Main Changes in V5.3-2
+-----------------------
+
 - A bug has been fixed in the FitsChan class that could cause wavelength
 axes to be assigned the units "m/s" when reading WCS information from a
 FITS header.

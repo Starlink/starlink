@@ -60,6 +60,7 @@
 #include "stccatalogentrylocation.h"
 #include "stcobsdatalocation.h"
 #include "stcschan.h"
+#include "table.h"
 
 #include "error.h"
 #include "ast_err.h"
@@ -162,6 +163,7 @@ if ( !strcmp( class, #name ) ) return (AstLoaderType *) astLoad##name##_
    LOAD(SphMap);
    LOAD(SelectorMap);
    LOAD(SwitchMap);
+   LOAD(Table);
    LOAD(TimeFrame);
    LOAD(TimeMap);
    LOAD(TranMap);

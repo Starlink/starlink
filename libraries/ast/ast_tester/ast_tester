@@ -8,29 +8,29 @@
 
 #  Description:
 #     Build and run various tests of an AST installation.
-#     
-#     Some tests produce graphical output. Postscript plots of the FITS 
-#     headers in the current directory are produced for visual comparison 
-#     with previous versions. For each file matching "*.head" in the current 
-#     directory, a file is created called "*-new.ps". This file should be 
-#     compared visually with the file "*.ps". The new files are displayed 
+#
+#     Some tests produce graphical output. Postscript plots of the FITS
+#     headers in the current directory are produced for visual comparison
+#     with previous versions. For each file matching "*.head" in the current
+#     directory, a file is created called "*-new.ps". This file should be
+#     compared visually with the file "*.ps". The new files are displayed
 #     automatically unless the -nd option is supplied on the command line
 #
-#     This script assumes the gnu g95 compiler is available. If this is not 
-#     the case, do a global edit of g95 to whatever fortran 77 compiler you 
-#     have available (you will probably also need to change the compiler 
+#     This script assumes the gnu g95 compiler is available. If this is not
+#     the case, do a global edit of g95 to whatever fortran 77 compiler you
+#     have available (you will probably also need to change the compiler
 #     flags).
 
 #  Options:
 #     -nd : Suppresses display of test plots.
 
 #  Prior Requirements:
-#     - Unless the "-nd" option is specified, it requires the gv command (a 
+#     - Unless the "-nd" option is specified, it requires the gv command (a
 #       frontend for ghostscript) to be on your PATH.
 #     - The following environment variables are used:
-#        STARLINK - should be set to the root of the tree in which the SSC is 
+#        STARLINK - should be set to the root of the tree in which the SSC is
 #              installed. A default of /star is used if not set.
-#        AST - should be set to the root of the tree in which the version of 
+#        AST - should be set to the root of the tree in which the version of
 #              AST to be tested is installed. A default of $HOME is used if not set.
 
 #  Author:
@@ -55,10 +55,10 @@ g95 -fno-second-underscore -o wcsconverter wcsconverter.f -I$AST/include -I$STAR
 g95 -fno-second-underscore -o simplify simplify.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link` `err_link`
 
 # Run the other test progs
-echo "" 
+echo ""
 
 
-foreach prog (teststcschan teststc testspecframe testfitschan testswitchmap testrebin testtrangrid testnormmap testtime testrate testflux testratemap testspecflux testxmlchan testregions testkeymap )
+foreach prog (testtable teststcschan teststc testspecframe testfitschan testswitchmap testrebin testtrangrid testnormmap testtime testrate testflux testratemap testspecflux testxmlchan testregions testkeymap )
 
 g95 -fno-second-underscore -w -g -o $prog -g $prog.f -I$AST/include \
      -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` \
@@ -110,14 +110,14 @@ foreach n (*.head)
    else
       set attr2 = ' '
    endif
-   
+
    set boxfile = "${bn}.box"
    if( -e $boxfile ) then
       set box = `cat $boxfile`
    else
       set box = ' '
    endif
-   
+
 
    set psfile = "${bn}-new.ps"
    plotter $n "$attr1" "$attr2" a.ps $box
@@ -137,7 +137,7 @@ end
 rm -f a.ps
 
 
-# Make new fits headers 
+# Make new fits headers
 echo ""
 echo "Doing WCS conversion tests..."
 echo ""
@@ -157,13 +157,13 @@ foreach n ( "timj ast fits-wcs cdmatrix=1" \
             "longslit fits-pc fits-wcs cdmatrix=1" )
 
   set a = `echo $n`
- 
+
   set base = $a[1]
   set in_suffix = $a[2]
   set encoding = $a[3]
   if( $#a > 3 ) then
      set attrs = $a[4]
-  else 
+  else
      set attrs = ""
   endif
 
@@ -203,7 +203,7 @@ foreach n ( *.map )
    diff -c $a.simp $a.out > $a.diff
 
    if( $status == 0 ) then
-      rm -f $a.out $a.diff  
+      rm -f $a.out $a.diff
    else
       echo "   $a.simp and $a.out differ\!\! (see $a.diff)"
       set ok = 0
@@ -222,4 +222,4 @@ endif
 
 
 
-rm -f plotter wcsconverter simplify testxmlchan 
+rm -f plotter wcsconverter simplify testxmlchan

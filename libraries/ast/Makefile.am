@@ -63,6 +63,7 @@ GRP_C_ROUTINES = \
     ftimeframe.c \
     ftimemap.c \
     fsphmap.c \
+    ftable.c \
     ftranmap.c \
     fselectormap.c \
     fswitchmap.c \
@@ -116,6 +117,7 @@ GRP_C_ROUTINES = \
     fstccatalogentrylocation.c \
     fstcobsdatalocation.c \
     fstcschan.c \
+    table.c \
     timeframe.c \
     timemap.c \
     tranmap.c \
@@ -143,6 +145,7 @@ AST_H_FILES = \
     version.h \
     object.h \
        keymap.h \
+          table.h \
        pointset.h \
        axis.h \
           skyaxis.h \
@@ -200,7 +203,7 @@ AST_H_FILES = \
        channel.h \
           fitschan.h \
           stcschan.h \
-          xmlchan.h 
+          xmlchan.h
 
 # All the (C) include files required to build the library.
 GRP_C_INCLUDE_FILES = \
@@ -320,7 +323,7 @@ dist_starnews_DATA = ast.news
 dist_pkgdata_DATA = LICENCE
 
 # Make all library code position independent by default. This is handy for
-# creating shareable libraries from the static ones (Java JNI libraries). 
+# creating shareable libraries from the static ones (Java JNI libraries).
 # Note we do not simply set the AM_CFLAGS variable, as this would also
 # apply to programs compiled without using libtool, possibly causing the
 # compilation to fail.
@@ -373,20 +376,20 @@ libast_ems_la_SOURCES = err_ems.c
 #  The error reporting module that uses DRAMA Ers to deliver errors.
 libast_drama_la_SOURCES = err_drama.c
 
-#  The module containing null implementations of the 3D graphics routines 
-#  required by AST 
-libast_grf3d_la_SOURCES = grf3d.c 
+#  The module containing null implementations of the 3D graphics routines
+#  required by AST
+libast_grf3d_la_SOURCES = grf3d.c
 
-#  The module containing null implementations of the graphics routines 
+#  The module containing null implementations of the graphics routines
 #  required by AST V2.0
-libast_grf_2_0_la_SOURCES = grf_2.0.c 
+libast_grf_2_0_la_SOURCES = grf_2.0.c
 
-#  The module containing null implementations of the graphics routines 
+#  The module containing null implementations of the graphics routines
 #  added by AST V3.2 and not present in V2.0
-libast_grf_3_2_la_SOURCES = grf_3.2.c 
+libast_grf_3_2_la_SOURCES = grf_3.2.c
 
 #  The graphics module that uses PGPLOT for 2D graphical output.
-libast_pgplot_la_SOURCES = grf_pgplot.c 
+libast_pgplot_la_SOURCES = grf_pgplot.c
 
 #  The graphics module that uses PGPLOT for 3D graphical output.
 libast_pgplot3d_la_SOURCES = grf3d_pgplot.c
@@ -443,14 +446,14 @@ ast.h: $(AST_H_FILES) ast_err.h makeh config.h
 # It's most straightforward to build it at the beginning.
 BUILT_SOURCES = AST_ERR ast_err.h version.h
 
-#  Form second links to the main object library (static and shared). This is 
+#  Form second links to the main object library (static and shared). This is
 #  used when a second pass through the library is needed during linking.
 #  Do not forget to change the contents of the libast_pass2.la file to refer
-#  to the pass2 libraries rather than the original libraries. Use target 
-#  install-exec-hook rather than install-exec-local so that the soft links 
-#  and files are created *after* the main library has been installed. 
+#  to the pass2 libraries rather than the original libraries. Use target
+#  install-exec-hook rather than install-exec-local so that the soft links
+#  and files are created *after* the main library has been installed.
 install-exec-hook: libast.la
-	$(mkdir_p) $(DESTDIR)$(libdir) 
+	$(mkdir_p) $(DESTDIR)$(libdir)
 	cd $(DESTDIR)$(libdir); \
 	for f in `ls libast.*`; do \
 	   ff=`echo $$f | sed -e 's/libast/libast_pass2/'`; \

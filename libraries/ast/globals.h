@@ -62,6 +62,7 @@
 #include "stcsearchlocation.h"
 #include "stcschan.h"
 #include "switchmap.h"
+#include "table.h"
 #include "timeframe.h"
 #include "timemap.h"
 #include "tranmap.h"
@@ -195,6 +196,7 @@ typedef struct AstGlobals {
    AstStcCatalogEntryLocationGlobals StcCatalogEntryLocation;
    AstStcObsDataLocationGlobals StcObsDataLocation;
    AstSwitchMapGlobals SwitchMap;
+   AstTableGlobals Table;
    AstTimeMapGlobals TimeMap;
    AstTranMapGlobals TranMap;
    AstUnitMapGlobals UnitMap;
