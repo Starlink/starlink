@@ -14,7 +14,8 @@ f     AST_KEYMAP
 *     The KeyMap class is used to store a set of values with associated keys
 *     which identify the values. The keys are strings (case-sensitive,
 *     trailing spaces are ignored), and the data type of the values can be
-*     integer, floating point,
+*     integer (signed 4 and 2 byte, or unsigned 1 byte), floating point
+*     (single or double precision),
 c     void pointer,
 *     character string or AST Object pointer. Each
 *     value can be a scalar or a one-dimensional vector. A KeyMap is
@@ -165,6 +166,8 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map
 *        Added support for short int valued entries.
 *     24-NOV-2010 (DSB):
 *        Fix memory leak in astMapPutElemC and astMapPutElemA.
+*     26-NOV-2010 (DSB):
+*        Added support for unsigned byte valued entries.
 *class--
 */
 
@@ -241,6 +244,13 @@ typedef struct Entry0S {
    short int value;          /* The short int value */
 } Entry0S;
 
+/* This structure is a AstMapEntry holding a scalar unsigned byte
+   (unsigned char) */
+typedef struct Entry0B {
+   struct AstMapEntry entry; /* The parent Entry information */
+   unsigned char value;      /* The byte value */
+} Entry0B;
+
 /* This structure is a AstMapEntry holding a scalar float */
 typedef struct Entry0F {
    struct AstMapEntry entry; /* The parent Entry information */
@@ -284,6 +294,12 @@ typedef struct Entry1S {
    struct AstMapEntry entry; /* The parent Entry information */
    short int *value;         /* The short int values */
 } Entry1S;
+
+/* This structure is a AstMapEntry holding a 1D array of unsigned bytes */
+typedef struct Entry1B {
+   struct AstMapEntry entry; /* The parent Entry information */
+   unsigned char *value;     /* The byte values */
+} Entry1B;
 
 /* This structure is a AstMapEntry holding a 1D array of floats */
 typedef struct Entry1F {
@@ -392,7 +408,7 @@ static int mapkey_init;
 /* Define the class virtual function table and its initialisation flag
    as static variables. */
 static AstKeyMapVtab class_vtab;   /* Virtual function table */
-static int class_init = 0;       /* Virtual function table initialised? */
+static int class_init = 0;         /* Virtual function table initialised? */
 
 #endif
 
@@ -421,12 +437,14 @@ static int MapGet0A( AstKeyMap *, const char *, AstObject **, int * );
 static int MapGet0C( AstKeyMap *, const char *, const char **, int * );
 static int MapGet0D( AstKeyMap *, const char *, double *, int * );
 static int MapGet0S( AstKeyMap *, const char *, short int *, int * );
+static int MapGet0B( AstKeyMap *, const char *, unsigned char *, int * );
 static int MapGet0F( AstKeyMap *, const char *, float *, int * );
 static int MapGet0I( AstKeyMap *, const char *, int *, int * );
 static int MapGet0P( AstKeyMap *, const char *, void **, int * );
 static int MapGet1A( AstKeyMap *, const char *, int, int *, AstObject **, int * );
 static int MapGet1C( AstKeyMap *, const char *, int, int, int *, char *, int * );
 static int MapGet1D( AstKeyMap *, const char *, int, int *, double *, int * );
+static int MapGet1B( AstKeyMap *, const char *, int, int *, unsigned char *, int * );
 static int MapGet1S( AstKeyMap *, const char *, int, int *, short int *, int * );
 static int MapGet1F( AstKeyMap *, const char *, int, int *, float *, int * );
 static int MapGet1I( AstKeyMap *, const char *, int, int *, int *, int * );
@@ -434,6 +452,7 @@ static int MapGet1P( AstKeyMap *, const char *, int, int *, void **, int * );
 static int MapGetElemA( AstKeyMap *, const char *, int, AstObject **, int * );
 static int MapGetElemC( AstKeyMap *, const char *, int, int, char *, int * );
 static int MapGetElemD( AstKeyMap *, const char *, int, double *, int * );
+static int MapGetElemB( AstKeyMap *, const char *, int, unsigned char *, int * );
 static int MapGetElemS( AstKeyMap *, const char *, int, short int *, int * );
 static int MapGetElemF( AstKeyMap *, const char *, int, float *, int * );
 static int MapGetElemI( AstKeyMap *, const char *, int, int *, int * );
@@ -461,6 +480,7 @@ static void MapCopy( AstKeyMap *, AstKeyMap *, int * );
 static void MapPut0A( AstKeyMap *, const char *, AstObject *, const char *, int * );
 static void MapPut0C( AstKeyMap *, const char *, const char *, const char *, int * );
 static void MapPut0D( AstKeyMap *, const char *, double, const char *, int * );
+static void MapPut0B( AstKeyMap *, const char *, unsigned char, const char *, int * );
 static void MapPut0S( AstKeyMap *, const char *, short int, const char *, int * );
 static void MapPut0F( AstKeyMap *, const char *, float, const char *, int * );
 static void MapPut0I( AstKeyMap *, const char *, int, const char *, int * );
@@ -468,6 +488,7 @@ static void MapPut0P( AstKeyMap *, const char *, void *, const char *, int * );
 static void MapPut1A( AstKeyMap *, const char *, int, AstObject *const [], const char *, int * );
 static void MapPut1C( AstKeyMap *, const char *, int, const char *const [], const char *, int * );
 static void MapPut1D( AstKeyMap *, const char *, int, const double *, const char *, int * );
+static void MapPut1B( AstKeyMap *, const char *, int, const unsigned char *, const char *, int * );
 static void MapPut1S( AstKeyMap *, const char *, int, const short int *, const char *, int * );
 static void MapPut1F( AstKeyMap *, const char *, int, const float *, const char *, int * );
 static void MapPut1I( AstKeyMap *, const char *, int, const int *, const char *, int * );
@@ -475,6 +496,7 @@ static void MapPut1P( AstKeyMap *, const char *, int, void *const [], const char
 static void MapPutElemA( AstKeyMap *, const char *, int, AstObject *, int * );
 static void MapPutElemC( AstKeyMap *, const char *, int, const char *, int * );
 static void MapPutElemD( AstKeyMap *, const char *, int, double, int * );
+static void MapPutElemB( AstKeyMap *, const char *, int, unsigned char, int * );
 static void MapPutElemS( AstKeyMap *, const char *, int, short int, int * );
 static void MapPutElemF( AstKeyMap *, const char *, int, float, int * );
 static void MapPutElemI( AstKeyMap *, const char *, int, int, int * );
@@ -1408,20 +1430,21 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type, int *
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstObject *aval;              /* AstObject pointer value */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    const char *cval;             /* Pointer to string value */
    const char *cvalue;           /* Pointer to output string value */
    double dval;                  /* Double precision value */
    float fval;                   /* Single precision value */
-   int ival;                     /* Integer value */
    int i;                        /* Loop count */
+   int ival;                     /* Integer value */
    int n1;                       /* Number of characters at reduced precision */
    int n2;                       /* Number of characters at full precision */
    int nc;                       /* Number of characters read from string */
    int nval;                     /* Number of values read from string */
    int result;                   /* Returned flag */
    short int sval;               /* Short int value */
+   unsigned char bval;           /* Byte value */
 
 /* Initialise. */
    result = 0;
@@ -1462,6 +1485,10 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type, int *
 /* Consider conversion to "short int". */
       } else if( out_type == AST__SINTTYPE ) {
          if( out ) *( (short int *) out ) = (short int) ival;
+
+/* Consider conversion to "byte". */
+      } else if( out_type == AST__BYTETYPE ) {
+         if( out ) *( (unsigned char *) out ) = (unsigned char) ival;
 
 /* Consider conversion to "float". */
       } else if( out_type == AST__FLOATTYPE ) {
@@ -1504,6 +1531,10 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type, int *
       } else if( out_type == AST__SINTTYPE ) {
          if( out ) *( (short int *) out ) = sval;
 
+/* Consider conversion to "byte". */
+      } else if( out_type == AST__BYTETYPE ) {
+         if( out ) *( (unsigned char *) out ) = sval;
+
 /* Consider conversion to "float". */
       } else if( out_type == AST__FLOATTYPE ) {
          if( out ) *( (float *) out ) = (float) sval;
@@ -1533,6 +1564,51 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type, int *
                    out_type );
       }
 
+/* Otherwise, consider conversion from "byte". */
+    } else if( raw_type == AST__BYTETYPE ) {
+      bval = *( (unsigned char *) raw );
+
+/* Consider conversion to "int". */
+      if( out_type == AST__INTTYPE ) {
+         if( out ) *( (int *) out ) = bval;
+
+/* Consider conversion to "short int". */
+      } else if( out_type == AST__SINTTYPE ) {
+         if( out ) *( (short int *) out ) = bval;
+
+/* Consider conversion to "byte". */
+      } else if( out_type == AST__BYTETYPE ) {
+         if( out ) *( (unsigned char *) out ) = bval;
+
+/* Consider conversion to "float". */
+      } else if( out_type == AST__FLOATTYPE ) {
+         if( out ) *( (float *) out ) = (float) bval;
+
+/* Consider conversion to "double". */
+      } else if( out_type == AST__DOUBLETYPE ) {
+         if( out ) *( (double *) out ) = (double) bval;
+
+/* Consider conversion to "const char *". */
+      } else if( out_type == AST__STRINGTYPE ) {
+         (void) sprintf( convertvalue_buff, "%d", (int) bval );
+         cvalue = convertvalue_buff;
+
+/* Consider conversion to "AstObject *". */
+      } else if( out_type == AST__OBJECTTYPE ) {
+         result = 0;
+
+/* Consider conversion to "void *". */
+      } else if( out_type == AST__POINTERTYPE ) {
+         result = 0;
+
+/* Report an error if the data type is unknown. */
+      } else {
+         result = 0;
+         astError( AST__INTER, "ConvertValue(KeyMap): Illegal map entry data "
+                   "type %d encountered (internal AST programming error).", status,
+                   out_type );
+      }
+
 /* Consider conversion from "double". */
    } else if( raw_type == AST__DOUBLETYPE ) {
       dval = *( (double *) raw );
@@ -1544,6 +1620,10 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type, int *
 /* Consider conversion to "short int". */
       } else if( out_type == AST__SINTTYPE ) {
          if( out ) *( (short int *) out ) = (int)( dval + 0.5 );
+
+/* Consider conversion to "byte". */
+      } else if( out_type == AST__BYTETYPE ) {
+         if( out ) *( (unsigned char *) out ) = (int)( dval + 0.5 );
 
 /* Consider conversion to "double". */
       } else if( out_type == AST__DOUBLETYPE ) {
@@ -1595,6 +1675,10 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type, int *
 /* Consider conversion to "short int". */
       } else if( out_type == AST__SINTTYPE ) {
          if( out ) *( (short int *) out ) = (int)( fval + 0.5 );
+
+/* Consider conversion to "byte". */
+      } else if( out_type == AST__BYTETYPE ) {
+         if( out ) *( (unsigned char *) out ) = (int)( fval + 0.5 );
 
 /* Consider conversion to "double". */
       } else if( out_type == AST__DOUBLETYPE ) {
@@ -1661,6 +1745,22 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type, int *
             }
          }
 
+/* Consider conversion to "byte". */
+      } else if( out_type == AST__BYTETYPE ) {
+         nc = 0;
+         nval = astSscanf( cval, " %d %n", &ival, &nc );
+         if( ( nval == 1 ) && ( nc >= (int) strlen( cval ) ) ) {
+            if( out ) *( (unsigned char *) out ) = ival;
+         } else {
+            nc = 0;
+            nval = astSscanf( cval, " %lf %n", &dval, &nc );
+            if( ( nval == 1 ) && ( nc >= (int) strlen( cval ) ) ) {
+               if( out ) *( (unsigned char *) out ) = (int) ( dval + 0.5 );
+            } else {
+               result = 0;
+            }
+         }
+
 /* Consider conversion to "double". */
       } else if( out_type == AST__DOUBLETYPE ) {
          nc = 0;
@@ -1718,6 +1818,10 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type, int *
       } else if( out_type == AST__SINTTYPE ) {
          result = 0;
 
+/* Consider conversion to "byte". */
+      } else if( out_type == AST__BYTETYPE ) {
+         result = 0;
+
 /* Consider conversion to "double". */
       } else if( out_type == AST__DOUBLETYPE ) {
          result = 0;
@@ -1756,6 +1860,10 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type, int *
 
 /* Consider conversion to "short int". */
       } else if( out_type == AST__SINTTYPE ) {
+         result = 0;
+
+/* Consider conversion to "byte". */
+      } else if( out_type == AST__BYTETYPE ) {
          result = 0;
 
 /* Consider conversion to "double". */
@@ -1962,6 +2070,15 @@ static AstMapEntry *CopyMapEntry( AstMapEntry *in, int *status ){
          ( (Entry1S *) result )->value = astStore( NULL,
                                             ( (Entry1S *) in )->value,
                                             sizeof( short int )*(size_t)nel );
+      }
+
+/* Now deal with byte entries. Scalar entries do not need any further
+   action. If this is a vector entry copy the values array. */
+   } else if( type == AST__BYTETYPE ) {
+      if( nel > 0 ) {
+         ( (Entry1B *) result )->value = astStore( NULL,
+                                            ( (Entry1B *) in )->value,
+                                            sizeof( unsigned char )*(size_t)nel );
       }
 
 /* Similarly deal with floating point entries. */
@@ -2261,6 +2378,9 @@ static void DumpEntry( AstMapEntry *entry, AstChannel *channel, int nentry, int 
    } else if( type == AST__SINTTYPE ) {
       com = "Item data type (short int)";
 
+   } else if( type == AST__BYTETYPE ) {
+      com = "Item data type (unsigned byte)";
+
    } else if( type == AST__DOUBLETYPE ) {
       com = "Item data type (double)";
 
@@ -2312,6 +2432,20 @@ static void DumpEntry( AstMapEntry *entry, AstChannel *channel, int nentry, int 
          for( index = 0; index < nel; index++ ){
             (void) sprintf( buff, "V%d_%d", nentry, index + 1 );
             astWriteInt( channel, buff, 1, 1, (int) ((Entry1S *)entry)->value[ index ], com );
+            com = "";
+         }
+      }
+
+/* Similarly, deal with byte entries. */
+   } else if( type == AST__BYTETYPE ) {
+      if( entry->nel == 0 ) {
+         (void) sprintf( buff, "Val%d", nentry );
+         astWriteInt( channel, buff, 1, 1, (int) ((Entry0B *)entry)->value, "Item value" );
+      } else {
+         com = "Item values";
+         for( index = 0; index < nel; index++ ){
+            (void) sprintf( buff, "V%d_%d", nentry, index + 1 );
+            astWriteInt( channel, buff, 1, 1, (int) ((Entry1B *)entry)->value[ index ], com );
             com = "";
          }
       }
@@ -2498,6 +2632,11 @@ static AstMapEntry *FreeMapEntry( AstMapEntry *in, int *status ){
    action. If this is a vector entry free the values array. */
    } else if( type == AST__SINTTYPE ) {
       if( nel > 0 ) ( (Entry1S *) in )->value = astFree( ( (Entry1S *) in )->value );
+
+/* Now deal with byte entries. Scalar entries do not need any further
+   action. If this is a vector entry free the values array. */
+   } else if( type == AST__BYTETYPE ) {
+      if( nel > 0 ) ( (Entry1B *) in )->value = astFree( ( (Entry1B *) in )->value );
 
 /* Similarly deal with void * pointer entries. */
    } else if( type == AST__POINTERTYPE ) {
@@ -2826,6 +2965,9 @@ static int GetObjSize( AstObject *this_object, int *status ) {
          } else if( type == AST__SINTTYPE ) {
             if( nel > 0 ) result += astTSizeOf( ( (Entry1S *) next )->value );
 
+         } else if( type == AST__BYTETYPE ) {
+            if( nel > 0 ) result += astTSizeOf( ( (Entry1B *) next )->value );
+
          } else if( type == AST__DOUBLETYPE ) {
             if( nel > 0 ) result += astTSizeOf( ( (Entry1D *) next )->value );
 
@@ -3153,6 +3295,7 @@ void astInitKeyMapVtab_(  AstKeyMapVtab *vtab, const char *name, int *status ) {
    vtab->MapGet0D = MapGet0D;
    vtab->MapGet0F = MapGet0F;
    vtab->MapGet0I = MapGet0I;
+   vtab->MapGet0B = MapGet0B;
    vtab->MapGet0S = MapGet0S;
    vtab->MapGet1P = MapGet1P;
    vtab->MapGet1A = MapGet1A;
@@ -3160,6 +3303,7 @@ void astInitKeyMapVtab_(  AstKeyMapVtab *vtab, const char *name, int *status ) {
    vtab->MapGet1D = MapGet1D;
    vtab->MapGet1F = MapGet1F;
    vtab->MapGet1I = MapGet1I;
+   vtab->MapGet1B = MapGet1B;
    vtab->MapGet1S = MapGet1S;
    vtab->MapGetElemP = MapGetElemP;
    vtab->MapGetElemA = MapGetElemA;
@@ -3168,6 +3312,7 @@ void astInitKeyMapVtab_(  AstKeyMapVtab *vtab, const char *name, int *status ) {
    vtab->MapGetElemF = MapGetElemF;
    vtab->MapGetElemI = MapGetElemI;
    vtab->MapGetElemS = MapGetElemS;
+   vtab->MapGetElemB = MapGetElemB;
    vtab->MapPutElemP = MapPutElemP;
    vtab->MapPutElemA = MapPutElemA;
    vtab->MapPutElemC = MapPutElemC;
@@ -3175,6 +3320,7 @@ void astInitKeyMapVtab_(  AstKeyMapVtab *vtab, const char *name, int *status ) {
    vtab->MapPutElemF = MapPutElemF;
    vtab->MapPutElemI = MapPutElemI;
    vtab->MapPutElemS = MapPutElemS;
+   vtab->MapPutElemB = MapPutElemB;
    vtab->MapPut0A = MapPut0A;
    vtab->MapPut0P = MapPut0P;
    vtab->MapPut0C = MapPut0C;
@@ -3182,6 +3328,7 @@ void astInitKeyMapVtab_(  AstKeyMapVtab *vtab, const char *name, int *status ) {
    vtab->MapPut0F = MapPut0F;
    vtab->MapPut0I = MapPut0I;
    vtab->MapPut0S = MapPut0S;
+   vtab->MapPut0B = MapPut0B;
    vtab->MapPut1P = MapPut1P;
    vtab->MapPut1A = MapPut1A;
    vtab->MapPut1C = MapPut1C;
@@ -3189,6 +3336,7 @@ void astInitKeyMapVtab_(  AstKeyMapVtab *vtab, const char *name, int *status ) {
    vtab->MapPut1F = MapPut1F;
    vtab->MapPut1I = MapPut1I;
    vtab->MapPut1S = MapPut1S;
+   vtab->MapPut1B = MapPut1B;
    vtab->MapPutU = MapPutU;
    vtab->MapRemove = MapRemove;
    vtab->MapCopy = MapCopy;
@@ -3866,12 +4014,14 @@ c     - C: "const" pointer to null terminated character string
 c     - A: Pointer to AstObject
 c     - P: Generic "void *" pointer
 c     - S: short int
+c     - B: unsigned byte (i.e. unsigned char)
 f     - D: DOUBLE PRECISION
 f     - R: REAL
 f     - I: INTEGER
 f     - C: CHARACTER
 f     - A: INTEGER used to identify an AstObject
 f     - S: INTEGER*2 (short integer)
+f     - B: Unsigned byte
 *
 c     For example, astMapPut0D would be used to store a "double" value,
 c     while astMapPut0I would be used to store an "int", etc.
@@ -3966,6 +4116,7 @@ static void MapPut0##X( AstKeyMap *this, const char *key, Xtype value, \
 #define CHECK_C
 #define CHECK_P
 #define CHECK_S
+#define CHECK_B
 
 /* Expand the above macro to generate a function for each required
    data type. */
@@ -3976,6 +4127,7 @@ MAKE_MAPPUT0(C,const char *,AST__STRINGTYPE,astStore(NULL,value,strlen(value)+1)
 MAKE_MAPPUT0(A,AstObject *,AST__OBJECTTYPE,(value?astClone(value):NULL))
 MAKE_MAPPUT0(P,void *,AST__POINTERTYPE,value)
 MAKE_MAPPUT0(S,short int,AST__SINTTYPE,value)
+MAKE_MAPPUT0(B,unsigned char,AST__BYTETYPE,value)
 
 /* Undefine the macro. */
 #undef MAKE_MAPPUT0
@@ -3986,6 +4138,7 @@ MAKE_MAPPUT0(S,short int,AST__SINTTYPE,value)
 #undef CHECK_F
 #undef CHECK_C
 #undef CHECK_P
+#undef CHECK_B
 
 /*
 *++
@@ -4068,12 +4221,14 @@ c     - C: "const" pointer to null terminated character string
 c     - A: Pointer to AstObject
 c     - P: Generic "void *" pointer
 c     - S: short int
+c     - B: Unsigned byte (i.e. char)
 f     - D: DOUBLE PRECISION
 f     - R: REAL
 f     - I: INTEGER
 f     - C: CHARACTER
 f     - A: INTEGER used to identify an AstObject
 f     - S: INTEGER*2 (short integer)
+f     - B: Unsigned byte
 *
 c     For example, astMapPut1D would be used to store "double" values,
 c     while astMapPut1I would be used to store "int", etc.
@@ -4173,6 +4328,7 @@ for( i = 0; i < size; i++ ) { \
 }
 #define CHECK_I
 #define CHECK_S
+#define CHECK_B
 #define CHECK_D
 #define CHECK_F
 #define CHECK_C
@@ -4187,11 +4343,13 @@ MAKE_MAPPUT1(C,const char *const,AST__STRINGTYPE,astStore(NULL,value[i],strlen(v
 MAKE_MAPPUT1(A,AstObject *const,AST__OBJECTTYPE,(value[i]?astClone(value[i]):NULL))
 MAKE_MAPPUT1(P,void *const,AST__POINTERTYPE,value[i])
 MAKE_MAPPUT1(S,const short int,AST__SINTTYPE,value[i])
+MAKE_MAPPUT1(B,const unsigned char,AST__BYTETYPE,value[i])
 
 /* Undefine the macro. */
 #undef MAKE_MAPPUT1
 #undef CHECK_A
 #undef CHECK_I
+#undef CHECK_B
 #undef CHECK_S
 #undef CHECK_D
 #undef CHECK_F
@@ -4534,12 +4692,14 @@ c     - C: "const" pointer to null terminated character string
 c     - A: Pointer to AstObject
 c     - P: Generic "void *" pointer
 c     - S: short int
+c     - B: Unsigned byte (i.e. word)
 f     - D: DOUBLE PRECISION
 f     - R: REAL
 f     - I: INTEGER
 f     - C: CHARACTER
 f     - A: INTEGER used to identify an AstObject
 f     - S: INTEGER*2 (short integer)
+f     - B: Unsigned byte
 *
 c     For example, astMapGet0D would be used to get a "double" value,
 c     while astMapGet0I would be used to get an "int", etc.
@@ -4589,6 +4749,13 @@ static int MapGet0##X( AstKeyMap *this, const char *key, Xtype *value, int *stat
             raw = &( ((Entry0S *)mapentry)->value ); \
          } else { \
             raw = ((Entry1S *)mapentry)->value; \
+         } \
+\
+      } else if( raw_type == AST__BYTETYPE ){ \
+         if( mapentry->nel == 0 ) { \
+            raw = &( ((Entry0B *)mapentry)->value ); \
+         } else { \
+            raw = ((Entry1B *)mapentry)->value; \
          } \
 \
       } else if( raw_type == AST__DOUBLETYPE ){ \
@@ -4674,6 +4841,7 @@ MAKE_MAPGET0(C,const char *,AST__STRINGTYPE)
 MAKE_MAPGET0(A,AstObject *,AST__OBJECTTYPE)
 MAKE_MAPGET0(P,void *,AST__POINTERTYPE)
 MAKE_MAPGET0(S,short int,AST__SINTTYPE)
+MAKE_MAPGET0(B,unsigned char,AST__BYTETYPE)
 
 /* Undefine the macro. */
 #undef MAKE_MAPGET0
@@ -4753,6 +4921,13 @@ int astMapGet0AId_( AstKeyMap *this, const char *key, AstObject **value, int *st
             raw = &( ((Entry0S *)mapentry)->value );
          } else {
             raw = ((Entry1S *)mapentry)->value;
+         }
+
+      } else if( raw_type == AST__BYTETYPE ){
+         if( mapentry->nel == 0 ) {
+            raw = &( ((Entry0B *)mapentry)->value );
+         } else {
+            raw = ((Entry1B *)mapentry)->value;
          }
 
       } else if( raw_type == AST__DOUBLETYPE ){
@@ -4939,12 +5114,14 @@ c     - C: "const" pointer to null terminated character string
 c     - A: Pointer to AstObject
 c     - P: Generic "void *" pointer
 c     - S: short int
+c     - B: Unsigned byte (i.e. char)
 f     - D: DOUBLE PRECISION
 f     - R: REAL
 f     - I: INTEGER
 f     - C: CHARACTER
 f     - A: INTEGER used to identify an AstObject
 f     - S: INTEGER*2 (short integer)
+f     - B: Unsigned byte
 *
 c     For example, astMapGet1D would be used to get "double" values, while
 c     astMapGet1I would be used to get "int" values, etc. For D or I, the
@@ -5018,6 +5195,14 @@ static int MapGet1##X( AstKeyMap *this, const char *key, int mxval, int *nval, X
             raw = &( ((Entry0S *)mapentry)->value ); \
          } else { \
             raw = ((Entry1S *)mapentry)->value; \
+         } \
+\
+      } else if( raw_type == AST__BYTETYPE ){ \
+         raw_size = sizeof( unsigned char ); \
+         if( nel == 0 ) { \
+            raw = &( ((Entry0B *)mapentry)->value ); \
+         } else { \
+            raw = ((Entry1B *)mapentry)->value; \
          } \
 \
       } else if( raw_type == AST__POINTERTYPE ){ \
@@ -5114,6 +5299,7 @@ MAKE_MAPGET1(F,float,AST__FLOATTYPE)
 MAKE_MAPGET1(A,AstObject *,AST__OBJECTTYPE)
 MAKE_MAPGET1(P,void *,AST__POINTERTYPE)
 MAKE_MAPGET1(S,short int,AST__SINTTYPE)
+MAKE_MAPGET1(B,unsigned char,AST__BYTETYPE)
 
 /* Undefine the macro. */
 #undef MAKE_MAPGET1
@@ -5214,6 +5400,14 @@ static int MapGet1C( AstKeyMap *this, const char *key, int l, int mxval,
             raw = &( ((Entry0S *)mapentry)->value );
          } else {
             raw = ((Entry1S *)mapentry)->value;
+         }
+
+      } else if( raw_type == AST__BYTETYPE ){
+         raw_size = sizeof( unsigned char );
+         if( nel == 0 ) {
+            raw = &( ((Entry0B *)mapentry)->value );
+         } else {
+            raw = ((Entry1B *)mapentry)->value;
          }
 
       } else if( raw_type == AST__FLOATTYPE ){
@@ -5391,6 +5585,14 @@ int astMapGet1AId_( AstKeyMap *this, const char *key, int mxval, int *nval,
             raw = &( ((Entry0S *)mapentry)->value );
          } else {
             raw = ((Entry1S *)mapentry)->value;
+         }
+
+      } else if( raw_type == AST__BYTETYPE ){
+         raw_size = sizeof( unsigned char );
+         if( nel == 0 ) {
+            raw = &( ((Entry0B *)mapentry)->value );
+         } else {
+            raw = ((Entry1B *)mapentry)->value;
          }
 
       } else if( raw_type == AST__POINTERTYPE ){
@@ -5592,12 +5794,14 @@ c     - C: "const" pointer to null terminated character string
 c     - A: Pointer to AstObject
 c     - P: Generic "void *" pointer
 c     - S: short int
+c     - B: Unsigned byte (i.e. char)
 f     - D: DOUBLE PRECISION
 f     - R: REAL
 f     - I: INTEGER
 f     - C: CHARACTER
 f     - A: INTEGER used to identify an AstObject
 f     - S: INTEGER*2 (short integer)
+f     - B: Unsigned byte
 *
 c     For example, astMapGetElemD would be used to get a "double" value, while
 c     astMapGetElemI would be used to get an "int" value, etc. For D or I, the
@@ -5669,6 +5873,14 @@ static int MapGetElem##X( AstKeyMap *this, const char *key, int elem, \
             raw = &( ((Entry0S *)mapentry)->value ); \
          } else { \
             raw = ((Entry1S *)mapentry)->value; \
+         } \
+\
+      } else if( raw_type == AST__BYTETYPE ){ \
+         raw_size = sizeof( unsigned char ); \
+         if( nel == 0 ) { \
+            raw = &( ((Entry0B *)mapentry)->value ); \
+         } else { \
+            raw = ((Entry1B *)mapentry)->value; \
          } \
 \
       } else if( raw_type == AST__POINTERTYPE ){ \
@@ -5763,6 +5975,7 @@ MAKE_MAPGETELEM(F,float,AST__FLOATTYPE)
 MAKE_MAPGETELEM(A,AstObject *,AST__OBJECTTYPE)
 MAKE_MAPGETELEM(P,void *,AST__POINTERTYPE)
 MAKE_MAPGETELEM(S,short int,AST__SINTTYPE)
+MAKE_MAPGETELEM(B,unsigned char,AST__BYTETYPE)
 
 /* Undefine the macro. */
 #undef MAKE_MAPGETELEM
@@ -5860,6 +6073,14 @@ static int MapGetElemC( AstKeyMap *this, const char *key, int l, int elem,
             raw = &( ((Entry0S *)mapentry)->value );
          } else {
             raw = ((Entry1S *)mapentry)->value;
+         }
+
+      } else if( raw_type == AST__BYTETYPE ){
+         raw_size = sizeof( unsigned char );
+         if( nel == 0 ) {
+            raw = &( ((Entry0B *)mapentry)->value );
+         } else {
+            raw = ((Entry1B *)mapentry)->value;
          }
 
       } else if( raw_type == AST__FLOATTYPE ){
@@ -6021,6 +6242,14 @@ int astMapGetElemAId_( AstKeyMap *this, const char *key, int elem,
             raw = &( ((Entry0S *)mapentry)->value );
          } else {
             raw = ((Entry1S *)mapentry)->value;
+         }
+
+      } else if( raw_type == AST__BYTETYPE ){
+         raw_size = sizeof( unsigned char );
+         if( nel == 0 ) {
+            raw = &( ((Entry0B *)mapentry)->value );
+         } else {
+            raw = ((Entry1B *)mapentry)->value;
          }
 
       } else if( raw_type == AST__DOUBLETYPE ){
@@ -6441,6 +6670,14 @@ c        This does not include the trailing null character.
             raw = ((Entry1S *)mapentry)->value;
          }
 
+      } else if( raw_type == AST__BYTETYPE ){
+         raw_size = sizeof( unsigned char );
+         if( nel == 0 ) {
+            raw = &( ((Entry0B *)mapentry)->value );
+         } else {
+            raw = ((Entry1B *)mapentry)->value;
+         }
+
       } else if( raw_type == AST__FLOATTYPE ){
          raw_size = sizeof( float );
          if( nel == 0 ) {
@@ -6693,12 +6930,14 @@ c     - C: "const" pointer to null terminated character string
 c     - A: Pointer to AstObject
 c     - P: Generic "void *" pointer
 c     - S: short int
+c     - B: Unsigned byte (i.e. char)
 f     - D: DOUBLE PRECISION
 f     - R: REAL
 f     - I: INTEGER
 f     - C: CHARACTER
 f     - A: INTEGER used to identify an AstObject
 f     - S: INTEGER*2 (short integer)
+f     - B: BYTE (unsigned)
 *
 c     For example, astMapPutElemD would be used to put a "double" value, while
 c     astMapPutElemI would be used to put an "int" value, etc. For D or I, the
@@ -6782,6 +7021,16 @@ static void MapPutElem##X( AstKeyMap *this, const char *key, int elem, \
          raw = ((Entry1S *)mapentry)->value; \
          raw_size = sizeof( short int ); \
 \
+      } else if( raw_type == AST__BYTETYPE ){ \
+         if( nel == 0 ) { \
+            astMapPut1B( this, key, 1, &( ((Entry0B *)mapentry)->value ), \
+                         mapentry->comment ); \
+            mapentry = SearchTableEntry( this, itab, key, status ); \
+            nel = 1; \
+         } \
+         raw = ((Entry1B *)mapentry)->value; \
+         raw_size = sizeof( unsigned char ); \
+\
       } else if( raw_type == AST__DOUBLETYPE ){ \
          if( nel == 0 ) { \
             astMapPut1D( this, key, 1, &( ((Entry0D *)mapentry)->value ), \
@@ -6852,6 +7101,8 @@ static void MapPutElem##X( AstKeyMap *this, const char *key, int elem, \
                ((Entry1I *)mapentry)->value = (int *) raw; \
             } else if( raw_type == AST__SINTTYPE ){ \
                ((Entry1S *)mapentry)->value = (short int *) raw; \
+            } else if( raw_type == AST__BYTETYPE ){ \
+               ((Entry1B *)mapentry)->value = (unsigned char *) raw; \
             } else if( raw_type == AST__DOUBLETYPE ){ \
                ((Entry1D *)mapentry)->value = (double *) raw; \
             } else if( raw_type == AST__POINTERTYPE ){ \
@@ -6899,6 +7150,7 @@ static void MapPutElem##X( AstKeyMap *this, const char *key, int elem, \
    Other types do not need any checks. */
 #define CHECK_A CheckCircle( this, value, "astMapPutElemA", status );
 #define CHECK_I
+#define CHECK_B
 #define CHECK_S
 #define CHECK_D
 #define CHECK_F
@@ -6914,11 +7166,13 @@ MAKE_MAPPUTELEM(A,AstObject *,AST__OBJECTTYPE)
 MAKE_MAPPUTELEM(P,void *,AST__POINTERTYPE)
 MAKE_MAPPUTELEM(C,const char *,AST__STRINGTYPE)
 MAKE_MAPPUTELEM(S,short int,AST__SINTTYPE)
+MAKE_MAPPUTELEM(B,unsigned char,AST__BYTETYPE)
 
 /* Undefine the macro. */
 #undef MAKE_MAPPUTELEM
 #undef CHECK_A
 #undef CHECK_I
+#undef CHECK_B
 #undef CHECK_S
 #undef CHECK_D
 #undef CHECK_F
@@ -6969,7 +7223,9 @@ f     AST_MAPTYPE = INTEGER
 *        One of AST__INTTYPE (for integer), AST__SINTTYPE (for
 c        short int),
 f        INTEGER*2),
-*        AST__DOUBLETYPE (for double
+*        AST__BYTETYPE (for unsigned bytes
+c        - i.e. unsigned chars
+*        ) AST__DOUBLETYPE (for double
 *        precision floating point), AST__FLOATTYPE (for single
 *        precision floating point), AST__STRINGTYPE (for character string),
 *        AST__OBJECTTYPE (for AST Object pointer), AST__POINTERTYPE (for
@@ -7859,6 +8115,9 @@ static size_t SizeOfEntry( AstMapEntry *entry, int *status ){
 
    } else if( type == AST__SINTTYPE ) {
       result = ( nel == 0 ) ? sizeof( Entry0S ) : sizeof( Entry1S );
+
+   } else if( type == AST__BYTETYPE ) {
+      result = ( nel == 0 ) ? sizeof( Entry0B ) : sizeof( Entry1B );
 
    } else if( type == AST__DOUBLETYPE ) {
       result = ( nel == 0 ) ? sizeof( Entry0D ) : sizeof( Entry1D );
@@ -9073,6 +9332,8 @@ AstKeyMap *astLoadKeyMap_( void *mem, size_t size, AstKeyMapVtab *vtab,
    int type;                 /* Data type for an entry */
    short int *wlist;         /* Pointer to vector of entry values */
    short int wval;           /* Short int value for an entry */
+   unsigned char *blist;     /* Pointer to vector of entry values */
+   unsigned char bval;       /* Byte value for an entry */
 
 /* Get a pointer to the thread specific global data structure. */
    astGET_GLOBALS(channel);
@@ -9237,6 +9498,22 @@ AstKeyMap *astLoadKeyMap_( void *mem, size_t size, AstKeyMapVtab *vtab,
                wlist = astFree( wlist );
             }
 
+/* Do the same for byte values. */
+         } else if( type == AST__BYTETYPE ) {
+            if( nel == 0 ) {
+               (void) sprintf( buff, "val%d", nentry );
+               bval = (unsigned char) astReadInt( channel, buff, 0 );
+               MapPut0B( new, key, bval, com, status );
+            } else {
+               blist = astMalloc( sizeof(unsigned char)*nel );
+               for( index = 0; astOK && index < nel; index++ ) {
+                  (void) sprintf( buff, "v%d_%d", nentry, index + 1 );
+                  blist[ index ] = (unsigned char) astReadInt( channel, buff, 0 );
+               }
+               MapPut1B( new, key, nel, blist, com, status );
+               blist = astFree( blist );
+            }
+
 /* Do the same for double values. */
          } else if( type == AST__DOUBLETYPE ) {
             if( nel == 0 ) {
@@ -9357,6 +9634,7 @@ MAKE_MAPPUT0_(C,const char *)
 MAKE_MAPPUT0_(A,AstObject *)
 MAKE_MAPPUT0_(P,void *)
 MAKE_MAPPUT0_(S,short int)
+MAKE_MAPPUT0_(B,unsigned char)
 #undef MAKE_MAPPUT0_
 
 
@@ -9368,6 +9646,7 @@ void astMapPut1##X##_( AstKeyMap *this, const char *key, int size, \
    (**astMEMBER(this,KeyMap,MapPut1##X))(this,key,size,value,comment, status ); \
 }
 MAKE_MAPPUT1_(S,const short int)
+MAKE_MAPPUT1_(B,const unsigned char)
 MAKE_MAPPUT1_(D,const double)
 MAKE_MAPPUT1_(F,const float)
 MAKE_MAPPUT1_(I,const int)
@@ -9383,6 +9662,7 @@ int astMapGet0##X##_( AstKeyMap *this, const char *key, Xtype *value, int *statu
 }
 MAKE_MAPGET0_(D,double)
 MAKE_MAPGET0_(S,short int)
+MAKE_MAPGET0_(B,unsigned char)
 MAKE_MAPGET0_(F,float)
 MAKE_MAPGET0_(I,int)
 MAKE_MAPGET0_(C,const char *)
@@ -9397,6 +9677,7 @@ int astMapGet1##X##_( AstKeyMap *this, const char *key, int mxval, int *nval, \
    if ( !astOK ) return 0; \
    return (**astMEMBER(this,KeyMap,MapGet1##X))(this,key,mxval,nval,value,status); \
 }
+MAKE_MAPGET1_(B,unsigned char)
 MAKE_MAPGET1_(S,short int)
 MAKE_MAPGET1_(D,double)
 MAKE_MAPGET1_(F,float)
@@ -9411,6 +9692,7 @@ int astMapGetElem##X##_( AstKeyMap *this, const char *key, int elem, \
    if ( !astOK ) return 0; \
    return (**astMEMBER(this,KeyMap,MapGetElem##X))(this,key,elem,value,status); \
 }
+MAKE_MAPGETELEM_(B,unsigned char)
 MAKE_MAPGETELEM_(S,short int)
 MAKE_MAPGETELEM_(D,double)
 MAKE_MAPGETELEM_(F,float)
@@ -9437,6 +9719,7 @@ void astMapPutElem##X##_( AstKeyMap *this, const char *key, int elem, \
    if ( !astOK ) return; \
    (**astMEMBER(this,KeyMap,MapPutElem##X))(this,key,elem,value,status); \
 }
+MAKE_MAPPUTELEM_(B,unsigned char)
 MAKE_MAPPUTELEM_(S,short int)
 MAKE_MAPPUTELEM_(D,double)
 MAKE_MAPPUTELEM_(F,float)

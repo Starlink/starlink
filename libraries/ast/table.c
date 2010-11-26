@@ -159,6 +159,7 @@ static int (* parent_mapget0d)( AstKeyMap *, const char *, double *, int *);
 static int (* parent_mapget0f)( AstKeyMap *, const char *, float *, int *);
 static int (* parent_mapget0i)( AstKeyMap *, const char *, int *, int *);
 static int (* parent_mapget0p)( AstKeyMap *, const char *, void **, int *);
+static int (* parent_mapget0b)( AstKeyMap *, const char *, unsigned char *, int *);
 static int (* parent_mapget0s)( AstKeyMap *, const char *, short int *, int *);
 static int (* parent_mapget1a)( AstKeyMap *, const char *, int, int *, AstObject **, int * );
 static int (* parent_mapget1c)( AstKeyMap *, const char *, int, int, int *, char *, int * );
@@ -167,6 +168,7 @@ static int (* parent_mapget1f)( AstKeyMap *, const char *, int, int *, float *, 
 static int (* parent_mapget1i)( AstKeyMap *, const char *, int, int *, int *, int * );
 static int (* parent_mapget1p)( AstKeyMap *, const char *, int, int *, void **, int * );
 static int (* parent_mapget1s)( AstKeyMap *, const char *, int, int *, short int *, int * );
+static int (* parent_mapget1b)( AstKeyMap *, const char *, int, int *, unsigned char *, int * );
 static int (* parent_mapgetelema)( AstKeyMap *, const char *, int, AstObject **, int * );
 static int (* parent_mapgetelemc)( AstKeyMap *, const char *, int, int, char *, int * );
 static int (* parent_mapgetelemd)( AstKeyMap *, const char *, int, double *, int * );
@@ -174,6 +176,7 @@ static int (* parent_mapgetelemf)( AstKeyMap *, const char *, int, float *, int 
 static int (* parent_mapgetelemi)( AstKeyMap *, const char *, int, int *, int * );
 static int (* parent_mapgetelemp)( AstKeyMap *, const char *, int, void **, int * );
 static int (* parent_mapgetelems)( AstKeyMap *, const char *, int, short int *, int * );
+static int (* parent_mapgetelemb)( AstKeyMap *, const char *, int, unsigned char *, int * );
 static int (* parent_testattrib)( AstObject *, const char *, int * );
 static void (* parent_clearattrib)( AstObject *, const char *, int * );
 static void (* parent_mapput0a)( AstKeyMap *, const char *, AstObject *, const char *, int *);
@@ -182,6 +185,7 @@ static void (* parent_mapput0d)( AstKeyMap *, const char *, double, const char *
 static void (* parent_mapput0f)( AstKeyMap *, const char *, float, const char *, int *);
 static void (* parent_mapput0i)( AstKeyMap *, const char *, int, const char *, int *);
 static void (* parent_mapput0p)( AstKeyMap *, const char *, void *, const char *, int *);
+static void (* parent_mapput0b)( AstKeyMap *, const char *, unsigned char, const char *, int *);
 static void (* parent_mapput0s)( AstKeyMap *, const char *, short int, const char *, int *);
 static void (* parent_mapput1a)( AstKeyMap *, const char *, int, AstObject *const [], const char *, int * );
 static void (* parent_mapput1c)( AstKeyMap *, const char *, int, const char *const [], const char *, int * );
@@ -189,6 +193,7 @@ static void (* parent_mapput1d)( AstKeyMap *, const char *, int, const double *,
 static void (* parent_mapput1f)( AstKeyMap *, const char *, int, const float *, const char *, int * );
 static void (* parent_mapput1i)( AstKeyMap *, const char *, int, const int *, const char *, int * );
 static void (* parent_mapput1p)( AstKeyMap *, const char *, int, void *const [], const char *, int * );
+static void (* parent_mapput1b)( AstKeyMap *, const char *, int, const unsigned char *, const char *, int * );
 static void (* parent_mapput1s)( AstKeyMap *, const char *, int, const short int *, const char *, int * );
 static void (* parent_mapputelema)( AstKeyMap *, const char *, int, AstObject *, int * );
 static void (* parent_mapputelemc)( AstKeyMap *, const char *, int, const char *, int * );
@@ -196,6 +201,7 @@ static void (* parent_mapputelemd)( AstKeyMap *, const char *, int, double, int 
 static void (* parent_mapputelemf)( AstKeyMap *, const char *, int, float, int * );
 static void (* parent_mapputelemi)( AstKeyMap *, const char *, int, int, int * );
 static void (* parent_mapputelemp)( AstKeyMap *, const char *, int, void *, int * );
+static void (* parent_mapputelemb)( AstKeyMap *, const char *, int, unsigned char, int * );
 static void (* parent_mapputelems)( AstKeyMap *, const char *, int, short int, int * );
 static void (* parent_mapremove)( AstKeyMap *, const char *, int * );
 static void (* parent_setattrib)( AstObject *, const char *, int * );
@@ -246,11 +252,15 @@ AstTable *astTableId_( const char *, ... );
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
+static const char *ColumnName( AstTable *, int index, int * );
 static const char *TypeString( int );
+static int ColumnNdim( AstTable *, const char *, int * );
+static int ColumnType( AstTable *, const char *, int * );
 static int Equal( AstObject *, AstObject *, int * );
-static int GetObjSize( AstObject *, int * );
 static int GetNcolumn( AstTable *, int * );
+static int GetObjSize( AstObject *, int * );
 static int MapGet0A( AstKeyMap *, const char *, AstObject **, int * );
+static int MapGet0B( AstKeyMap *, const char *, unsigned char *, int * );
 static int MapGet0C( AstKeyMap *, const char *, const char **, int * );
 static int MapGet0D( AstKeyMap *, const char *, double *, int * );
 static int MapGet0F( AstKeyMap *, const char *, float *, int * );
@@ -258,6 +268,7 @@ static int MapGet0I( AstKeyMap *, const char *, int *, int * );
 static int MapGet0P( AstKeyMap *, const char *, void **, int * );
 static int MapGet0S( AstKeyMap *, const char *, short int *, int * );
 static int MapGet1A( AstKeyMap *, const char *, int, int *, AstObject **, int * );
+static int MapGet1B( AstKeyMap *, const char *, int, int *, unsigned char *, int * );
 static int MapGet1C( AstKeyMap *, const char *, int, int, int *, char *, int * );
 static int MapGet1D( AstKeyMap *, const char *, int, int *, double *, int * );
 static int MapGet1F( AstKeyMap *, const char *, int, int *, float *, int * );
@@ -265,6 +276,7 @@ static int MapGet1I( AstKeyMap *, const char *, int, int *, int *, int * );
 static int MapGet1P( AstKeyMap *, const char *, int, int *, void **, int * );
 static int MapGet1S( AstKeyMap *, const char *, int, int *, short int *, int * );
 static int MapGetElemA( AstKeyMap *, const char *, int, AstObject **, int * );
+static int MapGetElemB( AstKeyMap *, const char *, int, unsigned char *, int * );
 static int MapGetElemC( AstKeyMap *, const char *, int, int, char *, int * );
 static int MapGetElemD( AstKeyMap *, const char *, int, double *, int * );
 static int MapGetElemF( AstKeyMap *, const char *, int, float *, int * );
@@ -273,10 +285,12 @@ static int MapGetElemP( AstKeyMap *, const char *, int, void **, int * );
 static int MapGetElemS( AstKeyMap *, const char *, int, short int *, int * );
 static int ParseKey( AstTable *, const char *, int, char *, int *, AstKeyMap **, const char *, int * );
 static void AddColumn( AstTable *, const char *, int, int, int *, int * );
+static void ColumnShape( AstTable *, const char *, int, int *, int *, int *);
 static void Copy( const AstObject *, AstObject *, int * );
 static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
 static void MapPut0A( AstKeyMap *, const char *, AstObject *, const char *, int * );
+static void MapPut0B( AstKeyMap *, const char *, unsigned char, const char *, int * );
 static void MapPut0C( AstKeyMap *, const char *, const char *, const char *, int * );
 static void MapPut0D( AstKeyMap *, const char *, double, const char *, int * );
 static void MapPut0F( AstKeyMap *, const char *, float, const char *, int * );
@@ -284,6 +298,7 @@ static void MapPut0I( AstKeyMap *, const char *, int, const char *, int * );
 static void MapPut0P( AstKeyMap *, const char *, void *, const char *, int * );
 static void MapPut0S( AstKeyMap *, const char *, short int, const char *, int * );
 static void MapPut1A( AstKeyMap *, const char *, int, AstObject *const [], const char *, int * );
+static void MapPut1B( AstKeyMap *, const char *, int, const unsigned char *, const char *, int * );
 static void MapPut1C( AstKeyMap *, const char *, int, const char *const [], const char *, int * );
 static void MapPut1D( AstKeyMap *, const char *, int, const double *, const char *, int * );
 static void MapPut1F( AstKeyMap *, const char *, int, const float *, const char *, int * );
@@ -291,19 +306,16 @@ static void MapPut1I( AstKeyMap *, const char *, int, const int *, const char *,
 static void MapPut1P( AstKeyMap *, const char *, int, void *const [], const char *, int * );
 static void MapPut1S( AstKeyMap *, const char *, int, const short int *, const char *, int * );
 static void MapPutElemA( AstKeyMap *, const char *, int, AstObject *, int * );
+static void MapPutElemB( AstKeyMap *, const char *, int, unsigned char, int * );
 static void MapPutElemC( AstKeyMap *, const char *, int, const char *, int * );
 static void MapPutElemD( AstKeyMap *, const char *, int, double, int * );
 static void MapPutElemF( AstKeyMap *, const char *, int, float, int * );
 static void MapPutElemI( AstKeyMap *, const char *, int, int, int * );
 static void MapPutElemP( AstKeyMap *, const char *, int, void *, int * );
 static void MapPutElemS( AstKeyMap *, const char *, int, short int, int * );
+static void MapPutU( AstKeyMap *, const char *, const char *, int * );
 static void RemoveColumn( AstTable *, const char *, int * );
 static void RemoveRow( AstTable *, int, int * );
-static void MapPutU( AstKeyMap *, const char *, const char *, int * );
-static const char *ColumnName( AstTable *, int index, int * );
-static int ColumnType( AstTable *, const char *, int * );
-static int ColumnNdim( AstTable *, const char *, int * );
-static void ColumnShape( AstTable *, const char *, int, int *, int *, int *);
 
 #if defined(THREAD_SAFE)
 static int ManageLock( AstObject *, int, int, AstObject **, int * );
@@ -360,15 +372,21 @@ f     NAME = CHARACTER * ( * ) (Given)
 *        are significant). Case is significant.
 c     type
 f     TYPE = INTEGER (Given)
-*        The data type associated with the column. One of AST__INTTYPE (for
-*        integer), AST__SINTTYPE (for
+*        The data type associated with the column.
+*        One of AST__INTTYPE (for integer), AST__SINTTYPE (for
 c        short int),
-d        INTEGER*2),
+f        INTEGER*2),
+*        AST__BYTETYPE (for 
+c        unsigned bytes - i.e. unsigned chars),
+f        bytes),
 *        AST__DOUBLETYPE (for double
 *        precision floating point), AST__FLOATTYPE (for single
 *        precision floating point), AST__STRINGTYPE (for character string),
 *        AST__OBJECTTYPE (for AST Object pointer), AST__POINTERTYPE (for
-*        arbitrary C pointer).
+*        arbitrary C pointer) or AST__UNDEFTYPE (for undefined values
+*        created by
+c        astMapPutU).
+f        AST_MAPPUTU).
 c     ndim
 f     NDIM = INTEGER (Given)
 *        The number of dimensions spanned by the values stored in a single
@@ -857,11 +875,18 @@ f     AST_COLUMNTYPE = INTEGER
 *        One of AST__INTTYPE (for integer), AST__SINTTYPE (for
 c        short int),
 f        INTEGER*2),
+*        AST__BYTETYPE (for 
+c        unsigned bytes - i.e. unsigned chars),
+f        bytes),
 *        AST__DOUBLETYPE (for double
 *        precision floating point), AST__FLOATTYPE (for single
 *        precision floating point), AST__STRINGTYPE (for character string),
 *        AST__OBJECTTYPE (for AST Object pointer), AST__POINTERTYPE (for
-*        arbitrary C pointer). AST__BADTYPE is returned if the supplied
+*        arbitrary C pointer) or AST__UNDEFTYPE (for undefined values
+*        created by
+c        astMapPutU).
+f        AST_MAPPUTU).
+*        AST__BADTYPE is returned if the supplied
 *        column is not found in the Table.
 
 *  Notes:
@@ -1294,7 +1319,8 @@ void astInitTableVtab_(  AstTableVtab *vtab, const char *name, int *status ) {
    OVERRIDE(method,D,methodlc,d) \
    OVERRIDE(method,F,methodlc,f) \
    OVERRIDE(method,I,methodlc,i) \
-   OVERRIDE(method,S,methodlc,s)
+   OVERRIDE(method,S,methodlc,s) \
+   OVERRIDE(method,B,methodlc,b)
 
 /* Use these macros to override the required methods. */
    OVERRIDE_METHOD(MapPut0,mapput0)
@@ -1544,6 +1570,7 @@ MAKE_MAPGET0(C,c,const char *,AST__STRINGTYPE)
 MAKE_MAPGET0(A,a,AstObject *,AST__OBJECTTYPE)
 MAKE_MAPGET0(P,p,void *,AST__POINTERTYPE)
 MAKE_MAPGET0(S,s,short int,AST__SINTTYPE)
+MAKE_MAPGET0(B,b,unsigned char,AST__BYTETYPE)
 
 /* Undefine the macro. */
 #undef MAKE_MAPGET0
@@ -1682,6 +1709,7 @@ MAKE_MAPGET1(F,f,float,AST__FLOATTYPE)
 MAKE_MAPGET1(A,a,AstObject *,AST__OBJECTTYPE)
 MAKE_MAPGET1(P,p,void *,AST__POINTERTYPE)
 MAKE_MAPGET1(S,s,short int,AST__SINTTYPE)
+MAKE_MAPGET1(B,b,unsigned char,AST__BYTETYPE)
 
 /* Undefine the macro. */
 #undef MAKE_MAPGET1
@@ -1889,6 +1917,7 @@ MAKE_MAPGETELEM(F,f,float,AST__FLOATTYPE)
 MAKE_MAPGETELEM(A,a,AstObject *,AST__OBJECTTYPE)
 MAKE_MAPGETELEM(P,p,void *,AST__POINTERTYPE)
 MAKE_MAPGETELEM(S,s,short int,AST__SINTTYPE)
+MAKE_MAPGETELEM(B,b,unsigned char,AST__BYTETYPE)
 
 /* Undefine the macro. */
 #undef MAKE_MAPGETELEM
@@ -2088,6 +2117,7 @@ MAKE_MAPPUT0(C,c,const char *,AST__STRINGTYPE,astStore(NULL,value,strlen(value)+
 MAKE_MAPPUT0(A,a,AstObject *,AST__OBJECTTYPE,(value?astClone(value):NULL))
 MAKE_MAPPUT0(P,p,void *,AST__POINTERTYPE,value)
 MAKE_MAPPUT0(S,s,short int,AST__SINTTYPE,value)
+MAKE_MAPPUT0(B,b,unsigned char,AST__BYTETYPE,value)
 
 /* Undefine the macro. */
 #undef MAKE_MAPPUT0
@@ -2241,6 +2271,7 @@ MAKE_MAPPUT1(C,c,const char *const,AST__STRINGTYPE,astStore(NULL,value[i],strlen
 MAKE_MAPPUT1(A,a,AstObject *const,AST__OBJECTTYPE,(value[i]?astClone(value[i]):NULL))
 MAKE_MAPPUT1(P,p,void *const,AST__POINTERTYPE,value[i])
 MAKE_MAPPUT1(S,s,const short int,AST__SINTTYPE,value[i])
+MAKE_MAPPUT1(B,b,const unsigned char,AST__BYTETYPE,value[i])
 
 /* Undefine the macro. */
 #undef MAKE_MAPPUT1
@@ -2400,6 +2431,7 @@ MAKE_MAPPUTELEM(A,a,AstObject *,AST__OBJECTTYPE)
 MAKE_MAPPUTELEM(P,p,void *,AST__POINTERTYPE)
 MAKE_MAPPUTELEM(C,c,const char *,AST__STRINGTYPE)
 MAKE_MAPPUTELEM(S,s,short int,AST__SINTTYPE)
+MAKE_MAPPUTELEM(B,b,unsigned char,AST__BYTETYPE)
 
 /* Undefine the macro. */
 #undef MAKE_MAPPUTELEM
@@ -2958,6 +2990,9 @@ static const char *TypeString( int type ) {
 /* Compare the supplied type code against each supported value. */
    if( type == AST__INTTYPE ) {
       result = "int";
+
+   } else if( type == AST__BYTETYPE ) {
+      result = "byte";
 
    } else if( type == AST__DOUBLETYPE ) {
       result = "double";

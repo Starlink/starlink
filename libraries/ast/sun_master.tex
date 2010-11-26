@@ -22150,7 +22150,16 @@ current version):
 \item A new class called ``Table'' has been added. A Table is a KeyMap in
 which each entry represents a cell in a two-dimensional table.
 
-\item a memory leak associated with the use of the 
+\item KeyMaps can now hold byte values. These are held in variables
+of type
+c+
+"unsigned char".
+c-
+f+
+BYTE.
+f-
+
+\item a memory leak associated with the use of the
 c+
 astMapPutElem<X>
 c-

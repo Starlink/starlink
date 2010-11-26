@@ -6,6 +6,7 @@
       include 'SAE_PAR'
 
       integer status, table, table2, dims( 7 ), ival, l, nval
+      byte bytes(1,2),bval
       real rval
       character cval*30, text(2,2)*10
 
@@ -210,6 +211,37 @@ c      call ast_watchmemory(483)
       else
          call stopit( status, 'Table error 29' )
       endif
+
+
+
+      dims( 1 ) = 1
+      dims( 2 ) = 2
+      call ast_addcolumn( table, 'HeHe', AST__BYTETYPE, 2, dims,
+     :                    status )
+      bytes(1,1) = 127
+      bytes(1,2) = 255
+      call ast_mapput1b( table, 'HeHe(2)', 2, bytes, 'jjjj', status )
+      if( ast_mapget1b( table, 'HeHe(2)', 2, nval, bytes,
+     :                  status ) ) then
+         if( nval .ne. 2 ) call stopit( status, 'Table error 30' )
+         if( bytes(1,1) .ne. 127 ) call stopit( status,
+     :                                          'Table error 31' )
+         if( bytes(1,2) .ne. -1 ) call stopit( status,
+     :                                         'Table error 32' )
+      else
+         call stopit( status, 'Table error 33' )
+      endif
+
+      call ast_addcolumn( table, 'GoGo', AST__BYTETYPE, 0, 0,
+     :                    status )
+      call ast_mapput0b( table, 'GoGo(2)', -10, ' ', status )
+      if( ast_mapget0b( table, 'GoGo(2)', bval, status ) ) then
+         if( bval .ne. -10 ) call stopit( status, 'Table error 33' )
+      else
+         call stopit( status, 'Table error 34' )
+      endif
+
+
 
 
 
