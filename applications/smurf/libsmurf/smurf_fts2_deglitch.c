@@ -39,8 +39,6 @@
 *          Tail cluster standard deviation multiplier.
 *     TCSIZE = _INTEGER (Read)
 *          Tail cluster size.
-*     ZPD = _CHAR (Read)
-*          2D ZPD calibration file.
 
 *  Authors:
 *     COBA: Coskun Oba (UoL)
@@ -53,6 +51,8 @@
 *     2010-10-04 (COBA):
 *        - Replaced single ZPD value input with 2D ZPD array input
 *        - Added ADAM param to control deglitching mode
+*     2010-11-26 (COBA):
+*        - Read ZPD index from smfFts->zpd insted of ZPD calibration file
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -108,57 +108,40 @@ void smurf_fts2_deglitch(int* status)
 {
   if(*status != SAI__OK) { return; }
 
-  int coreClusterSize       = 0;  /* Core cluster size */
-  int dsHalfLength          = 0;  /* Size of the double sided interferogram */
-  int index                 = 0;  /* Index */
-  int fIndex                = 0;  /* File loop counter */
-  int i                     = 0;    /* Loop counter */
-  int ii                    = 0;    /* Loop counter */
-  int j                     = 0;    /* Loop counter */
-  int jj                    = 0;    /* Loop counter */
-  int k                     = 0;    /* Loop counter */
-  int kk                    = 0;    /* Loop counter */
-  int mode                  = 0;    /* Deglitch mode 0 = ALL */
-  int pixelCount            = 0;  /* Number of bolometers in the subarray */
-  int pixelIndex            = 0;  /* Current bolometer index */
-  int srcHeight             = 0;  /* Height of the subarray */
-  int srcSubarray           = 0;  /* Source sub-array */
-  int srcWidth              = 0;  /* Width of the subarray */
-  int srcN                  = 0;  /* Time series length of the input data */
-  int tailClusterSize       = 0;  /* Tail cluster size */
-  int zpdHeight             = 0;    /* Height of the ZPD array */
-  int zpdIndex              = 0;    /* Index of ZPD */
-  int zpdSubarray           = 0;    /* ZPD sub-array */
-  int zpdWidth              = 0;    /* Width of the ZPD array */
-  double tcSigma            = 0.0;  /* Tail cutoff standard deviation percentage */
-  double tcSigmaMul         = 0.0;  /* Tail cutoff standard deviation multiplier */
-  double zpdValue           = 0.0;  /* ZPD value */
-  double* interferogram     = NULL; /* Single bolometer interferogram */
-  float* fPositions         = NULL; /* Mirror positions */
-  Grp* igrp                 = NULL; /* Input group */
-  Grp* ogrp                 = NULL; /* output group */
-  Grp* zpdgrp               = NULL; /* Output group */
-  HDSLoc* hdsLoc            = NULL; /* Pointer to HDS location */
-  HDSLoc* hdsLocPosition    = NULL; /* Pointer to mirror positions */
-  size_t count              = 0;    /* Mirror positions count */
-  size_t inSize             = 0;    /* Size of the input group */
-  size_t outSize            = 0;    /* Size of the output group */
-  size_t zpdSize            = 0;    /* Size of the ZPD group */
-  smfData* srcData          = NULL; /* Pointer to input data */
-  smfData* zpdData          = NULL; /* Pointer to ZPD data */
-  void* srcCube             = NULL; /* Pointer to the input data cube */
-  void* zpdArray            = NULL; /* Pointer to 2D ZPD data values */
+  int bolIndex           = 0;  /* Current bolometer index */
+  int coreClusterSize    = 0;  /* Core cluster size */
+  int dsHalfLength       = 0;  /* Size of the double sided interferogram */
+  int index              = 0;  /* Index */
+  int fIndex             = 0;  /* File loop counter */
+  int i                  = 0;    /* Loop counter */
+  int j                  = 0;    /* Loop counter */
+  int k                  = 0;    /* Loop counter */
+  int mode               = 0;    /* Deglitch mode 0 = ALL */
+  int numBol             = 0;  /* Number of bolometers in the subarray */
+  int srcH               = 0;  /* Height of the subarray */
+  int srcW               = 0;  /* Width of the subarray */
+  int srcN               = 0;  /* Time series length of the input data */
+  int tailClusterSize    = 0;  /* Tail cluster size */
+  int zpdIndex           = 0;    /* Index of ZPD */
+  double tcSigma         = 0.0;  /* Tail cutoff standard deviation percentage */
+  double tcSigmaMul      = 0.0;  /* Tail cutoff standard deviation multiplier */
+  double* interferogram  = NULL; /* Single bolometer interferogram */
+  Grp* grpInput          = NULL; /* Input group */
+  Grp* grpOutput         = NULL; /* output group */
+  size_t inSize          = 0;    /* Size of the input group */
+  size_t outSize         = 0;    /* Size of the output group */
+  smfData* srcData       = NULL; /* Pointer to input data */
+  smfData* zpdData       = NULL; /* Pointer to ZPD data */
+  void* srcCube          = NULL; /* Pointer to the input data cube */
 
   /* GET INPUT GROUP */
-  kpg1Rgndf("IN", 0, 1, "", &igrp, &inSize, status);
+  kpg1Rgndf("IN", 0, 1, "", &grpInput, &inSize, status);
   /* GET OUTPUT GROUP */
-  kpg1Wgndf("OUT", ogrp, inSize, inSize,
+  kpg1Wgndf("OUT", grpOutput, inSize, inSize,
             "Equal number of input and output files expected!",
-            &ogrp, &outSize, status);
-  /* GET ZPD GROUP */
-  kpg1Gtgrp("ZPD", &zpdgrp, &zpdSize, status);
+            &grpOutput, &outSize, status);
 
-  /* GET PARAMS */
+  // GET PARAMS
   parGet0i("CCSIZE", &coreClusterSize, status);
   parGet0i("TCSIZE", &tailClusterSize, status);
   parGet0d("TCSIGMA", &tcSigma, status);
@@ -166,128 +149,67 @@ void smurf_fts2_deglitch(int* status)
   parGet0i("DSHALFLENGTH", &dsHalfLength, status);
   parGet0i("DEGLITCHMODE", &mode, status);
 
+  // BEGIN NDF
   ndfBegin();
 
-  /* GET ZPD */
-  smf_open_file(zpdgrp, 1, "READ", SMF__NOCREATE_QUALITY, &zpdData, status);
-  if(*status != SAI__OK) {
-    *status = SAI__ERROR;
-    errRep(FUNC_NAME, "Unable to open the ZPD file!", status);
-    goto CLEANUP;
-  }
-  zpdArray  = zpdData->pntr[0];
-  zpdWidth  = zpdData->dims[0];
-  zpdHeight = zpdData->dims[1];
-  smf_find_subarray(zpdData->hdr, NULL, 0, &zpdSubarray, status);
-  if(*status != SAI__OK) {
-    *status = SAI__ERROR;
-    errRep(FUNC_NAME, "Unable to determine the ZPD subarray ID!", status);
-    smf_close_file(&zpdData, status);
-    goto CLEANUP;
-  }
-
-  /* LOOP THROUGH EACH NDF FILE  */
+  // LOOP THROUGH EACH NDF FILE
   for(fIndex = 1; fIndex <= inSize; fIndex++) {
-    smf_open_and_flatfield(igrp, ogrp, fIndex, NULL, NULL, &srcData, status);
+    smf_open_and_flatfield(grpInput, grpOutput, fIndex, NULL, NULL, &srcData, status);
     if(*status != SAI__OK) {
+      *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unable to open source file!", status);
-      break;
     }
 
-    /* GET DATA CUBE */
-    srcCube    = srcData->pntr[0];
-    srcWidth   = srcData->dims[0];
-    srcHeight  = srcData->dims[1];
-    srcN       = srcData->dims[2];
-    pixelCount = srcWidth * srcHeight;
-
-    smf_find_subarray(srcData->hdr, NULL, 0, &srcSubarray, status);
-    if(*status != SAI__OK) {
+    if(srcData->fts && srcData->fts->zpd) {
+      zpdData = srcData->fts->zpd;
+    } else {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Unable to determine the source subarray ID!", status);
-      smf_close_file(&srcData, status);
-      break;
-    }
-    if( zpdSubarray != srcSubarray ||
-        zpdWidth != srcWidth || zpdHeight != srcHeight) {
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Incompatible subarray found!", status);
-      smf_close_file(&srcData, status);
-      break;
+      errRep(FUNC_NAME, "The input file is NOT initialized!", status);
     }
 
-    /* MIRROR POSITIONS */
-    hdsLoc = smf_get_xloc(srcData, "JCMTSTATE", "EXT", "UPDATE", 0, 0, status);
-    datFind(hdsLoc, "FTS_POS", &hdsLocPosition, status);
-    datSize(hdsLocPosition, &count, status);
-    fPositions = astMalloc(count * sizeof(*fPositions));
-    datGetVR(hdsLocPosition, count, fPositions, &count, status);
-    if(hdsLoc) { datAnnul(&hdsLoc, status); }
-    if(hdsLocPosition) { datAnnul(&hdsLocPosition, status); }
+    // GET DATA CUBE
+    srcCube = srcData->pntr[0];
+    srcW = srcData->dims[0];
+    srcH = srcData->dims[1];
+    srcN = srcData->dims[2];
+    numBol = srcW * srcH;
 
-    /* LOOP THROUGH THE SUBARRAY */
+    // LOOP THROUGH THE SUBARRAY
     interferogram = astMalloc(srcN * sizeof(*interferogram));
-    for(i = 0; i < srcHeight; i++) {
-      for(j = 0; j < srcWidth; j++) {
-        pixelIndex = i + j * srcHeight;
+    for(i = 0; i < srcH; i++) {
+      for(j = 0; j < srcW; j++) {
+        bolIndex = j + i * srcW;
 
-        /* GET INTERFEROGRAM FOR BOLOMETER AT LOCATION (i, j) IN SUBARRAY */
+        // GET INTERFEROGRAM FOR THE BOLOMETER
         for(k = 0; k < srcN; k++) {
-          index = pixelIndex + pixelCount * k;
-          if(srcData->dtype == SMF__FLOAT) {
-            interferogram[k] = *((float*)srcCube + index);
-          }
-          else if(srcData->dtype == SMF__DOUBLE) {
-            interferogram[k] = *((double*)srcCube + index);
-          } else {
-            *status = SAI__ERROR;
-            errRep(FUNC_NAME, "Invalid data type found!", status);
-            break;
-          }
+          index = bolIndex + numBol * k;
+          interferogram[k] = *((double*)srcCube + index);
         }
 
-        /* GET ZPD VALUE & DETERMINE ZPD INDEX */
-        if(zpdData->dtype == SMF__FLOAT) {
-          zpdValue = (double)(*((float*)zpdArray + pixelIndex));
-        } else {
-          zpdValue = *((double*)zpdArray + pixelIndex);
-        }
-        jj = 0;
-        kk = srcN - 1;
-        while(kk - jj > 1) {
-          ii = (kk + jj) >> 1;
-          if(zpdValue < fPositions[ii]) {
-            kk = ii;
-          } else {
-            jj = ii;
-          }
-        }
-        zpdIndex = jj + 1;
+        // GET CORRESPONDING ZPD INDEX
+        zpdIndex = *((int*)zpdData->pntr[0] + bolIndex);
 
-        /* REMOVE GLITCHES */
+        // REMOVE GLITCHES
         fts2_deglitch( interferogram, srcN, coreClusterSize, tailClusterSize,
                        tcSigma, tcSigmaMul, zpdIndex, dsHalfLength, mode,
                        SMF__DEGLITCH_THRESHOLD);
 
-        /* UPDATE BOLOMETER INTERFEROGRAM AT LOCATION (i, j) */
+        // UPDATE BOLOMETER INTERFEROGRAM
         for(k = 0; k < srcN; k++) {
-          index = pixelIndex + pixelCount * k;
-          if(srcData->dtype == SMF__FLOAT) {
-            *((float*)srcCube + index) = (float) interferogram[k];
-          } else if(srcData->dtype == SMF__DOUBLE) {
-            *((double*)srcCube + index) = (double) interferogram[k];
-          }
+          index = bolIndex + numBol * k;
+          *((double*)srcCube + index) = (double) interferogram[k];
         }
       }
     }
     astFree(interferogram);
-    astFree(fPositions);
     smf_close_file(&srcData, status);
   }
 
   CLEANUP:
+    // END NDF
     ndfEnd(status);
-    grpDelet(&igrp, status);
-    grpDelet(&ogrp, status);
-    grpDelet(&zpdgrp, status);
+
+    // DELETE GROUPS
+    grpDelet(&grpInput, status);
+    grpDelet(&grpOutput, status);
 }

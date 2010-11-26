@@ -232,6 +232,10 @@
 #         Minor changes to FTS2 interface
 #     2010-11-03 (COBA):
 #         Add FTS2SPECRE
+#     2010-11-25 (COBA):
+#         Add FTS2INIT
+#     2010-11-26 (COBA):
+#         Removed ZPD param from FTS2DEGLITCH
 #     {enter_changes_here}
 
 #  Bugs:
@@ -1333,16 +1337,6 @@ package @PACKAGE@ {
                 vpath {PROMPT}
                 ppath GLOBAL CURRENT
                 prompt {Output data files}
-                helpkey *
-            }
-
-            parameter zpd {
-                position 3
-                type NDF
-                access READ
-                vpath {PROMPT}
-                ppath GLOBAL CURRENT
-                prompt {ZPD file}
                 helpkey *
             }
 
