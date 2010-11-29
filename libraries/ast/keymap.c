@@ -7496,7 +7496,7 @@ static const char *MapIterate( AstKeyMap *this, int reset, int *status ) {
 
 /* Get the index of the hash table to check first. Also get a pointer to
    the entry within the hash table to check next. */
-      if( reset || !this->iter_entry ) {
+      if( reset ){
          itab = 0;
          entry = this->table[ 0 ];
       } else {
@@ -7513,16 +7513,10 @@ static const char *MapIterate( AstKeyMap *this, int reset, int *status ) {
       if( entry ) {
          key = entry->key;
 
-/* Move on to the next entry in the linked list, saving the context
+/* Move on to the next entry in the unsorted linked list, saving the context
    in the KeyMap structure. */
          this->iter_itab = itab;
          this->iter_entry = entry->next;
-
-/* If no more entries were found, reset teh context in the KeyMap
-   structure. */
-      } else {
-         this->iter_itab = 0;
-         this->iter_entry = NULL;
       }
 
 /* Now deal with sorted keys. */
@@ -7541,12 +7535,14 @@ static const char *MapIterate( AstKeyMap *this, int reset, int *status ) {
       if( entry ) {
          key = entry->key;
          this->iter_entry = entry->snext;
-
-/* Otherwise, reset the context. */
-      } else {
-         this->iter_itab = 0;
-         this->iter_entry = NULL;
       }
+   }
+
+/* If no more entries were found, reset the context in the KeyMap
+   structure. */
+   if( ! key ) {
+      this->iter_itab = 0;
+      this->iter_entry = NULL;
    }
 
 /* Return the result.*/
