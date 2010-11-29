@@ -59,6 +59,7 @@ c     - astColumnName: Return the name of the column with a given index
 c     - astColumnNdim: Return the number of dimensions for a column
 c     - astColumnShape: Return the shape of the values in a named column
 c     - astColumnType: Return the data type of the values in a named column
+c     - astPurgeRows: Remove all empty rows from a Table.
 c     - astRemoveColumn: Remove a column from a Table.
 c     - astRemoveRow: Remove a row from a Table.
 f     - AST_ADDCOLUMN: Add a new column definition to a Table.
@@ -66,6 +67,7 @@ f     - AST_COLUMNNAME: Return the name of the column with a given index
 f     - AST_COLUMNNDIM: Return the number of dimensions for a column
 f     - AST_COLUMNSHAPE: Return the shape of the values in a named column
 f     - AST_COLUMNTYPE: Return the data type of the values in a named column
+f     - AST_PURGEROWS: Remove all empty rows from a Table.
 f     - AST_REMOVECOLUMN: Remove a column from a Table.
 f     - AST_REMOVEROW: Remove a row from a Table.
 
@@ -316,6 +318,7 @@ static void MapPutElemS( AstKeyMap *, const char *, int, short int, int * );
 static void MapPutU( AstKeyMap *, const char *, const char *, int * );
 static void RemoveColumn( AstTable *, const char *, int * );
 static void RemoveRow( AstTable *, int, int * );
+static void PurgeRows( AstTable *, int * );
 
 #if defined(THREAD_SAFE)
 static int ManageLock( AstObject *, int, int, AstObject **, int * );
@@ -376,7 +379,7 @@ f     TYPE = INTEGER (Given)
 *        One of AST__INTTYPE (for integer), AST__SINTTYPE (for
 c        short int),
 f        INTEGER*2),
-*        AST__BYTETYPE (for 
+*        AST__BYTETYPE (for
 c        unsigned bytes - i.e. unsigned chars),
 f        bytes),
 *        AST__DOUBLETYPE (for double
@@ -875,7 +878,7 @@ f     AST_COLUMNTYPE = INTEGER
 *        One of AST__INTTYPE (for integer), AST__SINTTYPE (for
 c        short int),
 f        INTEGER*2),
-*        AST__BYTETYPE (for 
+*        AST__BYTETYPE (for
 c        unsigned bytes - i.e. unsigned chars),
 f        bytes),
 *        AST__DOUBLETYPE (for double
@@ -1268,6 +1271,7 @@ void astInitTableVtab_(  AstTableVtab *vtab, const char *name, int *status ) {
    vtab->AddColumn = AddColumn;
    vtab->RemoveColumn = RemoveColumn;
    vtab->RemoveRow = RemoveRow;
+   vtab->PurgeRows = PurgeRows;
    vtab->GetNrow = GetNrow;
    vtab->SetNrow = SetNrow;
    vtab->GetNcolumn = GetNcolumn;
@@ -2645,6 +2649,125 @@ static int ParseKey( AstTable *this, const char *key, int report,
    return result;
 }
 
+static void PurgeRows( AstTable *this, int *status ) {
+/*
+*++
+*  Name:
+c     astPurgeRows
+f     AST_PURGEROWS
+
+*  Purpose:
+*     Remove all empty rows from a table.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "table.h"
+c     void astPurgeRows( AstTable *this )
+f     CALL AST_PURGEROWS( THIS, STATUS )
+
+*  Class Membership:
+*     Table method.
+
+*  Description:
+*     This function removes all empty rows from the Table, renaming
+*     the key associated with each table cell accordingly.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Table.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*--
+*/
+
+/* Local Variables: */
+   char newkey[ MXCOLNAMLEN + 24 ]; /* New cell key string */
+   char oldkey[ MXCOLNAMLEN + 24 ]; /* Old cell key string */
+   const char *col;              /* Column name */
+   const char *key;              /* Pointer to key string */
+   const char *op;               /* Pointer to opening parenthesis */
+   int *w1;                      /* Work space pointer */
+   int icol;                     /* Column index */
+   int inew;                     /* New row index */
+   int iold;                     /* Old row index */
+   int ncol;                     /* Number of columns in table */
+   int nrow;                     /* Number of rows in table */
+   int reset;                    /* Start a new pass through the KeyMap? */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Get the number of rows in the table. */
+   nrow = astGetNrow( this );
+
+/* Create workspace to hold the number of defined values stored in each
+   row. Initialise every row to have zero defined values. */
+   w1 = astCalloc( nrow, sizeof( int ), 1 );
+   if( astOK ) {
+
+/* Iterate round all keys in the KeyMap. */
+      reset = 1;
+      while( ( key = astMapIterate( this, reset ) ) && astOK ) {
+         reset = 0;
+
+/* Extract the row number from the key. */
+         op = strchr( key, '(' );
+         if( !op || astSscanf( op + 1, "%d", &iold ) != 1 ||
+             iold > nrow ) {
+            astError( AST__INTER, "astPurgeRows(%s): Illegal key '%s' "
+                      "found in a %s (internal programming error).",
+                      status, astGetClass( this ), key, astGetClass( this ) );
+
+/* Increment the number of values in this row. Note row indices are
+   one-based. */
+         } else {
+            w1[ iold - 1 ]++;
+         }
+      }
+
+/* Loop round all columns in the Table. */
+      ncol = astGetNcolumn( this );
+      for( icol = 1; icol <= ncol; icol++ ) {
+
+/* Get the column name */
+         col = astColumnName( this, icol );
+
+/* Loop round all the old row numbers. Skip empty rows.*/
+         inew = 0;
+         for( iold = 0; iold < nrow; iold++ ) {
+            if( w1[ iold ] > 0 ) {
+
+/* Increment the row number to use in place of the old row number. If the
+   old and new row numbers are the same, we do not need to rename the cell. */
+               if( iold != inew++ ) {
+
+/* For the old and new cell names */
+                  sprintf( oldkey, "%s(%d)", col, iold + 1 );
+                  sprintf( newkey, "%s(%d)", col, inew );
+
+/* Rename the KeyMap entry. */
+                  astMapRename( this, oldkey, newkey );
+               }
+            }
+         }
+
+/* If all rows were used, we do not need to check any more columns. */
+         if( iold == inew ) break;
+      }
+
+/* Store the new number of rows. */
+      astSetNrow( this, inew );
+   }
+
+/* Free resources. */
+   w1 = astFree( w1 );
+
+}
+
 static void RemoveColumn( AstTable *this, const char *name, int *status ) {
 /*
 *++
@@ -3708,15 +3831,19 @@ AstTable *astLoadTable_( void *mem, size_t size, AstTableVtab *vtab,
 void astAddColumn_( AstTable *this, const char *name, int type,
                     int ndim, int *dims, int *status ) {
    if ( !astOK ) return;
-   return (**astMEMBER(this,Table,AddColumn))(this,name,type,ndim,dims,status);
+   (**astMEMBER(this,Table,AddColumn))(this,name,type,ndim,dims,status);
 }
 void astRemoveColumn_( AstTable *this, const char *name, int *status ){
    if ( !astOK ) return;
-   return (**astMEMBER(this,Table,RemoveColumn))(this,name,status);
+   (**astMEMBER(this,Table,RemoveColumn))(this,name,status);
 }
 void astRemoveRow_( AstTable *this, int index, int *status ){
    if ( !astOK ) return;
-   return (**astMEMBER(this,Table,RemoveRow))(this,index,status);
+   (**astMEMBER(this,Table,RemoveRow))(this,index,status);
+}
+void astPurgeRows_( AstTable *this, int *status ){
+   if ( !astOK ) return;
+   (**astMEMBER(this,Table,PurgeRows))(this,status);
 }
 int astGetNcolumn_( AstTable *this, int *status ) {
    if ( !astOK ) return 0;

@@ -241,10 +241,7 @@ c      call ast_watchmemory(483)
          call stopit( status, 'Table error 34' )
       endif
 
-
-
-
-
+      call checkpurge( status )
 
 
 
@@ -425,6 +422,76 @@ c         write(*,*) buf( next : next + ll - 1 )
       endif
 
       next = next + ll
+
+      end
+
+
+      subroutine checkpurge( status )
+      implicit none
+      include 'SAE_PAR'
+      include 'AST_PAR'
+      integer status, table, ival
+
+      if( status .ne. sai__ok ) return
+
+      table = ast_table( ' ', status )
+
+      call ast_addcolumn( table, 'Fred', AST__INTTYPE, 0, 0, status )
+      call ast_addcolumn( table, 'Tom', AST__INTTYPE, 0, 0, status )
+
+      call ast_mapput0i( table, 'Fred(2)', 123, ' ', status )
+      call ast_mapput0i( table, 'Fred(4)', 456, ' ', status )
+      call ast_mapput0i( table, 'Tom(1)', -123, ' ', status )
+      call ast_mapput0i( table, 'Tom(2)', -456, ' ', status )
+      call ast_mapput0i( table, 'Tom(6)', 0, ' ', status )
+
+      if( ast_geti( table, 'NRow', status ) .ne. 6 ) then
+         call stopit( status, 'Table error purge-1' )
+      endif
+
+      call ast_mapremove( table, 'Tom(6)', status )
+      if( ast_geti( table, 'NRow', status ) .ne. 6 ) then
+         call stopit( status, 'Table error purge-2' )
+      endif
+
+      call ast_purgerows( table, status )
+      if( ast_geti( table, 'NRow', status ) .ne. 3 ) then
+         call stopit( status, 'Table error purge-3' )
+      endif
+
+      if( ast_mapget0i( table, 'Tom(1)', ival, status ) ) then
+         if( ival .ne. -123 ) call stopit( status,
+     :                                     'Table error purge-4' )
+      else
+         call stopit( status, 'Table error purge-5' )
+      endif
+
+      if( ast_mapget0i( table, 'Tom(2)', ival, status ) ) then
+         if( ival .ne. -456 ) call stopit( status,
+     :                                     'Table error purge-6' )
+      else
+         call stopit( status, 'Table error purge-7' )
+      endif
+
+      if( ast_mapget0i( table, 'Fred(1)', ival, status ) ) then
+         call stopit( status, 'Table error purge-8' )
+      endif
+
+      if( ast_mapget0i( table, 'Fred(2)', ival, status ) ) then
+         if( ival .ne. 123 ) call stopit( status,
+     :                                    'Table error purge-9' )
+      else
+         call stopit( status, 'Table error purge-10' )
+      endif
+
+      if( ast_mapget0i( table, 'Fred(3)', ival, status ) ) then
+         if( ival .ne. 456 ) call stopit( status,
+     :                                    'Table error purge-11' )
+      else
+         call stopit( status, 'Table error purge-12' )
+      endif
+
+      call ast_annul( table, status )
 
       end
 

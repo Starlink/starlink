@@ -108,6 +108,7 @@ typedef struct AstTableVtab {
    void (* AddColumn)( AstTable *, const char *, int, int, int *, int * );
    void (* RemoveColumn)( AstTable *, const char *, int * );
    void (* RemoveRow)( AstTable *, int, int * );
+   void (* PurgeRows)( AstTable *, int * );
    int (* GetNrow)( AstTable *, int * );
    int (* GetNcolumn)( AstTable *, int * );
    void (* SetNrow)( AstTable *, int, int * );
@@ -170,6 +171,7 @@ AstTable *astLoadTable_( void *, size_t, AstTableVtab *,
 void astAddColumn_( AstTable *, const char *, int, int, int *, int * );
 void astRemoveColumn_( AstTable *, const char *, int * );
 void astRemoveRow_( AstTable *, int, int * );
+void astPurgeRows_( AstTable *, int * );
 int astGetNrow_( AstTable *, int * );
 int astGetNcolumn_( AstTable *, int * );
 void astSetNrow_( AstTable *, int, int * );
@@ -227,6 +229,7 @@ astINVOKE(O,astLoadTable_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR
 #define astAddColumn(this,name,type,ndim,dims) astINVOKE(V,astAddColumn_(astCheckTable(this),name,type,ndim,dims,STATUS_PTR))
 #define astRemoveColumn(this,name) astINVOKE(V,astRemoveColumn_(astCheckTable(this),name,STATUS_PTR))
 #define astRemoveRow(this,index) astINVOKE(V,astRemoveRow_(astCheckTable(this),index,STATUS_PTR))
+#define astPurgeRows(this) astINVOKE(V,astPurgeRows_(astCheckTable(this),STATUS_PTR))
 #define astColumnName(this,index) astINVOKE(V,astColumnName_(astCheckTable(this),index,STATUS_PTR))
 #define astColumnType(this,column) astINVOKE(V,astColumnType_(astCheckTable(this),column,STATUS_PTR))
 #define astColumnNdim(this,column) astINVOKE(V,astColumnNdim_(astCheckTable(this),column,STATUS_PTR))

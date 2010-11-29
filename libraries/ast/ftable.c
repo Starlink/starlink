@@ -145,6 +145,16 @@ F77_SUBROUTINE(ast_removerow)( INTEGER(THIS),
    )
 }
 
+F77_SUBROUTINE(ast_purgerows)( INTEGER(THIS),
+                               INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+
+   astAt( "AST_PURGEROWS", NULL, 0 );
+   astWatchSTATUS(
+      astPurgeRows( astI2P( *THIS ) );
+   )
+}
+
 
 /* NO_CHAR_FUNCTION indicates that the f77.h method of returning a
    character result doesn't work, so add an extra argument instead and
