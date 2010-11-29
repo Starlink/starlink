@@ -233,7 +233,7 @@
 /* initialise the new region to zero and record the new size.		    */
          if ( *slot >= rec_gl_mxslot )
 	 {
-	    rec_reall_mem( rec_gl_mxslot * 2 * (INT) sizeof( struct FCV ),
+	    rec_reall_mem( rec_gl_mxslot * 2 * sizeof( struct FCV ),
 			   (void **) &rec_ga_fcv );
 	    if ( _ok( hds_gl_status ) )
 	    {

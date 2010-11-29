@@ -86,7 +86,7 @@ extern const struct RID rec_gl_ridzero;	/* Null record ID		    */
       int rec_locate_fns( const struct HAN *han, const char **fns );
       int rec_lock( const struct HAN *han );
       void rec_mark_delete( const struct HAN *han, int *status );
-      int rec_reall_mem( int size, void **pntr );
+      int rec_reall_mem( size_t size, void **pntr );
       void rec_refcnt( const struct HAN *han, int inc, int *refcnt,
 		       int *status );
       int rec_release_block ( int slot, INT_BIG bloc );

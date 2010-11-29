@@ -11,8 +11,9 @@
 #include "ems_par.h"             /* EMS__ public constants                  */
 #include "hds1.h"                /* Global definitions for HDS              */
 #include "dat_err.h"             /* DAT__ error codes                       */
+#include "rec.h"
 
-   int rec_reall_mem( int size, void **pntr )
+   int rec_reall_mem( size_t size, void **pntr )
    {
 /*+                                                                         */
 /* Name:                                                                    */
@@ -28,7 +29,7 @@
 /*    This function re-allocates memory for use as workspace.               */
 
 /* Parameters:                                                              */
-/*    int size                                                              */
+/*    size_t size                                                           */
 /*       The new amount of memory required, in bytes.                       */
 /*    void **pntr                                                           */
 /*       Address of a pointer to workspace already allocated. A new pointer */
@@ -42,6 +43,8 @@
 /* Copyright:                                                               */
 /*    Copyright (C) 1991 Science & Engineering Research Council             */
 /*    Copyright (C) 2006 Particle Physics and Astronomy Research Council    */
+/*    Copyright (C) 2010 Science & Technology Facilities Council.           */
+/*    All Rights Reserved                                                   */
 
 /*  Licence:                                                                */
 /*     This program is free software; you can redistribute it and/or        */
@@ -69,6 +72,8 @@
 /*       Original version.                                                  */
 /*    23-FEB-2006 (TIMJ):                                                   */
 /*       use starmem                                                        */
+/*    29-NOV-2010 (TIMJ):                                                   */
+/*       Use size_t rather than int                                         */
 /*    {@enter_changes_here@}                                                */
 
 /* Bugs:                                                                    */
@@ -85,18 +90,16 @@
       if ( !_ok( hds_gl_status ) ) return hds_gl_status;
 
 /* Re-allocate the required memory.                                         */
-      newptr = starRealloc( *pntr, (size_t) size );
+      newptr = starRealloc( *pntr, size );
 
 /* If re-allocation failed, then report an error.                           */
       if ( newptr == NULL )
       {
          hds_gl_status = DAT__NOMEM;
          emsSyser( "MESSAGE", errno );
-         emsSeti( "NBYTES", size );
-         emsRep( "REC_REALL_MEM_1",
-                    "Unable to obtain a block of ^NBYTES bytes of memory - \
-^MESSAGE",
-                    &hds_gl_status );
+         emsRepf( "REC_REALL_MEM_1",
+                  "Unable to obtain a block of %zu bytes of memory - "
+                  "^MESSAGE", &hds_gl_status, size );
       }
 
 /* If successful, return the new pointer.                                   */
