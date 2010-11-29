@@ -2,6 +2,7 @@
 #  include <config.h>
 #endif
 
+#include "ems.h"
 #include "hds1.h"                /* Global definitions for HDS              */
 #include "rec1.h"                /* Internal rec_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
