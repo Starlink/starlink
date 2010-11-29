@@ -36,6 +36,7 @@
 #include "sae_par.h"
 #include "prm_par.h"
 #include "dat_par.h"
+#include "dat_err.h"
 #include "star/hds.h"
 #include "star/kaplibs.h"
 #include "star/util.h"
@@ -760,7 +761,7 @@ int *status                   /* global status (given and returned) */
    RETRIEVE_STATE( smu_x, SMU_X, double, VAL__BADD );
    RETRIEVE_STATE( smu_y, SMU_Y, double, VAL__BADD );
    RETRIEVE_STATE( smu_z, SMU_Z, double, VAL__BADD );
-   RETRIEVE_STATE( smu_jig_index, SMU_JIG_INDEX, int, VAL__BADI );
+   RETRIEVE_STATE( smu_jig_index, SMU_JIG_INDEX, short, VAL__BADW );
    RETRIEVE_STATE( smu_az_jig_x, SMU_AZ_JIG_X, double, VAL__BADD );
    RETRIEVE_STATE( smu_az_jig_y, SMU_AZ_JIG_Y, double, VAL__BADD );
    RETRIEVE_STATE( smu_az_chop_x, SMU_AZ_CHOP_X, double, VAL__BADD );
@@ -779,8 +780,8 @@ int *status                   /* global status (given and returned) */
    RETRIEVE_STATE( tcs_az_dc2, TCS_AZ_DC2, double, VAL__BADD );
    RETRIEVE_STATE( tcs_az_bc1, TCS_AZ_BC1, double, VAL__BADD );
    RETRIEVE_STATE( tcs_az_bc2, TCS_AZ_BC2, double, VAL__BADD );
-   RETRIEVE_STATE( tcs_index,  TCS_INDEX, int, VAL__BADI );
-   RETRIEVE_STATE( tcs_percent_cmp,  TCS_PERCENT_CMP, int, VAL__BADI );
+   RETRIEVE_STATE( tcs_index,  TCS_INDEX, short, VAL__BADW );
+   RETRIEVE_STATE( tcs_percent_cmp,  TCS_PERCENT_CMP, short, VAL__BADW );
    RETRIEVE_STATE( tcs_tr_ang, TCS_TR_ANG, double, VAL__BADD );
    RETRIEVE_STATE( tcs_tr_ac1, TCS_TR_AC1, double, VAL__BADD );
    RETRIEVE_STATE( tcs_tr_ac2, TCS_TR_AC2, double, VAL__BADD );
@@ -793,7 +794,7 @@ int *status                   /* global status (given and returned) */
    RETRIEVE_STATE( tcs_dm_abs, TCS_DM_ABS, double, VAL__BADD );
    RETRIEVE_STATE( tcs_dm_rel, TCS_DM_REL, double, VAL__BADD );
 
-   RETRIEVE_STATE( jos_drcontrol,  JOS_DRCONTROL, int, VAL__BADI );
+   RETRIEVE_STATE( jos_drcontrol, JOS_DRCONTROL, short, VAL__BADW );
 
    RETRIEVE_STATE( enviro_rel_hum, ENVIRO_REL_HUM, float, VAL__BADR );
    RETRIEVE_STATE( enviro_pressure, ENVIRO_PRESSURE, float, VAL__BADR );
@@ -804,16 +805,16 @@ int *status                   /* global status (given and returned) */
    RETRIEVE_STATE( wvm_t78, WVM_T78, float, VAL__BADR );
    RETRIEVE_STATE( wvm_time, WVM_TIME, double, VAL__BADD );
 
-   RETRIEVE_STATE( sc2_heat, SC2_HEAT, int, VAL__BADI );
-   RETRIEVE_STATE( sc2_bias, SC2_BIAS, int, VAL__BADI );
+   RETRIEVE_STATE( sc2_heat, SC2_HEAT, unsigned short, VAL__BADUW );
+   RETRIEVE_STATE( sc2_bias, SC2_BIAS, unsigned short, VAL__BADUW );
    RETRIEVE_STATE( sc2_mixtemp, SC2_MIXTEMP, float, VAL__BADR );
    RETRIEVE_STATE( sc2_fputemp, SC2_FPUTEMP, float, VAL__BADR );
 
    RETRIEVE_STATE( acs_exposure, ACS_EXPOSURE, float, VAL__BADR );
    RETRIEVE_STATE( acs_offexposure, ACS_OFFEXPOSURE, float, VAL__BADR );
-   RETRIEVE_STATE( acs_no_prev_ref, ACS_NO_PREV_REF, int, VAL__BADI );
-   RETRIEVE_STATE( acs_no_next_ref, ACS_NO_NEXT_REF, int, VAL__BADI );
-   RETRIEVE_STATE( acs_no_ons, ACS_NO_ONS, int, VAL__BADI );
+   RETRIEVE_STATE( acs_no_prev_ref, ACS_NO_PREV_REF, short, VAL__BADW );
+   RETRIEVE_STATE( acs_no_next_ref, ACS_NO_NEXT_REF, short, VAL__BADW );
+   RETRIEVE_STATE( acs_no_ons, ACS_NO_ONS, short, VAL__BADW );
 
    RETRIEVE_STATE( fe_lofreq, FE_LOFREQ, double, VAL__BADD );
    RETRIEVE_STATE( fe_doppler, FE_DOPPLER, double, VAL__BADD );
@@ -975,7 +976,7 @@ int *status                   /* global status (given and returned) */
 
    /* Secondary Mirror */
    STORE_CHAR( smu_chop_phase, SMU_CHOP_PHASE, JCMT__SZSMU_CHOP_PHASE );
-   STORE_STATE( smu_jig_index, SMU_JIG_INDEX, int );
+   STORE_STATE( smu_jig_index, SMU_JIG_INDEX, short );
 
    STORE_STATE( smu_az_jig_x, SMU_AZ_JIG_X, double );
    STORE_STATE( smu_az_jig_y, SMU_AZ_JIG_Y, double );
@@ -997,8 +998,8 @@ int *status                   /* global status (given and returned) */
    STORE_STATE( tcs_az_bc1, TCS_AZ_BC1, double );
    STORE_STATE( tcs_az_bc2, TCS_AZ_BC2, double );
    STORE_CHAR( tcs_beam, TCS_BEAM, JCMT__SZTCS_BEAM );
-   STORE_STATE( tcs_index, TCS_INDEX, int );
-   STORE_STATE( tcs_percent_cmp, TCS_PERCENT_CMP, int );
+   STORE_STATE( tcs_index, TCS_INDEX, short );
+   STORE_STATE( tcs_percent_cmp, TCS_PERCENT_CMP, short );
    STORE_CHAR( tcs_source, TCS_SOURCE, JCMT__SZTCS_SOURCE );
    STORE_CHAR( tcs_tr_sys, TCS_TR_SYS, JCMT__SZTCS_TR_SYS );
    STORE_STATE( tcs_tr_ang, TCS_TR_ANG, double );
@@ -1014,7 +1015,7 @@ int *status                   /* global status (given and returned) */
    STORE_STATE( tcs_dm_rel, TCS_DM_REL, double );
 
    /* Status flags */
-   STORE_STATE( jos_drcontrol, JOS_DRCONTROL, int );
+   STORE_STATE( jos_drcontrol, JOS_DRCONTROL, short );
 
    /* Water Vapour Monitor */
    STORE_STATE( wvm_t12, WVM_T12, float );
@@ -1023,8 +1024,8 @@ int *status                   /* global status (given and returned) */
    STORE_STATE( wvm_time, WVM_TIME, double );
 
    /* SCUBA-2 specific */
-   STORE_STATE( sc2_heat, SC2_HEAT, int );
-   STORE_STATE( sc2_bias, SC2_BIAS, int );
+   STORE_STATE( sc2_heat, SC2_HEAT, unsigned short );
+   STORE_STATE( sc2_bias, SC2_BIAS, unsigned short );
    STORE_STATE( sc2_mixtemp, SC2_MIXTEMP, float );
    STORE_STATE( sc2_fputemp, SC2_FPUTEMP, float );
 
@@ -1095,6 +1096,14 @@ int *status                   /* global status (given and returned) */
        if ( *status != SAI__OK ) break;
        datMap ( sc2store_loc[pos], hdsRecords[j].type, "READ",
 		ndim, dim, &(sc2store_ptr[pos]), status );
+
+       /* in 2010 November we changed the types of some of the _INTEGER
+          entries to _WORD and _UWORD. HDS does not trap bad pixel values
+          so any VAL__BADIs in an earlier JCMTSTATE will trigger a conversion
+          error in HDS. We simply assume that conversion errors mean
+          a bad value and we annul them. */
+       if (*status == DAT__CONER) emsAnnul( status );
+
      } else {
        /* if missing and is a mandatory component then we need
 	  to complain somehow. Old files will be a problem if we set

@@ -88,9 +88,10 @@
 
 *  Notes:
 *     - <x> in the function name should be replaced by one of "r", "i",
-*     "d" and "c" for processing arrays of float, int, double and char
-*     respectively. <type> above should also be changed to one of the
-*     "float", "int", "double" or "char".
+*     "d", "w", "uw" and "c" for processing arrays of float, int, double
+*     short, unsigned short and char respectively. <type> above should
+*     also be changed to one of the "float", "int", "double", "short"
+*     "unsigned short" or "char".
 *     - The smf_reorderc function has an extra parameter "len" giving the
 *     length of each sub-string within the array of chars gievn by "in"
 *     and "out".
@@ -106,10 +107,12 @@
 *        Added "mask" and "maxis" arguments.
 *     3-APR-2008 (DSB):
 *        Added generic smf_reorder function.
+*     2010-11-23 (TIMJ):
+*        Add support for shorts
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2007-2008 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2008,2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -160,6 +163,14 @@ void smf_reorder( const char *type, void *in, int len, int ndim, int *dims_in,
      smf_reorderI( (int *) in, 1, ndim, dims_in, axis, index, maxis,
                     mask, (int *) out, status );
 
+   } else if( !strcmp( type, "_WORD" ) ) {
+     smf_reorderW( (short *) in, 1, ndim, dims_in, axis, index, maxis,
+                    mask, (short *) out, status );
+
+   } else if( !strcmp( type, "_UWORD" ) ) {
+     smf_reorderUW( (unsigned short *) in, 1, ndim, dims_in, axis, index, maxis,
+                    mask, (unsigned short *) out, status );
+
    } else if( !strncmp( type, "_CHAR", 5 ) ) {
       smf_reorderB( (char *) in, len, ndim, dims_in, axis, index, maxis,
                     mask, (char *) out, status );
@@ -185,6 +196,16 @@ void smf_reorder( const char *type, void *in, int len, int ndim, int *dims_in,
 #undef CGEN_CODE_TYPE
 
 #define CGEN_CODE_TYPE CGEN_INT_TYPE
+#include "cgeneric_defs.h"
+#include "smf_reorderx.cgen"
+#undef CGEN_CODE_TYPE
+
+#define CGEN_CODE_TYPE CGEN_WORD_TYPE
+#include "cgeneric_defs.h"
+#include "smf_reorderx.cgen"
+#undef CGEN_CODE_TYPE
+
+#define CGEN_CODE_TYPE CGEN_UWORD_TYPE
 #include "cgeneric_defs.h"
 #include "smf_reorderx.cgen"
 #undef CGEN_CODE_TYPE

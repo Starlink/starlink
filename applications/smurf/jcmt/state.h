@@ -138,7 +138,7 @@ typedef struct JCMTState {
   double smu_y;
   double smu_z;
   char   smu_chop_phase[JCMT__SZSMU_CHOP_PHASE+1];
-  int    smu_jig_index;
+  short  smu_jig_index;
   double smu_az_jig_x;
   double smu_az_jig_y;
   double smu_az_chop_x;
@@ -157,8 +157,8 @@ typedef struct JCMTState {
   double tcs_az_bc1;
   double tcs_az_bc2;
   char   tcs_beam[JCMT__SZTCS_BEAM+1];
-  int    tcs_index;
-  int    tcs_percent_cmp;
+  short  tcs_index;
+  short  tcs_percent_cmp;
   char   tcs_source[JCMT__SZTCS_SOURCE+1];
   char   tcs_tr_sys[JCMT__SZTCS_TR_SYS+1];
   double tcs_tr_ang;
@@ -172,7 +172,7 @@ typedef struct JCMTState {
   double tcs_en_dc2;
   double tcs_dm_abs;  /* Dome actual azimuth absolute */
   double tcs_dm_rel;  /* Dome actual azimuth relative */
-  int    jos_drcontrol; /* JOS DR control tag */
+  short  jos_drcontrol; /* JOS DR control tag */
   float  enviro_rel_hum;
   float  enviro_pressure;
   float  enviro_air_temp;
@@ -180,15 +180,15 @@ typedef struct JCMTState {
   float  wvm_t42;
   float  wvm_t78;
   double wvm_time;
-  int    sc2_heat;
-  int    sc2_bias;
+  unsigned short sc2_heat;
+  unsigned short sc2_bias;
   float  sc2_mixtemp;
   float  sc2_fputemp;
   float  acs_exposure;
   float  acs_offexposure;
-  int    acs_no_prev_ref;
-  int    acs_no_next_ref;
-  int    acs_no_ons;
+  short  acs_no_prev_ref;
+  short  acs_no_next_ref;
+  short  acs_no_ons;
   char   acs_source_ro[JCMT__SZACS_SOURCE_RO+1];
   double pol_ang;
   float  fts_pos;
@@ -297,7 +297,7 @@ static const HDSdataRecord hdsRecords[JCMT_COMP_NUM] =
     { SMU_Y, "_DOUBLE", "SMU_Y", INST__ACSIS, INST__NONE },
     { SMU_Z, "_DOUBLE", "SMU_Z", INST__ACSIS, INST__NONE },
     { SMU_CHOP_PHASE, CHARTYP(JCMT__SZSMU_CHOP_PHASE), "SMU_CHOP_PHASE", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
-    { SMU_JIG_INDEX, "_INTEGER", "SMU_JIG_INDEX", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
+    { SMU_JIG_INDEX, "_WORD", "SMU_JIG_INDEX", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
     { SMU_AZ_JIG_X, "_DOUBLE", "SMU_AZ_JIG_X", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
     { SMU_AZ_JIG_Y, "_DOUBLE", "SMU_AZ_JIG_Y", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
     { SMU_AZ_CHOP_X, "_DOUBLE", "SMU_AZ_CHOP_X", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
@@ -318,8 +318,8 @@ static const HDSdataRecord hdsRecords[JCMT_COMP_NUM] =
     { TCS_AZ_BC1, "_DOUBLE", "TCS_AZ_BC1", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
     { TCS_AZ_BC2, "_DOUBLE", "TCS_AZ_BC2", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
     { TCS_BEAM, CHARTYP(JCMT__SZTCS_BEAM), "TCS_BEAM", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
-    { TCS_INDEX, "_INTEGER", "TCS_INDEX", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
-    { TCS_PERCENT_CMP, "_INTEGER", "TCS_PERCENT_CMP", (inst_t)(INST__ACSIS | INST__SCUBA2),
+    { TCS_INDEX, "_WORD", "TCS_INDEX", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
+    { TCS_PERCENT_CMP, "_WORD", "TCS_PERCENT_CMP", (inst_t)(INST__ACSIS | INST__SCUBA2),
       (inst_t)(INST__ACSIS|INST__SCUBA2) },
     { TCS_SOURCE, CHARTYP(JCMT__SZTCS_SOURCE), "TCS_SOURCE", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
     { TCS_TR_SYS, CHARTYP(JCMT__SZTCS_TR_SYS), "TCS_TR_SYS", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
@@ -338,7 +338,7 @@ static const HDSdataRecord hdsRecords[JCMT_COMP_NUM] =
       (inst_t)(INST__ACSIS|INST__SCUBA2) },
     { TCS_DM_REL, "_DOUBLE", "TCS_DM_REL", (inst_t)(INST__ACSIS | INST__SCUBA2),
       (inst_t)(INST__ACSIS|INST__SCUBA2) },
-    { JOS_DRCONTROL, "_INTEGER", "JOS_DRCONTROL", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__SCUBA2 },
+    { JOS_DRCONTROL, "_WORD", "JOS_DRCONTROL", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__SCUBA2 },
     { ENVIRO_REL_HUM, "_REAL", "ENVIRO_REL_HUM", INST__ACSIS, INST__NONE },
     { ENVIRO_PRESSURE, "_REAL", "ENVIRO_PRESSURE", INST__ACSIS, INST__NONE },
     { ENVIRO_AIR_TEMP, "_REAL", "ENVIRO_AIR_TEMP", INST__ACSIS, INST__NONE },
@@ -346,14 +346,14 @@ static const HDSdataRecord hdsRecords[JCMT_COMP_NUM] =
     { WVM_T42, "_REAL", "WVM_T42", INST__SCUBA2, INST__NONE },
     { WVM_T78, "_REAL", "WVM_T78", INST__SCUBA2, INST__NONE },
     { WVM_TIME, "_DOUBLE", "WVM_TIME", INST__SCUBA2, INST__NONE },
-    { SC2_HEAT, "_INTEGER", "SC2_HEAT", INST__SCUBA2, INST__NONE },
-    { SC2_BIAS, "_INTEGER", "SC2_BIAS", INST__SCUBA2, INST__SCUBA2 }, /* Old data did not have it */
+    { SC2_HEAT, "_UWORD", "SC2_HEAT", INST__SCUBA2, INST__NONE },
+    { SC2_BIAS, "_UWORD", "SC2_BIAS", INST__SCUBA2, INST__SCUBA2 }, /* Old data did not have it */
     { SC2_MIXTEMP, "_REAL", "SC2_MIXTEMP", INST__SCUBA2, INST__SCUBA2 }, /* Old data did not have it */
     { SC2_FPUTEMP, "_REAL", "SC2_FPUTEMP", INST__SCUBA2, INST__SCUBA2 }, /* Old data did not have it */
     { ACS_SOURCE_RO, CHARTYP(JCMT__SZACS_SOURCE_RO), "ACS_SOURCE_RO", INST__ACSIS, INST__NONE },
-    { ACS_NO_PREV_REF, "_INTEGER", "ACS_NO_PREV_REF", INST__ACSIS, INST__NONE },
-    { ACS_NO_NEXT_REF, "_INTEGER", "ACS_NO_NEXT_REF", INST__ACSIS, INST__NONE },
-    { ACS_NO_ONS, "_INTEGER", "ACS_NO_ONS", INST__ACSIS, INST__NONE },
+    { ACS_NO_PREV_REF, "_WORD", "ACS_NO_PREV_REF", INST__ACSIS, INST__NONE },
+    { ACS_NO_NEXT_REF, "_WORD", "ACS_NO_NEXT_REF", INST__ACSIS, INST__NONE },
+    { ACS_NO_ONS, "_WORD", "ACS_NO_ONS", INST__ACSIS, INST__NONE },
     { ACS_EXPOSURE, "_REAL", "ACS_EXPOSURE", INST__ACSIS, INST__NONE },
     { ACS_OFFEXPOSURE, "_REAL", "ACS_OFFEXPOSURE", INST__ACSIS, INST__ACSIS },
     { POL_ANG, "_DOUBLE", "POL_ANG", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },

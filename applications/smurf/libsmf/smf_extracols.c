@@ -41,8 +41,14 @@
 *     This function collects values for extra columns to store in the
 *     catalogue created via the OUTCAT parameter of MAKECUBE.
 
+*  Notes:
+*     - The unsigned short items are cast to shorts. This should not be
+*     an issue since the main unsigned short entries are for SCUBA-2 and
+*     currently we only call this routine with ACSIS.
+
 *  Authors:
 *     David S Berry (JAC, UCLan)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -54,10 +60,12 @@
 *        Add SC2_MIXTEMP
 *     2010-09-22 (TIMJ):
 *        Add SC2_BIAS and SC2_FPUTEMP
+*     2010-11-19 (TIMJ):
+*        Some of the integer entries in JCMTState are now shorts.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2009-2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -169,9 +177,9 @@ void smf_extracols( smfHead *hdr, Grp *colgrp, void **cols_info,
 
 /* Use this macro to check for each JCMTSTATE item. */
                CHECK_ITEM("ACS_EXPOSURE",AST__FLOATTYPE,sizeof(float),acs_exposure )
-               CHECK_ITEM("ACS_NO_NEXT_REF",AST__INTTYPE,sizeof(int),acs_no_next_ref )
-               CHECK_ITEM("ACS_NO_ONS",AST__INTTYPE,sizeof(int),acs_no_ons)
-               CHECK_ITEM("ACS_NO_PREV_REF",AST__INTTYPE,sizeof(int),acs_no_prev_ref)
+               CHECK_ITEM("ACS_NO_NEXT_REF",AST__SINTTYPE,sizeof(short),acs_no_next_ref )
+               CHECK_ITEM("ACS_NO_ONS",AST__SINTTYPE,sizeof(short),acs_no_ons)
+               CHECK_ITEM("ACS_NO_PREV_REF",AST__SINTTYPE,sizeof(short),acs_no_prev_ref)
                CHECK_ITEM("ACS_OFFEXPOSURE",AST__FLOATTYPE,sizeof(float),acs_offexposure)
                CHECK_ITEM("ACS_SOURCE_RO",AST__STRINGTYPE,sizeof(char)*JCMT__SZACS_SOURCE_RO+1,acs_source_ro)
                CHECK_ITEM("ENVIRO_AIR_TEMP",AST__FLOATTYPE,sizeof(float),enviro_air_temp)
@@ -180,13 +188,13 @@ void smf_extracols( smfHead *hdr, Grp *colgrp, void **cols_info,
                CHECK_ITEM("FE_DOPPLER",AST__DOUBLETYPE,sizeof(double),fe_doppler)
                CHECK_ITEM("FE_LOFREQ",AST__DOUBLETYPE,sizeof(double),fe_lofreq)
                CHECK_ITEM("FTS_POS",AST__FLOATTYPE,sizeof(float),fts_pos)
-               CHECK_ITEM("JOS_DRCONTROL",AST__INTTYPE,sizeof(int),jos_drcontrol)
+               CHECK_ITEM("JOS_DRCONTROL",AST__SINTTYPE,sizeof(short),jos_drcontrol)
                CHECK_ITEM("POL_ANG",AST__DOUBLETYPE,sizeof(double),pol_ang)
                CHECK_ITEM("RTS_END",AST__DOUBLETYPE,sizeof(double),rts_end)
                CHECK_ITEM("RTS_NUM",AST__INTTYPE,sizeof(int),rts_num)
                CHECK_ITEM("RTS_TASKS",AST__STRINGTYPE,sizeof(char)*JCMT__SZRTS_TASKS+1,rts_tasks)
-               CHECK_ITEM("SC2_HEAT",AST__INTTYPE,sizeof(int),sc2_heat)
-               CHECK_ITEM("SC2_BIAS",AST__INTTYPE,sizeof(int),sc2_bias)
+               CHECK_ITEM("SC2_HEAT",AST__SINTTYPE,sizeof(unsigned short),sc2_heat)
+               CHECK_ITEM("SC2_BIAS",AST__SINTTYPE,sizeof(unsigned short),sc2_bias)
                CHECK_ITEM("SC2_MIXTEMP",AST__FLOATTYPE,sizeof(float),sc2_mixtemp)
                CHECK_ITEM("SC2_FPUTEMP",AST__FLOATTYPE,sizeof(float),sc2_fputemp)
                CHECK_ITEM("SMU_AZ_CHOP_X",AST__DOUBLETYPE,sizeof(double),smu_az_chop_x)
@@ -194,7 +202,7 @@ void smf_extracols( smfHead *hdr, Grp *colgrp, void **cols_info,
                CHECK_ITEM("SMU_AZ_JIG_X",AST__DOUBLETYPE,sizeof(double),smu_az_jig_x)
                CHECK_ITEM("SMU_AZ_JIG_Y",AST__DOUBLETYPE,sizeof(double),smu_az_jig_y)
                CHECK_ITEM("SMU_CHOP_PHASE",AST__STRINGTYPE,sizeof(char)*JCMT__SZSMU_CHOP_PHASE+1,smu_chop_phase)
-               CHECK_ITEM("SMU_JIG_INDEX",AST__INTTYPE,sizeof(int),smu_jig_index)
+                 CHECK_ITEM("SMU_JIG_INDEX",AST__SINTTYPE,sizeof(short),smu_jig_index)
                CHECK_ITEM("SMU_TR_CHOP_X",AST__DOUBLETYPE,sizeof(double),smu_tr_chop_x)
                CHECK_ITEM("SMU_TR_CHOP_Y",AST__DOUBLETYPE,sizeof(double),smu_tr_chop_y)
                CHECK_ITEM("SMU_TR_JIG_X",AST__DOUBLETYPE,sizeof(double),smu_tr_jig_x)
@@ -211,8 +219,8 @@ void smf_extracols( smfHead *hdr, Grp *colgrp, void **cols_info,
                CHECK_ITEM("TCS_AZ_DC1",AST__DOUBLETYPE,sizeof(double),tcs_az_dc1)
                CHECK_ITEM("TCS_AZ_DC2",AST__DOUBLETYPE,sizeof(double),tcs_az_dc2)
                CHECK_ITEM("TCS_BEAM",AST__STRINGTYPE,sizeof(char)*JCMT__SZTCS_BEAM+1,tcs_beam)
-               CHECK_ITEM("TCS_INDEX",AST__INTTYPE,sizeof(int),tcs_index)
-               CHECK_ITEM("TCS_PERCENT_CMP",AST__INTTYPE,sizeof(int),tcs_percent_cmp)
+               CHECK_ITEM("TCS_INDEX",AST__SINTTYPE,sizeof(short),tcs_index)
+               CHECK_ITEM("TCS_PERCENT_CMP",AST__SINTTYPE,sizeof(short),tcs_percent_cmp)
                CHECK_ITEM("TCS_SOURCE",AST__STRINGTYPE,sizeof(char)*JCMT__SZTCS_SOURCE+1,tcs_source)
                CHECK_ITEM("TCS_TAI",AST__DOUBLETYPE,sizeof(double),tcs_tai)
                CHECK_ITEM("TCS_TR_AC1",AST__DOUBLETYPE,sizeof(double),tcs_tr_ac1)
@@ -303,6 +311,10 @@ void smf_extracols( smfHead *hdr, Grp *colgrp, void **cols_info,
             } else if( (store->type)[ icol ] == AST__FLOATTYPE ) {
                astMapPut1F( *km, (store->name)[ icol ], store->nrow,
                             (float *) (store->data)[ icol ], NULL );
+
+            } else if( (store->type)[ icol ] == AST__SINTTYPE ) {
+               astMapPut1S( *km, (store->name)[ icol ], store->nrow,
+                            (short *) (store->data)[ icol ], NULL );
 
             } else if( (store->type)[ icol ] == AST__DOUBLETYPE ) {
                astMapPut1D( *km, (store->name)[ icol ], store->nrow,

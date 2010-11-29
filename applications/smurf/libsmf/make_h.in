@@ -126,6 +126,16 @@ EOF
             print OUTFILE "$fproto\n";
 
             $fproto = $proto;
+            $fproto =~ s/<X>/W/g;
+            $fproto =~ s/CGEN_TYPE/short/g;
+            print OUTFILE "$fproto\n";
+
+            $fproto = $proto;
+            $fproto =~ s/<X>/UW/g;
+            $fproto =~ s/CGEN_TYPE/unsigned short/g;
+            print OUTFILE "$fproto\n";
+
+            $fproto = $proto;
             $fproto =~ s/<X>/B/g;
             $fproto =~ s/CGEN_TYPE/char/g;
             print OUTFILE "$fproto\n";
