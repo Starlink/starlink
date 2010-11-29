@@ -6598,7 +6598,7 @@ f        The global status.
 /* Store the new key string, and terminate it to exclude any trailing
    spaces. */
          keylen = strlen( newkey );
-         entry->key = astStore( NULL, newkey, keylen + 1 );
+         entry->key = astStore( entry->key, newkey, keylen + 1 );
          if( astOK ) {
             p = (char *) entry->key + keylen;
             while( --p >= entry->key ) {
