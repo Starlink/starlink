@@ -117,6 +117,7 @@ typedef struct AstTableVtab {
    int (* ColumnType)( AstTable *, const char *, int * );
    const char *(* ColumnUnit)( AstTable *, const char *, int * );
    AstKeyMap *(* ColumnProps)( AstTable *, int * );
+   int (* ColumnLenC)( AstTable *, const char *, int * );
    int (* ColumnNdim)( AstTable *, const char *, int * );
    void (* ColumnShape)( AstTable *, const char *, int, int *, int *, int * );
 } AstTableVtab;
@@ -182,6 +183,7 @@ void astSetNrow_( AstTable *, int, int * );
 const char *astColumnName_( AstTable *, int, int * );
 int astColumnType_( AstTable *, const char *, int * );
 const char *astColumnUnit_( AstTable *, const char *, int * );
+int astColumnLenC_( AstTable *, const char *, int * );
 int astColumnNdim_( AstTable *, const char *, int * );
 void astColumnShape_( AstTable *, const char *, int, int *, int *, int * );
 
@@ -238,6 +240,7 @@ astINVOKE(O,astLoadTable_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR
 #define astColumnName(this,index) astINVOKE(V,astColumnName_(astCheckTable(this),index,STATUS_PTR))
 #define astColumnType(this,column) astINVOKE(V,astColumnType_(astCheckTable(this),column,STATUS_PTR))
 #define astColumnUnit(this,column) astINVOKE(V,astColumnUnit_(astCheckTable(this),column,STATUS_PTR))
+#define astColumnLenC(this,column) astINVOKE(V,astColumnLenC_(astCheckTable(this),column,STATUS_PTR))
 #define astColumnNdim(this,column) astINVOKE(V,astColumnNdim_(astCheckTable(this),column,STATUS_PTR))
 #define astColumnShape(this,column,mxdim,ndim,dims) astINVOKE(V,astColumnShape_(astCheckTable(this),column,mxdim,ndim,dims,STATUS_PTR))
 

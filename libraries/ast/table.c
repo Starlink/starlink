@@ -57,6 +57,7 @@ f     following routines may also be applied to all Tables:
 c     - astAddColumn: Add a new column definition to a Table.
 c     - astColumnName: Return the name of the column with a given index
 c     - astColumnNdim: Return the number of dimensions for a column
+c     - astColumnLenC: Get the maximum length of a named character column
 c     - astColumnShape: Return the shape of the values in a named column
 c     - astColumnType: Return the data type of the values in a named column
 c     - astColumnUnit: Return the unit string for a named column
@@ -64,6 +65,7 @@ c     - astPurgeRows: Remove all empty rows from a Table.
 c     - astRemoveColumn: Remove a column from a Table.
 c     - astRemoveRow: Remove a row from a Table.
 f     - AST_ADDCOLUMN: Add a new column definition to a Table.
+f     - AST_COLUMNLENC: Get the maximum length of a named character column
 f     - AST_COLUMNNAME: Return the name of the column with a given index
 f     - AST_COLUMNNDIM: Return the number of dimensions for a column
 f     - AST_COLUMNSHAPE: Return the shape of the values in a named column
@@ -260,6 +262,7 @@ AstTable *astTableId_( const char *, ... );
 static AstKeyMap *ColumnProps( AstTable *, int * );
 static const char *ColumnName( AstTable *, int index, int * );
 static const char *TypeString( int );
+static int ColumnLenC( AstTable *, const char *, int * );
 static int ColumnNdim( AstTable *, const char *, int * );
 static int ColumnType( AstTable *, const char *, int * );
 static int Equal( AstObject *, AstObject *, int * );
@@ -587,6 +590,110 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
    } else {
       (*parent_clearattrib)( this_object, attrib, status );
    }
+}
+
+static int ColumnLenC( AstTable *this, const char *column, int *status ) {
+/*
+*++
+*  Name:
+c     astColumnLenC
+f     AST_COLUMNLENC
+
+*  Purpose:
+*     Get the maximum formatted length of any value in a column.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "table.h"
+c     int astColumnLenC( AstTable *this, const char *column )
+f     RESULT = AST_COLUMNLENC( THIS, COLUMN, STATUS )
+
+*  Class Membership:
+*     Table method.
+
+*  Description:
+*     This function returns the minimum length which a character variable
+*     must have in order to be able to store the longest value currently
+*     present (at any row) in a specified column of the supplied Table. If
+*     the named column holds vector values, then the returned value is
+*     the length of the longest element of the vector value.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Table.
+c     column
+f     COLUMN = CHARACTER * ( * ) (Given)
+*        The character string holding the name of the column. Trailing
+*        spaces are ignored.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Returned Value:
+c     astColumnLenC()
+f     AST_COLUMNLENC = INTEGER
+*        The length (i.e. number of characters) of the longest formatted
+*        value associated with the named column.
+c        This does not include the trailing null character.
+
+*  Notes:
+*     - Automatic data type conversion occurs if the named column holds
+*     numerical values.
+*     - A function value of zero will be returned without error if the
+*     named column does not exist  or cannot be formatted as a character
+*     string.
+*     - A function value of zero will be returned if an error has already
+*     occurred, or if this function should fail for any reason.
+
+*--
+*/
+
+/* Local Variables: */
+   AstKeyMap *cols;        /* KeyMap holding column definitions */
+   char key[ MXCOLNAMLEN + 24 ]; /* Current cell key string */
+   int irow;               /* Current row index */
+   int len;                /* Length needed to format current cell */
+   int nrow;               /* Number of rows in table */
+   int result;             /* Returned value */
+
+/* Initialise */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get the KeyMap holding information about all columns. */
+   cols = astColumnProps( this );
+
+/* Check the table contains the requested column. */
+   if( astMapHasKey( cols, column ) ) {
+
+/* Loop round all rows in the table. */
+      nrow = astGetNrow( this );
+      for( irow = 1; irow <= nrow; irow++ ) {
+
+/* Format the cell name. */
+         sprintf( key, "%s(%d)", column, irow );
+
+/* Get the maximum length needed to format a string in the current
+   row/column. */
+         len = astMapLenC( this, key );
+
+/* Return the largest value found for any row. */
+         if( len > result ) result = len;
+      }
+   }
+
+/* Free resources */
+   cols = astAnnul( cols );
+
+/* Return AST__BADTYPE if an error occurred. */
+   if( !astOK ) result = 0;
+
+/* Return the result. */
+   return result;
 }
 
 static const char *ColumnName( AstTable *this, int index, int *status ) {
@@ -1474,6 +1581,7 @@ void astInitTableVtab_(  AstTableVtab *vtab, const char *name, int *status ) {
    vtab->SetNrow = SetNrow;
    vtab->GetNcolumn = GetNcolumn;
    vtab->ColumnName = ColumnName;
+   vtab->ColumnLenC = ColumnLenC;
    vtab->ColumnNdim = ColumnNdim;
    vtab->ColumnType = ColumnType;
    vtab->ColumnUnit = ColumnUnit;
@@ -4067,6 +4175,10 @@ int astColumnType_( AstTable *this, const char *column, int *status ){
 const char *astColumnUnit_( AstTable *this, const char *column, int *status ){
    if ( !astOK ) return NULL;
    return (**astMEMBER(this,Table,ColumnUnit))(this,column,status);
+}
+int astColumnLenC_( AstTable *this, const char *column, int *status ){
+   if ( !astOK ) return 0;
+   return (**astMEMBER(this,Table,ColumnLenC))(this,column,status);
 }
 int astColumnNdim_( AstTable *this, const char *column, int *status ){
    if ( !astOK ) return 0;

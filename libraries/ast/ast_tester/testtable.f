@@ -220,7 +220,9 @@ c      call ast_watchmemory(483)
          call stopit( status, 'Table error 29' )
       endif
 
-
+      if( ast_columnlenc( table, 'Dick', status ) .ne. 10 ) then
+         call stopit( status, 'Table error 29b' )
+      endif
 
       dims( 1 ) = 1
       dims( 2 ) = 2
