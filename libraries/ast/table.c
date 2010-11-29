@@ -59,6 +59,7 @@ c     - astColumnName: Return the name of the column with a given index
 c     - astColumnNdim: Return the number of dimensions for a column
 c     - astColumnShape: Return the shape of the values in a named column
 c     - astColumnType: Return the data type of the values in a named column
+c     - astColumnUnit: Return the unit string for a named column
 c     - astPurgeRows: Remove all empty rows from a Table.
 c     - astRemoveColumn: Remove a column from a Table.
 c     - astRemoveRow: Remove a row from a Table.
@@ -67,6 +68,7 @@ f     - AST_COLUMNNAME: Return the name of the column with a given index
 f     - AST_COLUMNNDIM: Return the number of dimensions for a column
 f     - AST_COLUMNSHAPE: Return the shape of the values in a named column
 f     - AST_COLUMNTYPE: Return the data type of the values in a named column
+f     - AST_COLUMNUNIT: Return the unit string for a named column
 f     - AST_PURGEROWS: Remove all empty rows from a Table.
 f     - AST_REMOVECOLUMN: Remove a column from a Table.
 f     - AST_REMOVEROW: Remove a row from a Table.
@@ -112,6 +114,7 @@ f     - AST_REMOVEROW: Remove a row from a Table.
 #define TYPE "Type"
 #define SHAPE "Shape"
 #define NROW "Nrow"
+#define UNIT "Unit"
 
 /* Maximum length of a column name */
 #define MXCOLNAMLEN 100
@@ -286,7 +289,7 @@ static int MapGetElemI( AstKeyMap *, const char *, int, int *, int * );
 static int MapGetElemP( AstKeyMap *, const char *, int, void **, int * );
 static int MapGetElemS( AstKeyMap *, const char *, int, short int *, int * );
 static int ParseKey( AstTable *, const char *, int, char *, int *, AstKeyMap **, const char *, int * );
-static void AddColumn( AstTable *, const char *, int, int, int *, int * );
+static void AddColumn( AstTable *, const char *, int, int, int *, const char *, int * );
 static void ColumnShape( AstTable *, const char *, int, int *, int *, int *);
 static void Copy( const AstObject *, AstObject *, int * );
 static void Delete( AstObject *, int * );
@@ -338,7 +341,7 @@ static int GetNcolumn( AstTable *, int * );
 /* Member functions. */
 /* ================= */
 static void AddColumn( AstTable *this, const char *name, int type,
-                       int ndim, int *dims, int *status ) {
+                       int ndim, int *dims, const char *unit, int *status ) {
 /*
 *++
 *  Name:
@@ -354,8 +357,8 @@ f     AST_ADDCOLUMN
 *  Synopsis:
 c     #include "table.h"
 c     void astAddColumn( AstTable *this, const char *name, int type, int ndim,
-c                        int *dims )
-f     CALL AST_ADDCOLUMN( THIS, NAME, TYPE, NDIM, DIMS, STATUS )
+c                        int *dims, const char *unit )
+f     CALL AST_ADDCOLUMN( THIS, NAME, TYPE, NDIM, DIMS, UNIT, STATUS )
 
 *  Class Membership:
 *     Table method.
@@ -399,6 +402,10 @@ f     DIMS( NDIM ) = INTEGER (Given)
 *        An array holding the the lengths of each of the axes spanned by
 *        the values stored in a single cell of the column. Ignored if the
 *        column holds scalara values.
+c     unit
+f     UNIT = CHARACTER * ( * ) (Given)
+*        A string specifying the units of the column. Supply a blank
+*        string if the column is unitless.
 f     STATUS = INTEGER (Given and Returned)
 f        The global status.
 
@@ -415,6 +422,7 @@ f     routine
 
 /* Local Variables: */
    AstKeyMap *col_km;    /* KeyMap holding new column details */
+   const char *oldunit;  /* Pointer to the old coumn unit string */
    int *olddims;         /* Shape of pre-existing column */
    int idim;             /* Axis index */
    int namlen;           /* Used length of "name" */
@@ -469,6 +477,13 @@ f     routine
                       name, TypeString( oldtype ) );
          }
 
+         if( !astMapGet0C( col_km, UNIT, &oldunit ) ) oldunit = "";
+         if( strcmp( oldunit, unit ) && astOK ) {
+            astError( AST__OLDCOL, "astAddColumn(%s): A column called "
+                      "%s already exists in the table with a different "
+                      "unit string ('%s').", status, astGetClass( this ),
+                      name, oldunit );
+         }
 
          if( ndim != astMapLength( col_km, SHAPE ) && astOK ) {
             astError( AST__OLDCOL, "astAddColumn(%s): A column called "
@@ -498,6 +513,7 @@ f     routine
          astMapPut0C( col_km, NAME, name, NULL );
          astMapPut0I( col_km, TYPE, type, NULL );
          if( ndim ) astMapPut1I( col_km, SHAPE, ndim, dims, NULL );
+         astMapPut0C( col_km, UNIT, unit, NULL );
 
 /* Put the column KeyMap into the KeyMap holding details of all columns.
    Use the column name as the key. */
@@ -506,7 +522,6 @@ f     routine
 
 /* Annul the local KeyMa[p pointer. */
       col_km = astAnnul( col_km );
-
    }
 }
 
@@ -926,6 +941,94 @@ f        AST_MAPPUTU).
    return result;
 }
 
+static const char *ColumnUnit( AstTable *this, const char *column, int *status ) {
+/*
+*++
+*  Name:
+c     astColumnUnit
+f     AST_COLUMNUNIT
+
+*  Purpose:
+*     Get the unit string for a column in a Table.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "table.h"
+c     const char *astColumnUnit( AstTable *this, const char *column )
+f     RESULT = AST_COLUMNUNIT( THIS, COLUMN, STATUS )
+
+*  Class Membership:
+*     Table method.
+
+*  Description:
+*     This function returns the unit string for a named column in a Table.
+*     This is the unit string that was provided when the column was added to
+*     the Table using
+c     astAddColumn.
+f     AST_ADDCOLUMN.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Table.
+c     column
+f     COLUMN = CHARACTER * ( * ) (Given)
+*        The character string holding the name of the column. Trailing
+*        spaces are ignored.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Returned Value:
+c     astColumnUnit()
+c        A pointer to a null-terminated string containing the column units.
+f     AST_COLUMNUNIT = CHARACTER * ( AST__SZCHR )
+f        The column units.
+
+*  Notes:
+c     - The returned pointer is guaranteed to remain valid and the
+c     string to which it points will not be over-written for a total
+c     of 50 successive invocations of this function. After this, the
+c     memory containing the string may be re-used, so a copy of the
+c     string should be made if it is needed for longer than this.
+c     - A NULL pointer will be returned if this function is invoked
+c     with the AST error status set, or if it should fail for any
+c     reason.
+f     - A blank string will be returned if this function is invoked
+f     with STATUS set to an error value, or if it should fail for any
+f     reason.
+
+*--
+*/
+
+/* Local Variables: */
+   AstKeyMap *col_km;      /* Pointer to KeyMap holding column info */
+   const char *result;     /* Returned value */
+
+/* Initialise */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get the KeyMap holding information about the requested column. */
+   if( astMapGet0A( this->columns, column, &col_km ) ) {
+
+/* Get the column unit string. */
+      (void) astMapGet0C( col_km, UNIT, &result );
+
+/* Annul the KeyMap pointer. */
+      col_km = astAnnul( col_km );
+   }
+
+/* Return NULL if an error occurred. */
+   if( !astOK ) result = NULL;
+
+/* Return the result. */
+   return result;
+}
+
 static int Equal( AstObject *this_object, AstObject *that_object, int *status ) {
 /*
 *  Name:
@@ -1278,6 +1381,7 @@ void astInitTableVtab_(  AstTableVtab *vtab, const char *name, int *status ) {
    vtab->ColumnName = ColumnName;
    vtab->ColumnNdim = ColumnNdim;
    vtab->ColumnType = ColumnType;
+   vtab->ColumnUnit = ColumnUnit;
    vtab->ColumnShape = ColumnShape;
 
 /* Save the inherited pointers to methods that will be extended, and
@@ -3829,9 +3933,9 @@ AstTable *astLoadTable_( void *mem, size_t size, AstTableVtab *vtab,
    same interface. */
 
 void astAddColumn_( AstTable *this, const char *name, int type,
-                    int ndim, int *dims, int *status ) {
+                    int ndim, int *dims, const char *unit, int *status ) {
    if ( !astOK ) return;
-   (**astMEMBER(this,Table,AddColumn))(this,name,type,ndim,dims,status);
+   (**astMEMBER(this,Table,AddColumn))(this,name,type,ndim,dims,unit,status);
 }
 void astRemoveColumn_( AstTable *this, const char *name, int *status ){
    if ( !astOK ) return;
@@ -3856,6 +3960,10 @@ const char *astColumnName_( AstTable *this, int index, int *status ){
 int astColumnType_( AstTable *this, const char *column, int *status ){
    if ( !astOK ) return 0;
    return (**astMEMBER(this,Table,ColumnType))(this,column,status);
+}
+const char *astColumnUnit_( AstTable *this, const char *column, int *status ){
+   if ( !astOK ) return NULL;
+   return (**astMEMBER(this,Table,ColumnUnit))(this,column,status);
 }
 int astColumnNdim_( AstTable *this, const char *column, int *status ){
    if ( !astOK ) return 0;

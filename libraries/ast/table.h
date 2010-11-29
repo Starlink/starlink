@@ -105,7 +105,8 @@ typedef struct AstTableVtab {
    AstClassIdentifier id;
 
 /* Properties (e.g. methods) specific to this class. */
-   void (* AddColumn)( AstTable *, const char *, int, int, int *, int * );
+   void (* AddColumn)( AstTable *, const char *, int, int, int *,
+                       const char *, int * );
    void (* RemoveColumn)( AstTable *, const char *, int * );
    void (* RemoveRow)( AstTable *, int, int * );
    void (* PurgeRows)( AstTable *, int * );
@@ -114,6 +115,7 @@ typedef struct AstTableVtab {
    void (* SetNrow)( AstTable *, int, int * );
    const char *(* ColumnName)( AstTable *, int, int * );
    int (* ColumnType)( AstTable *, const char *, int * );
+   const char *(* ColumnUnit)( AstTable *, const char *, int * );
    int (* ColumnNdim)( AstTable *, const char *, int * );
    void (* ColumnShape)( AstTable *, const char *, int, int *, int *, int * );
 } AstTableVtab;
@@ -168,7 +170,7 @@ AstTable *astLoadTable_( void *, size_t, AstTableVtab *,
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
-void astAddColumn_( AstTable *, const char *, int, int, int *, int * );
+void astAddColumn_( AstTable *, const char *, int, int, int *, const char *, int * );
 void astRemoveColumn_( AstTable *, const char *, int * );
 void astRemoveRow_( AstTable *, int, int * );
 void astPurgeRows_( AstTable *, int * );
@@ -177,6 +179,7 @@ int astGetNcolumn_( AstTable *, int * );
 void astSetNrow_( AstTable *, int, int * );
 const char *astColumnName_( AstTable *, int, int * );
 int astColumnType_( AstTable *, const char *, int * );
+const char *astColumnUnit_( AstTable *, const char *, int * );
 int astColumnNdim_( AstTable *, const char *, int * );
 void astColumnShape_( AstTable *, const char *, int, int *, int *, int * );
 
@@ -226,12 +229,13 @@ astINVOKE(O,astLoadTable_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR
    before use.  This provides a contextual error report if a pointer
    to the wrong sort of Object is supplied. */
 
-#define astAddColumn(this,name,type,ndim,dims) astINVOKE(V,astAddColumn_(astCheckTable(this),name,type,ndim,dims,STATUS_PTR))
+#define astAddColumn(this,name,type,ndim,dims,unit) astINVOKE(V,astAddColumn_(astCheckTable(this),name,type,ndim,dims,unit, STATUS_PTR))
 #define astRemoveColumn(this,name) astINVOKE(V,astRemoveColumn_(astCheckTable(this),name,STATUS_PTR))
 #define astRemoveRow(this,index) astINVOKE(V,astRemoveRow_(astCheckTable(this),index,STATUS_PTR))
 #define astPurgeRows(this) astINVOKE(V,astPurgeRows_(astCheckTable(this),STATUS_PTR))
 #define astColumnName(this,index) astINVOKE(V,astColumnName_(astCheckTable(this),index,STATUS_PTR))
 #define astColumnType(this,column) astINVOKE(V,astColumnType_(astCheckTable(this),column,STATUS_PTR))
+#define astColumnUnit(this,column) astINVOKE(V,astColumnUnit_(astCheckTable(this),column,STATUS_PTR))
 #define astColumnNdim(this,column) astINVOKE(V,astColumnNdim_(astCheckTable(this),column,STATUS_PTR))
 #define astColumnShape(this,column,mxdim,ndim,dims) astINVOKE(V,astColumnShape_(astCheckTable(this),column,mxdim,ndim,dims,STATUS_PTR))
 

@@ -100,20 +100,25 @@ F77_SUBROUTINE(ast_addcolumn)( INTEGER(THIS),
                                INTEGER(TYPE),
                                INTEGER(NDIM),
                                INTEGER_ARRAY(DIMS),
+                               CHARACTER(UNIT),
                                INTEGER(STATUS)
-                               TRAIL(NAME) ) {
+                               TRAIL(NAME)
+                               TRAIL(UNIT) ) {
    GENPTR_INTEGER(THIS)
    GENPTR_CHARACTER(NAME)
    GENPTR_INTEGER(TYPE)
    GENPTR_INTEGER(NDIM)
    GENPTR_INTEGER_ARRAY(DIMS)
-   char *name;
+   GENPTR_CHARACTER(UNIT)
+   char *name, *unit;
 
    astAt( "AST_ADDCOLUMN", NULL, 0 );
    astWatchSTATUS(
       name = astString( NAME, NAME_length );
-      astAddColumn( astI2P( *THIS ), name, *TYPE, *NDIM, DIMS );
+      unit = astString( UNIT, UNIT_length );
+      astAddColumn( astI2P( *THIS ), name, *TYPE, *NDIM, DIMS, unit );
       astFree( name );
+      astFree( unit );
    )
 }
 
@@ -182,6 +187,47 @@ F77_SUBROUTINE(ast_columnname)( CHARACTER_RETURN_VALUE(RESULT),
    astAt( "AST_COLUMNNAME", NULL, 0 );
    astWatchSTATUS(
       result = astColumnName( astI2P( *THIS ), *INDEX );
+      i = 0;
+      if ( astOK ) {             /* Copy result */
+         for ( ; result[ i ] && i < RESULT_length; i++ ) {
+            RESULT[ i ] = result[ i ];
+         }
+      }
+      while ( i < RESULT_length ) RESULT[ i++ ] = ' '; /* Pad with blanks */
+   )
+}
+
+
+/* NO_CHAR_FUNCTION indicates that the f77.h method of returning a
+   character result doesn't work, so add an extra argument instead and
+   wrap this function up in a normal FORTRAN 77 function (in the file
+   keymap.f). */
+#if NO_CHAR_FUNCTION
+F77_SUBROUTINE(ast_columnunit_a)( CHARACTER(RESULT),
+#else
+F77_SUBROUTINE(ast_columnunit)( CHARACTER_RETURN_VALUE(RESULT),
+#endif
+                          INTEGER(THIS),
+                          CHARACTER(COLUMNNAME),
+                          INTEGER(STATUS)
+#if NO_CHAR_FUNCTION
+                          TRAIL(RESULT)
+                          TRAIL(COLUMNNAME) ) {
+#else
+                          TRAIL(COLUMNNAME) ) {
+#endif
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(COLUMNNAME)
+   GENPTR_CHARACTER(RESULT)
+   const char *result;
+   int i;
+   char *columnname;
+
+   astAt( "AST_COLUMNUNIT", NULL, 0 );
+   astWatchSTATUS(
+      columnname = astString( COLUMNNAME, COLUMNNAME_length );
+      result = astColumnUnit( astI2P( *THIS ), columnname );
+      astFree( columnname );
       i = 0;
       if ( astOK ) {             /* Copy result */
          for ( ; result[ i ] && i < RESULT_length; i++ ) {

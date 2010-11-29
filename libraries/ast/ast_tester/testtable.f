@@ -39,7 +39,7 @@ c      call ast_watchmemory(483)
       dims( 1 ) = 5
       dims( 2 ) = 2
       call ast_addcolumn( table, 'Fred', AST__FLOATTYPE, 2, dims,
-     :                    status )
+     :                    ' ', status )
 
       if( ast_geti( table, 'NColumn', status ) .ne. 1 ) then
          call stopit( status, 'Table error 2b' )
@@ -63,6 +63,10 @@ c      call ast_watchmemory(483)
          call stopit( status, 'Table error 2g' )
       endif
 
+      if( ast_columnunit( table, 'Fred', status ) .ne. ' ' ) then
+         call stopit( status, 'Table error 2h' )
+      endif
+
       call ast_mapput0i( table, 'Fred(2)', 123, 'com 1', status )
       if( status .eq. AST__BADTYP ) then
          call err_annul( status )
@@ -78,7 +82,7 @@ c      call ast_watchmemory(483)
       endif
 
       call ast_addcolumn( table, 'Fred', AST__FLOATTYPE, 0, 0,
-     :                    status )
+     :                    'pW', status )
       if( status .eq. AST__OLDCOL ) then
          call err_annul( status )
       else if( status .eq. sai__ok ) then
@@ -92,7 +96,7 @@ c      call ast_watchmemory(483)
       endif
 
       call ast_addcolumn( table, 'Fred', AST__FLOATTYPE, 0, 0,
-     :                    status )
+     :                    'pW', status )
 
       call ast_mapput0r( table, 'Fred(1)', -123.0, 'com 1', status )
       call ast_mapput0r( table, 'Fred(2)', 123.0, 'com 2', status )
@@ -103,8 +107,12 @@ c      call ast_watchmemory(483)
          call stopit( status, 'Table error 7' )
       endif
 
+      if( ast_columnunit( table, 'Fred', status ) .ne. 'pW' ) then
+         call stopit( status, 'Table error 7b' )
+      endif
+
       call ast_addcolumn( table, 'Dick', AST__OBJECTTYPE, 0, 0,
-     :                    status )
+     :                    'W/m**2', status )
       call ast_mapput0a( table, 'Dick(1)', table, 'com 1', status )
       if( status .eq. AST__KYCIR ) then
          call err_annul( status )
@@ -180,7 +188,7 @@ c      call ast_watchmemory(483)
       dims( 1 ) = 2
       dims( 2 ) = 2
       call ast_addcolumn( table, 'Dick', AST__STRINGTYPE, 2, dims,
-     :                    status )
+     :                    ' ', status )
 
       text(1,1) = 'One'
       text(2,1) = 'two'
@@ -217,7 +225,7 @@ c      call ast_watchmemory(483)
       dims( 1 ) = 1
       dims( 2 ) = 2
       call ast_addcolumn( table, 'HeHe', AST__BYTETYPE, 2, dims,
-     :                    status )
+     :                    ' ', status )
       bytes(1,1) = 127
       bytes(1,2) = 255
       call ast_mapput1b( table, 'HeHe(2)', 2, bytes, 'jjjj', status )
@@ -233,7 +241,7 @@ c      call ast_watchmemory(483)
       endif
 
       call ast_addcolumn( table, 'GoGo', AST__BYTETYPE, 0, 0,
-     :                    status )
+     :                    ' ', status )
       call ast_mapput0b( table, 'GoGo(2)', -10, ' ', status )
       if( ast_mapget0b( table, 'GoGo(2)', bval, status ) ) then
          if( bval .ne. -10 ) call stopit( status, 'Table error 33' )
@@ -436,8 +444,10 @@ c         write(*,*) buf( next : next + ll - 1 )
 
       table = ast_table( ' ', status )
 
-      call ast_addcolumn( table, 'Fred', AST__INTTYPE, 0, 0, status )
-      call ast_addcolumn( table, 'Tom', AST__INTTYPE, 0, 0, status )
+      call ast_addcolumn( table, 'Fred', AST__INTTYPE, 0, 0, ' ',
+     :                    status )
+      call ast_addcolumn( table, 'Tom', AST__INTTYPE, 0, 0, ' ',
+     :                    status )
 
       call ast_mapput0i( table, 'Fred(2)', 123, ' ', status )
       call ast_mapput0i( table, 'Fred(4)', 456, ' ', status )
