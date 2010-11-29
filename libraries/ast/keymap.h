@@ -121,21 +121,23 @@ typedef struct AstMapEntry {
 typedef struct AstKeyMap {
 
 /* Attributes inherited from the parent class. */
-   AstObject object;                   /* Parent class structure */
+   AstObject object;               /* Parent class structure */
 
 /* Attributes specific to objects in this class. */
-   int sizeguess;                      /* Guess at KeyMap size */
-   AstMapEntry **table;                /* Hash table containing pointers to
-                                          the KeyMap entries */
-   int *nentry;                        /* No. of Entries in each table element */
-   int mapsize;                        /* Length of table */
-   int keyerror;                       /* Report error if no key? */
-   int maplocked;                      /* Prevent addition of new entries? */
-   int sortby;                         /* How the keys should be sorted */
-   AstMapEntry *first;                 /* Pointer to first structure in sorted list. */
-   int nsorted;                        /* Length of sorted list */
-   int member_count;                   /* Total no. of entries ever added to keyMap */
-   AstMapEntry *firstA;                /* Pointer to first "AST object"-type entry */
+   int sizeguess;                  /* Guess at KeyMap size */
+   AstMapEntry **table;            /* Hash table containing pointers to
+                                      the KeyMap entries */
+   int *nentry;                    /* No. of Entries in each table element */
+   int mapsize;                    /* Length of table */
+   int keyerror;                   /* Report error if no key? */
+   int maplocked;                  /* Prevent addition of new entries? */
+   int sortby;                     /* How the keys should be sorted */
+   AstMapEntry *first;             /* Pointer to first structure in sorted list. */
+   int nsorted;                    /* Length of sorted list */
+   int member_count;               /* Total no. of entries ever added to keyMap */
+   AstMapEntry *firstA;            /* Pointer to first "AST object"-type entry */
+   int iter_itab;                  /* Next hash table entry to return */
+   AstMapEntry *iter_entry;        /* Next entry to return */
 } AstKeyMap;
 
 /* Virtual function table. */
@@ -202,12 +204,14 @@ typedef struct AstKeyMapVtab {
    void (* MapPutElemF)( AstKeyMap *, const char *, int, float, int * );
    void (* MapPutElemI)( AstKeyMap *, const char *, int, int, int * );
    void (* MapRemove)( AstKeyMap *, const char *, int * );
+   void (* MapRename)( AstKeyMap *, const char *, const char *, int * );
    void (* MapCopy)( AstKeyMap *, AstKeyMap *, int * );
    int (* MapSize)( AstKeyMap *, int * );
    int (* MapLength)( AstKeyMap *, const char *, int * );
    int (* MapLenC)( AstKeyMap *, const char *, int * );
    int (* MapType)( AstKeyMap *, const char *, int * );
    int (* MapHasKey)( AstKeyMap *, const char *, int * );
+   const char *(* MapIterate)( AstKeyMap *, int, int * );
    const char *(* MapKey)( AstKeyMap *, int, int * );
 
    int (* GetSizeGuess)( AstKeyMap *, int * );
@@ -355,8 +359,11 @@ void astMapPutElemP_( AstKeyMap *, const char *, int, void *, int * );
 void astMapPutElemS_( AstKeyMap *, const char *, int, short int, int * );
 void astMapPutU_( AstKeyMap *, const char *, const char *, int * );
 void astMapRemove_( AstKeyMap *, const char *, int * );
+void astMapRename_( AstKeyMap *, const char *, const char *, int * );
 
 #if defined(astCLASS)            /* Protected */
+const char *astMapIterate_( AstKeyMap *, int, int * );
+
 int astGetSizeGuess_( AstKeyMap *, int * );
 int astTestSizeGuess_( AstKeyMap *, int * );
 void astSetSizeGuess_( AstKeyMap *, int, int * );
@@ -465,6 +472,7 @@ astINVOKE(O,astLoadKeyMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PT
 #define astMapPutElemC(this,key,elem,value) astINVOKE(V,astMapPutElemC_(astCheckKeyMap(this),key,elem,value,STATUS_PTR))
 #define astMapPutElemP(this,key,elem,value) astINVOKE(V,astMapPutElemP_(astCheckKeyMap(this),key,elem,value,STATUS_PTR))
 #define astMapRemove(this,key) astINVOKE(V,astMapRemove_(astCheckKeyMap(this),key,STATUS_PTR))
+#define astMapRename(this,oldkey,newkey) astINVOKE(V,astMapRename_(astCheckKeyMap(this),oldkey,newkey,STATUS_PTR))
 #define astMapCopy(this,that) astINVOKE(V,astMapCopy_(astCheckKeyMap(this),astCheckKeyMap(that),STATUS_PTR))
 #define astMapSize(this) astINVOKE(V,astMapSize_(astCheckKeyMap(this),STATUS_PTR))
 #define astMapLength(this,key) astINVOKE(V,astMapLength_(astCheckKeyMap(this),key,STATUS_PTR))
@@ -481,6 +489,7 @@ astINVOKE(O,astLoadKeyMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PT
 #define astMapGet1A(this,key,mxval,nval,value) astINVOKE(V,astMapGet1A_(astCheckKeyMap(this),key,mxval,nval,(AstObject **)(value),STATUS_PTR))
 #define astMapPut1A(this,key,size,value,comment) astINVOKE(V,astMapPut1A_(astCheckKeyMap(this),key,size,value,comment,STATUS_PTR))
 #define astMapGetElemA(this,key,elem,value) astINVOKE(V,astMapGetElemA_(astCheckKeyMap(this),key,elem,(AstObject **)(value),STATUS_PTR))
+#define astMapIterate(this,reset) astINVOKE(V,astMapIterate_(astCheckKeyMap(this),reset,STATUS_PTR))
 
 #define astClearSizeGuess(this) \
 astINVOKE(V,astClearSizeGuess_(astCheckKeyMap(this),STATUS_PTR))

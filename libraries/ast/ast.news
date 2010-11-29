@@ -21,6 +21,9 @@ which each entry represents a cell in a two-dimensional table.
 
 - KeyMaps can now hold byte (i.e. "unsigned char" or BYTE) values.
 
+- A new method called astMapRename (AST_MAPRENAME) has been added to rename
+an existing entry in a KeyMap.
+
 Main Changes in V5.3-2
 -----------------------
 

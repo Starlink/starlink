@@ -25,6 +25,7 @@
 *     AST_MAPGETELEM<X>
 *     AST_MAPPUTELEM<X>
 *     AST_MAPREMOVE
+*     AST_MAPRENAME
 *     AST_MAPSIZE
 *     AST_MAPLENGTH
 *     AST_MAPLENC
@@ -889,6 +890,27 @@ F77_SUBROUTINE(ast_mapremove)( INTEGER(THIS),
       key = astString( KEY, KEY_length );
       astMapRemove( astI2P( *THIS ), key );
       astFree( key );
+   )
+}
+
+F77_SUBROUTINE(ast_maprename)( INTEGER(THIS),
+                               CHARACTER(OLDKEY),
+                               CHARACTER(NEWKEY),
+                               INTEGER(STATUS)
+                               TRAIL(OLDKEY)
+                               TRAIL(NEWKEY) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(OLDKEY)
+   GENPTR_CHARACTER(NEWKEY)
+   char *oldkey, *newkey;
+
+   astAt( "AST_MAPRENAME", NULL, 0 );
+   astWatchSTATUS(
+      oldkey = astString( OLDKEY, OLDKEY_length );
+      newkey = astString( NEWKEY, NEWKEY_length );
+      astMapRename( astI2P( *THIS ), oldkey, newkey );
+      astFree( oldkey );
+      astFree( newkey );
    )
 }
 

@@ -57,6 +57,7 @@ c     - astMapPut1<X>: Add a new vector entry to a KeyMap
 c     - astMapPutElem<X>: Puts a value into a vector entry in a KeyMap
 c     - astMapPutU: Add a new entry to a KeyMap with an undefined value
 c     - astMapRemove: Removed a named entry from a KeyMap
+c     - astMapRename: Rename an existing entry in a KeyMap
 c     - astMapSize: Get the number of entries in a KeyMap
 c     - astMapType: Return the data type of a named entry in a map
 f     - AST_MAPGET0<X>: Get a named scalar entry from a KeyMap
@@ -72,6 +73,7 @@ f     - AST_MAPPUT1<X>: Add a new vector entry to a KeyMap
 f     - AST_MAPPUTELEM<X>: Puts a value into a vector entry in a KeyMap
 f     - AST_MAPPUTU: Add a new entry to a KeyMap with an undefined value
 f     - AST_MAPREMOVE: Removed a named entry from a KeyMap
+f     - AST_MAPRENAME: Rename an existing entry in a KeyMap
 f     - AST_MAPSIZE: Get the number of entries in a KeyMap
 f     - AST_MAPTYPE: Return the data type of a named entry in a map
 
@@ -424,8 +426,10 @@ AstKeyMap *astKeyMapId_( const char *, ... );
 static AstMapEntry *AddTableEntry( AstKeyMap *, int, AstMapEntry *, int * );
 static AstMapEntry *CopyMapEntry( AstMapEntry *, int * );
 static AstMapEntry *FreeMapEntry( AstMapEntry *, int * );
+static AstMapEntry *RemoveTableEntry( AstKeyMap *, int, const char *, int * );
 static AstMapEntry *SearchTableEntry( AstKeyMap *, int, const char *, int * );
 static const char *GetKey( AstKeyMap *, int index, int * );
+static const char *MapIterate( AstKeyMap *, int, int * );
 static const char *MapKey( AstKeyMap *, int index, int * );
 static const char *SortByString( int, const char *, int * );
 static int CompareEntries( const void *, const void * );
@@ -462,7 +466,6 @@ static int MapLenC( AstKeyMap *, const char *, int * );
 static int MapLength( AstKeyMap *, const char *, int * );
 static int MapSize( AstKeyMap *, int * );
 static int MapType( AstKeyMap *, const char *, int * );
-static int RemoveTableEntry( AstKeyMap *, int, const char *, int * );
 static int SortByInt( const char *, const char *, int * );
 static size_t SizeOfEntry( AstMapEntry *, int * );
 static void AddToObjectList( AstKeyMap *, AstMapEntry *, int * );
@@ -503,6 +506,7 @@ static void MapPutElemI( AstKeyMap *, const char *, int, int, int * );
 static void MapPutElemP( AstKeyMap *, const char *, int, void *, int * );
 static void MapPutU( AstKeyMap *, const char *, const char *, int * );
 static void MapRemove( AstKeyMap *, const char *, int * );
+static void MapRename( AstKeyMap *, const char *, const char *, int * );
 static void NewTable( AstKeyMap *, int, int * );
 static void RemoveFromSortedList( AstKeyMap *, AstMapEntry *, int * );
 static void RemoveFromObjectList( AstKeyMap *, AstMapEntry *, int * );
@@ -2728,7 +2732,7 @@ static void FreeTableEntry( AstKeyMap *this, int itab, int *status ){
          link = next->next;
 
 /* Free this MapEntry */
-         FreeMapEntry( next, status );
+         (void) FreeMapEntry( next, status );
 
 /* Set up the next MapEntry to be freed. */
          next = link;
@@ -3339,6 +3343,7 @@ void astInitKeyMapVtab_(  AstKeyMapVtab *vtab, const char *name, int *status ) {
    vtab->MapPut1B = MapPut1B;
    vtab->MapPutU = MapPutU;
    vtab->MapRemove = MapRemove;
+   vtab->MapRename = MapRename;
    vtab->MapCopy = MapCopy;
    vtab->MapSize = MapSize;
    vtab->MapLenC = MapLenC;
@@ -3346,6 +3351,7 @@ void astInitKeyMapVtab_(  AstKeyMapVtab *vtab, const char *name, int *status ) {
    vtab->MapType = MapType;
    vtab->MapHasKey = MapHasKey;
    vtab->MapKey = MapKey;
+   vtab->MapIterate = MapIterate;
 
    vtab->ClearSizeGuess = ClearSizeGuess;
    vtab->SetSizeGuess = SetSizeGuess;
@@ -3791,7 +3797,8 @@ f        The global status.
 /* If the source and desination entries are not KeyMaps, then just remove
    the entry in the desination KeyMap and add a copy of the source entry. */
             if( ! merged ) {
-               (void) RemoveTableEntry( this, itab, key, status );
+               (void) FreeMapEntry( RemoveTableEntry( this, itab, key, status ),
+                                    status );
                out_entry = CopyMapEntry( in_entry, status );
                out_entry = AddTableEntry( this, itab, out_entry, status );
             }
@@ -4040,6 +4047,7 @@ static void MapPut0##X( AstKeyMap *this, const char *key, Xtype value, \
 \
 /* Local Variables: */ \
    AstMapEntry *mapentry;  /* Pointer to parent MapEntry structure */ \
+   AstMapEntry *oldent;    /* Pointer to existing MapEntry */ \
    Entry0##X *entry;       /* Structure holding the data for the new Entry */ \
    char *p;                /* Pointer to next key character */ \
    int itab;               /* Index of hash table element to use */ \
@@ -4084,7 +4092,13 @@ static void MapPut0##X( AstKeyMap *this, const char *key, Xtype value, \
       itab = HashFun( mapentry->key, this->mapsize - 1, &(mapentry->hash), status ); \
 \
 /* Remove any existing entry with the given key from the table element. */ \
-      there = RemoveTableEntry( this, itab, mapentry->key, status ); \
+      oldent = RemoveTableEntry( this, itab, mapentry->key, status ); \
+      if( oldent ) { \
+         oldent = FreeMapEntry( oldent, status ); \
+         there = 1; \
+      } else { \
+         there = 0; \
+      } \
 \
 /* If the KeyMap is locked we report an error if an attempt is made to add a value for \
    a new key. */ \
@@ -4248,6 +4262,7 @@ static void MapPut1##X( AstKeyMap *this, const char *key, int size, \
 \
 /* Local Variables: */ \
    AstMapEntry *mapentry;  /* Pointer to parent MapEntry structure */ \
+   AstMapEntry *oldent;    /* Pointer to existing MapEntry */ \
    Entry1##X *entry;       /* Structure holding the data for the new Entry */ \
    char *p;                /* Pointer to next key character */ \
    int itab;               /* Index of hash table element to use */ \
@@ -4297,7 +4312,13 @@ static void MapPut1##X( AstKeyMap *this, const char *key, int size, \
       itab = HashFun( mapentry->key, this->mapsize - 1, &(mapentry->hash), status ); \
 \
 /* Remove any existing entry with the given key from the table element. */ \
-      there = RemoveTableEntry( this, itab, mapentry->key, status ); \
+      oldent = RemoveTableEntry( this, itab, mapentry->key, status ); \
+      if( oldent ) { \
+         oldent = FreeMapEntry( oldent, status ); \
+         there = 1; \
+      } else { \
+         there = 0; \
+      } \
 \
 /* If the KeyMap is locked we report an error if an attempt is made to add a value for \
    a new key. */ \
@@ -4390,6 +4411,7 @@ void astMapPut1AId_( AstKeyMap *this, const char *key, int size,
 /* Local Variables: */
    AstObject *op;          /* Object pointer */
    AstMapEntry *mapentry;  /* Pointer to parent MapEntry structure */
+   AstMapEntry *oldent;    /* Pointer to existing MapEntry */
    Entry1A *entry;         /* Structure holding the data for the new Entry */
    char *p;                /* Pointer to next key character */
    int itab;               /* Index of hash table element to use */
@@ -4437,7 +4459,13 @@ void astMapPut1AId_( AstKeyMap *this, const char *key, int size,
       itab = HashFun( mapentry->key, this->mapsize - 1, &(mapentry->hash), status );
 
 /* Remove any existing entry with the given key from the table element. */
-      there = RemoveTableEntry( this, itab, mapentry->key, status );
+      oldent = RemoveTableEntry( this, itab, mapentry->key, status );
+      if( oldent ) {
+         oldent = FreeMapEntry( oldent, status );
+         there = 1;
+      } else {
+         there = 0;
+      }
 
 /* If the KeyMap is locked we report an error if an attempt is made to add a value for
    a new key. */
@@ -4520,6 +4548,7 @@ f        The global status.
 
 /* Local Variables: */
    AstMapEntry *mapentry;  /* Pointer to parent MapEntry structure */
+   AstMapEntry *oldent;    /* Pointer to existing MapEntry */
    char *p;                /* Pointer to next key character */
    int itab;               /* Index of hash table element to use */
    int keylen;             /* Length of supplied key string */
@@ -4558,7 +4587,13 @@ f        The global status.
       itab = HashFun( mapentry->key, this->mapsize - 1, &(mapentry->hash), status );
 
 /* Remove any existing entry with the given key from the table element. */
-      there = RemoveTableEntry( this, itab, mapentry->key, status );
+      oldent = RemoveTableEntry( this, itab, mapentry->key, status );
+      if( oldent ) {
+         oldent = FreeMapEntry( oldent, status );
+         there = 1;
+      } else {
+         there = 0;
+      }
 
 /* If the KeyMap is locked we report an error if an attempt is made to add a value for
    a new key. */
@@ -6486,8 +6521,129 @@ f        The global status.
    itab = HashFun( key, this->mapsize - 1, &hash, status );
 
 /* Search the relevent table entry for the required MapEntry and remove it. */
-   (void) RemoveTableEntry( this, itab, key, status );
+   (void) FreeMapEntry( RemoveTableEntry( this, itab, key, status ), status );
+}
 
+static void MapRename( AstKeyMap *this, const char *oldkey, const char *newkey,
+                       int *status ) {
+/*
+*++
+*  Name:
+c     astMapRename
+f     AST_MAPRENAME
+
+*  Purpose:
+*     Rename an existing KeyMap entry.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "keymap.h"
+c     void astMapRename( AstKeyMap *this, const char *oldkey, const char *newkey )
+f     CALL AST_MAPRENAME( THIS, OLDKEY, NEWKEY, STATUS )
+
+*  Class Membership:
+*     KeyMap method.
+
+*  Description:
+c     This function
+f     This routine
+*     associated a new key with an existing entry in a KeyMap. It returns
+*     without action if the oldkey does not exist in the KeyMap.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the KeyMap.
+c     oldkey
+f     OLDKEY = CHARACTER * ( * ) (Given)
+*        The character string identifying the entry to be renamed. Trailing
+*        spaces are ignored.
+c     newkey
+f     NEKEY = CHARACTER * ( * ) (Given)
+*        The new character string to associated with the renamed entry.
+*        Trailing spaces are ignored.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+*--
+*/
+
+/* Local Variables: */
+   AstMapEntry *entry;     /* Pointer to the entry being renamed */
+   AstMapEntry *oldent;    /* Pointer to old entry with new name */
+   char *p;                /* Pointer to next key character */
+   int itab;               /* Index of hash table element to use */
+   int keylen;             /* Length of supplied key string */
+   int there;              /* Did the entry already exist in the KeyMap? */
+   unsigned long hash;     /* Full width hash value */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Do nothing if the keys are the same. */
+   if( strcmp( oldkey, newkey ) ){
+
+/* Use the hash function to determine the element of the hash table in
+   which the old key will be stored. */
+      itab = HashFun( oldkey, this->mapsize - 1, &hash, status );
+
+/* Search the relevent table entry for the required MapEntry. Remove it
+   from the list, but do not free it. */
+      entry = RemoveTableEntry( this, itab, oldkey, status );
+
+/* Skip rest if the key was not found. */
+      if( entry ) {
+
+/* Store the new key string, and terminate it to exclude any trailing
+   spaces. */
+         keylen = strlen( newkey );
+         entry->key = astStore( NULL, newkey, keylen + 1 );
+         if( astOK ) {
+            p = (char *) entry->key + keylen;
+            while( --p >= entry->key ) {
+               if( *p == ' ' ) {
+                  *p = 0;
+               } else {
+                  break;
+               }
+            }
+         }
+
+/* Use the hash function to determine the element of the hash table in
+   which to store the entry with its new key. */
+         itab = HashFun( entry->key, this->mapsize - 1, &(entry->hash), status );
+
+/* Remove and free any existing entry with the given key from the table
+   element. */
+         oldent = RemoveTableEntry( this, itab, entry->key, status );
+         if( oldent ) {
+            oldent = FreeMapEntry( oldent, status );
+            there = 1;
+         } else {
+            there = 0;
+         }
+
+/* If the KeyMap is locked we report an error if an attempt is made to
+   introduce a new key. */
+         if( !there && astGetMapLocked( this ) ) {
+            astError( AST__BADKEY, "astMapRename(%s): Failed to rename item "
+                      "\"%s\" in a KeyMap to \"%s\": \"%s\" is not a known "
+                      "item.", status, astGetClass( this ), oldkey, newkey,
+                      newkey );
+         }
+
+/* If all has gone OK, store the renamed entry at the head of the linked list
+   associated with the selected table entry. */
+         if( astOK ) {
+            entry = AddTableEntry( this, itab, entry, status );
+
+/* If anything went wrong, try to delete the renamed entry. */
+         } else {
+            entry = FreeMapEntry( entry, status );
+         }
+      }
+   }
 }
 
 static int MapSize( AstKeyMap *this, int *status ) {
@@ -7272,6 +7428,131 @@ f        AST_MAPPUTU).
 
 }
 
+static const char *MapIterate( AstKeyMap *this, int reset, int *status ) {
+/*
+*+
+*  Name:
+*     astMapIterate
+
+*  Purpose:
+*     Iterate through the keys in a KeyMap.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "keymap.h"
+*     const char *astMapIterate( AstKeyMap *this, int reset, int *status )
+
+*  Class Membership:
+*     KeyMap method.
+
+*  Description:
+*     If "reset" is non-zero, this function returns a pointer to a string
+*     holding the first key in the KeyMap. On subsequent invocation (if
+*     reset is zero) it returns a pointer to the next key in the KeyMap. The
+*     context is stored within the KeyMap structure, so calls on different
+*     KeyMaps can be mixed.
+*
+*     The order in which keys are returned is determined by the KeyMap
+*     SortBy attribute.
+
+*  Parameters:
+*     this
+*        Pointer to the KeyMap.
+*     reset
+*        If non-zero, return the first key in the KeyMap. Otherwise,
+*        returns the key following the one returned by the previous
+*        invocation of this function.
+
+*  Returned Value:
+*        A pointer to the null-terminated string holding the next key,
+*        or NULL if there are no more keys in the KeyMap. The returned
+*        string should NOT be freed or modified.
+
+*  Notes:
+*     - A NULL pointer will be returned if this function is invoked
+*     with the AST error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   AstMapEntry *entry;         /* Pointer to the entry */
+   const char *key;            /* Pointer value to return */
+   int itab;                   /* Index into hash table */
+   int sortby;                 /* The value of the SortBy attribute */
+
+/* Initialise. */
+   key = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return key;
+
+/* Get the SortBy value. */
+   sortby = astGetSortBy( this );
+
+/* First deal with unsorted keys. */
+   if( sortby == SORTBY_NONE ) {
+
+/* Get the index of the hash table to check first. Also get a pointer to
+   the entry within the hash table to check next. */
+      if( reset || !this->iter_entry ) {
+         itab = 0;
+         entry = this->table[ 0 ];
+      } else {
+         itab = this->iter_itab;
+         entry = this->iter_entry;
+      }
+
+/* Move through elements of the hash table until we have a non-null entry. */
+      while( !entry && ++itab < this->mapsize ) {
+         entry = this->table[ itab ];
+      }
+
+/* Return a pointer to the key. */
+      if( entry ) {
+         key = entry->key;
+
+/* Move on to the next entry in the linked list, saving the context
+   in the KeyMap structure. */
+         this->iter_itab = itab;
+         this->iter_entry = entry->next;
+
+/* If no more entries were found, reset teh context in the KeyMap
+   structure. */
+      } else {
+         this->iter_itab = 0;
+         this->iter_entry = NULL;
+      }
+
+/* Now deal with sorted keys. */
+   } else {
+
+/* If starting from the beginning, use the "first" entry. Otherwise, use
+   the nxt entry. */
+      if( reset ) {
+         entry = this->first;
+      } else {
+         entry = this->iter_entry;
+      }
+
+/* If we have an entry, return a pointer to its key, and then update the
+   context to point to the next entry in the *sorted* list. */
+      if( entry ) {
+         key = entry->key;
+         this->iter_entry = entry->snext;
+
+/* Otherwise, reset the context. */
+      } else {
+         this->iter_itab = 0;
+         this->iter_entry = NULL;
+      }
+   }
+
+/* Return the result.*/
+   return key;
+}
+
 static void NewTable( AstKeyMap *this, int size, int *status ){
 /*
 *  Name:
@@ -7500,7 +7781,8 @@ static void RemoveFromSortedList( AstKeyMap *this, AstMapEntry *entry,
    }
 }
 
-static int RemoveTableEntry( AstKeyMap *this, int itab, const char *key, int *status ){
+static AstMapEntry *RemoveTableEntry( AstKeyMap *this, int itab,
+                                      const char *key, int *status ){
 /*
 *  Name:
 *     RemoveTableEntry
@@ -7513,7 +7795,8 @@ static int RemoveTableEntry( AstKeyMap *this, int itab, const char *key, int *st
 
 *  Synopsis:
 *     #include "keymap.h"
-*     int RemoveTableEntry( AstKeyMap *this, int itab, const char *key, int *status )
+*     AstMapEntry *RemoveTableEntry( AstKeyMap *this, int itab,
+*                                    const char *key, int *status )
 
 *  Class Membership:
 *     KeyMap member function.
@@ -7521,8 +7804,8 @@ static int RemoveTableEntry( AstKeyMap *this, int itab, const char *key, int *st
 *  Description:
 *     This function removes any entries with the specified key from the
 *     linked-list of entries stored at the specified entry of the hash
-*     table. If the supplied key is not found in the list, the function
-*     returns without action.
+*     table. If the supplied key is found in the list, a pointer to the
+*     first removed entry is returned. Otherwise, a NULL pointer is returned.
 
 *  Parameters:
 *     this
@@ -7535,17 +7818,17 @@ static int RemoveTableEntry( AstKeyMap *this, int itab, const char *key, int *st
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     Non-zero if the specified key was found. Zero otherwise.
+*     Pointer to the removed Entry, or NULL if no matching entry found.
 
 */
 
 /* Local Variables: */
    AstMapEntry **link;    /* Address to store foward link */
    AstMapEntry *next;     /* Pointer to next Entry to copy */
-   int result;
+   AstMapEntry *result;
 
 /* Initialise */
-   result = 0;
+   result = NULL;
 
 /* Check the global error status. */
    if ( !astOK ) return result;
@@ -7577,17 +7860,19 @@ static int RemoveTableEntry( AstKeyMap *this, int itab, const char *key, int *st
    original pointer to the MapEntry which is being deleted. */
          *link = next->next;
 
-/* Free this MapEntry */
-         FreeMapEntry( next, status );
+/* Return a pointer to the first matching MapEntry. Free any subsequent
+   matching MapEntries.  */
+         if( result ) {
+            FreeMapEntry( next, status );
+         } else {
+            result = next;
+         }
 
 /* Decrement the number of entries in the linked list. */
          this->nentry[ itab ]--;
 
 /* Set up the next MapEntry to be freed. */
          next = *link;
-
-/* Indicate we have found the key. */
-         result = 1;
 
 /* If the key for the current entry does not match the supplied key... */
       } else {
@@ -9225,6 +9510,8 @@ AstKeyMap *astInitKeyMap_( void *mem, size_t size, int init, AstKeyMapVtab *vtab
       new->nsorted = 0;
       new->member_count = 0;
       new->firstA = NULL;
+      new->iter_itab = 0;
+      new->iter_entry = NULL;
 
       NewTable( new, MIN_TABLE_SIZE, status );
 
@@ -9372,6 +9659,8 @@ AstKeyMap *astLoadKeyMap_( void *mem, size_t size, AstKeyMapVtab *vtab,
       new->table = NULL;
       new->nentry = NULL;
       new->firstA = NULL;
+      new->iter_itab = 0;
+      new->iter_entry = NULL;
 
 /* Read input data. */
 /* ================ */
@@ -9738,6 +10027,11 @@ void astMapRemove_( AstKeyMap *this, const char *key, int *status ){
    if ( !astOK ) return;
    (**astMEMBER(this,KeyMap,MapRemove))(this,key,status);
 }
+void astMapRename_( AstKeyMap *this, const char *oldkey, const char *newkey,
+                    int *status ){
+   if ( !astOK ) return;
+   (**astMEMBER(this,KeyMap,MapRename))(this,oldkey,newkey,status);
+}
 void astMapCopy_( AstKeyMap *this, AstKeyMap *that, int *status ){
    if ( !astOK ) return;
    (**astMEMBER(this,KeyMap,MapCopy))(this,that,status);
@@ -9765,6 +10059,10 @@ int astMapHasKey_( AstKeyMap *this, const char *key, int *status ){
 const char *astMapKey_( AstKeyMap *this, int index, int *status ){
    if ( !astOK ) return NULL;
    return (**astMEMBER(this,KeyMap,MapKey))(this,index,status);
+}
+const char *astMapIterate_( AstKeyMap *this, int reset, int *status ){
+   if ( !astOK ) return NULL;
+   return (**astMEMBER(this,KeyMap,MapIterate))(this,reset,status);
 }
 int astGetSizeGuess_( AstKeyMap *this, int *status ){
    if( !astOK ) return 0;

@@ -923,6 +923,29 @@ C  Test AST_MAPPUTU and undefined values
          call stopit( status, 'Error UNDEF_10' )
       endif
 
+      call ast_maprename( map, 'GG', 'GGNEW', status )
+      if( ast_maphaskey( map, 'GG', status ) ) then
+         call stopit( status, 'Error RENAME_1' )
+      else if( .not. ast_mapget0i( map, 'GGNEW', ival, status ) ) then
+         call stopit( status, 'Error RENAME_2' )
+      else if( ival .ne. 0 ) then
+         call stopit( status, 'Error RENAME_3' )
+      endif
+
+      call ast_maprename( map, 'GGNEW', 'GG', status )
+      if( ast_maphaskey( map, 'GGNEW', status ) ) then
+         call stopit( status, 'Error RENAME_4' )
+      else if( .not. ast_mapget0i( map, 'GG', ival, status ) ) then
+         call stopit( status, 'Error RENAME_5' )
+      else if( ival .ne. 0 ) then
+         call stopit( status, 'Error RENAME_6' )
+      endif
+
+
+
+
+
+
       call ast_end( status )
 
       call ast_activememory( ' ' )
