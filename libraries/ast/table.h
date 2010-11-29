@@ -116,6 +116,7 @@ typedef struct AstTableVtab {
    const char *(* ColumnName)( AstTable *, int, int * );
    int (* ColumnType)( AstTable *, const char *, int * );
    const char *(* ColumnUnit)( AstTable *, const char *, int * );
+   AstKeyMap *(* ColumnProps)( AstTable *, int * );
    int (* ColumnNdim)( AstTable *, const char *, int * );
    void (* ColumnShape)( AstTable *, const char *, int, int *, int *, int * );
 } AstTableVtab;
@@ -170,6 +171,7 @@ AstTable *astLoadTable_( void *, size_t, AstTableVtab *,
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
+AstKeyMap *astColumnProps_( AstTable *, int * );
 void astAddColumn_( AstTable *, const char *, int, int, int *, const char *, int * );
 void astRemoveColumn_( AstTable *, const char *, int * );
 void astRemoveRow_( AstTable *, int, int * );
@@ -241,6 +243,7 @@ astINVOKE(O,astLoadTable_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR
 
 #if defined(astCLASS)            /* Protected */
 
+#define astColumnProps(this) astINVOKE(O,astColumnProps_(astCheckTable(this),STATUS_PTR))
 #define astGetNcolumn(this) \
 astINVOKE(V,astGetNcolumn_(astCheckTable(this),STATUS_PTR))
 #define astGetNrow(this) \

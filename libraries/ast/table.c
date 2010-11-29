@@ -257,6 +257,7 @@ AstTable *astTableId_( const char *, ... );
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
+static AstKeyMap *ColumnProps( AstTable *, int * );
 static const char *ColumnName( AstTable *, int index, int * );
 static const char *TypeString( int );
 static int ColumnNdim( AstTable *, const char *, int * );
@@ -421,6 +422,7 @@ f     routine
 */
 
 /* Local Variables: */
+   AstKeyMap *cols;      /* KeyMap holding all column details */
    AstKeyMap *col_km;    /* KeyMap holding new column details */
    const char *oldunit;  /* Pointer to the old coumn unit string */
    int *olddims;         /* Shape of pre-existing column */
@@ -467,7 +469,8 @@ f     routine
 /* If there is already a column with the given name, check its properties
    match the supplied properties. */
    if( astOK ) {
-      if( astMapGet0A( this->columns, name, &col_km ) ) {
+      cols = astColumnProps( this );
+      if( astMapGet0A( cols, name, &col_km ) ) {
 
          astMapGet0I( col_km, TYPE, &oldtype );
          if( oldtype != type && astOK ) {
@@ -517,11 +520,12 @@ f     routine
 
 /* Put the column KeyMap into the KeyMap holding details of all columns.
    Use the column name as the key. */
-         astMapPut0A( this->columns, name, col_km, NULL );
+         astMapPut0A( cols, name, col_km, NULL );
       }
 
-/* Annul the local KeyMa[p pointer. */
+/* Annul the local KeyMap pointers. */
       col_km = astAnnul( col_km );
+      cols = astAnnul( cols );
    }
 }
 
@@ -654,19 +658,32 @@ f     reason.
 *--
 */
 
+/* Local Variables: */
+   AstKeyMap *cols;        /* KeyMap holding column definitions */
+   const char *result;
+
 /* Check the global error status. */
    if ( !astOK ) return NULL;
 
+/* Get apointer to the KeyMap holding all column definitions. */
+   cols = astColumnProps( this );
+
 /* Issue a more useful error message than that issued by astMapKey if the
    index is invalid. */
-   if( index < 1 || index > astMapSize( this->columns ) ) {
+   if( index < 1 || index > astMapSize( cols ) ) {
       astError( AST__MPIND, "astColumnName(%s): Cannot find column "
                 "%d (zero-based) of the %s - invalid index.", status,
                 astGetClass( this ), index, astGetClass( this ) );
    }
 
+/* Get the column name. */
+   result = astMapKey( cols, index - 1 );
+
+/* Free resources. */
+   cols = astAnnul( cols );
+
 /* Return a pointer to the required column name. */
-   return astMapKey( this->columns, index - 1 );
+   return result;
 }
 
 static int ColumnNdim( AstTable *this, const char *column, int *status ) {
@@ -720,6 +737,7 @@ f     AST_COLUMNNDIM = INTEGER
 */
 
 /* Local Variables: */
+   AstKeyMap *cols;        /* KeyMap holding column definitions */
    AstKeyMap *col_km;      /* Pointer to KeyMap holding column info */
    int result;             /* Returned value */
 
@@ -729,21 +747,66 @@ f     AST_COLUMNNDIM = INTEGER
 /* Check the global error status. */
    if ( !astOK ) return result;
 
+/* Get the KeyMap holding information about all columns. */
+   cols = astColumnProps( this );
+
 /* Get the KeyMap holding information about the requested column. */
-   if( astMapGet0A( this->columns, column, &col_km ) ) {
+   if( astMapGet0A( cols, column, &col_km ) ) {
 
 /* Get the number of dimensions. */
       result = astMapLength( col_km, SHAPE );
 
-/* Annul the KeyMap pointer. */
+/* Free resources */
       col_km = astAnnul( col_km );
    }
+   cols = astAnnul( cols );
 
 /* Return AST__BADTYPE if an error occurred. */
    if( !astOK ) result = 0;
 
 /* Return the result. */
    return result;
+}
+
+static AstKeyMap *ColumnProps( AstTable *this, int *status ) {
+/*
+*+
+*  Name:
+*     astColumnProps
+
+*  Purpose:
+*     Returns a pointer to the KeyMap holding column properties.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "table.h"
+*     AstKeyMap *astColumnProps( AstTable *this )
+
+*  Class Membership:
+*     Table method.
+
+*  Description:
+*     This function returns a pointer to the KeyMap that holds
+*     definitions of all the coumns added to the Table.
+
+*  Parameters:
+*     this
+*        Pointer to the Table.
+
+*  Returned Value:
+*        A pointer to the KeyMap. It shpould be annulled using astAnnul
+*        when no longer needed.
+
+*-
+*/
+
+/* Check the global error status. */
+   if ( !astOK ) return NULL;
+
+/* Return a cloned pointer to the required KeyMap. */
+   return astClone( this->columns );
 }
 
 static void ColumnShape( AstTable *this, const char *column, int mxdim,
@@ -821,7 +884,8 @@ f     NDIM
 */
 
 /* Local Variables: */
-   AstKeyMap *col_km;      /* Pointer to KeyMap holding column info */
+   AstKeyMap *cols;        /* Pointer to KeyMap holding all column info */
+   AstKeyMap *col_km;      /* Pointer to KeyMap holding requested column info */
    int idim;               /* Axis index */
 
 /* Initialise */
@@ -831,7 +895,8 @@ f     NDIM
    if( !astOK ) return;
 
 /* Get the KeyMap holding information about the requested column. */
-   if( astMapGet0A( this->columns, column, &col_km ) ) {
+   cols = astColumnProps( this );
+   if( astMapGet0A( cols, column, &col_km ) ) {
 
 /* Get the shape of the column values. */
       (void) astMapGet1I( col_km, SHAPE, mxdim, ndim, dims );
@@ -842,6 +907,7 @@ f     NDIM
 /* Annul the KeyMap pointer. */
       col_km = astAnnul( col_km );
    }
+   cols = astAnnul( cols );
 
 /* If an error has occurred, set ndim to zero. */
    if( !astOK ) *ndim = 0;
@@ -915,7 +981,8 @@ f        AST_MAPPUTU).
 */
 
 /* Local Variables: */
-   AstKeyMap *col_km;      /* Pointer to KeyMap holding column info */
+   AstKeyMap *cols;        /* Pointer to KeyMap holding all column info */
+   AstKeyMap *col_km;      /* Pointer to KeyMap holding requested column info */
    int result;             /* Returned value */
 
 /* Initialise */
@@ -925,7 +992,8 @@ f        AST_MAPPUTU).
    if ( !astOK ) return result;
 
 /* Get the KeyMap holding information about the requested column. */
-   if( astMapGet0A( this->columns, column, &col_km ) ) {
+   cols = astColumnProps( this );
+   if( astMapGet0A( cols, column, &col_km ) ) {
 
 /* Get the column data type. */
       (void) astMapGet0I( col_km, TYPE, &result );
@@ -933,6 +1001,7 @@ f        AST_MAPPUTU).
 /* Annul the KeyMap pointer. */
       col_km = astAnnul( col_km );
    }
+   cols = astAnnul( cols );
 
 /* Return AST__BADTYPE if an error occurred. */
    if( !astOK ) result = AST__BADTYPE;
@@ -1003,8 +1072,9 @@ f     reason.
 */
 
 /* Local Variables: */
-   AstKeyMap *col_km;      /* Pointer to KeyMap holding column info */
-   const char *result;     /* Returned value */
+   AstKeyMap *col_km;    /* Pointer to KeyMap holding requested column info */
+   AstKeyMap *cols;      /* Pointer to KeyMap holding all column info */
+   const char *result;   /* Returned value */
 
 /* Initialise */
    result = NULL;
@@ -1013,7 +1083,8 @@ f     reason.
    if ( !astOK ) return result;
 
 /* Get the KeyMap holding information about the requested column. */
-   if( astMapGet0A( this->columns, column, &col_km ) ) {
+   cols = astColumnProps( this );
+   if( astMapGet0A( cols, column, &col_km ) ) {
 
 /* Get the column unit string. */
       (void) astMapGet0C( col_km, UNIT, &result );
@@ -1021,6 +1092,7 @@ f     reason.
 /* Annul the KeyMap pointer. */
       col_km = astAnnul( col_km );
    }
+   cols = astAnnul( cols );
 
 /* Return NULL if an error occurred. */
    if( !astOK ) result = NULL;
@@ -1069,6 +1141,8 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 */
 
 /* Local Variables: */
+   AstKeyMap *this_cols;
+   AstKeyMap *that_cols;
    AstTable *that;
    AstTable *this;
    int result;
@@ -1092,7 +1166,11 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
       if( (*parent_equal)( this_object, that_object, status ) ) {
 
 /* Check the Columns KeyMaps are equal.  */
-         result = astEqual( this->columns, that->columns );
+         this_cols = astColumnProps( this );
+         that_cols = astColumnProps( that );
+         result = astEqual( this_cols, that_cols );
+         this_cols = astAnnul( this_cols );
+         that_cols = astAnnul( that_cols );
       }
    }
 
@@ -1239,11 +1317,24 @@ static int GetNcolumn( AstTable *this, int *status ) {
 *-
 */
 
+/* Local Variables: */
+   AstKeyMap *cols;
+   int result;
+
 /* Check the global error status. */
    if ( !astOK ) return 0;
 
+/* Get a pointer to the KeyMap holding the column definitions. */
+   cols = astColumnProps( this );
+
+/* Get the number of column definitions in the KeyMap. */
+   result = astMapSize( cols );
+
+/* Annul the KeyMap pointer. */
+   cols = astAnnul( cols );
+
 /* Return the result. */
-   return astMapSize( this->columns );
+   return result;
 }
 
 static int GetObjSize( AstObject *this_object, int *status ) {
@@ -1284,6 +1375,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 */
 
 /* Local Variables: */
+   AstKeyMap *cols;           /* KeyMap holding column definitions */
    AstTable *this;            /* Pointer to Table structure */
    int result;                /* Result value to return */
 
@@ -1300,7 +1392,9 @@ static int GetObjSize( AstObject *this_object, int *status ) {
    then add on any components of the class structure defined by this class
    which are stored in dynamically allocated memory. */
    result = (*parent_getobjsize)( this_object, status );
-   result += astGetObjSize( this->columns );
+   cols = astColumnProps( this );
+   result += astGetObjSize( cols );
+   cols = astAnnul( cols );
 
 /* If an error occurred, clear the result value. */
    if ( !astOK ) result = 0;
@@ -1372,6 +1466,7 @@ void astInitTableVtab_(  AstTableVtab *vtab, const char *name, int *status ) {
 /* Store pointers to the member functions (implemented here) that provide
    virtual methods for this class. */
    vtab->AddColumn = AddColumn;
+   vtab->ColumnProps = ColumnProps;
    vtab->RemoveColumn = RemoveColumn;
    vtab->RemoveRow = RemoveRow;
    vtab->PurgeRows = PurgeRows;
@@ -1547,10 +1642,11 @@ static int ManageLock( AstObject *this_object, int mode, int extra,
 
 /* Invoke the astManageLock method on any Objects contained within
    the supplied Object. */
-   if( !result ) result = astManageLock( this->columns, mode, extra, fail );
+   if( !result && this->columns ) result = astManageLock( this->columns, mode, extra,
+                                                          fail );
 
+/* Return the result. */
    return result;
-
 }
 #endif
 
@@ -2686,6 +2782,7 @@ static int ParseKey( AstTable *this, const char *key, int report,
 */
 
 /* Local Variables: */
+   AstKeyMap *cols;    /* KeyMap holding column definitions */
    int result;         /* Returned flag */
    int collen;         /* Length of column name */
    int nctot;          /* Number of characters read */
@@ -2727,11 +2824,13 @@ static int ParseKey( AstTable *this, const char *key, int report,
 
 /* check that the column exists in the Table, returning a pointer to the
    column KeyMap is reequired. */
+         cols = astColumnProps( this );
          if( col_km ) {
-            result = astMapGet0A( this->columns, colname, col_km );
+            result = astMapGet0A( cols, colname, col_km );
          } else {
-            result = astMapHasKey( this->columns, colname );
+            result = astMapHasKey( cols, colname );
          }
+         cols = astAnnul( cols );
 
 /* Report an error if the table does not contain the specified column. */
          if( !result && astOK && report) {
@@ -2916,6 +3015,7 @@ f        The global status.
 */
 
 /* Local Variables: */
+   AstKeyMap *cols;      /* KeyMap holding column definitions */
    char key[ MXCOLNAMLEN + 24 ]; /* Cell key string */
    int irow;             /* Row index */
    int namlen;           /* Used length of "name" */
@@ -2935,10 +3035,11 @@ f        The global status.
    nrow = astGetNrow( this );
 
 /* If there is no column with the given name in the Table, do nothing more. */
-   if( astOK && astMapHasKey( this->columns, name ) ) {
+   cols = astColumnProps( this );
+   if( astOK && astMapHasKey( cols, name ) ) {
 
 /* Remove the column description from the columns keymap. */
-      astMapRemove( this->columns, name );
+      astMapRemove( cols, name );
 
 /* Remove any column cells with defined values from the parent KeyMap. */
       for( irow = 1; irow <= nrow; irow++ ) {
@@ -2946,6 +3047,7 @@ f        The global status.
          (*parent_mapremove)( (AstKeyMap *) this, key, status );
       }
    }
+   cols = astAnnul( cols );
 }
 
 static void RemoveRow( AstTable *this, int index, int *status ) {
@@ -2991,6 +3093,7 @@ f        The global status.
 */
 
 /* Local Variables: */
+   AstKeyMap *cols;              /* KeyMap holding column definitions */
    char key[ MXCOLNAMLEN + 24 ]; /* Cell key string */
    const char *col;              /* Column name */
    int icol;                     /* Column index */
@@ -3007,14 +3110,16 @@ f        The global status.
    if( index > 0 && index <= nrow ) {
 
 /* Loop round all columns in the table. */
-      ncol = astMapSize( this->columns );
+      cols = astColumnProps( this );
+      ncol = astMapSize( cols );
       for( icol = 0; icol < ncol; icol++ ) {
-         col = astMapKey( this->columns, icol );
+         col = astMapKey( cols, icol );
 
 /* Remove the cell of the current column at the requested row. */
          sprintf( key, "%s(%d)", col, index );
          (*parent_mapremove)( (AstKeyMap *) this, key, status );
       }
+      cols = astAnnul( cols );
 
 /* If the removed row was the last row, reduce the number of rows in the
    Table. */
@@ -3365,7 +3470,7 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 
 /* Make copies of the component KeyMaps and store pointers to them in the
    output Table structure. */
-   out->columns = astCopy( in->columns );
+   out->columns = in->columns ? astCopy( in->columns ) : NULL;
 }
 
 
@@ -3409,7 +3514,7 @@ static void Delete( AstObject *obj, int *status ) {
    this = (AstTable *) obj;
 
 /* Annul the pointers to the component KeyMaps. */
-   this->columns = astAnnul( this->columns );
+   if( this->columns ) this->columns = astAnnul( this->columns );
 
 }
 
@@ -3462,13 +3567,11 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
                 "Number of rows in table" );
 
 /* Write out the KeyMap holding parameters describing each column. */
-   astWriteObject( channel, "Columns", 1, 0, this->columns, "KeyMap holding "
-                   "column parameters" );
+   if( this->columns ) {
+      astWriteObject( channel, "Columns", 1, 0, this->columns, "KeyMap holding "
+                      "column parameters" );
+   }
 }
-
-
-
-
 
 
 
@@ -3974,4 +4077,8 @@ void astColumnShape_( AstTable *this, const char *column, int mxdim,
    if ( !astOK ) return;
    (**astMEMBER(this,Table,ColumnShape))( this, column, mxdim, ndim,
                                           dims, status );
+}
+AstKeyMap *astColumnProps_( AstTable *this, int *status ){
+   if ( !astOK ) return NULL;
+   return (**astMEMBER(this,Table,ColumnProps))(this,status);
 }
