@@ -530,9 +530,9 @@ itcl::class gaia::GaiaSpectralPlot {
             $itk_component(canvas) delete $label_
             set label_ {}
          }
-         if { $reflabel_ != {} } {
-            $itk_component(canvas) delete $reflabel_
-            set reflabel_ {}
+         if { $ref_label_ != {} } {
+            $itk_component(canvas) delete $ref_label_
+            set ref_label_ {}
          }
       }
    }
