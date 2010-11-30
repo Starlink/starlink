@@ -42,8 +42,7 @@ require DynaLoader;
 
 Exporter::export_tags('ems','emserr','sai','Ems');
 
-'$Revision$ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
-
+$VERSION = '2.0';
 
 bootstrap Starlink::EMS $VERSION;
 
