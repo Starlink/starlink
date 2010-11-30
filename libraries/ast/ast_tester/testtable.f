@@ -259,7 +259,7 @@ c      call ast_watchmemory(483)
       call ast_end( status )
       call err_rlse( status )
 
-      call ast_activememory( 'testtable' )
+c      call ast_activememory( 'testtable' )
       call ast_flushmemory( 1 );
 
       if( status .eq. sai__ok ) then
