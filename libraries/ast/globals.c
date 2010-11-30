@@ -158,6 +158,7 @@ AstGlobals *astGlobalsInit_( void ) {
       INIT( CmpMap );
       INIT( KeyMap );
       INIT( FitsChan );
+      INIT( FitsTable );
       INIT( CmpFrame );
       INIT( DSBSpecFrame );
       INIT( FrameSet );

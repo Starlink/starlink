@@ -75,6 +75,14 @@
 #  define  __attribute__(x)  /*NOTHING*/
 #endif
 
+#if defined(astCLASS)            /* Protected */
+
+/* Maximum length of a column name */
+#define AST__MXCOLNAMLEN 100
+
+#endif
+
+
 /* Type Definitions. */
 /* ================= */
 /* Table structure. */

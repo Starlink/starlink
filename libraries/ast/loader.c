@@ -61,6 +61,7 @@
 #include "stcobsdatalocation.h"
 #include "stcschan.h"
 #include "table.h"
+#include "fitstable.h"
 
 #include "error.h"
 #include "ast_err.h"
@@ -128,6 +129,7 @@ if ( !strcmp( class, #name ) ) return (AstLoaderType *) astLoad##name##_
    LOAD(DssMap);
    LOAD(Ellipse);
    LOAD(FitsChan);
+   LOAD(FitsTable);
    LOAD(FluxFrame);
    LOAD(Frame);
    LOAD(FrameSet);

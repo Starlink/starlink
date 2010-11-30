@@ -118,9 +118,6 @@ f     - AST_REMOVEROW: Remove a row from a Table.
 #define NROW "Nrow"
 #define UNIT "Unit"
 
-/* Maximum length of a column name */
-#define MXCOLNAMLEN 100
-
 /* Include files. */
 /* ============== */
 /* Interface definitions. */
@@ -382,21 +379,8 @@ f     NAME = CHARACTER * ( * ) (Given)
 *        are significant). Case is significant.
 c     type
 f     TYPE = INTEGER (Given)
-*        The data type associated with the column.
-*        One of AST__INTTYPE (for integer), AST__SINTTYPE (for
-c        short int),
-f        INTEGER*2),
-*        AST__BYTETYPE (for
-c        unsigned bytes - i.e. unsigned chars),
-f        bytes),
-*        AST__DOUBLETYPE (for double
-*        precision floating point), AST__FLOATTYPE (for single
-*        precision floating point), AST__STRINGTYPE (for character string),
-*        AST__OBJECTTYPE (for AST Object pointer), AST__POINTERTYPE (for
-*        arbitrary C pointer) or AST__UNDEFTYPE (for undefined values
-*        created by
-c        astMapPutU).
-f        AST_MAPPUTU).
+*        The data type associated with the column. See "Applicability:"
+*        below.
 c     ndim
 f     NDIM = INTEGER (Given)
 *        The number of dimensions spanned by the values stored in a single
@@ -412,6 +396,35 @@ f     UNIT = CHARACTER * ( * ) (Given)
 *        string if the column is unitless.
 f     STATUS = INTEGER (Given and Returned)
 f        The global status.
+
+*  Applicability:
+*     Table
+*        Tables can hold columns with any of the following data types -
+*        AST__INTTYPE (for integer), AST__SINTTYPE (for
+c        short int),
+f        INTEGER*2),
+*        AST__BYTETYPE (for
+c        unsigned bytes - i.e. unsigned chars),
+f        bytes),
+*        AST__DOUBLETYPE (for double
+*        precision floating point), AST__FLOATTYPE (for single
+*        precision floating point), AST__STRINGTYPE (for character string),
+*        AST__OBJECTTYPE (for AST Object pointer), AST__POINTERTYPE (for
+*        arbitrary C pointer) or AST__UNDEFTYPE (for undefined values
+*        created by
+c        astMapPutU).
+f        AST_MAPPUTU).
+*     FitsTable
+*        FitsTables can hold columns with any of the following data types -
+*        AST__INTTYPE (for integer), AST__SINTTYPE (for
+c        short int),
+f        INTEGER*2),
+*        AST__BYTETYPE (for
+c        unsigned bytes - i.e. unsigned chars),
+f        bytes),
+*        AST__DOUBLETYPE (for double
+*        precision floating point), AST__FLOATTYPE (for single
+*        precision floating point), AST__STRINGTYPE (for character string).
 
 *  Notes:
 *     - This
@@ -443,10 +456,10 @@ f     routine
       astError( AST__BADKEY, "astAddColumn(%s): Illegal blank column name "
                "supplied.", status, astGetClass( this ) );
 
-   } else if( namlen > MXCOLNAMLEN ) {
+   } else if( namlen > AST__MXCOLNAMLEN ) {
       astError( AST__BADKEY, "astAddColumn(%s): Column name '%s' is too "
                "long (must be no more than %d characters).", status,
-               astGetClass( this ), name, MXCOLNAMLEN );
+               astGetClass( this ), name, AST__MXCOLNAMLEN );
 
    } else if( ndim < 0 ) {
       astError( AST__NAXIN, "astAddColumn(%s): No of axes (%d) for values in "
@@ -652,7 +665,7 @@ c        This does not include the trailing null character.
 
 /* Local Variables: */
    AstKeyMap *cols;        /* KeyMap holding column definitions */
-   char key[ MXCOLNAMLEN + 24 ]; /* Current cell key string */
+   char key[ AST__MXCOLNAMLEN + 24 ]; /* Current cell key string */
    int irow;               /* Current row index */
    int len;                /* Length needed to format current cell */
    int nrow;               /* Number of rows in table */
@@ -1837,7 +1850,7 @@ static int MapGet0##X( AstKeyMap *this_keymap, const char *key, Xtype *value, \
 \
 /* Local Variables: */ \
    AstTable *this;     /* Pointer to Table structure */ \
-   char colname[ MXCOLNAMLEN + 1 ]; /* Column name read from string */ \
+   char colname[ AST__MXCOLNAMLEN + 1 ]; /* Column name read from string */ \
    int irow;           /* Row index within key string */ \
    int result;         /* Returned flag */ \
 \
@@ -1976,7 +1989,7 @@ static int MapGet1##X( AstKeyMap *this_keymap, const char *key, int mxval, int *
 \
 /* Local Variables: */ \
    AstTable *this;     /* Pointer to Table structure */ \
-   char colname[ MXCOLNAMLEN + 1 ]; /* Column name read from string */ \
+   char colname[ AST__MXCOLNAMLEN + 1 ]; /* Column name read from string */ \
    int irow;           /* Row index within key string */ \
    int result;         /* Returned flag */ \
 \
@@ -2060,7 +2073,7 @@ static int MapGet1C( AstKeyMap *this_keymap, const char *key, int l, int mxval,
 
 /* Local Variables: */
    AstTable *this;     /* Pointer to Table structure */
-   char colname[ MXCOLNAMLEN + 1 ]; /* Column name read from string */
+   char colname[ AST__MXCOLNAMLEN + 1 ]; /* Column name read from string */
    int irow;           /* Row index within key string */
    int result;         /* Returned flag */
 
@@ -2184,7 +2197,7 @@ static int MapGetElem##X( AstKeyMap *this_keymap, const char *key, int elem, \
 \
 /* Local Variables: */ \
    AstTable *this;     /* Pointer to Table structure */ \
-   char colname[ MXCOLNAMLEN + 1 ]; /* Column name read from string */ \
+   char colname[ AST__MXCOLNAMLEN + 1 ]; /* Column name read from string */ \
    int irow;           /* Row index within key string */ \
    int result;         /* Returned flag */ \
 \
@@ -2267,7 +2280,7 @@ static int MapGetElemC( AstKeyMap *this_keymap, const char *key, int l,
 
 /* Local Variables: */
    AstTable *this;     /* Pointer to Table structure */
-   char colname[ MXCOLNAMLEN + 1 ]; /* Column name read from string */
+   char colname[ AST__MXCOLNAMLEN + 1 ]; /* Column name read from string */
    int irow;           /* Row index within key string */
    int result;         /* Returned flag */
 
@@ -2375,7 +2388,7 @@ static void MapPut0##X( AstKeyMap *this_keymap, const char *key, Xtype value, \
 /* Local Variables: */ \
    AstKeyMap *col_km;  /* KeyMap holding details of the requested column */ \
    AstTable *this;     /* Pointer to Table structure */ \
-   char colname[ MXCOLNAMLEN + 1 ]; /* Column name read from string */ \
+   char colname[ AST__MXCOLNAMLEN + 1 ]; /* Column name read from string */ \
    int irow;           /* Row index within key string */ \
    int type;           /* Data type of the requested column */ \
 \
@@ -2503,7 +2516,7 @@ static void MapPut1##X( AstKeyMap *this_keymap, const char *key, int size, \
 /* Local Variables: */ \
    AstKeyMap *col_km;  /* KeyMap holding details of the requested column */ \
    AstTable *this;     /* Pointer to Table structure */ \
-   char colname[ MXCOLNAMLEN + 1 ]; /* Column name read from string */ \
+   char colname[ AST__MXCOLNAMLEN + 1 ]; /* Column name read from string */ \
    int *dims;          /* Array holding dimensions of each cell column */ \
    int idim;           /* Current axis index */ \
    int irow;           /* Row index within key string */ \
@@ -2661,7 +2674,7 @@ static void MapPutElem##X( AstKeyMap *this_keymap, const char *key, int elem, \
 /* Local Variables: */ \
    AstKeyMap *col_km;  /* KeyMap holding details of the requested column */ \
    AstTable *this;     /* Pointer to Table structure */ \
-   char colname[ MXCOLNAMLEN + 1 ]; /* Column name read from string */ \
+   char colname[ AST__MXCOLNAMLEN + 1 ]; /* Column name read from string */ \
    int *dims;          /* Array holding dimensions of each cell column */ \
    int idim;           /* Current axis index */ \
    int irow;           /* Row index within key string */ \
@@ -2805,7 +2818,7 @@ static void MapPutU( AstKeyMap *this_keymap, const char *key, const char *commen
 
 /* Local Variables: */
    AstTable *this;     /* Pointer to Table structure */
-   char colname[ MXCOLNAMLEN + 1 ]; /* Column name read from string */
+   char colname[ AST__MXCOLNAMLEN + 1 ]; /* Column name read from string */
    int irow;           /* Row index within key string */
 
 /* Check the global error status. */
@@ -2831,7 +2844,7 @@ static void MapPutU( AstKeyMap *this_keymap, const char *key, const char *commen
 }
 
 static int ParseKey( AstTable *this, const char *key, int report,
-                     char colname[ MXCOLNAMLEN + 1 ], int *irow,
+                     char colname[ AST__MXCOLNAMLEN + 1 ], int *irow,
                      AstKeyMap **col_km, const char *method, int *status ){
 /*
 *  Name:
@@ -2846,7 +2859,7 @@ static int ParseKey( AstTable *this, const char *key, int report,
 *  Synopsis:
 *     #include "table.h"
 *     int ParseKey( AstTable *this, const char *key, int report,
-*                   char colname[ MXCOLNAMLEN + 1 ], int *irow,
+*                   char colname[ AST__MXCOLNAMLEN + 1 ], int *irow,
 *                   AstKeyMap **col_km, const char *method, int *status )
 
 *  Class Membership:
@@ -2908,7 +2921,7 @@ static int ParseKey( AstTable *this, const char *key, int report,
        && ( nctot >= strlen( key ) ) ) {
 
 /* Check the column name is not too long. */
-      if( collen > MXCOLNAMLEN ) {
+      if( collen > AST__MXCOLNAMLEN ) {
          if( report ) {
             astError( AST__BADKEY, "%s(%s): Failed to store a value for cell "
                       "\"%s\": column name is too long.", status, method,
@@ -2996,8 +3009,8 @@ f        The global status.
 */
 
 /* Local Variables: */
-   char newkey[ MXCOLNAMLEN + 24 ]; /* New cell key string */
-   char oldkey[ MXCOLNAMLEN + 24 ]; /* Old cell key string */
+   char newkey[ AST__MXCOLNAMLEN + 24 ]; /* New cell key string */
+   char oldkey[ AST__MXCOLNAMLEN + 24 ]; /* Old cell key string */
    const char *col;              /* Column name */
    const char *key;              /* Pointer to key string */
    const char *op;               /* Pointer to opening parenthesis */
@@ -3124,7 +3137,7 @@ f        The global status.
 
 /* Local Variables: */
    AstKeyMap *cols;      /* KeyMap holding column definitions */
-   char key[ MXCOLNAMLEN + 24 ]; /* Cell key string */
+   char key[ AST__MXCOLNAMLEN + 24 ]; /* Cell key string */
    int irow;             /* Row index */
    int namlen;           /* Used length of "name" */
    int nrow;             /* Number of rows in table */
@@ -3202,7 +3215,7 @@ f        The global status.
 
 /* Local Variables: */
    AstKeyMap *cols;              /* KeyMap holding column definitions */
-   char key[ MXCOLNAMLEN + 24 ]; /* Cell key string */
+   char key[ AST__MXCOLNAMLEN + 24 ]; /* Cell key string */
    const char *col;              /* Column name */
    int icol;                     /* Column index */
    int ncol;                     /* Number of columns in table */

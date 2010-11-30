@@ -20,6 +20,7 @@
 #include "ellipse.h"
 #include "error.h"
 #include "fitschan.h"
+#include "fitstable.h"
 #include "fluxframe.h"
 #include "frame.h"
 #include "frameset.h"
@@ -150,6 +151,7 @@ typedef struct AstGlobals {
    AstCmpMapGlobals CmpMap;
    AstKeyMapGlobals KeyMap;
    AstFitsChanGlobals FitsChan;
+   AstFitsTableGlobals FitsTable;
    AstCmpFrameGlobals CmpFrame;
    AstDSBSpecFrameGlobals DSBSpecFrame;
    AstFrameSetGlobals FrameSet;

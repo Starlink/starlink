@@ -63,6 +63,7 @@ GRP_C_ROUTINES = \
     ftimeframe.c \
     ftimemap.c \
     fsphmap.c \
+    ffitstable.c \
     ftable.c \
     ftranmap.c \
     fselectormap.c \
@@ -117,6 +118,7 @@ GRP_C_ROUTINES = \
     fstccatalogentrylocation.c \
     fstcobsdatalocation.c \
     fstcschan.c \
+    fitstable.c \
     table.c \
     timeframe.c \
     timemap.c \
@@ -146,6 +148,7 @@ AST_H_FILES = \
     object.h \
        keymap.h \
           table.h \
+             fitstable.h \
        pointset.h \
        axis.h \
           skyaxis.h \

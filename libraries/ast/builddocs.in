@@ -38,6 +38,7 @@ goodsource="${srcdir}/axis.c \
             ${srcdir}/error.c \
             ${srcdir}/fchannel.c \
             ${srcdir}/fitschan.c \
+            ${srcdir}/fitstable.c \
             ${srcdir}/fluxframe.c \
             ${srcdir}/frame.c \
             ${srcdir}/frameset.c \
