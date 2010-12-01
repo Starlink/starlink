@@ -45,6 +45,7 @@
 #include "star/ndg.h"
 #include "star/atl.h"
 #include "mers.h"
+#include "ems.h"
 #include "f77.h"
 #include "Dits_Err.h"
 #include "Ers.h"
