@@ -161,6 +161,8 @@ F77_SUBROUTINE(ary1_s2dlt)( CHARACTER(LOC1), INTEGER(ZAXIS), CHARACTER(TYPE),
 *        Original version.
 *     2010-11-30 (TIMJ):
 *        Avoid dereferencing off the end of an array in the check functions
+*     1-DEC-2010 (DSB):
+*        Take care with casting of size_t values used in floating point calculations. 
 *     {enter_changes_here}
 
 *  Bugs:
@@ -580,6 +582,7 @@ F77_SUBROUTINE(ary1_s2dlt)( CHARACTER(LOC1), INTEGER(ZAXIS), CHARACTER(TYPE),
       }
    }
 
+
 /* Finalise the number of DATA, VALUE and REPEAT values required. */
    idata += ndata;
    ivalue += nvalue;
@@ -678,8 +681,8 @@ F77_SUBROUTINE(ary1_s2dlt)( CHARACTER(LOC1), INTEGER(ZAXIS), CHARACTER(TYPE),
    }
 
 /* Calculate the compressed ratio and return it in argument ZRATIO. */
-   *ZRATIO = ( (float)nel_indata*size_intype )/
-             ( 2*VAL__NBI + (float)(bsize*nel_first)/(float)ntest_row );
+   *ZRATIO = ( (float)nel_indata*(float)size_intype )/
+             ( 2*VAL__NBI + ((float)bsize*(float)nel_first)/(float)ntest_row );
 
 
 /* The next section stores the compressed values in the output arrays. */
