@@ -4420,6 +4420,10 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          \texttt{"new-*|.fit|.fits|"} will add the string \texttt{"new-"} to
          the start of every file name, and will substitute the string
          \texttt{".fits"} for the original string \texttt{".fit"}.
+
+         NDF2FITS will not permit you to overwrite an existing FITS file,
+         unless you supply an exclamation mark prefix (suitably escaped
+         if you are using a UNIX shell).
       }
       \sstsubsection{
          PROEXTS = \_LOGICAL (Read)
@@ -4476,17 +4480,17 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       \sstexamplesubsection{
          ndf2fits horse logo.fit d
       }{
-         This converts the NDF called horse to the FITS file called
+         This converts the NDF called horse to the new FITS file called
          \texttt{logo.fit}.  The data type of the FITS primary data array
          matches that of the NDF's data array.  The FITS extension in the NDF
          is merged into the FITS header of \texttt{logo.fit}.
       }
       \sstexamplesubsection{
-         ndf2fits horse logo.fit d proexts
+         ndf2fits horse !logo.fit d proexts
       }{
          This converts the NDF called horse to the FITS file called
-         \texttt{logo.fit}.
-         The data type of the FITS primary data array matches
+         \texttt{logo.fit}.  An existing \texttt{logo.fit} will be
+         overwritten.  The data type of the FITS primary data array matches
          that of the NDF's data array.  The FITS extension in the NDF
          is merged into the FITS header of \texttt{logo.fit}.  In addition any
          NDF extensions (apart from FITS) are turned into binary tables
@@ -4495,7 +4499,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       \sstexamplesubsection{
          ndf2fits horse logo.fit noprohis
       }{
-         This converts the NDF called horse to the FITS file called
+         This converts the NDF called horse to the new FITS file called
          \texttt{logo.fit}.
          The data type of the FITS primary data array matches
          that of the NDF's data array.  The FITS extension in the NDF
@@ -4511,7 +4515,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          ending in \texttt{"z"} in the directory called \texttt{data} into
          FITS files of the
          same name and with a file extension of \texttt{".fit"}.  The variance
-         array becomes the data array of each FITS file.  The data type
+         array becomes the data array of each new FITS file.  The data type
          of the FITS primary data array single-precision floating
          point.  Any FITS extension in the NDF is ignored.
       }
@@ -4543,7 +4547,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          ndf2fits u20040730\_00675 merge container accept
       }{
          This converts the UIST container file \texttt{u20040730\_00675.sdf}
-         to FITS file \texttt{u20040730\_00675.fit}, merging its .I1 and
+         to new FITS file \texttt{u20040730\_00675.fit}, merging its .I1 and
          .HEADER structures into a single NDF before the conversion.  The
          output file has only one header and data unit.
       }
@@ -4560,7 +4564,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       \sstexamplesubsection{
          ndf2fits in=huge out=huge.fits comp=d bitpix=n
       }{
-         This converts the NDF called huge to the FITS file called
+         This converts the NDF called huge to the new FITS file called
          \texttt{huge.fits}.  The data type of the FITS primary data array
          matches that of the NDF's scaled data array.  The scale and
          offset coefficients used to form the FITS array are also taken

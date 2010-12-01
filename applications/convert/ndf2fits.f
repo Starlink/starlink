@@ -174,6 +174,10 @@
 *        performed.  For instance, "new-*|.fit|.fits|" will add the
 *        string "new-" to the start of every file name, and will
 *        substitute the string ".fits" for the original string ".fit".
+*
+*        NDF2FITS will not permit you to overwrite an existing FITS file,
+*        unless you supply an exclamation-mark prefix (suitably escaped
+*        if you are using a UNIX shell).
 *     PROEXTS = _LOGICAL (Read)
 *        If TRUE, the NDF extensions (other than the FITS extension)
 *        are propagated to the FITS files as FITS binary-table
@@ -209,19 +213,20 @@
 
 *  Examples:
 *     ndf2fits horse logo.fit d
-*        This converts the NDF called horse to the FITS file called
+*        This converts the NDF called horse to the new FITS file called
 *        logo.fit.  The data type of the FITS primary data array matches
 *        that of the NDF's data array.  The FITS extension in the NDF
 *        is merged into the FITS header of logo.fit.
-*     ndf2fits horse logo.fit d proexts
+*     ndf2fits horse !logo.fit d proexts
 *        This converts the NDF called horse to the FITS file called
-*        logo.fit.  The data type of the FITS primary data array matches
-*        that of the NDF's data array.  The FITS extension in the NDF
-*        is merged into the FITS header of logo.fit.  In addition any
-*        NDF extensions (apart from FITS) are turned into binary tables.
-*        that follow the primary header and data unit.
+*        logo.fit.  An existing logo.fit will be overwritten.  The data
+*        type of the FITS primary data array matches that of the NDF's
+*        data array.  The FITS extension in the NDF is merged into the
+*        FITS header of logo.fit.  In addition any NDF extensions (apart
+*        from FITS) are turned into binary tables. that follow the
+*        primary header and data unit.
 *     ndf2fits horse logo.fit noprohis
-*        This converts the NDF called horse to the FITS file called
+*        This converts the NDF called horse to the new FITS file called
 *        logo.fit.  The data type of the FITS primary data array matches
 *        that of the NDF's data array.  The FITS extension in the NDF
 *        is merged into the FITS header of logo.fit.  Should horse
@@ -232,11 +237,11 @@
 *        This converts the NDFs with names beginning with "a" and ending
 *        in "z" in the directory called data into FITS files of the same
 *        name and with a file extension called .fit.  The variance
-*        array becomes the data array of each FITS file.  The data type
-*        of the FITS primary data array single-precision floating
+*        array becomes the data array of each new FITS file.  The data
+*        type of the FITS primary data array single-precision floating
 *        point.  Any FITS extension in the NDF is ignored.
 *     ndf2fits "abc,def" "jvp1.fit,jvp2.fit" comp=d  bitpix="16,-64"
-*        This converts the NDFs called abc and def into FITS files
+*        This converts the NDFs called abc and def into new FITS files
 *        called jvp1.fit and jvp2.fit respectively.  The data type of
 *        the FITS primary data array is signed integer words in
 *        jvp1.fit, and double-precision floating point in jvp2.fit.  The
@@ -255,7 +260,7 @@
 *        are able to interpret native encodings.
 *     ndf2fits u20040730_00675 merge container accept
 *        This converts the UIST container file u20040730_00675.sdf to
-*        FITS file u20040730_00675.fit, merging its .I1 and .HEADER
+*        new FITS file u20040730_00675.fit, merging its .I1 and .HEADER
 *        structures into a single NDF before the conversion.  The output
 *        file has only one header and data unit.
 *     ndf2fits in=c20011204_00016 out=cgs4_16.fit container
@@ -265,7 +270,7 @@
 *        four integrations in I1, I2, I3, and I4 components of the
 *        container file are converted to FITS IMAGE extensions.
 *     ndf2fits in=huge out=huge.fits comp=d bitpix=n
-*        This converts the NDF called huge to the FITS file called
+*        This converts the NDF called huge to the new FITS file called
 *        huge.fits.  The data type of the FITS primary data array
 *        matches that of the NDF's scaled data array.  The scale and
 *        offset coefficients used to form the FITS array are also taken
@@ -679,6 +684,9 @@
 *     2009 October 16 (MJC):
 *        Add prologue section on Quality Masking.  Allow three-letter
 *        COMP permutations.
+*     2010 November 30 (MJC):
+*        Add remark on clobbering of output file, and revised an
+*        example showing how to overwrite an existing FITS file.
 *     {enter_further_changes_here}
 
 *-
