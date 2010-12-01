@@ -153,11 +153,14 @@ F77_SUBROUTINE(ary1_s2dlt)( CHARACTER(LOC1), INTEGER(ZAXIS), CHARACTER(TYPE),
 
 *  Authors:
 *     DSB: David Berry (JAC, Hawaii)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     19-OCT-2010 (DSB):
 *        Original version.
+*     2010-11-30 (TIMJ):
+*        Avoid dereferencing off the end of an array in the check functions
 *     {enter_changes_here}
 
 *  Bugs:
@@ -194,9 +197,9 @@ F77_SUBROUTINE(ary1_s2dlt)( CHARACTER(LOC1), INTEGER(ZAXIS), CHARACTER(TYPE),
    char type[DAT__SZTYP + 1];
    char type_indata[DAT__SZTYP + 1];
    char variant[ VARIANT_LEN + 1 ];
-   check_fun_type check_fun;
+   check_fun_type check_fun = NULL;
    const char *type_temp;
-   delt_fun_type delt_fun;
+   delt_fun_type delt_fun = NULL;
    hdsdim dims_cindata[ ARY__MXDIM ];
    hdsdim dims_first[ ARY__MXDIM - 1 ];
    hdsdim dims_indata[ ARY__MXDIM ];
@@ -863,8 +866,8 @@ static void ary1Delt##incode##outcode( intype *pindata, int nel, \
    intype *pvalue0; \
    intype vdata; \
    intype vnext; \
-   intype vprev2; \
-   intype vprev; \
+   intype vprev2 = 0; \
+   intype vprev = 0; \
    long int delta; \
    outtype *poutdata0; \
 \
@@ -915,13 +918,6 @@ static void ary1Delt##incode##outcode( intype *pindata, int nel, \
       *(pvalue++) = vdata; \
    } \
 \
-/* Move on to the second element (i.e. "vdata" holds the second element, \
-   "vprev" holds the first and "vnext" holds the third). */ \
-   pindata += stride; \
-   vprev = vdata; \
-   vdata = vnext; \
-   vnext = *pindata; \
-\
 /* Check all the elements in the supplied row from the second element to \
    the penultimate element. We exclude first and last elements from this \
    loop as checking each element will in general require access to both the \
@@ -933,6 +929,13 @@ static void ary1Delt##incode##outcode( intype *pindata, int nel, \
    space. */ \
    nel--; \
    for( iel = 1; iel < nel; iel++ ) { \
+\
+/* Move on to next element ("vdata" holds the next element, \
+   "vprev" holds the previous and "vnext" holds the third). */ \
+      pindata += stride; \
+      vprev = vdata; \
+      vdata = vnext; \
+      vnext = *pindata; \
 \
 /* If this input pixel is bad, increment the number of bad pixels in the \
    current run of bad pixels. We do nothing else until we reach the end \
@@ -1023,13 +1026,13 @@ static void ary1Delt##incode##outcode( intype *pindata, int nel, \
           } \
       } \
 \
-/* Move on to the next element. */ \
-      pindata += stride; \
+/* Store previous previous */\
       vprev2 = vprev; \
-      vprev = vdata; \
-      vdata = vnext; \
-      vnext = *pindata; \
    } \
+\
+/* Update value of vdata and vprev for end of loop */\
+   vprev = vdata;\
+   vdata = vnext;\
 \
 /* The "v..." variables now refer to the last pixel in the input array. If \
    the last pixel is bad, we must treat VAL__BAD as a special sort of good \
@@ -1222,8 +1225,8 @@ static void ary1Check##incode##outcode( intype *pindata, int nel, \
    int nsingle; \
    intype vdata; \
    intype vnext; \
-   intype vprev2; \
-   intype vprev; \
+   intype vprev2 = 0; \
+   intype vprev = 0; \
    long int delta; \
 \
 /* Initialise */ \
@@ -1268,19 +1271,19 @@ static void ary1Check##incode##outcode( intype *pindata, int nel, \
       (*nvalue)++; \
    } \
 \
-/* Move on to the second element (i.e. "vdata" holds the second element, \
-   "vprev" holds the first and "vnext" holds the third). */ \
-   pindata += stride; \
-   vprev = vdata; \
-   vdata = vnext; \
-   vnext = *pindata; \
-\
 /* Check all the elements in the supplied row from the second element to \
    the penultimate element. We exclude first and last elements from this \
    loop as checking each element will in general require access to both the \
    previous and the following elements. */ \
    nel--; \
    for( iel = 1; iel < nel; iel++ ) { \
+\
+/* Move on to next element ("vdata" holds the next element, \
+   "vprev" holds the previous and "vnext" holds the third). */ \
+      pindata += stride; \
+      vprev = vdata; \
+      vdata = vnext; \
+      vnext = *pindata; \
 \
 /* If this input pixel is bad, increment the number of bad pixels in the \
    current run of bad pixels. We do nothing else until we reach the end \
@@ -1371,13 +1374,13 @@ static void ary1Check##incode##outcode( intype *pindata, int nel, \
          } \
       } \
 \
-/* Move on to the next element. */ \
-      pindata += stride; \
+/* Store previous previous element. */ \
       vprev2 = vprev; \
-      vprev = vdata; \
-      vdata = vnext; \
-      vnext = *pindata; \
    } \
+\
+/* Update value of vdata and vprev for end of loop */\
+   vprev = vdata;\
+   vdata = vnext;\
 \
 /* The "v..." variables now refer to the last pixel in the input array. If \
    the last pixel is bad, we must treat VAL__BAD as a special sort of good \
