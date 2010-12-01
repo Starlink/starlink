@@ -39,7 +39,7 @@ PUBLIC_INCLUDES = ndf.h NDF_PAR NDF_FUNC_DEC NDF_FUNC_DEF NDF_FUNC
 
 # Include files that are only needed for the build
 PRIVATE_INCLUDES = NDF_ACB NDF_CONST NDF_DCB NDF_ELB NDF_FCB NDF_PCB \
-	NDF_TCB NDF_TMP ndf1.h
+	NDF_TCB NDF_TMP ndf1.h ndf_const.h
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
