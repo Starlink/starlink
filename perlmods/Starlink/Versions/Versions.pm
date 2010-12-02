@@ -67,7 +67,7 @@ use version;
                 'Funcs' => [ @EXPORT_OK ],
                );
 
-$VERSION = '1.05';
+$VERSION = '1.06';
 $DEBUG = 0;
 
 # This is the cache used to store the version numbers
