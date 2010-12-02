@@ -45,7 +45,7 @@ use vars qw/ $VERSION @EXPORT_OK $DEBUG/;
 use constant SAI__OK => &NDF::SAI__OK;
 use constant SAI__ERROR => &NDF::SAI__ERROR;
 
-'$Revision$ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+$VERSION = '2.0';
 
 $DEBUG = 0;
 @EXPORT_OK = qw( copobj retrieve_locs delobj creobj setobj
