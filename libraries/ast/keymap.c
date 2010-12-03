@@ -4563,7 +4563,7 @@ MAKE_MAPPUT1(B,const unsigned char,AST__BYTETYPE,value[i])
 #undef CHECK_C
 #undef CHECK_P
 
-void astMapPut1AId_( AstKeyMap *this, const char *key, int size,
+void astMapPut1AId_( AstKeyMap *this, const char *skey, int size,
                      AstObject *const value[], const char *comment,
                      int *status ) {
 /*
@@ -4595,18 +4595,24 @@ void astMapPut1AId_( AstKeyMap *this, const char *key, int size,
 */
 
 /* Local Variables: */
-   AstObject *op;          /* Object pointer */
    AstMapEntry *mapentry;  /* Pointer to parent MapEntry structure */
    AstMapEntry *oldent;    /* Pointer to existing MapEntry */
+   AstObject *op;          /* Object pointer */
    Entry1A *entry;         /* Structure holding the data for the new Entry */
    char *p;                /* Pointer to next key character */
-   int itab;               /* Index of hash table element to use */
+   char keybuf[ AST__MXKEYLEN + 1 ]; /* Buffer for upper cas key */ \
+   const char *key;        /* Pointer to key string to use */ \
    int i;                  /* Loop count */
+   int itab;               /* Index of hash table element to use */
    int keylen;             /* Length of supplied key string */
    int there;              /* Did the entry already exist in the KeyMap? */
 
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Convert the supplied key to upper case if required. */
+   key = ConvertKey( this, skey, keybuf, AST__MXKEYLEN + 1, "astMapPut1A",
+                     status );
 
 /* Allocate memory for the new MapEntry. */
    entry = astMalloc( sizeof( Entry1A ) );
@@ -5078,7 +5084,7 @@ MAKE_MAPGET0(B,unsigned char,AST__BYTETYPE)
 /* Undefine the macro. */
 #undef MAKE_MAPGET0
 
-int astMapGet0AId_( AstKeyMap *this, const char *key, AstObject **value, int *status ) {
+int astMapGet0AId_( AstKeyMap *this, const char *skey, AstObject **value, int *status ) {
 /*
 *  Name:
 *     astMapGet0AId_
@@ -5110,9 +5116,11 @@ int astMapGet0AId_( AstKeyMap *this, const char *key, AstObject **value, int *st
 
 /* Local Variables: */
    AstMapEntry *mapentry;  /* Pointer to parent MapEntry structure */
+   char keybuf[ AST__MXKEYLEN + 1 ]; /* Buffer for upper cas key */ \
+   const char *key;        /* Pointer to key string to use */ \
    int itab;               /* Index of hash table element to use */
-   int result;             /* Returned flag */
    int raw_type;           /* Data type of stored value */
+   int result;             /* Returned flag */
    unsigned long hash;     /* Full width hash value */
    void *raw;              /* Pointer to stored value */
 
@@ -5121,6 +5129,10 @@ int astMapGet0AId_( AstKeyMap *this, const char *key, AstObject **value, int *st
 
 /* Check the global error status. */
    if ( !astOK ) return result;
+
+/* Convert the supplied key to upper case if required. */
+   key = ConvertKey( this, skey, keybuf, AST__MXKEYLEN + 1, "astMapGet0A",
+                     status );
 
 /* Use the hash function to determine the element of the hash table in
    which the key will be stored. */
@@ -5543,7 +5555,7 @@ MAKE_MAPGET1(B,unsigned char,AST__BYTETYPE)
 #undef MAKE_MAPGET1
 
 
-static int MapGet1C( AstKeyMap *this, const char *key, int l, int mxval,
+static int MapGet1C( AstKeyMap *this, const char *skey, int l, int mxval,
                      int *nval, char *value, int *status ) {
 /*
 *  Name:
@@ -5576,7 +5588,9 @@ static int MapGet1C( AstKeyMap *this, const char *key, int l, int mxval,
 /* Local Variables: */
    AstMapEntry *mapentry;  /* Pointer to parent MapEntry structure */
    char *val;              /* Pointer to next buffer element */
+   char keybuf[ AST__MXKEYLEN + 1 ]; /* Buffer for upper cas key */ \
    const char *cvalue;     /* Pointer to converted string */
+   const char *key;        /* Pointer to key string to use */ \
    int i;                  /* Element index */
    int itab;               /* Index of hash table element to use */
    int nel;                /* Number of elements in raw vector */
@@ -5592,6 +5606,10 @@ static int MapGet1C( AstKeyMap *this, const char *key, int l, int mxval,
 
 /* Check the global error status. */
    if ( !astOK ) return result;
+
+/* Convert the supplied key to upper case if required. */
+   key = ConvertKey( this, skey, keybuf, AST__MXKEYLEN + 1, "astMapGet1C",
+                     status );
 
 /* Use the hash function to determine the element of the hash table in
    which the key will be stored. */
@@ -5735,7 +5753,7 @@ static int MapGet1C( AstKeyMap *this, const char *key, int l, int mxval,
    return result;
 }
 
-int astMapGet1AId_( AstKeyMap *this, const char *key, int mxval, int *nval,
+int astMapGet1AId_( AstKeyMap *this, const char *skey, int mxval, int *nval,
                     AstObject **value, int *status ) {
 /*
 *  Name:
@@ -5770,6 +5788,8 @@ int astMapGet1AId_( AstKeyMap *this, const char *key, int mxval, int *nval,
 /* Local Variables: */
    AstMapEntry *mapentry;  /* Pointer to parent MapEntry structure */
    AstObject *avalue;      /* Pointer to AstObject */
+   char keybuf[ AST__MXKEYLEN + 1 ]; /* Buffer for upper cas key */ \
+   const char *key;        /* Pointer to key string to use */ \
    int i;                  /* Element index */
    int itab;               /* Index of hash table element to use */
    int nel;                /* Number of elements in raw vector */
@@ -5785,6 +5805,10 @@ int astMapGet1AId_( AstKeyMap *this, const char *key, int mxval, int *nval,
 
 /* Check the global error status. */
    if ( !astOK ) return result;
+
+/* Convert the supplied key to upper case if required. */
+   key = ConvertKey( this, skey, keybuf, AST__MXKEYLEN + 1, "astMapGet1A",
+                     status );
 
 /* Use the hash function to determine the element of the hash table in
    which the key will be stored. */
