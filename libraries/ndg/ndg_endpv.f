@@ -95,6 +95,8 @@
 *        Ignore any input NDF that is contained within another input NDF.
 *     13-APR-2010 (DSB):
 *        Do not propagate provenance by default for foreign format NDFs.
+*     3-DEC-2010 (DSB):
+*        Free Provenance structures when they are no longer needed.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -335,8 +337,10 @@
                         END IF
                      END DO
 
-*  Write out the modified provenance information to the output NDF.
+*  Write out the modified provenance information to the output NDF, and
+*  then free the structiure holding the provenance info.
                      CALL NDG_WRITEPROV( IPROV, INDF1, .FALSE., STATUS )
+                     CALL NDG_FREEPROV( IPROV, STATUS )
 
 *  If none of the input NDFs had a provenance extension, delete the
 *  provenance extension from the output NDF unless AUTOPROV indicates that

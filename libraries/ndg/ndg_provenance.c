@@ -167,6 +167,8 @@
 *          partially constructed Prov structure).
 *      18-AUG-2010 (DSB):
 *          Added ndgUnhashProv.
+*      3-DEC-2010 (DSB):
+*          Added debug facilities for tracking issue and release of Prov structures.
 */
 
 
@@ -279,6 +281,11 @@ typedef struct Prov {
    HistRec *hist_recs;         /* Array of history records */
    int nhrec;                  /* Number of history records */
    int hidden;                 /* Should the ancestor NDF be hidden? */
+
+#ifdef NDG_DEBUG
+   int id;
+#endif
+
 } Prov;
 
 
@@ -291,7 +298,6 @@ typedef struct Provenance {
                                   main NDF and all ancestors NDFs */
    int nprov;                  /* The length of the "provs" array */
 } Provenance;
-
 
 
 /* Prototypes for Private Functions. */
@@ -348,6 +354,19 @@ static const char *static_badpath = NULL;
 static Provenance *static_provenance = NULL;
 static int static_provid1 = -2;
 static int static_provid2 = -2;
+
+/* Facilities for debugging the use of provenance identifiers */
+#ifdef NDG_DEBUG
+static int nextid = 0;
+static Prov **issued = NULL;
+static void Issue( Prov * );
+#define ISSUE( pv ) Issue( pv )
+#define DEISSUE( pv ) Deissue( pv )
+#else
+#define ISSUE( pv )
+#define DEISSUE( pv )
+#endif
+
 
 /* Public F77 wrapper functions. */
 /* ============================= */
@@ -3450,6 +3469,7 @@ static Prov *ndg1CopyProv( Prov *prov, int *status ){
 /* Allocate memory and store a copy of the supplied Prov structure. */
    result = astStore( NULL, prov, sizeof( Prov ) );
    if( result ) {
+      ISSUE( result );
 
 /* For safety, first nullify all pointers in the copy. */
       result->path = NULL;
@@ -4282,6 +4302,9 @@ static Prov *ndg1FreeProv( Prov *prov, int *status ){
 /* Annul the HDS locator for the MORE structure. */
    if( prov->more ) datAnnul( &(prov->more), status );
 
+/* Remove the Prov from the list of active Provs. */
+   DEISSUE( prov );
+
 /* Free the memory used to hold the Prov itself, and return a NULL pointer. */
    return astFree( prov );
 }
@@ -4992,6 +5015,7 @@ static Prov *ndg1MakeProv( int index, const char *path, const char *date,
 /* Allocate the memory for the new Prov structure. */
    result = astMalloc( sizeof( Prov ) );
    if( result ) {
+      ISSUE( result );
 
 /* Store copies of the supplied strings. Store NULL pointers for any
    unspecified strings. */
@@ -6976,3 +7000,38 @@ static void ndg1DumpInfo( Prov *prov1, Prov *prov2, int *status ){
 
 }
 
+
+#ifdef NDG_DEBUG
+
+/* Append a Prov pointer to the end of a list of issued Prov pointers. */
+static void Issue( Prov *prov ){
+   prov->id = nextid++;
+   issued = astGrow( issued, nextid, sizeof( *issued ) );
+   issued[ prov->id ] = prov;
+}
+
+/* Remove a Prov pointer from a list of issued Prov pointers. */
+static void Deissue( Prov *prov ){
+   prov->id = nextid++;
+   issued = astGrow( issued, nextid, sizeof( *issued ) );
+   issued[ prov->id ] = prov;
+}
+
+/* List any Prov structurs that are still in use. */
+F77_SUBROUTINE(ndg_listprov)( INTEGER(status) ){
+   int i, first;
+   first = 1;
+   for( i = 0; i < nextid; i++ ) {
+      if( issued[ i ] ) {
+         if( first ) {
+            printf( "Following provenance identifiers are still active: ");
+            first = 0;
+         }
+         printf(" %d (%s)", i, issued[i]->path );
+      }
+   }
+   if( first ) printf( "All provenance identifiers have been freed.");
+   printf("\n");
+}
+
+#endif
