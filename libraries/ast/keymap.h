@@ -93,6 +93,9 @@
 #  define  __attribute__(x)  /*NOTHING*/
 #endif
 
+/* Maximum key length when using case insensitive keymaps */
+#define AST__MXKEYLEN 200
+
 /* Type Definitions. */
 /* ================= */
 
@@ -129,6 +132,7 @@ typedef struct AstKeyMap {
                                       the KeyMap entries */
    int *nentry;                    /* No. of Entries in each table element */
    int mapsize;                    /* Length of table */
+   int keycase;                    /* Are keys case sensitive? */
    int keyerror;                   /* Report error if no key? */
    int maplocked;                  /* Prevent addition of new entries? */
    int sortby;                     /* How the keys should be sorted */
@@ -228,6 +232,11 @@ typedef struct AstKeyMapVtab {
    int (* TestKeyError)( AstKeyMap *, int * );
    void (* ClearKeyError)( AstKeyMap *, int * );
    void (* SetKeyError)( AstKeyMap *, int, int * );
+
+   int (* GetKeyCase)( AstKeyMap *, int * );
+   int (* TestKeyCase)( AstKeyMap *, int * );
+   void (* ClearKeyCase)( AstKeyMap *, int * );
+   void (* SetKeyCase)( AstKeyMap *, int, int * );
 
    int (* GetSortBy)( AstKeyMap *, int * );
    int (* TestSortBy)( AstKeyMap *, int * );
@@ -374,6 +383,11 @@ int astTestKeyError_( AstKeyMap *, int * );
 void astSetKeyError_( AstKeyMap *, int, int * );
 void astClearKeyError_( AstKeyMap *, int * );
 
+int astGetKeyCase_( AstKeyMap *, int * );
+int astTestKeyCase_( AstKeyMap *, int * );
+void astSetKeyCase_( AstKeyMap *, int, int * );
+void astClearKeyCase_( AstKeyMap *, int * );
+
 int astGetSortBy_( AstKeyMap *, int * );
 int astTestSortBy_( AstKeyMap *, int * );
 void astSetSortBy_( AstKeyMap *, int, int * );
@@ -508,6 +522,15 @@ astINVOKE(V,astGetKeyError_(astCheckKeyMap(this),STATUS_PTR))
 astINVOKE(V,astSetKeyError_(astCheckKeyMap(this),keyerror,STATUS_PTR))
 #define astTestKeyError(this) \
 astINVOKE(V,astTestKeyError_(astCheckKeyMap(this),STATUS_PTR))
+
+#define astClearKeyCase(this) \
+astINVOKE(V,astClearKeyCase_(astCheckKeyMap(this),STATUS_PTR))
+#define astGetKeyCase(this) \
+astINVOKE(V,astGetKeyCase_(astCheckKeyMap(this),STATUS_PTR))
+#define astSetKeyCase(this,keycase) \
+astINVOKE(V,astSetKeyCase_(astCheckKeyMap(this),keycase,STATUS_PTR))
+#define astTestKeyCase(this) \
+astINVOKE(V,astTestKeyCase_(astCheckKeyMap(this),STATUS_PTR))
 
 #define astClearSortBy(this) \
 astINVOKE(V,astClearSortBy_(astCheckKeyMap(this),STATUS_PTR))

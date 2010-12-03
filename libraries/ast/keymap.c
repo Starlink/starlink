@@ -12,8 +12,9 @@ f     AST_KEYMAP
 
 *  Description:
 *     The KeyMap class is used to store a set of values with associated keys
-*     which identify the values. The keys are strings (case-sensitive,
-*     trailing spaces are ignored), and the data type of the values can be
+*     which identify the values. The keys are strings. These may be case
+*     sensitive or insensitive as selected by the KeyCase attribute, and
+*     trailing spaces are ignored. The value associated with a key can be
 *     integer (signed 4 and 2 byte, or unsigned 1 byte), floating point
 *     (single or double precision),
 c     void pointer,
@@ -33,6 +34,7 @@ c     void pointer,
 *     In addition to those attributes common to all Objects, every
 *     KeyMap also has the following attributes:
 *
+*     - KeyCase: Sets the case in which keys are stored
 *     - KeyError: Report an error if the requested key does not exist?
 *     - SizeGuess: The expected size of the KeyMap.
 *     - SortBy: Determines how keys are sorted in a KeyMap.
@@ -170,6 +172,8 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map
 *        Fix memory leak in astMapPutElemC and astMapPutElemA.
 *     26-NOV-2010 (DSB):
 *        Added support for unsigned byte valued entries.
+*     3-DEC-2010 (DSB):
+*         Added KeyCase attribute.
 *class--
 */
 
@@ -428,6 +432,7 @@ static AstMapEntry *CopyMapEntry( AstMapEntry *, int * );
 static AstMapEntry *FreeMapEntry( AstMapEntry *, int * );
 static AstMapEntry *RemoveTableEntry( AstKeyMap *, int, const char *, int * );
 static AstMapEntry *SearchTableEntry( AstKeyMap *, int, const char *, int * );
+static const char *ConvertKey( AstKeyMap *, const char *, char *, int, const char *, int * );
 static const char *GetKey( AstKeyMap *, int index, int * );
 static const char *MapIterate( AstKeyMap *, int, int * );
 static const char *MapKey( AstKeyMap *, int index, int * );
@@ -531,6 +536,11 @@ static int GetKeyError( AstKeyMap *, int * );
 static int TestKeyError( AstKeyMap *, int * );
 static void ClearKeyError( AstKeyMap *, int * );
 static void SetKeyError( AstKeyMap *, int, int * );
+
+static int GetKeyCase( AstKeyMap *, int * );
+static int TestKeyCase( AstKeyMap *, int * );
+static void ClearKeyCase( AstKeyMap *, int * );
+static void SetKeyCase( AstKeyMap *, int, int * );
 
 static int GetMapLocked( AstKeyMap *, int * );
 static int TestMapLocked( AstKeyMap *, int * );
@@ -1014,6 +1024,11 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
    } else if ( !strcmp( attrib, "keyerror" ) ) {
       astClearKeyError( this );
 
+/* KeyCase. */
+/* --------- */
+   } else if ( !strcmp( attrib, "keycase" ) ) {
+      astClearKeyCase( this );
+
 /* MapLocked. */
 /* --------- */
    } else if ( !strcmp( attrib, "maplocked" ) ) {
@@ -1028,6 +1043,69 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
    method for further interpretation. */
    } else {
       (*parent_clearattrib)( this_object, attrib, status );
+   }
+}
+
+static void ClearKeyCase( AstKeyMap *this, int *status ) {
+/*
+*+
+*  Name:
+*     astClearKeyCase
+
+*  Purpose:
+*     Clear the value of the KeyCase attribute for a KeyMap.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "keymap.h"
+*     void astSetKeyCase( AstKeyMap *this )
+
+*  Class Membership:
+*     KeyMap method.
+
+*  Description:
+*     This function Clears the KeyCase attribute of a KeyMap. It reports
+*     an error if the KeyMap contains any entries.
+
+*  Parameters:
+*     this
+*        Pointer to the KeyMap.
+
+*-
+*/
+
+/* Local Variables: */
+   int defval;                /* Default KeyCase value */
+   int itab;                  /* Index into hash table */
+   int oldval;                /* Old KeyCase value */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Save the old value. */
+   oldval = astGetKeyCase( this );
+
+/* Clear it. */
+   this->keycase = -1;
+
+/* Get the default value. */
+   defval = astGetKeyCase( this );
+
+/* If the old value and the default value are not the same, we must check
+   that the KeyMap is empty. If not, restore the old value and report an
+   error. */
+   if( defval != oldval ) {
+      for( itab = 0; itab < this->mapsize; itab++ ) {
+         if( this->nentry[ itab ] > 0 ) {
+            this->keycase = oldval;
+            astError( AST__NOWRT, "astClearAttrib(KeyMap): Illegal attempt to "
+                      "clear the KeyCase attribute of a non-empty KeyMap.",
+                      status);
+            break;
+         }
+      }
    }
 }
 
@@ -1383,6 +1461,88 @@ static int CompareEntries( const void *first_void, const void *second_void ) {
 /* Return the result. */
    return result;
 
+}
+
+static const char *ConvertKey( AstKeyMap *this, const char *skey, char *keybuf,
+                               int blen, const char *method, int *status ){
+/*
+*  Name:
+*     ConvertValue
+
+*  Purpose:
+*     Convert the supplied key to upper case if required.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "keymap.h"
+*     const char *ConvertKey( AstKeyMap *this, const char *skey, char *keybuf,
+*                             int blen, const char *method, int *status )
+
+*  Class Membership:
+*     KeyMap member function.
+
+*  Description:
+*     This function converts the supplied key string to uppercase if the
+*     KeyCase attribute it currently set to zero in the supplied KeyMap.
+
+*  Parameters:
+*     this
+*        Pointer to the KeyMap.
+*     skey
+*        Pointer to the supplied key string.
+*     keybuf
+*        Pointer to a buffer in which to place the converted string. This
+*        will only be used if the supplied key string needs to be
+*        converted.
+*     blen
+*        The length of the "keybuf" buffer. This should include room for
+*        a terminating null character.
+*     method
+*        Pointer to a string holding the name of the method to include in
+*        any error message.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     If the KeyMap's KeyCase attribute is currently set to a non-zero
+*     value, the returned value will be a copy of "skey". Otherwise it
+*     will be copy of "keybuf" (the buffer holding the upper case version
+*     of the supplied string).
+
+*  Notes:
+*     - The valeu of "skey" will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   const char *result;
+   int len;
+
+/* Initialise. */
+   result = skey;
+
+/* Check the global error status and the supplied pointers. */
+   if( !astOK ) return result;
+
+/* If the KeyCase attribute is non-zero, return "skey". Otherwise, convert
+   the "skey" string to upper case and return "keybuf". Report an error if
+   the key is too long. */
+   if( !astGetKeyCase( this ) && astOK ) {
+      len = astChrLen( skey );
+      if( len >= blen ) {
+         astError( AST__BIGKEY, "%s(%s): Supplied key '%s' is too long "
+                   "(keys must be no more than %d characters long).",
+                   status, method, astGetClass( this ), skey, blen - 1 );
+      } else {
+         astChrCase( skey, keybuf, 1, blen );
+         result = keybuf;
+      }
+   }
+
+/* Return the result. */
+   return result;
 }
 
 static int ConvertValue( void *raw, int raw_type, void *out, int out_type, int *status ) {
@@ -2827,6 +2987,15 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
          result = getattrib_buff;
       }
 
+/* KeyCase. */
+/* --------- */
+   } else if ( !strcmp( attrib, "keycase" ) ) {
+      ival = astGetKeyCase( this );
+      if ( astOK ) {
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
+      }
+
 /* KeyError. */
 /* --------- */
    } else if ( !strcmp( attrib, "keyerror" ) ) {
@@ -3367,6 +3536,11 @@ void astInitKeyMapVtab_(  AstKeyMapVtab *vtab, const char *name, int *status ) {
    vtab->SetKeyError = SetKeyError;
    vtab->GetKeyError = GetKeyError;
    vtab->TestKeyError = TestKeyError;
+
+   vtab->ClearKeyCase = ClearKeyCase;
+   vtab->SetKeyCase = SetKeyCase;
+   vtab->GetKeyCase = GetKeyCase;
+   vtab->TestKeyCase = TestKeyCase;
 
    vtab->ClearMapLocked = ClearMapLocked;
    vtab->SetMapLocked = SetMapLocked;
@@ -3975,6 +4149,8 @@ c     key
 f     KEY = CHARACTER * ( * ) (Given)
 *        A character string to be stored with the value, which can later
 *        be used to identify the value. Trailing spaces are ignored.
+*        The supplied string is converted to upper case before use if the
+*        KeyCase attribute is currently set to zero.
 c     value
 f     VALUE = <X>type (Given)
 *        The value to be stored. The data type of this value should match the
@@ -3993,8 +4169,6 @@ f     STATUS = INTEGER (Given and Returned)
 f        The global status.
 
 *  Notes:
-*     - Key names are case sensitive, and white space is considered
-*     significant.
 *     - If the supplied key is already in use in the KeyMap, the new value
 *     will replace the old value.
 *     - If the stored value is an AST Object pointer, the Object's reference
@@ -4042,14 +4216,16 @@ c     this is attempted.
 */
 /* Define a macro to implement the function for a specific data type. */
 #define MAKE_MAPPUT0(X,Xtype,Itype,ValExp) \
-static void MapPut0##X( AstKeyMap *this, const char *key, Xtype value, \
+static void MapPut0##X( AstKeyMap *this, const char *skey, Xtype value, \
                         const char *comment, int *status ) { \
 \
 /* Local Variables: */ \
    AstMapEntry *mapentry;  /* Pointer to parent MapEntry structure */ \
    AstMapEntry *oldent;    /* Pointer to existing MapEntry */ \
    Entry0##X *entry;       /* Structure holding the data for the new Entry */ \
+   const char *key;        /* Pointer to key string to use */ \
    char *p;                /* Pointer to next key character */ \
+   char keybuf[ AST__MXKEYLEN + 1 ]; /* Buffer for upper cas key */ \
    int itab;               /* Index of hash table element to use */ \
    int keylen;             /* Length of supplied key string */ \
    int there;              /* Did the entry already exist in the KeyMap? */ \
@@ -4059,6 +4235,10 @@ static void MapPut0##X( AstKeyMap *this, const char *key, Xtype value, \
 \
 /* Perform any necessary checks on the supplied value to be stored. */ \
    CHECK_##X \
+\
+/* Convert the supplied key to upper case if required. */ \
+   key = ConvertKey( this, skey, keybuf, AST__MXKEYLEN + 1, "astMapPut0" #X, \
+                     status ); \
 \
 /* Allocate memory for the new MapEntry. */ \
    entry = astMalloc( sizeof( Entry0##X ) ); \
@@ -4196,6 +4376,8 @@ c     key
 f     KEY = CHARACTER * ( * ) (Given)
 *        A character string to be stored with the values, which can later
 *        be used to identify the values. Trailing spaces are ignored.
+*        The supplied string is converted to upper case before use if the
+*        KeyCase attribute is currently set to zero.
 c     size
 f     SIZE = INTEGER (Given)
 *        The number of elements in the supplied array of values.
@@ -4219,8 +4401,6 @@ f        The global status.
 *  Notes:
 *     - If the supplied key is already in use in the KeyMap, the new values
 *     will replace the old values.
-*     - Key names are case sensitive, and white space is considered
-*     significant.
 
 *  Data Type Codes:
 *     To select the appropriate
@@ -4256,7 +4436,7 @@ c     this is attempted.
 */
 /* Define a macro to implement the function for a specific data type. */
 #define MAKE_MAPPUT1(X,Xtype,Itype,ValExp) \
-static void MapPut1##X( AstKeyMap *this, const char *key, int size, \
+static void MapPut1##X( AstKeyMap *this, const char *skey, int size, \
                         Xtype value[], const char *comment, \
                         int *status ) { \
 \
@@ -4264,6 +4444,8 @@ static void MapPut1##X( AstKeyMap *this, const char *key, int size, \
    AstMapEntry *mapentry;  /* Pointer to parent MapEntry structure */ \
    AstMapEntry *oldent;    /* Pointer to existing MapEntry */ \
    Entry1##X *entry;       /* Structure holding the data for the new Entry */ \
+   char keybuf[ AST__MXKEYLEN + 1 ]; /* Buffer for upper cas key */ \
+   const char *key;        /* Pointer to key string to use */ \
    char *p;                /* Pointer to next key character */ \
    int itab;               /* Index of hash table element to use */ \
    int i;                  /* Loop count */ \
@@ -4275,6 +4457,10 @@ static void MapPut1##X( AstKeyMap *this, const char *key, int size, \
 \
 /* Perform any necessary checks on the supplied value to be stored. */ \
    CHECK_##X \
+\
+/* Convert the supplied key to upper case if required. */ \
+   key = ConvertKey( this, skey, keybuf, AST__MXKEYLEN + 1, "astMapPut1" #X, \
+                     status ); \
 \
 /* Allocate memory for the new MapEntry. */ \
    entry = astMalloc( sizeof( Entry1##X ) ); \
@@ -4486,7 +4672,7 @@ void astMapPut1AId_( AstKeyMap *this, const char *key, int size,
    }
 }
 
-static void MapPutU( AstKeyMap *this, const char *key, const char *comment,
+static void MapPutU( AstKeyMap *this, const char *skey, const char *comment,
                      int *status ) {
 /*
 *++
@@ -4528,6 +4714,8 @@ c     key
 f     KEY = CHARACTER * ( * ) (Given)
 *        A character string to be stored with the value, which can later
 *        be used to identify the value. Trailing spaces are ignored.
+*        The supplied string is converted to upper case before use if the
+*        KeyCase attribute is currently set to zero.
 c     comment
 f     COMMENT = CHARACTER * ( * ) (Given)
 f        A comment string to be stored with the value.
@@ -4538,8 +4726,6 @@ f     STATUS = INTEGER (Given and Returned)
 f        The global status.
 
 *  Notes:
-*     - Key names are case sensitive, and white space is considered
-*     significant.
 *     - If the supplied key is already in use in the KeyMap, the value
 *     associated with the key will be removed.
 
@@ -4549,6 +4735,8 @@ f        The global status.
 /* Local Variables: */
    AstMapEntry *mapentry;  /* Pointer to parent MapEntry structure */
    AstMapEntry *oldent;    /* Pointer to existing MapEntry */
+   char keybuf[ AST__MXKEYLEN + 1 ]; /* Buffer for upper cas key */
+   const char *key;        /* Pointer to key string to use */
    char *p;                /* Pointer to next key character */
    int itab;               /* Index of hash table element to use */
    int keylen;             /* Length of supplied key string */
@@ -4556,6 +4744,10 @@ f        The global status.
 
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Convert the supplied key to upper case if required. */
+   key = ConvertKey( this, skey, keybuf, AST__MXKEYLEN + 1, "astMapPutU",
+                     status );
 
 /* Allocate memory for the new MapEntry. */
    mapentry = astMalloc( sizeof( AstMapEntry ) );
@@ -4657,7 +4849,8 @@ f     THIS = INTEGER (Given)
 c     key
 f     KEY = CHARACTER * ( * ) (Given)
 *        The character string identifying the value to be retrieved. Trailing
-*        spaces are ignored.
+*        spaces are ignored. The supplied string is converted to upper
+*        case before use if the KeyCase attribute is currently set to zero.
 c     value
 f     VALUE = <X>type (Returned)
 c        A pointer to a buffer in which to return the requested value.
@@ -4696,8 +4889,6 @@ c     zero
 f     .FALSE.
 *     value will be returned as the function value. The supplied buffer
 *     will be returned unchanged.
-*     - Key names are case sensitive, and white space is considered
-*     significant.
 *     - If the stored value is a vector value, then the first value in
 *     the vector will be returned.
 c     - A string pointer returned by astMapGet0C is guaranteed to remain valid
@@ -4744,13 +4935,15 @@ f     while AST_MAPGET0I would be used to get an INTEGER, etc.
 */
 /* Define a macro to implement the function for a specific data type. */
 #define MAKE_MAPGET0(X,Xtype,Itype) \
-static int MapGet0##X( AstKeyMap *this, const char *key, Xtype *value, int *status ) { \
+static int MapGet0##X( AstKeyMap *this, const char *skey, Xtype *value, int *status ) { \
 \
 /* Local Variables: */ \
    AstMapEntry *mapentry;  /* Pointer to parent MapEntry structure */ \
+   const char *key;        /* Pointer to key string to use */ \
+   char keybuf[ AST__MXKEYLEN + 1 ]; /* Buffer for upper cas key */ \
    int itab;               /* Index of hash table element to use */ \
-   int result;             /* Returned flag */ \
    int raw_type;           /* Data type of stored value */ \
+   int result;             /* Returned flag */ \
    unsigned long hash;     /* Full width hash value */ \
    void *raw;              /* Pointer to stored value */ \
 \
@@ -4759,6 +4952,10 @@ static int MapGet0##X( AstKeyMap *this, const char *key, Xtype *value, int *stat
 \
 /* Check the global error status. */ \
    if ( !astOK ) return result; \
+\
+/* Convert the supplied key to upper case if required. */ \
+   key = ConvertKey( this, skey, keybuf, AST__MXKEYLEN + 1, "astMapGet0" #X, \
+                     status ); \
 \
 /* Use the hash function to determine the element of the hash table in \
    which the key will be stored. */ \
@@ -5077,6 +5274,8 @@ c     key
 f     KEY = CHARACTER * ( * ) (Given)
 *        The character string identifying the value to be retrieved. Trailing
 *        spaces are ignored.
+*        The supplied string is converted to upper case before use if the
+*        KeyCase attribute is currently set to zero.
 c     mxval
 f     MXVAL = INTEGER (Given)
 *        The number of elements in the
@@ -5120,8 +5319,6 @@ c     zero
 f     .FALSE.
 *     value will be returned as the function value. The supplied array
 *     will be returned unchanged.
-*     - Key names are case sensitive, and white space is considered
-*     significant.
 *     - If the stored value is a scalar value, then the value will be
 *     returned in the first element of the supplied array, and
 c     "nval"
@@ -5173,15 +5370,17 @@ f     while AST_MAPGET1I would be used to get INTEGER values, etc.
 /* Define a macro to implement the function for a specific data type
 (excluding "C" since that needs an extra parameter). */
 #define MAKE_MAPGET1(X,Xtype,Itype) \
-static int MapGet1##X( AstKeyMap *this, const char *key, int mxval, int *nval, Xtype *value, int *status ) { \
+static int MapGet1##X( AstKeyMap *this, const char *skey, int mxval, int *nval, Xtype *value, int *status ) { \
 \
 /* Local Variables: */ \
    AstMapEntry *mapentry;  /* Pointer to parent MapEntry structure */ \
+   const char *key;        /* Pointer to key string to use */ \
+   char keybuf[ AST__MXKEYLEN + 1 ]; /* Buffer for upper cas key */ \
    int i;                  /* Element index */ \
    int itab;               /* Index of hash table element to use */ \
    int nel;                /* Number of elements in raw vector */ \
-   int result;             /* Returned flag */ \
    int raw_type;           /* Data type of stored value */ \
+   int result;             /* Returned flag */ \
    size_t raw_size;        /* Size of a single raw value */ \
    unsigned long hash;     /* Full width hash value */ \
    void *raw;              /* Pointer to stored value */ \
@@ -5192,6 +5391,10 @@ static int MapGet1##X( AstKeyMap *this, const char *key, int mxval, int *nval, X
 \
 /* Check the global error status. */ \
    if ( !astOK ) return result; \
+\
+/* Convert the supplied key to upper case if required. */ \
+   key = ConvertKey( this, skey, keybuf, AST__MXKEYLEN + 1, "astMapGet1" #X, \
+                     status ); \
 \
 /* Use the hash function to determine the element of the hash table in \
    which the key will be stored. */ \
@@ -5766,6 +5969,8 @@ c     key
 f     KEY = CHARACTER * ( * ) (Given)
 *        The character string identifying the value to be retrieved. Trailing
 *        spaces are ignored.
+*        The supplied string is converted to upper case before use if the
+*        KeyCase attribute is currently set to zero.
 c     elem
 f     ELEM = INTEGER (Given)
 *        The index of the required vector element, starting at
@@ -5803,8 +6008,6 @@ f        AST_MAPPUTU). .FALSE.
 c     zero
 f     .FALSE.
 *     value will be returned as the function value.
-*     - Key names are case sensitive, and white space is considered
-*     significant.
 
 c  astMapGetElemC:
 c     The "value" buffer supplied to the astMapGetElemC function should be a
@@ -5852,15 +6055,17 @@ f     value, while AST_MAPGETELEMI would be used to get an INTEGER value, etc.
 /* Define a macro to implement the function for a specific data type
 (excluding "C" since that needs an extra parameter). */
 #define MAKE_MAPGETELEM(X,Xtype,Itype) \
-static int MapGetElem##X( AstKeyMap *this, const char *key, int elem, \
+static int MapGetElem##X( AstKeyMap *this, const char *skey, int elem, \
                           Xtype *value, int *status ) { \
 \
 /* Local Variables: */ \
    AstMapEntry *mapentry;  /* Pointer to parent MapEntry structure */ \
+   const char *key;        /* Pointer to key string to use */ \
+   char keybuf[ AST__MXKEYLEN + 1 ]; /* Buffer for upper cas key */ \
    int itab;               /* Index of hash table element to use */ \
    int nel;                /* Number of elements in raw vector */ \
-   int result;             /* Returned flag */ \
    int raw_type;           /* Data type of stored value */ \
+   int result;             /* Returned flag */ \
    size_t raw_size;        /* Size of a single raw value */ \
    unsigned long hash;     /* Full width hash value */ \
    void *raw;              /* Pointer to stored value */ \
@@ -5870,6 +6075,10 @@ static int MapGetElem##X( AstKeyMap *this, const char *key, int elem, \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return result; \
+\
+/* Convert the supplied key to upper case if required. */ \
+   key = ConvertKey( this, skey, keybuf, AST__MXKEYLEN + 1, "astMapGetElem" #X, \
+                     status ); \
 \
 /* Use the hash function to determine the element of the hash table in \
    which the key will be stored. */ \
@@ -6016,7 +6225,7 @@ MAKE_MAPGETELEM(B,unsigned char,AST__BYTETYPE)
 #undef MAKE_MAPGETELEM
 
 
-static int MapGetElemC( AstKeyMap *this, const char *key, int l, int elem,
+static int MapGetElemC( AstKeyMap *this, const char *skey, int l, int elem,
                         char *value, int *status ) {
 /*
 *  Name:
@@ -6048,6 +6257,8 @@ static int MapGetElemC( AstKeyMap *this, const char *key, int l, int elem,
 
 /* Local Variables: */
    AstMapEntry *mapentry;  /* Pointer to parent MapEntry structure */
+   const char *key;        /* Pointer to key string to use */
+   char keybuf[ AST__MXKEYLEN + 1 ]; /* Buffer for upper cas key */
    const char *cvalue;     /* Pointer to converted string */
    int itab;               /* Index of hash table element to use */
    int nel;                /* Number of elements in raw vector */
@@ -6062,6 +6273,10 @@ static int MapGetElemC( AstKeyMap *this, const char *key, int l, int elem,
 
 /* Check the global error status. */
    if ( !astOK ) return result;
+
+/* Convert the supplied key to upper case if required. */
+   key = ConvertKey( this, skey, keybuf, AST__MXKEYLEN + 1, "astMapGetElemC",
+                     status );
 
 /* Use the hash function to determine the element of the hash table in
    which the key will be stored. */
@@ -6199,7 +6414,7 @@ static int MapGetElemC( AstKeyMap *this, const char *key, int l, int elem,
    return result;
 }
 
-int astMapGetElemAId_( AstKeyMap *this, const char *key, int elem,
+int astMapGetElemAId_( AstKeyMap *this, const char *skey, int elem,
                        AstObject **value, int *status ) {
 /*
 *  Name:
@@ -6234,6 +6449,8 @@ int astMapGetElemAId_( AstKeyMap *this, const char *key, int elem,
 /* Local Variables: */
    AstMapEntry *mapentry;  /* Pointer to parent MapEntry structure */
    AstObject *avalue;      /* Pointer to AstObject */
+   const char *key;        /* Pointer to key string to use */
+   char keybuf[ AST__MXKEYLEN + 1 ]; /* Buffer for upper cas key */
    int itab;               /* Index of hash table element to use */
    int nel;                /* Number of elements in raw vector */
    int raw_type;           /* Data type of stored value */
@@ -6247,6 +6464,10 @@ int astMapGetElemAId_( AstKeyMap *this, const char *key, int elem,
 
 /* Check the global error status. */
    if ( !astOK ) return result;
+
+/* Convert the supplied key to upper case if required. */
+   key = ConvertKey( this, skey, keybuf, AST__MXKEYLEN + 1, "astMapGetElemA",
+                     status );
 
 /* Use the hash function to determine the element of the hash table in
    which the key will be stored. */
@@ -6382,7 +6603,7 @@ int astMapGetElemAId_( AstKeyMap *this, const char *key, int elem,
    return result;
 }
 
-static int MapHasKey( AstKeyMap *this, const char *key, int *status ) {
+static int MapHasKey( AstKeyMap *this, const char *skey, int *status ) {
 /*
 *++
 *  Name:
@@ -6415,6 +6636,8 @@ c     key
 f     KEY = CHARACTER * ( * ) (Given)
 *        The character string identifying the KeyMap entry. Trailing spaces are
 *        ignored.
+*        The supplied string is converted to upper case before use if the
+*        KeyCase attribute is currently set to zero.
 f     STATUS = INTEGER (Given and Returned)
 f        The global status.
 
@@ -6441,6 +6664,8 @@ f     .FALSE.
 
 /* Local Variables: */
    AstMapEntry *mapentry;  /* Pointer to entry in linked list */
+   const char *key;        /* Pointer to key string to use */
+   char keybuf[ AST__MXKEYLEN + 1 ]; /* Buffer for upper cas key */
    int itab;               /* Index of hash table element to use */
    int result;             /* Returned value */
    unsigned long hash;     /* Full width hash value */
@@ -6450,6 +6675,10 @@ f     .FALSE.
 
 /* Check the global error status. */
    if ( !astOK ) return result;
+
+/* Convert the supplied key to upper case if required. */
+   key = ConvertKey( this, skey, keybuf, AST__MXKEYLEN + 1, "astMapHasKey",
+                     status );
 
 /* Use the hash function to determine the element of the hash table in
    which the key will be stored. */
@@ -6469,7 +6698,7 @@ f     .FALSE.
 
 }
 
-static void MapRemove( AstKeyMap *this, const char *key, int *status ) {
+static void MapRemove( AstKeyMap *this, const char *skey, int *status ) {
 /*
 *++
 *  Name:
@@ -6504,17 +6733,25 @@ c     key
 f     KEY = CHARACTER * ( * ) (Given)
 *        The character string identifying the value to be retrieved. Trailing
 *        spaces are ignored.
+*        The supplied string is converted to upper case before use if the
+*        KeyCase attribute is currently set to zero.
 f     STATUS = INTEGER (Given and Returned)
 f        The global status.
 *--
 */
 
 /* Local Variables: */
+   const char *key;        /* Pointer to key string to use */
+   char keybuf[ AST__MXKEYLEN + 1 ]; /* Buffer for upper cas key */
    int itab;               /* Index of hash table element to use */
    unsigned long hash;     /* Full width hash value */
 
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Convert the supplied key to upper case if required. */
+   key = ConvertKey( this, skey, keybuf, AST__MXKEYLEN + 1, "astMapRemove",
+                     status );
 
 /* Use the hash function to determine the element of the hash table in
    which the key will be stored. */
@@ -6524,7 +6761,7 @@ f        The global status.
    (void) FreeMapEntry( RemoveTableEntry( this, itab, key, status ), status );
 }
 
-static void MapRename( AstKeyMap *this, const char *oldkey, const char *newkey,
+static void MapRename( AstKeyMap *this, const char *soldkey, const char *snewkey,
                        int *status ) {
 /*
 *++
@@ -6560,10 +6797,14 @@ c     oldkey
 f     OLDKEY = CHARACTER * ( * ) (Given)
 *        The character string identifying the entry to be renamed. Trailing
 *        spaces are ignored.
+*        The supplied string is converted to upper case before use if the
+*        KeyCase attribute is currently set to zero.
 c     newkey
 f     NEKEY = CHARACTER * ( * ) (Given)
 *        The new character string to associated with the renamed entry.
 *        Trailing spaces are ignored.
+*        The supplied string is converted to upper case before use if the
+*        KeyCase attribute is currently set to zero.
 f     STATUS = INTEGER (Given and Returned)
 f        The global status.
 *--
@@ -6572,6 +6813,10 @@ f        The global status.
 /* Local Variables: */
    AstMapEntry *entry;     /* Pointer to the entry being renamed */
    AstMapEntry *oldent;    /* Pointer to old entry with new name */
+   const char *oldkey;     /* Pointer to key string to use */
+   char oldkeybuf[ AST__MXKEYLEN + 1 ]; /* Buffer for upper cas key */
+   const char *newkey;     /* Pointer to key string to use */
+   char newkeybuf[ AST__MXKEYLEN + 1 ]; /* Buffer for upper cas key */
    char *p;                /* Pointer to next key character */
    int itab;               /* Index of hash table element to use */
    int keylen;             /* Length of supplied key string */
@@ -6580,6 +6825,12 @@ f        The global status.
 
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Convert the supplied keys to upper case if required. */
+   oldkey = ConvertKey( this, soldkey, oldkeybuf, AST__MXKEYLEN + 1,
+                        "astMapRename", status );
+   newkey = ConvertKey( this, snewkey, newkeybuf, AST__MXKEYLEN + 1,
+                        "astMapRename", status );
 
 /* Do nothing if the keys are the same. */
    if( strcmp( oldkey, newkey ) ){
@@ -6598,7 +6849,7 @@ f        The global status.
 /* Store the new key string, and terminate it to exclude any trailing
    spaces. */
          keylen = strlen( newkey );
-         entry->key = astStore( entry->key, newkey, keylen + 1 );
+         entry->key = astStore( (void *) entry->key, newkey, keylen + 1 );
          if( astOK ) {
             p = (char *) entry->key + keylen;
             while( --p >= entry->key ) {
@@ -6707,7 +6958,7 @@ f     AST_MAPSIZE = INTEGER
 
 }
 
-static int MapLenC( AstKeyMap *this, const char *key, int *status ) {
+static int MapLenC( AstKeyMap *this, const char *skey, int *status ) {
 /*
 *++
 *  Name:
@@ -6743,6 +6994,8 @@ c     key
 f     KEY = CHARACTER * ( * ) (Given)
 *        The character string identifying the KeyMap entry. Trailing
 *        spaces are ignored.
+*        The supplied string is converted to upper case before use if the
+*        KeyCase attribute is currently set to zero.
 f     STATUS = INTEGER (Given and Returned)
 f        The global status.
 
@@ -6764,6 +7017,8 @@ c        This does not include the trailing null character.
 
 /* Local Variables: */
    AstMapEntry *mapentry;  /* Pointer to parent MapEntry structure */
+   const char *key;        /* Pointer to key string to use */
+   char keybuf[ AST__MXKEYLEN + 1 ]; /* Buffer for upper cas key */
    int i;                  /* Element index */
    int itab;               /* Index of hash table element to use */
    int l;                  /* Length of formatted vector element */
@@ -6779,6 +7034,10 @@ c        This does not include the trailing null character.
 
 /* Check the global error status. */
    if ( !astOK ) return result;
+
+/* Convert the supplied key to upper case if required. */
+   key = ConvertKey( this, skey, keybuf, AST__MXKEYLEN + 1, "astMapLenC",
+                     status );
 
 /* Use the hash function to determine the element of the hash table in
    which the key will be stored. */
@@ -6902,7 +7161,7 @@ c        This does not include the trailing null character.
 
 }
 
-static int MapLength( AstKeyMap *this, const char *key, int *status ) {
+static int MapLength( AstKeyMap *this, const char *skey, int *status ) {
 /*
 *++
 *  Name:
@@ -6935,6 +7194,8 @@ c     key
 f     KEY = CHARACTER * ( * ) (Given)
 *        The character string identifying the KeyMap entry. Trailing
 *        spaces are ignored.
+*        The supplied string is converted to upper case before use if the
+*        KeyCase attribute is currently set to zero.
 f     STATUS = INTEGER (Given and Returned)
 f        The global status.
 
@@ -6954,6 +7215,8 @@ f     AST_MAPLENGTH = INTEGER
 
 /* Local Variables: */
    AstMapEntry *mapentry;  /* Pointer to entry in linked list */
+   const char *key;        /* Pointer to key string to use */
+   char keybuf[ AST__MXKEYLEN + 1 ]; /* Buffer for upper cas key */
    int itab;               /* Index of hash table element to use */
    int result;             /* Returned value */
    unsigned long hash;     /* Full width hash value */
@@ -6963,6 +7226,10 @@ f     AST_MAPLENGTH = INTEGER
 
 /* Check the global error status. */
    if ( !astOK ) return result;
+
+/* Convert the supplied key to upper case if required. */
+   key = ConvertKey( this, skey, keybuf, AST__MXKEYLEN + 1, "astMapLength",
+                     status );
 
 /* Use the hash function to determine the element of the hash table in
    which the key will be stored. */
@@ -7032,6 +7299,8 @@ c     key
 f     KEY = CHARACTER * ( * ) (Given)
 *        The character string identifying the value to be retrieved. Trailing
 *        spaces are ignored.
+*        The supplied string is converted to upper case before use if the
+*        KeyCase attribute is currently set to zero.
 c     elem
 f     ELEM = INTEGER (Given)
 *        The index of the vector element to modify, starting at
@@ -7068,8 +7337,6 @@ f        AST_ADDCOLUMN.
 *     found but has an undefined value, a new
 *     vector entry with the given name, and data type implied by <X>, is
 *     created and the supplied value is stored in its first entry.
-*     - Key names are case sensitive, and white space is considered
-*     significant.
 
 *  Data Type Codes:
 *     To select the appropriate
@@ -7109,11 +7376,13 @@ f     value, while AST_MAPPUTELEMI would be used to put an INTEGER value, etc.
 /* Define a macro to implement the function for a specific data type
 (excluding "C" since that needs an extra parameter). */
 #define MAKE_MAPPUTELEM(X,Xtype,Itype) \
-static void MapPutElem##X( AstKeyMap *this, const char *key, int elem, \
+static void MapPutElem##X( AstKeyMap *this, const char *skey, int elem, \
                            Xtype value, int *status ) { \
 \
 /* Local Variables: */ \
    AstMapEntry *mapentry;  /* Pointer to parent MapEntry structure */ \
+   const char *key;        /* Pointer to key string to use */ \
+   char keybuf[ AST__MXKEYLEN + 1 ]; /* Buffer for upper cas key */ \
    int itab;               /* Index of hash table element to use */ \
    int nel;                /* Number of elements in raw vector */ \
    int new;                /* Was a new uninitialised element created? */ \
@@ -7127,6 +7396,10 @@ static void MapPutElem##X( AstKeyMap *this, const char *key, int elem, \
 \
 /* Perform any necessary checks on the supplied value to be stored. */ \
    CHECK_##X \
+\
+/* Convert the supplied key to upper case if required. */ \
+   key = ConvertKey( this, skey, keybuf, AST__MXKEYLEN + 1, "astMapPutElem" #X, \
+                     status ); \
 \
 /* Use the hash function to determine the element of the hash table in \
    which the key will be stored. */ \
@@ -7336,7 +7609,7 @@ MAKE_MAPPUTELEM(B,unsigned char,AST__BYTETYPE)
 #undef CHECK_P
 
 
-static int MapType( AstKeyMap *this, const char *key, int *status ) {
+static int MapType( AstKeyMap *this, const char *skey, int *status ) {
 /*
 *++
 *  Name:
@@ -7370,6 +7643,8 @@ c     key
 f     KEY = CHARACTER * ( * ) (Given)
 *        The character string identifying the KeyMap entry. Trailing
 *        spaces are ignored.
+*        The supplied string is converted to upper case before use if the
+*        KeyCase attribute is currently set to zero.
 f     STATUS = INTEGER (Given and Returned)
 f        The global status.
 
@@ -7400,6 +7675,8 @@ f        AST_MAPPUTU).
 
 /* Local Variables: */
    AstMapEntry *mapentry;  /* Pointer to entry in linked list */
+   const char *key;        /* Pointer to key string to use */
+   char keybuf[ AST__MXKEYLEN + 1 ]; /* Buffer for upper cas key */
    int itab;               /* Index of hash table element to use */
    int result;             /* Returned value */
    unsigned long hash;     /* Full width hash value */
@@ -7409,6 +7686,10 @@ f        AST_MAPPUTU).
 
 /* Check the global error status. */
    if ( !astOK ) return result;
+
+/* Convert the supplied key to upper case if required. */
+   key = ConvertKey( this, skey, keybuf, AST__MXKEYLEN + 1, "astMapType",
+                     status );
 
 /* Use the hash function to determine the element of the hash table in
    which the key will be stored. */
@@ -8028,6 +8309,13 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
         && ( nc >= len ) ) {
       astSetSizeGuess( this, ival );
 
+/* KeyCase. */
+/* --------- */
+   } else if ( nc = 0,
+        ( 1 == astSscanf( setting, "keycase= %d %n", &ival, &nc ) )
+        && ( nc >= len ) ) {
+      astSetKeyCase( this, ival );
+
 /* KeyError. */
 /* --------- */
    } else if ( nc = 0,
@@ -8053,6 +8341,71 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
    method for further interpretation. */
    } else {
       (*parent_setattrib)( this_object, setting, status );
+   }
+}
+
+static void SetKeyCase( AstKeyMap *this, int keycase, int *status ) {
+/*
+*+
+*  Name:
+*     astSetKeyCase
+
+*  Purpose:
+*     Set the value of the KeyCase attribute for a KeyMap.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "keymap.h"
+*     void astSetKeyCase( AstKeyMap *this, int keycase )
+
+*  Class Membership:
+*     KeyMap method.
+
+*  Description:
+*     This function sets a new value for the KeyCase attribute of a
+*     KeyMap. It reports an error if the KeyMap contains any entries.
+
+*  Parameters:
+*     this
+*        Pointer to the KeyMap.
+*     keycase
+*        The new attribute value.
+
+*-
+*/
+
+/* Local Variables: */
+   int ok;                    /* Can the KeyCase value be changed? */
+   int itab;                  /* Index into hash table */
+   int newval;                /* New KeyCase value */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Normalise the new value */
+   newval = keycase ? 1 : 0;
+
+/* If the KeyCase value is to be changed, see if the KeyMap is empty. */
+   ok = 1;
+   if( astGetKeyCase( this ) != newval ) {
+      for( itab = 0; itab < this->mapsize; itab++ ) {
+         if( this->nentry[ itab ] > 0 ) {
+            ok = 0;
+            break;
+         }
+      }
+   }
+
+/* If not report an error. */
+   if( !ok ) {
+      astError( AST__NOWRT, "astSetAttrib(KeyMap): Illegal attempt to "
+                "change the KeyCase attribute of a non-empty KeyMap." , status);
+
+/* Otherwise, store the new value. */
+   } else {
+      this->keycase = newval;
    }
 }
 
@@ -8750,6 +9103,11 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
    if ( !strcmp( attrib, "sizeguess" ) ) {
       result = astTestSizeGuess( this );
 
+/* KeyCase. */
+/* --------- */
+   } else if ( !strcmp( attrib, "keycase" ) ) {
+      result = astTestKeyCase( this );
+
 /* KeyError. */
 /* --------- */
    } else if ( !strcmp( attrib, "keyerror" ) ) {
@@ -8862,6 +9220,43 @@ static int TestSizeGuess( AstKeyMap *this, int *status ) {
 *        All KeyMaps have this attribute.
 *att--
 */
+
+/*
+*att++
+*  Name:
+*     KeyCase
+
+*  Purpose:
+*     Are keys case sensitive?
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer (boolean).
+
+*  Description:
+*     This attribute is a boolean value which controls how keys are
+*     used. If KeyCase is zero, then key strings supplied to any method
+*     are automatically converted to upper case before being used. If
+*     KeyCase is non-zero (the default), then supplied key strings are
+*     used without modification.
+*
+*     The value of this attribute can only be changed if the KeyMap is
+*     empty. Its value can be set conveniently when creating the KeyMap.
+*     An error will be reported if an attempt is made to change the
+*     attribute value when the KeyMap contains any entries.
+
+*  Applicability:
+*     KeyMap
+*        All KeyMaps have this attribute.
+*     Table
+*        The Table class over-rides this attribute by forcing it to zero.
+*        That is, keys within a Table are always case insensitive.
+*att--
+*/
+astMAKE_GET(KeyMap,KeyCase,int,1,(this->keycase == -1 ? 1 : this->keycase))
+astMAKE_TEST(KeyMap,KeyCase,( this->keycase != -1 ))
 
 /*
 *att++
@@ -9176,6 +9571,12 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
                                                             status ),
                    "Sorting scheme for keys" );
 
+/* KeyCase. */
+/* --------- */
+   set = TestKeyCase( this, status );
+   ival = set ? GetKeyCase( this, status ) : astGetKeyCase( this );
+   astWriteInt( channel, "KyCas", set, 0, ival, "Are keys case sensitive?" );
+
 /* KeyError. */
 /* --------- */
    set = TestKeyError( this, status );
@@ -9247,9 +9648,13 @@ c     astMapPut0<X> and astMapPut1<X> functions.
 f     AST_MAPPUT0<X> and AST_MAPPUT1<X> functions.
 *
 *     The KeyMap class is used to store a set of values with associated keys
-*     which identify the values. The keys are strings (case-sensitive,
-*     trailing spaces are ignored), and the data type of the values can be
-*     integer, floating point, character string or AST Object pointer. Each
+*     which identify the values. The keys are strings. These may be case
+*     sensitive or insensitive as selected by the KeyCase attribute, and
+*     trailing spaces are ignored. The value associated with a key can be
+*     integer (signed 4 and 2 byte, or unsigned 1 byte), floating point
+*     (single or double precision),
+c     void pointer,
+*     character string or AST Object pointer. Each
 *     value can be a scalar or a one-dimensional vector. A KeyMap is
 *     conceptually similar to a Mapping in that a KeyMap transforms an
 *     input into an output - the input is the key, and the output is the
@@ -9499,6 +9904,7 @@ AstKeyMap *astInitKeyMap_( void *mem, size_t size, int init, AstKeyMapVtab *vtab
       new->mapsize = 0;
       new->table = NULL;
       new->nentry = NULL;
+      new->keycase = -1;
       new->keyerror = -INT_MAX;
       new->maplocked = -INT_MAX;
       new->sortby = -INT_MAX;
@@ -9671,6 +10077,11 @@ AstKeyMap *astLoadKeyMap_( void *mem, size_t size, AstKeyMapVtab *vtab,
 /* ---------- */
       new->sizeguess = astReadInt( channel, "szgss", INT_MAX );
       if ( TestSizeGuess( new, status ) ) SetSizeGuess( new, new->sizeguess, status );
+
+/* KeyCase. */
+/* --------- */
+      new->keycase = astReadInt( channel, "kycas", -INT_MAX );
+      if ( TestKeyCase( new, status ) ) SetKeyCase( new, new->keycase, status );
 
 /* KeyError. */
 /* --------- */
@@ -10102,5 +10513,14 @@ void astClearSortBy_( AstKeyMap *this, int *status ){
 void astSetSortBy_( AstKeyMap *this, int sortby, int *status ){
    if( !astOK ) return;
    (**astMEMBER(this,KeyMap,SetSortBy))(this,sortby,status);
+}
+
+void astClearKeyCase_( AstKeyMap *this, int *status ){
+   if( !astOK ) return;
+   (**astMEMBER(this,KeyMap,ClearKeyCase))(this,status);
+}
+void astSetKeyCase_( AstKeyMap *this, int keycase, int *status ){
+   if( !astOK ) return;
+   (**astMEMBER(this,KeyMap,SetKeyCase))(this,keycase,status);
 }
 

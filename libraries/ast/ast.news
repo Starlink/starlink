@@ -28,6 +28,9 @@ FITS binary table.
 - A new method called astMapRename (AST_MAPRENAME) has been added to rename
 an existing entry in a KeyMap.
 
+- KeyMaps have a new attribute called KeyCase that can be set to zero to
+make the handling of keys case insensitive.
+
 Main Changes in V5.3-2
 -----------------------
 

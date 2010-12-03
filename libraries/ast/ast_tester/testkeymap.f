@@ -17,6 +17,7 @@
 
 c      call ast_watchmemory( 29286 )
 
+      call testcasesens( status )
       call testsorting( status )
 
       map = ast_keymap( ' ', status )
@@ -1198,6 +1199,71 @@ C  Now test sorting existing entries in a KeyMap.
 
 
 
+
+      end
+
+
+
+
+      subroutine testcasesens( status )
+      implicit none
+      include 'AST_PAR'
+      include 'AST_ERR'
+      include 'SAE_PAR'
+
+      integer status, map, l
+      character sval*( AST__SZCHR )
+
+      if( status .ne. sai__ok ) return
+
+      map = ast_keymap( 'KeyCase=0', status )
+      call ast_mapput0i( map, 'Freds', 1999, 'com 1', status )
+
+      if( .not. ast_maphaskey( map, 'fReDs', status ) ) then
+         call stopit( status, 'Error case 1' )
+      endif
+
+      if( ast_mapkey( map, 1, status ) .ne. 'FREDS' ) then
+         call stopit( status, 'Error case 2' )
+      endif
+
+      if( .not. ast_mapget0c( map, 'freds', sval, l, status ) ) then
+         call stopit( status, 'Error case 3' )
+      else if( sval .ne. '1999' ) then
+         call stopit( status, 'Error case 4' )
+      else if( l .ne. 4 ) then
+         call stopit( status, 'Error case 4b' )
+      end if
+
+      call ast_setl( map, 'KeyCase', 0, status );
+
+      if( status .eq. sai__ok ) then
+         call ast_clear( map, 'KeyCase', status )
+         if( status .eq. AST__NOWRT ) then
+            call err_annul( status )
+         else if( status .eq. sai__ok ) then
+            call stopit( status, 'Error case 5' )
+         end if
+      end if
+
+      if( ast_mapsize( map, status ) .ne. 1 ) then
+         call stopit( status, 'Error case 6' )
+      end if
+
+      call ast_mapremove( map, 'freDs', status )
+
+      if( ast_mapsize( map, status ) .ne. 0 ) then
+         call stopit( status, 'Error case 7' )
+      end if
+
+      call ast_clear( map, 'KeyCase', status )
+      call ast_mapput0i( map, 'Freds', 1999, 'com 1', status )
+      if( ast_maphaskey( map, ' fReDs', status ) ) then
+         call stopit( status, 'Error case 8' )
+      endif
+
+
+      call ast_annul( map, status )
 
       end
 

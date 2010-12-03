@@ -989,6 +989,80 @@ double astChr2Double_( const char *str, int *status ) {
    return result;
 }
 
+void astChrCase_( const char *in, char *out, int upper, int blen, int *status ) {
+/*
+*++
+*  Name:
+*     astChrCase
+
+*  Purpose:
+*     Convert a string to upper or lower case.
+
+*  Type:
+*     Public function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     void astChrCase( const char *in, char *out, int upper, int blen, int *status )
+
+*  Description:
+*     This function converts a supplied string to upper or lower case,
+*     storing the result in a supplied buffer. The astStringCase function
+*     is similar, but stores the result in a dynamically allocated buffer.
+
+*  Parameters:
+*     in
+*        Pointer to the null terminated string to be converted. If this
+*        is NULL, the supplied contents of the "out" string are used as
+*        the input string.
+*     out
+*        Pointer to the buffer to receive the converted string. The
+*        length of this buffer is given by "blen". If NULL is supplied
+*        for "in", then the supplied contents of "out" are converted and
+*        written back into "out" over-writing the supplied contents.
+*     upper
+*        If non-zero, the string is converted to upper case. Otherwise it
+*        is converted to lower case.
+*     blen
+*        The length of the output buffer. Ignored if "in" is NULL. No
+*        more than "blen - 1" characters will be copied from "in" to
+*        "out", and a terminating null character will then be added.
+
+*--
+*/
+
+/* Local Variables: */
+   const char *pin;
+   char *pout;
+   int i;
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* The simple case of over-writing the supplied string. */
+   if( ! in ) {
+      pout = out - 1;
+      while( *(++pout) ) *pout = toupper( (int) *pout );
+
+/* If a separate output buffer has been supplied... */
+   } else {
+
+/* Initialise pointers to the input and output buffers. */
+      pin = in;
+      pout = out;
+
+/* Copy the string character by character, converting the case in the
+   process. Start counting from 1, not 0, in order to ensure that we are
+   left with room for a terminating null. */
+      for( i = 1; i < blen && *pin; i++ ) {
+         *(pout++) = toupper( (int) *(pin++) );
+      }
+
+/* Terminate the returned string. */
+      *pout = 0;
+   }
+}
+
 int astChrMatch_( const char *str1, const char *str2, int *status ) {
 /*
 *++
@@ -3546,7 +3620,8 @@ char *astStringCase_( const char *string, int upper, int *status ) {
 
 *  Description:
 *     This function converts a supplied string to upper or lower case,
-*     storing the result in dynamically allocated memory.
+*     storing the result in dynamically allocated memory. The astChrCase
+*     function is similar, but stores the result in a supplied buffer.
 
 *  Parameters:
 *     string
