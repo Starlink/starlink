@@ -18,10 +18,10 @@ f     AST_MAPGET... and AST_MAPPUT...
 *     methods provided by the KeyMap class should be used for storing and
 *     retrieving values from individual cells within a Table. Each entry
 *     in the KeyMap represents a single cell of the table and has an
-*     associated key of the form "<COL>(i)" where "<COL>" is the name of a
-*     table column and "i" is the row index (the first row is row 1). Keys
-*     of this form should always be used when using KeyMap methods to access
-*     entries within a Table.
+*     associated key of the form "<COL>(i)" where "<COL>" is the
+*     upper-case name of a table column and "i" is the row index (the
+*     first row is row 1). Keys of this form should always be used when
+*     using KeyMap methods to access entries within a Table.
 *
 *     Columns must be declared using the
 c     astAddColumn
@@ -32,7 +32,8 @@ f     AST_ADDCOLUMN
 *     supported by the KeyMap class. Multi-dimensional arrays may also be
 *     stored, but these must be vectorised when storing and retrieving
 *     them within a table cell. All cells within a single column must
-*     have the same type and shape (specified when the column is declared).
+*     have the same type and shape, as specified when the column is added
+*     to the Table.
 *
 *     Note - since accessing entries within a KeyMap is a relatively slow
 *     process, it is not recommended to use the Table class to store
@@ -45,6 +46,11 @@ f     AST_ADDCOLUMN
 *     In addition to those attributes common to all KeyMaps, every
 *     Table also has the following attributes:
 *
+*     - ColumnLenC(column): The largest string length of any value in a column
+*     - ColumnLength(column): The number of elements in each value in a column
+*     - ColumnNdim(column): The number of axes spanned by each value in a column
+*     - ColumnType(column): The data type of each value in a column
+*     - ColumnUnit(column): The unit string describing each value in a column
 *     - Ncolumn: The number of columns currently in the Table
 *     - Nrow: The number of rows currently in the Table
 
@@ -56,21 +62,13 @@ f     following routines may also be applied to all Tables:
 *
 c     - astAddColumn: Add a new column definition to a Table.
 c     - astColumnName: Return the name of the column with a given index
-c     - astColumnNdim: Return the number of dimensions for a column
-c     - astColumnLenC: Get the maximum length of a named character column
 c     - astColumnShape: Return the shape of the values in a named column
-c     - astColumnType: Return the data type of the values in a named column
-c     - astColumnUnit: Return the unit string for a named column
 c     - astPurgeRows: Remove all empty rows from a Table.
 c     - astRemoveColumn: Remove a column from a Table.
 c     - astRemoveRow: Remove a row from a Table.
 f     - AST_ADDCOLUMN: Add a new column definition to a Table.
-f     - AST_COLUMNLENC: Get the maximum length of a named character column
 f     - AST_COLUMNNAME: Return the name of the column with a given index
-f     - AST_COLUMNNDIM: Return the number of dimensions for a column
 f     - AST_COLUMNSHAPE: Return the shape of the values in a named column
-f     - AST_COLUMNTYPE: Return the data type of the values in a named column
-f     - AST_COLUMNUNIT: Return the unit string for a named column
 f     - AST_PURGEROWS: Remove all empty rows from a Table.
 f     - AST_REMOVECOLUMN: Remove a column from a Table.
 f     - AST_REMOVEROW: Remove a row from a Table.
@@ -112,11 +110,16 @@ f     - AST_REMOVEROW: Remove a row from a Table.
 #define astCLASS Table
 
 /* Fixed KeyMap entry names */
+#define LENGTH "Length"
 #define NAME "Name"
-#define TYPE "Type"
-#define SHAPE "Shape"
 #define NROW "Nrow"
+#define SHAPE "Shape"
+#define SIZE "Size"
+#define TYPE "Type"
 #define UNIT "Unit"
+
+/* A function macro that puts quotes around a value */
+#define STRING(w) #w
 
 /* Include files. */
 /* ============== */
@@ -138,8 +141,7 @@ f     - AST_REMOVEROW: Remove a row from a Table.
 
 /* C header files. */
 /* --------------- */
-#include <float.h>
-#include <math.h>
+#include <ctype.h>
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -155,6 +157,8 @@ static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
 static const char *(* parent_getattrib)( AstObject *, const char *, int * );
+static void (* parent_setkeycase)( AstKeyMap *, int, int * );
+static void (* parent_clearkeycase)( AstKeyMap *, int * );
 static int (* parent_equal)( AstObject *, AstObject *, int * );
 static int (* parent_getobjsize)( AstObject *, int * );
 static int (* parent_mapget0a)( AstKeyMap *, const char *, AstObject * *, int *);
@@ -258,11 +262,13 @@ AstTable *astTableId_( const char *, ... );
 /* ======================================== */
 static AstKeyMap *ColumnProps( AstTable *, int * );
 static const char *ColumnName( AstTable *, int index, int * );
+static const char *GetColumnUnit( AstTable *, const char *, int * );
 static const char *TypeString( int );
-static int ColumnLenC( AstTable *, const char *, int * );
-static int ColumnNdim( AstTable *, const char *, int * );
-static int ColumnType( AstTable *, const char *, int * );
 static int Equal( AstObject *, AstObject *, int * );
+static int GetColumnLenC( AstTable *, const char *, int * );
+static int GetColumnLength( AstTable *, const char *, int * );
+static int GetColumnNdim( AstTable *, const char *, int * );
+static int GetColumnType( AstTable *, const char *, int * );
 static int GetNcolumn( AstTable *, int * );
 static int GetObjSize( AstObject *, int * );
 static int MapGet0A( AstKeyMap *, const char *, AstObject **, int * );
@@ -320,9 +326,11 @@ static void MapPutElemI( AstKeyMap *, const char *, int, int, int * );
 static void MapPutElemP( AstKeyMap *, const char *, int, void *, int * );
 static void MapPutElemS( AstKeyMap *, const char *, int, short int, int * );
 static void MapPutU( AstKeyMap *, const char *, const char *, int * );
+static void PurgeRows( AstTable *, int * );
 static void RemoveColumn( AstTable *, const char *, int * );
 static void RemoveRow( AstTable *, int, int * );
-static void PurgeRows( AstTable *, int * );
+static void SetKeyCase( AstKeyMap *, int, int * );
+static void ClearKeyCase( AstKeyMap *, int * );
 
 #if defined(THREAD_SAFE)
 static int ManageLock( AstObject *, int, int, AstObject **, int * );
@@ -365,9 +373,9 @@ f     CALL AST_ADDCOLUMN( THIS, NAME, TYPE, NDIM, DIMS, UNIT, STATUS )
 *     Table method.
 
 *  Description:
-*     Adds the definition of a new column to the supplied table. Initially, the
-*     column contains a null value for every row. Values may be added subsequently
-*     using the methods of the KeyMap class.
+*     Adds the definition of a new column to the supplied table. Initially,
+*     the column is empty. Values may be added subsequently using the
+*     methods of the KeyMap class.
 
 *  Parameters:
 c     this
@@ -376,7 +384,7 @@ f     THIS = INTEGER (Given)
 c     name
 f     NAME = CHARACTER * ( * ) (Given)
 *        The column name. Trailing spaces are ignored (all other spaces
-*        are significant). Case is significant.
+*        are significant). The supplied string is converted to upper case.
 c     type
 f     TYPE = INTEGER (Given)
 *        The data type associated with the column. See "Applicability:"
@@ -578,7 +586,9 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
 */
 
 /* Local Variables: */
-   AstTable *this;               /* Pointer to the Table structure */
+   AstTable *this;
+   int nc;
+   int len;
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -586,14 +596,28 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
 /* Obtain a pointer to the Table structure. */
    this = (AstTable *) this_object;
 
+/* Get the length of the attribute string. */
+   len = strlen( attrib );
+
 /* Check the attribute name and clear the appropriate attribute. */
    /* None yet */
+
+/* Define a macro to see if the attribute string matches any of the
+   read-only column attributes of this class. */
+#define MATCH(attr) \
+        ( nc = 0, ( 0 == astSscanf( attrib, attr "(%*s)%n", &nc ) ) && \
+                  ( nc >= len ) )
 
 /* If the name was not recognised, test if it matches any of the
    read-only attributes of this class. If it does, then report an
    error. */
    if ( !strcmp( attrib, "nrow" ) ||
-        !strcmp( attrib, "ncolumn" ) ) {
+        !strcmp( attrib, "ncolumn" ) ||
+        MATCH( "columnlenc" ) ||
+        MATCH( "columnlength" ) ||
+        MATCH( "columnndim" ) ||
+        MATCH( "columntype" ) ||
+        MATCH( "columnunit" ) ) {
       astError( AST__NOWRT, "astClear: Invalid attempt to clear the \"%s\" "
                 "value for a %s.", status, attrib, astGetClass( this ) );
       astError( AST__NOWRT, "This is a read-only attribute." , status);
@@ -603,110 +627,40 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
    } else {
       (*parent_clearattrib)( this_object, attrib, status );
    }
+
+#undef MATCH
+
 }
 
-static int ColumnLenC( AstTable *this, const char *column, int *status ) {
+static void ClearKeyCase( AstKeyMap *this, int *status ) {
 /*
-*++
 *  Name:
-c     astColumnLenC
-f     AST_COLUMNLENC
+*     ClearKeyCase
 
 *  Purpose:
-*     Get the maximum formatted length of any value in a column.
+*     Clear the KeyCase attribute value for a Table.
 
 *  Type:
-*     Public virtual function.
+*     Private function.
 
 *  Synopsis:
-c     #include "table.h"
-c     int astColumnLenC( AstTable *this, const char *column )
-f     RESULT = AST_COLUMNLENC( THIS, COLUMN, STATUS )
+*     #include "keymape.h"
+*     void ClearKeyCase( AstKeyMap *this, int *status )
 
 *  Class Membership:
-*     Table method.
+*     Table member function (over-rides the astClearKeyCase protected
+*     method inherited from the KeyMap class).
 
 *  Description:
-*     This function returns the minimum length which a character variable
-*     must have in order to be able to store the longest value currently
-*     present (at any row) in a specified column of the supplied Table. If
-*     the named column holds vector values, then the returned value is
-*     the length of the longest element of the vector value.
+*     This function clears the value of the KeyCase attribute for a
+*     Table. For a Table, the KeyCase attribute cannot be changed so this
+*     function exits without action.
 
 *  Parameters:
-c     this
-f     THIS = INTEGER (Given)
+*     this
 *        Pointer to the Table.
-c     column
-f     COLUMN = CHARACTER * ( * ) (Given)
-*        The character string holding the name of the column. Trailing
-*        spaces are ignored.
-f     STATUS = INTEGER (Given and Returned)
-f        The global status.
-
-*  Returned Value:
-c     astColumnLenC()
-f     AST_COLUMNLENC = INTEGER
-*        The length (i.e. number of characters) of the longest formatted
-*        value associated with the named column.
-c        This does not include the trailing null character.
-
-*  Notes:
-*     - Automatic data type conversion occurs if the named column holds
-*     numerical values.
-*     - A function value of zero will be returned without error if the
-*     named column does not exist  or cannot be formatted as a character
-*     string.
-*     - A function value of zero will be returned if an error has already
-*     occurred, or if this function should fail for any reason.
-
-*--
 */
 
-/* Local Variables: */
-   AstKeyMap *cols;        /* KeyMap holding column definitions */
-   char key[ AST__MXCOLNAMLEN + 24 ]; /* Current cell key string */
-   int irow;               /* Current row index */
-   int len;                /* Length needed to format current cell */
-   int nrow;               /* Number of rows in table */
-   int result;             /* Returned value */
-
-/* Initialise */
-   result = 0;
-
-/* Check the global error status. */
-   if ( !astOK ) return result;
-
-/* Get the KeyMap holding information about all columns. */
-   cols = astColumnProps( this );
-
-/* Check the table contains the requested column. */
-   if( astMapHasKey( cols, column ) ) {
-
-/* Loop round all rows in the table. */
-      nrow = astGetNrow( this );
-      for( irow = 1; irow <= nrow; irow++ ) {
-
-/* Format the cell name. */
-         sprintf( key, "%s(%d)", column, irow );
-
-/* Get the maximum length needed to format a string in the current
-   row/column. */
-         len = astMapLenC( this, key );
-
-/* Return the largest value found for any row. */
-         if( len > result ) result = len;
-      }
-   }
-
-/* Free resources */
-   cols = astAnnul( cols );
-
-/* Return AST__BADTYPE if an error occurred. */
-   if( !astOK ) result = 0;
-
-/* Return the result. */
-   return result;
 }
 
 static const char *ColumnName( AstTable *this, int index, int *status ) {
@@ -759,9 +713,10 @@ f        The global status.
 
 *  Returned Value:
 c     astColumnName()
-c        A pointer to a null-terminated string containing the column name.
+c        A pointer to a null-terminated string containing the
 f     AST_COLUMNNAME = CHARACTER * ( AST__SZCHR )
-f        The column name.
+f        The
+*        upper case column name.
 
 *  Notes:
 c     - The returned pointer is guaranteed to remain valid and the
@@ -803,88 +758,6 @@ f     reason.
    cols = astAnnul( cols );
 
 /* Return a pointer to the required column name. */
-   return result;
-}
-
-static int ColumnNdim( AstTable *this, const char *column, int *status ) {
-/*
-*++
-*  Name:
-c     astColumnNdim
-f     AST_COLUMNNDIM
-
-*  Purpose:
-*     Get the number of dimensions for a column in a Table.
-
-*  Type:
-*     Public virtual function.
-
-*  Synopsis:
-c     #include "table.h"
-c     int astColumnNdim( AstTable *this, const char *column )
-f     RESULT = AST_COLUMNNDIM( THIS, COLUMN, STATUS )
-
-*  Class Membership:
-*     Table method.
-
-*  Description:
-*     This function returns the number of dimensions spanned by the
-*     values stored in the cells of a named column in a Table. Scalar
-*     values have zero dimensions, images have two, cubes have three,
-*     etc.
-
-*  Parameters:
-c     this
-f     THIS = INTEGER (Given)
-*        Pointer to the Table.
-c     column
-f     COLUMN = CHARACTER * ( * ) (Given)
-*        The character string holding the name of the column. Trailing
-*        spaces are ignored.
-f     STATUS = INTEGER (Given and Returned)
-f        The global status.
-
-*  Returned Value:
-c     astColumnNdim()
-f     AST_COLUMNNDIM = INTEGER
-*        The number of dimensions - zero for a scalar.
-
-*  Notes:
-*     - A function value of zero will be returned if an error has
-*     already occurred, or if this function should fail for any reason.
-
-*--
-*/
-
-/* Local Variables: */
-   AstKeyMap *cols;        /* KeyMap holding column definitions */
-   AstKeyMap *col_km;      /* Pointer to KeyMap holding column info */
-   int result;             /* Returned value */
-
-/* Initialise */
-   result = 0;
-
-/* Check the global error status. */
-   if ( !astOK ) return result;
-
-/* Get the KeyMap holding information about all columns. */
-   cols = astColumnProps( this );
-
-/* Get the KeyMap holding information about the requested column. */
-   if( astMapGet0A( cols, column, &col_km ) ) {
-
-/* Get the number of dimensions. */
-      result = astMapLength( col_km, SHAPE );
-
-/* Free resources */
-      col_km = astAnnul( col_km );
-   }
-   cols = astAnnul( cols );
-
-/* Return AST__BADTYPE if an error occurred. */
-   if( !astOK ) result = 0;
-
-/* Return the result. */
    return result;
 }
 
@@ -967,7 +840,7 @@ f     THIS = INTEGER (Given)
 *        Pointer to the Table.
 c     column
 f     COLUMN = CHARACTER * ( * ) (Given)
-*        The character string holding the name of the column. Trailing
+*        The character string holding the upper case name of the column. Trailing
 *        spaces are ignored.
 c     mxdim
 f     MXDIM = INTEGER (Given)
@@ -1014,6 +887,7 @@ f     NDIM
 /* Check the inherited status. */
    if( !astOK ) return;
 
+
 /* Get the KeyMap holding information about the requested column. */
    cols = astColumnProps( this );
    if( astMapGet0A( cols, column, &col_km ) ) {
@@ -1024,7 +898,7 @@ f     NDIM
 /* Fill excess array elements with 1. */
       for( idim = *ndim; idim < mxdim; idim++ ) dims[ idim ] = 1;
 
-/* Annul the KeyMap pointer. */
+/* Free resources. */
       col_km = astAnnul( col_km );
    }
    cols = astAnnul( cols );
@@ -1032,193 +906,6 @@ f     NDIM
 /* If an error has occurred, set ndim to zero. */
    if( !astOK ) *ndim = 0;
 
-}
-
-static int ColumnType( AstTable *this, const char *column, int *status ) {
-/*
-*++
-*  Name:
-c     astColumnType
-f     AST_COLUMNTYPE
-
-*  Purpose:
-*     Get the data type of a column in a Table.
-
-*  Type:
-*     Public virtual function.
-
-*  Synopsis:
-c     #include "table.h"
-c     int astColumnType( AstTable *this, const char *column )
-f     RESULT = AST_COLUMNTYPE( THIS, COLUMN, STATUS )
-
-*  Class Membership:
-*     Table method.
-
-*  Description:
-*     This function returns a value indicating the data type of a
-*     named column in a Table. This is the data type which was used
-*     when the column was added to the Table using
-c     astAddColumn.
-f     AST_ADDCOLUMN.
-
-*  Parameters:
-c     this
-f     THIS = INTEGER (Given)
-*        Pointer to the Table.
-c     column
-f     COLUMN = CHARACTER * ( * ) (Given)
-*        The character string holding the name of the column. Trailing
-*        spaces are ignored.
-f     STATUS = INTEGER (Given and Returned)
-f        The global status.
-
-*  Returned Value:
-c     astColumnType()
-f     AST_COLUMNTYPE = INTEGER
-*        One of AST__INTTYPE (for integer), AST__SINTTYPE (for
-c        short int),
-f        INTEGER*2),
-*        AST__BYTETYPE (for
-c        unsigned bytes - i.e. unsigned chars),
-f        bytes),
-*        AST__DOUBLETYPE (for double
-*        precision floating point), AST__FLOATTYPE (for single
-*        precision floating point), AST__STRINGTYPE (for character string),
-*        AST__OBJECTTYPE (for AST Object pointer), AST__POINTERTYPE (for
-*        arbitrary C pointer) or AST__UNDEFTYPE (for undefined values
-*        created by
-c        astMapPutU).
-f        AST_MAPPUTU).
-*        AST__BADTYPE is returned if the supplied
-*        column is not found in the Table.
-
-*  Notes:
-*     - A function value of AST__BADTYPE will be returned if an error has
-*     already occurred, or if this function should fail for any reason.
-
-*--
-*/
-
-/* Local Variables: */
-   AstKeyMap *cols;        /* Pointer to KeyMap holding all column info */
-   AstKeyMap *col_km;      /* Pointer to KeyMap holding requested column info */
-   int result;             /* Returned value */
-
-/* Initialise */
-   result = AST__BADTYPE;
-
-/* Check the global error status. */
-   if ( !astOK ) return result;
-
-/* Get the KeyMap holding information about the requested column. */
-   cols = astColumnProps( this );
-   if( astMapGet0A( cols, column, &col_km ) ) {
-
-/* Get the column data type. */
-      (void) astMapGet0I( col_km, TYPE, &result );
-
-/* Annul the KeyMap pointer. */
-      col_km = astAnnul( col_km );
-   }
-   cols = astAnnul( cols );
-
-/* Return AST__BADTYPE if an error occurred. */
-   if( !astOK ) result = AST__BADTYPE;
-
-/* Return the result. */
-   return result;
-}
-
-static const char *ColumnUnit( AstTable *this, const char *column, int *status ) {
-/*
-*++
-*  Name:
-c     astColumnUnit
-f     AST_COLUMNUNIT
-
-*  Purpose:
-*     Get the unit string for a column in a Table.
-
-*  Type:
-*     Public virtual function.
-
-*  Synopsis:
-c     #include "table.h"
-c     const char *astColumnUnit( AstTable *this, const char *column )
-f     RESULT = AST_COLUMNUNIT( THIS, COLUMN, STATUS )
-
-*  Class Membership:
-*     Table method.
-
-*  Description:
-*     This function returns the unit string for a named column in a Table.
-*     This is the unit string that was provided when the column was added to
-*     the Table using
-c     astAddColumn.
-f     AST_ADDCOLUMN.
-
-*  Parameters:
-c     this
-f     THIS = INTEGER (Given)
-*        Pointer to the Table.
-c     column
-f     COLUMN = CHARACTER * ( * ) (Given)
-*        The character string holding the name of the column. Trailing
-*        spaces are ignored.
-f     STATUS = INTEGER (Given and Returned)
-f        The global status.
-
-*  Returned Value:
-c     astColumnUnit()
-c        A pointer to a null-terminated string containing the column units.
-f     AST_COLUMNUNIT = CHARACTER * ( AST__SZCHR )
-f        The column units.
-
-*  Notes:
-c     - The returned pointer is guaranteed to remain valid and the
-c     string to which it points will not be over-written for a total
-c     of 50 successive invocations of this function. After this, the
-c     memory containing the string may be re-used, so a copy of the
-c     string should be made if it is needed for longer than this.
-c     - A NULL pointer will be returned if this function is invoked
-c     with the AST error status set, or if it should fail for any
-c     reason.
-f     - A blank string will be returned if this function is invoked
-f     with STATUS set to an error value, or if it should fail for any
-f     reason.
-
-*--
-*/
-
-/* Local Variables: */
-   AstKeyMap *col_km;    /* Pointer to KeyMap holding requested column info */
-   AstKeyMap *cols;      /* Pointer to KeyMap holding all column info */
-   const char *result;   /* Returned value */
-
-/* Initialise */
-   result = NULL;
-
-/* Check the global error status. */
-   if ( !astOK ) return result;
-
-/* Get the KeyMap holding information about the requested column. */
-   cols = astColumnProps( this );
-   if( astMapGet0A( cols, column, &col_km ) ) {
-
-/* Get the column unit string. */
-      (void) astMapGet0C( col_km, UNIT, &result );
-
-/* Annul the KeyMap pointer. */
-      col_km = astAnnul( col_km );
-   }
-   cols = astAnnul( cols );
-
-/* Return NULL if an error occurred. */
-   if( !astOK ) result = NULL;
-
-/* Return the result. */
-   return result;
 }
 
 static int Equal( AstObject *this_object, AstObject *that_object, int *status ) {
@@ -1352,9 +1039,12 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 
 /* Local Variables: */
    astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
+   char cname[ AST__MXCOLNAMLEN + 1 ]; /* Column name */
    AstTable *this;               /* Pointer to the Table structure */
    const char *result;           /* Pointer value to return */
    int ival;                     /* Int attribute value */
+   int len;                      /* Length of attrib string */
+   int nc;                       /* No. characters read by astSscanf */
 
 /* Initialise. */
    result = NULL;
@@ -1368,10 +1058,16 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 /* Obtain a pointer to the Table structure. */
    this = (AstTable *) this_object;
 
+/* Obtain the length of the attrib string. */
+   len = strlen( attrib );
+
 /* Compare "attrib" with each recognised attribute name in turn,
    obtaining the value of the required attribute. If necessary, write
    the value into "getattrib_buff" as a null terminated string in an
    appropriate format.  Set "result" to point at the result string. */
+
+/* Table properties */
+/* ================ */
 
 /* Ncolumn */
 /* ------- */
@@ -1391,11 +1087,523 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
          result = getattrib_buff;
       }
 
+
+
+/* Column properties */
+/* ================= */
+
+/* A macro that gives the scannf pattern to test for a given column
+   property. Needed since the buffer length is defined by a macro
+   (AST__MXCOLNAMLEN). */
+#define PATTERN(cnam,blen) #cnam "(%" STRING(blen) "[^()])%n"
+
+/* ColumnNdim */
+   } else if ( nc = 0,
+             ( 1 == astSscanf( attrib, PATTERN(columnndim,AST__MXCOLNAMLEN),
+                               cname, &nc ) ) && ( nc >= len ) ) {
+      ival = astGetColumnNdim( this, cname );
+      if ( astOK ) {
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
+      }
+
+/* ColumnLenC */
+   } else if ( nc = 0,
+             ( 1 == astSscanf( attrib, PATTERN(columnlenc,AST__MXCOLNAMLEN),
+                               cname, &nc ) ) && ( nc >= len ) ) {
+      ival = astGetColumnLenC( this, cname );
+      if ( astOK ) {
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
+      }
+
+/* ColumnType */
+   } else if ( nc = 0,
+             ( 1 == astSscanf( attrib, PATTERN(columntype,AST__MXCOLNAMLEN),
+                               cname, &nc ) ) && ( nc >= len ) ) {
+      ival = astGetColumnType( this, cname );
+      if ( astOK ) {
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
+      }
+
+/* ColumnLength */
+   } else if ( nc = 0,
+             ( 1 == astSscanf( attrib, PATTERN(columnlength,AST__MXCOLNAMLEN),
+                               cname, &nc ) ) && ( nc >= len ) ) {
+      ival = astGetColumnLength( this, cname );
+      if ( astOK ) {
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
+      }
+
+/* ColumnUnit */
+   } else if ( nc = 0,
+             ( 1 == astSscanf( attrib, PATTERN(columnunit,AST__MXCOLNAMLEN),
+                               cname, &nc ) ) && ( nc >= len ) ) {
+      result = astGetColumnUnit( this, cname );
+
+#undef PATTERN
+
+
+/* Unknown attributes */
+/* ================== */
+
 /* If the attribute name was not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
       result = (*parent_getattrib)( this_object, attrib, status );
    }
+
+/* Return the result. */
+   return result;
+}
+
+static int GetColumnLenC( AstTable *this, const char *column, int *status ) {
+/*
+*+
+*  Name:
+*     astGetColumnLenC
+
+*  Purpose:
+*     Get the maximum formatted length of any value in a column.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "table.h"
+*     int astGetColumnLenC( AstTable *this, const char *column )
+
+*  Class Membership:
+*     Table method.
+
+*  Description:
+*     This function returns the minimum length which a character variable
+*     must have in order to be able to store the longest value currently
+*     present (at any row) in a specified column of the supplied Table. If
+*     the named column holds vector values, then the returned value is
+*     the length of the longest element of the vector value.
+
+*  Parameters:
+*     this
+*        Pointer to the Table.
+*     column
+*        The character string holding the upper-case name of the column.
+*        Trailing spaces are ignored. An error is reported if the supplied
+*        column is not found in the Table.
+
+*  Returned Value:
+*     The length (i.e. number of characters) of the longest formatted
+*     value associated with the named column. This does not include the
+*     trailing null character.
+
+*  Notes:
+*     - Automatic data type conversion occurs if the named column holds
+*     numerical values.
+*     - An error will be reported if named column does not exist or cannot
+*     be formatted as a character
+*     string.
+*     - A function value of zero will be returned if an error has already
+*     occurred, or if this function should fail for any reason.
+
+*-
+*/
+
+/* Local Variables: */
+   AstKeyMap *cols;        /* KeyMap holding column definitions */
+   char key[ AST__MXCOLKEYLEN ]; /* Current cell key string */
+   int irow;               /* Current row index */
+   int len;                /* Length needed to format current cell */
+   int nrow;               /* Number of rows in table */
+   int result;             /* Returned value */
+
+/* Initialise */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get the KeyMap holding information about all columns. */
+   cols = astColumnProps( this );
+
+/* Check the table contains the requested column. */
+   if( astMapHasKey( cols, column ) ) {
+
+/* Loop round all rows in the table. */
+      nrow = astGetNrow( this );
+      for( irow = 1; irow <= nrow; irow++ ) {
+
+/* Format the cell name. */
+         sprintf( key, "%s(%d)", column, irow );
+
+/* Get the maximum length needed to format a string in the current
+   row/column. */
+         len = astMapLenC( this, key );
+
+/* Return the largest value found for any row. */
+         if( len > result ) result = len;
+      }
+
+/* Report an error if the column does not exist. */
+   } else if( astOK ) {
+      astError( AST__BADCOL, "astGetColumnLenC(%s): No column named '%s' "
+                "exists in the table.", status, astGetClass( this ), column );
+   }
+
+/* Free resources */
+   cols = astAnnul( cols );
+
+/* Return AST__BADTYPE if an error occurred. */
+   if( !astOK ) result = 0;
+
+/* Return the result. */
+   return result;
+}
+
+static int GetColumnLength( AstTable *this, const char *column, int *status ) {
+/*
+*+
+*  Name:
+*     astGetColumnLength
+
+*  Purpose:
+*     Get the number of elements in each value in a column.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "table.h"
+*     int astGetColumnLength( AstTable *this, const char *column )
+
+*  Class Membership:
+*     Table method.
+
+*  Description:
+*     This function returns the number of elements in each value stored
+*     in a named column. Each value can be a scalar (in which case the
+*     ColumnLength attribute has a value of 1), or a multi-dimensional
+*     array ( in which case the ColumnLength value is equal to the
+*     product of the array dimensions).
+
+*  Parameters:
+*     this
+*        Pointer to the Table.
+*     column
+*        The character string holding the upper-case name of the column.
+*        Trailing spaces are ignored. An error is reported if the supplied
+*        column is not found in the Table.
+
+*  Returned Value:
+*     The number of elements in each column value.
+
+*  Notes:
+*     - An error will be reported if named column does not exist or cannot
+*     be formatted as a character
+*     string.
+*     - A function value of zero will be returned if an error has already
+*     occurred, or if this function should fail for any reason.
+
+*-
+*/
+
+/* Local Variables: */
+   AstKeyMap *col_km;      /* KeyMap holding requested column definition */
+   AstKeyMap *cols;        /* KeyMap holding all column definitions */
+   int *dims;              /* Pointer to array holding dimensions */
+   int idim;               /* Index of dimension */
+   int ndim;               /* Number of dimensions */
+   int result;             /* Returned value */
+
+/* Initialise */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get the KeyMap holding information about all columns. */
+   cols = astColumnProps( this );
+
+/* Get the KeyMap holding information about the requested column. */
+   if( astMapGet0A( cols, column, &col_km ) ) {
+
+/* If the Column properties includes the length, return it. Otherwise,
+   calculate the length and store it in the KeyMap as a column property. */
+      if( ! astMapGet0I( col_km, LENGTH, &result ) ) {
+
+/* Get the number of axes spanned by each column value, and allocate an
+   array big enough to hold the dimensions of these axes. */
+         ndim = astMapLength( col_km, SHAPE );
+         dims = astMalloc( sizeof( int )*ndim );
+         if( astOK ) {
+
+/* Get the dimensions. */
+            astMapGet1I( col_km, SHAPE, ndim, &ndim, dims );
+
+/* Find the number of elements. */
+            result = 1;
+            for( idim = 0; idim < ndim; idim++ ) {
+               result *= dims[ idim ];
+            }
+
+/* Store the result in the column KeyMap. */
+            astMapPut0I( col_km, LENGTH, result, NULL );
+         }
+      }
+
+/* Free resources */
+      col_km = astAnnul( col_km );
+      dims = astFree( dims );
+
+/* Report an error if the column does not exist. */
+   } else if( astOK ) {
+      astError( AST__BADCOL, "astGetColumnLength(%s): No column named '%s' "
+                "exists in the table.", status, astGetClass( this ), column );
+   }
+
+/* Free resources */
+   cols = astAnnul( cols );
+
+/* Return AST__BADTYPE if an error occurred. */
+   if( !astOK ) result = 0;
+
+/* Return the result. */
+   return result;
+}
+
+static int GetColumnNdim( AstTable *this, const char *column, int *status ) {
+/*
+*+
+*  Name:
+*     astGetColumnNdim
+
+*  Purpose:
+*     Get the number of dimensions for a column in a Table.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "table.h"
+*     int astGetColumnNdim( AstTable *this, const char *column )
+
+*  Class Membership:
+*     Table method.
+
+*  Description:
+*     This function attribute holds the number of axes spanned by each value
+*     in a column. If each cell in the column is a scalar, ColumnNdim will
+*     be zero. If each cell in the column is a 1D spectrum, ColumnNdim will
+*     be one. If each cell in the column is a 2D image, ColumnNdim will be
+*     two, etc.
+
+*  Parameters:
+*     this
+*        Pointer to the Table.
+*     column
+*        The character string holding the upper-case name of the column.
+*        Trailing spaces are ignored. An error is reported if the supplied
+*        column is not found in the Table.
+
+*  Returned Value:
+*     The number of dimensions - zero for a scalar.
+
+*  Notes:
+*     - A function value of zero will be returned if an error has
+*     already occurred, or if this function should fail for any reason.
+
+*-
+*/
+
+/* Local Variables: */
+   AstKeyMap *cols;        /* KeyMap holding column definitions */
+   AstKeyMap *col_km;      /* Pointer to KeyMap holding column info */
+   int result;             /* Returned value */
+
+/* Initialise */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get the KeyMap holding information about all columns. */
+   cols = astColumnProps( this );
+
+/* Get the KeyMap holding information about the requested column. */
+   if( astMapGet0A( cols, column, &col_km ) ) {
+
+/* Get the number of dimensions. */
+      result = astMapLength( col_km, SHAPE );
+
+/* Free resources */
+      col_km = astAnnul( col_km );
+
+/* Report an error if the column does not exist. */
+   } else if( astOK ) {
+      astError( AST__BADCOL, "astGetColumnNdim(%s): No column named '%s' "
+                "exists in the table.", status, astGetClass( this ), column );
+   }
+   cols = astAnnul( cols );
+
+/* Return AST__BADTYPE if an error occurred. */
+   if( !astOK ) result = 0;
+
+/* Return the result. */
+   return result;
+}
+
+static int GetColumnType( AstTable *this, const char *column, int *status ) {
+/*
+*+
+*  Name:
+*     astGetColumnType
+
+*  Purpose:
+*     Get the data type of a column in a Table.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "table.h"
+*     int astGetColumnType( AstTable *this, const char *column )
+
+*  Class Membership:
+*     Table method.
+
+*  Description:
+*     This function returns a value indicating the data type of a
+*     named column in a Table. This is the data type which was used
+*     when the column was added to the Table using astAddColumn.
+
+*  Parameters:
+*     this
+*        Pointer to the Table.
+*     column
+*        The character string holding the upper-case name of the column.
+*        Trailing spaces are ignored. An error is reported if the supplied
+*        column is not found in the Table.
+
+*  Returned Value:
+*     One of AST__INTTYPE (for integer), AST__SINTTYPE (for short int),
+*     AST__BYTETYPE (for unsigned bytes - i.e. unsigned chars),
+*     AST__DOUBLETYPE (for double precision floating point),
+*     AST__FLOATTYPE (for single precision floating point), AST__STRINGTYPE
+*     (for character string), AST__OBJECTTYPE (for AST Object pointer),
+*     AST__POINTERTYPE (for arbitrary C pointer) or AST__UNDEFTYPE (for
+*     undefined values created by astMapPutU).
+
+*  Notes:
+*     - A function value of AST__BADTYPE will be returned if an error has
+*     already occurred, or if this function should fail for any reason.
+
+*-
+*/
+
+/* Local Variables: */
+   AstKeyMap *cols;        /* Pointer to KeyMap holding all column info */
+   AstKeyMap *col_km;      /* Pointer to KeyMap holding requested column info */
+   int result;             /* Returned value */
+
+/* Initialise */
+   result = AST__BADTYPE;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get the KeyMap holding information about the requested column. */
+   cols = astColumnProps( this );
+   if( astMapGet0A( cols, column, &col_km ) ) {
+
+/* Get the column data type. */
+      (void) astMapGet0I( col_km, TYPE, &result );
+
+/* Annul the KeyMap pointer. */
+      col_km = astAnnul( col_km );
+
+/* Report an error if the column does not exist. */
+   } else if( astOK ) {
+      astError( AST__BADCOL, "astGetColumnType(%s): No column named '%s' "
+                "exists in the table.", status, astGetClass( this ), column );
+   }
+   cols = astAnnul( cols );
+
+/* Return AST__BADTYPE if an error occurred. */
+   if( !astOK ) result = AST__BADTYPE;
+
+/* Return the result. */
+   return result;
+}
+
+static const char *GetColumnUnit( AstTable *this, const char *column, int *status ) {
+/*
+*+
+*  Name:
+*     astGetColumnUnit
+
+*  Purpose:
+*     Get the unit string for a column in a Table.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "table.h"
+*     const char *astGetColumnUnit( AstTable *this, const char *column )
+
+*  Class Membership:
+*     Table method.
+
+*  Description:
+*     This function returns the unit string for a named column in a Table.
+*     This is the unit string that was provided when the column was added to
+*     the Table using astAddColumn.
+
+*  Parameters:
+*     this
+*        Pointer to the Table.
+*     column
+*        The character string holding the upper-case name of the column.
+*        Trailing spaces are ignored. An error is reported if the supplied
+*        column is not found in the Table.
+
+*  Returned Value:
+*     A pointer to a null-terminated string containing the column units.
+
+*-
+*/
+
+/* Local Variables: */
+   AstKeyMap *col_km;    /* Pointer to KeyMap holding requested column info */
+   AstKeyMap *cols;      /* Pointer to KeyMap holding all column info */
+   const char *result;   /* Returned value */
+
+/* Initialise */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get the KeyMap holding information about the requested column. */
+   cols = astColumnProps( this );
+   if( astMapGet0A( cols, column, &col_km ) ) {
+
+/* Get the column unit string. */
+      (void) astMapGet0C( col_km, UNIT, &result );
+
+/* Annul the KeyMap pointer. */
+      col_km = astAnnul( col_km );
+
+/* Report an error if the column does not exist. */
+   } else if( astOK ) {
+      astError( AST__BADCOL, "astGetColumnUnit(%s): No column named '%s' "
+                "exists in the table.", status, astGetClass( this ), column );
+   }
+   cols = astAnnul( cols );
+
+/* Return NULL if an error occurred. */
+   if( !astOK ) result = NULL;
 
 /* Return the result. */
    return result;
@@ -1594,10 +1802,11 @@ void astInitTableVtab_(  AstTableVtab *vtab, const char *name, int *status ) {
    vtab->SetNrow = SetNrow;
    vtab->GetNcolumn = GetNcolumn;
    vtab->ColumnName = ColumnName;
-   vtab->ColumnLenC = ColumnLenC;
-   vtab->ColumnNdim = ColumnNdim;
-   vtab->ColumnType = ColumnType;
-   vtab->ColumnUnit = ColumnUnit;
+   vtab->GetColumnLenC = GetColumnLenC;
+   vtab->GetColumnLength = GetColumnLength;
+   vtab->GetColumnNdim = GetColumnNdim;
+   vtab->GetColumnType = GetColumnType;
+   vtab->GetColumnUnit = GetColumnUnit;
    vtab->ColumnShape = ColumnShape;
 
 /* Save the inherited pointers to methods that will be extended, and
@@ -1654,6 +1863,8 @@ void astInitTableVtab_(  AstTableVtab *vtab, const char *name, int *status ) {
    OVERRIDE_METHOD(MapPutElem,mapputelem)
    OVERRIDE_METHOD(MapGetElem,mapgetelem)
    OVERRIDE(MapPut,U,mapput,u)
+   OVERRIDE(SetKeyCase,,setkeycase,)
+   OVERRIDE(ClearKeyCase,,clearkeycase,)
 
 /* Remove the macros. */
 #undef OVERRIDE_METHOD
@@ -1827,7 +2038,7 @@ static int ManageLock( AstObject *this_object, int mode, int extra,
 *     - No error is reported if the requested cell cannot be found in the
 *     given KeyMap, but a zero value will be returned as the function value.
 *     The supplied buffer will be returned unchanged.
-*     - Key names are case sensitive, and white space is considered
+*     - Key names are case insensitive, and white space is considered
 *     significant.
 *     - If the stored value is a vector value, then the first value in
 *     the vector will be returned.
@@ -1974,7 +2185,7 @@ MAKE_MAPGET0(B,b,unsigned char,AST__BYTETYPE)
 *     - No error is reported if the requested cell cannot be found in the
 *     given KeyMap, but a zero value will be returned as the function value.
 *     The supplied buffer will be returned unchanged.
-*     - Key names are case sensitive, and white space is considered
+*     - Key names are case insensitive, and white space is considered
 *     significant.
 *     - If the stored value is a scalar value, then the value will be
 *     returned in the first element of the supplied array, and "nval"
@@ -2182,7 +2393,7 @@ static int MapGet1C( AstKeyMap *this_keymap, const char *key, int l, int mxval,
 *     - No error is reported if the requested cell cannot be found in the
 *     given KeyMap, but a zero value will be returned as the function value.
 *     The supplied buffer will be returned unchanged.
-*     - Key names are case sensitive, and white space is considered
+*     - Key names are case insensitive, and white space is considered
 *     significant.
 *     - If the stored value is a scalar value, then the value will be
 *     returned in the first element of the supplied array, and "nval"
@@ -2367,7 +2578,7 @@ static int MapGetElemC( AstKeyMap *this_keymap, const char *key, int l,
 *        Pointer to inherited status value.
 
 *  Notes:
-*     - Key names are case sensitive, and white space is considered
+*     - Key names are case insensitive, and white space is considered
 *     significant.
 *     - The new value will replace any old value already stored in the
 *     Table for the specified cell.
@@ -2500,7 +2711,7 @@ MAKE_MAPPUT0(B,b,unsigned char,AST__BYTETYPE,value)
 *        Pointer to inherited status value.
 
 *  Notes:
-*     - Key names are case sensitive, and white space is considered
+*     - Key names are case insensitive, and white space is considered
 *     significant.
 *     - The new value will replace any old value already stored in the
 *     Table for the specified cell.
@@ -2514,16 +2725,9 @@ static void MapPut1##X( AstKeyMap *this_keymap, const char *key, int size, \
                         int *status ) { \
 \
 /* Local Variables: */ \
-   AstKeyMap *col_km;  /* KeyMap holding details of the requested column */ \
    AstTable *this;     /* Pointer to Table structure */ \
    char colname[ AST__MXCOLNAMLEN + 1 ]; /* Column name read from string */ \
-   int *dims;          /* Array holding dimensions of each cell column */ \
-   int idim;           /* Current axis index */ \
    int irow;           /* Row index within key string */ \
-   int ndim;           /* Number of dimensions for each column cell */ \
-   int nel;            /* Number of elements in each cell column */ \
-   int nval;           /* Number of values returned */ \
-   int type;           /* Data type of the requested column */ \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
@@ -2534,56 +2738,35 @@ static void MapPut1##X( AstKeyMap *this_keymap, const char *key, int size, \
 /* Check the supplied key looks like a table cell key, and get the \
    the column name and the row number. Also checks that the table \
    contains a column with the specified name. */ \
-   if( ParseKey( this, key, 1, colname, &irow, &col_km, "astMapPut1" #X, \
+   if( ParseKey( this, key, 1, colname, &irow, NULL, "astMapPut1" #X, \
                  status ) ) { \
 \
 /* Check the column holds vector values of the type implied by the <X> \
    code in the function name. */ \
-      (void) astMapGet0I( col_km, TYPE, &type ); \
-      if( type != Itype && astOK ) { \
+      if(  astGetColumnType( this, colname ) != Itype && astOK ) { \
          astError( AST__BADTYP, "astMapPut1" #X "(%s): Failed to store " \
                    #Xtype " values for cell \"%s\": column %s holds %s values.", \
                    status, astGetClass( this ), key, colname, \
-                   TypeString( type ) ); \
+                   TypeString( astGetColumnType( this, colname ) ) ); \
       } \
 \
 /* Check the column holds vectors with length equal to the supplied vector. */ \
-      ndim = astMapLength( col_km, SHAPE ); \
-      if( ndim == 0 && astOK ) { \
-         astError( AST__BADTYP, "astMapPut1" #X "(%s): Failed to store a " \
-                   "vector value for cell \"%s\": column %s holds scalar " \
-                   "values.", status, astGetClass( this ), key, colname ); \
-\
-      } else { \
-         dims = astMalloc( sizeof( int )*ndim ); \
-         if( astOK ) { \
-            (void) astMapGet1I( col_km, SHAPE, ndim, &nval, dims ); \
-\
-            nel = 1; \
-            for( idim = 0; idim < ndim && astOK; idim++ ) { \
-               nel *= dims[ idim ]; \
-            } \
-\
-            if( nel != size && astOK ) { \
-               astError( AST__BADTYP, "astMapPut1" #X "(%s): Failed to " \
-                         "store a vector value for cell \"%s\": column " \
-                         "%s needs %d values per cell but %d were supplied.", \
-                         status, astGetClass( this ), key, colname, nel, \
-                         size ); \
+      if( astGetColumnLength( this, colname ) != size && astOK ) { \
+         astError( AST__BADTYP, "astMapPut1" #X "(%s): Failed to " \
+                   "store a vector value for cell \"%s\": column " \
+                   "%s needs %d values per cell but %d were supplied.", \
+                   status, astGetClass( this ), key, colname, \
+                   astGetColumnLength( this, colname ), size ); \
+      } \
 \
 /* If all is OK, update the number of rows in the table if required, and \
    store the vector in the parent KeyMap. */ \
-            } else { \
-               if( irow > astGetNrow( this ) ) astSetNrow( this, irow ); \
-               (*parent_mapput1##Xlc)( this_keymap, key, size, value, \
-                                       comment, status ); \
-            } \
-         } \
-\
-/* Free resources. */ \
-         dims = astFree( dims ); \
+      if( astOK ) { \
+         if( irow > astGetNrow( this ) ) astSetNrow( this, irow ); \
+         (*parent_mapput1##Xlc)( this_keymap, key, size, value, \
+                                 comment, status ); \
       } \
-      col_km = astAnnul( col_km ); \
+\
    } \
 }
 
@@ -2652,7 +2835,7 @@ MAKE_MAPPUT1(B,b,const unsigned char,AST__BYTETYPE,value[i])
 *        Pointer to inherited status value.
 
 *  Notes:
-*     - Key names are case sensitive, and white space is considered
+*     - Key names are case insensitive, and white space is considered
 *     significant.
 *     - The new value will replace any old value already stored in the
 *     Table for the specified cell.
@@ -2672,15 +2855,9 @@ static void MapPutElem##X( AstKeyMap *this_keymap, const char *key, int elem, \
                            Xtype value, int *status ) { \
 \
 /* Local Variables: */ \
-   AstKeyMap *col_km;  /* KeyMap holding details of the requested column */ \
    AstTable *this;     /* Pointer to Table structure */ \
    char colname[ AST__MXCOLNAMLEN + 1 ]; /* Column name read from string */ \
-   int *dims;          /* Array holding dimensions of each cell column */ \
-   int idim;           /* Current axis index */ \
    int irow;           /* Row index within key string */ \
-   int ndim;           /* Number of dimensions for each column cell */ \
-   int nel;            /* Number of elements in each cell column */ \
-   int nval;           /* Number of values returned */ \
    int type;           /* Data type of the requested column */ \
 \
 /* Check the global error status. */ \
@@ -2692,58 +2869,34 @@ static void MapPutElem##X( AstKeyMap *this_keymap, const char *key, int elem, \
 /* Check the supplied key looks like a table cell key, and get the \
    the column name and the row number. Also checks that the table \
    contains a column with the specified name. */ \
-   if( ParseKey( this, key, 1, colname, &irow, &col_km, "astMapPutElem" #X, \
+   if( ParseKey( this, key, 1, colname, &irow, NULL, "astMapPutElem" #X, \
                  status ) ) { \
 \
 /* Check the column holds vector values of the type implied by the <X> \
    code in the function name. */ \
-      (void) astMapGet0I( col_km, TYPE, &type ); \
-      if( type != Itype && astOK ) { \
+      if(  astGetColumnType( this, colname ) != Itype && astOK ) { \
          astError( AST__BADTYP, "astMapPutElem" #X "(%s): Failed to store a " \
                    #Xtype " value in cell \"%s\": column %s holds %s values.", \
                    status, astGetClass( this ), key, colname, \
                    TypeString( type ) ); \
       } \
 \
-/* Check the column holds vectors with length large enough to hold the \
-   supplied element. */ \
-      ndim = astMapLength( col_km, SHAPE ); \
-      if( ndim == 0 && astOK ) { \
-         astError( AST__BADTYP, "astMapPutElem" #X "(%s): Failed to store a " \
-                   "vector element value for cell \"%s\": column %s holds " \
-                   "scalar values.", status, astGetClass( this ), key, \
-                   colname ); \
-\
-      } else { \
-         dims = astMalloc( sizeof( int )*ndim ); \
-         if( astOK ) { \
-            (void) astMapGet1I( col_km, SHAPE, ndim, &nval, dims ); \
-\
-            nel = 1; \
-            for( idim = 0; idim < ndim && astOK; idim++ ) { \
-               nel *= dims[ idim ]; \
-            } \
-\
-            if( nel <= elem && astOK ) { \
-               astError( AST__BADTYP, "astMapPutElem" #X "(%s): Failed to " \
-                         "store a value for element %d (zero-based) of " \
-                         "cell \"%s\": column %s has only %d values per " \
-                         "cell.", status, astGetClass( this ), elem, key, \
-                         colname, nel ); \
+/* Check the column holds vectors with length equal to the supplied vector. */ \
+      if( astGetColumnLength( this, colname ) <= elem && astOK ) { \
+         astError( AST__BADTYP, "astMapPutElem" #X "(%s): Failed to " \
+                   "store a value for element %d (zero-based) of " \
+                   "cell \"%s\": column %s has only %d values per " \
+                   "cell.", status, astGetClass( this ), elem, key, \
+                   colname, astGetColumnLength( this, colname ) ); \
+      } \
 \
 /* If all is OK, update the number of rows in the table if required, and \
    store the value in the parent KeyMap. */ \
-            } else { \
-               if( irow > astGetNrow( this ) ) astSetNrow( this, irow ); \
-               (*parent_mapputelem##Xlc)( this_keymap, key, elem, value, \
-                                       status ); \
-            } \
-         } \
-\
-/* Free resources. */ \
-         dims = astFree( dims ); \
+      if( astOK ) { \
+         if( irow > astGetNrow( this ) ) astSetNrow( this, irow ); \
+         (*parent_mapputelem##Xlc)( this_keymap, key, elem, value, \
+                                    status ); \
       } \
-      col_km = astAnnul( col_km ); \
    } \
 }
 
@@ -2809,7 +2962,7 @@ static void MapPutU( AstKeyMap *this_keymap, const char *key, const char *commen
 *        Pointer to inherited status value.
 
 *  Notes:
-*     - Key names are case sensitive, and white space is considered
+*     - Key names are case insensitive, and white space is considered
 *     significant.
 *     - The new undefined value will replace any old value already stored in
 *     the Table for the specified cell.
@@ -2939,8 +3092,8 @@ static int ParseKey( AstTable *this, const char *key, int report,
 /* If the key looks OK so far... */
       } else {
 
-/* Copy the column name to the returned buffer and terminate it. */
-         strncpy( colname, key, collen );
+/* Convert the column name to upper case and store in the returned buffer. */
+         astChrCase( key, colname, 1, collen + 1 );
          colname[ collen ] = 0;
 
 /* check that the column exists in the Table, returning a pointer to the
@@ -3009,8 +3162,8 @@ f        The global status.
 */
 
 /* Local Variables: */
-   char newkey[ AST__MXCOLNAMLEN + 24 ]; /* New cell key string */
-   char oldkey[ AST__MXCOLNAMLEN + 24 ]; /* Old cell key string */
+   char newkey[ AST__MXCOLKEYLEN + 1 ]; /* New cell key string */
+   char oldkey[ AST__MXCOLKEYLEN + 1 ]; /* Old cell key string */
    const char *col;              /* Column name */
    const char *key;              /* Pointer to key string */
    const char *op;               /* Pointer to opening parenthesis */
@@ -3137,7 +3290,7 @@ f        The global status.
 
 /* Local Variables: */
    AstKeyMap *cols;      /* KeyMap holding column definitions */
-   char key[ AST__MXCOLNAMLEN + 24 ]; /* Cell key string */
+   char key[ AST__MXCOLKEYLEN + 1 ]; /* Cell key string */
    int irow;             /* Row index */
    int namlen;           /* Used length of "name" */
    int nrow;             /* Number of rows in table */
@@ -3215,7 +3368,7 @@ f        The global status.
 
 /* Local Variables: */
    AstKeyMap *cols;              /* KeyMap holding column definitions */
-   char key[ AST__MXCOLNAMLEN + 24 ]; /* Cell key string */
+   char key[ AST__MXCOLKEYLEN + 1 ]; /* Cell key string */
    const char *col;              /* Column name */
    int icol;                     /* Column index */
    int ncol;                     /* Number of columns in table */
@@ -3292,7 +3445,7 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
 */
 
 /* Local Variables: */
-   AstTable *this;              /* Pointer to the Table structure */
+   AstTable *this;               /* Pointer to the Table structure */
    int len;                      /* Length of setting string */
    int nc;                       /* Number of characters read by astSscanf */
 
@@ -3318,10 +3471,19 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
         ( nc = 0, ( 0 == astSscanf( setting, attrib "=%*[^\n]%n", &nc ) ) && \
                   ( nc >= len ) )
 
+#define MATCH2(attrib) \
+        ( nc = 0, ( 0 == astSscanf( setting, attrib "(%*s) =%*[^\n]%n", &nc ) ) && \
+                  ( nc >= len ) )
+
 /* If the attribute was not recognised, use this macro to report an error
    if a read-only attribute has been specified. */
    if ( MATCH( "ncolumn" ) ||
-        MATCH( "nrow" ) ) {
+        MATCH( "nrow" ) ||
+        MATCH2( "columnlenc" ) ||
+        MATCH2( "columnlength" ) ||
+        MATCH2( "columnndim" ) ||
+        MATCH2( "columntype" ) ||
+        MATCH2( "columnunit" ) ) {
       astError( AST__NOWRT, "astSet: The setting \"%s\" is invalid for a %s.", status,
                 setting, astGetClass( this ) );
       astError( AST__NOWRT, "This is a read-only attribute." , status);
@@ -3334,6 +3496,40 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
 
 /* Undefine macros local to this function. */
 #undef MATCH
+#undef MATCH2
+}
+
+static void SetKeyCase( AstKeyMap *this, int keycase, int *status ) {
+/*
+*  Name:
+*     SetKeyCase
+
+*  Purpose:
+*     Set a value for the KeyCase attribute value for a Table.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "keymape.h"
+*     void SetKeyCase( AstKeyMap *this, int keycase, int *status )
+
+*  Class Membership:
+*     Table member function (over-rides the astSetKeyCase protected
+*     method inherited from the KeyMap class).
+
+*  Description:
+*     This function assigns a new valeu to the KeyCase attribute for a
+*     Table. For a Table, the KeyCase attribute cannot be changed so this
+*     function exits without action.
+
+*  Parameters:
+*     this
+*        Pointer to the Table.
+*     keycase
+*        The new value to set.
+*/
+
 }
 
 static int TestAttrib( AstObject *this_object, const char *attrib, int *status ) {
@@ -3379,6 +3575,8 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
 
 /* Local Variables: */
    AstTable *this;               /* Pointer to the Table structure */
+   int len;                      /* Length of attribute string */
+   int nc;                       /* Number of characters read by astSscanf */
    int result;                   /* Result value to return */
 
 /* Initialise. */
@@ -3390,14 +3588,28 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
 /* Obtain a pointer to the Table structure. */
    this = (AstTable *) this_object;
 
+/* Get the length of the attribute string. */
+   len = strlen( attrib );
+
 /* Check the attribute name and test the appropriate attribute. */
    /* None as yet */
+
+/* Define a macro to see if the attribute string matches any of the
+   read-only column attributes of this class. */
+#define MATCH(attr) \
+        ( nc = 0, ( 0 == astSscanf( attrib, attr "(%*s)%n", &nc ) ) && \
+                  ( nc >= len ) )
 
 /* If the name is not recognised, test if it matches any of the
    read-only attributes of this class. If it does, then return
    zero. */
    if ( !strcmp( attrib, "ncolumn" ) ||
-        !strcmp( attrib, "nrow" ) ) {
+        !strcmp( attrib, "nrow" ) ||
+        MATCH( "columnlenc" ) ||
+        MATCH( "columnlength" ) ||
+        MATCH( "columnndim" ) ||
+        MATCH( "columntype" ) ||
+        MATCH( "columnunit" ) ) {
       result = 0;
 
 /* If the attribute is still not recognised, pass it on to the parent
@@ -3408,6 +3620,8 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
 
 /* Return the result, */
    return result;
+
+#undef MATCH
 }
 
 static const char *TypeString( int type ) {
@@ -3487,10 +3701,10 @@ static const char *TypeString( int type ) {
 /*
 *att++
 *  Name:
-*     Nrow
+*     ColumnLenC(column)
 
 *  Purpose:
-*     The number of rows in the table.
+*     The largest string length of any value in a column
 
 *  Type:
 *     Public attribute.
@@ -3499,11 +3713,47 @@ static const char *TypeString( int type ) {
 *     Integer, read-only.
 
 *  Description:
-*     This attribute holds the index of the last row to which any
-*     contents have been added using any of the
-*     astMapPut...
-*     AST_MAPPUT...
-*     functions. The first row has index 1.
+*     This attribute holds the minimum length which a character variable
+*     must have in order to be able to store the longest value currently
+*     present (at any row) in a specified column of the supplied Table.
+c     This does not include room for a trailing null character.
+*     The required column name should be placed inside the parentheses in
+*     the attribute name. If the named column holds vector values, then
+*     the attribute value is the length of the longest element of the
+*     vector value.
+
+*  Applicability:
+*     Table
+*        All Tables have this attribute.
+
+*  Notes:
+*     - If the named column holds numerical values, the length returned
+*     is the length of the largest string that would be generated if the
+*     column values were accessed as strings.
+
+*att--
+*/
+
+/*
+*att++
+*  Name:
+*     ColumnLength(column)
+
+*  Purpose:
+*     The number of elements in each value in a column
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer, read-only.
+
+*  Description:
+*     This attribute holds the number of elements in each value stored
+*     in a named column. Each value can be a scalar (in which case the
+*     ColumnLength attribute has a value of 1), or a multi-dimensional
+*     array ( in which case the ColumnLength value is equal to the
+*     product of the array dimensions).
 
 *  Applicability:
 *     Table
@@ -3511,8 +3761,79 @@ static const char *TypeString( int type ) {
 
 *att--
 */
-astMAKE_GET(Table,Nrow,int,0,this->nrow)
-astMAKE_SET(Table,Nrow,int,nrow,value)
+
+/*
+*att++
+*  Name:
+*     ColumnNdim(column)
+
+*  Purpose:
+*     The number of axes spanned by each value in a column
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer, read-only.
+
+*  Description:
+*     This attribute holds the number of axes spanned by each value in a
+*     column. If each cell in the column is a scalar, ColumnNdim will be
+*     zero. If each cell in the column is a 1D spectrum, ColumnNdim will
+*     be one. If each cell in the column is a 2D image, ColumnNdim will be
+*     two, etc. The required column name should be placed inside the
+*     parentheses in the attribute name.
+
+*  Applicability:
+*     Table
+*        All Tables have this attribute.
+
+*att--
+*/
+
+/*
+*att++
+*  Name:
+*     ColumnType(column)
+
+*  Purpose:
+*     The data type of each value in a column
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer, read-only.
+
+*  Description:
+*     This attribute holds a integer value indicating the data type of
+*     a named column in a Table. This is the data type which was used
+*     when the column was added to the Table using astAddColumn. The
+*     required column name should be placed inside the parentheses in
+*     the attribute name.
+*
+*     The attribute value will be one of AST__INTTYPE (for integer),
+*     AST__SINTTYPE (for
+c     short int),
+f     INTEGER*2),
+*     AST__BYTETYPE (for
+c     unsigned bytes - i.e. unsigned chars),
+f     bytes),
+*     AST__DOUBLETYPE (for double
+*     precision floating point), AST__FLOATTYPE (for single
+*     precision floating point), AST__STRINGTYPE (for character string),
+*     AST__OBJECTTYPE (for AST Object pointer), AST__POINTERTYPE (for
+*     arbitrary C pointer) or AST__UNDEFTYPE (for undefined values
+*     created by
+c     astMapPutU).
+f     AST_MAPPUTU).
+
+*  Applicability:
+*     Table
+*        All Tables have this attribute.
+
+*att--
+*/
 
 /*
 *att++
@@ -3541,6 +3862,37 @@ f     AST_ADDCOLUMN and AST_REMOVECOLUMN
 
 *att--
 */
+
+/*
+*att++
+*  Name:
+*     Nrow
+
+*  Purpose:
+*     The number of rows in the table.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer, read-only.
+
+*  Description:
+*     This attribute holds the index of the last row to which any
+*     contents have been added using any of the
+*     astMapPut...
+*     AST_MAPPUT...
+*     functions. The first row has index 1.
+
+*  Applicability:
+*     Table
+*        All Tables have this attribute.
+
+*att--
+*/
+astMAKE_GET(Table,Nrow,int,0,this->nrow)
+astMAKE_SET(Table,Nrow,int,nrow,value)
+
 
 
 /* Copy constructor. */
@@ -4000,7 +4352,10 @@ AstTable *astInitTable_( void *mem, size_t size, int init,
 /* Initialise the Table data. */
 /* ---------------------------- */
       new->nrow = 0;
-      new->columns = astKeyMap( " ", status );
+      new->columns = astKeyMap( "KeyCase=0", status );
+
+/* Tables require the KeyCase attribute to be zero. */
+      (*parent_setkeycase)( (AstKeyMap *) new, 0, status );
 
 /* If an error occurred, clean up by deleting the new Table. */
       if ( !astOK ) new = astDelete( new );
@@ -4181,21 +4536,25 @@ const char *astColumnName_( AstTable *this, int index, int *status ){
    if ( !astOK ) return NULL;
    return (**astMEMBER(this,Table,ColumnName))(this,index,status);
 }
-int astColumnType_( AstTable *this, const char *column, int *status ){
+int astGetColumnType_( AstTable *this, const char *column, int *status ){
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,Table,ColumnType))(this,column,status);
+   return (**astMEMBER(this,Table,GetColumnType))(this,column,status);
 }
-const char *astColumnUnit_( AstTable *this, const char *column, int *status ){
+const char *astGetColumnUnit_( AstTable *this, const char *column, int *status ){
    if ( !astOK ) return NULL;
-   return (**astMEMBER(this,Table,ColumnUnit))(this,column,status);
+   return (**astMEMBER(this,Table,GetColumnUnit))(this,column,status);
 }
-int astColumnLenC_( AstTable *this, const char *column, int *status ){
+int astGetColumnLenC_( AstTable *this, const char *column, int *status ){
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,Table,ColumnLenC))(this,column,status);
+   return (**astMEMBER(this,Table,GetColumnLenC))(this,column,status);
 }
-int astColumnNdim_( AstTable *this, const char *column, int *status ){
+int astGetColumnLength_( AstTable *this, const char *column, int *status ){
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,Table,ColumnNdim))(this,column,status);
+   return (**astMEMBER(this,Table,GetColumnLength))(this,column,status);
+}
+int astGetColumnNdim_( AstTable *this, const char *column, int *status ){
+   if ( !astOK ) return 0;
+   return (**astMEMBER(this,Table,GetColumnNdim))(this,column,status);
 }
 void astColumnShape_( AstTable *this, const char *column, int mxdim,
                       int *ndim, int *dims, int *status ){

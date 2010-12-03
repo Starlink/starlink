@@ -225,7 +225,7 @@ static void AddColumn( AstTable *this, const char *name, int type,
 *        Pointer to the Table.
 *     name
 *        The column name. Trailing spaces are ignored (all other spaces
-*        are significant). Case is significant.
+*        are significant). The supplied string is converted to upper case.
 *     type
 *        The data type associated with the column. One of AST__INTTYPE
 *        (for integer), AST__SINTTYPE (for short int), AST__BYTETYPE (for
@@ -449,7 +449,7 @@ f        SET is .TRUE., the supplied NEWVAL
 
 /* Store the max and min integer values that can be store din the column
    data type. */
-   type = astColumnType( this, column );
+   type = astGetColumnType( this, column );
    if( type == AST__BYTETYPE ) {
       imin = 0;
       imax = UCHAR_MAX;
@@ -518,7 +518,7 @@ f        SET is .TRUE., the supplied NEWVAL
          if( !gotresult || hasnull ) {
 
 /* Get the total number of values in each cell of the column. */
-            ndim = astColumnNdim( this, column );
+            ndim = astGetColumnNdim( this, column );
             dims = astMalloc( ndim*sizeof( int ) );
             astColumnShape( this, column, ndim, &ndim, dims );
             nel = 1;
@@ -1250,9 +1250,9 @@ static void UpdateHeader( AstFitsTable *this, const char *method,
 
 /* Get the name, type and shape of the current column. */
       name = astColumnName( this, icol );
-      type = astColumnType( this, name );
-      unit = astColumnUnit( this, name );
-      ndim = astColumnNdim( this, name );
+      type = astGetColumnType( this, name );
+      unit = astGetColumnUnit( this, name );
+      ndim = astGetColumnNdim( this, name );
       dims = astGrow( dims, ndim, sizeof( int ) );
       astColumnShape( this, name, ndim, &ndim, dims );
       if( astOK ) {
@@ -1290,7 +1290,7 @@ static void UpdateHeader( AstFitsTable *this, const char *method,
 
 /* Use the maximum length of the strings in the current column (excluding
    null) to scale the FITS repeat count. */
-            slen = astColumnLenC( this, name );
+            slen = astGetColumnLenC( this, name );
             nel *= slen;
             rowsize += nel;
 

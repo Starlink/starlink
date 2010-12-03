@@ -45,12 +45,12 @@ c      call ast_watchmemory(483)
          call stopit( status, 'Table error 2b' )
       endif
 
-      if( ast_columnname( table, 1, status ) .ne. 'Fred' ) then
+      if( ast_columnname( table, 1, status ) .ne. 'FRED' ) then
          call stopit( status, 'Table error 2c' )
       endif
 
-      if( ast_columntype( table, 'Fred', status ) .ne.
-     :                    AST__FLOATTYPE ) then
+      if( ast_geti( table, 'ColumnType(Fred)', status ) .ne.
+     :    AST__FLOATTYPE ) then
          call stopit( status, 'Table error 2d' )
       endif
 
@@ -63,7 +63,7 @@ c      call ast_watchmemory(483)
          call stopit( status, 'Table error 2g' )
       endif
 
-      if( ast_columnunit( table, 'Fred', status ) .ne. ' ' ) then
+      if( ast_getc( table, 'ColumnUnit(Fred)', status ) .ne. ' ' ) then
          call stopit( status, 'Table error 2h' )
       endif
 
@@ -107,7 +107,7 @@ c      call ast_watchmemory(483)
          call stopit( status, 'Table error 7' )
       endif
 
-      if( ast_columnunit( table, 'Fred', status ) .ne. 'pW' ) then
+      if( ast_getc( table, 'ColumnUnit(Fred)', status ) .ne. 'pW' ) then
          call stopit( status, 'Table error 7b' )
       endif
 
@@ -124,11 +124,11 @@ c      call ast_watchmemory(483)
          call stopit( status, 'Table error 8b' )
       endif
 
-      if( ast_columnname( table, 1, status ) .ne. 'Dick' ) then
+      if( ast_columnname( table, 1, status ) .ne. 'DICK' ) then
          call stopit( status, 'Table error 8c' )
       endif
 
-      if( ast_columnname( table, 2, status ) .ne. 'Fred' ) then
+      if( ast_columnname( table, 2, status ) .ne. 'FRED' ) then
          call stopit( status, 'Table error 8d' )
       endif
 
@@ -220,7 +220,7 @@ c      call ast_watchmemory(483)
          call stopit( status, 'Table error 29' )
       endif
 
-      if( ast_columnlenc( table, 'Dick', status ) .ne. 10 ) then
+      if( ast_geti( table, 'columnlenc(Dick)', status ) .ne. 10 ) then
          call stopit( status, 'Table error 29b' )
       endif
 
@@ -302,6 +302,7 @@ c      call ast_activememory( 'testtable' )
       ch = ast_channel( mysource, mysink, ' ', status )
 
 
+
       nl = 0
       ll = 110
       next = 1
@@ -314,6 +315,9 @@ c      call ast_activememory( 'testtable' )
       next = 1
       nl = 0
       result = ast_read( ch, status )
+
+
+
 
       if( result .eq. ast__null ) then
          write(*,*) text
@@ -468,6 +472,7 @@ c         write(*,*) buf( next : next + ll - 1 )
 
       call ast_purgerows( table, status )
       if( ast_geti( table, 'NRow', status ) .ne. 3 ) then
+      write(*,*) 'ZZ: ',ast_geti( table, 'NRow', status )
          call stopit( status, 'Table error purge-3' )
       endif
 

@@ -80,6 +80,9 @@
 /* Maximum length of a column name */
 #define AST__MXCOLNAMLEN 100
 
+/* Maximum length of a key for a column cell */
+#define AST__MXCOLKEYLEN ( AST__MXCOLNAMLEN + 23 )
+
 #endif
 
 
@@ -113,21 +116,21 @@ typedef struct AstTableVtab {
    AstClassIdentifier id;
 
 /* Properties (e.g. methods) specific to this class. */
-   void (* AddColumn)( AstTable *, const char *, int, int, int *,
-                       const char *, int * );
+   AstKeyMap *(* ColumnProps)( AstTable *, int * );
+   const char *(* ColumnName)( AstTable *, int, int * );
+   const char *(* GetColumnUnit)( AstTable *, const char *, int * );
+   int (* GetColumnLenC)( AstTable *, const char *, int * );
+   int (* GetColumnLength)( AstTable *, const char *, int * );
+   int (* GetColumnNdim)( AstTable *, const char *, int * );
+   int (* GetColumnType)( AstTable *, const char *, int * );
+   int (* GetNcolumn)( AstTable *, int * );
+   int (* GetNrow)( AstTable *, int * );
+   void (* AddColumn)( AstTable *, const char *, int, int, int *, const char *, int * );
+   void (* ColumnShape)( AstTable *, const char *, int, int *, int *, int * );
+   void (* PurgeRows)( AstTable *, int * );
    void (* RemoveColumn)( AstTable *, const char *, int * );
    void (* RemoveRow)( AstTable *, int, int * );
-   void (* PurgeRows)( AstTable *, int * );
-   int (* GetNrow)( AstTable *, int * );
-   int (* GetNcolumn)( AstTable *, int * );
    void (* SetNrow)( AstTable *, int, int * );
-   const char *(* ColumnName)( AstTable *, int, int * );
-   int (* ColumnType)( AstTable *, const char *, int * );
-   const char *(* ColumnUnit)( AstTable *, const char *, int * );
-   AstKeyMap *(* ColumnProps)( AstTable *, int * );
-   int (* ColumnLenC)( AstTable *, const char *, int * );
-   int (* ColumnNdim)( AstTable *, const char *, int * );
-   void (* ColumnShape)( AstTable *, const char *, int, int *, int *, int * );
 } AstTableVtab;
 
 #if defined(THREAD_SAFE)
@@ -180,20 +183,24 @@ AstTable *astLoadTable_( void *, size_t, AstTableVtab *,
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
-AstKeyMap *astColumnProps_( AstTable *, int * );
 void astAddColumn_( AstTable *, const char *, int, int, int *, const char *, int * );
 void astRemoveColumn_( AstTable *, const char *, int * );
 void astRemoveRow_( AstTable *, int, int * );
 void astPurgeRows_( AstTable *, int * );
-int astGetNrow_( AstTable *, int * );
-int astGetNcolumn_( AstTable *, int * );
-void astSetNrow_( AstTable *, int, int * );
 const char *astColumnName_( AstTable *, int, int * );
-int astColumnType_( AstTable *, const char *, int * );
-const char *astColumnUnit_( AstTable *, const char *, int * );
-int astColumnLenC_( AstTable *, const char *, int * );
-int astColumnNdim_( AstTable *, const char *, int * );
 void astColumnShape_( AstTable *, const char *, int, int *, int *, int * );
+
+#if defined(astCLASS)            /* Protected */
+AstKeyMap *astColumnProps_( AstTable *, int * );
+const char *astGetColumnUnit_( AstTable *, const char *, int * );
+int astGetColumnLenC_( AstTable *, const char *, int * );
+int astGetColumnLength_( AstTable *, const char *, int * );
+int astGetColumnNdim_( AstTable *, const char *, int * );
+int astGetColumnType_( AstTable *, const char *, int * );
+int astGetNcolumn_( AstTable *, int * );
+int astGetNrow_( AstTable *, int * );
+void astSetNrow_( AstTable *, int, int * );
+#endif
 
 /* Function interfaces. */
 /* ==================== */
@@ -246,21 +253,28 @@ astINVOKE(O,astLoadTable_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR
 #define astRemoveRow(this,index) astINVOKE(V,astRemoveRow_(astCheckTable(this),index,STATUS_PTR))
 #define astPurgeRows(this) astINVOKE(V,astPurgeRows_(astCheckTable(this),STATUS_PTR))
 #define astColumnName(this,index) astINVOKE(V,astColumnName_(astCheckTable(this),index,STATUS_PTR))
-#define astColumnType(this,column) astINVOKE(V,astColumnType_(astCheckTable(this),column,STATUS_PTR))
-#define astColumnUnit(this,column) astINVOKE(V,astColumnUnit_(astCheckTable(this),column,STATUS_PTR))
-#define astColumnLenC(this,column) astINVOKE(V,astColumnLenC_(astCheckTable(this),column,STATUS_PTR))
-#define astColumnNdim(this,column) astINVOKE(V,astColumnNdim_(astCheckTable(this),column,STATUS_PTR))
 #define astColumnShape(this,column,mxdim,ndim,dims) astINVOKE(V,astColumnShape_(astCheckTable(this),column,mxdim,ndim,dims,STATUS_PTR))
 
 #if defined(astCLASS)            /* Protected */
 
-#define astColumnProps(this) astINVOKE(O,astColumnProps_(astCheckTable(this),STATUS_PTR))
+#define astColumnProps(this) \
+astINVOKE(O,astColumnProps_(astCheckTable(this),STATUS_PTR))
 #define astGetNcolumn(this) \
 astINVOKE(V,astGetNcolumn_(astCheckTable(this),STATUS_PTR))
 #define astGetNrow(this) \
 astINVOKE(V,astGetNrow_(astCheckTable(this),STATUS_PTR))
 #define astSetNrow(this,value) \
 astINVOKE(V,astSetNrow_(astCheckTable(this),value,STATUS_PTR))
+#define astGetColumnLenC(this,column) \
+astINVOKE(V,astGetColumnLenC_(astCheckTable(this),column,STATUS_PTR))
+#define astGetColumnLength(this,column) \
+astINVOKE(V,astGetColumnLength_(astCheckTable(this),column,STATUS_PTR))
+#define astGetColumnNdim(this,column) \
+astINVOKE(V,astGetColumnNdim_(astCheckTable(this),column,STATUS_PTR))
+#define astGetColumnType(this,column) \
+astINVOKE(V,astGetColumnType_(astCheckTable(this),column,STATUS_PTR))
+#define astGetColumnUnit(this,column) \
+astINVOKE(V,astGetColumnUnit_(astCheckTable(this),column,STATUS_PTR))
 
 #endif
 #endif
