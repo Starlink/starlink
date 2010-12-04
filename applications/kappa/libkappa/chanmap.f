@@ -297,6 +297,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S Berry (JAC)
+*     TIMJ: Tim Jenness (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -353,6 +354,9 @@
 *        Increase size of ESTIMO variable to allow all estimators to
 *        be selected. 78 characters was too small to hold the full
 *        list.
+*     2010-12-03 (TIMJ):
+*        Use correct bounds during blocking for estimators that
+*        require the coordinate value.
 *     {enter_further_changes_here}
 
 *-
@@ -1079,7 +1083,7 @@
 *  in the correct data type.
                CALL PSX_CALLOC( ELI, '_DOUBLE', IPAXCO, STATUS )
                CALL PSX_CALLOC( ELI, ITYPE, IPCO, STATUS )
-               CALL PSX_CALLOC( UBNDS( JAXIS ) - LBNDS( JAXIS ) + 1,
+               CALL PSX_CALLOC( UBNDBI( JAXIS ) - LBNDBI( JAXIS ) + 1,
      :                          '_DOUBLE', IPAXWO, STATUS )
 
 
@@ -1091,7 +1095,7 @@
 
 *  Obtain the double-precision co-ordinate centres along the collapse
 *  axis in the current Frame.
-               CALL KPG1_WCFAX( LBNDS, UBNDS, MAP, JAXIS, IAXIS,
+               CALL KPG1_WCFAX( LBNDBI, UBNDBI, MAP, JAXIS, IAXIS,
      :                          %VAL( CNF_PVAL( IPAXCO ) ),
      :                          %VAL( CNF_PVAL( IPAXWO ) ), STATUS )
 
