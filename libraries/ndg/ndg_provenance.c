@@ -169,6 +169,9 @@
 *          Added ndgUnhashProv.
 *      3-DEC-2010 (DSB):
 *          Added debug facilities for tracking issue and release of Prov structures.
+*      6-DEC-2010 (DSB):
+*          When freeing a Prov structure, erase the temporary HDS object holding the 
+*          MORE info, rather than just annulling its locator.
 */
 
 
@@ -4269,8 +4272,11 @@ static Prov *ndg1FreeProv( Prov *prov, int *status ){
 */
 
 /* Local Variables: */
-   int i;
+   HDSLoc *ploc = NULL;
    HistRec *hist_rec;
+   char name[ DAT__SZNAM + 1 ];
+   char type[ DAT__SZNAM + 1 ];
+   int i;
 
 /* Check that something has been supplied, but ignore the inherited
    status since we want this function to execute even if an error has
@@ -4299,8 +4305,21 @@ static Prov *ndg1FreeProv( Prov *prov, int *status ){
    prov->hist_recs = astFree( prov->hist_recs );
    prov->nhrec = 0;
 
-/* Annul the HDS locator for the MORE structure. */
-   if( prov->more ) datAnnul( &(prov->more), status );
+/* If the HDS structure holding the MORE information
+   was created in a temporary HDS object, erase it. 
+   Otherwise just annul the locator. */
+   if( prov->more ) {
+      datType( prov->more, type, status );
+      if( !strcmp( type, TEMP_TYPE ) ) {
+         datName( prov->more, name, status );
+         datParen( prov->more, &ploc, status );
+         datAnnul( &(prov->more), status );
+         datErase( ploc, name, status );
+         datAnnul( &ploc, status );
+      } else {
+         datAnnul( &(prov->more), status );
+      }
+   }
 
 /* Remove the Prov from the list of active Provs. */
    DEISSUE( prov );
