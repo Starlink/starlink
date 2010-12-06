@@ -117,6 +117,11 @@
 *        Add support for scaled arrays.
 *     1-NOV-2010 (DSB):
 *        Include support for delta compressed arrays.
+*     6-DEC-2010 (DSB):
+*       If the mapping transfer region doesn't fill the mapping region,
+*       but nevertheless exists, the returned array was being allocated
+*       twice leading to a bad memory leak. The second allocation has
+*       been removed.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -342,10 +347,8 @@
 *  Ensure any required scale and zero terms are available.
             CALL ARY1_DSCL( IDCB, STATUS )
 
-*  Create and map a temporary object, then read the data in the mapping
-*  transfer region into it, padding the rest of the mapped array with
-*  "bad" values.
-            CALL ARY1_CMTMP( TYPE, NDIMA, DIM, MLOC, PNTR, STATUS )
+*  Read the data in the mapping transfer region into the returned temporary object, 
+*  padding the rest of the mapped array with "bad" values.
             CALL ARY1_GTN( BAD, DCB_TYP( IDCB ), LOC,
      :                     MAX( NDIMA, NDIMD ), DCB_LBND( 1, IDCB ),
      :                     DCB_UBND( 1, IDCB ), MCB_LMTR( 1, IMCB ),
