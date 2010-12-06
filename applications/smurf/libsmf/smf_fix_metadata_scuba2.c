@@ -70,6 +70,8 @@
 *     2010-10-09 (TIMJ):
 *        Make sure we have two sequence steps when calculating
 *        step time (eg s8d20100112_00055_0008)
+*     2010-12-06 (TIMJ):
+*        Fix shutter header so that it is always numeric.
 
 *  Copyright:
 *     Copyright (C) 2009-2010 Science & Technology Facilities Council.
@@ -231,6 +233,30 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
     smf_fits_updateU( hdr, "BASETEMP", "[K] Base temperature", status );
     smf_fits_updateD( hdr, "MUXTEMP", muxtemp, "[K] Mux temperature", status );
     msgOutif( msglev, "", INDENT "Mux temperature is being read from BASETEMP header.", status );
+  }
+
+  /* Sometime before 20091119 the SHUTTER keyword was written as a string
+     OPEN or CLOSED. Rewrite those as numbers */
+  if (fitsvals.utdate < 20091119) {
+    double shutval = 0.0;
+    /* Try to read as a double. */
+    smf_fits_getD( hdr, "SHUTTER", &shutval, status );
+
+    /* Old data was a string. Convert to a double */
+    if (*status == AST__FTCNV) {
+      char shutter[100];
+      errAnnul( status );
+      smf_fits_getS( hdr, "SHUTTER", shutter, sizeof(shutter), status);
+      if (strcmp(shutter, "CLOSED") == 0) {
+        shutval = 0.0;
+      } else {
+        shutval = 1.0;
+      }
+      /* update the value */
+      have_fixed |= SMF__FIXED_FITSHDR;
+      smf_fits_updateD( hdr, "SHUTTER", shutval, "shutter position 0-Closed 1-Open", status );
+      msgOutif( msglev, "", INDENT "Forcing SHUTTER header to be numeric", status );
+    }
   }
 
   /* work out if this is a fast flat observation taken before May 2010 */
