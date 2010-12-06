@@ -72,6 +72,7 @@
 *        step time (eg s8d20100112_00055_0008)
 *     2010-12-06 (TIMJ):
 *        Fix shutter header so that it is always numeric.
+*        Add SEQ_TYPE header to old 2009 data.
 
 *  Copyright:
 *     Copyright (C) 2009-2010 Science & Technology Facilities Council.
@@ -313,12 +314,32 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
     }
   }
 
-  /* SEQ_TYPE header turned up in 200911xx but we do not need to fix that by copying
-     OBS_TYPE since SMURF already handles it. If we want to fill in this header then
-     we should copy the OBS_TYPE value except when the SHUTTER is closed and we are
-     not doing a NOISE or FLATFIELD observation. Set it to "noise" in those cases.
-     Some dark flatfields had an extra dark at the end so set the OBSEND=T dark
-     to a "noise" in that case */
+  /* SEQ_TYPE header turned up in 20091125. Before that date the SEQ_TYPE only
+     had two values. If the shutter was open then SEQ_TYPE is just OBS_TYPE. In the
+     dark only a FLATFIELD sometimes finished with a noise but in that case CALCFLAT
+     doesn't care so we just call it a flatfield sequence anyhow. We could look at
+     the OBSEND flag but I'm not sure it makes a difference. */
+  if ( fitsvals.utdate < 20091125 ) {
+    char obstype[100];
+    char seqtype[100];
+    double shutval = 0.0;
+    /* need to know what type of observation this is */
+    smf_getfitss( hdr, "OBS_TYPE", obstype, sizeof(obstype), status );
+    /* and the shutter status */
+    smf_fits_getD( hdr, "SHUTTER", &shutval, status );
+
+    if (shutval == 0.0 && strcasecmp( obstype, "flatfield" ) != 0 ) {
+      /* flatfield was the only non-noise observation in the dark */
+      one_strlcpy( seqtype, "NOISE", sizeof(seqtype), status );
+      msgOutif( msglev, "", INDENT "Setting sequence type to NOISE", status );
+    } else {
+      /* Shutter was open so SEQ_TYPE is just OBS_TYPE */
+      one_strlcpy( seqtype, obstype, sizeof(seqtype), status );
+      msgOutif( msglev, "",  INDENT "Setting sequence type to obs type", status);
+    }
+    smf_fits_updateS( hdr, "SEQ_TYPE", seqtype, "Type of sequence", status );
+    have_fixed |= SMF__FIXED_FITSHDR;
+  }
 
   return have_fixed;
 }
