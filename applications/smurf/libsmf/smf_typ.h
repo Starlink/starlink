@@ -182,6 +182,8 @@
 *        Add tlen to smfGroup
 *     2010-11-12 (EC):
 *        Add theta (scan direction each tslice) to smfData
+*     2010-12-06 (TIMJ):
+*        Add enginerring obs types.
 *     {enter_further_changes_here}
 
  *  Copyright:
@@ -321,7 +323,15 @@ typedef enum smf_obstype {
   SMF__TYP_SKYDIP,
   SMF__TYP_FLATFIELD,
   SMF__TYP_NOISE,
-  SMF__TYP_FASTFLAT
+  SMF__TYP_FASTFLAT,
+  SMF__TYP_HEATRAMP,
+  SMF__TYP_BIASSAW,
+  SMF__TYP_BIASRAMP,
+  SMF__TYP_NEP,
+  SMF__TYP_RAMP,
+  SMF__TYP_IV_CURVES_M,
+  SMF__TYP_IV_CURVES_H,
+  SMF__TYP_OPEN_LOOP_G
 } smf_obstype;
 
 typedef enum {

@@ -38,12 +38,14 @@
 *        Initial version, copied from smf_dtype_str.
 *     2010-03-16 (TIMJ):
 *        Add fastflat
+*     2010-12-06 (TIMJ):
+*        Add engineering modes.
 
 *  Notes:
 *     - See also smf_dtype_str, smf_obsmode_str.
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008,2010 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -117,6 +119,30 @@ const char * smf_obstype_str( smf_obstype type, int * status ) {
     break;
   case SMF__TYP_FASTFLAT:
     retval = "fastflat";
+    break;
+  case SMF__TYP_HEATRAMP:
+    retval = "heatramp";
+    break;
+  case SMF__TYP_BIASRAMP:
+    retval = "biasramp";
+    break;
+  case SMF__TYP_BIASSAW:
+    retval = "biassaw";
+    break;
+  case SMF__TYP_NEP:
+    retval = "nep";
+    break;
+  case SMF__TYP_RAMP:
+    retval = "ramp";
+    break;
+  case SMF__TYP_IV_CURVES_M:
+    retval = "iv curves m";
+    break;
+  case SMF__TYP_IV_CURVES_H:
+    retval = "iv curves h";
+    break;
+  case SMF__TYP_OPEN_LOOP_G:
+    retval = "open loop g";
     break;
   default:
     retval = NULL;

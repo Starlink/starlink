@@ -42,6 +42,8 @@
 *        Recognize fast flatfields.
 *     2010-08-09 (TIMJ):
 *        Add INBEAM support.
+*     2010-12-06 (TIMJ):
+*        Look for engineering modes.
 
 *  Notes:
 *     This function relies on an accurate hdr->instrument. i.e. call
@@ -222,8 +224,24 @@ static smf_obstype smf__parse_obstype ( char obs_type[], int *status ) {
     type = SMF__TYP_FASTFLAT;
   } else if (strcasecmp( obs_type, "NOISE" ) == 0) {
     type = SMF__TYP_NOISE;
+  } else if (strcasecmp( obs_type, "HEATRAMP" ) == 0) {
+    type = SMF__TYP_HEATRAMP;
+  } else if (strcasecmp( obs_type, "BIASRAMP" ) == 0) {
+    type = SMF__TYP_BIASRAMP;
+  } else if (strcasecmp( obs_type, "BIASSAW" ) == 0) {
+    type = SMF__TYP_BIASSAW;
+  } else if (strcasecmp( obs_type, "NEP" ) == 0) {
+    type = SMF__TYP_NEP;
+  } else if (strcasecmp( obs_type, "RAMP" ) == 0) {
+    type = SMF__TYP_RAMP;
+  } else if (strcasecmp( obs_type, "IV_CURVES_M" ) == 0) {
+    type = SMF__TYP_IV_CURVES_M;
+  } else if (strcasecmp( obs_type, "IV_CURVES_H" ) == 0) {
+    type = SMF__TYP_IV_CURVES_H;
+  } else if (strcasecmp( obs_type, "OPEN_LOOP_G" ) == 0) {
+    type = SMF__TYP_OPEN_LOOP_G;
   } else {
-    if (*status != SAI__OK) {
+    if (*status == SAI__OK) {
       *status = SAI__ERROR;
       msgSetc( "TYP", obs_type );
       errRep( " ", "Unrecognized observation type '^TYP'", status );
