@@ -905,8 +905,8 @@ static void smf1_find_gains_job( void *job_data, int *status ) {
    if( b1 < nbolo ) {
 
 /* Debugging message indicating thread started work */
-      msgOutiff( MSG__DEBUG, "", "smfFindGains: thread starting on bolos %zu -- %zu",
-                 status, b1, b2 );
+      msgOutiff( MSG__DEBUG, "", "smfFindGains: thread starting on bolos %" DIM_T_FMT
+                 " -- %" DIM_T_FMT, status, b1, b2 );
       smf_timerinit( &tv1, &tv2, status);
 
 /* Get the number of samples within the fit_box that overhang at each end
@@ -1013,7 +1013,8 @@ static void smf1_find_gains_job( void *job_data, int *status ) {
 
 /* Report the time taken in this thread. */
       msgOutiff( SMF__TIMER_MSG, "",
-                 "smfFindGains: thread finishing bolos %zu -- %zu (%.3f sec)",
+                 "smfFindGains: thread finishing bolos %" DIM_T_FMT
+                 " -- %" DIM_T_FMT " (%.3f sec)",
                  status, b1, b2, smf_timerupdate( &tv1, &tv2, status ) );
    }
 }
