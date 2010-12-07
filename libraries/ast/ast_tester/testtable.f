@@ -253,6 +253,16 @@ c      call ast_watchmemory(483)
 
       call checkpurge( status )
 
+      if( .not. ast_hascolumn( table, 'GoGo', status ) ) then
+         call stopit( status, 'Table error 35' )
+      else if( ast_hascolumn( table, 'dodo', status ) ) then
+         call stopit( status, 'Table error 36' )
+      endif
+
+      call ast_removecolumn( table, 'GoGo', status )
+      if( ast_hascolumn( table, 'GoGo', status ) ) then
+         call stopit( status, 'Table error 37' )
+      endif
 
 
 

@@ -60,18 +60,20 @@ c     following functions may also be applied to all Tables:
 f     In addition to those routines applicable to all KeyMaps, the
 f     following routines may also be applied to all Tables:
 *
-c     - astAddColumn: Add a new column definition to a Table.
+c     - astAddColumn: Add a new column definition to a Table
 c     - astColumnName: Return the name of the column with a given index
 c     - astColumnShape: Return the shape of the values in a named column
-c     - astPurgeRows: Remove all empty rows from a Table.
-c     - astRemoveColumn: Remove a column from a Table.
-c     - astRemoveRow: Remove a row from a Table.
-f     - AST_ADDCOLUMN: Add a new column definition to a Table.
+c     - astHasColumn: Checks if a column exists in a Table
+c     - astPurgeRows: Remove all empty rows from a Table
+c     - astRemoveColumn: Remove a column from a Table
+c     - astRemoveRow: Remove a row from a Table
+f     - AST_ADDCOLUMN: Add a new column definition to a Table
 f     - AST_COLUMNNAME: Return the name of the column with a given index
 f     - AST_COLUMNSHAPE: Return the shape of the values in a named column
-f     - AST_PURGEROWS: Remove all empty rows from a Table.
-f     - AST_REMOVECOLUMN: Remove a column from a Table.
-f     - AST_REMOVEROW: Remove a row from a Table.
+f     - AST_HASCOLUMN: Checks if a column exists in a Table
+f     - AST_PURGEROWS: Remove all empty rows from a Table
+f     - AST_REMOVECOLUMN: Remove a column from a Table
+f     - AST_REMOVEROW: Remove a row from a Table
 
 *  Copyright:
 *     Copyright (C) 2010 Science & Technology Facilities Council.
@@ -271,6 +273,7 @@ static int GetColumnNdim( AstTable *, const char *, int * );
 static int GetColumnType( AstTable *, const char *, int * );
 static int GetNcolumn( AstTable *, int * );
 static int GetObjSize( AstObject *, int * );
+static int HasColumn( AstTable *, const char *, int *);
 static int MapGet0A( AstKeyMap *, const char *, AstObject **, int * );
 static int MapGet0B( AstKeyMap *, const char *, unsigned char *, int * );
 static int MapGet0C( AstKeyMap *, const char *, const char **, int * );
@@ -1731,6 +1734,79 @@ static int GetObjSize( AstObject *this_object, int *status ) {
    return result;
 }
 
+static int HasColumn( AstTable *this, const char *column, int *status ){
+/*
+*++
+*  Name:
+c     astHasColumn
+f     AST_HASCOLUMN
+
+*  Purpose:
+*     Returns a flag indicating if a column is present in a Table.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "table.h"
+c     int astHasColumn( AstTable *this, const char *column, int *status )
+f     RESULT = AST_COLUMNSHAPE( THIS, COLUMN, STATUS )
+
+*  Class Membership:
+*     Table method.
+
+*  Description:
+c     This function
+f     This routine
+*     returns a flag indicating if a named column exists in a Table, for
+*     instance, by having been added to to the Table using
+c     astAddColumn.
+f     AST_ADDCOLUMN.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Table.
+c     column
+f     COLUMN = CHARACTER * ( * ) (Given)
+*        The character string holding the upper case name of the column. Trailing
+*        spaces are ignored.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Notes:
+*     - A value of
+c     zero
+f     .FALSE.
+*     is returned for if an error occurs.
+
+*--
+*/
+
+/* Local Variables: */
+   AstKeyMap *cols;
+   int result;
+
+/* Initialise */
+   result = 0;
+
+/* Check the inherited status. */
+   if( !astOK ) return result;
+
+/* Get the KeyMap holding information about all columns. */
+   cols = astColumnProps( this );
+
+/* Seeif it contains an entry for the named column. */
+   result = astMapHasKey( cols, column );
+
+/* Free resources. */
+   cols = astAnnul( cols );
+
+/* If an error has occurred, return zero. */
+   if( !astOK ) result = 0;
+   return result;
+}
+
 void astInitTableVtab_(  AstTableVtab *vtab, const char *name, int *status ) {
 /*
 *+
@@ -1808,6 +1884,7 @@ void astInitTableVtab_(  AstTableVtab *vtab, const char *name, int *status ) {
    vtab->GetColumnType = GetColumnType;
    vtab->GetColumnUnit = GetColumnUnit;
    vtab->ColumnShape = ColumnShape;
+   vtab->HasColumn = HasColumn;
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
@@ -4565,4 +4642,8 @@ void astColumnShape_( AstTable *this, const char *column, int mxdim,
 AstKeyMap *astColumnProps_( AstTable *this, int *status ){
    if ( !astOK ) return NULL;
    return (**astMEMBER(this,Table,ColumnProps))(this,status);
+}
+int astHasColumn_( AstTable *this, const char *column, int *status ){
+   if ( !astOK ) return 0;
+   return (**astMEMBER(this,Table,HasColumn))(this,column,status);
 }

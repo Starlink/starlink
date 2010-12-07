@@ -221,3 +221,21 @@ F77_SUBROUTINE(ast_columnshape)( INTEGER(THIS),
 }
 
 
+F77_LOGICAL_FUNCTION(ast_hascolumn)( INTEGER(THIS),
+                                     CHARACTER(COLUMN),
+                                     INTEGER(STATUS)
+                                     TRAIL(COLUMN) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(COLUMN)
+   F77_LOGICAL_TYPE(RESULT);
+   char *column;
+
+   astWatchSTATUS(
+   astAt( "AST_ISATABLE", NULL, 0 );
+      column = astString( COLUMN, COLUMN_length );
+      RESULT = astHasColumn( astI2P( *THIS ), column ) ? F77_TRUE : F77_FALSE;
+      astFree( column );
+   )
+   return RESULT;
+}
+

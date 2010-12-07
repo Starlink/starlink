@@ -125,6 +125,7 @@ typedef struct AstTableVtab {
    int (* GetColumnType)( AstTable *, const char *, int * );
    int (* GetNcolumn)( AstTable *, int * );
    int (* GetNrow)( AstTable *, int * );
+   int (* HasColumn)( AstTable *, const char *, int * );
    void (* AddColumn)( AstTable *, const char *, int, int, int *, const char *, int * );
    void (* ColumnShape)( AstTable *, const char *, int, int *, int *, int * );
    void (* PurgeRows)( AstTable *, int * );
@@ -189,6 +190,7 @@ void astRemoveRow_( AstTable *, int, int * );
 void astPurgeRows_( AstTable *, int * );
 const char *astColumnName_( AstTable *, int, int * );
 void astColumnShape_( AstTable *, const char *, int, int *, int *, int * );
+int astHasColumn_( AstTable *, const char *, int * );
 
 #if defined(astCLASS)            /* Protected */
 AstKeyMap *astColumnProps_( AstTable *, int * );
@@ -254,6 +256,7 @@ astINVOKE(O,astLoadTable_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR
 #define astPurgeRows(this) astINVOKE(V,astPurgeRows_(astCheckTable(this),STATUS_PTR))
 #define astColumnName(this,index) astINVOKE(V,astColumnName_(astCheckTable(this),index,STATUS_PTR))
 #define astColumnShape(this,column,mxdim,ndim,dims) astINVOKE(V,astColumnShape_(astCheckTable(this),column,mxdim,ndim,dims,STATUS_PTR))
+#define astHasColumn(this,column) astINVOKE(V,astHasColumn_(astCheckTable(this),column,STATUS_PTR))
 
 #if defined(astCLASS)            /* Protected */
 
