@@ -147,6 +147,7 @@
 *     2010-12-07 (TIMJ):
 *        Do not do stability comparisons if the previous flat ramp has a different
 *        reference heater setting.
+*        In NEP mode do not drop bad flatfields.
 
 *  Copyright:
 *     Copyright (C) 2008-2010 Science and Technology Facilities Council.
@@ -423,13 +424,19 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
 
               if (ngood < SMF__MINSTATSAMP) {
                 smf_smfFile_msg( NULL, "F", 1, thisfile, status );
-                msgOutif( MSG__QUIET, "",
-                          "Flatfield ramp file ^F had no good bolometers. Ignoring.",
-                          status );
-                ffcount--;
-                if (curresp) smf_close_file( &curresp, status );
-                if (infile) smf_close_file( &infile, status );
-                continue;
+                if (infile->hdr->obstype != SMF__TYP_NEP) {
+                  msgOutiff( MSG__QUIET, "",
+                            "Flatfield ramp file ^F had %zu good bolometer%s. Ignoring.",
+                            status, ngood, (ngood == 1 ? "" : "s") );
+                  ffcount--;
+                  if (curresp) smf_close_file( &curresp, status );
+                  if (infile) smf_close_file( &infile, status );
+                  continue;
+                } else {
+                  msgOutiff( MSG__NORM, "",
+                            "Flatfield ramp file ^F had %zu good bolometer%s. Eng mode.",
+                             status, ngood, (ngood == 1 ? "" : "s") );
+                }
               }
 
               /* See if we need to compare responsivity images */
