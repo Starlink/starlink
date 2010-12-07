@@ -37,7 +37,7 @@
 *     - If there is a fits header but no SHUTTER keyword, this will be an error.
 *     ie complete lack of knowledge indicates not a dark, but some knowledge
 *     indicates an error.
-*     - A fast flat is not a dark even if the shutter is closed.
+*     - Only dark noise observations are treated as darks
 
 *  History:
 *     2008-07-17 (TIMJ):
@@ -50,6 +50,8 @@
 *        with no information at all, assume not a dark.
 *     2010-02-22 (TIMJ):
 *        Handle fast flat fields in the dark.
+*     2010-12-06 (TIMJ):
+*        Use a reliable SEQ_TYPE
 
 *  Copyright:
 *     Copyright (C) 2008,2010 Science and Technology Facilities Council.
@@ -102,7 +104,6 @@
 
 int smf_isdark( const smfData * indata, int * status ) {
   double shutval = 0.0;
-  char shutter[SZFITSCARD];
 
   if (*status != SAI__OK) return 0;
 
@@ -121,23 +122,11 @@ int smf_isdark( const smfData * indata, int * status ) {
   /* if this is ACSIS data return */
   if (indata->hdr->instrument == INST__ACSIS) return 0;
 
-  /* Check sequence type */
-  if (indata->hdr->seqtype == SMF__TYP_FASTFLAT) return 0;
+  /* Noise is the only thing that matters for seqtype */
+  if (indata->hdr->seqtype != SMF__TYP_NOISE) return 0;
 
   /* Shutter is no a double. 0 indicates closed */
   smf_fits_getD( indata->hdr, "SHUTTER", &shutval, status );
-
-  /* Old data was a string. Handle it until we no longer need to */
-  if (*status == AST__FTCNV) {
-    errAnnul( status );
-    smf_fits_getS( indata->hdr, "SHUTTER", shutter, sizeof(shutter), status);
-    if (strcmp(shutter, "CLOSED") == 0) {
-      return 1;
-    } else {
-      return 0;
-    }
-  }
-
 
   if (*status == SAI__OK && shutval < 0.00001 ) {
     return 1;
