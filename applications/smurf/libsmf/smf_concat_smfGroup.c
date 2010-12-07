@@ -1035,7 +1035,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
         /* If we couldn't make the tswcs just annul error and continue... we
            don't really need it for anything */
         if( *status != SAI__OK ) {
-          errAnnul(status);
+          errFlush(status);
           msgOut( "", FUNC_NAME
                   ": Warning, Couldn't create TSWCS for data cube", status );
 
