@@ -195,6 +195,7 @@
  *        Concatenate theta
  *     2010-12-06 (TIMJ):
  *        Use smf_flat_override
+ *        Copy obsidss from refhdr when concatenating.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -233,6 +234,7 @@
 #include "ndf.h"
 #include "sae_par.h"
 #include "star/ndg.h"
+#include "star/one.h"
 #include "prm_par.h"
 #include "par_par.h"
 #include "kpg_err.h"
@@ -681,6 +683,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
               hdr->obsmode = refhdr->obsmode;
               hdr->obstype = refhdr->obstype;
               hdr->swmode = refhdr->swmode;
+              one_strlcpy(hdr->obsidss, refhdr->obsidss, sizeof(hdr->obsidss), status);
               smf_set_clabels( refhdr->title, refhdr->dlabel,
                                refhdr->units, hdr, status );
 
