@@ -33,11 +33,14 @@
 
 *  Authors:
 *     Edward Chapin (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     2010-05-19 (EC)
 *        Initial version -- based on timeWcs() in sc2store.c
+*     2010-12-06 (TIMJ):
+*        Missing DUT1 is not fatal.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -121,11 +124,10 @@ void smf_create_tswcs( smfHead *hdr, AstFrameSet **frameset, int *status ){
     return;
   }
 
-  if( astGetFitsF( hdr->fitshdr, "DUT1", &dut1 ) ) {
-    dut1 *= SPD;
-  } else {
-    dut1 = 0.0;
-  }
+  /* do not get concerned if DUT1 is missing */
+  dut1 = 0.0;
+  smf_getfitsd( hdr, "DUT1", &dut1, status );
+  dut1 *= SPD;
 
   /* Return here if an error encountered */
   if( *status != SAI__OK ) return;
