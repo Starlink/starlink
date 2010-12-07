@@ -4,9 +4,10 @@
       include 'AST_PAR'
       include 'AST_ERR'
       include 'SAE_PAR'
+      include 'CNF_PAR'
 
       integer status, table, table2, dims( 7 ), header, ival, l, nval,
-     :        icard
+     :        icard, colsize, pntr
       byte bytes(2,3),bval
       logical wasset, hasnull
       real rval
@@ -158,9 +159,75 @@ c      call ast_watchmemory(483)
          call stopit( status, 'FitsTable error 13' )
       endif
 
-      if( ast_columnsize( table, 'stringcol', status ) .ne. 90 ) then
+      colsize = ast_columnsize( table, 'stringcol', status )
+      if( colsize .ne. 99 ) then
          call stopit( status, 'FitsTable error 13b' )
-      endif
+      else
+         call psx_malloc( colsize, pntr, status )
+         call ast_getcolumndata( table, 'StringCol', 0.0, 0.0D0,
+     :                           colsize, pntr, colsize, status )
+         if( colsize .ne. 99 ) call stopit( status,
+     :                                      'FitsTable error 13c' )
+         call checkstrings( table, %val( CNF_PVAL( pntr ) ), status )
+         call psx_free( pntr, status )
+      end if
+
+      colsize = ast_columnsize( table, 'bytecol', status )
+      if( colsize .ne. 18 ) then
+         call stopit( status, 'FitsTable error 13d' )
+      else
+         call psx_malloc( colsize, pntr, status )
+         call ast_getcolumndata( table, 'BYTECOL', 0.0, 0.0D0, colsize,
+     :                           pntr, colsize, status )
+         if( colsize .ne. 18 ) call stopit( status,
+     :                                      'FitsTable error 13e' )
+         call checkbytes( table, %val( CNF_PVAL( pntr ) ),
+     :                    ast_columnnull( table, 'BYTECOL', .FALSE., 0,
+     :                                   wasset, hasnull, status ),
+     :                    status )
+         call psx_free( pntr, status )
+      end if
+
+      colsize = ast_columnsize( table, 'intcol', status )
+      if( colsize .ne. 12 ) then
+         call stopit( status, 'FitsTable error 13f' )
+      else
+         call psx_malloc( colsize, pntr, status )
+         call ast_getcolumndata( table, 'INTCOL', 0.0, 0.0D0, colsize,
+     :                           pntr, colsize, status )
+         if( colsize .ne. 12 ) call stopit( status,
+     :                                      'FitsTable error 13g' )
+         call checkints( table, %val( CNF_PVAL( pntr ) ),
+     :                    ast_columnnull( table, 'INTCOL', .FALSE., 0,
+     :                                   wasset, hasnull, status ),
+     :                    status )
+         call psx_free( pntr, status )
+      end if
+
+
+      call ast_addcolumn( table, 'REALCOL', AST__FLOATTYPE, 0, 0, ' ',
+     :                    status )
+      call ast_mapput0r( table, 'REALCOL(1)', -10.0, ' ', status )
+      call ast_mapput0r( table, 'REALCOL(3)', 10.0, ' ', status )
+
+      colsize = ast_columnsize( table, 'realcol', status )
+      if( colsize .ne. 12 ) then
+         call stopit( status, 'FitsTable error 13h' )
+      else
+         call psx_malloc( colsize, pntr, status )
+         call ast_getcolumndata( table, 'REALCOL', -1.0, 0.0D0, colsize,
+     :                           pntr, colsize, status )
+         if( colsize .ne. 12 ) call stopit( status,
+     :                                      'FitsTable error 13i' )
+         call checkreals( table, %val( CNF_PVAL( pntr ) ), -1.0,
+     :                    status )
+         call psx_free( pntr, status )
+      end if
+
+      call ast_removecolumn( table, 'REALCOL', status )
+
+
+
 
       call ast_mapremove( table, 'BYTECOL(3)', status )
       call ast_mapremove( table, 'INTCOL(3)', status )
@@ -264,5 +331,111 @@ c      call ast_activememory( 'testfitstable' )
       status = sai__error
       write(*,*) text
       end
+
+
+
+      subroutine checkbytes( table, vals, null, status )
+      implicit none
+      include 'SAE_PAR'
+      integer status, table, null, i
+      byte vals( * ), ans( 12 ), bnull
+
+      data ans / 0, 1, 128, 127, -127, -1, 0, 1, 0, 1, 0, 1 /
+
+      if( status .ne. sai__ok ) return
+
+      do i = 1, 12
+         if( vals( i ) .ne. ans( i ) ) then
+            call stopit( status, 'FitsTable error checkbytes 1' )
+         end if
+      end do
+
+      bnull = null
+      do i = 13, 18
+         if( vals( i ) .ne. bnull ) then
+            call stopit( status, 'FitsTable error checkbytes 2' )
+         end if
+      end do
+
+      end
+
+      subroutine checkints( table, vals, null, status )
+      implicit none
+      include 'SAE_PAR'
+      integer status, table, null
+      integer vals( * )
+
+      if( status .ne. sai__ok ) return
+
+      if( vals( 1 ) .ne. null ) then
+         call stopit( status, 'FitsTable error checkints 1' )
+      end if
+
+      if( vals( 2 ) .ne. 10 ) then
+         call stopit( status, 'FitsTable error checkints 2' )
+      end if
+
+      if( vals( 3 ) .ne. -10 ) then
+         call stopit( status, 'FitsTable error checkints 3' )
+      end if
+
+      end
+
+      subroutine checkreals( table, vals, null, status )
+      implicit none
+      include 'SAE_PAR'
+      integer status, table
+      real vals( * ), null
+
+      if( status .ne. sai__ok ) return
+
+      if( vals( 1 ) .ne. -10.0 ) then
+         call stopit( status, 'FitsTable error checkreals 1' )
+      end if
+
+      if( vals( 2 ) .ne. null ) then
+         call stopit( status, 'FitsTable error checkreals 2' )
+      end if
+
+      if( vals( 3 ) .ne. 10.0 ) then
+         call stopit( status, 'FitsTable error checkreals 3' )
+      end if
+
+      end
+
+      subroutine checkstrings( table, vals, status )
+      implicit none
+      include 'SAE_PAR'
+      integer status, table, i, start, end, j
+      character ans( 9 )*10
+      character vals*( * ), test*11
+
+      data ans / 'hello', ' ', 'goodbye', '', '', '', ' ', ' ', ' ' /
+
+      if( status .ne. sai__ok ) return
+
+      start = 1
+      end = 11
+
+      do i = 1, 9
+
+         do j = 1, 11
+            if( vals( start + j - 1 : start + j - 1 ) .lt. ' ' ) then
+               vals( start + j - 1 : start + j - 1 ) = ' '
+            endif
+         end do
+
+         if( vals( start : end ) .ne. ans( i ) ) then
+            call stopit( status, 'FitsTable error checkstrings 1' )
+         end if
+
+         start = start + 11
+         end = end + 11
+
+      end do
+
+      end
+
+
 
 

@@ -178,3 +178,40 @@ F77_INTEGER_FUNCTION(ast_columnsize)( INTEGER(THIS),
    return RESULT;
 }
 
+F77_SUBROUTINE(ast_getcolumndata)( INTEGER(THIS),
+                                   CHARACTER(COLUMN),
+                                   REAL(RNULL),
+                                   DOUBLE(DNULL),
+                                   INTEGER(MXSIZE),
+                                   POINTER(COLDATA),
+                                   INTEGER(SIZE),
+                                   INTEGER(STATUS)
+                                   TRAIL(COLUMN) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(COLUMN)
+   GENPTR_REAL(RNULL)
+   GENPTR_DOUBLE(DNULL)
+   GENPTR_INTEGER(MXSIZE)
+   GENPTR_POINTER(COLDATA)
+   GENPTR_INTEGER(SIZE)
+   size_t size;
+   char *column;
+
+   astAt( "AST_GETCOLUMNDATA", NULL, 0 );
+   astWatchSTATUS(
+      column = astString( COLUMN, COLUMN_length );
+
+      astGetColumnData( astI2P( *THIS ), column, *RNULL, *DNULL, *MXSIZE,
+                        cnfCptr( *COLDATA ), &size );
+      astFree( column );
+
+      *SIZE = size;
+      if( (size_t) *SIZE != size && astOK ) {
+         astError( AST__BIGTAB, "AST_GETCOLUMNDATA(FitsTable): The "
+                   "number of bytes in the column is too large to fit "
+                   "in a Fortran INTEGER.", status );
+      }
+
+   )
+}
+
