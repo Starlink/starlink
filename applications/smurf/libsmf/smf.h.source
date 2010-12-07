@@ -1064,6 +1064,9 @@ smf_flatmeth smf_flat_methcode ( const char * flatname, int * status );
 
 const char * smf_flat_methstring( smf_flatmeth flatmeth, int * status );
 
+int
+smf_flat_override ( const smfArray *flats, smfData * indata, int *status );
+
 void
 smf_flat_params( const smfData * refdata, const char resistpar[],
                  const char methpar[], const char orderpar[], const char snrminpar[],

@@ -177,6 +177,7 @@ smf_flat_malloc.c \
 smf_flat_mergedata.c \
 smf_flat_methcode.c \
 smf_flat_methstring.c \
+smf_flat_override.c \
 smf_flat_params.c \
 smf_flat_precondition.c \
 smf_flat_responsivity.c \
