@@ -48,6 +48,8 @@
 *        Initial version.
 *     2010-08-06 (TIMJ):
 *        Allow following flatfield ramps to be used.
+*     2010-12-06 (TIMJ):
+*        Choose closest previous flat rather than first previous flat.
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -130,10 +132,19 @@ void smf_choose_flat( const smfArray *flats, const smfData *indata,
         /* Valid previous flat */
         *flatidx = i;
       } else if (seqdiff < 0 ) {
+        /* if we have found a previous good flat then use that now
+           that we have gone past */
+        if (*flatidx != SMF__BADIDX) break;
+
         /* Valid next flat which we will want to use if we could not
            find a previous match. Only select it if it is from the
            sequence that follows immediately afterwards. */
         if (seqdiff == -1) *flatidx = i;
+
+        /* since we are in date order we also know that at this point
+           we are not going to find a relevant flatfield so break */
+        break;
+
       } else if (seqdiff == 0) {
         /* should not be possible */
         if (*status == SAI__OK) {
@@ -144,10 +155,6 @@ void smf_choose_flat( const smfArray *flats, const smfData *indata,
         }
       }
     }
-
-    /* finish if we have everything */
-    if (*flatidx != SMF__BADIDX) break;
-
   }
 
   if (*flatidx == SMF__BADIDX) {
