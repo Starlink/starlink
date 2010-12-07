@@ -193,6 +193,8 @@
  *        Propagate FTS2 info
  *     2010-11-15 (EC):
  *        Concatenate theta
+ *     2010-12-06 (TIMJ):
+ *        Use smf_flat_override
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -572,22 +574,8 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
 
           /* apply flatfield -- duplicated part of smf_flatfield */
           if( doflat ) {
-            size_t flatidx = SMF__BADIDX;
-
-            /* See if we have an override flatfield. */
-            smf_choose_flat( flatramps, refdata, &flatidx, status );
-
-            if( (flatidx != SMF__BADIDX) && (refdata->file) ) {
-              const smfData *flatdata = (flatramps->sdata)[flatidx];
-
-              smf_smfFile_msg( refdata->file, "INF", 1, "<unknown>", status );
-              smf_smfFile_msg( flatdata->file, "FLAT", 1, "<unknown>",
-                                 status );
-              msgOutif( MSG__VERB, "", FUNC_NAME
-                        ": Override flatfield of ^INF using ^FLAT", status );
-              smf_flat_assign( 1, SMF__FLATMETH_NULL, NULL, flatdata,
-                               refdata, status );
-            }
+            /* override if necessary */
+            smf_flat_override( flatramps, refdata, status );
 
             /* OK now apply flatfield calibration */
             smf_flatten( refdata, status);

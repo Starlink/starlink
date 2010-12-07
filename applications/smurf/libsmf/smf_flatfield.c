@@ -81,6 +81,8 @@
 *        Update prologue with new API. Slight clean ups.
 *     2010-03-16 (TIMJ):
 *        Accept override flatfields and assign them before processing.
+*     2010-12-06 (TIMJ):
+*        Use smf_flat_override
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -156,7 +158,6 @@ void smf_flatfield ( const smfData *idata, const smfArray * flats, smfData **oda
       smf_check_smfData( idata, *odata, flags, status );
     }
   } else if ( *status == SAI__OK ) {
-    size_t flatidx = SMF__BADIDX;
 
     /* OK data are not flatfielded: create smfData based on input and
        apply flatfield */
@@ -176,18 +177,7 @@ void smf_flatfield ( const smfData *idata, const smfArray * flats, smfData **oda
     }
 
     /* See if we have an override flatfield. */
-    smf_choose_flat( flats, *odata, &flatidx, status );
-
-    if ( flatidx != SMF__BADIDX ) {
-      const smfData * flatdata = (flats->sdata)[flatidx];
-
-      smf_smfFile_msg( idata->file, "INF", 1, "<unknown>", status );
-      smf_smfFile_msg( flatdata->file, "FLAT", 1, "<unknown>", status );
-      msgOutif( MSG__VERB, "", "Override flatfield of ^INF"
-                " using ^FLAT", status );
-      smf_flat_assign( 1, SMF__FLATMETH_NULL, NULL, flatdata,
-                       *odata, status );
-    }
+    smf_flat_override( flats, *odata, status );
 
     /* OK now apply flatfield calibration */
     smf_flatten( *odata, status);
