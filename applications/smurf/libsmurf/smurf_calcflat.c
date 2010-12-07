@@ -224,7 +224,8 @@ void smurf_calcflat( int *status ) {
   fgrp = NULL;
 
   /* Sanity check */
-  if ( *status == SAI__OK && grpGrpsz(ffgrp, status ) == 0 && grpGrpsz( dkgrp, status ) == 0) {
+  if ( *status == SAI__OK && grpGrpsz(ffgrp, status ) == 0 && grpGrpsz( dkgrp, status ) == 0
+       && grpGrpsz( igrp, status ) == 0 ) {
     *status = SAI__ERROR;
     errRep("", "No good files supplied to routine for flatfielding", status );
     goto CLEANUP;
