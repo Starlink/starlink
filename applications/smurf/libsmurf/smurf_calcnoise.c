@@ -101,6 +101,8 @@
 *        smf_bolonoise can now handle apodization.
 *     2010-12-06 (TIMJ):
 *        Assign flatramp flatfields to noise data correctly.
+*     2010-12-07 (TIMJ):
+*        Let the NEP output image be blank.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -367,10 +369,10 @@ void smurf_calcnoise( int *status ) {
           if (do_nep) {
             smfData * nepdata = NULL;
 
-            if (*status == SAI__OK && ngood == 0) {
-              *status = SAI__ERROR;
-              errRep( "", "No good responsivities found in flatfield."
-                      " Unable to calculate NEP", status );
+            if (ngood == 0) {
+              msgOutif( MSG__QUIET, "",
+                        "WARNING: No good responsivities in flatfield. Blank NEP image.",
+                        status );
             }
 
             /* now create the output image for NEP data */
