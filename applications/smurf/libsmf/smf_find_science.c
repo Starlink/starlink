@@ -144,6 +144,9 @@
 *     2010-08-05 (TIMJ):
 *        Trap bad flatfields (at least flatfields with less than SMF__MINSTATSAMP
 *        working bolometers).
+*     2010-12-07 (TIMJ):
+*        Do not do stability comparisons if the previous flat ramp has a different
+*        reference heater setting.
 
 *  Copyright:
 *     Copyright (C) 2008-2010 Science and Technology Facilities Council.
@@ -367,6 +370,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
 
     /* now open the flats and store them if requested */
     if (*status == SAI__OK) {
+      int prevheat = 0;
       smfData * prevresp = NULL;
       smfData * prevflat = NULL;
       size_t start_ffcount = ffcount;
@@ -407,7 +411,12 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
 
             if (calcflat) {
               size_t ngood = 0;
+              int curheat = 0;
               smfData * curresp = NULL;
+
+              /* get reference heater value */
+              smf_getfitsi( infile->hdr, "PIXHEAT", &curheat, status );
+
               ngood = smf_flat_calcflat( MSG__VERB, NULL, "RESIST",
                                        "FLATMETH", "FLATORDER", NULL, "RESPMASK",
                                        "FLATSNR", NULL, infile, &curresp, status );
@@ -424,7 +433,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
               }
 
               /* See if we need to compare responsivity images */
-              if ( prevresp && curresp &&
+              if ( prevresp && curresp && curheat == prevheat &&
                    strcmp(prevresp->hdr->obsidss, curresp->hdr->obsidss) == 0 ) {
                 size_t bol = 0;
                 smfData * ratio = NULL;
@@ -502,6 +511,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
               /* Free previous and then store new previous */
               if (prevresp) smf_close_file( &prevresp, status );
               prevresp = curresp;
+              prevheat = curheat;
             }
 
           }
