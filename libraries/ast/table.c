@@ -1353,11 +1353,11 @@ static int GetColumnLength( AstTable *this, const char *column, int *status ) {
 /* Store the result in the column KeyMap. */
             astMapPut0I( col_km, LENGTH, result, NULL );
          }
+         dims = astFree( dims );
       }
 
 /* Free resources */
       col_km = astAnnul( col_km );
-      dims = astFree( dims );
 
 /* Report an error if the column does not exist. */
    } else if( astOK ) {

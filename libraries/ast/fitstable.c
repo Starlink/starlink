@@ -47,9 +47,11 @@ f     In addition to those routines applicable to all Tables, the
 f     following routines may also be applied to all FitsTables:
 *
 c     - astColumnNull: Get/set the null value for a column of a FitsTable
+c     - astColumnSize: Get number of bytes needed to hold a full column of data
 c     - astGetTableHeader: Get the FITS headers from a FitsTable
 c     - astPutTableHeader: Store FITS headers within a FitsTable
 f     - AST_COLUMNNULL: Get/set the null value for a column of a FitsTable
+f     - AST_COLUMNSIZE: Get number of bytes needed to hold a full column of data
 f     - AST_GETTABLEHEADER: Get the FITS headers from a FitsTable
 f     - AST_PUTTABLEHEADER: Store FITS headers within a FitsTable
 
@@ -173,6 +175,7 @@ AstFitsTable *astFitsTableId_( const char *, ... );
 /* ======================================== */
 static AstFitsChan *GetTableHeader( AstFitsTable *, int * );
 static int ColumnNull( AstFitsTable *, const char *, int, int, int *, int *, int * );
+static size_t ColumnSize( AstFitsTable *, const char *, int * );
 static int Equal( AstObject *, AstObject *, int * );
 static int GetObjSize( AstObject *, int * );
 static void AddColumn( AstTable *, const char *, int, int, int *, const char *, int * );
@@ -420,7 +423,6 @@ f        SET is .TRUE., the supplied NEWVAL
    AstKeyMap *cols;        /* KeyMap holding all column definitions */
    char key[ AST__MXCOLNAMLEN + 24 ]; /* Current cell key string */
    int *cell;              /* Pointer to array of cell values */
-   int *dims;              /* Pointer to array of dimension lengths */
    int foundhi;            /* Has an occurrence of "nullhi" been found yet? */
    int foundlo;            /* Has an occurrence of "nulllo" been found yet? */
    int gotresult;          /* Has a usable value been put into "result"? */
@@ -430,7 +432,7 @@ f        SET is .TRUE., the supplied NEWVAL
    int imin;               /* Minimum storable value */
    int irow;               /* Index of current row in table */
    int ndim;               /* Number of axes in each column's value */
-   int nel;                /* Number of elements in each column's value */
+   int nel;                /* Total number of values in each cell */
    int nrow;               /* Number of rows in table */
    int null;               /* The null value on exit */
    int nullfound;          /* Has a null value been found in the column yet? */
@@ -518,15 +520,7 @@ f        SET is .TRUE., the supplied NEWVAL
          if( !gotresult || hasnull ) {
 
 /* Get the total number of values in each cell of the column. */
-            ndim = astGetColumnNdim( this, column );
-            dims = astMalloc( ndim*sizeof( int ) );
-            astColumnShape( this, column, ndim, &ndim, dims );
-            nel = 1;
-            if( astOK ) {
-               for( idim = 0; idim < ndim; idim++ ) {
-                  nel *= dims[ idim ];
-               }
-            }
+            nel = astGetColumnLength( this, column );
 
 /* Allocate memory to hold the values in a single cell of the column,
    stored as ints. */
@@ -554,6 +548,9 @@ f        SET is .TRUE., the supplied NEWVAL
 
 /* Attempt to get the values in the cell */
                if( astMapGet1I( this, key, nel, &nel, cell ) ) {
+
+/* Get the number of dimensions. */
+                  ndim = astGetColumnNdim( this, column );
 
 /* If we know what the null value is on exit, check the cell for such null
    values (but only if the caller want s to know). Skip this check after the
@@ -632,7 +629,6 @@ f        SET is .TRUE., the supplied NEWVAL
             }
 
 /* Free resources */
-            dims = astFree( dims );
             cell = astFree( cell );
          }
          col_km = astAnnul( col_km );
@@ -646,6 +642,108 @@ f        SET is .TRUE., the supplied NEWVAL
       *wasset = 0;
       if( hasnull ) *hasnull = 0;
    }
+
+/* Return the result. */
+   return result;
+}
+
+static size_t ColumnSize( AstFitsTable *this, const char *column, int *status ){
+/*
+*++
+*  Name:
+c     astColumnSize
+f     AST_COLUMNSIZE
+
+*  Purpose:
+*     Get the number of bytes needed to hold a full column of data.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "table.h"
+c     size_t astColumnSize( AstFitsTable *this, const char *column,
+c                           int *hasnull )
+f     RESULT = AST_COLUMNSIZE( THIS, COLUMN, STATUS )
+
+*  Class Membership:
+*     FitsTable method.
+
+*  Description:
+*     This function returns the number of bytes of memory that must be
+*     allocated prior to retrieving the data from a column using
+c     astColumnData.
+f     AST_COLUMNDATA.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Table.
+c     column
+f     COLUMN = CHARACTER * ( * ) (Given)
+*        The character string holding the name of the column. Trailing
+*        spaces are ignored.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Returned Value:
+c     astColumnNull()
+f     AST_COLUMNNULL = INTEGER
+*        The number of bytes required to store the column data.
+
+*  Notes:
+*     - An error will be reported if the named column does not exist in
+*     the FitsTable.
+*     - Zero will be returned as the function value in an error occurs.
+
+*--
+*/
+
+/* Local Variables: */
+   size_t result;          /* Returned value */
+   int type;               /* Column data type */
+
+/* Initialise */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Find the number of bytes needed to hold a single element of the value
+   in a column cell. */
+   type = astGetColumnType( this, column );
+   if( type == AST__INTTYPE ) {
+      result = sizeof( int );
+
+   } else if(  type == AST__DOUBLETYPE ){
+      result = sizeof( double );
+
+   } else if(  type == AST__STRINGTYPE ){
+      result = astGetColumnLenC( this, column )*sizeof( char );
+
+   } else if(  type == AST__FLOATTYPE ){
+      result = sizeof( float );
+
+   } else if(  type == AST__SINTTYPE ){
+      result = sizeof( short int );
+
+   } else if(  type == AST__BYTETYPE ){
+      result = sizeof( char );
+
+   } else if( astOK ) {
+      astError( AST__INTER, "astColumnSize(%s): Unsupported column type "
+                "%d (internal AST programming error).", status,
+                astGetClass( this ), type );
+   }
+
+/* Multiply it by the number of elements per value. */
+   result *= astGetColumnLength( this, column );
+
+/* Multiply it by the number of values per column (i.e. the number of rows). */
+   result *= astGetNrow( this );
+
+/* Return zero if an error occurred. */
+   if( !astOK ) result = 0;
 
 /* Return the result. */
    return result;
@@ -919,6 +1017,7 @@ void astInitFitsTableVtab_(  AstFitsTableVtab *vtab, const char *name, int *stat
    vtab->GetTableHeader = GetTableHeader;
    vtab->PutTableHeader = PutTableHeader;
    vtab->ColumnNull = ColumnNull;
+   vtab->ColumnSize = ColumnSize;
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
@@ -1250,18 +1349,13 @@ static void UpdateHeader( AstFitsTable *this, const char *method,
 
 /* Get the name, type and shape of the current column. */
       name = astColumnName( this, icol );
+      nel = astGetColumnLength( this, name );
       type = astGetColumnType( this, name );
       unit = astGetColumnUnit( this, name );
       ndim = astGetColumnNdim( this, name );
       dims = astGrow( dims, ndim, sizeof( int ) );
-      astColumnShape( this, name, ndim, &ndim, dims );
       if( astOK ) {
-
-/* Get the total number of elements in each cell of the column. */
-         nel = 1;
-         for( idim = 0; idim < ndim; idim++ ) {
-            nel *= dims[ idim ];
-         }
+         astColumnShape( this, name, ndim, &ndim, dims );
 
 /* Get the FITS code that describes the column data type. Also increment
   the number of bytes (rowsize) used to describe a whole row. */
@@ -1988,6 +2082,11 @@ int astColumnNull_( AstFitsTable *this, const char *column, int set,
    if( hasnull ) *hasnull = 0;
    if ( !astOK ) return 0;
    return (**astMEMBER(this,FitsTable,ColumnNull))(this,column,set,newval,wasset,hasnull,status);
+}
+
+size_t astColumnSize_( AstFitsTable *this, const char *column, int *status ){
+   if ( !astOK ) return 0;
+   return (**astMEMBER(this,FitsTable,ColumnSize))(this,column,status);
 }
 
 

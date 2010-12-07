@@ -53,6 +53,7 @@
 
 /* Header files. */
 /* ============= */
+#include "ast_err.h"             /* AST error codes */
 #include "f77.h"                 /* FORTRAN <-> C interface macros (SUN/209) */
 #include "c2f77.h"               /* F77 <-> C support functions/macros */
 #include "error.h"               /* Error reporting facilities */
@@ -147,6 +148,32 @@ F77_INTEGER_FUNCTION(ast_columnnull)( INTEGER(THIS),
       *WASSET = wasset ? F77_TRUE : F77_FALSE;
       *HASNULL = hasnull ? F77_TRUE : F77_FALSE;
       astFree( column );
+   )
+   return RESULT;
+}
+
+F77_INTEGER_FUNCTION(ast_columnsize)( INTEGER(THIS),
+                                      CHARACTER(COLUMN),
+                                      INTEGER(STATUS)
+                                      TRAIL(COLUMN) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(COLUMN)
+   F77_INTEGER_TYPE(RESULT);
+   char *column;
+   size_t result;
+
+   astAt( "AST_COLUMNSIZE", NULL, 0 );
+   astWatchSTATUS(
+      column = astString( COLUMN, COLUMN_length );
+      result = astColumnSize( astI2P( *THIS ), column );
+      astFree( column );
+
+      RESULT = result;
+      if( (size_t) RESULT != result && astOK ) {
+         astError( AST__BIGTAB, "AST_COLUMNSIZE(FitsTable): The number of bytes in the "
+                   "column is too large to fit in a Fortran INTEGER.", status );
+      }
+
    )
    return RESULT;
 }

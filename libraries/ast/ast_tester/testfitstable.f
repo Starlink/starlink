@@ -106,7 +106,6 @@ c      call ast_watchmemory(483)
      :                    ' ', status )
 
 
-
       header = ast_gettableheader( table, status )
       icard = 0
       do while( ast_findfits( header, '%f', card, .true., status ) )
@@ -157,6 +156,10 @@ c      call ast_watchmemory(483)
 
       if( ast_geti( table, 'Ncolumn', status ) .ne. 3 ) then
          call stopit( status, 'FitsTable error 13' )
+      endif
+
+      if( ast_columnsize( table, 'stringcol', status ) .ne. 90 ) then
+         call stopit( status, 'FitsTable error 13b' )
       endif
 
       call ast_mapremove( table, 'BYTECOL(3)', status )
