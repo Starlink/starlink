@@ -35,9 +35,10 @@
 *  Notes:
 *     Uses the OBSIDSS and SUBARRAY information to associate a flatfield ramp with
 *     the science data. Does not yet use discrete flatfields from previous
-*     observations. Assumes that the flatfield at the start of the observation
+*     observations. Assumes that the closest flatfield prior to the sequence
 *     is the relevant one but if one can not be find it will use a ramp that
-*     immediately follows the sequence.
+*     immediately follows the sequence. Will only choose flats that have
+*     matching SHUTTER values.
 
 *  Authors:
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -50,6 +51,8 @@
 *        Allow following flatfield ramps to be used.
 *     2010-12-06 (TIMJ):
 *        Choose closest previous flat rather than first previous flat.
+*     2010-12-07 (TIMJ):
+*        Check SHUTTER
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -89,7 +92,9 @@
 void smf_choose_flat( const smfArray *flats, const smfData *indata,
                        size_t *flatidx, int * status ) {
   size_t i;          /* loop counter */
+  int matchseq = 0;  /* Matching sequence counter */
   int refseq;        /* Sequence count of input science data */
+  double refshut = 0.0;        /* Shutter values of science data */
   sc2ast_subarray_t refsubnum; /* Subarray number of science data */
 
   *flatidx = SMF__BADIDX;
@@ -98,12 +103,13 @@ void smf_choose_flat( const smfArray *flats, const smfData *indata,
   if (!flats) return;
   if (!smf_validate_smfData( indata, 1, 0, status ) ) return;
 
-  /* get reference sequence counter and subarray number */
+  /* get reference sequence counter, subarray number and shutter state */
   smf_find_seqcount( indata->hdr, &refseq, status );
   smf_find_subarray( indata->hdr, NULL, (size_t)0, &refsubnum, status );
+  smf_fits_getD( indata->hdr, "SHUTTER", &refshut, status );
 
-  msgOutiff( MSG__DEBUG, "", "Looking for a flatfield for %s subarray %d (seq=%d)",
-             status, indata->hdr->obsidss, refsubnum, refseq);
+  msgOutiff( MSG__DEBUG, "", "Flatfield search: %s subarray %d shutter %g (seq=%d)",
+             status, indata->hdr->obsidss, refsubnum, refshut, refseq);
 
   /* Loop through all the flats looking for ones that match
      subarray and have an earlier sequence counter. If we only find a
@@ -111,26 +117,28 @@ void smf_choose_flat( const smfArray *flats, const smfData *indata,
      Assume that the flatfields are in date order. */
   for (i=0; i< flats->ndat; i++) {
     smfData *thisflat = (flats->sdata)[i];
+    double thisshut = VAL__BADD;
     sc2ast_subarray_t thissubnum;
+
+    smf_fits_getD( thisflat->hdr, "SHUTTER", &thisshut, status );
     smf_find_subarray( thisflat->hdr, NULL, (size_t)0, &thissubnum, status );
 
-    msgOutiff( MSG__DEBUG, "", "Checking against flatfield %s subarray %d",
-               status, thisflat->hdr->obsidss, thissubnum);
+    msgOutiff( MSG__DEBUG, "", "Checking against flatfield %s subarray %d shutter %g",
+               status, thisflat->hdr->obsidss, thissubnum, thisshut);
 
     /* see if we even need to look at the obsidss */
     if (thissubnum == refsubnum &&
+        thisshut == refshut &&
         strcmp( indata->hdr->obsidss, thisflat->hdr->obsidss ) == 0 ) {
       int thisseq;
       int seqdiff;
       smf_find_seqcount( thisflat->hdr, &thisseq, status );
       seqdiff = refseq - thisseq;
 
-      msgOutiff( MSG__DEBUG, "", "Matching flatfield has sequence count %d cf %d",
-                 status, thisseq, refseq );
-
       if ( seqdiff > 0 ) {
         /* Valid previous flat */
         *flatidx = i;
+        matchseq = thisseq;
       } else if (seqdiff < 0 ) {
         /* if we have found a previous good flat then use that now
            that we have gone past */
@@ -139,7 +147,10 @@ void smf_choose_flat( const smfArray *flats, const smfData *indata,
         /* Valid next flat which we will want to use if we could not
            find a previous match. Only select it if it is from the
            sequence that follows immediately afterwards. */
-        if (seqdiff == -1) *flatidx = i;
+        if (seqdiff == -1) {
+          *flatidx = i;
+          matchseq = thisseq;
+        }
 
         /* since we are in date order we also know that at this point
            we are not going to find a relevant flatfield so break */
@@ -160,6 +171,9 @@ void smf_choose_flat( const smfArray *flats, const smfData *indata,
   if (*flatidx == SMF__BADIDX) {
     msgOutiff( MSG__VERB, " ","Unable to find any prior flatfield for %s",
                status, indata->hdr->obsidss );
+  } else if (matchseq != 0) {
+    msgOutiff( MSG__DEBUG, "", "Matching flatfield has sequence count %d cf %d",
+               status, matchseq, refseq );
   }
 
 }

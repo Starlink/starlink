@@ -148,6 +148,7 @@
 *        Do not do stability comparisons if the previous flat ramp has a different
 *        reference heater setting.
 *        In NEP mode do not drop bad flatfields.
+8        Allow dark flat ramps through. They are now filtered in smf_choose_flat.
 
 *  Copyright:
 *     Copyright (C) 2008-2010 Science and Technology Facilities Council.
@@ -331,18 +332,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
         }
 
       } else if (infile->hdr->seqtype == SMF__TYP_FASTFLAT ) {
-        /* Early data erroneously had fastflats in the dark which are not overly
-           useful from a calibration perspective. We need to filter these out since they
-           are useless */
-        double shutval = 0.0;
-        smf_fits_getD( infile->hdr, "SHUTTER", &shutval, status );
-        if (*status == SAI__OK && shutval < 0.00001 ) {
-          smf_smfFile_msg( infile->file, "F", 1, "<unknown file>", status);
-          msgOutif( MSG__QUIET, "", "File ^F is a dark fastflat and will be ignored", status );
-        } else {
-          /* Assume these are fast ramps - need to put them in a sort struct */
-          ffcount = smf__addto_sortinfo( infile, allfflats, i, ffcount, "Fast flat", status );
-        }
+        ffcount = smf__addto_sortinfo( infile, allfflats, i, ffcount, "Fast flat", status );
       } else {
         smf_smfFile_msg( infile->file, "F", 1, "<unknown file>", status);
         msgOutif(MSG__DEBUG, " ", "Sequence type mismatch with observation type: ^F",status);
