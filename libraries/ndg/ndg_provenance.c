@@ -170,8 +170,13 @@
 *      3-DEC-2010 (DSB):
 *          Added debug facilities for tracking issue and release of Prov structures.
 *      6-DEC-2010 (DSB):
-*          When freeing a Prov structure, erase the temporary HDS object holding the 
+*          When freeing a Prov structure, erase the temporary HDS object holding the
 *          MORE info, rather than just annulling its locator.
+*      7-DEC-2010 (DSB):
+*          Create all NDG temporary HDS obejcts within a single component of the HDS 
+*          temporary file (avoids problems using datParen with temporary files). 
+*          Application code should now use ndgAntmp/NDG_ANTMP to free MORE locators 
+*          returned by NDG. 
 */
 
 
@@ -306,8 +311,10 @@ typedef struct Provenance {
 /* Prototypes for Private Functions. */
 /* --------------------------------- */
 static AstKeyMap *ndg1FormatProv( Provenance *, int, int, AstKeyMap *, int * );
+static AstKeyMap *ndg1ShowProv( Prov *, int, AstKeyMap *, FILE *, int * )__attribute__((unused));
 static HDSLoc *ndg1GtAnc( HDSLoc *, size_t *, int * );
 static HDSLoc *ndg1TCopy( HDSLoc *, int * );
+static HDSLoc *ndg1Temp( const char *, int, int *, int * );
 static NdgProvenance *ndg1Encode( Provenance *, int * );
 static Prov *ndg1CopyProv( Prov *, int * );
 static Prov *ndg1FreeProv( Prov *, int * );
@@ -327,10 +334,10 @@ static int ndg1CheckSameParents( Prov *, Prov *, int * );
 static int ndg1FindAncestorIndex( Prov *, Provenance *, int * );
 static int ndg1GetLogicalComp( HDSLoc *, const char *, int, int * );
 static int ndg1GetProvId( Prov *, int * );
-static unsigned int ndg1HashFun( const char *,  unsigned int, int * );
 static int ndg1IntCmp( const void *, const void * );
 static int ndg1IsWanted( AstXmlElement *, int * );
 static int ndg1TheSame( Prov *, Prov *, int * );
+static unsigned int ndg1HashFun( const char *,  unsigned int, int * );
 static void ndg1A2h( AstKeyMap *, HDSLoc *, int * );
 static void ndg1AddHistKM( AstKeyMap *, const char *, Prov *, int * );
 static void ndg1Check( const char *, Prov *, AstKeyMap *, int * )__attribute__((unused));
@@ -348,7 +355,6 @@ static void ndg1ResetIndices( Provenance *, int * );
 static void ndg1Rmprv( Provenance *, int, int * );
 static void ndg1WriteProvenanceExtension( Provenance *, HDSLoc *, int * );
 static void ndg1WriteProvenanceNDF( Provenance *, int, int, int * );
-static AstKeyMap *ndg1ShowProv( Prov *, int, AstKeyMap *, FILE *, int * )__attribute__((unused));
 
 /* Debug stuff.... */
 static void ndg1DumpInfo( Prov *prov1, Prov *prov2, int *status );
@@ -373,6 +379,47 @@ static void Issue( Prov * );
 
 /* Public F77 wrapper functions. */
 /* ============================= */
+
+F77_SUBROUTINE(ndg_antmp)( CHARACTER(floc), INTEGER(status) TRAIL(floc) ){
+/*
+*+
+*  Name:
+*     NDG_ANTMP
+
+*  Purpose:
+*     Erase a temporary HDS object created by the NDG library.
+
+*  Language:
+*     Starlink ANSI C (callable from Fortran)
+
+*  Invocation:
+*     CALL NDG_ANTMP( LOC, STATUS )
+
+*  Description:
+*     The routine annuls a locator to a temporary object created by the
+*     NDG library, thereby causing the associated object to be erased and
+*     the file space associated with it to be released.
+
+*  Arguments:
+*     LOC = CHARACTER * (DAT__SZLOC) (Given and Returned)
+*        An HDS locator for a temporary object created by NDG. The
+*        locator is set to DAT__NOLOC on exit. The routine returns without
+*        action if the supplied locator is DAT__NOLOC.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*-
+*/
+
+   GENPTR_CHARACTER(floc)
+   GENPTR_INTEGER(status)
+   HDSLoc *loc = NULL;
+
+   if( strncmp( DAT__NOLOC, floc, floc_length) ){
+      datImportFloc( floc, floc_length, &loc, status );
+      ndgAntmp( &loc, status );
+   }
+}
 
 F77_SUBROUTINE(ndg_copyprov)( INTEGER(iprov), LOGICAL(cleanse),
                               INTEGER(iprov2), INTEGER(status) ){
@@ -675,8 +722,8 @@ F77_SUBROUTINE(ndg_getprov)( INTEGER(iprov), INTEGER(ianc),
 *     MORE = CHARACTER * (DAT__SZLOC) (Returned)
 *        A locator for a temporary HDS object containing a full deep copy
 *        of each component of the MORE structure associated with the
-*        requested ancestor. The returned locator should be annulled using
-*        DAT_ANNUL when no longer needed. A value of DAT__NOLOC will be
+*        requested ancestor. The returned locator should be freed using
+*        NDG_ANTMP when no longer needed. A value of DAT__NOLOC will be
 *        returned if the requested ancestor has no MORE component. Note,
 *        the returned object will be assigned an arbitrary HDS Name, which
 *        will not in general be "MORE".
@@ -1254,6 +1301,64 @@ F77_SUBROUTINE(ndg_writeprov)( INTEGER(iprov), INTEGER(indf), INTEGER(whdef),
 /* Public C functions. */
 /* =================== */
 
+void ndgAntmp( HDSLoc **loc, int *status ){
+/*
+*+
+*  Name:
+*     ndgAntmp
+
+*  Purpose:
+*     Erase a temporary HDS object created by the NDG library.
+
+*  Invocation:
+*     void ndgAntmp( HDSLoc **loc, int *status )
+
+*  Description:
+*     The function annuls a locator to a temporary object created by the
+*     NDG library, thereby causing the associated object to be erased and
+*     the file space associated with it to be released.
+
+*  Arguments:
+*     loc
+*        Address of a pointer to an HDS locator for a temporary object
+*        created by NDG. The pointer is returned set to NULL. The
+*        function returns without action if a NULL address or pointer
+*        is supplied.
+*     status
+*        The global status.
+
+*-
+*/
+
+/* Local variables: */
+   HDSLoc *locp = NULL;          /* Locator to parent object */
+   char name[ DAT__SZNAM + 1 ];  /* Name of object to be erased */
+
+/* Check a pointer was supplied. */
+   if( !loc || !*loc ) return;
+
+/* Begin a new error reporting context. */
+   errBegin( status );
+
+/* Find the temporary object's name. */
+   datName( *loc, name, status );
+
+/* Find its parent. */
+   datParen( *loc, &locp, status );
+
+/* Annul the object's locator. */
+   datAnnul( loc, status );
+
+/* Erase the object. */
+   datErase( locp, name, status );
+
+/* Annul the parent's locator. */
+   datAnnul( &locp, status );
+
+/* End the error reporting context. */
+   errEnd( status );
+}
+
 NdgProvenance *ndgCopyProv( NdgProvenance *prov, int cleanse, int *status ){
 /*
 *+
@@ -1689,7 +1794,7 @@ AstKeyMap *ndgGetProv( NdgProvenance *prov, int ianc, HDSLoc **more,
 *        The location at which to return a pointer to a locator for a
 *        temporary HDS object containing a full deep copy of the MORE
 *        structure associated with the requested ancestor. The
-*        returned locator should be annulled using datAnnul when no
+*        returned locator should be freed using ndgAntmp when no
 *        longer needed. A NULL pointer may be supplied for this argument
 *        if the MORE structure is not needed. A NULL pointer will be
 *        returned if the requested ancestor has no MORE component. Note,
@@ -2101,7 +2206,7 @@ void ndgModifyProv( NdgProvenance *prov, int ianc, AstKeyMap *km,
    object. */
          if( anc->more ) datAnnul( &(anc->more), status );
          if( more ) {
-            datTemp( TEMP_TYPE, 0, NULL, &( anc->more ), status );
+            anc->more = ndg1Temp( TEMP_TYPE, 0, NULL, status );
             ndg1CopyComps( more, anc->more, status );
          }
 
@@ -2111,8 +2216,8 @@ void ndgModifyProv( NdgProvenance *prov, int ianc, AstKeyMap *km,
             if( more2 && astMapSize( more2 ) > 0 ) {
 
 /* First ensure that there is a temporary HDS object. */
-               if( !anc->more ) datTemp( TEMP_TYPE, 0, NULL,
-                                         &( anc->more ), status );
+               if( !anc->more ) anc->more = ndg1Temp( TEMP_TYPE, 0, NULL,
+                                                      status );
 
 /* Now copy each primitive top-level entry in the KeyMap into a
    corresponding component in the HDS structure. */
@@ -3497,7 +3602,7 @@ static Prov *ndg1CopyProv( Prov *prov, int *status ){
    This copies all the top-level contents of "more" into the top-level
    of the temporary HDS object. */
       if( prov->more ) {
-         datTemp( TEMP_TYPE, 0, NULL, &( result->more ), status );
+         result->more = ndg1Temp( TEMP_TYPE, 0, NULL, status );
          ndg1CopyComps( prov->more, result->more, status );
       }
 
@@ -4305,21 +4410,8 @@ static Prov *ndg1FreeProv( Prov *prov, int *status ){
    prov->hist_recs = astFree( prov->hist_recs );
    prov->nhrec = 0;
 
-/* If the HDS structure holding the MORE information
-   was created in a temporary HDS object, erase it. 
-   Otherwise just annul the locator. */
-   if( prov->more ) {
-      datType( prov->more, type, status );
-      if( !strcmp( type, TEMP_TYPE ) ) {
-         datName( prov->more, name, status );
-         datParen( prov->more, &ploc, status );
-         datAnnul( &(prov->more), status );
-         datErase( ploc, name, status );
-         datAnnul( &ploc, status );
-      } else {
-         datAnnul( &(prov->more), status );
-      }
-   }
+/* Erase the temporary HDS structure holding the MORE information. */
+   ndgAntmp( &(prov->more), status );
 
 /* Remove the Prov from the list of active Provs. */
    DEISSUE( prov );
@@ -5061,7 +5153,7 @@ static Prov *ndg1MakeProv( int index, const char *path, const char *date,
    of the temporary HDS object. */
       result->more = NULL;
       if( more ) {
-         datTemp( TEMP_TYPE, 0, NULL, &( result->more ), status );
+         result->more = ndg1Temp( TEMP_TYPE, 0, NULL, status );
          ndg1CopyComps( more, result->more, status );
       }
 
@@ -5069,8 +5161,8 @@ static Prov *ndg1MakeProv( int index, const char *path, const char *date,
       if( more2 && astMapSize( more2 ) > 0 ) {
 
 /* First ensure that there is a temporary HDS object. */
-         if( !result->more ) datTemp( TEMP_TYPE, 0, NULL, &( result->more ),
-                                      status );
+         if( !result->more ) result->more = ndg1Temp( TEMP_TYPE, 0, NULL,
+                                                      status );
 
 /* Copy primtive values from the KeyMap to the temporary HDS object. */
          ndg1A2h( more2, result->more, status );
@@ -6112,7 +6204,7 @@ static Provenance *ndg1ReadProvenanceXml( const char *xml, const char *path,
 
 /* Create a temporary HDS structure to hold the provenance information
    read from the XML. */
-   datTemp( "PROV_TEMP", 0, NULL, &tloc, status);
+   tloc = ndg1Temp( "PROV_TEMP", 0, NULL, status);
 
 /* Convert the XML into an HDS structure. This should replicate the
    structure of an NDF PROVENANCE extension. */
@@ -6123,7 +6215,7 @@ static Provenance *ndg1ReadProvenanceXml( const char *xml, const char *path,
                                          status );
 /* Free resources. */
    datAnnul( &xloc, status );
-   datAnnul( &tloc, status );
+   ndgAntmp( &tloc, status );
    doc = astXmlAnnul( doc );
 
 /* If an error occurred, free the result. */
@@ -6431,10 +6523,88 @@ static HDSLoc *ndg1TCopy( HDSLoc *loc, int *status ){
 /* Create a temporary HDS object with arbitrary name and the type
    of the supplied object. */
    datType( loc, type, status );
-   datTemp( type, 0, NULL, &result, status );
+   result = ndg1Temp( type, 0, NULL, status );
 
 /* Copy all the components inside the supplied object into "result". */
    ndg1CopyComps( loc, result, status );
+
+/* Return the resulting locator. */
+   return result;
+}
+
+static HDSLoc *ndg1Temp( const char *type, int ndim, int *dim, int *status ){
+/*
+*  Name:
+*     ndg1Temp
+
+*  Purpose:
+*     Create a temporary HDS object.
+
+*  Invocation:
+*     HDSLoc *ndg1Temp( const char *type, int ndim, int *dim, int *status )
+
+*  Description:
+*     This function creates a temporary HDS object with the specified
+*     type and shape. On the first invocation a temporary structure is
+*     created to contain such objects. Subsequently, temporary objects
+*     are created within this enclosing structure.
+
+*  Arguments:
+*     type
+*        String holding HDS type of object to be created.
+*     ndim
+*        Number of object dimensions.
+*     dim
+*        Pointer to array of object dimensions.
+*     status
+*        The global status.
+
+*  Notes:
+*     -  This routine is a work-around to avoid the problems associated
+*     with calling datTemp if the objects created must subsequently be
+*     erased.
+
+*  Returned Value:
+*     A pointer to a locator for a new temporary HDS object. It should be
+*     erased using ndgAntmp when no longer needed.
+
+*/
+
+/* Local variables: */
+   HDSLoc *result = NULL;        /* Returned locator for temporary object */
+   char name[ DAT__SZNAM + 1 ];  /* Temporary object name */
+   int dummy[ 1 ];               /* Dummy dimensions array */
+   int nchar;                    /* Number of characters formatted */
+
+/* Static variables! But the NDF library is not thread safe, so we cannot
+   be using this module in a thread-safe environment, so there is no harm
+   in using static variables. */
+   static int count = 0;         /* Count of objects created */
+   static HDSLoc *tmploc = NULL; /* Locator to enclosing structure */
+
+/* Check the inherited status. */
+   if( *status != SAI__OK ) return result;
+
+/* Increment the count of temporary objects created. */
+   count++;
+
+/* Before creating the first object, create a temporary enclosing
+   structure and tune HDS to expect a large number of components in it. */
+   if( count == 1 ) {
+      tmploc = NULL;
+      datTemp( "NDG_TEMP", 0, dummy, &tmploc, status );
+      hdsTune( "NCOMP", 20, status );
+   }
+
+/* Form a unique name for the temporary object. */
+   if( *status == SAI__OK ) {
+      sprintf( name, "NDG_%d", count );
+
+/*  Create an object inside the enclosing structure and obtain a locator
+    to it. */
+      datNew( tmploc, name, type, ndim, dim, status );
+      datFind( tmploc, name, &result, status );
+   }
 
 /* Return the resulting locator. */
    return result;
@@ -6846,7 +7016,7 @@ static const char *ndg1WriteProvenanceXml( Provenance *provenance, int *status )
 
 /* Create a temporary HDS structure holding the provenance information. This
    structure is the same as would be stored in an NDF PROVENANCE extension. */
-   datTemp( "TEMP", 0, NULL, &tloc, status);
+   tloc = ndg1Temp( "TEMP", 0, NULL, status );
    datNew( tloc, EXT_NAME, EXT_TYPE,  0, NULL, status );
    datFind( tloc, EXT_NAME, &xloc, status );
    ndg1WriteProvenanceExtension( provenance, xloc, status );
@@ -6861,7 +7031,7 @@ static const char *ndg1WriteProvenanceXml( Provenance *provenance, int *status )
 /* Free resources. */
    elem = astXmlAnnul( elem );
    datAnnul( &xloc, status );
-   datAnnul( &tloc, status );
+   ndgAntmp( &tloc, status );
 
 /* If an error has occurred, free the returned string. */
    if( *status != SAI__OK ) result = astFree( (void *) result );

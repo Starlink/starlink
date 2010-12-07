@@ -197,6 +197,10 @@
 *     21-OCT-2009 (DSB):
 *        Modified to handle either " or ' as quote characters in history
 *        information.
+*     7-DEC-2010 (DSB):
+*        Use NDG_ANTMP rather than DAT_ANNUL to annul temporary HDS
+*        objects created by NDG. Using DAT_ANNUL does not erase such
+*        temporary objects form the HDS temp file.
 *     {enter_further_changes_here}
 
 *-
@@ -669,7 +673,7 @@
 *  supplied NDF. This includes the indices of the NDFs direct parents.
       ELSE
          CALL NDG_GETPROV( IPROV, 0, KM, MORE, STATUS )
-         IF( MORE .NE. DAT__NOLOC ) CALL DAT_ANNUL( MORE, STATUS )
+         CALL NDG_ANTMP( MORE, STATUS )
 
 *  Check that the NDF has some parents.
          IF( AST_MAPHASKEY( KM, 'PARENTS', STATUS ) ) THEN
@@ -686,7 +690,7 @@
 
 *  Get the provenance information for the parent.
                CALL NDG_GETPROV( IPROV, PARI, KMP, MORE, STATUS )
-               IF( MORE .NE. DAT__NOLOC ) CALL DAT_ANNUL( MORE, STATUS )
+               CALL NDG_ANTMP( MORE, STATUS )
 
 *  Check the provenance information includes a path to the parent file.
 *  If so, get the path and write it to the output text file.

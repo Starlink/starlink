@@ -89,13 +89,16 @@ Grp *ndgCopy( const Grp *grp1, size_t indxlo, size_t indxhi, int reject, int *st
 NdgProvenance *ndgCopyProv( NdgProvenance *prov, int clense, int *status );
 NdgProvenance *ndgFreeProv( NdgProvenance *prov, int *status );
 NdgProvenance *ndgReadProv( int indf, const char *creator, int *status );
+NdgProvenance *ndgReadVotProv( const char *xml, const char *path, const char *creator, int *status );
+const char *ndgWriteVotProv( NdgProvenance *prov, int *status );
 int ndgCountProv( NdgProvenance *prov, int *status );
 int ndgIsHiddenProv( NdgProvenance *, int, int * );
 void ndgAddgh( const char param[], const Grp * igrp, int * status );
+void ndgAntmp( HDSLoc **loc, int *status );
 void ndgAsexp( const char grpexp[], int verb, const Grp *igrp1, Grp **igrp2, size_t *size, int *flag, int *status );
 void ndgAssoc( const char *param, int verb, Grp **igrp, size_t *size, int *flag, int *status );
-void ndgBegpv( int *status );
 void ndgBeggh( int *status );
+void ndgBegpv( int *status );
 void ndgCpsup( const Grp *igrp1, size_t i, Grp *igrp2, int * status );
 void ndgCreat( const char *param, const Grp *igrp0, Grp **igrp, size_t *size, int *flag, int *status);
 void ndgCrexp( const char grpexp[], const Grp *igrp0, Grp **igrp, size_t *size, int *flag, int *status );
@@ -113,8 +116,6 @@ void ndgRemoveProv( NdgProvenance *prov, int nanc, int *anc, int *status );
 void ndgUnhashProv( NdgProvenance *, int * );
 void ndgUnhideProv( NdgProvenance *, int, int * );
 void ndgWriteProv( NdgProvenance *prov, int indf, int whdef, int *status );
-NdgProvenance *ndgReadVotProv( const char *xml, const char *path, const char *creator, int *status );
-const char *ndgWriteVotProv( NdgProvenance *prov, int *status );
 
 AstXmlElement *ndgHds2vot( const HDSLoc *loc, AstXmlElement *elem, int *status );
 AstXmlElement *ndgPutParam0( AstXmlElement *elem, const char *name, const char *datatype, const char *value, int *status );

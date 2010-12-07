@@ -195,6 +195,10 @@
 *        Updated to use new provenance API.
 *     7-JUL-2009 (DSB):
 *        Added Parameter HIDE.
+*     7-DEC-2010 (DSB):
+*        Use NDG_ANTMP rather than DAT_ANNUL to annul temporary HDS
+*        objects created by NDG. Using DAT_ANNUL does not erase such
+*        temporary objects form the HDS temp file.
 *     {enter_further_changes_here}
 
 *-
@@ -299,7 +303,7 @@
 
 *  Annul the KeyMap and locator holding information about the I'th ancestor.
             CALL AST_ANNUL( KM, STATUS )
-            IF( AMORE .NE. DAT__NOLOC ) CALL DAT_ANNUL( AMORE, STATUS )
+            CALL NDG_ANTMP( AMORE, STATUS )
 
 *  See if the pattern matches the item. If required, hide the ancestor, or
 *  add the ancestor index to the list to be deleted.

@@ -231,6 +231,10 @@
 *        Added parameter MORETEXT.
 *     25-JUN-2009 (DSB):
 *        Updated to use new provenance API.
+*     7-DEC-2010 (DSB):
+*        Use NDG_ANTMP rather than DAT_ANNUL to annul temporary HDS
+*        objects created by NDG. Using DAT_ANNUL does not erase such
+*        temporary objects form the HDS temp file.
 *     {enter_further_changes_here}
 
 *-
@@ -278,6 +282,7 @@
       INTEGER NANC               ! Total number of ancestors
       LOGICAL DOALL              ! Modify all ancestors?
       LOGICAL CHANGED            ! Has the component changed?
+      LOGICAL USENDG             ! Use NDG to annul the AMORE locator?
 *.
 
 
@@ -366,9 +371,14 @@
 *  If a new MORE structure has been specified, use its locator in place
 *  of the old one.
          IF( MORE .NE. DAT__NOLOC ) THEN
-            IF( AMORE .NE. DAT__NOLOC ) CALL DAT_ANNUL( AMORE, STATUS )
+            CALL NDG_ANTMP( AMORE, STATUS )
             AMORE = MORE
             MORE = DAT__NOLOC
+
+*  Note if the AMORE locator should be freed using NDG or HDS.
+            USENDG = .FALSE.
+         ELSE
+            USENDG = .TRUE.
          END IF
 
 *  Is the CREATOR string to be modified?
@@ -460,7 +470,13 @@
          CALL NDG_MODIFYPROV( IPROV, I, KM, AMORE, STATUS )
 
 *  Annul any MORE HDS structure.
-         IF( AMORE .NE. DAT__NOLOC ) CALL DAT_ANNUL( AMORE, STATUS )
+         IF( USENDG ) THEN
+            CALL NDG_ANTMP( AMORE, STATUS )
+
+         ELSE IF( AMORE .NE. DAT__NOLOC ) THEN
+            CALL DAT_ANNUL( AMORE, STATUS )
+
+         END IF
 
 *  Annul the KeyMap holding the ancestor information.
          CALL AST_ANNUL( KM, STATUS )
