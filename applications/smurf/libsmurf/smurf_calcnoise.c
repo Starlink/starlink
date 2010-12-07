@@ -99,6 +99,8 @@
 *        noise of darks or skys.
 *     2010-07-01 (TIMJ):
 *        smf_bolonoise can now handle apodization.
+*     2010-12-06 (TIMJ):
+*        Assign flatramp flatfields to noise data correctly.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -254,7 +256,7 @@ void smurf_calcnoise( int *status ) {
 
     /* Concatenate this continuous chunk but forcing a raw data read.
        We will need quality. */
-    smf_concat_smfGroup( wf, igroup, NULL, NULL, flatramps, contchunk, 0, 1,
+    smf_concat_smfGroup( wf, igroup, NULL, NULL, NULL, contchunk, 0, 1,
                          NULL, 0, NULL, NULL, 0, 0, 0, 1, &concat, status );
 
     /* Now loop over each subarray */
@@ -343,6 +345,7 @@ void smurf_calcnoise( int *status ) {
               smfData * powval;
               smfData * bolval;
               smf_flatmeth flatmethod;
+              smf_flat_override( flatramps, thedata, status );
               smf_flat_smfData( thedata, &flatmethod, &powval, &bolval, status );
               ngood = smf_flat_responsivity( flatmethod, respmap, 5.0, 1, powval, bolval, NULL, status);
               if (powval) smf_close_file( &powval, status );
