@@ -184,7 +184,7 @@ F77_SUBROUTINE(ast_getcolumndata)( INTEGER(THIS),
                                    DOUBLE(DNULL),
                                    INTEGER(MXSIZE),
                                    POINTER(COLDATA),
-                                   INTEGER(SIZE),
+                                   INTEGER(NELEM),
                                    INTEGER(STATUS)
                                    TRAIL(COLUMN) ) {
    GENPTR_INTEGER(THIS)
@@ -193,25 +193,15 @@ F77_SUBROUTINE(ast_getcolumndata)( INTEGER(THIS),
    GENPTR_DOUBLE(DNULL)
    GENPTR_INTEGER(MXSIZE)
    GENPTR_POINTER(COLDATA)
-   GENPTR_INTEGER(SIZE)
-   size_t size;
+   GENPTR_INTEGER(NELEM)
    char *column;
 
    astAt( "AST_GETCOLUMNDATA", NULL, 0 );
    astWatchSTATUS(
       column = astString( COLUMN, COLUMN_length );
-
       astGetColumnData( astI2P( *THIS ), column, *RNULL, *DNULL, *MXSIZE,
-                        cnfCptr( *COLDATA ), &size );
+                        cnfCptr( *COLDATA ), NELEM );
       astFree( column );
-
-      *SIZE = size;
-      if( (size_t) *SIZE != size && astOK ) {
-         astError( AST__BIGTAB, "AST_GETCOLUMNDATA(FitsTable): The "
-                   "number of bytes in the column is too large to fit "
-                   "in a Fortran INTEGER.", status );
-      }
-
    )
 }
 

@@ -177,7 +177,7 @@ static void AddColumn( AstTable *, const char *, int, int, int *, const char *, 
 static void Copy( const AstObject *, AstObject *, int * );
 static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
-static void GetColumnData( AstFitsTable *, const char *, float, double, size_t, void *, size_t *, int * );
+static void GetColumnData( AstFitsTable *, const char *, float, double, size_t, void *, int *, int * );
 static void PurgeHeader( AstFitsTable *, int * );
 static void PutTableHeader( AstFitsTable *, AstFitsChan *, int * );
 static void UpdateHeader( AstFitsTable *, const char *, int * );
@@ -668,8 +668,8 @@ f     RESULT = AST_COLUMNSIZE( THIS, COLUMN, STATUS )
 *  Description:
 *     This function returns the number of bytes of memory that must be
 *     allocated prior to retrieving the data from a column using
-c     astColumnData.
-f     AST_COLUMNDATA.
+c     astGetColumnData.
+f     AST_GETCOLUMNDATA.
 
 *  Parameters:
 c     this
@@ -821,7 +821,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 
 static void GetColumnData( AstFitsTable *this, const char *column,
                            float fnull, double dnull, size_t mxsize,
-                           void *coldata, size_t *size, int *status ){
+                           void *coldata, int *nelem, int *status ){
 /*
 *++
 *  Name:
@@ -838,9 +838,9 @@ f     AST_GETCOLUMNDATA
 c     #include "frameset.h"
 c     void astGetColumnData( AstFitsTable *this, const char *column,
 c                            float fnull, double dnull, size_t mxsize,
-c                            void *coldata, size_t *size, int *status )
+c                            void *coldata, int *nelem, int *status )
 f     CALL AST_GETCOLUMNDATA( THIS, COLUMN, RNULL, DNULL, MXSIZE,
-f                             COLDATA, SIZE, STATUS )
+f                             COLDATA, NELEM, STATUS )
 
 *  Class Membership:
 *     FitsTable method.
@@ -898,12 +898,13 @@ f     COLDATA = POINTER (Given)
 *        strings will be null terminated. Any excess room at the end of
 *        the array will be left unchanged.
 f        In Starlink Fortran, a POINTER type is stored in an INTEGER.
-c     size
-f     SIZE = INTEGER (Return)
-*        The number of bytes returned in the
+c     nelem
+f     NELEM = INTEGER (Return)
+*        The number of elements returned in the
 c        "coldata"
 f        COLDATA
-*        array.
+*        array. This is the product of the number of rows returned and
+*        the number of elements in each column value.
 f     STATUS = INTEGER (Given and Returned)
 f        The global status.
 
@@ -937,7 +938,7 @@ f     AST_COLUMNNULL functiom.
    void *pout;       /* Pointer to next output element */
 
 /* Initialise */
-   *size = 0;
+   *nelem = 0;
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -1065,9 +1066,8 @@ f     AST_COLUMNNULL functiom.
 /* Free resources. */
    pnull = astFree( pnull );
 
-/* Return the number of returned bytes. */
-   *size = pout - coldata;
-
+/* Return the number of returned elements. */
+   *nelem = ( pout - coldata )/nb;
 }
 
 static int GetObjSize( AstObject *this_object, int *status ) {
@@ -2338,11 +2338,11 @@ size_t astColumnSize_( AstFitsTable *this, const char *column, int *status ){
 }
 
 void astGetColumnData_( AstFitsTable *this, const char *column, float fnull,
-                        double dnull, size_t mxsize, void *coldata, size_t *size,
+                        double dnull, size_t mxsize, void *coldata, int *nelem,
                         int *status ){
    if ( !astOK ) return;
    (**astMEMBER(this,FitsTable,GetColumnData))(this,column,fnull,dnull,mxsize,
-                                               coldata,size,status);
+                                               coldata,nelem,status);
 }
 
 
