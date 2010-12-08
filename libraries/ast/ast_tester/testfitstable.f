@@ -27,12 +27,12 @@
      :               'TTYPE1  = ''BYTECOL ''',
      :               'TUNIT1  = ''ADU     ''',
      :               'TDIM1   = ''(2,3)   ''',
-     :               'TFORM2  = ''0A      ''',
-     :               'TTYPE2  = ''STRINGCOL''',
-     :               'TDIM2   = ''(0,3)   ''',
-     :               'TFORM3  = ''1J      ''',
-     :               'TTYPE3  = ''INTCOL  ''',
-     :               'TUNIT3  = ''m       ''' /
+     :               'TFORM2  = ''1J      ''',
+     :               'TTYPE2  = ''INTCOL  ''',
+     :               'TUNIT2  = ''m       ''',
+     :               'TFORM3  = ''0A      ''',
+     :               'TTYPE3  = ''STRINGCOL''',
+     :               'TDIM3   = ''(0,3)   ''' /
 
 
       data header2 / 'XTENSION= ''BINTABLE''',
@@ -48,13 +48,13 @@
      :               'TUNIT1  = ''ADU     ''',
      :               'TNULL1  =                  254',
      :               'TDIM1   = ''(2,3)   ''',
-     :               'TFORM2  = ''30A     ''',
-     :               'TTYPE2  = ''STRINGCOL''',
-     :               'TDIM2   = ''(10,3)  ''',
-     :               'TFORM3  = ''1J      ''',
-     :               'TTYPE3  = ''INTCOL  ''',
-     :               'TUNIT3  = ''m       ''',
-     :               'TNULL3  =           2147483647' /
+     :               'TFORM2  = ''1J      ''',
+     :               'TTYPE2  = ''INTCOL  ''',
+     :               'TUNIT2  = ''m       ''',
+     :               'TNULL2  =           2147483647',
+     :               'TFORM3  = ''30A     ''',
+     :               'TTYPE3  = ''STRINGCOL''',
+     :               'TDIM3   = ''(10,3)  ''' /
 
 c      call ast_watchmemory(483)
 
