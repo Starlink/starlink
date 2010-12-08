@@ -124,11 +124,11 @@ c      call ast_watchmemory(483)
          call stopit( status, 'Table error 8b' )
       endif
 
-      if( ast_columnname( table, 1, status ) .ne. 'DICK' ) then
+      if( ast_columnname( table, 1, status ) .ne. 'FRED' ) then
          call stopit( status, 'Table error 8c' )
       endif
 
-      if( ast_columnname( table, 2, status ) .ne. 'FRED' ) then
+      if( ast_columnname( table, 2, status ) .ne. 'DICK' ) then
          call stopit( status, 'Table error 8d' )
       endif
 

@@ -698,10 +698,10 @@ f     RESULT = AST_COLUMNNAME( THIS, INDEX, STATUS )
 c     zero to one less than Ncolumn.
 f     one to Ncolumn.
 *
-*     Note, the index associated with each column is not necessarily
-*     related to the order in which the columns are added to the Table.
-*     Adding or removing columns may change the indices associated with
-*     other columns.
+*     Note, the index associated with a column decreases monotonically with
+*     the age of the column: the oldest Column in the Table will have index
+*     one, and the Column added most recently to the Table will have the
+*     largest index.
 
 *  Parameters:
 c     this
@@ -4429,7 +4429,7 @@ AstTable *astInitTable_( void *mem, size_t size, int init,
 /* Initialise the Table data. */
 /* ---------------------------- */
       new->nrow = 0;
-      new->columns = astKeyMap( "KeyCase=0", status );
+      new->columns = astKeyMap( "KeyCase=0,Sortby=AgeDown", status );
 
 /* Tables require the KeyCase attribute to be zero. */
       (*parent_setkeycase)( (AstKeyMap *) new, 0, status );
