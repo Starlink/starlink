@@ -33,7 +33,7 @@
 *     topic = const char * (Given)
 *        Topic on which information is to be obtained. Allowed values are:
 *        - LOCATORS : Return the number of active locators.
-*                     Internal scratch locators are ignored.
+*                     Internal root scratch locators are ignored.
 *        - ALOCATORS: Returns the number of all active locators, including
 *                     scratch space.
 *        - FILES : Return the number of open files
@@ -60,7 +60,7 @@
 *       - "LOCATORS", if non-NULL, "extra" can contain a comma
 *         separated list of locator paths (upper case, as returned
 *         by hdsTrace) that should be included in the count. If any
-*         component is preceeded by a '!' all locators with starting
+*         component is preceeded by a '!' all locators starting
 *         with that path will be ignored in the count. This can be
 *         used to remove parameter locators from the count.
 *       - If "!EXTINCTION,EXTINCTION" is requested then they will
@@ -69,6 +69,9 @@
 *       - Only valid hds locators are counted. If there is an internal
 *         error tracing a locator, it is ignored and that locator is
 *         not included in the count.
+*    - Top-level scratch locators such as "HDS_SCRATCH.TEMP_N" are not
+*      included in the "LOCATORS" count but children of the temp locators
+*      are included (since those temporary items should be freed).
 
 *  Authors
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -88,9 +91,13 @@
 *     22-MAR-2007 (TIMJ):
 *        - LOCATORS now filters out internal HDS_SCRATCH locators
 *        - Add ALOCATORS (which behaves like the old LOCATORS and does not filter)
+*     2010-12-09 (TIMJ):
+*        LOCATORS will now count HDS_SCRATCH locators but will skip the root
+*        HDS_SCRATCH locators.
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     Copyright (C) 2006, 2007 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -141,7 +148,7 @@ hdsInfoI(const HDSLoc* loc, const char *topic_str, const char * extra_str,
    struct LOC      locator;
    struct STR      path;
    struct STR      file;
-   int             i;
+   size_t          i;
    int             j;
    int             ncomp = 0;
    char            *comps[MAXCOMP];
@@ -152,6 +159,7 @@ hdsInfoI(const HDSLoc* loc, const char *topic_str, const char * extra_str,
    int             tracestat;
    int             nlev;
    char            extra[STR_K_LENGTH];
+   int             skip_scratch_root = 0;
 
 /* These buffers are only used when using VMS descriptors. */
 
@@ -220,10 +228,9 @@ hdsInfoI(const HDSLoc* loc, const char *topic_str, const char * extra_str,
      /* If we find some we store the pointers into comps[] */
      ncomp = 0;
 
-     /* If LOCATORS we need to filter out !HDS_SCRATCH */
+     /* If LOCATORS we need to filter out HDS_SCRATCH.TEMP root locators */
      if (_cheql(4,name, "LOCA")) {
-       comps[ncomp] = "!HDS_SCRATCH";
-       ncomp++;
+       skip_scratch_root = 1;
      }
 
      if (extra_str != NULL) {
@@ -282,22 +289,38 @@ hdsInfoI(const HDSLoc* loc, const char *topic_str, const char * extra_str,
 	       /* we can match on more than one item */
 	       match = 0;
 	       exclude = 0;
-	       for (j=0; j<ncomp; j++) {
-		 /* matching or anti-matching? */
-		 if ( *(comps[j]) == '!' ) {
-		   /* do not forget to start one character in for the ! */
-		   if (strncmp(path.body, (comps[j])+1,
-			       strlen(comps[j])-1) == 0) {
-		     /* Should be exempt */
-		     exclude = 1;
-		   }
-		 } else {
-		   if (strncmp(path.body, comps[j], strlen(comps[j])) == 0) {
-		     /* Should be included */
-		     match = 1;
-		   }
-		 }
-	       }
+
+               /* Do a special case for skipping the root scratch locator */
+               if (skip_scratch_root) {
+                 const char *root = "HDS_SCRATCH.TEMP_";
+                 const size_t rootlen = strlen(root);
+                 if (strncmp( path.body, root, rootlen) == 0)  {
+                   /* exclude if the string only has one "." */
+                   if ( !strstr( &((path.body)[rootlen-1]), ".")) {
+                     exclude = 1;
+                   }
+                 }
+               }
+
+               if (!exclude) {
+                 for (j=0; j<ncomp; j++) {
+                   /* matching or anti-matching? */
+                   if ( *(comps[j]) == '!' ) {
+                     /* do not forget to start one character in for the ! */
+                     if (strncmp(path.body, (comps[j])+1,
+                                 strlen(comps[j])-1) == 0) {
+                       /* Should be exempt */
+                       exclude = 1;
+                     }
+                   } else {
+                     if (strncmp(path.body, comps[j], strlen(comps[j])) == 0) {
+                       /* Should be included */
+                       match = 1;
+                     }
+                   }
+                 }
+               }
+
 	       /* increment if we either matched something
 		  or was not excluded */
 	       if (match || !exclude ) (*result)++;
