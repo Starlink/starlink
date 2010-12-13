@@ -293,6 +293,11 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *     13-AUG-2010 (DSB):
 *        In astRebinSeq<X>, scale WLIM to take account of weighting by
 *        input variances.
+*     13-DEC-2010 (DSB):
+*        Ensure that astMapSplit returns a Mapping that is independent of
+*        the supplied Mapping (i.e. return a deep copy). This means that
+*        subsequent changes to the supplied Mapping cannot affect the returned
+*        Mapping.
 *class--
 */
 
@@ -8015,7 +8020,8 @@ static int *MapSplit( AstMapping *this, int nin, const int *in,
 *        Mapping. This Mapping will have "nin" inputs (the number of
 *        outputs may be differetn to "nin"). A NULL pointer will be
 *        returned if the supplied Mapping has no subset of outputs which
-*        depend only on the selected inputs.
+*        depend only on the selected inputs. The returned Mapping is a
+*        deep copy of the required parts of the supplied Mapping.
 
 *  Returned Value:
 *     A pointer to a dynamically allocated array of ints. The number of
@@ -23475,9 +23481,19 @@ int astMapList_( AstMapping *this, int series, int invert, int *nmap,
 }
 int *astMapSplit_( AstMapping *this, int nin, const int *in, AstMapping **map,
                    int *status ){
+   int *result = NULL;
+   AstMapping *tmap;
+
    if( map ) *map = NULL;
    if ( !astOK ) return NULL;
-   return (**astMEMBER(this,Mapping,MapSplit))( this, nin, in, map, status );
+
+   result = (**astMEMBER(this,Mapping,MapSplit))( this, nin, in, &tmap, status );
+   if( tmap ) {
+      *map = astCopy( tmap );
+      tmap = astAnnul( tmap );
+   }
+
+   return result;
 }
 int astMapMerge_( AstMapping *this, int where, int series, int *nmap,
                   AstMapping ***map_list, int **invert_list, int *status ) {
@@ -24226,7 +24242,8 @@ f        The
 c        "nin" inputs (the number of outputs may be different to "nin"). NULL
 f        NIN inputs (the number of outputs may be different to NIN). AST__NULL
 *        is returned if the supplied Mapping has no subset of outputs which
-*        depend only on the selected inputs.
+*        depend only on the selected inputs. The returned Mapping is a
+*        deep copy of the required parts of the supplied Mapping.
 
 *  Notes:
 *     - If this
