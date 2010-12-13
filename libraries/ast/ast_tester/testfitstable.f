@@ -165,7 +165,8 @@ c      call ast_watchmemory(483)
       else
          call psx_malloc( colsize, pntr, status )
          call ast_getcolumndata( table, 'StringCol', 0.0, 0.0D0,
-     :                           colsize, pntr, colsize, status )
+     :                           colsize, %val( cnf_pval(pntr)),
+     :                           colsize, status )
          if( colsize .ne. 9 ) call stopit( status,
      :                                     'FitsTable error 13c' )
          call checkstrings( table, %val( CNF_PVAL( pntr ) ), status )
@@ -178,7 +179,8 @@ c      call ast_watchmemory(483)
       else
          call psx_malloc( colsize, pntr, status )
          call ast_getcolumndata( table, 'BYTECOL', 0.0, 0.0D0, colsize,
-     :                           pntr, colsize, status )
+     :                           %val( cnf_pval( pntr ) ), colsize,
+     :                           status )
          if( colsize .ne. 18 ) call stopit( status,
      :                                      'FitsTable error 13e' )
          call checkbytes( table, %val( CNF_PVAL( pntr ) ),
@@ -194,7 +196,8 @@ c      call ast_watchmemory(483)
       else
          call psx_malloc( colsize, pntr, status )
          call ast_getcolumndata( table, 'INTCOL', 0.0, 0.0D0, colsize,
-     :                           pntr, colsize, status )
+     :                           %val( cnf_pval( pntr ) ), colsize,
+     :                           status )
          if( colsize .ne. 3 ) call stopit( status,
      :                                    'FitsTable error 13g' )
          call checkints( table, %val( CNF_PVAL( pntr ) ),
@@ -216,7 +219,8 @@ c      call ast_watchmemory(483)
       else
          call psx_malloc( colsize, pntr, status )
          call ast_getcolumndata( table, 'REALCOL', -1.0, 0.0D0, colsize,
-     :                           pntr, colsize, status )
+     :                           %val( cnf_pval( pntr ) ), colsize,
+     :                           status )
          if( colsize .ne. 3 ) call stopit( status,
      :                                    'FitsTable error 13i' )
          call checkreals( table, %val( CNF_PVAL( pntr ) ), -1.0,

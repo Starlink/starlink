@@ -887,8 +887,10 @@ f        AST_COLUMNSIZE.
 *        trailing column values will be omitted from the returned array,
 *        but no error will be reported.
 c     coldata
-f     COLDATA = POINTER (Given)
-*        A pointer to an area of memory in which to return the data
+f     COLDATA( * ) = BYTE (Given)
+c        A pointer to an
+f        An
+*        area of memory in which to return the data
 *        values currently stored in the column. The values are stored in
 *        row order. If the column holds non-scalar values, the elements
 *        of each value are stored in "Fortran" order. No data type
@@ -897,7 +899,6 @@ f     COLDATA = POINTER (Given)
 *        added to the table. If the column holds strings, the returned
 *        strings will be null terminated. Any excess room at the end of
 *        the array will be left unchanged.
-f        In Starlink Fortran, a POINTER type is stored in an INTEGER.
 c     nelem
 f     NELEM = INTEGER (Return)
 *        The number of elements returned in the

@@ -183,7 +183,7 @@ F77_SUBROUTINE(ast_getcolumndata)( INTEGER(THIS),
                                    REAL(RNULL),
                                    DOUBLE(DNULL),
                                    INTEGER(MXSIZE),
-                                   POINTER(COLDATA),
+                                   BYTE_ARRAY(COLDATA),
                                    INTEGER(NELEM),
                                    INTEGER(STATUS)
                                    TRAIL(COLUMN) ) {
@@ -192,7 +192,7 @@ F77_SUBROUTINE(ast_getcolumndata)( INTEGER(THIS),
    GENPTR_REAL(RNULL)
    GENPTR_DOUBLE(DNULL)
    GENPTR_INTEGER(MXSIZE)
-   GENPTR_POINTER(COLDATA)
+   GENPTR_BYTE_ARRAY(COLDATA)
    GENPTR_INTEGER(NELEM)
    char *column;
 
@@ -200,7 +200,7 @@ F77_SUBROUTINE(ast_getcolumndata)( INTEGER(THIS),
    astWatchSTATUS(
       column = astString( COLUMN, COLUMN_length );
       astGetColumnData( astI2P( *THIS ), column, *RNULL, *DNULL, *MXSIZE,
-                        cnfCptr( *COLDATA ), NELEM );
+                        (void *) COLDATA, NELEM );
       astFree( column );
    )
 }
