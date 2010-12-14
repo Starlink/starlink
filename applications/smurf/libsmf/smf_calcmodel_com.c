@@ -167,6 +167,9 @@
 *     2010-06-16 (DSB):
 *        Refactor all the code for finding gains and offsets, and
 *        rejecting aberrant bolometers, into smf_find_gains_array.
+*     2010-12-14 (DSB):
+*        Use sqrt, not sqrtf (sqrtf can cause "inf" gain values for bad
+*        data, which then pollute all other gain values).
 
 *  Copyright:
 *     Copyright (C) 2006-2010 University of British Columbia.
@@ -386,7 +389,7 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
          estimate of the bolometer gain. This means that the bolometers
          will be normalized to a common level when forming the first
          estimate of the common mode signal. */
-      gain = ( sum > 0.0 ) ? sqrtf( sum/nsum ) : VAL__BADD;
+      gain = ( sum > 0.0 ) ? sqrt( sum/nsum ) : VAL__BADD;
 
       /* Initialise the bolometer fit parameters for every block. */
       if( gai_data ) {
