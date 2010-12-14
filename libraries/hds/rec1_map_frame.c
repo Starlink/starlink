@@ -111,6 +111,8 @@
 /*       Extended file mapping for use on any suitable machine.		    */
 /*    16-FEB-1999 (RFWS):                                                   */
 /*       Allocate exportable memory.                                        */
+/*    14-DEC-2010 (TIMJ):                                                   */
+/*       Fix cnfRegp error handling logic.                                  */
 /*    {@enter_further_changes_here@}					    */
 
 /* Bugs:								    */
@@ -602,12 +604,27 @@ file ^FILE - ^MESSAGE",
 /* from both C and Fortran.                                                 */
                   reg = cnfRegp( *pntr );
 
+/* If any other type of error occurred while registering the pointer, then  */
+/* report an error, unmap the file and abort.                               */
+
+                  if ( reg == -1 )
+                  {
+                     hds_gl_status = DAT__FILMP;
+                     rec1_fmsg( "FILE", slot );
+                     emsRep( "REC1_MAP_FRAME_8",
+                                "Error registering a pointer for mapped data "
+                                "in the file ^FILE - internal CNF error",
+                                &hds_gl_status );
+                     (void) munmap( start, len );
+                     break;
+
 /* If registration failed because the pointer is not unique when converted  */
 /* into Fortran format, then unmap the file and generate a suggested        */
 /* virtual address at which the file should be mapped next time in order to */
 /* produce a different pointer value. Check for any errors during           */
 /* unmapping (report an error and abort if necessary).                      */
-                  if ( reg == -1 )
+                  }
+                  else if ( !reg )
                   {
                      if ( munmap( start, len ) )
                      {
@@ -621,21 +638,6 @@ file ^FILE - ^MESSAGE",
                      }
                      if ( !where ) where = start;
                      where += pagesize;
-
-/* If any other type of error occurred while registering the pointer, then  */
-/* report an error, unmap the file and abort.                               */
-                  }
-                  else if ( !reg )
-                  {
-                     hds_gl_status = DAT__FILMP;
-                     emsSyser( "MESSAGE", errno );
-                     rec1_fmsg( "FILE", slot );
-                     emsRep( "REC1_MAP_FRAME_8",
-                                "Error registering a pointer for mapped data "
-                                "in the file ^FILE - ^MESSAGE",
-                                &hds_gl_status );
-                     (void) munmap( start, len );
-                     break;
 
 /* Otherwise, file mapping was successful. If the access mode is demand     */
 /* zero, then fill the mapped addresses with zeros.			    */
