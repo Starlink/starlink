@@ -162,6 +162,9 @@
 *        Add auto mode to use WVM if available else CSO.
 *     2010-06-03 (TIMJ):
 *        Add extinction scaling parameters keymap.
+*     2010-12-14 (TIMJ):
+*        Trap negative taus from WVM. Currently just use the previous good
+*        value.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -506,15 +509,21 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
         newtau = 0;
       }
       if (newtau) {
-        tau = smf_calc_wvm( hdr, amprev, extpars, status );
+        float thistau = VAL__BADD;
+        thistau = smf_calc_wvm( hdr, amprev, extpars, status );
         newtau = 0;
         /* Check status and/or value of tau */
-        if ( tau == VAL__BADD ) {
+        if ( thistau == VAL__BADD ) {
           if ( *status == SAI__OK ) {
             *status = SAI__ERROR;
             errRep("", "Error calculating tau from WVM temperatures",
                    status);
           }
+        } else if ( thistau < 0.0 ) {
+          msgOutiff( MSG__QUIET, "", "WARNING: Negative WVM tau calculated (%g). Ignoring.",
+                    status, thistau );
+        } else {
+          tau = thistau;
         }
       }
     }
