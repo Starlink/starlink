@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.37}
 \newcommand{\stardocnumber}    {95.37}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2010 October 26}
+\newcommand{\stardocdate}      {2010 December 15}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.12}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -38384,8 +38384,7 @@ KAPPA: \htmlref{PALDEF}{PALDEF},
          a value is given which does not end with a hyphen.  All the
          NDFs given in this way are concatenated into a single group.
 
-         For consistency with the old method a), the group can contain
-         no more than 26 names.
+         The group can contain no more than 1000 names.
       }
       \sstsubsection{
          OUT = NDF (Write)
@@ -57619,6 +57618,12 @@ The following applications have been modified:
    \item [\htmlref{NDFTRACE}{NDFTRACE}]\mbox{}
       \begin{itemize}
         \item Writes Parameter FPIXSCALE even if QUIET=TRUE.
+      \end{itemize}
+
+   \item [\htmlref{PASTE}{PASTE}]\mbox{}
+      \begin{itemize}
+        \item The maximum number of NDFs that can be supplied via Parameter
+        IN has increased from 26 to 1000.
       \end{itemize}
 
    \item [\htmlref{PSF}{PSF}]\mbox{}

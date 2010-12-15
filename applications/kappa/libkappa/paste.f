@@ -72,8 +72,7 @@
 *        is given which does not end with a hyphen.  All the NDFs
 *        given in this way are concatenated into a single group.
 *
-*        For consistency with the old method a), the group can contain
-*        no more than 26 names.
+*        The group can contain no more than 1000 names.
 *     OUT = NDF (Write)
 *        The NDF resulting from pasting of the input NDFs onto the base
 *        NDF.  Its dimensions may be different from the base NDF.  See
@@ -175,6 +174,9 @@
 *     2005 November 2 (MJC):
 *        Allowed parameter IN to be a group.  Added examples to
 *        demonstrate this option.
+*     2010 December 15 (MJC):
+*        Increase maximum number of NDFs defined through Parameter IN
+*        to 1000.
 *     {enter_further_changes_here}
 
 *-
@@ -192,8 +194,11 @@
       INTEGER STATUS             ! Global status
 
 *  Local Constants:
+      INTEGER NDFMXC             ! Maximum number of input NDFs
+      PARAMETER ( NDFMXC = 26 )  ! Classic method
+
       INTEGER NDFMAX             ! Maximum number of input NDFs
-      PARAMETER ( NDFMAX = 26 )
+      PARAMETER ( NDFMAX = 1000 )
 
 *  Local Variables:
       LOGICAL BAD                ! Input NDFs' data arrays may have bad
@@ -291,10 +296,11 @@
 *  Make a loop to input the NDFs, via parameters P1, IP2,...  Start an
 *  error context because a null is used to end the list of NDFs.  Since
 *  the order and bounds given after the NDF name are important, IRG
-*  cannot be used safely.
+*  cannot be used safely.  Limit to the constrained maximum number of
+*  NDFs.
          CALL ERR_MARK
          I = 0
-         DO WHILE ( STATUS .EQ. SAI__OK .AND. I .LT. NDFMAX - 1 )
+         DO WHILE ( STATUS .EQ. SAI__OK .AND. I .LT. NDFMXC - 1 )
             I = I + 1
             CALL CHR_ITOC( I, CIN, NC )
             PNIN = 'P'//CIN( :NC )
@@ -313,8 +319,8 @@
 *  for the extra loop is counteracted by plus one for the principal
 *  NDF, except for the last input NDF as the loop is not entered after
 *  it has been obtained.
-         IF ( I .GE. NDFMAX - 1 ) THEN
-            NUMNDF = NDFMAX
+         IF ( I .GE. NDFMXC - 1 ) THEN
+            NUMNDF = NDFMXC
          ELSE
             NUMNDF = MAX( 1, I )
          END IF

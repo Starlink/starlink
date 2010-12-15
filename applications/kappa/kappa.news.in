@@ -72,6 +72,11 @@
 
       -  Writes Parameter FPIXSCALE even if QUIET=TRUE.
 
+   o  PASTE
+
+      -  The maximum number of NDFs that can be supplied via
+      Parameter IN has increased from 26 to 1000.
+
    o  PSF
 
       -  A bug has fixed in the normalisation of the fit in cases
