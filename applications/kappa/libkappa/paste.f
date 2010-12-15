@@ -143,7 +143,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -153,8 +153,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -281,7 +281,7 @@
      :                 GRPIN, NUMNDF, STATUS )
 
 *  The options are a) classic method where one principal NDF is supplied
-*  via parameter IN and those to be pasted through parameters P1 to P26.
+*  via parameter IN and those to be pasted through parameters P1 to P25.
 *  The modern alternative is to supply a list via GRP, where the first
 *  file is the base and the subsequent frames are pasted in the order
 *  supplied.
@@ -293,7 +293,7 @@
 *  First the principal NDF.
          CALL NDG_NDFAS( GRPIN, 1, 'READ', NDFI( 1 ), STATUS )
 
-*  Make a loop to input the NDFs, via parameters P1, IP2,...  Start an
+*  Make a loop to input the NDFs, via parameters P1, P2,...  Start an
 *  error context because a null is used to end the list of NDFs.  Since
 *  the order and bounds given after the NDF name are important, IRG
 *  cannot be used safely.  Limit to the constrained maximum number of
