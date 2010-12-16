@@ -21464,8 +21464,9 @@ static void ReadFromSource( AstFitsChan *this, int *status ){
          card = (char *) astFree( (void *) card );
 
 /* Obtain the next header card. */
+         LOCK_MUTEX2;
          card = ( *this->source_wrap )( source, status );
-
+         UNLOCK_MUTEX2;
       }
 
 /* Set the current card index so that the first of the new cards will be the
