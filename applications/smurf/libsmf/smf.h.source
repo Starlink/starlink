@@ -24,6 +24,7 @@
  *     Edward Chapin (UBC)
  *     Malcolm J. Currie (Starlink)
  *     Coskun Oba (COBA, UoL)
+ *     Remo Tilanus (JAC, Hawaii)
  *     {enter_new_authors_here}
 
  *  History:
@@ -396,6 +397,8 @@
  *        Add smf_check_smfFts
  *     2010-10-20 (EC):
  *        Add smf_downsamp_smfData
+ *     2010-10-06 (RPT)
+ *        Added smf_dataOrder_ndims.c
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -831,6 +834,10 @@ void * smf_dataOrder_array( void * oldbuf, smf_dtype dtype, size_t ndata,
                             size_t tstr1, size_t bstr1,
                             size_t tstr2, size_t bstr2, int inPlace,
                             int freeOld, int * status );
+
+void * smf_dataOrder_ndims( void * oldbuf, smf_dtype dtype, size_t ndata,
+			    size_t ndims, size_t * dims, size_t * perm,
+			    int inPlace, int freeOld, int * status );
 
 smfDA * smf_deepcopy_smfDA ( const smfData *old, int cpdks, int * status);
 
