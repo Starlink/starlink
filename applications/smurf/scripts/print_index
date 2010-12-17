@@ -254,8 +254,8 @@ my @ofiles = sort grep { /$FILE_PATTERN/ } grep { /$FILSUFPATT/ } readdir($DIR);
 closedir($DIR);
 
 # If: Found valid files in the flat directory
-if ($#ofiles > 0 && !$force) {
-  print "Found $#ofiles files in ${datadir}\n" if ($debug);
+if (@ofiles > 0 && !$force) {
+  print "Found ". @ofiles . " files in ${datadir}\n" if ($debug);
   foreach my $of (@ofiles) {
     push(@obsfiles, File::Spec->catfile($datadir,$of));
   }
@@ -289,7 +289,7 @@ $origin = $1 if $datadir =~ /[1,2][9,0,1](\d{6})/;
 # Handle each file
 
 # in case obs_... gsd files sort by scan number
-if ($obsfiles[0] !~ /sdf$/) {
+if (@obsfiles && $obsfiles[0] !~ /sdf$/) {
   print "Sorting files...\n" if $debug;
   my @unsorted = @obsfiles;
   @obsfiles = sort sort_by_scan @unsorted;
