@@ -199,7 +199,7 @@ if ( $prog !~ /scuba/ ) {
 my $sw = join( " ", grep { $_ !~ /^\-scu/i } @args);
 print "Running: ${prog} $sw\n" if ($debug);
 
-if ($skip && (!$tsys || $trx) ) {
+if ($skip && !($tsys || $trx) ) {
   print "\n*ERROR*: -skip is only valid with -tsys and/or -trx";
   pod2usage(1);
   exit;
