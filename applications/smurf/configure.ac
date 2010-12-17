@@ -117,21 +117,21 @@ STAR_DECLARE_DEPENDENCIES([sourceset], [sst])
 dnl    No use dependencies
 
 dnl Documentation
-STAR_LATEX_DOCUMENTATION(sun258/ sun259/ sc19/)
+STAR_LATEX_DOCUMENTATION(sun258/ sun259/ sun264/ sc19/)
 
 dnl Ask for a config.h so that we can retain control of when to define
 dnl parameters. And also to simplify the build line
 AC_CONFIG_HEADERS(config.h)
 
 dnl  But we also need to define the docs subdirs
-DOCS_SUBDIRS="sun258 sun259 sc19"
+DOCS_SUBDIRS="sun258 sun259 sun264 sc19"
 AC_SUBST(DOCS_SUBDIRS)
 
 AC_CONFIG_FILES(Makefile smurf.ifd component.xml libsmurf/Makefile \
                 libsmf/Makefile libsc2sim/Makefile libacsis/Makefile \
                 libaztec/Makefile libgsd/Makefile libsc2fts/Makefile \
                 docs/Makefile docs/sun258/Makefile docs/sun259/Makefile \
-                docs/sc19/Makefile)
+                docs/sun264/Makefile docs/sc19/Makefile)
 
 AC_CONFIG_FILES([libsmf/make_h], [chmod 755 libsmf/make_h])
 
