@@ -343,8 +343,7 @@ itcl::class gaia::GaiaImagePanel {
          }
          add_short_help $itk_component(autocolor) \
             {Select a quick colour map (more in View...Colors)}
-         foreach {name value} \
-            {default real greyscale ramp color bgyrw heat heat pastel pastel} {
+         foreach {name value} $itk_option(-quick_luts) {
             $itk_component(autocolor) add \
                -label "$name" \
                -command [code $this set_colormap_ $value] \
@@ -814,8 +813,16 @@ itcl::class gaia::GaiaImagePanel {
    #  panel.
    itk_option define -ukirt_ql ukirt_ql UKIRT_QL 0
 
-   #  Wether to show pixel indices as well.
+   #  Whether to show pixel indices as well.
    itk_option define -showpxy showpxy Showpxy 0
+
+   #  The quick look up tables.
+   itk_option define -quick_luts quick_luts Quick_Luts {
+      default real
+      greyscale ramp
+      color bgyrw
+      heat heat
+      pastel pastel}
 
    #   Protected variable.
    protected variable make_now_ 0
