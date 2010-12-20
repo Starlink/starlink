@@ -34,7 +34,7 @@ with the ACSIS correlator at JCMT.
       <uname>agg</uname>
     </person>
   </developers>
-  <documentation> sun258 sun259 sun264 sc19</documentation>
+  <documentation> sun258 sun259 sc19</documentation>
   <bugreports>t.jenness@jach.hawaii.edu</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
