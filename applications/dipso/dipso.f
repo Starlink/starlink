@@ -3532,10 +3532,10 @@ c       WRITE(*,*)
      :                TITLE(1:SLEN(TITLE))
                       IF( ABS(X2).LT.100000.0 ) THEN
                          WRITE (FFUNIT,
-     :                   '('' '',3(F10.2,3X),1P2(E12.5,2X))')
+     :                   '('' '',3(F10.2,3X),1P,2(E12.5,2X))')
      :                   X0, X2, (0.5*(X0+X2)), FFLX, FLXEW
                       ELSE
-                         WRITE (FFUNIT,'('' '',5(1PE11.4,2X))')
+                         WRITE (FFUNIT,'('' '',5(1P,E11.4,2X))')
      :                   X0, X2, (0.5*(X0+X2)), FFLX, FLXEW
                       END IF
 *
@@ -3556,22 +3556,22 @@ c       WRITE(*,*)
                    END IF
                    IF( ABS(X2).LT.100000.0 ) THEN
                       WRITE (*,
-     :                '(''   FLUX: '',1PE12.5/
-     :                ''   (X1, X2:'',0P2F10.2,'')'')')
+     :                '(''   FLUX: '',1P,E12.5/
+     :                ''   (X1, X2:'',0P,2F10.2,'')'')')
      :                FFLX, X0, X2
                    ELSE
                       WRITE (*,
-     :                '(''   FLUX: '',1PE12.5/
-     :                ''   (X1, X2:'',1P2E11.4,'')'')') FFLX, X0, X2
+     :                '(''   FLUX: '',1P,E12.5/
+     :                ''   (X1, X2:'',1P,2E11.4,'')'')') FFLX, X0, X2
                    END IF
                 ELSE
                    IF( FFOPEN ) THEN
                       IF( ABS(X2).LT.100000.0 ) THEN
                          WRITE (FFUNIT,
-     :                   '('' '',3(F10.2,3X),1P2(E12.5,2X))')
+     :                   '('' '',3(F10.2,3X),1P,2(E12.5,2X))')
      :                   X0, X2, (0.5*(X0+X2)), FFLX, FLXEW
                       ELSE
-                         WRITE (FFUNIT,'('' '',5(1PE11.4,2X))')
+                         WRITE (FFUNIT,'('' '',5(1P,E11.4,2X))')
      :                   X0, X2, (0.5*(X0+X2)), FFLX, FLXEW
                       END IF
 *
@@ -4121,9 +4121,9 @@ C ----------------------------------------------------------------
              ISKIP = NINT(VARRAY(1))
              WRITE (*,'(''   LIST - break points:''/(5I10))')
      :       (BREAK(I),I=1,NBREAK)
-             WRITE (*,'(0PI10,1PE15.3,1PE15.5)')
+             WRITE (*,'(0P,I10,1P,E15.3,1P,E15.5)')
      :       (I,WAVE(I),FLUX(I),I=1,NPOINT-1,ISKIP)
-             WRITE (*,'(0PI10,1PE15.3,1PE15.5)')
+             WRITE (*,'(0P,I10,1P,E15.3,1P,E15.5)')
      :       NPOINT,WAVE(NPOINT),FLUX(NPOINT)
 
 *  LOGAXX:  X axis in log space?
