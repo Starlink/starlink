@@ -165,6 +165,9 @@
 *     2010-12-14 (TIMJ):
 *        Trap negative taus from WVM. Currently just use the previous good
 *        value.
+*     2010-12-21 (TIMJ):
+*        Trap 0 airmass in same manner as VAL__BADD airmass. Fall back to using
+*        TCS_AZ_AC2.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -376,7 +379,8 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
     for ( k=0; k<nframes && (*status == SAI__OK) ; k++) {
       amstart = curstate->tcs_airmass;
       elstart = curstate->tcs_az_ac2;
-      if (amstart != VAL__BADD && elstart != VAL__BADD) {
+      if (amstart != VAL__BADD && elstart != VAL__BADD
+          && amstart != 0.0 ) {
         break;
       }
       curstate++;
@@ -386,7 +390,8 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
     for ( k=nframes; k>0 && (*status == SAI__OK) ; k--) {
       amend = curstate->tcs_airmass;
       elend = curstate->tcs_az_ac2;
-      if (amend != VAL__BADD && elend != VAL__BADD) {
+      if (amend != VAL__BADD && elend != VAL__BADD
+          && amend != 0.0 ) {
         break;
       }
       curstate--;
@@ -544,10 +549,15 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
 
       /* if things have gone bad use the previous value else store
          this value. We also need to switch to quick mode and disable adaptive. */
-      if (airmass == VAL__BADD) {
-        airmass = amprev;
-        quick = 1;
-        adaptive = 0;
+      if (airmass == VAL__BADD || airmass == 0.0 ) {
+        if ( hdr->state->tcs_az_ac2 != VAL__BADD ) {
+          /* try the elevation */
+          airmass = slaAirmas( M_PI_2 - hdr->state->tcs_az_ac2 );
+        } else {
+          airmass = amprev;
+          quick = 1;
+          adaptive = 0;
+        }
       } else {
         amprev = airmass;
       }

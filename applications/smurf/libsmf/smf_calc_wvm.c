@@ -64,6 +64,9 @@
 *        Check for bad values in the WVM temperature readings.
 *     2010-06-03 (TIMJ):
 *        Add keymap containing tau scaling parameters.
+*     2010-12-21 (TIMJ):
+*        Trap 0 airmass in same manner as VAL__BADD airmass. Fall back to using
+*        TCS_AZ_AC2.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -102,6 +105,7 @@
 #include "mers.h"
 #include "msg_par.h"
 #include "prm_par.h"
+#include "star/slalib.h"
 
 /* SMURF includes */
 #include "smf.h"
@@ -143,8 +147,11 @@ double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars, i
 
   airmass = state->tcs_airmass;
 
-  if (airmass == VAL__BADD) {
-    if ( approxam != VAL__BADD && approxam > 0) {
+  if (airmass == VAL__BADD || airmass == 0.0 ) {
+    /* try the tcs elevation value */
+    if ( state->tcs_az_ac2 != VAL__BADD ) {
+      airmass = slaAirmas( M_PI_2 - state->tcs_az_ac2 );
+    } else if ( approxam != VAL__BADD && approxam > 0) {
       airmass = approxam;
     } else {
       double amstart = VAL__BADD;
