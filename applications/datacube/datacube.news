@@ -8,7 +8,7 @@
  The following scripts have been added:
 
    o  mapbyvel
-      Form a new image from a cube's voxels using all the data
+      Forms a new image from a cube's voxels using all the data
       values of a supplied image as the Z co-ordinate in the cube.
       The supplied image must span the same X-Y region as the cube.
       In practice the cube has RA, Dec, velocity axes and the input
