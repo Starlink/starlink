@@ -1,24 +1,9 @@
 1 Figaro - Spectroscopy Data Reduction Package
                                                       Expires: ????.??.??
 
- Version 5.6-6
-
- A bug in the longslit and arc2d applications has been fixed. Previously
- these applications failed to run.
-
- Version 5.6-5
-
- A bug in the movie application has been fixed. Previously the movie
- axis had to be shorter than the first axis.
-
- Version 5.6-3 of Figaro has recently been released.  Figaro is a
- powerful and comprehensive general-purpose package for the reduction
- of astronomical images and spectra.  It contains particularly extensive
- facilities for spectroscopy.
-
- The changes in Version 5.6-3 comprise only a few minor bug fixes
- and enhancements, and a missing flux calibration file has been added.
- Brief details of the changes are given below.
+ Figaro is a powerful and comprehensive general-purpose package for
+ the reduction of astronomical images and spectra.  It contains
+ particularly extensive facilities for spectroscopy.
 
  Figaro is documented in SUN/86.  To view a hypertext version of this
  document type:
@@ -37,12 +22,37 @@
  Please report any problems with Figaro by sending an e-mail message to
  address figaro@star.rl.ac.uk.
 
+2 Version 5.6-6
+
+ Changes largely comprised bug fixes to re-enable former TWODSPEC tasks
+ to operate.
+ 
+ Bug fixes:
+   -  Corrected pointer indexing introduced while switching tasks to
+   support 64-bit addressing, notably in ARC2D, LONGSLIT, and COMB.
+
+   - Spectral-line editing restored.
+
+   - LONGSLIT and ARC2D applications ha stopped operating after the 
+   merger of TWODSPEC.
+
+2 Version 5.6-5
+
+ A bug in the movie application has been fixed. Previously the movie
+ axis had to be shorter than the first axis.
+
+2 Version 5.6-3
+
+ Version 5.6-3 of Figaro has recently been released.
+ 
+ The changes in Version 5.6-3 comprise only a few minor bug fixes
+ and enhancements, and a missing flux calibration file has been added.
+ Brief details of the changes are given below.
 
  A C Davenhall, 9 February 2004.
  revised Malcolm J Currie 2004 February 17
 
-
-2 Bug Fixes and Minor Enhancements
+3 Bug Fixes and Minor Enhancements
 
  GAUSS and IARC have each received both a bug fix and a minor
  enhancement.  Consequently, there has been an equally minor revision to
@@ -57,7 +67,7 @@
  was an arbitrary cut-off of the size of the extracted cross-section to be
  fitted.
 
-2 Flux Calibration Files
+3 Flux Calibration Files
 
  The flux calibration file for Hiltner 102, hil102.tab, was missing.  It
  has been added.
