@@ -17,13 +17,13 @@
 {Copyright \copyright\ 2005 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {55.26}
+\newcommand{\stardocnumber}    {55.27}
 \newcommand{\stardocauthors}   {Malcolm J. Currie\\
                                 G.J.Privett\\
                                 A.J.Chipperfield\\
                                 D.S.Berry\\
                                 A.C.Davenhall}
-\newcommand{\stardocdate}      {2010 February 2}
+\newcommand{\stardocdate}      {2010 December 23}
 \newcommand{\stardoctitle}     {CONVERT\\
                                 A Format-conversion Package}
 \newcommand{\stardocversion}   {Version 1.5-19}
@@ -7480,14 +7480,24 @@ environment variable.
 
 \subsection{Release Notes -- V1.5-19}
 
+Propagate LABEL keyword to NDF label in \htmlref{FITS2NDF}{FITS2NDF}.
+FITS2NDF can now recreate data that were formerly in a UKIRT\_HDS
+container file.
+
 \htmlref{NDF2FITS}{NDF2FITS} now recognises the modified data type of
-the SMURF extension. It also handles component names that are too long
+the SMURF extension.  It handles component names that are too long
 to fit in a single EXTNAME header by creating an EXTNAMEF keyword that
-uses the Long-string convention.
+uses the Long-string convention.  It also attempts to use the FIT-WCS
+encoding before any other.
 
 Added support for the SMURF\_EXT type for the SMURF extension, and for
 extensions within the SMURF extension's NDFs.
 
-Propagate LABEL keyword to NDF label in \htmlref{FITS2NDF}{FITS2NDF}.
+\htmlref{SPECX2NDF}{SPECX2NDF} converts the GSD bad value into the
+Starlink equivalent.
+
+The IDL scripts \htmlref{READ\_NDF}{READ_NDF} and
+\htmlref{WRITE\_NDF}{WRITE_NDF} have been fixed to use STARLINK\_DIR
+to specify the correct IDL library path.
 
 \end{document}

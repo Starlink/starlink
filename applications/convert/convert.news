@@ -1,14 +1,21 @@
 1 CONVERT_Version_1.5-19
 
+ FITS2NDF can now recreate data that were formerly in a UKIRT_HDS
+ container file.  The LABEL keyword propagates to the NDF label.
+
  NDF2FITS now recognises the modified data type of the SMURF
- extension. It also handles component names that are too long to
+ extension.  It handles component names that are too long to
  fit in a single EXTNAME header by creating an EXTNAMEF keyword
- that uses the Long-string convention.
+ that uses the Long-string convention.  It also attempts to use
+ the FIT-WCS encoding before any other.
 
  Added support for the SMURF_EXT type for the SMURF extension,
  and for extensions within the SMURF extension's NDFs.
 
- Propagate LABEL keyword to NDF label in FITS2NDF.
+ SPECX2NDF converts the GSD bad value into the Starlink equivalent.
+
+ The IDL scripts READ_NDF and WRITE_NDF have been fixed to use
+ STARLINK_DIR to specify the correct IDL library path.
 
 1 CONVERT_Version_1.5-18
 
