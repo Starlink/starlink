@@ -76,6 +76,9 @@ Version 3.1
      these routines will need to modify calling routines accordingly;
      without skewness or kurtosis values to document supply
      VAL__BADD for each undefined statistic.
+   - Support for FITS tapes was removed from FTS1_PHEAD, FTS1_RDATA,
+     FTS1_RGRDA, FTS1_RSTAB, FTS1_SKIP.  Argument MEDIUM in these
+     routines now only accepts the value 'DISK'.
 
 Version 3.0
    - CCG routines' NBAD argument excludes bad elements not attributable

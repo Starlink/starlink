@@ -870,6 +870,9 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
       these routines will need to modify calling routines accordingly;
       without skewness or kurtosis values to document supply
       VAL\_\_BADD for each undefined statistic.
+\item Support for FITS tapes was removed from FTS1\_PHEAD, FTS1\_RDATA,
+      FTS1\_RGRDA, FTS1\_RSTAB, FTS1\_SKIP.  Argument MEDIUM in these
+      routines now only accepts the value {\tt DISK}.
 \end{itemize}
 
 \section{Changes in Version 3.0}
