@@ -82,6 +82,11 @@ Version 3.1
      FTS1_RGRDA, FTS1_RSTAB, FTS1_SKIP.  Argument MEDIUM in these
      routines now only accepts the value 'DISK'.
 
+   - Config files can now include "<def>" to revert to the default
+     value.
+   - Config files can now include "<undef>" to store an undefined
+     value using kpy1Kymap.
+
 Version 3.0
    - CCG routines' NBAD argument excludes bad elements not attributable
      to the MINPIX threshold.
