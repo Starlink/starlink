@@ -6,12 +6,12 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {238.6}
+\newcommand{\stardocnumber}    {238.7}
 \newcommand{\stardocauthors}   {D.S. Berry \\Malcolm J. Currie}
-\newcommand{\stardocdate}      {9th March 2009}
+\newcommand{\stardocdate}      {2010 December 24}
 \newcommand{\stardoctitle}     {KAPLIBS -- Internal subroutines used within
                                 the KAPPA package.}
-\newcommand{\stardocversion}   {Version 3.0}
+\newcommand{\stardocversion}   {Version 3.1}
 \newcommand{\stardocmanual}    {Programmer's Reference}
 \newcommand{\stardocabstract}  {KAPLIBS is a package of Fortran subroutine
 libraries which were originally written as part of the KAPPA package (a
@@ -870,6 +870,9 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
       these routines will need to modify calling routines accordingly;
       without skewness or kurtosis values to document supply
       VAL\_\_BADD for each undefined statistic.
+\item Support for FITS tapes was removed from FTS1\_PHEAD, FTS1\_RDATA,
+      FTS1\_RGRDA, FTS1\_RSTAB, FTS1\_SKIP.  Argument MEDIUM in these
+      routines now only accepts the value {\tt DISK}.
 \end{itemize}
 
 \section{Changes in Version 3.0}
@@ -20538,6 +20541,67 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
    }
 }
 \sstroutine{
+   KPG1\_DSSFM
+}{
+   Displays information about the storage form of an NDF array
+}{
+   \sstdescription{
+      This routine displays a textual description of the storage form of
+      the specified NDF array.
+   }
+   \sstinvocation{
+      CALL KPG1\_DSSFM( INDF, COMP, REPORT, FORM, SCALE, ZERO, SCTYP,
+                       STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         INDF = INTEGER (Given)
+      }{
+         An identifier for the ndf.
+      }
+      \sstsubsection{
+         COMP = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The name of the NDF component (DATA, QUALITY or VARIANCE) to be
+         displayed.
+      }
+      \sstsubsection{
+         REPORT = LOGICAL (Given)
+      }{
+         If .TRUE. the storage form information is displayed on standard
+         output.
+      }
+      \sstsubsection{
+         FORM = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The storage form.
+      }
+      \sstsubsection{
+         SCALE = DOUBLE PRECISION (Returned)
+      }{
+         The scale factor. This will be set to 1.0 if the storage form
+         does not support scaled storage.
+      }
+      \sstsubsection{
+         ZERO = DOUBLE PRECISION (Returned)
+      }{
+         The zero offset. This will be set to 0.0 if the storage form
+         does not support scaled storage.
+      }
+      \sstsubsection{
+         SCTYP = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The scaled data type. This will be set to {\tt '} {\tt '} if the storage form
+         does not support scaled storage.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
    KPG1\_DWSOx
 }{
    Obtains for the scale and offset for a linear transformation from
@@ -29821,7 +29885,7 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
          input RGB colour.  Note at least eighteen characters are
          required to avoid truncation. This string may also be an HTML
          code of the form {\tt "}\#aabbcc{\tt "} (or {\tt "}@aabbcc{\tt "} - for use in contexts
-         where {\tt "}\#{\tt "} is a comment character, e.g. kappa style files) where
+         where {\tt "}\#{\tt "} is a comment character, e.g. KAPPA style files) where
          a, b and c are hexadecimal digits, and {\tt "}aa{\tt "}, {\tt "}bb{\tt "} and {\tt "}cc{\tt "} give
          red, blue and green intensities normalised to a maximum of {\tt "}ff{\tt "}
          (256).
