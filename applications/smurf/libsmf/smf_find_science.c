@@ -408,9 +408,16 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
               /* get reference heater value */
               smf_getfitsi( infile->hdr, "PIXHEAT", &curheat, status );
 
-              ngood = smf_flat_calcflat( MSG__VERB, NULL, "RESIST",
-                                       "FLATMETH", "FLATORDER", NULL, "RESPMASK",
-                                       "FLATSNR", NULL, infile, &curresp, status );
+              if (*status == SAI__OK) {
+                ngood = smf_flat_calcflat( MSG__VERB, NULL, "RESIST",
+                                           "FLATMETH", "FLATORDER", NULL, "RESPMASK",
+                                           "FLATSNR", NULL, infile, &curresp, status );
+                if (*status != SAI__OK) {
+                  /* if we failed to calculate a flatfield we should simply ignore it */
+                  ngood = 0;
+                  errAnnul(status);
+                }
+              }
 
               if (ngood < SMF__MINSTATSAMP) {
                 smf_smfFile_msg( NULL, "F", 1, thisfile, status );
