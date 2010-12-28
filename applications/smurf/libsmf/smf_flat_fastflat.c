@@ -63,6 +63,8 @@
 *        back to the reference heater and uses that in the sky fit.
 *     2010-07-23 (TIMJ):
 *        Set status to BADFLAT if we encounter bad values in SC2_HEAT.
+*     2010-12-27 (TIMJ):
+*        Fix off-by-one error when counting backwards.
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -331,7 +333,7 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
         after_heat = astCalloc( szfit, sizeof(*after_heat), 1 );
         extras += meas_per_heat;
         for (i=0;i<szfit; i++) {
-          after_heat[i] = (hdr->allState)[nframes-i].sc2_heat;
+          after_heat[i] = (hdr->allState)[nframes-1-i].sc2_heat;
         }
       }
 
@@ -553,7 +555,7 @@ double smf__calc_refheat_meas ( int indata[], size_t boloffset, size_t tstride, 
     if (forward) {
       htindex = i;
     } else {
-      htindex = nframes - i;
+      htindex = nframes - 1 - i;
     }
     buffer[i] = indata[ boloffset + htindex * tstride ];
   }
