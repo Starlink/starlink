@@ -940,9 +940,34 @@ int *status                      /* global status (given and returned) */
 
 }
 
+/*+ sc2store_putjcmtstate - put JCMTState values in the header arrays */
 
+void sc2store_putjcmtstate
+(
+size_t nframes,             /* number of frames (given) */
+const JCMTState head[],     /* header data for each frame (given) */
+int *status                 /* global status (given and returned) */
+ )
+/* Method :
+    Writes JCMTState information to the relevant chunks of mapped HDS
+    arrays.
+   History :
+    29Dec2010 : original as a wrapper around sc2store_headput (timj)
+*/
+{
 
-/*+ sc2store_headput - put values into the header arrays */
+   size_t j;
+
+   if ( *status != SAI__OK ) return;
+
+   for ( j=0; j<nframes; j++ )
+   {
+      sc2store_headput ( j, head[j], status );
+   }
+
+}
+
+/*+ sc2store_headput - put frame state values into header arrays */
 
 void sc2store_headput
 (
@@ -2872,10 +2897,7 @@ int *status                 /* global status (given and returned) */
 
 /* Insert per-frame headers */
 
-   for ( j=0; j<nframes; j++ )
-   {
-      sc2store_headput ( j, head[j], status );
-   }
+   sc2store_putjcmtstate( nframes, head, status );
    sc2store_errconv ( status );
 }
 

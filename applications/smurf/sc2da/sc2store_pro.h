@@ -198,6 +198,15 @@ const int pixval[],   /* values of incompressible pixels (given) */
 int *status           /* global status (given and returned) */
 );
 
+/*+ sc2store_putjcmtstate - put JCMTState values in the header arrays */
+
+void sc2store_putjcmtstate
+(
+size_t nframes,             /* number of frames (given) */
+const JCMTState head[],     /* header data for each frame (given) */
+int *status                 /* global status (given and returned) */
+ );
+
 /*+ sc2store_putscanfit - store scan fit coefficients */
 
 void sc2store_putscanfit

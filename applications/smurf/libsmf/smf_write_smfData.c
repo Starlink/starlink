@@ -353,9 +353,8 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
                              status  );
 
         /* Write out the per-frame headers */
-        for( i=0; (*status==SAI__OK)&&(i<inhdr->nframes); i++ ) {
-          sc2store_headput( i, inhdr->allState[i], status );
-        }
+        sc2store_putjcmtstate( inhdr->nframes, inhdr->allState, status );
+
       }
     }
 

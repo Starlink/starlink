@@ -860,10 +860,8 @@ void smurf_impaztec( int *status ) {
 
   sc2store_headcremap ( jcmtstateloc, ngframes, INST__SCUBA2, status );
 
-  /* Store the JCMState one frame at a time */
-  for( j=0; j<numsamples; j++ ) {
-    sc2store_headput ( j, head[j], status );
-  }
+  /* Store the JCMState */
+  sc2store_putjcmtstate( numsamples, head, status );
 
   /* Close the NDF */
 
