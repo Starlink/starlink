@@ -63,6 +63,11 @@
 
       -  Output variances can now be created for spline fits.
 
+   o  MFITTREND
+
+      -  Permits processing of very large datasets by dividing into
+      manageable sections.
+
    o  NDFCOMPRESS
 
       -  Now supports "delta" compression---a lossless compression
