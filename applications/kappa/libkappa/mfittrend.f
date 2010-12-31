@@ -158,9 +158,10 @@
 *        slower.   [FALSE]
 *     MASK = NDF (Write)
 *        The name of the NDF to contain the feature mask.  It is only
-*        accessed for automatic mode and METHOD="Single".  It has the
-*        same bounds as the input NDF and the data array is type _BYTE.
-*        No mask NDF is created if null (!) is supplied  [!]
+*        accessed for automatic mode and METHOD="Single" or "Global".
+*        It has the same bounds as the input NDF and the data array is
+*        type _BYTE.  No mask NDF is created if null (!) is supplied.
+*        [!]
 *     METHOD = LITERAL (Given)
 *        The method used to define the masked regions in automatic
 *        mode.  Allowed values are as follows.
@@ -175,7 +176,7 @@
 *        intervals between the rejected points, rescaled to the
 *        original pixels.  They are returned in parameter ARANGES.
 *
-*        This best suited to a low dispersion along the trend axis
+*        This is best suited to a low dispersion along the trend axis
 *        and a single concentrated region containing the bulk of the
 *        signal to be excluded from the trend fitting.
 *

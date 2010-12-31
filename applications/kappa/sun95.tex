@@ -34676,9 +34676,10 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          MASK = NDF (Write)
       }{
          The name of the NDF to contain the feature mask.  It is only
-         accessed for automatic mode and METHOD={\tt "Single"}.  It has the
-         same bounds as the input NDF and the data array is type \_BYTE.
-         No mask NDF is created if null ({\tt{!}}) is supplied  {\tt [!]}
+         accessed for automatic mode and METHOD={\tt "Single"} or
+         {\tt "Global"}.  It has the same bounds as the input NDF and the
+         data array is type \_BYTE.  No mask NDF is created if null
+         ({\tt{!}}) is supplied.  {\tt [!]}
       }
       \sstsubsection{
          METHOD = LITERAL (Given)
@@ -34699,7 +34700,7 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
             intervals between the rejected points, rescaled to the
             original pixels.  They are returned in Parameter ARANGES.
 
-            This best suited to a low dispersion along the trend axis
+            This is best suited to a low dispersion along the trend axis
             and a single concentrated region containing the bulk of the
             signal to be excluded from the trend fitting.
 
@@ -34710,7 +34711,7 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
             dispersion for the clipping of outliers within a line is
             the standard deviation within that line.
 
-             This is more appropriate when the features being masked
+            This is more appropriate when the features being masked
             vary widely across the image, and significantly between
             adjacent lines.  Some prior smoothing or background tracing
             (\xref{CUPID}{sun255}{}: \xref{FINDBACK}{sun255}{FINDBACK})
@@ -36314,8 +36315,8 @@ KAPPA: \htmlref{ADD}{ADD},
       If the input NDF is already DELTA compressed, it will be
       uncompressed and then recompressed using the supplied parameter values.
 
-      More details of delta compression can be found in 
-      \latex{SUN/11 (\emph{ARY - A Subroutine Library for Accessing ARRAY 
+      More details of delta compression can be found in
+      \latex{SUN/11 (\emph{ARY - A Subroutine Library for Accessing ARRAY
       Data Structures}), subsection \emph{Delta Compressed Array Form}.}
       \html{\xref{Delta Compressed Array Form}{sun11}{ddelta_form}.}
    }
@@ -36793,7 +36794,7 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
       \sstsubsection{
          FORM = LITERAL (Write)
       }{
-         The storage form of the NDF's data array.   This will be 
+         The storage form of the NDF's data array.   This will be
          {\tt "SIMPLE"}, {\tt "PRIMITIVE"}, or {\tt "SCALED"}.
       }
       \sstsubsection{
