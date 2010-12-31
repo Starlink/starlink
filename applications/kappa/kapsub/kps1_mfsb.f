@@ -194,7 +194,7 @@
      :                DTYPE, STATUS )
 
 *  Create a section of the input NDF containing the region will actually
-*  be used (i.e. excluding any pixels which lie over the edge of the
+*  be used (i.e. excluding any pixels that lie over the edge of the
 *  output image).
       CALL NDF_SECT( INDF, NDIM, LBND, UBND, NDFS, STATUS )
 

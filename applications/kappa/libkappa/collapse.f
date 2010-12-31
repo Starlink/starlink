@@ -24,7 +24,7 @@
 *     This application collapses a nominated pixel axis of an
 *     N-dimensional NDF, producing an output NDF with one fewer pixel
 *     axes than the input NDF.  A specified range of axis values can
-*     be used instead of the whole axis (see parameters LOW and HIGH).
+*     be used instead of the whole axis (see Parameters LOW and HIGH).
 *
 *     For each output pixel, all corresponding input pixel values
 *     between the specified bounds of the nominated axis to be
@@ -370,7 +370,7 @@
 *        Update the units for Iwc and Iwd estimators, as the incorrect
 *        published formulae for these were dimensionless.
 *     2006 February 13 (MJC):
-*        Allow for very large datsets by blocking into manageable
+*        Allow for very large datasets by blocking into manageable
 *        sections.
 *     2006 February 14 (MJC):
 *        Correct calculation of the blocked bounds for the output NDF.
@@ -471,7 +471,7 @@
       REAL CLPDEF                ! Default no. of standard deviations to
       PARAMETER( CLPDEF = 3.0 )  ! clip for mode, clipped mean & std dev
 
-      INTEGER MAXPIX
+      INTEGER MAXPIX             ! Maximum number of pixels in a block
       PARAMETER ( MAXPIX = 8388608 ) ! Guestimate a size: 8 mega
 
 *  Local Variables:

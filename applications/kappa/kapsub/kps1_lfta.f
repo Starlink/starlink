@@ -66,7 +66,7 @@
 *        accessed if USEMSK is .TRUE..  The array should have dimensions
 *        matching the input data.
 *     DIMS( NDF__MXDIM ) = INTEGER (Given)
-*        The dimensions of the input data.  Extra dimension should have
+*        The dimensions of the input data.  Extra dimensions should have
 *        size 1 up to NDF__MXDIM.
 *     IPDAT = INTEGER (Given)
 *        Pointer to the data to be fitted, mapped using type ITYPE.
