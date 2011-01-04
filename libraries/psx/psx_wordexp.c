@@ -102,6 +102,7 @@ F77_SUBROUTINE(psx_wordexp)( CHARACTER(WORDS), INTEGER(CONTEXT),
 
     /* first time through - get some nice CNF memory for the result */
     ContextPtr = cnfMalloc( sizeof(*ContextPtr) );
+    memset( ContextPtr, 0, sizeof(*ContextPtr) );
     if (!ContextPtr) {
       *STATUS = PSX__NOMEM;
       psx1_rep_c( "PSX_WORDEXP_ERR1",
