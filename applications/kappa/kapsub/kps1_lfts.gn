@@ -75,6 +75,9 @@
 *        Original version based upon KPS1_LFTx.
 *     2007 January 11 (MJC):
 *        Move DATS argument to regulation order.
+*     2011 January 4 (MJC):
+*        Divide the processing by the SUBTRA flag's value to avoid
+*        accessing undefined values.
 *     {enter_further_changes_here}
 
 *-
@@ -183,63 +186,115 @@
       CALL NUM_HANDL( NUM_TRAP )
       CALL NUM_CLEARERR()
 
+      IF ( SUBTRA ) THEN
+
 *  Loop over the whole data array.  Move around data array using IP1 to
 *  IP7 and workspace array using B (as in related functions that pick 
 *  out ranges of one axis).
-      B = 1
-      DO I7 = 1, DIMS( 7 )
-         IP7 = ( I7 - 1 ) * STRID( 7 )
-         DO I6 = 1, DIMS( 6 )
-            IP6 = IP7 + ( I6 - 1 ) * STRID( 6 )
-            DO I5 = 1, DIMS( 5 )
-               IP5 = IP6 + ( I5 - 1 ) * STRID( 5 )
-               DO I4 = 1, DIMS( 4 )
-                  IP4 = IP5 + ( I4 - 1 ) * STRID( 4 )
-                  DO I3 = 1, DIMS( 3 )
-                     IP3 = IP4 + ( I3 - 1 ) * STRID( 3 )
-                     DO I2 = 1, DIMS( 2 )
-                        IP2 = IP3 + ( I2 - 1 ) * STRID( 2 )
-                        DO I1 = 1, DIMS( 1 )
-                           IP1 = IP2 + I1
+         B = 1
+         DO I7 = 1, DIMS( 7 )
+            IP7 = ( I7 - 1 ) * STRID( 7 )
+               DO I6 = 1, DIMS( 6 )
+               IP6 = IP7 + ( I6 - 1 ) * STRID( 6 )
+               DO I5 = 1, DIMS( 5 )
+                  IP5 = IP6 + ( I5 - 1 ) * STRID( 5 )
+                  DO I4 = 1, DIMS( 4 )
+                     IP4 = IP5 + ( I4 - 1 ) * STRID( 4 )
+                     DO I3 = 1, DIMS( 3 )
+                        IP3 = IP4 + ( I3 - 1 ) * STRID( 3 )
+                        DO I2 = 1, DIMS( 2 )
+                           IP2 = IP3 + ( I2 - 1 ) * STRID( 2 )
+                           DO I1 = 1, DIMS( 1 )
+                              IP1 = IP2 + I1
 
-*  Check for BADness and evaluate the polynomial.
-                           TVAL = DATS( IP1 )
-                           IF ( TVAL .NE. VAL__BAD<T> ) THEN
-                              DVAL = KPS1_POLYV( ORDER, BS( 1, B ),
-     :                                           DBLE( I( AXIS ) ) )
+*  Check for badness and evaluate the polynomial.
+                              TVAL = DATS( IP1 )
+                              IF ( TVAL .NE. VAL__BAD<T> ) THEN
+                                 DVAL = KPS1_POLYV( ORDER, BS( 1, B ),
+     :                                              DBLE( I( AXIS ) ) )
 
-*  Subtract, or not, from data value.
-                              IF ( SUBTRA ) THEN 
+*  Subtract from the good data value.
                                  DATS( IP1 ) =  NUM_SUB<T>( TVAL, 
      :                                          NUM_DTO<T>( DVAL ) )
-                              ELSE
-                                 DATS( IP1 ) = NUM_DTO<T>( DVAL )
                               END IF
 
 *  Failed conversion from double precision, or subtraction so output is
-*  now BAD.
+*  now bad.
                               IF ( .NOT. NUM_WASOK() ) THEN
                                  DATS( IP1 ) = VAL__BAD<T>
                                  CALL NUM_CLEARERR()
                               END IF
-                           END IF
                            
 *  Move to the next workspace pixel and next coefficients.
-                           B = B + STRIDA( 1 )
+                              B = B + STRIDA( 1 )
+                           END DO
+                           B = B + STRIDA( 2 ) - STRIDA( 1 ) * DIMS( 1 )
                         END DO
-                        B = B + STRIDA( 2 ) - STRIDA( 1 ) * DIMS( 1 )
+                        B = B + STRIDA( 3 ) - STRIDA( 2 ) * DIMS( 2 )
                      END DO
-                     B = B + STRIDA( 3 ) - STRIDA( 2 ) * DIMS( 2 )
+                     B = B + STRIDA( 4 ) - STRIDA( 3 ) * DIMS( 3 )
                   END DO
-                  B = B + STRIDA( 4 ) - STRIDA( 3 ) * DIMS( 3 )
+                  B = B + STRIDA( 5 ) - STRIDA( 4 ) * DIMS( 4 )
                END DO
-               B = B + STRIDA( 5 ) - STRIDA( 4 ) * DIMS( 4 )
+               B = B + STRIDA( 6 ) - STRIDA( 5 ) * DIMS( 5 )
             END DO
-            B = B + STRIDA( 6 ) - STRIDA( 5 ) * DIMS( 5 )
+            B = B + STRIDA( 7 ) - STRIDA( 6 ) * DIMS( 6 )
          END DO
-         B = B + STRIDA( 7 ) - STRIDA( 6 ) * DIMS( 6 )
-      END DO
+
+*  No subtraction.  The division is is required because the supplied
+*  data array may not be initialised, i.e. only has write access, and
+*  tests for input bad pixels are meaningless.
+      ELSE
       
+*  Loop over the whole data array.  Move around data array using IP1 to
+*  IP7 and workspace array using B (as in related functions that pick 
+*  out ranges of one axis).
+         B = 1
+         DO I7 = 1, DIMS( 7 )
+            IP7 = ( I7 - 1 ) * STRID( 7 )
+               DO I6 = 1, DIMS( 6 )
+               IP6 = IP7 + ( I6 - 1 ) * STRID( 6 )
+               DO I5 = 1, DIMS( 5 )
+                  IP5 = IP6 + ( I5 - 1 ) * STRID( 5 )
+                  DO I4 = 1, DIMS( 4 )
+                     IP4 = IP5 + ( I4 - 1 ) * STRID( 4 )
+                     DO I3 = 1, DIMS( 3 )
+                        IP3 = IP4 + ( I3 - 1 ) * STRID( 3 )
+                        DO I2 = 1, DIMS( 2 )
+                           IP2 = IP3 + ( I2 - 1 ) * STRID( 2 )
+                           DO I1 = 1, DIMS( 1 )
+                              IP1 = IP2 + I1
+
+*  Evaluate the polynomial.
+                              DVAL = KPS1_POLYV( ORDER, BS( 1, B ),
+     :                                           DBLE( I( AXIS ) ) )
+
+*  Subtract from the good data value.
+                              DATS( IP1 ) = NUM_DTO<T>( DVAL )
+
+*  Failed conversion from double precision, so output is now bad.
+                              IF ( .NOT. NUM_WASOK() ) THEN
+                                 DATS( IP1 ) = VAL__BAD<T>
+                                 CALL NUM_CLEARERR()
+                              END IF
+                           
+*  Move to the next workspace pixel and next coefficients.
+                              B = B + STRIDA( 1 )
+                           END DO
+                           B = B + STRIDA( 2 ) - STRIDA( 1 ) * DIMS( 1 )
+                        END DO
+                        B = B + STRIDA( 3 ) - STRIDA( 2 ) * DIMS( 2 )
+                     END DO
+                     B = B + STRIDA( 4 ) - STRIDA( 3 ) * DIMS( 3 )
+                  END DO
+                  B = B + STRIDA( 5 ) - STRIDA( 4 ) * DIMS( 4 )
+               END DO
+               B = B + STRIDA( 6 ) - STRIDA( 5 ) * DIMS( 5 )
+            END DO
+            B = B + STRIDA( 7 ) - STRIDA( 6 ) * DIMS( 6 )
+         END DO
+      END IF
+
 * Remove error handler.
       CALL NUM_REVRT
 
