@@ -1982,7 +1982,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             quit = 1;
           } else {
             /* Check that we will exceed maxiter next time through */
-            if( iter >= (maxiter-1) ) {
+            if( iter > (maxiter-1) ) {
+              quit = 1;
+            } else if( iter == (maxiter-1) ) {
               quit = 0;
             }
 
