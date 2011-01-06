@@ -552,9 +552,10 @@
       INTEGER MAXBIN             ! Maximum number of bins for auto mode
       INTEGER MAXSIZ             ! Maximum size of block along current
                                  ! dimension
+      INTEGER MBDIMS( NDF__MXDIM ) ! Maximum NDF dimensions in a block
+      INTEGER MBL                ! Identifier for mask-NDF block
       CHARACTER*9 METHOD         ! Method for determining the mode
       LOGICAL MODIN              ! Modify input NDF by subtracting fits?
-      INTEGER MBL                ! Identifier for mask-NDF block
       INTEGER MSKNDF             ! Identifier of the mask NDF
       INTEGER MXKNOT             ! Maximum number of knots
       INTEGER NAXC               ! Number of axes in current frame
@@ -689,10 +690,11 @@
          UBND( I ) = 1
       END DO
 
-*  Get dimensions of NDF.
+*  Get dimensions of NDF and fill maximum blocking size for unused
+*  dimensions.
       DO I = 1, NDF__MXDIM
          DIMS( I ) = UBND( I ) - LBND( I ) + 1
-         BLDIMS( I ) = DIMS( I )
+         MBDIMS( I ) = DIMS( I )
       END DO
 
 *  Do we have any variances to use for weights and should they be used?
@@ -1211,7 +1213,7 @@
 *  a full span of a dimension that becomes the block size along that
 *  axis.  Partial fills take the remaining maximum size and subsequent
 *  dimensions' block sizes are unity.
-      BLDIMS( JAXIS ) = DIMS( JAXIS )
+      MBDIMS( JAXIS ) = DIMS( JAXIS )
       MAXSIZ = MAX( 1, MAXPIX / DIMS( JAXIS ) )
       LOOP = .TRUE.
       DO I = 1, NDIM
@@ -1219,30 +1221,34 @@
             IF ( LOOP ) THEN
                D = UBND( I ) - LBND( I ) + 1
                IF ( MAXSIZ .GE. D ) THEN
-                  BLDIMS( I ) = D
+                  MBDIMS( I ) = D
                   MAXSIZ = MAXSIZ / D
                ELSE
-                  BLDIMS( I ) = MAXSIZ
+                  MBDIMS( I ) = MAXSIZ
                   LOOP = .FALSE.
                END IF
             ELSE
-               BLDIMS( I ) = 1
+               MBDIMS( I ) = 1
             END IF
          END IF
       END DO
 
 *  Determine the number of blocks.
-      CALL NDF_NBLOC( INNDF, NDIM, BLDIMS, NBLOCK, STATUS )
+      CALL NDF_NBLOC( INNDF, NDIM, MBDIMS, NBLOCK, STATUS )
 
 *  Loop through each block.  Start a new NDF context for each block.
       DO IBLOCK = 1, NBLOCK
          CALL NDF_BEGIN
-         CALL NDF_BLOCK( INNDF, NDIM, BLDIMS, IBLOCK, IBL, STATUS )
-         CALL NDF_BLOCK( OUTNDF, NDIM, BLDIMS, IBLOCK, OBL, STATUS )
+         CALL NDF_BLOCK( INNDF, NDIM, MBDIMS, IBLOCK, IBL, STATUS )
+         CALL NDF_BLOCK( OUTNDF, NDIM, MBDIMS, IBLOCK, OBL, STATUS )
          IF ( GLOBAL )
-     :     CALL NDF_BLOCK( TMPNDF, NDIM, BLDIMS, IBLOCK, TBL, STATUS )
+     :     CALL NDF_BLOCK( TMPNDF, NDIM, MBDIMS, IBLOCK, TBL, STATUS )
          IF ( FILMSK )
-     :     CALL NDF_BLOCK( MSKNDF, NDIM, BLDIMS, IBLOCK, MBL, STATUS )
+     :     CALL NDF_BLOCK( MSKNDF, NDIM, MBDIMS, IBLOCK, MBL, STATUS )
+
+*  Find the dimensions of the block, as they may be smaller than the
+*  maximum.
+         CALL NDF_DIM( IBL, NDF__MXDIM, BLDIMS, NDIM, STATUS )
 
 *  Map the data.
 *  =============
