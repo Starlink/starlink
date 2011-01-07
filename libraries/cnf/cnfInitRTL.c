@@ -2,6 +2,8 @@
 #  include <config.h>
 #endif
 
+#include "f77.h"
+
 void cnfInitRTL (int argc, char** argv)
 
 /*
