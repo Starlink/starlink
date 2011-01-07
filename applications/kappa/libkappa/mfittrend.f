@@ -774,6 +774,7 @@
 
       ELSE
          SINGLE = .FALSE.
+         GLOBAL = .FALSE.
 
 *  Get the ranges to use. These values are transformed from current
 *  co-ordinates along the fit axis to pixel co-ordinates on some
