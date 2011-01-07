@@ -21,6 +21,7 @@ libary_la_SOURCES = \
 # shareable libraries from the static ones (Java JNI libraries).
 if !NOPIC
 libary_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
+libary_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 endif
 
 include_HEADERS = $(PUBLIC_F_INCLUDES)
