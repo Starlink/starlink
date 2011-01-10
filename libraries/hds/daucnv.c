@@ -52,6 +52,9 @@ int dat1_cvt_dtype( bad, nval, imp, exp, nbad )
  *    2007-05-24 (TIMJ):
  *       Write an informative DAT__TRUNC error message including any input string
  *       that has been truncated.
+ *    2011-01-10 (TIMJ):
+ *       Make sure the truncation error message includes the correct length of the
+ *       source string by not including trailing spaces.
 
  *-
  */
@@ -1009,11 +1012,19 @@ int dat1_cvt_dtype( bad, nval, imp, exp, nbad )
      emsRep(" ", "Error converting from ^I to ^O",
 	    &hds_gl_status);
    } else if (hds_gl_status == DAT__TRUNC) {
-     emsSeti( "SLEN", (int)(imp->length) );
+     /* work out the length of the string taking into account fortran trailing
+        spaces. We can not use cnfLenc because the buffer is not terminated. */
+     int slen = imp->length - 1;
+     char * sourcestr = (_CHAR*)imp->body;
+     for( slen-- ; ( slen >= 0 ) && ( sourcestr[slen] == ' ' ) ; slen-- )
+       ;
+     slen++;
+
+     emsSeti( "SLEN", slen );
      emsSeti( "DLEN", (int)(exp->length) );
      /* If we are converting a string tell people the string in the error message */
      if (imp->dtype == DAT__C) {
-       emsSetnc( "STR", (_CHAR *)imp->body, imp->length );
+       emsSetnc( "STR", sourcestr, slen );
      } else {
        emsSetc( "STR", "<numeric>");
      }
