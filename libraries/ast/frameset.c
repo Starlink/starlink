@@ -736,7 +736,7 @@ static int Test##attribute( AstFrame *this_frame, int axis, int *status ) { \
 #include "cmpmap.h"              /* Compound Mappings */
 #include "frame.h"               /* Parent Frame class */
 #include "frameset.h"            /* Interface definition for this class */
-#include "globals.h"             /* Thread-safe global data access */
+#include "cmpframe.h"            /* Compound coordinate frames */
 
 /* Error code definitions. */
 /* ----------------------- */
