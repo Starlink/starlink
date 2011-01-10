@@ -144,7 +144,7 @@ f     - AST_WRITE: Write an Object to a Channel
 #include "channel.h"             /* Interface definition for this class */
 #include "loader.h"              /* Interface to the global loader */
 #include "keymap.h"              /* Storing arbitrary data in an AST Object */
-#include "globals.h"             /* Thread-safe global data access */
+#include "pointset.h"            /* For AST__BAD */
 
 /* Error code definitions. */
 /* ----------------------- */
