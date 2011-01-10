@@ -899,6 +899,8 @@ f     - AST_TESTFITS: Test if a keyword has a defined value in a FitsChan
 *        - Correct loading of FitsChans that contain UNDEF keywords.
 *        - Correct translation of spectral units with non-standard
 *        capitalisation in SpecTrans.
+*     10-JAN-2011 (DSB):
+*        Fix memory leak in MakeIntWorld.
 *class--
 */
 
@@ -17884,20 +17886,18 @@ static int MakeIntWorld( AstMapping *cmap, AstFrame *fr, int *wperm, char s,
                skycol[ wperm[ i ] ] = paxis + 1;
                lin[ i ] = 0;
                if( !sfrm ) {
-                  sfrm = pfrm;
+                  sfrm = astClone( pfrm );
                   skycol0 = wperm[ i ];
                   skydiag0 = fullmat[ skycol0 ][ i ];
                } else if( sfrm == pfrm ) {
                   skycol1 = wperm[ i ];
                   skydiag1 = fullmat[ skycol1 ][ i ];
-               } else {
-                  pfrm = astAnnul( pfrm );
                }
             } else {
                skycol[ wperm[ i ] ] = 0;
                lin[ i ] = !strcmp( astGetClass( pfrm ), "Frame" );
-               pfrm = astAnnul( pfrm );
             }
+            pfrm = astAnnul( pfrm );
          }
          if( sfrm ) sfrm = astAnnul( sfrm );
 
