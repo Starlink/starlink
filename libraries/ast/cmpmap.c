@@ -132,6 +132,12 @@ f     The CmpMap class does not define any new routines beyond those
 *     30-JUL-2009 (DSB):
 *        Ensure the PermMap has equal number of inputs and outputs when
 *        swapping a PermMap and a CmpMap in astMapMerge.
+*     3-JAN-2011 (DSB):
+*        In MapSplit, certain classes of Mapping (e.g. PermMaps) can
+*        produce a returned Mapping with zero outputs. Consider such
+*        Mappings to be unsplitable.
+*     11-JAN-2011 (DSB):
+*        Improve simplification of serial combinations of parellel CmpMaps.
 *class--
 */
 
@@ -1305,6 +1311,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    AstCmpMap *cmpmap2;           /* Pointer to second CmpMap */
    AstCmpMap *cmpmap;            /* Pointer to nominated CmpMap */
    AstCmpMap *new_cm;            /* Pointer to new CmpMap */
+   AstMapping **map_list1;       /* Pointer to list of cmpmap1 component Mappings */
+   AstMapping **map_list2;       /* Pointer to list of cmpmap2 component Mappings */
    AstMapping **new_map_list;    /* Extended Mapping list */
    AstMapping *map;              /* Pointer to nominated CmpMap */
    AstMapping *new1;             /* Pointer to new CmpMap */
@@ -1312,6 +1320,10 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    AstMapping *new;              /* Pointer to replacement Mapping */
    AstMapping *simp1;            /* Pointer to simplified Mapping */
    AstMapping *simp2;            /* Pointer to simplified Mapping */
+   AstMapping *submap1;          /* A subset of mappings from cmpmap1 */
+   AstMapping *submap2;          /* A subset of mappings from cmpmap2 */
+   AstMapping *tmap2;            /* Temporary Mapping */
+   AstMapping *tmap;             /* Temporary Mapping */
    AstPermMap *new_pm;           /* Pointer to new PermMap */
    AstPermMap *permmap1;         /* Pointer to first PermMap */
    AstUnitMap *unit;             /* UnitMap that feeds const PermMap i/p's */
@@ -1324,6 +1336,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    double *qb;                   /* Pointer to 2nd component output position */
    int *inperm;                  /* Pointer to copy of PermMap inperm array */
    int *inperm_new;              /* Pointer to new PermMap inperm array */
+   int *invert_list1;            /* Pointer to list of cmpmap1 invert values */
+   int *invert_list2;            /* Pointer to list of cmpmap2 invert values */
    int *new_invert_list;         /* Extended Invert flag list */
    int *outperm;                 /* Pointer to copy of PermMap outperm array */
    int *outperm_new;             /* Pointer to new PermMap outperm array */
@@ -1343,11 +1357,13 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    int invert2b;                 /* Invert flag for sub-Mapping */
    int invert;                   /* Invert attribute value */
    int j;                        /* Coordinate index */
+   int jmap1;                    /* Index of next component Mapping in cmpmap1 */
+   int jmap2;                    /* Index of next component Mapping in cmpmap2 */
    int new_invert;               /* New Invert attribute value */
    int nin2a;                    /* No. input coordinates for sub-Mapping */
    int nin2b;                    /* No. input coordinates for sub-Mapping */
-   int nout1a;                   /* No. output coordinates for sub-Mapping */
-   int nout1b;                   /* No. output coordinates for sub-Mapping */
+   int nmap1;                    /* Number of Mappings in cmpmap1 */
+   int nmap2;                    /* Number of Mappings in cmpmap2 */
    int nout2a;                   /* No. of outputs for 1st component Mapping */
    int nout2b;                   /* No. of outputs for 2nd component Mapping */
    int npin;                     /* No. of inputs for original PermMap */
@@ -1359,6 +1375,10 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    int result;                   /* Result value to return */
    int set;                      /* Invert attribute set? */
    int simpler;                  /* Simplification possible? */
+   int subin2;                   /* Number of inputs of submap2 */
+   int subinv1;                  /* Invert attribute to use with submap1 */
+   int subinv2;                  /* Invert attribute to use with submap2 */
+   int subout1;                  /* Number of outputs of submap1 */
 
 /* Initialise.*/
    result = -1;
@@ -1581,77 +1601,134 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    adjacent CmpMaps both combine their sub-Mappings in parallel. */
                } else if ( series && !cmpmap1->series && !cmpmap2->series ) {
 
-/* In this case, we must check that the number of input and output
-   coordinates associated with the sub-Mappings are
-   compatible. Determine the effective number of output coordinates
-   produced by each sub-Mapping of the first CmpMap. Take account of
-   the invert flags to be applied and the current setting of the
-   Invert attributes. */
-                  if ( astGetInvert( cmpmap1->map1 ) ) {
-                     nout1a = invert1a ? astGetNout( cmpmap1->map1 ) :
-                                         astGetNin( cmpmap1->map1 );
-                  } else {
-                     nout1a = invert1a ? astGetNin( cmpmap1->map1 ) :
-                                         astGetNout( cmpmap1->map1 );
+/* Expand each of the two adjacent CmpMaps into a list of Mappings to be
+   combined in parallel. */
+                  map_list1 = map_list2 = NULL;
+                  invert_list1 = invert_list2 = NULL;
+                  nmap1 = nmap2 = 0;
+                  (void) astMapList( (AstMapping *) cmpmap1, 0, invert1,
+                                     &nmap1, &map_list1, &invert_list1 );
+                  (void) astMapList( (AstMapping *) cmpmap2, 0, invert2,
+                                     &nmap2, &map_list2, &invert_list2 );
+
+/* We want to divide each of these lists into N sub-lists so that the
+   outputs of the Mappings in the i'th sub-list from cmpmap1 can feed
+   (i.e. equal in number) the inputs of the Mappings in the i'th sub-list
+   from cmpmap2. If such a sub-list contains more than one Mapping we
+   combine them together into a parallel CmpMap. Initialise a flag to
+   indicate that we have not yet found any genuine simplification. */
+                  simpler = 0;
+
+/* Initialise the index of the next Mapping to be added into each
+   sublist. */
+                  jmap1 = jmap2 = 0;
+
+/* Indicate both sublists are currently empty. */
+                  subout1 = subin2 = 0;
+                  new = submap1 = submap2 = NULL;
+
+/* Loop round untill all Mappings have been used. */
+                  while( jmap1 <= nmap1 && jmap2 <= nmap2 && astOK ) {
+
+/* Note the number of outputs from submap1 and the number of inputs to
+   submap2. */
+                     subout1 = submap1 ? astGetNout( submap1 ) : 0;
+                     subin2 = submap2 ? astGetNin( submap2 ) : 0;
+
+/* If sublist for cmpmap1 has too few outputs, add the next Mapping from
+   the cmpmap1 list into the submap1 sublist. */
+                     if( subout1 < subin2 ) {
+                        tmap = CombineMaps( submap1, subinv1,
+                                            map_list1[ jmap1 ],
+                                            invert_list1[ jmap1 ], 0, status );
+                        (void) astAnnul( submap1 );
+                        submap1 = tmap;
+                        subinv1 = 0;
+                        jmap1++;
+
+/* If sublist for cmpmap2 has too few inputs, add the next Mapping from
+   the cmpmap2 list into the submap2 sublist. */
+                     } else if( subin2 < subout1 ) {
+                        tmap = CombineMaps( submap2, subinv2,
+                                            map_list2[ jmap2 ],
+                                            invert_list2[ jmap2 ], 0, status );
+                        (void) astAnnul( submap2 );
+                        submap2 = tmap;
+                        subinv2 = 0;
+                        jmap2++;
+
+/* If submap1 can now feed submap2, combine them in series, and attempt to
+   simplify it. */
+                     } else {
+
+/* Check this is not the first pass (when we do not have a submap1 or
+   submap2). */
+                        if( submap1 && submap2 ) {
+
+/* Combine the Mappings in series and simplify. */
+                           tmap = CombineMaps( submap1, subinv1, submap2,
+                                               subinv2, 1, status );
+                           submap1 = astAnnul( submap1 );
+                           submap2 = astAnnul( submap2 );
+                           tmap2 = astSimplify( tmap );
+                           tmap = astAnnul( tmap );
+
+/* Note if any simplification took place. */
+                           if( tmap != tmap2 ||
+                               astGetInvert( tmap ) != astGetInvert( tmap2 ) )
+                                           simpler = 1;
+
+/* Add the simplifed Mapping into the total merged Mapping (a parallel
+   CmpMap). */
+                           if( !new ) {
+                              new = tmap2;
+                           } else {
+                              tmap = (AstMapping *) astCmpMap( new, tmap2, 0,
+                                                               " ", status );
+                              tmap2 = astAnnul( tmap2 );
+                              (void) astAnnul( new );
+                              new = tmap;
+                           }
+                        }
+
+/* Reset submap1 to be the next Mapping from the cmpmap1 map list. First,
+   save its old Invert flag and set it to the required value. */
+                        if( jmap1 < nmap1 ) {
+                           submap1 = astClone( map_list1[ jmap1 ] );
+                           subinv1 = invert_list1[ jmap1 ];
+                           jmap1++;
+                        } else {
+                           break;
+                        }
+
+/* Do the same for the second list. */
+                        if( jmap2 < nmap2 ) {
+                           submap2 = astClone( map_list2[ jmap2 ] );
+                           subinv2 = invert_list2[ jmap2 ];
+                           jmap2++;
+                        } else {
+                           break;
+                        }
+                     }
                   }
-                  if ( astGetInvert( cmpmap1->map2 ) ) {
-                     nout1b = invert1b ? astGetNout( cmpmap1->map2 ) :
-                                         astGetNin( cmpmap1->map2 );
-                  } else {
-                     nout1b = invert1b ? astGetNin( cmpmap1->map2 ) :
-                                         astGetNout( cmpmap1->map2 );
+
+/* Free the lists of Mapping pointers and invert flags. */
+                  if( map_list1 ) {
+                     for( jmap1 = 0; jmap1 < nmap1; jmap1++ ) {
+                        map_list1[ jmap1 ] = astAnnul( map_list1[ jmap1 ] );
+                     }
+                     map_list1 = astFree( map_list1 );
                   }
+                  invert_list1 = astFree( invert_list1 );
 
-/* Repeat this to obtain the effective number of input coordinates for
-   each sub-Mapping of the second CmpMap. */
-                  if ( astGetInvert( cmpmap2->map1 ) ) {
-                     nin2a = invert2a ? astGetNin( cmpmap2->map1 ) :
-                                        astGetNout( cmpmap2->map1 );
-                  } else {
-                     nin2a = invert2a ? astGetNout( cmpmap2->map1 ) :
-                                        astGetNin( cmpmap2->map1 );
+                  if( map_list2 ) {
+                     for( jmap2 = 0; jmap2 < nmap2; jmap2++ ) {
+                        map_list2[ jmap2 ] = astAnnul( map_list2[ jmap2 ] );
+                     }
+                     map_list2 = astFree( map_list2 );
                   }
-                  if ( astGetInvert( cmpmap2->map2 ) ) {
-                     nin2b = invert2b ? astGetNin( cmpmap2->map2 ) :
-                                        astGetNout( cmpmap2->map2 );
-                  } else {
-                     nin2b = invert2b ? astGetNout( cmpmap2->map2 ) :
-                                        astGetNin( cmpmap2->map2 );
-                  }
+                  invert_list2 = astFree( invert_list2 );
 
-/* Check if the numbers of coordinates are compatible. */
-                  if ( astOK && ( nout1a == nin2a ) && ( nout1b == nin2b ) ) {
-
-/* If so, combine the sub-Mappings into a pair of series CmpMaps
-   which, when combined in parallel, are equivalent to the original
-   ones. */
-                     new1 = CombineMaps( cmpmap1->map1, invert1a,
-                                         cmpmap2->map1, invert2a, 1, status );
-                     new2 = CombineMaps( cmpmap1->map2, invert1b,
-                                         cmpmap2->map2, invert2b, 1, status );
-
-/* Having converted the series combination of parallel CmpMaps into a
-   pair of equivalent series CmpMaps that can be combined in parallel,
-   try and simplify each of these new CmpMaps. */
-                     simp1 = astSimplify( new1 );
-                     simp2 = astSimplify( new2 );
-
-/* Test if either could be simplified by checking if its pointer value
-   has changed. Also check if the Invert attribute has changed. */
-                     simpler = ( simp1 != new1 ) || ( simp2 != new2 ) ||
-                               astGetInvert( simp1 ) || astGetInvert( simp2 );
-
-/* If either CmpMap was simplified, then combine the resulting
-   Mappings in parallel to give the replacement CmpMap. */
-                     if ( simpler ) new =
-                               (AstMapping *) astCmpMap( simp1, simp2, 0, "", status );
-
-/* Annul the temporary Mapping pointers. */
-                     new1 = astAnnul( new1 );
-                     new2 = astAnnul( new2 );
-                     simp1 = astAnnul( simp1 );
-                     simp2 = astAnnul( simp2 );
-                  }
                }
             }
 
@@ -2505,6 +2582,9 @@ static int *MapSplit1( AstMapping *this_map, int nin, const int *in, AstMapping 
       astSetInvert( map1, old_inv1 );
       astSetInvert( map2, old_inv2 );
    }
+
+/* Mappings that have no outputs cannot be used. */
+   if( !result && *map ) *map = astAnnul( *map );
 
 /* Free returned resources if an error has occurred. */
    if( !astOK ) {
