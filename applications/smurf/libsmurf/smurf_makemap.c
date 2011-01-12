@@ -873,12 +873,15 @@
 *        Properly support varying step time.
 *     2010-10-15 (TIMJ):
 *        Slight speed up in provenance loop.
+*     2011-01-12 (TIMJ):
+*        Trigger an error if there are no science files. This makes it easier
+*        for the pipeline to know something has gone wrong.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2005-2010 University of British Columbia.
-*     Copyright (C) 2007-2010 Science and Technology Facilities Council.
+*     Copyright (C) 2007-2011 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -1065,8 +1068,11 @@ void smurf_makemap( int *status ) {
   fgrp = NULL;
 
   if (size == 0) {
-    msgOutif(MSG__NORM, " ","All supplied input frames were DARK,"
-             " nothing from which to make a map", status );
+    if (*status == SAI__OK) {
+      *status = SMF__NOSCI;
+      errRep( "", "No science frames supplied. Unable to make a map.",
+              status );
+    }
     goto L998;
   }
 

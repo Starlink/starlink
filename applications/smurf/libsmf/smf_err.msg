@@ -21,4 +21,5 @@ DIVBZ      <Divide-by-zero detected>
 INFREQ     <Invalid frequency specified>
 BADQNM     <Unknown quality name>
 BADFLAT    <Bad flatfield data>
+NOSCI      <No science data found>
 .END
