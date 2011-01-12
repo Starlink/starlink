@@ -56,6 +56,8 @@
 *        Flatfield the data to make it more useful. Fix a problem with
 *        bad status leading to a segv. Fix provenance propagation
 *        from raw data.
+*     2011-01-11 (TIMJ):
+*        Now writes out the relevant JCMTSTATE slice.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -71,7 +73,7 @@
 *     SMURF: jcmtstate2cat
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008,2009,2011 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -109,6 +111,7 @@
 #include "libsmf/smf.h"
 #include "smurflib.h"
 #include "smurf_par.h"
+#include "sc2da/sc2store.h"
 
 void smurf_smurfcopy ( int * status ) {
 
@@ -224,8 +227,9 @@ void smurf_smurfcopy ( int * status ) {
       /* Write the FITS header */
       kpgPtfts( ofile->ndfid, data->hdr->fitshdr, status );
 
-      /* Do not currently propagate JCMTSTATE slice - sc2store_headput
-         does not work without using sc2store_wrtstream first */
+      /* JCMTSTATE */
+      sc2store_writejcmtstate( ofile->ndfid, 1, &((data->hdr->allState)[slice-1]),
+                               status );
 
     }
 

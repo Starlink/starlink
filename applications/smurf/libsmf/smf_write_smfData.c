@@ -91,6 +91,8 @@
 *        Write FTS2 data
 *     2010-09-22 (COBA):
 *        Validate FTS2 data before writing
+*     2011-01-11 (TIMJ):
+*        Use sc2store_writejcmtstate
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -153,7 +155,6 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
   size_t i;                     /* Loop counter */
   int flags = 0;                /* Flags for open file */
   size_t j;                     /* Loop counter */
-  HDSLoc *jcmtstateloc=NULL;    /* HDS Locator for JCMT headers */
   int lbnd[NDF__MXDIM];         /* Lower pixel bounds */
   dim_t nbolo;                  /* number of bolos */
   dim_t ncols;                  /* number of columns */
@@ -344,16 +345,8 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
       /* JCMT State -- if ntslice is known */
       if( inhdr->allState ) {
 
-        /* Get an HDS locator */
-        ndfXnew( outfile->ndfid, JCMT__EXTNAME, JCMT__EXTTYPE, 0, 0,
-                 &jcmtstateloc, status );
-
-        /* Map the header */
-        sc2store_headcremap( jcmtstateloc, inhdr->nframes, INST__SCUBA2,
-                             status  );
-
-        /* Write out the per-frame headers */
-        sc2store_putjcmtstate( inhdr->nframes, inhdr->allState, status );
+        sc2store_writejcmtstate( outfile->ndfid, inhdr->nframes,
+                                 inhdr->allState, status );
 
       }
     }

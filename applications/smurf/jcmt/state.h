@@ -75,9 +75,11 @@
 *        Add SC2_MIXTEMP in kelvin
 *     2010-09-22 (TIMJ):
 *        Add SC2_BIAS and SC2_FPUTEMP
+*     2011-01-11 (TIMJ):
+*        Define largest string length for _CHAR types
 
 *  Copyright:
-*     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2011 Science and Technology Facilities Council.
 *     Copyright (C) 2004, 2006, 2007 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -112,6 +114,9 @@
 #define JCMT__SZACS_SOURCE_RO  16
 #define JCMT__SZSMU_CHOP_PHASE  1
 #define JCMT__SZTCS_BEAM        1
+
+/* The longest string length */
+#define JCMT__SZLARGEST        JCMT__SZRTS_TASKS
 
 /* Flags indicating whether a component should be used in ACSIS or SCUBA-2. Instrument
    usability can be checked by AND'ing the value in hdsRecord array with one of these.

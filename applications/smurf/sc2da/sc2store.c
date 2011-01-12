@@ -20,6 +20,7 @@
     24Jun2008 : Add tcs_percent_cmp. Some const warnings.
     22Sep2010 : Add sc2_bias and sc2_fputemp (timj)
     09Nov2010 : Add delta compression option (dsb)
+    11Jan2011 : Compress JCMTSTATE using simple compression scheme (timj)
 */
 
 #define _POSIX_C_SOURCE 200112L
@@ -749,11 +750,17 @@ int *status                   /* global status (given and returned) */
 
 /* use a macro to simplify things */
 
-#define RETRIEVE_STATE(state, index, type, bad )	\
-   if ( sc2store_ptr[index] ) { \
-     head->state = ((type *)sc2store_ptr[index])[frame]; \
-   } else { \
-     head->state = bad; \
+#define RETRIEVE_STATE(state, index, type, bad )                 \
+   if ( sc2store_ptr[index] ) {                                  \
+     size_t findex;                                              \
+     if (sc2store_array[index]) {                                \
+       findex = frame;                                           \
+     } else {                                                    \
+       findex = 0;                                               \
+     }                                                           \
+     head->state = ((type *)sc2store_ptr[index])[findex];        \
+   } else {                                                      \
+     head->state = bad;                                          \
    }
 
    RETRIEVE_STATE( rts_num, RTS_NUM, unsigned int, (unsigned int)VAL__BADI );
@@ -828,12 +835,18 @@ int *status                   /* global status (given and returned) */
    HDS component size.
 */
 
-#define RETRIEVE_CHAR( state, index, len ) \
-   if ( sc2store_ptr[index] ) { \
-     cnfImprt( (char*)sc2store_ptr[index]+len*frame, len, head->state ); \
-     (head->state)[len] = '\0'; \
-   } else { \
-     (head->state)[0] = '\0'; \
+#define RETRIEVE_CHAR( state, index, len )                              \
+   if ( sc2store_ptr[index] ) {                                         \
+     size_t findex;                                                     \
+     if (sc2store_array[index] ) {                                      \
+       findex = frame;                                                  \
+     } else {                                                           \
+       findex = 0;                                                      \
+     }                                                                  \
+     cnfImprt( (char*)sc2store_ptr[index]+len*findex, len, head->state ); \
+     (head->state)[len] = '\0';                                         \
+   } else {                                                             \
+     (head->state)[0] = '\0';                                           \
    }
 
    RETRIEVE_CHAR( smu_chop_phase, SMU_CHOP_PHASE, JCMT__SZSMU_CHOP_PHASE );
@@ -950,7 +963,7 @@ int *status                 /* global status (given and returned) */
  )
 /* Method :
     Writes JCMTState information to the relevant chunks of mapped HDS
-    arrays.
+    arrays. See also sc2store_writejcmtstate.
    History :
     29Dec2010 : original as a wrapper around sc2store_headput (timj)
 */
@@ -978,7 +991,10 @@ int *status                   /* global status (given and returned) */
 /* Method :
     The given structure contains values for all the header elements of
     the frame. These are copied into the relevant place in the mapped HDS
-    arrays.
+    arrays. No data compression is applied. The assumption is that the
+    full set of JCMTSTATE is written out to the items mapped using
+    sc2store_headcremap. Use sc2store_writejcmtstate to do data
+    compression.
    History :
     18Aug2004 : original (bdk)
     17Feb2005 : add sc2_heat (bdk)
@@ -1100,9 +1116,6 @@ int *status                   /* global status (given and returned) */
 
    if ( *status != SAI__OK ) return;
 
-   dim[0] = nframes;
-   ndim = 1;
-
    for ( j=0; j<JCMT_COMP_NUM; j++ )
    {
      /* what index should we use? */
@@ -1111,13 +1124,34 @@ int *status                   /* global status (given and returned) */
      /* Should really initialise outside this routine */
      sc2store_loc[pos] = NULL;
      sc2store_ptr[pos] = NULL;
+     sc2store_array[pos] = 1;
 
      /* See if the component exists (it may be an ACSIS or SCUBA-2
 	file or whatever) */
      datThere( headloc, hdsRecords[j].name, &isthere, status );
      if (isthere) {
+       size_t nelem = 0;
+
        datFind ( headloc, hdsRecords[j].name, &(sc2store_loc[pos]),
 		 status );
+
+       /* see if this is a scalar item */
+       datSize( sc2store_loc[pos], &nelem, status );
+       dim[0] = nframes;
+       ndim = 1;
+       if ( nelem == 1 ) {
+         sc2store_array[pos] = 0;
+         dim[0] = 1;
+         ndim = 0;
+       } else if (nelem != nframes ) {
+         if (*status == SAI__OK) {
+           *status = DITS__APP_ERROR;
+           sprintf( sc2store_errmess,
+                    "sc2store_headrmap: Size mismatch in entry '%s'. Expected %d elements got %d",
+                    hdsRecords[j].name, nframes, nelem );
+           ErsRep( 0, status, sc2store_errmess );
+         }
+       }
 
        if ( *status != SAI__OK ) break;
        datMap ( sc2store_loc[pos], hdsRecords[j].type, "READ",
@@ -2472,26 +2506,33 @@ int *status              /* Global status (given and returned) */
 /* See if the component exists (it may be an ACSIS or SCUBA-2 or whatever) */
             datThere( *xloc, hdsRecords[ j ].name, &isthere, status );
             if( isthere ) {
+               size_t nelem = 0;
 
 /* Get a locator for the component of the NDF extension that holds the
    required values. */
                datFind( *xloc, hdsRecords[ j ].name, &xloc2, status );
+               datSize( xloc2, &nelem, status );
+
+/* Only slice the array items */
+               if( nelem > 1 ) {
 
 /* Extract a slice of this array that matches the pixel bounds of the NDF
    on the third pixel axis. */
-               datSlice( xloc2, 1, lower, upper, &xloc3, status );
+                  datSlice( xloc2, 1, lower, upper, &xloc3, status );
 
 /* Delete the old (full-sized) component from the returned temporary HDS
    object. */
-               datErase( *yloc, hdsRecords[ j ].name, status );
+                  datErase( *yloc, hdsRecords[ j ].name, status );
 
 /* Copy the resized slice into a component of the returned temporary HDS
    object. kpg1Datcp is identical to datCopy except that it will
    succesfully copy an array slice (which datCopy will not). */
-               kpg1Datcp( xloc3, *yloc, hdsRecords[ j ].name, status );
+                  kpg1Datcp( xloc3, *yloc, hdsRecords[ j ].name, status );
 
 /* Annul the locators. */
-               datAnnul( &xloc3, status );
+                  datAnnul( &xloc3, status );
+
+               }
                datAnnul( &xloc2, status );
             }
          }
@@ -2884,7 +2925,6 @@ int *status                 /* global status (given and returned) */
 {
    int j;                             /* loop counter */
 
-
    if ( !StatusOkP(status) ) return;
 
    if ( !head ) return; /* disable JCMTSTATE writing if null pointer */
@@ -2893,15 +2933,226 @@ int *status                 /* global status (given and returned) */
 
    ndfXnew ( sc2store_indf, JCMT__EXTNAME, JCMT__EXTTYPE, 0, 0,
      &sc2store_jcmtstateloc, status );
+
    sc2store_headcremap ( sc2store_jcmtstateloc, nframes, INST__SCUBA2, status );
 
 /* Insert per-frame headers */
 
    sc2store_putjcmtstate( nframes, head, status );
+
    sc2store_errconv ( status );
 }
 
+/* sc2store_writejcmtstate - Create JCMTSTATE structure in file */
 
+void sc2store_writejcmtstate
+(
+int indf,                   /* NDF identifier (can be NDF__NOID) */
+size_t nframes,             /* number of frames (given) */
+const JCMTState head[],     /* header data for each frame (given) */
+int *status                 /* global status (given and returned) */
+)
+
+/*  Description :
+     Create JCMTSTATE structure and write contents.
+
+     This routine uses the global sc2store NDF identifier
+     but on exit there are no open locators or mapped
+     HDS components.
+
+     Use sc2store_writeframehead to leave the JCMTSTATE mapped.
+
+     If "indf" is NDF__NOID the routine will use the cached
+     global NDF identifier. An external NDF identifier can be
+     supplied to write state information to an external file.
+
+    Authors :
+     Tim Jenness (JAC)
+
+    History :
+     7Jan2011:  original (timj)
+*/
+{
+  HDSLoc * jcmtstateloc = NULL;
+  double * dbuff = NULL;
+  int * ibuff = NULL;
+  short * sbuff = NULL;
+  float * fbuff = NULL;
+  unsigned short * usbuff = NULL;
+  char * strbuff = NULL;
+  size_t i = 0;
+  int thisndf = NDF__NOID;
+
+  /* Use the external one if defined */
+  thisndf = ( indf != NDF__NOID ? indf : sc2store_indf );
+
+  /* Create the JCMTSTATE extension */
+  ndfXnew ( thisndf, JCMT__EXTNAME, JCMT__EXTTYPE, 0, 0,
+            &jcmtstateloc, status );
+
+
+  /* We need to go through each state structure and find out whether
+     to map it as a full N-element array or a single scalar. We do not
+     need to use all buffers at the same time so we just cast pointers
+     to the largest buffer. */
+
+  dbuff = astMalloc( nframes * sizeof(*dbuff) );
+  fbuff = (float *)dbuff;
+  ibuff = (int *)dbuff;
+  sbuff = (short *)dbuff;
+  usbuff = (unsigned short *)dbuff;
+
+  /* The string buffer is created from the largest string length of an
+     item (which we define in jcmt/state.h). Make space for one nul. */
+  strbuff = astMalloc( ( nframes * JCMT__SZLARGEST ) + 1 );
+
+  /* Macro to create items in HDS and copy the values. */
+#define STORE_STATE( ITEM, ITEMSTR, HDSTYPE, TYPE, BUFFER, DIFFERENT ) \
+  if (*status == SAI__OK) {                                            \
+    int dim[1];                                                        \
+    int different = DIFFERENT;                                         \
+    int ndim;                                                          \
+    int nwrite;                                                        \
+    HDSLoc * tloc = NULL;                                              \
+    TYPE previous;                                                     \
+    void * mapped = NULL;                                              \
+    if (different) {                                                   \
+      /* We know beforehand that each entry is different */            \
+      for (i=0; i<nframes; i++) {                                      \
+        BUFFER[i] = head[i].ITEM;                                      \
+      }                                                                \
+    } else {                                                           \
+      previous = head[0].ITEM;                                         \
+      for (i=0; i<nframes; i++) {                                      \
+        BUFFER[i] = head[i].ITEM;                                      \
+        if (!different) {                                              \
+          if (BUFFER[i] != previous) {                                 \
+            different = 1;                                             \
+          }                                                            \
+          previous = BUFFER[i];                                        \
+        }                                                              \
+      }                                                                \
+    }                                                                  \
+    if (different) {                                                   \
+      ndim = 1;                                                        \
+      dim[0] = nframes;                                                \
+      nwrite = nframes;                                                \
+    } else {                                                           \
+      ndim = 0;                                                        \
+      dim[0] = 0;                                                      \
+      nwrite = 1;                                                      \
+    }                                                                  \
+    datNew( jcmtstateloc, ITEMSTR, HDSTYPE, ndim, dim, status );       \
+    datFind( jcmtstateloc, ITEMSTR, &tloc, status );                   \
+    datMap( tloc, HDSTYPE, "WRITE", ndim, dim, &mapped, status );      \
+    memcpy( mapped, BUFFER, nwrite * sizeof(*BUFFER) );                \
+    datAnnul( &tloc, status );                                         \
+  }
+
+#define STORE_CHAR( ITEM, ITEMSTR, ITEMLEN )                            \
+  if (*status == SAI__OK) {                                             \
+    int dim[1];                                                         \
+    int different = 0;                                                  \
+    int ndim;                                                           \
+    int nwrite;                                                         \
+    HDSLoc * tloc = NULL;                                               \
+    char previous[ITEMLEN + 1];                                         \
+    void * mapped = NULL;                                               \
+    char * curpos = NULL;                                               \
+    char hdstype[DAT__SZTYP+1];                                         \
+    star_strlcpy( previous, head[0].ITEM, sizeof(previous) );           \
+    curpos = strbuff;                                                   \
+    for (i=0; i<nframes; i++) {                                         \
+      cnfExprt( head[i].ITEM, curpos, ITEMLEN );                        \
+      if (!different) {                                                 \
+        if (strcmp( head[i].ITEM, previous ) != 0 ) {                   \
+          different = 1;                                                \
+        }                                                               \
+        star_strlcpy( previous, head[i].ITEM, sizeof(previous) );       \
+      }                                                                 \
+      curpos += ITEMLEN;                                                \
+    }                                                                   \
+    if (different) {                                                    \
+      ndim = 1;                                                         \
+      dim[0] = nframes;                                                 \
+      nwrite = nframes;                                                 \
+    } else {                                                            \
+      ndim = 0;                                                         \
+      dim[0] = 0;                                                       \
+      nwrite = 1;                                                       \
+    }                                                                   \
+    datCctyp( ITEMLEN, hdstype );                                       \
+    datNew( jcmtstateloc, ITEMSTR, hdstype, ndim, dim, status );        \
+    datFind( jcmtstateloc, ITEMSTR, &tloc, status );                    \
+    datMap( tloc, hdstype, "WRITE", ndim, dim, &mapped, status );       \
+    memcpy( mapped, strbuff, nwrite * ITEMLEN );                        \
+    datAnnul( &tloc, status );                                          \
+  }
+
+  /* The first two are always stored in full */
+  STORE_STATE( rts_num, "RTS_NUM", "_INTEGER", int, ibuff, 1 );
+  STORE_STATE( rts_end, "RTS_END", "_DOUBLE", double, dbuff, 1 );
+
+  STORE_CHAR( smu_chop_phase, "SMU_CHOP_PHASE", JCMT__SZSMU_CHOP_PHASE );
+  STORE_STATE( smu_jig_index, "SMU_JIG_INDEX", "_WORD", short, sbuff, 0 );
+  STORE_STATE( smu_az_jig_x, "SMU_AZ_JIG_X", "_DOUBLE", double, dbuff, 0 );
+  STORE_STATE( smu_az_jig_y, "SMU_AZ_JIG_Y", "_DOUBLE", double, dbuff, 0 );
+  STORE_STATE( smu_az_chop_x, "SMU_AZ_CHOP_X", "_DOUBLE", double, dbuff, 0 );
+  STORE_STATE( smu_az_chop_y, "SMU_AZ_CHOP_Y", "_DOUBLE", double, dbuff, 0 );
+  STORE_STATE( smu_tr_jig_x, "SMU_TR_JIG_X", "_DOUBLE", double, dbuff, 0 );
+  STORE_STATE( smu_tr_jig_y, "SMU_TR_JIG_Y", "_DOUBLE", double, dbuff, 0 );
+  STORE_STATE( smu_tr_chop_x, "SMU_TR_CHOP_X", "_DOUBLE", double, dbuff, 0 );
+  STORE_STATE( smu_tr_chop_y, "SMU_TR_CHOP_Y", "_DOUBLE", double, dbuff, 0 );
+
+  STORE_STATE( tcs_tai, "TCS_TAI", "_DOUBLE", double, dbuff, 0 );
+  STORE_STATE( tcs_airmass, "TCS_AIRMASS", "_DOUBLE", double, dbuff, 0 );
+  STORE_STATE( tcs_az_ang, "TCS_AZ_ANG", "_DOUBLE", double, dbuff, 0 );
+  STORE_STATE( tcs_az_ac1, "TCS_AZ_AC1", "_DOUBLE", double, dbuff, 0 );
+  STORE_STATE( tcs_az_ac2, "TCS_AZ_AC2", "_DOUBLE", double, dbuff, 0 );
+  STORE_STATE( tcs_az_dc1, "TCS_AZ_DC1", "_DOUBLE", double, dbuff, 0 );
+  STORE_STATE( tcs_az_dc2, "TCS_AZ_DC2", "_DOUBLE", double, dbuff, 0 );
+  STORE_STATE( tcs_az_bc1, "TCS_AZ_BC1", "_DOUBLE", double, dbuff, 0 );
+  STORE_STATE( tcs_az_bc2, "TCS_AZ_BC2", "_DOUBLE", double, dbuff, 0 );
+  STORE_CHAR( tcs_beam, "TCS_BEAM", JCMT__SZTCS_BEAM );
+  STORE_STATE( tcs_index, "TCS_INDEX", "_WORD", short, sbuff, 0 );
+  STORE_STATE( tcs_percent_cmp, "TCS_PERCENT_CMP", "_WORD", short, sbuff, 0 );
+  STORE_CHAR( tcs_source, "TCS_SOURCE", JCMT__SZTCS_SOURCE );
+  STORE_CHAR( tcs_tr_sys, "TCS_TR_SYS", JCMT__SZTCS_TR_SYS );
+  STORE_STATE( tcs_tr_ang, "TCS_TR_ANG", "_DOUBLE", double, dbuff, 0 );
+  STORE_STATE( tcs_tr_ac1, "TCS_TR_AC1", "_DOUBLE", double, dbuff, 0 );
+  STORE_STATE( tcs_tr_ac2, "TCS_TR_AC2", "_DOUBLE", double, dbuff, 0 );
+  STORE_STATE( tcs_tr_dc1, "TCS_TR_DC1", "_DOUBLE", double, dbuff, 0 );
+  STORE_STATE( tcs_tr_dc2, "TCS_TR_DC2", "_DOUBLE", double, dbuff, 0 );
+  STORE_STATE( tcs_tr_bc1, "TCS_TR_BC1", "_DOUBLE", double, dbuff, 0 );
+  STORE_STATE( tcs_tr_bc2, "TCS_TR_BC2", "_DOUBLE", double, dbuff, 0 );
+  STORE_STATE( tcs_en_dc1, "TCS_EN_DC1", "_DOUBLE", double, dbuff, 0 );
+  STORE_STATE( tcs_en_dc2, "TCS_EN_DC2", "_DOUBLE", double, dbuff, 0 );
+  STORE_STATE( tcs_dm_abs, "TCS_DM_ABS", "_DOUBLE", double, dbuff, 0 );
+  STORE_STATE( tcs_dm_rel, "TCS_DM_REL", "_DOUBLE", double, dbuff, 0 );
+
+  STORE_STATE( jos_drcontrol, "JOS_DRCONTROL", "_WORD", short, sbuff, 0 );
+
+  STORE_STATE( wvm_t12, "WVM_T12", "_REAL", float, fbuff, 0 );
+  STORE_STATE( wvm_t42, "WVM_T42", "_REAL", float, fbuff, 0 );
+  STORE_STATE( wvm_t78, "WVM_T78", "_REAL", float, fbuff, 0 );
+  STORE_STATE( wvm_time, "WVM_TIME", "_DOUBLE", double, dbuff, 0 );
+
+  STORE_STATE( sc2_heat, "SC2_HEAT", "_UWORD", unsigned short, usbuff, 0 );
+  STORE_STATE( sc2_bias, "SC2_BIAS", "_UWORD", unsigned short, usbuff, 0 );
+  STORE_STATE( sc2_mixtemp, "SC2_MIXTEMP", "_REAL", float, fbuff, 0 );
+  STORE_STATE( sc2_fputemp, "SC2_FPUTEMP", "_REAL", float, fbuff, 0 );
+
+  STORE_STATE( pol_ang, "POL_ANG", "_DOUBLE", double, dbuff, 0 );
+  STORE_STATE( fts_pos, "FTS_POS", "_REAL", float, fbuff, 0 );
+
+  /* Free resources */
+  dbuff = astFree( dbuff );
+  strbuff = astFree( strbuff );
+  datAnnul( &jcmtstateloc, status );
+
+  sc2store_errconv ( status );
+
+}
 
 /*+ sc2store_writejig - create and write DREAM extension in output file */
 
@@ -3511,8 +3762,8 @@ int *status                 /* global status (given and returned) */
    }
 
 /* Write the per-frame headers */
-
-   sc2store_writeframehead ( nframes, head, status );
+   printf("Am about to write jcmtstate\n");
+   sc2store_writejcmtstate ( NDF__NOID, nframes, head, status );
 
 /* Create DREAM extension ONLY if we have DREAM data */
 

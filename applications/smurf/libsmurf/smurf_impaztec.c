@@ -104,10 +104,12 @@
 *        API change to create_lutwcs
 *     2008-12-03 (DSB):
 *        Another API change to smf_create_lutwcs.
+*     2011-01-11 (TIMJ):
+*        Use sc2store_writejcmtstate
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2007-2008 Science and Technology Facilities Council.
+*     Copyright (C) 2007-2008,2011 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2008 Univeristy of British Columbia.
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
 *     Council. All Rights Reserved.
@@ -856,12 +858,7 @@ void smurf_impaztec( int *status ) {
   kpgPtfts ( indf, fitschan, status );
 
   /* Create storage for Header values for each frame - store in JCMTSTATE */
-  ndfXnew( indf, JCMT__EXTNAME, JCMT__EXTTYPE, 0, 0, &jcmtstateloc, status );
-
-  sc2store_headcremap ( jcmtstateloc, ngframes, INST__SCUBA2, status );
-
-  /* Store the JCMState */
-  sc2store_putjcmtstate( numsamples, head, status );
+  sc2store_writejcmtstate( indf, ngframes, head, status);
 
   /* Close the NDF */
 

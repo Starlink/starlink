@@ -207,6 +207,16 @@ const JCMTState head[],     /* header data for each frame (given) */
 int *status                 /* global status (given and returned) */
  );
 
+/*+ sc2store_writejcmtstate - Create JCMTSTATE structure in file */
+
+void sc2store_writejcmtstate
+(
+int indf,                   /* NDF identifier (can be NDF__NOID) */
+size_t nframes,             /* number of frames (given) */
+const JCMTState head[],     /* header data for each frame (given) */
+int *status                 /* global status (given and returned) */
+ );
+
 /*+ sc2store_putscanfit - store scan fit coefficients */
 
 void sc2store_putscanfit
