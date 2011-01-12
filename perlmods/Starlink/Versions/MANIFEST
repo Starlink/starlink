@@ -1,9 +1,0 @@
-MANIFEST
-META.yml
-Makefile.PL
-Versions.pm
-starversion
-t/datestamp.t
-t/manifest.t
-t/perl560.t
-t/simple.t
