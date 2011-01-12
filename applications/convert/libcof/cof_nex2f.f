@@ -171,7 +171,8 @@
 *     open.
 
 *  Copyright:
-*     Copyright (C) 2007, 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2009, 2011 Science & Technology Facilities
+*     Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -201,6 +202,8 @@
 *        Use revised COF_WHEAD API.
 *     2007 October 26 (MJC):
 *        Implement the further revised COF_WHEAD API.
+*     2011 January 12 (MJC):
+*        Use KPG_TYPSZ instead of COF_TYPSZ.
 *     {enter_further_changes_here}
 
 *-
@@ -374,8 +377,8 @@
 *  ======================
 
 *  Get the the number of bytes per data type.
-         CALL COF_TYPSZ( TYPE, NBYTES, STATUS )
-         IF ( NSCALE ) CALL COF_TYPSZ( SCTYPE, SBYTES, STATUS )
+         CALL KPG_TYPSZ( TYPE, NBYTES, STATUS )
+         IF ( NSCALE ) CALL KPG_TYPSZ( SCTYPE, SBYTES, STATUS )
 
 *  Convert this to a pseudo-BITPIX value, where floating point values
 *  are designated by being greater than the integer types.  The unsigned

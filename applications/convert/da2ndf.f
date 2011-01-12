@@ -97,7 +97,8 @@
 
 *  Copyright:
 *     Copyright (C) 1996, 2004 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils.  Copyright (C) 2011 Science & Technology Facilities
+*     Council.  All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -124,7 +125,9 @@
 *     1996 October 19 (MJC):
 *        Original version.
 *     2004 September 9 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2011 January 12 (MJC):
+*        Use KPG_TYPSZ instead of COF_TYPSZ.
 *     {enter_further_changes_here}
 
 *-
@@ -204,7 +207,7 @@
       END IF
 
 *  Obtain the number of bytes corresponding to the chosen data type.
-      CALL COF_TYPSZ( TYPE, NBYTES, STATUS )
+      CALL KPG_TYPSZ( TYPE, NBYTES, STATUS )
 
 *  Exit here in case an error arose so as to prevent spurious error
 *  messages.

@@ -240,8 +240,8 @@
 *     Copyright (C) 1994 Science & Engineering Research Council.
 *     Copyright (C) 1995-2000, 2003-2004 Central Laboratory of the
 *     Research Councils. Copyright (C) 2006 Particle Physics &
-*     Astronomy Research Council. Copyright (C) 2007-2009 Science &
-*     Technology Facilities Council. All Rights Reserved.
+*     Astronomy Research Council. Copyright (C) 2007-2009, 2011
+*     Science & Technology Facilities Council. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -355,6 +355,8 @@
 *        Disable automatic quality masking if the conversions includes
 *        the QUALITY component along with either DATA or VARIANCE
 *        array.
+*     2011 January 12 (MJC):
+*        Use KPG_TYPSZ instead of COF_TYPSZ.
 *     {enter_further_changes_here}
 
 *-
@@ -610,8 +612,8 @@
 *  ======================
 
 *  Get the the number of bytes per data type.
-            CALL COF_TYPSZ( TYPE, NBYTES, STATUS )
-            IF ( NSCALE ) CALL COF_TYPSZ( SCTYPE, SBYTES, STATUS )
+            CALL KPG_TYPSZ( TYPE, NBYTES, STATUS )
+            IF ( NSCALE ) CALL KPG_TYPSZ( SCTYPE, SBYTES, STATUS )
 
 *  Convert this to a pseudo-BITPIX value, where floating point values
 *  are designated by being greater than the integer types.  The unsigned

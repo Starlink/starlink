@@ -294,8 +294,8 @@
 *     Copyright (C) 1994 Science & Engineering Research Council.
 *     Copyright (C) 1997-2004 Central Laboratory of the Research
 *     Councils.  Copyright (C) 2006 Particle Physics & Astronomy
-*     Research Council.  Copyright (C) 2007-2008, 2010 Science &
-*     Technology Facilities Council.  All Rights Reserved.
+*     Research Council.  Copyright (C) 2007-2008, 2010-2011 Science
+*     & Technology Facilities Council.  All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -411,6 +411,8 @@
 *        -  Retain the HEADER NDF instead of replacing it with a
 *        component of type FITS_HEADER.
 *        -  Reset the top-level type to UKIRT_HDS.
+*     2011 January 12 (MJC):
+*        Use KPG_TYPSZ instead of COF_TYPSZ.
 *     {enter_further_changes_here}
 
 *-
@@ -847,8 +849,8 @@
 *  if there is a potential loss of precision or dynamic range.
                IF ( UTYPE .NE. ' ' ) THEN
                   IF ( TYPE .NE. ' ' ) THEN
-                     CALL COF_TYPSZ( TYPE, NBFTYP, STATUS )
-                     CALL COF_TYPSZ( UTYPE, NBUTYP, STATUS )
+                     CALL KPG_TYPSZ( TYPE, NBFTYP, STATUS )
+                     CALL KPG_TYPSZ( UTYPE, NBUTYP, STATUS )
                      IF ( NBUTYP .LT. NBFTYP .OR.
      :                    ( TYPE .EQ. '_REAL' .AND.
      :                      UTYPE .EQ. '_INTEGER' ) ) THEN
