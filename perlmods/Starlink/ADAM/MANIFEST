@@ -1,8 +1,0 @@
-ADAM.pm
-ADAM.xs
-Makefile.PL
-MANIFEST
-ChangeLog
-t/basic.t
-t/fork.t
-
