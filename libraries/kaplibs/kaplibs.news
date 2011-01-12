@@ -6,6 +6,11 @@ which provide general purpose algorithms required by the KAPPA package,
 and which may be of use to anyone developing their own KAPPA-like
 applications (see SUN/238).
 
+Version 3.2
+   - New KPG_TYPSZ routine (adapted from CONVERT equivalent) that
+     returns the number of bytes for a given numeric HDS data type.
+
+
 Version 3.1
    - New C function kpg1Config gets a KeyMap containing configuration
      parameters from the user, with name checking and default values

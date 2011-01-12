@@ -248,6 +248,7 @@ kpg1_slice.f \
 kpg1_snkta.f \
 kpg1_srcta.f \
 kpg1_sscof.f \
+kpg_typsz.f \
 kpg1_vec2n.f \
 kpg1_verb.f \
 kpg1_wcatw.f \

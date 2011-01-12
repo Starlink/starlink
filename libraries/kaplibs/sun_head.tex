@@ -8,10 +8,10 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {238.7}
 \newcommand{\stardocauthors}   {D.S. Berry \\Malcolm J. Currie}
-\newcommand{\stardocdate}      {2010 December 24}
+\newcommand{\stardocdate}      {2011 January 11}
 \newcommand{\stardoctitle}     {KAPLIBS -- Internal subroutines used within
                                 the KAPPA package.}
-\newcommand{\stardocversion}   {Version 3.1}
+\newcommand{\stardocversion}   {Version 3.2}
 \newcommand{\stardocmanual}    {Programmer's Reference}
 \newcommand{\stardocabstract}  {KAPLIBS is a package of Fortran subroutine
 libraries which were originally written as part of the KAPPA package (a
@@ -799,6 +799,12 @@ related items to be removed.
 \newpage
 \appendix
 
+\section{Changes in Version 3.2}
+\begin{itemize}
+\item New KPG\_TYPSZ routine adapted from CONVERT's COF\_TYPSZ that
+      returns the number of bytes for a given numeric HDS data type.
+\end{itemize}
+
 \section{Changes in Version 3.1}
 \begin{itemize}
 \item New C function kpg1Config gets a KeyMap containing configuration
@@ -999,7 +1005,6 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
   \newpage
   \latexonlysection{Alphabetical List of Routines}
   \small
-
 
 
 
