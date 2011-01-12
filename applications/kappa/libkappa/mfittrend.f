@@ -459,8 +459,8 @@
                                  ! real
 
 *  Local Constants:
-      INTEGER MAXPIX             ! Maximum number of pixels in a block
-      PARAMETER ( MAXPIX = 8388608 ) ! Guestimate a size: 8 mega
+      INTEGER MAXBIB             ! Maximum number of bytes in a block
+      PARAMETER ( MAXBIB = 67108864 ) ! Guestimate a size: 64MB
 
       INTEGER MAXRNG             ! Maximum number of range limits
       PARAMETER( MAXRNG = 20 )
@@ -485,6 +485,7 @@
       CHARACTER*9 ATTR           ! Name of an AST attribute
       LOGICAL AUTO               ! Determine regions automatically?
       INTEGER BLDIMS( NDF__MXDIM ) ! NDF dimensions in current block
+      INTEGER BPV                ! Number of bytes per data value
       INTEGER CFRM               ! Current frame
       REAL CLIP( MXCLIP )        ! Clipping sigmas during binning
       LOGICAL CLIPRE             ! Clip the outlier residuals?
@@ -550,8 +551,7 @@
       INTEGER MAP                ! PIXEL Frame to Current Frame Mapping
                                  ! pointer
       INTEGER MAXBIN             ! Maximum number of bins for auto mode
-      INTEGER MAXSIZ             ! Maximum size of block along current
-                                 ! dimension
+      INTEGER MAXSIZ             ! Maximum size of block (in pixels)
       INTEGER MBDIMS( NDF__MXDIM ) ! Maximum NDF dimensions in a block
       INTEGER MBL                ! Identifier for mask-NDF block
       CHARACTER*9 METHOD         ! Method for determining the mode
@@ -1215,7 +1215,8 @@
 *  axis.  Partial fills take the remaining maximum size and subsequent
 *  dimensions' block sizes are unity.
       MBDIMS( JAXIS ) = DIMS( JAXIS )
-      MAXSIZ = MAX( 1, MAXPIX / DIMS( JAXIS ) )
+      CALL KPG_TYPSZ( ITYPE, BPV, STATUS )
+      MAXSIZ = MAX( 1, MAXBIB / DIMS( JAXIS ) / BPV )
       LOOP = .TRUE.
       DO I = 1, NDIM
          IF ( I .NE. JAXIS ) THEN
