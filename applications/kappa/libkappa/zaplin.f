@@ -483,6 +483,7 @@
       DOUBLE PRECISION XU(2)     ! Double precision dummy argument
       INTEGER ACT( 2 )           ! Action associated with each vertex
       INTEGER BOX                ! Non-zero if a box is to be drawn
+      INTEGER BPV                ! Bytes per value for selected data type
       INTEGER BYTES              ! No of bytes to allocate
       INTEGER CFRM               ! Current Frame from input NDF
       INTEGER CMAP               ! Mapping from PIXEL to Current Frame
@@ -859,28 +860,8 @@
 *  the defined HDS data types.  Since the data type at this point could
 *  be anything, we need to use PSX_MALLOC, first finding the total
 *  number of bytes required.
-         IF ( ITYPE .EQ. '_REAL' ) THEN
-            BYTES = EL*VAL__NBR
-
-         ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
-            BYTES = EL*VAL__NBB
-
-         ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            BYTES = EL*VAL__NBD
-
-         ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-            BYTES = EL*VAL__NBI
-
-         ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-            BYTES = EL*VAL__NBUB
-
-         ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-            BYTES = EL*VAL__NBUW
-
-         ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-            BYTES = EL*VAL__NBW
-
-         END IF
+         CALL KPG_TYPSZ( ITYPE, BPV, STATUS )
+         BYTES = EL * BPV
 
          CALL PSX_MALLOC( BYTES, IPOUT( 2 ), STATUS )
 

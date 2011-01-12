@@ -378,27 +378,9 @@
 
 *  Determine the number of bytes per value for the selected data type.
 *  We do this becaise PSX_CALLOC cannot accept the whole range of HDS
-*  data types. So we work out the numberof bytes needed and use
+*  data types.  So we work out the number of bytes needed and use
 *  PSX_MALLOC instead.
-      IF ( ITYPE .EQ. '_BYTE' ) THEN
-         BPV = VAL__NBB
-      ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-         BPV = VAL__NBUB
-      ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-         BPV = VAL__NBW
-      ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-         BPV = VAL__NBUW
-      ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-         BPV = VAL__NBI
-      ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-         BPV = VAL__NBR
-      ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         BPV = VAL__NBD
-      ELSE IF ( STATUS .EQ. SAI__OK ) THEN
-         STATUS = SAI__ERROR
-         CALL ERR_REP( 'SQORST_ERR1', 'Data type '//ITYPE//' not yet '//
-     :                 'supported fully.', STATUS )
-      END IF
+      CALL KPG_TYPSZ( ITYPE, BPV, STATUS )
 
 *  Get its pixel index bounds.
       CALL NDF_BOUND( NDFI, NDF__MXDIM, LBNDI, UBNDI, NDIM, STATUS )
