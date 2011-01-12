@@ -16,7 +16,7 @@ F_ROUTINES = \
  cof_lws1.f cof_lws2.f cof_lwsan.f cof_mandh.f cof_mrghd.f cof_ndf2f.f \
  cof_ndfax.f cof_ndfcc.f cof_ndxt.f cof_nhead.f cof_rhead.f cof_savhd.f \
  cof_sbnd.f cof_spec.f cof_stypc.f cof_stype.f cof_swsaa.f cof_t2hds.f \
- cof_thier.f cof_typsz.f cof_wfexf.f cof_wfext.f cof_wgbfe.f cof_whead.f \
+ cof_thier.f cof_wfexf.f cof_wfext.f cof_wgbfe.f cof_whead.f \
  cof_whisr.f cof_wndfh.f cof_wrtab.f cof_ftwcs.f cof_fpwcs.f cof_fndfs.f \
  cof_wcsax.f cof_wcsdf.f cof_wcsex.f cof_wcsim.f cof_wcsut.f cof_mghdr.f \
  cof_getfc.f cof_getyp.f cof_stscl.f cof_smurf.f cof_nex2f.f cof_pcadc.f \

@@ -13,7 +13,7 @@ F_ROUTINES = \
  con_mandh.f con_ndfcm.f con_pcard.f con_pfith.f \
  con_rgasp.f con_raux.f  con_raxes.f con_rccc.f  \
  con_rcpy.f  con_saxis.f con_sphea.f con_spcpy.f con_sphst.f \
- con_trcha.f con_typsz.f con_vaxis.f con_vcorr.f con_wfman.f \
+ con_trcha.f con_vaxis.f con_vcorr.f con_wfman.f \
  con_wcspx.f con_wgasp.f con_wgrid.f con_wrpgm.f con_wrtif.f
 
 C_ROUTINES = con_gbl.c con_cclos.c con_copen.c con_cwrit.c con_cwri2.c \
