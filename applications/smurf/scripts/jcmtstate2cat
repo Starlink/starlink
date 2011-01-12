@@ -41,7 +41,8 @@ Print the full documentation to STDOUT.
 =item B<--with-mce>
 
 Include SCUBA-2 MCE information in output table. This adds a lot of data to
-the output files and much of it is constant for the observation.
+the output files and much of it is constant for the observation. Default
+is not to add this option.
 
 =back
 
@@ -62,7 +63,9 @@ Note that information from the ACSIS extension is not included at this
 time. This is partly because this extension can change in shape
 between observations.
 
-MCE header information is included for SCUBA-2 data files.
+MCE header information is included for SCUBA-2 data files taken before
+summer 2010. After December 2010 MCE data is stored in a different
+way in the files and is not currently supported by this command.
 
 =cut
 
