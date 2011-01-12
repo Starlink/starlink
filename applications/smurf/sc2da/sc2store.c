@@ -3762,7 +3762,6 @@ int *status                 /* global status (given and returned) */
    }
 
 /* Write the per-frame headers */
-   printf("Am about to write jcmtstate\n");
    sc2store_writejcmtstate ( NDF__NOID, nframes, head, status );
 
 /* Create DREAM extension ONLY if we have DREAM data */
