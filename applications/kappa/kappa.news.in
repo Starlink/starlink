@@ -1,7 +1,21 @@
-1 KAPPA_Version_1.12
+1 KAPPA_Version_1.13
 
    A new release of KAPPA (@PACKAGE_VERSION@) is under development.  The main
    changes so far are listed below.  For complete details of all
+   changes, see the "Release Notes" appendix in SUN/95.
+
+2 Modified_applications
+
+   o  MFITTREND
+
+      -  Permits processing of very large datasets by dividing into
+      manageable sections.
+
+
+1 KAPPA_Version_1.12
+
+   A new release of KAPPA (V1.12-9) has been released.  The main
+   changes are listed below.  For complete details of all
    changes, see the "Release Notes" appendix in SUN/95.
 
 2 General_changes
@@ -62,11 +76,6 @@
    o  MAKESURFACE
 
       -  Output variances can now be created for spline fits.
-
-   o  MFITTREND
-
-      -  Permits processing of very large datasets by dividing into
-      manageable sections.
 
    o  NDFCOMPRESS
 
