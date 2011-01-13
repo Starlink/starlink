@@ -127,6 +127,8 @@ f     following routines may also be applied to all FitsChans:
 *
 c     - astDelFits: Delete the current FITS card in a FitsChan
 f     - AST_DELFITS: Delete the current FITS card in a FitsChan
+c     - astEmptyFits: Delete all cards in a FitsChan
+f     - AST_EMPTYFITS: Delete all cards in a FitsChan
 c     - astFindFits: Find a FITS card in a FitsChan by keyword
 f     - AST_FINDFITS: Find a FITS card in a FitsChan by keyword
 c     - astGetFits<X>: Get a keyword value from a FitsChan
@@ -901,6 +903,8 @@ f     - AST_TESTFITS: Test if a keyword has a defined value in a FitsChan
 *        capitalisation in SpecTrans.
 *     10-JAN-2011 (DSB):
 *        Fix memory leak in MakeIntWorld.
+*     13-JAN-2011 (DSB):
+*        Rename astEmpty ast astEmptyFits and make public.
 *class--
 */
 
@@ -1583,7 +1587,7 @@ static void Delete( AstObject *, int * );
 static void DeleteCard( AstFitsChan *, const char *, const char *, int * );
 static void DistortMaps( AstFitsChan *, FitsStore *, char, int , AstMapping **, AstMapping **, AstMapping **, AstMapping **, const char *, const char *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
-static void Empty( AstFitsChan *, int * );
+static void EmptyFits( AstFitsChan *, int * );
 static void FindWcs( AstFitsChan *, int, int, int, const char *, const char *, int * );
 static void FixNew( AstFitsChan *, int, int, const char *, const char *, int * );
 static void FixUsed( AstFitsChan *, int, int, int, const char *, const char *, int * );
@@ -7663,37 +7667,41 @@ static void DSSToStore( AstFitsChan *this, FitsStore *store,
    }
 }
 
-static void Empty( AstFitsChan *this, int *status ){
+static void EmptyFits( AstFitsChan *this, int *status ){
 /*
-*+
+*++
 *  Name:
-*     astEmpty
+c     astEmptyFits
+f     AST_EMPTYFITS
 
 *  Purpose:
-*     Remove all cards and related data from a FitsChan.
+*     Delete all cards in a FitsChan.
 
 *  Type:
-*     Protected virtual function.
+*     Public virtual function.
 
 *  Synopsis:
-*     #include "fitschan.h"
-*     void astEmpty( AstFitsChan *this )
+c     #include "fitschan.h"
+c     void astEmptyFits( AstFitsChan *this )
+f     CALL AST_EMPTYFITS( THIS, STATUS )
 
 *  Class Membership:
-*     FitsChan member function.
+*     FitsChan method.
 
 *  Description:
-*     This function removes all cards and associated information from the
-*     supplied FitsChan.
+c     This function
+f     This routine
+*     deletes all cards and associated information from a FitsChan.
 
 *  Parameters:
-*     this
+c     this
+f     THIS = INTEGER (Given)
 *        Pointer to the FitsChan.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
 
 *  Notes:
-*     -  This function attempts to execute even if an error has occurred.
-
-*-
+*--
 */
 
 /* Local Variables: */
@@ -15567,7 +15575,7 @@ void astInitFitsChanVtab_(  AstFitsChanVtab *vtab, const char *name, int *status
    vtab->RetainFits = RetainFits;
    vtab->FindFits = FindFits;
    vtab->KeyFields = KeyFields;
-   vtab->Empty = Empty;
+   vtab->EmptyFits = EmptyFits;
    vtab->FitsEof = FitsEof;
    vtab->GetFitsCF = GetFitsCF;
    vtab->GetFitsCI = GetFitsCI;
@@ -20855,7 +20863,7 @@ f        The global status.
    class = astGetClass( this );
 
 /* Empty the FitsChan. */
-   astEmpty( this );
+   astEmptyFits( this );
 
 /* Loop round the supplied string in 80 character segments, inserting
    each segment into the FitsChan as a header card. Allow the last card
@@ -34536,7 +34544,7 @@ static void Delete( AstObject *obj, int *status ) {
    WriteToSink( this, status );
 
 /* Remove all cards from the FitsChan. */
-   Empty( this, status );
+   EmptyFits( this, status );
 
 /* Free any memory used to hold the Warnings attribute value. */
    this->warnings = astFree( this->warnings );
@@ -35810,9 +35818,9 @@ AstFitsChan *astLoadFitsChan_( void *mem, size_t size,
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
 
-void astEmpty_( AstFitsChan *this, int *status ){
+void astEmptyFits_( AstFitsChan *this, int *status ){
    if( !this ) return;
-   (**astMEMBER(this,FitsChan,Empty))(this, status );
+   (**astMEMBER(this,FitsChan,EmptyFits))(this, status );
 }
 
 void astPutCards_( AstFitsChan *this, const char *cards, int *status ){

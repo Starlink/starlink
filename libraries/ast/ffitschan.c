@@ -775,5 +775,15 @@ MAKE_AST_GETFITS(cn,CN,CN)
 
 #undef MAKE_AST_GETFITS
 
+F77_SUBROUTINE(ast_emptyfits)( INTEGER(THIS),
+                               INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+
+   astAt( "AST_EMPTYFITS", NULL, 0 );
+   astWatchSTATUS(
+      astEmptyFits( astI2P( *THIS ) );
+   )
+}
+
 
 
