@@ -202,7 +202,7 @@ typedef struct AstFitsChanVtab {
    AstClassIdentifier id;
 
 /* Properties (e.g. methods) specific to this class. */
-   void (* Empty)( AstFitsChan *, int * );
+   void (* EmptyFits)( AstFitsChan *, int * );
    void (* DelFits)( AstFitsChan *, int * );
    void (* PurgeWCS)( AstFitsChan *, int * );
    void (* RetainFits)( AstFitsChan *, int * );
@@ -356,29 +356,30 @@ void astInitFitsChanGlobals_( AstFitsChanGlobals * );
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
-   void astPutFits_( AstFitsChan *, const char [81], int, int * );
-   void astPutCards_( AstFitsChan *, const char *, int * );
    int  astFindFits_( AstFitsChan *, const char *, char [81], int, int * );
-   void astDelFits_( AstFitsChan *, int * );
-   void astPurgeWCS_( AstFitsChan *, int * );
-   void astRetainFits_( AstFitsChan *, int * );
-   void astSetFitsCF_( AstFitsChan *, const char *, double *, const char *, int, int * );
-   void astSetFitsCI_( AstFitsChan *, const char *, int *, const char *, int, int * );
-   void astSetFitsF_( AstFitsChan *, const char *, double, const char *, int, int * );
-   void astSetFitsI_( AstFitsChan *, const char *, int, const char *, int, int * );
-   void astSetFitsL_( AstFitsChan *, const char *, int, const char *, int, int * );
-   void astSetFitsU_( AstFitsChan *, const char *, const char *, int, int * );
-   void astSetFitsS_( AstFitsChan *, const char *, const char *, const char *, int, int * );
-   void astSetFitsCM_( AstFitsChan *, const char *, int, int * );
-   void astSetFitsCN_( AstFitsChan *, const char *, const char *, const char *, int, int * );
    int  astGetFitsCF_( AstFitsChan *, const char *, double *, int * );
    int  astGetFitsCI_( AstFitsChan *, const char *, int *, int * );
+   int  astGetFitsCN_( AstFitsChan *, const char *, char **, int * );
    int  astGetFitsF_( AstFitsChan *, const char *, double *, int * );
    int  astGetFitsI_( AstFitsChan *, const char *, int *, int * );
    int  astGetFitsL_( AstFitsChan *, const char *, int *, int * );
-   int  astTestFits_( AstFitsChan *, const char *, int *, int * );
    int  astGetFitsS_( AstFitsChan *, const char *, char **, int * );
-   int  astGetFitsCN_( AstFitsChan *, const char *, char **, int * );
+   int  astTestFits_( AstFitsChan *, const char *, int *, int * );
+   void astDelFits_( AstFitsChan *, int * );
+   void astEmptyFits_( AstFitsChan *, int * );
+   void astPurgeWCS_( AstFitsChan *, int * );
+   void astPutCards_( AstFitsChan *, const char *, int * );
+   void astPutFits_( AstFitsChan *, const char [81], int, int * );
+   void astRetainFits_( AstFitsChan *, int * );
+   void astSetFitsCF_( AstFitsChan *, const char *, double *, const char *, int, int * );
+   void astSetFitsCI_( AstFitsChan *, const char *, int *, const char *, int, int * );
+   void astSetFitsCM_( AstFitsChan *, const char *, int, int * );
+   void astSetFitsCN_( AstFitsChan *, const char *, const char *, const char *, int, int * );
+   void astSetFitsF_( AstFitsChan *, const char *, double, const char *, int, int * );
+   void astSetFitsI_( AstFitsChan *, const char *, int, const char *, int, int * );
+   void astSetFitsL_( AstFitsChan *, const char *, int, const char *, int, int * );
+   void astSetFitsS_( AstFitsChan *, const char *, const char *, const char *, int, int * );
+   void astSetFitsU_( AstFitsChan *, const char *, const char *, int, int * );
 
 # if defined(astCLASS)           /* Protected */
 
@@ -386,7 +387,6 @@ void astInitFitsChanGlobals_( AstFitsChanGlobals * );
    int  astFitsGetCom_( AstFitsChan *, const char *, char **, int * );
    void astSetFitsCom_( AstFitsChan *, const char *, const char *, int, int * );
 
-   void astEmpty_( AstFitsChan *, int * );
    int  astKeyFields_( AstFitsChan *, const char *, int, int *, int *, int * );
 
    int astGetCard_( AstFitsChan *, int * );
@@ -556,6 +556,9 @@ astINVOKE(V,astGetFitsS_(astCheckFitsChan(this),name,value,STATUS_PTR))
 #define astGetFitsCN(this,name,value) \
 astINVOKE(V,astGetFitsCN_(astCheckFitsChan(this),name,value,STATUS_PTR))
 
+#define astEmptyFits(this) \
+astINVOKE(V,astEmptyFits_(astCheckFitsChan(this),STATUS_PTR))
+
 
 #if defined(astCLASS)            /* Protected */
 
@@ -567,9 +570,6 @@ astINVOKE(V,astFitsGetCom_(astCheckFitsChan(this),name,comment,STATUS_PTR))
 
 #define astSetFitsCom(this,name,comment,overwrite) \
 astINVOKE(V,astSetFitsCom_(astCheckFitsChan(this),name,comment,overwrite,STATUS_PTR))
-
-#define astEmpty(this) \
-astINVOKE(V,astEmpty_(astCheckFitsChan(this),STATUS_PTR))
 
 #define astKeyFields(this,filter,maxfld,ubnd,lbnd) \
 astINVOKE(V,astKeyFields_(astCheckFitsChan(this),filter,maxfld,ubnd,lbnd,STATUS_PTR))
