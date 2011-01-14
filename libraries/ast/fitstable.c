@@ -164,7 +164,7 @@ static int class_init = 0;       /* Virtual function table initialised? */
 /* The following functions have public prototypes only (i.e. no
    protected prototypes), so we must provide local prototypes for use
    within this module. */
-AstFitsTable *astFitsTableId_( const char *, ... );
+AstFitsTable *astFitsTableId_( void *, const char *, ... );
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
@@ -177,6 +177,7 @@ static void AddColumn( AstTable *, const char *, int, int, int *, const char *, 
 static void Copy( const AstObject *, AstObject *, int * );
 static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
+static void GenerateColumns( AstFitsTable *, AstFitsChan *, int * );
 static void GetColumnData( AstFitsTable *, const char *, float, double, size_t, void *, int *, int * );
 static void PurgeHeader( AstFitsTable *, int * );
 static void PutTableHeader( AstFitsTable *, AstFitsChan *, int * );
@@ -817,6 +818,225 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 
 /* Return the result, */
    return result;
+}
+
+static void GenerateColumns( AstFitsTable *this, AstFitsChan *header,
+                             int *status ) {
+/*
+*  Name:
+*     GenerateColumns
+
+*  Purpose:
+*     Add new column definitions to a FitsTable as defined by a FITS
+*     header.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "table.h"
+*     void GenerateColumns( AstFitsTable *this, AstFitsChan *header,
+*                           int *status )
+
+*  Class Membership:
+*     FitsTable member function
+
+*  Description:
+*     For each binary table column defined in the supplied FITS header,
+*     this function adds an equivalent column to the FitsTable.
+
+*  Parameters:
+*     this
+*        Pointer to the FitsTable.
+*     header
+*        Pointer to a FitsChan holding the column definitions.
+*     status
+*        Pointer to the inherited status.
+
+*/
+
+/* Local Variables: */
+   char *cval;
+   char *name;
+   char *p;
+   char *unit;
+   char buff[ 50 ];
+   char code;
+   char keyword[ 20 ];
+   double dval;
+   int *dims;
+   int icol;
+   int idim;
+   int ival;
+   int nc;
+   int ncol;
+   int ndim;
+   int nel;
+   int repeat;
+   int type;
+   int wasset;
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Get the number of columns defined in the header. */
+   if( !astGetFitsI( header, "TFIELDS", &ncol ) ) ncol = 0;
+
+/* Add a column definition to the FitsTable for each column in the header. */
+   for( icol = 0; icol < ncol; icol++ ) {
+
+/* Get the TFORMi keyword that defines the column data type and shape from
+   the header. Report an error if it is missing. */
+      sprintf( keyword, "TFORM%d", icol + 1 );
+      if( !astGetFitsS( header, keyword, &cval ) ) {
+         astError( AST__NOFTS, "astFitsTable: Supplied FITS binary table "
+                   "header does not contain the required keyword '%s'.",
+                   status, keyword );
+      }
+
+/* Extract the repeat count and data type code from the TFORM string. */
+      if( sscanf( cval, "%d%n", &repeat, &nc ) == 0 ) {
+         repeat = 1;
+         nc = 0;
+      } else if( repeat < 0 && astOK ) {
+         astError( AST__BDFTS, "astFitsTable: Keyword '%s' in supplied FITS "
+                   "binary table header has unsupported value '%s'.", status,
+                   keyword, cval );
+      }
+      code = cval[ nc ];
+
+/* Get the corresponding KeyMap data type. Report an error if the FITS
+   data type is not supported by the KeyMap class. */
+      if( code == 'B' ) {
+         type = AST__BYTETYPE;
+
+      } else if( code == 'I' ) {
+         type = AST__SINTTYPE;
+
+      } else if( code == 'J' ) {
+         type = AST__INTTYPE;
+
+      } else if( code == 'D' ) {
+         type = AST__DOUBLETYPE;
+
+      } else if( code == 'E' ) {
+         type = AST__FLOATTYPE;
+
+      } else if( code == 'A' ) {
+         type = AST__STRINGTYPE;
+
+      } else if( astOK ){
+         astError( AST__BDFTS, "astFitsTable: Keyword '%s' in supplied FITS "
+                   "binary table header has unsupported value '%s'.", status,
+                   keyword, cval );
+      }
+
+/* The TTYPEi keyword gives the column name. Create a column name based
+   on the index of the column. */
+      sprintf( keyword, "TTYPE%d", icol + 1 );
+      if( !astGetFitsS( header, keyword, &cval ) ) {
+         sprintf( buff, "FCOLUMN%d", icol + 1 );
+         cval = buff;
+      }
+      name = astStore( NULL, cval, strlen( cval ) + 1 );
+
+/* Column units. */
+      sprintf( keyword, "TUNIT%d", icol + 1 );
+      if( !astGetFitsS( header, keyword, &cval ) ) {
+         buff[ 0 ] = 0;
+         cval = buff;
+      }
+      unit = astStore( NULL, cval, strlen( cval ) + 1 );
+
+/* Column shape is defined by the TDIMi keyword - in the form
+   "(i,j,k,...)". where i, j, k ... are the dimensions.  */
+      sprintf( keyword, "TDIM%d", icol + 1 );
+      if( astGetFitsS( header, keyword, &cval ) ) {
+
+/* Count the commas in the keyword value. This equals one less than the
+   number of dimensions. */
+         ndim = 1;
+         p = cval;
+         while( *p ) {
+            if( *(p++) == ',' ) ndim++;
+         }
+
+/* Allocate memory for the dimensions. */
+         dims = astMalloc( ndim*sizeof( int ) );
+
+/* Find each dimension and copy it into the above memory. Also find the
+   total number of elements (nel). */
+         nel = 1;
+         idim = 0;
+         p = cval;
+         if( *p == '(' ) p++;
+         while( sscanf( p, "%d%n", dims + idim, &nc ) ) {
+            nel *= dims[ idim ];
+            idim++;
+            p += nc;
+            if( *p == ',' ) p++;
+         }
+
+/* For strings, the first TDIM value gives the length of the string, so
+   reduce the number of dimensions by one. */
+         if( type == AST__STRINGTYPE ) {
+            ndim--;
+            dims++;
+         }
+
+      } else {
+         nel = 1;
+         ndim = 0;
+         dims = NULL;
+      }
+
+/* Check the total number of elements equal the repeat count from the
+   TFORM keyword. */
+      if( repeat != nel && astOK ) {
+
+         sprintf( keyword, "TFORM%d", icol + 1 );
+         astGetFitsS( header, keyword, &cval );
+         strcpy( buff, cval );
+
+         sprintf( keyword, "TDIM%d", icol + 1 );
+         if( !astGetFitsS( header, keyword, &cval ) ) cval = " ";
+
+         astError( AST__BDFTS, "astFitsTable: Supplied FITS binary table "
+                   "header contains inconsistent TFORM (%s) and TDIM (%s) "
+                   "keywords for field %d.", status, buff, cval, icol + 1 );
+      }
+
+/* Check any TSCALi value is 1.0 */
+      sprintf( keyword, "TSCAL%d", icol + 1 );
+      if( astGetFitsF( header, keyword, &dval ) && dval != 1.0 && astOK ) {
+         astError( AST__BDFTS, "astFitsTable: Supplied FITS binary table "
+                   "header contains scaled columns which are not "
+                   "supported by AST.", status );
+      }
+
+/* Check any TZEROi value is 0.0 */
+      sprintf( keyword, "TSCAL%d", icol + 1 );
+      if( astGetFitsF( header, keyword, &dval ) && dval != 0.0 && astOK ) {
+         astError( AST__BDFTS, "astFitsTable: Supplied FITS binary table "
+                   "header contains scaled columns which are not "
+                   "supported by AST.", status );
+      }
+
+/* Add the column to the table. */
+      astAddColumn( this, name, type, ndim, dims, unit );
+
+/* Set the null value, if present. */
+      sprintf( keyword, "TNULL%d", icol + 1 );
+      if( astGetFitsI( header, keyword, &ival ) ) {
+         (void) astColumnNull( this, name, 1, ival, &wasset, NULL );
+      }
+
+/* Free resources. */
+      dims = astFree( dims - ( ( type == AST__STRINGTYPE ) ? 1 : 0 ) );
+      name = astFree( name );
+      unit = astFree( unit );
+
+   }
 }
 
 static void GetColumnData( AstFitsTable *this, const char *column,
@@ -1607,7 +1827,7 @@ static void UpdateHeader( AstFitsTable *this, const char *method,
          astColumnShape( this, name, ndim, &ndim, dims );
 
 /* Get the FITS code that describes the column data type. Also increment
-  the number of bytes (rowsize) used to describe a whole row. */
+   the number of bytes (rowsize) used to describe a whole row. */
          if( type == AST__BYTETYPE ) {
             code = 'B';
             rowsize += nel;
@@ -1885,7 +2105,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 astMAKE_ISA(FitsTable,Table)
 astMAKE_CHECK(FitsTable)
 
-AstFitsTable *astFitsTable_( const char *options, int *status, ...) {
+AstFitsTable *astFitsTable_( void *header_void, const char *options, int *status, ...) {
 /*
 *++
 *  Name:
@@ -1900,14 +2120,14 @@ f     AST_FITSTABLE
 
 *  Synopsis:
 c     #include "fitstable.h"
-c     AstFitsTable *astFitsTable( const char *options, ... )
-f     RESULT = AST_FITSTABLE( OPTIONS, STATUS )
+c     AstFitsTable *astFitsTable( AstFitsChan *header, const char *options, ... )
+f     RESULT = AST_FITSTABLE( HEADER, OPTIONS, STATUS )
 
 *  Class Membership:
 *     FitsTable constructor.
 
 *  Description:
-*     This function creates a new empty FitsTable and optionally initialises
+*     This function creates a new FitsTable and optionally initialises
 *     its attributes.
 *
 *     The FitsTable class is a representation of a FITS binary table. It
@@ -1920,6 +2140,15 @@ f     RESULT = AST_FITSTABLE( OPTIONS, STATUS )
 *     very large tables.
 
 *  Parameters:
+c     header
+f     HEADER = INTEGER (Given)
+*        Pointer to an optional FitsChan containing headers to be stored
+*        in the FitsTable.
+c        NULL
+f        AST__NULL
+*        may be supplied if the new FitsTable is to be left empty. If
+*        supplied, and if the headers describe columns of a FITS binary
+*        table, then equivalent (empty) columns are added to the FitsTable.
 c     options
 f     OPTIONS = CHARACTER * ( * ) (Given)
 c        Pointer to a null-terminated string containing an optional
@@ -1964,6 +2193,7 @@ f     function is invoked with STATUS set to an error value, or if it
 /* Local Variables: */
    astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstFitsTable *new;            /* Pointer to new FitsTable */
+   AstFitsChan *header;          /* Pointer to header FitsChan */
    va_list args;                 /* Variable argument list */
 
 /* Get a pointer to the thread specific global data structure. */
@@ -1972,10 +2202,13 @@ f     function is invoked with STATUS set to an error value, or if it
 /* Check the global status. */
    if ( !astOK ) return NULL;
 
+/* Obtain and validate pointers to the header FitsChan provided. */
+   header = header_void ? astCheckFitsChan( header_void ) : NULL;
+
 /* Initialise the FitsTable, allocating memory and initialising the
    virtual function table as well if necessary. */
    new = astInitFitsTable( NULL, sizeof( AstFitsTable ), !class_init,
-                           &class_vtab, "FitsTable" );
+                           &class_vtab, "FitsTable", header );
 
 /* If successful, note that the virtual function table has been
    initialised. */
@@ -1996,7 +2229,7 @@ f     function is invoked with STATUS set to an error value, or if it
    return new;
 }
 
-AstFitsTable *astFitsTableId_( const char *options, ... ) {
+AstFitsTable *astFitsTableId_( void *header_void, const char *options, ... ) {
 /*
 *  Name:
 *     astFitsTableId_
@@ -2009,7 +2242,7 @@ AstFitsTable *astFitsTableId_( const char *options, ... ) {
 
 *  Synopsis:
 *     #include "fitstable.h"
-*     AstFitsTable *astFitsTableId_( const char *options, ... )
+*     AstFitsTable *astFitsTableId_( AstFitsChan *header, const char *options, ... )
 
 *  Class Membership:
 *     FitsTable constructor.
@@ -2036,10 +2269,10 @@ AstFitsTable *astFitsTableId_( const char *options, ... ) {
 
 /* Local Variables: */
    astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
+   AstFitsChan *header;          /* Genuine C poitner to header FitsChan */
    AstFitsTable *new;            /* Pointer to new FitsTable */
-   va_list args;                 /* Variable argument list */
-
    int *status;                  /* Pointer to inherited status value */
+   va_list args;                 /* Variable argument list */
 
 /* Get a pointer to the inherited status value. */
    status = astGetStatusPtr;
@@ -2050,10 +2283,14 @@ AstFitsTable *astFitsTableId_( const char *options, ... ) {
 /* Check the global status. */
    if ( !astOK ) return NULL;
 
+/* Obtain a FitsChan pointer from any ID supplied and validate the
+   pointer to ensure it identifies a valid FitsChan. */
+   header = header_void ? astCheckFitsChan( astMakePointer( header_void ) ) : NULL;
+
 /* Initialise the FitsTable, allocating memory and initialising the
    virtual function table as well if necessary. */
    new = astInitFitsTable( NULL, sizeof( AstFitsTable ), !class_init,
-                           &class_vtab, "FitsTable" );
+                           &class_vtab, "FitsTable", header );
 
 /* If successful, note that the virtual function table has been
    initialised. */
@@ -2076,7 +2313,7 @@ AstFitsTable *astFitsTableId_( const char *options, ... ) {
 
 AstFitsTable *astInitFitsTable_( void *mem, size_t size, int init,
                                  AstFitsTableVtab *vtab, const char *name,
-                                 int *status ) {
+                                 AstFitsChan *header, int *status ) {
 /*
 *+
 *  Name:
@@ -2091,7 +2328,8 @@ AstFitsTable *astInitFitsTable_( void *mem, size_t size, int init,
 *  Synopsis:
 *     #include "fitstable.h"
 *     AstFitsTable *astInitFitsTable( void *mem, size_t size, int init,
-*                                     AstFitsTableVtab *vtab, const char *name )
+*                                     AstFitsTableVtab *vtab, const char *name,
+*                                     AstFitsChan *header )
 
 *  Class Membership:
 *     FitsTable initialiser.
@@ -2130,6 +2368,9 @@ AstFitsTable *astInitFitsTable_( void *mem, size_t size, int init,
 *        the name of the class to which the new object belongs (it is this
 *        pointer value that will subsequently be returned by the astGetClass
 *        method).
+*     header
+*        If not NULL, a FitsChan that is used to populate the FitsTable
+*        with headers and columns.
 
 *  Returned Value:
 *     A pointer to the new FitsTable.
@@ -2162,6 +2403,13 @@ AstFitsTable *astInitFitsTable_( void *mem, size_t size, int init,
 /* Initialise the FitsTable data. */
 /* ---------------------------- */
       new->header = astFitsChan( NULL, NULL, " ", status );
+
+/* If a header was supplied, add equivalent columns to the FitsTable, and
+   store the header. */
+      if( header ) {
+         GenerateColumns( new, header, status );
+         PutTableHeader( new, header, status );
+      }
 
 /* If an error occurred, clean up by deleting the new FitsTable. */
       if ( !astOK ) new = astDelete( new );
