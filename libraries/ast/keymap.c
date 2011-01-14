@@ -174,6 +174,9 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map
 *        Added support for unsigned byte valued entries.
 *     3-DEC-2010 (DSB):
 *         Added KeyCase attribute.
+*     14-JAN-2011 (DSB):
+*         Fix bug that prevented zero length strings being stored in a
+*         keymap.
 *class--
 */
 
@@ -1584,7 +1587,7 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type, int *
 *  Returned Value:
 *     Non-zero if the conversion was performed succesfully, otherwise zero.
 *     In the case of the output type being AST__STRINGTYPE, the returned
-*     non-zero value will be the length of the formatted string (not including
+*     non-zero value will be the length of the formatted string (including
 *     the terminating null character). This value will be returned correctly
 *     even if "out" is NULL.
 
@@ -2073,11 +2076,11 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type, int *
    element, so the earlier string is effectively replaced by the new
    one.) */
    if( out_type == AST__STRINGTYPE && astOK && result && cvalue ) {
-      result = strlen( cvalue );
+      result = strlen( cvalue ) + 1;
 
       astBeginPM;
       convertvalue_strings[ convertvalue_istr ] = astStore( convertvalue_strings[ convertvalue_istr ], cvalue,
-                                  (size_t) ( result + 1 ) );
+                                  (size_t) result );
       astEndPM;
 
 /* If OK, return a pointer to the copy and increment "convertvalue_istr" to use the
@@ -7167,9 +7170,11 @@ c        This does not include the trailing null character.
 
 /* Go through the motions of formatting the value. We do not actually
    need the formatted string (just its length) so we provide a NULL pointer
-   for the output buffer. The entry is ignored if it cannot be formatted. */
+   for the output buffer. The entry is ignored if it cannot be formatted. 
+   Note, the length returned by ConvertValue includes the terminating null, 
+   so decrement it first. */
             l = ConvertValue( raw, raw_type, NULL, AST__STRINGTYPE, status );
-            if( l > result ) result = l;
+            if( --l > result ) result = l;
 
 /* Increment the pointer to the next raw value. */
             raw = (char *) raw + raw_size;
