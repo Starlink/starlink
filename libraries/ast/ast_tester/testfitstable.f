@@ -62,10 +62,7 @@ c      call ast_watchmemory(483)
       call err_mark( status )
       call ast_begin( status )
 
-
-
-      table = ast_fitstable( ' ', status )
-
+      table = ast_fitstable( AST__NULL, ' ', status )
 
       header = ast_gettableheader( table, status )
       if( ast_geti( header, 'NCard', status ) .ne. 8 ) then
@@ -117,8 +114,80 @@ c      call ast_watchmemory(483)
             call stopit( status, 'FitsTable error 10' )
          end if
       end do
-      call ast_annul( header, status )
       if( icard .ne. 18 ) call stopit( status, 'FitsTable error 11' )
+
+
+      table2 = ast_fitstable( header, ' ', status )
+      call ast_annul( header, status )
+
+      if( ast_geti( table2, 'Ncolumn', status ) .ne. 3 ) then
+         call stopit( status, 'FitsTable error 11a' )
+      end if
+
+
+
+      if( ast_geti( table2, 'ColumnLength(bytecol)', status )
+     :    .ne. 6 ) then
+         call stopit( status, 'FitsTable error 11b' )
+      endif
+
+      if( ast_geti( table2, 'ColumnNdim(bytecol)', status )
+     :    .ne. 2 ) then
+         call stopit( status, 'FitsTable error 11c' )
+      end if
+
+      if( ast_geti( table2, 'ColumnType(bytecol)', status )
+     :    .ne. AST__BYTETYPE ) then
+         call stopit( status, 'FitsTable error 11d' )
+      end if
+
+      if( ast_getc( table2, 'ColumnUnit(bytecol)', status )
+     :    .ne. 'ADU' ) then
+         call stopit( status, 'FitsTable error 11e' )
+      end if
+
+
+      if( ast_geti( table2, 'ColumnLength(intcol)', status )
+     :    .ne. 1 ) then
+         call stopit( status, 'FitsTable error 11f' )
+      endif
+
+      if( ast_geti( table2, 'ColumnNdim(intcol)', status )
+     :    .ne. 0 ) then
+         call stopit( status, 'FitsTable error 11g' )
+      end if
+
+      if( ast_geti( table2, 'ColumnType(intcol)', status )
+     :    .ne. AST__INTTYPE ) then
+         call stopit( status, 'FitsTable error 11h' )
+      end if
+
+      if( ast_getc( table2, 'ColumnUnit(intcol)', status )
+     :    .ne. 'm' ) then
+         call stopit( status, 'FitsTable error 11i' )
+      end if
+
+
+      if( ast_geti( table2, 'ColumnLength(StringCol)', status )
+     :    .ne. 3 ) then
+         call stopit( status, 'FitsTable error 11j' )
+      endif
+
+      if( ast_geti( table2, 'ColumnNdim(StringCol)', status )
+     :    .ne. 1 ) then
+         call stopit( status, 'FitsTable error 11k' )
+      end if
+
+      if( ast_geti( table2, 'ColumnType(StringCol)', status )
+     :    .ne. AST__STRINGTYPE ) then
+         call stopit( status, 'FitsTable error 11l' )
+      end if
+
+      if( ast_getc( table2, 'ColumnUnit(StringCol)', status )
+     :    .ne. ' ' ) then
+         call stopit( status, 'FitsTable error 11m' )
+      end if
+
 
 
       bytes(1,1) = 0

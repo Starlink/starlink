@@ -141,16 +141,16 @@ astPROTO_ISA(FitsTable)             /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstFitsTable *astFitsTable_( const char *, int *, ...);
+AstFitsTable *astFitsTable_( void *, const char *, int *, ...);
 #else
-AstFitsTable *astFitsTableId_( const char *, ... )__attribute__((format(printf,1,2)));
+AstFitsTable *astFitsTableId_( void *, const char *, ... )__attribute__((format(printf,2,3)));
 #endif
 
 #if defined(astCLASS)            /* Protected */
 
 /* Initialiser. */
 AstFitsTable *astInitFitsTable_( void *, size_t, int, AstFitsTableVtab *,
-                                 const char *, int * );
+                                 const char *, AstFitsChan *, int * );
 
 /* Vtab initialiser. */
 void astInitFitsTableVtab_( AstFitsTableVtab *, const char *, int * );
@@ -198,8 +198,8 @@ void astGetColumnData_( AstFitsTable *, const char *, float, double, size_t, voi
 #if defined(astCLASS)            /* Protected */
 
 /* Initialiser. */
-#define astInitFitsTable(mem,size,init,vtab,name) \
-astINVOKE(O,astInitFitsTable_(mem,size,init,vtab,name,STATUS_PTR))
+#define astInitFitsTable(mem,size,init,vtab,name,header) \
+astINVOKE(O,astInitFitsTable_(mem,size,init,vtab,name,header,STATUS_PTR))
 
 /* Vtab Initialiser. */
 #define astInitFitsTableVtab(vtab,name) astINVOKE(V,astInitFitsTableVtab_(vtab,name,STATUS_PTR))

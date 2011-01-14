@@ -72,9 +72,11 @@ F77_LOGICAL_FUNCTION(ast_isafitstable)( INTEGER(THIS),
    return RESULT;
 }
 
-F77_INTEGER_FUNCTION(ast_fitstable)( CHARACTER(OPTIONS),
+F77_INTEGER_FUNCTION(ast_fitstable)( INTEGER(HEADER),
+                                     CHARACTER(OPTIONS),
                                      INTEGER(STATUS)
                                      TRAIL(OPTIONS) ) {
+   GENPTR_INTEGER(HEADER)
    GENPTR_CHARACTER(OPTIONS)
    F77_INTEGER_TYPE(RESULT);
    int i;
@@ -90,7 +92,7 @@ F77_INTEGER_FUNCTION(ast_fitstable)( CHARACTER(OPTIONS),
             if ( options[ i ] == ',' ) options[ i ] = '\n';
          }
       }
-      RESULT = astP2I( astFitsTable( "%s", options ) );
+      RESULT = astP2I( astFitsTable( astI2P( *HEADER ), "%s", options ) );
       astFree( options );
    )
    return RESULT;
