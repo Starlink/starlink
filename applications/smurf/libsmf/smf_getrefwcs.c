@@ -50,6 +50,10 @@
 *  History:
 *     18-DEC-2007 (DSB):
 *        Initial version.
+*     17-JAN-2011 (DSB):
+*        Move the spectral axis code out into a separate function
+*        (smf_getspectralwcs). The same could be done with the code for
+*        the spatial axes if required.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -183,47 +187,8 @@ void smf_getrefwcs( const char *param, AstFrameSet **specwcs,
          }
       }
 
-/* Now look for the spectral WCS. Create a DSBSpecFrame that we can use as
-   a template for searching the reference WCS. Set a high value for MaxAxes
-   so that DSBSpecFrames can be found within CmpFrames (which will have
-   more than 1 axis). */
-      template = (AstFrame *) astDSBSpecFrame( "MaxAxes=7" );
-
-/* Use astFindFrame to search the reference WCS for a DSBSpecFrame. This search
-   includes the component Frames contained within CmpFrames. */
-      fs = astFindFrame( refwcs, template, " " );
-
-/* If a DSBSpecFrame was found... */
-      if( fs ) {
-
-/* Get the Mapping from spectral coords to PIXEL coords. */
-         map = astGetMapping( fs, AST__CURRENT, AST__BASE );
-
-/* Get the spectral coord Frame. This will be a DSBSpecFrame, but its
-   attributes will be inherited form the reference WCS rather than the
-   template DSBSpecFrame. */
-         cfrm = astGetFrame( fs, AST__CURRENT );
-
-/* Get the PIXEL Frame. If the reference NDF is a cube this will be a 3D
-   Frame. */
-         bfrm = astGetFrame( fs, AST__BASE );
-
-/* Since the mappiong above may include spatial axes, see if we can split
-   off the spectral axis axes from the total Mapping. If we can, this will
-   give us the Mapping from 1D spectral coords to 1D PIXEL coords. */
-         inax[ 0 ] = 1;
-         astMapSplit( map, 1, inax, outax, &splitmap );
-         if( splitmap && astGetI( splitmap, "Nout" ) == 1 ) {
-
-/* Pick the corresponding axis form the (potentially 3D) PIXEL Frame. */
-            gfrm = astPickAxes( bfrm, 1, outax, NULL );
-
-/* Create the returned spectral FrameSet. */
-            *specwcs = astFrameSet( gfrm, " " );
-            astInvert( splitmap );
-            astAddFrame( *specwcs, AST__BASE, splitmap, cfrm );
-         }
-      }
+/* Now look for the spectral WCS (described by a DSBSpecFrame). */
+      smf_getspectralwcs( refwcs, 1, specwcs, status );
    }
 
 /* If no error has occurred, export any returned FrameSet pointers from
