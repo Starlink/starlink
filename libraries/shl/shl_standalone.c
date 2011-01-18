@@ -164,6 +164,7 @@
  *       Use C interface to Fortran routines.
  *    18-JAN-2011 (TIMJ):
  *       Change API of shl_standalone to use const
+ *       Use strlcat and test argc
 
  * Bugs:
  *    {Enter_new_bugs_here}
@@ -179,6 +180,7 @@
 #include "ems.h"
 #include "sae_par.h"
 #include "shl.h"
+#include "star/util.h"
 
 /* Macros.
  */
@@ -196,7 +198,6 @@ int shl_standalone( const char * help_library, int isenv, int argc, char **argv 
    int     retval;          /* Return status 0=good 1=bad */
    char    topic[LENSTR];   /* Topic as C string    */
    int     i;               /* Parameter counter    */
-   size_t  nleft;           /* Space left in string */
    char    libra[LENSTR];   /* Expanded Library */
 
 /*.
@@ -211,7 +212,7 @@ int shl_standalone( const char * help_library, int isenv, int argc, char **argv 
  * Export it to Fortran.
  * Set parameter counter (i) such that argv[i] is first topic word.
  */
-   if ( argv[1] && !strcmp( "-l", argv[1] ) )      /* library is in argv[2] */
+   if ( argc > 1 && argv[1] && !strcmp( "-l", argv[1] ) )      /* library is in argv[2] */
    {
 
      shlTrnvar( argv[2], isenv, libra, LENSTR, &status );
@@ -236,9 +237,11 @@ int shl_standalone( const char * help_library, int isenv, int argc, char **argv 
 /* Assemble the topic string from remaining parameters.
  * Export it to Fortran.
  */
-   for ( *topic = '\0', nleft = LENSTR - 1; argv[i]; i++ )
-   {  (void) strncat( topic, argv[i], nleft ); nleft -= strlen(argv[i]);
-      (void) strncat( topic, " ",     nleft ); nleft--;
+   topic[0] = '\0';
+   for ( ; i < argc; i++ )
+   {
+     star_strlcat( topic, argv[i], sizeof(topic) );
+     star_strlcat( topic, " ", sizeof(topic) );
    }
 
    /* Call the SHL routine for the actual help functionality
