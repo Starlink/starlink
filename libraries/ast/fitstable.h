@@ -110,6 +110,7 @@ typedef struct AstFitsTableVtab {
    int (* ColumnNull)( AstFitsTable *, const char *, int, int, int *, int *, int * );
    size_t (* ColumnSize)( AstFitsTable *, const char *, int * );
    void (* GetColumnData)( AstFitsTable *, const char *, float, double, size_t, void *, int *, int * );
+   void (* PutColumnData)( AstFitsTable *, const char *, int, size_t, void *, int * );
 
 } AstFitsTableVtab;
 
@@ -167,6 +168,7 @@ void astPutTableHeader_( AstFitsTable *, AstFitsChan *, int * );
 int astColumnNull_( AstFitsTable *, const char *, int, int, int *, int *, int * );
 size_t astColumnSize_( AstFitsTable *, const char *, int * );
 void astGetColumnData_( AstFitsTable *, const char *, float, double, size_t, void *, int *, int * );
+void astPutColumnData_( AstFitsTable *, const char *, int, size_t, void *, int * );
 
 /* Function interfaces. */
 /* ==================== */
@@ -224,6 +226,8 @@ astINVOKE(V,astColumnNull_(astCheckFitsTable(this),column,set,newval,wasset,hasn
 astINVOKE(V,astColumnSize_(astCheckFitsTable(this),column,STATUS_PTR))
 #define astGetColumnData(this,column,fnull,dnull,mxsize,coldata,nelem) \
 astINVOKE(V,astGetColumnData_(astCheckFitsTable(this),column,fnull,dnull,mxsize,coldata,nelem,STATUS_PTR))
+#define astPutColumnData(this,column,clen,size,coldata) \
+astINVOKE(V,astPutColumnData_(astCheckFitsTable(this),column,clen,size,coldata,STATUS_PTR))
 
 #if defined(astCLASS)            /* Protected */
 #endif

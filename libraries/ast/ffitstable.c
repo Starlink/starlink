@@ -207,3 +207,25 @@ F77_SUBROUTINE(ast_getcolumndata)( INTEGER(THIS),
    )
 }
 
+F77_SUBROUTINE(ast_putcolumndata)( INTEGER(THIS),
+                                   CHARACTER(COLUMN),
+                                   INTEGER(CLEN),
+                                   INTEGER(SIZE),
+                                   BYTE_ARRAY(COLDATA),
+                                   INTEGER(STATUS)
+                                   TRAIL(COLUMN) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(COLUMN)
+   GENPTR_INTEGER(CLEN)
+   GENPTR_INTEGER(SIZE)
+   GENPTR_BYTE_ARRAY(COLDATA)
+   char *column;
+
+   astAt( "AST_PUTCOLUMNDATA", NULL, 0 );
+   astWatchSTATUS(
+      column = astString( COLUMN, COLUMN_length );
+      astPutColumnData( astI2P( *THIS ), column, *CLEN, *SIZE, (void *) COLDATA );
+      astFree( column );
+   )
+}
+

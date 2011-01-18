@@ -7,7 +7,7 @@
       include 'CNF_PAR'
 
       integer status, table, table2, dims( 7 ), header, ival, l, nval,
-     :        icard, colsize, pntr
+     :        icard, colsize, pntr, head, clen, oldnull, null
       byte bytes(2,3),bval
       logical wasset, hasnull
       real rval
@@ -228,79 +228,141 @@ c      call ast_watchmemory(483)
          call stopit( status, 'FitsTable error 13' )
       endif
 
+      head = ast_gettableheader( table, status )
+      table2 = ast_fitstable( head, ' ', status )
+      call ast_annul( head, status )
+
       colsize = ast_columnsize( table, 'stringcol', status )
-      if( colsize .ne. 99 ) then
-         call stopit( status, 'FitsTable error 13b' )
+      if( colsize .ne. 90 ) then
+         call stopit( status, 'FitsTable error 13a' )
       else
          call psx_malloc( colsize, pntr, status )
          call ast_getcolumndata( table, 'StringCol', 0.0, 0.0D0,
      :                           colsize, %val( cnf_pval(pntr)),
      :                           colsize, status )
          if( colsize .ne. 9 ) call stopit( status,
-     :                                     'FitsTable error 13c' )
+     :                                     'FitsTable error 13b' )
          call checkstrings( table, %val( CNF_PVAL( pntr ) ), status )
+
+         clen = ast_geti( table, 'ColumnLenC(StringCol)', status )
+         if( clen .ne. 10 ) call stopit( status,
+     :                                  'FitsTable error 13c' )
+
+         colsize = 90
+         call ast_putcolumndata( table2, 'StringCol', 10, colsize,
+     :                           %val( CNF_PVAL( pntr ) ), status )
+         call ast_getcolumndata( table2, 'StringCol', 0.0, 0.0D0,
+     :                           colsize, %val( cnf_pval(pntr)),
+     :                           colsize, status )
+
+         if( colsize .ne. 9 ) call stopit( status,
+     :                                     'FitsTable error 13d' )
+         call checkstrings( table2, %val( CNF_PVAL( pntr ) ), status )
+
          call psx_free( pntr, status )
       end if
 
       colsize = ast_columnsize( table, 'bytecol', status )
       if( colsize .ne. 18 ) then
-         call stopit( status, 'FitsTable error 13d' )
+         call stopit( status, 'FitsTable error 13e' )
       else
          call psx_malloc( colsize, pntr, status )
          call ast_getcolumndata( table, 'BYTECOL', 0.0, 0.0D0, colsize,
      :                           %val( cnf_pval( pntr ) ), colsize,
      :                           status )
          if( colsize .ne. 18 ) call stopit( status,
-     :                                      'FitsTable error 13e' )
-         call checkbytes( table, %val( CNF_PVAL( pntr ) ),
-     :                    ast_columnnull( table, 'BYTECOL', .FALSE., 0,
-     :                                   wasset, hasnull, status ),
+     :                                      'FitsTable error 13f' )
+
+         null = ast_columnnull( table, 'BYTECOL', .FALSE., 0,
+     :                          wasset, hasnull, status )
+         call checkbytes( table, %val( CNF_PVAL( pntr ) ), null,
      :                    status )
+
+         colsize = 18
+         call ast_putcolumndata( table2, 'byteCol', 0, colsize,
+     :                           %val( CNF_PVAL( pntr ) ), status )
+         oldnull = ast_columnnull( table2, 'BYTECOL', .TRUE., null,
+     :                             wasset, hasnull, status )
+         call ast_getcolumndata( table2, 'BYTECOL', 0.0, 0.0D0, colsize,
+     :                           %val( cnf_pval( pntr ) ), colsize,
+     :                           status )
+         if( colsize .ne. 18 ) call stopit( status,
+     :                                      'FitsTable error 13g' )
+         call checkbytes( table2, %val( CNF_PVAL( pntr ) ), null,
+     :                    status )
+
          call psx_free( pntr, status )
       end if
 
       colsize = ast_columnsize( table, 'intcol', status )
       if( colsize .ne. 12 ) then
-         call stopit( status, 'FitsTable error 13f' )
+         call stopit( status, 'FitsTable error 13h' )
       else
          call psx_malloc( colsize, pntr, status )
          call ast_getcolumndata( table, 'INTCOL', 0.0, 0.0D0, colsize,
      :                           %val( cnf_pval( pntr ) ), colsize,
      :                           status )
          if( colsize .ne. 3 ) call stopit( status,
-     :                                    'FitsTable error 13g' )
+     :                                    'FitsTable error 13i' )
          call checkints( table, %val( CNF_PVAL( pntr ) ),
      :                    ast_columnnull( table, 'INTCOL', .FALSE., 0,
      :                                   wasset, hasnull, status ),
      :                    status )
+
+         colsize = 12
+         call ast_putcolumndata( table2, 'INTCol', 0, colsize,
+     :                           %val( CNF_PVAL( pntr ) ), status )
+
+         call ast_getcolumndata( table2, 'INTCOL', 0.0, 0.0D0, colsize,
+     :                           %val( cnf_pval( pntr ) ), colsize,
+     :                           status )
+         if( colsize .ne. 3 ) call stopit( status,
+     :                                    'FitsTable error 13j' )
+         call checkints( table2, %val( CNF_PVAL( pntr ) ),
+     :                    ast_columnnull( table2, 'INTCOL', .FALSE., 0,
+     :                                   wasset, hasnull, status ),
+     :                    status )
+
          call psx_free( pntr, status )
       end if
 
 
       call ast_addcolumn( table, 'REALCOL', AST__FLOATTYPE, 0, 0, ' ',
      :                    status )
+      call ast_addcolumn( table2, 'REALCOL', AST__FLOATTYPE, 0, 0, ' ',
+     :                    status )
       call ast_mapput0r( table, 'REALCOL(1)', -10.0, ' ', status )
       call ast_mapput0r( table, 'REALCOL(3)', 10.0, ' ', status )
 
       colsize = ast_columnsize( table, 'realcol', status )
       if( colsize .ne. 12 ) then
-         call stopit( status, 'FitsTable error 13h' )
+         call stopit( status, 'FitsTable error 13k' )
       else
          call psx_malloc( colsize, pntr, status )
          call ast_getcolumndata( table, 'REALCOL', -1.0, 0.0D0, colsize,
      :                           %val( cnf_pval( pntr ) ), colsize,
      :                           status )
          if( colsize .ne. 3 ) call stopit( status,
-     :                                    'FitsTable error 13i' )
+     :                                    'FitsTable error 13l' )
          call checkreals( table, %val( CNF_PVAL( pntr ) ), -1.0,
      :                    status )
+
+         colsize = 12
+         call ast_putcolumndata( table2, 'realCol', 0, colsize,
+     :                           %val( CNF_PVAL( pntr ) ), status )
+
+         call ast_getcolumndata( table2, 'REALCOL', 0.0, 0.0D0, colsize,
+     :                           %val( cnf_pval( pntr ) ), colsize,
+     :                           status )
+         if( colsize .ne. 3 ) call stopit( status,
+     :                                    'FitsTable error 13m' )
+         call checkreals( table2, %val( CNF_PVAL( pntr ) ), -1.0,
+     :                    status )
+
          call psx_free( pntr, status )
       end if
 
       call ast_removecolumn( table, 'REALCOL', status )
-
-
-
 
       call ast_mapremove( table, 'BYTECOL(3)', status )
       call ast_mapremove( table, 'INTCOL(3)', status )
@@ -419,6 +481,7 @@ c      call ast_activememory( 'testfitstable' )
 
       do i = 1, 12
          if( vals( i ) .ne. ans( i ) ) then
+            write(*,*) 'i,vals,ans: ',i,' ',vals(i),' ',ans(i)
             call stopit( status, 'FitsTable error checkbytes 1' )
          end if
       end do
@@ -481,14 +544,14 @@ c      call ast_activememory( 'testfitstable' )
       include 'SAE_PAR'
       integer status, table, i, start, end, j
       character ans( 9 )*10
-      character vals*( * ), test*11
+      character vals*( * )
 
       data ans / 'hello', ' ', 'goodbye', '', '', '', ' ', ' ', ' ' /
 
       if( status .ne. sai__ok ) return
 
       start = 1
-      end = 11
+      end = 10
 
       do i = 1, 9
 
@@ -499,11 +562,14 @@ c      call ast_activememory( 'testfitstable' )
          end do
 
          if( vals( start : end ) .ne. ans( i ) ) then
+            write(*,*) 'start,end,i : ',start,' ',end,' ',i
+            write(*,*) 'vals: ',vals( start : end )
+            write(*,*) 'ans: ',ans( i )
             call stopit( status, 'FitsTable error checkstrings 1' )
          end if
 
-         start = start + 11
-         end = end + 11
+         start = start + 10
+         end = end + 10
 
       end do
 

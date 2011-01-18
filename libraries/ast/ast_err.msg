@@ -182,5 +182,6 @@ BADNULL         <Bad null value for a FITS table column>
 BIGKEY          <Key string is too long>
 BADCOL          <No such column exists in the table>
 BIGTAB          <Table is too large>
+BADSIZ          <Invalid array size>
 
 .END
