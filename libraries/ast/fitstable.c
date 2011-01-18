@@ -948,7 +948,7 @@ static void GenerateColumns( AstFitsTable *this, AstFitsChan *header,
 /* Get the TFORMi keyword that defines the column data type and shape from
    the header. Report an error if it is missing. */
       sprintf( keyword, "TFORM%d", icol + 1 );
-      if( !astGetFitsS( header, keyword, &cval ) ) {
+      if( !astGetFitsS( header, keyword, &cval ) && astOK ) {
          astError( AST__NOFTS, "astFitsTable: Supplied FITS binary table "
                    "header does not contain the required keyword '%s'.",
                    status, keyword );
@@ -1009,7 +1009,10 @@ static void GenerateColumns( AstFitsTable *this, AstFitsChan *header,
       unit = astStore( NULL, cval, strlen( cval ) + 1 );
 
 /* Column shape is defined by the TDIMi keyword - in the form
-   "(i,j,k,...)". where i, j, k ... are the dimensions.  */
+   "(i,j,k,...)". where i, j, k ... are the dimensions. If it is missing
+   then the field is assumed to be a 1D vector with the length specified by
+   the repeat count in the TFORMn keyword, or a scalar (if repeat cound
+   is one). */
       sprintf( keyword, "TDIM%d", icol + 1 );
       if( astGetFitsS( header, keyword, &cval ) ) {
 
@@ -1045,9 +1048,15 @@ static void GenerateColumns( AstFitsTable *this, AstFitsChan *header,
          }
 
       } else {
-         nel = 1;
-         ndim = 0;
-         dims = NULL;
+         nel = repeat;
+         if( nel == 1 ) {
+            ndim = 0;
+            dims = NULL;
+         } else {
+            ndim = 1;
+            dims = astMalloc( sizeof( int ) );
+            if( dims ) *dims = nel;
+         }
       }
 
 /* Check the total number of elements equal the repeat count from the
@@ -1819,6 +1828,8 @@ f        The global status.
 /* Local Variables: */
    char key[ AST__MXCOLKEYLEN + 1 ]; /* Current cell key string */
    char **carray;    /* Pointer to array of null terminated string pointers */
+   char *colname;    /* Pointer to column name with no trailing white space */
+   int collen;       /* Used length of column name */
    int irow;         /* Index of value being copied */
    int nel;          /* No. of elements per value */
    int nrow;         /* No. of values to copy */
@@ -1830,9 +1841,14 @@ f        The global status.
 /* Check the global error status. */
    if ( !astOK ) return;
 
+/* produce a copy of "column" excluding trailing white space. */
+   collen = astChrLen( column );
+   colname = astStore( NULL, column, collen + 1 );
+   colname[ collen ] = 0;
+
 /* Find the number of bytes in the supplied array holding a single element
    of the value in a column cell. */
-   type = astGetColumnType( this, column );
+   type = astGetColumnType( this, colname );
    if( type == AST__INTTYPE ) {
       nb = sizeof( int );
 
@@ -1859,7 +1875,7 @@ f        The global status.
 
 /* Get the number of elements per value, and the number of bytes (in the
    supplied array) per value. */
-   nel = astGetColumnLength( this, column );
+   nel = astGetColumnLength( this, colname );
    nbv = nb*nel;
 
 /* Initialise a pointer to the next element of the supplied array to read. */
@@ -1884,7 +1900,7 @@ f        The global status.
    for( irow = 1; irow <= nrow; irow++ ) {
 
 /* Format the cell name. */
-      sprintf( key, "%s(%d)", column, irow );
+      sprintf( key, "%s(%d)", colname, irow );
 
 /* Put the next value into the current cell of the column, using its native
    data type. */
@@ -1919,9 +1935,12 @@ f        The global status.
 /* Remove any remaining cells already present in this column. */
    nrow = astGetNrow( this );
    for( ; irow <= nrow; irow++ ) {
-      sprintf( key, "%s(%d)", column, irow );
+      sprintf( key, "%s(%d)", colname, irow );
       astMapRemove( this, key );
    }
+
+/* Free resources. */
+   colname = astFree( colname );
 
 }
 
