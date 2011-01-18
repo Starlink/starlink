@@ -15,7 +15,7 @@
  *    status = shl_standalone( helplb, isenv, argc, argv );
 
  * Arguments:
- *    helplb = char * (Given)
+ *    helplb = const char * (Given)
  *       Name of default help library to open. There must be a corresponding
  *       environment variable named HELPLB_HELP containing the help
  *       file to be opened. Will be ignored if argv contains a -l parameter.
@@ -124,6 +124,7 @@
 *     Copyright (C) 1994 Science & Engineering Research Council.
 *     Copyright (C) 1998, 2004 Central Laboratory of the Research Councils.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2010 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -161,6 +162,8 @@
  *       of that code in C. Now have return status.
  *    01 Nov 2006 (TIMJ):
  *       Use C interface to Fortran routines.
+ *    18-JAN-2011 (TIMJ):
+ *       Change API of shl_standalone to use const
 
  * Bugs:
  *    {Enter_new_bugs_here}
@@ -186,7 +189,7 @@
 /*:
  */
 
-int shl_standalone( char * help_library, int isenv, int argc, char **argv )
+int shl_standalone( const char * help_library, int isenv, int argc, char **argv )
 {
 
    int status;             /* global status */

@@ -18,6 +18,8 @@
  *    28-JUL-2004 (TIMJ):
  *       Add isenv argument to shl_standalone.
  *       Return value indicates success or failure.
+ *    18-JAN-2011 (TIMJ):
+ *       Use const for shl_standalone
  *    {enter_further_changes_here}
  *
  */
@@ -27,7 +29,7 @@
 
 /* Pure C interfaces */
 
-int shl_standalone( char * hlp_library, int isenv, int argc, char ** argv );
+int shl_standalone( const char * hlp_library, int isenv, int argc, char ** argv );
 
 /* Non-adam interfaces */
 
