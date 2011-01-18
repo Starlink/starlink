@@ -45,11 +45,13 @@ c     - astColumnNull: Get/set the null value for a column of a FitsTable
 c     - astColumnSize: Get number of bytes needed to hold a full column of data
 c     - astGetColumnData: Retrieve all the data values stored in a column
 c     - astGetTableHeader: Get the FITS headers from a FitsTable
+c     - astPutColumnData: Store data values in a column
 c     - astPutTableHeader: Store FITS headers within a FitsTable
 f     - AST_COLUMNNULL: Get/set the null value for a column of a FitsTable
 f     - AST_COLUMNSIZE: Get number of bytes needed to hold a full column of data
 f     - AST_GETCOLUMNDATA: Retrieve all the data values stored in a column
 f     - AST_GETTABLEHEADER: Get the FITS headers from a FitsTable
+f     - AST_PUTCOLUMNDATA: Store data values in a column
 f     - AST_PUTTABLEHEADER: Store FITS headers within a FitsTable
 
 *  Copyright:
@@ -175,6 +177,7 @@ static int GetObjSize( AstObject *, int * );
 static size_t ColumnSize( AstFitsTable *, const char *, int * );
 static void AddColumn( AstTable *, const char *, int, int, int *, const char *, int * );
 static void Copy( const AstObject *, AstObject *, int * );
+static void CopyStrings( int, size_t, const char *, char *, int * );
 static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
 static void GenerateColumns( AstFitsTable *, AstFitsChan *, int * );
@@ -182,6 +185,7 @@ static void GetColumnData( AstFitsTable *, const char *, float, double, size_t, 
 static void PurgeHeader( AstFitsTable *, int * );
 static void PutTableHeader( AstFitsTable *, AstFitsChan *, int * );
 static void UpdateHeader( AstFitsTable *, const char *, int * );
+static void PutColumnData( AstFitsTable *, const char *, int, size_t, void *, int * );
 
 #if defined(THREAD_SAFE)
 static int ManageLock( AstObject *, int, int, AstObject **, int * );
@@ -716,7 +720,7 @@ f     AST_COLUMNNULL = INTEGER
       result = sizeof( double );
 
    } else if(  type == AST__STRINGTYPE ){
-      result = astGetColumnLenC( this, column )*sizeof( char ) + 1;
+      result = astGetColumnLenC( this, column )*sizeof( char );
 
    } else if(  type == AST__FLOATTYPE ){
       result = sizeof( float );
@@ -744,6 +748,62 @@ f     AST_COLUMNNULL = INTEGER
 
 /* Return the result. */
    return result;
+}
+
+static void CopyStrings( int nval, size_t nb, const char *cbuf, char *pout,
+                         int *status ){
+/*
+*  Name:
+*     CopyStrings
+
+*  Purpose:
+*     Remove terminating nulls from an array of fixed-length strings.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     void CopyStrings( int nval, size_t nb, const char *cbuf, char *pout,
+*                       int *status )
+
+*  Description:
+*     This function copies null terminated strings from "cbuf" to "pout",
+*     removing the terminating nulls in the process. Thus each output string
+*     is one character shorter than the corresponding input string.
+
+*  Parameters:
+*     nval
+*        The number of strings to copy.
+*     nb
+*        The maximum length of each string, excluding trailing null.
+*     cbuf
+*        The input array holding "nval" adjacent strings, each occupying
+*        ( nb + 1 ) characters (the last one is the trailing null).
+*     pout
+*        The output array to which "nval" adjacent strings are written,
+*        each occupying ( nb ) characters (i.e. no trailing null).
+*     status
+*        Pointer to inherited status.
+
+*/
+
+/* Local Variables: */
+   int i;
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Copy the first "nb" characters of each string. */
+   for( i = 0; i < nval; i++ ) {
+      memcpy( pout, cbuf, nb );
+
+/* Increment the pointer to the start of the next output string. */
+      pout += nb;
+
+/* Increment the pointer to the start of the next input string. */
+      cbuf += nb + 1;
+   }
+
 }
 
 static int Equal( AstObject *this_object, AstObject *that_object, int *status ) {
@@ -1144,6 +1204,7 @@ f     AST_COLUMNNULL functiom.
 */
 
 /* Local Variables: */
+   char *cbuf;       /* Array of strings returned by astMapGet1C */
    char key[ AST__MXCOLKEYLEN + 1 ]; /* Current cell key string */
    int iel;          /* Index of current element */
    int irow;         /* Index of value being copied */
@@ -1170,19 +1231,19 @@ f     AST_COLUMNNULL functiom.
    if( type == AST__INTTYPE ) {
       nb = sizeof( int );
 
-   } else if(  type == AST__DOUBLETYPE ){
+   } else if( type == AST__DOUBLETYPE ){
       nb = sizeof( double );
 
-   } else if(  type == AST__STRINGTYPE ){
-      nb = astGetColumnLenC( this, column )*sizeof( char ) + 1;
+   } else if( type == AST__STRINGTYPE ){
+      nb = astGetColumnLenC( this, column )*sizeof( char );
 
-   } else if(  type == AST__FLOATTYPE ){
+   } else if( type == AST__FLOATTYPE ){
       nb = sizeof( float );
 
-   } else if(  type == AST__SINTTYPE ){
+   } else if( type == AST__SINTTYPE ){
       nb = sizeof( short int );
 
-   } else if(  type == AST__BYTETYPE ){
+   } else if( type == AST__BYTETYPE ){
       nb = sizeof( char );
 
    } else if( astOK ) {
@@ -1200,6 +1261,18 @@ f     AST_COLUMNNULL functiom.
 
 /* Get the number of rows in the table. */
    nrow = astGetNrow( this );
+
+/* For string columns, the buffer returned by astMapGet1C will include a
+   null character at the end of each string. This is not required for the
+   fixed-length string format used by FITS binary tables, so for each row we
+   produce a copy of the string returned by astMapGet1C excluding the
+   trailing nulls. Allocate a buffer to receive the string returned by
+   astMapGet1C. */
+   if(  type == AST__STRINGTYPE ) {
+      cbuf = astMalloc( ( nb + 1 )*nel );
+   } else {
+      cbuf = NULL;
+   }
 
 /* Indicate we have not yet determined a null value for the column */
    pnull = NULL;
@@ -1222,9 +1295,6 @@ f     AST_COLUMNNULL functiom.
       } else if(  type == AST__DOUBLETYPE ){
          ok = astMapGet1D( this, key, nel, &nval, pout );
 
-      } else if(  type == AST__STRINGTYPE ){
-         ok = astMapGet1C( this, key, nb, nel, &nval, pout );
-
       } else if(  type == AST__FLOATTYPE ){
          ok = astMapGet1F( this, key, nel, &nval, pout );
 
@@ -1234,6 +1304,12 @@ f     AST_COLUMNNULL functiom.
       } else if(  type == AST__BYTETYPE ){
          ok = astMapGet1B( this, key, nel, &nval, pout );
 
+      } else if(  type == AST__STRINGTYPE ){
+         ok = astMapGet1C( this, key, nb + 1, nel, &nval, cbuf );
+
+/* Copy the strings returned by astMapGet1C into the returned array,
+   omitting the trailing null at the end of each string. */
+         CopyStrings( nval, nb, cbuf, pout, status );
       }
 
 /* If the cell could not be found, return a suitable number of column null
@@ -1283,12 +1359,12 @@ f     AST_COLUMNNULL functiom.
       }
    }
 
-
 /* Free resources. */
+   cbuf = astFree( cbuf );
    pnull = astFree( pnull );
 
 /* Return the number of returned elements. */
-   *nelem = ( pout - coldata )/nb;
+   *nelem = nel*nrow;
 }
 
 static int GetObjSize( AstObject *this_object, int *status ) {
@@ -1487,6 +1563,7 @@ void astInitFitsTableVtab_(  AstFitsTableVtab *vtab, const char *name, int *stat
    vtab->ColumnNull = ColumnNull;
    vtab->ColumnSize = ColumnSize;
    vtab->GetColumnData = GetColumnData;
+   vtab->PutColumnData = PutColumnData;
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
@@ -1668,6 +1745,184 @@ static void PurgeHeader( AstFitsTable *this, int *status ) {
 
 /* Undefine local constants */
 #undef nfixed
+}
+
+static void PutColumnData( AstFitsTable *this, const char *column,
+                           int clen, size_t size, void *coldata, int *status ){
+/*
+*++
+*  Name:
+c     astGetColumnData
+f     AST_GETCOLUMNDATA
+
+*  Purpose:
+*     Retrieve all the data values stored in a column.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "frameset.h"
+c     void astPutColumnData( AstFitsTable *this, const char *column,
+c                            int clen, size_t size, void *coldata )
+f     CALL AST_PUTCOLUMNDATA( THIS, COLUMN, CLEN, SIZE, COLDATA, STATUS )
+
+*  Class Membership:
+*     FitsTable method.
+
+*  Description:
+c     This function
+f     This routine
+*     copies data values from a supplied buffer into a named column. The
+*     first element in the buffer becomes the first element in the first
+*     row of the column. If the buffer does not completely fill the
+*     column, then any trailing rows are filled with null values.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the FitsTable.
+c     column
+f     COLUMN = CHARACTER * ( * ) (Given)
+*        The character string holding the name of the column. Trailing
+*        spaces are ignored.
+c     clen
+f     CLEN = INTEGER (Given)
+*        If the column holds character strings, then this must be set to
+*        the length of each fixed length string in the supplied array.
+*        This is often determined by the appropriate TFORMn keyword in
+*        the binary table header. The supplied value is ignored if the
+*        column does not hold character data.
+c     size
+f     SIZE = INTEGER (Given)
+*        The size of the
+c        "coldata"
+f        COLDATA
+*        array, in bytes. This should be an integer multiple of the
+*        number of bytes needed to hold the full vector value stored in a
+*        single cell of the column. An error is reported if this is not
+*        the case.
+c     coldata
+f     COLDATA( * ) = BYTE (Given)
+c        A pointer to an
+f        An
+*        area of memory holding the data to copy into the column. The values
+*        should be stored in row order. If the column holds non-scalar values,
+*        the elements of each value should be stored in "Fortran" order. No
+*        data type conversion is performed.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*--
+*/
+
+/* Local Variables: */
+   char key[ AST__MXCOLKEYLEN + 1 ]; /* Current cell key string */
+   char **carray;    /* Pointer to array of null terminated string pointers */
+   int irow;         /* Index of value being copied */
+   int nel;          /* No. of elements per value */
+   int nrow;         /* No. of values to copy */
+   int type;         /* Data type */
+   size_t nb;        /* No. of bytes for a single element of a value */
+   size_t nbv;       /* No. of bytes per value */
+   void *pin;        /* Pointer to next input array element */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Find the number of bytes in the supplied array holding a single element
+   of the value in a column cell. */
+   type = astGetColumnType( this, column );
+   if( type == AST__INTTYPE ) {
+      nb = sizeof( int );
+
+   } else if(  type == AST__DOUBLETYPE ){
+      nb = sizeof( double );
+
+   } else if(  type == AST__STRINGTYPE ){
+      nb = clen*sizeof( char );
+
+   } else if(  type == AST__FLOATTYPE ){
+      nb = sizeof( float );
+
+   } else if(  type == AST__SINTTYPE ){
+      nb = sizeof( short int );
+
+   } else if(  type == AST__BYTETYPE ){
+      nb = sizeof( char );
+
+   } else if( astOK ) {
+      astError( AST__INTER, "astPutColumnData(%s): Unsupported column type "
+                "%d (internal AST programming error).", status,
+                astGetClass( this ), type );
+   }
+
+/* Get the number of elements per value, and the number of bytes (in the
+   supplied array) per value. */
+   nel = astGetColumnLength( this, column );
+   nbv = nb*nel;
+
+/* Initialise a pointer to the next element of the supplied array to read. */
+   pin = coldata;
+
+/* Get the number of rows to copy from the supplied array. */
+   nrow = nbv ? size / nbv : 0;
+
+/* As yet we have no array of null terminated character pointers. */
+   carray = NULL;
+
+/* Report an error if the supplied array does not hold an exact number of
+   column cells. */
+   if( nrow*nbv != size && astOK ) {
+      astError( AST__BADSIZ, "astPutColumnData(%s): The supplied array size "
+                "(%d bytes) is not an exact multiple of the size of one "
+                "column value (%d bytes).", status, astGetClass( this ),
+                (int) size, (int) nbv );
+   }
+
+/* Loop round the rows to be copied. */
+   for( irow = 1; irow <= nrow; irow++ ) {
+
+/* Format the cell name. */
+      sprintf( key, "%s(%d)", column, irow );
+
+/* Put the next value into the current cell of the column, using its native
+   data type. */
+      if( type == AST__INTTYPE ) {
+         astMapPut1I( this, key, nel, pin, NULL );
+
+      } else if(  type == AST__DOUBLETYPE ){
+         astMapPut1D( this, key, nel, pin, NULL );
+
+      } else if(  type == AST__FLOATTYPE ){
+         astMapPut1F( this, key, nel, pin, NULL );
+
+      } else if(  type == AST__SINTTYPE ){
+         astMapPut1S( this, key, nel, pin, NULL );
+
+      } else if(  type == AST__BYTETYPE ){
+         astMapPut1B( this, key, nel, pin, NULL );
+
+/* If each cell in the column holds an array of strings, we need to
+   convert the fixed length strings in the supplied array into an array
+   of pointers to null terminated strings. */
+      } else if(  type == AST__STRINGTYPE ){
+         carray = astStringArray( pin, nel, clen );
+         astMapPut1C( this, key, nel, (const char ** ) carray, NULL );
+         carray = astFree( carray );
+      }
+
+/* Increment the pointer to the next input value. */
+      pin += nbv;
+   }
+
+/* Remove any remaining cells already present in this column. */
+   nrow = astGetNrow( this );
+   for( ; irow <= nrow; irow++ ) {
+      sprintf( key, "%s(%d)", column, irow );
+      astMapRemove( this, key );
+   }
+
 }
 
 static void PutTableHeader( AstFitsTable *this, AstFitsChan *header,
@@ -2149,6 +2404,8 @@ f        AST__NULL
 *        may be supplied if the new FitsTable is to be left empty. If
 *        supplied, and if the headers describe columns of a FITS binary
 *        table, then equivalent (empty) columns are added to the FitsTable.
+*        Each column has the same index in the FitsTable that it has in
+*        the supplied header.
 c     options
 f     OPTIONS = CHARACTER * ( * ) (Given)
 c        Pointer to a null-terminated string containing an optional
@@ -2593,5 +2850,16 @@ void astGetColumnData_( AstFitsTable *this, const char *column, float fnull,
    (**astMEMBER(this,FitsTable,GetColumnData))(this,column,fnull,dnull,mxsize,
                                                coldata,nelem,status);
 }
+
+void astPutColumnData_( AstFitsTable *this, const char *column, int clen,
+                        size_t size, void *coldata, int *status ){
+   if ( !astOK ) return;
+   (**astMEMBER(this,FitsTable,PutColumnData))(this,column,clen,size,coldata,status);
+}
+
+
+
+
+
 
 
