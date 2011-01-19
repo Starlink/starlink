@@ -4,6 +4,8 @@
 #include "ndf.h"
 #include "star/task_adam.h"
 #include "star/ndg.h"
+#include "star/one.h"
+#include "ems.h"
 #include "par_par.h"
 #include "cupid.h"
 #include <string.h>
@@ -83,6 +85,8 @@ void cupid_mon( int *status ) {
 *     16-OCT-2009 (DSB):
 *        Use ndgBeggh/ndgEndgh to record contents of group parameters in
 *        the history component of output NDFs.
+*     2011-01-19 (TIMJ):
+*        Add leak checking to CUPID monolith
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -94,11 +98,21 @@ void cupid_mon( int *status ) {
 /* Local variables: */
    char appname[NDF__SZAPP+1];    /* Application name for NDF History */
    char buff[PAR__SZNAM+7];       /* Application name for provenance handling */
+   char filter[PAR__SZNAM+PAR__SZNAM+1];
    char name[PAR__SZNAM+1];       /* C character variable to hold name */
    int ast_caching;               /* Initial value of AST MemoryCaching tuning parameter */
+   int emslev1;                   /* EMS level on entry */
+   int emslev2;                   /* EMS level on exit */
+   int ngrp0;                     /* Number of grp ids at start */
+   int ngrp1;                     /* Number of grp ids at end */
+   int nloc0;                     /* Number of active HDS Locators at start */
+   int nloc1;                     /* Number of active HDS Locators at end */
 
 /* Check the inherited status. */
    if( *status != SAI__OK ) return;
+
+/* Read the input error message stack level */
+   emsLevel( &emslev1 );
 
 /* Obtain the command from the environment.  This returns uppercase names. */
    taskGetName( name, sizeof(name), status );
@@ -114,6 +128,13 @@ void cupid_mon( int *status ) {
 
 /* Tell AST to re-cycle memory when possible. */
    ast_caching = astTune( "MemoryCaching", 1 );
+
+/* Get the GRP and HDS status for leak checking - need the task name
+   to mask out parameter names. Also need to mask out the monlith name */
+   one_strlcpy( filter, "!CUPID_MON,!", sizeof(filter), status);
+   one_strlcat( filter, name, sizeof(filter), status );
+   grpInfoi( NULL, 0, "NGRP", &ngrp0, status );
+   hdsInfoI( NULL, "LOCATORS", filter, &nloc0, status );
 
 /* Begin a provenance block. This causes event handlers to be registered
    with the NDF library so that a handler routine in NDG is called every
@@ -176,6 +197,66 @@ void cupid_mon( int *status ) {
 /* Re-instate the original value of the AST ObjectCaching tuning
    parameter. */
    astTune( "MemoryCaching", ast_caching );
+
+/* Check for GRP leaks Do this in a new error reporting context so
+   that we get the correct value even if an error has occurred. */
+   errBegin( status );
+   grpInfoi( NULL, 0, "NGRP", &ngrp1, status );
+
+/* If there are more active groups now than there were on entry,
+   there must be a problem (GRP identifiers are not being freed
+   somewhere). So report it. */
+   if (*status == SAI__OK && ngrp1 > ngrp0) {
+     msgBlank( status );
+     msgSetc( "NAME", name );
+     msgSeti( "NGRP0", ngrp0 );
+     msgSeti( "NGRP1", ngrp1 );
+     msgOut( " ", "WARNING: The number of active "
+             "GRP identifiers increased from ^NGRP0 to ^NGRP1 "
+             "during execution of ^NAME (" PACKAGE_UPCASE " programming "
+             " error).", status);
+     msgBlank(status);
+   }
+   errEnd( status );
+
+/* Check for HDS leaks Do this in a new error reporting context so
+   that we get the correct value even if an error has occurred. */
+   errBegin( status );
+   hdsInfoI( NULL, "LOCATORS", filter, &nloc1, status );
+
+/* If there are more active locators now than there were on entry,
+   there must be a problem (HDS locators are not being freed
+   somewhere). So report it. */
+   if (*status == SAI__OK && nloc1 > nloc0) {
+     msgBlank( status );
+     msgSetc( "NAME", name );
+     msgSeti( "NLOC0", nloc0 );
+     msgSeti( "NLOC1", nloc1 );
+     msgOut( " ", "WARNING: The number of active "
+             "HDS Locators increased from ^NLOC0 to ^NLOC1 "
+             "during execution of ^NAME (" PACKAGE_UPCASE " programming "
+             " error).", status);
+     msgBlank(status);
+     hdsShow("LOCATORS", status);
+     hdsShow("FILES", status);
+   }
+   errEnd( status );
+
+/* Read the exitt error message stack level */
+   emsLevel( &emslev2 );
+
+   if (*status == SAI__OK && emslev1 != emslev2 ) {
+     errMark();
+     msgBlank( status );
+     msgSetc( "NAME", name );
+     msgSeti( "LV1", emslev1);
+     msgSeti( "LV2", emslev2);
+     msgOut( " ", "WARNING: EMS Stack level went from ^LV1 to ^LV2"
+             " during execution of ^NAME (" PACKAGE_UPCASE " programming"
+             " error).", status );
+     msgBlank(status);
+     errRlse();
+   }
 
 /* Make AST use its own internal variable for its inherited status. */
    astWatch( NULL );
