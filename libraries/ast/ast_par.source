@@ -75,6 +75,14 @@
       DOUBLE PRECISION AST__BAD
       PARAMETER ( AST__BAD = <AST__BAD> )
 
+*  Double precision NaN flag (this value is not actually a NaN itself).
+      DOUBLE PRECISION AST__NAN
+      PARAMETER ( AST__NAN = <AST__NAN> )
+
+*  Single precision NaN flag (this value is not actually a NaN itself).
+      REAL AST__NANR
+      PARAMETER ( AST__NANR = <AST__NANR> )
+
 *  Error module.
       LOGICAL AST_OK
       INTEGER AST_STATUS

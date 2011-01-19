@@ -456,6 +456,7 @@ int astTest##attr##_( AstPointSet *this, int axis, int *status ) { \
 /* --------------- */
 #include <stdarg.h>
 #include <stddef.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
@@ -466,6 +467,14 @@ int astTest##attr##_( AstPointSet *this, int axis, int *status ) { \
 /* Address of this static variable is used as a unique identifier for
    member of this class. */
 static int class_check;
+
+/* This static variable is used to hold an IEEE 754 quiet double precision
+   Nan value. */
+static double ast_nan;
+
+/* This static variable is used to hold an IEEE 754 quiet single precision
+   Nan value. */
+static float ast_nanf;
 
 /* Pointers to parent class methods which are extended by this class. */
 static const char *(* parent_getattrib)( AstObject *, const char *, int * );
@@ -491,7 +500,9 @@ astMAKE_INITGLOBALS(PointSet)
 #define class_vtab astGLOBAL(PointSet,Class_Vtab)
 #define getattrib_buff astGLOBAL(PointSet,GetAttrib_Buff)
 
-
+static pthread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
+#define LOCK_MUTEX1 pthread_mutex_lock( &mutex1 );
+#define UNLOCK_MUTEX1 pthread_mutex_unlock( &mutex1 );
 
 /* If thread safety is not needed, declare and initialise globals at static
    variables. */
@@ -504,6 +515,9 @@ static char getattrib_buff[ 101 ];
    as static variables. */
 static AstPointSetVtab class_vtab;   /* Virtual function table */
 static int class_init = 0;       /* Virtual function table initialised? */
+
+#define LOCK_MUTEX1
+#define UNLOCK_MUTEX1
 
 #endif
 
@@ -1511,12 +1525,13 @@ void astInitPointSetVtab_(  AstPointSetVtab *vtab, const char *name, int *status
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
+   size_t i;                     /* Index of next byte in NaN value */
+   unsigned char *p;             /* Pointer to next byte in NaN value */
 
 /* Check the local error status. */
    if ( !astOK ) return;
-
 
 /* Get a pointer to the thread specific global data structure. */
    astGET_GLOBALS(NULL);
@@ -1573,6 +1588,15 @@ void astInitPointSetVtab_(  AstPointSetVtab *vtab, const char *name, int *status
    astSetDelete( vtab, Delete );
    astSetDump( vtab, Dump, "PointSet", "Container for a set of points" );
 
+/* Calculate single and double precision NaN values and store in static
+   module variables. Setting all bits to 1 produces a quiet NaN. */
+   LOCK_MUTEX1
+   p = (unsigned char *) &ast_nan;
+   for( i = 0; i < sizeof( ast_nan ); i++ ) *(p++) = 255;
+   p = (unsigned char *) &ast_nanf;
+   for( i = 0; i < sizeof( ast_nanf ); i++ ) *(p++) = 255;
+   UNLOCK_MUTEX1
+
 /* If we have just initialised the vtab for the current class, indicate
    that the vtab is now initialised, and store a pointer to the class
    identifier in the base "object" level of the vtab. */
@@ -1580,6 +1604,86 @@ void astInitPointSetVtab_(  AstPointSetVtab *vtab, const char *name, int *status
       class_init = 1;
       astSetVtabClassIdentifier( vtab, &(vtab->id) );
    }
+}
+
+double astCheckNaN_( double value ) {
+/*
+*+
+*  Name:
+*     astCheckNaN
+
+*  Purpose:
+*     Substitute a NaN for a supplied value if the supplied value is
+*     AST__NAN.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "pointset.h"
+*     double astCheckNaN( double value )
+
+*  Class Membership:
+*     PointSet method.
+
+*  Description:
+*     If the supplied double is AST__NAN then this function returns an
+*     IEEE double precision NaN value. Otherwise it returns the supplied
+*     value.
+
+*  Parameters:
+*     valuethis
+*        The value to check.
+
+*  Returned Value:
+*     The suppleid value, or NaN.
+
+*  Notes:
+*     - This function does not check the inherited status.
+
+*-
+*/
+   return ( value == AST__NAN ) ? ast_nan : value;
+}
+
+float astCheckNaNF_( float value ) {
+/*
+*+
+*  Name:
+*     astCheckNaNF
+
+*  Purpose:
+*     Substitute a NaN for a supplied value if the supplied value is
+*     AST__NANF.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "pointset.h"
+*     float astCheckNaNF( float value )
+
+*  Class Membership:
+*     PointSet method.
+
+*  Description:
+*     If the supplied float is AST__NANF then this function returns an
+*     IEEE single precision NaN value. Otherwise it returns the supplied
+*     value.
+
+*  Parameters:
+*     valuethis
+*        The value to check.
+
+*  Returned Value:
+*     The suppleid value, or NaN.
+
+*  Notes:
+*     - This function does not check the inherited status.
+
+*-
+*/
+   return ( value == AST__NANF ) ? ast_nanf : value;
 }
 
 static void PermPoints( AstPointSet *this, int forward, const int perm[], int *status ) {

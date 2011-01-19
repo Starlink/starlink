@@ -418,7 +418,10 @@ CLEANFILES = AST_PAR ast.h
 noinst_PROGRAMS = astbad
 astbad_SOURCES = astbad.c pointset.h
 AST_PAR: ast_par.source astbad
-	sed -e 's/<AST__BAD>/'`./astbad | tr 'E' 'D'`'/' ast_par.source >$@
+	sed -e 's/<AST__BAD>/'`./astbad AST__BAD | tr 'E' 'D'`'/' \
+	    -e 's/<AST__NAN>/'`./astbad AST__NAN | tr 'E' 'D'`'/' \
+	    -e 's/<AST__NANR>/'`./astbad AST__NANF | tr 'E' 'D'`'/' \
+	    ast_par.source >$@
 
 # ast_link is generated from ast_link.in; ast_link_adam does not
 # need configuration, and so is not mentioned in AC_CONFIG_FILES within

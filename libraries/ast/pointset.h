@@ -201,6 +201,12 @@
 
 /* Macros. */
 /* ======= */
+#if defined(astCLASS) || defined(astFORTRAN77)
+#define STATUS_PTR status
+#else
+#define STATUS_PTR astGetStatusPtr
+#endif
+
 /*
 *+
 *  Name:
@@ -231,12 +237,67 @@
 /* Define AST__BAD to be the most negative (normalised) double
    value. */
 
-#if defined(astCLASS) || defined(astFORTRAN77)
-#define STATUS_PTR status
-#else
-#define STATUS_PTR astGetStatusPtr
-#endif
 #define AST__BAD (-(DBL_MAX))
+
+/*
+*+
+*  Name:
+*     AST__NAN
+
+*  Type:
+*     Public macro.
+
+*  Purpose:
+*     A value representing the double precision IEEE NaN value.
+
+*  Synopsis:
+*     #include "pointset.h"
+*     const double AST__NAN
+
+*  Class Membership:
+*     Defined by the PointSet class.
+
+*  Description:
+*     This macro expands to a const double value that is used to indicate
+*     that a IEEE NaN value should be used. Note, AST__NAN itself is a finite
+*     double precision floating point value a little below the maximum
+*     allowed value for a double. This value can be used as flag to
+*     indicate that the corresponding IEEE NaN value should be used in its
+*     place.
+
+*-
+*/
+#define AST__NAN (-(0.95*DBL_MAX))
+
+/*
+*+
+*  Name:
+*     AST__NANF
+
+*  Type:
+*     Public macro.
+
+*  Purpose:
+*     A value representing the single precision IEEE NaN value.
+
+*  Synopsis:
+*     #include "pointset.h"
+*     const double AST__NANF
+
+*  Class Membership:
+*     Defined by the PointSet class.
+
+*  Description:
+*     This macro expands to a const float value that is used to indicate
+*     that a IEEE NaN value should be used. Note, AST__NANF itself is a finite
+*     single precision floating point value a little below the maximum
+*     allowed value for a float. This value can be used as flag to
+*     indicate that the corresponding IEEE NaN value should be used in its
+*     place.
+
+*-
+*/
+#define AST__NANF ((float)-(0.95*FLT_MAX))
 
 #if defined(astCLASS)            /* Protected */
 
@@ -481,6 +542,9 @@ int astTestPointAccuracy_( AstPointSet *, int, int * );
 void astClearPointAccuracy_( AstPointSet *, int, int * );
 void astSetPointAccuracy_( AstPointSet *, int, double, int * );
 
+double astCheckNaN_( double );
+float astCheckNaNF_( float );
+
 #endif
 
 /* Function interfaces. */
@@ -558,6 +622,10 @@ astINVOKE(V,astGetPointAccuracy_(astCheckPointSet(this),axis,STATUS_PTR))
 astINVOKE(V,astSetPointAccuracy_(astCheckPointSet(this),axis,value,STATUS_PTR))
 #define astTestPointAccuracy(this,axis) \
 astINVOKE(V,astTestPointAccuracy_(astCheckPointSet(this),axis,STATUS_PTR))
+
+#define astCheckNaNF(value) astCheckNaNF_(value)
+#define astCheckNaN(value) astCheckNaN_(value)
+
 
 #endif
 #endif

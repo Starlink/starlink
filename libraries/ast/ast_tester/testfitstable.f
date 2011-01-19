@@ -351,12 +351,15 @@ c      call ast_watchmemory(483)
          call ast_putcolumndata( table2, 'realCol', 0, colsize,
      :                           %val( CNF_PVAL( pntr ) ), status )
 
-         call ast_getcolumndata( table2, 'REALCOL', 0.0, 0.0D0, colsize,
+
+         call ast_mapremove( table2, 'REALCOL(2)', status )
+         call ast_getcolumndata( table2, 'REALCOL', AST__NANR, 0.0D0,
+     :                           colsize,
      :                           %val( cnf_pval( pntr ) ), colsize,
      :                           status )
          if( colsize .ne. 3 ) call stopit( status,
      :                                    'FitsTable error 13m' )
-         call checkreals( table2, %val( CNF_PVAL( pntr ) ), -1.0,
+         call checkreals( table2, %val( CNF_PVAL( pntr ) ), AST__NANR,
      :                    status )
 
          call psx_free( pntr, status )
@@ -520,6 +523,7 @@ c      call ast_activememory( 'testfitstable' )
       subroutine checkreals( table, vals, null, status )
       implicit none
       include 'SAE_PAR'
+      include 'AST_PAR'
       integer status, table
       real vals( * ), null
 
@@ -529,8 +533,14 @@ c      call ast_activememory( 'testfitstable' )
          call stopit( status, 'FitsTable error checkreals 1' )
       end if
 
-      if( vals( 2 ) .ne. null ) then
-         call stopit( status, 'FitsTable error checkreals 2' )
+      if( null .ne. AST__NANR ) then
+         if( vals( 2 ) .ne. null ) then
+            call stopit( status, 'FitsTable error checkreals 2a' )
+         end if
+      else
+         if( .not. isnan( vals( 2 ) ) ) then
+            call stopit( status, 'FitsTable error checkreals 2b' )
+         end if
       end if
 
       if( vals( 3 ) .ne. 10.0 ) then

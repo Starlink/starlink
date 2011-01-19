@@ -2,43 +2,60 @@
 /* ============= */
 /* Interface definitions. */
 /* ---------------------- */
-#include "pointset.h"           /* declaration of AST__BAD */
+#include "pointset.h"           /* declaration of AST__BAD etc */
 
 /* C header files. */
 /* --------------- */
 #include <float.h>
 #include <stdio.h>
+#include <string.h>
+
+/* Local Constants: */
+#define BUFF_LEN ( 2 * DBL_DIG + 20 ) /* Buffer length */
+#define IEEE_DIG 17                   /* Minimum number of digits required by
+                                         IEEE for conversion from binary to
+                                         string and back again to be an
+                                         identity. */
+
+/* Prototypes for local functions */
+static void printdval( double );
+static void printfval( float );
 
 /* Main function. */
 /* ============== */
-int main( void ) {
+int main( int argc, char *argv[] ) {
 /*
 *+
 *  Name:
 *     astbad
 
 *  Purpose:
-*     Generate a string representing the AST__BAD value.
+*     Generate a string representing an AST floating point constant.
+
+*  Invocation:
+*     astbad <value>
 
 *  Type:
 *     C program.
 
 *  Description:
-*     This program writes a string to standard output containing a
-*     formatted decimal representation of the C double value
-*     AST__BAD. This is intended for use in defining the AST__BAD
-*     constant for use from languages other than C.
+*     This program writes a string to standard output containing
+*     a formatted decimal representation of a specified C floating point
+*     constant defined by AST. This is intended for use in defining these
+*     constants for use from languages other than C.
 *
 *     The value written should contain sufficient decimal digits so
 *     that a routine that uses it to generate a value in another
 *     language will produce exactly the same value as a C program
-*     using the AST__BAD macro.
+*     using the same macro.
 
 *  Arguments:
-*     None.
+*     value = LITERAL
+*        The name of the constant to be printed: AST__BAD, AST__NAN or
+*        AST__NANF. If not supplied, AST__BAD is printed.
 
 *  Copyright:
-*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2009-2011 Science & Technology Facilities Council.
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
 *     Research Councils
 
@@ -72,19 +89,49 @@ int main( void ) {
 *        to binary to be an identity.
 *     31-MAR-2009 (TIMJ):
 *        Does not take any arguments so don't try to read arguments.
+*     18-JAN-2011 (DSB):
+*        Extend to print other floating point constants as well as
+*        AST__BAD.
 *-
 */
 
-/* Local Constants: */
-#define BUFF_LEN ( 2 * DBL_DIG + 20 ) /* Buffer length */
-#define IEEE_DIG 17                   /* Minimum number of digits required by
-                                         IEEE for conversion from binary to
-                                         string and back again to be an
-                                         identity. */
+/* Local Variables; */
+   const char *name;        /* Pointer to name of constant to be printed */
+
+/* Get the name of the constant to be printed. */
+   if( argc > 1 ) {
+      name = argv[1];
+   } else {
+      name = "AST__BAD";
+   }
+
+/* Print it. */
+   if( !strcmp( name, "AST__BAD" ) ) {
+      printdval( AST__BAD );
+
+   } else if( !strcmp( name, "AST__NAN" ) ) {
+      printdval( AST__NAN );
+
+   } else if( !strcmp( name, "AST__NANF" ) ) {
+      printfval( AST__NANF );
+
+/* Issue an error message if the argument is unknown. */
+   } else {
+      (void) fprintf( stderr, "astbad: Unknown constant requested: %s\n",
+                      name );
+   }
+
+/* Exit. */
+   return 0;
+}
+
+
+/* Print a double precision value to standard output */
+static void printdval( double val ){
 
 /* Local Variables: */
    char buff[ BUFF_LEN + 1 ];    /* Buffer for formatted string */
-   double ast__bad;              /* Value read back from string */
+   double newval;                /* Value read back from string */
    int digits;                   /* Number of digits of precision */
 
 /* Vary the precision over a reasonable range to see how many decimal
@@ -93,19 +140,42 @@ int main( void ) {
    for ( digits = ( DBL_DIG > IEEE_DIG )?DBL_DIG:IEEE_DIG;
          digits <= ( 2 * DBL_DIG ); digits++ ) {
 
-/* Format the AST__BAD value using this precision and then read it
-   back. */
-      (void) sprintf( buff, "%.*G", digits, AST__BAD );
-      (void) sscanf( buff, "%lg", &ast__bad );
+/* Format the value using this precision and then read it back. */
+      (void) sprintf( buff, "%.*G", digits, val );
+      (void) sscanf( buff, "%lg", &newval );
 
 /* Quit looping when the original value is read back. */
-      if ( ast__bad == AST__BAD ) break;
+      if ( newval == val ) break;
    }
 
-/* Write the AST__BAD value to standard output, with one extra digit
-   for good measure. */
-   (void) printf( "%.*G\n", digits + 1, AST__BAD );
-
-/* Exit. */
-   return 0;
+/* Write the value to standard output, with one extra digit for good
+   measure. */
+   (void) printf( "%.*G\n", digits + 1, val );
 }
+
+/* Print a single precision value to standard output */
+static void printfval( float val ){
+
+/* Local Variables: */
+   char buff[ BUFF_LEN + 1 ];    /* Buffer for formatted string */
+   float newval;                 /* Value read back from string */
+   int digits;                   /* Number of digits of precision */
+
+/* Vary the precision over a reasonable range to see how many decimal
+   digits are required. The initial number of digits is FLT_DIG. */
+   for ( digits = FLT_DIG; digits <= ( 2 * FLT_DIG ); digits++ ) {
+
+/* Format the value using this precision and then read it back. */
+      (void) sprintf( buff, "%.*G", digits, val );
+      (void) sscanf( buff, "%g", &newval );
+
+/* Quit looping when the original value is read back. */
+      if ( newval == val ) break;
+   }
+
+/* Write the value to standard output, with one extra digit for good
+   measure. */
+   (void) printf( "%.*G\n", digits + 1, val );
+
+}
+

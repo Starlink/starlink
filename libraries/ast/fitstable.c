@@ -104,6 +104,7 @@ f     - AST_PUTTABLEHEADER: Store FITS headers within a FitsTable
 #include "object.h"              /* Base Object class */
 #include "table.h"               /* Tables (parent class) */
 #include "channel.h"             /* I/O channels */
+#include "pointset.h"            /* For astCheckNaN(F) functions */
 #include "fitstable.h"           /* Interface definition for this class */
 
 
@@ -1154,7 +1155,10 @@ c        "coldata"
 f        COLDATA
 *        for any cells for which no value has been stored in the
 *        FitsTable. Ignored if the column's data type is not
-*        AST__FLOATTYPE.
+*        AST__FLOATTYPE. Supplying
+c        AST__NANF
+f        AST__NANR
+*        will cause a single precision IEEE NaN value to be used.
 c     dnull
 f     DNULL = REAL (Given)
 *        The value to return in
@@ -1162,7 +1166,8 @@ c        "coldata"
 f        COLDATA
 *        for any cells for which no value has been stored in the
 *        FitsTable. Ignored if the column's data type is not
-*        AST__DOUBLETYPE.
+*        AST__DOUBLETYPE. Supplying AST__NAN will cause a double precision
+*        IEEE NaN value to be used.
 c     mxsize
 f     MXSIZE = INTEGER (Given)
 *        The size of the
@@ -1208,7 +1213,6 @@ c     astColumNull function.
 f     AST_COLUMNNULL functiom.
 *     For columns holding string values, the ASCII NULL character is returned
 *     for empty cells.
-
 *--
 */
 
@@ -1283,6 +1287,10 @@ f     AST_COLUMNNULL functiom.
       cbuf = NULL;
    }
 
+/* If required, substitute NaN values for the supplied null values. */
+   fnull = astCheckNaNF( fnull );
+   dnull = astCheckNaN( dnull );
+
 /* Indicate we have not yet determined a null value for the column */
    pnull = NULL;
 
@@ -1297,15 +1305,32 @@ f     AST_COLUMNNULL functiom.
       sprintf( key, "%s(%d)", column, irow );
 
 /* Get the values in the current cell of the column, using its native
-   data type. */
+   data type. For floating point, convert any NaNs into the appropriate
+   null value (do not need to do this if the null value is itself NaN). */
       if( type == AST__INTTYPE ) {
          ok = astMapGet1I( this, key, nel, &nval, pout );
 
       } else if(  type == AST__DOUBLETYPE ){
          ok = astMapGet1D( this, key, nel, &nval, pout );
 
+         if( ok && dnull != AST__NAN ) {
+            for( iel = 0; iel < nel; iel++ ) {
+               if( astISNAN( ((double *)pout)[ iel ] ) ) {
+                  ((double *)pout)[ iel ] = dnull;
+               }
+            }
+         }
+
       } else if(  type == AST__FLOATTYPE ){
          ok = astMapGet1F( this, key, nel, &nval, pout );
+
+         if( ok && fnull != AST__NANF ) {
+            for( iel = 0; iel < nel; iel++ ) {
+               if( astISNAN( ((float *)pout)[ iel ] ) ) {
+                  ((float *)pout)[ iel ] = fnull;
+               }
+            }
+         }
 
       } else if(  type == AST__SINTTYPE ){
          ok = astMapGet1S( this, key, nel, &nval, pout );
@@ -1361,7 +1386,7 @@ f     AST_COLUMNNULL functiom.
             pout += nb;
          }
 
-/* If the cell was foudn in the table, just increment the pointer to the next
+/* If the cell was found in the table, just increment the pointer to the next
    returned value. */
       } else {
          pout += nbv;
@@ -1831,6 +1856,7 @@ f        The global status.
    char *colname;    /* Pointer to column name with no trailing white space */
    int collen;       /* Used length of column name */
    int irow;         /* Index of value being copied */
+   int iel;          /* Index of current element */
    int nel;          /* No. of elements per value */
    int nrow;         /* No. of values to copy */
    int type;         /* Data type */
@@ -1903,15 +1929,25 @@ f        The global status.
       sprintf( key, "%s(%d)", colname, irow );
 
 /* Put the next value into the current cell of the column, using its native
-   data type. */
+   data type. Skip floating point values that are entirely NaN. */
       if( type == AST__INTTYPE ) {
          astMapPut1I( this, key, nel, pin, NULL );
 
       } else if(  type == AST__DOUBLETYPE ){
-         astMapPut1D( this, key, nel, pin, NULL );
+         for( iel = 0; iel < nel; iel++ ) {
+            if( ! astISNAN( ((double *)pin)[ iel ] ) ) {
+               astMapPut1D( this, key, nel, pin, NULL );
+               break;
+            }
+         }
 
       } else if(  type == AST__FLOATTYPE ){
-         astMapPut1F( this, key, nel, pin, NULL );
+         for( iel = 0; iel < nel; iel++ ) {
+            if( ! astISNAN( ((double *)pin)[ iel ] ) ) {
+               astMapPut1F( this, key, nel, pin, NULL );
+               break;
+            }
+         }
 
       } else if(  type == AST__SINTTYPE ){
          astMapPut1S( this, key, nel, pin, NULL );
