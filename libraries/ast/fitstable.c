@@ -172,6 +172,7 @@ AstFitsTable *astFitsTableId_( void *, const char *, ... );
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
 static AstFitsChan *GetTableHeader( AstFitsTable *, int * );
+static char *MakeKey( const char *, int, char *, int, int * );
 static int ColumnNull( AstFitsTable *, const char *, int, int, int *, int *, int * );
 static int Equal( AstObject *, AstObject *, int * );
 static int GetObjSize( AstObject *, int * );
@@ -184,9 +185,9 @@ static void Dump( AstObject *, AstChannel *, int * );
 static void GenerateColumns( AstFitsTable *, AstFitsChan *, int * );
 static void GetColumnData( AstFitsTable *, const char *, float, double, size_t, void *, int *, int * );
 static void PurgeHeader( AstFitsTable *, int * );
+static void PutColumnData( AstFitsTable *, const char *, int, size_t, void *, int * );
 static void PutTableHeader( AstFitsTable *, AstFitsChan *, int * );
 static void UpdateHeader( AstFitsTable *, const char *, int * );
-static void PutColumnData( AstFitsTable *, const char *, int, size_t, void *, int * );
 
 #if defined(THREAD_SAFE)
 static int ManageLock( AstObject *, int, int, AstObject **, int * );
@@ -546,7 +547,8 @@ f        SET is .TRUE., the supplied NEWVAL
             for( irow = 1; irow <= nrow && astOK; irow++ ) {
 
 /* Format the cell name. */
-               sprintf( key, "%s(%d)", column, irow );
+               (void) MakeKey( column, irow, key, AST__MXCOLKEYLEN + 1,
+                               status );
 
 /* Attempt to get the values in the cell */
                if( astMapGet1I( this, key, nel, &nel, cell ) ) {
@@ -1302,7 +1304,8 @@ f     AST_COLUMNNULL functiom.
    for( irow = 1; irow <= nrow; irow++ ) {
 
 /* Format the cell name. */
-      sprintf( key, "%s(%d)", column, irow );
+      (void) MakeKey( column, irow, key, AST__MXCOLKEYLEN + 1,
+                      status );
 
 /* Get the values in the current cell of the column, using its native
    data type. For floating point, convert any NaNs into the appropriate
@@ -1313,7 +1316,7 @@ f     AST_COLUMNNULL functiom.
       } else if(  type == AST__DOUBLETYPE ){
          ok = astMapGet1D( this, key, nel, &nval, pout );
 
-         if( ok && dnull != AST__NAN ) {
+         if( ok && !astISNAN(dnull) ) {
             for( iel = 0; iel < nel; iel++ ) {
                if( astISNAN( ((double *)pout)[ iel ] ) ) {
                   ((double *)pout)[ iel ] = dnull;
@@ -1324,7 +1327,7 @@ f     AST_COLUMNNULL functiom.
       } else if(  type == AST__FLOATTYPE ){
          ok = astMapGet1F( this, key, nel, &nval, pout );
 
-         if( ok && fnull != AST__NANF ) {
+         if( ok && !astISNAN(fnull) ) {
             for( iel = 0; iel < nel; iel++ ) {
                if( astISNAN( ((float *)pout)[ iel ] ) ) {
                   ((float *)pout)[ iel ] = fnull;
@@ -1632,6 +1635,82 @@ void astInitFitsTableVtab_(  AstFitsTableVtab *vtab, const char *name, int *stat
    }
 }
 
+static char *MakeKey( const char *column, int irow, char *buf, int len,
+                      int *status ){
+/*
+*  Name:
+*     MakeKey
+
+*  Purpose:
+*     Construct a key for a column cell from a column name and row number.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "fitstable.h"
+*     char *MakeKey( const char *column, int irow, char *buf, int len,
+*                    int *status )
+
+*  Class Membership:
+*     FitsTable member function
+
+*  Description:
+*     This function constructs a key for a column cell from a column name
+*     and row number. An error is reported if the buffer is too short.
+
+*  Parameters:
+*     column
+*        Pointer to the column name. Trailing white space is ignored.
+*     irow
+*        One-based index of the row.
+*     buf
+*        Pointer to a buffer in which to store the returned key.
+*     len
+*        The length of the buffer.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     A copy of "buf".
+
+*/
+
+/* Local Variables: */
+   char *result;
+   char rbuf[ 40 ];
+   int collen;
+   int nc;
+
+/* Initialise. */
+   result = buf;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Format the column number. */
+   nc = sprintf( rbuf, "%d", irow );
+
+/* Get the used length of the column name (i.e. excluding trailing white
+   space). */
+   collen = astChrLen( column );
+
+/* For the total length of the returned string. */
+   nc += collen + 3;
+
+/* If the buffer is large enough, store the returned string. */
+   if( len >= nc ) {
+      sprintf( buf, "%.*s(%s)", collen, column, rbuf );
+   } else {
+      astError( AST__INTER, "MakeKey(FitsTable): Internal buffer is too "
+                "short to hold Table cell name '%.*s(%s)' (internal AST "
+                "programming error).", status, collen, column, rbuf );
+   }
+
+/* Return the result, */
+   return result;
+}
+
 #if defined(THREAD_SAFE)
 static int ManageLock( AstObject *this_object, int mode, int extra,
                        AstObject **fail, int *status ) {
@@ -1853,8 +1932,6 @@ f        The global status.
 /* Local Variables: */
    char key[ AST__MXCOLKEYLEN + 1 ]; /* Current cell key string */
    char **carray;    /* Pointer to array of null terminated string pointers */
-   char *colname;    /* Pointer to column name with no trailing white space */
-   int collen;       /* Used length of column name */
    int irow;         /* Index of value being copied */
    int iel;          /* Index of current element */
    int nel;          /* No. of elements per value */
@@ -1867,14 +1944,9 @@ f        The global status.
 /* Check the global error status. */
    if ( !astOK ) return;
 
-/* produce a copy of "column" excluding trailing white space. */
-   collen = astChrLen( column );
-   colname = astStore( NULL, column, collen + 1 );
-   colname[ collen ] = 0;
-
 /* Find the number of bytes in the supplied array holding a single element
    of the value in a column cell. */
-   type = astGetColumnType( this, colname );
+   type = astGetColumnType( this, column );
    if( type == AST__INTTYPE ) {
       nb = sizeof( int );
 
@@ -1901,7 +1973,7 @@ f        The global status.
 
 /* Get the number of elements per value, and the number of bytes (in the
    supplied array) per value. */
-   nel = astGetColumnLength( this, colname );
+   nel = astGetColumnLength( this, column );
    nbv = nb*nel;
 
 /* Initialise a pointer to the next element of the supplied array to read. */
@@ -1926,7 +1998,8 @@ f        The global status.
    for( irow = 1; irow <= nrow; irow++ ) {
 
 /* Format the cell name. */
-      sprintf( key, "%s(%d)", colname, irow );
+      (void) MakeKey( column, irow, key, AST__MXCOLKEYLEN + 1,
+                      status );
 
 /* Put the next value into the current cell of the column, using its native
    data type. Skip floating point values that are entirely NaN. */
@@ -1971,13 +2044,10 @@ f        The global status.
 /* Remove any remaining cells already present in this column. */
    nrow = astGetNrow( this );
    for( ; irow <= nrow; irow++ ) {
-      sprintf( key, "%s(%d)", colname, irow );
+      (void) MakeKey( column, irow, key, AST__MXCOLKEYLEN + 1,
+                      status );
       astMapRemove( this, key );
    }
-
-/* Free resources. */
-   colname = astFree( colname );
-
 }
 
 static void PutTableHeader( AstFitsTable *this, AstFitsChan *header,
@@ -2911,6 +2981,7 @@ void astPutColumnData_( AstFitsTable *this, const char *column, int clen,
    if ( !astOK ) return;
    (**astMEMBER(this,FitsTable,PutColumnData))(this,column,clen,size,coldata,status);
 }
+
 
 
 
