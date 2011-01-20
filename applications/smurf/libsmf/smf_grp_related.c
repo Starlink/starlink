@@ -246,13 +246,13 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
   int refnsubscan;            /* reference subscan file counter */
   char refobsidss[SZFITSCARD];/* reference obsidss */
   int refseqcount;            /* reference sequence counter */
-  int *refsubsys=NULL;        /* Array of template subarrays */
+  sc2ast_subarray_t *refsubsys=NULL;/* Array of template subarrays */
   int seqcount;               /* Sequence counter */
   int nsubscan;               /* subscan file counter */
   double *starts = NULL;      /* Array of starting RTS_END values */
   double steptime = 0;        /* Length of a sample */
   dim_t **subgroups = NULL;   /* Array containing index arrays to parent Grp */
-  int subsysnum;              /* Subsystem numeric id. 0 - 8 */
+  sc2ast_subarray_t subsysnum;/* Subsystem numeric id. 0 - 8 */
   size_t thischunk;           /* Current chunk that we're on */
   dim_t thistlen;             /* Length of current time chunk */
   dim_t thistlenr;            /* Length of current time chunk, no downsample */
