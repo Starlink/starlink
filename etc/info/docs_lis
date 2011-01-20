@@ -260,6 +260,7 @@ SUN                            STARLINK USER NOTES                           SUN
 262.01  2009-08-09 MJC   ??   CTG - Accessing Groups of Catalogues
 263.01  2009-08-11 MJC   ??   LPG - Processing in a loop a set of NDFs or catalogues
 264.01  2009-08-26 AGG   ??   ORAC-DR - SCUBA-2 pipeline data reduction
+265.01  2011-01-20 AGG   ??   PICARD - analyze and combine reduced data
 
 AUTHORS                          AUTHORS                                AUTHORS
                                      (Site code)
