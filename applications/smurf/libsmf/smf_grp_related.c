@@ -142,10 +142,14 @@
  *        Account for down-sampling in pad
  *     2010-11-01 (EC):
  *        Handle 4d FFT data by placing each file in its own time chunk
+ *     2011-01-19 (TIMJ):
+ *        Simulated RTS does not have the same precision as the real RTS
+ *        so we have to be careful when using rts_end for multiple
+ *        subarrays.
  *     {enter_further_changes_here}
 
  *  Copyright:
- *     Copyright (C) 2008-2009 Science and Technology Facilities Council.
+ *     Copyright (C) 2008-2011 Science and Technology Facilities Council.
  *     Copyright (C) 2006-2010 University of British Columbia.
  *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
  *     All Rights Reserved.
@@ -290,6 +294,8 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
 
   /* Loop over files in input Grp: remember Grps are indexed from 1 */
   for (i=1; i<=grpsize; i++) {
+    double timeprec = 0.0; /* Time precision */
+
     /* First step: open file and read start/end RTS_END values */
     smf_open_file( igrp, i, "READ", SMF__NOCREATE_DATA, &data, status );
 
@@ -323,6 +329,9 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
     hdr = data->hdr;
     opentime = hdr->state->rts_end;
 
+    /* Accuracy for time determination is 1/10th of a step */
+    timeprec = hdr->steptime / ( 10 * SPD );
+
     /* Set header for last time slice */
     frame = thistlenr - 1;
     smf_tslice_ast( data, frame, 0, status );
@@ -351,7 +360,8 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
         if ( allOK ) {
           /* Then check if the RTS_END values match */
           indices = subgroups[j];
-          if ( opentime == starts[j] && writetime == ends[j] ) {
+          if ( fabs(opentime - starts[j]) < timeprec &&
+               fabs(writetime - ends[j]) < timeprec ) {
             if ( nx == nbolx[j] && ny == nboly[j]) {
               /* Store in first available slot in current subgroup.
                  No point starting at 0 because it WILL be occupied if
