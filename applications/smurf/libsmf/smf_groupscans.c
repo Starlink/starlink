@@ -13,11 +13,11 @@
 *     C function
 
 *  Invocation:
-*     AstKeyMap *smf_groupscans( Grp *igrp,  int size, int *maxsyspop,
+*     AstKeyMap *smf_groupscans( const Grp *igrp,  int size, int *maxsyspop,
 *                                int *conform, Grp **ogrp, int *status );
 
 *  Arguments:
-*     igrp = Grp * (Given)
+*     igrp = const Grp * (Given)
 *        Group of input NDFs.
 *     size = int (Given)
 *        Number of elements in igrp
@@ -102,7 +102,7 @@
 #include "star/kaplibs.h"
 #include "star/one.h"
 
-AstKeyMap *smf_groupscans( Grp *igrp,  int size, int *maxsyspop,
+AstKeyMap *smf_groupscans( const Grp *igrp,  int size, int *maxsyspop,
                            int *conform, Grp **ogrp, int *status ){
 
 /* Local Variables */

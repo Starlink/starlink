@@ -1197,7 +1197,7 @@ void smf_getrefwcs( const char *param, AstFrameSet **specwcs,
 void smf_getspectralwcs( AstFrameSet *fset, int type, AstFrameSet **specwcs,
                          int *status );
 
-AstKeyMap *smf_groupscans( Grp *igrp,  int size, int *maxsyspop,
+AstKeyMap *smf_groupscans( const Grp *igrp,  int size, int *maxsyspop,
                            int *conform, Grp **ogrp, int *status );
 
 void smf_grp_related( const Grp *igrp, const size_t grpsize,
