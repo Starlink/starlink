@@ -425,7 +425,7 @@ int yydebug;
    }
 
 
-   void sappend( char *s ) {
+   void sappend( const char *s ) {
 /*
 *+
 *  Name:

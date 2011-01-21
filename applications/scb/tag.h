@@ -27,7 +27,7 @@
 
 /* Functions for keeping track of whitespace-type characters to be put
    into yylval but not yytext. */
-      void sappend( char *s );
+      void sappend( const char *s );
       void cappend( char c );
 
 /* Function for doing grammar-specific tidying after the parser is finished. */

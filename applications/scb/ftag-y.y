@@ -91,17 +91,16 @@ typedef char * STRING;
 #include "tag.h"
 #include <stdio.h>
 #include <stdlib.h>
-char *refname( char *name );
-char *fanchor( char *attrib, char *name );
-char *fanchor_inc( char *attrib, char *name );
-int isreserved( char *name );
+char *refname( const char *name );
+char *fanchor( const char *attrib, char *name );
+char *fanchor_inc( const char *attrib, char *name );
+int isreserved( const char *name );
 int inlist( char *name, ELEMENT *list );
-void array_declare( char *name );
+void array_declare( const char *name );
 char *function_call( char *name );
 void module_start();
 void tagwrap();
 void handle_error();
-
 
 %}
 
@@ -404,7 +403,7 @@ token_brac
 
    yyerror(char *s) { /* No action. */ }
 
-   char *refname( char *name ) {
+   char *refname( const char *name ) {
 /*
 *+
 *  Name:
@@ -420,7 +419,7 @@ token_brac
 *     tag attribute value.  No underscore is appended however.
 *
 *  Arguments:
-*     name = char *
+*     name = const char *
 *        The unstripped text to get the name from.
 *
 *  Return value:
@@ -466,7 +465,7 @@ token_brac
    }
 
 
-   char *fanchor( char *attrib, char *name ) {
+   char *fanchor( const char *attrib, char *name ) {
 /*
 *+
 *  Name:
@@ -511,8 +510,8 @@ token_brac
 
 /* Local variables. */
       char *string, *rname, *genpos, *vname, *fend;
-      char *gencode[] = { "i", "r", "d", "l", "c", "b", "ub", "w", "uw", "" };
-      int i, l, leng, nspace;
+      const char *gencode[] = { "i", "r", "d", "l", "c", "b", "ub", "w", "uw", "" };
+      int i, l, leng;
 
 /* Find the start of the identifier itself, which is assumed to be right
    at the end of the string. */
@@ -563,7 +562,7 @@ token_brac
    }
 
 
-   char *fanchor_inc( char *attrib, char *name ) {
+   char *fanchor_inc( const char *attrib, char *name ) {
 /*
 *+
 *  Name:
@@ -573,9 +572,9 @@ token_brac
 *     Generate an HTML-like anchor tag for an include file.
 *
 *  Arguments:
-*     attrib = char *
+*     attrib = const char *
 *        Name of the attribute, presumably "href".
-*     name = char *
+*     name = const char *
 *        Text to be tagged.  Must include two "'" characters.  The text
 *        between these will be the contents of the tag.  This variable
 *        will be free'd by this function, so must previously have been
@@ -590,7 +589,7 @@ token_brac
 
 /* Local variables. */
       char *string, *rname, *rns;
-      int leng, nleng, i;
+      int leng, i;
 
 /* Get the stripped value of the name. */
       rname = refname( name );
@@ -622,7 +621,7 @@ token_brac
    }
 
 
-   int isreserved( char *name ) {
+   int isreserved( const char *name ) {
 /*
 *+
 *  Name:
@@ -648,7 +647,7 @@ token_brac
 /* Reserved words.  These are supposed to be all the words which might
    turn up in fortran source followed by an opening parenthesis, which
    ought not to be interpreted as potential function calls. */
-      static char *reserved[] = {
+      static const char *reserved[] = {
          "%val", "%loc",
          "read", "write", "backspace", "close", "open", "endfile", "format", 
          "inquire", "while", "print", "return",
@@ -723,7 +722,7 @@ token_brac
    }
 
 
-   void array_declare( char *name ) {
+   void array_declare( const char *name ) {
 /*
 *+
 *  Name:
