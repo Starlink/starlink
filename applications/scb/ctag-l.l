@@ -172,7 +172,7 @@ F77_CALL/{S}\(			{ count(); return(F77_CALL); }
 #endif
 
 extern char *yylval;
-extern int yyleng;
+extern size_t yyleng;
 
 
    int yywrap() {
