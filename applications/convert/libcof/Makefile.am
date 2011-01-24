@@ -20,13 +20,14 @@ F_ROUTINES = \
  cof_whisr.f cof_wndfh.f cof_wrtab.f cof_ftwcs.f cof_fpwcs.f cof_fndfs.f \
  cof_wcsax.f cof_wcsdf.f cof_wcsex.f cof_wcsim.f cof_wcsut.f cof_mghdr.f \
  cof_getfc.f cof_getyp.f cof_stscl.f cof_smurf.f cof_nex2f.f cof_pcadc.f \
- cof_wprov.f cof_fi2ne.f cof_wstr.f cof_smfim.f cof_genam.f cof_wenam.f
+ cof_wprov.f cof_fi2ne.f cof_wstr.f cof_smfim.f cof_genam.f cof_wenam.f \
+ cof_bt2ft.f  cof_ft2bt.f cof_tbsrc.f cof_hd2fc.f cof_fc2hd.f
 
-GEN_ROUTINES = $(DIRW_GEN_ROUTINES) $(CDILR_GEN_ROUTINES) 
+GEN_ROUTINES = $(DIRW_GEN_ROUTINES) $(CDILR_GEN_ROUTINES)
 
-F_GEN_FILES = $(DIRW_GEN_ROUTINES:.gdirw=.f) $(CDILR_GEN_ROUTINES:.gcdilr=.f) 
+F_GEN_FILES = $(DIRW_GEN_ROUTINES:.gdirw=.f) $(CDILR_GEN_ROUTINES:.gcdilr=.f)
 
-INCLUDE_FILES = COF_CMN F2NDF1_CMN F2NDF2_CMN
+INCLUDE_FILES = COF_CMN F2NDF1_CMN F2NDF2_CMN F2NDF3_CMN
 
 ##  Double, integer, real and word.
 DIRW_GEN_ROUTINES = cof_escox.gdirw cof_mxmnx.gdirw cof_scofx.gdirw

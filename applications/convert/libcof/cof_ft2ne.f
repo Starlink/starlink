@@ -78,6 +78,11 @@
 *        Allow for long strings to be stored in EXTNAME keyword
 *        via indirection.  Set the type for a MORE structure in an NDF
 *        extension to be EXT instead of the generic STRUCT.
+*     24-JAN-2011 (DSB):
+*        Not all FITS extensions created by ndf2fits correspond to NDF 
+*        extensions - for instance, ndf2fits can create a "WCS-TAB" 
+*        extension to holds columns of WCS values. So do not report an 
+*        error if the extension holds WCS values.
 *     {enter_further_changes_here}
 
 *-
@@ -89,6 +94,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT__ constants
       INCLUDE 'NDF_PAR'          ! NDF__ constants
+      INCLUDE 'AST_PAR'          ! AST__ constants
 
 *  Arguments Given:
       INTEGER FUNIT
@@ -139,14 +145,20 @@
       CALL COF_GENAM( FUNIT, EXPATH, COMENT, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
-*  Validate the extension name.
+*  Validate the extension name. Ignore binary tables containing
+*  coordinate tables created by AST as a consequence of exporting WCS
+*  information using the "-TAB" algorithm described in FITS-WCS paper III.
       CALL CHR_UCASE( EXPATH )
-      IF ( INDEX( EXPATH, 'MORE' ) .EQ. 0 ) THEN
+      IF ( INDEX( EXPATH, AST__TABEXTNAME ) .EQ. 1 ) THEN
+         GOTO 999
+
+      ELSE IF ( INDEX( EXPATH, 'MORE' ) .EQ. 0 ) THEN
          STATUS = SAI__ERROR
+         CALL MSG_SETC( 'X', EXPATH )
          CALL ERR_REP( 'COF_FT2NE_EXTMORE',
-     :     'EXTNAME keyword value does not contain the NDF extension '/
-     :     /'component.  Unable to recreate the NDF extension.',
-     :     STATUS )
+     :     'EXTNAME keyword value (^X) does not contain the NDF '/
+     :     /'extension component.  Unable to recreate the NDF '/
+     :     /'extension.', STATUS )
          GOTO 999
       END IF
 

@@ -1,4 +1,4 @@
-      SUBROUTINE COF_FTWCS( FUNIT, INDF, NENCOD, ENCODS, FILE, WCSATT,
+      SUBROUTINE COF_FTWCS( FUNT, INDF, NENCOD, ENCODS, FILE, WCSATT,
      :                      STATUS )
 *+
 *  Name:
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL COF_FTWCS( FUNIT, INDF, NENCOD, ENCODS, FILE, WCSATT, STATUS )
+*     CALL COF_FTWCS( FUNT, INDF, NENCOD, ENCODS, FILE, WCSATT, STATUS )
 
 *  Description:
 *     This constructs an AST FrameSet from the FITS headers of the current
@@ -48,8 +48,9 @@
 *     are non-linear.
 
 *  Arguments:
-*     FUNIT = INTEGER (Given)
-*        The FITSIO unit number for the FITS file.
+*     FUNT = INTEGER (Given)
+*        The FITSIO unit number for the FITS file. Not called "FUNIT"
+*        because it would clash with the FUNIT variable held in common.
 *     INDF = INTEGER (Given)
 *        The NDF identifier.
 *     NENCOD = INTEGER (Given)
@@ -107,6 +108,9 @@
 *     2004 September 10 (TIMJ):
 *        Fix valgrind warning with uninitialised HEADER on entry
 *        to fitsio routine
+*     17-JAN-2011 (DSB):
+*        - Most of code refactored into COF_HD2FC.
+*        - Add support for -TAB axes.
 *     {enter_further_changes_here}
 
 *-
@@ -118,8 +122,13 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and functions
 
+*  Global Variables:
+      INCLUDE 'F2NDF3_CMN'
+*        INTEGER FUNIT (Write)
+*           The fortran unit number associated with the FITS file
+
 *  Arguments Given:
-      INTEGER FUNIT
+      INTEGER FUNT
       INTEGER INDF
       INTEGER NENCOD
       CHARACTER ENCODS( NENCOD )*(*)
@@ -129,22 +138,11 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  Local Constants:
-      INTEGER FITSOK             ! Value of good FITSIO status
-      PARAMETER( FITSOK = 0 )
-
-      INTEGER HEDLEN             ! FITS header length
-      PARAMETER( HEDLEN = 80 )
+*  External References:
+      EXTERNAL COF_TBSRC
 
 *  Local Variables:
-      CHARACTER * ( HEDLEN ) HEADER ! A FITS header
       INTEGER FC                 ! Identifier for AST FitsChan
-      INTEGER FSTAT              ! FITSIO status
-      INTEGER IHEAD              ! Loop counter for headers
-      INTEGER KEYADD             ! Number of headers that can be added
-      INTEGER NBAD               ! Number of bad header cards
-      INTEGER NHEAD              ! Number of FITS headers
-
 *.
 
 *  Check the inherited global status.
@@ -156,65 +154,20 @@
 *  Create an AST FitsChan. This is an object which acts as a buffer to
 *  hold a set of FITS header cards to be used by other AST routines.
       FC = AST_FITSCHAN( AST_NULL, AST_NULL, WCSATT, STATUS )
-      IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Initialise the FITSIO status.  It's not the same as the Starlink
-*  status, which is reset by the fixed part.
-      FSTAT = FITSOK
+*  Copy all the headers in the current HDU into the FitsChan.
+      CALL COF_HD2FC( FUNT, FC, STATUS )
 
-*  Find the number of headers (not including the final END).
-      CALL FTGHSP( FUNIT, NHEAD, KEYADD, FSTAT )
-      IF( FSTAT .NE. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_FTWCS_NHEAD', 'FTGHSP',
-     :                   'Error obtaining the number of header cards.',
-     :                   STATUS )
-         GO TO 999
-      END IF
+*  Indicate that axes that use the -TAB algorithm defined in FITS-WCS
+*  paper III should be recognised.
+      CALL AST_SETL( FC, 'TabOK', .TRUE., STATUS )
 
-*  Initialise the number of bad header cards.
-      NBAD = 0
-
-*  Loop through the headers.
-      DO IHEAD = 1, NHEAD
-
-*  Obtain the header. If an error occurred getting the header, flush
-*  the FITSIO error stack, increment the number of bad headers, but
-*  carry on to process any remaining headers.
-         HEADER = ' '
-         CALL FTGREC( FUNIT, IHEAD, HEADER, FSTAT )
-         IF( FSTAT .NE. FITSOK ) THEN
-            FSTAT = FITSOK
-            CALL FTCMSG
-            NBAD = NBAD + 1
-
-*  Add this header into the FitsChan. If an error occurs, annul the
-*  error, increment the number of bad headers, and continue to process any
-*  remaining headers.
-         ELSE
-            CALL AST_PUTFITS( FC, HEADER, 1, STATUS )
-            IF ( STATUS .NE. SAI__OK ) THEN
-               CALL ERR_ANNUL( STATUS )
-               NBAD = NBAD + 1
-            END IF
-         END IF
-
-      END DO
-
-*  Issue a warning if any bad header cards were encountered.
-      IF ( ( STATUS .EQ. SAI__OK ) .AND. ( NBAD .NE. 0 ) ) THEN
-         CALL ERR_MARK
-         STATUS = SAI__ERROR
-         CALL MSG_SETI( 'NBAD', NBAD )
-         CALL ERR_REP( 'COF_FTWCS_WARN', 'WARNING: ^NBAD FITS header '//
-     :                 'cards could not be read and were not used.',
-     :                 STATUS )
-         CALL ERR_FLUSH( STATUS )
-         CALL ERR_RLSE
-      END IF
-
-*  Rewind the FitsChan by clearing the Card attribute so that the first
-*  header card will be read by COF_WCSIM.
-      CALL AST_CLEAR( FC, 'Card', STATUS )
+*  Tell the FitsChan to use the COF_TBSRC routine if and when it needs to
+*  get data from a binary table extension (as it will do if any axes are
+*  described using the -TAB algorithm). Also store the FITSIO unit number
+*  for the FITS file in common for use by COF_TBSRC.
+      CALL AST_TABLESOURCE( FC, COF_TBSRC, STATUS )
+      FUNIT = FUNT
 
 *  Now import any WCS information from the FitsChan into the NDF.
       CALL COF_WCSIM( FC, INDF, NENCOD, ENCODS, STATUS )
@@ -222,8 +175,7 @@
 *  Report any warnings stored in the FitsChan by AST.
       CALL COF_ASTWN( FC, INDF, STATUS )
 
-*  Jump to here if an error occurs. Add a context message.
-  999 CONTINUE
+*  If an error occurred, add a context message.
       IF( STATUS .NE. SAI__OK )THEN
          CALL MSG_SETC( 'FL', FILE )
          CALL ERR_REP( 'COF_FTWCS_ERR1', 'The output NDF will still '//

@@ -1,0 +1,18 @@
+*+
+*  Name:
+*     F2NDF3_CMN
+
+*  Purpose:
+*     Hold information needed by COF_TBSRC (a service routine for AST_READ).
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     INCLUDE file
+
+      INTEGER FUNIT          ! Unit number for fits file
+
+      COMMON /F2NDF3_CMN/ FUNIT
+*.
+

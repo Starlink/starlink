@@ -86,6 +86,10 @@
 *        Initialise HEADER to fix valgrind warning
 *     30-JUN-2008 (DSB):
 *        Delete cards from end of list to avoid massive CFITSIO overheads.
+*     20-JAN-2011 (DSB):
+*        - Increase the value of the FitsDigits attribute from 10 to 15
+*        to get sub-second accuracy on MJD-OBS.
+*        - Support FITS-WCS paper III "-TAB" algorithm.
 *     {enter_further_changes_here}
 
 *-
@@ -117,12 +121,17 @@
       PARAMETER( HEDLEN = 80 )
 
 *  Local Variables:
-      CHARACTER * ( HEDLEN ) HEADER ! A FITS header
+      CHARACTER HEADER*( HEDLEN )! A FITS header
+      CHARACTER KEY*30           ! Extension name
       INTEGER FC                 ! Identifier for AST FitsChan
       INTEGER FSTAT              ! FITSIO status
       INTEGER IHEAD              ! Loop counter for headers
+      INTEGER ITABLE             ! Index of current entry in KEYMAP
       INTEGER KEYADD             ! Number of headers that can be added
+      INTEGER KEYMAP             ! KeyMap holding FitsTables
       INTEGER NHEAD              ! Number of FITS headers
+      INTEGER NTABLE             ! No. of entries in KEYMAP
+      INTEGER TABLE              ! Pointer to a FitsTable
       LOGICAL THERE              ! Does the object exist?
 *.
 
@@ -139,8 +148,10 @@
 *  hold a set of FITS header cards to be used by other AST routines.
 *  Setting FitsDigits to a negative value ensures that FitsChan never
 *  uses more than the number of digits allowed by the FITS standard when
-*  formatting floating point values.
-      FC = AST_FITSCHAN( AST_NULL, AST_NULL, 'FITSDIGITS=-10', STATUS )
+*  formatting floating point values. Also indicate that axes can be
+*  described using the -TAB algorithm described in FITS-WCS paper III.
+      FC = AST_FITSCHAN( AST_NULL, AST_NULL, 'FITSDIGITS=-15,TABOK=1',
+     :                   STATUS )
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Initialise the FITSIO status.  It's not the same as the Starlink
@@ -185,28 +196,39 @@
 *  least one Object was written to the FitsChan.
       IF( COF_WCSEX( FC, INDF, ENCOD, NATIVE, STATUS ) .GE. 1 ) THEN
 
-*  See how many cards there are in the FITSIO header now.
-          CALL FTGHPS( FUNIT, NHEAD, KEYADD, FSTAT )
+*  Copy the contents of the FitsChan into the CHDU header.
+          CALL COF_FC2HD( FC, FUNIT, STATUS )
 
-*  Empty the FITSIO header. For efficiency, delete from the end of the
-*  list to the start of the list.
-          DO IHEAD = NHEAD, 1, -1
-             CALL FTDREC( FUNIT, IHEAD, FSTAT )
-             IF( FSTAT .NE. FITSOK ) THEN
-                FSTAT = FITSOK
-                CALL FTCMSG
-             END IF
-          END DO
+*  If any axes were successfully described using the -TAB algorithm, there
+*  will be one or more FitsTables stored in the FitsChan. For each such
+*  FitsTable, create a corresponding extension in the FITS file containing a
+*  binary table. Get a pointer to a KeyMap that holds copies of the
+*  FitsTables in the FitsChan.
+         KEYMAP = AST_GETTABLES( FC, STATUS )
+         IF( KEYMAP .NE. AST__NULL ) THEN
 
-* Now copy the contents of the FitsChan into the empty FITSIO header.
-         CALL AST_CLEAR( FC, 'Card', STATUS )
-         DO WHILE( AST_FINDFITS( FC, '%f', HEADER, .TRUE., STATUS ) )
-            CALL FTPREC( FUNIT, HEADER, FSTAT )
-            IF( FSTAT .NE. FITSOK ) THEN
-               FSTAT = FITSOK
-               CALL FTCMSG
-            END IF
-         END DO
+*  Get the number of tables in the KeyMap, and loop round them all.
+            NTABLE = AST_MAPSIZE( KEYMAP, STATUS )
+            DO ITABLE = 1, NTABLE
+
+*  Get the key for the KeyMap entry with the current index, and use it to
+*  retrieve a pointer to the FitsTable.
+               KEY = AST_MAPKEY( KEYMAP, ITABLE, STATUS )
+               IF( AST_MAPGET0A( KEYMAP, KEY, TABLE, STATUS ) ) THEN
+
+*  Create an extension in the FITS file holding a binary table containing
+*  values copied from the FitsTable, and then annul the FitsTable pointer.
+*  Use the table key in the KeyMap as the extension name.
+                  CALL COF_FT2BT( TABLE, FUNIT, KEY, STATUS )
+                  CALL AST_ANNUL( TABLE, STATUS )
+
+               END IF
+            END DO
+
+*  Annul the pointer to the KeyMap holding the tables.
+            CALL AST_ANNUL( KEYMAP, STATUS )
+
+         END IF
 
 *  If the NDF has a WCS component but it could not be written out, issue a
 *  warning.

@@ -241,6 +241,8 @@
 *        sometimes directories have "."s in them).
 *     2009 November 25 (MJC):
 *        Allow for long extension names.
+*     20-JAN-2011 (DSB):
+*        Only write out the WCS component once.
 *     {enter_further_changes_here}
 
 *-
@@ -876,7 +878,11 @@
 
 *  Write out the NDF WCS information.
 *  ==================================
-      CALL COF_FPWCS( FUNIT, NDFI, ENCOD, NATIVE, STATUS )
+
+*  Only do this if the Data component is being written out. This avoids
+*  writing the WCS out multiple times for the same NDF.
+      IF( COMP.EQ. 'DATA' ) CALL COF_FPWCS( FUNIT, NDFI, ENCOD, NATIVE,
+     :                                      STATUS )
 
   999 CONTINUE
 
