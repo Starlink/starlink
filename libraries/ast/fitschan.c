@@ -29039,8 +29039,8 @@ static AstMapping *TabMapping( AstFitsChan *this, FitsStore *store, char s,
 /* Get the FITS binary table. This will invoke any supplied table source
    function, and put a copy of the table into the FitsChan structure.
    Report an error if the table can not be obtained. */
-                  table = GetNamedTable( this, extname, 1, extver,
-                                         extlevel, method, status );
+                  table = GetNamedTable( this, extname, extver, extlevel, 1,
+                                         method, status );
 
 /* Add this extension name to a list of used extensions. */
                   astMapPut0I( used_tables, extname, 1, NULL );
