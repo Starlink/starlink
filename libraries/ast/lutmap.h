@@ -183,6 +183,7 @@ typedef struct AstLutMapVtab {
    int (* TestLutInterp)( AstLutMap *, int * );
    void (* ClearLutInterp)( AstLutMap *, int * );
    void (* SetLutInterp)( AstLutMap *, int, int * );
+   double *(* GetLutMapInfo)( AstLutMap *, double *, double *, int *, int * );
 
 } AstLutMapVtab;
 
@@ -239,6 +240,7 @@ void astInitLutMapGlobals_( AstLutMapGlobals * );
    int astTestLutInterp_( AstLutMap *, int * );
    void astClearLutInterp_( AstLutMap *, int * );
    void astSetLutInterp_( AstLutMap *, int, int * );
+   double *astGetLutMapInfo_( AstLutMap *, double *, double *, int *, int * );
 #endif
 
 /* Function interfaces. */
@@ -288,6 +290,7 @@ astINVOKE(O,astLoadLutMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PT
    before use.  This provides a contextual error report if a pointer
    to the wrong sort of Object is supplied. */
 #if defined(astCLASS)            /* Protected */
+
 #define astClearLutInterp(this) \
         astINVOKE(V,astClearLutInterp_(astCheckLutMap(this),STATUS_PTR))
 #define astGetLutInterp(this) \
@@ -296,6 +299,9 @@ astINVOKE(O,astLoadLutMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PT
         astINVOKE(V,astSetLutInterp_(astCheckLutMap(this),value,STATUS_PTR))
 #define astTestLutInterp(this) \
         astINVOKE(V,astTestLutInterp_(astCheckLutMap(this),STATUS_PTR))
+#define astGetLutMapInfo(this,start,inc,nlut) \
+        astINVOKE(V,astGetLutMapInfo_(astCheckLutMap(this),start,inc,nlut,STATUS_PTR))
+
 #endif
 
 #endif

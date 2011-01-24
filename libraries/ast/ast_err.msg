@@ -183,5 +183,7 @@ BIGKEY          <Key string is too long>
 BADCOL          <No such column exists in the table>
 BIGTAB          <Table is too large>
 BADSIZ          <Invalid array size>
+BADTAB          <Error reading WCS from FITS binary table>
+NOTAB           <Cannot access FITS binary table>
 
 .END

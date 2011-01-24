@@ -74,10 +74,12 @@
 
 /* Header files. */
 /* ============= */
+#include "ast_err.h"             /* AST error codes */
 #include "f77.h"                 /* FORTRAN <-> C interface macros (SUN/209) */
 #include "c2f77.h"               /* F77 <-> C support functions/macros */
 #include "error.h"               /* Error reporting facilities */
 #include "memory.h"              /* Memory handling facilities */
+#include "object.h"              /* C interface to the base Object class */
 #include "fitschan.h"            /* C interface to the FitsChan class */
 
 #include <stddef.h>
@@ -87,6 +89,8 @@
 /* ================================= */
 static char *SourceWrap( const char *(*)( void ), int * );
 static void SinkWrap( void (*)( const char * ), const char *, int * );
+static void TabSourceWrap( void (*)( void  ),
+                           AstFitsChan *, const char *, int, int, int * );
 
 /* Prototypes for external functions. */
 /* ================================== */
@@ -240,6 +244,124 @@ static char *SourceWrap( const char *(* source)( void ), int *status ) {
 
 /* Return the result. */
    return result;
+}
+
+static void TabSourceWrap( void (*tabsource)( void  ),
+                           AstFitsChan *this, const char *extname,
+                           int extver, int extlevel, int *status ){
+/*
+*  Name:
+*     TabSourceWrap
+
+*  Purpose:
+*     Wrapper function to invoke the F77 table source function.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     void TabSourceWrap( void (*tabsource)( void ),
+*                         AstFitsChan *this, const char *extname,
+*                         int extver, int extlevel, int *status ){
+
+*  Class Membership:
+*     Channel member function.
+
+*  Description:
+*     This function invokes the table source function whose pointer is
+*     supplied in order to read a named FITS binary table from an external
+*     FITS file.
+
+*  Parameters:
+*     tabsource
+*        Pointer to the C tab source function.
+*     this
+*        Pointer to the FitsChan. It's reference count will be decremented
+*        by this function.
+*     extname
+*        Pointer to the string holding the name of the FITS extension
+*        from which a table is to be read.
+*     extver
+*        FITS "EXTVER" value for required extension.
+*     extlevel
+*        FITS "EXTLEVEL" value for required extension.
+*     status
+*        Pointer to the inherited status variable.
+
+*/
+
+/* Local Variables: */
+   DECLARE_CHARACTER(EXTNAME,80);
+   DECLARE_INTEGER(THIS_ID);
+   DECLARE_INTEGER(LSTAT);
+   DECLARE_INTEGER(EXTVER);
+   DECLARE_INTEGER(EXTLEVEL);
+   AstObject *this_id;
+   char *d;
+   const char *c;
+   int i;
+   int lim;
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Get an external identifier for the FitsChan. Note, this does not
+   increment the Object's reference count. Cannot use astClone as we
+   are in a "public" environment and so astClone would require an object
+   identifier, not a true C pointer. So the calling function should clone
+   the pointer before calling this function to avoid the reference count
+   dropping to zero when the associated identifier is annulled at the end of
+   this function. */
+   this_id = astMakeId( this );
+   THIS_ID = astP2I( this_id );
+
+/* Export the extver and extlevel values */
+   EXTVER = extver;
+   EXTLEVEL = extlevel;
+
+/* Copy the supplied null terminated string to a fixed length, blank
+   padded string which can be passed to the Fortran routine. */
+   c = extname;
+   d = EXTNAME;
+
+   lim = (int) strlen( extname );
+   if( lim > 80 ) lim = 80;
+
+   for( i = 0; i < lim; i++ ){
+      *(d++) = (*c++);
+   }
+
+   for( ; i < 80; i++ ){
+      *(d++) = ' ';
+   }
+
+/* Invoke the table source function (casting it to the F77 API first) to
+   read the table, and store it in the FitsChan. */
+   if( astOK ) {
+      LSTAT = 0;
+      ( ( void (*)() ) tabsource )(
+           INTEGER_ARG(&THIS_ID), CHARACTER_ARG(EXTNAME), INTEGER_ARG(&EXTVER),
+           INTEGER_ARG(&EXTLEVEL), INTEGER_ARG(&LSTAT) TRAIL_ARG(EXTNAME) );
+   }
+
+/* Report an error if the source function failed. */
+   if( LSTAT ) {
+      if( astOK ) {
+         astError( AST__NOTAB, "astRead(%s): The table source function failed to read "
+                   "a binary table from extension %s in an external FITS file.",
+                   status, astGetC( this_id, "Class" ), extname );
+      } else {
+         astError( astStatus, "astRead(%s): The table source function failed to read "
+                   "a binary table from extension %s in an external FITS file.",
+                   status, astGetC( this_id, "Class" ), extname );
+      }
+   }
+
+
+/* Free the external identifier for the FitsChan. Note, this decrements
+   the Object reference count. See comments above. */
+   (void) astAnnulId( this_id );
+
 }
 
 /* FORTRAN interface functions. */
@@ -785,5 +907,79 @@ F77_SUBROUTINE(ast_emptyfits)( INTEGER(THIS),
    )
 }
 
+
+F77_INTEGER_FUNCTION(ast_gettables)( INTEGER(THIS),
+                                     INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   F77_INTEGER_TYPE(RESULT);
+
+   astAt( "AST_GETTABLES", NULL, 0 );
+   astWatchSTATUS(
+      RESULT = astP2I( astGetTables( astI2P( *THIS ) ) );
+   )
+   return RESULT;
+}
+
+F77_SUBROUTINE(ast_removetables)( INTEGER(THIS),
+                                  CHARACTER(KEY),
+                                  INTEGER(STATUS)
+                                  TRAIL(KEY) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(KEY)
+   char *key;
+
+   astAt( "AST_REMOVETABLES", NULL, 0 );
+   astWatchSTATUS(
+      key = astString( KEY, KEY_length );
+      astRemoveTables( astI2P( *THIS ), key );
+      (void) astFree( (void *) key );
+   )
+}
+
+F77_SUBROUTINE(ast_puttable)( INTEGER(THIS),
+                              INTEGER(TABLE),
+                              CHARACTER(EXTNAM),
+                              INTEGER(STATUS)
+                              TRAIL(EXTNAM) ){
+   GENPTR_INTEGER(THIS)
+   GENPTR_INTEGER(TABLES)
+   GENPTR_CHARACTER(EXTNAM)
+   char *extnam;
+
+   astAt( "AST_PUTTABLE", NULL, 0 );
+   astWatchSTATUS(
+      extnam = astString( EXTNAM, EXTNAM_length );
+      astPutTable( astI2P( *THIS ), astI2P( *TABLE ), extnam );
+      extnam = astFree( extnam );
+   )
+}
+
+F77_SUBROUTINE(ast_puttables)( INTEGER(THIS),
+                               INTEGER(TABLES),
+                               INTEGER(STATUS) ){
+   GENPTR_INTEGER(THIS)
+   GENPTR_INTEGER(TABLES)
+
+   astAt( "AST_PUTTABLES", NULL, 0 );
+   astWatchSTATUS(
+      astPutTables( astI2P( *THIS ), astI2P( *TABLES ) );
+   )
+}
+
+F77_SUBROUTINE(ast_tablesource)( INTEGER(THIS),
+                                 void (* SOURCE)(),
+                                 INTEGER(STATUS) ){
+   GENPTR_INTEGER(THIS)
+   void (* source)( void );
+
+   astAt( "AST_TABLESOURCE", NULL, 0 );
+   astWatchSTATUS(
+      source = (void (*)( void )) SOURCE;
+      if ( source == (void (*)( void )) F77_EXTERNAL_NAME(ast_null) ) {
+         source = NULL;
+      }
+      astSetTableSource( astI2P( *THIS ), source, TabSourceWrap );
+   )
+}
 
 

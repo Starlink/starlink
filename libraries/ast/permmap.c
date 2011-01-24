@@ -78,6 +78,8 @@ f     The PermMap class does not define any new routines beyond those
 *     11-SEP-2007 (DSB):
 *        In MapSplit, check that the permuted axis index is less than the
 *        number of axes available. Use AST__BAD otherwise.
+*     10-JAN-2011 (DSB):
+*        Add protected PermSplit attribute.
 *class--
 */
 
@@ -111,6 +113,7 @@ f     The PermMap class does not define any new routines beyond those
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
+#include <limits.h>
 
 /* Module Variables. */
 /* ================= */
@@ -170,6 +173,12 @@ static int NullPerm( AstPermMap *, int, int * );
 static void Copy( const AstObject *, AstObject *, int * );
 static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
+
+static void SetPermSplit( AstPermMap *, int, int * );
+static void ClearPermSplit( AstPermMap *, int * );
+static int TestPermSplit( AstPermMap *, int * );
+static int GetPermSplit( AstPermMap *, int * );
+
 
 /* Member functions. */
 /* ================= */
@@ -614,6 +623,10 @@ void astInitPermMapVtab_(  AstPermMapVtab *vtab, const char *name, int *status )
    vtab->GetConstants = GetConstants;
    vtab->GetInPerm = GetInPerm;
    vtab->GetOutPerm = GetOutPerm;
+   vtab->ClearPermSplit = ClearPermSplit;
+   vtab->GetPermSplit = GetPermSplit;
+   vtab->SetPermSplit = SetPermSplit;
+   vtab->TestPermSplit = TestPermSplit;
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
@@ -1471,77 +1484,119 @@ static int *MapSplit( AstMapping *this_map, int nin, const int *in, AstMapping *
    }
    con = this->constant;
 
-/* Allocate memory for the inperm and outperm arrays of the returned
-   PermMap. Make these the largest they could possible need to be. */
-   inpm = astMalloc( sizeof( int )*(size_t) npin );
-   outpm = astMalloc( sizeof( int )*(size_t) npout );
+/* The "normal" method, as described in the prologue. */
+   if( astGetPermSplit( this ) == 0 ) {
 
 /* Allocate memory for the returned array of output indices. */
-   result = astMalloc( sizeof( int )*(size_t) npout );
-   if( astOK ) {
+      result = astMalloc( sizeof( int )*(size_t) npout );
+
+/* Allocate memory for the inperm and outperm arrays of the returned
+   PermMap. Make these the largest they could possible need to be. */
+      inpm = astMalloc( sizeof( int )*(size_t) npin );
+      outpm = astMalloc( sizeof( int )*(size_t) npout );
+      if( astOK ) {
 
 /* Initialise number of outputs in returned PermMap. */
-      nout = 0;
+         nout = 0;
 
 /* Loop round each output of the supplied PermMap. */
-      for( iout = 0; iout < npout; iout++ ) {
+         for( iout = 0; iout < npout; iout++ ) {
 
 /* Is this output fed by one of the selected inputs? If so store the input
    index of the returned Mapping, which feeds this output and add this
    output index to the list of returned outputs. */
-         iin = outp ? outp[ iout ] : iout;
-         if( iin >= 0 && iin < npin ) {
-            for( i = 0; i < nin; i++ ) {
-               if( in[ i ] == iin ) {
-                  outpm[ nout ] = i;
-                  result[ nout ] = iout;
-                  nout++;
-                  break;
+            iin = outp ? outp[ iout ] : iout;
+            if( iin >= 0 && iin < npin ) {
+               for( i = 0; i < nin; i++ ) {
+                  if( in[ i ] == iin ) {
+                     outpm[ nout ] = i;
+                     result[ nout ] = iout;
+                     nout++;
+                     break;
+                  }
                }
             }
          }
-      }
 
 /* We now need to set up the inperm array for the returned PermMap. This
    ensures that the inverse transformation in the returned Mapping provides
    values for the selected inputs. Loop round all the selected inputs. */
-      for( i = 0; i < nin; i++ ) {
-         iin = in[ i ];
+         for( i = 0; i < nin; i++ ) {
+            iin = in[ i ];
 
 /* Is this input constant or fed by one of the selected outputs? If so store
    the output or constant index in the returned Mapping which feeds this
    input. */
-         ok = 0;
-         iout = inp ? inp[ iin ] : iin;
-         if( iout >= 0 && iout < npout ) {
-            for( j = 0; j < nout; j++ ) {
-               if( result[ j ] == iout ) {
-                  ok = 1;
-                  inpm[ i ] = j;
-                  break;
+            ok = 0;
+            iout = inp ? inp[ iin ] : iin;
+            if( iout >= 0 && iout < npout ) {
+               for( j = 0; j < nout; j++ ) {
+                  if( result[ j ] == iout ) {
+                     ok = 1;
+                     inpm[ i ] = j;
+                     break;
+                  }
                }
+            } else {
+               inpm[ i ] = iout;
+               ok = 1;
             }
-         } else {
-            inpm[ i ] = iout;
-            ok = 1;
-         }
 
 /* If this input is fed by an output which has not been selected, then we
    cannot produce the required Mapping. */
-         if( !ok ) break;
-      }
+            if( !ok ) break;
+         }
 
 /* If possible produce the returned PermMap. Otherwise, free the returned
    array. */
-      if( ok ) {
-         *map = (AstMapping *) astPermMap( nin, inpm, nout, outpm, con, "", status );
-      } else {
-         result = astFree( result );
-      }
+         if( ok ) {
+            *map = (AstMapping *) astPermMap( nin, inpm, nout, outpm, con, "", status );
+         } else {
+            result = astFree( result );
+         }
 
 /* Free other resources. */
-      inpm = astFree( inpm );
-      outpm = astFree( outpm );
+         inpm = astFree( inpm );
+         outpm = astFree( outpm );
+      }
+
+/* The "alternative" method. Only the inperm array is used - the outperm
+   array is assumed to be an exact inverse of the inperm array. In other
+   words, only the inverse transformation is used, and the forward
+   transformation is assumed to be the exact opposite. */
+   } else {
+
+/* The returned array of output indices holds the "inperm" values for the
+   selected inputs. */
+      result = astMalloc( sizeof( int )*(size_t) nin );
+      if( astOK ) {
+         for( i = 0; i < nin; i++ ) {
+            result[ i ] = inp[ in[ i ] ];
+
+/* Check the input is not fed by a constant. */
+            if( result[ i ] < 0 ) {
+               result = astFree( result );
+               break;
+
+/* Check that the the output has not already been used. */
+            } else {
+               for( j = 0; j < i; j++ ) {
+                  if( result[ j ] == result[ i ] ) {
+                     result = astFree( result );
+                     break;
+                  }
+               }
+            }
+         }
+
+/* If the split was possible, the returned Mapping is a UnitMap. */
+         if( result ) *map = (AstMapping *) astUnitMap( nin, " ", status );
+      }
+   }
+
+/* If the returned Mapping has no outputs, do not return it. */
+   if( !result && *map ) {
+      *map = astAnnul( *map );
    }
 
 /* Free returned resources if an error has occurred. */
@@ -1877,6 +1932,50 @@ static AstPointSet *Transform( AstMapping *map, AstPointSet *in,
    return result;
 }
 
+/* Functions which access class attributes. */
+/* ---------------------------------------- */
+/*
+*att+
+*  Name:
+*     PermSplit
+
+*  Purpose:
+*     The method to use when splitting a PermMap using astMapSplit.
+
+*  Type:
+*     Protected attribute.
+
+*  Synopsis:
+*     Integer.
+
+*  Description:
+*     This attribute controls the behaviour of the implementation of the
+*     astMapSplit method provided by the PermMap class. If set to zero (the
+*     default), astMapSplit will split PermMaps according to the public
+*     documentation for the method. If set non-zero, the forward transformation
+*     of the PermMap defined by the "outperm" array will be ignored.
+*     Instead, the forward transformation is assumed to be the exact
+*     inverse of the inverse transformation. The Mapping returned will
+*     then be a UnitMap with Nin equal to the number of picked inputs,
+*     and the returned array of output indices will hold the "inperm"
+*     values for the picked inputs. Note, if any of these "inperm" values
+*     are negative (indicating that the inverse transformation supplies a
+*     constant value for the input), or if more than one of the selected
+*     inputs are fed (by the inverse transformation) by the same output,
+*     then the PermMap cannot be split.
+
+*  Applicability:
+*     PermMap
+*        All PermMaps have this attribute.
+*att-
+*/
+astMAKE_CLEAR(PermMap,PermSplit,permsplit,-INT_MAX)
+astMAKE_GET(PermMap,PermSplit,int,0,( this->permsplit != -INT_MAX ?
+                                      this->permsplit : 0 ))
+astMAKE_SET(PermMap,PermSplit,int,permsplit,( value != 0 ))
+astMAKE_TEST(PermMap,PermSplit,( this->permsplit != -INT_MAX ))
+
+
 /* Copy constructor. */
 /* ----------------- */
 static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
@@ -2067,6 +2166,14 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
    which is more useful to a human reader as it corresponds to the
    actual default attribute value.  Since "set" will be zero, these
    values are for information only and will not be read back. */
+
+/* PermSplit */
+/* --------- */
+   set = TestPermSplit( this, status );
+   ival = set ? GetPermSplit( this, status ) : astGetPermSplit( this );
+   astWriteInt( channel, "pmsplt", set, 0, ival,
+                ival ? "Use alternative astMapSplit implementation" :
+                       "Use normal astMapSplit implementation" );
 
 /* "outperm" array contents. */
 /* ------------------------- */
@@ -2678,6 +2785,8 @@ AstPermMap *astInitPermMap_( void *mem, size_t size, int init,
 
 /* Initialise the PermMap data. */
 /* ---------------------------- */
+      new->permsplit = -INT_MAX;
+
 /* Initialise the array pointers. */
       new->inperm = NULL;
       new->outperm = NULL;
@@ -2880,6 +2989,11 @@ AstPermMap *astLoadPermMap_( void *mem, size_t size,
       invert = astGetInvert( new );
       nin = !invert ? astGetNin( new ) : astGetNout( new );
       nout = !invert ? astGetNout( new ) : astGetNin( new );
+
+/* PermSplit. */
+/* ---------- */
+      new->permsplit = astReadInt( channel, "pmsplt", -INT_MAX );
+      if ( TestPermSplit( new, status ) ) SetPermSplit( new, new->permsplit, status );
 
 /* InCpy and OutCpy. */
 /* ----------------- */

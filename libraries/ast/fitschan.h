@@ -152,7 +152,9 @@
 
 #endif
 
-
+/* The EXTNAME value for FITS binary tables used to store coordinate arrays for
+   the -TAB algorithm. */
+#define AST_TABEXTNAME "WCS-TAB"
 
 /* Type Definitions. */
 /* ================= */
@@ -161,6 +163,7 @@
 /* ------------------ */
 /* This structure contains all information that is unique to each object in
    the class (e.g. its instance variables). */
+struct AstFitsChan;
 typedef struct AstFitsChan {
 
 /* Attributes inherited from the parent class. */
@@ -169,6 +172,7 @@ typedef struct AstFitsChan {
 /* Attributes specific to objects in this class. */
    int encoding;    /* System for encoding AST objects ito FITS headers */
    int defb1950;    /* Use FK4 B1950 as defaults? */
+   int tabok;       /* Support -TAB algorithm? */
    int cdmatrix;    /* Use a CD matrix in FITS-WCS Encoding? */
    int carlin;      /* Use linear CAR mappings? */
    int iwc;         /* Include an IWC Frame? */
@@ -179,17 +183,30 @@ typedef struct AstFitsChan {
    void *head;      /* Pointer to first FitsCard in the circular linked list */
    AstKeyMap *keyseq;   /* List of keyword sequence numbers used */
    AstKeyMap *keywords; /* A KeyMap holding the keywords in the FitsChan */
+   AstKeyMap *tables;   /* A KeyMap holding the binary tables in the FitsChan */
+
    const char *(* source)( void ); /* Pointer to source function */
    char *(* source_wrap)( const char *(*)( void ), int * );
                                    /* Source wrapper function pointer */
+
    void (* sink)( const char * );  /* Pointer to sink function */
    void (* sink_wrap)( void (*)( const char * ), const char *, int * );
                                    /* Sink wrapper function pointer */
+
+   void (* tabsource)( void );     /* Pointer to table source function */
+   void (* tabsource_wrap)( void (*)( void ), struct AstFitsChan *, const char *, int, int, int * );
+                                   /* Table source wrapper function pointer */
 
 } AstFitsChan;
 
 /* Virtual function table. */
 /* ----------------------- */
+/* The virtual function table makes a forward reference to the
+   AstFitsTable structure which is not defined until "fitstable.h" is
+   included (below). Hence make a preliminary definition available
+   now. */
+struct AstFitsTable;
+
 /* This table contains all information that is the same for all
    objects in the class (e.g. pointers to its virtual functions). */
 #if defined(astCLASS)            /* Protected */
@@ -202,64 +219,84 @@ typedef struct AstFitsChanVtab {
    AstClassIdentifier id;
 
 /* Properties (e.g. methods) specific to this class. */
-   void (* EmptyFits)( AstFitsChan *, int * );
-   void (* DelFits)( AstFitsChan *, int * );
-   void (* PurgeWCS)( AstFitsChan *, int * );
-   void (* RetainFits)( AstFitsChan *, int * );
+   AstKeyMap *(* GetTables)( AstFitsChan *, int * );
    int (* FindFits)( AstFitsChan *, const char *, char [81], int, int * );
-   void (* PutFits)( AstFitsChan *, const char [81], int, int * );
-   void (* PutCards)( AstFitsChan *, const char *, int * );
-   int (* KeyFields)( AstFitsChan *, const char *, int, int *, int *, int * );
    int (* FitsEof)( AstFitsChan *, int * );
+   int (* FitsGetCom)( AstFitsChan *, const char *, char **, int * );
    int (* GetFitsCF)( AstFitsChan *, const char *, double *, int * );
    int (* GetFitsCI)( AstFitsChan *, const char *, int *, int * );
+   int (* GetFitsCN)( AstFitsChan *, const char *, char **, int * );
    int (* GetFitsF)( AstFitsChan *, const char *, double *, int * );
    int (* GetFitsI)( AstFitsChan *, const char *, int *, int * );
    int (* GetFitsL)( AstFitsChan *, const char *, int *, int * );
-   int (* TestFits)( AstFitsChan *, const char *, int *, int * );
    int (* GetFitsS)( AstFitsChan *, const char *, char **, int * );
-   int (* GetFitsCN)( AstFitsChan *, const char *, char **, int * );
-   int (* FitsGetCom)( AstFitsChan *, const char *, char **, int * );
-   void (* SetFitsCom)( AstFitsChan *, const char *, const char *, int, int * );
+   int (* KeyFields)( AstFitsChan *, const char *, int, int *, int *, int * );
+   int (* TestFits)( AstFitsChan *, const char *, int *, int * );
+   void (* DelFits)( AstFitsChan *, int * );
+   void (* Empty)( AstFitsChan *, int * );
+   void (* EmptyFits)( AstFitsChan *, int * );
+   void (* PurgeWCS)( AstFitsChan *, int * );
+   void (* PutCards)( AstFitsChan *, const char *, int * );
+   void (* PutFits)( AstFitsChan *, const char [81], int, int * );
+   void (* PutTable)( AstFitsChan *, struct AstFitsTable *, const char *, int * );
+   void (* PutTables)( AstFitsChan *, AstKeyMap *, int * );
+   void (* RemoveTables)( AstFitsChan *, const char *, int * );
+   void (* RetainFits)( AstFitsChan *, int * );
    void (* SetFitsCF)( AstFitsChan *, const char *, double *, const char *, int, int * );
    void (* SetFitsCI)( AstFitsChan *, const char *, int *, const char *, int, int * );
+   void (* SetFitsCM)( AstFitsChan *, const char *, int, int * );
+   void (* SetFitsCN)( AstFitsChan *, const char *, const char *, const char *, int, int * );
+   void (* SetFitsCom)( AstFitsChan *, const char *, const char *, int, int * );
    void (* SetFitsF)( AstFitsChan *, const char *, double, const char *, int, int * );
    void (* SetFitsI)( AstFitsChan *, const char *, int, const char *, int, int * );
    void (* SetFitsL)( AstFitsChan *, const char *, int, const char *, int, int * );
-   void (* SetFitsU)( AstFitsChan *, const char *, const char *, int, int * );
    void (* SetFitsS)( AstFitsChan *, const char *, const char *, const char *, int, int * );
-   void (* SetFitsCN)( AstFitsChan *, const char *, const char *, const char *, int, int * );
-   void (* SetFitsCM)( AstFitsChan *, const char *, int, int * );
+   void (* SetFitsU)( AstFitsChan *, const char *, const char *, int, int * );
+
    int (* GetCard)( AstFitsChan *, int * );
    int (* TestCard)( AstFitsChan *, int * );
    void (* SetCard)( AstFitsChan *, int, int * );
    void (* ClearCard)( AstFitsChan *, int * );
+
    int (* GetFitsDigits)( AstFitsChan *, int * );
    int (* TestFitsDigits)( AstFitsChan *, int * );
    void (* SetFitsDigits)( AstFitsChan *, int, int * );
    void (* ClearFitsDigits)( AstFitsChan *, int * );
+
    int (* GetDefB1950)( AstFitsChan *, int * );
    int (* TestDefB1950)( AstFitsChan *, int * );
    void (* SetDefB1950)( AstFitsChan *, int, int * );
    void (* ClearDefB1950)( AstFitsChan *, int * );
+
+   int (* GetTabOK)( AstFitsChan *, int * );
+   int (* TestTabOK)( AstFitsChan *, int * );
+   void (* SetTabOK)( AstFitsChan *, int, int * );
+   void (* ClearTabOK)( AstFitsChan *, int * );
+
    int (* GetCarLin)( AstFitsChan *, int * );
    int (* TestCarLin)( AstFitsChan *, int * );
    void (* SetCarLin)( AstFitsChan *, int, int * );
    void (* ClearCarLin)( AstFitsChan *, int * );
+
    int (* GetNcard)( AstFitsChan *, int * );
+
    int (* GetEncoding)( AstFitsChan *, int * );
    int (* TestEncoding)( AstFitsChan *, int * );
    void (* SetEncoding)( AstFitsChan *, int, int * );
    void (* ClearEncoding)( AstFitsChan *, int * );
-   const char *(* GetWarnings)( AstFitsChan *, int * );
+
    const char *(* GetAllWarnings)( AstFitsChan *, int * );
+
+   const char *(* GetWarnings)( AstFitsChan *, int * );
    int (* TestWarnings)( AstFitsChan *, int * );
    void (* ClearWarnings)( AstFitsChan *, int * );
    void (* SetWarnings)( AstFitsChan *, const char *, int * );
+
    int (* GetClean)( AstFitsChan *, int * );
    int (* TestClean)( AstFitsChan *, int * );
    void (* SetClean)( AstFitsChan *, int, int * );
    void (* ClearClean)( AstFitsChan *, int * );
+
    int (* GetCDMatrix)( AstFitsChan *, int * );
    int (* TestCDMatrix)( AstFitsChan *, int * );
    void (* SetCDMatrix)( AstFitsChan *, int, int * );
@@ -269,6 +306,18 @@ typedef struct AstFitsChanVtab {
    int (* TestIwc)( AstFitsChan *, int * );
    void (* SetIwc)( AstFitsChan *, int, int * );
    void (* ClearIwc)( AstFitsChan *, int * );
+
+   void (* SetTableSource)( AstFitsChan *,
+                            void (*)( void ),
+                            void (*)( void (*)( void ),
+                                      AstFitsChan *, const char *, int,
+                                      int, int * ),
+                            int * );
+
+   void (* TableSource)( AstFitsChan *,
+                         void (*)( AstFitsChan *, const char *, int, int,
+                                   int * ),
+                         int * );
 
 } AstFitsChanVtab;
 
@@ -356,6 +405,7 @@ void astInitFitsChanGlobals_( AstFitsChanGlobals * );
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
+   AstKeyMap *astGetTables_( AstFitsChan *, int * );
    int  astFindFits_( AstFitsChan *, const char *, char [81], int, int * );
    int  astGetFitsCF_( AstFitsChan *, const char *, double *, int * );
    int  astGetFitsCI_( AstFitsChan *, const char *, int *, int * );
@@ -370,6 +420,9 @@ void astInitFitsChanGlobals_( AstFitsChanGlobals * );
    void astPurgeWCS_( AstFitsChan *, int * );
    void astPutCards_( AstFitsChan *, const char *, int * );
    void astPutFits_( AstFitsChan *, const char [81], int, int * );
+   void astPutTable_( AstFitsChan *, struct AstFitsTable *, const char *, int * );
+   void astPutTables_( AstFitsChan *, AstKeyMap *, int * );
+   void astRemoveTables_( AstFitsChan *, const char *, int * );
    void astRetainFits_( AstFitsChan *, int * );
    void astSetFitsCF_( AstFitsChan *, const char *, double *, const char *, int, int * );
    void astSetFitsCI_( AstFitsChan *, const char *, int *, const char *, int, int * );
@@ -380,6 +433,22 @@ void astInitFitsChanGlobals_( AstFitsChanGlobals * );
    void astSetFitsL_( AstFitsChan *, const char *, int, const char *, int, int * );
    void astSetFitsS_( AstFitsChan *, const char *, const char *, const char *, int, int * );
    void astSetFitsU_( AstFitsChan *, const char *, const char *, int, int * );
+
+   void astTableSource_( AstFitsChan *,
+                         void (*)( AstFitsChan *, const char *, int, int, int * ),
+                         int * );
+
+
+
+# if defined(astCLASS)  || defined(astFORTRAN77)         /* Protected or F77 interface */
+   void astSetTableSource_( AstFitsChan *,
+                            void (*)( void ),
+                            void (*)( void (*)( void ),
+                                      AstFitsChan *, const char *, int,
+                                      int, int * ),
+                            int * );
+
+#endif
 
 # if defined(astCLASS)           /* Protected */
 
@@ -398,6 +467,11 @@ void astInitFitsChanGlobals_( AstFitsChanGlobals * );
    int astTestDefB1950_( AstFitsChan *, int * );
    void astSetDefB1950_( AstFitsChan *, int, int * );
    void astClearDefB1950_( AstFitsChan *, int * );
+
+   int astGetTabOK_( AstFitsChan *, int * );
+   int astTestTabOK_( AstFitsChan *, int * );
+   void astSetTabOK_( AstFitsChan *, int, int * );
+   void astClearTabOK_( AstFitsChan *, int * );
 
    int astGetCDMatrix_( AstFitsChan *, int * );
    int astTestCDMatrix_( AstFitsChan *, int * );
@@ -481,6 +555,19 @@ astINVOKE(O,astInitFitsChan_(mem,size,init,vtab,name,source,sourcewrap,sink,sink
 astINVOKE(O,astLoadFitsChan_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
+
+/* More include files. */
+/* =================== */
+/* The interface to the FitsTable class must be included here (after the
+   type definitions for the FitsChan class) because "fitstable.h" itself
+   includes this file ("fitschan.h"), although "fitschan.h" refers to the
+   AstFitsTable structure above. This seems a little strange at first,
+   but is simply analogous to making a forward reference to a
+   structure type when recursively defining a normal C structure
+   (except that here the definitions happen to be in separate include
+   files). */
+#include "fitstable.h"
+
 /* Interfaces to public member functions. */
 /* -------------------------------------- */
 /* Here we make use of astCheckFitsChan to validate FitsChan pointers
@@ -498,6 +585,18 @@ astINVOKE(V,astDelFits_(astCheckFitsChan(this),STATUS_PTR))
 
 #define astPurgeWCS(this) \
 astINVOKE(V,astPurgeWCS_(astCheckFitsChan(this),STATUS_PTR))
+
+#define astGetTables(this) \
+astINVOKE(O,astGetTables_(astCheckFitsChan(this),STATUS_PTR))
+
+#define astPutTable(this,table,extnam) \
+astINVOKE(V,astPutTable_(astCheckFitsChan(this),astCheckFitsTable(table),extnam,STATUS_PTR))
+
+#define astPutTables(this,tables) \
+astINVOKE(V,astPutTables_(astCheckFitsChan(this),astCheckKeyMap(tables),STATUS_PTR))
+
+#define astRemoveTables(this,key) \
+astINVOKE(V,astRemoveTables_(astCheckFitsChan(this),key,STATUS_PTR))
 
 #define astRetainFits(this) \
 astINVOKE(V,astRetainFits_(astCheckFitsChan(this),STATUS_PTR))
@@ -559,6 +658,17 @@ astINVOKE(V,astGetFitsCN_(astCheckFitsChan(this),name,value,STATUS_PTR))
 #define astEmptyFits(this) \
 astINVOKE(V,astEmptyFits_(astCheckFitsChan(this),STATUS_PTR))
 
+#define astTableSource(this,tabsource) \
+astINVOKE(V,astTableSource_(astCheckFitsChan(this),tabsource,STATUS_PTR))
+
+
+#if defined(astCLASS) || defined(astFORTRAN77) /* Protected or F77 interface */
+
+#define astSetTableSource(this,tabsource,tabsource_wrap) \
+astINVOKE(V,astSetTableSource_(astCheckFitsChan(this),tabsource,tabsource_wrap,STATUS_PTR))
+
+#endif
+
 
 #if defined(astCLASS)            /* Protected */
 
@@ -591,6 +701,15 @@ astINVOKE(V,astGetDefB1950_(astCheckFitsChan(this),STATUS_PTR))
 astINVOKE(V,astSetDefB1950_(astCheckFitsChan(this),defb950,STATUS_PTR))
 #define astTestDefB1950(this) \
 astINVOKE(V,astTestDefB1950_(astCheckFitsChan(this),STATUS_PTR))
+
+#define astClearTabOK(this) \
+astINVOKE(V,astClearTabOK_(astCheckFitsChan(this),STATUS_PTR))
+#define astGetTabOK(this) \
+astINVOKE(V,astGetTabOK_(astCheckFitsChan(this),STATUS_PTR))
+#define astSetTabOK(this,tabok) \
+astINVOKE(V,astSetTabOK_(astCheckFitsChan(this),tabok,STATUS_PTR))
+#define astTestTabOK(this) \
+astINVOKE(V,astTestTabOK_(astCheckFitsChan(this),STATUS_PTR))
 
 #define astClearCDMatrix(this) \
 astINVOKE(V,astClearCDMatrix_(astCheckFitsChan(this),STATUS_PTR))

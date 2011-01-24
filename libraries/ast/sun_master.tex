@@ -16103,8 +16103,17 @@ depart from the data model which the encoding assumes.  AST knows
 about the data model used by each encoding and will attempt to
 simplify the FrameSet you provide so as to fit into that model, thus
 relieving you of the need to understand the details and limitations of
-each encoding yourself. When this attempt fails, however, you must
-consider what alternative encoding to use.
+each encoding yourself.\footnote{Storing values in the FitsChan for
+FITS headers NAXIS1, NAXIS2, {\em{etc.}} (the grid dimensions in pixels),
+before invoking
+c+
+astWrite
+c-
+f+
+AST\_WRITE
+f-
+can sometimes help to produce a successful write.} When this attempt fails,
+however, you must consider what alternative encoding to use.
 
 Ideally, you would probably want to try a sequence of alternative
 encodings, using an approach such as the following:
@@ -19298,9 +19307,14 @@ in the FrameSet) to the WCS SkyFrame includes a WcsMap.
 \item The Mapping after the WcsMap (\emph{i.e.} from native spherical to
 celestial coordinates) is a spherical rotation for the
 celestial axes, and linear for any other axes.
+tabok
+\item The TabOK attribute is set non-zero in the FitsChan, and the
+longitude and latitude axes are separable. In this case the Mapping will
+be described by a pair of 1-dimensional look-up tables, using the ``-TAB''
+algorithm described in FITS-WCS paper III.
 \end{enumerate}
 
-If any of the above conditions do not hold, the write operation will be
+If none of the above conditions hold, the write operation will be
 unsuccessful.
 
 \subsubsection{Choice of LONPOLE/LATPOLE}
@@ -19418,9 +19432,9 @@ whose meaning is defined or extended by FITS-WCS paper III.
 & \multicolumn{1}{c|}{{\bf Write}} \\ \hline
 
 \fitskey{CTYPE\emph{ia}}{All coordinate systems and projection types
-listed in paper III are supported, except for the ``-TAB''
-algorithm (the ``-LOG'' algorithm may also be applied to non-spectral linear
-axes).}{Determined by the System attribute of the
+listed in paper III are supported algorithm (the ``-LOG'' algorithm may
+also be applied to non-spectral linear axes; the ``-TAB'' algorithm
+requires the TabOK attribute to be set in the FitsChan).}{Determined by the System attribute of the
 SpecFrame and the nature of the pixel to SpecFrame
 Mapping.}
 
@@ -19503,10 +19517,16 @@ other spectral systems supported by FITS-WCS paper III.
 pixel coordinates to grism parameter) is linear, and the Mapping after the
 GrismMap is either null or represents a change of spectral system from wavelength (air or
 vacuum) to one of the supported spectral systems.
+\item The TabOK attribute is set non-zero in the FitsChan.
 \end{enumerate}
 
 If none of the above conditions hold, the write operation will be
-unsuccessful.
+unsuccessful. Note, if the FitsChan's TabOK attribute is set non-zero
+then any Mapping that does not meet any of the earlier conditions will be
+written out as a look-up table, using the ``-TAB'' algorithm described in
+FITS-WCS paper III. If the TabOK attribute is to zero (the default) in
+the FitsChan, then the write operation will be unsuccessful unless one of
+the eaerlier conditions is met.
 
 \subsubsection{Common Non-Standard Features}
 The following non-standard features are supported when reading spectral
@@ -22146,6 +22166,11 @@ occurred in the AST library between versions V5.3-2 and V5.4-0 (the
 current version):
 
 \begin{enumerate}
+
+\item the FitsChan class now has an option to support reading and writing
+of FITS-WCS headers that use the -TAB algorithm described in FITS-WCS paper
+III. This option is controlled by a new FitsChan attribute called TabOK.
+See the documentation for TabOK for more information.
 
 \item A new class called ``Table'' has been added. A Table is a KeyMap in
 which each entry represents a cell in a two-dimensional table.

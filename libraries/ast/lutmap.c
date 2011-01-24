@@ -96,6 +96,8 @@ f     The LutMap class does not define any new routines beyond those
 *     8-NOV-2007 (DSB):
 *        - Take account of the requested invert flag when comparing two
 *        neighbouring LutMaps for equality in MapMerge.
+*     19-NOV-2010 (DSB):
+*        Added (protected) astGetLutMapInfo function.
 *class--
 */
 
@@ -202,6 +204,7 @@ static void Copy( const AstObject *, AstObject *, int * );
 static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
 static int Equal( AstObject *, AstObject *, int * );
+static double *GetLutMapInfo( AstLutMap *, double *, double *, int *, int * );
 
 static const char *GetAttrib( AstObject *, const char *, int * );
 static int TestAttrib( AstObject *, const char *, int * );
@@ -583,6 +586,69 @@ static int GetLinear( AstMapping *this_mapping, int *status ) {
    return linear;
 }
 
+static double *GetLutMapInfo( AstLutMap *this, double *start, double *inc,
+                              int *nlut, int *status ){
+/*
+*  Name:
+*     GetLutMapInfo
+
+*  Purpose:
+*     Return information about a LutMap.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "permmap.h"
+*     double *astGetLutMapInfo( AstLutMap *this, double *start, double *inc,
+*                               int *nlut, int *status )
+
+*  Class Membership:
+*     LutMap method
+
+*  Description:
+*     This function returns information about the supplied LutMap.
+
+*  Parameters:
+*     this
+*        Pointer to the LutMap.
+*     start
+*        Pointer to a double in which to return the "start" value
+*        supplied when the LutMap was created.
+*     inc
+*        Pointer to a double in which to return the "inc" value
+*        supplied when the LutMap was created.
+*     nlut
+*        Pointer to a double in which to return the number of values in
+*        the LUT.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     A pointer to a dynamically allocated array holding a copy of the
+*     look-up table. This is an array of "nlut" elements, giving the
+*     output values for input values "start", "start+inc", "start+2*inc",
+*     etc. The pointer should be freed using astFree when no longer
+*     needed.
+
+*  Notes:
+*     - A value of NULL will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Check the global error status. */
+   if ( !astOK ) return NULL;
+
+/* Store the scalar values. */
+   *start = this->start;
+   *inc = this->inc;
+   *nlut = this->nlut;
+
+/* Return a copy of the look up table. */
+   return astStore( NULL, this->lut, sizeof( double )*this->nlut );
+}
+
 void astInitLutMapVtab_(  AstLutMapVtab *vtab, const char *name, int *status ) {
 /*
 *+
@@ -649,6 +715,7 @@ void astInitLutMapVtab_(  AstLutMapVtab *vtab, const char *name, int *status ) {
    vtab->GetLutInterp = GetLutInterp;
    vtab->SetLutInterp = SetLutInterp;
    vtab->TestLutInterp = TestLutInterp;
+   vtab->GetLutMapInfo = GetLutMapInfo;
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
@@ -2184,7 +2251,12 @@ AstLutMap *astLoadLutMap_( void *mem, size_t size,
    it may have been over-ridden by a derived class. However, it should
    still have the same interface. */
 
-
+double *astGetLutMapInfo_( AstLutMap *this, double *start, double *inc,
+                           int *nlut, int *status ){
+   if( !astOK ) return NULL;
+   return (**astMEMBER(this,LutMap,GetLutMapInfo))( this, start, inc, nlut,
+                                                    status );
+}
 
 
 

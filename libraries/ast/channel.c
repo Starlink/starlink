@@ -3748,6 +3748,15 @@ f     AST_WRITE = INTEGER
 c        invocation of astWrite (normally, this will be one).
 f        invocation of AST_WRITE (normally, this will be one).
 
+*  Applicability:
+*     FitsChan
+*        If the FitsChan uses a foreign encoding (e.g. FITS-WCS) rather
+*        than the native AST encoding, then storing values in the
+*        FitsChan for keywords NAXIS1, NAXIS2, etc., before invoking
+c        astWrite
+f        AST_WRITE
+*        can help to produce a successful write.
+
 *  Notes:
 *     - A value of zero will be returned if this function is invoked
 c     with the AST error status set, or if it should fail for any

@@ -16,6 +16,11 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
+- The FitsChan class now has an option to support reading and writing
+of FITS-WCS headers that use the -TAB algorithm described in FITS-WCS paper
+III. This option is controlled by a new FitsChan attribute called TabOK.
+See the documentation for TabOK for more information.
+
 - A new class called "Table" has been added. A Table is a KeyMap in
 which each entry represents a cell in a two-dimensional table.
 

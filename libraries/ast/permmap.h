@@ -169,6 +169,7 @@ typedef struct AstPermMap {
    int *inperm;                  /* Pointer to input permutation array */
    int *outperm;                 /* Pointer to output permutation array */
    double *constant;             /* Pointer to array of constant values */
+   int permsplit;                /* Method to use within MapSplit */
 } AstPermMap;
 
 /* Virtual function table. */
@@ -188,6 +189,10 @@ typedef struct AstPermMapVtab {
    double *(* GetConstants)( AstPermMap *, int * );
    int *(* GetInPerm)( AstPermMap *, int * );
    int *(* GetOutPerm)( AstPermMap *, int * );
+   void (* SetPermSplit)( AstPermMap *, int, int * );
+   void (* ClearPermSplit)( AstPermMap *, int * );
+   int (* TestPermSplit)( AstPermMap *, int * );
+   int (* GetPermSplit)( AstPermMap *, int * );
 
 } AstPermMapVtab;
 
@@ -247,6 +252,10 @@ AstPermMap *astLoadPermMap_( void *, size_t, AstPermMapVtab *,
 double *astGetConstants_( AstPermMap *, int * );
 int *astGetInPerm_( AstPermMap *, int * );
 int *astGetOutPerm_( AstPermMap *, int * );
+void astSetPermSplit_( AstPermMap *, int, int * );
+void astClearPermSplit_( AstPermMap *, int * );
+int astTestPermSplit_( AstPermMap *, int * );
+int astGetPermSplit_( AstPermMap *, int * );
 #endif
 
 /* Function interfaces. */
@@ -299,6 +308,10 @@ astINVOKE(O,astLoadPermMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_P
 #define astGetConstants(this) astINVOKE(V,astGetConstants_(astCheckPermMap(this),STATUS_PTR))
 #define astGetInPerm(this) astINVOKE(V,astGetInPerm_(astCheckPermMap(this),STATUS_PTR))
 #define astGetOutPerm(this) astINVOKE(V,astGetOutPerm_(astCheckPermMap(this),STATUS_PTR))
+#define astSetPermSplit(this,permsplit) astINVOKE(V,astSetPermSplit_(astCheckPermMap(this),permsplit,STATUS_PTR))
+#define astClearPermSplit(this) astINVOKE(V,astClearPermSplit_(astCheckPermMap(this),STATUS_PTR))
+#define astTestPermSplit(this) astINVOKE(V,astTestPermSplit_(astCheckPermMap(this),STATUS_PTR))
+#define astGetPermSplit(this) astINVOKE(V,astGetPermSplit_(astCheckPermMap(this),STATUS_PTR))
 #endif
 
 #endif
