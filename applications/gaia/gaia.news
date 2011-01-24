@@ -1,3 +1,13 @@
+    Version 4.4-2
+    =============
+
+    The USNO NOMAD catalogue has been added to the list of Skycat
+    catalogues. NOMAD is a simple merge of the Hipparcos, Tycho-2,
+    UCAC-2 and USNO-B1 catalogues.
+
+  Namaka release
+  ==============
+
     Version 4.4-1
     =============
 
