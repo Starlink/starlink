@@ -22,11 +22,12 @@
 *  Description:
 *     Takes a stack of 2d frames of bolometer data, usually noise
 *     images or responsivity images, and combines them into a single
-*     cube with, if sort is enabled, an annotated time axis.
+*     cube with, if sort is enabled, an annotated time axis or an axis
+*     based on a numeric FITS header item.
 *     This makes it easy to look at the behaviour of a single detector
 *     as it varies with time. Not all observations include time information
-*     or should be sorted by time and for those set SORT to false. The 3rd
-*     axis will not be a time axis in that case. This can be useful for
+*     or should be sorted at all and for those set SORT to false. The 3rd
+*     axis will not be a sorted axis in that case. This can be useful for
 *     examining bolometer maps created by MAKEMAP.
 
 *  ADAM Parameters:
@@ -46,6 +47,11 @@
 *          order given in IN (false). If the first file in IN has no
 *          date information sorting will be disabled automatically.
 *          Default is true if date information is available.
+*     SORTBY = _CHAR (Read)
+*          If the data are sorted (SORT=TRUE) this parameter controls
+*          which header item should be used to do the sorting. Options are
+*          MJD (the date) or the name of a numeric FITS header. MJD is not
+*          allowed if no date items are present. [MJD]
 
 *  Notes:
 *     - No special SCUBA-2 processing is applied. The assumption is simply
@@ -80,10 +86,12 @@
 *        Force "not a time series" mode since we do get some images that
 *        have a dummy third dimension but won't have JCMTSTATE.
 *        Fix dimensionality test.
+*     2011-01-25 (TIMJ):
+*        Add SORTBY option to sort by any FITS header.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2009-2010 Science and Technology Facilities Council.
+*     Copyright (C) 2009-2011 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -149,7 +157,6 @@ void smurf_stackframes( int *status ) {
   char * odatad = NULL;          /* Output data array as bytes */
   smf_qual_t * odataq = NULL;    /* Output quality array */
   char * odatav = NULL;          /* Output variance array as bytes */
-  double origin = 0.0;           /* Origin of time frame */
   smfData * outdata = NULL;      /* Output smfData */
   int outndf;                    /* Output NDF file */
   size_t outsize;                /* Size of output group */
@@ -159,6 +166,8 @@ void smurf_stackframes( int *status ) {
   size_t refndims = 0;           /* Number of dims in first image */
   char reftype[NDF__SZTYP+1];    /* reference data type */
   size_t size;                   /* Size of intput group */
+  char sortby[10];               /* Header item to sort by */
+  int sortbytime = 0;            /* Are we sorting by time? */
   smfSortInfo * sortinfo = NULL; /* For sorting */
   size_t szplane = 0;            /* Number of elements in a plane */
   size_t szplaneb = 0;           /* Number of bytes in plane */
@@ -260,23 +269,55 @@ void smurf_stackframes( int *status ) {
     }
     if (*status == SAI__OK) {
       smfSortInfo * thisitem = &(sortinfo[i-1]);
-      /* first time round we see whether there is a date in the file
-         to provide an intelligent default for SORT parameter */
+      /* We can sort on any key so we must always ask for SORT value */
       if (i==1) {
-        double thismjd;
-        smf_find_dateobs( data->hdr, &thismjd, NULL, status );
-        if (*status != SAI__OK) {
-          dosort = 0;
-          errAnnul( status );
-          msgOutif( MSG__NORM, "", "No date information available. Disabling date sorting",
-                    status);
-        } else {
-          parDef0l( "SORT", 1, status);
-          parGet0l( "SORT", &dosort, status );
+        parGet0l( "SORT", &dosort, status );
+
+        /* but if sorting is requested we set the default SORTBY to MJD
+           if we have dates */
+        if (dosort && *status == SAI__OK) {
+          double thismjd;
+          int mjdok = 0;
+          smf_find_dateobs( data->hdr, &thismjd, NULL, status );
+          if (*status != SAI__OK) {
+            mjdok = 0;
+            errAnnul( status );
+            msgOutif( MSG__NORM, "", "No date information available. Disabling date sorting option",
+                      status);
+          } else {
+            mjdok = 1;
+            parDef0c( "SORTBY", "MJD", status );
+          }
+
+          parGet0c( "SORTBY", sortby, sizeof(sortby), status );
+
+          if ( strcmp(sortby, "MJD") == 0 ) {
+            if (!mjdok) {
+              *status = SAI__ERROR;
+              errRep("", "Can not sort by MJD as no dates available in input file", status );
+            } else {
+              sortbytime = 1;
+            }
+          } else {
+          /* check the FITS header */
+            if (*status == SAI__OK) {
+              int testint;
+              smf_fits_getI( data->hdr, sortby, &testint, status );
+
+              if (*status == SMF__NOKWRD) {
+                errRep("", "Can not sort by a header item that does not exist in input file", status );
+              }
+            }
+          }
         }
       }
+
       if (dosort) {
-        smf_find_dateobs( data->hdr, &(thisitem->sortval), NULL, status );
+        if (sortbytime) {
+          smf_find_dateobs( data->hdr, &(thisitem->sortval), NULL, status );
+        } else {
+          smf_fits_getD( data->hdr, sortby, &(thisitem->sortval), status );
+        }
       } else {
         thisitem->sortval = 0.0;
       }
@@ -394,9 +435,15 @@ void smurf_stackframes( int *status ) {
        Also assume that observations are
        going to be some distance apart so use iso.0 formatting.
     */
-    timefrm = astTimeFrame ( "format=iso.0" );
-    origin = floor( times[0] );
-    astSetD( timefrm, "TimeOrigin", origin );
+    double origin = 0.0;           /* Origin of time frame */
+
+    if (sortbytime) {
+      timefrm = astTimeFrame ( "format=iso.0" );
+      origin = floor( times[0] );
+      astSetD( timefrm, "TimeOrigin", origin );
+    } else {
+      timefrm = (AstTimeFrame*)astFrame( 1, "Domain=%s,Label=%s", sortby, sortby );
+    }
     for (i = 0; i < size; i++ ) {
       times[i] = times[i] - origin;
     }

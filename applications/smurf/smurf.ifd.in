@@ -3665,6 +3665,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter sortby {
+                position 4
+                type LITERAL
+                access READ
+                vpath PROMPT
+                prompt {Sort key}
+                helpkey *
+            }
+
         }
 
         action starecalc {
