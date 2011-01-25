@@ -6,7 +6,7 @@
   <version>@PACKAGE_VERSION@</version>
   <path>libraries/shl</path>
   <description>SHL -- Support for HLP Library access</description>
-  <abstract><p>The Starlink HLP system allows an application to 
+  <abstract><p>The Starlink HLP system allows an application to
      retrieve named items from a hierarchically-arranged library
      of text.  The facility resembles VAX/VMS HELP.  It consists of a
      library plus utility programs for creating, listing and reading
