@@ -694,11 +694,11 @@ typedef struct smfArray {
 
 typedef struct smfGroup {
   Grp *grp;                  /* Copy of input Grp */
-  dim_t **subgroups;         /* Indices into Grp [ngroups][nrelated] */
+  size_t **subgroups;        /* Indices into Grp [ngroups][nrelated] */
   size_t *chunk;             /* Flag for continuous chunks in time [ngroups]*/
   dim_t *tlen;               /* Length in time slices each chunk [ngroups]*/
-  dim_t ngroups;             /* Number of subgroups */
-  dim_t nrelated;            /* Maximum number of related files */
+  size_t ngroups;            /* Number of subgroups */
+  size_t nrelated;           /* Maximum number of related files */
 } smfGroup;
 
 /* Structure containing pointers to data required for DIMM component
