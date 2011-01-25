@@ -21499,10 +21499,6 @@ static AstMapping *OtherAxes( AstFitsChan *this, AstFrameSet *fs, double *dim,
                   if( icolindex >= 0 ) SetItemC( &(store->ps), fits_i, 2, s,
                                   astColumnName( table, icolindex ), status );
 
-/* The one-based index of the axis within the coordinate array that
-   describes FITS WCS axis "fits_i". */
-                  SetItem( &(store->pv), fits_i, 3, s, 1.0, status );
-
 /* The interpolation method (an AST extension to the published -TAB
    algorithm, communicated through the QVi_4a keyword). */
                   SetItem( &(store->pv), fits_i, 4, s, interp, status );
@@ -26104,10 +26100,6 @@ static AstMapping *SpectralAxes( AstFitsChan *this, AstFrameSet *fs,
 /* Next the name of the column containing the index array */
                   if( icolindex >= 0 ) SetItemC( &(store->ps), fits_i, 2, s,
                                   astColumnName( table, icolindex ), status );
-
-/* The one-based index of the axis within the coordinate array that
-   describes FITS WCS axis "fits_i". */
-                  SetItem( &(store->pv), fits_i, 3, s, 1.0, status );
 
 /* The interpolation method (an AST extension to the published -TAB
    algorithm, communicated through the QVi_4a keyword). */
@@ -32154,10 +32146,12 @@ static int WcsFromStore( AstFitsChan *this, FitsStore *store,
    clashing with any standard use of PV1_4a, rename it to QVi_4a. The
    default is zero (linear interpolation) so do not write the QV value
    if it zero. */
-               if( m == 4 && tabaxis[ i ] && val != 0.0 ) {
-                  SetValue( this, FormatKey( "QV", i + 1, m, s, status ), &val,
-                            AST__FLOAT, "Use nearest neighbour interpolation",
-                            status );
+               if( m == 4 && tabaxis[ i ] ) {
+                  if( val != 0.0 ) {
+                     SetValue( this, FormatKey( "QV", i + 1, m, s, status ),
+                               &val, AST__FLOAT, "Use nearest neighbour "
+                               "interpolation", status );
+                  }
 
 /* Just store the parameters for other type of axes. */
                } else {
