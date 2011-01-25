@@ -146,6 +146,9 @@
  *        Simulated RTS does not have the same precision as the real RTS
  *        so we have to be careful when using rts_end for multiple
  *        subarrays.
+ *     2011-01-24 (TIMJ):
+ *        Rewrite to use an AST KeyMap to determine related files. Has the
+ *        side effect of sorting the chunks into date order.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -209,101 +212,47 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
                       dim_t *pad, int *status ) {
 
   /* Local variables */
-  dim_t *all_tlen = NULL;     /* Lengths of each chunk */
-  size_t allOK = 1;           /* Flag to determine whether to continue */
   size_t *chunk=NULL;         /* Array of flags for continuous chunks */
-  dim_t chunkend;             /* Index to end of chunk */
-  dim_t chunkstart;           /* Index to start of chunk */
+  dim_t * chunklen = NULL;    /* Length of continuous chunk */
+  size_t currentindex = 0;    /* Counter */
   smfData *data = NULL;       /* Current smfData */
-  smfData *data2 = NULL;      /* Second smfData */
-  double *ends = NULL;        /* Array of ending RTS_END values */
-  int frame;                  /* Variable to store either first or last frame*/
+  AstKeyMap * grouped = NULL; /* Primary AstKeyMap for grouping */
   smfHead *hdr=NULL;          /* Header for current file */
-  smfHead *hdr2=NULL;         /* Second header */
   size_t i;                   /* Loop counter for index into Grp */
   int isFFT=0;                /* Set if data are 4d FFT */
-  dim_t isub;                 /* loop counter over subgroup */
-  dim_t *indices = NULL;      /* Array of indices to be stored in subgroup */
   size_t j;                   /* Loop counter */
-  size_t k = 0;               /* Incremental counter for subgroup indices */
   int *keepchunk=NULL;        /* Flag for chunks that will be kept */
-  double *lambda = NULL;      /* Wavelength - only used if grpbywave is true */
-  int matchsubsys;            /* Flag for matched subarrays */
   dim_t maxconcat=0;          /* Longest continuous chunk length */
-  dim_t maxlends=0;           /* Maxlen after applying downsampling factor */
   dim_t maxflen=0;            /* Max file length in time steps */
-  dim_t maxnelem=0;           /* Max elem (subarrays) encountered */
   dim_t maxpad=0;             /* Maximum padding neeed for any input file */
-  dim_t *nbolx = NULL;        /* Number of bolometers in X direction */
-  dim_t *nboly = NULL;        /* Number of bolometers in Y direction */
-  dim_t nelem;                /* Number of elements in index array */
+  size_t maxrelated = 0;     /* Keep track of max number of related items */
   size_t *new_chunk=NULL;     /* chunks associated with new_subgroups */
-  dim_t new_ngroups=0;        /* counter for new_subgroups */
+  size_t new_ngroups=0;       /* counter for new_subgroups */
   dim_t *new_tlen=NULL;       /* tlens for new_subgroup */
-  dim_t **new_subgroups=NULL; /* subgroups that are long enough */
   size_t ngroups = 0;         /* Counter for subgroups to be stored */
-  dim_t nx;                   /* (data->dims)[0] */
-  dim_t ny;                   /* (data->dims)[1] */
-  double obslam;              /* Observed wavelength from FITS header (m) */
-  double opentime;            /* RTS_END value at beginning of written data */
-  dim_t thispad;              /* Padding neeed for current input file */
-  int refnsubscan;            /* reference subscan file counter */
-  char refobsidss[SZFITSCARD];/* reference obsidss */
-  int refseqcount;            /* reference sequence counter */
-  sc2ast_subarray_t *refsubsys=NULL;/* Array of template subarrays */
-  int seqcount;               /* Sequence counter */
-  int nsubscan;               /* subscan file counter */
-  double *starts = NULL;      /* Array of starting RTS_END values */
-  double steptime = 0;        /* Length of a sample */
-  dim_t **subgroups = NULL;   /* Array containing index arrays to parent Grp */
-  sc2ast_subarray_t subsysnum;/* Subsystem numeric id. 0 - 8 */
-  size_t thischunk;           /* Current chunk that we're on */
-  dim_t thistlen;             /* Length of current time chunk */
-  dim_t thistlenr;            /* Length of current time chunk, no downsample */
-  dim_t thisnelem;            /* Number of elements (subarrays) at this chunk*/
-  dim_t totlen;               /* Total length of continuous time chunk */
-  double writetime;           /* RTS_END value at end of written data */
+  size_t nkeep = 0;           /* Number of chunks to keep */
+  dim_t * piecelen = NULL;   /* Length of single file */
+  size_t **subgroups = NULL;  /* Array containing index arrays to parent Grp */
+
+
+
+
 
   if ( *status != SAI__OK ) return;
 
-  /* Allocate space for groups array - can't be any bigger than
-     grpsize so use that. Initialize everything to NULL */
-  subgroups = astCalloc( grpsize, sizeof(*subgroups), 1 );
-  starts = astCalloc( grpsize, sizeof(*starts), 1 );
-  ends = astCalloc( grpsize, sizeof(*ends), 1 );
-  nbolx = astCalloc( grpsize, sizeof(*nbolx), 1 );
-  nboly = astCalloc( grpsize, sizeof(*nboly), 1 );
-  chunk = astCalloc( grpsize, sizeof(*chunk), 1 );
-  new_subgroups = astCalloc( grpsize, sizeof(*new_subgroups), 1 );
-  new_chunk = astCalloc( grpsize, sizeof(*new_chunk) , 1 );
-  new_tlen = astCalloc( grpsize, sizeof(*new_tlen) , 1 );
-
-  if ( *status != SAI__OK ) goto CLEANUP;
-
-  /* Do we want to group by wavelength? */
-  if ( grpbywave == 1 ) {
-    /* If yes, then we only need to allocate space for 4 elements */
-    nelem = SMF__MXSMF;
-    /* And define the wavelength array */
-    lambda = astCalloc( grpsize, sizeof(*lambda), 1 );
-  } else {
-    /* OK we might have data from up to 8 subarrays so allocate
-       twice as much space */
-    nelem = 2*SMF__MXSMF;
-  }
-
   /* Loop over files in input Grp: remember Grps are indexed from 1 */
+  grouped = astKeyMap( "SortBy=KeyUp" );
   for (i=1; i<=grpsize; i++) {
-    double timeprec = 0.0; /* Time precision */
+    char newkey[128];
+    char dateobs[81];
+    char subarray[10];
+    size_t nrelated = 0;
+    AstKeyMap * filemap = NULL;
+    AstKeyMap * indexmap = NULL;
 
-    /* First step: open file and read start/end RTS_END values */
+    /* First step: open file and harvest metadata */
     smf_open_file( igrp, i, "READ", SMF__NOCREATE_DATA, &data, status );
-
-    if( !data->hdr ) {
-      *status = SAI__ERROR;
-      errRep( "", FUNC_NAME ": data do not have a header, cannot continue.",
-              status );
-    }
+    if (*status != SAI__OK) break;
 
     if( i==1 ) {
       isFFT = smf_isfft( data, NULL, NULL, NULL, status );
@@ -312,426 +261,311 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
       errRep( "", FUNC_NAME
               ": mixture of time-series and FFT data encountered!",
               status );
+      break;
     }
 
-    if (*status != SAI__OK) goto CLEANUP;
+    /* Want to form a key that will be unique for a particular subscan
+       We know that DATE-OBS will be set for SCUBA-2 files and be the same
+       for a single set. Prefix by wavelength if we are grouping by wavelength.
+     */
+    newkey[0] = '\0';
 
-    /* Get dimensions */
-    smf_get_dims( data, &ny, &nx, NULL, &thistlenr, NULL, NULL, NULL, status );
-
-    /* Set header for first time slice */
-    frame = 0;
-    smf_tslice_ast( data, frame, 0, status );
-    if ( *status != SAI__OK ) {
-      errRep(FUNC_NAME, "Unable to retrieve first timeslice", status);
-      goto CLEANUP;
+    if (grpbywave) {
+      char cwave[10];
+      smf_fits_getS( data->hdr, "WAVELEN", cwave, sizeof(cwave), status);
+      one_strlcat( newkey, cwave, sizeof(newkey), status );
+      one_strlcat( newkey, "_", sizeof(newkey), status );
     }
-    hdr = data->hdr;
-    opentime = hdr->state->rts_end;
+    smf_fits_getS( data->hdr, "DATE-OBS", dateobs, sizeof(dateobs), status );
+    one_strlcat( newkey, dateobs, sizeof(newkey), status );
 
-    /* Accuracy for time determination is 1/10th of a step */
-    timeprec = hdr->steptime / ( 10 * SPD );
-
-    /* Set header for last time slice */
-    frame = thistlenr - 1;
-    smf_tslice_ast( data, frame, 0, status );
-    if ( *status != SAI__OK ) {
-      errRep(FUNC_NAME, "Unable to retrieve final timeslice", status);
-      goto CLEANUP;
+    /* Include the dimenionality of the time series in the primary key
+       so that we do not end up doing something confusing like relating
+       a truncated file with a full length file */
+    if (*status == SAI__OK) {
+      dim_t dims[3];
+      char formatted[32];
+      smf_get_dims( data, &dims[0], &dims[1], NULL, &dims[2], NULL, NULL, NULL,
+                    status );
+      sprintf(formatted, "_%" DIM_T_FMT "_%" DIM_T_FMT "_%" DIM_T_FMT, dims[0], dims[1], dims[2]);
+      one_strlcat( newkey, formatted, sizeof(newkey), status );
     }
-    writetime = hdr->state->rts_end;
-    /* Retrieve wavelength if necessary */
-    if ( grpbywave ) {
-      smf_fits_getD(hdr, "WAVELEN", &obslam, status );
-    }
-    if ( *status != SAI__OK ) goto CLEANUP;
 
-    /* Now to check if it's a related file... */
-    for ( j=0; j<grpsize; j++ ) {
+    /* May want to read the dimensionality of the file outside of loop
+       so that we can compare values when storing in the keymap */
 
-      /* Does the subgroup exist? */
-      if ( subgroups[j] != 0 ) {
-        /* If yes, are we grouping by wavelength? */
-        if ( grpbywave ) {
-          if ( obslam != lambda[j] ) {
-            allOK = 0;
-          }
+    /* Now we want to create a keymap based on this key */
+    if (!astMapGet0A( grouped, newkey, &filemap ) ) {
+      int itemp = 0;
+      double steptime = data->hdr->steptime;
+      dim_t ntslice = 0;
+      dim_t maxscaled = 0;
+      dim_t thispad;              /* Padding neeed for current input file */
+
+      filemap = astKeyMap( " " );
+      astMapPut0A( grouped, newkey, filemap, NULL );
+
+      /* Fill up filemap with general information on this file */
+      smf_find_seqcount( data->hdr, &itemp, status );
+      astMapPut0I( filemap, "SEQCOUNT", itemp, NULL );
+
+      smf_fits_getI( data->hdr, "NSUBSCAN", &itemp, status );
+      astMapPut0I( filemap, "NSUBSCAN", itemp, NULL );
+
+      /* Number of time slices */
+      smf_get_dims( data, NULL, NULL, NULL, &ntslice, NULL, NULL, NULL,
+                    status );
+
+      /* Check that an individual file is too long (we assume related
+         files are all the same) */
+      if( maxlen && (ntslice > maxlen) && *status == SAI__OK) {
+        *status = SAI__ERROR;
+        msgSeti("NTSLICE",ntslice);
+        msgSeti("MAXLEN",maxlen);
+        smf_smfFile_msg( data->file, "FILE", 1, "", status );
+        errRep(FUNC_NAME,
+               "Length of file ^FILE time steps exceeds maximum "
+               "(^NTSLICE>^MAXLEN)", status);
+      }
+
+      /* Step time might be down-sampled */
+      /* Assume there is no downsampling to beging with */
+      maxscaled = maxlen;
+
+      /* Find length of down-sampled data and steptime */
+      if( downsampscale && data->hdr && (*status==SAI__OK) ) {
+        double oldscale = steptime * data->hdr->scanvel;
+        double scalelen = oldscale / downsampscale;
+
+        /* only down-sample if it will be at least a factor of 20% */
+        if( scalelen <= 0.8 ) {
+          msgOutiff( MSG__VERB, "", FUNC_NAME
+                     ": will down-sample from %5.1lf Hz to %5.1lf Hz", status,
+                     (1./steptime),
+                     (scalelen/steptime) );
+
+          ntslice = round(ntslice * scalelen);
+
+          /* update maxscaled */
+          maxscaled = round(maxlen * scalelen);
+
+          /* update steptime to include down-sample factor */
+          steptime = hdr->steptime / scalelen;
         }
-        if ( allOK ) {
-          /* Then check if the RTS_END values match */
-          indices = subgroups[j];
-          if ( fabs(opentime - starts[j]) < timeprec &&
-               fabs(writetime - ends[j]) < timeprec ) {
-            if ( nx == nbolx[j] && ny == nboly[j]) {
-              /* Store in first available slot in current subgroup.
-                 No point starting at 0 because it WILL be occupied if
-                 we've reached this point */
-              for ( k=1; k<nelem; k++) {
-                if (indices[k] == 0) {
-                  indices[k] = i;
-                  goto CLOSE;
-                }
-              }
-            } else {
-              msgOutif(MSG__VERB," ",
-                       "Start and end times match but data arrays are of "
-                       "different size", status);
-            }
-          }
-        } /* Close if allOK */
+      }
+
+      /* Scaled values of steptime, ntslice and maximum length */
+      astMapPut0D( filemap, "STEPTIME", steptime, NULL );
+      astMapPut0I( filemap, "NTSLICE", ntslice, NULL );
+      astMapPut0I( filemap, "MAXLEN", maxscaled, NULL );
+
+      /* Work out the padding needed for this file using the recalculated
+         steptime */
+      if( keymap ) {
+        thispad = smf_get_padding( keymap, steptime, 0, data->hdr, status );
+        if( thispad > maxpad ) maxpad = thispad;
       } else {
-        /* If not, there's nothing to match so create it and add the
-           current index */
-        indices = astCalloc( nelem, sizeof(*indices), 1 );
-        /* Initialize the pointers to NULL */
-        if ( *status != SAI__OK ) {
-          errRep(FUNC_NAME, "Unable to allocate memory to store index array",
-                 status);
-          goto CLEANUP;
-        }
-        indices[0] = i;
-        subgroups[j] = indices;
-        /* Add new open/end times to arrays */
-        starts[j] = opentime;
-        ends[j] = writetime;
-        nbolx[j] = nx;
-        nboly[j] = ny;
-        if ( grpbywave ) {
-          lambda[j] = obslam;
-        }
-        ngroups++;
-        goto CLOSE;
+        thispad = 0;
+      }
+      astMapPut0I( filemap, "PADDING", thispad, NULL );
+
+      /* Update maxflen */
+      if( ntslice > maxflen ) {
+        maxflen = ntslice;
+      }
+
+      /* Store OBSID or OBSIDSS depending on whether we are grouping by wavelength */
+      if (grpbywave) {
+        astMapPut0C( filemap, "OBSID", data->hdr->obsidss, NULL );
+      } else {
+        char obsid[81];
+        smf_getobsidss( data->hdr->fitshdr, obsid, sizeof(obsid), NULL, 0, status );
+        astMapPut0C( filemap, "OBSID", obsid, NULL );
       }
     }
-  CLOSE:
+
+    /* Store the file index in another keymap indexed by subarray */
+    if ( !astMapGet0A( filemap, "GRPINDICES", &indexmap ) ) {
+      indexmap = astKeyMap( "SortBy=KeyUp" );
+      astMapPut0A( filemap, "GRPINDICES", indexmap, NULL );
+    }
+    smf_find_subarray( data->hdr, subarray, sizeof(subarray), NULL, status );
+    astMapPut0I( indexmap, subarray, i, NULL );
+
+    /* Need to track the largest number of related subarrays in a single slot */
+    nrelated = astMapSize( indexmap );
+    if (nrelated > maxrelated) maxrelated = nrelated;
+
+    /* Free resources */
+    filemap = astAnnul( filemap );
+    indexmap = astAnnul( indexmap );
     smf_close_file( &data, status );
   }
-  /* Sanity check - make sure that the number of groups is less than
-     the grpsize */
-  if ( ngroups > grpsize ) {
-    if ( *status == SAI__OK) {
-      *status = SAI__ERROR;
-      msgSeti("G",grpsize);
-      msgSeti("S",ngroups);
-      errRep(FUNC_NAME,
-             "Number of subgroups, ^S, exceeds grpsize, ^G. Possible "
-             "programming error", status);
-    }
-  }
 
-  /* At this stage assume the subgroups are time-sorted, and that each
-     file within the group is itself continuous. Also assume that the
-     subarrays are sorted (second index of subgroups). Check the last
-     sample of each file with the first sample of the next to set up
-     continuous chunk flags. Also check that all of the same subarrays
-     are present in subsequent chunks flagged "continuous". */
+  /* We now know how many groups there are */
+  ngroups = astMapSize( grouped );
 
-  refsubsys = astCalloc( nelem, sizeof(*refsubsys), 0 );
-  all_tlen = astCalloc( grpsize, sizeof(*all_tlen), 1 );
+  /* Sort out chunking. The items are sorted by date and then by wavelength.
+     We define a continuous chunk if it has the same OBSID, the same SEQCOUNT
+     and NSUBSCAN increments by one from the previous entry.
 
-  thistlen = 0;
-  totlen = 0;
-  thischunk = 0;
-  maxconcat = 0;
-  refseqcount=0;
-  refnsubscan=0;
-  refobsidss[0] = '\0';
+     Also count number of related items in each slot.
+   */
+  if (*status == SAI__OK) {
+    typedef struct { /* somewhere to store the values easily */
+      char obsid[81];
+      char related[81];  /* for concatenated subarrays */
+      int nsubscan;
+      int seqcount;
+    } smfCompareSeq;
+    smfCompareSeq current;
+    smfCompareSeq previous;
+    dim_t totlen = 0;
+    size_t thischunk;
 
-  for( i=0; (i<ngroups)&&(*status==SAI__OK); i++ ) {
+    /* Get the chunk flags and also store the size of the chunk */
+    chunk = astCalloc( ngroups, sizeof(*chunk), 1 );
+    chunklen = astCalloc( ngroups, sizeof(*chunklen), 1 );
+    piecelen = astCalloc( ngroups, sizeof(*piecelen), 1 );
 
-    /* Open header of the first file at each time */
-    smf_open_file( igrp, subgroups[i][0], "READ", SMF__NOCREATE_DATA, &data,
-                   status );
+    thischunk = 0;  /* The current chunk */
+    for (i=0; i<ngroups; i++) {
+      AstKeyMap * thismap = NULL;
+      AstKeyMap * grpindices = NULL;
+      const char * tempstr = NULL;
+      int thistlen = 0;
+      int thismax = 0;
+      size_t nsubarrays = 0;
 
-    /* Length of chunk */
-    smf_get_dims( data, NULL, NULL, NULL, &thistlenr, NULL, NULL, NULL,
-                  status );
+      /* Get the keymap entry for this slot */
+      astMapGet0A( grouped, astMapKey(grouped, i), &thismap );
 
-    if( isFFT ) {
-      /* **********************************************************************
-         Are we working with FFTs? If so, no concatenation or downsampling
-         will happen. Each file is indicated as a new chunk.
-         **********************************************************************/
+      /* Get info for length limits */
+      astMapGet0I( thismap, "NTSLICE", &thistlen );
+      astMapGet0I( thismap, "MAXLEN", &thismax );
+      piecelen[i] = thistlen;
 
-      chunk[i] = i;
-      all_tlen[i] = thistlenr;
-
-    } else {
-      /* **********************************************************************
-         Otherwise proceed with continuity checks etc.
-         **********************************************************************/
-
-      /* Read the SEQCOUNT and NSUBSCAN header values */
-      if( *status == SAI__OK ) {
-        hdr = data->hdr;
-
-        if( hdr ) {
-          steptime = hdr->steptime;
-        }
-      }
-      smf_find_seqcount( hdr, &seqcount, status );
-      smf_fits_getI( hdr, "NSUBSCAN", &nsubscan, status );
-
-      if( *status == SAI__OK ) {
-
-        thistlen = thistlenr;
-
-        /* Assume there is no downsampling to beging with */
-        maxlends = maxlen;
-
-        /* Find length of down-sampled data */
-        if( downsampscale && hdr && (*status==SAI__OK) ) {
-          double oldscale = (hdr->steptime * hdr->scanvel);
-          double scalelen = oldscale / downsampscale;
-
-          /* only down-sample if it will be at least a factor of 20% */
-          if( scalelen <= 0.8 ) {
-            msgOutiff( MSG__VERB, "", FUNC_NAME
-                       ": will down-sample from %5.1lf Hz to %5.1lf Hz", status,
-                       (1./hdr->steptime),
-                       (scalelen/hdr->steptime) );
-
-            thistlen = round(thistlen * scalelen);
-
-            /* update maxlends */
-            maxlends = round(maxlen * scalelen);
-
-            /* update steptime to include down-sample factor */
-            steptime = hdr->steptime / scalelen;
-          }
-        }
-
-        /* Store length (including downsampling) to check chunk lengths later */
-        all_tlen[i] = thistlen;
-
-        /* Check that an individual file is too long */
-        if( maxlends && (thistlen > maxlends) ) {
-          *status = SAI__ERROR;
-          msgSeti("THISTLEN",thistlen);
-          msgSeti("MAXLENDS",maxlends);
-          errRep(FUNC_NAME,
-                 "Length of file time steps exceeds maximum "
-                 "(^THISTLEN>^MAXLENDS)", status);
-        }
-
-        /* Get the padding to filter this data, and find the maximum
-           padding needed by any of the input files. We do it here to
-           catch steptime after it has been potentially modified by a
-           downsampling factor. */
-        if( keymap ) {
-          thispad = smf_get_padding( keymap, steptime, 0, data->hdr, status );
-          if( thispad > maxpad ) maxpad = thispad;
-        } else {
-          thispad = 0;
-        }
-
-        /* Add length to running total */
-        totlen += thistlen;
-
-        /* Update maxflen */
-        if( thistlen > maxflen ) {
-          maxflen = thistlen;
-        }
-
-        /* Update maxconcat */
-        if( totlen > maxconcat ) {
-          maxconcat = totlen;
-        }
+      if (isFFT) {
+        /* Never concatenate FFT data */
+        thismap = astAnnul(thismap);
+        chunk[i] = i;
+        chunklen[i] = thistlen;
+        continue;
       }
 
-      /* Set header to first time slice and obtain RTS_END */
-      frame = 0;
-      smf_tslice_ast( data, frame, 0, status );
+      /* Get indices information and retrieve the sub-instrument names
+         in sort order to concatenate for comparison. We only store in
+         a continuous chunk if we have the same subarrays for the whole
+         chunk. */
+      astMapGet0A( thismap, "GRPINDICES", &grpindices );
+      nsubarrays = astMapSize( grpindices );
+      (current.related)[0] = '\0';
+      for (j = 0; j < nsubarrays; j++ ) {
+        one_strlcat( current.related, astMapKey(grpindices, j), sizeof(current.related), status );
+      }
+      grpindices = astAnnul( grpindices );
 
-      if( *status == SAI__OK ) {
-        if( i > 0 ) {
-          /* check that we have the same subarrays */
-          matchsubsys = 1;
+      /* Fill in the current struct */
+      astMapGet0I( thismap, "SEQCOUNT", &(current.seqcount) );
+      astMapGet0I( thismap, "NSUBSCAN", &(current.nsubscan) );
+      astMapGet0C( thismap, "OBSID", &tempstr );
+      one_strlcpy( current.obsid, tempstr, sizeof(current.obsid), status );
 
-          for( j=0; j<nelem; j++ ) {
-            if( subgroups[i][j] > 0 ) {
-              /* Increment subarray counter */
-              thisnelem++;
-
-              if( j==0 ) {
-                /* Look at header of file that is already opened */
-                smf_find_subarray( hdr, NULL, 0, &subsysnum, status );
-              } else {
-                /* Otherwise open header in new file */
-                smf_open_file( igrp, subgroups[i][j], "READ",
-                               SMF__NOCREATE_DATA, &data2, status );
-                if( *status == SAI__OK ) {
-                  hdr2 = data2->hdr;
-                  smf_find_subarray( hdr2, NULL, 0, &subsysnum, status );
-                }
-              }
-
-              /* Close the new file that we've opened */
-              if( j>0 ) {
-                smf_close_file( &data2, status );
-              }
-            } else {
-              /* Flag this subsystem spot as empty */
-              subsysnum = -1;
-            }
-
-            if( subsysnum != refsubsys[j] ) {
-              matchsubsys = 0;
-            }
-          }
-
-          /* check against writetime from the last file to see if we're on the
-             same chunk. Also check that the subsystems match, and that the
-             continuous chunk doesn't exceed maxlends */
-
-          if( !( !strncmp(refobsidss, hdr->obsidss, sizeof(refobsidss)) &&
-                 (seqcount==refseqcount) && ((nsubscan-refnsubscan)==1) ) ||
-              !matchsubsys || (maxlends && (totlen > maxlends)) ) {
-
-            /* Found a discontinuity */
+      /* First chunk is special, else compare */
+      if (i == 0) {
+        totlen = thistlen;
+      } else {
+        if (  ( current.seqcount == previous.seqcount  ) &&
+              ( current.nsubscan - previous.nsubscan == 1 ) &&
+              ( strcmp( current.obsid, previous.obsid ) == 0 ) &&
+              ( strcmp( current.related, previous.related ) == 0 ) ) {
+          /* continuous - check length */
+          totlen += thistlen;
+          if ( thismax && totlen > (dim_t)thismax ) {
             thischunk++;
-
-            /* Since this piece puts us over the limit, it is now the initial
-               total length for the next chunk. */
-            totlen = thistlen;
+            totlen = thistlen; /* reset length */
+          } else {
+            /* Continuous */
           }
+        } else {
+          /* discontinuity */
+          thischunk++;
+          totlen = thistlen;  /* Update length of current chunk */
         }
-
-        /* update refobsidss, refseqcount, refnsubscan */
-        one_strlcpy( refobsidss, hdr->obsidss, sizeof(refobsidss), status );
-        refseqcount = seqcount;
-        refnsubscan = nsubscan;
       }
 
-      /* Obtain the last RTS_END from this file */
-      if( *status == SAI__OK ) {
-        frame = thistlenr - 1;
-      }
+      chunklen[thischunk] = totlen;
+      chunk[i] = thischunk;
+      memcpy( &previous, &current, sizeof(current) );
 
-      smf_tslice_ast( data, frame, 0, status );
-
-      if( *status == SAI__OK ) {
-        /* Populate the reference subsystem array */
-        for( j=0; j<nelem; j++ ) {
-          if( subgroups[i][j] > 0 ) {
-            if( j==0 ) {
-              /* Look at header of file that is already opened */
-              smf_find_subarray( hdr, NULL, 0, &subsysnum, status );
-            } else {
-              /* Otherwise open header in new file */
-              smf_open_file( igrp, subgroups[i][j], "READ", SMF__NOCREATE_DATA,
-                             &data2, status );
-              if (*status == SAI__OK) {
-                hdr2 = data2->hdr;
-                smf_find_subarray( hdr2, NULL, 0, &subsysnum, status );
-              }
-            }
-            if( *status == SAI__OK ) {
-              refsubsys[j] = subsysnum;
-            }
-            /* Close the new file that we've opened */
-            if( j>0 ) {
-              smf_close_file( &data2, status );
-            }
-          } else if( *status == SAI__OK ) {
-            /* Flag this subsystem slot as empty */
-            refsubsys[j] = -1;
-          }
-        }
-
-        /* Store thischunk in chunk */
-        chunk[i] = thischunk;
-      }
+      thismap = astAnnul( thismap );
     }
-
-    /* Close file */
-    smf_close_file( &data, status );
-
   }
 
-  /* Now that the continuous chunks are flagged, check for any chunk that
-     is shorter than SMF__MINCHUNKSAMP in length (time) and remove it */
-
+  /* Decide if we are keeping a chunk by looking at the length. */
+  maxconcat = 0;
+  nkeep = 0;
   keepchunk = astCalloc( ngroups, sizeof(*keepchunk), 0 );
+  for (i=0; i<ngroups; i++) {
+    size_t thischunk;
 
-  if( *status == SAI__OK ) {
-
-    for( i=0; i<ngroups; i++ ) {
+    thischunk = chunk[i];
+    if ( chunklen[thischunk] < SMF__MINCHUNKSAMP ) {
+      /* Warning message */
+      msgSeti("LEN",chunklen[thischunk]);
+      msgSeti("MIN",SMF__MINCHUNKSAMP);
+      msgOut( " ", "SMF_GRP_RELATED: ignoring short chunk (^LEN<^MIN)",
+              status);
+      keepchunk[i] = 0;
+    } else {
       keepchunk[i] = 1;
+      if (maxconcat < chunklen[thischunk]) maxconcat = chunklen[thischunk];
+      nkeep++;
     }
 
-    totlen = all_tlen[0];
-    chunkstart = 0;
-
-    for( i=1; i<=ngroups; i++ ) {
-
-      /* Chunk finished? */
-      if( (i==ngroups) || (chunk[i] != chunk[i-1]) ) {
-
-        chunkend = i-1;
-
-        /* Flag the pieces of last chunk as bad if it was too short */
-        if( totlen < SMF__MINCHUNKSAMP ) {
-          for( j=chunkstart; j<=chunkend; j++ ) {
-            keepchunk[j] = 0;
-          }
-
-          /* Warning message */
-          msgSeti("LEN",totlen);
-          msgSeti("MIN",SMF__MINCHUNKSAMP);
-          msgOut( " ", "SMF_GRP_RELATED: ignoring short chunk (^LEN<^MIN)",
-                  status);
-        }
-
-        /* Re-set the chunk start/length */
-        chunkstart = i;
-        totlen = 0;
-      }
-
-      /* Add to the length of the current chunk if we're not at the end */
-      if( i<ngroups ) totlen += all_tlen[i];
-    }
-
-    /* Determine max subarrays */
-
-    maxnelem = 0;
-    if( *status == SAI__OK ) for( i=0; i<ngroups; i++ ) {
-      thisnelem = 0;
-
-      for( j=0; j<nelem; j++ ) {
-        if( subgroups[i][j] > 0 ) {
-          /* Increment subarray counter */
-          thisnelem++;
-        }
-      }
-
-      /* update maxnelem based on this chunk */
-      if( thisnelem > maxnelem ) {
-        maxnelem = thisnelem;
-      }
-    }
-
-    /* Create the new subgroups array from the chunks that we're keeping */
-    new_ngroups=0;
-
-    for( i=0; i<ngroups; i++ ) {
-      if( keepchunk[i] ) {
-        indices = astCalloc( maxnelem, sizeof(*indices), 1 );
-        if( *status == SAI__OK ) {
-          memcpy( indices, subgroups[i], maxnelem*sizeof(*indices) );
-          new_subgroups[new_ngroups] = indices;
-          new_chunk[new_ngroups] = chunk[i];
-          new_tlen[new_ngroups] = all_tlen[i];
-          new_ngroups++;
-        }
-      }
-    }
   }
 
+  /* Allocate a subgroup array of the right size and fill it. They keymap
+     is sorted by date (and wavelength) so we can always index into it by using
+     indices from the subgroup. */
+  subgroups = astCalloc( nkeep, sizeof(*subgroups), 1 );
+  new_chunk = astCalloc( nkeep, sizeof(*new_chunk), 1 );
+  new_tlen  = astCalloc( nkeep, sizeof(*new_tlen), 1 );
+
+  currentindex = 0;
+  for (i=0;i<ngroups;i++) {
+    AstKeyMap * thismap = NULL;
+    AstKeyMap * grpindices = NULL;
+    size_t nsubarrays = 0;
+    size_t *indices = astCalloc( maxrelated, sizeof(*indices), 1 );
+
+    /* skip if we are dropping this chunk */
+    if (!keepchunk[i]) continue;
+
+    /* Get the keymap entry for this slot */
+    astMapGet0A( grouped, astMapKey(grouped, i), &thismap );
+
+    /* Get the indices keymap */
+    astMapGet0A( thismap, "GRPINDICES", &grpindices );
+    nsubarrays = astMapSize( grpindices );
+    for (j=0; j<nsubarrays; j++) {
+      int myindex;
+      astMapGet0I( grpindices, astMapKey(grpindices, j), &myindex );
+      indices[j] = myindex;
+    }
+    grpindices = astAnnul( grpindices );
+    thismap = astAnnul( thismap );
+
+    subgroups[currentindex] = indices;
+    new_chunk[currentindex] = chunk[i];
+    new_tlen[currentindex]  = piecelen[i];
+    currentindex++;
+
+  }
 
   /* Create the smfGroup */
-  *group = smf_construct_smfGroup( igrp, new_subgroups, new_chunk, new_tlen,
-                                   new_ngroups, maxnelem, 0, status );
+  *group = smf_construct_smfGroup( igrp, subgroups, new_chunk, new_tlen,
+                                   nkeep, maxrelated, 0, status );
 
   /* Return maxfilelen if requested */
   if( maxfilelen ) {
@@ -751,48 +585,43 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
     /* Loop over time chunks */
     for( i=0; (*status==SAI__OK)&&(i<(*group)->ngroups); i++ ) {
       size_t idx;
-      /* Loop over subarray */
-      for( idx=0; idx<(*group)->nrelated; idx++ ) {
-        /* Check for new continuous chunk */
-        if( i==0 || ( (*group)->chunk[i] != (*group)->chunk[i-1]) ) {
-          ndgCpsup( (*group)->grp, (*group)->subgroups[i][idx], *basegrp,
-                    status );
+      /* Check for new continuous chunk */
+      if( i==0 || ( (*group)->chunk[i] != (*group)->chunk[i-1]) ) {
+        /* Loop over subarray */
+        for( idx=0; idx<(*group)->nrelated; idx++ ) {
+          size_t grpindex = (*group)->subgroups[i][idx];
+          if ( grpindex > 0 ) {
+            ndgCpsup( (*group)->grp, grpindex, *basegrp, status );
+          }
         }
       }
     }
   }
 
-
-
  CLEANUP:
-  starts = astFree( starts );
-  ends = astFree( ends );
-  nbolx = astFree( nbolx );
-  nboly = astFree( nboly );
-  refsubsys = astFree( refsubsys );
   keepchunk = astFree( keepchunk );
   chunk = astFree( chunk );
-  all_tlen = astFree( all_tlen );
-  lambda = astFree( lambda );
-  if (data) smf_close_file( &data, status );
-
-  if( subgroups ) {
-    for( i=0; i<ngroups; i++ ) {
-      subgroups[i] = astFree( subgroups[i] );
-    }
-    subgroups = astFree( subgroups );
-  }
+  chunklen = astFree( chunklen );
+  piecelen = astFree( piecelen );
+  grouped = astAnnul( grouped );
 
   if( *status != SAI__OK ) {
-    new_chunk = astFree( new_chunk );
-
-    if( new_subgroups ) {
-      for( isub=0; isub<new_ngroups; i++ ) {
-        new_subgroups[isub] = astFree( new_subgroups[isub] );
+    /* free the group */
+    if (*basegrp) grpDelet( basegrp, status );
+    if (*group) {
+      smf_close_smfGroup( group, status );
+    } else {
+      /* have to clean up manually */
+      new_chunk = astFree( new_chunk );
+      new_tlen = astFree( new_tlen );
+      if( subgroups ) {
+        size_t isub;
+        for( isub=0; isub<new_ngroups; i++ ) {
+          subgroups[isub] = astFree( subgroups[isub] );
+        }
+        subgroups = astFree( subgroups );
       }
-      new_subgroups = astFree( new_subgroups );
     }
-
   }
 
   /* Return the maximum padding if required. */
