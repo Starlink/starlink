@@ -324,12 +324,11 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
     foundlast = 0;
 
     for( i=0; i<igrp->ngroups; i++ ) {
-      if( (igrp->chunk[i] == whichchunk) && (!foundfirst) ) {
-        firstpiece = i;
-        foundfirst = 1;
-      }
-
       if( igrp->chunk[i] == whichchunk ) {
+        if (!foundfirst) {
+          firstpiece = i;
+          foundfirst = 1;
+        }
         lastpiece = i;
         foundlast = 1;
       }
