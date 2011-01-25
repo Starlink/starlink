@@ -743,9 +743,9 @@ smfFts* smf_construct_smfFts( smfFts* tofill,
                               smfData* zpd, smfData* fpm, smfData* sigma,
                               int* status);
 
-smfGroup *smf_construct_smfGroup( const Grp *igrp, dim_t **subgroups,
+smfGroup *smf_construct_smfGroup( const Grp *igrp, size_t **subgroups,
                                   size_t *chunk, dim_t *tlen,
-                                  const dim_t ngroups, const dim_t nrelated,
+                                  const size_t ngroups, const size_t nrelated,
                                   const int copysubgroups, int *status );
 
 smfHead *smf_construct_smfHead( smfHead * tofill, inst_t instrument,

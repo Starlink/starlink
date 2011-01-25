@@ -13,7 +13,7 @@
  *     SMURF subroutine
 
  *  Invocation:
- *     smfGroup* = smf_construct_smfGroup( const Grp *igrp, int **subgroups,
+ *     smfGroup* = smf_construct_smfGroup( const Grp *igrp, size_t **subgroups,
  *                                         size_t *chunk,
  *                                         dim_t *tlen,
  *                                         const dim_t ngroups,
@@ -24,7 +24,7 @@
  *  Arguments:
  *     igrp = const Grp* (Given)
  *        Input Grp to be copied
- *     subgroups = int** (Given)
+ *     subgroups = size_t** (Given)
  *        Pointer to array of pointers to arrays of indices into Grp
  *     chunk = size_t* (Given)
  *        Array of length ngroups flagging which subgroups are continuous
@@ -123,16 +123,16 @@
 
 #define FUNC_NAME "smf_construct_smfGroup"
 
-smfGroup *smf_construct_smfGroup( const Grp *igrp, dim_t **subgroups,
+smfGroup *smf_construct_smfGroup( const Grp *igrp, size_t **subgroups,
                                   size_t *chunk, dim_t *tlen,
-                                  const dim_t ngroups,  const dim_t nrelated,
+                                  const size_t ngroups,  const size_t nrelated,
                                   const int copy, int *status ) {
 
   /* Local variables */
   smfGroup *group = NULL;
-  int isize;
-  dim_t i;
-  dim_t **newsubgroups=NULL;
+  size_t isize;
+  size_t i;
+  size_t **newsubgroups=NULL;
 
   if ( *status != SAI__OK ) return NULL;
 
