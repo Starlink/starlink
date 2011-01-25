@@ -276,9 +276,9 @@ void smurf_stackframes( int *status ) {
         }
       }
       if (dosort) {
-        smf_find_dateobs( data->hdr, &(thisitem->mjd), NULL, status );
+        smf_find_dateobs( data->hdr, &(thisitem->sortval), NULL, status );
       } else {
-        thisitem->mjd = 0.0;
+        thisitem->sortval = 0.0;
       }
       thisitem->index = i;
     }
@@ -314,7 +314,7 @@ void smurf_stackframes( int *status ) {
 	   size, (size_t)refdims[0], (size_t)refdims[1] );
 
   /* Now need to sort the files into time order. We have the dates and indices */
-  if (dosort) qsort( sortinfo, size, sizeof(*sortinfo), smf_sort_bytime );
+  if (dosort) qsort( sortinfo, size, sizeof(*sortinfo), smf_sort_bydouble );
 
   /* Now we can do the real work */
 
@@ -361,7 +361,7 @@ void smurf_stackframes( int *status ) {
     smfData * data = NULL;
     smf_open_file( igrp, sortinfo[i-1].index, "READ", SMF__NOCREATE_HEAD|SMF__NOTTSERIES, &data, status );
     if (*status != SAI__OK) break;
-    if (dosort) times[i-1] = sortinfo[i-1].mjd;
+    if (dosort) times[i-1] = sortinfo[i-1].sortval;
 
     /* copy data to slice */
     if ( odatad && (data->pntr)[0] ) {

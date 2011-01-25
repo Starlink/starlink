@@ -867,9 +867,9 @@ typedef struct smfRebinMapData {
 */
 
 typedef struct {
-  double mjd;     /* MJD date - primary sorting key  */
+  double sortval; /* Primary sort value. Generic double. Can be an MJD */
   void *misc;     /* Pointer to additional information */
-  int index;      /* an index that will be sorted with the mjd */
+  int index;      /* an index that will be sorted with the sortval */
   char name [GRP__SZNAM+1]; /* string to carry around naming the item */
 } smfSortInfo;
 

@@ -148,10 +148,12 @@
 *        Do not do stability comparisons if the previous flat ramp has a different
 *        reference heater setting.
 *        In NEP mode do not drop bad flatfields.
-8        Allow dark flat ramps through. They are now filtered in smf_choose_flat.
+*        Allow dark flat ramps through. They are now filtered in smf_choose_flat.
+*     2011-01-25 (TIMJ):
+*        Tweak to smfSortInfo struct member.
 
 *  Copyright:
-*     Copyright (C) 2008-2010 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2011 Science and Technology Facilities Council.
 *     Copyright (C) 2010 University of British Columbia.
 *     All Rights Reserved.
 
@@ -355,7 +357,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
     smfArray * array = NULL;
 
     /* sort flats into order */
-    qsort( allfflats, ffcount, sizeof(*allfflats), smf_sort_bytime);
+    qsort( allfflats, ffcount, sizeof(*allfflats), smf_sort_bydouble);
 
     if (fflats) array = smf_create_smfArray( status );
 
@@ -544,7 +546,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
     smfArray * array = NULL;
 
     /* sort darks into order */
-    qsort( alldarks, dkcount, sizeof(*alldarks), smf_sort_bytime);
+    qsort( alldarks, dkcount, sizeof(*alldarks), smf_sort_bydouble);
 
     if (darks) array = smf_create_smfArray( status );
 
@@ -699,7 +701,7 @@ smf__addto_sortinfo ( const smfData * indata, smfSortInfo allinfo[], size_t this
   sortinfo = &(allinfo[counter]);
   one_strlcpy( sortinfo->name, indata->file->name, sizeof(sortinfo->name),
                status );
-  smf_find_dateobs( indata->hdr, &(sortinfo->mjd), NULL, status );
+  smf_find_dateobs( indata->hdr, &(sortinfo->sortval), NULL, status );
   msgOutiff(MSG__DEBUG, " ", "%s file: %s",status,
             type, indata->file->name);
   sortinfo->index = this_index;

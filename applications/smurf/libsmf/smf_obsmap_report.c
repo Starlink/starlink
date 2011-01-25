@@ -55,9 +55,11 @@
 *        Move sort routine externally.
 *     2010-09-28 (TIMJ):
 *        Handle null pointers explicitly rather than letting MERS write <null>.
+*     2011-01-25 (TIMJ):
+*        Tweak to smfSortInfo struct member.
 
 *  Copyright:
-*     Copyright (C) 2008-2010 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2011 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -150,7 +152,7 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
         obsinfo = (AstKeyMap*)ao;  /* strict-aliasing warning avoidance in astMapGet0A */
         astMapGet0D( obsinfo, "MJD-OBS", &dateobs );
         obslist[i].index = i;
-        obslist[i].mjd = dateobs;
+        obslist[i].sortval = dateobs;
 
         /* since we are looping already, extract INSTRUME information so that we can count it */
         astMapGet0C( obsinfo, "INSTRUME", &instrume );
@@ -159,7 +161,7 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
         obsinfo = astAnnul( obsinfo );
       }
     }
-    qsort( obslist, nobs, sizeof(*obslist), smf_sort_bytime );
+    qsort( obslist, nobs, sizeof(*obslist), smf_sort_bydouble );
 
     /* See how many instruments we have */
     ninst = astMapSize( instmap );

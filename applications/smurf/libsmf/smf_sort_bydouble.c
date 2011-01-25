@@ -1,10 +1,10 @@
 /*
 *+
 *  Name:
-*     smf_sort_bytime
+*     smf_sort_bydouble
 
 *  Purpose:
-*     Sort array of smfSortInfo structs by time
+*     Sort array of smfSortInfo structs by the sortval
 
 *  Language:
 *     Starlink ANSI C
@@ -14,15 +14,15 @@
 
 *  Invocation:
 *     qsort( smfSortInfo* tobeSorted, size_t nel, sizeof(*tobeSorted),
-*            smf_sort_bytime );
+*            smf_sort_bydouble );
 
 *  Description:
 *     This routine is a sort comparison function that can be called
 *     from qsort() to sort an array of smfSortInfo structures into
-*     time order. It should not be called directly.
+*     order based on a double precision value. It should not be called directly.
 
 *  Notes:
-*     - The mjd item of the structure must be filled in.
+*     - The sortkey item (a double) of the structure must be filled in.
 *     - Only use with smfSortInfo arrays.
 
 *  Authors:
@@ -32,9 +32,11 @@
 *  History:
 *     2009-09-25 (TIMJ):
 *        Initial version. Moved from smf_find_darks
+*     2011-01-25 (TIMJ):
+*        Change name of sort item in struct.
 
 *  Copyright:
-*     Copyright (C) 2009 Science and Technology Facilities Council.
+*     Copyright (C) 2009, 2011 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -65,24 +67,23 @@
 #include "smf_typ.h"
 #include "smf.h"
 
-int smf_sort_bytime ( const void *in1, const void *in2 ) {
+int smf_sort_bydouble ( const void *in1, const void *in2 ) {
   const smfSortInfo * sort1;
   const smfSortInfo * sort2;
-  double mjd1;
-  double mjd2;
+  double sortval1;
+  double sortval2;
 
   sort1 = in1;
   sort2 = in2;
 
-  mjd1 = sort1->mjd;
-  mjd2 = sort2->mjd;
+  sortval1 = sort1->sortval;
+  sortval2 = sort2->sortval;
 
-  if (mjd1 < mjd2) {
+  if (sortval1 < sortval2) {
     return -1;
-  } else if (mjd1 > mjd2) {
+  } else if (sortval1 > sortval2) {
     return 1;
   } else {
-    /* least likely case last */
     return 0;
   }
 }
