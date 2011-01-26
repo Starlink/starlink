@@ -217,7 +217,6 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
   size_t currentindex = 0;    /* Counter */
   smfData *data = NULL;       /* Current smfData */
   AstKeyMap * grouped = NULL; /* Primary AstKeyMap for grouping */
-  smfHead *hdr=NULL;          /* Header for current file */
   size_t i;                   /* Loop counter for index into Grp */
   int isFFT=0;                /* Set if data are 4d FFT */
   size_t j;                   /* Loop counter */
@@ -226,17 +225,12 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
   dim_t maxflen=0;            /* Max file length in time steps */
   dim_t maxpad=0;             /* Maximum padding neeed for any input file */
   size_t maxrelated = 0;     /* Keep track of max number of related items */
-  size_t *new_chunk=NULL;     /* chunks associated with new_subgroups */
-  size_t new_ngroups=0;       /* counter for new_subgroups */
+  size_t *new_chunk=NULL;     /* keeper chunks associated with subgroups */
   dim_t *new_tlen=NULL;       /* tlens for new_subgroup */
   size_t ngroups = 0;         /* Counter for subgroups to be stored */
   size_t nkeep = 0;           /* Number of chunks to keep */
   dim_t * piecelen = NULL;   /* Length of single file */
   size_t **subgroups = NULL;  /* Array containing index arrays to parent Grp */
-
-
-
-
 
   if ( *status != SAI__OK ) return;
 
@@ -350,12 +344,11 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
           maxscaled = round(maxlen * scalelen);
 
           /* update steptime to include down-sample factor */
-          steptime = hdr->steptime / scalelen;
+          steptime = steptime / scalelen;
         }
       }
 
-      /* Scaled values of steptime, ntslice and maximum length */
-      astMapPut0D( filemap, "STEPTIME", steptime, NULL );
+      /* Scaled values of ntslice and maximum length */
       astMapPut0I( filemap, "NTSLICE", ntslice, NULL );
       astMapPut0I( filemap, "MAXLEN", maxscaled, NULL );
 
@@ -616,7 +609,7 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
       new_tlen = astFree( new_tlen );
       if( subgroups ) {
         size_t isub;
-        for( isub=0; isub<new_ngroups; i++ ) {
+        for( isub=0; isub<nkeep; i++ ) {
           subgroups[isub] = astFree( subgroups[isub] );
         }
         subgroups = astFree( subgroups );
