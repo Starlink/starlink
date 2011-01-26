@@ -113,7 +113,7 @@ enum { GRP__SZTYP  = 80 };
 enum { GRP__SZFNM  = 256 };
 
 /* Max. number of groups which can be used simultaneously. */
-enum { GRP__MAXG  = 500 };
+enum { GRP__MAXG  = 2048 };
 
 /* Type definitions for GRP C interface */
 /* ------------------------------------ */

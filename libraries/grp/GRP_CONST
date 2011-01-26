@@ -17,6 +17,7 @@
 *     which calls GRP_ routines.
 
 *  Copyright:
+*     Copyright (C) 2011 Science & Technology Facilities Council.
 *     Copyright (C) 1992, 1994 Science & Engineering Research Council.
 *     Copyright (C) 1999 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
@@ -39,6 +40,7 @@
 
 *  Authors:
 *     DSB: D.S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -48,6 +50,8 @@
 *        GRP__POPKC and GRP__PCLKC added
 *     27-AUG-1999 (DSB):
 *        GRP__PESCC added.
+*     26-JAN-2011 (TIMJ):
+*        Increase size of GRP__MAXG to 2048 from 500.
 *     {enter_further_changes_here}
 
 *-
@@ -79,7 +83,7 @@
 *  The size of the common arrays. This is the limit on the number of
 *  groups which can be used by an application at once.
       INTEGER GRP__MAXG
-      PARAMETER ( GRP__MAXG = 500 )
+      PARAMETER ( GRP__MAXG = 2048 )
 
 *  Upper limit on fortran logical unit numbers.
       INTEGER GRP__MAXUN
