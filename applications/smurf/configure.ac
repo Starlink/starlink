@@ -117,7 +117,7 @@ STAR_DECLARE_DEPENDENCIES([sourceset], [sst])
 dnl    No use dependencies
 
 dnl Documentation
-STAR_LATEX_DOCUMENTATION(sun258/ sun259/ sun264/ sc19/)
+STAR_LATEX_DOCUMENTATION(sun258/ sun259/ sc19/)
 
 dnl Ask for a config.h so that we can retain control of when to define
 dnl parameters. And also to simplify the build line
