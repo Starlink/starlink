@@ -432,6 +432,7 @@
 #define SMF_DEFINED
 
 #include <sys/time.h>    /* for struct timeval */
+#include <stdint.h>      /* for int64_t */
 
 #include "ast.h"
 #include "jcmt/state.h"  /* for inst_t */
