@@ -138,6 +138,8 @@ f     The CmpMap class does not define any new routines beyond those
 *        Mappings to be unsplitable.
 *     11-JAN-2011 (DSB):
 *        Improve simplification of serial combinations of parellel CmpMaps.
+*     25-JAN-2011 (DSB):
+*        Big improvement to the efficiency of the astMapSplit method.
 *class--
 */
 
@@ -2075,58 +2077,56 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    return result;
 }
 
-static int *MapSplit( AstMapping *this, int nin, const int *in, AstMapping **map, int *status ){
+static int *MapSplit1( AstMapping *this, int nin, const int *in, AstMapping **map, int *status ){
 /*
 *  Name:
-*     MapSplit
+*     MapSplit1
 
 *  Purpose:
 *     Create a Mapping representing a subset of the inputs of an existing
-*     CmpMap.
+*     Mapping.
 
 *  Type:
 *     Private function.
 
 *  Synopsis:
 *     #include "cmpmap.h"
-*     int *MapSplit( AstMapping *this, int nin, const int *in, AstMapping **map )
+*     int *MapSplit1( AstMapping *this, int nin, const int *in, AstMapping **map )
 
 *  Class Membership:
-*     CmpMap method (over-rides the protected astMapSplit method
-*     inherited from the Mapping class).
+*     CmpMap method
 
 *  Description:
 *     This function performs the work for the astMapSplit method. It
-*     first simply invokes the private MapSplit1 function to see if the
-*     forward transformation of the supplied CmpMap can be split as
-*     requested. If this is not possible it attempts an inverse approach
-*     to the problem. For each possible sub-sets of the Mapping outputs
-*     it call MapSplit1 to see if the sub-set of outputs are generated
-*     from the selected inputs.
+*     first invokes the astMapSplit method to see if the forward
+*     transformation of the supplied Mapping (not necessarily a CmpMap)
+*     can be split as requested. If this is not possible it attempts an
+*     inverse approach to the problem. For each possible sub-sets of the
+*     Mapping outputs it call astMapSplit to see if the sub-set of outputs
+*     are generated from the selected inputs.
 
 *  Parameters:
 *     this
-*        Pointer to the CmpMap to be split (the CmpMap is not actually
-*        modified by this function).
+*        Pointer to the Mapping to be split. It is not assumed to be a CmpMap.
 *     nin
 *        The number of inputs to pick from "this".
 *     in
 *        Pointer to an array of indices (zero based) for the inputs which
 *        are to be picked. This array should have "nin" elements. If "Nin"
-*        is the number of inputs of the supplied CmpMap, then each element
+*        is the number of inputs of the supplied Mapping, then each element
 *        should have a value in the range zero to Nin-1.
 *     map
 *        Address of a location at which to return a pointer to the new
 *        Mapping. This Mapping will have "nin" inputs (the number of
 *        outputs may be different to "nin"). A NULL pointer will be
-*        returned if the supplied CmpMap has no subset of outputs which
+*        returned if the supplied Mapping has no subset of outputs which
 *        depend only on the selected inputs.
 
 *  Returned Value:
 *     A pointer to a dynamically allocated array of ints. The number of
 *     elements in this array will equal the number of outputs for the
 *     returned Mapping. Each element will hold the index of the
-*     corresponding output in the supplied CmpMap. The array should be
+*     corresponding output in the supplied Mapping. The array should be
 *     freed using astFree when no longer needed. A NULL pointer will
 *     be returned if no output Mapping can be created.
 
@@ -2157,7 +2157,7 @@ static int *MapSplit( AstMapping *this, int nin, const int *in, AstMapping **map
    if ( !astOK ) return result;
 
 /* First see if the forward transformation can be split as requested. */
-   result = MapSplit1( this, nin, in, map, status );
+   result = astMapSplit( this, nin, in, map );
 
 /* If forward transformation could not be split, we attempt to split the
    inverse transformation by selecting every possible sub-set of Mapping
@@ -2202,7 +2202,7 @@ static int *MapSplit( AstMapping *this, int nin, const int *in, AstMapping **map
 
 /* Attempt to split the inverted Mapping using the current subset of
    outputs. */
-                  result2 = MapSplit1( this2, mout, out, &map2, status );
+                  result2 = astMapSplit( this2, mout, out, &map2 );
 
 /* If succesful... */
                   if( result2 ) {
@@ -2272,11 +2272,11 @@ static int *MapSplit( AstMapping *this, int nin, const int *in, AstMapping **map
    return result;
 }
 
-static int *MapSplit1( AstMapping *this_map, int nin, const int *in, AstMapping **map,
-                       int *status ){
+static int *MapSplit( AstMapping *this_mapping, int nin, const int *in,
+                      AstMapping **map, int *status ){
 /*
 *  Name:
-*     MapSplit1
+*     MapSplit
 
 *  Purpose:
 *     Create a Mapping representing a subset of the inputs of an existing
@@ -2287,11 +2287,12 @@ static int *MapSplit1( AstMapping *this_map, int nin, const int *in, AstMapping 
 
 *  Synopsis:
 *     #include "cmpmap.h"
-*     int *MapSplit1( AstMapping *this, int nin, const int *in, AstMapping **map,
-*                     int *status )
+*     int *MapSplit( AstMapping *this, int nin, const int *in,
+*                    AstMapping **map, int *status )
 
 *  Class Membership:
-*     CmpMap method
+*     CmpMap method (over-rides the protected astMapSplit method
+*     inherited from the Mapping class).
 
 *  Description:
 *     This function creates a new Mapping by picking specified inputs from
@@ -2337,38 +2338,38 @@ static int *MapSplit1( AstMapping *this_map, int nin, const int *in, AstMapping 
 */
 
 /* Local Variables: */
-   AstCmpMap *this;      /* Pointer to CmpMap structure */
-   AstCmpMap *tmap;      /* Pointer to partial Mapping */
-   AstMapping *amap;     /* Pointer to ealier Mapping split by given inputs */
-   AstMapping *bmap;     /* Pointer to later Mapping split by earlier outputs */
-   AstMapping *map1;     /* Pointer to 1st component Mapping */
-   AstMapping *map2;     /* Pointer to 2nd component Mapping */
-   AstMapping *rmap1;    /* Pointer to split lower Mapping */
-   AstMapping *rmap2;    /* Pointer to split higher Mapping */
-   AstPermMap *pmap;     /* Input permutation */
-   int *bin;             /* Inputs to use with later Mapping */
-   int *inp;             /* Pointer to inperm work array */
-   int *outp;            /* Pointer to outperm work array */
-   int *p;               /* Pointer to next element */
-   int *pb;              /* Pointer to first input for higher Mapping */
-   int *res1;            /* Pointer to outputs used from lower Mapping */
-   int *res2;            /* Pointer to outputs used from higher Mapping */
-   int *result;          /* Pointer to returned array */
-   int doperm;           /* Is input permutation needed? */
-   int i;                /* Loop count */
-   int inv;              /* Has the CmpMap been inverted? */
-   int j;                /* Loop count */
-   int nbin;             /* Number of inputs to pick from later Mapping */
-   int nin1;             /* No. of inputs to lower Mapping */
-   int nin2;             /* No. of inputs to higher Mapping */
-   int noff;             /* No. of outputs from total lower Mapping */
-   int nout1;            /* No. of outputs from split lower Mapping */
-   int nout2;            /* No. of outputs from split higher Mapping */
-   int npin;             /* Total no. of CmpMap inputs */
-   int ok;               /* Can required Mapping be created? */
-   int old_inv1;         /* Original Invert flag for map1 */
-   int old_inv2;         /* Original Invert flag for map2 */
-   int t;                /* Temporary storage */
+   AstCmpMap *this;
+   AstMapping **map_list;
+   AstMapping *amap;
+   AstMapping *bmap;
+   AstPermMap *pmap;
+   int *aout;
+   int *cin;
+   int *cout;
+   int *inp;
+   int *invert_list;
+   int *outp;
+   int *p;
+   int *result;
+   int doperm;
+   int i;
+   int ibot;
+   int ibotout;
+   int iin;
+   int imap;
+   int iout;
+   int itop;
+   int j;
+   int naout;
+   int ncin;
+   int ncout;
+   int nmap;
+   int npin;
+   int npout;
+   int ok;
+   int old_inv;
+   int t;
+
 
 /* Initialise */
    result = NULL;
@@ -2378,10 +2379,11 @@ static int *MapSplit1( AstMapping *this_map, int nin, const int *in, AstMapping 
    if ( !astOK ) return result;
 
 /* Get a pointer to the CmpMap structure. */
-   this = (AstCmpMap *) this_map;
+   this = (AstCmpMap *) this_mapping;
 
-/* Get the number of inputs in the supplied CmpMap. */
+/* Get the number of inputs and outputs in the supplied CmpMap. */
    npin = astGetNin( this );
+   npout = astGetNout( this );
 
 /* Check all input axis indices are valid. */
    ok = 1;
@@ -2395,65 +2397,82 @@ static int *MapSplit1( AstMapping *this_map, int nin, const int *in, AstMapping 
 /* If OK, proceed. */
    if( ok ) {
 
-/* Get the component Mapping pointers. Set the Invert flags as they were when
-   the CmpMap was created, first saving the current Invert flags so they can
-   be re-instated later. */
-      map1 = this->map1;
-      old_inv1 = astGetInvert( map1 );
-      astSetInvert( map1, this->invert1 );
-      map2 = this->map2;
-      old_inv2 = astGetInvert( map2 );
-      astSetInvert( map2, this->invert2 );
+/* Initialise dynamic arrays of Mapping pointers and associated Invert
+   flags. */
+      nmap = 0;
+      map_list = NULL;
+      invert_list = NULL;
 
-/* If the CmpMap has been inverted, invert the components. */
-      inv = astGetInvert( this );
-      if( inv ) {
-         astInvert( map1 );
-         astInvert( map2 );
-      }
+/* Decompose the CmpMap into a sequence of Mappings to be applied in
+   series or parallel, as appropriate, and an associated list of
+   Invert flags. */
+      (void) astMapList( this_mapping, this->series, astGetInvert( this ),
+                         &nmap, &map_list, &invert_list );
 
-/* First deal with series CmpMaps. */
+/* First handle lists of Mapping in series. */
       if( this->series ) {
 
-/* Try to split the first (or second if the CmpMap has been inverted)
-   component Mapping. */
-         bin = astMapSplit( inv ? map2 : map1, nin, in, &amap );
+/* Initialise the array of inputs to be split from the next component
+   Mapping. */
+         ncin = nin;
+         cin = astStore( NULL, in, sizeof( int )*nin );
 
-/* Check the split was done. */
-         if( bin ) {
+/* Loop round all the component Mappings that are combined in series to form
+   the supplied CmpMap. */
+         for( imap = 0; imap < nmap && cin; imap++ ) {
 
-/* Split the other component using the outputs generated by splitting the
-   first component. */
-            nbin = astGetNout( amap );
-            result = astMapSplit( inv ? map1 : map2, nbin, bin, &bmap );
+/* Temporarily reset the Invert attribute within the commponent Mapping back
+   to the value it had when the CmpMap was created. */
+            old_inv = astGetInvert( map_list[ imap ] );
+            astSetInvert(  map_list[ imap ], invert_list[ imap ] );
 
-/* Check the split was done. */
-            if( result ) {
+/* Attempt to split the component Mapping using the current list of
+   inputs. */
+            cout = MapSplit1( map_list[ imap ], ncin, cin, &amap, status );
 
-/* Form the required CmpMap. */
-               *map = (AstMapping *) astCmpMap( amap, bmap, 1, "", status );
+/* If the split could be done... */
+            if( amap ) {
 
-/* Free resources. */
-               bmap = astAnnul( bmap );
+/* The outputs that correspond to the picked inputs become the inputs to
+   be picked from the next component Mapping. */
+               (void) astFree( cin );
+               cin = cout;
+               ncin = astGetNout( amap );
+
+/* Combine the split Mapping in series with the earlier split Mappings. */
+               if( *map ) {
+                  bmap = (AstMapping *) astCmpMap( *map, amap, 1, " ", status );
+                  amap = astAnnul( amap );
+                  (void) astAnnul( *map );
+                  *map = bmap;
+               } else {
+                  *map = amap;
+               }
+
+/* If the split could not be done, free the array of Mapping inputs to
+   indicate that no more component Mappings need be checked. */
+            } else {
+               cin = astFree( cin );
+               cout = astFree( cout );
             }
 
-            bin = astFree( bin );
-            amap = astAnnul( amap );
+/* Re-instate the original value of the Invert attribute within the
+   commponent Mapping. */
+            astSetInvert(  map_list[ imap ], old_inv );
          }
 
-/* Now deal with parallel CmpMaps. */
+/* Return the final array of output indices. */
+         result = cin;
+
+/* Now handle lists of Mapping in parallel. */
       } else {
 
 /* Allocate work space. */
          outp = astMalloc( sizeof(int)*(size_t)nin );
          inp = astMalloc( sizeof(int)*(size_t)nin );
+         cin = astMalloc( sizeof(int)*(size_t)npin );
+         cout = astMalloc( sizeof(int)*(size_t)npout );
          if( astOK ) {
-
-/* Initialise pointers. */
-            res1 = NULL;
-            rmap1 = NULL;
-            res2 = NULL;
-            rmap2 = NULL;
 
 /* The caller may have selected the Mapping inputs in any order, so we
    need to create a PermMap which will permute the inputs from the
@@ -2485,102 +2504,126 @@ static int *MapSplit1( AstMapping *this_map, int nin, const int *in, AstMapping 
 /* Create a PermMap which reorders the inputs into ascending order. */
             pmap = doperm ? astPermMap( nin, inp, nin, outp, NULL, "", status ) : NULL;
 
-/* Store the sorted input indices in the inp work array, get a pointer
-   to the first input relating to the second component Mapping, and shift
-   all the indices relating to the second component Mapping so they are
-   zero based. */
-            nin1 = astGetNin( map1 );
-            pb = NULL;
+/* Store the sorted input indices in the inp work array. */
             for( i = 0; i < nin; i++ ) {
                inp[ i ] = in[ outp[ i ] ];
-               if( inp[ i ] >= nin1 ) {
-                  inp[ i ] -= nin1;
-                  if( !pb ) pb = inp + i;
-               }
             }
 
-/* If any of the selected inputs relate to the first component Mapping, try
-   to split the first component Mapping using the input indices stored
-   at the start of the sorted array. */
-            nin1 = pb ? ( pb - inp ) : nin;
-            if( nin1 ) {
-               res1 = astMapSplit( map1, nin1, inp, &rmap1 );
-               ok = ( res1 != NULL );
-            } else {
-               ok = 1;
-            }
+/* Initialise the index within the supplied CmpMap of the last (highest)
+   input in the current component Mapping. */
+            itop = -1;
 
-/* If OK, see if any of the selected inputs relate to the second component
-   Mapping, try to split the second component Mapping using the input indices
-   stored at the end of the sorted array. */
-            if( ok ) {
-               nin2 = nin - nin1;
-               if( nin2 ) {
-                  res2 = astMapSplit( map2, nin2, pb, &rmap2 );
-                  ok = ( res2 != NULL );
-               } else {
-                  ok = 1;
-               }
-            }
+/* Initialise the index within the supplied CmpMap of the first (lowest)
+   output for the current component Mapping. */
+            ibotout = 0;
 
-/* If OK, combine the two resulting Mappings in parallel and construct
-   the returned results array. */
-            if( ok ) {
-               if( res1 && res2 ) {
-                  tmap = astCmpMap( rmap1, rmap2, 0, "", status );
-                  nout1 = astGetNout( rmap1 );
-                  nout2 = astGetNout( rmap2 );
-                  result = astMalloc( sizeof(int)*(size_t) (nout1+nout2) );
-                  for( i = 0; i < nout1; i++ ) result[ i ] = res1[ i ];
-                  noff = astGetNout( map1 );
-                  for( i = 0; i < nout2; i++ ) result[ i + nout1 ] = res2[ i ] + noff;
+/* Initialise the index within the supplied CmpMap of the current picked input. */
+            iin = 0;
 
-               } else if( res1 ) {
-                  tmap = astCopy( rmap1 );
-                  nout1 = astGetNout( rmap1 );
-                  result = astMalloc( sizeof(int)*(size_t) nout1 );
-                  for( i = 0; i < nout1; i++ ) result[ i ] = res1[ i ];
+/* Initialise the index of the next returned output index. */
+            ncout = 0;
 
-               } else if( res2 ) {
-                  tmap = astCopy( rmap2 );
-                  nout2 = astGetNout( rmap2 );
-                  result = astMalloc( sizeof(int)*(size_t) nout2 );
-                  noff = astGetNout( map1 );
-                  for( i = 0; i < nout2; i++ ) result[ i ] = res2[ i ] + noff;
+/* Loop round all the component Mappings that are combined in series to form
+   the supplied CmpMap. */
+            for( imap = 0; imap < nmap && cout; imap++ ) {
 
-               } else {
-                  ok = 0;
-                  tmap = NULL;
+/* Temporarily reset the Invert attribute within the component Mapping back
+   to the value it had when the CmpMap was created. */
+               old_inv = astGetInvert( map_list[ imap ] );
+               astSetInvert(  map_list[ imap ], invert_list[ imap ] );
+
+/* Get the index within the supplied CmpMap of the first (lowest) input in
+   the current component Mapping. */
+               ibot = itop + 1;
+
+/* Get the index within the supplied CmpMap of the last (highest) input in
+   the current component Mapping. */
+               itop += astGetNin( map_list[ imap ] );
+
+/* Get the zero-based indicies of the required inputs that feed the current
+   component Mapping. */
+               ncin = 0;
+               while( iin < nin && inp[ iin ] <= itop ) {
+                  cin[ ncin++ ] = inp[ iin++ ] - ibot;
                }
 
-/* If required, add in the PermMap which re-orders the inputs. */
-               if( ok ) {
-                  if( doperm ) {
-                     *map = (AstMapping *) astCmpMap( pmap, tmap, 1, "", status );
+/* Skip components from which no inputs are being picked. */
+               if( ncin > 0 ) {
+
+/* Attempt to split the component Mapping using the current list of inputs. */
+                  aout = MapSplit1( map_list[ imap ], ncin, cin, &amap,
+                                    status );
+
+/* If successful... */
+                  if( amap ) {
+
+/* Correct the output indices so that they refer to the numbering scheme
+   of the total CmpMap, and append to the total list of output indices. */
+                     naout = astGetNout( amap );
+                     for( iout = 0; iout < naout; iout++ ) {
+                        cout[ ncout++ ] = aout[ iout ] + ibotout;
+                     }
+
+/* Combine the split Mapping in parallel with the earlier split Mappings. */
+                     if( *map ) {
+                        bmap = (AstMapping *) astCmpMap( *map, amap, 0, " ",
+                                                         status );
+                        amap = astAnnul( amap );
+                        (void) astAnnul( *map );
+                        *map = bmap;
+                     } else {
+                        *map = amap;
+                     }
+
+/* If the component Mapping could not be split, free the cout array to
+   indicate that no more component Mappings need be considered. */
                   } else {
-                     *map = astCopy( tmap );
+                     cout = astFree( cout );
                   }
+
+/* Free remaining resources. */
+                  aout = astFree( aout );
                }
 
-/* Free resources */
-               if( tmap ) tmap = astAnnul( tmap );
+/* Update the index within the supplied CmpMap of the first (lowest) output in
+   the next component Mapping. */
+               ibotout += astGetNout( map_list[ imap ] );
+
+/* Re-instate the original value of the Invert attribute within the
+   commponent Mapping. */
+               astSetInvert(  map_list[ imap ], old_inv );
             }
 
-            if( res1 ) res1 = astFree( res1 );
-            if( rmap1 ) rmap1 = astAnnul( rmap1 );
-            if( res2 ) res2 = astFree( res2 );
-            if( rmap2 ) rmap2 = astAnnul( rmap2 );
+/* If the requested inputs could be split from the total CmpMap, add in any
+   PermMap needed to re-order the inputs. */
+            if( cout && ncout ){
+               if( doperm ) {
+                  bmap = (AstMapping *) astCmpMap( pmap, *map, 1, "", status );
+                  (void) astAnnul( *map );
+                  *map = bmap;
+               }
+
+/* Also return the list of output indices. */
+               result = cout;
+               cout = NULL;
+            }
+
+/* Free remaining resources. */
             if( pmap ) pmap = astAnnul( pmap );
          }
-
-         inp = astFree( inp );
          outp = astFree( outp );
+         inp = astFree( inp );
+         cin = astFree( cin );
+         cout = astFree( cout );
       }
 
-/* Reset the original values of the Invert flags of the component
-   Mappings. */
-      astSetInvert( map1, old_inv1 );
-      astSetInvert( map2, old_inv2 );
+/* Loop to annul all the Mapping pointers in the list. */
+      for ( i = 0; i < nmap; i++ ) map_list[ i ] = astAnnul( map_list[ i ] );
+
+/* Free the dynamic arrays. */
+      map_list = astFree( map_list );
+      invert_list = astFree( invert_list );
+
    }
 
 /* Mappings that have no outputs cannot be used. */
