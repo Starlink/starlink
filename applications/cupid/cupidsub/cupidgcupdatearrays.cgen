@@ -89,7 +89,8 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 *     excols
 *        Include extra columns in the output catalogue holding GaussClumps
 *        specific values? Zero produces no extra info. One causes the
-*        gaussian FWHMs to be included. Two causes more info to be included.
+*        gaussian FWHMs and spatial position angle to be included. Two
+*        causes more info to be included.
 *     mean_peak
 *        The mean value of the most recent fitted peak values.
 *     maxbad
@@ -144,6 +145,8 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 *        Add velocity gradient to "extracols" information.
 *     14-JAN-2008 (TIMJ):
 *        Use msgOutif instead of ilevel
+*     26-JAN-2011 (DSB):
+*        Add spatial position angle to "extracols" information.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -466,6 +469,11 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
                             sqrt( cupidGC.velres_sq + par[ 8 ]*par[ 8 ] ), NULL );
             }
          }
+
+/* Spatial orientation angle. In degrees, positive from +ve GRID1 axis to +ve
+   GRID2 axis. */
+         if( ndim > 1 ) astMapPut0D( extra, "GCANGLE", par[ 6 ]*AST__DR2D,
+                                     NULL );
 
 /* The remaining extra information is only added to the output catalogue
    if verbose mode. */

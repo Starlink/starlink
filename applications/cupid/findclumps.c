@@ -872,7 +872,9 @@ void findclumps( int *status ) {
 *     catalogue. If ExtraCols is set to 1, then the catalogue will include
 *     columns with names GCFWHM<i> (where <i> is 1, 2, or 3), holding the
 *     FWHM of the fitted Gaussian in units of pixels (these FWHM values
-*     have NOT been reduced to excluded the effect of the beam width).
+*     have NOT been reduced to excluded the effect of the beam width),
+*     and "GCANGLE" - the spatial orientation angle (in degrees, positive
+*     from +ve GRID1 axis to +ve GRID2 axis).
 
 */
 
