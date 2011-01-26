@@ -10,7 +10,7 @@
 
 /* Global Variables: */
 /* ================= */
-/* A structure holding the global parameters of the GaussClump algorithm 
+/* A structure holding the global parameters of the GaussClump algorithm
    needed by the service functions cupidGCcalcf and cupidGCcalcg called
    by the PDA minimisation function. This structure is declared in
    cupidGaussClumps, and its contents are initialised by this function. */
@@ -19,8 +19,8 @@ extern CupidGC cupidGC;
 void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel, int ndim,
                                          int *dims, double *par, double rms,
                                          double mlim, int imax,
-                                         int *lbnd, HDSLoc **ndfs, int iclump, 
-                                         int excols, double mean_peak, 
+                                         int *lbnd, HDSLoc **ndfs, int iclump,
+                                         int excols, double mean_peak,
                                          double maxbad, int *area, double *sumclumps,
                                          int *status ){
 /*
@@ -35,10 +35,10 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 *     Starlink C
 
 *  Synopsis:
-*     void cupidGCUpdateArrays<X>( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel, 
-*                                  int ndim, int *dims, double *par, 
-*                                  double rms, double mlim, int imax, 
-*                                  int *lbnd, HDSLoc **ndfs, 
+*     void cupidGCUpdateArrays<X>( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel,
+*                                  int ndim, int *dims, double *par,
+*                                  double rms, double mlim, int imax,
+*                                  int *lbnd, HDSLoc **ndfs,
 *                                  int iclump, int excols, double mean_peak,
 *                                  double maxbad, int *area, double *sumclumps,
 *                                  int *status )
@@ -54,15 +54,15 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 *     ipd
 *        Pointer to the start of the supplied data array. May be NULL.
 *     nel
-*        The number of elements in the supplied array. 
+*        The number of elements in the supplied array.
 *     ndim
 *        The number of pixel axes in the array.
 *     dims
 *        The number of pixels on each pixel axis of the array, using
 *        external axis ordering (i.e. the axis ordering within the data file).
 *     par
-*        Pointer to an array holding the parameters describing thw Gaussian 
-*        clump to be removed from the residuals array. 
+*        Pointer to an array holding the parameters describing thw Gaussian
+*        clump to be removed from the residuals array.
 *     rms
 *        The RMS noise level.
 *     mlim
@@ -77,7 +77,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 *     ndfs
 *        Pointer to a location containing an HDS locator for an array of
 *        NDF structures. If the HDS locator is NULL on entry a new HDS
-*        object is created and its locator stored in place of the NULL 
+*        object is created and its locator stored in place of the NULL
 *        pointer. The array of NDF structures is extended by one, and the
 *        new NDF in the array describes the supplied clump. If the
 *        supplied pointer is NULL, no HDS array or NDF is created. No NDF
@@ -87,8 +87,8 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 *     iclump
 *        Clump index.
 *     excols
-*        Include extra columns in the output catalogue holding GaussClumps 
-*        specific values? Zero produces no extra info. One causes the 
+*        Include extra columns in the output catalogue holding GaussClumps
+*        specific values? Zero produces no extra info. One causes the
 *        gaussian FWHMs to be included. Two causes more info to be included.
 *     mean_peak
 *        The mean value of the most recent fitted peak values.
@@ -104,10 +104,10 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 *        Pointer to the inherited status value.
 
 *  Notes:
-*     - This function can be invoked using the generic cupidGCUpdateArrays macro 
-*     defined in cupid.h. This macro has the same parameter list as 
-*     cupidGCUpdateArrays<X> except that an extra parameter is added to the start 
-*     of the parameter list indicating the data type of the specific 
+*     - This function can be invoked using the generic cupidGCUpdateArrays macro
+*     defined in cupid.h. This macro has the same parameter list as
+*     cupidGCUpdateArrays<X> except that an extra parameter is added to the start
+*     of the parameter list indicating the data type of the specific
 *     cupidGCUpdateArrays... function to be invoked. This extra parameter should
 *     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.
 
@@ -223,8 +223,8 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 
 /* We evaluate the model at increasing radii, like the layers of an onion,
    until a "layer" is found for which the model Gaussian does not exceed
-   a given user-supplied value at any point on the layer. This particular 
-   onion is cuboid rather than spherical. That is, each "layer" is actually 
+   a given user-supplied value at any point on the layer. This particular
+   onion is cuboid rather than spherical. That is, each "layer" is actually
    a box, with faces parallel to the pixel axes. The "extend" array is
    used to hold flags saying whether we need to extend each individual face
    to a larger radius. Initially, assume all faces need to be extended. */
@@ -239,8 +239,8 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
    plist = astMalloc( psize*cupidGC.nel );
    list_size = 0;
 
-/* Now loop over increasingly larger layers until a layer is found over which 
-   the model Gaussian does not exceed the user-supplied limit. */   
+/* Now loop over increasingly larger layers until a layer is found over which
+   the model Gaussian does not exceed the user-supplied limit. */
    bad = 0;
    more = 1;
    first = 1;
@@ -269,9 +269,9 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
                }
 
 /* Set up the GRID bounds of the section representing this face. Also set
-   the GRID coords of the first point to test. Also, get the corresponding 
-   N-dimensional GRID indices in the input array. This allows for any 
-   permutation of the pixels axes necessary to make the velocity axis the 
+   the GRID coords of the first point to test. Also, get the corresponding
+   N-dimensional GRID indices in the input array. This allows for any
+   permutation of the pixels axes necessary to make the velocity axis the
    third axis. */
                for( jax = 0; jax < ndim; jax++ ) {
                   yy[ cupidGC.dax[ jax ] ] = xx[ jax ] = lface[ jax ] = lbox[ jax ];
@@ -299,10 +299,10 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
                      } else {
                         j = yy[ jax ] + j*dims[ jax ] - 1;
                      }
-                  }         
+                  }
 
-/* Find the Gaussian model value at the current pixel. This excludes any 
-   background level because the background value in "par" was set to zero 
+/* Find the Gaussian model value at the current pixel. This excludes any
+   background level because the background value in "par" was set to zero
    before entring this loop. */
                   m = cupidGCModel( ndim, xx, par, -1, 1, first, status );
                   first = 0;
@@ -312,7 +312,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
                   if( m > mlim ) {
                      extend[ iax ][ iedge ] = 1;
 
-/* Scale the model using the RMS noise so that it has the same normalisation 
+/* Scale the model using the RMS noise so that it has the same normalisation
    as the residuals and input data, and then add it to the total clump sum. */
                      m *= rms;
                      sum += m;
@@ -349,8 +349,8 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
                      }
                   }
 
-/* Get the grid coords of the next pixel in the section currently being 
-   fitted. This assumes fortran ordering of the elements in the arrays, and 
+/* Get the grid coords of the next pixel in the section currently being
+   fitted. This assumes fortran ordering of the elements in the arrays, and
    assumes the velocity axis (if any) is axis 3. */
                   jax = 0;
                   xx[ jax ] += 1.0;
@@ -377,7 +377,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
    *sumclumps += sum;
 
 /* Set the specified element of the residuals array bad if the fit was
-   unusable.  This prevents the any subsequent attempt to fit a Gaussian 
+   unusable.  This prevents the any subsequent attempt to fit a Gaussian
    to the same peak value.*/
    if( res && ( !peakok || res[ imax ] == r0  ) ) res[ imax ] = CGEN_BAD;
 
@@ -403,7 +403,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 
          }
       }
-   
+
       meanr = sumr/nr;
       sigr = sqrt( sumr2/nr - meanr*meanr );
 
@@ -436,8 +436,8 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
    msgOutif( MSG__DEBUG1, "", "   Residual sigma: ^M", status );
 
 /* Dump the residuals to disk if required. */
-   sprintf( name, "clump_residuals%d", iclump ); 
-   CGEN_FUNCTION(cupidGCDump)( MSG__DEBUG2, res, ndim, dims, name, status );   
+   sprintf( name, "clump_residuals%d", iclump );
+   CGEN_FUNCTION(cupidGCDump)( MSG__DEBUG2, res, ndim, dims, name, status );
 
 /* If required, create an NDF holding the clump data values so long as
    the clump does not touch the edge of the data array. */
@@ -456,17 +456,17 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
          extra = astKeyMap( " " );
 
 /* Total FWHM on axis 0, 1 & 2, in pixels. */
-         astMapPut0D( extra, "GCFWHM1", 
+         astMapPut0D( extra, "GCFWHM1",
                       sqrt( cupidGC.beam_sq + par[ 3 ]*par[ 3 ] ), NULL );
          if( ndim > 1 ) {
-            astMapPut0D( extra, "GCFWHM2", 
+            astMapPut0D( extra, "GCFWHM2",
                          sqrt( cupidGC.beam_sq + par[ 5 ]*par[ 5 ] ), NULL );
             if( ndim > 2 ) {
-               astMapPut0D( extra, "GCFWHM3", 
+               astMapPut0D( extra, "GCFWHM3",
                             sqrt( cupidGC.velres_sq + par[ 8 ]*par[ 8 ] ), NULL );
             }
          }
-        
+
 /* The remaining extra information is only added to the output catalogue
    if verbose mode. */
          if( excols > 1 ) {
@@ -474,10 +474,10 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
             astMapPut0D( extra, "GCCHISQ", cupidGC.chisq, NULL );
             astMapPut0D( extra, "GCINITPEAK", cupidGC.initpars[0]*rms, NULL );
             astMapPut0D( extra, "GCINITBACK", cupidGC.initpars[1]*rms, NULL );
-   
+
             d = par[ 2 ] - cupidGC.initpars[ 2 ];
             shiftsq = d*d;
-   
+
             astMapPut0D( extra, "GCINITFWHM1", cupidGC.initpars[3], NULL );
             if( ndim > 1 ) {
                d = par[ 5 ] - cupidGC.initpars[ 5 ];
@@ -493,7 +493,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 
                }
             }
-   
+
             astMapPut0D( extra, "GCSHIFT", sqrt(shiftsq), NULL );
             astMapPut0D( extra, "GCBG", bg, NULL );
             astMapPut0D( extra, "GCMAXR", maxr, NULL );
@@ -508,8 +508,8 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
       }
 
 /* Create the NDF. */
-      cupidGCNdfClump( ndfs, sum, excols ? par : NULL, rms, ndim, lbox, ubox, 
-                       list_size, mlist, plist, lbnd, iclump, cupidGC.dax, 
+      cupidGCNdfClump( ndfs, sum, excols ? par : NULL, rms, ndim, lbox, ubox,
+                       list_size, mlist, plist, lbnd, iclump, cupidGC.dax,
                        extra, ( bad > maxbad*( *area ) ), status );
 
 /* Free resources */
