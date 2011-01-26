@@ -139,6 +139,11 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
 *        Initiaslise "exloc" locator to NULL before calling datFind.
 *     13-JAN-2009 (TIMJ):
 *        DO NOT CAST int* to size_t* since that is not going to work for long.
+*     26-JAN-2011 (DSB):
+*        Ensure the "m" pointer is incremented even if the currrent model pixel
+*        is off the edge of the NDF. Previously, this bug caused a stripey
+*        "aliasing" type effect if the supplied model data extends outside the 
+*        bounds of the NDF.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -242,7 +247,7 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
 /* Store every supplied model value in the NDF data array. */
       m = mlist;
       p = plist;
-      for( i = 0; i < list_size; i++ ) {
+      for( i = 0; i < list_size; i++,m++ ) {
 
 /* Find the 1D vector index into the NDF data array corresponding to the
    grid indices (within the user supplied NDF) of the current point.*/
@@ -256,7 +261,7 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
          }
 
 /* Store the value. */
-         if( ok ) ipd[ iv ] = *(m++);
+         if( ok ) ipd[ iv ] = *m;
       }
 
 /* Unmap the NDFs Data array. */
