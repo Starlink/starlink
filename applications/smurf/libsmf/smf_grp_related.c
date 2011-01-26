@@ -28,7 +28,7 @@
  *        Flag to denote whether to group files by common wavelength
  *     maxlen = dim_t (Given)
  *        If set, maximum length of a continuous chunk in time samples
- *        (prior to applying the downsampling factor). If 0 don't enforce a
+ *        (after applying the downsampling factor). If 0 don't enforce a
  *        maximum length.
  *     keymap = AstKeyMap * (Given)
  *        A pointer to a KeyMap holding the configuration parameters. Only
@@ -149,6 +149,8 @@
  *     2011-01-24 (TIMJ):
  *        Rewrite to use an AST KeyMap to determine related files. Has the
  *        side effect of sorting the chunks into date order.
+ *     2011-01-25 (TIMJ):
+ *        Do not scale maxlen.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -293,7 +295,6 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
       int itemp = 0;
       double steptime = data->hdr->steptime;
       dim_t ntslice = 0;
-      dim_t maxscaled = 0;
       dim_t thispad;              /* Padding neeed for current input file */
 
       filemap = astKeyMap( " " );
@@ -310,6 +311,27 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
       smf_get_dims( data, NULL, NULL, NULL, &ntslice, NULL, NULL, NULL,
                     status );
 
+      /* Find length of down-sampled data and steptime */
+      if( downsampscale && data->hdr && (*status==SAI__OK) ) {
+        double oldscale = steptime * data->hdr->scanvel;
+        double scalelen = oldscale / downsampscale;
+
+        /* only down-sample if it will be at least a factor of 20% */
+        if( scalelen <= 0.8 ) {
+          smf_smfFile_msg(data->file, "FILE", 1, "", status );
+          msgOutiff( MSG__VERB, "", FUNC_NAME
+                     ": will down-sample file ^FILE from %5.1lf Hz to %5.1lf Hz", status,
+                     (1./steptime),
+                     (scalelen/steptime) );
+
+          ntslice = round(ntslice * scalelen);
+
+          /* update steptime to include down-sample factor
+             (in effect this is downsampscale/scanvel) */
+          steptime = steptime / scalelen;
+        }
+      }
+
       /* Check that an individual file is too long (we assume related
          files are all the same) */
       if( maxlen && (ntslice > maxlen) && *status == SAI__OK) {
@@ -318,39 +340,12 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
         msgSeti("MAXLEN",maxlen);
         smf_smfFile_msg( data->file, "FILE", 1, "", status );
         errRep(FUNC_NAME,
-               "Length of file ^FILE time steps exceeds maximum "
+               "Number of time steps in file ^FILE time exceeds maximum "
                "(^NTSLICE>^MAXLEN)", status);
-      }
-
-      /* Step time might be down-sampled */
-      /* Assume there is no downsampling to beging with */
-      maxscaled = maxlen;
-
-      /* Find length of down-sampled data and steptime */
-      if( downsampscale && data->hdr && (*status==SAI__OK) ) {
-        double oldscale = steptime * data->hdr->scanvel;
-        double scalelen = oldscale / downsampscale;
-
-        /* only down-sample if it will be at least a factor of 20% */
-        if( scalelen <= 0.8 ) {
-          msgOutiff( MSG__VERB, "", FUNC_NAME
-                     ": will down-sample from %5.1lf Hz to %5.1lf Hz", status,
-                     (1./steptime),
-                     (scalelen/steptime) );
-
-          ntslice = round(ntslice * scalelen);
-
-          /* update maxscaled */
-          maxscaled = round(maxlen * scalelen);
-
-          /* update steptime to include down-sample factor */
-          steptime = steptime / scalelen;
-        }
       }
 
       /* Scaled values of ntslice and maximum length */
       astMapPut0I( filemap, "NTSLICE", ntslice, NULL );
-      astMapPut0I( filemap, "MAXLEN", maxscaled, NULL );
 
       /* Work out the padding needed for this file using the recalculated
          steptime */
@@ -427,7 +422,6 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
       AstKeyMap * grpindices = NULL;
       const char * tempstr = NULL;
       int thistlen = 0;
-      int thismax = 0;
       size_t nsubarrays = 0;
 
       /* Get the keymap entry for this slot */
@@ -435,7 +429,6 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
 
       /* Get info for length limits */
       astMapGet0I( thismap, "NTSLICE", &thistlen );
-      astMapGet0I( thismap, "MAXLEN", &thismax );
       piecelen[i] = thistlen;
 
       if (isFFT) {
@@ -474,7 +467,8 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
               ( strcmp( current.related, previous.related ) == 0 ) ) {
           /* continuous - check length */
           totlen += thistlen;
-          if ( thismax && totlen > (dim_t)thismax ) {
+          if ( maxlen && totlen > maxlen ) {
+            printf(" Totlen of %zd is > %zd Chunk %zd closed.\n", totlen, maxlen, thischunk );
             thischunk++;
             totlen = thistlen; /* reset length */
           } else {
