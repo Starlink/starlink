@@ -155,14 +155,18 @@ typedef struct AstLutMap {
 
 /* Attributes specific to objects in this class. */
    double *lut;                 /* Pointer to lookup table */
-   double start;                /* Input value for first table entry */
+   double *luti;                /* Reduced lookup table for inverse trans. */
    double inc;                  /* Input increment between table entries */
    double last_fwd_in;          /* Last input value (forward transfm.) */
    double last_fwd_out;         /* Last output value (forward transfm.) */
    double last_inv_in;          /* Last input value (inverse transfm.) */
    double last_inv_out;         /* Last output value (inverse transfm.) */
-   int nlut;                    /* Number of table entries */
+   double start;                /* Input value for first table entry */
+   int *flagsi;                 /* Flags indicating adjacent bad values */
+   int *indexi;                 /* Translates reduced to original indices */
    int lutinterp;               /* Interpolation method */
+   int nlut;                    /* Number of table entries */
+   int nluti;                   /* Reduced number of table entries */
 } AstLutMap;
 
 /* Virtual function table. */

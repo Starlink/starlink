@@ -30,9 +30,9 @@ f     AST_LUTMAP
 *     entries used for the interplation has a value of AST__BAD, then the
 *     interpolated value is returned as AST__BAD.
 *
-*     If the lookup table entries increase or decrease monotonically (and
-*     if the table contains no AST__BAD values), then the inverse
-*     transformation may also be performed.
+*     If the lookup table entries increase or decrease monotonically
+*     (ignoring any flat sections), then the inverse transformation may
+*     also be performed.
 
 *  Inheritance:
 *     The LutMap class inherits from the Mapping class.
@@ -51,7 +51,7 @@ f     The LutMap class does not define any new routines beyond those
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
 *     Research Councils
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2011 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -98,6 +98,11 @@ f     The LutMap class does not define any new routines beyond those
 *        neighbouring LutMaps for equality in MapMerge.
 *     19-NOV-2010 (DSB):
 *        Added (protected) astGetLutMapInfo function.
+*     24-JAN-2011 (DSB):
+*        Implement an inverse transformation even if the coordinate
+*        array contains sections of equal or bad values. The inverse
+*        transformation will generate bad values if used within such
+*        regions of the coordinate array.
 *class--
 */
 
@@ -199,6 +204,7 @@ AstLutMap *astLutMapId_( int, const double [], double, double, const char *, ...
 /* ======================================== */
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
 static int GetLinear( AstMapping *, int * );
+static int GetMonotonic( int, const double *, int *, double **, int **, int **, int * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
 static void Copy( const AstObject *, AstObject *, int * );
 static void Delete( AstObject *, int * );
@@ -647,6 +653,179 @@ static double *GetLutMapInfo( AstLutMap *this, double *start, double *inc,
 
 /* Return a copy of the look up table. */
    return astStore( NULL, this->lut, sizeof( double )*this->nlut );
+}
+
+static int GetMonotonic( int nlut, const double *lut, int *nluti, double **luti,
+                         int **flagsi, int **indexi, int *status ) {
+/*
+*  Name:
+*     GetMonotonic
+
+*  Purpose:
+*     Determine if a array is monotonic increasing or decreasing.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "lutmap.h"
+*     int GetMonotonic( int nlut, const double *lut, int *nluti, double **luti,
+*                       int **flagsi, int **indexi, int *status )
+
+*  Class Membership:
+*     LutMap member function.
+
+*  Description:
+*     This function returns a flag indiciating the supplied array is
+*     monotonic increasing, monotonic decreasing, or non-monotonic.
+*     Sections of equal or bad values do not invalidate an otherwise
+*     monotonic array.
+*
+*     It also returns information needed to implement the inverse
+*     transformation of a LutMap.
+
+*  Parameters:
+*     nlut
+*        The length of the array.
+*     lut
+*        The array to check.
+*     nluti
+*        Address of an int in which to store the length of the returned
+*        "luti" and "flags" arrays.
+*     luti
+*        Address at which to return a pointer to a newly allocated array
+*        containing "*nluti" elements. This is a copy of the supplied
+*        "lut" array but with any bad or NaN values omitted. Subsequent
+*        elements are shuffled down to fill the holes left by removing
+*        these bad values. A NULL pointer is returned if there are no bad
+*        values in "lut".
+*     flagsi
+*        Address at which to return a pointer to a newly allocated array
+*        containing "*nluti" elements. Each element is non-zero if the
+*        corresponding value stored in "luti" was adjacent to a bad value
+*        in the supplied "lut" array. A NULL pointer is returned if there
+*        are no bad values in "lut".
+*     indexi
+*        Address at which to return a pointer to a newly allocated array
+*        containing "*nluti" elements. Each element is the index within
+*        "lut" of the corresponding value stored in "luti". A NULL pointer
+*        is returned if there are no bad values in "lut".
+*     status
+*        Pointer to the inherited status variable.
+
+*  Notes:
+*    - A value of zero will be returned if this function is invoked
+*    with the global error status set, or if it should fail for any
+*    reason.
+*/
+
+/* Local Variables: */
+   const double *p3;
+   double *p1;
+   double lval;
+   int *p2;
+   int *p4;
+   int ilut;
+   int nbad;
+   int result;
+
+/* Initialise. */
+   result = 0;
+   *nluti = 0;
+   *luti = NULL;
+   *flagsi = NULL;
+   *indexi = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* As yet we have not found a good value. */
+   lval = AST__BAD;
+
+/* As yet we have not found a bad value. */
+   nbad = 0;
+
+/* Loop  round the supplied array, ignoring bad (AST__BAD or NaN) values. */
+   for ( ilut = 0; ilut < nlut; ilut++ ) {
+      if( !astISBAD( lut[ ilut ] ) ) {
+
+/* If this is the first good value, record it. */
+         if( lval == AST__BAD ) {
+            lval = lut[ ilut ];
+
+/* If this is not the first good value, ignore it if it is equal to the
+   previous god value. */
+         } else if( lut[ ilut ] != lval ) {
+
+/* Set the returned flag on the basis of the first pair of good values. */
+            if( result == 0 ) {
+               result = ( lut[ ilut ] > lval ) ? 1 : -1;
+
+/* For subsequent pairs of good values, check the pair increases or
+   decreases in the same way as the first pair. Reset the returned value
+   to zero and break if not. */
+            } else if( result == 1 && lut[ ilut ] < lval ) {
+               result = 0;
+               break;
+
+            } else if( result == -1 && lut[ ilut ] >lval ) {
+               result = 0;
+               break;
+            }
+
+         }
+      } else {
+         nbad++;
+      }
+   }
+
+/* If any bad values were found, we now allocate the required returned
+   arrays. */
+   if( nbad ) {
+      *nluti = nlut - nbad;
+      *luti = astMalloc( sizeof( double )*( *nluti ) );
+      *flagsi = astMalloc( sizeof( double )*( *nluti ) );
+      *indexi = astMalloc( sizeof( double )*( *nluti ) );
+
+      if( astOK ) {
+
+/* Into "luti" copy all good values from "lut", shuffling down values to
+   fill holes left by bad values. Into "flagsi", store a flag indicating
+   if the corresponding "luti" value was adjacent to a bad value in the
+   full "lut" array. */
+         p1 = *luti;
+         p2 = *flagsi;
+         p3 = lut;
+         p4 = *indexi;
+
+/* Do the first input point (it has no lower neighbour). */
+         if( !astISBAD( *p3 ) ) {
+            *(p1++) = *p3;
+            *(p2++) = astISBAD( p3[ +1 ] );
+            *(p4++) = 0;
+         }
+
+/* Do all remaining input points except for the last one. */
+         for ( ilut = 1,p3++; ilut < nlut-1; ilut++,p3++ ) {
+            if( !astISBAD( *p3 ) ) {
+               *(p1++) = *p3;
+               *(p2++) = astISBAD( p3[ -1 ] ) || astISBAD( p3[ +1 ] );
+               *(p4++) = ilut;
+            }
+         }
+
+/* Do the last input point (it has no upper neighbour). */
+         if( !astISBAD( *p3 ) ) {
+            *p1 = *p3;
+            *p2 = astISBAD( p3[ -1 ] );
+            *p4 = ilut;
+         }
+      }
+   }
+
+
+/* Return the result. */
+   return result;
 }
 
 void astInitLutMapVtab_(  AstLutMapVtab *vtab, const char *name, int *status ) {
@@ -1236,13 +1415,18 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    double value_out;             /* Output coordinate value */
    double x;                     /* Value normalised to LUT increment */
    double xi;                    /* Integer value of "x" */
+   int *flags;                   /* Flags indicating an adjacent bad value */
+   int *index;                   /* Translates reduced to original indices */
    int i1;                       /* Lower adjacent LUT index */
    int i2;                       /* Upper adjacent LUT index */
    int i;                        /* New LUT index */
+   int istart;                   /* Original LUT index at start of interval */
    int ix;                       /* "x" converted to an int */
    int near;                     /* Perform nearest neighbour interpolation? */
    int nlut;                     /* Number of LUT entries */
+   int nlutm1;                   /* Number of LUT entries minus one */
    int npoint;                   /* Number of points */
+   int ok;                       /* Lookup table is not flat */
    int point;                    /* Loop counter for points */
    int up;                       /* LUT values are increasing? */
 
@@ -1273,15 +1457,16 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    been inverted. */
    if ( astGetInvert( map ) ) forward = !forward;
 
-/* Obtain lookup table details. */
-   lut = map->lut;
-   nlut = map->nlut;
-   near = ( astGetLutInterp( map ) == NEAR );
-
 /* Forward transformation. */
 /* ----------------------- */
    if( astOK ){
       if ( forward ) {
+
+/* Obtain lookup table details. */
+         lut = map->lut;
+         nlut = map->nlut;
+         near = ( astGetLutInterp( map ) == NEAR );
+         nlutm1 = nlut - 1;
 
 /* Calculate the scale factor required. */
          scale = 1.0 / map->inc;
@@ -1332,12 +1517,12 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 
 /* If the input value lies above the last lookup table entry (or equals
    it), extrapolate using the last two table values. */
-               } else if ( ix >= ( nlut - 1 ) ) {
-                  if( lut[ nlut - 1 ] != AST__BAD &&
+               } else if ( ix >= nlutm1 ) {
+                  if( lut[ nlutm1 ] != AST__BAD &&
                       lut[ nlut - 2 ] != AST__BAD ) {
-                     value_out = lut[ nlut - 1 ] +
-                                 ( x - (double) ( nlut - 1 ) ) *
-                                 ( lut[ nlut - 1 ] - lut[ nlut - 2 ] );
+                     value_out = lut[ nlutm1 ] +
+                                 ( x - (double) ( nlutm1 ) ) *
+                                 ( lut[ nlutm1 ] - lut[ nlut - 2 ] );
                   } else {
                      value_out = AST__BAD;
                   }
@@ -1368,6 +1553,25 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* ----------------------- */
       } else {
 
+/* Obtain details of the lookup table to be used by the inverse
+   transformation. This is the same as the forward transformation lookup
+   table, except that any bad values are omitted. Also, get a pointer to a
+   array of flags that indicate if the corresponding lookup table entries
+   were adjacent to a bad value or not in the full lookup table. */
+         if( map->luti ) {
+            lut = map->luti;
+            flags = map->flagsi;
+            nlut = map->nluti;
+            index = map->indexi;
+         } else {
+            lut = map->lut;
+            flags = NULL;
+            nlut = map->nlut;
+            index = NULL;
+         }
+         near = ( astGetLutInterp( map ) == NEAR );
+         nlutm1 = nlut - 1;
+
 /* Loop to transform each input point. */
          for ( point = 0; point < npoint; point++ ) {
 
@@ -1384,12 +1588,12 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
             } else if ( value_in == AST__BAD ) {
                value_out = AST__BAD;
 
-/* Otherwise, determine if the lookup table's elements are increasing
-   or decreasing. (Note the inverse transformation will not be
-   defined, so will not be attempted, unless all the table entries are
-   monotonically increasing or decreasing.) */
+/* Otherwise, we can determine an inverse. Note the inverse transformation
+   will not be defined, so will not be attempted, unless all the table
+   entries are monotonically increasing or decreasing, possibly with sections
+   of equal or bad values. */
             } else {
-               up = ( lut[ nlut - 1 ] > lut[ 0 ] );
+               up = ( lut[ nlutm1 ] > lut[ 0 ] );
 
 /* Perform a binary search to identify two adjacent lookup table
    elements whose values bracket the input coordinate value. */
@@ -1400,20 +1604,49 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                   *( ( ( value_in >= lut[ i ] ) == up ) ? &i1 : &i2 ) = i;
                }
 
+/* If the lower table value is equal to the required value, and either of
+   its neighbours is also equal to the required value, then we have been
+   asked to find the inverse in a flat region of the table, so return
+   a bad value. Likewise, if the upper table value is equal to the required
+   value, and either of its neighbours is also equal to the required value,
+   then we have been asked to find the inverse in a flat region of the table,
+   so return a bad value. */
+               ok = 1;
+               if( lut[ i1 ] == value_in ) {
+                  if( i1 > 0 && lut[ i1 - 1 ] == value_in ) ok = 0;
+                  if( lut[ i2 ] == value_in ) ok = 0;
+               } else if( lut[ i2 ] == value_in ) {
+                  if( i2 < nlutm1 && lut[ i2 + 1 ] == value_in ) ok = 0;
+                  if( lut[ i1 ] == value_in ) ok = 0;
+               }
+
+               if( !ok ) {
+                  value_out = AST__BAD;
+
+/* If both of the two table elements were adjacent to a bad value in the
+   full lookup table, return a bad output value. */
+               } else if( flags && ( flags[ i1 ] && flags[ i2 ] ) ) {
+                  value_out = AST__BAD;
+
 /* Nearest neighbour interpolation: return the closest of i1 or i2. Return
    AST__BAD if the supplied value is less than either or greater than
    either.  */
-               if( near ) {
+               } else if( near ) {
                   d1 = lut[ i1 ] - value_in;
                   d2 = lut[ i2 ] - value_in;
                   if( ( d1 > 0.0 && d2 > 0.0 ) ||
                       ( d1 < 0.0 && d2 < 0.0 ) ) {
                      value_out = AST__BAD;
 
-                  } else if( fabs( d1 ) < fabs( d2 ) ){
-                     value_out = i1;
                   } else {
-                     value_out = i2;
+
+                     if( fabs( d1 ) < fabs( d2 ) ){
+                        istart = index ? index[ i1 ] : i1;
+                     } else {
+                        istart = index ? index[ i2 ] : i2;
+                     }
+                     value_out = map->start + map->inc * istart;
+
                   }
 
 /* Linear interpolation... */
@@ -1429,8 +1662,9 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 
 /* Interpolate (or extrapolate) to derive the output coordinate
    value. */
-                  value_out = map->start + map->inc *
-                           ( (double) i1 + ( ( value_in - lut[ i1 ] ) /
+                  istart = index ? index[ i1 ] : i1;
+                  value_out = map->start + map->inc * ( (double) istart +
+                                             ( ( value_in - lut[ i1 ] ) /
                                              ( lut[ i1 + 1 ] - lut[ i1 ] ) ) );
                }
             }
@@ -1534,9 +1768,23 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
    in= (AstLutMap *) objin;
    out = (AstLutMap *) objout;
 
+/* Nullify all output pointers. */
+   out->lut = NULL;
+   out->luti = NULL;
+   out->flagsi = NULL;
+   out->indexi = NULL;
+
 /* Allocate memory and store a copy of the lookup table data. */
    out->lut = astStore( NULL, in->lut,
                         sizeof( double ) * (size_t) in->nlut );
+
+/* Do the arrays used for the inverse transformation, if they exist. */
+   if( in->luti ) out->luti = astStore( NULL, in->luti,
+                                        sizeof( double ) * (size_t) in->nluti );
+   if( in->flagsi ) out->flagsi = astStore( NULL, in->flagsi,
+                                        sizeof( double ) * (size_t) in->nluti );
+   if( in->indexi ) out->indexi = astStore( NULL, in->indexi,
+                                        sizeof( double ) * (size_t) in->nluti );
 }
 
 /* Destructor. */
@@ -1571,8 +1819,11 @@ static void Delete( AstObject *obj, int *status ) {
 /* Obtain a pointer to the LutMap structure. */
    this = (AstLutMap *) obj;
 
-/* Free the memory holding the lookup table. */
-   if ( this->lut ) this->lut = astFree( this->lut );
+/* Free the memory holding the lookup tables, etc. */
+   this->lut = astFree( this->lut );
+   this->luti = astFree( this->luti );
+   this->flagsi = astFree( this->flagsi );
+   this->indexi = astFree( this->indexi );
 }
 
 /* Dump function. */
@@ -1977,12 +2228,14 @@ AstLutMap *astInitLutMap_( void *mem, size_t size, int init,
 */
 
 /* Local Variables: */
-   AstLutMap *new;               /* Pointer to new LutMap */
-   double *p;                    /* Pointer to next lut element */
-   int down;                     /* Values are decreasing? */
-   int ilut;                     /* Loop counter for LUT elements */
-   int monotonic;                /* LUT elements distinct and monotonic? */
-   int up;                       /* Values are increasing? */
+   AstLutMap *new;       /* Pointer to new LutMap */
+   double *luti;         /* Pointer to table for inverse transformation */
+   double *p;            /* Pointer to next lut element */
+   int *flagsi;          /* Pointer to flags for inverse transformation */
+   int *indexi;          /* Pointer to translation from original to reduced */
+   int dirn;             /* +1 => values increasing, -1 => values decreasing */
+   int ilut;             /* Loop counter for LUT elements */
+   int nluti;            /* Length of "luti" array */
 
 /* Initialise. */
    new = NULL;
@@ -2004,30 +2257,14 @@ AstLutMap *astInitLutMap_( void *mem, size_t size, int init,
       astError( AST__LUTII, "astInitLutMap(%s): An input value increment of "
                 "zero between lookup table elements is not allowed.", status, name );
 
-/* Determine if the element values are all good, distinct and increase
-   or decrease monotonically. We can only implement the inverse
-   transformation if this is so. Use the astISBAD macro to include NaNs
-   in the checking as well as AST__BAD values. */
+/* Determine if the element values increase or decrease monotonically (except
+   that adjacent entries can be equal). We can only implement the inverse
+   transformation if this is so. The inverse transformation will generate
+   AST__BAD output values for sections of the table that contain equal
+   adjacent values, or hold AST__BAD values. */
    } else {
-      if( astISBAD(lut[ 0 ]) ) {
-         monotonic = 0;
-
-      } else {
-         up = ( lut[ nlut - 1 ] > lut[ 0 ] );
-         down = ( lut[ nlut - 1 ] < lut[ 0 ] );
-         monotonic = up || down;
-         if ( monotonic ) {
-            for ( ilut = 0; ilut < ( nlut - 1 ); ilut++ ) {
-               if( astISBAD(lut[ ilut  + 1 ]) ) {
-                  monotonic = 0;
-               } else {
-                  monotonic = up ? ( lut[ ilut + 1 ] > lut[ ilut ] ) :
-                                   ( lut[ ilut + 1 ] < lut[ ilut ] );
-               }
-               if ( !monotonic ) break;
-            }
-         }
-      }
+      dirn = GetMonotonic( nlut, lut, &nluti, &luti, &flagsi, &indexi,
+                           status );
 
 /* Initialise a Mapping structure (the parent class) as the first
    component within the LutMap structure, allocating memory if
@@ -2035,7 +2272,7 @@ AstLutMap *astInitLutMap_( void *mem, size_t size, int init,
    forward direction, and conditionally in the inverse direction. */
       new = (AstLutMap *) astInitMapping( mem, size, 0,
                                          (AstMappingVtab *) vtab, name,
-                                          1, 1, 1, monotonic );
+                                          1, 1, 1, ( dirn != 0 ) );
 
       if ( astOK ) {
 
@@ -2045,6 +2282,10 @@ AstLutMap *astInitLutMap_( void *mem, size_t size, int init,
          new->start = start;
          new->inc = inc;
          new->lutinterp = LINEAR;
+         new->nluti = nluti;
+         new->luti = luti;
+         new->flagsi = flagsi;
+         new->indexi = indexi;
 
 /* Allocate memory and store the lookup table. */
          new->lut = astStore( NULL, lut, sizeof( double ) * (size_t) nlut );
@@ -2225,6 +2466,11 @@ AstLutMap *astLoadLutMap_( void *mem, size_t size,
          new->last_fwd_out = AST__BAD;
          new->last_inv_in = AST__BAD;
          new->last_inv_out = AST__BAD;
+
+/* See if the array is monotonic increasing or decreasing. */
+         (void) GetMonotonic( new->nlut, new->lut, &(new->nluti),
+                              &(new->luti), &(new->flagsi), &(new->indexi),
+                              status );
       }
    }
 
