@@ -14,7 +14,7 @@
 
  *  Invocation:
  *     size_t smf_get_freemem( double * mbytes, size_t *pagesize,
- *                             size_t *physsize, int *status );
+ *                             int64_t *physsize, int *status );
 
  *  Arguments:
  *     mbytes = double * (Returned)
@@ -22,7 +22,7 @@
  *        megabytes if required. Can be NULL.
  *     pagesize = size_t * (Returned)
  *        Pagesize in bytes. Can be NULL.
- *     physsize = size_t * (Returned)
+ *     physsize = int64_t * (Returned)
  *        Total physical memory in bytes. Can be NULL.
  *     status = int* (Given and Returned)
  *        Pointer to inherited status.
@@ -44,9 +44,11 @@
  *       Initial version
  *     2009-10-16 (EC):
  *       Add physsize parameter.
+ *     2011-01-25 (TIMJ):
+ *        Change type of physsize to guarantee it is a 64-bit value.
 
  *  Copyright:
- *     Copyright (C) 2009 Science & Technology Facilities Council.
+ *     Copyright (C) 2009-2011 Science & Technology Facilities Council.
  *     Copyright (C) 2009 University of British Columbia.
  *     All Rights Reserved.
 
@@ -95,10 +97,10 @@
 
 
 size_t smf_get_freemem ( double *mbytes, size_t * pagesize,
-                         size_t * physsize, int * status ) {
-  size_t mem_used = 0;
-  size_t mem_free = 0;
-  size_t mem_total = 0;
+                         int64_t * physsize, int * status ) {
+  int64_t mem_used = 0;
+  int64_t mem_free = 0;
+  int64_t mem_total = 0;
   double freembytes = 0.0;
 
   if (*status != SAI__OK) return mem_free;

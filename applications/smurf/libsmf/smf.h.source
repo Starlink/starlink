@@ -1142,7 +1142,7 @@ void smf_get_extpar( AstKeyMap *keymap, smf_tausrc *tausrc,
 size_t smf_get_findex( double f, double df, dim_t nf, int *status );
 
 size_t smf_get_freemem ( double * mbytes, size_t *pagesize,
-                         size_t *physsize, int * status );
+                         int64_t *physsize, int * status );
 
 void smf_get_goodrange( const smf_qual_t *quality, dim_t ntslice,
                         size_t tstride, smf_qual_t mask,

@@ -1004,7 +1004,6 @@ void smurf_makemap( int *status ) {
   AstFrameSet *outfset=NULL; /* Frameset containing sky->output mapping */
   char pabuf[ 10 ];          /* Text buffer for parameter value */
   double params[ 4 ];        /* astRebinSeq parameters */
-  size_t physsize;           /* Physical memory available */
   char *pname = NULL;        /* Name of currently opened data file */
   int ***ptime = NULL;       /* Holds time slice indices for each bol bin */
   int *pt = NULL;            /* Holds time slice indices for each bol bin */
@@ -1087,7 +1086,7 @@ void smurf_makemap( int *status ) {
 
   if( *status == SAI__OK ) {
     double freemem = 0.0;
-    physsize = 0;
+    int64_t physsize = 0;
 
     (void)smf_get_freemem( NULL, NULL, &physsize, status );
 
