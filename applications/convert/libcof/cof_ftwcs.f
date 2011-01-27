@@ -5,8 +5,9 @@
 *     COF_FTWCS
 
 *  Purpose:
-*     Uses coordinate system information in the FITS headers of the current
-*     header and data unit to create WCS and AXIS components in an NDF.
+*     Uses co-ordinate system information in the FITS headers of the
+*     current header and data unit to create WCS and AXIS components in
+*     an NDF.
 
 *  Language:
 *     Starlink Fortran 77
@@ -15,37 +16,38 @@
 *     CALL COF_FTWCS( FUNT, INDF, NENCOD, ENCODS, FILE, WCSATT, STATUS )
 
 *  Description:
-*     This constructs an AST FrameSet from the FITS headers of the current
-*     header and data unit and adds it into the existing WCS information in
-*     the supplied NDF. It can also create AXIS structures (see below).
+*     This constructs an AST FrameSet from the FITS headers of the
+*     current header and data unit and adds it into the existing WCS
+*     information in the supplied NDF. It can also create AXIS
+*     structures (see below).
 *
-*     The information needed to create the FrameSet can be stored several
-*     times in a single FITS header, using different keywords each time.
-*     Each of these descriptions is known as an "encoding" and AST supports
-*     several different encoding schemes (i.e. FITS-WCS, DSS, NATIVE).
-*     If the supplied FITS header contains more than one encoding then we
-*     need to choose which one to use. This decision is important because
-*     is is possible for encodings to be inconsistent (i.e. software may
-*     modify one encoding without making equivalent modifications to the
-*     other encodings). The simplest way to make this decision is to hand
-*     responsibility for it over to the user. In this case, the user
-*     supplies a list of preferred encodings, and the first of these encodings
-*     which exists in the FITS header gets used. If the user does not
-*     know which encoding to use, then we can make an intelligent guess by
-*     comparing the encodings to see which ones are consistent and which
-*     ones are not.
+*     The information needed to create the FrameSet can be stored
+*     several times in a single FITS header, using different keywords
+*     each time. Each of these descriptions is known as an "encoding"
+*     and AST supports several different encoding schemes (e.g.
+*     FITS-WCS, DSS, NATIVE). If the supplied FITS header contains more
+*     than one encoding then we need to choose which one to use. This
+*     decision is important because is is possible for encodings to be
+*     inconsistent (i.e. software may modify one encoding without making
+*     equivalent modifications to the other encodings). The simplest way
+*     to make this decision is to hand responsibility for it over to the
+*     user. In this case, the user supplies a list of preferred
+*     encodings, and the first of these encodings that exists in the
+*     FITS header gets used. If the user does not know which encoding to
+*     use, then we can make an intelligent guess by comparing the
+*     encodings to see which ones are consistent and which ones are not.
 *
 *     In addition to the WCS component, this routine also creates AXIS
 *     Centre, Label and Units components in the NDF, but only if they do
 *     not already exist, and if the FrameSet read from the FITS header
 *     contains an AXIS Frame. NDF2FITS does not write out the AXIS Frame
-*     if it is equivalent to pixel coordinates, and so no AXIS structures
-*     will be created by this routine in this case. Also, if the AXIS Frame
-*     represents linear axis coordinates, then there will already be AXIS
-*     structures in the NDF (created earlier within FITS2NDF), and so again
-*     no AXIS  structures will be created by this routine. Thus, this routine
-*     will only create AXIS structures in the cases where the axis coordinates
-*     are non-linear.
+*     if it is equivalent to pixel co-ordinates, and so no AXIS
+*     structures will be created by this routine in this case. Also, if
+*     the AXIS Frame represents linear axis co-ordinates, then there
+*     will already be AXIS structures in the NDF (created earlier within
+*     FITS2NDF), and so again no AXIS structures will be created by
+*     this routine. Thus, this routine will only create AXIS structures
+*     in the cases where the axis co-ordinates are non-linear.
 
 *  Arguments:
 *     FUNT = INTEGER (Given)
@@ -56,9 +58,9 @@
 *     NENCOD = INTEGER (Given)
 *        The number of encodings supplied in ENCODS.
 *     ENCODS( NENCOD ) = CHARACTER * ( * ) (Given)
-*        The user's preferred AST encodings. If NENCOD is zero, then this
-*        is ignored, and an intelligent guess is made as to which encoding
-*        to use (see COF_WCSIM).
+*        The user's preferred AST encodings. If NENCOD is zero, then
+*        this is ignored, and an intelligent guess is made as to which
+*        encoding to use (see COF_WCSIM).
 *     FILE = CHARACTER * ( * ) (Given)
 *        The name of the FITS file or tape device to appear in error
 *        messages.
@@ -127,7 +129,7 @@
 *  Global Variables:
       INCLUDE 'F2NDF3_CMN'
 *        INTEGER FUNIT (Write)
-*           The fortran unit number associated with the FITS file
+*           The Fortran unit number associated with the FITS file
 
 *  Arguments Given:
       INTEGER FUNT
@@ -164,10 +166,10 @@
 *  paper III should be recognised.
       CALL AST_SETL( FC, 'TabOK', .TRUE., STATUS )
 
-*  Tell the FitsChan to use the COF_TBSRC routine if and when it needs to
-*  get data from a binary table extension (as it will do if any axes are
-*  described using the -TAB algorithm). Also store the FITSIO unit number
-*  for the FITS file in common for use by COF_TBSRC.
+*  Tell the FitsChan to use the COF_TBSRC routine if and when it needs
+*  to get data from a binary table extension (as it will do if any axes
+*  are described using the -TAB algorithm). Also store the FITSIO unit
+*  number for the FITS file in common for use by COF_TBSRC.
       CALL AST_TABLESOURCE( FC, COF_TBSRC, STATUS )
       FUNIT = FUNT
 

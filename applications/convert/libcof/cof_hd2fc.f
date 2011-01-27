@@ -4,7 +4,7 @@
 *     COF_HD2FC
 
 *  Purpose:
-*     Copy all headers from the current HDU into a FitsChan.
+*     Copies all headers from the current HDU into a FitsChan.
 
 *  Language:
 *     Starlink Fortran 77
@@ -125,8 +125,8 @@
             NBAD = NBAD + 1
 
 *  Add this header into the FitsChan. If an error occurs, annul the
-*  error, increment the number of bad headers, and continue to process any
-*  remaining headers.
+*  error, increment the number of bad headers, and continue to process
+*  any remaining headers.
          ELSE
             CALL AST_PUTFITS( FC, HEADER, 1, STATUS )
             IF ( STATUS .NE. SAI__OK ) THEN

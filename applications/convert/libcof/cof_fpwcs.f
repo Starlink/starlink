@@ -4,7 +4,7 @@
 *     COF_FPWCS
 
 *  Purpose:
-*     Uses coordinate system information from the NDF WCS component
+*     Uses co-ordinate system information from the NDF WCS component
 *     to create FITS headers in the current header and data unit.
 
 *  Language:
@@ -14,23 +14,25 @@
 *     CALL COF_FPWCS( FUNIT, INDF, ENCOD, NATIVE, STATUS )
 
 *  Description:
-*     The AST FrameSet (see SUN/210) describing the coordinate systems
-*     of the supplied NDF is obtained. Any Frames which can be generated
-*     automatically are removed from this FrameSet (i.e. the PIXEL Frame,
-*     and also the AXIS Frame if it is equivalent to the PIXEL Frame). If
-*     more than one Frame (i.e. the GRID frame) remains, a FITS header is
-*     created containing desriptions (known as "encodings") of the FrameSet.
+*     The AST FrameSet (see SUN/210) describing the co-ordinate systems
+*     of the supplied NDF is obtained. Any Frames that can be generated
+*     automatically are removed from this FrameSet (i.e. the PIXEL
+*     Frame, and also the AXIS Frame if it is equivalent to the PIXEL
+*     Frame). If more than one Frame (i.e. the GRID frame) remains, a
+*     FITS header is created containing desriptions (known as
+*     "encodings") of the FrameSet.
 
 *  Arguments:
 *     FUNIT = INTEGER (Given)
-*        The FITSIO unit number to which the FITS header cards are written.
+*        The FITSIO unit number to which the FITS header cards are
+*         written.
 *     INDF = INTEGER (Given)
 *        The NDF identifier.
 *     ENCOD = CHARACTER * ( * ) (Given)
 *        The encoding to use. If this is blank, then a default encoding
 *        is chosen based on the contents of the FITS extension. The
-*        supplied string should be a recognised AST encoding such as 'DSS',
-*        'FITS-WCS', 'NATIVE', etc (or a blank string).
+*        supplied string should be a recognised AST encoding such as
+*        'DSS', 'FITS-WCS', 'NATIVE', etc. (or a blank string).
 *     NATIVE = LOGICAL (Given)
 *        Include a NATIVE encoding in the header?
 *     STATUS = INTEGER (Given and Returned)
@@ -41,7 +43,7 @@
 
 *  Copyright:
 *     Copyright (C) 1997-2000, 2003-2004 Central Laboratory of the
-*     Research Councils. Copyright (C) 2008 Science & Technology
+*     Research Councils. Copyright (C) 2008, 2011 Science & Technology
 *     Facilities Council. All Rights Reserved.
 
 *  Licence:
@@ -85,11 +87,12 @@
 *     10-SEP-2004 (TIMJ):
 *        Initialise HEADER to fix valgrind warning
 *     30-JUN-2008 (DSB):
-*        Delete cards from end of list to avoid massive CFITSIO overheads.
+*        Delete cards from end of list to avoid massive CFITSIO
+*        overheads.
 *     20-JAN-2011 (DSB):
 *        - Increase the value of the FitsDigits attribute from 10 to 15
 *        to get sub-second accuracy on MJD-OBS.
-*        - Support FITS-WCS paper III "-TAB" algorithm.
+*        - Support FITS-WCS Paper III "-TAB" algorithm.
 *     {enter_further_changes_here}
 
 *-
@@ -149,7 +152,7 @@
 *  Setting FitsDigits to a negative value ensures that FitsChan never
 *  uses more than the number of digits allowed by the FITS standard when
 *  formatting floating point values. Also indicate that axes can be
-*  described using the -TAB algorithm described in FITS-WCS paper III.
+*  described using the -TAB algorithm described in FITS-WCS Paper III.
       FC = AST_FITSCHAN( AST_NULL, AST_NULL, 'FITSDIGITS=-15,TABOK=1',
      :                   STATUS )
       IF( STATUS .NE. SAI__OK ) GO TO 999
@@ -191,7 +194,7 @@
       END DO
 
 *  Now export any WCS information from the NDF into the FitsChan. This
-*  may over-write any WCS information which already existed in the
+*  may overwrite any WCS information which already existed in the
 *  FITSIO header on entry. Only modify the supplied FITSIO header if at
 *  least one Object was written to the FitsChan.
       IF( COF_WCSEX( FC, INDF, ENCOD, NATIVE, STATUS ) .GE. 1 ) THEN
@@ -199,11 +202,11 @@
 *  Copy the contents of the FitsChan into the CHDU header.
           CALL COF_FC2HD( FC, FUNIT, STATUS )
 
-*  If any axes were successfully described using the -TAB algorithm, there
-*  will be one or more FitsTables stored in the FitsChan. For each such
-*  FitsTable, create a corresponding extension in the FITS file containing a
-*  binary table. Get a pointer to a KeyMap that holds copies of the
-*  FitsTables in the FitsChan.
+*  If any axes were successfully described using the -TAB algorithm,
+*  there will be one or more FitsTables stored in the FitsChan. For each
+*  such FitsTable, create a corresponding extension in the FITS file
+*  containing a binary table. Get a pointer to a KeyMap that holds
+*  copies of the FitsTables in the FitsChan.
          KEYMAP = AST_GETTABLES( FC, STATUS )
          IF( KEYMAP .NE. AST__NULL ) THEN
 
@@ -211,14 +214,15 @@
             NTABLE = AST_MAPSIZE( KEYMAP, STATUS )
             DO ITABLE = 1, NTABLE
 
-*  Get the key for the KeyMap entry with the current index, and use it to
-*  retrieve a pointer to the FitsTable.
+*  Get the key for the KeyMap entry with the current index, and use it
+*  to retrieve a pointer to the FitsTable.
                KEY = AST_MAPKEY( KEYMAP, ITABLE, STATUS )
                IF( AST_MAPGET0A( KEYMAP, KEY, TABLE, STATUS ) ) THEN
 
-*  Create an extension in the FITS file holding a binary table containing
-*  values copied from the FitsTable, and then annul the FitsTable pointer.
-*  Use the table key in the KeyMap as the extension name.
+*  Create an extension in the FITS file holding a binary table
+*  containing values copied from the FitsTable, and then annul the
+*  FitsTable pointer. Use the table key in the KeyMap as the extension
+*  name.
                   CALL COF_FT2BT( TABLE, FUNIT, KEY, STATUS )
                   CALL AST_ANNUL( TABLE, STATUS )
 
@@ -230,8 +234,8 @@
 
          END IF
 
-*  If the NDF has a WCS component but it could not be written out, issue a
-*  warning.
+*  If the NDF has a WCS component but it could not be written out, issue
+*  a warning.
       ELSE
 
          CALL NDF_STATE( INDF, 'WCS', THERE, STATUS )

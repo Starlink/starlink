@@ -15,21 +15,25 @@
 
 *  Description:
 *     This function creates a new AST FitsTable object holding the data
-*     read from a FITS binary table held in a named extension of the supplied
-*     FITS file.
+*     read from a FITS binary table held in a named extension of the
+*     supplied FITS file.
 
 *  Arguments:
 *     FUNIT = INTEGER (Given)
 *        The FITSIO unit number for the FITS file.
 *     EXTNAM = CHARACTER * ( * ) (Given)
-*        The name of the FITS extension containing the required binary table.
+*        The name of the FITS extension containing the required binary
+*        table.
 *     EXTVER = INTEGER (Given)
-*        The value of the EXTVER keyword in the required binary table HDU.
+*        The value of the EXTVER keyword in the required binary-table
+*        HDU.
 *     EXTLEVEL = INTEGER (Given)
-*        The value of the EXTLEVEL keyword in the required binary table HDU.
+*        The value of the EXTLEVEL keyword in the required binary-table
+*        HDU.
 *     TABLE = INTEGER (Returned)
-*        A pointer to the new FitsTable. A value of AST__NULL is returned
-*        (without error) if the named extension cannot be found.
+*        A pointer to the new FitsTable. A value of AST__NULL is
+*        returned (without error) if the named extension cannot be
+*        found.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -145,7 +149,8 @@
 *  Create a FitsChan to hold the headers in the extension HDU.
          HEADER = AST_FITSCHAN( AST_NULL, AST_NULL, ' ', STATUS )
 
-*  Extract the headers from the HDU and store them in the above FitsChan.
+*  Extract the headers from the HDU and store them in the above
+*  FitsChan.
          CALL COF_HD2FC( FUNIT, HEADER, STATUS )
 
 *  Since the FITSIO "FTGCF<x>" routine applies any required scaling
@@ -205,7 +210,7 @@
             NEL = AST_GETI( TABLE, NAME( : IAT ), STATUS )
             TOTNEL = NROW*NEL
 
-*  Do each data type in turn. First 4 byte integer.
+*  Do each data type in turn. First four-byte integer.
             IF( CTYPE .EQ. AST__INTTYPE ) THEN
 
 *  Allocate memory to store the column values.
@@ -214,8 +219,8 @@
 
 *  Read the FITS file to get all the data values in the column, storing
 *  them in the above memory. The FitsTable will have inherited the null
-*  value from the FITS header, and so we do not need to replace null values
-*  in the following call.
+*  value from the FITS header, and so we do not need to replace null
+*  values in the following call.
                CALL FTGCVJ( FUNIT, ICOL, 1, 1, TOTNEL, 0,
      :                      %VAL( CNF_PVAL( IP ) ), ANYF, FSTAT )
 
@@ -226,7 +231,7 @@
 *  Free the memory.
                CALL PSX_FREE( IP, STATUS )
 
-*  Do the same for 2 byte integer.
+*  Do the same for two-byte integer.
             ELSE IF( CTYPE .EQ. AST__SINTTYPE ) THEN
                SIZE = VAL__NBW*TOTNEL
                CALL PSX_MALLOC( SIZE, IP, STATUS )
@@ -236,7 +241,7 @@
      :                                 %VAL( CNF_PVAL( IP ) ), STATUS )
                CALL PSX_FREE( IP, STATUS )
 
-*  Do the same for 1 byte unsigned integer.
+*  Do the same for one-byte unsigned integer.
             ELSE IF( CTYPE .EQ. AST__BYTETYPE ) THEN
                SIZE = VAL__NBUB*TOTNEL
                CALL PSX_MALLOC( SIZE, IP, STATUS )
@@ -246,8 +251,8 @@
      :                                 %VAL( CNF_PVAL( IP ) ), STATUS )
                CALL PSX_FREE( IP, STATUS )
 
-*  Do the same for double precision floats. FITS does not allow a bad
-*  value to be specified for floating point values in binary tables, so
+*  Do the same for double-precision floats. FITS does not allow a bad
+*  value to be specified for floating-point values in binary tables, so
 *  replace NaNs by VAL__BADD in the following call.
             ELSE IF( CTYPE .EQ. AST__DOUBLETYPE ) THEN
                SIZE = VAL__NBD*TOTNEL
@@ -258,7 +263,7 @@
      :                                 %VAL( CNF_PVAL( IP ) ), STATUS )
                CALL PSX_FREE( IP, STATUS )
 
-*  Do the same for single precision floats.
+*  Do the same for single-precision floats.
             ELSE IF( CTYPE .EQ. AST__FLOATTYPE ) THEN
                SIZE = VAL__NBR*TOTNEL
                CALL PSX_MALLOC( SIZE, IP, STATUS )
@@ -272,10 +277,10 @@
             ELSE IF( CTYPE .EQ. AST__STRINGTYPE ) THEN
 
 *  The strings in the FITS binary table are fixed length, but the
-*  FitsTable class holds null terminated variable length strings. Get the
-*  length of each fixed-length string in the binary table. This is the
-*  repeat count in the TFORMn keyword value, devided by the number of
-*  elements in each cell.
+*  FitsTable class holds null-terminated variable-length strings. Get
+*  the length of each fixed-length string in the binary table. This is
+*  the repeat count in the TFORMn keyword value, devided by the number
+*  of elements in each cell.
                CLEN = 0
                NAME = 'TFORM'
                IAT = 5
@@ -325,7 +330,7 @@
                CALL PSX_MALLOC( SIZE, IP, STATUS )
 
 *  Read the FITS file to get all the data values in the column, storing
-*  them in the above memory. */
+*  them in the above memory.
                CALL FTGCVS( FUNIT, ICOL, 1, 1, TOTNEL, ' ',
      :                      %VAL( CNF_PVAL( IP ) ), ANYF, FSTAT )
 
@@ -347,7 +352,7 @@
 
          END DO
 
-*  Annull  local AST objects.
+*  Annul local AST objects.
          CALL AST_ANNUL( HEADER, STATUS )
 
 *  Reset the FITS error status if no suitable extension was found, and
@@ -381,4 +386,3 @@
       CALL AST_END( STATUS )
 
       END
-

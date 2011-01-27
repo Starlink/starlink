@@ -4,7 +4,7 @@
 *     COF_TBSRC
 
 *  Purpose:
-*     Read a FITS binary table and store it in a FitsChan.
+*     Reads a FITS binary table and store it in a FitsChan.
 
 *  Language:
 *     Starlink Fortran 77
@@ -17,7 +17,7 @@
 *     It is invoked when AST_READ needs to read WCS information from a
 *     binary table of a FITS file. This happens if one or more of the
 *     CTYPE keywords in the header uses the "-TAB" algorithm code
-*     (defined in FITS-WCS paper III). It reads a binary table from the
+*     (defined in FITS-WCS Paper III). It reads a binary table from the
 *     named extension of the FITS file, copies the data into a newly
 *     created AstFitsTable structure, and stores this AstFitsTable in
 *     the supplied FitsChan. If the required extension cannot be found,
@@ -27,13 +27,17 @@
 
 *  Arguments:
 *     FC = INTEGER (Given)
-*        An AST pointer to the FitsChan in which to store the table data.
+*        An AST pointer to the FitsChan in which to store the table
+*        data.
 *     EXTNAM = CHARACTER * ( * ) (Given)
-*        The name of the FITS extension containing the required binary table.
+*        The name of the FITS extension containing the required binary
+*        table.
 *     EXTVER = INTEGER (Given)
-*        The value of the EXTVER keyword in the required binary table HDU.
+*        The value of the EXTVER keyword in the required binary table
+*        HDU.
 *     EXTLEVEL = INTEGER (Given)
-*        The value of the EXTLEVEL keyword in the required binary table HDU.
+*        The value of the EXTLEVEL keyword in the required binary table
+*        HDU.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -78,7 +82,7 @@
 *  Global Variables:
       INCLUDE 'F2NDF3_CMN'
 *        INTEGER FUNIT (Read)
-*           The fortran unit number associated with the FITS file
+*           The Fortran unit number associated with the FITS file
 
 *  Arguments Given:
       INTEGER FC
@@ -108,5 +112,3 @@
       END IF
 
       END
-
-

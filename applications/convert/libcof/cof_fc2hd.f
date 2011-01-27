@@ -4,7 +4,7 @@
 *     COF_FC2HD
 
 *  Purpose:
-*     Copy all headers from a FitsChan to the current HDU.
+*     Copies all headers from a FitsChan to the current HDU.
 
 *  Language:
 *     Starlink Fortran 77

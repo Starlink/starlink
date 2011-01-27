@@ -114,17 +114,18 @@
 
 *  Get the index of the last HDU in the FITS file, and then make it the
 *  current HDU and then move back to the original HDU (this is so that
-*  the following call to FTCRHD will create the new HDU at the end of the
-*  FITS file).
+*  the following call to FTCRHD will create the new HDU at the end of
+*  the FITS file).
       CALL FTTHDU( FUNIT, HDUNUM, FSTAT )
       IF( HDUNUM .GT. 0 ) THEN
          CALL FTMAHD( FUNIT, HDUNUM, HDUTYPE, FSTAT )
          CALL FTMAHD( FUNIT, IHDU0, HDUTYPE, FSTAT )
       END IF
 
-*  Create a new header and data section. It will be created at the end of
-*  the FITS file. We presume it becomes the current HDU although the docs
-*  do not say anything about its effect on the current HDU.
+*  Create a new header and data section. It will be created at the end
+*  of the FITS file. We presume it becomes the current HDU although the
+*  documentation does not say anything about its effect on the current
+*  HDU.
       CALL FTCRHD( FUNIT, FSTAT )
 
 *  Get a FitsChan holding the other headers to put into extension HDU.
@@ -142,8 +143,8 @@
 *  Get the number of rows in the table.
       NROW = AST_GETI( TABLE, 'NRow', STATUS )
 
-*  Copy the data for each column from the FitsTable into the binary table.
-*  Loop over all columns.
+*  Copy the data for each column from the FitsTable into the binary
+*  table. Loop over all columns.
       NCOL = AST_GETI( TABLE, 'NColumn', STATUS )
       DO ICOL = 1, NCOL
 
@@ -186,7 +187,7 @@
      :                    STATUS )
          END IF
 
-*  Put this data into the FITS file. Do each data type in turn.
+*  Put these data into the FITS file. Do each data type in turn.
          IF( CTYPE .EQ. AST__INTTYPE ) THEN
             CALL FTPCLJ( FUNIT, ICOL, 1, 1, TOTNEL, %VAL(CNF_PVAL(IP)),
      :                   FSTAT )
@@ -242,4 +243,3 @@
 
 
       END
-

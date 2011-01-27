@@ -80,9 +80,9 @@
 *        via indirection.  Set the type for a MORE structure in an NDF
 *        extension to be EXT instead of the generic STRUCT.
 *     24-JAN-2011 (DSB):
-*        Not all FITS extensions created by ndf2fits correspond to NDF 
-*        extensions - for instance, ndf2fits can create a "WCS-TAB" 
-*        extension to holds columns of WCS values. So do not report an 
+*        Not all FITS extensions created by NDF2FITS correspond to NDF
+*        extensions - for instance, NDF2FITS can create a "WCS-TAB"
+*        extension to holds columns of WCS values. So do not report an
 *        error if the extension holds WCS values.
 *     {enter_further_changes_here}
 
@@ -147,8 +147,9 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Validate the extension name. Ignore binary tables containing
-*  coordinate tables created by AST as a consequence of exporting WCS
-*  information using the "-TAB" algorithm described in FITS-WCS paper III.
+*  co-ordinate tables created by AST as a consequence of exporting WCS
+*  information using the "-TAB" algorithm described in FITS-WCS
+*  Paper III.
       CALL CHR_UCASE( EXPATH )
       IF ( INDEX( EXPATH, AST__TABEXTNAME ) .EQ. 1 ) THEN
          GOTO 999
