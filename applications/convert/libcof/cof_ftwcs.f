@@ -72,7 +72,9 @@
 
 *  Copyright:
 *     Copyright (C) 1997, 2000-2002, 2004 Central Laboratory of the
-*     Research Councils. All Rights Reserved.
+*     Research Councils.
+*     Copyright (C) 2011 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or

@@ -38,7 +38,8 @@
 *  Copyright:
 *     Copyright (C) 1997 Central Laboratory of the Research Councils.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2008, 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2008, 2009, 2011 Science & Technology Facilities
+*     Council.
 *     All Rights Reserved.
 
 *  Licence:
