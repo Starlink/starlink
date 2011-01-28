@@ -21,12 +21,14 @@
 *     On disk, the provenance information is stored in an NDF extension
 *     called "PROVENANCE" (for details see the section "The PROVENANCE
 *     Extension" below). The ndgReadProv function reads this information
-*     and copies it into an in-memory structure for faster access. All the
-*     other public functions defined by this module accept an identifier
-*     for such an in-memory structure as their first argument. The
-*     ndgWriteProv function can be used to write the in-memory structure
-*     back out to disk as a PROVENANCE extension in an NDF. The in-memory
-*     structure should be freed when no longer needed, using ndgFreeProv.
+*     and copies it into an in-memory structure for faster access
+*     (ndgReadProv can also create an empty anonymous provenance structure
+*     that is not associated with an NDF). All the other public functions
+*     defined by this module accept an identifier for such an in-memory
+*     structure as their first argument. The ndgWriteProv function can be
+*     used to write the in-memory structure back out to disk as a PROVENANCE
+*     extension in an NDF. The in-memory structure should be freed when no
+*     longer needed, using ndgFreeProv.
 
 *  Functions Provides:
 *     This modules provides the following public functions. There is an
@@ -173,10 +175,13 @@
 *          When freeing a Prov structure, erase the temporary HDS object holding the
 *          MORE info, rather than just annulling its locator.
 *      7-DEC-2010 (DSB):
-*          Create all NDG temporary HDS obejcts within a single component of the HDS 
-*          temporary file (avoids problems using datParen with temporary files). 
-*          Application code should now use ndgAntmp/NDG_ANTMP to free MORE locators 
-*          returned by NDG. 
+*          Create all NDG temporary HDS obejcts within a single component of the HDS
+*          temporary file (avoids problems using datParen with temporary files).
+*          Application code should now use ndgAntmp/NDG_ANTMP to free MORE locators
+*          returned by NDG.
+*      28-JAN-2011 (DSB):
+*          Allow ndgReadProv to create a new empty provenance structure that is not 
+*          associated with an NDF.
 */
 
 
@@ -1002,9 +1007,9 @@ F77_SUBROUTINE(ndg_readprov)( INTEGER(indf), CHARACTER(fcreator),
 *     contents of the structure.
 *
 *     If the NDF has no provenance information (for instance, if it is a
-*     newly created NDF), the returned structure will contain just the
-*     supplied creator name (which may be blank), and an empty ancestor
-*     list.
+*     newly created NDF), or if no NDF is supplied, the returned structure
+*     will contain just the supplied creator name (which may be blank), and
+*     an empty ancestor list.
 *
 *     The structure should be freed when it is no longer needed by
 *     calling NDG_FREEPROV.
@@ -1015,7 +1020,9 @@ F77_SUBROUTINE(ndg_readprov)( INTEGER(indf), CHARACTER(fcreator),
 *  Arguments:
 *     INDF = INTEGER (Given)
 *        An identifier for the NDF containing the provenance information
-*        to be read.
+*        to be read. This may be NDF__NOID, in which case a new provenance
+*        structure with the supplied creator name and an empty ancestor
+*        list will be created and returned.
 *     CREATOR = CHARACTER * ( * ) (Given)
 *        A text identifier for the software that created INDF (usually the
 *        name of the calling application). The format of the identifier
@@ -2423,9 +2430,9 @@ NdgProvenance *ndgReadProv( int indf, const char *creator, int *status ){
 *     the contents of the structure.
 *
 *     If the NDF has no provenance information (for instance, if it is a
-*     newly created NDF), the returned structure will contain just the
-*     supplied creator name (which may be blank), and an empty ancestor
-*     list.
+*     newly created NDF), or if no NDF is supplied, the returned structure
+*     will contain just the supplied creator name (which may be blank), and
+*     an empty ancestor list.
 *
 *     The structure should be freed when it is no longer needed by
 *     calling ndgFreeProv.
@@ -2433,7 +2440,9 @@ NdgProvenance *ndgReadProv( int indf, const char *creator, int *status ){
 *  Arguments:
 *     indf
 *        An identifier for the NDF containing the provenance information
-*        to be read.
+*        to be read. This may be NDF__NOID, in which case a new provenance
+*        structure with the supplied creator name and an empty ancestor
+*        list will be created and returned.
 *     creator
 *        A text identifier for the software that created INDF (usually the
 *        name of the calling application). The format of the identifier
@@ -5077,7 +5086,7 @@ static Prov *ndg1MakeProv( int index, const char *path, const char *date,
 *        NDF.
 *     path
 *        Pointer to a string holding the path to the NDF described by the
-*        new Prov structure.
+*        new Prov structure. Can be NULL.
 *     date
 *        Pointer to a string holding the formatted UTC date and time at
 *        which provenance information was recorded for the NDF.
@@ -5842,7 +5851,8 @@ static Provenance *ndg1ReadProvenanceExtension( HDSLoc *xloc, const char *npath,
 *     xloc
 *        An HDS structure holding provenance information. Can be NULL.
 *     npath
-*        The path of the NDF from which the provenance was read.
+*        The path of the NDF from which the provenance was read. Can be
+*        NULL.
 *     more
 *        An optional HDS structure holding additional information. This is
 *        stored in the main Prov structure in the returned Provenance.
@@ -6081,15 +6091,19 @@ static Provenance *ndg1ReadProvenanceNDF( int indf, HDSLoc *more,
 *     This function allocates dynamic memory to hold a new Provenance
 *     structure, and copies provenance information from the PROVENANCE
 *     extension of the supplied NDF into the new Provenance structure.
-*     If the NDF does not have a PROVENANCE extension, then the returned
-*     Provenance structure contains only a single Prov structure, for the
-*     supplied NDF itself. The only items stored in this Prov structure is
-*     the NDF path, plus any "more" and "creator" values supplied as
+*     If the NDF does not have a PROVENANCE extension, or if no NDF is
+*     supplied, then the returned Provenance structure contains only a
+*     single Prov structure, for the supplied NDF itself (an anonymous
+*     "pretend" NDF is no NDF identifier was supplied). The only items
+*     stored in this Prov structure is the NDF path (NULL if no NDF was
+*     supplied), plus any "more" and "creator" values supplied as
 *     arguments to this function.
 
 *  Arguments:
 *     indf
-*        The NDF identifier.
+*        An identifier for the NDF containing the provenance information
+*        to be read. This may be NDF__NOID, in which case a new anonymous
+*        provenance structure will be created and returned.
 *     more
 *        An optional HDS structure holding additional information about
 *        the NDF. This is stored in the main Prov structure in the
@@ -6131,13 +6145,21 @@ static Provenance *ndg1ReadProvenanceNDF( int indf, HDSLoc *more,
    HDS locator to it. If we are pretending that the NDF is a root NDF
    (i.e. if we are ignoring any provenance information within it) then skip
    this bit. */
-   ndfXstat( indf, EXT_NAME, &there, status );
+   if( indf != NDF__NOID ) {
+      ndfXstat( indf, EXT_NAME, &there, status );
+   } else {
+      there = 0;
+   }
    if( there && !isroot ) ndfXloc( indf, EXT_NAME, "Read", &xloc, status );
 
 /* Get the path to the supplied NDF. */
-   ndfMsg( "NDF", indf );
-   msgLoad( " ", "^NDF", path_buf, PATH_LEN, &path_len, status );
-   path = path_buf;
+   if( indf != NDF__NOID ) {
+      ndfMsg( "NDF", indf );
+      msgLoad( " ", "^NDF", path_buf, PATH_LEN, &path_len, status );
+      path = path_buf;
+   } else {
+      path = NULL;
+   }
 
 /* Read the information from the extension. */
    result = ndg1ReadProvenanceExtension( xloc, path, more, more2, creator,
@@ -6919,7 +6941,10 @@ static void ndg1WriteProvenanceNDF( Provenance *provenance, int indf,
 
 /* Local Variables: */
    HDSLoc *xloc = NULL;
+   char *path;
+   char path_buf[ PATH_LEN + 1 ];
    int irec;
+   int path_len;
    int there;
 
 /* Check the inherited status value. */
@@ -6961,8 +6986,23 @@ static void ndg1WriteProvenanceNDF( Provenance *provenance, int indf,
          }
       }
 
+/* If the provenance for the main NDF does not have a path, record it
+   temporarily now. */
+      path = provenance->main->path;
+      if( !path ) {
+         ndfMsg( "NDF", indf );
+         msgLoad( " ", "^NDF", path_buf, PATH_LEN, &path_len, status );
+         provenance->main->path = astStore( NULL, path_buf,
+                                            strlen( path_buf ) + 1 );
+      }
+
 /* Add the required components to the extension. */
       ndg1WriteProvenanceExtension( provenance, xloc, status );
+
+
+/* If the provenance for the main NDF originally had no path, remove the
+   temporary path added earlier. */
+      if( !path ) provenance->main->path = astFree( provenance->main->path );
 
 /* Free resources */
       datAnnul( &xloc, status );
