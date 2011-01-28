@@ -1,23 +1,23 @@
 *TRACK
 *
-* TRACK   -- measures and fits the X position of the spectrum as a
-* function of Y. The result is needed when you wish to cope with
+* TRACK   -- measures and fits the X position of the spectrum as a 
+* function of Y. The result is needed when you wish to cope with 
 * significant tilt on the spectrum. It is assumed that the spectrum
 * runs more-or-less vertically.
 *
 * TRACK works by first locating the spectrum in a block of rows. It then steps
 * up and down from this point looking for the spectrum in a window centred on
-* the previous position. The positions are measured by cross-correlation with
+* the previous position. The positions are measured by cross-correlation with 
 * a gaussian. The positions are fitted with B-splines and optionally the
-* whole process is repeated for stability with the windows centred on
-* positions defined by the previous fit. Plots of the fit can be overlaid a
+* whole process is repeated for stability with the windows centred on 
+* positions defined by the previous fit. Plots of the fit can be overlaid a 
 * greyscale image or over the measured positions.
 *
 * If an old track file is used, then the spline is kept fixed, and the residuals relative
 * to the spline are fitted with a polynomial whose order is stored in the PAMELA.TRACK
 * extension as NPOLY. This is set to zero for a new spline-only fit. If non zero then the
 * data values are the polynomial coefficients. If NPOLY=0, the data value (only 1 of them) is
-* meaningless. The polynomial is scaled to run from -1 to 1 between the end spline knots which
+* meaningless. The polynomial is scaled to run from -1 to 1 between the end spline knots which 
 * mark the edge of the data
 *
 * TRACK checks for bad pixels and eliminates points too badly affected by them. This allows
@@ -31,7 +31,7 @@
 *  FLAT   -- Balance frame
 *
 *  OLD    -- TRUE to update an old fit. In this case the spline from the old fit
-*            will be read in and preserved and you will be prompted for the number
+*            will be read in and preserved and you will be prompted for the number 
 *            coefficients of a polynomial correction to this.
 *
 *  TRACK  -- Name of file in which fit will be stored. Should already exist
@@ -40,11 +40,11 @@
 * If OLD
 *
 *    NPOLY  -- Order of polynomial fit. This will only be prompted for if OLD=TRUE.
-*              It is the number of poly coefficients after the existing spline fit
-*              has first been subtracted.
+*              It is the number of poly coefficients after the existing spline fit 
+*              has first been subtracted. 
 * else
 *
-*    NSPLINE - number of splines to use if OLD=FALSE.
+*    NSPLINE - number of splines to use if OLD=FALSE. 
 *
 *    ORDER   - order of the spline (4=cubic)
 *
@@ -63,7 +63,7 @@
 *
 *   TWEAK  -- TRUE to tweak spectrum as opposed to completely relocating it.
 *           This means that the old spectrum will be used to find the new one
-*           as opposed to finding the entire spectrum from scratch. The current
+*           as opposed to finding the entire spectrum from scratch. The current 
 *           spectrum should be close to the old one (within a FWHM or two).
 *
 * PICK   -- TRUE to pick spectrum automatically. Normally this works, but
@@ -110,10 +110,10 @@
 * ESIG  -- FWHM of gaussian used to measure position by cross-correlation.
 *          Should be similar to FWHM of spectrum.
 *
-* FWHM  -- FWHM of profile. This need only be an estimate and is used to
+* FWHM  -- FWHM of profile. This need only be an estimate and is used to 
 *          attempt to correct for undersampling. This can be seen if the
 *          positions tend to stick to the middle of pixels. Beware of making
-*          it too large because it can actually add discontinuities to the
+*          it too large because it can actually add discontinuities to the 
 *          measured positions. Set = 0 to ignore.
 *
 * READOUT -- RMS readout noise, ADU
@@ -128,7 +128,7 @@
 * If NBLOCK.GT.2
 *
 *    PSIG   -- The blocks can be improved by kicking out discrepant rows.
-*              PSIG is a threshold for doing just this.
+*              PSIG is a threshold for doing just this. 
 *
 * TCYCLE  -- The number of additional cycles following the first fit to
 *            clean it up and make sure that it is stable.
@@ -155,7 +155,7 @@ C
       INTEGER MAXSPLINE, MAXORD
       PARAMETER (MAXORD=20)
       PARAMETER (MAXSPLINE=200)
-C
+C      
 C NDF identifiers and pointers
 C
       INTEGER IMAGE, FLAT, TRCK, TEMP, IPTR
@@ -190,17 +190,17 @@ C
       CALL NDF_ASSOC('IMAGE','READ',IMAGE,STATUS)
 C
 C     Open balance frame, identifier FLAT
-C
+C     
       CALL NDF_ASSOC('FLAT','READ',FLAT,STATUS)
-C
+C     
 C     Force to same size
-C
+C     
       CALL NDF_MBND('TRIM', IMAGE, FLAT, STATUS)
-C
+C     
 C     Get distortion output file. First check to see if it is an old
 C     file or not. If it is, we will fit a low order poly, after subtractoin
 C     of the spline.
-C
+C     
       CALL PAR_GET0L('OLD', OLD, STATUS)
       IF(OLD) THEN
          CALL NDF_ASSOC('TRACK','UPDATE',TRCK,STATUS)
@@ -245,24 +245,24 @@ C
          IF(NSPLINE+2*NORD-1.NE.EL) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP('TRACK',
-     &           'Incorrect number of knots given NSPLINE & NORD',
+     &           'Incorrect number of knots given NSPLINE & NORD', 
      &           STATUS)
          END IF
          CALL CMP_MAPV(LOC1,'CSPLINE','_DOUBLE','READ',CPTR,EL,STATUS )
          IF(NSPLINE+NORD-1.NE.EL) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP('TRACK',
-     &           'Incorrect number of coeffs given NSPLINE & NORD',
+     &           'Incorrect number of coeffs given NSPLINE & NORD', 
      &           STATUS)
          END IF
          CALL DAT_ANNUL(LOC1, STATUS)
-         CALL DAT_ANNUL(LOC, STATUS)
-      ELSE
-         CALL NDF_SECT(IMAGE,1,1,1,SMALL,STATUS)
+         CALL DAT_ANNUL(LOC, STATUS)      
+      ELSE  
+         CALL NDF_SECT(IMAGE,1,1,1,SMALL,STATUS)         
          CALL NDF_PROP(SMALL,' ','TRACK',TRCK,STATUS)
          CALL NDF_RESET(TRCK,'Title,Data',STATUS)
          CALL NDF_CPUT('TRACK output',TRCK,'Title',STATUS)
-C
+C     
 C     data array is used to store the polynomial. This only means something
 C     in the 'old' case, so here we just create a 1 element array set to zero
 C
@@ -284,14 +284,14 @@ C
          ELSE
             CALL NDF_XLOC(TRCK,'PAMELA','UPDATE',LOC,STATUS)
             CALL DAT_THERE(LOC, 'TRACK', THERE, STATUS)
-            IF(.NOT.THERE)
+            IF(.NOT.THERE) 
      &           CALL DAT_NEW(LOC, 'TRACK', 'Struct', 0, 0, STATUS)
          END IF
 C
 C     Create and map arrays for  knot positions and spline coefficients
 C
          CALL DAT_FIND(LOC, 'TRACK', LOC1, STATUS)
-         CALL DAT_NEW1D(LOC1, 'XKNOT', NSPLINE+2*NORD-1, STATUS)
+         CALL DAT_NEW1D(LOC1, 'XKNOT', NSPLINE+2*NORD-1, STATUS) 
          CALL CMP_MAPV(LOC1,'XKNOT','_DOUBLE','WRITE',XPTR,EL,STATUS )
          CALL DAT_NEW1D(LOC1, 'CSPLINE', NSPLINE+3, STATUS)
          CALL CMP_MAPV(LOC1,'CSPLINE','_DOUBLE','WRITE',CPTR,EL,STATUS )
@@ -301,8 +301,8 @@ C
          NPOLY = 0
          NPOLD = 0
          CALL NDF_XPT0I(NSPLINE, TRCK,'PAMELA','TRACK.NSPLINE',STATUS)
-         CALL NDF_XPT0I(NORD, TRCK,'PAMELA','TRACK.NORD',STATUS)
-         CALL NDF_XPT0I(NPOLY, TRCK,'PAMELA','TRACK.NPOLY',STATUS)
+         CALL NDF_XPT0I(NORD, TRCK,'PAMELA','TRACK.NORD',STATUS)      
+         CALL NDF_XPT0I(NPOLY, TRCK,'PAMELA','TRACK.NPOLY',STATUS)      
 
       END IF
 C
@@ -321,9 +321,9 @@ C
      &        .FALSE.,YLO,STATUS)
          CALL PAR_GDR0I('YEND',UBND(2),YLO,UBND(2),
      &        .FALSE.,YHI,STATUS)
-C
+C     
 C     Replace IMAGE and FLAT with section ndfs
-C
+C     
          IF(XLO.NE.LBND(1) .OR. XHI.NE.UBND(1) .OR.
      &        YLO.NE.LBND(2) .OR. YHI.NE.UBND(2)) THEN
             LBND(1) = XLO
@@ -369,13 +369,13 @@ C
       END IF
 
       CALL PAR_GET0L('PLOT', PLOT, STATUS)
-      IF(PLOT) THEN
-         CALL PAR_GET0C('DEVICE',DEVICE,STATUS)
+      IF(PLOT) THEN      
+         CALL PAR_GET0C('DEVICE',DEVICE,STATUS) 
          CALL PAR_GET0L('AUTO', AUTO, STATUS)
          IF(.NOT.AUTO) CALL PAR_GET1R('LIMITS',2,LIMITS,NSET,STATUS)
       END IF
 C
-C     Get special variables
+C     Get special variables 
 C
       CALL PAR_GDR0R('WIDTH',15.,3.,REAL(NXS),.FALSE.,WIDTH,STATUS)
       CALL PAR_GDR0R('ESIG',3.,2.,REAL(NXS),.FALSE.,ESIG,STATUS)
@@ -391,12 +391,12 @@ C
       IF(TCYCLE.GT.0. .OR. TWEAK) THEN
          CALL PAR_GDR0R('CHANGE',1.,0.,1.E6,.FALSE.,CHANGE,STATUS)
       END IF
-C
+C     
 C     Map arrays
 C
       CALL NDF_MAP(IMAGE,'Data','_REAL','READ',IPTR,EL,STATUS)
       CALL NDF_MAP(FLAT,'Data','_REAL','READ',FPTR,EL,STATUS)
-C
+C     
 C     Generate plot title
 C
       CALL NDF_MSG('NAME', IMAGE)
@@ -404,10 +404,10 @@ C
 C
 C     TRACK spectrum
 C
-      CALL TRACK_SPEC(%VAL(CNF_PVAL(IPTR)), %VAL(CNF_PVAL(FPTR)),
-     &     %VAL(CNF_PVAL(XPTR)), %VAL(CNF_PVAL(CPTR)), NSPLINE,
-     &     NORD, %VAL(CNF_PVAL(TPTR)), NPOLY, OLDPOLY, NPOLD, NXS, NYS,
-     &     LBND(1), LBND(2), NBLOCK, WIDTH, ESIG, CLIP, PSIG, AUTO,
+      CALL TRACK_SPEC(%VAL(CNF_PVAL(IPTR)), %VAL(CNF_PVAL(FPTR)), 
+     &     %VAL(CNF_PVAL(XPTR)), %VAL(CNF_PVAL(CPTR)), NSPLINE, 
+     &     NORD, %VAL(CNF_PVAL(TPTR)), NPOLY, OLDPOLY, NPOLD, NXS, NYS, 
+     &     LBND(1), LBND(2), NBLOCK, WIDTH, ESIG, CLIP, PSIG, AUTO, 
      &     PICK, NOBJ, IOBJ, IBLOCK, YPOS, TCYCLE, PLOT, FILE(:FLEN),
      &     LIMITS(1), LIMITS(2), READOUT, PHOTON, NFPOLY, TWEAK, CHANGE,
      &     FCHANGE, FWHM, OFFSET, DEVICE, STATUS)
@@ -416,24 +416,24 @@ C     Tidy up
 C
       CALL NDF_END(STATUS)
       RETURN
-      END
+      END	
 
 C Subroutine to do the real work
 
       SUBROUTINE TRACK_SPEC(DATA, BALANCE, XKNOT, CSPLINE, NSPLINE,
-     &     NORD, CPOLY, NPOLY, OLDPOLY, NPOLD, NXS, NYS, XLO, YLO,
-     &     NBLOCK, WIDTH, ESIG, CLIP, PSIG, AUTO, PICK, NOBJ, IOBJ,
-     &     IBLOCK, YPOS, TCYCLE, PLOT, TITLE, LOW, HIGH, READOUT,
-     &     PHOTON, NFPOLY, TWEAK, CHANGE, FCHANGE, FWHM, OFFSET,
+     &     NORD, CPOLY, NPOLY, OLDPOLY, NPOLD, NXS, NYS, XLO, YLO, 
+     &     NBLOCK, WIDTH, ESIG, CLIP, PSIG, AUTO, PICK, NOBJ, IOBJ, 
+     &     IBLOCK, YPOS, TCYCLE, PLOT, TITLE, LOW, HIGH, READOUT, 
+     &     PHOTON, NFPOLY, TWEAK, CHANGE, FCHANGE, FWHM, OFFSET, 
      &     DEVICE, STATUS)
-*
-* TRACK_SPEC measures the spatial position of a spectrum and fits a
-* polynomial to it. It works by locating a point on the spectrum either
-* interactively or autonatically and then moving upwards and downwards
+*     
+* TRACK_SPEC measures the spatial position of a spectrum and fits a 
+* polynomial to it. It works by locating a point on the spectrum either 
+* interactively or autonatically and then moving upwards and downwards 
 * from that point measuring the X position of the spectrum at each value
-* of Y. The position is measured by cross-correlation with the derivative
-* of a gaussian and finding the point where this goes through zero. This
-* is accomplished with the routine MEDIAN. The positions are then fitted
+* of Y. The position is measured by cross-correlation with the derivative 
+* of a gaussian and finding the point where this goes through zero. This 
+* is accomplished with the routine MEDIAN. The positions are then fitted 
 * with a polynomial, which is then returned to the calling program.
 *
 * A correction is made for undersampling effects as follows. After
@@ -444,7 +444,7 @@ C Subroutine to do the real work
 *
 * Arguments: (> = input, < = output)
 *
-* >   REAL DATA(NXS,NYS)       -- The image
+* >   REAL DATA(NXS,NYS)       -- The image 
 * >   REAL BALANCE(NXS,NYS)    -- Multiplicative balance frame
 * ><  REAL*8 XKNOT(NSPLINE+2*NORD-1)  -- Positions of knots. Input if NPOLY > 0, output if NPOLY=0
 * ><  REAL*8 CSPLINE(NSPLINE+3)-- Spline coefficients
@@ -528,7 +528,7 @@ C Subroutine to do the real work
       CHARACTER*(*) TITLE, OPTION*2, DEVICE
       LOGICAL CURSOR, AUTO, PICK, OK, PLOT
       LOGICAL FPLOT, TWEAK
-C
+C     
 C     Internal work arrays
 C
       INTEGER MAXPROF, NPLOT, MAXDAT, MAXPOLY, MAXOBJ
@@ -556,7 +556,7 @@ C
       PARAMETER (MAXOBJ=100)
       INTEGER IPEAK(MAXOBJ)
       REAL PEAK(MAXOBJ)
-      INTEGER NHIST
+      INTEGER NHIST 
       PARAMETER (NHIST=100)
       REAL HIST(NHIST), DATMIN, DATMAX
 C
@@ -565,7 +565,7 @@ C
       IF(NPOLY.GT.MAXPOLY .OR. NFPOLY.GT.MAXPOLY) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP('TRACK_SPEC',
-     &        'MAXPOLY must be increased; NPOLY OR NFPOLY too large',
+     &        'MAXPOLY must be increased; NPOLY OR NFPOLY too large', 
      &        STATUS)
          RETURN
       END IF
@@ -574,10 +574,10 @@ C
          XMID    = (XKNOT(1)+XKNOT(NSPLINE+2*NORD-1))/2.
          XHRANGE = (XKNOT(NSPLINE+2*NORD-1)-XKNOT(1))/2.
       END IF
-C
+C     
 C     Select device for greyscale plot (if not picking
 C     point automatically).
-C
+C     
       XHI = XLO + NXS - 1
       YHI = YLO + NYS - 1
       IF(NXS.GT.MAXPROF .OR. NYS.GT.MAXDAT) THEN
@@ -605,11 +605,12 @@ C
                DATMAX = MAX(DATMAX, DATA(IX,IY))
             END DO
          END DO
-         CALL CDF_LOC(DATA, NXS, NYS, HIST, NHIST, 0.1,
+         CALL CDF_LOC(DATA, NXS, NYS, HIST, NHIST, 0.1, 
      &        2, DATMIN, DATMAX, LOW)
-         CALL CDF_LOC(DATA, NXS, NYS, HIST, NHIST, 0.98,
-     &        2, DATMIN, DATMAX, HIGH)
+         CALL CDF_LOC(DATA, NXS, NYS, HIST, NHIST, 0.98, 
+     &        2, DATMIN, DATMAX, HIGH)      
       END IF
+
       IF(FPLOT) THEN
          IFAIL = PGOPEN(DEVICE)
          IF(IFAIL.LE.0) THEN
@@ -640,9 +641,9 @@ C
          CALL PGBOX('BCNST', 0., 0, 'BCNST', 0., 0)
          CALL PGSCI(7)
          CALL PGLAB('Column number, \\fi i',
-     &        'Row number, \\fi j',TITLE)
+     &        'Row number, \\fi j',TITLE)              
          CALL PGIDEN
-C
+C     
 C     Now pick a point on the spectrum
 C
          IF(.NOT.TWEAK .AND. .NOT.PICK) THEN
@@ -652,9 +653,9 @@ C
             ELSE
                CURSOR = .FALSE.
             END IF
-C
+C     
 C     Find what mode of input (if any)
-C
+C     
             WRITE(*,*) ' '
             WRITE(*,*) 'Pick a point on the spectrum'//
      &           ' to be TRACKed'
@@ -668,10 +669,10 @@ C
                ELSE
                   OPTION = 'T'
                   IFAIL = 0
-               END IF
+               END IF     
             END DO
             OPTION(2:2) = 'B'
-            CALL GET_POINT(OPTION, X, REAL(XLO), REAL(XHI), Y,
+            CALL GET_POINT(OPTION, X, REAL(XLO), REAL(XHI), Y, 
      &           REAL(YLO), REAL(YHI))
             X = X -  REAL(XLO-1)
             Y = Y -  REAL(YLO-1)
@@ -681,7 +682,7 @@ C
       VAR0     = READOUT*READOUT
       EFAC     = 1./2./(ESIG/2.3548)**2
       IF(TWEAK) GOTO 1000
-C
+C     
       IF(PICK) THEN
 C
 C     Select point automatically
@@ -694,7 +695,7 @@ C
          DO IX = 1, NXS
             NOK = 0
             DO IY = J1, J2
-               IF(BALANCE(IX,IY).NE.VAL__BADR .AND.
+               IF(BALANCE(IX,IY).NE.VAL__BADR .AND. 
      &              DATA(IX,IY).NE.VAL__BADR) THEN
                   NOK = NOK + 1
                   RBUF(NOK) = BALANCE(IX,IY)*DATA(IX,IY)
@@ -703,10 +704,10 @@ C
             IF(NOK.EQ.0) THEN
                PROFILE(IX) = VAL__BADR
             ELSE
-               PROFILE(IX) = MEDVAL( RBUF, NOK )
+               PROFILE(IX) = MEDVAL( RBUF, NOK ) 
             END IF
          END DO
-C
+C     
 C     Locate top NOBJ peaks, arrange in descending order of height.
 C
          DO I = 1, NOBJ
@@ -714,10 +715,10 @@ C
          END DO
          NFOUND = 0
          DO IX = 2, NXS-1
-            IF(PROFILE(IX).NE.VAL__BADR       .AND.
-     &           PROFILE(IX-1).NE.VAL__BADR   .AND.
-     &           PROFILE(IX+1).NE.VAL__BADR   .AND.
-     &           PROFILE(IX-1).LE.PROFILE(IX) .AND.
+            IF(PROFILE(IX).NE.VAL__BADR       .AND. 
+     &           PROFILE(IX-1).NE.VAL__BADR   .AND. 
+     &           PROFILE(IX+1).NE.VAL__BADR   .AND. 
+     &           PROFILE(IX-1).LE.PROFILE(IX) .AND. 
      &           PROFILE(IX+1).LE.PROFILE(IX)) THEN
                NFOUND = NFOUND + 1
                I = 1
@@ -736,7 +737,7 @@ C
                   END IF
                   I = I + 1
                END DO
-            END IF
+            END IF   
          END DO
          IF(NFOUND.LT.NOBJ) THEN
             STATUS = SAI__ERROR
@@ -746,7 +747,7 @@ C
          END IF
 C
 C     Sort and choose the IOBJ'th peak
-C
+C     
          DO I = 1, NOBJ
             PEAK(I) = REAL(IPEAK(I))
          END DO
@@ -754,55 +755,56 @@ C
          X = PEAK(IPEAK(IOBJ))
          Y = REAL(J1+J2)/2.
       END IF
-C
+
+C     
 C     Measure position of spectrum.
-C
+C     
       ISTART = NINT((Y-0.5)/REAL(NBLOCK)+1.)
-C
+C     
 C     First move upwards
-C
+C     
       XSTART = X
       XSAVE  = X
       DO IB = ISTART, NUMBLOCK
          J1 = 1 + (IB-1)*NBLOCK
          J2 = J1 + NBLOCK - 1
          IF(IB.EQ.NUMBLOCK) J2 = NYS
-C
+C     
 C     Offset and scale to reduce under/overflow chance
-C
+C     
          IF(NPOLY.GT.0) THEN
             WORK(1,IB) = (DBLE(YLO-1)+DBLE(J1+J2)/2.-XMID)/XHRANGE
          ELSE
             WORK(1,IB) = DBLE(YLO-1)+DBLE(J1+J2)/2.
          END IF
-C
+C     
 C     Compute profile.
-C
+C     
          I1 = MAX(1, MIN(NXS, NINT(XSTART-WIDTH/2.)))
          I2 = MAX(1, MIN(NXS, NINT(XSTART+WIDTH/2.)))
-C
+C     
 C     Collapse with cosmic ray rejection
 C
-         CALL RCOLLP(PROFILE, VAR, MAXPROF, DATA, BALANCE,
-     &        NXS, NYS, I1, I2, J1, J2, VAR0, PHOTON, PSIG,
+         CALL RCOLLP(PROFILE, VAR, MAXPROF, DATA, BALANCE, 
+     &        NXS, NYS, I1, I2, J1, J2, VAR0, PHOTON, PSIG, 
      &        RBUF, SBUF, ACC, MAXDAT, OK)
-C
+C     
 C     Measure peak position
 C
          IF(OK) THEN
             IGUESS = NINT(XSTART) - I1 + 1
             CALL MEDIAN(PROFILE(I1),I2-I1+1,IGUESS,ESIG,XPOS,SIGBIN,1)
             WORK(2,IB) = DBLE(XPOS) + DBLE(XLO+I1-2)
-C
+C     
 C     Compute error in position
-C
-            IF(SIGBIN.GT.0. .AND. XPOS.GT.1. .AND.
+C     
+            IF(SIGBIN.GT.0. .AND. XPOS.GT.1. .AND. 
      &           XPOS.LT.REAL(I2-I1+1)) THEN
                SUM1 = 0.
                SUM2 = 0.
                DO I = I1, I2
                   X    = REAL(I-I1+1) - XPOS
-                  FAC  = EXP(-EFAC*X*X)
+                  FAC  = EXP(-EFAC*X*X)   
                   SUM1 = SUM1 + VAR(I)*(X*FAC)**2
                   SUM2 = SUM2 + PROFILE(I)*FAC*(1.-2.*EFAC*X*X)
                END DO
@@ -812,7 +814,7 @@ C     First time through set to unit weights
 C
                UNCERT(IB) = MAX(0.001, SIGBIN)
                WORK(3,IB) = 1.D0
-               IF(ABS(REAL(IGUESS)-XPOS).LT.ESIG/2.)
+               IF(ABS(REAL(IGUESS)-XPOS).LT.ESIG/2.) 
      &              XSTART = REAL(WORK(2,IB) - DBLE(XLO-1))
             ELSE
                WORK(3,IB) = -1.D10
@@ -821,7 +823,8 @@ C
             WORK(3,IB) = -1.D10
          END IF
       END DO
-C
+
+C     
 C     Now downwards
 C
       XSTART = XSAVE
@@ -834,32 +837,32 @@ C
          ELSE
             WORK(1,IB) = DBLE(YLO-1)+DBLE(J1+J2)/2.
          END IF
-C
+C     
 C     Compute profile.
 C
          I1 = MAX(1, MIN(NXS, NINT(XSTART-WIDTH/2.)))
          I2 = MAX(1, MIN(NXS, NINT(XSTART+WIDTH/2.)))
          CALL RCOLLP(PROFILE, VAR, MAXPROF, DATA, BALANCE,
-     &        NXS, NYS, I1, I2, J1, J2, VAR0, PHOTON, PSIG, RBUF,
+     &        NXS, NYS, I1, I2, J1, J2, VAR0, PHOTON, PSIG, RBUF, 
      &        SBUF, ACC, MAXDAT, OK)
-C
+C     
 C     Measure peak position
 C
          IF(OK) THEN
             IGUESS = NINT(XSTART) - I1 + 1
             CALL MEDIAN(PROFILE(I1),I2-I1+1,IGUESS,ESIG,XPOS,SIGBIN,1)
-C
+C     
             WORK(2,IB) = DBLE(XPOS) + DBLE(XLO+I1-2)
 C
 C     Compute error in position
 C
-            IF(SIGBIN.GT.0. .AND. XPOS.GT.1. .AND.
+            IF(SIGBIN.GT.0. .AND. XPOS.GT.1. .AND. 
      &           XPOS.LT.REAL(I2-I1+1)) THEN
                SUM1 = 0.
                SUM2 = 0.
                DO I = I1, I2
                   X    = REAL(I-I1+1) - XPOS
-                  FAC  = EXP(-EFAC*X*X)
+                  FAC  = EXP(-EFAC*X*X)   
                   SUM1 = SUM1 + VAR(I)*(X*FAC)**2
                   SUM2 = SUM2 + PROFILE(I)*FAC*(1.-2.*EFAC*X*X)
                END DO
@@ -908,26 +911,26 @@ C
             WORK(1,IB) = (DBLE(YLO-1)+DBLE(J1+J2)/2.-XMID)/XHRANGE
          END DO
       END IF
-C
+C     
 C     Now fit.
 C
       ICYCLE = 0
       DO WHILE(ICYCLE.LE.TCYCLE)
          ICYCLE = ICYCLE + 1
          IF(TWEAK .OR. ICYCLE.GT.1) THEN
-C
+C     
 C     Tweak positions using fit for initial estimate
 C     This part only carried out if at least one
 C     fit has been made and TCYCLE .GT. 0 or a pure TWEAK
 C     is wanted.
-C
+C     
             DO IB = 1, NUMBLOCK
                J1 = 1 + (IB-1)*NBLOCK
                J2 = J1 + NBLOCK - 1
                IF(IB.EQ.NUMBLOCK) J2 = NYS
-C
+C     
 C     Compute profile. We need a centre position to extract
-C     the profile which is determined in different ways according
+C     the profile which is determined in different ways according 
 C     to the fit.
 C
                IF(ICYCLE.EQ.1) THEN
@@ -948,27 +951,27 @@ C
                I2 = MAX(1, MIN(NXS, NINT(XSTART+WIDTH/2.)))
 
                CALL RCOLLP(PROFILE, VAR, MAXPROF, DATA, BALANCE,
-     &              NXS, NYS, I1, I2, J1, J2, VAR0, PHOTON, PSIG,
+     &              NXS, NYS, I1, I2, J1, J2, VAR0, PHOTON, PSIG, 
      &              RBUF, SBUF, ACC, MAXDAT, OK)
-C
+C     
 C     Measure peak position
 C
                IF(OK) THEN
                   IGUESS = NINT(XSTART) - I1 + 1
                   CALL MEDIAN(PROFILE(I1),I2-I1+1,IGUESS,ESIG,
      &                 XPOS,SIGBIN,1)
-C
+C     
                   WORK(2,IB) = DBLE(XPOS) + DBLE(XLO+I1-2)
 C
 C     Compute error in position. Points which have shifted
 C     too far are eliminated, unless it is the first cycle
 C     of a TWEAK (02/08/2001)
 C
-                  IF(SIGBIN.LT.0. .OR.
+                  IF(SIGBIN.LT.0. .OR. 
      &                 ((TWEAK .AND. ICYCLE.EQ.1 .AND.
-     &                 ABS(WORK(2,IB)-REAL(XLO-1)-XSTART) .GT. FCHANGE)
+     &                 ABS(WORK(2,IB)-REAL(XLO-1)-XSTART) .GT. FCHANGE) 
      &                 .OR. ((.NOT.TWEAK .OR. ICYCLE.GT.1) .AND.
-     &                 ABS(WORK(2,IB)-REAL(XLO-1)-XSTART) .GT.
+     &                 ABS(WORK(2,IB)-REAL(XLO-1)-XSTART) .GT. 
      &                 CHANGE))) THEN
                      WORK(3,IB) = -1.E10
                   ELSE
@@ -976,7 +979,7 @@ C
                      SUM2 = 0.
                      DO I = I1, I2
                         X    = REAL(I-I1+1) - XPOS
-                        FAC  = EXP(-EFAC*X*X)
+                        FAC  = EXP(-EFAC*X*X)   
                         SUM1 = SUM1 + VAR(I)*(X*FAC)**2
                         SUM2 = SUM2 + PROFILE(I)*FAC*(1.-2.*EFAC*X*X)
                      END DO
@@ -997,7 +1000,7 @@ C
             IF(ICYCLE.GT.1 .AND. FWHM.GT.0.) THEN
                SFAC = SQRT(2.)*FWHM/2.3548
                DO IB = 1, NUMBLOCK
-C
+C     
 C     Compute profile from a pixel integrated gaussian.
 C
                   IF(NPOLY.GT.1) THEN
@@ -1014,22 +1017,22 @@ C
                      DX2 = (DBLE(I)+0.5-XSTART)/SFAC
                      PROFILE(I) = REAL(5.*(PDA_DERF(DX2)-PDA_DERF(DX1)))
                   END DO
-C
+C     
 C     Measure peak position
 C
                   IGUESS = NINT(XSTART) - (I1 - 1)
                   CALL MEDIAN(PROFILE(I1),I2-I1+1,IGUESS,ESIG,
      &                 XPOS,SIGBIN,1)
-C
+C     
 C     Compute undersampling correction and add to measurements
 C
-                  IF(SIGBIN.GT.0.) WORK(2,IB) =
+                  IF(SIGBIN.GT.0.) WORK(2,IB) = 
      &                 WORK(2,IB)+XSTART-XPOS-REAL(I1-1)
                END DO
             END IF
-C
+C     
 C     Correct positions for the spline
-C
+C     
             IF(NPOLY.GT.0) THEN
                DO IB = 1, NUMBLOCK
                   WORK(2,IB) = WORK(2,IB) - YFIT(IB)
@@ -1053,9 +1056,9 @@ C
                   RETURN
                END IF
             END IF
-C
+C     
 C     Compute RMS, evaluate largest deviate.
-C
+C     
             RMS = 0.
             PRMS = 0.
             NFIT = 0
@@ -1083,17 +1086,17 @@ C
             ELSE
                RMS    = SQRT(RMS/REAL(NFIT-NSPLINE))
             END IF
-
+            
             CHIMAX = CHIMAX/RMS
-C
+C     
 C     Reject if greater than CLIP*RMS from prediction.
-C
+C     
             IF(CHIMAX.GT.CLIP) WORK(3,IREJ) = -ABS(WORK(3,IREJ))
          END DO
 C
 C     Recover uncertainties now. First fits are with unit weights to prevent
 C     being affected by single points too much.
-C
+C     
          IF(.NOT.TWEAK .AND. ICYCLE.EQ.1) THEN
             DO IB = 1, NUMBLOCK
                IF(WORK(3,IB).GT.0.D0) WORK(3,IB) = UNCERT(IB)
@@ -1101,18 +1104,18 @@ C
          END IF
 
       END DO
-C
+C     
 C     Restore positions
-C
+C     
       IF(NPOLY.GT.0) THEN
          DO IB = 1, NUMBLOCK
             WORK(2,IB) = WORK(2,IB) + YFIT(IB)
          END DO
       END IF
-C
+C     
 C     Fit for residual plot
-C
-      IF(NFPOLY.GT.0)
+C     
+      IF(NFPOLY.GT.0) 
      &     CALL LSQUAR(WORK,NUMBLOCK,NFPOLY,SUBFIT,CHISQ,XM,0)
       NREJTOT = 0
       DO I = 1, NUMBLOCK
@@ -1126,9 +1129,9 @@ C
       CALL MSG_SETI('REJ',NREJTOT)
       CALL MSG_OUT(' ','Rejected ^REJ points during fit.',
      &     STATUS)
-C
+C     
 C     Plot TRACK
-C
+C     
       IF(FPLOT) THEN
 
          DO I = 1, NPLOT
@@ -1145,7 +1148,7 @@ C
          END IF
          IF(NPOLY.GT.0) THEN
             DO I = 1, NPLOT
-               YSTORE(I) = YSTORE(I) +
+               YSTORE(I) = YSTORE(I) + 
      &              POLY(CPOLY,NPOLY,(DBUFFER(I)-XMID)/XHRANGE)
             END DO
          END IF
@@ -1171,7 +1174,7 @@ C
 
       DO I = 1, 3
          IF(NPOLY.GT.0) THEN
-            YSTORE(I) = YSTORE(I) +
+            YSTORE(I) = YSTORE(I) + 
      &           POLY(CPOLY,NPOLY,(DBUFFER(I)-XMID)/XHRANGE)
          END IF
          CALL MSG_SETR('X',REAL(YSTORE(I)))
@@ -1226,9 +1229,9 @@ C
                   PLOTX(I) = REAL(WORK(1,I))
                   PLOTY(I) = REAL(YFIT(I))
                END IF
-
+               
                IF(NFPOLY.GT.0) THEN
-                  PLOTY(I) = REAL(PLOTY(I) -
+                  PLOTY(I) = REAL(PLOTY(I) - 
      &                 POLY(SUBFIT,NFPOLY,WORK(1,I)))
                   Y  = REAL(WORK(2,I) - POLY(SUBFIT,NFPOLY,WORK(1,I)))
                ELSE
@@ -1259,7 +1262,7 @@ C
       IFAIL = 0
       RETURN
       END
-
+      
       SUBROUTINE RCOLLP(PROFILE, VAR, MXPROF, DATA, BALANCE,
      &     NX, NY, I1, I2, J1, J2, VAR0, PHOTON, PSIG, RBUF, SBUF,
      &     ACC, MXBUF, OK)
@@ -1280,7 +1283,7 @@ C
          OK = .TRUE.
          DO I = I1, I2
             DO J = J1, J2
-               IF(BALANCE(I,J).EQ.VAL__BADR .OR.
+               IF(BALANCE(I,J).EQ.VAL__BADR .OR. 
      &              DATA(I,J).EQ.VAL__BADR) THEN
                   ACC(J) = .FALSE.
                ELSE
@@ -1329,7 +1332,7 @@ C
                IF(ACC(J)) THEN
                   NOK  = NOK + 1
                   SUM1 = SUM1 + RBUF(J)
-                  SUM2 = SUM2 + SBUF(J)*(SBUF(J)*VAR0+
+                  SUM2 = SUM2 + SBUF(J)*(SBUF(J)*VAR0+ 
      &                   MAX(0.,RBUF(J))/PHOTON)
                END IF
             END DO
@@ -1357,14 +1360,14 @@ C
                BAL        = BALANCE(I,J)
                DAT        = BAL*DATA(I,J)
                PROFILE(I) = PROFILE(I) + DAT
-               VAR(I)     = VAR(I) + BAL*(BAL*VAR0 +
+               VAR(I)     = VAR(I) + BAL*(BAL*VAR0 + 
      &              MAX(0.,DAT)/PHOTON)
             END DO
          END DO
       END IF
-C
+C     
 C     Test for zero counts
-C
+C     
       IF(OK) THEN
          OK = .FALSE.
          DO I = I1, I2

@@ -1,8 +1,8 @@
       SUBROUTINE SPLCALC( NDATA, XDATA, XKNOT, CSPLINE, NCAP7,
      &     YFIT, IFAIL )
-*
+*     
 *     EVALUATES SPLINE FIT
-*
+*     
 *     Input:
 *     NDATA      = NUMBER OF DATA PAIRS
 *     XDATA      = DATA X VALUES
@@ -12,19 +12,19 @@
 *     Output:
 *     YFIT      = CORRESPONDING Y VALUE OF SPLINE FIT
 *     IFAIL      = 0 IF SUCCESSFUL, 1 IF FAILED.
-*
-*
+*     
+*     
       IMPLICIT NONE
       INTEGER NDATA, IFAIL
       REAL  XDATA(NDATA), YFIT(NDATA)
-*
+*     
       INTEGER NCAP7, I,  KNOT
       DOUBLE PRECISION DERIV
       DOUBLE PRECISION XKNOT(NCAP7), CSPLINE(NCAP7-4)
       DOUBLE PRECISION WORK(12)
       DOUBLE PRECISION PDA_DBVALU
       INTEGER INBV,K
-
+ 
       INBV = 1
       IFAIL = 0
       K=4
@@ -32,9 +32,9 @@ C
 C     Loop thru the data
 C
       DO I=1,NDATA
-C
+C         
 C     Evaluate spline at desired x-value
-C
+C     
 
          IF( XDATA(I).GE.XKNOT(1).AND.
      &        XDATA(I).LE.XKNOT(NCAP7) ) THEN
@@ -45,19 +45,19 @@ C
                print *,' XDATA(',I,') = ',XDATA(I)
                print *,' XKNOT(1) = ', XKNOT(1)
                print *,' XKNOT(',NCAP7,') = ', XKNOT(NCAP7)
-               RETURN
+               RETURN  
             END IF
-
+            
          ELSE
-C
+C            
 C     Evaluate spline and first derivative at the end knot
 C
             IF (XDATA(I).GT.XKNOT(NCAP7)) THEN
                KNOT=NCAP7
-            ELSE
+            ELSE 
                KNOT = 1
             ENDIF
-
+            
             YFIT(I) = REAL(PDA_DBVALU(XKNOT,CSPLINE,NCAP7-4
      +           ,4,0,XKNOT(KNOT),INBV,WORK,IFAIL))
             IF( IFAIL.NE.0) THEN
@@ -65,28 +65,28 @@ C
                print *,xknot(1),xknot(knot),xknot(ncap7)
                RETURN
             ENDIF
-
+            
             DERIV = PDA_DBVALU(XKNOT,CSPLINE,NCAP7-4
      +           ,4,1,XKNOT(KNOT),INBV,WORK,IFAIL)
             IF( IFAIL.NE.0) THEN
                WRITE(*,*) '** PDA_DBVALU Failed.(3) IFAIL=',IFAIL
                RETURN
             ENDIF
-C
+C            
 C     Linear extrapolation to desired point
 C
-
+            
             YFIT(I) = YFIT(I) + REAL(DERIV*(XDATA(I)-XKNOT(KNOT)))
-         END IF
+         END IF     
       ENDDO
       RETURN
       END
 
       SUBROUTINE SPLFIT( NDATA, XDATA, YDATA, YSIGMA,
      *     YFIT, KNOTREQ, IFAIL )
-*
+*     
 *     COMPUTES WEIGHTED LEAST-SQUARES SPLINE FIT TO DATA PAIRS
-*
+*     
 *     Input:
 *     NDATA   = NUMBER OF DATA PAIRS
 *     XDATA   = DATA X VALUES
@@ -97,11 +97,11 @@ C
 *     YFIT    = FITTED Y VALUES
 *     RMS     = RMS NORMALIZED RESIDUAL OF POINTS NOT REJECTED
 *     IFAIL   = 0 IF SUCCESSFUL, 1 IF FAILED.
-*
-*
+*     
+*     
 *     SEPT 1984 SORTING AND EXTRAPOLATION ADDED BY KDH
 *     JULY 1984 BY KEITH HORNE
-*
+*     
       IMPLICIT NONE
       INTEGER NDATA, KNOTREQ, IFAIL, MAXFIT, MAXKNOT, NCAP7
       INTEGER NFIT, LOCMAX, LOCMIN, I, ISTEP, IGET1, IGET2
@@ -120,15 +120,15 @@ C
       COMMON/SPLFIT0/NCAP7
       COMMON/SPLFIT1/XKNOT
       COMMON/SPLFIT2/CSPLINE
-*
+*     
       IF(NDATA.LE.0) THEN
          PRINT *,'** NO DATA IN ''SPLFIT1'','
          GOTO 999
       END IF
-*
+*     
 *     Count and compute mean of YDATA with positive YSIGMA,
 *     and locate extreme values of XDATA.
-*
+*     
       NFIT = 0
       LOCMAX = 1
       LOCMIN = 1
@@ -147,9 +147,9 @@ C
       END IF
 
       YMEAN = REAL(CALC/NFIT)
-*
+*     
 *     Use mean of YDATA if there is not enough data for a spline fit
-*
+*     
       IF(NFIT.LT.3) THEN
          WRITE(*,*) '** WARNING: MEAN OF', NFIT,
      &        ' DATA POINTS INSTEAD SPLINE FIT.'
@@ -158,9 +158,9 @@ C
          END DO
          GOTO 1000
       END IF
-*
+*     
 *     Decide in which direction to load the data values
-*
+*     
       IF( LOCMAX.GT.LOCMIN ) THEN
          ISTEP = 1              ! Forward loading
          IGET1 = 1
@@ -170,13 +170,13 @@ C
          IGET1 = NDATA
          IGET2 = 1
       END IF
-*
+*     
       IPUT1 = 2                 ! Skip one datum at beginning
-*
+*     
 *     Load data arrays for spline fit ---------------------------------------
-*
+*     
       IF( NFIT.LE.MAXFIT ) THEN
-*
+*     
          IPUT = IPUT1 - 1
          DO IGET= IGET1, IGET2, ISTEP
             IF( YSIGMA(IGET).GT.0.) THEN ! Load only data with positive sigma
@@ -188,11 +188,11 @@ C
          END DO
          IPUT2 = IPUT
          NFIT = IPUT2 - IPUT1 + 1
-*
+*     
 *     Too much data, some points must be skipped
-*
+*     
       ELSE
-*
+*     
          PRINT *,'** TOO MUCH DATA FOR ''SPLFIT''.', NFIT, MAXFIT
          PRINT *,'** INTERSPERSED DATA WILL BE SKIPPED.'
          IGET = IGET1
@@ -216,11 +216,11 @@ C
          END DO
          IPUT2 = IPUT
          NFIT = IPUT2 - IPUT1 + 1
-*
+*     
       END IF
-*
+*     
 *     Re-scale weights to their RMS value
-*
+*     
       CALC = 0.D0
       DO I = IPUT1, IPUT2
          CALC = CALC + W(I)*W(I)
@@ -233,11 +233,11 @@ C     changing E02BAF to PDA_DEFC is done here - pflm
 
          W(I) = W(I)/RMS
       END DO
-C
+C     
 C     Sort data so that X values increase -------------------------------
-C
+C     
       DO ITEST = IPUT1+1, IPUT2
-*
+*     
          IF( X(ITEST) .LT. X(ITEST-1) ) THEN
             print *,'Shell sort to make X-values ascend.'
             CALL SHELLSORT( NFIT, X(IPUT1), KEY(IPUT1) )
@@ -265,39 +265,39 @@ C
       END DO
 C
 C     Decide how many splines will be used
-C
+C     
  50   NSPLINE = MAX(1, MIN(KNOTREQ, MIN(NFIT/2+1, MAXKNOT) ) )
       IF(NSPLINE.LT.KNOTREQ) THEN
-         PRINT *,'** NUMBER OF SPLINES REDUCED FROM',
+         PRINT *,'** NUMBER OF SPLINES REDUCED FROM', 
      &        KNOTREQ,' TO', NSPLINE
       END IF
-C
+C     
 C     Distribute spline knots
-C
+C     
       DO I = 1, NSPLINE+1
          PART = (I-1.)/NSPLINE
          LOOKUP = NINT( IPUT1*(1.-PART) + IPUT2*PART )
          XKNOT(I+3) = X(LOOKUP)
       END DO
-*
+*     
 *     Call NAG routine to compute spline fit
 *
 C     IFAIL = 1
-C     CALL E02BAF( NFIT, NSPLINE+7, X(IPUT1), Y(IPUT1), W(IPUT1),
+C     CALL E02BAF( NFIT, NSPLINE+7, X(IPUT1), Y(IPUT1), W(IPUT1), 
 C     &  XKNOT, WORK1, WORK2, CSPLINE, CALC, IFAIL )
-
+      
 C     Initialize end knots
 
       DO I=1,3
          XKNOT(I)           =  X(IPUT1)
          XKNOT(NSPLINE+4+I) =  X(IPUT2)
       ENDDO
-
+      
       MAXWORK = MAXFIT + 2
       NCAP7   = NSPLINE+7
       LW      = (NCAP7-1)*5 + (NCAP7+1)*5
      &     + 2*MAX(NFIT,NCAP7) + NCAP7 + 16
-      IF (LW .GT. MAXWORK) THEN
+      IF (LW .GT. MAXWORK) THEN 
          WRITE(*,*) 'SPLFIT: INSUFFICIENT WORKSPACE FOR PDA_DEFC'
          WRITE(*,*) 'Array elements required : ',LW
          WRITE(*,*) 'Array elements available: ',MAXWORK
@@ -310,36 +310,36 @@ C     Initialize end knots
       IF( J.NE.1 .OR. IFAIL.NE.0) THEN
          WRITE(*,*) '** PDA_DEFC failed.  IFAIL= ',IFAIL
          WRITE(*,*) '** PDA_DEFC failed.  MDEOUT=',J
-         RETURN
+         RETURN       
       END IF
-C
+C     
 C     Evaluate spline at required points
-C
+C     
       CALL SPLCALC( NDATA, XDATA, XKNOT, CSPLINE, NCAP7,
      &     YFIT, IFAIL )
       IF(IFAIL.NE.0) THEN
          PRINT *,'** ''SPLCALC'' FAILED.  IFAIL=',IFAIL
          RETURN
       END IF
-C
+C     
 C     NORMAL RETURN
-C
+C     
  1000 IFAIL = 0
       RETURN
-C
+C     
 C     ERROR RETURN
-C
+C     
  999  IFAIL = 1
       RETURN
-*
+*     
       END
-
+      
       SUBROUTINE SPLFITA( NDATA, XDATA, YDATA, YSIGMA, YFIT,
      #     NSPLINE, NCYCLE, THRHI, THRLO, IFAIL )
 *
 *     Fits spline to data and performs reject cycles with
 *     no user interaction.
-*
+*     
 *     Inputs:
 *     NDATA       = number of data values
 *     XDATA       = X data values
@@ -349,69 +349,69 @@ C
 *     NCYCLE      = Max number of reject cycles
 *     THRHI       = high threshold for sigma clipping
 *     THRLO       = low threshold for sigma clipping
-*
+*     
 *     Output:
 *     YFIT       = Y FIT VALUES
 *     IFAIL      = 0 IF SUCCESSFUL, 1 IF FAILED.
-*
+*     
 *     Oct 1986 KDH @ STScI
-*
+*     
       IMPLICIT NONE
       INTEGER NDATA, NSPLINE, NCYCLE, NREJ, ICYCLE
       INTEGER LASTREJ, IFAIL
       REAL XDATA(NDATA), YDATA(NDATA), YSIGMA(NDATA)
       REAL YFIT(NDATA), THRHI, THRLO, RMS
-C
+C     
 C     Test inputs
 C
       IF(NDATA.LE.0) THEN
          WRITE(*,*) '** No data.', NDATA
          GOTO 999
       END IF
-
+      
       NREJ = 0
       ICYCLE = -1
  100  ICYCLE = ICYCLE + 1
       LASTREJ = NREJ
-C
+C     
 C     Fit the spline
 C
-      CALL SPLFIT( NDATA, XDATA, YDATA, YSIGMA, YFIT,
+      CALL SPLFIT( NDATA, XDATA, YDATA, YSIGMA, YFIT, 
      &     NSPLINE, IFAIL)
       IF( IFAIL.NE.0 ) GOTO 999
-C
+C     
 C     Evaluate the fit
 C     Do not restore any points
-C
+C     
       NREJ = -1
 C
       IF( NCYCLE.EQ.0 ) THEN
          CALL REJECT( NDATA, YDATA, YSIGMA, YFIT,
      &        1.E20, -1.E20, RMS, NREJ )
-C
+C     
 C     Evaluate the fit and reject large outliers
-C
+C     
       ELSE
          CALL REJECT( NDATA, YDATA, YSIGMA, YFIT,
      &        THRHI, THRLO, RMS, NREJ )
       END IF
-C
+C     
 C     Report results of this reject
-C
+C     
       WRITE(*,*) ' Cycle', ICYCLE, '  RMS =', RMS,
      &     ' (sigma)  Rejects =', NREJ
-C
+C     
 C     Next fit-reject cycle
-C
+C     
       IF( ICYCLE.LT.NCYCLE .AND. NREJ.NE.LASTREJ ) GOTO 100
-C
+C     
 C     normal return
 C
       IFAIL = 0
       RETURN
 C
 C error return
-C
+C     
 999   IFAIL = 1
       WRITE(*,*) 'SPLFITA aborted.'
       RETURN
@@ -552,19 +552,19 @@ C
 C
 C     Next routine offers more control to calling routines
 C
-      SUBROUTINE SPLFITB( ADATA, NDATA, NSPLINE, NORD, WORK,
+      SUBROUTINE SPLFITB( ADATA, NDATA, NSPLINE, NORD, WORK, 
      &     MXWORK, XKNOT, YFIT, CSPLINE, IFAIL)
 *
 * Computes weighted least-squares cubic spline fit to data pairs and is
 * designed to fit more with the calling sequence of LSQUAR
 *
 *  Input:
-*      ADATA      = DATA in the form
+*      ADATA      = DATA in the form 
 *      NDATA      = Number of data pairs
 *      NSPLINE    = Number of splines requested
 *      NORD       = Spline order cubic=4
-*      WORK       = R*8 work space, dimension MXWORK
-*      MXWORK     = This will be checked, but should be
+*      WORK       = R*8 work space, dimension MXWORK 
+*      MXWORK     = This will be checked, but should be 
 *                   at least 3*NDATA+(NORD+1)*(2*NBKPT-NORD+4)+2*MAX(NDATA,NBKPT)+NORD**2
 *                   where NBKPT=NSPLINE+2*NORD-1
 *
@@ -584,7 +584,7 @@ C
       DOUBLE PRECISION WORK(MXWORK), XKNOT(NSPLINE+2*NORD-1)
       DOUBLE PRECISION CSPLINE(NSPLINE+NORD-1)
 
-      NBKPT = NSPLINE+2*NORD-1
+      NBKPT = NSPLINE+2*NORD-1      
       NWKMIN= (NORD+1)*(2*NBKPT-NORD+4)+2*MAX(NDATA,NBKPT)+
      &     NBKPT+NORD**2
 *
@@ -592,7 +592,7 @@ C
          WRITE(*,*) '** NO DATA IN ''SPLFITB'','
          GOTO 999
       END IF
-
+      
       IF(MXWORK .LT. 3*NDATA+NWKMIN) THEN
          WRITE(*,*) '** WORK ARRAY NOT LARGE ENOUGH IN ''SPLFITB'','
          WRITE(*,*) '** MUST BE AT LEAST',3*NDATA+NWKMIN,
@@ -603,16 +603,16 @@ C
       NOFF1 =   NDATA
       NOFF2 = 2*NOFF1
       NOFF3 = 3*NOFF1
-
+ 
 *     Load data arrays for spline fit
-
+ 
       CALC = 0.D0
       YMEAN=0.0
       NFIT = 0
       XMIN = ADATA(1,1)
       XMAX = XMIN
       DO I= 1, NDATA
-         IF( ADATA(3,I).GT.0.) THEN
+         IF( ADATA(3,I).GT.0.) THEN      
             NFIT = NFIT + 1
             WORK(NFIT)       = ADATA(1,I)
             WORK(NOFF1+NFIT) = ADATA(2,I)
@@ -631,26 +631,26 @@ C
          WRITE(*,*) '** TOO FEW DATA POINTS IN ''SPLFITB'','
          GOTO 999
       END IF
-
+      
       RMS   = SQRT(CALC/REAL(NFIT))
       YMEAN = YMEAN/NFIT
-
+      
 *     Re-scale sigmas
-
+      
       DO I=NOFF2+1,NOFF2+NFIT
          WORK(I) = WORK(I)/RMS
       END DO
-
+ 
 *  Distribute spline knots ---------------------------------------------
 
 C
 C     Distribute interior knots
-C
+C     
       DO I = 0, NSPLINE
          XKNOT(I+NORD) = XMIN+I*(XMAX-XMIN)/NSPLINE
       END DO
 
-C
+C     
 C     Initialize end knots (extra part to reduce chance of error)
 C
       DO I=1,NORD-1
@@ -660,37 +660,37 @@ C
 
       IFAIL = 0
       CALL PDA_DEFC( NFIT, WORK, WORK(NOFF1+1), WORK(NOFF2+1), NORD,
-     &     NBKPT, XKNOT, 1, MDEOUT, CSPLINE, NWKMIN, WORK(NOFF3+1),
+     &     NBKPT, XKNOT, 1, MDEOUT, CSPLINE, NWKMIN, WORK(NOFF3+1), 
      &     IFAIL)
       IF( MDEOUT.NE.1 .OR. IFAIL.NE.0) THEN
          WRITE(*,*) '** SPLFITB. PDA_DEFC failed.  IFAIL=',IFAIL
          WRITE(*,*) '** SPLFITB. PDA_DEFC failed.  MDEOUT=',MDEOUT
          RETURN
       END IF
-
+      
 *     Evaluate spline at required points
-
+      
       DO I= 1, NDATA
          WORK(I) = ADATA(1,I)
       END DO
-      CALL SPLCALCB( NDATA, WORK, XKNOT, CSPLINE, NSPLINE, NORD,
+      CALL SPLCALCB( NDATA, WORK, XKNOT, CSPLINE, NSPLINE, NORD, 
      &     YFIT, IFAIL)
-*
+*     
 *     Normal RETURN
-*
+*     
       IFAIL = 0
       RETURN
-*
+*     
 *     Error RETURN
-*
+*     
  999  IFAIL = 1
       RETURN
-*
+*     
       END
-
+      
       SUBROUTINE SPLCALCB( NDATA, XDATA, XKNOT, CSPLINE, NSPLINE, NORD,
      +     YFIT, IFAIL )
-*
+*     
 *     Evaluates spline fit. Beyond end knots it extrapolates.
 *     The knots position are assumed to ascend.
 *
@@ -703,30 +703,33 @@ C
 *     NORD       = SPLINE ORDER (CUBIC=4)
 *
 *     Output:
-*     YFIT      = CORRESPONDING Y VALUE OF SPLINE FIT
+*     YFIT       = CORRESPONDING Y VALUES OF SPLINE FIT
 *     IFAIL      = 0 IF SUCCESSFUL, 1 IF FAILED.
-*
-*
+*     
+*     
       IMPLICIT NONE
       INTEGER NDATA, IFAIL, NSPLINE, NORD
       DOUBLE PRECISION XDATA(NDATA), YFIT(NDATA)
 *
-      INTEGER I,  KNOT, INBV, NKNOT, NCOEFF
-      DOUBLE PRECISION DERIV, WORK(3*NORD), PDA_DBVALU
+* WORK array long enough to take 3x maximum value of NORD
+*
+      INTEGER I, J, KNOT, INBV, NKNOT, NCOEFF
+      DOUBLE PRECISION DERIV, WORK(60), PDA_DBVALU
       DOUBLE PRECISION XKNOT(NSPLINE+2*NORD-1), CSPLINE(NSPLINE+NORD-1)
-
+      
       NCOEFF = NSPLINE+NORD-1
       NKNOT  = NCOEFF+NORD
-      INBV = 1
-      IFAIL = 0
+      INBV   = 1
+      IFAIL  = 0
 
 C     Loop thru the data
 
       DO I=1,NDATA
-
+         
 C  Evaluate spline at desired x-value
-
+         
          IF( XDATA(I).GE.XKNOT(1).AND. XDATA(I).LE.XKNOT(NKNOT) ) THEN
+
             YFIT(I)  = PDA_DBVALU(XKNOT,CSPLINE,NCOEFF,NORD,0,XDATA(I),
      &           INBV,WORK,IFAIL)
             IF( IFAIL.NE.0) THEN
@@ -735,18 +738,18 @@ C  Evaluate spline at desired x-value
                print *,' XDATA(',I,') = ',XDATA(I)
                print *,' XKNOT(1) = ', XKNOT(1)
                print *,' XKNOT(',NCOEFF,') = ', XKNOT(NCOEFF)
-               RETURN
+               RETURN  
             END IF
          ELSE
-C
+C     
 C     Evaluate spline and first derivative at the end knot
-C
+C     
             IF (XDATA(I).GT.XKNOT(NCOEFF)) THEN
                KNOT = NCOEFF
-            ELSE
+            ELSE 
                KNOT = 1
             ENDIF
-
+            
             YFIT(I) = PDA_DBVALU(XKNOT,CSPLINE,NCOEFF,NORD,0,
      &           XKNOT(KNOT),INBV,WORK,IFAIL)
             IF( IFAIL.NE.0) THEN
@@ -755,7 +758,7 @@ C
                WRITE(*,*) 'XKNOT(',KNOT,') = ',XKNOT(KNOT)
                RETURN
             ENDIF
-
+            
             DERIV = PDA_DBVALU(XKNOT,CSPLINE,NCOEFF,NORD,1,
      &           XKNOT(KNOT),INBV,WORK,IFAIL)
             IF( IFAIL.NE.0) THEN
@@ -763,11 +766,11 @@ C
      &              IFAIL
                RETURN
             ENDIF
-C
+C     
 C     Linear extrapolation to desired point
-C
+C     
             YFIT(I) = YFIT(I) + DERIV * ( XDATA(I) - XKNOT(KNOT))
-
+            
          END IF
       END DO
       RETURN
