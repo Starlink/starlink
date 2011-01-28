@@ -148,6 +148,10 @@ AstKeyMap *kpg1Config( const char *param, const char *def,
 *        - In order to get better error messages, do explicit checks that all
 *        user supplied keys are good, so that
 *        - Expand on the documentation for "nested".
+*     28-JAN-2011 (DSB):
+*        Correct handling of case where the user supplied "def" to
+*        indicate that the defaults should be accepted. In this case
+*        there is no "external" keymap.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -159,11 +163,11 @@ AstKeyMap *kpg1Config( const char *param, const char *def,
 /* Local Variables: */
    AstKeyMap *external = NULL;  /* Keymap of externally supplied values */
    AstKeyMap *result = NULL;    /* Returned KeyMap */
+   Grp *grp;                    /* Group to hold config values */
    char *value;                 /* Pointer to GRP element buffer */
    char buffer[ GRP__SZNAM ];   /* Buffer for GRP element */
    int added;                   /* Number of names added to group */
    int flag;                    /* Flag */
-   Grp *grp;                    /* Group to hold config values */
    size_t size;                 /* Size of group */
 
 /* Check inherited status */
@@ -181,7 +185,7 @@ AstKeyMap *kpg1Config( const char *param, const char *def,
    grpDelet( &grp, status );
 
 /* Handle nested entries */
-  kpg1Config_ProcessNesting( result, nested, status );
+   kpg1Config_ProcessNesting( result, nested, status );
 
 /* Lock the KeyMap so that an error will be reported if an attempt
    is made to add any new entries to it. */
@@ -205,24 +209,25 @@ AstKeyMap *kpg1Config( const char *param, const char *def,
       }
 
 /* Otherwise, store the configuration settings in the KeyMap. */
-      if( ! astChrMatch( value, "DEF" ) ) kpg1Kymap( grp, &external, status );
+      if( ! astChrMatch( value, "DEF" ) ) {
+         kpg1Kymap( grp, &external, status );
 
 /* Handle alternate nested entries */
-     kpg1Config_ProcessNesting( external, nested, status );
+         kpg1Config_ProcessNesting( external, nested, status );
 
 /* Test every entry in the user-supplied configuration keymap. If an
    entry is found which does not exist in the defaults keymap, report an
    error. We could rely on astMapCopy to do this (called below) but the
    wording of the error message created by astMapCopy is a bit too
    generalised to be useful. */
-      kpg1Config_CheckNames( result, external, grp, param, status );
+         kpg1Config_CheckNames( result, external, grp, param, status );
 
 /* Copy the overrides into the default. */
-      astMapCopy( result, external );
+         astMapCopy( result, external );
 
 /* Delete the external KeyMap */
-      external = astAnnul( external );
-
+         external = astAnnul( external );
+      }
    }
 
 /* Ensure the KeyError attribute is non-zero in the returned KeyMap so that an
@@ -234,15 +239,14 @@ AstKeyMap *kpg1Config( const char *param, const char *def,
    This is the one that will actually be used rather than the one that was given
    by the user. */
    if ( result ) {
-     Grp *mergedgrp = NULL;
+      Grp *mergedgrp = NULL;
 
 /* Convert to a GRP */
-     kpg1Kygrp( result, &mergedgrp, status );
+      kpg1Kygrp( result, &mergedgrp, status );
 
 /* Register it */
-     ndgAddgh( param, mergedgrp, status );
-     if (mergedgrp) grpDelet( &mergedgrp, status );
-
+      ndgAddgh( param, mergedgrp, status );
+      if (mergedgrp) grpDelet( &mergedgrp, status );
    }
 
 /* Delete the group, if any. */
