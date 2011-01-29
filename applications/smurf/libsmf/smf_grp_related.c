@@ -59,25 +59,46 @@
 
  *  Description:
  *     This routine groups related files together and populates a
- *     smfGroup. The smfGroup contains a copy of the input Grp, the
- *     number of subgroups within the smfGroup, and an array of
- *     pointers to integer arrays which contain the Grp index values
- *     corresponding to related files. This method reduces the number
- *     of Grps required to 1, and allows new Grps to be created on
- *     demand so that the maximum Grp number is not exceeded. In addition,
- *     continuous subsets of the input data are identified and stored in
- *     the "chunk" component of group. The caller may optionally specify
- *     a maximum sample length (in time) for these continuous pieces. In
- *     this case, the length of each continuously flagged region is truncated
- *     to the minimum complete set of files that does not exceed the limit
- *     (e.g. files are not broken up into several smaller pieces).
+ *     smfGroup. Related files are those that were written at the same
+ *     time by the data acquisition system and so will have the same
+ *     values for the DATE-OBS, OBSID and SEQCOUNT FITS headers. Additionally
+ *     if grpbywave is true files will not be designated as related if they
+ *     have a different value for the WAVELEN FITS header. For SCUBA-2 this
+ *     means that there will be at most 8 related files unless we are grouping
+ *     by wavelength where the limit will be 4 files. If the related files
+ *     have different dimensions they are not treated as related files.
+ *
+ *     The constructed smfGroup stores the indices of the file as they occur
+ *     in the supplied Grp in the smfGroup.subgroups array which is an array
+ *     of size_t pointers indexed by group number and then number of related
+ *     files. If an entry is zero there is no corresponding file for that
+ *     slot (since there are at most 4 or 8 files but there does not need
+ *     to be that many for each group).
+ *
+ *     The smfGroup is filled in time order. If we are grouping by wavelength
+ *     the sorting will be in time order for each wavelength. Contiguous chunks
+ *     of related files that all share the same sequence (SEQCOUNT and OBSID
+ *     being equal) are assigned an integer "chunk number" which is stored in
+ *     smfGroup.chunks. The chunk number increments if the consecutive groups
+ *     are not part of the sequence, if the sequence is too long ("maxlen")
+ *     or if the two groups contain different subarrays. Files are not broken
+ *     up so it is not guaranteed that chunks are equal size.
+ *
+ *     The supplied Grp is cloned and the Grp stored in the smfGroup
+ *     is independent of the supplied Grp which can be deleted.
  *
  *     If the input files are 4D FFT data, each file appears in a single time
  *     chunk (i.e. checking for continuity does not make sense in this case).
 
  *  Notes:
- *     Resources allocated with this routine should be freed by calling
+ *     - Resources allocated with this routine should be freed by calling
  *     smf_close_smfGroup
+ *     - This routine is not clever when deciding to break continuous chunks
+ *     into smaller entities if "maxlen" is exceeded. If there are 6 files
+ *     contributing to a sequence and the 6th makes the sequence too long
+ *     this function will return two chunks with one chunk containing 5
+ *     files and the other containing 1. The clever thing to do would be to
+ *     return two chunks of 3 files in each.
 
  *  Authors:
  *     Andy Gibb (UBC)
