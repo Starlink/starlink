@@ -1130,25 +1130,28 @@ int *status                   /* global status (given and returned) */
 	file or whatever) */
      datThere( headloc, hdsRecords[j].name, &isthere, status );
      if (isthere) {
-       size_t nelem = 0;
+       int actdim = 0;
+       hdsdim dims[1];
 
        datFind ( headloc, hdsRecords[j].name, &(sc2store_loc[pos]),
 		 status );
 
-       /* see if this is a scalar item */
-       datSize( sc2store_loc[pos], &nelem, status );
+       /* see if this is a scalar item - we have to look at the shape
+          and not simply count elements. */
+       datShape( sc2store_loc[pos], 1, dims, &actdim,status );
+
        dim[0] = nframes;
        ndim = 1;
-       if ( nelem == 1 ) {
+       if ( actdim == 0 ) {
          sc2store_array[pos] = 0;
          dim[0] = 1;
          ndim = 0;
-       } else if (nelem != nframes ) {
+       } else if (dims[0] != nframes ) {
          if (*status == SAI__OK) {
            *status = DITS__APP_ERROR;
            sprintf( sc2store_errmess,
-                    "sc2store_headrmap: Size mismatch in entry '%s'. Expected %d elements got %d",
-                    hdsRecords[j].name, nframes, nelem );
+                    "sc2store_headrmap: Size mismatch in entry '%s'. Expected %d elements got %" HDS_DIM_FORMAT,
+                    hdsRecords[j].name, nframes, dims[0] );
            ErsRep( 0, status, sc2store_errmess );
          }
        }
