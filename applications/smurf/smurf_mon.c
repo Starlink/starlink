@@ -261,6 +261,8 @@ void smurf_mon( int * status ) {
     smurf_calcflat( status );
   } else if (strcmp( taskname, "CALCNOISE" ) == 0 ) {
     smurf_calcnoise( status );
+  } else if (strcmp( taskname, "CALCQU" ) == 0 ) {
+    smurf_calcqu( status );
   } else if (strcmp( taskname, "CALCRESP" ) == 0 ) {
     smurf_calcresp( status );
   } else if (strcmp( taskname, "COPYFLAT" ) == 0 ) {

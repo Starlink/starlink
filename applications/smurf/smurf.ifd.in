@@ -561,6 +561,58 @@ package @PACKAGE@ {
 
         }
 
+        action calcqu {
+
+            helplib {$SMURF_HELP}
+
+            parameter arcerror {
+                type _REAL
+                prompt {Max spatial shift in one time-slice block (arc-secs)}
+                vpath DYNAMIC CURRENT DEFAULT
+                ppath DYNAMIC CURRENT DEFAULT
+                default 1.0
+                helpkey *
+            }
+
+            parameter config {
+                type LITERAL
+                access READ
+                ppath CURRENT
+                vpath CURRENT
+                prompt {Configuration parameters}
+                helpkey *
+            }
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT }
+                ppath GLOBAL CURRENT
+                association <-GLOBAL.DATA_ARRAY
+                prompt {Input NDF data structure}
+                helpkey *
+            }
+
+            parameter outq {
+                position 2
+                type NDF
+                access WRITE
+                association ->GLOBAL.DATA_ARRAY
+                prompt {Container file for output Q NDFs}
+                helpkey *
+            }
+
+            parameter outu {
+                position 3
+                type NDF
+                access WRITE
+                prompt {Container file for output U NDFs}
+                helpkey *
+            }
+
+        }
+
         action calcresp {
 
             helplib {$SMURF_HELP}

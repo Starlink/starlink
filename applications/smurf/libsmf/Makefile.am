@@ -20,6 +20,7 @@ smf_addto_smfArray.c \
 smf_apodize.c \
 smf_apply_dark.c \
 smf_apply_mask.c \
+smf_block_end.c \
 smf_bolonoise.c \
 smf_calc_covar.c \
 smf_calc_fcon.c \
@@ -28,6 +29,7 @@ smf_calc_mappa.c \
 smf_calc_meantau.c \
 smf_calc_mmapsize.c \
 smf_calc_mode.c \
+smf_calc_qu.c \
 smf_calc_skyframe.c \
 smf_calc_stareimage.c \
 smf_calc_stats.c \

@@ -18,7 +18,8 @@
 
 *  Arguments:
 *     ondf = int (Given)
-*        The output NDF identifier.
+*        The output NDF identifier. NDF__NOID may be supplied if and only
+*        if a non-NULL value is supplied for "modprov".
 *     data = const smfData * (Given)
 *        Pointer to the structure describing the current input NDF. If
 *        NULL, then the "indf" is used instead.
@@ -28,13 +29,23 @@
 *     creator = const char * (Given)
 *        A string such as "SMURF:MAKECUBE" indicating the calling app.
 *     modprov = NdgProvenance ** (Given & Returned)
-*        If NULL the provenance will be read by this routine and the
-*        file will be immediately updated. The provenance will then
-*        be freed. If a pointer is provided and points to a NULL
-*        provenance the provenance will be read and modified but the
-*        file will not be updated. If the pointer is provided and
-*        points to a provenance then that provenance will be modified
-*        without reading the output NDF.
+*        If "modprov" is NULL, any existing provenance is read from the
+*        supplied output NDF, updated to include the input NDF as an ancestor,
+*        and then immediately written back to the output NDF. The local
+*        provenance structure is then freed.
+*
+*        If "modprov" is non-NULL but "*modprov" is NULL, any existing
+*        provenance is read from the supplied output NDF. If no output
+*        NDF is supplied, a new empty provenance structure is created to
+*        store the output provenance. Either way, the output provenance is
+*        updated to include the input NDF as an ancestor, but it is not
+*        written back to the output NDF, or freed. Instead, a pointer to
+*        the output provenance structure is returned in "*modprov".
+*
+*        If both "modprov" and "*modprov" are non-NULL, any supplied
+*        output NDF identifier is ignored. Instead, the supplied provenance
+*        structure pointed to by "*modprov" is updated to include the
+*        input NDF as an ancestor.
 *     status = int * (Given and Returned)
 *        Inherited status value.
 
@@ -48,7 +59,8 @@
 *     we have ancestors in the input provenance. Does not propagate if
 *     we have no ancestors and no OBSIDSS.
 *     - If an external provenance pointer is provided the caller
-*     is responsible for writing the provenance to the output file.
+*     is responsible for writing the provenance to the output file and
+*     freeing the structure.
 
 *  Authors:
 *     David S Berry (JAC, UCLan)
@@ -76,6 +88,8 @@
 *        fits header at all.
 *     2010-10-15 (TIMJ):
 *        Allow provenance structure to be retained between calls.
+*     28-JAN-2011 (DSB):
+*        Allow "ondf" to be NDF__NOID.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -106,6 +120,7 @@
 /* Starlink includes */
 #include "sae_par.h"
 #include "star/ndg.h"
+#include "mers.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
@@ -199,8 +214,15 @@ void smf_updateprov( int ondf, const smfData *data, int indf,
         are using an external provenance struct or returning
         it to the caller */
      if (!modprov) {
-       ndgWriteProv( oprov, ondf, 1, status );
-       oprov = ndgFreeProv( oprov, status );
+       if( ondf != NDF__NOID ) {
+         ndgWriteProv( oprov, ondf, 1, status );
+         oprov = ndgFreeProv( oprov, status );
+       } else if( *status == SAI__OK ){
+         *status = SAI__ERROR;
+         errRep( " ", "smf_updateprov: Provenance is to be stored in the "
+                 "output NDF but no output NDF identifier was supplied "
+                 "(programming error).", status );
+       }
      }
    }
 

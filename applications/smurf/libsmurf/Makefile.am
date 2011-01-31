@@ -9,6 +9,7 @@ smurf_badbolos.c \
 smurf_calcdark.c \
 smurf_calcflat.c \
 smurf_calcnoise.c \
+smurf_calcqu.c \
 smurf_calcresp.c \
 smurf_copyflat.c \
 smurf_dreamsolve.c \

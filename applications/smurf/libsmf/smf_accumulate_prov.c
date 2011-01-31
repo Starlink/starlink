@@ -27,14 +27,28 @@
 *     index = int (Given)
 *        Index corresponding to required file in group of Grp is used.
 *     ondf = int (Given)
-*        Output NDF identifier.
+*        The output NDF identifier. NDF__NOID may be supplied if and only
+*        if a non-NULL value is supplied for "modprov".
 *     creator = const char * (Given)
 *        String to associate with the provenance entry. Usually SMURF:TASKNAME
 *     modprov = NdgProvenance ** (Given & Returned)
-*        Pointer to NdgProvenance information. If NULL the provenance will be updated
-*        in the output ndf and the file updated. If non-NULL the provenance
-*        will be returned and the file will not be updated. The caller must free
-*        the structure.
+*        If "modprov" is NULL, any existing provenance is read from the
+*        supplied output NDF, updated to include the input NDF as an ancestor,
+*        and then immediately written back to the output NDF. The local
+*        provenance structure is then freed.
+*
+*        If "modprov" is non-NULL but "*modprov" is NULL, any existing
+*        provenance is read from the supplied output NDF. If no output
+*        NDF is supplied, a new empty provenance structure is created to
+*        store the output provenance. Either way, the output provenance is
+*        updated to include the input NDF as an ancestor, but it is not
+*        written back to the output NDF, or freed. Instead, a pointer to
+*        the output provenance structure is returned in "*modprov".
+*
+*        If both "modprov" and "*modprov" are non-NULL, any supplied
+*        output NDF identifier is ignored. Instead, the supplied provenance
+*        structure pointed to by "*modprov" is updated to include the
+*        input NDF as an ancestor.
 *     status = int* (Given and Returned)
 *        Pointer to inherited status.
 
@@ -46,8 +60,14 @@
 *     struct and so the input file must be reopened. If the smfData contains
 *     an NDF identifier the input file will not be reopened.
 
+*  Notes:
+*     - If an external provenance pointer is provided the caller
+*     is responsible for writing the provenance to the output file and
+*     freeing the structure.
+
 *  Authors:
-*     Tim Jenness (JAC, Hawaii)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+*     DSB: David Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -59,10 +79,12 @@
 *        Now a wrapper around smf_updateprov
 *     2010-10-15 (TIMJ):
 *        Add modprov parameter
+*     2011-31-01 (DSB):
+*        Update docs for modprov parameter.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2007, 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2007-2011 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
