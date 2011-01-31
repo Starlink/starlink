@@ -67,5 +67,6 @@ BLOCKDATA = grp1_init.f
 
 dist_starnews_DATA = grp.news
 dist_pkgdata_DATA = LICENCE
+dist_noinst_HEADERS = $(PRIVATE_INCLUDES)
 
-EXTRA_DIST = GRP_CONST GRP_COM grp_test.dat
+EXTRA_DIST = grp_test.dat
