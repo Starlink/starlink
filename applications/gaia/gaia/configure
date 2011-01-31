@@ -308,7 +308,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_default_prefix=/loc/pwda/pdraper/starlink_git/build
+ac_default_prefix=/home/pdraper/starlink_git/build
 ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CYGPATH EXEEXT PKG_LIB_FILE PKG_STUB_LIB_FILE PKG_STUB_SOURCES PKG_STUB_OBJECTS PKG_TCL_SOURCES PKG_HEADERS PKG_INCLUDES PKG_LIBS PKG_CFLAGS TCL_VERSION TCL_BIN_DIR TCL_SRC_DIR TCL_LIB_FILE TCL_LIB_FLAG TCL_LIB_SPEC TCL_STUB_LIB_FILE TCL_STUB_LIB_FLAG TCL_STUB_LIB_SPEC TCL_LIBS TCL_DEFS TCL_EXTRA_CFLAGS TCL_LD_FLAGS TCL_SHLIB_LD_LIBS TK_VERSION TK_BIN_DIR TK_SRC_DIR TK_LIB_FILE TK_LIB_FLAG TK_LIB_SPEC TK_STUB_LIB_FILE TK_STUB_LIB_FLAG TK_STUB_LIB_SPEC TK_LIBS TK_XINCLUDES CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC OBJEXT CPP CXX CXXFLAGS ac_ct_CXX INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA SET_MAKE RANLIB ac_ct_RANLIB EGREP MATH_LIBS tclutil_VERSION tclutil_LIB_FILE tclutil_BUILD_LIB_SPEC tclutil_BUILD_DIR tclutil_LIB_SPEC BLT_LIB_SPEC BLT_LIB_DIR tclutil_SRC_DIR tclutil_PKG_OBJECTS CFITSIO_LIB_SPEC CFITSIO_LIB_DIR astrotcl_VERSION astrotcl_LIB_FILE astrotcl_BUILD_LIB_SPEC astrotcl_BUILD_DIR astrotcl_LIB_SPEC astrotcl_SRC_DIR astrotcl_PKG_OBJECTS rtd_VERSION rtd_LIB_FILE rtd_BUILD_LIB_SPEC rtd_BUILD_DIR rtd_LIB_SPEC rtd_SRC_DIR rtd_PKG_OBJECTS cat_VERSION cat_LIB_FILE cat_BUILD_LIB_SPEC cat_BUILD_DIR cat_LIB_SPEC cat_SRC_DIR skycat_VERSION skycat_LIB_FILE skycat_BUILD_LIB_SPEC skycat_BUILD_DIR skycat_LIB_SPEC skycat_SRC_DIR PKG_SOURCES PKG_OBJECTS CLEANFILES TCL_INCLUDES TK_INCLUDES TCL_THREADS SHARED_BUILD AR CELIB_DIR LIBOBJS SHLIB_SUFFIX DL_LIBS CFLAGS_DEBUG CFLAGS_OPTIMIZE CFLAGS_WARNING STLIB_LD SHLIB_LD SHLIB_CFLAGS SHLIB_LD_LIBS LDFLAGS_DEBUG LDFLAGS_OPTIMIZE LD_LIBRARY_PATH_VAR TCL_DBGX CFLAGS_DEFAULT LDFLAGS_DEFAULT MAKE_LIB MAKE_SHARED_LIB MAKE_STATIC_LIB MAKE_STUB_LIB RANLIB_STUB TCLSH_PROG WISH_PROG OS SHLIB_LD_CXX_LIBS STARLINK STAR_CPPFLAGS STAR_FCFLAGS STAR_FFLAGS STAR_LDFLAGS build build_cpu build_vendor build_os FC FCFLAGS ac_ct_FC C_FC_FCLINK_MAGIC C_FC_PPFC_FCLINK_MAGIC stardocsdir staretcdir starexamplesdir starfacsdir starhelpdir starnewsdir STAR_DEPENDENCIES_ATTRIBUTES STAR_DEPENDENCIES_CHILDREN STAR_DOCUMENTATION PACKAGE_VERSION_MAJOR PACKAGE_VERSION_MINOR PACKAGE_VERSION_RELEASE PACKAGE_VERSION_INTEGER STAR_MANIFEST_DIR GIT STAR_SOURCE_ROOT_DIR PREDIST PAX TAR LIBTOOL FGENERIC FCLIBS SHLIB_PKG_LIBS LTLIBOBJS'
 ac_subst_files=''
 
@@ -892,7 +892,7 @@ Optional Packages:
   --with-x                use the X Window System
   --with-celib=DIR        use Windows/CE support library from DIR
   --with-starlink         Starlink tree to use (default
-                          ${STARLINK:=/loc/pwda/pdraper/starlink_git/build})
+                          ${STARLINK:=/home/pdraper/starlink_git/build})
   --without-stardocs      Do not install built documentation (default --with)
 
 Some influential environment variables:
@@ -7908,7 +7908,7 @@ echo $ECHO_N "checking for X11 libraries... $ECHO_C" >&6
 	XLIBSW=nope
 	dirs="/usr/unsupported/lib /usr/local/lib /usr/X386/lib /usr/X11R6/lib /usr/X11R5/lib /usr/lib/X11R5 /usr/lib/X11R4 /usr/openwin/lib /usr/X11/lib /usr/sww/X11/lib"
 	for i in $dirs ; do
-	    if test -r $i/libX11.a -o -r $i/libX11.so -o -r $i/libX11.sl; then
+	    if test -r $i/libX11.a -o -r $i/libX11.so -o -r $i/libX11.sl -o -r $i/libX11.dylib -o -r $i/libX11.la -o -r $i/libX11.dll; then
 		echo "$as_me:$LINENO: result: $i" >&5
 echo "${ECHO_T}$i" >&6
 		XLIBSW="-L$i -lX11"
@@ -12454,7 +12454,7 @@ test -n "$_star_docs_only"        || _star_docs_only=false
 
 
 # Ensure that STARLINK has a value, defaulting to
-# /loc/pwda/pdraper/starlink_git/build.  Note that this directory may be
+# /home/pdraper/starlink_git/build.  Note that this directory may be
 # different from /star, and reflects the value of
 # STARCONF_DEFAULT_STARLINK that the `starconf' package was configured
 # with before its installation.
@@ -12468,7 +12468,7 @@ test -n "$_star_docs_only"        || _star_docs_only=false
 # is possible to make a test version of a new package, using tools
 # from an old installation, but installing in a new place.
 #
-# However, we install software in /loc/pwda/pdraper/starlink_git/build by
+# However, we install software in /home/pdraper/starlink_git/build by
 # default.  This is so even if $STARLINK and STARCONF_DEFAULT_STARLINK
 # are different, because in this case we are planning to use a
 # previous installation in $STARLINK or $STARCONF_DEFAULT_STARLINK,
@@ -12484,7 +12484,7 @@ test -n "$_star_docs_only"        || _star_docs_only=false
 # installed.
 
 
-test -n "$STARLINK" || STARLINK=/loc/pwda/pdraper/starlink_git/build
+test -n "$STARLINK" || STARLINK=/home/pdraper/starlink_git/build
 
 # Handle the --with-starlink option.  If --with-starlink is present
 # with no argument (the default), we do nothing as this simply
@@ -13220,13 +13220,172 @@ _ACEOF
           fi
  2>&5
            if test $ac_cv_fc_have_old_typeless_boz = no; then
-              #  Test if "-fno-range-check" works.
-                            ac_ext=${FC_SRCEXT-f}
+              #  Test if -f77 works. Note need to clear the cached variables
+              #  for these tests.
+              unset ac_cv_fc_have_typeless_boz
+              unset ac_cv_fc_have_old_typeless_boz
+              old_FCFLAGS="$FCFLAGS"
+              FCFLAGS="-f77 $FCFLAGS"
+                        echo "$as_me:$LINENO: checking whether ${FC} supports F95 typeless BOZ constants" >&5
+echo $ECHO_N "checking whether ${FC} supports F95 typeless BOZ constants... $ECHO_C" >&6
+if test "${ac_cv_fc_have_typeless_boz+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_ext=${FC_SRCEXT-f}
 ac_compile='$FC -c $FCFLAGS $FCFLAGS_SRCEXT conftest.$ac_ext >&5'
 ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $FCFLAGS_SRCEXT conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_fc_compiler_gnu
 
-              cat >conftest.$ac_ext <<_ACEOF
+                          if test "$cross_compiling" = yes; then
+  { { echo "$as_me:$LINENO: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&5
+echo "$as_me: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&2;}
+   { (exit 1); exit 1; }; }
+else
+  cat >conftest.$ac_ext <<_ACEOF
+
+      PROGRAM TMP
+      INTEGER I
+      PARAMETER ( I = X'FF7FFFFF' )
+      REAL D
+      PARAMETER ( D = X'FF7FFFFF' )
+      LOGICAL L
+      PARAMETER ( L = X'A55A5AA5' )
+      IF ( D .EQ. I ) THEN
+         CALL EXIT( 1 )
+      END IF
+      END
+
+_ACEOF
+rm -f conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_fc_have_typeless_boz=yes
+else
+  echo "$as_me: program exited with status $ac_status" >&5
+echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+( exit $ac_status )
+ac_cv_fc_have_typeless_boz=no
+fi
+rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+fi
+                          ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+fi
+echo "$as_me:$LINENO: result: $ac_cv_fc_have_typeless_boz" >&5
+echo "${ECHO_T}$ac_cv_fc_have_typeless_boz" >&6
+          if test $ac_cv_fc_have_typeless_boz = yes; then
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_TYPELESS_BOZ 1
+_ACEOF
+
+          fi
+ 2>&5
+              if test $ac_cv_fc_have_typeless_boz = no; then
+                           echo "$as_me:$LINENO: checking whether ${FC} supports OLD style typeless BOZ constants" >&5
+echo $ECHO_N "checking whether ${FC} supports OLD style typeless BOZ constants... $ECHO_C" >&6
+if test "${ac_cv_fc_have_old_typeless_boz+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_ext=${FC_SRCEXT-f}
+ac_compile='$FC -c $FCFLAGS $FCFLAGS_SRCEXT conftest.$ac_ext >&5'
+ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $FCFLAGS_SRCEXT conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_fc_compiler_gnu
+
+                          if test "$cross_compiling" = yes; then
+  { { echo "$as_me:$LINENO: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&5
+echo "$as_me: error: cannot run test program while cross compiling
+See \`config.log' for more details." >&2;}
+   { (exit 1); exit 1; }; }
+else
+  cat >conftest.$ac_ext <<_ACEOF
+
+      PROGRAM TMP
+      INTEGER I
+      PARAMETER ( I = 'FF7FFFFF'X )
+      REAL D
+      PARAMETER ( D = 'FF7FFFFF'X )
+      LOGICAL L
+      PARAMETER ( L = 'A55A5AA5'X )
+      IF ( D .EQ. I ) THEN
+         CALL EXIT( 1 )
+      END IF
+      END
+
+_ACEOF
+rm -f conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_fc_have_old_typeless_boz=yes
+else
+  echo "$as_me: program exited with status $ac_status" >&5
+echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+( exit $ac_status )
+ac_cv_fc_have_old_typeless_boz=no
+fi
+rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+fi
+                          ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+fi
+echo "$as_me:$LINENO: result: $ac_cv_fc_have_old_typeless_boz" >&5
+echo "${ECHO_T}$ac_cv_fc_have_old_typeless_boz" >&6
+          if test $ac_cv_fc_have_old_typeless_boz = yes; then
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_OLD_TYPELESS_BOZ 1
+_ACEOF
+
+          fi
+ 2>&5
+                 if test $ac_cv_fc_have_old_typeless_boz = no; then
+                    star_cv_prm_compatible_symbols="nocheck"
+                 else
+                    star_cv_prm_compatible_symbols="-f77"
+                 fi
+              else
+                 star_cv_prm_compatible_symbols="-f77"
+              fi
+              FCFLAGS="$old_FCFLAGS"
+              if test "$star_cv_prm_compatible_symbols" = "nocheck"; then
+                 #  Test if "-fno-range-check" works.
+                                  ac_ext=${FC_SRCEXT-f}
+ac_compile='$FC -c $FCFLAGS $FCFLAGS_SRCEXT conftest.$ac_ext >&5'
+ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $FCFLAGS_SRCEXT conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_fc_compiler_gnu
+
+                 cat >conftest.$ac_ext <<_ACEOF
 
       PROGRAM conftest
       INTEGER*2 VAL__BADUW
@@ -13236,17 +13395,18 @@ ac_compiler_gnu=$ac_cv_fc_compiler_gnu
       END
 
 _ACEOF
-              if $FC -c $FCFLAGS -fno-range-check -o conftest conftest.f 2>&5
-              then
-                 star_cv_prm_compatible_symbols="-fno-range-check"
-              fi
-              rm -f conftest.f
-              ac_ext=c
+                 if $FC -c $FCFLAGS -fno-range-check -o conftest conftest.f 2>&5
+                 then
+                    star_cv_prm_compatible_symbols="-fno-range-check"
+                 fi
+                 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
+                 rm -f conftest.f
+              fi
            else
               star_cv_prm_compatible_symbols=""
            fi
@@ -13357,7 +13517,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:13360:" \
+echo "$as_me:13520:" \
      "checking for Fortran compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -13950,7 +14110,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FCFLAGS
 FCFLAGS="$FCFLAGS $ac_verb"
-(eval echo $as_me:13953: \"$ac_link\") >&5
+(eval echo $as_me:14113: \"$ac_link\") >&5
 ac_fc_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_fc_v_output" >&5
 FCFLAGS=$ac_save_FFLAGS
@@ -14028,7 +14188,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FCFLAGS
 FCFLAGS="$FCFLAGS $ac_cv_prog_fc_v"
-(eval echo $as_me:14031: \"$ac_link\") >&5
+(eval echo $as_me:14191: \"$ac_link\") >&5
 ac_fc_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_fc_v_output" >&5
 FCFLAGS=$ac_save_FFLAGS

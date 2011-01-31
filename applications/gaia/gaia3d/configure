@@ -7466,7 +7466,7 @@ echo $ECHO_N "checking for X11 libraries... $ECHO_C" >&6
 	XLIBSW=nope
 	dirs="/usr/unsupported/lib /usr/local/lib /usr/X386/lib /usr/X11R6/lib /usr/X11R5/lib /usr/lib/X11R5 /usr/lib/X11R4 /usr/openwin/lib /usr/X11/lib /usr/sww/X11/lib"
 	for i in $dirs ; do
-	    if test -r $i/libX11.a -o -r $i/libX11.so -o -r $i/libX11.sl; then
+	    if test -r $i/libX11.a -o -r $i/libX11.so -o -r $i/libX11.sl -o -r $i/libX11.dylib -o -r $i/libX11.la -o -r $i/libX11.dll; then
 		echo "$as_me:$LINENO: result: $i" >&5
 echo "${ECHO_T}$i" >&6
 		XLIBSW="-L$i -lX11"

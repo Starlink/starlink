@@ -1,3 +1,4 @@
+# -*- mode: m4 -*-
 # Starlink M4 macros for autoconf
 # original starconf.m4, installed by starconf 1.3, rnum=1003000
 # DO NOT EDIT: it may be overwritten when starconf is next run
@@ -49,17 +50,17 @@ m4_ifdef([_poss_STAR_RESTFP_FIX],
 ## acinclude.m4 file just before running ./bootstrap or autoreconf.
 m4_define([per_dir_PREFIX],   [m4_ifdef([OVERRIDE_PREFIX],
                                         [OVERRIDE_PREFIX],
-                                        [/loc/pwda/pdraper/starlink_git/build])])
+                                        [/home/pdraper/starlink_git/build])])
 m4_define([per_dir_STARLINK], [m4_ifdef([OVERRIDE_STARLINK],
                                         [OVERRIDE_STARLINK],
-                                        [/loc/pwda/pdraper/starlink_git/build])])
+                                        [/home/pdraper/starlink_git/build])])
 
 test -n "$_star_per_package_dirs" || _star_per_package_dirs=false
 test -n "$_star_docs_only"        || _star_docs_only=false
 
 
 # Ensure that STARLINK has a value, defaulting to
-# /loc/pwda/pdraper/starlink_git/build.  Note that this directory may be
+# /home/pdraper/starlink_git/build.  Note that this directory may be
 # different from /star, and reflects the value of
 # STARCONF_DEFAULT_STARLINK that the `starconf' package was configured
 # with before its installation. 
@@ -73,7 +74,7 @@ test -n "$_star_docs_only"        || _star_docs_only=false
 # is possible to make a test version of a new package, using tools
 # from an old installation, but installing in a new place.
 #
-# However, we install software in /loc/pwda/pdraper/starlink_git/build by
+# However, we install software in /home/pdraper/starlink_git/build by
 # default.  This is so even if $STARLINK and STARCONF_DEFAULT_STARLINK
 # are different, because in this case we are planning to use a
 # previous installation in $STARLINK or $STARCONF_DEFAULT_STARLINK,
@@ -618,12 +619,15 @@ AC_DEFUN([STAR_CNF_BLANK_COMMON],
 #  PRM_PAR will be defined as part of the STAR_FCFLAGS and STAR_FFLAGS
 #  variables.
 #
-#  In fact this macro is only currently of use with the gfortran compiler
-#  which has no typeless BOZ support, so requires that the -fno-range-check
-#  flag is set so that assigments to integers can silently overflow (BOZ
-#  constants are replaced with their plain integer and floating point
-#  equivalents). In general this macro should be used by all packages that
-#  include PRM_PAR, all monoliths are assumed to use this by default.
+#  In fact this macro is only currently used for the gfortran and Solaris f95
+#  compilers. Gfortran has no typeless BOZ support, so requires that the
+#  -fno-range-check flag is set so that assigments to integers can silently
+#  overflow (BOZ constants are replaced with their plain integer and floating
+#  point equivalents). The Solaris f95 compiler doesn't allow assignments to
+#  LOGICAL parameters, so we need to use the -f77 flag.
+#
+#  In general this macro should be used by all packages that include PRM_PAR,
+#  all monoliths are assumed to use this by default. 
 #
 AC_DEFUN([STAR_PRM_COMPATIBLE_SYMBOLS],
    [$_star_docs_only &&
@@ -636,10 +640,29 @@ AC_DEFUN([STAR_PRM_COMPATIBLE_SYMBOLS],
         if test $ac_cv_fc_have_typeless_boz = no; then
            AC_FC_HAVE_OLD_TYPELESS_BOZ 2>&5
            if test $ac_cv_fc_have_old_typeless_boz = no; then
-              #  Test if "-fno-range-check" works.
-              AC_REQUIRE([AC_PROG_FC])dnl
-              AC_LANG_PUSH([Fortran])
-              AC_LANG_CONFTEST([AC_LANG_SOURCE([
+              #  Test if -f77 works. Note need to clear the cached variables
+              #  for these tests.
+              unset ac_cv_fc_have_typeless_boz
+              unset ac_cv_fc_have_old_typeless_boz
+              old_FCFLAGS="$FCFLAGS"
+              FCFLAGS="-f77 $FCFLAGS"
+              AC_FC_HAVE_TYPELESS_BOZ 2>&5
+              if test $ac_cv_fc_have_typeless_boz = no; then
+                 AC_FC_HAVE_OLD_TYPELESS_BOZ 2>&5
+                 if test $ac_cv_fc_have_old_typeless_boz = no; then
+                    star_cv_prm_compatible_symbols="nocheck"
+                 else
+                    star_cv_prm_compatible_symbols="-f77"
+                 fi
+              else
+                 star_cv_prm_compatible_symbols="-f77"
+              fi
+              FCFLAGS="$old_FCFLAGS"
+              if test "$star_cv_prm_compatible_symbols" = "nocheck"; then
+                 #  Test if "-fno-range-check" works.
+                 AC_REQUIRE([AC_PROG_FC])dnl
+                 AC_LANG_PUSH([Fortran])
+                 AC_LANG_CONFTEST([AC_LANG_SOURCE([
       PROGRAM conftest
       INTEGER*2 VAL__BADUW
       PARAMETER ( VAL__BADUW = 65535 )
@@ -647,12 +670,13 @@ AC_DEFUN([STAR_PRM_COMPATIBLE_SYMBOLS],
       PARAMETER ( VAL__BADUB = 255 )
       END
 ])])
-              if $FC -c $FCFLAGS -fno-range-check -o conftest conftest.f 2>&5
-              then
-                 star_cv_prm_compatible_symbols="-fno-range-check"
+                 if $FC -c $FCFLAGS -fno-range-check -o conftest conftest.f 2>&5
+                 then
+                    star_cv_prm_compatible_symbols="-fno-range-check"
+                 fi              
+                 AC_LANG_POP([Fortran])
+                 rm -f conftest.f
               fi
-              rm -f conftest.f
-              AC_LANG_POP([Fortran])
            else
               star_cv_prm_compatible_symbols=""
            fi
