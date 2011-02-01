@@ -5,6 +5,13 @@
 
 ^$STARLINK_DIR/share/smurf/dimmconfig_newfilt.lis
 
+# Some pointings are done with slow speeds so tweak the lower
+# limit. An example of this is 20091208#55 where 60% of the data
+# are removed with the default flagging. That observation
+# reduces fine with bright_compact but fails with the default
+# flagslow of 30 using this config.
+flagslow = 20
+
 # In case of poor crosslinking. For pointings this won't
 # take very long
 numiter=10
