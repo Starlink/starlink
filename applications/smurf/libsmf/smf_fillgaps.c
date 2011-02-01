@@ -13,8 +13,8 @@
 *     Library routine
 
 *  Invocation:
-*     smf_fillgaps( smfWorkForce *wf, smfData *data, smf_qual_t *quality,
-*                   smf_qual_t mask, int *status )
+*     smf_fillgaps( smfWorkForce *wf, smfData *data, smf_qual_t mask,
+*                   int *status )
 
 *  Arguments:
 *     wf = smfWorkForce * (Given)
