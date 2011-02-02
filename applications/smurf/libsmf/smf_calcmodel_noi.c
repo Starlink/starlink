@@ -262,7 +262,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
         /* Measure the noise from power spectra */
         smf_bolonoise( wf, res->sdata[idx], 0, 0.5, SMF__F_WHITELO,
-                       SMF__F_WHITEHI, 0, 0, zeropad ? SMF__MAXAPLEN : SMF__BADSZT,
+                       SMF__F_WHITEHI, 0, zeropad ? SMF__MAXAPLEN : SMF__BADSZT,
                        var, NULL, NULL, status );
 
         for( i=0; i<nbolo; i++ ) if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {

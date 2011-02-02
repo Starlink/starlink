@@ -950,7 +950,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
                                   status );
 
                     smf_bolonoise( wf, idata, 0, 0.5, SMF__F_WHITELO,
-                                   SMF__F_WHITEHI, 0, 0, zeropad ? SMF__MAXAPLEN : SMF__BADSZT,
+                                   SMF__F_WHITEHI, 0, zeropad ? SMF__MAXAPLEN : SMF__BADSZT,
                                    dataptr, NULL, NULL, status );
                   } else {
                     *status = SAI__ERROR;

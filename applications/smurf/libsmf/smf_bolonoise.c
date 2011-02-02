@@ -15,7 +15,7 @@
 *  Invocation:
 *     smf_bolonoise( smfWorkForce *wf, smfData *data,
 *                    size_t window, double f_low,
-*                    double f_white1, double f_white2, double flagratio,
+*                    double f_white1, double f_white2,
 *                    int nep, size_t len, double *whitenoise, double *fratio,
 *                    smfData **fftpow, int *status )
 
@@ -32,9 +32,6 @@
 *        Lower frequency edge of window for calculating average white noise
 *     f_white2 = double (Given)
 *        Upper frequency edge of window for calculating average white noise
-*     flagratio = double (Given)
-*        If nonzero, limit for fratio below which bolo is flagged as bad
-*        in the input "quality" array.
 *     nep = int (Given)
 *        If set, calculate whitenoise in 1 second of averaged time-series data
 *        by dividing by the sample rate.
@@ -114,10 +111,12 @@
 *     2010-07-07 (TIMJ):
 *        Can not have const input because we update its quality.
 *        No longer explicit sidecar quality as argument.
+*     2011-02-01 (TIMJ):
+*        Remove flagratio argument.
 
 *  Copyright:
 *     Copyright (C) 2008-2009 University of British Columbia.
-*     Copyright (C) 2008-2010 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2011 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -157,14 +156,13 @@
 
 void smf_bolonoise( smfWorkForce *wf, smfData *data,
                     size_t window, double f_low,
-                    double f_white1, double f_white2, double flagratio,
+                    double f_white1, double f_white2,
                     int nep, size_t len, double *whitenoise, double *fratio,
                     smfData **fftpow,int *status ) {
 
   double *base=NULL;       /* Pointer to base coordinates of array */
   size_t bstride;          /* bolometer index stride */
   double df=1;             /* Frequency step size in Hz */
-  double fr;               /* Ratio of p_low to p_white */
   size_t i;                /* Loop counter */
   size_t i_low;            /* Index in power spectrum to f_low */
   size_t i_w1;             /* Index in power spectrum to f_white1 */
@@ -265,15 +263,7 @@ void smf_bolonoise( smfWorkForce *wf, smfData *data,
 
       /* Power ratio requested */
       if ( fratio ) {
-        fr = p_low/p_white;
-
-        /* Flag bad bolometer */
-        if( qua && (fr < flagratio) ) {
-          for( j=0; j<ntslice; j++ ) {
-            qua[i*bstride + j*tstride] |= SMF__Q_BADB;
-          }
-        }
-        fratio[i] = fr;
+        fratio[i] = p_low/p_white;
       }
 
       /* Store values */

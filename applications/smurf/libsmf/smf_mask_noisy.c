@@ -125,7 +125,7 @@ void smf_mask_noisy( smfWorkForce *wf, smfData *data, smfData **noise,
 
   /* Calculate the noise on each bolometer */
   smf_bolonoise( wf, data, 0, 0.5, SMF__F_WHITELO,
-                 SMF__F_WHITEHI, 0, 0, zeropad ? SMF__MAXAPLEN : SMF__BADSZT,
+                 SMF__F_WHITEHI, 0, zeropad ? SMF__MAXAPLEN : SMF__BADSZT,
                  (noisemap->pntr)[0], NULL, NULL, status );
 
   /* Now need to convert this to noise by square rooting */

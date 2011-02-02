@@ -309,7 +309,7 @@ void smurf_calcnoise( int *status ) {
         if (*status == SAI__OK) {
           double * od = (outdata->pntr)[0];
           smf_bolonoise( wf, thedata, 0, f_low, freqs[0], freqs[1],
-                         10.0, 1, SMF__MAXAPLEN,
+                         1, SMF__MAXAPLEN,
                          (outdata->pntr)[0], (ratdata->pntr)[0],
                          (powgrp ? &powdata : NULL), status );
 
