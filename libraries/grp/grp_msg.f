@@ -1,4 +1,4 @@
-      SUBROUTINE GRP_MSG( TOKEN, IGRP, INDEX, STATUS )
+      SUBROUTINE GRP_MSG( TOKEN, IGRP, INDEX )
 *+
 *  Name:
 *     GRP_MSG
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL GRP_MSG( TOKEN, IGRP, INDEX, STATUS )
+*     CALL GRP_MSG( TOKEN, IGRP, INDEX )
 
 *  Description:
 *     The routine assigns a specified element of a GRP group to a message
@@ -24,13 +24,11 @@
 *        A GRP identifier for the group.
 *     INDEX = INTEGER (Given)
 *        The index of the element to assign to the message token.
-*     STATUS = INTEGER (Given and Returned)
-*        The global status.
 
 *  Notes:
-*     - This routine attempts to execute even if STATUS is bad on entry,
-*     although no further error report will be made if it subsequently
-*     fails under these circumstances.
+*     - This routine has no inherited status argument. It will always
+*     attempt to execute, and no error will be reported if it should
+*     fail (although the message token will be assigned a blank string).
 
 *  Copyright:
 *     Copyright (C) 2011 Science & Technology Facilities Council.
@@ -74,9 +72,6 @@
       INTEGER IGRP
       INTEGER INDEX
 
-*  Status:
-      INTEGER STATUS             ! Global status
-
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_CONST'        ! GRP private constants.
@@ -98,14 +93,15 @@
 *  Local Variables:
       INTEGER SLOT
       CHARACTER NAME*(GRP__SZNAM)
-
+      INTEGER STATUS
 *.
 
 *  Initialise
       NAME = ' '
 
-*  Begin a new error reporting environment.
-      CALL ERR_BEGIN( STATUS )
+*  Mark the message stack, and initialise the local error status to OK.
+      CALL ERR_MARK
+      STATUS = SAI__OK
 
 *  Check that the supplied GRP identifier is valid, and find the index
 *  within the common arrays at which information describing the group is
@@ -140,8 +136,15 @@
          END IF
       END IF
 
-*  End the current error reporting environment.
-      CALL ERR_END( STATUS )
+*  If an error has occurred, annull it and store a blank value for the
+*  name.
+      IF( STATUS .NE. SAI__OK ) THEN
+         CALL ERR_ANNUL( STATUS )
+         NAME = ' '
+      END IF
+
+* Release the message stack.
+      CALL ERR_RLSE
 
 *  Assign the string to the message token. Do it as the last act so that
 *  there is no chance of the token being annulled.

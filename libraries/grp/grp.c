@@ -661,30 +661,41 @@ Grp *grpRemov( const Grp *grp, const char *name, int *status ) {
 
 F77_SUBROUTINE(grp_msg)( CHARACTER(TOKEN),
                          INTEGER(IGRP),
-                         INTEGER(INDEX),
-                         INTEGER(STATUS)
+                         INTEGER(INDEX)
                          TRAIL(TOKEN) );
 
-void grpMsg( const char *token, const Grp *grp, int index, int *status ){
+void grpMsg( const char *token, const Grp *grp, int index ){
    DECLARE_CHARACTER_DYN(TOKEN);
    DECLARE_INTEGER(IGRP);
    DECLARE_INTEGER(INDEX);
-   DECLARE_INTEGER(STATUS);
+   int status = SAI__OK;
 
-   F77_CREATE_CHARACTER( TOKEN, strlen( token ) );
-   F77_EXPORT_CHARACTER( token, TOKEN, TOKEN_length );
-   IGRP = grpC2F( (Grp *) grp, status );
-   F77_EXPORT_INTEGER( index, INDEX );
-   F77_EXPORT_INTEGER( *status, STATUS );
+   if( grp ) {
+      errMark();
+      IGRP = grpC2F( (Grp *) grp, &status );
+      if( status == SAI__OK ) {
+         errRlse();
 
-   F77_CALL(grp_msg)( CHARACTER_ARG(TOKEN),
-                      INTEGER_ARG(&IGRP),
-                      INTEGER_ARG(&INDEX),
-                      INTEGER_ARG(&STATUS)
-                      TRAIL_ARG(TOKEN) );
+         F77_CREATE_CHARACTER( TOKEN, strlen( token ) );
+         F77_EXPORT_CHARACTER( token, TOKEN, TOKEN_length );
+         F77_EXPORT_INTEGER( index, INDEX );
 
-   F77_FREE_CHARACTER( TOKEN );
-   F77_IMPORT_INTEGER( STATUS, *status );
+         F77_CALL(grp_msg)( CHARACTER_ARG(TOKEN),
+                            INTEGER_ARG(&IGRP),
+                            INTEGER_ARG(&INDEX)
+                            TRAIL_ARG(TOKEN) );
+
+         F77_FREE_CHARACTER( TOKEN );
+
+      } else {
+         errAnnul( &status );
+         errRlse();
+         msgSetc( token, " " );
+      }
+
+   } else {
+      msgSetc( token, " " );
+   }
 }
 
 

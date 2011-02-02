@@ -146,7 +146,7 @@
       END IF
 
 *  Display it
-      CALL GRP_MSG( 'N', IGRP, INDX, STATUS )
+      CALL GRP_MSG( 'N', IGRP, INDX )
       CALL MSG_OUT( ' ', 'Element 3 is "^N" ("HELLOB").', status )
 
 *  Find the depth of indirection and the file name of the first name.

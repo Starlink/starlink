@@ -2021,7 +2021,7 @@ environment}
 \noteroutine{\htmlref{GRP\_LISTF}{GRP_LISTF}}{( FILENM, INDXLO, INDXHI, COMNT, IGRP, STATUS )}
             {Write all the names in a group out to a text file specified by the
 calling application}
-\noteroutine{\htmlref{GRP\_MSG}{GRP_MSG}}{( TOKEN, IGRP, INDEX, STATUS )}
+\noteroutine{\htmlref{GRP\_MSG}{GRP_MSG}}{( TOKEN, IGRP, INDEX )}
             {Assign a group element to a message token}
 \noteroutine{\htmlref{GRP\_NEW}{GRP_NEW}}{( TYPE, IGRP, STATUS )}
             {Create a new, empty group}
@@ -2123,7 +2123,7 @@ environment}
 \noteroutine{\htmlref{GRP\_LISTF}{GRP_LISTF}}{( FILENM, INDXLO, INDXHI, COMNT, IGRP, STATUS )}
             {Write all the names in a group out to a text file specified by the
 calling application}
-\noteroutine{\htmlref{GRP\_MSG}{GRP_MSG}}{( TOKEN, IGRP, INDEX, STATUS )}
+\noteroutine{\htmlref{GRP\_MSG}{GRP_MSG}}{( TOKEN, IGRP, INDEX )}
             {Assign a group element to a message token}
 
 
@@ -3007,7 +3007,7 @@ environment}
       routines (see SUN/104).
    }
    \sstinvocation{
-      CALL GRP\_MSG( TOKEN, IGRP, INDEX, STATUS )
+      CALL GRP\_MSG( TOKEN, IGRP, INDEX )
    }
    \sstarguments{
       \sstsubsection{
@@ -3025,19 +3025,14 @@ environment}
       }{
          The index of the element to assign to the message token.
       }
-      \sstsubsection{
-         STATUS = INTEGER (Given and Returned)
-      }{
-         The global status.
-      }
    }
    \sstnotes{
       \sstitemlist{
 
          \sstitem
-         This routine attempts to execute even if STATUS is bad on entry,
-         although no further error report will be made if it subsequently
-         fails under these circumstances.
+         This routine has no inherited status argument. It will always
+         attempt to execute, and no error will be reported if it should
+         fail (although the message token will be assigned a blank string).
       }
    }
 }
