@@ -26,12 +26,12 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 BUILT_SOURCES = GRP_ERR grp_err.h
 
 #  Define test programs.
-TESTS = test1 
+TESTS = test1
 check_PROGRAMS = test1
 test1_SOURCES = grp_test.f
 test1_LDADD = libgrp.la `$(srcdir)/grp_link`
 
-PUBLIC_F_INCLUDES = GRP_PAR 
+PUBLIC_F_INCLUDES = GRP_PAR
 PUBLIC_C_INCLUDES = grp.h
 PUBLIC_INCLUDES = $(PUBLIC_F_INCLUDES) $(PUBLIC_C_INCLUDES)
 PRIVATE_INCLUDES = GRP_CONST GRP_COM grp1.h
@@ -49,9 +49,10 @@ BASIC_F_ROUTINES = grp1_cdesc.f grp1_conc.f grp1_cpoin.f grp1_eledt.f \
   grp1_setc.f grp1_seti.f grp1_simin.f grp1_slave.f grp1_subst.f \
   grp1_trunc.f grp_copy.f grp_delet.f grp_get.f grp_getcc.f grp_getcs.f \
   grp_grpex.f grp_grpsz.f grp_gtype.f grp_head.f grp_index.f grp_infoc.f \
-  grp_infoi.f grp_listf.f grp_new.f grp_own.f grp_ptype.f grp_purge.f \
-  grp_put.f grp_put1.f grp_remov.f grp_setcc.f grp_setcs.f grp_setsz.f grp_sown.f \
-  grp_valid.f grp1_index.f grp1_chkcc.f grp1_rmesc.f grp1_vrbtm.f
+  grp_infoi.f grp_listf.f grp_msg.f grp_new.f grp_own.f grp_ptype.f \
+  grp_purge.f grp_put.f grp_put1.f grp_remov.f grp_setcc.f grp_setcs.f \
+  grp_setsz.f grp_sown.f grp_valid.f grp1_index.f grp1_chkcc.f grp1_rmesc.f \
+  grp1_vrbtm.f
 
 #  Additional Fortran routines required for the standalone library.
 STANDALONE_F_ROUTINES =

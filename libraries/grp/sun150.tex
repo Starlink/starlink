@@ -9,10 +9,10 @@
 \newcommand{\stardocsource}    {sun150.8}
 \newcommand{\stardocnumber}    {150.8}
 \newcommand{\stardocauthors}   {D.S. Berry}
-\newcommand{\stardocdate}      {21st October 2009}
+\newcommand{\stardocdate}      {2nd February 2011}
 \newcommand{\stardoctitle}     {GRP \\ [1ex]
                                 Routines for Managing Groups of Objects}
-\newcommand{\stardocversion}   {Version 3.4}
+\newcommand{\stardocversion}   {Version 3.5}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -2021,6 +2021,8 @@ environment}
 \noteroutine{\htmlref{GRP\_LISTF}{GRP_LISTF}}{( FILENM, INDXLO, INDXHI, COMNT, IGRP, STATUS )}
             {Write all the names in a group out to a text file specified by the
 calling application}
+\noteroutine{\htmlref{GRP\_MSG}{GRP_MSG}}{( TOKEN, IGRP, INDEX, STATUS )}
+            {Assign a group element to a message token}
 \noteroutine{\htmlref{GRP\_NEW}{GRP_NEW}}{( TYPE, IGRP, STATUS )}
             {Create a new, empty group}
 \noteroutine{\htmlref{GRP\_OWN}{GRP_OWN}}{( IGRP1, IGRP2, STATUS )}
@@ -2121,6 +2123,8 @@ environment}
 \noteroutine{\htmlref{GRP\_LISTF}{GRP_LISTF}}{( FILENM, INDXLO, INDXHI, COMNT, IGRP, STATUS )}
             {Write all the names in a group out to a text file specified by the
 calling application}
+\noteroutine{\htmlref{GRP\_MSG}{GRP_MSG}}{( TOKEN, IGRP, INDEX, STATUS )}
+            {Assign a group element to a message token}
 
 
 \subsection{Storing Names}
@@ -2993,6 +2997,51 @@ environment}
    }
 }
 \sstroutine{
+   GRP\_MSG
+}{
+   Assign an element of a group to a message token
+}{
+   \sstdescription{
+      The routine assigns a specified element of a GRP group to a message
+      token for use in constructing messages with the ERR\_ and MSG\_
+      routines (see SUN/104).
+   }
+   \sstinvocation{
+      CALL GRP\_MSG( TOKEN, IGRP, INDEX, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         TOKEN = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Name of the message token.
+      }
+      \sstsubsection{
+         IGRP = INTEGER (Given)
+      }{
+         A GRP identifier for the group.
+      }
+      \sstsubsection{
+         INDEX = INTEGER (Given)
+      }{
+         The index of the element to assign to the message token.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This routine attempts to execute even if STATUS is bad on entry,
+         although no further error report will be made if it subsequently
+         fails under these circumstances.
+      }
+   }
+}
+\sstroutine{
    GRP\_NEW
 }{
    Create a new empty group
@@ -3622,6 +3671,13 @@ library (see \xref{SUN/121}{sun121}{}), the CHR library (see
 Peter Draper is thanked for his work on porting the original IRH\_ package to
 UNIX, and Rodney Warren-Smith is thanked for his extensive suggestions for
 improvements to the GRP\_ package.
+
+\section{Changes and New Features in V3.5}
+The following changes have occurred in the GRP\_ system since version 3.4:
+
+\begin{enumerate}
+\item Addition of routine GRP\_MSG.
+\end{enumerate}
 
 \section{Changes and New Features in V3.4}
 The following changes have occurred in the GRP\_ system since version 3.3:

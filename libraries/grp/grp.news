@@ -1,14 +1,7 @@
 1 GRP_library
                                              Expires: ???
 
-V3.4-1
-
- o Replace call to ONE_FIND_FILE with call to PSX_WORDEXP. Removes forking
-   overhead.
-
-A new release (V3.4) of the GRP library is now available. It includes
+A new release (V3.5) of the GRP library is now available. It includes
 the following changes:
 
-- The GRP_INFOI routine has a new option to return a flag indicating
-if all elements in a group were supplied literally (i.e. not by
-indirection or modification).
+- A new routine GRP_MSG to assign a group element to a message token.

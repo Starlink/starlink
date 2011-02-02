@@ -145,6 +145,10 @@
      :                 STATUS )
       END IF
 
+*  Display it
+      CALL GRP_MSG( 'N', IGRP, INDX, STATUS )
+      CALL MSG_OUT( ' ', 'Element 3 is "^N" ("HELLOB").', status )
+
 *  Find the depth of indirection and the file name of the first name.
       CALL GRP_INFOI( IGRP, 1, 'DEPTH', DEPTH, STATUS )
       IF( STATUS .EQ. SAI__OK .AND. DEPTH .NE. 1 ) THEN
