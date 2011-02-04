@@ -404,7 +404,7 @@ itcl::class gaia::GaiaNDFChooser {
          #  Add the image to the table
          set row [expr $max_row_-$ext_($i,row)]
          set col $ext_($i,col)
-         blt::table $w $f ${row},${col} -fill both
+         blt::blttable $w $f ${row},${col} -fill both
       }
 
       frame $w.buttons2 -borderwidth 2
@@ -415,7 +415,7 @@ itcl::class gaia::GaiaNDFChooser {
       add_short_help $w.buttons2.settings \
          {Set the cut levels and colormap for the preview images to the one used in the main image}
 
-      blt::table $w \
+      blt::blttable $w \
          $w.buttons2 [expr $max_row_ + 1],0 -fill x -columnspan [min 4 $num_images_]
 
       update  ; # wait until images are displayed (needed !)

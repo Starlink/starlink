@@ -5,12 +5,12 @@
 RECURSIVE_TARGETS = all clean distclean
 
 $(RECURSIVE_TARGETS):
-	( cd blt; $(MAKE) $@; )
+	( cd wizeblt; $(MAKE) $@; )
 
-EXTRA_DIST = blt
+EXTRA_DIST = wizeblt
 
 ##  Before distributing subdirectories we need to clean then up (we get all
 ##  the files in these directories). Also remove the softlinks.
 dist-hook:
 	rm -rf `find $(distdir) -type l`
-	(cd $(distdir)/blt; make distclean)
+	(cd $(distdir)/wizeblt; make distclean)

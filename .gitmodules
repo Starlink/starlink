@@ -19,9 +19,6 @@
 [submodule "thirdparty/eso/skycat/skycat"]
 	path = thirdparty/eso/skycat/skycat
 	url = ../skycat.git
-[submodule "thirdparty/tclsys/blt/blt"]
-	path = thirdparty/tclsys/blt/blt
-	url = ../blt.git
 [submodule "thirdparty/fsf/libtool"]
 	path = thirdparty/fsf/libtool
 	url = ../libtool.git
@@ -88,3 +85,6 @@
 [submodule "applications/extractor/extract/src"]
 	path = applications/extractor/extract/src
 	url = ../starextract.git
+[submodule "thirdparty/tclsys/blt/wizeblt"]
+	path = thirdparty/tclsys/blt/wizeblt
+	url = ../wizeblt.git

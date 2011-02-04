@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="blt" support="U">
-  <version>3.0a</version>
+  <version>2.5.2</version>
   <path>thirdparty/tclsys/blt</path>
   <description>BLT</description>
   <!-- <abstract><p></p></abstract> -->
@@ -11,7 +11,7 @@
     <build>tcl</build><build>tk</build>
   </dependencies>
   <developers>
-    <!-- BLT is maintained by George Howlett, but we take the call first-->
+    <!-- BLT is maintained by the Wize project, but we take the call first-->
     <person>
       <name>Peter W. Draper</name>
       <uname>pwd</uname>

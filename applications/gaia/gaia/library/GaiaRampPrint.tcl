@@ -104,7 +104,7 @@ itcl::class gaia::GaiaRampPrint {
 
       #  Remove elements that are not required here.
       pack forget $w_.whole.yes
-      blt::table forget $w_.pagesize.footer
+      blt::blttable forget $w_.pagesize.footer
 
       #  Add menu to select the font and its size.
       itk_component add lsize {

@@ -102,16 +102,11 @@ itcl::class gaia::MultiGraphPrint {
       } else {
          set fit no
       }
-      if { [set $w_.color] == "color" } {
-         set gs no
-      } else {
-         set gs yes
-      }
 
       foreach graph $itk_option(-graphs) {
 
          $graph postscript configure \
-            -greyscale $gs \
+            -colormode [set $w_.color] \
             -paperwidth [$w_.pagesize.width get] \
             -paperheight [$w_.pagesize.height get] \
             -landscape [set $w_.rotate] \

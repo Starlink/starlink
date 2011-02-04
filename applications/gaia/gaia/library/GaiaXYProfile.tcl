@@ -382,9 +382,9 @@ itcl::class gaia::GaiaXYProfile {
             -relief groove \
             -anchor e
       }
-      blt::table $itk_component(uppertableframe) $itk_component(uppercoord) \
+      blt::blttable $itk_component(uppertableframe) $itk_component(uppercoord) \
             0,0 -fill both
-      blt::table $itk_component(uppertableframe) $itk_component(uppervalue) \
+      blt::blttable $itk_component(uppertableframe) $itk_component(uppervalue) \
             0,1 -fill both
 
       #  Display X peak coordinate.
@@ -411,9 +411,9 @@ itcl::class gaia::GaiaXYProfile {
             -anchor e
       }
 
-      blt::table $itk_component(uppertableframe) $itk_component(xpeakcoord) \
+      blt::blttable $itk_component(uppertableframe) $itk_component(xpeakcoord) \
             1,0 -fill both
-      blt::table $itk_component(uppertableframe) $itk_component(xpeakvalue) \
+      blt::blttable $itk_component(uppertableframe) $itk_component(xpeakvalue) \
             1,1 -fill both
 
       #  Create the Y graph and add it to the lower pane.
@@ -461,9 +461,9 @@ itcl::class gaia::GaiaXYProfile {
             -relief groove \
             -anchor e
       }
-      blt::table $itk_component(lowertableframe) $itk_component(lowercoord) \
+      blt::blttable $itk_component(lowertableframe) $itk_component(lowercoord) \
             0,0 -fill both
-      blt::table $itk_component(lowertableframe) $itk_component(lowervalue) \
+      blt::blttable $itk_component(lowertableframe) $itk_component(lowervalue) \
             0,1 -fill both
 
       #  Y peak coordinate.
@@ -490,9 +490,9 @@ itcl::class gaia::GaiaXYProfile {
             -anchor e
       }
 
-      blt::table $itk_component(lowertableframe) $itk_component(ypeakcoord) \
+      blt::blttable $itk_component(lowertableframe) $itk_component(ypeakcoord) \
             1,0 -fill both
-      blt::table $itk_component(lowertableframe) $itk_component(ypeakvalue) \
+      blt::blttable $itk_component(lowertableframe) $itk_component(ypeakvalue) \
             1,1 -fill both
 
       #  Set axes labels.
@@ -712,22 +712,18 @@ itcl::class gaia::GaiaXYProfile {
 
          #  Find the closest position and hence the current data value.
          #  If off the graph then do nothing.
-         set ret [$w element closest $x $y -interpolate no -halo 2i -along x]
-         if { $ret == {} } {
+         if { ![$w element closest $x $y result -interpolate yes -halo 10i -along x]} {
             return
          }
-         ::array set result $ret
          $itk_component(uppercoord) config -value "$result(x)"
          $itk_component(uppervalue) config -value "$result(y)"
       } else {
 
          #  Find the closest position and hence the current data value.
          #  If off the graph then do nothing.
-         set ret [$w element closest $x $y -interpolate no -halo 2i -along y]
-         if { $ret == {} } {
+         if { ![$w element closest $x $y result -interpolate yes -halo 10i -along y]} {
             return
          }
-         ::array set result $ret
          $itk_component(lowercoord) config -value "$result(y)"
          $itk_component(lowervalue) config -value "$result(x)"
       }
@@ -858,10 +854,10 @@ itcl::class gaia::GaiaXYProfile {
       add_short_help $itk_component(close) \
          {Close window}
 
-      blt::table $itk_component(rframe) $itk_component(xmin) 0,0 -fill both
-      blt::table $itk_component(rframe) $itk_component(xmax) 0,1 -fill both
-      blt::table $itk_component(rframe) $itk_component(ymin) 0,2 -fill both
-      blt::table $itk_component(rframe) $itk_component(ymax) 0,3 -fill both
+      blt::blttable $itk_component(rframe) $itk_component(xmin) 0,0 -fill both
+      blt::blttable $itk_component(rframe) $itk_component(xmax) 0,1 -fill both
+      blt::blttable $itk_component(rframe) $itk_component(ymin) 0,2 -fill both
+      blt::blttable $itk_component(rframe) $itk_component(ymax) 0,3 -fill both
 
       if { $itk_option(-ukirt_options) } {
          pack $itk_component(logfile) -side top -fill x -expand 1

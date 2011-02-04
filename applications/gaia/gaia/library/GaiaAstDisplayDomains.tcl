@@ -209,14 +209,14 @@ itcl::class gaia::GaiaAstDisplayDomains {
       set current [$itk_option(-rtdimage) astget current]
 
       set w [$itk_component(readoutarea) childsite]
-      blt::table $w
+      blt::blttable $w
       foreach {domain dims} "$domains_" {
          incr i
 
          itk_component add label$i {
             label $w.label$i -text "$domain:" -width $lwidth -anchor e
          }
-         blt::table $w $itk_component(label$i) $i,0 -fill x
+         blt::blttable $w $itk_component(label$i) $i,0 -fill x
 
          for {set j 1} {$j <= $dims} {incr j} {
             set values_($i,$j) 0.0
@@ -231,7 +231,7 @@ itcl::class gaia::GaiaAstDisplayDomains {
             set unit [$itk_option(-rtdimage) astget unit\($j\)]
             add_short_help $itk_component(value$i$j) "$label ($unit)"
 
-            blt::table $w $itk_component(value$i$j) $i,$j -fill x
+            blt::blttable $w $itk_component(value$i$j) $i,$j -fill x
          }
       }
 

@@ -87,7 +87,7 @@ itcl::class gaia::GaiaImagePanel {
          #  prematurely.
          return
       }
-      blt::table $w_
+      blt::blttable $w_
       add_short_help $w_ {Image information area}
 
       #  The RtdImage code sets this array for us to speed up the panel
@@ -111,9 +111,9 @@ itcl::class gaia::GaiaImagePanel {
                -relief groove
          }
          if { "$itk_option(-panel_orient)" == "vertical" } {
-            blt::table $w_ $itk_component(object)  [incr row],0 -fill x -anchor e
+            blt::blttable $w_ $itk_component(object)  [incr row],0 -fill x -anchor e
          } else {
-            blt::table $w_ $itk_component(object)  [incr row],0 -fill x -anchor e -columnspan 3
+            blt::blttable $w_ $itk_component(object)  [incr row],0 -fill x -anchor e -columnspan 3
          }
          add_short_help $itk_component(object) {Filename or Object name (filename )}
       }
@@ -183,12 +183,12 @@ itcl::class gaia::GaiaImagePanel {
                -anchor e
          }
          if { "$itk_option(-panel_orient)" == "vertical" } {
-            blt::table $w_ \
+            blt::blttable $w_ \
                $itk_component(x)       [incr row],0 -fill x -anchor w \
                $itk_component(y)       [incr row],0 -fill x -anchor w \
                $itk_component(value)   [incr row],0 -fill x -anchor w
          } else {
-            blt::table $w_ \
+            blt::blttable $w_ \
                $itk_component(x)       [incr row],0 -fill x -anchor w \
                $itk_component(y)       $row,1 -fill x -anchor w \
                $itk_component(value)   $row,2 -fill x -anchor w
@@ -239,12 +239,12 @@ itcl::class gaia::GaiaImagePanel {
          }
 
          if { "$itk_option(-panel_orient)" == "vertical" } {
-            blt::table $w_ \
+            blt::blttable $w_ \
                $itk_component(ra)      [incr row],0 -fill x -anchor w \
                $itk_component(dec)     [incr row],0 -fill x -anchor w \
                $itk_component(equinox) [incr row],0 -fill x -anchor w
          } else {
-            blt::table $w_ \
+            blt::blttable $w_ \
                $itk_component(ra)      [incr row],0 -fill x -anchor w \
                $itk_component(dec)     $row,1 -fill x -anchor w \
                $itk_component(equinox) $row,2 -fill x -anchor w
@@ -296,11 +296,11 @@ itcl::class gaia::GaiaImagePanel {
          }
 
          if { "$itk_option(-panel_orient)" == "vertical" } {
-            blt::table $w_ \
+            blt::blttable $w_ \
                $itk_component(min)     [incr row],0 -fill x -anchor w \
                $itk_component(max)     [incr row],0 -fill x -anchor w
          } else {
-            blt::table $w_ \
+            blt::blttable $w_ \
                $itk_component(min)     [incr row],0 -fill x -anchor w \
                $itk_component(max)     $row,1 -fill x -anchor w
          }
@@ -373,11 +373,11 @@ itcl::class gaia::GaiaImagePanel {
 
          # XXX how does this pack?
          if { "$itk_option(-panel_orient)" == "vertical" } {
-            blt::table $w_ \
+            blt::blttable $w_ \
                $itk_component(aframe) [incr row],0 -rowspan 3 -anchor w
             incr row 2
          } else {
-            blt::table $w_ \
+            blt::blttable $w_ \
                $itk_component(aframe) $row,2 -rowspan 3 -anchor w
          }
       }
@@ -414,11 +414,11 @@ itcl::class gaia::GaiaImagePanel {
          }
 
          if { "$itk_option(-panel_orient)" == "vertical" } {
-            blt::table $w_ \
+            blt::blttable $w_ \
                $itk_component(low)     [incr row],0 -fill x -anchor w \
                $itk_component(high)    [incr row],0 -fill x -anchor w \
          } else {
-            blt::table $w_ \
+            blt::blttable $w_ \
                $itk_component(low)     [incr row],0 -fill x -anchor w \
                $itk_component(high)    $row,1 -fill x -anchor w \
          }
@@ -444,7 +444,7 @@ itcl::class gaia::GaiaImagePanel {
          } {
             keep -state
          }
-         blt::table $w_ \
+         blt::blttable $w_ \
             $itk_component(trans)   [incr row],0 -fill x -anchor w -columnspan 2
       }
 
@@ -456,17 +456,17 @@ itcl::class gaia::GaiaImagePanel {
       }
       if { "$itk_option(-panel_orient)" == "vertical" } {
          $w_.status config -width 10 -height 36
-         blt::table $w_ \
+         blt::blttable $w_ \
             $itk_component(cameraStatus)  [incr row 2],0 -fill both -anchor nw
       } else {
-         blt::table $w_ \
+         blt::blttable $w_ \
             $itk_component(cameraStatus)  [incr row],2 -fill both -anchor nw
       }
 
       if { $itk_option(-ukirt_ql) } {
          add_ukirt_panel_
       }
-      blt::table configure $w_ c2 -padx 1m
+      blt::blttable configure $w_ c2 -padx 1m
    }
 
 
@@ -514,7 +514,7 @@ itcl::class gaia::GaiaImagePanel {
                -relief groove \
                -anchor e
          }
-         blt::table $w_ \
+         blt::blttable $w_ \
             $itk_component(xy1)       6,0 -fill x -anchor w \
             $itk_component(xy2)       6,1 -fill x -anchor w \
             $itk_component(pixels)   6,2 -fill x -anchor w
@@ -566,7 +566,7 @@ itcl::class gaia::GaiaImagePanel {
                -relief groove \
                -anchor e
          }
-         blt::table $w_ \
+         blt::blttable $w_ \
             $itk_component(smin)       7,0 -fill x -anchor w \
             $itk_component(smax)       7,1 -fill x -anchor w \
             $itk_component(total)   7,2 -fill x -anchor w
@@ -619,7 +619,7 @@ itcl::class gaia::GaiaImagePanel {
                -anchor e
          }
 
-         blt::table $w_ \
+         blt::blttable $w_ \
             $itk_component(mean)       8,0 -fill x -anchor w \
             $itk_component(std)       8,1 -fill x -anchor w \
             $itk_component(sid)   8,2 -fill x -anchor w

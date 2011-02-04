@@ -11,7 +11,7 @@
     @STAR_DEPENDENCIES_CHILDREN@
   </dependencies>
   <developers>
-    <!-- BLT is maintained by George Howlett, but we take the call first-->
+    <!-- BLT is maintained by the Wize project, but we take the call first-->
     <person>
       <name>Peter W. Draper</name>
       <uname>pwd</uname>

@@ -371,7 +371,7 @@ itcl::class gaia::StarArdTool {
                    -bitmap $bitmap \
                    -bd 3 \
                    -command [code $this create_region $i] ]
-         blt::table $Buttonbox_ $b $row,$col -fill x -ipadx 1m -ipady 1m
+         blt::blttable $Buttonbox_ $b $row,$col -fill x -ipadx 1m -ipady 1m
          if {$col < $maxcol} {
             incr col
          } else {

@@ -118,7 +118,7 @@ itcl::class gaia::GaiaImageSpectrum {
       catch {rtd::RtdImageSpectrum::destructor}
 
       if { $namer_ != {} } {
-	 catch {delete object $namer_}
+         catch {delete object $namer_}
       }
    }
 
@@ -129,12 +129,12 @@ itcl::class gaia::GaiaImageSpectrum {
 
       #  Add the graph
       itk_component add graph {
-	  blt::graph $w_.graph \
-	      -width 6i \
-	      -height 3i \
-	      -borderwidth 3 \
-	      -relief groove \
-	      -title "Pixel Values"
+         blt::graph $w_.graph \
+            -width 6i \
+            -height 3i \
+            -borderwidth 3 \
+            -relief groove \
+            -title "Pixel Values"
       } {}
       set graph_ $itk_component(graph)
       pack $itk_component(graph) -fill both -expand 1 -padx 1m -pady 1m
@@ -218,7 +218,7 @@ itcl::class gaia::GaiaImageSpectrum {
       #  of pixels we want.
       set numValues [$image_ slice $graph_ elem $x0 $y0 $x1 $y1 canvas \
                         $iVector_ $vVector_ \
-			$xVector_ $yVector_ ]
+                        $xVector_ $yVector_ ]
 
       #  Get the pixel indices of the end-points.
       $image_ convert coords $x0 $y0 canvas xs ys image
@@ -228,8 +228,8 @@ itcl::class gaia::GaiaImageSpectrum {
       #set image [$image_ cget -file]
       set image [$image_ fullname]
       if { $image != "" } {
-	 $namer_ configure -imagename $image
-	 set image [$namer_ ndfname]
+         $namer_ configure -imagename $image
+         set image [$namer_ ndfname]
 
          #  Get a name for the slice.
          set slice [filename_dialog "." "*.sdf" $w_]
@@ -283,16 +283,8 @@ itcl::class gaia::GaiaImageSpectrum {
          error_dialog "$msg"
          return 0
       }
-      $graph_ xaxis configure -min 1 -max $numValues_
+      $graph_ xaxis configure -max $numValues_
 
-      #  Needs a kick to set the initial range, but we want autoscaling.
-      if { $op == "update" } {
-         $vVector_ variable vec
-         set ymin $vec(min)
-         set ymax $vec(max)
-         $graph_ yaxis configure -min $ymin -max $ymax
-      }
-      $graph_ yaxis configure -min {} -max {}
       return 0
    }
 
@@ -303,8 +295,7 @@ itcl::class gaia::GaiaImageSpectrum {
       $graph_ crosshairs configure -position @$x,$y
 
       #  Now update the readout.
-      set ret [$graph_ element closest $x $y -interpolate 1 -halo 10000]
-      if { $ret == {} } {
+      if { ! [$graph_ element closest $x $y "" -interpolate 1 -halo 10000] } {
          return
       }
       lassign [$graph_ invtransform $x $y] index value
