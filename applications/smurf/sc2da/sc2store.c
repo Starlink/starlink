@@ -3734,11 +3734,14 @@ int *status                 /* global status (given and returned) */
      11Nov2007 : make compressed data short instead of unsigned short (bdk)
      13Nov2007 : divide by sc2store_wrbscale (bdk)
      13Nov2009 : Add heater track info (timj)
+     04Feb2011 : Add rts_end buffer
 */
 
 {
+   size_t i = 0;                      /* Loop counter */
    AstFrameSet * wcs;                 /* World Coordinates frame set */
    int *oldstat;                      /* Previous status used by AST */
+   double * rts_end = NULL;           /* Place to store the times */
 
    if ( !StatusOkP(status) ) return;
 
@@ -3779,10 +3782,16 @@ int *status                 /* global status (given and returned) */
 
    sc2store_writefitshead ( sc2store_indf, nrec, fitsrec, status );
 
-/* And create a convenience frameset for focal plane and time coordinates */
+/* And create a convenience frameset for focal plane and time coordinates.
+   Need the RTS_END information. */
+   rts_end = astMalloc( nframes * sizeof(*rts_end) );
+   for (i=0; i<nframes; i++) {
+     rts_end[i] = head[i].rts_end;
+   }
    oldstat = astWatch( status );
    wcs = sc2store_timeWcs ( subnum, nframes, 1, telpar,
-                            ((double*)sc2store_ptr[RTS_END]), status );
+                            rts_end, status );
+   rts_end = astFree( rts_end );
    if (wcs) {
      ndfPtwcs ( wcs, sc2store_indf, status );
      wcs = astAnnul ( wcs );
