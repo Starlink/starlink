@@ -10,4 +10,4 @@ CD2_1   =        -4.2198799E-6 / Transformation matrix element
 CD2_2   =        0.00083332205 / Transformation matrix element                  
 RADECSYS= 'FK5     '           / Reference frame for RA/DEC values              
 EQUINOX =               2000.0 / Epoch of reference equinox                     
-DATE-OBS= '2002-05-20T14:09:36.786'/ Date of observation                        
+DATE-OBS= '2002-05-20T14:09:36.786' / Date of observation                       

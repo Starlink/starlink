@@ -13,4 +13,4 @@ CTYPE2  = 'DEC--TAN'           / Type of co-ordinate on axis 2
 RADECSYS= 'FK5     '           / Reference frame for RA/DEC values              
 EQUINOX =               2000.0 / Epoch of reference equinox                     
 MJD-OBS =             52414.59 / Modified Julian Date of observation            
-DATE-OBS= '2002-05-20T14:09:36.786'/ Date of observation                        
+DATE-OBS= '2002-05-20T14:09:36.786' / Date of observation                       

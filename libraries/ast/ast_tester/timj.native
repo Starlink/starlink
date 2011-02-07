@@ -18,7 +18,7 @@ LNK4_A  =                    1 / Node 4 is derived from node 1
 LNK5_A  =                    1 / Node 5 is derived from node 1                  
 FRM1_A  = '        '           / Frame number 1                                 
 BEGAST_B= 'Frame   '           / Coordinate system description                  
-TITLE_A = 'Data grid indices; first pixel at (1&'/ Title of coordinate system   
+TITLE_A = 'Data grid indices; first pixel at (1&' / Title of coordinate system  
 CONTINUE  ',1)     '                                                            
 NAXES_A =                    2 / Number of coordinate axes                      
 DOMAIN_A= 'GRID    '           / Coordinate system domain                       
@@ -39,7 +39,7 @@ ENDAST_B= 'Axis    '           / End of object definition
 ENDAST_C= 'Frame   '           / End of object definition                       
 FRM2_A  = '        '           / Frame number 2                                 
 BEGAST_E= 'Frame   '           / Coordinate system description                  
-TITLE_B = 'Pixel coordinates; first pixel at (-&'/ Title of coordinate system   
+TITLE_B = 'Pixel coordinates; first pixel at (-&' / Title of coordinate system  
 CONTINUE  '128.5,-127.5)'                                                       
 NAXES_B =                    2 / Number of coordinate axes                      
 DOMAIN_B= 'PIXEL   '           / Coordinate system domain                       
@@ -60,7 +60,7 @@ ENDAST_E= 'Axis    '           / End of object definition
 ENDAST_F= 'Frame   '           / End of object definition                       
 FRM3_A  = '        '           / Frame number 3                                 
 BEGAST_H= 'Frame   '           / Coordinate system description                  
-TITLE_C = 'Axis coordinates; first pixel at (38&'/ Title of coordinate system   
+TITLE_C = 'Axis coordinates; first pixel at (38&' / Title of coordinate system  
 CONTINUE  '4,-381) '                                                            
 NAXES_C =                    2 / Number of coordinate axes                      
 DOMAIN_C= 'AXIS    '           / Coordinate system domain                       

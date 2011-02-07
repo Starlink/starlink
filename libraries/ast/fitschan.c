@@ -921,6 +921,9 @@ f     - AST_TESTFITS: Test if a keyword has a defined value in a FitsChan
 *        - Extensive changes to support -TAB algorithm
 *        - Recovery from a major unrequested reformatting of whitespace by
 *        my editor!
+*     7-FEB-2011 (DSB):
+*        Put a space between keyword value and slash that starts a comment
+*        when formatting a FITS header card.
 *class--
 */
 
@@ -14655,7 +14658,7 @@ static void FormatCard( AstFitsChan *this, char *buf, const char *method, int *s
    the value, or running off the end of the card unless this is
    unavoidable. */
          if ( comstart > FITSCOMCOL ) comstart = FITSCOMCOL;
-         if ( comstart < len + 1 ) comstart = len + 1;
+         if ( comstart < len + 2 ) comstart = len + 2;
 
 /* Pad the output buffer with spaces up to the start of the comment. */
          while ( len < comstart - 1 ) buf[ len++ ] = ' ';

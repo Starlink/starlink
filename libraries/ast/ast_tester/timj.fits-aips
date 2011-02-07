@@ -8,4 +8,4 @@ CDELT1  =        -8.3333273E-4 / Pixel size
 CDELT2  =        0.00083333273 / Pixel size                                     
 CROTA2  =           0.29013902 / Axis rotation                                  
 EPOCH   =               2000.0 / Epoch of reference equinox                     
-DATE-OBS= '2002-05-20T14:09:36.786'/ Date of observation                        
+DATE-OBS= '2002-05-20T14:09:36.786' / Date of observation                       
