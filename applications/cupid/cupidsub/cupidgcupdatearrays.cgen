@@ -147,6 +147,12 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 *        Use msgOutif instead of ilevel
 *     26-JAN-2011 (DSB):
 *        Add spatial position angle to "extracols" information.
+*     7-FEB-2011 (DSB):
+*        Continue checking all faces to see if any need to be extended,
+*        until none need to be extended. Previously, faces were no longer
+*        checked when the one face itself did not rise above mlim. But
+*        extending other faces may cause such faces to include higher
+*        values, so all faces should continue to be checked.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -156,7 +162,6 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 */
 
 /* Local Variables: */
-
    AstKeyMap *extra;      /* Keymap holding extra diagnostic information */
    CGEN_TYPE r0;          /* Supplied residual at initial peak */
    CGEN_TYPE r;           /* Current residual value */
@@ -258,9 +263,11 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
       for( iax = 0; iax < ndim; iax++ ) {
          for( iedge = 0; iedge < 2; iedge++ ) {
 
-/* If this face does not need to be extended, pass on to the next face.
-   If it does, we extend it by 1 pixel now. Assume to begin with that it
-   will not need to be extended any further. */
+/* If this face needs to be extended, we extend it by 1 pixel now. Assume
+   to begin with that it will not need to be extended any further. Faces
+   that do not need to be extended are not extended, but they are checked
+   again to see if extending the current face has caused any higher values
+   to appear on the face. */
             if( extend[ iax ][ iedge ] ) {
                more = 1;
                extend[ iax ][ iedge ] = 0;
@@ -270,105 +277,105 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
                } else {
                   ubox[ iax ]++;
                }
+            }
 
 /* Set up the GRID bounds of the section representing this face. Also set
    the GRID coords of the first point to test. Also, get the corresponding
    N-dimensional GRID indices in the input array. This allows for any
    permutation of the pixels axes necessary to make the velocity axis the
    third axis. */
-               for( jax = 0; jax < ndim; jax++ ) {
-                  yy[ cupidGC.dax[ jax ] ] = xx[ jax ] = lface[ jax ] = lbox[ jax ];
-                  uface[ jax ] = ubox[ jax ];
-               }
+            for( jax = 0; jax < ndim; jax++ ) {
+               yy[ cupidGC.dax[ jax ] ] = xx[ jax ] = lface[ jax ] = lbox[ jax ];
+               uface[ jax ] = ubox[ jax ];
+            }
 
-               if( iedge ) {
-                  uface[ iax ] = lface[ iax ];
-               } else {
-                  yy[ cupidGC.dax[ iax ] ] = xx[ iax ] = lface[ iax ] = uface[ iax ];
-               }
+            if( iedge ) {
+               uface[ iax ] = lface[ iax ];
+            } else {
+               yy[ cupidGC.dax[ iax ] ] = xx[ iax ] = lface[ iax ] = uface[ iax ];
+            }
 
 /* Now loop round all the pixels on the face. */
-               face_done = 0;
-               while( !face_done ){
+            face_done = 0;
+            while( !face_done ){
 
 /* Get the corresponding 1-dimensional index into the input array. Also check
    it is within the bounds of the array. */
-                  ok = 1;
-                  j = 0;
-                  for( jax = ndim - 1; jax >= 0; jax-- ) {
-                     if( yy[ jax ] < 1 || yy[ jax ] > dims[ jax ] ) {
-                        ok = 0;
-                        break;
-                     } else {
-                        j = yy[ jax ] + j*dims[ jax ] - 1;
-                     }
+               ok = 1;
+               j = 0;
+               for( jax = ndim - 1; jax >= 0; jax-- ) {
+                  if( yy[ jax ] < 1 || yy[ jax ] > dims[ jax ] ) {
+                     ok = 0;
+                     break;
+                  } else {
+                     j = yy[ jax ] + j*dims[ jax ] - 1;
                   }
+               }
 
 /* Find the Gaussian model value at the current pixel. This excludes any
    background level because the background value in "par" was set to zero
    before entring this loop. */
-                  m = cupidGCModel( ndim, xx, par, -1, 1, first, status );
-                  first = 0;
+               m = cupidGCModel( ndim, xx, par, -1, 1, first, status );
+               first = 0;
 
 /* If the model value is higher than the supplied limit, indicate that the
    face needs to be extended further. */
-                  if( m > mlim ) {
-                     extend[ iax ][ iedge ] = 1;
+               if( m > mlim ) {
+                  extend[ iax ][ iedge ] = 1;
 
 /* Scale the model using the RMS noise so that it has the same normalisation
    as the residuals and input data, and then add it to the total clump sum. */
-                     m *= rms;
-                     sum += m;
+                  m *= rms;
+                  sum += m;
 
 /* Count the total number of pixels contributing to the peak. */
-                     (*area)++;
+                  (*area)++;
 
 /* If this pixel is within the data array, update the residuals array. */
-                     if( ok ) {
+                  if( ok ) {
 
 /* Indicate the peak is usable */
-                        peakok = 1;
+                     peakok = 1;
 
 /* Subtract the model value from the residuals (if good). */
-                        if( res && res[ j ] != CGEN_BAD ) res[ j ] -= (CGEN_TYPE) m;
+                     if( res && res[ j ] != CGEN_BAD ) res[ j ] -= (CGEN_TYPE) m;
 
 /* Increment the count of bad pixels in the clump. */
-                        if( ipd && ipd[ j ] == CGEN_BAD ) bad++;
+                     if( ipd && ipd[ j ] == CGEN_BAD ) bad++;
 
 /* Add this model value and its associated pixel indices into the lists */
-                        ilist = list_size++;
-                        mlist = astGrow( mlist, list_size, sizeof( double ) );
-                        plist = astGrow( plist, list_size, psize );
-                        mlist[ ilist ] = m;
-                        pnext = plist + ilist*ndim;
-                        for( jax = 0; jax < ndim; jax ++ ) {
-                           pnext[ jax ] = (int) ( yy[ jax ] + 0.5 );
-                        }
+                     ilist = list_size++;
+                     mlist = astGrow( mlist, list_size, sizeof( double ) );
+                     plist = astGrow( plist, list_size, psize );
+                     mlist[ ilist ] = m;
+                     pnext = plist + ilist*ndim;
+                     for( jax = 0; jax < ndim; jax ++ ) {
+                        pnext[ jax ] = (int) ( yy[ jax ] + 0.5 );
+                     }
 
 /* If this pixel is not within the data array, count the number of
    off-image pixels encountered. */
-                     } else {
-                        area_off++;
-                     }
+                  } else {
+                     area_off++;
                   }
+               }
 
 /* Get the grid coords of the next pixel in the section currently being
    fitted. This assumes fortran ordering of the elements in the arrays, and
    assumes the velocity axis (if any) is axis 3. */
-                  jax = 0;
+               jax = 0;
+               xx[ jax ] += 1.0;
+               yy[ cupidGC.dax[ jax ] ] = xx[ jax ];
+               while( xx[ jax ] > uface[ jax ] ) {
+                  xx[ jax ] = lface[ jax ];
+                  yy[ cupidGC.dax[ jax ] ] = xx[ jax ];
+
+                  if( ++jax == ndim ) {
+                     face_done = 1;
+                     break;
+                  }
                   xx[ jax ] += 1.0;
                   yy[ cupidGC.dax[ jax ] ] = xx[ jax ];
-                  while( xx[ jax ] > uface[ jax ] ) {
-                     xx[ jax ] = lface[ jax ];
-                     yy[ cupidGC.dax[ jax ] ] = xx[ jax ];
-
-                     if( ++jax == ndim ) {
-                        face_done = 1;
-                        break;
-                     }
-                     xx[ jax ] += 1.0;
-                     yy[ cupidGC.dax[ jax ] ] = xx[ jax ];
-                  }
                }
             }
          }

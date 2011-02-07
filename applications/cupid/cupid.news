@@ -6,6 +6,11 @@
  and  analyse clumps of emission within 2- or 3- dimensional
  data arrays.
 
+Changes introduced at V1.4
+
+   - A bug in the GaussClumps method that could cause Gaussian model
+   clumps to have straight edges has been fixed.
+
 Changes introduced at V1.3
 
    - A serious error in the use of the FellWalker.MinDip parameter has been
