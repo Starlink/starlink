@@ -106,6 +106,7 @@
  *     EC: Edward Chapin (UBC)
  *     TIMJ: Tim Jenness (JAC, Hawaii)
  *     COBA: Coskun Oba (UoL)
+ *     DSB: David Berry (JAC, Hawaii)
  *     {enter_new_authors_here}
 
  *  History:
@@ -196,6 +197,8 @@
  *     2010-12-06 (TIMJ):
  *        Use smf_flat_override
  *        Copy obsidss from refhdr when concatenating.
+ *     2011-02-07 (DSB):
+ *        Copy instap and telpos from reference header to returned header.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -682,6 +685,11 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
               hdr->obsmode = refhdr->obsmode;
               hdr->obstype = refhdr->obstype;
               hdr->swmode = refhdr->swmode;
+              hdr->instap[ 0 ] = refhdr->instap[ 0 ];
+              hdr->instap[ 1 ] = refhdr->instap[ 1 ];
+              hdr->telpos[ 0 ] = refhdr->telpos[ 0 ];
+              hdr->telpos[ 1 ] = refhdr->telpos[ 1 ];
+              hdr->telpos[ 2 ] = refhdr->telpos[ 2 ];
               one_strlcpy(hdr->obsidss, refhdr->obsidss, sizeof(hdr->obsidss), status);
               smf_set_clabels( refhdr->title, refhdr->dlabel,
                                refhdr->units, hdr, status );
