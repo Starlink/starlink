@@ -53,7 +53,6 @@
 #include <string.h>              /* String handling */
 
 /* External interface header files. */
-#include "ast.h"                 /* AST world coordinate system handling */
 #include "dat_par.h"             /* Hierarchical Data System (HDS) */
 #include "f77.h"                 /* C<-->Fortran interface macros */
 #include "sae_par.h"             /* SAI__OK */
