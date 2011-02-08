@@ -1,0 +1,11 @@
+#!/bin/tcsh
+
+$CUPID_DIR/findback in=ngc2024_13co_pt1 out=backoff box=\[21,21,3\] rms=0.25 \
+                    sub=yes msg_filter=verb
+
+$CUPID_DIR/findclumps config=^config_fw in=backoff rms=0.25 \
+       out=my_clumps-fw.sdf outcat=my_cat_fw method=fellwalker \
+       shape=polygon wcspar msg_filter=verb
+
+rm backoff.sdf
+

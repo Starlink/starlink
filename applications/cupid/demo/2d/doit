@@ -1,0 +1,8 @@
+#!/bin/tcsh
+$CUPID_DIR/findclumps in=extract_SN_map rms=1 \
+    config="'^config_fw'" \
+    method=fell out=clumps_fw \
+    outcat=clumps_fw shape=polygon \
+    wcspar=true deconv=false msg_filter=verb
+
+

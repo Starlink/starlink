@@ -1,0 +1,21 @@
+Contents:
+
+- "clumps_fw.FIT": The output FITS catalogue containing the clump
+  descriptions created by cupid:findclumps.
+
+- "doit": a shell script to run cupid:findback and cupid:findclumps
+
+- "clumps_fw.sdf": The output NDF containing the clump masks created by
+  cupid:findclumps (delta compressed).
+
+- "config_fw": Contains the configuration parameters used by cupid:findclumps
+  (referenced within "doit").
+
+- "ngc2024_13co_pt1.sdf": the 3D input NDF (part of a GBS HARP cube).
+  Supplied by Julia Roberts (work/cupid/Roberts). Her file "ngc2024_13co_pt1.sdf"
+  has had its SMURF extension removed and has been "scale" compressed
+  (bscale_data=0.025 bscale_var=0.000625 bzero_data=bzero_var=0.0) and then
+  delta compressed.
+
+
+

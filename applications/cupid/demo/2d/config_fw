@@ -1,0 +1,9 @@
+Fellwalker.FwhmBeam=2
+Fellwalker.RMS=1
+Fellwalker.AllowEdge=0
+Fellwalker.MaxBad=5
+Fellwalker.MinHeight=5
+Fellwalker.Noise=3
+FellWalker.MaxJump=3
+Fellwalker.CleanIter=2
+Fellwalker.MinDip=2
