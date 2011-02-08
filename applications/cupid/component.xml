@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="cupid" support="S">
-  <version>1.3</version>
+  <version>1.4</version>
   <path>applications/cupid</path>
   <description>CUPID - AST applications</description>
   <abstract><p>

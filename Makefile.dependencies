@@ -77,7 +77,6 @@ $(MANIFESTS)/ard: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/messgen \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/prm \
@@ -130,7 +129,6 @@ $(MANIFESTS)/atl: \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/prm \
@@ -454,7 +452,7 @@ $(MANIFESTS)/ctg: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/htx \
 		$(MANIFESTS)/mers \
-		$(MANIFESTS)/one \
+		$(MANIFESTS)/messgen \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/prm \
@@ -642,7 +640,6 @@ $(MANIFESTS)/dipso: \
 		$(MANIFESTS)/ncar \
 		$(MANIFESTS)/ndf \
 		$(MANIFESTS)/ndg \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/pda \
@@ -817,7 +814,6 @@ $(MANIFESTS)/extractor: \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/ndf \
 		$(MANIFESTS)/ndg \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/prm \
@@ -979,7 +975,6 @@ $(MANIFESTS)/gaia: \
 		$(MANIFESTS)/itcl \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/ndf \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/pda \
@@ -1067,7 +1062,6 @@ $(MANIFESTS)/grp: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/messgen \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/prm \
@@ -1356,7 +1350,6 @@ $(MANIFESTS)/irq: \
 		$(MANIFESTS)/ncar \
 		$(MANIFESTS)/ndf \
 		$(MANIFESTS)/ndg \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/prm \
@@ -1469,7 +1462,6 @@ $(MANIFESTS)/kaplibs: \
 		$(MANIFESTS)/ncar \
 		$(MANIFESTS)/ndf \
 		$(MANIFESTS)/ndg \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/prm \
@@ -1634,7 +1626,6 @@ $(MANIFESTS)/lpg: \
 		$(MANIFESTS)/htx \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/ndf \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/prm \
@@ -1759,8 +1750,8 @@ $(MANIFESTS)/ndg: \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
+		$(MANIFESTS)/messgen \
 		$(MANIFESTS)/ndf \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/prm \

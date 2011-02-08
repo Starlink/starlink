@@ -66,7 +66,7 @@ high-level interface to the AST library.
 </component>
 
 <component id="ccdpack" support="S">
-  <version>4.0-23</version>
+  <version>4.0-24</version>
   <path>applications/ccdpack</path>
   <description>CCD data reduction package</description>
   <abstract>
@@ -176,7 +176,7 @@ Starlink applications, and a number of other common data formats.
 </component>
 
 <component id="cupid" support="S">
-  <version>1.2</version>
+  <version>1.4</version>
   <path>applications/cupid</path>
   <description>CUPID - AST applications</description>
   <abstract><p>
@@ -278,7 +278,7 @@ on-line catalogues via the Internet.
 </component>
 
 <component id="datacube" support="S">
-  <version>1.2</version>
+  <version>1.3</version>
   <path>applications/datacube</path>
   <description>DATACUBE - An IFS datacube manipulation package</description>
   <abstract><p>DATACUBE is a package which includes the IFU Data Product Co
@@ -658,7 +658,7 @@ JCMT telescope based on Mauna Kea, Hawaii.
 </component>
 
 <component id="gaia" support="S">
-  <version>4.4-1</version>
+  <version>4.4-2</version>
   <path>applications/gaia</path>
   <description>GAIA - Graphical Astronomy and Image Analysis</description>
   <abstract><p>
@@ -866,7 +866,7 @@ Traces an HDS file
 </component>
 
 <component id="kappa" support="S">
-  <version>1.12</version>
+  <version>1.13</version>
   <path>applications/kappa</path>
   <description>KAPPA - Kernel Application Package</description>
   <abstract><p>
@@ -1578,7 +1578,7 @@ package.
 </component>
 
 <component id="smurf">
-  <version>1.0.0</version>
+  <version>1.2.0</version>
   <path>applications/smurf</path>
   <description>SMURF - Sub-mm User Reduction Facility</description>
   <abstract><p>
@@ -4831,7 +4831,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="ary" support="S">
-  <version>1.2</version>
+  <version>1.3</version>
   <path>libraries/ary</path>
   <description>A Subroutine Library for Accessing ARRAY Data Structures</description>
   <abstract><p> The ARY library is a set of routines for accessing
@@ -4862,7 +4862,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="ast" support="S">
-  <version>5.3-1</version>
+  <version>5.4-0</version>
   <path>libraries/ast</path>
   <description>WCS library</description>
   <abstract>
@@ -4904,7 +4904,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="atl" support="S">
-  <version>1.3</version>
+  <version>1.4</version>
   <path>libraries/atl</path>
   <description>ATL - A Library of AST Utility Routines</description>
   <abstract><p>ATL provides routines that perform high-level AST-related
@@ -5045,7 +5045,7 @@ No longer under active control.
 </component>
 
 <component id="ctg" support="U">
-  <version>3.0</version>
+  <version>3.0-1</version>
   <path>libraries/ctg</path>
   <description>Library to access groups of catalogues.</description>
   <abstract><p>
@@ -5055,7 +5055,7 @@ No longer under active control.
      single parameter.
   </p></abstract>
   <dependencies >
-    <build>cat</build><build>grp</build><build>one</build><build>prm</build><build>psx</build><build>sae</build><link>cat</link><link>chr</link><link>grp</link><link>mers</link><link>one</link><link>par</link><link>pcs</link><link>prm</link><link>psx</link><sourceset>htx</sourceset><sourceset>sst</sourceset><sourceset>star2html</sourceset>
+    <build>cat</build><build>grp</build><build>prm</build><build>psx</build><build>sae</build><link>cat</link><link>chr</link><link>grp</link><link>mers</link><link>par</link><link>pcs</link><link>prm</link><link>psx</link><sourceset>htx</sourceset><sourceset>sst</sourceset><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -5230,7 +5230,7 @@ No longer under active control.
 </component>
 
 <component id="grp" support="S">
-  <version>3.4</version>
+  <version>3.5</version>
   <path>libraries/grp</path>
   <description>GRP - Routines for Managing Groups of Objects</description>
   <abstract><p>GRP provides facilities for handling groups of objects which
@@ -5241,7 +5241,7 @@ No longer under active control.
       file. It also allows the creation of groups in which each element
       is a modified version of an element in another group.</p></abstract>
   <dependencies >
-    <build>cnf</build><build>one</build><build>par</build><build>prm</build><build>sae</build><link>chr</link><link>mers</link><link>one</link><link>par</link><link>pcs</link><link>psx</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>cnf</build><build>par</build><build>prm</build><build>sae</build><link>chr</link><link>mers</link><link>par</link><link>pcs</link><link>psx</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -5500,7 +5500,7 @@ understand.
 </component>
 
 <component id="kaplibs" support="S">
-  <version>3.0</version>
+  <version>3.2</version>
   <path>libraries/kaplibs</path>
   <description>KAPLIBS - Internal subroutines used within the KAPPA package.</description>
   <abstract><p>KAPLIBS is a package of Fortran subroutine
@@ -5619,7 +5619,7 @@ independently of KAPPA.</p></abstract>
 </component>
 
 <component id="ndf" support="S">
-  <version>1.10</version>
+  <version>1.11</version>
   <path>libraries/ndf</path>
   <description>NDF - Routines for Accessing the Extensible N-Dimensional Data Format</description>
   <abstract><p>The Extensible N-Dimensional Data Format (NDF) is a
@@ -5655,7 +5655,7 @@ independently of KAPPA.</p></abstract>
 </component>
 
 <component id="ndg" support="S">
-  <version>5.9</version>
+  <version>5.9-1</version>
   <path>libraries/ndg</path>
   <description>NDG - Routines for Accessing Groups of NDFs</description>
   <abstract><p>NDG provides facilities for handling groups of NDFs.
@@ -5665,7 +5665,7 @@ independently of KAPPA.</p></abstract>
       The syntax for specifying groups of NDFs is inherited from the GRP
       library (see SUN/150).</p></abstract>
   <dependencies >
-    <build>hds</build><build>grp</build><build>ndf</build><build>par</build><build>prm</build><build>psx</build><build>cnf</build><build>sae</build><link>grp</link><link>ndf</link><sourceset>star2html</sourceset>
+    <build>hds</build><build>grp</build><build>ndf</build><build>par</build><build>prm</build><build>psx</build><build>cnf</build><build>sae</build><link>grp</link><link>ndf</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -6203,20 +6203,20 @@ Ultrix and for SunOS and may still work for them.
   <version>1.0-1</version>
   <path>libraries/shl</path>
   <description>SHL -- Support for HLP Library access</description>
-  <abstract><p>The Starlink HLP system allows an application program
-      to retrieve named items from a hierarchically-arranged library
-      of text.  The facility resembles VAX/VMS HELP.  It consists of a
-      library plus utility programs for creating, listing and reading
-      help libraries.</p>
+  <abstract><p>The Starlink HLP system allows an application to
+     retrieve named items from a hierarchically-arranged library
+     of text.  The facility resembles VAX/VMS HELP.  It consists of a
+     library plus utility programs for creating, listing and reading
+     help libraries.</p>
      <p>Since each application needs its own help system, it made little
      sense to rewrite a help browser for each application independently.
      Over the years Starlink applications have switched to using the
      standard KAPPA help application code. Implemented by copying
-     the kappa files to each application in turn. Now that all the
-     applications are in a single location, the kappa help infrastructure
+     the KAPPA files to each application in turn. Now that all the
+     applications are in a single location, the KAPPA help infrastructure
      has been factored out into the SHL library.</p>
-     <p>In addition to the KAPPA fortran infrastructure, a C implementation
-     of a help browser has also been integrated (from figaro) into
+     <p>In addition to the KAPPA Fortran infrastructure, a C implementation
+     of a help browser has also been integrated (from Figaro) into
      SHL.</p>
   </abstract>
   <dependencies >
