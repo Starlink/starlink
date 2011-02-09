@@ -960,7 +960,7 @@ void sc2store_putjcmtstate
 size_t nframes,             /* number of frames (given) */
 const JCMTState head[],     /* header data for each frame (given) */
 int *status                 /* global status (given and returned) */
- )
+)
 /* Method :
     Writes JCMTState information to the relevant chunks of mapped HDS
     arrays. See also sc2store_writejcmtstate.
