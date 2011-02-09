@@ -331,7 +331,8 @@ typedef enum smf_obstype {
   SMF__TYP_RAMP,
   SMF__TYP_IV_CURVES_M,
   SMF__TYP_IV_CURVES_H,
-  SMF__TYP_OPEN_LOOP_G
+  SMF__TYP_OPEN_LOOP_G,
+  SMF__TYP_SETUP
 } smf_obstype;
 
 typedef enum {

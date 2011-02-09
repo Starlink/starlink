@@ -44,13 +44,15 @@
 *        Add INBEAM support.
 *     2010-12-06 (TIMJ):
 *        Look for engineering modes.
+*     2011-02-08 (TIMJ):
+*        Add SETUP as an obs type
 
 *  Notes:
 *     This function relies on an accurate hdr->instrument. i.e. call
 *     smf_inst_get first.
 
 *  Copyright:
-*     Copyright (C) 2008-2010 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2011 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2007 University of British Columbia.
 *     All Rights Reserved.
 
@@ -240,6 +242,8 @@ static smf_obstype smf__parse_obstype ( char obs_type[], int *status ) {
     type = SMF__TYP_IV_CURVES_H;
   } else if (strcasecmp( obs_type, "OPEN_LOOP_G" ) == 0) {
     type = SMF__TYP_OPEN_LOOP_G;
+  } else if (strcasecmp( obs_type, "SETUP" ) == 0) {
+    type = SMF__TYP_SETUP;
   } else {
     if (*status == SAI__OK) {
       *status = SAI__ERROR;
