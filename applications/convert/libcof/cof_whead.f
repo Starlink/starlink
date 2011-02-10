@@ -244,6 +244,13 @@
 *        Allow for long extension names.
 *     20-JAN-2011 (DSB):
 *        Only write out the WCS component once.
+*     10-FEB-2011 (DSB):
+*        Write out the WCS component for each NDF array component. Each
+*        IMAGE extension needs to have its own WCS so that  it can be
+*        handled independently of the other IMAGE extensions. (Also, the
+*        20-JAN-2011 change was bad as it resulted in WCS inherited from
+*        the NDF's FITS extension being stored instead of the potentially
+*        modifed WCS from the NDF's WCS component).
 *     {enter_further_changes_here}
 
 *-
@@ -879,11 +886,7 @@
 
 *  Write out the NDF WCS information.
 *  ==================================
-
-*  Only do this if the DATA component is being written out. This avoids
-*  writing the WCS out multiple times for the same NDF.
-      IF ( COMP.EQ. 'DATA' .OR. PROPEX )
-     :  CALL COF_FPWCS( FUNIT, NDFI, ENCOD, NATIVE, STATUS )
+      CALL COF_FPWCS( FUNIT, NDFI, ENCOD, NATIVE, STATUS )
 
   999 CONTINUE
 
