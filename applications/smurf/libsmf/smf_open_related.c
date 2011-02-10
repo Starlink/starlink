@@ -41,6 +41,7 @@
 *  Authors:
 *     Andy Gibb (UBC)
 *     Ed Chapin (UBC)
+*     Coskun Oba (UoL)
 *     {enter_new_authors_here}
 
 *  History:
@@ -54,6 +55,8 @@
 *        Modified interface to smf_open_file.
 *     2008-07-03 (EC):
 *        Use dim_t for subindex
+*     2011-02-10 (COBA):
+*        Changed data type of indices and subgroups from dim_t to size_t
 
 *  Copyright:
 *     Copyright (C) 2006 University of British Columbia.  All Rights
@@ -109,13 +112,13 @@ void smf_open_related ( const smfGroup *group, const dim_t subindex,
                         int *status ) {
 
   /* Local variables */
-  smfData *data = NULL;     /* Data struct for file */
-  Grp *grp = NULL;          /* Grp stored within smfGroup */
+  smfData *data = NULL;      /* Data struct for file */
+  Grp *grp = NULL;           /* Grp stored within smfGroup */
   dim_t i;                  /* Loop counter */
-  dim_t *indices = NULL;    /* Array of indices */
+  size_t *indices = NULL;    /* Array of indices */
   dim_t nrelated;           /* Number of related files */
   dim_t index;              /* Index into the subgroups within the group */
-  dim_t **subgroups = NULL; /* Pointer to array of subgroups */
+  size_t **subgroups = NULL; /* Pointer to array of subgroups */
 
   if ( *status != SAI__OK ) return;
 
