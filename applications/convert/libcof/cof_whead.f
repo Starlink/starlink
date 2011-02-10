@@ -882,8 +882,8 @@
 
 *  Only do this if the DATA component is being written out. This avoids
 *  writing the WCS out multiple times for the same NDF.
-      IF ( COMP.EQ. 'DATA' ) CALL COF_FPWCS( FUNIT, NDFI, ENCOD, NATIVE,
-     :                                       STATUS )
+      IF ( COMP.EQ. 'DATA' .OR. PROPEX )
+     :  CALL COF_FPWCS( FUNIT, NDFI, ENCOD, NATIVE, STATUS )
 
   999 CONTINUE
 
