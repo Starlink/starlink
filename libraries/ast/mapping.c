@@ -298,6 +298,10 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        the supplied Mapping (i.e. return a deep copy). This means that
 *        subsequent changes to the supplied Mapping cannot affect the returned
 *        Mapping.
+*     10-FEB-2011 (DSB):
+*        When rebinning (in macros NEAR_1/2/ND, KERNEL_1/2/ND, LINEAR_1/2/ND),
+*        do not treat a zero variance as bad unless the reciprocals of the
+*        variances are being used as weights.
 *class--
 */
 
@@ -17319,15 +17323,20 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
       off_in = offset[ point ]; \
       in_val = in[ off_in ]; \
 \
-/* If necessary, test if the input data value or variance is bad (or zero). */ \
+/* If necessary, test if the input data value or variance is bad. If we \
+   are using the reciprocal of the input variances as weights, then \
+   variance values of zero are also effectively bad (but we can use input \
+   variances of zero otherwise). */ \
       if ( Usebad ) { \
          bad = ( in_val == badval ); \
-         if ( Usevar || Varwgt ) { \
+         if ( Varwgt ) { \
             bad = bad || ( in_var[ off_in ] == badval ) \
                       || ( in_var[ off_in ] <= 0.0 ); \
+         } else if ( Usevar ) { \
+            bad = bad || ( in_var[ off_in ] == badval ); \
          } \
       } else { \
-         if ( Usevar || Varwgt ) { \
+         if ( Varwgt ) { \
             bad = ( in_var[ off_in ] <= 0.0 ); \
          } else { \
             bad = 0; \
@@ -17482,15 +17491,20 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
       off_in = offset[ point ]; \
       in_val = in[ off_in ]; \
 \
-/* If necessary, test if the input data value or variance is bad (or zero). */ \
+/* If necessary, test if the input data value or variance is bad. If we \
+   are using the reciprocal of the input variances as weights, then \
+   variance values of zero are also effectively bad (but we can use input \
+   variances of zero otherwise). */ \
       if ( Usebad ) { \
          bad = ( in_val == badval ); \
-         if ( Usevar || Varwgt ) { \
+         if ( Varwgt ) { \
             bad = bad || ( in_var[ off_in ] == badval ) \
                       || ( in_var[ off_in ] <= 0.0 ); \
+         } else if ( Usevar ) { \
+            bad = bad || ( in_var[ off_in ] == badval ); \
          } \
       } else { \
-         if ( Usevar || Varwgt ) { \
+         if ( Varwgt ) { \
             bad = ( in_var[ off_in ] <= 0.0 ); \
          } else { \
             bad = 0; \
@@ -17738,15 +17752,20 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
       off_in = offset[ point ]; \
       in_val = in[ off_in ]; \
 \
-/* If necessary, test if the input data value or variance is bad (or zero). */ \
+/* If necessary, test if the input data value or variance is bad. If we \
+   are using the reciprocal of the input variances as weights, then \
+   variance values of zero are also effectively bad (but we can use input \
+   variances of zero otherwise). */ \
       if ( Usebad ) { \
          bad = ( in_val == badval ); \
-         if ( Usevar || Varwgt ) { \
+         if ( Varwgt ) { \
             bad = bad || ( in_var[ off_in ] == badval ) \
                       || ( in_var[ off_in ] <= 0.0 ); \
+         } else if ( Usevar ) { \
+            bad = bad || ( in_var[ off_in ] == badval ); \
          } \
       } else { \
-         if ( Usevar || Varwgt ) { \
+         if ( Varwgt ) { \
             bad = ( in_var[ off_in ] <= 0.0 ); \
          } else { \
             bad = 0; \
@@ -18460,15 +18479,20 @@ static void SpreadLinear##X( int ndim_out, \
       off_in = offset[ point ]; \
       in_val = in[ off_in ]; \
 \
-/* If necessary, test if the input data value or variance is bad (or zero). */ \
+/* If necessary, test if the input data value or variance is bad. If we \
+   are using the reciprocal of the input variances as weights, then \
+   variance values of zero are also effectively bad (but we can use input \
+   variances of zero otherwise). */ \
       if ( Usebad ) { \
          bad = ( in_val == badval ); \
-         if ( Usevar || Varwgt ) { \
+         if ( Varwgt ) { \
             bad = bad || ( in_var[ off_in ] == badval ) \
                       || ( in_var[ off_in ] <= 0.0 ); \
+         } else if ( Usevar ) { \
+            bad = bad || ( in_var[ off_in ] == badval ); \
          } \
       } else { \
-         if ( Usevar || Varwgt ) { \
+         if ( Varwgt ) { \
             bad = ( in_var[ off_in ] <= 0.0 ); \
          } else { \
             bad = 0; \
@@ -18545,15 +18569,20 @@ static void SpreadLinear##X( int ndim_out, \
       off_in = offset[ point ]; \
       in_val = in[ off_in ]; \
 \
-/* If necessary, test if the input data value or variance is bad (or zero). */ \
+/* If necessary, test if the input data value or variance is bad. If we \
+   are using the reciprocal of the input variances as weights, then \
+   variance values of zero are also effectively bad (but we can use input \
+   variances of zero otherwise). */ \
       if ( Usebad ) { \
          bad = ( in_val == badval ); \
-         if ( Usevar || Varwgt ) { \
+         if ( Varwgt ) { \
             bad = bad || ( in_var[ off_in ] == badval ) \
                       || ( in_var[ off_in ] <= 0.0 ); \
+         } else if ( Usevar ) { \
+            bad = bad || ( in_var[ off_in ] == badval ); \
          } \
       } else { \
-         if ( Usevar || Varwgt ) { \
+         if ( Varwgt ) { \
             bad = ( in_var[ off_in ] <= 0.0 ); \
          } else { \
             bad = 0; \
@@ -18680,15 +18709,20 @@ static void SpreadLinear##X( int ndim_out, \
       off_in = offset[ point ]; \
       in_val = in[ off_in ]; \
 \
-/* If necessary, test if the input data value or variance is bad (or zero). */ \
+/* If necessary, test if the input data value or variance is bad. If we \
+   are using the reciprocal of the input variances as weights, then \
+   variance values of zero are also effectively bad (but we can use input \
+   variances of zero otherwise). */ \
       if ( Usebad ) { \
          bad = ( in_val == badval ); \
-         if ( Usevar || Varwgt ) { \
+         if ( Varwgt ) { \
             bad = bad || ( in_var[ off_in ] == badval ) \
                       || ( in_var[ off_in ] <= 0.0 ); \
+         } else if ( Usevar ) { \
+            bad = bad || ( in_var[ off_in ] == badval ); \
          } \
       } else { \
-         if ( Usevar || Varwgt ) { \
+         if ( Varwgt ) { \
             bad = ( in_var[ off_in ] <= 0.0 ); \
          } else { \
             bad = 0; \
@@ -19237,15 +19271,20 @@ static void SpreadNearest##X( int ndim_out, \
                off_in = offset[ point ]; \
                in_val = in[ off_in ]; \
 \
-/* If necessary, test if the input data value or variance is bad (or zero). */ \
+/* If necessary, test if the input data value or variance is bad. If we \
+   are using the reciprocal of the input variances as weights, then \
+   variance values of zero are also effectively bad (but we can use input \
+   variances of zero otherwise). */ \
                if ( Usebad ) { \
                   bad = ( in_val == badval ); \
-                  if ( Usevar || Varwgt ) { \
+                  if ( Varwgt ) { \
                      bad = bad || ( in_var[ off_in ] == badval ) \
                                || ( in_var[ off_in ] <= 0.0 ); \
+                  } else if ( Usevar ) { \
+                     bad = bad || ( in_var[ off_in ] == badval ); \
                   } \
                } else { \
-                  if ( Usevar || Varwgt ) { \
+                  if ( Varwgt ) { \
                      bad = ( in_var[ off_in ] <= 0.0 ); \
                   } else { \
                      bad = 0; \
@@ -19334,15 +19373,20 @@ static void SpreadNearest##X( int ndim_out, \
                off_in = offset[ point ]; \
                in_val = in[ off_in ]; \
 \
-/* If necessary, test if the input data value or variance is bad (or zero). */ \
+/* If necessary, test if the input data value or variance is bad. If we \
+   are using the reciprocal of the input variances as weights, then \
+   variance values of zero are also effectively bad (but we can use input \
+   variances of zero otherwise). */ \
                if ( Usebad ) { \
                   bad = ( in_val == badval ); \
-                  if ( Usevar || Varwgt ) { \
+                  if ( Varwgt ) { \
                      bad = bad || ( in_var[ off_in ] == badval ) \
                                || ( in_var[ off_in ] <= 0.0 ); \
+                  } else if ( Usevar ) { \
+                     bad = bad || ( in_var[ off_in ] == badval ); \
                   } \
                } else { \
-                  if ( Usevar || Varwgt ) { \
+                  if ( Varwgt ) { \
                      bad = ( in_var[ off_in ] <= 0.0 ); \
                   } else { \
                      bad = 0; \
@@ -19437,15 +19481,20 @@ static void SpreadNearest##X( int ndim_out, \
                off_in = offset[ point ]; \
                in_val = in[ off_in ]; \
 \
-/* If necessary, test if the input data value or variance is bad. */ \
+/* If necessary, test if the input data value or variance is bad. If we \
+   are using the reciprocal of the input variances as weights, then \
+   variance values of zero are also effectively bad (but we can use input \
+   variances of zero otherwise). */ \
                if ( Usebad ) { \
                   bad = ( in_val == badval ); \
-                  if ( Usevar || Varwgt ) { \
+                  if ( Varwgt ) { \
                      bad = bad || ( in_var[ off_in ] == badval ) \
                                || ( in_var[ off_in ] <= 0.0 ); \
+                  } else if ( Usevar ) { \
+                     bad = bad || ( in_var[ off_in ] == badval ); \
                   } \
                } else { \
-                  if ( Usevar || Varwgt ) { \
+                  if ( Varwgt ) { \
                      bad = ( in_var[ off_in ] <= 0.0 ); \
                   } else { \
                      bad = 0; \
