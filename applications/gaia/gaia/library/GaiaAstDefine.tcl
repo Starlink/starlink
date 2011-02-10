@@ -432,7 +432,7 @@ itcl::class gaia::GaiaAstDefine {
       reset_
 
       #  Now create and pack a table with all the above.
-      table $itk_component(f1) \
+      blt::blttable $itk_component(f1) \
 	      $itk_component(space1) 0,0 -cspan 3 -fill x \
 	      $itk_component(dateobs) 1,0 -cspan 2 -fill x \
 	      $itk_component(space2) 2,0 -cspan 3 -fill x \

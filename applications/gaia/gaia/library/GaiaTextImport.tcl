@@ -459,7 +459,7 @@ itcl::class gaia::GaiaTextImport {
       itk_component add head5 {
          label $parent.head5 -text "Y"
       }
-      table $itk_component(headtable) \
+      blt::blttable $itk_component(headtable) \
          $itk_component(head0)  0,0 \
          $itk_component(head1)  0,1 \
          $itk_component(head2)  0,2 \
@@ -507,7 +507,7 @@ itcl::class gaia::GaiaTextImport {
                -value $i
          }
 
-         table $itk_component(headtable) \
+         blt::blttable $itk_component(headtable) \
             $itk_component(col$i) $j,0 -fill x -pady 3 -padx 3 \
             $itk_component(id$i) $j,1 -fill x -pady 3 -padx 3 \
             $itk_component(ra$i) $j,2 -fill x -pady 3 -padx 3 \

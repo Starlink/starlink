@@ -120,11 +120,11 @@ itcl::class gaia::ScrollArrows {
       bind $itk_component(right) <ButtonRelease-1> [code $this stop_increment]
 
       #  Now position them.
-      table $w_
-      table $w_ $itk_component(up)    0,1
-      table $w_ $itk_component(left)  1,0
-      table $w_ $itk_component(right) 1,2
-      table $w_ $itk_component(down)  2,1
+      blt::blttable $w_
+      blt::blttable $w_ $itk_component(up)    0,1
+      blt::blttable $w_ $itk_component(left)  1,0
+      blt::blttable $w_ $itk_component(right) 1,2
+      blt::blttable $w_ $itk_component(down)  2,1
    }
 
    #  Destructor:

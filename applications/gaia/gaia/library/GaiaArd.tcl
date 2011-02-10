@@ -300,7 +300,7 @@ itcl::class gaia::GaiaArd {
 
       #  Frame for control buttons.
       itk_component add action {frame $w_.action}
-      table $itk_component(action)
+      blt::blttable $itk_component(action)
 
       #  Button to close window.
       itk_component add close {
@@ -410,7 +410,7 @@ itcl::class gaia::GaiaArd {
       pack $itk_component(label) -side top -fill x -pady 5 -padx 5
       pack $Buttonbox_ -side top -fill x -pady 5 -padx 5
       pack $itk_component(action) -side bottom -fill x -pady 5 -padx 5
-      table $itk_component(action) \
+      blt::blttable $itk_component(action) \
          $itk_component(extractwhole)    0,0 -fill x -pady 3 -padx 3 \
          $itk_component(extractselected) 0,1 -fill x -pady 3 -padx 3 \
          $itk_component(maskwhole)       0,2 -fill x -pady 3 -padx 3 \
