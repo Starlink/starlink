@@ -80,6 +80,8 @@ f     The PermMap class does not define any new routines beyond those
 *        number of axes available. Use AST__BAD otherwise.
 *     10-JAN-2011 (DSB):
 *        Add protected PermSplit attribute.
+*     11-FEB-2011 (DSB):
+*        Do not allow MapSplit to return a Mapping with zero outputs.
 *class--
 */
 
@@ -1549,7 +1551,7 @@ static int *MapSplit( AstMapping *this_map, int nin, const int *in, AstMapping *
 
 /* If possible produce the returned PermMap. Otherwise, free the returned
    array. */
-         if( ok ) {
+         if( ok && nout > 0 ) {
             *map = (AstMapping *) astPermMap( nin, inpm, nout, outpm, con, "", status );
          } else {
             result = astFree( result );
