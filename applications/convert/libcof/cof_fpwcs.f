@@ -93,6 +93,9 @@
 *        - Increase the value of the FitsDigits attribute from 10 to 15
 *        to get sub-second accuracy on MJD-OBS.
 *        - Support FITS-WCS Paper III "-TAB" algorithm.
+*     11-FEB-2011 (DSB):
+*        Prevent multiple copies (i.e. one for each NDF array component)
+*        of a -TAB bintable being created.
 *     {enter_further_changes_here}
 
 *-
@@ -123,6 +126,9 @@
       INTEGER HEDLEN             ! FITS header length
       PARAMETER( HEDLEN = 80 )
 
+      INTEGER ASTVER             ! Version number for new tables
+      PARAMETER( ASTVER = 143526 )
+
 *  Local Variables:
       CHARACTER HEADER*( HEDLEN )! A FITS header
       CHARACTER KEY*30           ! Extension name
@@ -151,10 +157,17 @@
 *  hold a set of FITS header cards to be used by other AST routines.
 *  Setting FitsDigits to a negative value ensures that FitsChan never
 *  uses more than the number of digits allowed by the FITS standard when
-*  formatting floating point values. Also indicate that axes can be
-*  described using the -TAB algorithm described in FITS-WCS Paper III.
-      FC = AST_FITSCHAN( AST_NULL, AST_NULL, 'FITSDIGITS=-15,TABOK=1',
-     :                   STATUS )
+*  formatting floating point values.
+      FC = AST_FITSCHAN( AST_NULL, AST_NULL, 'FITSDIGITS=-15', STATUS )
+
+*  Indicate that the FitsChan can describe axes using the -TAB algorithm
+*  defined in FITS-WCS Paper III. The value assigned to the TabOK
+*  attribute (ASTVER) is used as the table version number for any tables
+*  created by the AST_WRITE method. The value used is a "magic value"
+*  that is used to identify tables created by AST.
+      CALL AST_SETI( FC, 'TABOK', ASTVER, STATUS )
+
+*  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Initialise the FITSIO status.  It's not the same as the Starlink
@@ -223,7 +236,7 @@
 *  containing values copied from the FitsTable, and then annul the
 *  FitsTable pointer. Use the table key in the KeyMap as the extension
 *  name.
-                  CALL COF_FT2BT( TABLE, FUNIT, KEY, STATUS )
+                  CALL COF_FT2BT( TABLE, FUNIT, KEY, ASTVER, STATUS )
                   CALL AST_ANNUL( TABLE, STATUS )
 
                END IF
