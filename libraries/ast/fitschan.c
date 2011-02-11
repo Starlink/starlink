@@ -21382,6 +21382,7 @@ static AstMapping *OtherAxes( AstFitsChan *this, AstFrameSet *fs, double *dim,
    double crval;           /* The value for the FITS CRVAL keyword */
    int *inperm;            /* Pointer to permutation array for input axes */
    int *outperm;           /* Pointer to permutation array for output axes */
+   int extver;             /* Table version number for -TAB headers */
    int fits_i;             /* FITS WCS axis index */
    int i;                  /* Loop count */
    int iax;                /* WCS Frame axis index */
@@ -21473,6 +21474,10 @@ static AstMapping *OtherAxes( AstFitsChan *this, AstFrameSet *fs, double *dim,
             log_axis = 0;
             tab_axis = 0;
 
+/* Get the table version number to use if we end up using the -TAB
+   algorithm. This is the set value of the TabOK attribute (if positive). */
+            extver = astGetTabOK( this );
+
 /* See if the axis is linear. If so, create a ShiftMap which subtracts off
    the CRVAL value. */
             if( IsMapLinear( map, lbnd_p, ubnd_p, iax, status ) ) {
@@ -21495,7 +21500,7 @@ static AstMapping *OtherAxes( AstFitsChan *this, AstFrameSet *fs, double *dim,
 
 /* If it is not linear or logarithmic, and the TabOK attribute is
    non-zero, describe it using the -TAB algorithm. */
-            } else if( astGetTabOK( this ) > 0 ){
+            } else if( extver > 0 ){
 
 /* Get any pre-existing FitsTable from the FitsStore. This is the table
    in which the tabular data will be stored (if the Mapping can be expressed
@@ -21517,6 +21522,14 @@ static AstMapping *OtherAxes( AstFitsChan *this, AstFrameSet *fs, double *dim,
 /* Store TAB-specific values in the FitsStore. First the name of the
    FITS binary table extension holding the coordinate info. */
                   SetItemC( &(store->ps), fits_i, 0, s, AST_TABEXTNAME, status );
+
+/* Next the table version number. This is the set (positive) value for the
+   TabOK attribute. */
+                  SetItem( &(store->pv), fits_i, 1, s, extver, status );
+
+/* Also store the table version in the binary table header. */
+                  astSetFitsI( table->header, "EXTVER", extver,
+                               "Table version number", 0 );
 
 /* Next the name of the table column containing the main coords array. */
                   SetItemC( &(store->ps), fits_i, 1, s,
@@ -25685,6 +25698,7 @@ static AstMapping *SpectralAxes( AstFitsChan *this, AstFrameSet *fs,
    double zsource;         /* Redshift of source */
    int *inperm;            /* Pointer to permutation array for input axes */
    int *outperm;           /* Pointer to permutation array for output axes */
+   int extver;             /* Table version number for -TAB headers */
    int fits_i;             /* FITS WCS axis index for current WCS axis */
    int iax;                /* Axis index */
    int icolindex;          /* Index of table column holding index vector */
@@ -26094,7 +26108,8 @@ static AstMapping *SpectralAxes( AstFitsChan *this, AstFrameSet *fs,
 /* If none of the above algorithms are appropriate, we must resort to
    using the -TAB algorithm, in which the Mapping is defined by a look-up
    table. Check the TabOK attribute to see -TAB is to be supported. */
-            if( !ctype[ 0 ] && astGetTabOK( this ) > 0 ) {
+            extver = astGetTabOK( this );
+            if( !ctype[ 0 ] && extver > 0 ) {
 
 /* Get any pre-existing FitsTable from the FitsStore. This is the table
    in which the tabular data will be stored (if the Mapping can be expressed
@@ -26119,6 +26134,14 @@ static AstMapping *SpectralAxes( AstFitsChan *this, AstFrameSet *fs,
 /* Store TAB-specific values in the FitsStore. First the name of the
    FITS binary table extension holding the coordinate info. */
                   SetItemC( &(store->ps), fits_i, 0, s, AST_TABEXTNAME, status );
+
+/* Next the table version number. This is the set (positive) value for the
+   TabOK attribute. */
+                  SetItem( &(store->pv), fits_i, 1, s, extver, status );
+
+/* Also store the table version in the binary table header. */
+                  astSetFitsI( table->header, "EXTVER", extver,
+                               "Table version number", 0 );
 
 /* Next the name of the table column containing the main coords array. */
                   SetItemC( &(store->ps), fits_i, 1, s,
