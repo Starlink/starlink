@@ -19307,9 +19307,8 @@ in the FrameSet) to the WCS SkyFrame includes a WcsMap.
 \item The Mapping after the WcsMap (\emph{i.e.} from native spherical to
 celestial coordinates) is a spherical rotation for the
 celestial axes, and linear for any other axes.
-tabok
-\item The TabOK attribute is set non-zero in the FitsChan, and the
-longitude and latitude axes are separable. In this case the Mapping will
+\item The TabOK attribute is set to a non-zero positive value in the FitsChan,
+and the longitude and latitude axes are separable. In this case the Mapping will
 be described by a pair of 1-dimensional look-up tables, using the ``-TAB''
 algorithm described in FITS-WCS paper III.
 \end{enumerate}
@@ -19517,16 +19516,18 @@ other spectral systems supported by FITS-WCS paper III.
 pixel coordinates to grism parameter) is linear, and the Mapping after the
 GrismMap is either null or represents a change of spectral system from wavelength (air or
 vacuum) to one of the supported spectral systems.
-\item The TabOK attribute is set non-zero in the FitsChan.
+\item The TabOK attribute is set to a non-zero positive value in the FitsChan.
 \end{enumerate}
 
 If none of the above conditions hold, the write operation will be
-unsuccessful. Note, if the FitsChan's TabOK attribute is set non-zero
-then any Mapping that does not meet any of the earlier conditions will be
-written out as a look-up table, using the ``-TAB'' algorithm described in
-FITS-WCS paper III. If the TabOK attribute is to zero (the default) in
-the FitsChan, then the write operation will be unsuccessful unless one of
-the eaerlier conditions is met.
+unsuccessful. Note, if the FitsChan's TabOK attribute is set to a positive
+non-zero value then any Mapping that does not meet any of the earlier conditions
+will be written out as a look-up table, using the ``-TAB'' algorithm described
+in FITS-WCS paper III. If the TabOK attribute is to zero (the default) or
+negative in the FitsChan, then the write operation will be unsuccessful unless
+one of the eaerlier conditions is met.\footnote{If the -TAB algorithm is used, the
+positive value of the TabOK attribute is used as the table version number
+(the EXTVER header) in the associated FITS binary table.}
 
 \subsubsection{Common Non-Standard Features}
 The following non-standard features are supported when reading spectral
@@ -22158,12 +22159,10 @@ values.
 \end{enumerate}
 
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V5.4-0}
+\subsection{Changes Introduced in V5.4-0}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V5.3-2 and V5.4-0 (the
-current version):
+The following describes the most significant changes which
+occurred in the AST library between versions V5.3-2 and V5.4-0:
 
 \begin{enumerate}
 
@@ -22208,6 +22207,41 @@ f+
 AST\_MAPRENAME
 f-
 has been added to rename existing entry in a KeyMap.
+\end{enumerate}
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V5.5-0}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V5.4-0 and V5.5-0 (the
+current version):
+
+\begin{enumerate}
+
+\item The FitsChan ``TabOK'' attribute is now an integer value rather
+than a boolean value. If TabOK is set to a non-zero positive integer
+before invoking the
+c+
+astWrite
+c-
+f+
+AST\_WRITE
+f-
+method, its value is used as the version number for any table that is
+created as a consequence of the write operation. This is the value stored
+in the PVi\_1a keyword in the IMAGE header, and the EXTVER keyword in the
+binary table header. In previous versions of AST, the value used for these
+headers could not be controlled and was fixed at 1. If TabOK is set to a
+negative or zero value, the -TAB algorithm will not be supported by
+either the
+c+
+astWrite or astRead
+c-
+f+
+AST\_WRITE or AST\_READ
+f-
+methods.
+
 \end{enumerate}
 
 Programs which are statically linked will need to be re-linked in

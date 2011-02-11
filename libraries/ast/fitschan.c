@@ -924,6 +924,15 @@ f     - AST_TESTFITS: Test if a keyword has a defined value in a FitsChan
 *     7-FEB-2011 (DSB):
 *        Put a space between keyword value and slash that starts a comment
 *        when formatting a FITS header card.
+*     11-FEB-2011 (DSB):
+*        Change meaning of TabOK attribute. It is no longer a simple
+*        boolean indicating if the -TAB algorithm is supported. Instead
+*        it gives the value to be used for the EXTVER header - i.e. the
+*        version number to store with any binary table created as a
+*        result of calling astWrite. If TabOK is zero or begative, then
+*        the -TAB algorithm is not supported. This is so that there is
+*        some way of having multiple binary table extensions with the same
+*        name (but different EXTVER values).
 *class--
 */
 
@@ -2279,7 +2288,7 @@ static int AddVersion( AstFitsChan *this, AstFrameSet *fs, int ipix, int iwcs,
    defined. Return if not. Note, we can handle non-invertable Mappings if
    we are allowed to use the -TAB algorithm. */
    mapping = astGetMapping( fset, AST__BASE, AST__CURRENT );
-   if( !astGetTranInverse( mapping ) && !astGetTabOK( this ) ) {
+   if( !astGetTranInverse( mapping ) && astGetTabOK( this ) <= 0 ) {
       mapping = astAnnul( mapping );
       fset = astAnnul( fset );
       return ret;
@@ -4023,6 +4032,7 @@ static AstMapping *CelestialAxes( AstFitsChan *this, AstFrameSet *fs, double *di
    int *tperm;             /* Pointer to new FITS axis numbering array */
    int axlat;              /* Index of latitude output from WcsMap */
    int axlon;              /* Index of longitude output from WcsMap */
+   int extver;             /* Table version number for -TAB headers */
    int fits_ilat;          /* FITS WCS axis index for latitude axis */
    int fits_ilon;          /* FITS WCS axis index for longitude axis */
    int i;                  /* Loop index */
@@ -4104,6 +4114,10 @@ static AstMapping *CelestialAxes( AstFitsChan *this, AstFrameSet *fs, double *di
 
 /* Get the pixel->wcs Mapping. */
       map = astGetMapping( fs, AST__BASE, AST__CURRENT );
+
+/* Get the table version number to use if we end up using the -TAB
+   algorithm. This is the set value of the TabOK attribute (if positive). */
+      extver = astGetTabOK( this );
 
 /* Some of the required FITS Keyword values are defined by the WcsMap
    contained within the Mapping. Split the mapping up into a list of serial
@@ -4394,7 +4408,7 @@ static AstMapping *CelestialAxes( AstFitsChan *this, AstFrameSet *fs, double *di
    to describe the celestial axes using a tabular look-up table (i.e. the
    FITS-WCS "_TAB" algorithm). Only do this if the -TAB algorithm is to
    be supported. */
-      } else if( astGetTabOK( this ) ) {
+      } else if( extver > 0 ) {
 
 /* Get any pre-existing FitsTable from the FitsStore. This is the table
    in which the tabular data will be stored (if the Mapping can be expressed
@@ -4482,6 +4496,15 @@ static AstMapping *CelestialAxes( AstFitsChan *this, AstFrameSet *fs, double *di
    FITS binary table extension holding the coordinate info. */
             SetItemC( &(store->ps), fits_ilon, 0, s, AST_TABEXTNAME, status );
             SetItemC( &(store->ps), fits_ilat, 0, s, AST_TABEXTNAME, status );
+
+/* Next the table version number. This is the set (positive) value for the
+   TabOK attribute. */
+            SetItem( &(store->pv), fits_ilon, 1, s, extver, status );
+            SetItem( &(store->pv), fits_ilat, 1, s, extver, status );
+
+/* Also store the table version in the binary table header. */
+            astSetFitsI( table->header, "EXTVER", extver, "Table version number",
+                         0 );
 
 /* Next the name of the table column containing the main coords array. */
             SetItemC( &(store->ps), fits_ilon, 1, s,
@@ -12041,17 +12064,18 @@ f     RESULT = AST_GETTABLES( THIS, STATUS )
 *     table. The key used to access each entry is the FITS extension
 *     name in which the table should be stored.
 *
-*     Tables can be present in a FitsChan as a result of using the
+*     Tables can be present in a FitsChan as a result either of using the
+c     astPutTable (or astPutTables)
+f     AST_PUTTABLE (or AST_PUTTABLES)
+*     method to store existing tables in the FitsChan, or of using the
 c     astWrite
 f     AST_WRITE
-*     method to write a FrameSet to the FitsChan. If the FitsChan "TabOK"
-*     attribute is
-c     non-zero
-f     .TRUE.
-*     and the FrameSet requires a look-up table to describe one or more
-*     axes, then the "-TAB" algorithm code described in FITS-WCS paper III
-*     is used and the table values are stored in the FitsChan in the form
-*     of a FitsTable object.
+*     method to write a FrameSet to the FitsChan. For the later case, if
+*     the FitsChan "TabOK" attribute is positive and the FrameSet requires
+*     a look-up table to describe one or more axes, then the "-TAB"
+*     algorithm code described in FITS-WCS paper III is used and the table
+*     values are stored in the FitsChan in the form of a FitsTable object
+*     (see the documentation for the "TabOK" attribute).
 
 *  Parameters:
 c     this
@@ -21471,7 +21495,7 @@ static AstMapping *OtherAxes( AstFitsChan *this, AstFrameSet *fs, double *dim,
 
 /* If it is not linear or logarithmic, and the TabOK attribute is
    non-zero, describe it using the -TAB algorithm. */
-            } else if( astGetTabOK( this ) ){
+            } else if( astGetTabOK( this ) > 0 ){
 
 /* Get any pre-existing FitsTable from the FitsStore. This is the table
    in which the tabular data will be stored (if the Mapping can be expressed
@@ -26070,7 +26094,7 @@ static AstMapping *SpectralAxes( AstFitsChan *this, AstFrameSet *fs,
 /* If none of the above algorithms are appropriate, we must resort to
    using the -TAB algorithm, in which the Mapping is defined by a look-up
    table. Check the TabOK attribute to see -TAB is to be supported. */
-            if( !ctype[ 0 ] && astGetTabOK( this ) ) {
+            if( !ctype[ 0 ] && astGetTabOK( this ) > 0 ) {
 
 /* Get any pre-existing FitsTable from the FitsStore. This is the table
    in which the tabular data will be stored (if the Mapping can be expressed
@@ -28791,11 +28815,9 @@ f     AST_READ
 *     that use the "-TAB" algorithm to describe one or more axes. Such
 *     axes use a FITS binary table to store a look-up table of axis values.
 *     The FitsChan will fail to read such axes unless the "TabOK" attribute
-*     is set to a
-c     non-zero value.
-f     .TRUE. value.
-*     The table containing the axis values must be made available to the
-*     FitsChan either by storing the table contents in the FitsChan (using
+*     is set to a non-zero positive integer value. The table containing the
+*     axis values must be made available to the FitsChan either by storing
+*     the table contents in the FitsChan (using
 c     astPutTables or astPutTable) prior to invoking astRead
 f     AST_PUTTABLES or AST_PUTTABLE) prior to invoking AST_READ
 *     or by registering a call-back
@@ -28927,7 +28949,7 @@ static AstMapping *TabMapping( AstFitsChan *this, FitsStore *store, char s,
 *  Returned Value:
 *     A pointer to a Mapping. A NULL pointer is returned if the FitsChan does
 *     not support the -TAB algorithm (i.e. if the value of the TabOK
-*     attribute is zero), or if no axes use the "-TAB" algorithm.
+*     attribute is zero or negative), or if no axes use the "-TAB" algorithm.
 */
 
 /* Local Variables: */
@@ -28984,7 +29006,7 @@ static AstMapping *TabMapping( AstFitsChan *this, FitsStore *store, char s,
 
 /* If the FitsChan does not support the -TAB algorithm, return a NULL
    pointer. */
-   if( astGetTabOK( this ) ) {
+   if( astGetTabOK( this ) > 0 ) {
 
 /* Create a KeyMap to hold a list of the used extension names. */
       used_tables = astKeyMap( " ", status );
@@ -34838,7 +34860,7 @@ static int WorldAxes( AstFitsChan *this, AstMapping *cmap, double *dim, int *per
       dw = astFree( dw );
 
 /* Now, if we can use the TAB algorithm, deal with Mappings that are defined only in the forward direction. */
-   } else if( astGetTranForward( map ) && astGetTabOK( this ) ) {
+   } else if( astGetTranForward( map ) && astGetTabOK( this ) > 0 ) {
 
 /* Assume success. */
       ret = 1;
@@ -36764,18 +36786,18 @@ astMAKE_TEST(FitsChan,DefB1950,( this->defb1950 != -1 ))
 *     Public attribute.
 
 *  Synopsis:
-*     Integer (boolean).
+*     Integer.
 
 *  Description:
-*     This attribute is a boolean value which indicates if the "-TAB"
-*     algorithm, defined in FITS-WCS paper III, should be supported
-*     by the FitsChan. The default value (zero) results in no support for
-*     -TAB axes (i.e. axes that have "-TAB" in their CTYPE keyword value).
-*     In this case, the
+*     This attribute is an integer value which indicates if the "-TAB"
+*     algorithm, defined in FITS-WCS paper III, should be supported by
+*     the FitsChan. The default value is zero. A zero or negative value
+*     results in no support for -TAB axes (i.e. axes that have "-TAB"
+*     in their CTYPE keyword value). In this case, the
 c     astWrite
 f     AST_WRITE
-*     method will return zero if the write operation would required the use
-*     of the -TAB algorithm, and the
+*     method will return zero if the write operation would required the
+*     use of the -TAB algorithm, and the
 c     astRead
 f     AST_READ
 *     method will return
@@ -36783,8 +36805,9 @@ c     a NULL pointer
 f     AST__NULL
 *     if any axis in the supplied header uses the -TAB algorithm.
 
-*     If TabOK is set non-zero, these methods will recognise and convert axes
-*     described by the -TAB algorithm, as follows:
+*     If TabOK is set to a non-zero positive integer, these methods will
+*     recognise and convert axes described by the -TAB algorithm, as
+*     follows:
 *
 c     The astWrite
 f     The AST_WRITE
@@ -36808,9 +36831,10 @@ f     AST_GETTABLES
 *     vector(s) will be in columns named "INDEX<i>" (where <i> is the index
 *     of the corresponding FITS WCS  axis). Note, index vectors are only
 *     created if required. The EXTNAME value will be set to the value of the
-*     AST__TABEXTNAME constant (currently "WCS-TAB"). No values will be
-*     stored for the EXTVER and EXTLEVEL headers, and should therefore be
-*     considered to default to 1.
+*     AST__TABEXTNAME constant (currently "WCS-TAB"). The EXTVER header
+*     will be set to the positive integer value assigned to the TabOK
+*     attribute. No value will be stored for the EXTLEVEL header, and should
+*     therefore be considered to default to 1.
 *
 c     The astRead
 f     The AST_READ
@@ -36848,10 +36872,10 @@ f     AST_READ. Note, currently AST_READ
 *        All FitsChans have this attribute.
 *att--
 */
-astMAKE_CLEAR(FitsChan,TabOK,tabok,-1)
-astMAKE_GET(FitsChan,TabOK,int,0,(this->tabok == -1 ? 0 : this->tabok))
-astMAKE_SET(FitsChan,TabOK,int,tabok,( value ? 1 : 0 ))
-astMAKE_TEST(FitsChan,TabOK,( this->tabok != -1 ))
+astMAKE_CLEAR(FitsChan,TabOK,tabok,-INT_MAX)
+astMAKE_GET(FitsChan,TabOK,int,0,(this->tabok == -INT_MAX ? 0 : this->tabok))
+astMAKE_SET(FitsChan,TabOK,int,tabok,value)
+astMAKE_TEST(FitsChan,TabOK,( this->tabok != -INT_MAX ))
 
 /* CarLin */
 /* ====== */
@@ -37590,7 +37614,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /* ----- */
    set = TestTabOK( this, status );
    ival = set ? GetTabOK( this, status ) : astGetTabOK( this );
-   astWriteInt( channel, "TabOK", set, 1, ival, (ival ? "Support -TAB CTYPE codes": "Do not support -TAB CTYPE codes") );
+   astWriteInt( channel, "TabOK", set, 1, ival, ( ival > 0 ? "EXTVER value for -TAB headers": "Do not support -TAB CTYPE codes") );
 
 /* CDMatrix */
 /* -------- */
@@ -38411,7 +38435,7 @@ AstFitsChan *astInitFitsChan_( void *mem, size_t size, int init,
       new->keyseq = NULL;
       new->keywords = NULL;
       new->defb1950 = -1;
-      new->tabok = -1;
+      new->tabok = -INT_MAX;
       new->cdmatrix = -1;
       new->carlin = -1;
       new->iwc = -1;
@@ -38616,7 +38640,7 @@ AstFitsChan *astLoadFitsChan_( void *mem, size_t size,
 
 /* TabOK */
 /* ----- */
-      new->tabok = astReadInt( channel, "tabok", -1 );
+      new->tabok = astReadInt( channel, "tabok", -INT_MAX );
       if ( TestTabOK( new, status ) ) SetTabOK( new, new->tabok, status );
 
 /* CDMatrix */

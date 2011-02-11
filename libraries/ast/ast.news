@@ -1,6 +1,6 @@
 AST Library
 -----------
-   A new release (V5.4) of the Starlink AST (astrometry) library is
+   A new release (V5.5) of the Starlink AST (astrometry) library is
 now available.
 
    AST provides a comprehensive range of facilities for attaching
@@ -15,6 +15,21 @@ environment-independent.
 
 Main Changes in this Version
 ----------------------------
+
+- The FitsChan "TabOK" attribute is now an integer value rather
+than a boolean value. As in previous versions, it is used to indicate
+whether the "-TAB" algorithm should be supported by the astRead
+(AST_READ) and astWrite (AST_WRITE) methods, but in addition it is now
+also used to give the version number to assign to any table gebnerated as
+a consequence of calling astWrite (AST_WRITE).  A negative or zero value
+(the default) indicates that support for the -TAB algorithm is not
+available, where as a positive non-zero value indicates that support is
+available and also gives the table version number to use when creating
+subsequent -TAB headers.
+
+
+Main Changes in V5.4-0
+-----------------------
 
 - The FitsChan class now has an option to support reading and writing
 of FITS-WCS headers that use the -TAB algorithm described in FITS-WCS paper

@@ -334,7 +334,7 @@ c      call ast_activememory( 'testtable' )
          call stopit( status, 'Cannot read object from channel' )
       end if
 
-      if( .not. ast_isatable( result ) ) then
+      if( .not. ast_isatable( result, status ) ) then
          call stopit( status, 'Object read from channel is not a table')
       end if
 
