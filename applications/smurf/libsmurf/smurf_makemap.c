@@ -1544,7 +1544,7 @@ void smurf_makemap( int *status ) {
 
       /* Write WCS */
       if (wcstile2d) {
-	smf_set_moving(wcstile2d,status);
+	smf_set_moving(wcstile2d,fchan,status);
 	ndfPtwcs( wcstile2d, ondf, status );
       }
 
@@ -1779,7 +1779,7 @@ void smurf_makemap( int *status ) {
     }
 
     /* Write WCS */
-    smf_set_moving(outfset,status);
+    smf_set_moving(outfset,fchan,status);
     ndfPtwcs( outfset, ondf, status );
 
     /* Set bad bits mask to enable QUALITY. We can have quality bits set

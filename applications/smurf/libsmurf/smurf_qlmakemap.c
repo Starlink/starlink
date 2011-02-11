@@ -583,7 +583,7 @@ void smurf_qlmakemap( int *status ) {
   }
 
   /* Write WCS FrameSet to output file */
-  smf_set_moving( outframeset, status );
+  smf_set_moving( outframeset, fchan, status );
   ndfPtwcs( outframeset, ondf, status );
 
   /* write units - hack we do not have a smfHead */

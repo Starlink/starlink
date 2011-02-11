@@ -13,11 +13,15 @@
 *     Library routine
 
 *  Invocation:
-*     smf_set_moving( AstFrameSet * wcs, int *status);
+*     smf_set_moving( AstFrameSet * wcs, AstFitsChan *fchan, int *status);
 
 *  Arguments:
 *     wcs = AstFrameSet * (Given and Returned)
 *        World coordinate system information to be checked and modified.
+*     fchan = AstFitsChan * (Given and Returned)
+*        If the source is moving but no BASECx header is present, they
+*        will be constructed from the frameset reference position. Can
+*        be NULL.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -26,7 +30,8 @@
 *     FrameSet and sets the SkyRefIs and AlignOffset attributes to the
 *     appropriate values for objects which have a moving BASE position
 *     (e.g. planets). The routine performs no action if the SYSTEM is
-*     not AZEL or GAPPT.
+*     not AZEL or GAPPT. BASECx headers are written to the FitsChan
+*     for moving sources if they are not present already.
 
 *  Notes:
 
@@ -37,9 +42,12 @@
 *  History:
 *     2008-08-27 (AGG):
 *        Original version
+*     2011-02-09 (TIMJ):
+*        Add Fitschan to fill in BASECx
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2011 Science & Technology Facilities Council.
 *     Copyright (C) 2008 University of British Columbia. All
 *     Rights Reserved.
 
@@ -76,6 +84,7 @@
 #include "prm_par.h"
 #include "par.h"
 #include "ast.h"
+#include "star/atl.h"
 
 /* SMURF includes */
 #include "smf.h"
@@ -84,7 +93,7 @@
 
 #define FUNC_NAME "smf_set_moving"
 
-void smf_set_moving ( AstFrameSet* wcs, int *status ) {
+void smf_set_moving ( AstFrameSet* wcs, AstFitsChan * fchan, int *status ) {
 
   /* Local variables */
   const char *astsys = NULL;    /* Name of AST-supported coordinate system */
@@ -99,6 +108,19 @@ void smf_set_moving ( AstFrameSet* wcs, int *status ) {
 	msgOutif( MSG__DEBUG, "",
 		  "SMF_SET_MOVING: setting attributes for moving sources", status );
 	astSet( wcs, "SkyRefIs=Origin,AlignOffset=1" );
+
+        if (fchan && strcmp(astsys, "GAPPT" ) == 0 ) {
+          double dtemp = 0.0;
+          /* If we are missing one of the BASE headers add in new versions
+             with the base position from the frameset */
+          if (!astGetFitsF( fchan, "BASEC1", &dtemp ) ||
+              !astGetFitsF( fchan, "BASEC2", &dtemp ) ) {
+            atlPtftd( fchan, "BASEC1", AST__DR2D * astGetD( wcs, "SkyRef(1)"),
+                      "C1 BASE position", status);
+            atlPtftd( fchan, "BASEC2", AST__DR2D * astGetD( wcs, "SkyRef(2)"),
+                      "C2 BASE position", status);
+          }
+        }
       }
     }
   } else {

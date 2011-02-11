@@ -181,7 +181,7 @@ void smf_write_flagmap( smf_qual_t mask, smfArray *lut, smfArray *qua,
   }
 
   /* Write WCS */
-  smf_set_moving(outfset,status);
+  smf_set_moving(outfset,NULL,status);
   ndfPtwcs( outfset, mapdata->file->ndfid, status );
 
   /* Clean up */

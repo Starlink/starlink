@@ -252,7 +252,7 @@ void smf_write_bolomap( smfArray *ast, smfArray *res, smfArray *lut,
           qua_data[k*bstride] = SMF__Q_BADB;
 
           /* Write WCS */
-          smf_set_moving(outfset,status);
+          smf_set_moving(outfset,NULL,status);
           ndfPtwcs( outfset, mapdata->file->ndfid, status );
 
           /* Clean up */
