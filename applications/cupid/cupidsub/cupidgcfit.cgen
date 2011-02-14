@@ -13,7 +13,7 @@
 
 /* Global Variables: */
 /* ================= */
-/* A structure holding the global parameters of the GaussClump algorithm 
+/* A structure holding the global parameters of the GaussClump algorithm
    needed by this function. These are set by function cupidGaussClumps. */
 extern CupidGC cupidGC;
 
@@ -42,18 +42,18 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
 *  Parameters:
 *     res
 *        Pointer to the start of the 1D array containing the current
-*        residuals. 
+*        residuals.
 *     imax
-*        The index within the supplied array of the element with the largest 
-*        value. 
-*     x 
+*        The index within the supplied array of the element with the largest
+*        value.
+*     x
 *        A pointer to an array containing the initial guess at the
 *        Gaussian parameters. The array is returned holding the best fit
 *        parameter values. How many of these are used depends on the number
-*        of pixel axes in the data "ndim": if ndim is 1 only elements 0 to 
+*        of pixel axes in the data "ndim": if ndim is 1 only elements 0 to
 *        3 are used, if ndim is 2 only elements 0 to 6 are used, if ndim
-*        is 3 all elements are used. All axis values are represented in GRID 
-*        pixels: 
+*        is 3 all elements are used. All axis values are represented in GRID
+*        pixels:
 *
 *           x[0]: Peak intensity of clump ("a0" in Stutski & Gusten)
 *           x[1]: Constant intensity offset ("b0" in Stutski & Gusten)
@@ -64,11 +64,11 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
 *           x[6]: Spatial orientation angle ("phi" in Stutski & Gusten)
 *                 In rads, positive from +ve GRID1 axis to +ve GRID2 axis.
 *           x[7]: Model centre on velocity axis ("v_0" in Stutski & Gusten)
-*           x[8]: Intrinsic FWHM on velocity axis ("D_xi_v" in Stutski & 
+*           x[8]: Intrinsic FWHM on velocity axis ("D_xi_v" in Stutski &
 *                                                   Gusten)
-*           x[9]: Axis 0 of internal velocity gradient vector ("alpha_0" 
+*           x[9]: Axis 0 of internal velocity gradient vector ("alpha_0"
 *                 in Stutski & Gusten), in vel. pixels per spatial pixel.
-*           x[10]: Axis 1 of internal velocity gradient vector ("alpha_1" 
+*           x[10]: Axis 1 of internal velocity gradient vector ("alpha_1"
 *                 in Stutski & Gusten), in vel. pixels per spatial pixel.
 *     chisq
 *        A pointer to a location at which to return the chi-squared
@@ -80,12 +80,12 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
 *     Non-zero if the fit was succesfully completed.
 
 *  Notes:
-*     - The peak intensity and background offset values returned in "x" 
+*     - The peak intensity and background offset values returned in "x"
 *     are in units of the RMS noise within the data.
-*     - This function can be invoked using the generic cupidGCFit macro 
-*     defined in cupid.h. This macro has the same parameter list as 
-*     cupidGCFit<X> except that an extra parameter is added to the start 
-*     of the parameter list indicating the data type of the specific 
+*     - This function can be invoked using the generic cupidGCFit macro
+*     defined in cupid.h. This macro has the same parameter list as
+*     cupidGCFit<X> except that an extra parameter is added to the start
+*     of the parameter list indicating the data type of the specific
 *     cupidGCFit... function to be invoked. This extra parameter should
 *     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.
 
@@ -146,7 +146,7 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
    if( *status != SAI__OK ) return ret;
 
 /* Set the number of parameters for the Gaussian, depending on the
-   dimensionality of the data. Also, set up an array of scale values 
+   dimensionality of the data. Also, set up an array of scale values
    for each parameter being fitted. */
    if( cupidGC.ndim == 1 ) {
       n = CUPID__GCNP1;
@@ -158,9 +158,9 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
       n = CUPID__GCNP3;
    }
 
-/* If the background level is to remain fixed at its initial value (i.e. be 
-   excluded from the fitting process) move the background level to the end 
-   of the array of parameter values and reduce the number of free parameters 
+/* If the background level is to remain fixed at its initial value (i.e. be
+   excluded from the fitting process) move the background level to the end
+   of the array of parameter values and reduce the number of free parameters
    by one. */
    bg = x[ 1 ];
    if( cupidGC.fixback ) {
@@ -170,7 +170,7 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
    }
 
 /* This block of code is used for testing the calculation of gradients by
-   cupidGCcalg. Uncomment it when debugging gradient mis-calculations.  
+   cupidGCcalg. Uncomment it when debugging gradient mis-calculations.
    {  double f;
       double f0;
       double g[ CUPID__GCNP3 ];
@@ -191,15 +191,15 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
          x[ i ] += dx;
          cupidGCcalcf( n, x, &nf, &f, status );
          printf("Par %d: %g %g %g %g\n", i, f, f0, f - f0, dx );
-         printf("        %g %g\n", (f - f0)/dx, g[ i ] ); 
+         printf("        %g %g\n", (f - f0)/dx, g[ i ] );
          x[ i ] -= dx;
          getchar();
 
       }
       getchar();
-      
+
       cupidGC.nwf = nwf;
-       
+
    }
 */
 
@@ -218,7 +218,7 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
 
 /* If false convergence was flagged, try the minimisation again, starting
    the process using the parameter values found by the first call (except
-   that the original background value is re-instated), but preventing any 
+   that the original background value is re-instated), but preventing any
    changes to the weights this time. */
    if( iv[ 0 ] == 8 ) {
       int nwf;
@@ -279,7 +279,7 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
       }
    }
 
-/* If the background level was kept fixed at its initial value move the 
+/* If the background level was kept fixed at its initial value move the
    background level back to its original position in "x". */
    if( cupidGC.fixback ) {
       for( ip = n; ip > 1; ip-- ) x[ ip ] = x[ ip - 1 ];
@@ -290,5 +290,5 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
    *chisq = v[ 9 ];
 
 /* Return the result */
-   return ret;  
+   return ret;
 }
