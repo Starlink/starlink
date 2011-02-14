@@ -933,6 +933,14 @@ f     - AST_TESTFITS: Test if a keyword has a defined value in a FitsChan
 *        the -TAB algorithm is not supported. This is so that there is
 *        some way of having multiple binary table extensions with the same
 *        name (but different EXTVER values).
+*     14-FEB-2011 (DSB):
+*        - Spectral reference point CRVAL records the obs. centre. So for -TAB
+*        (when CRVAL is set to zero) we need to record the obs centre some
+*        other way (use the AST-specific AXREF keywords, as for spatial axes).
+*        - Whether to scale spatial axes from degs to rads depends on
+*        whether the spatial axes are descirbed by -TAB or not.
+
+ Change meaning of TabOK attribute. It is no longer a simple
 *class--
 */
 
@@ -1480,8 +1488,8 @@ static AstMapping *NonLinSpecWcs( AstFitsChan *, char *, FitsStore *, int, char,
 static AstMapping *OtherAxes( AstFitsChan *, AstFrameSet *, double *, int *, char, FitsStore *, double *, int *, const char *, const char *, int * );
 static AstMapping *SIPMapping( FitsStore *, char, int, const char *, const char *, int * );
 static AstMapping *SpectralAxes( AstFitsChan *, AstFrameSet *, double *, int *, char, FitsStore *, double *, int *, const char *, const char *, int * );
-static AstMapping *TabMapping( AstFitsChan *, FitsStore *, char, const char *, const char *, int *);
-static AstMapping *WcsCelestial( AstFitsChan *, FitsStore *, char, AstFrame **, AstFrame *, double *, double *, AstSkyFrame **, AstMapping **, const char *, const char *, int * );
+static AstMapping *TabMapping( AstFitsChan *, FitsStore *, char, int **, const char *, const char *, int *);
+static AstMapping *WcsCelestial( AstFitsChan *, FitsStore *, char, AstFrame **, AstFrame *, double *, double *, AstSkyFrame **, AstMapping **, int *, const char *, const char *, int * );
 static AstMapping *WcsIntWorld( AstFitsChan *, FitsStore *, char, int, const char *, const char *, int * );
 static AstMapping *WcsMapFrm( AstFitsChan *, FitsStore *, char, AstFrame **, const char *, const char *, int * );
 static AstMapping *WcsNative( AstFitsChan *, FitsStore *, char, AstWcsMap *, int, int, const char *, const char *, int * );
@@ -4451,7 +4459,7 @@ static AstMapping *CelestialAxes( AstFitsChan *this, AstFrameSet *fs, double *di
    just store the sky reference point coords (in degs) in keywords
    AXREFn, and use 1.0 for the CRVAL values, so that IWC becomes equal
    to (psi-1) i.e. (grid coords - 1). This means the reference point is
-   at grid coords (1.0,1.0). Note this choise of 1.0 for CRVAL is not
+   at grid coords (1.0,1.0). Note this choice of 1.0 for CRVAL is not
    arbitrary since it is required by the trick used to create invertable CD
    matrix in function MakeInvertable. */
                } else {
@@ -26128,7 +26136,9 @@ static AstMapping *SpectralAxes( AstFitsChan *this, AstFrameSet *fs,
 
 /* The values stored in the table index vector are GRID coords. So we
    need to ensure that IWC are equivalent to GRID coords. So set CRVAL
-   to zero. */
+   to zero. First store the original CRVAL value (which gives the
+   observation centre) in AXREF. */
+                  SetItem( &(store->axref), fits_i, 0, s, crval, status );
                   crval = 0.0;
 
 /* Store TAB-specific values in the FitsStore. First the name of the
@@ -28916,8 +28926,8 @@ f     pointer.
 }
 
 static AstMapping *TabMapping( AstFitsChan *this, FitsStore *store, char s,
-                               const char *method, const char *class,
-                               int *status ) {
+                               int **tabaxis, const char *method,
+                               const char *class, int *status ) {
 
 /*
 *  Name:
@@ -28931,10 +28941,9 @@ static AstMapping *TabMapping( AstFitsChan *this, FitsStore *store, char s,
 
 *  Synopsis:
 *     #include "fitschan.h"
-
 *     AstMapping *TabMapping( AstFitsChan *this, FitsStore *store, char s,
-*                             const char *method, const char *class,
-*                             int *status )
+*                             int **tabaxis, const char *method,
+*                             const char *class, int *status )
 
 *  Class Membership:
 *     FitsChan member function.
@@ -28960,6 +28969,12 @@ static AstMapping *TabMapping( AstFitsChan *this, FitsStore *store, char s,
 *        A character identifying the co-ordinate version to use. A space
 *        means use primary axis descriptions. Otherwise, it must be an
 *        upper-case alphabetical characters ('A' to 'Z').
+*     tabaxis
+*        Address of a location at which to store a pointer to an array of
+*        flags, one for each output of the returned Mapping. A flag will
+*        be non-zero if the corresponding output of the returned Mapping
+*        corresponds to a -TAB axis. A NULL pointer is returned if the
+*        returned Mapping is NULL.
 *     method
 *        A pointer to a string holding the name of the calling method.
 *        This is used only in the construction of error messages.
@@ -29008,14 +29023,15 @@ static AstMapping *TabMapping( AstFitsChan *this, FitsStore *store, char s,
    int unit;
    int wcsaxes;
 
-/* Check the global status. */
-   ret = NULL;
-   if( !astOK ) return ret;
-
 /* Initialise */
+   ret = NULL;
+   *tabaxis = NULL;
    extname = NULL;
    tmap0 = NULL;
    tmap2 = NULL;
+
+/* Check the global status. */
+   if( !astOK ) return ret;
 
 /* Obtain the number of physical axes in the header. If the WCSAXES header
    was specified, use it. Otherwise assume it is the same as the number
@@ -29033,6 +29049,10 @@ static AstMapping *TabMapping( AstFitsChan *this, FitsStore *store, char s,
 
 /* Create a KeyMap to hold a list of the used extension names. */
       used_tables = astKeyMap( " ", status );
+
+/* Allocate memory to indicate if each WCS axis is described by a -TAB
+   algorithm or not. Initialiss it to zero. */
+      *tabaxis = astCalloc( wcsaxes, sizeof( int ), 1 );
 
 /* Allocate memory to hold the FITS-WCS axis index corresponding to each
    input of the "tmap0" Mapping. Indicate that as yet, not values are
@@ -29273,6 +29293,9 @@ static AstMapping *TabMapping( AstFitsChan *this, FitsStore *store, char s,
                   strcpy( name + 4, ctype + 8 );
                   SetItemC( &(store->ctype), iaxis, 0, s, name, status );
 
+/* Set the returned flag for this axis. */
+                  (*tabaxis)[ iaxis ] = 1;
+
 /* If the FITS WCS axis "iaxis" does not use a -TAB algorithm, describe
    it in the returned Mapping using a 1D UnitMap. */
                } else {
@@ -29343,6 +29366,10 @@ static AstMapping *TabMapping( AstFitsChan *this, FitsStore *store, char s,
 
 /* Delete the KeyMap holding the used table names. */
       used_tables = astAnnul( used_tables );
+
+/* If we are not returning a Mapping, ensure we do not return any axis
+   flags either. */
+      if( !ret ) *tabaxis = astFree( *tabaxis );
    }
 
 /* Return the result */
@@ -30524,7 +30551,8 @@ static AstMatrixMap *WcsCDeltMatrix( FitsStore *store, char s, int naxes,
 static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
                                  AstFrame **frm, AstFrame *iwcfrm, double *reflon, double *reflat,
                                  AstSkyFrame **reffrm, AstMapping **tabmap,
-                                 const char *method, const char *class, int *status ){
+                                 int *tabaxis, const char *method,
+                                 const char *class, int *status ){
 
 /*
 *  Name:
@@ -30542,7 +30570,8 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
 *     AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
 *                               AstFrame **frm, AstFrame *iwcfrm, double *reflon, double *reflat,
 *                               AstSkyFrame **reffrm, , AstMapping **tabmap,
-*                               const char *method, const char *class, int *status )
+*                               int *tabaxis, const char *method,
+*                               const char *class, int *status )
 
 *  Class Membership:
 *     FitsChan
@@ -30591,7 +30620,11 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
 *        transformations to be applied to the results of the Mapping returned
 *        by this function. If any celestial axes are found, the supplied
 *        Mapping is modified so that the celestial axes produce values in
-*        radians rather than degrees.
+*        radians rather than degrees. NULL if no axes are described by -TAB.
+*     tabaxis
+*        Pointer to an array of flags, one for each WCS axis, indicating
+*        if the corresponding WCS axis is described by the -TAB algorithm.
+*        NULL if no axes are described by -TAB.
 *     method
 *        A pointer to a string holding the name of the calling method.
 *        This is used only in the construction of error messages.
@@ -31123,16 +31156,15 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
 
 /* Set the units in the supplied IWC Frame for the longitude and latitude
    axes. Unless using -TAB, these are degrees (the conversion from degs to
-   rads is part of the Mapping fronm IWC to WCS). If using -TAB the units
+   rads is part of the Mapping from IWC to WCS). If using -TAB the units
    are unknown. */
-      if( !tabmap || !*tabmap ) {
-         astSetUnit( iwcfrm, axlon, "deg" );
-         astSetUnit( iwcfrm, axlat, "deg" );
-      }
+      if( !tabaxis || !tabaxis[ axlon ] ) astSetUnit( iwcfrm, axlon, "deg" );
+      if( !tabaxis || !tabaxis[ axlat ] ) astSetUnit( iwcfrm, axlat, "deg" );
 
 /* Modify any supplied tabmap so that the celestial outputs create
-   radians rather than degrees. */
-      if( tabmap && *tabmap ) {
+   radians rather than degrees (but only if the celestial axes are
+   generated by the -TAB algorithm). */
+      if( tabaxis && tabaxis[ axlon ] && tabaxis[ axlat ] ) {
          mat = (double *) astMalloc( sizeof(double)*naxes );
          if( mat ){
             for( i = 0; i < naxes; i++ ){
@@ -32537,6 +32569,7 @@ static AstMapping *WcsMapFrm( AstFitsChan *this, FitsStore *store, char s,
 /* Local Variables: */
    AstFrame *iwcfrm;         /* Frame defining IWC system */
    AstFrameSet *fs;          /* Pointer to returned FrameSet */
+   AstMapping *map10;        /* Pointer to a Mapping */
    AstMapping *map1;         /* Pointer to a Mapping */
    AstMapping *map2;         /* Pointer to a Mapping */
    AstMapping *map3;         /* Pointer to a Mapping */
@@ -32546,17 +32579,17 @@ static AstMapping *WcsMapFrm( AstFitsChan *this, FitsStore *store, char s,
    AstMapping *map7;         /* Pointer to a Mapping */
    AstMapping *map8;         /* Pointer to a Mapping */
    AstMapping *map9;         /* Pointer to a Mapping */
-   AstMapping *map10;        /* Pointer to a Mapping */
    AstMapping *ret;          /* Pointer to the returned Mapping */
    AstMapping *tabmap;       /* Mapping from psi to WCS (paper III - 6.1.2) */
    AstSkyFrame *reffrm;      /* SkyFrame defining reflon and reflat */
-   char iwc[5];              /* Domain name for IWC Frame */
    char id[2];               /* ID string for returned Frame */
+   char iwc[5];              /* Domain name for IWC Frame */
    const char *cc;           /* Pointer to Domain */
    double dut1;              /* UT1-UTC correction in days */
    double dval;              /* Temporary double value */
    double reflat;            /* Reference celestial latitude */
    double reflon;            /* Reference celestial longitude */
+   int *tabaxis;             /* Flags indicating -TAB axes */
    int wcsaxes;              /* Number of physical axes */
 
 /* Initialise the pointer to the returned Mapping. */
@@ -32571,7 +32604,7 @@ static AstMapping *WcsMapFrm( AstFitsChan *this, FitsStore *store, char s,
    Mapping (which includes one or more LutMaps) that should be applied to
    the resulting linear axis values in order to generate the final WCS
    axis values. A NULL pointer is returned if no axes use -TAB. */
-   tabmap = TabMapping( this, store, s, method, class, status );
+   tabmap = TabMapping( this, store, s, &tabaxis, method, class, status );
 
 /* Obtain the number of physical axes in the header. If the WCSAXES header
    was specified, use it. Otherwise assume it is the same as the number
@@ -32629,7 +32662,7 @@ static AstMapping *WcsMapFrm( AstFitsChan *this, FitsStore *store, char s,
    unchanged by the Mapping. It also modifies the Frame so that a
    SkyFrame is used to describe the celestial axes. */
    map2 = WcsCelestial( this, store, s, frm, iwcfrm, &reflon, &reflat,
-                        &reffrm, &tabmap, method, class, status );
+                        &reffrm, &tabmap, tabaxis, method, class, status );
 
 /* Spectral coordinate axes. The following call returns a Mapping which
    transforms any spectral coordinate axes from intermediate world
@@ -32695,6 +32728,7 @@ static AstMapping *WcsMapFrm( AstFitsChan *this, FitsStore *store, char s,
 /* Annull temporary resources. */
    if( reffrm ) reffrm = astAnnul( reffrm );
    if( tabmap ) tabmap = astAnnul( tabmap );
+   tabaxis = astFree( tabaxis );
    iwcfrm = astAnnul( iwcfrm );
    map1 = astAnnul( map1 );
    map2 = astAnnul( map2 );
@@ -34252,6 +34286,7 @@ static AstMapping *WcsSpectral( AstFitsChan *this, FitsStore *store, char s,
    double geolon;         /* Observer's geodetic longitude */
    double h;              /* Observer's geodetic height */
    double mjd;            /* Modified Julian Date */
+   double obscentre;      /* Spectral value at observation centre */
    double obsgeo[ 3 ];    /* Observer's Cartesian position */
    double restfrq;        /* RESTFRQ keyword value */
    double vsource;        /* Source velocity */
@@ -34369,12 +34404,22 @@ static AstMapping *WcsSpectral( AstFitsChan *this, FitsStore *store, char s,
             cname = GetItemC( &(store->cname), i, 0, s, NULL, method, class, status );
             if( cname ) astSetLabel( specfrm, 0, cname );
 
+/* If the header contains an AXREF value for the spectral axis, use it as the
+   observation centre in preferences to the CRVAL value. AXREF keywords are
+   created by the astWrite method for axes described by -TAB algorithm that
+   have no inverse transformation. */
+            obscentre = GetItem( &(store->axref), i, 0, s, NULL, method,
+                                  class, status );
+            if( obscentre == AST__BAD ) {
+               obscentre = GetItem( &(store->crval), i, 0, s, NULL, method,
+                                    class, status );
+            }
+
 /* Now do the extra stuff needed if we are creating a dual sideband
    SpecFrame. */
             if( astIsADSBSpecFrame( specfrm ) ) {
                DSBSetUp( this, store, (AstDSBSpecFrame *) specfrm, s,
-                         GetItem( &(store->crval), i, 0, s, NULL, method,
-                                  class, status ), method, class, status );
+                         obscentre, method, class, status );
             }
 
 /* Now branch for each type of algorithm code. Each case returns a 1D
