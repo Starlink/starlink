@@ -120,6 +120,8 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
 *        Original version.
 *     14-JAN-2009 (TIMJ):
 *        Use MERS for message filtering.
+*     14-FEB-2011 (DSB):
+*        Ensure returned spatial position angle is in the range +/- PI.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -262,6 +264,14 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
                    "   pdaSumsl returned NaN parameters", status );
          break;
       }
+   }
+
+/* Ensure the spatial position angle is in the range +/- PI */
+   x[ 6 ] = fmod( x[ 6 ], 2*AST__DPI );
+   if( x[ 6 ] > 0.0 ) {
+      if( x[ 6 ] > AST__DPI ) x[ 6 ] -= 2*AST__DPI;
+   } else {
+      if( x[ 6 ] < -AST__DPI ) x[ 6 ] += 2*AST__DPI;
    }
 
 /* Check the size of the fitted model is significant. */
