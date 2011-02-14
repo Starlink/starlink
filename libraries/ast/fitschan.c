@@ -939,8 +939,9 @@ f     - AST_TESTFITS: Test if a keyword has a defined value in a FitsChan
 *        other way (use the AST-specific AXREF keywords, as for spatial axes).
 *        - Whether to scale spatial axes from degs to rads depends on
 *        whether the spatial axes are descirbed by -TAB or not.
-
- Change meaning of TabOK attribute. It is no longer a simple
+*        - Relax the linearity requirement in IsMapLinear by a factor of
+*        10 to prevent a change in rest frame resulting in a non-linear
+*        mapping.
 *class--
 */
 
@@ -17061,7 +17062,7 @@ static int IsMapLinear( AstMapping *smap, const double lbnd_in[],
    coord produced by the actual Mapping should be less than some small
    fraction of the total range of input coord value, at every point. Test
    this. */
-                  tol = 1.0E-8*( in_ubnd - in_lbnd );
+                  tol = 1.0E-7*( in_ubnd - in_lbnd );
                   for( j = 0; j < NP; j++ ) {
                      if( fabs( p[ j ] ) > tol ) {
                         ret = 0;
