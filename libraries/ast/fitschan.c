@@ -942,6 +942,8 @@ f     - AST_TESTFITS: Test if a keyword has a defined value in a FitsChan
 *        - Relax the linearity requirement in IsMapLinear by a factor of
 *        10 to prevent a change in rest frame resulting in a non-linear
 *        mapping.
+*     17-FEB-2011 (DSB):
+*        Fix bug in axis linearity check (IsMapLinear).
 *class--
 */
 
@@ -16896,10 +16898,28 @@ static int IsMapLinear( AstMapping *smap, const double lbnd_in[],
    astInvert( smap );
    ins = astMapSplit( smap, 1, &coord_out, &map );
    astInvert( smap );
+
+/* If successful, check that the output is fed by only one input. */
    if( ins ) {
-      astInvert( map );
-      coord_out = 0;
+      if( astGetNin( map ) == 1 ) {
+
+/* If so, invert the map so that it goes from pixel to wcs, and then
+   modify the supplied arguments so that they refer to the single required
+   axis. */
+         astInvert( map );
+         lbnd_in += coord_out;
+         ubnd_in += coord_out;
+         coord_out = 0;
+
+/* If the output was fed by more than one input, annul the split mapping
+   and use the supplied nmapping. */
+      } else {
+         (void) astAnnul( map );
+         map = astClone( smap );
+      }
       ins = astFree( ins );
+
+/* If the supplied Mapping could not be split, use the supplied nmapping. */
    } else {
       map = astClone( smap );
    }
