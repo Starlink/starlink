@@ -116,10 +116,12 @@
 *        Revert to concatenation method, but now smf_grp_related and
 *        smf_concat_smfGroup properly handle 4d FFT data so that no
 *        concatenation happens for inverse tranforms.
+*     2011-02-17 (TIMJ):
+*        Use AVPSPECTHRESH rather than simply ignoring it.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008-2010 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2011 Science and Technology Facilities Council.
 *     Copyright (C) 2008-2010 University of British Columbia.
 *     All Rights Reserved.
 
@@ -373,7 +375,7 @@ void smurf_sc2fft( int *status ) {
               newgood=0;
               for( i=0; i<nbolo; i++ ) {
                 if( whitenoise[i] != VAL__BADD ){
-                  if( (whitenoise[i] - mean) > 3.*sig ) {
+                  if( (whitenoise[i] - mean) > avpspecthresh *sig ) {
                     whitenoise[i] = VAL__BADD;
                     bolomask[i] = SMF__Q_BADB;
                   } else {
