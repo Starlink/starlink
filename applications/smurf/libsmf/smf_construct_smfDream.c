@@ -211,7 +211,7 @@ smfDream *smf_construct_smfDream( smfData *data, size_t nvert,
 		/* First, the grid weights array */
 		ndfid = smf_get_ndfid(drmloc, "GRIDWTS", "READ", "OLD", "", 0,
 				      NULL, NULL, status);
-		smf_open_ndf( ndfid, "READ", weightsfile, SMF__DOUBLE,
+		smf_open_ndf( ndfid, "READ", SMF__DOUBLE,
                               &griddata, status);
 		if ( griddata != NULL ) {
 		  nelem = (size_t)((griddata->dims)[0] * (griddata->dims)[1]);
@@ -227,7 +227,7 @@ smfDream *smf_construct_smfDream( smfData *data, size_t nvert,
 		/* Then the inverse matrix */
 		ndfid = smf_get_ndfid(drmloc, "INVMATX", "READ", "OLD", "", 0,
 				      NULL, NULL, status);
-		smf_open_ndf( ndfid, "READ", weightsfile, SMF__DOUBLE, &griddata, status);
+		smf_open_ndf( ndfid, "READ", SMF__DOUBLE, &griddata, status);
 		if ( griddata != NULL ) {
 		  nelem = (size_t)((griddata->dims)[0]);
 		  invmatx = astCalloc( nelem, sizeof(double), 1 );
@@ -242,7 +242,7 @@ smfDream *smf_construct_smfDream( smfData *data, size_t nvert,
 		/* Now for the gridpts array */
 		ndfid = smf_get_ndfid(drmloc, "GRIDEXT", "READ", "OLD", "", 0,
 				      NULL, NULL, status);
-		smf_open_ndf( ndfid, "READ", weightsfile, SMF__INTEGER, &griddata, status);
+		smf_open_ndf( ndfid, "READ", SMF__INTEGER, &griddata, status);
 		if ( griddata != NULL ) {
 		  gridiptr = (griddata->pntr)[0];
 		  gridxmin = gridiptr[0];

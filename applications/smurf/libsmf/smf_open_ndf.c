@@ -4,7 +4,7 @@
 *     smf_open_ndf
 
 *  Purpose:
-*     Low-level NDF access function
+*     Maps a previously opened NDF into a smfData
 
 *  Language:
 *     Starlink ANSI C
@@ -14,7 +14,6 @@
 
 *  Invocation:
 *     smf_open_ndf( const int newndf, const char accmode[],
-*                   const char filename[]
 *		    smf_dtype dtype, smfData **ndfdata, * int *status);
 
 *  Arguments:
@@ -22,23 +21,23 @@
 *        NDF identififer for the requested NDF
 *     accmode = const char[] (Given)
 *        Access mode for data array (READ, WRITE or UPDATE)
-*     filename = const char[] (Given)
-*        Name of disk file which holds the requested NDF
 *     dtype = smf_dtype (Given)
-*        Data type (see smf_typ.h)
+*        Data type to use when mapping the data (see smf_typ.h)
 *     ndfdata = smfData** (Returned)
 *        Output smfData with mapped access to requested NDF
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
 *  Description:
-*     This routine opens a specified NDF within an already-opened file
-*     associated with a smfData. A new smfData is returned with the
-*     DATA array mapped. Returns a NULL smfData on error.
+*     This routine takes an identifier from a previously opened NDF
+*     and populates a minimal smfData with the data mapped with the
+*     specified data type and access mode.
+*     Returns a NULL smfData on error.
 
 *  Notes:
 *     - Only the DATA component of the NDF is mapped. Including the VARIANCE
 *       and QUALITY components is not beyond the realms of possibility.
+*     - Does not read the header information.
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -56,10 +55,14 @@
 *     2010-09-17 (COBA):
 *        - Updated smf_construct_smfData which now contains smfFts
 *        - Updated flags with SMF__NOCREATE_FTS
+*     2011-02-17 (TIMJ):
+*        Fix docs and remove filename argument. The filename was
+*        not being passed in properly and can be derived from the NDF
+*        identifier.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2009,2011 Science & Technology Facilities Council.
 *     Copyright (C) 2006 University of British Columbia
 *     and the Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
@@ -108,7 +111,6 @@
 #define FUNC_NAME "smf_open_ndf"
 
 void smf_open_ndf( const int newndf, const char accmode[],
-                   const char filename[],
                    smf_dtype dtype, smfData **ndfdata, int *status) {
 
   /* Local variables */
@@ -167,7 +169,7 @@ void smf_open_ndf( const int newndf, const char accmode[],
   ndfBound( newndf, NDF__MXDIM, lbnd, ubnd, &ndims, status );
 
   /* Create the smfFile */
-  newfile = smf_construct_smfFile( newfile, newndf, 0, 0, filename, status );
+  newfile = smf_construct_smfFile( newfile, newndf, 0, 0, NULL, status );
   if ( *status != SAI__OK ) {
     errRep( FUNC_NAME, "Unable to construct new smfFile", status );
   }

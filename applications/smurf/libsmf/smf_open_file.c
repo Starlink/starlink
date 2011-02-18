@@ -1184,7 +1184,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
                    status);
           }
         } else {
-          smf_open_ndf( jigvndf, "READ", filename, SMF__INTEGER, &jigvdata, status);
+          smf_open_ndf( jigvndf, "READ", SMF__INTEGER, &jigvdata, status);
         }
         jigpndf = smf_get_ndfid( xloc, "JIGPATH", "READ", "OLD", "", 0, NULL,
                                  NULL, status);
@@ -1195,7 +1195,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
                    status);
           }
         } else {
-          smf_open_ndf( jigpndf, "READ", filename, SMF__DOUBLE, &jigpdata, status);
+          smf_open_ndf( jigpndf, "READ", SMF__DOUBLE, &jigpdata, status);
         }
         if ( jigvdata != NULL ) {
           jigvert = (jigvdata->pntr)[0];

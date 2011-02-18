@@ -1351,11 +1351,11 @@ void smf_open_model( const Grp *igrp, int index, const char *mode,
                      smfData **data, int *status );
 
 void smf_open_ndf( const int newndf, const char accmode[],
-                   const char filename[], smf_dtype dtype, smfData **ndata,
+                   smf_dtype dtype, smfData **ndata,
                    int *status);
 
 void smf_open_ndfname( const HDSLoc *loc, const char accmode[],
-                       const char filename[], const char extname[],
+                       const char extname[],
                        const char state[], const char dattype[],
                        const int ndims, const int lbnd[], const int ubnd[],
                        const char datalabel[], const char dataunits[],

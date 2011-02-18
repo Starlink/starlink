@@ -1551,7 +1551,7 @@ void smurf_makecube( int *status ) {
             if( savewgt ) {
                weightsloc = smf_get_xloc ( odata, "ACSISRED", "WT_ARR", "WRITE",
                                            0, 0, status );
-               smf_open_ndfname ( weightsloc, "WRITE", NULL, "WEIGHTS", "NEW",
+               smf_open_ndfname ( weightsloc, "WRITE", "WEIGHTS", "NEW",
                                   "_DOUBLE", nwgtdim, (int *) lbnd_wgt,
                                   (int *) ubnd_wgt, NULL, NULL, NULL,  &wdata, status );
                if( wdata ) wgt_array = (wdata->pntr)[ 0 ];
@@ -1568,7 +1568,7 @@ void smurf_makecube( int *status ) {
    needs variances to be calculated. Include spatial WCS in each NDF. */
          smurf_xloc = smf_get_smurfloc ( odata, "WRITE", status );
 
-         smf_open_ndfname ( smurf_xloc, "WRITE", NULL, "EXP_TIME", "NEW",
+         smf_open_ndfname ( smurf_xloc, "WRITE", "EXP_TIME", "NEW",
                             "_REAL", 2, (int *) tile->elbnd,
                             (int *) tile->eubnd, "Total exposure time",
                             "s", wcstile2d, &expdata, status );
@@ -1576,7 +1576,7 @@ void smurf_makecube( int *status ) {
             exp_array = (expdata->pntr)[ 0 ];
          }
 
-         smf_open_ndfname ( smurf_xloc, "WRITE", NULL, "EFF_TIME", "NEW",
+         smf_open_ndfname ( smurf_xloc, "WRITE", "EFF_TIME", "NEW",
                             "_REAL", 2, (int *) tile->elbnd,
                             (int *) tile->eubnd, "Effective integration time",
                             "s", wcstile2d, &effdata, status );
@@ -1585,7 +1585,7 @@ void smurf_makecube( int *status ) {
          }
 
          if( genvar && spread == AST__NEAREST ) {
-            smf_open_ndfname ( smurf_xloc, "WRITE", NULL, "TSYS", "NEW",
+            smf_open_ndfname ( smurf_xloc, "WRITE", "TSYS", "NEW",
                                "_REAL", 2, (int *) tile->elbnd,
                                (int *) tile->eubnd,
                                "Effective system temperature", "K", wcstile2d,

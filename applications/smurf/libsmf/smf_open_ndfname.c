@@ -14,11 +14,11 @@
 
 *  Invocation:
 *     smf_open_ndfname( const HDSLoc *loc, const char accmode[],
-*           const char filename[], const char extname[],
+*                       const char extname[],
 *		        const char state[], const char dattype[], const int ndims,
 *		        const int lbnd[], const int ubnd[], const char datalabel[],
-*           const char dataunits[], const AstFrameSet * wcs,
-*           smfData **ndfdata,
+*                       const char dataunits[], const AstFrameSet * wcs,
+*                       smfData **ndfdata,
 *                       int *status);
 
 *  Arguments:
@@ -27,10 +27,6 @@
 *        and can not be NULL.
 *     accmode = const char[] (Given)
 *        Access mode for locator (READ, WRITE or UPDATE)
-*     filename = const char[] (Given)
-*        Name of disk file which holds the requested NDF. Only used
-*        so that the smfFile struct has the correct file information.
-*        Is not used to actually open the file.
 *     extname = const char[] (Given)
 *        Name of extension
 *     state = const char[] (Given)
@@ -93,10 +89,14 @@
 *     2010-09-17 (COBA):
 *        - Updated smf_construct_smfData which now contains smfFts
 *        - Updated flags with SMF__NOCREATE_FTS
+*     2011-02-17 (TIMJ):
+*        Do not pass filename in as a parameter since it was always
+*        being passed in with a NULL value and was highly unlikely
+*        to ever have the correct value.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2011 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2007 University of British Columbia. All
 *     Rights Reserved.
 
@@ -145,7 +145,7 @@
 
 #define FUNC_NAME "smf_open_ndfname"
 
-void smf_open_ndfname( const HDSLoc *loc, const char accmode[], const char filename[],
+void smf_open_ndfname( const HDSLoc *loc, const char accmode[],
                        const char extname[], const char state[], const char dattype[],
                        const int ndims, const int lbnd[], const int ubnd[],
                        const char datalabel[], const char dataunits[],
@@ -267,7 +267,7 @@ void smf_open_ndfname( const HDSLoc *loc, const char accmode[], const char filen
 
 
   /* Create the smfFile */
-  newfile = smf_construct_smfFile( newfile, ndfid, 0, 0, filename, status );
+  newfile = smf_construct_smfFile( newfile, ndfid, 0, 0, NULL, status );
   if ( *status != SAI__OK ) {
     errRep( FUNC_NAME, "Unable to construct new smfFile", status );
   }

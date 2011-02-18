@@ -1361,7 +1361,7 @@ void smurf_makemap( int *status ) {
       smurfloc = smf_get_xloc ( odata, SMURF__EXTNAME, SMURF__EXTTYPE, "WRITE", 0, 0, status );
 
       /* Create WEIGHTS component in output file */
-      smf_open_ndfname ( smurfloc, "WRITE", NULL, "WEIGHTS", "NEW", "_DOUBLE",
+      smf_open_ndfname ( smurfloc, "WRITE", "WEIGHTS", "NEW", "_DOUBLE",
                          2, tile->elbnd, tile->eubnd, "Weight", NULL, wcstile2d, &wdata, status );
       if ( wdata ) {
         weights = (wdata->pntr)[0];
@@ -1369,7 +1369,7 @@ void smurf_makemap( int *status ) {
       }
 
       /* Create EXP_TIME component in output file */
-      smf_open_ndfname ( smurfloc, "WRITE", NULL, "EXP_TIME", "NEW", "_DOUBLE",
+      smf_open_ndfname ( smurfloc, "WRITE", "EXP_TIME", "NEW", "_DOUBLE",
                          2, tile->elbnd, tile->eubnd, "Total exposure time","s", wcstile2d,
                          &tdata, status );
       if ( tdata ) {
@@ -1695,7 +1695,7 @@ void smurf_makemap( int *status ) {
     smurfloc = smf_get_smurfloc ( odata, "WRITE", status );
 
     /* Create WEIGHTS component in output file */
-    smf_open_ndfname ( smurfloc, "WRITE", NULL, "WEIGHTS", "NEW", "_DOUBLE",
+    smf_open_ndfname ( smurfloc, "WRITE", "WEIGHTS", "NEW", "_DOUBLE",
                        2, lbnd_out, ubnd_out, "Weight", NULL, outfset, &wdata, status );
     if ( wdata ) {
       weights = (wdata->pntr)[0];
@@ -1703,7 +1703,7 @@ void smurf_makemap( int *status ) {
     }
 
     /* Create EXP_TIME component in output file */
-    smf_open_ndfname ( smurfloc, "WRITE", NULL, "EXP_TIME", "NEW", "_DOUBLE",
+    smf_open_ndfname ( smurfloc, "WRITE", "EXP_TIME", "NEW", "_DOUBLE",
                        2, lbnd_out, ubnd_out, "Total exposure time","s", outfset,
                        &tdata, status );
     if ( tdata ) {
