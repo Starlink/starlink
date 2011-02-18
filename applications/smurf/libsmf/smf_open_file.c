@@ -385,13 +385,12 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
   /* Return the NDF identifier */
   if (*status == SAI__OK) {
     ndgNdfas( igrp, index, mode, &indf, status );
+    grpMsg( "F", igrp, index );
     if ( indf == NDF__NOID ) {
       if (*status == SAI__OK) *status = SAI__ERROR;
-      msgSetc( "FILE", filename );
-      errRep("", FUNC_NAME ": Could not locate file ^FILE", status);
+      errRep("", FUNC_NAME ": Could not locate file ^F", status);
       return;
     }
-    msgSetc( "F", filename );
     msgOutif(MSG__DEBUG, "", "Opening file ^F", status);
   }
 
