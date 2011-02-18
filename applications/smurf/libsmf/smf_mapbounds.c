@@ -318,7 +318,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
     hdr = data->hdr;
 
     /* report name of the input file */
-    smf_smfFile_msg( file, "FILE", 1, "<unknown>", status );
+    smf_smfFile_msg( file, "FILE", 1, "<unknown>" );
     msgSeti("I", i);
     msgSeti("N", size);
     msgOutif(MSG__VERB, " ",
@@ -327,7 +327,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
 
 /* Check that there are 3 pixel axes. */
     if( data->ndims != 3 ) {
-      smf_smfFile_msg( file, "FILE", 1, "<unknown>", status );
+      smf_smfFile_msg( file, "FILE", 1, "<unknown>" );
       msgSeti( "NDIMS", data->ndims );
       *status = SAI__ERROR;
       errRep( FUNC_NAME, "^FILE has ^NDIMS pixel axes, should be 3.",

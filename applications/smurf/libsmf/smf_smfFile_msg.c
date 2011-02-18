@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_smfFile_msg( const smfFile * file, const char token[],
-*                      int strip, const char fallback[], int * status );
+*                      int strip, const char fallback[] );
 
 *  Arguments:
 *     file = const smfFile * (Given)
@@ -26,9 +26,6 @@
 *     fallback = const char [] (Given)
 *        Default value for token if a filename can not be obtained.
 *        Token will not be set if this is a null pointer.
-*     status = int* (Given and Returned)
-*        Pointer to global status. If status is bad on entry the token
-*        will not be set.
 
 *  Description:
 *     Store the filename associated with a smfFile into a message token.
@@ -45,6 +42,8 @@
 *  History:
 *     2010-03-16 (TIMJ):
 *        Initial version.
+*     2011-02-17 (TIMJ):
+*        Should work if status is bad
 
 *  Copyright:
 *     Copyright (C) 2010 Science & Technology Facilities Council.
@@ -90,12 +89,14 @@
 
 void
 smf_smfFile_msg( const smfFile * file, const char token[],
-                 int strip, const char fallback[], int * status ) {
+                 int strip, const char fallback[] ) {
 
   int have_set = 0;         /* have we set the token yet? */
   char path[GRP__SZNAM+1];  /* Full path information */
+  int status = SAI__OK;
 
-  if (*status != SAI__OK) return;
+  errMark();
+
   if (!file) {
     if (fallback) msgSetc( token, fallback );
     return;
@@ -105,7 +106,7 @@ smf_smfFile_msg( const smfFile * file, const char token[],
 
   if (file->name && strlen(file->name) > 0 ) {
     if (strip) {
-      one_strlcpy( path, file->name, sizeof(path), status );
+      one_strlcpy( path, file->name, sizeof(path), &status );
     } else {
       /* set directly */
       msgSetc( token, file->name );
@@ -116,10 +117,8 @@ smf_smfFile_msg( const smfFile * file, const char token[],
       int oplen = 0;
       /* we need to get the value from the NDF subsystem
          and we need to do it without clearing tokens */
-      errMark();
       ndfMsg( "LOCALTOK", file->ndfid );
-      msgLoad( "", "^LOCALTOK", path, sizeof(path), &oplen, status );
-      errRlse();
+      msgLoad( "", "^LOCALTOK", path, sizeof(path), &oplen, &status );
 
     } else {
       /* set directly */
@@ -128,6 +127,12 @@ smf_smfFile_msg( const smfFile * file, const char token[],
     }
   } else {
     msgSetc( token, fallback );
+  }
+
+  /* Do not worry about bad status */
+  if (status != SAI__OK) {
+    errAnnul( &status );
+    path[0] = '\0';
   }
 
   /* if "path" has stuff in it we are meant to strip it and we have not
@@ -154,6 +159,8 @@ smf_smfFile_msg( const smfFile * file, const char token[],
   if (!have_set) {
     msgSetc(token, fallback );
   }
+
+  errRlse();
 
   return;
 

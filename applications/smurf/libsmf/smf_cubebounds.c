@@ -415,7 +415,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
       hdr = data->hdr;
 
 /* Report the name of the input file. */
-      smf_smfFile_msg( file, "FILE", 1, "<unknown>", status );
+      smf_smfFile_msg( file, "FILE", 1, "<unknown>" );
       msgSeti( "I", ifile );
       msgSeti( "N", size );
       msgOutif( MSG__VERB, " ", "SMF_CUBEBOUNDS: Processing ^I/^N ^FILE",
@@ -423,7 +423,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 
 /* Make sure the input file is a suitable ACSIS cube. */
       if( hdr->instrument != INST__ACSIS ) {
-         smf_smfFile_msg( file, "FILE", 1, "<unknown>", status );
+         smf_smfFile_msg( file, "FILE", 1, "<unknown>" );
          *status = SAI__ERROR;
          errRep( FUNC_NAME, "^FILE does not contain ACSIS instrument data.",
                  status );
@@ -432,7 +432,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 
 /* Check that there are 3 pixel axes. */
       if( data->ndims != 3 ) {
-         smf_smfFile_msg( file, "FILE", 1, "<unknown>", status );
+         smf_smfFile_msg( file, "FILE", 1, "<unknown>" );
          msgSeti( "NDIMS", data->ndims );
          *status = SAI__ERROR;
          errRep( FUNC_NAME, "^FILE has ^NDIMS pixel axes, should be 3.",
@@ -476,7 +476,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 
          if( !fs ) {
             if( *status == SAI__OK ) {
-               smf_smfFile_msg( file, "FILE", 1, "<unknown>", status );
+               smf_smfFile_msg( file, "FILE", 1, "<unknown>" );
                *status = SAI__ERROR;
                errRep( FUNC_NAME, "Cannot read WCS information from "
                        "the FITS header in ^FILE.", status );
@@ -491,7 +491,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
          specframe = astPickAxes( fs, 1, &specax, NULL );
          if( !astIsASpecFrame( specframe ) ) {
             if( *status == SAI__OK ) {
-               smf_smfFile_msg( file, "FILE", 1, "<unknown>", status );
+               smf_smfFile_msg( file, "FILE", 1, "<unknown>" );
                *status = SAI__ERROR;
                errRep( FUNC_NAME, "FITS-WCS axis 1 in ^FILE is not a spectral "
                        "axis.", status );
@@ -507,7 +507,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
       astMapSplit( fsmap, 1, &specax, pixax, &specmap );
       if( !specmap || astGetI( specmap, "Nout" ) != 1 ) {
          if( *status == SAI__OK ) {
-            smf_smfFile_msg( file, "FILE", 1, "<unknown>", status );
+            smf_smfFile_msg( file, "FILE", 1, "<unknown>" );
             *status = SAI__ERROR;
             errRep( FUNC_NAME, "The spectral axis in ^FILE is not "
                     "independent of the other axes.", status );
@@ -538,7 +538,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    spectral axes. */
          if( !fs ) {
             if( *status == SAI__OK ) {
-               smf_smfFile_msg( file, "FILE", 1, "<unknown>", status );
+               smf_smfFile_msg( file, "FILE", 1, "<unknown>" );
                *status = SAI__ERROR;
                errRep( FUNC_NAME, "The spectral axis in ^FILE is not "
                        "compatible with the spectral axis in the first "
@@ -721,7 +721,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 
          if( fs == NULL ) {
             if( *status == SAI__OK ) {
-               smf_smfFile_msg( file, "FILE", 1, "<unknown>", status );
+               smf_smfFile_msg( file, "FILE", 1, "<unknown>" );
                *status = SAI__ERROR;
                errRep( FUNC_NAME, "The spatial coordinate system in ^FILE "
                        "is not compatible with the spatial coordinate "

@@ -256,7 +256,7 @@ int smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
   if (*status == SAI__OK) {
     file = data->file;
     if ( file != NULL ) {
-      smf_smfFile_msg( file, "FILE", 0, "<unknown>", status );
+      smf_smfFile_msg( file, "FILE", 0, "<unknown>" );
       msgOutif(MSG__VERB, " ", "Flatfielding file '^FILE'", status);
     }
     /* If ffdata is NULL then populate a struct to work with */

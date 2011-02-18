@@ -136,7 +136,7 @@ void smf_labelunit( Grp *igrp,  int size, smfData *odata, int *status ){
          msgSeti( "I", ifile );
          msgSetc( "L1", label1 );
          msgSetc( "L", label );
-         smf_smfFile_msg( data->file, "N", 1, "<unknown file>", status );
+         smf_smfFile_msg( data->file, "N", 1, "<unknown file>" );
          msgOutif( MSG__NORM, " ", "   WARNING: Input ^I (^N) has Label "
                    "'^L' but the first input had Label '^L1'.", status );
 
@@ -144,7 +144,7 @@ void smf_labelunit( Grp *igrp,  int size, smfData *odata, int *status ){
          msgSeti( "I", ifile );
          msgSetc( "U1", unit1 );
          msgSetc( "U", unit );
-         smf_smfFile_msg( data->file, "N", 1, "<unknown file>", status );
+         smf_smfFile_msg( data->file, "N", 1, "<unknown file>" );
          msgOutif( MSG__NORM, " ", "   WARNING: Input ^I (^N) has Unit "
                    "'^U' but the first input had Unit '^U1'.", status );
 

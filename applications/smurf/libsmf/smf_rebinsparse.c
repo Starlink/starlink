@@ -469,8 +469,7 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
       if( fs == NULL ) {
          if( *status == SAI__OK ) {
             if (data->file) {
-               smf_smfFile_msg(data->file, "FILE", 1, "<unknown>",
-                               status );
+               smf_smfFile_msg(data->file, "FILE", 1, "<unknown>");
             } else {
                msgSetc( "FILE", "<unknown>" );
             }

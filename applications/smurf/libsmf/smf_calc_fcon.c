@@ -210,7 +210,7 @@ double smf_calc_fcon( smfData *data, dim_t nchan, int report,
          } else if( *status == SAI__OK ) {
             *status = SAI__ERROR;
             msgSetc( "W", fftwin );
-            smf_smfFile_msg( data->file, "F", 1, "<unknown file>", status);
+            smf_smfFile_msg( data->file, "F", 1, "<unknown file>");
             errRep( "", "FITS header FFT_WIN has unknown value "
                     "'^W' in ^F (programming error).", status );
          }
@@ -232,7 +232,7 @@ double smf_calc_fcon( smfData *data, dim_t nchan, int report,
    variances, report an error. */
    if( report && fcon2 == VAL__BADD ) {
       if( *status == SAI__OK ) {
-         smf_smfFile_msg( data->file, "F", 1, "<unknown file>", status);
+         smf_smfFile_msg( data->file, "F", 1, "<unknown file>");
          errRep( "", "Cannot calculate input variances for ^F",
                  status );
          if( !gotbf ) {

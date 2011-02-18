@@ -310,7 +310,7 @@ void  smf_rebincube( smfWorkForce *wf, smfData *data, int first, int last,
       if ( percent > 1.0 ) {
         msgSetd( "ORI", *fcon );
         msgSetd( "NEW", fcon2 );
-        smf_smfFile_msg( data->file, "FILE", 1, "<unknown file>", status );
+        smf_smfFile_msg( data->file, "FILE", 1, "<unknown file>" );
         msgSetd( "PC", percent );
         msgOutif( MSG__NORM," ", "WARNING: Tsys conversion factor has "
                   "changed from ^ORI to ^NEW (^PC %) in file ^FILE",
@@ -381,7 +381,7 @@ void  smf_rebincube( smfWorkForce *wf, smfData *data, int first, int last,
    found in the input NDF. */
    if( ( usewgt || genvar == 2 ) && !good_tsys ) {
       msgBlank( status );
-      smf_smfFile_msg( data->file, "FILE", 1, "<unknown file>", status );
+      smf_smfFile_msg( data->file, "FILE", 1, "<unknown file>" );
       msgOutif( MSG__NORM, " ", "WARNING: ^FILE contains no Tsys values "
                 "and will be ignored.", status );
    }

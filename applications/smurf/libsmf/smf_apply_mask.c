@@ -150,7 +150,7 @@ void smf_apply_mask( smfData *indata,
   smf_get_dims( indata, NULL, NULL, &nbolo, NULL, NULL, NULL, NULL, status );
 
   /* get the file struct and create a token */
-  smf_smfFile_msg( indata->file, "FILE", 1, "<no file>", status);
+  smf_smfFile_msg( indata->file, "FILE", 1, "<no file>");
 
   /* and correct for dark */
   if (previdx != SMF__BADIDX) bbm1 = bbms->sdata[previdx];

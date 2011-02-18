@@ -448,7 +448,7 @@ void smurf_unmakecube( int *status ) {
       }
 
 /* Report the name of the input template. */
-      smf_smfFile_msg( data->file, "FILE", 1, "<unknown>", status );
+      smf_smfFile_msg( data->file, "FILE", 1, "<unknown>" );
       msgSeti( "THISFILE", ifile );
       msgSeti( "NUMFILES", size );
       msgOutif( MSG__NORM, " ", "Simulating ^THISFILE/^NUMFILES ^FILE",

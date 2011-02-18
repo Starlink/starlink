@@ -339,7 +339,7 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
 
         /* only down-sample if it will be at least a factor of 20% */
         if( scalelen <= 0.8 ) {
-          smf_smfFile_msg(data->file, "FILE", 1, "", status );
+          smf_smfFile_msg(data->file, "FILE", 1, "" );
           msgOutiff( MSG__VERB, "", FUNC_NAME
                      ": will down-sample file ^FILE from %5.1lf Hz to %5.1lf Hz", status,
                      (1./steptime),
@@ -359,7 +359,7 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
         *status = SAI__ERROR;
         msgSeti("NTSLICE",ntslice);
         msgSeti("MAXLEN",maxlen);
-        smf_smfFile_msg( data->file, "FILE", 1, "", status );
+        smf_smfFile_msg( data->file, "FILE", 1, "" );
         errRep(FUNC_NAME,
                "Number of time steps in file ^FILE time exceeds maximum "
                "(^NTSLICE>^MAXLEN)", status);

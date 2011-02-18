@@ -98,7 +98,7 @@ int smf_apply_dark( smfData *indata, const smfArray *darks,
   smf_choose_darks( darks, indata, &dark1, &dark2, status );
 
   /* get the file struct and create a token */
-  smf_smfFile_msg( indata->file, "FILE", 1, "<no file>", status );
+  smf_smfFile_msg( indata->file, "FILE", 1, "<no file>" );
 
   /* and correct for dark */
   if (dark1 != SMF__BADIDX) dkdata1 = darks->sdata[dark1];

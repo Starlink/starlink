@@ -397,7 +397,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
          reference array dimensions if we aren't working with 4d FFT
           data */
       if( (*status == SAI__OK) && (!isFFT) ) {
-        smf_smfFile_msg( refdata->file, "FILE", 1, "<unknown file", status );
+        smf_smfFile_msg( refdata->file, "FILE", 1, "<unknown file" );
 
         if( refdata->ndims != 3 ) {
           *status = SAI__ERROR;

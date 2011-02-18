@@ -1652,7 +1652,7 @@ void smurf_makecube( int *status ) {
                }
 
 /* Report the name of the input file. */
-               smf_smfFile_msg( data->file, "FILE", 1, "<unknown>", status );
+               smf_smfFile_msg( data->file, "FILE", 1, "<unknown>" );
                msgSeti( "THISFILE", ifile );
                msgSeti( "NUMFILES", tile->size );
                msgOutif( MSG__VERB, " ", "Processing ^FILE (^THISFILE/^NUMFILES)",
@@ -1666,7 +1666,7 @@ void smurf_makecube( int *status ) {
 /* Check that the input data type is single precision. */
                if( data->dtype != SMF__FLOAT ) {
                   if( *status == SAI__OK ) {
-                     smf_smfFile_msg( data->file, "FILE", 1, "<unknown>", status );
+                     smf_smfFile_msg( data->file, "FILE", 1, "<unknown>" );
                      msgSetc( "DTYPE", smf_dtype_string( data, status ) );
                      *status = SAI__ERROR;
                      errRep( FUNC_NAME, "^FILE has ^DTYPE data type, should "

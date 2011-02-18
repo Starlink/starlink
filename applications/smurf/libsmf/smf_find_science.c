@@ -311,7 +311,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
 
         if( tmpState ) {
           firstnum = (tmpState[0]).rts_num;
-          smf_smfFile_msg( infile->file, "F", 1, "<unknown file>", status);
+          smf_smfFile_msg( infile->file, "F", 1, "<unknown file>");
           if ( firstnum >= seqstart && firstnum <= seqend ) {
             /* store the file in the output group */
             ndgCpsup( ingrp, i, ogrp, status );
@@ -324,7 +324,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
                       status );
           }
         } else {
-          smf_smfFile_msg( infile->file, "F", 1, "<unknown file>", status);
+          smf_smfFile_msg( infile->file, "F", 1, "<unknown file>");
           /* store the file in the output group */
           ndgCpsup( ingrp, i, ogrp, status );
           msgOutif( MSG__DEBUG, " ",
@@ -336,7 +336,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
       } else if (infile->hdr->seqtype == SMF__TYP_FASTFLAT ) {
         ffcount = smf__addto_sortinfo( infile, allfflats, i, ffcount, "Fast flat", status );
       } else {
-        smf_smfFile_msg( infile->file, "F", 1, "<unknown file>", status);
+        smf_smfFile_msg( infile->file, "F", 1, "<unknown file>");
         msgOutif(MSG__DEBUG, " ", "Sequence type mismatch with observation type: ^F",status);
       }
     }
@@ -382,7 +382,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
           if (*status == SMF__BADFLAT) {
             errAnnul( status );
             if (outfile) smf_close_file( &outfile, status );
-            smf_smfFile_msg( infile->file, "F", 1, "<unknown file>", status );
+            smf_smfFile_msg( infile->file, "F", 1, "<unknown file>" );
             msgOutif( MSG__QUIET, "",
                       "Flatfield ramp file ^F could not be processed. Ignoring.",
                       status );
@@ -396,7 +396,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
                the responsivity image */
             int oplen = 0;
             char thisfile[MSG__SZMSG];
-            smf_smfFile_msg( infile->file, "F", 1, "<unknown file>", status );
+            smf_smfFile_msg( infile->file, "F", 1, "<unknown file>" );
             msgLoad( "", "^F", thisfile, sizeof(thisfile), &oplen, status );
 
             smf_close_file( &infile, status );
@@ -422,7 +422,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
               }
 
               if (ngood < SMF__MINSTATSAMP) {
-                smf_smfFile_msg( NULL, "F", 1, thisfile, status );
+                smf_smfFile_msg( NULL, "F", 1, thisfile );
                 if (infile->hdr->obstype != SMF__TYP_NEP) {
                   msgOutiff( MSG__QUIET, "",
                             "Flatfield ramp file ^F had %zu good bolometer%s. Ignoring.",
@@ -476,7 +476,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
 
                 if (*status == SMF__INSMP) {
                   errAnnul(status);
-                  smf_smfFile_msg( NULL, "F", 1, thisfile, status );
+                  smf_smfFile_msg( NULL, "F", 1, thisfile );
                   msgOutiff( MSG__QUIET, "",
                             "Flatfield ramp ratio with second file ^F had too few bolometers (%zu < %d). Not clipping ratio.",
                              status, ngood, SMF__MINSTATSAMP );

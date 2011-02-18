@@ -221,7 +221,7 @@ int smf_check_detpos( smfData *data, int report, int *status ){
                   if( max_dist != VAL__MIND ) {
                      result = ( max_dist*AST__DR2D <= 1.0/3600 );
                      if( ! result && report ) {
-                        smf_smfFile_msg( data->file, "FILE", 1, "<unknown file>", status );
+                        smf_smfFile_msg( data->file, "FILE", 1, "<unknown file>" );
                         msgSetr( "MAX", (float)( max_dist*AST__DR2D*3600.0) );
                         msgSeti( "T", itime + 1 );
                         msgOutif( MSG__QUIET, " ", "   WARNING: The detector "

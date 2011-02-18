@@ -1596,7 +1596,7 @@ void smf_set_clabels( const char title[], const char label[],
 void smf_set_moving( AstFrameSet* wcs, AstFitsChan * fchan, int *status );
 
 void smf_smfFile_msg( const smfFile * file, const char token[],
-                      int strip, const char fallback[], int * status );
+                      int strip, const char fallback[] );
 
 int smf_sort_bydouble ( const void *in1, const void *in2 );
 

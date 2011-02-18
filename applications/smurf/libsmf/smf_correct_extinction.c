@@ -333,7 +333,7 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
 
   /* Check auto mode */
   if (tausrc == SMF__TAUSRC_AUTO && *status == SAI__OK) {
-    smf_smfFile_msg( data->file, "FILE", 1, "<unknown>", status );
+    smf_smfFile_msg( data->file, "FILE", 1, "<unknown>" );
 
     if (ndims == 2) {
       /* have to use CSO mode */

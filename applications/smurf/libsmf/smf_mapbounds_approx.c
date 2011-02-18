@@ -220,7 +220,7 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system,
 
   /* Retrieve file name for use feedback */
   file = data->file;
-  smf_smfFile_msg( file, "FILE", 1, "<unknown>", status );
+  smf_smfFile_msg( file, "FILE", 1, "<unknown>" );
   if( *status == SAI__OK ) {
     msgOutif(MSG__VERB, " ",
 	     "SMF_MAPBOUNDS_APPROX: Processing ^FILE",
@@ -232,7 +232,7 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system,
   /* Check that the data dimensions are 3 (for time ordered data) */
   if( *status == SAI__OK ) {
     if( data->ndims != 3 ) {
-      smf_smfFile_msg( file, "FILE", 1, "<unknown>", status );
+      smf_smfFile_msg( file, "FILE", 1, "<unknown>" );
       msgSeti("THEDIMS", data->ndims);
       *status = SAI__ERROR;
       errRep("smf_mapbounds_approx",

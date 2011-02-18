@@ -192,7 +192,7 @@ void smf_flat_assign ( int use_da, smf_flatmeth inflatmeth, const smfData * powv
       char buffer[80];
       int oplen = 0;
       errMark();
-      smf_smfFile_msg( bolval->file, "FILE", 1, "<none>", status );
+      smf_smfFile_msg( bolval->file, "FILE", 1, "<none>" );
       msgLoad( "", "^FILE", buffer, sizeof(buffer), &oplen, status );
       errRlse();
       smf_fits_updateS( updata->hdr, "FLAT", buffer,
