@@ -258,7 +258,6 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    AstMapping *fsmap = NULL;  /* Mapping from the "fs" FrameSet */
    Grp *colgrp = NULL;   /* Group holding names of extra catalogue columns */
    Grp *labgrp = NULL;   /* Group holding used detector labels */
-   char *pname = NULL;   /* Name of currently opened data file */
    char outcatnam[ 41 ]; /* Output catalogue name */
    const char *lab = NULL;/* Pointer to start of next detector name */
    const double *tsys;   /* Pointer to Tsys value for first detector */
@@ -385,8 +384,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
       hdr = data->hdr;
 
 /* Report the name of the input file. */
-      pname =  file->name;
-      msgSetc( "FILE", pname );
+      smf_smfFile_msg( file, "FILE", 1, "<unknown>", status );
       msgSeti( "I", ifile );
       msgSeti( "N", size );
       msgOutif( MSG__VERB, " ", "SMF_CUBEGRID: Processing ^I/^N ^FILE",
@@ -394,7 +392,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 
 /* Make sure the input file is a suitable ACSIS cube. */
       if( hdr->instrument != INST__ACSIS ) {
-         msgSetc( "FILE", pname );
+         smf_smfFile_msg( file, "FILE", 1, "<unknown>", status );
          *status = SAI__ERROR;
          errRep( FUNC_NAME, "^FILE does not contain ACSIS instrument data.",
                      status );
@@ -403,7 +401,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 
 /* Check that there are 3 pixel axes. */
       if( data->ndims != 3 ) {
-         msgSetc( "FILE", pname );
+         smf_smfFile_msg( file, "FILE", 1, "<unknown>", status );
          msgSeti( "NDIMS", data->ndims );
          *status = SAI__ERROR;
          errRep( FUNC_NAME, "^FILE has ^NDIMS pixel axes, should be 3.",
@@ -495,7 +493,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 
          if( fs == NULL ) {
             if( *status == SAI__OK ) {
-               msgSetc( "FILE", pname );
+               smf_smfFile_msg( file, "FILE", 1, "<unknown>", status );
                *status = SAI__ERROR;
                errRep( FUNC_NAME, "The spatial coordinate system in ^FILE "
                            "is not compatible with the spatial coordinate "

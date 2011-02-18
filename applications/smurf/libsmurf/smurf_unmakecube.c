@@ -236,7 +236,6 @@ void smurf_unmakecube( int *status ) {
    NdgProvenance *oprov = NULL;/* Provenance for the output NDF */
    SkyCube *sky_cubes = NULL; /* Pointer to array of sky cube descriptions */
    SkyCube *skycube = NULL;   /* Pointer to next sky cube description */
-   char *pname = NULL;        /* Name of currently opened data file */
    char pabuf[ 10 ];          /* Text buffer for parameter value */
    double params[ 4 ];        /* astResample parameters */
    int axes[ 2 ];             /* Indices of selected axes */
@@ -449,8 +448,7 @@ void smurf_unmakecube( int *status ) {
       }
 
 /* Report the name of the input template. */
-      pname =  data->file->name;
-      msgSetc( "FILE", pname );
+      smf_smfFile_msg( data->file, "FILE", 1, "<unknown>", status );
       msgSeti( "THISFILE", ifile );
       msgSeti( "NUMFILES", size );
       msgOutif( MSG__NORM, " ", "Simulating ^THISFILE/^NUMFILES ^FILE",

@@ -154,7 +154,6 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    AstMapping *ospecmap = NULL; /* Spec <> PIXEL mapping in output FrameSet */
    AstMapping *specmap = NULL;  /* PIXEL -> Spec mapping in input FrameSet */
    AstPermMap *pmap = NULL;     /* Axis permutation */
-   char *pname = NULL;   /* Name of currently opened data file */
    const char *name;     /* Pointer to current detector name */
    double *latlut = NULL;/* Workspace to hold latitude values */
    double *lonlut = NULL;/* Workspace to hold longitude values */
@@ -256,8 +255,7 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
       hdr = data->hdr;
 
 /* Report the name of the input file. */
-      pname =  file->name;
-      msgSetc( "FILE", pname );
+      smf_smfFile_msg( file, "FILE", 1, "<unknown>", status );
       msgSeti( "I", ifile );
       msgSeti( "N", size );
       msgOutif( MSG__VERB, " ", "SMF_SPARSEBOUNDS: Processing ^I/^N ^FILE",
@@ -265,7 +263,7 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 
 /* Make sure the input file is a suitable ACSIS cube. */
       if( hdr->instrument != INST__ACSIS ) {
-         msgSetc( "FILE", pname );
+         smf_smfFile_msg( file, "FILE", 1, "<unknown>", status );
          *status = SAI__ERROR;
          errRep( FUNC_NAME, "^FILE does not contain ACSIS instrument data.",
                  status );
@@ -274,7 +272,7 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 
 /* Check that there are 3 pixel axes. */
       if( data->ndims != 3 ) {
-         msgSetc( "FILE", pname );
+         smf_smfFile_msg( file, "FILE", 1, "<unknown>", status );
          msgSeti( "NDIMS", data->ndims );
          *status = SAI__ERROR;
          errRep( FUNC_NAME, "^FILE has ^NDIMS pixel axes, should be 3.",
@@ -318,7 +316,7 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 
          if( !fs ) {
             if( *status == SAI__OK ) {
-               msgSetc( "FILE", pname );
+               smf_smfFile_msg( file, "FILE", 1, "<unknown>", status );
                *status = SAI__ERROR;
                errRep( FUNC_NAME, "Cannot read WCS information from "
                        "the FITS header in ^FILE.", status );
@@ -333,7 +331,7 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
          specframe = astPickAxes( fs, 1, &specax, NULL );
          if( !astIsASpecFrame( specframe ) ) {
             if( *status == SAI__OK ) {
-               msgSetc( "FILE", pname );
+               smf_smfFile_msg( file, "FILE", 1, "<unknown>", status );
                *status = SAI__ERROR;
                errRep( FUNC_NAME, "FITS-WCS axis 1 in ^FILE is not a spectral "
                        "axis.", status );
@@ -349,7 +347,7 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
       astMapSplit( fsmap, 1, &specax, pixax, &specmap );
       if( !specmap || astGetI( specmap, "Nout" ) != 1 ) {
          if( *status == SAI__OK ) {
-            msgSetc( "FILE", pname );
+            smf_smfFile_msg( file, "FILE", 1, "<unknown>", status );
             *status = SAI__ERROR;
             errRep( FUNC_NAME, "The spectral axis in ^FILE is not "
                     "independent of the other axes.", status );
@@ -384,7 +382,7 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    spectral axes. */
          if( !fs ) {
             if( *status == SAI__OK ) {
-               msgSetc( "FILE", pname );
+               smf_smfFile_msg( file, "FILE", 1, "<unknown>", status );
                *status = SAI__ERROR;
                errRep( FUNC_NAME, "The spectral axis in ^FILE is not "
                        "compatible with the spectral axis in the first "
@@ -489,7 +487,7 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 
          if( fs == NULL ) {
             if( *status == SAI__OK ) {
-               msgSetc( "FILE", pname );
+               smf_smfFile_msg( file, "FILE", 1, "<unknown>", status );
                *status = SAI__ERROR;
                errRep( FUNC_NAME, "The spatial coordinate system in ^FILE "
                        "is not compatible with the spatial coordinate "

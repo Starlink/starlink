@@ -182,7 +182,6 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system,
   double mapy;                 /* Map Y offset in radians */
   double par[7];               /* Projection parameters */
   double pixsize = 0.0;        /* Requested pixel size */
-  char *pname = NULL;          /* Name of currently opened data file */
   double shift[ 2 ];           /* Shifts from PIXEL to GRID coords */
   AstMapping *sky2map = NULL;  /* Mapping celestial->map coordinates */
   AstSkyFrame *skyframe = NULL;/* Output SkyFrame */
@@ -221,21 +220,19 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system,
 
   /* Retrieve file name for use feedback */
   file = data->file;
-  pname =  file->name;
+  smf_smfFile_msg( file, "FILE", 1, "<unknown>", status );
   if( *status == SAI__OK ) {
-    msgSetc("FILE", pname);
     msgOutif(MSG__VERB, " ",
 	     "SMF_MAPBOUNDS_APPROX: Processing ^FILE",
 	     status);
   } else {
-    msgSetc("FILE", pname);
     errRep( "smf_mapbounds_approx", "Couldn't open input file, ^FILE", status );
   }
 
   /* Check that the data dimensions are 3 (for time ordered data) */
   if( *status == SAI__OK ) {
     if( data->ndims != 3 ) {
-      msgSetc("FILE", pname);
+      smf_smfFile_msg( file, "FILE", 1, "<unknown>", status );
       msgSeti("THEDIMS", data->ndims);
       *status = SAI__ERROR;
       errRep("smf_mapbounds_approx",

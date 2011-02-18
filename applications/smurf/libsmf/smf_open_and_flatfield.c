@@ -179,7 +179,6 @@ int smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
   int nout;                 /* Number of data points in output data file */
   void *outdata[1] = { NULL };/* Pointer to array of output mapped pointers*/
   int outndf;               /* Output NDF identifier */
-  char *pname;              /* Pointer to input filename */
   size_t npts = 0;          /* Number of data points */
   int flags = 0;            /* Flags for creating smfFile and smfHead */
   char prvname[2*PAR__SZNAM+1]; /* provenance ID string */
@@ -257,8 +256,7 @@ int smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
   if (*status == SAI__OK) {
     file = data->file;
     if ( file != NULL ) {
-      pname = file->name;
-      msgSetc("FILE", pname);
+      smf_smfFile_msg( file, "FILE", 0, "<unknown>", status );
       msgOutif(MSG__VERB, " ", "Flatfielding file '^FILE'", status);
     }
     /* If ffdata is NULL then populate a struct to work with */
@@ -311,9 +309,8 @@ int smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
   if (!ogrp && *status == SAI__OK) {
     file = data->file;
     if (file) {
-      pname = file->name;
       (*ffdata)->file = smf_construct_smfFile( NULL, NDF__NOID, 0, 1,
-                                               pname, status);
+                                               file->name, status);
     }
   }
 

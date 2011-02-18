@@ -1475,8 +1475,7 @@ void smurf_makemap( int *status ) {
 
           /* Report the name of the input file. */
           if (data->file && data->file->name) {
-            pname =  data->file->name;
-            msgSetc( "FILE", pname );
+            smf_smfFile_msg( data->file, "FILE", 1, "<unknown>", status );
             msgSeti( "THISFILE", ifile );
             msgSeti( "NUMFILES", tile->size );
             msgOutif( MSG__VERB, " ", "Processing ^FILE (^THISFILE/^NUMFILES)",

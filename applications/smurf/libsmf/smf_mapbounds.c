@@ -228,7 +228,6 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
   dim_t nbadt  = 0;            /* Number of bad time slices */
   dim_t ngoodt = 0;            /* Number of good time slices */
   double par[7];               /* Projection parameters */
-  char *pname = NULL;          /* Name of currently opened data file */
   double shift[ 2 ];           /* Shifts from PIXEL to GRID coords */
   AstMapping *oskymap = NULL;  /* Mapping celestial->map coordinates,
                                   Sky <> PIXEL mapping in output
@@ -319,8 +318,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
     hdr = data->hdr;
 
     /* report name of the input file */
-    pname =  file->name;
-    msgSetc("FILE", pname);
+    smf_smfFile_msg( file, "FILE", 1, "<unknown>", status );
     msgSeti("I", i);
     msgSeti("N", size);
     msgOutif(MSG__VERB, " ",
@@ -329,7 +327,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
 
 /* Check that there are 3 pixel axes. */
     if( data->ndims != 3 ) {
-      msgSetc( "FILE", pname );
+      smf_smfFile_msg( file, "FILE", 1, "<unknown>", status );
       msgSeti( "NDIMS", data->ndims );
       *status = SAI__ERROR;
       errRep( FUNC_NAME, "^FILE has ^NDIMS pixel axes, should be 3.",

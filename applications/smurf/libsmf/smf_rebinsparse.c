@@ -183,7 +183,6 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
    AstMapping *fsmap = NULL;    /* Base->Current Mapping extracted from a FrameSet */
    AstMapping *specmap = NULL;  /* PIXEL -> Spec mapping in input FrameSet */
    char *fftwin = NULL;  /* Name of FFT windowing function */
-   char *pname = NULL;   /* Name of currently opened data file */
    const char *name = NULL; /* Pointer to current detector name */
    const double *tsys=NULL; /* Pointer to Tsys value for first detector */
    dim_t timeslice_size; /* No of detector values in one time slice */
@@ -469,7 +468,12 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
 
       if( fs == NULL ) {
          if( *status == SAI__OK ) {
-            msgSetc( "FILE", pname );
+            if (data->file) {
+               smf_smfFile_msg(data->file, "FILE", 1, "<unknown>",
+                               status );
+            } else {
+               msgSetc( "FILE", "<unknown>" );
+            }
             *status = SAI__ERROR;
             errRep( FUNC_NAME, "The spatial coordinate system in ^FILE "
                     "is not compatible with the spatial coordinate "
