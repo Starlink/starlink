@@ -93,10 +93,13 @@
 *        Validate FTS2 data before writing
 *     2011-01-11 (TIMJ):
 *        Use sc2store_writejcmtstate
+*     2011-02-17 (TIMJ):
+*        Get the file name from the group for display since the filename
+*        can be a null pointer. Use grpMsg.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008-2010 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2011 Science and Technology Facilities Council.
 *     Copyright (C) 2008-2010 University of British Columbia.
 *     All Rights Reserved.
 
@@ -267,7 +270,8 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
     }
   }
 
-  msgSetc( "NAME", filename );
+  /* Say that we are going to write a file */
+  grpMsg( "NAME", ogrp, 1 );
   msgOutif( MSG__VERB, "", FUNC_NAME ": writing ^NAME", status );
 
   /* Open the file */
