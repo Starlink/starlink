@@ -57,6 +57,8 @@
 *  History:
 *     2-FEB-2011 (DSB):
 *        Original version
+*     2011-02-17 (TIMJ):
+*        Remove lots of code cloned from GRP_GET and just use GRP_GET
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -74,24 +76,9 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'GRP_CONST'        ! GRP private constants.
       INCLUDE 'GRP_PAR'          ! GRP public constants.
-      INCLUDE 'GRP_ERR'          ! GRP error values.
-      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
-
-*  Global Variables:
-      INCLUDE 'GRP_COM'          ! GRP common blocks.
-*        CMN_GSIZE( GRP__MAXG ) = INTEGER (Read)
-*           The index of the last entry in each group.
-*        CMN_NMPNT( GRP__MAXG ) = INTEGER (Read)
-*           Pointers to the mapped NAMES array of each group.
-*        CMN_UPPER( GRP__MAXG ) = LOGICAL (Read)
-*           If true, then all names in the group should be converted
-*           to upper case before being used. Otherwise, they are left
-*           as they are.
 
 *  Local Variables:
-      INTEGER SLOT
       CHARACTER NAME*(GRP__SZNAM)
       INTEGER STATUS
 *.
@@ -103,38 +90,7 @@
       CALL ERR_MARK
       STATUS = SAI__OK
 
-*  Check that the supplied GRP identifier is valid, and find the index
-*  within the common arrays at which information describing the group is
-*  stored.
-      CALL GRP1_IMPID( IGRP, SLOT, STATUS )
-
-*  Abort if an error has occurred.
-      IF ( STATUS .EQ. SAI__OK ) THEN
-
-*  If the index is outside the bounds of the group, report an error.
-         IF( INDEX .LE. 0 .OR. INDEX .GT. CMN_GSIZE( SLOT ) ) THEN
-            STATUS = GRP__OUTBN
-            CALL MSG_SETI( 'I', INDEX )
-            CALL MSG_SETI( 'MX', CMN_GSIZE( SLOT ) )
-            CALL ERR_REP( 'GRP_GET_ERR1', 'GRP_MSG: Attempt to access'//
-     :                    ' a name outside the bounds of the group. '//
-     :                    '(^I/^MX)', STATUS )
-
-*  Otherwise, call GRP1_GETC to get the string.  NB, the final argument
-*  specifies the length of each character string in the mapped NAMES
-*  array, and is required by UNIX. There is no corresponding dummy
-*  argument in the code for GRP1_GETC.
-         ELSE
-            CALL GRP1_GETC( CMN_GSIZE( SLOT ),
-     :                      %VAL( CNF_PVAL( CMN_NMPNT( SLOT ) ) ),
-     :                      INDEX, NAME, STATUS,
-     :                      %VAL( CNF_CVAL( GRP__SZNAM ) ) )
-
-*  If the group is case insensitive, convert the name to upper case.
-            IF( CMN_UPPER( SLOT ) ) CALL CHR_UCASE( NAME )
-
-         END IF
-      END IF
+      CALL GRP_GET( IGRP, INDEX, 1, NAME, STATUS )
 
 *  If an error has occurred, annull it and store a blank value for the
 *  name.
