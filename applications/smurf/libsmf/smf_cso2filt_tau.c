@@ -41,6 +41,8 @@
 *       and the keymap should contain an entry named "taurelation_FILT"
 *       containing "a" and "b".
 *     - The routine will not attempt to guess a tau relation.
+*     - Since "b" is usually negative, the calculation is skipped if the
+*       CSO tau is zero. The routine returns a tau of 0.0.
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -52,10 +54,13 @@
 *        Initial version
 *     2010-06-02 (TIMJ):
 *        Add external extinction parameters. No longer calls smf_scale_tau.
+*     2011-02-18 (AGG):
+*        Trap CSO tau of 0 and return 0
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008,2010 Science and Technology Facilities Council.
+*     Copyright (C) 2011 the University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -101,6 +106,9 @@ double smf_cso2filt_tau( const smfHead *hdr, double csotau, AstKeyMap * extpars,
   if (csotau == VAL__BADD) {
     csotau = smf_calc_meantau( hdr, status );
   }
+
+  /* Trap a CSO tau of 0 and just return 0 */
+  if (csotau == 0.0) return 0.0;
 
   /* Get the filter name */
   smf_fits_getS( hdr, "FILTER", filter, sizeof(filter), status);
