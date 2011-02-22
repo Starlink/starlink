@@ -944,6 +944,11 @@ f     - AST_TESTFITS: Test if a keyword has a defined value in a FitsChan
 *        mapping.
 *     17-FEB-2011 (DSB):
 *        Fix bug in axis linearity check (IsMapLinear).
+*     22-FEB-2011 (DSB):
+*        The translations of AIPS non-standard CTYPE values were always
+*        stored as primary axis description keywords, even if the original
+*        non-standard CTYPE values were read from an alternative axis
+*        descriptions.
 *class--
 */
 
@@ -27650,13 +27655,13 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
                        AST__STRING, (void *) &cval, 0, method,
                        class, status ) ){
             if( IsAIPSSpectral( cval, &astype, &assys, status ) ) {
-               SetValue( ret, FormatKey( "CTYPE", j + 1, -1, ' ', status ),
+               SetValue( ret, FormatKey( "CTYPE", j + 1, -1, s, status ),
                          (void *) &astype, AST__STRING, NULL, status );
                SetValue( ret, "SPECSYS", (void *) &assys, AST__STRING, NULL, status );
                break;
             } else if( !strcmp( cval, "LAMBDA  " ) ) {
                cval = "WAVE";
-               SetValue( ret, FormatKey( "CTYPE", j + 1, -1, ' ', status ),
+               SetValue( ret, FormatKey( "CTYPE", j + 1, -1, s, status ),
                          (void *) &cval, AST__STRING, NULL, status );
                break;
             }
