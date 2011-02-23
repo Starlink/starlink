@@ -32,7 +32,7 @@
 
 *  Arguments:
 *     NDIM2 = INTEGER (Given)
-*        The numner of axes in the reference NDF.
+*        The number of axes in the reference NDF.
 *     INDF1 = INTEGER (Given)
 *        Identifier for the input NDF.
 *     INDF2 = INTEGER (Given)
@@ -144,6 +144,9 @@
 *     15-JAN-2008 (DSB):
 *        Use AST_RESAMPLEUB instead of AST_RESAMPLEUW when resampling the
 *        quality array.
+*     23-FEB-2011 (DSB):
+*        Fix two places where it is assumed that the number of input and
+*        output axes are equal.
 *     {enter_further_changes_here}
 
 *-
@@ -268,22 +271,31 @@
       ELSE
 
 *  Store the pixel co-ordinate bounds of the input image.
-         DO I = 1, NDIM2
+         DO I = 1, NDIM1
             PLBND1( I ) = DBLE( LBND1( I ) - 1 )
             PUBND1( I ) = DBLE( UBND1( I ) )
          END DO
 
 *  Find the bounds on each axis of the corresponding area in the output
-*  image.
+*  image (just use the supplied bounds on any axis that has good supplied
+*  bounds - these are added to the reference NDF by KPS1_WALA8).
          DO I = 1, NDIM2
-            CALL AST_MAPBOX( MAP, PLBND1, PUBND1, .TRUE., I,
-     :                       PLBND2( I ), PUBND2( I ), XL, XU, STATUS )
+            IF( XY1( I ) .EQ. VAL__BADI .OR.
+     :          XY2( I ) .EQ. VAL__BADI ) THEN
+               CALL AST_MAPBOX( MAP, PLBND1, PUBND1, .TRUE., I,
+     :                          PLBND2( I ), PUBND2( I ), XL, XU,
+     :                          STATUS )
 
 *  Convert to pixel index bounds.
-            LBND2( I ) = NINT( PLBND2( I ) )
-            UBND2( I ) = NINT( PUBND2( I ) )
-         END DO
+               LBND2( I ) = NINT( PLBND2( I ) )
+               UBND2( I ) = NINT( PUBND2( I ) )
 
+            ELSE
+               LBND2( I ) = XY1( I )
+               UBND2( I ) = XY2( I )
+            END IF
+
+         END DO
       END IF
 
 *  Report the bounds of the output NDF.
@@ -297,10 +309,12 @@
      :                'NDF has bounds ( ^B )', STATUS )
 
 *  Get bounds of the input and output NDFs in grid co-ords
-      DO I = 1, NDIM2
+      DO I = 1, NDIM1
          LGRID1( I ) = 1
          UGRID1( I ) = UBND1( I ) - LBND1( I ) + 1
+      END DO
 
+      DO I = 1, NDIM2
          LGRID2( I ) = 1
          UGRID2( I ) = UBND2( I ) - LBND2( I ) + 1
 

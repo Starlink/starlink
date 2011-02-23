@@ -47,6 +47,7 @@ kps1_skyfn.f kps1_skyft.f kps1_stqa0.f kps1_stqa1.f kps1_rmask.f \
 kps1_supeb.f kps1_supei.f kps1_supev.f kps1_supf.f  kps1_suseb.f \
 kps1_susei.f kps1_susev.f kps1_susf.f  kps1_trop1.f kps1_trop2.f \
 kps1_vecky.f kps1_vecpl.f kps1_vect.f  kps1_wala0.f kps1_wala7.f \
+kps1_wala8.f \
 kps1_wieap.f kps1_wiecp.f kps1_wiecs.f kps1_wiefl.f kps1_wiefp.f \
 kps1_wieou.f kps1_wiepw.f kps1_wmos0.f kps1_zpdec.f kps1_zprep.f \
 linplt.f listsb.f lsfun1.f med3d.f medwts.f medwv.f \
@@ -129,7 +130,7 @@ MAINTAINERCLEANFILES = $(GEN_F_ROUTINES)
 .gbdirw.f:
 	$(FGENERIC)  -t bdirw $<
 
-# We need KAP_ERR 
+# We need KAP_ERR
 AM_FCFLAGS = -I.. @TCL_CFLAGS@ @TK_CFLAGS@
 STAR_FCFLAGS = -I.. @STAR_FCFLAGS@
 

@@ -49357,6 +49357,12 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       producing corresponding output NDFs which are aligned pixel-for-pixel
       with a specified reference NDF.
 
+      If an input NDF has more pixel axes than the reference NDF, then
+      the extra pixel axes are retained unchanged in the output NDF.
+      Thus, for instance, if an input RA/Dec/velocity cube is aligned
+      with a reference 2D galactic longitude/latitude image, the output
+      NDF will be a galactic longitude/latitude/velocity cube.
+
       The transformations needed to produce alignment are derived from the
       co-ordinate system information stored in the
       \htmlref{WCS}{apndf:wcs} components of the supplied NDFs.  For each
@@ -57684,6 +57690,14 @@ The following applications have been modified:
       \begin{itemize}
         \item Permits processing of very large datasets by dividing into
         manageable sections.
+      \end{itemize}
+   \item [\htmlref{WCSALIGN}{WCSALIGN}]\mbox{}
+      \begin{itemize}
+        \item If an input NDF has more pixel axes than the reference NDF,
+         an attempt will now be made to align the input using the reference
+         axes, whilst retaining the other axes. Thus, if a 3D spectral cube
+         is aligned with a 2D image, the resuling output NDF would be a
+         3D cube, aligned spatially with the image
       \end{itemize}
 \end{description}
 

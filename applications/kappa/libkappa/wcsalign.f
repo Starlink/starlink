@@ -24,6 +24,12 @@
 *     producing corresponding output NDFs which are aligned
 *     pixel-for-pixel with a specified reference NDF.
 *
+*     If an input NDF has more pixel axes than the reference NDF, then
+*     the extra pixel axes are retained unchanged in the output NDF.
+*     Thus, for instance, if an input RA/Dec/velocity cube is aligned
+*     with a reference 2D galactic longitude/latitude image, the output
+*     NDF will be a galactic longitude/latitude/velocity cube.
+*
 *     The transformations needed to produce alignment are derived from
 *     the co-ordinate system information stored in the WCS components of
 *     the supplied NDFs. For each input NDF, alignment is first
@@ -459,6 +465,8 @@
 *        Add CONSERVE parameter, and Sombrero function methods.
 *     29-NOV-2005 (DSB):
 *        Pass the AUTOBN value to kps1_wala0.
+*     23-FEB-2011 (DSB):
+*        Allow input 3D cubes to be aligned with reference 2D images.
 *     {enter_further_changes_here}
 
 *-
@@ -490,14 +498,17 @@
       INTEGER INDF2              ! NDF id. for the output NDF
       INTEGER INDFR              ! NDF id. for the reference NDF
       INTEGER IWCSR              ! WCS FrameSet for reference NDF
+      INTEGER IWCSRT             ! Modified WCS FrameSet for ref. NDF
       INTEGER J                  ! Axis index
       INTEGER LBND( NDF__MXDIM ) ! Indices of lower left corner of outputs
       INTEGER LBNDR( NDF__MXDIM )! Lower pixel bounds of reference NDF
+      INTEGER LBNDT( NDF__MXDIM )! Modified indices of output corner
       INTEGER MAP                ! AST id for (pix_in -> pix_out) Mapping
       INTEGER MAP4               ! AST id for (grid_in -> pix_in) Mapping
       INTEGER MAXPIX             ! Initial scale size in pixels
       INTEGER METHOD_CODE        ! Integer corresponding to interp. method
       INTEGER NDIMR              ! Number of pixel axes in reference NDF
+      INTEGER NDIMRT             ! Modified no. of pixel axes in ref. NDF
       INTEGER NPAR               ! No. of required interpolation parameters
       INTEGER ORIGIN( NDF__MXDIM )! New pixel origin
       INTEGER SHIFT( NDF__MXDIM )! Pixel axis shifts
@@ -505,6 +516,7 @@
       INTEGER SIZEO              ! Total size of the output group
       INTEGER UBND( NDF__MXDIM ) ! Indices of upper right corner of outputs
       INTEGER UBNDR( NDF__MXDIM )! Upper pixel bounds of reference NDF
+      INTEGER UBNDT( NDF__MXDIM )! Modified indices of output corner
       LOGICAL ABORT              ! Abort upon first error?
       LOGICAL AUTOBN             ! Determine output bounds automatically?
       LOGICAL CONSRV             ! Conserve flux whilst resampling?
@@ -748,11 +760,17 @@
          CALL NDF_MSG( 'NDF', INDF1 )
          CALL MSG_OUT( 'WCSALIGN_MSG7', '  Processing ^NDF...', STATUS )
 
+*  If the reference NDF has fewer pixel axes than the current input NDF,
+*  then modify the reference WCS FrameSet and bounds by adding extra axes
+*  so that the reference and input NDFs have the same number of pixel axes.
+         CALL KPS1_WALA8( INDF1, NDIMR, IWCSR, LBND, UBND,
+     :                    NDIMRT, IWCSRT, LBNDT, UBNDT, STATUS )
+
 *  Find the Mapping from input pixel co-ordinates to reference (i.e.
 *  output) pixel co-ordinates. This also determines if the Mapping is a
 *  simple integer pixel shift of origin. If it is, it returns the new pixel
 *  origin in ORIGIN.
-         CALL KPS1_WALA7( INDF1, IWCSR, MAP, MAP4, ORIGIN, STATUS )
+         CALL KPS1_WALA7( INDF1, IWCSRT, MAP, MAP4, ORIGIN, STATUS )
 
 *  If the input pixel->output pixel Mapping is a shift of origin, we do
 *  not need to do a full resampling or rebinning. However, if the output
@@ -769,13 +787,14 @@
             END IF
 
 *  Determine the pixel shifts to apply to INDF2.
-            CALL NDF_BOUND( INDF2, NDIMR, LBND, UBND, NDIMR, STATUS )
-            DO J = 1, NDIMR
-               SHIFT( J ) = ORIGIN( J ) - LBND( J )
+            CALL NDF_BOUND( INDF2, NDIMRT, LBNDT, UBNDT, NDIMRT,
+     :                      STATUS )
+            DO J = 1, NDIMRT
+               SHIFT( J ) = ORIGIN( J ) - LBNDT( J )
             END DO
 
 *  Apply the shifts.
-            CALL NDF_SHIFT( NDIMR, SHIFT, INDF2, STATUS )
+            CALL NDF_SHIFT( NDIMRT, SHIFT, INDF2, STATUS )
 
 *  If the input pixel->output pixel Mapping is not just a shift of origin,
 *  we do a full resampling or rebinning. We cannot do this if "in-situ"
@@ -789,8 +808,8 @@
             CALL NDG_NDFPR( INDF1, 'UNITS', IGRP2, I, INDF2, STATUS )
 
 *  Process this pair of input and output NDFs.
-            CALL KPS1_WALA0( NDIMR, INDF1, INDF2, MAP, MAP4, IWCSR,
-     :                       METHOD_CODE, PARAMS, AUTOBN, LBND, UBND,
+            CALL KPS1_WALA0( NDIMRT, INDF1, INDF2, MAP, MAP4, IWCSRT,
+     :                       METHOD_CODE, PARAMS, AUTOBN, LBNDT, UBNDT,
      :                       ERRLIM, MAXPIX, REBIN, CONSRV, WLIM,
      :                       STATUS )
 
@@ -805,6 +824,9 @@
 
 *  Annul the input NDF identifier.
          CALL NDF_ANNUL( INDF1, STATUS )
+
+*  Annul the temporary reference FrameSet.
+         CALL AST_ANNUL( IWCSRT, STATUS )
 
 *  If an error has occurred, delete any output NDF, otherwise just
 *  annul its identifier.
