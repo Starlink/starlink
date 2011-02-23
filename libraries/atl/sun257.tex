@@ -517,6 +517,80 @@ higher-level utility tasks.
 % =====================
 \small
 \sstroutine{
+   ATL\_ADDWCSAXIS
+}{
+   Add one or more axes to an NDFs WCS FrameSet
+}{
+   \sstdescription{
+      This routine adds one or more new axes to all the Frames in an NDF
+      WCS FrameSet. Frames that are known to be NDF-special (e.g. GRID,
+      AXIS, PIXEL and FRACTION) are expanded to include a number of extra
+      appropriate axes equal to the Nin attribute of the supplied Mapping.
+      all other Frames in the FrameSet are replaced by CmpFrames holding the
+      original Frame and the supplied Frame. These new axes are connected to
+      the new GRID axes using the supplied Mapping.
+   }
+   \sstinvocation{
+      CALL ATL\_ADDWCSAXIS( WCS, MAP, FRM, LBND, UBND, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         WCS = INTEGER (Given)
+      }{
+         A pointer to a FrameSet that is to be used as the WCS FrameSet in
+         an NDF. This imposes the restriction that the base Frame must
+         have Domain GRID.
+      }
+      \sstsubsection{
+         MAP = INTEGER (Given)
+      }{
+         A pointer to a Mapping. The forward transformation should transform
+         the new GRID axes into the new WCS axes.
+      }
+      \sstsubsection{
+         FRM = INTEGER (Given)
+      }{
+         A pointer to a Frame defining the new WCS axes.
+      }
+      \sstsubsection{
+         LBND() = INTEGER (Given)
+      }{
+         An array holding the lower pixel index bounds on the new axes.
+         The length of this array should beq aual to the Nin attribute of
+         the MAP Mapping.
+      }
+      \sstsubsection{
+         UBND() = INTEGER (Given)
+      }{
+         An array holding the upper pixel index bounds on the new axes.
+         The length of this array should beq aual to the Nin attribute of
+         the MAP Mapping.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This routine is just a wrapper around the C function atlAddWcsAxis.
+
+         \sstitem
+         The new axes are appended to the end of the existing axes, so the
+         axis indices associated with the new axes will extend from {\tt "}nold$+$1{\tt "}
+         to {\tt "}nold$+$nnew{\tt "}, where {\tt "}nold{\tt "} is the number of axes in the original
+         Frame, and {\tt "}nnew{\tt "} is the number of new axes.
+
+         \sstitem
+         An error will be reported if the Nout attribute of {\tt "}map{\tt "} is
+         different to the Naxes attribute of {\tt "}frm{\tt "}.
+      }
+   }
+}
+\sstroutine{
    ATL\_AXTRM
 }{
    Trim axes from the current Frame of a FrameSet
