@@ -4,7 +4,7 @@
 *     SHOWQUAL
 
 *  Purpose:
-*     Display the quality names defined in an NDF.
+*     Displays the quality names defined in an NDF.
 
 *  Language:
 *     Starlink Fortran 77
@@ -21,7 +21,7 @@
 
 *  Description:
 *     This routine displays a list of all the quality names currently
-*     defined within a supplied NDF (see task SETQUAL). The descriptive
+*     defined within a supplied NDF (see Task SETQUAL). The descriptive
 *     comments which were stored with the quality names when they were
 *     originally defined are also displayed. An option exists for also
 *     displaying the number of pixels which hold each quality.
@@ -53,13 +53,13 @@
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
 *     Copyright (C) 2002 Central Laboratory of the Research Councils.
-*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2010, 2011 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -69,8 +69,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
