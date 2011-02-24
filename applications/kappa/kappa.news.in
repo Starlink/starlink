@@ -11,6 +11,11 @@
       -  Permits processing of very large datasets by dividing into
       manageable sections.
 
+   o  SHOWQUAL
+
+      -  Add new QNAMES output parameter to list the attribute name
+      associated with each QUALITY bit.
+
 
 1 KAPPA_Version_1.12
 

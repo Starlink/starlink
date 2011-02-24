@@ -46592,6 +46592,14 @@ Click \htmladdnormallink{here}{shadow_exam.gif} to see an example plot
          The input NDF.
       }
    }
+   \sstresparameters{
+      \sstsubsection{
+         QNAMES( ) = LITERAL (Write)
+      }{
+         The quality names associated with each bit, starting from the
+         lowest significant bit.  Unassigned bits have blank strings.
+      }
+   }
    \sstexamples{
       \sstexamplesubsection{
          showqual "m51,cena" yes
@@ -57691,14 +57699,23 @@ The following applications have been modified:
         \item Permits processing of very large datasets by dividing into
         manageable sections.
       \end{itemize}
-   \item [\htmlref{WCSALIGN}{WCSALIGN}]\mbox{}
+
+   \item [\htmlref{SHOWQUAL}{SHOWQUAL}]\mbox{}
+      \begin{itemize}
+        \item Add new QNAMES output parameter to list the attribute name
+        associated with each QUALITY bit.
+      \end{itemize}
+
+      \item [\htmlref{WCSALIGN}{WCSALIGN}]\mbox{}
       \begin{itemize}
         \item If an input NDF has more pixel axes than the reference NDF,
          an attempt will now be made to align the input using the reference
-         axes, whilst retaining the other axes. Thus, if a 3D spectral cube
-         is aligned with a 2D image, the resuling output NDF would be a
-         3D cube, aligned spatially with the image
+         axes, whilst retaining the other axes. Thus, if a three-dimensional 
+         spectral cube is aligned with a two-dimensional image, the resuling
+         output NDF would be a three-dimensional cube, aligned spatially
+         with the image.
       \end{itemize}
+
 \end{description}
 
 \begin{latexonly}

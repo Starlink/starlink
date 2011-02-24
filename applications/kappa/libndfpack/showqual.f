@@ -37,6 +37,9 @@
 *        comment.  This option adds significantly to the run time.  [NO]
 *     IN = NDF (Read)
 *        The input NDF.
+*     QNAMES( ) = LITERAL (Write)
+*        The quality names associated with each bit, starting from the
+*        lowest significant bit.  Unassigned bits have blank strings.
 
 *  Examples:
 *     showqual "m51,cena" yes
@@ -72,6 +75,7 @@
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -81,6 +85,8 @@
 *        Brought into KAPPA.
 *     2010-10-04 (TIMJ):
 *        SHOWQUAL has no reason to open the input file in UPDATE mode.
+*     2011 February 24 (MJC):
+*        Add QNAMES output parameter.
 *     {enter_further_changes_here}
 
 *-
@@ -115,6 +121,8 @@
       LOGICAL FIXED              ! True if the the current quality is
                                  ! either held or not held by all
                                  ! pixels.
+      INTEGER I                  ! Loop counter
+      CHARACTER LQNAME( IRQ__QBITS )*(IRQ__SZQNM) ! Quality-name list
       CHARACTER LOCS( 5 )*(DAT__SZLOC) ! Locators for quality name
                                  ! information.
       INTEGER NAMES              ! No. of quality names defined in the
@@ -173,6 +181,11 @@
          QI = .FALSE.
       END IF
 
+*  Initialise returned list of quality names.
+      DO I = 1, IRQ__QBITS
+         LQNAME( I ) = ' '
+      END DO
+
 *  If no quality names are defined give a message.
       IF( NAMES .EQ. 0 ) THEN
          CALL MSG_OUT( 'SHOWQUAL_MSG1', '  No quality name '//
@@ -194,6 +207,8 @@
          CONTXT = 0
          CALL IRQ_NXTQN( LOCS, CONTXT, QNAME, FIXED, VALUE, BIT,
      :                   COMMNT, DONE, STATUS )
+
+         IF ( STATUS .EQ. SAI__OK ) LQNAME( BIT ) = QNAME
 
 *  Loop round displaying each quality name in turn.
          DO WHILE( .NOT. DONE .AND. STATUS .EQ. SAI__OK )
@@ -253,6 +268,7 @@
             CALL IRQ_NXTQN( LOCS, CONTXT, QNAME, FIXED, VALUE, BIT,
      :                      COMMNT, DONE, STATUS )
 
+            IF ( STATUS .EQ. SAI__OK ) LQNAME( BIT ) = QNAME
          END DO
       END IF
 
@@ -261,6 +277,9 @@
 
 *  End the NDF context.
       CALL NDF_END( STATUS )
+
+*  Write the output paramter.
+      CALL PAR_PUT1C( 'QNAMES', IRQ__QBITS, LQNAME, STATUS )
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN

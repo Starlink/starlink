@@ -2762,6 +2762,15 @@ package kappa {
             prompt {The input NDF}
             helpkey *
          }
+
+         parameter qnames {
+            size *
+            type LITERAL
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+         }
+
       }
 
       action wcsadd {
