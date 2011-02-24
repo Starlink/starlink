@@ -16,6 +16,14 @@
       -  Add new QNAMES output parameter to list the attribute name
       associated with each QUALITY bit.
 
+   o  WCSALIGN
+
+      -  If an input NDF has more pixel axes than the reference NDF,
+      an attempt will now be made to align the input using the
+      reference axes, whilst retaining the other axes.  Thus, if a
+      three-dimensional spectral cube is aligned with a
+      two-dimensional image, the resuling output NDF would be a
+      three-dimensional cube, aligned spatially with the image.
 
 1 KAPPA_Version_1.12
 
