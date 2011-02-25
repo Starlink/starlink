@@ -14,6 +14,9 @@ text file containing a dump of an AST Object created by (say) atlShow.
 - The function atlMapCopy has been removed. The functionality has been
 moved into the astMapCopy functionin the AST library.
 
+- The new C function atlDumpFits writes a FITS header defined by a FitsChan
+to a new text file specified by a named environment parameter.
+
 Changes introduced by V1.3:
 
 - A new function astAddWcsAxis has been added. It modifies a WCS FrameSet

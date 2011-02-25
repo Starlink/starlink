@@ -49,7 +49,7 @@ atl_kychk.f atl_rdstcs.f atl_rmblft.f
 ADAM_F_ROUTINES = atl_creat.f atl_gtgrp.f
 
 #  Additional C routines required for the ADAM library.
-ADAM_C_ROUTINES = atlGetParam.c atl_adam.c
+ADAM_C_ROUTINES = atlGetParam.c atlDumpFits.c atl_adam.c
 
 dist_starnews_DATA = atl.news
 dist_pkgdata_DATA = LICENCE

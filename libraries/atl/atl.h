@@ -91,5 +91,6 @@ void atlRmblft( AstFitsChan *, int * );
 void atlShow( AstObject *, const char *, const char *, int * );
 void atlTolut( AstMapping *, double, double, double, const char *, AstMapping **, int * );
 void atlWcspx( AstKeyMap *, AstKeyMap *, double[3], double, double, AstFrameSet **, int * );
+void atlDumpFits( const char *, AstFitsChan *, int * );
 
 #endif

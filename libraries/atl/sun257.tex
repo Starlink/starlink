@@ -1970,6 +1970,38 @@ higher-level utility tasks.
    }
 }
 \sstroutine{
+   atlDumpFits
+}{
+   Write the contents of a FitsChan to a text file
+}{
+   \sstdescription{
+      This function creates a new text file containing the contents of
+      the supplied FitsChan as a set of FITS header cards. The name of
+      the text file is obtained via the evironment using a specified
+      parameter.
+   }
+   \sstinvocation{
+      void atlDumpFits( const char $*$param, AstFitsChan $*$fc, int $*$status )
+   }
+   \sstarguments{
+      \sstsubsection{
+         param
+      }{
+         The parameter name.
+      }
+      \sstsubsection{
+         fc
+      }{
+         A pointer to the FitsChan.
+      }
+      \sstsubsection{
+         status
+      }{
+         Pointer to the global status variable.
+      }
+   }
+}
+\sstroutine{
    atlGetParam
 }{
    Create a vector character string entry in an AST KeyMap from a list
