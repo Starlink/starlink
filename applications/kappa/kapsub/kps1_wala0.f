@@ -147,6 +147,9 @@
 *     23-FEB-2011 (DSB):
 *        Fix two places where it is assumed that the number of input and
 *        output axes are equal.
+*     24-FEB-2011 (DSB):
+*        Correct conversion from pixel coord to pixel index when finding
+*        bounds of output NDF.
 *     {enter_further_changes_here}
 
 *-
@@ -287,7 +290,7 @@
      :                          STATUS )
 
 *  Convert to pixel index bounds.
-               LBND2( I ) = NINT( PLBND2( I ) )
+               LBND2( I ) = NINT( PLBND2( I ) ) + 1
                UBND2( I ) = NINT( PUBND2( I ) )
 
             ELSE
