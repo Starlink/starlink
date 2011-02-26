@@ -312,7 +312,11 @@
 *        CRVALn, CDELTn, CRPIXn, CTYPEn, CUNITn --- are derived from
 *          the NDF WCS component if possible (see "World Co-ordinate
 *          Systems").  If this is not possible, and if PROFITS is TRUE,
-*          then they are copied from the NDF's FITS extension.
+*          then it copies the headers of a valid WCS specified in the
+*          NDF's FITS airlock.  Should that attempt fail, the last
+*          resort tries the NDF AXIS component, if it exists, but it
+*          only creates the headers provided all of the axis centre
+*          co-ordinates are linear.
 *        OBJECT, LABEL, BUNIT --- the values held in the NDF's TITLE,
 *          LABEL, and UNITS components respectively are used if
 *          they are defined; otherwise any values found in the FITS

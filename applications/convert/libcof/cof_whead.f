@@ -82,15 +82,18 @@
 *        LBOUNDn --- the pixel lower bounds of an NDF whose origin is
 *          not 1 along each axis.  (These are not part of the standard.)
 *        CRVALn, CDELTn, CRPIXn, CTYPEn, CUNITn --- are derived from
-*          the NDF axis structures if possible.  If no linear NDF axis
-*          structures are present, the values in the NDF FITS extension
-*          are copied.  If any are non-linear, all FITS axis
-*          information is lost.  When any non-zero CROTAn card is
-*          present in the FITS extension, the extension axis
-*          information is propagated, and not that of the NDF axis
-*          structure.  [This rule is to enable rotated axis (not
-*          supported in the NDF) to be retained in the cycle from FITS
-*          to NDF and back to FITS.]
+*          the NDF WCS component if possible (i.e. exists and maps to
+*          a FITS WCS projection type).  If this is not possible, and
+*          if argument PROPEX is .TRUE., then it copies the headers of
+*          a valid WCS specified in the NDF's FITS airlock.  Should
+*          that attempt fail, the last resort tries the NDF AXIS
+*          component, if it exists, but it only creates the headers
+*          provided all of the axis centre co-ordinates are linear.
+*          When any non-zero CROTAn card is present in the FITS
+*          extension, the extension axis information is propagated, and
+*          not that of the NDF AXIS component.  [This rule is to enable
+*          rotated axis (not supported in the NDF) to be retained in the
+*          cycle from FITS to NDF and back to FITS.]
 *        OBJECT, LABEL, BUNIT --- the values held in NDF TITLE, LABEL,
 *          and UNITS respectively are used if present, otherwise any
 *          units found in the FITS extension are used.  For a variance
@@ -398,10 +401,13 @@
 *    LBOUNDn --- the pixel lower bounds of an NDF whose origin is
 *      not 1 along each axis.  (These are not part of the standard.)
 *    CRVALn, CDELTn, CRPIXn, CTYPEn, CUNITn --- are derived from the
-*      NDF axis structures if possible.  If no linear NDF axis
-*      structures are present, the values in the NDF FITS extension are
-*      copied.  If any are non-linear, all FITS axis information is
-*      lost.
+*      NDF WCS component if possible (i.e. exists and maps to a FITS WCS
+*      projection type).  If this is not possible, and if argument
+*      PROPEX is .TRUE., then it copies the headers of a valid WCS
+*      specified in the NDF's FITS airlock.  Should that attempt fail,
+*      the last resort tries the NDF AXIS component, if it exists, but
+*      it only creates the headers  provided all of the axis centre
+*      co-ordinates are linear.
 *    OBJECT, LABEL, BUNIT --- the values held in NDF TITLE, LABEL,
 *      and UNITS respectively are used if present, otherwise any values
 *      found in the FITS extension are used.

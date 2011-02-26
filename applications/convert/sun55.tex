@@ -4666,8 +4666,12 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
               from the NDF WCS component if possible (see
               \htmlref{\texttt{"}World Co-ordinate Systems\texttt{"}}
                  {world_coordinate_systems}).
-              If this is not possible, and if PROFITS is \texttt{TRUE}, then
-              they are copied from the NDF's FITS extension.
+              If this is not possible, and if PROFITS is \texttt{TRUE},
+              then it copies the headers of a valid WCS specified in the
+              NDF's FITS airlock.  Should that attempt fail, the last
+              resort tries the NDF AXIS component, if it exists, but it
+              only creates the headers provided all of the axis centre
+              co-ordinates are linear.
 
             \sstitem
             OBJECT, LABEL, BUNIT --- the values held in the NDF's TITLE,

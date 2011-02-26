@@ -30,9 +30,11 @@
 *        o  The OBJECT, LABEL, and BUNIT keywords are derived from
 *           the TITLE, LABEL, and UNITS NDF components.
 *        o  The CDELTn, CRPIXn, CRVALn keywords are derived from a
-*           set of linear NDF AXIS structures.  Whenever the NDF AXIS
-*           structure contains units or a label CUNITn and CTYPEn
-*           keywords are created repsectively.
+*           set of linear NDF AXIS structures, provided that there is
+*           no WCS component in the NDF and the FITS airlock has no
+*           usable WCS information.  Whenever the NDF AXIS structure
+*           contains units or a label CUNITn and CTYPEn keywords are
+*           created respectively.
 *        o  DATE and ORIGIN cards are written.
 *        o  For integer DATA types a BLANK card is written using the
 *           standard bad value corresponding to the type of the FITS
@@ -74,8 +76,8 @@
 *     Copyright (C) 1994 Science & Engineering Research Council.
 *     Copyright (C) 1996, 1998, 2003-2004 Central Laboratory of the
 *     Research Councils. Copyright (C) 2006 Particle Physics &
-*     Astronomy Research Council. Copyright (C) 2007-2008 Science &
-*     Technology Facilities Council. All Rights Reserved.
+*     Astronomy Research Council. Copyright (C) 2007-2008, 2011 Science
+*     & Technology Facilities Council. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
