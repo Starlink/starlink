@@ -103,7 +103,7 @@
 *        DATE --- is created automatically.
 *        ORIGIN --- inherits any existing ORIGIN card in the NDF FITS
 *          extension, unless you supply a value through argument
-*          ORIGIN other than the default "Starlink Project, U.K." or
+*          ORIGIN other than the default "Starlink Software" or
 *          a blank string.
 *        EXTNAME --- is the component name of the object from the COMP
 *          argument, unless argument EXTNAM is not blank when keyword
@@ -384,11 +384,11 @@
 
 *  Use local variable for the origin to deal with a null value.
       LORIGN = ORIGIN
-      IF ( ORIGIN . EQ. ' ' ) LORIGN = 'Starlink Project, U.K.'
+      IF ( ORIGIN . EQ. ' ' ) LORIGN = 'Starlink Software'
 
 *  Record whether or not an existing ORIGIN card in the FITS airlock
 *  is inherited.
-      PRORIG = LORIGN .EQ. 'Starlink Project, U.K.'
+      PRORIG = LORIGN .EQ. 'Starlink Software'
 
 *  Write special header cards.
 *  ===========================
@@ -414,8 +414,7 @@
 *    DATE --- is created automatically.
 *    ORIGIN --- inherits any existing ORIGIN card in the NDF FITS
 *      extension, unless you supply a value through argument ORIGIN
-*      other than the default "Starlink Project, U.K." or a blank
-*      string.
+*      other than the default "Starlink Software" or a blank string.
 *    BLANK --- is created for integer data types from the bad value.
 *
       CALL COF_WNDFH( NDFI, COMP, FUNIT, NFLAGS, BITPIX, LORIGN,

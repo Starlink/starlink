@@ -157,7 +157,7 @@
 *     ORIGIN = LITERAL (Read)
 *        The origin of the FITS files.  This becomes the value of the
 *        ORIGIN keyword in the FITS headers.  If a null value is given
-*        it defaults to "Starlink Project, U.K.".
+*        it defaults to "Starlink Software".
 *        [!]
 *     OUT = LITERAL (Write)
 *        The names for the output FITS files.  These may be enclosed in
@@ -327,7 +327,7 @@
 *        DATE --- is created automatically.
 *        ORIGIN --- inherits any existing ORIGIN card in the NDF FITS
 *          extension, unless you supply a value through parameter
-*          ORIGIN other than the default "Starlink Project, U.K."
+*          ORIGIN other than the default "Starlink Software".
 *        EXTNAME --- is the array-component name when the EXTNAME
 *          appears in the primary header or an IMAGE extension.  In a
 *          binary-table derived from an NDF extension, EXTNAME is the
@@ -691,6 +691,8 @@
 *     2010 November 30 (MJC):
 *        Add remark on clobbering of output file, and revised an
 *        example showing how to overwrite an existing FITS file.
+*     2011 February 25 (MJC):
+*        Change ORIGIN keyword default from "Starlink Project, U.K.".
 *     {enter_further_changes_here}
 
 *-
