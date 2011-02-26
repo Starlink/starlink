@@ -1115,7 +1115,7 @@
 
 *  Tidy and exit if there has been an error.
       IF ( STATUS .NE. SAI__OK ) THEN
-         CALL GRP_DELET( IGRP1, STATUS )
+         IF ( IGRP1 .NE. GRP__NOID ) CALL GRP_DELET( IGRP1, STATUS )
          GOTO 999
       END IF
 
@@ -1203,11 +1203,11 @@
       END DO
 
 *  Finished with the first group so delete it.
-      CALL GRP_DELET( IGRP1, STATUS )
+      IF ( IGRP1 .NE. GRP__NOID ) CALL GRP_DELET( IGRP1, STATUS )
 
 *  Tidy up and exit if something went wrong.
       IF ( STATUS .NE. SAI__OK ) THEN
-         CALL GRP_DELET( IGRP2, STATUS )
+         IF ( IGRP2 .NE. GRP__NOID ) CALL GRP_DELET( IGRP2, STATUS )
          GOTO 999
       END IF
 
@@ -1238,7 +1238,7 @@
       CALL GRP_PURGE( IGRP2, IGRP3, STATUS )
 
 *  Finished with the second group so delete it.
-      CALL GRP_DELET( IGRP2, STATUS )
+      IF ( IGRP2 .NE. GRP__NOID ) CALL GRP_DELET( IGRP2, STATUS )
 
 *  Find the number of FITS files after the purge.
       CALL GRP_GRPSZ( IGRP3, NIFILE, STATUS )
@@ -1252,7 +1252,7 @@
 
 *  Tidy up and exit if something went wrong.
       IF ( STATUS .NE. SAI__OK ) THEN
-         CALL GRP_DELET( IGRP3, STATUS )
+         IF ( IGRP3 .NE. GRP__NOID ) CALL GRP_DELET( IGRP3, STATUS )
          GOTO 999
       END IF
 
@@ -1282,8 +1282,8 @@
 
 *  Tidy up and exit.
       IF ( STATUS .NE. SAI__OK ) THEN
-         CALL GRP_DELET( IGRP3, STATUS )
-         CALL GRP_DELET( NGROUP, STATUS )
+         IF ( IGRP3 .NE. GRP__NOID ) CALL GRP_DELET( IGRP3, STATUS )
+         IF ( NGROUP .NE. GRP__NOID ) CALL GRP_DELET( NGROUP, STATUS )
          GOTO 999
       END IF
 
@@ -1310,12 +1310,12 @@
       END DO
 
 *  Finished with the group of default output file names.
-      CALL GRP_DELET( NGROUP, STATUS )
+      IF ( NGROUP .NE. GRP__NOID ) CALL GRP_DELET( NGROUP, STATUS )
 
 *  Tidy up and exit if something went wrong.
       IF ( STATUS .NE. SAI__OK ) THEN
-         CALL GRP_DELET( OGROUP, STATUS )
-         CALL GRP_DELET( IGRP3, STATUS )
+         IF ( OGROUP .NE. GRP__NOID ) CALL GRP_DELET( OGROUP, STATUS )
+         IF ( IGRP3 .NE. GRP__NOID ) CALL GRP_DELET( IGRP3, STATUS )
          GOTO 999
       END IF
 
@@ -1330,8 +1330,8 @@
      :     /'equal the number of input FITS files (^NI).', STATUS )
 
 *  Tidy up and exit.
-         CALL GRP_DELET( OGROUP, STATUS )
-         CALL GRP_DELET( IGRP3, STATUS )
+         IF ( OGROUP .NE. GRP__NOID ) CALL GRP_DELET( OGROUP, STATUS )
+         IF ( IGRP3 .NE. GRP__NOID ) CALL GRP_DELET( IGRP3, STATUS )
          GOTO 999
       END IF
 
@@ -1343,8 +1343,8 @@
 
 *  Tidy up and exit if there has been an error.
       IF ( STATUS .NE. SAI__OK ) THEN
-         CALL GRP_DELET( OGROUP, STATUS )
-         CALL GRP_DELET( IGRP3, STATUS )
+         IF ( OGROUP .NE. GRP__NOID ) CALL GRP_DELET( OGROUP, STATUS )
+         IF ( IGRP3 .NE. GRP__NOID ) CALL GRP_DELET( IGRP3, STATUS )
          GOTO 999
       END IF
 
@@ -1355,9 +1355,9 @@
 
 *  Tidy up and exit.
       IF ( STATUS .NE. SAI__OK ) THEN
-         CALL GRP_DELET( FCGRP, STATUS )
-         CALL GRP_DELET( OGROUP, STATUS )
-         CALL GRP_DELET( IGRP3, STATUS )
+         IF ( FCGRP .NE. GRP__NOID ) CALL GRP_DELET( FCGRP, STATUS )
+         IF ( OGROUP .NE. GRP__NOID ) CALL GRP_DELET( OGROUP, STATUS )
+         IF ( IGRP3 .NE. GRP__NOID ) CALL GRP_DELET( IGRP3, STATUS )
          GOTO 999
       END IF
 
@@ -1497,11 +1497,11 @@
       END DO
 
 *  Delete the groups.
-      CALL GRP_DELET( TGROUP, STATUS )
-      CALL GRP_DELET( FCGRP, STATUS )
-      CALL GRP_DELET( OGROUP, STATUS )
-      CALL GRP_DELET( IGRP3, STATUS )
-      CALL GRP_DELET( ENCGRP, STATUS )
+      IF ( TGROUP .NE. GRP__NOID ) CALL GRP_DELET( TGROUP, STATUS )
+      IF ( FCGRP .NE. GRP__NOID ) CALL GRP_DELET( FCGRP, STATUS )
+      IF ( OGROUP .NE. GRP__NOID ) CALL GRP_DELET( OGROUP, STATUS )
+      IF ( IGRP3 .NE. GRP__NOID ) CALL GRP_DELET( IGRP3, STATUS )
+      IF ( ENCGRP .NE. GRP__NOID ) CALL GRP_DELET( ENCGRP, STATUS )
 
  999  CONTINUE
 
