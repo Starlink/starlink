@@ -1,3 +1,10 @@
+1 CONVERT_Version_1.6
+
+ Support for FITS -TAB projection type added.
+
+ Add new WCSCOMP parameter to FITS2NDF.  It controls where world
+ co-ordinate information is propagated in the output NDF.
+
 1 CONVERT_Version_1.5-19
 
  FITS2NDF can now recreate data that were formerly in a UKIRT_HDS

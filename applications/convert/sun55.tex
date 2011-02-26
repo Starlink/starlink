@@ -17,16 +17,16 @@
 {Copyright \copyright\ 2005 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {55.27}
+\newcommand{\stardocnumber}    {55.28}
 \newcommand{\stardocauthors}   {Malcolm J. Currie\\
                                 G.J.Privett\\
                                 A.J.Chipperfield\\
                                 D.S.Berry\\
                                 A.C.Davenhall}
-\newcommand{\stardocdate}      {2010 December 23}
+\newcommand{\stardocdate}      {2011 February 25}
 \newcommand{\stardoctitle}     {CONVERT\\
                                 A Format-conversion Package}
-\newcommand{\stardocversion}   {Version 1.5-19}
+\newcommand{\stardocversion}   {Version 1.6-1}
 \newcommand{\stardocmanual}    {User's Manual}
 \newcommand{\stardocabstract}  {
 The \CONVERT\ package contains utilities for converting data files
@@ -2056,7 +2056,9 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       }{
          Determines which FITS keywords should be used to define the
          world co-ordinate systems to be stored in the NDF's WCS
-         component. The allowed values (case-insensitive) are:
+         component.  This parameter is only relevant when WCSCOMP is
+         \texttt{"WCS"} or \texttt{"Both"}.  The allowed values
+         (case-insensitive) are:
          \ssthitemlist{
 
          \sstitem
@@ -2486,6 +2488,41 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          WCSATTRS=\texttt{"CarLin=1"}.  A null  value (\texttt{!})
          results in all attributes using default values. \texttt{[!]}
       }
+      \sstsubsection{
+         WCSCOMP = LITERAL (Read)
+      }{
+         This requests where co-ordinate information is stored in the
+         NDF for arbitrary FITS files.  FITS files from certain sources
+         (see \htmlref{\texttt{"}Special Formats\texttt{"}}{special_formats}
+         below) adopt their own conventions such
+         as always creating AXIS structures and not WCS, thus ignore
+         this parameter.  The allowed values are as follows.
+         \ssthitemlist{
+
+         \sstitem
+            \texttt{"Axis"} --- Writes co-ordinates of each element in the
+                                AXIS structure.
+
+         \sstitem
+            \texttt{"WCS"}  --- Stores co-ordinate information in the WCS component.
+
+         \sstitem
+            \texttt{"Both"} --- Writes co-ordinate information in both the AXIS and
+                                WCS components.
+
+         \sstitem
+            \texttt{"None"} --- Omits co-ordinate information.
+         }
+
+         \texttt{"WCS"} is the recommended option as it offers most flexibility
+         and many facilities such as transformations between co-ordinate
+         systems.  However, some legacy applications such as Figaro do
+         not recognise WCS and for these \texttt{"Axis"} is more appropriate.
+         If you are mixing data processing packages then you may need
+         \texttt{"Both"}, but care should be exercised to avoid inconsistent
+         representations, especially if the data are exported to FITS
+         with \htmlref{NDF2FITS}{NDF2FITS} (see its Parameter USEAXIS).  \texttt{["WCS"]}
+      }
    }
    \sstexamples{
       \sstexamplesubsection{
@@ -2504,11 +2541,12 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          BITPIX=8 or 16 and non-default BSCALE and BZERO keywords.
       }
       \sstexamplesubsection{
-         fits2ndf 256.fit f256 fmtcnv=t type=\_real
+         fits2ndf 256.fit f256 fmtcnv=t type=\_real wcscomp=axis
       }{
          As the first example, but now a \_REAL type data array is
          created by applying the scale and offset from BSCALE and
          BZERO keywords to the integer values stored in {\tt 256.fit}.
+         Co-ordinate information is written only to the AXIS structure.
       }
       \sstexamplesubsection{
          fits2ndf 256.fit f256 noprofits noproexts
@@ -2652,8 +2690,8 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          \ssthitemlist{
             \sstitem
             CRVAL\textit{n}, CDELT\textit{n}, CRPIX\textit{n}, CTYPE\textit{n},
-            CUNIT\textit{n} --- define the NDF's WCS component (see Parameter
-            ENCODINGS).
+            CUNIT\textit{n} --- define the NDF's WCS and/or AXIS components
+            (see Parameters ENCODINGS and WCSCOMP).
             \sstitem
             OBJECT, LABEL, BUNIT --- if present are equated to the NDF's
             TITLE, LABEL, and UNITS components respectively.
@@ -7499,5 +7537,13 @@ Starlink equivalent.
 The IDL scripts \htmlref{READ\_NDF}{READ_NDF} and
 \htmlref{WRITE\_NDF}{WRITE_NDF} have been fixed to use STARLINK\_DIR
 to specify the correct IDL library path.
+
+\subsection{Release Notes -- V1.6}
+
+Support for FITS -TAB projection type added.
+
+Add new WCSCOMP parameter to \htmlref{FITS2NDF}{FITS2NDF}.  It
+controls where world co-ordinate information is propagated in the output
+NDF.
 
 \end{document}

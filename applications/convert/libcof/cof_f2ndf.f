@@ -1,6 +1,6 @@
       SUBROUTINE COF_F2NDF( FILNAM, NDF, LOGHDR, FDL, FMTCNV, USETYP,
      :                      PROFIT, PROXTI, CONTNR, NENCOD, ENCODS,
-     :                      WCSATT, STATUS )
+     :                      WCSATT, WCSCMP, STATUS )
 *+
 *  Name:
 *     COF_F2NDF
@@ -13,7 +13,8 @@
 
 *  Invocation:
 *     CALL COF_F2NDF( FILNAM, NDF, LOGHDR, FDL, FMTCNV, USETYP, PROFIT,
-*                     PROXTI, CONTNR, NENCOD, ENCODS, WCSATT, STATUS )
+*                     PROXTI, CONTNR, NENCOD, ENCODS, WCSATT, WCSCMP,
+*                     STATUS )
 
 *  Description:
 *     This routine converts a FITS file into an NDF.  It can process an
@@ -123,6 +124,19 @@
 *        It is ignored if NENCOD is zero.
 *     WCSATT = CHARACTER * ( * ) (Given)
 *        Attribute settings for the WCS FitsChan.
+*     WCSCMP = CHARACTER * ( * ) (Given)
+*        This requests where co-ordinate information is stored in the
+*        NDF for arbitrary FITS files.  FITS files from certain sources
+*        (see "Special Formats" below) adopt their own conventions such
+*        as always creating AXIS structures and not WCS, thus ignore
+*        this argument.  The allowed values are as follows.
+*
+*        "Axis" --- Writes co-ordinates of each element in the AXIS
+*                   structure.
+*        "WCS"  --- Stores co-ordinate information in the WCS component.
+*        "Both" --- Writes co-ordinate information in both the AXIS and
+*                   WCS components.
+*        "None" --- Ignores co-ordinate information.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -156,7 +170,7 @@
 *     -  Here are details of the processing of standard items from the
 *     the FITS header, listed by FITS keyword.
 *        CRVALn, CDELTn, CRPIXn, CTYPEn, CUNITn --- define the NDF's
-*          WCS component.
+*          WCS and/or AXIS component (depending on argument WCSCMP).
 *        OBJECT, LABEL, BUNIT --- if present are equated to the NDF's
 *          title, label, and units components respectively.
 *        LBOUNDn --- if present, this specifies the pixel origin for
@@ -413,6 +427,8 @@
 *        -  Reset the top-level type to UKIRT_HDS.
 *     2011 January 12 (MJC):
 *        Use KPG_TYPSZ instead of COF_TYPSZ.
+*     2011 February 24 (MJC):
+*        Add WCSCMP argument.
 *     {enter_further_changes_here}
 
 *-
@@ -441,6 +457,7 @@
       INTEGER NENCOD
       CHARACTER ENCODS( NENCOD ) * ( * )
       CHARACTER WCSATT * ( * )
+      CHARACTER WCSCMP * ( * )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -554,17 +571,20 @@
       LOGICAL PROEXT             ! Local version of PROXTI argument (may
                                  ! alter)
       INTEGER REPNTR             ! Pointer to header-propagation flags
-      LOGICAL SIMPLE             ! True if the FITS file is simple
-      CHARACTER * ( 6 ) SPENAM   ! Name of special type of FITS file
-      CHARACTER * ( NDF__SZTYP ) STYPE ! NDF scaled array's data type
-      LOGICAL THERE              ! NDF already created?
-      CHARACTER * ( NDF__SZTYP ) TYPE ! NDF array's data type
-      LOGICAL TYPPRE             ! HDSTYPE keyword is present?
-      CHARACTER * ( NDF__SZTYP ) UTYPE ! Use data type
-      LOGICAL VALID              ! True if the NDF identifier is valid
-      LOGICAL WRTEXT             ! True if write NDF FITS extension
-      CHARACTER * ( DAT__SZLOC ) XLOC ! Locator to an NDF extension
-      CHARACTER * ( 20 ) XTENS   ! Type of FITS extension
+      LOGICAL SIMPLE             ! Is the FITS file simple?
+      CHARACTER*6 SPENAM         ! Name of special type of FITS file
+      CHARACTER*( NDF__SZTYP ) STYPE ! NDF scaled array's data type
+      LOGICAL THERE              ! Has NDF already been created?
+      LOGICAL TOAXIS             ! Write co-ordinate info. to AXIS?
+      LOGICAL TOWCS              ! Write co-ordinate info. to WCS?
+      CHARACTER*( NDF__SZTYP ) TYPE ! NDF array's data type
+      LOGICAL TYPPRE             ! Is HDSTYPE keyword present?
+      CHARACTER*( NDF__SZTYP ) UTYPE ! Use data type
+      LOGICAL VALID              ! Is NDF identifier valid?
+      LOGICAL WRTEXT             ! Write NDF FITS extension?
+      CHARACTER*( DAT__SZLOC ) XLOC ! Locator to an NDF extension
+      CHARACTER*20 XTENS         ! Type of FITS extension
+
 *.
 
 *  Check the inherited global status.
@@ -625,6 +645,10 @@
 
 *  Initialise the number of saved primary header cards.
       NPHEAD = 0
+
+*  Create flags whether or not to create AXIS, and WCS components.
+      TOAXIS = WCSCMP .EQ. 'BOTH' .OR. WCSCMP .EQ. 'AXIS'
+      TOWCS = WCSCMP .EQ. 'BOTH' .OR. WCSCMP .EQ. 'WCS'
 
 *  Open the FITS file.
 *  ===================
@@ -1418,10 +1442,11 @@
                         CALL COF_NDFCC( FUNITH, NDFE, STATUS )
 
 *  Create the NDF AXIS structure from the FITS headers.
-                        CALL COF_NDFAX( FUNITH, NDFE, STATUS )
+                        IF ( TOAXIS )
+     :                    CALL COF_NDFAX( FUNITH, NDFE, STATUS )
 
 *  Create the AST World Coordinate information from the FITS headers.
-                        IF ( NDIM .GT. 0 )
+                        IF ( NDIM .GT. 0 .AND. TOWCS )
      :                    CALL COF_FTWCS( FUNITH, NDFE, NENCOD, ENCODS,
      :                                    FILNAM, WCSATT, STATUS )
 

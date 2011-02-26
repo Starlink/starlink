@@ -497,6 +497,16 @@ interface FITS2NDF
       default     !
    endparameter
 
+   parameter      WCSCOMP       # Storage destination of wcs information
+      type        'LITERAL'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT,CURRENT'
+      prompt      'Destination for world c-ordinate information'
+      helpkey     '*'
+      default     'WCS'
+   endparameter
+
+
 endinterface
 ## GASP2NDF - Converts an image in GASP format to an NDF.
 

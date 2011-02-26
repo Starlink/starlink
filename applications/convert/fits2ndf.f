@@ -77,7 +77,8 @@
 *     ENCODINGS = LITERAL (Read)
 *        Determines which FITS keywords should be used to define the
 *        world co-ordinate systems to be stored in the NDF's WCS
-*        component.  The allowed values (case-insensitive) are:
+*        component.  This parameter is only relevant when WCSCOMP is
+*        "WCS" or "Both".  The allowed values (case-insensitive) are:
 *
 *        "FITS-IRAF" --- This uses keywords CRVALi CRPIXi, CDi_j, and is
 *           the system commonly used by IRAF. It is described in the
@@ -436,6 +437,28 @@
 *        co-ordinates (rather than the non-linear mapping  implied by
 *        the FITS-WCS conventions), use WCSATTRS="CarLin=1".  A null
 *        value (!) results in all attributes using default values.  [!]
+*     WCSCOMP = LITERAL (Read)
+*        This requests where co-ordinate information is stored in the
+*        NDF for arbitrary FITS files.  FITS files from certain sources
+*        (see "Special Formats" below) adopt their own conventions such
+*        as always creating AXIS structures and not WCS, thus ignore
+*        this parameter.  The allowed values are as follows.
+*
+*        "Axis" --- Writes co-ordinates of each element in the AXIS
+*                   structure.
+*        "WCS"  --- Stores co-ordinate information in the WCS component.
+*        "Both" --- Writes co-ordinate information in both the AXIS and
+*                   WCS components.
+*        "None" --- Omits co-ordinate information.
+*
+*        "WCS" is the recommended option as it offers most flexibility
+*        and many facilities such as transformations between co-ordinate
+*        systems.  However, some legacy applications such as Figaro do
+*        not recognise WCS and for these "Axis" is more appropriate.
+*        If you are mixing data processing packages then you may need
+*        "Both", but care should be exercised to avoid inconsistent
+*        representations, especially if the data are exported to FITS
+*        with NDF2FITS (see its Parameter USEAXIS).  ["WCS"]
 
 *  Examples:
 *     fits2ndf 256.fit f256 fmtcnv=f
@@ -447,10 +470,11 @@
 *        As above but now a _REAL type scaled data array is created,
 *        assuming that 256.fit contains scaled integer data with
 *        BITPIX=8 or 16 and non-default BSCALE and BZERO keywords.
-*     fits2ndf 256.fit f256 fmtcnv=t type=_real
+*     fits2ndf 256.fit f256 fmtcnv=t type=_real wcscomp=axis
 *        As the first example, but now a _REAL type data array is
 *        created by applying the scale and offset from BSCALE and
 *        BZERO keywords to the integer values stored in 256.fit.
+*        Co-ordinate information is written only to the AXIS structure.
 *     fits2ndf 256.fit f256 noprofits noproexts
 *        As the previous example except there will be a format
 *        conversion from a FITS integer data type to floating point in
@@ -549,7 +573,8 @@
 *     -  Here are details of the processing of standard items from the
 *     the FITS header, listed by FITS keyword.
 *        CRVALn, CDELTn, CRPIXn, CTYPEn, CUNITn --- define the NDF's
-*          WCS component (see {Parameter ENCODINGS).
+*          WCS and/or AXIS components (see Parameters ENCODINGS and
+*          WCSCOMP).
 *        OBJECT, LABEL, BUNIT --- if present are equated to the NDF's
 *          TITLE, LABEL, and UNITS components respectively.
 *        LBOUNDn --- if present, this specifies the pixel origin for
@@ -864,7 +889,7 @@
 *     Copyright (C) 1994 Science & Engineering Research Council.
 *     Copyright (C) 1997-1998, 2000, 2002, 2004 Central Laboratory of
 *     the Research Councils. Copyright (C) 2006-2007 Particle Physics &
-*     Astronomy Research Council.  2009 Science & Technology
+*     Astronomy Research Council.  2009, 2011 Science & Technology
 *     Facilities Council.  All Rights Reserved.
 
 *  Licence:
@@ -959,6 +984,8 @@
 *        Remove default history recording in output NDF since the NDF
 *        library now allows the user to control automatic history creation
 *        via the "NDF_AUTO_HISTORY" environment variable.
+*     2011 February 24 (MJC):
+*        Add WCSCOMP parameter.
 *     {enter_further_changes_here}
 
 *-
@@ -1037,7 +1064,8 @@
       INTEGER TGROUP             ! Group identifier of output types
       CHARACTER * ( NDF__SZTYP ) TYPE ! Data type for processing
       INTEGER TSTAT              ! Temporary status
-      CHARACTER WCSATT*255       ! Attributes for the WCS FitsChan
+      CHARACTER*255 WCSATT       ! Attributes for the WCS FitsChan
+      CHARACTER*4 WCSCMP         ! Location for co-ordinate information
 
 *.
 
@@ -1346,46 +1374,60 @@
 *  Determine whether or not a container file is to be created.
       CALL PAR_GET0L( 'CONTAINER', CONTNR, STATUS )
 
+*  Obtain destination(s) for WCS information.
+      CALL PAR_CHOIC( 'WCSCOMP', 'WCS', 'WCS,Axis,Both,None', .TRUE.,
+     :                WCSCMP, STATUS )
+
 *  Abort if there has been an error.
-      IF( STATUS .NE. SAI__OK ) GO TO 999
+      IF ( STATUS .NE. SAI__OK ) GO TO 999
+
+      ENCGRP = GRP__NOID
+      IF ( WCSCMP .EQ. 'WCS' .OR. WCSCMP .EQ. 'Both' ) THEN
 
 *  Get a group from parameter ENCODINGS holding the AST encodings to
 *  use when creating the WCS component from the FITS header.
-      CALL GRP_NEW( 'AST Encodings', ENCGRP, STATUS )
-      CALL GRP_SETCS( ENCGRP, .FALSE., STATUS )
+         CALL GRP_NEW( 'AST Encodings', ENCGRP, STATUS )
+         CALL GRP_SETCS( ENCGRP, .FALSE., STATUS )
 
-      CFLAG = .TRUE.
-      DO WHILE ( CFLAG .AND. STATUS .EQ. SAI__OK )
-         CALL GRP_GROUP( 'ENCODINGS', GRP__NOID, ENCGRP, NENCOD, ADDED,
-     :                   CFLAG, STATUS )
-         IF ( CFLAG ) CALL PAR_CANCL( 'ENCODINGS', STATUS )
-      END DO
+         CFLAG = .TRUE.
+         DO WHILE ( CFLAG .AND. STATUS .EQ. SAI__OK )
+            CALL GRP_GROUP( 'ENCODINGS', GRP__NOID, ENCGRP, NENCOD,
+     :                      ADDED, CFLAG, STATUS )
+            IF ( CFLAG ) CALL PAR_CANCL( 'ENCODINGS', STATUS )
+         END DO
 
 *  If a NULL parameter value was given for ENCODINGS annul the error,
 *  and find the real number of values in the group.
-      IF ( STATUS .EQ. PAR__NULL ) THEN
-         CALL ERR_ANNUL( STATUS )
-         CALL GRP_GRPSZ( ENCGRP, NENCOD, STATUS )
-      END IF
-
-*  Limit the number of encodings used to MAXCOD.
-      IF ( NENCOD .GT. MAXCOD ) THEN
-         CALL MSG_OUTIF( MSG__NORM, 'ENCODINGS', 'Only the first ^MX '/
-     :                   /'values for parameter %ENCODINGS will be '/
-     :                   /'used.', STATUS )
-         NENCOD = MAXCOD
-      END IF
-
-*  Extract the encodings from the group into an array.
-      CALL GRP_GET( ENCGRP, 1, NENCOD, ENCODS, STATUS )
-
-* Get any extra attributes for the FitsChan.
-      IF ( STATUS .EQ. SAI__OK ) THEN
-         CALL PAR_GET0C( 'WCSATTRS', WCSATT, STATUS )
          IF ( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
-            WCSATT = ' '
+            CALL GRP_GRPSZ( ENCGRP, NENCOD, STATUS )
          END IF
+
+*  Limit the number of encodings used to MAXCOD.
+         IF ( NENCOD .GT. MAXCOD ) THEN
+            CALL MSG_OUTIF( MSG__NORM, 'ENCODINGS', 'Only the first '/
+     :                      /'^MX values for parameter %ENCODINGS '/
+     :                      /'will be used.', STATUS )
+            NENCOD = MAXCOD
+         END IF
+
+*  Extract the encodings from the group into an array.
+         CALL GRP_GET( ENCGRP, 1, NENCOD, ENCODS, STATUS )
+
+* Get any extra attributes for the FitsChan.
+         IF ( STATUS .EQ. SAI__OK ) THEN
+            CALL PAR_GET0C( 'WCSATTRS', WCSATT, STATUS )
+            IF ( STATUS .EQ. PAR__NULL ) THEN
+               CALL ERR_ANNUL( STATUS )
+               WCSATT = ' '
+            END IF
+         END IF
+
+* Define defaults to satisfy the argument list of the main subroutine.
+      ELSE
+         NENCOD = 1
+         ENCODS = 'FITS-WCS'
+         WCSATT = ' '
       END IF
 
 *  Get the EXTABLE information.  (Assumes this is good for all FITS
@@ -1433,7 +1475,7 @@
 
 *  Convert the FITS file into an NDF as best we can.
          CALL COF_F2NDF( FILNAM, NDF, LOGHDR, FDL, FMTCON, TYPE, PROFIT,
-     :                   PROEXT, CONTNR, NENCOD, ENCODS, WCSATT,
+     :                   PROEXT, CONTNR, NENCOD, ENCODS, WCSATT, WCSCMP,
      :                   STATUS )
 
 *  Tidy the NDF.  Some of the options create a series of NDFs in the
