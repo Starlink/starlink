@@ -402,7 +402,8 @@
 *      not 1 along each axis.  (These are not part of the standard.)
 *    CRVALn, CDELTn, CRPIXn, CTYPEn, CUNITn --- are derived from the
 *      NDF WCS component if possible (i.e. exists and maps to a FITS WCS
-*      projection type).  If this is not possible, and if argument
+*      projection type), but added at the end of this routine by
+*      routine COF_FPWCS.  If this is not possible, and if argument
 *      PROPEX is .TRUE., then it copies the headers of a valid WCS
 *      specified in the NDF's FITS airlock.  Should that attempt fail,
 *      the last resort tries the NDF AXIS component, if it exists, but
