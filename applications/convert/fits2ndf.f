@@ -88,11 +88,11 @@
 *           /fits/documents/wcs/wcs88.ps.Z.
 *
 *        "FITS-WCS" --- This is the FITS standard WCS encoding scheme
-*          described in the paper "Representation of celestial
-*          coordinates in FITS"
-*          (http://www.atnf.csiro.au/people/mcalabre/WCS/).  It is
-*          very similar to "FITS-IRAF" but supports a wider range of
-*          projections and co-ordinate systems.
+*           described in the paper "Representation of celestial
+*           coordinates in FITS"
+*           (http://www.atnf.csiro.au/people/mcalabre/WCS/).  It is
+*           very similar to "FITS-IRAF" but supports a wider range of
+*           projections and co-ordinate systems.
 *
 *        "FITS-PC" --- This uses keywords CRVALi, CDELTi, CRPIXi,
 *           PCiiijjj,  etc, as described in a previous (now superseded)
@@ -145,7 +145,7 @@
 *        non-native encodings are available, then the first non-native
 *        encoding to be found which is inconsistent with the native
 *        encoding is used.  If all encodings are consistent, then the
-*        native encoding is used (if present). [!]
+*        native encoding is used (if present).  [!]
 *     EXTABLE = FILE (Read)
 *        This specifies the name of a text file containing a table
 *        associating sub-files from a multi-extension FITS file with
@@ -1025,21 +1025,21 @@
       LOGICAL CONTNR             ! FITS HDU's are to be written as
                                  ! components of an HDS container file?
       INTEGER ENCGRP             ! Group identifier of ENCODINGS
-      CHARACTER * ( GRP__SZNAM ) ENCODS( MAXCOD ) ! AST encodings for
-                                 ! WCS component
+      CHARACTER*( GRP__SZNAM ) ENCODS( MAXCOD ) ! AST encodings for WCS
+                                 ! component
       INTEGER EXTLEN             ! Length extension part of FSPEC
       INTEGER FCGRP              ! Group identifier of FMTCNVs
       INTEGER FDL                ! FIle descriptor for logfile
       LOGICAL FILEXS             ! FITS file exists
-      CHARACTER * ( 255 ) FILNAM ! Name of FITS file
-      CHARACTER * ( 6 ) FMTCON   ! Character form of a FMTCNV value
-      CHARACTER * ( 255 ) FSPEC  ! File specification
+      CHARACTER*255 FILNAM       ! Name of FITS file
+      CHARACTER*6 FMTCON         ! Character form of a FMTCNV value
+      CHARACTER*255 FSPEC        ! File specification
       INTEGER FLEN               ! Length of filename part of FSPEC
       LOGICAL FOUND              ! Found a wildcarded file?
-      CHARACTER * ( 255 ) IFSPEC ! Individual File specification
+      CHARACTER*255 IFSPEC       ! Individual File specification
       INTEGER IPOSN              ! String index
       INTEGER IFILE              ! Loop counter for each input NDF
-      CHARACTER * ( FIO__SZFNM ) INFILE ! Input-file name
+      CHARACTER*( FIO__SZFNM ) INFILE ! Input-file name
       INTEGER IGRP1              ! Group identifier of input file list
       INTEGER IGRP2              ! Group identifier of input files
       INTEGER IGRP3              ! Group identifier of input purged FITS
@@ -1049,7 +1049,7 @@
       LOGICAL LOGHDR             ! There is an open logfile?
       INTEGER LP                 ! Loop counter
       INTEGER NDF                ! NDF identifier
-      CHARACTER * ( 255 ) NDFNAM ! Name of NDF
+      CHARACTER*255 NDFNAM       ! Name of NDF
       INTEGER NENCOD             ! No. of of WCS encodings supplied
       INTEGER NGLIST             ! No. of items in input list
       INTEGER NGROUP             ! Group identifier of default list of
@@ -1062,7 +1062,7 @@
                                  ! propagated to NDF extensions
       LOGICAL PROFIT             ! The FITS extension is created?
       INTEGER TGROUP             ! Group identifier of output types
-      CHARACTER * ( NDF__SZTYP ) TYPE ! Data type for processing
+      CHARACTER*( NDF__SZTYP ) TYPE ! Data type for processing
       INTEGER TSTAT              ! Temporary status
       CHARACTER*255 WCSATT       ! Attributes for the WCS FitsChan
       CHARACTER*4 WCSCMP         ! Location for co-ordinate information

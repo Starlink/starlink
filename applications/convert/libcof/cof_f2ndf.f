@@ -260,10 +260,10 @@
 *        not duplicated in each SMURF-extension NDF.
 *
 *        -  When CONTNR is .TRUE., a former UKIRT_HDS container file,
-*        identified by the presence and values of HDSNAME and HDSTYPE 
+*        identified by the presence and values of HDSNAME and HDSTYPE
 *        keywords may be created.  The container file has the original
-*        structure including the NDFs' names, unless a text file is 
-*        used to associate sub-files with NDFs (see FITS2NDF EXTABLE 
+*        structure including the NDFs' names, unless a text file is
+*        used to associate sub-files with NDFs (see FITS2NDF EXTABLE
 *        documentation for details).
 *
 *     o  IUE Final Archive LILO, LIHI, SILO, SIHI
@@ -502,23 +502,23 @@
 *           The number of saved primary header cards
 
 *  Local Variables:
-      CHARACTER * ( DAT__SZLOC ) ALOC ! Locator to an NDF FITS Airlock
-      LOGICAL BAD                ! Bad values may be present in array?
+      CHARACTER*( DAT__SZLOC ) ALOC ! Locator to an NDF FITS Airlock
+      LOGICAL BAD                ! May bad values be present in array?
       INTEGER BITPIX             ! FITS file's BITPIX
       INTEGER BLOCSZ             ! Block size of FITS file (or blocking
                                  ! factor if <11)
-      CHARACTER * ( 200 ) BUFFER ! Buffer for error messages
-      CHARACTER * ( 48 ) COMENT  ! FITS header comment
-      CHARACTER * ( 8 ) COMP     ! NDF array component name
-      CHARACTER * ( DAT__SZTYP ) CTYPE ! Type of component
+      CHARACTER*200 BUFFER       ! Buffer for error messages
+      CHARACTER*48 COMENT        ! FITS header comment
+      CHARACTER*8 COMP           ! NDF array component name
+      CHARACTER*( DAT__SZTYP ) CTYPE ! Type of component
       LOGICAL DARRAY             ! Current HDU contains a data array?
       INTEGER DIMS( NDF__MXDIM ) ! NDF dimensions (axis length)
       INTEGER EL                 ! Number of elements in array
-      CHARACTER * ( DAT__SZLOC ) ELOC ! Locator to NDF extension (MORE)
+      CHARACTER*( DAT__SZLOC ) ELOC ! Locator to NDF extension (MORE)
                                  ! structure
-      CHARACTER * ( 80 ) ERRMSG  ! FITSIO error message
+      CHARACTER*80 ERRMSG        ! FITSIO error message
       LOGICAL EXTABL             ! Using an EXTABLE?
-      CHARACTER * ( 12 ) EXTNAM  ! NDF-extension name
+      CHARACTER*12 EXTNAM        ! NDF-extension name
       LOGICAL EXTEND             ! Value of FITS EXTEND keyword
       LOGICAL EXNDF              ! FITS file originated from an NDF?
       LOGICAL FIRST              ! Processing the first HDU
@@ -530,11 +530,11 @@
       INTEGER FUNITD             ! FITS unit for the FITS file
       INTEGER GCMIN              ! Minimum group number (0|1)
       INTEGER GCOUNT             ! Value of FITS GCOUNT keyword
-      CHARACTER * ( 12 ) GRPNAM  ! NDF-extension name for group element
-      CHARACTER * ( DAT__SZNAM ) HDSNAM ! Component name from multi-NDF
-      CHARACTER * ( DAT__SZTYP ) HDSTYP ! Component type from multi-NDF
+      CHARACTER*12 GRPNAM        ! NDF-extension name for group element
+      CHARACTER*( DAT__SZNAM ) HDSNAM ! Component name from multi-NDF
+      CHARACTER*( DAT__SZTYP ) HDSTYP ! Component type from multi-NDF
       LOGICAL HDUPRE             ! HDUCLASn keyword is present?
-      CHARACTER * ( NDF__SZFTP ) HDUCLA ! Classification of HDU
+      CHARACTER*( NDF__SZFTP ) HDUCLA ! Classification of HDU
       INTEGER HDUTYP             ! HDU type (primary, IMAGE, ASCII or
                                  ! binary table)
       INTEGER I, J               ! Loop counters
@@ -542,30 +542,30 @@
       INTEGER IEXT               ! Extension-set number in EXTABLE
       INTEGER IGROUP             ! Loop counter for random groups
       LOGICAL ISNDF              ! If a genuine NDF is created
-      CHARACTER * ( NDF__SZTYP ) ITYPE ! NDF implementation data type
+      CHARACTER*( NDF__SZTYP ) ITYPE ! NDF implementation data type
       LOGICAL LOOP               ! Loop for another FITS extension?
-      LOGICAL MERGED             ! Headers have been merged?
-      LOGICAL NAMPRE             ! HDSNAME keyword is present?
+      LOGICAL MERGED             ! Have headers been merged?
+      LOGICAL NAMPRE             ! Is HDSNAME keyword present?
       LOGICAL NATIVE             ! Propagate values, scale, and offset?
       LOGICAL MULTIP             ! More than one data array?
       INTEGER NBFTYP             ! Number of bytes in FITS-implied type
       INTEGER NBUTYP             ! Number of bytes in user-selected type
       INTEGER NC                 ! Number of characters
       INTEGER NCF                ! Number of characters in filename
-      INTEGER NDFS(MAXEXT)       ! NDFs for each extn set in EXTABLE
+      INTEGER NDFS( MAXEXT )     ! NDFs for each extn set in EXTABLE
       INTEGER NDFE               ! Identifier of effective NDF
-      CHARACTER * ( DAT__SZNAM ) NDFNAM ! Multi NDF name
+      CHARACTER*( DAT__SZNAM ) NDFNAM ! Multi NDF name
       INTEGER NDIM               ! Number of dimensions
       LOGICAL NEEDED             ! Extension needed?
       LOGICAL NEWNDF             ! NDF needs sizing?
       INTEGER NHDU               ! Count of header and data unit
       INTEGER NHEAD              ! Number of FITS header cards
-      LOGICAL NONSDA             ! True if the current HDU contains a
-                                 ! non-standard data array
+      LOGICAL NONSDA             ! Does current HDU contains a
+                                 ! non-standard data array?
       INTEGER NPOS               ! Character position in extension name
       INTEGER PCOUNT             ! Value of FITS PCOUNT keyword
       INTEGER PLACE              ! NDF placeholder for <NDF> extension
-      CHARACTER * ( DAT__SZLOC ) PLOC ! Locator to NDF top-level
+      CHARACTER*( DAT__SZLOC ) PLOC ! Locator to NDF top-level
       INTEGER PNTR( 1 )          ! Pointer to NDF array
       LOGICAL PRMRY              ! Processing the primary HDU?
       LOGICAL PROEXT             ! Local version of PROXTI argument (may
@@ -662,8 +662,8 @@
 *  Open the FITS file with read access.  NHDU is returned negative if
 *  there was no extension specified, or to the specified extension
 *  number (0 indicates the Primary HDU).
-      CALL COF_FTOPR( FUNITH, FILNAM(1:NCF), EXTABL .OR. CONTNR, BLOCSZ,
-     :                NHDU, STATUS )
+      CALL COF_FTOPR( FUNITH, FILNAM( 1:NCF ), EXTABL .OR. CONTNR,
+     :                BLOCSZ, NHDU, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Set the initial Header and Data Unit number.
@@ -815,7 +815,7 @@
 
 *  Test for a primary HDU or an IMAGE extension.  Note that this
 *  includes random groups as these must be defined in the primary HDU.
-            IF ( PRMRY. OR. (XTENS .EQ. 'IMAGE') ) THEN
+            IF ( PRMRY. OR. ( XTENS .EQ. 'IMAGE' ) ) THEN
 
 *  Determine the main properties of the FITS object.
 *  =================================================
@@ -906,7 +906,7 @@
 *  Define whether or not the extension came from an NDF.
                EXNDF = HDUPRE .AND. HDUCLA .EQ. 'NDF'
 
-*  Later data from multi-NDF container files will cause failure if the 
+*  Later data from multi-NDF container files will cause failure if the
 *  user has forgotten to set the CONTAINER flag.  An attempt to put
 *  these into an NDF extension fails because there will be no EXTNAME
 *  keyword present.  These can be detected by the presence of the
@@ -951,7 +951,7 @@
                      END IF
 
 *  Re-type the container file for EXTABLE output unless we think it
-*  originated from a UKIRT_HDS file.  The latter is a kludge and ought 
+*  originated from a UKIRT_HDS file.  The latter is a kludge and ought
 *  to be handled as a Special Format in a UKIRT-specific routine.  It
 *  assumes that the first proper NDF is called I1 rather than I<n>, for
 *  integer n other than 1.
@@ -978,11 +978,10 @@
 *  that more-efficient data structure.
 *
 *  However if it's MULTIP because of an EXTABLE do not end loop.
-!                  IF ( .NOT. EXTABL ) LOOP = .FALSE.
                   IF ( NONSDA ) LOOP = .FALSE.
 
                ELSE
-*  Prepare for a simple and 1-element random-groups primary HDU, or an
+*  Prepare for a simple and one-element random-groups primary HDU, or an
 *  IMAGE extension as an NDF extension.
 
 *  Ensure that the number of group NDFs to process is 0 unless it is a
@@ -1179,7 +1178,7 @@
 
 *  We are forcing a series of NDFs in a container file by using the
 *  CONTAINER parameter.
-                     
+
 *  The NDFs names may be stored in HDSNAME obtained earlier.
                      IF ( NAMPRE ) THEN
                         NDFNAM = HDSNAM
@@ -1386,7 +1385,7 @@
                   END IF
 
 *  If we are creating a MULTIP other than a Random Groups file, a header
-*  without data either becomes a) an HDS structure of type FITS_HEADER, 
+*  without data either becomes a) an HDS structure of type FITS_HEADER,
 *  containing the FITS header as a _CHARACTER array; or b) when the
 *  HEADER was an NDF is restored as a HEADER.
                   ISNDF = .TRUE.
