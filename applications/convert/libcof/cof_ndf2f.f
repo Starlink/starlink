@@ -82,14 +82,14 @@
 *        "NONE" -- No provenance is written.
 *
 *        "CADC" -- The CADC headers are written.  These record the
-*        number and paths of both the direct parents of the NDF being
-*        converted, and its root ancestors (the ones without parents).
-*        Also modify the PRODUCT keyword to be unique for each FITS
-*        extension.
+*          number and paths of both the direct parents of the NDF being
+*          converted, and its root ancestors (the ones without parents).
+*          Also modify the PRODUCT keyword to be unique for each FITS
+*          extension.
 *
 *        "GENERIC" -- Encapsulates the entire PROVENANCE structure in
-*        FITS headers in sets of five character-value indexed headers.
-*        There is a set for the current NDF and each parent.
+*          FITS headers in sets of five character-value indexed headers.
+*          There is a set for the current NDF and each parent.
 *     SUMS = LOGICAL (Given)
 *        If .TRUE., DATASUM and CHECKSUM headers are written to each
 *        HDU.

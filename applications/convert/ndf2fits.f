@@ -39,7 +39,7 @@
 *     ndf2fits in out [comp] [bitpix] [origin]
 
 *  ADAM Parameters:
-*     BITPIX = LITERAL (Read)
+*     BITPIX = GROUP (Read)
 *        The FITS bits-per-pixel (BITPIX) value for each conversion.
 *        This specifies the data type of the output FITS file.
 *        Permitted values are: 8 for unsigned byte, 16 for signed word,
@@ -71,7 +71,7 @@
 *        If TRUE, each header and data unit in the FITS file will
 *        contain the integrity-check keywords CHECKSUM and DATASUM
 *        immediately before the END card.  [TRUE]
-*     COMP = LITERAL (Read)
+*     COMP = GROUP (Read)
 *        The list of array components to attempt to transfer to each
 *        FITS file.  The acceptable values are "D" for the main data
 *        array "V" for variance, "Q" for quality, or any permutation
@@ -594,7 +594,7 @@
 *     Copyright (C) 1994 Science & Engineering Research Council.
 *     Copyright (C) 1996-2000, 2004 Central Laboratory of the Research
 *     Councils. Copyright (C) 2006 Particle Physics & Astronomy
-*     Research Council. Copyright (C) 2007-2009 Science & Technology
+*     Research Council. Copyright (C) 2007-2011 Science & Technology
 *     Facilities Council. All Rights Reserved.
 
 *  Licence:
@@ -707,7 +707,7 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
-      LOGICAL CHR_INSET          ! True if string is one of a set
+      LOGICAL CHR_INSET          ! Os string one of a set?
       CHARACTER * ( 2 ) CHR_NTH  ! Ordinal abbreviation
 
 *  Local Constants:
@@ -722,41 +722,41 @@
 *  Local Variables:
       INTEGER ACGRP              ! Group identifier of COMPs
       INTEGER ADDED              ! Number of items added to a group
-      CHARACTER * ( 8 ) ARRPRE( 3 ) ! Names of selected and present
+      CHARACTER*8 ARRPRE( 3 )    ! Names of selected and present
                                  ! array components
-      LOGICAL AVALID             ! True if supplied COMP is one of the
-                                 ! allowed permutations
+      LOGICAL AVALID             ! Is supplied COMP an allowed
+                                 ! permutation?
       INTEGER BITPIX             ! BITPIX code
       INTEGER BPGRP              ! Group identifier of BITPIXs
-      CHARACTER * ( 3 ) CBP      ! Character form of a BITPIX value
+      CHARACTER*3 CBP            ! Character form of a BITPIX value
       LOGICAL CFLAG              ! A group requires further input via
                                  ! continuation lines?
       LOGICAL CHECKS             ! Write CHECKSUM and DATASUM headers?
-      CHARACTER * ( DAT__SZLOC ) CLOC ! Locator to a component
-      CHARACTER * ( DAT__SZNAM ) CNAME ! Component name
-      CHARACTER * ( DAT__SZNAM ) CTYPE ! Component type
-      CHARACTER * ( 3 ) COMPS    ! Array-component code
-      LOGICAL DATSEL             ! True if DATA component was selected
+      CHARACTER*( DAT__SZLOC ) CLOC ! Locator to a component
+      CHARACTER*( DAT__SZNAM ) CNAME ! Component name
+      CHARACTER*( DAT__SZNAM ) CTYPE ! Component type
+      CHARACTER*3 COMPS          ! Array-component code
+      LOGICAL DATSEL             ! Was DATA component selected?
       LOGICAL DUPLEX             ! Propagate airlock for all array comp?
-      CHARACTER * ( 15 ) ENCOD   ! FITS encoding requested for WCS info
+      CHARACTER*15 ENCOD         ! FITS encoding requested for WCS info
       INTEGER FGROUP             ! Group identifier of default list of
                                  ! FITS files
-      CHARACTER * ( 255 ) FILNAM ! Name of FITS file
+      CHARACTER*255 FILNAM       ! Name of FITS file
       LOGICAL FCLOSE             ! Close the FITS file after conversion?
-      CHARACTER * ( DAT__SZLOC ) FLOC ! Locator to a container file
+      CHARACTER*( DAT__SZLOC ) FLOC ! Locator to a container file
       LOGICAL FOPEN              ! Open the FITS file before conversion?
       LOGICAL GOOD               ! All group values are valid?
       LOGICAL HDRHDU             ! HDU of only headers?
       LOGICAL HDRPRS             ! .HEADER NDF is present in multi-NDF
                                  ! container file?
-      CHARACTER * ( 255 ) HDSNAM ! Name of HDS container file
+      CHARACTER*255 HDSNAM      ! Name of HDS container file
       INTEGER I                  ! Loop counter
       INTEGER ICOMP              ! Top-level components loop counter
       INTEGER IFILE              ! Loop counter for each input NDF
       INTEGER IGRP2              ! Group identifier of input NDFs
       INTEGER IGRP3              ! Group identifier of input purged NDFs
       INTEGER INDF               ! NDF loop counter
-      CHARACTER * ( 9 ) ITEM     ! Form of input data for messages
+      CHARACTER*9 ITEM           ! Form of input data for messages
       LOGICAL MERGE              ! Merge .I1 & .HEADER in primary HDU?
       LOGICAL MULTI              ! Input files are multi-NDF containers?
       INTEGER NAC                ! Number of COMP values
@@ -776,21 +776,17 @@
       INTEGER NOFILE             ! Number of output files
       INTEGER NONDF              ! Number of NDFs in container file
       INTEGER OGROUP             ! Group identifier of output FITS files
-      CHARACTER * ( 68 ) ORIGIN  ! Place of origin of the FITS file
+      CHARACTER*68 ORIGIN        ! Place of origin of the FITS file
       INTEGER PLACE              ! Place holder for temporary NDF
-      LOGICAL PROEXT             ! True if the other extensions are
-                                 ! propagated
-      LOGICAL PROFIT             ! True if the FITS extension is
-                                 ! propagated
-      LOGICAL PROHIS             ! True if history information is
-                                 ! propagated
-      CHARACTER * ( 7 ) PROVEX   ! Provenance export option
-      LOGICAL QUAPRE             ! True if the QUALITY component is
-                                 ! present
-      LOGICAL QUASEL             ! True if QUALITY was selected
-      LOGICAL VARPRE             ! True if the VARIANCE component is
-                                 ! present
-      LOGICAL VARSEL             ! True if VARIANCE was selected
+      LOGICAL PROEXT             ! Propagated other extensions?
+      LOGICAL PROFIT             ! Is FITS extension propagated?
+      LOGICAL PROHIS             ! Propagated history information?
+      CHARACTER*7 PROVEX         ! Provenance export option
+      LOGICAL QUAPRE             ! Is QUALITY component present?
+      LOGICAL QUASEL             ! Was QUALITY selected?
+      LOGICAL USEAXI             ! Save AXIS information?
+      LOGICAL VARPRE             ! Is VARIANCE component present?
+      LOGICAL VARSEL             ! Was VARIANCE selected?
 
 *.
 

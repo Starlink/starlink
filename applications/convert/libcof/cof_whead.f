@@ -21,14 +21,14 @@
 *     an NDF.  The IMAGE extension is written when the current header
 *     and data unit (CHDU) is not the first.
 
-*     There are three stages:
+*     There are three stages.
 *     a) Inquire of the NDF its shape, type, character components,
 *     and axis components; and write these to the header.
 *     b) Look for a FITS extension if requested to do so.  If one is
 *     present append the headers contained therein to the FITS header
-*     section, but not replacing any of the headers created in stage a).
+*     section, but not replacing any of the headers created in Stage a).
 *     c) Creates keywords describing the NDF's WCS component.  These
-*     overwrite any keywords created in stages a) and b).
+*     overwrite any keywords created in Stages a) and b).
 
 *  Arguments:
 *     NDFI = INTEGER (Given)
@@ -246,7 +246,7 @@
 *        Only write out the WCS component once.
 *     10-FEB-2011 (DSB):
 *        Write out the WCS component for each NDF array component. Each
-*        IMAGE extension needs to have its own WCS so that  it can be
+*        IMAGE extension needs to have its own WCS so that it can be
 *        handled independently of the other IMAGE extensions. (Also, the
 *        20-JAN-2011 change was bad as it resulted in WCS inherited from
 *        the NDF's FITS extension being stored instead of the potentially
