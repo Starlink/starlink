@@ -87,6 +87,8 @@ f     The Box class does not define any new routines beyond those
 *        does so. This is because being able to express a Region in
 *        its current Frame is more important than having the simplest
 *        possible structure.
+*     28-FEB-2011 (DSB):
+*        Do not assume the first axis value is good in function BestBox.
 *class--
 */
 
@@ -416,7 +418,8 @@ static AstBox *BestBox( AstFrame *frm, AstPointSet *mesh, AstRegion *unc, int *s
 
 *  Returned Value:
 *     Pointer to the best fitting Region. It will inherit the positional
-*     uncertainty and Frame represented by "unc".
+*     uncertainty and Frame represented by "unc". NULL is returned if all
+*     the supplied positions are bad.
 
 *  Notes:
 *    - A NULL pointer is returned if an error has already occurred, or if
@@ -456,6 +459,7 @@ static AstBox *BestBox( AstFrame *frm, AstPointSet *mesh, AstRegion *unc, int *s
    int np;
    int nxl;
    int nxu;
+   int ok;
 
 /* Initialise */
    result = NULL;
@@ -486,17 +490,30 @@ static AstBox *BestBox( AstFrame *frm, AstPointSet *mesh, AstRegion *unc, int *s
       astGetRegionBounds( unc, lbnd, ubnd );
 
 /* We fit the box one axis at a time. */
+      ok = 1;
       for( ic = 0; ic < nc; ic++ ) {
 
+/* Find the first good value on this axis. */
+         for( ip = 0; ip < np; ip++ ) {
+            org = ptr[ ic ][ ip ];
+            axval[ ip ] = org;
+            if( org != AST__BAD ) break;
+         }
+
+/* Abort if all the axis values werebad. */
+         if( ip >= np ) {
+            ok = 0;
+            break;
+         }
+
 /* Find the upper and lower limits of the supplied mesh on this axis. */
-         org = ptr[ ic ][ 0 ];
          lb = 0.0;
          ub = 0.0;
-         p = ptr[ ic ] + 1;
+         ip++;
+         p = ptr[ ic ] + ip;
          p0 = org;
          d = 0.0;
-         axval[ 0 ] = org;
-         for( ip = 1; ip < np; ip++, p++ ) {
+         for( ; ip < np; ip++, p++ ) {
             dinc = astAxDistance( frm, ic + 1, p0, *p );
             if( dinc != AST__BAD ) {
                d += dinc;
@@ -611,8 +628,8 @@ static AstBox *BestBox( AstFrame *frm, AstPointSet *mesh, AstRegion *unc, int *s
          bubnd[ ic ] = mxu;
       }
 
-/* Create the returned Box. */
-      result = astBox( unc, 1, blbnd, bubnd, unc, "", status );
+/* If possible, create the returned Box. */
+      if( ok ) result = astBox( unc, 1, blbnd, bubnd, unc, " ", status );
    }
 
 /* Free resources */
@@ -3982,7 +3999,7 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 
 /* See if all points within this mesh fall on the boundary of the best
    fitting Box, to within the uncertainty of the Region. */
-      if( astRegPins( newbox, mesh, NULL, NULL ) ) {
+      if( newbox && astRegPins( newbox, mesh, NULL, NULL ) ) {
 
 /* If so, check that the inverse is true (we need to transform the
    simplified boxes mesh into the base Frame of he original box for use by
@@ -4138,7 +4155,7 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
       frm = astAnnul( frm );
       mesh = astAnnul( mesh );
       unc = astAnnul( unc );
-      newbox = astAnnul( newbox );
+      if( newbox ) newbox = astAnnul( newbox );
    }
 
    map = astAnnul( map );
