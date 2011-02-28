@@ -23298,7 +23298,7 @@ c     astRemoveTables
 f     AST_REMOVETABLES
 
 *  Purpose:
-*     Renmove one or more tables from a FitsChan.
+*     Remove one or more tables from a FitsChan.
 
 *  Type:
 *     Public virtual function.
