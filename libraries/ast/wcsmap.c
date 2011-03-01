@@ -197,6 +197,10 @@ f     The WcsMap class does not define any new routines beyond those
 *        highest index correctly.
 *     23-FEB-2007 (DSB):
 *        Added HPX projection.
+*     1-MAR-2011 (DSB):
+*        In function Map, do not allow valid longitude range to include both 
+*        the high limit and the low limt (since they are both the same point on 
+*        the sky).
 *class--
 */
 
@@ -2717,7 +2721,7 @@ static int Map( AstWcsMap *this, int forward, int npoint, double *in0,
    latitude ranges. This avoids (x,y) points outside the physical domain
    of the mapping being assigned valid (long,lat) values. */
             if( wcs_status == 0 ){
-               if( longitude <= longhi && longitude >= longlo &&
+               if( longitude < longhi && longitude >= longlo &&
                    fabs( latitude ) <= 90.0 ){
 
 /* Assign zero longitude to positions very close to a pole. */
