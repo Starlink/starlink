@@ -59,6 +59,10 @@
 *        the AstPrjPrm structure.Override astGetObjSize. This is to
 *        reduce the in-memory size of a WcsMap.
 *     -  Healpix projection added.
+*     -  The expressions for xc in astHPXrev and phic in astHPXfwd have
+*        been conditioned differently to the WCSLIB code in order to improve
+*        accuracy of the floor function for arguments very slightly below an
+*        integer value.
 
 *=============================================================================
 *
@@ -4488,6 +4492,7 @@ double *x, *y;
 
 {
    double abssin, sigma, sinthe, phic;
+   int hodd;
 
    if( prj->flag != WCS__HPX ) {
       if( astHPXset( prj ) ) return 1;
@@ -4503,11 +4508,16 @@ double *x, *y;
 
 /* Polar zone */
    } else {
-      if( prj->n || theta > 0.0 ) {
-         phic = -180.0 + (2.0*floor( (phi+180.0) * prj->w[7] ) + 1 ) * prj->w[6];
 
+/* DSB - The expression for phic is conditioned differently to the
+   WCSLIB code in order to improve accuracy of the floor function for
+   arguments very slightly below an integer value. */
+      hodd =  ((int)prj->p[1]) % 2;
+      if( !prj->n && theta <= 0.0 ) hodd = 1 - hodd;
+      if( hodd ) {
+         phic = -180.0 + (2.0*floor( prj->w[7] * phi + 1/2 ) + prj->p[1] ) * prj->w[6];
       } else {
-         phic = -180.0 + (2.0*floor( (phi+180.0) * prj->w[7] + 1/2 ) ) * prj->w[6];
+         phic = -180.0 + (2.0*floor( prj->w[7] * phi ) +  prj->p[1] + 1 ) * prj->w[6];
       }
 
       sigma = sqrt( prj->p[2]*( 1.0 - abssin ));
@@ -4532,6 +4542,7 @@ double *phi, *theta;
 
 {
    double absy, sigma, t, yr, xc;
+   int hodd;
 
    if (prj->flag != WCS__HPX) {
       if (astHPXset(prj)) return 1;
@@ -4553,10 +4564,16 @@ double *phi, *theta;
 /* Polar zone */
    } else if( absy <= 90 ){
 
-      if( prj->n || yr > 0.0 ) {
-         xc = -180.0 + ( 2.0*floor( ( x + 180.0 )*prj->w[7]  ) + 1.0 )*prj->w[6];
+
+/* DSB - The expression for xc is conditioned differently to the
+   WCSLIB code in order to improve accuracy of the floor function for
+   arguments very slightly below an integer value. */
+      hodd =  ((int)prj->p[1]) % 2;
+      if( !prj->n && yr <= 0.0 ) hodd = 1 - hodd;
+      if( hodd ) {
+         xc = -180.0 + (2.0*floor( prj->w[7] * x + 1/2 ) + prj->p[1] ) * prj->w[6];
       } else {
-         xc = -180.0 + 2.0*floor( ( x + 180.0 )*prj->w[7] + 1/2 )*prj->w[6];
+         xc = -180.0 + (2.0*floor( prj->w[7] * x ) +  prj->p[1] + 1 ) * prj->w[6];
       }
 
       sigma = prj->w[4] - absy / prj->w[6];
