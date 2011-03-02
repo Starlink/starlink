@@ -180,8 +180,11 @@
 *          Application code should now use ndgAntmp/NDG_ANTMP to free MORE locators
 *          returned by NDG.
 *      28-JAN-2011 (DSB):
-*          Allow ndgReadProv to create a new empty provenance structure that is not 
+*          Allow ndgReadProv to create a new empty provenance structure that is not
 *          associated with an NDF.
+*      2-MAR-2011 (DSB):
+*          Do not clear the provid value in child structures if the provid in the  
+*          parent has already been cleared. This saves a lot of time in ndg1ClearProvId.
 */
 
 
@@ -3294,7 +3297,7 @@ static void ndg1Check( const char *text, Prov *prov, AstKeyMap *km,
    for( i = 0; i < prov->nparent && *status == SAI__OK; i++ ) {
       parent = prov->parents[ i ];
 
-/* See if the current parent recognises the suppleid Prov as a child. */
+/* See if the current parent recognises the supplied Prov as a child. */
       ok = 0;
       for( j = 0; j < parent->nchild; j++ ) {
          if( parent->children[ j ] == prov ) {
@@ -3481,12 +3484,18 @@ static void ndg1ClearProvId( Prov *prov, int *status ) {
    pointer is NULL. */
    if( *status != SAI__OK || ! prov ) return;
 
+/* Do nothing if the hash code has already been cleared in the supplied
+   prov (the provid values within the children will also have been cleared
+   at the same time). */
+   if( prov->provid != 0 ) {
+
 /* Clear the hash code in the supplied Prov.*/
-   prov->provid = 0;
+      prov->provid = 0;
 
 /* Clear the hash code in any child Provs.*/
-   for( ichild = 0; ichild < prov->nchild; ichild++ ) {
-      ndg1ClearProvId( prov->children[ ichild ], status );
+      for( ichild = 0; ichild < prov->nchild; ichild++ ) {
+         ndg1ClearProvId( prov->children[ ichild ], status );
+      }
    }
 }
 
