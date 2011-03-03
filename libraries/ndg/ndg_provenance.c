@@ -183,8 +183,10 @@
 *          Allow ndgReadProv to create a new empty provenance structure that is not
 *          associated with an NDF.
 *      2-MAR-2011 (DSB):
-*          Do not clear the provid value in child structures if the provid in the  
+*          Do not clear the provid value in child structures if the provid in the
 *          parent has already been cleared. This saves a lot of time in ndg1ClearProvId.
+*      3-MAR-2011 (DSB):
+*          In ndg1PurgeProvenance, speed up the way in which redundant Provs are removed.
 */
 
 
@@ -339,6 +341,7 @@ static const char *ndg1Date( int * );
 static const char *ndg1WriteProvenanceXml( Provenance *, int * );
 static int *ndg1ParentIndicies( Prov *, Provenance *, int *, int *, int * );
 static int ndg1CheckSameParents( Prov *, Prov *, int * );
+static void ndg1FindAliens( Prov *, int * );
 static int ndg1FindAncestorIndex( Prov *, Provenance *, int * );
 static int ndg1GetLogicalComp( HDSLoc *, const char *, int, int * );
 static int ndg1GetProvId( Prov *, int * );
@@ -368,6 +371,7 @@ static void ndg1WriteProvenanceNDF( Provenance *, int, int, int * );
 static void ndg1DumpInfo( Prov *prov1, Prov *prov2, int *status );
 static int static_badtype = 0;
 static const char *static_badpath = NULL;
+static int static_badprovid = -2;
 static Provenance *static_provenance = NULL;
 static int static_provid1 = -2;
 static int static_provid2 = -2;
@@ -3398,6 +3402,7 @@ static int ndg1CheckSameParents( Prov *prov1, Prov *prov2, int *status ) {
 
 /* Local Variables: */
    AstKeyMap *km;
+   Prov *temp;
    int result;
    int i;
 
@@ -3411,9 +3416,9 @@ static int ndg1CheckSameParents( Prov *prov1, Prov *prov2, int *status ) {
    km = astKeyMap( " " );
 
 /* Add an entry to the KeyMap for each parent of prov1. The key is the
-   path to parent and the (integer) value is set arbitrarily to zero. */
+   path to parent and the value is a pointer to the Prov structure. */
    for( i = 0; i < prov1->nparent; i++ ) {
-      astMapPut0I( km, prov1->parents[ i ]->path, 0, NULL );
+      astMapPut0P( km, prov1->parents[ i ]->path, prov1->parents[ i ], NULL );
    }
 
 /* Loop round all the parents of prov2. */
@@ -3424,6 +3429,7 @@ static int ndg1CheckSameParents( Prov *prov1, Prov *prov2, int *status ) {
       if( ! astMapHasKey( km, prov2->parents[ i ]->path ) ) {
          static_badtype = 0;
          static_badpath = prov2->parents[ i ]->path;
+         static_badprovid = ndg1GetProvId(  prov2->parents[ i ], status );
          result = 0;
          break;
 
@@ -3437,7 +3443,9 @@ static int ndg1CheckSameParents( Prov *prov1, Prov *prov2, int *status ) {
    that are not parents of prov2), clear the returned flag. */
    if( result && astMapSize( km ) > 0 ) {
       static_badtype = 1;
-      astMapGet0C( km, astMapKey( km, 0 ), &static_badpath );
+      static_badpath = astMapKey( km, 0 );
+      (void) astMapGet0P( km, static_badpath, (void **) &temp );
+      static_badprovid = ndg1GetProvId(  temp, status );
       result = 0;
    }
 
@@ -3902,6 +3910,57 @@ static NdgProvenance *ndg1Encode( Provenance *prov, int *status ) {
 
 /* Return the KeyMap pointer, cast to "NdgProvenance *". */
    return (NdgProvenance *) keymap;
+}
+
+static void ndg1FindAliens( Prov *prov, int *status ) {
+/*
+*  Name:
+*     ndg1FindAliens
+
+*  Purpose:
+*     Flag Provs that are not part of the family tree.
+
+*  Invocation:
+*     static void ndg1FindAliens( Prov *prov, int *status )
+
+*  Description:
+*     If the supplied Prov has no children, the parent-child link between
+*     it and each of its parents is broken, leaving it as an alien (i.e.
+*     no parents and no children). Each parent of the supplied Prov is
+*     then checked in the same way.
+
+*  Arguments:
+*     prov
+*        The Prov structure to be checked.
+*     status
+*        Inherited status pointer.
+
+*/
+
+/* Local Variables: */
+   Prov *parent;
+   int i;
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* Do nothing if the supplied Prov has any children. */
+   if( prov->nchild == 0 ) {
+
+/* Loop round each parent of the supplied Prov. Loop backwards to avoid
+   changing the indices of remaining parents as we delete them. */
+      for( i = prov->nparent - 1; i >= 0 && *status == SAI__OK; i-- ) {
+         parent = prov->parents[ i ];
+
+/* Break the parent-child link between the supplied Prov and the current
+   parent. */
+         ndg1Disown( parent, prov, status );
+
+/* Now invoke this function recursively to see if the current parent
+   now has no children (i.e. is an alien). */
+         ndg1FindAliens( parent, status );
+      }
+   }
 }
 
 static int ndg1FindAncestorIndex( Prov *prov, Provenance *provenance,
@@ -5524,13 +5583,19 @@ static void ndg1PurgeProvenance( Provenance *provenance,
 /* Loop through every Prov structure in the supplied Provenance. */
    for( i = 0; i < provenance->nprov; i++ ) {
       prov1 = provenance->provs[ i ];
-      if( prov1 ) {
+
+/* Check the provenance slot is still in use and that the provenance is
+   not an alien (i.e. has no parents and no children ). */
+      if( prov1 && ( prov1->nchild || prov1->nparent ) ) {
 
 /* Check all the remaining Prov structures to see if any of them refer to
    the same NDF. */
          for( j = i + 1; j < provenance->nprov; j++ ) {
             prov2 = provenance->provs[ j ];
-            if( prov2 ) {
+
+/* Check the provenance slot is still in use and that the provenance is
+   not an alien (i.e. has no parents and no children ). */
+            if( prov2 && ( prov2->nchild || prov2->nparent ) ) {
                keep = ndg1TheSame( prov1, prov2, status );
 
 /* If the two provenance structures refer to the same NDF, check they have
@@ -5560,15 +5625,26 @@ static void ndg1PurgeProvenance( Provenance *provenance,
                   }
                }
 
-/* If the two provenance structures refer to the same NDF, break the
-   parent-child link for the first Prov and register the second Prov with
-   the parent in place of the first Prov. */
+/* If the two provenance structures refer to the same NDF, then the first
+   provenance structure adopts all the children of the second provenance
+   structure, which is then left childless and so can be deleted. For each
+   child in the second structure, break its parent-child link with the second
+   structure, and and register it as a child of the first structure. Loop
+   backwards through the child list to avoid changing the indices of
+   remaining children as we delete them. */
                if( keep && *status == SAI__OK ) {
-                  for( ichild = 0; ichild < prov2->nchild; ichild++ ) {
+                  for( ichild = prov2->nchild - 1; ichild >= 0; ichild-- ) {
                      child = prov2->children[ ichild ];
                      ndg1Disown( prov2, child, status );
                      ndg1ParentChild( prov1, child, status );
                   }
+
+/* The childless provenance structure is now of no use. If it is itself
+   the only child of any of its parents, they too are of no use. Recurse
+   up the family tree looking for such "alien" Prov structures. These can
+   later be recognised by the fact that they have no parents and no
+   children. */
+                  ndg1FindAliens( prov2, status );
 
                } else {
                  keep = 0;
@@ -5578,38 +5654,13 @@ static void ndg1PurgeProvenance( Provenance *provenance,
       }
    }
 
-/* Now look for Prov structures that have no children, and remove them. Do
-   this repeatedly to go down the chain of parent-child links to the
-   roots. */
-   done = 0;
-   while( !done) {
-
-/* Assume there are no childless entries in the list of Prov structures. */
-      done = 1;
-
-/* Loop round all non-NULL entries in the list of Prov structures. */
-      for( i = 0; i < provenance->nprov; i++ ) {
-         prov1 = provenance->provs[ i ];
-         if( prov1 ) {
-
-/* Is this Prov structure without any children? If so, it is not used in
-   the creation of any of the other NDFs, so we can remove it, so long as
-   it is not the main NDF. */
-            if( prov1 != provenance->main && prov1->nchild == 0 ) {
-
-/* First, check all remaining Provs to see if the Prov that we are about
-   to remove is a child. If so, break the parent child relationship. */
-               for( j = 0; j < provenance->nprov; j++ ) {
-                  ndg1Disown( provenance->provs[ j ], prov1, status );
-               }
-
-/* Now free the resources used by the Prov. */
-               provenance->provs[ i ] = ndg1FreeProv( prov1, status );
-
-/* The above call to ndg1Disown may have produced a new childless Prov
-   structure, so indicate we need to check again. */
-               done = 0;
-            }
+/* Free any aliens (i.e. Prov structures that have no parents and no
+   children). */
+   for( i = 0; i < provenance->nprov; i++ ) {
+      prov1 = provenance->provs[ i ];
+      if( prov1 ) {
+         if( prov1->nchild == 0 &&  prov1->nparent == 0 ) {
+            provenance->provs[ i ] = ndg1FreeProv( prov1, status );
          }
       }
    }
@@ -7183,11 +7234,11 @@ static void ndg1DumpInfo( Prov *prov1, Prov *prov2, int *status ){
    }
 
    if( static_badtype == 0 ) {
-      fprintf( fd, "PROV2 is a child of %s but PROV1 is not.\n",
-               static_badpath );
+      fprintf( fd, "PROV2 is a child of %s (provid=%d) but PROV1 is not.\n",
+               static_badpath, static_badprovid );
    } else {
-      fprintf( fd, "PROV1 is a child of %s but PROV2 is not.\n",
-               static_badpath );
+      fprintf( fd, "PROV1 is a child of %s (provid=%d) but PROV2 is not.\n",
+               static_badpath, static_badprovid );
    }
 
    fprintf( fd, "\n\n" );

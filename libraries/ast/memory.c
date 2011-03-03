@@ -204,6 +204,8 @@
 #include <pthread.h>
 #endif
 
+#define MEM_PROFILE 1
+
 #ifdef MEM_PROFILE
 #include <sys/times.h>
 #endif
