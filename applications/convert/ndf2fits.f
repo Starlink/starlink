@@ -259,7 +259,7 @@
 *        called jvp1.fit and jvp2.fit respectively.  The data type of
 *        the FITS primary data array is signed integer words in
 *        jvp1.fit, and double-precision floating point in jvp2.fit.  The
-*        FITS extension in each NDFs is merged into the FITS header of
+*        FITS extension in each NDF is merged into the FITS header of
 *        the corresponding FITS file.
 *     ndf2fits horse logo.fit d native encoding="fits-wcs"
 *        This is the same as the first example except that the
@@ -299,7 +299,7 @@
 *     The rules for the conversion are as follows:
 *     -  The NDF main data array becomes the primary data array of the
 *     FITS file if it is in value of Parameter COMP, otherwise the first
-*     array defined by PARAMETER COMP will become the primary data
+*     array defined by Parameter COMP will become the primary data
 *     array.  A conversion from floating point to integer or to a
 *     shorter integer type will cause the output array to be scaled and
 *     offset, the values being recorded in keywords BSCALE and BZERO.
@@ -359,7 +359,7 @@
 *          the component name, and it is assigned the HDU index to
 *          provide a unique identifier.
 *        EXTLEVEL --- is the level in the hierarchical structure of the
-*          extensions.  Thus a top-level extension has value 1,
+*          extension.  Thus a top-level extension has value 1,
 *          sub-components of this extension have value 2 and so on.
 *        EXTTYPE --- is the data type of the NDF extension used to
 *          create a binary table.
