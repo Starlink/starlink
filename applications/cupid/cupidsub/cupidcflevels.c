@@ -77,6 +77,8 @@ double *cupidCFLevels( AstKeyMap *config, double maxd, double mind,
 *        Correct calculation of number of contour levels based on TLOW
 *        and TDELTA values.Original version. Previously, the number of
 *        contours was too small by 1.
+*     3-MAR-2011 (DSB):
+*        More error checking.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -159,6 +161,16 @@ double *cupidCFLevels( AstKeyMap *config, double maxd, double mind,
                  "(Tlow=^TLOW) is below the minimum value in the data "
                  "array (^MIND).", status );
 
+/* Report an error if the lowest contour level is above the maximum value
+   in the data array. */
+      } else if( clow >= maxd && *status == SAI__OK ) {
+         *status = SAI__ERROR;
+         msgSetd( "TLOW", clow );
+         msgSetd( "MAXD", maxd );
+         errRep( "CUPIDCFLEVELS_ERR2", "The supplied lowest contour level "
+                 "(Tlow=^TLOW) is above the maximum value in the data "
+                 "array (^MAXD).", status );
+
 /* Otherwise, use 2*RMS as the default. */
       } else {
          cdelta = 2.0*rms;
@@ -166,16 +178,40 @@ double *cupidCFLevels( AstKeyMap *config, double maxd, double mind,
 /* Get the contour interval using the above default. */
          cdelta = cupidConfigRMS( config, "DELTAT", rms, cdelta, status );
 
-/* Find the number of levels needed for this deltat. */
-         *nlevels = (int) ( ( maxd - clow )/cdelta ) + 1;
+/* Report an error if it is negative or zero. */
+         if( cdelta <= 0.0 && *status == SAI__OK ) {
+            *status = SAI__ERROR;
+            msgSetd( "CD", cdelta );
 
-/* Allocate the array and fill it with the appropriate contour levels. */
-         ret = astMalloc( sizeof( double )*(*nlevels) );
-         if( ret ) {
-            clevel = clow;
-            for( i = *nlevels - 1; i >= 0; i-- ) {
-               ret[ i ]= clevel;
-               clevel += cdelta;
+            errRep( "CUPIDCFLEVELS_ERR3", "The supplied contour interval "
+                    "(DeltaT=^CD) is zero or negative.", status );
+
+/* Otherwise, find the number of levels needed for this deltat. */
+         } else if( *status == SAI__OK ) {
+            *nlevels = (int) ( ( maxd - clow )/cdelta ) + 1;
+
+/* Check the number of lebels is reasonable. */
+            if( ( *nlevels < 2 || *nlevels > 10000000 ) ) {
+               *status = SAI__ERROR;
+               msgSetd( "T", clow );
+               msgSetd( "D", cdelta );
+               msgSetd( "R", rms );
+               msgSeti( "NL", *nlevels );
+               errRep( "CUPIDCFLEVELS_ERR4", "The supplied values for "
+                       "parameters TLOW (^T), DELTAT (^D) and RMS (^R) "
+                       "would result in an unusable number (^NL) of "
+                       "contours.", status );
+
+/* If so, allocate the array and fill it with the appropriate contour levels. */
+            } else {
+               ret = astMalloc( sizeof( double )*(*nlevels) );
+               if( ret ) {
+                  clevel = clow;
+                  for( i = *nlevels - 1; i >= 0; i-- ) {
+                     ret[ i ]= clevel;
+                     clevel += cdelta;
+                  }
+               }
             }
          }
       }

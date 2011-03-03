@@ -5,6 +5,7 @@
 #include "star/hds.h"
 #include "prm_par.h"
 #include <stdio.h>
+#include <math.h>
 
 HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                         double *ipv, double rms, AstKeyMap *config, int velax,
@@ -123,6 +124,8 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        Added "backoff" parameter.
 *     14-JAN-2009 (TIMJ):
 *        Use MERS for message filtering.
+*     3-MAR-2011 (DSB):
+*        Report an error if the supplied RMS value is unusable.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -138,6 +141,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    CupidPixelSet *ps;   /* Pointer to PixelSet */
    HDSLoc *ret;         /* Locator for the returned array of NDFs */
    double *levels;      /* Pointer to array of contour levels */
+   double amaxd;        /* Largest absolute data value */
    double clevel;       /* Current data level */
    double dd;           /* Data value */
    double maxd;         /* Maximum value in data array */
@@ -284,6 +288,26 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
             }
          }
 
+      }
+
+/* Report an error if the RMS value looks wrong. */
+      if( *status == SAI__OK ) {
+         if( rms <= 0.0 ) {
+            *status = SAI__ERROR;
+            msgSetd( "R", rms );
+            errRep( " ", "The supplied RMS value (^R) is illegal: it must be "
+                    "greater than zero.", status );
+         } else {
+            amaxd = ( fabs( maxd ) > fabs( mind ) ) ? fabs( maxd ) : fabs( mind );
+            if( rms >= amaxd ) {
+               *status = SAI__ERROR;
+               msgSetd( "R", rms );
+               msgSetd( "M", amaxd );
+               errRep( " ", "The supplied RMS value (^R) is illegal: it is "
+                       "larger than the maximum absolute data value (^M).",
+                       status );
+            }
+         }
       }
 
 /* Get the contour levels at which to check for clumps. */
