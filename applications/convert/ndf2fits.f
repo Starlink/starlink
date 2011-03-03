@@ -330,7 +330,8 @@
 *          NDF's FITS airlock.  Should that attempt fail, the last
 *          resort tries the NDF AXIS component, if it exists.  If its
 *          co-ordinates are non-linear, the AXIS co-ordinates may be
-*          exported in a -TAB sub-file subject to Parameter USEAXIS.
+*          exported in a -TAB sub-file subject to the value of
+*          Parameter USEAXIS.
 *        OBJECT, LABEL, BUNIT --- the values held in the NDF's TITLE,
 *          LABEL, and UNITS components respectively are used if
 *          they are defined; otherwise any values found in the FITS

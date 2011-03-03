@@ -130,10 +130,14 @@
 *          data array; however the BITPIX in the FITS airlock extension
 *          is transferred when argument BITPIX is -1.
 *        CRVALn, CDELTn, CRPIXn, CTYPEn, CUNITn --- are derived from
-*          the NDF axis structures if possible.  If no linear NDF axis
-*          structures are present, the values in the NDF's FITS
-*          extension are copied (when argument PROFIT is .TRUE.).  If
-*          any axes are non-linear, all FITS axis information is lost.
+*          the NDF WCS component if possible (i.e. exists and maps to
+*          a FITS WCS projection type).  If this is not possible, and
+*          if argument PROFIT is .TRUE., then it copies the headers of
+*          a valid WCS specified in the NDF's FITS airlock.  Should
+*          that attempt fail, the last resort tries the NDF AXIS
+*          component, if it exists.  If its co-ordinates are non-linear,
+*          the AXIS co-ordinates may be exported in a -TAB sub-file
+*          subject to the value of argument USEAXS.
 *        OBJECT, LABEL, BUNIT --- the values held in the NDF's title,
 *          label, and units components respectively are used if
 *          they are defined; otherwise any values found in the FITS

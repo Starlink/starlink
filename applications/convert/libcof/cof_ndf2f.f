@@ -156,8 +156,9 @@
 *          if argument PROFIT is .TRUE., then it copies the headers of
 *          a valid WCS specified in the NDF's FITS airlock.  Should
 *          that attempt fail, the last resort tries the NDF AXIS
-*          component, if it exists, but it only creates the headers
-*          provided all of the axis centre co-ordinates are linear.
+*          component, if it exists.  If its co-ordinates are non-linear,
+*          the AXIS co-ordinates may be exported in a -TAB sub-file
+*          subject to the value of argument USEAXS.
 *        OBJECT, LABEL, BUNIT --- the values held in the NDF's title,
 *          label, and units components respectively are used if
 *          they are defined; otherwise any values found in the FITS
