@@ -1232,7 +1232,7 @@
      :                               NOARR, ARRNAM, BITPIX, BLOCKF,
      :                               ORIGIN, PROFIT, DUPLEX, PROEXT,
      :                               PROHIS, SUMS, ENCOD, NATIVE,
-     :                               STATUS )
+     :                               USEAXS, STATUS )
                   END IF
 
 *  Write integrity-check headers.

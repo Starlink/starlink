@@ -1,7 +1,7 @@
       SUBROUTINE COF_SMURF( SNAME, LOC, FUNIT, NDF, FILNAM, NOARR,
      :                      ARRNAM, BITPIX, BLOCKF, ORIGIN, PROFIT,
      :                      DUPLEX, PROEXT, PROHIS, SUMS, ENCOD,
-     :                      NATIVE, STATUS )
+     :                      NATIVE, USEAXS, STATUS )
 *+
 *  Name:
 *     COF_SMURF
@@ -15,7 +15,7 @@
 *  Invocation:
 *     CALL COF_SMURF( SNAME, LOC, FUNIT, NDF, FILNAM, NOARR, ARRNAM,
 *                     BITPIX, BLOCKF, ORIGIN, PROFIT, DUPLEX, PROEXT,
-*                     PROHIS, ENCOD, NATIVE, STATUS )
+*                     PROHIS, ENCOD, NATIVE, USEAXS, STATUS )
 
 *  Description:
 *     This routine converts contents of a SMURF extension to FITS.  Each
@@ -99,6 +99,20 @@
 *     NATIVE = LOGICAL (Given)
 *        Should a NATIVE encoding of the WCS info be included in the
 *        header?
+*     USEAXS = CHARACTER * ( * ) (Given)
+*        Whether or not to export AXIS co-ordinates to an alternate
+*        world co-ordinate representation in the FITS headers.  Such an
+*        alternate may require a FITS extension to store lookup tables
+*        of co-ordinates using the -TAB projection type.  The allowed
+*        options are as follows.
+*
+*        "CHECK" --- requests no AXIS information be stored unless the
+*                    current NDF contains AXIS information but no WCS.
+*        "YES"   --- May create an alternate world co-ordinate
+*                    representation irrespective of how the current
+*                    NDF stores co-ordinate information.
+*        "NO"    --- Must not create an alternate world co-ordinate
+*                    representation in the current NDF.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -107,7 +121,8 @@
 *     open.
 
 *  Copyright:
-*     Copyright (C) 2007, 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2009, 2011 Science & Technology Facilities
+*     Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -138,6 +153,8 @@
 *        which are converted in binary tables using the generic
 *        recursion.  Write the dummy header for SMURF structure as type
 *        SMURF_EXT.
+*     2011 March 3 (MJC):
+*        Add USEAXS argument.
 *     {enter_further_changes_here}
 
 *-
@@ -168,6 +185,7 @@
       LOGICAL SUMS
       CHARACTER * ( * ) ENCOD
       LOGICAL NATIVE
+      CHARACTER * ( * ) USEAXS
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -278,7 +296,7 @@
             CALL COF_NEX2F( NAME, FUNIT, NDF, NDFE, FILNAM, 1,
      :                      ARRNAM, BITPIX, BLOCKF, ORIGIN, PROFIT,
      :                      DUPLEX, PROHIS, SUMS, ENCOD, NATIVE,
-     :                      STATUS )
+     :                      USEAXS, STATUS )
 
 *  Process extensions.
 *  ===================
