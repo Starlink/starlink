@@ -1,6 +1,6 @@
       SUBROUTINE COF_WHEAD( NDFI, NDFFAI, COMP, FUNIT, BITPIX, PROPEX,
      :                      ORIGIN, ENCOD, NATIVE, MULTI, EXTNAM,
-     :                      STATUS )
+     :                      USEAXS, STATUS )
 *+
 *  Name:
 *     COF_WHEAD
@@ -13,7 +13,8 @@
 
 *  Invocation:
 *     CALL COF_WHEAD( NDFI, NDFFAI, COMP, FUNIT, BITPIX, PROPEX,
-*                     ORIGIN, ENCOD, NATIVE, MULTI, EXTNAM, STATUS )
+*                     ORIGIN, ENCOD, NATIVE, MULTI, EXTNAM, USEAXS,
+*                     STATUS )
 
 *  Description:
 *     This routine creates the header section of the primary array or
@@ -69,6 +70,20 @@
 *        processed in the primary NDF.  This argument affects the
 *        values or presence of FITS keywords.  See the Notes
 *        for EXTNAME, EXTLEVEL, and EXTTYPE keywords.
+*     USEAXS = CHARACTER * ( * ) (Given)
+*        Whether or not to export AXIS co-ordinates to an alternate
+*        world co-ordinate representation in the FITS headers.  Such an
+*        alternate may require a FITS extension to store lookup tables
+*        of co-ordinates using the -TAB projection type.  The allowed
+*        options are as follows.
+*
+*        "CHECK" --- requests no AXIS information be stored unless the
+*                    current NDF contains AXIS information but no WCS.
+*        "YES"   --- May create an alternate world co-ordinate
+*                    representation irrespective of how the current
+*                    NDF stores co-ordinate information.
+*        "NO"    --- Must not create an alternate world co-ordinate
+*                    representation in the current NDF.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -254,6 +269,8 @@
 *        20-JAN-2011 change was bad as it resulted in WCS inherited from
 *        the NDF's FITS extension being stored instead of the potentially
 *        modifed WCS from the NDF's WCS component).
+*     2011 February 25 (MJC):
+*        Add USEAXS argument.
 *     {enter_further_changes_here}
 
 *-
@@ -280,6 +297,7 @@
       LOGICAL   NATIVE           ! Include NATIVE encoding of WCS info?
       LOGICAL   MULTI            ! Multi-NDF container file?
       CHARACTER * ( * ) EXTNAM
+      CHARACTER * ( * ) USEAXS
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -892,7 +910,7 @@
 
 *  Write out the NDF WCS information.
 *  ==================================
-      CALL COF_FPWCS( FUNIT, NDFI, ENCOD, NATIVE, STATUS )
+      CALL COF_FPWCS( FUNIT, NDFI, ENCOD, NATIVE, USEAXS, STATUS )
 
   999 CONTINUE
 

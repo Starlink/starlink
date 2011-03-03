@@ -2,8 +2,14 @@
 
  Support for FITS -TAB projection type added.
 
- Add new WCSCOMP parameter to FITS2NDF.  It controls where world
+ Add WCSCOMP parameter to FITS2NDF.  It controls where world
  co-ordinate information is propagated in the output NDF.
+
+ Add USEAXS parameter to NDF2FITS.  It controls whether AXIS
+ co-ordinate information can be stored in an alternate
+ representation in the FITS headers, that may include a -TAB
+ extension.  The default behaviour is to not write alternate AXIS
+ co-ordinates if a WCS component exists in the NDF.
 
 1 CONVERT_Version_1.5-19
 

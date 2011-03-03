@@ -23,10 +23,10 @@
                                 A.J.Chipperfield\\
                                 D.S.Berry\\
                                 A.C.Davenhall}
-\newcommand{\stardocdate}      {2011 February 25}
+\newcommand{\stardocdate}      {2011 March 2}
 \newcommand{\stardoctitle}     {CONVERT\\
                                 A Format-conversion Package}
-\newcommand{\stardocversion}   {Version 1.6-1}
+\newcommand{\stardocversion}   {Version 1.6-2}
 \newcommand{\stardocmanual}    {User's Manual}
 \newcommand{\stardocabstract}  {
 The \CONVERT\ package contains utilities for converting data files
@@ -4514,6 +4514,18 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          }
          \texttt{["None"]}
       }
+      \sstsubsection{
+         USEAXIS = \_LOGICAL (Read)
+      }{
+         Whether or not to export AXIS co-ordinates to an alternate
+         world co-ordinate representation in the FITS headers.  Such an
+         alternate may require a FITS sub-file to store lookup tables
+         of co-ordinates using the -TAB projection type.  The default
+         null value requests no AXIS information be stored unless the
+         current NDF contains AXIS information but no WCS.  An explicit
+         \texttt{TRUE} or \texttt{FALSE} selection demands the chosen setting irrespective
+         of how the current NDF stores co-ordinate information.  \texttt{[!]}
+      }
    }
    \sstexamples{
       \sstexamplesubsection{
@@ -4670,9 +4682,9 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
               If this is not possible, and if PROFITS is \texttt{TRUE},
               then it copies the headers of a valid WCS specified in the
               NDF's FITS airlock.  Should that attempt fail, the last
-              resort tries the NDF AXIS component, if it exists, but it
-              only creates the headers provided all of the axis centre
-              co-ordinates are linear.
+              resort tries the NDF AXIS component, if it exists.  If its
+              co-ordinates are non-linear, the AXIS co-ordinates may be
+              exported in a -TAB sub-file subject to Parameter USEAXIS.
 
             \sstitem
             OBJECT, LABEL, BUNIT --- the values held in the NDF's TITLE,
@@ -7547,8 +7559,13 @@ to specify the correct IDL library path.
 
 Support for FITS -TAB projection type added.
 
-Add new WCSCOMP parameter to \htmlref{FITS2NDF}{FITS2NDF}.  It
-controls where world co-ordinate information is propagated in the output
-NDF.
+Add WCSCOMP parameter to \htmlref{FITS2NDF}{FITS2NDF}.  It controls
+where world co-ordinate information is propagated in the output NDF.
+
+Add USEAXS parameter to \htmlref{NDF2FITS}{NDF2FITS}.  It controls
+whether AXIS co-ordinate information can be stored in an alternate
+representation in the FITS headers, that may include a -TAB
+extension.  The default behaviour is to not write alternate AXIS
+co-ordinates if a WCS component exists in the NDF.
 
 \end{document}

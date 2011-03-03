@@ -210,6 +210,15 @@
 *
 *        See Section "Provenance" for more details.
 *        ["None"]
+*     USEAXIS = _LOGICAL (Read)
+*        Whether or not to export AXIS co-ordinates to an alternate
+*        world co-ordinate representation in the FITS headers.  Such an
+*        alternate may require a FITS sub-file to store lookup tables
+*        of co-ordinates using the -TAB projection type.  The default
+*        null value requests no AXIS information be stored unless the
+*        current NDF contains AXIS information but no WCS.  An explicit
+*        TRUE or FALSE selection demands the chosen setting irrespective
+*        of how the current NDF stores co-ordinate information.  [!]
 
 *  Examples:
 *     ndf2fits horse logo.fit d
@@ -314,9 +323,9 @@
 *          Systems").  If this is not possible, and if PROFITS is TRUE,
 *          then it copies the headers of a valid WCS specified in the
 *          NDF's FITS airlock.  Should that attempt fail, the last
-*          resort tries the NDF AXIS component, if it exists, but it
-*          only creates the headers provided all of the axis centre
-*          co-ordinates are linear.
+*          resort tries the NDF AXIS component, if it exists.  If its
+*          co-ordinates are non-linear, the AXIS co-ordinates may be
+*          exported in a -TAB sub-file subject to Parameter USEAXIS.
 *        OBJECT, LABEL, BUNIT --- the values held in the NDF's TITLE,
 *          LABEL, and UNITS components respectively are used if
 *          they are defined; otherwise any values found in the FITS
@@ -691,6 +700,8 @@
 *     2010 November 30 (MJC):
 *        Add remark on clobbering of output file, and revised an
 *        example showing how to overwrite an existing FITS file.
+*     2011 February 24 (MJC):
+*        Add USEAXIS parameter.
 *     2011 February 25 (MJC):
 *        Change ORIGIN keyword default from "Starlink Project, U.K.".
 *     {enter_further_changes_here}
@@ -791,6 +802,7 @@
       LOGICAL QUAPRE             ! Is QUALITY component present?
       LOGICAL QUASEL             ! Was QUALITY selected?
       LOGICAL USEAXI             ! Save AXIS information?
+      CHARACTER*5 USEAXS         ! Save/check AXIS information?
       LOGICAL VARPRE             ! Is VARIANCE component present?
       LOGICAL VARSEL             ! Was VARIANCE selected?
 
@@ -1203,6 +1215,17 @@
 *  Abort if there has been an error.
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
+*  Find out how to handle AXIS co-odinates.
+      CALL ERR_MARK
+      USEAXS = 'NO'
+      CALL PAR_GET0L( 'USEAXIS', USEAXI, STATUS )
+      IF ( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         USEAXS = 'CHECK'
+      ELSE
+         IF ( USEAXI ) USEAXS = 'YES'
+      END IF
+
 *  Get the AST encoding to use when converting WCS information to FITS
 *  headers.  If a null "auto" is supplied, the choice is made
 *  automatically.  Convert the "auto" string to a blank string which is
@@ -1509,7 +1532,7 @@
                CALL COF_NDF2F( NDF, FILNAM, NAPRES, ARRPRE, BITPIX,
      :                         BLOCKF, ORIGIN, PROFIT, DUPLEX, PROEXT,
      :                         PROHIS, PROVEX, CHECKS, ENCOD, NATIVE,
-     :                         FOPEN, FCLOSE, STATUS )
+     :                         FOPEN, FCLOSE, USEAXS, STATUS )
 
 *  There are no arrays to transfer to the FITS file for the .HEADER
 *  NDF.
@@ -1525,14 +1548,14 @@
                CALL COF_NDF2F( NDF, FILNAM, 1, 'HEADER', -32, BLOCKF,
      :                         ORIGIN, PROFIT, DUPLEX, PROEXT, PROHIS,
      :                         PROVEX, CHECKS, ENCOD, NATIVE, FOPEN,
-     :                         FCLOSE, STATUS )
+     :                         FCLOSE, USEAXS,  STATUS )
             ELSE
 
 *  Convert the NDF to the FITS file.
                CALL COF_NDF2F( NDF, FILNAM, NAPRES, ARRPRE, BITPIX,
      :                         BLOCKF, ORIGIN, PROFIT, DUPLEX, PROEXT,
      :                         PROHIS, PROVEX, CHECKS, ENCOD, NATIVE,
-     :                         FOPEN, FCLOSE, STATUS )
+     :                         FOPEN, FCLOSE, USEAXS, STATUS )
             END IF
 
 *  Tidy the NDF.

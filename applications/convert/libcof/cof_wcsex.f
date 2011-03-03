@@ -1,4 +1,5 @@
-      INTEGER FUNCTION COF_WCSEX( FC, INDF, ENCOD0, NATIVE, STATUS )
+      INTEGER FUNCTION COF_WCSEX( FC, INDF, ENCOD0, NATIVE, EXCLUD,
+     :                            STATUS )
 *+
 *  Name:
 *     COF_WCSEX
@@ -45,6 +46,10 @@
 *     NATIVE = LOGICAL (Given)
 *        Should a NATIVE encoding be included in the header? Ignored if
 *        ENCOD is "NATIVE".
+*     EXCLUD = CHARACTER * ( * ) (Given)
+*        A comma-separated list of Frames to exclude from the FitsChan.
+*        A blank value indicates that no extra Frames are to be removed.
+*        GRID, PIXEL, and FRACTION Frames will be ignored.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -54,7 +59,7 @@
 
 *  Copyright:
 *     Copyright (C) 1997-2001, 2003-2004 Central Laboratory of the
-*     Research Councils. Copyright (C) 2007 Science & Technology
+*     Research Councils. Copyright (C) 2007, 2011 Science & Technology
 *     Facilities Council. All Rights Reserved.
 
 *  Licence:
@@ -75,6 +80,7 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -118,6 +124,8 @@
 *     6-DEC-2010 (DSB):
 *        Modified to prefer FITS-WCS encoding over FITS-IRAF (FITS-IRAF
 *        does not support spectral axes).
+*     2011 March 2 (MJC):
+*        Added EXCLUD argument.
 *     {enter_further_changes_here}
 
 *-
@@ -137,6 +145,7 @@
       INTEGER INDF
       CHARACTER ENCOD0*(*)
       LOGICAL NATIVE
+      CHARACTER*( * ) EXCLUD
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -157,10 +166,13 @@
       CHARACTER COD*80           ! The encoding to use
       CHARACTER DEFENC*9         ! The default encoding to use
       CHARACTER ENCOD*13         ! The basic AST encoding to use
+      CHARACTER EXCNAM*80        ! Name of a Frame to exclude
       CHARACTER FCATTR*100       ! String holding FitsChan attributes
       CHARACTER FTLOC * ( DAT__SZLOC ) ! Locator to whole FITS extension
       CHARACTER FTLOCI * ( DAT__SZLOC ) ! Locator to element of FITS extension
       INTEGER AXFRM              ! Pointer to AXIS Frame
+      INTEGER END                ! Index of last char. in EXCLUD element
+      INTEGER EXCFRM             ! Index of Frame to exclude
       INTEGER FCT                ! Temporary FitsChan
       INTEGER I, J               ! Loop indices
       INTEGER IAT                ! Used length of string
@@ -177,13 +189,15 @@
       INTEGER NCARD              ! No. of cards
       INTEGER NCARDP             ! Previous no. of cards in FitsChan
       INTEGER NDIM               ! Number of NDF pixel axes
+      INTEGER NEXCH              ! Number of characters in EXCLUD
       INTEGER NWCS               ! Number of WCS axes
       INTEGER NOBJ               ! No. of objects written to the FitsChan
       INTEGER OBJ                ! Object read from FitsChan
       INTEGER P1                 ! Index of first opening parenthesis in ENCOD0
+      INTEGER START              ! Index of first char in EXCLUD element
       INTEGER UBND( NDF__MXDIM ) ! NDF upper pixel bounds
       LOGICAL FITSPR             ! True if FITS extension is present
-      LOGICAL MORE               ! Read another object?
+      LOGICAL MORE               ! Read another object/excluded Frame?
       LOGICAL OK                 ! Are all excess pixel axes degenerate?
 *.
 
@@ -472,10 +486,65 @@
 
       END IF
 
-*  Now write out any remaining WCS information. If the current Frame
-*  in the FrameSet is the GRID Frame then we do not need to write any WCS
-*  information out since the GRID Frame is implied by the FITS data array.
-*  ======================================================================
+*  Exclude requested Frames.
+*  =========================
+      IF ( EXCLUD .NE. ' ' ) THEN
+
+*  Look for the list.
+         NEXCH = CHR_LEN( EXCLUD )
+         IAT = 1
+         MORE = .TRUE.
+         START = 1
+         DO WHILE ( MORE )
+            CALL CHR_TOCHR( ',', EXCLUD, .TRUE., IAT )
+
+*  No more commas, so this is the last name.
+            IF ( IAT .GT. NEXCH ) THEN
+               MORE = .FALSE.
+
+*  Set the index of the final character of the current name.
+               END = NEXCH
+            ELSE
+               END = IAT - 1
+            END IF
+
+*  Extract the current Frame in the list.
+            EXCNAM = EXCLUD( START: END )
+            CALL CHR_LDBLK( EXCNAM )
+            CALL CHR_UCASE( EXCNAM )
+
+*  Ignore PIXEL and FRACTION as these are already handled.  GRID
+*  should remain.
+            IF ( EXCNAM .NE. 'GRID' .AND.
+     :           EXCNAM .NE. 'PIXEL' .AND.
+     :           EXCNAM .NE. 'FRACTION' ) THEN
+
+               IF ( AST_FINDFRAME( IWCS, AST_FRAME( NDIM, ' ', STATUS ),
+     :                            EXCNAM, STATUS ) .NE. AST__NULL ) THEN
+                  EXCFRM = AST_GETI( IWCS, 'CURRENT', STATUS )
+
+*  If found, remove the chosen Frame from the FrameSet, correct the AXIS
+*  Frame index, the current Frame index, and invalidate the PIXEL Frame
+*  index. If the PIXEL Frame was the original Current Frame, then make
+*  the AXIS Frame the current Frame.
+                  CALL AST_REMOVEFRAME( IWCS, EXCFRM, STATUS )
+               END IF
+            END IF
+
+*  Ready to extract the next name.
+            IF ( MORE ) THEN
+               IAT = IAT + 1
+               START = IAT
+            END IF
+         END DO
+      END IF
+
+*  Write out any remaining WCS information.
+*  ========================================
+
+*  If the current Frame in the FrameSet is the GRID Frame then we do not
+*  need to write any WCS information out since the GRID Frame is
+*  implied by the FITS data array.
       IF( AST_GETC( AST_GETFRAME( IWCS, AST__CURRENT, STATUS ),
      :              'DOMAIN', STATUS ) .NE. 'GRID' ) THEN
 

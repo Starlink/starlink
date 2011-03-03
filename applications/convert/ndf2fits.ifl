@@ -31,6 +31,8 @@
 #        Added DUPLEX.
 #     2008 January 8 (MJC):
 #        Added PROVENANCE.
+#     2011 February 25 (MJC):
+#        Added USEAXIS.
 #     {enter_further_changes_here}
 
 #-
@@ -176,6 +178,14 @@ interface NDF2FITS
       prompt      'Storage of provenance information'
       helpkey     '*'
       default     'None'
+   endparameter
+
+   parameter      USEAXIS        # Whether to store AXIS info in a table
+      type        '_LOGICAL'
+      vpath       'DEFAULT'
+      prompt      'Should AXIS information be stored in a FITS -TAB table?'
+      default     !
+      helpkey     '*'
    endparameter
 
 endinterface

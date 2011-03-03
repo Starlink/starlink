@@ -1,4 +1,4 @@
-      SUBROUTINE COF_FPWCS( FUNIT, INDF, ENCOD, NATIVE, STATUS )
+      SUBROUTINE COF_FPWCS( FUNIT, INDF, ENCOD, NATIVE, USEAXS, STATUS )
 *+
 *  Name:
 *     COF_FPWCS
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL COF_FPWCS( FUNIT, INDF, ENCOD, NATIVE, STATUS )
+*     CALL COF_FPWCS( FUNIT, INDF, ENCOD, NATIVE, USEAXS, STATUS )
 
 *  Description:
 *     The AST FrameSet (see SUN/210) describing the co-ordinate systems
@@ -35,6 +35,20 @@
 *        'DSS', 'FITS-WCS', 'NATIVE', etc. (or a blank string).
 *     NATIVE = LOGICAL (Given)
 *        Include a NATIVE encoding in the header?
+*     USEAXS = CHARACTER * ( * ) (Given)
+*        Whether or not to export AXIS co-ordinates to an alternate
+*        world co-ordinate representation in the FITS headers.  Such an
+*        alternate may require a FITS extension to store lookup tables
+*        of co-ordinates using the -TAB projection type.  The allowed
+*        options are as follows.
+*
+*        "CHECK" --- requests no AXIS information be stored unless the
+*                    current NDF contains AXIS information but no WCS.
+*        "YES"   --- May create an alternate world co-ordinate
+*                    representation irrespective of how the current
+*                    NDF stores co-ordinate information.
+*        "NO"    --- Must not create an alternate world co-ordinate
+*                    representation in the current NDF.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -65,6 +79,7 @@
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -96,6 +111,8 @@
 *     11-FEB-2011 (DSB):
 *        Prevent multiple copies (i.e. one for each NDF array component)
 *        of a -TAB bintable being created.
+*     2011 February 25 (MJC):
+*        Added USEAXS argument.
 *     {enter_further_changes_here}
 
 *-
@@ -112,6 +129,7 @@
       INTEGER INDF
       CHARACTER ENCOD*(*)
       LOGICAL NATIVE
+      CHARACTER*( * ) USEAXS
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -130,16 +148,21 @@
       PARAMETER( ASTVER = 143526 )
 
 *  Local Variables:
-      CHARACTER HEADER*( HEDLEN )! A FITS header
-      CHARACTER KEY*30           ! Extension name
+      CHARACTER EXCLUD*4         ! Frame (AXIS) to exclude
       INTEGER FC                 ! Identifier for AST FitsChan
+      INTEGER FS                 ! NDF's FrameSet identifier
       INTEGER FSTAT              ! FITSIO status
+      LOGICAL GOTAXI             ! Does NDF have an AXIS component?
+      LOGICAL GOTWCS             ! Does NDF have a WCS component?
+      CHARACTER HEADER*( HEDLEN )! A FITS header
       INTEGER IHEAD              ! Loop counter for headers
       INTEGER ITABLE             ! Index of current entry in KEYMAP
+      CHARACTER KEY*30           ! Key name
       INTEGER KEYADD             ! Number of headers that can be added
       INTEGER KEYMAP             ! KeyMap holding FitsTables
       INTEGER NHEAD              ! Number of FITS headers
       INTEGER NTABLE             ! No. of entries in KEYMAP
+      LOGICAL PPGTAB             ! Propagate a table?
       INTEGER TABLE              ! Pointer to a FitsTable
       LOGICAL THERE              ! Does the object exist?
 *.
@@ -206,14 +229,34 @@
          END IF
       END DO
 
+*  Decide whether the AXIS -TAB table is to be created.  Default to
+*  USEAXS=NO.
+      PPGTAB = .FALSE.
+      IF ( USEAXS .EQ. 'YES' ) THEN
+         PPGTAB = .TRUE.
+
+      ELSE IF ( USEAXS .EQ. 'CHECK' ) THEN
+
+*  If the NDF has a WCS component do not propagate the AXIS information
+*  in a table.
+         CALL NDF_STATE( INDF, 'WCS', GOTWCS, STATUS )
+
+*  If the NDF has an AXIS component without a WCS componen, do propagate
+*  the AXIS information in a table.
+         CALL NDF_STATE( INDF, 'AXIS', GOTAXI, STATUS )
+         PPGTAB = GOTAXI .AND. .NOT. GOTWCS
+      END IF
+
+*  Remove the unwanted AXIS from the NDF FrameSet
+      EXCLUD = ' '
+      IF ( .NOT. PPGTAB ) EXCLUD = 'AXIS'
+
 *  Now export any WCS information from the NDF into the FitsChan. This
 *  may overwrite any WCS information which already existed in the
 *  FITSIO header on entry. Only modify the supplied FITSIO header if at
 *  least one Object was written to the FitsChan.
-      IF( COF_WCSEX( FC, INDF, ENCOD, NATIVE, STATUS ) .GE. 1 ) THEN
-
-*  Copy the contents of the FitsChan into the CHDU header.
-          CALL COF_FC2HD( FC, FUNIT, STATUS )
+      IF( COF_WCSEX( FC, INDF, ENCOD, NATIVE, EXCLUD, STATUS ) .GE.
+     :    1 ) THEN
 
 *  If any axes were successfully described using the -TAB algorithm,
 *  there will be one or more FitsTables stored in the FitsChan. For each
@@ -232,18 +275,27 @@
                KEY = AST_MAPKEY( KEYMAP, ITABLE, STATUS )
                IF( AST_MAPGET0A( KEYMAP, KEY, TABLE, STATUS ) ) THEN
 
+                  IF ( PPGTAB ) THEN
+
 *  Create an extension in the FITS file holding a binary table
 *  containing values copied from the FitsTable, and then annul the
 *  FitsTable pointer. Use the table key in the KeyMap as the extension
 *  name.
-                  CALL COF_FT2BT( TABLE, FUNIT, KEY, ASTVER, STATUS )
-                  CALL AST_ANNUL( TABLE, STATUS )
+                     CALL COF_FT2BT( TABLE, FUNIT, KEY, ASTVER, STATUS )
+                     CALL AST_ANNUL( TABLE, STATUS )
 
+                  END IF
                END IF
             END DO
 
 *  Annul the pointer to the KeyMap holding the tables.
             CALL AST_ANNUL( KEYMAP, STATUS )
+
+*  Re-copy the contents of the FitsChan into the refreshed CHDU header
+*  if tables have been removed from the FitsChan.
+*            IF ( .NOT. PPGTAB ) THEN
+               CALL COF_FC2HD( FC, FUNIT, STATUS )
+*            END IF
 
          END IF
 
