@@ -72,7 +72,8 @@
 *          FFT. [FALSE]
 *     POWER = _LOGICAL (Read)
 *          Use polar representation of FFT with squared
-*          amplitudes. [FALSE]
+*          amplitudes divided by the frequency bin spacing (gives a
+*          power spectral density). [FALSE]
 *     ZEROBAD = _LOGICAL (Read)
 *          Zero any bad values in the data before taking FFT. [TRUE]
 

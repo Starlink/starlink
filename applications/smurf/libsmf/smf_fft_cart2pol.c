@@ -22,7 +22,9 @@
 *     inverse = int (Given)
 *        If set convert polar --> cartesian. Otherwise cartesian --> polar.
 *     power = int (Given)
-*        If set, magnitudes in polar form are squared to give power units
+*        If set, magnitudes in polar form are squared and then divided by
+*        the frequency spacing df to get power spectral density units
+*        (e.g. pW / Hz)
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -106,6 +108,7 @@ void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status ) {
   double amp;                   /* Amplitude coeff */
   double *baseR=NULL;           /* base pointer to real/amplitude coeff */
   double *baseI=NULL;           /* base pointer to imag/argument coeff */
+  double df=1;                  /* frequency steps in Hz */
   size_t i;                     /* Loop counter */
   double imag;                  /* Imaginary coeff */
   size_t j;                     /* Loop counter */
@@ -131,6 +134,18 @@ void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status ) {
 
   if( *status != SAI__OK ) return;
 
+  /* Need to know df to get normalization right when dealing with PSDs */
+  if( power ) {
+    if( data->hdr && data->hdr->steptime ) {
+      df = 1. / (data->hdr->steptime * (double) ntslice );
+    } else {
+      msgOut( "", FUNC_NAME ": *** Warning *** no valid steptime "
+              "encountered, so setting frequency bin width df=1 "
+              "(PSD units will be meaningless)", status );
+    }
+  }
+
+
   /* Loop over bolometer */
 
   for( i=0; (*status==SAI__OK)&&(i<nbolo); i++ ) {
@@ -151,6 +166,7 @@ void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status ) {
           } else {
             /* Convert polar --> cartesian */
             if( power ) {
+              /* Converting from PSD */
               if( baseR[j] < 0 ) {
                 /* Check for sqrt of negative number */
                 *status = SAI__ERROR;
@@ -158,7 +174,7 @@ void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status ) {
                         ": amplitude^2 < 0. FFT data may not be in correct form",
                         status);
               } else {
-                amp = sqrt(baseR[j]);
+                amp = sqrt(baseR[j]*df);
               }
             } else {
               amp = baseR[j];
@@ -176,11 +192,19 @@ void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status ) {
       }
     } else {
       for( j=0; j<nf; j++ ) {
+        /* Convert cartesian --> polar */
         if( (baseR[j]!=VAL__BADD)&&
             (baseI[j]!=VAL__BADD) ) {
-          /* Convert cartesian --> polar */
+
           amp = baseR[j]*baseR[j] + baseI[j]*baseI[j];
-          if( !power ) amp = sqrt(amp);
+
+          if( power ) {
+            /* Calculate power spectral density */
+            amp /= df;
+          } else {
+            /* Normal polar form */
+            amp = sqrt(amp);
+          }
           theta = atan2( baseI[j], baseR[j] );
           baseR[j] = amp;
           baseI[j] = theta;
