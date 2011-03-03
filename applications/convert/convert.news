@@ -11,6 +11,9 @@
  extension.  The default behaviour is to not write alternate AXIS
  co-ordinates if a WCS component exists in the NDF.
 
+ Changed the default ORIGIN keyword from "Starlink Project, U.K."
+ to Starlink Software in NDF2FITS..
+
 1 CONVERT_Version_1.5-19
 
  FITS2NDF can now recreate data that were formerly in a UKIRT_HDS

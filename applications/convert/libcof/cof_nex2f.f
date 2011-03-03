@@ -56,7 +56,7 @@
 *     ORIGIN = CHARACTER * ( * ) (Given)
 *        The name of the institution where the FITS file originates.
 *        This is used to create the ORIGIN card in the FITS header.
-*        A blank value gives a default of "Starlink Project, U.K.".
+*        A blank value gives a default of "Starlink Software".
 *     PROFIT = LOGICAL (Given)
 *        If .TRUE., the contents of the FITS airlock, if present, are
 *        merged into the FITS header.  Argument DUPLEX qualifies to
@@ -127,7 +127,7 @@
 *        DATE --- is created automatically.
 *        ORIGIN --- inherits any existing ORIGIN card in the NDF FITS
 *          extension, unless you supply a value through argument
-*          ORIGIN other than the default "Starlink Project, U.K." or
+*          ORIGIN other than the default "Starlink Software" or
 *          a blank string.
 *        EXTNAME --- is the is the path of the extension within the
 *          NDF.  If the path is too long to fit within the header
