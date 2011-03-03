@@ -21611,12 +21611,13 @@ static AstMapping *OtherAxes( AstFitsChan *this, AstFrameSet *fs, double *dim,
                   tmap1 = astAnnul( tmap1 );
                }
                if( table ) table = astAnnul( table );
+            }
 
 /* If the axis cannot be described by any of the above methods, we
    pretend it is linear. This will generate a non-linear PIXEL->IWC
    mapping later (in MakeIntWorld) which will cause the write operation
    to fail. */
-            } else {
+            if( !axmap ) {
                crval = -crval;
                tmap0 = (AstMapping *) astShiftMap( 1, &crval, "", status );
                axmap = AddUnitMaps( tmap0, iax, nwcs, status );
@@ -32102,7 +32103,7 @@ static int WcsFromStore( AstFitsChan *this, FitsStore *store,
          }
 
 /* Note if the axis is described by the -TAB algorithm. */
-         tabaxis[ i ] = ( prj == AST__WCSBAD &&
+         tabaxis[ i ] = ( prj == AST__WCSBAD && strlen( cval ) >= 8 &&
                           !strncmp( cval + 4, "-TAB", 4 ) );
 
 /* Store the (potentially modified) CTYPE value. */
