@@ -4265,6 +4265,11 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
 
       The application also accepts NDFs stored as top-level components
       of an HDS container file.
+
+      Both NDF and FITS use the term extension, and they mean different
+      things.  Thus to avoid confusion in the descriptions below, the
+      term `sub-file' is used to refer to a FITS IMAGE, TABLE or
+      BINTABLE Header and Data Unit (HDU).
    }
    \sstusage{
       ndf2fits in out [comp] [bitpix] [origin]
@@ -4469,7 +4474,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       }{
          If \texttt{TRUE}, the NDF extensions (other than the FITS extension)
          are propagated to the FITS files as FITS binary-table
-         extensions, one per structure of the hierarchy. \texttt{[FALSE]}
+         sub-files, one per structure of the hierarchy. \texttt{[FALSE]}
       }
       \sstsubsection{
          PROFITS = \_LOGICAL (Read)
@@ -4484,7 +4489,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       }{
          If \texttt{TRUE}, any NDF history records are written to the primary
          FITS header as HISTORY cards.  These follow the mandatory
-         headers and any merged FITS-extension headers (see parameter
+         headers and any merged FITS-extension headers (see Parameter
          PROFITS). \texttt{[TRUE]}
       }
       \sstsubsection{
@@ -4502,7 +4507,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
 	    record the number and paths of both the direct parents
 	    of the NDF being converted, and its root ancestors (the
 	    ones without parents).  It also modifies the PRODUCT
-            keyword to be unique for each FITS extension.
+            keyword to be unique for each FITS sub-file.
 
             \sstitem
             \texttt{"Generic"} --- Encapsulates the entire
@@ -4556,7 +4561,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          that of the NDF's data array.  The FITS extension in the NDF
          is merged into the FITS header of \texttt{logo.fit}.  Should horse
          contain variance and quality arrays, these are written in IMAGE
-         extensions.  Any history information in the NDF is not relayed
+         sub-files.  Any history information in the NDF is not relayed
          to the FITS file.
       }
       \sstexamplesubsection{
@@ -4610,7 +4615,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          file \texttt{cgs4\_16.fit}.  The primary HDU has the global
          metadata from the .HEADER's FITS airlock.  The
          four integrations in I1, I2, I3, and I4 components of the
-         container file are converted to FITS IMAGE extensions.
+         container file are converted to FITS IMAGE sub-files.
       }
       \sstexamplesubsection{
          ndf2fits in=huge out=huge.fits comp=d bitpix=n
@@ -4653,7 +4658,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
 
          \sstitem
          The NDF's quality and variance arrays appear in individual
-         FITS IMAGE extensions immediately following the primary header
+         FITS IMAGE sub-files immediately following the primary header
          and data unit, unless that component already appears as the
          primary data array.  The quality array will always be written as
          an unsigned-byte array in the FITS file, regardless of the value
@@ -4705,7 +4710,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
 
             \sstitem
             EXTNAME --- is the array-component name when the EXTNAME
-              appears in the primary header or an IMAGE extension.  In a
+              appears in the primary header or an IMAGE sub-file.  In a
               binary-table derived from an NDF extension, EXTNAME is the
               path of the extension within the NDF, the path separator
               being the usual dot.  The path includes the indices to
@@ -4750,7 +4755,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
             \sstitem
             XTENSION, BSCALE, BZERO, BLANK and END --- are not propagated
               from the NDF's FITS extension.  XTENSION will be set for
-              any extension.  BSCALE and BZERO will be defined based on
+              any sub-file.  BSCALE and BZERO will be defined based on
               the chosen output data type in comparison with the NDF
               array's type, but cards with values 1.0 and 0.0 respectively
               are written to reserve places in the header section.  These
@@ -4814,12 +4819,12 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
 
          \sstitem
             For multiple NDFs a header-only HDU may be created followed
-            by an IMAGE extension containing the data array (or
+            by an IMAGE sub-file containing the data array (or
             whichever other array is first specified by COMP).
          \sstitem
             BITPIX for the header HDU is set to an arbitrary 8.
          \sstitem
-            Additional keywords are written for each IMAGE extension.
+            Additional keywords are written for each IMAGE sub-file.
          \ssthitemlist{
             \sstitem
              HDSNAME --- is the NDF name for a component NDF in a multi-NDF
@@ -4970,7 +4975,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
           file extension.
 
          \sstitem
-          PRODUCT is modified or added to each extension's header to
+          PRODUCT is modified or added to each sub-file's header to
           be the primary header's value of PRODUCT with a
           \texttt{\_$<$extnam$>$} suffix, where \texttt{$<$extnam$>$}
           is the extension name in lowercase.
@@ -5113,7 +5118,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          OUT = FILENAME (Write)
       }{
          The name of the output GASP image.  Two files are produced
-         with the same name but different extensions.  The \texttt{".dat"} file
+         with the same name but different file extensions.  The \texttt{".dat"} file
          contains the data array, and \texttt{".hdr"} is the associated header
          file that specifies the dimensions of the image.  The
          suggested default is the current value.

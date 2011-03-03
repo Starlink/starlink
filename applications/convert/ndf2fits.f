@@ -34,6 +34,11 @@
 *
 *     The application also accepts NDFs stored as top-level components
 *     of an HDS container file.
+*
+*     Both NDF and FITS use the term extension, and they mean different
+*     things.  Thus to avoid confusion in the descriptions below, the
+*     term `sub-file' is used to refer to a FITS IMAGE, TABLE or
+*     BINTABLE Header and Data Unit (HDU).
 
 *  Usage:
 *     ndf2fits in out [comp] [bitpix] [origin]
@@ -181,7 +186,7 @@
 *     PROEXTS = _LOGICAL (Read)
 *        If TRUE, the NDF extensions (other than the FITS extension)
 *        are propagated to the FITS files as FITS binary-table
-*        extensions, one per structure of the hierarchy.  [FALSE]
+*        sub-files, one per structure of the hierarchy.  [FALSE]
 *     PROFITS = _LOGICAL (Read)
 *        If TRUE, the contents of the FITS extension of the NDF are
 *        merged with the header information derived from the standard
@@ -190,7 +195,7 @@
 *     PROHIS = _LOGICAL (Read)
 *        If TRUE, any NDF history records are written to the primary
 *        FITS header as HISTORY cards.  These follow the mandatory
-*        headers and any merged FITS-extension headers (see parameter
+*        headers and any merged FITS-extension headers (see Parameter
 *        PROFITS).  [TRUE]
 *     PROVENANCE = LITERAL (Read)
 *        This controls the export of NDF provenance information to the
@@ -202,7 +207,7 @@
 *        number and paths of both the direct parents of the NDF being
 *        converted, and its root ancestors (the ones without parents).
 *        It also modifies the PRODUCT keyword to be unique for each FITS
-*        extension.
+*        sub-file.
 *
 *        "Generic" -- Encapsulates the entire PROVENANCE structure in
 *        FITS headers in sets of five character-value indexed headers.
@@ -240,7 +245,7 @@
 *        that of the NDF's data array.  The FITS extension in the NDF
 *        is merged into the FITS header of logo.fit.  Should horse
 *        contain variance and quality arrays, these are written in IMAGE
-*        extensions.  Any history information in the NDF is not relayed
+*        sub-files.  Any history information in the NDF is not relayed
 *        to the FITS file.
 *     ndf2fits "data/a*z" * comp=v noprofits bitpix=-32
 *        This converts the NDFs with names beginning with "a" and ending
@@ -277,7 +282,7 @@
 *        the multiple-extension FITS file cgs4_16.fit.  The primary HDU
 *        has the global metadata from the .HEADER's FITS airlock.  The
 *        four integrations in I1, I2, I3, and I4 components of the
-*        container file are converted to FITS IMAGE extensions.
+*        container file are converted to FITS IMAGE sub-files.
 *     ndf2fits in=huge out=huge.fits comp=d bitpix=n
 *        This converts the NDF called huge to the new FITS file called
 *        huge.fits.  The data type of the FITS primary data array
@@ -306,7 +311,7 @@
 *     output types.  Bad values in floating-point output arrays are
 *     denoted by IEEE not-a-number values.
 *     -  The NDF's quality and variance arrays appear in individual
-*     FITS IMAGE extensions immediately following the primary header
+*     FITS IMAGE sub-files immediately following the primary header
 *     and data unit, unless that component already appears as the
 *     primary data array.  The quality array will always be written as
 *     an unsigned-byte array in the FITS file, regardless of the value
@@ -338,7 +343,7 @@
 *          extension, unless you supply a value through parameter
 *          ORIGIN other than the default "Starlink Software".
 *        EXTNAME --- is the array-component name when the EXTNAME
-*          appears in the primary header or an IMAGE extension.  In a
+*          appears in the primary header or an IMAGE sub-file.  In a
 *          binary-table derived from an NDF extension, EXTNAME is the
 *          path of the extension within the NDF, the path separator
 *          being the usual dot.  The path includes the indices to
@@ -368,7 +373,7 @@
 *          standard FITS keyword.)
 *        XTENSION, BSCALE, BZERO, BLANK and END --- are not propagated
 *          from the NDF's FITS extension.  XTENSION will be set for
-*          any extension.  BSCALE and BZERO will be defined based on
+*          any sub-file.  BSCALE and BZERO will be defined based on
 *          the chosen output data type in comparison with the NDF
 *          array's type, but cards with values 1.0 and 0.0 respectively
 *          are written to reserve places in the header section.  These
@@ -418,10 +423,10 @@
 *     there are but two NDFs---one data and the other just
 *     headers---that have already been merged (see Parameter MERGE):
 *     -  For multiple NDFs a header-only HDU may be created followed by
-*     an IMAGE extension containing the data array (or whichever other
+*     an IMAGE sub-file containing the data array (or whichever other
 *     array is first specified by COMP).
 *     -  BITPIX for the header HDU is set to an arbitrary 8.
-*     -  Additional keywords are written for each IMAGE extension.
+*     -  Additional keywords are written for each IMAGE sub-file
 *        HDSNAME --- is the NDF name for a component NDF in a multi-NDF
 *          container file, for example "I2".
 *        HDSTYPE --- is set to "NDF" for a component NDF in a multi-NDF
@@ -520,7 +525,7 @@
 *        FILEID --- is the name of the output FITS file, omitting any
 *          file extension.
 *
-*        PRODUCT is modified or added to each extension's header to
+*        PRODUCT is modified or added to each sub-file's header to
 *        be the primary header's value of PRODUCT with a '_<extnam>'
 *        suffix, where <extnam> is the extension name in lowercase.
 *
@@ -585,7 +590,7 @@
 *     is treated like the main NDF except that it is assumed that
 *     these extension NDFs have no extensions of their own.  FITS
 *     airlock information and HISTORY are inherited from the parent
-*     NDF.  Also the extension keywords are written: EXTNAME gives the
+*     NDF.  Also the sub-file keywords are written: EXTNAME gives the
 *     path to the NDF, EXTLEVEL records the extension hierarchy level,
 *     and EXTTYPE is set to "NDF".  Any non-NDF components of the SMURF
 *     extension are written to a binary table in the normal fashion.
@@ -704,6 +709,9 @@
 *        Add USEAXIS parameter.
 *     2011 February 25 (MJC):
 *        Change ORIGIN keyword default from "Starlink Project, U.K.".
+*     2011 March 2 (MJC):
+*        Delineate FITS and NDF extensions by using the sub-file term
+*        for the former (as also used in FITS2NDF).
 *     {enter_further_changes_here}
 
 *-
