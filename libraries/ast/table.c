@@ -2951,7 +2951,8 @@ static void MapPutElem##X( AstKeyMap *this_keymap, const char *key, int elem, \
 \
 /* Check the column holds vector values of the type implied by the <X> \
    code in the function name. */ \
-      if(  astGetColumnType( this, colname ) != Itype && astOK ) { \
+      type = astGetColumnType( this, colname ); \
+      if(  type != Itype && astOK ) { \
          astError( AST__BADTYP, "astMapPutElem" #X "(%s): Failed to store a " \
                    #Xtype " value in cell \"%s\": column %s holds %s values.", \
                    status, astGetClass( this ), key, colname, \

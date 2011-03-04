@@ -4406,7 +4406,7 @@ f     AST_TEST
 */
 astMAKE_CLEAR(Object,UseDefs,usedefs,CHAR_MAX)
 astMAKE_GET(Object,UseDefs,int,1,((this->usedefs!=CHAR_MAX)?this->usedefs:1))
-astMAKE_SET(Object,UseDefs,int,usedefs,(this->usedefs=(value)?1:0))
+astMAKE_SET(Object,UseDefs,int,usedefs,((value)?1:0))
 astMAKE_TEST(Object,UseDefs,(this->usedefs!=CHAR_MAX))
 
 /*
