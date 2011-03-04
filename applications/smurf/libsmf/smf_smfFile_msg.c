@@ -44,9 +44,11 @@
 *        Initial version.
 *     2011-02-17 (TIMJ):
 *        Should work if status is bad
+*     2011-03-04 (TIMJ):
+*        Set new error level after the code that might return early.
 
 *  Copyright:
-*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2010,2011 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -95,12 +97,12 @@ smf_smfFile_msg( const smfFile * file, const char token[],
   char path[GRP__SZNAM+1];  /* Full path information */
   int status = SAI__OK;
 
-  errMark();
-
   if (!file) {
     if (fallback) msgSetc( token, fallback );
     return;
   }
+
+  errMark();
 
   path[0] = '\0';
 
