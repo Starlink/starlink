@@ -71,6 +71,7 @@
 *        involving steptime were broken.
 *     2011-03-04 (TIMJ):
 *        Report the unsupported mode string
+*        Ensure that we have obsmode information
 
 *  Copyright:
 *     Copyright (C) 2009-2011 Science & Technology Facilities Council.
@@ -579,7 +580,7 @@ int smf_fix_metadata_acsis ( msglev_t msglev, smfData * data, int have_fixed, in
   }
 
   /* New nomenclature for "raster". It is now a "scan" since 20080610. */
-  if (hdr->obsmode == SMF__OBS_SCAN && fitsvals.utdate <= 20080610) {
+  if (fitsvals.utdate <= 20080610) {
     char sam_mode[81];
     smf_getfitss( hdr, "SAM_MODE", sam_mode, sizeof(sam_mode), status );
     if ( strncasecmp( "raster", sam_mode, 6 ) == 0 ) {
@@ -587,6 +588,10 @@ int smf_fix_metadata_acsis ( msglev_t msglev, smfData * data, int have_fixed, in
       have_fixed |= SMF__FIXED_FITSHDR;
     }
   }
+
+  /* We need general information on observing modes so at this point we assume
+     the header information describing the mode is correct. */
+  smf_calc_mode( hdr, status );
 
   /* JIG_SCAL */
   if ( hdr->obsmode == SMF__OBS_JIGGLE ) {
