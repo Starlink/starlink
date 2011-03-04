@@ -113,9 +113,11 @@
 *        No longer explicit sidecar quality as argument.
 *     2011-02-01 (TIMJ):
 *        Remove flagratio argument.
+*     2011-03-04 (EC):
+*        Account for smf_fft_cart2pol behaviour change when PSD requested
 
 *  Copyright:
-*     Copyright (C) 2008-2009 University of British Columbia.
+*     Copyright (C) 2008-2009,2011 University of British Columbia.
 *     Copyright (C) 2008-2011 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -211,7 +213,7 @@ void smf_bolonoise( smfWorkForce *wf, smfData *data,
   if( whitenoise ) for(i=0; i<nbolo; i++) whitenoise[i] = VAL__BADD;
   if( fratio ) for(i=0; i<nbolo; i++) fratio[i] = VAL__BADD;
 
-  /* FFT the data and convert to polar power form */
+  /* FFT the data and convert to polar power spectral density form */
   pow = smf_fft_data( wf, data, 0, len, status );
   smf_convert_bad(  pow, status );
   smf_fft_cart2pol( pow, 0, 1, status );
@@ -268,20 +270,17 @@ void smf_bolonoise( smfWorkForce *wf, smfData *data,
 
       /* Store values */
       if( whitenoise ) {
-        /* Multiply average white noise level by total number of
-           samples: this calculates the total white noise contribution
-           assuming this level holds at all frequencies. Another
-           potential way to calculate this number would be to multiply
-           by 2 * (i_w2-i_w1+1) instead of ntslice to estimate the
-           time-domain noise power generated only within the
-           measurement band. */
+        /* Integrate the PSD by multiplying the average white noise
+           level by total number of samples and the frequency spacing:
+           this calculates the time-domain variance (in 200 Hz SCUBA-2
+           samples for example) assuming this level holds at all
+           frequencies. */
 
-        whitenoise[i] = p_white * ntslice;
+        whitenoise[i] = p_white * ntslice * df;
 
-        /* If NEP set, scale this to variance in 1-second average by
+        /* If NEP set, scale this to variance in a 1-second average by
            dividing by the sampling frequency (equivalent to
-           multiplying by sample length). This gives you the "/rtHz"
-           in the units. */
+           multiplying by sample length). */
 
         if( nep ) {
           whitenoise[i] *= steptime;
