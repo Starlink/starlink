@@ -1,6 +1,6 @@
 AST Library
 -----------
-   A new release (V5.5) of the Starlink AST (astrometry) library is
+   A new release (V5.6) of the Starlink AST (astrometry) library is
 now available.
 
    AST provides a comprehensive range of facilities for attaching
@@ -15,6 +15,25 @@ environment-independent.
 
 Main Changes in this Version
 ----------------------------
+
+- New functions astBBuf (AST_BBUF) and astEBuf (AST_EBUF) have been added
+to the Plot class. These control the buffering of graphical output
+produced by other Plot methods.
+
+- New functions astGBBuf and astGEBuf have been added to the interface
+defined by file grf.h. The ast_link command has been modified so that the
+-grf_v3.2 switch loads dummy versions of the new grf functions. This
+means that applications that use the -grf_v3.2 switch should continue to
+build without any change. However, the new public functions astBBuf and
+astEBuf described in the previous item will report an error unless the
+new grf functions are implemented. If you choose to implement them, you
+should modify your linking procedure to use the -grf (or -grf_v5.6)
+switch in place of the older -grf_v3.2 switch. See the description of the
+ast_link command for details of these switches.
+
+
+Main Changes in V5.5-0
+-----------------------
 
 - The FitsChan "TabOK" attribute is now an integer value rather
 than a boolean value. As in previous versions, it is used to indicate

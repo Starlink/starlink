@@ -22209,12 +22209,10 @@ f-
 has been added to rename existing entry in a KeyMap.
 \end{enumerate}
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V5.5-0}
+\subsection{Changes Introduced in V5.5-0}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V5.4-0 and V5.5-0 (the
-current version):
+The following describes the most significant changes which
+occurred in the AST library between versions V5.4-0 and V5.5-0:
 
 \begin{enumerate}
 
@@ -22243,6 +22241,47 @@ f-
 methods.
 
 \end{enumerate}
+
+
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V5.6-0}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V5.5-0 and V5.6-0 (the
+current version):
+
+\begin{enumerate}
+
+\item
+c+
+New functions astBBuf and astEBuf
+c-
+f+
+New routines AST\_BBUF and AST\_EBUF
+f-
+have been added to the Plot class. These control the buffering of graphical
+output produced by other Plot methods.
+
+\item New functions astGBBuf and astGEBuf have been added to the interface
+defined by file \verb+grf.h+. The ast\_link command has been modified so
+that the \verb+-grf_v3.2+ switch loads dummy versions of the new grf
+functions. This means that applications that use the  \verb+-grf_v3.2+
+switch should continue to build without any change. However, the new public
+c+
+functions astBBuf and astEBuf
+c-
+f+
+routines AST\_BBUF and AST\_EBUF
+f-
+will report an error unless the new grf functions are implemented. If you
+choose to implement them, you should modify your linking procedure to
+use the \verb+-grf+ (or  \verb+-grf_v5.6+ ) switch in place of the older
+\verb+-grf_v3.2+ switch. See the description of the ast\_link command for
+details of these switches.
+
+\end{enumerate}
+
 
 Programs which are statically linked will need to be re-linked in
 order to take advantage of these new facilities.

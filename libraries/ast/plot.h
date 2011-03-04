@@ -114,8 +114,10 @@
 #define AST__GSCALES	6
 #define AST__GQCH	7
 #define AST__GCAP	8
+#define AST__GBBUF	9
+#define AST__GEBUF	10
 
-#define AST__NGRFFUN    9   /* No. of Grf functions used by Plot */
+#define AST__NGRFFUN    11   /* No. of Grf functions used by Plot */
 
 #if defined(astCLASS)       /* Protected */
 #define AST__MXBRK     100  /* Max. no. of breaks in a drawn curve */
@@ -179,6 +181,8 @@ typedef void (* AstGrfFun)( void );
    may have different interfaces). */
 typedef int (* AstGAttrFun)( AstKeyMap *, int, double, double *, int );
 typedef int (* AstGFlushFun)( AstKeyMap * );
+typedef int (* AstGBBufFun)( AstKeyMap * );
+typedef int (* AstGEBufFun)( AstKeyMap * );
 typedef int (* AstGLineFun)( AstKeyMap *, int, const float *, const float * );
 typedef int (* AstGMarkFun)( AstKeyMap *, int, const float *, const float *, int );
 typedef int (* AstGTextFun)( AstKeyMap *, const char *, float, float, const char *, float, float );
@@ -193,6 +197,8 @@ typedef void (* AstGrfWrap)( void );
 
 /* Interfaces for the wrapper functions which wrap specific Grf funstions. */
 typedef int (* AstGAttrWrap)( struct AstPlot *, int, double, double *, int, int * );
+typedef int (* AstGBBufWrap)( struct AstPlot *, int * );
+typedef int (* AstGEBufWrap)( struct AstPlot *, int * );
 typedef int (* AstGFlushWrap)( struct AstPlot *, int * );
 typedef int (* AstGLineWrap)( struct AstPlot *, int, const float *, const float *, int * );
 typedef int (* AstGMarkWrap)( struct AstPlot *, int, const float *, const float *, int, int * );
@@ -207,6 +213,8 @@ typedef int (* AstGQchWrap)( struct AstPlot *, float *, float *, int * );
 typedef struct AstGrfPtrs {
    AstGrfFun grffun[AST__NGRFFUN];
    AstGAttrWrap GAttr;
+   AstGBBufWrap GBBuf;
+   AstGEBufWrap GEBuf;
    AstGFlushWrap GFlush;
    AstGLineWrap GLine;
    AstGMarkWrap GMark;
@@ -312,6 +320,8 @@ typedef struct AstPlot {
    int loglabel[ 3 ];
    AstGrfFun grffun[AST__NGRFFUN];
    AstGAttrWrap GAttr;
+   AstGBBufWrap GBBuf;
+   AstGEBufWrap GEBuf;
    AstGFlushWrap GFlush;
    AstGLineWrap GLine;
    AstGMarkWrap GMark;
@@ -346,26 +356,28 @@ typedef struct AstPlotVtab {
    AstClassIdentifier id;
 
 /* Properties (e.g. methods) specific to this class. */
-   AstPointSet *(* GetDrawnTicks)( AstPlot *, int, int, int * );
-   void (* SetTickValues)( AstPlot *, int, int, double *, int, double *, int * );
-   void (* DrawExtraTicks)( AstPlot *, int, AstPointSet *, int * );
-   int (* Border)( AstPlot *, int * );
-   void (* BoundingBox)( AstPlot *, float[2], float[2], int * );
    AstKeyMap *(* GetGrfContext)( AstPlot *, int * );
-   void (* Clip)( AstPlot *, int, const double [], const double [], int * );
+   AstPointSet *(* GetDrawnTicks)( AstPlot *, int, int, int * );
+   int (* Border)( AstPlot *, int * );
    int (* CvBrk)( AstPlot *, int, double *, double *, double *, int * );
+   void (* BBuf)( AstPlot *, int * );
+   void (* BoundingBox)( AstPlot *, float[2], float[2], int * );
+   void (* Clip)( AstPlot *, int, const double [], const double [], int * );
    void (* CopyPlotDefaults)( AstPlot *, int, AstPlot *, int, int * );
-   void (* Mirror)( AstPlot *, int, int * );
-   void (* GridLine)( AstPlot *, int, const double [], double, int * );
    void (* Curve)( AstPlot *, const double [], const double [], int * );
+   void (* DrawExtraTicks)( AstPlot *, int, AstPointSet *, int * );
+   void (* EBuf)( AstPlot *, int * );
    void (* GenCurve)( AstPlot *, AstMapping *, int * );
-   void (* PolyCurve)( AstPlot *, int, int, int, const double *, int * );
-   void (* GrfSet)( AstPlot *, const char *, AstGrfFun, int * );
-   void (* GrfPush)( AstPlot *, int * );
    void (* GrfPop)( AstPlot *, int * );
+   void (* GrfPush)( AstPlot *, int * );
+   void (* GrfSet)( AstPlot *, const char *, AstGrfFun, int * );
    void (* GrfWrapper)( AstPlot *, const char *, AstGrfWrap, int * );
    void (* Grid)( AstPlot *, int * );
+   void (* GridLine)( AstPlot *, int, const double [], double, int * );
    void (* Mark)( AstPlot *, int, int, int, const double *, int, int * );
+   void (* Mirror)( AstPlot *, int, int * );
+   void (* PolyCurve)( AstPlot *, int, int, int, const double *, int * );
+   void (* SetTickValues)( AstPlot *, int, int, double *, int, double *, int * );
    void (* Text)( AstPlot *, const char *, const double [], const float [], const char *, int * );
 
    double (* GetTol)( AstPlot *, int * );
@@ -695,21 +707,23 @@ void astInitPlotGlobals_( AstPlotGlobals * );
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
+   AstKeyMap *astGetGrfContext_( AstPlot *, int * );
    AstKeyMap *astGrfConID_( AstPlot *, int * );
    const char *astStripEscapes_( const char *, int * );
-   int astFindEscape_( const char *, int *, int *, int *, int * );
    int astBorder_( AstPlot *, int * );
-   AstKeyMap *astGetGrfContext_( AstPlot *, int * );
+   int astFindEscape_( const char *, int *, int *, int *, int * );
+   void astBBuf_( AstPlot *, int * );
    void astBoundingBox_( AstPlot *, float[2], float[2], int * );
    void astClip_( AstPlot *, int, const double [], const double [], int * );
-   void astGridLine_( AstPlot *, int, const double [], double, int * );
    void astCurve_( AstPlot *, const double [], const double [], int * );
+   void astEBuf_( AstPlot *, int * );
+   void astGenCurve_( AstPlot *, AstMapping *, int * );
+   void astGrfPop_( AstPlot *, int * );
+   void astGrfPush_( AstPlot *, int * );
+   void astGrfSet_( AstPlot *, const char *, AstGrfFun, int * );
+   void astGridLine_( AstPlot *, int, const double [], double, int * );
    void astGrid_( AstPlot *, int * );
    void astMark_( AstPlot *, int, int, int, const double *, int, int * );
-   void astGrfSet_( AstPlot *, const char *, AstGrfFun, int * );
-   void astGrfPush_( AstPlot *, int * );
-   void astGrfPop_( AstPlot *, int * );
-   void astGenCurve_( AstPlot *, AstMapping *, int * );
    void astPolyCurve_( AstPlot *, int, int, int, const double *, int * );
    void astText_( AstPlot *, const char *, const double [], const float [], const char *, int * );
 
@@ -1002,6 +1016,12 @@ astINVOKE(V,astGrfPush_(astCheckPlot(this),STATUS_PTR))
 
 #define astGrfPop(this) \
 astINVOKE(V,astGrfPop_(astCheckPlot(this),STATUS_PTR))
+
+#define astBBuf(this) \
+astINVOKE(V,astBBuf_(astCheckPlot(this),STATUS_PTR))
+
+#define astEBuf(this) \
+astINVOKE(V,astEBuf_(astCheckPlot(this),STATUS_PTR))
 
 
 #define astGrfFunID(name,method,class) astGrfFunID_(name,method,class,STATUS_PTR)

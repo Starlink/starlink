@@ -315,6 +315,7 @@ lib_LTLIBRARIES = \
     libast_grf3d.la \
     libast_grf_2.0.la \
     libast_grf_3.2.la \
+    libast_grf_5.6.la \
     libast_pgplot.la \
     libast_pgplot3d.la \
     libast_pal.la \
@@ -351,6 +352,7 @@ libast_drama_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 libast_grf3d_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 libast_grf_2.0_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 libast_grf_3.2_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
+libast_grf_5.6_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 libast_pgplot_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 libast_pgplot3d_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 libast_pal_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
@@ -390,6 +392,10 @@ libast_grf_2_0_la_SOURCES = grf_2.0.c
 #  The module containing null implementations of the graphics routines
 #  added by AST V3.2 and not present in V2.0
 libast_grf_3_2_la_SOURCES = grf_3.2.c
+
+#  The module containing null implementations of the graphics routines
+#  added by AST V5.6 and not present in V3.2
+libast_grf_5_6_la_SOURCES = grf_5.6.c
 
 #  The graphics module that uses PGPLOT for 2D graphical output.
 libast_pgplot_la_SOURCES = grf_pgplot.c
@@ -506,4 +512,4 @@ ast_test_SOURCES = ast_test.c
 
 #ast_test_LDADD = `ast_link`
 # Expand ast_link to avoid libast_pass2, which causes problems for Solaris
-ast_test_LDADD = libast.la libast_pal.la libast_grf_3.2.la libast_wcslib.la libast_grf_2.0.la libast_grf3d.la libast_err.la -lm
+ast_test_LDADD = libast.la libast_pal.la libast_grf_3.2.la libast_grf_5.6.la libast_wcslib.la libast_grf_2.0.la libast_grf3d.la libast_err.la -lm

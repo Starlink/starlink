@@ -67,6 +67,10 @@
 #     graphics module which implements the 2D graphics interface required by
 #     V3.2 of AST.
 #
+#     - ``-grf_v5.6'': Indicates that you want to link with your own
+#     graphics module which implements the 2D graphics interface required by
+#     V5.6 of AST.
+#
 #     - ``-myerr'': Requests that no arguments be generated to specify how
 #     error messages produced by the AST library should be delivered. You
 #     should use this option only if you have implemented an interface to a
@@ -200,6 +204,8 @@
 #        Added "-grf3d", "-pgplot3d" and "-pgp3d" flags.
 #     13-NOV-2008 (TIMJ):
 #        Add -drama option for DRAMA Ers support.
+#     3-MAR-2011 (DSB):
+#        Added grf 5.6 options.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -283,6 +289,12 @@
             grf='v3.2'
             shift;;
 
+#  -grf_v5.6 - Requests no 2D graphics, except for null implementations of
+#  functions aded to the grf interface after AST V5.6.
+         -grf_v5.6)
+            grf='v5.6'
+            shift;;
+
 #  -pgp - Requests 2D graphical output through Starlink PGPLOT.
          -pgp)
             grf='pgp'
@@ -359,11 +371,17 @@
 #  version of AST, do not produce any arguments.
       current) :;;
 
+#  If using own graphics which conform to the requirements of version 5.6
+#  of AST, produce arguments which link in dummy implementations of any
+#  functions which are required by the current version of AST but which were
+#  not required by version 5.6.
+      v5.6) :;;
+
 #  If using own graphics which conform to the requirements of version 3.2
 #  of AST, produce arguments which link in dummy implementations of any
 #  functions which are required by the current version of AST but which were
 #  not required by version 3.2.
-      v3.2) :;;
+      v3.2) args="${args} -last_grf_5.6";;
 
 #  If using own graphics which conform to the requirements of version 2.0
 #  of AST, produce arguments which link in dummy implementations of any
@@ -373,7 +391,7 @@
 
 #  Default graphics (none) requires linking with all the default (null) AST
 #  "grf" modules.
-      *) args="${args} -last_grf_2.0 -last_grf_3.2";;
+      *) args="${args} -last_grf_2.0 -last_grf_3.2 -last_grf_5.6";;
       esac
 
 

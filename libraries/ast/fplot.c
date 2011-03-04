@@ -117,6 +117,8 @@ fobject.c. */
 F77_SUBROUTINE(ast_null)( void );
 
 static int FGAttrWrapper( AstPlot *, int, double, double *, int );
+static int FGBBufWrapper( AstPlot * );
+static int FGEBufWrapper( AstPlot * );
 static int FGFlushWrapper( AstPlot * );
 static int FGLineWrapper( AstPlot *, int, const float *, const float * );
 static int FGMarkWrapper( AstPlot *, int, const float *, const float *, int );
@@ -344,6 +346,22 @@ F77_SUBROUTINE(ast_grfpop)( INTEGER(THIS), INTEGER(STATUS) ) {
    )
 }
 
+F77_SUBROUTINE(ast_bbuf)( INTEGER(THIS), INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   astAt( "AST_BBUF", NULL, 0 );
+   astWatchSTATUS(
+      astBBuf( astI2P( *THIS ) );
+   )
+}
+
+F77_SUBROUTINE(ast_ebuf)( INTEGER(THIS), INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   astAt( "AST_EBUF", NULL, 0 );
+   astWatchSTATUS(
+      astEBuf( astI2P( *THIS ) );
+   )
+}
+
 F77_SUBROUTINE(ast_grfset)( INTEGER(THIS), CHARACTER(NAME),
                                AstGrfFun FUN, INTEGER(STATUS)
                                TRAIL(NAME) ) {
@@ -376,6 +394,12 @@ F77_SUBROUTINE(ast_grfset)( INTEGER(THIS), CHARACTER(NAME),
 
       if( ifun == AST__GATTR ) {
          wrapper = (AstGrfWrap) FGAttrWrapper;
+
+      } else if( ifun == AST__GBBUF ) {
+         wrapper = (AstGrfWrap) FGBBufWrapper;
+
+      } else if( ifun == AST__GEBUF ) {
+         wrapper = (AstGrfWrap) FGEBufWrapper;
 
       } else if( ifun == AST__GFLUSH ) {
          wrapper = (AstGrfWrap) FGFlushWrapper;
@@ -430,6 +454,22 @@ static int FGAttrWrapper( AstPlot *this, int attr, double value,
                                                 INTEGER_ARG(&prim) );
    if( old_value ) *old_value = OLDVAL;
    return ret;
+}
+
+static int FGBBufWrapper( AstPlot *this ) {
+   F77_INTEGER_TYPE(GRFCON);
+   int *status = astGetStatusPtr;
+   if ( !astOK ) return 0;
+   GRFCON = astP2I( astGrfConID( this ) );
+   return ( *(int (*)(INTEGER(grfcon))) this->grffun[ AST__GBBUF ])(INTEGER_ARG(&GRFCON));
+}
+
+static int FGEBufWrapper( AstPlot *this ) {
+   F77_INTEGER_TYPE(GRFCON);
+   int *status = astGetStatusPtr;
+   if ( !astOK ) return 0;
+   GRFCON = astP2I( astGrfConID( this ) );
+   return ( *(int (*)(INTEGER(grfcon))) this->grffun[ AST__GEBUF ])(INTEGER_ARG(&GRFCON));
 }
 
 static int FGFlushWrapper( AstPlot *this ) {

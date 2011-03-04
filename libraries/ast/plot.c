@@ -110,10 +110,12 @@ c     following functions may also be applied to all Plots:
 f     In addition to those routines applicable to all FrameSets, the
 f     following routines may also be applied to all Plots:
 *
+c     - astBBuf: Begin a new graphical buffering context
 c     - astBorder: Draw a border around valid regions of a Plot
 c     - astBoundingBox: Returns a bounding box for previously drawn graphics
 c     - astClip: Set up or remove clipping for a Plot
 c     - astCurve: Draw a geodesic curve
+c     - astEBuf: End the current graphical buffering context
 c     - astGenCurve: Draw a generalized curve
 c     - astGetGrfContext: Get the graphics context for a Plot
 c     - astGrfPop: Retrieve previously saved graphics functions
@@ -124,10 +126,12 @@ c     - astGridLine: Draw a grid line (or axis) for a Plot
 c     - astMark: Draw a set of markers for a Plot
 c     - astPolyCurve: Draw a series of connected geodesic curves
 c     - astText: Draw a text string for a Plot
+f     - AST_BBUF: Begin a new graphical buffering context
 f     - AST_BORDER: Draw a border around valid regions of a Plot
 f     - AST_BOUNDINGBOX: Returns a bounding box for previously drawn graphics
 f     - AST_CLIP: Set up or remove clipping for a Plot
 f     - AST_CURVE: Draw a geodesic curve
+f     - AST_EBUF: End the current graphical buffering context
 f     - AST_GENCURVE: Draw a generalized curve
 f     - AST_GETGRFCONTEXT: Get the graphics context for a Plot
 f     - AST_GRFPOP: Retrieve previously saved graphics functions
@@ -664,6 +668,9 @@ f     - Title: The Plot title drawn using AST_GRID
 *        axes (2 for a Plot, 3 for a Plot3D).
 *     12-JAN-2010 (DSB):
 *        Fix various memory leaks.
+*     4-MAR-2011 (DSB):
+*        - Added grf functions BBuf and EBuf.
+*        - Added public method astBBuf and astEBuf.
 *class--
 */
 
@@ -2101,32 +2108,34 @@ static void ClearAttrib( AstObject *, const char *, int * );
 static void SetAttrib( AstObject *, const char *, int * );
 
 static AstFrameSet *Fset2D( AstFrameSet *, int, int * );
-static AstPointSet *DefGap( AstPlot *, double *, int *, double *, int *, const char *, const char *, int * );
-static AstPointSet *Trans( AstPlot *, AstFrame *, AstMapping *, AstPointSet *, int, AstPointSet *, int, const char *, const char *, int * );
-static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static AstKeyMap *GetGrfContext( AstPlot *, int * );
 static AstPlotCurveData **CleanCdata( AstPlotCurveData **, int * );
 static AstPlotCurveData **DrawGrid( AstPlot *, TickInfo **, int, const char *, const char *, int * );
+static AstPointSet *DefGap( AstPlot *, double *, int *, double *, int *, const char *, const char *, int * );
+static AstPointSet *GetDrawnTicks( AstPlot *, int, int, int * );
+static AstPointSet *Trans( AstPlot *, AstFrame *, AstMapping *, AstPointSet *, int, AstPointSet *, int, const char *, const char *, int * );
+static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
 static TickInfo **CleanGrid( TickInfo **, int * );
 static TickInfo **GridLines( AstPlot *, double *, double *, int *, const char *, const char *, int * );
 static TickInfo *TickMarks( AstPlot *, int, double *, double *, int *, GetTicksStatics **, const char *, const char *, int * );
 static char **CheckLabels2( AstPlot *, AstFrame *, int, double *, int, char **, double, int * );
 static char *FindWord( char *, const char *, const char **, int * );
 static char *GrfItem( int, const char *, int *, int * );
-static const char *SplitValue( AstPlot *, const char *, int, int *, int * );
 static const char *JustMB( AstPlot *, int, const char *, float *, float *, float, float, const char *, float, float, float, float, float *, float *, const char *, const char *, int * );
+static const char *SplitValue( AstPlot *, const char *, int, int *, int * );
 static double **MakeGrid( AstPlot *, AstFrame *, AstMapping *, int, int, double, double, double, double, int, AstPointSet **, AstPointSet**, int, const char *, const char *, int * );
 static double GetTicks( AstPlot *, int, double *, double **, int *, double **, int *, int, int *, double *, GetTicksStatics **, const char *, const char *, int * );
 static double GetUseSize( AstPlot *, int, int * );
-static AstKeyMap *GetGrfContext( AstPlot *, int * );
 static double GetUseWidth( AstPlot *, int, int * );
 static double GoodGrid( AstPlot *, int *, AstPointSet **, AstPointSet **, const char *, const char *, int * );
-static AstPointSet *GetDrawnTicks( AstPlot *, int, int, int * );
 static double Typical( int, double *, double, double, double *, int * );
 static int Border( AstPlot *, int * );
 static int Boundary( AstPlot *, const char *, const char *, int * );
 static int BoxCheck( float *, float *, float *, float *, int * );
 static int CGAttrWrapper( AstPlot *, int, double, double *, int, int * );
+static int CGBBufWrapper( AstPlot *, int * );
 static int CGCapWrapper( AstPlot *, int, int, int * );
+static int CGEBufWrapper( AstPlot *, int * );
 static int CGFlushWrapper( AstPlot *, int * );
 static int CGLineWrapper( AstPlot *, int, const float *, const float *, int * );
 static int CGMarkWrapper( AstPlot *, int, const float *, const float *, int, int * );
@@ -2153,6 +2162,7 @@ static int GVec( AstPlot *, AstMapping *, double *, int, double, AstPointSet **,
 static int GetUseColour( AstPlot *, int, int * );
 static int GetUseFont( AstPlot *, int, int * );
 static int GetUseStyle( AstPlot *, int, int * );
+static int GraphGrid( int, int, double, double, double, double, double **, int * );
 static int HasEscapes( const char *, int * );
 static int IdFind( int, int, int *, int *, int *, int * );
 static int Inside( int, float *, float *, float, float, int * );
@@ -2170,12 +2180,11 @@ static int ToggleLogLin( AstPlot *, int, int, const char *, int * );
 static int TraceBorder( AstPlot *, AstMapping *, double, double, double, double, int, double, int[ 4 ], const char *, const char *, int * );
 static int Ustrcmp( const char *, const char *, int * );
 static int Ustrncmp( const char *, const char *, size_t, int * );
-static void Mirror( AstPlot *, int, int * );
-static void SetTickValues( AstPlot *, int, int, double *, int, double *, int * );
 static int swapEdges( AstPlot *, TickInfo **, AstPlotCurveData **, int * );
 static void AddCdt( AstPlotCurveData *, AstPlotCurveData *, const char *, const char *, int * );
 static void Apoly( AstPlot *, float, float, const char *, const char *, int * );
 static void AxPlot( AstPlot *, int, const double *, double, int, AstPlotCurveData *, const char *, const char *, int * );
+static void BBuf( AstPlot *, int * );
 static void BoundingBox( AstPlot *, float[2], float[2], int * );
 static void Bpoly( AstPlot *, float, float, const char *, const char *, int * );
 static void Clip( AstPlot *, int, const double [], const double [], int * );
@@ -2190,7 +2199,10 @@ static void DrawAxis( AstPlot *, TickInfo **, double *, double *, const char *, 
 static void DrawText( AstPlot *, int, int, const char *, float, float, const char *, float, float, float *, float *, float *, const char *, const char *, int * );
 static void DrawTicks( AstPlot *, TickInfo **, int, double *, double *, const char *, const char *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
+static void EBuf( AstPlot *, int * );
 static void GAttr( AstPlot *, int, double, double *, int, const char *, const char *, int * );
+static void GBBuf( AstPlot *, const char *, const char *, int * )__attribute__((unused));
+static void GEBuf( AstPlot *, const char *, const char *, int * )__attribute__((unused));
 static void GFlush( AstPlot *, const char *, const char *, int * )__attribute__((unused));
 static void GLine( AstPlot *, int, const float *, const float *, const char *, const char *, int * );
 static void GMark( AstPlot *, int, const float *, const float *, int, const char *, const char *, int * );
@@ -2199,7 +2211,6 @@ static void GScales( AstPlot *, float *, float *, const char *, const char *, in
 static void GText( AstPlot *, const char *, float, float, const char *, float, float, const char *, const char *, int * );
 static void GTxExt( AstPlot *, const char *, float , float, const char *, float, float, float *, float *, const char *, const char *, int * );
 static void GenCurve( AstPlot *, AstMapping *, int * );
-static int GraphGrid( int, int, double, double, double, double, double **, int * );
 static void GrfPop( AstPlot *, int * );
 static void GrfPush( AstPlot *, int * );
 static void GrfSet( AstPlot *, const char *,  AstGrfFun, int * );
@@ -2216,6 +2227,7 @@ static void Map3( int, double *, double *, double *, const char *, const char *,
 static void Map4( int, double *, double *, double *, const char *, const char *, int * GLOBALS_PROTO );
 static void Map5( int, double *, double *, double *, const char *, const char *, int * GLOBALS_PROTO );
 static void Mark( AstPlot *, int, int, int, const double *, int, int * );
+static void Mirror( AstPlot *, int, int * );
 static void Norm1( AstMapping *, int, int, double *, double, double, int * );
 static void Opoly( AstPlot *, const char *, const char *, int * );
 static void PlotLabels( AstPlot *, int, AstFrame *, int, LabelList *, char *, int, float **, const char *, const char *, int * );
@@ -2225,6 +2237,7 @@ static void PushGat( AstPlot *, float, const char *, const char *, int * );
 static void RemoveFrame( AstFrameSet *, int, int * );
 static void RightVector( AstPlot *, float *, float *, float *, float *, const char *, const char *, int * );
 static void SaveTick( AstPlot *, int, double, double, int, int * );
+static void SetTickValues( AstPlot *, int, int, double *, int, double *, int * );
 static void Text( AstPlot *, const char *, const double [], const float [], const char *, int * );
 static void TextLabels( AstPlot *, int, int *, const char *, const char *, int * );
 static void Ticker( AstPlot *, int, int, double, double *, double, int, int, EdgeCrossingsStatics **, const char *, const char *, int * );
@@ -4708,6 +4721,62 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
 
 }
 
+static void BBuf( AstPlot *this, int *status ) {
+/*
+*++
+*  Name:
+c     astBBuf
+f     AST_BBUF
+
+*  Purpose:
+*     Begin a new graphical buffering context.
+
+*  Type:
+*     Public function.
+
+*  Synopsis:
+c     #include "plot.h"
+c     void astBBuf( AstPlot *this )
+f     CALL AST_BBUF( THIS STATUS )
+
+*  Class Membership:
+*     Plot member function.
+
+*  Description:
+c     This function
+f     This routine
+*     starts a new graphics buffering context. A matching call to the
+c     function astEBuf
+f     routine AST_EBUF
+*     should be used to end the context.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Plot.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Notes:
+*     - The nature of the buffering is determined by the underlying
+*     graphics system (as defined by the current grf module). Each call
+c     to this function
+f     to this routine
+c     to this function
+f     to this routine
+*     simply invokes the astGBBuf function in the grf module.
+
+*--
+*/
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Invoke the active GRF BBuf function. */
+   GBBuf( this, "astBBuf", astGetClass( this ), status );
+
+}
+
 static int Boundary( AstPlot *this, const char *method, const char *class, int *status ){
 /*
 *  Name:
@@ -5434,6 +5503,74 @@ static int CGAttrWrapper( AstPlot *this, int attr, double value,
 */
    if( !astOK ) return 0;
    return ( (AstGAttrFun) this->grffun[ AST__GATTR ] )( astGrfConID(this), attr, value, old_value, prim );
+}
+
+static int CGBBufWrapper( AstPlot *this, int *status ) {
+/*
+*
+*  Name:
+*     CGBBufWrapper
+
+*  Purpose:
+*     Call a C implementation of the GBBuf Grf function.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int CGBBufWrapper( AstPlot *this ) {
+
+*  Class Membership:
+*     Plot private function.
+
+*  Description:
+*     This function is a wrapper for a C implementation of the GBBuf
+*     grf function to start a new graphics context.
+
+*  Parameters:
+*     this
+*        The Plot.
+*     status
+*        Pointer to the inherited status value.
+
+*/
+   if( !astOK ) return 0;
+   return ( (AstGBBufFun) this->grffun[ AST__GBBUF ])( astGrfConID(this) );
+}
+
+static int CGEBufWrapper( AstPlot *this, int *status ) {
+/*
+*
+*  Name:
+*     CGEBufWrapper
+
+*  Purpose:
+*     Call a C implementation of the GEBuf Grf function.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int CGEBufWrapper( AstPlot *this ) {
+
+*  Class Membership:
+*     Plot private function.
+
+*  Description:
+*     This function is a wrapper for a C implementation of the GEBuf
+*     grf function to start a new graphics context.
+
+*  Parameters:
+*     this
+*        The Plot.
+*     status
+*        Pointer to the inherited status value.
+
+*/
+   if( !astOK ) return 0;
+   return ( (AstGEBufFun) this->grffun[ AST__GEBUF ])( astGrfConID(this) );
 }
 
 static int CGFlushWrapper( AstPlot *this, int *status ) {
@@ -10389,6 +10526,59 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
 
 }
 
+static void EBuf( AstPlot *this, int *status ) {
+/*
+*++
+*  Name:
+c     astEBuf
+f     AST_EBUF
+
+*  Purpose:
+*     End the current graphical buffering context.
+
+*  Type:
+*     Public function.
+
+*  Synopsis:
+c     #include "plot.h"
+c     void astEBuf( AstPlot *this )
+f     CALL AST_EBUF( THIS STATUS )
+
+*  Class Membership:
+*     Plot member function.
+
+*  Description:
+c     This function
+f     This routine
+*     ends the current graphics buffering context. It should match a
+*     corresponding call to the
+c     astBBuf function.
+f     AST_EBUF routine.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Plot.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Notes:
+*     - The nature of the buffering is determined by the underlying
+*     graphics system (as defined by the current grf module). Each call
+c     to this function
+f     to this routine
+*     simply invokes the astGEBuf function in the grf module.
+
+*--
+*/
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Invoke the active GRF EBuf function. */
+   GEBuf( this, "astEBuf", astGetClass( this ), status );
+}
+
 static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
                        AstPlotCurveData **cdata, int force, const char *method,
                        const char *class, int *status ){
@@ -13667,6 +13857,160 @@ static int GetLabelUnits( AstPlot *this, int axis, int *status ) {
    return ret;
 }
 
+static void GBBuf( AstPlot *this, const char *method,
+                   const char *class, int *status ) {
+/*
+*
+*  Name:
+*     GBBuf
+
+*  Purpose:
+*     Call the GBBuf Grf function.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     void GBBuf( AstPlot *this, const char *method,
+*                  const char *class, int *status ) {
+
+*  Class Membership:
+*     Plot private function.
+
+*  Description:
+*     This function calls the GBBuf grf function to begin a new graphics
+*     context, either calling the version registered using astGrfSet, or
+*     the version in the linked grf module. The linked version is used
+*     if the Grf attribute is zero, or if no function has been registered
+*     for GBBuf using astGrfSet.
+
+*  Parameters:
+*     this
+*        The Plot.
+*     method
+*        Pointer to a string holding the name of the calling method.
+*        This is only for use in constructing error messages.
+*     class
+*        Pointer to a string holding the name of the supplied object class.
+*        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
+
+*/
+
+/* Local Variables: */
+   int grf_status;          /* Status retruned from Grf function */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Since we are about to call an external function which may not be
+   thread safe, prevent any other thread from executing the following code
+   until the current thread has finished executing it. */
+   LOCK_MUTEX2;
+
+/* If the Grf attribute is set to a non-zero value, use the Grf function
+   registered using astGrfSet (so long as a function has been supplied).
+   This called via a wrapper which adapts the interface to suit the
+   language in which the function is written. */
+   if( astGetGrf( this ) && this->grffun[ AST__GBBUF ] ) {
+      grf_status = ( *( this->GBBuf ) )( this, status );
+
+/* Otherwise, use the function in the external Grf module, selected at
+   link-time using ast_link options.*/
+   } else {
+      grf_status = astGBBuf();
+   }
+
+/* Allow the next thread to proceed. */
+   UNLOCK_MUTEX2;
+
+/* Report an error if anything went wrong. */
+   if( !grf_status ) {
+      astError( AST__GRFER, "%s(%s): Graphics error in astGBBuf. ", status, method,
+                class );
+   }
+
+}
+
+static void GEBuf( AstPlot *this, const char *method,
+                   const char *class, int *status ) {
+/*
+*
+*  Name:
+*     GEBuf
+
+*  Purpose:
+*     Call the GEBuf Grf function.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     void GEBuf( AstPlot *this, const char *method,
+*                  const char *class, int *status ) {
+
+*  Class Membership:
+*     Plot private function.
+
+*  Description:
+*     This function calls the GEBuf grf function to end the current graphics
+*     context, either calling the version registered using astGrfSet, or
+*     the version in the linked grf module. The linked version is used
+*     if the Grf attribute is zero, or if no function has been registered
+*     for GEBuf using astGrfSet.
+
+*  Parameters:
+*     this
+*        The Plot.
+*     method
+*        Pointer to a string holding the name of the calling method.
+*        This is only for use in constructing error messages.
+*     class
+*        Pointer to a string holding the name of the supplied object class.
+*        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
+
+*/
+
+/* Local Variables: */
+   int grf_status;          /* Status retruned from Grf function */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Since we are about to call an external function which may not be
+   thread safe, prevent any other thread from executing the following code
+   until the current thread has finished executing it. */
+   LOCK_MUTEX2;
+
+/* If the Grf attribute is set to a non-zero value, use the Grf function
+   registered using astGrfSet (so long as a function has been supplied).
+   This called via a wrapper which adapts the interface to suit the
+   language in which the function is written. */
+   if( astGetGrf( this ) && this->grffun[ AST__GEBUF ] ) {
+      grf_status = ( *( this->GEBuf ) )( this, status );
+
+/* Otherwise, use the function in the external Grf module, selected at
+   link-time using ast_link options.*/
+   } else {
+      grf_status = astGEBuf();
+   }
+
+/* Allow the next thread to proceed. */
+   UNLOCK_MUTEX2;
+
+/* Report an error if anything went wrong. */
+   if( !grf_status ) {
+      astError( AST__GRFER, "%s(%s): Graphics error in astGEBuf. ", status, method,
+                class );
+   }
+
+}
+
 static void GFlush( AstPlot *this, const char *method,
                    const char *class, int *status ) {
 /*
@@ -16104,6 +16448,8 @@ c     - This function returns without action if there are no snapshots to
             this->grffun[i] = (newframe->grffun)[i];
          }
          this->GAttr = newframe->GAttr;
+         this->GBBuf = newframe->GBBuf;
+         this->GEBuf = newframe->GEBuf;
          this->GFlush = newframe->GFlush;
          this->GLine = newframe->GLine;
          this->GMark = newframe->GMark;
@@ -16195,6 +16541,8 @@ f        The global status.
          (newframe->grffun)[i] = this->grffun[i];
       }
       newframe->GAttr = this->GAttr;
+      newframe->GBBuf = this->GBBuf;
+      newframe->GEBuf = this->GEBuf;
       newframe->GFlush = this->GFlush;
       newframe->GLine = this->GLine;
       newframe->GMark = this->GMark;
@@ -16274,7 +16622,9 @@ f        link-time (using the ast_link command) are used. The allowed
 f        function names are:
 *
 *        - Attr -  Enquire or set a graphics attribute value
+*        - BBuf - Start a new graphics buffering context
 *        - Cap -  Inquire a capability
+*        - EBuf - End the current graphics buffering context
 *        - Flush - Flush all pending graphics to the output device
 *        - Line - Draw a polyline (i.e. a set of connected lines)
 *        - Mark -  Draw a set of markers
@@ -16366,6 +16716,19 @@ f       Identified by the following values defined in GRF_PAR:
 *       GRF__MARK,
 *       GRF__TEXT.
 
+*  BBuf:
+*     The "BBuf" function should start a new graphics buffering context.
+*     A matching call to the function "EBuf" should be used to end the
+*     context. The nature of the buffering is determined by the underlying
+*     graphics system.
+*
+c     int BBuf( AstObject *grfcon )
+f     INTEGER FUNCTION BBUF( GRFCON )
+*
+c     - grfcon -
+f     - GRFCON = INTEGER (Given) -
+*       A KeyMap containing information passed from the calling application.
+
 *  Cap:
 *     The "Cap" function is called to determine if the grf module has a
 *     given capability, as indicated by the "cap" argument:
@@ -16427,6 +16790,18 @@ c        The value returned by the function depends on the value of "cap"
 f        The value returned by the function depends on the value of CAP
 *        as described above. Zero should be returned if the supplied
 *        capability is not recognised.
+
+*  EBuf:
+*     The "EBuf" function should end the current graphics buffering
+*     context. See the description of "BBuf" above for further details.
+*     It requires the following interface:
+*
+c     int EBuf( AstObject *grfcon )
+f     INTEGER FUNCTION EBUF( GRFCON )
+*
+c     - grfcon -
+f     - GRFCON = INTEGER (Given) -
+*       A KeyMap containing information passed from the calling application.
 
 *  Flush:
 *     The "Flush" function ensures that the display device is up-to-date,
@@ -16640,6 +17015,12 @@ f     - YB( 4 ) = REAL (Returned) - Returned holding the y coordinate of
       if( ifun == AST__GATTR ) {
          wrapper = (AstGrfWrap) CGAttrWrapper;
 
+      } else if( ifun == AST__GBBUF ) {
+         wrapper = (AstGrfWrap) CGBBufWrapper;
+
+      } else if( ifun == AST__GEBUF ) {
+         wrapper = (AstGrfWrap) CGEBufWrapper;
+
       } else if( ifun == AST__GFLUSH ) {
          wrapper = (AstGrfWrap) CGFlushWrapper;
 
@@ -16703,8 +17084,8 @@ int astGrfFunID_( const char *name, const char *method, const char *class, int *
 *     name
 *        The grf function name. Any unambiguous abbreviation will do.
 *        Case is ignored. The full list of grf function names is:
-*        "Attr Scales Flush Line Mark Qch Text TxExt". See grf_pgplot.c
-*        for details of these functions.
+*        "Attr BBuf EBuf Scales Flush Line Mark Qch Text TxExt". See
+*        grf_pgplot.c for details of these functions.
 *     method
 *        Pointer to a string holding the name of the calling method.
 *        This is only for use in constructing error messages.
@@ -16717,8 +17098,9 @@ int astGrfFunID_( const char *name, const char *method, const char *class, int *
 
 /* Note that the list of identifiers here must be in the same order as the
    sorted values of the constants AST__GATTR, AST__GFLUSH, etc */
-   return FullForm( "Attr Flush Line Mark Text TxExt Scales Qch Cap", name,
-                    "Grf function name (programming error)", method, class, status );
+   return FullForm( "Attr Flush Line Mark Text TxExt Scales Qch Cap BBuf "
+                    "EBuf", name, "Grf function name (programming error)",
+                    method, class, status );
 }
 
 static char *GrfItem( int item, const char *text, int *axis, int *status ){
@@ -16949,6 +17331,12 @@ static void GrfWrapper( AstPlot *this, const char *name, AstGrfWrap wrapper, int
    function, and store it in the appropriate component of the Plot. */
    if( ifun == AST__GATTR ) {
       this->GAttr = (AstGAttrWrap) wrapper;
+
+   } else if( ifun == AST__GBBUF ) {
+      this->GBBuf = (AstGBBufWrap) wrapper;
+
+   } else if( ifun == AST__GEBUF ) {
+      this->GEBuf = (AstGEBufWrap) wrapper;
 
    } else if( ifun == AST__GFLUSH ) {
       this->GFlush = (AstGFlushWrap) wrapper;
@@ -18422,33 +18810,35 @@ void astInitPlotVtab_(  AstPlotVtab *vtab, const char *name, int *status ) {
 /* ------------------------------------ */
 /* Store pointers to the member functions (implemented here) that provide
    virtual methods for this class. */
-   vtab->Mark = Mark;
-   vtab->Text = Text;
+   vtab->BBuf = BBuf;
    vtab->Border = Border;
    vtab->BoundingBox = BoundingBox;
-   vtab->Clip = Clip;
-   vtab->GridLine = GridLine;
-   vtab->Curve = Curve;
-   vtab->GrfSet = GrfSet;
-   vtab->GrfPush = GrfPush;
-   vtab->GrfPop = GrfPop;
-   vtab->GrfWrapper = GrfWrapper;
-   vtab->GenCurve = GenCurve;
-   vtab->PolyCurve = PolyCurve;
-   vtab->CopyPlotDefaults = CopyPlotDefaults;
-   vtab->CvBrk = CvBrk;
-   vtab->Mirror = Mirror;
-   vtab->GetDrawnTicks = GetDrawnTicks;
-   vtab->SetTickValues = SetTickValues;
-   vtab->Grid = Grid;
-   vtab->ClearTol = ClearTol;
-   vtab->SetTol = SetTol;
-   vtab->GetTol = GetTol;
-   vtab->TestTol = TestTol;
    vtab->ClearGrid = ClearGrid;
-   vtab->SetGrid = SetGrid;
+   vtab->ClearTol = ClearTol;
+   vtab->Clip = Clip;
+   vtab->CopyPlotDefaults = CopyPlotDefaults;
+   vtab->Curve = Curve;
+   vtab->CvBrk = CvBrk;
+   vtab->EBuf = EBuf;
+   vtab->GenCurve = GenCurve;
+   vtab->GetDrawnTicks = GetDrawnTicks;
    vtab->GetGrid = GetGrid;
+   vtab->GetTol = GetTol;
+   vtab->GrfPop = GrfPop;
+   vtab->GrfPush = GrfPush;
+   vtab->GrfSet = GrfSet;
+   vtab->GrfWrapper = GrfWrapper;
+   vtab->Grid = Grid;
+   vtab->GridLine = GridLine;
+   vtab->Mark = Mark;
+   vtab->Mirror = Mirror;
+   vtab->PolyCurve = PolyCurve;
+   vtab->SetGrid = SetGrid;
+   vtab->SetTickValues = SetTickValues;
+   vtab->SetTol = SetTol;
    vtab->TestGrid = TestGrid;
+   vtab->TestTol = TestTol;
+   vtab->Text = Text;
 
    vtab->ClearTickAll = ClearTickAll;
    vtab->SetTickAll = SetTickAll;
@@ -29587,6 +29977,8 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
    wrappers are defined in fplot.c for use with GRF routines written in
    F77. */
       new->GAttr = CGAttrWrapper;
+      new->GBBuf = CGBBufWrapper;
+      new->GEBuf = CGEBufWrapper;
       new->GFlush = CGFlushWrapper;
       new->GLine = CGLineWrapper;
       new->GMark = CGMarkWrapper;
@@ -30283,6 +30675,8 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
 /* Grf. */
       new->grf = -1;
       new->GAttr = CGAttrWrapper;
+      new->GBBuf = CGBBufWrapper;
+      new->GEBuf = CGEBufWrapper;
       new->GFlush = CGFlushWrapper;
       new->GLine = CGLineWrapper;
       new->GMark = CGMarkWrapper;
@@ -30356,6 +30750,11 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
 
+void astBBuf_( AstPlot *this, int *status ){
+   if( !astOK ) return;
+   (**astMEMBER(this,Plot,BBuf))(this, status );
+}
+
 int astBorder_( AstPlot *this, int *status ){
    if( !astOK ) return 0;
    return (**astMEMBER(this,Plot,Border))(this, status );
@@ -30381,6 +30780,11 @@ int astCvBrk_( AstPlot *this, int ibrk, double *brk, double *vbrk,
                    double *len, int *status ){
    if( !astOK ) return 0;
    return (**astMEMBER(this,Plot,CvBrk))(this,ibrk,brk,vbrk,len, status );
+}
+
+void astEBuf_( AstPlot *this, int *status ){
+   if( !astOK ) return;
+   (**astMEMBER(this,Plot,EBuf))(this, status );
 }
 
 void astMirror_( AstPlot *this, int axis, int *status ){
