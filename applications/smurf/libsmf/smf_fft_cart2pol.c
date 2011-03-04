@@ -216,4 +216,28 @@ void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status ) {
     }
   }
 
+  /* Convert the units and labels of the axes */
+  if( data->hdr && power ) {
+    char tempunits[SMF__CHARLABEL];
+    one_strlcpy( tempunits, data->hdr->units, sizeof(tempunits), status );
+
+    if( inverse ) {
+      size_t len;
+      /* Undo PSD units, assuming we just need to remove the last 6 characters
+         (excluding \0) */
+
+      len = strlen( tempunits );
+      if( len >= 6 ) {
+        tempunits[len-6] = '\0';
+      }
+
+      smf_set_clabels( NULL, "Signal", tempunits, data->hdr, status );
+
+    } else {
+      /* Change to PSD units */
+      one_strlcat( tempunits, "**2/Hz", sizeof(tempunits), status );
+      smf_set_clabels( NULL, "PSD", tempunits, data->hdr, status );
+    }
+  }
+
 }
