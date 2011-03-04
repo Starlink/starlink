@@ -69,9 +69,11 @@
 *     2010-03-12 (TIMJ):
 *        Fix brokenness since split. "steptime" was not being set so any fixups
 *        involving steptime were broken.
+*     2011-03-04 (TIMJ):
+*        Report the unsupported mode string
 
 *  Copyright:
-*     Copyright (C) 2009-2010 Science & Technology Facilities Council.
+*     Copyright (C) 2009-2011 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -858,7 +860,8 @@ int smf_fix_metadata_acsis ( msglev_t msglev, smfData * data, int have_fixed, in
           }
         } else {
           *status = SAI__ERROR;
-          errRep( "", "Unsupported scan switch mode.", status );
+          errRepf( "", "Unsupported scan switch mode (%s).", status,
+                   smf_swmode_str( hdr->swmode, status ) );
         }
         break;
       case SMF__OBS_GRID:
@@ -876,7 +879,8 @@ int smf_fix_metadata_acsis ( msglev_t msglev, smfData * data, int have_fixed, in
           off_time = exp_time;
         } else {
           *status = SAI__ERROR;
-          errRep( "", "Unsupported grid switch mode.", status );
+          errRepf( "", "Unsupported grid switch mode (%s).", status,
+                   smf_swmode_str( hdr->swmode, status ) );
         }
         break;
       case SMF__OBS_JIGGLE:
@@ -909,12 +913,14 @@ int smf_fix_metadata_acsis ( msglev_t msglev, smfData * data, int have_fixed, in
           errRep( "", "Not expecting to have to deal with missing exposure time in jiggle/pssw mode", status);
         } else {
           *status = SAI__ERROR;
-          errRep( "", "Unsupported jiggle switch mode.", status );
+          errRepf( "", "Unsupported jiggle switch mode (%s).", status,
+                   smf_swmode_str( hdr->swmode, status ) );
         }
         break;
       default:
         *status = SAI__ERROR;
-        errRep( "", "Unsupported observing mode.", status );
+        errRepf( "", "Unsupported observing mode (%s).", status,
+                smf_obsmode_str( hdr->obsmode, status ) );
     }
     msgOutiff( msglev, "", INDENT "Calculating ON exposure = %g sec and OFF exposure = %g sec", status, exp_time,
                off_time);
