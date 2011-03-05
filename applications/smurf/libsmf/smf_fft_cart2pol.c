@@ -216,28 +216,42 @@ void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status ) {
     }
   }
 
-  /* Convert the units and labels of the axes */
+  /* Convert the units and labels of the axes using AST */
   if( data->hdr && power ) {
-    char tempunits[SMF__CHARLABEL];
-    one_strlcpy( tempunits, data->hdr->units, sizeof(tempunits), status );
+    AstFrame *unitframe = NULL;
+    char oldunits[SMF__CHARLABEL];
+    char newunits[SMF__CHARLABEL];
+
+    oldunits[0] = '\0';
+    newunits[0] = '\0';
+
+    /* Use a frame to store the modified units which AST will then simplify */
+    unitframe = astFrame( 1, " " );
+
+    /* Get the original units */
+    one_strlcpy( oldunits, data->hdr->units, sizeof(oldunits), status );
+    one_strlcpy( newunits, "(", sizeof(newunits), status );
+    one_strlcat( newunits, oldunits, sizeof(newunits), status );
 
     if( inverse ) {
-      size_t len;
-      /* Undo PSD units, assuming we just need to remove the last 6 characters
-         (excluding \0) */
+      /* Undo PSD units */
+      one_strlcat( newunits, "*Hz)**0.5", sizeof(newunits), status );
 
-      len = strlen( tempunits );
-      if( len >= 6 ) {
-        tempunits[len-6] = '\0';
-      }
-
-      smf_set_clabels( NULL, "Signal", tempunits, data->hdr, status );
-
+      /* Simplify the units and store */
+      astSetC( unitframe, "Unit(1)", newunits );
+      smf_set_clabels( NULL, "Signal", astGetC( unitframe, "NormUnit(1)" ),
+                       data->hdr, status );
     } else {
       /* Change to PSD units */
-      one_strlcat( tempunits, "**2/Hz", sizeof(tempunits), status );
-      smf_set_clabels( NULL, "PSD", tempunits, data->hdr, status );
+      one_strlcat( newunits, ")**2/Hz", sizeof(newunits), status );
+
+      /* Simplify the units and store */
+      astSetC( unitframe, "Unit(1)", newunits );
+      smf_set_clabels( NULL, "PSD", astGetC( unitframe, "NormUnit(1)" ),
+                       data->hdr, status );
     }
+
+    unitframe = astAnnul( unitframe );
   }
 
 }
