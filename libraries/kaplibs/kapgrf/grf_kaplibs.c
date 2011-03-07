@@ -55,7 +55,8 @@
 *        Added grf_gettbg to allow the text background colour to be
 *        obtained.
 *     7-MAR-2011 (DSB):
-*        Added astGBBuf and astGEBuf.
+*        - Added astGBBuf and astGEBuf.
+*        - Fix misc harmless compiler warnings
 */
 
 /* Macros */
@@ -128,6 +129,7 @@ F77_SUBROUTINE(pgqlw)( INTEGER(ival) );
 F77_SUBROUTINE(pgqtbg)( INTEGER(tbg) );
 F77_SUBROUTINE(pgqtxt)( REAL(x), REAL(y), REAL(angle), REAL(fjust), CHARACTER(text), REAL_ARRAY(xbox), REAL_ARRAY(ybox) TRAIL(text) );
 F77_SUBROUTINE(pgqvp)( INTEGER(units), REAL(vx1), REAL(vx2), REAL(vy1), REAL(vy2) );
+F77_SUBROUTINE(pgqvsz)( INTEGER(units), REAL(x1), REAL(x2), REAL(y1), REAL(y2) );
 F77_SUBROUTINE(pgqwin)( REAL(wx1), REAL(wx2), REAL(wy1), REAL(wy2) );
 F77_SUBROUTINE(pgscf)( INTEGER(ival) );
 F77_SUBROUTINE(pgsch)( REAL(rval) );
@@ -797,8 +799,8 @@ int astGTxExt( const char *text, float x, float y, const char *just,
    char lj[ 2 ];
    float udx, udy, vdx, vdy, vx, vy, uplen, xbox[ 4 ],
          ybox[ 4 ], uxu, uyu, uxd, uyd, ux, uy;
-   float angle, height, width, test, xl, yl;
-   float alpha, beta, xc, yc, hu, hd, a, b, vlen;
+   float angle, width, test, xl, yl;
+   float alpha, beta, xc, yc, hu, hd, a, b;
    int i;
 
 /* Initialise the returned values to indicate no box available. */
@@ -1105,7 +1107,7 @@ int astGAttr( int attr, double value, double *old_value, int prim ){
 */
 
    int ival;
-   float rval, x1, x2, y1, y2, sz, dx, dy, deflw;
+   float rval, x1, x2, y1, y2, dx, dy, deflw;
    static float origsize=-1.0;
 
 /* If required retrieve the current line style, and set a new line style. */
@@ -1235,7 +1237,6 @@ static void ccpgline(int n, float xpts[], float ypts[] ){
    F77_INTEGER_TYPE N;
    F77_REAL_TYPE *XX;
    F77_REAL_TYPE *YY;
-   float *xp, *yp;
    int i;
 
    XX = (F77_REAL_TYPE *) malloc( sizeof( F77_REAL_TYPE )*(size_t) n );
@@ -1265,7 +1266,6 @@ static void ccpgpt(int n, float xpts[], float ypts[], int symbol){
    F77_REAL_TYPE *XX;
    F77_REAL_TYPE *YY;
    F77_INTEGER_TYPE SYMBOL;
-   float *xp, *yp;
    int i;
 
    XX = (F77_REAL_TYPE *) malloc( sizeof( F77_REAL_TYPE )*(size_t) n );
