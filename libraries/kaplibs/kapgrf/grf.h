@@ -92,6 +92,8 @@
 /* ==================== */
 int astGAttr( int, double, double *, int );
 int astGScales( float *, float * );
+int astGBBuf( void );
+int astGEBuf( void );
 int astGFlush( void );
 int astGLine( int, const float *, const float * );
 int astGMark( int, const float *, const float *, int );

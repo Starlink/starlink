@@ -54,6 +54,8 @@
 *     13-APR-2007 (DSB):
 *        Added grf_gettbg to allow the text background colour to be
 *        obtained.
+*     7-MAR-2011 (DSB):
+*        Added astGBBuf and astGEBuf.
 */
 
 /* Macros */
@@ -108,6 +110,8 @@ static void ccpgsls(int ls);
 static void ccpgslw(int lw);
 static void ccpgstbg(int tbci);
 static void ccpgupdt( void );
+static void ccpgbbuf( void );
+static void ccpgebuf( void );
 
 /* These describe the native Fortran interface to the PGPLOT library. The
    macros used come from the "f77.h" include file. */
@@ -132,11 +136,82 @@ F77_SUBROUTINE(pgsls)( INTEGER(ival) );
 F77_SUBROUTINE(pgslw)( INTEGER(ival) );
 F77_SUBROUTINE(pgstbg)( INTEGER(tbg) );
 F77_SUBROUTINE(pgupdt)( );
+F77_SUBROUTINE(pgbbuf)( );
+F77_SUBROUTINE(pgebuf)( );
 
 /* Externally visible functions. */
 /* ============================= */
 /* These implement the "grf" interface in terms of the local C interface
    to PGPLOT. */
+int astGBBuf( void ){
+/*
+*+
+*  Name:
+*     astGBBuf
+
+*  Purpose:
+*     Start a new graphics buffering context.
+
+*  Synopsis:
+*     #include "grf.h"
+*     int astGBBuf( void )
+
+*  Description:
+*     This function begins saving graphical output commands in an
+*     internal buffer; the commands are held until a matching astGEBuf
+*     call (or until the buffer is emptied by astGFlush). This can
+*     greatly improve the efficiency of some graphics systems. astGBBuf
+*     increments an internal counter, while astGEBuf decrements this
+*     counter and flushes the buffer to the output device when the
+*     counter drops to zero.  astGBBuf and astGEBuf calls should always
+*     be paired.
+
+*  Parameters:
+*     None.
+
+*  Returned Value:
+*     A value of 0 is returned if an error occurs, and 1 is returned
+*     otherwise.
+
+*-
+*/
+   ccpgbbuf();
+   return 1;
+}
+
+int astGEBuf( void ){
+/*
+*+
+*  Name:
+*     astGEBuf
+
+*  Purpose:
+*     End a graphics buffering context.
+
+*  Synopsis:
+*     #include "grf.h"
+*     int astGEBuf( void )
+
+*  Description:
+*     This function marks the end of a batch of graphical output begun
+*     with the last call of astGBBuf.  astGBBuf and astGEBUF calls should
+*     always be paired. Each call to astGBBuf increments a counter, while
+*     each call to astGEBuf decrements the counter. When the counter
+*     reaches 0, the batch of output is written on the output device.
+
+*  Parameters:
+*     None.
+
+*  Returned Value:
+*     A value of 0 is returned if an error occurs, and 1 is returned
+*     otherwise.
+
+*-
+*/
+   ccpgebuf();
+   return 1;
+}
+
 int astGCap( int cap, int value ){
 /*
 *+
@@ -1425,6 +1500,14 @@ static void ccpgsci(int ci){
 
 static void ccpgupdt( void ){
    F77_CALL(pgupdt)();
+}
+
+static void ccpgbbuf( void ){
+   F77_CALL(pgbbuf)();
+}
+
+static void ccpgebuf( void ){
+   F77_CALL(pgebuf)();
 }
 
 
