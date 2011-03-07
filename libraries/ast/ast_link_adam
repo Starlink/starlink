@@ -341,7 +341,7 @@
 #  of AST, produce arguments which link in dummy implementations of any
 #  functions which are required by the current version of AST but which were
 #  not required by version 2.0.
-      v2.0) args="${args} -last_grf_3.2";;
+      v2.0) args="${args} -last_grf_3.2 -last_grf_5.6";;
 
 #  Default graphics (none) requires linking with all the default (null) AST
 #  "grf" modules.
