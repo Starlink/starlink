@@ -198,9 +198,12 @@ f     The WcsMap class does not define any new routines beyond those
 *     23-FEB-2007 (DSB):
 *        Added HPX projection.
 *     1-MAR-2011 (DSB):
-*        In function Map, do not allow valid longitude range to include both 
-*        the high limit and the low limt (since they are both the same point on 
+*        In function Map, do not allow valid longitude range to include both
+*        the high limit and the low limt (since they are both the same point on
 *        the sky).
+*     7-MAR-2011 (DSB):
+*        In function Map, only do the longitude check if the projection
+*        is not cyclic.
 *class--
 */
 
@@ -752,6 +755,7 @@ static int CanSwap( AstMapping *, AstMapping *, int, int, int *, int * );
 static int Equal( AstObject *, AstObject *, int * );
 static int GetNP( AstWcsMap *, int, int * );
 static int IsZenithal( AstWcsMap *, int * );
+static int LongRange( const PrjData *, struct AstPrjPrm *, double *, double *, int * );
 static int Map( AstWcsMap *, int, int, double *, double *, double *, double *, int * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
 static int TestAttrib( AstObject *, const char *, int * );
@@ -762,7 +766,6 @@ static void Delete( AstObject *obj, int * );
 static void Dump( AstObject *, AstChannel *, int * );
 static void FreePV( AstWcsMap *, int * );
 static void InitPrjPrm( AstWcsMap *, int * );
-static void LongRange( const PrjData *, struct AstPrjPrm *, double *, double *, int * );
 static void PermGet( AstPermMap *, int **, int **, double **, int * );
 static void SetAttrib( AstObject *, const char *, int * );
 static void WcsPerm( AstMapping **, int *, int, int * );
@@ -2462,7 +2465,7 @@ static int IsZenithal( AstWcsMap *this, int *status ){
    return ret;
 }
 
-static void LongRange( const PrjData *prjdata, struct AstPrjPrm *params,
+static int LongRange( const PrjData *prjdata, struct AstPrjPrm *params,
                        double *high, double *low, int *status ){
 /*
 *
@@ -2504,8 +2507,8 @@ static void LongRange( const PrjData *prjdata, struct AstPrjPrm *params,
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     None.
-
+*     A flag indicating if the sky->xy transformation is cyclic (i.e.
+*     [a,0] gets mapped to the same (x,y) position as [a+2.PI,0]).
 */
 
 
@@ -2515,13 +2518,16 @@ static void LongRange( const PrjData *prjdata, struct AstPrjPrm *params,
    static double yy[ 4 ] = {     0.0, 1.0E-6,    0.0, -1.0E-6 };
    double aa;
    double bb;
+   double xxx[ 2 ];
+   double yyy[ 2 ];
+   int cyclic;
 
 /* Initialise the returned values. */
    *high = 180.0;
    *low = -180.0;
 
 /* Check the global error status. */
-   if ( !astOK ) return;
+   if ( !astOK ) return 0;
 
 /* Project each of the points. If any longitude value is found which is
    greater than 180 degrees, return [0,360] as the longitude range. */
@@ -2535,8 +2541,15 @@ static void LongRange( const PrjData *prjdata, struct AstPrjPrm *params,
       }
    }
 
+/* See if the projection is cyclic. Transform the sky positions [90,bb] and
+   [450,bb] into cartesian positions and see if they are the same. */
+   prjdata->WcsFwd( 90.0, bb, params, xxx, yyy );
+   prjdata->WcsFwd( 450.0, bb, params, xxx + 1, yyy + 1 );
+   cyclic = ( fabs( xxx[ 0 ] - xxx[ 1 ] ) < 1.0E-10 &&
+              fabs( yyy[ 0 ] - yyy[ 1 ] ) < 1.0E-10 );
+
 /* Return. */
-   return;
+   return cyclic;
 
 }
 
@@ -2616,6 +2629,7 @@ static int Map( AstWcsMap *this, int forward, int npoint, double *in0,
    double longlo;                /* Lower longitude limit in degrees */
    double x;                     /* X Cartesian coordinate in degrees */
    double y;                     /* Y Cartesian coordinate in degrees */
+   int cyclic;                   /* Is sky->xy transformation cyclic? */
    int i;                        /* Loop count */
    int plen;                     /* Length of proj par array */
    int point;                    /* Loop counter for points */
@@ -2650,7 +2664,7 @@ static int Map( AstWcsMap *this, int forward, int npoint, double *in0,
 
 /* If we are doing a reverse mapping, get the acceptable range of longitude
    values. */
-   if( !forward ) LongRange( prjdata, params, &longhi, &longlo, status );
+   cyclic = forward ? 0 : LongRange( prjdata, params, &longhi, &longlo, status );
 
 /* Loop to apply the projection to each point in turn, checking for
    (and propagating) bad values in the process. */
@@ -2721,7 +2735,8 @@ static int Map( AstWcsMap *this, int forward, int npoint, double *in0,
    latitude ranges. This avoids (x,y) points outside the physical domain
    of the mapping being assigned valid (long,lat) values. */
             if( wcs_status == 0 ){
-               if( longitude < longhi && longitude >= longlo &&
+               if( ( cyclic || ( longitude < longhi &&
+                                 longitude >= longlo ) ) &&
                    fabs( latitude ) <= 90.0 ){
 
 /* Assign zero longitude to positions very close to a pole. */

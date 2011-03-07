@@ -1711,7 +1711,7 @@ C
 
       if( res .ne. 522 ) then
          write(*,*) 'Res is ',res
-         call stopit( status, 'res should be 1978' )
+         call stopit( status, 'res should be 522' )
       end if
 
       if( image(34,42) .ne. VAL__BADR ) then
