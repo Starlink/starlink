@@ -33,10 +33,7 @@ AC_FC_HAVE_PERCENTLOC()
 
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES(build, [ast cnf grp pcs sae])
-STAR_DECLARE_DEPENDENCIES(link, [ast chr mers pgplot psx])
-
-dnl    Check for PGPLOT since there is a slight dependency on it.
-AC_CHECK_LIB(pgplot,pgbbuf_)
+STAR_DECLARE_DEPENDENCIES(link, [ast chr mers psx])
 
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.

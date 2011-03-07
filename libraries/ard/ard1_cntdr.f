@@ -1,6 +1,3 @@
-#if HAVE_CONFIG_H
-#include "config.h"
-#endif
       SUBROUTINE ARD1_CNTDR( IPLOT, DIM1, DIM2, ARRAY, XLL, YLL, XSIZE,
      :                       YSIZE, CONT, MAXPTS, XY, DONE, STATUS )
 *+
@@ -83,6 +80,9 @@
 *  History:
 *     13-SEP-2001 (DSB):
 *        Original version.
+*     7-MAR-2011 (DSB):
+*        Use AST for graphics buffering instead of direct calls to pgplot.
+*        This involved renaming the file from ard1_cntdr.F to ard1_cntdr.f.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -183,10 +183,8 @@
       XUU = XLL + XSIZE - 1
       YUU = YLL + YSIZE - 1
 
-#ifdef HAVE_PGPLOT
-*  Buffer all PGPLOT output produced while drawing the contour.
-      CALL PGBBUF
-#endif
+*  Buffer all graphics output produced while drawing the contour.
+      CALL AST_BBUF( IPLOT, STATUS )
 
 *  Scan the rows and pixels of the sub-array to be contoured.
       DO J = 0, YSIZE
@@ -434,10 +432,9 @@
 
  999  CONTINUE
 
-#ifdef HAVE_PGPLOT
-*  Flush the buffer holding PGPLOT output produced while drawing this contour.
-      CALL PGEBUF
-#endif
+*  Flush the buffer holding graphics output produced while drawing this
+*  contour.
+      CALL AST_EBUF( IPLOT, STATUS )
 
 *  Remove the Current Frame added by ARD1_ASSIM and re-instate the original
 *  Current Frame.

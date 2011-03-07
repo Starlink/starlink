@@ -16,7 +16,7 @@
      operators (AND, OR, NOT, etc.) to create more complex shapes.
      Data arrays can be multi-dimensional.</p></abstract>
   <dependencies >
-    <build>ast</build><build>cnf</build><build>grp</build><build>pcs</build><build>sae</build><link>ast</link><link>chr</link><link>mers</link><link>pgplot</link><link>psx</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>ast</build><build>cnf</build><build>grp</build><build>pcs</build><build>sae</build><link>ast</link><link>chr</link><link>mers</link><link>psx</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
