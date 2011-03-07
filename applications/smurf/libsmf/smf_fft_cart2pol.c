@@ -219,38 +219,33 @@ void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status ) {
   /* Convert the units and labels of the axes using AST */
   if( data->hdr && power ) {
     AstFrame *unitframe = NULL;
-    char oldunits[SMF__CHARLABEL];
     char newunits[SMF__CHARLABEL];
-
-    oldunits[0] = '\0';
-    newunits[0] = '\0';
+    char label[SMF__CHARLABEL];
 
     /* Use a frame to store the modified units which AST will then simplify */
     unitframe = astFrame( 1, " " );
 
     /* Get the original units */
-    one_strlcpy( oldunits, data->hdr->units, sizeof(oldunits), status );
     one_strlcpy( newunits, "(", sizeof(newunits), status );
-    one_strlcat( newunits, oldunits, sizeof(newunits), status );
+    one_strlcat( newunits, data->hdr->units, sizeof(newunits), status );
 
     if( inverse ) {
       /* Undo PSD units */
       one_strlcat( newunits, "*Hz)**0.5", sizeof(newunits), status );
+      one_strlcpy( label, "Signal", sizeof(label), status );
 
-      /* Simplify the units and store */
-      astSetC( unitframe, "Unit(1)", newunits );
-      smf_set_clabels( NULL, "Signal", astGetC( unitframe, "NormUnit(1)" ),
-                       data->hdr, status );
     } else {
       /* Change to PSD units */
       one_strlcat( newunits, ")**2/Hz", sizeof(newunits), status );
-
-      /* Simplify the units and store */
-      astSetC( unitframe, "Unit(1)", newunits );
-      smf_set_clabels( NULL, "PSD", astGetC( unitframe, "NormUnit(1)" ),
-                       data->hdr, status );
+      one_strlcpy( label, "PSD", sizeof(label), status );
     }
 
+    /* Simplify the units and store */
+    astSetC( unitframe, "Unit(1)", newunits );
+    smf_set_clabels( NULL, label, astGetC( unitframe, "NormUnit(1)" ),
+                     data->hdr, status );
+
+    /* Clean up */
     unitframe = astAnnul( unitframe );
   }
 
