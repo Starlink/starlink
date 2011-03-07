@@ -34,7 +34,7 @@
 
 *  ADAM Parameters:
 *     AVPSPEC = _LOGICAL (Read)
-*          Calculate average power spectrum over "good" bolometers
+*          Calculate average power spectral density over "good" bolometers
 *     AVPSPECTHRESH = _DOUBLE (Read)
 *          N-sigma noise threshold to define "good" bolometers for AVPSPEC
 *     BBM = NDF (Read)
