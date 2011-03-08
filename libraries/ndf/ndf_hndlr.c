@@ -328,6 +328,9 @@ F77_SUBROUTINE(ndf1_event)( CHARACTER(EVNAME),
 *     7-NOV-2007 (DSB):
 *        Avoid modifying TEXT_length by copying the required sub-string
 *        to a secondary, dynamically allocated, text string (SHORTTEXT).
+*     8-MAR-2011 (DSB):
+*        Ensure the NDF_EVENT message token is always cleared before
+*        leaving this function.
 *     {@enter_changes_here@}
 
 *  Bugs:
@@ -343,7 +346,6 @@ F77_SUBROUTINE(ndf1_event)( CHARACTER(EVNAME),
    char *evname;
    int ihandler;
    int i;
-   int expanded;
    int tlen;
    NdfEventHandler *handler_list;
    int *old_status;
@@ -362,20 +364,16 @@ F77_SUBROUTINE(ndf1_event)( CHARACTER(EVNAME),
    handlers arrays. */
    ihandler = CheckType( evname, STATUS );
 
+/* Expand the NDF_EVENT message token. */
+   emsMload( "", "^NDF_EVENT", TEXT, &tlen, STATUS );
+   F77_CREATE_CHARACTER(SHORTTEXT,tlen);
+   memcpy( SHORTTEXT, TEXT, tlen );
+
 /* If OK, invoke any defined handlers. */
    if( *STATUS == SAI__OK  && handlers[ ihandler ] ) {
-      expanded = 0;
       handler_list = handlers[ ihandler ];
       for( i = 0; i < nhandlers[ ihandler ]; i++ ) {
          if( handler_list[ i ] ) {
-
-/* If not already done, expand the NDF_EVENT message token. */
-            if( !expanded ) {
-               emsMload( "", "^NDF_EVENT", TEXT, &tlen, STATUS );
-               F77_CREATE_CHARACTER(SHORTTEXT,tlen);
-               memcpy( SHORTTEXT, TEXT, tlen );
-               expanded = 1;
-            }
 
 /* Invoke the handler. */
             ( *handler_list[ i ] )( CHARACTER_ARG(EVNAME),
@@ -385,10 +383,10 @@ F77_SUBROUTINE(ndf1_event)( CHARACTER(EVNAME),
                                     TRAIL_ARG(SHORTTEXT) );
          }
       }
+   }
 
 /* Free resources */
-      if( expanded ) F77_FREE_CHARACTER(SHORTTEXT);
-   }
+   F77_FREE_CHARACTER(SHORTTEXT);
    evname = astFree( evname );
 
 /* Make AST use the original status variable. */
