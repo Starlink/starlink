@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
   
 dnl    Initialisation: package name and version number
-AC_INIT(one, 1.2-2, ussc@star.rl.ac.uk)
+AC_INIT(one, 1.3-1, ussc@star.rl.ac.uk)
   
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -35,7 +35,7 @@ STAR_CNF_COMPATIBLE_SYMBOLS
  
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES([build], [sae ems cnf starutil])
-STAR_DECLARE_DEPENDENCIES([link],  [ems cnf starutil])
+STAR_DECLARE_DEPENDENCIES([link],  [ems cnf psx starutil])
  
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.

@@ -1,6 +1,6 @@
-1 ONE_Version_1.2
+1 ONE_Version_1.3
 
-   The Odds and Ends Library (V1.2) is now released. The full specification
+   The Odds and Ends Library (V1.3) is now released. The full specification
    can be found in sun234.
 
    This Library is a set of Fortran and C routines of a general nature and
@@ -28,6 +28,12 @@
       is a safer replacement for the standard strncat function.
 
 2 Changes_in_ONE
+
+3 V1.3
+
+  - Add ONE_WORDEXP_FILE as a replacement for ONE_FIND_FILE that may
+    not require a fork. Can be used as a direct replacement for PSX_WORDEXP
+    but with the results checked to make sure they correspond to a file.
 
 3 V1.2
 
