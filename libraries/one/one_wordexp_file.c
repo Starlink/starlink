@@ -19,8 +19,10 @@
 *     will be set to 0.
 
 *  Notes:
-*     Continue to call this routine until CONTEXT is set to 0, otherwise
+*     - Continue to call this routine until CONTEXT is set to 0, otherwise
 *     there will be a possible memory leak.
+*     - If there are multiple returns from PSX_WORDEXP that are not files
+*     this routine will loop internally until a valid file is located.
 
 *  Arguments:
 *     WORDS = CHARACTER*(*) (Given)
@@ -61,6 +63,10 @@
 *  History:
 *     2011-03-07 (TIMJ):
 *        First version
+*     2011-03-08 (TIMJ):
+*        Continue looking for files if CONTEXT indicates that
+*        there are more files to test and we have not yet found
+*        a valid one.
 
 *-
 */
@@ -95,30 +101,37 @@ F77_SUBROUTINE(one_wordexp_file)( CHARACTER(WORDS), INTEGER(CONTEXT),
   /* We can pass many arguments directly to psx_wordexp */
   if (*STATUS != SAI__OK) return;
 
-  /* Call the PSX routine to do all the work */
-  F77_CALL(psx_wordexp)( WORDS, CONTEXT, EXPAN, STATUS
-                         TRAIL_ARG(WORDS) TRAIL_ARG(EXPAN) );
-
-  /* Need to copy the Fortran EXPAN string to C */
+  /* Get a buffer for the C version of the expansion */
   expan = starMallocAtomic( EXPAN_length + 1 );
-  F77_IMPORT_CHARACTER( EXPAN, EXPAN_length, expan );
 
-  /* Stat the file to see if it is there */
-  if (stat( expan, &buf ) != 0 ) {
-    /* The expansion is not associated with a file so export
-     a blank string */
-    F77_EXPORT_CHARACTER( "", EXPAN, EXPAN_length );
+  while ( 1 ) {
 
-    /* Context should be 0 at this point since wordexp() would
-       return a single result if the glob does not match something. */
-    if (*CONTEXT != 0) {
-      if (*STATUS == SAI__OK) {
-        *STATUS = SAI__ERROR;
-        emsRep( "", "one_wordexp_file: Internal error calling psx_wordexp",
-                STATUS );
-      }
+    /* Call the PSX routine to do all the work */
+    F77_CALL(psx_wordexp)( WORDS, CONTEXT, EXPAN, STATUS
+                           TRAIL_ARG(WORDS) TRAIL_ARG(EXPAN) );
+
+    /* Need to copy the Fortran EXPAN string to C */
+    F77_IMPORT_CHARACTER( EXPAN, EXPAN_length, expan );
+
+    /* Stat the file to see if it is there */
+    if (stat( expan, &buf ) == 0 ) {
+      /* Success */
+      break;
     }
 
+    /* if we still have CONTEXT we need to loop round and get the
+       next value to see if that is a file, otherwise we blank
+       the return string and exit. */
+    if ( ! *CONTEXT) {
+
+      /* The expansion is not associated with a file so export
+         a blank string */
+      F77_EXPORT_CHARACTER( "", EXPAN, EXPAN_length );
+      break;
+    }
   }
+
+  /* Tidy up */
+  starFree( expan );
 
 }
