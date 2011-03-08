@@ -187,6 +187,10 @@
 *          parent has already been cleared. This saves a lot of time in ndg1ClearProvId.
 *      3-MAR-2011 (DSB):
 *          In ndg1PurgeProvenance, speed up the way in which redundant Provs are removed.
+*      8-MAR-2011 (DSB):
+*          In ndg1PurgeProvenance, speed up the way in which redundant Provs are
+*          identified (use quick sort to sort them into increasing ProvId
+*          order then look for blocks of Provs with identical provid value).
 */
 
 
@@ -346,6 +350,7 @@ static int ndg1FindAncestorIndex( Prov *, Provenance *, int * );
 static int ndg1GetLogicalComp( HDSLoc *, const char *, int, int * );
 static int ndg1GetProvId( Prov *, int * );
 static int ndg1IntCmp( const void *, const void * );
+static int ndg1ProvCmp( const void *, const void * );
 static int ndg1IsWanted( AstXmlElement *, int * );
 static int ndg1TheSame( Prov *, Prov *, int * );
 static unsigned int ndg1HashFun( const char *,  unsigned int, int * );
@@ -375,6 +380,7 @@ static int static_badprovid = -2;
 static Provenance *static_provenance = NULL;
 static int static_provid1 = -2;
 static int static_provid2 = -2;
+
 
 /* Facilities for debugging the use of provenance identifiers */
 #ifdef NDG_DEBUG
@@ -3487,7 +3493,7 @@ static void ndg1ClearProvId( Prov *prov, int *status ) {
 /* Local Variables: */
    int ichild;
 
-/* Check the local error status. Partially constructed Prov striuctures
+/* Check the local error status. Partially constructed Prov structures
    can contain NULL parent or child pointers, so also return if the Prov
    pointer is NULL. */
    if( *status != SAI__OK || ! prov ) return;
@@ -4454,10 +4460,7 @@ static Prov *ndg1FreeProv( Prov *prov, int *status ){
 */
 
 /* Local Variables: */
-   HDSLoc *ploc = NULL;
    HistRec *hist_rec;
-   char name[ DAT__SZNAM + 1 ];
-   char type[ DAT__SZNAM + 1 ];
    int i;
 
 /* Check that something has been supplied, but ignore the inherited
@@ -5539,6 +5542,54 @@ static int *ndg1ParentIndicies( Prov *prov, Provenance *provenance,
    return result;
 }
 
+static int ndg1ProvCmp( const void *a, const void *b ){
+/*
+*  Name:
+*     ndg1ProvCmp
+
+*  Purpose:
+*     qsort Prov comparison function
+
+*  Invocation:
+*     int ndg1ProvCmp(const void *a, const void *b );
+
+*  Description:
+*     This function returns a positive, zero, or negative value if
+*     the ProvId value in the Prov pointer pointed to by "b" is larger
+*     than, equal to, or less than, the ProvId value in the Prov pointer
+*     pointed to by "a". Note, this results in qsort sorting into
+*     descending ProvId order, rather than ascending.
+
+*  Arguments:
+*     a
+*        Pointer to the first Prov pointer to be compared.
+*     b
+*        Pointer to the second Prov pointer to be compared.
+
+*/
+    int result;
+    int status = SAI__OK;
+
+    Prov *pa = *((Prov **) a );
+    Prov *pb = *((Prov **) b );
+
+    if( pa && pb ) {
+       result = ndg1GetProvId( pb, &status ) - ndg1GetProvId( pa, &status );
+
+    } else if( pa ) {
+       result = -1;
+
+    } else if( pb ) {
+       result = 1;
+
+    } else {
+       result = 0;
+    }
+
+    return result;
+
+}
+
 static void ndg1PurgeProvenance( Provenance *provenance,
                                  int *status ){
 /*
@@ -5565,93 +5616,112 @@ static void ndg1PurgeProvenance( Provenance *provenance,
 */
 
 /* Local Variables; */
+   Prov **provs;
    Prov *child;
-   Prov *prov1;
    Prov *prov2;
-   int done;
+   Prov *prov1;
+   int *pids;
    int i;
    int ichild;
    int j;
-   int keep;
+   int provid;
 
 /* Check the inherited status value. */
    if( *status != SAI__OK ) return;
 
+/* Record debug info. */
    static_provenance = provenance;
 
+/* Create a copy of the array of Prov pointers. */
+   provs = astStore( NULL, provenance->provs,
+                     provenance->nprov*sizeof( *provs ) );
 
-/* Loop through every Prov structure in the supplied Provenance. */
-   for( i = 0; i < provenance->nprov; i++ ) {
-      prov1 = provenance->provs[ i ];
+/* Allocate memory for a copy of the ProvId values. */
+   pids = astMalloc( provenance->nprov*sizeof( *pids ) );
 
-/* Check the provenance slot is still in use and that the provenance is
-   not an alien (i.e. has no parents and no children ). */
-      if( prov1 && ( prov1->nchild || prov1->nparent ) ) {
+   if( *status == SAI__OK ) {
 
-/* Check all the remaining Prov structures to see if any of them refer to
-   the same NDF. */
-         for( j = i + 1; j < provenance->nprov; j++ ) {
-            prov2 = provenance->provs[ j ];
+/* Sort the pointers in this array so that they are in descreasing order
+   of ProvId value. */
+      qsort( provs, (size_t) provenance->nprov, sizeof( *provs ), ndg1ProvCmp );
 
-/* Check the provenance slot is still in use and that the provenance is
-   not an alien (i.e. has no parents and no children ). */
-            if( prov2 && ( prov2->nchild || prov2->nparent ) ) {
-               keep = ndg1TheSame( prov1, prov2, status );
+/* Store the original ProvId values (as these will be cleared in the actual
+   Prov structures by the calls to ndg1Disown below). */
+      for( i = 0; i < provenance->nprov ; i++ ) {
+         pids[ i ] = ndg1GetProvId( provs[ i ], status );
+      }
+
+/* Now work through the array looking for blocks of Provs that have equal
+   ProvId value (i.e. represent the same ancestor NDF). We ignore null
+   Provs or alien Provs (i.e. Provs that have no parents or children -
+   such as may be generated on a previous pass round this loop). */
+      for( i = 0; i < provenance->nprov - 1; i++ ) {
+         prov1 = provs[ i ];
+         if( prov1 && ( prov1->nchild > 0 || prov1->nparent > 0 ) ) {
+            provid = pids[ i ];
+
+/* Move forward from the i'th Prov until we find a Prov which has a
+   different provid value (i.e describes a different ancestor). */
+            for( j = i + 1; j < provenance->nprov; j++ ) {
+               prov2 = provs[ j ];
+               if( prov2 && ( prov2->nchild > 0 || prov2->nparent > 0 ) ) {
+
+/* If the j'th Prov does not refer to the same ancestor NDF as the i'th
+   Prov, then we have reached the end of the block (if any) so break out of
+   the "j" loop, setting the j'th Prov as the start of the next block. */
+                  if( pids[ j ] != provid ){
+                     i = j - 1;
+                     break;
 
 /* If the two provenance structures refer to the same NDF, check they have
    the same list of parents, and report an error if not. */
-               if( keep ) {
-                  if( !ndg1CheckSameParents( prov1, prov2, status ) ) {
-                     if( *status == SAI__OK ) {
-
-
-
+                  } else {
+                     if( !ndg1CheckSameParents( prov1, prov2, status ) ) {
+                        if( *status == SAI__OK ) {
 
 /* >>>  Temporary fix to dump info to see why this error is being
         reported. <<< */
-                        ndg1DumpInfo( prov1, prov2, status );
+                           ndg1DumpInfo( prov1, prov2, status );
 
-
-
-
-
-                        *status = SAI__ERROR;
-                        msgSetc( "N", prov1->path );
-                        errRep( " ", "The ancestor NDF '^N' was included "
-                                "twice within the provenance structure, but "
-                                "each occurrence specifies a different set "
-                                "of parents.", status );
-                     }
-                  }
-               }
+                           *status = SAI__ERROR;
+                           msgSetc( "N", prov1->path );
+                           errRep( " ", "The ancestor NDF '^N' was included "
+                                   "twice within the provenance structure, but "
+                                   "each occurrence specifies a different set "
+                                   "of parents.", status );
+                        }
 
 /* If the two provenance structures refer to the same NDF, then the first
    provenance structure adopts all the children of the second provenance
-   structure, which is then left childless and so can be deleted. For each
-   child in the second structure, break its parent-child link with the second
-   structure, and and register it as a child of the first structure. Loop
-   backwards through the child list to avoid changing the indices of
+   structure, which is then left childless and so can be deleted later. For
+   each child in the second structure, break its parent-child link with the
+   second structure, and register it as a child of the first structure.
+   Loop backwards through the child list to avoid changing the indices of
    remaining children as we delete them. */
-               if( keep && *status == SAI__OK ) {
-                  for( ichild = prov2->nchild - 1; ichild >= 0; ichild-- ) {
-                     child = prov2->children[ ichild ];
-                     ndg1Disown( prov2, child, status );
-                     ndg1ParentChild( prov1, child, status );
-                  }
+                     } else {
+                        for( ichild = prov2->nchild - 1; ichild >= 0; ichild-- ) {
+                           child = prov2->children[ ichild ];
+                           ndg1Disown( prov2, child, status );
+                           ndg1ParentChild( prov1, child, status );
+                        }
 
 /* The childless provenance structure is now of no use. If it is itself
    the only child of any of its parents, they too are of no use. Recurse
    up the family tree looking for such "alien" Prov structures. These can
    later be recognised by the fact that they have no parents and no
    children. */
-                  ndg1FindAliens( prov2, status );
-
-               } else {
-                 keep = 0;
+                        ndg1FindAliens( prov2, status );
+                     }
+                  }
                }
             }
          }
       }
+
+/* Free resources. */
+      pids = astFree( pids );
+      provs = astFree( provs );
+
    }
 
 /* Free any aliens (i.e. Prov structures that have no parents and no
@@ -6656,7 +6726,6 @@ static HDSLoc *ndg1Temp( const char *type, int ndim, int *dim, int *status ){
    HDSLoc *result = NULL;        /* Returned locator for temporary object */
    char name[ DAT__SZNAM + 1 ];  /* Temporary object name */
    int dummy[ 1 ];               /* Dummy dimensions array */
-   int nchar;                    /* Number of characters formatted */
 
 /* Static variables! But the NDF library is not thread safe, so we cannot
    be using this module in a thread-safe environment, so there is no harm
