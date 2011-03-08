@@ -32,7 +32,7 @@
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2010-2011 Science & Technology Facilities Council.
 *     Copyright (C) 1999, 2004 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
 
@@ -66,6 +66,9 @@
 *        Switch to using ONE_FIND_FILE
 *     2010-03-19 (TIMJ):
 *        Switch from ONE_FIND_FILE to PSX_WORDEXP
+*     2011-03-07 (TIMJ):
+*        Use ONE_WORDEXP_FILE so that we can trap cases
+*        where no files match.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -116,7 +119,7 @@
             FIRST = .FALSE.
 *  Attempt to find the next matching file.
             FILE = ' '
-            CALL PSX_WORDEXP( TEMPLT, ICONTX, FILE, STATUS )
+            CALL ONE_WORDEXP_FILE( TEMPLT, ICONTX, FILE, STATUS )
 
 *  If another file was found which matches the name...
             IF ( FILE .NE. ' ' .AND. STATUS .EQ. SAI__OK ) THEN

@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
   
 dnl    Initialisation: package name and version number
-AC_INIT(ctg, 3.0-1, ussc@star.rl.ac.uk)
+AC_INIT(ctg, 3.0-2, ussc@star.rl.ac.uk)
   
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -23,7 +23,7 @@ AC_PROG_LIBTOOL
 
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES([build], [cat grp prm psx sae])
-STAR_DECLARE_DEPENDENCIES([link], [cat chr grp mers par pcs prm psx] )
+STAR_DECLARE_DEPENDENCIES([link], [cat chr grp mers one par pcs prm psx] )
 STAR_DECLARE_DEPENDENCIES(sourceset, [htx sst])
 
 STAR_CNF_COMPATIBLE_SYMBOLS

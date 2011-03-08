@@ -27,7 +27,7 @@ STAR_PRM_COMPATIBLE_SYMBOLS
 
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES(build, [hds grp ndf par prm psx cnf sae])
-STAR_DECLARE_DEPENDENCIES(link,  [grp ndf] )
+STAR_DECLARE_DEPENDENCIES(link,  [grp ndf one] )
 
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.

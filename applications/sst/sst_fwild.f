@@ -36,7 +36,7 @@
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2010-2011 Science & Technology Facilities Council.
 *     Copyright (C) 1990, 1994 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -78,6 +78,9 @@
 *        Now uses UNIX find_file call.
 *     2010-03-19 (TIMJ):
 *        Use PSX_WORDEXP instead of ONE_FIND_FILE
+*     2011-03-07 (TIMJ):
+*        Use ONE_WORDEXP_FILE so that we can trap cases
+*        where no files match.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -179,7 +182,7 @@
          DO WHILE ( FIRST .OR. ICONTX .NE. 0 )
             FNAME = ' '
             FIRST = .FALSE.
-            CALL PSX_WORDEXP( SSPEC, ICONTX, FNAME, STATUS )
+            CALL ONE_WORDEXP_FILE( SSPEC, ICONTX, FNAME, STATUS )
             IF ( FNAME .NE. ' ' .AND. STATUS .EQ. SAI__OK) THEN
 
 *  When a file name is found, write it to the output unit.

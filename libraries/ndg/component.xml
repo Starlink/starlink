@@ -13,7 +13,7 @@
       The syntax for specifying groups of NDFs is inherited from the GRP
       library (see SUN/150).</p></abstract>
   <dependencies >
-    <build>hds</build><build>grp</build><build>ndf</build><build>par</build><build>prm</build><build>psx</build><build>cnf</build><build>sae</build><link>grp</link><link>ndf</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>hds</build><build>grp</build><build>ndf</build><build>par</build><build>prm</build><build>psx</build><build>cnf</build><build>sae</build><link>grp</link><link>ndf</link><link>one</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>

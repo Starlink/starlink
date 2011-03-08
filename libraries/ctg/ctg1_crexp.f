@@ -49,6 +49,7 @@
 *  Copyright:
 *     Copyright (C) 1999, 2004 Central Laboratory of the Research Councils.
 *     Copyright (C) 2005, 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2010-2011 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -86,6 +87,9 @@
 *        ONE_FIND_FILE.
 *     2010-03-19 (TIMJ):
 *        Use PSX_WORDEXP instead of ONE_FIND_FILE
+*     2011-03-07 (TIMJ):
+*        Use ONE_WORDEXP_FILE so that we can trap cases
+*        where no files match.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -160,7 +164,6 @@
       INTEGER MODIND             ! Index of basis spec
       INTEGER NTYP               ! No. of known foreign data formats
       INTEGER SIZE0              ! Size of group on entry.
-      LOGICAL FOUND              ! Found a matching file
       LOGICAL IN                 ! Does IGRP identify a valid group?
       LOGICAL INGRP              ! Does IGRP0 identify a valid group?
 *.

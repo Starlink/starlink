@@ -60,7 +60,7 @@
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2010-2011 Science & Technology Facilities Council.
 *     Copyright (C) 1994 Science & Engineering Research Council.
 *     Copyright (C) 1999, 2000, 2003, 2004 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
@@ -100,6 +100,9 @@
 *        Switch from private GRP1_WILD to ONE_FIND_FILE
 *     2010-03-19 (TIMJ):
 *        Use PSX_WORDEXP instead of ONE_FIND_FILE
+*     2011-03-07 (TIMJ):
+*        Use ONE_WORDEXP_FILE so that we can trap cases
+*        where no files match.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -175,14 +178,23 @@
 *  name. If the file name includes any wild-cards, the first matching file
 *  name is returned.
       FILE = ' '
-      CALL PSX_WORDEXP( INFILE, ICONTX, FILE, STATUS )
+      CALL ONE_WORDEXP_FILE( INFILE, ICONTX, FILE, STATUS )
 
 *  Currently no way to free the memory if we are not interested in additional
 *  results so we have to read them back anyhow.
       DO WHILE ( ICONTX .NE. 0 )
-         CALL PSX_WORDEXP( INFILE, ICONTX, DUMMY, STATUS )
+         CALL ONE_WORDEXP_FILE( INFILE, ICONTX, DUMMY, STATUS )
       END DO
 
+*  Trap empty match
+      IF ( STATUS .EQ. SAI__OK .AND. FILE .EQ. ' ' ) THEN
+         STATUS = GRP__FIOER
+         CALL MSG_SETC( 'FNAME', INFILE )
+         CALL MSG_SETI( 'UNIT', UNIT )
+         CALL ERR_REP( 'GRP1_RDIND_ERR1', 'GRP1_RDIND: Error '//
+     :        'opening text file ^FNAME on Fortran '//
+     :        'unit ^UNIT - "File not found".', STATUS )
+      END IF
 
 *  If a file was found which matches the name...
       IF( FILE .NE. ' ' .AND. STATUS .EQ. SAI__OK ) THEN

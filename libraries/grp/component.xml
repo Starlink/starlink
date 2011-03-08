@@ -14,7 +14,7 @@
       file. It also allows the creation of groups in which each element
       is a modified version of an element in another group.</p></abstract>
   <dependencies >
-    <build>cnf</build><build>par</build><build>prm</build><build>sae</build><link>chr</link><link>mers</link><link>par</link><link>pcs</link><link>psx</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>cnf</build><build>one</build><build>par</build><build>prm</build><build>sae</build><link>chr</link><link>mers</link><link>one</link><link>par</link><link>pcs</link><link>psx</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>

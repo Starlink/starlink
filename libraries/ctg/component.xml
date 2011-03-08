@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="ctg" support="U">
-  <version>3.0-1</version>
+  <version>3.0-2</version>
   <path>libraries/ctg</path>
   <description>Library to access groups of catalogues.</description>
   <abstract><p>
@@ -13,7 +13,7 @@
      single parameter.
   </p></abstract>
   <dependencies >
-    <build>cat</build><build>grp</build><build>prm</build><build>psx</build><build>sae</build><link>cat</link><link>chr</link><link>grp</link><link>mers</link><link>par</link><link>pcs</link><link>prm</link><link>psx</link><sourceset>htx</sourceset><sourceset>sst</sourceset><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>cat</build><build>grp</build><build>prm</build><build>psx</build><build>sae</build><link>cat</link><link>chr</link><link>grp</link><link>mers</link><link>one</link><link>par</link><link>pcs</link><link>prm</link><link>psx</link><sourceset>htx</sourceset><sourceset>sst</sourceset><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>

@@ -69,6 +69,9 @@
 *        Use PSX_WORDEXP instead of ONE_FIND_FILE
 *     12-apr-2010 (DSB):
 *        Check for wild-cards in file name returned by PSX_WORDEXP.
+*     2011-03-07 (TIMJ):
+*        Use the new ONE_WORDEXP_FILE so that we only get matches
+*        to files that exist.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -117,25 +120,15 @@
 
 *  Attempt to find the next matching file.
             FILE = ' '
-            CALL PSX_WORDEXP( TEMPLT, ICONTX, FILE, STATUS )
+            CALL ONE_WORDEXP_FILE( TEMPLT, ICONTX, FILE, STATUS )
 
-*  If the WORDEXP function is supplied with a template that contains
-*  wild-cards, but no matching files are found, a "file name" is returned
-*  that contains the original wild cards, but no error is reported. Check
-*  for this.
             IF( FILE .NE. ' ' .AND. STATUS .EQ. SAI__OK ) THEN
-               IF( INDEX( FILE, '*' ) .EQ. 0 .AND.
-     :             INDEX( FILE, '?' ) .EQ. 0 .AND.
-     :             INDEX( FILE, '[' ) .EQ. 0 .AND.
-     :             INDEX( FILE, ']' ) .EQ. 0 ) THEN
 
 *  Append it to the group.
-                  CALL GRP_PUT( IGRP1, 1, FILE, 0, STATUS )
+               CALL GRP_PUT( IGRP1, 1, FILE, 0, STATUS )
 
 *  Append a copy of REST to the second group.
-                  CALL GRP_PUT( IGRP2, 1, REST, 0, STATUS )
-
-               END IF
+               CALL GRP_PUT( IGRP2, 1, REST, 0, STATUS )
 
             END IF
 
