@@ -67,31 +67,7 @@
 #include "sae_par.h"
 #include "ems.h"
 #include "star/mem.h"
-
-/* Macro to test whether a character needs escaping
-   and to call some code if a metacharacter is found. */
-#define PROCESS_META( INPUT, POSN, ACTION ) \
-  switch (WORDS[inpos]) {                   \
-  case '|':                                 \
-  case '&':                                 \
-  case ';':                                 \
-  case '<':                                 \
-  case '>':                                 \
-  case '(':                                 \
-  case ')':                                 \
-  case '{':                                 \
-  case '}':                                 \
-  case '*':   /* glob characters */         \
-  case '[':                                 \
-  case ']':                                                     \
-  case '?':                                                     \
-    /* Make sure that the previous character is not a \ */      \
-    if (POSN > 0 && INPUT[POSN-1] != '\\') {                    \
-      ACTION;                                                   \
-    }                                                           \
-    break;                                                      \
-  }
-
+#include "star/util.h"
 
 /* We will be calling the PSX_WORDEXP Fortran wrapper so define
    the prototype. */
@@ -112,33 +88,27 @@ F77_SUBROUTINE(one_wordexp_noglob)( CHARACTER(WORDS),
   int BUFF_length = 0;
   F77_INTEGER_TYPE CONTEXT = 0;
   char * buff = NULL;     /* Buffer for escaped input */
-  size_t inpos = 0;
-  size_t outpos = 0;
-  size_t nmeta = 0;
+  char * words = NULL;    /* C copy of WORDS */
+  size_t bufflen = 0;
 
   /* We can pass many arguments directly to psx_wordexp */
   if (*STATUS != SAI__OK) return;
 
-  /* Count how many metacharacters we will be escaping */
-  for (inpos = 0; inpos < WORDS_length; inpos++) {
-    PROCESS_META( WORDS, inpos, nmeta++ );
-  }
+  /* Import the WORDS string into C */
+  words = cnfCreim( WORDS, WORDS_length );
 
-  /* Get a buffer to copy the WORDS with enough space for escape
-     characters and the terminator */
-  buff = starMallocAtomic( WORDS_length + nmeta + 1 );
+  /* Get a buffer to copy the WORDS with enough space for two
+     quotes and the terminator */
+  bufflen = strlen( words ) + 2 + 1;
+  buff = starMallocAtomic( bufflen );
 
-  /* Copy from WORDS to the buffer (assumes a Fortran string is
-     a lot like a C string. */
-  for (inpos = 0; inpos < WORDS_length; inpos++, outpos++) {
-    PROCESS_META( WORDS, inpos, buff[outpos]='\\';outpos++ );
-    buff[outpos] = WORDS[inpos];
-  }
-  buff[outpos] = '\0'; /* terminate */
+  /* Copy the words into the buffer and surround with double quotes */
+  star_strlcpy( buff, "\"", bufflen );
+  star_strlcat( buff, words, bufflen );
+  star_strlcat( buff, "\"", bufflen );
 
-  /* Now size the string */
-  BUFF_length = cnfLenc( buff );
-  buff[BUFF_length] = '\0';
+  /* Now size the string for the Fortran call */
+  BUFF_length = strlen( buff );
 
   /* Call the PSX routine to do all the work. Do not create
      a new fortran buffer for the C buffer that was copied from
@@ -163,5 +133,6 @@ F77_SUBROUTINE(one_wordexp_noglob)( CHARACTER(WORDS),
 
   /* Tidy up */
   starFree( buff );
+  cnfFree( words );
 
 }
