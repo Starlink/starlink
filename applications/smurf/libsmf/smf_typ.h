@@ -723,7 +723,6 @@ typedef struct smfDIMMData {
   AstFrameSet *outfset;      /* contains map->sky transformation */
   int *lbnd_out;             /* map lower bounds */
   int *ubnd_out;             /* map upper bounds */
-  double weightnorm;         /* Average weight normalization */
   unsigned char *zeromask;   /* Map indicating region to be masked in ast */
 } smfDIMMData;
 

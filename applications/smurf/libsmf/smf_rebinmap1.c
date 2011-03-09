@@ -18,7 +18,7 @@
 *                    dim_t nmap, smf_qual_t mask, int sampvar, int flags,
 *                    double *map, double *mapweight, double *mapweightsq,
 *                    int *hitsmap, double *mapvar, dim_t msize,
-*                    double *scalevariance, double *weightnorm, int *status )
+*                    double *scalevariance, int *status )
 
 *  Arguments:
 *     data = smfData* (Given)
@@ -72,8 +72,6 @@
 *        to input variances such that error propagation would give the
 *        same variance as that calculated from the sample scatter in
 *        each pixel.
-*     weightnorm = double* (Returned)
-*        Return the typical weight normalization if requested.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -118,9 +116,16 @@
 *     {enter_further_changes_here}
 
 *  Notes:
-*     If the variance map is calculated from the scatter of data in each pixel,
-*     rather than using the Gaussian error propagation formula, the expression
-*     used is:
+*     If the variance map is calculated from the scatter of data in
+*     each pixel, rather than using the Gaussian error propagation
+*     formula, the expression used is the "biased weighted sample
+*     variance" divided by the number samples used for the average
+*     (the un-biased estimate is not used since it makes almost no
+*     difference but requires the accumulation of an additional map of
+*     sums --- however, see
+*     __SMF_REBINMAP__UNBIASED_WEIGHTED_SAMPLE_VARIANCE definition
+*     below):
+*
 *                  sigma^2 =  sum(w_i)*sum(w_i*x_i^2) - [sum(w_i*x_i)]^2
 *                             ------------------------------------------
 *                                          N*[sum(w_i)]^2
@@ -156,10 +161,10 @@
 */
 
 
-/* Define the following if we want to use the sample standard deviation
-   instead of the standard deviation of the sample */
+/* Define the following if we want to use the un-biased weighted sample variance
+   instead. */
 
-/* #define __SMF_REBINMAP__SAMPLE_STANDARD_DEVIATION */
+/* #define __SMF_REBINMAP__UNBIASED_WEIGHTED_SAMPLE_VARIANCE */
 
 
 
@@ -184,7 +189,7 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
                     int flags, double *map, double *mapweight,
                     double *mapweightsq, int *hitsmap,
                     double *mapvar, dim_t msize, double *scalevariance,
-                    double *weightnorm, int *status ) {
+                    int *status ) {
 
   /* Local Variables */
   double *dat=NULL;          /* Pointer to data array */
@@ -480,26 +485,6 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
   /* If this is the last data to be accumulated re-normalize */
   if( flags & AST__REBINEND ) {
 
-    /* First thing we do is work out the average normalization of the
-       weights if requested */
-    if( weightnorm ) {
-      double totnorm = 0;
-      size_t numnorm = 0;
-
-      for( i=0; i<mbufsize; i++ ) {
-        if( mapweight[i] ) {
-          totnorm += hitsmap[i] / mapweight[i];
-          numnorm++;
-        }
-      }
-
-      if( numnorm ) {
-        *weightnorm = totnorm / numnorm;
-      } else {
-        *weightnorm = VAL__BADD;
-      }
-    }
-
     if( sampvar || !var ) {
       /* Variance also needs re-normalization in sampvar case */
 
@@ -521,7 +506,7 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
           /* variance only reliable if we had enough samples */
           if( hitsmap[i] >= SMF__MINSTATSAMP ) {
 
-#ifdef __SMF_REBINMAP__SAMPLE_STANDARD_DEVIATION
+#ifdef __SMF_REBINMAP__UNBIASED_WEIGHTED_SAMPLE_VARIANCE
             mapvar[i] = (mapweight[i]*mapvar[i] - tempmap*tempmap) /
               (hitsmap[i]*(mapweight[i]*mapweight[i] - mapweightsq[i]));
 #else

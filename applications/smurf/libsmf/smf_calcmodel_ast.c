@@ -309,10 +309,9 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)),
 
   if( (mapspike > 0) && noi && !(flags&SMF__DIMM_FIRSTITER) ) {
     size_t nflagged;
-    smf_map_spikes( res->sdata[idx], noi->sdata[idx], dat->weightnorm,
-                    lut->sdata[idx]->pntr[0], SMF__Q_GOOD,
-                    map, hitsmap, mapvar, mapspike, &nflagged,
-                    status );
+    smf_map_spikes( res->sdata[idx], noi->sdata[idx], lut->sdata[idx]->pntr[0],
+                    SMF__Q_GOOD, map, mapweight, hitsmap, mapvar, mapspike,
+                    &nflagged, status );
 
     msgOutiff(MSG__VERB, "","   detected %zu new spikes relative to map\n",
               status, nflagged);

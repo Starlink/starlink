@@ -522,7 +522,6 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int untilconverge=0;          /* Set if iterating to convergence */
   double *var_data=NULL;        /* Pointer to DATA component of NOI */
   int varmapmethod=0;           /* Method for calculating varmap */
-  double weightnorm=0;          /* Average weight normalization */
   dim_t whichast=0;             /* Model index of AST (must be specified) */
   dim_t whichext=0;             /* Model index of EXT if present */
   dim_t whichgai=0;             /* Model index of GAI if present */
@@ -1425,7 +1424,6 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       dat.lbnd_out = lbnd_out;
       dat.ubnd_out = ubnd_out;
       dat.chisquared = chisquared;
-      dat.weightnorm = 1;
       if( havenoi ) {
         dat.noi = model[whichnoi];
       } else {
@@ -1776,12 +1774,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                              lut_data, 0, 0, 0, NULL, 0, SMF__Q_GOOD,
                              varmapmethod, rebinflags, thismap, thisweight,
                              thisweightsq, thishits, thisvar, msize, &scalevar,
-                             &weightnorm, status );
-
-              /* Update typical normalization of weights */
-              if( rebinflags & AST__REBINEND ) {
-                dat.weightnorm = weightnorm;
-              }
+                             status );
             }
 
             /*** TIMER ***/

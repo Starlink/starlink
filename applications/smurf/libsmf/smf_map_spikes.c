@@ -13,10 +13,10 @@
 *     C function
 
 *  Invocation:
-*     smf_map_spikes( smfData *data, smfData *variance, double weightnorm,
-*                     int *lut, smf_qual_t mask, double *map, int *hitsmap,
-*                     double *mapvar, double thresh, size_t *nflagged,
-*                     int *status )
+*     smf_map_spikes( smfData *data, smfData *variance, int *lut,
+*                     smf_qual_t mask, double *map, double *mapweight,
+*                     int *hitsmap, double *mapvar, double thresh,
+*                     size_t *nflagged, int *status )
 
 *  Arguments:
 *     data = smfData* (Given)
@@ -27,8 +27,6 @@
 *        (time-varying for each bolo). In the former case ndims should
 *        still be 3, but the length of the time dimension should be 0
 *        (e.g. a NOI model component created by smf_model_create).
-*     weightnorm = double (Given)
-*        Normalization for data weights
 *     lut = int* (Given)
 *        1-d LUT for indices of data points in map (same dimensions as data)
 *     mask = smf_qual_t (Given)
@@ -36,6 +34,8 @@
 *        the calculation.
 *     map = double* (Given)
 *        The current map estimate (can be NULL).
+*     mapweight = double* (Returned)
+*        Relative weighting for each pixel in map.
 *     hitsmap = int* (Given)
 *        Number of samples that land in a pixel.
 *     mapvar = double* (Given)
@@ -57,13 +57,13 @@
 *
 *                          sigma^2 = N *sigma_m^2
 *
-*     The population we are considering are weighted data points, where
-*     each weight, w_i = norm/var^2, i.e. inverse variance weighting times
-*     a normalization, weightnorm, for which we also have an average value
-*     calculated by smf_rebinmap1. We simply check to see if the difference
-*     between the data point and the mean (stored in the map), multiplied
-*     by this weight, exceeds the requested threshold beyond the population
-*     variance.
+*     The population we are considering are weighted data points,
+*     which are simply the differences between the samples that went
+*     into the average, and the average itself (the map) multiplied by
+*     the weight (1 / bolometer noise^2) and some normalization
+*     factor. We simply check to see if the difference between these
+*     weighted data points and the map exceeds the requested threshold
+*     beyond the population variance.
 *
 *     If map is NULL, it is assumed that the data have already had the
 *     map value subtracted, and are assumed to be scattered about zero.
@@ -77,11 +77,14 @@
 *        Initial version.
 *     2010-09-24 (EC):
 *        Finish and get it working properly.
+*     2011-03-09 (EC):
+*        Instead of using an average weightnorm, now calculate weighted
+*        sample normalization on per-pixel basis using mapweight
 
 *  Notes:
 
 *  Copyright:
-*     Copyright (C) 2009-2010 University of British Columbia
+*     Copyright (C) 2009-2011 University of British Columbia
 *     All Rights Reserved.
 
 *  Licence:
@@ -120,10 +123,10 @@
 
 #define FUNC_NAME "smf_map_spikes"
 
-void smf_map_spikes( smfData *data, smfData *variance, double weightnorm,
-                     int *lut, smf_qual_t mask, double *map, int *hitsmap,
-                     double *mapvar, double thresh, size_t *nflagged,
-                     int *status ) {
+void smf_map_spikes( smfData *data, smfData *variance, int *lut,
+                     smf_qual_t mask, double *map, double *mapweight,
+                     int *hitsmap, double *mapvar, double thresh,
+                     size_t *nflagged, int *status ) {
 
   /* Local Variables */
   double *dat=NULL;          /* Pointer to data array */
@@ -140,20 +143,19 @@ void smf_map_spikes( smfData *data, smfData *variance, double weightnorm,
   smf_qual_t * qual = NULL;  /* Quality to update for flagging */
   double thisweight;
   double threshsq;           /* square of thresh */
-  double val;                /* weighted offset value */
   double *var=NULL;          /* Pointer to variance array */
   size_t vbstride;           /* bolo stride of variance */
   dim_t vi;                  /* variance array index */
   dim_t vnbolo;              /* number of bolos in variance */
   dim_t vntslice;            /* number of bolos in variance */
   size_t vtstride;           /* tstride of variance */
-
+  double woffsq;             /* weighted sample offset^2 from map value */
 
   /* Main routine */
   if (*status != SAI__OK) return;
 
   /* Check inputs */
-  if( !data || !variance || !lut || !mapvar || !hitsmap ) {
+  if( !data || !variance || !lut || !mapvar || !hitsmap || !mapweight ) {
     *status = SAI__ERROR;
     errRep(" ", FUNC_NAME ": Null inputs", status );
     return;
@@ -201,22 +203,28 @@ void smf_map_spikes( smfData *data, smfData *variance, double weightnorm,
       if( (lut[di] != VAL__BADI) && !(qual[di]&mask) && (var[vi] != 0) &&
         (mapvar[lut[di]] != VAL__BADD) ) {
 
-        /* What is the weighted offset of this data point from the mean */
-        thisweight = (1/var[vi])*weightnorm;
-
-        if( map ) val = (dat[di] - map[lut[di]]);
-        else val = dat[di];
-
-        val *= thisweight;
-
         /* What is the estimated population variance? */
         popvar = mapvar[lut[di]]*hitsmap[lut[di]];
 
+        /* Estimate the weighted sample offset (squared) from the
+           mean. This definition is slightly odd, but I arrived at it
+           by figuring out the factor you need to multiply (data - map) by
+           in order to plug it straight into the sum_i (residual_i)^2 / N
+           for the variance and get the same answer as the population
+           variance. */
+
+        thisweight = (1/var[vi]);
+        if( map ) woffsq = (dat[di] - map[lut[di]]);
+        else woffsq = dat[di];
+
+        woffsq *= woffsq * thisweight * hitsmap[lut[di]] / mapweight[lut[di]];
+
         /* Flag it if it's an outlier */
-        if( val*val > threshsq*popvar ) {
+        if( woffsq > threshsq*popvar ) {
           qual[di] |= SMF__Q_SPIKE;
           nflag++;
         }
+
       }
     }
   }
