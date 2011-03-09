@@ -258,6 +258,9 @@
       IF( COF_WCSEX( FC, INDF, ENCOD, NATIVE, EXCLUD, STATUS ) .GE.
      :    1 ) THEN
 
+*  Copy the contents of the FitsChan into the CHDU header.
+         CALL COF_FC2HD( FC, FUNIT, STATUS )
+
 *  If any axes were successfully described using the -TAB algorithm,
 *  there will be one or more FitsTables stored in the FitsChan. For each
 *  such FitsTable, create a corresponding extension in the FITS file
@@ -290,13 +293,6 @@
 
 *  Annul the pointer to the KeyMap holding the tables.
             CALL AST_ANNUL( KEYMAP, STATUS )
-
-*  Re-copy the contents of the FitsChan into the refreshed CHDU header
-*  if tables have been removed from the FitsChan.
-*            IF ( .NOT. PPGTAB ) THEN
-               CALL COF_FC2HD( FC, FUNIT, STATUS )
-*            END IF
-
          END IF
 
 *  If the NDF has a WCS component but it could not be written out, issue
