@@ -135,7 +135,6 @@
 *  switch off HDS metacharacter interpretation, since HDS has problems
 *  with spaces in file names.
       CALL ONE_WORDEXP_NOGLOB( NAME, ENAME, STATUS )
-      CALL ONE_SHELL_ECHO( NAME, ENAME, STATUS )
       CALL HDS_GTUNE( 'SHELL', SHELL, STATUS )
       CALL HDS_TUNE( 'SHELL', -1, STATUS )
 
