@@ -18,7 +18,8 @@ cinclude_HEADERS = one.h
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 C_ROUTINES = one_exec.c  one_find_file.c  one_shell_echo.c one_scrsz.c \
-	one_strlcpy.c one_strlcat.c one_wordexp_file.c
+	one_strlcpy.c one_strlcat.c one_wordexp_file.c \
+	one_wordexp_noglob.c
 
 BUILT_SOURCES = $(include_MESSAGES)
 
