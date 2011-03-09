@@ -68,6 +68,7 @@
 *      2011-03-08 (TIMJ):
 *         Use strlcpy and strlcat for string copying.
 *         Correct exit status handling.
+*         Quote echo string to prevent problems with parentheses.
 
 *-
  */
@@ -176,8 +177,9 @@ F77_SUBROUTINE(one_shell_echo)( CHARACTER(FileSpec), CHARACTER(FileName),
 /* This is the child process in which we will exec `echo'.  Copy t
    the filespec from the FileSpec pointer that we have been passed. */
       } else if( STATUS == 0 ) {
-         star_strlcpy( Command, "set -f ; echo ", cmdlen );
+         star_strlcpy( Command, "set -f ; echo \"", cmdlen );
          star_strlcat( Command, CFileSpec, cmdlen );
+         star_strlcat( Command, "\"", cmdlen );
 
 /* Now we arrange things so that the 'echo' command will send its output back
    down our pipe.  We want to redirect our current standard output to the
