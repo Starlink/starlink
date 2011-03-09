@@ -67,6 +67,7 @@
 *         use starmem.
 *      2011-03-08 (TIMJ):
 *         Use strlcpy and strlcat for string copying.
+*         Correct exit status handling.
 
 *-
  */
@@ -253,12 +254,16 @@ F77_SUBROUTINE(one_shell_echo)( CHARACTER(FileSpec), CHARACTER(FileName),
    if (STATUS != 0) {
      int process_status;
      waitpid( STATUS, &process_status, 0 );
-     if (! WIFEXITED(process_status)) {
+     if ( !WIFEXITED(process_status) || /* Did not exit using _exit */
+          WEXITSTATUS(process_status)   /* Exited with bad status */
+          ) {
        /* non-normal exit */
-       if (*Status != SAI__OK) {
+       if (*Status == SAI__OK) {
 	 *Status = ONE__PIPEERR;
-	 emsRep( "ONE_SHELL_ECHO","ONE_SHELL_ECHO: Error from child",
-		 Status);
+         emsSetnc( "FS", FileSpec, FileSpec_length);
+         emsRepf( "ONE_SHELL_ECHO","ONE_SHELL_ECHO: Error from child expanding '^FS'"
+                  " (exit status=%d)",
+                  Status, WEXITSTATUS(process_status) );
        }
      }
    }

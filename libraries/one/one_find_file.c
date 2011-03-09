@@ -608,6 +608,8 @@ F77_INTEGER_FUNCTION(one_find_file)( CHARACTER(FileSpec), LOGICAL(LisDir),
 *    28-AUG-2004 (TIMJ):
 *       Incorporate tweaks from Norman's patches to SST. Use cnfCptr
 *       Always try to free regardless of status
+*    2011-03-08 (TIMJ):
+*       Check exit status from waitpid and set EMS status accordingly.
 *-
  */
 
@@ -635,9 +637,11 @@ F77_SUBROUTINE(one_find_file_end)( POINTER(Context), INTEGER(Status) )
              paranoia. */
           int process_status;
           waitpid (ContextPtr->ls_pid, &process_status, 0);
-          if (! WIFEXITED(process_status)) {
+          if (! WIFEXITED(process_status) || /* Did not exit using _exit */
+              WEXITSTATUS(process_status)    /* Exited with bad status */
+              ) {
 	    /* non-normal exit */
-	    if (*Status != SAI__OK) {
+	    if (*Status == SAI__OK) {
 	      *Status = ONE__PIPEERR;
 	      emsRep( "ONE_FIND_FILE_END","Error from child",
 		      Status);
