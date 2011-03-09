@@ -65,6 +65,8 @@
 *      19-APR-2006 (TIMJ):
 *         reap child process to prevent zombies. Close parent file descriptor.
 *         use starmem.
+*      2011-03-08 (TIMJ):
+*         Use strlcpy and strlcat for string copying.
 
 *-
  */
@@ -116,6 +118,7 @@
 #include "one_err.h"
 #include "sae_par.h"
 #include "star/mem.h"
+#include "star/util.h"
 
 F77_SUBROUTINE(one_shell_echo)( CHARACTER(FileSpec), CHARACTER(FileName),
                                 INTEGER(Status)
@@ -156,7 +159,8 @@ F77_SUBROUTINE(one_shell_echo)( CHARACTER(FileSpec), CHARACTER(FileName),
 
 /* If succesful, allocate enough room for the eventual echo command string */
    } else {
-      Command = (char *) starMalloc( SpecLength + 20 );
+      size_t cmdlen = SpecLength + 20;
+      Command = (char *) starMalloc( cmdlen );
 
 /* Fdptr[0] can now be used as the reading end of the pipe, and Fdptr[1] as
    the writing end.  Having that, we now fork off a new process to do the
@@ -171,8 +175,8 @@ F77_SUBROUTINE(one_shell_echo)( CHARACTER(FileSpec), CHARACTER(FileName),
    remembering that this is a string from a Fortran program, and so
    is blank padded rather than null terminated. */
       } else if( STATUS == 0 ) {
-         (void) strcpy( Command, "set -f ; echo " );
-	 (void) strncat( Command, FileSpec, SpecLength );
+         star_strlcpy( Command, "set -f ; echo ", cmdlen );
+         star_strlcat( Command, FileSpec, cmdlen );
 
 /* Now we arrange things so that the 'echo' command will send its output back
    down our pipe.  We want to redirect our current standard output to the
