@@ -131,6 +131,7 @@ F77_SUBROUTINE(one_shell_echo)( CHARACTER(FileSpec), CHARACTER(FileName),
    GENPTR_INTEGER(Status)     /* Used to return the Adam Status Code */
 
 /*  Local variables  */
+   char *CFileSpec = NULL; /* C version of Fortran FileSpec */
    char *Command;        /* 'echo' command executed */
    char Char;            /* Byte read from pipe */
    char Line[LINE_LEN];  /* String into which line is read */
@@ -149,7 +150,8 @@ F77_SUBROUTINE(one_shell_echo)( CHARACTER(FileSpec), CHARACTER(FileName),
    if( FileSpec == NULL ) return;
 
 /* Set input string lengths to those returned by CNF. */
-   SpecLength = FileSpec_length;
+   CFileSpec = cnfCreim( FileSpec, FileSpec_length );
+   SpecLength = strlen(CFileSpec);
    NameLength = FileName_length;
 
 /* Create two file descriptors of a pipe. */
@@ -171,12 +173,10 @@ F77_SUBROUTINE(one_shell_echo)( CHARACTER(FileSpec), CHARACTER(FileName),
 	 emsRep( "one_shell_echo", "Unable to fork", Status );
 
 /* This is the child process in which we will exec `echo'.  Copy t
-   the filespec from the FileSpec pointer that we have been passed,
-   remembering that this is a string from a Fortran program, and so
-   is blank padded rather than null terminated. */
+   the filespec from the FileSpec pointer that we have been passed. */
       } else if( STATUS == 0 ) {
          star_strlcpy( Command, "set -f ; echo ", cmdlen );
-         star_strlcat( Command, FileSpec, cmdlen );
+         star_strlcat( Command, CFileSpec, cmdlen );
 
 /* Now we arrange things so that the 'echo' command will send its output back
    down our pipe.  We want to redirect our current standard output to the
@@ -214,6 +214,9 @@ F77_SUBROUTINE(one_shell_echo)( CHARACTER(FileSpec), CHARACTER(FileName),
 	 starFree( Command );
       }
    }
+
+/* Free the temporary buffer */
+   if (CFileSpec) cnfFree(CFileSpec);
 
 /* At this point, if status still indicates OK, we have two file descriptors,
    the first of which is that of the reading end of the pipe to which our
