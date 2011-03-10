@@ -191,6 +191,10 @@
 *          In ndg1PurgeProvenance, speed up the way in which redundant Provs are
 *          identified (use quick sort to sort them into increasing ProvId
 *          order then look for blocks of Provs with identical provid value).
+*      10-MAR-2011 (DSB):
+*          Guard against integer overlflow in ndg1CmpProv when finding
+*          the difference between two integer provid values. This bug
+*          caused the purging of duplicate ancestors to fail sometimes.
 */
 
 
@@ -5569,12 +5573,24 @@ static int ndg1ProvCmp( const void *a, const void *b ){
 */
     int result;
     int status = SAI__OK;
+    long int ida, idb;
 
     Prov *pa = *((Prov **) a );
     Prov *pb = *((Prov **) b );
 
     if( pa && pb ) {
-       result = ndg1GetProvId( pb, &status ) - ndg1GetProvId( pa, &status );
+
+/* Need to guard against integer overflow. */
+       ida = (long int) ndg1GetProvId( pa, &status );
+       idb = (long int) ndg1GetProvId( pb, &status );
+
+       if( idb > ida ) {
+          result = 1;
+       } else if( idb < ida ) {
+          result = -1;
+       } else {
+          result = 0;
+       }
 
     } else if( pa ) {
        result = -1;
