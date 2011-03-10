@@ -19,10 +19,10 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {2.8}
 \newcommand{\stardocauthors}   {D.S.\ Berry \\ M.B.\ Taylor}
-\newcommand{\stardocdate}      {22nd October 2009}
+\newcommand{\stardocdate}      {10th March 2011}
 \newcommand{\stardoctitle}     {NDG \\ [\latex{1ex}]
                                 Routines for Accessing Groups of NDFs}
-\newcommand{\stardocversion}   {Version 5.8}
+\newcommand{\stardocversion}   {Version 6.0}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 \newcommand{\stardocabstract}  {
 This document describes the routines provided within the NDG subroutine
@@ -2332,21 +2332,63 @@ again afterwards to re-establish the recording of NDF names.
 
 \subsection{The PROVENANCE Extension:}
 
-The PROVENANCE extension in an NDF contains four components: ``PARENTS'',
-``ANCESTORS'', ``CREATOR'', ``DATE'' and ``HASH''. The DATE component is a
-character string holding the date and time at which the information in
-the provenance extension was last modified. The date is UTC formatted by
-PSX\_ASCTIME. The ANCESTORS component is a 1D array of ``PROV'' structures
-(described below). Each element describes a single NDF that was used in
-the creation of the main NDF, either directly or indirectly. The PARENTS
-component is a 1D integer array holding the indices within the ANCESTORS
-array of the NDFs that are the direct parents of the main NDF. The
-CREATOR component holds an arbitrary identifier for the software that
-created the main NDF. The HASH component is an integer that identifies
-the contents of the current History record in the NDF at the time the
-PROVENANCE extension was created. This is used to determine which history
-records to copy into the PROVENANCE extension if the main NDF is used in
-the creation of another NDF.
+This section describes the format of the NDF extension used to
+store provenance information in NDG version 6.0 and later (for the
+pre-V6.0 format, see ``The Pre V6 PROVENANCE Extension:''. The
+PROVENANCE extension in an NDF contains the following components:
+
+\begin{description}
+
+\item [DATA] --- A one-dimensional integer array containing descriptions
+of all the NDFs that were used to create the main NDF. These descriptions
+are encoded into an opaque set of integer values in order to save time
+and space, but represent the same set of items descibed in ``The Pre V6
+PROVENANCE Extension:'' below (but note, the MORE component is not
+included in the DATA array).
+
+\item [MORE] --- An optional one-dimensional array of structures containing
+arbitrary extra information about selected ancestor NDFs. If present,
+each element of this array contains supplemental information for a single
+ancestor NDF, and the DATA array will contain indices into the MORE array
+for those ancestors which have additional information.
+
+\end{description}
+
+
+\subsection{The Pre V6 PROVENANCE Extension:}
+
+The format in which provenance information is stored within an NDF's
+PROVENANCE extension changed radically at NDG version 6.0. Prior to v6.0,
+the seperate numerical values, strings, etc, that form the provenance
+information were stored in separate HDS components. But for large
+provenance systems this proved to be in efficient in terms of both
+processing time and disk space. Therefore, as of NDG v6.0, the numerical
+values, strings, etc, forming the information are encoded into a single
+array of integers as described in the previous section. The current
+version of NDG will read both formats of provenance extension, but always
+writes the new integer-encoded format.
+
+The rest of this section describes the old format. In addition to
+documenting the old format, this description serves to illustrate the
+concepts behind the provenance system. These concepts have not changed -
+the only thing that has changed is how these concepts are stored within
+an HDS object.
+
+Pre-V6.0 PROVENANCE extensions in an NDF contains four components:
+``PARENTS'', ``ANCESTORS'', ``CREATOR'', ``DATE'' and ``HASH''. The DATE
+component is a character string holding the date and time at which the
+information in the provenance extension was last modified. The date is
+UTC formatted by PSX\_ASCTIME. The ANCESTORS component is a 1D array of
+``PROV'' structures (described below). Each element describes a single
+NDF that was used in the creation of the main NDF, either directly or
+indirectly. The PARENTS component is a 1D integer array holding the
+indices within the ANCESTORS array of the NDFs that are the direct
+parents of the main NDF. The CREATOR component holds an arbitrary
+identifier for the software that created the main NDF. The HASH component
+is an integer that identifies the contents of the current History record
+in the NDF at the time the PROVENANCE extension was created. This is used
+to determine which history records to copy into the PROVENANCE extension
+if the main NDF is used in the creation of another NDF.
 
 Each PROV structure describes a single NDF that was used in the creation
 of the main NDF, and can contain the following components; ``PARENTS'',

@@ -56,6 +56,46 @@
 *     - ndgWriteVotProv: Writes a provenance structure out to a VOTABLE.
 
 *  The PROVENANCE Extension:
+*     This section describes the format of the NDF extension used to
+*     store provenance information in NDG version 6.0 and later (for the
+*     pre-V6.0 format, see the next section). The PROVENANCE extension in
+*     an NDF contains the following components:
+*
+*     - "DATA": A one-dimensional integer array containing descriptions
+*     of all the NDFs that were used to create the main NDF. These
+*     descriptions are encoded into am opaque set of integer values in
+*     order to save time and space. See the next section for a list of the
+*     separate items of information that go into the DATA array (but note
+*     the MORE component described in the next section is not included in
+*     the DATA array).
+*
+*     - "MORE": An optional one-dimensional array of structures containing
+*     arbitrary extra information about selected ancestor NDFs. If
+*     present, each element of this array contains supplemental information
+*     for a single ancestor NDF, and the DATA array will contain indices
+*     into the MORE array for those ancestors which have additional
+*     information.
+
+*  The pre-V6.0 PROVENANCE Extension:
+*     The format in which provenance information is stored within an
+*     NDF's PROVENANCE extension changed radically at NDG version 6.0.
+*     Prior to v6.0, the seperate numerical values, strings, etc, that
+*     form the provenance information were stored in separate HDS
+*     components. But for large provenance systems this proved to be in
+*     efficient in terms of both processing time and disk space.
+*     Therefore, as of NDG v6.0, the numerical values, strings, etc,
+*     forming the information are encoded into a single array of integers
+*     as described in the previous section. The current version of NDG
+*     will read both formats of provenance extension, but always writes
+*     the new integer-encoded format.
+*
+*     The rest of this section describes the old format (note, the use of
+*     the present tense is purely historical). In addition to documenting
+*     the old format, this description serves to illustrate the concepts
+*     behind the provenance system. These concepts have not changed - the
+*     only thing that has changed is how these concepts are stored within
+*     an HDS object.
+*
 *     - The PROVENANCE extension in an NDF contains four components:
 *     "PARENTS", "ANCESTORS", "CREATOR", "DATE" and "HASH". The DATE
 *     component is a character string holding the date and time at which the
@@ -191,10 +231,14 @@
 *          In ndg1PurgeProvenance, speed up the way in which redundant Provs are
 *          identified (use quick sort to sort them into increasing ProvId
 *          order then look for blocks of Provs with identical provid value).
-*      10-MAR-2011 (DSB):
-*          Guard against integer overlflow in ndg1CmpProv when finding
-*          the difference between two integer provid values. This bug
-*          caused the purging of duplicate ancestors to fail sometimes.
+*      9-MAR-2011 (DSB):
+*          Change the format for the HDS provenance extension. Using the
+*          old system large provenance systems occupied a lot of disk space,
+*          and took a lot of time to read and write. The new system
+*          avoids this by encoding descriptions of all ancestors into a
+*          single array of integers, rather than into many different HDS
+*          components. Both old and new formats can be read, but only the
+*          new format is written.
 */
 
 
@@ -215,6 +259,7 @@
 #define USER_NAME "USER"
 #define TEXT_NAME "TEXT"
 #define HIDDEN_NAME "HIDDEN"
+#define DATA_NAME "DATA"
 
 /* HDS types for components used in the PROVENANCE extension of an NDF */
 #define TEMP_TYPE "STARLINK_PROV"
@@ -236,6 +281,17 @@
 /* Constants for the Fowler/Noll/Vo hash function. */
 #define FNV1_32_INIT ( (unsigned int) 0x811c9dc5 )
 #define FNV_32_PRIME ( (unsigned int) 0x01000193 )
+
+/* The current version number for the structure used to encode Provenance
+   information in an HDS _INTEGER array. */
+#define PDATA_VERSION 1
+
+/* "int" value used to flag the end of the encoded provenance data */
+#define END_FLAG -123456789
+
+/* "char" value used to fill unused space at the end of the encoded
+   provenance data */
+#define PAD_FLAG 123
 
 /* Include files. */
 /* -------------- */
@@ -340,22 +396,25 @@ static Prov *ndg1MakeProv( int, const char *, const char *, const char *, int, H
 static Provenance *ndg1Decode( NdgProvenance *, const char *, int * );
 static Provenance *ndg1FreeProvenance( Provenance *, int, int * );
 static Provenance *ndg1MakeProvenance( Prov *, int * );
+static Provenance *ndg1ReadOldProvenanceExtension( HDSLoc *, const char *, HDSLoc *, AstKeyMap *, const char *, int, int * );
 static Provenance *ndg1ReadProvenanceExtension( HDSLoc *, const char *, HDSLoc *, AstKeyMap *, const char *, int, int * );
-static Provenance *ndg1ReadProvenanceNDF( int, HDSLoc *, AstKeyMap *, const char *, int, int * );
 static Provenance *ndg1ReadProvenanceXml( const char *, const char *, const char *, int * );
+static Provenance *ndg1ReadProvenanceNDF( int, HDSLoc *, AstKeyMap *, const char *, int, int * );
+static char *ndg1DecodeProvData( char *, int, int, HDSLoc *, size_t, Provenance *, int * );
+static char *ndg1EncodeProvData( char *, int, Prov *, Provenance *, size_t *, HDSLoc ***, hdsdim *, int * );
 static char *ndg1GetTextComp( HDSLoc *, const char *, char *, size_t, int * );
+static char *ndg1StoreCharData( char *, const void *, size_t, size_t *, int * );
 static char ndg1XmlSource( void *, int * );
 static const char *ndg1Date( int * );
 static const char *ndg1WriteProvenanceXml( Provenance *, int * );
 static int *ndg1ParentIndicies( Prov *, Provenance *, int *, int *, int * );
 static int ndg1CheckSameParents( Prov *, Prov *, int * );
-static void ndg1FindAliens( Prov *, int * );
 static int ndg1FindAncestorIndex( Prov *, Provenance *, int * );
 static int ndg1GetLogicalComp( HDSLoc *, const char *, int, int * );
 static int ndg1GetProvId( Prov *, int * );
 static int ndg1IntCmp( const void *, const void * );
-static int ndg1ProvCmp( const void *, const void * );
 static int ndg1IsWanted( AstXmlElement *, int * );
+static int ndg1ProvCmp( const void *, const void * );
 static int ndg1TheSame( Prov *, Prov *, int * );
 static unsigned int ndg1HashFun( const char *,  unsigned int, int * );
 static void ndg1A2h( AstKeyMap *, HDSLoc *, int * );
@@ -364,15 +423,17 @@ static void ndg1Check( const char *, Prov *, AstKeyMap *, int * )__attribute__((
 static void ndg1ClearProvId( Prov *, int * );
 static void ndg1CopyComps( HDSLoc *, HDSLoc *, int * );
 static void ndg1Disown( Prov *, Prov *, int * );
+static void ndg1FindAliens( Prov *, int * );
 static void ndg1H2a( HDSLoc *, AstKeyMap *, int * );
 static void ndg1Hout1( int, char *const[], int * );
-static void ndg1ParentChild( Prov *, Prov *, int * );
-static void ndg1ParentChildIndex( Provenance *, int, int, int * );
+static void ndg1ParentChild( Prov *, Prov *, int, int * );
+static void ndg1ParentChildIndex( Provenance *, int, int, int, int * );
 static void ndg1PurgeProvenance( Provenance *, int * );
 static void ndg1PutTextComp( HDSLoc *, const char *, const char *, int * );
 static void ndg1ReadHistRec( Prov *, int, int, int *, int * );
 static void ndg1ResetIndices( Provenance *, int * );
 static void ndg1Rmprv( Provenance *, int, int * );
+static void ndg1StoreMore( Prov *, HDSLoc *, AstKeyMap *, int * );
 static void ndg1WriteProvenanceExtension( Provenance *, HDSLoc *, int * );
 static void ndg1WriteProvenanceNDF( Provenance *, int, int, int * );
 
@@ -2413,7 +2474,7 @@ void ndgPutProv( NdgProvenance *prov, int indf, HDSLoc *more,
          ndg1ResetIndices( provenance, status );
 
 /* Record the new ancestor NDF as a parent of the main NDF. */
-         ndg1ParentChild( prov2->main, provenance->main, status );
+         ndg1ParentChild( prov2->main, provenance->main, 1, status );
 
 /* Purge any duplicate entries in the extended provenance information. */
          ndg1PurgeProvenance( provenance, status );
@@ -3793,6 +3854,188 @@ static Provenance *ndg1Decode( NdgProvenance *prov, const char *method,
    return result;
 }
 
+static char *ndg1DecodeProvData( char *pdata, int iprov, int version,
+                                 HDSLoc *mloc, size_t nmore,
+                                 Provenance *provenance, int *status ){
+/*
+*  Name:
+*     ndg1DecodeProvData
+
+*  Purpose:
+*     Decode a single encoded ancestor description and store in a supplied
+*     Prov structure.
+
+*  Invocation:
+*     char *ndg1DecodeProvData( char *pdata, int iprov, int version,
+*                               HDSLoc *mloc, size_t nmore,
+*                               Provenance *provenance, int *status )
+
+*  Description:
+*     This function decodes a stream of bytes containing a description of
+*     a single ancestor NDF, and stores the decoded description in a
+*     supplied Prov structure.
+
+*  Arguments:
+*     pdata
+*        Pointer to the first byte to decode.
+*     iprov
+*        The zero-based index of the ancestor within "provenance".
+*     version
+*        The version number of the format used to encode the byte stream.
+*     mloc
+*        An HDS locator for an array of structures. Each structure
+*        contains extra "more" information associated with a single ancestor.
+*        May be NULL.
+*     nmore
+*        The length of the array located by "mloc".
+*     provenance
+*        Pointer to the Provenance structure containing the ancestor.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     Pointer to the next byte to be read from the data stream, or NULL
+*     if the ancestor could not be decoded.
+
+*/
+
+/* Macro to allocate memory holding a copy of a string read from the
+   start of the remaining part of the data array (pointed to by "result"),
+   checking for ludicrously large string lengths.  */
+#define MAXSTRINGLEN 5000
+#define STORESTRING(Item) \
+      len = result ? strlen( result ) + 1 : MAXSTRINGLEN; \
+      if( len < MAXSTRINGLEN ) { \
+         Item = ( len > 1 ) ? astStore( NULL, result, len ) : NULL; \
+         result += len; \
+      } else { \
+         result = NULL; \
+      }
+
+/* Macro to copy an int from the start of the remaining part of the data
+   array (pointed to by "result") to a specified variable. */
+#define STOREINT(Item) \
+      if( result ) { \
+         Item = *( (int *) result ); \
+         result += sizeof( int ); \
+      }
+
+/* Local Variables: */
+   HDSLoc *cloc = NULL;
+   HistRec *hist_rec;
+   Prov *prov;
+   char *result;
+   hdsdim  dim;
+   int imore;
+   int iparent;
+   int irec;
+   int len;
+   int parindex;
+   int nparent;
+
+/* Initialise */
+   result = pdata;
+
+/* Check inherited status amd supplied data array pointer. */
+   if( *status != SAI__OK || !pdata ) return result;
+
+/* Get a pointer to the Prov structure in which to store the values
+   decoded from the integer data array. */
+   prov = provenance->provs[ iprov ];
+
+/* If the data array is encoded using encoding version 1 ... */
+   if( version == 1 ) {
+
+/* Get the ancestor's path. */
+      STORESTRING( prov->path );
+
+/* Get the ancestor's date. */
+      STORESTRING( prov->date );
+
+/* Get the ancestor's hidden flag. */
+      if( result ) prov->hidden = *(result++);
+
+/* Get the ancestor's creator. */
+      STORESTRING( prov->creator );
+
+/* If we are decoding the Prov structure for the main NDF, get the
+   history record hash code. */
+      if( prov == provenance->main ) {
+         STOREINT( prov->hhash );
+
+/* If we are not decoding the provenance for the main NDF, decode any
+   history records.  */
+      } else {
+
+/* First get the number of history records. Check it is not negative. */
+         STOREINT( prov->nhrec );
+         if( prov->nhrec < 0 ) {
+            result = NULL;
+         } else {
+
+/* Create the array of HistRec structures. */
+            prov->hist_recs = astMalloc( prov->nhrec*sizeof( HistRec ) );
+            if( *status == SAI__OK ) {
+
+/* Now decode each history record. */
+               hist_rec = prov->hist_recs;
+               for( irec = 0; irec < prov->nhrec; irec++,hist_rec++ ) {
+                  STORESTRING( hist_rec->date );
+                  STORESTRING( hist_rec->command );
+                  STORESTRING( hist_rec->user );
+                  STORESTRING( hist_rec->text );
+               }
+            }
+         }
+      }
+
+/* Get the index of the associated MORE structure. */
+      STOREINT( imore );
+
+/* If there is an associated MORE structure, create one in the returned
+   Prov structure, and copy the components over from the supplied
+   structure. */
+      if( imore >= 0 ) {
+         if( imore < nmore ) {
+            dim = imore + 1;
+            datCell( mloc, 1, &dim, &cloc, status );
+            prov->more = ndg1Temp( TEMP_TYPE, 0, NULL, status );
+            ndg1CopyComps( cloc, prov->more, status );
+            datAnnul( &cloc, status );
+         } else {
+            result = NULL;
+         }
+      }
+
+/* Get the number of parents. Check it is not negative. */
+      STOREINT( nparent );
+      if( nparent < 0 ) result = NULL;
+
+/* For each, establish a parent-child link between the Prov structure
+   being constructed (the child) and the parent Prov structure. */
+      for( iparent = 0; iparent < nparent; iparent++ ) {
+         STOREINT( parindex );
+         ndg1ParentChildIndex( provenance, parindex, iprov, 0, status );
+      }
+
+/* Store the index of the parent within the list of ancestors (zero is
+   the main NDF). */
+      prov->index = iprov;
+
+/* Unsupported versions. */
+   } else {
+      result = NULL;
+   }
+
+/* Return the updated pointer into the encoded data array. */
+   return result;
+
+#undef STOREINT
+#undef STORESTRING
+#undef MAXSTRINGLEN
+
+}
+
 static void ndg1Disown( Prov *parent, Prov *child, int *status ){
 /*
 *  Name:
@@ -3920,6 +4163,204 @@ static NdgProvenance *ndg1Encode( Provenance *prov, int *status ) {
 
 /* Return the KeyMap pointer, cast to "NdgProvenance *". */
    return (NdgProvenance *) keymap;
+}
+
+static char *ndg1EncodeProvData( char *pdata, int ismain, Prov *prov,
+                                 Provenance *provenance,
+                                 size_t *pdlen, HDSLoc ***mores,
+                                 hdsdim *nmore, int *status ){
+/*
+*  Name:
+*     ndg1EncodeProvData
+
+*  Purpose:
+*     Encode the contents of a Prov structure into a stream of bytes.
+
+*  Invocation:
+*     char *ndg1EncodeProvData( char *pdata, int ismain, Prov *prov,
+*                               Provenance *provenance,
+*                               size_t *pdlen, HDSLoc ***mores,
+*                               hdsdim *nmore, int *status )
+
+*  Description:
+*     This function converts a single Prov structure into a stream of
+*     bytes and appends them to the end of a supplied array.
+
+*  Arguments:
+*     pdata
+*        Pointer to a pre-allocated memory area in which to store the
+*        encoded Prov data.
+*     ismain
+*        Non-zero if the Prov structure describes the main NDF, rather
+*        than an ancestor.
+*     prov
+*        Pointer to the Prov structure to be encoded.
+*     provenance
+*        Pointer to the Provenance structure containing "Prov".
+*     pdlen
+*        Pointer to a size of the array, in bytes. This is increased by
+*        this function to take account of the supplied Prov.
+*     mores
+*        The address of a pointer to an array of HDSLoc pointers. The
+*        length of the array is given by "*nmore". If the supplied Prov
+*        contains any MORE structures, this array is extended by the
+*        number or MORE structures in "Prov", and the new array elements
+*        are returned holding copies of the HDSLoc pointers for the MORE
+*        structures in "Prov".
+*     nmore
+*        Pointer to location at which is stored the number of HDSLoc
+*        pointers in the array identified by "mores". Updated on exit to
+*        take account of any new MORE structures found in "Prov".
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     Pointer to the extended memory area containing the encoded Prov.
+*     Should be freed using astFree when no longer needed.
+
+*/
+
+/* Local Variables: */
+   HDSLoc *more = NULL;
+   HistRec *hist_rec = NULL;
+   char *path = NULL;
+   char cval;
+   const char *date = NULL;
+   int imore;
+   int *parents = NULL;
+   int irec;
+   int len;
+   int npar;
+   char *result;
+
+/* Initialise the returned poitner to be the supplied pointer. */
+   result = pdata;
+
+/* Check the inherited status value. */
+   if( *status != SAI__OK ) return result;
+
+/* If this is not the main NDF provenance, use components from the Prov
+   structure. */
+   if( !ismain ) {
+      path = prov->path;
+      date = prov->date;
+      more = prov->more;
+
+/* If it is the main NDF provenance, do not write out the PATH (since the
+   NDF may subsequently be moved), and force the DATE to the current
+   date. Also no "more" information is stored for the main NDF since the
+   information that may be stored in "more" will usually be available at
+   other places in the NDF. It is the responsibilty of each application
+   to extract the information it thinks is relevant from each input NDF
+   and store it in the "more" structure with the input NDF's provenance
+   information. */
+   } else {
+      path = NULL;
+      date = ndg1Date( status );
+      more = NULL;
+   }
+
+/* Append the path to the end of the array, extending the array as needed.
+   We must always store something, even if the path is undefined. */
+   if( path ) {
+      len = astChrLen( path );
+      if( len ) {
+         if( path[ len ] != 0 ) {
+            path[ len ] = 0;
+            ndg1ClearProvId( prov, status );
+         }
+      }
+      len++;
+   }
+   result = ndg1StoreCharData( result, path, len, pdlen, status );
+
+/* Append the date to the end of the array, extending the array as needed. */
+   if( date ) len = astChrLen( date ) + 1;
+   result = ndg1StoreCharData( result, date, len, pdlen, status );
+
+/* Store the hidden flag. */
+   cval = prov->hidden ? 1 : 0;
+   result = ndg1StoreCharData( result, &cval, sizeof( char ), pdlen, status );
+
+/* Store the creator (the same code for both main and ancestor NDFs). */
+   if( prov->creator ) {
+      len = astChrLen( prov->creator );
+      if( len ) {
+          if( prov->creator[ len ] != 0 ) {
+            prov->creator[ len ] = 0;
+            ndg1ClearProvId( prov, status );
+         }
+      }
+      len++;
+   }
+   result = ndg1StoreCharData( result, prov->creator, len, pdlen, status );
+
+/* If we are writing the provenance for the main NDF, write out the history
+   record hash code. */
+   if( ismain ) {
+      result = ndg1StoreCharData( result, &(prov->hhash),
+                                  sizeof( prov->hhash ), pdlen, status );
+
+/* If we are not writing the provenance for the main NDF, write out any
+   history records.  */
+   } else {
+
+/* First write the number of history records. */
+      result = ndg1StoreCharData( result, &(prov->nhrec),
+                                  sizeof( prov->nhrec ), pdlen, status );
+
+/* Now write out each history record. */
+      hist_rec = prov->hist_recs;
+      for( irec = 0; irec < prov->nhrec; irec++,hist_rec++ ) {
+
+         len = hist_rec->date ? strlen( hist_rec->date ) + 1 : 0;
+         result = ndg1StoreCharData( result, hist_rec->date, len, pdlen,
+                                     status );
+
+         len = hist_rec->command ? strlen( hist_rec->command ) + 1 : 0;
+         result = ndg1StoreCharData( result, hist_rec->command, len, pdlen,
+                                     status );
+
+         len = hist_rec->user ? strlen( hist_rec->user ) + 1 : 0;
+         result = ndg1StoreCharData( result, hist_rec->user, len, pdlen,
+                                     status );
+
+         len = hist_rec->text ? strlen( hist_rec->text ) + 1 : 0;
+         result = ndg1StoreCharData( result, hist_rec->text, len, pdlen,
+                                     status );
+      }
+   }
+
+/* If the supplied Prov has a MORE structure, add it to the end of the
+   "mores" array, and store its index within the main returned array. */
+   if( more ) {
+      imore = (*nmore)++;
+      *mores = astGrow( *mores, *nmore, sizeof( **mores ) );
+      if( *status == SAI__OK ) {
+         (*mores)[ imore ] = more;
+      }
+
+   } else {
+      imore = -1;
+   }
+
+   result = ndg1StoreCharData( result, &imore, sizeof( imore ), pdlen,
+                               status );
+
+/* Store the number of parents. */
+   result = ndg1StoreCharData( result, &(prov->nparent),
+                               sizeof( prov->nparent ), pdlen, status );
+
+/* Append the array of parent indices to the returned array. */
+   if( prov->nparent ) {
+      parents = ndg1ParentIndicies( prov, provenance, NULL, &npar, status );
+      result = ndg1StoreCharData( result, parents, npar*sizeof( int ),
+                                  pdlen, status );
+      parents = astFree( parents );
+   }
+
+   return result;
+
 }
 
 static void ndg1FindAliens( Prov *prov, int *status ) {
@@ -5232,26 +5673,11 @@ static Prov *ndg1MakeProv( int index, const char *path, const char *date,
    calculated. */
       result->provid = 0;
 
-/* Store a deep copy of the "more" structure in a temporary HDS object.
-   This copies all the top-level contents of "more" into the top-level
-   of the temporary HDS object. */
+/* Copy any supplied "more" information into a newly created temporary
+   HDS object and store a locator for this object in the returned Prov
+   structure. */
       result->more = NULL;
-      if( more ) {
-         result->more = ndg1Temp( TEMP_TYPE, 0, NULL, status );
-         ndg1CopyComps( more, result->more, status );
-      }
-
-/* Copy extra top-level scalar items from the "more2" KeyMap. */
-      if( more2 && astMapSize( more2 ) > 0 ) {
-
-/* First ensure that there is a temporary HDS object. */
-         if( !result->more ) result->more = ndg1Temp( TEMP_TYPE, 0, NULL,
-                                                      status );
-
-/* Copy primtive values from the KeyMap to the temporary HDS object. */
-         ndg1A2h( more2, result->more, status );
-
-      }
+      ndg1StoreMore( result, more, more2, status );
 
 /* Store the hash code that identifies the most recent history record. */
       result->hhash = hhash;
@@ -5352,7 +5778,8 @@ static Provenance *ndg1MakeProvenance( Prov *main, int * status ){
    return result;
 }
 
-static void ndg1ParentChild( Prov *parent, Prov *child, int *status ){
+static void ndg1ParentChild( Prov *parent, Prov *child, int check,
+                             int *status ){
 /*
 *  Name:
 *     ndg1ParentChild
@@ -5361,7 +5788,8 @@ static void ndg1ParentChild( Prov *parent, Prov *child, int *status ){
 *     Create a parent-child link between two supplied Prov structures.
 
 *  Invocation:
-*     void ndg1ParentChild( Prov *parent, Prov *child, int *status )
+*     void ndg1ParentChild( Prov *parent, Prov *child, int check,
+*                           int *status )
 
 *  Description:
 *     This function joins the two supplied Prov structures together into
@@ -5375,6 +5803,12 @@ static void ndg1ParentChild( Prov *parent, Prov *child, int *status ){
 *        The parent Prov structure.
 *     child
 *        The child Prov structure.
+*     check
+*        If non-zero, only set up the parent-child link if it does not
+*        already exist. This check is based on the ProvId values in the
+*        Prov structures, and so is unreliable if the full family tree
+*        has not yet been established (as is the case when reading in a
+*        provenance extension for instance).
 *     status
 *        Pointer to the inherited status variable.
 
@@ -5389,10 +5823,12 @@ static void ndg1ParentChild( Prov *parent, Prov *child, int *status ){
 
 /* Check that the parent is not already a parent of the child. */
    found = 0;
-   for( i = 0; i < child->nparent; i++ ) {
-      if( ndg1TheSame( child->parents[ i ], parent, status ) ) {
-         found = 1;
-         break;
+   if( check ) {
+      for( i = 0; i < child->nparent; i++ ) {
+         if( ndg1TheSame( child->parents[ i ], parent, status ) ) {
+            found = 1;
+            break;
+         }
       }
    }
 
@@ -5421,7 +5857,7 @@ static void ndg1ParentChild( Prov *parent, Prov *child, int *status ){
 }
 
 static void ndg1ParentChildIndex( Provenance *provenance, int iparent,
-                                  int ichild, int *status ){
+                                  int ichild, int check, int *status ){
 /*
 *  Name:
 *     ndg1ParentChildIndex
@@ -5432,7 +5868,7 @@ static void ndg1ParentChildIndex( Provenance *provenance, int iparent,
 
 *  Invocation:
 *     void ndg1ParentChildIndex( Provenance *provenance, int iparent,
-*                                int ichild, int *status )
+*                                int ichild, int check, int *status )
 
 *  Description:
 *     This function looks up the Prov structures with the specified
@@ -5452,6 +5888,12 @@ static void ndg1ParentChildIndex( Provenance *provenance, int iparent,
 *     ichild
 *        The index within the "provenance->provs" array of the child
 *        Prov structure.
+*     check
+*        If non-zero, only set up the parent-child link if it does not
+*        already exist. This check is based on the ProvId values in the
+*        Prov structures, and so is unreliable if the full family tree
+*        has not yet been established (as is the case when reading in a
+*        provenance extension for instance).
 *     status
 *        Pointer to the inherited status variable.
 
@@ -5469,7 +5911,7 @@ static void ndg1ParentChildIndex( Provenance *provenance, int iparent,
    child = provenance->provs[ ichild ];
 
 /* set up the connection. */
-   ndg1ParentChild( parent, child, status );
+   ndg1ParentChild( parent, child, check, status );
 }
 
 static int *ndg1ParentIndicies( Prov *prov, Provenance *provenance,
@@ -5573,24 +6015,12 @@ static int ndg1ProvCmp( const void *a, const void *b ){
 */
     int result;
     int status = SAI__OK;
-    long int ida, idb;
 
     Prov *pa = *((Prov **) a );
     Prov *pb = *((Prov **) b );
 
     if( pa && pb ) {
-
-/* Need to guard against integer overflow. */
-       ida = (long int) ndg1GetProvId( pa, &status );
-       idb = (long int) ndg1GetProvId( pb, &status );
-
-       if( idb > ida ) {
-          result = 1;
-       } else if( idb < ida ) {
-          result = -1;
-       } else {
-          result = 0;
-       }
+       result = ndg1GetProvId( pb, &status ) - ndg1GetProvId( pa, &status );
 
     } else if( pa ) {
        result = -1;
@@ -5718,7 +6148,7 @@ static void ndg1PurgeProvenance( Provenance *provenance,
                         for( ichild = prov2->nchild - 1; ichild >= 0; ichild-- ) {
                            child = prov2->children[ ichild ];
                            ndg1Disown( prov2, child, status );
-                           ndg1ParentChild( prov1, child, status );
+                           ndg1ParentChild( prov1, child, 1, status );
                         }
 
 /* The childless provenance structure is now of no use. If it is itself
@@ -5965,33 +6395,37 @@ static void ndg1ReadHistRec( Prov *prov, int indf, int irec, int *hash,
 #undef TEXT_LEN
 }
 
-static Provenance *ndg1ReadProvenanceExtension( HDSLoc *xloc, const char *npath,
-                                                HDSLoc *more, AstKeyMap *more2,
-                                                const char *creator,
-                                                int isroot, int *status ){
+static Provenance *ndg1ReadOldProvenanceExtension( HDSLoc *xloc, const char *npath,
+                                                   HDSLoc *more, AstKeyMap *more2,
+                                                   const char *creator,
+                                                   int isroot, int *status ){
 /*
 *  Name:
-*     ndg1ReadProvenanceExtension
+*     ndg1ReadOldProvenanceExtension
 
 *  Purpose:
-*     Create a new Provenance structure from an HDS PROVENANCE extension.
+*     Create a new Provenance structure from a non-encoded HDS PROVENANCE
+*     extension.
 
 *  Invocation:
-*     Provenance *ndg1ReadProvenanceExtension( HDSLoc *xloc,  const char *npath,
-*                                              HDSLoc *more, AstKeyMap *more2,
-*                                              const char *creator,
-*                                              int isroot, int *status )
+*     Provenance *ndg1ReadOldProvenanceExtension( HDSLoc *xloc,  const char *npath,
+*                                                 HDSLoc *more, AstKeyMap *more2,
+*                                                 const char *creator,
+*                                                 int isroot, int *status )
 
 *  Description:
-*     This function allocates dynamic memory to hold a new Provenance
-*     structure, and copies provenance information from the supplied HDS
-*     structure into the new Provenance structure.
+*     This function is just like ndg1ReadProvenanceExtension except that
+*     it expects the supplied provenance extension to conform to the
+*     structure used by NDG prior to version 6.0. Prior to version 6.0
+*     each item of information within a Prov structure was held in a separate
+*     HDS component. This caused speed and size problems when reading
+*     or writing provenance extensions that describe several thousand
+*     ancestors, and so version 6.0 of NDG changed to using a single HDS
+*     _INTEGER array to hold all the provenance information in a binary
+*     encoded form.
 *
-*     If a NULL pointer is supplied for "xloc", then the returned
-*     Provenance structure contains only a single Prov structure, for the
-*     supplied NDF itself. The only items stored in this Prov structure is
-*     the NDF path, plus any "more" and "creator" values supplied as
-*     arguments to this function.
+*     This function is retained so that NDFs containing pre version 6.0
+*     Provenance extensions can still be read.
 
 *  Arguments:
 *     xloc
@@ -6169,7 +6603,7 @@ static Provenance *ndg1ReadProvenanceExtension( HDSLoc *xloc, const char *npath,
    stored at "prov1[1]". So this means we can use the PARENT values
    directly without needing to change from one-based to zero-based. */
          for( i = 0; i < npar; i++ ) {
-            ndg1ParentChildIndex( result, parents[ i ], 0, status );
+            ndg1ParentChildIndex( result, parents[ i ], 0, 1, status );
          }
 
 /* Free the main NDF parents list. */
@@ -6192,7 +6626,7 @@ static Provenance *ndg1ReadProvenanceExtension( HDSLoc *xloc, const char *npath,
 /* For each, establish a parent-child link between the ancestor NDF Prov
    structure and the parent Prov structure. */
             for( j = 0; j < npar; j++ ) {
-               ndg1ParentChildIndex( result, parents[ j ], i, status );
+               ndg1ParentChildIndex( result, parents[ j ], i, 1, status );
             }
 
 /* Free the main NDF parents list. */
@@ -6208,6 +6642,238 @@ static Provenance *ndg1ReadProvenanceExtension( HDSLoc *xloc, const char *npath,
 
 /* Free resources */
    if( aloc ) datAnnul( &aloc, status );
+
+/* If an error occurred, free the result. */
+   if( !astOK ) result = ndg1FreeProvenance( result, 1, status );
+
+/* Return the result */
+   return result;
+}
+
+static Provenance *ndg1ReadProvenanceExtension( HDSLoc *xloc, const char *npath,
+                                                HDSLoc *more, AstKeyMap *more2,
+                                                const char *creator,
+                                                int isroot, int *status ){
+/*
+*  Name:
+*     ndg1ReadProvenanceExtension
+
+*  Purpose:
+*     Create a new Provenance structure from an HDS PROVENANCE extension.
+
+*  Invocation:
+*     Provenance *ndg1ReadProvenanceExtension( HDSLoc *xloc,  const char *npath,
+*                                              HDSLoc *more, AstKeyMap *more2,
+*                                              const char *creator,
+*                                              int isroot, int *status )
+
+*  Description:
+*     This function allocates dynamic memory to hold a new Provenance
+*     structure, and copies provenance information from the supplied HDS
+*     structure into the new Provenance structure.
+*
+*     If a NULL pointer is supplied for "xloc", then the returned
+*     Provenance structure contains only a single Prov structure, for the
+*     supplied NDF itself. The only items stored in this Prov structure is
+*     the NDF path, plus any "more" and "creator" values supplied as
+*     arguments to this function.
+
+*  Arguments:
+*     xloc
+*        An HDS structure holding provenance information. Can be NULL.
+*     npath
+*        The path of the NDF from which the provenance was read. Can be
+*        NULL.
+*     more
+*        An optional HDS structure holding additional information. This is
+*        stored in the main Prov structure in the returned Provenance.
+*     more2
+*        An optional KeyMap holding additional primitive (scalar or vector)
+*        information. This is added into the HDS structure specified by
+*        "more", over-writing any components with the same names.
+*     creator
+*        An optional text string to be stored as the "creator" string in
+*        the returned Prov structure. This is only used if the supplied
+*        provenance has no creator string.
+*     isroot
+*        If non-zero, then the NDF is treated like a root NDF (that is,
+*        information about any parents in the provenance information for
+*        the NDF is ignored, and it is assumed the NDF has no parents).
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     Pointer to the new Provenance structure. It should be freed using
+*     ndg1FreeProvenance when no longer needed.
+
+*/
+
+/* Local Variables: */
+   HDSLoc *dloc = NULL;
+   HDSLoc *mloc = NULL;
+   Prov *main_prov = NULL;
+   Provenance *result = NULL;
+   char type[DAT__SZTYP + 1];
+   hdsdim dims[ 10 ];
+   int actdim;
+   int iprov;
+   int nprov;
+   int there;
+   int version;
+   size_t nmore = 0;
+   char *pdata = NULL;
+   char *pdend = NULL;
+
+/* Check the inherited status value. */
+   if( *status != SAI__OK ) return result;
+
+/* First handle cases where a provenance extension is available and is to
+   be used. */
+   if( xloc && !isroot ) {
+
+/* If the provenance extension contains a component called ANCESTORS,
+   then it uses the old non-encoded format. [This old format was replaced
+   by a format that encodes all the provenance info into a single integer
+   array. This avoid the large speed and size overheads associated with
+   complex HDS structures.] If the extension uses the old format, call a
+   function to read it. */
+      datThere( xloc, ANCESTORS_NAME, &there, status );
+      if( there ) {
+         result = ndg1ReadOldProvenanceExtension( xloc, npath, more, more2,
+                                                  creator, isroot, status );
+
+/* Otherwise, we use the new encoded format. */
+      } else {
+
+/* Get a locator to the DATA component within the supplied provenance
+   extension. This is a 1-D integer array containing the binary encoded
+   provenance information. Check it is a 1D _INTEGER array. If so, map it. */
+         datThere( xloc, DATA_NAME, &there, status );
+         if( there ) {
+            datFind( xloc, DATA_NAME, &dloc, status );
+            datType( dloc, type, status );
+            datShape( dloc, 10, dims, &actdim, status );
+            if( !strcmp( type, "_INTEGER" ) && actdim == 1 ) {
+               datMap( dloc, "_INTEGER", "READ", 1, dims, (void **) &pdata,
+                       status );
+               pdend = pdata + dims[ 0 ]*sizeof( int );
+            }
+         }
+
+/* The first int is the version number. */
+         if( pdata ) {
+            version = ( (int *) pdata )[ 0 ];
+            pdata += sizeof( int );
+            if( version < 1 || version > 1000000 ) pdata = NULL;
+         }
+
+/* The second int is the number of Prov structures. */
+         if( pdata ) {
+            nprov = ( (int *) pdata )[ 0 ];
+            pdata += sizeof( int );
+            if( nprov < 1 || nprov > 1000000 ) pdata = NULL;
+         }
+
+/* If OK, create a Provenance structure, and fill it with "nprov" new,
+   zero-filled, Prov structures. */
+         if( pdata ) {
+            result = astMalloc( sizeof( Provenance ) );
+            if( *status == SAI__OK ) {
+               result->nprov = nprov;
+               result->main = NULL;
+               result->provs = astMalloc( nprov*sizeof( Prov * ) );
+               if( *status == SAI__OK ) {
+                  for( iprov = 0; iprov < nprov; iprov++ ) {
+                     (result->provs)[ iprov ] = astCalloc( 1, sizeof( Prov ), 1 );
+                  }
+                  result->main = (result->provs)[ 0 ];
+               }
+            }
+
+/* If there is a MORE component, get a locator to it, and get its length. */
+            datThere( xloc, MORE_NAME, &there, status );
+            if( there ) {
+               datFind( xloc, MORE_NAME, &mloc, status );
+               datSize( mloc, &nmore, status );
+            }
+
+/* Decode and copy each Prov structure from the integer array into the
+   empty Prov structures created above. */
+            for( iprov = 0; iprov < nprov; iprov++ ) {
+               pdata = ndg1DecodeProvData( pdata, iprov, version, mloc, nmore,
+                                           result, status );
+            }
+
+/* Force the Prov structure for the main NDF to use the supplied values
+   for path and more. */
+            if( result && result->main ) {
+               if( npath ) {
+                  result->main->path = astStore( result->main->path, npath,
+                                                 strlen( npath ) + 1 );
+               } else {
+                  result->main->path = astFree( result->main->path );
+               }
+               ndg1StoreMore( result->main, more, more2, status );
+            }
+
+/* If the data was decoded succesfully, check that the next integer has
+   the value given by END_FLAG. */
+            if( pdata ) {
+               int end_value = ( (int *) pdata )[ 0 ];
+               pdata += sizeof( int );
+               if( end_value != END_FLAG ) pdata = NULL;
+            }
+
+/* Check that we have not read beyond the end of the data array. */
+            if( pdata ) {
+               if( pdata > pdend ) {
+                  pdata = NULL;
+
+/* If not, check that any remaining bytes in the data array are equal to
+   PAD_FLAG. */
+               } else {
+                  while( pdata < pdend ) {
+                     if( *pdata++ != PAD_FLAG ) {
+                        pdata = NULL;
+                        break;
+                     }
+                  }
+               }
+            }
+
+/* If the data could not be decoded, free the returned Provenance
+   structure. */
+            if( !pdata ) result = ndg1FreeProvenance( result, 1, status );
+         }
+
+/* Issue a warning if the provenance information could not be decoded. */
+         if( !pdata ) {
+            msgBlank( status );
+            if( npath ) {
+               msgSetc( "N", npath );
+               msgOut( "", "!! Could not read full provenance information "
+                       "from ^N - continuing anyway...", status );
+            } else {
+               msgOut( "", "!! Could not read full input provenance "
+                       "information - continuing anyway...", status );
+            }
+         }
+
+/* Free resources. */
+         if( dloc ) datAnnul( &dloc, status );
+         if( mloc ) datAnnul( &mloc, status );
+      }
+   }
+
+/* If no Provenance structure was created above (either because no
+   provenance extension is available (or is not to be used), or an error
+   occurred whilst reading the provenance extension), create one now
+   describing just the supplied NDF. */
+   if( !result && *status == SAI__OK ) {
+      main_prov = ndg1MakeProv( 0, npath, NULL, creator, 0, more, more2,
+                                NULL, 0, status );
+      result = ndg1MakeProvenance( main_prov, status );
+   }
 
 /* If an error occurred, free the result. */
    if( !astOK ) result = ndg1FreeProvenance( result, 1, status );
@@ -6506,7 +7172,7 @@ static void ndg1Rmprv( Provenance *prov, int ianc, int *status ){
 
 /* Create a parent-child link between the parent and the child, thus
    skipping the ancestor that is to be removed. */
-            ndg1ParentChild( parent, child, status );
+            ndg1ParentChild( parent, child, 1, status );
          }
       }
 
@@ -6652,6 +7318,158 @@ static AstKeyMap *ndg1ShowProv( Prov *prov, int depth, AstKeyMap *km,
 
 /* Return a pointer to the KeyMap. */
    return result;
+}
+
+static char *ndg1StoreCharData( char *mem, const void *data, size_t len,
+                                size_t *memsize, int *status ){
+/*
+*  Name:
+*     ndg1StoreCharData
+
+*  Purpose:
+*     Append supplied bytes to the end of a supplied array, extending the
+*     array as required.
+
+*  Invocation:
+*     char *ndg1StoreCharData( char *mem, const void *data, size_t len,
+*                              size_t *memsize, int *status )
+
+*  Description:
+*     This function extends a supplied memory area and then appends the
+*     supplied bytes to the end of the area.
+
+*  Arguments:
+*     mem
+*        Pointer to a pre-allocated memory area to which the supplied
+*        bytes should be appended.
+*     data
+*        Pointer to the bytes to be appended to "mem".
+*     len
+*        The number of bytes to be appended to the end of "mem".
+*     memsize
+*        Pointer to a location holding the number of bytes in the "mem"
+*        area. The supplied value is increment by "len" on exit.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Notes:
+*     - If "data" is NULL or "len" is zero, a zero length string (i.e. a
+*     single null character) is appended to the end of "mem"
+
+*  Returned Value:
+*     Pointer to the extended memory area containing the original
+*     contents of "mem" plus the new data. Returned equal to "mem" if an
+*     error occurs.
+
+*/
+
+/* Local Variables: */
+   char *result;
+   size_t newlen;
+   const char *adata;
+   size_t alen;
+   char cval;
+
+/* Initialise the returned memory pointer. */
+   result = mem;
+
+/* Check the inherited status. */
+   if( *status != SAI__OK ) return result;
+
+/* If some data has been supplied, use it. */
+   if( data && len ) {
+      adata = data;
+      alen = len;
+
+/* If no data has been supplied, store a zero-length string (i.e. a
+   single null character). */
+   } else {
+      cval = 0;
+      adata = &cval;
+      alen = sizeof( char );
+   }
+
+/* Get the new size of the memory area. */
+   newlen = *memsize + alen;
+
+/* Extend the memory area to become the required new size. */
+   result = astGrow( result, newlen, sizeof( char ) );
+
+/* If the memory was allocated succesfully, copy the new data to teh end
+   of it, and update the size of the memory area. */
+   if( *status == SAI__OK ) {
+      memcpy( result + *memsize, adata, alen );
+      *memsize = newlen;
+   }
+
+/* Return a pointer to the extended memory area. */
+   return result;
+}
+
+static void ndg1StoreMore( Prov *prov, HDSLoc *more, AstKeyMap *more2,
+                           int *status ){
+/*
+*  Name:
+*     ndg1StoreMore
+
+*  Purpose:
+*     Store supplemental information about an ancestor NDF.
+
+*  Invocation:
+*     void ndg1StoreMore( Prov *prov, HDSLoc *more, AstKeyMap *more2,
+*                         int *status )
+
+*  Description:
+*     This function removes any supplemental information already stored
+*     with the supplied Prov structure. It then creates a temporary HDS
+*     object containing a copy of the supplied "more" structure and
+*     stores a locator for this temporary object in the Prov structure.
+*     It then copies any information contained in the supplied KeyMap
+*     into the temporary HDS object, potentially over-writing items
+*     copied in from "more.
+
+*  Arguments:
+*     prov
+*        Pointer to a Prov structure describing the ancestor NDF that is
+*        to be changed.
+*     more
+*        Pointer to a locator for an HDS object holding extra information
+*        about the NDF. A deep copy is taken of the supplied structure.
+*     more2
+*        A pointer to an AstKeyMap holding extra items of information
+*        to be added into the MORE component. Only entries holding primitive
+*        data values (scalar or vector) are used - entries holding nested
+*        KeyMaps, etc, are ignored. If an entry in this KeyMap has the same
+*        name as a component in the supplied "more" HDS structure, then the
+*        KeyMap value is used in preference to the HDS value.
+*     status
+*        Pointer to the inherited status variable.
+
+*/
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* Annul any existing more locator in the Prov structure. */
+   if( prov->more ) datAnnul( &(prov->more), status );
+
+/* Store a deep copy of any supplied "more" structure in a temporary HDS
+   object. This copies all the top-level contents of "more" into the top-level
+   of the temporary HDS object. */
+   if( more ) {
+      prov->more = ndg1Temp( TEMP_TYPE, 0, NULL, status );
+      ndg1CopyComps( more, prov->more, status );
+   }
+
+/* Copy extra top-level scalar items from the "more2" KeyMap. */
+   if( more2 && astMapSize( more2 ) > 0 ) {
+
+/* First ensure that there is a temporary HDS object. */
+      if( !prov->more ) prov->more = ndg1Temp( TEMP_TYPE, 0, NULL, status );
+
+/* Copy primtive values from the KeyMap to the temporary HDS object. */
+      ndg1A2h( more2, prov->more, status );
+   }
 }
 
 static HDSLoc *ndg1TCopy( HDSLoc *loc, int *status ){
@@ -6869,169 +7687,94 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance,
 
 */
 
+
 /* Local Variables: */
-   HDSLoc *aloc = NULL;
+   HDSLoc **mores = NULL;
    HDSLoc *cloc = NULL;
-   HDSLoc *hcloc = NULL;
-   HDSLoc *hloc = NULL;
-   HDSLoc *loc = NULL;
-   HDSLoc *more = NULL;
-   HistRec *hist_rec = NULL;
+   HDSLoc *dloc = NULL;
+   HDSLoc *mloc = NULL;
    Prov *prov = NULL;
-   char *path = NULL;
-   const char *date = NULL;
-   hdsdim  dim[ 1 ];
-   int *parents = NULL;
+   hdsdim dim;
+   hdsdim imore;
+   hdsdim nmore = 0;
+   int *ipdata = NULL;
    int i;
-   int irec;
-   int len;
-   time_t t;
+   int ival;
+   size_t pdlen = 0;
+   char *pdata = NULL;
 
 /* Check the inherited status value. */
    if( *status != SAI__OK ) return;
 
-/* Create an ANCESTORS array of the correct length (exclude the main NDF
-   Prov structure), and get a locator for it. */
-   if( provenance->nprov > 1 ) {
-      dim[ 0 ] = provenance->nprov - 1;
-      datNew( xloc, ANCESTORS_NAME, ANCESTORS_TYPE,  1, dim, status );
-      datFind( xloc, ANCESTORS_NAME, &aloc, status );
-   }
+/* The first int in the buffer is a version number that identifies the
+   way in which the provenance information is encoded. */
+   ival = PDATA_VERSION;
+   pdata = ndg1StoreCharData( pdata, &ival, sizeof( ival ), &pdlen, status );
+
+/* The second int in the buffer is the number of Prov structures (I.e.
+   the number of ancestors plus the main NDF). */
+   ival = provenance->nprov;
+   pdata = ndg1StoreCharData( pdata, &ival, sizeof( ival ), &pdlen, status );
+
+/* Add a description of the main NDF to the above buffer. */
+   pdata = ndg1EncodeProvData( pdata, 1, provenance->main, provenance, &pdlen,
+                               &mores, &nmore, status );
 
 /* Loop round all the Prov structures. */
    for( i = 0; i < provenance->nprov; i++ ) {
       prov = provenance->provs[ i ];
 
-/* Get a locator to the place where this Prov structure should be
-   written. The Prov structure for the main NDF is written to the
-   PROVENANCE extension itself. Other Prov structures are written
-   to an element of the ANCESTORS array. */
-      if( prov == provenance->main ) {
-         datClone( xloc, &cloc, status );
-      } else {
-         dim[ 0 ] = i;
-         datCell( aloc, 1, dim, &cloc, status );
-      }
-
-/* If this is not the main NDF provenance, use components from the Prov
-   structure. */
+/* Skip the main NDF (which has already been added to the buffer. */
       if( prov != provenance->main ) {
-         path = prov->path;
-         date = prov->date;
-         more = prov->more;
 
-/* If it is the main NDF provenance, do not write out the PATH (since the
-   NDF may subsequently be moved), and force the DATE to the current
-   date. Also no "more" information is stored for the main NDF since the
-   information that may be stored in "more" will usually be available at
-   other places in the NDF. It is the responsibilty of each application
-   to extract the information it thinks is relevant from each input NDF
-   and store it in the "more" structure with the input NDF's provenance
-   information. */
-      } else {
-         path = NULL;
-         time( &t );
-         date = ndg1Date( status );
-         more = NULL;
+/* Add the Prov structure to the buffer. */
+         pdata = ndg1EncodeProvData( pdata, 0, prov, provenance, &pdlen,
+                                     &mores, &nmore, status );
       }
-
-/* Store the path. */
-      if( path ) {
-         len = astChrLen( path );
-         if( len ) {
-            if( path[ len ] != 0 ) {
-               path[ len ] = 0;
-               ndg1ClearProvId( prov, status );
-            }
-            ndg1PutTextComp( cloc, PATH_NAME, path, status );
-         }
-      }
-
-/* Store the date. */
-      if( date ) {
-         len = astChrLen( date );
-         if( len ) ndg1PutTextComp( cloc, DATE_NAME, date, status );
-      }
-
-/* Store the hidden flag (but only if the ancestor is hidden). */
-      if( prov->hidden ) {
-         datNew0L( cloc, HIDDEN_NAME, status );
-         datFind( cloc, HIDDEN_NAME, &loc, status );
-         datPut0L( loc, 1, status );
-         datAnnul( &loc, status );
-      }
-
-/* Store the creator (the same code for both main and ancestor NDFs). */
-      if( prov->creator ) {
-         len = astChrLen( prov->creator );
-         if( len ) {
-            if( prov->creator[ len ] != 0 ) {
-               prov->creator[ len ] = 0;
-               ndg1ClearProvId( prov, status );
-            }
-            ndg1PutTextComp( cloc, CREATOR_NAME, prov->creator, status );
-         }
-      }
-
-/* If we are writing the provenance for the main NDF, write out the history
-   record hash code. */
-      if( prov == provenance->main ) {
-         if( prov->hhash != 0 ) {
-            datNew0I( cloc, HASH_NAME, status );
-            datFind( cloc, HASH_NAME, &loc, status );
-            datPut0I( loc, prov->hhash, status );
-            datAnnul( &loc, status );
-         }
-
-/* If we are not writing the provenance for the main NDF, write out any
-   history records.  */
-      } else if( prov->nhrec > 0 ){
-         dim[ 0 ] = prov->nhrec;
-         datNew( cloc, HIST_NAME, HIST_TYPE, 1, dim, status );
-         datFind( cloc, HIST_NAME, &hloc, status );
-
-         hist_rec = prov->hist_recs;
-         for( irec = 0; irec < prov->nhrec; irec++,hist_rec++ ) {
-            dim[ 0 ] = irec + 1;
-            datCell( hloc, 1, dim, &hcloc, status );
-            ndg1PutTextComp( hcloc, DATE_NAME, hist_rec->date, status );
-            ndg1PutTextComp( hcloc, COMMAND_NAME, hist_rec->command, status );
-            ndg1PutTextComp( hcloc, USER_NAME, hist_rec->user, status );
-            ndg1PutTextComp( hcloc, TEXT_NAME, hist_rec->text, status );
-            datAnnul( &hcloc, status );
-         }
-
-         datAnnul( &hloc, status );
-      }
-
-/* Store a deep copy of "more". Note, the "more" variable is a locator
-   for a temporary structure that contains the required components for the
-   MORE structure. */
-      if( more ) datCopy( more, cloc, MORE_NAME, status );
-
-/* Create a PARENTS array of the correct length, and map it. */
-      if( prov->nparent > 0 ) {
-         datNew1I( cloc, PARENTS_NAME, prov->nparent, status );
-         datFind( cloc, PARENTS_NAME, &loc, status );
-         dim[ 0 ] = prov->nparent;
-         datMapI( loc, "WRITE", 1, dim, &parents, status );
-
-/* Put the indices of the direct parents of the ancestor into the mapped
-   array. */
-         (void) ndg1ParentIndicies( prov, provenance, parents, NULL,
-                                    status );
-
-/* Free the parents array. */
-         datUnmap( loc, status );
-         datAnnul( &loc, status );
-      }
-
-/* Free the locator to the Prov structure. */
-      datAnnul( &cloc, status );
    }
 
-/* Free resources */
-   if( aloc ) datAnnul( &aloc, status );
+/* Add an end flag to the buffer. */
+   ival = END_FLAG;
+   pdata = ndg1StoreCharData( pdata, &ival, sizeof( ival ), &pdlen, status );
+
+/* Get the number of integers needed to store the data (round up to
+   ensure nothing is lost). */
+   dim = pdlen/sizeof( int );
+   if( dim*sizeof(int ) < pdlen ) dim++;
+
+/* Store a copy of the buffer in a new HDS component within the supplied
+   structure. Fill any extra space following the buffer with pad values. */
+   datNew( xloc, DATA_NAME, "_INTEGER", 1, &dim, status );
+   datFind( xloc, DATA_NAME, &dloc, status );
+   datMapI( dloc, "WRITE", 1, &dim, &ipdata, status );
+   if( *status == SAI__OK ) {
+      memcpy( ipdata, pdata, pdlen );
+      size_t npad = dim*sizeof(int) - pdlen;
+      if( npad > 0 ) memset( (char *) ipdata + pdlen, PAD_FLAG, npad );
+   }
+   datAnnul( &dloc, status );
+
+/* Now create a component to hold any MORE structures found in the
+   provenance information. */
+   if( nmore ) {
+      datNew( xloc, MORE_NAME, MORE_TYPE, 1, &nmore, status );
+      datFind( xloc, MORE_NAME, &mloc, status );
+
+/* Loop round each MORE structure found within the supplied Provenance. */
+      for( imore = 1; imore <= nmore; imore++ ) {
+         datCell( mloc, 1, &imore, &cloc, status );
+
+/* Copy all the components from the input MORE structure to the output
+   HDS object. */
+         ndg1CopyComps( mores[ imore - 1 ], cloc, status );
+
+         datAnnul( &cloc, status );
+      }
+
+      datAnnul( &mloc, status );
+   }
+
+   pdata = astFree( pdata );
 }
 
 static void ndg1WriteProvenanceNDF( Provenance *provenance, int indf,

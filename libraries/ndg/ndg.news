@@ -1,5 +1,14 @@
 1 NDG_library
 
+Version 6.0
+
+   o The HDS structure used to store provenance information in an NDF
+   extension has been changed. As a result, large provenance systems
+   now occupy much less disk space and are much faster to read and write.
+   Provenance extensions created by NDG version 6.0 and later will not be
+   readable by applications linked against earlier versions of NDG. Version
+   6 can read both formats (old and new) but will only write the new format.
+
 Version 5.9
 
    o  NDG now uses its own facility code in the Starlink error message
