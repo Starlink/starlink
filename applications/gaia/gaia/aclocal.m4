@@ -195,9 +195,9 @@ STAR_LARGEFILE_SUPPORT
 #  GAIA needs several Starlink libraries for linking. Use -latl instead
 #  of atl_link to avoid picking up two versions of cfitsio (skycat and
 #  starlink). 
-PKG_LIBS="${PKG_LIBS} ${STAR_LDFLAGS} -latl `ard_link -myerr -mygrf -grf3d` \
+PKG_LIBS="${PKG_LIBS} ${STAR_LDFLAGS} -latl `ard_link -myerr -grf_v5.6 -grf3d` \
 `fio_link` -L${STARLINK}/lib/startcl -ltclAdam `ams_link_adam` \
-`ndf_link -myerr -mygrf -grf3d` -lpda `ast_link -myerr -grf3d` `sla_link`"
+`ndf_link -myerr -grf_v5.6 -grf3d` -lpda `ast_link -myerr -grf3d` `sla_link`"
 
 #  On Alphas we get unwanted flags to control the address space. 
 #  Remove these when building shareable library.

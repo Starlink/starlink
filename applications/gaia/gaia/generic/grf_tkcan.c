@@ -33,7 +33,7 @@
  *  Copyright:
  *     Copyright (C) 1997-2004 Central Laboratory of the Research Councils
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
- *     Copyright (C) 2007-2009 Science and Technology Facilities Council.
+ *     Copyright (C) 2007-2011 Science and Technology Facilities Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -74,6 +74,8 @@
  *     28-JUL-2009 (PWD):
  *        Change the way that font scaling works. Broken by previous change.
  *        Remove the resizing concept, that is no longer applicable.
+ *     11-MAR-2011 (PWD):
+ *        Add astGBBuf and astGEBuf dummy routines for grf 5.6.
  *     {enter_changes_here}
  *-
  */
@@ -1627,3 +1629,18 @@ static int textAnchor ( const char *just, char *anchor ) {
 
     return 1;
 }
+
+
+/*  Graphics buffering is not supported. */
+int astGBBuf( void )
+{
+    astError( AST__GRFER, "astGBBuf: is not supported" );
+    return 0;
+}
+
+int astGEBuf( void )
+{
+    astError( AST__GRFER, "astGEBuf: is not supported" );
+    return 0;
+}
+
