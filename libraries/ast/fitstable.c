@@ -1865,8 +1865,8 @@ static void PutColumnData( AstFitsTable *this, const char *column,
 /*
 *++
 *  Name:
-c     astGetColumnData
-f     AST_GETCOLUMNDATA
+c     astPutColumnData
+f     AST_PUTCOLUMNDATA
 
 *  Purpose:
 *     Retrieve all the data values stored in a column.
