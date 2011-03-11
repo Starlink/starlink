@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_BADBX( NDF, OPER, INDF2, NGOOD, STATUS )
+*     CALL KPG1_BADBX( INDF1, OPER, INDF2, NGOOD, STATUS )
 
 *  Description:
 *     This routine finds the pixel bounding box that encloses all good
@@ -22,12 +22,27 @@
 
 *  Arguments:
 *     INDF1 = INTEGER (Given)
-*        The input NDF identifier.
+*        The input NDF identifier. Note, if OPER is 1 or 2 then any mapped
+*        access to the NDF will be unmapped on exit. In addition, if
+*        OPER is 2 then any mapped access to NDFs that are located within
+*        an extension of the supplied NDF will be unmapped on exit. Also,
+*        for OPER 1 and 2, "UPDATE" access is required to the NDF, and
+*        (for OPER 2) any extension NDFs.
 *     OPER = INTEGER (Given)
-*        If OPER is 1, the bounds of the supplied NDF will be modified to
-*        match the bounding box enclosing the good data. Otherwise, INDF2
-*        will be returned holding an NDF identifier for a section of the
-*        supplied NDF matching the bounding box.
+*        Indicates how the box should be used.
+*
+*        1 - the bounds of the supplied NDF will be modified to match the
+*        bounding box enclosing the good data.
+*
+*        2 - the bounds of the supplied NDF will be modified to match the
+*        bounding box enclosing the good data. In addition, any NDFs
+*        found within the MORE component of the supplied NDF, which
+*        have bounds equal to those of the supplied NDF, are changed to
+*        match the bounds of the bounding box.
+*
+*        If any other value is supplied for OPER, INDF2 will be returned
+*        holding an NDF identifier for a section of the supplied NDF
+*        matching the bounding box.
 *     INDF2 = INTEGER (Returned)
 *        An identifier for the smallest NDF section that contains all
 *        good DATA values in the the input NDF. Returned equal to
@@ -81,6 +96,7 @@
       INCLUDE 'SAE_PAR'          ! SAI__ constants
       INCLUDE 'CNF_PAR'          ! CNF_ functions
       INCLUDE 'NDF_PAR'          ! NDF__ constants
+      INCLUDE 'GRP_PAR'          ! GRP__ constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
 
 *  Arguments Given:
@@ -96,13 +112,26 @@
 
 *  Local Variables:
       CHARACTER TYPE*( NDF__SZTYP )! Numeric type for processing
-      INTEGER BLBND( NDF__MXDIM )! Lower bounds of bounding box
-      INTEGER BUBND( NDF__MXDIM )! Upper bounds of bounding box
       INTEGER EL                 ! Number of elements in the NDF
+      INTEGER I                  ! NDF index within group
+      INTEGER IGRP               ! Group holding extension NDFs
+      INTEGER INDFB              ! Identifier for base NDF
+      INTEGER INDFX              ! Identifier for extension NDF
       INTEGER IPDATA             ! Pointer to Data array
+      INTEGER J                  ! Pixel axis index
       INTEGER LBND( NDF__MXDIM ) ! Lower bounds of supplied NDF
-      INTEGER NDIM               ! Total number of dimensions in the NDF
+      INTEGER LBNDB( NDF__MXDIM )! Lower bounds of base NDF
+      INTEGER LBNDX( NDF__MXDIM )! Lower bounds of extension NDF
+      INTEGER NDIM               ! Total no. of dims in the NDF
+      INTEGER NDIMB              ! Total no. of dims in base NDF
+      INTEGER NDIMX              ! Total no. of dims in extension NDF
+      INTEGER OLBND( NDF__MXDIM )! Lower bounds of bounding box
+      INTEGER OUBND( NDF__MXDIM )! Upper bounds of bounding box
+      INTEGER SIZE               ! Number of extension NDFs
       INTEGER UBND( NDF__MXDIM ) ! Upper bounds of supplied NDF
+      INTEGER UBNDB( NDF__MXDIM )! Upper bounds of base NDF
+      INTEGER UBNDX( NDF__MXDIM )! Upper bounds of extension NDF
+      LOGICAL SAME               ! Base and extension NDFs match?
 *.
 
 *  Initialise returned values
@@ -124,37 +153,37 @@
 *  data array.
       IF ( TYPE .EQ. '_BYTE' ) THEN
          CALL KPG1_BBOXB( NDIM, LBND, UBND, %VAL( CNF_PVAL( IPDATA ) ),
-     :                    VAL__BADB, .FALSE., BLBND, BUBND, NGOOD,
+     :                    VAL__BADB, .FALSE., OLBND, OUBND, NGOOD,
      :                    STATUS )
 
       ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
          CALL KPG1_BBOXUB( NDIM, LBND, UBND, %VAL( CNF_PVAL( IPDATA ) ),
-     :                    VAL__BADUB, .FALSE., BLBND, BUBND, NGOOD,
+     :                    VAL__BADUB, .FALSE., OLBND, OUBND, NGOOD,
      :                    STATUS )
 
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
          CALL KPG1_BBOXD( NDIM, LBND, UBND, %VAL( CNF_PVAL( IPDATA ) ),
-     :                    VAL__BADD, .FALSE., BLBND, BUBND, NGOOD,
+     :                    VAL__BADD, .FALSE., OLBND, OUBND, NGOOD,
      :                    STATUS )
 
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
          CALL KPG1_BBOXI( NDIM, LBND, UBND, %VAL( CNF_PVAL( IPDATA ) ),
-     :                    VAL__BADI, .FALSE., BLBND, BUBND, NGOOD,
+     :                    VAL__BADI, .FALSE., OLBND, OUBND, NGOOD,
      :                    STATUS )
 
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN
          CALL KPG1_BBOXR( NDIM, LBND, UBND, %VAL( CNF_PVAL( IPDATA ) ),
-     :                    VAL__BADR, .FALSE., BLBND, BUBND, NGOOD,
+     :                    VAL__BADR, .FALSE., OLBND, OUBND, NGOOD,
      :                    STATUS )
 
       ELSE IF ( TYPE .EQ. '_WORD' ) THEN
          CALL KPG1_BBOXW( NDIM, LBND, UBND, %VAL( CNF_PVAL( IPDATA ) ),
-     :                    VAL__BADW, .FALSE., BLBND, BUBND, NGOOD,
+     :                    VAL__BADW, .FALSE., OLBND, OUBND, NGOOD,
      :                    STATUS )
 
       ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
          CALL KPG1_BBOXUW( NDIM, LBND, UBND, %VAL( CNF_PVAL( IPDATA ) ),
-     :                    VAL__BADUW, .FALSE., BLBND, BUBND, NGOOD,
+     :                    VAL__BADUW, .FALSE., OLBND, OUBND, NGOOD,
      :                    STATUS )
 
       END IF
@@ -167,12 +196,82 @@
      :                    STATUS )
          END IF
 
-*  Otherwise, either create aN NDF section matching the bounding box, or
-*  set the bounds of the supplied NDF
-      ELSE IF( OPER .EQ. 1 ) THEN
-         CALL NDF_SBND( NDIM, BLBND, BUBND, INDF1, STATUS )
+*  Otherwise, if required, set the bounds of the supplied NDF and
+*  optionally any extension NDFs.
+      ELSE IF( OPER .EQ. 1 .OR. OPER .EQ. 2 ) THEN
+
+*  Firest unmap the NDF.
+         CALL NDF_UNMAP( INDF1, '*', STATUS )
+
+*  If required, just set the bounds of the supplied NDFs.
+         IF( OPER .EQ. 1 ) THEN
+            CALL NDF_SBND( NDIM, OLBND, OUBND, INDF1, STATUS )
+
+*  If required, set the bounds of supplied NDF and any matching extension
+*  NDFs.
+         ELSE
+
+*  First note the original bounds of the base NDF associated with the
+*  supplied NDF identifer.
+            CALL NDF_BASE( INDF1, INDFB, STATUS )
+            CALL NDF_BOUND( INDFB, NDF__MXDIM, LBNDB, UBNDB, NDIMB,
+     :                      STATUS )
+
+*  Now set the new bounds in the supplied NDF.
+            CALL NDF_SBND( NDIM, OLBND, OUBND, INDF1, STATUS )
+
+*  Get a GRP group containing paths to any NDFs contained within extensions
+*  of the supplied NDF.
+            IGRP = GRP__NOID
+            CALL NDG_MOREG( INDF1, IGRP, SIZE, STATUS )
+
+*  Loop round each extension NDF.
+            DO I = 1, SIZE
+               CALL NDG_NDFAS( IGRP, I, 'UPDATE', INDFX, STATUS )
+
+*  Get its bounds.
+               CALL NDF_BOUND( INDFX, NDF__MXDIM, LBNDX, UBNDX, NDIMX,
+     :                         STATUS )
+
+*  See if this NDF has the same shape as the base NDF on the pixel axes
+*  that they share in common...
+               SAME = .TRUE.
+               DO J = 1, MIN( NDIMX, NDIMB )
+                  IF( UBNDX( J ) .NE. UBNDB( J ) .OR.
+     :                LBNDX( J ) .NE. LBNDB( J ) ) SAME = .FALSE.
+               END DO
+
+*  If so, ensure that OLBND/OUBND arrays inherit bounds from the input
+*  extension NDF if the extension NDF has more axes than the main NDF.
+               IF( SAME ) THEN
+                  IF( NDIMX .GT. NDIM ) THEN
+                     DO J = NDIM + 1, NDIMX
+                        OLBND( J ) = LBNDX( J )
+                        OUBND( J ) = UBNDX( J )
+                     END DO
+                  END IF
+
+*  Ensure the NDF is unmapped.
+                  CALL NDF_UNMAP( INDFX, '*', STATUS )
+
+*  Set the bounds of the extension NDF.
+                  CALL NDF_SBND( NDIMX, OLBND, OUBND, INDFX, STATUS )
+
+*  Anull the extension NDF identifier.
+                  CALL NDF_ANNUL( INDFX, STATUS )
+
+               END IF
+            END DO
+
+*  Free resources.
+            CALL GRP_DELET( IGRP, STATUS )
+            CALL NDF_ANNUL( INDFB, STATUS )
+
+         END IF
+
+*  Otherwise, create an NDF section matching the bounding box.
       ELSE
-         CALL NDF_SECT( INDF1, NDIM, BLBND, BUBND, INDF2, STATUS )
+         CALL NDF_SECT( INDF1, NDIM, OLBND, OUBND, INDF2, STATUS )
       END IF
 
       END

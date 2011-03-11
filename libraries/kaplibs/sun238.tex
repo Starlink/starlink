@@ -17259,21 +17259,36 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
       bounding box.
    }
    \sstinvocation{
-      CALL KPG1\_BADBX( NDF, OPER, INDF2, NGOOD, STATUS )
+      CALL KPG1\_BADBX( INDF1, OPER, INDF2, NGOOD, STATUS )
    }
    \sstarguments{
       \sstsubsection{
          INDF1 = INTEGER (Given)
       }{
-         The input NDF identifier.
+         The input NDF identifier. Note, if OPER is 1 or 2 then any mapped
+         access to the NDF will be unmapped on exit. In addition, if
+         OPER is 2 then any mapped access to NDFs that are located within
+         an extension of the supplied NDF will be unmapped on exit. Also,
+         for OPER 1 and 2, {\tt "}UPDATE{\tt "} access is required to the NDF, and
+         (for OPER 2) any extension NDFs.
       }
       \sstsubsection{
          OPER = INTEGER (Given)
       }{
-         If OPER is 1, the bounds of the supplied NDF will be modified to
-         match the bounding box enclosing the good data. Otherwise, INDF2
-         will be returned holding an NDF identifier for a section of the
-         supplied NDF matching the bounding box.
+         Indicates how the box should be used.
+
+         1 - the bounds of the supplied NDF will be modified to match the
+         bounding box enclosing the good data.
+
+         2 - the bounds of the supplied NDF will be modified to match the
+         bounding box enclosing the good data. In addition, any NDFs
+         found within the MORE component of the supplied NDF, which
+         have bounds equal to those of the supplied NDF, are changed to
+         match the bounds of the bounding box.
+
+         If any other value is supplied for OPER, INDF2 will be returned
+         holding an NDF identifier for a section of the supplied NDF
+         matching the bounding box.
       }
       \sstsubsection{
          INDF2 = INTEGER (Returned)
