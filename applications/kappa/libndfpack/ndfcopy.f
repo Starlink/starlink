@@ -362,7 +362,7 @@
 *  If so, obtain the required section of the input NDF. This is the
 *  smallest section that encloses all good data values.
       IF( TRMBAD ) THEN
-         CALL KPG1_BADBX( NDF1, NDFT, NGOOD, STATUS )
+         CALL KPG1_BADBX( NDF1, 0, NDFT, NGOOD, STATUS )
 
 *  Use this section in place of the supplied NDF.
          IF( STATUS .EQ. SAI__OK ) NDF1 = NDFT

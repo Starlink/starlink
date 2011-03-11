@@ -9,13 +9,14 @@ applications (see SUN/238).
 Version 3.2
    - New KPG_TYPSZ routine (adapted from CONVERT equivalent) that
      returns the number of bytes for a given numeric HDS data type.
-
+   - Routine KPG1_BADBX now has an extra argument that indicates how the
+     calculated bounding box should be used.
 
 Version 3.1
    - New C function kpg1Config gets a KeyMap containing configuration
      parameters from the user, with name checking and default values
      supplied.
-   - The new routine KPG1_DSSFM displays information about the storage 
+   - The new routine KPG1_DSSFM displays information about the storage
      form of an NDF array.
    - There is a new generic routine KPG_FISEx that fills a section
      of a multi-dimensional array.

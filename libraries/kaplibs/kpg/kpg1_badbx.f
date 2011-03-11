@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_BADBX( INDF1, INDF2, NGOOD, STATUS )
+      SUBROUTINE KPG1_BADBX( INDF1, OPER, INDF2, NGOOD, STATUS )
 *+
 *  Name:
 *     KPG1_BADBX
@@ -11,26 +11,35 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_BADBX( NDF, MXDIM, NGOOD, STATUS )
+*     CALL KPG1_BADBX( NDF, OPER, INDF2, NGOOD, STATUS )
 
 *  Description:
 *     This routine finds the pixel bounding box that encloses all good
-*     data values in the DATA array of supplied NDF. It then creates and
-*     returns an NDF section corresponding to this bounding box.
+*     data values in the DATA array of supplied NDF. It then either
+*     creates and returns an NDF section corresponding to this bounding
+*     box, or sets the pixel bounds of the supplied NDF to match the
+*     bounding box.
 
 *  Arguments:
 *     INDF1 = INTEGER (Given)
 *        The input NDF identifier.
+*     OPER = INTEGER (Given)
+*        If OPER is 1, the bounds of the supplied NDF will be modified to
+*        match the bounding box enclosing the good data. Otherwise, INDF2
+*        will be returned holding an NDF identifier for a section of the
+*        supplied NDF matching the bounding box.
 *     INDF2 = INTEGER (Returned)
 *        An identifier for the smallest NDF section that contains all
-*        good DATA values in the the input NDF.
+*        good DATA values in the the input NDF. Returned equal to
+*        NDF__NOID if OPER is 1, or if an error occurs.
 *     NGOOD = INTEGER (Returned)
-*        The number of good DATA values in the supplied NDF>
+*        The number of good DATA values in the supplied NDF. Returned
+*        equal to zero if an error occurs.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2009-2011 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -56,6 +65,8 @@
 *  History:
 *     9-MAR-2009 (DSB):
 *        Original version.
+*     10-MAR-2011 (DSB):
+*        Added argument OPER.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -74,6 +85,7 @@
 
 *  Arguments Given:
       INTEGER INDF1
+      INTEGER OPER
 
 *  Arguments Returned:
       INTEGER INDF2
@@ -92,6 +104,10 @@
       INTEGER NDIM               ! Total number of dimensions in the NDF
       INTEGER UBND( NDF__MXDIM ) ! Upper bounds of supplied NDF
 *.
+
+*  Initialise returned values
+      NGOOD = 0
+      INDF2 = NDF__NOID
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -151,7 +167,10 @@
      :                    STATUS )
          END IF
 
-*  Otherwise, create aN NDF section matching the bounding box.
+*  Otherwise, either create aN NDF section matching the bounding box, or
+*  set the bounds of the supplied NDF
+      ELSE IF( OPER .EQ. 1 ) THEN
+         CALL NDF_SBND( NDIM, BLBND, BUBND, INDF1, STATUS )
       ELSE
          CALL NDF_SECT( INDF1, NDIM, BLBND, BUBND, INDF2, STATUS )
       END IF

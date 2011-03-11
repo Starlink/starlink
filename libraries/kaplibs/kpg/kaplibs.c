@@ -1397,3 +1397,34 @@ void kpgPixsc( AstFrameSet * iwcs,
 
   return;
 }
+
+
+F77_SUBROUTINE(kpg1_badbx)( INTEGER(INDF1),
+                            INTEGER(OPER),
+                            INTEGER(INDF2),
+                            INTEGER(NGOOD),
+                            INTEGER(STATUS) );
+
+void kpg1Badbx( int indf1, int oper, int *indf2, int *ngood, int *status ){
+   DECLARE_INTEGER(INDF1);
+   DECLARE_INTEGER(OPER);
+   DECLARE_INTEGER(INDF2);
+   DECLARE_INTEGER(NGOOD);
+   DECLARE_INTEGER(STATUS);
+
+   F77_EXPORT_INTEGER( indf1, INDF1 );
+   F77_EXPORT_INTEGER( oper, OPER );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(kpg1_badbx)( INTEGER_ARG(&INDF1),
+                         INTEGER_ARG(&OPER),
+                         INTEGER_ARG(&INDF2),
+                         INTEGER_ARG(&NGOOD),
+                         INTEGER_ARG(&STATUS) );
+
+   F77_IMPORT_INTEGER( INDF2, *indf2 );
+   F77_IMPORT_INTEGER( NGOOD, *ngood );
+   F77_IMPORT_INTEGER( STATUS, *status );
+}
+
+
