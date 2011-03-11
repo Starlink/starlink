@@ -148,13 +148,16 @@
 *        SMU can break sc2ast_createwcs.
 *     2010-01-14 (TIMJ):
 *        Include SMU offset in excursion.
+*     2011-3-11 (DSB):
+*        Ensure user-supplied pixel bounds do not extend beyond the
+*        available data if the TRIMBAD parameter is set TRUE.
 *     {enter_further_changes_here}
 
 *  Notes:
 *     The par[7] array used in this routine is documented in smf_get_projpar.c
 
 *  Copyright:
-*     Copyright (C) 2008-2010 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2011 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2005-2008 University of British Columbia.
 *     All Rights Reserved.
@@ -238,6 +241,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
   double skyref[ 2 ];          /* Values for output SkyFrame SkyRef attribute */
   struct timeval tv1;          /* Timer */
   struct timeval tv2;          /* Timer */
+  int trimbad;                 /* Trim borders of bad pixels from o/p image? */
   int ubnd0[ 2 ];              /* Defaults for UBND parameter */
   double x_array_corners[4];   /* X-Indices for corner bolos in array */
   double x_map[4];             /* Projected X-coordinates of corner bolos */
@@ -671,6 +675,18 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
     int itmp = lbnd_out[ 1 ];
     lbnd_out[ 1 ] = ubnd_out[ 1 ];
     ubnd_out[ 1 ] = itmp;
+  }
+
+  /* If borders of bad pixels are being trimmed from the output image,
+     then do not allow the user-specified bounds to extend outside the
+     default bounding box (since we know that the default bounding box
+     encloses all available data). */
+  parGet0l( "TRIMBAD", &trimbad, status );
+  if( trimbad ) {
+     if( lbnd_out[ 0 ] < lbnd0[ 0 ] ) lbnd_out[ 0 ] = lbnd0[ 0 ];
+     if( lbnd_out[ 1 ] < lbnd0[ 1 ] ) lbnd_out[ 1 ] = lbnd0[ 1 ];
+     if( ubnd_out[ 0 ] > ubnd0[ 0 ] ) ubnd_out[ 0 ] = ubnd0[ 0 ];
+     if( ubnd_out[ 1 ] > ubnd0[ 1 ] ) ubnd_out[ 1 ] = ubnd0[ 1 ];
   }
 
   /* Modify the returned FrameSet to take account of the new pixel origin. */

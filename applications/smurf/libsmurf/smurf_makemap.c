@@ -131,7 +131,8 @@
 *     LBND( 2 ) = _INTEGER (Read)
 *          An array of values giving the lower pixel index bound on each
 *          spatial axis of the output NDF. The suggested default values
-*          encompass all the input spatial information. []
+*          encompass all the input spatial information. The supplied
+*          values may be modified if TRIMBAD is set TRUE. []
 *     LBOUND( 2 ) = _INTEGER (Write)
 *          The lower pixel bounds of the output NDF. Note, values will be
 *          written to this output parameter even if a null value is supplied
@@ -316,6 +317,9 @@
 *          entire output array is created as a single tile and stored in
 *          a single output NDF with the name given by parameter OUT
 *          (without any "_<N>" appendix). [!]
+*     TRIMBAD = _LOGICAL (Read)
+*          If TRUE, then the output image is trimmed to remove any border
+*          of bad pixels. [FALSE]
 *     TRIMTILES = _LOGICAL (Read)
 *          Only accessed if the output is being split up into more than
 *          one spatial tile (see parameter TILEDIMS). If TRUE, then the
@@ -326,7 +330,8 @@
 *     UBND( 2 ) = _INTEGER (Read)
 *          An array of values giving the upper pixel index bound on each
 *          spatial axis of the output NDF. The suggested default values
-*          encompass all the input spatial information. []
+*          encompass all the input spatial information. The supplied
+*          values may be modified if TRIMBAD is set TRUE. []
 *     UBOUND( 2 ) = _INTEGER (Write)
 *          The upper pixel bounds of the output NDF. Note, values will be
 *          written to this output parameter even if a null value is supplied
@@ -456,8 +461,8 @@
 *       below which the telescope is considered to be stationary.
 *     FILLGAPS = LOGICAL
 *       Fill vicinity of spikes / DC steps with constrained realization of
-*       noise. Also (unless ZEROPAD is 1), fill the padded region at the start 
-*       and end of each time stream with artificial data. You almost always 
+*       noise. Also (unless ZEROPAD is 1), fill the padded region at the start
+*       and end of each time stream with artificial data. You almost always
 *       want to do this.
 *     FILT_EDGEHIGH = REAL
 *       Hard-edge high-pass frequency-domain filter (Hz).
@@ -491,7 +496,7 @@
 *       the time stream smoothly. In this case, no apodisation is
 *       performed, and the value of the APOD parameter is ignored. The
 *       default for ZEROPAD is 0 (i.e. pad with artificial data rather
-*       than zeros) unless FILLGAPS is zero, in which case the supplied 
+*       than zeros) unless FILLGAPS is zero, in which case the supplied
 *       ZEROPAD value is ignored and a value of 1 is always used.
 *
 *     iii) Parameters controlling the calculation of model components.
@@ -876,6 +881,8 @@
 *     2011-01-12 (TIMJ):
 *        Trigger an error if there are no science files. This makes it easier
 *        for the pipeline to know something has gone wrong.
+*     2011-03-11 (DSB):
+*        Add TRIMBAD parameter (also accessed in smf_mapbounds).
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -979,6 +986,7 @@ void smurf_makemap( int *status ) {
   int iterate=0;             /* Flag to denote ITERATE method */
   size_t itile;              /* Output tile index */
   int jin;                   /* Input NDF index within igrp */
+  int junk;                  /* Unused integer */
   AstKeyMap *keymap=NULL;    /* Pointer to keymap of config settings */
   int lbnd_out[2];           /* Lower pixel bounds for output map */
   double *map=NULL;          /* Pointer to the rebinned map data */
@@ -1021,6 +1029,7 @@ void smurf_makemap( int *status ) {
   smfTile *tile = NULL;      /* Pointer to next output tile description */
   smfTile *tiles=NULL;       /* Pointer to array of output tile descriptions */
   int tndf = NDF__NOID;      /* NDF identifier for 3D output NDF */
+  int trimbad;               /* Trim the output image to exclude bad pixels? */
   int trimtiles;             /* Trim the border tiles to exclude bad pixels? */
   AstMapping *tskymap = NULL;/* GRID->SkyFrame Mapping from output tile WCS */
   struct timeval tv1, tv2;   /* Timers */
@@ -1239,6 +1248,9 @@ void smurf_makemap( int *status ) {
   } else {
     msgOutif(MSG__VERB, " ", "Tracking a stationary object", status);
   }
+
+  /* See if output NDFs are to be trimmed to exclude bad borders. */
+  parGet0l( "TRIMBAD", &trimbad, status );
 
   /* Create a new group to hold the names of the output NDFs that have been
      created. This group does not include any NDFs that correspond to tiles
@@ -1602,6 +1614,13 @@ void smurf_makemap( int *status ) {
       smf_reshapendf( &wdata, tile, status );
       smf_reshapendf( &odata, tile, status );
 
+      /* If required trim any remaining bad borders. Note, this will
+         unmap the NDF, but we do not need access to the data arrays
+         anymore so that's OK. */
+      if( trimbad && tndf != NDF__NOID ) {
+         kpg1Badbx( tndf, 2, &junk, &junk, status );
+      }
+
       /* Add a spectral axis to the main output NDF for this tile. */
       if( tndf != NDF__NOID ) smf_add_spectral_axis( tndf, fchan, status );
 
@@ -1857,8 +1876,13 @@ void smurf_makemap( int *status ) {
     smf_close_file ( &wdata, status );
     smf_close_file ( &odata, status );
 
-   /* Convert the output NDF form 2D to 3D by adding a spectral axis
-      spanning a single pixel. Then the output NDF identifier. */
+    /* If required trim any remaining bad borders. Note, this will
+       unmap the NDF, but we do not need access to the data arrays
+       anymore so that's OK. */
+    if( trimbad ) kpg1Badbx( tndf, 2, &junk, &junk, status );
+
+    /* Convert the output NDF form 2D to 3D by adding a spectral axis
+       spanning a single pixel. Then the output NDF identifier. */
     smf_add_spectral_axis( tndf, fchan, status );
     ndfAnnul( &tndf, status );
 

@@ -2565,6 +2565,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter trimbad {
+                type _LOGICAL
+                vpath DEFAULT
+                ppath CURRENT
+                prompt {Trim bad border from output image?}
+                default FALSE
+                helpkey *
+            }
+
             parameter trimtiles {
                 type _LOGICAL
                 vpath DEFAULT
