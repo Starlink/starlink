@@ -46,6 +46,9 @@
 *        Should work if status is bad
 *     2011-03-04 (TIMJ):
 *        Set new error level after the code that might return early.
+*     2011-03-11 (TIMJ):
+*        More fixes now that status is not used. No longer use a
+*        new ERR context regardless and only use status in one call.
 
 *  Copyright:
 *     Copyright (C) 2010,2011 Science & Technology Facilities Council.
@@ -84,7 +87,7 @@
 #include "mers.h"
 #include "sae_par.h"
 #include "msg_par.h"
-#include "star/one.h"
+#include "star/util.h"
 
 #include "smf.h"
 #include "smurf_par.h"
@@ -102,13 +105,11 @@ smf_smfFile_msg( const smfFile * file, const char token[],
     return;
   }
 
-  errMark();
-
   path[0] = '\0';
 
   if (file->name && strlen(file->name) > 0 ) {
     if (strip) {
-      one_strlcpy( path, file->name, sizeof(path), &status );
+      star_strellcpy( path, file->name, sizeof(path) );
     } else {
       /* set directly */
       msgSetc( token, file->name );
@@ -119,9 +120,12 @@ smf_smfFile_msg( const smfFile * file, const char token[],
       int oplen = 0;
       /* we need to get the value from the NDF subsystem
          and we need to do it without clearing tokens */
+
+      errMark();
       ndfMsg( "LOCALTOK", file->ndfid );
       msgLoad( "", "^LOCALTOK", path, sizeof(path), &oplen, &status );
-
+      if (status != SAI__OK) errAnnul(&status);
+      errRlse();
     } else {
       /* set directly */
       ndfMsg( token, file->ndfid );
@@ -129,12 +133,6 @@ smf_smfFile_msg( const smfFile * file, const char token[],
     }
   } else {
     msgSetc( token, fallback );
-  }
-
-  /* Do not worry about bad status */
-  if (status != SAI__OK) {
-    errAnnul( &status );
-    path[0] = '\0';
   }
 
   /* if "path" has stuff in it we are meant to strip it and we have not
@@ -161,8 +159,6 @@ smf_smfFile_msg( const smfFile * file, const char token[],
   if (!have_set) {
     msgSetc(token, fallback );
   }
-
-  errRlse();
 
   return;
 
