@@ -2565,7 +2565,7 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter trimbad {
+            parameter trim {
                 type _LOGICAL
                 vpath DEFAULT
                 ppath CURRENT

@@ -151,6 +151,8 @@
 *     2011-3-11 (DSB):
 *        Ensure user-supplied pixel bounds do not extend beyond the
 *        available data if the TRIMBAD parameter is set TRUE.
+*     2011-3-14 (DSB):
+*        Rename TRIMBAD parameter as TRIM (for consistency with MAKECUBE).
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -241,7 +243,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
   double skyref[ 2 ];          /* Values for output SkyFrame SkyRef attribute */
   struct timeval tv1;          /* Timer */
   struct timeval tv2;          /* Timer */
-  int trimbad;                 /* Trim borders of bad pixels from o/p image? */
+  int trim;                    /* Trim borders of bad pixels from o/p image? */
   int ubnd0[ 2 ];              /* Defaults for UBND parameter */
   double x_array_corners[4];   /* X-Indices for corner bolos in array */
   double x_map[4];             /* Projected X-coordinates of corner bolos */
@@ -681,8 +683,8 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
      then do not allow the user-specified bounds to extend outside the
      default bounding box (since we know that the default bounding box
      encloses all available data). */
-  parGet0l( "TRIMBAD", &trimbad, status );
-  if( trimbad ) {
+  parGet0l( "TRIM", &trim, status );
+  if( trim ) {
      if( lbnd_out[ 0 ] < lbnd0[ 0 ] ) lbnd_out[ 0 ] = lbnd0[ 0 ];
      if( lbnd_out[ 1 ] < lbnd0[ 1 ] ) lbnd_out[ 1 ] = lbnd0[ 1 ];
      if( ubnd_out[ 0 ] > ubnd0[ 0 ] ) ubnd_out[ 0 ] = ubnd0[ 0 ];

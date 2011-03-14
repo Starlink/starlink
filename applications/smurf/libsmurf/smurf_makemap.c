@@ -132,7 +132,7 @@
 *          An array of values giving the lower pixel index bound on each
 *          spatial axis of the output NDF. The suggested default values
 *          encompass all the input spatial information. The supplied
-*          values may be modified if TRIMBAD is set TRUE. []
+*          values may be modified if TRIM is set TRUE. []
 *     LBOUND( 2 ) = _INTEGER (Write)
 *          The lower pixel bounds of the output NDF. Note, values will be
 *          written to this output parameter even if a null value is supplied
@@ -317,7 +317,7 @@
 *          entire output array is created as a single tile and stored in
 *          a single output NDF with the name given by parameter OUT
 *          (without any "_<N>" appendix). [!]
-*     TRIMBAD = _LOGICAL (Read)
+*     TRIM = _LOGICAL (Read)
 *          If TRUE, then the output image is trimmed to remove any border
 *          of bad pixels. [FALSE]
 *     TRIMTILES = _LOGICAL (Read)
@@ -331,7 +331,7 @@
 *          An array of values giving the upper pixel index bound on each
 *          spatial axis of the output NDF. The suggested default values
 *          encompass all the input spatial information. The supplied
-*          values may be modified if TRIMBAD is set TRUE. []
+*          values may be modified if TRIM is set TRUE. []
 *     UBOUND( 2 ) = _INTEGER (Write)
 *          The upper pixel bounds of the output NDF. Note, values will be
 *          written to this output parameter even if a null value is supplied
@@ -883,6 +883,8 @@
 *        for the pipeline to know something has gone wrong.
 *     2011-03-11 (DSB):
 *        Add TRIMBAD parameter (also accessed in smf_mapbounds).
+*     2011-03-14 (DSB):
+*        Rename TRIMBAD parameter as TRIM (for consistency with MAKECUBE).
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -1029,7 +1031,7 @@ void smurf_makemap( int *status ) {
   smfTile *tile = NULL;      /* Pointer to next output tile description */
   smfTile *tiles=NULL;       /* Pointer to array of output tile descriptions */
   int tndf = NDF__NOID;      /* NDF identifier for 3D output NDF */
-  int trimbad;               /* Trim the output image to exclude bad pixels? */
+  int trim;                  /* Trim the output image to exclude bad pixels? */
   int trimtiles;             /* Trim the border tiles to exclude bad pixels? */
   AstMapping *tskymap = NULL;/* GRID->SkyFrame Mapping from output tile WCS */
   struct timeval tv1, tv2;   /* Timers */
@@ -1250,7 +1252,7 @@ void smurf_makemap( int *status ) {
   }
 
   /* See if output NDFs are to be trimmed to exclude bad borders. */
-  parGet0l( "TRIMBAD", &trimbad, status );
+  parGet0l( "TRIM", &trim, status );
 
   /* Create a new group to hold the names of the output NDFs that have been
      created. This group does not include any NDFs that correspond to tiles
@@ -1617,7 +1619,7 @@ void smurf_makemap( int *status ) {
       /* If required trim any remaining bad borders. Note, this will
          unmap the NDF, but we do not need access to the data arrays
          anymore so that's OK. */
-      if( trimbad && tndf != NDF__NOID ) {
+      if( trim && tndf != NDF__NOID ) {
          kpg1Badbx( tndf, 2, &junk, &junk, status );
       }
 
@@ -1879,7 +1881,7 @@ void smurf_makemap( int *status ) {
     /* If required trim any remaining bad borders. Note, this will
        unmap the NDF, but we do not need access to the data arrays
        anymore so that's OK. */
-    if( trimbad ) kpg1Badbx( tndf, 2, &junk, &junk, status );
+    if( trim ) kpg1Badbx( tndf, 2, &junk, &junk, status );
 
     /* Convert the output NDF form 2D to 3D by adding a spectral axis
        spanning a single pixel. Then the output NDF identifier. */
