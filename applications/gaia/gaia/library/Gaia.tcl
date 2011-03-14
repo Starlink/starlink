@@ -182,6 +182,7 @@ Options:
  -file <file>             - image file to load.
  -float_panel <bool>      - put info panel in a popup window (default: 0).
  -focus_follows_mouse <bool> - entry focus follows mouse (default: 0).
+ -force_degrees <bool>    - force the display of degrees in main window (default: 0)
  -geometry <wxh+x+y>      - geometry of the main window (default: last session).
  -hdu <n>                 - HDU to display (default: 1)
  -ident <string>          - identifying string that will be prefixed to the window title.
@@ -621,6 +622,7 @@ itcl::class gaia::Gaia {
             -appname $appname_ \
             -extended_precision $itk_option(-extended_precision) \
             -linear_cartesian $itk_option(-linear_cartesian) \
+            -force_degrees $itk_option(-force_degrees) \
             -always_merge $itk_option(-always_merge) \
             -show_hdu_chooser $itk_option(-show_hdu_chooser) \
             -default_cut $itk_option(-default_cut) \
@@ -2685,6 +2687,9 @@ window gives you access to this."
 
    #  Whether CAR projections should be interpreted as a linear mapping.
    itk_option define -linear_cartesian linear_cartesian Linear_Cartesian 1
+
+   #  Whether to force the display of degrees (instead of HMS).
+   itk_option define -force_degrees force_degrees Force_Degrees 0
 
    #  Whether primary headers should always be merged with extension.
    itk_option define -always_merge always_merge Always_Merge 0

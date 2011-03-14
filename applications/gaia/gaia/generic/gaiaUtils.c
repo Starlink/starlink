@@ -593,7 +593,9 @@ int gaiaUtilsAtlAxTrm( AstFrameSet *frameset, int axes[], int lbnd[],
 /**
  * Read a set of FITS cards (80 character non-NULL terminated strings stored
  * at a single memory location) into an AST FITS channel, and return the
- * channel. The result is 1 if there were no errors.
+ * channel. The result is 1 if there were no errors. If an existing channel is
+ * given it will be used rather than creating a new one (so make sure NULL is
+ * passed as necessary).
  */
 int gaiaUtilsGtFitsChan( char header[], int ncards, AstFitsChan **fitschan )
 {
@@ -602,7 +604,9 @@ int gaiaUtilsGtFitsChan( char header[], int ncards, AstFitsChan **fitschan )
     int i;
 
     /*  Create and fill a FITS channel with the given cards. */
-    *fitschan = astFitsChan( NULL, NULL, " " );
+    if ( *fitschan == NULL ) {
+        *fitschan = astFitsChan( NULL, NULL, " " );
+    }
     if ( astOK ) {
         ptr = header;
         for ( i = 0 ; i < ncards; i++, ptr += 80 ) {
@@ -645,7 +649,7 @@ int gaiaUtilsGtFitsChan( char header[], int ncards, AstFitsChan **fitschan )
 int gaiaUtilsGtFitsWcs( char header[], int ncards, char *encoding,
                         AstFrameSet **iwcs )
 {
-    AstFitsChan *fitschan;
+    AstFitsChan *fitschan = NULL;
     int result = 0;
     *iwcs = NULL;
 

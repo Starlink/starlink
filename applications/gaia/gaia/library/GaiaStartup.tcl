@@ -236,6 +236,7 @@ itcl::class gaia::GaiaStartup {
       set values_($this,focus_follows_mouse) 0
       set values_($this,interop_menu) 1
       set values_($this,linear_cartesian) 1
+      set values_($this,force_degrees) 0
       set values_($this,max_scale) 20
       set values_($this,min_scale) -10
       set values_($this,panel_orient) horizontal
@@ -282,6 +283,8 @@ itcl::class gaia::GaiaStartup {
             $values_($this,default_cut)
          $itk_option(-image) configure -linear_cartesian \
             $values_($this,linear_cartesian)
+         $itk_option(-image) configure -force_degrees \
+            $values_($this,force_degrees)
          $itk_option(-image) configure -always_merge \
             $values_($this,always_merge)
       }
@@ -531,6 +534,18 @@ itcl::class gaia::GaiaStartup {
       add_short_help $itk_component(cartesian) \
          {Assume any FITS CAR projections are simple linear mapping}
       pack $itk_component(cartesian) -side top -fill x
+
+      #  Force display of degrees.
+      itk_component add forcedegrees {
+         StarLabelCheck $parent.forcedegrees \
+            -text "Display decimal degrees:" \
+            -onvalue 1 -offvalue 0 \
+            -labelwidth $lwidth_ \
+            -variable [scope values_($this,force_degrees)]
+      }
+      add_short_help $itk_component(forcedegrees) \
+         {Force the display of decimal degrees in main window}
+      pack $itk_component(forcedegrees) -side top -fill x
 
       #  How to merge MEF headers.
       itk_component add alwaysmerge {
@@ -859,6 +874,7 @@ itcl::class gaia::GaiaStartup {
       float_panel
       focus_follows_mouse
       font_scale
+      force_degrees
       image_background
       interop_menu
       isize

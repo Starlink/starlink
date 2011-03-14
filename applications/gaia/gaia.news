@@ -1,6 +1,11 @@
     Version 4.4-2
     =============
 
+    Support has been added for reading the -TAB WCS FITS format.
+
+    The display of decimal degrees can now be forced using a command-line
+    option -forcedegrees, or as a permanent choice using a startup option.
+
     The USNO NOMAD catalogue has been added to the list of Skycat
     catalogues. NOMAD is a simple merge of the Hipparcos, Tycho-2,
     UCAC-2 and USNO-B1 catalogues.

@@ -416,6 +416,9 @@ class StarRtdImage : public Skycat
    //  Set the CarLin attribute of FITS channels.
    int astcarlinCmd( int argc, char *argv[] );
 
+   //  Set the forced degrees attribute.
+   int forcedegreesCmd( int argc, char *argv[] );
+
    //  Set the always merge attribute.
    int astalwaysmergeCmd( int argc, char *argv[] );
 

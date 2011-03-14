@@ -53,6 +53,8 @@
  *        Added milli-arcsec resolution option.
  *     19-DEC-2003 (PWD):
  *        Added CarLin static member and control method.
+ *     10-FEB-2010 (PWD):
+ *        Added forceDegrees static member.
  *-
  */
 
@@ -139,10 +141,16 @@ protected:
   //  Whether CAR projections are broken linear. Applies to all instances.
   static int carlin_;
 
+  //  Whether to work in degrees. Overrides everything.
+  static int forceDegrees_;
+
 public:
 
-  //  Constructor (derived classes call this)
-  StarWCS( const char* header, const size_t lheader );
+  //  Constructor (derived classes call this).
+  StarWCS( const char* header, const size_t lheader,
+           void *channelData = NULL,
+           void (*)( AstFitsChan *, const char *,
+                     int, int, int * ) = NULL );
 
   //  Destructor
   virtual ~StarWCS();
@@ -276,7 +284,14 @@ public:
   void extraPrecision( int value );
 
   //  Set whether CAR projections are linear.
-  static void setCarLin( int value ) { StarWCS::carlin_ = value; }
+  static void setCarLin( int value ) {
+      StarWCS::carlin_ = value;
+  }
+
+  //  Set whether to force use of degrees.
+  static void setForceDegrees( int value ) {
+      StarWCS::forceDegrees_ = value;
+  }
 
 };
 

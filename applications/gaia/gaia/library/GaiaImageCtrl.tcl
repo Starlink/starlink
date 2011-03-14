@@ -601,6 +601,9 @@ move any overlapping windows and try again"
       #  Set the default for CAR projections.
       set_linear_cartesian_
 
+      #  Set default for displaying degrees.
+      set_force_degrees_
+
       #  Set the default for merging headers.
       set_always_merge_
 
@@ -626,6 +629,15 @@ move any overlapping windows and try again"
       if { $image_ != {} } {
          catch {
             $image_ astcarlin $itk_option(-linear_cartesian)
+         }
+      }
+   }
+
+   #  Set whether to display degrees instead of HMS.
+   protected method set_force_degrees_ {} {
+      if { $image_ != {} } {
+         catch {
+            $image_ forcedegrees $itk_option(-force_degrees)
          }
       }
    }
@@ -1435,6 +1447,11 @@ move any overlapping windows and try again"
    #  Whether CAR projections should be interpreted as a linear mapping.
    itk_option define -linear_cartesian linear_cartesian Linear_Cartesian 1 {
       set_linear_cartesian_
+   }
+
+   #  Whether to force the display of degress.
+   itk_option define -force_degrees force_degrees Force_Degress 0 {
+      set_force_degrees_
    }
 
    #  How to merge FITS headers from primary and extension images.

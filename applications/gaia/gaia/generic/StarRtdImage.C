@@ -206,6 +206,9 @@
  *        Add blankvalueCmd.
  *     17-AUG-2009 (PWD):
  *        Added astgetcloneCmd.
+ *     10-FEB-2010 (PWD):
+ *        Added forcedegrees command. Sets whether to display decimal
+ *        degrees for all celestial coordinate systems.
  *-
  */
 #if HAVE_CONFIG_H
@@ -318,6 +321,7 @@ public:
     { "colorramp",       &StarRtdImage::colorrampCmd,       0, 2 },
     { "contour",         &StarRtdImage::contourCmd,         1, 7 },
     { "dump",            &StarRtdImage::dumpCmd,            1, 2 },
+    { "forcedegrees",    &StarRtdImage::forcedegreesCmd,    1, 1 },
     { "foreign",         &StarRtdImage::foreignCmd,         2, 2 },
     { "fullname",        &StarRtdImage::fullNameCmd,        0, 0 },
     { "gband",           &StarRtdImage::gbandCmd,           6, 6 },
@@ -663,18 +667,7 @@ ImageData *StarRtdImage::makeImage( ImageIO imio )
     // SAOWCS class
     WCSRep* rep = imio.wcs().rep();
     if ( ! rep || strcmp( rep->classname(), "StarWCS" ) != 0 ) {
-        char* header = "";
-        size_t lheader = 0;
-
-        // set WCS header
-        header = (char *) imio.header().ptr();
-        lheader = imio.header().size();
-
-        WCS wcs( new StarWCS( header, lheader ) );
-        if ( wcs.status() != 0 ) {
-            return (ImageData*) NULL;
-        }
-        imio.wcs( wcs );  // this sets the WCS object to use for this image
+        imio.wcsinit();
     }
 
     // The image data is fixed at first.
@@ -897,7 +890,7 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
             //  of any existing WCS content and then write the new WCS.
             Mem oldhead = image_->header();
             int ncard = (int) oldhead.size() / FITSCARD;
-            AstFitsChan *chan;
+            AstFitsChan *chan = NULL;
             gaiaUtilsGtFitsChan( (char *) oldhead.ptr(), ncard, &chan );
 
             //  Read the headers once, this determines the default encoding.
@@ -7037,6 +7030,27 @@ int StarRtdImage::astcarlinCmd( int argc, char *argv[] )
     }
     else {
         StarWCS::setCarLin( 1 );
+    }
+    return TCL_OK;
+}
+
+//+
+//   StarRtdImage::forcedegreesCmd
+//
+//   Purpose:
+//      Set the value used for the forced degrees attribute.
+//      The value should be 0 or 1.
+//-
+int StarRtdImage::forcedegreesCmd( int argc, char *argv[] )
+{
+#ifdef _DEBUG_
+    cout << "Called StarRtdImage::forcedegreesCmd" << std::endl;
+#endif
+    if ( *argv[0] == '0' ) {
+        StarWCS::setForceDegrees( 0 );
+    }
+    else {
+        StarWCS::setForceDegrees( 1 );
     }
     return TCL_OK;
 }

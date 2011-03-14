@@ -11,10 +11,12 @@
  *                extension images and supports the extraction of
  *                compressed extension images to a file.
  *
+ *                Also handles the "-TAB" WCS format.
+ *
  *  Copyright:
  *     Copyright (C) 2000-2005 Central Laboratory of the Research Councils.
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
- *     Copyright (C) 2007 Science and Technology Facilities Council.
+ *     Copyright (C) 2007-2011 Science and Technology Facilities Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -60,6 +62,9 @@
  *                           (nearly).
  *                 24/05/07  Add methods for extracting compressed extension
  *                           images.
+ *                 01/03/11  Add support for the -TAB format. Stores look up
+ *                           tables to map coordinates to pixel indices in 
+ *                           a further extension of an MEF.
  */
 static const char* const rcsId="@(#) $Id$";
 
@@ -86,6 +91,8 @@ static const char* const rcsId="@(#) $Id$";
 extern "C" {
 #include "cnf.h"
 }
+#include "gaiaUtils.h"
+#include "prm_par.h"
 
 // Initialize static members.
 int StarFitsIO::alwaysMerge_ = 0;
@@ -117,6 +124,25 @@ static char* getFromStdin(char* filename)
     return filename;
 }
 
+/**
+ *  Handle a request from AST (which uses C binding) to locate and load a -TAB
+ *  table. Note the given AstFitsChan must have the "this" pointer of the 
+ *  StarFitsIO object stored so we can call the real member that has access to
+ *  the FITS file handle.
+ */
+static void staticLoadTabTable( AstFitsChan *chan, const char *extname,
+                                int extver, int extlevel, int *status )
+{
+    //  Get the instance and call the read member.
+    StarFitsIO *instance = (StarFitsIO *) astChannelData;
+    *status = 0;
+    instance->loadTabTable( chan, extname, extver, extlevel, status );
+
+    // Local status is 0 for success, AST wants that to be 1.
+    if ( *status == 0 ) {
+        *status = 1;
+    }
+}
 
 /*
  * Constructor
@@ -179,7 +205,8 @@ StarFitsIO* StarFitsIO::copy()
  *  Note this is copy of FitsIO::read member so that we can return a
  *  StarFitsIO object, rather than a FitsIO one, the only
  *  modifications are related to using a copy of the file when
- *  readonly access is just available.
+ *  readonly access is just available and handling pointer registration
+ *  with CNF for passing into Fortran.
  */
 StarFitsIO* StarFitsIO::read( const char* filename, int mem_options )
 {
@@ -357,20 +384,226 @@ int StarFitsIO::getReadonly() {
 }
 
 /*
- *  Initialize world coordinates (based on the image header)
+ *  Initialize world coordinates (based on the image header).
  */
 int StarFitsIO::wcsinit()
 {
     //   If there are multiple HDUs, merge the primary header with
-    //   the extension header to get all of the WCS info.
+    //   the extension header to get all of the WCS info. Pass in a function
+    //   that should be called to access any extensions that contain -TAB
+    //   tables.
     if ( mergeNeeded() ) {
         mergeHeader();
         wcs_ = WCS( new StarWCS( (const char *)mergedHeader_.ptr(),
-                                 mergedHeader_.size() ) );
+                                 mergedHeader_.size(),
+                                 (void *) this,
+                                 &staticLoadTabTable ) );
         return wcs_.status();
     }
-    wcs_ = WCS( new StarWCS( (const char *)header_.ptr(), header_.size() ) );
+    wcs_ = WCS( new StarWCS( (const char *)header_.ptr(), header_.size(),
+                             (void *) this, &staticLoadTabTable ) );
     return wcs_.status();
+}
+
+/**
+ *  Get an AST FITS table from named extension in the current MEF.
+ *  This supports the -TAB coordinate system type.
+ */
+int StarFitsIO::loadTabTable( AstFitsChan *chan, const char *extname,
+                              int extver, int extlevel, int *status )
+{
+    if ( ! astOK || *status != 0 ) return 0;
+
+    AstFitsTable *table = NULL;
+    char card[81];
+    char cname[81];
+    char name[81];
+    char *tform;
+    int anyf;
+    int naxis2;
+
+    //  Current HDU so we restore before exit.
+    int currentHdu = getHDUNum();
+
+    //  Find the table.
+    *status = setHDUByName( extname, extver );
+    if ( *status != 0 ) {
+        return 0;
+    }
+
+    //  Start an AST context.
+    astBegin;
+
+    //  Create a FitsChan to hold the headers in the extension HDU.
+    AstFitsChan *fitschan = astFitsChan( NULL, NULL, " " );
+
+    //  Extract the headers from the HDU and store them.
+    int ncard = header_.size() / FITSCARD;
+    gaiaUtilsGtFitsChan( (char *) header_.ptr(), ncard, &fitschan );
+
+    //  Since the FITSIO "FTGCF<x>" routine applies any required
+    //  scaling (specified by the column's TSCALn and TZEROn header
+    //  values) to the returned column values, the values stored in the
+    //  FitsTable will be unscaled, and so no TSCALn and TZEROn headers
+    //  should be stored in the FitsTable. Delete such headers now.
+    astClear( fitschan, "Card" );
+    while ( astFindFits( fitschan, "TSCAL%d", card, 0 ) ) {
+        astDelFits( fitschan );
+    }
+    astClear( fitschan, "Card" );
+    while ( astFindFits( fitschan, "TZERO%d", card, 0 ) ) {
+        astDelFits( fitschan );
+    }
+
+    //  Get the number of rows in the table.
+    astGetFitsI( fitschan, "NAXIS2", &naxis2 );
+
+    //  Create a FitsTable, creating columns equivalent to those in the
+    //  extension header.
+    table = astFitsTable( fitschan, " " );
+
+    //  Copy the data for each column from the binary table into the
+    //  FitsTable. Loop over all columns.
+    int ncol = astGetI(  table, "NColumn" );
+    for ( int icol = 1; icol <= ncol; icol++ ) {
+
+        //  Get the column data type.
+        const char *sname = astColumnName( table, icol );
+        sprintf( cname, "ColumnType(%s)", sname );
+        int ctype = astGetI( table, cname );
+
+        //  Get the total number of elements to be read. If a column holds
+        //  vector values, then each cell in the column will hold more than
+        //  one element.
+        sprintf( name, "ColumnLength(%s)", sname );
+        int nel = astGetI( table, name );
+        int totnel = naxis2 * nel;
+
+        //  Do each data type in turn. First four-byte integer.
+        if ( ctype == AST__INTTYPE ) {
+
+            //  Allocate memory to store the column values.
+            size_t size = sizeof( int ) * totnel;
+            int *ip = new int[totnel];
+
+            //  Read the FITS file to get all the data values in the
+            //  column. The FitsTable will have inherited the null value from
+            //  the FITS header, and so we do not need to replace null values
+            //  in the following call.
+            fits_read_col_int( fitsio_, icol, 1, 1, totnel, 0, ip, &anyf,
+                               status );
+
+            //  Store the column values in the FitsTable.
+            astPutColumnData( table, sname, 0, size, ip );
+            delete[] ip;
+        }
+        //  Do the same for two-byte integer.
+        else if ( ctype == AST__SINTTYPE ) {
+            size_t size = sizeof( short int ) * totnel;
+            short int *ip = new short int[totnel];
+            fits_read_col_sht( fitsio_, icol, 1, 1, totnel, 0, ip, &anyf,
+                               status );
+            astPutColumnData( table, sname, 0, size, ip );
+            delete[] ip;
+        }
+        //  Do the same for one-byte unsigned integer.
+        else if ( ctype == AST__BYTETYPE ) {
+            size_t size = sizeof( unsigned char ) * totnel;
+            unsigned char *ip = new unsigned char[totnel];
+            fits_read_col_byt( fitsio_, icol, 1, 1, totnel, 0, ip, &anyf,
+                               status );
+            astPutColumnData( table, sname, 0, size, ip );
+            delete[] ip;
+        }
+        //  Do the same for double-precision floats. FITS does not allow a bad
+        //  value to be specified for floating-point values in binary tables,
+        //  so replace NaNs by VAL__BADD in the following call.
+        else if ( ctype == AST__DOUBLETYPE ) {
+            size_t size = sizeof( double ) * totnel;
+            double *ip = new double[totnel];
+            fits_read_col_dbl( fitsio_, icol, 1, 1, totnel, VAL__BADD,
+                               ip, &anyf, status );
+            astPutColumnData( table, sname, 0, size, ip );
+            delete[] ip;
+        }
+        //  Do the same for single-precision floats.
+        else if ( ctype == AST__FLOATTYPE ) {
+            size_t size = sizeof( float ) * totnel;
+            float *ip = new float[totnel];
+            fits_read_col_flt( fitsio_, icol, 1, 1, totnel, VAL__BADR,
+                               ip, &anyf, status );
+            astPutColumnData( table, sname, 0, size, ip );
+            delete[] ip;
+        }
+        //  Things are a bit different for string types.
+        else if ( ctype == AST__STRINGTYPE ) {
+
+            //  The strings in the FITS binary table are fixed length, but the
+            //  FitsTable class holds null-terminated variable-length
+            //  strings. Get the length of each fixed-length string in the
+            //  binary table. This is the repeat count in the TFORMn keyword
+            //  value, divided by the number of elements in each cell.
+            sprintf( name, "TFORM(%d)", icol );
+            int clen = 0;
+            if ( astGetFitsS( fitschan, name, &tform ) == 0 ) {
+                if ( astOK ) {
+                    const char *a = strchr( tform, 'A' );
+                    int repeat = 0;
+                    if ( tform[0] == 'A' ) {
+                        repeat = 1;
+                    }
+                    else if ( a != NULL ) {
+                        //  Convert to int, need to trap error.
+                        int n = sscanf( tform, "%d", &repeat );
+                        if ( n == 0 ) {
+                            repeat = 0;
+                        }
+                    }
+                    else {
+                        repeat = 0;
+                    }
+                    clen = repeat / nel;
+
+                    if ( clen <= 0 ) {
+                        // XXX error cannot determine the length of
+                        // fixed-length strings in column
+                    }
+                }
+
+                //  Allocate memory to store the column values.
+                size_t size = sizeof( char ) * clen * totnel;
+                char *ip = new char[totnel];
+
+                //  Read the FITS file.
+                char cnull[2] = {" "};
+                fits_read_col_str( fitsio_, icol, 1, 1, totnel, cnull, &ip,
+                                   &anyf, status );
+                astPutColumnData( table, sname, clen, size, ip );
+                delete[] ip;
+            }
+        }
+    }
+
+    //  Reinstate the original current HDU in the FITS file.
+    setHDU( currentHdu );
+
+    //  If all went well import the table into the FitsChan.
+    if (  *status == 0 && astOK ) {
+        astPutTable( chan, table, extname );
+    }
+    else {
+        if ( *status != 0 ) {
+            astEnd;
+            return cfitsio_error();
+        }
+    }
+    if ( ! astOK ) {
+        astClearStatus;
+        astEnd;
+        return error( "failed to load WCS table" );
+    }
+    astEnd;
+    return 0;
 }
 
 /**
@@ -660,6 +893,25 @@ int StarFitsIO::setHDU( int num )
     cnfRegp( data_.ptr() );
 
     return result;
+}
+
+/**
+ *  Move to the named HDU and make it the current one.
+ */
+int StarFitsIO::setHDUByName( const char *extname, int extver )
+{
+    int status = 0;
+
+    //  Try to move.
+    if ( fits_movnam_hdu( fitsio_, BINARY_TBL, (char *) extname, extver,
+                          &status ) != 0 ) {
+        return cfitsio_error();
+    }
+    int hdu;
+    fits_get_hdu_num( fitsio_, &hdu );
+
+    //  Success so make it official.
+    return FitsIO::setHDU( hdu );
 }
 
 //

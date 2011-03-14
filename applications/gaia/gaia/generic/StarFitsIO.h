@@ -44,8 +44,11 @@
  *                 16/02/04  Added alwaysMerge_ member.
  *                 13/06/05  Added setHDU member.
  *                 28/11/05  Added copy member.
+ *                 01/02/11  Add -TAB support.
  */
-
+extern "C" {
+#include "ast.h"
+}
 #include "Fits_IO.h"
 
 /*
@@ -109,11 +112,18 @@ public:
     // Move to the specified HDU and make it the current one
     int setHDU( int num );
 
+    // Move to the named HDU.
+    int setHDUByName( const char *extname, int extver );
+
     // Does current HDU contain a compressed image?
     int isCompressedImage();
 
     // Save a compressed image from the current extension to a file.
     int saveCompressedImage( const char *filename, const char *object );
+
+    // Handle -TAB WCS. Public but do not use. Only for AST internal calls.
+    int loadTabTable( AstFitsChan *chan, const char *extname,
+                      int extver, int extlevel, int *status );
 
 protected:
     // Whether to merge headers or not.

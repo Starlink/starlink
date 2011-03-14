@@ -138,6 +138,24 @@ void GaiaFITSUnmap( Mem *dataPtr )
 }
 
 /**
+ *  Local function to extract the context from a FITS channel
+ *  set up handle -TAB requests.
+ */ 
+static void staticLoadTabTable( AstFitsChan *chan, const char *extname,
+                                int extver, int extlevel, int *status )
+{
+    /*  Get the instance and call the read member. */
+    StarFitsIO *instance = (StarFitsIO *) astChannelData;
+    *status = 0;
+    instance->loadTabTable( chan, extname, extver, extlevel, status );
+
+    /* Local status is 0 for success, AST wants that to be 1. */
+    if ( *status == 0 ) {
+        *status = 1;
+    }
+}
+
+/**
  * Get the WCS as an AstFrameSet from the current HDU headers. Also returns
  * the array dimensions. The dims array should have MAX_DIM elements. The
  * number of dimensions returned is ndims. If no valid WCS is found a dummy
@@ -155,7 +173,7 @@ int GaiaFITSGtWcs( StarFitsIO *fitsio, AstFrameSet **iwcs,
     size_t lheader = mem.size();
 
     // Read headers using a FITS channel.
-    AstFitsChan *fitschan = astFitsChan( NULL, NULL, " " );
+    AstFitsChan *fitschan = NULL;
     int ncard = (int) ( lheader / (size_t) FITSCARD );
     gaiaUtilsGtFitsChan( (char *) header, ncard, &fitschan );
 
@@ -170,6 +188,13 @@ int GaiaFITSGtWcs( StarFitsIO *fitsio, AstFrameSet **iwcs,
         }
     }
     *ndims = i;
+
+    // Prepare to handle the -TAB format.
+    astSetI( fitschan, "TabOK", 1 );
+    astTableSource( fitschan, staticLoadTabTable );
+
+    // Store the StarFitsIO pointer for context.
+    astPutChannelData( fitschan, fitsio );
 
     // Now try to read in the FITS headers to create a frameset.
     astClear( fitschan, "Card" );

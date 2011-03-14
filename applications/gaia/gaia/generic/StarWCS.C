@@ -112,6 +112,7 @@ static const int FITSCARD = 80;
 
 //  Initialize static members.
 int StarWCS::carlin_ = 1;
+int StarWCS::forceDegrees_ = 0;
 
 //
 //  Define a function to wrap the AST TranN function using a
@@ -152,9 +153,18 @@ static void dcard(char *card, const char *keyword, double value)
 }
 
 //
-//  Constructor
+//  Constructor.
 //
-StarWCS::StarWCS( const char *header, const size_t lheader )
+//  The channelData pointer will be stored in the FitsChannel
+//  and can be retrieved using a call to astChannelData, if the
+//  tabSource function is called. That function should handle
+//  access to -TAB tables that define a look up table for the
+//  WCS.
+//
+StarWCS::StarWCS( const char *header, const size_t lheader,
+                  void *channelData,
+                  void (* tabSource)( AstFitsChan *, const char *,
+                                      int, int, int * ) )
   : wcs_(NULL),
     equinox_(0.0),
     extraPrecision_(0),
@@ -180,6 +190,18 @@ StarWCS::StarWCS( const char *header, const size_t lheader )
             // This should be a FITS header which we need to read it in
             // through a FITS channel.
             AstFitsChan *fitschan = astFitsChan( NULL, NULL, " " );
+
+            // If given register to read -TAB tables.
+            if ( tabSource != NULL ) {
+                astSetI( fitschan, "TabOK", 1 );
+                astTableSource( fitschan, tabSource );
+
+                //  Store user pointer to context information.
+                if ( channelData != NULL ) {
+                    astPutChannelData( fitschan, channelData );
+                }
+            }
+
             int ncard = (int) lheader / FITSCARD;
             gaiaUtilsGtFitsChan( (char *) header, ncard, &fitschan );
 
@@ -292,7 +314,8 @@ StarWCS::StarWCS( const char *header, const size_t lheader )
                 if ( !make2D() ) {
                     astClearStatus;
                     wcs_ = (AstFrameSet *) astAnnul( wcs_ );
-                    print_error( "Failed to read a 2D World Coordinate System from FITS headers");
+                    print_error( "Failed to read a 2D World Coordinate System"
+                                 " from FITS headers");
                 }
                 else {
                     initCelestial();
@@ -556,7 +579,8 @@ double StarWCS::epoch() const
 //  the image.
 //
 //  If hms_flag is 1, the result is always in H:M:S D:M:S, otherwise
-//  the result is returned in decimal degrees.
+//  the result is returned in decimal degrees, unless the use of
+//  degrees is forced.
 //
 char* StarWCS::pix2wcs( double x, double y, char* buf, int bufsz,
                         int hms_flag ) const
@@ -573,13 +597,18 @@ char* StarWCS::pix2wcs( double x, double y, char* buf, int bufsz,
 //  This version allows a return if the result doesn't lie on the image.
 //
 //  If hms_flag is 1, the result is always in H:M:S D:M:S, otherwise
-//  the result is returned in decimal degrees.
+//  the result is returned in decimal degrees, unless the use of
+//  degrees is forced.
 //
 //  The behaviour with hms_flag may not be the same after moving to AST.
 //
 char* StarWCS::pix2wcs( double x, double y, int notbound, char* buf,
                         int bufsz, int hms_flag ) const
 {
+    if ( StarWCS::forceDegrees_ ) {
+        hms_flag = 0;
+    }
+
     buf[0] = '\0';
     int onimage = ( x >= 0 && y >= 0 &&
                     x <= ( nxpix_ + 1 ) && y <= ( nypix_ + 1 ) );
