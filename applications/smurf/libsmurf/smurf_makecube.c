@@ -264,7 +264,9 @@
 *     LBND( 2 ) = _INTEGER (Read)
 *          An array of values giving the lower pixel-index bound on each
 *          spatial axis of the output NDF. The suggested default values
-*          encompass all the input spatial information. []
+*          encompass all the input spatial information. The supplied
+*          bounds may be modified if the parameter TRIM takes its default
+*          value of TRUE. []
 *     LBOUND( 3 ) = _INTEGER (Write)
 *          The lower pixel bounds of the output NDF. Note, values will be
 *          written to this output parameter even if a null value is supplied
@@ -562,11 +564,10 @@
 *          (without any "_<N>" appendage). [!]
 *     TRIM = _LOGICAL (Read)
 *          If TRUE, then the output cube will be trimmed to exclude any
-*          borders filled with bad data caused by one or more detectors
-*          having been excluded (see parameter DETECTORS). If FALSE, then
-*          the pixel bounds of the output cube will be such as to include
-*          data from all detectors, whether or not they have been selected
-*          for inclusion using the DETECTORS parameter. [TRUE]
+*          borders filled with bad values. Such borders can be caused, for
+*          instance, by one or more detectors having been excluded (see
+*          parameter DETECTORS), or by the supplied LBND and/or UBND parameter
+*          values extending beyond the available data. [TRUE]
 *     TRIMTILES = _LOGICAL (Read)
 *          Only accessed if the output is being split up into more than
 *          one spatial tile (see parameter TILEDIMS). If TRUE, then the
@@ -577,7 +578,9 @@
 *     UBND( 2 ) = _INTEGER (Read)
 *          An array of values giving the upper pixel-index bound on each
 *          spatial axis of the output NDF. The suggested default values
-*          encompass all the input spatial information. []
+*          encompass all the input spatial information. The supplied
+*          bounds may be modified if the parameter TRIM takes its default
+*          value of TRUE. []
 *     UBOUND( 3 ) = _INTEGER (Write)
 *          The upper pixel bounds of the output NDF. Note, values will be
 *          written to this output parameter even if a null value is supplied
@@ -815,9 +818,13 @@
 *     4-OCT-2009 (DSB)
 *        Allow the supplied TIMEDIMS value to be changed by up to 10% to
 *        avoid creating thin tiles around the edges.
+*     14-MAR-2011 (DSB)
+*        If poarameter TRIM is true, then trim bad borders no matter what
+*        causes them (previously only bad borders caused by excluded
+*        detectors were trimmed).
 
 *  Copyright:
-*     Copyright (C) 2007-2009 Science and Technology Facilities Council.
+*     Copyright (C) 2007-2011 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research
 *     Council. Copyright (C) 2006-2008 University of British Columbia.
 *     All Rights Reserved.
@@ -947,6 +954,7 @@ void smurf_makecube( int *status ) {
    int ispec;                 /* Index of next spectrum within output NDF */
    size_t itile;              /* Output tile index */
    int jin;                   /* Input NDF index within igrp */
+   int junk;                  /* Unused integer */
    int lbnd_out[ 3 ];         /* Lower pixel bounds for full output map */
    int lbnd_wgt[ 4 ];         /* Lower pixel bounds for weight array */
    int moving;                /* Is the telescope base position changing? */
@@ -976,6 +984,7 @@ void smurf_makecube( int *status ) {
    int spread = 0;            /* Pixel spreading method */
    int tileborder;            /* Dimensions (in pixels) of tile overlap */
    int tiledims[2];           /* Dimensions (in pixels) of each output tile */
+   int tndf = NDF__NOID;      /* Temporary NDF identifier */
    int trim;                  /* Trim the output cube to exclude bad pixels? */
    int trimtiles;             /* Trim the border tiles to exclude bad pixels? */
    int ubnd_out[ 3 ];         /* Upper pixel bounds for full output map */
@@ -1986,6 +1995,10 @@ void smurf_makecube( int *status ) {
    the polarisation angle for the data in the output cube. */
          if( npbin > 1 ) smf_polext( ondf, pangle[ ipbin ], status );
 
+/* The following calls to smf_reshapendf close the open NDFs. So if we
+   will need access to the NDF afterwards, clone the NDF identifier now. */
+         if( trim ) ndfClone( ondf, &tndf, status );
+
 /* For each open output NDF (the main tile NDF, and any extension NDFs),
    first clone the NDF identifier, then close the file (which will unmap
    the NDF arrays), and then reshape the NDF to exclude the boundary
@@ -1996,6 +2009,13 @@ void smurf_makecube( int *status ) {
          smf_reshapendf( &tsysdata, tile, status );
          smf_reshapendf( &wdata, tile, status );
          smf_reshapendf( &odata, tile, status );
+
+/* If required trim any remaining bad borders, and annul the cloned output
+   NDF identifier. */
+         if( tndf != NDF__NOID ) {
+            if( trim ) kpg1Badbx( tndf, 2, &junk, &junk, status );
+            ndfAnnul( &tndf, status );
+         }
 
 /* Free other resources related to the current tile. */
          if( wgt_array && !savewgt ) wgt_array = astFree( wgt_array );

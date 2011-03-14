@@ -213,10 +213,13 @@
 *        edges of the first and last channel, rather than the values at
 *        the channel centres. This makes it consistent with the values
 *        written to the FLBND and FUBND parameters.
+*     14-MAR-2011 (DSB):
+*        Ensure user-supplied pixel bounds do not extend beyond the
+*        available data if the TRIM parameter is set TRUE.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2007, 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2007-2011 Science and Technology Facilities Council.
 *     Copyright (C) 2006, 2007 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -321,6 +324,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    int nval;             /* Number of values supplied */
    int pixax[ 3 ];       /* The output fed by each selected mapping input */
    int specax;           /* Index of spectral axis in input FrameSet */
+   int trim;             /* Trim borders of bad pixels from o/p cube? */
    int ubnd0[ 2 ];       /* Defaults for UBND parameter */
    smfData *data = NULL; /* Pointer to data struct for current input file */
    smfFile *file = NULL; /* Pointer to file struct for current input file */
@@ -1053,6 +1057,18 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
       itmp = lbnd[ 1 ];
       lbnd[ 1 ] = ubnd[ 1 ];
       ubnd[ 1 ] = itmp;
+   }
+
+/* If borders of bad pixels are being trimmed from the output cube,
+   then do not allow the user-specified bounds to extend outside the
+   default bounding box (since we know that the default bounding box
+   encloses all available data). */
+   parGet0l( "TRIM", &trim, status );
+   if( trim ) {
+      if( lbnd[ 0 ] < lbnd0[ 0 ] ) lbnd[ 0 ] = lbnd0[ 0 ];
+      if( lbnd[ 1 ] < lbnd0[ 1 ] ) lbnd[ 1 ] = lbnd0[ 1 ];
+      if( ubnd[ 0 ] > ubnd0[ 0 ] ) ubnd[ 0 ] = ubnd0[ 0 ];
+      if( ubnd[ 1 ] > ubnd0[ 1 ] ) ubnd[ 1 ] = ubnd0[ 1 ];
    }
 
 /* Modify the returned FrameSet to take account of the new pixel origin. */
