@@ -79,6 +79,9 @@
 *     8-MAY-2007 (DSB):
 *        - Correct initialisation of SKYFRAME.
 *        - Format celestial axes as arc-seconds, and time axes as seconds.
+*     15-MAR-2011 (DSB):
+*        Fix bug that caused a scale of zero to be returned for celestial
+*        axes inclined at exactly 45 degrees to the X axis.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -108,14 +111,21 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  Local Constants:
+      INTEGER MAXPNT
+      PARAMETER ( MAXPNT = 3**NDF__MXDIM )
+
 *  Local Variables:
       CHARACTER ATTR*20
       CHARACTER DOM*30
       DOUBLE PRECISION ATWCS( NDF__MXDIM )
+      DOUBLE PRECISION DAX
+      DOUBLE PRECISION DAXMAX
       DOUBLE PRECISION DPIX
       DOUBLE PRECISION DWCS
-      DOUBLE PRECISION IN( 2, NDF__MXDIM )
-      DOUBLE PRECISION OUT( 2, NDF__MXDIM )
+      DOUBLE PRECISION IN( MAXPNT, NDF__MXDIM )
+      DOUBLE PRECISION OFF( NDF__MXDIM )
+      DOUBLE PRECISION OUT( MAXPNT, NDF__MXDIM )
       DOUBLE PRECISION Q( NDF__MXDIM )
       DOUBLE PRECISION QGRID( NDF__MXDIM )
       DOUBLE PRECISION XIN( 2 )
@@ -124,11 +134,15 @@
       INTEGER FWCS
       INTEGER I
       INTEGER IAT
+      INTEGER IMAX( NDF__MXDIM )
+      INTEGER IPNT
       INTEGER MAP
       INTEGER NPIX
+      INTEGER NPNT
       INTEGER NWCS
-      INTEGER OUTAX( NDF__MXDIM )
       INTEGER OMAP
+      INTEGER OUTAX( NDF__MXDIM )
+      LOGICAL INCR
 *.
 
 *  Check the inherited global status.
@@ -149,16 +163,60 @@
 *  Check the Mapping has an inverse transformation.
       IF( AST_GETL( MAP, 'TranInverse', STATUS ) ) THEN
 
-*  Store the supplied AT position and another point that is 1 pixel away
-*  from AT along each grid axis.
+*  Store the supplied AT position and a set of neighbouring points that
+*  are all one pixel away from AT along different directions.
          DO I = 1, NPIX
-            IN( 1, I ) = AT( I )
-            IN( 2, I ) = AT( I ) + 1.0
+            OFF( I ) = 0.0D0
+         END DO
+
+         NPNT = 3**NPIX
+         DO IPNT = 1, NPNT
+
+            INCR = .TRUE.
+            DO I = 1, NPIX
+               IN( IPNT, I ) = AT( I ) + OFF( I )
+
+               IF( INCR ) THEN
+                  OFF( I ) = OFF( I ) + 1.0D0
+                  INCR = .FALSE.
+
+                  IF( OFF( I ) .EQ. 2.0D0 ) THEN
+                     OFF( I ) = -1.0D0
+                  ELSE IF( OFF( I ) .EQ. 0.0D0 ) THEN
+                     INCR = .TRUE.
+                  END IF
+
+               END IF
+
+            END DO
+
          END DO
 
 *  Transform them into WCS coords.
-         CALL AST_TRANN( MAP, 2, NPIX, 2, IN, .TRUE., NWCS, 2, OUT,
-     :                   STATUS )
+         CALL AST_SETL( MAP, 'Report', .TRUE., STATUS )
+         CALL AST_TRANN( MAP, NPNT, NPIX, MAXPNT, IN, .TRUE., NWCS,
+     :                   MAXPNT, OUT, STATUS )
+         CALL AST_SETL( MAP, 'Report', .FALSE., STATUS )
+
+*  For each WCS axis, find the point which is furthest away from the AT
+*  point.
+         DO I = 1, NWCS
+            DAXMAX = -1.0D0
+            IMAX( I ) = 0
+
+            DO IPNT = 2, NPNT
+               DAX = AST_AXDISTANCE( FWCS, I, OUT( 1, I ),
+     :                               OUT( IPNT, I ), STATUS )
+               IF( DAX .NE. AST__BAD ) THEN
+                  DAX = ABS( DAX )
+                  IF( DAX .GT. DAXMAX ) THEN
+                     DAXMAX = DAX
+                     IMAX( I ) = IPNT
+                  END IF
+               END IF
+            END DO
+
+         END DO
 
 *  Save a copy of the WCS co-ordinates at the AT point. Initialise Q to
 *  be the same as the AT point.
@@ -172,7 +230,7 @@
 
 *  Get the co-ordinates of a point that is a small distance away from AT
 *  along the current WCS axis.
-            Q( I ) = OUT( 2, I )
+            Q( I ) = OUT( IMAX( I ), I )
 
 *  Find the geodesic distance in the WCS frame between this point and the
 *  AT point.
