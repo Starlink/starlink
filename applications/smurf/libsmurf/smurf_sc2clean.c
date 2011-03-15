@@ -69,17 +69,18 @@
 *
 *             <keyword>=<value>
 *
-*          The available parameters are identical to the cleaning parameters
-*          used by the iterative map-maker (method=ITER) and the list of parameters
-*          is explained in the "Configuration Parameters" section and can be
-*          found, with defaults, in $SMURF_DIR/smurf_sc2clean.def.
-*          Default values will be used for any unspecified
-*          parameters. Assigning the value "<def>" (case insensitive)
-*          to a keyword has the effect of resetting it to its default
-*          value. Options available to the map-maker but not understood
-*          by SC2CLEAN will be ignored. Parameters not understood will trigger
-*          an error. Use the "cleandk." namespace for configuring cleaning
-*          parameters for the dark squids. [current value]
+*          The available parameters are identical to the cleaning
+*          parameters used by the iterative map-maker (method=ITER)
+*          and the list of parameters is explained in the
+*          "Configuration Parameters" section and can be found, with
+*          defaults, in $SMURF_DIR/smurf_sc2clean.def.  Default values
+*          will be used for any unspecified parameters. Assigning the
+*          value "<def>" (case insensitive) to a keyword has the
+*          effect of resetting it to its default value. Options
+*          available to the map-maker but not understood by SC2CLEAN
+*          will be ignored. Parameters not understood will trigger an
+*          error. Use the "cleandk." namespace for configuring
+*          cleaning parameters for the dark squids. [current value]
 *     IN = NDF (Read)
 *          Input files to be cleaned
 *     MSG_FILTER = _CHAR (Read)
@@ -94,10 +95,10 @@
 *          line). If a null (!) value is supplied no file is created. [!]
 
 *  Configuration Parameters:
-*     APOD = INTEGER
-*       Apodize signals (smoothly roll-off) using sine/cosine functions at
-*       start and end of the signal across this many samples. The supplied
-*       APOD value is ignored and a value of zero is used if ZEROPAD is set to 0.
+*     APOD = INTEGER Apodize signals (smoothly roll-off) using
+*       sine/cosine functions at start and end of the signal across
+*       this many samples. The supplied APOD value is ignored and a
+*       value of zero is used if ZEROPAD is set to 0.
 *     BADFRAC = REAL
 *       Flag entire bolometer as dead if at least this fraction of the samples
 *       in a detector time series were flagged as bad by the DA system.
@@ -329,16 +330,18 @@ void smurf_sc2clean( int *status ) {
     /* Apply a mask to the quality array and data array */
     smf_apply_mask( ffdata, bbms, SMF__BBM_QUAL|SMF__BBM_DATA, 0, status );
 
-    /* Place cleaning parameters into a keymap and set defaults. Do this inside
-       the loop in case we are cleaning files with differing sub-instruments.
-       Note that we use the map-maker defaults file here (which loads the sc2clean
-       defaults) so that we populate the locked keymap with all the parameters that
-       people may come across to allow them to load their map-maker config directly
-       into sc2clean.
+    /* Place cleaning parameters into a keymap and set defaults. Do
+       this inside the loop in case we are cleaning files with
+       differing sub-instruments.  Note that we use the map-maker
+       defaults file here (which loads the sc2clean defaults) so that
+       we populate the locked keymap with all the parameters that
+       people may come across to allow them to load their map-maker
+       config directly into sc2clean.
     */
+
     sub_instruments = smf_subinst_keymap( ffdata, NULL, 0, status );
-    keymap = kpg1Config( "CONFIG", "$SMURF_DIR/smurf_makemap.def", sub_instruments,
-                         status );
+    keymap = kpg1Config( "CONFIG", "$SMURF_DIR/smurf_makemap.def",
+                         sub_instruments, status );
     sub_instruments = astAnnul( sub_instruments );
 
     if (*status != SAI__OK) {
@@ -404,8 +407,8 @@ void smurf_sc2clean( int *status ) {
         size_t last_nmap = 0;
         if (tmparr) tmparr->owndata = 0;  /* someone else owns smfData */
         smf_addto_smfArray( tmparr, ffdata, status );
-        smf_qualstats_report( MSG__VERB, SMF__QFAM_TSERIES, 1, tmparr, last_qcount,
-                              &last_nmap, 1, NULL, NULL, status );
+        smf_qualstats_report( MSG__VERB, SMF__QFAM_TSERIES, 1, tmparr,
+                              last_qcount, &last_nmap, 1, NULL, NULL, status );
         smf_close_related( &tmparr, status );
       }
     }
