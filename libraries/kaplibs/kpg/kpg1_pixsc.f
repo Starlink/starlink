@@ -163,25 +163,42 @@
 *  Check the Mapping has an inverse transformation.
       IF( AST_GETL( MAP, 'TranInverse', STATUS ) ) THEN
 
-*  Store the supplied AT position and a set of neighbouring points that
-*  are all one pixel away from AT along different directions.
+*  Store the supplied AT position and a set of neighbouring test points
+*  that are all one pixel away from AT along different directions. For
+*  each pixel axis, the OFF array holds the pixel offset of the current
+*  test point from the AT point. Initialise the OFF array so that teh
+*  current test point is the AT point.
          DO I = 1, NPIX
             OFF( I ) = 0.0D0
          END DO
 
+*  Get the total number of test points. Each axis has 3 test offsets, +1,
+*  0 and -1.
          NPNT = 3**NPIX
+
+*  Loop round all test points.
          DO IPNT = 1, NPNT
 
+*  For each axis , store the pixel coord at the current test point.
+*  Set the INCR flag so that the offset for axis 1 is always incremented.
             INCR = .TRUE.
             DO I = 1, NPIX
                IN( IPNT, I ) = AT( I ) + OFF( I )
 
+*  If required, increment the pixel offset for the current axis. These
+*  offsets are used in the order zero, +1, -1.
                IF( INCR ) THEN
                   OFF( I ) = OFF( I ) + 1.0D0
+
+*  Assume we wont need to increment any other offsets.
                   INCR = .FALSE.
 
+*  When we reach an offset of +2, change it to -1.
                   IF( OFF( I ) .EQ. 2.0D0 ) THEN
                      OFF( I ) = -1.0D0
+
+*  When we come back to zero offset, it is time to increment the offset on
+*  the next axis.
                   ELSE IF( OFF( I ) .EQ. 0.0D0 ) THEN
                      INCR = .TRUE.
                   END IF
@@ -193,10 +210,8 @@
          END DO
 
 *  Transform them into WCS coords.
-         CALL AST_SETL( MAP, 'Report', .TRUE., STATUS )
          CALL AST_TRANN( MAP, NPNT, NPIX, MAXPNT, IN, .TRUE., NWCS,
      :                   MAXPNT, OUT, STATUS )
-         CALL AST_SETL( MAP, 'Report', .FALSE., STATUS )
 
 *  For each WCS axis, find the point which is furthest away from the AT
 *  point.
