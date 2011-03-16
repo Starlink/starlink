@@ -57687,7 +57687,11 @@ The following applications have been modified:
 
 %\subsection{General Changes}
 %\begin{itemize}
-
+   \item Applications that report pixel scales (\emph{e.g.} NDFTRACE,
+   WCSFRAME, \emph{etc.}) now report more representative pixel scales.
+   Previously the pixel scales were measured at the first pixel in the
+   array. Now the pixel scales are found at a number of places within the
+   array, and the median of these values are reported.
 %\end{itemize}
 
 \subsection{Modified Commands}
@@ -57710,7 +57714,7 @@ The following applications have been modified:
       \begin{itemize}
         \item If an input NDF has more pixel axes than the reference NDF,
          an attempt will now be made to align the input using the reference
-         axes, whilst retaining the other axes. Thus, if a three-dimensional 
+         axes, whilst retaining the other axes. Thus, if a three-dimensional
          spectral cube is aligned with a two-dimensional image, the resuling
          output NDF would be a three-dimensional cube, aligned spatially
          with the image.

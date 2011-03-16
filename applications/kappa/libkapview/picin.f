@@ -137,7 +137,9 @@
 *  Copyright:
 *     Copyright (C) 1991, 1993 Science & Engineering Research Council.
 *     Copyright (C) 2001, 2004 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils.
+*     Copyright (C) 2011 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -169,6 +171,11 @@
 *        Converted to AST/PGPLOT.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     16-MAR-2011 (DSB):
+*        Change call to KPG1_DSFRM so that the displayed pixel scales
+*        are the median values taken at a range of different positions in
+*        the picture, rather than just being the scales at the bottom
+*        left corner.
 *     {enter_further_changes_here}
 
 *-
@@ -376,10 +383,10 @@
          IF( DESC ) THEN
             IF( USECUR ) THEN
                CALL KPG1_DSFRM( IPLOT, '   Current co-ordinate Frame:',
-     :                          .TRUE., STATUS )
+     :                          LBNDG, UBNDG, .TRUE., STATUS )
             ELSE
                CALL KPG1_DSFRM( IPLOT, '   Requested co-ordinate '//
-     :                          'Frame:', .TRUE., STATUS )
+     :                          'Frame:', LBNDG, UBNDG, .TRUE., STATUS )
             END IF
 
          ELSE

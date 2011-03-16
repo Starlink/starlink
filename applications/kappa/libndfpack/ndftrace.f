@@ -328,6 +328,10 @@
 *        it writes out the out value for output parameter FPIXSCALE.
 *     8-NOV-2010 (DSB):
 *        Add support for DELTA storage form.
+*     16-MAR-2011 (DSB):
+*        Change call to KPG1_DSFRM so that the displayed pixel scales
+*        are the median values taken at a range of different positions in
+*        the NDF, rather than just being the scales at the first pixel.
 *     {enter_further_changes_here}
 
 *-
@@ -1156,7 +1160,8 @@
                END IF
 
                CALL MSG_SETI( 'INDEX', IFRAME )
-               CALL KPG1_DSFRM( IWCS, BUF( : IAT ), FULLFR, STATUS )
+               CALL KPG1_DSFRM( IWCS, BUF( : IAT ), LBIN, UBIN, FULLFR,
+     :                          STATUS )
 
             END IF
 

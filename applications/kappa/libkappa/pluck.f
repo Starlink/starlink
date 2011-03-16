@@ -511,7 +511,7 @@
          IF ( DESC ) THEN
             CALL KPG1_DSFRM( CFRM, 'Positions should be supplied in '/
      :                       /'the following co-ordinate Frame:',
-     :                       .TRUE., STATUS )
+     :                       AST__BAD, AST__BAD, .TRUE., STATUS )
          END IF
       END IF
 

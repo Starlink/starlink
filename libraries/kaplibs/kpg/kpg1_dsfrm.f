@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_DSFRM( FSET, TEXT, FULL, STATUS )
+      SUBROUTINE KPG1_DSFRM( FSET, TEXT, LBND, UBND, FULL, STATUS )
 *+
 *  Name:
 *     KPG1_DSFRM
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_DSFRM( FSET, TEXT, FULL, STATUS )
+*     CALL KPG1_DSFRM( FSET, TEXT, LBND, UBND, FULL, STATUS )
 
 *  Description:
 *     This routine displays a textual description of the Current Frame
@@ -36,6 +36,14 @@
 *        recognised is "ndftrace:", which causes the pixel scales to be
 *        written out to the output parameter FPIXSCALE. Any such string is
 *        not included in the displayed title.
+*     LBND( * ) = DOUBLE PRECISION (Given)
+*        The lower bounds of a region within the base Frame over which
+*        the displayed nominal WCS axis scales are to be determined. Both
+*        UBND and LBND are ignored if the first element of either UBND or
+*        LBND is AST__BAD, in which case the displayed WCS axis scales are
+*        determined at coords (1,1,...) in the base Frame.
+*     UBND( * ) = DOUBLE PRECISION (Given)
+*        The Upper bounds of a region within the base Frame. See LBND.
 *     FULL = LOGICAL (Given)
 *        Display full information?
 *     STATUS = INTEGER (Given and Returned)
@@ -43,7 +51,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998, 1999, 2000, 2003 Central Laboratory of the Research Councils.
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2011 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -84,6 +92,10 @@
 *        avoid changing the calling signature of this function, control
 *        over this feature is provided via a special string flag supplied
 *        at the start of TEXT.
+*     16-MAR-2011 (DSB):
+*        Changed so that the displayed WCS axis scales can be the nominal
+*        values taken over the whole image rather than just at position
+*        1,1,1...).
 *     {enter_changes_here}
 
 *  Bugs:
@@ -102,6 +114,8 @@
 *  Arguments Given:
       INTEGER FSET
       CHARACTER TEXT*(*)
+      DOUBLE PRECISION LBND( * )
+      DOUBLE PRECISION UBND( * )
       LOGICAL FULL
 
 *  Status:
@@ -227,9 +241,16 @@
                CALL MSG_OUT( 'WCS_FIRSTP',
      :      '        First pixel centre  : ^FIRST', STATUS )
 
-*  Get the pixel scales at the first pixel.
-               CALL KPG1_PIXSC( FSET, GFIRST, PIXSC, FPIXSC, UPIXSC,
-     :                          STATUS )
+*  Get the pixel scales at the first pixel, or the nominal scales over
+*  the supplied region within the base Frame.
+               IF( LBND( 1 ) .EQ. AST__BAD .OR.
+     :             UBND( 1 ) .EQ. AST__BAD ) THEN
+                  CALL KPG1_PIXSC( FSET, GFIRST, PIXSC, FPIXSC, UPIXSC,
+     :                             STATUS )
+               ELSE
+                  CALL KPG1_SCALE( FSET, LBND, UBND, PIXSC, FPIXSC,
+     :                             UPIXSC, STATUS )
+               END IF
 
             END IF
 

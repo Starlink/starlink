@@ -898,7 +898,7 @@
             CALL MSG_BLANK( STATUS )
             CALL KPG1_DSFRM( IWCS, 'Positions will be reported in '//
      :                       'the following co-ordinate Frame:',
-     :                       .TRUE., STATUS )
+     :                       AST__BAD, AST__BAD, .TRUE., STATUS )
          END IF
 
 *  Display any title read from the positions list.

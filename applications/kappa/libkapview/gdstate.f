@@ -196,7 +196,7 @@
 *     Copyright (C) 1989-1991 Science & Engineering Research Council.
 *     Copyright (C) 2000, 2002, 2004 Central Laboratory of the Research
 *     Councils.
-*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2010-2011 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -249,6 +249,11 @@
 *        Use CNF_PVAL.
 *     2010 October 14 (MJC):
 *        Allow temporary style attributes.
+*     16-MAR-2011 (DSB):
+*        Change call to KPG1_DSFRM so that the displayed pixel scales
+*        are the median values taken at a range of different positions in
+*        the picture, rather than just being the scales at the bottom
+*        left corner.
 *     {enter_further_changes_here}
 
 *-
@@ -495,10 +500,10 @@
          IF ( DESC ) THEN
             IF ( USECUR ) THEN
                CALL KPG1_DSFRM( IPLOT, '   Current co-ordinate Frame:',
-     :                          .TRUE., STATUS )
+     :                          LBNDG, UBNDG, .TRUE., STATUS )
             ELSE
                CALL KPG1_DSFRM( IPLOT, '   Requested co-ordinate '//
-     :                          'Frame:', .TRUE., STATUS )
+     :                          'Frame:', LBNDG, UBNDG, .TRUE., STATUS )
             END IF
 
          ELSE

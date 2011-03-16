@@ -230,12 +230,14 @@ kpg1_prnth.f \
 kpg1_pseed.f \
 kpg1_pvers.f \
 kpg1_px2ax.f \
+kpg1_pxscl.f \
 kpg1_r2nag.f \
 kpg1_rcatw.f \
 kpg1_rdast.f \
 kpg1_reprt.f \
 kpg1_rglmt.f \
 kpg1_saxat.f \
+kpg1_scale.f \
 kpg1_scalx.f \
 kpg1_sclof.f \
 kpg1_sdimp.f \

@@ -308,8 +308,8 @@
 *  of the Current Frame, and the default format.
          ELSE IF( POS( F : L ) .EQ. ':' ) THEN
             CALL KPG1_DSFRM( IWCS, 'A position is required in the '//
-     :                       'following co-ordinate frame:', .TRUE.,
-     :                       STATUS )
+     :                       'following co-ordinate frame:', AST__BAD,
+     :                       AST__BAD, .TRUE., STATUS )
 
             CALL MSG_SETC( 'FMT', FMT )
             CALL MSG_OUT( 'KPG1_GTPOS_M1', '      Suggested format: '//

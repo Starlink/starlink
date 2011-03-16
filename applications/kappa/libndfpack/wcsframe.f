@@ -114,6 +114,7 @@
 *     KAPPA: NDFTRACE, WCSREMOVE, WCSCOPY, WCSATTRIB
 
 *  Copyright:
+*     Copyright (C) 2011 Science & Technology Facilities Council.
 *     Copyright (C) 1998-1999 Central Laboratory of the Research
 *     Councils. All Rights Reserved.
 
@@ -142,6 +143,10 @@
 *        Original version.
 *     25-AUG-1999 (DSB):
 *        Add TOKEN arg in call to KPG1_ASFRM
+*     16-MAR-2011 (DSB):
+*        Change call to KPG1_DSFRM so that the displayed pixel scales
+*        are the median values taken at a range of different positions in
+*        the NDF, rather than just being the scales at the first pixel.
 *     {enter_further_changes_here}
 
 *-
@@ -152,6 +157,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PAR_PAR'          ! PAR constants
       INCLUDE 'AST_PAR'          ! AST constants
+      INCLUDE 'NDF_PAR'          ! NDF constants
 
 *  Status:
       INTEGER STATUS
@@ -161,8 +167,13 @@
 
 *  Local Variables:
       CHARACTER DEF*50           ! Dynamic default value for FRAME
+      DOUBLE PRECISION GLB( NDF__MXDIM ) ! Lower GRID bounds
+      DOUBLE PRECISION GUB( NDF__MXDIM ) ! Upper GRID bounds
+      INTEGER DIMS( NDF__MXDIM ) ! Length of each NDF pixel axis
+      INTEGER I                  ! Axis index
       INTEGER INDF               ! NDF identifier
       INTEGER IWCS               ! AST pointer for WCS FrameSet
+      INTEGER NDIM               ! Number of pixel axes in the NDF
       INTEGER STATE              ! Indicates state of FRAME parameter
 *.
 
@@ -179,13 +190,23 @@
       CALL KPG1_GTWCS( INDF, IWCS, STATUS )
 
 *  If no value was supplied for parameter FRAME on the command line,
-*  display the current co-ordinate Frame.
+*  we display the current co-ordinate Frame.
       CALL LPG_STATE( 'FRAME', STATE, STATUS )
       IF( STATE .NE. PAR__ACTIVE ) THEN
+
+*  Get the dimensions of the NDF, and store the bounds of the NDF in grid
+*  coords.
+         CALL NDF_DIM( INDF, NDF__MXDIM, DIMS, NDIM, STATUS )
+         DO I = 1, NDIM
+            GLB( I ) = 0.5D0
+            GUB( I ) = DIMS( I ) + 0.5D0
+         END DO
+
+*  Display the coordinate Frame description.
          CALL MSG_BLANK( STATUS )
          CALL NDF_MSG( 'NDF', INDF )
          CALL KPG1_DSFRM( IWCS, 'Current co-ordinate Frame in ^NDF:',
-     :                    .TRUE., STATUS )
+     :                    GLB, GUB, .TRUE., STATUS )
       END IF
 
 *  Abort if an error has occurred.

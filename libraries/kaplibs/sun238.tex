@@ -20549,7 +20549,7 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
       in the supplied AST FrameSet.
    }
    \sstinvocation{
-      CALL KPG1\_DSFRM( FSET, TEXT, FULL, STATUS )
+      CALL KPG1\_DSFRM( FSET, TEXT, LBND, UBND, FULL, STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -20566,6 +20566,20 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
          recognised is {\tt "}ndftrace:{\tt "}, which causes the pixel scales to be
          written out to the output parameter FPIXSCALE. Any such string is
          not included in the displayed title.
+      }
+      \sstsubsection{
+         LBND( $*$ ) = DOUBLE PRECISION (Given)
+      }{
+         The lower bounds of a region within the base Frame over which
+         the displayed nominal WCS axis scales are to be determined. Both
+         UBND and LBND are ignored if the first element of either UBND or
+         LBND is AST\_\_BAD, in which case the displayed WCS axis scales are
+         determined at coords (1,1,...) in the base Frame.
+      }
+      \sstsubsection{
+         UBND( $*$ ) = DOUBLE PRECISION (Given)
+      }{
+         The Upper bounds of a region within the base Frame. See LBND.
       }
       \sstsubsection{
          FULL = LOGICAL (Given)
@@ -31349,14 +31363,14 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
 \sstroutine{
    KPG1\_PIXSC
 }{
-   Determines pixel scales at a given grid position
+   Determines formatted pixel scales at a given grid position
 }{
    \sstdescription{
       This routine determines the scales of the WCS axes in the current
-      Frame of the supplied FrameSet. For a specified WCS axis, the
-      returned scale is the WCS axis increment produced by moving a
-      distance of one grid pixel away from the supplied {\tt "}AT{\tt "} position,
-      along the WCS axis.
+      Frame of the supplied FrameSet, and formated them into a string.
+      For a specified WCS axis, the returned scale is the WCS axis
+      increment produced by moving a distance of one grid pixel away
+      from the supplied {\tt "}AT{\tt "} position, along the WCS axis.
    }
    \sstinvocation{
       CALL KPG1\_PIXSC( IWCS, AT, PIXSC, VALUE, UNIT, STATUS )
@@ -33588,6 +33602,49 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
    }
 }
 \sstroutine{
+   KPG1\_PXSCL
+}{
+   Determines pixel scales at a given grid position
+}{
+   \sstdescription{
+      This routine determines the scales of the WCS axes in the current
+      Frame of the supplied FrameSet. For a specified WCS axis, the
+      returned scale is the WCS axis increment produced by moving a
+      distance of one grid pixel away from the supplied {\tt "}AT{\tt "} position,
+      along the WCS axis.
+   }
+   \sstinvocation{
+      CALL KPG1\_PXSCL( IWCS, AT, PXSCL, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IWCS = INTEGER (Given)
+      }{
+         The FrameSet.
+      }
+      \sstsubsection{
+         AT( $*$ ) = DOUBLE PRECISION (Given)
+      }{
+         The position in GRID co-ordinates at which the pixel scales are
+         to be determined. Note, the pixel scales may vary across the data
+         array if the WCS Mappings are non-linear. The array should have
+         one element for each GRID axis.
+      }
+      \sstsubsection{
+         PXSCL( $*$ ) = DOUBLE PRECISION (Returned)
+      }{
+         The returned pixel scales. Note, the pixel scale for both celestial
+         longitude and latitude axes are returned as an arc-distance in
+         radians. The array should have one element for each WCS axis.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
    KPG1\_QNTLx
 }{
    Finds a quantile in a (possibly weighted) set of data
@@ -34872,6 +34929,76 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
          FRAME = INTEGER (Given)
       }{
          The identifier for the AST Frame to be modified.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   KPG1\_SCALE
+}{
+   Determines nominal WCS axis scales in an array
+}{
+   \sstdescription{
+      This routine determines (and formats) the nominal scales of the WCS
+      axes in the current Frame of the supplied FrameSet. The scales are
+      determined at a selection of points within the supplied base Frame
+      bounds, and the median scales are returned. At each point, the scale
+      for a specific WCS axis is the WCS axis increment produced by moving
+      a unit distance within the base Frame away from the point, along the
+      WCS axis.
+   }
+   \sstinvocation{
+      CALL KPG1\_SCALE( IWCS, LBND, UBND, SCALE, VALUE, UNIT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IWCS = INTEGER (Given)
+      }{
+         The FrameSet.
+      }
+      \sstsubsection{
+         LBND( $*$ ) = DOUBLE PRECISION (Given)
+      }{
+         The lower bounds of the region within the base Frame of the
+         supplied FrameSet in which the WCS scales are to be evaluated.
+         The array should have one element for each base Frame axis.
+      }
+      \sstsubsection{
+         UBND( $*$ ) = DOUBLE PRECISION (Given)
+      }{
+         The upper bounds of the region within the base Frame of the
+         supplied FrameSet in which the WCS scales are to be evaluated.
+         The array should have one element for each base Frame axis.
+      }
+      \sstsubsection{
+         SCALE( $*$ ) = DOUBLE PRECISION (Returned)
+      }{
+         The returned WCS scales. Note, the scales for both celestial
+         longitude and latitude axes are returned as an arc-distance in
+         radians. The array should have one element for each WCS axis.
+      }
+      \sstsubsection{
+         VALUE( $*$ ) = CHARACTER( $*$ ) (Returned)
+      }{
+         The formatted WCS scales. Celestial axes are formatted as
+         arc-seconds using a {\tt "}G15.6{\tt "} format. Time values are also formatted
+         using G15.6 (the Format attribute in the current WCS Frame is
+         ignored, since it may produce a calendar date), in what ever
+         units are indicated in the current Frame. Other types of
+         axes (including spectral axes) are formatted using the axis Format
+         attribute in the current WCS Frame. The array should have one
+         element for each WCS axis. Each element of the array should be at
+         least 15 characters long. The returned text is left justified.
+      }
+      \sstsubsection{
+         UNIT( $*$ ) = CHARACTER( $*$ ) (Returned)
+      }{
+         Units strings that describe the values returned in VALUES. The
+         array should have one element for each WCS axis.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)

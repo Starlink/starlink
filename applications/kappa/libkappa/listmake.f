@@ -494,8 +494,8 @@
       IF( DESC ) THEN
          CALL MSG_BLANK( STATUS )
          CALL KPG1_DSFRM( FRM, 'Positions must be supplied in '//
-     :                    'the following co-ordinate Frame:', .TRUE.,
-     :                    STATUS )
+     :                    'the following co-ordinate Frame:', AST__BAD,
+     :                    AST__BAD, .TRUE., STATUS )
       END IF
 
 *  If required, attempt to read positions from a file specified by the

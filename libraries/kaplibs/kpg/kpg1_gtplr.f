@@ -573,8 +573,8 @@
          ELSE IF ( POS( F : L ) .EQ. ':' .AND.
      :             STATUS .EQ. SAI__OK ) THEN
             CALL KPG1_DSFRM( COPWCS, 'A position is required in the '//
-     :                       'following co-ordinate frame:', .TRUE.,
-     :                       STATUS )
+     :                       'following co-ordinate frame:', AST__BAD,
+     :                       AST__BAD, .TRUE., STATUS )
 
             CALL MSG_SETC( 'FMT', FMT )
             CALL MSG_OUT( 'KPG1_GTPLR_M3', '      Suggested format: '//

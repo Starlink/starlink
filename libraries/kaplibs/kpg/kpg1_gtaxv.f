@@ -256,7 +256,8 @@
             CALL CHR_APPND( ' in the following co-ordinate frame:',
      :                      TEXT, IAT )
 
-            CALL KPG1_DSFRM( FRAME, TEXT( : IAT ), .TRUE., STATUS )
+            CALL KPG1_DSFRM( FRAME, TEXT( : IAT ), AST__BAD, AST__BAD,
+     :                       .TRUE., STATUS )
 
             CALL MSG_SETC( 'FMT', FMT )
             CALL MSG_OUT( 'KPG1_GTAXV_M1', '      Suggested format: '//

@@ -760,8 +760,8 @@
 *  will be reported if required.
       IF( DESC .AND. .NOT. QUIET ) THEN
          CALL KPG1_DSFRM( CFRM, 'Positions will be reported in the '//
-     :                    'following co-ordinate Frame:', .TRUE.,
-     :                    STATUS )
+     :                    'following co-ordinate Frame:', AST__BAD,
+     :                    AST__BAD, .TRUE., STATUS )
       END IF
 
 *  If we are in "File" mode, obtain the file and read the positions,

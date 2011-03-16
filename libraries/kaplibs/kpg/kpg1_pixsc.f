@@ -4,7 +4,7 @@
 *     KPG1_PIXSC
 
 *  Purpose:
-*     Determines pixel scales at a given grid position.
+*     Determines formatted pixel scales at a given grid position.
 
 *  Language:
 *     Starlink Fortran 77
@@ -14,10 +14,10 @@
 
 *  Description:
 *     This routine determines the scales of the WCS axes in the current
-*     Frame of the supplied FrameSet. For a specified WCS axis, the
-*     returned scale is the WCS axis increment produced by moving a
-*     distance of one grid pixel away from the supplied "AT" position,
-*     along the WCS axis.
+*     Frame of the supplied FrameSet, and formated them into a string.
+*     For a specified WCS axis, the returned scale is the WCS axis
+*     increment produced by moving a distance of one grid pixel away
+*     from the supplied "AT" position, along the WCS axis.
 
 *  Arguments:
 *     IWCS = INTEGER (Given)
@@ -48,7 +48,7 @@
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2011 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -82,6 +82,8 @@
 *     15-MAR-2011 (DSB):
 *        Fix bug that caused a scale of zero to be returned for celestial
 *        axes inclined at exactly 45 degrees to the X axis.
+*     16-MAR-2011 (DSB):
+*        Re-written to use KPG1_PXSCL.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -94,10 +96,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'AST_PAR'          ! AST constants
-      INCLUDE 'PRM_PAR'          ! PRIMDAT constants
-      INCLUDE 'CNF_PAR'          ! For CNF_PVAL
 
 *  Arguments Given:
       INTEGER IWCS
@@ -111,288 +110,77 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  Local Constants:
-      INTEGER MAXPNT
-      PARAMETER ( MAXPNT = 3**NDF__MXDIM )
-
 *  Local Variables:
       CHARACTER ATTR*20
       CHARACTER DOM*30
-      DOUBLE PRECISION ATWCS( NDF__MXDIM )
-      DOUBLE PRECISION DAX
-      DOUBLE PRECISION DAXMAX
-      DOUBLE PRECISION DPIX
-      DOUBLE PRECISION DWCS
-      DOUBLE PRECISION IN( MAXPNT, NDF__MXDIM )
-      DOUBLE PRECISION OFF( NDF__MXDIM )
-      DOUBLE PRECISION OUT( MAXPNT, NDF__MXDIM )
-      DOUBLE PRECISION Q( NDF__MXDIM )
-      DOUBLE PRECISION QGRID( NDF__MXDIM )
-      DOUBLE PRECISION XIN( 2 )
-      DOUBLE PRECISION XOUT( 2 )
-      INTEGER FGRID
       INTEGER FWCS
       INTEGER I
       INTEGER IAT
-      INTEGER IMAX( NDF__MXDIM )
-      INTEGER IPNT
-      INTEGER MAP
-      INTEGER NPIX
-      INTEGER NPNT
       INTEGER NWCS
-      INTEGER OMAP
-      INTEGER OUTAX( NDF__MXDIM )
-      LOGICAL INCR
 *.
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Get the number of grid axes.
-      NPIX = AST_GETI( IWCS, 'Nin', STATUS )
+*  Get the numerical pixel scales.
+      CALL KPG1_PXSCL( IWCS, AT, PIXSC, STATUS )
 
-*  Get the number of WCS axes.
-      NWCS = AST_GETI( IWCS, 'Nout', STATUS )
-
-*  Get pointers to the base and current Frames, and the base to current
-*  Mapping.
-      FGRID = AST_GETFRAME( IWCS, AST__BASE, STATUS )
+*  Get a pointer to the current (i.e. WCS) Frame, and get the number of
+*  WCS axes.
       FWCS = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
-      MAP = AST_GETMAPPING( IWCS, AST__BASE, AST__CURRENT, STATUS )
-
-*  Check the Mapping has an inverse transformation.
-      IF( AST_GETL( MAP, 'TranInverse', STATUS ) ) THEN
-
-*  Store the supplied AT position and a set of neighbouring test points
-*  that are all one pixel away from AT along different directions. For
-*  each pixel axis, the OFF array holds the pixel offset of the current
-*  test point from the AT point. Initialise the OFF array so that teh
-*  current test point is the AT point.
-         DO I = 1, NPIX
-            OFF( I ) = 0.0D0
-         END DO
-
-*  Get the total number of test points. Each axis has 3 test offsets, +1,
-*  0 and -1.
-         NPNT = 3**NPIX
-
-*  Loop round all test points.
-         DO IPNT = 1, NPNT
-
-*  For each axis , store the pixel coord at the current test point.
-*  Set the INCR flag so that the offset for axis 1 is always incremented.
-            INCR = .TRUE.
-            DO I = 1, NPIX
-               IN( IPNT, I ) = AT( I ) + OFF( I )
-
-*  If required, increment the pixel offset for the current axis. These
-*  offsets are used in the order zero, +1, -1.
-               IF( INCR ) THEN
-                  OFF( I ) = OFF( I ) + 1.0D0
-
-*  Assume we wont need to increment any other offsets.
-                  INCR = .FALSE.
-
-*  When we reach an offset of +2, change it to -1.
-                  IF( OFF( I ) .EQ. 2.0D0 ) THEN
-                     OFF( I ) = -1.0D0
-
-*  When we come back to zero offset, it is time to increment the offset on
-*  the next axis.
-                  ELSE IF( OFF( I ) .EQ. 0.0D0 ) THEN
-                     INCR = .TRUE.
-                  END IF
-
-               END IF
-
-            END DO
-
-         END DO
-
-*  Transform them into WCS coords.
-         CALL AST_TRANN( MAP, NPNT, NPIX, MAXPNT, IN, .TRUE., NWCS,
-     :                   MAXPNT, OUT, STATUS )
-
-*  For each WCS axis, find the point which is furthest away from the AT
-*  point.
-         DO I = 1, NWCS
-            DAXMAX = -1.0D0
-            IMAX( I ) = 0
-
-            DO IPNT = 2, NPNT
-               DAX = AST_AXDISTANCE( FWCS, I, OUT( 1, I ),
-     :                               OUT( IPNT, I ), STATUS )
-               IF( DAX .NE. AST__BAD ) THEN
-                  DAX = ABS( DAX )
-                  IF( DAX .GT. DAXMAX ) THEN
-                     DAXMAX = DAX
-                     IMAX( I ) = IPNT
-                  END IF
-               END IF
-            END DO
-
-         END DO
-
-*  Save a copy of the WCS co-ordinates at the AT point. Initialise Q to
-*  be the same as the AT point.
-         DO I = 1, NWCS
-            ATWCS( I ) = OUT( 1, I )
-            Q( I ) = ATWCS( I )
-         END DO
+      NWCS = AST_GETI( FWCS, 'Naxes', STATUS )
 
 *  Now loop round each WCS axis.
-         DO I = 1, NWCS
+      DO I = 1, NWCS
 
-*  Get the co-ordinates of a point that is a small distance away from AT
-*  along the current WCS axis.
-            Q( I ) = OUT( IMAX( I ), I )
-
-*  Find the geodesic distance in the WCS frame between this point and the
-*  AT point.
-            DWCS = AST_DISTANCE( FWCS, ATWCS, Q, STATUS )
-
-*  Transform the outlying WCS positions back into GRID coords.
-            CALL AST_TRANN( MAP, 1, NWCS, 1, Q, .FALSE., NPIX, 1, QGRID,
-     :                      STATUS )
-
-*  Find the distance between the two points in the GRID frame.
-            DPIX = AST_DISTANCE( FGRID, AT, QGRID, STATUS )
-
-*  Find and return the axis scale.
-            IF( DWCS .NE. AST__BAD .AND. DPIX .NE. AST__BAD .AND.
-     :          DPIX .NE. 0.0 ) THEN
-               PIXSC( I ) = DWCS/DPIX
+*  If the pixel scale for the current WCS axis was found, format it. */
+         IF( PIXSC( I ) .NE. AST__BAD ) THEN
 
 *  Get the Domain of the primary Frame defining the current axis.
-               ATTR = 'Domain('
-               IAT = 7
+            ATTR = 'Domain('
+            IAT = 7
+            CALL CHR_PUTI( I, ATTR, IAT )
+            CALL CHR_APPND( ')', ATTR, IAT )
+            DOM = AST_GETC( FWCS, ATTR( : IAT ), STATUS )
+
+*  If this is a celestial axis, we convert from radians to arc-seconds
+*  and format with a fixed format specifier.
+            IF( DOM .EQ. 'SKY' ) THEN
+               WRITE( VALUE( I ), '(G15.6)' ) PIXSC( I )*
+     :                                        AST__DR2D*3600.0
+               CALL CHR_LDBLK( VALUE( I ) )
+               UNIT( I ) = 'arc-sec'
+
+*  If this is time, we ignore the Format since it may be set to format as
+*  a  calendar date.
+            ELSE IF( DOM .EQ. 'TIME' ) THEN
+               WRITE( VALUE( I ), '(G15.6)' ) PIXSC( I )
+               CALL CHR_LDBLK( VALUE( I ) )
+
+               ATTR = 'Unit('
+               IAT = 5
                CALL CHR_PUTI( I, ATTR, IAT )
                CALL CHR_APPND( ')', ATTR, IAT )
-               DOM = AST_GETC( FWCS, ATTR( : IAT ), STATUS )
-
-*  If this is a celestial axis, we convert from radians to arc-seconds
-*  and format with a fixed format specifier.
-               IF( DOM .EQ. 'SKY' ) THEN
-                  WRITE( VALUE( I ), '(G15.6)' ) PIXSC( I )*
-     :                                           AST__DR2D*3600.0
-                  CALL CHR_LDBLK( VALUE( I ) )
-
-                  UNIT( I ) = 'arc-sec'
-
-*  If this is time, we ignore the Format since it may be set to format as
-*  a  calendar date.
-               ELSE IF( DOM .EQ. 'TIME' ) THEN
-                  WRITE( VALUE( I ), '(G15.6)' ) PIXSC( I )
-                  CALL CHR_LDBLK( VALUE( I ) )
-
-                  ATTR = 'Unit('
-                  IAT = 5
-                  CALL CHR_PUTI( I, ATTR, IAT )
-                  CALL CHR_APPND( ')', ATTR, IAT )
-                  UNIT( I ) = AST_GETC( FWCS, ATTR( : IAT ), STATUS )
+               UNIT( I ) = AST_GETC( FWCS, ATTR( : IAT ), STATUS )
 
 *  All other axes are formatted using their own Format attribute.
-               ELSE
-                  VALUE( I ) = AST_FORMAT( FWCS, I, PIXSC( I ), STATUS )
-
-                  ATTR = 'Unit('
-                  IAT = 5
-                  CALL CHR_PUTI( I, ATTR, IAT )
-                  CALL CHR_APPND( ')', ATTR, IAT )
-                  UNIT( I ) = AST_GETC( FWCS, ATTR( : IAT ), STATUS )
-               END IF
-
             ELSE
-               PIXSC( I ) = AST__BAD
-               VALUE( I ) = '<undefined>'
-               UNIT( I ) = ' '
+               VALUE( I ) = AST_FORMAT( FWCS, I, PIXSC( I ), STATUS )
+
+               ATTR = 'Unit('
+               IAT = 5
+               CALL CHR_PUTI( I, ATTR, IAT )
+               CALL CHR_APPND( ')', ATTR, IAT )
+               UNIT( I ) = AST_GETC( FWCS, ATTR( : IAT ), STATUS )
             END IF
 
-*  Reset Q back to the AT point.
-            Q( I ) = ATWCS( I )
-
-         END DO
-
-*  If the Mapping is missing an inverse transformation, we may still be
-*  able to deal with WCS axes that correspond with a single pixel axis.
-      ELSE
-
-         DO I = 1, NWCS
-
-*  Initialise the scale to unknwon.
-            PIXSC( I ) = AST__BAD
+         ELSE
             VALUE( I ) = '<undefined>'
             UNIT( I ) = ' '
-
-*  Attempt to split off the current axis form the Mapping
-            CALL AST_MAPSPLIT( MAP, 1, I, OUTAX, OMAP, STATUS )
-            IF( OMAP .NE. AST__NULL ) then
-               IF( AST_GETI( OMAP, 'Nout', STATUS ) .EQ. 1 ) THEN
-
-*  Transform a one pixel gap into WCS coords.
-                  XIN( 1 ) = AT( 1 )
-                  XIN( 2 ) = AT( I ) + 1.0
-                  CALL AST_TRAN1( OMAP, 2, XIN, .TRUE., XOUT, STATUS )
-
-*  Find and return the axis scale.
-                  IF( XOUT( 1 ) .NE. AST__BAD .AND.
-     :                XOUT( 2 ) .NE. AST__BAD ) THEN
-                     PIXSC( I ) = ABS( XOUT( 2 ) - XOUT( 1 ) )
-
-
-*  Get the Domain of the primary Frame defining the current axis.
-                     ATTR = 'Domain('
-                     IAT = 7
-                     CALL CHR_PUTI( I, ATTR, IAT )
-                     CALL CHR_APPND( ')', ATTR, IAT )
-                     DOM = AST_GETC( FWCS, ATTR( : IAT ), STATUS )
-
-*  If this is a celestial axis, we convert from radians to arc-seconds
-*  and format with a fixed format specifier.
-                     IF( DOM .EQ. 'SKY' ) THEN
-                        WRITE( VALUE( I ), '(G15.6)' ) PIXSC( I )*
-     :                                           AST__DR2D*3600.0
-                        CALL CHR_LDBLK( VALUE( I ) )
-
-                        UNIT( I ) = 'arc-sec'
-
-*  If this is time, we ignore the Format since it may be set to format as
-*  a  calendar date.
-                     ELSE IF( DOM .EQ. 'TIME' ) THEN
-                        WRITE( VALUE( I ), '(G15.6)' ) PIXSC( I )
-                        CALL CHR_LDBLK( VALUE( I ) )
-
-                        ATTR = 'Unit('
-                        IAT = 5
-                        CALL CHR_PUTI( I, ATTR, IAT )
-                        CALL CHR_APPND( ')', ATTR, IAT )
-                        UNIT( I ) = AST_GETC( FWCS, ATTR( : IAT ),
-     :                                        STATUS )
-
-*  All other axes are formatted using their own Format attribute.
-                     ELSE
-                         VALUE( I ) = AST_FORMAT( FWCS, I, PIXSC( I ),
-     :                                            STATUS )
-
-                        ATTR = 'Unit('
-                        IAT = 5
-                        CALL CHR_PUTI( I, ATTR, IAT )
-                        CALL CHR_APPND( ')', ATTR, IAT )
-                        UNIT( I ) = AST_GETC( FWCS, ATTR( : IAT ),
-     :                                        STATUS )
-                     END IF
-
-                  END IF
-              END IF
-              CALL AST_ANNUL( OMAP, STATUS )
-           END IF
-        END DO
-
-      END IF
+         END IF
+      END DO
 
 *  Free resources
-      CALL AST_ANNUL( FGRID, STATUS )
       CALL AST_ANNUL( FWCS, STATUS )
-      CALL AST_ANNUL( MAP, STATUS )
 
       END

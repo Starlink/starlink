@@ -568,6 +568,10 @@
 *        keep valgrind happy.
 *     2010 October 14 (MJC):
 *        Permit temporary style attributes.
+*     16-MAR-2011 (DSB):
+*        Change call to KPG1_DSFRM so that the displayed pixel scales
+*        are the median values taken at a range of different positions in
+*        the NDF, rather than just being the scales at the first pixel.
 *     {enter_further_changes_here}
 
 *-
@@ -616,6 +620,8 @@
       DOUBLE PRECISION FPAR( MXCOEF ) ! Stores fixed parameter values
       LOGICAL FIXCON( BF__NCON ) ! Constraints set?
       DOUBLE PRECISION FWHM( BF__NDIM ) ! Fixed FWHM
+      DOUBLE PRECISION GLB( BF__NDIM ) ! GRID lower bounds
+      DOUBLE PRECISION GUB( BF__NDIM ) ! GRID upper bounds
       LOGICAL GOTLOC             ! Locator to the NDF obtained?
       LOGICAL GOTNAM             ! Reference name of the NDF obtained?
       LOGICAL GOTREF             ! Reference position obtained?
@@ -888,6 +894,8 @@
      :                 SLBND, SUBND, IWCS, STATUS )
       DO I = 1, BF__NDIM
          DIMS( I ) = SUBND( I ) - SLBND( I ) + 1
+         GLB( I ) = 0.5D0
+         GUB( I ) = DIMS( I ) + 0.5D0
       END DO
 
 *  In case the data have come from a cube with an insignificant axis
@@ -974,8 +982,8 @@
 *  will be reported if required.
       IF ( DESC .AND. .NOT. QUIET ) THEN
          CALL KPG1_DSFRM( CFRM, 'Positions will be reported in the '//
-     :                    'following co-ordinate Frame:', .TRUE.,
-     :                    STATUS )
+     :                    'following co-ordinate Frame:', GLB, GUB,
+     :                    .TRUE., STATUS )
       END IF
 
 *  If we are in "File" mode, obtain the file and read the positions,
