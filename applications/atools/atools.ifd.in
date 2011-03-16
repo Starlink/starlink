@@ -3395,6 +3395,54 @@ iraf! {
             helpkey *
           }
       }
+
+
+      action astratemap {
+
+         helplib {$ATOOLS_HELP}
+
+         parameter ax1 {
+            position 2
+            type _INTEGER
+            prompt {Mapping output for which rate of change is required}
+            ppath CURRENT
+            helpkey *
+         }
+
+         parameter ax2 {
+            position 3
+            type _INTEGER
+            prompt {Mapping input to be varied}
+            ppath CURRENT
+            helpkey *
+         }
+
+         parameter map {
+            position 1
+            type LITERAL
+            prompt {The encapsulated Mapping}
+            ppath CURRENT
+            helpkey *
+         }
+
+         parameter options {
+            position 4
+            type LITERAL
+            prompt {Options for the RateMap}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+         }
+
+         parameter result {
+            position 5
+            type LITERAL
+            prompt {Name of file in which to store the RateMap}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+         }
+      }
    }
 
    command astshow {

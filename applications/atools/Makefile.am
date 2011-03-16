@@ -25,12 +25,12 @@ atools_mon_TASKS = astcopy astaddframe astclear astget astset asttest \
  astdsbframe astfluxframe astsfluxframe astpolygon astellipse astmapsplit \
  astselectormap astinterval astbox astshowmesh astzoommap astdistance \
  astcircle astlinearapprox astnegate astremoveregion astdownsize \
- astoutline astrate astoverlap astmask asttrangrid astquadapprox
+ astoutline astrate astoverlap astmask asttrangrid astquadapprox astratemap
 
 FSRC = \
  atl1_gtfrm.f \
  atl1_ptobj.f atl1_setop.f atl1_gtofl.f \
- atl1_cpcol.f atl1_prnt2.f atl1_prnt1.f atl1_prntn.f 
+ atl1_cpcol.f atl1_prnt2.f atl1_prnt1.f atl1_prntn.f
 
 
 ##  The on-line help.
@@ -89,7 +89,7 @@ MISC_FILES = asttest dtask_applic.lo atools.shl history.help \
 atools_mon version.dat atools.csh atools.icl atools.sh
 
 IFC_FILES = astaddframe.ifc astclear.ifc astcmpframe.ifc astcmpmap.ifc \
-astconvert.ifc astcopy.ifc astdsbframe.ifc astellipse.ifc \
+astratemap.ifc astconvert.ifc astcopy.ifc astdsbframe.ifc astellipse.ifc \
 astfindframe.ifc astmatchaxes.ifc astfluxframe.ifc astformat.ifc astunformat.ifc astframe.ifc \
 astframeset.ifc astgetactunit.ifc astgetframe.ifc astget.ifc \
 astgetmapping.ifc astgetrefpos.ifc astinvert.ifc astlutmap.ifc \
@@ -107,7 +107,7 @@ astoutline.ifc astrate.ifc astoverlap.ifc astmask.ifc asttrangrid.ifc \
 astquadapprox.ifc
 
 IFL_FILES = astaddframe.ifl astclear.ifl astcmpframe.ifl astcmpmap.ifl \
-astconvert.ifl astcopy.ifl astdsbframe.ifl astellipse.ifl \
+astratemap.ifl astconvert.ifl astcopy.ifl astdsbframe.ifl astellipse.ifl \
 astfindframe.ifl astmatchaxes.ifl astfluxframe.ifl astformat.ifl astunformat.ifl astframe.ifl \
 astframeset.ifl astgetactunit.ifl astgetframe.ifl astget.ifl \
 astgetmapping.ifl astgetrefpos.ifl astinvert.ifl astlutmap.ifl \

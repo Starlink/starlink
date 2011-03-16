@@ -9,6 +9,10 @@
  high-level interface to the AST library.
 
 
+  Changes in V1.9-8
+
+  - New command astratemap.
+
   Changes in V1.9-7
 
   - New commands asttrangrid, astquadapprox.

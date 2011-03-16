@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(atools, 1.9-7, ussc@star.rl.ac.uk)
+AC_INIT(atools, 1.9-8, ussc@star.rl.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -24,7 +24,7 @@ AC_PROG_CC
 dnl    Setup for creating a monolith.
 STAR_MONOLITHS
 
-dnl ATOOLS source files depend on include files from the following components  
+dnl ATOOLS source files depend on include files from the following components
 STAR_DECLARE_DEPENDENCIES([build], [ast cnf hds fio grp ifd ndf par sae])
 
 dnl The ATOOLS link script links against the following components
