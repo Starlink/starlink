@@ -5,6 +5,7 @@
 #include "star/grp.h"
 #include "star/ndg.h"
 #include "star/atl.h"
+#include "star/one.h"
 #include "par.h"
 #include "par_par.h"
 #include "prm_par.h"
@@ -155,7 +156,7 @@ F77_SUBROUTINE(carpet)( INTEGER(STATUS) ){
 *     propagated to the output cube.
 
 *  Copyright:
-*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2009, 2011 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -176,11 +177,14 @@ F77_SUBROUTINE(carpet)( INTEGER(STATUS) ){
 
 *  Authors:
 *     DSB: David S. Berry
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     10-NOV-2009 (DSB):
 *        Original version.
+*     2011-03-16 (TIMJ):
+*        Use strlcpy rather than strcpy. Use sizeof(*var) for malloc.
 *     {enter_further_changes_here}
 
 *-
@@ -303,15 +307,15 @@ F77_SUBROUTINE(carpet)( INTEGER(STATUS) ){
 
 /* If the input NDF has a LABEL component, assign it to the Label
    attribute of this Frame. */
-   cval[ 0 ] = 0;
-   ndfCget( indf1, "Label", cval, 255, STATUS );
-   if( astChrLen( cval ) == 0 ) strcpy( cval, "Data value" );
+   cval[ 0 ] = '\0';
+   ndfCget( indf1, "Label", cval, sizeof(cval), STATUS );
+   if( astChrLen( cval ) == 0 ) one_strlcpy( cval, "Data value", sizeof(cval), STATUS );
    astSetC( datafrm, "Label(1)", cval );
 
 /* If the input NDF has a UNIT component, assign it to the Unit
    attribute of this Frame. */
-   cval[ 0 ] = 0;
-   ndfCget( indf1, "Unit", cval, 255, STATUS );
+   cval[ 0 ] = '\0';
+   ndfCget( indf1, "Unit", cval, sizeof(cval), STATUS );
    if( astChrLen( cval ) > 0 ) astSetC( datafrm, "Unit(1)", cval );
 
 /* Add this Frame into the WCS FrameSet as an extra "data value" axis.
@@ -333,7 +337,7 @@ F77_SUBROUTINE(carpet)( INTEGER(STATUS) ){
 
 /* Get an array holding the data value associated with each pixel on the
    new axis. */
-   zdata = astMalloc( ndatapix*sizeof( double ) );
+   zdata = astMalloc( ndatapix*sizeof( *zdata ) );
    if( *STATUS == SAI__OK ) {
       for( iz = 0; iz < ndatapix; iz++ ) zdata[ iz ] = iz + 1.0;
       astTran1( map, ndatapix, zdata, 1, zdata );
