@@ -243,6 +243,10 @@
 *          Guard against integer overlflow in ndg1CmpProv when finding
 *          the difference between two integer provid values. This bug
 *          caused the purging of duplicate ancestors to fail sometimes.
+*      16-MAR-2011 (DSB):
+*          When decoding the integer values used to store a Prov
+*          structure in ndg1DecodeProvData, allow for history text up to
+*          100000 characters long.
 */
 
 
@@ -3906,7 +3910,7 @@ static char *ndg1DecodeProvData( char *pdata, int iprov, int version,
 /* Macro to allocate memory holding a copy of a string read from the
    start of the remaining part of the data array (pointed to by "result"),
    checking for ludicrously large string lengths.  */
-#define MAXSTRINGLEN 5000
+#define MAXSTRINGLEN 100000
 #define STORESTRING(Item) \
       len = result ? strlen( result ) + 1 : MAXSTRINGLEN; \
       if( len < MAXSTRINGLEN ) { \
