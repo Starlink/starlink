@@ -244,9 +244,11 @@
 *          the difference between two integer provid values. This bug
 *          caused the purging of duplicate ancestors to fail sometimes.
 *      16-MAR-2011 (DSB):
-*          When decoding the integer values used to store a Prov
+*          - When decoding the integer values used to store a Prov
 *          structure in ndg1DecodeProvData, allow for history text up to
 *          100000 characters long. Put lower limits on other strings.
+*          - Ensure subsequent string pointers are NULLified if an error
+*          occurs whilst decoding Prov data.
 */
 
 
@@ -3917,6 +3919,7 @@ static char *ndg1DecodeProvData( char *pdata, int iprov, int version,
          Item = ( len > 1 ) ? astStore( NULL, result, len ) : NULL; \
          result += len; \
       } else { \
+         Item = NULL; \
          result = NULL; \
       }
 
