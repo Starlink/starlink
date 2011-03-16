@@ -246,7 +246,7 @@
 *      16-MAR-2011 (DSB):
 *          When decoding the integer values used to store a Prov
 *          structure in ndg1DecodeProvData, allow for history text up to
-*          100000 characters long.
+*          100000 characters long. Put lower limits on other strings.
 */
 
 
@@ -3909,11 +3909,11 @@ static char *ndg1DecodeProvData( char *pdata, int iprov, int version,
 
 /* Macro to allocate memory holding a copy of a string read from the
    start of the remaining part of the data array (pointed to by "result"),
-   checking for ludicrously large string lengths.  */
-#define MAXSTRINGLEN 100000
-#define STORESTRING(Item) \
-      len = result ? strlen( result ) + 1 : MAXSTRINGLEN; \
-      if( len < MAXSTRINGLEN ) { \
+   checking that the string is not unbelievably long. MaxLen should be a
+   generous upper limit on the reaonable expected length of the string. */
+#define STORESTRING(Item,MaxLen) \
+      len = result ? strlen( result ) + 1 : MaxLen; \
+      if( len < MaxLen ) { \
          Item = ( len > 1 ) ? astStore( NULL, result, len ) : NULL; \
          result += len; \
       } else { \
@@ -3955,16 +3955,16 @@ static char *ndg1DecodeProvData( char *pdata, int iprov, int version,
    if( version == 1 ) {
 
 /* Get the ancestor's path. */
-      STORESTRING( prov->path );
+      STORESTRING( prov->path, 2000 );
 
 /* Get the ancestor's date. */
-      STORESTRING( prov->date );
+      STORESTRING( prov->date, 100 );
 
 /* Get the ancestor's hidden flag. */
       if( result ) prov->hidden = *(result++);
 
 /* Get the ancestor's creator. */
-      STORESTRING( prov->creator );
+      STORESTRING( prov->creator, 100 );
 
 /* If we are decoding the Prov structure for the main NDF, get the
    history record hash code. */
@@ -3988,10 +3988,10 @@ static char *ndg1DecodeProvData( char *pdata, int iprov, int version,
 /* Now decode each history record. */
                hist_rec = prov->hist_recs;
                for( irec = 0; irec < prov->nhrec; irec++,hist_rec++ ) {
-                  STORESTRING( hist_rec->date );
-                  STORESTRING( hist_rec->command );
-                  STORESTRING( hist_rec->user );
-                  STORESTRING( hist_rec->text );
+                  STORESTRING( hist_rec->date, 100 );
+                  STORESTRING( hist_rec->command, 2000 );
+                  STORESTRING( hist_rec->user, 100 );
+                  STORESTRING( hist_rec->text, 100000 );
                }
             }
          }
@@ -4040,7 +4040,6 @@ static char *ndg1DecodeProvData( char *pdata, int iprov, int version,
 
 #undef STOREINT
 #undef STORESTRING
-#undef MAXSTRINGLEN
 
 }
 
