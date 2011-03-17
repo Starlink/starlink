@@ -1398,7 +1398,6 @@ void kpgPixsc( AstFrameSet * iwcs,
   return;
 }
 
-
 F77_SUBROUTINE(kpg1_badbx)( INTEGER(INDF1),
                             INTEGER(OPER),
                             INTEGER(INDF2),
@@ -1425,6 +1424,46 @@ void kpg1Badbx( int indf1, int oper, int *indf2, int *ngood, int *status ){
    F77_IMPORT_INTEGER( INDF2, *indf2 );
    F77_IMPORT_INTEGER( NGOOD, *ngood );
    F77_IMPORT_INTEGER( STATUS, *status );
+}
+
+F77_SUBROUTINE(kpg1_pxscl)( INTEGER(IWCS),
+                            DOUBLE_ARRAY(AT),
+                            DOUBLE_ARRAY(PIXSC),
+                            INTEGER(STATUS));
+
+void kpg1Pxscl( AstFrameSet *iwcs,
+                const double *at,
+                double *pixsc,
+                int *status ) {
+   DECLARE_INTEGER( IWCS );
+   DECLARE_DOUBLE_ARRAY_DYN( AT );
+   DECLARE_DOUBLE_ARRAY_DYN( PIXSC );
+   DECLARE_INTEGER( STATUS );
+
+   int nwcs;
+   int nin;
+
+   if( *status != SAI__OK ) return;
+
+   nwcs = astGetI( iwcs, "Nout" );
+   nin = astGetI( iwcs, "Nin" );
+
+   F77_CREATE_DOUBLE_ARRAY( PIXSC, nwcs );
+   F77_ASSOC_DOUBLE_ARRAY( PIXSC, pixsc );
+   F77_CREATE_DOUBLE_ARRAY( AT, nwcs );
+   F77_EXPORT_DOUBLE_ARRAY( at, AT, nin );
+   F77_EXPORT_INTEGER( astP2I( iwcs ), IWCS );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(kpg1_pxscl)( INTEGER_ARG(&IWCS),
+                         DOUBLE_ARRAY_ARG(AT),
+                         DOUBLE_ARRAY_ARG(PIXSC),
+                         INTEGER_ARG(&STATUS) );
+
+   F77_IMPORT_INTEGER( STATUS, *status );
+   F77_IMPORT_DOUBLE_ARRAY( PIXSC, pixsc, nwcs );
+
+   return;
 }
 
 
