@@ -22,10 +22,11 @@
 *     thresh = double (Given)
 *        Outlier threshold for amplitudes to remove from data for cleaning
 *     components = smfData ** (Returned)
-*        New 3d cube of principal component time-series (ncomponents x 1 x time)
+*        New 3d cube of principal component time-series (ncomponents * 1 * time)
+*        Can be NULL.
 *     amplitudes = smfData ** (Returned)
-*        New 3d map giving amplitudes of each component for each bolometer
-*        (bolometer, component amplitude)
+*        New 3d cube giving amplitudes of each component for each bolometer
+*        (bolo X * bolo Y * component amplitude). Can be NULL.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -54,6 +55,8 @@
 *  History:
 *     2011-03-16 (EC):
 *        Initial version -- only does the projection, no filtering
+*     2011-03-17 (EC):
+*        Add basic header to returned components smfData
 
 *  Copyright:
 *     Copyright (C) 2011 University of British Columbia.
@@ -295,6 +298,7 @@ void smf_clean_pca( smfData *data, double thresh, smfData **components,
   if( (*status==SAI__OK) && components ) {
     dim_t dims[3];
     int lbnd[3];
+    smfHead *hdr=NULL;
 
     dims[0] = ngoodbolo;
     dims[1] = 1;
@@ -309,7 +313,19 @@ void smf_clean_pca( smfData *data, double thresh, smfData **components,
       lbnd[2] = data->lbnd[0];
     }
 
-    *components = smf_construct_smfData( NULL, NULL, NULL, NULL, NULL,
+    /* Copy the header if one was supplied with the input data. This
+       will at least give us a sensible time axis and allow us to run
+       components through sc2fft if stored to disk, although the
+       bolometer axes will be misleading. Should probably strip off
+       the time axis properly, e.g. code that was removed from
+       smf_model_createHdr.c in commit
+       2c342cd4f7d9ab33e4fea5bc250eaae9804a229f
+    */
+    if( data->hdr ) {
+      hdr = smf_deepcopy_smfHead( data->hdr, status );
+    }
+
+    *components = smf_construct_smfData( NULL, NULL, hdr, NULL, NULL,
                                          SMF__DOUBLE, NULL, NULL,
                                          SMF__QFAM_TSERIES, NULL,
                                          1, dims, lbnd, 3, 0, 0, NULL,
