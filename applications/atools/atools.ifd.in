@@ -3443,6 +3443,61 @@ iraf! {
             helpkey *
          }
       }
+
+      action astwcsmap {
+
+         helplib {$ATOOLS_HELP}
+
+         parameter latax {
+            position 4
+            type _INTEGER
+            prompt {The index of the latitude axis}
+            ppath CURRENT
+            helpkey *
+         }
+
+         parameter lonax {
+            position 3
+            type _INTEGER
+            prompt {The index of the longitude axis}
+            ppath CURRENT
+            helpkey *
+         }
+
+         parameter ncoord {
+            position 1
+            type _INTEGER
+            prompt {The number of inputs and outputs}
+            ppath CURRENT
+            helpkey *
+         }
+
+         parameter type {
+            position 2
+            type LITERAL
+            prompt {The FITS-WCS projection code}
+            ppath CURRENT
+            helpkey *
+         }
+
+         parameter options {
+            position 5
+            type LITERAL
+            prompt {Options for the WcsMap}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+         }
+
+         parameter result {
+            position 6
+            type LITERAL
+            prompt {Name of file in which to store the WcsMap}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+         }
+      }
    }
 
    command astshow {

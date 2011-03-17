@@ -301,6 +301,9 @@
       ELSE IF ( NAME .EQ. 'ASTRATEMAP' ) THEN
          CALL ASTRATEMAP( STATUS )
 
+      ELSE IF ( NAME .EQ. 'ASTWCSMAP' ) THEN
+         CALL ASTWCSMAP( STATUS )
+
 *  If the action name is not recognised, then report an error.
       ELSE
          STATUS = SAI__ERROR
