@@ -13,12 +13,15 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_clean_pca( smfData *data, double thresh, smfData **components,
-*                    smfData **amplitudes, int *status )
+*     smf_clean_pca( smfWorkForce *wf, smfData *data, double thresh,
+*                    smfData **components, smfData **amplitudes, int *status )
 
 *  Arguments:
+*     wf = smfWorkForce * (Given)
+*        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData * (Given)
-*        Pointer to the input smfData
+*        Pointer to the input smfData (assume that bolometer means have been
+*        removed)
 *     thresh = double (Given)
 *        Outlier threshold for amplitudes to remove from data for cleaning
 *     components = smfData ** (Returned)
@@ -56,7 +59,8 @@
 *     2011-03-16 (EC):
 *        Initial version -- only does the projection, no filtering
 *     2011-03-17 (EC):
-*        Add basic header to returned components smfData
+*        -Add basic header to returned components smfData
+*        -Parallelize as much as possible over exclusive time chunks
 
 *  Copyright:
 *     Copyright (C) 2011 University of British Columbia.
@@ -99,10 +103,172 @@
 #include "smf_typ.h"
 #include "smf_err.h"
 
+/* ------------------------------------------------------------------------ */
+/* Local variables and functions */
+
+/* Structure containing information about blocks of time slices to be
+   processed by each thread. All threads read/write to/from mutually
+   exclusive parts of data. */
+
+typedef struct smfPCAData {
+  double *amp;            /* matrix of components amplitudes for each bolo */
+  size_t abstride;        /* bolo stride in amp array */
+  size_t acompstride;     /* component stride in amp array */
+  size_t bstride;         /* bolo stride */
+  double *comp;           /* data cube of components */
+  gsl_matrix *cov;        /* bolo-bolo covariance matrix */
+  double *covwork;        /* work array for covariance calculation */
+  size_t ccompstride;     /* component stride in comp array */
+  size_t ctstride;        /* time stride in comp array */
+  smfData *data;          /* Pointer to input data */
+  size_t *goodbolo;       /* Local copy of global goodbolo */
+  int ijob;               /* Job identifier */
+  dim_t nbolo;            /* Number of detectors  */
+  size_t ngoodbolo;       /* Number of good bolos */
+  dim_t ntslice;          /* Number of time slices */
+  int operation;          /* 0=covar,1=eigenvect,2=projection */
+  size_t t1;              /* Index of first time slice for chunk */
+  size_t t2;              /* Index of last time slice */
+  size_t tstride;         /* time slice stride */
+} smfPCAData;
+
+/* Function to be executed in thread: FFT all of the bolos from b1 to b2 */
+
+void smfPCAParallel( void *job_data_ptr, int *status );
+
+void smfPCAParallel( void *job_data_ptr, int *status ) {
+  double *amp=NULL;       /* matrix of components amplitudes for each bolo */
+  size_t abstride;        /* bolo stride in amp array */
+  size_t acompstride;     /* component stride in amp array */
+  size_t bstride;         /* bolo stride */
+  size_t ccompstride;     /* component stride in comp array */
+  size_t ctstride;        /* time stride in comp array */
+  double *comp=NULL;      /* data cube of components */
+  gsl_matrix *cov=NULL;   /* bolo-bolo covariance matrix */
+  double *covwork=NULL;   /* goodbolo * 3 work array for covariance */
+  double *d=NULL;         /* Pointer to data array */
+  size_t *goodbolo;       /* Local copy of global goodbolo */
+  size_t i;               /* Loop counter */
+  size_t j;               /* Loop counter */
+  size_t k;               /* Loop counter */
+  dim_t ngoodbolo;        /* number good bolos = number principal components */
+  dim_t ntslice;          /* number of time slices */
+  smfPCAData *pdata=NULL; /* Pointer to job data */
+  size_t tstride;         /* time slice stride */
+
+  if( *status != SAI__OK ) return;
+
+  /* Pointer to the data that this thread will process */
+  pdata = job_data_ptr;
+
+  amp = pdata->amp;
+  abstride = pdata->abstride;
+  acompstride = pdata->acompstride;
+  bstride = pdata->bstride;
+  comp = pdata->comp;
+  ccompstride = pdata->ccompstride;
+  ctstride = pdata->ctstride;
+  cov = pdata->cov;
+  covwork = pdata->covwork;
+  d = pdata->data->pntr[0];
+  goodbolo = pdata->goodbolo;
+  ngoodbolo = pdata->ngoodbolo;
+  ntslice = pdata->ntslice;
+  tstride = pdata->tstride;
+
+  /* Check for valid inputs */
+  if( !pdata ) {
+    *status = SAI__ERROR;
+    errRep( "", "smfPCAParallel: No job data supplied", status );
+    return;
+  }
+
+  /* Debugging message indicating thread started work */
+  msgOutiff( MSG__DEBUG, "",
+             "smfPCAParallel: op=%i thread starting on time slices %zu -- %zu",
+             status, pdata->operation, pdata->t1, pdata->t2 );
+
+
+  /* if t1 past end of the work, nothing to do so we return */
+  if( pdata->t1 >= pdata->ntslice ) {
+    msgOutif( MSG__DEBUG, "",
+              "smfPCAParallel: nothing for thread to do, returning",
+              status);
+    return;
+  }
+
+  if( (pdata->operation == 0) && (*status==SAI__OK) ) {
+    /* Operation 0: accumulate sums for covariance calculation -------------- */
+
+    for( i=0; i<ngoodbolo; i++ ) {
+      double sum_xy;
+
+      /*msgOutiff( MSG__DEBUG, "", "   bolo %zu", status, goodbolo[i] );*/
+
+      for( j=i; j<ngoodbolo; j++ ) {
+        sum_xy = 0;
+
+        for( k=pdata->t1; k<=pdata->t2; k++ ) {
+          sum_xy += d[goodbolo[i]*bstride + k*tstride] *
+            d[goodbolo[j]*bstride + k*tstride];
+        }
+
+        /* Store sums in work array and normalize once all threads finish */
+        covwork[ i + j*ngoodbolo ] = sum_xy;
+      }
+    }
+  } else if( (pdata->operation == 1) && (*status == SAI__OK) ) {
+    /* Operation 1: normalized eigenvectors --------------------------------- */
+
+    for( i=0; i<ngoodbolo; i++ ) {   /* loop over comp */
+      double u;
+
+      /*msgOutiff( MSG__DEBUG, "", "   bolo %zu", status, goodbolo[i] );*/
+
+      for( j=0; j<ngoodbolo; j++ ) { /* loop over bolo */
+
+        u = gsl_matrix_get( cov, j, i );
+
+        /* Calculate the vector */
+        for( k=pdata->t1; k<=pdata->t2; k++ ) {
+          comp[i*ccompstride+k*ctstride] += d[goodbolo[j] *
+                                              bstride + k*tstride] * u;
+        }
+      }
+    }
+  } else if( (pdata->operation == 2) && (*status == SAI__OK) ) {
+    /* Operation 1: project data along eigenvectors ------------------------- */
+
+    for( i=0; i<ngoodbolo; i++ ) {    /* loop over bolometer */
+      /*msgOutiff( MSG__DEBUG, "", "   bolo %zu", status, goodbolo[i] );*/
+      for( j=0; j<ngoodbolo; j++ ) {  /* loop over component */
+        for( k=pdata->t1; k<=pdata->t2; k++ ) {
+          amp[goodbolo[i]*abstride + j*acompstride] +=
+            d[goodbolo[i]*bstride + k*tstride] *
+            comp[j*ccompstride + k*ctstride];
+        }
+      }
+    }
+
+  } else if( *status==SAI__OK ) {
+    *status = SAI__ERROR;
+    errRep( "", "smfPCAParallel"
+            ": possible programming error: invalid operation number", status );
+  }
+
+  /* Debugging message indicating thread finished work */
+  msgOutiff( MSG__DEBUG, "",
+             "smfPCAParallel: op=%i thread finishing time slices %zu -- %zu",
+             status, pdata->operation, pdata->t1, pdata->t2 );
+}
+
+/* ------------------------------------------------------------------------ */
+
+
 #define FUNC_NAME "smf_clean_pca"
 
-void smf_clean_pca( smfData *data, double thresh, smfData **components,
-                    smfData **amplitudes, int *status ) {
+void smf_clean_pca( smfWorkForce *wf, smfData *data, double thresh,
+                    smfData **components, smfData **amplitudes, int *status ) {
 
   double *amp=NULL;       /* matrix of components amplitudes for each bolo */
   size_t abstride;        /* bolo stride in amp array */
@@ -114,20 +280,28 @@ void smf_clean_pca( smfData *data, double thresh, smfData **components,
   gsl_matrix *cov=NULL;   /* bolo-bolo covariance matrix */
   double *d = NULL;       /* Pointer to data array */
   size_t i;               /* Loop counter */
+  int ii;                 /* Loop counter */
   size_t j;               /* Loop counter */
+  smfPCAData *job_data=NULL;/* job data */
   size_t k;               /* Loop counter */
   size_t *goodbolo=NULL;  /* Indices of the good bolometers for analysis */
   dim_t nbolo;            /* number of bolos */
   dim_t ndata;            /* number of samples in data */
   dim_t ngoodbolo;        /* number good bolos = number principal components */
   dim_t ntslice;          /* number of time slices */
+  int nw;                 /* total available worker threads */
+  smfPCAData *pdata=NULL; /* Pointer to job data */
   smf_qual_t *qua=NULL;   /* Pointer to quality array */
   gsl_vector *s=NULL;     /* singular values for SVD */
+  size_t step;            /* step size for job division */
   size_t tstride;         /* time slice stride */
-  gsl_matrix *v=NULL;     /* orthogonal square matrix for SVD */
+  gsl_matrix *v=NULL;      /* orthogonal square matrix for SVD */
   gsl_vector *work=NULL;  /* workspace for SVD */
 
   if (*status != SAI__OK) return;
+
+  /* How many threads do we get to play with */
+  nw = wf ? wf->nworker : 1;
 
   /* Check for NULL smfData pointer */
   if( !data || !data->pntr[0]) {
@@ -154,6 +328,12 @@ void smf_clean_pca( smfData *data, double thresh, smfData **components,
             ": possible programming error, smfData should be double precision",
             status );
     return;
+  }
+
+  if( ntslice <= 2 ) {
+    *status = SAI__ERROR;
+    errRep( " ", FUNC_NAME ": fewer than 2 time slices!", status );
+    goto CLEANUP;
   }
 
   qua = smf_select_qualpntr( data, 0, status );
@@ -214,85 +394,173 @@ void smf_clean_pca( smfData *data, double thresh, smfData **components,
   /* input bolo data pointer */
   d = data->pntr[0];
 
-  if( *status == SAI__OK ) {
-    double c;
+  /* Allocate job data for threads */
+  job_data = astCalloc( nw, sizeof(*job_data), 1 );
 
-    msgOutif( MSG__DEBUG, "", FUNC_NAME
+  /* Set up the division of labour for threads: independent blocks of time */
+
+  if( nw > (int) ntslice ) {
+    step = 1;
+  } else {
+    step = ntslice/nw;
+  }
+
+  for( ii=0; (*status==SAI__OK)&&(ii<nw); ii++ ) {
+    pdata = job_data + ii;
+
+    /* Blocks of time slices */
+    pdata->t1 = ii*step;
+    pdata->t2 = (ii+1)*step-1;
+
+    /* Ensure that the last thread picks up any left-over tslices */
+    if( (ii==(nw-1)) && (pdata->t1<(ntslice-1)) ) {
+      pdata->t2=ntslice-1;
+    }
+
+    /* initialize work data */
+    pdata->amp = amp;
+    pdata->abstride = abstride;
+    pdata->acompstride = acompstride;
+    pdata->bstride = bstride;
+    pdata->comp = comp;
+    pdata->cov = NULL;
+    pdata->covwork = NULL;
+    pdata->ccompstride = ccompstride;
+    pdata->ctstride = ctstride;
+    pdata->data = data;
+    pdata->goodbolo = NULL;
+    pdata->ijob = -1;
+    pdata->nbolo = nbolo;
+    pdata->ngoodbolo = ngoodbolo;
+    pdata->ntslice = ntslice;
+    pdata->operation = 0;
+    pdata->tstride = tstride;
+
+    /* Each thread will accumulate sums of x, y, and x*y for each bolo when
+       calculating the covariance matrix */
+    pdata->covwork = astCalloc( ngoodbolo*ngoodbolo,
+                                sizeof(*(pdata->covwork)), 1 );
+
+    /* each thread gets its own copy of the goodbolo lookup table */
+    pdata->goodbolo = astCalloc( ngoodbolo, sizeof(*(pdata->goodbolo)), 1 );
+    if( *status == SAI__OK ) {
+      memcpy( pdata->goodbolo, goodbolo,
+              ngoodbolo*sizeof(*(pdata->goodbolo)) );
+    }
+
+  }
+
+  if( *status == SAI__OK ) {
+
+    /* Measure the covariance matrix using parallel code ---------------------*/
+
+    msgOutif( MSG__VERB, "", FUNC_NAME
               ": measuring bolo-bolo covariance matrix...", status );
 
-    /* Measure the covariance matrix */
-    for( i=0; i<ngoodbolo; i++ ) {
-      msgOutiff( MSG__DEBUG, "", "   bolo %zu", status, goodbolo[i] );
+    /* Set up the jobs to calculate sums for each time block and submit */
+    for( ii=0; ii<nw; ii++ ) {
+      pdata = job_data + ii;
+      pdata->operation = 0;
+      pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata, smfPCAParallel,
+                                 NULL, status );
+    }
 
-      for( j=i; j<ngoodbolo; j++ ) {
-        c = gsl_stats_covariance( d + goodbolo[i]*bstride, tstride,
-                                  d + goodbolo[j]*bstride, tstride, ntslice );
+    /* Wait until all of the submitted jobs have completed */
+    smf_wait( wf, status );
 
-        gsl_matrix_set( cov, i, j, c );
-        gsl_matrix_set( cov, j, i, c );
+    /* We now have to add together all of the sums from each thread and
+       normalize */
+    if( *status == SAI__OK ) {
+      for( i=0; i<ngoodbolo; i++ ) {
+        for( j=i; j<ngoodbolo; j++ ) {
+          double c;
+          double *covwork=NULL;
+          double sum_xy;
+
+          sum_xy = 0;
+
+          for( ii=0; ii<nw; ii++ ) {
+            pdata = job_data + ii;
+            covwork = pdata->covwork;
+
+            sum_xy += covwork[ i + j*ngoodbolo ];
+          }
+
+          c = sum_xy / ((double)ntslice-1);
+
+          gsl_matrix_set( cov, i, j, c );
+          gsl_matrix_set( cov, j, i, c );
+        }
       }
     }
   }
 
-  /* First factor cov = u s v^T, noting that the gsl routine
-     calculates U in cov in-place. */
+  /* Factor cov = u s v^T, noting that the gsl routine calculates u in
+     in-place of cov. --------------------------------------------------------*/
 
-  msgOutif( MSG__DEBUG, "", FUNC_NAME
+  msgOutif( MSG__VERB, "", FUNC_NAME
             ": perfoming singular value decomposition...", status );
 
-  gsl_linalg_SV_decomp( cov, v, s, work );
+  if( *status == SAI__OK ) {
+    gsl_linalg_SV_decomp( cov, v, s, work );
+  }
+
+  /* Calculate normalized eigenvectors with parallel code --------------------*/
+
+  msgOutif( MSG__VERB, "", FUNC_NAME
+            ": calculating statistically-independent components...", status );
 
   /* The above calculation tells us what linear combinations of the original
      bolometer time series will give us the statistically independent new
      set of basis vectors (components), which we then normalize by their RMS. */
 
-  msgOutif( MSG__DEBUG, "", FUNC_NAME
-            ": calculating statistically-independent components...", status );
-
-  if( *status==SAI__OK ) for( i=0; i<ngoodbolo; i++ ) {   /* loop over comp */
-    double sigma;
-    double u;
-
-    msgOutiff( MSG__DEBUG, "", "   bolo %zu", status, goodbolo[i] );
-
-    if( *status==SAI__OK ) for( j=0; j<ngoodbolo; j++ ) { /* loop over bolo */
-
-        u = gsl_matrix_get( cov, j, i );
-
-      /* Calculate the vector */
-      for( k=0; k<ntslice; k++ ) {
-        comp[i*ccompstride+k*ctstride] += d[goodbolo[j]*bstride + k*tstride]*u;
-      }
+  /* Set up the jobs to calculate sums for each time block and submit */
+  if( *status == SAI__OK ) {
+    for( ii=0; ii<nw; ii++ ) {
+      pdata = job_data + ii;
+      pdata->cov = cov;
+      pdata->operation = 1;
+      pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata, smfPCAParallel,
+                                 NULL, status );
     }
+  }
 
-      /* Then normalize */
-      smf_stats1D( comp + i*ccompstride, ctstride, ntslice, NULL, 0,
-                   0, NULL, &sigma, NULL, status );
+  /* Wait until all of the submitted jobs have completed */
+  smf_wait( wf, status );
 
-      if( *status == SAI__OK ) for( k=0; k<ntslice; k++ ) {
+  /* Then normalize */
+  for( i=0; (*status==SAI__OK)&&(i<ngoodbolo); i++ ) {
+    double sigma;
+
+    smf_stats1D( comp + i*ccompstride, ctstride, ntslice, NULL, 0,
+                 0, NULL, &sigma, NULL, status );
+
+    if( *status == SAI__OK ) {
+      for( k=0; k<ntslice; k++ ) {
         comp[i*ccompstride + k*ctstride] /= sigma;
       }
+    }
   }
 
   /* Now project the data along each of these normalized basis vectors
      to figure out the amplitudes of the components in each bolometer
-     time series. */
+     time series. ------------------------------------------------------------*/
 
-  msgOutif( MSG__DEBUG, "", FUNC_NAME
+  msgOutif( MSG__VERB, "", FUNC_NAME
               ": calculating component amplitudes in each bolo...", status );
 
+  /* Set up the jobs  */
   if( *status == SAI__OK ) {
-    for( i=0; i<ngoodbolo; i++ ) {    /* loop over bolometer */
-      msgOutiff( MSG__DEBUG, "", "   bolo %zu", status, goodbolo[i] );
-      for( j=0; j<ngoodbolo; j++ ) {  /* loop over component */
-        for( k=0; k<ntslice; k++ ) {
-          amp[goodbolo[i]*abstride + j*acompstride] +=
-            d[goodbolo[i]*bstride + k*tstride] *
-            comp[j*ccompstride + k*ctstride];
-        }
-      }
+    for( ii=0; ii<nw; ii++ ) {
+      pdata = job_data + ii;
+      pdata->operation = 2;
+      pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata, smfPCAParallel,
+                                 NULL, status );
     }
   }
+
+  /* Wait until all of the submitted jobs have completed */
+  smf_wait( wf, status );
 
   /* Returning components? */
   if( (*status==SAI__OK) && components ) {
@@ -394,4 +662,12 @@ void smf_clean_pca( smfData *data, double thresh, smfData **components,
   if( v ) gsl_matrix_free( v );
   if( work ) gsl_vector_free( work );
 
+  if( job_data ) {
+    for( ii=0; ii<nw; ii++ ) {
+      pdata = job_data + ii;
+      if( pdata->goodbolo ) pdata->goodbolo = astFree( pdata->goodbolo );
+      if( pdata->covwork ) pdata->covwork = astFree( pdata->covwork );
+    }
+    job_data = astFree(job_data);
+  }
 }
