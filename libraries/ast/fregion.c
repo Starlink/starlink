@@ -241,5 +241,44 @@ F77_SUBROUTINE(ast_showmesh)( INTEGER(THIS),
    )
 }
 
+F77_SUBROUTINE(ast_getregionpoints)( INTEGER(THIS),
+                                     INTEGER(MAXPOINT),
+                                     INTEGER(MAXCOORD),
+                                     INTEGER(NPOINT),
+                                     DOUBLE_ARRAY(POINTS),
+                                     INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_INTEGER(MAXPOINT)
+   GENPTR_INTEGER(MAXCOORD)
+   GENPTR_INTEGER(NPOINT)
+   GENPTR_DOUBLE_ARRAY(POINTS)
+
+   astAt( "AST_GETREGIONPOINT", NULL, 0 );
+   astWatchSTATUS(
+      astGetRegionPoints( astI2P( *THIS ), *MAXPOINT, *MAXCOORD, NPOINT,
+                          POINTS );
+   )
+}
+
+F77_SUBROUTINE(ast_getregionmesh)( INTEGER(THIS),
+                                   LOGICAL(SURFACE),
+                                   INTEGER(MAXPOINT),
+                                   INTEGER(MAXCOORD),
+                                   INTEGER(NPOINT),
+                                   DOUBLE_ARRAY(POINTS),
+                                   INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_LOGICAL(SURFACE)
+   GENPTR_INTEGER(MAXPOINT)
+   GENPTR_INTEGER(MAXCOORD)
+   GENPTR_INTEGER(NPOINT)
+   GENPTR_DOUBLE_ARRAY(POINTS)
+
+   astAt( "AST_GETREGIONMESH", NULL, 0 );
+   astWatchSTATUS(
+      astGetRegionMesh( astI2P( *THIS ), F77_ISTRUE( *SURFACE ), *MAXPOINT,
+                        *MAXCOORD, NPOINT, POINTS );
+   )
+}
 
 

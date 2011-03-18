@@ -111,6 +111,8 @@ c     - astGetRegionBounds: Get the bounds of a Region
 f     - AST_GETREGIONBOUNDS: Get the bounds of a Region
 c     - astGetRegionFrame: Get a copy of the Frame represent by a Region
 f     - AST_GETREGIONFRAME: Get a copy of the Frame represent by a Region
+c     - astGetRegionMesh: Get a mesh of points covering a Region
+f     - AST_GETREGIONMESH: Get a mesh of points covering a Region
 c     - astGetRegionPoints: Get the positions that define a Region
 f     - AST_GETREGIONPOINTS: Get the positions that define a Region
 c     - astGetUnc: Obtain uncertainty information from a Region
@@ -190,6 +192,8 @@ f     - AST_SHOWMESH: Display a mesh of points on the surface of a Region
 *     4-JAN-2010 (DSB):
 *        Fix bug in GetRegionBounds (it was assumed implicitly that the base
 *        Frame had the same number of axes as the current Frame).
+*     18-MAR-2011 (DSB):
+*        Added astGetRegionMesh public method.
 *class--
 
 *  Implementation Notes:
@@ -916,6 +920,7 @@ static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
 static void GetRegionBounds( AstRegion *, double *, double *, int * );
 static void GetRegionBounds2( AstRegion *, double *, double *, int * );
+static void GetRegionMesh( AstRegion *, int, int, int, int *, double *, int * );
 static void GetRegionPoints( AstRegion *, int, int, int *, double *, int * );
 static void Intersect( AstFrame *, const double[2], const double[2], const double[2], const double[2], double[2], int * );
 static void LineOffset( AstFrame *, AstLineDef *, double, double, double[2], int * );
@@ -4279,6 +4284,7 @@ void astInitRegionVtab_(  AstRegionVtab *vtab, const char *name, int *status ) {
    vtab->ShowMesh = ShowMesh;
    vtab->GetRegionBounds = GetRegionBounds;
    vtab->GetRegionBounds2 = GetRegionBounds2;
+   vtab->GetRegionMesh = GetRegionMesh;
    vtab->GetRegionPoints = GetRegionPoints;
    vtab->RegOverlay = RegOverlay;
    vtab->RegFrame = RegFrame;
@@ -8385,6 +8391,180 @@ static void GetRegionBounds2( AstRegion *this, double *lbnd, double *ubnd, int *
    ubndb = astFree( ubndb );
 }
 
+static void GetRegionMesh( AstRegion *this, int surface, int maxpoint,
+                           int maxcoord, int *npoint, double *points,
+                           int *status ){
+/*
+*++
+*  Name:
+c     astGetRegionMesh
+f     AST_GETREGIONMESH
+
+*  Purpose:
+*     Return a mesh of points covering the surface or volume of a Region.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "region.h"
+c     void astGetRegionMesh( AstRegion *this, int surface, int maxpoint,
+c                            int maxcoord, int *npoint, double *points )
+f     CALL AST_GETREGIONMESH( THIS, SURFACE, MAXPOINT, MAXCOORD, NPOINT,
+f                             POINTS, STATUS )
+
+*  Class Membership:
+*     Region method.
+
+*  Description:
+c     This function
+f     This routine
+*     returns the axis values at a mesh of points either covering the
+*     surface (i.e. boundary) of the supplied Region, or filling the
+*     interior (i.e. volume) of the Region. The number of points in
+*     the mesh is approximately equal to the MeshSize attribute.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Region.
+c     surface
+f     SURFACE = LOGICAL (Given)
+c        If zero,
+f        If .TRUE.,
+*        the returned points will cover the surface or the Region.
+*        Otherwise, they will fill the interior of the Region.
+c     maxpoint
+f     MAXPOINT = INTEGER (Given)
+*        If zero, the number of points in the mesh is returned in
+c        "*npoint",
+f        NPOINT,
+*        but no axis values are returned and all other parameters are ignored.
+*        If not zero, the supplied value should be the length of the
+c        second dimension of the "points"
+f        first dimension of the POINTS
+*        array. An error is reported if the number of points in the mesh
+*        exceeds this number.
+c     maxcoord
+f     MAXCOORD = INTEGER (Given)
+*        The length of the
+c        first dimension of the "points" array.
+f        second dimension of the POINTS array.
+*        An error is reported if the number of axes in the supplied Region
+*        exceeds this number.
+c     npoint
+f     NPOINT = INTEGER (Returned)
+c        A pointer to an integer in which to return the
+f        The
+*        number of points in the returned mesh.
+c     points
+f     POINTS( MAXPOINT, MAXCOORD ) = DOUBLE PRECISION (Returned)
+c        The address of the first element in a 2-dimensional array of
+c        shape "[maxcoord][maxpoint]", in which to return the coordinate
+c        values at the mesh positions. These are stored such that the
+c        value of coordinate number "coord" for point number "point" is
+c        found in element "points[coord][point]".
+f        An array in which to return the coordinates values at the mesh
+f        positions. These are stored such that the value of coordinate
+f        number COORD for point number POINT is found in element
+f        POINTS(POINT,COORD).
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Notes:
+*     - If the coordinate system represented by the Region has been
+*     changed since it was first created, the returned axis values refer
+*     to the new (changed) coordinate system, rather than the original
+*     coordinate system. Note however that if the transformation from
+*     original to new coordinate system is non-linear, the shape within
+*     the new coordinate system may be distorted, and so may not match
+*     that implied by the name of the Region subclass (Circle, Box, etc).
+
+*--
+*/
+
+/* Local Variables: */
+   AstPointSet *pset;       /* PointSet holding mesh/grid axis values */
+   double **ptr;            /* Pointer to mesh/grid axes values */
+   double *p;               /* Pointer to next input axis value */
+   double *q;               /* Pointer to next output axis value */
+   int j;                   /* Axis index */
+   int nc;                  /* No. of axes to copy */
+
+/* Initialise */
+   *npoint = 0;
+
+/* Check the inherited status. */
+   if( !astOK ) return;
+
+/* Get the mesh or grid as required. If only the size of the mesh or grid
+   is required, get it in the base Frame as there is no need to spend the
+   extra time transforming it into the current Frame. */
+   if( maxpoint == 0  ){
+      if( surface ) {
+         pset = astRegBaseMesh( this );
+      } else {
+         pset = astRegBaseGrid( this );
+      }
+   } else {
+      if( surface ) {
+         pset = astRegMesh( this );
+      } else {
+         pset = astRegGrid( this );
+      }
+   }
+
+/* Return the number of points in the mesh or grid. */
+   *npoint = astGetNpoint( pset );
+
+/* Do nothing more unless a non-zero array size was supplied. */
+   if( *npoint > 0 && maxpoint != 0 && astOK ) {
+
+/* Check the supplied array is large enough. */
+      if( *npoint > maxpoint ) {
+         astError( AST__DIMIN, "astGetRegionMesh(%s): The supplied "
+                   "array can hold up to %d points but the %s supplied "
+                   "has %d points on its mesh (programming error).",
+                   status, astGetClass( this ), maxpoint, astGetClass( this ),
+                   *npoint );
+      }
+
+/* Get the dimensionality of the PointSet, and get a pointer to the axis
+   values. */
+      nc = astGetNcoord( pset );
+      ptr = astGetPoints( pset );
+
+/* Check pointers can be used safely. */
+      if ( astOK ) {
+
+/* Check the supplied array has room for all the axes. */
+         if( nc > maxcoord ) {
+            astError( AST__DIMIN, "astGetRegionMesh(%s): The supplied "
+                      "array can hold up to %d axes but the %s supplied "
+                      "has %d axes (programming error).", status,
+                      astGetClass( this ), maxcoord, astGetClass( this ), nc );
+
+/* If all is OK, copy the current Frame axis values into the supplied array. */
+         } else {
+
+/* Loop round the axes to be copied. */
+            for( j = 0; j < nc; j++ ) {
+
+/* Get points to the first element of the input and output arrays. */
+               p = ptr[ j ];
+               q = points + j*maxpoint;
+
+/* Copying the axis values. */
+               (void) memcpy( q, p, sizeof( double )*( *npoint ) );
+            }
+         }
+      }
+   }
+
+/* Free resources. */
+   pset = astAnnul( pset );
+}
+
 static void GetRegionPoints( AstRegion *this, int maxpoint, int maxcoord,
                              int *npoint, double *points, int *status ){
 /*
@@ -11393,9 +11573,13 @@ astMAKE_SET(Region,FillFactor,double,fillfactor,((value<0.0||value>1.0)?(
 
 *  Description:
 *     This attribute controls how many points are used when creating a
-*     mesh of points covering the boundary of a Region. This mesh is used
-*     primarily when testing for overlap with a second Region: each point in
-*     the mesh is checked to see if it is inside or outside the second Region.
+*     mesh of points covering the boundary or volume of a Region. Such a
+*     mesh is returned by the
+c     astGetRegionMesh
+f     AST_GETREGIONMESH
+*     method. The boundary mesh is also used when testing for overlap
+*     between two Regions: each point in the bomdary mesh of the first
+*     Region is checked to see if it is inside or outside the second Region.
 *     Thus, the reliability of the overlap check depends on the value assigned
 *     to this attribute. If the value used is very low, it is possible for
 *     overlaps to go unnoticed. High values produce more reliable results, but
@@ -12428,6 +12612,13 @@ int astRegTrace_( AstRegion *this, int n, double *dist, double **ptr, int *statu
 void astGetRegionBounds_( AstRegion *this, double *lbnd, double *ubnd, int *status ){
    if ( !astOK ) return;
    (**astMEMBER(this,Region,GetRegionBounds))( this, lbnd, ubnd, status );
+}
+void astGetRegionMesh_( AstRegion *this, int surface, int maxpoint,
+                        int maxcoord, int *npoint, double *points,
+                        int *status ){
+   if ( !astOK ) return;
+   (**astMEMBER(this,Region,GetRegionMesh))( this, surface, maxpoint, maxcoord,
+                                             npoint, points, status );
 }
 void astGetRegionPoints_( AstRegion *this, int maxpoint, int maxcoord,
                           int *npoint, double *points, int *status ){

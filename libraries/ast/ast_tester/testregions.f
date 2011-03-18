@@ -2235,10 +2235,11 @@ C
       include 'AST_PAR'
       include 'SAE_PAR'
 
-      integer status, cir1, cir2, fc, i, fs, frm1,unc,f1,f2,f3
+      integer status, cir1, cir2, fc, i, fs, frm1,unc,f1,f2,f3,
+     :        npoint, j
       double precision p1(4),p2(4),xin(2),yin(2),xout(2),yout(2),
      :                 p3(3),rad,zin(2),zout(2),pp1(3),pp2(3),
-     :                 lbnd(2),ubnd(2)
+     :                 lbnd(2),ubnd(2), mesh(250,3)
       character cards(8)*80, sys*40
       logical hasframeset
 
@@ -2299,6 +2300,32 @@ C
      :    call stopit( status, 'Circle: Error AA7' )
       if( abs(ubnd(2)-(1.5707963267948966)) .gt. 1.0E-6 )
      :    call stopit( status, 'Circle: Error AA8' )
+
+      call ast_getregionmesh( cir1, .true., 0, 0, npoint, 0, status )
+      if( npoint .ne. 200 )
+     :    call stopit( status, 'Circle: Error mesh 1' )
+
+      call ast_getregionmesh( cir1, .true., 250, 3, npoint, mesh,
+     :                        status )
+
+      do i = 1, npoint
+         p2(1) = mesh(i,1)
+         p2(2) = mesh(i,2)
+         if( abs( ast_distance( frm1, p1, p2, status ) - 0.01 ) .gt.
+     :       1.0E-6 ) call stopit( status, 'Circle: Error mesh 2' )
+      enddo
+
+      call ast_getregionmesh( cir1, .false., 250, 3, npoint, mesh,
+     :                        status )
+      if( npoint .ne. 142 )
+     :    call stopit( status, 'Circle: Error mesh 3' )
+
+      do i = 1, npoint
+         p2(1) = mesh(i,1)
+         p2(2) = mesh(i,2)
+         if( ast_distance( frm1, p1, p2, status ) .gt. 0.01 )
+     :       call stopit( status, 'Circle: Error mesh 4' )
+      enddo
 
 
       p1( 1 ) = 1.2217305

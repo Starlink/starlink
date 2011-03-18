@@ -31,6 +31,8 @@ should modify your linking procedure to use the -grf (or -grf_v5.6)
 switch in place of the older -grf_v3.2 switch. See the description of the
 ast_link command for details of these switches.
 
+- New method astGetRegionMesh (AST_GETREGIONMESH) returns a set of
+positions covering the boundary, or volume, of a supplied Region.
 
 Main Changes in V5.5-0
 -----------------------
