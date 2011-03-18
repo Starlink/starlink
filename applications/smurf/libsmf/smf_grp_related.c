@@ -489,7 +489,6 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
           /* continuous - check length */
           totlen += thistlen;
           if ( maxlen && totlen > maxlen ) {
-            printf(" Totlen of %zd is > %zd Chunk %zd closed.\n", totlen, maxlen, thischunk );
             thischunk++;
             totlen = thistlen; /* reset length */
           } else {
