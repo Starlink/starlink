@@ -139,12 +139,14 @@
 *        Add FTS2_EQSLICED
 *     2010-11-03 (COBA):
 *        Add FTS2SPECRE
+*     2011-03-18 (EC):
+*        Add SC2PCA
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2007-2009 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2005-2007 Council and the University of British Columbia.
+*     Copyright (C) 2005-2008,2010-2011 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -329,6 +331,8 @@ void smurf_mon( int * status ) {
     smurf_sc2expandmodel( status );
   } else if (strcmp( taskname, "SC2FFT" ) == 0 ) {
     smurf_sc2fft( status );
+  } else if (strcmp( taskname, "SC2PCA" ) == 0 ) {
+    smurf_sc2pca( status );
   } else if (strcmp( taskname, "SC2SIM" ) == 0 ) {
     smurf_sc2sim( status );
   } else if (strcmp( taskname, "SC2THREADTEST" ) == 0 ) {

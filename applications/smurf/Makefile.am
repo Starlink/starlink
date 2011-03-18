@@ -59,6 +59,7 @@ sc2clean \
 sc2concat \
 sc2expandmodel \
 sc2fft \
+sc2pca \
 sc2sim \
 sc2threadtest \
 skynoise \

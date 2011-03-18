@@ -69,24 +69,28 @@
 *     2009-05-19 (TIMJ):
 *        Add RAWFIXMETA
 *     2010-07-19 (COBA):
-#         Add FTS2_FLATFIELD, FTS2_FREQCORR, FTS2_PORTIMBAL,
-#             FTS2_REMOVEBSE, FTS2_SPATIALWCS, FTS2_TRANSCORR
+*         Add FTS2_FLATFIELD, FTS2_FREQCORR, FTS2_PORTIMBAL,
+*             FTS2_REMOVEBSE, FTS2_SPATIALWCS, FTS2_TRANSCORR
 *     2010-08-27 (COBA):
-#         Remove smurf_sc2fts( int * )
+*         Remove smurf_sc2fts( int * )
 *     2010-09-17 (COBA):
-#         Add FTS2_PHASECORR
+*         Add FTS2_PHASECORR
 *     2010-09-30 (COBA):
-#         Add FTS2_EQSLICED
+*         Add FTS2_EQSLICED
 *     2010-11-03 (COBA):
-#         Add smurf_fts2_specre
+*         Add smurf_fts2_specre
 *     2010-11-24 (COBA):
-#         Add smurf_fts2_init
+*         Add smurf_fts2_init
+*     2011-03-18 (EC):
+*         Add smurf_sc2pca
+
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2007-2009 Science and Technology Facilities Council.
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
-*     Council, University of British Columbia.  All Rights Reserved.
+*     Copyright (C) 2006,2008,2011 University of British Columbia.
+*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -149,6 +153,7 @@ void smurf_sc2clean( int * );
 void smurf_sc2concat( int * );
 void smurf_sc2expandmodel( int * );
 void smurf_sc2fft( int * );
+void smurf_sc2pca( int * );
 void smurf_sc2sim( int * );
 void smurf_sc2threadtest( int * );
 void smurf_skynoise( int * );
