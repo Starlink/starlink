@@ -55,9 +55,10 @@
 *       time of the observation, only that the end reading is close
 *       enough. Assumes that if the end reading is reasonable the
 *       start reading will also be reasonable.
+*     - If the date is bad the tau reading is assumed to be bad.
 
 *  Copyright:
-*     Copyright (C) 2008,2010 Science and Technology Facilities Council.
+*     Copyright (C) 2008,2010-2011 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -148,6 +149,10 @@ smf__calc_meantau_from_fits( const smfHead * hdr, double refmjd, double threshol
   /* see whether the date is reasonable. The date can't be in the future beyond
      the end of the observation so we just check the start. */
   smf_fits_getS( hdr, datecard, iso, sizeof(iso), status );
+
+  /* Trap "bad value" date */
+  if (strcmp( iso, "0000-00-00T00:00:00" ) == 0 ) return retval;
+
   tf = astTimeFrame( "TimeOrigin=%s,TimeScale=UTC", iso);
   mjd = astGetD( tf, "TimeOrigin" );
 
