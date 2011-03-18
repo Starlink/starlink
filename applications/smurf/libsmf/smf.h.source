@@ -1342,6 +1342,10 @@ int smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
                              const smfArray * darks, const smfArray * ramps,
                              smfData **ffdata, int *status);
 
+void smf_open_asdouble( const Grp *igrp, size_t index, const smfArray* darks,
+                        const smfArray* flatramps, int ensureflat,
+                        smfData **data, int *status );
+
 void smf_open_file( const Grp * igrp, size_t index, const char * mode,
                     int withHdr, smfData ** data, int *status);
 

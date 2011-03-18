@@ -258,6 +258,7 @@ smf_obsmap_report.c \
 smf_obsmode_str.c \
 smf_obstype_str.c \
 smf_open_and_flatfield.c \
+smf_open_asdouble.c \
 smf_open_file.c \
 smf_open_group.c \
 smf_open_mapcoord.c \

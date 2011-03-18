@@ -592,25 +592,9 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
         } else {
           /* Open the file corresponding to this chunk. Data may
              require flat-fielding. */
-          if (ensureflat) {
-            smf_open_and_flatfield( igrp->grp, NULL, igrp->subgroups[j][i],
-                                    darks, flatramps, &refdata, status );
-          } else {
-            /* open as raw if raw else just open as whatever we have */
-            smfData *tmpdata = NULL;
-            smf_open_file( igrp->grp, igrp->subgroups[j][i], "READ",
-                           SMF__NOCREATE_DATA, &tmpdata, status );
-            if (tmpdata && tmpdata->file && tmpdata->file->isSc2store) {
-              smf_open_raw_asdouble( igrp->grp, igrp->subgroups[j][i],
-                                     darks, &refdata, status );
-            } else {
-              smf_open_and_flatfield( igrp->grp, NULL, igrp->subgroups[j][i],
-                                      darks, flatramps, &refdata, status );
-            }
-            smf_close_file( &tmpdata, status );
-          }
+          smf_open_asdouble( igrp->grp, igrp->subgroups[j][i], darks, flatramps,
+                           ensureflat, &refdata, status );
         }
-
 
         /* Set havequal flag based on first file. This is required
            because the initial pass through for dimensions only looked

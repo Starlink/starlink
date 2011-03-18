@@ -197,21 +197,7 @@ void smurf_sc2pca( int *status ) {
     if( *status != SAI__OK ) break;
 
     /* Load data, flatfielding and/or opening raw as double as necessary */
-    if( ensureflat ) {
-      smf_open_and_flatfield( igrp, NULL, i, darks, flatramps, &data,
-                              status );
-    } else {
-      /* open as raw if raw else just open as whatever we have */
-      smfData *tmpdata = NULL;
-      smf_open_file( igrp, i, "READ", SMF__NOCREATE_DATA, &tmpdata, status );
-      if (tmpdata && tmpdata->file && tmpdata->file->isSc2store) {
-        smf_open_raw_asdouble( igrp, i, darks, &data, status );
-      } else {
-        smf_open_and_flatfield( igrp, NULL, i, darks, flatramps, &data,
-                                status );
-      }
-      smf_close_file( &tmpdata, status );
-    }
+    smf_open_asdouble( igrp, i, darks, flatramps, ensureflat, &data, status );
 
     /* Mask out bad bolometers - mask data array not quality array */
     smf_apply_mask( data, bbms, SMF__BBM_DATA, 0, status );
