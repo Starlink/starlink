@@ -176,6 +176,12 @@ if ($doversion) {
 # Provide output from SCUBA or HETERODYNE data (default):
 my $data_root = ( $prog =~ /scuba/ ? $scuba2_root : $acsis_root );
 
+# Handle Mac mounting
+if (!-d $data_root) {
+  my $alt_root = File::Spec->catdir( "/Volumes", $data_root);
+  $data_root = $alt_root if -d $alt_root;
+}
+
 # Print extended lines?
 my $pformat = ( $extended ? "LONG" : "SHORT");
 
