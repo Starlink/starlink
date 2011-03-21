@@ -9,7 +9,8 @@ if( $# < 1 ) then
    echo
    echo "   <inlist> is a text file in which each line contains the path"
    echo "   to a directory holding the raw time series cubes for a single"
-   echo "   planet observation."
+   echo "   planet observation from a single array (different directories" 
+   echo "   can hold data for different arrays)."
    echo
    echo "If the -t option is supplied, the distortion is calculated on the"
    echo "basis of individual slices in the time series data. Otherwise it is"
@@ -416,8 +417,7 @@ foreach indir ($dir_list)
          exit
       endif
 
-#  See if the bolomaps have a chunk number in the NDF name or not. If so, get
-#  the highest chunk number (only check up to 5 chunks).
+#  Get the highest chunk number (only check up to 5 chunks).
       grep "Writing single bolo map" makemap.log | grep CH05 > /dev/null
       if( $status == 0 ) then
          set top_chunk = 5
@@ -511,7 +511,7 @@ foreach indir ($dir_list)
       echo "# BC1 - array pixel X coord at centre of source " >> $cat
       echo "# BC2 - array pixel Y coord at centre of source " >> $cat
       echo "# BF1 - array pixel X coord at bolometer centre" >> $cat
-      echo "# BF2 - - array pixel Y coord at bolometer centre" >> $cat
+      echo "# BF2 - array pixel Y coord at bolometer centre" >> $cat
       echo "# DBC1 - error in BC1" >> $cat
       echo "# DBC2 - error in BC2" >> $cat
       echo "# AMP - source amplitude " >> $cat
@@ -554,11 +554,7 @@ foreach indir ($dir_list)
             while( $ich <= $top_chunk )
 
 #  Construct the name of the bolometer map.
-               if( $top_chunk > 0 ) then
-                  set bolo_name = "CH0${ich}"
-               else
-                  set bolo_name = ""
-               endif
+               set bolo_name = "CH0${ich}"
 
                if( $ix < 10 ) then
                   set bolo_name = "${bolo_name}C0${ix}"
