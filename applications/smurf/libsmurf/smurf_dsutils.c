@@ -1275,16 +1275,16 @@ void smurf_dsutils( int *status ) {
 
 /* Paste the X offset values into an output NDF. */
     PasteNDF( subarray, NULL, NULL, nrow, f1_vals, f2_vals, bc1_vals, dbf1_vals, map,
-              fp_fset, niter, genvar, 2.0, "OUTDX", status );
+              fp_fset, niter, genvar, 0.5, "OUTDX", status );
 
 /* Create the Y offset NDF in the same way. */
     PasteNDF( subarray, NULL, NULL, nrow, f1_vals, f2_vals, bc2_vals, dbf2_vals, map,
-              fp_fset, niter, genvar, 2.0, "OUTDY", status );
+              fp_fset, niter, genvar, 0.5, "OUTDY", status );
 
 /* Create an NDF holding any extra required column in the same way. */
     if( extra_vals ) {
       PasteNDF( subarray, NULL, NULL, nrow, f1_vals, f2_vals, extra_vals,
-                dbf1_vals, map, fp_fset, niter, genvar, 2.0, "COLNDF", status );
+                dbf1_vals, map, fp_fset, niter, genvar, 0.5, "COLNDF", status );
     }
 
 /* Free resources. */
