@@ -223,6 +223,8 @@ void smurf_calcnoise( int *status ) {
     fgrp = NULL;
   } else {
     msgOutif( MSG__NORM, " ", "No valid frames supplied. Nothing to do.", status );
+    if (fgrp) grpDelet( &fgrp, status );
+    goto CLEANUP;
   }
 
   /* We now need to combine files from the same subarray and same sequence
@@ -458,6 +460,7 @@ void smurf_calcnoise( int *status ) {
 
   }
 
+ CLEANUP:
   /* Write out the list of output NDF names, annulling the error if a null
      parameter value is supplied. */
   if( *status == SAI__OK ) {
