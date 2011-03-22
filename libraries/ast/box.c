@@ -89,6 +89,8 @@ f     The Box class does not define any new routines beyond those
 *        possible structure.
 *     28-FEB-2011 (DSB):
 *        Do not assume the first axis value is good in function BestBox.
+*     22-MAR-2011 (DSB):
+*        Improve uniformity of points within grid produced by astRegBaseGrid.
 *class--
 */
 
@@ -203,7 +205,7 @@ static double *GeoLengths( AstFrame *, int, double *, double *, double *, int * 
 static double *RegCentre( AstRegion *this, double *, double **, int, int, int * );
 static double SetShrink( AstBox *, double, int * );
 static int GetObjSize( AstObject *, int * );
-static int MakeGrid( int, double **, int, double *, double *, int, int, double, int * );
+static int MakeGrid( int, double **, int, double *, double *, int *, int, int, double, int * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
 static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int **, int * );
 static int RegTrace( AstRegion *, int, double *, double **, int * );
@@ -1258,7 +1260,8 @@ void astInitBoxVtab_(  AstBoxVtab *vtab, const char *name, int *status ) {
 }
 
 static int MakeGrid( int naxes, double **ptr, int ip, double *lbnd,
-                     double *ubnd, int np_axis, int iaxis, double axval, int *status ){
+                     double *ubnd, int *np_axes, int np_axis, int iaxis,
+                     double axval, int *status ){
 /*
 *  Name:
 *     MakeGrid
@@ -1272,7 +1275,8 @@ static int MakeGrid( int naxes, double **ptr, int ip, double *lbnd,
 *  Synopsis:
 *     #include "box.h"
 *     int MakeGrid( int naxes, double **ptr, int ip, double *lbnd,
-*                   double *ubnd, int np_axis, int iaxis, double axval, int *status )
+*                   double *ubnd, int *np_axes, int np_axis, int iaxis,
+*                   double axval, int *status )
 
 *  Class Membership:
 *     Box member function
@@ -1281,7 +1285,8 @@ static int MakeGrid( int naxes, double **ptr, int ip, double *lbnd,
 *     This function creates an evenly sampled grid covering a given
 *     volume of n-D space, putting the coordinates at the sample points
 *     into a supplied array and returning the number of samples added.
-*     The volume is assumed to have a constant value on a specified axis.
+*     Optionally, the volume can be assumed to have a constant value on
+*     a specified axis.
 
 *  Parameters:
 *     naxes
@@ -1297,17 +1302,28 @@ static int MakeGrid( int naxes, double **ptr, int ip, double *lbnd,
 *     ubnd
 *        Pointer to an array containing the upper axis bounds of the
 *        volume to be sampled.
+*     np_axes
+*        Pointer to an array with one element for every axis, giving the
+*        number of samples along each axis (except, optionally, the axis
+*        specified by "iaxis"). The first sample (sample 0) for each axis
+*        will be at the lower bound given in "lbnd" and the last sample
+*        (sample "np_axes[iax]-1") will be at the upper bound given in
+*        "ubnd". If NULL, then the single scalar avalue given by
+*        "np_axis" is used for all axes.
 *     np_axis
-*        The number of samples along each axis (except the axis specified
-*        by "iaxis"). The first sample (sample 0) for each axis will be at
-*        the lower bound given in "lbnd" and the last sample (sample
-*        "np_axis-1") will be at the upper bound given in "ubnd".
+*        The constant number of samples along every axis (except, optionally,
+*        the axis specified by "iaxis"). The first sample (sample 0) for each
+*        axis will be at the lower bound given in "lbnd" and the last sample
+*        (sample "np_axis-1") will be at the upper bound given in "ubnd".
+*        The supplied value is only used if "np_axes" is NULL.
 *     iaxis
-*        The index of an axis which has constant value in the volume.
+*        The index of an axis which has constant value in the volume, or
+*        -1 if all axes are to span the full volume given by lbnd/ubnd.
 *        The values in "lbnd" and "ubnd" are ignored for this axis and all
 *        sample positions will have the axis value given by "axval".
 *     axval
-*        The constant value for the axis with index "iaxis".
+*        The constant value for the axis with index "iaxis". Ignored if
+*        "iaxis" is -1.
 *     status
 *        Pointer to the inherited status variable.
 
@@ -1322,6 +1338,7 @@ static int MakeGrid( int naxes, double **ptr, int ip, double *lbnd,
    int *pi;              /* Pointer to array holding current sample indices */
    int i;                /* Axis index */
    int ipp;              /* Index of next point */
+   int nsamp;            /* Number of samples along the axis */
 
 /* Check the global error status. */
    if ( !astOK ) return 0;
@@ -1340,13 +1357,17 @@ static int MakeGrid( int naxes, double **ptr, int ip, double *lbnd,
    the lower bound, and store a modified upper limit which includes some
    safety marging to allow for rounding errors. */
       for( i = 0; i < naxes; i++ ) {
-         step[ i ] = ( ubnd[ i ] - lbnd[ i ] )/(np_axis-1);
+         nsamp = np_axes ? np_axes[ i ] : np_axis;
+         step[ i ] = ( ubnd[ i ] - lbnd[ i ] )/( nsamp - 1 );
          pi[ i ] = 0;
-         maxi[ i ] = np_axis - 1;
+         maxi[ i ] = nsamp - 1;
       }
-      maxi[ iaxis ] = 0;
-      step[ iaxis ] = 0.0;
-      pi[ iaxis ] = 0;
+
+      if( iaxis >= 0 ) {
+         maxi[ iaxis ] = 0;
+         step[ iaxis ] = 0.0;
+         pi[ iaxis ] = 0;
+      }
 
 /* Initialise the index of the next position to store. */
       ipp = ip;
@@ -2188,25 +2209,11 @@ static AstPointSet *RegBaseGrid( AstRegion *this, int *status ){
 
 /* Local Variables: */
    AstFrame *frm;                 /* Base Frame in encapsulated FrameSet */
-   AstPointSet *newps;            /* New results PointSet */
-   AstPointSet *ps;               /* New boundary mesh */
    AstPointSet *result;           /* Returned pointer */
-   double **ptr;                  /* Pointers to data */
-   double *ax;                    /* Pointer to next first axis value */
    double *lbnd;                  /* Pointer to array of lower bounds of box */
-   double *ubnd;                  /* Pointer to array of lower bounds of box */
-   double dx;                     /* Increment along first axis of 2D box */
-   double shrink0;                /* Original shrink factor */
-   int i;                         /* Loop count */
-   int ii;                        /* Loop count */
-   int ik;                        /* Next value to add to "is" */
-   int ip;                        /* Index of next point */
-   int is;                        /* Sum of first "m-1" integers raised to power of (naxes-1) */
-   int k1;                        /* Intermediate constant */
-   int m;                         /* No. of times to invoke astRegBaseMesh */
+   double *ubnd;                  /* Pointer to array of upper bounds of box */
+   int meshsize;                  /* Requested size of grid */
    int naxes;                     /* No. of axes in base Frame */
-   int np;                        /* Original MeshSize value */
-   int npp;                       /* Current MeshSize value */
 
 /* Initialise */
    result = NULL;
@@ -2236,92 +2243,16 @@ static AstPointSet *RegBaseGrid( AstRegion *this, int *status ){
 /* Get the number of points which would be used to create a boundary
    mesh. We use the same number to determine the number of points in the
    grid. */
-      np = astGetMeshSize( this );
+      meshsize = astGetMeshSize( this );
 
-/* First deal with the simple case of 1-D boxes. Store "np" axis values
-   evenly spaced between lbnd and ubnd. */
-      if( naxes == 1 ) {
-         result = astPointSet( np, 1, "", status );
-         ptr = astGetPoints( result );
-         if( astOK ) {
-            ax = ptr[ 0 ];
-            dx = ( ubnd[ 0 ] - lbnd[ 0 ] )/( np - 1 );
-            for( ip = 0; ip < np; ip++ ) *(ax++) = lbnd[ 0 ] + ip*dx;
-         }
+/* Create the PointSet holding the grid. */
+      result = astFrameGrid( frm, meshsize, lbnd, ubnd );
 
-/* Now deal with boxes with more than 1 axis. The algorithm uses the
-   astRegBaseMesh method to create a boundary mesh covering the box.
-   The box is then shrunk slightly and a new boundary mesh created, which
-   is appended to the first mesh. This process of shrinking the box and
-   appending the new boundary mesh is continued until the box has zero
-   size. The final mesh represents the required volume grid like a series
-   of "onion skins". We reduce the MeshSize attribute each time prior to
-   calling the astRegBaseMesh method in order to retain a roughly constant
-   density of points throughout the final grid, and so that the final number
-   of points in the grid is close to "np". */
-      } else {
-
-/* First find the number of times ("m") the astRegBaseMesh method should be
-   called. This is calculated on the basis of the MeshSize value ("np")
-   and the number of axes in the Region. */
-         k1 = naxes;
-         for( ii = 0; ii < naxes; ii++ ) k1 *= 2;
-
-         is = 1;
-         for( m = 2; m < 100; m++ ) {
-            if( is*k1 >= np ) {
-               m--;
-               break;
-            }
-            ik = m;
-            for( ii = 2; ii < naxes; ii++ ) ik *= m;
-            is += ik;
-         }
-
-/* Save the original shrink factor. */
-         shrink0 = ((AstBox *) this)->shrink;
-
-/* Loop round invoking the astRegBaseMesh method. */
-         for( i = 1; i <= m; i++ ) {
-
-/* Shrink the Box temporarily. */
-            SetShrink( (AstBox *) this, (shrink0*i)/m, status );
-
-/* Set the new MeshSize. */
-            npp = k1;
-            for( ii = 1; ii < naxes; ii++ ) npp *= i;
-            astSetMeshSize( this, npp );
-
-/* Invoke the astRegBaseMesh method to create a new boundary mesh. */
-            ps = astRegBaseMesh( this );
-
-/* If this is the first PointSet created, use it as the returned
-   PointSet. Otherwise, append this PointSet to the results PointSet. */
-            if( !result ) {
-               result = astClone( ps );
-            } else {
-               newps = astAppendPoints( result, ps );
-               (void) astAnnul( result );
-               result = newps;
-            }
-
-/* Free resources. */
-            ps = astAnnul( ps );
-         }
-
-/* Unshrink the Box. */
-         SetShrink( (AstBox *) this, shrink0, status );
-
-/* Reinstate the original MeshSize. */
-         astSetMeshSize( this, np );
-
-      }
-
-/* Same the returned pointer in the Region structure so that it does not
+/* Save the returned pointer in the Region structure so that it does not
    need to be created again next time this function is called. */
       if( astOK && result ) this->basegrid = astClone( result );
 
-/* Free resources. */
+/* Free remaining resources. */
       frm = astAnnul( frm );
       lbnd = astFree( lbnd );
       ubnd = astFree( ubnd );
@@ -2678,12 +2609,12 @@ static AstPointSet *RegBaseMesh( AstRegion *this, int *status ){
             for( iaxis = 0; iaxis < naxes; iaxis++ ) {
 
 /* First do the upper face for this axis. */
-               ip += MakeGrid( naxes, ptr, ip, lbnd, ubnd, np_axis, iaxis,
-                               ubnd[ iaxis ], status );
+               ip += MakeGrid( naxes, ptr, ip, lbnd, ubnd, NULL, np_axis,
+                               iaxis, ubnd[ iaxis ], status );
 
 /* Now do the lower face for this axis. */
-               ip += MakeGrid( naxes, ptr, ip, lbnd, ubnd, np_axis, iaxis,
-                               lbnd[ iaxis ], status );
+               ip += MakeGrid( naxes, ptr, ip, lbnd, ubnd, NULL, np_axis,
+                               iaxis, lbnd[ iaxis ], status );
             }
 
 /* Remove any unused space at the end of the PointSet. */

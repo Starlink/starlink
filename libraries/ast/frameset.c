@@ -233,6 +233,8 @@ f     - AST_REMOVEFRAME: Remove a Frame from a FrameSet
 *     30-OCT-2009 (DSB):
 *        Make the Ident attribute relate to the FrameSet, not the current
 *        Frame.
+*     22-MAR-2011 (DSB):
+*        Override astFrameGrid method.
 *class--
 */
 
@@ -827,6 +829,7 @@ static AstMapping *GetMapping( AstFrameSet *, int, int, int * );
 static AstMapping *RemoveRegions( AstMapping *, int * );
 static AstMapping *Simplify( AstMapping *, int * );
 static AstObject *Cast( AstObject *, AstObject *, int * );
+static AstPointSet *FrameGrid( AstFrame *, int, const double *, const double *, int * );
 static AstPointSet *ResolvePoints( AstFrame *, const double [], const double [], AstPointSet *, AstPointSet *, int * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
 static const char *Abbrev( AstFrame *, int, const char *, const char *, const char *, int * );
@@ -3481,6 +3484,81 @@ static AstFrameSet *FindFrame( AstFrame *target_frame, AstFrame *template,
    return result;
 }
 
+static AstPointSet *FrameGrid( AstFrame *this_frame, int size, const double *lbnd,
+                               const double *ubnd, int *status ){
+/*
+*  Name:
+*     FrameGrid
+
+*  Purpose:
+*     Return a grid of points covering a rectangular area of a Frame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "frameset.h"
+*     AstPointSet *FrameGrid( AstFrame *this_frame, int size,
+*                             const double *lbnd, const double *ubnd,
+*                             int *status )
+
+*  Class Membership:
+*     FrameSet member function (over-rides the protected astFrameGrid
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function returns a PointSet containing positions spread
+*     approximately evenly throughtout a specified rectangular area of
+*     the Frame.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     size
+*        The preferred number of points in the returned PointSet. The
+*        actual number of points in the returned PointSet may be
+*        different, but an attempt is made to stick reasonably closely to
+*        the supplied value.
+*     lbnd
+*        Pointer to an array holding the lower bound of the rectangular
+*        area on each Frame axis. The array should have one element for
+*        each Frame axis.
+*     ubnd
+*        Pointer to an array holding the upper bound of the rectangular
+*        area on each Frame axis. The array should have one element for
+*        each Frame axis.
+
+*  Returned Value:
+*     A pointer to a new PointSet holding the grid of points.
+
+*  Notes:
+*     - A NULL pointer is returned if an error occurs.
+*/
+
+/* Local Variables: */
+   AstFrame *fr;                 /* Pointer to current Frame */
+   AstFrameSet *this;            /* Pointer to the FrameSet structure */
+   AstPointSet *result;          /* Value to return */
+
+/* Check the global error status. */
+   if ( !astOK ) return NULL;
+
+/* Obtain a pointer to the FrameSet structure. */
+   this = (AstFrameSet *) this_frame;
+
+/* Obtain a pointer to the FrameSet's current Frame and invoke this
+   Frame's astFrameGrid method. Annul the Frame pointer afterwards. */
+   fr = astGetFrame( this, AST__CURRENT );
+   result = astFrameGrid( fr, size, lbnd, ubnd );
+   fr = astAnnul( fr );
+
+/* If an error occurred, clear the result. */
+   if ( !astOK ) result = astAnnul( result );
+
+/* Return the result. */
+   return result;
+}
+
 static int ForceCopy( AstFrameSet *this, int iframe, int *status ) {
 /*
 *  Name:
@@ -5210,6 +5288,7 @@ void astInitFrameSetVtab_(  AstFrameSetVtab *vtab, const char *name, int *status
    frame->Fields = Fields;
    frame->FindFrame = FindFrame;
    frame->Format = Format;
+   frame->FrameGrid = FrameGrid;
    frame->Gap = Gap;
    frame->GetAxis = GetAxis;
    frame->GetDigits = GetDigits;
@@ -5229,6 +5308,10 @@ void astInitFrameSetVtab_(  AstFrameSetVtab *vtab, const char *name, int *status
    frame->GetUnit = GetUnit;
    frame->Intersect = Intersect;
    frame->IsUnitFrame = IsUnitFrame;
+   frame->LineContains = LineContains;
+   frame->LineCrossing = LineCrossing;
+   frame->LineDef = LineDef;
+   frame->LineOffset = LineOffset;
    frame->Match = Match;
    frame->MatchAxes = MatchAxes;
    frame->MatchAxesX = MatchAxesX;
@@ -5276,10 +5359,6 @@ void astInitFrameSetVtab_(  AstFrameSetVtab *vtab, const char *name, int *status
    frame->ValidateAxis = ValidateAxis;
    frame->ValidateAxisSelection = ValidateAxisSelection;
    frame->ValidateSystem = ValidateSystem;
-   frame->LineDef = LineDef;
-   frame->LineContains = LineContains;
-   frame->LineCrossing = LineCrossing;
-   frame->LineOffset = LineOffset;
 
    frame->GetActiveUnit = GetActiveUnit;
    frame->SetActiveUnit = SetActiveUnit;
@@ -11425,8 +11504,6 @@ f     function is invoked with STATUS set to an error value, or if it
 /* Return an ID value for the new FrameSet. */
    return astMakeId( new );
 }
-
-
 
 
 

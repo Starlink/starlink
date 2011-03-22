@@ -1029,9 +1029,10 @@ c      call ast_activememory( 'testregions' )
       include 'PRM_PAR'
 
       integer status, box1, frm1, i, fc, fs, map1, perm(3), frm2, box3,
-     :                box2, frm3, map2, res, j, bfrm, cfrm, reg1, map
+     :                box2, frm3, map2, res, j, bfrm, cfrm, reg1, map,
+     :                npoint
       double precision p1(3), p2(3), v2, xin(9), yin(9), xout(9),
-     :                 yout(9),in(4,3),out(4,3),matrix(9)
+     :                 yout(9),in(4,3),out(4,3),matrix(9),grid(250,2)
       character*(AST__SZCHR) t1, t2, cards(9)*80
       logical hasframeset
 
@@ -2006,6 +2007,33 @@ C
 
       box1 = ast_box( bfrm, 0, p1, p2, AST__NULL, ' ', status )
 
+
+      call ast_getregionmesh( box1, .false., 250, 2, npoint, grid,
+     :                        status )
+
+      if( npoint .ne. 176 )
+     :    call stopit( status, 'Box: Error mesh 3' )
+
+      do i = 1, npoint
+         if( abs( grid(i,1) - 100 ) .gt. 50.0D0 ) then
+             call stopit( status, 'Box: Error mesh 1' )
+         else if( abs( grid(i,2) - 150 ) .gt. 20.0D0 ) then
+             call stopit( status, 'Box: Error mesh 2' )
+         endif
+      enddo
+
+      call ast_getregionmesh( box1, .true., 250, 2, npoint, grid,
+     :                        status )
+      if( npoint .ne. 198 )
+     :    call stopit( status, 'Box: Error mesh 4' )
+
+      do i = 1, npoint
+         if( grid(i,1) .ne. 50.0D0 .and. grid(i,1) .ne. 150.0D0 .and.
+     :       grid(i,2) .ne. 130.0D0 .and. grid(i,2) .ne. 170.0D0 ) then
+             call stopit( status, 'Box: Error mesh 5' )
+         endif
+      enddo
+
       cfrm = ast_getFrame( fs, AST__CURRENT, status )
       map = ast_getmapping( fs, AST__BASE, AST__CURRENT, status )
       reg1 = ast_mapregion( box1, map, cfrm, status )
@@ -2245,6 +2273,7 @@ C
 
       double precision in( 2, 3 ), out( 2, 3 )
 
+
       data cards /'CTYPE1  = ''RA---TAN''',
      :            'CTYPE2  = ''DEC--TAN''',
      :            'CRPIX1  = 100',
@@ -2317,7 +2346,8 @@ C
 
       call ast_getregionmesh( cir1, .false., 250, 3, npoint, mesh,
      :                        status )
-      if( npoint .ne. 142 )
+
+      if( npoint .ne. 201 )
      :    call stopit( status, 'Circle: Error mesh 3' )
 
       do i = 1, npoint
@@ -2326,7 +2356,6 @@ C
          if( ast_distance( frm1, p1, p2, status ) .gt. 0.01 )
      :       call stopit( status, 'Circle: Error mesh 4' )
       enddo
-
 
       p1( 1 ) = 1.2217305
       p1( 2 ) = 1.3962634

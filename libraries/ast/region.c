@@ -194,6 +194,8 @@ f     - AST_SHOWMESH: Display a mesh of points on the surface of a Region
 *        Frame had the same number of axes as the current Frame).
 *     18-MAR-2011 (DSB):
 *        Added astGetRegionMesh public method.
+*     22-MAR-2011 (DSB):
+*        Improve uniformity of points produced by astRegBaseGrid method.
 *class--
 
 *  Implementation Notes:
@@ -7291,8 +7293,11 @@ static AstPointSet *RegBaseGrid( AstRegion *this, int *status ){
    int ic;
    int ip;
    int ipr;
+   int meshsize;
    int naxb;
+   int np;
    int npnt2;
+   int ntry;
 
 /* Initialise */
    result= NULL;
@@ -7309,6 +7314,9 @@ static AstPointSet *RegBaseGrid( AstRegion *this, int *status ){
 /* Otherwise, check the Region is bounded. */
    } else if( astGetBounded( this ) ) {
 
+/* Get the original MeshSize attribute. */
+      meshsize = astGetMeshSize( this );
+
 /* Get the base Frame bounding box. */
       naxb = astGetNin( this->frameset );
       lbnd = astMalloc( sizeof( double )*(size_t)naxb );
@@ -7319,72 +7327,92 @@ static AstPointSet *RegBaseGrid( AstRegion *this, int *status ){
       frmb = astGetFrame( this->frameset, AST__BASE );
       box = astBox( frmb, 1, lbnd, ubnd, NULL, "", status );
 
+/* Loop until we have a grid of nearly the right size. Make at most three
+   attempts. */
+      np = meshsize;
+      ntry = 0;
+      while( ntry++ < 3 ) {
+
 /* Copy the MeshSize attribute to the new Box since this will be used by
    the invocation of astRegBaseGrid below. */
-      astSetMeshSize( box, astGetMeshSize( this ) );
+         astSetMeshSize( box, np );
 
 /* Invoke the Box astRegGrid method. Note, the Box class overrides this
    implementation of astRegBaseGrid and does not (must not) invoke this
    implementation, in order to avoid an infinite loop. */
-      ps1 = astRegBaseGrid( box );
+         ps1 = astRegBaseGrid( box );
 
 /* Some of the base Frame points in the above bounding box will fall outside
    the supplied Region. Use the Region as a Mapping to determine which they
    are. Since the points are base Frame points, use astBTransform rather
    than astTransform. */
-      ps2 = astBTransform( this, ps1, 1, NULL );
+         ps2 = astBTransform( this, ps1, 1, NULL );
 
 /* We now create a PointSet which is a copy of "ps2" but with all the bad
    points (i.e. the points in the bounding box grid which are not inside
    the supplied Region) removed. Create a result PointSet which is the same
    size as "ps2", then copy just the good points from "ps2" to the result
    PointSet, keeping a record of the number of points copied. */
-      ptr2 = astGetPoints( ps2 );
-      npnt2 = astGetNpoint( ps2 );
-      result = astPointSet( npnt2, naxb, "", status );
-      ptr = astGetPoints( result );
-      if( astOK ) {
+         ptr2 = astGetPoints( ps2 );
+         npnt2 = astGetNpoint( ps2 );
+         result = astPointSet( npnt2, naxb, "", status );
+         ptr = astGetPoints( result );
+         if( astOK ) {
 
 /* Initialise the index of the next point to be stored in "result". */
-         ipr = 0;
+            ipr = 0;
 
 /* Loop round all points in "ps2" */
-         for( ip = 0; ip < npnt2; ip++ ) {
+            for( ip = 0; ip < npnt2; ip++ ) {
 
 /* Copy each axis value for this point from "ps2" to "result". If a bad
    axis value is encountered, flag that the point is bad and break out of
    the axis loop. */
-            good = 1;
-            for( ic = 0; ic < naxb; ic++ ) {
-               if( ptr2[ ic ][ ip ] == AST__BAD ) {
-                  good = 0;
-                  break;
-               } else {
-                  ptr[ ic ][ ipr ] = ptr2[ ic ][ ip ];
+               good = 1;
+               for( ic = 0; ic < naxb; ic++ ) {
+                  if( ptr2[ ic ][ ip ] == AST__BAD ) {
+                     good = 0;
+                     break;
+                  } else {
+                     ptr[ ic ][ ipr ] = ptr2[ ic ][ ip ];
+                  }
                }
-            }
 
 /* If the current point has no bad axis values, increment the index of
    the next point to be stored in "result". */
-            if( good ) ipr++;
+               if( good ) ipr++;
+            }
          }
+
+/* Free resources */
+         ps1 = astAnnul( ps1 );
+         ps2 = astAnnul( ps2 );
+
+/* Leave the loop if an error has occurred. */
+         if( !astOK ) break;
+
+/* if the number of points in the grid is within 5% of the target value,
+   it is good enough, so break. */
+         if( fabs( (double)( ipr - meshsize ) )/meshsize < 0.05 ) break;
+
+/* Otherwise, adjust the target size of the grid by the ratio by which it
+   is in error. */
+         np *= (double)meshsize/(double)ipr;
+         result = astAnnul( result );
+      }
 
 /* Truncate the "result" PointSet to exclude any unused space at the end
    of the axis values arrays. */
-         astSetNpoint( result, ipr );
-      }
+      if( astOK ) astSetNpoint( result, ipr );
 
 /* Free resources */
       lbnd = astFree( lbnd );
       ubnd = astFree( ubnd );
       frmb = astAnnul( frmb );
       box = astAnnul( box );
-      ps1 = astAnnul( ps1 );
-      ps2 = astAnnul( ps2 );
 
 /* Cache the new grid for future use. */
       if( astOK ) this->basegrid = astClone( result );
-
    }
 
 /* Annul the result if an error occurred. */

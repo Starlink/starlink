@@ -288,6 +288,8 @@ f     - AST_SKYOFFSETMAP: Obtain a Mapping from absolute to offset coordinates
 *        Add IsLatAxis and IsLonAxis attributes.
 *     11-MAY-2010 (DSB):
 *        In SetSystem, clear SkyRefP as well as SkyRef.
+*     22-MAR-2011 (DSB):
+*        Override astFrameGrid method.
 *class--
 */
 
@@ -877,6 +879,7 @@ static int class_init = 0;       /* Virtual function table initialised? */
 /* ======================================== */
 static AstLineDef *LineDef( AstFrame *, const double[2], const double[2], int * );
 static AstMapping *SkyOffsetMap( AstSkyFrame *, int * );
+static AstPointSet *FrameGrid( AstFrame *, int, const double *, const double *, int * );
 static AstPointSet *ResolvePoints( AstFrame *, const double [], const double [], AstPointSet *, AstPointSet *, int * );
 static AstSystemType GetAlignSystem( AstFrame *, int * );
 static AstSystemType GetSystem( AstFrame *, int * );
@@ -1954,6 +1957,207 @@ static const char *Format( AstFrame *this_frame, int axis, double value, int *st
    if ( !astOK ) result = NULL;
 
 /* Return the result. */
+   return result;
+}
+
+static AstPointSet *FrameGrid( AstFrame *this_object, int size, const double *lbnd,
+                               const double *ubnd, int *status ){
+/*
+*  Name:
+*     FrameGrid
+
+*  Purpose:
+*     Return a grid of points covering a rectangular area of a Frame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     AstPointSet *FrameGrid( AstFrame *this_frame, int size,
+*                             const double *lbnd, const double *ubnd,
+*                             int *status )
+
+*  Class Membership:
+*     SkyFrame member function (over-rides the protected astFrameGrid
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function returns a PointSet containing positions spread
+*     approximately evenly throughtout a specified rectangular area of
+*     the Frame.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     size
+*        The preferred number of points in the returned PointSet. The
+*        actual number of points in the returned PointSet may be
+*        different, but an attempt is made to stick reasonably closely to
+*        the supplied value.
+*     lbnd
+*        Pointer to an array holding the lower bound of the rectangular
+*        area on each Frame axis. The array should have one element for
+*        each Frame axis.
+*     ubnd
+*        Pointer to an array holding the upper bound of the rectangular
+*        area on each Frame axis. The array should have one element for
+*        each Frame axis.
+
+*  Returned Value:
+*     A pointer to a new PointSet holding the grid of points.
+
+*  Notes:
+*     - A NULL pointer is returned if an error occurs.
+*/
+
+/* Local Variables: */
+   AstPointSet *result;
+   AstSkyFrame *this;
+   double **ptr;
+   double box_area;
+   double cl;
+   double dlon;
+   double hilat;
+   double hilon;
+   double inclon;
+   double lat_size;
+   double lat;
+   double lon;
+   double lolon;
+   double lon_size;
+   double lolat;
+   double totlen;
+   int ilat;
+   int ilon;
+   int imer;
+   int ip;
+   int ipar;
+   int ipmax;
+   int nmer;
+   int npar;
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the SkyFrame structure. */
+   this = (AstSkyFrame *) this_object;
+
+/* Get the zero-based indices of the longitude and latitude axes. */
+   ilon = astGetLonAxis( this );
+   ilat = 1 - ilon;
+
+/* The latitude bounds may not be the right way round so check for it. */
+   if( lbnd[ ilat ] <= ubnd[ ilat ] ) {
+      lolat = lbnd[ ilat ];
+      hilat = ubnd[ ilat ];
+   } else {
+      lolat = ubnd[ ilat ];
+      hilat = lbnd[ ilat ];
+   }
+
+/* Check all bounds are good. Also check the size is positive. */
+   lolon = lbnd[ ilon ];
+   hilon = ubnd[ ilon ];
+   if( size > 0 && lolat != AST__BAD && hilat != AST__BAD &&
+       lolon != AST__BAD && hilon != AST__BAD ) {
+
+/* Ensure the longitude bounds are in the range 0-2PI. */
+      lolon = palSlaDranrm( lolon );
+      hilon = palSlaDranrm( hilon );
+
+/* If the upper longitude limit is less than the lower limit, add 2.PI */
+      if( hilon <= lolon &&
+          ubnd[ ilon ] != lbnd[ ilon ] ) hilon += 2*AST__DPI;
+
+/* Get the total area of the box in steradians. */
+      dlon = hilon - lolon;
+      box_area = fabs( dlon*( sin( hilat ) - sin( lolat ) ) );
+
+/* Get the nominal size of a square grid cell, in radians. */
+      lat_size = sqrt( box_area/size );
+
+/* How many parallels should we use to cover the box? Ensure we use at
+   least two. These parallels pass through the centre of the grid cells. */
+      npar = (int)( 0.5 + ( hilat - lolat )/lat_size );
+      if( npar < 2 ) npar = 2;
+
+/* Find the actual sample size implied by this number of parallels. */
+      lat_size = ( hilat - lolat )/npar;
+
+/* Find the total arc length of the parallels. */
+      totlen = 0.0;
+      lat = lolat + 0.5*lat_size;
+      for( ipar = 0; ipar < npar; ipar++ ) {
+         totlen += dlon*cos( lat );
+         lat += lat_size;
+      }
+
+/* If we space "size" samples evenly over this total arc-length, what is
+   the arc-distance between samples? */
+      lon_size = totlen/size;
+
+/* Create a PointSet in which to store the grid. Make it bigger than
+   necessary in order to leave room for extra samples caused by integer
+   truncation. */
+      ipmax = 2*size;
+      result = astPointSet( ipmax, 2, " ", status );
+      ptr = astGetPoints( result );
+      if( astOK ) {
+
+/* Loop over all the parallels. */
+         ip = 0;
+         lat = lolat + 0.5*lat_size;
+         for( ipar = 0; ipar < npar; ipar++ ) {
+
+/* Get the longitude increment between samples on this parallel. */
+            cl = cos( lat );
+            inclon = ( cl != 0.0 ) ? lon_size/cl : 0.0;
+
+/* Get the number of longitude samples for this parallel. Reduce it if
+   it would extend beyond the end of the PointSet. */
+            nmer = dlon/inclon;
+            if( ip + nmer >= ipmax ) nmer = ipmax - ip;
+
+/* Adjust the longitude increment to take up any slack caused by the
+   above integer division. */
+            inclon = dlon/nmer;
+
+/* Produce the samples for the current parallel. */
+            lon = lolon + 0.5*inclon;
+            for( imer = 0; imer < nmer; imer++ ) {
+               ptr[ ilon ][ ip ] = lon;
+               ptr[ ilat ][ ip ] = lat;
+
+               lon += inclon;
+               ip++;
+            }
+
+/* Get the latitude on the next parallel. */
+            lat += lat_size;
+         }
+      }
+
+/* Report error if supplied values were bad. */
+   } else if( astOK ) {
+      if( size < 1 ) {
+         astError( AST__ATTIN, "astFrameGrid(%s): The supplied grid "
+                   "size (%d) is invalid (programming error).",
+                   status, astGetClass( this ), size );
+      } else {
+         astError( AST__ATTIN, "astFrameGrid(%s): One of more of the "
+                   "supplied bounds is AST__BAD (programming error).",
+                   status, astGetClass( this ) );
+      }
+   }
+
+/* Annul the returned PointSet if an error has occurred. */
+   if( !astOK ) result = astAnnul( result );
+
+/* Return the PointSet holding the grid. */
    return result;
 }
 
@@ -4593,6 +4797,7 @@ void astInitSkyFrameVtab_(  AstSkyFrameVtab *vtab, const char *name, int *status
    member functions implemented here. */
    frame->Angle = Angle;
    frame->Distance = Distance;
+   frame->FrameGrid = FrameGrid;
    frame->Intersect = Intersect;
    frame->Norm = Norm;
    frame->NormBox = NormBox;

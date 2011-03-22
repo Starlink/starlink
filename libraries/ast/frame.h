@@ -758,6 +758,7 @@ typedef struct AstFrameVtab {
    void (* SetUnit)( AstFrame *, int, const char *, int * );
    void (* ValidateAxisSelection)( AstFrame *, int, const int *, const char *, int * );
    void (* LineOffset)( AstFrame *, AstLineDef *, double, double, double[2], int * );
+   AstPointSet *(* FrameGrid)( AstFrame *, int, const double *, const double *, int * );
 
    double (* GetTop)( AstFrame *, int, int * );
    int (* TestTop)( AstFrame *, int, int * );
@@ -991,6 +992,7 @@ void astValidateAxisSelection_( AstFrame *, int, const int *, const char *, int 
 double astReadDateTime_( const char *, int * );
 const char *astFmtDecimalYr_( double, int, int * );
 void astLineOffset_( AstFrame *, AstLineDef *, double, double, double[2], int * );
+AstPointSet *astFrameGrid_( AstFrame *, int, const double *, const double *, int * );
 
 double astGetTop_( AstFrame *, int, int * );
 int astTestTop_( AstFrame *, int, int * );
@@ -1156,6 +1158,8 @@ astINVOKE(O,astResolvePoints_(astCheckFrame(this),p1,p2,astCheckPointSet(in),((o
 astINVOKE(V,astLineDef_(astCheckFrame(this),p1,p2,STATUS_PTR))
 #define astLineOffset(this,line,par,prp,point) \
 astINVOKE(V,astLineOffset_(astCheckFrame(this),line,par,prp,point,STATUS_PTR))
+#define astFrameGrid(this,size,lbnd,ubnd) \
+astINVOKE(O,astFrameGrid_(astCheckFrame(this),size,lbnd,ubnd,STATUS_PTR))
 #define astLineCrossing(this,l1,l2,cross) \
 astINVOKE(V,astLineCrossing_(astCheckFrame(this),l1,l2,cross,STATUS_PTR))
 #define astLineContains(this,l,def,point) \

@@ -176,6 +176,8 @@ f     The CmpFrame class does not define any new routines beyond those
 *     29-SEP-2009 (DSB):
 *        Ensure the astMatch method provided by this class honours the
 *        PreserveAxes, MaxAxes and MinAxes attribute settings.
+*     22-MAR-2011 (DSB):
+*        Override astFrameGrid method.
 *class--
 */
 
@@ -677,6 +679,7 @@ static AstAxis *GetAxis( AstFrame *, int, int * );
 static AstMapping *RemoveRegions( AstMapping *, int * );
 static AstMapping *Simplify( AstMapping *, int * );
 static AstObject *Cast( AstObject *, AstObject *, int * );
+static AstPointSet *FrameGrid( AstFrame *, int, const double *, const double *, int * );
 static AstPointSet *ResolvePoints( AstFrame *, const double [], const double [], AstPointSet *, AstPointSet *, int * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
 static AstSystemType GetAlignSystem( AstFrame *, int * );
@@ -2566,6 +2569,201 @@ static const char *Format( AstFrame *this_frame, int axis, double value, int *st
    return result;
 }
 
+static AstPointSet *FrameGrid( AstFrame *this_object, int size, const double *lbnd,
+                               const double *ubnd, int *status ){
+/*
+*  Name:
+*     FrameGrid
+
+*  Purpose:
+*     Return a grid of points covering a rectangular area of a Frame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     AstPointSet *FrameGrid( AstFrame *this_frame, int size,
+*                             const double *lbnd, const double *ubnd,
+*                             int *status )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the protected astFrameGrid
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function returns a PointSet containing positions spread
+*     approximately evenly throughtout a specified rectangular area of
+*     the Frame.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     size
+*        The preferred number of points in the returned PointSet. The
+*        actual number of points in the returned PointSet may be
+*        different, but an attempt is made to stick reasonably closely to
+*        the supplied value.
+*     lbnd
+*        Pointer to an array holding the lower bound of the rectangular
+*        area on each Frame axis. The array should have one element for
+*        each Frame axis.
+*     ubnd
+*        Pointer to an array holding the upper bound of the rectangular
+*        area on each Frame axis. The array should have one element for
+*        each Frame axis.
+
+*  Returned Value:
+*     A pointer to a new PointSet holding the grid of points.
+
+*  Notes:
+*     - A NULL pointer is returned if an error occurs.
+*/
+
+/* Local Variables: */
+   AstCmpFrame *this;
+   AstPointSet *ps1;
+   AstPointSet *ps2;
+   AstPointSet *result;
+   const int *perm;
+   double **ptr1;
+   double **ptr2;
+   double **ptr;
+   double *lbnd1;
+   double *lbnd2;
+   double *p;
+   double *ubnd1;
+   double *ubnd2;
+   double v;
+   int axis;
+   int iax1;
+   int iax2;
+   int iaxis;
+   int ip1;
+   int ip2;
+   int nax1;
+   int nax2;
+   int naxes;
+   int npoint1;
+   int npoint2;
+   int npoint;
+   int size1;
+   int size2;
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the CmpFrame structure. */
+   this = (AstCmpFrame *) this_object;
+
+/* Get the number of axes in each component Frame, and the total number
+   of axes. */
+   nax1 = astGetNaxes( this->frame1 );
+   nax2 = astGetNaxes( this->frame2 );
+   naxes = nax1 + nax2;
+
+/* Allocate memory to hold bounds for each component Frame */
+   lbnd1 = astMalloc( nax1*sizeof( double ) );
+   ubnd1 = astMalloc( nax1*sizeof( double ) );
+   lbnd2 = astMalloc( nax2*sizeof( double ) );
+   ubnd2 = astMalloc( nax2*sizeof( double ) );
+
+/* Obtain a pointer to the CmpFrame's axis permutation array. This array
+   holds the original axis index for each current Frame axis index. */
+   perm = astGetPerm( this );
+
+/* Check pointers can be used safely, and check the supplied size value
+   is good. */
+   if( astOK && size > 0 ) {
+
+/* Copy the supplied bounds into the work arrays, permuting them in the
+   process so that they use the internal axis numbering of the two
+   component Frames. */
+      for( axis = 0; axis < naxes; axis++ ) {
+         iaxis = perm[ axis ];
+         if( iaxis < nax1 ) {
+            lbnd1[ iaxis ] = lbnd[ axis ];
+            ubnd1[ iaxis ] = ubnd[ axis ];
+         } else {
+            iaxis -= nax1;
+            lbnd2[ iaxis ] = lbnd[ axis ];
+            ubnd2[ iaxis ] = ubnd[ axis ];
+         }
+      }
+
+/* Get the target number of points to be used in the grid that covers the
+   first Frame. */
+      size1 = (int)( pow( size, (double)nax1/(double)naxes ) + 0.5 );
+
+/* Get the target number of points to be used in the grid that covers the
+   second Frame. */
+      size2 = (int)( (double)size/(double)size1 + 0.5 );
+
+/* Get the grids covering the two component Frames, and get the actual sizes
+   of the resulting PointSets. */
+      ps1 = astFrameGrid( this->frame1, size1, lbnd1, ubnd1 );
+      ptr1 = astGetPoints( ps1 );
+      npoint1 = astGetNpoint( ps1 );
+
+      ps2 = astFrameGrid( this->frame2, size2, lbnd2, ubnd2 );
+      ptr2 = astGetPoints( ps2 );
+      npoint2 = astGetNpoint( ps2 );
+
+/* Get the number of points in the returned FrameSet, and then create a
+   PointSet large enough to hold them. */
+      npoint = npoint1*npoint2;
+      result = astPointSet( npoint, naxes, " ", status );
+      ptr = astGetPoints( result );
+      if( astOK ) {
+
+/* For every point in the first Frame's PointSet, duplicate the second
+   Frame's entire PointSet, using the first Frame's axis values. */
+         for( ip1 = 0; ip1 < npoint1; ip1++ ) {
+            for( iax1 = 0; iax1 < nax1; iax1++ ) {
+               p = ptr[ iax1 ];
+               v = ptr1[ iax1 ][ ip1 ];
+               for( ip2 = 0; ip2 < npoint2; ip2++ ) {
+                  *(p++) = v;
+               }
+               ptr[ iax1 ] = p;
+            }
+            for( iax2 = 0; iax2 < nax2; iax2++ ) {
+               memcpy( ptr[ iax2 + nax1 ], ptr2[ iax2 ], npoint2*sizeof( double ) );
+               ptr[ iax2 + nax1 ] += npoint2*sizeof( double );
+            }
+         }
+
+/* Permute the returned PointSet so that it uses external axis numbering. */
+         astPermPoints( result, 1, perm );
+      }
+
+/* Free resources. */
+      ps1 = astAnnul( ps1 );
+      ps2 = astAnnul( ps2 );
+
+/* Report error if supplied values were bad. */
+   } else if( astOK ) {
+      astError( AST__ATTIN, "astFrameGrid(%s): The supplied grid "
+                "size (%d) is invalid (programming error).",
+                status, astGetClass( this ), size );
+   }
+
+/* Free resources. */
+   lbnd1 = astFree( lbnd1 );
+   ubnd1 = astFree( ubnd1 );
+   lbnd2 = astFree( lbnd2 );
+   ubnd2 = astFree( ubnd2 );
+
+/* Annul the returned PointSet if an error has occurred. */
+   if( !astOK ) result = astAnnul( result );
+
+/* Return the PointSet holding the grid. */
+   return result;
+}
+
 static double Gap( AstFrame *this_frame, int axis, double gap, int *ntick, int *status ) {
 /*
 *  Name:
@@ -4369,6 +4567,7 @@ void astInitCmpFrameVtab_(  AstCmpFrameVtab *vtab, const char *name, int *status
    frame->Distance = Distance;
    frame->Fields = Fields;
    frame->Format = Format;
+   frame->FrameGrid = FrameGrid;
    frame->Gap = Gap;
    frame->GetAxis = GetAxis;
    frame->GetDirection = GetDirection;

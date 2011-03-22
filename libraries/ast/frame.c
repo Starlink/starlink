@@ -261,6 +261,8 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *        Added ObsAlt attribute.
 *     28-SEP-2009 (DSB):
 *        Added astMatchAxes method.
+*     22-MAR-2011 (DSB):
+*        Add astFrameGrid method.
 *class--
 */
 
@@ -789,6 +791,7 @@ static AstFrameSet *FindFrame( AstFrame *, AstFrame *, const char *, int * );
 static void MatchAxes( AstFrame *, AstFrame *, int *, int * );
 static void MatchAxesX( AstFrame *, AstFrame *, int *, int * );
 static AstLineDef *LineDef( AstFrame *, const double[2], const double[2], int * );
+static AstPointSet *FrameGrid( AstFrame *, int, const double *, const double *, int * );
 static AstPointSet *ResolvePoints( AstFrame *, const double [], const double [], AstPointSet *, AstPointSet *, int * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
 static char *CleanDomain( char *, int * );
@@ -4061,6 +4064,229 @@ static const char *Format( AstFrame *this, int axis, double value, int *status )
    return result;
 }
 
+static AstPointSet *FrameGrid( AstFrame *this, int size, const double *lbnd,
+                               const double *ubnd, int *status ){
+/*
+*+
+*  Name:
+*     astFrameGrid
+
+*  Purpose:
+*     Return a grid of points covering a rectangular area of a Frame.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "frame.h"
+*     AstPointSet *astFrameGrid( AstFrame *this_frame, int size,
+*                                const double *lbnd, const double *ubnd )
+
+*  Class Membership:
+*     Frame method.
+
+*  Description:
+*     This function returns a PointSet containing positions spread
+*     approximately evenly throughtout a specified rectangular area of
+*     the Frame.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     size
+*        The preferred number of points in the returned PointSet. The
+*        actual number of points in the returned PointSet may be
+*        different, but an attempt is made to stick reasonably closely to
+*        the supplied value.
+*     lbnd
+*        Pointer to an array holding the lower bound of the rectangular
+*        area on each Frame axis. The array should have one element for
+*        each Frame axis.
+*     ubnd
+*        Pointer to an array holding the upper bound of the rectangular
+*        area on each Frame axis. The array should have one element for
+*        each Frame axis.
+
+*  Returned Value:
+*     A pointer to a new PointSet holding the grid of points.
+
+*  Notes:
+*     - A NULL pointer is returned if an error occurs.
+*-
+*/
+
+/* Local Variables: */
+   AstPointSet *result;
+   const char *unit;
+   double **ptr;
+   double *gmean;
+   double *step;
+   int *maxi;
+   int *nsame;
+   int *ntick;
+   int *pi;
+   int bad;
+   int iax;
+   int ipp;
+   int jax;
+   int naxes;
+   int np;
+   int ntick0;
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get the number of axes in the Frame. */
+   naxes = astGetNaxes( this );
+
+/* Allocate an array to hold the number of ticks along each axis. */
+   ntick = astMalloc( sizeof(int)*naxes );
+
+/* Allocate an array to hold the geometric mean of the lengths of the
+   axes that have the same units as the current axis. */
+   gmean = astMalloc( naxes*sizeof(double) );
+
+/* Allocate an array to hold the number of axes that share the same unit. */
+   nsame = astMalloc( naxes*sizeof(int) );
+   if( astOK ) {
+
+/* For each axis, find the total number of axes in the Frame that have
+   the same unit string. Also, find the product of the lengths of these
+   axes. */
+      bad = 0;
+      for( iax = 0; iax < naxes; iax++ ) {
+         nsame[ iax ] = 1;
+
+         if( ubnd[ iax ] == AST__BAD &&
+             lbnd[ iax ] == AST__BAD ) {
+            bad = 1;
+            break;
+         }
+
+         gmean[ iax ] = ubnd[ iax ] - lbnd[ iax ];
+         unit = astGetUnit( this, iax );
+         for( jax = 0; jax < naxes; jax++ ) {
+            if( jax != iax ) {
+               if( astOK && !strcmp( unit, astGetUnit( this, jax ) ) ) {
+                  nsame[ iax ]++;
+                  gmean[ iax ] *= ubnd[ jax ] - lbnd[ jax ];
+               }
+            }
+         }
+      }
+
+/* Do nothing if any bad bounds were supplied, or if the size is less
+   than 1. */
+      if( !bad && size >= 1 ) {
+
+/* Get the nominal number of ticks per axis. */
+         ntick0 = pow( size, 1.0/(double)naxes );
+         if( ntick0 < 2 ) ntick0 = 2;
+
+/* Convert the dimension products into geometric means. */
+         for( iax = 0; iax < naxes; iax++ ) {
+            gmean[ iax ] = pow( fabs(gmean[ iax ]), 1.0/(double)nsame[ iax ] );
+         }
+
+/* The number of ticks to use on each axis is equal to the nominal number
+   multiplied by the ratio of the axis length to the geometric mean of the
+   axis lengths that sahare the same unit string. This gives more ticks
+   on the longer axes within any group of common-unit axes, whilst
+   retaining the overall number of ticks (roughly). Also find the total
+   number of points. */
+         np = 1;
+         for( iax = 0; iax < naxes; iax++ ) {
+            ntick[ iax ] = ntick0*( ubnd[ iax ] - lbnd[ iax ] )/gmean[ iax ];
+            if( ntick[ iax ] < 2 ) ntick[ iax ] = 2;
+            np *= ntick[ iax ];
+         }
+
+/* Create a PointSet large enough to hold this many points. */
+         result = astPointSet( np, naxes, " ", status );
+         ptr = astGetPoints( result );
+
+/* Allocate memory to hold the max indices on each axis. */
+         maxi = astMalloc( sizeof( int )*(size_t) naxes );
+
+/* Allocate memory to hold the indices of the current position.*/
+         pi = astMalloc( sizeof( int )*(size_t) naxes );
+
+/* Allocate memory to hold the step size for each axis. */
+         step = astMalloc( sizeof( double )*(size_t) naxes );
+         if( astOK ) {
+
+/* For every axis, set up the step size, initialise the current position to
+   the lower bound, and store a modified upper limit which includes some
+   safety marging to allow for rounding errors. */
+            for( iax = 0; iax < naxes; iax++ ) {
+               step[ iax ] = ( ubnd[ iax ] - lbnd[ iax ] )/( ntick[ iax ] - 1 );
+               pi[ iax ] = 0;
+               maxi[ iax ] = ntick[ iax ] - 1;
+            }
+
+/* Initialise the index of the next position to store. */
+            ipp = 0;
+
+/* Loop round adding points to the array until the whole volume has been
+   done. */
+            iax = 0;
+            while( iax < naxes ) {
+
+/* Add the current point to the supplied array, and increment the index of
+   the next point to add. */
+               for( iax = 0; iax < naxes; iax++ ) {
+                  ptr[ iax ][ ipp ] = lbnd[ iax ] + pi[ iax ]*step[ iax ];
+               }
+               ipp++;
+
+/* We now move the current position on to the next sample */
+               iax = 0;
+               while( iax < naxes ) {
+                  pi[ iax ]++;
+                  if( pi[ iax ] > maxi[ iax ] ) {
+                     pi[ iax ] = 0;
+                     iax++;
+                  } else {
+                     break;
+                  }
+               }
+            }
+         }
+
+/* Free resources. */
+         maxi = astFree( maxi );
+         pi = astFree( pi );
+         step = astFree( step );
+
+/* Report error if supplied values were bad. */
+      } else if( astOK ) {
+         if( bad ) {
+            astError( AST__ATTIN, "astFrameGrid(%s): One of more of the "
+                      "supplied bounds is AST__BAD (programming error).",
+                      status, astGetClass( this ) );
+         } else if( size < 1 ) {
+            astError( AST__ATTIN, "astFrameGrid(%s): The supplied grid "
+                      "size (%d) is invalid (programming error).",
+                      status, astGetClass( this ), size );
+         }
+      }
+   }
+
+/* Free resources. */
+   ntick = astFree( ntick );
+   nsame = astFree( nsame );
+   gmean = astFree( gmean );
+
+/* Annul the returned PointSet if an error has occurred. */
+   if( !astOK ) result = astAnnul( result );
+
+/* Return the PointSet holding the grid. */
+   return result;
+}
+
 static double Gap( AstFrame *this, int axis, double gap, int *ntick, int *status ) {
 /*
 *+
@@ -5412,6 +5638,7 @@ void astInitFrameVtab_(  AstFrameVtab *vtab, const char *name, int *status ) {
    vtab->AxOffset = AxOffset;
    vtab->AxIn = AxIn;
    vtab->AxAngle = AxAngle;
+   vtab->FrameGrid = FrameGrid;
    vtab->Offset = Offset;
    vtab->Offset2 = Offset2;
    vtab->Resolve = Resolve;
@@ -14209,6 +14436,15 @@ double astAxOffset_( AstFrame *this, int axis, double v1, double dist, int *stat
    if ( !astOK ) return AST__BAD;
    return (**astMEMBER(this,Frame,AxOffset))( this, axis, v1, dist, status );
 }
+
+
+AstPointSet *astFrameGrid_( AstFrame *this, int size, const double *lbnd,
+                            const double *ubnd, int *status ){
+   if ( !astOK ) return NULL;
+   return (**astMEMBER(this,Frame,FrameGrid))( this, size, lbnd, ubnd, status );
+}
+
+
 void astOffset_( AstFrame *this, const double point1[], const double point2[],
                  double offset, double point3[], int *status ) {
    if ( !astOK ) return;
@@ -15133,7 +15369,6 @@ f     for any reason.
    to become zero-based. */
    return astUnformat( this, axis - 1, string, value );
 }
-
 
 
 
