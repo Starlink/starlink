@@ -1426,7 +1426,7 @@
 * Define defaults to satisfy the argument list of the main subroutine.
       ELSE
          NENCOD = 1
-         ENCODS = 'FITS-WCS'
+         ENCODS( 1 ) = 'FITS-WCS'
          WCSATT = ' '
       END IF
 
