@@ -153,6 +153,10 @@
 *        available data if the TRIMBAD parameter is set TRUE.
 *     2011-3-14 (DSB):
 *        Rename TRIMBAD parameter as TRIM (for consistency with MAKECUBE).
+*     2011-3-22 (DSB):
+*        - Ensure that the "moving" flag is assigned a value even if the
+*        output skyframe is supplied via spacerefwcs.
+*        - Report an error if the extreme positions cannot be found.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -226,6 +230,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
   smfHead *hdr = NULL;         /* Pointer to data header this time slice */
   int i;                       /* Loop counter */
   dim_t j;                     /* Loop counter */
+  AstSkyFrame *junksky = NULL; /* Unused SkyFrame argument */
   dim_t k;                     /* Loop counter */
   int lbnd0[ 2 ];              /* Defaults for LBND parameter */
   double map_pa=0;             /* Map PA in output coord system (rads) */
@@ -421,7 +426,20 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
 
         if (skyin) skyin = astAnnul( skyin );
 
-      } /* End oskyframe construction */
+      /* If the output skyframe has been supplied, we still need to
+         determine whether the source is moving or not. */
+      } else {
+
+        /* smf_tslice_ast only needs to get called once to set up framesets */
+        if( data->hdr->wcs == NULL ) {
+          smf_tslice_ast( data, 0, 1, status);
+        }
+
+        /* Retrieve input SkyFrame */
+        skyin = astGetFrame( hdr->wcs, AST__CURRENT );
+        smf_calc_skyframe( skyin, system, hdr, alignsys, &junksky, skyref,
+                           moving, status );
+      }
 
       if ( *outframeset == NULL && oskyframe != NULL && (*status == SAI__OK)){
         /* Now created a spatial Mapping. Use the supplied reference frameset
@@ -576,16 +594,23 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
 
           /* Update min/max for this time slice */
           for( k=0; k<4; k++ ) {
-            if( x_map[k] < dlbnd[0] ) dlbnd[0] = x_map[k];
-            if( y_map[k] < dlbnd[1] ) dlbnd[1] = y_map[k];
-            if( x_map[k] > dubnd[0] ) dubnd[0] = x_map[k];
-            if( y_map[k] > dubnd[1] ) dubnd[1] = y_map[k];
 
-            if( x_map[k] < box->lbnd[0] ) box->lbnd[0] = x_map[k];
-            if( y_map[k] < box->lbnd[1] ) box->lbnd[1] = y_map[k];
-            if( x_map[k] > box->ubnd[0] ) box->ubnd[0] = x_map[k];
-            if( y_map[k] > box->ubnd[1] ) box->ubnd[1] = y_map[k];
+            if( x_map[k] != AST__BAD && y_map[k] != AST__BAD ) {
+              if( x_map[k] < dlbnd[0] ) dlbnd[0] = x_map[k];
+              if( y_map[k] < dlbnd[1] ) dlbnd[1] = y_map[k];
+              if( x_map[k] > dubnd[0] ) dubnd[0] = x_map[k];
+              if( y_map[k] > dubnd[1] ) dubnd[1] = y_map[k];
 
+              if( x_map[k] < box->lbnd[0] ) box->lbnd[0] = x_map[k];
+              if( y_map[k] < box->lbnd[1] ) box->lbnd[1] = y_map[k];
+              if( x_map[k] > box->ubnd[0] ) box->ubnd[0] = x_map[k];
+              if( y_map[k] > box->ubnd[1] ) box->ubnd[1] = y_map[k];
+
+            } else if( *status == SAI__OK ) {
+              *status = SAI__ERROR;
+              errRep( FUNC_NAME, "Extreme positions are bad.", status );
+              break;
+            }
           }
         }
         /* Explicitly annul these mappings each time slice for reduced
