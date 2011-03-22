@@ -127,6 +127,7 @@ typedef struct smfPCAData {
   size_t ngoodbolo;       /* Number of good bolos */
   dim_t ntslice;          /* Number of time slices */
   int operation;          /* 0=covar,1=eigenvect,2=projection */
+  double *rms_amp;        /* VAL__BADD where modes need to be removed */
   size_t t1;              /* Index of first time slice for chunk */
   size_t t2;              /* Index of last time slice */
   size_t tstride;         /* time slice stride */
@@ -154,6 +155,7 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
   dim_t ngoodbolo;        /* number good bolos = number principal components */
   dim_t ntslice;          /* number of time slices */
   smfPCAData *pdata=NULL; /* Pointer to job data */
+  double *rms_amp=NULL;   /* VAL__BADD for components to remove */
   size_t tstride;         /* time slice stride */
 
   if( *status != SAI__OK ) return;
@@ -174,6 +176,7 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
   goodbolo = pdata->goodbolo;
   ngoodbolo = pdata->ngoodbolo;
   ntslice = pdata->ntslice;
+  rms_amp = pdata->rms_amp;
   tstride = pdata->tstride;
 
   /* Check for valid inputs */
@@ -237,7 +240,7 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
       }
     }
   } else if( (pdata->operation == 2) && (*status == SAI__OK) ) {
-    /* Operation 1: project data along eigenvectors ------------------------- */
+    /* Operation 2: project data along eigenvectors ------------------------- */
 
     for( i=0; i<ngoodbolo; i++ ) {    /* loop over bolometer */
       /*msgOutiff( MSG__DEBUG, "", "   bolo %zu", status, goodbolo[i] );*/
@@ -246,6 +249,27 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
           amp[goodbolo[i]*abstride + j*acompstride] +=
             d[goodbolo[i]*bstride + k*tstride] *
             comp[j*ccompstride + k*ctstride];
+        }
+      }
+    }
+
+  } else if( (pdata->operation == 3) && (*status == SAI__OK) ) {
+    /* Operation 3: clean --------------------------------------------------- */
+    double a;
+
+    for( j=0; j<ngoodbolo; j++ ) {        /* loop over component */
+      if( rms_amp[j] == VAL__BADD ) {
+
+        /* Bad values in rms_amp indicate components that we are
+           removing. Subtract the component scaled by the amplitude for
+           each bolometer at all relevant time-slices */
+
+        for( i=0; i<ngoodbolo; i++ ) {    /* loop over bolometer */
+          a =  amp[goodbolo[i]*abstride + j*acompstride];
+          for( k=pdata->t1; k<=pdata->t2; k++ ) {
+            d[goodbolo[i]*bstride + k*tstride] -=
+              a*comp[j*ccompstride + k*ctstride];
+          }
         }
       }
     }
@@ -535,6 +559,9 @@ void smf_clean_pca( smfWorkForce *wf, smfData *data, double thresh,
     smf_stats1D( comp + i*ccompstride, ctstride, ntslice, NULL, 0,
                  0, NULL, &sigma, NULL, status );
 
+    /* do we need this?? */
+    sigma *= sqrt((double) ntslice);
+
     if( *status == SAI__OK ) {
       for( k=0; k<ntslice; k++ ) {
         comp[i*ccompstride + k*ctstride] /= sigma;
@@ -562,7 +589,115 @@ void smf_clean_pca( smfWorkForce *wf, smfData *data, double thresh,
   /* Wait until all of the submitted jobs have completed */
   smf_wait( wf, status );
 
-  /* Returning components? */
+  /* Cleaning ----------------------------------------------------------------*/
+
+  if( (*status == SAI__OK) && thresh ) {
+    int converge=0;          /* Set if converged */
+    size_t ngood;            /* Number of values that are still good */
+    double *rms_amp=NULL;    /* RMS amplitude across bolos each component */
+    double sum;
+    double sum_sq;
+    size_t iter=0;
+    double x;
+
+    /* First calculate the RMS of the amplitudes across the array for
+       each component. This will be a positive number whose value
+       gives a typical amplitude of the component that can be compared
+       to other components */
+
+    rms_amp = astCalloc( ngoodbolo, sizeof(*rms_amp), 1 );
+
+    if( *status == SAI__OK ) {
+      for( i=0; i<ngoodbolo; i++ ) {     /* Loop over component */
+
+        sum = 0;
+        sum_sq = 0;
+
+        for( j=0; j<ngoodbolo; j++ ) {   /* Loop over bolo */
+          x = amp[i*acompstride + goodbolo[j]*abstride];
+          sum += x;
+          sum_sq += x*x;
+        }
+
+        rms_amp[i] = sqrt( sum_sq / ((double)ngoodbolo) );
+      }
+    }
+
+    /* Then, perform an iterative clip using the mean and standard
+       deviation of the component amplitude RMS's. Note that the RMS
+       is always massively dominated by the first mode, so we will
+       always assume that it should be removed to help things be more
+       well-behaved. */
+
+    rms_amp[0] = VAL__BADD;
+
+    while( !converge && (*status==SAI__OK) ) {
+      double m;                /* mean */
+      int new;                 /* Set if new values flagged */
+      double sig;              /* standard deviation */
+
+      /* Update interation counter */
+      iter ++;
+
+      /* Measure mean and standard deviation of non-flagged samples */
+      smf_stats1D( rms_amp, 1, ngoodbolo, NULL, 0, 0, &m, &sig, &ngood,
+                   status );
+
+      msgOutiff( MSG__DEBUG, "", FUNC_NAME
+                 ": iter %zu mean=%lf sig=%lf ngood=%zu", status,
+                 iter, m, sig, ngood );
+
+      /* Flag new outliers */
+      new = 0;
+      for( i=0; i<ngood; i++ ) {
+        if( (rms_amp[i]!=VAL__BADD) && ((rms_amp[i]-m) > sig*thresh) ) {
+          new = 1;
+          rms_amp[i] = VAL__BADD;
+          ngood--;
+        }
+      }
+
+      /* Converged if no new values flagged */
+      if( !new ) converge = 1;
+
+      /* Trap huge numbers of iterations */
+      if( iter > 50 ) {
+        *status = SAI__ERROR;
+        errRep( "", FUNC_NAME ": more than 50 iterations!", status );
+      }
+
+      /* If we have less than 10% of the original modes (or 2,
+         whichever is larger), generate bad status */
+      if( (ngood <= 2) || (ngood < 0.1*ngoodbolo) ) {
+        *status = SAI__ERROR;
+        errRepf( "", FUNC_NAME ": only %zu of %zu modes remain!", status,
+                 ngoodbolo, ngood );
+      }
+    }
+
+    msgOutiff( MSG__VERB, "", FUNC_NAME
+               ": after %zu clipping iterations, will remove "
+               "%zu / %zu components...", status, iter, ngoodbolo - ngood,
+               ngoodbolo );
+
+    /* Now that we know which modes to remove, call the parallel routine
+       for doing the hard work */
+
+    for( ii=0; ii<nw; ii++ ) {
+      pdata = job_data + ii;
+      pdata->operation = 3;
+      pdata->rms_amp = rms_amp;
+      pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata, smfPCAParallel,
+                                 NULL, status );
+    }
+
+    /* Wait until all of the submitted jobs have completed */
+    smf_wait( wf, status );
+
+    if( rms_amp ) rms_amp = astFree( rms_amp );
+  }
+
+  /* Returning components? ---------------------------------------------------*/
   if( (*status==SAI__OK) && components ) {
     dim_t dims[3];
     int lbnd[3];
