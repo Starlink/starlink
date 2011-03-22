@@ -211,6 +211,33 @@ flagslow = 30
 
 #compreprocess=1
 
+# An alternative to removing the simple common-mode is cleaning by way
+# of principal component analysis (PCA). In this case, a new set of
+# basis vectors (components) are calculated from the bolometer time-series
+# such that they have 0 covariances. The amplitudes of these new correlated
+# signals are then calculated, and the largest amplitude components can
+# be removed. In this simplest case of white detectors noise + a common
+# atmospheric signal, this operation would be similar to using compreprocess.
+# However, PCA is capable of detecting multiple signals with different
+# correlation patterns across the array.
+#
+# It is *ESSENTIAL* that the bolometer data first have their mean values
+# removed (i.e., order=0), as this assumption is used to speed up the
+# calculation.
+#
+# The single parameter to the PCA cleaning is the threshold above
+# which components will be removed from the bolometer time-series. For
+# each component, the RMS amplitude across all bolometers is
+# calculated -- a single positive number related to the average
+# strength of the component. An iterative sigma clipper is then used
+# to flag components that are more than thresh*RMS away from the mean value.
+# This approach is quite arbitrary, but a value of about 4 seems reasonable
+# for some test data. Be warned that this statistical black box will remove
+# real correlated astronomical signals as well! As with common-mode removal,
+# the actual impact on science will need to be calibrated with simulations.
+
+pcathresh = 0
+
 # S/N threshold to detect DC steps. Note, this refers to the noise level
 # in the bolometer data after it has been smoothed with a median filter of
 # width given by DCSMOOTH. In order to find the equivalent threshold in

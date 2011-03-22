@@ -47,6 +47,7 @@
 *     Gap filling  : FILLGAPS, ZEROPAD
 *     Baselines    : ORDER
 *     Common-Mode  : COMPREPROCESS
+*     PCA:         : PCATHRESH
 *     Filtering    : FILT_EDGELOW, FILT_EDGEHIGH, FILT_NOTCHLOW,
 *                    FILT_NOTCHHIGH, APOD, FILT_WLIM, WHITEN
 *     Noisy Bolos  : NOISECLIP
@@ -87,9 +88,11 @@
 *     2010-10-13 (EC):
 *        Add "compreprocess" option to do common-mode subtraction as an
 *        optional pre-processing step.
+*     2011-03-22 (EC):
+*        Add "pcathresh" option to do PCA cleaning as a pre-processing step
 
 *  Copyright:
-*     Copyright (C) 2010 Univeristy of British Columbia.
+*     Copyright (C) 2010-2011 Univeristy of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -151,6 +154,7 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
   double noiseclip = 0;     /* Sigma clipping based on noise */
   smfData *noisemap=NULL;   /* Individual noisemap */
   int order;                /* Order of polynomial for baseline fitting */
+  double pcathresh;         /* n-sigma threshold for PCA cleaning */
   double spikethresh;       /* Threshold for finding spikes */
   size_t spikebox=0;        /* Box size for spike finder */
   struct timeval tv1, tv2;  /* Timers */
@@ -189,7 +193,7 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
                     &fillgaps, &zeropad, NULL, NULL, NULL, NULL, NULL,
                     NULL, NULL, NULL, &flagslow, &flagfast, &order,
                     &spikethresh, &spikebox, &noiseclip, NULL,
-                    &compreprocess, status );
+                    &compreprocess, &pcathresh, status );
 
   /* Loop over subarray */
   for( idx=0; (idx<array->ndat)&&(*status==SAI__OK); idx++ ) {
@@ -384,6 +388,21 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
       }
       if( quadata ) smf_close_related( &quadata, status );
     }
+  }
+
+  /* PCA cleaning */
+  if( pcathresh ) {
+
+    /* Loop over subarray */
+    for( idx=0; (idx<array->ndat)&&(*status==SAI__OK); idx++ ) {
+      data = array->sdata[idx];
+
+      smf_clean_pca( wf, data, pcathresh, NULL, NULL, status );
+    }
+
+    /*** TIMER ***/
+    msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ":   ** %f s PCA cleaning",
+               status, smf_timerupdate(&tv1,&tv2,status) );
   }
 
 

@@ -22,8 +22,9 @@
 *                       double *filt_notchlow, double *filt_notchhigh,
 *                       int *filt_nnotch, int *dofilt, double *flagslow,
 *                       double *flagfast, int *order, double *spikethresh,
-*                       size_t *spikebox, double * noiseclip,
-*                       int *whiten, int compreprocess, int *status )
+*                       size_t *spikebox, double *noiseclip,
+*                       int *whiten, int compreprocess, double *pcathresh,
+*                       int *status )
 
 *  Arguments:
 *     keymap = AstKeyMap* (Given)
@@ -97,6 +98,8 @@
 *        Apply a whitening filter to the data?
 *     compreprocess = int * (Returned)
 *        If set do common-mode rejection and bad-data rejection.
+*     pcathresh = double (Given)
+*        Outlier threshold for PCA amplitudes to remove from data for cleaning
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -147,13 +150,15 @@
 *        Add whiten
 *     2010-10-13 (EC):
 *        Add compreprocess
+*     2011-03-22 (EC):
+*        Add pcathresh
 *     {enter_further_changes_here}
 
 *  Notes:
 
 *  Copyright:
 *     Copyright (C) 2010 Science & Technology Facilities Council.
-*     Copyright (C) 2009-2010 University of British Columbia
+*     Copyright (C) 2009-2011 University of British Columbia
 *     All Rights Reserved.
 
 *  Licence:
@@ -205,7 +210,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac, dim_t *dcfitbox,
                        double *flagslow, double *flagfast, int *order,
                        double *spikethresh, size_t *spikebox,
                        double *noiseclip, int *whiten, int *compreprocess,
-                       int *status ) {
+                       double *pcathresh, int *status ) {
 
   int dofft=0;                  /* Flag indicating that filtering is required */
   int f_nnotch=0;               /* Number of notch filters in array */
@@ -510,4 +515,17 @@ void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac, dim_t *dcfitbox,
     msgOutiff( MSG__DEBUG, "", FUNC_NAME ": COMPREPROCESS is %s", status,
                (*compreprocess ? "enabled" : "disabled") );
   }
+
+  if( pcathresh ) {
+    *pcathresh = 0;
+    astMapGet0D( keymap, "PCATHRESH", pcathresh );
+    if( *pcathresh < 0 ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "PCATHRESH must be >= 0.", status );
+    }
+
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": PCATHRESH=%f", status,
+               *pcathresh );
+  }
+
 }

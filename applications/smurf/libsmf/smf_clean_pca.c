@@ -335,6 +335,14 @@ void smf_clean_pca( smfWorkForce *wf, smfData *data, double thresh,
     return;
   }
 
+  /* Valid thresh */
+  if( thresh < 0 ) {
+    *status = SAI__ERROR;
+    errRep( " ", FUNC_NAME
+            ": possible programming error, thresh < 0", status );
+    return;
+  }
+
   smf_get_dims( data, NULL, NULL, &nbolo, &ntslice, &ndata, &bstride, &tstride,
                 status );
 
@@ -397,10 +405,8 @@ void smf_clean_pca( smfWorkForce *wf, smfData *data, double thresh,
   }
 
   /* Allocate arrays */
-
   amp = astCalloc( nbolo*nbolo, sizeof(*amp),1 );
   comp = astCalloc( ngoodbolo*ntslice, sizeof(*comp),1 );
-
   cov = gsl_matrix_alloc( ngoodbolo, ngoodbolo );
   s = gsl_vector_alloc( ngoodbolo );
   v = gsl_matrix_alloc( ngoodbolo, ngoodbolo );

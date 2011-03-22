@@ -53,6 +53,7 @@ order = -1
 spikethresh = 0
 spikebox = 50
 noiseclip = 0.0
+pcathresh = 0
 
 # these are analogous cleaning parameters for dark squids
 # We do not have a clever syntax for recursively reading this
@@ -83,6 +84,7 @@ cleandk.whiten = 0
 cleandk.flagslow = 0
 cleandk.flagfast = 0
 cleandk.compreprocess = 0
+cleandk.pcathresh = 0
 
 # the following two parameters are included because the same
 # code is used to clean bolometers and the dark squids. However,
@@ -127,4 +129,4 @@ com.gain_is_one = 0
 com.offset_is_zero = 0
 
 gai.flatfield = 0
-# -------------------------------------------------------------------------
+
