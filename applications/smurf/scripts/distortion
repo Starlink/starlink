@@ -5,11 +5,11 @@ if( $# < 1 ) then
    echo
    echo "Produces a 2D polynomial describing the SCUBA-2 focal plane distortion"
    echo
-   echo "Usage: distortion <inlist> [-t|-extra] [-p]"
+   echo "Usage: distortion <inlist> [-r|-t|-extra] [-p]"
    echo
    echo "   <inlist> is a text file in which each line contains the path"
    echo "   to a directory holding the raw time series cubes for a single"
-   echo "   planet observation from a single array (different directories" 
+   echo "   planet observation from a single array (different directories"
    echo "   can hold data for different arrays)."
    echo
    echo "If the -t option is supplied, the distortion is calculated on the"
@@ -25,6 +25,10 @@ if( $# < 1 ) then
    echo "circular aperture (bad pixels are replaced using KAPPA:FILLBAD prior"
    echo "to finding the sum), but if the -p option is supplied it will be the"
    echo "integral of the model star profile found by the KAPPA:PSF command."
+   echo
+   echo "If the -r option is supplied, the scripts attempts to restart a"
+   echo "previously interupted run (the same <inlist> should be supplied)."
+   echo "This facility currently cannot be used with the -t or -extra options."
    echo
    exit
 endif
@@ -42,7 +46,7 @@ foreach dir (`cat $1`)
    set indir = `readlink -f $dir`
    if( ! -d "$indir" ) then
       echo " "
-      echo ">>>>  Cannot find directory $indir \!\!\!\!\!"
+      echo ">>>>  Cannot find directory $dir \!\!\!\!\!"
       echo " "
       exit
    endif
@@ -55,11 +59,14 @@ end
 #  bolomaps algorithm).
 set method = BOLOMAPS
 set make_extra = 0
+set restart = 0
 if( $# > 1 ) then
    if( "$2" == "-t" ) then
       set method = TIMESLICES
    else if( "$2" == "-extra" ) then
       set make_extra = 1
+   else if( "$2" == "-r" ) then
+      set restart = 1
    else
       echo "Unknown second command line argument - $2"
       exit
@@ -83,16 +90,73 @@ endif
 
 #  Create a temporary directory to hold all the intermediate files, and
 #  move into it.
-rm -rf distortion-tmp >& /dev/null
-mkdir distortion-tmp
+if( $restart ) then
+   if( ! -d "distortion-tmp" ) then
+      echo " "
+      echo ">>>>  Cannot find directory distortion-tmp \!\!\!\!\!"
+      echo "      Failed to restart previous run."
+      echo " "
+      exit
+   endif
+else
+   rm -rf distortion-tmp >& /dev/null
+   mkdir distortion-tmp
+endif
 cd distortion-tmp
 
 #  Create a temporary ADAM directory within the above directory.
-mkdir adam
+if( $restart ) then
+   if( ! -d "adam" ) then
+      echo " "
+      echo ">>>>  Cannot find directory distortion-tmp/adam \!\!\!\!\!"
+      echo "      Failed to restart previous run."
+      echo " "
+      exit
+   endif
+else
+   mkdir adam
+endif
 setenv ADAM_USER $PWD/adam
 
 #  Create some empty files so that we can append to them later.
+if( $restart ) then
+   rm -f outdx.lis outdy.lis outdx_A.lis outdy_A.lis >& /dev/null
+endif
 touch outdx.lis outdy.lis outdx_A.lis outdy_A.lis
+
+#  Initialise the index of the last observation for which makemap
+#  completed succesfully on the previous run. This index is 1-based. A
+#  value of zero indicates that no makemap results can be re-used.
+set last_done = 0
+
+#  If we are restarting a previous interupted run, update the last_done
+#  value.
+if( $restart ) then
+
+#  Loop round each observation.
+   set idir = 0
+   foreach indir ($dir_list)
+
+#  See if the observation's working directory exists from a previous and
+#  if so, move into it.
+      @ idir = $idir + 1
+      set pdir = "obs$idir"
+      if( -d "$pdir" ) then
+         cd $pdir
+
+#  See if makemap completed succesfully for the current observation on the
+#  previous run. If so, update the index of the last successful makemap run.
+         $KAPPA_DIR/ndftrace junk quiet >& junk.log
+         grep \!\! junk.log >& /dev/null
+         if( $status == 1 ) then
+            set last_done = $idir
+         endif
+
+#  Move back up into the parent directory.
+         cd ..
+      endif
+   end
+endif
 
 #  Loop round each observation.
 set idir = 0
@@ -102,7 +166,9 @@ foreach indir ($dir_list)
 #  into it.
    @ idir = $idir + 1
    set pdir = "obs$idir"
-   mkdir $pdir
+   if( ! -d "$pdir" ) then
+      mkdir $pdir
+   endif
    cd $pdir
 
 #  Save the name of the output catalogue for this observation.
@@ -206,21 +272,21 @@ foreach indir ($dir_list)
 #  Get the subarray name, and its corresponding integer index.
             if( $iscan == 1 ) then
                set subarray = `$KAPPA_DIR/fitsmod junk edit=print keyword=SUBARRAY`
-               if( $subarray == "s8a" ) then
+               if( "$subarray" == "s8a" ) then
                   set array = 0
-               else if( $subarray == "s8b" ) then
+               else if( "$subarray" == "s8b" ) then
                   set array = 1
-               else if( $subarray == "s8c" ) then
+               else if( "$subarray" == "s8c" ) then
                   set array = 2
-               else if( $subarray == "s8d" ) then
+               else if( "$subarray" == "s8d" ) then
                   set array = 3
-               else if( $subarray == "s4a" ) then
+               else if( "$subarray" == "s4a" ) then
                   set array = 4
-               else if( $subarray == "s4b" ) then
+               else if( "$subarray" == "s4b" ) then
                   set array = 5
-               else if( $subarray == "s4c" ) then
+               else if( "$subarray" == "s4c" ) then
                   set array = 6
-               else if( $subarray == "s4d" ) then
+               else if( "$subarray" == "s4d" ) then
                   set array = 7
                else
                   echo "Unknown subarray - $subarray"
@@ -380,282 +446,301 @@ foreach indir ($dir_list)
 #  ===============================
    else
 
-#  Use the iterative mapmaker to create map for each individual bolometers.
-      $SMURF_DIR/makemap "$indir/*" method=iter out=junk system=AZEL \
-                alignsys=t config="'^$SMURF_DIR/../../share/smurf/dimmconfig_distortionmap.lis,bolomap=1'" | tee makemap.log
+#  We assume this observation completed succesfully on a previous run and
+#  so does not need to be re-done, if the makemap output for the *next*
+#  observation was created succesfully.
+      if( $idir >= $last_done ) then
+
+#  If the makemap output file does not already exist from a previous run, use
+#  the iterative mapmaker to create a new map for each individual bolometers.
+#  Each bolomap is an image made from a collection of time slices but only
+#  one bolometer, and is gridded in AZEL offsets from the expected source
+#  position.
+         if( $idir > $last_done ) then
+            $SMURF_DIR/makemap "$indir/*" method=iter out=junk system=AZEL \
+                      alignsys=t config="'^$SMURF_DIR/../../share/smurf/dimmconfig_distortionmap.lis,bolomap=1'" | tee makemap.log
+         endif
+
+#  Get the subarray name, and its corresponding integer index.
+         set subarray = `$KAPPA_DIR/fitsmod junk edit=print keyword=SUBARRAY`
+         if( "$subarray" == "s8a" ) then
+            set array = 0
+         else if( "$subarray" == "s8b" ) then
+            set array = 1
+         else if( "$subarray" == "s8c" ) then
+            set array = 2
+         else if( "$subarray" == "s8d" ) then
+            set array = 3
+         else if( "$subarray" == "s4a" ) then
+            set array = 4
+         else if( "$subarray" == "s4b" ) then
+            set array = 5
+         else if( "$subarray" == "s4c" ) then
+            set array = 6
+         else if( "$subarray" == "s4d" ) then
+            set array = 7
+         else
+            echo "Unknown subarray - $subarray"
+            exit
+         endif
+
+#  The rest of the current if-block can be skipped if the outdx.sdf and
+#  outdy.sdf exist in the current directory.
+         if( ! (-e outdx.sdf) || ! (-e outdy.sdf) ) then
 
 #  See if the data has been flat-fielded (as implied by the map units being "pW"). If not,
 #  the source features will be negative in the bolomaps.
-      $KAPPA_DIR/ndftrace junk quiet
-      set units = `$KAPPA_DIR/parget UNITS ndftrace`
-      if( "$units" == "pW" ) then
-         set negative = 0;
-      else
-         set negative = 1;
-      endif
-
-#  Get the subarray name, and its corresponding integer index.
-      set subarray = `$KAPPA_DIR/fitsmod junk edit=print keyword=SUBARRAY`
-      if( $subarray == "s8a" ) then
-         set array = 0
-      else if( $subarray == "s8b" ) then
-         set array = 1
-      else if( $subarray == "s8c" ) then
-         set array = 2
-      else if( $subarray == "s8d" ) then
-         set array = 3
-      else if( $subarray == "s4a" ) then
-         set array = 4
-      else if( $subarray == "s4b" ) then
-         set array = 5
-      else if( $subarray == "s4c" ) then
-         set array = 6
-      else if( $subarray == "s4d" ) then
-         set array = 7
-      else
-         echo "Unknown subarray - $subarray"
-         exit
-      endif
+            $KAPPA_DIR/ndftrace junk quiet
+            set units = `$KAPPA_DIR/parget UNITS ndftrace`
+            if( "$units" == "pW" ) then
+               set negative = 0;
+            else
+               set negative = 1;
+            endif
 
 #  Get the highest chunk number (only check up to 5 chunks).
-      grep "Writing single bolo map" makemap.log | grep CH05 > /dev/null
-      if( $status == 0 ) then
-         set top_chunk = 5
-      else
-         grep "Writing single bolo map" makemap.log | grep CH04 > /dev/null
-         if( $status == 0 ) then
-            set top_chunk = 4
-         else
-            grep "Writing single bolo map" makemap.log | grep CH03 > /dev/null
+            grep "Writing single bolo map" makemap.log | grep CH05 > /dev/null
             if( $status == 0 ) then
-               set top_chunk = 3
+               set top_chunk = 5
             else
-               grep "Writing single bolo map" makemap.log | grep CH02 > /dev/null
+               grep "Writing single bolo map" makemap.log | grep CH04 > /dev/null
                if( $status == 0 ) then
-                  set top_chunk = 2
+                  set top_chunk = 4
                else
-                  grep "Writing single bolo map" makemap.log | grep CH01 > /dev/null
+                  grep "Writing single bolo map" makemap.log | grep CH03 > /dev/null
                   if( $status == 0 ) then
-                     set top_chunk = 1
+                     set top_chunk = 3
                   else
-                     set top_chunk = 0
+                     grep "Writing single bolo map" makemap.log | grep CH02 > /dev/null
+                     if( $status == 0 ) then
+                        set top_chunk = 2
+                     else
+                        grep "Writing single bolo map" makemap.log | grep CH01 > /dev/null
+                        if( $status == 0 ) then
+                           set top_chunk = 1
+                        else
+                           set top_chunk = 0
+                        endif
+                     endif
                   endif
                endif
             endif
-         endif
-      endif
 
 #  Get the date.
-      set date = `$KAPPA_DIR/fitsmod junk edit=print keyword=UTDATE`
+            set date = `$KAPPA_DIR/fitsmod junk edit=print keyword=UTDATE`
 
 #  Get the middle elevation
-      set el0 = `$KAPPA_DIR/fitsmod junk edit=print keyword=ELSTART`
-      set el1 = `$KAPPA_DIR/fitsmod junk edit=print keyword=ELEND`
-      set elev = `$KAPPA_DIR/calc exp="0.5*(pa+pb)" pa=$el0 pb=$el1`
+            set el0 = `$KAPPA_DIR/fitsmod junk edit=print keyword=ELSTART`
+            set el1 = `$KAPPA_DIR/fitsmod junk edit=print keyword=ELEND`
+            set elev = `$KAPPA_DIR/calc exp="0.5*(pa+pb)" pa=$el0 pb=$el1`
 
 #  Get the observation number.
-      set obsnum = `$KAPPA_DIR/fitsmod junk edit=print keyword=OBSNUM`
+            set obsnum = `$KAPPA_DIR/fitsmod junk edit=print keyword=OBSNUM`
 
 #  Need to identify a usable subscan. Loop round all subscans in the
-#  current directory.
-      set usable = " "
-      foreach n ($indir/s*_*_*.sdf)
+#  current directory. Skip if the bmap.ast file already exists from
+#  a previous run.
+            if( ! -e bmap.ast ) then
+               set usable = " "
+               foreach n ($indir/s*_*_*.sdf)
 
 #  If the file has SEQ_TYPE and OBS_TYPE headers, the scan is usable if
 #  the values of these headers are equal
-         set there = `$KAPPA_DIR/fitsmod $n edit=exist keyword=SEQ_TYPE`
-         if( "$there" == "TRUE" ) then
-            set there = `$KAPPA_DIR/fitsmod $n edit=exist keyword=OBS_TYPE`
-            if( "$there" == "TRUE" ) then
-               set seq_type = `$KAPPA_DIR/fitsmod $n edit=print keyword=SEQ_TYPE`
-               set obs_type = `$KAPPA_DIR/fitsmod $n edit=print keyword=OBS_TYPE`
-               if( "$seq_type" == "$obs_type" ) then
-                  set usable = "$n"
-               endif
-            endif
-         endif
+                  set there = `$KAPPA_DIR/fitsmod $n edit=exist keyword=SEQ_TYPE`
+                  if( "$there" == "TRUE" ) then
+                     set there = `$KAPPA_DIR/fitsmod $n edit=exist keyword=OBS_TYPE`
+                     if( "$there" == "TRUE" ) then
+                        set seq_type = `$KAPPA_DIR/fitsmod $n edit=print keyword=SEQ_TYPE`
+                        set obs_type = `$KAPPA_DIR/fitsmod $n edit=print keyword=OBS_TYPE`
+                        if( "$seq_type" == "$obs_type" ) then
+                           set usable = "$n"
+                        endif
+                     endif
+                  endif
 
 #  If either the SEQ_TYPE or OBS_TYPE header was not found, check the file has
 #  a SHUTTER keyword in its FITS extension
-         if( "$there" != "TRUE" ) then
-            set there = `$KAPPA_DIR/fitsmod $n edit=exist keyword=SHUTTER`
-            if( "$there" == "TRUE" ) then
+                  if( "$there" != "TRUE" ) then
+                     set there = `$KAPPA_DIR/fitsmod $n edit=exist keyword=SHUTTER`
+                     if( "$there" == "TRUE" ) then
 
 #  If the value of SHUTTER is zero, the scan is a dark (unusable).
-               set val = `$KAPPA_DIR/fitsmod $n edit=print keyword=SHUTTER`
-               if( "$val" != "0" ) then
-                  set usable = "$n"
-               endif
-            endif
-         endif
-      end
+                        set val = `$KAPPA_DIR/fitsmod $n edit=print keyword=SHUTTER`
+                        if( "$val" != "0" ) then
+                           set usable = "$n"
+                        endif
+                     endif
+                  endif
+               end
 
-      if( "$usable" == " " ) then
-         echo "No usable scans found"
-         exit
-      endif
+               if( "$usable" == " " ) then
+                  echo "No usable scans found"
+                  exit
+               endif
 
 #  Get a Mapping from bolometer array pixel offsets from the reference point,
-#  to (Az,El) offsets from the reference point, for a typical time slice,
-#  in the usable scan found above, and invert it so it goes the other way.
-#  Using this bolomaps approach, we need to assume that all the time slices
-#  are rotated in the same way on the sky. The timeslices approach does not
-#  suffer from this assumption.
-      $SMURF_DIR/dsutils in=$usable bmap=bmap.ast
-      $ATOOLS_DIR/astinvert bmap.ast bmap.ast
+#  to (Az,El) offsets from the reference point (assuming no distortion), for
+#  a typical time slice, in the usable scan found above, and invert it so it
+#  goes the other way. Using this bolomaps approach, we need to assume that
+#  this mapping is the same for all time slices (i.e. all the time slices are
+#  rotated in the same way on the sky). The timeslices approach does not
+#  need to make this assumption.
+               $SMURF_DIR/dsutils in=$usable bmap=bmap.ast
+               $ATOOLS_DIR/astinvert bmap.ast bmap.ast
+            endif
 
 #  Write the header for the output catalogue.
-      echo "# SCUBA-2 focal plane distortion data" > $cat
-      echo "#" >> $cat
-      echo "# ICH - zero-based makemap chunk index" >> $cat
-      echo "# BC1 - array pixel X coord at centre of source " >> $cat
-      echo "# BC2 - array pixel Y coord at centre of source " >> $cat
-      echo "# BF1 - array pixel X coord at bolometer centre" >> $cat
-      echo "# BF2 - array pixel Y coord at bolometer centre" >> $cat
-      echo "# DBC1 - error in BC1" >> $cat
-      echo "# DBC2 - error in BC2" >> $cat
-      echo "# AMP - source amplitude " >> $cat
-      echo "# DAMP - error in AMP" >> $cat
-      echo "# FSUM - total data value in fitted source " >> $cat
-      echo "# RMS - RMS error of fit" >> $cat
-      echo "# OBS - observation number" >> $cat
-      echo "# DATE - observation date" >> $cat
-      echo "# ARRAY - array index (s8a=0, s8b=1, s8c=2, s8d=3, s4a=4, s4b=5, s4c=6, s4d=7)" >> $cat
-      echo "# ELEV - telescope elevation (degrees)" >> $cat
-      echo "#" >> $cat
-      echo "# ICH BC1 BC2 BF1 BF2 DBC1 DBC2 AMP DAMP FSUM RMS OBS DATE ARRAY ELEV" >> $cat
+            echo "# SCUBA-2 focal plane distortion data" > $cat
+            echo "#" >> $cat
+            echo "# ICH - zero-based makemap chunk index" >> $cat
+            echo "# BC1 - array pixel X coord at centre of source " >> $cat
+            echo "# BC2 - array pixel Y coord at centre of source " >> $cat
+            echo "# BF1 - array pixel X coord at bolometer centre" >> $cat
+            echo "# BF2 - array pixel Y coord at bolometer centre" >> $cat
+            echo "# DBC1 - error in BC1" >> $cat
+            echo "# DBC2 - error in BC2" >> $cat
+            echo "# AMP - source amplitude " >> $cat
+            echo "# DAMP - error in AMP" >> $cat
+            echo "# FSUM - total data value in fitted source " >> $cat
+            echo "# RMS - RMS error of fit" >> $cat
+            echo "# OBS - observation number" >> $cat
+            echo "# DATE - observation date" >> $cat
+            echo "# ARRAY - array index (s8a=0, s8b=1, s8c=2, s8d=3, s4a=4, s4b=5, s4c=6, s4d=7)" >> $cat
+            echo "# ELEV - telescope elevation (degrees)" >> $cat
+            echo "#" >> $cat
+            echo "# ICH BC1 BC2 BF1 BF2 DBC1 DBC2 AMP DAMP FSUM RMS OBS DATE ARRAY ELEV" >> $cat
 
 #  Loop round all GRID X columns (1 to 32)
-      set ix = 0
-      while( $ix < 32 )
-         @ ix = $ix + 1
+            set ix = 0
+            while( $ix < 32 )
+               @ ix = $ix + 1
 
 #  In the catalogue, the "true" source position (columns BF1 and BF2) is
 #  given by the pixel coords of the centre of the bolometer used to make
 #  the bolomap. Store the X pixel coord for the centre of bolometers in the
 #  current column. This assumes the lower pixel index bound is zero on the
 #  first axis.
-         set bf1 = `$KAPPA_DIR/calc exp="pa-1.5" pa=$ix`
+               set bf1 = `$KAPPA_DIR/calc exp="pa-1.5" pa=$ix`
 
 #  Loop round all GRID Y rows (1 to 40).
-         set iy = 0
-         while( $iy < 40 )
-            @ iy = $iy + 1
+               set iy = 0
+               while( $iy < 40 )
+                  @ iy = $iy + 1
 
 #  In the catalogue, the "true" source position (columns BF1 and BF2) is
 #  given by the pixel coords of the centre of the bolometer used to make
 #  the bolomap. Store the Y pixel coord for the centre of bolometers in the
 #  current row. This assumes the lower pixel index bound is zero on the second
 #  axis.
-            set bf2 = `$KAPPA_DIR/calc exp="pa-1.5" pa=$iy`
+                  set bf2 = `$KAPPA_DIR/calc exp="pa-1.5" pa=$iy`
 
 #  Loop round all chunks (if any)
-            set ich = 0
-            while( $ich <= $top_chunk )
+                  set ich = 0
+                  while( $ich <= $top_chunk )
 
 #  Construct the name of the bolometer map.
-               set bolo_name = "CH0${ich}"
+                     set bolo_name = "CH0${ich}"
 
-               if( $ix < 10 ) then
-                  set bolo_name = "${bolo_name}C0${ix}"
-               else
-                  set bolo_name = "${bolo_name}C${ix}"
-               endif
+                     if( $ix < 10 ) then
+                        set bolo_name = "${bolo_name}C0${ix}"
+                     else
+                        set bolo_name = "${bolo_name}C${ix}"
+                     endif
 
-               if( $iy < 10 ) then
-                  set bolo_name = "${bolo_name}R0${iy}"
-               else
-                  set bolo_name = "${bolo_name}R${iy}"
-               endif
+                     if( $iy < 10 ) then
+                        set bolo_name = "${bolo_name}R0${iy}"
+                     else
+                        set bolo_name = "${bolo_name}R${iy}"
+                     endif
 
 #  Skip if the bolomap was not created by makemap.
-               grep -i $bolo_name makemap.log > /dev/null
-               if( $status == 1 ) then
-                  echo "Skipping bolomap $bolo_name"
-               else
-                  echo "Doing bolomap $bolo_name"
+                     grep -i $bolo_name makemap.log > /dev/null
+                     if( $status == 1 ) then
+                        echo "Skipping bolomap $bolo_name"
+                     else
+                        echo "Doing bolomap $bolo_name"
 
 #  Get the full path to the bolomap NDF.
-                  set ndf = "junk.more.smurf.bolomaps.$bolo_name"
+                        set ndf = "junk.more.smurf.bolomaps.$bolo_name"
 
 #  From here on, use pixel coords to refer to positions within the bolomap,
 #  increasing the format precision from the one decimal place provided by
 #  the NDF library. NDF does not allow us to change the Format attributes for
 #  the PIXEL Frame directly, so take a copy of the PIXEL Frame first, and set
 #  the Format attributes of the copy.
-                  $KAPPA_DIR/wcsadd $ndf frame=pixel domain=newpix maptype=unit accept
-                  $KAPPA_DIR/wcsattrib $ndf set 'format(1)' "%5.3f"
-                  $KAPPA_DIR/wcsattrib $ndf set 'format(2)' "%5.3f"
+                        $KAPPA_DIR/wcsadd $ndf frame=pixel domain=newpix maptype=unit accept
+                        $KAPPA_DIR/wcsattrib $ndf set 'format(1)' "%5.3f"
+                        $KAPPA_DIR/wcsattrib $ndf set 'format(2)' "%5.3f"
 
 #  If source features are negative in the bolomap, negate the bolomap so that they become positive.
-                  if( $negative == 1 ) then
-                     $KAPPA_DIR/cmult $ndf -1 pos
-                     set ndf = "pos"
-                  endif
+                        if( $negative == 1 ) then
+                           $KAPPA_DIR/cmult $ndf -1 pos
+                           set ndf = "pos"
+                        endif
 
 #  Find the pixel coords at the centre of the feature. The feature is
 #  nominally at the reference point and so should, in the absence of errors
 #  and incorrect polymaps, have pixel coords (0.5,0.5). PSF fails unless a good
 #  central position is supplied, so first find the peak value in a box centred
 #  on (0,0)
-                  $KAPPA_DIR/stats $ndf'(0~20,0~20)' quiet
-                  set maxco = `$KAPPA_DIR/parget maxcoord stats`
-                  rm -f coin > /dev/null
-                  echo $maxco > coin
-                  $KAPPA_DIR/psf $ndf incat=! cofile=coin isize=31 norm=f device=! | grep \!\! >& /dev/null
+                        $KAPPA_DIR/stats $ndf'(0~20,0~20)' quiet
+                        set maxco = `$KAPPA_DIR/parget maxcoord stats`
+                        rm -f coin > /dev/null
+                        echo $maxco > coin
+                        $KAPPA_DIR/psf $ndf incat=! cofile=coin isize=31 norm=f device=! | grep \!\! >& /dev/null
 
 #  Check a psf was found succesfully.
-                  if( $status == 1 ) then
+                        if( $status == 1 ) then
 
 #  Get the parameters of the psf.
-                     set amp = `$KAPPA_DIR/parget amp1 psf`
-                     set posxy = `$KAPPA_DIR/parget centre psf`
+                           set amp = `$KAPPA_DIR/parget amp1 psf`
+                           set posxy = `$KAPPA_DIR/parget centre psf`
 
 #  Get the total data sum. Two methods - 1) aperture photometry...
-                     if( $sum_method == APERADD ) then
+                           if( $sum_method == APERADD ) then
 
 #  Choose the aperture size in pixels (60 arc-secs assuming default makemap pixel sizes of 2
 #  and 4 arc-seconds)..
-                        if( $array > 3 ) then
-                           set diam = 30
-                        else
-                           set diam = 15
-                        endif
+                              if( $array > 3 ) then
+                                 set diam = 30
+                              else
+                                 set diam = 15
+                              endif
 
 #  Replace any bad pixels within a box centred on the max pixel with sides twice
 #  the above diameter.
-                        @ size = $diam + $diam
-                        $KAPPA_DIR/fillbad in=$ndf\($maxco[1]~$size,$maxco[2]~$size\) size=2 out=filled | grep \!\! >& /dev/null
+                              @ size = $diam + $diam
+                              $KAPPA_DIR/fillbad in=$ndf\($maxco[1]~$size,$maxco[2]~$size\) size=2 out=filled | grep \!\! >& /dev/null
 
 #  Do the aperture photometry within the filled image. Check some bad pixels
 #  were filled. If not, use $ndf instead of "filled".
-                        if( $status == 1 ) then
-                           $KAPPA_DIR/aperadd filled centre="'$posxy'" diam=$diam
-                        else
-                           $KAPPA_DIR/aperadd $ndf centre="'$posxy'" diam=$diam
-                        endif
-                        set fsum = `$KAPPA_DIR/parget total aperadd`
+                              if( $status == 1 ) then
+                                 $KAPPA_DIR/aperadd filled centre="'$posxy'" diam=$diam
+                              else
+                                 $KAPPA_DIR/aperadd $ndf centre="'$posxy'" diam=$diam
+                              endif
+                              set fsum = `$KAPPA_DIR/parget total aperadd`
 
 #  Alternatively - 2) use the integral of the model PSF as the souce total data sum.
-                     else
-                        set fsum = `$KAPPA_DIR/parget total psf`
-                     endif
+                           else
+                              set fsum = `$KAPPA_DIR/parget total psf`
+                           endif
 
 #  Get the Mapping from bolomap pixel coords to sky offsets from the
 #  reference point, and combine with the mapping from sky offsets to focal
 #  plane pixel coordinate offsets.
-                     $ATOOLS_DIR/astgetmapping $ndf PIXEL SKY smap.ast
-                     $ATOOLS_DIR/astcmpmap smap.ast bmap.ast yes \! sbmap.ast
+                           $ATOOLS_DIR/astgetmapping $ndf PIXEL SKY smap.ast
+                           $ATOOLS_DIR/astcmpmap smap.ast bmap.ast yes \! sbmap.ast
 
 #  Use this CmpMap to transform the psf centre from bolomap pixel coords
 #  to offsets from the nominal reference point in pixel coords within the
 #  bolometer array.
-                     set dfp = `$ATOOLS_DIR/asttran2 sbmap.ast $posxy[1] $posxy[2] y`
+                           set dfp = `$ATOOLS_DIR/asttran2 sbmap.ast $posxy[1] $posxy[2] y`
 
 #  Check for AST__BAD values from the above astTran2 call.
-                     echo $dfp | grep -i "e+308" > /dev/null
-                     if( $status == 0 ) then
-                        echo "  astTran failure"
+                           echo $dfp | grep -i "e+308" > /dev/null
+                           if( $status == 0 ) then
+                              echo "  astTran failure"
 
 #  In the catalogue, the "base" source position (columns BC1 and BC2)
 #  corresponds to the bolometer array pixel coords of the source after
@@ -664,37 +749,67 @@ foreach indir ($dir_list)
 #  psf centre found above would be at bolometer array pixel offsets (0,0).
 #  Any discrepancy is caused by distortion (and noise). So modify the known
 #  bolometer position ($bf1,$bf2) by subtracting off the discrepancies in
-#  the psf position to get the distorted source position.
-                     else
-                        set bc1 = `$KAPPA_DIR/calc exp="pa-pb" pa=$bf1 pb=$dfp[1]`
-                        set bc2 = `$KAPPA_DIR/calc exp="pa-pb" pa=$bf2 pb=$dfp[2]`
+#  the psf position to get the distorted source position. That is, a source
+#  that should - if there was no distorion -  be seen at bolo pixel coords
+#  (bf1,bf2) is actually seen at bolo pixel coords (bc1,bc2).
+                           else
+                              set bc1 = `$KAPPA_DIR/calc exp="pa-pb" pa=$bf1 pb=$dfp[1]`
+                              set bc2 = `$KAPPA_DIR/calc exp="pa-pb" pa=$bf2 pb=$dfp[2]`
 
 #  Copy the parameters of the fit into the output text file.
-                        echo "$ich $bc1 $bc2 $bf1 $bf2 0 0 $amp 0 $fsum 0 $obsnum $date $array $elev " >> $cat
+                              echo "$ich $bc1 $bc2 $bf1 $bf2 0 0 $amp 0 $fsum 0 $obsnum $date $array $elev " >> $cat
+                           endif
+                        else
+                           echo "  psf failure"
+                        endif
                      endif
-                  else
-                     echo "  psf failure"
-                  endif
-               endif
 
 #  Increment the chunk index
-               @ ich = $ich + 1
+                     @ ich = $ich + 1
+                  end
+               end
             end
-         end
-      end
 
 #  If required, create an image containing the peak source values for every
 #  bolometer in the current observation, and another containing the fitted
 #  total data sum.
-      if( $make_extra ) then
-         $SMURF_DIR/dsutils infitx=\! incat=$cat subarray=$subarray \
-                            outdx=! outdy=! outcat=\! \
-                            colname=AMP colndf=../../$subarray$date-$obsnum-amp
-         $SMURF_DIR/dsutils infitx=\! incat=$cat subarray=$subarray \
-                            outdx=! outdy=! outcat=\! \
-                            colname=FSUM colndf=../../$subarray$date-$obsnum-sum
-      endif
+            if( $make_extra ) then
+               $SMURF_DIR/dsutils infitx=\! incat=$cat subarray=$subarray \
+                                  outdx=! outdy=! outcat=\! \
+                                  colname=AMP colndf=../../$subarray$date-$obsnum-amp
+               $SMURF_DIR/dsutils infitx=\! incat=$cat subarray=$subarray \
+                                  outdx=! outdy=! outcat=\! \
+                                  colname=FSUM colndf=../../$subarray$date-$obsnum-sum
+            endif
 
+         endif
+
+#  If junk.sdf was re-used from a previous run, get the subarray name,
+#  and its corresponding integer index.
+      else
+         set subarray = `$KAPPA_DIR/fitsmod junk edit=print keyword=SUBARRAY`
+         if( "$subarray" == "s8a" ) then
+            set array = 0
+         else if( "$subarray" == "s8b" ) then
+            set array = 1
+         else if( "$subarray" == "s8c" ) then
+            set array = 2
+         else if( "$subarray" == "s8d" ) then
+            set array = 3
+         else if( "$subarray" == "s4a" ) then
+            set array = 4
+         else if( "$subarray" == "s4b" ) then
+            set array = 5
+         else if( "$subarray" == "s4c" ) then
+            set array = 6
+         else if( "$subarray" == "s4d" ) then
+            set array = 7
+         else
+            echo "Unknown subarray - $subarray"
+            exit
+         endif
+
+      endif
       set zbox = !
 
    endif
@@ -708,8 +823,10 @@ foreach indir ($dir_list)
 #  both in units of mm. The current WCS Frame in these images is FPLANE
 #  (also in units of mm). The GRID->FPLANE mapping includes no polynomial
 #  distortion.
-   $SMURF_DIR/dsutils infitx=\! incat=$cat subarray=$subarray \
-                  outdx=outdx outdy=outdy outcat=\! zbox=$zbox
+   if( ! -e outdx.sdf || ! -e outdy.sdf ) then
+      $SMURF_DIR/dsutils infitx=\! incat=$cat subarray=$subarray \
+                     outdx=outdx outdy=outdy outcat=\! zbox=$zbox
+   endif
 
 #  Move back to the "distortion-tmp" directory.
    cd ..
