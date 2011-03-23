@@ -160,7 +160,7 @@
 *          output cube. If the first name starts with a minus sign, then
 *          the specified detectors are excluded from the output cube (all
 *          other detectors are included). Otherwise, the specified detectors
-*          are included from the output cube (all other detectors are
+*          are included in the output cube (all other detectors are
 *          excluded). If a null (!) value is supplied, data from all detectors
 *          will be used. [!]
 *     EXTRACOLS = LITERAL (Read)
