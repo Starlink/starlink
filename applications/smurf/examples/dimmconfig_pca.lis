@@ -1,0 +1,30 @@
+^$STARLINK_DIR/share/smurf/dimmconfig.lis
+
+# *** Specialized config to use PCA cleaning on point-source fields ***
+#
+# Principal Component Analysis (PCA) is used to identify and remove
+# correlated noise. The method projects all of the bolometers along
+# a new set of statistically independent basis vectors, and removes
+# the signal associated with the strongest of these vectors.
+# Currently this is applied as a pre-processing step, and is performed
+# instead of COMmon-mode rejection and high-pass FiLTering. For this
+# reason there is a simplified modelorder. A minimal number of iterations
+# is required simply to identify the noise weights and to perform
+# map-based despiking. The single pcathresh parameter is used to establish
+# which correlated components to remove: a smaller value will remove more
+# components, and a larger value fewer components.
+#
+# This method is somewhat of a statistical black-box, and therefore
+# requires simulations for characterization. It is also *extremely* slow.
+# Probably only useful for compact / point-sources as large-scale structures
+# are even more heavily filtered than with the usual processing.
+#
+# ****************************************************************
+
+numiter = 3
+
+pcathresh=4
+
+modelorder = (ext,ast,noi)
+
+ast.mapspike = 5
