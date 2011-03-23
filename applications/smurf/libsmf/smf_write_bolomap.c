@@ -68,9 +68,13 @@
 *  History:
 *     2010-08-20 (EC):
 *        Initial version factored out of smf_iteratemap.
+*     2011-03-23 (TIMJ):
+*        Do not overwrite bolometers from different subarrays. Include
+*        the subarray string in output name.
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2011 Science & Technology Facilities Council.
 *     Copyright (C) 2010 University of British Columbia
 *     All Rights Reserved.
 
@@ -109,6 +113,8 @@
 #include "libsmf/smf.h"
 #include "libsmf/smf_err.h"
 
+#include <ctype.h>
+
 #define FUNC_NAME "smf_write_bolomap"
 
 void smf_write_bolomap( smfArray *ast, smfArray *res, smfArray *lut,
@@ -126,6 +132,7 @@ void smf_write_bolomap( smfArray *ast, smfArray *res, smfArray *lut,
   int *lut_data=NULL;           /* Pointer to DATA component of lut */
   char name[GRP__SZNAM+1];      /* Buffer for storing names */
   dim_t nbolo;                  /* Number of bolometers */
+  size_t nbolomaps = 0;         /* Number of bolomaps written */
   char *pname=NULL;             /* Poiner to name */
   smf_qual_t *qua_data=NULL;    /* Pointer to DATA component of qua */
   double *res_data=NULL;        /* Pointer to DATA component of res */
@@ -188,12 +195,15 @@ void smf_write_bolomap( smfArray *ast, smfArray *res, smfArray *lut,
           char tmpname[GRP__SZNAM+1]; /* temp name buffer */
           char thisbol[20];     /* name particular to this bolometer */
           size_t col, row;
+          char subarray[10];
+
+          nbolomaps++;
 
           /* Set the quality back to good for this single bolometer */
           qua_data[k*bstride] = bolomask[k];
 
           /* Create a name for the new map, take into account the
-             chunk number. Only required if we are using a single
+             chunk number and subarray. Only required if we are using a single
              output container. */
           pname = tmpname;
           grpGet( bolrootgrp, 1, 1, &pname, sizeof(tmpname), status );
@@ -204,11 +214,23 @@ void smf_write_bolomap( smfArray *ast, smfArray *res, smfArray *lut,
           sprintf(tempstr, "CH%02zd", contchunk);
           one_strlcat( name, tempstr, sizeof(name), status );
 
-          /* Column and row */
+          /* Column and row and subarray. HDS does not care about case but we
+             convert to upper case anyhow. */
+          smf_find_subarray( res->sdata[idx]->hdr, subarray, sizeof(subarray),
+                             NULL, status );
+          if (*status == SAI__OK) {
+            size_t len = strlen(subarray);
+            size_t n = 0;
+            for (n=0; n<len; n++) {
+              subarray[n] = toupper(subarray[n]);
+            }
+          }
+
           col = (k % res->sdata[idx]->dims[1])+1;
           row = (k / res->sdata[idx]->dims[1])+1;
 
-          sprintf( thisbol, "C%02zuR%02zu",
+          sprintf( thisbol, "%3sC%02zuR%02zu",
+                   subarray,
                    col,   /* x-coord */
                    row ); /* y-coord */
 
@@ -243,6 +265,7 @@ void smf_write_bolomap( smfArray *ast, smfArray *res, smfArray *lut,
 
             atlPtfti( fitschan, "COLNUM", col, "bolometer column", status);
             atlPtfti( fitschan, "ROWNUM", row, "bolometer row", status );
+            atlPtfts( fitschan, "SUBARRAY", subarray, "Subarray identifier", status );
             kpgPtfts( mapdata->file->ndfid, fitschan, status );
 
             if( fitschan ) fitschan = astAnnul( fitschan );
@@ -267,6 +290,8 @@ void smf_write_bolomap( smfArray *ast, smfArray *res, smfArray *lut,
         qua_data[k*bstride] = bolomask[k];
       }
     }
+
+    msgOutf( "", "*** Wrote %zu bolo maps", status, nbolomaps );
 
     /* Free up memory */
     if( bolomask ) bolomask = astFree( bolomask );
