@@ -14,7 +14,8 @@
 
 *  Invocation:
 *     smf_clean_pca( smfWorkForce *wf, smfData *data, double thresh,
-*                    smfData **components, smfData **amplitudes, int *status )
+*                    smfData **components, smfData **amplitudes,
+*                    int flagbad, AstKeyMap *keymap, int *status )
 
 *  Arguments:
 *     wf = smfWorkForce * (Given)
@@ -30,6 +31,12 @@
 *     amplitudes = smfData ** (Returned)
 *        New 3d cube giving amplitudes of each component for each bolometer
 *        (bolo X * bolo Y * component amplitude). Can be NULL.
+*     flagbad = int (Given)
+*        If set, compare each bolometer to the first component as a template
+*        to decide whether the data are good or not.
+*     keymap = AstKeyMap * (Given)
+*        Keymap containing parameters that control how flagbad works. See
+*        smf_find_gains for details.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -47,6 +54,15 @@
 *     be optionally returned. The largest amplitude components are
 *     generally assumed to be noise sources, and are identified as
 *     outliers from the general population and removed.
+*
+*     In addition, this routine can be used to flag bad bolometers in
+*     the same way that the common-mode routines work. Once the
+*     decomposition into principal components is complete (but prior
+*     to cleaning), most of the signal in each bolometer should
+*     resemble the first, largest component (sky+fridge).A fit of this
+*     template to each bolometer is a useful way of finding entire
+*     bolometers (or portions) that are outliers, and their quality
+*     arrays are flagged accordingly.
 
 *  Notes:
 *     The input bolometer time series are assumed to have had their
@@ -292,7 +308,9 @@ void smfPCAParallel( void *job_data_ptr, int *status ) {
 #define FUNC_NAME "smf_clean_pca"
 
 void smf_clean_pca( smfWorkForce *wf, smfData *data, double thresh,
-                    smfData **components, smfData **amplitudes, int *status ) {
+                    smfData **components, smfData **amplitudes, int flagbad,
+                    AstKeyMap *keymap, int *status ) {
+
 
   double *amp=NULL;       /* matrix of components amplitudes for each bolo */
   size_t abstride;        /* bolo stride in amp array */
@@ -565,7 +583,7 @@ void smf_clean_pca( smfWorkForce *wf, smfData *data, double thresh,
     smf_stats1D( comp + i*ccompstride, ctstride, ntslice, NULL, 0,
                  0, NULL, &sigma, NULL, status );
 
-    /* do we need this?? */
+    /* Apparently we need this to get the normalization right */
     sigma *= sqrt((double) ntslice);
 
     if( *status == SAI__OK ) {
@@ -594,6 +612,87 @@ void smf_clean_pca( smfWorkForce *wf, smfData *data, double thresh,
 
   /* Wait until all of the submitted jobs have completed */
   smf_wait( wf, status );
+
+  /* Check to see if the amplitudes are mostly negative or positive. If
+     mostly negative, flip the sign of both the component and amplitudes */
+  if( *status == SAI__OK ) {
+    double total;
+    for( j=0; j<ngoodbolo; j++ ) {    /* loop over component */
+      total = 0;
+      for( i=0; i<ngoodbolo; i++ ) {  /* loop over bolometer */
+        total += amp[goodbolo[i]*abstride + j*acompstride];
+      }
+
+      /* Are most amplitudes negative for this component? */
+      if( total < 0 ) {
+        /* Flip sign of the amplitude */
+        for( i=0; i<ngoodbolo; i++ ) { /* loop over bolometer */
+          amp[goodbolo[i]*abstride + j*acompstride] =
+            -amp[goodbolo[i]*abstride + j*acompstride];
+        }
+
+        /* Flip sign of the component */
+        for( k=0; k<ntslice; k++ ) {
+           comp[j*ccompstride + k*ctstride] =
+             -comp[j*ccompstride + k*ctstride];
+        }
+      }
+    }
+  }
+
+  /* Flag outlier bolometers if requested ------------------------------------*/
+
+  if( (*status==SAI__OK) && flagbad ) {
+    smfArray *data_array=NULL;
+    smfArray *gain_array=NULL;
+    smfGroup *gain_group=NULL;
+    AstKeyMap *kmap=NULL;         /* Local keymap */
+    int nrej;
+    AstObject *obj=NULL;          /* Used to avoid compiler warnings */
+    double *template=NULL;
+
+    /* Obtain pointer to sub-keymap containing bolo rejection parameters.
+       Since this is an essentially identical operation to what we do with
+       COM, just lift its parameters for now */
+    astMapGet0A( keymap, "COM", &obj );
+    kmap = (AstKeyMap *) obj;
+    obj = NULL;
+
+    /* Create a 1d array containing a copy of the first component as a
+       template */
+    template = astCalloc( ntslice, sizeof(*template),1 );
+    if( *status == SAI__OK ) {
+      for( i=0; i<ntslice; i++ ) {
+        template[i] = comp[i*ctstride];
+      }
+    }
+
+    /* We need a smfData to store the gains of the template
+       temporarily. Do this using smf_model_create (which uses
+       smfArray's as inputs/outputs) to ensure that we get the
+       dimensions that smf_find_gains will be expecting. */
+    data_array = smf_create_smfArray( status );
+    smf_addto_smfArray( data_array, data, status );
+
+    smf_model_create( wf, NULL, &data_array, NULL, NULL, NULL, NULL, 1,
+                      SMF__GAI, data->isTordered, NULL, 0, NULL, NULL,
+                      &gain_group, 1, 1, &gain_array, keymap, status );
+
+    /* Compare bolometers to the template in order to flag outliers */
+    smf_find_gains( wf, data, template, kmap, SMF__Q_GOOD, SMF__Q_COM,
+                    gain_array->sdata[0], &nrej, status );
+
+    /* Clean up */
+    if( template ) template = astFree( template );
+    if( data_array ) {
+      /* Data doesn't belong to us, so avoid freeing */
+      data_array->owndata = 0;
+      smf_close_related( &data_array, status );
+    }
+    if( gain_array ) smf_close_related( &gain_array, status );
+    if( gain_group ) smf_close_smfGroup( &gain_group, status );
+    if( kmap ) kmap = astAnnul( kmap );
+  }
 
   /* Cleaning ----------------------------------------------------------------*/
 

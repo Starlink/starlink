@@ -394,12 +394,11 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
 
   /* PCA cleaning */
   if( pcathresh ) {
-
     /* Loop over subarray */
     for( idx=0; (idx<array->ndat)&&(*status==SAI__OK); idx++ ) {
       data = array->sdata[idx];
 
-      smf_clean_pca( wf, data, pcathresh, NULL, NULL, status );
+      smf_clean_pca( wf, data, pcathresh, NULL, NULL, 1, keymap, status );
     }
 
     /*** TIMER ***/

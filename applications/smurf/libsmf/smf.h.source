@@ -694,7 +694,8 @@ void smf_clean_dksquid( smfData *indata, smf_qual_t mask, size_t window,
                         int *status );
 
 void smf_clean_pca( smfWorkForce *wf, smfData *data, double thresh,
-                    smfData **components, smfData **amplitudes, int *status );
+                    smfData **components, smfData **amplitudes, int flagbad,
+                    AstKeyMap *keymap, int *status );
 
 void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
                          smfArray **noisemaps, AstKeyMap *keymap, int *status );
