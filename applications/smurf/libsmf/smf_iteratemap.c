@@ -1208,11 +1208,16 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
            before we start using more memory for other things. Note that
            we are guaranteed to have only one filegroup if memiter=1. If
            memiter=0 we do the cleaning the first time RES and QUA are
-           opened in the first iteration instead. */
+           opened in the first iteration instead. Once the QUA model
+           has been initialized with a copy of the quality inside RES,
+           we can free up the quality in RES. */
 
         for( idx=0; idx<res[0]->ndat; idx++ ) {
           smfData *thisqua = qua[0]->sdata[idx];
           res[0]->sdata[idx]->sidequal = thisqua;
+          if( res[0]->sdata[idx]->qual ) {
+            res[0]->sdata[idx]->qual = astFree( res[0]->sdata[idx]->qual );
+          }
         }
 
 
