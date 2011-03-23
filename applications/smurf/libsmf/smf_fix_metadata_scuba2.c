@@ -74,9 +74,13 @@
 *        Fix shutter header so that it is always numeric.
 *        Add SEQ_TYPE header to old 2009 data.
 *        Fix RTS_NUM for 2009 data taken in the dark
+*     2011-03-22 (TIMJ):
+*        Do the RTS_NUM fix for more data since engineering data with a private
+*        sequence has the same problem. Also check that the end value is zero.
+*        Can not check for shutter state either.
 
 *  Copyright:
-*     Copyright (C) 2009-2010 Science & Technology Facilities Council.
+*     Copyright (C) 2009-2011 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -261,27 +265,27 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
     }
   }
 
-  /* Fix RTS_NUM values in <= 20091201 dark observations */
-  if (fitsvals.utdate < 20091202) {
-    double shutval = 0.0;
-    smf_fits_getD( hdr, "SHUTTER", &shutval, status );
-    if ( shutval < 0.0001 ) {
-      JCMTState * curstate = &((hdr->allState)[0]);
-      if (curstate->rts_num == 0) {
-        /* have to set the values from the SEQSTART and SEQEND headers
-           since those were set correctly (although any value would
-           do of course apart from the sanity check in smf_find_science. */
-        size_t nframes = hdr->nframes;
-        size_t i;
-        int seqnum = 1;
-        smf_fits_getI( hdr, "SEQSTART", &seqnum, status );
-        for ( i=0; i<nframes; i++) {
-          curstate = &((hdr->allState)[i]);
-          curstate->rts_num = seqnum;
-          seqnum++;
-        }
-        have_fixed |= SMF__FIXED_JCMTSTATE;
+  /* Engineering data with just SCUBA2 and no RTS left the RTS_NUM field
+     filled with zeroes. Just assume that a zero in RTS_NUM is always
+     indicative of a private sequence. */
+  if (fitsvals.utdate < 20110401) {
+    size_t nframes = hdr->nframes;
+    JCMTState * curstate = &((hdr->allState)[0]);
+    JCMTState * endstate = &((hdr->allState)[nframes-1]);
+    if (curstate->rts_num == 0 && endstate->rts_num == 0) {
+      /* have to set the values from the SEQSTART and SEQEND headers
+         since those were set correctly (although any value would
+         do of course apart from the sanity check in smf_find_science. */
+      size_t i;
+      int seqnum = 1;
+      smf_fits_getI( hdr, "SEQSTART", &seqnum, status );
+      for ( i=0; i<nframes; i++) {
+        curstate = &((hdr->allState)[i]);
+        curstate->rts_num = seqnum;
+        seqnum++;
       }
+      have_fixed |= SMF__FIXED_JCMTSTATE;
+      msgOutif( msglev, "", INDENT "Private RTS sequence. Fixing RTS_NUM.", status );
     }
   }
 
