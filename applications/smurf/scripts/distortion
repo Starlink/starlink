@@ -446,7 +446,7 @@ foreach indir ($dir_list)
 #  ===============================
    else
 
-#  We assume this observation completed succesfully on a previous run and
+#  We assume this obseravtion completed succesfully on a previous run and
 #  so does not need to be re-done, if the makemap output for the *next*
 #  observation was created succesfully.
       if( $idir >= $last_done ) then
@@ -866,11 +866,32 @@ if( $idir > 1 ) then
 
 #  Mosaic them into a single image, adjusting the zero points to make
 #  them agree as far as possible. Use the largest possible number of overlaps.
+#  If makemos fails (.e.g. because there is insufficient overlap to find the
+#  scales and zeros), try again but this time not adjusting scales and zeros.
    @ nov = $idir - 1
+
    $CCDPACK_DIR/makemos in=^outdx_A.lis out=outdx-total zero scale \
-                        logto=term skysup=0 method=median optov=$nov
+                        logto=term skysup=0 method=median optov=$nov | tee makemap.tmp
+   grep \!\! makemap.tmp >& /dev/null
+   if( $status == 0 ) then
+      echo
+      echo
+      echo "MAKEMOS failed - re-running without scale/zero adjustment..."
+      $CCDPACK_DIR/makemos in=^outdx_A.lis out=outdx-total nozero noscale \
+                        logto=term skysup=0 method=median
+   endif
+
+
    $CCDPACK_DIR/makemos in=^outdy_A.lis out=outdy-total zero scale \
-                        logto=term skysup=0 method=median optov=$nov
+                        logto=term skysup=0 method=median optov=$nov | tee makemap.tmp
+   grep \!\! makemap.tmp >& /dev/null
+   if( $status == 0 ) then
+      echo
+      echo
+      echo "MAKEMOS failed - re-running without scale/zero adjustment..."
+      $CCDPACK_DIR/makemos in=^outdy_A.lis out=outdy-total nozero noscale \
+                        logto=term skysup=0 method=median
+   endif
 
 #  If we only have one observation, just copy it to the right place.
 else
