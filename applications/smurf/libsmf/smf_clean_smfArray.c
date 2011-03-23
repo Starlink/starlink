@@ -90,6 +90,8 @@
 *        optional pre-processing step.
 *     2011-03-22 (EC):
 *        Add "pcathresh" option to do PCA cleaning as a pre-processing step
+*     2011-03-23 (DSB):
+*        Use smf_select_quality to get pointer to quality arrays.
 
 *  Copyright:
 *     Copyright (C) 2010-2011 Univeristy of British Columbia.
@@ -354,7 +356,7 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
       thisqua->isTordered = array->sdata[idx]->isTordered;
       memcpy( thisqua->dims, array->sdata[idx]->dims, sizeof(thisqua->dims) );
       memcpy( thisqua->lbnd, array->sdata[idx]->lbnd, sizeof(thisqua->lbnd) );
-      thisqua->pntr[0] = array->sdata[idx]->qual;
+      thisqua->pntr[0] = smf_select_qualpntr( array->sdata[idx], NULL, status );
 
       smf_addto_smfArray( quadata, thisqua, status );
     }
