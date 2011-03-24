@@ -1,6 +1,6 @@
 ^$STARLINK_DIR/share/smurf/dimmconfig.lis
 
-# *** Specialized config to use PCA cleaning on point-source fields ***
+# *** Specialized config to use PCA cleaning on faint point-source fields ***
 #
 # Principal Component Analysis (PCA) is used to identify and remove
 # correlated noise. The method projects all of the bolometers along
@@ -17,7 +17,8 @@
 # This method is somewhat of a statistical black-box, and therefore
 # requires simulations for characterization. It is also *extremely* slow.
 # Probably only useful for compact / point-sources as large-scale structures
-# are even more heavily filtered than with the usual processing.
+# are even more heavily filtered than with the usual processing. Extremely
+# bright sources cause strange results.
 #
 # ****************************************************************
 
