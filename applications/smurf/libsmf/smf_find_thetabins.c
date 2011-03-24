@@ -214,37 +214,52 @@ void smf_find_thetabins( const smfData *data, int nosign, double **bins,
   }
 
   /* Finally, assign each time slice to the appropriate bin */
+
   if( whichbin && (*status==SAI__OK) ) {
     int which;
     int wrapstart=0;   /* flag if first bin is wrapped. Otherwise last */
 
-    if( bin[0] > bin[1] ) {
-      wrapstart = 1;
-    }
-
     *whichbin = astCalloc( ntslice, sizeof(**whichbin), 1 );
 
-    if( *status == SAI__OK ) {
-      for( i=0; i<ntslice; i++ ) {
+    if( nb == 1 ) {
+      /* Special case: if only 1 bin, all samples go into it */
 
+      for( i=0; i<ntslice; i++ ) {
         if( theta[i] == VAL__BADD ) {
           (*whichbin)[i] = VAL__BADI;
         } else {
+          (*whichbin)[i] = 0;
+        }
+      }
+    } else {
+      /* Otherwise full treatment */
 
-          which = -1;
+      if( bin[0] > bin[1] ) {
+        wrapstart = 1;
+      }
 
-          /* Try to find within non-wrapped bin */
-          for( j=wrapstart; j<(nb - !wrapstart); j++ ) {
-            if( (theta[i] >= bin[j]) && (theta[i] < bin[(j+1)%nb]) ) {
-              which = j;
-              break;
+      if( *status == SAI__OK ) {
+        for( i=0; i<ntslice; i++ ) {
+
+          if( theta[i] == VAL__BADD ) {
+            (*whichbin)[i] = VAL__BADI;
+          } else {
+
+            which = -1;
+
+            /* Try to find within non-wrapped bin */
+            for( j=wrapstart; j<(nb - !wrapstart); j++ ) {
+              if( (theta[i] >= bin[j]) && (theta[i] < bin[(j+1)%nb]) ) {
+                which = j;
+                break;
+              }
             }
+
+            /* If we get here without finding a bin, it's the wrapped one */
+            if( which == -1 ) which = (nb-1)*(!wrapstart);
+
+            (*whichbin)[i] = which;
           }
-
-          /* If we get here without finding a bin, it's the wrapped one */
-          if( which == -1 ) which = (nb-1)*(!wrapstart);
-
-          (*whichbin)[i] = which;
         }
       }
     }
