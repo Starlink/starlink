@@ -33,6 +33,10 @@ if( $# < 1 ) then
    exit
 endif
 
+#  Not sure if this is necessary bit ensure the shell does not try to
+#  "correct" any part of the command line.
+set correct = none
+
 #  Ensure SMURF tasks assume there is no focal plane distortion.
 setenv SMURF_DISTORTION NONE
 
@@ -833,25 +837,26 @@ foreach indir ($dir_list)
 
 #  Construct a list of all the outdx.sdf files, and another of all the
 #  outdy.sdf files.
-   echo "$PWD/$pdir/outdx" >> outdx.lis
-   echo "$PWD/$pdir/outdy" >> outdy.lis
+   if( -e $PWD/$pdir/outdx.sdf && -e $PWD/$pdir/outdy.sdf ) then
+      echo "$PWD/$pdir/outdx" >> outdx.lis
+      echo "$PWD/$pdir/outdy" >> outdy.lis
 
 #  Construct a list of all the aligned outdx.sdf files, and another of all the
 #  aligned outdy.sdf files.
-   echo "$PWD/$pdir/outdx_A" >> outdx_A.lis
-   echo "$PWD/$pdir/outdy_A" >> outdy_A.lis
+      echo "$PWD/$pdir/outdx_A" >> outdx_A.lis
+      echo "$PWD/$pdir/outdy_A" >> outdy_A.lis
 
 #  Choose a reference observation for later on. Prefer 450 um if both 450 and 850 are
 #  present since the axes are the usual way round (unlike 850 which has swapped axes).
-   if( $array > 3 ) then
-      set refdx = "$PWD/$pdir/outdx"
-      set refdy = "$PWD/$pdir/outdy"
+      if( $array > 3 ) then
+         set refdx = "$PWD/$pdir/outdx"
+         set refdy = "$PWD/$pdir/outdy"
 
-   else if( $idir == 1 ) then
-      set refdx = "$PWD/$pdir/outdx"
-      set refdy = "$PWD/$pdir/outdy"
+      else if( $?refdx == 0 ) then
+         set refdx = "$PWD/$pdir/outdx"
+         set refdy = "$PWD/$pdir/outdy"
+      endif
    endif
-
 end
 
 #  If we have more than one observation, we need to combine them.
@@ -864,34 +869,64 @@ if( $idir > 1 ) then
    $KAPPA_DIR/wcsalign in=^outdy.lis out=^outdy_A.lis method=sincsinc wlim=0.4 \
                        rebin=no ref=$refdy lbnd=!
 
-#  Mosaic them into a single image, adjusting the zero points to make
-#  them agree as far as possible. Use the largest possible number of overlaps.
-#  If makemos fails (.e.g. because there is insufficient overlap to find the
-#  scales and zeros), try again but this time not adjusting scales and zeros.
-   @ nov = $idir - 1
+#  We now mosaic images for each pair of overlapping arrays into a single
+#  image (one for each pair of overlapping arrays). Adjust  the zero points
+#  to make them agree as far as possible. Use the largest possible number of
+#  overlaps.
+   rm -f tinx.lis tiny.lis >& /dev/null
+   touch tinx.lis tiny.lis
+   set imos = 0
+   foreach a ("s4a\|s8d" "s4b\|s8c" "s4c\|s8b" "s4d\|s8a")
+      rm -f insx.lis insy.lis >& /dev/null
 
-   $CCDPACK_DIR/makemos in=^outdx_A.lis out=outdx-total zero scale \
-                        logto=term skysup=0 method=median optov=$nov | tee makemap.tmp
-   grep \!\! makemap.tmp >& /dev/null
-   if( $status == 0 ) then
-      echo
-      echo
-      echo "MAKEMOS failed - re-running without scale/zero adjustment..."
-      $CCDPACK_DIR/makemos in=^outdx_A.lis out=outdx-total nozero noscale \
-                        logto=term skysup=0 method=median
-   endif
+      foreach line (`cat outdx_A.lis`)
+         $HDSTRACE_DIR/hdstrace $line.more.dsutils.subarray | grep $a > /dev/null
+         if( $status == 0 ) then
+            echo $line >> insx.lis
+         endif
+      end
 
+      foreach line (`cat outdy_A.lis`)
+         $HDSTRACE_DIR/hdstrace $line.more.dsutils.subarray | grep $a > /dev/null
+         if( $status == 0 ) then
+            echo $line >> insy.lis
+         endif
+      end
 
-   $CCDPACK_DIR/makemos in=^outdy_A.lis out=outdy-total zero scale \
-                        logto=term skysup=0 method=median optov=$nov | tee makemap.tmp
-   grep \!\! makemap.tmp >& /dev/null
-   if( $status == 0 ) then
-      echo
-      echo
-      echo "MAKEMOS failed - re-running without scale/zero adjustment..."
-      $CCDPACK_DIR/makemos in=^outdy_A.lis out=outdy-total nozero noscale \
-                        logto=term skysup=0 method=median
-   endif
+      set aa = `wc insx.lis`
+      set novx = $aa[1]
+      set aa = `wc insy.lis`
+      set novy = $aa[1]
+
+      if( $novx > 0 && $novy > 0 ) then
+         @ imos = $imos + 1
+
+         if( $novx > 1 ) then
+            $CCDPACK_DIR/makemos in=^insx.lis out=outdx_mos_$imos zero scale \
+                              logto=term skysup=0 method=median optov=$novx
+         else
+            $KAPPA_DIR/ndfcopy in=^insx.lis out=outdx_mos_$imos
+         endif
+
+         if( $novy > 1 ) then
+            $CCDPACK_DIR/makemos in=^insy.lis out=outdy_mos_$imos zero scale \
+                              logto=term skysup=0 method=median optov=$novy
+         else
+            $KAPPA_DIR/ndfcopy in=^insy.lis out=outdy_mos_$imos
+         endif
+
+         echo outdx_mos_$imos >> tinx.lis
+         echo outdy_mos_$imos >> tiny.lis
+      endif
+   end
+
+#  Now mosaic all the arrays into a single pair of (dx,dy) images. Cannot
+#  adjust scales or zeros here as there are overlaps between the pairs of
+#  arrays.
+   $CCDPACK_DIR/makemos in=^tinx.lis out=outdx-total nozero noscale \
+                        logto=term skysup=0 method=mean
+   $CCDPACK_DIR/makemos in=^tiny.lis out=outdy-total nozero noscale \
+                        logto=term skysup=0 method=mean
 
 #  If we only have one observation, just copy it to the right place.
 else
