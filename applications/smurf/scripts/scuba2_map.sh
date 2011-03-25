@@ -61,7 +61,7 @@ date >> $PERSISTDIR/$3/scuba2_map.log
 # rsync config directory from login host, and change to the directory
 # with the config files relevant for this reduction.
 
-rsync -az -e ssh --delete canfar.dao.nrc.ca:config /home/$LOGNAME/
+rsync -az -e ssh --delete canfar.dao.nrc.ca:$1 /home/$LOGNAME/
 cd $1
 
 # launch the pipeline
