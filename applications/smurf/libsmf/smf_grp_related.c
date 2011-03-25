@@ -614,8 +614,8 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
 
   if( *status != SAI__OK ) {
     /* free the group */
-    if (*basegrp) grpDelet( basegrp, status );
-    if (*group) {
+    if (basegrp && *basegrp) grpDelet( basegrp, status );
+    if (group && *group) {
       smf_close_smfGroup( group, status );
     } else {
       /* have to clean up manually */
