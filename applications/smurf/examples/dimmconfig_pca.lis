@@ -24,7 +24,19 @@
 
 numiter = 3
 
+# a decent threshold for using PCA to clean out junk
 pcathresh=4
+
+# COM pre-processing is good to flag bad bolometers
+compreprocess = 1
+
+# In practice, each file will be just over 30 s. This length ensures that
+# each file will be processed with PCA independently, rather than conctatenating
+# them altogether. This seems to give better results... and is consistent with
+# what the AzTEC team found (they PCA cleaned each ~10 s scan across a field).
+# Probably something to do with the noise components looking more linear
+# on short time scales.
+maxlen = 60
 
 modelorder = (ext,ast,noi)
 
