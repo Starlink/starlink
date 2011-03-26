@@ -64,7 +64,7 @@
 
 *  Description:
 *     This function updates the par array which contains a description of
-*     the map projection. The array is updates using user-defined
+*     the map projection. The array is updated using user-defined
 *     ADAM parameters. If no previous values have been specified for
 *     par, each element should be initialized to AST__BAD.
 
@@ -87,6 +87,10 @@
 *     2009-10-29 (TIMJ):
 *        If par[4] and par[5] are filled in then fallback to those values
 *        rather than filling in with 6 arcsec.
+*     2011-03-26 (DSB):
+*        Allow pixel ref position (par[0] and par[1]) to be supplied via
+*        adam parameters REFPIX1 and REFPIX2, and write out the used
+*        pixel ref position to output parameter PIXREF.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -94,7 +98,7 @@
 *  Copyright:
 *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2008 University of British Columbia.
-*     Copyright (C) 2008-2009 Science & Technology Facilities Council.
+*     Copyright (C) 2008-2011 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -154,6 +158,7 @@ void smf_get_projpar( AstSkyFrame *skyframe, const double skyref[2],
    int coin;             /* Are all points effectively co-incident? */
    int i;
    int nval;             /* Number of values supplied */
+   int refine_crpix;     /* Should the pixel ref position be updated? */
    int sparse = 0;       /* Local definition of sparseness */
    int udefs = 0;        /* Flag for defaults used or not */
 
@@ -287,8 +292,23 @@ void smf_get_projpar( AstSkyFrame *skyframe, const double skyref[2],
          if( par[ 0 ] == AST__BAD ) par[ 0 ] = 1.0;
          if( par[ 1 ] == AST__BAD ) par[ 1 ] = 1.0;
 
-/* Get the reference position strings. Use the returned SkyFrame to
-   format and unformat them. */
+/* Get the crpix1/2 (in the interim GRID frame) to use. Note if the user
+   specifies any values. These parameters have vpath=default (which is null)
+   and ppath=dynamic. */
+         refine_crpix = 0;
+         parDef0d( "REFPIX1", par[ 0 ], status );
+         parDef0d( "REFPIX2", par[ 1 ], status );
+         if( *status == SAI__OK ) {
+            parGet0d( "REFPIX1", par + 0, status );
+            parGet0d( "REFPIX2", par + 1, status );
+            if( *status == PAR__NULL ) {
+               errAnnul( status );
+               refine_crpix = 1;
+            }
+         }
+
+/* Get the sky coords reference position strings. Use the returned SkyFrame
+   to format and unformat them. */
          if( par[ 2 ] != AST__BAD ) {
             deflon = astFormat( skyframe, 1, par[ 2 ] );
             parDef0c( "REFLON", deflon, status );
@@ -412,7 +432,7 @@ void smf_get_projpar( AstSkyFrame *skyframe, const double skyref[2],
 /* If any parameter were given explicit values which differ from the
    autogrid default values, then we need to re-calculate the optimal CRPIX1/2
    values. We also do this if all the points are effectively co-incident. */
-         if( ( coin || !udefs ) && autogrid ) {
+         if( ( coin || !udefs ) && autogrid && refine_crpix ) {
             par[ 0 ] = AST__BAD;
             par[ 1 ] = AST__BAD;
             kpg1Opgrd( nallpos, allpos, strcmp( usesys, "AZEL" ), par,
@@ -421,6 +441,9 @@ void smf_get_projpar( AstSkyFrame *skyframe, const double skyref[2],
 
 /* Display the projection parameters being used. */
          smf_display_projpars( skyframe, par, status );
+
+/* Write out the reference grid coords to output parameter PIXREF. */
+         parPut1d( "PIXREF", 2, par, status );
 
 /* If no grid was found, indicate that no spatial projection will be used. */
       } else {

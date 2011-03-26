@@ -72,16 +72,35 @@
 *     AUTOGRID = _LOGICAL (Read)
 *          Only accessed if a null value is supplied for parameter REF.
 *          Determines how the dynamic default values should be determined
-*          for the projection parameters CROTA, PIXSIZE, REFLAT and REFLON.
-*          If TRUE, then default projection parameters are determined by
-*          adjusting the grid until as many data samples as possible fall
-*          close to the centre of pixels in the output cube. If FALSE,
-*          REFLON/REFLAT are set to the first pointing BASE position, CROTA
-*          is set to the MAP_PA value in the FITS header (converted to the
-*          requested sky co-ordinate system), and PIXSIZE is set to 6
-*          arcseconds. In addition, if AUTOGRID is TRUE the precise placement
-*          of the tangent point is adjusted by up to 1 pixel along each
-*          spatial pixel axis in order to optimise the grid. [FALSE]
+*          for the projection parameters CROTA, PIXSIZE, REFLAT, REFLON,
+*          REFPIX1 and REFPIX2. If TRUE, then default projection parameters
+*          are determined by adjusting the grid until as many data samples as
+*          possible fall close to the centre of pixels in the output cube. If
+*          FALSE, REFLON/REFLAT are set to the first pointing BASE position,
+*          CROTA is set to the MAP_PA value in the FITS header (converted
+*          to the requested sky co-ordinate system), PIXSIZE is set to 6
+*          arcseconds, and REFPIX1/REFPIX2 are both set to zero. [FALSE]
+*     REFPIX1 = _DOUBLE (Read)
+*          Controls the precise placement of the spatial tangent point on
+*          the first pixel axis of the output cube. The position of the
+*          tangent point on the sky is specified by REFLON/REFLAT, and
+*          this sky position is placed at grid coordinates specified by
+*          REFPIX1/REFPIX2. Note, these grid coordinates refer to an
+*          interim grid coordinate system that does not depend on the
+*          values supplied for LBND, rather than the final grid coordinate
+*          system of the output cube. Therefore, if values are supplied for
+*          REFPIX1/REFPIX2, they should be copies of the values written to
+*          output parameter PIXREF by a previous run of MAKECUBE. The
+*          REFPIX and PIXREF parameters allow an initial run of MAKECUBE
+*          with AUTGRID=YES to generate projection parameters that can
+*          then be re-used in subsequent runs of MAKECUBE with
+*          AUTOGFRID=NO in order to force MAKECUBE to use the same pixel
+*          grid. If a null (!) value is supplied, default values will be
+*          used for REFPIX1/2 - either the autogrid values (if AUTOGRID=YES)
+*          or (0,0) (if AUTOGRID=NO). [!]
+*     REFPIX2 = _DOUBLE (Read)
+*          Controls the precise placement of the spatial tangent point on
+*          the second pixel axis of the output cube. See REFPIX1. [!]
 *     BADMASK = LITERAL (Read)
 *          A string determining the way in which bad pixels are propagated
 *          from input to output. The "AND" scheme uses all input data (thus
@@ -339,6 +358,9 @@
 *          spectra, good results are often obtained by approximately
 *          matching the FWHM of the envelope function, given by PARAMS(2),
 *          to the point-spread function of the input data.  []
+*     PIXREF( 2 ) = _DOUBLE (Write)
+*          The grid coordinates used for the reference pixel, within the
+*          interim grid coordinate system. See REFPIX1.
 *     PIXSIZE( 2 ) = _REAL (Read)
 *          Only accessed if a null value is supplied for parameter REF.
 *          Pixel dimensions in the output image, in arcseconds. If only one
@@ -822,6 +844,8 @@
 *        If poarameter TRIM is true, then trim bad borders no matter what
 *        causes them (previously only bad borders caused by excluded
 *        detectors were trimmed).
+*     26-MAR-2011 (DSB)
+*        Added parameters REFPIX1, REFPIX2 and PIXREF.
 
 *  Copyright:
 *     Copyright (C) 2007-2011 Science and Technology Facilities Council.

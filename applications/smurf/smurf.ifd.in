@@ -2140,6 +2140,14 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter pixref {
+                size *
+                type _DOUBLE
+                access WRITE
+                vpath INTERNAL
+                helpkey *
+            }
+
             parameter pixsize {
                 position 3
                 type _REAL
@@ -2200,6 +2208,26 @@ package @PACKAGE@ {
                 ppath DYNAMIC
                 vpath DYNAMIC
                 prompt {Celestial longitude at output reference point}
+                helpkey *
+            }
+
+            parameter refpix1 {
+                type _DOUBLE
+                access READ
+                ppath DYNAMIC
+                vpath DEFAULT
+                default !
+                prompt {X pixel coord at output reference point}
+                helpkey *
+            }
+
+            parameter refpix2 {
+                type _DOUBLE
+                access READ
+                ppath DYNAMIC
+                vpath DEFAULT
+                default !
+                prompt {Y pixel coord at output reference point}
                 helpkey *
             }
 
@@ -2492,6 +2520,14 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter pixref {
+                size *
+                type _DOUBLE
+                access WRITE
+                vpath INTERNAL
+                helpkey *
+            }
+
             parameter pixsize {
                 position 3
                 type _REAL
@@ -2526,6 +2562,26 @@ package @PACKAGE@ {
                 ppath DYNAMIC
                 vpath DYNAMIC
                 prompt {Celestial longitude at output reference point}
+                helpkey *
+            }
+
+            parameter refpix1 {
+                type _DOUBLE
+                access READ
+                ppath DYNAMIC
+                vpath DEFAULT
+                default !
+                prompt {X pixel coord at output reference point}
+                helpkey *
+            }
+
+            parameter refpix2 {
+                type _DOUBLE
+                access READ
+                ppath DYNAMIC
+                vpath DEFAULT
+                default !
+                prompt {Y pixel coord at output reference point}
                 helpkey *
             }
 
