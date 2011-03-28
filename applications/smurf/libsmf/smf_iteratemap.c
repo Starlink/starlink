@@ -2046,8 +2046,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                   ": *** WARNING *** bolomap=1, but memiter=0", status );
         } else {
           smf_write_bolomap( ast[0], res[0], lut[0], qua[0], &dat, msize,
-                             bolrootgrp, contchunk, varmapmethod, lbnd_out,
-                             ubnd_out, outfset, status );
+                             bolrootgrp, varmapmethod, lbnd_out, ubnd_out,
+                             outfset, status );
         }
       }
 

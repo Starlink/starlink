@@ -15,10 +15,9 @@
 *  Invocation:
 *     smf_write_bolomap( smfArray *ast, smfArray *res, smfArray *lut,
 *                        smfArray *qua, smfDIMMData *dat, dim_t msize,
-*                        const Grp *bolrootgrp, size_t contchunk,
-*                        int varmapmethod, const int *lbnd_out,
-*                        const int *ubnd_out, AstFrameSet *outfset,
-*                        int *status ) {
+*                        const Grp *bolrootgrp, int varmapmethod,
+*                        const int *lbnd_out, const int *ubnd_out,
+*                        AstFrameSet *outfset, int *status ) {
 
 *  Arguments:
 *     ast = smfArray* (Given)
@@ -35,8 +34,6 @@
 *        Number of pixels in map/mapvar
 *     bolrootgrp = const Grp* (Given)
 *        Root name for bolomaps. Can be path to HDS container.
-*     contchunk = size_t (Given)
-*        Continuous chunk number
 *     varmapmethod = int (Given)
 *        Method for estimating map variance. If 1 use sample variance,
 *        if 0 propagate noise from time series.
@@ -52,17 +49,19 @@
 *  Description:
 *     After the map has converged, create single-bolometer maps in an
 *     NDF. The root of the name is supplied by bolrootgrp, and the
-*     suffix will be CH##C##R##, where "CH" is the continuous chunk
-*     number, "C" refers to the column, and "R" refers to the row of
-*     the bolometer. The AST and RES data are temporarily combined in
-*     this routine before re-gridding into the output map for each
-*     detector. Upon completion AST is once again subtracted from
-*     RES. No maps will be made for bolometers flaged as SMF__Q_BADB.
+*     suffix will be ???C##R##, where the first 3 characters indicate
+*     the subarray, "C" refers to the column, and "R" refers to the
+*     row of the bolometer. The AST and RES data are temporarily
+*     combined in this routine before re-gridding into the output map
+*     for each detector. Upon completion AST is once again subtracted
+*     from RES. No maps will be made for bolometers flaged as
+*     SMF__Q_BADB.
 
 *  Notes:
 
 *  Authors:
 *     EC: Ed Chapin (UBC)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -71,11 +70,13 @@
 *     2011-03-23 (TIMJ):
 *        Do not overwrite bolometers from different subarrays. Include
 *        the subarray string in output name.
+*     2011-03-28 (EC):
+*        Don't write a different map for each chunk, instead combine them
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2011 Science & Technology Facilities Council.
-*     Copyright (C) 2010 University of British Columbia
+*     Copyright (C) 2011 Science & Technology Facilities Council
+*     Copyright (C) 2010-2011 University of British Columbia
 *     All Rights Reserved.
 
 *  Licence:
@@ -108,6 +109,7 @@
 #include "par_par.h"
 #include "star/one.h"
 #include "star/atl.h"
+#include "dat_err.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
@@ -119,13 +121,15 @@
 
 void smf_write_bolomap( smfArray *ast, smfArray *res, smfArray *lut,
                         smfArray *qua, smfDIMMData *dat, dim_t msize,
-                        const Grp *bolrootgrp, size_t contchunk,
-                        int varmapmethod, const int *lbnd_out,
-                        const int *ubnd_out, AstFrameSet *outfset,
-                        int *status ) {
+                        const Grp *bolrootgrp, int varmapmethod,
+                        const int *lbnd_out, const int *ubnd_out,
+                        AstFrameSet *outfset, int *status ) {
 
+  int addtomap=0;               /* Set if adding to existing map */
   double *ast_data=NULL;        /* Pointer to DATA component of ast */
   size_t bstride;               /* Bolometer stride */
+  double *curmap=NULL;          /* Pointer to current map being rebinned */
+  double *curvar=NULL;          /* Pointer to variance associate with curmap */
   dim_t dsize;                  /* Size of data arrays in containers */
   size_t idx=0;                 /* index within subgroup */
   size_t k;                     /* loop counter */
@@ -191,7 +195,6 @@ void smf_write_bolomap( smfArray *ast, smfArray *res, smfArray *lut,
         if( !(bolomask[k]&SMF__Q_BADB) ) {
           Grp *mgrp=NULL;       /* Temporary group to hold map names */
           smfData *mapdata=NULL;/* smfData for new map */
-          char tempstr[20];     /* Temporary string */
           char tmpname[GRP__SZNAM+1]; /* temp name buffer */
           char thisbol[20];     /* name particular to this bolometer */
           size_t col, row;
@@ -210,11 +213,7 @@ void smf_write_bolomap( smfArray *ast, smfArray *res, smfArray *lut,
           one_strlcpy( name, tmpname, sizeof(name), status );
           one_strlcat( name, ".", sizeof(name), status );
 
-          /* Continuous chunk number */
-          sprintf(tempstr, "CH%02zd", contchunk);
-          one_strlcat( name, tempstr, sizeof(name), status );
-
-          /* Column and row and subarray. HDS does not care about case but we
+          /* Subarray, column and row. HDS does not care about case but we
              convert to upper case anyhow. */
           smf_find_subarray( res->sdata[idx]->hdr, subarray, sizeof(subarray),
                              NULL, status );
@@ -241,8 +240,28 @@ void smf_write_bolomap( smfArray *ast, smfArray *res, smfArray *lut,
           msgOutf( "", "*** Writing single bolo map %s", status,
                    name );
 
-          smf_open_newfile ( mgrp, 1, SMF__DOUBLE, 2, lbnd_out,
-                             ubnd_out, SMF__MAP_VAR, &mapdata, status);
+          /* Try to open an existing extention first. Create a new map
+             array, and then later we'll add it to the existing
+             one. If it isn't there, create it. */
+
+          smf_open_file( mgrp, 1, "UPDATE", 0, &mapdata, status );
+
+          if( *status == SAI__OK ) {
+            /* Allocate memory for the new rebinned data */
+            curmap = astCalloc( msize, sizeof(*curmap), 1 );
+            curvar = astCalloc( msize, sizeof(*curvar), 1 );
+            addtomap = 1;
+          } else {
+            /* Create a new extension */
+            errAnnul( status );
+            smf_open_newfile ( mgrp, 1, SMF__DOUBLE, 2, lbnd_out,
+                               ubnd_out, SMF__MAP_VAR, &mapdata, status);
+
+            /* Rebin directly into the newly mapped space */
+            curmap = mapdata->pntr[0];
+            curvar = mapdata->pntr[1];
+            addtomap = 0;
+          }
 
           /* Rebin the data for this single bolometer. Don't care
              about variance weighting because all samples from
@@ -253,9 +272,42 @@ void smf_write_bolomap( smfArray *ast, smfArray *res, smfArray *lut,
                          lut_data, 0, 0, 0, NULL, 0,
                          SMF__Q_GOOD, varmapmethod,
                          AST__REBININIT | AST__REBINEND,
-                         mapdata->pntr[0],
-                         bmapweight, bmapweightsq, bhitsmap,
-                         mapdata->pntr[1], msize, NULL, status );
+                         curmap, bmapweight, bmapweightsq, bhitsmap,
+                         curvar, msize, NULL, status );
+
+          /* If required, add this new map to the existing one */
+          if( addtomap ) {
+            size_t i;
+            double *oldmap=NULL;
+            double *oldvar=NULL;
+            double weight;
+
+            if( *status == SAI__OK ) {
+
+              oldmap = mapdata->pntr[0];
+              oldvar = mapdata->pntr[1];
+
+              for( i=0; i<msize; i++ ) {
+                if( oldmap[i]==VAL__BADD ) {
+                  /* No data in this pixel in the old map, just copy */
+                  oldmap[i] = curmap[i];
+                  oldvar[i] = curvar[i];
+                } else if( curmap[i]!=VAL__BADD &&
+                           oldvar[i]!=VAL__BADD && oldvar[i]!=0 &&
+                           curvar[i]!=VAL__BADD && curvar[i]!=0 ) {
+                  /* Both old and new values available */
+                  weight = 1/oldvar[i] + 1/curvar[i];
+                  oldmap[i] = (oldmap[i]/oldvar[i] + curmap[i]/curvar[i]) /
+                    weight;
+                  oldvar[i] = 1/weight;
+                }
+              }
+            }
+
+            /* Free up temporary arrays */
+            if( curmap ) curmap = astFree( curmap );
+            if( curvar ) curvar = astFree( curvar );
+          }
 
           /* Write out COLNUM and ROWNUM to FITS header */
           if( *status == SAI__OK ) {
@@ -265,22 +317,24 @@ void smf_write_bolomap( smfArray *ast, smfArray *res, smfArray *lut,
 
             atlPtfti( fitschan, "COLNUM", col, "bolometer column", status);
             atlPtfti( fitschan, "ROWNUM", row, "bolometer row", status );
-            atlPtfts( fitschan, "SUBARRAY", subarray, "Subarray identifier", status );
+            atlPtfts( fitschan, "SUBARRAY", subarray, "Subarray identifier",
+                      status );
             kpgPtfts( mapdata->file->ndfid, fitschan, status );
 
             if( fitschan ) fitschan = astAnnul( fitschan );
+
+
+            /* Set the bolo to bad quality again */
+            qua_data[k*bstride] = SMF__Q_BADB;
+
+            /* Write WCS */
+            smf_set_moving(outfset,NULL,status);
+            ndfPtwcs( outfset, mapdata->file->ndfid, status );
           }
-
-          /* Set the bolo to bad quality again */
-          qua_data[k*bstride] = SMF__Q_BADB;
-
-          /* Write WCS */
-          smf_set_moving(outfset,NULL,status);
-          ndfPtwcs( outfset, mapdata->file->ndfid, status );
 
           /* Clean up */
           if( mgrp ) grpDelet( &mgrp, status );
-          smf_close_file( &mapdata, status );
+          if( mapdata ) smf_close_file( &mapdata, status );
 
         }
       }
