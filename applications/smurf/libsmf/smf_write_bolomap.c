@@ -345,8 +345,6 @@ void smf_write_bolomap( smfArray *ast, smfArray *res, smfArray *lut,
       }
     }
 
-    msgOutf( "", "*** Wrote %zu bolo maps", status, nbolomaps );
-
     /* Free up memory */
     if( bolomask ) bolomask = astFree( bolomask );
     if( bmapweight ) bmapweight = astFree( bmapweight );
@@ -360,5 +358,7 @@ void smf_write_bolomap( smfArray *ast, smfArray *res, smfArray *lut,
       }
     }
   }
+
+  msgOutf( "", "*** Wrote %zu bolo maps", status, nbolomaps );
 
 }
