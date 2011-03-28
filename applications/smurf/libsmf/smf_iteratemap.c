@@ -1236,7 +1236,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
         /* Even though EXT would normally be handled in the dynamic memory
            allocation, do it here explicitly so that we can add the fakemap
-           signal to RES before cleaning */
+           signal to RES before cleaning. Be careful not to re-initialize
+           it again later! */
 
         if( haveext ) {
           smf_model_create( wf, NULL, res, darks, bbms, flatramps, noisemaps,
@@ -1380,8 +1381,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       for( i=0; i<nmodels; i++ ) {
 
         if( memiter ) {
-          /* Don't do SMF__LUT as it was handled earlier */
-          if( modeltyps[i] != SMF__LUT ) {
+          /* Don't do SMF__LUT or SMF__EXT as they were handled earlier */
+          if( (modeltyps[i] != SMF__LUT) && (modeltyps[i] != SMF__EXT) ) {
             smf_model_create( wf, NULL, res, darks, bbms, flatramps, noisemaps,
                               nfilegroups, modeltyps[i], 0, NULL, 0, NULL, NULL,
                               NULL, memiter, memiter, model[i], keymap, status);
