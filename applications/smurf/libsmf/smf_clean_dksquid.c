@@ -87,9 +87,11 @@
 *        Only fit gain of DKS, not gain and offset (to avoid COM offset degen.)
 *     2010-06-10 (EC):
 *        Don't remove the means here since that is handled by smf_clean_smfData
+*     2011-03-28 (DSB):
+*        Check for VAL__BADD when checking if dark squid ever changes.
 
 *  Copyright:
-*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2009-2011 Science & Technology Facilities Council.
 *     Copyright (C) 2008-2010 University of British Columbia.
 *     All Rights Reserved.
 
@@ -139,7 +141,7 @@ void smf_clean_dksquid( smfData *indata, smf_qual_t mask, size_t window, smfData
   int *dkgood=NULL;       /* Flag for non-constant dark squid */
   double *dksquid=NULL;   /* Buffer for smoothed dark squid */
   double *dkav=NULL;      /* Buffer for average dark squid */
-  int firstdk;            /* First value in dksquid signal */
+  double firstdk;         /* First value in dksquid signal */
   double gain;            /* Gain parameter from template fit */
   double *gainbuf=NULL;   /* Array of gains for all bolos in this col */
   size_t i;               /* Loop counter */
@@ -281,17 +283,21 @@ void smf_clean_dksquid( smfData *indata, smf_qual_t mask, size_t window, smfData
         }
 
         /* Check for a good dark squid by seeing if it ever changes */
-        firstdk = dksquid[jt1];
-        for( j=jt1+1; j<=jt2; j++ ) {
-          if( dksquid[j] != firstdk ) {
-            dkgood[i] = 1;
-            ngood++;
+        firstdk = VAL__BADD;
+        for( j=jt1; j<=jt2; j++ ) {
+          if(  dksquid[j] != VAL__BADD ) {
+            if( firstdk == VAL__BADD ) {
+              firstdk = dksquid[j];
+            } else if( dksquid[j] != firstdk ) {
+              dkgood[i] = 1;
+              ngood++;
 
-            /* Add good squid to average dksquid */
-            for( k=jt1; k<=jt2; k++ ) {
-              dkav[k] += dksquid[k];
+              /* Add good squid to average dksquid */
+              for( k=jt1; k<=jt2; k++ ) {
+                dkav[k] += dksquid[k];
+              }
+              break;
             }
-            break;
           }
         }
       }
