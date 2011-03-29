@@ -34,26 +34,22 @@
 # MAKEMAP_CONFIG = /home/echapin/dimmconfig.lis
 #
 
-
+export MAKEMAP_CONFIG_DIR=$HOME/$1
 SCRATCHDIR=/staging/$LOGNAME/scratch
 PERSISTDIR=/staging/$LOGNAME/persist
-export MAKEMAP_CONFIG_DIR=$HOME/$1
 
-if [ ! -d $SCRATCHDIR ]
-then
-  echo "Scratch directory doesn't exist, creating $SCRATCHDIR" 
-  mkdir $SCRATCHDIR
-fi
+# extra paranoid setup of /staging partition since we may need to
+# clean up from the last person who made it
 
-if [ ! -d $PERSISTDIR ]
-then
-  mkdir $PERSISTDIR
-fi
+sudo /bin/rm -rf /staging/*
+sudo chown root:root /staging
+sudo mkdir /staging/$LOGNAME
+sudo chown $LOGNAME:$LOGNAME /staging/$LOGNAME
+chmod +s /staging/$LOGNAME
 
-if [ ! -d $PERSISTDIR/$3 ]
-then
-  mkdir $PERSISTDIR/$3
-fi
+mkdir $SCRATCHDIR
+mkdir $PERSISTDIR
+mkdir $PERSISTDIR/$3
 
 echo "Job started at" >> $PERSISTDIR/$3/scuba2_map.log
 date >> $PERSISTDIR/$3/scuba2_map.log
