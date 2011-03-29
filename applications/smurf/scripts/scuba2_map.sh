@@ -35,8 +35,8 @@
 #
 
 
-SCRATCHDIR=/staging/scratch
-PERSISTDIR=/staging/persist
+SCRATCHDIR=/staging/$LOGNAME/scratch
+PERSISTDIR=/staging/$LOGNAME/persist
 export MAKEMAP_CONFIG_DIR=$HOME/$1
 
 if [ ! -d $SCRATCHDIR ]
