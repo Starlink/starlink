@@ -354,6 +354,14 @@ cleandk.order = 0
 
 #com.notfirst = 1
 
+# If this flag is set, the common-mode will be estimated while
+# iteratively flagging and removing outlier detectors as
+# usual. However, once the flagging is completed, the common-mode will
+# not actually be removed from the time-series (and if the model is
+# exported, it will be set to 0).
+
+#com.noremove=1
+
 # low-pass boxcar filter on COM (samples) to assist with convergence
 # if boxfact set reduce width of boxcar by this factor each iteration
 # boxmin specifies a minimum width below which it can't be reduced

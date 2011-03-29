@@ -557,6 +557,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   size_t noibstride;            /* bolo stride for noise */
   dim_t nointslice;             /* number of time slices for noise */
   size_t noitstride;            /* Time stride for noise */
+  int noremove=0;               /* Don't remove COM from time-series */
   int notfirst=0;               /* flag for delaying until after 1st iter */
   size_t ndchisq=0;             /* number of elements contributing to dchisq */
   dim_t ntslice=0;              /* Number of time slices */
@@ -632,6 +633,9 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
   /* Bolo rejection parameters */
   astMapGet0I(kmap, "NOTFIRST", &notfirst);
+
+  /* Don't remove common-mode from time-series? */
+  astMapGet0I(kmap, "NOREMOVE", &noremove);
 
   /* Are we using gains to adjust the flatfield? */
   astMapGet0I( gkmap, "FLATFIELD", &gflat );
@@ -984,121 +988,123 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     even if we are not using a GAI model).
     ----------------------------------------------------------------- */
 
-  /*  Allocate work space. */
-  woff = astMalloc( sizeof( *woff )*ntslice );
-  wg = astMalloc( sizeof( *wg )*ntslice );
-  woff_copy = astMalloc( sizeof( *woff_copy )*ntslice );
-  wg_copy = astMalloc( sizeof( *wg_copy )*ntslice );
+  if( !noremove ) {
 
-  for( idx=0; (idx<res->ndat)&&(*status==SAI__OK); idx++ ) {
-    smf_get_dims( res->sdata[idx],  NULL, NULL, NULL, NULL, NULL, &bstride,
-                  &tstride, status );
+    /*  Allocate work space. */
+    woff = astMalloc( sizeof( *woff )*ntslice );
+    wg = astMalloc( sizeof( *wg )*ntslice );
+    woff_copy = astMalloc( sizeof( *woff_copy )*ntslice );
+    wg_copy = astMalloc( sizeof( *wg_copy )*ntslice );
 
-    /* Get pointers */
-    res_data = (double *)(res->sdata[idx]->pntr)[0];
-    qua_data = (smf_qual_t *)(qua->sdata[idx]->pntr)[0];
-    if( gai ) {
-       smf_get_dims( gai->sdata[idx],  NULL, NULL, NULL, NULL, NULL,
-                     &gbstride, &gcstride, status);
-       gai_data = (gai->sdata[idx]->pntr)[0];
-       gai_copy = gai_data_copy[ idx ];
-    }
-    if( noi ) {
-      smf_get_dims( noi->sdata[idx],  NULL, NULL, NULL, &nointslice,
-                    NULL, &noibstride, &noitstride, status);
-      noi_data = (double *)(noi->sdata[idx]->pntr)[0];
-    }
+    for( idx=0; (idx<res->ndat)&&(*status==SAI__OK); idx++ ) {
+      smf_get_dims( res->sdata[idx],  NULL, NULL, NULL, NULL, NULL, &bstride,
+                    &tstride, status );
 
-    /* Loop round all bolometers. */
-    for( j = 0 ; j < nbolo && *status == SAI__OK; j++ ) {
+      /* Get pointers */
+      res_data = (double *)(res->sdata[idx]->pntr)[0];
+      qua_data = (smf_qual_t *)(qua->sdata[idx]->pntr)[0];
+      if( gai ) {
+        smf_get_dims( gai->sdata[idx],  NULL, NULL, NULL, NULL, NULL,
+                      &gbstride, &gcstride, status);
+        gai_data = (gai->sdata[idx]->pntr)[0];
+        gai_copy = gai_data_copy[ idx ];
+      }
+      if( noi ) {
+        smf_get_dims( noi->sdata[idx],  NULL, NULL, NULL, &nointslice,
+                      NULL, &noibstride, &noitstride, status);
+        noi_data = (double *)(noi->sdata[idx]->pntr)[0];
+      }
 
-      /* Initialise the index of the first time slice for the current
-         bolometer within the res_data and qua_data arrays. */
-      size_t ijindex = j*bstride;
+      /* Loop round all bolometers. */
+      for( j = 0 ; j < nbolo && *status == SAI__OK; j++ ) {
 
-      /* Skip bad bolometers */
-      if( !(qua_data[ ijindex ] & SMF__Q_BADB ) ) {
-        size_t inbase = j*noibstride;
+        /* Initialise the index of the first time slice for the current
+           bolometer within the res_data and qua_data arrays. */
+        size_t ijindex = j*bstride;
 
-        /* Get the gain and offset for each time slice. */
-        smf_gandoff( j, 0, ntslice-1, ntslice, gbstride, gcstride,
-                     gai_data, nblock, gain_box, wg, woff, status );
+        /* Skip bad bolometers */
+        if( !(qua_data[ ijindex ] & SMF__Q_BADB ) ) {
+          size_t inbase = j*noibstride;
 
-        /* Also get the previous gain and offset for each time slice. */
-        smf_gandoff( j, 0, ntslice-1, ntslice, gbstride, gcstride,
-                     gai_copy, nblock, gain_box, wg_copy, woff_copy,
-                     status );
+          /* Get the gain and offset for each time slice. */
+          smf_gandoff( j, 0, ntslice-1, ntslice, gbstride, gcstride,
+                       gai_data, nblock, gain_box, wg, woff, status );
 
-        /* Loop over all time slices. */
-        for( i = 0; i < ntslice; i++ ) {
+          /* Also get the previous gain and offset for each time slice. */
+          smf_gandoff( j, 0, ntslice-1, ntslice, gbstride, gcstride,
+                       gai_copy, nblock, gain_box, wg_copy, woff_copy,
+                       status );
 
-          g = wg[ i ];
-          off = woff[ i ];
-          g_copy = wg_copy[ i ];
-          off_copy = woff_copy[ i ];
+          /* Loop over all time slices. */
+          for( i = 0; i < ntslice; i++ ) {
 
-          if( (g!=VAL__BADD) && (g!=0) ) {
+            g = wg[ i ];
+            off = woff[ i ];
+            g_copy = wg_copy[ i ];
+            off_copy = woff_copy[ i ];
 
-            /* Important: if flat-fielding data re-scale noi. May have
-             different dimensions from res. */
-            if( gflat && noi && i < nointslice &&
-                noi_data[ inbase + i*noitstride ] != VAL__BADD ) {
-              noi_data[ inbase + i*noitstride ] /= (g*g);
-            }
+            if( (g!=VAL__BADD) && (g!=0) ) {
 
-            /* Remove the common mode */
-            if( !( qua_data[ijindex] & SMF__Q_MOD ) ){
-              if( model_data[ i ] != VAL__BADD ) {
-                if( gflat ) {
-                  /* If correcting the flatfield, scale data to match
-                     template amplitude first, then remove */
-                  res_data[ijindex] =
-                    (res_data[ijindex] - off)/g - model_data[i];
-                } else {
-                  /* Otherwise subtract scaled template off data */
-                  res_data[ijindex] -= (g*model_data[i] + off);
-                }
+              /* Important: if flat-fielding data re-scale noi. May have
+                 different dimensions from res. */
+              if( gflat && noi && i < nointslice &&
+                  noi_data[ inbase + i*noitstride ] != VAL__BADD ) {
+                noi_data[ inbase + i*noitstride ] /= (g*g);
+              }
 
-                /* also measure contribution to dchisq */
-                if( noi &&
-                    (noi_data[inbase+(i%nointslice)*noitstride] != 0) &&
-                    !(qua_data[ijindex]&SMF__Q_GOOD) ) {
-
+              /* Remove the common mode */
+              if( !( qua_data[ijindex] & SMF__Q_MOD ) ){
+                if( model_data[ i ] != VAL__BADD ) {
                   if( gflat ) {
-                    /* Compare change in template + offset/g */
-                    dchisq += ( (model_data[i] + off/g) -
-                                (model_data_copy[i] + off_copy/g_copy) ) *
-                      ( (model_data[i] + off/g) -
-                        (model_data_copy[i] + off_copy/g_copy) ) /
-                      noi_data[inbase + (i%nointslice)*noitstride];
-                    ndchisq++;
+                    /* If correcting the flatfield, scale data to match
+                       template amplitude first, then remove */
+                    res_data[ijindex] =
+                      (res_data[ijindex] - off)/g - model_data[i];
                   } else {
-                    /* Otherwise scale the template and measure change*/
-                    dchisq += ((g*model_data[i] + off) -
-                               (g_copy*model_data_copy[i] + off_copy)) *
-                      ((g*model_data[i] + off) -
-                       (g_copy*model_data_copy[i] + off_copy)) /
-                      noi_data[inbase + (i%nointslice)*noitstride];
-                    ndchisq++;
+                    /* Otherwise subtract scaled template off data */
+                    res_data[ijindex] -= (g*model_data[i] + off);
                   }
+
+                  /* also measure contribution to dchisq */
+                  if( noi &&
+                      (noi_data[inbase+(i%nointslice)*noitstride] != 0) &&
+                      !(qua_data[ijindex]&SMF__Q_GOOD) ) {
+
+                    if( gflat ) {
+                      /* Compare change in template + offset/g */
+                      dchisq += ( (model_data[i] + off/g) -
+                                  (model_data_copy[i] + off_copy/g_copy) ) *
+                        ( (model_data[i] + off/g) -
+                          (model_data_copy[i] + off_copy/g_copy) ) /
+                        noi_data[inbase + (i%nointslice)*noitstride];
+                      ndchisq++;
+                    } else {
+                      /* Otherwise scale the template and measure change*/
+                      dchisq += ((g*model_data[i] + off) -
+                                 (g_copy*model_data_copy[i] + off_copy)) *
+                        ((g*model_data[i] + off) -
+                         (g_copy*model_data_copy[i] + off_copy)) /
+                        noi_data[inbase + (i%nointslice)*noitstride];
+                      ndchisq++;
+                    }
+                  }
+                } else {
+                  qua_data[ijindex] |= SMF__Q_COM;
                 }
-              } else {
-                qua_data[ijindex] |= SMF__Q_COM;
               }
             }
+            ijindex += tstride;
           }
-          ijindex += tstride;
         }
       }
     }
+
+    /*  Free work space. */
+    woff = astFree( woff );
+    wg = astFree( wg );
+    woff_copy = astFree( woff_copy );
+    wg_copy = astFree( wg_copy );
   }
-
-  /*  Free work space. */
-  woff = astFree( woff );
-  wg = astFree( wg );
-  woff_copy = astFree( woff_copy );
-  wg_copy = astFree( wg_copy );
-
 
   /* If any blocks of bolometer values were flagged, replace the bad
      bolometer values with artifical data that is continuous with the
@@ -1112,7 +1118,10 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     }
   }
 
-
+  /* If we're not removing the common-mode, set it to 0 here */
+  if( noremove && (*status==SAI__OK) ) {
+    memset(model_data,0,(model->sdata[0]->dims)[0]*sizeof(*model_data));
+  }
 
   /* If damping boxcar smooth, reduce window size here */
   if( do_boxcar && do_boxfact && (*status == SAI__OK) ) {
