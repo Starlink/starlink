@@ -413,6 +413,9 @@ void smurf_sc2clean( int *status ) {
          information was written to the NDF (in smf_open_and_flatfield). */
       smf_puthistory( odata, "SMURF:SC2CLEAN", status );
 
+      /* Ensure ICD data order */
+      smf_dataOrder( odata, 1, status );
+
       if( odata->file && odata->file->name ) {
         smf_write_smfData( odata, NULL, NULL, ogrp, gcount, NDF__NOID, status );
       } else {
