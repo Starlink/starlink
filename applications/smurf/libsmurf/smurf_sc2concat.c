@@ -191,8 +191,8 @@ void smurf_sc2concat( int *status ) {
   fgrp = NULL;
 
   if (isize == 0) {
-    msgOutif(MSG__NORM, " ","All supplied input frames were DARK,"
-             " nothing to concatenate", status );
+    msgOutif(MSG__NORM, " ","All supplied input frames were filtered,"
+       " nothing to do", status );
     goto CLEANUP;
   }
 
