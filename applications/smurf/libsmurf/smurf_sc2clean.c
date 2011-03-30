@@ -81,8 +81,15 @@
 *          will be ignored. Parameters not understood will trigger an
 *          error. Use the "cleandk." namespace for configuring
 *          cleaning parameters for the dark squids. [current value]
+*     FLAT = _LOGICAL (Read)
+*          If set ensure data are flatfielded. If not set do not scale the
+*          data in any way (but convert to DOUBLE). [TRUE]
 *     IN = NDF (Read)
 *          Input files to be cleaned
+*     MAXLEN = _DOUBLE (Read)
+*          Maximum length (in seconds) for concatenated file. The
+*          default is to use all data if possible (subject to
+*          available memory). [!]
 *     MSG_FILTER = _CHAR (Read)
 *          Control the verbosity of the application. Values can be
 *          NONE (no messages), QUIET (minimal messages), NORMAL,
@@ -93,75 +100,14 @@
 *          The name of text file to create, in which to put the names of
 *          all the output NDFs created by this application (one per
 *          line). If a null (!) value is supplied no file is created. [!]
-
-*  Configuration Parameters:
-*     APOD = INTEGER Apodize signals (smoothly roll-off) using
-*       sine/cosine functions at start and end of the signal across
-*       this many samples. The supplied APOD value is ignored and a
-*       value of zero is used if ZEROPAD is set to 0.
-*     BADFRAC = REAL
-*       Flag entire bolometer as dead if at least this fraction of the samples
-*       in a detector time series were flagged as bad by the DA system.
-*     DCFITBOX = REAL
-*       Number of samples (box size) used on either side of a DC step to
-*       estimate the height of the step.
-*     DCMAXSTEPS = INTEGER
-*       The maximum number of steps that can be corrected in each minute of
-*       good data (i.e. per 12000 samples) from a bolometer before the entire
-*       bolometer is flagged as bad. A value of zero will cause a bolometer to
-*       be rejected if any steps are found in the bolometer data stream.
-*     DCSMOOTH = INTEGER
-*       The width of the median filter used to smooth a bolometer data stream
-*       prior to finding DC steps.
-*     DCTHRESH = REAL
-*       Threshold S/N to detect and flag DC (baseline) steps.
-*     DKCLEAN = LOGICAL
-*       Clean the bolometers using the dark squids. Defaults to false.
-*     FILLGAPS = LOGICAL
-*       Fill vicinity of spikes / DC steps with constrained realization of
-*       noise. Also (unless ZEROPAD is 1), fill the padded region at the start
-*       and end of each time stream with artificial data. You almost always
-*       want to do this.
-*     FILT_EDGEHIGH = REAL
-*       Hard-edge high-pass frequency-domain filter (Hz).
-*     FILT_EDGELOW = REAL
-*       Hard-edge low-pass frequency-domain filter (Hz).
-*     FILT_NOTCHHIGH( ) = REAL
-*       Hard-edge band-cut frequency-domain notch filters. FILT_NOTCHHIGH is
-*       an array of upper-edge frequencies (Hz).
-*     FILT_NOTCHLOW( ) = REAL
-*       Array of lower-edge frequencies corresponding to FILT_NOTCHHIGH.
-*     FLAGSTAT = REAL
-*       Flag data taken while the telescope was stationary so that it
-*       they are ignored in the final map. The value given is a threshold
-*       slew velocity (arcsec/sec) measured in tracking coordinates
-*       below which the telescope is considered to be stationary.
-*     ORDER = INTEGER
-*       Subtract a fitted baseline polynomial of this order (0 to remove mean).
-*     SPIKEBOX = INTEGER
-*       The size of the filter box for the sigma-clipper.
-*     SPIKETHRESH = REAL
-*       Threshold S/N to flag spikes using sigma-clipper.
-*     ZEROPAD = LOGICAL
-*       Determines the nature of the padding added to the start and end of
-*       each bolometer time stream. Padding is needed to avoid
-*       interaction between the data values at the start and end of each
-*       bolometer time stream, due to the cyclic wrap-around nature of the
-*       FFTs used to filter each time stream. If ZEROPAD is set to 1, the
-*       padded sections will be filled with zeros. This requires that the
-*       data also be apodised (see APOD) to avoid ringing due the sudden
-*       steps down to zero at the start and end of each time stream). If
-*       ZEROPAD is set to 0, then the padded regions will be filled with
-*       artificial data that links the data values at the start and end of
-*       the time stream smoothly. In this case, no apodisation is
-*       performed, and the value of the APOD parameter is ignored. The
-*       default for ZEROPAD is 0 (i.e. pad with artificial data rather
-*       than zeros) unless FILLGAPS is zero, in which case the supplied
-*       ZEROPAD value is ignored and a value of 1 is always used.
+*     PADEND = _INTEGER (Read)
+*          Number of samples to pad at end. Default is no padding. [!]
+*     PADSTART = _INTEGER (Read)
+*          Number of samples to pad at start. Default is no padding. [!]
+*     USEDARKS = _LOGICAL (Read)
+*          Use darks to mask data. [TRUE]
 
 *  Notes:
-*     - Replacing spikes with noise is not yet implemented.
-*     - Assumes that padding has been applied externally (e.g. in SC2CONCAT)
 *     - The default values and allowed parameters can be found in
 *     $SMURF_DIR/smurf_sc2clean.def
 *     - An iterative map-maker config file can be used.
@@ -216,12 +162,14 @@
 *        Add BBM support
 *     2010-08-19 (DSB):
 *        Complete output NDF history by calling smf_puthistory before exiting.
+*     2011-03-30 (EC):
+*        Add concatenation functionality from SMURF:SC2CONCAT
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008-2010 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2008-2010 University of British Columbia.
+*     Copyright (C) 2008-2011 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -273,18 +221,33 @@
 #define TASK_NAME "SC2CLEAN"
 
 void smurf_sc2clean( int *status ) {
-  smfArray *array = NULL;   /* Data to be cleaned */
-  smfArray *bbms = NULL;    /* Bad bolometer masks */
-  smfArray *darks = NULL;   /* Dark data */
+  smfArray *array = NULL;    /* Data to be cleaned */
+  Grp *basegrp=NULL;         /* Grp containing first file each chunk */
+  size_t basesize;           /* Number of files in base group */
+  smfArray *bbms = NULL;     /* Bad bolometer masks */
+  smfArray *concat=NULL;     /* Pointer to a smfArray */
+  size_t contchunk;          /* Continuous chunk counter */
+  smfArray *darks = NULL;    /* Dark data */
+  int ensureflat;            /* Flag for flatfielding data */
   smfArray *flatramps = NULL;/* Flatfield ramps */
-  smfData *ffdata = NULL;   /* Pointer to output data struct */
-  Grp *fgrp = NULL;         /* Filtered group, no darks */
-  size_t i = 0;             /* Counter, index */
-  Grp *igrp = NULL;         /* Input group of files */
-  Grp *ogrp = NULL;         /* Output group of files */
-  size_t outsize;           /* Total number of NDF names in the output group */
-  size_t size;              /* Number of files in input group */
-  smfWorkForce *wf = NULL;  /* Pointer to a pool of worker threads */
+  smfData *odata = NULL;     /* Pointer to output data struct */
+  Grp *fgrp = NULL;          /* Filtered group, no darks */
+  size_t gcount=0;           /* Grp index counter */
+  size_t idx;                /* Subarray counter */
+  Grp *igrp = NULL;          /* Input group of files */
+  smfGroup *igroup=NULL;     /* smfGroup corresponding to igrp */
+  dim_t maxconcat=0;         /* Longest continuous chunk length in samples */
+  dim_t maxlen=0;            /* Constrain maxconcat to this many samples */
+  double maxlen_s;           /* Constrain maxconcat to this many seconds */
+  size_t ncontchunks=0;      /* Number continuous chunks outside iter loop */
+  Grp *ogrp = NULL;          /* Output group of files */
+  size_t osize;              /* Total number of NDF names in the output group */
+  dim_t padStart=0;          /* How many samples padding at start */
+  dim_t padEnd=0;            /* How many samples padding at end */
+  size_t size;               /* Number of files in input group */
+  int temp;                  /* Temporary signed integer */
+  int usedarks;              /* flag for using darks */
+  smfWorkForce *wf = NULL;   /* Pointer to a pool of worker threads */
 
   /* Main routine */
   ndfBegin();
@@ -307,52 +270,88 @@ void smurf_sc2clean( int *status ) {
   igrp = fgrp;
   fgrp = NULL;
 
-  if (size > 0) {
-    /* Get output file(s) */
-    kpg1Wgndf( "OUT", igrp, size, size, "More output files required...",
-               &ogrp, &outsize, status );
-  } else {
+  if (size == 0) {
     msgOutif(MSG__NORM, " ","All supplied input frames were filtered,"
        " nothing to do", status );
+    goto CLEANUP;
   }
+
+  /* --- Parse ADAM parameters ---------------------------------------------- */
+
+  /* Maximum length of a continuous chunk */
+  parGdr0d( "MAXLEN", 0, 0, VAL__MAXI, 1, &maxlen_s, status );
+  if( maxlen_s > 0 ) {
+    /* Obtain sample length from header of first file in igrp */
+    smf_open_file( igrp, 1, "READ", SMF__NOCREATE_DATA, &odata, status );
+    if( (*status == SAI__OK) && odata && (odata->hdr) ) {
+      maxlen = (dim_t) (maxlen_s / odata->hdr->steptime);
+    }
+    if( odata ) smf_close_file( &odata, status );
+  } else {
+    maxlen = 0;
+  }
+
+  /* Padding */
+  parGdr0i( "PADSTART", 0, 0, VAL__MAXI, 1, &temp, status );
+  padStart = (dim_t) temp;
+
+  parGdr0i( "PADEND", 0, 0, VAL__MAXI, 1, &temp, status );
+  padEnd = (dim_t) temp;
+
+  /* Are we using darks? */
+  parGet0l( "USEDARKS", &usedarks, status );
+
+  /* Are we flatfielding? */
+  parGet0l( "FLAT", &ensureflat, status );
 
   /* Get group of bolometer masks and read them into a smfArray */
   smf_request_mask( "BBM", &bbms, status );
 
-  /* Loop over input files */
-  if( *status == SAI__OK ) for( i=1; i<=size; i++ ) {
-    AstKeyMap * sub_instruments = NULL;
-    AstKeyMap * keymap = NULL;
+  /* Group the input files by subarray and continuity ----------------------- */
 
-    /* Open and flatfield in case we're using raw data */
-    smf_open_and_flatfield(igrp, ogrp, i, darks, flatramps, &ffdata, status);
+  smf_grp_related( igrp, size, 1, maxlen-padStart-padEnd, NULL, 0, &maxconcat,
+                   NULL, &igroup, &basegrp, NULL, status );
 
-    /* Apply a mask to the quality array and data array */
-    smf_apply_mask( ffdata, bbms, SMF__BBM_QUAL|SMF__BBM_DATA, 0, status );
+  /* Obtain the number of continuous chunks and subarrays */
+  if( *status == SAI__OK ) {
+    ncontchunks = igroup->chunk[igroup->ngroups-1]+1;
+  }
 
-    /* Place cleaning parameters into a keymap and set defaults. Do
-       this inside the loop in case we are cleaning files with
-       differing sub-instruments.  Note that we use the map-maker
-       defaults file here (which loads the sc2clean defaults) so that
-       we populate the locked keymap with all the parameters that
-       people may come across to allow them to load their map-maker
-       config directly into sc2clean.
-    */
+  basesize = grpGrpsz( basegrp, status );
 
-    sub_instruments = smf_subinst_keymap( ffdata, NULL, 0, status );
-    keymap = kpg1Config( "CONFIG", "$SMURF_DIR/smurf_makemap.def",
-                         sub_instruments, status );
-    sub_instruments = astAnnul( sub_instruments );
+  /* Get output file(s) */
+  kpg1Wgndf( "OUT", basegrp, basesize, basesize,
+             "More output files required...",
+             &ogrp, &osize, status );
 
-    if (*status != SAI__OK) {
-      /* Tell the user which file went bad... */
-      /* Might be user-friendly to trap 1st etc and then continue on... */
-      msgSeti("I",i);
-      msgSeti("N",size);
-      errRep(FUNC_NAME,	"Error opening file ^I of ^N", status);
-      if (size > 1 && i != size) errFlush(status);
-    } else {
+ /* Loop over continuous chunks and clean ------------------------------------*/
+  gcount = 1;
+  for( contchunk=0;(*status==SAI__OK)&&contchunk<ncontchunks; contchunk++ ) {
+
+    /* Concatenate this continuous chunk */
+    smf_concat_smfGroup( wf, igroup, usedarks ? darks:NULL, bbms, flatramps,
+                         contchunk, ensureflat, 1, NULL, 0, NULL, NULL,
+                         padStart, padEnd, 0, 1, &concat, status );
+
+    if( *status == SAI__OK) {
+      AstKeyMap *keymap=NULL;
       int dkclean;
+      AstKeyMap *sub_instruments=NULL;
+
+
+      /* Place cleaning parameters into a keymap and set defaults. Do
+         this inside the loop in case we are cleaning files with
+         differing sub-instruments.  Note that we use the map-maker
+         defaults file here (which loads the sc2clean defaults) so that
+         we populate the locked keymap with all the parameters that
+         people may come across to allow them to load their map-maker
+         config directly into sc2clean.
+      */
+
+      sub_instruments = smf_subinst_keymap( concat->sdata[0], NULL, 0, status );
+      keymap = kpg1Config( "CONFIG", "$SMURF_DIR/smurf_makemap.def",
+                           sub_instruments, status );
+      if( sub_instruments ) sub_instruments = astAnnul( sub_instruments );
 
       /* clean the dark squids now since we might need to use them
          to clean the bolometer data */
@@ -362,66 +361,73 @@ void smurf_sc2clean( int *status ) {
                         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                         NULL, NULL, status );
 
-      if( dkclean && ffdata && ffdata->da && ffdata->da->dksquid ) {
-        smfData *dksquid = ffdata->da->dksquid;
-        AstKeyMap *kmap=NULL;
+      for( idx=0; dkclean&&(*status==SAI__OK)&&idx<concat->ndat; idx++ ) {
+        odata = concat->sdata[idx];
 
-        msgOut("", TASK_NAME ": cleaning dark squids", status);
+        if( odata && odata->da && odata->da->dksquid ) {
+          smfData *dksquid = odata->da->dksquid;
+          AstKeyMap *kmap=NULL;
 
-        /* fudge the header so that we can get at JCMTState */
-        dksquid->hdr = ffdata->hdr;
+          msgOut("", TASK_NAME ": cleaning dark squids", status);
 
-        /* clean darks using cleandk.* parameters */
-        astMapGet0A( keymap, "CLEANDK", &kmap );
-        array = smf_create_smfArray( status );
-        smf_addto_smfArray( array, dksquid, status );
-        smf_clean_smfArray( wf, array, NULL, kmap, status );
-        if( array ) {
-          array->owndata = 0;
-          smf_close_related( &array, status );
+          /* fudge the header so that we can get at JCMTState */
+          dksquid->hdr = odata->hdr;
+
+          /* clean darks using cleandk.* parameters */
+          astMapGet0A( keymap, "CLEANDK", &kmap );
+          array = smf_create_smfArray( status );
+          smf_addto_smfArray( array, dksquid, status );
+          smf_clean_smfArray( wf, array, NULL, kmap, status );
+          if( array ) {
+            array->owndata = 0;
+            smf_close_related( &array, status );
+          }
+          if( kmap ) kmap = astAnnul( kmap );
+
+          /* Unset hdr pointer so that we don't accidentally close it */
+          dksquid->hdr = NULL;
         }
-        if( kmap ) kmap = astAnnul( kmap );
-
-        /* Unset hdr pointer so that we don't accidentally close it */
-        dksquid->hdr = NULL;
       }
 
+      /* Then the main data arrays */
       msgOut("", TASK_NAME ": cleaning bolometer data", status );
-
-      /* Clean the data */
-      array = smf_create_smfArray( status );
-      smf_addto_smfArray( array, ffdata, status );
-      smf_clean_smfArray( wf, array, NULL, keymap, status );
-      if( array ) {
-        array->owndata = 0;
-        smf_close_related( &array, status );
-      }
-
-      /* Ensure that the data is ICD ordered before closing */
-      smf_dataOrder( ffdata, 1, status );
+      smf_clean_smfArray( wf, concat, NULL, keymap, status );
 
       /* Report statistics (currently need a smfArray for that) */
       if (*status == SAI__OK) {
-        smfArray *tmparr = smf_create_smfArray( status );
         size_t last_qcount[SMF__NQBITS];
         size_t last_nmap = 0;
-        if (tmparr) tmparr->owndata = 0;  /* someone else owns smfData */
-        smf_addto_smfArray( tmparr, ffdata, status );
-        smf_qualstats_report( MSG__VERB, SMF__QFAM_TSERIES, 1, tmparr,
+        smf_qualstats_report( MSG__VERB, SMF__QFAM_TSERIES, 1, concat,
                               last_qcount, &last_nmap, 1, NULL, NULL, status );
-        smf_close_related( &tmparr, status );
       }
+
+      if( keymap ) keymap = astAnnul( keymap );
     }
 
-    /* Complete the history iunformation in the output NDF so that it
-       includes group parameters accessed since the default history
-       information was written to the NDF (in smf_open_and_flatfield). */
-    smf_puthistory( ffdata, "SMURF:SC2CLEAN", status );
+    /* Export concatenated/cleaned data for each subarray to NDF file */
+    for( idx=0; (*status==SAI__OK)&&idx<concat->ndat; idx++ ) {
+      odata = concat->sdata[idx];
 
-    /* Free resources for output data */
-    smf_close_file( &ffdata, status );
-    if( keymap ) keymap = astAnnul( keymap );
+      /* Complete the history information in the output NDF so that it
+         includes group parameters accessed since the default history
+         information was written to the NDF (in smf_open_and_flatfield). */
+      smf_puthistory( odata, "SMURF:SC2CLEAN", status );
 
+      if( odata->file && odata->file->name ) {
+        smf_write_smfData( odata, NULL, NULL, ogrp, gcount, NDF__NOID, status );
+      } else {
+        *status = SAI__ERROR;
+        errRep( FUNC_NAME,
+                "Unable to determine file name for concatenated data.",
+                status );
+      }
+
+      /* Increment the group index counter */
+      gcount++;
+    }
+
+    /* Close the smfArray */
+    smf_close_related( &concat, status );
   }
 
   /* Write out the list of output NDF names, annulling the error if a null
@@ -431,12 +437,16 @@ void smurf_sc2clean( int *status ) {
     if( *status == PAR__NULL ) errAnnul( status );
   }
 
+ CLEANUP:
+
   /* Tidy up after ourselves: release the resources used by the grp routines */
-  if (darks) smf_close_related( &darks, status );
-  if (flatramps) smf_close_related( &flatramps, status );
-  if (bbms) smf_close_related( &bbms, status );
-  grpDelet( &igrp, status);
-  grpDelet( &ogrp, status);
+  if( darks ) smf_close_related( &darks, status );
+  if( flatramps ) smf_close_related( &flatramps, status );
+  if( bbms ) smf_close_related( &bbms, status );
+  if( igrp ) grpDelet( &igrp, status);
+  if( ogrp ) grpDelet( &ogrp, status);
+  if( basegrp ) grpDelet( &basegrp, status );
+  if( igroup ) smf_close_smfGroup( &igroup, status );
   if( wf ) wf = smf_destroy_workforce( wf );
   fftw_cleanup();
   ndfEnd( status );

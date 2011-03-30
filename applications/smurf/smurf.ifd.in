@@ -3076,6 +3076,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter flat {
+                type _LOGICAL
+                vpath {DEFAULT }
+                prompt {If set ensure data are flatfielded}
+                ppath GLOBAL CURRENT
+                default TRUE
+                helpkey *
+            }
+
             parameter in {
                 position 1
                 type NDF
@@ -3083,6 +3092,16 @@ package @PACKAGE@ {
                 vpath {PROMPT }
                 association <-GLOBAL.DATA_ARRAY
                 prompt {Input timeseries}
+                helpkey *
+            }
+
+            parameter maxlen {
+                type _DOUBLE
+                access READ
+                ppath CURRENT DEFAULT
+                prompt {Maximum concatenated length in seconds}
+                vpath DEFAULT
+                default !
                 helpkey *
             }
 
@@ -3102,6 +3121,35 @@ package @PACKAGE@ {
                 default !
                 vpath DEFAULT
                 ppath CURRENT DEFAULT
+                helpkey *
+            }
+
+            parameter padend {
+                type _INTEGER
+                access READ
+                ppath CURRENT DEFAULT
+                prompt {Number of samples to pad at start}
+                vpath DEFAULT
+                default !
+                helpkey *
+            }
+
+            parameter padstart {
+                type _INTEGER
+                access READ
+                ppath CURRENT DEFAULT
+                prompt {Number of samples to pad at end}
+                vpath DEFAULT
+                default !
+                helpkey *
+            }
+
+            parameter usedarks {
+                type _LOGICAL
+                vpath {DEFAULT }
+                prompt {If set mask data using darks}
+                ppath GLOBAL CURRENT
+                default FALSE
                 helpkey *
             }
 
