@@ -92,6 +92,8 @@
 *        Add "pcathresh" option to do PCA cleaning as a pre-processing step
 *     2011-03-23 (DSB):
 *        Use smf_select_quality to get pointer to quality arrays.
+*     2011-03-30 (EC):
+*        Only measure/flag slew speeds when telescope moving
 
 *  Copyright:
 *     Copyright (C) 2010-2011 Univeristy of British Columbia.
@@ -256,23 +258,38 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
           msgOutiff( MSG__VERB, "", FUNC_NAME
                      ": Flagging regions with slew speeds > %.2lf arcsec/sec",
                      status, flagfast );
+
+
+          /* Check to see if this was a sequence type that involved
+             motion.  If not, skip this section */
+          if( data && data->hdr && (
+                                    (data->hdr->seqtype==SMF__TYP_SCIENCE) ||
+                                    (data->hdr->seqtype==SMF__TYP_POINTING) ||
+                                    (data->hdr->seqtype==SMF__TYP_FOCUS) ||
+                                    (data->hdr->seqtype==SMF__TYP_SKYDIP)) ) {
+
+            smf_flag_slewspeed( data, flagslow, flagfast, &nflag, &scanvel,
+                              status );
+            msgOutiff( MSG__VERB,"", "%zu new time slices flagged", status,
+                       nflag);
+
+            if( msgIflev( NULL, status ) >= MSG__VERB ) {
+              msgOutf( "", FUNC_NAME ": mean SCANVEL=%.2lf arcsec/sec"
+                       " (was %.2lf)", status, scanvel, data->hdr->scanvel );
+            }
+
+            data->hdr->scanvel = scanvel;
+
+            /*** TIMER ***/
+            msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+                       ":   ** %f s flagging outlier slew speeds",
+                       status, smf_timerupdate(&tv1,&tv2,status) );
+          } else {
+            msgOutif( MSG__VERB, "", FUNC_NAME
+                      ": not a moving sequence or missing header, "
+                      "skipping slew speed flagging", status );
+          }
         }
-
-        smf_flag_slewspeed( data, flagslow, flagfast, &nflag, &scanvel,
-                            status );
-        msgOutiff( MSG__VERB,"", "%zu new time slices flagged", status, nflag);
-
-        if( msgIflev( NULL, status ) >= MSG__VERB ) {
-          msgOutf( "", FUNC_NAME ": mean SCANVEL=%.2lf arcsec/sec"
-                   " (was %.2lf)", status, scanvel, data->hdr->scanvel );
-        }
-
-        data->hdr->scanvel = scanvel;
-
-        /*** TIMER ***/
-        msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
-                   ":   ** %f s flagging outlier slew speeds",
-                   status, smf_timerupdate(&tv1,&tv2,status) );
       } else {
         msgOutif( MSG__DEBUG, "", FUNC_NAME
                   ": Skipping flagslow/flagfast because no header present",
