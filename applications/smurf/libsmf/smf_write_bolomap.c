@@ -251,16 +251,18 @@ void smf_write_bolomap( smfArray *ast, smfArray *res, smfArray *lut,
             curmap = astCalloc( msize, sizeof(*curmap), 1 );
             curvar = astCalloc( msize, sizeof(*curvar), 1 );
             addtomap = 1;
-          } else {
+          } else if( *status == DAT__NAMIN ) {
             /* Create a new extension */
             errAnnul( status );
             smf_open_newfile ( mgrp, 1, SMF__DOUBLE, 2, lbnd_out,
                                ubnd_out, SMF__MAP_VAR, &mapdata, status);
 
             /* Rebin directly into the newly mapped space */
-            curmap = mapdata->pntr[0];
-            curvar = mapdata->pntr[1];
-            addtomap = 0;
+            if( *status == SAI__OK ) {
+              curmap = mapdata->pntr[0];
+              curvar = mapdata->pntr[1];
+              addtomap = 0;
+            }
           }
 
           /* Rebin the data for this single bolometer. Don't care
