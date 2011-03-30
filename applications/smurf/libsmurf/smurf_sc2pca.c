@@ -166,8 +166,8 @@ void smurf_sc2pca( int *status ) {
   /* Are we flatfielding? */
   parGet0l( "FLAT", &ensureflat, status );
 
-  /* Filter out darks */
-  smf_find_science( igrp, &fgrp, 0, NULL, NULL, 1, 1, SMF__NULL, &darks,
+  /* Filter out useful data (revert to darks if no science data) */
+  smf_find_science( igrp, &fgrp, 1, NULL, NULL, 1, 1, SMF__NULL, &darks,
                     &flatramps, NULL, status );
 
   /* input group is now the filtered group so we can use that and
