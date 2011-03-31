@@ -53,6 +53,7 @@ makemap \
 qlmakemap \
 rawfixmeta \
 rawpress \
+rawrecreatewcs \
 rawunpress \
 remsky \
 sc2clean \

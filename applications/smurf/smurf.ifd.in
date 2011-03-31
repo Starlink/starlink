@@ -2909,6 +2909,22 @@ package @PACKAGE@ {
 
         }
 
+        action rawrecreatewcs {
+
+            helplib {$SMURF_HELP}
+
+            parameter ndf {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT }
+                association <-GLOBAL.DATA_ARRAY
+                prompt {Input ACSIS timeseries}
+                helpkey *
+            }
+
+        }
+
         action rawunpress {
 
             helplib {$SMURF_HELP}
