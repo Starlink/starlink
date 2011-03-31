@@ -987,6 +987,7 @@ NDFinfo *traceMNDFs( NDFinfo **headptr, HDSLoc *baseloc, int baseid,
                      int deepsearch, const char *slice )
 {
     HDSLoc *newloc = NULL;
+    NDFinfo *laststate = NULL;
     NDFinfo *newstate = NULL;
     NDFinfo *state = NULL;
     char *emess = NULL;
@@ -1011,6 +1012,7 @@ NDFinfo *traceMNDFs( NDFinfo **headptr, HDSLoc *baseloc, int baseid,
 
     /* Initialise the result. */
     state = *headptr;
+    laststate = NULL;
 
     datNcomp( baseloc, &ncomp, &status );
     if ( status != SAI__OK ) {
@@ -1058,6 +1060,7 @@ NDFinfo *traceMNDFs( NDFinfo **headptr, HDSLoc *baseloc, int baseid,
                 newstate = (NDFinfo *) malloc( sizeof( NDFinfo ) );
                 if ( state != NULL ) {
                     state->next = newstate;
+                    laststate = state;
                 }
                 else {
                     /*  No existing info structs, so start a list. */
@@ -1081,7 +1084,24 @@ NDFinfo *traceMNDFs( NDFinfo **headptr, HDSLoc *baseloc, int baseid,
             free( emess );
             emess = NULL;
         }
+
         datAnnul( &newloc, &status );
+        if ( status != SAI__OK ) {
+            /*  Something very bad happened. Truncate the search and release
+             *  current state (this may have forced something to be exhausted
+             *  and stop further processing, so we're better off without
+             *  it). */
+            if ( laststate != NULL ) {
+                if ( state != NULL ) {
+                    gaiaReleaseMNDF( state );
+                }
+                state = laststate;
+                state->next = NULL;
+                fprintf( stderr, "WARNING: truncated number of NDFs accessed "
+                         "to %d (found %d)\n", i, ncomp );
+            }
+            break;
+        }
     }
 
     if ( status != SAI__OK ) {
