@@ -5,6 +5,11 @@ if( $# < 1 ) then
    echo
    echo "Produces a 2D polynomial describing the SCUBA-2 focal plane distortion"
    echo
+   echo "    NOTE - to create distortion maps using the bolomap method, the "
+   echo "    distmap script should be used as it allows new observations to be"
+   echo "    added into the map incrementally."
+   echo
+   echo
    echo "Usage: distortion <inlist> [-r|-t|-extra] [-p]"
    echo
    echo "   <inlist> is a text file in which each line contains the path"
@@ -469,20 +474,28 @@ foreach indir ($dir_list)
          set subarray = `$KAPPA_DIR/fitsmod junk edit=print keyword=SUBARRAY`
          if( "$subarray" == "s8a" ) then
             set array = 0
+            set ucarray = S8A
          else if( "$subarray" == "s8b" ) then
             set array = 1
+            set ucarray = S8B
          else if( "$subarray" == "s8c" ) then
             set array = 2
+            set ucarray = S8C
          else if( "$subarray" == "s8d" ) then
             set array = 3
+            set ucarray = S8D
          else if( "$subarray" == "s4a" ) then
             set array = 4
+            set ucarray = S4A
          else if( "$subarray" == "s4b" ) then
             set array = 5
+            set ucarray = S4B
          else if( "$subarray" == "s4c" ) then
             set array = 6
+            set ucarray = S4C
          else if( "$subarray" == "s4d" ) then
             set array = 7
+            set ucarray = S4D
          else
             echo "Unknown subarray - $subarray"
             exit
@@ -500,34 +513,6 @@ foreach indir ($dir_list)
                set negative = 0;
             else
                set negative = 1;
-            endif
-
-#  Get the highest chunk number (only check up to 5 chunks).
-            grep "Writing single bolo map" makemap.log | grep CH05 > /dev/null
-            if( $status == 0 ) then
-               set top_chunk = 5
-            else
-               grep "Writing single bolo map" makemap.log | grep CH04 > /dev/null
-               if( $status == 0 ) then
-                  set top_chunk = 4
-               else
-                  grep "Writing single bolo map" makemap.log | grep CH03 > /dev/null
-                  if( $status == 0 ) then
-                     set top_chunk = 3
-                  else
-                     grep "Writing single bolo map" makemap.log | grep CH02 > /dev/null
-                     if( $status == 0 ) then
-                        set top_chunk = 2
-                     else
-                        grep "Writing single bolo map" makemap.log | grep CH01 > /dev/null
-                        if( $status == 0 ) then
-                           set top_chunk = 1
-                        else
-                           set top_chunk = 0
-                        endif
-                     endif
-                  endif
-               endif
             endif
 
 #  Get the date.
@@ -596,7 +581,7 @@ foreach indir ($dir_list)
 #  Write the header for the output catalogue.
             echo "# SCUBA-2 focal plane distortion data" > $cat
             echo "#" >> $cat
-            echo "# ICH - zero-based makemap chunk index" >> $cat
+            echo "# ICH - zero-based makemap chunk index (now unused)" >> $cat
             echo "# BC1 - array pixel X coord at centre of source " >> $cat
             echo "# BC2 - array pixel Y coord at centre of source " >> $cat
             echo "# BF1 - array pixel X coord at bolometer centre" >> $cat
@@ -638,113 +623,109 @@ foreach indir ($dir_list)
 #  axis.
                   set bf2 = `$KAPPA_DIR/calc exp="pa-1.5" pa=$iy`
 
-#  Loop round all chunks (if any)
-                  set ich = 0
-                  while( $ich <= $top_chunk )
-
 #  Construct the name of the bolometer map.
-                     set bolo_name = "CH0${ich}"
+                  set bolo_name = $ucarray
 
-                     if( $ix < 10 ) then
-                        set bolo_name = "${bolo_name}C0${ix}"
-                     else
-                        set bolo_name = "${bolo_name}C${ix}"
-                     endif
+                  if( $ix < 10 ) then
+                     set bolo_name = "${bolo_name}C0${ix}"
+                  else
+                     set bolo_name = "${bolo_name}C${ix}"
+                  endif
 
-                     if( $iy < 10 ) then
-                        set bolo_name = "${bolo_name}R0${iy}"
-                     else
-                        set bolo_name = "${bolo_name}R${iy}"
-                     endif
+                  if( $iy < 10 ) then
+                     set bolo_name = "${bolo_name}R0${iy}"
+                  else
+                     set bolo_name = "${bolo_name}R${iy}"
+                  endif
 
 #  Skip if the bolomap was not created by makemap.
-                     grep -i $bolo_name makemap.log > /dev/null
-                     if( $status == 1 ) then
-                        echo "Skipping bolomap $bolo_name"
-                     else
-                        echo "Doing bolomap $bolo_name"
+                  grep -i $bolo_name makemap.log > /dev/null
+                  if( $status == 1 ) then
+                     echo "Skipping bolomap $bolo_name"
+                  else
+                     echo "Doing bolomap $bolo_name"
 
 #  Get the full path to the bolomap NDF.
-                        set ndf = "junk.more.smurf.bolomaps.$bolo_name"
+                     set ndf = "junk.more.smurf.bolomaps.$bolo_name"
 
 #  From here on, use pixel coords to refer to positions within the bolomap,
 #  increasing the format precision from the one decimal place provided by
 #  the NDF library. NDF does not allow us to change the Format attributes for
 #  the PIXEL Frame directly, so take a copy of the PIXEL Frame first, and set
 #  the Format attributes of the copy.
-                        $KAPPA_DIR/wcsadd $ndf frame=pixel domain=newpix maptype=unit accept
-                        $KAPPA_DIR/wcsattrib $ndf set 'format(1)' "%5.3f"
-                        $KAPPA_DIR/wcsattrib $ndf set 'format(2)' "%5.3f"
+                     $KAPPA_DIR/wcsadd $ndf frame=pixel domain=newpix maptype=unit accept
+                     $KAPPA_DIR/wcsattrib $ndf set 'format(1)' "%5.3f"
+                     $KAPPA_DIR/wcsattrib $ndf set 'format(2)' "%5.3f"
 
 #  If source features are negative in the bolomap, negate the bolomap so that they become positive.
-                        if( $negative == 1 ) then
-                           $KAPPA_DIR/cmult $ndf -1 pos
-                           set ndf = "pos"
-                        endif
+                     if( $negative == 1 ) then
+                        $KAPPA_DIR/cmult $ndf -1 pos
+                        set ndf = "pos"
+                     endif
 
 #  Find the pixel coords at the centre of the feature. The feature is
 #  nominally at the reference point and so should, in the absence of errors
 #  and incorrect polymaps, have pixel coords (0.5,0.5). PSF fails unless a good
 #  central position is supplied, so first find the peak value in a box centred
 #  on (0,0)
-                        $KAPPA_DIR/stats $ndf'(0~20,0~20)' quiet
-                        set maxco = `$KAPPA_DIR/parget maxcoord stats`
-                        rm -f coin > /dev/null
-                        echo $maxco > coin
-                        $KAPPA_DIR/psf $ndf incat=! cofile=coin isize=31 norm=f device=! | grep \!\! >& /dev/null
+                     $KAPPA_DIR/stats $ndf'(0~20,0~20)' quiet
+                     set maxco = `$KAPPA_DIR/parget maxcoord stats`
+                     rm -f coin > /dev/null
+                     echo $maxco > coin
+                     $KAPPA_DIR/psf $ndf incat=! cofile=coin isize=31 norm=f device=! | grep \!\! >& /dev/null
 
 #  Check a psf was found succesfully.
-                        if( $status == 1 ) then
+                     if( $status == 1 ) then
 
 #  Get the parameters of the psf.
-                           set amp = `$KAPPA_DIR/parget amp1 psf`
-                           set posxy = `$KAPPA_DIR/parget centre psf`
+                        set amp = `$KAPPA_DIR/parget amp1 psf`
+                        set posxy = `$KAPPA_DIR/parget centre psf`
 
 #  Get the total data sum. Two methods - 1) aperture photometry...
-                           if( $sum_method == APERADD ) then
+                        if( $sum_method == APERADD ) then
 
 #  Choose the aperture size in pixels (60 arc-secs assuming default makemap pixel sizes of 2
 #  and 4 arc-seconds)..
-                              if( $array > 3 ) then
-                                 set diam = 30
-                              else
-                                 set diam = 15
-                              endif
+                           if( $array > 3 ) then
+                              set diam = 30
+                           else
+                              set diam = 15
+                           endif
 
 #  Replace any bad pixels within a box centred on the max pixel with sides twice
 #  the above diameter.
-                              @ size = $diam + $diam
-                              $KAPPA_DIR/fillbad in=$ndf\($maxco[1]~$size,$maxco[2]~$size\) size=2 out=filled | grep \!\! >& /dev/null
+                           @ size = $diam + $diam
+                           $KAPPA_DIR/fillbad in=$ndf\($maxco[1]~$size,$maxco[2]~$size\) size=2 out=filled | grep \!\! >& /dev/null
 
 #  Do the aperture photometry within the filled image. Check some bad pixels
 #  were filled. If not, use $ndf instead of "filled".
-                              if( $status == 1 ) then
-                                 $KAPPA_DIR/aperadd filled centre="'$posxy'" diam=$diam
-                              else
-                                 $KAPPA_DIR/aperadd $ndf centre="'$posxy'" diam=$diam
-                              endif
-                              set fsum = `$KAPPA_DIR/parget total aperadd`
+                           if( $status == 1 ) then
+                              $KAPPA_DIR/aperadd filled centre="'$posxy'" diam=$diam
+                           else
+                              $KAPPA_DIR/aperadd $ndf centre="'$posxy'" diam=$diam
+                           endif
+                           set fsum = `$KAPPA_DIR/parget total aperadd`
 
 #  Alternatively - 2) use the integral of the model PSF as the souce total data sum.
-                           else
-                              set fsum = `$KAPPA_DIR/parget total psf`
-                           endif
+                        else
+                           set fsum = `$KAPPA_DIR/parget total psf`
+                        endif
 
 #  Get the Mapping from bolomap pixel coords to sky offsets from the
 #  reference point, and combine with the mapping from sky offsets to focal
 #  plane pixel coordinate offsets.
-                           $ATOOLS_DIR/astgetmapping $ndf PIXEL SKY smap.ast
-                           $ATOOLS_DIR/astcmpmap smap.ast bmap.ast yes \! sbmap.ast
+                        $ATOOLS_DIR/astgetmapping $ndf PIXEL SKY smap.ast
+                        $ATOOLS_DIR/astcmpmap smap.ast bmap.ast yes \! sbmap.ast
 
 #  Use this CmpMap to transform the psf centre from bolomap pixel coords
 #  to offsets from the nominal reference point in pixel coords within the
 #  bolometer array.
-                           set dfp = `$ATOOLS_DIR/asttran2 sbmap.ast $posxy[1] $posxy[2] y`
+                        set dfp = `$ATOOLS_DIR/asttran2 sbmap.ast $posxy[1] $posxy[2] y`
 
 #  Check for AST__BAD values from the above astTran2 call.
-                           echo $dfp | grep -i "e+308" > /dev/null
-                           if( $status == 0 ) then
-                              echo "  astTran failure"
+                        echo $dfp | grep -i "e+308" > /dev/null
+                        if( $status == 0 ) then
+                           echo "  astTran failure"
 
 #  In the catalogue, the "base" source position (columns BC1 and BC2)
 #  corresponds to the bolometer array pixel coords of the source after
@@ -756,21 +737,17 @@ foreach indir ($dir_list)
 #  the psf position to get the distorted source position. That is, a source
 #  that should - if there was no distorion -  be seen at bolo pixel coords
 #  (bf1,bf2) is actually seen at bolo pixel coords (bc1,bc2).
-                           else
-                              set bc1 = `$KAPPA_DIR/calc exp="pa-pb" pa=$bf1 pb=$dfp[1]`
-                              set bc2 = `$KAPPA_DIR/calc exp="pa-pb" pa=$bf2 pb=$dfp[2]`
+                        else
+                           set bc1 = `$KAPPA_DIR/calc exp="pa-pb" pa=$bf1 pb=$dfp[1]`
+                           set bc2 = `$KAPPA_DIR/calc exp="pa-pb" pa=$bf2 pb=$dfp[2]`
 
 #  Copy the parameters of the fit into the output text file.
-                              echo "$ich $bc1 $bc2 $bf1 $bf2 0 0 $amp 0 $fsum 0 $obsnum $date $array $elev " >> $cat
-                           endif
-                        else
-                           echo "  psf failure"
+                           echo "0 $bc1 $bc2 $bf1 $bf2 0 0 $amp 0 $fsum 0 $obsnum $date $array $elev " >> $cat
                         endif
+                     else
+                        echo "  psf failure"
                      endif
-
-#  Increment the chunk index
-                     @ ich = $ich + 1
-                  end
+                  endif
                end
             end
 
