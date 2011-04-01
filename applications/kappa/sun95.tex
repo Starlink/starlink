@@ -3486,6 +3486,7 @@ each.  Full descriptions are included \hyperref{later}{in Section~}{}{se:plottin
 {\att TextBackColour}: Background colour to use when drawing text\\
 {\att TextLab(axis)}: Draw descriptive axis labels?\\
 {\att TextLabGap(axis)}: Spacing of descriptive axis labels\\
+{\att TextMargin}: Width of margin to clear when drawing text\\
 {\att TickAll}: Draw tick marks on all edges?\\
 {\att TitleGap}: Vertical spacing for the title\\
 {\att Tol}: Plotting tolerance\\
@@ -4829,6 +4830,21 @@ It is often useful to specify values for some of the attributes of the current
          If no axis is specified, (\emph{e.g.} {\att TextLabGap} instead of
          {\att TextLabGap(2)}), then both axes are affected.
       }
+   }
+}
+\sstattribute{
+   TextMargin
+}{
+   The width of the margin to clear when drawing text
+}{
+   \sstdescription{
+      This attribute determines the width of the margin that is cleared
+      around the edges of each drawn text string, in units of the text
+      height. That is, if TEXTMARGIN is set to 0.5, the margin will be
+      half the height of the text. The default is zero.
+   }
+   \sstattributetype{
+      Floating point.
    }
 }
 \sstattribute{
@@ -57687,6 +57703,9 @@ The following applications have been modified:
 
 \subsection{General Changes}
 \begin{itemize}
+   \item A new graphical style attribute called TEXTMARGIN has been added
+   that controls the width of margins cleared around the edges of
+   each drawn text string.
    \item Applications that report pixel scales (\emph{e.g.} NDFTRACE,
    WCSFRAME, \emph{etc.}) now report more representative pixel scales.
    Previously the pixel scales were measured at the first pixel in the
