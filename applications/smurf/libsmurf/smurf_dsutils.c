@@ -734,6 +734,9 @@ void smurf_dsutils( int *status ) {
          }
       }
 
+/* Abort if an error has occurred. */
+      if( *status != SAI__OK ) goto L999;
+
 /* Get pointers to the linear X and Y coefficient values. */
       p = cofs;
       for( i = 0; i < ncoeff_f; i++ ) {
