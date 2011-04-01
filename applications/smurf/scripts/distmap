@@ -1,0 +1,1054 @@
+#!/bin/tcsh
+
+#  If the first command line parameter is "add", then we create interim
+#  results from the specified new data and add them into a specified
+#  directory structure. Check we have the correct number of command line
+#  arguments.
+set usage = 1
+set exclude = " "
+if( $# > 0 ) then
+   if( "$1" == "add" ) then
+      set operation = "add"
+      if( $# == 3 ) then
+         set usage = 0
+      endif
+
+   else if( "$1" == "make" ) then
+      set operation = "make"
+      if( $# == 2 ) then
+         set usage = 0
+      else if( $# == 3 ) then
+         set exclude = `readlink -f $3`
+         set usage = 0
+      endif
+
+   else if( "$1" == "readd" ) then
+      set operation = "readd"
+      if( $# == 2 ) then
+         set usage = 0
+      endif
+   endif
+endif
+
+#  Display a usage message and exit if required.
+if( $usage == 1 ) then
+   echo
+   echo "Produces a 2D polynomial describing the SCUBA-2 focal plane distortion"
+   echo
+   echo "For each set of data files listed in <indir>, the map-maker is"
+   echo "used to create a map from each individual bolometer. The source"
+   echo "position within each such bolomap is found using kappa:psf, and"
+   echo "this is compared to the position the source predicted by the WCS"
+   echo "information (assuming no distortion). The X and Y offsets between"
+   echo "expected and actual source position at each point in the focal"
+   echo "plane, as determined from each set of data files, are stacked"
+   echo "together. Polynomial surfaces are then fitted to the resulting"
+   echo "stacked X and Y offset images, and the details of a corresponding"
+   echo "AST PolyMap are written out as C code."
+   echo
+   echo "Usage: distmap add <inlist> <datadir>"
+   echo "       distmap make <datadir>"
+   echo "       distmap readd <indirs>"
+   echo
+   echo "   <datadir> is the path to directory holding interim data created"
+   echo "   by running the 'distmap add' command."
+   echo
+   echo "   <inlist> is a text file in which each line contains the path"
+   echo "   to a directory holding the raw time series cubes for a single"
+   echo "   planet observation from a single array (different directories"
+   echo "   can hold data for different arrays)."
+   echo
+   echo "   <indirs> is a text file in which each line contains the path"
+   echo "   to a directory holding interim data created by a previous run "
+   echo "   'distmap add'. All outdx.sdf and outdy.sdf files that exist in "
+   echo "   or under any of these directories are re-created from the "
+   echo "   corresponding total.txt files."
+   echo
+   echo "The 'distmap add' command creates interim data from a list of raw"
+   echo "scuba-2 observations, and stores the interim data in a specified"
+   echo "directory. Creation of this interim data is seriously time consuming"
+   echo
+   echo "The 'distmap make' command read interim data stored by earlier runs"
+   echo "of the 'distmap add' command in a specified directory, and creates"
+   echo "a file 'code.c' containing the C code needed to implement a suitable"
+   echo "AST PolyMap."
+   echo
+   echo "The 'distmap readd' command re-creates interim data from a list of "
+   echo "raw scuba-2 observations."
+   echo
+   exit
+endif
+
+#  Not sure if this is necessary bit ensure the shell does not try to
+#  "correct" any part of the command line.
+set correct = none
+
+#  Ensure SMURF tasks assume there is no focal plane distortion.
+setenv SMURF_DISTORTION NONE
+
+#  Ensure ADAM tasks fail rather than prompt for parameter values
+setenv ADAM_NOPROMPT 1
+
+#  Ensure NDF provenance and history are record.
+setenv AUTOPROV 1
+setenv AUTO_HISTORY 1
+
+#  Ensure NDG does not try to fork processes to expand shell meta-characters
+#  for output NDFs ("fork" can fail when creating the bolomaps due to lack
+#  of memory on big data sets).
+setenv NDG_NOSHELL 1
+
+#  First deal with cases where we are creating interim results from new
+#  raw data and storing in a named directory.
+#  ===================================================================
+if( $operation == "add" ) then
+
+#  Expand the supplied list of raw data directories into absolute paths and
+#  check they exist.
+   set dir_list = " "
+   foreach dir (`cat $2`)
+      set indir = `readlink -f $dir`
+      if( ! -d "$indir" ) then
+         echo " "
+         echo ">>>>  Cannot find directory $dir \!\!\!\!\!"
+         echo " "
+         exit
+      endif
+      set dir_list = "$dir_list $indir"
+   end
+
+#  Check the named output directory exists. Create it if not.
+   if( -e $3 ) then
+      if( ! -d $3 ) then
+         echo " "
+         echo ">>>>  $3 exists but is not a directory \!\!\!\!\!"
+         echo " "
+         exit
+      endif
+   else
+      mkdir $3
+   endif
+
+# Move into the output directory
+   cd $3
+
+#  Create a temporary ADAM directory within this directory.
+   rm -rf adam >& /dev/null
+   mkdir adam
+   setenv ADAM_USER $PWD/adam
+
+#  Loop round each observation.
+   foreach indir ($dir_list)
+
+#  Create an interim directory in which to process the current observation.
+#  Once it has been completed it will be moved to a permanent location.
+      rm -rf tempdir >& /dev/null
+      mkdir tempdir
+      cd tempdir
+
+#  Tell the user what's happening
+      echo "-----------------------------------------------"
+      echo "Processing directory $indir ....."
+      echo " "
+
+#  Save the name of the output catalogue for this observation.
+      set cat = "$PWD/total.txt"
+
+#  Use the iterative mapmaker to create a new map for each individual
+#  bolometers. Each bolomap is an image made from a collection of time slices
+#  but only one bolometer, and is gridded in AZEL offsets from the expected
+#  source position.
+      $SMURF_DIR/makemap "$indir/*" method=iter out=junk system=AZEL \
+                          alignsys=t \
+                          config="'^$SMURF_DIR/../../share/smurf/dimmconfig_distortionmap.lis,bolomap=1'" | tee makemap.log
+
+#  Get the subarray name, and its corresponding integer index.
+      set subarray = `$KAPPA_DIR/fitsmod junk edit=print keyword=SUBARRAY`
+      if( "$subarray" == "s8a" ) then
+         set array = 0
+         set ucarray = S8A
+      else if( "$subarray" == "s8b" ) then
+         set array = 1
+         set ucarray = S8B
+      else if( "$subarray" == "s8c" ) then
+         set array = 2
+         set ucarray = S8C
+      else if( "$subarray" == "s8d" ) then
+         set array = 3
+         set ucarray = S8D
+      else if( "$subarray" == "s4a" ) then
+         set array = 4
+         set ucarray = S4A
+      else if( "$subarray" == "s4b" ) then
+         set array = 5
+         set ucarray = S4B
+      else if( "$subarray" == "s4c" ) then
+         set array = 6
+         set ucarray = S4C
+      else if( "$subarray" == "s4d" ) then
+         set array = 7
+         set ucarray = S4D
+      else
+         echo "Unknown subarray - $subarray"
+         exit
+      endif
+
+#  See if the data has been flat-fielded (as implied by the map units being "pW"). If not,
+#  the source features will be negative in the bolomaps.
+      $KAPPA_DIR/ndftrace junk quiet
+      set units = `$KAPPA_DIR/parget UNITS ndftrace`
+      if( "$units" == "pW" ) then
+         set negative = 0;
+      else
+         set negative = 1;
+      endif
+
+#  Get the date.
+      set date = `$KAPPA_DIR/fitsmod junk edit=print keyword=UTDATE`
+
+#  Get the middle elevation
+      set el0 = `$KAPPA_DIR/fitsmod junk edit=print keyword=ELSTART`
+      set el1 = `$KAPPA_DIR/fitsmod junk edit=print keyword=ELEND`
+      set elev = `$KAPPA_DIR/calc exp="0.5*(pa+pb)" pa=$el0 pb=$el1`
+
+#  Get the observation number.
+      set obsnum = `$KAPPA_DIR/fitsmod junk edit=print keyword=OBSNUM`
+
+#  Need to identify a usable subscan. Loop round all subscans in the
+#  current directory.
+      set usable = " "
+      foreach n ($indir/s*_*_*.sdf)
+
+#  If the file has SEQ_TYPE and OBS_TYPE headers, the scan is usable if
+#  the values of these headers are equal
+         set there = `$KAPPA_DIR/fitsmod $n edit=exist keyword=SEQ_TYPE`
+         if( "$there" == "TRUE" ) then
+            set there = `$KAPPA_DIR/fitsmod $n edit=exist keyword=OBS_TYPE`
+            if( "$there" == "TRUE" ) then
+               set seq_type = `$KAPPA_DIR/fitsmod $n edit=print keyword=SEQ_TYPE`
+               set obs_type = `$KAPPA_DIR/fitsmod $n edit=print keyword=OBS_TYPE`
+               if( "$seq_type" == "$obs_type" ) then
+                  set usable = "$n"
+               endif
+            endif
+         endif
+
+#  If either the SEQ_TYPE or OBS_TYPE header was not found, check the file has
+#  a SHUTTER keyword in its FITS extension
+         if( "$there" != "TRUE" ) then
+            set there = `$KAPPA_DIR/fitsmod $n edit=exist keyword=SHUTTER`
+            if( "$there" == "TRUE" ) then
+
+#  If the value of SHUTTER is zero, the scan is a dark (unusable).
+               set val = `$KAPPA_DIR/fitsmod $n edit=print keyword=SHUTTER`
+               if( "$val" != "0" ) then
+                  set usable = "$n"
+               endif
+            endif
+         endif
+      end
+
+      if( "$usable" == " " ) then
+         echo "No usable scans found"
+         exit
+      endif
+
+#  Get a Mapping from bolometer array pixel offsets from the reference point,
+#  to (Az,El) offsets from the reference point (assuming no distortion), for
+#  a typical time slice, in the usable scan found above, and invert it so it
+#  goes the other way. Using this bolomaps approach, we need to assume that
+#  this mapping is the same for all time slices (i.e. all the time slices are
+#  rotated in the same way on the sky). The timeslices approach does not
+#  need to make this assumption.
+      $SMURF_DIR/dsutils in=$usable bmap=bmap.ast
+      $ATOOLS_DIR/astinvert bmap.ast bmap.ast
+
+#  Write the header for the output catalogue.
+      echo "# SCUBA-2 focal plane distortion data" > $cat
+      echo "#" >> $cat
+      echo "# ICH - zero-based makemap chunk index (now unused)" >> $cat
+      echo "# BC1 - array pixel X coord at centre of source " >> $cat
+      echo "# BC2 - array pixel Y coord at centre of source " >> $cat
+      echo "# BF1 - array pixel X coord at bolometer centre" >> $cat
+      echo "# BF2 - array pixel Y coord at bolometer centre" >> $cat
+      echo "# DBC1 - error in BC1" >> $cat
+      echo "# DBC2 - error in BC2" >> $cat
+      echo "# AMP - source amplitude " >> $cat
+      echo "# DAMP - error in AMP" >> $cat
+      echo "# FSUM - total data value in fitted source " >> $cat
+      echo "# RMS - RMS error of fit" >> $cat
+      echo "# OBS - observation number" >> $cat
+      echo "# DATE - observation date" >> $cat
+      echo "# ARRAY - array index (s8a=0, s8b=1, s8c=2, s8d=3, s4a=4, s4b=5, s4c=6, s4d=7)" >> $cat
+      echo "# ELEV - telescope elevation (degrees)" >> $cat
+      echo "#" >> $cat
+      echo "# ICH BC1 BC2 BF1 BF2 DBC1 DBC2 AMP DAMP FSUM RMS OBS DATE ARRAY ELEV" >> $cat
+
+#  Loop round all GRID X columns (1 to 32)
+      set ix = 0
+      while( $ix < 32 )
+         @ ix = $ix + 1
+
+#  In the catalogue, the "true" source position (columns BF1 and BF2) is
+#  given by the pixel coords of the centre of the bolometer used to make
+#  the bolomap. Store the X pixel coord for the centre of bolometers in the
+#  current column. This assumes the lower pixel index bound is zero on the
+#  first axis.
+         set bf1 = `$KAPPA_DIR/calc exp="pa-1.5" pa=$ix`
+
+#  Loop round all GRID Y rows (1 to 40).
+         set iy = 0
+         while( $iy < 40 )
+            @ iy = $iy + 1
+
+#  In the catalogue, the "true" source position (columns BF1 and BF2) is
+#  given by the pixel coords of the centre of the bolometer used to make
+#  the bolomap. Store the Y pixel coord for the centre of bolometers in the
+#  current row. This assumes the lower pixel index bound is zero on the second
+#  axis.
+            set bf2 = `$KAPPA_DIR/calc exp="pa-1.5" pa=$iy`
+
+#  Construct the name of the bolometer map.
+            set bolo_name = $ucarray
+
+            if( $ix < 10 ) then
+               set bolo_name = "${bolo_name}C0${ix}"
+            else
+               set bolo_name = "${bolo_name}C${ix}"
+            endif
+
+            if( $iy < 10 ) then
+               set bolo_name = "${bolo_name}R0${iy}"
+            else
+               set bolo_name = "${bolo_name}R${iy}"
+            endif
+
+#  Skip if the bolomap was not created by makemap.
+            grep -i $bolo_name makemap.log > /dev/null
+            if( $status == 1 ) then
+               echo "Skipping bolomap $bolo_name"
+            else
+               echo "Doing bolomap $bolo_name"
+
+#  Get the full path to the bolomap NDF.
+               set ndf = "junk.more.smurf.bolomaps.$bolo_name"
+
+#  From here on, use pixel coords to refer to positions within the bolomap,
+#  increasing the format precision from the one decimal place provided by
+#  the NDF library. NDF does not allow us to change the Format attributes for
+#  the PIXEL Frame directly, so take a copy of the PIXEL Frame first, and set
+#  the Format attributes of the copy.
+               $KAPPA_DIR/wcsadd $ndf frame=pixel domain=newpix maptype=unit accept
+               $KAPPA_DIR/wcsattrib $ndf set 'format(1)' "%5.3f"
+               $KAPPA_DIR/wcsattrib $ndf set 'format(2)' "%5.3f"
+
+#  If source features are negative in the bolomap, negate the bolomap so that they become positive.
+               if( $negative == 1 ) then
+                  $KAPPA_DIR/cmult $ndf -1 pos
+                  set ndf = "pos"
+               endif
+
+#  Find the pixel coords at the centre of the feature. The feature is
+#  nominally at the reference point and so should, in the absence of errors
+#  and incorrect polymaps, have pixel coords (0.5,0.5). PSF fails unless a good
+#  central position is supplied, so first find the peak value in a box centred
+#  on (0,0)
+               $KAPPA_DIR/stats $ndf'(0~20,0~20)' quiet
+               set maxco = `$KAPPA_DIR/parget maxcoord stats`
+               rm -f coin > /dev/null
+               echo $maxco > coin
+               $KAPPA_DIR/psf $ndf incat=! cofile=coin isize=31 norm=f device=! | grep \!\! >& /dev/null
+
+#  Check a psf was found succesfully.
+               if( $status == 1 ) then
+
+#  Get the parameters of the psf.
+                  set amp = `$KAPPA_DIR/parget amp1 psf`
+                  set posxy = `$KAPPA_DIR/parget centre psf`
+
+#  Choose the aperture size in pixels (60 arc-secs assuming default makemap pixel sizes of 2
+#  and 4 arc-seconds)..
+                  if( $array > 3 ) then
+                     set diam = 30
+                  else
+                     set diam = 15
+                  endif
+
+#  Replace any bad pixels within a box centred on the max pixel with sides twice
+#  the above diameter.
+                  @ size = $diam + $diam
+                  $KAPPA_DIR/fillbad in=$ndf\($maxco[1]~$size,$maxco[2]~$size\) size=2 out=filled | grep \!\! >& /dev/null
+
+#  Do the aperture photometry within the filled image. Check some bad pixels
+#  were filled. If not, use $ndf instead of "filled".
+                  if( $status == 1 ) then
+                     $KAPPA_DIR/aperadd filled centre="'$posxy'" diam=$diam
+                  else
+                     $KAPPA_DIR/aperadd $ndf centre="'$posxy'" diam=$diam
+                  endif
+                  set fsum = `$KAPPA_DIR/parget total aperadd`
+
+#  Get the Mapping from bolomap pixel coords to sky offsets from the
+#  reference point, and combine with the mapping from sky offsets to focal
+#  plane pixel coordinate offsets.
+                  $ATOOLS_DIR/astgetmapping $ndf PIXEL SKY smap.ast
+                  $ATOOLS_DIR/astcmpmap smap.ast bmap.ast yes \! sbmap.ast
+
+#  Use this CmpMap to transform the psf centre from bolomap pixel coords
+#  to offsets from the nominal reference point in pixel coords within the
+#  bolometer array.
+                  set dfp = `$ATOOLS_DIR/asttran2 sbmap.ast $posxy[1] $posxy[2] y`
+
+#  Check for AST__BAD values from the above astTran2 call.
+                  echo $dfp | grep -i "e+308" > /dev/null
+                  if( $status == 0 ) then
+                     echo "  astTran failure"
+
+#  In the catalogue, the "base" source position (columns BC1 and BC2)
+#  corresponds to the bolometer array pixel coords of the source after
+#  distortion (columns BF1 and BF2 give the bolometer array pixel coords
+#  of the source before distortion). In the absence of any distortion, the
+#  psf centre found above would be at bolometer array pixel offsets (0,0).
+#  Any discrepancy is caused by distortion (and noise). So modify the known
+#  bolometer position ($bf1,$bf2) by subtracting off the discrepancies in
+#  the psf position to get the distorted source position. That is, a source
+#  that should - if there was no distorion -  be seen at bolo pixel coords
+#  (bf1,bf2) is actually seen at bolo pixel coords (bc1,bc2).
+                  else
+                     set bc1 = `$KAPPA_DIR/calc exp="pa-pb" pa=$bf1 pb=$dfp[1]`
+                     set bc2 = `$KAPPA_DIR/calc exp="pa-pb" pa=$bf2 pb=$dfp[2]`
+
+#  Copy the parameters of the fit into the output text file.
+                     echo "0 $bc1 $bc2 $bf1 $bf2 0 0 $amp 0 $fsum 0 $obsnum $date $array $elev " >> $cat
+                  endif
+               else
+                  echo "  psf failure"
+               endif
+            endif
+         end
+      end
+
+#  Bin the offsets in the "total.txt" catalogue to create two images, one
+#  containing FplaneX offsets and the other containing FplaneY offsets,
+#  both in units of mm. The current WCS Frame in these images is FPLANE
+#  (also in units of mm). The GRID->FPLANE mapping includes no polynomial
+#  distortion.
+      $SMURF_DIR/dsutils infitx=\! incat=$cat subarray=$subarray \
+                     outdx=outdx outdy=outdy outcat=\! zbox=\! | tee dsutils.log
+
+#  If all has gone well, move the temporary directory containing the interim
+#  to its final resting place.
+      grep \!\! dsutils.log >& /dev/null
+      if(  $status == 1 && -e outdx.sdf && -e outdy.sdf ) then
+         cd ..
+
+         if( ! -e "$subarray" ) then
+            mkdir $subarray
+         endif
+
+         if( ! -e "$subarray/$date" ) then
+            mkdir $subarray/$date
+         endif
+
+         rm -rf $subarray/$date/$obsnum >& /dev/null
+
+         mv -f tempdir $subarray/$date/$obsnum
+
+#  Issue a warning and continue to process any remaining data directories.
+      else
+         cd ..
+         echo
+         echo
+         echo "Failed to process $indir. Continuing..."
+         echo
+         echo
+      endif
+
+   end
+
+#  Remove any left over tempdir (caused by an error on the last directory)
+   rm -rf tempdir >& /dev/null
+
+#  Move back to the original directory
+   cd ..
+
+
+
+
+
+#  Now deal with cases where we are re-creating interim results from
+#  previously added raw data.
+#  ===================================================================
+else if( $operation == "readd" ) then
+
+#  Record the current directory
+   set here = $PWD
+
+#  Loop round each directory in the specified indirs file.
+   foreach dir (`cat $2`)
+
+#  Expand it and check it exists.
+      set indir = `readlink -f $dir`
+      if( ! -d "$indir" ) then
+         echo " "
+         echo ">>>>  Cannot find directory $dir \!\!\!\!\!"
+         echo " "
+         exit
+      endif
+
+#  Move into it.
+      cd $indir
+
+#  Loop round all directories containing a junk.sdf file
+      foreach junk (`find . -name junk.sdf`)
+         set subdir = `dirname $junk`
+
+#  Move into it.
+         echo "Re-adding $subdir"
+         cd $subdir
+
+#  Get the sub-array string
+         set subarray = `$KAPPA_DIR/fitsmod junk edit=print keyword=SUBARRAY`
+
+#  Re-create the outdx.sdf and outdy.sdf files
+         if( -e total.txt ) then
+            $SMURF_DIR/dsutils infitx=\! incat=total.txt subarray=$subarray \
+                        outdx=outdx outdy=outdy outcat=\! zbox=\!
+         else
+            echo "File total.txt was not found in $subdir"
+         endif
+
+#  Move back to the named directory.
+         cd $indir
+      end
+
+#  Move back to the original directory.
+      cd $here
+   end
+
+
+
+
+#  Now deal with cases where we are creating a PolyMap from the interim
+#  results stored in a named directory.
+#  ===================================================================
+else
+
+#  Check the named interim data directory exists. Abort if not.
+   if( -e $2 ) then
+      if( ! -d $2 ) then
+         echo " "
+         echo ">>>>  $2 exists but is not a directory \!\!\!\!\!"
+         echo " "
+         exit
+      endif
+   else
+      echo " "
+      echo ">>>>  $2 does not exist \!\!\!\!\!"
+      echo " "
+      exit
+   endif
+
+#  Move into the interim data directory.
+   cd $2
+
+#  Create a temporary ADAM directory within this directory.
+   rm -rf adam-make >& /dev/null
+   mkdir adam-make
+   setenv ADAM_USER $PWD/adam-make
+
+#  Construct lists of all the outdx.sdf and outdy.sdf files
+   find . -name outdx.sdf > outdx.tmp
+   find . -name outdy.sdf > outdy.tmp
+
+#  If a list of scans to be excluded was supplied, exclude them from the
+#  outdx/y.tmp files
+   if( "$exclude" != " " ) then
+      if( ! -e $exclude ) then
+         echo
+         echo "Cannot find $exclude"
+         echo
+         exit
+      else
+         foreach word (`cat $exclude`)
+            grep -v $word outdx.tmp > tmp
+            mv -f tmp outdx.tmp
+            grep -v $word outdy.tmp > tmp
+            mv -f tmp outdy.tmp
+         end
+      endif
+   endif
+
+#  Remove files that contain fewer than 20 % (=254) good values
+   rm -f outdx.tmp2 outdy.tmp2 >& /dev/null
+   echo
+   foreach n (`cat outdx.tmp`)
+      $KAPPA_DIR/stats $n quiet
+      set ngood = `$KAPPA_DIR/parget numgood stats`
+      if( $ngood > 600 ) then
+         echo $n >> outdx.tmp2
+      else
+         echo "Rejecting $n (only has $ngood good corrections)"
+      endif
+   end
+   echo
+   foreach n (`cat outdy.tmp`)
+      $KAPPA_DIR/stats $n quiet
+      set ngood = `$KAPPA_DIR/parget numgood stats`
+      if( $ngood > 600 ) then
+         echo $n >> outdy.tmp2
+      else
+         echo "Rejecting $n (only has $ngood good corrections)"
+      endif
+   end
+   echo
+
+#  Check some were found
+   set a = `wc outdx.tmp2`
+   set b = `wc outdy.tmp2`
+   if( $a[1] == 0 || $b[1] == 0 ) then
+      echo
+      echo "No good data found from previous runs of 'distmap add'"
+      echo
+      exit
+   else
+      echo
+      echo
+      echo
+      echo "Processing:"
+      cat outdx.tmp2
+      cat outdy.tmp2
+      echo
+      echo
+      echo
+   endif
+
+#  Remove the ".sdf" strings fom the end of the file names.
+   sed -e 's/.sdf//' outdx.tmp2 > outdx.lis
+   sed -e 's/.sdf//' outdy.tmp2 > outdy.lis
+
+#  Construct lists of the aligned outdx.sdf and outdy.sdf files.
+   sed -e 's/.sdf/_A/' outdx.tmp2 > outdx_A.lis
+   sed -e 's/.sdf/_A/' outdy.tmp2 > outdy_A.lis
+
+#  Note the number of observations to combine
+   set idir = $a[1]
+
+#  If there is more than one, we need to combine them.
+   if( $idir > 1 ) then
+
+#  Choose a reference observation for later on. Prefer 450 um if both 450 and 850 are
+#  present since the axes are the usual way round (unlike 850 which has swapped axes).
+      set refdx = "\!"
+      set refdy = "\!"
+      foreach n (`cat outdx.lis`)
+         echo $n | grep s4 >& /dev/null
+         if( $status == 0 ) then
+            set refdx = $n
+            set refdy = `echo $n | sed -e 's/outdx/outdy/'`
+         endif
+      end
+
+#  Align all the outdx and outdy files. Alignment occurs in focal plane
+#  X and Y coords.
+      $KAPPA_DIR/wcsalign in=^outdx.lis out=^outdx_A.lis method=sincsinc wlim=0.4 \
+                          rebin=no ref=$refdx lbnd=!
+      $KAPPA_DIR/wcsalign in=^outdy.lis out=^outdy_A.lis method=sincsinc wlim=0.4 \
+                          rebin=no ref=$refdy lbnd=!
+
+#  We now mosaic images for each array into a single image. Adjust  the zero points
+#  to make them agree as far as possible. Use the largest possible number of
+#  overlaps.
+      rm -f tinx.lis tiny.lis >& /dev/null
+      touch tinx.lis tiny.lis
+      set imos = 0
+      foreach a ("s4a\|s8d" "s4b\|s8c" "s4c\|s8b" "s4d\|s8a")
+         rm -f insx.lis insy.lis >& /dev/null
+
+         foreach line (`cat outdx_A.lis`)
+            echo $line | grep $a > /dev/null
+            if( $status == 0 ) then
+               echo $line >> insx.lis
+            endif
+         end
+
+         foreach line (`cat outdy_A.lis`)
+            echo $line | grep $a > /dev/null
+            if( $status == 0 ) then
+               echo $line >> insy.lis
+            endif
+         end
+         if( -e insx.lis && -e insy.lis ) then
+
+            set aa = `wc insx.lis`
+            set novx = $aa[1]
+            set aa = `wc insy.lis`
+            set novy = $aa[1]
+
+            if( $novx > 0 && $novy > 0 ) then
+               @ imos = $imos + 1
+
+               if( $novx > 1 ) then
+                  $CCDPACK_DIR/makemos in=^insx.lis out=outdx_mos_$imos zero \
+                                    logto=term skysup=0 method=median optov=$novx \
+                                    genvar=yes usevar=no
+               else
+                  $KAPPA_DIR/ndfcopy in=^insx.lis out=outdx_mos_$imos
+               endif
+
+               if( $novy > 1 ) then
+                  $CCDPACK_DIR/makemos in=^insy.lis out=outdy_mos_$imos zero \
+                                    logto=term skysup=0 method=median optov=$novy \
+                                    genvar=yes usevar=no
+               else
+                  $KAPPA_DIR/ndfcopy in=^insy.lis out=outdy_mos_$imos
+               endif
+
+               if( -e outdx_mos_$imos.sdf && -e  outdy_mos_$imos.sdf ) then
+
+
+#  Set pixels bad that have an variance greater than 0.1 (i.e. an error of
+#  about 0.3 mm)
+                  $KAPPA_DIR/maths exp="'qif((va<pa),ia,<bad>)'" ia= outdx_mos_$imos \
+                                   out=aa pa=0.1
+
+#  Smooth using amediabn block filter to remove aberrant values. Also set
+#  wlim so that small areas of bad values are filled in.
+                  $KAPPA_DIR/block aa estimator=median wlim=0.5 box=7 out=bb
+
+#  Add a constant so that the mean of the remaining corrections is zero
+                  $KAPPA_DIR/stats bb quiet
+                  set ave = `$KAPPA_DIR/parget mean stats`
+                  $KAPPA_DIR/csub in=bb scalar=$ave out=outdx_mos_$imos
+
+#  Copy the variance (block drops the variance if estimator=median)
+                  $KAPPA_DIR/setvar outdx_mos_$imos from=aa comp=var
+                  echo outdx_mos_$imos >> tinx.lis
+
+#  Do the same for the Y corrections
+                  $KAPPA_DIR/maths exp="'qif((va<pa),ia,<bad>)'" ia= outdy_mos_$imos \
+                                   out=aa pa=0.1
+                  $KAPPA_DIR/block aa estimator=median wlim=0.5 box=7 out=bb
+                  $KAPPA_DIR/stats bb quiet
+                  set ave = `$KAPPA_DIR/parget mean stats`
+                  $KAPPA_DIR/csub in=bb scalar=$ave out=outdy_mos_$imos
+                  $KAPPA_DIR/setvar outdy_mos_$imos from=aa comp=var
+                  echo outdy_mos_$imos >> tiny.lis
+
+               endif
+            endif
+         endif
+      end
+
+#  If we only have one observation, just copy it to the right place.
+   else
+      $KAPPA_DIR/ndfcopy in=^outdx.lis out=^outdx_A.lis
+      $KAPPA_DIR/ndfcopy in=^outdx_A.lis out=outdx-total
+
+#  Smooth with median block filter.
+      $KAPPA_DIR/block outdx-total estimator=median wlim=0.5 box=7 out=bb
+
+#  Ensure that the mean residual (after sigma clipping) is zero.
+      $KAPPA_DIR/stats bb quiet
+      set mean = `$KAPPA_DIR/parget mean stats`
+      $KAPPA_DIR/csub in=bb scalar=$mean out=outdx-total
+
+#  Do the same for the Y correction
+      $KAPPA_DIR/ndfcopy in=^outdy.lis out=^outdy_A.lis
+      $KAPPA_DIR/ndfcopy in=^outdy_A.lis out=outdy-total
+      $KAPPA_DIR/block outdy-total estimator=median wlim=0.5 box=7 out=bb
+      $KAPPA_DIR/stats bb quiet
+      set mean = `$KAPPA_DIR/parget mean stats`
+      $KAPPA_DIR/csub in=bb scalar=$mean out=outdy-total
+
+      cp outdx_A.lis tinx.lis
+      cp outdy_A.lis tiny.lis
+   endif
+
+#  Paste all the subarray images into a single image of the entire focal plane
+   $KAPPA_DIR/paste in=^tinx.lis out=outdx-total
+   $KAPPA_DIR/paste in=^tiny.lis out=outdy-total
+
+#  Problem is to fit a single polynonial surface to the focal plane correction
+#  taking account of the fact that each subarray pair may have a unique offset
+#  from the global correction. We use an iterative procedure. Use an iterative
+#  procedure
+   set more = 1
+   set iter = 0
+   set rmslo = 100000.0
+   set nlow = 0
+
+   while( $more == 1 && $iter < 40 )
+      echo
+      echo
+      echo  "X Iteration $iter"
+
+# Fit a polynomial surface to each correction image.
+      $KAPPA_DIR/surfit outdx-total out=surfitx fittype=poly order=3 bindim=5 \
+                  estimator=mode fitclip=\[3,3\] evaluate=a quiet
+
+#  Display rms residuals to these fits
+      set rms = `$KAPPA_DIR/parget rms surfit`
+      echo "RMS of X fit is $rms"
+
+#  Find the mean offset between each subarray and this fitted surface, and
+#  subtract the mean difference from the subarray image.
+      foreach n (`cat tinx.lis`)
+         $KAPPA_DIR/sub $n surfitx diff
+         $KAPPA_DIR/stats diff clip=\[3,3,3\] quiet
+         set ave = `$KAPPA_DIR/parget mean stats`
+         set ave = `$KAPPA_DIR/calc "3*pa" pa=$ave`
+         $KAPPA_DIR/csub in=$n scalar=$ave out=fred
+         $KAPPA_DIR/ndfcopy fred $n
+      end
+
+#  Paste all the corrected subarray images into a single image of the entire
+#  focal plane
+      $KAPPA_DIR/paste in=^tinx.lis out=outdx-total
+
+#  If the new RMS is lower than any previous RMS, record it as the new low RMS.
+      if( `$KAPPA_DIR/calc "pa<pb" pa=$rms pb=$rmslo` == 1 ) then
+         set rmslo = $rms
+         set nlow = 0
+
+#  If the past 3 iterations have failed to lower the RMS, we have reached convergence.
+      else
+         @ nlow = $nlow + 1
+         if( $nlow > 2 ) then
+            set more = 0
+         endif
+      endif
+
+      @ iter = $iter + 1
+   end
+
+#  Do the same for the Y correction
+   set more = 1
+   set iter = 0
+   set rmslo = 100000.0
+   set nlow = 0
+
+   while( $more == 1 && $iter < 40 )
+      echo
+      echo
+      echo  "Y Iteration $iter"
+
+      $KAPPA_DIR/surfit outdy-total out=surfity fittype=poly order=3 bindim=5 \
+                  estimator=mode fitclip=\[3,3\] evaluate=a quiet
+
+      set rms = `$KAPPA_DIR/parget rms surfit`
+      echo "RMS of Y fit is $rms"
+
+      foreach n (`cat tiny.lis`)
+         $KAPPA_DIR/sub $n surfity diff
+         $KAPPA_DIR/stats diff clip=\[3,3,3\] quiet
+         set ave = `$KAPPA_DIR/parget mean stats`
+         set ave = `$KAPPA_DIR/calc "3*pa" pa=$ave`
+         $KAPPA_DIR/csub in=$n scalar=$ave out=fred
+         $KAPPA_DIR/ndfcopy fred $n
+      end
+
+      $KAPPA_DIR/paste in=^tiny.lis out=outdy-total
+
+      if( `$KAPPA_DIR/calc "pa<pb" pa=$rms pb=$rmslo` == 1 ) then
+         set rmslo = $rms
+         set nlow = 0
+
+      else
+         @ nlow = $nlow + 1
+         if( $nlow > 2 ) then
+            set more = 0
+         endif
+      endif
+
+      @ iter = $iter + 1
+   end
+
+#  Save the names of the total focal plane offset images
+   set outdx = outdx-total
+   set outdy = outdy-total
+
+#  Ensure focal plane Y is upwards so that we can use setaxis to transfer WCS
+#  FPLANE coords into the NDF AXIS structures (as required by FITSURFACE)
+   $KAPPA_DIR/rotate $outdx out=outdxr angle=!
+
+#  Set up AXIS structures holding the FPLANE X and Y positions in mm, and
+#  make it the current Frame
+   $KAPPA_DIR/setaxis outdxr 1 wcs
+   $KAPPA_DIR/setaxis outdxr 2 wcs
+   $KAPPA_DIR/wcsframe outdxr axis
+
+#  Fit a cubic surface to the values in the X error image, doing
+#  sigma-clipping to get rid of aberrant points.
+   $KAPPA_DIR/surfit outdxr out=surfitx fittype=poly order=3 bindim=5 \
+                  estimator=mode fitclip=\[3,3\] evaluate=a
+
+#  Surfit does not report the coefficients of the polynomial fit, so we now
+#  use fitsurface to fit a surface to the cubic surface created by surfit.
+#  Hopefully this fit will be exact since the surface is accurately cubic
+#  by definition. The resulting polynomial coefficients are put into a
+#  SURFACEFIT extension in the NDF. Select "cosys=data" so that the
+#  polynomial transforms (Fx,Fy) in mm, into delta_Fx, also in mm.
+   $KAPPA_DIR/fitsurface surfitx variance=no fittype=poly nxpar=4 \
+                  nypar=4 overwrite cosys=data
+
+#  Now do exactly the same with the Y correction image...
+   $KAPPA_DIR/rotate $outdy out=outdyr angle=!
+   $KAPPA_DIR/setaxis outdyr 1 wcs
+   $KAPPA_DIR/setaxis outdyr 2 wcs
+   $KAPPA_DIR/wcsframe outdyr axis
+   $KAPPA_DIR/surfit outdyr out=surfity fittype=poly order=3 bindim=5 \
+                  estimator=mode fitclip=\[3,3\] evaluate=a
+   $KAPPA_DIR/fitsurface surfity variance=no fittype=poly nxpar=4 \
+                  nypar=4 overwrite cosys=data
+
+#  Get the clipped standard deviation of the residuals between the
+#  polynomial fit and the original data.
+   $KAPPA_DIR/sub outdxr surfitx fred
+   $KAPPA_DIR/stats fred clip=\[3,3,3\] quiet
+   set err_x = `$KAPPA_DIR/parget sigma stats`
+   $KAPPA_DIR/sub outdyr surfity fred
+   $KAPPA_DIR/stats fred clip=\[3,3,3\] quiet
+   set err_y = `$KAPPA_DIR/parget sigma stats`
+
+#  Produce the description of the forward transformation. C source code
+#  defining the coefficients of the forward transformation of the PolyMap
+#  are put in fwd.c
+   $SMURF_DIR/dsutils subarray=s8d infitx=surfitx infity=surfity outcode=fwd.c \
+                               outdx=invdx outdy=invdy forward=yes
+
+
+#  Now generate the inverse transformation. Allow the inverse polynomial to
+#  be one degree higher than the forward polynomial, in order to achieve an
+#  accurate inverse.
+   $KAPPA_DIR/rotate invdx out=invdxr angle=!
+   $KAPPA_DIR/setaxis invdxr 1 wcs
+   $KAPPA_DIR/setaxis invdxr 2 wcs
+   $KAPPA_DIR/wcsframe invdxr axis
+   $KAPPA_DIR/fitsurface invdxr variance=no fittype=poly nxpar=6 \
+                  nypar=6 overwrite cosys=data
+
+   $KAPPA_DIR/rotate invdy out=invdyr angle=!
+   $KAPPA_DIR/setaxis invdyr 1 wcs
+   $KAPPA_DIR/setaxis invdyr 2 wcs
+   $KAPPA_DIR/wcsframe invdyr axis
+   $KAPPA_DIR/fitsurface invdyr variance=no fittype=poly nxpar=6 \
+                  nypar=6 overwrite cosys=data
+
+   $SMURF_DIR/dsutils subarray=s8d infitx=invdxr infity=invdyr outcode=inv.c \
+                               outdx=! outdy=! forward=no
+
+#  Conbine both transformations into one file
+   rm -f code.c >& /dev/null
+   cat fwd.c inv.c > code.c
+
+   rm -f *.fpc*
+
+#  Now find the systematic offset unique to each individual directory.
+   foreach n (`cat outdx_A.lis`)
+
+#  Find the mean residual between the X corrections for the current directory
+#  and the overall X corrections.
+      $KAPPA_DIR/sub $n outdx-total diff
+      if( $idir > 1 ) then
+         $KAPPA_DIR/stats diff quiet clip=\[3,3,3\]
+      else
+         $KAPPA_DIR/stats diff quiet
+      endif
+      set mean = `$KAPPA_DIR/parget mean stats`
+
+#  Get the subarray name, and store the result in a file for the subarray
+      set words = `$KAPPA_DIR/setext $n DSUTILS get SUBARRAY loop=no`
+      set subarray = $words[3]
+      if( -e $subarray.fpcx ) then
+         echo $mean >> $subarray.fpcx
+      else
+         echo $mean > $subarray.fpcx
+      endif
+   end
+
+#  Do the same for the Y offsets.
+   foreach n (`cat outdy_A.lis`)
+      $KAPPA_DIR/sub $n outdy-total diff
+      if( $idir > 1 ) then
+         $KAPPA_DIR/stats diff quiet clip=\[3,3,3\]
+      else
+         $KAPPA_DIR/stats diff quiet
+      endif
+      set mean = `$KAPPA_DIR/parget mean stats`
+      set words = `$KAPPA_DIR/setext $n DSUTILS get SUBARRAY loop=no`
+      set subarray = $words[3]
+      if( -e $subarray.fpcy ) then
+         echo $mean >> $subarray.fpcy
+      else
+         echo $mean > $subarray.fpcy
+      endif
+   end
+
+   echo "" >> code.c
+
+#  Find the median (or mean if less than 4 values are available) X offset for each subarray,
+#  converting from mm to pixels.
+   foreach n (s*.fpcx)
+      set w = `wc $n`
+      $KAPPA_DIR/trandat freename=$n auto shape=$w[1] ndf=tmp
+
+      if( $w[1] > 3 ) then
+         $KAPPA_DIR/stats tmp order quiet
+         set typical = `$KAPPA_DIR/parget median stats`
+      else
+         $KAPPA_DIR/stats tmp quiet
+         set typical = `$KAPPA_DIR/parget mean stats`
+      endif
+
+      set typical = `$KAPPA_DIR/calc exp='pa/1.135' pa=$typical`
+      set subarray = `basename $n .fpcx`
+      echo "Add $typical pixels to the focal plane X centre of subarray $subarray" | tee -a code.c
+   end
+
+#  Find the median (or mean if less than 4 values are available) Y offset for each subarray,
+#  converting from mm to pixels.
+   foreach n (s*.fpcy)
+      set w = `wc $n`
+      $KAPPA_DIR/trandat freename=$n auto shape=$w[1] ndf=tmp
+
+      if( $w[1] > 3 ) then
+         $KAPPA_DIR/stats tmp order quiet
+         set typical = `$KAPPA_DIR/parget median stats`
+      else
+         $KAPPA_DIR/stats tmp quiet
+         set typical = `$KAPPA_DIR/parget mean stats`
+      endif
+
+      set typical = `$KAPPA_DIR/calc exp='pa/1.135' pa=$typical`
+      set subarray = `basename $n .fpcy`
+      echo "Add $typical pixels to the focal plane Y centre of subarray $subarray" | tee -a code.c
+   end
+
+#  Move the final result ("code.c") into the parent directory
+   echo
+   if( -e code.c ) then
+      mv -f code.c ..
+      echo
+      echo "Finished - results are in file code.c"
+      echo "           Errors ($err_x,$err_y) mm"
+      echo
+   else
+      echo "Finished - something went wrong so there are no results :-("
+   endif
+   echo
+
+#  Move back to the original directory.
+   cd ..
+
+endif
+
+
+
+
+
+
+
+
+
+
