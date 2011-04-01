@@ -3,19 +3,22 @@
 #+
 #  Description:
 #     Displays a vector plot on the current graphics device showing the
-#     distortion at each point in the quadrant of the focal plane containing
-#     subarrays s8d and s4a, and over-plots the outline of each sub-array.
+#     distortion at each point in the area of the focal plane containing
+#     specified subarrays, and over-plots the outline of each sub-array.
 #     The distortion to use can be specified on the command line or selected
 #     by setting the environment variable SMURF_DISTORTION before running
 #     this script.
 
 #  Usage:
-#     showdistortion [distortion] [fxoff fyoff]
+#     showdistortion [distortion] [array] [fxoff fyoff]
 
 #  Arguments:
 #     distortion
 #        A distortion code. If no value is supplied, the current value of
 #        the SMURF_DISTORTION envieonment variable will be used.
+#     array
+#        The name of the array (s4a,s8d,etc) to plot, or "all". If no value
+#        is supplied, "all" is used.
 #     fxoff fyoff
 #        The focal plane coordinates (in mm) of a reference point. The
 #        distortion vector at this reference point will be subtracted from
@@ -43,45 +46,123 @@ else
    echo "   Using original distortion polynomial"
 endif
 
+#  Get the bounds of the focal plane area to plot.
+if( $# > 1 ) then
+   set array = $2
+else
+   set array = "all"
+endif
+
+if( $array == s4a || $array == s8d ) then
+   set fxlo = -50
+   set fxhi = 0
+   set fylo = 0
+   set fyhi = 50
+   set s4 = s4a
+   set s8 = s8d
+
+else if( $array == s4b || $array == s8c ) then
+   set fxlo = -50
+   set fxhi = 0
+   set fylo = 0
+   set fyhi = 50
+   set s4 = s4b
+   set s8 = s8c
+
+else if( $array == s4c || $array == s8b ) then
+   set fxlo = -50
+   set fxhi = 0
+   set fylo = 0
+   set fyhi = 50
+   set s4 = s4c
+   set s8 = s8b
+
+else if( $array == s4d || $array == s8a ) then
+   set fxlo = -50
+   set fxhi = 0
+   set fylo = 0
+   set fyhi = 50
+   set s4 = s4d
+   set s8 = s8a
+
+else
+   set fxlo = -50
+   set fxhi = 50
+   set fylo = -50
+   set fyhi = 50
+   set s4 = `echo s4a s4b s4c s4d`
+   set s8 = `echo s8a s8b s8c s8d`
+endif
+
+   set fxlo = -50
+   set fxhi = 50
+   set fylo = -50
+   set fyhi = 50
+
+
 #  Note the focal plane position of the vector to use as the reference (if
 #  any). This vector will be subtracted from all other displayed vectors.
-if( $# > 1 ) then
-   set fxoff = $2
+if( $# > 2 ) then
+   set fxoff = $3
 else
    set fxoff = "!"
 endif
 
-if( $# > 2 ) then
-   set fyoff = $3
+if( $# > 3 ) then
+   set fyoff = $4
 else
    set fyoff = "!"
 endif
 
 # Get NDFs holding the magnitude and orientation of the distortion at
 # each point in the focal plane.
-$SMURF_DIR/dsutils outmag=mag outang=ang in=! fxlo=-50 fxhi=0 fylo=0 fyh=50 \
-                   fxoff=$fxoff fyoff=$fyoff
+$SMURF_DIR/dsutils outmag=mag outang=ang in=! fxlo=$fxlo fxhi=$fxhi fylo=$fylo \
+                                   fyhi=$fyhi fxoff=$fxoff fyoff=$fyoff
 $KAPPA_DIR/settitle mag "'$dist distortion map'"
 
 #  Clear the graphics device, display a faint greyscale image of the vector
 #  magnitude, and then draw the vectors (so long as SMURF_DISTORTION is
 #  not NONE, VECPLOT objects to drawing nothing but zero length vectors).
 $KAPPA_DIR/gdclear current
+$KAPPA_DIR/lutable mapping=linear coltab=external lut=$KAPPA_DIR/cold_lut
+
 if( $none == 0 ) then
-   $KAPPA_DIR/display mag mode=sigma sigmas=\[-2,15\] quiet
-   $KAPPA_DIR/vecplot mag ang arrow=0.003 clear=no quiet
+   $KAPPA_DIR/display mag mode=scale key keypos=0.15 quiet \
+                      keystyle="'numlabgap(1)=0.1,size=0.5,edge(1)=right,textlab(1)=1,label(1)=Distortion magnitude (mm)'" accept
+   $KAPPA_DIR/vecplot mag ang noaxes arrow=0.003 clear=no key keypos=0.01 \
+                      keystyle='size=0.75' keyvec=10 quiet
 else
    echo "   There are no vectors draw because SMURF_DISTORTION is set to NONE"
    $KAPPA_DIR/display mag mode=scale low=0 high=1
 endif
 
-#  Display s8d outline in red
-$KAPPA_DIR/wcsframe mag s8d
-$KAPPA_DIR/ardplot region=mag quiet style='colour=red'
-$KAPPA_DIR/wcsframe mag fplane
+#  Display s8 arrays outlines in red
+foreach a ($s8)
+   $KAPPA_DIR/wcsframe mag $a
+   $KAPPA_DIR/ardplot region=mag quiet style="'colour=red,width=3'"
+   $KAPPA_DIR/wcsframe mag fplane
+end
 
-#  Display s4a outline in green
-$KAPPA_DIR/wcsframe mag s4a
-$KAPPA_DIR/ardplot region=mag quiet style='colour=green'
-$KAPPA_DIR/wcsframe mag fplane
+#  Display s4 array outlines in green
+foreach a ($s4)
+   $KAPPA_DIR/wcsframe mag $a
+   $KAPPA_DIR/ardplot region=mag quiet style="'colour=green,width=3'"
+   $KAPPA_DIR/wcsframe mag fplane
+end
+
+echo "-45,-43" > coin
+echo "-45,47" >> coin
+echo "45,47" >> coin
+echo "45,-43" >> coin
+$KAPPA_DIR/listmake frame=FPLANE mode=file outcat=fred dim=2 file=coin
+$KAPPA_DIR/listshow fred plot=text strings="'s4d,s4a,s4b,s4c'" \
+                    style="'size=0.6,colour=green,textmargin=0.6'" quiet
+
+echo "-45,-47" > coin
+echo "-45,43" >> coin
+echo "45,43" >> coin
+echo "45,-47" >> coin
+$KAPPA_DIR/listmake frame=FPLANE mode=file outcat=fred dim=2 file=coin
+$KAPPA_DIR/listshow fred plot=text strings="'s8a,s8d,s8c,s8b'" \
+                    style="'size=0.6,colour=red,textmargin=0.6'" quiet
 
