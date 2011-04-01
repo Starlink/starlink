@@ -92,6 +92,7 @@ examples/dimmconfig_bright_extended.lis \
 examples/dimmconfig_distortionmap.lis \
 examples/dimmconfig_faint_extended.lis \
 examples/dimmconfig_fridgeflat.lis \
+examples/dimmconfig_moon.lis \
 examples/dimmconfig_newfilt.lis \
 examples/dimmconfig_pca.lis \
 examples/dimmconfig_pointing.lis \
