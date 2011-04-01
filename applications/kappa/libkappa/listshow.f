@@ -447,6 +447,9 @@
 *        Added Parameter STEP.
 *     2010 October 14 (MJC):
 *        Permit temporary style attributes.
+*     1-APR-2011 (DSB):
+*        Use KPG_GDFND in place of KPG1_AGFND in case the most recent
+*        data picture had no WCS.
 *     {enter_further_changes_here}
 
 *-
@@ -712,10 +715,10 @@
          ELSE
 
 *  See if the current picture has the specified name or contains a
-*  picture with the specified NAME.  If found, the picture becomes the
-*  current picture and its AGI identifier is returned.  If it's not
-*  found, an error will be reported.
-            CALL KPG1_AGFND( PICNAM, IPIC, STATUS )
+*  picture with the specified NAME (and with WCS).  If found, the picture
+*  becomes the current picture and its AGI identifier is returned.  If it's
+*  not found, an error will be reported.
+            CALL KPG1_GDFND( 'DATA', IPIC, STATUS )
 
 *  If no picture was found, annul the error and use the original
 *  current picture.

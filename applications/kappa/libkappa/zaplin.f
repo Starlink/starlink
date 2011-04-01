@@ -429,6 +429,9 @@
 *        Replace calls to BAD2Dx with KPG_FISEx.
 *     2010 October 14 (MJC):
 *        Allow temporary style attributes.
+*     1-APR-2011 (DSB):
+*        Use KPG_GDFND in place of KPG1_AGFND in case the most recent
+*        data picture had no WCS.
 *     {enter_further_changes_here}
 
 *-
@@ -625,8 +628,8 @@
 *  identifier for the current AGI picture.
          CALL KPG1_PGOPN( 'DEVICE', 'UPDATE', IPIC0, STATUS )
 
-*  Find the most recent DATA picture.
-         CALL KPG1_AGFND( 'DATA', IPIC, STATUS )
+*  Find the most recent DATA picture which has WCS.
+         CALL KPG1_GDFND( 'DATA', IPIC, STATUS )
 
 *  Report the name, comment, and label, if one exists, for the current
 *  picture.
