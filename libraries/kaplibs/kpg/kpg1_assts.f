@@ -79,6 +79,8 @@
 *        Original version.
 *     16-DEC-2005: (DSB):
 *        Added DrawDSB.
+*     1-APR-2011: (DSB):
+*        Added TextMargin.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -116,6 +118,7 @@
       CHARACTER VALUE*(GRP__SZNAM) ! Attribute value
       INTEGER ISTAT                ! CHR status value
       INTEGER IVAL                 ! Integer value read from string
+      REAL RVAL                    ! Real value read from string
 *.
 
 *  Initialise.
@@ -155,6 +158,20 @@
                   CALL GRF_SETTBG( IVAL )
                END IF
 
+            END IF
+
+*  TEXTMARGIN: specifies the margin to clear around each text string. The
+*  value is normalised to the height of the text (i.e. a margin of 1.0
+*  produces a margin equal to the text height).
+         ELSE IF( CHR_SIMLR( NAME, 'TEXTMARGIN' ) ) THEN
+
+*  Attempt to extract a margin width.
+            ISTAT = STATUS
+            CALL CHR_CTOR( VALUE, RVAL, ISTAT )
+
+*  If a valid value was supplied, set it as the margin width.
+            IF( ISTAT .EQ. SAI__OK ) THEN
+               CALL GRF_SETTMG( RVAL )
             END IF
 
 *  DrawDSB: specifies whether the unselected sideband of a DSBSpecFrame

@@ -11,6 +11,10 @@ Version 3.2
      returns the number of bytes for a given numeric HDS data type.
    - Routine KPG1_BADBX now has an extra argument that indicates how the
      calculated bounding box should be used.
+   - Routine KPG1_ASSET now allows the new pseudo-attribute "TEXTMARGIN"
+     to be used to specify a margin to clear around a text string. The
+     value of the attribute gives the width of the margin in units of the
+     text height.
 
 Version 3.1
    - New C function kpg1Config gets a KeyMap containing configuration

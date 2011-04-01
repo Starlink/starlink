@@ -262,6 +262,7 @@
       IF( CLASS .EQ. 'Plot' .AND.
      :     PARAM( IS : IE ) .NE. 'TEMPSTYLE' ) THEN
          CALL GRF_SETTBG( 0 )
+         CALL GRF_SETTMG( 0.0 )
          CALL KPG1_SETASTDSB( .TRUE. )
          CALL KPG1_SETASTFIT( .FALSE. )
       END IF

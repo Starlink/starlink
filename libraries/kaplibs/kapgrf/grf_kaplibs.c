@@ -57,6 +57,9 @@
 *     7-MAR-2011 (DSB):
 *        - Added astGBBuf and astGEBuf.
 *        - Fix misc harmless compiler warnings
+*     1-APR-2011 (DSB):
+*        Added grf_settmg/grf_get_tmg to allow margin around text to be
+*        specified.
 */
 
 /* Macros */
@@ -86,10 +89,15 @@
 /* The colour index for the background of text strings. */
 static int textbg = 0;
 
+/* The fraction width of the margin to clear around text. The value is
+   normalised to the height of the text box. */
+static float text_margin = 0.0;
+
 /* Function Prototypes. */
 /* ==================== */
 /* These define a local C interface to the PGPLOT library. */
 static void ccpgline(int n, float xpts[], float ypts[] );
+static void ccpgpoly(int n, float xpts[], float ypts[] );
 static void ccpgpt(int n, float xpts[], float ypts[], int symbol);
 static void ccpgptxt(float x, float y, float angle, float fjust, char *text );
 static void ccpgqcf(int *cf);
@@ -100,6 +108,7 @@ static void ccpgqcs(int units, float *xch, float *ych);
 static void ccpgqls(int *ls);
 static void ccpgqlw(int *lw);
 static void ccpgqtbg(int *tbci);
+static void ccpgqfs(int *fs);
 static void ccpgqtxt(float x, float y, float angle, float fjust, char *text, float xbox[], float ybox[]);
 static void ccpgqvp(int units, float *x1, float *x2, float *y1, float *y2);
 static void ccpgqvsz(int units, float *x1, float *x2, float *y1, float *y2);
@@ -109,6 +118,7 @@ static void ccpgsch(float ch);
 static void ccpgsci(int ci);
 static void ccpgsls(int ls);
 static void ccpgslw(int lw);
+static void ccpgsfs(int fs);
 static void ccpgstbg(int tbci);
 static void ccpgupdt( void );
 static void ccpgbbuf( void );
@@ -117,6 +127,7 @@ static void ccpgebuf( void );
 /* These describe the native Fortran interface to the PGPLOT library. The
    macros used come from the "f77.h" include file. */
 F77_SUBROUTINE(pgline)( INTEGER(n), REAL_ARRAY(x), REAL_ARRAY(y) );
+F77_SUBROUTINE(pgpoly)( INTEGER(n), REAL_ARRAY(x), REAL_ARRAY(y) );
 F77_SUBROUTINE(pgpt)( INTEGER(n), REAL_ARRAY(x), REAL_ARRAY(y), INTEGER(TYPE) );
 F77_SUBROUTINE(pgptxt)( REAL(x), REAL(y), REAL(angle), REAL(fjust), CHARACTER(text) TRAIL(text) );
 F77_SUBROUTINE(pgqcf)( INTEGER(ival) );
@@ -127,6 +138,7 @@ F77_SUBROUTINE(pglen)( INTEGER(units), CHARACTER(text), REAL(xl), REAL(yl) TRAIL
 F77_SUBROUTINE(pgqls)( INTEGER(ival) );
 F77_SUBROUTINE(pgqlw)( INTEGER(ival) );
 F77_SUBROUTINE(pgqtbg)( INTEGER(tbg) );
+F77_SUBROUTINE(pgqfs)( INTEGER(fs) );
 F77_SUBROUTINE(pgqtxt)( REAL(x), REAL(y), REAL(angle), REAL(fjust), CHARACTER(text), REAL_ARRAY(xbox), REAL_ARRAY(ybox) TRAIL(text) );
 F77_SUBROUTINE(pgqvp)( INTEGER(units), REAL(vx1), REAL(vx2), REAL(vy1), REAL(vy2) );
 F77_SUBROUTINE(pgqvsz)( INTEGER(units), REAL(x1), REAL(x2), REAL(y1), REAL(y2) );
@@ -137,6 +149,7 @@ F77_SUBROUTINE(pgsci)( INTEGER(ival) );
 F77_SUBROUTINE(pgsls)( INTEGER(ival) );
 F77_SUBROUTINE(pgslw)( INTEGER(ival) );
 F77_SUBROUTINE(pgstbg)( INTEGER(tbg) );
+F77_SUBROUTINE(pgsfs)( INTEGER(fs) );
 F77_SUBROUTINE(pgupdt)( );
 F77_SUBROUTINE(pgbbuf)( );
 F77_SUBROUTINE(pgebuf)( );
@@ -561,7 +574,8 @@ int astGText( const char *text, float x, float y, const char *just,
    char lj[ 2 ];
    float uplen, xbox[ 4 ], ybox[ 4 ];
    float angle, fjust, hu, test, alpha, beta;
-   int i, tbg;
+   int i, fs, tbg;
+   float ca, sa, dx, dy, margin, xpx, xpy, ypx, ypy;
 
 /* Check that there is something to draw. */
    if( text && text[ 0 ] != 0 ){
@@ -650,6 +664,45 @@ int astGText( const char *text, float x, float y, const char *just,
             x -= 0.5*upx*hu;
             y -= 0.5*upy*hu;
          }
+      }
+
+/* If we want a cleared marging around the text... */
+      if( text_margin > 0 && textbg >= 0 ) {
+
+/* Get the text bounding box. */
+         ccpgqtxt( x, y, angle, fjust, (char *) text, xbox, ybox );
+
+/* Get the width of the margin. */
+         dx = ( xbox[ 1 ] - xbox[ 0 ] )*alpha;
+         dy = ( ybox[ 1 ] - ybox[ 0 ] )*beta;
+         margin = sqrt( dx*dx + dy*dy )*text_margin;
+
+/* Get the corresponding increments in X and Y. */
+         ca = cos( angle );
+         sa = sin( angle );
+         xpx = margin*ca/alpha;
+         xpy = margin*sa/beta;
+         ypx = -margin*sa/alpha;
+         ypy = margin*ca/beta;
+
+/* Extend the box */
+         xbox[ 0 ] += -xpx - ypx;
+         ybox[ 0 ] += -xpy - ypy;
+         xbox[ 1 ] += -xpx + ypx;
+         ybox[ 1 ] += -xpy + ypy;
+         xbox[ 2 ] +=  xpx + ypx;
+         ybox[ 2 ] +=  xpy + ypy;
+         xbox[ 3 ] +=  xpx - ypx;
+         ybox[ 3 ] +=  xpy - ypy;
+
+/* Fill the polygon with the requested text background colour. */
+         ccpgqfs( &fs );
+         ccpgqci( &tbg );
+         ccpgsfs( 1 );
+         ccpgsci( textbg );
+         ccpgpoly( 4, xbox, ybox );
+         ccpgsci( tbg );
+         ccpgsfs( fs );
       }
 
 /* Display the text, erasing any graphics. */
@@ -1261,6 +1314,34 @@ static void ccpgline(int n, float xpts[], float ypts[] ){
    }
 }
 
+static void ccpgpoly(int n, float xpts[], float ypts[] ){
+   F77_INTEGER_TYPE N;
+   F77_REAL_TYPE *XX;
+   F77_REAL_TYPE *YY;
+   int i;
+
+   XX = (F77_REAL_TYPE *) malloc( sizeof( F77_REAL_TYPE )*(size_t) n );
+   YY = (F77_REAL_TYPE *) malloc( sizeof( F77_REAL_TYPE )*(size_t) n );
+
+   if( astOK ){
+
+      for( i = 0; i < n; i++ ){
+         XX[ i ] = (F77_REAL_TYPE) xpts[ i ];
+         YY[ i ] = (F77_REAL_TYPE) ypts[ i ];
+      }
+
+      N = (F77_INTEGER_TYPE) n;
+
+      F77_CALL(pgpoly)( INTEGER_ARG(&N), REAL_ARRAY_ARG(XX),
+                        REAL_ARRAY_ARG(YY) );
+
+      free( (void *) XX );
+      free( (void *) YY );
+      XX = NULL;
+      YY = NULL;
+   }
+}
+
 static void ccpgpt(int n, float xpts[], float ypts[], int symbol){
    F77_INTEGER_TYPE N;
    F77_REAL_TYPE *XX;
@@ -1357,6 +1438,18 @@ static void ccpgstbg(int tbci){
    F77_INTEGER_TYPE TBCI;
    TBCI = (F77_INTEGER_TYPE) tbci;
    F77_CALL(pgstbg)( INTEGER_ARG(&TBCI) );
+}
+
+static void ccpgqfs(int *fs){
+   F77_INTEGER_TYPE FS;
+   F77_CALL(pgqfs)( INTEGER_ARG(&FS) );
+   *fs = (int) FS;
+}
+
+static void ccpgsfs(int fs){
+   F77_INTEGER_TYPE FS;
+   FS = (F77_INTEGER_TYPE) fs;
+   F77_CALL(pgsfs)( INTEGER_ARG(&FS) );
 }
 
 static void ccpgqcs(int units, float *xch, float *ych){
@@ -1537,4 +1630,16 @@ F77_SUBROUTINE(grf_gettbg)( INTEGER(TBG) ) {
    GENPTR_INTEGER(TBG)
 
    *TBG = textbg;
+}
+
+F77_SUBROUTINE(grf_settmg)( REAL(TMG) ) {
+   GENPTR_REAL(TMG)
+
+   text_margin = (float) *TMG;
+}
+
+F77_SUBROUTINE(grf_gettmg)( REAL(TMG) ) {
+   GENPTR_REAL(TMG)
+
+   *TMG = text_margin;
 }
