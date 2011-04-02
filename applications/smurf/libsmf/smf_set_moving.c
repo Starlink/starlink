@@ -44,6 +44,9 @@
 *        Original version
 *     2011-02-09 (TIMJ):
 *        Add Fitschan to fill in BASECx
+*     2011-04-01 (TIMJ):
+*        BASECx must be stored in TRACKSYS coordinates, not the
+*        system of the current frameset.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -90,6 +93,7 @@
 #include "smf.h"
 #include "smf_typ.h"
 #include "smf_err.h"
+#include "sc2da/sc2ast.h"
 
 #define FUNC_NAME "smf_set_moving"
 
@@ -108,16 +112,26 @@ void smf_set_moving ( AstFrameSet* wcs, AstFitsChan * fchan, int *status ) {
 	msgOutif( MSG__DEBUG, "",
 		  "SMF_SET_MOVING: setting attributes for moving sources", status );
 	astSet( wcs, "SkyRefIs=Origin,AlignOffset=1" );
+      }
 
-        if (fchan && strcmp(astsys, "GAPPT" ) == 0 ) {
-          double dtemp = 0.0;
-          /* If we are missing one of the BASE headers add in new versions
-             with the base position from the frameset */
-          if (!astGetFitsF( fchan, "BASEC1", &dtemp ) ||
-              !astGetFitsF( fchan, "BASEC2", &dtemp ) ) {
-            atlPtftd( fchan, "BASEC1", AST__DR2D * astGetD( wcs, "SkyRef(1)"),
+      /* if there is a FITS header we now worry about having a BASECx header */
+      if (fchan) {
+        double dtemp = 0.0;
+        /* If we are missing one of the BASE headers add in new versions
+           with the base position from the frameset */
+        if (!astGetFitsF( fchan, "BASEC1", &dtemp ) ||
+            !astGetFitsF( fchan, "BASEC2", &dtemp ) ) {
+          char * tracksys = NULL;
+          /* To fill it in we need to add it back in the TRACKSYS coordinate
+             frame. So take a copy of the WCS before we modify things */
+          if (astGetFitsS( fchan, "TRACKSYS", &tracksys )) {
+            const char * asttracksys = sc2ast_convert_system( tracksys, status );
+            AstFrameSet * wcs2 = astCopy( wcs );
+
+            astSet( wcs2, "System=%s", asttracksys );
+            atlPtftd( fchan, "BASEC1", AST__DR2D * astGetD( wcs2, "SkyRef(1)"),
                       "C1 BASE position", status);
-            atlPtftd( fchan, "BASEC2", AST__DR2D * astGetD( wcs, "SkyRef(2)"),
+            atlPtftd( fchan, "BASEC2", AST__DR2D * astGetD( wcs2, "SkyRef(2)"),
                       "C2 BASE position", status);
           }
         }
