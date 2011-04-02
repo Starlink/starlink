@@ -57,7 +57,7 @@
 *        Parameter OUTCAT.  See Parameter FRAME for a description of the
 *        allowed values for this parameter.  If a null (!) value is
 *        supplied, the positions will be stored in the Frame used to
-*        specify positions within the input catalogue. [!]
+*        specify positions within the input catalogue.  [!]
 *     CATEPOCH = DOUBLE PRECISION (Read)
 *        The epoch at which the sky positions stored in the output
 *        catalogue were determined.  It will only be accessed if an
@@ -266,8 +266,9 @@
 *        in units of radians.
 *     STEP = _INTEGER (Read)
 *        The increment between position identifiers to be displayed.
-*        Specifying a value larger than 1 causes a subset of the position
-*        identifiers between FIRST and LAST to be displayed. [1]
+*        Specifying a value larger than 1 causes a subset of the
+*        position identifiers between FIRST and LAST to be displayed.
+*        [1]
 *     STCSCOL = LITERAL (Read)
 *        The name of a catalogue column containing an STC-S description
 *        of a two-dimensional spatial shape associated with each
@@ -278,10 +279,10 @@
 *        shape includes the co-ordinate system in which the shape is
 *        defined. This application assumes that all the STC-S shapes
 *        read from the specified column will be defined within the same
-*        co-ordinate system. The transformation from the STC-S co-ordinate
-*        system to the co-ordinate system of the displayed image is
-*        determined once from the first shape plotted, and then re-used
-*        for all later shapes. ["Shape"]
+*        co-ordinate system. The transformation from the STC-S
+*        co-ordinate system to the co-ordinate system of the displayed
+*        image is determined once from the first shape plotted, and then
+*        re-used for all later shapes.  ["Shape"]
 *     STRINGS = LITERAL (Read)
 *        A group of text strings which are used to mark the supplied
 *        positions if Parameter PLOT is set to "TEXT".  The first
@@ -715,9 +716,9 @@
          ELSE
 
 *  See if the current picture has the specified name or contains a
-*  picture with the specified NAME (and with WCS).  If found, the picture
-*  becomes the current picture and its AGI identifier is returned.  If it's
-*  not found, an error will be reported.
+*  picture with the specified NAME (and with WCS).  If found, the
+*  picture becomes the current picture and its AGI identifier is
+*  returned.  If it's not found, an error will be reported.
             CALL KPG1_GDFND( 'DATA', IPIC, STATUS )
 
 *  If no picture was found, annul the error and use the original
