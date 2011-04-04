@@ -3,27 +3,26 @@
 # *** Specialized config for the moon ***
 #
 # This config file is for the fairly specialized case of scans across
-# the moon (tuned  using 850um observations 20110328 #40). Astronomical
-# signal dominates everything else, so we place map estimation *before*
-# the removal of low-frequency noise (see modelorder). In addition, we
-# set the filter scale to 0.5 deg, the approximate diameter of the disk.
-# Common-mode removal is completely turned off. Noise in the
-# WVM signal can cause significant steps, so we instead use CSOTAU as
-# a fixed zenith opacity monitor (which internally gets converted into
-# line-of-sight values smoothly with elevation). Finally, we use a
-# zero-constraint to provide a solid baseline beyond the edge of the moon
-# as a reference, and to help the solution converge.
+# the moon (tuned using 850um observations 20110328 #40). Astronomical
+# signal dominates everything else, so we place map estimation
+# *before* the removal of low-frequency noise (see modelorder). In
+# addition, we set the filter scale to 0.5 deg, the approximate
+# diameter of the disk.  Common-mode removal is completely turned off.
+# Noise in the WVM signal can cause significant steps, so we instead
+# use CSOTAU as a fixed zenith opacity monitor (which internally gets
+# converted into line-of-sight values smoothly with
+# elevation). Finally, we use a zero-constraint to provide a solid
+# baseline beyond the edge of the moon as a reference, and to help the
+# solution converge.
 #
 # ********************************************************************
 
 # required to help the large-scale modes converge
 numiter=20
 
-# estimate the map before filtering. COM is only used to flag bad
-# data (see com.noremove flag)
+# estimate the map before filtering. Don't use COM because it removes
+# structure on the scale of the array.
 modelorder = (ext,ast,flt,noi)
-
-com.noremove=1
 
 # set map beyond moon to 0 after each iteration
 ast.zero_circle=0.26
