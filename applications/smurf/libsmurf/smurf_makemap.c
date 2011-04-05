@@ -342,20 +342,22 @@
 *     i) General parameters controlling the iterative map-maker.
 *
 *     BOLOMAP = LOGICAL
-*       If true a map is made of every bolometer (in addition to the main
-*       map) and written to the .MORE.SMURF.BOLOMAPS extension. Default is false.
+*       If true a map is made of every bolometer (in addition to the
+*       main map) and written to the .MORE.SMURF.BOLOMAPS
+*       extension. Default is false.
 *     CHITOL = REAL
 *       Maximum difference in chi^2 between subsequent iterations required
 *       to stop if NUMITER is negative.
 *     DELDIMM = LOGICAL
-*       If 1 delete temporary files produced by the dynamic iterative map maker
-*       (with a ".dimm" extension).
+*       If 1 delete temporary files produced by the dynamic iterative
+*       map maker when memoiter=0 (with a ".dimm" extension).
 *     ENSUREFLAT = LOGICAL
-*       If true (the default) the input data will be flat-fielded before the map
-*       is made. If false the input data will not be flat-fielded although if the
-*       data have already been flatfielded this will be acceptable. This can be
-*       used to investigate flatfielding errors in conjunction with the BOLOMAP
-*       parameter.
+*       If true (the default) the input data will be flat-fielded
+*       before the map is made. If false the input data will not be
+*       flat-fielded although if the data have already been
+*       flatfielded this will be acceptable. This can be used to
+*       investigate flatfielding errors in conjunction with the
+*       BOLOMAP parameter.
 *     EXPORTNDF( ) = STRING
 *       Export model components to Starlink ".sdf" files. Specify 1 or
 *       0 to export all or none of the components respectively. One
@@ -380,7 +382,8 @@
 *       slower, and will not produce as good a final map, because
 *       discontinuities exist at each file boundary (since, for
 *       example, operations like FFT filtering will pad part of the
-*       boundary around file edges).
+*       boundary around file edges). Creates temporary files with a ".dimm"
+*       extension (see DELDIMM).
 *     MODELORDER( ) = STRING
 *       An ordered list of model components to be fit by the iterative
 *       map-maker, e.g. "(com,gai,ext,ast,flt,noi)". Each component has a
@@ -433,9 +436,10 @@
 *     ii) Parameters controlling pre-iteration data-cleaning steps.
 *
 *     APOD = INTEGER
-*       Apodize signals (smoothly roll-off) using sine/cosine functions at
-*       start and end of the signal across this many samples. The supplied
-*       APOD value is ignored and a value of zero is used if ZEROPAD is set to 0.
+*       Apodize signals (smoothly roll-off) using sine/cosine
+*       functions at start and end of the signal across this many
+*       samples. The supplied APOD value is ignored and a value of
+*       zero is used if ZEROPAD is set to 0.
 *     BADFRAC = REAL
 *       Flag entire bolometer as dead if at least this fraction of the samples
 *       in a detector time series were flagged as bad by the DA system.
@@ -505,11 +509,12 @@
 *       Constrain boundary regions with low hit count to 0. The threshold
 *       is where the hits are this fraction lower than the mean.
 *     AST.ZERO_NOTLAST = LOGICAL
-*       If ast.zero_notlast is set, on the final iteration the AST.ZERO_LOWHITS
-*       boundary condition will not be applied. This will probably be useful
-*       for deep point-source observations for which the large-scale noise is
-*       not as important, but keeping as much data around the edges of the map is.
-*       (currently requires that NUMITER is not a negative number).
+*       If ast.zero_notlast is set, on the final iteration the
+*       AST.ZERO_LOWHITS boundary condition will not be applied. This
+*       will probably be useful for deep point-source observations for
+*       which the large-scale noise is not as important, but keeping
+*       as much data around the edges of the map is.  (currently
+*       requires that NUMITER is not a negative number).
 *     COM.BOXCAR = INTEGER
 *       If COM model component specified, boxcar smooth by this number of
 *       samples before removing it.
@@ -650,8 +655,8 @@
 *     SMO.NOTFIRST = LOGICAL
 *       If true the SMO model will not be executed in the first iteration.
 *     SMO.TYPE = STRING
-*       Type of filter to remove. Current options are "mean" and "median". Default
-*       is mean.
+*       Type of filter to remove. Current options are "mean" and
+*       "median". Default is mean.
 
 *  Related Applications:
 *     SMURF: QLMAKEMAP
