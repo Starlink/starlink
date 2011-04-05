@@ -171,14 +171,19 @@
 *          can be displayed as a vector plot using KAPPA:VECPLOT. In addition,
 *          the outline of any sub-array can be over-plotted by changing
 *          the current coordinate Frame and then using KAPPA:ARDPLOT (for
-*          instance "wcsframe outmag s8a" followed by "ardplot s8a"). [!]
+*          instance "wcsframe outmag s8a" followed by "ardplot s8a").
+*          Note, for some distortions (e.g. NEW4) the distortion at 450
+*          and 850 are different. The waveband to use is determined by
+*          the value supplied for the SUBARRAY parameter. [!]
 *     OUTSLICE = NDF (Write)
 *          If a value was supplied for IN and ITIME, then OUTSLICE gives the
 *          name of  the NDF in which to store the bolometer data for the
 *          given time slice, including celestial WCS.
 *     SUBARRAY = LITERAL (Write)
 *          The name of the subarray being processed: one of "s8a", "s8b",
-*          "s8b", "s8d", "s4a", "s4b", "s4b", "s4d".
+*          "s8b", "s8d", "s4a", "s4b", "s4b", "s4d". If OUTMAG is not
+*          null, then the value supplied for SUBARRAY determines the waveband
+*          for which the distortion is returned.
 
 *  Related Applications:
 *     SMURF: DISTORTION, SHOWDISTORTION
@@ -200,9 +205,12 @@
 *        Prologue tweaks for hawaiki release
 *     18-FEB-2010 (DSB):
 *        Added parameters ITIME and OUTSLICE.
+*     5-APR-2011 (DSB):
+*        Use SUBARRAY value to determine waveband of distortion to return in
+*        OUTMAG.
 
 *  Copyright:
-*     Copyright (C) 2009-2010 Science and Technology Facilities Council.
+*     Copyright (C) 2009-2011 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -466,6 +474,7 @@ void smurf_dsutils( int *status ) {
    int ubnd_out[ 2 ];        /* Pixel index upper bounds in output NDF */
    int used;                 /* Was the time slice usable? */
    int zbox;
+   sc2ast_subarray_t subnum;
    size_t size;              /* Number of files in input group */
    smfData *data = NULL;     /* Pointer to data struct for input file */
    smfFile *file = NULL;     /* Pointer to file struct for input file */
@@ -542,9 +551,12 @@ void smurf_dsutils( int *status ) {
 /* We now need the PolyMap  specified by the current setting of
    environment variable SMURF_DISTORTION. Get the whole GRID-> FP (in
    rads) Mapping for the first sub array, and extract the PolyMap from it. */
-      sc2ast_createwcs( S8A, NULL, NULL, NULL, &fp_fset, status );
+      parGet0c( "SUBARRAY", subarray, 8, status );
+      sc2ast_name2num( subarray, &subnum, status );
+      sc2ast_createwcs( subnum, NULL, NULL, NULL, &fp_fset, status );
       polymap = FindPolyMap( astGetMapping( fp_fset, AST__BASE, AST__CURRENT ),
                              status );
+
 /* If no PolyMap was found, use a UnitMap instead. */
       if( !polymap ) polymap = (AstPolyMap *) astUnitMap( 2, " " );
 

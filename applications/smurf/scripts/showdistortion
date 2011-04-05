@@ -94,12 +94,6 @@ else
    set s8 = `echo s8a s8b s8c s8d`
 endif
 
-   set fxlo = -50
-   set fxhi = 50
-   set fylo = -50
-   set fyhi = 50
-
-
 #  Note the focal plane position of the vector to use as the reference (if
 #  any). This vector will be subtracted from all other displayed vectors.
 if( $# > 2 ) then
@@ -117,7 +111,8 @@ endif
 # Get NDFs holding the magnitude and orientation of the distortion at
 # each point in the focal plane.
 $SMURF_DIR/dsutils outmag=mag outang=ang in=! fxlo=$fxlo fxhi=$fxhi fylo=$fylo \
-                                   fyhi=$fyhi fxoff=$fxoff fyoff=$fyoff
+                                   fyhi=$fyhi fxoff=$fxoff fyoff=$fyoff \
+                                   subarray=$array
 $KAPPA_DIR/settitle mag "'$dist distortion map'"
 
 #  Clear the graphics device, display a faint greyscale image of the vector
@@ -130,7 +125,7 @@ if( $none == 0 ) then
    $KAPPA_DIR/display mag mode=scale key keypos=0.15 quiet \
                       keystyle="'numlabgap(1)=0.1,size=0.5,edge(1)=right,textlab(1)=1,label(1)=Distortion magnitude (mm)'" accept
    $KAPPA_DIR/vecplot mag ang noaxes arrow=0.003 clear=no key keypos=0.01 \
-                      keystyle='size=0.75' keyvec=10 quiet
+                      keystyle='size=0.75' quiet
 else
    echo "   There are no vectors draw because SMURF_DISTORTION is set to NONE"
    $KAPPA_DIR/display mag mode=scale low=0 high=1
