@@ -34,6 +34,9 @@
 **    18-JUN-2009 (DSB):
 **       Added palSlaPvobs by translating the corresponding fortran routine
 **       into C (by hand).
+**    5-APR-2011 (DSB):
+**       Change palSlaDrange to better handle cases where the supplied
+**       value is very close to +/- PI.
 */
 
 #include "pal.h"
@@ -233,8 +236,11 @@ int Q0,FOBAR;double q1,Q2[3];for(FOBAR=0;FOBAR<3;FOBAR++){q1
 FOBAR]=q1;}for(FOBAR=0;FOBAR<3;FOBAR++){BAZ[FOBAR]=Q2[FOBAR]
 ;}}
 
-double palSlaDrange(double fOo){double bar;bar=dmod(fOo,D2PI);
-return(fabs(bar)<DPI)?bar:bar-dsign(D2PI,fOo);}
+double palSlaDrange(double fOo){
+   while( fOo < -DPI ) fOo += D2PI;
+   while( fOo > DPI ) fOo -= D2PI;
+   return fOo;
+}
 
 double palSlaDranrm(double FoO){double BAR;BAR=dmod(FoO,D2PI);
 return(BAR>=0.0)?BAR:BAR+D2PI;}

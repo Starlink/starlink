@@ -949,6 +949,11 @@ f     - AST_TESTFITS: Test if a keyword has a defined value in a FitsChan
 *        stored as primary axis description keywords, even if the original
 *        non-standard CTYPE values were read from an alternative axis
 *        descriptions.
+*     5-APR-2011 (DSB):
+*        In SpecTrans, correct the MSX CAR projection translation. The
+*        first pixel starts at GRID=0.5, not GRID=0.0. So the CRPIX value
+*        needs to be reduced by 0.5 prior to normalisation, and then
+*        increased by 0.5 after normalisation.
 *class--
 */
 
@@ -1161,6 +1166,7 @@ f     - AST_TESTFITS: Test if a keyword has a defined value in a FitsChan
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 /* Type Definitions */
 /* ================ */
@@ -27600,7 +27606,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
              GetValue2( ret, this, FormatKey( "CRPIX", axlon + 1, -1, s, status ),
                         AST__FLOAT, (void *) &dval, 0, method, class, status ) ) {
             if( cdelti != 0.0 ) {
-               dval = AST__DR2D*palSlaDrange( AST__DD2R*dval*cdelti )/cdelti;
+               dval = 0.5 + AST__DR2D*palSlaDrange( AST__DD2R*( dval - 0.5 )*cdelti )/cdelti;
                SetValue( ret, FormatKey( "CRPIX", axlon + 1, -1, s, status ),
                          (void *) &dval, AST__FLOAT, CardComm( this, status ), status );
             }
