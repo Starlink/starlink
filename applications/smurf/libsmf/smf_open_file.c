@@ -968,7 +968,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
         /* Free header info if no longer needed */
         if ( (flags & SMF__NOCREATE_HEAD) && tmpState != NULL) {
           /* can not use smf_free */
-          free( tmpState );
+          astFree( tmpState );
           tmpState = NULL;
         } else {
           hdr->allState = tmpState;
