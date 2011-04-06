@@ -342,9 +342,9 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
       /* check first and last WVM reading. At least one should be good */
       JCMTState * curstate = hdr->allState;
       JCMTState * endstate = &((hdr->allState)[nframes-1]);
-      if (curstate->wvm_time != VAL__BADR && curstate->wvm_time > 0) {
-        tausrc = SMF__TAUSRC_WVMRAW;
-      } else if ( endstate->wvm_time != VAL__BADR && endstate->wvm_time > 0.0) {
+
+      if (curstate->wvm_time != VAL__BADR && curstate->wvm_time > 0 &&
+          endstate->wvm_time != VAL__BADR && endstate->wvm_time > 0) {
         tausrc = SMF__TAUSRC_WVMRAW;
       } else {
         tausrc = SMF__TAUSRC_CSOTAU;
