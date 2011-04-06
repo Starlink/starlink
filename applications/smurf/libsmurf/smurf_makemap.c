@@ -214,10 +214,14 @@
 *          the spatial projection in the output cube. This should be provided
 *          in the system specified by parameter SYSTEM.
 *     SPREAD = LITERAL (Read)
+
 *          The method to use when spreading each input pixel value out
-*          between a group of neighbouring output pixels. If SPARSE is set
-*          TRUE, then SPREAD is not accessed and a value of "Nearest" is
-*          always assumed. SPREAD can take the following values:
+*          between a group of neighbouring output pixels if using
+*          METHOD=REBIN (for METHOD=ITERATE nearest-neighbour
+*          resampling is always used). If SPARSE is set TRUE, then
+*          SPREAD is not accessed and a value of "Nearest" is always
+*          assumed. SPREAD can take the following values:
+
 *
 *          - "Linear" -- The input pixel value is divided bi-linearly between
 *          the four nearest output pixels.  Produces smoother output NDFs than
@@ -344,20 +348,29 @@
 *     BOLOMAP = LOGICAL
 *       If true a map is made of every bolometer (in addition to the
 *       main map) and written to the .MORE.SMURF.BOLOMAPS
-*       extension. Default is false.
+*       extension. [0]
 *     CHITOL = REAL
 *       Maximum difference in chi^2 between subsequent iterations required
-*       to stop if NUMITER is negative.
+*       to stop if NUMITER is negative. [1e-3]
 *     DELDIMM = LOGICAL
 *       If 1 delete temporary files produced by the dynamic iterative
-*       map maker when memoiter=0 (with a ".dimm" extension).
+*       map maker when memoiter=0 (with a ".dimm" extension). [1]
+*     DOWNSAMPSCALE = REAL
+*       The sample rate of the data need only ensure that the angular scale
+*       is adequately sampled given the telescope slew rate. Usually the
+*       approximately 200 Hz sample rate is over-kill, and the data may
+*       be safely down-sampled to a lower rate -- reducing the memory
+*       footprint and execution time. This parameter specifies a target
+*       angular scale, which is converted to a sample rate internally based
+*       on the average slew speed during the observation. If 0, no
+*       down-sampling is applied. [0]
 *     ENSUREFLAT = LOGICAL
 *       If true (the default) the input data will be flat-fielded
 *       before the map is made. If false the input data will not be
 *       flat-fielded although if the data have already been
 *       flatfielded this will be acceptable. This can be used to
 *       investigate flatfielding errors in conjunction with the
-*       BOLOMAP parameter.
+*       BOLOMAP parameter. [1]
 *     EXPORTNDF( ) = STRING
 *       Export model components to Starlink ".sdf" files. Specify 1 or
 *       0 to export all or none of the components respectively. One
@@ -368,12 +381,32 @@
 *       may be provided to modelorder. Exportation of `res' is implied
 *       if either `noi' or `qua' are specified as they become the
 *       variance and quality components of the resulting NDF for `res'
-*       respectively.
+*       respectively. If 0 no files are exported. [0]
+*     FAKEMAP = STRING
+*       To test the impact of map-making on known astronomical sources, an
+*       external map may be specified to this parameter, and its flux will
+*       be added to an existing data set prior to map-making. At present,
+*       the dimensions of this map must be identical to that of the output
+*       map. Note that this is a fully-parsed NDF identified, so, for example, a
+*       subset of a larger map may be specified using ranges. [undef]
+*     FAKESCALE = REAL
+*       If a FAKEMAP is specified, FAKESCALE can be used to apply an arbitrary
+*       scake factor to the map before adding it to the time series. [1]
+*     FLAGMAP( ) = STRING
+*       Create .MORE.SMURF.FLAGMAPS extensions containing counts of
+*       flags as projected on the map for each chunk of data. This
+*       array of strings contains the named quality bits that should
+*       be counted (use KAPPA:SHOWQUAL on output residual using
+*       EXPORTNDF option to see list of quality bits). Note that if
+*       BADBOL is specified and the quality bit is set, the behaviour
+*       is different than might be expected: the entire bolometer will
+*       be excluded from the flagmap. [undef]
 *     ITERMAP = LOGICAL
 *       If true each iteration is written to the output file in the
-*       .MORE.SMURF.ITERMAPS extension. Default is false.
+*       .MORE.SMURF.ITERMAPS extension. [0]
 *     MAXLEN = REAL
-*       Maximum number of seconds of data to be loaded at once if MEMITER=1.
+*       Maximum number of seconds of data to be loaded at once if
+*       MEMITER=1.  [0]
 *     MEMITER = LOGICAL
 *       If 1, load data and perform iterations entirely in memory
 *       (limited by MAXMEM ADAM parameter, and MAXLEN Config
@@ -383,7 +416,7 @@
 *       discontinuities exist at each file boundary (since, for
 *       example, operations like FFT filtering will pad part of the
 *       boundary around file edges). Creates temporary files with a ".dimm"
-*       extension (see DELDIMM).
+*       extension (see DELDIMM). [1]
 *     MODELORDER( ) = STRING
 *       An ordered list of model components to be fit by the iterative
 *       map-maker, e.g. "(com,gai,ext,ast,flt,noi)". Each component has a
@@ -404,19 +437,23 @@
 *       completion of the map if DELDIMM is set. Set EXPORTNDF
 *       to produce Starlink ".sdf" files that can be viewed using
 *       tools such as KAPPA and Gaia regardless of the value of MEMITER.
+*       [(com,gai,ext,flt,ast,noi)]
 *     NOEXPORTSETBAD = LOGICAL
 *       If true, the output models from the map-maker will not be modified
-*       to use bad values wherever the bolometer is known to be bad. Default
-*       is to write bad values (false).
+*       to use bad values wherever the bolometer is known to be bad. [0]
+*     NOISECLIP = REAL
+*       Clip outlier bolometers based on their noise. Any bolometers more
+*       than this number of standard deviations from the mean noise will be
+*       removed. [0]
 *     NUMITER = INTEGER
 *       A positive value if a set number of iterations are desired. A
 *       negative number indicates the maximum number of iterations allowed if
-*       CHITOL is being used for the stopping criterion.
+*       CHITOL is being used for the stopping criterion. [-5]
 *     SHORTMAP = INTEGER
-*       If non-zero a map is made of every SHORTMAP samples and written to the
-*       output file in the .MORE.SMURF.SHORTMAPS extension. This can be used to
-*       investigate pointing fluctuations when making maps of bright sources.
-*       Default is 0.
+*       If non-zero a map is made of every SHORTMAP samples and
+*       written to the output file in the .MORE.SMURF.SHORTMAPS
+*       extension. This can be used to investigate pointing
+*       fluctuations when making maps of bright sources. [0]
 *     TSTEP = INTEGER
 *       The gap (in time slices) between full calculations of the output map
 *       bolometer positions. Setting a larger value for this will speed up
@@ -426,12 +463,12 @@
 *       pushed into a neighouring map pixel. For tstep=100, the calculation of
 *       bolometer positions speeds up by about a factor of 60. Setting tstep to
 *       1 (or zero) causes all bolometer positions to be calculated in full,
-*       without any approximation.
+*       without any approximation. [100]
 *     VARMAPMETHOD = LOGICAL
 *       Method of estimating the variance map. If 0 calculate theoretical
 *       uncertainties propagated from the time-domain noise measurements. If
 *       1 calculate the weighted sample variance of data points that land in
-*       each pixel of the map.
+*       each pixel of the map. [1]
 *
 *     ii) Parameters controlling pre-iteration data-cleaning steps.
 *
@@ -439,53 +476,139 @@
 *       Apodize signals (smoothly roll-off) using sine/cosine
 *       functions at start and end of the signal across this many
 *       samples. The supplied APOD value is ignored and a value of
-*       zero is used if ZEROPAD is set to 0.
+*       zero is used if ZEROPAD is set to 0. [0]
 *     BADFRAC = REAL
 *       Flag entire bolometer as dead if at least this fraction of the samples
-*       in a detector time series were flagged as bad by the DA system.
-*     DCFITBOX = REAL
+*       in a detector time series were flagged as bad by the DA system. [0.05]
+*     CLEANDK.APOD = INTEGER
+*       Dark squid cleaning parameter. See APOD. [0]
+*     CLEANDK.BADFRAC = REAL
+*       Dark squid cleaning parameter. See BADFRAC. [0]
+*     CLEANDK.COMPREPROCESS = LOGICAL
+*       Dark squid cleaning parameter. See COMPREPROCESS. [0]
+*     CLEANDK.DCFITBOX = INTEGER
+*       Dark squid cleaning parameter. See DCFITBOX. [0]
+*     CLEANDK.DCMAXSTEPS = INTEGER
+*       Dark squid cleaning parameter. See DCMAXSTEPS. [10]
+*     CLEANDK.DCLIMCORR = INTEGER
+*       Dark squid cleaning parameter. See DCLIMCORR. [0]
+*     CLEANDK.DCTHRESH = DOUBLE
+*       Dark squid cleaning parameter. See DCTHRESH. [25.0]
+*     CLEANDK.DCSMOOTH = INTEGER
+*       Dark squid cleaning parameter. See DCSMOOTH. [50]
+*     CLEANDK.FILLGAPS = LOGICAL
+*       Dark squid cleaning parameter. See FILLGAPS. [1]
+*     CLEANDK.FILT_EDGELOW = REAL
+*       Dark squid cleaning parameter. See FILT_EDGELOW. [0]
+*     CLEANDK.FILT_EDGEHIGH = REAL
+*       Dark squid cleaning parameter. See FILT_EDGEHIGH. [0]
+*     CLEANDK.FILT_EDGE_SMALLSCALE = REAL
+*       Dark squid cleaning parameter. See FILT_EDGE_SMALLSCALE. [0]
+*     CLEANDK.FILT_EDGE_LARGESCALE = REAL
+*       Dark squid cleaning parameter. See FILT_EDGE_LARGESCALE. [0]
+*     CLEANDK.FILT_NOTCHLOW( ) = REAL
+*       Dark squid cleaning parameter. See FILT_NOTCHLOW. [0]
+*     CLEANDK.FILT_NOTCHHIGH( ) = REAL
+*       Dark squid cleaning parameter. See FILT_NOTCHHIGH. [0]
+*     CLEANDK.ORDER = INTEGER
+*       Dark squid cleaning parameter. See ORDER. [0]
+*     CLEANDK.PCATHRESH = REAL
+*       Dark squid cleaning parameter. See PCATHRESH. [0]
+*     CLEANDK.SPIKETHRESH = REAL
+*       Dark squid cleaning parameter. See SPIKETHRESH. [0]
+*     CLEANDK.SPIKEBOX = INTEGER
+*       Dark squid cleaning parameter. See SPIKEBOX. [50]
+*     CLEANDK.WHITEN = LOGICAL
+*       Dark squid cleaning parameter. See WHITEN. [0]
+*     CLEANDK.ZEROPAD = LOGICAL
+*       Dark squid cleaning parameter. See ZEROPAD. [0]
+*     COMPREPROCESS = LOGICAL
+*       If set, the common-mode calculation will be performed
+*       additionally as a pre-processing step. All model parameters
+*       com.* and gai.* below are parsed and used.  If this
+*       pre-processing step is chosen, it is still possible to specify
+*       COM/GAI as model components in the iterative solution. [0]
+*     DCFITBOX = INTEGER
 *       Number of samples (box size) used on either side of a DC step to
-*       estimate the height of the step.
+*       estimate the height of the step. [0]
+*     DCLIMCORR = INTEGER
+*      If more than DCLIMCORR bolometer have a step at a given time,
+*      then all bolometers are corrected for a step at that time,
+*      using lower thresholds.  Setting it to zero here switches off
+*      the correction of correlated steps. [10]
 *     DCMAXSTEPS = INTEGER
 *       The maximum number of steps that can be corrected in each minute of
 *       good data (i.e. per 12000 samples) from a bolometer before the entire
 *       bolometer is flagged as bad. A value of zero will cause a bolometer to
-*       be rejected if any steps are found in the bolometer data stream.
+*       be rejected if any steps are found in the bolometer data stream. [10]
+*     DCTHRESH = DOUBLE
+*       Threshold standard deviations from median for step detection. [25.0]
 *     DCSMOOTH = INTEGER
 *       The width of the median filter used to smooth a bolometer data stream
-*       prior to finding DC steps.
+*       prior to finding DC steps. [50]
 *     DCTHRESH = REAL
-*       Threshold S/N to detect and flag DC (baseline) steps.
+*       Threshold S/N to detect and flag DC (baseline) steps. [25.0]
 *     DKCLEAN = LOGICAL
-*       Clean the bolometers using the dark squids. Defaults to false.
-*     FLAGSTAT = REAL
-*       Flag data taken while the telescope was stationary so that it
+*       Clean the bolometers using the dark squids. See CLEANDK.* parameters
+*       to control cleaning. [0]
+*     DOCLEAN = LOGICAL
+*       If this flag is set to 0, all pre-processing / cleaning operations
+*       will be disabled. [1]
+*     EXPORTCLEAN = LOGICAL
+*       If set, the data immediately after pre-processing / cleaning, but
+*       prior to map-making, will be exported to files with the same name
+*       as the input/concatenated data, but with a suffix "_cln.sdf". [0]
+*     FLAGSLOW = REAL
+*       Flag data taken while the telescope was moving slowly so that it
 *       they are ignored in the final map. The value given is a threshold
-*       slew velocity (arcsec/sec) measured in tracking coordinates
-*       below which the telescope is considered to be stationary.
+*       slew velocity (arcsec/sec) measured in tracking coordinates. [30]
+*     FLAGFLAST = REAL
+*       Flag data taken while the telescope was moving too fast to effectively
+*       sample the PSF. [450.flagfast=600, 850.flagfast=980]
 *     FILLGAPS = LOGICAL
 *       Fill vicinity of spikes / DC steps with constrained realization of
 *       noise. Also (unless ZEROPAD is 1), fill the padded region at the start
 *       and end of each time stream with artificial data. You almost always
-*       want to do this.
+*       want to do this. [1]
 *     FILT_EDGEHIGH = REAL
-*       Hard-edge high-pass frequency-domain filter (Hz).
+*       Hard-edge high-pass frequency-domain filter (Hz). If 0 unused. [0]
 *     FILT_EDGELOW = REAL
-*       Hard-edge low-pass frequency-domain filter (Hz).
+*       Hard-edge low-pass frequency-domain filter (Hz). If 0 unused. [0]
+*     FILT_EDGE_SMALLSCALE = REAL
+*       Hard-edge low-pass frequency-domain filter. Convert scale
+*       specified by this parameter into a frequency given the slew
+*       velocity. [0]
+*     FILT_EDGE_LARGESCALE = REAL
+*       Hard-edge high-pass frequency-domain filter. Convert scale
+*       specified by this parameter into a frequency given the slew
+*       velocity. [0]
 *     FILT_NOTCHHIGH( ) = REAL
 *       Hard-edge band-cut frequency-domain notch filters. FILT_NOTCHHIGH is
-*       an array of upper-edge frequencies (Hz).
+*       an array of upper-edge frequencies (Hz). If 0 unused. [0]
 *     FILT_NOTCHLOW( ) = REAL
-*       Array of lower-edge frequencies corresponding to FILT_NOTCHHIGH.
+*       Array of lower-edge frequencies corresponding to FILT_NOTCHHIGH. [0]
 *     ORDER = INTEGER
-*       Subtract a fitted baseline polynomial of this order (0 to remove mean).
+*       Subtract a fitted baseline polynomial of this order (0 to
+*       remove mean, -1 to turn off feature). [-1]
 *     PAD = INTEGER
 *       Number of samples of padding to add to start and end before filtering.
-*       The nature of this padding is determined by ZEROPAD.
+*       The nature of this padding is determined by ZEROPAD. [undef]
+*     PCATHRESH = REAL
+*       If set, principal component analysis is used to identify a set of
+*       NBOLO new statistically un-correlated basis vectors to represent the
+*       data. Each bolometer then has a set of coefficients indicating the
+*       amplitudes of these components. The PCATHRESH parameter indicates
+*       a clipping level above which components will be removed from the
+*       time-series (i.e. the brightest, most correlated components will be
+*       removed). A good value to try is 4. This cleaning option is extremely
+*       slow. [0]
 *     SPIKETHRESH = REAL
-*       Threshold S/N to flag spikes using sigma-clipper.
+*       Threshold S/N to flag spikes using time-series sigma-clipper. [0]
 *     SPIKEBOX = INTEGER
-*       The size of the sigma-clipper filter box.
+*       The size of the time-series sigma-clipper filter box. [50]
+*     WHITEN = LOGICAL
+*       If set, a whitening filter is applied to flatten-out the 1/f part
+*       of the bolometer spectra. [0]
 *     ZEROPAD = LOGICAL
 *       Determines the nature of the padding added to the start and end of
 *       each bolometer time stream (see PAD). Padding is needed to avoid
@@ -501,111 +624,129 @@
 *       performed, and the value of the APOD parameter is ignored. The
 *       default for ZEROPAD is 0 (i.e. pad with artificial data rather
 *       than zeros) unless FILLGAPS is zero, in which case the supplied
-*       ZEROPAD value is ignored and a value of 1 is always used.
+*       ZEROPAD value is ignored and a value of 1 is always used. [0]
 *
 *     iii) Parameters controlling the calculation of model components.
 *
+*     AST.MAPSPIKE = REAL
+*       Alternative method of despiking the time-series using the
+*       map. Identify samples that are this number of standard
+*       deviations from the mean of the population of weighted samples
+*       that go into a map pixel. This method is more robust against
+*       bright compact sources than the time-domain despiker, and a
+*       good value is 10. [0]
+*     AST.ZERO_CIRCLE = REAL
+*       Constrain map outside of this radius in degrees from the map centre
+*       to 0. [0]
 *     AST.ZERO_LOWHITS = REAL
 *       Constrain boundary regions with low hit count to 0. The threshold
-*       is where the hits are this fraction lower than the mean.
+*       is where the hits are this fraction lower than the mean. [0]
 *     AST.ZERO_NOTLAST = LOGICAL
 *       If ast.zero_notlast is set, on the final iteration the
 *       AST.ZERO_LOWHITS boundary condition will not be applied. This
 *       will probably be useful for deep point-source observations for
 *       which the large-scale noise is not as important, but keeping
 *       as much data around the edges of the map is.  (currently
-*       requires that NUMITER is not a negative number).
+*       requires that NUMITER is not a negative number). [1]
+*     AST.ZERO_SNR = REAL
+*       Constrain map to 0 wherever the map SNR is lower than this
+*       threshold. [0]
 *     COM.BOXCAR = INTEGER
 *       If COM model component specified, boxcar smooth by this number of
-*       samples before removing it.
+*       samples before removing it. [0]
 *     COM.BOXFACT = REAL
 *       If specified, reduce length of boxcar filter after each iteration by
-*       this factor.
+*       this factor. [0]
 *     COM.BOXMIN = INTEGER
 *       If COM.BOXFACT specified, this value is the minimum boxcar filter length
-*       in samples.
+*       in samples. [0]
 *     COM.CORR_ABSTOL = REAL
-*       The absolute lower limit of acceptable correlation
+*       The absolute lower limit of acceptable correlation. [0.2]
 *     COM.CORR_TOL = REAL
-*       N-sigma away from mean correlation coefficient tolerance.
+*       N-sigma away from mean correlation coefficient tolerance. [5.0]
 *     COM.FIT_BOX = INTEGER
 *       If defined, this is the number of samples to use when calculating the
 *       correlation coefficient to compare bolometers. It is identical to
-*       COM.GAIN_BOX when COM.FIT_BOX is undefined.
+*       COM.GAIN_BOX when COM.FIT_BOX is undefined. [undef]
 *     COM.GAIN_ABSTOL = REAL
-*       Absolute factor away from mean gain coefficient tolerance.
+*       Absolute factor away from mean gain coefficient tolerance. [3.0]
 *     COM.GAIN_BOX = INTEGER
 *       If COM.FIT_BOX is not set this is the number of samples to use when
 *       calculating a common mode signal to calculate a correlation coefficient
 *       when rejecting bolometers. If COM.FIT_BOX is non-zero this is the step
-*       used when calculating the correlation coefficient.
+*       used when calculating the correlation coefficient. [6000]
 *     COM.GAIN_FGOOD = REAL
-*       Minimum fraction of good boxes for a usable bolometer.
+*       Minimum fraction of good boxes for a usable bolometer. [0.25]
 *     COM.GAIN_IS_ONE = LOGICAL
 *       Setting com.gain_is_one non-zero causes all bolometer gains to be
-*       forced to 1.0
+*       forced to 1.0. [0]
 *     COM.GAIN_RAT = REAL
-*       Ratio of largest usable gain to mean gain for a bolometer.
+*       Ratio of largest usable gain to mean gain for a bolometer. [4.0]
 *     COM.GAIN_TOL = REAL
-*       N-sigma away from mean gain coefficient tolerance.
+*       N-sigma away from mean gain coefficient tolerance. [5.0]
 *     COM.NOTFIRST = LOGICAL
-*       If true the common mode will not be subtracted on the first iteration.
+*       If true the common mode will not be subtracted on the first
+*       iteration. [0]
+*     COM.NOREMOVE = LOGICAL
+*       If true, common-mode will be estimated only to flag bad data,
+*       but will not be removed from the time-series. [0]
 *     COM.OFFSET_IS_ZERO = LOGICAL
 *       Setting com.offset_is_zero non-zero causes all bolometer
-*       offsets to be forced to 0.0.
+*       offsets to be forced to 0.0. [0]
 *     DKS.BOXCAR = INTEGER
 *       If DKS (dark squid) model component requested, boxcar the dark squid
 *       signal by this many samples before fitting/removing from each detector
-*       in the same column.
+*       in the same column. [0]
 *     DKS.REPLACEBAD = INTEGER
 *       If true, bad dark squids will be replaced by the mean of the working
-*       dark squids. Default is false.
+*       dark squids. [0]
 *     EXT.CSOTAU = REAL
 *       As with EXTINCTION task, value of the 225 GHz zenith optical
 *       depth. Only used if TAUSRC equals "CSOTAU". If no value is
 *       given, the map maker will use the value from the FITS header for
 *       each file. Note that if a value is entered by the user, that
-*       value is used for all input files.
+*       value is used for all input files. [undef]
 *     EXT.FILTERTAU = REAL
 *       As with EXTINCTION task, value of the zenith optical depth for
 *       the current wavelength. Only used if TAUSRC equals
 *       "FILTERTAU". Note that no check is made to ensure that all the
-*       input files share the same filter.
+*       input files share the same filter. [undef]
 *     EXT.METHOD = STRING
 *       As with EXTINCTION task, method to use for airmass calculation:
 *          - ADAPTIVE  - Determine whether to use QUICK or FULL
-*          based on the elevation of the source and the opacity. (default)
+*          based on the elevation of the source and the opacity. [default]
 *          - FULL      - Calculate the airmass of each bolometer.
 *          - QUICK     - Use a single airmass for each time slice.
 *     EXT.TAURELATION.<FILT>() = REAL
-*       Tau relation for the named filter (850 or 450 currently). Should be
-*       a two element array with coefficients using a formula:
-*          tau_filt = coeff_1 ( tau_cso + coeff_2 )
+*       Tau relation for the named filter (850 or 450
+*       currently). Should be a two element array with coefficients
+*       using a formula: tau_filt = coeff_1(tau_cso + coeff_2).
+*       [ext.taurelation.450 = (19.04,-0.018),
+*        ext.taurelation.850 = (5.36,-0.006)]
 *     EXT.TAUSRC = STRING
 *       As with EXTINCTION task, specify source of optical depth data:
 *          - WVMRAW    - use the water vapour monitor time series data
 *          - CSOTAU    - use a single 225GHz tau value
 *          - FILTERTAU - use a single tau value for this wavelength
-*          - AUTO      - Use WVM if available else 225 GHz tau. (default)
+*          - AUTO      - Use WVM if available else 225 GHz tau. [default]
 *     FLT.APOD = INTEGER
-*       Apodize signals (smoothly roll-off) using sine/cosine functions at
-*       start and end of the signal across this many samples.
+*       Apodization for iterative filter. See APOD. [0]
 *     FLT.FILT_EDGEHIGH = REAL
 *       If FLT specified, perform filtering as an iterative component, rather
 *       than doing it once at the beginning as a pre-processing step. See
-*       FILT_EDGEHIGH.
+*       FILT_EDGEHIGH. [0]
 *     FLT.FILT_EDGELOW = REAL
 *       If FLT specified, perform filtering as an iterative component, rather
 *       than doing it once at the beginning as a pre-processing step. See
-*       FILT_EDGELOW.
+*       FILT_EDGELOW. [0]
 *     FLT.FILT_NOTCHHIGH( ) = REAL
 *       If FLT specified, perform filtering as an iterative component, rather
 *       than doing it once at the beginning as a pre-processing step. See
-*       FILT_ NOTCHHIGH.
+*       FILT_ NOTCHHIGH. [undef]
 *     FLT.FILT_NOTCHLOW( ) = REAL
 *       If FLT specified, perform filtering as an iterative component, rather
 *       than doing it once at the beginning as a pre-processing step. See
-*       FILT_ NOTCHLOW.
+*       FILT_ NOTCHLOW. [undef]
 *     FLT.FILT_WLIM = INTEGER
 *       Specifies the minimum fraction of good values that must contribute to a
 *       filtered value. For instance, if wlim is 0.9 then a filtered data value
@@ -616,48 +757,54 @@
 *       less data to be rejected. A value of <undef> causes the old filtering
 *       algorithm to be used that is based on filling gaps with artificial data.
 *       If the new algorithm is used the following additional settings can be
-*       made: "apod=0, fillgaps=0, noi.fillgaps=0".
+*       made: "apod=0, fillgaps=0, noi.fillgaps=0". [undef]
 *     FLT.NOTFIRST = LOGICAL
-*       If true the filter model will not be executed for the first iteration.
+*       If true the filter model will not be executed for the first
+*       iteration. [0]
 *     GAI.FLATFIELD = LOGICAL
-*       Use the GAIn/COMmon mode to re-calculate the flatfield? Probably a
-*       good idea in most cases, but dangerous for short scans of very bright
-*       sources because the astronomical signal may completely dominate
-*       sky signal.
-*     NOI.DCFITBOX = REAL
-*       Number of samples (box size) used on either side of a DC step to
-*       estimate the height of the step.
+*       Use the GAIn/COMmon mode to re-calculate the flatfield? A
+*       reasonable option in many cases, but potentially dangerous for
+*       short scans of very bright sources because the astronomical
+*       signal may completely dominate sky signal. [0]
+*     NOI.CALCFIRST = LOGICAL
+*       Normally bolometer weights calculated after first
+*       iteration. Setting this flag will instead calculated weights
+*       before iterations begin. This is dangerous if there are strong
+*       correlated noise, or astronomical signals in the typical noise
+*       measurement band (2--10 Hz), but can reduce execution time if
+*       NOISECLIP is also specified since both operations share a
+*       single FFT at the start. [0]
+*     NOI.DCFITBOX = INTEGER
+*       Iterative DC step correction parameter. See DCFITBOX. [0]
+*     NOI.DCLIMCORR = INTEGER
+*       Iterative DC step correction parameter. See DCLIMCORR. [10]
 *     NOI.DCMAXSTEPS = INTEGER
-*       The maximum number of steps that can be corrected in each minute of
-*       good data (i.e. per 12000 samples) from a bolometer before the entire
-*       bolometer is flagged as bad. A value of zero will cause a bolometer to
-*       be rejected if any steps are found in the bolometer data stream.
+*       Iterative DC step correction parameter. See DCMAXSTEPS. [10]
 *     NOI.DCSMOOTH = INTEGER
-*       The width of the median filter used to smooth a bolometer data stream
-*       prior to finding DC steps.
+*       Iterative DC step correction parameter. See DCSMOOTH. [50.0]
 *     NOI.DCTHRESH = REAL
-*       Threshold S/N to detect and flag DC (baseline) steps.
+*       Iterative DC step correction parameter. See DCTHRESH. [25.0]
 *     NOI.FILLGAPS = LOGICAL
 *       Fill vicinity of spikes / DC steps with constrained realization of
-*       noise. You almost always want to do this.
+*       noise. See FILLGAPS. [1]
 *     NOI.SPIKETHRESH = REAL
 *       If NOI specified, flag new spikes in the residual after each iteration
-*       before measuring noise. This is the S/N threshold for detecting
-*       spikes with sigma-clipper.
+*       before measuring noise. See SPIKETHRESH. [0]
 *     NOI.SPIKEBOX = INTEGER
 *       If NOI specified, flag new spikes in the residual after each iteration
-*       before measuring noise. This value gives the size of the filter
-*       box for the sigma clipper.
+*       before measuring noise. See SPIKEBOX. [50]
 *     PLN.NOTFIRST = LOGICAL
-*       If true the PLN model will not be executed in the first iteration.
+*       If true the PLN model will not be executed in the first
+*       iteration. [0]
 *     SMO.BOXCAR = INTEGER
-*       Number of samples to use for box car smoothing filter. Defaults to 2000.
+*       Number of samples to use for box car smoothing
+*       filter. [2000]
 *     SMO.NOTFIRST = LOGICAL
-*       If true the SMO model will not be executed in the first iteration.
+*       If true the SMO model will not be executed in the first
+*       iteration. [0]
 *     SMO.TYPE = STRING
 *       Type of filter to remove. Current options are "mean" and
-*       "median". Default is mean.
-
+*       "median". [mean]
 *  Related Applications:
 *     SMURF: QLMAKEMAP
 

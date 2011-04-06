@@ -37,7 +37,7 @@
 
 # These come from smf_iteratemap
 
-numiter = -20
+numiter = -5
 tstep = 100
 chitol = 1e-4
 
@@ -51,7 +51,7 @@ flagmap = <undef>
 
 ensureflat = 1
 noexportsetbad = 0
-varmapmethod = 0
+varmapmethod = 1
 maxlen = 0
 pad = <undef>
 
@@ -99,7 +99,7 @@ ext.taumethod = adaptive
 # smf_calcmodel_ast
 
 ast.zero_lowhits = 0
-ast.zero_notlast = 0
+ast.zero_notlast = 1
 ast.zero_circle = <undef>
 ast.zero_snr = <undef>
 ast.mapspike = 0

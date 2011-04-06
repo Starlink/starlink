@@ -198,8 +198,6 @@ flagslow = 30
 450.flagfast = 600
 850.flagfast = 980
 
-# Alternatively, specify a minimum spatial scale that should be
-
 # --- Many of the following may not be useful ---
 
 # If this flag is set, the common-mode calculation will be performed
