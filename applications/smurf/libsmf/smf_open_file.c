@@ -427,10 +427,11 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
   } else if (ndims == 3) { /* Time series data */
     /* Check if raw timeseries - _WORD, _UWORD or _INTEGER */
     /* Note that _INTEGER may or may not have been flatfielded */
+    /* NOTTSERIES is treated as flatfielded to prevent use of sc2store */
     if ( (strncmp(dtype, "_WORD", 5) == 0 ) ||     /* Compressed */
          (strncmp(dtype, "_INTEGER", 8) == 0 ) ||  /* Uncompressed */
          (strncmp(dtype, "_UWORD", 6) == 0 ) ) {   /* Old format */
-      isFlat = 0;  /* Data have not been flatfielded */
+      isFlat = ( flags & SMF__NOTTSERIES ? 1 : 0);  /* Data may not have been flatfielded */
     } else {
       /* Note that the data should be of type _DOUBLE here */
       isFlat = 1;  /* Data have been flatfielded */
