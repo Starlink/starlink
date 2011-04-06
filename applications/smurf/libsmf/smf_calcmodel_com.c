@@ -847,7 +847,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
       /* Submit the job */
       pdata = job_data + ii;
       pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata,
-                                 smfCalcmodelComPar, NULL, status );
+                                 smfCalcmodelComPar, 0, NULL, status );
     }
     /* Wait until all of the submitted jobs have completed */
     smf_wait( wf, status );
@@ -939,7 +939,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         /* Submit the job */
         pdata = job_data + ii;
         pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata,
-                                   smfCalcmodelComPar, NULL, status );
+                                   smfCalcmodelComPar, 0, NULL, status );
       }
 
       smf_wait( wf, status );

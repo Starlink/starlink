@@ -510,7 +510,7 @@ void smf_clean_pca( smfWorkForce *wf, smfData *data, double thresh,
       pdata = job_data + ii;
       pdata->operation = 0;
       pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata, smfPCAParallel,
-                                 NULL, status );
+                                 0, NULL, status );
     }
 
     /* Wait until all of the submitted jobs have completed */
@@ -569,7 +569,7 @@ void smf_clean_pca( smfWorkForce *wf, smfData *data, double thresh,
       pdata->cov = cov;
       pdata->operation = 1;
       pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata, smfPCAParallel,
-                                 NULL, status );
+                                 0, NULL, status );
     }
   }
 
@@ -606,7 +606,7 @@ void smf_clean_pca( smfWorkForce *wf, smfData *data, double thresh,
       pdata = job_data + ii;
       pdata->operation = 2;
       pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata, smfPCAParallel,
-                                 NULL, status );
+                                 0, NULL, status );
     }
   }
 
@@ -793,7 +793,7 @@ void smf_clean_pca( smfWorkForce *wf, smfData *data, double thresh,
       pdata->operation = 3;
       pdata->rms_amp = rms_amp;
       pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata, smfPCAParallel,
-                                 NULL, status );
+                                 0, NULL, status );
     }
 
     /* Wait until all of the submitted jobs have completed */

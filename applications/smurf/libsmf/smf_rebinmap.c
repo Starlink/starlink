@@ -366,7 +366,7 @@ void smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar,
    pdata->data = data;
    pdata->bolovar = bolovar;
    pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata, smf_rebinslices,
-                              NULL, status );
+                              0, NULL, status );
 
 /* Finalise things if we have just submitted a job to paste the last input
    file. */

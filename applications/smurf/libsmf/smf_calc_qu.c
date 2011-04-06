@@ -247,7 +247,7 @@ void smf_calc_qu( smfWorkForce *wf, smfData *data, int block_start,
          pdata->block_end = block_end;
 
 /* Pass the job to the workforce for execution. */
-         smf_add_job( wf, SMF__REPORT_JOB, pdata, smf1_calc_qu_job, NULL,
+         smf_add_job( wf, SMF__REPORT_JOB, pdata, smf1_calc_qu_job, 0, NULL,
                       status );
       }
 

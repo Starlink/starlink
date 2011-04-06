@@ -711,7 +711,7 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
   for( i=0; (*status==SAI__OK)&&i<nw; i++ ) {
     pdata = job_data + i;
     pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata,
-                               smfFilterExecuteParallel,
+                               smfFilterExecuteParallel, 0,
                                NULL, status );
   }
 

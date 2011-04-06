@@ -523,7 +523,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, double dcthresh,
                          NULL;
 
 /* Pass the job to the workforce for execution. */
-         smf_add_job( wf, SMF__REPORT_JOB, pdata, smf1_fix_steps_job, NULL,
+         smf_add_job( wf, SMF__REPORT_JOB, pdata, smf1_fix_steps_job, 0, NULL,
                       status );
       }
 
@@ -569,7 +569,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, double dcthresh,
             pdata = job_data + iworker;
             pdata->bcount = bcount;
             smf_add_job( wf, SMF__REPORT_JOB, pdata,
-                         smf1_fix_correlated_steps_job, NULL, status );
+                         smf1_fix_correlated_steps_job, 0, NULL, status );
          }
 
 /* Wait for the workforce to complete all jobs. */

@@ -573,7 +573,7 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
   for( i=0; (*status==SAI__OK)&&i<njobs; i++ ) {
     pdata = job_data + i;
     pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata,
-                               smfFFTDataParallel, NULL, status );
+                               smfFFTDataParallel, 0, NULL, status );
   }
 
   /* Wait until all of the submitted jobs have completed */

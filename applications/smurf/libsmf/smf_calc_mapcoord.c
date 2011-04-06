@@ -555,7 +555,7 @@ void smf_calc_mapcoord( smfWorkForce *wf, smfData *data, AstFrameSet *outfset,
         /* Submit the job */
         pdata = job_data + ii;
         pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata,
-                                   smfCalcMapcoordPar, NULL, status );
+                                   smfCalcMapcoordPar, 0, NULL, status );
       }
       /* Wait until all of the submitted jobs have completed */
       smf_wait( wf, status );

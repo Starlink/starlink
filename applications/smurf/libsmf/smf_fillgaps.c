@@ -254,7 +254,7 @@ void  smf_fillgaps( smfWorkForce *wf, smfData *data,
     pdata->mask = mask;
 
     /* Submit a job to the workforce to process this group of bolometers. */
-    (void) smf_add_job( wf, 0, pdata, smfFillGapsParallel, NULL, status );
+    (void) smf_add_job( wf, 0, pdata, smfFillGapsParallel, 0, NULL, status );
   }
 
   /* Wait until all jobs in the current job context have completed, and

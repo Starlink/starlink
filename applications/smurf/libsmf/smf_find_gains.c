@@ -477,7 +477,7 @@ int smf_find_gains( smfWorkForce *wf, smfData *data, double *template,
          pdata->tstride = tstride;
          pdata->converged = converged;
 
-         smf_add_job( wf, SMF__REPORT_JOB, pdata, smf1_find_gains_job, NULL,
+         smf_add_job( wf, SMF__REPORT_JOB, pdata, smf1_find_gains_job, 0, NULL,
                       status );
       }
       smf_wait( wf, status );

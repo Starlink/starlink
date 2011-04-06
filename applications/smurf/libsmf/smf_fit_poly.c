@@ -368,7 +368,7 @@ void smf_fit_poly( smfWorkForce *wf, smfData *data, const size_t order,
   for( i=0; (*status==SAI__OK)&&i<njobs; i++ ) {
     pdata = job_data + i;
     pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata,
-                               smfFitPolyPar, NULL, status );
+                               smfFitPolyPar, 0, NULL, status );
   }
 
   /* Wait until all of the submitted jobs have completed */

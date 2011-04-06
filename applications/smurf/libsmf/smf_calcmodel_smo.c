@@ -291,8 +291,8 @@ void smf_calcmodel_smo( smfWorkForce *wf, smfDIMMData *dat, int chunk,
          pdata->tstride = tstride;
          pdata->tstride = tstride;
 
-         smf_add_job( wf, SMF__REPORT_JOB, pdata, smf1_calcmodel_smo_job, NULL,
-                      status );
+         smf_add_job( wf, SMF__REPORT_JOB, pdata, smf1_calcmodel_smo_job,
+                      0, NULL, status );
       }
       smf_wait( wf, status );
 

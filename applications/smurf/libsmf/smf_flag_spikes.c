@@ -689,7 +689,7 @@ void smf_flag_spikes( smfWorkForce *wf, smfData *data, smf_qual_t mask,
    for( i=0; (*status==SAI__OK)&&i<njobs; i++ ) {
      pdata = job_data + i;
      pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata,
-                                smfFlagSpikesPar, NULL, status );
+                                smfFlagSpikesPar, 0, NULL, status );
    }
 
 /* Wait until all of the submitted jobs have completed */

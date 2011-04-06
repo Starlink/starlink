@@ -233,7 +233,7 @@ void smf_rebincube_seqf( smfWorkForce *workforce, int njobs,
    smf_rebinseq_thread function, passing it the data structure
    created above. */
             smf_add_job( workforce, 0, data, smf_rebinseq_thread,
-                         NULL, status );
+                         0, NULL, status );
          }
 
 /* Wait until the work force has done all the re-binning. This call blocks
@@ -273,7 +273,7 @@ void smf_rebincube_seqf( smfWorkForce *workforce, int njobs,
 
 /* Add the new job to the workforce. */
                smf_add_job( workforce, 0, data, smf_rebinseq_thread,
-                            NULL, status );
+                            0, NULL, status );
             }
 
 /* Wait for the work force to complete the re-binning. This call blocks until

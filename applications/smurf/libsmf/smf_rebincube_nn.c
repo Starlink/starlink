@@ -619,7 +619,7 @@ void smf_rebincube_nn( smfWorkForce *wf, smfData *data, int first, int last,
    or smf_rebincube_paste3d to paste the detector input spectrum into the
    output cube. */
                      smf_add_job( wf, 0, detector_data + idet,
-                                  smf_rebincube_paste_thread, NULL, status );
+                                  smf_rebincube_paste_thread, 0, NULL, status );
                   }
                }
             }

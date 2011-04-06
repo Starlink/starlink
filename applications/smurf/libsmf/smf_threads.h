@@ -60,10 +60,10 @@ struct smfJob {
   int flags;                  /* Job control flags */
   void *data;                 /* Structure holding data for the worker */
   void (*func)(void *, int *);/* The function to be run by the worker */
-  int (*checker)( int, smfWorkForce *, int *);/* Function that checks if
-                                                 the job can run */
-  int nwaiting;               /* Length of "waiting" array */
-  smfJob **waiting;           /* Array of jobs waiting on this one */
+  int nheld_up;               /* Length of "held_up" array */
+  smfJob **held_up;           /* Jobs that cannot run until this one has finished */
+  int nwaiting_on;            /* Length of "waiting_on" array */
+  smfJob **waiting_on;        /* Jobs that must finish before this one can run */
   smfJob *next;               /* Next job in list */
   smfJob *prev;               /* Previous job in list */
   int conid;                  /* Context idenrifier for job */
@@ -105,10 +105,8 @@ smfWorkForce *smf_create_workforce( int nworker, int *status );
 smfWorkForce *smf_destroy_workforce( smfWorkForce *workforce );
 void smf_wait( smfWorkForce *workforce, int *status );
 int smf_add_job( smfWorkForce *workforce, int flags, void *data,
-                 void (*func)( void *, int * ),
-                 int (*checker)( int, smfWorkForce *, int * ),
-                 int *status );
-int smf_wait_on_job( smfWorkForce *workforce, int ijob1, int ijob2, int *status );
+                 void (*func)( void *, int * ), int nwait_on,
+                 const int *wait_on, int *status );
 int smf_job_wait( smfWorkForce *workforce, int *status );
 void *smf_get_job_data( int ijob, smfWorkForce *workforce, int *status );
 void smf_begin_job_context( smfWorkForce *workforce, int *status );
