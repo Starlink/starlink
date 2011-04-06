@@ -51,9 +51,12 @@
 *        Make 3 times faster:
 *         - loop over a single index rather than over bolos and time slices
 *         - chain if tests rather than doing all 3 every time
+*     2011-04-06 (TIMJ):
+*        Summarize where the bad values are coming from in VERBOSE mode.
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2011 Science & Technology Facilities Council.
 *     Copyright (C) 2010 University of British Columbia.
 *     All Rights Reserved.
 
@@ -105,6 +108,9 @@ size_t smf_check_quality( smfData *data, int showbad, int *status ) {
   size_t i;                     /* loop counter */
   int isbad;                    /* inconsistency found */
   size_t nbad=0;                /* inconsistency counter */
+  size_t nnan = 0;              /* Number of nan values found */
+  size_t ninf = 0;              /* Number of inf values found */
+  size_t nqualincon = 0;        /* Number of inconsistent bad/qual */
   dim_t ndata;                  /* Number of data points */
   size_t bstride;               /* bol stride */
   size_t tslice;                /* Time slice */
@@ -161,11 +167,16 @@ size_t smf_check_quality( smfData *data, int showbad, int *status ) {
         there is no point testing if it is BADD as well */
      if( !isfinite(val) ) {
        isbad = 1;
+       if (isnan(val)) {
+         nnan++;
+       } else {
+         ninf++;
+       }
        if( showbad ) {
          smf__index_to_tbol( bstride, tstride, i, &bolnum, &tslice,
                              status );
-         msgOutf( "", "b%zu t%zu: non-finite value encountered",
-                  status, bolnum, tslice );
+         msgOutf( "", "b%zu t%zu: non-finite %s value encountered",
+                  status, bolnum, tslice, (isnan(val) ? "NaN" : "Inf") );
        }
      } else if( (val==VAL__BADD) && !badqual ) {
        isbad = 1;
@@ -177,6 +188,7 @@ size_t smf_check_quality( smfData *data, int showbad, int *status ) {
        }
      } else if( badqual && (val!=VAL__BADD) ) {
        isbad = 1;
+       nqualincon++;
        if( showbad ) {
          smf__index_to_tbol( bstride, tstride, i, &bolnum, &tslice,
                              status );
@@ -189,6 +201,11 @@ size_t smf_check_quality( smfData *data, int showbad, int *status ) {
        nbad++;
      }
     }
+  }
+
+  if (nbad > 0) {
+    msgOutiff( MSG__VERB, "", "Quality inconsistency found: %zu DATA/QUAL, %zu NaN, %zu Inf",
+               status, nqualincon, nnan, ninf );
   }
 
   return nbad;
