@@ -950,7 +950,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
          but subtract off one file if it exceeds available memory. If we
          don't have enough memory even for one input file we're hooped. */
 
-      try = ((try/maxfile)*maxfile + pad);
+      try = ((size_t) ((double)try/(double)maxfile + 0.5))*maxfile + pad;
 
       if( (try > (maxconcat*( (double) maxmem / (double) memneeded ))) &&
           (try > maxfile) ) {
