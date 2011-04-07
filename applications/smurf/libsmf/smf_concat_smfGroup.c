@@ -199,11 +199,13 @@
  *        Copy obsidss from refhdr when concatenating.
  *     2011-02-07 (DSB):
  *        Copy instap and telpos from reference header to returned header.
+ *     2011-04-07 (DSB):
+ *        Open files in a separate thread.
  *     {enter_further_changes_here}
 
  *  Copyright:
  *     Copyright (C) 2007-2010 University of British Columbia.
- *     Copyright (C) 2008 Science and Technology Facilities Council.
+ *     Copyright (C) 2008-2011 Science and Technology Facilities Council.
  *
  *     All Rights Reserved.
 
@@ -541,6 +543,9 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
          Otherwise proceed with concatenation
          **********************************************************************/
 
+      smfData *tmpdata = NULL;      /* for the original data before resamp */
+      smfData *tmpdata_next = NULL; /* for the next data before resamp */
+
       /* Add any padding to the length */
       tlen += padStart + padEnd;
 
@@ -556,13 +561,27 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
              it. Then do the dark masking and flatfield corrections
              ourselves (normally handled by smf_open_and_flatfield) */
 
-          smfData *tmpdata = NULL; /* for the original data before resamp */
           int doflat=1;
 
-          smf_open_file( igrp->grp, igrp->subgroups[j][i], "READ", 0,
-                         &tmpdata, status );
+          /* If this is the first piece, open the file directly in the
+             current thread. */
+          if( j == firstpiece ) {
+             smf_open_file( igrp->grp, igrp->subgroups[j][i], "READ", 0,
+                            &tmpdata, status );
+          }
 
-          /* See if data are flatfielded */
+          /* If any pieces remain to be opened, start a job to open the next
+             piece, running the job in a separate thread. Return as soon
+             as the job is submitted (i.e. do not wait for the job to
+             complete). */
+          if( j < lastpiece ) {
+             smf_open_file_job( wf, 0, igrp->grp, igrp->subgroups[j+1][i],
+                                "READ", 0, &tmpdata_next, status );
+          }
+
+          /* Meanwhile, whilst the next piece in being opened in a
+             separate thread, we continue to process the already opened
+             piece in the main thread. First, see if data are flatfielded */
           smf_check_flat( tmpdata, status );
           if( *status == SMF__FLATN ) {
             doflat = 0;
@@ -589,11 +608,22 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
           }
 
           smf_close_file( &tmpdata, status );
+
+          /* If any pieces remain to be processed, wait for the completion
+             of the job that is opening the next piece. Then lock the
+             smfData for use by this thread, and use it in place of the
+             previous smfData pointer. */
+          if( j < lastpiece ) {
+             smf_wait( wf, status );
+             smf_lock_data( tmpdata_next, 1, status );
+             tmpdata = tmpdata_next;
+          }
+
         } else {
           /* Open the file corresponding to this chunk. Data may
              require flat-fielding. */
           smf_open_asdouble( igrp->grp, igrp->subgroups[j][i], darks, flatramps,
-                           ensureflat, &refdata, status );
+                             ensureflat, &refdata, status );
         }
 
         /* Set havequal flag based on first file. This is required

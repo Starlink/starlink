@@ -283,6 +283,16 @@
 #include "libaztec/aztec.h"
 
 static char * smf__read_ocsconfig ( int ndfid, int *status);
+static void smf1_open_file_caller( void *data, int *status );
+
+
+typedef struct smfOpenFileData {
+   const Grp *grp;
+   size_t index;
+   const char *mode;
+   int flags;
+   smfData **data;
+} smfOpenFileData;
 
 #define FUNC_NAME "smf_open_file"
 
@@ -1314,3 +1324,144 @@ static char * smf__read_ocsconfig ( int ndfid, int *status) {
   }
   return ocscfg;
 }
+
+
+void smf_open_file_job( smfWorkForce *wf, int wait, const Grp *grp,
+                        size_t index, const char *mode, int flags,
+                        smfData **data, int *status ) {
+/*
+ *+
+ *  Name:
+ *     smf_open_file_job
+
+ *  Purpose:
+ *     Run smf_open_file in a thread.
+
+ *  Language:
+ *     Starlink ANSI C
+
+ *  Type of Module:
+ *     Library routine
+
+ *  Invocation:
+ *     smf_open_file_job( smfWorkForce *wf, int wait, const Grp *grp,
+ *                        size_t index, const char *mode, int flags,
+ *                        smfData **data, int *status )
+
+ *  Arguments:
+ *     wf = smfWorkForce *wf
+ *        Workforce to use.
+ *     wait = smfWorkForce *wf
+ *        Should this function wait until the job has completed before
+ *        returning? If not, the job is added to the current job context
+ *        and the function returns immediately. Note, if "wait" is zero,
+ *        then the returned smfData should beb locked (using smf_lock_data)
+ *        when the job eventually completes.
+ *     grp = const Grp * (Given)
+ *        NDG group identifier
+ *     index = size_t (Given)
+ *        Index corresponding to required file in group
+ *     mode = const char * (Given)
+ *        File access mode
+ *     flags = int (Given)
+ *        Bitmask controls which components are opened. If 0 open everything.
+ *     data = smfData ** (Returned)
+ *        Pointer to pointer smfData struct to be filled with file info and data
+ *        Should be freed using smf_close_file. Will be NULL if this routine completes
+ *        with error.
+ *     status = int* (Given and Returned)
+ *        Pointer to global status.
+
+ *  Description:
+ *     This runs smf_open_file within a worker thread of a given WorkForce.
+ *     Note, since smf_open_file calls Fortran code, care should be taken
+ *     to avoid running this job simultaneously in multiple threads.
+
+ *-
+ */
+
+/* Local Variables; */
+   smfOpenFileData *pdata;
+
+/* Check inherited status. */
+   if( *status != SAI__OK ) return;
+
+/* Get pointer to a job data structure. */
+   pdata = astMalloc( sizeof( *pdata ) );
+   if( *status == SAI__OK ) {
+
+/* begin a new job context. */
+      smf_begin_job_context( wf, status );
+
+/* Store the values needed by the smf_open_file function. */
+      pdata->grp = grp;
+      pdata->index = index;
+      pdata->mode = mode;
+      pdata->flags = flags;
+      pdata->data = data;
+
+/* Submit the job, telling it to free the job data (i.e. "pdata") when the
+   job is completed. */
+      smf_add_job( wf, SMF__FREE_JOBDATA, pdata, smf1_open_file_caller, 0,
+                   NULL, status );
+
+/* If required, wait for the job to complete and then lock the AST
+   objects for access by the current thread. */
+      if( wait ) {
+         smf_wait( wf, status );
+         smf_lock_data( *data, 1, status );
+      }
+
+/* End the current job context. */
+      smf_end_job_context( wf, status );
+   }
+}
+
+static void smf1_open_file_caller( void *data, int *status ){
+/*
+ *  Name:
+ *     smf_open_file_caller
+
+ *  Purpose:
+ *     Calls smf_open_file.
+
+ *  Language:
+ *     Starlink ANSI C
+
+ *  Type of Module:
+ *     Library routine
+
+ *  Invocation:
+ *     smf1_open_file_caller( void *data, int *status )
+
+ *  Arguments:
+ *     data = void *
+ *        Data structure containing arguments for smf_open_file.
+ *     status = int* (Given and Returned)
+ *        Pointer to global status.
+
+ *  Description:
+ *     This calls smf_open_file within a worker thread.
+ */
+
+/* Local Variables; */
+   smfOpenFileData *pdata;
+
+/* Check inherited status. */
+   if( *status != SAI__OK ) return;
+
+/* Get pointer to job data structure. */
+   pdata = (smfOpenFileData *) data;
+
+/* Open the file. */
+   smf_open_file( pdata->grp, pdata->index, pdata->mode, pdata->flags,
+                  pdata->data, status );
+
+/* Unlock all AST objects within the smfData so that the calling thread
+   can lock them. */
+   smf_lock_data( *(pdata->data), 0, status );
+
+}
+
+
+

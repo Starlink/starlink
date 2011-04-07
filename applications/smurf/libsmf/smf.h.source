@@ -1350,6 +1350,10 @@ void smf_open_asdouble( const Grp *igrp, size_t index, const smfArray* darks,
 void smf_open_file( const Grp * igrp, size_t index, const char * mode,
                     int withHdr, smfData ** data, int *status);
 
+void smf_open_file_job( smfWorkForce *wf, int wait, const Grp *igrp,
+                        size_t index, const char *mode, int flags,
+                        smfData **data, int *status );
+
 void smf_open_group( const Grp * igrp, const dim_t refdims[],
                      smfArray **files, int *status );
 
