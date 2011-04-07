@@ -6,31 +6,40 @@
 # the moon (tuned using 850um observations 20110328 #40). Astronomical
 # signal dominates everything else, so we place map estimation
 # *before* the removal of low-frequency noise (see modelorder). In
-# addition, we set the filter scale to 0.5 deg, the approximate
-# diameter of the disk.  Common-mode removal is completely turned off.
-# Noise in the WVM signal can cause significant steps, so we instead
-# use CSOTAU as a fixed zenith opacity monitor (which internally gets
-# converted into line-of-sight values smoothly with
-# elevation). Finally, we use a zero-constraint to provide a solid
-# baseline beyond the edge of the moon as a reference, and to help the
-# solution converge.
+# addition, we set the filter scale to 2000 arcsec, slightly beyond
+# disk.  Common-mode removal is completely turned off.  Noise in the
+# WVM signal can cause significant steps, so we instead use CSOTAU as
+# a fixed zenith opacity monitor (which internally gets converted into
+# line-of-sight values smoothly with elevation). Finally, we use a
+# zero-constraint to provide a solid baseline beyond the edge of the
+# moon as a reference, and to help the solution converge.
 #
 # ********************************************************************
 
 # required to help the large-scale modes converge
-numiter=20
+numiter=10
 
 # estimate the map before filtering. Don't use COM because it removes
 # structure on the scale of the array.
 modelorder = (ext,ast,flt,noi)
 
 # set map beyond moon to 0 after each iteration
-ast.zero_circle=0.26
+ast.zero_circle=0.333
 
-# only filter out scales larger than the moon
-850.flt.filt_edge_largescale=1800
+# only filter out scales larger than the moon to preserve the large-scale
+# gradients
+450.flt.filt_edge_largescale=2000
+850.flt.filt_edge_largescale=2000
 
-# weeker spike detection
+# the above filters will do a good job on large-scale structure, but
+# there will be striping due to residual low-frequency noise, and
+# errors in the flatfield. Re-run with a much harsher filter to reduce
+# these effects, at the expense of having much more poorly constrained
+# larger-scale structures:
+#450.flt.filt_edge_largescale=200
+#850.flt.filt_edge_largescale=200
+
+# weaker spike detection
 ast.mapspike=10
 
 # use CSOTau instead of WVM because it gives a smoother extinction correction
@@ -38,4 +47,4 @@ ast.mapspike=10
 ext.tausrc = csotau
 
 # back off on DC step thresholds
-dcthresh = 2000
+dcthresh = 10000
