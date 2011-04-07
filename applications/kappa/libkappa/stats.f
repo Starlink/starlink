@@ -273,7 +273,7 @@
       PARAMETER( NPRCTL = 100 )
 
       INTEGER SZBUF              ! Size of text buffer
-      PARAMETER ( SZBUF = 132 )
+      PARAMETER ( SZBUF = 200 )
 
 *  Local Variables:
       BYTE BQUANT( NPRCTL )      ! Byte quantile values
@@ -437,7 +437,7 @@
 *  meaning no logfile is required, is handled invisibly.
       LOGFIL = .FALSE.
       CALL ERR_MARK
-      CALL FIO_ASSOC( 'LOGFILE', 'WRITE', 'LIST', 132, IFIL, STATUS )
+      CALL FIO_ASSOC( 'LOGFILE', 'WRITE', 'LIST', SZBUF, IFIL, STATUS )
 
       IF ( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )

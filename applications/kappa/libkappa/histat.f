@@ -293,7 +293,7 @@
       PARAMETER( NPRCTL = 100 )
 
       INTEGER SZBUF              ! Size of text buffer
-      PARAMETER ( SZBUF = 132 )
+      PARAMETER ( SZBUF = 200 )
 
 *  Local Variables:
       LOGICAL BAD                ! There may be bad values in the array
@@ -562,7 +562,7 @@
 *  Obtain an optional file for logging the results.  Start a new error
 *  context as null is a valid value.
       CALL ERR_MARK
-      CALL FIO_ASSOC( 'LOGFILE', 'WRITE', 'LIST', 132, IFIL, STATUS )
+      CALL FIO_ASSOC( 'LOGFILE', 'WRITE', 'LIST', SZBUF, IFIL, STATUS )
 
 *  Null is a valid response to say do create a logfile.  Record this
 *  fact.  Close the new error context.
