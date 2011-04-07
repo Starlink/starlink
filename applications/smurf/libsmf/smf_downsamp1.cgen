@@ -154,7 +154,6 @@ void CGEN_FUNCTION(smf_downsamp1)( const CGEN_TYPE *in, size_t instride,
   double j2;                  /* Fractional high-res index lower edge */
   size_t jf1;                 /* low-res index lower edge */
   size_t jf2;                 /* high-res index lower edge */
-  dim_t index;                /* index into array */
   CGEN_TYPE *pi=NULL;         /* pointer to current input value */
   CGEN_TYPE *po=NULL;         /* pointer to current output value */
   double *pod=NULL;           /* pointer to current double output value */
@@ -301,11 +300,6 @@ void CGEN_FUNCTION(smf_downsamp1)( const CGEN_TYPE *in, size_t instride,
 
     /* Normalize the output */
     for( i=0; i<outlen; i++ ) {
-      /* index = i*outstride;
-         if( outbuf[index] != CGEN_BAD ) {
-         outbuf[i*outstride] = (CGEN_TYPE) ((double) outbuf[i*outstride]*step);
-         } */
-
       po = PTROFF(outbuf,i,obstride);
 
       if( *po != CGEN_BAD ) {
@@ -413,11 +407,6 @@ void CGEN_FUNCTION(smf_downsamp1)( const CGEN_TYPE *in, size_t instride,
 
     /* Normalize the output */
     for( i=0; i<outlen; i++ ) {
-      /* index = i*outstride;
-         if( outbufd[index] != VAL__BADD ) {
-         outbufd[i*outstride] *= step;
-         } */
-
       pod = PTROFFD(outbufd,i,obstride);
 
       if( *pod != VAL__BADD ) {
