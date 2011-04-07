@@ -102,6 +102,8 @@
 *        do away with the checker function idea, and instead when adding
 *        a job just specify a list of jobs that need to complete before
 *        the new job can be started.
+*     7-APR-2011 (DSB):
+*        Allow job data to be freed automatically when a job completes.
 */
 
 
@@ -204,7 +206,9 @@ int smf_add_job( smfWorkForce *workforce, int flags, void *data,
 *        below.
 *     data
 *        An arbitrary data pointer that will be passed to the worker
-*        allocated to perform this job.
+*        allocated to perform this job. If the SMF__FREE_JOBDATA flag is
+*        set (see "flags") the pointer will be freed automatically using
+*        astFree when the job completes.
 *     func
 *        A pointer to a function that the worker will invoke to do the
 *        job. This function takes two arguments; 1) the supplied "data"
@@ -235,9 +239,13 @@ int smf_add_job( smfWorkForce *workforce, int flags, void *data,
 *     they are added to the workforce.
 
 *  Job Control Flags:
-*     SMF__REPORT_JOB: Indicates that this job is to be included in the
+*     - SMF__REPORT_JOB: Indicates that this job is to be included in the
 *     list of jobs for which smf_job_wait will wait.
-
+*     - SMF__FREE_JOBDATA: Indicates that the supplied pointer to the job
+*     data ("data") is to be freed when the job completes. This is
+*     performed simply by passing the supplied "data" pointer to astFree.
+*     Therefore, if the job data includes pointers to other memory areas,
+*     such memory areas will not themselves be freed.
 */
 
 /* Local Variables: */
@@ -2093,6 +2101,9 @@ static void *smf_run_worker( void *wf_ptr ) {
                smf_push_list_head( job2, &(wf->available_jobs), &status );
             }
          }
+
+/* If required, free the job data pointer. */
+         if( job->flags & SMF__FREE_JOBDATA ) job->data = astFree( job->data );
 
 /* If required, add the completed job onto the end of the "finished" list, and
    issue the job_done signal. */

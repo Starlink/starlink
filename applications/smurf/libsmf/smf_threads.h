@@ -39,6 +39,7 @@
 
 /* Macros */
 #define SMF__REPORT_JOB 1
+#define SMF__FREE_JOBDATA 2
 
 
 /* Type definitions */
