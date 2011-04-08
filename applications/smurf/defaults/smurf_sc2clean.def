@@ -30,7 +30,7 @@
 # These are read in smf_get_cleanpar
 
 apod = 0
-badfrac = 0
+badfrac = 0.05
 dcfitbox = 0
 dcmaxsteps = 10
 dclimcorr = 10
