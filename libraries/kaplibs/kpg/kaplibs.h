@@ -179,5 +179,6 @@ void kpgPixsc( AstFrameSet * iwcs,
                int chrarr_length, /* length of each element in "value" and "unit". Can be 0 if no value/unit required */
                int *status );
 
+void kpg1Gtobj( const char *, const char *, void (*)(void), AstObject **, int * );
 
 #endif

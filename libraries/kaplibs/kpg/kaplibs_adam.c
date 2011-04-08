@@ -645,3 +645,48 @@ void kpg1Darad( const char *param, int el, double *array, const char *methds,
 
 
 
+/* ------------------------------- */
+
+/* Due to the fact that F77 and C access AST objects differently, the
+   supplied "isa" function pointer needs to be a pointer to the F77
+   AST_ISA... function, not the C astIsa... function. The AST_ISA...
+   function should be case to "void (*)( void )". */
+
+
+F77_SUBROUTINE(kpg1_gtobj)( CHARACTER(PARAM),
+                            CHARACTER(CLASS),
+                            void (*ISA)( void ),
+                            INTEGER(IAST),
+                            INTEGER(STATUS)
+                            TRAIL(PARAM)
+                            TRAIL(CLASS) );
+
+void kpg1Gtobj( const char *param, const char *class, void (*isa)( void ),
+                AstObject **obj, int *status ){
+   DECLARE_CHARACTER_DYN(PARAM);
+   DECLARE_CHARACTER_DYN(CLASS);
+   DECLARE_INTEGER(IAST);
+   DECLARE_INTEGER(STATUS);
+   int tmp;
+
+   F77_CREATE_EXPORT_CHARACTER( param, PARAM );
+   F77_CREATE_EXPORT_CHARACTER( class, CLASS );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(kpg1_gtobj)( CHARACTER_ARG(PARAM),
+                         CHARACTER_ARG(CLASS),
+                         isa,
+                         INTEGER_ARG(&IAST),
+                         INTEGER_ARG(&STATUS)
+                         TRAIL_ARG(PARAM)
+                         TRAIL_ARG(CLASS) );
+   F77_IMPORT_INTEGER( IAST, tmp );
+   *obj = astI2P( tmp );
+
+   F77_FREE_CHARACTER( PARAM );
+   F77_FREE_CHARACTER( CLASS );
+   F77_IMPORT_INTEGER( STATUS, *status );
+
+   return;
+}
+
