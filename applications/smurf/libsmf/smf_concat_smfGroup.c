@@ -545,6 +545,8 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
 
       smfData *tmpdata = NULL;      /* for the original data before resamp */
       smfData *tmpdata_next = NULL; /* for the next data before resamp */
+      int doflat;
+      int israw;
 
       /* Add any padding to the length */
       tlen += padStart + padEnd;
@@ -553,77 +555,75 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
          if the chunk is equal to whichchunk */
       for( j=firstpiece; (*status==SAI__OK) && (j<=lastpiece); j++ ) {
 
-        /* Second pass copy data over to new array */
+        /* If this is the first piece, open the file directly in the
+           current thread. */
+        if( j == firstpiece ) {
+          smf_open_file( igrp->grp, igrp->subgroups[j][i], "READ", 0,
+                         &tmpdata, status );
+        }
 
+        /* If any pieces remain to be opened, start a job to open the next
+           piece, running the job in a separate thread. Return as soon
+           as the job is submitted (i.e. do not wait for the job to
+           complete). */
+        if( j < lastpiece ) {
+           smf_open_file_job( wf, 0, igrp->grp, igrp->subgroups[j+1][i],
+                              "READ", 0, &tmpdata_next, status );
+        }
+
+        /* Meanwhile, whilst the next piece in being opened in a
+           separate thread, we continue to process the already opened
+           piece in the main thread... */
+
+        /* See if the data needs to be flat-fielded. If the data has
+           already been flat-fielded, then we clearly do not need to
+           flat-field it again. If the data has not yet been flat-fielded,
+           then we flat-field it below only if requested and otherwise
+           just convert the raw integers to doubles. */
+        smf_check_flat( tmpdata, status );
+        if( *status == SMF__FLATN ) {
+          israw = 0;
+          doflat = 0;
+          errAnnul( status );
+        } else {
+          israw = 1;
+          doflat = ensureflat;
+        }
+
+        /* If required, downsample the data and if it is raw, convert it to
+           double precision. Then release the original data. */
         if( dslen && dslen[j-firstpiece] ) {
-          /* We're down-sampling the data, so break down the way we do
-             things differently.  First open the file and down-sample
-             it. Then do the dark masking and flatfield corrections
-             ourselves (normally handled by smf_open_and_flatfield) */
-
-          int doflat=1;
-
-          /* If this is the first piece, open the file directly in the
-             current thread. */
-          if( j == firstpiece ) {
-             smf_open_file( igrp->grp, igrp->subgroups[j][i], "READ", 0,
-                            &tmpdata, status );
-          }
-
-          /* If any pieces remain to be opened, start a job to open the next
-             piece, running the job in a separate thread. Return as soon
-             as the job is submitted (i.e. do not wait for the job to
-             complete). */
-          if( j < lastpiece ) {
-             smf_open_file_job( wf, 0, igrp->grp, igrp->subgroups[j+1][i],
-                                "READ", 0, &tmpdata_next, status );
-          }
-
-          /* Meanwhile, whilst the next piece in being opened in a
-             separate thread, we continue to process the already opened
-             piece in the main thread. First, see if data are flatfielded */
-          smf_check_flat( tmpdata, status );
-          if( *status == SMF__FLATN ) {
-            doflat = 0;
-            errAnnul( status );
-          }
-
-          /* downsample and convert to double precision */
           smf_downsamp_smfData( tmpdata, &refdata, dslen[j-firstpiece],
                                 1, status );
-
-          /* handle darks */
-          smf_apply_dark( refdata, darks, status );
-
-          /* apply flatfield -- duplicated part of smf_flatfield */
-          if( doflat ) {
-            /* override if necessary */
-            smf_flat_override( flatramps, refdata, status );
-
-            /* OK now apply flatfield calibration */
-            smf_flatten( refdata, status);
-
-            /* Write history entry to file */
-            smf_history_add( refdata, FUNC_NAME, status);
-          }
-
           smf_close_file( &tmpdata, status );
 
-          /* If any pieces remain to be processed, wait for the completion
-             of the job that is opening the next piece. Then lock the
-             smfData for use by this thread, and use it in place of the
-             previous smfData pointer. */
-          if( j < lastpiece ) {
-             smf_wait( wf, status );
-             smf_lock_data( tmpdata_next, 1, status );
-             tmpdata = tmpdata_next;
-          }
+        /* Otherwise, if the data is raw, convert it to double precision
+           then release the original. */
+        } else if( israw ) {
+          refdata = smf_deepcopy_smfData( tmpdata, 1,  SMF__NOCREATE_FILE, 0, 0,
+                                          status );
+          smf_close_file( &tmpdata, status );
 
+        /* Otherwise, just continue to use the original data. */
         } else {
-          /* Open the file corresponding to this chunk. Data may
-             require flat-fielding. */
-          smf_open_asdouble( igrp->grp, igrp->subgroups[j][i], darks, flatramps,
-                             ensureflat, &refdata, status );
+           refdata = tmpdata;
+        }
+
+        /* Do dark subtraction */
+        smf_apply_dark( refdata, darks, status );
+
+        /* If required, apply the flat-field correction. */
+        if( doflat ) {
+
+          /* Override if necessary */
+          smf_flat_override( flatramps, refdata, status );
+
+          /* OK now apply flatfield calibration */
+          smf_flatten( refdata, status);
+
+          /* Write history entry to file */
+          smf_history_add( refdata, FUNC_NAME, status);
+
         }
 
         /* Set havequal flag based on first file. This is required
@@ -644,7 +644,11 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
           /* Set havelut flag */
           havelut = 1;
 
-          /* Calculate the LUT for this chunk */
+          /* Calculate the LUT for this chunk. Note, this call divides up
+             its work between several threads.  It takes care to use a
+             separate job context so that any other jobs currently being
+             performed by the workforce (e.g. opening the next file) do
+             not cause the call to block.  */
           smf_calc_mapcoord( wf, refdata, outfset, moving, lbnd_out, ubnd_out,
                              SMF__NOCREATE_FILE, tstep, status );
         } else {
@@ -926,8 +930,20 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
             tchunk += reftlen;
           }
         }
+
         /* Close the file we had open */
         smf_close_file( &refdata, status );
+
+        /* If any pieces remain to be processed, wait for the completion
+           of the job that is opening the next piece. Then lock the
+           smfData for use by this thread, and use it in place of the
+           previous smfData pointer. */
+        if( j < lastpiece ) {
+           smf_wait( wf, status );
+           smf_lock_data( tmpdata_next, 1, status );
+           tmpdata = tmpdata_next;
+        }
+
       }
 
       /* Full subarray is now concatenated. Finish up by filling the padded

@@ -89,6 +89,9 @@
 *        Only perform full Mapping calculations periodically.
 *     2010-09-21 (COBA):
 *        Add SMF__NOCREATE_FTS
+*     2011-04-08 (DSB):
+*        Ensure smf_wait does not wait for jobs created earlier within the
+*        calling function.
 
 *  Notes:
 *     This routines asserts ICD data order.
@@ -497,68 +500,80 @@ void smf_calc_mapcoord( smfWorkForce *wf, smfData *data, AstFrameSet *outfset,
 
       /* --- Begin parellelized portion ------------------------------------ */
 
+      /* Start a new job context. Each call to smf_wait within this
+         context will wait until all jobs created within the context have
+         completed. Jobs created in higher contexts are ignored by smf_wait. */
+      smf_begin_job_context( wf, status );
+
       /* Allocate job data for threads */
       job_data = astCalloc( nw, sizeof(*job_data), 1 );
+      if( *status == SAI__OK ) {
 
-      /* Set up job data, and start calculating pointing for blocks of
-         time slices in different threads */
+        /* Set up job data, and start calculating pointing for blocks of
+           time slices in different threads */
 
-      if( nw > (int) ntslice ) {
-        step = 1;
-      } else {
-        step = ntslice/nw;
-      }
-
-      for( ii=0; (*status==SAI__OK)&&(ii<nw); ii++ ) {
-        pdata = job_data + ii;
-
-        /* Blocks of time slices */
-        pdata->t1 = ii*step;
-        pdata->t2 = (ii+1)*step-1;
-
-        /* Ensure that the last thread picks up any left-over tslices */
-        if( (ii==(nw-1)) && (pdata->t1<(ntslice-1)) ) {
-          pdata->t2=ntslice-1;
+        if( nw > (int) ntslice ) {
+          step = 1;
+        } else {
+          step = ntslice/nw;
         }
 
-        pdata->ijob = -1;
-        pdata->lut = lut;
-        pdata->theta = theta;
-        pdata->lbnd_out = lbnd_out;
-        pdata->moving = moving;
-        pdata->ubnd_out = ubnd_out;
-        pdata->tstep = tstep;
+        for( ii=0; (*status==SAI__OK)&&(ii<nw); ii++ ) {
+          pdata = job_data + ii;
 
-        /* Make deep copies of AST objects and unlock them so that each
-           thread can then lock them for their own exclusive use */
+          /* Blocks of time slices */
+          pdata->t1 = ii*step;
+          pdata->t2 = (ii+1)*step-1;
 
-        pdata->abskyfrm = astCopy( abskyfrm );
-        astUnlock( pdata->abskyfrm, 1 );
-        pdata->sky2map = astCopy( sky2map );
-        astUnlock( pdata->sky2map, 1 );
+          /* Ensure that the last thread picks up any left-over tslices */
+          if( (ii==(nw-1)) && (pdata->t1<(ntslice-1)) ) {
+            pdata->t2=ntslice-1;
+          }
 
-        /* Similarly, make a copy of the smfData, including only the header
-           information which each thread will need in order to make calls to
-           smf_rebin_totmap */
+          pdata->ijob = -1;
+          pdata->lut = lut;
+          pdata->theta = theta;
+          pdata->lbnd_out = lbnd_out;
+          pdata->moving = moving;
+          pdata->ubnd_out = ubnd_out;
+          pdata->tstep = tstep;
 
-        pdata->data = smf_deepcopy_smfData( data, 0, SMF__NOCREATE_FILE |
-                                            SMF__NOCREATE_DA |
-                                            SMF__NOCREATE_FTS |
-                                            SMF__NOCREATE_DATA |
-                                            SMF__NOCREATE_VARIANCE |
-                                            SMF__NOCREATE_QUALITY, 0, 0,
-                                            status );
-        smf_lock_data( pdata->data, 0, status );
+          /* Make deep copies of AST objects and unlock them so that each
+             thread can then lock them for their own exclusive use */
+
+          pdata->abskyfrm = astCopy( abskyfrm );
+          astUnlock( pdata->abskyfrm, 1 );
+          pdata->sky2map = astCopy( sky2map );
+          astUnlock( pdata->sky2map, 1 );
+
+          /* Similarly, make a copy of the smfData, including only the header
+             information which each thread will need in order to make calls to
+             smf_rebin_totmap */
+
+          pdata->data = smf_deepcopy_smfData( data, 0, SMF__NOCREATE_FILE |
+                                              SMF__NOCREATE_DA |
+                                              SMF__NOCREATE_FTS |
+                                              SMF__NOCREATE_DATA |
+                                              SMF__NOCREATE_VARIANCE |
+                                              SMF__NOCREATE_QUALITY, 0, 0,
+                                              status );
+          smf_lock_data( pdata->data, 0, status );
+        }
+
+        for( ii=0; ii<nw; ii++ ) {
+          /* Submit the job */
+          pdata = job_data + ii;
+          pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata,
+                                     smfCalcMapcoordPar, 0, NULL, status );
+        }
+
+        /* Wait until all of the jobs submitted within the current job
+           context have completed */
+        smf_wait( wf, status );
       }
 
-      for( ii=0; ii<nw; ii++ ) {
-        /* Submit the job */
-        pdata = job_data + ii;
-        pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata,
-                                   smfCalcMapcoordPar, 0, NULL, status );
-      }
-      /* Wait until all of the submitted jobs have completed */
-      smf_wait( wf, status );
+      /* End the current job context. */
+      smf_end_job_context( wf, status );
 
       /* --- End parellelized portion -------------------------------------- */
 
