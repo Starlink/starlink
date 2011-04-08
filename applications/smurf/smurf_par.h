@@ -50,10 +50,12 @@
  *     2010-07-20 (TIMJ):
  *        Retain incorrect DTOI value until we can pin down accurate values
  *        for the resistors.
+ *     2011-04-08 (TIMJ):
+ *        Use correct DTOI value.
  *     {enter_further_changes_here}
 
  *  Copyright:
- *     Copyright (C) 2008-2010 Science and Technology Facilities Council.
+ *     Copyright (C) 2008-2011 Science and Technology Facilities Council.
  *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
  *     University of British Columbia.
  *     All Rights Reserved.
@@ -193,7 +195,7 @@ error can not determine PI
 
 /* Heater circuit constant for converting D/A setting to Amps */
 
-#define SC2FLAT__DTOI (20.0e-6/65536)
+#define SC2FLAT__DTOI (24.71e-6/65536)
 
 /* Convert raw DAC numbers to current
    - include factor for MCE low-pass filter
