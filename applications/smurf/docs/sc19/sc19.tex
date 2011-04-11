@@ -583,7 +583,7 @@ type:
 % smurf
 
 
-        SMURF commands are now available -- (Version 1.1.0)
+        SMURF commands are now available -- (Version 1.2.1)
 
         Type smurfhelp for help on SMURF commands.
         Type 'showme sun258' to browse the hypertext documentation.
@@ -654,11 +654,11 @@ flatfield calibration. The calibration can be stored internally in the
 data file (see the HDS extension \texttt{MORE.SCUBA2.FLATCAL}) or can
 be calculated dynamically from the flatfield ramps bracketing each
 science observation. The DIMM will always use a flatfield ramp if
-available. Use the command
+available. For example, use the command
 
 \begin{myquote}
 \begin{verbatim}
-% flatfield 's4d20090107_00007_00*.sdf' '*_flat'
+% flatfield 's4a20091214_00015_*.sdf' '*_flat'
 \end{verbatim}
 \end{myquote}
 %
@@ -694,7 +694,7 @@ current working directory,
 
 \begin{myquote}
 \begin{verbatim}
-% sc2concat 's4a20091214_00015_000*.sdf' './*_con'
+% sc2concat 's4a20091214_00015_00??.sdf' './*_con'
 \end{verbatim}
 \end{myquote}
 
@@ -916,22 +916,24 @@ be identified and repaired using some extra parameters to \clean:
 \begin{myquote}
 \begin{verbatim}
 % sc2clean s4a20091214_00015_0002_con.sdf clean2 \
-   config='"order=0,dcfitbox=30,dcthresh=25,dcsmooth=50,fillgaps=1"'
+   config='"order=0,dcfitbox=30,dcthresh=25,dcsmooth=50"'
 \end{verbatim}
 \end{myquote}
 
 In addition to removing the mean as in the previous example, the extra
-parameters starting with `dc' instruct \clean\ to smooth the data with a
-median filter of width 50 samples, and then look for steps in the
+parameters starting with `dc' instruct \clean\ to smooth the data with
+a median filter of width 50 samples, and then look for steps in the
 smoothed data in excess of 25-$\sigma$. The heights of steps found in
-this way are measured by fitting straight lines to the smoothed data on
-either side of the jump using 30 samples in each fit. The corrections
-thus determiend are applied to the original bolometer data.  Finally,
-`fillgaps' indicates that the data range around the identified steps
-($\pm 400$ samples in this case) should be replaced with a constrained
-(smooth) realisation of noise to avoid introducing spikes into the data
-stream (these ranges are ultimately ignored when producing final maps). A
-map produced from `clean2.sdf' is shown in Fig.~\ref{fig:map_dc_mean}.
+this way are measured by fitting straight lines to the smoothed data
+on either side of the jump using 30 samples in each fit. The
+corrections thus determined are applied to the original bolometer
+data.  Note that an additional flag has been set by default,
+\texttt{fillgaps=1}, indicating that the data range around the
+identified steps ($\pm 400$ samples in this case) should be replaced
+with a constrained (smooth) realisation of noise to avoid introducing
+spikes into the data stream (these ranges are ultimately ignored when
+producing final maps). A map produced from `clean2.sdf' is shown in
+Fig.~\ref{fig:map_dc_mean}.
 
 \begin{figure}
 \begin{center}
