@@ -2,8 +2,9 @@
 # the example test data of Uranus and generate clean3.sdf
 
 order=0
-dcfitbox=400
-dcthresh=5
+dcfitbox=30
+dcthresh=25
+dcsmooth=50
 fillgaps=1
-apod=1000
+apod=<undef>
 filt_edgehigh=0.5
