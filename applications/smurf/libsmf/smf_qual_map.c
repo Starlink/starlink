@@ -53,10 +53,12 @@
 *  History:
 *     2010-06-16 (TIMJ):
 *        Initial version
+*     2011-04-11 (TIMJ):
+*        Simplify initialisation logic. Always initialise.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2010 Science and Technology Facilities Council.
+*     Copyright (C) 2010-2011 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -115,8 +117,10 @@ smf_qual_t * smf_qual_map( int indf, const char mode[], smf_qfam_t *family,
   nout = itemp;
   if (nmap) *nmap = nout;
 
-  /* malloc the QUALITY buffer */
-  retval = astCalloc( nout, sizeof(*retval), 0 );
+  /* malloc the QUALITY buffer. Initialise to zero to simplify logic
+     below. It is difficult to determine in advance which case can use
+     initialisation. */
+  retval = astCalloc( nout, sizeof(*retval), 1 );
 
   /* READ and UPDATE mode require that the QUALITY is processed
      and copied before being returned. WRITE mode means that the
@@ -124,9 +128,9 @@ smf_qual_t * smf_qual_map( int indf, const char mode[], smf_qfam_t *family,
      and WRITE/BAD also require that we do not do any quality
      handling */
   if ( strncmp(mode, "WRITE",5) == 0 ) {
-    if ( strcmp( mode, "WRITE/ZERO") == 0 ) {
-      memset( retval, 0, nout * sizeof(*retval) );
-    } else if ( strcmp( mode, "WRITE/BAD") == 0 ) {
+    /* WRITE and WRITE/ZERO are actually treated the same way
+       because we always initialise */
+    if ( strcmp( mode, "WRITE/BAD") == 0 ) {
       for (i=0; i<nout; i++) {
         retval[i] = VAL__BADQ;
       }
@@ -225,7 +229,7 @@ smf_qual_t * smf_qual_map( int indf, const char mode[], smf_qfam_t *family,
       if (*status == SAI__OK) {
         for (i=0; i<nout; i++) {
           if (qmap[i] == 0) {
-            retval[i] = 0;
+            /* Output buffer would be set to zero but it already has that value */
           } else {
             /* this becomes a very laborious bitwise copy.
              One to one mapping for TSERIES and MAP families. */
