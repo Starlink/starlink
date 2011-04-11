@@ -982,12 +982,8 @@ array scans across is.
 \subsubsection{\xlabel{fftfilter}Frequency-domain filtering}
 
 \clean\ can also perform frequency domain filtering on the
-bolometers. In order for this to work properly, the data must first be
-apodized (smoothly rolled-off to 0 at the beginning and end),
-step-corrected and some padding added to the beginning and end, to
-avoid ringing. The following steps will concatenate the raw data files
-together, adding padding at the beginning and end, and then will
-apodize and filter the single large file.
+bolometers. In the following example data are concatenated, and
+filtered using a single call to \clean.
 
 \begin{figure}
 \begin{center}
@@ -1010,15 +1006,7 @@ apodize and filter the single large file.
 
 \begin{myquote}
 \begin{verbatim}
-% sc2concat 's4a20091214_00015_000?.sdf' './*_con2' padstart=1000 \
-padend=1000
-
-Out of 2 input files, 0 were darks and 2 were not darks
-Processing data from instrument 'SCUBA-2' for object 'URANUS' from the
-following observation  :
-  20091214 #15 scan
-
-% sc2clean s4a20091214_00015_0002_con2.sdf clean3 \
+% sc2clean 's4a20091214_00015_000?.sdf' clean3 \
    config=^${STARLINK_DIR}/share/smurf/sc19_clean3.lis
 
 Processing data from instrument 'SCUBA-2' for object 'URANUS' from the
@@ -1038,50 +1026,44 @@ dcfitbox=30
 dcthresh=25
 dcsmooth=50
 fillgaps=1
-apod=1000
+apod=<undef>
 filt_edgehigh=0.5
 \end{verbatim}
 \end{myquote}
 
-When concatenating the data using \concat\ an additional 1000 samples
-at the start and end of the data have been added as padding. The call
-to \clean\ has done several things: removed the mean value of each
-bolometer; corrected DC steps; apodized over a range of 1000 samples;
-and finally performed a high-pass filter with a hard lower cutoff
-frequency of 0.5\,Hz.
-
-For the purpose of viewing the full effects of the apodization,
-padding and filtering, we also disable the QUALITY flags (see
-Section~\ref{sec:quality} for further details) using the \Kappa\ task
-\setbb,
-
-\begin{myquote}
-\begin{verbatim}
-setbb clean3 0
-\end{verbatim}
-\end{myquote}
+As in the early examples, the first four parameters cause \clean\ to
+remove the mean bolometer values, and repair DC steps. Next, the
+\texttt{apod=<undef>} (combined with an internal default
+\texttt{zeropad=0}) is a slightly cryptic way to tell \clean\ to
+enforce continuity between the starts and ends of each bolometer
+time-series by temporarily adding padding that is a function of the
+filter frequency, and interpolating the ends using a cubic
+function. This step is required to avoid ringing once the FFT is
+taken. The alternative, and now deprecated, method for reduing ringing
+is to pad and apodize. Finally, the last parameter tells \clean\ to
+apply a high-pass filter with a hard lower cutoff frequency of
+0.5\,Hz.
 
 Fig.~\ref{fig:highpass} shows the filtered bolometer signal for
-(13,23), as well as a map produced from the data. Had we not first
-disabled the QUALITY flags, the smooth drop to zero at the start and
-end of the time series would not appear in \gaia\ (although in either
-case those samples are not included by \makemap\ when producing the
-image).  The filtering has significantly improved the noise properties
-of the map compared with Fig.~\ref{fig:map_dc_mean}, but the filtering
-has now introduced ringing around the source which results in a
-negative cross pattern along the scan directions.
+(13,23), as well as a map produced from the data. The filtering has
+significantly improved the noise properties of the map compared with
+Fig.~\ref{fig:map_dc_mean}, but the filtering has now introduced
+ringing around the source which results in a negative cross pattern
+along the scan directions.
 
 \subsection{\xlabel{pspec}Bolometer power-spectra}
 
 The frequency-domain power spectra of SCUBA-2 bolometers can be
-produced with the \smurf\ task \fft. Using the padded, concatenated
-data `s4a20091214\_00015\_0002\_con2.sdf' from the previous step, use the
-following commands:
+produced with the \smurf\ task \fft. Similar to the previous example,
+we first produce cleaned, concatenated data. However, we omit the
+high-pass filtering by overriding the `filt\_edgehigh' parameter
+explicitly, since the goal now is to see what the full bolometer noise
+power spectrum looks like.
 
 \begin{myquote}
 \begin{verbatim}
 
-% sc2clean s4a20091214_00015_0002_con2 clean4 \
+% sc2clean 's4a20091214_00015_000?.sdf' clean4 \
    config="'^${STARLINK_DIR}/share/smurf/sc19_clean3.lis,filt_edgehigh=0'"
 
 Processing data from instrument 'SCUBA-2' for object 'URANUS' from the
@@ -1100,24 +1082,19 @@ SC2FFT: power spectrum requested so setting POLAR=TRUE
 \end{verbatim}
 \end{myquote}
 
-As in the previous example we have used \clean\ with the included
-`sc19\_clean3.lis' configuration file to fix DC steps and remove the
-mean. However, we omit the high-pass filtering by overriding the
-`filt\_edgehigh' parameter explicitly, since the goal now is to see
-what the full bolometer noise power spectrum looks like. Since there
-is no \starlink\ standard format for storing complex values,
-\fft\ uses its own format: a 4-dimensional array, with the first axis
-indicating frequency, the second and third axes bolometer row and
-column, and the final axis containing the real and imaginary parts of
-each Fourier coefficient. By setting `power=true' it switches to polar
-power form, such that the first element of the 4th array axis stores
-the square of the amplitudes, and the second element stores the
-arguments (phases) of each Fourier coefficient. As with the time
-series data, \gaia\ may then be used to view the data cube. The
-difference is that we now specify a subset of the data so that the 3rd
-axis of the cube is the array of squared Fourier amplitudes for each
-bolometer, and ignore the phases (i.e.~we observe only the 1st elements
-along the 4th axis):
+ Since there is no \starlink\ standard format for storing complex
+ values, \fft\ uses its own format: a 4-dimensional array, with the
+ first axis indicating frequency, the second and third axes bolometer
+ row and column, and the final axis containing the real and imaginary
+ parts of each Fourier coefficient. By setting `power=true' it
+ switches to polar power form, such that the first element of the 4th
+ array axis stores the square of the amplitudes, and the second
+ element stores the arguments (phases) of each Fourier coefficient. As
+ with the time series data, \gaia\ may then be used to view the data
+ cube. The difference is that we now specify a subset of the data so
+ that the 3rd axis of the cube is the array of squared Fourier
+ amplitudes for each bolometer, and ignore the phases (i.e.~we observe
+ only the 1st elements along the 4th axis):
 
 \begin{myquote}
 \begin{verbatim}
@@ -1162,7 +1139,7 @@ producing `clean4.sdf' in the previous example:
 % kappa
 
 
-     KAPPA commands are now available -- (Version 1.12-1)
+     KAPPA commands are now available -- (Version 1.13-2)
 
      Type kaphelp for help on KAPPA commands.
      Type 'showme sun95' to browse the hypertext documentation.
@@ -1175,10 +1152,8 @@ producing `clean4.sdf' in the previous example:
 
 % showqual clean4 count
   BADDA           (bit 1) - "Set iff a sample is flagged by the DA" (4416000)
-  BADBOL          (bit 2) - "Set iff all data from bolo to be ignored" (5152000)
-  DCJUMP          (bit 3) - "Set iff a DC jump is present" (56092)
-  PAD             (bit 4) - "Set iff data are padding" (2560000)
-
+  BADBOL          (bit 2) - "Set iff all data from bolo to be ignored" (4476000)
+  DCJUMP          (bit 3) - "Set iff a DC jump is present" (6924)
 \end{verbatim}
 \end{myquote}
 
@@ -1187,24 +1162,15 @@ occurences of each Quality flag in the data should be counted and
 displayed.  This example shows that 4416000 samples in total were
 flagged `\texttt{BADDA}' by the flatfielding algorithm or by the data
 acquisition (DA) system itself based on the array setup. Since each
-bolometer produced 12000 samples (excluding 2000 for padding, as
-indicated by `\texttt{PAD}' for which there were $1280
-\,\mathrm{bolometers} \times 2000 = 2560000$ samples flagged), this
-corresponds to 4416000/12000 $=$ 368 bolometers that were not
-operational (out of 1280). The `\texttt{BADBOL}' flag is used by
-\smurf\ to flag {\em every} sample of a bolometer that is not being
-used. In this case only the bolometers flagged by the DA system were
-turned off. So, including the 2000 samples of padding, we again see
-that 5152000/14000 $=$ 368 bad bolometers. Finally, `\texttt{DCJUMP}'
-indicates the number of samples that were affected by the DC step
-correction procedure (which include a number of samples on either side
-of the precise locations where the steps occurred).
-
-%Finally, the
-%apodization (\texttt{APOD}) is flagged over the same sample length as
-%the padding, but then that same amount again is flagged beyond this
-%region to avoid including any ringing in the final map (i.e. $2560000
-%\times 2 = 5120000$).
+bolometer produced 12000 samples, this corresponds to 4416000/12000
+$=$ 368 bolometers that were not operational (out of 1280). The
+`\texttt{BADBOL}' flag is used by \smurf\ to flag {\em every} sample
+of a bolometer that is not being used. In this case the number of
+flags is 4476000 which corresponds to 373 bolometers. In other words,
+cleaning turned off an additional 5 bolometers. Finally,
+`\texttt{DCJUMP}' indicates the number of samples that were affected
+by the DC step correction procedure (which include a number of samples
+on either side of the precise locations where the steps occurred).
 
 During map-making flagged samples will not be used and by default they
 will be hidden from view for all \starlink\ tools. However, if you
@@ -1222,19 +1188,18 @@ will disable quality and make visible all the underlying data. Using a
 value of 255 will turn all bits back on and so any non-zero quality will be
 treated as bad data.
 
-Additionally, the \Kappa\ task \qualtobad\ may be used to
-permanently convert samples with given quality bits to a {\em magic\/} or {\em
+Additionally, the \Kappa\ task \qualtobad\ may be used to permanently
+convert samples with given quality bits to a {\em magic\/} or {\em
   invalid\/} value. For example:
 
 \begin{myquote}
 \begin{verbatim}
-% qualtobad clean4 badmasked pad
+% qualtobad clean4 badmasked DCJUMP
 \end{verbatim}
 \end{myquote}
 %
-will set all of the samples flagged with quality \texttt{PAD} to the
-magic value. This corresponds to the first and last 1000 time
-slices. When `badmasked.sdf' is subsequently viewed with \gaia, none
+will set all of the samples flagged with quality \texttt{DCJUMP} to the
+magic value. When `badmasked.sdf' is subsequently viewed with \gaia, none
 of those portions of the data will be visible.
 
 \section{\xlabel{maps}Dynamic Iterative Map-Making}
@@ -1268,14 +1233,14 @@ Processing data from instrument 'SCUBA-2' for object 'URANUS' from the
 following observation  :
   20091214 #15 scan
 
-MAKEMAP: Map-maker will use 38671 MBytes of memory
+MAKEMAP: Map-maker will use no more than 38670 MiB of memory
 
    Output sky coordinates are (RA,Dec) offsets from the (moving)
    telescope base position, which started at (RA,Dec) = (23:34:38.6,
 -3:33:57).
 
    Projection parameters used:
-      CRPIX1 = 0
+      CRPIX1 = 6.95327973673941e-310
       CRPIX2 = 0
       CRVAL1 = 0 ( DRA = 0:00:00.000 )
       CRVAL2 = 0 ( DDec = 0:00:00.00 )
@@ -1283,44 +1248,45 @@ MAKEMAP: Map-maker will use 38671 MBytes of memory
       CDELT2 = 0.000555555555555556 ( 2 arcsec )
       CROTA2 = 0
 
-   Output map pixel bounds: ( -74:112, -112:116 )
+   Output map pixel bounds: ( -74:112, -113:116 )
 
    Output map WCS bounds:
         Right ascension offset: -0:00:14.867 -> 0:00:10.067
-        Declination offset: -0:03:47.00 -> 0:03:51.00
+        Declination offset: -0:03:49.00 -> 0:03:51.00
 
 smf_iteratemap: Iterate to convergence (max 5)
 smf_iteratemap: Stopping criteria is a change in chi^2 < 0.001
+smf_iteratemap: map-making requires 1355 MiB (map=1 MiB model calc=1353 MiB)
 smf_iteratemap: Continuous chunk 1 / 1 =========
 smf_iteratemap: Iteration 1 / 5 ---------------
-smf_iteratemap: Pre-conditioning chunk
 --- Size of the entire data array ------------------------------------------
 bolos  : 1280
 tslices: bnd:0(0.0 min), map:12000(1.4 min), tot:12000(1.4 min)
 Total samples: 15360000
 --- Quality flagging statistics --------------------------------------------
  BADDA:    4416000 (28.75%),         368 bolos
-BADBOL:    4920000 (32.03%),         410 bolos
-DCJUMP:      27500 ( 0.18%),
- NOISE:     504000 ( 3.28%),          42 bolos
-Total samples available for map:   10412658, 67.79% of max (867.721 bolos)
+BADBOL:    4956000 (32.27%),         413 bolos
+DCJUMP:       1557 ( 0.01%),
+ NOISE:     480000 ( 3.12%),          40 bolos
+Total samples available for map:   10402995, 67.73% of max (866.916 bolos)
 smf_iteratemap: Calculate time-stream model components
 smf_iteratemap: Rebin residual to estimate MAP
 smf_iteratemap: Will calculate chi^2 next iteration
 smf_iteratemap: Calculate ast
 --- Quality flagging statistics --------------------------------------------
  BADDA:    4416000 (28.75%),         368 bolos  ,change          0 (+0.00%)
-BADBOL:    5184000 (33.75%),         432 bolos  ,change     264000 (+5.37%)
-DCJUMP:      27500 ( 0.18%),                    ,change          0 (+0.00%)
-  APOD:    3635200 (23.67%),        2840 tslices,change    3635200 (+inf%)
-   COM:     364579 ( 2.37%),                    ,change     364579 (+inf%)
- NOISE:     504000 ( 3.28%),          42 bolos  ,change          0 (+0.00%)
-Total samples available for map:    7664503, 65.37% of max (836.736 bolos)
-     Change from last report:   -2748155, -26.39% of previous
+BADBOL:    5292000 (34.45%),         441 bolos  ,change     336000 (+6.78%)
+ SPIKE:        137 ( 0.00%),                    ,change        137 (+inf%)
+DCJUMP:       1557 ( 0.01%),                    ,change          0 (+0.00%)
+   COM:     369162 ( 2.40%),                    ,change     369162 (+inf%)
+ NOISE:     480000 ( 3.12%),          40 bolos  ,change          0 (+0.00%)
+Total samples available for map:   10033706, 65.32% of max (836.142 bolos)
+     Change from last report:    -369289, -3.55% of previous
 smf_iteratemap: Iteration 2 / 5 ---------------
 smf_iteratemap: Calculate time-stream model components
 smf_iteratemap: Rebin residual to estimate MAP
-smf_iteratemap: *** CHISQUARED = 4.72918514955082 for chunk 1
+smf_iteratemap: *** CHISQUARED = 1.15486085552371 for filegroup 1
+
 
 \end{verbatim}
 \end{myquote}
@@ -1330,55 +1296,57 @@ dimensions of the data being processed are listed near the start of
 the first iteration, as well as the QUALITY flagging statistics. This
 report is similar to that produced by the \Kappa\ task \showqual\ in
 Section~\ref{sec:quality}. At the beginning, the main purpose is to
-indicate how many bolometers are being used: 368 bolometers were turned
-off during data acquisition (\texttt{BADDA}); and 42 bolometers
-exceeded the acceptable noise threshold (\texttt{NOISE}). Together,
-the total number of bad bolometers (\texttt{BADBOL}) is therefore
-$368+42=410$. Another particularly important flag is \texttt{COM}: the
-DIMM rejects bolometers (or portions of their time series) if they
-differ significantly from the common-mode (average) of the remaining
-bolometers.
+indicate how many bolometers are being used: 368 bolometers were
+turned off during data acquisition (\texttt{BADDA}); and 40 bolometers
+exceeded the acceptable noise threshold (\texttt{NOISE}). There were
+also small numbers of samples flagged as containing spikes and
+jumps. The total number of bad bolometers (\texttt{BADBOL}) is
+413. Accounting for these, and the small numbers of additionally
+flagged samples, $866.916$ effective bolometers are available at the
+start of the first iteration.
 
-After each subsequent iteration a new QUALITY report is
-produced, indicating how the flags have changed. Another useful
-quantity reported is \texttt{CHISQUARED} -- the RMS of the residual
-(time series with the various model components removed) for all of the
-samples with good QUALITY, normalized by the measured white noise
-levels.
+After each subsequent iteration a new QUALITY report is produced,
+indicating how the flags have changed. An important flag that appears
+in the QUALITY report following the first iteration is \texttt{COM}:
+the DIMM rejects bolometers (or portions of their time series) if they
+differ significantly from the common-mode (average) of the remaining
+bolometers. Another useful quantity reported is \texttt{CHISQUARED} --
+the RMS of the residual (time series with the various model components
+removed) for all of the samples with good QUALITY, normalized by the
+measured white noise levels.
 
 This particular configuration executes a maximum of 5 iterations, but
 stops sooner if the change in \texttt{CHISQUARED} is less then
-0.001. In this case, it reaches this stopping criterion after 4
+0.001. In this case, it reaches this stopping criterion after 5
 iterations:
 
 \begin{myquote}
 \begin{verbatim}
-smf_iteratemap: Iteration 4 / 5 ---------------
+smf_iteratemap: Iteration 5 / 5 ---------------
 smf_iteratemap: Calculate time-stream model components
 smf_iteratemap: Rebin residual to estimate MAP
-smf_iteratemap: *** CHISQUARED = 4.66531758242692 for chunk 1
-smf_iteratemap: *** change: -5.92439207922624e-05
+smf_iteratemap: *** CHISQUARED = 1.14451425189281 for filegroup 1
+smf_iteratemap: *** change: -2.48779013769518e-05
 smf_iteratemap: Calculate ast
 --- Quality flagging statistics --------------------------------------------
  BADDA:    4416000 (28.75%),         368 bolos  ,change          0 (+0.00%)
-BADBOL:    5292000 (34.45%),         441 bolos  ,change      36000 (+0.68%)
- SPIKE:       5931 ( 0.04%),                    ,change        579 (+10.82%)
-DCJUMP:      27500 ( 0.18%),                    ,change          0 (+0.00%)
-  APOD:    3635200 (23.67%),        2840 tslices,change          0 (+0.00%)
-   COM:     437684 ( 2.85%),                    ,change      22263 (+5.36%)
- NOISE:     504000 ( 3.28%),          42 bolos  ,change          0 (+0.00%)
-Total samples available for map:    7606521, 64.88% of max (830.406 bolos)
-     Change from last report:     -18005, -0.24% of previous
-smf_iteratemap: ****** Completed in 4 iterations
+BADBOL:    5304000 (34.53%),         442 bolos  ,change          0 (+0.00%)
+ SPIKE:        180 ( 0.00%),                    ,change          0 (+0.00%)
+DCJUMP:       1557 ( 0.01%),                    ,change          0 (+0.00%)
+   COM:     392350 ( 2.55%),                    ,change       1670 (+0.43%)
+ NOISE:     480000 ( 3.12%),          40 bolos  ,change          0 (+0.00%)
+Total samples available for map:   10010475, 65.17% of max (834.206 bolos)
+     Change from last report:      -1670, -0.02% of previous
+smf_iteratemap: ****** Completed in 5 iterations
 smf_iteratemap: ****** Solution CONVERGED
-Total samples available from all chunks: 7606521 (830.406 bolos)
+Total samples available from all chunks: 10010475 (834.206 bolos)
 \end{verbatim}
 \end{myquote}
 
-Note that compared to the first iteration, the total number of samples
-with good QUALITY has dropped from 7664503 to 7606521 (about an 0.8
-per cent decrease) as additional samples were flagged in each
-iteration.
+Note that compared to the initial report, the total number of samples
+with good QUALITY (\texttt{Total samples available for map}) has
+dropped from 10402995 to 10010475 (about a 4 per cent decrease) as
+additional samples were flagged in each iteration.
 
 \begin{figure}
 \begin{center}
@@ -1393,11 +1361,12 @@ iteration.
 \end{figure}
 
 The iterative map-maker estimates several components of the bolometer
-signal simultaneously with the map estimate. The particular sequence
-of components that it fits is specified by \texttt{modelorder} in the
-configuration file. All of the examples provided with \smurf\ are
-derived from \texttt{\$STARLINK\_DIR/share/smurf/dimmconfig.lis}, and
-we show the relevant excerpt here:
+signal in addition to the astronomical signal that goes into the
+map. The particular sequence of components that it fits is specified
+by \texttt{modelorder} in the configuration file. All of the examples
+provided with \smurf\ are derived from
+\texttt{\$STARLINK\_DIR/share/smurf/dimmconfig.lis}, and we show the
+relevant excerpt here:
 
 \begin{myquote}
 \begin{verbatim}
@@ -1458,15 +1427,15 @@ Note that the quality and variance for the data are stored as the
 VARIANCE and QUALITY components within the residual file NDF.
 
 As with the input data, these are all standard \starlink\ NDF files
-which can be examined using all of the existing tools, and can be
-manipulated by other \smurf\ routines. The base of the filenames is
-the first input file that went into the maps for each subarray, and
-the `\texttt{con}' suffix indicates that several data files may have
-been concatenated together. The new files are: `\texttt{*ast.sdf}',
-the time-domain projection of the astronomical signal as estimated in
-the final map (same dimensions as the input bolometer data);
-`\texttt{*com.sdf}', an estimate of the common-mode signal
-(predominantly sky emission and fridge temperature variations);
+which can be examined using all of the existing tools, and can be used
+by other \smurf\ routines such as \clean, \fft, and \makemap. The base
+of the filenames is the first input file that went into the maps for
+each subarray, and the `\texttt{con}' suffix indicates that several
+data files may have been concatenated together. The new files are:
+`\texttt{*ast.sdf}', the time-domain projection of the astronomical
+signal as estimated in the final map (same dimensions as the input
+bolometer data); `\texttt{*com.sdf}', an estimate of the common-mode
+signal (predominantly sky emission and fridge temperature variations);
 `\texttt{*flt.sdf}', additional noise (low-frequency noise in this
 particular case) that was filtered out of each bolometer (same
 dimensions as the input bolometer data); and finally
@@ -1491,7 +1460,7 @@ input bolometer data).
   location of the DC step -- the numerical value 8; this region of the
   data is not used in the final map). All of the plots were produced
   with \gaia, restricting the range of the $x$-axis to samples
-  2840--12000, to avoid the padding and apodization at the ends.}
+  2840--11500.}
 \label{fig:itercomp}
 \end{center}
 \end{figure}
@@ -1529,10 +1498,10 @@ project:
 
 \item[\texttt{dimmconfig.lis}]\quad Before the iterative solution
   begins, some pre-processing steps are performed, like repairing DC
-  steps, turning off particularly noisy bolometers (see the \\
-  \texttt{noiseclip} parameter), and the mean levels are subtracted.
-  This default configuration solves for the following models:
-  \texttt{COM}, \texttt{GAI}, \texttt{EXT}, \texttt{FLT},
+  steps, turning off particularly noisy bolometers (see the
+  \\ \texttt{noiseclip} parameter), and the mean levels are
+  subtracted.  This default configuration solves for the following
+  models: \texttt{COM}, \texttt{GAI}, \texttt{EXT}, \texttt{FLT},
   \texttt{AST}, \texttt{NOI}. The components \texttt{COM} and
   \texttt{GAI} work together to calculate the average signal template
   of all the bolometers, and then fit/remove the templates from each
@@ -1540,47 +1509,56 @@ project:
   resemble the template and remove them from the final solution. The
   component \texttt{EXT} applies the extinction correction (derived
   from the water vapour radiometer by default), and then \texttt{FLT}
-  applies a high-pass filter to the data, above 0.1\,Hz and 0.3\,Hz at
-  450\micron\ and 850\micron, respectively. These cutoff frequencies
-  were chosen through trial and error, but appear to give good results
-  under a wide variety of situations. Finally, \texttt{AST} estimates
-  the astronomical signal contribution to the bolometer signals from
-  the current map estimate, and \texttt{NOI} measures the noise in the
-  residual signals for each bolometer to establish weights for the
-  data as they are placed into the map in subsequent iterations.
+  applies a high-pass filter to the data, above frequencies that
+  correspond to angular scales of 600\,arcsec and 300\,arcsec at
+  450\micron\ and 850\micron, respectively (as established
+  automatically from the mean slew speed of the scan). These cutoff
+  frequencies were chosen through trial and error, but appear to give
+  good results under a wide variety of situations. Finally,
+  \texttt{AST} estimates the astronomical signal contribution to the
+  bolometer signals from the current map estimate, and \texttt{NOI}
+  measures the noise in the residual signals for each bolometer to
+  establish weights for the data as they are placed into the map in
+  subsequent iterations.
 
 \item[\texttt{dimmconfig\_blank\_field.lis}]\quad This configuration
   is tuned for deep surveys for which the goal is to detect low-S/N
   point sources. Instead of iteratively applying a high-pass filter
   (\texttt{FLT}), which can result in convergence problems when there
   is little signal in the map, a single, harsher high-pass filter is
-  applied as a pre-processing step (0.2\, and 0.6\,Hz at 450\micron\
-  and 850\micron, respectively). There are also more conservative cuts
-  to remove noisy/problematic bolometers. Finally, the parameters
-  \texttt{ast.zero\_lowhits} and \texttt{ast.zero\_notlast} are set to
-  constrain much of the map to precisely zero for all but the last of
-  5 iterations. This helps with map convergence, and is a reasonable
-  prior for a blank-field. Normally the map would then be processed
-  using a matched filter (see Section~\ref{sec:cosmology}).
+  applied as a pre-processing step (corresponding to 200\,arcsec
+  scales at both 450\micron\ and 850\micron). There are also more
+  conservative cuts to remove noisy/problematic bolometers. Finally,
+  the parameters \texttt{ast.zero\_lowhits} and
+  \texttt{ast.zero\_notlast} are set to constrain much of the map to
+  precisely zero for all but the last of 5 iterations. This helps with
+  map convergence, and is a reasonable prior for a
+  blank-field. Normally the map would then be processed using a
+  matched filter (see Section~\ref{sec:cosmology}).
+
+\item[\texttt{dimmconfig\_bright.lis}]\quad This configuration is
+  aimed at reducing maps of bright sources. Weaker noise clipping, DC
+  step thresholds and common-mode rejection are used. In addition, the
+  number of iterations is increased to a fixed value of 20 to allow
+  potentially large-scale structures to converge.
 
 \item[\texttt{dimmconfig\_bright\_compact.lis}]\quad This
   configuration is aimed at reducing maps of bright, compact sources
-  that are isolated near the centre of the map. The number of
-  iterations is increased, and as in
-  \texttt{dimmconfig\_blank\_field.lis}, the
-  \texttt{ast.zero\_lowhits} and \texttt{ast.zero\_notlast} parameters
-  are used to constrain the map edges to zero for all but the final
-  iteration. This strategy helps with map convergence significantly,
-  and can provide good maps of bright sources, even in cases where
-  scan patterns failed and the telescope degenerated into scanning
-  back-and-forth along a single position angle on the sky.
+  that are isolated at the centre of the map, and is derived from
+  \texttt{dimmconfig\_bright.lis}. The addition of
+  \texttt{ast.zero\_circle} and \texttt{ast.zero\_notlast} parameters
+  are used to constrain the map to zero beyond a radius of 1\,arcmin
+  for all but the final iteration. This strategy helps with map
+  convergence significantly, and can provide good maps of bright
+  sources, even in cases where scan patterns failed and the telescope
+  degenerated into scanning back-and-forth along a single position
+  angle on the sky.
 
-\item[\texttt{dimmconfig\_bright\_extended.lis}]\quad The only
-  difference between this configuration and the default is to increase
-  the iterations to 20 in order to allow more time for high-S/N
-  large-scale structure to converge. In the future, automatic
-  convergence tests will be added, but for now the number of
-  iterations is fairly subjective. We recommend setting the parameter
+\item[\texttt{dimmconfig\_bright\_extended.lis}]\quad This
+  configuration is for reducing maps of bright extended sources, and
+  is also derived from \texttt{dimmconfig\_bright.lis}. Here
+  \texttt{ast.zero\_snr} is used to constrain the map to zero wherever
+  the S/N is lower than 5-$\sigma$. We recommend setting the parameter
   \texttt{itermap=1}, and then visually inspecting the maps produced
   after each iteration (e.g., \texttt{gaia map.more.smurf.itermaps})
   to help determine an appropriate number of iterations.
@@ -1592,30 +1570,30 @@ project:
 %  focal-plane offsets for each bolometer, and to constrain the relative
 %  bolometer responsivities.
 
-\item[\texttt{dimmconfig\_faint\_extended.lis}]\quad It is presently
-  very challenging to produce SCUBA-2 maps of faint extended
-  structures, given the instrument's low-frequency noise
-  performance. In particular, for some observing configurations, wide
-  scans can suffer significant magnetic field pickup. If there are no
-  bright sources in the map, a single high-pass filter may be applied
-  at the start (as in \texttt{dimmconfig\_blank\_field.lis}). Then,
-  the dark-squid signals (one for each column in the array, sensitive
-  primarily to this pickup) can be used as templates to fit and remove
-  this extra low-frequency noise component, the \texttt{DKS}
-  model. Note that for maps of brighter structures, \texttt{DKS} does
-  not have much of an impact, and may simply increase the noise, as
-  all three of \texttt{COM}, \texttt{FLT}, and \texttt{DKS} model the
-  low-frequency bolometer noise, and are somewhat degenerate.  In
-  addition, a more conservative cut on noisy bolometers is applied
-  (\texttt{noiseclip=2.0}).
+%\item[\texttt{dimmconfig\_faint\_extended.lis}]\quad It is presently
+%  very challenging to produce SCUBA-2 maps of faint extended
+%  structures, given the instrument's low-frequency noise
+%  performance. In particular, for some observing configurations, wide
+%  scans can suffer significant magnetic field pickup. If there are no
+%  bright sources in the map, a single high-pass filter may be applied
+%  at the start (as in \texttt{dimmconfig\_blank\_field.lis}). Then,
+%  the dark-squid signals (one for each column in the array, sensitive
+%  primarily to this pickup) can be used as templates to fit and remove
+%  this extra low-frequency noise component, the \texttt{DKS}
+%  model. Note that for maps of brighter structures, \texttt{DKS} does
+%  not have much of an impact, and may simply increase the noise, as
+%  all three of \texttt{COM}, \texttt{FLT}, and \texttt{DKS} model the
+%  low-frequency bolometer noise, and are somewhat degenerate.  In
+%  addition, a more conservative cut on noisy bolometers is applied
+%  (\texttt{noiseclip=2.0}).
 
-\item[\texttt{dimmconfig\_veryshort.lis}]\quad Some scans of
-  calibrators for the purpose of focus or pointing are extremely short
-  (e.g.~10\,s). In these cases it makes no sense to pad and apodize in
-  order to filter out noise on time scales comparable to, or longer
-  than the entire scan. This configuration turns off apodization and
-  the \texttt{FLT} model, relying only on the mean subtraction and
-  \texttt{COM} to model and remove the low-frequency noise.
+%\item[\texttt{dimmconfig\_veryshort.lis}]\quad Some scans of
+%  calibrators for the purpose of focus or pointing are extremely short
+%  (e.g.~10\,s). In these cases it makes no sense to pad and apodize in
+%  order to filter out noise on time scales comparable to, or longer
+%  than the entire scan. This configuration turns off apodization and
+%  the \texttt{FLT} model, relying only on the mean subtraction and
+%  \texttt{COM} to model and remove the low-frequency noise.
 
 %\item[\texttt{dimmconfig\_fridgeflat.lis}] This configuration is also
 %  primarily for use by the engineering team. It was designed to reduce
