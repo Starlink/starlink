@@ -4,6 +4,18 @@
    changes so far are listed below.  For complete details of all
    changes, see the "Release Notes" appendix in SUN/95.
 
+2 General_changes
+
+   o  A new graphical style attribute called TEXTMARGIN controls
+   the width of margins cleared around the edges of each drawn
+   text string.
+
+   o  Applications that report pixel scales (e.g.} NDFTRACE,
+   WCSFRAME) now report more representative pixel scales.  The pixel
+   scales were previously measured at the first pixel in the array.
+   Now the pixel scales are found at a number of places within the
+   array, and the median of these values are reported.
+
 2 Modified_applications
 
    o  MFITTREND
@@ -32,6 +44,7 @@
    changes, see the "Release Notes" appendix in SUN/95.
 
 2 General_changes
+
    o  Parameters that set the plotting style can now recognise
    temporary attributes that only last for the duration of a
    single task, rather than persist until changed or reset.  The
