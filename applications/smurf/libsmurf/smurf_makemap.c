@@ -1648,6 +1648,9 @@ void smurf_makemap( int *status ) {
                       status );
           }
 
+          /* Apply quality mask */
+          smf_update_valbad( data, SMF__NUL, NULL, 0, 0, SMF__Q_GOOD, status );
+
           /* Mask out bad bolometers - mask data array not quality array */
           smf_apply_mask( data, bbms, SMF__BBM_DATA, 0, status );
 
