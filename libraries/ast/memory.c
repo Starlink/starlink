@@ -131,6 +131,10 @@
 *     8-OCT-2010 (DSB):
 *        Modify memory allocation to use "calloc" directly, rather than
 *        using "malloc+memset".
+*     12-APR-2011 (DSB):
+*        Fix regular expression problem where a ".*" template field failed to 
+*        match a null string if it occurred before a closing parenthesis at 
+*        the end of the template.
 */
 
 /* Configuration results. */
@@ -2575,6 +2579,24 @@ static char *ChrMatcher( const char *test, const char *end, const char *template
 /* Increment the the pointer to the next test character. */
          a += na;
          if( a > end ) a = end;
+      }
+   }
+
+/* If the test string is finished but the template string is not, see if
+   the next part of the template string will match a null test string.
+   But ignore the ends of substitution fields. */
+   if( !*a && *b && match ) {
+      while( *b && *b != ')' ) {
+         allowed = CheckTempStart( template, b, pattern, allowed, &nb, &allow,
+                                   &min_na, &max_na, &start_sub, &end_sub,
+                                   &greedy, status );
+         b += nb;
+         allowed = astFree( allowed );
+
+         if( min_na > 0 ) {
+            match = 0;
+            break;
+         }
       }
    }
 
