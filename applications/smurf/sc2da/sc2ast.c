@@ -277,6 +277,7 @@ int *status             /* global status (given and returned) */
      09Mar2010 : Check SMU values are not VAL__BADD before using them.
      30Mar2011 : Added NEW4 distortion (first estimate based on seven
                  arrays). (DSB)
+     12Apr2011 : Make NEW4 distortion the default. (DSB)
 */
 {
 
@@ -1073,20 +1074,14 @@ int *status             /* global status (given and returned) */
       }
 
 /* Translate DATE into the best estimate of the distortion for the date
-   the data was obtained. MJD 55168.19 was the start of observing on 3rd
-   December 2009 - the first night of observing with the corrected C2
-   mirror rotation. */
+   the data was obtained. MJD 55621.0 is 3-JAN-2011 - just before the full
+   focal plane (minus s4b) started being used. MJD 55168.19 was the
+   start of observing on 3rd December 2009 - the first night of observing
+   with the corrected C2 mirror rotation. */
       if( idistortion == DATE_DISTORTION ) {
-
-/*      Uncomment this when we are happy that NEW4 is working correctly on
-        March 2011 data
-
-   if( !state || state->tcs_tai > 55621.0 ) {
+         if( !state || state->tcs_tai > 55621.0 ) {
             idistortion = NEW4_DISTORTION;
-         } else
-*/
-
-         if( !state || state->tcs_tai > 55168.19 ) {
+         } else if( state->tcs_tai > 55168.19 ) {
             idistortion = NEW3_DISTORTION;
          } else {
             idistortion = NEW2_DISTORTION;
