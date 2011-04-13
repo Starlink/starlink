@@ -2110,19 +2110,22 @@ PIs should consider undertaking:
 \label{sec:galactic}
 In this section we shall focus on the reduction of extended, Galactic
 sources. In the following example we produce a map of the Orion nebula
-from two observations (\#22 \& \#23) taken on 16th February 2010; this
-reduction is carried out using the DIMM method followed by a series of
-post processing steps.
+from two observations (\#22 \& \#23) taken on 16th February 2010. Two
+alternative methods will be used. The first is more cumbersome, but
+illustrates the use of \picard\ facilities for background removal,
+cropping, and mosaicking. The second method uses an alternative DIMM
+configuration aimed at maps of bright extended structures, and a
+single call to \makemap.
+
+\subsubsection{Standard DIMM configuration + \picard}
 
 If, as in this case, you have multiple observations contributing to
-your final map, there are two possible routes for reduction. The first
-is to provide the mapmaker with a list of \emph{all} your files and
-let it process and coadd them in a single run.  The second approach is
-to reduce each observation separately then to combine the individual
-maps afterwards. Currently there is no advantage in terms of data
-quality to either route however the latter does allow the option of
-assessing the individual maps before coadding and is the method
-followed in this example.
+your map, each observation can be reduced separately, and then
+combined to make the final map. Currently there is no advantage in
+terms of data quality to reducing all observations simultaneously or
+separately. However, the latter does allow the option of assessing the
+individual maps before coadding and is the method followed in this
+example.
 
 When running the DIMM we select the default configuration file
 \texttt{dimmconfig.lis}; the individual parameters of which are
@@ -2220,9 +2223,10 @@ configured to use \makemos\ or to use a different \wcsmosaic\ method.
 \end{verbatim}
 \end{myquote}
 
-The key advantage to using the \picard\ recipe over standalone \Kappa\
-commands is that the exposure time image is also propagated correctly
-to the output mosaic (it is stored in the \texttt{.MORE.SMURF.EXP\_TIME} extension).
+The key advantage to using the \picard\ recipe over standalone
+\Kappa\ commands is that the exposure time image is also propagated
+correctly to the output mosaic (it is stored in the
+\texttt{.MORE.SMURF.EXP\_TIME} extension).
 
 The final, coadded map is shown in Fig.~\ref{fig:orionmosaic}.
 
@@ -2243,6 +2247,38 @@ filename.
 \end{center}
 \end{figure}
 
+\subsubsection{Bright / extended DIMM configuration}
+
+The simpler method is to make a map from all of the data at once using
+\texttt{dimmconfig\_bright\_extended.lis}:
+
+\begin{myquote}
+\begin{verbatim}
+% makemap "$STARLINK_DIR/share/smurf/s8d20100216_00022_0002[23].sdf" Orion \
+method=iterate config=^$STARLINK_DIR/share/smurf/dimmconfig_bright_extended.lis
+\end{verbatim}
+\end{myquote}
+
+The large-scale noise and negative bowling is compensated for using a
+S/N-based zero mask during map-making. Everywhere the signal is below
+this threshold (5-$\sigma$ by default), the map is set to zero for all
+but the final iteration. The resulting map, and the location of the
+iteratively-determined zero mask are shown in Fig.~\ref{fig:snrmask}.
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=\linewidth]{sc19_map22+23_brightextended}
+\includegraphics[width=\linewidth]{sc19_map22+23_brightextended_mask}
+\caption{\textbf{Top:} Map using all of the same data as in
+  Fig.~\ref{fig:orionmakemap}, but processed simultaneously using a
+  single call to \makemap\ with the specialized
+  \texttt{dimmconfig\_bright\_extended.lis}. \textbf{Bottom:} The
+  QUALITY component of the resulting map indicates (white) where the
+  map has been constrained to zero after all but the final
+  iteration. It is selected based on a S/N threshold.}
+\label{fig:snrmask}
+\end{center}
+\end{figure}
 
 \begin{thebibliography}{}
 \addcontentsline{toc}{section}{References}
