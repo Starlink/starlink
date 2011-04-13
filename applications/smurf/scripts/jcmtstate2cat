@@ -189,9 +189,8 @@ for my $f (@files) {
           $tamb = $local{ENVIRO_AIR_TEMP}->[$i];
         }
 
-        my $key = join("", sprintf("%.3f", $local{TCS_AIRMASS}->[$i]),
-                       $tamb, $local{WVM_T12}->[$i],
-                       $local{WVM_T42}->[$i], $local{WVM_T78}->[$i]);
+        # Use WVM_TIME as the primary key
+        my $key = $local{WVM_TIME}->[$i];
         if (exists $wvmcache{$key}) {
           $wvmtau = $wvmcache{$key};
         } else {
@@ -200,6 +199,7 @@ for my $f (@files) {
                                                       $local{WVM_T12}->[$i],
                                                       $local{WVM_T42}->[$i],
                                                       $local{WVM_T78}->[$i]);
+          $wvmtau = ($wvmtau * 1.01) + 0.01; # Match SMURF calibration offset
           $wvmcache{$key} = $wvmtau;
         }
       }
