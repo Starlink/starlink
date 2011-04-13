@@ -151,6 +151,9 @@
 *        Allow dark flat ramps through. They are now filtered in smf_choose_flat.
 *     2011-01-25 (TIMJ):
 *        Tweak to smfSortInfo struct member.
+*     2011-04-12 (TIMJ):
+*        If DARKS are to be treated as SCIENCE then we also need to free the
+*        darks smfArray.
 
 *  Copyright:
 *     Copyright (C) 2008-2011 Science and Technology Facilities Council.
@@ -609,6 +612,9 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
     grpDelet( &fgrp, status);
 
     if (meanstep && nsteps_dark > 0) *meanstep = duration_darks / nsteps_dark;
+
+    /* Have to clear the darks smfArray as well */
+    if (darks) smf_close_related( darks, status );
 
   } else {
     /* Store the output groups in the return variable or free it */
