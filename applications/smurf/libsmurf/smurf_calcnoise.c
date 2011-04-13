@@ -27,6 +27,18 @@
 *     frequency to the whitenoise.
 
 *  ADAM Parameters:
+*     FLATMETH = _CHAR (Read)
+*          Method to use to calculate the flatfield solution. Options
+*          are POLYNOMIAL and TABLE. Polynomial fits a polynomial to
+*          the measured signal. Table uses an interpolation scheme
+*          between the measurements to determine the power. [POLYNOMIAL]
+*     FLATORDER = _INTEGER (Read)
+*          The order of polynomial to use when choosing POLYNOMIAL method.
+*          [1]
+*     FLATSNR = _DOUBLE (Read)
+*          Signal-to-noise ratio threshold to use when filtering the
+*          responsivity data to determine valid bolometers for the
+*          flatfield. Only used in TABLE mode. [10.0]
 *     FLOW = _DOUBLE (Given)
 *          Frequency to use when determining noise ratio image. The noise
 *          ratio image is determined by dividing the power at this frequency
@@ -54,6 +66,14 @@
 *          chunk. There will be the same number of output files as
 *          created for the OUT parameter. If a null (!) value
 *          is supplied no files will be created. [!]
+*     RESIST = GROUP (Read)
+*          A group expression containing the resistor settings for
+*          each bolometer.  Usually specified as a text file using "^"
+*          syntax. An example can be found in $STARLINK_DIR/share/smurf/resist.cfg
+*          [$STARLINK_DIR/share/smurf/resist.cfg]
+*     RESPMASK = _LOGICAL (Read)
+*          If true, responsivity data will be used to mask bolometer data
+*          when calculating the flatfield. [TRUE]
 
 *  Notes:
 *     - NEP and NOISERATIO images are stored in the .MORE.SMURF extension
