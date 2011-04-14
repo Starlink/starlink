@@ -15,7 +15,7 @@ Version 3.2
      to be used to specify a margin to clear around a text string. The
      value of the attribute gives the width of the margin in units of the
      text height.
-   - C wrappers added for KPG1_BADBX, KOG1_GTOBJ, and KPG1_PXSCL.
+   - C wrappers added for KPG1_BADBX, KPG1_GTOBJ, and KPG1_PXSCL.
    - Fixed bug handling default-configuration settings by kpg1Config.
 
 Version 3.1
