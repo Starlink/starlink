@@ -1,7 +1,7 @@
       SUBROUTINE KPG1_CTCPK( CI, NAX, GI, NEL, KEYMAP, STATUS )
 *+
 *  Name:
-*     KPG1_CTCPx
+*     KPG1_CTCPK
 
 *  Purpose:
 *     Copies values from catalogue columns to an AST KeyMap.
