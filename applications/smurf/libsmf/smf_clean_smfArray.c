@@ -44,7 +44,7 @@
 *     Flag spikes  : SPIKETHRESH, SPIKEBOX
 *     Slew speed   : FLAGSLOW, FLAGFAST
 *     Dark squids  : DKCLEAN
-*     Gap filling  : FILLGAPS, ZEROPAD
+*     Gap filling  : ZEROPAD
 *     Baselines    : ORDER
 *     Common-Mode  : COMPREPROCESS
 *     PCA:         : PCATHRESH
@@ -94,6 +94,8 @@
 *        Use smf_select_quality to get pointer to quality arrays.
 *     2011-03-30 (EC):
 *        Only measure/flag slew speeds when telescope moving
+*     2011-04-14 (DSB):
+*        Remove gap filling since it is now done in smf_filter_execute.
 
 *  Copyright:
 *     Copyright (C) 2010-2011 Univeristy of British Columbia.
@@ -149,7 +151,6 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
   double dcthresh;          /* n-sigma threshold for primary DC steps */
   int dofft;                /* are we doing a freq.-domain filter? */
   int dkclean;              /* Flag for dark squid cleaning */
-  int fillgaps;             /* Flag to do gap filling */
   smfFilter *filt=NULL;     /* Frequency domain filter */
   double flagfast;          /* Threshold for flagging slow slews */
   double flagslow;          /* Threshold for flagging slow slews */
@@ -194,7 +195,7 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
   /* Get cleaning parameters */
   smf_get_cleanpar( keymap, &badfrac, &dcfitbox, &dcmaxsteps,
                     &dcthresh, &dcsmooth, &dclimcorr, &dkclean,
-                    &fillgaps, &zeropad, NULL, NULL, NULL, NULL, NULL,
+                    NULL, &zeropad, NULL, NULL, NULL, NULL, NULL,
                     NULL, NULL, NULL, &flagslow, &flagfast, &order,
                     &spikethresh, &spikebox, &noiseclip, NULL,
                     &compreprocess, &pcathresh, status );
@@ -434,17 +435,6 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
 
   for( idx=0; (idx<array->ndat)&&(*status==SAI__OK); idx++ ) {
     data = array->sdata[idx];
-
-    /* Gap filling */
-    if( fillgaps ) {
-      msgOutif(MSG__VERB, "", FUNC_NAME ": Gap filling.", status);
-      smf_fillgaps( wf, data, zeropad ? SMF__Q_GAP : SMF__Q_GAP | SMF__Q_PAD,
-                    status );
-
-      /*** TIMER ***/
-      msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ":   ** %f s gap filling",
-                 status, smf_timerupdate(&tv1,&tv2,status) );
-    }
 
     /* Filter the data. Note that we call smf_filter_execute to apply
        a per-bolometer whitening filter even if there is no

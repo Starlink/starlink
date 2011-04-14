@@ -67,11 +67,13 @@
 *        data.
 *     2010-10-13 (EC):
 *        Move calculation of complementary filter into smf_filter_execute
+*     2011-04-14 (DSB):
+*        Remove gap filling since it is now done in smf_filter_execute.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2009-2010 University of British Columbia.
-*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2010-2011 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -204,11 +206,6 @@ void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
       *status = SAI__ERROR;
       errRep( "", FUNC_NAME ": Null data in inputs", status);
     } else {
-
-      /* Fill gaps. Replace padded regiosn with artifical data if
-      required. */
-      smf_fillgaps( wf, res->sdata[idx],
-                    zeropad ? SMF__Q_GAP : SMF__Q_GAP | SMF__Q_PAD, status );
 
       /* Create a filter */
       filt = smf_create_smfFilter( res->sdata[idx], status );

@@ -60,6 +60,9 @@
 *        Call smf_scale2freq to convert spatial scales to frequencies.
 *     2010-10-13 (EC):
 *        Add whiten flag to interface
+*     2011-04-14 (DSB):
+*        Store an apodisation length of SMF__BADSZT if no apodisation is
+*        required because we are padding with artifical data.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -192,7 +195,7 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap,
       }
 
     } else {
-      filt->apod_length = 0;
+      filt->apod_length = SMF__BADSZT;
       msgOutif( MSG__VERB, "", " Data will not be apodised since time streams "
                 "are being padded with artificial data rather than zeros.", status );
     }

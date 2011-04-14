@@ -95,6 +95,8 @@
 *        Allow padding with artificial data.
 *     2010-10-19 (COBA):
 *        Removed SMF__NOCREATE_FTS in order to propagate the smfFts data.
+*     2011-04-14 (DSB):
+*        Ensure gaps are filled even if apodisation and zero padding are being used.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -346,7 +348,7 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
                                SMF__NOCREATE_DA,
                                1, 0, status );
 
-  /* Create some quality. We only apodize or pad if we are doing a
+  /* Create some quality. We only apodize, pad or fill if we are doing a
      forward FFT. */
   if( !inverse ) {
     const smf_qual_t *inqual = smf_select_cqualpntr( indata, NULL, status );
@@ -361,12 +363,14 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
 
 
    /* If we are padding with artificial data, we must not apodise.
-      Re-create the padding based on the current contents of the smfData. */
+      Re-create the padding based on the current contents of the smfData
+      (this also fill any gaps in the data). */
     if( len == SMF__BADSZT ) {
       smf_fillgaps( wf, data, SMF__Q_PAD | SMF__Q_GAP, status );
 
-    /* If required, apodise the data */
+    /* If required, fill the data (excluding padding) and apodise the data */
     } else if( len > 0 ) {
+      smf_fillgaps( wf, data, SMF__Q_GAP, status );
       smf_apodize( data, len, status );
     }
 

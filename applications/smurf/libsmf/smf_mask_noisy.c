@@ -59,10 +59,13 @@
 *        Added zeropad argument.
 *     2010-10-08 (DSB):
 *        Fill gaps before calling smf_bolonoise.
+*     2011-04-14 (DSB):
+*        Remove gap filling since it is done in smf_fft_data (called by
+*        bolonoise).
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2010 Science and Technology Facilities Council.
+*     Copyright (C) 2010-2011 Science and Technology Facilities Council.
 *     Copyright (C) 2010 University of British Columbia.
 *     All Rights Reserved.
 
@@ -117,11 +120,6 @@ void smf_mask_noisy( smfWorkForce *wf, smfData *data, smfData **noise,
   smf_create_bolfile( NULL, 1, data, "Noise", "blahs Hz**-0.5",
                       0, &noisemap, status );
   if (noisemap) noisedata = (noisemap->pntr)[0];
-
-  /* Check all gaps are filled, and data padding handled properly, so
-    that we can do the FFT safely within smf_bolonoise. */
-  smf_fillgaps( wf, data, zeropad ? SMF__Q_GAP : SMF__Q_GAP | SMF__Q_PAD,
-                status );
 
   /* Calculate the noise on each bolometer */
   smf_bolonoise( wf, data, 0, 0.5, SMF__F_WHITELO,

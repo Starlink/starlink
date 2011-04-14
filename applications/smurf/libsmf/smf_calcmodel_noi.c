@@ -108,11 +108,14 @@
 *     2010-10-08 (DSB):
 *        Move gap filling to before smf_bolonoise in preparation for the
 *        FFT performed within smf_bolonoise.
+*     2011-04-14 (DSB):
+*        Remove gap filling since it is done in smf_fft_data (called by
+*        bolonoise).
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2005-2010 University of British Columbia.
-*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2010-2011 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -251,15 +254,6 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
       var = astCalloc( nbolo, sizeof(*var), 0 );
 
       if( (flags & SMF__DIMM_FIRSTITER) && (!calcfirst) ) {
-
-        /* Fill gaps and (maybe) pad with artificial data so that the FFT
-           can be taken safely within smf_bolonoise. */
-        if( fillgaps ) {
-          msgOutif(MSG__VERB," ", "   gap filling", status);
-          smf_fillgaps( wf, res->sdata[idx],
-                        zeropad ? SMF__Q_GAP : SMF__Q_GAP | SMF__Q_PAD,
-                        status );
-        }
 
         /* Measure the noise from power spectra */
         smf_bolonoise( wf, res->sdata[idx], 0, 0.5, SMF__F_WHITELO,
