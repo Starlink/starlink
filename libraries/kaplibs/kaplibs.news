@@ -15,6 +15,8 @@ Version 3.2
      to be used to specify a margin to clear around a text string. The
      value of the attribute gives the width of the margin in units of the
      text height.
+   - C wrappers added for KPG1_BADBX, KOG1_GTOBJ, and KPG1_PXSCL.
+   - Fixed bug handling default-configuration settings by kpg1Config.
 
 Version 3.1
    - New C function kpg1Config gets a KeyMap containing configuration
@@ -95,7 +97,7 @@ Version 3.1
    - Config files can now include "<def>" to revert to the default
      value.
    - Config files can now include "<undef>" to store an undefined
-     value using kpy1Kymap.
+     value using kpg1Kymap.
 
 Version 3.0
    - CCG routines' NBAD argument excludes bad elements not attributable

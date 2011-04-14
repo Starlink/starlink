@@ -6,9 +6,9 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {238.7}
+\newcommand{\stardocnumber}    {238.8}
 \newcommand{\stardocauthors}   {D.S. Berry \\Malcolm J. Currie}
-\newcommand{\stardocdate}      {2011 January 11}
+\newcommand{\stardocdate}      {2011 April 12}
 \newcommand{\stardoctitle}     {KAPLIBS -- Internal subroutines used within
                                 the KAPPA package.}
 \newcommand{\stardocversion}   {Version 3.2}
@@ -803,6 +803,16 @@ related items to be removed.
 \begin{itemize}
 \item New KPG\_TYPSZ routine adapted from CONVERT's COF\_TYPSZ that
       returns the number of bytes for a given numeric HDS data type.
+\item Routine KPG1\_BADBX now has an extra argument that indicates how the
+      calculated bounding box should be used.
+\item Routine KPG1\_ASSET now allows the new pseudo-attribute {\tt TEXTMARGIN}
+      to be used to specify a margin to clear around a text string. The
+      value of the attribute gives the width of the margin in units of the
+      text height.
+\item C wrappers have been added for KPG1\_BADBX, KPG1\_GTOBJ, and KPG1\_PXSCL.
+\item A bug handling default-configuration settings in kpg1Config, resulting in
+      an "invalid object pointer" error, has been fixed.
+
 \end{itemize}
 
 \section{Changes in Version 3.1}
@@ -884,7 +894,7 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
 
 \item Config files can now include {\tt <def>} to revert to the default value.
 \item Config files can now include {\tt <undef>} to store an undefined
-      value using kpy1Kymap.
+      value using kpg1Kymap.
 \end{itemize}
 
 
