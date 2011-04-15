@@ -10,6 +10,11 @@
     catalogues. NOMAD is a simple merge of the Hipparcos, Tycho-2,
     UCAC-2 and USNO-B1 catalogues.
 
+    A problem reading FITS catalogues that have radians stored as
+    single precision values has been fixed. Previously the precision
+    used when converting to sexagesimal and degrees wasn't sufficient
+    and RA could be truncated at a 1/10th of a degree.
+
   Namaka release
   ==============
 
