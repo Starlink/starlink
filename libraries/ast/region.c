@@ -8458,7 +8458,7 @@ f     THIS = INTEGER (Given)
 *        Pointer to the Region.
 c     surface
 f     SURFACE = LOGICAL (Given)
-c        If zero,
+c        If non-zero,
 f        If .TRUE.,
 *        the returned points will cover the surface or the Region.
 *        Otherwise, they will fill the interior of the Region.
