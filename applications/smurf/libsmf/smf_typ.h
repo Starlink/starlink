@@ -241,7 +241,7 @@
 #define SMF__MXNOTCH 64    /* Arbitrary maximum number of notch filters */
 #define SMF__F_WHITELO 2   /* Lower freq. over which to calculate NEP/NEFD */
 #define SMF__F_WHITEHI 10  /* Upper freq. over which to calculate NEP/NEFD */
-#define SMF__MAXAPLEN (size_t)-1 /* tell smf_apodize to use maximum interval */
+#define SMF__MAXAPLEN ((size_t) -2) /* tell smf_apodize to use maximum interval */
 
 /* Minimum number of time samples for a data chunk to be useful*/
 #define SMF__MINCHUNKSAMP 100
