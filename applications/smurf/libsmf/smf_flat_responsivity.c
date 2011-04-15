@@ -98,10 +98,12 @@
 *        Change type of method to an enum
 *     2010-09-17 (COBA):
 *        Updated smf_construct_smfData which now contains smfFts
+*     2011-04-15 (TIMJ):
+*        Lower MINRESP by an order of magnitude.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2007-2010 Science and Technology Facilities Council.
+*     Copyright (C) 2007-2011 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -162,7 +164,7 @@ size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snr
   double * bolvalvar = NULL;   /* pointer to variance in smfData bolvald */
 
   const int usevar = 1;
-  const double MINRESP = 0.1e6;/* Minimum "in specification" responsivity A/W */
+  const double MINRESP = 0.1e5;/* Minimum "in specification" responsivity A/W */
   const double MAXRESP = 5.0e6;/* Maximum "in specification" responsivity A/W */
 
   if (*status != SAI__OK) return ngood;
