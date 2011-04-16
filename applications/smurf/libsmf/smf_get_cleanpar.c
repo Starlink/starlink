@@ -23,8 +23,8 @@
 *                       int *filt_nnotch, int *dofilt, double *flagslow,
 *                       double *flagfast, int *order, double *spikethresh,
 *                       size_t *spikebox, double *noiseclip,
-*                       int *whiten, int compreprocess, double *pcathresh,
-*                       int *status )
+*                       int *whiten, int *compreprocess, double *pcathresh,
+*                       int groupsubarray, int *status )
 
 *  Arguments:
 *     keymap = AstKeyMap* (Given)
@@ -98,8 +98,11 @@
 *        Apply a whitening filter to the data?
 *     compreprocess = int * (Returned)
 *        If set do common-mode rejection and bad-data rejection.
-*     pcathresh = double (Given)
+*     pcathresh = double (Returned)
 *        Outlier threshold for PCA amplitudes to remove from data for cleaning
+*     groupsubarray = int (Returned)
+*        If set, handle subarrays separately instead of grouping data at same
+*        wavelength that were taken simultaneously together.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -152,6 +155,8 @@
 *        Add compreprocess
 *     2011-03-22 (EC):
 *        Add pcathresh
+*     2011-04-15 (EC):
+*        Add groupsubarray
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -210,7 +215,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac, dim_t *dcfitbox,
                        double *flagslow, double *flagfast, int *order,
                        double *spikethresh, size_t *spikebox,
                        double *noiseclip, int *whiten, int *compreprocess,
-                       double *pcathresh, int *status ) {
+                       double *pcathresh, int *groupsubarray, int *status ) {
 
   int dofft=0;                  /* Flag indicating that filtering is required */
   int f_nnotch=0;               /* Number of notch filters in array */
@@ -528,4 +533,18 @@ void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac, dim_t *dcfitbox,
                *pcathresh );
   }
 
+  if( groupsubarray ) {
+    *groupsubarray = 0;
+    astMapGet0I( keymap, "GROUPSUBARRAY", &temp );
+
+    if( (temp != 0) && (temp != 1) ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "GROUPSUBARRAY must be either 0 or 1.", status );
+    } else {
+      *groupsubarray = temp;
+    }
+
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": GROUPSUBARRAY is %s", status,
+               (*groupsubarray ? "enabled" : "disabled" ) );
+  }
 }

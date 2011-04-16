@@ -146,9 +146,9 @@ dim_t smf_get_padding( AstKeyMap *keymap, double steptime, int report,
       f_nnotch = 0;
       smf_get_cleanpar( keymap, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                         NULL, &filt_edgelow, &filt_edgehigh, &filt_edgesmall,
-                        &filt_edgelarge, filt_notchlow, NULL,
-                        &f_nnotch, NULL, NULL, NULL, NULL, NULL, NULL,
-                        NULL, NULL, NULL, NULL, status );
+                        &filt_edgelarge, filt_notchlow, NULL, &f_nnotch, NULL,
+                        NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+                        NULL, status );
 
 /* If none were found, annul the error and return a padding length of
    zero. */

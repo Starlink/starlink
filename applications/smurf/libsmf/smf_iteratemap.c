@@ -350,6 +350,8 @@
 *        Add downsampling capability
 *     2010-10-26 (EC):
 *        Add fakemap capability to add external astronomical signal
+*     2011-04-15 (EC):
+*        Optionally handle subarrays separately with new groupsubarray flag
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -445,6 +447,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   double fakescale;             /* Scale factor for fakemap */
   smf_qual_t flagmap=0;         /* bit mask for flagmaps */
   double *fmapdata=NULL;        /* fakemap for adding external ast signal */
+  int groupsubarray;            /* Handle subarrays separately? */
   int noexportsetbad=0;         /* Don't set bad values in exported models */
   int haveast=0;                /* Set if AST is one of the models */
   int haveext=0;                /* Set if EXT is one of the models */
@@ -900,8 +903,13 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
      data. Maxconcat will be the length of the largest continuous
      chunk, or maxlen, whichever comes first -- but excluding padding. */
 
-  smf_grp_related( igrp, isize, 1, maxlen, keymap, downsampscale, &maxconcat,
-                   &maxfile, &igroup, NULL, &pad, status );
+  smf_get_cleanpar( keymap, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+                    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+                    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+                    &groupsubarray, status );
+
+  smf_grp_related( igrp, isize, 1+groupsubarray, maxlen, keymap, downsampscale,
+                   &maxconcat, &maxfile, &igroup, NULL, &pad, status );
 
   /* Once we've run smf_grp_related we know how many subarrays there
      are.  We also know the maximum length of a concatenated piece of
@@ -973,8 +981,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         smf_close_smfGroup( &igroup, status );
       }
 
-      smf_grp_related( igrp, isize, 1, try, NULL, downsampscale, &maxconcat,
-                       NULL, &igroup, NULL, NULL, status );
+      smf_grp_related( igrp, isize, 1+groupsubarray, try, NULL, downsampscale,
+                       &maxconcat, NULL, &igroup, NULL, NULL, status );
     }
   }
 

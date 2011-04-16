@@ -198,7 +198,7 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
                     NULL, &zeropad, NULL, NULL, NULL, NULL, NULL,
                     NULL, NULL, NULL, &flagslow, &flagfast, &order,
                     &spikethresh, &spikebox, &noiseclip, NULL,
-                    &compreprocess, &pcathresh, status );
+                    &compreprocess, &pcathresh, NULL, status );
 
   /* Loop over subarray */
   for( idx=0; (idx<array->ndat)&&(*status==SAI__OK); idx++ ) {

@@ -14,6 +14,10 @@ varmapmethod = 1
 # Perform iterations in memory?
 memiter = 1
 
+# Handle each subarray separately? Normally all data that were taken
+# simultaneously at a given wavelength are handlded together.
+#groupsubarray = 1
+
 # Delete temporary .DIMM files if memiter=0?
 deldimm = 1
 

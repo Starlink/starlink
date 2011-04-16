@@ -1141,7 +1141,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac,
                        int *dofilt, double *flagslow, double *flagfast,
                        int *order, double *spikethresh, size_t *spikeiter,
                        double *noiseclip, int *whiten, int *compreprocess,
-                       double *pcathresh, int *status );
+                       double *pcathresh, int *groupsubarray, int *status );
 
 void smf_get_dims( const smfData *data, dim_t *nrows, dim_t *ncols,
                    dim_t *nbolo, dim_t *ntslice, dim_t *ndata,
@@ -1212,7 +1212,7 @@ AstKeyMap *smf_groupscans( const Grp *igrp,  int size, int *maxsyspop,
                            int *conform, Grp **ogrp, int *status );
 
 void smf_grp_related( const Grp *igrp, const size_t grpsize,
-                      const int grpbywave, dim_t maxlen, AstKeyMap *keymap,
+                      const int grouping, dim_t maxlen, AstKeyMap *keymap,
                       double downsampscale, dim_t *maxconcatlen,
                       dim_t *maxfilelen, smfGroup **group, Grp **basegrp,
                       dim_t *pad, int *status );

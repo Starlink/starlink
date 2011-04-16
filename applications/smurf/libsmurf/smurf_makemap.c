@@ -401,6 +401,14 @@
 *       BADBOL is specified and the quality bit is set, the behaviour
 *       is different than might be expected: the entire bolometer will
 *       be excluded from the flagmap. [undef]
+*     GROUPSUBARRAY = LOGICAL
+*       Normally data from all subarrays simultaneously, at a given
+*       wavelength, are also processed simultaneously. By setting this
+*       flag each subarray will be handled independently. This can be
+*       useful for long observations where all of the data cannot fit
+*       into memory simultaneously. In such circumstances it may still
+*       be possible to produce fully cross-linked maps from each
+*       subarray before they are combined internally.
 *     ITERMAP = LOGICAL
 *       If true each iteration is written to the output file in the
 *       .MORE.SMURF.ITERMAPS extension. [0]

@@ -54,6 +54,7 @@ spikethresh = 0
 spikebox = 50
 noiseclip = 0.0
 pcathresh = 0
+groupsubarray = 0
 
 # these are analogous cleaning parameters for dark squids
 # We do not have a clever syntax for recursively reading this

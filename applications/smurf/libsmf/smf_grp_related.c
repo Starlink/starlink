@@ -14,7 +14,7 @@
 
  *  Invocation:
  *     smf_grp_related( const Grp *igrp, const size_t grpsize,
- *                      const int grpbywave, dim_t maxlen, AstKeyMap *keymap,
+ *                      const int grouping, dim_t maxlen, AstKeyMap *keymap,
  *                      double downsampscale, dim_t *maxconcatlen,
  *                      dim_t *maxfilelen, smfGroup **group, Grp **basegrp,
  *                      dim_t *pad, int *status );
@@ -24,8 +24,10 @@
  *        Input Grp
  *     grpsize = const size_t (Given)
  *        Size of input Grp
- *     grpbywave = const int (Given)
- *        Flag to denote whether to group files by common wavelength
+ *     grouping = const int (Given)
+ *        Flag describing how to group the data: 0 = all data taken
+ *        simultaneously; 1 = all data at same wavelength taken
+ *        simultaneously; 2 = only data from same subarray.
  *     maxlen = dim_t (Given)
  *        If set, maximum length of a continuous chunk in time samples
  *        (after applying the downsampling factor). If 0 don't enforce a
@@ -61,12 +63,15 @@
  *     This routine groups related files together and populates a
  *     smfGroup. Related files are those that were written at the same
  *     time by the data acquisition system and so will have the same
- *     values for the DATE-OBS, OBSID and SEQCOUNT FITS headers. Additionally
- *     if grpbywave is true files will not be designated as related if they
- *     have a different value for the WAVELEN FITS header. For SCUBA-2 this
- *     means that there will be at most 8 related files unless we are grouping
- *     by wavelength where the limit will be 4 files. If the related files
- *     have different dimensions they are not treated as related files.
+ *     values for the DATE-OBS, OBSID and SEQCOUNT FITS
+ *     headers. Additionally if grouping is 1, files will not be
+ *     designated as related if they have a different value for the
+ *     WAVELEN FITS header. For SCUBA-2 this means that there will be
+ *     at most 8 related files unless we are grouping by wavelength
+ *     where the limit will be 4 files. If the related files have
+ *     different dimensions they are not treated as related files. If
+ *     grouping is 2, data from different subarrays will not be
+ *     considered related.
  *
  *     The constructed smfGroup stores the indices of the file as they occur
  *     in the supplied Grp in the smfGroup.subgroups array which is an array
@@ -172,11 +177,13 @@
  *        side effect of sorting the chunks into date order.
  *     2011-01-25 (TIMJ):
  *        Do not scale maxlen.
+ *     2011-04-15 (EC):
+ *        Change grpbywave to grouping to enable handling subarrays separately
  *     {enter_further_changes_here}
 
  *  Copyright:
  *     Copyright (C) 2008-2011 Science and Technology Facilities Council.
- *     Copyright (C) 2006-2010 University of British Columbia.
+ *     Copyright (C) 2006-2011 University of British Columbia.
  *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
  *     All Rights Reserved.
 
@@ -229,7 +236,7 @@
 #define FUNC_NAME "smf_grp_related"
 
 void smf_grp_related( const Grp *igrp, const size_t grpsize,
-                      const int grpbywave, dim_t maxlen, AstKeyMap *keymap,
+                      const int grouping, dim_t maxlen, AstKeyMap *keymap,
                       double downsampscale, dim_t *maxconcatlen,
                       dim_t *maxfilelen, smfGroup **group, Grp **basegrp,
                       dim_t *pad, int *status ) {
@@ -287,16 +294,25 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
      */
     newkey[0] = '\0';
 
-    if (grpbywave) {
+    smf_find_subarray( data->hdr, subarray, sizeof(subarray), NULL, status );
+
+    if( grouping == 1 ) {
+      /* Group different wavelengths separately */
       char cwave[10];
       smf_fits_getS( data->hdr, "WAVELEN", cwave, sizeof(cwave), status);
       one_strlcat( newkey, cwave, sizeof(newkey), status );
       one_strlcat( newkey, "_", sizeof(newkey), status );
     }
+
+    if( grouping == 2 ) {
+      /* Group different subarrays separately */
+      one_strlcat( newkey, subarray, sizeof(newkey), status );
+    }
+
     smf_fits_getS( data->hdr, "DATE-OBS", dateobs, sizeof(dateobs), status );
     one_strlcat( newkey, dateobs, sizeof(newkey), status );
 
-    /* Include the dimenionality of the time series in the primary key
+    /* Include the dimentionality of the time series in the primary key
        so that we do not end up doing something confusing like relating
        a truncated file with a full length file */
     if (*status == SAI__OK) {
@@ -384,7 +400,7 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
       }
 
       /* Store OBSID or OBSIDSS depending on whether we are grouping by wavelength */
-      if (grpbywave) {
+      if (grouping) {
         astMapPut0C( filemap, "OBSID", data->hdr->obsidss, NULL );
       } else {
         char obsid[81];
@@ -398,7 +414,7 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
       indexmap = astKeyMap( "SortBy=KeyUp" );
       astMapPut0A( filemap, "GRPINDICES", indexmap, NULL );
     }
-    smf_find_subarray( data->hdr, subarray, sizeof(subarray), NULL, status );
+
     astMapPut0I( indexmap, subarray, i, NULL );
 
     /* Need to track the largest number of related subarrays in a single slot */
