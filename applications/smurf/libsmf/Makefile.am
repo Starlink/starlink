@@ -146,6 +146,7 @@ smf_filter_ident.c \
 smf_filter_notch.c \
 smf_filter_r2c.c \
 smf_find_acsis_corners.c \
+smf_find_airmass_interval.c \
 smf_find_bad_dets.c \
 smf_find_dateobs.c \
 smf_find_gains.c \

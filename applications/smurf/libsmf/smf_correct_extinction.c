@@ -369,43 +369,8 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
     tausrc = SMF__TAUSRC_TAU;
   }
 
-  /* it is possible to have gaps in the TCS part of jcmtstate which causes
-     difficulties in determining telescope elevation for extinction correction.
-     We can not necessarily assume that first and last airmasses are known so
-     we find them as a reference.
-  */
-  if (ndims == 3) {
-    JCMTState * curstate = hdr->allState;
-    for ( k=0; k<nframes && (*status == SAI__OK) ; k++) {
-      amstart = curstate->tcs_airmass;
-      elstart = curstate->tcs_az_ac2;
-      if (amstart != VAL__BADD && elstart != VAL__BADD
-          && amstart != 0.0 ) {
-        break;
-      }
-      curstate++;
-    }
-    /* reset and start from end */
-    curstate = &((hdr->allState)[nframes-1]);
-    for ( k=nframes; k>0 && (*status == SAI__OK) ; k--) {
-      amend = curstate->tcs_airmass;
-      elend = curstate->tcs_az_ac2;
-      if (amend != VAL__BADD && elend != VAL__BADD
-          && amend != 0.0 ) {
-        break;
-      }
-      curstate--;
-    }
-  } else {
-    smf_getfitsd( hdr, "AMSTART", &amstart, status );
-    smf_getfitsd( hdr, "ELSTART", &elstart, status );
-    smf_getfitsd( hdr, "AMEND", &amend, status );
-    smf_getfitsd( hdr, "ELEND", &elend, status );
-    if (elstart != VAL__BADD) elstart *= DD2R;
-    if (elend != VAL__BADD) elend *= DD2R;
-
-  }
-
+  /* Find the airmass range for this data */
+  smf_find_airmass_interval( hdr, &amstart, &amend, &elstart, &elend, status );
   if (*status == SAI__OK && (amstart == VAL__BADD || amend == VAL__BADD)) {
     *status = SAI__ERROR;
     errRep( "", "No good airmass values found in JCMTSTATE structure for these data",

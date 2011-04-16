@@ -960,6 +960,11 @@ void smf_filter_r2c( smfFilter *filt, int *status );
 void smf_find_acsis_corners( smfData *data, double xc[4], double yc[4],
                              int *status );
 
+void
+smf_find_airmass_interval( const smfHead * hdr, double *amstart,
+                           double * amend, double *elstart, double *elend,
+                           int * status );
+
 int *smf_find_bad_dets( Grp *igrp,  int size, int *nbaddet, int *status );
 
 void smf_find_dateobs(  const smfHead * hdr, double *dateobs,
