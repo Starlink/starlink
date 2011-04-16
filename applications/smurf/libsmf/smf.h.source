@@ -578,6 +578,10 @@ void smf_calc_skyframe( const AstFrame * skyin,
                         double skyref[2],
                         int * moving, int * status );
 
+void smf_calc_smoothedwvm ( const smfArray * alldata, const smfData * adata,
+                            AstKeyMap* extpars, double **wvmtau,
+                            size_t *nelems, size_t *ngood, int * status );
+
 void smf_calc_stareimage( smfData *data, const int naver, int *status);
 
 void smf_calc_stats( const smfData *data, const char *mode, const dim_t index,
