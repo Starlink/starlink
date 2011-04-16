@@ -27,7 +27,8 @@
 *        AST keymap containing the parameters required to convert
 *        the tau (on the CSO scale) to the current filter. Must
 *        contain the "taurelation" key which itself will be a keymap
-*        containing the parameters for the specific filter.
+*        containing the parameters for the specific filter. If NULL
+*        the 225GHz tau will be returned.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -67,6 +68,8 @@
 *     2010-12-21 (TIMJ):
 *        Trap 0 airmass in same manner as VAL__BADD airmass. Fall back to using
 *        TCS_AZ_AC2.
+*     2011-04-12 (TIMJ):
+*        Return 225 GHz tau if not extinction parameters supplied.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -195,8 +198,12 @@ double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars, i
     }
   }
 
-  /* Scale from CSO to filter tau */
-  tau = smf_cso2filt_tau( hdr, tau225, extpars, status );
+  /* Scale from CSO to filter tau if necessary */
+  if (extpars) {
+    tau = smf_cso2filt_tau( hdr, tau225, extpars, status );
+  } else {
+    tau = tau225;
+  }
 
   /*  printf("A = %g tau225 = %g tau = %g\n",airmass,tau225,tau);*/
 
