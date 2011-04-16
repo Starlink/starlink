@@ -53,10 +53,14 @@
 *     2008-03-30 (EC)
 *        -Stripped out calculation. Model is now filled by smf_model_create.
 *        -added SMF__DIMM_INVERT flag to undo extinction correction
+*     2011-04-15 (TIMJ):
+*        Set quality to SMF__Q_EXT if there is a bad extinction correction
+*        value.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2011 Science & Technology Facilities Council.
+*     Copyright (C) 2005-2008 Particle Physics and Astronomy Research Council.
 *     University of British Columbia.
 *     All Rights Reserved.
 
@@ -145,14 +149,22 @@ void smf_calcmodel_ext( smfWorkForce *wf __attribute__((unused)),
 	/* Apply the extinction correction */
 	for( i=0; i<ndata; i++ ) {
 	  if( !(qua_data[i]&SMF__Q_MOD) ) {
-	    res_data[i] *= model_data[i];
-	  }
+            if (model_data[i] == VAL__BADD) {
+              qua_data[i] |= SMF__Q_EXT;
+            } else {
+              res_data[i] *= model_data[i];
+            }
+	  } else if (model_data[i] == VAL__BADD) {
+            qua_data[i] |= SMF__Q_EXT;
+          }
 	}
       } else {
 	/* Undo the extinction correction */
 	for( i=0; i<ndata; i++ ) {
 	  if( !(qua_data[i]&SMF__Q_MOD) && (model_data[i] > 0) ) {
-	    res_data[i] /= model_data[i];
+            if (model_data[i] != VAL__BADD) {
+              res_data[i] /= model_data[i];
+            }
 	  }
 	}
       }
