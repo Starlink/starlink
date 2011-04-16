@@ -84,10 +84,12 @@
 *        Control message level of report
 *     2010-07-16 (TIMJ):
 *        Add ability to ignore padding.
+*     2011-04-15 (TIMJ):
+*        Add SMF__Q_EXT
 
 *  Copyright:
 *     Copyright (C) 2010 University of British Columbia.
-*     Copyright (C) 2010 Science and Technology Facilities Council.
+*     Copyright (C) 2010-2011 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -233,6 +235,7 @@ void smf_qualstats_report( msglev_t msglev, smf_qfam_t qfamily, int nopad,
       case SMF__Q_PAD: /* Padding is for all bolos at given tslice */
       case SMF__Q_APOD: /* Apodization is for all bolos at given tslice */
       case SMF__Q_STAT: /* Stationary is for all bolos at given tslice */
+      case SMF__Q_EXT: /* Extinction correction is usually for time slices */
         sprintf( scalestr, "%7zu tslices",
                  qcount[i] / nbolo_tot );
         break;

@@ -472,6 +472,7 @@ typedef enum {
   SMF__Q_COM     = BIT_TO_VAL(7),   /* Flagged as bad chunk in common-mode rejection */
   SMF__Q_FILT    = BIT_TO_VAL(8),   /* Weight less than wlim when filtering */
   SMF__Q_NOISE   = BIT_TO_VAL(9),   /* Bolometer flagged because of noise constraint */
+  SMF__Q_EXT     = BIT_TO_VAL(10),  /* Unable to apply extinction correction */
 } smf_qual_bits;
 
 /* These macros are for several commonly-used combinations of quality flags */
@@ -483,7 +484,7 @@ typedef enum {
 #define SMF__Q_FIT ~(SMF__Q_APOD|SMF__Q_STAT)            /* Samples that can't
                                                            be used to fit
                                                            time-domain models */
-#define SMF__Q_GAP (SMF__Q_BADDA|SMF__Q_SPIKE|SMF__Q_JUMP|SMF__Q_COM)/* Samples
+#define SMF__Q_GAP (SMF__Q_BADDA|SMF__Q_SPIKE|SMF__Q_JUMP|SMF__Q_COM|SMF__Q_EXT)/* Samples
                                                            that should
                                                            be gap-filled */
 #define SMF__Q_BOUND (SMF__Q_PAD|SMF__Q_APOD)            /* apodized/padded
@@ -521,10 +522,10 @@ typedef enum {
 /* Number of quality bits in each family. SMF__NQBITS can be used
    for declaring array sizes. */
 typedef enum {
-  SMF__NQBITS_TSERIES = 10,
+  SMF__NQBITS_TSERIES = 11,
   SMF__NQBITS_MAP     = 1,
   SMF__NQBITS_TCOMP   = 5,
-  SMF__NQBITS         = 10    /* Largest number of bits in a family */
+  SMF__NQBITS         = 11    /* Largest number of bits in a family */
 } smf_qfam_count_t;
 
 

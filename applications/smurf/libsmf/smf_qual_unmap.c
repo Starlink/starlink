@@ -67,10 +67,12 @@
 *        If we do not know the family just copy the quality
 *        to the output without using quality names and just
 *        assuming a simple cast to unsigned char will be enough.
+*     2011-04-15 (TIMJ):
+*        Add SMF__Q_EXT
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2010 Science and Technology Facilities Council.
+*     Copyright (C) 2010-2011 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -305,7 +307,7 @@ smf_qual_t * smf_qual_unmap( int indf, smf_qfam_t family, smf_qual_t * qual, int
             if ( qual[i] & (SMF__Q_APOD|SMF__Q_PAD) ) {
               qmap[i] |= SMF__TCOMPQ_ENDS;
             }
-            if ( qual[i] & (SMF__Q_JUMP|SMF__Q_SPIKE|SMF__Q_FILT) ) {
+            if ( qual[i] & (SMF__Q_JUMP|SMF__Q_SPIKE|SMF__Q_FILT|SMF__Q_EXT) ) {
               qmap[i] |= SMF__TCOMPQ_BLIP;
             }
             if ( qual[i] & (SMF__Q_COM) ) {

@@ -45,10 +45,12 @@
 *        Initial version
 *     2010-07-06 (TIMJ):
 *        Add SMF__Q_NOISE
+*     2011-04-15 (TIMJ):
+*        Add SMF__Q_EXT
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2010 Science and Technology Facilities Council.
+*     Copyright (C) 2010-2011 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -117,6 +119,9 @@ smf_qual_t smf_qual_str_to_val( const char *qname, smf_qfam_t * family, int * st
     lfamily = SMF__QFAM_TSERIES;
   } else if ( strcmp(qname, "NOISE") == 0 ) {
     retval = SMF__Q_NOISE;
+    lfamily = SMF__QFAM_TSERIES;
+  } else if ( strcmp(qname, "EXT") == 0 ) {
+    retval = SMF__Q_EXT;
     lfamily = SMF__QFAM_TSERIES;
   } else if ( strcmp(qname, "ZERO") == 0 ) {
     retval = SMF__MAPQ_ZERO;

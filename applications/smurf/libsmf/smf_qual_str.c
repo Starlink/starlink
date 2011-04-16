@@ -65,9 +65,11 @@
 *        Add quality family.
 *     2010-07-06 (TIMJ):
 *        Add SMF__Q_NOISE
+*     2011-04-15 (TIMJ):
+*        Add SMF__Q_EXT
 
 *  Copyright:
-*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2010-2011 Science & Technology Facilities Council.
 *     Copyright (C) 2010 University of British Columbia.
 *     All Rights Reserved.
 
@@ -177,6 +179,11 @@ const char *smf_qual_str( smf_qfam_t family, int usebit, int bit_or_val,
     case SMF__Q_NOISE:
       retval = "NOISE";
       ldescr = "Set if bolometer was too noisy";
+      break;
+
+    case SMF__Q_EXT:
+      retval = "EXT";
+      ldescr = "Set if extinction correction failed";
       break;
 
     default:
