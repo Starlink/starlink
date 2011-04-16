@@ -241,17 +241,14 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
   dim_t k;                 /* Loop counter */
   int lbnd[2];             /* Lower bound */
   size_t ndims;            /* Number of dimensions in input data */
-  size_t newtau = 0;       /* Flag to denote whether to calculate a
-                              new tau from the WVM data */
-  float newtwvm[3];        /* Array of WVM temperatures */
   dim_t nframes = 0;       /* Number of frames */
   dim_t npts = 0;          /* Number of data points */
   dim_t nx = 0;            /* # pixels in x-direction */
   dim_t ny = 0;            /* # pixels in y-direction */
-  float oldtwvm[3] = {VAL__BADR, VAL__BADR, VAL__BADR}; /* Cached value of WVM temperatures */
   int ubnd[2];             /* Upper bound */
   double *vardata = NULL;  /* Pointer to variance array */
   AstFrameSet *wcs = NULL; /* Pointer to AST WCS frameset */
+  double * wvmtau = NULL;  /* WVM tau (smoothed or not) for these data */
   double zd = 0;           /* Zenith distance */
 
   /* Check status */
@@ -331,6 +328,17 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
     }
   }
 
+  if (tausrc == SMF__TAUSRC_WVMRAW) {
+    size_t ntotaltau = 0;
+    size_t ngoodtau = 0;
+    smf_calc_smoothedwvm( NULL, data, extpars, &wvmtau, &ntotaltau,
+                          &ngoodtau, status );
+    smf_smfFile_msg( data->file, "FILE", 1, "<unknown>");
+    msgOutiff( MSG__VERB, "", "Using WVM mode for extinction correction of ^FILE"
+               " %.0f %% of WVM data are present", status,
+               (double)(100.0*(double)ngoodtau/(double)ntotaltau) );
+  }
+
   /* Check auto mode */
   if (tausrc == SMF__TAUSRC_AUTO && *status == SAI__OK) {
     smf_smfFile_msg( data->file, "FILE", 1, "<unknown>" );
@@ -339,21 +347,28 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
       /* have to use CSO mode */
       tausrc = SMF__TAUSRC_CSOTAU;
     } else if (ndims == 3) {
-      /* check first and last WVM reading. At least one should be good */
-      JCMTState * curstate = hdr->allState;
-      JCMTState * endstate = &((hdr->allState)[nframes-1]);
+      /* Calculate the WVM tau data and see if we have enough good data */
+      size_t ngoodtau = 0;
+      size_t ntotaltau = 0;
+      double percentgood = 0.0;
 
-      if (curstate->wvm_time != VAL__BADR && curstate->wvm_time > 0 &&
-          endstate->wvm_time != VAL__BADR && endstate->wvm_time > 0) {
+      smf_calc_smoothedwvm( NULL, data, extpars, &wvmtau, &ntotaltau,
+                            &ngoodtau, status );
+      percentgood = 100.0 * ((double)ngoodtau / (double)ntotaltau);
+
+      if ( percentgood > 80.0) {
         tausrc = SMF__TAUSRC_WVMRAW;
+        msgOutiff( MSG__VERB, "", "Selecting WVM mode for extinction correction of ^FILE."
+                   " %.0f %% of WVM data are present", status, percentgood );
       } else {
         tausrc = SMF__TAUSRC_CSOTAU;
+        if (wvmtau) wvmtau = astFree( wvmtau );
       }
     }
     if (tausrc == SMF__TAUSRC_CSOTAU) {
       msgOutiff( MSG__VERB, "", "Selecting CSO mode for extinction correction of ^FILE", status );
     } else if (tausrc == SMF__TAUSRC_WVMRAW) {
-      msgOutiff( MSG__VERB, "", "Selecting WVM mode for extinction correction of ^FILE", status );
+      /* Dealt with this above */
     } else {
       /* oops. Fall back position */
       tausrc = SMF__TAUSRC_CSOTAU;
@@ -434,12 +449,6 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
   /* Store the previous good airmass if we need it for a gap */
   amprev = amstart;
 
-  /* initialise the tau if we are in WVM mode. Use an intelligent
-     default in case we have some bad wvm data at the start.*/
-  if (tausrc == SMF__TAUSRC_WVMRAW) {
-    tau = smf_cso2filt_tau( hdr, VAL__BADD, extpars, status );
-  }
-
   /* Loop over number of time slices/frames */
 
   for ( k=0; k<nframes && (*status == SAI__OK) ; k++) {
@@ -457,45 +466,9 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
        timeslice. If we're in QUICK mode then we don't need the WCS */
     smf_tslice_ast( data, k, !quick, status );
 
-    /* See if we have a new WVM value */
+    /* Read the WVM tau value if required */
     if (tausrc == SMF__TAUSRC_WVMRAW) {
-      newtwvm[0] = hdr->state->wvm_t12;
-      newtwvm[1] = hdr->state->wvm_t42;
-      newtwvm[2] = hdr->state->wvm_t78;
-      /* Have any of the temperatures changed? Are any of the new
-         temperatures bad? If bad we'll just reuse the previous value. */
-      if ( newtwvm[0] == VAL__BADR ||
-           newtwvm[1] == VAL__BADR ||
-           newtwvm[2] == VAL__BADR ) {
-        newtau = 0;
-      } else if ( (newtwvm[0] != oldtwvm[0]) ||
-                  (newtwvm[1] != oldtwvm[1]) ||
-                  (newtwvm[2] != oldtwvm[2]) ) {
-        newtau = 1;
-        oldtwvm[0] = newtwvm[0];
-        oldtwvm[1] = newtwvm[1];
-        oldtwvm[2] = newtwvm[2];
-      } else {
-        newtau = 0;
-      }
-      if (newtau) {
-        float thistau = VAL__BADD;
-        thistau = smf_calc_wvm( hdr, amprev, extpars, status );
-        newtau = 0;
-        /* Check status and/or value of tau */
-        if ( thistau == VAL__BADD ) {
-          if ( *status == SAI__OK ) {
-            *status = SAI__ERROR;
-            errRep("", "Error calculating tau from WVM temperatures",
-                   status);
-          }
-        } else if ( thistau < 0.0 ) {
-          msgOutiff( MSG__QUIET, "", "WARNING: Negative WVM tau calculated (%g). Ignoring.",
-                    status, thistau );
-        } else {
-          tau = thistau;
-        }
-      }
+      tau = wvmtau[k];
     }
 
     /* in all modes we need to keep track of the previous airmass in case
@@ -529,8 +502,11 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
     }
 
     /* If we're using the FAST application method, we assume a single
-       airmass and tau for the whole array but we have to consider adaptive mode */
-    if (quick) {
+       airmass and tau for the whole array but we have to consider adaptive mode.
+       If the tau is bad the extinction correction must also be bad. */
+    if (tau == VAL__BADD) {
+      extcorr = VAL__BADD;
+    } else if (quick) {
       /* we have an airmass, see if we need to provide per-pixel correction */
       if (adaptive) {
         if (is_large_delta_atau( airmass, hdr->state->tcs_az_ac2, tau, status) ) {
@@ -541,9 +517,7 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
       }
 
       if (quick) extcorr = exp(airmass*tau);
-    }
-
-    if (!quick) {
+    } else {
       /* Not using quick so retrieve WCS to obtain elevation info */
       wcs = hdr->wcs;
       /* Check current frame, store it and then select the AZEL
@@ -578,9 +552,13 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
       }
 
       if (!quick) {
-        zd = M_PI_2 - azel[npts+i];
-        airmass = slaAirmas( zd );
-        extcorr = exp(airmass*tau);
+        if (tau != VAL__BADD) {
+          zd = M_PI_2 - azel[npts+i];
+          airmass = slaAirmas( zd );
+          extcorr = exp(airmass*tau);
+        } else {
+          extcorr = VAL__BADD;
+        }
       }
 
       if( allextcorr ) {
@@ -598,8 +576,8 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
             vardata[index] *= extcorr * extcorr;
           }
         } else {
-          indata[index] = VAL__BADD;
-          vardata[index] = VAL__BADD;
+          if (indata) indata[index] = VAL__BADD;
+          if (vardata) vardata[index] = VAL__BADD;
         }
       }
 
@@ -616,6 +594,7 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
 
  CLEANUP:
   if (azel) azel = astFree( azel );
+  if (wvmtau) wvmtau = astFree( wvmtau );
 
 }
 
