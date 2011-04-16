@@ -55,3 +55,9 @@
 
 ext.taurelation.450 = (19.04,-0.018)
 ext.taurelation.850 =  (5.36,-0.006)
+
+# Control whether we want WVM smoothing. The value is the
+# size in seconds for the tophat function. A value of 0 disables
+# smoothing.
+
+ext.smoothwvm = 10.0
