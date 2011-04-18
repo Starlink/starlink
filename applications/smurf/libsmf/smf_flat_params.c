@@ -76,10 +76,13 @@
 *     2010-07-15 (TIMJ):
 *        Use kpg1Config to read resistor information based on subarray.
 *        Remove refrespar since that information is now in the resistor file.
+*     2011-04-18 (TIMJ):
+*        Use ARRAYID rather than subarray name to handle resistor values.
+*        Focal plane name is not reliable.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2010 Science and Technology Facilities Council.
+*     Copyright (C) 2010-2011 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -129,7 +132,7 @@ smf_flat_params( const smfData * refdata, const char resistpar[],
   int nrows;                 /* number of rows read from resistor data */
   AstKeyMap * resmap = NULL; /* Resistor map */
   AstKeyMap * subarrays = NULL; /* Subarray lookup table */
-  char thissub[5];           /* This sub-instrument string */
+  char thissub[32];          /* This sub-instrument string */
 
   if (resistance) *resistance = NULL;
 
@@ -150,21 +153,23 @@ smf_flat_params( const smfData * refdata, const char resistpar[],
 
   /* Based on refdata we now need to calculate the default reference
      resistance and retrieve the correct resistance entry for each bolometer.
-     We need the subarray string so that we can set up a look up keymap.
+     We need the unique subarray string so that we can set up a look up keymap.
      There is no code in SMURF to return all the known subarrays but
      we need to know all the options in order to use kpg1Config. */
   subarrays = astKeyMap( " " );
-  astMapPut0I( subarrays, "S4A", 0, NULL );
-  astMapPut0I( subarrays, "S4B", 0, NULL );
-  astMapPut0I( subarrays, "S4C", 0, NULL );
-  astMapPut0I( subarrays, "S4D", 0, NULL );
-  astMapPut0I( subarrays, "S8A", 0, NULL );
-  astMapPut0I( subarrays, "S8B", 0, NULL );
-  astMapPut0I( subarrays, "S8C", 0, NULL );
-  astMapPut0I( subarrays, "S8D", 0, NULL );
+  astMapPut0I( subarrays, "CG450MK2_M0907D0501", 0, NULL );
+  astMapPut0I( subarrays, "CG850MK2_M0904D0503", 0, NULL );
+  astMapPut0I( subarrays, "SG850_M0906D1005", 0, NULL );
+  astMapPut0I( subarrays, "SG850_M1002D1006", 0, NULL );
+  astMapPut0I( subarrays, "SG850_M1005D1007", 0, NULL );
+  astMapPut0I( subarrays, "SG850_M1003D1004", 0, NULL );
+  astMapPut0I( subarrays, "SG450_M1004D1000", 0, NULL );
+  astMapPut0I( subarrays, "SG450_M1007D1002", 0, NULL );
+  astMapPut0I( subarrays, "SG450_M1006D1003", 0, NULL );
+  astMapPut0I( subarrays, "SG450_M1009D1008", 0, NULL );
 
   /* and indicate which subarray we are interested in (uppercased) */
-  smf_find_subarray( refdata->hdr, thissub, sizeof(thissub), NULL, status );
+  smf_fits_getS( refdata->hdr, "ARRAYID", thissub, sizeof(thissub), status );
   { /* need to uppercase */
     size_t l = strlen(thissub);
     for (j=0;j<l;j++) {
