@@ -100,6 +100,8 @@
 *        Fixed bug where x co-ordinate was 10 times too big for a box.
 *     18-SEP-2001 (DSB):
 *        Modified for ARD V2/AST/PGPLOT.
+*     2011 April 18: (MJC):
+*        Fixed bug in calculation of BOX length and width.
 *     {enter_further_changes_here}
 
 *-
@@ -197,8 +199,8 @@
 *  Find the centre and side lengths.
          XC = X( 1 )
          YC = Y( 1 )
-         LN = ABS( X( 3 ) - X( 2 ) )
-         WD = ABS( Y( 3 ) - Y( 2 ) )
+         LN = 2.0D0 * ABS( X( 2 ) - X( 1 ) )
+         WD = 2.0D0 * ABS( Y( 2 ) - Y( 1 ) )
 
 *  Create the string.
          CALL CHR_PUTC( 'BOX(', LINE, NC )
