@@ -33,6 +33,7 @@
 
 *  Authors:
 *     David S Berry (JAC, UCLan)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -41,10 +42,12 @@
 *     3-DEC-2008 (DSB):
 *        Include cached objects used by smf_create_lutwcs and
 *        smf_detpos_wcs.
+*     2011-04-19 (TIMJ):
+*        Catch a NULL smfData
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2008,2011 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -86,6 +89,8 @@ void smf_lock_data( smfData *data, int lock, int *status ){
    sc2astCache *cache1 = NULL;
    smfCreateLutwcsCache *cache2 = NULL;
    smfDetposWcsCache *cache3 = NULL;
+
+   if (!data) return;
 
 /* Start a new error reporting context. */
    emsBegin( status );
