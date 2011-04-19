@@ -274,6 +274,7 @@
 % SMURF tasks
 \newcommand{\copyflat}{\xref{\task{copyflat}}{sun258}{COPYFLAT}}
 \newcommand{\calcflat}{\xref{\task{calcflat}}{sun258}{CALCFLAT}}
+\newcommand{\calcnoise}{\xref{\task{calcnoise}}{sun258}{CALCNOISE}}
 \newcommand{\concat}{\xref{\task{sc2concat}}{sun258}{SC2CONCAT}}
 \newcommand{\fft}{\xref{\task{sc2fft}}{sun258}{SC2FFT}}
 \newcommand{\clean}{\xref{\task{sc2clean}}{sun258}{SC2CLEAN}}
@@ -710,6 +711,7 @@ handle sanely. Fifteen minute chunks (30 files) should be more than
 big enough.
 
 \subsection{\xlabel{display_scan}Displaying scan patterns}
+\label{sec:state}
 
 The pointing of the telescope throughout a scan (as well as other
 state information) is stored in the \texttt{MORE.SMURF.JCMTSTATE}
@@ -1627,7 +1629,7 @@ reference them all to \texttt{dimmconfig.lis}.
 \section{\xlabel{calib}Calibrating SCUBA-2 Data}
 \label{sec:calib}
 
-\subsection{Extinction Correction}
+\subsection{\xlabel{extinction}Extinction Correction}
 
 Analysis of the SCUBA-2 skydips and heater-tracking data from the
 S2SRO data has allowed calculation of the opacity factors for the
@@ -1687,7 +1689,7 @@ about the same airmass and if the tau did not change appreciably), any
 errors in extinction correction should cancel out in the calibration.
 
 
-\subsection{Flux conversion factors}
+\subsection{\xlabel{fcf}Flux conversion factors}
 \label{sec:fcf}
 
 Primary and secondary calibrator observations have been reduced using
@@ -2117,7 +2119,7 @@ cropping, and mosaicking. The second method uses an alternative DIMM
 configuration aimed at maps of bright extended structures, and a
 single call to \makemap.
 
-\subsubsection{Standard DIMM configuration + \picard}
+\subsubsection{\xlabel{galacticpicard}Standard DIMM configuration + \picard}
 
 If, as in this case, you have multiple observations contributing to
 your map, each observation can be reduced separately, and then
@@ -2247,7 +2249,7 @@ filename.
 \end{center}
 \end{figure}
 
-\subsubsection{Bright / extended DIMM configuration}
+\subsubsection{\xlabel{galacticextended}Bright / extended DIMM configuration}
 
 The simpler method is to make a map from all of the data at once using
 \texttt{dimmconfig\_bright\_extended.lis}:
@@ -2279,6 +2281,134 @@ iteratively-determined zero mask are shown in Fig.~\ref{fig:snrmask}.
 \label{fig:snrmask}
 \end{center}
 \end{figure}
+
+\clearpage
+
+\section{\xlabel{dataqual}Cheat sheet for checking data quality}
+\label{sec:dataqual}
+
+This section is a cheat sheet for a number of simple operations that
+can be used to do quick checks of the data quality.
+
+\subsection{\label{clean}Using \clean\ to help inspect time-series}
+
+\clean\ can be used to do two basic tasks in one go: concatenate data
+(with or without applying a flatfield); and cleaning (fix up steps and
+spikes, remove the means, filter, remove common-mode etc.). It uses
+the same configuration files as the iterative map-maker (though
+ignoring the map-making specific items).
+
+In this first basic example, we just want to clean up some data enough
+to be able to see whether the bolometers have been flat-fielded
+correctly, and more-or-less exhibit the same behaviour over time:
+
+\begin{myquote}
+\begin{verbatim}
+sc2clean $FILES clean config=^$STARLINK_DIR/share/smurf/dimmconfig.lis
+\end{verbatim}
+\end{myquote}
+
+Here \texttt{\$FILES} can just be a single file from a subarray, or a
+subset, e.g. \texttt{s8a20110417\_00051\_0003.sdf} (the first file
+containing science data), \texttt{s8a20110417\_00051\_000"[1234]"}
+(file 1 is a noise observation with shutter closed that gets ignored,
+file 2 is a flatfield observation that will be used to override the
+flatfield stored in the subsequent files 3 and 4 which are
+concatenated together, the \texttt{.sdf} is optional),
+\texttt{s8a20110417\_00051\_000\textbackslash?} (files 1 through 9),
+\texttt{s8a20110417\_00051\_\textbackslash*} (the whole
+observation). If you inspect the resulting \texttt{clean.sdf} in
+\gaia\ and flip through the data cube you should see all of the
+bolometers signals go up and down together with about the same
+amplitude (the hope is that for a well-behaved instrument you are
+mostly seeing sky noise variations). Another common feature is to see
+if the scans are particularly long and/or fast (e.g. 1\,deg across) is
+strong periodic signals that are correlated with the scan pattern. See
+Section~\ref{sec:state} -- in particular you will want to plot
+\texttt{az} and \texttt{el} (the absolute azimuth and elevation), and
+also \texttt{daz} and \texttt{del} (the azimuth and elevation offsets
+from the map centre). It is common to see an azimuth-correlated signal
+due to magnetic field pickup.
+
+Part of the reason the signals look the same is because they have been
+flatfielded. You can turn off flatfielding using the \texttt{noflat}
+option to \clean, and you should then see that all of the detector
+amplitudes vary.
+
+Another very useful option is to remove the common signal observed by
+all of the bolometers. This may be accomplished by
+
+\begin{myquote}
+\begin{verbatim}
+sc2clean $FILES clean \
+   config='"^$STARLINK_DIR/share/smurf/dimmconfig.lis,comprocess=1"'
+\end{verbatim}
+\end{myquote}
+
+The residual of this signal will exhibit second-order time-varying
+correlated signals across the focal plane. Usually these are not very
+large, but in some cases some very large localized signals have been
+detected, particularly in the 850\,$\mu$m arrays in early 2011.
+
+Another variation on this is to accentuate the residual low-frequency
+noise by low-pass filtering the result. This can again be accomplished
+by simply adding a filter command in the \texttt{config} parameter,
+which in this case low-pass filters with a cutoff at 10\,Hz:
+
+\begin{myquote}
+\begin{verbatim}
+sc2clean $FILES clean \
+   config='"^$STARLINK_DIR/share/smurf/dimmconfig.lis,comprocess=1,filt_edge_low=10"'
+\end{verbatim}
+\end{myquote}
+
+Finally, in some cases you might just want to fit and remove
+polynomial baselines from the bolometers (by default only the mean is
+removed). This example will remove a line, but you can increase the
+value of \texttt{order} to remove higher-order polynomials
+
+\begin{myquote}
+\begin{verbatim}
+sc2clean $FILES clean \
+   config='"^$STARLINK_DIR/share/smurf/dimmconfig.lis,order=1"'
+\end{verbatim}
+\end{myquote}
+
+\subsection{\label{caldata}Looking at calibration data}
+
+Currently all science observations are preceeded by two calibrations:
+a short shutter-closed integration (file 1), followed by a ``sky
+flat'' to determine the response of all the bolometers to a current
+ramp through their heater resistors with the shutter open (file 2).
+The science observations are all subsequent files, except for the last
+which is also a sky flat.
+
+The shutter-closed integrations can be useful to track the array
+sensitivity independent of sky conditions. You can run these files (or
+the science data files as well) through \calcnoise\ (the NEP map for
+the subarray will be stored in the \texttt{.MORE.SMURF.NEP} extension
+of the output NDF):
+
+\begin{myquote}
+\begin{verbatim}
+calcnoise s8a20110417_00051_0001 s8a_noise method=! power=!
+\end{verbatim}
+\end{myquote}
+
+The sky flats can be used to calculate responsivity images using
+\calcflat:
+
+\begin{myquote}
+\begin{verbatim}
+calcflat s8a20110417_00051_0002 s8a_flat method=! resp=s8a_resp respmask
+\end{verbatim}
+\end{myquote}
+
+The resulting \texttt{s8a\_flat} contains a data cube of the data used
+to fit the responsivity (stacking several heater ramps together -- it
+is easy to see bizarre/non-linear detectors that will subsequently be
+flagged and removed), and the actual responsivity image is stored in
+\texttt{s8a\_resp}.
 
 \begin{thebibliography}{}
 \addcontentsline{toc}{section}{References}
