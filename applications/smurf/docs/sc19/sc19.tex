@@ -760,6 +760,7 @@ the Az/El offset and the 225\,GHz opacity values are also calculated
 from the raw WVM measurements.
 
 \subsection{\xlabel{display_cube}Displaying data cubes}
+\label{sec:gaiacube}
 
 \begin{figure}
 \begin{center}
@@ -2318,17 +2319,20 @@ concatenated together, the \texttt{.sdf} is optional),
 \texttt{s8a20110417\_00051\_000\textbackslash?} (files 1 through 9),
 \texttt{s8a20110417\_00051\_\textbackslash*} (the whole
 observation). If you inspect the resulting \texttt{clean.sdf} in
-\gaia\ and flip through the data cube you should see all of the
-bolometers signals go up and down together with about the same
-amplitude (the hope is that for a well-behaved instrument you are
-mostly seeing sky noise variations). Another common feature is to see
-if the scans are particularly long and/or fast (e.g. 1\,deg across) is
-strong periodic signals that are correlated with the scan pattern. See
-Section~\ref{sec:state} -- in particular you will want to plot
-\texttt{az} and \texttt{el} (the absolute azimuth and elevation), and
-also \texttt{daz} and \texttt{del} (the azimuth and elevation offsets
-from the map centre). It is common to see an azimuth-correlated signal
-due to magnetic field pickup.
+\gaia\ (Section~\ref{sec:gaiacube}) and flip through the data cube you
+should see all of the bolometers signals go up and down together with
+about the same amplitude: the hope is that for a well-behaved
+instrument you are mostly seeing sky noise variations that are seen
+with roughly the same amplitude by all bolometers. Another common
+feature, if the scans are particularly long and/or fast (e.g. 1\,deg
+across), is strong periodic signals that are correlated with the scan
+pattern. See Section~\ref{sec:state} -- in particular you will want to
+plot \texttt{az} and \texttt{el} (the absolute azimuth and elevation),
+and also \texttt{daz} and \texttt{del} (the azimuth and elevation
+offsets from the map centre). This signal is usually
+azimuth-correlated due to magnetic field pickup. It only shows up in
+azimuth, because the instrument is on a Nasmyth platform and therefore
+does not move in elevation.
 
 Part of the reason the signals look the same is because they have been
 flatfielded. You can turn off flatfielding using the \texttt{noflat}
@@ -2341,7 +2345,7 @@ all of the bolometers. This may be accomplished by
 \begin{myquote}
 \begin{verbatim}
 sc2clean $FILES clean \
-   config='"^$STARLINK_DIR/share/smurf/dimmconfig.lis,comprocess=1"'
+   config='"^$STARLINK_DIR/share/smurf/dimmconfig.lis,compreprocess=1"'
 \end{verbatim}
 \end{myquote}
 
@@ -2358,7 +2362,7 @@ which in this case low-pass filters with a cutoff at 10\,Hz:
 \begin{myquote}
 \begin{verbatim}
 sc2clean $FILES clean \
-   config='"^$STARLINK_DIR/share/smurf/dimmconfig.lis,comprocess=1,filt_edge_low=10"'
+   config='"^$STARLINK_DIR/share/smurf/dimmconfig.lis,compreprocess=1,filt_edge_low=10"'
 \end{verbatim}
 \end{myquote}
 
@@ -2387,7 +2391,7 @@ The shutter-closed integrations can be useful to track the array
 sensitivity independent of sky conditions. You can run these files (or
 the science data files as well) through \calcnoise\ (the NEP map for
 the subarray will be stored in the \texttt{.MORE.SMURF.NEP} extension
-of the output NDF):
+of the output NDF \texttt{s8a\_noise.sdf}):
 
 \begin{myquote}
 \begin{verbatim}
@@ -2404,11 +2408,11 @@ calcflat s8a20110417_00051_0002 s8a_flat method=! resp=s8a_resp respmask
 \end{verbatim}
 \end{myquote}
 
-The resulting \texttt{s8a\_flat} contains a data cube of the data used
+The resulting \texttt{s8a\_flat.sdf} contains a data cube of the data used
 to fit the responsivity (stacking several heater ramps together -- it
 is easy to see bizarre/non-linear detectors that will subsequently be
 flagged and removed), and the actual responsivity image is stored in
-\texttt{s8a\_resp}.
+\texttt{s8a\_resp.sdf}.
 
 \begin{thebibliography}{}
 \addcontentsline{toc}{section}{References}
