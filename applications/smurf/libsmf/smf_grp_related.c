@@ -179,6 +179,8 @@
  *        Do not scale maxlen.
  *     2011-04-15 (EC):
  *        Change grpbywave to grouping to enable handling subarrays separately
+ *     2011-04-20 (DSB):
+ *        Change interface for smf_get_padding.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -354,7 +356,7 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
         double scalelen = oldscale / downsampscale;
 
         /* only down-sample if it will be at least a factor of 20% */
-        if( scalelen <= 0.8 ) {
+        if( scalelen <= SMF__DOWNSAMPLIMIT ) {
           smf_smfFile_msg(data->file, "FILE", 1, "" );
           msgOutiff( MSG__VERB, "", FUNC_NAME
                      ": will down-sample file ^FILE from %5.1lf Hz to %5.1lf Hz", status,
@@ -363,9 +365,6 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
 
           ntslice = round(ntslice * scalelen);
 
-          /* update steptime to include down-sample factor
-             (in effect this is downsampscale/scanvel) */
-          steptime = steptime / scalelen;
         }
       }
 
@@ -384,10 +383,9 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
       /* Scaled values of ntslice and maximum length */
       astMapPut0I( filemap, "NTSLICE", ntslice, NULL );
 
-      /* Work out the padding needed for this file using the recalculated
-         steptime */
+      /* Work out the padding needed for this file including downsampling. */
       if( keymap ) {
-        thispad = smf_get_padding( keymap, steptime, 0, data->hdr, status );
+        thispad = smf_get_padding( keymap, downsampscale, 0, data->hdr, status );
         if( thispad > maxpad ) maxpad = thispad;
       } else {
         thispad = 0;

@@ -14,19 +14,20 @@
 *     C function
 
 *  Invocation:
-*     result = smf_get_padding( AstKeyMap *keymap, double steptime,
+*     result = smf_get_padding( AstKeyMap *keymap, double downsampscale,
 *                               int report, const smfHead *hdr, int *status )
 
 *  Arguments:
 *     keymap = AstKeyMap* (Given)
 *        keymap containing the user-supplied configuration.
-*     steptime = double * (Given)
-*        Length of a sample in seconds,
+*     downsampscale = double (Given)
+*        If not zero, downsample the data such that this scale (in arcsec)
+*        is retained.
 *     report = int (Given)
 *        If non-zero, report the default value if it is used.
 *     hdr = smfHead *(Given)
-*        Used to determine the scan velocity when converting spatial
-*        scales to frequencies.
+*        Used to determine the step size, and the scan velocity when
+*        converting spatial scales to frequencies.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -41,9 +42,8 @@
 *     where "freq" is the lowest frequency specified for any filter edge
 *     in the supplied configuration.
 
-
 *     This function gets the lowest filter edge frequency from the
-*     keymap, and returns a valeu equal to 200/freq. This is
+*     keymap, and returns a value equal to 200/freq. This is
 *     approximately the width of the central peak in the sinc smoothing
 *     kernel produced by the filtering.
 
@@ -59,6 +59,10 @@
 *        Initial version.
 *     4-OCT-2010 (DSB):
 *        Add support for spatial filter scales.
+*     20-APR-2011 (DSB):
+*        - Get the stepsize from the supplied header, rather than using an
+*        argument to supply the stepsize.
+*        - Take account of any downsampling.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -97,7 +101,7 @@
 /* SMURF includes */
 #include "libsmf/smf.h"
 
-dim_t smf_get_padding( AstKeyMap *keymap, double steptime, int report,
+dim_t smf_get_padding( AstKeyMap *keymap, double downsampscale, int report,
                        const smfHead *hdr, int *status ) {
 
 /* Local Variables: */
@@ -111,10 +115,12 @@ dim_t smf_get_padding( AstKeyMap *keymap, double steptime, int report,
    double filt_edgelow;
    double filt_edgesmall;
    double filt_notchlow[ SMF__MXNOTCH ];
+   double steptime;
    int f_nnotch;
    int iel;
    int nel;
    int temp;
+   double scalelen;
 
 /* Initialise */
    result = 0;
@@ -168,6 +174,17 @@ dim_t smf_get_padding( AstKeyMap *keymap, double steptime, int report,
            if( filt_notchlow[ iel ] > 0.0 && filt_notchlow[ iel ] < f_low ) f_low = filt_notchlow[ iel ];
          }
 
+/* Get the step time from the header. */
+         steptime = hdr->steptime;
+
+/* If any down-sampling is occurring, set the step time to value implied by
+   the requested downsample size (in effect this is downsampscale/scanvel).
+   Only down-sample if it will be at least a factor of 20% */
+         if( downsampscale != 0.0 ) {
+            scalelen = steptime * hdr->scanvel / downsampscale;
+            if( scalelen <= SMF__DOWNSAMPLIMIT ) steptime = steptime/scalelen;
+         }
+
 /* Find the corresponding padding. */
          if( f_low != VAL__MAXD ) {
             result = 1.0/( steptime * f_low );
@@ -190,7 +207,7 @@ dim_t smf_get_padding( AstKeyMap *keymap, double steptime, int report,
                (void) astMapGet0A( keymap, key, &obj );
 
 /* Call this function to get the padding implied by the sub-KeyMap. */
-               pad = smf_get_padding( (AstKeyMap *) obj, steptime, report, hdr,
+               pad = smf_get_padding( (AstKeyMap *) obj, downsampscale, report, hdr,
                                       status );
 
 /* Use the larger of the two paddings. */
