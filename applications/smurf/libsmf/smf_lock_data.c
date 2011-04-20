@@ -44,6 +44,7 @@
 *        smf_detpos_wcs.
 *     2011-04-19 (TIMJ):
 *        Catch a NULL smfData
+*        Lock the history keymap
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -100,7 +101,7 @@ void smf_lock_data( smfData *data, int lock, int *status ){
 /* If requested, lock all AST pointers for exclusive use by the current
    thread. */
    if( lock ) {
-/*      if( data->history ) astLock( data->history, 0 );*/
+      if( data->history ) astLock( data->history, 0 );
       if( hdr ){
          if( hdr->fitshdr ) astLock( hdr->fitshdr, 0 );
          if( hdr->wcs ) astLock( hdr->wcs, 0 );
@@ -140,7 +141,7 @@ void smf_lock_data( smfData *data, int lock, int *status ){
 /* Otherwise, unlock all AST pointers so that they can be locked by other
    threads. */
    } else {
-/*      if( data->history ) astUnlock( data->history, 1 ); */
+      if( data->history ) astUnlock( data->history, 1 );
       if( hdr ){
          if( hdr->fitshdr ) astUnlock( hdr->fitshdr, 1 );
          if( hdr->wcs ) astUnlock( hdr->wcs, 1 );
