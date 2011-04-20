@@ -1641,8 +1641,8 @@ void smf_store_outputbounds (int updatepars, const int lbnd_out[3],
 void smf_string_to_dtype ( const char * datatype, smf_dtype *dtype,
                            int * status );
 
-AstKeyMap *smf_subinst_keymap( const smfData * indata, const Grp * igrp, size_t index,
-                               int * status );
+AstKeyMap *smf_subinst_keymap( smf_subinst_t subinst, const smfData * indata,
+                               const Grp * igrp, size_t index, int * status );
 
 const char * smf_subinst_str( smf_subinst_t subinst, int * status );
 

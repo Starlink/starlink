@@ -341,7 +341,8 @@ void smurf_calcqu( int *status ) {
    smfDatas in the current smfArray (i.e. chunk) will relate to the same
    wavelength. Therefore we can use the same parameters for all smfDatas in
    the current smfArray. */
-         sub_instruments = smf_subinst_keymap( concat->sdata[ 0 ], NULL,
+         sub_instruments = smf_subinst_keymap( SMF__SUBINST_NONE,
+                                               concat->sdata[ 0 ], NULL,
                                                0, status );
          config = kpg1Config( "CONFIG", "$SMURF_DIR/smurf_calcqu.def",
                                sub_instruments, status );

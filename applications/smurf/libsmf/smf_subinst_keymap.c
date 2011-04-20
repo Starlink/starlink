@@ -13,16 +13,20 @@
 *     Library routine
 
 *  Invocation:
-*     keymap = smf_subinst_keymap(  const smfData * indata, const Grp * igrp, size_t idx,
-*                       int * status );
+*     keymap = smf_subinst_keymap( smf_subinst_t subinst, const smfData * indata,
+*                                  const Grp * igrp, size_t idx, int * status );
 
 *  Arguments:
+*     subinst = smf_subinst_t (Given)
+*        The current sub-instrument. I the supplied, value is SMF__SUBINST_NONE,
+*        the current sub-instrument will be determined from "indata" or "igrp/idx".
 *     indata = const smfData * (Given)
-*        If non-null, the header of this smfData will be used to define the current
-*        sub-instrument.
+*        If non-null and if subinst is SMF__SUBINST_NONE, the header of this
+*        smfData will be used to define the current sub-instrument.
 *     igrp = const Grp * (Given)
-*        If non-null and if indata is non-null, the group (along with idx) will
-*        be used to determine which file should be opened.
+*        If non-null and if indata is non-null and if subinst is
+*        SMF__SUBINST_NONE, the group (along with idx) will be used to
+*        determine which file should be opened.
 *     idx = size_t (Given)
 *        index into igrp.
 *     status = int* (Given and Returned)
@@ -41,15 +45,18 @@
 
 *  Authors:
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     DSB: David Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     2010-06-08 (TIMJ):
 *        Initial version
+*     2011-04-20 (DSB):
+*        Added argument subinst.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2010 Science and Technology Facilities Council.
+*     Copyright (C) 2010-2011 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -79,8 +86,8 @@
 #include "sae_par.h"
 #include "ast.h"
 
-AstKeyMap *smf_subinst_keymap( const smfData * indata, const Grp * igrp, size_t idx,
-                               int * status ) {
+AstKeyMap *smf_subinst_keymap( smf_subinst_t subinst, const smfData * indata,
+                               const Grp * igrp, size_t idx, int * status ) {
 
   const smfHead * hdr = NULL;        /* Header of file to be examined */
   size_t i;
@@ -89,9 +96,9 @@ AstKeyMap *smf_subinst_keymap( const smfData * indata, const Grp * igrp, size_t 
 
   if (*status != SAI__OK) return NULL;
 
-  if (!indata && !igrp) {
+  if (subinst == SMF__SUBINST_NONE && !indata && !igrp) {
     *status = SAI__ERROR;
-    errRep( "", "Must supply either a smfData or a Grp"
+    errRep( "", "Must supply either a subinst, a smfData or a Grp"
             " (possible programming error)", status );
     return NULL;
   }
@@ -105,21 +112,24 @@ AstKeyMap *smf_subinst_keymap( const smfData * indata, const Grp * igrp, size_t 
     if (substr) astMapPut0I( sub_instruments, substr, 0, NULL );
   }
 
-  /* Now look at the file. Use indata in preference to the group */
-  if (indata) {
-    hdr = indata->hdr;
-  } else {
-    smf_open_file( igrp, idx, "READ", SMF__NOCREATE_DATA, &sub_data, status );
-    if (sub_data) {
-      hdr = sub_data->hdr;
+  /* If the current sub-instrument has not been supplied, get it from the file.
+     Use indata in preference to the group */
+  if( subinst == SMF__SUBINST_NONE ) {
+    if (indata) {
+      hdr = indata->hdr;
+    } else {
+      smf_open_file( igrp, idx, "READ", SMF__NOCREATE_DATA, &sub_data, status );
+      if (sub_data) {
+        hdr = sub_data->hdr;
+      }
     }
+    if (hdr) subinst = smf_calc_subinst( hdr, status );
   }
 
-  if (hdr) {
-    smf_subinst_t subinst = smf_calc_subinst( hdr, status );
+  /* flag this as being the relevant sub-instrument */
+  if (subinst != SMF__SUBINST_NSUBINST ) {
     const char * substr = smf_subinst_str( subinst, status );
     if (substr) {
-      /* flag this as being the relevant sub-instrument */
       astMapPut0I( sub_instruments, substr, 1, NULL );
     }
   }

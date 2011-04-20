@@ -241,7 +241,8 @@ void smurf_fixsteps( int *status ) {
    use the map-maker defaults file here so that we populate the locked
    keymap with all the parameters that people may come across to allow
    them to load their map-maker config directly this application. */
-   sub_instruments = smf_subinst_keymap( data, NULL, 0, status );
+   sub_instruments = smf_subinst_keymap( SMF__SUBINST_NONE, data, NULL, 0,
+                                         status );
    keymap = kpg1Config( "CONFIG", "$SMURF_DIR/smurf_makemap.def",
                         sub_instruments, status );
    sub_instruments = astAnnul( sub_instruments );

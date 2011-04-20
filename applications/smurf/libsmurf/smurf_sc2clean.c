@@ -348,7 +348,8 @@ void smurf_sc2clean( int *status ) {
          config directly into sc2clean.
       */
 
-      sub_instruments = smf_subinst_keymap( concat->sdata[0], NULL, 0, status );
+      sub_instruments = smf_subinst_keymap( SMF__SUBINST_NONE,
+                                            concat->sdata[0], NULL, 0, status );
       keymap = kpg1Config( "CONFIG", "$SMURF_DIR/smurf_makemap.def",
                            sub_instruments, status );
       if( sub_instruments ) sub_instruments = astAnnul( sub_instruments );

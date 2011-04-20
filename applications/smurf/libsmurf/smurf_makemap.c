@@ -1334,7 +1334,8 @@ void smurf_makemap( int *status ) {
          subinstrument we are actively interested in for merging
          purposes. We need to open a representative file for that. */
 
-      AstKeyMap * sub_instruments = smf_subinst_keymap( NULL, igrp, 1, status );
+      AstKeyMap * sub_instruments = smf_subinst_keymap( SMF__SUBINST_NONE,
+                                                        NULL, igrp, 1, status );
       keymap = kpg1Config( "CONFIG", "$SMURF_DIR/smurf_makemap.def",
                            sub_instruments, status );
       sub_instruments = astAnnul( sub_instruments );
