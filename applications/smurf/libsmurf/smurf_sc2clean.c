@@ -331,7 +331,7 @@ void smurf_sc2clean( int *status ) {
     /* Concatenate this continuous chunk */
     smf_concat_smfGroup( wf, igroup, usedarks ? darks:NULL, bbms, flatramps,
                          contchunk, ensureflat, 1, NULL, 0, NULL, NULL,
-                         padStart, padEnd, 0, 1, &concat, status );
+                         padStart, padEnd, 0, 1, &concat, NULL, status );
 
     if( *status == SAI__OK) {
       AstKeyMap *keymap=NULL;

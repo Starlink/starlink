@@ -1147,7 +1147,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         smf_concat_smfGroup( wf, igroup, darks, bbms, flatramps, contchunk,
                              ensureflat, 0, outfset, moving, lbnd_out,
                              ubnd_out, pad, pad, SMF__NOCREATE_VARIANCE, tstep,
-                             &res[0], status );
+                             &res[0], NULL, status );
 
         /* Assign each time slice to a scan angle bin */
         smf_find_thetabins( res[0]->sdata[0], 1, &thetabins, &thetabincen,

@@ -283,7 +283,8 @@ void smurf_calcnoise( int *status ) {
     /* Concatenate this continuous chunk but forcing a raw data read.
        We will need quality. */
     smf_concat_smfGroup( wf, igroup, NULL, NULL, NULL, contchunk, 0, 1,
-                         NULL, 0, NULL, NULL, 0, 0, 0, 1, &concat, status );
+                         NULL, 0, NULL, NULL, 0, 0, 0, 1, &concat, NULL,
+                         status );
 
     /* Now loop over each subarray */
     /* Export concatenated data for each subarray to NDF file */

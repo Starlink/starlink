@@ -20,7 +20,8 @@
  *                          AstFrameSet *outfset, int moving,
  *                          int *lbnd_out, int *ubnd_out, dim_t req_padStart,
  *                          dim_t req_padEnd, int flags, int tstep,
- *                          smfArray **concat, int *status )
+ *                          smfArray **concat, smf_subinst_t *subinst,
+ *                          int *status )
 
  *  Arguments:
  *     wf = smfWorkForce * (Given)
@@ -67,19 +68,29 @@
  *        The increment in time slices between full Mapping calculations.
  *        The Mapping for intermediate time slices will be approximated.
  *     concat = smfArray ** (Returned)
- *        smfArray containing concatenated data for each subarray
+ *        smfArray containing concatenated data for each subarray. The
+ *        supplied pointer may be NULL, in which case "subinst" argument
+ *        is assigned a value and this functon then returns without doing
+ *        anything else.
+ *     subinst = smf_subinst_t * (Returned)
+ *        Pointer to a variable in which to return the identifier for the
+ *        subinstrument (one of SMF__SUBINST_450 or SMF__SUBINST_850)
+ *        that produced the concatenated data. May be NULL.
  *     status = int* (Given and Returned)
  *        Pointer to global status.
 
  *  Description:
- *     This function takes an input group containing data taken continuously,
- *     but chopped up into smaller files (possibly from multiple subarrays).
- *     This routine attempts to load all of the data into memory at once,
- *     concatenates it into a single contiguous piece of memory for each
- *     subarray, and optionally re-orders the data to bolo-ordered rather
- *     than time-ordered if desired. If a pointing LUT is to be calculated
- *     as data is being loaded, specify outfset, moving, lbnd_out and
- *     ubnd_out. Otherwise set outfset to NULL.
+ *     This function takes an input group containing data taken
+ *     continuously, but chopped up into smaller files (possibly from
+ *     multiple subarrays). It first finds the subinstrument identifier
+ *     for the data in the requested chunk (returned via argument
+ *     "subinst"). If "concat" is not NULL, it then attempts to load all
+ *     of the data into memory at once, concatenates it into a single
+ *     contiguous piece of memory for each subarray, and optionally
+ *     re-orders the data to bolo-ordered rather than time-ordered if
+ *     desired. If a pointing LUT is to be calculated as data is being
+ *     loaded, specify outfset, moving, lbnd_out and ubnd_out. Otherwise
+ *     set outfset to NULL.
  *
  *     In the case of 4D FFT data, no concatenation is performed. Each input
  *     file (subarray) at the given "whichchunk" is propagated as-is to concat.
@@ -201,6 +212,9 @@
  *        Copy instap and telpos from reference header to returned header.
  *     2011-04-07 (DSB):
  *        Open files in a separate thread.
+ *     2011-04-20(DSB):
+ *        - Added argument subinst.
+ *        - Allow "concat" to be null.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -259,7 +273,8 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                           AstFrameSet *outfset, int moving,
                           int *lbnd_out, int *ubnd_out, dim_t req_padStart,
                           dim_t req_padEnd, int flags, int tstep,
-                          smfArray **concat, int *status ) {
+                          smfArray **concat, smf_subinst_t *subinst,
+                          int *status ) {
 
   /* Local Variables */
   size_t bstr;                  /* Concatenated bolo stride */
@@ -311,6 +326,9 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
   dim_t tstart;                 /* Time at end of padded region */
   size_t tstr;                  /* Concatenated time slice stride */
 
+  /* Initialise returned values. */
+  if( subinst ) *subinst = SMF__SUBINST_NONE;
+
   /* Main routine */
   if (*status != SAI__OK) return;
 
@@ -349,8 +367,8 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
     return;
   }
 
-  /* Allocate space for the smfArray */
-  *concat = smf_create_smfArray( status );
+  /* Allocate space for the smfArray if required. */
+  if( concat ) *concat = smf_create_smfArray( status );
 
   /* Determine how many subarrays there actually are in this chunk*/
   nrelated = 0;
@@ -365,7 +383,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
   /* Allocate space for array of downsampled lengths for each file */
   dslen = astCalloc( lastpiece-firstpiece+1, sizeof(*dslen), 1 );
 
-  /* Loop over related elements (number of subarrays) */
+  /* Loop over related elements (number of subarrays). */
   for( i=0; (*status == SAI__OK) && i<nrelated; i++ ) {
     /* Initialize time length of concatenated array. We will add on
        padding if the first and last files have not already recevied
@@ -513,9 +531,23 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
         tlen += reftlen;
       }
 
+      /* If required return the sub-instrument identifier for the data
+         being concatenated. */
+      if( subinst && *subinst == SMF__SUBINST_NONE ) {
+        *subinst = smf_calc_subinst( refdata->hdr, status );
+      }
+
       /* Close the reference file */
       smf_close_file( &refdata, status );
+
+      /* If we are not concatenating any data, we can leave the "j"
+         loop now that we have determined the returned subinst value. */
+      if( !concat ) break;
     }
+
+    /* If we are not concatenating any data, we can leave the "i" loop now
+       that we have determined the returned subinst value. */
+    if( !concat ) break;
 
     if( isFFT ) {
       /* **********************************************************************
@@ -1085,11 +1117,9 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
 
 
 
-
-
     /* Put this concatenated subarray (or directly copied subarray in the
        case of an FFT) into the smfArray */
-    smf_addto_smfArray( *concat, data, status );
+    if( concat ) smf_addto_smfArray( *concat, data, status );
   }
 
   /* Clean up */
