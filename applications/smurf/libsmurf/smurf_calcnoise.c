@@ -122,6 +122,7 @@
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
+*     David S Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -160,7 +161,7 @@
 *        Let the NEP output image be blank.
 *     2011-04-19 (TIMJ):
 *        Presence of DA struct is not enough to determine if flatfield is available.
-*     2011-04-20 (TIMJ):
+*     2011-04-20 (DSB):
 *        - Clean the arrays before calculating the noise.
 *        - Added CONFIG parameter.
 *        - When calling smf_bolonoise, only apodize if ZEROPAD is set (as done in 
@@ -330,7 +331,7 @@ void smurf_calcnoise( int *status ) {
     size_t idx;
 
     /* Get the first smfData that will contribute to this continuous chunk,
-       but do concatanate the data just yet. */
+       but do not concatanate the data just yet. */
     smf_concat_smfGroup( wf, igroup, NULL, NULL, NULL, contchunk, 0, 1,
                          NULL, 0, NULL, NULL, 0, 0, 0, 1, NULL, &firstdata,
                          status );
