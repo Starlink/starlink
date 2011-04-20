@@ -43,15 +43,18 @@
 *  Authors:
 *     EC: Edward Chapin (UBC)
 *     DSB: David S Berry (JAC, Hawaii)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     4-OCT-2010 (DSB):
 *        Original version (copied from smf_filter_fromkeymap.c by EC).
+*     2011-04-20 (TIMJ):
+*        More explicit error message
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2010-2011 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -94,11 +97,17 @@ void smf_scale2freq( double f_edgesmall, double f_edgelarge,
    if( f_edgesmall || f_edgelarge ) {
 
 /* Check the supplied header is usable. If not, report an error. */
-      if( !hdr || ( hdr->scanvel <= 0 ) ) {
+      if( !hdr ) {
         *status = SAI__ERROR;
         errRep( "", "smf_scale2freq: FILT_EDGE_SMALLSCALE or "
-                "FILT_EDGE_LARGESCALE, but no smfHead supplied or "
-                "invalid smfHead->scanvel", status );
+                "FILT_EDGE_LARGESCALE, but no smfHead supplied",
+                 status );
+
+      } else if ( hdr->scanvel <= 0 ) {
+        *status = SAI__ERROR;
+        errRep( "", "smf_scale2freq: FILT_EDGE_SMALLSCALE or "
+                "FILT_EDGE_LARGESCALE, but telescope was stationary",
+                 status );
 
 /* Ohterwise convert the supplied values. */
       } else {
