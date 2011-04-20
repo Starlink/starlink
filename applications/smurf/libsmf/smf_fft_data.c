@@ -97,6 +97,10 @@
 *        Removed SMF__NOCREATE_FTS in order to propagate the smfFts data.
 *     2011-04-14 (DSB):
 *        Ensure gaps are filled even if apodisation and zero padding are being used.
+*     2011-20-14 (DSB):
+*        If the input smfData is time ordered, we need to re-order the
+*        quality array when copying it into the FFTed smfData (which is
+*        always bolometer ordered).
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -266,6 +270,8 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
   fftw_iodim dims;              /* I/O dimensions for transformations */
   AstCmpMap *fftmapping=NULL;   /* Mapping from GRID to curframe2d */
   int i;                        /* Loop counter */
+  size_t inbstr;                /* Bolometer stride in input data */
+  size_t intstr;                /* Time slice stride in input data */
   int isFFT=0;                  /* Are the input data freq. domain? */
   size_t j;                     /* Loop counter */
   smfFFTData *job_data=NULL;    /* Array of job data for each thread */
@@ -314,8 +320,8 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
      parts along the last index. */
 
   if( indata->ndims == 3 ) {
-    smf_get_dims( indata, NULL, NULL, &nbolo, &ntslice, NULL, NULL, NULL,
-                  status );
+    smf_get_dims( indata, NULL, NULL, &nbolo, &ntslice, NULL, &inbstr,
+                  &intstr, status );
     nf = ntslice/2 + 1;
     isFFT = 0;
   } else if( (indata->ndims==4) && (indata->dims[3]==2) ) {
@@ -340,7 +346,7 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
      apodization will not be propagated back to the input
      smfData since we work on the copy. We therefore create
      a workspace copy of the quality. Re-ordering is also done
-     if needed. */
+     if needed to ensure the copy is bolometer ordered. */
   data = smf_deepcopy_smfData( indata, 0,
                                SMF__NOCREATE_VARIANCE |
                                SMF__NOCREATE_QUALITY |
@@ -354,11 +360,20 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
     const smf_qual_t *inqual = smf_select_cqualpntr( indata, NULL, status );
 
     /* we know that "data" does not have a quality component because
-       we did a deepcopy without copying it */
+       we did a deepcopy without copying it. If the input quality array is in 
+       the required order (bolometer order) just copy it. Otherwise, reorder
+       and copy it. */
     if (inqual) {
-      data->qual = astCalloc( nbolo * ntslice, sizeof(*(data->qual)), 0 );
-      if (data->qual) memcpy( data->qual, inqual, nbolo*ntslice *
-                              sizeof(*(data->qual)) );
+      if( indata->isTordered == 0 ) {
+         data->qual = astCalloc( nbolo * ntslice, sizeof(*(data->qual)), 0 );
+         if (data->qual) memcpy( data->qual, inqual,
+                                 nbolo*ntslice * sizeof(*(data->qual)) );
+      } else {
+         data->qual = smf_dataOrder_array( (void *) inqual, SMF__QUALTYPE,
+                                           nbolo*ntslice, ntslice, nbolo,
+                                           intstr, inbstr, 1, nbolo, 0, 0,
+                                           status );
+      }
     }
 
 
