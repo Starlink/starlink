@@ -20,7 +20,7 @@
  *                          AstFrameSet *outfset, int moving,
  *                          int *lbnd_out, int *ubnd_out, dim_t req_padStart,
  *                          dim_t req_padEnd, int flags, int tstep,
- *                          smfArray **concat, smf_subinst_t *subinst,
+ *                          smfArray **concat, smfData **first,
  *                          int *status )
 
  *  Arguments:
@@ -69,23 +69,22 @@
  *        The Mapping for intermediate time slices will be approximated.
  *     concat = smfArray ** (Returned)
  *        smfArray containing concatenated data for each subarray. The
- *        supplied pointer may be NULL, in which case "subinst" argument
+ *        supplied pointer may be NULL, in which case "first" argument
  *        is assigned a value and this functon then returns without doing
  *        anything else.
- *     subinst = smf_subinst_t * (Returned)
- *        Pointer to a variable in which to return the identifier for the
- *        subinstrument (one of SMF__SUBINST_450 or SMF__SUBINST_850)
- *        that produced the concatenated data. May be NULL.
+ *     first = smfData ** (Returned)
+ *        Address of a smfData pointer in which to return a pointer to a
+ *        deep copy of the first smfData in the requested chunk. May be NULL.
  *     status = int* (Given and Returned)
  *        Pointer to global status.
 
  *  Description:
  *     This function takes an input group containing data taken
  *     continuously, but chopped up into smaller files (possibly from
- *     multiple subarrays). It first finds the subinstrument identifier
- *     for the data in the requested chunk (returned via argument
- *     "subinst"). If "concat" is not NULL, it then attempts to load all
- *     of the data into memory at once, concatenates it into a single
+ *     multiple subarrays). It returns a smfData for the first input
+ *     data file that contributes to the requested chunk (returned via
+ *     argument "first"). If "concat" is not NULL, it then attempts to load
+ *     all of the data into memory at once, concatenates it into a single
  *     contiguous piece of memory for each subarray, and optionally
  *     re-orders the data to bolo-ordered rather than time-ordered if
  *     desired. If a pointing LUT is to be calculated as data is being
@@ -213,7 +212,7 @@
  *     2011-04-07 (DSB):
  *        Open files in a separate thread.
  *     2011-04-20(DSB):
- *        - Added argument subinst.
+ *        - Added argument first.
  *        - Allow "concat" to be null.
  *     {enter_further_changes_here}
 
@@ -273,8 +272,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                           AstFrameSet *outfset, int moving,
                           int *lbnd_out, int *ubnd_out, dim_t req_padStart,
                           dim_t req_padEnd, int flags, int tstep,
-                          smfArray **concat, smf_subinst_t *subinst,
-                          int *status ) {
+                          smfArray **concat, smfData **first, int *status ) {
 
   /* Local Variables */
   size_t bstr;                  /* Concatenated bolo stride */
@@ -327,7 +325,8 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
   size_t tstr;                  /* Concatenated time slice stride */
 
   /* Initialise returned values. */
-  if( subinst ) *subinst = SMF__SUBINST_NONE;
+  if( first ) *first = NULL;
+  if( concat ) *concat = NULL;
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -531,22 +530,22 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
         tlen += reftlen;
       }
 
-      /* If required return the sub-instrument identifier for the data
-         being concatenated. */
-      if( subinst && *subinst == SMF__SUBINST_NONE ) {
-        *subinst = smf_calc_subinst( refdata->hdr, status );
+      /* If required return a deep copy of the first data being
+         concatenated. */
+      if( first && *first == NULL ) {
+        *first = smf_deepcopy_smfData( refdata, 0, 0, 0, 0, status );
       }
 
       /* Close the reference file */
       smf_close_file( &refdata, status );
 
       /* If we are not concatenating any data, we can leave the "j"
-         loop now that we have determined the returned subinst value. */
+         loop now that we have the returned "first" value. */
       if( !concat ) break;
     }
 
     /* If we are not concatenating any data, we can leave the "i" loop now
-       that we have determined the returned subinst value. */
+       that we have determined the returned "first" value. */
     if( !concat ) break;
 
     if( isFFT ) {

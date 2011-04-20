@@ -733,7 +733,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                           AstFrameSet *outfset, int moving,
                           int *lbnd_out, int *ubnd_out, dim_t padStart,
                           dim_t padEnd, int flags,  int tstep,
-                          smfArray **concat, smf_subinst_t *subinst,
+                          smfArray **concat, smfData **first,
                           int *status );
 
 smfDA *smf_construct_smfDA( smfDA * tofill, smfData *dksquid, double * flatcal,
