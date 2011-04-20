@@ -20,13 +20,48 @@
 *        Pointer to global status.
 
 *  Description:
-*     This routine calculates the white noise on the array by performing
-*     an FFT to generate a power spectrum and then extracting the
-*     data between two frequency ranges. It additionally calculates an
-*     NEP image and an image of the ratio of the power at a specified
-*     frequency to the whitenoise.
+*     This routine cleans the supplied data and then calculates the white
+*     noise on the array by performing an FFT to generate a power spectrum
+*     and then extracting the data between two frequency ranges. It
+*     additionally calculates an NEP image and an image of the ratio of
+*     the power at a specified frequency to the whitenoise.
 
 *  ADAM Parameters:
+*     CONFIG = GROUP (Read)
+*          Specifies values for the cleaning parameters. If the string
+*          "def" (case-insensitive) or a null (!) value is supplied, a
+*          set of default configuration parameter values will be used.
+*
+*          The supplied value should be either a comma-separated list of
+*          strings or the name of a text file preceded by an up-arrow
+*          character "^", containing one or more comma-separated lists of
+*          strings. Each string is either a "keyword=value" setting, or
+*          the name of a text file preceded by an up-arrow character
+*          "^". Such text files should contain further comma-separated
+*          lists which will be read and interpreted in the same manner
+*          (any blank lines or lines beginning with "#" are
+*          ignored). Within a text file, newlines can be used as
+*          delimiters, as well as commas. Settings are applied in the
+*          order in which they occur within the list, with later
+*          settings over-riding any earlier settings given for the same
+*          keyword.
+*
+*          Each individual setting should be of the form:
+*
+*             <keyword>=<value>
+*
+*          The available parameters are identical to the cleaning
+*          parameters used by the iterative map-maker (method=ITER)
+*          and the list of parameters is explained in the "Configuration
+*          Parameters" section of the MAKEMAP documentation, and can be
+*          found, with defaults, in $SMURF_DIR/smurf_sc2clean.def.  Default
+*          values will be used for any unspecified parameters. Assigning
+*          the value "<def>" (case insensitive) to a keyword has the
+*          effect of resetting it to its default value. Options
+*          available to the map-maker but not understood by CALCNOISE
+*          will be ignored. Parameters not understood will trigger an
+*          error. Use the "cleandk." namespace for configuring
+*          cleaning parameters for the dark squids. [current value]
 *     FLATMETH = _CHAR (Read)
 *          Method to use to calculate the flatfield solution. Options
 *          are POLYNOMIAL and TABLE. Polynomial fits a polynomial to
@@ -125,6 +160,11 @@
 *        Let the NEP output image be blank.
 *     2011-04-19 (TIMJ):
 *        Presence of DA struct is not enough to determine if flatfield is available.
+*     2011-04-20 (TIMJ):
+*        - Clean the arrays before calculating the noise.
+*        - Added CONFIG parameter.
+*        - When calling smf_bolonoise, only apodize if ZEROPAD is set (as done in 
+*          the makemap NOI model).
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -189,22 +229,31 @@ smf__create_bolfile_extension( const Grp * ogrp, size_t gcount,
 
 void smurf_calcnoise( int *status ) {
 
+  smfArray *array = NULL;   /* Data to be cleaned */
   Grp * basegrp = NULL;     /* Basis group for output filenames */
-  smfArray *concat=NULL;     /* Pointer to a smfArray */
-  size_t contchunk;          /* Continuous chunk counter */
+  smfArray *concat=NULL;    /* Pointer to a smfArray */
+  size_t contchunk;         /* Continuous chunk counter */
+  int dkclean;              /* Clean dark squids? */
+  double downsampscale;     /* Downsample factor to preserve this scale */
   Grp *fgrp = NULL;         /* Filtered group, no darks */
+  smfData *firstdata=NULL;  /* First smfData in the current chunk */
   smfArray * flatramps = NULL; /* Flatfield ramps */
-  size_t gcount=0;           /* Grp index counter */
+  size_t gcount=0;          /* Grp index counter */
   size_t i=0;               /* Counter, index */
   Grp *igrp = NULL;         /* Input group of files */
-  smfGroup *igroup=NULL;     /* smfGroup corresponding to igrp */
-  dim_t maxconcat=0;         /* Longest continuous chunk length in samples */
-  size_t ncontchunks=0;      /* Number continuous chunks outside iter loop */
+  smfGroup *igroup=NULL;    /* smfGroup corresponding to igrp */
+  AstKeyMap *keymap=NULL;   /* KeyMap holding configuration parameters */
+  dim_t maxconcat=0;        /* Longest continuous chunk length in samples */
+  size_t ncontchunks=0;     /* Number continuous chunks outside iter loop */
+  smfData *odata = NULL;    /* Pointer to output data struct */
   Grp *ogrp = NULL;         /* Output group of files */
   size_t outsize;           /* Total number of NDF names in the output group */
+  dim_t pad;                /* No. of samples of padding at start and end */
   Grp *powgrp = NULL;       /* Group for output power spectra */
   size_t size;              /* Number of files in input group */
+  AstKeyMap *sub_instruments=NULL; /* KeyMap holding subinstrument names */
   smfWorkForce *wf = NULL;  /* Pointer to a pool of worker threads */
+  int zeropad;              /* Pad with zeros before FFTing? */
   double f_low = 0.5;       /* Frequency to use for noise ratio image */
   double freqdef[] = { SMF__F_WHITELO,
                        SMF__F_WHITEHI }; /* Default values for frequency range */
@@ -280,11 +329,86 @@ void smurf_calcnoise( int *status ) {
   for( contchunk=0;(*status==SAI__OK)&&contchunk<ncontchunks; contchunk++ ) {
     size_t idx;
 
-    /* Concatenate this continuous chunk but forcing a raw data read.
-       We will need quality. */
+    /* Get the first smfData that will contribute to this continuous chunk,
+       but do concatanate the data just yet. */
     smf_concat_smfGroup( wf, igroup, NULL, NULL, NULL, contchunk, 0, 1,
-                         NULL, 0, NULL, NULL, 0, 0, 0, 1, &concat, NULL,
+                         NULL, 0, NULL, NULL, 0, 0, 0, 1, NULL, &firstdata,
                          status );
+
+    /* Get the configuration parameters to use, selecting the values
+       approproate to the subinstrument that generated this continuous
+       chunk. Do this inside the loop in case we are processing chunks
+       from differing sub-instruments. Note that we use the map-maker
+       defaults file here so that we populate the locked keymap with all
+       the parameters that people may come across to allow them to load
+       their map-maker config directly into calcnoise. */
+    sub_instruments = smf_subinst_keymap( SMF__SUBINST_NONE, firstdata, NULL,
+                                          0, status );
+    keymap = kpg1Config( "CONFIG", "$SMURF_DIR/smurf_makemap.def",
+                         sub_instruments, status );
+    if( sub_instruments ) sub_instruments = astAnnul( sub_instruments );
+
+    /* Are we downsampling the data? */
+    astMapGet0D( keymap, "DOWNSAMPSCALE", &downsampscale );
+
+    /* Get the padding to use. */
+    pad = smf_get_padding( keymap, downsampscale, 0, firstdata->hdr, status );
+
+    /* Free the first smfData. */
+    smf_close_file( &firstdata, status );
+
+    /* Now that we have the padding, concatenate this continuous chunk but
+       forcing a raw data read. We will need quality. */
+    smf_concat_smfGroup( wf, igroup, NULL, NULL, NULL, contchunk, 0, 1,
+                         NULL, 0, NULL, NULL, pad, pad, 0, 1, &concat, NULL,
+                         status );
+
+    /* Clean the dark squids now since we might need to use them
+       to clean the bolometer data */
+    smf_get_cleanpar( keymap, NULL, NULL, NULL, NULL, NULL, NULL, &dkclean,
+                      NULL, &zeropad, NULL, NULL, NULL, NULL, NULL, NULL,
+                      NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+                      NULL, NULL, NULL, status );
+
+    for( idx=0; dkclean&&(*status==SAI__OK)&&idx<concat->ndat; idx++ ) {
+      odata = concat->sdata[idx];
+
+      if( odata && odata->da && odata->da->dksquid ) {
+        smfData *dksquid = odata->da->dksquid;
+        AstKeyMap *kmap=NULL;
+
+        msgOut("", TASK_NAME ": cleaning dark squids", status);
+
+        /* fudge the header so that we can get at JCMTState */
+        dksquid->hdr = odata->hdr;
+
+        /* clean darks using cleandk.* parameters */
+        astMapGet0A( keymap, "CLEANDK", &kmap );
+        array = smf_create_smfArray( status );
+        smf_addto_smfArray( array, dksquid, status );
+        smf_clean_smfArray( wf, array, NULL, kmap, status );
+        if( array ) {
+          array->owndata = 0;
+          smf_close_related( &array, status );
+        }
+        if( kmap ) kmap = astAnnul( kmap );
+
+        /* Unset hdr pointer so that we don't accidentally close it */
+        dksquid->hdr = NULL;
+      }
+    }
+
+    /* Then clean the main data arrays */
+    msgOut("", TASK_NAME ": cleaning bolometer data", status );
+    smf_clean_smfArray( wf, concat, NULL, keymap, status );
+
+    /* Report statistics (currently need a smfArray for that) */
+    if (*status == SAI__OK) {
+      size_t last_qcount[SMF__NQBITS];
+      size_t last_nmap = 0;
+      smf_qualstats_report( MSG__VERB, SMF__QFAM_TSERIES, 1, concat,
+                            last_qcount, &last_nmap, 1, NULL, NULL, status );
+    }
 
     /* Now loop over each subarray */
     /* Export concatenated data for each subarray to NDF file */
@@ -334,7 +458,7 @@ void smurf_calcnoise( int *status ) {
         if (*status == SAI__OK) {
           double * od = (outdata->pntr)[0];
           smf_bolonoise( wf, thedata, 0, f_low, freqs[0], freqs[1],
-                         1, SMF__MAXAPLEN,
+                         1, zeropad ? SMF__MAXAPLEN : SMF__BADSZT,
                          (outdata->pntr)[0], (ratdata->pntr)[0],
                          (powgrp ? &powdata : NULL), status );
 
@@ -481,6 +605,8 @@ void smurf_calcnoise( int *status ) {
     /* Close the smfArray */
     smf_close_related( &concat, status );
 
+    /* Annul the configuration keymap. */
+    keymap = astAnnul( keymap );
   }
 
  CLEANUP:

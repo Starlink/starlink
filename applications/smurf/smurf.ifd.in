@@ -452,6 +452,14 @@ package @PACKAGE@ {
 
             helplib {$SMURF_HELP}
 
+            parameter config {
+                type LITERAL
+                access READ
+                ppath CURRENT
+                prompt {Configuration parameters}
+                helpkey *
+            }
+
             parameter flow {
                 type _DOUBLE
                 vpath DEFAULT
