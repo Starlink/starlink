@@ -123,10 +123,12 @@
 *        Assign flatramp flatfields to noise data correctly.
 *     2010-12-07 (TIMJ):
 *        Let the NEP output image be blank.
+*     2011-04-19 (TIMJ):
+*        Presence of DA struct is not enough to determine if flatfield is available.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2009-2010 Science and Technology Facilities Council.
+*     Copyright (C) 2009-2011 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -360,7 +362,7 @@ void smurf_calcnoise( int *status ) {
           size_t ngood = 0;
           smfData * respmap = NULL;
 
-          if (da) {
+          if (da && da->nflat) {
             smf_create_bolfile( NULL, 1, thedata, "Responsivity", "A/W",
                                 0, &respmap, status );
             if (*status == SAI__OK) {
