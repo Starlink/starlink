@@ -173,6 +173,7 @@
 *          the makemap NOI model).
 *     2011-04-20 (TIMJ):
 *        CONFIG=! disables all cleaning and uses full apodization.
+*        Use rt(s) instead of /rt(Hz) for noise units.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -471,7 +472,7 @@ void smurf_calcnoise( int *status ) {
 
         one_strlcpy( noiseunits, thedata->hdr->units, sizeof(noiseunits), status );
         if (strlen(noiseunits)) one_strlcat( noiseunits, " ", sizeof(noiseunits), status );
-        one_strlcat( noiseunits, "Hz**-0.5", sizeof(noiseunits), status );
+        one_strlcat( noiseunits, "s**0.5", sizeof(noiseunits), status );
 
         /* Create the output file if required, else a malloced smfData */
         smf_create_bolfile( ogrp, gcount, thedata, "Noise",
@@ -554,7 +555,7 @@ void smurf_calcnoise( int *status ) {
             /* now create the output image for NEP data */
             nepdata = smf__create_bolfile_extension( ogrp, gcount, thedata,
                                                      ".MORE.SMURF.NEP", "NEP",
-                                                     "W Hz**-0.5", status );
+                                                     "W s**0.5", status );
 
             /* and divide the noise data by the responsivity
                correcting for SIMULT */

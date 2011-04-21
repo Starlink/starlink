@@ -62,6 +62,8 @@
 *     2011-04-14 (DSB):
 *        Remove gap filling since it is done in smf_fft_data (called by
 *        bolonoise).
+*     2011-04-20 (TIMJ):
+*        Use rt(s) instead of /rt(Hz) for noise units.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -117,7 +119,7 @@ void smf_mask_noisy( smfWorkForce *wf, smfData *data, smfData **noise,
                 NULL, NULL, status );
 
   /* Create some space for the result */
-  smf_create_bolfile( NULL, 1, data, "Noise", "blahs Hz**-0.5",
+  smf_create_bolfile( NULL, 1, data, "Noise", "blahs s**0.5",
                       0, &noisemap, status );
   if (noisemap) noisedata = (noisemap->pntr)[0];
 
@@ -158,7 +160,7 @@ void smf_mask_noisy( smfWorkForce *wf, smfData *data, smfData **noise,
         noisedata[i] = VAL__BADD;
       }
     }
-    msgOutiff( MSG__VERB, "", "Removed %zu bolometers with noise exceeding %g %s Hz**-0.5",
+    msgOutiff( MSG__VERB, "", "Removed %zu bolometers with noise exceeding %g %s s**0.5",
                status, nmasked, thrhi, data->hdr->units );
   }
 
