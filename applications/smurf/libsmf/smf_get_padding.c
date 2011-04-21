@@ -63,12 +63,14 @@
 *        - Get the stepsize from the supplied header, rather than using an
 *        argument to supply the stepsize.
 *        - Take account of any downsampling.
+*     2011-04-20 (TIMJ):
+*        Trap for a stationary telescope when working out padding.
 *     {enter_further_changes_here}
 
 *  Notes:
 
 *  Copyright:
-*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2010-2011 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -99,6 +101,7 @@
 #include "ast_err.h"
 
 /* SMURF includes */
+#include "libsmf/smf_err.h"
 #include "libsmf/smf.h"
 
 dim_t smf_get_padding( AstKeyMap *keymap, double downsampscale, int report,
@@ -163,8 +166,13 @@ dim_t smf_get_padding( AstKeyMap *keymap, double downsampscale, int report,
       } else {
 
 /* Modify edge filters if spatial scales were requested */
-         smf_scale2freq( filt_edgesmall, filt_edgelarge, hdr, &filt_edgelow,
-                         &filt_edgehigh, status );
+         if( *status == SAI__OK ) {
+            smf_scale2freq( filt_edgesmall, filt_edgelarge, hdr, &filt_edgelow,
+                            &filt_edgehigh, status );
+            if( *status == SMF__TELSTAT ) {
+              errAnnul( status );
+            }
+         }
 
 /* Find the lowest of these frequencies. The lowest frequency will give
    the greatest padding. */

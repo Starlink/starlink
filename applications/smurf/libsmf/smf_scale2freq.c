@@ -29,16 +29,18 @@
 *        will have bit SMF__Q_JUMP set.
 *     f_edgelow = double * (Given and Returned)
 *        The low pass frequency, in Hz. The supplied value is left
-*        unchanged if "f_edgesmall" is zero.
+*        unchanged if "f_edgesmall" is zero or the telescope is stationary.
 *     f_edgehigh = double * (Given and Returned)
 *        The high pass frequency, in Hz. The supplied value is left
-*        unchanged if "f_edgelarge" is zero.
+*        unchanged if "f_edgelarge" is zero or the telescope is stationary.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
 *  Description:
 *     Convert low and high pass filter specificiations from spatial
 *     scales to frequencies.
+*
+*     Status is set to SMF__TELSTAT if the telescope is stationary.
 
 *  Authors:
 *     EC: Edward Chapin (UBC)
@@ -51,6 +53,7 @@
 *        Original version (copied from smf_filter_fromkeymap.c by EC).
 *     2011-04-20 (TIMJ):
 *        More explicit error message
+*        Set status to SMF__TELSTAT if the telescope is not moving.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -84,6 +87,7 @@
 
 /* SMURF includes */
 #include "libsmf/smf.h"
+#include "libsmf/smf_err.h"
 #include "libsmf/smf_typ.h"
 
 void smf_scale2freq( double f_edgesmall, double f_edgelarge,
@@ -104,7 +108,7 @@ void smf_scale2freq( double f_edgesmall, double f_edgelarge,
                  status );
 
       } else if ( hdr->scanvel <= 0 ) {
-        *status = SAI__ERROR;
+        *status = SMF__TELSTAT;
         errRep( "", "smf_scale2freq: FILT_EDGE_SMALLSCALE or "
                 "FILT_EDGE_LARGESCALE, but telescope was stationary",
                  status );
