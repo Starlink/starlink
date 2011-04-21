@@ -313,6 +313,7 @@ int *status             /* global status (given and returned) */
    int nc_i;
    const double *c_f;
    const double *c_i;
+   const char *cval;
 
 /* Codes identifying the available optical distortion maps */
    enum distortion_codes {
@@ -1336,7 +1337,8 @@ int *status             /* global status (given and returned) */
    } else {
      /* Only do this if we know it is not AZEL already since it takes
         time for AST to change from AZEL to AZEL */
-     if ( strcmp("AZEL", astGetC(cache->skyframe, "SYSTEM")) != 0 ) {
+     cval = astGetC(cache->skyframe, "SYSTEM");
+     if ( cval && strcmp("AZEL", cval) != 0 ) {
        astSet( cache->skyframe, "system=AzEl" );
      }
    }
@@ -1400,6 +1402,7 @@ int *status               /* global status (given and returned) */
    int frameno;        /* number of frame */
    int nframes;        /* number of frames in the frameset */
    int j;              /* loop counter */
+   const char *cval;
 
    if ( *status != SAI__OK ) return;
 
@@ -1413,7 +1416,8 @@ int *status               /* global status (given and returned) */
    for ( j=nframes; j>0; j-- )
    {
       frame = astGetFrame ( fset, j );
-      if ( strcmp ( name, astGetC ( frame, "DOMAIN" )) == 0 )
+      cval = astGetC ( frame, "DOMAIN" );
+      if ( cval && strcmp( name, cval ) == 0 )
       {
          frameno = j;
          break;
@@ -1771,7 +1775,8 @@ void sc2ast_set_output_system
     astSetC( fset, "SYSTEM", astsys );
 
     astsys = astGetC( fset, "SYSTEM");
-    if (strcmp(astsys,"AZEL") == 0 || strcmp(astsys, "GAPPT") == 0 ) {
+    if ( astsys && ( strcmp(astsys,"AZEL") == 0 ||
+                     strcmp(astsys, "GAPPT") == 0 ) ) {
       astSet( fset, "SkyRefIs=Origin,AlignOffset=1" );
     }
   }
