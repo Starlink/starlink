@@ -37,6 +37,7 @@ maxlen = 0
 #  noi = estimate time-domain variance
 #  smo = time series smoothing using a median or mean boxcar filter
 #  pln = remove plane from each time slice
+#  tmp = remove externally define template such as azimuth
 
 modelorder = (com,gai,ext,flt,ast,noi)
 
@@ -54,7 +55,7 @@ modelorder = (com,gai,ext,flt,ast,noi)
 # written to model components with different dimensions.
 
 exportndf = 0
-#exportndf = (com,gai,ast,flt,dks,smo,pln,res,noi,qua)
+#exportndf = (com,gai,ast,flt,dks,smo,pln,tmp,res,noi,qua)
 
 # Normally all data points in exported model components are set to BAD values
 # wherever there is a bad bolometer established during map-making. Set
@@ -518,3 +519,11 @@ smo.type = median
 # respectively)
 450.smo.boxcar = 2000
 850.smo.boxcar = 600
+
+# The TMP model fits an externally defined template to each bolometer
+# time-series. The only parameter defines what that template
+# is. Presently the only two valid options are "state_az" and
+# "state_el" to use the telescope azimuth and elevation
+# respectively. The former seems to be a good way for removing
+# magnetic field pickup.
+# tmp.source = state_az

@@ -756,6 +756,33 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
             }
             break;
 
+          case SMF__TMP: /* Gain/offset for each bolometer */
+            head.data.dtype = SMF__DOUBLE;
+            head.data.ndims = 3; /* Gain, Offset, Correlation coefficient */
+
+            smf_set_clabels( "Common-mode Gain/Offset/Correlation", "Value",
+                             "", &head.hdr, status );
+
+            /* Note that we're using the time axis to store the coefficients */
+            if( isTordered ) {
+              head.data.dims[0] = (idata->dims)[0];
+              head.data.dims[1] = (idata->dims)[1];
+              head.data.dims[2] = 3;
+
+              head.data.lbnd[0] = (idata->lbnd)[0];
+              head.data.lbnd[1] = (idata->lbnd)[1];
+              head.data.lbnd[2] = 1;
+            } else {
+              head.data.dims[0] = 3;
+              head.data.dims[1] = (idata->dims)[1];
+              head.data.dims[2] = (idata->dims)[2];
+
+              head.data.lbnd[0] = 1;
+              head.data.lbnd[1] = (idata->lbnd)[1];
+              head.data.lbnd[2] = (idata->lbnd)[2];
+            }
+            break;
+
           case SMF__TWO: /* TWO-component common-mode */
             head.data.dtype = SMF__DOUBLE;
             head.data.ndims = 2;
@@ -1083,6 +1110,18 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
                   ((double *)dataptr)[2*nblock*tstride + ibase] = 0.0;
                   ibase += bstride;
                 }
+              }
+            } else if( mtype == SMF__TMP ) {
+              /* Initialize gain to 1, offset to 0, correlation to 0 */
+              smf_get_dims( &(head.data), NULL, NULL, &nbolo, NULL, NULL,
+                             &bstride, &tstride, status);
+
+              ibase = 0;
+              for( l=0; l<nbolo; l++ ) {
+                ((double *)dataptr)[ibase] = 1.0;
+                ((double *)dataptr)[tstride + ibase] = 0.0;
+                ((double *)dataptr)[2*tstride + ibase] = 0.0;
+                ibase += bstride;
               }
 
             } else if( mtype == SMF__TWO ) {

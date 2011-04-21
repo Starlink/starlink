@@ -210,6 +210,11 @@ void smf_model_createHdr( smfData *model, smf_modeltype type,
       fset = astCopy( refwcs );
       break;
 
+    case SMF__TMP:
+      /* Don't know how to make a particularly meaningful framset */
+      fset = NULL;
+      break;
+
     case SMF__TWO:
       /* Don't know how to make a particularly meaningful framset */
       fset = NULL;

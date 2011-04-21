@@ -294,7 +294,8 @@ typedef enum smf_modeltype {
   SMF__FLT=1024,            /* Frequency domain filter */
   SMF__PLN=2048,            /* Spatial plane removal */
   SMF__SMO=4096,            /* Time series smoothing */
-  SMF__TWO=8192             /* Two-component common-mode */
+  SMF__TWO=8192,            /* Two-component common-mode */
+  SMF__TMP=16384            /* Generic fitting of external template to bolos */
 } smf_modeltype;
 
 /* Observing mode and type */

@@ -302,6 +302,12 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
         case SMF__SMO:
           total += nsamp*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
           break;
+        case SMF__TMP:
+          /* An externally supplied template. The model just stores the gain,
+             offset and correlation coefficient for each bolometer, similar
+             to SMF__GAI except with only one chunk considered */
+          total += 3*nrow*ncol*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
+          break;
         case SMF__TWO:
           /* two common-mode time series and coefficients for all the
              detectors */

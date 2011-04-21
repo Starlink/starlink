@@ -635,6 +635,10 @@ void smf_calcmodel_smo( smfWorkForce *wf, smfDIMMData *dat, int chunk,
                         AstKeyMap *keymap, smfArray **allmodel, int flags,
                         int *status );
 
+void smf_calcmodel_tmp( smfWorkForce *wf, smfDIMMData *dat, int chunk,
+                        AstKeyMap *keymap, smfArray **allmodel, int flags,
+                        int *status );
+
 void smf_calcmodel_two( smfWorkForce *wf, smfDIMMData *dat, int chunk,
                         AstKeyMap *keymap, smfArray **allmodel, int flags,
                         int *status );

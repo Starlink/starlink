@@ -171,3 +171,7 @@ smo.type = mean
 
 two.amap = <undef>
 two.bmap = <undef>
+
+# External template fitting
+
+tmp.source = <undef>

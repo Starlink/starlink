@@ -168,6 +168,10 @@ const char *smf_model_getname( smf_modeltype type, int *status ) {
     retval = "two";
     break;
 
+  case SMF__TMP:
+    retval = "tmp";
+    break;
+
   default:
     retval = "nul";
     *status = SAI__ERROR;

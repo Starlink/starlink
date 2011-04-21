@@ -153,7 +153,11 @@ smf_modeltype smf_model_gettype( const char *modelname, int *status ) {
     break;
   case 'T':
   case 't':
-    retval = SMF__TWO;
+    if (strncasecmp( modelname, "TMP", 3 ) == 0) {
+      retval = SMF__TMP;
+    } else if (strncasecmp( modelname, "TWO", 3 ) == 0) {
+      retval = SMF__TWO;
+    }
     break;
   case 'Q':
   case 'q':
