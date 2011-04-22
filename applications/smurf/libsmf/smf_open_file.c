@@ -565,6 +565,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
               if(*status == SAI__OK) {
                 fts->zpd = smf_create_smfData(CREATEFLAG, status);
                 if(*status == SAI__OK) {
+                  size_t count;
                   fts->zpd->dtype   = SMF__INTEGER;
                   fts->zpd->ndims   = ndimsFTS;
                   fts->zpd->dims[0] = dimsFTS[0];
@@ -573,7 +574,6 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
                   fts->zpd->lbnd[1] = 0;
 
                   // MAKE A DEEP COPY
-                  int index, count;
                   count = dimsFTS[0] * dimsFTS[1];
                   fts->zpd->pntr[0] = astCalloc(count, sizeof(int), 0);
                   for(index = 0; index < count; index++) {
@@ -597,6 +597,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
               if(*status == SAI__OK) {
                 fts->fpm = smf_create_smfData(CREATEFLAG, status);
                 if(*status == SAI__OK) {
+                  size_t count;
                   fts->fpm->dtype   = SMF__DOUBLE;
                   fts->fpm->ndims   = ndimsFTS;
                   fts->fpm->dims[0] = dimsFTS[0];
@@ -607,7 +608,6 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
                   fts->fpm->lbnd[2] = 1;
 
                   // MAKE A DEEP COPY
-                  int index, count;
                   count = dimsFTS[0] * dimsFTS[1] * dimsFTS[2];
                   fts->fpm->pntr[0] = astCalloc(count, sizeof(double), 0);
                   for(index = 0; index < count; index++) {
@@ -631,6 +631,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
               if(*status == SAI__OK) {
                 fts->sigma = smf_create_smfData(CREATEFLAG, status);
                 if(*status == SAI__OK) {
+                  size_t count;
                   fts->sigma->dtype   = SMF__DOUBLE;
                   fts->sigma->ndims   = ndimsFTS;
                   fts->sigma->dims[0] = dimsFTS[0];
@@ -639,7 +640,6 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
                   fts->sigma->lbnd[1] = 0;
 
                   // MAKE A DEEP COPY
-                  int index, count;
                   count = dimsFTS[0] * dimsFTS[1];
                   fts->sigma->pntr[0] = astCalloc(count, sizeof(double), 0);
                   for(index = 0; index < count; index++) {
