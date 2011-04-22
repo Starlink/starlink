@@ -30,6 +30,7 @@
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -41,9 +42,12 @@
 *        Minor change to logic on checking existence of smfDA
 *     2006-03-29 (AGG):
 *        Add check on data type
+*     2011-04-21 (TIMJ):
+*        Trap null smfData
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2011 Science & Technology Facilities Council.
 *     Copyright (C) 2005-2006 University of British Columbia. All
 *     Rights Reserved.
 
@@ -87,6 +91,12 @@ void smf_check_flat ( const smfData *data, int *status ) {
   smf_dtype dtype;
 
   if ( *status != SAI__OK ) return;
+  if ( !data ) {
+    *status = SAI__ERROR;
+    errRep("", "Error checking if data are flatfielded. smfData is null."
+           " (possible programming error)", status );
+    return;
+  }
 
   /* Retrieve the smfDa struct */
   da = data->da;
