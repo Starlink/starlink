@@ -1446,6 +1446,7 @@ static void smf1_open_file_caller( void *data, int *status ){
 
 /* Local Variables; */
    smfOpenFileData *pdata;
+   smfData * thisdata = NULL;
 
 /* Check inherited status. */
    if( *status != SAI__OK ) return;
@@ -1456,6 +1457,18 @@ static void smf1_open_file_caller( void *data, int *status ){
 /* Open the file. */
    smf_open_file( pdata->grp, pdata->index, pdata->mode, pdata->flags,
                   pdata->data, status );
+
+/* If this file is associated with an NDF then we do a deep copy
+   and close the original file. We do this to allow smf_close_file
+   to run in a thread */
+
+   thisdata = *(pdata->data);
+   if (thisdata && thisdata->file && thisdata->file->ndfid != NDF__NOID) {
+     smfData *tmpdata = NULL;
+     tmpdata = smf_deepcopy_smfData( thisdata, 0, 0, 0, 0, status );
+     smf_close_file( pdata->data, status );
+     *(pdata->data) = tmpdata;
+   }
 
 /* Unlock all AST objects within the smfData so that the calling thread
    can lock them. */
