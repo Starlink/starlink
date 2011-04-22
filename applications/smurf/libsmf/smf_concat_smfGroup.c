@@ -214,6 +214,9 @@
  *     2011-04-20(DSB):
  *        - Added argument first.
  *        - Allow "concat" to be null.
+ *     2011-04-21 (TIMJ):
+ *        Move some NDG/GRP code earlier in the loop to avoid
+ *        a thread problem.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -589,6 +592,25 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
         /* If this is the first piece, open the file directly in the
            current thread. */
         if( j == firstpiece ) {
+
+          /* Copy over the name of the first file in
+             subarray. Use a grpex to strip off the path, and
+             then add the suffix "_con.dimm" to denote concatenated
+             iterative map-maker data */
+
+          ingrp = grpNew( "GRP", status );
+          outgrp = grpNew( "GRP", status );
+
+          ndgCpsup( igrp->grp, igrp->subgroups[j][i], ingrp, status );
+          ndgCrexp( "./*_con" SMF__DIMM_SUFFIX "|.sdf||", ingrp, &outgrp,
+                    &outgrpsize, &flag, status );
+
+          pname = filename;
+          grpGet( outgrp, 1, 1, &pname, SMF_PATH_MAX, status);
+
+          grpDelet( &ingrp, status );
+          grpDelet( &outgrp, status );
+
           smf_open_file( igrp->grp, igrp->subgroups[j][i], "READ", 0,
                          &tmpdata, status );
         }
@@ -753,24 +775,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                    coordinates are derived using an AST polyMap */
               }
 
-              /* Copy over the name of the first file in
-                 subarray. Use a grpex to strip off the path, and
-                 then add the suffix "_con.dimm" to denote concatenated
-                 iterative map-maker data */
-
-              ingrp = grpNew( "GRP", status );
-              outgrp = grpNew( "GRP", status );
-
-              ndgCpsup( igrp->grp, igrp->subgroups[j][i], ingrp, status );
-              ndgCrexp( "./*_con" SMF__DIMM_SUFFIX "|.sdf||", ingrp, &outgrp,
-                        &outgrpsize, &flag, status );
-
-              pname = filename;
-              grpGet( outgrp, 1, 1, &pname, SMF_PATH_MAX, status);
-
-              grpDelet( &ingrp, status );
-              grpDelet( &outgrp, status );
-
+              /* Override the reference name */
               one_strlcpy( data->file->name, filename,
                            sizeof(data->file->name), status );
 
