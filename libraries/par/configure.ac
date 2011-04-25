@@ -2,7 +2,7 @@ dnl  Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl   Initialisation: package name and version number
-AC_INIT(par, 2.3, ussc@star.rl.ac.uk)
+AC_INIT(par, 2.3-2, ussc@star.rl.ac.uk)
 
 dnl   Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -19,6 +19,8 @@ STAR_MONOLITHS
 AC_PROG_CC
 AC_PROG_FC
 AC_PROG_LIBTOOL
+
+STAR_CHECK_PROGS([fgeneric])
 
 STAR_CNF_COMPATIBLE_SYMBOLS
 
