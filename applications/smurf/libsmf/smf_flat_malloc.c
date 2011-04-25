@@ -49,9 +49,11 @@
 *        Initial version
 *     2010-09-17 (COBA):
 *        Updated smf_construct_smfData which now contains smfFts
+*     2011-04-25 (TIMJ):
+*        Handle time ordering properly.
 
 *  Copyright:
-*     Copyright (C) 2010 Science and Technology Facilities Council.
+*     Copyright (C) 2010-2011 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -96,6 +98,8 @@
 void smf_flat_malloc( size_t nheat, const smfData * refdata,
                       smfData **powvald, smfData **bolvald, int *status ) {
 
+  size_t bolidx1 = SC2STORE__ROW_INDEX;
+  size_t bolidx2 = SC2STORE__COL_INDEX;
   double * bolval = NULL; /* Data array inside bolrefd */
   double * bolvalvar = NULL; /* Variance inside bolrefd */
   dim_t dims[] = { 1, 1, 1 }; /* Default dimensions */
@@ -129,8 +133,6 @@ void smf_flat_malloc( size_t nheat, const smfData * refdata,
   if ( !smf_validate_smfData( refdata, 1, 0, status ) ) return;
   oldhdr = refdata->hdr;
 
-  nelem = refdata->dims[0] * refdata->dims[1];
-
   if (powvald) {
     powval = astCalloc( nheat, sizeof(*powval), 1 );
     pntr[0] = powval;
@@ -143,15 +145,22 @@ void smf_flat_malloc( size_t nheat, const smfData * refdata,
   }
 
   if (bolvald) {
+    /* Handle data ordering */
+    if ( ! refdata->isTordered ) {
+      bolidx1++;
+      bolidx2++;
+    }
+
+    nelem = refdata->dims[bolidx1] * refdata->dims[bolidx2];
     bolval = astCalloc( nheat * nelem, sizeof(*bolval), 1 );
     bolvalvar = astCalloc( nheat * nelem, sizeof(*bolvalvar), 1 );
     pntr[0] = bolval;
     pntr[1] = bolvalvar;
-    dims[0] = refdata->dims[0];
-    dims[1] = refdata->dims[1];
+    dims[0] = refdata->dims[bolidx1];
+    dims[1] = refdata->dims[bolidx2];
     dims[2] = nheat;
-    lbnd[0] = refdata->lbnd[0];
-    lbnd[1] = refdata->lbnd[1];
+    lbnd[0] = refdata->lbnd[bolidx1];
+    lbnd[1] = refdata->lbnd[bolidx2];
     lbnd[2] = 1;
 
     /* Create a header to attach to the bolometer data. We only want the basic 2-d
