@@ -362,20 +362,14 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
     const smf_qual_t *inqual = smf_select_cqualpntr( indata, NULL, status );
 
     /* we know that "data" does not have a quality component because
-       we did a deepcopy without copying it. If the input quality array is in 
-       the required order (bolometer order) just copy it. Otherwise, reorder
-       and copy it. */
+       we did a deepcopy without copying it. Ensure that the output has
+       quality with bolometer order. */
+
     if (inqual) {
-      if( indata->isTordered == 0 ) {
-         data->qual = astCalloc( nbolo * ntslice, sizeof(*(data->qual)), 0 );
-         if (data->qual) memcpy( data->qual, inqual,
-                                 nbolo*ntslice * sizeof(*(data->qual)) );
-      } else {
-         data->qual = smf_dataOrder_array( (void *) inqual, SMF__QUALTYPE,
-                                           nbolo*ntslice, ntslice, nbolo,
-                                           intstr, inbstr, 1, ntslice, 0, 0,
-                                           status );
-      }
+      data->qual = smf_dataOrder_array( (void *)inqual, SMF__QUALTYPE,
+                                        nbolo*ntslice, ntslice, nbolo,
+                                        intstr, inbstr, 1, ntslice, 0, 0,
+                                        status );
     }
 
 
