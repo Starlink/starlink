@@ -101,10 +101,12 @@
 *        If the input smfData is time ordered, we need to re-order the
 *        quality array when copying it into the FFTed smfData (which is
 *        always bolometer ordered).
+*     2011-04-25 (TIMJ):
+*        Fix stride argument to smf_dataOrder_array
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008-2010 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2011 Science and Technology Facilities Council.
 *     Copyright (C) 2008 University of British Columbia.
 *     All Rights Reserved.
 
@@ -371,7 +373,7 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
       } else {
          data->qual = smf_dataOrder_array( (void *) inqual, SMF__QUALTYPE,
                                            nbolo*ntslice, ntslice, nbolo,
-                                           intstr, inbstr, 1, nbolo, 0, 0,
+                                           intstr, inbstr, 1, ntslice, 0, 0,
                                            status );
       }
     }
