@@ -57,6 +57,10 @@
 *     newbuf = void *
 *        Pointer to the re-ordered data.
 
+*  Notes:
+*     Will do nothing if the input and output strides are the same
+*     and the inPlace flag is true.
+
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
 *     Ed Chapin (UBC)
@@ -67,11 +71,13 @@
 *        Move private routine written by TIMJ out of smf_dataOrder.c
 *     2010-09-17 (EC):
 *        Add freeOrder flag in case routine is being used for copy
+*     2011-04-25 (TIMJ):
+*        Trap case when input and output strides are the same.
 
 *  Notes:
 
 *  Copyright:
-*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2010-2011 Science & Technology Facilities Council.
 *     Copyright (C) 2010 University of British Columbia.
 *     All Rights Reserved.
 
@@ -124,6 +130,11 @@ void * smf_dataOrder_array( void * oldbuf, smf_dtype dtype, size_t ndata,
   if (*status != SAI__OK) return retval;
   if (!retval) return retval;
 
+  /* Special case the inPlace variant with no reordering */
+  if ( inPlace && tstr1 == tstr2 && bstr1 == bstr2 ) {
+    return retval;
+  }
+
   /* Size of data type */
   sz = smf_dtype_sz(dtype, status);
 
@@ -131,61 +142,69 @@ void * smf_dataOrder_array( void * oldbuf, smf_dtype dtype, size_t ndata,
   newbuf = astCalloc( ndata, sz, 0 );
 
   if( *status == SAI__OK ) {
-    size_t j;
-    size_t k;
 
-    /* Loop over all of the elements and re-order the data */
-    switch( dtype ) {
-    case SMF__INTEGER:
-      for( j=0; j<ntslice; j++ ) {
-        for( k=0; k<nbolo; k++ ) {
-          ((int *)newbuf)[j*tstr2+k*bstr2] =
-            ((int *)oldbuf)[j*tstr1+k*bstr1];
+    /* if the input and output strides are the same we just memcpy */
+    if ( tstr1 == tstr2 && bstr1 == bstr2 ) {
+
+      memcpy( newbuf, oldbuf, sz*ndata );
+
+    } else {
+      size_t j;
+      size_t k;
+
+      /* Loop over all of the elements and re-order the data */
+      switch( dtype ) {
+      case SMF__INTEGER:
+        for( j=0; j<ntslice; j++ ) {
+          for( k=0; k<nbolo; k++ ) {
+            ((int *)newbuf)[j*tstr2+k*bstr2] =
+              ((int *)oldbuf)[j*tstr1+k*bstr1];
+          }
         }
-      }
-      break;
+        break;
 
-    case SMF__FLOAT:
-      for( j=0; j<ntslice; j++ ) {
-        for( k=0; k<nbolo; k++ ) {
-          ((float *)newbuf)[j*tstr2+k*bstr2] =
-            ((float *)oldbuf)[j*tstr1+k*bstr1];
+      case SMF__FLOAT:
+        for( j=0; j<ntslice; j++ ) {
+          for( k=0; k<nbolo; k++ ) {
+            ((float *)newbuf)[j*tstr2+k*bstr2] =
+              ((float *)oldbuf)[j*tstr1+k*bstr1];
+          }
         }
-      }
-      break;
+        break;
 
-    case SMF__DOUBLE:
-      for( j=0; j<ntslice; j++ ) {
-        for( k=0; k<nbolo; k++ ) {
-          ((double *)newbuf)[j*tstr2+k*bstr2] =
-            ((double *)oldbuf)[j*tstr1+k*bstr1];
+      case SMF__DOUBLE:
+        for( j=0; j<ntslice; j++ ) {
+          for( k=0; k<nbolo; k++ ) {
+            ((double *)newbuf)[j*tstr2+k*bstr2] =
+              ((double *)oldbuf)[j*tstr1+k*bstr1];
+          }
         }
-      }
-      break;
+        break;
 
-    case SMF__USHORT:
-      for( j=0; j<ntslice; j++ ) {
-        for( k=0; k<nbolo; k++ ) {
-          ((unsigned short *)newbuf)[j*tstr2+k*bstr2] =
-            ((unsigned short *)oldbuf)[j*tstr1+k*bstr1];
+      case SMF__USHORT:
+        for( j=0; j<ntslice; j++ ) {
+          for( k=0; k<nbolo; k++ ) {
+            ((unsigned short *)newbuf)[j*tstr2+k*bstr2] =
+              ((unsigned short *)oldbuf)[j*tstr1+k*bstr1];
+          }
         }
-      }
-      break;
+        break;
 
-    case SMF__UBYTE:
-      for( j=0; j<ntslice; j++ ) {
-        for( k=0; k<nbolo; k++ ) {
-          ((unsigned char *)newbuf)[j*tstr2+k*bstr2] =
-            ((unsigned char *)oldbuf)[j*tstr1+k*bstr1];
+      case SMF__UBYTE:
+        for( j=0; j<ntslice; j++ ) {
+          for( k=0; k<nbolo; k++ ) {
+            ((unsigned char *)newbuf)[j*tstr2+k*bstr2] =
+              ((unsigned char *)oldbuf)[j*tstr1+k*bstr1];
+          }
         }
-      }
-      break;
+        break;
 
-    default:
-      msgSetc("DTYPE",smf_dtype_str(dtype, status));
-      *status = SAI__ERROR;
-      errRep( "", FUNC_NAME
-              ": Don't know how to handle ^DTYPE type.", status);
+      default:
+        msgSetc("DTYPE",smf_dtype_str(dtype, status));
+        *status = SAI__ERROR;
+        errRep( "", FUNC_NAME
+                ": Don't know how to handle ^DTYPE type.", status);
+      }
     }
 
     if( inPlace ) {
