@@ -103,10 +103,12 @@
 *        Add ability to do a re-ordering copy
 *     2010-09-17 (COBA):
 *        Add smfFts
+*     2011-04-25 (TIMJ):
+*        Fix reordering bug associated with quality.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008, 2010 Science and Technology Facilities Council.
+*     Copyright (C) 2008, 2010-2011 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
 *     Council. University of British Columbia. All Rights Reserved.
 
@@ -336,9 +338,9 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
   if ( (old->qual != NULL) && create[2] ) {
     if( reOrder ) {
       /* Do a re-ordering copy into a new buffer */
-      pntr[i] = smf_dataOrder_array( old->qual, SMF__QUALTYPE, npts,
-                                     ntslice, nbolo, tstr1, bstr1, tstr2,
-                                     bstr2, 0, 0, status );
+      qual = smf_dataOrder_array( old->qual, SMF__QUALTYPE, npts,
+                                  ntslice, nbolo, tstr1, bstr1, tstr2,
+                                  bstr2, 0, 0, status );
     } else {
       /* Allocate space and memcpy */
       qual = astCalloc( npts, sizeof(*qual), 0 );
@@ -348,8 +350,8 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
                status);
         return NULL;
       }
+      memcpy( qual, old->qual, npts*sizeof(*qual) );
     }
-    memcpy( qual, old->qual, npts*sizeof(*qual) );
   } else {
     qual = NULL;
   }
