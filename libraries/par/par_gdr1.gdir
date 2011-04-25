@@ -111,6 +111,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
 *     AJC: Alan J. Chipperfield   (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -124,6 +125,8 @@
 *        description of parameter NULL.
 *     1999 September 16 (AJC):
 *        Warn in MSG__VERB mode if NULL operates to adopt default.
+*     2011 April 25 (TIMJ):
+*        Do not look at result from PAR_EXACx unless status is good.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -241,23 +244,23 @@
 *  Get exactly NVALS values for the parameter.
          CALL PAR_EXAC<T>( PARAM, NVALS, VALUES, STATUS )
 
-*  Obtain the range of the values given.
-*  =====================================
-
-*  Initialise the minimum and maximum values.
-         VRANGE( 1 ) = VALUES( 1 )
-         VRANGE( 2 ) = VALUES( 1 )
-
-*   Search all the remaining values for their minimum and maximum.
-         DO 190 I = 2, NVALS
-            VRANGE( 1 ) = MIN( VRANGE( 1 ), VALUES( I ) )
-            VRANGE( 2 ) = MAX( VRANGE( 2 ), VALUES( I ) )
-  190    CONTINUE
-
 *   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 *   Check for an error.
          IF ( STATUS .EQ. SAI__OK ) THEN
+
+*  Obtain the range of the values given.
+*  =====================================
+
+*  Initialise the minimum and maximum values.
+            VRANGE( 1 ) = VALUES( 1 )
+            VRANGE( 2 ) = VALUES( 1 )
+
+*   Search all the remaining values for their minimum and maximum.
+            DO 190 I = 2, NVALS
+               VRANGE( 1 ) = MIN( VRANGE( 1 ), VALUES( I ) )
+               VRANGE( 2 ) = MAX( VRANGE( 2 ), VALUES( I ) )
+ 190        CONTINUE
 
 *  Check that the values are within the specified include or exclude
 *  range.
