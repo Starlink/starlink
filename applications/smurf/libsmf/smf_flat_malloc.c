@@ -51,6 +51,8 @@
 *        Updated smf_construct_smfData which now contains smfFts
 *     2011-04-25 (TIMJ):
 *        Handle time ordering properly.
+*     2011-04-26 (TIMJ):
+*        Fix assignment of rows and colums to bolval
 
 *  Copyright:
 *     Copyright (C) 2010-2011 Science and Technology Facilities Council.
@@ -98,8 +100,8 @@
 void smf_flat_malloc( size_t nheat, const smfData * refdata,
                       smfData **powvald, smfData **bolvald, int *status ) {
 
-  size_t bolidx1 = SC2STORE__ROW_INDEX;
-  size_t bolidx2 = SC2STORE__COL_INDEX;
+  size_t rowidx = SC2STORE__ROW_INDEX;
+  size_t colidx = SC2STORE__COL_INDEX;
   double * bolval = NULL; /* Data array inside bolrefd */
   double * bolvalvar = NULL; /* Variance inside bolrefd */
   dim_t dims[] = { 1, 1, 1 }; /* Default dimensions */
@@ -132,6 +134,8 @@ void smf_flat_malloc( size_t nheat, const smfData * refdata,
 
   if ( !smf_validate_smfData( refdata, 1, 0, status ) ) return;
   oldhdr = refdata->hdr;
+  printf("Inside flat malloc\n");
+  smf_dump_smfData( refdata, 0, status );
 
   if (powvald) {
     powval = astCalloc( nheat, sizeof(*powval), 1 );
@@ -147,20 +151,20 @@ void smf_flat_malloc( size_t nheat, const smfData * refdata,
   if (bolvald) {
     /* Handle data ordering */
     if ( ! refdata->isTordered ) {
-      bolidx1++;
-      bolidx2++;
+      rowidx++;
+      colidx++;
     }
 
-    nelem = refdata->dims[bolidx1] * refdata->dims[bolidx2];
+    nelem = refdata->dims[rowidx] * refdata->dims[colidx];
     bolval = astCalloc( nheat * nelem, sizeof(*bolval), 1 );
     bolvalvar = astCalloc( nheat * nelem, sizeof(*bolvalvar), 1 );
     pntr[0] = bolval;
     pntr[1] = bolvalvar;
-    dims[0] = refdata->dims[bolidx1];
-    dims[1] = refdata->dims[bolidx2];
+    dims[SC2STORE__ROW_INDEX] = refdata->dims[rowidx];
+    dims[SC2STORE__COL_INDEX] = refdata->dims[colidx];
     dims[2] = nheat;
-    lbnd[0] = refdata->lbnd[bolidx1];
-    lbnd[1] = refdata->lbnd[bolidx2];
+    lbnd[SC2STORE__ROW_INDEX] = refdata->lbnd[rowidx];
+    lbnd[SC2STORE__COL_INDEX] = refdata->lbnd[colidx];
     lbnd[2] = 1;
 
     /* Create a header to attach to the bolometer data. We only want the basic 2-d
