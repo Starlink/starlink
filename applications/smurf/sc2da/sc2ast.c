@@ -25,6 +25,9 @@
    sc2ast_createwcs(2) is called. */
 #define CURRENT 3
 
+/* The FPLANE_IFRAME macro gives the one-based index of the FPLANE  Frame
+   within the cached FrameSet. */
+#define FPLANE_IFRAME 4
 
 static char errmess[132];              /* For DRAMA error messages */
 
@@ -164,6 +167,11 @@ int *status             /* global status (given and returned) */
      includes the rotations and reflections relevant to each subarray and
      the distortion imposed by the SCUBA-2 optics.
 
+     In addition to the base (GRID) Frame and the current (SKY) Frame,
+     the returned FrameSet also contains a Frame with Domain FPLANE
+     describing focal plane coordinates in arc-seconds, and a Frame with
+     Domain BOLO describing bolometer coordinates.
+
      This function uses a supplied structure to hold a cache of information
      that does not change between invocations. If "cache" is supplied as
      NULL, then memory for a new structure is allocated and initialised, and
@@ -190,7 +198,7 @@ int *status             /* global status (given and returned) */
 
      - After the first call the cached part of the frameset contains information
      specific to the SCUBA-2 instrument, observatory location etc. If you
-     wish to subsequently calculate framesets for a different instrument
+     wish subsequently to calculate framesets for a different instrument
      or observatory location ensure that you first clear the cache by
      setting subnum=SC2AST__NULLSUB.
 
@@ -278,42 +286,46 @@ int *status             /* global status (given and returned) */
      30Mar2011 : Added NEW4 distortion (first estimate based on seven
                  arrays). (DSB)
      12Apr2011 : Make NEW4 distortion the default. (DSB)
+     26Apr2011 : Ensure the returned FrameSet always has an FPLANE Frame (DSB)
 */
 {
 
-   AstMapping *azelmap;
    AstFrame *bfrm;
+   AstFrame *fp_pos_frame;
+   AstMapping *azelmap;
    AstMapping *bmap;
    AstMapping *mapping;
    AstMatrixMap *rotmap;
    AstPolyMap *polymap;
-   AstShiftMap *shiftmap;
-   AstZoomMap *radmap;
-   AstZoomMap *zoommap;
-   AstShiftMap *zshiftmap;
-   double shifts[ 2 ];
    AstShiftMap *instapmap;
    AstShiftMap *jigglemap;
+   AstShiftMap *shiftmap;
+   AstShiftMap *zshiftmap;
+   AstZoomMap *radmap;
+   AstZoomMap *zoommap;
+   const char *cval;
    const char *distortion;
-   sc2astCache *result;
+   const double *c_f;
+   const double *c_i;
+   const double rotangle[8] = { 0.0, PIBY2, 2*PIBY2, 3*PIBY2, 3*PIBY2, 2*PIBY2, PIBY2, 0.0 };
+   double r;                       /* subarray angle */
+   double rot[4];                  /* rotation matrix */
+   double shift[2];
+   double shifts[ 2 ];
+   double zshift[2];
+   int icurr;
    int isub;
+   int nc_f;
+   int nc_i;
+   int nin;
+   int nout;
+   sc2astCache *result;
+
 #if COLROW
    AstPermMap *permmap;
    int perm[ 2 ];
 #endif
-   int nin;
-   int nout;
-   double r;                       /* subarray angle */
-   double rot[4];                  /* rotation matrix */
-   const double rotangle[8] =
-     { 0.0, PIBY2, 2*PIBY2, 3*PIBY2, 3*PIBY2, 2*PIBY2, PIBY2, 0.0 };
-   double shift[2];
-   double zshift[2];
-   int nc_f;
-   int nc_i;
-   const double *c_f;
-   const double *c_i;
-   const char *cval;
+
 
 /* Codes identifying the available optical distortion maps */
    enum distortion_codes {
@@ -1221,6 +1233,30 @@ int *status             /* global status (given and returned) */
 /* Simplify the Cached Mapping. */
       cache->map[ subnum ] = astSimplify( cache->map[ subnum ] );
 
+/* Create a Frame describing focal plane coords in radians. This is the
+   coordinate system produced by the cached Mapping. */
+      fp_pos_frame = astFrame( 2, "Unit(1)=rad,Unit(2)=rad,Domain=FPLANE,"
+                               "label(1)=FplaneX,label(2)=FplaneY" );
+
+/* Ensure the Frame responds to changes in its axis units. */
+      astSetActiveUnit( fp_pos_frame, 1 );
+
+/* Add the Farme into the cached FrameSet, first noting the index of the
+   original current Frame. The index of the newly added Frame is specified
+   by the macro FPLANE_IFRAME, which will need to be changed if further
+   Frames are added to the FrameaSet prior to the FPLANE Frame. */
+      icurr = astGetI( cache->frameset[ subnum ], "Current" );
+      astAddFrame( cache->frameset[ subnum ], AST__BASE, cache->map[ subnum ],
+                   fp_pos_frame );
+
+/* Change the focal plane units from radians to arc-seconds. The Mapping
+   in the FrameSet will be adjusted accordingly (because of the call to
+   astSetActiveUnit above). */
+      astSet( cache->frameset[ subnum ], "unit(1)=arcsec,unit(2)=arcsec" );
+
+/* Change the current Frame back to the original. */
+      astSetI(  cache->frameset[ subnum ], "Current", icurr );
+
 /* Exempt the cached AST objects from AST context handling. This means
    that the pointers will not be annulled as a result of calling
    astEnd.  Therefore the objects need to be annulled explicitly when
@@ -1254,59 +1290,45 @@ int *status             /* global status (given and returned) */
       astSetI( cache->frameset[ subnum ], "Current", CURRENT );
    }
 
-   /* If state is NULL we are simply returning the focal plane coordinate
-      frames */
-   if (!state) {
-     AstFrame * fp_pos_frame;
-     *fset = astClone( cache->frameset[ subnum ] );
-     astRemoveFrame( *fset, AST__CURRENT );
-     fp_pos_frame = astFrame( 2,
-			      "Unit(1)=rad,Unit(2)=rad,Domain=FPLANE"
-			      ",label(1)=FplaneX,label(2)=FplaneY" );
-     astSetActiveUnit( fp_pos_frame, 1 );
-     astAddFrame( *fset, AST__BASE, cache->map[ subnum ],
-		  fp_pos_frame );
-     astSet( *fset, "unit(1)=arcsec,unit(2)=arcsec" );
+/* If the returned FrameSet is to contain just the FPLANE Frame (i.e. no
+   sky coords), ensure the FPLANE Frame is current. */
+   if( !state ) {
+      astSetI(  cache->frameset[ subnum ], "Current", FPLANE_IFRAME );
 
-     /* Return early rather than embed the subsequent code in a big else.
-	A bit dangerous if more is added at the end */
-     astExport( *fset );
-     astEnd;
-     return result;
-   }
-
+/* If sky coords are required in the returned FrameSet... */
+   } else {
 
 /* Create a Mapping from these Cartesian Nasmyth coords (in rads) to spherical
    AzEl coords (in rads). */
 
-   azelmap = sc2ast_maketanmap( state->tcs_az_ac1, state->tcs_az_ac2,
-				cache->azel, state->tcs_az_ac2, status );
+      azelmap = sc2ast_maketanmap( state->tcs_az_ac1, state->tcs_az_ac2,
+   				cache->azel, state->tcs_az_ac2, status );
 
 /* Calculate final mapping with SMU position correction only if needed
    (i.e. ignore SMU if all four values are zero or if any single value is bad) */
-   if( ( (!state->smu_az_jig_x) && (!state->smu_az_jig_y) &&
-         (!state->smu_az_chop_x) && (!state->smu_az_chop_y) ) ||
-       state->smu_az_jig_x == VAL__BADD || state->smu_az_jig_y == VAL__BADD ||
-       state->smu_az_chop_x == VAL__BADD || state->smu_az_chop_y == VAL__BADD ){
+      if( ( (!state->smu_az_jig_x) && (!state->smu_az_jig_y) &&
+            (!state->smu_az_chop_x) && (!state->smu_az_chop_y) ) ||
+          state->smu_az_jig_x == VAL__BADD || state->smu_az_jig_y == VAL__BADD ||
+          state->smu_az_chop_x == VAL__BADD || state->smu_az_chop_y == VAL__BADD ){
 
 /* Combine these with the cached Mapping (from GRID coords for subarray
    to Tanplane Nasmyth coords in rads), to get total Mapping from GRID
    coords to spherical AzEl in rads. */
 
-      mapping = (AstMapping *) astCmpMap( cache->map[ subnum ], azelmap, 1,
-					  " " );
+         mapping = (AstMapping *) astCmpMap( cache->map[ subnum ], azelmap, 1,
+   					  " " );
 
-   } else {
+      } else {
 /* Create a ShiftMap which moves the origin of projection plane (X,Y)
    coords to take account of the small offsets of SMU jiggle pattern. */
-      shifts[ 0 ] = (state->smu_az_jig_x + state->smu_az_chop_x) * AST__DD2R / 3600.0;
-      shifts[ 1 ] = (state->smu_az_jig_y + state->smu_az_chop_y) * AST__DD2R / 3600.0;
-      jigglemap = astShiftMap( 2, shifts, " " );
+         shifts[ 0 ] = (state->smu_az_jig_x + state->smu_az_chop_x) * AST__DD2R / 3600.0;
+         shifts[ 1 ] = (state->smu_az_jig_y + state->smu_az_chop_y) * AST__DD2R / 3600.0;
+         jigglemap = astShiftMap( 2, shifts, " " );
 
-      mapping = (AstMapping *) astCmpMap( cache->map[ subnum ],
-					  astCmpMap( jigglemap, azelmap, 1,
-						     " " ), 1, " " );
-   }
+         mapping = (AstMapping *) astCmpMap( cache->map[ subnum ],
+   					  astCmpMap( jigglemap, azelmap, 1,
+   						     " " ), 1, " " );
+      }
 
 /* If not already created, create a SkyFrame describing (Az,El). Hard-wire
    the geodetic longitude and latitude of JCMT into this Frame. Note, the
@@ -1319,48 +1341,49 @@ int *status             /* global status (given and returned) */
    get cleared between observations, especially in the DA. Benchmarking
    indicates that there is no penalty in calling this every time for
    non-moving objects. */
-   if( !cache->skyframe ) {
-      cache->skyframe = astSkyFrame ( "system=AzEl" );
+      if( !cache->skyframe ) {
+         cache->skyframe = astSkyFrame ( "system=AzEl" );
 
-      /* Ast assumes longitude increases eastward, so change sign to
-	 be consistent with smf_calc_telpos here */
-      astSetD( cache->skyframe, "ObsLon", -telpos[0] );
-      astSetD( cache->skyframe, "ObsLat", telpos[1] );
+         /* Ast assumes longitude increases eastward, so change sign to
+   	 be consistent with smf_calc_telpos here */
+         astSetD( cache->skyframe, "ObsLon", -telpos[0] );
+         astSetD( cache->skyframe, "ObsLat", telpos[1] );
 
-      astExempt( cache->skyframe );
+         astExempt( cache->skyframe );
 
 /* If the cached SkyFrame already exists, ensure it has the required
    System (AZEL). This needs to be checked since it is possible that the
    System may have been changed via the FrameSet pointer returned by a
    previous invocation of this function (the returned FrameSet contains a
    clone, not a deep copy, of the cached SkyFrame pointer). */
-   } else {
-     /* Only do this if we know it is not AZEL already since it takes
-        time for AST to change from AZEL to AZEL */
-     cval = astGetC(cache->skyframe, "SYSTEM");
-     if ( cval && strcmp("AZEL", cval) != 0 ) {
-       astSet( cache->skyframe, "system=AzEl" );
-     }
-   }
+      } else {
+        /* Only do this if we know it is not AZEL already since it takes
+           time for AST to change from AZEL to AZEL */
+        cval = astGetC(cache->skyframe, "SYSTEM");
+        if ( cval && strcmp("AZEL", cval) != 0 ) {
+          astSet( cache->skyframe, "system=AzEl" );
+        }
+      }
 
 /* Update the epoch, dut1 and sky reference. Call this every time for
    skyref and dut1 since we can not ensure that we will always have
    cleared the cache when a new observation starts */
-   astSet( cache->skyframe,
-           "Epoch=MJD %.*g,SkyRef(1)=%.*g, SkyRef(2)=%.*g,dut1=%.*g",
-           DBL_DIG, state->tcs_tai + 32.184/SC2AST_SPD,
-           DBL_DIG, state->tcs_az_bc1,
-           DBL_DIG, state->tcs_az_bc2,
-           DBL_DIG, dut1 );
+      astSet( cache->skyframe,
+              "Epoch=MJD %.*g,SkyRef(1)=%.*g, SkyRef(2)=%.*g,dut1=%.*g",
+              DBL_DIG, state->tcs_tai + 32.184/SC2AST_SPD,
+              DBL_DIG, state->tcs_az_bc1,
+              DBL_DIG, state->tcs_az_bc2,
+              DBL_DIG, dut1 );
 
 /* Now modify the cached FrameSet to use the new Mapping and SkyFrame.
    First remove the existing current Frame and then add in the new one.
    Note, we add a copy of the SkyFrame rather than the cached SkyFrame
    itself since the SkyFrame contained in the FrameSet will be modified
    by later functions.  */
-   astRemoveFrame( cache->frameset[ subnum ], AST__CURRENT );
-   astAddFrame( cache->frameset[ subnum ], AST__BASE, mapping,
-                astClone( cache->skyframe ) );
+      astRemoveFrame( cache->frameset[ subnum ], AST__CURRENT );
+      astAddFrame( cache->frameset[ subnum ], AST__BASE, mapping,
+                   astClone( cache->skyframe ) );
+   }
 
 /* Return the final FrameSet. */
    *fset = astClone( cache->frameset[ subnum ] );
