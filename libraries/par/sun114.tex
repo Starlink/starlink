@@ -794,7 +794,7 @@ omit the brackets in response to a prompt.}  For this input, ACTVAL
 becomes 3.
 
 A parameter's values may be stored as an $n$-dimensional array.
-The following example shows a 3-dimensional mask of integers
+The following example shows a three-dimensional mask of integers
 being obtained from parameter MASK and being stored in an array called
 VALUES.  MAXD gives the maximum dimensions of the array.  The array
 itself must be large enough to hold the values.  ACTD receives the
@@ -885,7 +885,7 @@ name with an {\tt @} prefix, namely {\tt @ADAM\_USER:STATISTICS.SIGMA}
 for VMS and {\tt @\$ADAM\_USER/statistics.SIGMA} for UNIX.}
 
 If we had the values corresponding to the quartiles and median of a
-data array we could use a routine that handles a 1-dimensional array.
+data array we could use a routine that handles a one-dimensional array.
 \begin{verbatim}
           DOUBLE PRECISION QRTILE( 3 )
 
@@ -2659,7 +2659,7 @@ type, the function prototypes are:
    Sets a vector of values as the dynamic default for a parameter
 }{
    \sstdescription{
-      This routine sets a 1-dimensional array of values as the dynamic
+      This routine sets a one-dimensional array of values as the dynamic
       default for a parameter. The dynamic default may be used as the
       parameter value by means of appropriate specifications in the
       interface file.
@@ -3144,8 +3144,8 @@ type, the function prototypes are:
          VALUE argument must have the corresponding data type.
 
          \sstitem
-         Note that a scalar (0-dimensional) parameter is different from
-         a vector (1-dimensional) parameter containing a single value.
+         Note that a scalar (zero-dimensional) parameter is different from
+         a vector (one-dimensional) parameter containing a single value.
       }
    }
 }
@@ -4217,8 +4217,8 @@ type, the function prototypes are:
          VALUE argument must have the corresponding data type.
 
          \sstitem
-         A scalar (0-dimensional) parameter is different from a vector
-         (1-dimensional) parameter containing a single value.
+         A scalar (zero-dimensional) parameter is different from a vector
+         (one-dimensional) parameter containing a single value.
 
          \sstitem
          In order to obtain a storage object for the parameter, the
@@ -4241,7 +4241,7 @@ type, the function prototypes are:
    Puts a vector of values into a parameter
 }{
    \sstdescription{
-      This routine puts a 1-dimensional array of values into a
+      This routine puts a one-dimensional array of values into a
       parameter.  If necessary, the specified array is converted to
       the type of the parameter.
    }
@@ -4280,8 +4280,8 @@ type, the function prototypes are:
          VALUES argument must have the corresponding data type.
 
          \sstitem
-         A scalar (0-dimensional) parameter is different from a vector
-         (1-dimensional) parameter containing a single value.
+         A scalar (zero-dimensional) parameter is different from a vector
+         (one-dimensional) parameter containing a single value.
 
          \sstitem
          In order to obtain a storage object for the parameter, the
@@ -4380,7 +4380,7 @@ type, the function prototypes are:
    a vector
 }{
    \sstdescription{
-      This routine puts a 1-dimensional array of primitive values into
+      This routine puts a one-dimensional array of primitive values into
       a parameter as it if the parameter were vectorized ({\it i.e.}\
       regardless of its actual dimensionality).  If necessary, the
       specified array is converted to the type of the parameter.
