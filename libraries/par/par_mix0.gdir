@@ -61,10 +61,10 @@
 *        NULL controls the behaviour of this routine when the parameter
 *        is in the null state.  If NULL is .FALSE., this routine
 *        returns with STATUS=PAR__NULL.  If NULL is .TRUE., the
-*        returned VALUE takes the value of DEFAUL and, if the MSG filtering
-*        level (see SUN/104) is 'verbose', a message informs the user of the
-*        value used for the parameter. The routine then returns with
-*        STATUS=SAI__OK.  This feature is intended for
+*        returned VALUE takes the value of DEFAUL and, if the MSG
+*        filtering level (see SUN/104) is 'verbose', a message informs
+*        the user of the value used for the parameter.  The routine then
+*        returns with STATUS=SAI__OK.  This feature is intended for
 *        convenient handling of null values.  NULL should only be set
 *        to .TRUE. when the value of DEFAUL will always give a
 *        reasonable value for the parameter.
@@ -147,22 +147,22 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
-*     AJC: Alan J. Chipperfield   (STARLINK)
+*     AJC: Alan J. Chipperfield  (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -187,57 +187,45 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            ! Switch off default typing
+      IMPLICIT NONE              ! Switch off default typing
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'        ! Environment constants
-      INCLUDE 'PAR_ERR'        ! Parameter-system error constants
-      INCLUDE 'MSG_PAR'        ! Message-system constants
+      INCLUDE 'SAE_PAR'          ! Environment constants
+      INCLUDE 'PAR_ERR'          ! Parameter-system error constants
+      INCLUDE 'MSG_PAR'          ! Message-system constants
 
 *  Arguments Given:
-      CHARACTER * ( * )
-     :  DEFAUL,                ! Suggested default value
-     :  PARAM,                 ! Parameter name corresponding to
-                               ! variable VALUE
-     :  OPTS                   ! List of possible options for VALUE
+      CHARACTER * ( * ) DEFAUL   ! Suggested default value
+      CHARACTER * ( * ) PARAM    ! Parameter name corresponding to
+                                 ! variable VALUE
+      CHARACTER * ( * ) OPTS     ! List of possible options for VALUE
 
-      <TYPE>
-     :  VMIN,                  ! Minimum acceptable numeric value for
-                               ! value to be obtained
-     :  VMAX                   ! Maximum acceptable numeric value for
-                               ! value to be obtained
-
-      LOGICAL                  ! True if:
-     :  NULL                   ! Default value used when bad status is
-                               ! returned by the parameter get.
+      <TYPE> VMIN                ! Minimum acceptable numeric value for
+                                 ! value to be obtained
+      <TYPE> VMAX                ! Maximum acceptable numeric value for
+                                 ! value to be obtained
+      LOGICAL NULL               ! Use default value when bad status is
+                                 ! returned by the parameter get?
 
 *  Arguments Returned:
-      CHARACTER * ( * )
-     :  VALUE                  ! Character variable for which value is
-                               ! to be obtained
+      CHARACTER * ( * ) VALUE    ! Obtained value
 
 *  Status:
-      INTEGER STATUS           ! Global status
+      INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      LOGICAL                  ! True if:
-     :  EXCLUD,                ! The numeric range is an exclusion zone
-     :  NOTOK,                 ! No acceptable value obtained
-     :  NUMERC,                ! Supplied value or default is numeric
-     :  SUGDEF                 ! Suggest a default
-
-      INTEGER
-     :  NCD,                   ! Number of characters in the default
-     :  NCV,                   ! Number of characters in the value
-     :  PENALT                 ! Number of characters mismatched
-
-      CHARACTER
-     :  DEF * ( 132 ),         ! The selected default from the list of
-                               ! menu options or numeric value
-     :  OPTION * ( 132 )       ! The selected option from the menu
-
-      <TYPE>
-     :  VAL                    ! Value obtained if the input is numeric
+      CHARACTER*132 DEF          ! The selected default from the list of
+                                 ! menu options or numeric value
+      LOGICAL EXCLUD             ! Is numeric range an exclusion zone?
+      INTEGER NCD                ! Number of characters in the default
+      INTEGER NCV                ! Number of characters in the value
+      LOGICAL NOTOK              ! No acceptable value obtained?
+      LOGICAL NUMERC             ! Supplied value or default is numeric?
+      CHARACTER*132 OPTION       ! The selected option from the menu
+      INTEGER PENALT             ! Number of characters mismatched
+      LOGICAL SUGDEF             ! Suggest a default?
+      <LTYPE> VAL                ! Value obtained if the input is 
+                                 ! numeric
 
 *.
 

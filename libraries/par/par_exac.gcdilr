@@ -62,29 +62,29 @@
 *     requested is not positive.
 *
 *  Copyright:
-*     Copyright (C) 1991, 1992, 1993 Science & Engineering Research Council.
+*     Copyright (C) 1991-1993 Science & Engineering Research Council.
 *     Copyright (C) 1999 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
-*     AJC: Alan J. Chipperfield   (STARLINK)
+*     AJC: Alan J. Chipperfield  (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -106,35 +106,30 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            ! Switch off default typing
+      IMPLICIT NONE              ! Switch off default typing
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'        ! Environment constants
-      INCLUDE 'PAR_ERR'        ! Parameter-system errors
-      INCLUDE 'MSG_PAR'        ! MSG constants
+      INCLUDE 'SAE_PAR'          ! Environment constants
+      INCLUDE 'PAR_ERR'          ! Parameter-system errors
+      INCLUDE 'MSG_PAR'          ! MSG constants
 
 *  Arguments Given:
-      CHARACTER * ( * )
-     :  PARAM                  ! Parameter name
+      CHARACTER * ( * ) PARAM  ! Parameter name
 
-      INTEGER
-     :  NVALS                  ! Number of values to obtain
+      INTEGER NVALS              ! Number of values to obtain
 
 *  Arguments Returned:
-      <TYPE>
-     :  VALUES( NVALS )        ! The values obtained from parameter
-                               ! system
+      <TYPE> VALUES( NVALS )     ! The values obtained from parameter
+                                 ! system
 
 *  Status:
-      INTEGER
-     :  STATUS                 ! Global status
+      INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER
-     :  NOBT,                  ! Number of values obtained in one
-                               ! request
-     :  NGOT,                  ! Number of values obtained so far
-     :  NEEDED                 ! Number of values still needed
+      INTEGER NOBT               ! Number of values obtained in one
+                                 ! request
+      INTEGER NGOT               ! Number of values obtained so far
+      INTEGER NEEDED             ! Number of values still needed
 
 *.
 

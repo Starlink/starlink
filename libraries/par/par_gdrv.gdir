@@ -75,18 +75,18 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
@@ -109,47 +109,36 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            ! Switch off default typing
+      IMPLICIT NONE              ! Switch off default typing
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'        ! Environment constants
-      INCLUDE 'PAR_ERR'        ! Parameter-system error constants
+      INCLUDE 'SAE_PAR'          ! Environment constants
+      INCLUDE 'PAR_ERR'          ! Parameter-system error constants
 
 *  Arguments Given:
-      CHARACTER * ( * )
-     :  PARAM                  ! Parameter name associated with value
-                               ! to be obtained
+      CHARACTER * ( * ) PARAM    ! Parameter name associated with value
+                                 ! to be obtained
 
-      INTEGER
-     :  MAXVAL                 ! Maximum number of values to obtain
-
-      <TYPE>
-     :  VMIN,                  ! Minimum acceptable value for values to
-                               ! be obtained
-     :  VMAX                   ! Maximum acceptable value for values to
-                               ! be obtained
+      INTEGER MAXVAL             ! Maximum number of values to obtain
+      <TYPE> VMIN                ! Minimum acceptable value for values
+                                 ! to be obtained
+      <TYPE> VMAX                ! Maximum acceptable value for values
+                                 ! to be obtained
 
 *  Arguments Returned:
-      <TYPE>
-     :  VALUES( MAXVAL )       ! Values---only valid if STATUS does not
-                               ! have an error
+      <TYPE> VALUES( MAXVAL )    ! Values---only valid if STATUS does
+                                 ! not have an error
 
-      INTEGER
-     :  ACTVAL                 ! Number of values obtained
+      INTEGER ACTVAL             ! Number of values obtained
 
 *  Status:
-      INTEGER STATUS           ! Global status
+      INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      LOGICAL                  ! True if:
-     :  EXCLUD,                ! The range is an exclusion zone
-     :  NOTOK                  ! Unacceptable values obtained
-
-      INTEGER
-     :  I                      ! Loop counter
-
-      <TYPE>
-     :  VRANGE( 2 )            ! Minimum and maximum of values read
+      LOGICAL EXCLUD             ! Is the range an exclusion zone?
+      INTEGER I                  ! Loop counter
+      LOGICAL NOTOK              ! Unacceptable values obtained?
+      <LTYPE> VRANGE( 2 )        ! Minimum and maximum of values read
 
 *.
 

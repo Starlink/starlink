@@ -32,8 +32,8 @@
 *        The array of values to be put into the parameter.  These must
 *        be in Fortran order.
 *     ACTD( NDIM ) = INTEGER (Given)
-*        The dimensions of the parameter storage to be created. These are
-*        unlikely to be different from MAXD.
+*        The dimensions of the parameter storage to be created.  These
+*        are unlikely to be different from MAXD.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -54,25 +54,26 @@
 *     Call the underlying parameter-system primitives.
 
 *  Copyright:
-*     Copyright (C) 1984, 1988, 1990, 1992 Science & Engineering Research Council.
+*     Copyright (C) 1984, 1988, 1990, 1992 Science & Engineering
+*     Research Council.
 *     Copyright (C) 1998 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     BDK: B D Kelly (REVAD::BDK)
@@ -91,7 +92,7 @@
 *        Fixed bug so the pointer rather than the parameter name is
 *        passed to the SUBPAR_PUTNx routine.  Re-tidied the prologue.
 *      9-NOV-1998 (AJC):
-*        Correct description of ACTD
+*        Correct description of ACTD.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -110,8 +111,6 @@
       INTEGER NDIM
       INTEGER MAXD( * )
       <TYPE> VALUES( * )
-
-*  Arguments Returned:
       INTEGER ACTD( * )
 
 *  Status:

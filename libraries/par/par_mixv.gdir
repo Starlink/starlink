@@ -126,18 +126,18 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
@@ -162,60 +162,42 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            ! Switch off default typing
+      IMPLICIT NONE              ! Switch off default typing
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'        ! Environment constants
-      INCLUDE 'PAR_ERR'        ! Parameter-system error constants
-      INCLUDE 'MSG_PAR'        ! Message-system constants
+      INCLUDE 'SAE_PAR'          ! Environment constants
+      INCLUDE 'PAR_ERR'          ! Parameter-system error constants
+      INCLUDE 'MSG_PAR'          ! Message-system constants
 
 *  Arguments Given:
-      CHARACTER * ( * )
-     :  PARAM,                 ! Parameter name corresponding to
-                               ! variable VALUES
-     :  OPTS                   ! List of possible non-numeric options
-                               ! for VALUES
-
-      <TYPE>
-     :  VMIN,                  ! Minimum acceptable numeric value for
-                               ! each value to be obtained
-     :  VMAX                   ! Maximum acceptable numeric value for
-                               ! each value to be obtained
-
-      INTEGER
-     :  MAXVAL                 ! Maximum number of values to obtain
+      CHARACTER * ( * ) PARAM    ! Parameter name corresponding to
+                                 ! variable VALUES
+      CHARACTER * ( * ) OPTS     ! List of possible non-numeric options
+                                 ! for VALUES
+      <TYPE> VMIN                ! Minimum acceptable numeric value for
+                                 ! each value to be obtained
+      <TYPE> VMAX                ! Maximum acceptable numeric value for
+                                 ! each value to be obtained
+      INTEGER MAXVAL             ! Maximum number of values to obtain
 
 *  Arguments Returned:
-      CHARACTER * ( * )
-     :  VALUES( MAXVAL )       ! Character array for which values are
-                               ! to be obtained from the parameter
-                               ! system
-
-      INTEGER
-     :  ACTVAL                 ! Number of values obtained
+      CHARACTER * ( * ) VALUES( MAXVAL ) ! Obtained values
+      INTEGER ACTVAL             ! Number of values obtained
 
 *  Status:
-      INTEGER STATUS           ! Global status
+      INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      LOGICAL                  ! True if:
-     :  ALLOK,                 ! All values are acceptable
-     :  EXCLUD,                ! The numeric range is an exclusion zone
-     :  NOTOK,                 ! No acceptable value obtained
-     :  NUMERC                 ! Supplied value is numeric
-
-      INTEGER
-     :  J,                     ! Loop counter
-     :  NCV,                   ! Number of characters in the value
-     :  PENALT                 ! Number of characters mismatched
-
-      CHARACTER
-     :  OPTION * ( 132 )       ! The selected option from the menu
-
-
-      <TYPE>
-     :  VAL                    ! A value obtained if the input is
-                               ! numeric
+      LOGICAL ALLOK              ! Are all values acceptable?
+      LOGICAL EXCLUD             ! Is numeric range an exclusion zone?
+      INTEGER J                  ! Loop counter
+      INTEGER NCV                ! Number of characters in the value
+      LOGICAL NOTOK              ! No acceptable value obtained?
+      LOGICAL NUMERC             ! Is supplied value numeric?
+      CHARACTER*132 OPTION       ! The selected option from the menu
+      INTEGER PENALT             ! Number of characters mismatched
+      <LTYPE> VAL                ! A value obtained if the input is
+                                 ! numeric
 
 *.
 
@@ -226,7 +208,6 @@
       IF ( MAXVAL .LT. 1 ) THEN
 
 *  Too few values requested.
-
          STATUS = PAR__ERROR
          CALL MSG_SETC( 'PARAM', PARAM )
          CALL ERR_REP( 'PAR_MIXVx_TOOFEW',

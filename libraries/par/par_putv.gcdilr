@@ -14,7 +14,7 @@
 *     CALL PAR_PUTVx( PARAM, NVAL, VALUES, STATUS )
 
 *  Description:
-*     This routine puts a 1-dimensional array of primitive values into
+*     This routine puts a one-dimensional array of primitive values into
 *     a parameter as it if the parameter were vectorized (i.e.
 *     regardless of its actual dimensionality).  If necessary, the
 *     specified array is converted to the type of the parameter.
@@ -47,24 +47,25 @@
 *     Call the underlying parameter-system primitives.
 
 *  Copyright:
-*     Copyright (C) 1984, 1988, 1991, 1992 Science & Engineering Research Council.
+*     Copyright (C) 1984, 1988, 1991, 1992 Science & Engineering
+*     Research Council.
 *     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     B D Kelly (REVAD::BDK)
@@ -73,13 +74,13 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     20-NOV-1984:
-*        Original (BDK)
-*     1-JUN-1988:
+*     20-NOV-1984 (BDK):
+*        Original.
+*     1-JUN-1988 (AJC):
 *        Check import status
-*        Revised prologue  (AJC)
-*     7-JAN-1991:
-*        Revised prologue again (AJC)
+*        Revised prologue
+*     7-JAN-1991 (AJC):
+*        Revised prologue again.
 *     1992 March 27 (MJC):
 *        Used SST prologues.
 *     1992 November 13 (MJC):
@@ -92,7 +93,7 @@
 
 *-
 
-*  Type Dfeinitions:
+*  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
@@ -104,10 +105,10 @@
       <TYPE> VALUES( * )         ! Array to supply values
 
 *  Status:
-      INTEGER STATUS              ! Global status
+      INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER NAMCOD              ! Pointer to the parameter
+      INTEGER NAMCOD             ! Pointer to the parameter
 
 *.
 
