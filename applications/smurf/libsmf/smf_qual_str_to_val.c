@@ -47,6 +47,8 @@
 *        Add SMF__Q_NOISE
 *     2011-04-15 (TIMJ):
 *        Add SMF__Q_EXT
+*     2011-04-15 (DSB):
+*        Add SMF__Q_LOWAP
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -141,6 +143,9 @@ smf_qual_t smf_qual_str_to_val( const char *qname, smf_qfam_t * family, int * st
   } else if ( strcmp(qname, "TEL") == 0 ) {
     retval = SMF__TCOMPQ_TEL;
     lfamily = SMF__QFAM_TCOMP;
+  } else if ( strcmp(qname, "LOWAP") == 0 ) {
+    retval = SMF__Q_LOWAP;
+    lfamily = SMF__QFAM_TSERIES;
   } else {
     *status = SMF__BADQNM;
     errRepf( "", "Unrecognized quality name (%s)",

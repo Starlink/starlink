@@ -382,7 +382,7 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
     /* If required, fill the data (excluding padding) and apodise the data */
     } else if( len > 0 ) {
       smf_fillgaps( wf, data, SMF__Q_GAP, status );
-      smf_apodize( data, len, status );
+      smf_apodize( data, len, 1, status );
     }
 
     if (data && data->qual) data->qual = astFree( data->qual );

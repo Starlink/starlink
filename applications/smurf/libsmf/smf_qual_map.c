@@ -55,6 +55,8 @@
 *        Initial version
 *     2011-04-11 (TIMJ):
 *        Simplify initialisation logic. Always initialise.
+*     2011-04-26 (DSB):
+*        Added SMF__Q_LOWAP.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -250,7 +252,7 @@ smf_qual_t * smf_qual_map( int indf, const char mode[], smf_qfam_t *family,
                   } else if (ndfqtoval[k] & SMF__TCOMPQ_ENDS) {
                     retval[i] |= (SMF__Q_PAD|SMF__Q_APOD);
                   } else if (ndfqtoval[k] & SMF__TCOMPQ_BLIP) {
-                    retval[i] |= (SMF__Q_SPIKE | SMF__Q_JUMP | SMF__Q_FILT);
+                    retval[i] |= (SMF__Q_SPIKE | SMF__Q_JUMP | SMF__Q_FILT | SMF__Q_LOWAP);
                   } else if (ndfqtoval[k] & SMF__TCOMPQ_MATCH) {
                     retval[i] |= SMF__Q_COM;
                   } else if (ndfqtoval[k] & SMF__TCOMPQ_TEL) {

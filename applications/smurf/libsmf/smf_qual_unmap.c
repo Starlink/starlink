@@ -69,6 +69,8 @@
 *        assuming a simple cast to unsigned char will be enough.
 *     2011-04-15 (TIMJ):
 *        Add SMF__Q_EXT
+*     2011-04-26 (DSB):
+*        Add SMF__Q_LOWAP
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -307,7 +309,7 @@ smf_qual_t * smf_qual_unmap( int indf, smf_qfam_t family, smf_qual_t * qual, int
             if ( qual[i] & (SMF__Q_APOD|SMF__Q_PAD) ) {
               qmap[i] |= SMF__TCOMPQ_ENDS;
             }
-            if ( qual[i] & (SMF__Q_JUMP|SMF__Q_SPIKE|SMF__Q_FILT|SMF__Q_EXT) ) {
+            if ( qual[i] & (SMF__Q_JUMP|SMF__Q_SPIKE|SMF__Q_FILT|SMF__Q_EXT|SMF__Q_LOWAP) ) {
               qmap[i] |= SMF__TCOMPQ_BLIP;
             }
             if ( qual[i] & (SMF__Q_COM) ) {

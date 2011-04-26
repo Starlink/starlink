@@ -93,6 +93,8 @@
 *     2011-04-14 (DSB):
 *        - Do gap filling here.
 *        - Use smf_apodize to apodise the data.
+*     2011-04-26 (DSB):
+*        Remove the effects of apodisation from the filtered data.
 
 *  Copyright:
 *     Copyright (C) 2011 Science & Technology Facilities Council.
@@ -597,7 +599,7 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
      and apodise the data. */
   } else {
     smf_fillgaps( wf, data, SMF__Q_GAP, status );
-    if( apod_length > 0 ) smf_apodize( data, apod_length, status );
+    if( apod_length > 0 ) smf_apodize( data, apod_length, 1, status );
   }
 
   /* Describe the input and output array dimensions for FFTW guru interface.
@@ -714,4 +716,11 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
 
   /* Return the filter to its original state if required */
   if( complement == -1 ) smf_filter_complement( filt, status );
+
+
+  /* Remove the effects of the apodisation from the filtered data. */
+  if( apod_length != SMF__BADSZT && apod_length > 0 ) {
+     smf_apodize( data, apod_length, 0, status );
+  }
+
 }

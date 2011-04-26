@@ -67,6 +67,8 @@
 *        Add SMF__Q_NOISE
 *     2011-04-15 (TIMJ):
 *        Add SMF__Q_EXT
+*     2011-04-26 (DSB):(TIMJ):
+*        Add SMF__Q_LOWAP
 
 *  Copyright:
 *     Copyright (C) 2010-2011 Science & Technology Facilities Council.
@@ -184,6 +186,11 @@ const char *smf_qual_str( smf_qfam_t family, int usebit, int bit_or_val,
     case SMF__Q_EXT:
       retval = "EXT";
       ldescr = "Set if extinction correction failed";
+      break;
+
+    case SMF__Q_LOWAP:
+      retval = "LOWAP";
+      ldescr = "Set iff apodisation factor is too low to invert";
       break;
 
     default:

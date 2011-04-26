@@ -14,7 +14,7 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_apodize( smfData *data, size_t len, int * status );
+*     smf_apodize( smfData *data, size_t len, int forward, int * status );
 
 *  Arguments:
 *     data = smfData* (Given)
@@ -23,6 +23,10 @@
 *        Number of samples over which to apply apodization. Can be set to
 *        SMF__MAXAPLEN in which case the routine will automatically apodize
 *        the entire data stream (maximum valid value of len)
+*     forward = int (Given)
+*        If non-zero, the supplied data is apodised using the Hanning
+*        window. If zero, the effects of previous apodisation is removed
+*        from the supplied data using the inverse of the Hanning window.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -67,10 +71,13 @@
 *       Apodize and mask all detectors to ensure that smf_get_goodrange works!
 *     2010-03-31 (EC):
 *       Only apodize working detectors, even though all detectors are flagged.
+*     2011-04-26 (DSB):
+*       Added "forward" argument.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008-2010 University of British Columbia.
+*     Copyright (C) 2011 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -109,9 +116,10 @@
 /* Other includes */
 #include <math.h>
 
+#define LOWAP 1.0E-6
 #define FUNC_NAME "smf_apodize"
 
-void smf_apodize( smfData *data, size_t len, int *status ) {
+void smf_apodize( smfData *data, size_t len, int forward, int *status ) {
 
   double ap;                    /* Apodization factor at this step */
   size_t bstride;               /* Bolometer stride in data array */
@@ -184,16 +192,43 @@ void smf_apodize( smfData *data, size_t len, int *status ) {
 
         /* First roll-off the signal, working detectors only */
         if( !(qua[i*bstride] & SMF__Q_BADB) ) {
-          for( j=0; j<thelen; j++ ) {
-            ap = 0.5 - 0.5*cos( AST__DPI * (double) j / thelen );
 
-            /* scale the signal */
-            if( !(qua[i*bstride+(first+j)*tstride]&SMF__Q_MOD) ) {
-              dat[i*bstride+(first+j)*tstride]*=ap;
+          /* Apply apodisation. */
+          if( forward ) {
+            for( j=0; j<thelen; j++ ) {
+              ap = 0.5 - 0.5*cos( AST__DPI * (double) j / thelen );
+
+              /* scale the signal */
+              if( !(qua[i*bstride+(first+j)*tstride]&SMF__Q_MOD) ) {
+                dat[i*bstride+(first+j)*tstride]*=ap;
+              }
+
+              if( !(qua[i*bstride+(last-j)*tstride]&SMF__Q_MOD) ) {
+                dat[i*bstride+(last-j)*tstride]*=ap;
+              }
             }
 
-            if( !(qua[i*bstride+(last-j)*tstride]&SMF__Q_MOD) ) {
-              dat[i*bstride+(last-j)*tstride]*=ap;
+          /* Remove apodisation. In order to avoid the signal blowing up
+             at the ends, very low apodisation factors are skipped, and the
+             corresponding samples are flagged with SMF__Q_LOWAP (causing
+             them to be gap-filled in future).*/
+          } else {
+            for( j=0; j<thelen; j++ ) {
+              ap = 0.5 - 0.5*cos( AST__DPI * (double) j / thelen );
+              if( fabs( ap ) > LOWAP ) {
+
+                if( !(qua[i*bstride+(first+j)*tstride]&SMF__Q_MOD) ) {
+                  dat[i*bstride+(first+j)*tstride] /= ap;
+                }
+
+                if( !(qua[i*bstride+(last-j)*tstride]&SMF__Q_MOD) ) {
+                  dat[i*bstride+(last-j)*tstride] /= ap;
+                }
+
+              } else {
+                qua[i*bstride+(first+j)*tstride] |= SMF__Q_LOWAP;
+                qua[i*bstride+(last-j)*tstride] |= SMF__Q_LOWAP;
+              }
             }
           }
         }
@@ -208,15 +243,36 @@ void smf_apodize( smfData *data, size_t len, int *status ) {
 
       } else if (!qua) {
         /* Non-Quality checking version */
-        for( j=0; j<thelen; j++ ) {
-          ap = 0.5 - 0.5*cos( AST__DPI * (double) j / thelen );
 
-          if( dat[i*bstride+(first+j)*tstride]!=VAL__BADD ) {
-            dat[i*bstride+(first+j)*tstride]*=ap;
+        if( forward ) {
+          for( j=0; j<thelen; j++ ) {
+            ap = 0.5 - 0.5*cos( AST__DPI * (double) j / thelen );
+
+            if( dat[i*bstride+(first+j)*tstride]!=VAL__BADD ) {
+              dat[i*bstride+(first+j)*tstride]*=ap;
+            }
+
+            if( dat[i*bstride+(last-j)*tstride]!=VAL__BADD ) {
+              dat[i*bstride+(last-j)*tstride]*=ap;
+            }
           }
+        } else {
+          for( j=0; j<thelen; j++ ) {
+            ap = 0.5 - 0.5*cos( AST__DPI * (double) j / thelen );
+            if( fabs( ap ) > LOWAP ) {
 
-          if( dat[i*bstride+(last-j)*tstride]!=VAL__BADD ) {
-            dat[i*bstride+(last-j)*tstride]*=ap;
+              if( dat[i*bstride+(first+j)*tstride]!=VAL__BADD ) {
+                dat[i*bstride+(first+j)*tstride] /= ap;
+              }
+
+              if( dat[i*bstride+(last-j)*tstride]!=VAL__BADD ) {
+                dat[i*bstride+(last-j)*tstride] /= ap;
+              }
+
+            } else {
+              dat[i*bstride+(first+j)*tstride] = VAL__BADD;
+              dat[i*bstride+(last-j)*tstride] = VAL__BADD;
+            }
           }
         }
       }
