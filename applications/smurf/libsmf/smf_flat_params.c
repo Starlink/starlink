@@ -125,6 +125,8 @@ smf_flat_params( const smfData * refdata, const char resistpar[],
                  int * outcols, smf_flatmeth  *flatmeth,
                  int * order, double * snrmin, int * status ) {
 
+  dim_t datarows = 0;       /* Number of rows in refdata */
+  dim_t datacols = 0;       /* Number of columns in refdata */
   size_t j = 0;             /* Counter, index */
   char method[SC2STORE_FLATLEN]; /* flatfield method string */
   size_t nbols;              /* Number of bolometers */
@@ -225,15 +227,18 @@ smf_flat_params( const smfData * refdata, const char resistpar[],
     }
 
     /* Check row vs column count */
-    if ( (refdata->dims)[SC2STORE__COL_INDEX] != (size_t)ncols ||
-         (refdata->dims)[SC2STORE__ROW_INDEX] != (size_t)nrows ) {
+    smf_dump_smfData( refdata, 0 , status );
+    smf_get_dims( refdata, &datarows, &datacols, NULL, NULL, NULL, NULL, NULL, status );
+
+    if ( (size_t)datacols != (size_t)ncols ||
+         (size_t)datarows != (size_t)nrows ) {
       *status = SAI__ERROR;
       msgSeti( "RC", ncols );
       msgSeti( "RR", nrows );
-      msgSeti( "DC", (refdata->dims)[SC2STORE__COL_INDEX]);
-      msgSeti( "DR", (refdata->dims)[SC2STORE__ROW_INDEX]);
-      errRep( " ", "Dimensions of subarray from resistor file (^RC x ^RR)"
-              " do not match those of data file (^DC x ^DR)", status );
+      msgSeti( "DC", datacols);
+      msgSeti( "DR", datarows);
+      errRep( " ", "Dimensions of subarray from resistor file (^RC cols x ^RR rows)"
+              " do not match those of data file (^DC cols x ^DR rows)", status );
       goto CLEANUP;
     }
 
