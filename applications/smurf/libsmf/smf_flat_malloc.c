@@ -134,8 +134,6 @@ void smf_flat_malloc( size_t nheat, const smfData * refdata,
 
   if ( !smf_validate_smfData( refdata, 1, 0, status ) ) return;
   oldhdr = refdata->hdr;
-  printf("Inside flat malloc\n");
-  smf_dump_smfData( refdata, 0, status );
 
   if (powvald) {
     powval = astCalloc( nheat, sizeof(*powval), 1 );
