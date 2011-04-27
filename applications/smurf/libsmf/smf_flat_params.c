@@ -227,7 +227,6 @@ smf_flat_params( const smfData * refdata, const char resistpar[],
     }
 
     /* Check row vs column count */
-    smf_dump_smfData( refdata, 0 , status );
     smf_get_dims( refdata, &datarows, &datacols, NULL, NULL, NULL, NULL, NULL, status );
 
     if ( (size_t)datacols != (size_t)ncols ||
