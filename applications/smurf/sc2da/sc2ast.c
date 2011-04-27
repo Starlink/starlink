@@ -27,7 +27,7 @@
 
 /* The FPLANE_IFRAME macro gives the one-based index of the FPLANE  Frame
    within the cached FrameSet. */
-#define FPLANE_IFRAME 4
+#define FPLANE_IFRAME 3
 
 static char errmess[132];              /* For DRAMA error messages */
 
@@ -1246,6 +1246,7 @@ int *status             /* global status (given and returned) */
    by the macro FPLANE_IFRAME, which will need to be changed if further
    Frames are added to the FrameaSet prior to the FPLANE Frame. */
       icurr = astGetI( cache->frameset[ subnum ], "Current" );
+      if (!state) astRemoveFrame( cache->frameset[ subnum ], AST__CURRENT );
       astAddFrame( cache->frameset[ subnum ], AST__BASE, cache->map[ subnum ],
                    fp_pos_frame );
 
