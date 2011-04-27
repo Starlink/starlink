@@ -395,6 +395,10 @@ com.corr_tol = 5
 com.gain_tol = 5
 com.gain_abstol = 3
 
+# by default negative gains are used to flag bad bolometer data. However, if
+# this parameter is set to 0 negative values will be allowed
+#com.gain_positive = 0
+
 # Do not set com.gain_box lower than about 6000 which corresponds to
 # 30s, or roughly the fridge oscillation period.
 com.gain_box = 6000

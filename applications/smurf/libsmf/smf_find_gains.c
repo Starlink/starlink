@@ -63,6 +63,9 @@
 *        is used for all gains. The offsets and correlation coefficients
 *        are still determined.
 *
+*        - gain_positive (int): If non-zero gains must be positive. If zero,
+*        negative gains will be allowed.
+*
 *        - gain_rat (double): The square root of the ratio of the maximum
 *        acceptable block gain within a bolometer to the minimum acceptable
 *        block gain. It is used when checking for consistency amongst the
@@ -156,15 +159,19 @@
 
 *  Authors:
 *     David S Berry (JAC, Hawaii)
+*     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
 *     13-JUN-2010 (DSB):
 *        Original version.
+*     27-APR-2011 (EC):
+*        Add gain_positive flag
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2011 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -264,6 +271,7 @@ int smf_find_gains( smfWorkForce *wf, smfData *data, double *template,
    double g;
    double gain_abstol;
    double gain_fgood;
+   int gain_positive;
    double gain_rat;
    double gain_tol;
    double gmax;
@@ -362,6 +370,7 @@ int smf_find_gains( smfWorkForce *wf, smfData *data, double *template,
    astMapGet0D( keymap, "CORR_ABSTOL", &corr_abstol );
    astMapGet0D( keymap, "GAIN_TOL", &gain_tol );
    astMapGet0D( keymap, "GAIN_FGOOD", &gain_fgood );
+   astMapGet0I( keymap, "GAIN_POSITIVE", &gain_positive );
    astMapGet0D( keymap, "GAIN_RAT", &gain_rat );
    astMapGet0D( keymap, "GAIN_ABSTOL", &gain_abstol );
    astMapGet0I( keymap, "GAIN_IS_ONE", &nogains );
@@ -537,20 +546,23 @@ int smf_find_gains( smfWorkForce *wf, smfData *data, double *template,
                   if( g == VAL__BADD ) {
 
 /* Ignore failed fits, negative gains and very low correlation
-   coefficients, recording the reason why the bolometer was rejected. */
+   coefficients, recording the reason why the bolometer was rejected.
+   We can allow negative gains, but never a gain of 0, if gain_positive
+   was set. */
                   } else if( g == NOFIT ){
                      reason[ 0 ]++;
 
-                  } else if( g <= 0 ){
+                  } else if( ((gain_positive) && (g < 0)) || (g == 0) ){
                      reason[ 1 ]++;
 
                   } else if( c <= corr_abstol ){
                      reason[ 2 ]++;
 
 /* Otherwise, store the correlation coefficient and the logarithm of the
-   gain. */
+   gain. We take the absolute value in case we are allowing negative gain
+   values... a bit of a kludge. */
                   } else {
-                     glog[ ibolo ] = log( g );
+                     glog[ ibolo ] = log( fabs(g) );
                      corr[ ibolo ] = c;
                   }
                }

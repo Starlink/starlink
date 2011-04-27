@@ -1,0 +1,39 @@
+^$STARLINK_DIR/share/smurf/dimmconfig.lis
+
+# *** Specialized config for CALCNOISE ***
+#
+# The purpose of CALCNOISE is to estimate the white noise level of the
+# bolometers using cleaning steps that are similar to those used by
+# MAKEMAP. However, we use less harsh flagging of the bolometers so
+# that we can get measurements of even the less well-behaved
+# bolometers (which would probably be ignored during map-making). We
+# turn on compreprocess to mimic a significant portion of the
+# low-frequency noise removal of makemap. However, since many noise
+# observations are done in the dark, the common-mode signal may not
+# vary much, making the common-mode bad-bolo flagging problematic. To
+# combat this problem we allow negative gains for the common-mode (in
+# case the common-signal is nearly completely invariant with time and
+# so the gains are extremely noisy), and relax many of the flagging
+# constraints. We also turn off the blocked common-mode calculation to
+# avoid having large stretches of the bolometer signal replaced with
+# padding, by setting gain_box to a very large value. Finally, since
+# the common-mode removal is done using most of the bolos (even very
+# noisy ones) it could potentially have substantial high-frequency
+# noise compared to the less noisy bolometers. Since we're mostly
+# using this to remove low-frequency noise, we turn on boxcar
+# smoothing.
+#
+# ***********************************************************************
+
+compreprocess = 1
+com.gain_box = 1000000
+com.gain_positive = 0
+com.corr_tol = 10
+com.gain_tol = 10
+com.gain_abstol = 10
+com.corr_abstol = -1
+
+com.boxcar = 100
+
+noiseclip = 0
+

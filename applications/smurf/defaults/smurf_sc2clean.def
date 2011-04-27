@@ -112,6 +112,7 @@ com.boxmin = 0
 
 com.corr_tol = 5
 com.corr_abstol = 0.2
+com.gain_positive = 1
 com.gain_tol = 5
 com.gain_fgood = 0.25
 com.gain_rat = 4
