@@ -67,6 +67,14 @@
 *          the full time series will be apodized with no padding.
 *          This differs to the behaviour of SC2CLEAN where the defaults
 *          will be read and used. [current value]
+*     EFFNEP = _DOUBLE (Write)
+*          The effective noise of the .MORE.SMURF.NEP image. See the EFFNOISE
+*          parameter for details of how it is calculated.
+*     EFFNOISE = _DOUBLE (Write)
+*          The effective noise of the primary output image. If this command
+*          was run on raw data it will be the current noise and if run on
+*          flatfielded data it will be the effective NEP. Calculated as
+*          the sqrt of 1/sum(1/sigma^2). See also the EFFNEP parameter.
 *     FLATMETH = _CHAR (Read)
 *          Method to use to calculate the flatfield solution. Options
 *          are POLYNOMIAL and TABLE. Polynomial fits a polynomial to
@@ -485,6 +493,8 @@ void smurf_calcnoise( int *status ) {
 
         if (*status == SAI__OK) {
           double * od = (outdata->pntr)[0];
+          size_t noisegoodbol = 0;
+          double noisesum = 0.0;
           smf_bolonoise( wf, thedata, 0, f_low, freqs[0], freqs[1],
                          1, zeropad ? SMF__MAXAPLEN : SMF__BADSZT,
                          (outdata->pntr)[0], (ratdata->pntr)[0],
@@ -492,7 +502,21 @@ void smurf_calcnoise( int *status ) {
 
           /* Bolonoise gives us a variance - we want square root */
           for (i = 0; i < (outdata->dims)[0]*(outdata->dims)[1]; i++) {
-            if ( od[i] != VAL__BADD ) od[i] = sqrt( od[i] );
+            if ( od[i] != VAL__BADD ) {
+              noisegoodbol++;
+              noisesum += 1.0 / od[i];
+              od[i] = sqrt( od[i] );
+            }
+          }
+
+          if (noisegoodbol) {
+            double noiseeff;
+            noiseeff = sqrt( 1.0 / noisesum );
+            msgOutf( "", "Effective noise of array = %g %s from %zu bolometers",
+                     status, noiseeff, noiseunits, noisegoodbol );
+            parPut0d( "EFFNOISE", noiseeff, status );
+          } else {
+            parPut0d( "EFFNOISE", VAL__BADD, status );
           }
 
           if (powdata) {
@@ -560,6 +584,8 @@ void smurf_calcnoise( int *status ) {
             /* and divide the noise data by the responsivity
                correcting for SIMULT */
             if (*status == SAI__OK) {
+              double nepsum = 0.0;
+              size_t nepgoodbol = 0;
               for (i = 0; i < (nepdata->dims)[0]*(nepdata->dims)[1]; i++) {
                 /* ignore variance since noise will not have any */
                 double * noise = (outdata->pntr)[0];
@@ -569,7 +595,18 @@ void smurf_calcnoise( int *status ) {
                   nep[i] = VAL__BADD;
                 } else {
                   nep[i] = (noise[i] / SIMULT) / resp[i];
+                  nepsum += ( 1.0 / (nep[i] * nep[i]) );
+                  nepgoodbol++;
                 }
+              }
+              if (nepgoodbol) {
+                double nepeff;
+                nepeff = sqrt( 1.0 / nepsum );
+                msgOutf( "", "Effective NEP of array  = %g %s from %zu bolometers",
+                         status, nepeff, nepdata->hdr->units, nepgoodbol );
+                parPut0d( "EFFNEP", nepeff, status );
+              } else {
+                parPut0d( "EFFNEP", VAL__BADD, status );
               }
             }
             if (*status == SAI__OK && nepdata->file) {

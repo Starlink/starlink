@@ -460,6 +460,24 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter effnep {
+                type _DOUBLE
+                access WRITE
+                vpath DEFAULT
+                prompt {Effective NEP of subarray}
+                default 0
+                helpkey *
+            }
+
+            parameter effnoise {
+                type _DOUBLE
+                access WRITE
+                vpath DEFAULT
+                prompt {Effective noise of subarray}
+                default 0
+                helpkey *
+            }
+
             parameter flow {
                 type _DOUBLE
                 vpath DEFAULT
