@@ -19,15 +19,16 @@
  */
 #define COLROW 1
 
-/* The CURRENT macro specifies the index of the current Frame in the
-   FrameSet returned by sc2ast_createwcs(2). This current Frame is
-   re-established (in case it was changed by the calling code) each time
-   sc2ast_createwcs(2) is called. */
-#define CURRENT 3
-
-/* The FPLANE_IFRAME macro gives the one-based index of the FPLANE  Frame
-   within the cached FrameSet. */
+/* The one-based index for each Frame within the cached FrameSet. Note,
+   these values reflect on the order in which the Frames are added to the
+   FrameSet. So if the order is changed, these values should be changed
+   accordingly. In order to ensure these values remain fixed, the SKY
+   rame should always be the last Frame since it is removed and
+   re-added on each invocation */
+#define GRID_IFRAME 1
+#define BOLO_IFRAME 2
 #define FPLANE_IFRAME 3
+#define SKY_IFRAME 4
 
 static char errmess[132];              /* For DRAMA error messages */
 
@@ -287,6 +288,10 @@ int *status             /* global status (given and returned) */
                  arrays). (DSB)
      12Apr2011 : Make NEW4 distortion the default. (DSB)
      26Apr2011 : Ensure the returned FrameSet always has an FPLANE Frame (DSB)
+     26Apr2011 : Simplify the logic by doing away with the blank Frame
+                 previously used as a place-holder for the SKY Frame.
+                 Also corrects the logic in the case of "state" being NULL on
+                 one call and not NULL on the next call.
 */
 {
 
@@ -313,10 +318,10 @@ int *status             /* global status (given and returned) */
    double shift[2];
    double shifts[ 2 ];
    double zshift[2];
-   int icurr;
    int isub;
    int nc_f;
    int nc_i;
+   int nfrm;
    int nin;
    int nout;
    sc2astCache *result;
@@ -1003,15 +1008,20 @@ int *status             /* global status (given and returned) */
 /* Add a 2D Frame with Domain "BOLO" describing the bolometer rows and
    columns. */
       sc2ast_make_bolo_frame( &bfrm, &bmap, status );
-      astAddFrame( cache->frameset[ subnum ], AST__BASE, bmap, bfrm );
+      astAddFrame( cache->frameset[ subnum ], GRID_IFRAME, bmap, bfrm );
 
-/* We add a another 2D Frame to the FrameSet (which becomes Frame number
-   3 in the FrameSet). Without this, the first call to astRemoveFrame below
-   would remove the BOLO Frame we have just added. NOTE, if in future we add
-   any further Frames in here, the value of the CURRENT macro (defined
-   above) should be changed. */
-      astAddFrame( cache->frameset[ subnum ], AST__BASE,
-                   astUnitMap( 2, " " ), astFrame( 2, " " ) );
+/* Create a Frame describing focal plane coords in arc-seconds. This is the
+   coordinate system that will be produced by the completed cached Mapping
+   (except that the cached mapping produces radians, not arc-seconds). */
+      fp_pos_frame = astFrame( 2, "Unit(1)=arcsec,Unit(2)=arcsec,Domain=FPLANE,"
+                               "label(1)=FplaneX,label(2)=FplaneY" );
+
+/* Add the Frame into the cached FrameSet (it becomes Frame 3). For the
+   moment, we use a UnitMap to connect it to the GRID Frame. The Frame
+   will be re-mapped using the correct Mapping when the cached Mapping
+   is completed. */
+      astAddFrame( cache->frameset[ subnum ], GRID_IFRAME,
+                   astUnitMap( 2, " " ), fp_pos_frame );
 
 /* Start off with a PermMap that swaps the grid axes from the new
    axes ordering to the old axis ordering (AST uses 1-based axis
@@ -1233,30 +1243,15 @@ int *status             /* global status (given and returned) */
 /* Simplify the Cached Mapping. */
       cache->map[ subnum ] = astSimplify( cache->map[ subnum ] );
 
-/* Create a Frame describing focal plane coords in radians. This is the
-   coordinate system produced by the cached Mapping. */
-      fp_pos_frame = astFrame( 2, "Unit(1)=rad,Unit(2)=rad,Domain=FPLANE,"
-                               "label(1)=FplaneX,label(2)=FplaneY" );
-
-/* Ensure the Frame responds to changes in its axis units. */
-      astSetActiveUnit( fp_pos_frame, 1 );
-
-/* Add the Farme into the cached FrameSet, first noting the index of the
-   original current Frame. The index of the newly added Frame is specified
-   by the macro FPLANE_IFRAME, which will need to be changed if further
-   Frames are added to the FrameaSet prior to the FPLANE Frame. */
-      icurr = astGetI( cache->frameset[ subnum ], "Current" );
-      if (!state) astRemoveFrame( cache->frameset[ subnum ], AST__CURRENT );
-      astAddFrame( cache->frameset[ subnum ], AST__BASE, cache->map[ subnum ],
-                   fp_pos_frame );
-
-/* Change the focal plane units from radians to arc-seconds. The Mapping
-   in the FrameSet will be adjusted accordingly (because of the call to
-   astSetActiveUnit above). */
-      astSet( cache->frameset[ subnum ], "unit(1)=arcsec,unit(2)=arcsec" );
-
-/* Change the current Frame back to the original. */
-      astSetI(  cache->frameset[ subnum ], "Current", icurr );
+/* Now that the Mapping from GRID to FPLANE is known, we remap the FPLANE
+   Frame in the FrameSet (which is currently connected to the GRID Frame
+   using a UnitMap). We use the cached Mapping in series with a ZoomMap
+   that converts radians (as produced by the cached Mapping) to arc-seconds
+   (as described by the FPLANE Frame). */
+       astRemapFrame( cache->frameset[ subnum ], FPLANE_IFRAME,
+                      astCmpMap( cache->map[ subnum ],
+                                 astZoomMap( 2, AST__DR2D*3600.0, " " ), 1,
+                                 " " ) );
 
 /* Exempt the cached AST objects from AST context handling. This means
    that the pointers will not be annulled as a result of calling
@@ -1266,11 +1261,20 @@ int *status             /* global status (given and returned) */
       astExempt( cache->map[ subnum ] );
       astExempt( cache->frameset[ subnum ] );
 
+/* Note the number of Frames in the FrameSet. */
+      nfrm = astGetI( cache->frameset[ subnum ], "NFrame" );
+
 /* If we already have a cached FrameSet, check that no-one has been mucking
-   about with it - it should have 2D base Frame and a 2D current Frame. */
+   about with it - it should have 2D base Frame and a 2D current Frame,
+   and it should have 3 or 4 Frames (depending on whether it contains a
+   SKY Frame or not). The checks here are minimal since this code is
+   time-critical. */
    } else {
+
       nin = astGetI( cache->frameset[ subnum ], "Nin" );
       nout = astGetI( cache->frameset[ subnum ], "Nout" );
+      nfrm = astGetI( cache->frameset[ subnum ], "NFrame" );
+
       if( nin != 2 && *status == SAI__OK ) {
          *status = SAI__ERROR;
          sprintf( errmess, "sc2ast_createwcs2: cached FrameSet has been "
@@ -1284,16 +1288,22 @@ int *status             /* global status (given and returned) */
                   "corrupted - it now has %d current frame axes (should "
                   "be 2).", nout );
          ErsRep( 0, status, errmess );
-      }
 
-/* Ensure the original current Frame is still the CURRENT Frame (the caller
-   may have changed the current Frame - e.g. to access the BOLO Frame). */
-      astSetI( cache->frameset[ subnum ], "Current", CURRENT );
+      } else if( nfrm != SKY_IFRAME && nfrm != SKY_IFRAME - 1 &&
+                 *status == SAI__OK ){
+         *status = SAI__ERROR;
+         sprintf( errmess, "sc2ast_createwcs2: cached FrameSet has been "
+                  "corrupted - it now has %d frames (should be %d or %d).",
+	          nfrm, SKY_IFRAME - 1, SKY_IFRAME );
+         ErsRep( 0, status, errmess );
+      }
    }
 
-/* If the returned FrameSet is to contain just the FPLANE Frame (i.e. no
-   sky coords), ensure the FPLANE Frame is current. */
+/* If the returned FrameSet is not to contain a SKY Frame, remove any
+   SKY Frame, then ensure the FPLANE Frame is the current Frame. */
    if( !state ) {
+      if( nfrm >= SKY_IFRAME ) astRemoveFrame( cache->frameset[ subnum ],
+                                               SKY_IFRAME );
       astSetI(  cache->frameset[ subnum ], "Current", FPLANE_IFRAME );
 
 /* If sky coords are required in the returned FrameSet... */
@@ -1377,12 +1387,13 @@ int *status             /* global status (given and returned) */
               DBL_DIG, dut1 );
 
 /* Now modify the cached FrameSet to use the new Mapping and SkyFrame.
-   First remove the existing current Frame and then add in the new one.
-   Note, we add a copy of the SkyFrame rather than the cached SkyFrame
-   itself since the SkyFrame contained in the FrameSet will be modified
-   by later functions.  */
-      astRemoveFrame( cache->frameset[ subnum ], AST__CURRENT );
-      astAddFrame( cache->frameset[ subnum ], AST__BASE, mapping,
+   First remove any existing SKY Frame and then add in the new one. Note,
+   we add a copy of the SkyFrame rather than the cached SkyFrame itself
+   since the SkyFrame contained in the FrameSet will be modified by later
+   functions.  */
+      if( nfrm >= SKY_IFRAME ) astRemoveFrame( cache->frameset[ subnum ],
+                                               SKY_IFRAME );
+      astAddFrame( cache->frameset[ subnum ], GRID_IFRAME, mapping,
                    astClone( cache->skyframe ) );
    }
 
