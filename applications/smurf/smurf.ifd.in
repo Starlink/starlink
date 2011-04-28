@@ -455,8 +455,9 @@ package @PACKAGE@ {
             parameter config {
                 type LITERAL
                 access READ
-                ppath CURRENT
-                prompt {Configuration parameters}
+                ppath CURRENT DEFAULT
+                default {^$STARLINK_DIR/share/smurf/dimmconfig_calcnoise.lis}
+                prompt {Configuration parameters for cleaning}
                 helpkey *
             }
 
