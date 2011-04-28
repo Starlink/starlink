@@ -217,10 +217,12 @@
  *     2011-04-21 (TIMJ):
  *        Move some NDG/GRP code earlier in the loop to avoid
  *        a thread problem.
+ *     2011-04-28 (EC):
+ *        Set SMF__Q_BADDA if ensureflat=0 and SMF__NOCREATE_QUALITY not set
  *     {enter_further_changes_here}
 
  *  Copyright:
- *     Copyright (C) 2007-2010 University of British Columbia.
+ *     Copyright (C) 2007-2011 University of British Columbia.
  *     Copyright (C) 2008-2011 Science and Technology Facilities Council.
  *
  *     All Rights Reserved.
@@ -845,10 +847,6 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                   da->dksquid->qual = astCalloc(ncol*tlen,
                                                 sizeof(*(da->dksquid->qual)),
                                                 1);
-                  if( *status == SAI__OK ) {
-                    memset( da->dksquid->qual, 0,
-                            ncol*tlen*sizeof(*(da->dksquid->qual)) );
-                  }
                 }
 
               }
@@ -980,6 +978,41 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
            tmpdata = tmpdata_next;
         }
 
+      }
+
+      /* If ensureflat=0 and SMF__NOCREATE_QUALITY is not set, we may
+         have a bunch of bolometers that don't change with time that
+         were turned off by the DA system. Explicitly do that check
+         here in the non-padded region of the concatenated array and
+         set SMF__Q_BADDA */
+      if( (*status == SAI__OK) && (!ensureflat) && (data->qual) ) {
+        if( data->dtype == SMF__DOUBLE ) {
+          int change;
+          double *d = data->pntr[0];
+
+          for( j=0; j<nbolo; j++ ) {
+            change = 0;
+            for( k=padStart; k<(tlen-padEnd); k++) {
+              if( d[j*bstr + k*tstr] != d[j*bstr] ) {
+                /* If even one sample is different than first, we've detected
+                   a change so don't flag this bolo */
+                change = 1;
+                break;
+              }
+            }
+
+            if( !change ) {
+              for( k=padStart; k<(tlen-padEnd); k++) {
+                data->qual[j*bstr + k*tstr] |= SMF__Q_BADDA;
+              }
+            }
+          }
+        } else {
+          *status = SAI__ERROR;
+          errRepf( "", FUNC_NAME
+                   ": Don't know how to handle %s type when flagging BADDA.",
+                   status, smf_dtype_string(data,status) );
+        }
       }
 
       /* Full subarray is now concatenated. Finish up by filling the padded
@@ -1118,8 +1151,6 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
 
       }
     }
-
-
 
     /* Put this concatenated subarray (or directly copied subarray in the
        case of an FFT) into the smfArray */
