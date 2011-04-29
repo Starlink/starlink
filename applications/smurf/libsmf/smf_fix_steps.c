@@ -197,6 +197,9 @@
 *        proximity to a bright source.
 *        - Removed argument "bcount".
 *        - Re-instate DCLIMCORR and correction of correlated steps.
+*     29-APR-2011 (DSB):
+*        Assign Q_JUMP to bolometers that are totally rejected (as well
+*        as Q_BADB).
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -885,7 +888,7 @@ static void smf1_fix_steps_job( void *job_data, int *status ) {
                           "insufficient samples", status, ibolo );
                pq = qua + base;
                for( itime = 0; itime < ntslice; itime++) {
-                 *pq |= SMF__Q_BADB;
+                 *pq |= ( SMF__Q_BADB | SMF__Q_JUMP );
                   pq += tstride;
                }
                nrej++;
@@ -1024,7 +1027,7 @@ static void smf1_fix_steps_job( void *job_data, int *status ) {
                           "insufficient samples", status, ibolo );
                pq = qua + base;
                for( itime = 0; itime < ntslice; itime++) {
-                 *pq |= SMF__Q_BADB;
+                 *pq |= ( SMF__Q_BADB | SMF__Q_JUMP );
                   pq += tstride;
                }
                nrej++;
@@ -1252,7 +1255,7 @@ static void smf1_fix_steps_job( void *job_data, int *status ) {
             if( dcmaxsteps > 0 && mbstep > maxsteps ) {
                pq = qua + base;
                for( itime = 0; itime < ntslice; itime++ ) {
-                  *pq |= SMF__Q_BADB;
+                  *pq |= ( SMF__Q_BADB | SMF__Q_JUMP );
                   pq += tstride;
                }
 
