@@ -1,6 +1,6 @@
 AST Library
 -----------
-   A new release (V5.6) of the Starlink AST (astrometry) library is
+   A new release (V5.6-1) of the Starlink AST (astrometry) library is
 now available.
 
    AST provides a comprehensive range of facilities for attaching
@@ -15,6 +15,16 @@ environment-independent.
 
 Main Changes in this Version
 ----------------------------
+
+- A bug has been fixed in the astFindFrame (AST_FINDFRAME) method that
+allowed a template Frame of a more specialised class to match a target
+frame of a less specialised class. For example, this bug would allow a
+template SkyFrame to match a target Frame. This no longer happens.
+
+
+
+Main Changes in V5.6-0
+-----------------------
 
 - New functions astBBuf (AST_BBUF) and astEBuf (AST_EBUF) have been added
 to the Plot class. These control the buffering of graphical output

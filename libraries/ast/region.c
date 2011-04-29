@@ -196,6 +196,9 @@ f     - AST_SHOWMESH: Display a mesh of points on the surface of a Region
 *        Added astGetRegionMesh public method.
 *     22-MAR-2011 (DSB):
 *        Improve uniformity of points produced by astRegBaseGrid method.
+*     29-APR-2011 (DSB):
+*        Prevent astFindFrame from matching a subclass template against a
+*        superclass target.
 *class--
 
 *  Implementation Notes:
@@ -907,7 +910,7 @@ static int GetUseDefs( AstObject *, int * );
 static int IsUnitFrame( AstFrame *, int * );
 static int LineContains( AstFrame *, AstLineDef *, int, double *, int * );
 static int LineCrossing( AstFrame *, AstLineDef *, AstLineDef *, double **, int * );
-static int Match( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame **, int * );
+static int Match( AstFrame *, AstFrame *, int, int **, int **, AstMapping **, AstFrame **, int * );
 static int Overlap( AstRegion *, AstRegion *, int * );
 static int OverlapX( AstRegion *, AstRegion *, int * );
 static int RegDummyFS( AstRegion *, int * );
@@ -5626,7 +5629,7 @@ MAKE_MASK(F,float)
 
 
 
-static int Match( AstFrame *this_frame, AstFrame *target,
+static int Match( AstFrame *this_frame, AstFrame *target, int matchsub,
                   int **template_axes, int **target_axes,
                   AstMapping **map, AstFrame **result, int *status ) {
 /*
@@ -5641,7 +5644,7 @@ static int Match( AstFrame *this_frame, AstFrame *target,
 
 *  Synopsis:
 *     #include "region.h"
-*     int Match( AstFrame *template, AstFrame *target,
+*     int Match( AstFrame *template, AstFrame *target, int matchsub,
 *                int **template_axes, int **target_axes,
 *                AstMapping **map, AstFrame **result, int *status )
 
@@ -5670,6 +5673,10 @@ static int Match( AstFrame *this_frame, AstFrame *target,
 *     target
 *        Pointer to the target Frame. This describes the coordinate
 *        system in which we already have coordinates.
+*     matchsub
+*        If zero then a match only occurs if the template is of the same
+*        class as the target, or of a more specialised class. If non-zero
+*        then a match can occur even if this is not the case.
 *     template_axes
 *        Address of a location where a pointer to int will be returned
 *        if the requested coordinate conversion is possible. This
@@ -5745,7 +5752,7 @@ static int Match( AstFrame *this_frame, AstFrame *target,
 /* Invoke the parent astMatch method on the current Frame within the
    encapsulated FrameSet within the Region. */
    fr = astGetFrame( ((AstRegion *) this_frame)->frameset, AST__CURRENT );
-   match = astMatch( fr, target, template_axes, target_axes, map, result );
+   match = astMatch( fr, target, matchsub, template_axes, target_axes, map, result );
    fr = astAnnul( fr );
 
 /* Return the result. */

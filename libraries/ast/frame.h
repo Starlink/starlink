@@ -693,7 +693,7 @@ typedef struct AstFrameVtab {
    int (* IsUnitFrame)( AstFrame *, int * );
    int (* LineCrossing)( AstFrame *, AstLineDef *, AstLineDef *, double **, int * );
    int (* LineContains)( AstFrame *, AstLineDef *, int, double *, int * );
-   int (* Match)( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame **, int * );
+   int (* Match)( AstFrame *, AstFrame *, int, int **, int **, AstMapping **, AstFrame **, int * );
    int (* SubFrame)( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame **, int * );
    int (* TestDigits)( AstFrame *, int * );
    int (* TestDirection)( AstFrame *, int, int * );
@@ -939,7 +939,7 @@ int astGetPreserveAxes_( AstFrame *, int * );
 int astIsUnitFrame_( AstFrame *, int * );
 int astLineCrossing_( AstFrame *, AstLineDef *, AstLineDef *, double **, int * );
 int astLineContains_( AstFrame *, AstLineDef *, int, double *, int * );
-int astMatch_( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame **, int * );
+int astMatch_( AstFrame *, AstFrame *, int, int **, int **, AstMapping **, AstFrame **, int * );
 int astSubFrame_( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame **, int * );
 int astTestDigits_( AstFrame *, int * );
 int astTestDirection_( AstFrame *, int, int * );
@@ -1228,8 +1228,8 @@ astINVOKE(V,astGetTitle_(astCheckFrame(this),STATUS_PTR))
 astINVOKE(V,astGetUnit_(astCheckFrame(this),axis,STATUS_PTR))
 #define astGetNormUnit(this,axis) \
 astINVOKE(V,astGetNormUnit_(astCheckFrame(this),axis,STATUS_PTR))
-#define astMatch(template,target,template_axes,target_axes,map,result) \
-astINVOKE(V,astMatch_(astCheckFrame(template),astCheckFrame(target),template_axes,target_axes,(AstMapping **)(map),(AstFrame **)(result),STATUS_PTR))
+#define astMatch(template,target,matchsub,template_axes,target_axes,map,result) \
+astINVOKE(V,astMatch_(astCheckFrame(template),astCheckFrame(target),matchsub,template_axes,target_axes,(AstMapping **)(map),(AstFrame **)(result),STATUS_PTR))
 #define astIsUnitFrame(this) \
 astINVOKE(V,astIsUnitFrame_(astCheckFrame(this),STATUS_PTR))
 #define astOverlay(template,template_axes,result) \

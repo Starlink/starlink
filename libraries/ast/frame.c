@@ -263,6 +263,9 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *        Added astMatchAxes method.
 *     22-MAR-2011 (DSB):
 *        Add astFrameGrid method.
+*     29-APR-2011 (DSB):
+*        Prevent astFindFrame from matching a subclass template against a
+*        superclass target.
 *class--
 */
 
@@ -891,7 +894,7 @@ static int GetNin( AstMapping *, int * );
 static int GetNout( AstMapping *, int * );
 static int GetPermute( AstFrame *, int * );
 static int GetPreserveAxes( AstFrame *, int * );
-static int Match( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame **, int * );
+static int Match( AstFrame *, AstFrame *, int, int **, int **, AstMapping **, AstFrame **, int * );
 static int SubFrame( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame **, int * );
 static int TestAttrib( AstObject *, const char *, int * );
 static int TestDigits( AstFrame *, int * );
@@ -2917,7 +2920,7 @@ static AstFrameSet *ConvertX( AstFrame *to, AstFrame *from,
 /* See if conversion from "frame1" to the common coordinate system is
    possible.  If successful, this results in a new approximation
    ("common1") to the possible common coordinate system. */
-            match1 = astMatch( common0, frame1, &axes1, &axes2,
+            match1 = astMatch( common0, frame1, 1, &axes1, &axes2,
                                map1_address, &ftmp );
             common1 = (AstMapping *) ftmp;
 
@@ -2933,7 +2936,7 @@ static AstFrameSet *ConvertX( AstFrame *to, AstFrame *from,
                frame2 = astClone( icom ? from : to );
                map2_address = icom ? &from_map : &to_map;
                astSetPreserveAxes( common1, 0 );
-               match2 = astMatch( common1, frame2, &axes1, &axes2,
+               match2 = astMatch( common1, frame2, 1, &axes1, &axes2,
                                   map2_address, &ftmp );
                common2 = (AstMapping *) ftmp;
 
@@ -3836,7 +3839,7 @@ f     DOMAINLIST string provides an alternative way of restricting the
    Frame. This matches the template to the target and returns
    information about how to convert between the target and the Frame
    it found (if any). */
-      match = astMatch( template, target,
+      match = astMatch( template, target, 0,
                         &template_axes, &target_axes, &map, &frame );
 
 /* If successful, obtain a pointer to the Domain string of the result
@@ -6612,7 +6615,7 @@ static int *MapSplit( AstMapping *this_map, int nin, const int *in, AstMapping *
    return result;
 }
 
-static int Match( AstFrame *template, AstFrame *target,
+static int Match( AstFrame *template, AstFrame *target, int matchsub,
                   int **template_axes, int **target_axes,
                   AstMapping **map, AstFrame **result, int *status ) {
 /*
@@ -6628,7 +6631,7 @@ static int Match( AstFrame *template, AstFrame *target,
 
 *  Synopsis:
 *     #include "frame.h"
-*     int astMatch( AstFrame *template, AstFrame *target,
+*     int astMatch( AstFrame *template, AstFrame *target, int matchsub,
 *                   int **template_axes, int **target_axes,
 *                   AstMapping **map, AstFrame **result )
 
@@ -6654,6 +6657,15 @@ static int Match( AstFrame *template, AstFrame *target,
 *     target
 *        Pointer to the target Frame. This describes the coordinate
 *        system in which we already have coordinates.
+*     matchsub
+*        If zero then a match only occurs if the template is of the same
+*        class as the target, or of a more specialised class. If non-zero
+*        then a match can occur even if this is not the case (i.e. if the
+*        target is of a more specialised class than the template). In
+*        this latter case, the target is cast down to the class of the
+*        template. NOTE, this argument is handled by the global method
+*        wrapper function "astMatch_", rather than by the class-specific
+*        implementations of this method.
 *     template_axes
 *        Address of a location where a pointer to int will be returned
 *        if the requested coordinate conversion is possible. This
@@ -7055,7 +7067,7 @@ static void MatchAxesX( AstFrame *frm2, AstFrame *frm1, int *axes,
 
 /* Attempt to find a sub-frame within the frm1 Frame that corresponds to
    this primary Frame. */
-      if( astMatch( frm1, pfrm, &frm1_axes, &pfrm_axes, &resmap, &resfrm ) ) {
+      if( astMatch( frm1, pfrm, 1, &frm1_axes, &pfrm_axes, &resmap, &resfrm ) ) {
 
 /* Store the one-based index within "frm1" of the corresponding axis. */
          axes[ ifirst ] = frm1_axes[ pax ] + 1;
@@ -14369,7 +14381,7 @@ const int *astGetPerm_( AstFrame *this, int *status ) {
 }
 
 
-int astMatch_( AstFrame *this, AstFrame *target,
+int astMatch_( AstFrame *this, AstFrame *target, int matchsub,
                int **template_axes, int **target_axes,
                AstMapping **map, AstFrame **result, int *status ) {
 
@@ -14379,7 +14391,7 @@ int astMatch_( AstFrame *this, AstFrame *target,
 
    if ( !astOK ) return 0;
 
-   match = (**astMEMBER(this,Frame,Match))( this, target,
+   match = (**astMEMBER(this,Frame,Match))( this, target, matchsub,
                                             template_axes, target_axes,
                                             map, result, status );
 
@@ -14393,7 +14405,7 @@ int astMatch_( AstFrame *this, AstFrame *target,
    form of the target that has been cast into the same class as the
    template. This is only possible if the template class is a sub-class of
    the target class. Attempt to do the cast. */
-   if( ! match ) {
+   if( ! match && matchsub ) {
       super_this = (AstFrame *) astCast( this, target );
 
 /* If the cast was  possible, fix the template Domain since the parent
@@ -14405,7 +14417,7 @@ int astMatch_( AstFrame *this, AstFrame *target,
             if( astChrLen( dom ) > 0 ) astSetDomain( super_this, dom );
          }
          match = (**astMEMBER(super_this,Frame,Match))( super_this, target,
-                                                        template_axes,
+                                                        matchsub, template_axes,
                                                         target_axes, map,
                                                         result, status );
          super_this = astAnnul( super_this );

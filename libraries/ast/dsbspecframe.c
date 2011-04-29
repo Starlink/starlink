@@ -118,6 +118,9 @@ f     The DSBSpecFrame class does not define any new routines beyond those
 *     12-FEB-2010 (DSB):
 *        Report an error if the local oscillator frequency looks silly
 *        (specifically, if it less than the absolute intermediate frequency).
+*     29-APR-2011 (DSB):
+*        Prevent astFindFrame from matching a subclass template against a
+*        superclass target.
 *class--
 
 *  Implementation Deficiencies:
@@ -195,7 +198,7 @@ static int class_check;
 /* Pointers to parent class methods which are extended by this class. */
 static const char *(* parent_getattrib)( AstObject *, const char *, int * );
 static const char *(* parent_getlabel)( AstFrame *, int, int * );
-static int (* parent_match)( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame **, int * );
+static int (* parent_match)( AstFrame *, AstFrame *, int, int **, int **, AstMapping **, AstFrame **, int * );
 static int (* parent_subframe)( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame **, int * );
 static int (* parent_testattrib)( AstObject *, const char *, int * );
 static void (* parent_clearattrib)( AstObject *, const char *, int * );
@@ -261,7 +264,7 @@ static const char *GetAttrib( AstObject *, const char *, int * );
 static const char *GetLabel( AstFrame *, int, int * );
 static double GetImagFreq( AstDSBSpecFrame *, int * );
 static double GetLO( AstDSBSpecFrame *, const char *, const char *, int * );
-static int Match( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame **, int * );
+static int Match( AstFrame *, AstFrame *, int, int **, int **, AstMapping **, AstFrame **, int * );
 static int SubFrame( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame **, int * );
 static int TestAttrib( AstObject *, const char *, int * );
 static void ClearAttrib( AstObject *, const char *, int * );
@@ -970,7 +973,7 @@ void astInitDSBSpecFrameVtab_(  AstDSBSpecFrameVtab *vtab, const char *name, int
    }
 }
 
-static int Match( AstFrame *template_frame, AstFrame *target,
+static int Match( AstFrame *template_frame, AstFrame *target, int matchsub,
                   int **template_axes, int **target_axes, AstMapping **map,
                   AstFrame **result, int *status ) {
 /*
@@ -985,7 +988,7 @@ static int Match( AstFrame *template_frame, AstFrame *target,
 
 *  Synopsis:
 *     #include "dsbspecframe.h"
-*     int Match( AstFrame *template, AstFrame *target,
+*     int Match( AstFrame *template, AstFrame *target, int matchsub,
 *                int **template_axes, int **target_axes,
 *                AstMapping **map, AstFrame **result, int *status )
 
@@ -1011,6 +1014,10 @@ static int Match( AstFrame *template_frame, AstFrame *target,
 *     target
 *        Pointer to the target Frame. This describes the coordinate system in
 *        which we already have coordinates.
+*     matchsub
+*        If zero then a match only occurs if the template is of the same
+*        class as the target, or of a more specialised class. If non-zero
+*        then a match can occur even if this is not the case.
 *     template_axes
 *        Address of a location where a pointer to int will be returned if the
 *        requested coordinate conversion is possible. This pointer will point
@@ -1092,7 +1099,7 @@ static int Match( AstFrame *template_frame, AstFrame *target,
    SpecFrame class object. This ensures that the number of axes (1) and
    domain, class, etc. of the target Frame are suitable. Invoke the parent
    "astMatch" method to verify this. */
-   match = (*parent_match)( template_frame, target,
+   match = (*parent_match)( template_frame, target, matchsub,
                             template_axes, target_axes, map, result, status );
 
 /* If a match was found, the target Frame must be (or contain) a SpecFrame,

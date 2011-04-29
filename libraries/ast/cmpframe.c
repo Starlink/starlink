@@ -178,6 +178,9 @@ f     The CmpFrame class does not define any new routines beyond those
 *        PreserveAxes, MaxAxes and MinAxes attribute settings.
 *     22-MAR-2011 (DSB):
 *        Override astFrameGrid method.
+*     29-APR-2011 (DSB):
+*        Prevent astFindFrame from matching a subclass template against a
+*        superclass target.
 *class--
 */
 
@@ -699,7 +702,7 @@ static const int *GetPerm( AstFrame *, int * );
 static double Angle( AstFrame *, const double[], const double[], const double[], int * );
 static double Distance( AstFrame *, const double[], const double[], int * );
 static double Gap( AstFrame *, int, double, int *, int * );
-static int ComponentMatch( AstCmpFrame *, AstFrame *, int, int **, int **, AstMapping **, AstFrame **, int * );
+static int ComponentMatch( AstCmpFrame *, AstFrame *, int, int, int **, int **, AstMapping **, AstFrame **, int * );
 static int Fields( AstFrame *, int, const char *, const char *, int, char **, int *, double *, int * );
 static int GenAxisSelection( int, int, int [], int * );
 static int GetActiveUnit( AstFrame *, int * );
@@ -711,8 +714,8 @@ static int GetObjSize( AstObject *, int * );
 static int GetUseDefs( AstObject *, int * );
 static int GoodPerm( int, const int [], int, const int [], int * );
 static int IsUnitFrame( AstFrame *, int * );
-static int Match( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame **, int * );
-static int PartMatch( AstCmpFrame *, AstFrame *, int, const int [], int, const int [], int **, int **, AstMapping **, AstFrame **, int * );
+static int Match( AstFrame *, AstFrame *, int, int **, int **, AstMapping **, AstFrame **, int * );
+static int PartMatch( AstCmpFrame *, AstFrame *, int, int, const int [], int, const int [], int **, int **, AstMapping **, AstFrame **, int * );
 static int QsortCmpAxes( const void *, const void * );
 static int SubFrame( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame **, int * );
 static int TestDirection( AstFrame *, int, int * );
@@ -1787,7 +1790,7 @@ static void ClearObsLon( AstFrame *this_frame, int *status ) {
    astClearObsLon( this->frame2 );
 }
 
-static int ComponentMatch( AstCmpFrame *template, AstFrame *target,
+static int ComponentMatch( AstCmpFrame *template, AstFrame *target, int matchsub,
                            int icomp, int **template_axes, int **target_axes,
                            AstMapping **map, AstFrame **result, int *status ) {
 /*
@@ -1803,7 +1806,7 @@ static int ComponentMatch( AstCmpFrame *template, AstFrame *target,
 
 *  Synopsis:
 *     #include "cmpframe.h"
-*     int ComponentMatch( AstCmpFrame *template, AstFrame *target,
+*     int ComponentMatch( AstCmpFrame *template, AstFrame *target, int matchsub,
 *                         int icomp, int **template_axes, int **target_axes,
 *                         AstMapping **map, AstFrame **result, int *status )
 
@@ -1825,6 +1828,13 @@ static int ComponentMatch( AstCmpFrame *template, AstFrame *target,
 *     target
 *        Pointer to the target Frame. This describes the coordinate
 *        system in which we already have coordinates.
+*     matchsub
+*        If zero then a match only occurs if the template is of the same
+*        class as the target, or of a more specialised class. If non-zero
+*        then a match can occur even if this is not the case (i.e. if the
+*        target is of a more specialised class than the template). In
+*        this latter case, the target is cast down to the class of the
+*        template.
 *     icomp
 *        The index of the component Frame to use within the template
 *        CmpFrame; 0 or 1.
@@ -1941,8 +1951,8 @@ static int ComponentMatch( AstCmpFrame *template, AstFrame *target,
 
 /* Attempt to find a match between the axes of the supplied target Frame
    and the axes of the selected component Frame in the template. */
-   match = astMatch( ctemplate, target, &ftemplate_axes, &ftarget_axes, &fmap,
-                     &fresult );
+   match = astMatch( ctemplate, target, matchsub, &ftemplate_axes, &ftarget_axes,
+                     &fmap, &fresult );
 
 /* Restore the original PreserveAxes value in the component template
    Frame. */
@@ -4765,7 +4775,7 @@ static int ManageLock( AstObject *this_object, int mode, int extra,
 }
 #endif
 
-static int Match( AstFrame *template_frame, AstFrame *target,
+static int Match( AstFrame *template_frame, AstFrame *target, int matchsub,
                   int **template_axes, int **target_axes,
                   AstMapping **map, AstFrame **result, int *status ) {
 /*
@@ -4780,7 +4790,7 @@ static int Match( AstFrame *template_frame, AstFrame *target,
 
 *  Synopsis:
 *     #include "cmpframe.h"
-*     int Match( AstFrame *template, AstFrame *target,
+*     int Match( AstFrame *template, AstFrame *target, int matchsub,
 *                int **template_axes, int **target_axes,
 *                AstMapping **map, AstFrame **result, int *status )
 
@@ -4807,6 +4817,15 @@ static int Match( AstFrame *template_frame, AstFrame *target,
 *     target
 *        Pointer to the target Frame. This describes the coordinate
 *        system in which we already have coordinates.
+*     matchsub
+*        If zero then a match only occurs if the template is of the same
+*        class as the target, or of a more specialised class. If non-zero
+*        then a match can occur even if this is not the case (i.e. if the
+*        target is of a more specialised class than the template). In
+*        this latter case, the target is cast down to the class of the
+*        template. NOTE, this argument is handled by the global method
+*        wrapper function "astMatch_", rather than by the class-specific
+*        implementations of this method.
 *     template_axes
 *        Address of a location where a pointer to int will be returned
 *        if the requested coordinate conversion is possible. This
@@ -5041,7 +5060,7 @@ static int Match( AstFrame *template_frame, AstFrame *target,
 
 /* Attempt to match the target axes partitioned in this way to the two
    template components. */
-               match = PartMatch( template, target,
+               match = PartMatch( template, target, matchsub,
                                   naxes1, axes1, naxes2, axes2,
                                   template_axes, target_axes, map, result, status );
 
@@ -5117,13 +5136,15 @@ static int Match( AstFrame *template_frame, AstFrame *target,
 /* If the target did not match the supplied template CmpFrame, see if it
    will match either of the component Frames. First try matching it against
    the first component Frame. */
-   if( !match ) match = ComponentMatch( template, target, 0, template_axes,
-                                        target_axes, map, result, status );
+   if( !match ) match = ComponentMatch( template, target, matchsub, 0,
+                                        template_axes, target_axes, map, result,
+                                        status );
 
 /* If we still dont have a mcth, try matching it against the second
    component Frame. */
-   if( !match ) match = ComponentMatch( template, target, 1, template_axes,
-                                        target_axes, map, result, status );
+   if( !match ) match = ComponentMatch( template, target, matchsub, 1,
+                                        template_axes, target_axes, map,
+                                        result, status );
 
 /* If an error occurred, free all allocated memory, annul the result
    Object pointers and clear all returned values. */
@@ -6089,7 +6110,7 @@ static void PartitionSelection( int nselect, const int select[],
 }
 
 static int PartMatch( AstCmpFrame *template, AstFrame *target,
-                      int naxes1, const int axes1[],
+                      int matchsub, int naxes1, const int axes1[],
                       int naxes2, const int axes2[],
                       int **template_axes, int **target_axes,
                       AstMapping **map, AstFrame **result, int *status ) {
@@ -6106,7 +6127,7 @@ static int PartMatch( AstCmpFrame *template, AstFrame *target,
 *  Synopsis:
 *     #include "cmpframe.h"
 *     int PartMatch( AstCmpFrame *template, AstFrame *target,
-*                    int naxes1, const int axes1[],
+*                    int matchsub, int naxes1, const int axes1[],
 *                    int naxes2, const int axes2[],
 *                    int **template_axes, int **target_axes,
 *                    AstMapping **map, AstFrame **result, int *status )
@@ -6142,6 +6163,13 @@ static int PartMatch( AstCmpFrame *template, AstFrame *target,
 *     target
 *        Pointer to the target Frame. This describes the coordinate
 *        system in which we already have coordinates.
+*     matchsub
+*        If zero then a match only occurs if the template is of the same
+*        class as the target, or of a more specialised class. If non-zero
+*        then a match can occur even if this is not the case (i.e. if the
+*        target is of a more specialised class than the template). In
+*        this latter case, the target is cast down to the class of the
+*        template.
 *     naxes1
 *        The number of target axes to be matched against the first
 *        component Frame of the template CmpFrame.
@@ -6338,7 +6366,7 @@ static int PartMatch( AstCmpFrame *template, AstFrame *target,
    astSetPermute( template->frame1, 1 );
 
 /* Test for a match with the first template component Frame. */
-   match1 = astMatch( template->frame1, frame1,
+   match1 = astMatch( template->frame1, frame1, matchsub,
                       &template_axes1, &target_axes1, &map1, &result1 );
 
 /* Clear the attribute values again afterwards if necessary. */
@@ -6365,7 +6393,7 @@ static int PartMatch( AstCmpFrame *template, AstFrame *target,
    if ( permute_set ) permute_value = astGetPermute( template->frame2 );
    astSetPermute( template->frame2, 1 );
 
-   match2 = astMatch( template->frame2, frame2,
+   match2 = astMatch( template->frame2, frame2, matchsub,
                       &template_axes2, &target_axes2, &map2, &result2 );
 
    if ( !match_end_set ) astClearMatchEnd( template->frame2 );

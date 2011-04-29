@@ -22244,12 +22244,10 @@ methods.
 
 
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V5.6-0}
+\subsection{Changes Introduced in V5.6-0}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V5.5-0 and V5.6-0 (the
-current version):
+The following describes the most significant changes which
+occurred in the AST library between versions V5.5-0 and V5.6-0:
 
 \begin{enumerate}
 
@@ -22289,6 +22287,30 @@ AST\_GETREGIONMESH
 f-
 returns a set of positions covering the boundary, or volume, of a supplied
 Region.
+
+\end{enumerate}
+
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V5.6-1}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V5.6-0 and V5.6-1 (the
+current version):
+
+\begin{enumerate}
+
+\item A bug has been fixed in the
+c+
+astFindFrame
+c-
+f+
+AST\_FINDFRAME
+f-
+method that allowed a template Frame of a more specialised class to match
+a target frame of a less specialised class. For example, this bug would
+allow a template SkyFrame to match a target Frame. This no longer
+happens.
 
 \end{enumerate}
 

@@ -60,6 +60,9 @@ f     The SpecFluxFrame class does not define any new routines beyond those
 *  History:
 *     8-DEC-2004 (DSB):
 *        Original version.
+*     29-APR-2011 (DSB):
+*        Prevent astFindFrame from matching a subclass template against a
+*        superclass target.
 *class--
 */
 
@@ -120,7 +123,7 @@ f     The SpecFluxFrame class does not define any new routines beyond those
 static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static int (* parent_match)( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame **, int * );
+static int (* parent_match)( AstFrame *, AstFrame *, int, int **, int **, AstMapping **, AstFrame **, int * );
 static int (* parent_subframe)( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame **, int * );
 static const char *(* parent_gettitle)( AstFrame *, int * );
 
@@ -173,7 +176,7 @@ static AstMapping *MakeMapI( AstFluxFrame *, AstSpecFrame *, AstFluxFrame *, Ast
 static AstSpecFrame *GetSpecFrame( AstSpecFluxFrame *, int, int * );
 static const char *GetTitle( AstFrame *, int * );
 static int MakeSFMapping( AstSpecFluxFrame *, AstSpecFluxFrame *, AstMapping **, int * );
-static int Match( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame **, int * );
+static int Match( AstFrame *, AstFrame *, int, int **, int **, AstMapping **, AstFrame **, int * );
 static int SubFrame( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame **, int * );
 static void Dump( AstObject *, AstChannel *, int * );
 
@@ -1210,7 +1213,7 @@ static int MakeSFMapping( AstSpecFluxFrame *target, AstSpecFluxFrame *result,
    return match;
 }
 
-static int Match( AstFrame *template_frame, AstFrame *target,
+static int Match( AstFrame *template_frame, AstFrame *target, int matchsub,
                   int **template_axes, int **target_axes,
                   AstMapping **map, AstFrame **result, int *status ) {
 /*
@@ -1225,7 +1228,7 @@ static int Match( AstFrame *template_frame, AstFrame *target,
 
 *  Synopsis:
 *     #include "specfluxframe.h"
-*     int Match( AstFrame *template, AstFrame *target,
+*     int Match( AstFrame *template, AstFrame *target, int matchsub,
 *                int **template_axes, int **target_axes,
 *                AstMapping **map, AstFrame **result, int *status )
 
@@ -1252,6 +1255,10 @@ static int Match( AstFrame *template_frame, AstFrame *target,
 *     target
 *        Pointer to the target Frame. This describes the coordinate
 *        system in which we already have coordinates.
+*     matchsub
+*        If zero then a match only occurs if the template is of the same
+*        class as the target, or of a more specialised class. If non-zero
+*        then a match can occur even if this is not the case.
 *     template_axes
 *        Address of a location where a pointer to int will be returned
 *        if the requested coordinate conversion is possible. This
@@ -1340,7 +1347,7 @@ static int Match( AstFrame *template_frame, AstFrame *target,
 /* If the target is not a SpecFluxFrame, use the results returned by the
    parent Match method inherited from the CmpFrame class. */
    if( !astIsASpecFluxFrame( target ) ) {
-      match = (*parent_match)( template_frame, target, template_axes,
+      match = (*parent_match)( template_frame, target, matchsub, template_axes,
                                target_axes, map, result, status );
 
 

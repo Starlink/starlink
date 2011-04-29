@@ -235,6 +235,9 @@ f     - AST_REMOVEFRAME: Remove a Frame from a FrameSet
 *        Frame.
 *     22-MAR-2011 (DSB):
 *        Override astFrameGrid method.
+*     29-APR-2011 (DSB):
+*        Prevent astFindFrame from matching a subclass template against a
+*        superclass target.
 *class--
 */
 
@@ -883,7 +886,7 @@ static int GetPreserveAxes( AstFrame *, int * );
 static int GetTranForward( AstMapping *, int * );
 static int GetTranInverse( AstMapping *, int * );
 static int IsUnitFrame( AstFrame *, int * );
-static int Match( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame **, int * );
+static int Match( AstFrame *, AstFrame *, int, int **, int **, AstMapping **, AstFrame **, int * );
 static int Span( AstFrameSet *, AstFrame **, int, int, int, AstMapping **, int *, int * );
 static int SubFrame( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame **, int * );
 static int TestAttrib( AstObject *, const char *, int * );
@@ -6045,7 +6048,7 @@ static int *MapSplit( AstMapping *this_map, int nin, const int *in, AstMapping *
    return result;
 }
 
-static int Match( AstFrame *this_frame, AstFrame *target,
+static int Match( AstFrame *this_frame, AstFrame *target, int matchsub,
                   int **template_axes, int **target_axes,
                   AstMapping **map, AstFrame **result, int *status ) {
 /*
@@ -6060,7 +6063,7 @@ static int Match( AstFrame *this_frame, AstFrame *target,
 
 *  Synopsis:
 *     #include "frameset.h"
-*     int Match( AstFrame *template, AstFrame *target,
+*     int Match( AstFrame *template, AstFrame *target, int matchsub,
 *                int **template_axes, int **target_axes,
 *                AstMapping **map, AstFrame **result, int *status )
 
@@ -6089,6 +6092,15 @@ static int Match( AstFrame *this_frame, AstFrame *target,
 *     target
 *        Pointer to the target Frame. This describes the coordinate
 *        system in which we already have coordinates.
+*     matchsub
+*        If zero then a match only occurs if the template is of the same
+*        class as the target, or of a more specialised class. If non-zero
+*        then a match can occur even if this is not the case (i.e. if the
+*        target is of a more specialised class than the template). In
+*        this latter case, the target is cast down to the class of the
+*        template. NOTE, this argument is handled by the global method
+*        wrapper function "astMatch_", rather than by the class-specific
+*        implementations of this method.
 *     template_axes
 *        Address of a location where a pointer to int will be returned
 *        if the requested coordinate conversion is possible. This
@@ -6169,7 +6181,8 @@ static int Match( AstFrame *this_frame, AstFrame *target,
    fr = astGetFrame( this, AST__CURRENT );
 
 /* Invoke the astMatch method for this Frame. */
-   match =astMatch( fr, target, template_axes, target_axes, map, result );
+   match =astMatch( fr, target, matchsub, template_axes, target_axes,
+                    map, result );
 
 /* Annul the Frame pointer. */
    fr = astAnnul( fr );

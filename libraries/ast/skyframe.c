@@ -290,6 +290,9 @@ f     - AST_SKYOFFSETMAP: Obtain a Mapping from absolute to offset coordinates
 *        In SetSystem, clear SkyRefP as well as SkyRef.
 *     22-MAR-2011 (DSB):
 *        Override astFrameGrid method.
+*     29-APR-2011 (DSB):
+*        Prevent astFindFrame from matching a subclass template against a
+*        superclass target.
 *class--
 */
 
@@ -771,7 +774,7 @@ static double (* parent_getepoch)( AstFrame *, int * );
 static double (* parent_gettop)( AstFrame *, int, int * );
 static int (* parent_getdirection)( AstFrame *, int, int * );
 static int (* parent_getobjsize)( AstObject *, int * );
-static int (* parent_match)( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame **, int * );
+static int (* parent_match)( AstFrame *, AstFrame *, int, int **, int **, AstMapping **, AstFrame **, int * );
 static int (* parent_subframe)( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame **, int * );
 static int (* parent_testattrib)( AstObject *, const char *, int * );
 static int (* parent_testformat)( AstFrame *, int, int * );
@@ -923,7 +926,7 @@ static int LineContains( AstFrame *, AstLineDef *, int, double *, int * );
 static int LineCrossing( AstFrame *, AstLineDef *, AstLineDef *, double **, int * );
 static int LineIncludes( SkyLineDef *, double[3], int * );
 static int MakeSkyMapping( AstSkyFrame *, AstSkyFrame *, AstSystemType, AstMapping **, int * );
-static int Match( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame **, int * );
+static int Match( AstFrame *, AstFrame *, int, int **, int **, AstMapping **, AstFrame **, int * );
 static int SubFrame( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame **, int * );
 static int TestActiveUnit( AstFrame *, int * );
 static int TestAsTime( AstSkyFrame *, int, int * );
@@ -6390,7 +6393,7 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
 #undef TRANSFORM_3
 }
 
-static int Match( AstFrame *template_frame, AstFrame *target,
+static int Match( AstFrame *template_frame, AstFrame *target, int matchsub,
                   int **template_axes, int **target_axes, AstMapping **map,
                   AstFrame **result, int *status ) {
 /*
@@ -6405,7 +6408,7 @@ static int Match( AstFrame *template_frame, AstFrame *target,
 
 *  Synopsis:
 *     #include "skyframe.h"
-*     int Match( AstFrame *template, AstFrame *target,
+*     int Match( AstFrame *template, AstFrame *target, int matchsub,
 *                int **template_axes, int **target_axes,
 *                AstMapping **map, AstFrame **result, int *status )
 
@@ -6431,6 +6434,10 @@ static int Match( AstFrame *template_frame, AstFrame *target,
 *     target
 *        Pointer to the target Frame. This describes the coordinate system in
 *        which we already have coordinates.
+*     matchsub
+*        If zero then a match only occurs if the template is of the same
+*        class as the target, or of a more specialised class. If non-zero
+*        then a match can occur even if this is not the case.
 *     template_axes
 *        Address of a location where a pointer to int will be returned if the
 *        requested coordinate conversion is possible. This pointer will point
@@ -6530,7 +6537,7 @@ static int Match( AstFrame *template_frame, AstFrame *target,
    Frame class object. This ensures that the number of axes (2) and
    domain, etc. of the target Frame are suitable. Invoke the parent
    "astMatch" method to verify this. */
-   match = (*parent_match)( template_frame, target,
+   match = (*parent_match)( template_frame, target, matchsub,
                             template_axes, target_axes, map, result, status );
 
 /* If a match was found, annul the returned objects, which are not
@@ -6757,7 +6764,7 @@ static void MatchAxesX( AstFrame *frm2_frame, AstFrame *frm1, int *axes,
 
 /* Attempt to find a sub-frame within the first supplied Frame that
    corresponds to the supplied SkyFrame. */
-   if( astMatch( frm1, frm2, &frm1_axes, &frm2_axes, &resmap, &resfrm ) ) {
+   if( astMatch( frm1, frm2, 1, &frm1_axes, &frm2_axes, &resmap, &resfrm ) ) {
 
 /* If successfull, Store the one-based index within "frm1" of the
    corresponding axes. */
