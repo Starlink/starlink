@@ -182,6 +182,10 @@
 *     2011-04-20 (TIMJ):
 *        CONFIG=! disables all cleaning and uses full apodization.
 *        Use rt(s) instead of /rt(Hz) for noise units.
+*     2011-04-26 (TIMJ):
+*        Calculate effective NEP
+*     2011-04-29 (TIMJ):
+*        Calculate effective NEP over all input chunks/subarrays.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -248,6 +252,7 @@ void smurf_calcnoise( int *status ) {
 
   smfArray *array = NULL;   /* Data to be cleaned */
   Grp * basegrp = NULL;     /* Basis group for output filenames */
+  int calc_effnoise = 1;    /* Can we calculate the effective noise? */
   smfArray *concat=NULL;    /* Pointer to a smfArray */
   size_t contchunk;         /* Continuous chunk counter */
   int dkclean;              /* Clean dark squids? */
@@ -263,12 +268,18 @@ void smurf_calcnoise( int *status ) {
   AstKeyMap *keymap=NULL;   /* KeyMap holding configuration parameters */
   dim_t maxconcat=0;        /* Longest continuous chunk length in samples */
   size_t ncontchunks=0;     /* Number continuous chunks outside iter loop */
+  size_t nepgoodbol = 0;    /* Number of bolometers used in eff NEP calc */
+  double nepsum = 0.0;      /* Sum of weights for effective NEP calculation */
+  size_t noisegoodbol = 0;  /* Number of bolometers used in eff noise calc */
+  double noisesum = 0.0;    /* Sum of weights for effective noise calculation */
   smfData *odata = NULL;    /* Pointer to output data struct */
   Grp *ogrp = NULL;         /* Output group of files */
   size_t outsize;           /* Total number of NDF names in the output group */
   dim_t pad;                /* No. of samples of padding at start and end */
   int parstate = 0;         /* CONFIG parameter state */
   Grp *powgrp = NULL;       /* Group for output power spectra */
+  char refunits[SMF__CHARLABEL];/* Reference units for effective noise calc */
+  char refnepunits[SMF__CHARLABEL]; /* Reference units for effective NEP calc */
   size_t size;              /* Number of files in input group */
   AstKeyMap *sub_instruments=NULL; /* KeyMap holding subinstrument names */
   smfWorkForce *wf = NULL;  /* Pointer to a pool of worker threads */
@@ -351,6 +362,14 @@ void smurf_calcnoise( int *status ) {
   } else {
     doclean = 1;
   }
+
+  /* We will calculate an effective noise for all input data */
+  noisegoodbol = 0;
+  noisesum = 0.0;
+  nepsum = 0.0;
+  nepgoodbol = 0;
+  refnepunits[0] = '\0';
+  refunits[0] = '\0';
 
   /* Loop over input data as contiguous chunks */
   gcount = 1;
@@ -482,6 +501,17 @@ void smurf_calcnoise( int *status ) {
         if (strlen(noiseunits)) one_strlcat( noiseunits, " ", sizeof(noiseunits), status );
         one_strlcat( noiseunits, "s**0.5", sizeof(noiseunits), status );
 
+        /* Sanity check units for effective noise calculations - this will also disable NEP */
+        if (strlen(refunits)) {
+          if (strcmp( refunits, noiseunits ) != 0) {
+            msgOutiff(MSG__QUIET, "", "Units for input data (%s) do not match previous files (%s)."
+                      " Will not calculate effective noise", status, noiseunits, refunits );
+            calc_effnoise = 0;
+          }
+        } else {
+          one_strlcpy( refunits, noiseunits, sizeof(refunits), status );
+        }
+
         /* Create the output file if required, else a malloced smfData */
         smf_create_bolfile( ogrp, gcount, thedata, "Noise",
                             noiseunits, 1, &outdata, status );
@@ -493,8 +523,6 @@ void smurf_calcnoise( int *status ) {
 
         if (*status == SAI__OK) {
           double * od = (outdata->pntr)[0];
-          size_t noisegoodbol = 0;
-          double noisesum = 0.0;
           smf_bolonoise( wf, thedata, 0, f_low, freqs[0], freqs[1],
                          1, zeropad ? SMF__MAXAPLEN : SMF__BADSZT,
                          (outdata->pntr)[0], (ratdata->pntr)[0],
@@ -507,16 +535,6 @@ void smurf_calcnoise( int *status ) {
               noisesum += 1.0 / od[i];
               od[i] = sqrt( od[i] );
             }
-          }
-
-          if (noisegoodbol) {
-            double noiseeff;
-            noiseeff = sqrt( 1.0 / noisesum );
-            msgOutf( "", "Effective noise of array = %g %s from %zu bolometers",
-                     status, noiseeff, noiseunits, noisegoodbol );
-            parPut0d( "EFFNOISE", noiseeff, status );
-          } else {
-            parPut0d( "EFFNOISE", VAL__BADD, status );
           }
 
           if (powdata) {
@@ -584,8 +602,8 @@ void smurf_calcnoise( int *status ) {
             /* and divide the noise data by the responsivity
                correcting for SIMULT */
             if (*status == SAI__OK) {
-              double nepsum = 0.0;
-              size_t nepgoodbol = 0;
+              if (strlen(refnepunits) == 0) one_strlcpy( refnepunits, nepdata->hdr->units,
+                                                          sizeof(refnepunits), status );
               for (i = 0; i < (nepdata->dims)[0]*(nepdata->dims)[1]; i++) {
                 /* ignore variance since noise will not have any */
                 double * noise = (outdata->pntr)[0];
@@ -598,15 +616,6 @@ void smurf_calcnoise( int *status ) {
                   nepsum += ( 1.0 / (nep[i] * nep[i]) );
                   nepgoodbol++;
                 }
-              }
-              if (nepgoodbol) {
-                double nepeff;
-                nepeff = sqrt( 1.0 / nepsum );
-                msgOutf( "", "Effective NEP of array  = %g %s from %zu bolometers",
-                         status, nepeff, nepdata->hdr->units, nepgoodbol );
-                parPut0d( "EFFNEP", nepeff, status );
-              } else {
-                parPut0d( "EFFNEP", VAL__BADD, status );
               }
             }
             if (*status == SAI__OK && nepdata->file) {
@@ -673,6 +682,26 @@ void smurf_calcnoise( int *status ) {
     /* Annul the configuration keymap. */
     if (keymap) keymap = astAnnul( keymap );
   }
+
+  if (calc_effnoise && noisegoodbol) {
+    double noiseeff;
+    noiseeff = sqrt( 1.0 / noisesum );
+    msgOutf( "", "Effective noise = %g %s from %zu bolometers",
+             status, noiseeff, refunits, noisegoodbol );
+    parPut0d( "EFFNOISE", noiseeff, status );
+  } else {
+    parPut0d( "EFFNOISE", VAL__BADD, status );
+  }
+  if (calc_effnoise && nepgoodbol) {
+    double nepeff;
+    nepeff = sqrt( 1.0 / nepsum );
+    msgOutf( "", "Effective NEP = %g %s from %zu bolometers",
+             status, nepeff, refnepunits, nepgoodbol );
+    parPut0d( "EFFNEP", nepeff, status );
+  } else {
+    parPut0d( "EFFNEP", VAL__BADD, status );
+  }
+
 
  CLEANUP:
   /* Write out the list of output NDF names, annulling the error if a null
