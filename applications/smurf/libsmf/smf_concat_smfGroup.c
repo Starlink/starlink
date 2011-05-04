@@ -219,6 +219,8 @@
  *        a thread problem.
  *     2011-04-28 (EC):
  *        Set SMF__Q_BADDA if ensureflat=0 and SMF__NOCREATE_QUALITY not set
+ *     2011-05-04 (DSB):
+ *        Set data values to VAL__BADD if they are assigned a qualitu of BADDA.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -984,7 +986,8 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
          have a bunch of bolometers that don't change with time that
          were turned off by the DA system. Explicitly do that check
          here in the non-padded region of the concatenated array and
-         set SMF__Q_BADDA */
+         set SMF__Q_BADDA. Also set the data values to VAL__BADD to 
+         prevent quality/data inconsistencies being reported. */
       if( (*status == SAI__OK) && (!ensureflat) && (data->qual) ) {
         if( data->dtype == SMF__DOUBLE ) {
           int change;
@@ -1002,8 +1005,11 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
             }
 
             if( !change ) {
+              size_t ii = j*bstr + padStart*tstr;
               for( k=padStart; k<(tlen-padEnd); k++) {
-                data->qual[j*bstr + k*tstr] |= SMF__Q_BADDA;
+                data->qual[ii] |= SMF__Q_BADDA;
+                d[ii] = VAL__BADD;
+                ii += tstr;
               }
             }
           }
