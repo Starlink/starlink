@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# This is a script that is used for reducing data using the 
+# This is a script that is used for reducing SCUBA-2 data using the 
 # Canadian Advanced Network for Astrophysical Research (CANFAR)
 #
 # The first argument is the path to the directory containing all of
