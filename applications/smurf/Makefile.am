@@ -142,7 +142,7 @@ DYNSCRIPTS = smurf.sh smurf.csh smurf.icl
 # Install without modification
 STATICSCRIPTS = scripts/jcmtstate2cat scripts/dumpocscfg scripts/gettsys \
 scripts/distortion scripts/showdistortion scripts/tobeam scripts/print_index \
-scripts/cbas scripts/bolcoords scripts/matched-filter scripts/smas scripts/scuba2_map.sh
+scripts/cbas scripts/bolcoords scripts/matched-filter scripts/smas scripts/canfar_scuba2_map.sh
 
 DEFAULTS = defaults/smurf_makemap.def defaults/smurf_extinction.def \
 defaults/smurf_sc2clean.def defaults/smurf_calcflat.def \

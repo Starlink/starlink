@@ -19,9 +19,10 @@
 # is expanded to retrieve 850um s8d data files, from UT date
 # 20100311, observation 79.
 #
-# The third argument is an ID for the reduced data. All of the results will
-# be stored in /data/1/username/id/ and will be accessible from the CANFAR
-# login host.
+# The third argument is an ID for the reduced data. All of the results
+# will be copied to VOSpace store, which presently is hard-wired to
+# vos://cadc.nrc.ca\!vospace/$LOGNAME and may accessed through a browser
+# at the following URL: http://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/vosui
 #
 # The forth optional argument is a file containing additional parameters
 # for the oracdr script. Presently the only option of interest is a 
@@ -63,19 +64,22 @@ cd $1
 # launch the pipeline
 /stardev/Perl/bin/jsawrapdr --inputs=$2 --id=$3 -persist --outdir=$SCRATCHDIR --transdir=$PERSISTDIR --mode=public --drparameters "-verbose -recpar $HOME/$1/$4" --canfar --cleanup all &> $PERSISTDIR/$3/jsawrapdr.log
 
-#/stardev/Perl/bin/jsawrapdr --inputs=$2 --id=$3 -persist --outdir=$SCRATCHDIR --transdir=$PERSISTDIR --mode=public --drparameters "-verbose -recpar $HOME/$1/$4" --canfar --cleanup all
 echo "Job finished at" >> $PERSISTDIR/$3/scuba2_map.log
 
 date >> $PERSISTDIR/$3/scuba2_map.log
 
-cp $SCRATCHDIR/.*log $PERSISTDIR/$3
+# copy data products to vospace
 
-# copy data products back to login host
+java -jar ${CADCVOSCLIENT}/lib/cadcVOSClient.jar --delete --target=vos://cadc.nrc.ca\!vospace/$LOGNAME/$3
 
-ssh canfar.dao.nrc.ca "mkdir /data/1/$LOGNAME/$3"
+java -jar ${CADCVOSCLIENT}/lib/cadcVOSClient.jar --create --target=vos://cadc.nrc.ca\!vospace/$LOGNAME/$3
 
-scp $PERSISTDIR/$3/*.fits canfar.dao.nrc.ca:/data/1/$LOGNAME/$3/
-scp $PERSISTDIR/$3/*_reduced.sdf canfar.dao.nrc.ca:/data/1/$LOGNAME/$3/
-scp $PERSISTDIR/$3/*.log canfar.dao.nrc.ca:/data/1/$LOGNAME/$3/
-scp $PERSISTDIR/$3/.*log canfar.dao.nrc.ca:/data/1/$LOGNAME/$3/
-scp $SCRATCHDIR/*fmos.sdf canfar.dao.nrc.ca:/data/1/$LOGNAME/$3/
+for i in $PERSISTDIR/$3/*.fits; do java -jar ${CADCVOSCLIENT}/lib/cadcVOSClient.jar --copy --src=$i --dest=vos://cadc.nrc.ca\!vospace/$LOGNAME/$3/`basename $i`; done;
+
+for i in $PERSISTDIR/$3/*_reduced.sdf; do java -jar ${CADCVOSCLIENT}/lib/cadcVOSClient.jar --copy --src=$i --dest=vos://cadc.nrc.ca\!vospace/$LOGNAME/$3/`basename $i`; done;
+
+for i in $PERSISTDIR/$3/*.log; do java -jar ${CADCVOSCLIENT}/lib/cadcVOSClient.jar --copy --src=$i --dest=vos://cadc.nrc.ca\!vospace/$LOGNAME/$3/`basename $i`; done;
+
+for i in $PERSISTDIR/$3/.*log; do java -jar ${CADCVOSCLIENT}/lib/cadcVOSClient.jar --copy --src=$i --dest=vos://cadc.nrc.ca\!vospace/$LOGNAME/$3/`basename $i`; done;
+
+for i in $PERSISTDIR/$3/*fmos.sdf; do java -jar ${CADCVOSCLIENT}/lib/cadcVOSClient.jar --copy --src=$i --dest=vos://cadc.nrc.ca\!vospace/$LOGNAME/$3/`basename $i`; done;
