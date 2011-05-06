@@ -103,6 +103,9 @@
 *        "Fortran order" - the lower left pixel first, and the upper
 *        right pixel last.
 *
+*        - "wglist" -- Like "wlist" except bad pixels are omitted from
+*        the list.
+*
 *        - "vlist" -- Each row of textual output consists of just the
 *        pixel data value. No headers or blank lines are included. The
 *        pixels are listed in "Fortran order" - the lower-left pixel
@@ -134,6 +137,8 @@
 *        extend beyond this value. [80]
 *     MODE = LITERAL (Read)
 *        Indicates how the region to be listed will be specified:
+*
+*        - "All" -- The entire NDF is used.
 *
 *        - "Centre" -- The centre and size of the region are specified
 *        using parameters CENTRE and SIZE.
@@ -311,6 +316,9 @@
 *     2009 July 24 (MJC):
 *        Remove QUIET parameter and use the current reporting level
 *        instead (set by the global MSG_FILTER environment variable).
+*     5-MAY-2011 (DSB):
+*        - Added "wglist" format.
+*        - Added "all" mode.
 *     {enter_further_changes_here}
 
 *-
@@ -401,7 +409,7 @@
       CALL NDF_BOUND( INDF1, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
 
 *  Obtain the mode in which to obtain the region to be listed.
-      CALL PAR_CHOIC( 'MODE', 'Centre', 'Centre,Bounds,ARD,ARDFile',
+      CALL PAR_CHOIC( 'MODE', 'Centre', 'Centre,Bounds,ARD,ARDFile,All',
      :                .FALSE., MODE, STATUS )
 
 *  Abort if an error has occurred.
@@ -475,10 +483,12 @@
 
 *  Obtain the formatting method to use.
       CALL PAR_CHOIC( 'FORMAT', 'strips', 'Strips,Clist,Vlist,'//
-     :                'Region,CGlist,Wlist', .FALSE., FORMAT, STATUS )
+     :                'Region,CGlist,Wlist,WGlist', .FALSE., FORMAT,
+     :                STATUS )
 
-*  For WLIST format, check the current WCS Frame is two dimensional.
-      IF( FORMAT .EQ. 'WLIST' ) THEN
+*  For WLIST and WGLIST formats, check the current WCS Frame is two
+*  dimensional.
+      IF( FORMAT .EQ. 'WLIST' .OR. FORMAT .EQ. 'WGLIST' ) THEN
          NAX = AST_GETi( IWCS, 'Naxes', STATUS )
          IF( NAX .GT. 2 ) THEN
             STATUS = SAI__ERROR
@@ -500,8 +510,20 @@
       AGAIN = .TRUE.
       DO WHILE( AGAIN .AND. STATUS .EQ. SAI__OK )
 
+*  In ALL mode, just clone and map the supplied NDF, and use the original
+*  bounds.
+         IF( MODE .EQ. 'ALL' ) THEN
+            CALL NDF_CLONE( INDF1, INDF2, STATUS )
+            CALL NDF_MAP( INDF2, MCOMP, '_DOUBLE', 'READ', IPDAT, EL,
+     :                    STATUS )
+
+            RLBND( 1 ) = SLBND( SDIM( 1 ) )
+            RLBND( 2 ) = SLBND( SDIM( 2 ) )
+            RUBND( 1 ) = SUBND( SDIM( 1 ) )
+            RUBND( 2 ) = SUBND( SDIM( 2 ) )
+
 *  In CENTER mode, get the centre position and size for the region.
-         IF( MODE .EQ. 'CENTRE' ) THEN
+         ELSE IF( MODE .EQ. 'CENTRE' ) THEN
 
 *  Obtain the Current Frame co-ordinates (returned in CC) to put at the
 *  centre of the listing, using Parameter CENTRE.
@@ -624,7 +646,8 @@
      :                   STATUS, %VAL( CNF_CVAL( MAXLEN ) ) )
 
 *  Annull the temporary resources.
-         IF( MODE .EQ. 'CENTRE' .OR. MODE .EQ. 'BOUNDS' ) THEN
+         IF( MODE .EQ. 'CENTRE' .OR. MODE .EQ. 'BOUNDS' .OR.
+     :       MODE .EQ. 'ALL' ) THEN
             CALL NDF_ANNUL( INDF2, STATUS )
          ELSE
             CALL PSX_FREE( IPDAT, STATUS )

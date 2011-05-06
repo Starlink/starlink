@@ -67,12 +67,9 @@
 *
 *        - "CGLIST" -- Like CLIST except bad pixels are omitted.
 *
-*        - "VLIST" -- Each row of textual output consists of just the
-*        pixel data value. No headers or blank lines are included. The
-*        pixels are listed in "fortran order" - the lower left pixel first,
-*        and the upper right pixel last.
+*        - "WGLIST" -- Like WLIST except bad pixels are omitted.
 *
-*        - "WLIST" -- Each row of textual output consists of just the
+*        - "VLIST" -- Each row of textual output consists of just the
 *        pixel data value. No headers or blank lines are included. The
 *        pixels are listed in "fortran order" - the lower left pixel first,
 *        and the upper right pixel last.
@@ -127,6 +124,8 @@
 *        Added WList format.
 *     11-NOV-2009 (DSB):
 *        Fix formatting of axis and data values in WLIST mode.
+*     5-MAY-2011 (DSB):
+*        Added WGList format.
 *     {enter_further_changes_here}
 
 *-
@@ -214,16 +213,16 @@
 *  Check the global inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  For WLIST, get the Mapping from PIXEL to WCS Frame.
-      IF( FORMAT .EQ. 'WLIST' ) THEN
+*  For WLIST and WGLIST, get the Mapping from PIXEL to WCS Frame.
+      IF( FORMAT .EQ. 'WLIST' .OR. FORMAT .EQ. 'WGLIST' ) THEN
          CALL KPG1_ASFFR( IWCS, 'PIXEL', IPIX, STATUS )
          MAP = AST_GETMAPPING( IWCS, IPIX, AST__CURRENT, STATUS )
       END IF
 
-*  For WLIST, CLIST and CGLIST format, assume the maximum possible field
-*  width.
-      IF( FORMAT .EQ. 'WLIST' .OR. FORMAT .EQ. 'CLIST' .OR.
-     :    FORMAT .EQ. 'CGLIST' ) THEN
+*  For WLIST, WGLIST, CLIST and CGLIST format, assume the maximum possible
+*  field width.
+      IF( FORMAT .EQ. 'WLIST' .OR. FORMAT .EQ. 'WGLIST' .OR.
+     :    FORMAT .EQ. 'CLIST' .OR. FORMAT .EQ. 'CGLIST' ) THEN
          VWID = VAL__SZD
 
 *  For other formats, format every value, using CHR to get the most compact
@@ -246,7 +245,7 @@
       END IF
 
 *  Find the maximum field width for a pixel index or WCS coord value.
-      IF( FORMAT .EQ. 'WLIST' ) THEN
+      IF( FORMAT .EQ. 'WLIST' .OR. FORMAT .EQ. 'WGLIST' ) THEN
          CC = AST_FORMAT( IWCS, 1, AST__DPI, STATUS )
          XWID = CHR_LEN( CC )
          CC = AST_FORMAT( IWCS, 2, AST__DPI, STATUS )
@@ -421,14 +420,15 @@
             END DO
          END DO
 
-*  "WLIST": Each row of textual output consists of the WCS coords, followed
-*  by the pixel data value. No headers or blank lines are included. The
-*  pixels are listed in "fortran order" - the lower left pixel first, and
-*  the upper right pixel last. All columns left justified.
-      ELSE IF( FORMAT .EQ. 'WLIST' ) THEN
+*  "WLIST" & "WGLIST": Each row of textual output consists of the WCS coords,
+*  followed by the pixel data value. No headers or blank lines are included.
+*  The pixels are listed in "fortran order" - the lower left pixel first,
+*  and the upper right pixel last. All columns left justified. WGLIST
+*  skips bad data values.
+      ELSE IF( FORMAT .EQ. 'WLIST' .OR. FORMAT .EQ. 'WGLIST' ) THEN
 
-*  Transforming every pixel position into WCS using a separate call to
-*  AST_TRAN2 would be very inefficient. So we collect a group of
+*  Transforming every required pixel position into WCS using a separate
+*  call to AST_TRAN2 would be very inefficient. So we collect a group of
 *  positions together, and transform them all using a single call to
 *  AST_TRAN2. Initialise the number of positions ready to transform.
          STORED = 0
@@ -437,67 +437,118 @@
          DO IY = YLO, YHI
             DO IX = XLO, XHI
 
+*  If mode is WGLIST, check the data value is good.
+               IF( FORMAT .EQ. 'WLIST' .OR.
+     :             ARRAY( IX, IY ) .NE. VAL__BADD ) THEN
+
 *  Add these pixel centre positions to the store of positions to be
 *  transformed.
-               STORED = STORED + 1
-               XSTORE( STORED ) = DBLE( IX ) - 0.5D0
-               YSTORE( STORED ) = DBLE( IY ) - 0.5D0
-               VSTORE( STORED ) = ARRAY( IX, IY )
+                  STORED = STORED + 1
+                  XSTORE( STORED ) = DBLE( IX ) - 0.5D0
+                  YSTORE( STORED ) = DBLE( IY ) - 0.5D0
+                  VSTORE( STORED ) = ARRAY( IX, IY )
 
 *  If the store is now full, or if this is the last pixel, transform the
 *  stored pixel positions into WCS positions.
-               IF( STORED .EQ. MXSTOR .OR.
-     :             ( IX .EQ. XHI .AND. IY .EQ. YHI ) ) THEN
-                  CALL AST_TRAN2( MAP, STORED, XSTORE, YSTORE, .TRUE.,
-     :                            ASTORE, BSTORE, STATUS )
+                  IF( STORED .EQ. MXSTOR .OR.
+     :                ( IX .EQ. XHI .AND. IY .EQ. YHI ) ) THEN
+
+                     CALL AST_TRAN2( MAP, STORED, XSTORE, YSTORE,
+     :                               .TRUE., ASTORE, BSTORE, STATUS )
 
 *  Loop round displaying each stored WCS position and the corresponding
 *  pixel value.
-                  DO I = 1, STORED
-                     LINE = ' '
-                     IAT = 0
+                     DO I = 1, STORED
+                        LINE = ' '
+                        IAT = 0
 
-                     POS( 1 ) = ASTORE( I )
-                     POS( 2 ) = BSTORE( I )
-                     CALL AST_NORM( IWCS, POS, STATUS )
+                        POS( 1 ) = ASTORE( I )
+                        POS( 2 ) = BSTORE( I )
+                        CALL AST_NORM( IWCS, POS, STATUS )
 
-                     CC = AST_FORMAT( IWCS, 1, POS( 1 ), STATUS )
-                     CC( XWID: ) = ' '
-                     CALL CHR_APPND( CC, LINE, IAT )
+                        CC = AST_FORMAT( IWCS, 1, POS( 1 ), STATUS )
+                        CC( XWID: ) = ' '
+                        CALL CHR_APPND( CC, LINE, IAT )
 
-                     IAT = XWID
-                     JAT = IAT
+                        IAT = XWID
+                        JAT = IAT
 
-                     CC = AST_FORMAT( IWCS, 2, POS( 2 ), STATUS )
-                     CC( YWID: ) = ' '
-                     CALL CHR_APPND( CC, LINE, IAT )
+                        CC = AST_FORMAT( IWCS, 2, POS( 2 ), STATUS )
+                        CC( YWID: ) = ' '
+                        CALL CHR_APPND( CC, LINE, IAT )
 
-                     IAT = JAT + YWID
+                        IAT = JAT + YWID
 
-                     IF( VSTORE( I ) .EQ. VAL__BADD ) THEN
-                        CALL CHR_PUTC( BADTXT, LINE, IAT )
+                        IF( VSTORE( I ) .EQ. VAL__BADD ) THEN
+                           CALL CHR_PUTC( BADTXT, LINE, IAT )
 
-                     ELSE IF( VSTORE( I ) .EQ. OUTVAL ) THEN
-                        CALL CHR_PUTC( OUTTXT, LINE, IAT )
+                        ELSE IF( VSTORE( I ) .EQ. OUTVAL ) THEN
+                           CALL CHR_PUTC( OUTTXT, LINE, IAT )
 
-                     ELSE
-                        CALL CHR_PUTC( AST_FORMAT( FRM, 1,
-     :                                             VSTORE( I ),
-     :                                             STATUS ),
-     :                                 LINE, IAT )
-                     END IF
+                        ELSE
+                           CALL CHR_PUTC( AST_FORMAT( FRM, 1,
+     :                                                VSTORE( I ),
+     :                                                STATUS ),
+     :                                    LINE, IAT )
+                        END IF
 
-                     CALL KPG1_REPRT( LINE( : IAT ), QUIET, LOG, FD,
-     :                                STATUS )
+                        CALL KPG1_REPRT( LINE( : IAT ), QUIET, LOG, FD,
+     :                                   STATUS )
 
-                  END DO
+                     END DO
 
 *  Indicate no positions are ready to be transformed.
-                  STORED = 0
+                     STORED = 0
 
+                  END IF
                END IF
             END DO
          END DO
+
+*  Do any remaining positions.
+         IF( STORED .GT. 0 ) THEN
+
+            CALL AST_TRAN2( MAP, STORED, XSTORE, YSTORE, .TRUE., ASTORE,
+     :                      BSTORE, STATUS )
+
+            DO I = 1, STORED
+               LINE = ' '
+               IAT = 0
+
+               POS( 1 ) = ASTORE( I )
+               POS( 2 ) = BSTORE( I )
+               CALL AST_NORM( IWCS, POS, STATUS )
+
+               CC = AST_FORMAT( IWCS, 1, POS( 1 ), STATUS )
+               CC( XWID: ) = ' '
+               CALL CHR_APPND( CC, LINE, IAT )
+
+               IAT = XWID
+               JAT = IAT
+
+               CC = AST_FORMAT( IWCS, 2, POS( 2 ), STATUS )
+               CC( YWID: ) = ' '
+               CALL CHR_APPND( CC, LINE, IAT )
+
+               IAT = JAT + YWID
+
+               IF( VSTORE( I ) .EQ. VAL__BADD ) THEN
+                  CALL CHR_PUTC( BADTXT, LINE, IAT )
+
+               ELSE IF( VSTORE( I ) .EQ. OUTVAL ) THEN
+                  CALL CHR_PUTC( OUTTXT, LINE, IAT )
+
+               ELSE
+                  CALL CHR_PUTC( AST_FORMAT( FRM, 1,
+     :                                       VSTORE( I ),
+     :                                       STATUS ),
+     :                           LINE, IAT )
+               END IF
+
+               CALL KPG1_REPRT( LINE( : IAT ), QUIET, LOG, FD,
+     :                          STATUS )
+            END DO
+         END IF
 
 *  "VLIST":  Each row of textual output consists of just the pixel data value.
 *  No headers or blank lines are included. The pixels are listed in "fortran

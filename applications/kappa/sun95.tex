@@ -31233,6 +31233,10 @@ KAPPA: \htmlref{LOG10}{LOG10},
             upper-right pixel last.
 
             \sstitem
+            {\tt "wglist"} --- Like {\tt "wlist"} except that bad pixel
+            are omitted from the list.
+
+            \sstitem
             {\tt "region"} --- The pixel data values are listed as a two-dimensional
             region.  Each row of textual output contains a whole row of data
             values.  The textual output may be truncated if it is too wide.  The
@@ -31273,6 +31277,9 @@ KAPPA: \htmlref{LOG10}{LOG10},
          Indicates how the region to be listed will be specified:
 
          \ssthitemlist{
+
+            \sstitem
+            {\tt "All"} --- The entire NDF is used.
 
             \sstitem
             {\tt "Centre"} --- The centre and size of the region are specified
@@ -57717,6 +57724,14 @@ The following applications have been modified:
 The following applications have been modified:
 
 \begin{description}
+   \item [\htmlref{LOOK}{LOOK}]\mbox{}
+      \begin{itemize}
+        \item New format ``wglist'' has been added, which lists the WCS
+        co-ordinates and pixel values in an image, omitting bad pixels.
+        \item New mode ``all'' has been added, which lists the entire
+        suppied NDF.
+      \end{itemize}
+
    \item [\htmlref{MFITTREND}{MFITTREND}]\mbox{}
       \begin{itemize}
         \item Permits processing of very large datasets by dividing into

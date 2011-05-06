@@ -18,6 +18,13 @@
 
 2 Modified_applications
 
+   o  LOOK
+
+      -  New format "wglist" has been added, which lists the WCS
+      co-ordinates and pixel values in an image, omitting bad pixels.
+      -  New mode "all" has been added, which lists the entire supplied
+      NDF.
+
    o  MFITTREND
 
       -  Permits processing of very large datasets by dividing into
