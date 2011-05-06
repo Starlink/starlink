@@ -24,7 +24,7 @@ STAR_CHECK_PROGS([fgeneric])
 
 STAR_CNF_COMPATIBLE_SYMBOLS
 
-STAR_DECLARE_DEPENDENCIES([build], [cnf mers pcs sae])
+STAR_DECLARE_DEPENDENCIES([build], [cnf generic mers pcs sae])
 STAR_DECLARE_DEPENDENCIES([link], [chr mers pcs])
 
 STAR_LATEX_DOCUMENTATION(sun114)
