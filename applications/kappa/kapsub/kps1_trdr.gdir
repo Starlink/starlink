@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_TRDRx( FD, DIM1, DIM2, POSCOD, COUNT, CODATA, VADATA, 
+*     CALL KPS1_TRDRx( FD, DIM1, DIM2, POSCOD, COUNT, CODATA, VADATA,
 *    :                 LBND, UBND, CMPLET, STATUS )
 
 *  Description:
@@ -112,10 +112,13 @@
 *        when there where columns beyond the last column used.
 *     1996 January 31 (MJC):
 *        Replaced NAG calls.
+*     6-MAY-2011 (DSB):
+*        Correct sorting of columns (PDA_QSIAx does not modify the
+*        supplied array).
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -190,14 +193,15 @@
 *  Sort the columns positions.
 *  ===========================
 
-*  Copy the columns.
+*  Sort a sorted index of the columns so that we can read them in
+*  sequence.
+      CALL PDA_QSIAI( DIM1 + 1, POSCOD, INDPOS )
+
+*  Copy and sort the column indices.
       DO  I = 1, DIM1 + 1
          ORDPOS( I ) = POSCOD( I )
       END DO
-
-*  Sort the columns to be able to read them in sequence and 
-*  obtain an index to old positions.
-      CALL PDA_QSIAI( DIM1 + 1, ORDPOS, INDPOS )
+      CALL PDA_QSAI( DIM1 + 1, ORDPOS )
 
 *  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -221,8 +225,8 @@
             SHRIEK = INDEX( BUFFER, '!' )
             HASH = INDEX( BUFFER, '#' )
 
-*  Get the length of the string, watching for blank lines or comment 
-*  lines.  A hash or shriek in the first column indicates a comment 
+*  Get the length of the string, watching for blank lines or comment
+*  lines.  A hash or shriek in the first column indicates a comment
 *  line.  In such cases the line can be ignored.
             IF ( SHRIEK .EQ. 1 .OR. HASH .EQ. 1 .OR.
      :           BUFFER .EQ. ' ' ) THEN
@@ -231,7 +235,7 @@
                NCOM = CHR_LEN( BUFFER )
             END IF
 
-*  Initialise to the start of the string, and the number of values 
+*  Initialise to the start of the string, and the number of values
 *  stored.
             NVAL = 0
             INDEXE = -1
@@ -269,7 +273,7 @@
                CALL CHR_FIWE( BUFFER, INDEXE, STATUS )
 
 *  Watch for the case where the word terminates the line.  Since this
-*  is quite normal for the last word (value) in the buffer, the error 
+*  is quite normal for the last word (value) in the buffer, the error
 *  should be annulled.
                IF ( NVAL .EQ. DIM1 ) THEN
                   IF ( STATUS .EQ. CHR__ENDOFSENT )
