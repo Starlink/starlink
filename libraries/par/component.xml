@@ -21,7 +21,7 @@
       library -- this may be subject to change in the light of experience.</p>
   </abstract>
   <dependencies >
-    <build>pcs</build><build>cnf</build><build>mers</build><build>pcs</build><build>sae</build><link>chr</link><link>mers</link><link>pcs</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>pcs</build><build>cnf</build><build>generic</build><build>mers</build><build>pcs</build><build>sae</build><link>chr</link><link>mers</link><link>pcs</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>

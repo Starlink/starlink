@@ -36,7 +36,7 @@
 </component>
 
 <component id="atools" support="S">
-  <version>1.9-7</version>
+  <version>1.9-8</version>
   <path>applications/atools</path>
   <description>ATOOLS - AST applications</description>
   <abstract><p>
@@ -138,7 +138,7 @@ system are supported.
 </component>
 
 <component id="convert" support="S">
-  <version>1.5-19</version>
+  <version>1.6-2</version>
   <path>applications/convert</path>
   <description>CONVERT -- format-conversion package</description>
   <abstract><p>
@@ -465,7 +465,7 @@ proposal, or before or during an observing run.
 </component>
 
 <component id="extractor" support="S">
-  <version>2.5-0</version>
+  <version>2.5-1</version>
   <path>applications/extractor</path>
   <description>EXTRACTOR - An Astronomical Source Detection Program</description>
   <abstract><p>
@@ -866,7 +866,7 @@ Traces an HDS file
 </component>
 
 <component id="kappa" support="S">
-  <version>1.13</version>
+  <version>1.13-2</version>
   <path>applications/kappa</path>
   <description>KAPPA - Kernel Application Package</description>
   <abstract><p>
@@ -1578,7 +1578,7 @@ package.
 </component>
 
 <component id="smurf">
-  <version>1.2.0</version>
+  <version>1.3.2</version>
   <path>applications/smurf</path>
   <description>SMURF - Sub-mm User Reduction Facility</description>
   <abstract><p>
@@ -1617,7 +1617,7 @@ with the ACSIS correlator at JCMT.
   <version>0.7-2</version>
   <path>libraries/acsisio</path>
   <description>I/O routines for ACSIS data files</description>
-  <abstract><p>
+  <abstract><p> 
 	Collection of routines for reading and writing ACSIS format
         data files containing collections of spectra.
     </p></abstract>
@@ -1698,7 +1698,7 @@ UNIX).
 </component>
 
 <component id="sst" support="S">
-  <version>1.1-1</version>
+  <version>1.1-2</version>
   <path>applications/sst</path>
   <description>SST - A Simple Software Tools Package</description>
   <abstract><p>SST is now considered obsolete; it is included to
@@ -3719,7 +3719,7 @@ to handle data from a variety of different instruments.
     the item name. If you are using the hypertext version of this
     document, the most up-to-date document references can be found by
     following the link from the software item name.
-  </p></abstract>
+  </p></abstract>  
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -3785,7 +3785,7 @@ to handle data from a variety of different instruments.
      on object class, image number, camera, aperture, homogeneous ID,
      sky position or any combination of these attributes. Users in the
      UK will use the USSP on the Starlink database Microvax (STADAT).
-  </p></abstract>
+  </p></abstract>  
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -3818,7 +3818,7 @@ to handle data from a variety of different instruments.
      and a variety of spectral atlases. It is not a general purpose
      computer, and users will not have permanent file space or private
      usernames allocated on it.
-  </p></abstract>
+  </p></abstract>  
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -3843,7 +3843,7 @@ to handle data from a variety of different instruments.
     This document describes the GNU EMACS editor as distributed by
     Starlink for UNIX systems. It is intended to provide an
     introduction for the new user.
-  </p></abstract>
+  </p></abstract>  
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -3956,7 +3956,7 @@ to handle data from a variety of different instruments.
      describe how to gain access or obtain copies of selected data,
      and to guide potential users to Starlink software and
      documentation which can help in the analysis of the data.
-  </p></abstract>
+  </p></abstract>  
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -3982,7 +3982,7 @@ to handle data from a variety of different instruments.
      This guide describes the IRAS Calibrated Raw Detector Data, how
      to access the data, and the programs available to process it and
      examine the results.
-  </p></abstract>
+  </p></abstract>  
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -4016,7 +4016,7 @@ to handle data from a variety of different instruments.
 
     This manual is an introduction to the use of TeX on Starlink
     machines.
-  </p></abstract>
+  </p></abstract>  
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -4096,7 +4096,7 @@ to handle data from a variety of different instruments.
      systems. Applications written using the CHI and CHP routines will
      run on the current STARLINK database (ADC) and any future
      STARLINK database systems.
-  </p></abstract>
+  </p></abstract>  
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -4132,7 +4132,7 @@ to handle data from a variety of different instruments.
      databases. Some of these databases have data products associated
      with them, these may be plotted and analysed using software
      within the EXOSAT database system.
-  </p></abstract>
+  </p></abstract>  
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -4653,10 +4653,10 @@ to handle data from a variety of different instruments.
     operates on data produced by these instruments and can be used to
     transform them into calibrated images, spectra, time-series etc.
 
-   XRT was created by taking the ROSAT XRT-specific functions in the
-   ASTERIX general X-ray astronomy data reduction system and
+   XRT was created by taking the ROSAT XRT-specific functions in the 
+   ASTERIX general X-ray astronomy data reduction system and 
    re-packaging them as stand-alone applications.
-  </p></abstract>
+  </p></abstract>  
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -4733,7 +4733,7 @@ to handle data from a variety of different instruments.
     </p>
   </abstract>
   <dependencies >
-
+    
   </dependencies>
   <developers>
     <person>
@@ -4812,7 +4812,7 @@ to handle data from a variety of different instruments.
      operators (AND, OR, NOT, etc.) to create more complex shapes.
      Data arrays can be multi-dimensional.</p></abstract>
   <dependencies >
-    <build>ast</build><build>cnf</build><build>grp</build><build>pcs</build><build>sae</build><link>ast</link><link>chr</link><link>mers</link><link>pgplot</link><link>psx</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>ast</build><build>cnf</build><build>grp</build><build>pcs</build><build>sae</build><link>ast</link><link>chr</link><link>mers</link><link>psx</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -4862,7 +4862,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="ast" support="S">
-  <version>5.4-0</version>
+  <version>5.6-1</version>
   <path>libraries/ast</path>
   <description>WCS library</description>
   <abstract>
@@ -5045,7 +5045,7 @@ No longer under active control.
 </component>
 
 <component id="ctg" support="U">
-  <version>3.0-1</version>
+  <version>3.0-2</version>
   <path>libraries/ctg</path>
   <description>Library to access groups of catalogues.</description>
   <abstract><p>
@@ -5055,7 +5055,7 @@ No longer under active control.
      single parameter.
   </p></abstract>
   <dependencies >
-    <build>cat</build><build>grp</build><build>prm</build><build>psx</build><build>sae</build><link>cat</link><link>chr</link><link>grp</link><link>mers</link><link>par</link><link>pcs</link><link>prm</link><link>psx</link><sourceset>htx</sourceset><sourceset>sst</sourceset><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>cat</build><build>grp</build><build>prm</build><build>psx</build><build>sae</build><link>cat</link><link>chr</link><link>grp</link><link>mers</link><link>one</link><link>par</link><link>pcs</link><link>prm</link><link>psx</link><sourceset>htx</sourceset><sourceset>sst</sourceset><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -5241,7 +5241,7 @@ No longer under active control.
       file. It also allows the creation of groups in which each element
       is a modified version of an element in another group.</p></abstract>
   <dependencies >
-    <build>cnf</build><build>par</build><build>prm</build><build>sae</build><link>chr</link><link>mers</link><link>par</link><link>pcs</link><link>psx</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>cnf</build><build>one</build><build>par</build><build>prm</build><build>sae</build><link>chr</link><link>mers</link><link>one</link><link>par</link><link>pcs</link><link>psx</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -5655,7 +5655,7 @@ independently of KAPPA.</p></abstract>
 </component>
 
 <component id="ndg" support="S">
-  <version>5.9-1</version>
+  <version>6.0</version>
   <path>libraries/ndg</path>
   <description>NDG - Routines for Accessing Groups of NDFs</description>
   <abstract><p>NDG provides facilities for handling groups of NDFs.
@@ -5665,7 +5665,7 @@ independently of KAPPA.</p></abstract>
       The syntax for specifying groups of NDFs is inherited from the GRP
       library (see SUN/150).</p></abstract>
   <dependencies >
-    <build>hds</build><build>grp</build><build>ndf</build><build>par</build><build>prm</build><build>psx</build><build>cnf</build><build>sae</build><link>grp</link><link>ndf</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>hds</build><build>grp</build><build>ndf</build><build>par</build><build>prm</build><build>psx</build><build>cnf</build><build>sae</build><link>grp</link><link>ndf</link><link>one</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -5726,7 +5726,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="one" support="U">
-  <version>1.2-2</version>
+  <version>1.3-1</version>
   <path>libraries/one</path>
   <description>General purpose Starlink odds and ends functions</description>
   <abstract><p> This library is a set of Fortran and C routines of a
@@ -5734,7 +5734,7 @@ Ultrix and for SunOS and may still work for them.
   in other more focussed Starlink libraries.
     </p></abstract>
   <dependencies >
-    <build>sae</build><build>ems</build><build>cnf</build><build>starutil</build><link>ems</link><link>cnf</link><link>starutil</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>sae</build><build>ems</build><build>cnf</build><build>starutil</build><link>ems</link><link>cnf</link><link>psx</link><link>starutil</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -5763,7 +5763,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="par" support="S">
-  <version>2.3</version>
+  <version>2.3-2</version>
   <path>libraries/par</path>
   <description>Interface to the ADAM Parameter System</description>
  <abstract><p>PAR is a library of Fortran subroutines that provides
@@ -5781,7 +5781,7 @@ Ultrix and for SunOS and may still work for them.
       library -- this may be subject to change in the light of experience.</p>
   </abstract>
   <dependencies >
-    <build>pcs</build><build>cnf</build><build>mers</build><build>pcs</build><build>sae</build><link>chr</link><link>mers</link><link>pcs</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>pcs</build><build>cnf</build><build>generic</build><build>mers</build><build>pcs</build><build>sae</build><link>chr</link><link>mers</link><link>pcs</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -6301,7 +6301,7 @@ Ultrix and for SunOS and may still work for them.
 	<p>C Memory management wrapper routines.</p>
   </abstract>
   <dependencies >
-
+    
   </dependencies>
   <developers>
     <person>
@@ -6322,7 +6322,7 @@ Ultrix and for SunOS and may still work for them.
    functions.
     </p></abstract>
   <dependencies >
-
+    
   </dependencies>
   <developers>
     <person>
@@ -6376,7 +6376,7 @@ Ultrix and for SunOS and may still work for them.
   <path>thirdparty/apache/xerces-c</path>
   <description>Apache Xerces-c library for parsing XML</description>
   <dependencies >
-
+    
   </dependencies>
   <!--developers>
     <person>
@@ -6496,7 +6496,7 @@ Ultrix and for SunOS and may still work for them.
   <path>thirdparty/fsf/gsl</path>
   <description>GNU Scientific Library</description>
   <dependencies >
-
+    
   </dependencies>
   <developers>
     <person>
@@ -6589,7 +6589,7 @@ Pence for giving his permission for CFITSIO to be released on Starlink.
   <path>thirdparty/ijg/jpeg</path>
   <description>Independent JPEG Group library</description>
   <dependencies >
-
+    
   </dependencies>
   <!--developers>
     <person>
@@ -6657,7 +6657,7 @@ The well known LaTeX2HTML converter. Used only for converting Starlink
 documents to hypertext.
 </p></abstract>
   <dependencies >
-
+    
   </dependencies>
   <developers>
     <person>
@@ -6673,7 +6673,7 @@ documents to hypertext.
   <path>thirdparty/mesa3d/mesa</path>
   <description>Mesa library for OpenGL support</description>
   <dependencies >
-
+    
   </dependencies>
   <!--developers>
     <person>
@@ -6687,7 +6687,7 @@ documents to hypertext.
   <path>thirdparty/mit/fftw</path>
   <description>Fastest Fourier Transform in the West</description>
   <dependencies >
-
+    
   </dependencies>
   <developers>
     <person>
@@ -6711,7 +6711,7 @@ documents to hypertext.
       XBM, XPM, GIF and PNG files.
     </p></abstract>
   <dependencies >
-
+    
   </dependencies>
   <developers>
     <person>
@@ -6734,7 +6734,7 @@ documents to hypertext.
   <path>thirdparty/perlsys/perl</path>
   <description>Perl</description>
   <dependencies >
-
+    
   </dependencies>
   <!--developers>
     <person>
@@ -6753,7 +6753,7 @@ another list, allowing for arbitrary translation, rotation, scaling,
 and some distortion.
 </p></abstract>
     <dependencies >
-
+    
   </dependencies>
   <developers>
     <!-- MATCH is maintained by Michael Richmond http://spiff.rit.edu/match,
@@ -6769,7 +6769,7 @@ and some distortion.
 </component>
 
 <component id="blt" support="U">
-  <version>3.0a</version>
+  <version>2.5.2</version>
   <path>thirdparty/tclsys/blt</path>
   <description>BLT</description>
   <dependencies >
@@ -6811,7 +6811,7 @@ and some distortion.
   <path>thirdparty/tclsys/tcl</path>
   <description>The Tcl system</description>
   <dependencies >
-
+    
   </dependencies>
   <developers>
     <!-- Tcl is maintained by Scriptics, but this part of the tree
