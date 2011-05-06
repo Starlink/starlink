@@ -230,12 +230,6 @@ foreach n (`cat $1`)
             echo "$in.more.smurf.bolomaps.$name" >> files.smas
          end
 
-#  Create an output image filled with bad values. Make it bigger than any reasonable expected output image.
-         if( "$outimg" != " " ) then
-            $KAPPA_DIR/creframe temp-smas mode=bl lbound=\[-100,-100\] ubound=\[100,100\]
-            $KAPPA_DIR/setmagic temp-smas back 0.0 quiet
-         endif
-
 # Now deal with NDF that do not contain shortmaps....
       else
 
@@ -251,16 +245,17 @@ end
 #  Create the line holding the column names in the output catalogue.
 if( $moon == 0 ) then
    echo "# TAI UTC SEQSTART SEQEND XCEN YCEN AMP SUM FWHM AXISR GAMMA ORIENT NDF BXCEN BYCEN BAMP BSUM BFWHM BAXISR BORIENT ROW COL" > $2
+   set xcol = 21
+   set ycol = 22
+   set valcol = 8
 else
    echo "# SUM ROW COL" > $2
+   set xcol = 2
+   set ycol = 3
+   set valcol = 1
 endif
 
 # Next loop round all the NDFs to be processed.
-set maxrow = 0
-set minrow = 10000
-set maxcol = 0
-set mincol = 10000
-
 foreach n (`cat files.smas`)
    echo "Doing $n"
 
@@ -270,18 +265,6 @@ foreach n (`cat files.smas`)
       set rc = `echo $n | sed -e 's/.*C\([0-9]\{2\}\)R\([0-9]\{2\}\)/\1 \2/'`
       set row = `echo $rc[1] | sed -e 's/0\([0-9]\)/\1/'`
       set col = `echo $rc[2] | sed -e 's/0\([0-9]\)/\1/'`
-      if( $row > $maxrow ) then
-         set maxrow = $row
-      endif
-      if( $row < $minrow ) then
-         set minrow = $row
-      endif
-      if( $col > $maxcol ) then
-         set maxcol = $col
-      endif
-      if( $col < $mincol ) then
-         set mincol = $col
-      endif
    else
       set row = null
       set col = null
@@ -523,21 +506,14 @@ foreach n (`cat files.smas`)
 
    endif
 
-#  Poke the current fsum value into the image of fsum values, at the current
-#  row and column indices.
-   if( "$outimg" != " " ) then
-      $KAPPA_DIR/chpix back temp-smas section="'$row,$col'" newval=$fsum
-      mv -f temp-smas.sdf back.sdf
-   endif
 end
 
-# If an output image was created, trim it to the size specified by the
-# bolomaps in the supplied data.
+# If an output image is required, create it from the output catalogue.
 if( "$outimg" != " " ) then
-   $KAPPA_DIR/ndfcopy back\(${minrow}:${maxrow},${mincol}:${maxcol}\) $outimg
+   $KAPPA_DIR/trandat freename=$2 poscols="[$xcol,$ycol]" valcol=$valcol auto=no ndf=$outimg
 endif
 
 # Clean up.
-#rm -f back.sdf files.smas log.smas cut-smas.sdf coin.smas temp-smas.sdf pos-smas.sdf filled-smas.sdf >& /dev/null
+rm -f back.sdf files.smas log.smas cut-smas.sdf coin.smas temp-smas.sdf pos-smas.sdf filled-smas.sdf >& /dev/null
 
 
