@@ -647,13 +647,13 @@ produced by a single continuous scan of Uranus. The main data arrays
 of each file are cubes, with the first two dimensions enumerating
 columns and rows, and the third time slices (sampled at 200\,Hz).
 
-Raw SCUBA-2 data are stored as integers (uncalibrated digitized units
-known as ``DAC units''). The \smurf\ task \flatfield\ can be used to
-scale raw data to units proportional to picowatts (pW, as double
-precision floating points) using the results of measurements of a
-flatfield calibration. The calibration can be stored internally in the
-data file (see the HDS extension \texttt{MORE.SCUBA2.FLATCAL}) or can
-be calculated dynamically from the flatfield ramps bracketing each
+Raw SCUBA-2 data are stored as integers (uncalibrated digitized
+units). The \smurf\ task \flatfield\ can be used to scale raw data to
+units proportional to picowatts (pW, as double precision floating
+points) using the results of measurements of a flatfield
+calibration. The calibration can be stored internally in the data file
+(see the HDS extension \texttt{MORE.SCUBA2.FLATCAL}) or can be
+calculated dynamically from the flatfield ramps bracketing each
 science observation. The DIMM will always use a flatfield ramp if
 available. For example, use the command
 

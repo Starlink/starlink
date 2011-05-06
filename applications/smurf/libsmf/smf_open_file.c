@@ -1059,6 +1059,10 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
              it is needed in the metadata fixup */
           hdr->nframes = nframes;
 
+          /* Store units and label */
+          one_strlcpy( hdr->units, units, sizeof(hdr->units), status );
+          one_strlcpy( hdr->dlabel, dlabel, sizeof(hdr->dlabel), status );
+
           /* Metadata corrections - hide the messages by default */
           if ( !(flags & SMF__NOFIX_METADATA) ) smf_fix_metadata( MSG__DEBUG, *data, status );
 
@@ -1070,10 +1074,6 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
             (void )smf_getobsidss( hdr->fitshdr, NULL, 0, hdr->obsidss,
                                    sizeof(hdr->obsidss), status );
           }
-
-          /* Store units and label */
-          one_strlcpy( hdr->units, units, sizeof(hdr->units), status );
-          one_strlcpy( hdr->dlabel, dlabel, sizeof(hdr->dlabel), status );
 
           /* Determine and store the telescope location in hdr->telpos */
           smf_telpos_get( hdr, status );

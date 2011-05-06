@@ -485,7 +485,7 @@ void smurf_calcnoise( int *status ) {
 
         /* Convert the data to amps if we have DAC units. Else leave them
            alone. */
-        if ( strncmp(thedata->hdr->units, "DAC", 3) == 0) {
+        if ( strncmp(thedata->hdr->units, "adu", 3) == 0) {
           msgOutiff( MSG__VERB, "", "Scaling data from '%s' to amps",
                      status, thedata->hdr->units );
           smf_scalar_multiply( thedata, RAW2CURRENT, status );

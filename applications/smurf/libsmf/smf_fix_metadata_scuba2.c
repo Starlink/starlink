@@ -161,6 +161,13 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
     return have_fixed;
   }
 
+  /* Update units string to something that is FITS standard compliant
+     - we used "DAC units" for a while but in FITS land this becomes
+     "decacoulomb * units" */
+  if ( strncmp( hdr->units, "DAC", 3) == 0 ) {
+    one_strlcpy( hdr->units, "adu", SMF__CHARLABEL, status );
+  }
+
   /* Clock jitter and readout efficiencies mean we need to recalculate STEPTIME from the data.
      This is possible because we know that we have a continuous sequence in each file (unlike
      ACSIS). */

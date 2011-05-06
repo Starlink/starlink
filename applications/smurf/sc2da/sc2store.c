@@ -2283,7 +2283,7 @@ int *status              /* global status (given and returned) */
        if (hasunits) {
          ndfCget( sc2store_indf, "Units", units, SC2STORE_UNITLEN, status );
        } else {
-         star_strlcpy( units, "DAC Units", SC2STORE_UNITLEN );
+         star_strlcpy( units, "adu", SC2STORE_UNITLEN );
        }
      }
      if (label) {
@@ -2313,7 +2313,7 @@ int *status              /* global status (given and returned) */
 /* Units and label - we are uncompressing so we ignore the label
    and units that are in the file already. */
      if (units) {
-         star_strlcpy( units, "DAC Units", SC2STORE_UNITLEN );
+         star_strlcpy( units, "adu", SC2STORE_UNITLEN );
      }
      if (label) {
          star_strlcpy( label, "Signal", SC2STORE_LABLEN );
@@ -3508,7 +3508,7 @@ int *status              /* global status (given and returned) */
         &sc2store_scuba2loc, status );
 
 /* Labels and units */
-      ndfCput( "DAC units", sc2store_indf, "UNITS", status );
+      ndfCput( "adu", sc2store_indf, "UNITS", status );
       ndfCput( "Signal", sc2store_indf, "LABEL", status );
    }
 
