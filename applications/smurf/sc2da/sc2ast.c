@@ -37,6 +37,7 @@ static char errmess[132];              /* For DRAMA error messages */
 #define MM2RAD_NEW2 MM2RAD*0.9975      /* MM2RAD for use with NEW2 distortion */
 #define MM2RAD_NEW3 MM2RAD*1.0084      /* MM2RAD for use with NEW3 distortion */
 #define MM2RAD_NEW4 MM2RAD*0.9975      /* MM2RAD for use with NEW4 distortion */
+#define MM2RAD_NEW5 MM2RAD*0.9986      /* MM2RAD for use with NEW5 distortion */
 
 #define PIBY2 1.57079632679
 #define PI 2*PIBY2
@@ -292,6 +293,8 @@ int *status             /* global status (given and returned) */
                  previously used as a place-holder for the SKY Frame.
                  Also corrects the logic in the case of "state" being NULL on
                  one call and not NULL on the next call.
+     06May2011 : Added NEW5 distortion (first estimate based on eight
+                 arrays). (DSB)
 */
 {
 
@@ -341,7 +344,8 @@ int *status             /* global status (given and returned) */
       NEW1_DISTORTION,     /* First estimate prior to C2 mirror fix */
       NEW2_DISTORTION,     /* Second estimate prior to C2 mirror fix */
       NEW3_DISTORTION,     /* First estimate after C2 mirror fix */
-      NEW4_DISTORTION      /* First estimate based on 7 arrays */
+      NEW4_DISTORTION,     /* First estimate based on 7 arrays */
+      NEW5_DISTORTION      /* First estimate based on 8 arrays */
    } idistortion;
 
 /* xoff and yoff are the distance in pixel units from the tracking centre
@@ -389,6 +393,15 @@ int *status             /* global status (given and returned) */
       { -37.3,   37.2, 45.1, -29.4, -38.7,  33.5,  43.9, -30.7 };
    const double yoff_NEW4[8] =
       { -35.1,  -42.7, 32.0,  40.0,  31.8,  41.5, -35.1, -43.0 };
+
+/* Values modified to reduce errors implied by NEW5 distortion (initial
+   eight array distortion). */
+   /*    s8a    s8b     s8c   s8d    s4a    s4b    s4c    s4d */
+   const double xoff_NEW5[8] =
+      { -37.3,   37.6, 45.4, -29.5, -38.7,  36.4,  44.2, -30.7 };
+   const double yoff_NEW5[8] =
+      { -35.3,  -43.1, 31.9,  39.7,  31.6,  39.6, -35.2, -43.1 };
+
 
 
 /* Distortion Mappings. A specific version of the distortion Mapping can
@@ -901,7 +914,184 @@ int *status             /* global status (given and returned) */
             };
 
 
+/* SMURF_DISTORTION = "NEW5": determined from bolomap approach, using
+   all arrays except s4b from observations: 20110320_22 20110320_23
+   20110320_29 20110320_27 20110330_22 20110330_34 20110417_37
+   20110417_41 20110420_13 20110420_18 20110420_42 20110420_28
+   20110420_32 20110420_38 20110323_26 20110326_24 20110326_28
+   20110326_45 and s4b from observations: 20110417_37 20110417_41
+   20110420_13 20110420_18 20110420_42 20110420_28 20110420_32
+   20110420_38. This is the first estimate with eight arrays. Note,
+   there is a separate polyniomial for 850 and 450. */
+/* ------------------------------------------------------------ */
 
+
+/* SCUBA-2 PolyMap cooefficients. Forward coefficients are from
+   FRAME850 to Nasmyth */
+
+/* Forward 850 transformation coefficients... */
+   int ncoeff_f_NEW5_850 = 20;
+   const double coeff_f_NEW5_850[] = {
+
+/* X-coordinate */
+               -0.11754    ,     1.0, 0.0, 0.0,
+               1.0004      ,     1.0, 1.0, 0.0,
+               -7.6665e-05 ,     1.0, 2.0, 0.0,
+               -3.0987e-06 ,     1.0, 3.0, 0.0,
+               -0.012009   ,     1.0, 0.0, 1.0,
+               3.9014e-05  ,     1.0, 1.0, 1.0,
+               3.3449e-08  ,     1.0, 2.0, 1.0,
+               4.9288e-05  ,     1.0, 0.0, 2.0,
+               -1.5432e-06 ,     1.0, 1.0, 2.0,
+               -1.0526e-06 ,     1.0, 0.0, 3.0,
+
+/* Y-coordinate */
+               -0.52707    ,     2.0, 0.0, 0.0,
+               0.0031522   ,     2.0, 1.0, 0.0,
+               0.00011257  ,     2.0, 2.0, 0.0,
+               1.5452e-06  ,     2.0, 3.0, 0.0,
+               0.99956     ,     2.0, 0.0, 1.0,
+               -9.6166e-05 ,     2.0, 1.0, 1.0,
+               -7.8614e-07 ,     2.0, 2.0, 1.0,
+               -8.9167e-05 ,     2.0, 0.0, 2.0,
+               5.4614e-08  ,     2.0, 1.0, 2.0,
+               -2.379e-06  ,     2.0, 0.0, 3.0,
+            };
+
+
+/* Inverse transformation coefficients... */
+   int ncoeff_i_NEW5_850 = 42;
+   const double coeff_i_NEW5_850[] = {
+
+/* X-coordinate */
+               0.1238      ,     1.0, 0.0, 0.0,
+               0.99952     ,     1.0, 1.0, 0.0,
+               7.6489e-05  ,     1.0, 2.0, 0.0,
+               3.0917e-06  ,     1.0, 3.0, 0.0,
+               1.2784e-09  ,     1.0, 4.0, 0.0,
+               2.9004e-11  ,     1.0, 5.0, 0.0,
+               0.011953    ,     1.0, 0.0, 1.0,
+               -3.415e-05  ,     1.0, 1.0, 1.0,
+               7.2972e-08  ,     1.0, 2.0, 1.0,
+               -7.0453e-10 ,     1.0, 3.0, 1.0,
+               -4.0377e-12 ,     1.0, 4.0, 1.0,
+               -4.6727e-05 ,     1.0, 0.0, 2.0,
+               1.5163e-06  ,     1.0, 1.0, 2.0,
+               -1.918e-10  ,     1.0, 2.0, 2.0,
+               1.7207e-11  ,     1.0, 3.0, 2.0,
+               1.0924e-06  ,     1.0, 0.0, 3.0,
+               5.2027e-10  ,     1.0, 1.0, 3.0,
+               1.2967e-11  ,     1.0, 2.0, 3.0,
+               -3.6195e-11 ,     1.0, 0.0, 4.0,
+               1.1012e-11  ,     1.0, 1.0, 4.0,
+               1.0267e-11  ,     1.0, 0.0, 5.0,
+
+/* Y-coordinate */
+               0.52694     ,     2.0, 0.0, 0.0,
+               -0.00313    ,     2.0, 1.0, 0.0,
+               -0.00011326 ,     2.0, 2.0, 0.0,
+               -1.5858e-06 ,     2.0, 3.0, 0.0,
+               -1.3317e-09 ,     2.0, 4.0, 0.0,
+               -1.5966e-11 ,     2.0, 5.0, 0.0,
+               1.0005      ,     2.0, 0.0, 1.0,
+               9.3227e-05  ,     2.0, 1.0, 1.0,
+               7.3656e-07  ,     2.0, 2.0, 1.0,
+               4.5504e-10  ,     2.0, 3.0, 1.0,
+               4.9617e-12  ,     2.0, 4.0, 1.0,
+               9.4259e-05  ,     2.0, 0.0, 2.0,
+               -3.0967e-08 ,     2.0, 1.0, 2.0,
+               -8.981e-10  ,     2.0, 2.0, 2.0,
+               -1.9767e-11 ,     2.0, 3.0, 2.0,
+               2.4003e-06  ,     2.0, 0.0, 3.0,
+               6.7683e-10  ,     2.0, 1.0, 3.0,
+               5.0374e-12  ,     2.0, 2.0, 3.0,
+               9.6264e-10  ,     2.0, 0.0, 4.0,
+               2.7101e-12  ,     2.0, 1.0, 4.0,
+               2.1801e-11  ,     2.0, 0.0, 5.0,
+            };
+
+
+/* Forward transformation coefficients... */
+   int ncoeff_f_NEW5_450 = 20;
+   const double coeff_f_NEW5_450[] = {
+
+/* X-coordinate */
+               0.27605     ,     1.0, 0.0, 0.0,
+               0.99719     ,     1.0, 1.0, 0.0,
+               -4.9717e-05 ,     1.0, 2.0, 0.0,
+               -4.7891e-07 ,     1.0, 3.0, 0.0,
+               -0.0072979  ,     1.0, 0.0, 1.0,
+               0.00011709  ,     1.0, 1.0, 1.0,
+               2.3845e-07  ,     1.0, 2.0, 1.0,
+               1.5125e-05  ,     1.0, 0.0, 2.0,
+               -2.3361e-06 ,     1.0, 1.0, 2.0,
+               7.3939e-07  ,     1.0, 0.0, 3.0,
+
+/* Y-coordinate */
+               0.20326     ,     2.0, 0.0, 0.0,
+               -0.0012542  ,     2.0, 1.0, 0.0,
+               9.2377e-05  ,     2.0, 2.0, 0.0,
+               -1.7809e-06 ,     2.0, 3.0, 0.0,
+               1.0028      ,     2.0, 0.0, 1.0,
+               -4.7275e-05 ,     2.0, 1.0, 1.0,
+               1.9229e-06  ,     2.0, 2.0, 1.0,
+               -5.29e-05   ,     2.0, 0.0, 2.0,
+               9.9074e-07  ,     2.0, 1.0, 2.0,
+               -3.5012e-06 ,     2.0, 0.0, 3.0,
+            };
+
+
+
+/* Inverse transformation coefficients... */
+   int ncoeff_i_NEW5_450 = 42;
+   const double coeff_i_NEW5_450[] = {
+
+/* X-coordinate */
+               -0.27832    ,     1.0, 0.0, 0.0,
+               1.0028      ,     1.0, 1.0, 0.0,
+               4.8902e-05  ,     1.0, 2.0, 0.0,
+               5.1244e-07  ,     1.0, 3.0, 0.0,
+               -6.0656e-11 ,     1.0, 4.0, 0.0,
+               4.3451e-13  ,     1.0, 5.0, 0.0,
+               0.0073358   ,     1.0, 0.0, 1.0,
+               -0.00011708 ,     1.0, 1.0, 1.0,
+               -2.5017e-07 ,     1.0, 2.0, 1.0,
+               -4.9333e-10 ,     1.0, 3.0, 1.0,
+               7.654e-12   ,     1.0, 4.0, 1.0,
+               -1.5608e-05 ,     1.0, 0.0, 2.0,
+               2.3217e-06  ,     1.0, 1.0, 2.0,
+               6.5267e-10  ,     1.0, 2.0, 2.0,
+               -9.802e-12  ,     1.0, 3.0, 2.0,
+               -7.0353e-07 ,     1.0, 0.0, 3.0,
+               -8.16e-10   ,     1.0, 1.0, 3.0,
+               6.0303e-13  ,     1.0, 2.0, 3.0,
+               1.5495e-10  ,     1.0, 0.0, 4.0,
+               2.5026e-11  ,     1.0, 1.0, 4.0,
+               -1.2617e-11 ,     1.0, 0.0, 5.0,
+
+/* Y-coordinate */
+               -0.20304    ,     2.0, 0.0, 0.0,
+               0.0012959   ,     2.0, 1.0, 0.0,
+               -9.3795e-05 ,     2.0, 2.0, 0.0,
+               1.7626e-06  ,     2.0, 3.0, 0.0,
+               1.049e-10   ,     2.0, 4.0, 0.0,
+               -3.6388e-12 ,     2.0, 5.0, 0.0,
+               0.99717     ,     2.0, 0.0, 1.0,
+               4.6889e-05  ,     2.0, 1.0, 1.0,
+               -1.874e-06  ,     2.0, 2.0, 1.0,
+               -3.3218e-10 ,     2.0, 3.0, 1.0,
+               1.3293e-12  ,     2.0, 4.0, 1.0,
+               5.0829e-05  ,     2.0, 0.0, 2.0,
+               -9.6454e-07 ,     2.0, 1.0, 2.0,
+               -9.2162e-10 ,     2.0, 2.0, 2.0,
+               3.6041e-11  ,     2.0, 3.0, 2.0,
+               3.4746e-06  ,     2.0, 0.0, 3.0,
+               1.46e-10    ,     2.0, 1.0, 3.0,
+               -5.0333e-11 ,     2.0, 2.0, 3.0,
+               1.7209e-10  ,     2.0, 0.0, 4.0,
+               -1.0446e-11 ,     2.0, 1.0, 4.0,
+               4.719e-11   ,     2.0, 0.0, 5.0,
+            };
 
 
 
@@ -1088,6 +1278,8 @@ int *status             /* global status (given and returned) */
          idistortion = NEW3_DISTORTION;
       } else if( !strcmp( distortion, "NEW4" ) ) {
          idistortion = NEW4_DISTORTION;
+      } else if( !strcmp( distortion, "NEW5" ) ) {
+         idistortion = NEW5_DISTORTION;
       } else if( *status == SAI__OK ) {
          *status = SAI__ERROR;
          sprintf( errmess, "Environment variable SMURF_DISTORTION has "
@@ -1103,7 +1295,7 @@ int *status             /* global status (given and returned) */
    with the corrected C2 mirror rotation. */
       if( idistortion == DATE_DISTORTION ) {
          if( !state || state->tcs_tai > 55621.0 ) {
-            idistortion = NEW4_DISTORTION;
+            idistortion = NEW5_DISTORTION;
          } else if( state->tcs_tai > 55168.19 ) {
             idistortion = NEW3_DISTORTION;
          } else {
@@ -1129,6 +1321,10 @@ int *status             /* global status (given and returned) */
       } else if( NEW4_DISTORTION == idistortion ) {
          shift[ 0 ] = xoff_NEW4[ subnum ];
          shift[ 1 ] = yoff_NEW4[ subnum ];
+
+      } else if( NEW5_DISTORTION == idistortion ) {
+         shift[ 0 ] = xoff_NEW5[ subnum ];
+         shift[ 1 ] = yoff_NEW5[ subnum ];
 
       } else {
          shift[ 0 ] = xoff[ subnum ];
@@ -1181,6 +1377,20 @@ int *status             /* global status (given and returned) */
             c_i = coeff_i_NEW4_450;
          }
 
+      } else if( NEW5_DISTORTION == idistortion ) {
+         if( subnum < S4A ) { /* 850 arrays */
+            nc_f = ncoeff_f_NEW5_850;
+            nc_i = ncoeff_i_NEW5_850;
+            c_f = coeff_f_NEW5_850;
+            c_i = coeff_i_NEW5_850;
+
+         } else { /* 450 arrays */
+            nc_f = ncoeff_f_NEW5_450;
+            nc_i = ncoeff_i_NEW5_450;
+            c_f = coeff_f_NEW5_450;
+            c_i = coeff_i_NEW5_450;
+         }
+
       } else if( NONE_DISTORTION == idistortion ) {
          nc_f = 0;
          nc_i = 0;
@@ -1214,6 +1424,9 @@ int *status             /* global status (given and returned) */
 
       } else if( NEW4_DISTORTION == idistortion ) {
          radmap = astZoomMap ( 2, MM2RAD_NEW4, " " );
+
+      } else if( NEW5_DISTORTION == idistortion ) {
+         radmap = astZoomMap ( 2, MM2RAD_NEW5, " " );
 
       } else {
          radmap = astZoomMap ( 2, MM2RAD, " " );
