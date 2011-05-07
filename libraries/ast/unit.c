@@ -85,6 +85,8 @@
 *        converted to "^-2".
 *     2-DEC-2008 (DSB):
 *        Correct memory allocation bug in CleanExp.
+*     6-MAY-2011 (DSB):
+*        Include "adu" as basic unit.
 */
 
 /* Module Macros. */
@@ -117,7 +119,7 @@
    In addition to the usual M, L and T, this includes pseudo-dimensions
    describing strictly dimensionless quantities such as plane angle,
    magnitude, etc. */
-#define NQUANT 9
+#define NQUANT 10
 
 /* Include files. */
 /* ============== */
@@ -1402,12 +1404,12 @@ static int DimAnal( UnitNode *node, double powers[NQUANT], double *scale, int *s
 *     powers
 *        An array in which are returned the powers for each of the following
 *        basic units (in the order shown): kilogramme, metre, second, radian,
-*        Kelvin, count, photon, magnitude, pixel. If the supplied unit does
-*        not depend on a given basic unit a value of 0.0 will be returned in
-*        the array. The returns values represent a system of units which is a
-*        scaled form of the supplied units, expressed in the basic units of m,
-*        kg, s, rad, K count,photon, mag and pixel. For instance, a returned
-*        array of [1,0,-2,0,0,0,0,0,0] would represent "m/s**2".
+*        Kelvin, count, adu, photon, magnitude, pixel. If the supplied unit
+*        does not depend on a given basic unit a value of 0.0 will be returned
+*        in the array. The returns values represent a system of units which is
+*        a scaled form of the supplied units, expressed in the basic units of
+*        m, kg, s, rad, K, count, adu, photon, mag and pixel. For instance, a
+*        returned array of [1,0,-2,0,0,0,0,0,0,0] would represent "m/s**2".
 *     scale
 *        Pointer to a location at which to return a scaling factor for the
 *        supplied units. The is the value, in the units represented by the
@@ -2260,6 +2262,8 @@ static KnownUnit *GetKnownUnits( int lock, int *status ) {
       MakeKnownUnit( "lyr", "light year", "9.460730E15 m", status );
       MakeKnownUnit( "pc", "parsec", "3.0867E16 m", status );
       MakeKnownUnit( "count", "count", NULL, status );
+      quant_units[ iq++ ] = known_units;
+      MakeKnownUnit( "adu", "analogue-to-digital unit", NULL, status );
       quant_units[ iq++ ] = known_units;
       MakeKnownUnit( "photon", "photon", NULL, status );
       quant_units[ iq++ ] = known_units;
@@ -5114,12 +5118,12 @@ double astUnitAnalyser_( const char *in, double powers[9], int *status ){
 *     powers
 *        An array in which are returned the powers for each of the following
 *        basic units (in the order shown): kilogramme, metre, second, radian,
-*        Kelvin, count, photon, magnitude, pixel. If the supplied unit does
-*        not depend on a given basic unit a value of 0.0 will be returned in
-*        the array. The returns values represent a system of units which is a
-*        scaled form of the supplied units, expressed in the basic units of m,
-*        kg, s, rad, K count,photon, mag and pixel. For instance, a returned
-*        array of [1,0,-2,0,0,0,0,0,0] would represent "m/s**2".
+*        Kelvin, count, adu, photon, magnitude, pixel. If the supplied unit
+*        does not depend on a given basic unit a value of 0.0 will be returned
+*        in the array. The returns values represent a system of units which is
+*        a scaled form of the supplied units, expressed in the basic units of
+*        m, kg, s, rad, K, count, adu, photon, mag and pixel. For instance, a
+*        returned array of [1,0,-2,0,0,0,0,0,0] would represent "m/s**2".
 
 *  Returned Value:
 *     A scaling factor for the supplied units. The is the value, in the
@@ -5387,6 +5391,7 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
 *     - "pc":  parsec  (3.0867E16 m).
 *     - "count":  count.
 *     - "ct":  count.
+*     - "adu":  analogue-to-digital converter unit.
 *     - "photon":  photon.
 *     - "ph":  photon.
 *     - "Jy":  Jansky  (1.0E-26 W /m**2 /Hz).
