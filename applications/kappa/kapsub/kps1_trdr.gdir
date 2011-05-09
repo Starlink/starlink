@@ -193,21 +193,21 @@
 *  Sort the columns positions.
 *  ===========================
 
-*  Sort a sorted index of the columns so that we can read them in
-*  sequence.
-      CALL PDA_QSIAI( DIM1 + 1, POSCOD, INDPOS )
-
-*  Copy and sort the column indices.
+*  Sort the column indices using a local array to preserve the supplied
+*  indices.
       DO  I = 1, DIM1 + 1
          ORDPOS( I ) = POSCOD( I )
       END DO
       CALL PDA_QSAI( DIM1 + 1, ORDPOS )
 
+*  In order to be able to read the columns in sequence, further provide
+*  an index to the sorted column indices.
+      CALL PDA_QSIAI( DIM1 + 1, POSCOD, INDPOS )
+
 *  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 *  Start a new error context.
       CALL ERR_MARK
-
 
 *  Now run through free-format file picking up the required co-ordinate
 *  and data values (up to the maximum allowed within the array bounds).
