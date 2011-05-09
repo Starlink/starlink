@@ -2011,8 +2011,10 @@ C
       call ast_getregionmesh( box1, .false., 250, 2, npoint, grid,
      :                        status )
 
-      if( npoint .ne. 176 )
-     :    call stopit( status, 'Box: Error mesh 3' )
+      if( npoint .ne. 176 ) then
+         write(*,*) npoint
+         call stopit( status, 'Box: Error mesh 3' )
+      endif
 
       do i = 1, npoint
          if( abs( grid(i,1) - 100 ) .gt. 50.0D0 ) then
@@ -2347,8 +2349,10 @@ C
       call ast_getregionmesh( cir1, .false., 250, 3, npoint, mesh,
      :                        status )
 
-      if( npoint .ne. 201 )
-     :    call stopit( status, 'Circle: Error mesh 3' )
+      if( npoint .ne. 201 ) then
+         write(*,*) npoint
+         call stopit( status, 'Circle: Error mesh 3' )
+      endif
 
       do i = 1, npoint
          p2(1) = mesh(i,1)

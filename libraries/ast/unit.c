@@ -87,6 +87,9 @@
 *        Correct memory allocation bug in CleanExp.
 *     6-MAY-2011 (DSB):
 *        Include "adu" as basic unit.
+*     9-MAY-2011 (DSB):
+*        Change "A" to be Ampere (as defined by FITS-WCS paper 1) rather
+*        than "Angstrom".
 */
 
 /* Module Macros. */
@@ -2283,7 +2286,6 @@ static KnownUnit *GetKnownUnits( int lock, int *status ) {
       }
 
 /* Unit aliases... */
-      MakeUnitAlias( "Angstrom", "A", status );
       MakeUnitAlias( "Angstrom", "Ang", status );
       MakeUnitAlias( "count", "ct", status );
       MakeUnitAlias( "photon", "ph", status );
@@ -5383,7 +5385,7 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
 *     - "solLum":  solar luminosity  (3.8268E26 W).
 *     - "Angstrom":  Angstrom  (1.0E-10 m).
 *     - "Ang":  Angstrom
-*     - "A":  Angstrom
+*     - "A":  Ampere
 *     - "micron":  micron (1.0E-6 m).
 *     - "solRad":  solar radius  (6.9599E8 m).
 *     - "AU":  astronomical unit  (1.49598E11 m).
@@ -5402,10 +5404,6 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
 *     - "pix":  pixel.
 *     - "barn":  barn  (1.0E-28 m**2).
 *     - "D":  Debye  (1.0E-29/3 C.m).
-*
-*     Note, AST follows the widespread practice within astronomy of using
-*     "A" as an alias for "Angstrom". This replaces the association of "A"
-*     with Ampere included in the FITS-WCS standard.
 *
 *     In addition, any other unknown unit symbol may be used (but of course
 *     no mapping will be possible between unknown units).
