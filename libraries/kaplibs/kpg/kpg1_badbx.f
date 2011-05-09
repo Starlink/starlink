@@ -82,6 +82,8 @@
 *        Original version.
 *     10-MAR-2011 (DSB):
 *        Added argument OPER.
+*     9-MAY-2011 (DSB):
+*        Set status before calling err_rep.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -191,6 +193,7 @@
 *  Report an error if no good data values were found in the input NDF.
       IF( NGOOD .EQ. 0 ) THEN
          IF( STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
             CALL NDF_MSG( 'NDF', INDF1 )
             CALL ERR_REP( ' ','No good data values found in ''^NDF''.',
      :                    STATUS )
