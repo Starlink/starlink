@@ -101,7 +101,8 @@ Usage: smas [-a diam] <in-list> <out-table> [<out-image>]
 	  MORE.SMURF.BOLOMAPS extension item, then the NDFs in the
 	  SHORTMAPS or BOLOMAPS array are used in place of the
 	  supplied NDF (SHORTMAPS is used in preference to BOLOMAPS
-	  if both are present).
+	  if both are present). NOTE, all the data must be for the
+          same subarray.
 
       <out-table>: the name of a text file in which to store a
           catalogue containing details of the source in each
@@ -323,14 +324,8 @@ end
 #  Create the line holding the column names in the output catalogue.
 if( $moon == 0 ) then
    echo "# TAI UTC SEQSTART SEQEND XCEN YCEN AMP SUM FWHM AXISR GAMMA ORIENT NDF BXCEN BYCEN BAMP BSUM BFWHM BAXISR BORIENT ROW COL" > $outtable
-   set xcol = 21
-   set ycol = 22
-   set valcol = 8
 else
    echo "# SUM ROW COL" > $outtable
-   set xcol = 2
-   set ycol = 3
-   set valcol = 1
 endif
 
 # Next loop round all the NDFs to be processed.
@@ -612,12 +607,20 @@ foreach n (`cat files.smas`)
    set first = 0
 end
 
-# If an output image is required, create it from the output catalogue.
+#  If an output image is required, create it from the output catalogue.
+#  TRANDAT fails if the file contains any non-numeric column values, so first
+#  copy the required columns from the returned catalogue into a separate file.
 if( "$outimage" != " " ) then
-   $KAPPA_DIR/trandat freename=$outtable poscols="[$xcol,$ycol]" valcol=$valcol auto=no ndf=$outimage
+   if( $moon == 0 ) then
+      cat fred.txt | grep -v \# | awk '{print $21, $22, $8}' > cat.smas
+   else
+      cat fred.txt | grep -v \# | awk '{print $2, $3, $1}' > cat.smas
+   endif
+
+   $KAPPA_DIR/trandat freename=cat.smas poscols="[1,2]" valcol=3 auto=no ndf=$outimage
 endif
 
 # Clean up.
-rm -f back.sdf files.smas log.smas cut-smas.sdf coin.smas temp-smas.sdf pos-smas.sdf filled-smas.sdf >& /dev/null
+rm -f cat.smas back.sdf files.smas log.smas cut-smas.sdf coin.smas temp-smas.sdf pos-smas.sdf filled-smas.sdf >& /dev/null
 
 
