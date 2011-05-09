@@ -1,72 +1,170 @@
 #!/bin/tcsh
 
-#  Check a list of observations has been supplied on the command line.
-if( $# < 1 ) then
-   echo
-   echo "Short Map Analysis Script"
-   echo
-   echo "Usage: smas <in-list> <out-table> <out-image>"
-   echo
-   echo "   <in-list> is a text file in which each line contains the path"
-   echo "   to an NDF holding a SCUBA-2 map of a point source. If an NDF"
-   echo "   contains a MORE.SMURF.SHORTMAPS or MORE.SMURF.BOLOMAPS extension"
-   echo "   item, then the NDFs in the SHORTMAPS or BOLOMAPS array are used"
-   echo "   in place of the supplied NDF (SHORTMAPS is used in preference to"
-   echo "   BOLOMAPS if both are present)."
-   echo
-   echo "   <out-table> is the name of a text file in which to store a"
-   echo "   catalogue containing details of the source in each supplied map,"
-   echo "   as described below. This catalogue can be displayed and analysed"
-   echo "   using 'topcat -f ascii <out-table>'."
-   echo
-   echo "   If <out-image> is supplied, and if the input data contains bolomaps, a 2D"
-   echo "   NDF containing the fsum values for each bolometer is created, with the "
-   echo "   name given by <out-image>."
-   echo
-   echo "   With the exception of moon maps, each NDF is processed in the same way."
-   echo "   The KAPPA:PSF command is used to locate the accurate source centre and "
-   echo "   fit it using an elliptical Gaussian-like model. The details of the model"
-   echo "   are then appended to an output text file as a new row."
-   echo
-   echo "   The resulting output catalogue has a row for every input NDF, and contains"
-   echo "   the following columns:"
-   echo "   - TAI: The MJD (in the TAI timescale) associated with the NDF"
-   echo "   - UTC: The UTC date and time string associated with the NDF"
-   echo "   - SEQSTART - RTS index number of first frame"
-   echo "   - SEQEND - RTS index number of last frame"
-   echo "   - XCEN: The X pixel co-ordinate at the centre of the source"
-   echo "   - YCEN: The Y pixel co-ordinate at the centre of the source"
-   echo "   - AMP: The peak value in the source"
-   echo "   - SUM: The total data sum in the source. This is the integral"
-   echo "   of the Gaussian-like model calculated by KAPPA:PSF"
-   echo "   - FWHM: The seeing-disc size: the full width at half maximum "
-   echo "   across the minor axis of the source (arc-seconds)"
-   echo "   - AXISR: The axis ratio of the source: the ratio of the major"
-   echo "   axis length to that of the minor axis."
-   echo "   - GAMMA: The radial fall-off parameter of the source. A gamma "
-   echo "   of two would be a Gaussian."
-   echo "   - ORIENT: The position angle (measured from north through east)"
-   echo "   of the major axis of the source, in degrees."
-   echo "   - NDF: The path to the NDF"
-   echo "   - ROW: The row number for the bolometer (if known)
-   echo "   - COL: The column number for the bolometer (if known)
-   echo
-   echo "   For comparison, a set of extra columns is appended to these "
-   echo "   that give the source properties as calculated by KAPPA:BEAMFIT"
-   echo "   rather than KAPPA:PSF. These columns have the same names, but "
-   echo "   are prefixed by the letter B. Note, BEAMFIT assumes a gamma "
-   echo "   value of 2.0  (i.e. a pure Gaussian) and so there is no BGAMMA"
-   echo "   column in the output catalogue."
-   echo
-   echo "   The SEQSTART and SEQEND columns will be set to 'null' if the "
-   echo "   supplied map does not contain these FITS headers."
-   echo
-   echo "   If the supplied data is for the moon, then all the above is ignored and the
-   echo "   output contains the following columns:"
-   echo "   - SUM: The integrated value within a 35 arc-minute aperture centred on (0,0)
-   echo "   - ROW: The row number for the bolometer (if known)
-   echo "   - COL: The column number for the bolometer (if known)
-   echo
+#  Set defaults
+set sum_method = PSF
+set diam = " "
+set inlist = " "
+set outtable = " "
+set outimage = " "
+set help = 0
+set narg = 0
+set word = " "
+
+#  Look at each word on the command line in turn.
+while( $# > 0 )
+   set arg = " "
+
+#  Classify the first word left on the command line, and then shift all
+#  words one to the left so that he second word becomes the first word.
+
+#  If the previous first word was "-a" then the current first word is either
+#  the aperture diameter or the <in-list> file. We assume it is the diameter
+#  if the word consists only of digits.
+   if( $word == "-a" ) then
+      echo $argv[1] | grep -q '[a-zA-Z]'
+      if( $status == 1 ) then
+         set diam = $argv[1]
+      else
+         set arg = $argv[1]
+      endif
+
+#  Check for each supported option.
+   else if( $argv[1] == "-a" ) then
+      set sum_method = APERADD
+
+   else if( $argv[1] == "-h" || $argv[1] == "--help" ) then
+      set help = 1
+
+#  See if the first word is an argument (i.e. a word that does not begin with
+#  a dash).
+   else
+      echo $argv[1] | grep -q "^-"
+      if( $status == 0 ) then
+         echo "Unknown option: $argv[1]"
+         set help = 1
+      else
+         set arg = $argv[1]
+      endif
+   endif
+
+#  Each argument is identified by its index within the total list of arguments.
+   if( "$arg" != " " ) then
+      if( $narg == 0 ) then
+         set inlist = $arg
+      else if( $narg == 1 ) then
+         set outtable = $arg
+      else if( $narg == 2 ) then
+         set outimage = $arg
+      else
+         echo "Too many arguments"
+         set help = 1
+      endif
+      @ narg = $narg + 1
+   endif
+
+#  Save the current first word.
+   set word = $argv[1]
+
+#  Shift the command line words so that the second word becomes the first
+#  word (and the first word is lost)
+   shift
+end
+
+#  Check enough arguments were supplied.
+if( $narg < 2 ) then
+   set help = 1
+endif
+
+#  Issue help and exit if required.
+if( $help == 1 ) then
+   cat << FOO
+
+Short Map Analysis Script
+
+Usage: smas [-a diam] <in-list> <out-table> [<out-image>]
+
+   option:
+      -a: Specifies that the catalogue fsum column values (the total
+          data sum) should be the integrated data value within a
+	  circular aperture centred on the source peak position,
+	  with radius specified by "diam" (a numerical value in
+	  arc-seconds). This is calculated using KAPPA:APERADD.
+	  If this option is not supplied, the fsum value is the
+	  integrated value under the model source calculated by
+	  KAPPA:PSF. If "diam" is not supplied, defaults of 30 and
+	  15 are used for 850 and 450 um data respectively.
+
+   arguments:
+      <in-list>: a text file in which each line contains the path
+          to an NDF holding a SCUBA-2 map of a point source (or
+	  the moon). an NDF contains a MORE.SMURF.SHORTMAPS or
+	  MORE.SMURF.BOLOMAPS extension item, then the NDFs in the
+	  SHORTMAPS or BOLOMAPS array are used in place of the
+	  supplied NDF (SHORTMAPS is used in preference to BOLOMAPS
+	  if both are present).
+
+      <out-table>: the name of a text file in which to store a
+          catalogue containing details of the source in each
+	  supplied map, as described below. This catalogue can
+	  be displayed and analysed using 'topcat -f ascii
+	  <out-table>'.
+
+      <out-image>: if supplied, and if the input data contains bolomaps,
+          a 2D NDF containing the fsum values for each bolometer is
+	  created, with the name given by <out-image>.
+
+   Description:
+
+      With the exception of moon maps, each NDF is processed in the
+      same way. The KAPPA:PSF command is used to locate the accurate
+      source centre and fit it using an elliptical Gaussian-like
+      model. The details of the model are then appended to an output
+      text file as a new row.
+
+      The resulting output catalogue has a row for every input NDF,
+      and contains the following columns:
+
+      - TAI: The MJD (in the TAI timescale) associated with the NDF
+      - UTC: The UTC date and time string associated with the NDF
+      - SEQSTART - RTS index number of first frame
+      - SEQEND - RTS index number of last frame
+      - XCEN: The X pixel co-ordinate at the centre of the source
+      - YCEN: The Y pixel co-ordinate at the centre of the source
+      - AMP: The peak value in the source
+      - SUM: The total data sum in the source. This is the integral
+        of the Gaussian-like model calculated by KAPPA:PSF
+      - FWHM: The seeing-disc size: the full width at half maximum
+        across the minor axis of the source (arc-seconds)
+      - AXISR: The axis ratio of the source: the ratio of the major
+        axis length to that of the minor axis.
+      - GAMMA: The radial fall-off parameter of the source. A gamma
+        of two would be a Gaussian.
+      - ORIENT: The position angle (measured from north through east)
+        of the major axis of the source, in degrees.
+      - NDF: The path to the NDF
+      - ROW: The row number for the bolometer (if known)
+      - COL: The column number for the bolometer (if known)
+
+      For comparison, a set of extra columns is appended to these
+      that give the source properties as calculated by KAPPA:BEAMFIT
+      rather than KAPPA:PSF. These columns have the same names, but
+      are prefixed by the letter B. Note, BEAMFIT assumes a gamma
+      value of 2.0  (i.e. a pure Gaussian) and so there is no BGAMMA
+      column in the output catalogue.
+
+      The SEQSTART and SEQEND columns will be set to 'null' if the
+      supplied map does not contain these FITS headers.
+
+      If the supplied data is for the moon, then all the above is
+      ignored and the output contains the following columns:
+
+      - SUM: The integrated value within a 35 arc-minute aperture
+        centred on (0,0)
+      - ROW: The row number for the bolometer (if known)
+      - COL: The column number for the bolometer (if known)
+
+FOO
+
    exit
 endif
 
@@ -76,43 +174,16 @@ unset noclobber
 #  Ensure ADAM tasks fail rather than prompt for parameter values
 setenv ADAM_NOPROMPT 1
 
-#  Check we have enough command line arguments.
-if( $# < 2 ) then
-   echo "Usage: smas <in-list> <out-table>"
-   exit
-endif
-
 # Check the input file exists
-if( ! -e "$1" ) then
-   echo "Input file not found: $1"
+if( ! -e "$inlist" ) then
+   echo "Input file not found: $inlist"
    exit
-endif
-
-#  See if an output image is required.
-if( $# > 2 ) then
-   set outimg = $3
-else
-   set outimg = " "
-endif
-
-# Check the remaining options (NOTE THE -p OPTION IS CURRENTLY IGNORED
-# BECAUSE OF A BUG IN ARD - KAPPA:PSF IS ALWAYS USED)
-set sum_method = APERADD
-if( $# == 4 ) then
-   if( "$4" == "-p" ) then
-      set sum_method = PSF
-   else
-      echo "Unknown command line option - $4"
-      exit
-   endif
-else if( $# > 4 ) then
-   echo "Too many command line arguments"
 endif
 
 # Delete any existing output catalogue.
-if( -e "$2" ) then
-   rm -f $2
-   if( -e "$2" ) then
+if( -e "$outtable" ) then
+   rm -f $outtable
+   if( -e "$outtable" ) then
       exit
    endif
 endif
@@ -127,7 +198,7 @@ set moon = 0
 set sar = -1
 set negative = -1
 set bolomaps = 0
-foreach n (`cat $1`)
+foreach n (`cat $inlist`)
 
 # Ensure there is no ".sdf" on the end of the NDF name.
    set dir = `dirname $n`
@@ -142,6 +213,13 @@ foreach n (`cat $1`)
    set object = `$KAPPA_DIR/fitsmod $in edit=print keyword=OBJECT`
    if( $object == MOON ) then
       set moon = 1
+      if( $sum_method == PSF ) then
+         echo
+         echo "Cannot use KAPPA:PSF to determine total flux for moon data."
+         echo "Will use KAPPA:APERADD instead."
+         echo
+         set sum_method = APERADD
+      endif
    endif
 
 #  Get the subarray name, and its corresponding integer index.
@@ -210,7 +288,7 @@ foreach n (`cat $1`)
       end
 
 #  No output image can be created.
-      set outimg = " "
+      set outimage = " "
 
 # Now deal with NDF that do not contain shortmaps....
    else
@@ -237,25 +315,26 @@ foreach n (`cat $1`)
          echo "$in" >> files.smas
 
 #  No output image can be created.
-         set outimg = " "
+         set outimage = " "
       endif
    endif
 end
 
 #  Create the line holding the column names in the output catalogue.
 if( $moon == 0 ) then
-   echo "# TAI UTC SEQSTART SEQEND XCEN YCEN AMP SUM FWHM AXISR GAMMA ORIENT NDF BXCEN BYCEN BAMP BSUM BFWHM BAXISR BORIENT ROW COL" > $2
+   echo "# TAI UTC SEQSTART SEQEND XCEN YCEN AMP SUM FWHM AXISR GAMMA ORIENT NDF BXCEN BYCEN BAMP BSUM BFWHM BAXISR BORIENT ROW COL" > $outtable
    set xcol = 21
    set ycol = 22
    set valcol = 8
 else
-   echo "# SUM ROW COL" > $2
+   echo "# SUM ROW COL" > $outtable
    set xcol = 2
    set ycol = 3
    set valcol = 1
 endif
 
 # Next loop round all the NDFs to be processed.
+set first = 1
 foreach n (`cat files.smas`)
    echo "Doing $n"
 
@@ -278,6 +357,7 @@ foreach n (`cat files.smas`)
       set ndf = temp-smas
 
 #  From here on, use offset sky coords to refer to positions within the map.
+      $KAPPA_DIR/wcsframe $ndf sky
       $KAPPA_DIR/wcsattrib $ndf set skyrefis origin
 
 #  Ensure formatted axis values are decimal arc-seconds.
@@ -378,17 +458,22 @@ foreach n (`cat files.smas`)
          set gamma = `$KAPPA_DIR/parget gamma psf`
 
 #  Get the total data sum. Two methods - 1) aperture photometry...
-#  NOTE - there is a bug in the ARD library that causes APERADD to fail
-#  if the current Frame is an offset SKY Frame. Until this bug is fixed,
-#  always use KAPPA:PSF to determine the SUM value.
-         if( $sum_method == THIS_SHOULD_BE_SIMPLY_APERADD ) then
+         if( $sum_method == APERADD ) then
 
-#  Choose the aperture size in pixels (60 arc-secs assuming default makemap pixel sizes of 2
-#  and 4 arc-seconds)..
-            if( $sar > 3 ) then
-               set diam = 30
-            else
-               set diam = 15
+#  Choose the aperture size in pixels (60 arc-secs assuming default makemap
+#  pixel sizes of 2 and 4 arc-seconds)..
+            if( "$diam" == " " ) then
+               if( $sar > 3 ) then
+                  set diam = 30
+               else
+                  set diam = 15
+               endif
+            endif
+
+            if( $first == 1  ) then
+               echo
+               echo "Using KAPPA:APERADD to determine total flux (aperture $diam arcsec)"
+               echo
             endif
 
 #  Replace any bad pixels within a box centred on the max pixel with sides twice
@@ -407,6 +492,11 @@ foreach n (`cat files.smas`)
 
 #  Alternatively - 2) use the integral of the model PSF as the souce total data sum.
          else
+            if( $first == 1  ) then
+               echo
+               echo "Using KAPPA:PSF to determine total flux"
+               echo
+            endif
             set fsum = `$KAPPA_DIR/parget total psf`
          endif
 
@@ -467,7 +557,7 @@ foreach n (`cat files.smas`)
          set date = `$ATOOLS_DIR/astformat tf axis=1 value=0.0`
 
 #  Write a row to the output catalogue.
-         echo "$tai $date $seqstart $seqend $posxy[1] $posxy[2] $amp $fsum $fwhm $axisr $gamma $orient $n $bxcen $bycen $bamp $bsum $bfwhm $baxisr $borient $row $col" >> $2
+         echo "$tai $date $seqstart $seqend $posxy[1] $posxy[2] $amp $fsum $fwhm $axisr $gamma $orient $n $bxcen $bycen $bamp $bsum $bfwhm $baxisr $borient $row $col" >> $outtable
 
 #  Report any PSF failure.
       else
@@ -482,6 +572,7 @@ foreach n (`cat files.smas`)
       set ndf = temp-smas
 
 #  From here on, use offset sky coords to refer to positions within the map.
+      $KAPPA_DIR/wcsframe $ndf sky
       $KAPPA_DIR/wcsattrib $ndf set skyrefis origin
 
 #  Ensure formatted axis values are decimal arc-seconds.
@@ -495,22 +586,35 @@ foreach n (`cat files.smas`)
          set ndf = "pos-smas"
       endif
 
+#  If no aperture diameter was supplied on the command line, use 35 arcmins,
+#  a little bigger than needed in order to allow for small variations in the
+#  size of the moon.
+      if( "$diam" == " " ) then
+         set diam = 2100
+      endif
+
+      if( $first == 1  ) then
+         echo
+         echo "Using KAPPA:APERADD to determine total flux (aperture $diam arcsec)"
+         echo
+      endif
+
 # Find the integrated value in a circular aperture centred on the nominal
-# target position (0,0). Make the aperture (35 arcmins) a little bigger than
-# needed in order to allow for small variations in the size of the moon.
-      $KAPPA_DIR/aperadd $ndf centre="'0,0'" diam="0:35:00" quiet
+# target position (0,0).
+      $KAPPA_DIR/aperadd $ndf centre="'0,0'" diam=$diam quiet
       set fsum = `$KAPPA_DIR/parget total aperadd`
 
 #  Write a row to the output catalogue.
-      echo "$fsum $row $col" >> $2
+      echo "$fsum $row $col" >> $outtable
 
    endif
 
+   set first = 0
 end
 
 # If an output image is required, create it from the output catalogue.
-if( "$outimg" != " " ) then
-   $KAPPA_DIR/trandat freename=$2 poscols="[$xcol,$ycol]" valcol=$valcol auto=no ndf=$outimg
+if( "$outimage" != " " ) then
+   $KAPPA_DIR/trandat freename=$outtable poscols="[$xcol,$ycol]" valcol=$valcol auto=no ndf=$outimage
 endif
 
 # Clean up.
