@@ -175,6 +175,9 @@ unset noclobber
 #  Ensure ADAM tasks fail rather than prompt for parameter values
 setenv ADAM_NOPROMPT 1
 
+#  Ensure ADAM sets the shell status variable when each command exits
+setenv ADAM_EXIT 1
+
 # Check the input file exists
 if( ! -e "$inlist" ) then
    echo "Input file not found: $inlist"
@@ -383,8 +386,8 @@ foreach n (`cat files.smas`)
       endif
 
 #  Determine the source parameters using kappa:beamfit
-      $KAPPA_DIR/beamfit $ndf mode=file coin=coin.smas  | grep \!\! >& /dev/null
-      if( $status == 1 ) then
+      $KAPPA_DIR/beamfit $ndf mode=file coin=coin.smas quiet
+      if( $status == 0 ) then
          set centre = `$KAPPA_DIR/parget centre beamfit`
          set bxcen = $centre[1]
          set bycen = $centre[2]
@@ -439,10 +442,10 @@ foreach n (`cat files.smas`)
       set isize = `$KAPPA_DIR/calc exp="1+2*nint(pa/2-0.1)" pa=$isize`
 
 #  Determine the source parameters using kappa:psf
-      $KAPPA_DIR/psf $ndf incat=! cofile=coin.smas isize=$isize norm=f device=! | grep \!\! >& /dev/null
+      $KAPPA_DIR/psf $ndf incat=! cofile=coin.smas isize=$isize norm=f device=! quiet
 
 #  Check a psf was found succesfully.
-      if( $status == 1 ) then
+      if( $status == 0 ) then
 
 #  Get the parameters of the psf.
          set amp = `$KAPPA_DIR/parget amp1 psf`
@@ -474,11 +477,11 @@ foreach n (`cat files.smas`)
 #  Replace any bad pixels within a box centred on the max pixel with sides twice
 #  the above diameter.
             @ size = $diam + $diam
-            $KAPPA_DIR/fillbad in=$ndf\($maxco[1]~$size,$maxco[2]~$size\) size=2 out=filled-smas | grep \!\! >& /dev/null
+            $KAPPA_DIR/fillbad in=$ndf\($maxco[1]~$size,$maxco[2]~$size\) size=2 out=filled-smas quiet
 
 #  Do the aperture photometry within the filled image. Check some bad pixels
 #  were filled. If not, use $ndf instead of "filled-smas".
-            if( $status == 1 ) then
+            if( $status == 0 ) then
                $KAPPA_DIR/aperadd filled-smas centre="'$posxy'" diam=$diam quiet
             else
                $KAPPA_DIR/aperadd $ndf centre="'$posxy'" diam=$diam quiet
