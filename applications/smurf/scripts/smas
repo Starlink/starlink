@@ -615,9 +615,9 @@ end
 #  copy the required columns from the returned catalogue into a separate file.
 if( "$outimage" != " " ) then
    if( $moon == 0 ) then
-      cat fred.txt | grep -v \# | awk '{print $21, $22, $8}' > cat.smas
+      cat $outtable | grep -v \# | awk '{print $21, $22, $8}' > cat.smas
    else
-      cat fred.txt | grep -v \# | awk '{print $2, $3, $1}' > cat.smas
+      cat $outtable | grep -v \# | awk '{print $2, $3, $1}' > cat.smas
    endif
 
    $KAPPA_DIR/trandat freename=cat.smas poscols="[1,2]" valcol=3 auto=no ndf=$outimage
