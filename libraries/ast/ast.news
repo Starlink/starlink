@@ -16,6 +16,9 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
+- Frames now interpret the unit string "A" as meaning "Ampere" rather
+than "Angstrom", as specified by FITS-WCS paper I.
+
 - A bug has been fixed in the astFindFrame (AST_FINDFRAME) method that
 allowed a template Frame of a more specialised class to match a target
 frame of a less specialised class. For example, this bug would allow a
