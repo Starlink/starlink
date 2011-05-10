@@ -1324,10 +1324,8 @@
             END IF
             CALL PSX_CALLOC( AREA * ( ORDER + 1 ), '_DOUBLE', IPBS,
      :                       STATUS )
-            CALL PSX_CALLOC( AREA * ( ORDER + 1 ), '_DOUBLE', IPWRK1,
-     :                       STATUS )
-            CALL PSX_CALLOC( AREA * ( ORDER + 1 ), '_INTEGER', IPWRK2,
-     :                       STATUS )
+            CALL PSX_CALLOC( ORDER + 1 , '_DOUBLE', IPWRK1, STATUS )
+            CALL PSX_CALLOC( ORDER + 1, '_INTEGER', IPWRK2, STATUS )
 
 *  Spline
 *  ------
@@ -1381,7 +1379,7 @@
          IF ( SINGLE ) THEN
 
 *  Form ranges by averaging the lines in the section, and then
-*  performing a fit, and rejecting outliers thast define the output
+*  performing a fit, and rejecting outliers that define the output
 *  mask array.
             IF ( .NOT. GLOBAL ) THEN
                CALL KPS1_MFSB( IBL, JAXIS, NCLIP, CLIP, NUMBIN, GLOBAL,
