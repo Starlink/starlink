@@ -322,8 +322,6 @@
       DOUBLE PRECISION DYMIN     ! Lower y position limit of the fit
       INTEGER EL                 ! General "number of elements" variable
       CHARACTER * ( 16 ) FITYPE  ! Type of fit ('POLYNOMIAL'|'SPLINE')
-      CHARACTER * ( DAT__SZLOC ) FLOC ! Locator to FIT polynomial
-                                 ! structure
       INTEGER FTPTR              ! Pointer to mapped fit array
       INTEGER GPTR               ! Pointer: sort-positions workspace
       INTEGER I                  ! Loop counter
@@ -358,8 +356,6 @@
       INTEGER NYKNOT             ! Number of knots in y direction
       INTEGER NYPAR              ! Number of fitting parameters in y
                                  ! direction
-      INTEGER ONXPAR             ! Old value of NXPAR
-      INTEGER ONYPAR             ! Old value of NYPAR
       LOGICAL OVERWR             ! Allow surface fits to be overwritten?
       REAL RMAX                  ! Maximum value (single precision)
       REAL RMIN                  ! Minimum value (single precision)
@@ -384,12 +380,9 @@
                                  ! variance?
       INTEGER VPTR               ! Pointer to mapped variance array
       INTEGER VSIZE              ! Number of elements in variance array
-      DOUBLE PRECISION WORK( MXPAR, MXPAR ) ! Workspace for flipped
-                                 ! polynomial coefficients
       INTEGER WPTR               ! Pointer to mapped weight array
       INTEGER XDIM               ! First (x) dimension of data array
       REAL XKNOT( MTKNOT )       ! Spline knots in x direction
-      CHARACTER * ( DAT__SZLOC ) XLOC ! Locator to SURFACEFIT extension
       REAL XMAX                  ! Upper x position limit of the fit
       REAL XMIN                  ! Lower x position limit of the fit
       INTEGER XPTR               ! Pointer to mapped x co-ordinate array

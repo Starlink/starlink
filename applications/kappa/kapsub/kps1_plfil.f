@@ -158,7 +158,6 @@
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'MSG_PAR'          ! Message-system constants
-      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER INDF
@@ -201,7 +200,6 @@
                                  ! supplied
       CHARACTER*( DAT__SZLOC ) LOCN ! HDS locator to dummy NDF
       INTEGER MAPIO              ! Mapping from input to output
-      LOGICAL MORE               ! Process another position?
       INTEGER NC                 ! Number of characters in buffer
       INTEGER NDIM               ! Number of pixel axes
       CHARACTER*256 PATH         ! Path to container file
@@ -329,37 +327,37 @@
 *  =====================================================
          IF ( ITYPE .EQ. '_REAL' ) THEN
             CALL KPS1_PLRSR( MAPIO, PARAMS( 1 ), CONTNR, PATH( :PLEN ),
-     :                       FIRST, INTERP, RSPARS, TOL, INDF, IWCS,
+     :                       FIRST, INTERP, RSPARS, TOL, INDF,
      :                       NDIM, LBNDI, UBNDI, LBNDO, UBNDO, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
             CALL KPS1_PLRSB( MAPIO, PARAMS( 1 ), CONTNR, PATH( :PLEN ),
-     :                       FIRST, INTERP, RSPARS, TOL, INDF, IWCS,
+     :                       FIRST, INTERP, RSPARS, TOL, INDF,
      :                       NDIM, LBNDI, UBNDI, LBNDO, UBNDO, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
             CALL KPS1_PLRSD( MAPIO, PARAMS( 1 ), CONTNR, PATH( :PLEN ),
-     :                       FIRST, INTERP, RSPARS, TOL, INDF, IWCS,
+     :                       FIRST, INTERP, RSPARS, TOL, INDF,
      :                       NDIM, LBNDI, UBNDI, LBNDO, UBNDO, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
             CALL KPS1_PLRSI( MAPIO, PARAMS( 1 ), CONTNR, PATH( :PLEN ),
-     :                       FIRST, INTERP, RSPARS, TOL, INDF, IWCS,
+     :                       FIRST, INTERP, RSPARS, TOL, INDF,
      :                       NDIM, LBNDI, UBNDI, LBNDO, UBNDO, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
             CALL KPS1_PLRSUB( MAPIO, PARAMS( 1 ), CONTNR, PATH( :PLEN ),
-     :                        FIRST, INTERP, RSPARS, TOL, INDF, IWCS,
+     :                        FIRST, INTERP, RSPARS, TOL, INDF,
      :                        NDIM, LBNDI, UBNDI, LBNDO, UBNDO, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
             CALL KPS1_PLRSUW( MAPIO, PARAMS( 1 ), CONTNR, PATH( :PLEN ),
-     :                        FIRST, INTERP, RSPARS, TOL, INDF, IWCS,
+     :                        FIRST, INTERP, RSPARS, TOL, INDF,
      :                        NDIM, LBNDI, UBNDI, LBNDO, UBNDO, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
             CALL KPS1_PLRSW( MAPIO, PARAMS( 1 ), CONTNR, PATH( :PLEN ),
-     :                       FIRST, INTERP, RSPARS, TOL, INDF, IWCS,
+     :                       FIRST, INTERP, RSPARS, TOL, INDF,
      :                       NDIM, LBNDI, UBNDI, LBNDO, UBNDO, STATUS )
 
          END IF

@@ -137,7 +137,6 @@
       INTEGER I                  ! Loop counter
       INTEGER IG                 ! Gaussian counter
       INTEGER J                  ! Loop counter
-      REAL SIGMA                 ! Gaussian width along the minor axis
       DOUBLE PRECISION ST        ! Sine of the orientation
       DOUBLE PRECISION XX        ! X pixel co-ordinate
       DOUBLE PRECISION YY        ! Y pixel co-ordinate

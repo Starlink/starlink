@@ -186,8 +186,6 @@
       DOUBLE PRECISION POS( 3, 2 ) ! Reporting positions
       DOUBLE PRECISION PIXPOS( 3, 2 ) ! Pixel positions
       DOUBLE PRECISION SPOS( 2 ) ! Single reporting position
-      DOUBLE PRECISION SX        ! Co-ordinate sum along longitude axis
-      DOUBLE PRECISION SY        ! Co-ordinate sum along latitude axis
       REAL THETA                 ! Orientation in radians
       DOUBLE PRECISION VAR       ! Variance
       DOUBLE PRECISION VARX      ! Sum of longitude-axis variances

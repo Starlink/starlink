@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_BFINT( INDF, IWCS, IPLOT, MAP1, MAP2, MAP3, RFRM,
+      SUBROUTINE KPS1_BFINT( INDF, IWCS, IPLOT, MAP1, MAP2, RFRM,
      :                       VAR, NPOS, POLPAR, PARAM, CURSOR, MARK,
      :                       MARKER, NAXR, NAXIN, LOGF, FDL, FIXCON,
      *                       AMPRAT, SLBND, SUBND, FAREA, FITREG,
@@ -14,7 +14,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_BFINT( INDF, IWCS, IPLOT, MAP1, MAP2, MAP3, RFRM, VAR,
+*     CALL KPS1_BFINT( INDF, IWCS, IPLOT, MAP1, MAP2, RFRM, VAR,
 *                      NPOS, POLPAR, PARAM, CURSOR, MARK, MARKER, NAXR,
 *                      NAXIN, LOGF, FDL, FIXCON, AMPRAT, SLBND, SUBND,
 *                      FAREA, FITREG, REFPOS, REFLAB, NPAR, FPAR,
@@ -56,9 +56,6 @@
 *     MAP2 = INTEGER (Given)
 *        The AST Mapping from the PIXEL Frame of the NDF to the
 *        reporting Frame.
-*     MAP3 = INTEGER (Given)
-*        The AST Mapping from the Frame in which the initial guess
-*        positions are supplied, to the reporting Frame.
 *     RFRM = INTEGER (Given)
 *        A pointer to the reporting Frame.
 *     VAR = LOGICAL (Given)
@@ -159,7 +156,7 @@
 
 *  Copyright:
 *     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2009-2010 Science and Technology Facilities Council.
+*     Copyright (C) 2009-2011 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -227,6 +224,8 @@
 *     2010 July 5 (MJC):
 *        Switched to generalised Gaussian fit by the introduction of
 *        the shape exponent.
+*     2011 May 11 (MJC):
+*        Removed no-longer-used argument MAP3.
 *     {enter_further_changes_here}
 
 *-
@@ -242,7 +241,6 @@
       INCLUDE 'PAR_ERR'          ! PAR error constants
       INCLUDE 'MSG_PAR'          ! Message-system public constants
       INCLUDE 'NDF_PAR'          ! NDF constants
-      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
       INCLUDE 'BF_PAR'           ! BEAMFIT constants
 
 *  Global Variables:
@@ -263,7 +261,6 @@
       INTEGER IPLOT
       INTEGER MAP1
       INTEGER MAP2
-      INTEGER MAP3
       INTEGER RFRM
       LOGICAL VAR
       INTEGER NPOS
@@ -314,8 +311,6 @@
       INTEGER I                  ! Position index
       INTEGER IMARK              ! Marker to use when marking initial
                                  ! positions
-      DOUBLE PRECISION INCEN( BF__MXPOS, NDF__MXDIM )! Beam graphics
-                                 ! position
       LOGICAL INFO               ! Display instructions on cursor use?
       DOUBLE PRECISION INPOL( 2 ) ! Pole co-ordinates
       CHARACTER*( NDF__SZTYP ) ITYPE ! Data type for processing(dummy)
@@ -779,7 +774,7 @@
 
 *  The selection of what appears depends on MARK and MARKER.
          IF ( CURSOR ) THEN
-             CALL KPS1_BFPRE( IPLOT, MAP1, NPOS, NAXIN, MARK, MARKER,
+             CALL KPS1_BFPRE( IPLOT, MAP1, NPOS, MARK, MARKER,
      :                        NPAR, FPAR, STATUS )
          END IF
 
@@ -815,12 +810,12 @@
 *  ------
 
 *  Log the results and residuals if required.
-         CALL KPS1_BFLOG( LOGF, FDL, .FALSE., MAP2, RFRM, NAXR,
+         CALL KPS1_BFLOG( LOGF, FDL, .FALSE., MAP2, RFRM,
      :                    NPOS, BF__NCOEF, RP, RSIGMA, REFOFF, REFLAB,
      :                    POLAR, POLSIG, RMS, DTYPE, STATUS )
 
 *  Write primary beam's fit to output parameters.
-         CALL KPS1_BFOP( RFRM, MAP2, NAXR, NPAR, RP, RSIGMA,
+         CALL KPS1_BFOP( RFRM, NAXR, NPAR, RP, RSIGMA,
      :                   NPOS, REFOFF, POLAR, POLSIG, RMS, STATUS )
 
       ELSE

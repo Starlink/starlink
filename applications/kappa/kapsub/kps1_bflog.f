@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_BFLOG( LOGF, FD, PIXEL, MAP, CFRM, NAXC, NBEAM,
+      SUBROUTINE KPS1_BFLOG( LOGF, FD, PIXEL, MAP, CFRM, NBEAM,
      :                       NCOEF, P, SIGMA, REFOFF, REFLAB, POLAR,
      :                       POLSIG, RMS, DPREC, STATUS )
 *+
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_BFLOG( LOGF, FD, PIXEL, MAP, CFRM, NAXC, NCOEF, P,
+*     CALL KPS1_BFLOG( LOGF, FD, PIXEL, MAP, CFRM, NCOEF, P,
 *                      SIGMA, REFOFF, REFLAB, POLAR, POLSIG, RMS,
 *                      DPREC, STATUS )
 
@@ -40,9 +40,6 @@
 *     CFRM = INTEGER (Given)
 *        A pointer to the current Frame of the NDF.  This argument is
 *        ignored if PIXEL is FALSE.
-*     NAXC = INTEGER (Given)
-*        The number of axes in CFRM.  This argument is ignored if PIXEL
-*        is FALSE.
 *     NBEAM = INTEGER (Given)
 *        The number of beams fitted.
 *     NCOEF = INTEGER (Given)
@@ -90,7 +87,8 @@
 
 *  Copyright:
 *     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2007, 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2010, 2011 Science & Technology Facilities
+*     Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -148,6 +146,8 @@
 *     2010 July 5 (MJC):
 *        Switched to generalised normal distribution by introducing the
 *        shape exponent.
+*     2011 May 11 (MJC):
+*        Removed no-longer-used argument MAP3.
 *     {enter_further_changes_here}
 
 *-
@@ -168,7 +168,6 @@
       LOGICAL PIXEL
       INTEGER MAP
       INTEGER CFRM
-      INTEGER NAXC
       INTEGER NBEAM
       INTEGER NCOEF
       DOUBLE PRECISION P( NCOEF, NBEAM )

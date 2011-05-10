@@ -1,8 +1,7 @@
-      SUBROUTINE KPS1_BFFIL( INDF, IWCS, MAP1, MAP2, MAP3, RFRM, VAR,
-     :                       NPOS, NAXR, NAXIN, INPOS, GOTID, ID, LOGF,
-     :                       FDL, FIXCON, AMPRAT, SLBND, SUBND, FAREA,
-     :                       FITREG, REFPOS, REFLAB, NPAR, FPAR,
-     :                       STATUS )
+      SUBROUTINE KPS1_BFFIL( INDF, IWCS, MAP1, MAP2, RFRM, VAR, NPOS,
+     :                       NAXR, NAXIN, INPOS, LOGF, FDL, FIXCON,
+     :                       AMPRAT, SLBND, SUBND, FAREA, FITREG,
+     :                       REFPOS, REFLAB, NPAR, FPAR, STATUS )
 *+
 *  Name:
 *     KPS1_BFFIL
@@ -14,8 +13,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_BFFIL( INDF, IWCS, MAP1, MAP2, MAP3, RFRM, VAR, NPOS,
-*                      NAXR, NAXIN, INPOS, GOTID, ID, LOGF, FDL, FIXCON,
+*     CALL KPS1_BFFIL( INDF, IWCS, MAP1, MAP2, RFRM, VAR, NPOS,
+*                      NAXR, NAXIN, INPOS, LOGF, FDL, FIXCON,
 *                      AMPRAT, SLBND, SUBND, FAREA, FITREG, REFPOS,
 *                      REFLAB, NPAR, FPAR, STATUS )
 
@@ -48,9 +47,6 @@
 *     MAP2 = INTEGER (Given)
 *        The AST Mapping from the PIXEL Frame of the NDF to the
 *        reporting Frame.
-*     MAP3 = INTEGER (Given)
-*        The AST Mapping from the Frame in which the initial guess
-*        positions are supplied, to the reporting Frame.
 *     RFRM = INTEGER (Given)
 *        A pointer to the reporting Frame (i.e. the Frame in which
 *        positions are to be reported).
@@ -69,15 +65,8 @@
 *        beam positions separations in absolute or relative polar
 *        co-ordinates.  The meaning depends on the settings of the
 *        fourth and sixth elements of argument FIXCON, and argument
-*        POLPAR.   All should be in the co-ordinate system defined by
-*        MAP1 and MAP3 (albeit transformed for polar co-ordinates).
-*     GOTID = LOGICAL (Given)
-*        If TRUE then the position identifiers supplied in ID are used.
-*        Otherwise identifiers equal to the position index are used.
-*     ID( NPOS ) = INTEGER (Given)
-*        A set of integer identifiers for the supplied positions.  These
-*        are displayed with the fit parameters.  It is only accessed if
-*        GOTID is .TRUE.
+*        POLPAR.  All should be in the co-ordinate system defined by
+*        MAP1 (albeit transformed for polar co-ordinates).
 *     LOGF = LOGICAL (Given)
 *        Should the results be written to a log file?
 *     FDL = INTEGER (Given)
@@ -141,7 +130,7 @@
 
 *  Copyright:
 *     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2010, 2011 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -202,6 +191,8 @@
 *     2010 July 5 (MJC):
 *        Switched to generalised Gaussian fit by the introduction of
 *        the shape exponent.
+*     2011 May 11 (MJC):
+*        Removed no-longer-used arguments MAP3, GOTID, and ID.
 *     {enter_further_changes_here}
 
 *-
@@ -215,7 +206,6 @@
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'MSG_PAR'          ! Message-system public constants
-      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
       INCLUDE 'BF_PAR'           ! BEAMFIT constants
 
 *  Global Variables:
@@ -235,15 +225,12 @@
       INTEGER IWCS
       INTEGER MAP1
       INTEGER MAP2
-      INTEGER MAP3
       INTEGER RFRM
       LOGICAL VAR
       INTEGER NPOS
       INTEGER NAXIN
       INTEGER NAXR
       DOUBLE PRECISION INPOS( NPOS, NAXIN )
-      LOGICAL GOTID
-      INTEGER ID( NPOS )
       LOGICAL LOGF
       INTEGER FDL
       LOGICAL FIXCON( BF__NCON )
@@ -536,12 +523,12 @@
             END IF
 
 *  Log the results and residuals if required.
-            CALL KPS1_BFLOG( LOGF, FDL, .FALSE., MAP2, RFRM, NAXR,
+            CALL KPS1_BFLOG( LOGF, FDL, .FALSE., MAP2, RFRM,
      :                       NPOS, BF__NCOEF, RP, RSIGMA, REFOFF,
      :                       REFLAB, POLAR, POLSIG, RMS, DTYPE, STATUS )
 
 *  Write primary beam's fit to output parameters.
-            CALL KPS1_BFOP( RFRM, MAP2, NAXR, NPAR, RP, RSIGMA,
+            CALL KPS1_BFOP( RFRM, NAXR, NPAR, RP, RSIGMA,
      :                      NPOS, REFOFF, POLAR, POLSIG, RMS, STATUS )
 
          ELSE

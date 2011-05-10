@@ -327,7 +327,6 @@
       INTEGER NDF                ! NDF identifier
       INTEGER NDIM               ! Number of NDF dimensions
       INTEGER NGOOD              ! No. valid pixels in array
-      INTEGER NUMBIN             ! Number of histogram bins
       INTEGER NUMPER             ! Number of percentiles
       INTEGER NWCS               ! Number of WCS axes
       REAL PERCNT( NPRCTL )      ! Percentiles

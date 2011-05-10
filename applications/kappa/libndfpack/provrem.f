@@ -237,7 +237,6 @@
       INTEGER IPW1               ! Pointer to work space
       INTEGER IR                 ! Index of next array element to read
       INTEGER IW                 ! Index of next array element to write
-      INTEGER J                  ! Ancestor index
       INTEGER KM                 ! KeyMap holding provenance info
       INTEGER L                  ! Used length of returned string
       INTEGER NANC               ! Total number of ancestors

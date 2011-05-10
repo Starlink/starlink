@@ -307,7 +307,6 @@
       DOUBLE PRECISION STDEVC    ! Std. devn. of pixels after clipping
       DOUBLE PRECISION SUM       ! Sum of pixels in array
       DOUBLE PRECISION SUMC      ! Sum of pixels after clipping
-      INTEGER*2 WQUANT( NPRCTL ) ! Word quantile values
       INTEGER EL                 ! Number of array elements mapped
       INTEGER I                  ! Loop counter for NDF dimensions
       INTEGER ICLIP              ! Loop counter for clipping levels
@@ -316,7 +315,6 @@
       INTEGER IMAXC( 1 )         ! Vector index of max. clipped pixel
       INTEGER IMIN( 1 )          ! Vector index of min. pixel
       INTEGER IMINC( 1 )         ! Vector index of min. clipped pixel
-      INTEGER IQUANT( NPRCTL )   ! Integer quantile values
       INTEGER ISTAT( 3 )         ! Array of integer statistics
       INTEGER ISTATC( 3 )        ! Array of clipped integer statistics
       INTEGER IWCS               ! Pointer to WCS FrameSet
@@ -333,7 +331,6 @@
       INTEGER NGOODC             ! No. valid pixels after clipping
       INTEGER NUMPER             ! Number of percentiles
       INTEGER NWCS               ! Number of WCS axes
-      INTEGER PERIND( NPRCTL )   ! Percentile indices in sorted array
       INTEGER PNTR( 1 )          ! Pointer to mapped NDF array
       INTEGER UBND( NDF__MXDIM ) ! NDF upper bounds
       LOGICAL BAD                ! Bad-pixel flag
@@ -343,7 +340,6 @@
       LOGICAL THERE              ! Array component exists?
       REAL CLIP( MXCLIP )        ! Array of clipping limits
       REAL PERCNT( NPRCTL )      ! Percentiles
-      REAL RQUANT( NPRCTL )      ! Real quantile values
 
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! Declarations of conversion routines

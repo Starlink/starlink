@@ -239,15 +239,12 @@
 *  Local Variables:
       REAL AXRAT                 ! Initial beam axis ratio
       LOGICAL BAD                ! Array may contain bad values?
-      DOUBLE PRECISION CORREL( BF__NCOEF, BF__NCOEF ) ! Two-param correlations
-      DOUBLE PRECISION COVAR( BF__NCOEF, BF__NCOEF ) ! Covariance
       INTEGER DIMS( BF__NDIM )   ! Dimensions
       LOGICAL FIXORI             ! Fix the orientation?
       LOGICAL FLAG( MXCOEF )     ! Problem parameter during inversion?
       DOUBLE PRECISION FS        ! Sum of squared residuals
       INTEGER GO                 ! Offset to current Gaussian's coeffs
       INTEGER I                  ! Loop count
-      INTEGER IERR               ! Location of first conversion error
       INTEGER IFAIL              ! PDA error status
       INTEGER IG                 ! Gaussian counter
       DOUBLE PRECISION INIT( BF__NDIM ) ! Refined initial co-ordinates
@@ -271,7 +268,6 @@
       DOUBLE PRECISION MEDIAN    ! Median of the small region
       DOUBLE PRECISION MODE      ! Mode of the small region
       INTEGER N                  ! Number of free parameters
-      INTEGER NERR               ! Number of numerical error
       INTEGER NGOOD              ! Number of good values
       INTEGER NPOS               ! Number of data values
       REAL ORIENT                ! Initial orientation of beam (radians)
@@ -283,7 +279,6 @@
       INTEGER REL                ! Number of elements in small region
       DOUBLE PRECISION RMEAN     ! Mean value ibn the small region
       INTEGER RUBND( BF__NDIM )  ! Upper bounds of small region
-      INTEGER START              ! Index of 1st char in projection name
       DOUBLE PRECISION SD( MXCOEF ) ! Std. deviations of fitted params
       REAL SIGMIN                ! Initial minor-axis standard deviation
       DOUBLE PRECISION SUM       ! Sum of values in the small region

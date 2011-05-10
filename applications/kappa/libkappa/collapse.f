@@ -506,7 +506,6 @@
                                ! co-ords
       DOUBLE PRECISION GRDPOS( NDF__MXDIM ) ! Valid grid Frame position
       DOUBLE PRECISION PIXPOS( NDF__MXDIM ) ! Valid pixel Frame position
-      DOUBLE PRECISION PPOS( 2, NDF__MXDIM ) ! Two pixel Frame positions
       DOUBLE PRECISION PXHIGH    ! High pixel bound of collapse axis
       DOUBLE PRECISION PXLOW     ! Low pixel bound of collapse axis
       INTEGER AEL                ! Number of collapse axis elements

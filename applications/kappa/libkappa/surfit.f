@@ -1320,7 +1320,7 @@
      :                       %VAL( CNF_PVAL( YPTR ) ),
      :                       %VAL( CNF_PVAL( ZPTR ) ),
      :                       DXMIN, DXMAX, DYMIN, DYMAX,
-     :                       NXPAR, NYPAR, MCHOEF, CHCOEF, NCOEF,
+     :                       NXPAR, NYPAR, MCHOEF, CHCOEF,
      :                       %VAL( CNF_PVAL( FITPTR ) ),
      :                       %VAL( CNF_PVAL( RESPTR ) ), DRMS, STATUS )
 
@@ -1388,7 +1388,7 @@
             CALL KPS1_SUPEV( DIMS( 1 ), DIMS( 2 ),
      :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                       DXMIN, DXMAX, DYMIN, DYMAX, NXPAR, NYPAR,
-     :                       MCHOEF, CHCOEF, NCOEF,
+     :                       MCHOEF, CHCOEF,
      :                       %VAL( CNF_PVAL( LINPTR ) ),
      :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                       RMSF, STATUS )
@@ -1399,7 +1399,7 @@
             CALL KPS1_SUPEI( DIMS( 1 ), DIMS( 2 ),
      :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                       IX, IY, DXMIN, DXMAX, DYMIN, DYMAX, NXPAR,
-     :                       NYPAR, MCHOEF, CHCOEF, NCOEF,
+     :                       NYPAR, MCHOEF, CHCOEF,
      :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                       RMSF, STATUS )
          END IF

@@ -1,5 +1,4 @@
-      SUBROUTINE KPS1_PUTS( NDIM, DIMS, IVALUE, VALUE, COMMA, INDS,
-     :                      LINE, LENG, FULL, STATUS )
+      SUBROUTINE KPS1_PUTS( VALUE, COMMA, LINE, LENG, FULL, STATUS )
 *+
 *  Name:
 *     KPS1_PUTS
@@ -11,8 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*      CALL KPS1_PUTS( NDIM, DIMS, IVALUE, VALUE, COMMA, INDS, LINE,
-*    :                LENG, FULL, STATUS )
+*      CALL KPS1_PUTS( VALUE, COMMA, LINE, LENG, FULL, STATUS )
 
 *  Description:
 *     The supplied value string is planted in the text line followed by
@@ -22,18 +20,10 @@
 *     stating what has happened.
 
 *  Arguments:
-*     NDIM = INTEGER (Given)
-*        Dimensionality of the object.
-*     DIMS( DAT__MXDIM ) = INTEGER (Given)
-*        Dimensions of the object.
-*     IVALUE = INTEGER (Given)
-*        Index to the value if the object is a vector.
 *     VALUE = CHARACTER * ( * ) (Given)
 *        Value string.
 *     COMMA = LOGICAL (Given)
-*        If true a comma is written after the value.
-*     INDS = CHARACTER (Given and Returned)
-*        Array indices
+*        If true, a comma is written after the value.
 *     LINE = CHARACTER*(*) (Given and Returned)
 *        Line of text to be appended
 *     LENG = INTEGER (Given and Returned)
@@ -50,12 +40,13 @@
 
 *  Copyright:
 *     Copyright (C) 1995 Central Laboratory of the Research Councils.
+*     Copyright (C) 2011 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -65,8 +56,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
@@ -75,6 +66,8 @@
 *  History:
 *     1995 May 9 (MJC)
 *        Original version based upon HDSTRACE routine TRA_PUTS.
+*     2011 May 11 (MJC):
+*        Removed no-longer-used arguments NDIM, DIMS, IVALUE, and INDS.
 *     {enter_further_changes_here}
 
 *-
@@ -86,15 +79,11 @@
       INCLUDE 'SAE_PAR'          ! SAI Constants
 
 *  Arguments Given:
-      INTEGER NDIM               ! Number of dimensions
-      INTEGER DIMS( * )          ! Dimensions
-      INTEGER IVALUE             ! Value index as if object is vector
       CHARACTER * ( * ) VALUE    ! Value string
       LOGICAL COMMA              ! True if a comma is to be appended to
                                  ! value
 
 *  Arguments Given and Returned:
-      INTEGER INDS( * )          ! Array indices
       CHARACTER * ( * ) LINE     ! Line to receive numbers
       INTEGER LENG               ! Current line length
 

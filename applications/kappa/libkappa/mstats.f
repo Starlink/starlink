@@ -373,7 +373,6 @@
       LOGICAL HIGHER             ! Significant dimensions above collapse
                                  ! axis?
       INTEGER I                  ! Loop variable
-      INTEGER IBL                ! Identifier for input-NDF block
       INTEGER IBLOCK             ! Loop counter for the NDF blocks
       INTEGER IBLSIZ( NDF__MXDIM ) ! Input-NDF sizes for processing
                                  ! large datasets in blocks
@@ -382,16 +381,11 @@
       INTEGER IPDAT              ! Pointer to data array
       INTEGER IPIN( 2 )          ! Pointers to mapped input arrays
       INTEGER IPNDF              ! Pointer to array of NDF identifiers
-      INTEGER IPODAT             ! Pointer to output data array
       INTEGER IPOUT( 2 )         ! Pointers to mapped output arrays
-      INTEGER IPOVAR             ! Pointer to output variance array
-      INTEGER IPPTR              ! Pointer to array of pointers to
-                                 ! mapped arrays
       INTEGER IPW1               ! Pointer to first work array
       INTEGER IPW2               ! Pointer to second work array
       INTEGER IPW3               ! Pointer to third work array
       INTEGER IPWID              ! Pointers to mapped width work array
-      INTEGER IPWORK             ! Pointer to workspace array
       CHARACTER*( NDF__SZTYP ) ITYPE ! HDS type of output data arrays
       INTEGER J                  ! Loop count
       INTEGER LBND( NDF__MXDIM ) ! Lower pixel index bounds of the
@@ -420,7 +414,6 @@
       INTEGER ONDF               ! NDF identifier of output NDF
       LOGICAL PVAR               ! Process variances?
       LOGICAL SINGLE             ! Are we in SINGLE or ARRAY mode?
-      CHARACTER*8 SMODE          ! Calculation mode - 'mean' or 'median'
       CHARACTER*8 STRIM          ! Trim parameter to pass to NDF_MBNDN
       DOUBLE PRECISION SUM       ! Running total of pixel values
       DOUBLE PRECISION SUM2      ! Running total of pixel values squared

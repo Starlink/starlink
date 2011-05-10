@@ -1,5 +1,5 @@
       SUBROUTINE KPS1_PLRS<T>( MAPIO, PARAMS, CONTNR, PATH, RESET, 
-     :                         INTERP, RSPARS, TOL, NDFI, IWCS, NDIM, 
+     :                         INTERP, RSPARS, TOL, NDFI, NDIM,
      :                         LBNDI, UBNDI, LBNDO, UBNDO, STATUS )
 *+
 *  Name:
@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     CALL KPS1_PLRSx( MAPIO, PARAMS, CONTNR, PATH, RESET, INTERP, 
-*                      RSPARS, TOL, NDFI, IWCS, NDIM, LBNDI, UBNDI, 
+*                      RSPARS, TOL, NDFI, NDIM, LBNDI, UBNDI,
 *                      LBNDO, UBNDO, STATUS )
 
 *  Description:
@@ -85,8 +85,6 @@
 *        at the expense of increasing execution time.
 *     NDFI = INTEGER (Given)
 *        The identifier of the input NDF to be resampled.
-*     IWCS = INTEGER (Given) 
-*        The FrameSet associated with the input NDF.
 *     NDIM = INTEGER (Given)
 *        The number of input dimensions.
 *     LBNDI( NDIM ) = INTEGER (Given)
@@ -170,7 +168,6 @@
       DOUBLE PRECISION RSPARS( 2 )
       DOUBLE PRECISION TOL
       INTEGER NDFI
-      INTEGER IWCS
       INTEGER NDIM
       INTEGER LBNDI( NDIM )
       INTEGER UBNDI( NDIM )
@@ -209,13 +206,10 @@
       INTEGER IPDATO             ! Pointer to output Data array
       INTEGER IPVARI             ! Pointer to input Variance array
       INTEGER IPVARO             ! Pointer to output Variance array
-      INTEGER J                  ! Loop counter
       INTEGER MAXPIX             ! Maximum size of linear approximation 
                                  ! region
       INTEGER NBAD               ! Number of bad pixels
       INTEGER NC                 ! No. of characters in NDF path so far
-      INTEGER NCOMP              ! No. of components within cell of AXIS
-                                 ! array
       CHARACTER*270 NDFNAM       ! NDF name
       INTEGER NDFO               ! NDF identifier of output NDF
       DOUBLE PRECISION NEWVAL    ! New axis array value for fixed axes

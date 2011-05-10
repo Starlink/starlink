@@ -259,7 +259,6 @@
       INTEGER IBOX( NDF__MXDIM ) ! Smoothing box half-size
       INTEGER LBND( NDF__MXDIM + 1 ) ! Lower bounds of NDF pixel axes
       INTEGER NDF1               ! Identifier for input NDF
-      INTEGER NDF1B              ! Section of input NDF to be smoothed
       INTEGER NDF2               ! Identifier for output NDF
       INTEGER NDF2B              ! Section of output NDF to be filled
       INTEGER NDIM               ! Number of dimensions in the NDF
@@ -267,7 +266,6 @@
       INTEGER NVAL               ! Number of values obtained
       INTEGER PNTR1( 2 )         ! Pointers for mapped input arrays
       INTEGER PNTR2( 2 )         ! Pointers for mapped output arrays
-      INTEGER SDIM( NDF__MXDIM ) ! Significant NDF dimensions
       INTEGER STATE              ! State of BOX parameter
       INTEGER UBND( NDF__MXDIM + 1 ) ! Upper bounds of NDF pixel axes
       INTEGER WPNTR1             ! Mapped workspace pointer

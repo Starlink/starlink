@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_BFOP( RFRM, MAP, NAXR, NP, P, SIGMA, NBEAM,
+      SUBROUTINE KPS1_BFOP( RFRM, NAXR, NP, P, SIGMA, NBEAM,
      :                      REFOFF, POLAR, POLSIG, RMS, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_BFOP( RFRM, MAP, NAXR, NP, P, SIGMA, NBEAM, REFOFF,
+*     CALL KPS1_BFOP( RFRM, NAXR, NP, P, SIGMA, NBEAM, REFOFF,
 *                     POLAR, POLSIG, RMS, STATUS )
 
 *  Description:
@@ -58,9 +58,6 @@
 *     RFRM = INTEGER (Given)
 *        A pointer to the reporting Frame (i.e. the Frame in which
 *        positions are to be reported).
-*     MAP = INTEGER (Given)
-*        The AST Mapping from the PIXEL Frame of the NDF to the
-*        reporting Frame.
 *     NAXR = INTEGER (Given)
 *        The number of axes in the reporting Frame.
 *     NP = INTEGER (Given)
@@ -97,7 +94,7 @@
 
 *  Copyright:
 *     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2009, 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2009, 2011 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -145,6 +142,8 @@
 *        not a SkyFrame.
 *     2010 July 5 (MJC):
 *        Switched to generalised Gaussian fit adding its exponent.
+*     2011 May 11 (MJC):
+*        Removed no-longer-used argument MAP.
 *     {enter_further_changes_here}
 
 *-
@@ -162,7 +161,6 @@
 
 *  Arguments Given:
       INTEGER RFRM
-      INTEGER MAP
       INTEGER NAXR
       INTEGER NP
       DOUBLE PRECISION P( NP )

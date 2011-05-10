@@ -247,7 +247,6 @@
       CHARACTER ZERPAR(2)*6      ! Parameters for getting zero values
       CHARACTER ZTYPE*(DAT__SZTYP)! Numerical type for storing differences
       DOUBLE PRECISION MAXVAL    ! Max value in array
-      DOUBLE PRECISION MINDIF    ! Min abs difference between neighbours
       DOUBLE PRECISION MINVAL    ! Min value in array
       DOUBLE PRECISION SCALE     ! Scale factor
       DOUBLE PRECISION VMN       ! Min value for scaled data type

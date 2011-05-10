@@ -373,12 +373,10 @@
       INTEGER HPNTR              ! Pointer to the histogram
       INTEGER HPPTR1             ! Pointer to the histogram x locus
       INTEGER HPPTR2             ! Pointer to the histogram y locus
-      INTEGER IAT                ! Position with TEXT
       INTEGER IERR               ! Position of first conversion error
       INTEGER IFIL               ! File descriptor for logfile
       INTEGER IWCS               ! Pointer to NDFs WCS FrameSet
       CHARACTER * ( 256 ) LABEL  ! Label of the histogram NDF
-      INTEGER LENXL              ! Used length of XL
       LOGICAL LOGFIL             ! Log file is required
       INTEGER MAXH               ! Maximum number in an histogram bin
       REAL MAXIM                 ! Maximum value of pixels in array
@@ -390,10 +388,7 @@
                                  ! standardised for locus
       INTEGER MINPOS             ! Index of minimum-valued pixel
       INTEGER NC                 ! No. characters in text buffer
-      INTEGER NMLEN              ! Used length of NDFNAM
       INTEGER NDFI               ! Identifier for input NDF
-      CHARACTER * ( 255 ) NDFNAM ! Base name of NDF (+ possibly an HDS
-                                 ! path)
       INTEGER NDFO               ! NDF identifier of output histogram
       INTEGER NERR               ! Number of conversion errors
       INTEGER NINVAL             ! Number of invalid pixels in array

@@ -186,7 +186,6 @@
 
 *  Local Variables:
       CHARACTER CC*40          ! Buffer for formatted value
-      DOUBLE PRECISION A       ! Value for first WCS axis
       DOUBLE PRECISION ASTORE( MXSTOR ) ! Stored WCS axis 1 values
       DOUBLE PRECISION B       ! Value for second WCS axis
       DOUBLE PRECISION BSTORE( MXSTOR ) ! Stored WCS axis 2 values

@@ -1,5 +1,5 @@
       SUBROUTINE KPS1_FSPE2( NBIN, X, Y, Z, XMIN, XMAX, YMIN, YMAX,
-     :                       NXPAR, NYPAR, MCHOEF, CHCOEF, NCOEF, FIT,
+     :                       NXPAR, NYPAR, MCHOEF, CHCOEF, FIT,
      :                       RESID, RMS, STATUS )
 *+
 *  Name:
@@ -14,7 +14,7 @@
 
 *  Invocation:
 *      CALL KPS1_FSPE2( NBIN, X, Y, Z, XMIN, XMAX, YMIN, YMAX, NXPAR,
-*                       NYPAR, MCHOEF, CHCOEF, NCOEF, FIT, RESID, RMS,
+*                       NYPAR, MCHOEF, CHCOEF, FIT, RESID, RMS,
 *                       STATUS )
 
 *  Description:
@@ -59,8 +59,6 @@
 *        the standard convention is %CHCOEF(i*(%NYPAR)+j+1).  The array
 *        may be rectangular, i.e. the highest x and y orders do not
 *        have to be the same.
-*     NCOEF = INTEGER (Given)
-*        The number of Chebyshev coefficients.
 *     FIT( * ) = DOUBLE PRECISION (Returned)
 *        The fitted array.
 *     RESID( * ) = DOUBLE PRECISION (Returned)
@@ -78,7 +76,7 @@
 *     Copyright (C) 1990 Science & Engineering Research Council.
 *     Copyright (C) 1995-1996 Central Laboratory of the Research
 *     Councils.
-*     Copyright (C) 2007 Science & Technology Facilites Council
+*     Copyright (C) 2007, 2011 Science & Technology Facilites Council
 *     All Rights Reserved.
 
 *  Licence:
@@ -113,6 +111,8 @@
 *     2007 June 30 (MJC):
 *        Made more efficient by looking for contiguous series of pixels
 *        at the same Y co-ordinate.
+*     2011 May 11 (MJC):
+*        Removed no-longer-used argument NCOEF.
 *     {enter_further_changes_here}
 
 *-
@@ -137,7 +137,6 @@
       INTEGER NYPAR              ! Y degree of the polynomial plus 1
       INTEGER MCHOEF             ! Dimension of Chebyshev coeff. array
       DOUBLE PRECISION CHCOEF( MCHOEF ) ! Chebyshev coefficients
-      INTEGER NCOEF             ! Number of Chebyshev coefficients
 
 *  Arguments Returned:
       DOUBLE PRECISION FIT( * )  ! Fitted data

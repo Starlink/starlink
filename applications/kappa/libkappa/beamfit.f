@@ -631,7 +631,6 @@
       LOGICAL HASVAR             ! Errors to be calculated
       INTEGER I                  ! Loop counter
       INTEGER IMARK              ! PGPLOT marker type
-      DOUBLE PRECISION INPOL( 2 ) ! Pole co-ordinates
       LOGICAL ISSKY              ! Current Frame in SKY Domain?
       LOGICAL INTERF             ! Interface mode selected?
       INTEGER IPD                ! Pointer to input data array
@@ -661,8 +660,6 @@
                                  ! Frame
       CHARACTER*8 MARK           ! Positions to mark
       CHARACTER*10 MODE          ! Mode for getting initial co-ords
-      LOGICAL MORE               ! Obtain another separation?
-      INTEGER MSGFIL             ! Initial message-system filter level
       INTEGER NAMP               ! Number of amplitude ratios supplied
       INTEGER NAXC               ! Number of axes in current NDF Frame
       INTEGER NAXIN              ! Number of axes in supplied Frame
@@ -670,18 +667,14 @@
       INTEGER NDFC               ! Copied-NDF identifier
       INTEGER NDFI               ! Input NDF identifier
       INTEGER NDFR               ! Residuals map's NDF identifier
-      CHARACTER*256 NDFNAM       ! Name of input IMAGE
       INTEGER NDIM               ! Number of dimensions of the NDF
       INTEGER NPOS               ! Number of supplied beam positions
       INTEGER NVAL               ! Number of values returned for a
                                  ! parameter
-      DOUBLE PRECISION OFF1( NDF__MXDIM ) ! Separation for one position
-      DOUBLE PRECISION OFFSET( BF__MXPOS - 1, NDF__MXDIM )! Separations
       CHARACTER*( PAR__SZNAM + 1 ) PARNAM ! Parameter name for the
                                  ! current initial beam position
       INTEGER PLACE              ! NDF placeholder
       LOGICAL POLAR              ! Use polar co-ordinates for POS2-POS5?
-      LOGICAL POSC               ! Centre fixed at supplied position?
       LOGICAL QUIET              ! Suppress screen output?
       CHARACTER*22 REFLAB        ! Label describing reference point
       CHARACTER*256 REFNAM       ! Reference name
@@ -689,10 +682,8 @@
       LOGICAL RESID              ! Produce output residuals?
       DOUBLE PRECISION S2FWHM    ! Standard deviation to FWHM
       INTEGER SDIM( BF__NDIM )   ! Significant dimensions of the NDF
-      CHARACTER*4 SEPAR          ! SEPn parameter name
       INTEGER SHIFT( NDF__MXDIM ) ! Pixel-index shifts to apply
       INTEGER SLBND( BF__NDIM )  ! Significant lower bounds of the image
-      CHARACTER*3 SPARAM         ! Parameter root for fixed separations
       CHARACTER*7 SKYREF         ! Value of Frame attribute SkyRefIs
       INTEGER STATE              ! State of POSx parameter
       INTEGER SUBND( BF__NDIM )  ! Significant upper bounds of the image
@@ -1277,11 +1268,10 @@
       IF ( CAT .OR. FILE ) THEN
 
 *  Find the beam parameters and determine errors, and report them.
-         CALL KPS1_BFFIL( NDFI, IWCS, MAP3, MAP1, MAP2, CFRM, VAR, NPOS,
-     :                    NAXC, NAXIN, %VAL( CNF_PVAL( IPIN ) ), CAT,
-     :                    %VAL( CNF_PVAL( IPID ) ), LOGF, FDL, FIXCON,
-     :                    AMPRAT, SLBND, SUBND, FAREA, FITREG, REFPOS,
-     :                    REFLAB, MXCOEF, FPAR, STATUS )
+         CALL KPS1_BFFIL( NDFI, IWCS, MAP3, MAP1, CFRM, VAR, NPOS,
+     :                    NAXC, NAXIN, %VAL( CNF_PVAL( IPIN ) ), LOGF,
+     :                    FDL, FIXCON, AMPRAT, SLBND, SUBND, FAREA,
+     :                    FITREG, REFPOS, REFLAB, MXCOEF, FPAR, STATUS )
 
 *  In interactive modes, find each beam individually, waiting for the
 *  user to supply a new one before continuing each time.
@@ -1319,7 +1309,7 @@
 
 *  Fit the beams obtained interactively, and determine errors.
 *  Display the results.
-         CALL KPS1_BFINT( NDFC, IWCS, IPLOT, MAP3, MAP1, MAP2, CFRM,
+         CALL KPS1_BFINT( NDFC, IWCS, IPLOT, MAP3, MAP1, CFRM,
      :                    VAR, NPOS, POLAR, 'POS', CURSOR, MARK, IMARK,
      :                    NAXC, NAXIN, LOGF, FDL, FIXCON, AMPRAT, SLBND,
      :                    SUBND, FAREA, FITREG, REFPOS, REFLAB, MXCOEF,

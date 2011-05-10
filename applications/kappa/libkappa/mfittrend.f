@@ -493,8 +493,6 @@
       CHARACTER*15 COMP          ! List of array components to process
       DOUBLE PRECISION CPOS( 2, NDF__MXDIM ) ! Two current Frame
                                  ! positions
-      DOUBLE PRECISION CURPOS( NDF__MXDIM ) ! A valid current Frame
-                                 ! position
       INTEGER D                  ! A dimension size
       INTEGER DIMS( NDF__MXDIM ) ! Dimensions of NDF
       DOUBLE PRECISION DRANGE( MAXRNG ) ! Fit ranges world co-ordinates
@@ -506,7 +504,6 @@
       LOGICAL FILMSK             ! Fill a mask array?
       CHARACTER*14 FMT           ! Format string
       LOGICAL GLOBAL             ! Use the automatic global method?
-      INTEGER GPTR               ! Pointer to sort-positions workspace
       LOGICAL HASBAD             ! Input NDF may have BAD pixels?
       LOGICAL HAVVAR             ! Have a variance component?
       INTEGER I                  ! Loop variable
@@ -540,7 +537,6 @@
       INTEGER IPWT               ! Pointer to weights
       CHARACTER*( NDF__SZTYP ) ITYPE ! Numeric type for processing
       INTEGER IWCS               ! AST FrameSet identifier
-      INTEGER J                  ! Loop variable
       INTEGER JAXIS              ! Index of axis within pixel Frame
       INTEGER JHI                ! High pixel index for axis
       INTEGER JLO                ! Low pixel index for axis
@@ -566,7 +562,6 @@
       INTEGER NDFS               ! NDF identifier of section
       INTEGER NDIM               ! Number of NDF dimensions
       INTEGER NERR               ! Number of errors
-      INTEGER NFEED              ! Number of pixel axes feeding WCS axis
       INTEGER NFIT               ! Number of successful fits
       INTEGER NGOOD              ! Number of good knot positions
       INTEGER NKNOT              ! Number of interior knots
@@ -589,7 +584,6 @@
       LOGICAL REGION             ! Representative region auto method?
       CHARACTER*80 SECT          ! Section specifier
       LOGICAL SINGLE             ! Single-line automatic method?
-      INTEGER SIWPTR             ! Pointer to spline-fitting workspace
       LOGICAL SUBTRA             ! Subtract fit from data?
       INTEGER SWPTR              ! Pointer to spline-fitting workspace
       INTEGER TBL                ! Identifier for temporary-NDF block
@@ -598,9 +592,6 @@
       INTEGER UBND( NDF__MXDIM ) ! Upper bounds of NDF
       LOGICAL USEALL             ! Use the entire axis?
       LOGICAL USEVAR             ! Use variance as weights in fits?
-      INTEGER WPTR               ! Pointer to mapped weight array
-      INTEGER XPTR               ! Pointer to mapped x co-ordinate array
-      INTEGER ZPTR               ! Pointer to mapped data value array
 
 *.
 

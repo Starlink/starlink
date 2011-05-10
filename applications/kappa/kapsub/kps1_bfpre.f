@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_BFPRE( IPLOT, MAP, NPOS, NAXIN, MARK, MARKER,
+      SUBROUTINE KPS1_BFPRE( IPLOT, MAP, NPOS, MARK, MARKER,
      :                       NPAR, FPAR, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_BFPRE( IPLOT, MAP, NPOS, NAXIN, MARK, MARKER,
+*     CALL KPS1_BFPRE( IPLOT, MAP, NPOS, MARK, MARKER,
 *                      NPAR, FPAR, STATUS )
 
 *  Description:
@@ -31,9 +31,6 @@
 *     MARK = CHARACTER * ( * ) (Given)
 *        What positions are to be marked?  Can be "INITIAL", "FIT",
 *        'ELLIPSE' or "NONE".
-*     NAXIN = INTEGER (Given)
-*        The number of axes in the Frame in which the initial guess
-*        positions are supplied.
 *     MARKER = INTEGER (Given)
 *        The PGPLOT number for the marker type to mark the positions
 *        specified by MARK.
@@ -50,8 +47,9 @@
 *      - The plotting style should be set before calling this routine.
 
 *  Copyright:
-*     Copyright (C) 2007 Particle Physics and Astronomy Research
-*     Council.  All Rights Reserved.
+*     Copyright (C) 2007 Particle Physics and Astronomy Research.
+*     Copyright (C) 2011 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -78,7 +76,9 @@
 *        Original version.
 *     2007 June 25 (MJC):
 *        The fitted orientation is now in radians.
-*     {enter_changes_here}
+*     2011 May 11 (MJC):
+*        Removed no-longer-used argument NAXIN.
+*     {enter_further_changes_here}
 
 *-
 
@@ -96,7 +96,6 @@
       INTEGER IPLOT
       INTEGER MAP
       INTEGER NPOS
-      INTEGER NAXIN
       CHARACTER MARK*( * )
       INTEGER MARKER
       INTEGER NPAR
@@ -124,8 +123,6 @@
       INTEGER ELL                ! Ellipse identifier
       INTEGER I                  ! Position index
       INTEGER ICURR              ! Current PLOT Frame
-      INTEGER IMARK              ! Marker to use when marking initial
-                                 ! positions
       DOUBLE PRECISION INCEN( BF__MXPOS, 2 )! Beam graphics positions
       INTEGER J                  ! Axis index
       INTEGER K                  ! Index
@@ -134,7 +131,6 @@
       REAL ORIN                  ! Orientation, PIXEL Frame
       REAL OROUT                 ! Orientation, Graphics Frame
       DOUBLE PRECISION PIXPOS( BF__MXPOS, BF__NDIM ) ! Pixel position
-      DOUBLE PRECISION PRIPOS( BF__NDIM )! Primary pos, current Frame
       DOUBLE PRECISION SEMIAX( 2 ) ! Semi-major axes
       REAL WIDIN                 ! Width (norrmally FWHM), PIXEL Frame
       DOUBLE PRECISION WIDOUT    ! Width, Graphics Frame

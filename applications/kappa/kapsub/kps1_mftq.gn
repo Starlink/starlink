@@ -206,7 +206,6 @@
       <TYPE> TVAL                ! The current data value
       INTEGER WEL                ! Workspace elements
       REAL VAL                   ! The current data value
-      REAL VAR                   ! The current variance
 
 *  Equivalences so we can index loop variables by AXIS.
       EQUIVALENCE( I1, I( 1 ) )

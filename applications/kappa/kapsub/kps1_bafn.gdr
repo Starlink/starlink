@@ -182,7 +182,6 @@
       INTEGER IDIM               ! Dimension counter
       INTEGER LAST               ! Final element in current dimension
       INTEGER ITER               ! Iteration loop counter
-      INTEGER J                  ! Loop counter
       DOUBLE PRECISION LASTMX    ! Last maximum change
       <LTYPE> NEWVAL             ! New value
       INTEGER NRMS               ! Number of values used to compute the

@@ -302,9 +302,8 @@
             END IF
 
 *  Put the value into the buffer unless it overflows the line.
-            CALL KPS1_PUTS( NDIM, DIMS, IVALUE, STR( 1:NCHAR ),
-     :                      I .NE. SIZE, INDS, LINE, LENG, FULL,
-     :                      STATUS )
+            CALL KPS1_PUTS( STR( 1:NCHAR ), I .NE. SIZE, LINE,
+     :                      LENG, FULL, STATUS )
 
 *  Is the line full?
             IF ( FULL ) THEN
@@ -327,9 +326,8 @@
 
 *  Write the value that would not fit into previous line at the start
 *  of the new line.
-                  CALL KPS1_PUTS( NDIM, DIMS, IVALUE, STR( 1:NCHAR ),
-     :                            I .NE. SIZE, INDS, LINE, LENG,
-     :                            FULL, STATUS )
+                  CALL KPS1_PUTS( STR( 1:NCHAR ), I .NE. SIZE, LINE,
+     :                            LENG, FULL, STATUS )
                ELSE
 
 *  The last value is not displayed if the line was full.  So decrement

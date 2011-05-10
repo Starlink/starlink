@@ -421,7 +421,6 @@
                                  ! array
       REAL CLIP                  ! Value of CLIP parameter
       CHARACTER COMP * ( 13 )    ! List of components to process
-      DOUBLE PRECISION CURPOS( NDIM ) ! Valid current Frame position
       INTEGER D                  ! A dimension size
       DOUBLE PRECISION DLBNDI( NDIM ) ! Slab inverse lower bounds in
                                  ! GRID collapsed-axis co-ords

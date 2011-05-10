@@ -363,37 +363,37 @@
 *  =====================================================
          IF ( ITYPE .EQ. '_REAL' ) THEN
             CALL KPS1_PLRSR( MAPIO, PARAMS( 2 ), CONTNR, PATH( :PLEN ),
-     :                       FIRST, INTERP, RSPARS, TOL, INDF, IWCS,
+     :                       FIRST, INTERP, RSPARS, TOL, INDF,
      :                       NDIM, LBNDI, UBNDI, LBNDO, UBNDO, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
             CALL KPS1_PLRSB( MAPIO, PARAMS( 2 ), CONTNR, PATH( :PLEN ),
-     :                       FIRST, INTERP, RSPARS, TOL, INDF, IWCS,
+     :                       FIRST, INTERP, RSPARS, TOL, INDF,
      :                       NDIM, LBNDI, UBNDI, LBNDO, UBNDO, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
             CALL KPS1_PLRSD( MAPIO, PARAMS( 2 ), CONTNR, PATH( :PLEN ),
-     :                       FIRST, INTERP, RSPARS, TOL, INDF, IWCS,
+     :                       FIRST, INTERP, RSPARS, TOL, INDF,
      :                       NDIM, LBNDI, UBNDI, LBNDO, UBNDO, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
             CALL KPS1_PLRSI( MAPIO, PARAMS( 2 ), CONTNR, PATH( :PLEN ),
-     :                       FIRST, INTERP, RSPARS, TOL, INDF, IWCS,
+     :                       FIRST, INTERP, RSPARS, TOL, INDF,
      :                       NDIM, LBNDI, UBNDI, LBNDO, UBNDO, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
             CALL KPS1_PLRSUB( MAPIO, PARAMS( 2 ), CONTNR, PATH( :PLEN ),
-     :                        FIRST, INTERP, RSPARS, TOL, INDF, IWCS,
+     :                        FIRST, INTERP, RSPARS, TOL, INDF,
      :                        NDIM, LBNDI, UBNDI, LBNDO, UBNDO, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
             CALL KPS1_PLRSUW( MAPIO, PARAMS( 2 ), CONTNR, PATH( :PLEN ),
-     :                        FIRST, INTERP, RSPARS, TOL, INDF, IWCS,
+     :                        FIRST, INTERP, RSPARS, TOL, INDF,
      :                        NDIM, LBNDI, UBNDI, LBNDO, UBNDO, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
             CALL KPS1_PLRSW( MAPIO, PARAMS( 2 ), CONTNR, PATH( :PLEN ),
-     :                       FIRST, INTERP, RSPARS, TOL, INDF, IWCS,
+     :                       FIRST, INTERP, RSPARS, TOL, INDF,
      :                       NDIM, LBNDI, UBNDI, LBNDO, UBNDO, STATUS )
          END IF
 

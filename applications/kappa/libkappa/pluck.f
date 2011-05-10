@@ -354,8 +354,6 @@
                                  ! Current Frame
       INTEGER MAP3               ! Mapping from supplied Frame to GRID
                                  ! Frame
-      INTEGER MAPX               ! Basic Mapping to use (without extra
-                                 ! scaling)
       CHARACTER*16 METHOD        ! Name of resampling scheme
       CHARACTER*10 MODE          ! Mode for getting co-ordinates
       INTEGER NAXC               ! No. of axes in current NDF Frame

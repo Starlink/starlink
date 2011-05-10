@@ -275,7 +275,6 @@
       INTEGER IPROV              ! Identifier for provenance structure
       INTEGER IPW1               ! Pointer to work space
       INTEGER J                  ! Ancestor count
-      INTEGER K                  ! Substitution count
       INTEGER KM                 ! KeyMap holding provenance info
       INTEGER L                  ! String len
       INTEGER MANC               ! Number of selected ancestors
