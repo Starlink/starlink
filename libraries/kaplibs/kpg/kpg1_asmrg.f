@@ -64,6 +64,7 @@
 *  Copyright:
 *     Copyright (C) 1998, 1999, 2003 Central Laboratory of the Research Councils.
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2011 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -84,6 +85,7 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -104,7 +106,9 @@
 *        Do not issue warning about multiple PIXEL Domains if alignment
 *        is performed in the PIXEL Domain (there is usally an extra PIXEL
 *        Frame in the Plot because KPG1_GDGET adds one).
-*     {enter_changes_here}
+*     2011 May 10 (MJC):
+*        Set mandatory bad status before calling ERR_REP.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -201,7 +205,7 @@
       CALL AST_SETI( IWCS1, 'BASE', ICURR1, STATUS )
       CALL AST_SETI( IWCS2, 'BASE', ICURR2, STATUS )
 
-*  Attempt to align the FrameSets. If succesfull, a new FrameSet is
+*  Attempt to align the FrameSets. If successful, a new FrameSet is
 *  returned describing the relationship between the Current Frames in
 *  IWCS2 and IWCS1, and the Base Frames are changed to indicate
 *  the Frames in which alignment occurred.
@@ -220,8 +224,13 @@
      :                    'positions.', STATUS )
          END IF
 
-*  Warn the user about any different dimensionalities in the two current Frames
+*  Warn the user about any different dimensionalities in the two
+*  current Frames.
+*  MJC: inserted the manadatory bad status, but if the original
+*  intention was merely to warn, the ERR_REP call should be substituted
+*  with MSG_OUTIF.
          IF( NAXC1 .NE. NAXC2 ) THEN
+            STATUS = SAI__ERROR
             CALL MSG_SETI( 'NC1', NAXC1 )
             CALL MSG_SETI( 'NC2', NAXC2 )
             CALL ERR_REP( 'KPG1_ASMRG_2', 'The two current '//

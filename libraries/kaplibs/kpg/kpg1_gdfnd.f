@@ -34,7 +34,7 @@
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2011 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -55,6 +55,7 @@
 
 *  Authors:
 *     DSB: David S Berry (JAC, UCLan)
+*     MJC: Malcolm J. Currie (Starlink)
 *     {enter_new_authors_here}
 
 *  History:
@@ -63,7 +64,9 @@
 *     11-SEP-2007 (DSB):
 *        Do not annul the picture identifier until it has been finished
 *        with.
-*     {enter_changes_here}
+*     2011 May 10 (MJC):
+*        Set mandatory bad status before calling ERR_REP.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -94,7 +97,7 @@
       LOGICAL HASMOR            ! Does picture have a MORE component?
       LOGICAL HASWCS            ! Does picture have a WCS Plot?
       LOGICAL MORE              ! Continue searching?
-      INTEGER III
+
 *.
 
 *  Check inherited global status.
@@ -171,6 +174,7 @@
 
 *  If no picture of the chosen name with WCS was found report an error.
       IF( IPIC .EQ. -1 .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
          CALL MSG_SETC( 'NAME', NAME )
          CALL ERR_REP( 'KPG1_GDFND_NOTPRE', 'No suitable ^NAME '//
      :                 'picture can be found within the the current '//

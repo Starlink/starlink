@@ -50,26 +50,26 @@
 *  Notes:
 *     The comments and values are extracted from a single card.
 
-*  [optional_subroutine_items]...
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2011 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -78,7 +78,9 @@
 *  History:
 *     2005 October 6 (MJC):
 *        Original version.
-*     {enter_changes_here}
+*     2011 May 10 (MJC):
+*        Set mandatory bad status before calling ERR_REP.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -135,6 +137,7 @@
 
 *  Validate the input dimensions.
       IF ( CARD .LT. 1 .OR. CARD .GT. NCARD ) THEN
+         STATUS = SAI__ERROR
          CALL MSG_SETI( 'M', NCARD )
          CALL MSG_SETI( 'C', CARD )
          CALL ERR_REP( 'FTS1_PRVAL_INVCARD',

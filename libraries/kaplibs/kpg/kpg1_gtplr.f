@@ -93,7 +93,7 @@
 *  Copyright:
 *     Copyright (C) 1998, 1999, 2000 Central Laboratory of the Research
 *     Councils
-*     Copyright (c) 2007 Science and Technology Facilities Council
+*     Copyright (c) 2007, 2011 Science and Technology Facilities Council
 *     All Rights Reserved.
 
 *  Licence:
@@ -124,6 +124,8 @@
 *        Fixed incomplete coding for SkyFrame-to-polar mapping, in
 *        particular transform radius to 90-latitude and ensure longitude
 *        is measured in degrees North via East.
+*     2011 May 10 (MJC):
+*        Set mandatory bad status before calling ERR_REP.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -301,6 +303,7 @@
          END DO
 
          IF ( .NOT. GOODPO ) THEN
+            STATUS = SAI__ERROR
             CALL MSG_SETC( 'PARAM', PARAM )
             CALL ERR_REP( 'KPG1_GTPLR_M3', 'A co-ordinate of the '//
      :                    'pole is undefined.  Parameter %^PARAM '//

@@ -152,8 +152,10 @@
 *     - The format specifier for each field is validated.
 
 *  Copyright:
-*     Copyright (C) 1989, 1990, 1991, 1992, 1993 Science & Engineering Research Council.
+*     Copyright (C) 1989, 1990, 1991, 1992, 1993 Science & Engineering
+*     Research Council.
 *     Copyright (C) 1996 Central Laboratory of the Research Councils.
+*     Copyright (C) 2011 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -211,6 +213,8 @@
 *        FIO_CANCL.
 *     1996 November 24 (MJC):
 *        Modern style.  Revised FTS1_GKEYx calls.
+*     2011 May 10 (MJC):
+*        Set mandatory bad status before calling ERR_REP.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -435,6 +439,7 @@
       IF ( .NOT. THERE ) GCOUNT = 1
 
       IF ( GCOUNT .NE. 1 ) THEN
+         STATUS = SAI__ERROR
          CALL ERR_REP( 'FTS1_SDSCF_GCOUNT',
      :     'GCOUNT not equal to one.', STATUS )
          GOTO 999
