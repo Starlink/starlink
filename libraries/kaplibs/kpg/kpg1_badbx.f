@@ -75,6 +75,7 @@
 
 *  Authors:
 *     DSB: David S Berry (JACH)
+*     MJC: Malcolm J. Currie (MJC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -82,9 +83,9 @@
 *        Original version.
 *     10-MAR-2011 (DSB):
 *        Added argument OPER.
-*     9-MAY-2011 (DSB):
-*        Set status before calling err_rep.
-*     {enter_changes_here}
+*     9-MAY-2011 (DSB/MJC):
+*        Set mandatory STATUS bad before issuing an ERR_REP.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
