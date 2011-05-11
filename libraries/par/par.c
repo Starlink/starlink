@@ -44,6 +44,9 @@
 *         null pointer risk.
 *     16-APR-2009 (DSB):
 *         Export maxval in the wrapper for parGet1c.
+*     10-MAY-2011 (TIMJ):
+*         Need to make sure that we return unmodified argument if status
+*         is bad
 *-
 */
 
@@ -1473,9 +1476,12 @@ DECLARE_INTEGER(fstatus);
                         TRAIL_ARG(fvalue) );
 
    F77_FREE_CHARACTER(fparam);
-   F77_IMPORT_CHARACTER(fvalue,fvalue_length,value);
-   F77_FREE_CHARACTER(fvalue);
    F77_IMPORT_INTEGER(fstatus,*status);
+   if (*status == SAI__OK) {
+     F77_IMPORT_CHARACTER(fvalue,fvalue_length,value);
+   }
+   F77_FREE_CHARACTER(fvalue);
+
 
    return;
 }
@@ -1503,8 +1509,10 @@ DECLARE_INTEGER(fstatus);
                         TRAIL_ARG(fparam) );
 
    F77_FREE_CHARACTER(fparam);
-   F77_IMPORT_DOUBLE(fvalue,*value);
    F77_IMPORT_INTEGER(fstatus,*status);
+   if (*status == SAI__OK) {
+     F77_IMPORT_DOUBLE(fvalue,*value);
+   }
 
    return;
 }
@@ -1532,8 +1540,10 @@ DECLARE_INTEGER(fstatus);
                         TRAIL_ARG(fparam) );
 
    F77_FREE_CHARACTER(fparam);
-   F77_IMPORT_INTEGER(fvalue,*value);
    F77_IMPORT_INTEGER(fstatus,*status);
+   if (*status == SAI__OK) {
+     F77_IMPORT_INTEGER(fvalue,*value);
+   }
 
    return;
 }
@@ -1561,8 +1571,10 @@ DECLARE_INTEGER(fstatus);
                         TRAIL_ARG(fparam) );
 
    F77_FREE_CHARACTER(fparam);
-   F77_IMPORT_LOGICAL(fvalue,*value);
    F77_IMPORT_INTEGER(fstatus,*status);
+   if (*status == SAI__OK) {
+     F77_IMPORT_LOGICAL(fvalue,*value);
+   }
 
    return;
 }
@@ -1590,8 +1602,10 @@ DECLARE_INTEGER(fstatus);
                         TRAIL_ARG(fparam) );
 
    F77_FREE_CHARACTER(fparam);
-   F77_IMPORT_REAL(fvalue,*value);
    F77_IMPORT_INTEGER(fstatus,*status);
+   if (*status == SAI__OK) {
+     F77_IMPORT_REAL(fvalue,*value);
+   }
 
    return;
 }
@@ -1632,11 +1646,13 @@ DECLARE_INTEGER(fstatus);
                         TRAIL_ARG(fvalues) );
 
    F77_FREE_CHARACTER(fparam);
-   F77_IMPORT_INTEGER(factval,*actval);
-   F77_IMPORT_CHARACTER_ARRAY_P(fvalues,fvalues_length,values,values_length,
-      *actval);
-   F77_FREE_CHARACTER(fvalues);
    F77_IMPORT_INTEGER(fstatus,*status);
+   if (*status == SAI__OK) {
+     F77_IMPORT_INTEGER(factval,*actval);
+     F77_IMPORT_CHARACTER_ARRAY_P(fvalues,fvalues_length,values,values_length,
+                                  *actval);
+   }
+   F77_FREE_CHARACTER(fvalues);
 
    return;
 }
@@ -1675,10 +1691,12 @@ DECLARE_INTEGER(fstatus);
                         TRAIL_ARG(fparam) );
 
    F77_FREE_CHARACTER(fparam);
-   F77_IMPORT_INTEGER(factval,*actval);
-   F77_IMPORT_DOUBLE_ARRAY(fvalues,values,*actval);
-   F77_FREE_DOUBLE(fvalues);
    F77_IMPORT_INTEGER(fstatus,*status);
+   if (*status == SAI__OK) {
+     F77_IMPORT_INTEGER(factval,*actval);
+     F77_IMPORT_DOUBLE_ARRAY(fvalues,values,*actval);
+   }
+   F77_FREE_DOUBLE(fvalues);
 
    return;
 }
@@ -1717,10 +1735,12 @@ DECLARE_INTEGER(fstatus);
                         TRAIL_ARG(fparam) );
 
    F77_FREE_CHARACTER(fparam);
-   F77_IMPORT_INTEGER(factval,*actval);
-   F77_IMPORT_INTEGER_ARRAY(fvalues,values,*actval);
-   F77_FREE_INTEGER(fvalues);
    F77_IMPORT_INTEGER(fstatus,*status);
+   if (*status == SAI__OK) {
+     F77_IMPORT_INTEGER(factval,*actval);
+     F77_IMPORT_INTEGER_ARRAY(fvalues,values,*actval);
+   }
+   F77_FREE_INTEGER(fvalues);
 
    return;
 }
@@ -1759,10 +1779,12 @@ DECLARE_INTEGER(fstatus);
                         TRAIL_ARG(fparam) );
 
    F77_FREE_CHARACTER(fparam);
-   F77_IMPORT_INTEGER(factval,*actval);
-   F77_IMPORT_LOGICAL_ARRAY(fvalues,values,*actval);
-   F77_FREE_LOGICAL(fvalues);
    F77_IMPORT_INTEGER(fstatus,*status);
+   if (*status == SAI__OK) {
+     F77_IMPORT_INTEGER(factval,*actval);
+     F77_IMPORT_LOGICAL_ARRAY(fvalues,values,*actval);
+   }
+   F77_FREE_LOGICAL(fvalues);
 
    return;
 }
@@ -1801,10 +1823,12 @@ DECLARE_INTEGER(fstatus);
                         TRAIL_ARG(fparam) );
 
    F77_FREE_CHARACTER(fparam);
-   F77_IMPORT_INTEGER(factval,*actval);
-   F77_IMPORT_REAL_ARRAY(fvalues,values,*actval);
-   F77_FREE_REAL(fvalues);
    F77_IMPORT_INTEGER(fstatus,*status);
+   if (*status == SAI__OK) {
+     F77_IMPORT_INTEGER(factval,*actval);
+     F77_IMPORT_REAL_ARRAY(fvalues,values,*actval);
+   }
+   F77_FREE_REAL(fvalues);
 
    return;
 }
@@ -1856,12 +1880,14 @@ int i,nvalues;
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_INTEGER(fmaxd);
-   F77_IMPORT_CHARACTER_ARRAY_P(fvalues,fvalues_length,values,values_length,
-      nvalues);
-   F77_FREE_CHARACTER(fvalues);
-   F77_IMPORT_INTEGER_ARRAY(factd,actd,ndim);
-   F77_FREE_INTEGER(factd);
    F77_IMPORT_INTEGER(fstatus,*status);
+   if (*status == SAI__OK) {
+     F77_IMPORT_CHARACTER_ARRAY_P(fvalues,fvalues_length,values,values_length,
+                                  nvalues);
+     F77_IMPORT_INTEGER_ARRAY(factd,actd,ndim);
+   }
+   F77_FREE_CHARACTER(fvalues);
+   F77_FREE_INTEGER(factd);
 
    return;
 }
@@ -1911,11 +1937,13 @@ int i,nvalues;
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_INTEGER(fmaxd);
-   F77_IMPORT_DOUBLE_ARRAY(fvalues,values,nvalues);
-   F77_FREE_DOUBLE(fvalues);
-   F77_IMPORT_INTEGER_ARRAY(factd,actd,ndim);
-   F77_FREE_INTEGER(factd);
    F77_IMPORT_INTEGER(fstatus,*status);
+   if (*status == SAI__OK) {
+     F77_IMPORT_DOUBLE_ARRAY(fvalues,values,nvalues);
+     F77_IMPORT_INTEGER_ARRAY(factd,actd,ndim);
+   }
+   F77_FREE_DOUBLE(fvalues);
+   F77_FREE_INTEGER(factd);
 
    return;
 }
@@ -1965,11 +1993,14 @@ int i,nvalues;
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_INTEGER(fmaxd);
-   F77_IMPORT_INTEGER_ARRAY(fvalues,values,nvalues);
-   F77_FREE_INTEGER(fvalues);
-   F77_IMPORT_INTEGER_ARRAY(factd,actd,ndim);
-   F77_FREE_INTEGER(factd);
    F77_IMPORT_INTEGER(fstatus,*status);
+   if (*status == SAI__OK) {
+     F77_IMPORT_INTEGER_ARRAY(fvalues,values,nvalues);
+     F77_IMPORT_INTEGER_ARRAY(factd,actd,ndim);
+   }
+   F77_FREE_INTEGER(fvalues);
+   F77_FREE_INTEGER(factd);
+
 
    return;
 }
@@ -2019,11 +2050,13 @@ int i,nvalues;
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_INTEGER(fmaxd);
-   F77_IMPORT_LOGICAL_ARRAY(fvalues,values,nvalues);
-   F77_FREE_LOGICAL(fvalues);
-   F77_IMPORT_INTEGER_ARRAY(factd,actd,ndim);
-   F77_FREE_INTEGER(factd);
    F77_IMPORT_INTEGER(fstatus,*status);
+   if (*status == SAI__OK) {
+     F77_IMPORT_LOGICAL_ARRAY(fvalues,values,nvalues);
+     F77_IMPORT_INTEGER_ARRAY(factd,actd,ndim);
+   }
+   F77_FREE_LOGICAL(fvalues);
+   F77_FREE_INTEGER(factd);
 
    return;
 }
@@ -2073,11 +2106,14 @@ int i,nvalues;
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_INTEGER(fmaxd);
-   F77_IMPORT_REAL_ARRAY(fvalues,values,nvalues);
-   F77_FREE_REAL(fvalues);
-   F77_IMPORT_INTEGER_ARRAY(factd,actd,ndim);
-   F77_FREE_INTEGER(factd);
    F77_IMPORT_INTEGER(fstatus,*status);
+   if (*status == SAI__OK) {
+     F77_IMPORT_REAL_ARRAY(fvalues,values,nvalues);
+     F77_IMPORT_INTEGER_ARRAY(factd,actd,ndim);
+   }
+   F77_FREE_REAL(fvalues);
+   F77_FREE_INTEGER(factd);
+
 
    return;
 }
@@ -2118,11 +2154,13 @@ DECLARE_INTEGER(fstatus);
                         TRAIL_ARG(fvalues) );
 
    F77_FREE_CHARACTER(fparam);
-   F77_IMPORT_INTEGER(factval,*actval);
-   F77_IMPORT_CHARACTER_ARRAY_P(fvalues,fvalues_length,values,values_length,
-      *actval);
-   F77_FREE_CHARACTER(fvalues);
    F77_IMPORT_INTEGER(fstatus,*status);
+   if (*status == SAI__OK) {
+     F77_IMPORT_INTEGER(factval,*actval);
+     F77_IMPORT_CHARACTER_ARRAY_P(fvalues,fvalues_length,values,values_length,
+                                  *actval);
+   }
+   F77_FREE_CHARACTER(fvalues);
 
    return;
 }
@@ -2161,10 +2199,12 @@ DECLARE_INTEGER(fstatus);
                         TRAIL_ARG(fparam) );
 
    F77_FREE_CHARACTER(fparam);
-   F77_IMPORT_INTEGER(factval,*actval);
-   F77_IMPORT_DOUBLE_ARRAY(fvalues,values,*actval);
-   F77_FREE_DOUBLE(fvalues);
    F77_IMPORT_INTEGER(fstatus,*status);
+   if (*status == SAI__OK) {
+     F77_IMPORT_INTEGER(factval,*actval);
+     F77_IMPORT_DOUBLE_ARRAY(fvalues,values,*actval);
+   }
+   F77_FREE_DOUBLE(fvalues);
 
    return;
 }
@@ -2203,10 +2243,12 @@ DECLARE_INTEGER(fstatus);
                         TRAIL_ARG(fparam) );
 
    F77_FREE_CHARACTER(fparam);
-   F77_IMPORT_INTEGER(factval,*actval);
-   F77_IMPORT_INTEGER_ARRAY(fvalues,values,*actval);
-   F77_FREE_INTEGER(fvalues);
    F77_IMPORT_INTEGER(fstatus,*status);
+   if (*status == SAI__OK) {
+     F77_IMPORT_INTEGER(factval,*actval);
+     F77_IMPORT_INTEGER_ARRAY(fvalues,values,*actval);
+   }
+   F77_FREE_INTEGER(fvalues);
 
    return;
 }
@@ -2245,10 +2287,12 @@ DECLARE_INTEGER(fstatus);
                         TRAIL_ARG(fparam) );
 
    F77_FREE_CHARACTER(fparam);
-   F77_IMPORT_INTEGER(factval,*actval);
-   F77_IMPORT_LOGICAL_ARRAY(fvalues,values,*actval);
-   F77_FREE_LOGICAL(fvalues);
    F77_IMPORT_INTEGER(fstatus,*status);
+   if (*status == SAI__OK) {
+     F77_IMPORT_INTEGER(factval,*actval);
+     F77_IMPORT_LOGICAL_ARRAY(fvalues,values,*actval);
+   }
+   F77_FREE_LOGICAL(fvalues);
 
    return;
 }
@@ -2287,10 +2331,12 @@ DECLARE_INTEGER(fstatus);
                         TRAIL_ARG(fparam) );
 
    F77_FREE_CHARACTER(fparam);
-   F77_IMPORT_INTEGER(factval,*actval);
-   F77_IMPORT_REAL_ARRAY(fvalues,values,*actval);
-   F77_FREE_REAL(fvalues);
    F77_IMPORT_INTEGER(fstatus,*status);
+   if (*status == SAI__OK) {
+     F77_IMPORT_INTEGER(factval,*actval);
+     F77_IMPORT_REAL_ARRAY(fvalues,values,*actval);
+   }
+   F77_FREE_REAL(fvalues);
 
    return;
 }
