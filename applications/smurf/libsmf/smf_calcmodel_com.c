@@ -170,6 +170,13 @@
 *     2010-12-14 (DSB):
 *        Use sqrt, not sqrtf (sqrtf can cause "inf" gain values for bad
 *        data, which then pollute all other gain values).
+*     2011-05-11 (DSB):
+*        Change COM to be the mean of the remaining bolometer values,
+*        without any scaling. Previously, the remaining bolometers were
+*        scaled using the inverse of the GAI model, before being added
+*        together to form COM, but this introduces a degeneracy between
+*        COM and GAI that could cause instabilities (i.e. high GAI*low
+*        COM is the same as low GAI*high COM).
 
 *  Copyright:
 *     Copyright (C) 2006-2010 University of British Columbia.
@@ -268,8 +275,6 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
   dim_t nsum;              /* Number of values summed in "sum" */
   dim_t ntslice;           /* number of time slices */
   smfCalcmodelComData *pdata=NULL; /* Pointer to job data */
-  double *pg;              /* Pointer to next gain value */
-  double *poff;            /* Pointer to next offset value */
   double *res_data;        /* Pointer to common residual data */
   double sum;              /* Running sum of values */
   size_t tstride;          /* time stride for res/qua */
@@ -434,10 +439,6 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
                status, pdata->operation, pdata->t1, pdata->t2 );
     smf_timerinit( &tv1, &tv2, status);
 
-    /*  Allocate work space. */
-    woff = astMalloc( sizeof( *woff )*( pdata->t2 - pdata->t1 + 1 ) );
-    wg = astMalloc( sizeof( *wg )*( pdata->t2 - pdata->t1 + 1 ) );
-
     /* Initialise the arrays if this is the first chunk. */
     if( idx == 0 ) {
       for( i = pdata->t1; i <= pdata->t2; i++ ) {
@@ -460,20 +461,14 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
          bolometer within the res_data and qua_data arrays. */
         ijindex += pdata->t1*tstride;
 
-        /* Get the bolometer's gain and offset for the required time slices. */
-        smf_gandoff( j, pdata->t1, pdata->t2, ntslice, gbstride, gcstride,
-                     gai_data, nblock, gain_box, wg, woff, status );
-
         /* Loop round all the time slices being processed by this thread. */
-        pg = wg;
-        poff = woff;
-        for( i = pdata->t1; i <= pdata->t2; i++,pg++,poff++ ) {
+        for( i = pdata->t1; i <= pdata->t2; i++ ) {
 
           /* Skip previously flagged samples or bolometers that have zero
              gain. Otherwise, increment the running sums. */
-          if( !( qua_data[ ijindex ] & SMF__Q_FIT ) && *pg != 0.0 &&
-               model_data[ i ] != VAL__BADD ) {
-            model_data[ i ] += ( res_data[ ijindex ] - *poff)/(*pg);
+          if( !( qua_data[ ijindex ] & SMF__Q_FIT ) &&
+                 model_data[ i ] != VAL__BADD ) {
+            model_data[ i ] += res_data[ ijindex ];
             weight[ i ]++;
           }
 
@@ -483,10 +478,6 @@ void smfCalcmodelComPar( void *job_data_ptr, int *status ) {
         }
       }
     }
-
-    /*  Free work space. */
-    woff = astFree( woff );
-    wg = astFree( wg );
 
     msgOutiff( SMF__TIMER_MSG, "",
                "smfCalcmodelComPar(%i): thread finishing tslices %zu -- %zu (%.3f sec)",
@@ -894,11 +885,8 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
     /* Calculate a new estimate of the common mode signal excluding
        blocks rejected on any previous passes round this loop. The new
-       common mode signal is the mean of the remaining scaled bolometer
-       data (scaled using the inverse of the previous linear fit). The
-       initial gain will have been set to the bolometer RMS value at
-       the same time that the old common mode was added back on to the
-       residuals (above). Initialize model data and weights to 0 */
+       common mode signal is the mean of the remaining bolometer data.
+       Initialize model data and weights to 0 */
     memset(model_data,0,(model->sdata[0]->dims)[0]*sizeof(*model_data));
     memset(weight,0,(model->sdata[0]->dims)[0]*sizeof(*weight));
 
