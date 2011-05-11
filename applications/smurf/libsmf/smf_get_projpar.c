@@ -91,6 +91,9 @@
 *        Allow pixel ref position (par[0] and par[1]) to be supplied via
 *        adam parameters REFPIX1 and REFPIX2, and write out the used
 *        pixel ref position to output parameter PIXREF.
+*     2011-05-10 (DSB):
+*        If REFPIX1 or REFPIX2 is null, ensure both par[0] and par[1]
+*        retain their original values.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -150,10 +153,11 @@ void smf_get_projpar( AstSkyFrame *skyframe, const double skyref[2],
    char usesys[ 41 ];    /* Output skyframe system */
    const char *deflat;   /* Default for REFLAT */
    const char *deflon;   /* Default for REFLON */
-   double autorot;       /* Autogrid default for CROTA parameter */
    const double fbpixsize = 6.0; /* Fallback pixel size if we have no other information */
+   double autorot;       /* Autogrid default for CROTA parameter */
    double defsize[ 2 ];  /* Default pixel sizes in arc-seconds */
    double pixsize[ 2 ];  /* Pixel sizes in arc-seconds */
+   double refpix[ 2 ];   /* New REFPIX values */
    double rdiam;         /* Diameter of bounding circle, in rads */
    int coin;             /* Are all points effectively co-incident? */
    int i;
@@ -299,11 +303,14 @@ void smf_get_projpar( AstSkyFrame *skyframe, const double skyref[2],
          parDef0d( "REFPIX1", par[ 0 ], status );
          parDef0d( "REFPIX2", par[ 1 ], status );
          if( *status == SAI__OK ) {
-            parGet0d( "REFPIX1", par + 0, status );
-            parGet0d( "REFPIX2", par + 1, status );
+            parGet0d( "REFPIX1", refpix + 0, status );
+            parGet0d( "REFPIX2", refpix + 1, status );
             if( *status == PAR__NULL ) {
                errAnnul( status );
                refine_crpix = 1;
+            } else {
+               par[ 0 ] = refpix[ 0 ];
+               par[ 1 ] = refpix[ 1 ];
             }
          }
 
