@@ -2347,6 +2347,30 @@ actually expands to the same thing as the macro
 but is included as it is more descriptive of
 what is being done when calling a FORTRAN routine from C\@.
 
+\subsection{Thread Safety}
+Fortran code is not thread-safe, and therefore any C code that calls
+Fortran code will not be thread-safe unless extra work is done to make it
+so. The \htmlref{\texttt{F77\_LOCK}}{F77_LOCK} macro is provided for this
+purpose. The argument to the macro is a block of code to be run. CNF
+defines a single global pthread mutex. The F77\_LOCK macro firsts locks this
+mutex, then executes the code specified in its argument, then unlocks the
+mutex. If another thread already has the mutex locked, then the calling
+thread will block until the mutex is unlocked.
+
+So any C code that may potentially need to be executed in a threaded
+context (for instance, C wrappers for Fortran subroutine libraries)
+should use the F77\_LOCK macro to invoke each Fortran call:
+
+{\small \begin{verbatim}
+    F77_LOCK ( F77_CALL(silly2)( REAL_ARG(&a), REAL_ARG(&b),
+                                 INTEGER_ARG(&i), INTEGER_ARG(&j),
+                                 CHARACTER_ARG(fline), INTEGER_ARG(&fline_l),
+                                 LOGICAL_ARG(&x) TRAIL_ARG(fline) ); )
+\end{verbatim} }
+
+If this is done consistently, then it ensures that no two threads will
+attempt to run any Fortran code simultaneously.
+
 \section{\xlabel{more_on_arrays}More on Arrays}
 For most data types arrays are handled simply, using pointers as already
 demonstrated. However, for arrays of some types the data in the arrays
@@ -4102,6 +4126,8 @@ REAL, BYTE, WORD, UBYTE, UWORD or POINTER.
    {Is this the FORTRAN logical value false?}
 \listroutine{F77\_ISTRUE}
    {Is this the FORTRAN logical value true?}
+\listroutine{F77\_LOCK}
+   {Prevents code from being run simultaneously in two separate threads}
 \listroutine{F77\_LOGICAL\_TYPE}
    {Define the C type corresponding to the FORTRAN type LOGICAL}
 \listroutine{F77\_NAMED\_COMMON}
@@ -4316,6 +4342,12 @@ REAL, BYTE, WORD, UBYTE, UWORD or POINTER.
    {Pass a FORTRAN-callable SUBROUTINE name as an argument to a FORTRAN routine}
 \listroutine{TRAIL\_ARG}
    {Pass the length of a CHARACTER argument to a FORTRAN routine}
+}
+
+\subsection{\xlabel{thread_safety}Thread Safety}
+\routinelist{
+\listroutine{F77\_LOCK}
+   {Prevents code from being run simultaneously in two separate threads}
 }
 
 \section{\xlabel{full_description_of_f77_macros}\label{f77_description}Full Description of F77 Macros}
@@ -6626,6 +6658,43 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
             value of this C macro depends on which FORTRAN compiler is
             being used.
       }
+   }
+}
+\sstmacro{
+   F77\_LOCK
+}{
+   Prevents code from being run simultaneously in two separate threads
+}{
+   \sstdescription{
+      Any C code that may need to be used in a threaded context
+      should use this macro should to prevent Fortran code being run
+      simultaneously in two separate threads, with consequent danger of
+      unsynchronised memory access. The macro locks the global CNF mutex,
+      then executes the code specified in the argument, and then unlocks
+      the mutex. If the mutex is currently locked by another thread (e.g.
+      due to the use of F77\_LOCK in the other thread), then the calling
+      thread blocks until the other thread releases the mutex.
+   }
+   \sstinvocation{
+      F77\_LOCK(code)
+   }
+   \sstarguments{
+      \sstsubsection{
+         code
+      }{
+         Any arbitrary C code. Typically, this will be an invocation of a
+         Fortran subroutine.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         F77\_LOCK( result = F77\_CALL(sim)( nel, data, status ); )
+      }{
+      }
+   }
+   \sstnotes{
+      This macro invokes the cnfLock and cnfUnlock functions to lock and
+      unlock the global mutex.
    }
 }
 \sstmacro{

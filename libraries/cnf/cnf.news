@@ -1,5 +1,12 @@
 1 CNF_update
 
+ CNF Version 5.0
+
+ o New macro F77_LOCK allows invocation of Fortran code from C to be
+   synchronised using a mutex. Consistent use of F77_LOCK within the C
+   wrappers for Fortran libraries means that no two threads will ever
+   attempt to execute any of the wrapped Fortran code simultanously.
+
  CNF Version 4.3
 
  o New function CNF_CVAL, this converts a Fortran integer into the

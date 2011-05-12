@@ -292,11 +292,11 @@ void slaAddet ( double rm, double dm, double eq, double *rc, double *dc ) {
    RM = rm;
    DM = dm;
    EQ = eq;
-   F77_CALL(sla_addet)( DOUBLE_ARG(&RM),
+   F77_LOCK( F77_CALL(sla_addet)( DOUBLE_ARG(&RM),
                         DOUBLE_ARG(&DM),
                         DOUBLE_ARG(&EQ),
                         DOUBLE_ARG(&RC),
-                        DOUBLE_ARG(&DC) );
+                        DOUBLE_ARG(&DC) ); )
    *rc = RC;
    *dc = DC;
 }
@@ -319,11 +319,11 @@ void slaAmpqk ( double ra, double da, double amprms[21],
    RA = ra;
    DA = da;
    for ( i = 0; i < 21; i++ ) AMPRMS[ i ] = amprms[ i ];
-   F77_CALL(sla_ampqk)( DOUBLE_ARG(&RA),
+   F77_LOCK( F77_CALL(sla_ampqk)( DOUBLE_ARG(&RA),
                         DOUBLE_ARG(&DA),
                         DOUBLE_ARRAY_ARG(AMPRMS),
                         DOUBLE_ARG(&RM),
-                        DOUBLE_ARG(&DM) );
+                        DOUBLE_ARG(&DM) ); )
    *rm = RM;
    *dm = DM;
 }
@@ -334,7 +334,7 @@ double slaAirmas( double zd ) {
   DECLARE_DOUBLE(ZD);
   double result;
   ZD = zd;
-  result = F77_CALL(sla_airmas)( DOUBLE_ARG(&ZD) );
+  F77_LOCK( result = F77_CALL(sla_airmas)( DOUBLE_ARG(&ZD) ); )
   return result;
 }
 
@@ -353,11 +353,11 @@ void slaCaldj ( int iy, int im, int id, double *djm, int *j ) {
    IY = iy;
    IM = im;
    ID = id;
-   F77_CALL(sla_caldj)( INTEGER_ARG(&IY),
+   F77_LOCK( F77_CALL(sla_caldj)( INTEGER_ARG(&IY),
                         INTEGER_ARG(&IM),
                         INTEGER_ARG(&ID),
                         DOUBLE_ARG(&DJM),
-                        INTEGER_ARG(&J) );
+                        INTEGER_ARG(&J) ); )
    *djm = DJM;
    *j = J;
 }
@@ -377,11 +377,11 @@ void slaDaf2r ( int ideg, int iamin, double asec, double *rad, int *j ) {
    IDEG = ideg;
    IAMIN = iamin;
    ASEC = asec;
-   F77_CALL(sla_daf2r)( INTEGER_ARG(&IDEG),
+   F77_LOCK( F77_CALL(sla_daf2r)( INTEGER_ARG(&IDEG),
                         INTEGER_ARG(&IAMIN),
                         DOUBLE_ARG(&ASEC),
                         DOUBLE_ARG(&RAD),
-                        INTEGER_ARG(&J) );
+                        INTEGER_ARG(&J) ); )
    *rad = RAD;
    *j = J;
 }
@@ -395,8 +395,8 @@ void slaDav2m ( double axvec[3], double rmat[3][3] ) {
    int i;
    int j;
    for ( i = 0; i < 3; i++ ) AXVEC[ i ] = axvec[ i ];
-   F77_CALL(sla_dav2m)( DOUBLE_ARRAY_ARG(AXVEC),
-                        DOUBLE_ARRAY_ARG(RMAT) );
+   F77_LOCK( F77_CALL(sla_dav2m)( DOUBLE_ARRAY_ARG(AXVEC),
+                        DOUBLE_ARRAY_ARG(RMAT) ); )
    for ( i = 0; i < 3; i++ ) {
       for ( j = 0; j < 3; j++ ) rmat[ i ][ j ] = RMAT[ i + 3 * j ];
    }
@@ -412,9 +412,9 @@ void slaDcc2s ( double v[3], double *a, double *b ) {
    DECLARE_DOUBLE(B);
    int i;
    for ( i = 0; i < 3; i++ ) V[ i ] = v[ i ];
-   F77_CALL(sla_dcc2s)( DOUBLE_ARRAY_ARG(V),
+   F77_LOCK( F77_CALL(sla_dcc2s)( DOUBLE_ARRAY_ARG(V),
                         DOUBLE_ARG(&A),
-                        DOUBLE_ARG(&B) );
+                        DOUBLE_ARG(&B) ); )
    *a = A;
    *b = B;
 }
@@ -430,9 +430,9 @@ void slaDcs2c ( double a, double b, double v[3] ) {
    int i;
    A = a;
    B = b;
-   F77_CALL(sla_dcs2c)( DOUBLE_ARG(&A),
+   F77_LOCK( F77_CALL(sla_dcs2c)( DOUBLE_ARG(&A),
                         DOUBLE_ARG(&B),
-                        DOUBLE_ARRAY_ARG(V) );
+                        DOUBLE_ARRAY_ARG(V) ); )
    for ( i = 0; i < 3; i++ ) v[ i ] = V[ i ];
 }
 
@@ -451,11 +451,11 @@ void slaDd2tf ( int ndp, double days, char *sign, int ihmsf[4] ) {
 
    NDP = ndp;
    DAYS = days;
-   F77_CALL(sla_dd2tf)( INTEGER_ARG(&NDP),
+   F77_LOCK( F77_CALL(sla_dd2tf)( INTEGER_ARG(&NDP),
                         DOUBLE_ARG(&DAYS),
                         CHARACTER_ARG(SIGN),
                         INTEGER_ARRAY_ARG(IHMSF)
-                        TRAIL_ARG(SIGN) );
+                        TRAIL_ARG(SIGN) ); )
    sign[0] = SIGN[0];
    sign[1] = 0;
    for ( i = 0; i < 4; i++ ) ihmsf[ i ] = IHMSF[ i ];
@@ -477,11 +477,11 @@ slaDr2tf( int ndp, double angle, char * sign, int ihmsf[4] )  {
 
   NDP = ndp;
   ANGLE = angle;
-  F77_CALL(sla_dr2tf)( INTEGER_ARG(&NDP),
+  F77_LOCK( F77_CALL(sla_dr2tf)( INTEGER_ARG(&NDP),
 		       DOUBLE_ARG(&ANGLE),
 		       CHARACTER_ARG(SIGN),
 		       INTEGER_ARRAY_ARG(IHMSF)
-		       TRAIL_ARG(SIGN) );
+		       TRAIL_ARG(SIGN) ); )
   sign[0] = SIGN[0];
   sign[1] = 0;
   for ( i = 0; i < 4; i++ ) ihmsf[ i ] = IHMSF[ i ];
@@ -503,11 +503,11 @@ slaDr2af( int ndp, double angle, char * sign, int idmsf[4] )  {
 
   NDP = ndp;
   ANGLE = angle;
-  F77_CALL(sla_dr2af)( INTEGER_ARG(&NDP),
+  F77_LOCK( F77_CALL(sla_dr2af)( INTEGER_ARG(&NDP),
 		       DOUBLE_ARG(&ANGLE),
 		       CHARACTER_ARG(SIGN),
 		       INTEGER_ARRAY_ARG(IDMSF)
-		       TRAIL_ARG(SIGN) );
+		       TRAIL_ARG(SIGN) ); )
   sign[0] = SIGN[0];
   sign[1] = 0;
   for ( i = 0; i < 4; i++ ) idmsf[ i ] = IDMSF[ i ];
@@ -527,9 +527,9 @@ void slaDimxv ( double dm[3][3], double va[3], double vb[3] ) {
       for ( j = 0; j < 3; j++ ) DM[ i + j * 3 ] = dm[ i ][ j ];
       VA[ i ] = va[ i ];
    }
-   F77_CALL(sla_dimxv)( DOUBLE_ARRAY_ARG(DM),
+   F77_LOCK( F77_CALL(sla_dimxv)( DOUBLE_ARRAY_ARG(DM),
                         DOUBLE_ARRAY_ARG(VA),
-                        DOUBLE_ARRAY_ARG(VB) );
+                        DOUBLE_ARRAY_ARG(VB) ); )
    for ( i = 0; i < 3; i++ ) vb[ i ] = VB[ i ];
 }
 
@@ -547,10 +547,10 @@ void slaDjcal ( int ndp, double djm, int iymdf[ 4 ], int *j ) {
 
    NDP = ndp;
    DJM = djm;
-   F77_CALL(sla_djcal)( INTEGER_ARG(&NDP),
+   F77_LOCK( F77_CALL(sla_djcal)( INTEGER_ARG(&NDP),
                         DOUBLE_ARG(&DJM),
                         INTEGER_ARRAY_ARG(IYMDF),
-                        INTEGER_ARG(&J) );
+                        INTEGER_ARG(&J) ); )
    for ( i = 0; i < 4; i++ ) iymdf[ i ] = IYMDF[ i ];
    *j = J;
 }
@@ -571,12 +571,12 @@ void slaDjcl ( double djm, int *iy, int *im, int *id, double *fd, int *j ) {
    DECLARE_INTEGER(J);
 
    DJM = djm;
-   F77_CALL(sla_djcl)( DOUBLE_ARG(&DJM),
+   F77_LOCK( F77_CALL(sla_djcl)( DOUBLE_ARG(&DJM),
                        INTEGER_ARG(&IY),
                        INTEGER_ARG(&IM),
                        INTEGER_ARG(&ID),
                        DOUBLE_ARG(&FD),
-                       INTEGER_ARG(&J) );
+                       INTEGER_ARG(&J) ); )
    *iy = IY;
    *im = IM;
    *id = ID;
@@ -613,9 +613,9 @@ void slaDmat ( int n, double *a, double *y, double *d, int *jf, int *iw ) {
          for ( j = 0; j < n; j++ ) A[ i + n * j ] = a[ n * i + j ];
          Y[ i ] = y[ i ];
       }
-      F77_CALL(sla_dmat)( INTEGER_ARG(&N), DOUBLE_ARRAY_ARG(A),
+      F77_LOCK( F77_CALL(sla_dmat)( INTEGER_ARG(&N), DOUBLE_ARRAY_ARG(A),
                           DOUBLE_ARRAY_ARG(Y), DOUBLE_ARG(&D),
-                          INTEGER_ARG(&JF), INTEGER_ARG(IW) );
+                          INTEGER_ARG(&JF), INTEGER_ARG(IW) ); )
       for ( i = 0; i < n; i++ ) {
          for ( j = 0; j < n; j++ ) a[ n * i + j ] = A[ i + n * j ];
          y[ i ] = Y[ i ];
@@ -644,9 +644,9 @@ void slaDmxm ( double a[3][3], double b[3][3], double c[3][3] ) {
          B[ i + 3 * j ] = b[ i ][ j ];
       }
    }
-   F77_CALL(sla_dmxm)( DOUBLE_ARRAY_ARG(A),
+   F77_LOCK( F77_CALL(sla_dmxm)( DOUBLE_ARRAY_ARG(A),
                        DOUBLE_ARRAY_ARG(B),
-                       DOUBLE_ARRAY_ARG(C) );
+                       DOUBLE_ARRAY_ARG(C) ); )
    for ( i = 0; i < 3; i++ ) {
       for ( j = 0; j < 3; j++ ) c[ i ][ j ] = C[ i + 3 * j ];
    }
@@ -666,9 +666,9 @@ void slaDmxv ( double dm[3][3], double va[3], double vb[3] ) {
       for ( j = 0; j < 3; j++ ) DM[ i + 3 * j ] = dm[ i ][ j ];
       VA[ i ] = va[ i ];
    }
-   F77_CALL(sla_dmxv)( DOUBLE_ARRAY_ARG(DM),
+   F77_LOCK( F77_CALL(sla_dmxv)( DOUBLE_ARRAY_ARG(DM),
                        DOUBLE_ARRAY_ARG(VA),
-                       DOUBLE_ARRAY_ARG(VB) );
+                       DOUBLE_ARRAY_ARG(VB) ); )
    for ( i = 0; i < 3; i++ ) vb[ i ] = VB[ i ];
 }
 
@@ -685,8 +685,8 @@ double slaDbear ( double a1, double b1, double a2, double b2  ) {
    B1 = b1;
    A2 = a2;
    B2 = b2;
-   result = F77_CALL(sla_dbear)( DOUBLE_ARG(&A1), DOUBLE_ARG(&B1),
-                                 DOUBLE_ARG(&A2), DOUBLE_ARG(&B2) );
+   F77_LOCK( result = F77_CALL(sla_dbear)( DOUBLE_ARG(&A1), DOUBLE_ARG(&B1),
+                                 DOUBLE_ARG(&A2), DOUBLE_ARG(&B2) ); )
    return result;
 }
 
@@ -696,7 +696,7 @@ double slaDrange ( double angle ) {
    DECLARE_DOUBLE(ANGLE);
    double result;
    ANGLE = angle;
-   result = F77_CALL(sla_drange)( DOUBLE_ARG(&ANGLE) );
+   F77_LOCK( result = F77_CALL(sla_drange)( DOUBLE_ARG(&ANGLE) ); )
    return result;
 }
 
@@ -706,7 +706,7 @@ double slaDranrm ( double angle ) {
    DECLARE_DOUBLE(ANGLE);
    double result;
    ANGLE = angle;
-   result = F77_CALL(sla_dranrm)( DOUBLE_ARG(&ANGLE) );
+   F77_LOCK( result = F77_CALL(sla_dranrm)( DOUBLE_ARG(&ANGLE) ); )
    return result;
 }
 
@@ -725,10 +725,10 @@ double slaDsep ( double a1, double b1, double a2, double b2 ) {
    B1 = b1;
    A2 = a2;
    B2 = b2;
-   result = F77_CALL(sla_dsep)( DOUBLE_ARG(&A1),
+   F77_LOCK( result = F77_CALL(sla_dsep)( DOUBLE_ARG(&A1),
                                 DOUBLE_ARG(&B1),
                                 DOUBLE_ARG(&A2),
-                                DOUBLE_ARG(&B2) );
+                                DOUBLE_ARG(&B2) ); )
    return result;
 }
 
@@ -752,13 +752,13 @@ void slaDs2tp ( double ra, double dec, double raz, double decz, double * xi, dou
   F77_EXPORT_DOUBLE(raz, RAZ);
   F77_EXPORT_DOUBLE(decz, DECZ);
 
-  F77_CALL(sla_ds2tp)( DOUBLE_ARG(&RA),
+  F77_LOCK( F77_CALL(sla_ds2tp)( DOUBLE_ARG(&RA),
                        DOUBLE_ARG(&DEC),
                        DOUBLE_ARG(&RAZ),
                        DOUBLE_ARG(&DECZ),
                        DOUBLE_ARG(&XI),
                        DOUBLE_ARG(&ETA),
-                       INTEGER_ARG(&J) );
+                       INTEGER_ARG(&J) ); )
 
   F77_IMPORT_DOUBLE(XI, *xi);
   F77_IMPORT_DOUBLE(ETA, *eta);
@@ -778,8 +778,8 @@ double slaDvdv( double va[3], double vb[3] ) {
       VA[ i ] = va[ i ];
       VB[ i ] = vb[ i ];
    }
-   result = F77_CALL(sla_dvdv)( DOUBLE_ARRAY_ARG(VA),
-                                DOUBLE_ARRAY_ARG(VB) );
+   F77_LOCK( result = F77_CALL(sla_dvdv)( DOUBLE_ARRAY_ARG(VA),
+                                DOUBLE_ARRAY_ARG(VB) ); )
    return result;
 }
 
@@ -798,11 +798,11 @@ void slaDtf2d ( int ihour, int imin, double sec, double *days, int *j ) {
    IHOUR = ihour;
    IMIN = imin;
    SEC = sec;
-   F77_CALL(sla_dtf2d)( INTEGER_ARG(&IHOUR),
+   F77_LOCK( F77_CALL(sla_dtf2d)( INTEGER_ARG(&IHOUR),
                         INTEGER_ARG(&IMIN),
                         DOUBLE_ARG(&SEC),
                         DOUBLE_ARG(&DAYS),
-                        INTEGER_ARG(&J) );
+                        INTEGER_ARG(&J) ); )
    *days = DAYS;
    *j = J;
 }
@@ -822,11 +822,11 @@ void slaDtf2r ( int ihour, int imin, double sec, double *rad, int *j ) {
    IHOUR = ihour;
    IMIN = imin;
    SEC = sec;
-   F77_CALL(sla_dtf2r)( INTEGER_ARG(&IHOUR),
+   F77_LOCK( F77_CALL(sla_dtf2r)( INTEGER_ARG(&IHOUR),
                         INTEGER_ARG(&IMIN),
                         DOUBLE_ARG(&SEC),
                         DOUBLE_ARG(&RAD),
-                        INTEGER_ARG(&J) );
+                        INTEGER_ARG(&J) ); )
    *rad = RAD;
    *j = J;
 }
@@ -838,7 +838,7 @@ double slaDt ( double epoch )
     DECLARE_DOUBLE(EPOCH);
     double result;
     EPOCH = epoch;
-    result = F77_CALL(sla_dt)( DOUBLE_ARG(&EPOCH) );
+    F77_LOCK( result = F77_CALL(sla_dt)( DOUBLE_ARG(&EPOCH) ); )
     return result;
 }
 
@@ -852,9 +852,9 @@ void slaDvn ( double v[3], double uv[3], double *vm ) {
    DECLARE_DOUBLE(VM);
    int i;
    for ( i = 0; i < 3; i++ ) V[ i ] = v[ i ];
-   F77_CALL(sla_dvn)( DOUBLE_ARRAY_ARG(V),
+   F77_LOCK( F77_CALL(sla_dvn)( DOUBLE_ARRAY_ARG(V),
                       DOUBLE_ARRAY_ARG(UV),
-                      DOUBLE_ARG(&VM) );
+                      DOUBLE_ARG(&VM) ); )
    for ( i = 0; i < 3; i++ ) uv[ i ] = UV[ i ];
    *vm = VM;
 }
@@ -872,9 +872,9 @@ void slaDvxv ( double va[3], double vb[3], double vc[3] ) {
       VA[ i ] = va[ i ];
       VB[ i ] = vb[ i ];
    }
-   F77_CALL(sla_dvxv)( DOUBLE_ARRAY_ARG(VA),
+   F77_LOCK( F77_CALL(sla_dvxv)( DOUBLE_ARRAY_ARG(VA),
                        DOUBLE_ARRAY_ARG(VB),
-                       DOUBLE_ARRAY_ARG(VC) );
+                       DOUBLE_ARRAY_ARG(VC) ); )
    for ( i = 0; i < 3; i++ ) vc[ i ] = VC[ i ];
 }
 
@@ -887,8 +887,8 @@ void slaEcmat ( double date, double rmat[3][3] ) {
    int i;
    int j;
    DATE = date;
-   F77_CALL(sla_ecmat)( DOUBLE_ARG(&DATE),
-                        DOUBLE_ARRAY_ARG(RMAT) );
+   F77_LOCK( F77_CALL(sla_ecmat)( DOUBLE_ARG(&DATE),
+                        DOUBLE_ARRAY_ARG(RMAT) ); )
    for ( i = 0; i < 3; i++ ) {
       for ( j = 0; j < 3; j++ ) rmat[ i ][ j ] = RMAT[ i + 3 * j ];
    }
@@ -900,7 +900,7 @@ double slaEpb ( double date ) {
    DECLARE_DOUBLE(DATE);
    double result;
    DATE = date;
-   result = F77_CALL(sla_epb)( DOUBLE_ARG(&DATE) );
+   F77_LOCK( result = F77_CALL(sla_epb)( DOUBLE_ARG(&DATE) ); )
    return result;
 }
 
@@ -910,7 +910,7 @@ double slaEpb2d ( double epb ) {
    DECLARE_DOUBLE(EPB);
    double result;
    EPB = epb;
-   result = F77_CALL(sla_epb2d)( DOUBLE_ARG(&EPB) );
+   F77_LOCK( result = F77_CALL(sla_epb2d)( DOUBLE_ARG(&EPB) ); )
    return result;
 }
 
@@ -920,7 +920,7 @@ double slaEpj ( double date ) {
    DECLARE_DOUBLE(DATE);
    double result;
    DATE = date;
-   result = F77_CALL(sla_epj)( DOUBLE_ARG(&DATE) );
+   F77_LOCK( result = F77_CALL(sla_epj)( DOUBLE_ARG(&DATE) ); )
    return result;
 }
 
@@ -930,7 +930,7 @@ double slaEpj2d ( double epj ) {
    DECLARE_DOUBLE(EPJ);
    double result;
    EPJ = epj;
-   result = F77_CALL(sla_epj2d)( DOUBLE_ARG(&EPJ) );
+   F77_LOCK( result = F77_CALL(sla_epj2d)( DOUBLE_ARG(&EPJ) ); )
    return result;
 }
 
@@ -940,7 +940,7 @@ double slaEqeqx ( double date ) {
    DECLARE_DOUBLE(DATE);
    double result;
    DATE = date;
-   result = F77_CALL(sla_eqeqx)( DOUBLE_ARG(&DATE) );
+   F77_LOCK( result = F77_CALL(sla_eqeqx)( DOUBLE_ARG(&DATE) ); )
    return result;
 }
 
@@ -956,10 +956,10 @@ void slaEqgal ( double dr, double dd, double *dl, double *db ) {
    DECLARE_DOUBLE(DB);
    DR = dr;
    DD = dd;
-   F77_CALL(sla_eqgal)( DOUBLE_ARG(&DR),
+   F77_LOCK( F77_CALL(sla_eqgal)( DOUBLE_ARG(&DR),
                         DOUBLE_ARG(&DD),
                         DOUBLE_ARG(&DL),
-                        DOUBLE_ARG(&DB) );
+                        DOUBLE_ARG(&DB) ); )
    *dl = DL;
    *db = DB;
 }
@@ -980,11 +980,11 @@ void slaFk45z ( double r1950, double d1950, double bepoch,
    R1950 = r1950;
    D1950 = d1950;
    BEPOCH = bepoch;
-   F77_CALL(sla_fk45z)( DOUBLE_ARG(&R1950),
+   F77_LOCK( F77_CALL(sla_fk45z)( DOUBLE_ARG(&R1950),
                         DOUBLE_ARG(&D1950),
                         DOUBLE_ARG(&BEPOCH),
                         DOUBLE_ARG(&R2000),
-                        DOUBLE_ARG(&D2000) );
+                        DOUBLE_ARG(&D2000) ); )
    *r2000 = R2000;
    *d2000 = D2000;
 }
@@ -1010,13 +1010,13 @@ void slaFk54z ( double r2000, double d2000, double bepoch,
    R2000 = r2000;
    D2000 = d2000;
    BEPOCH = bepoch;
-   F77_CALL(sla_fk54z)( DOUBLE_ARG(&R2000),
+   F77_LOCK( F77_CALL(sla_fk54z)( DOUBLE_ARG(&R2000),
                         DOUBLE_ARG(&D2000),
                         DOUBLE_ARG(&BEPOCH),
                         DOUBLE_ARG(&R1950),
                         DOUBLE_ARG(&D1950),
                         DOUBLE_ARG(&DR1950),
-                        DOUBLE_ARG(&DD1950) );
+                        DOUBLE_ARG(&DD1950) ); )
    *r1950 = R1950;
    *d1950 = D1950;
    *dr1950 = DR1950;
@@ -1035,10 +1035,10 @@ void slaGaleq ( double dl, double db, double *dr, double *dd ) {
    DECLARE_DOUBLE(DD);
    DL = dl;
    DB = db;
-   F77_CALL(sla_galeq)( DOUBLE_ARG(&DL),
+   F77_LOCK( F77_CALL(sla_galeq)( DOUBLE_ARG(&DL),
                         DOUBLE_ARG(&DB),
                         DOUBLE_ARG(&DR),
-                        DOUBLE_ARG(&DD) );
+                        DOUBLE_ARG(&DD) ); )
    *dr = DR;
    *dd = DD;
 }
@@ -1055,10 +1055,10 @@ void slaGalsup ( double dl, double db, double *dsl, double *dsb ) {
    DECLARE_DOUBLE(DSB);
    DL = dl;
    DB = db;
-   F77_CALL(sla_galsup)( DOUBLE_ARG(&DL),
+   F77_LOCK( F77_CALL(sla_galsup)( DOUBLE_ARG(&DL),
                          DOUBLE_ARG(&DB),
                          DOUBLE_ARG(&DSL),
-                         DOUBLE_ARG(&DSB) );
+                         DOUBLE_ARG(&DSB) ); )
    *dsl = DSL;
    *dsb = DSB;
 }
@@ -1069,7 +1069,7 @@ double slaGmst ( double ut1 ) {
    DECLARE_DOUBLE(UT1);
    double result;
    UT1 = ut1;
-   result = F77_CALL(sla_gmst)( DOUBLE_ARG(&UT1) );
+   F77_LOCK( result = F77_CALL(sla_gmst)( DOUBLE_ARG(&UT1) ); )
    return result;
 }
 
@@ -1084,9 +1084,9 @@ void slaMappa ( double eq, double date, double amprms[21] ) {
    int i;
    EQ = eq;
    DATE = date;
-   F77_CALL(sla_mappa)( DOUBLE_ARG(&EQ),
+   F77_LOCK( F77_CALL(sla_mappa)( DOUBLE_ARG(&EQ),
                         DOUBLE_ARG(&DATE),
-                        DOUBLE_ARRAY_ARG(AMPRMS) );
+                        DOUBLE_ARRAY_ARG(AMPRMS) ); )
    for ( i = 0; i < 21; i++ ) amprms[ i ] = AMPRMS[ i ];
 }
 
@@ -1121,7 +1121,7 @@ slaMap( double rm, double dm, double pr, double pd, double px,
   F77_EXPORT_DOUBLE(eq,EQ);
   F77_EXPORT_DOUBLE(date,DATE);
 
-  F77_CALL(sla_map)( DOUBLE_ARG(&RM),
+  F77_LOCK( F77_CALL(sla_map)( DOUBLE_ARG(&RM),
 		     DOUBLE_ARG(&DM),
 		     DOUBLE_ARG(&PR),
 		     DOUBLE_ARG(&PD),
@@ -1131,7 +1131,7 @@ slaMap( double rm, double dm, double pr, double pd, double px,
 		     DOUBLE_ARG(&DATE),
 		     DOUBLE_ARG(&RA),
 		     DOUBLE_ARG(&DA)
-		     );
+		     ); )
 
 
   F77_IMPORT_DOUBLE(RA, *ra);
@@ -1156,11 +1156,11 @@ void slaMapqkz ( double rm, double dm, double amprms[21],
    RM = rm;
    DM = dm;
    for ( i = 0; i < 21; i++ ) AMPRMS[ i ] = amprms[ i ];
-   F77_CALL(sla_mapqkz)( DOUBLE_ARG(&RM),
+   F77_LOCK( F77_CALL(sla_mapqkz)( DOUBLE_ARG(&RM),
                          DOUBLE_ARG(&DM),
                          DOUBLE_ARRAY_ARG(AMPRMS),
                          DOUBLE_ARG(&RA),
-                         DOUBLE_ARG(&DA) );
+                         DOUBLE_ARG(&DA) ); )
    *ra = RA;
    *da = DA;
 }
@@ -1177,9 +1177,9 @@ void slaPrebn ( double bep0, double bep1, double rmatp[3][3] ) {
    int j;
    BEP0 = bep0;
    BEP1 = bep1;
-   F77_CALL(sla_prebn)( DOUBLE_ARG(&BEP0),
+   F77_LOCK( F77_CALL(sla_prebn)( DOUBLE_ARG(&BEP0),
                         DOUBLE_ARG(&BEP1),
-                        DOUBLE_ARRAY_ARG(RMATP) );
+                        DOUBLE_ARRAY_ARG(RMATP) ); )
    for ( i = 0; i < 3; i++ ) {
       for ( j = 0; j < 3; j++ ) rmatp[ i ][ j ] = RMATP[ i + 3 * j ];
    }
@@ -1197,9 +1197,9 @@ void slaPrec ( double ep0, double ep1, double rmatp[3][3] ) {
    int j;
    EP0 = ep0;
    EP1 = ep1;
-   F77_CALL(sla_prec)( DOUBLE_ARG(&EP0),
+   F77_LOCK( F77_CALL(sla_prec)( DOUBLE_ARG(&EP0),
                        DOUBLE_ARG(&EP1),
-                       DOUBLE_ARRAY_ARG(RMATP) );
+                       DOUBLE_ARRAY_ARG(RMATP) ); )
    for ( i = 0; i < 3; i++ ) {
       for ( j = 0; j < 3; j++ ) rmatp[ i ][ j ] = RMATP[ i + 3 * j ];
    }
@@ -1220,10 +1220,10 @@ float slaRverot ( float phi, float ra, float dec, float st ) {
    RA = ra;
    DEC = dec;
    ST = st;
-   result = F77_CALL(sla_rverot)( REAL_ARG(&PHI),
+   F77_LOCK( result = F77_CALL(sla_rverot)( REAL_ARG(&PHI),
                                   REAL_ARG(&RA),
                                   REAL_ARG(&DEC),
-                                  REAL_ARG(&ST) );
+                                  REAL_ARG(&ST) ); )
    return result;
 }
 
@@ -1236,8 +1236,8 @@ float slaRvgalc ( float ra, float dec ) {
    float result;
    RA = ra;
    DEC = dec;
-   result = F77_CALL(sla_rvgalc)( REAL_ARG(&RA),
-                                  REAL_ARG(&DEC) );
+   F77_LOCK( result = F77_CALL(sla_rvgalc)( REAL_ARG(&RA),
+                                  REAL_ARG(&DEC) ); )
    return result;
 }
 
@@ -1250,8 +1250,8 @@ float slaRvlg ( float ra, float dec ) {
    float result;
    RA = ra;
    DEC = dec;
-   result = F77_CALL(sla_rvlg)( REAL_ARG(&RA),
-                                REAL_ARG(&DEC) );
+   F77_LOCK( result = F77_CALL(sla_rvlg)( REAL_ARG(&RA),
+                                REAL_ARG(&DEC) ); )
    return result;
 }
 
@@ -1264,8 +1264,8 @@ float slaRvlsrd ( float ra, float dec ) {
    float result;
    RA = ra;
    DEC = dec;
-   result = F77_CALL(sla_rvlsrd)( REAL_ARG(&RA),
-                                  REAL_ARG(&DEC) );
+   F77_LOCK( result = F77_CALL(sla_rvlsrd)( REAL_ARG(&RA),
+                                  REAL_ARG(&DEC) ); )
    return result;
 }
 
@@ -1278,8 +1278,8 @@ float slaRvlsrk ( float ra, float dec ) {
    float result;
    RA = ra;
    DEC = dec;
-   result = F77_CALL(sla_rvlsrk)( REAL_ARG(&RA),
-                                  REAL_ARG(&DEC) );
+   F77_LOCK( result = F77_CALL(sla_rvlsrk)( REAL_ARG(&RA),
+                                  REAL_ARG(&DEC) ); )
    return result;
 }
 
@@ -1299,11 +1299,11 @@ void slaSubet ( double rc, double dc, double eq, double *rm, double *dm ) {
    RC = rc;
    DC = dc;
    EQ = eq;
-   F77_CALL(sla_subet)( DOUBLE_ARG(&RC),
+   F77_LOCK( F77_CALL(sla_subet)( DOUBLE_ARG(&RC),
                         DOUBLE_ARG(&DC),
                         DOUBLE_ARG(&EQ),
                         DOUBLE_ARG(&RM),
-                        DOUBLE_ARG(&DM) );
+                        DOUBLE_ARG(&DM) ); )
    *rm = RM;
    *dm = DM;
 }
@@ -1320,10 +1320,10 @@ void slaSupgal ( double dsl, double dsb, double *dl, double *db ) {
    DECLARE_DOUBLE(DB);
    DSL = dsl;
    DSB = dsb;
-   F77_CALL(sla_supgal)( DOUBLE_ARG(&DSL),
+   F77_LOCK( F77_CALL(sla_supgal)( DOUBLE_ARG(&DSL),
                          DOUBLE_ARG(&DSB),
                          DOUBLE_ARG(&DL),
-                         DOUBLE_ARG(&DB) );
+                         DOUBLE_ARG(&DB) ); )
    *dl = DL;
    *db = DB;
 }
@@ -1372,7 +1372,7 @@ void slaSvd ( int m, int n, int mp, int np,
          for ( j = 0; j < n; j++ ) A[ i + mp * j ] = a[ np * i + j ];
       }
 
-      F77_CALL(sla_svd)( INTEGER_ARG(&M),
+      F77_LOCK( F77_CALL(sla_svd)( INTEGER_ARG(&M),
                          INTEGER_ARG(&N),
                          INTEGER_ARG(&MP),
                          INTEGER_ARG(&NP),
@@ -1380,7 +1380,7 @@ void slaSvd ( int m, int n, int mp, int np,
                          DOUBLE_ARRAY_ARG(W),
                          DOUBLE_ARRAY_ARG(V),
                          DOUBLE_ARRAY_ARG(WORK),
-                         INTEGER_ARG(&JSTAT) );
+                         INTEGER_ARG(&JSTAT) ); )
 
 
       for ( i = 0; i < m; i++ ) {
@@ -1453,7 +1453,7 @@ void slaSvdsol ( int m, int n, int mp, int np,
          for ( j = 0; j < n; j++ ) V[ i + np * j ] = v[ np * i + j ];
       }
 
-      F77_CALL(sla_svdsol)( INTEGER_ARG(&M),
+      F77_LOCK( F77_CALL(sla_svdsol)( INTEGER_ARG(&M),
                          INTEGER_ARG(&N),
                          INTEGER_ARG(&MP),
                          INTEGER_ARG(&NP),
@@ -1462,7 +1462,7 @@ void slaSvdsol ( int m, int n, int mp, int np,
                          DOUBLE_ARRAY_ARG(W),
                          DOUBLE_ARRAY_ARG(V),
                          DOUBLE_ARRAY_ARG(WORK),
-                         DOUBLE_ARRAY_ARG(X) );
+                         DOUBLE_ARRAY_ARG(X) ); )
 
       for ( i = 0; i < n; i++ ) {
          x[ i ] = X[ i ];
@@ -1499,12 +1499,12 @@ void slaEvp ( double date, double deqx, double dvb[3], double dpb[3],
    int i;
    DATE = date;
    DEQX = deqx;
-   F77_CALL(sla_evp)( DOUBLE_ARG(&DATE),
+   F77_LOCK( F77_CALL(sla_evp)( DOUBLE_ARG(&DATE),
                       DOUBLE_ARG(&DEQX),
                       DOUBLE_ARRAY_ARG(DVB),
                       DOUBLE_ARRAY_ARG(DPB),
                       DOUBLE_ARRAY_ARG(DVH),
-                      DOUBLE_ARRAY_ARG(DPH) );
+                      DOUBLE_ARRAY_ARG(DPH) ); )
    for ( i = 0; i < 3; i++ ) {
       dvb[ i ] = DVB[ i ];
       dpb[ i ] = DPB[ i ];
@@ -1530,11 +1530,11 @@ void slaFk5hz ( double r5, double d5, double jepoch,
    R5 = r5;
    D5 = d5;
    JEPOCH = jepoch;
-   F77_CALL(sla_fk5hz)( DOUBLE_ARG(&R5),
+   F77_LOCK( F77_CALL(sla_fk5hz)( DOUBLE_ARG(&R5),
                         DOUBLE_ARG(&D5),
                         DOUBLE_ARG(&JEPOCH),
                         DOUBLE_ARG(&RH),
-                        DOUBLE_ARG(&DH) );
+                        DOUBLE_ARG(&DH) ); )
    *rh = RH;
    *dh = DH;
 }
@@ -1560,13 +1560,13 @@ void slaHfk5z ( double rh, double dh, double jepoch,
    RH = rh;
    DH = dh;
    JEPOCH = jepoch;
-   F77_CALL(sla_hfk5z)( DOUBLE_ARG(&RH),
+   F77_LOCK( F77_CALL(sla_hfk5z)( DOUBLE_ARG(&RH),
                         DOUBLE_ARG(&DH),
                         DOUBLE_ARG(&JEPOCH),
                         DOUBLE_ARG(&R5),
                         DOUBLE_ARG(&D5),
                         DOUBLE_ARG(&DR5),
-                        DOUBLE_ARG(&DD5) );
+                        DOUBLE_ARG(&DD5) ); )
    *r5 = R5;
    *d5 = D5;
    *dr5 = DR5;
@@ -1585,10 +1585,10 @@ void slaGeoc ( double p, double h, double *r, double *z ) {
    DECLARE_DOUBLE(Z);
    P = p;
    H = h;
-   F77_CALL(sla_geoc)( DOUBLE_ARG(&P),
+   F77_LOCK( F77_CALL(sla_geoc)( DOUBLE_ARG(&P),
                        DOUBLE_ARG(&H),
                        DOUBLE_ARG(&R),
-                       DOUBLE_ARG(&Z) );
+                       DOUBLE_ARG(&Z) ); )
    *r = R;
    *z = Z;
 }
@@ -1635,11 +1635,11 @@ void slaDe2h ( double ha, double dec, double phi, double *az, double *el ) {
    HA = ha;
    DEC = dec;
    PHI = phi;
-   F77_CALL(sla_de2h)( DOUBLE_ARG(&HA),
+   F77_LOCK( F77_CALL(sla_de2h)( DOUBLE_ARG(&HA),
                        DOUBLE_ARG(&DEC),
                        DOUBLE_ARG(&PHI),
                        DOUBLE_ARG(&AZ),
-                       DOUBLE_ARG(&EL) );
+                       DOUBLE_ARG(&EL) ); )
    *az = AZ;
    *el = EL;
 }
@@ -1659,11 +1659,11 @@ void slaDh2e ( double az, double el, double phi, double *ha, double *dec ) {
    AZ = az;
    EL = el;
    PHI = phi;
-   F77_CALL(sla_dh2e)( DOUBLE_ARG(&AZ),
+   F77_LOCK( F77_CALL(sla_dh2e)( DOUBLE_ARG(&AZ),
                        DOUBLE_ARG(&EL),
                        DOUBLE_ARG(&PHI),
                        DOUBLE_ARG(&HA),
-                       DOUBLE_ARG(&DEC) );
+                       DOUBLE_ARG(&DEC) ); )
    *ha = HA;
    *dec = DEC;
 }
@@ -1708,14 +1708,14 @@ slaObs( int n, char *c, char *name, double *w, double *p, double *h  ) {
   F77_EXPORT_DOUBLE( *h, H );
 
   /* call the routine */
-  F77_CALL(sla_obs)( INTEGER_ARG(&N),
+  F77_LOCK( F77_CALL(sla_obs)( INTEGER_ARG(&N),
 		     CHARACTER_ARG(C),
 		     CHARACTER_ARG(NAME),
 		     DOUBLE_ARG(&W),
 		     DOUBLE_ARG(&P),
 		     DOUBLE_ARG(&H)
 		     TRAIL_ARG(C)
-		     TRAIL_ARG(NAME) );
+		     TRAIL_ARG(NAME) ); )
 
   /* extract results */
   slaStringImport( NAME, 40, name );
@@ -1746,7 +1746,7 @@ slaPa ( double ha, double dec, double phi ) {
   F77_EXPORT_DOUBLE( dec, DEC );
   F77_EXPORT_DOUBLE( phi, PHI );
 
-  RETVAL = F77_CALL(sla_pa)( DOUBLE_ARG(&HA), DOUBLE_ARG(&DEC), DOUBLE_ARG(&PHI));
+  F77_LOCK( RETVAL = F77_CALL(sla_pa)( DOUBLE_ARG(&HA), DOUBLE_ARG(&DEC), DOUBLE_ARG(&PHI)); )
 
   F77_IMPORT_DOUBLE( RETVAL, retval );
   return retval;
@@ -1761,7 +1761,7 @@ slaDtt( double utc ) {
   double retval;
 
   F77_EXPORT_DOUBLE( utc, UTC );
-  RETVAL = F77_CALL(sla_dtt)( DOUBLE_ARG(&UTC) );
+  F77_LOCK( RETVAL = F77_CALL(sla_dtt)( DOUBLE_ARG(&UTC) ); )
 
   F77_IMPORT_DOUBLE( RETVAL, retval );
   return retval;
@@ -1776,7 +1776,7 @@ slaDat( double utc ) {
   double retval;
 
   F77_EXPORT_DOUBLE( utc, UTC );
-  RETVAL = F77_CALL(sla_dat)( DOUBLE_ARG(&UTC) );
+  F77_LOCK( RETVAL = F77_CALL(sla_dat)( DOUBLE_ARG(&UTC) ); )
 
   F77_IMPORT_DOUBLE( RETVAL, retval );
   return retval;
@@ -1801,13 +1801,13 @@ slaRdplan( double date, int i, double elong, double phi,
   F77_EXPORT_DOUBLE( elong, ELONG );
   F77_EXPORT_DOUBLE( phi, PHI );
 
-  F77_CALL(sla_rdplan)( DOUBLE_ARG(&DATE),
+  F77_LOCK( F77_CALL(sla_rdplan)( DOUBLE_ARG(&DATE),
 			INTEGER_ARG(&I),
 			DOUBLE_ARG(&ELONG),
 			DOUBLE_ARG(&PHI),
 			DOUBLE_ARG(&RA),
 			DOUBLE_ARG(&DEC),
-			DOUBLE_ARG(&DIAM));
+			DOUBLE_ARG(&DIAM)); )
 
   F77_IMPORT_DOUBLE( RA, *ra );
   F77_IMPORT_DOUBLE( DEC, *dec );
@@ -1828,8 +1828,8 @@ slaDafin( const char * string, int * iptr, double *a, int *j ) {
   F77_EXPORT_INTEGER( *iptr, IPTR );
   F77_CREATE_EXPORT_CHARACTER( string, STRING );
 
-  F77_CALL(sla_dafin)( CHARACTER_ARG(STRING), INTEGER_ARG(&IPTR),
-		       DOUBLE_ARG(&A), INTEGER_ARG(&J) TRAIL_ARG(STRING) );
+  F77_LOCK( F77_CALL(sla_dafin)( CHARACTER_ARG(STRING), INTEGER_ARG(&IPTR),
+		       DOUBLE_ARG(&A), INTEGER_ARG(&J) TRAIL_ARG(STRING) ); )
 
   F77_IMPORT_INTEGER(IPTR, *iptr );
   F77_IMPORT_INTEGER(J, *j );
@@ -1896,7 +1896,7 @@ void slaOap ( const char *type, double ob1, double ob2, double date,
   WL = wl;
   TLR = tlr;
 
-  F77_CALL(sla_oap)( CHARACTER_ARG(TYPE),
+  F77_LOCK( F77_CALL(sla_oap)( CHARACTER_ARG(TYPE),
                      DOUBLE_ARG(&OB1), DOUBLE_ARG(&OB2),
                      DOUBLE_ARG(&DATE), DOUBLE_ARG(&DUT),
                      DOUBLE_ARG(&ELONGM), DOUBLE_ARG(&PHIM),
@@ -1905,7 +1905,7 @@ void slaOap ( const char *type, double ob1, double ob2, double date,
                      DOUBLE_ARG(&PMB), DOUBLE_ARG(&RH),
                      DOUBLE_ARG(&WL), DOUBLE_ARG(&TLR),
                      DOUBLE_ARG(&RAP), DOUBLE_ARG(&DAP)
-                     TRAIL_ARG(TYPE) );
+                     TRAIL_ARG(TYPE) ); )
 
   *rap = RAP;
   *dap = DAP;
@@ -1935,12 +1935,12 @@ void slaAmp( double ra, double da, double date, double eq,
   DATE = date;
   EQ = eq;
 
-  F77_CALL(sla_amp)( DOUBLE_ARG(&RA),
+  F77_LOCK( F77_CALL(sla_amp)( DOUBLE_ARG(&RA),
                      DOUBLE_ARG(&DA),
                      DOUBLE_ARG(&DATE),
                      DOUBLE_ARG(&EQ),
                      DOUBLE_ARG(&RM),
-                     DOUBLE_ARG(&DM));
+                     DOUBLE_ARG(&DM)); )
 
   *rm = RM;
   *dm = DM;
@@ -2010,7 +2010,7 @@ void slaAop ( double rap, double dap, double date, double dut,
     WL = wl;
     TLR = tlr;
 
-    F77_CALL(sla_aop)(
+    F77_LOCK( F77_CALL(sla_aop)(
                       DOUBLE_ARG(&RAP),
                       DOUBLE_ARG(&DAP),
                       DOUBLE_ARG(&DATE),
@@ -2029,7 +2029,7 @@ void slaAop ( double rap, double dap, double date, double dut,
                       DOUBLE_ARG(&ZOB),
                       DOUBLE_ARG(&HOB),
                       DOUBLE_ARG(&DOB),
-                      DOUBLE_ARG(&ROB) );
+                      DOUBLE_ARG(&ROB) ); )
 
     *aob = AOB;
     *zob = ZOB;
@@ -2056,11 +2056,11 @@ slaCldj( int iy, int im, int id, double * djm, int *i ) {
   IM = im;
   ID = id;
 
-  F77_CALL(sla_cldj)( INTEGER_ARG(&IY),
+  F77_LOCK( F77_CALL(sla_cldj)( INTEGER_ARG(&IY),
                       INTEGER_ARG(&IM),
                       INTEGER_ARG(&ID),
                       DOUBLE_ARG(&DJM),
-                      INTEGER_ARG(&I) );
+                      INTEGER_ARG(&I) ); )
 
   *djm = DJM;
   *i = I;
@@ -2123,7 +2123,7 @@ void slaPertel (int jform, double date0, double date1,
   E0 = e0;
   AM0 = am0;
 
-  F77_CALL(sla_pertel)( INTEGER_ARG(&JFORM),
+  F77_LOCK( F77_CALL(sla_pertel)( INTEGER_ARG(&JFORM),
                        DOUBLE_ARG(&DATE0),
                        DOUBLE_ARG(&DATE1),
                        DOUBLE_ARG(&EPOCH0),
@@ -2140,7 +2140,7 @@ void slaPertel (int jform, double date0, double date1,
                        DOUBLE_ARG(&AORQ1),
                        DOUBLE_ARG(&E1),
                        DOUBLE_ARG(&AM1),
-                       INTEGER_ARG(&JSTAT) );
+                       INTEGER_ARG(&JSTAT) ); )
 
   *epoch1 = EPOCH1;
   *orbi1 = ORBI1;
@@ -2205,7 +2205,7 @@ void slaPlante ( double date, double elong, double phi, int jform,
   AORL = aorl;
   DM = dm;
 
-  F77_CALL(sla_plante)( DOUBLE_ARG(&EPOCH),
+  F77_LOCK( F77_CALL(sla_plante)( DOUBLE_ARG(&EPOCH),
                        DOUBLE_ARG(&ELONG),
                        DOUBLE_ARG(&PHI),
                        INTEGER_ARG(&JFORM),
@@ -2220,7 +2220,7 @@ void slaPlante ( double date, double elong, double phi, int jform,
                        DOUBLE_ARG(&RA),
                        DOUBLE_ARG(&DEC),
                        DOUBLE_ARG(&R),
-                       INTEGER_ARG(&JSTAT) );
+                       INTEGER_ARG(&JSTAT) ); )
 
   *ra = RA;
   *dec = DEC;

@@ -89,13 +89,13 @@ DECLARE_INTEGER(STATUS);
    F77_CREATE_EXPORT_CHARACTER( access, ACCESS );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(dat_assoc)( CHARACTER_ARG(PARAM),
+   F77_LOCK( F77_CALL(dat_assoc)( CHARACTER_ARG(PARAM),
                         CHARACTER_ARG(ACCESS),
                         CHARACTER_ARG(LOC),
                         INTEGER_ARG(&STATUS)
                         TRAIL_ARG(PARAM)
                         TRAIL_ARG(ACCESS)
-                        TRAIL_ARG(LOC) );
+                        TRAIL_ARG(LOC) ); )
 
    F77_FREE_CHARACTER( PARAM );
    F77_FREE_CHARACTER( ACCESS );
@@ -126,9 +126,9 @@ DECLARE_INTEGER(STATUS);
    F77_CREATE_EXPORT_CHARACTER( param, PARAM );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(dat_cancl)( CHARACTER_ARG(PARAM),
+   F77_LOCK( F77_CALL(dat_cancl)( CHARACTER_ARG(PARAM),
                         INTEGER_ARG(&STATUS)
-                        TRAIL_ARG(PARAM) );
+                        TRAIL_ARG(PARAM) ); )
 
    F77_FREE_CHARACTER( PARAM );
    F77_IMPORT_INTEGER( STATUS, *status );
@@ -164,13 +164,13 @@ DECLARE_INTEGER(STATUS);
    F77_EXPORT_INTEGER_ARRAY( dims, DIMS, ndims );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(dat_creat)( CHARACTER_ARG(PARAM),
+   F77_LOCK( F77_CALL(dat_creat)( CHARACTER_ARG(PARAM),
                         CHARACTER_ARG(TYPE),
                         INTEGER_ARG(&NDIMS),
                         INTEGER_ARRAY_ARG(DIMS),
                         INTEGER_ARG(&STATUS)
                         TRAIL_ARG(PARAM)
-                        TRAIL_ARG(TYPE) );
+                        TRAIL_ARG(TYPE) ); )
 
    F77_FREE_CHARACTER( PARAM );
    F77_FREE_CHARACTER( TYPE );

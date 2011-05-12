@@ -103,7 +103,7 @@ void hdrInF( char *param,
   F77_CREATE_CHARACTER(fitem,strlen( item ));
   cnf_exprt( item, fitem, fitem_length );
 
-  F77_CALL(hdr_inr)( CHARACTER_ARG(fparam),
+  F77_LOCK( F77_CALL(hdr_inr)( CHARACTER_ARG(fparam),
                      CHARACTER_ARG(fxname),
                      CHARACTER_ARG(fitem),
                      INTEGER_ARG(&comp),
@@ -111,7 +111,7 @@ void hdrInF( char *param,
                      INTEGER_ARG(status)
                      TRAIL_ARG(fparam)
                      TRAIL_ARG(fxname)
-                     TRAIL_ARG(fitem) );
+                     TRAIL_ARG(fitem) ); )
 
   F77_FREE_CHARACTER(fparam);
   F77_FREE_CHARACTER(fxname);

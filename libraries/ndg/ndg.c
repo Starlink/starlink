@@ -101,9 +101,9 @@ void ndgNdfas( const Grp *igrp, size_t index, const char mode[], int * indf, int
    F77_EXPORT_CHARACTER( mode, MODE, 10 );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(ndg_ndfas)( INTEGER_ARG(&IGRP), INTEGER_ARG(&INDEX),
+   F77_LOCK( F77_CALL(ndg_ndfas)( INTEGER_ARG(&IGRP), INTEGER_ARG(&INDEX),
                         CHARACTER_ARG(MODE), INTEGER_ARG(&INDF),
-                        INTEGER_ARG(&STATUS) TRAIL_ARG(MODE) );
+                        INTEGER_ARG(&STATUS) TRAIL_ARG(MODE) ); )
 
    F77_IMPORT_INTEGER( INDF, *indf );
    F77_IMPORT_INTEGER( STATUS, *status );
@@ -138,10 +138,10 @@ void ndgNdfcr( const Grp* igrp, size_t index, const char ftype[], int ndim,
   UBND = hdsDimC2F( ndim, ubnd, UBND_DUMMY, status );
   F77_EXPORT_INTEGER(*status, STATUS );
 
-  F77_CALL(ndg_ndfcr)( INTEGER_ARG(&IGRP), INTEGER_ARG(&INDEX), CHARACTER_ARG(FTYPE),
+  F77_LOCK( F77_CALL(ndg_ndfcr)( INTEGER_ARG(&IGRP), INTEGER_ARG(&INDEX), CHARACTER_ARG(FTYPE),
 		       INTEGER_ARG(&NDIM), INTEGER_ARRAY_ARG(LBND), INTEGER_ARRAY_ARG(UBND),
 		       INTEGER_ARG(&INDF), INTEGER_ARG(&STATUS)
-		       TRAIL_ARG(FTYPE) );
+		       TRAIL_ARG(FTYPE) ); )
 
   F77_IMPORT_INTEGER( STATUS, *status );
   F77_IMPORT_INTEGER( INDF, *indf );
@@ -166,10 +166,10 @@ void ndgNdfpr( int indf1, const char clist[], const Grp *igrp, size_t index, int
   F77_EXPORT_INTEGER(index, INDEX);
   F77_EXPORT_INTEGER(*status, STATUS);
 
-  F77_CALL(ndg_ndfpr)( INTEGER_ARG(&INDF1), CHARACTER_ARG(CLIST),
+  F77_LOCK( F77_CALL(ndg_ndfpr)( INTEGER_ARG(&INDF1), CHARACTER_ARG(CLIST),
 		       INTEGER_ARG(&IGRP), INTEGER_ARG(&INDEX),
 		       INTEGER_ARG(&INDF2), INTEGER_ARG(&STATUS)
-		       TRAIL_ARG(CLIST) );
+		       TRAIL_ARG(CLIST) ); )
 
   F77_IMPORT_INTEGER( STATUS, *status);
   F77_IMPORT_INTEGER( INDF2, *indf2);
@@ -197,10 +197,10 @@ void ndgAsexp( const char grpexp[], int verb, const Grp *igrp1, Grp ** igrp2, si
    F77_EXPORT_CHARACTER( grpexp, GRPEXP, GRP__SZNAM );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(ndg_asexp)( CHARACTER_ARG(GRPEXP), LOGICAL_ARG(&VERB), INTEGER_ARG(&IGRP1),
+   F77_LOCK( F77_CALL(ndg_asexp)( CHARACTER_ARG(GRPEXP), LOGICAL_ARG(&VERB), INTEGER_ARG(&IGRP1),
                         INTEGER_ARG(&IGRP2),
                         INTEGER_ARG(&SIZE), LOGICAL_ARG(&FLAG),
-                        INTEGER_ARG(&STATUS) TRAIL_ARG(GRPEXP) );
+                        INTEGER_ARG(&STATUS) TRAIL_ARG(GRPEXP) ); )
 
    F77_IMPORT_INTEGER( SIZE, *size );
    F77_IMPORT_LOGICAL( FLAG, *flag );
@@ -233,11 +233,11 @@ void ndgGtsup( const Grp *grp, size_t i, char *const fields[6], size_t len, int 
    F77_CREATE_CHARACTER_ARRAY(FIELDS,len-1,6);
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(ndg_gtsup)( INTEGER_ARG(&IGRP),
+   F77_LOCK( F77_CALL(ndg_gtsup)( INTEGER_ARG(&IGRP),
                         INTEGER_ARG(&I),
                         CHARACTER_ARRAY_ARG(FIELDS),
                         INTEGER_ARG(&STATUS)
-                        TRAIL_ARG(FIELDS) );
+                        TRAIL_ARG(FIELDS) ); )
 
    F77_IMPORT_CHARACTER_ARRAY_P(FIELDS,FIELDS_length,fields,
                                 len,6);
@@ -261,8 +261,8 @@ void ndgCpsup( const Grp *igrp1, size_t i, Grp *igrp2, int * status ) {
    IGRP2 = grpC2F( igrp2, status );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(ndg_cpsup)( INTEGER_ARG(&IGRP1), INTEGER_ARG(&I),
-                        INTEGER_ARG(&IGRP2), INTEGER_ARG(&STATUS) );
+   F77_LOCK( F77_CALL(ndg_cpsup)( INTEGER_ARG(&IGRP1), INTEGER_ARG(&I),
+                        INTEGER_ARG(&IGRP2), INTEGER_ARG(&STATUS) ); )
 
    F77_IMPORT_INTEGER( STATUS, *status );
 
@@ -276,8 +276,8 @@ void ndgEndpv( const char *creator, int * status ) {
   DECLARE_INTEGER(STATUS);
   F77_EXPORT_INTEGER(*status, STATUS );
   F77_CREATE_EXPORT_CHARACTER( creator, CREATR );
-  F77_CALL(ndg_endpv)( CHARACTER_ARG(CREATR), INTEGER_ARG(&STATUS)
-                       TRAIL_ARG(CREATR) );
+  F77_LOCK( F77_CALL(ndg_endpv)( CHARACTER_ARG(CREATR), INTEGER_ARG(&STATUS)
+                       TRAIL_ARG(CREATR) ); )
   F77_IMPORT_INTEGER( STATUS, *status );
   F77_FREE_CHARACTER( CREATR );
 }
@@ -287,7 +287,7 @@ F77_SUBROUTINE(ndg_begpv)( INTEGER(STATUS) );
 void ndgBegpv( int * status ) {
   DECLARE_INTEGER(STATUS);
   F77_EXPORT_INTEGER(*status, STATUS );
-  F77_CALL(ndg_begpv)( INTEGER_ARG(&STATUS) );
+  F77_LOCK( F77_CALL(ndg_begpv)( INTEGER_ARG(&STATUS) ); )
   F77_IMPORT_INTEGER( STATUS, *status );
 }
 
@@ -313,9 +313,9 @@ Grp * ndgCopy( const Grp* grp1, size_t indxlo, size_t indxhi, int reject,
   F77_EXPORT_INTEGER( indxhi, INDXHI );
   F77_EXPORT_INTEGER( *status, STATUS );
 
-  F77_CALL(ndg_copy)( INTEGER_ARG(&IGRP1), INTEGER_ARG(&INDXLO),
+  F77_LOCK( F77_CALL(ndg_copy)( INTEGER_ARG(&IGRP1), INTEGER_ARG(&INDXLO),
 		      INTEGER_ARG(&INDXHI), LOGICAL_ARG(&REJECT),
-		      INTEGER_ARG(&IGRP2), INTEGER_ARG(&STATUS));
+		      INTEGER_ARG(&IGRP2), INTEGER_ARG(&STATUS)); )
 
   F77_IMPORT_INTEGER( STATUS, *status );
 
@@ -342,9 +342,9 @@ void ndgCrexp( const char grpexp[], const Grp *igrp0, Grp ** igrp, size_t *size,
    F77_EXPORT_CHARACTER( grpexp, GRPEXP, GRP__SZNAM );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(ndg_crexp)( CHARACTER_ARG(GRPEXP), INTEGER_ARG(&IGRP0), INTEGER_ARG(&IGRP),
+   F77_LOCK( F77_CALL(ndg_crexp)( CHARACTER_ARG(GRPEXP), INTEGER_ARG(&IGRP0), INTEGER_ARG(&IGRP),
                         INTEGER_ARG(&SIZE), LOGICAL_ARG(&FLAG),
-                        INTEGER_ARG(&STATUS) TRAIL_ARG(GRPEXP) );
+                        INTEGER_ARG(&STATUS) TRAIL_ARG(GRPEXP) ); )
 
    F77_IMPORT_INTEGER( SIZE, *size );
    F77_IMPORT_LOGICAL( FLAG, *flag );
@@ -360,7 +360,7 @@ F77_SUBROUTINE(ndg_beggh)( INTEGER(STATUS) );
 void ndgBeggh( int * status ) {
   DECLARE_INTEGER(STATUS);
   F77_EXPORT_INTEGER(*status, STATUS );
-  F77_CALL(ndg_beggh)( INTEGER_ARG(&STATUS) );
+  F77_LOCK( F77_CALL(ndg_beggh)( INTEGER_ARG(&STATUS) ); )
   F77_IMPORT_INTEGER( STATUS, *status );
 }
 
@@ -370,7 +370,7 @@ F77_SUBROUTINE(ndg_endgh)( INTEGER(STATUS) );
 void ndgEndgh( int * status ) {
   DECLARE_INTEGER(STATUS);
   F77_EXPORT_INTEGER(*status, STATUS );
-  F77_CALL(ndg_endgh)( INTEGER_ARG(&STATUS) );
+  F77_LOCK( F77_CALL(ndg_endgh)( INTEGER_ARG(&STATUS) ); )
   F77_IMPORT_INTEGER( STATUS, *status );
 }
 
@@ -381,7 +381,7 @@ void ndgHwrgh( int indf, int *status ) {
   DECLARE_INTEGER(STATUS);
   F77_EXPORT_INTEGER( indf, INDF );
   F77_EXPORT_INTEGER( *status, STATUS );
-  F77_CALL(ndg_hwrgh)( INTEGER_ARG(&INDF), INTEGER_ARG(&STATUS) );
+  F77_LOCK( F77_CALL(ndg_hwrgh)( INTEGER_ARG(&INDF), INTEGER_ARG(&STATUS) ); )
   F77_IMPORT_INTEGER( STATUS, *status );
 }
 
@@ -397,8 +397,8 @@ void ndgHltgh( int new, int *old, int *status ){
    F77_EXPORT_LOGICAL( new, NEW );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(ndg_hltgh)( LOGICAL_ARG(&NEW), LOGICAL_ARG(&OLD),
-                        INTEGER_ARG(&STATUS) );
+   F77_LOCK( F77_CALL(ndg_hltgh)( LOGICAL_ARG(&NEW), LOGICAL_ARG(&OLD),
+                        INTEGER_ARG(&STATUS) ); )
 
    F77_IMPORT_LOGICAL( OLD, *old );
    F77_IMPORT_INTEGER( STATUS, *status );
@@ -416,8 +416,8 @@ void ndgHltpv( int new, int *old, int *status ){
    F77_EXPORT_LOGICAL( new, NEW );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(ndg_hltpv)( LOGICAL_ARG(&NEW), LOGICAL_ARG(&OLD),
-                        INTEGER_ARG(&STATUS) );
+   F77_LOCK( F77_CALL(ndg_hltpv)( LOGICAL_ARG(&NEW), LOGICAL_ARG(&OLD),
+                        INTEGER_ARG(&STATUS) ); )
 
    F77_IMPORT_LOGICAL( OLD, *old );
    F77_IMPORT_INTEGER( STATUS, *status );

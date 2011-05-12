@@ -59,10 +59,10 @@ shlAdam( const char libnam[], int isenv, int * status ) {
   F77_EXPORT_LOGICAL( isenv, ISENV );
   F77_EXPORT_INTEGER( *status, STATUS );
 
-  F77_CALL(shl_adam)( CHARACTER_ARG(LIBNAM),
+  F77_LOCK( F77_CALL(shl_adam)( CHARACTER_ARG(LIBNAM),
 		      LOGICAL_ARG(&ISENV),
 		      INTEGER_ARG(&STATUS)
-		      TRAIL_ARG(LIBNAM) );
+		      TRAIL_ARG(LIBNAM) ); )
 
   F77_FREE_CHARACTER( LIBNAM );
   F77_IMPORT_INTEGER( STATUS, *status );

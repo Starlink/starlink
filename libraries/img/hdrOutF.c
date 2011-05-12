@@ -102,7 +102,7 @@ void hdrOutF( char *param,
   F77_CREATE_CHARACTER(fcommen,strlen( commen ));
   cnf_exprt( commen, fcommen, fcommen_length );
 
-  F77_CALL(hdr_outr)( CHARACTER_ARG(fparam),
+  F77_LOCK( F77_CALL(hdr_outr)( CHARACTER_ARG(fparam),
                       CHARACTER_ARG(fxname),
                       CHARACTER_ARG(fitem),
                       CHARACTER_ARG(fcommen),
@@ -111,7 +111,7 @@ void hdrOutF( char *param,
                       TRAIL_ARG(fparam)
                       TRAIL_ARG(fxname)
                       TRAIL_ARG(fitem)
-                      TRAIL_ARG(fcommen) );
+                      TRAIL_ARG(fcommen) ); )
 
   F77_FREE_CHARACTER(fparam);
   F77_FREE_CHARACTER(fxname);

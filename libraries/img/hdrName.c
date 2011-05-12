@@ -101,14 +101,14 @@ void hdrName( char *param,
   cnf_exprt( xname, fxname, fxname_length );
   F77_CREATE_CHARACTER(fitem,item_length);
 
-  F77_CALL(hdr_name)( CHARACTER_ARG(fparam),
+  F77_LOCK( F77_CALL(hdr_name)( CHARACTER_ARG(fparam),
                       CHARACTER_ARG(fxname),
                       INTEGER_ARG(&n),
                       CHARACTER_ARG(fitem),
                       INTEGER_ARG(status)
                       TRAIL_ARG(fparam)
                       TRAIL_ARG(fxname)
-                      TRAIL_ARG(fitem) );
+                      TRAIL_ARG(fitem) ); )
 
   F77_FREE_CHARACTER(fparam);
   F77_FREE_CHARACTER(fxname);

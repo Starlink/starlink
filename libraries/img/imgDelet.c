@@ -72,9 +72,9 @@ void imgDelet( char *param,
   F77_CREATE_CHARACTER(fparam,strlen( param ));
   cnf_exprt( param, fparam, fparam_length );
 
-  F77_CALL(img_delet)( CHARACTER_ARG(fparam),
+  F77_LOCK( F77_CALL(img_delet)( CHARACTER_ARG(fparam),
                        INTEGER_ARG(status)
-                       TRAIL_ARG(fparam) );
+                       TRAIL_ARG(fparam) ); )
 
   F77_FREE_CHARACTER(fparam);
 

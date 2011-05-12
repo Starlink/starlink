@@ -215,8 +215,8 @@ int grpSlot( int igrp, int *status ){
    }
 
    F77_EXPORT_INTEGER( igrp, IGRP );
-   F77_CALL(grp1_id2sl)( INTEGER_ARG(&IGRP),
-                         INTEGER_ARG(&SLOT) );
+   F77_LOCK( F77_CALL(grp1_id2sl)( INTEGER_ARG(&IGRP),
+                         INTEGER_ARG(&SLOT) ); )
    F77_IMPORT_INTEGER( SLOT, ret );
 
    ret--;   /* Convert from 1-based to zero-based index */
@@ -247,9 +247,9 @@ size_t grpGrpsz( const Grp *grp, int *status ){
 
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(grp_grpsz)( INTEGER_ARG(&IGRP),
+   F77_LOCK( F77_CALL(grp_grpsz)( INTEGER_ARG(&IGRP),
                         INTEGER_ARG(&SIZE),
-                        INTEGER_ARG(&STATUS) );
+                        INTEGER_ARG(&STATUS) ); )
 
    F77_IMPORT_INTEGER( SIZE, size );
    F77_IMPORT_INTEGER( STATUS, *status );
@@ -269,9 +269,9 @@ void grpSetsz( Grp *grp, size_t size, int *status ){
    F77_EXPORT_INTEGER( size, SIZE );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(grp_setsz)( INTEGER_ARG(&IGRP),
+   F77_LOCK( F77_CALL(grp_setsz)( INTEGER_ARG(&IGRP),
                         INTEGER_ARG(&SIZE),
-                        INTEGER_ARG(&STATUS) );
+                        INTEGER_ARG(&STATUS) ); )
 
    F77_IMPORT_INTEGER( STATUS, *status );
 
@@ -290,8 +290,8 @@ void grpDelet( Grp **grp, int *status ){
 
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(grp_delet)( INTEGER_ARG(&IGRP),
-                        INTEGER_ARG(&STATUS) );
+   F77_LOCK( F77_CALL(grp_delet)( INTEGER_ARG(&IGRP),
+                        INTEGER_ARG(&STATUS) ); )
 
    F77_IMPORT_INTEGER( STATUS, *status );
 
@@ -325,12 +325,12 @@ void grpGet( const Grp *grp, size_t index, size_t size, char *const *names,
    F77_CREATE_CHARACTER_ARRAY(NAMES,len-1,size);
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(grp_get)( INTEGER_ARG(&IGRP),
+   F77_LOCK( F77_CALL(grp_get)( INTEGER_ARG(&IGRP),
                       INTEGER_ARG(&INDEX),
                       INTEGER_ARG(&SIZE),
                       CHARACTER_ARRAY_ARG(NAMES),
                       INTEGER_ARG(&STATUS)
-                      TRAIL_ARG(NAMES) );
+                      TRAIL_ARG(NAMES) ); )
 
    F77_IMPORT_CHARACTER_ARRAY_P(NAMES,NAMES_length,names,len,size);
    F77_FREE_CHARACTER(NAMES);
@@ -356,9 +356,9 @@ int grpValid( const Grp *grp, int *status ){
 
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(grp_valid)( INTEGER_ARG(&IGRP),
+   F77_LOCK( F77_CALL(grp_valid)( INTEGER_ARG(&IGRP),
                         LOGICAL_ARG(&VALID),
-                        INTEGER_ARG(&STATUS) );
+                        INTEGER_ARG(&STATUS) ); )
 
    F77_IMPORT_LOGICAL( VALID, valid );
    F77_IMPORT_INTEGER( STATUS, *status );
@@ -384,10 +384,10 @@ Grp *grpNew( const char *type, int *status ){
    F77_EXPORT_CHARACTER( type, TYPE, TYPE_length );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(grp_new)( CHARACTER_ARG(TYPE),
+   F77_LOCK( F77_CALL(grp_new)( CHARACTER_ARG(TYPE),
                       INTEGER_ARG(&IGRP),
                       INTEGER_ARG(&STATUS)
-                      TRAIL_ARG(TYPE) );
+                      TRAIL_ARG(TYPE) ); )
 
    F77_FREE_CHARACTER( TYPE );
    F77_IMPORT_INTEGER( STATUS, *status );
@@ -419,11 +419,11 @@ void grpPut1( Grp *grp, const char *name, size_t index, int *status ){
    F77_EXPORT_INTEGER( index, INDEX );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(grp_put1)( INTEGER_ARG(&IGRP),
+   F77_LOCK( F77_CALL(grp_put1)( INTEGER_ARG(&IGRP),
                        CHARACTER_ARG(NAME),
                        INTEGER_ARG(&INDEX),
                        INTEGER_ARG(&STATUS)
-                       TRAIL_ARG(NAME) );
+                       TRAIL_ARG(NAME) ); )
 
    F77_FREE_CHARACTER( NAME );
    F77_IMPORT_INTEGER( STATUS, *status );
@@ -452,12 +452,12 @@ void grpInfoi( const Grp *grp, size_t index, const char *item, int *value,
   F77_EXPORT_INTEGER( index, INDEX );
   F77_EXPORT_INTEGER( *status, STATUS );
 
-  F77_CALL(grp_infoi)( INTEGER_ARG( &IGRP ),
+  F77_LOCK( F77_CALL(grp_infoi)( INTEGER_ARG( &IGRP ),
 		       INTEGER_ARG( &INDEX ),
 		       CHARACTER_ARG(ITEM),
 		       INTEGER_ARG(&VALUE),
 		       INTEGER_ARG(&STATUS)
-		       TRAIL_ARG(ITEM) );
+		       TRAIL_ARG(ITEM) ); )
 
   F77_FREE_CHARACTER( ITEM );
   F77_IMPORT_INTEGER( STATUS, *status );
@@ -488,12 +488,12 @@ void grpInfoc( const Grp *grp, size_t index, const char *item, char *value,
      the C string so that we can take into account the nul */
   F77_CREATE_CHARACTER( VALUE, value_len - 1 );
 
-  F77_CALL(grp_infoc)( INTEGER_ARG( &IGRP ),
+  F77_LOCK( F77_CALL(grp_infoc)( INTEGER_ARG( &IGRP ),
 		       INTEGER_ARG( &INDEX ),
 		       CHARACTER_ARG(ITEM),
 		       CHARACTER_ARG(VALUE),
 		       INTEGER_ARG(&STATUS)
-		       TRAIL_ARG(ITEM) TRAIL_ARG(VALUE) );
+		       TRAIL_ARG(ITEM) TRAIL_ARG(VALUE) ); )
 
   F77_FREE_CHARACTER( ITEM );
   F77_IMPORT_CHARACTER( VALUE, VALUE_length, value );
@@ -530,10 +530,10 @@ void grpGrpex( const char *grpexp, const Grp *grp1, Grp *grp2,
   F77_EXPORT_INTEGER( *status, STATUS );
 
 
-  F77_CALL(grp_grpex)( CHARACTER_ARG(GRPEXP), INTEGER_ARG(&IGRP1),
+  F77_LOCK( F77_CALL(grp_grpex)( CHARACTER_ARG(GRPEXP), INTEGER_ARG(&IGRP1),
                        INTEGER_ARG(&IGRP2), INTEGER_ARG(&SIZE),
                        INTEGER_ARG(&ADDED), LOGICAL_ARG(&FLAG),
-                       INTEGER_ARG(&STATUS) TRAIL_ARG(GRPEXP) );
+                       INTEGER_ARG(&STATUS) TRAIL_ARG(GRPEXP) ); )
 
   F77_FREE_CHARACTER( GRPEXP );
   F77_IMPORT_INTEGER( STATUS, *status );
@@ -564,9 +564,9 @@ size_t grpIndex( const char *name, const Grp *grp, size_t start,
   F77_EXPORT_INTEGER( start, START );
   F77_EXPORT_INTEGER( *status, STATUS );
 
-  F77_CALL(grp_index)( CHARACTER_ARG(NAME), INTEGER_ARG(&IGRP),
+  F77_LOCK( F77_CALL(grp_index)( CHARACTER_ARG(NAME), INTEGER_ARG(&IGRP),
                        INTEGER_ARG(&START), INTEGER_ARG(&INDEX),
-                       INTEGER_ARG(&STATUS) TRAIL_ARG(NAME) );
+                       INTEGER_ARG(&STATUS) TRAIL_ARG(NAME) ); )
 
   F77_FREE_CHARACTER( NAME );
   F77_IMPORT_INTEGER( STATUS, *status );
@@ -596,9 +596,9 @@ Grp * grpCopy( const Grp* grp1, size_t indxlo, size_t indxhi, int reject,
   F77_EXPORT_INTEGER( indxhi, INDXHI );
   F77_EXPORT_INTEGER( *status, STATUS );
 
-  F77_CALL(grp_copy)( INTEGER_ARG(&IGRP1), INTEGER_ARG(&INDXLO),
+  F77_LOCK( F77_CALL(grp_copy)( INTEGER_ARG(&IGRP1), INTEGER_ARG(&INDXLO),
 		      INTEGER_ARG(&INDXHI), LOGICAL_ARG(&REJECT),
-		      INTEGER_ARG(&IGRP2), INTEGER_ARG(&STATUS));
+		      INTEGER_ARG(&IGRP2), INTEGER_ARG(&STATUS)); )
 
   F77_IMPORT_INTEGER( STATUS, *status );
 
@@ -619,9 +619,9 @@ void grpSetcs( Grp *grp, int sensit, int *status ){
    F77_EXPORT_INTEGER( *status, STATUS );
    F77_EXPORT_LOGICAL( sensit, SENSIT );
 
-   F77_CALL(grp_setcs)( INTEGER_ARG(&IGRP),
+   F77_LOCK( F77_CALL(grp_setcs)( INTEGER_ARG(&IGRP),
                         LOGICAL_ARG(&SENSIT),
-                        INTEGER_ARG(&STATUS) );
+                        INTEGER_ARG(&STATUS) ); )
 
    F77_IMPORT_INTEGER( STATUS, *status );
 
@@ -646,9 +646,9 @@ Grp *grpRemov( const Grp *grp, const char *name, int *status ) {
    F77_EXPORT_INTEGER( *status, STATUS );
 
 
-   F77_CALL(grp_remov)( INTEGER_ARG(&IGRP1), CHARACTER_ARG(NAME),
+   F77_LOCK( F77_CALL(grp_remov)( INTEGER_ARG(&IGRP1), CHARACTER_ARG(NAME),
                         INTEGER_ARG(&IGRP2), INTEGER_ARG(&STATUS)
-                        TRAIL_ARG(NAME) );
+                        TRAIL_ARG(NAME) ); )
 
    F77_FREE_CHARACTER( NAME );
    F77_IMPORT_INTEGER( STATUS, *status );
@@ -680,10 +680,10 @@ void grpMsg( const char *token, const Grp *grp, int index ){
          F77_EXPORT_CHARACTER( token, TOKEN, TOKEN_length );
          F77_EXPORT_INTEGER( index, INDEX );
 
-         F77_CALL(grp_msg)( CHARACTER_ARG(TOKEN),
+         F77_LOCK( F77_CALL(grp_msg)( CHARACTER_ARG(TOKEN),
                             INTEGER_ARG(&IGRP),
                             INTEGER_ARG(&INDEX)
-                            TRAIL_ARG(TOKEN) );
+                            TRAIL_ARG(TOKEN) ); )
 
          F77_FREE_CHARACTER( TOKEN );
 

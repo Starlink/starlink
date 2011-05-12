@@ -2,7 +2,7 @@ dnl  Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl   Initialisation: package name and version number
-AC_INIT(cnf, 4.3-0, ussc@star.rl.ac.uk)
+AC_INIT(cnf, 5.0-0, ussc@star.rl.ac.uk)
 
 dnl   Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -61,7 +61,7 @@ STAR_CNF_TRAIL_TYPE
 dnl   Need to know size of these trailing character lengths for CNF_CVAL.
 if test "$star_cv_cnf_trail_type" = "int"; then
    AC_CHECK_SIZEOF([int])
-   AC_DEFINE_UNQUOTED(SIZEOF_TRAILARG,$ac_cv_sizeof_int, 
+   AC_DEFINE_UNQUOTED(SIZEOF_TRAILARG,$ac_cv_sizeof_int,
                       [Size of TRAIL argument])
 else
    AC_CHECK_SIZEOF([long])
@@ -73,7 +73,7 @@ dnl   This package has no dependencies
 
 STAR_LATEX_DOCUMENTATION(sun209)
 
-dnl   Header checks.  
+dnl   Header checks.
 AM_CONFIG_HEADER(config.h)
 
 AC_CONFIG_FILES(Makefile component.xml f77.h)

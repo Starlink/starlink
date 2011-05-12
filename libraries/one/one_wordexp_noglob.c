@@ -113,14 +113,14 @@ F77_SUBROUTINE(one_wordexp_noglob)( CHARACTER(WORDS),
   /* Call the PSX routine to do all the work. Do not create
      a new fortran buffer for the C buffer that was copied from
      the original Fortran buffer... */
-  F77_CALL(psx_wordexp)( buff, &CONTEXT, EXPAN, STATUS
-                         TRAIL_ARG(BUFF) TRAIL_ARG(EXPAN) );
+  F77_LOCK( F77_CALL(psx_wordexp)( buff, &CONTEXT, EXPAN, STATUS
+                         TRAIL_ARG(BUFF) TRAIL_ARG(EXPAN) ); )
 
   /* Should only have one result */
   if (CONTEXT != 0) {
     while (CONTEXT != 0) {
-      F77_CALL(psx_wordexp)( WORDS, &CONTEXT, EXPAN, STATUS
-                             TRAIL_ARG(WORDS) TRAIL_ARG(EXPAN) );
+      F77_LOCK( F77_CALL(psx_wordexp)( WORDS, &CONTEXT, EXPAN, STATUS
+                             TRAIL_ARG(WORDS) TRAIL_ARG(EXPAN) ); )
     }
     F77_EXPORT_CHARACTER("", EXPAN, EXPAN_length);
     if (*STATUS == SAI__OK) {

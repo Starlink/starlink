@@ -98,14 +98,14 @@ void grpList( const char *param, size_t indxlo, size_t indxhi,
 
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(grp_list)( CHARACTER_ARG(PARAM),
+   F77_LOCK( F77_CALL(grp_list)( CHARACTER_ARG(PARAM),
                        INTEGER_ARG(&INDXLO),
                        INTEGER_ARG(&INDXHI),
                        CHARACTER_ARG(COMNT),
                        INTEGER_ARG(&IGRP),
                        INTEGER_ARG(&STATUS)
                        TRAIL_ARG(PARAM)
-                       TRAIL_ARG(COMNT) );
+                       TRAIL_ARG(COMNT) ); )
 
    F77_FREE_CHARACTER( PARAM );
    F77_FREE_CHARACTER( COMNT );

@@ -54,8 +54,10 @@
 *        should disappear as ANSI compilers become the default.
 
 *  Copyright:
-*     Copyright (C) 1991, 1993 Science & Engineering Research Council
-*     Copyright (C) 2006 Particle Physics and Astronomy Research Council
+*     Copyright (C) 1991, 1993 Science & Engineering Research Council.
+*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2011 Science and Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -88,6 +90,8 @@
 *        REAL functions (double, not float, on some platforms).
 *     13-JUL-2007 (PWD):
 *        Parameterise the type used for Fortran string lengths.
+*     11-MAY-2011 (DSB):
+*        Added F77_LOCK
 *     {enter_further_changes_here}
 *
 
@@ -517,6 +521,12 @@
 #define F77_CALL(X)  F77_EXTERNAL_NAME(X)
 
 
+/*  ---  Execute code synchronised by the CNF global mutex                  */
+#define F77_LOCK(code) \
+   cnfLock(); \
+   code \
+   cnfUnlock();
+
 /*  ---  Pass arguments to a FORTRAN routine  ---			    */
 
 #define INTEGER_ARG(X)   X
@@ -898,6 +908,8 @@ int cnfLenf( const char *source_f, int source_len );
 void *cnfMalloc( size_t );
 int cnfRegp( void * );
 void cnfUregp( void * );
+void cnfLock( void );
+void cnfUnlock( void );
 #endif
 
 #ifndef CNF_OLD_DEFINED

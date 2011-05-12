@@ -175,7 +175,7 @@ void pdaSumsl( int n, double *d, double *x,
    F77_CREATE_INTEGER_ARRAY( UIPARM, 1 );
    F77_CREATE_DOUBLE_ARRAY( URPARM, 1 );
 
-   F77_CALL(pda_sumsl)( INTEGER_ARG(&N),
+   F77_LOCK( F77_CALL(pda_sumsl)( INTEGER_ARG(&N),
                         DOUBLE_ARRAY_ARG(D),
                         DOUBLE_ARRAY_ARG(X),
                         F77_EXTERNAL_NAME(CALCF),
@@ -186,7 +186,7 @@ void pdaSumsl( int n, double *d, double *x,
                         DOUBLE_ARRAY_ARG(V),
                         INTEGER_ARRAY_ARG(UIPARM),
                         DOUBLE_ARRAY_ARG(URPARM),
-                        F77_EXTERNAL_NAME(CALCF) );
+                        F77_EXTERNAL_NAME(CALCF) ); )
 
    F77_IMPORT_DOUBLE_ARRAY( D, d, n );
    F77_FREE_DOUBLE( D );
@@ -213,8 +213,10 @@ F77_REAL_FUNCTION(pda_rand)( REAL(X) );
 
 float pdaRand(){
    DECLARE_REAL(X);
+   float result;
    X = 0;
-   return F77_CALL(pda_rand)( REAL_ARG(&X) );
+   F77_LOCK( result = F77_CALL(pda_rand)( REAL_ARG(&X) ); )
+   return result;
 }
 
 
@@ -224,9 +226,11 @@ F77_REAL_FUNCTION(pda_rnnor)( REAL(MEAN), REAL(SIGMA) );
 float pdaRnnor( float mean, float sigma ){
    DECLARE_REAL(MEAN);
    DECLARE_REAL(SIGMA);
+   float result;
    MEAN = mean;
    SIGMA = sigma;
-   return F77_CALL(pda_rnnor)( REAL_ARG(&MEAN), REAL_ARG(&SIGMA) );
+   F77_LOCK( result = F77_CALL(pda_rnnor)( REAL_ARG(&MEAN), REAL_ARG(&SIGMA) ); )
+   return result;
 }
 
 
@@ -234,8 +238,10 @@ F77_INTEGER_FUNCTION(pda_rnpoi)( REAL(MEAN) );
 
 int pdaRnpoi( float mean ){
    DECLARE_REAL(MEAN);
+   float result;
    MEAN = mean;
-   return F77_CALL(pda_rnpoi)( REAL_ARG(&MEAN) );
+   F77_LOCK( result = F77_CALL(pda_rnpoi)( REAL_ARG(&MEAN) ); )
+   return result;
 }
 
 
@@ -262,11 +268,11 @@ void pdaDeflt( int alg, int *iv, int liv, int lv, double *v){
    F77_CREATE_DOUBLE_ARRAY( V, lv );
    F77_EXPORT_DOUBLE_ARRAY( v, V, lv );
 
-   F77_CALL(pda_deflt)( INTEGER_ARG(&ALG),
+   F77_LOCK( F77_CALL(pda_deflt)( INTEGER_ARG(&ALG),
                         INTEGER_ARRAY_ARG(IV),
                         INTEGER_ARG(&LIV),
                         INTEGER_ARG(&LV),
-                        DOUBLE_ARRAY_ARG(V) );
+                        DOUBLE_ARRAY_ARG(V) ); )
 
    F77_IMPORT_INTEGER_ARRAY( IV, iv, liv );
    F77_FREE_INTEGER( IV );

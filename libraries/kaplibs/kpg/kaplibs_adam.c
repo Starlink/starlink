@@ -109,7 +109,7 @@ void kpg1Asget( int indf, int ndim, int exact, int trim, int reqinv,
    F77_ASSOC_INTEGER_ARRAY( SUBND, subnd );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(kpg1_asget)( INTEGER_ARG(&INDF),
+   F77_LOCK( F77_CALL(kpg1_asget)( INTEGER_ARG(&INDF),
                          INTEGER_ARG(&NDIM),
                          LOGICAL_ARG(&EXACT),
                          LOGICAL_ARG(&TRIM),
@@ -118,7 +118,7 @@ void kpg1Asget( int indf, int ndim, int exact, int trim, int reqinv,
                          INTEGER_ARRAY_ARG(SLBND),
                          INTEGER_ARRAY_ARG(SUBND),
                          INTEGER_ARG(&IWCS),
-                         INTEGER_ARG(&STATUS) );
+                         INTEGER_ARG(&STATUS) ); )
 
    {
       int tmp;
@@ -157,11 +157,11 @@ void kpg1Gtgrp( const char *param, Grp **grp, size_t *size, int *status ){
    F77_CREATE_EXPORT_CHARACTER(param,PARAM);
    F77_EXPORT_INTEGER(*status,STATUS);
 
-   F77_CALL(kpg1_gtgrp)( CHARACTER_ARG(PARAM),
+   F77_LOCK( F77_CALL(kpg1_gtgrp)( CHARACTER_ARG(PARAM),
                          INTEGER_ARG(&IGRP),
                          INTEGER_ARG(&SIZE),
                          INTEGER_ARG(&STATUS)
-                         TRAIL_ARG(PARAM) );
+                         TRAIL_ARG(PARAM) ); )
 
    F77_FREE_CHARACTER(PARAM);
    F77_IMPORT_INTEGER( STATUS, *status );
@@ -214,7 +214,7 @@ void kpg1Wrlst( const char *param, int arrdim, int npos, int nax, double *pos,
    F77_EXPORT_LOGICAL(pnull,PNULL);
    F77_EXPORT_INTEGER(*status,STATUS);
 
-   F77_CALL(kpg1_wrlst)( CHARACTER_ARG(PARAM),
+   F77_LOCK( F77_CALL(kpg1_wrlst)( CHARACTER_ARG(PARAM),
                          INTEGER_ARG(&ARRDIM),
                          INTEGER_ARG(&NPOS),
                          INTEGER_ARG(&NAX),
@@ -227,7 +227,7 @@ void kpg1Wrlst( const char *param, int arrdim, int npos, int nax, double *pos,
                          LOGICAL_ARG(&PNULL),
                          INTEGER_ARG(&STATUS)
                          TRAIL_ARG(PARAM)
-                         TRAIL_ARG(TITLE) );
+                         TRAIL_ARG(TITLE) ); )
 
    F77_IMPORT_INTEGER( STATUS, *status );
    F77_FREE_CHARACTER(PARAM);
@@ -283,7 +283,7 @@ void kpg1Wrtab( const char *param, int arrdim, int npos, int nax, double *pos,
    F77_EXPORT_LOGICAL(pnull,PNULL);
    F77_EXPORT_INTEGER(*status,STATUS);
 
-   F77_CALL(kpg1_wrtab)( CHARACTER_ARG(PARAM),
+   F77_LOCK( F77_CALL(kpg1_wrtab)( CHARACTER_ARG(PARAM),
                          INTEGER_ARG(&ARRDIM),
                          INTEGER_ARG(&NPOS),
                          INTEGER_ARG(&NAX),
@@ -298,7 +298,7 @@ void kpg1Wrtab( const char *param, int arrdim, int npos, int nax, double *pos,
                          LOGICAL_ARG(&PNULL),
                          INTEGER_ARG(&STATUS)
                          TRAIL_ARG(PARAM)
-                         TRAIL_ARG(TITLE) );
+                         TRAIL_ARG(TITLE) ); )
 
    F77_IMPORT_INTEGER( STATUS, *status );
    F77_FREE_CHARACTER(PARAM);
@@ -357,7 +357,7 @@ void kpg1Wrcat( const char *param, int arrdim, int npos, int nax, double *pos,
    F77_EXPORT_LOGICAL(pnull,PNULL);
    F77_EXPORT_INTEGER(*status,STATUS);
 
-   F77_CALL(kpg1_wrcat)( CHARACTER_ARG(PARAM),
+   F77_LOCK( F77_CALL(kpg1_wrcat)( CHARACTER_ARG(PARAM),
                          INTEGER_ARG(&ARRDIM),
                          INTEGER_ARG(&NPOS),
                          INTEGER_ARG(&NAX),
@@ -373,7 +373,7 @@ void kpg1Wrcat( const char *param, int arrdim, int npos, int nax, double *pos,
                          LOGICAL_ARG(&PNULL),
                          INTEGER_ARG(&STATUS)
                          TRAIL_ARG(PARAM)
-                         TRAIL_ARG(TITLE) );
+                         TRAIL_ARG(TITLE) ); )
 
    F77_IMPORT_INTEGER( STATUS, *status );
    F77_FREE_CHARACTER(PARAM);
@@ -410,7 +410,7 @@ void kpg1Rgndf( const char *param, size_t maxsiz, size_t minsiz,
 
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(kpg1_rgndf)( CHARACTER_ARG(PARAM),
+   F77_LOCK( F77_CALL(kpg1_rgndf)( CHARACTER_ARG(PARAM),
                          INTEGER_ARG(&MAXSIZ),
                          INTEGER_ARG(&MINSIZ),
                          CHARACTER_ARG(TEXT),
@@ -418,7 +418,7 @@ void kpg1Rgndf( const char *param, size_t maxsiz, size_t minsiz,
                          INTEGER_ARG(&SIZE),
                          INTEGER_ARG(&STATUS)
                          TRAIL_ARG(PARAM)
-                         TRAIL_ARG(TEXT) );
+                         TRAIL_ARG(TEXT) ); )
 
 
    F77_FREE_CHARACTER( PARAM );
@@ -462,7 +462,7 @@ void kpg1Wgndf( const char *param, const Grp *grp0, size_t maxsiz,
 
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(kpg1_wgndf)( CHARACTER_ARG(PARAM),
+   F77_LOCK( F77_CALL(kpg1_wgndf)( CHARACTER_ARG(PARAM),
                          INTEGER_ARG(&IGRP0),
                          INTEGER_ARG(&MAXSIZ),
                          INTEGER_ARG(&MINSIZ),
@@ -471,7 +471,7 @@ void kpg1Wgndf( const char *param, const Grp *grp0, size_t maxsiz,
                          INTEGER_ARG(&SIZE),
                          INTEGER_ARG(&STATUS)
                          TRAIL_ARG(PARAM)
-                         TRAIL_ARG(TEXT) );
+                         TRAIL_ARG(TEXT) ); )
 
 
    F77_FREE_CHARACTER( PARAM );
@@ -515,7 +515,7 @@ void kpg1Gtaxv( const char *param, int mxval, int exact, AstFrame *frame,
    F77_ASSOC_DOUBLE_ARRAY( AXVAL, axval );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(kpg1_gtaxv)( CHARACTER_ARG(PARAM),
+   F77_LOCK( F77_CALL(kpg1_gtaxv)( CHARACTER_ARG(PARAM),
                          INTEGER_ARG(&MXVAL),
                          LOGICAL_ARG(&EXACT),
                          INTEGER_ARG(&FRAME),
@@ -523,7 +523,7 @@ void kpg1Gtaxv( const char *param, int mxval, int exact, AstFrame *frame,
                          DOUBLE_ARRAY_ARG(AXVAL),
                          INTEGER_ARG(&NVAL),
                          INTEGER_ARG(&STATUS)
-                         TRAIL_ARG(PARAM) );
+                         TRAIL_ARG(PARAM) ); )
 
    F77_FREE_CHARACTER( PARAM );
 
@@ -571,7 +571,7 @@ void kpg1Gilst( int lonum, int upnum, int maxlin, const char *param,
    F77_ASSOC_DOUBLE_ARRAY( NUMBER, number );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(kpg1_gilst)( INTEGER_ARG(&LONUM),
+   F77_LOCK( F77_CALL(kpg1_gilst)( INTEGER_ARG(&LONUM),
                          INTEGER_ARG(&UPNUM),
                          INTEGER_ARG(&MAXLIN),
                          CHARACTER_ARG(PARAM),
@@ -579,7 +579,7 @@ void kpg1Gilst( int lonum, int upnum, int maxlin, const char *param,
                          INTEGER_ARRAY_ARG(NUMBER),
                          INTEGER_ARG(&NDISP),
                          INTEGER_ARG(&STATUS)
-                         TRAIL_ARG(PARAM) );
+                         TRAIL_ARG(PARAM) ); )
 
    F77_FREE_CHARACTER( PARAM );
    F77_IMPORT_INTEGER( NDISP, *ndisp );
@@ -623,7 +623,7 @@ void kpg1Darad( const char *param, int el, double *array, const char *methds,
    F77_EXPORT_LOGICAL( *bad, BAD );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(kpg1_darad)( CHARACTER_ARG(PARAM),
+   F77_LOCK( F77_CALL(kpg1_darad)( CHARACTER_ARG(PARAM),
                          INTEGER_ARG(&EL),
                          DOUBLE_ARRAY_ARG(ARRAY),
                          CHARACTER_ARG(METHDS),
@@ -632,7 +632,7 @@ void kpg1Darad( const char *param, int el, double *array, const char *methds,
                          DOUBLE_ARG(&UPPER),
                          INTEGER_ARG(&STATUS)
                          TRAIL_ARG(PARAM)
-                         TRAIL_ARG(METHDS) );
+                         TRAIL_ARG(METHDS) ); )
 
    F77_IMPORT_INTEGER( STATUS, *status );
    F77_IMPORT_INTEGER( LOWER, *lower );
@@ -673,13 +673,13 @@ void kpg1Gtobj( const char *param, const char *class, void (*isa)( void ),
    F77_CREATE_EXPORT_CHARACTER( class, CLASS );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(kpg1_gtobj)( CHARACTER_ARG(PARAM),
+   F77_LOCK( F77_CALL(kpg1_gtobj)( CHARACTER_ARG(PARAM),
                          CHARACTER_ARG(CLASS),
                          isa,
                          INTEGER_ARG(&IAST),
                          INTEGER_ARG(&STATUS)
                          TRAIL_ARG(PARAM)
-                         TRAIL_ARG(CLASS) );
+                         TRAIL_ARG(CLASS) ); )
    F77_IMPORT_INTEGER( IAST, tmp );
    *obj = astI2P( tmp );
 

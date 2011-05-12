@@ -107,8 +107,8 @@ F77_SUBROUTINE(one_wordexp_file)( CHARACTER(WORDS), INTEGER(CONTEXT),
   while ( 1 ) {
 
     /* Call the PSX routine to do all the work */
-    F77_CALL(psx_wordexp)( WORDS, CONTEXT, EXPAN, STATUS
-                           TRAIL_ARG(WORDS) TRAIL_ARG(EXPAN) );
+    F77_LOCK( F77_CALL(psx_wordexp)( WORDS, CONTEXT, EXPAN, STATUS
+                           TRAIL_ARG(WORDS) TRAIL_ARG(EXPAN) ); )
 
     /* Need to copy the Fortran EXPAN string to C */
     F77_IMPORT_CHARACTER( EXPAN, EXPAN_length, expan );

@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 dist_bin_SCRIPTS = cnf_link cnf_link_adam cnfrtl_link cnfrtl_link_adam
-include_HEADERS = CNF_PAR f77.h 
+include_HEADERS = CNF_PAR f77.h
 
 lib_LTLIBRARIES = libcnf.la libcnfrtl.la
 libcnf_la_SOURCES = \
@@ -26,7 +26,7 @@ C_ROUTINES = cnfCopyf.c cnfCreat.c cnfCref.c cnfCrefa.c cnfCreib.c \
     cnfFreef.c \
     cnfImpb.c cnfImpbn.c cnfImpch.c cnfImpla.c cnfImpn.c cnfImprt.c \
     cnfImprta.c cnfImprtap.c cnfLenc.c cnfLenf.c \
-    cnfMem.c oldnames.c
+    cnfMem.c cnfLock.c oldnames.c
 
 RTL_ROUTINES = cnfInitRTL.c
 

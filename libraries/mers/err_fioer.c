@@ -76,6 +76,6 @@ F77_SUBROUTINE(err_fioer)( CHARACTER(TOKEN),
 
   /* Note that we pass this directly to the EMS Fortran wrapper and so
      do not need to convert strings or other arguments */
-  F77_CALL(ems_fioer)( TOKEN, IOSTAT TRAIL_ARG(TOKEN) );
+  F77_LOCK( F77_CALL(ems_fioer)( TOKEN, IOSTAT TRAIL_ARG(TOKEN) ); )
 
 }

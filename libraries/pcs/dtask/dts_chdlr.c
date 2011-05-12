@@ -65,5 +65,5 @@ extern void F77_EXTERNAL_NAME(dtask_asthdlr)( INTEGER(id) );
 
 F77_SUBROUTINE(dtask_chdlr)( int id )
 {
-F77_CALL(dtask_asthdlr)( INTEGER_ARG(&id) );
+F77_LOCK( F77_CALL(dtask_asthdlr)( INTEGER_ARG(&id) ); )
 }

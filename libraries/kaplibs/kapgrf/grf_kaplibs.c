@@ -1304,8 +1304,8 @@ static void ccpgline(int n, float xpts[], float ypts[] ){
 
       N = (F77_INTEGER_TYPE) n;
 
-      F77_CALL(pgline)( INTEGER_ARG(&N), REAL_ARRAY_ARG(XX),
-                        REAL_ARRAY_ARG(YY) );
+      F77_LOCK( F77_CALL(pgline)( INTEGER_ARG(&N), REAL_ARRAY_ARG(XX),
+                        REAL_ARRAY_ARG(YY) ); )
 
       free( (void *) XX );
       free( (void *) YY );
@@ -1332,8 +1332,8 @@ static void ccpgpoly(int n, float xpts[], float ypts[] ){
 
       N = (F77_INTEGER_TYPE) n;
 
-      F77_CALL(pgpoly)( INTEGER_ARG(&N), REAL_ARRAY_ARG(XX),
-                        REAL_ARRAY_ARG(YY) );
+      F77_LOCK( F77_CALL(pgpoly)( INTEGER_ARG(&N), REAL_ARRAY_ARG(XX),
+                        REAL_ARRAY_ARG(YY) ); )
 
       free( (void *) XX );
       free( (void *) YY );
@@ -1363,8 +1363,8 @@ static void ccpgpt(int n, float xpts[], float ypts[], int symbol){
       SYMBOL = (F77_INTEGER_TYPE) symbol;
 
 
-      F77_CALL(pgpt)( INTEGER_ARG(&N), REAL_ARRAY_ARG(XX),
-                      REAL_ARRAY_ARG(YY), INTEGER_ARG(&SYMBOL) );
+      F77_LOCK( F77_CALL(pgpt)( INTEGER_ARG(&N), REAL_ARRAY_ARG(XX),
+                      REAL_ARRAY_ARG(YY), INTEGER_ARG(&SYMBOL) ); )
 
       free( (void *) XX );
       free( (void *) YY );
@@ -1390,9 +1390,9 @@ static void ccpgptxt(float x, float y, float angle, float fjust, char *text ){
    if( ftext_length > LTEXT_length ) ftext_length = LTEXT_length;
    cnf_expch( text, LTEXT, ftext_length );
 
-   F77_CALL(pgptxt)( REAL_ARG(&X), REAL_ARG(&Y), REAL_ARG(&ANGLE),
+   F77_LOCK( F77_CALL(pgptxt)( REAL_ARG(&X), REAL_ARG(&Y), REAL_ARG(&ANGLE),
                      REAL_ARG(&FJUST), CHARACTER_ARG(LTEXT)
-                     TRAIL_ARG(ftext) );
+                     TRAIL_ARG(ftext) ); )
 }
 
 static void ccpgqtxt(float x, float y, float angle, float fjust, char *text,
@@ -1416,10 +1416,10 @@ static void ccpgqtxt(float x, float y, float angle, float fjust, char *text,
    if( ftext_length > LTEXT_length ) ftext_length = LTEXT_length;
    cnf_expch( text, LTEXT, ftext_length );
 
-   F77_CALL(pgqtxt)( REAL_ARG(&X), REAL_ARG(&Y), REAL_ARG(&ANGLE),
+   F77_LOCK( F77_CALL(pgqtxt)( REAL_ARG(&X), REAL_ARG(&Y), REAL_ARG(&ANGLE),
                      REAL_ARG(&FJUST), CHARACTER_ARG(LTEXT),
                      REAL_ARRAY_ARG(XBOX), REAL_ARRAY_ARG(YBOX)
-                     TRAIL_ARG(ftext) );
+                     TRAIL_ARG(ftext) ); )
 
    for( i = 0; i < 4; i++ ){
       xbox[ i ] = (float) XBOX[ i ];
@@ -1430,26 +1430,26 @@ static void ccpgqtxt(float x, float y, float angle, float fjust, char *text,
 
 static void ccpgqtbg(int *tbci){
    F77_INTEGER_TYPE TBCI;
-   F77_CALL(pgqtbg)( INTEGER_ARG(&TBCI) );
+   F77_LOCK( F77_CALL(pgqtbg)( INTEGER_ARG(&TBCI) ); )
    *tbci = (int) TBCI;
 }
 
 static void ccpgstbg(int tbci){
    F77_INTEGER_TYPE TBCI;
    TBCI = (F77_INTEGER_TYPE) tbci;
-   F77_CALL(pgstbg)( INTEGER_ARG(&TBCI) );
+   F77_LOCK( F77_CALL(pgstbg)( INTEGER_ARG(&TBCI) ); )
 }
 
 static void ccpgqfs(int *fs){
    F77_INTEGER_TYPE FS;
-   F77_CALL(pgqfs)( INTEGER_ARG(&FS) );
+   F77_LOCK( F77_CALL(pgqfs)( INTEGER_ARG(&FS) ); )
    *fs = (int) FS;
 }
 
 static void ccpgsfs(int fs){
    F77_INTEGER_TYPE FS;
    FS = (F77_INTEGER_TYPE) fs;
-   F77_CALL(pgsfs)( INTEGER_ARG(&FS) );
+   F77_LOCK( F77_CALL(pgsfs)( INTEGER_ARG(&FS) ); )
 }
 
 static void ccpgqcs(int units, float *xch, float *ych){
@@ -1458,7 +1458,7 @@ static void ccpgqcs(int units, float *xch, float *ych){
    F77_REAL_TYPE YCH;
    UNITS = (F77_INTEGER_TYPE) units;
 
-   F77_CALL(pgqcs)( INTEGER_ARG(&UNITS), REAL_ARG(&XCH), REAL_ARG(&YCH) );
+   F77_LOCK( F77_CALL(pgqcs)( INTEGER_ARG(&UNITS), REAL_ARG(&XCH), REAL_ARG(&YCH) ); )
 
    *xch = (float) XCH;
    *ych = (float) YCH;
@@ -1478,8 +1478,8 @@ static void ccpglen(int units, char *text, float *xl, float *yl ){
    if( ftext_length > LTEXT_length ) ftext_length = LTEXT_length;
    cnf_expch( text, LTEXT, ftext_length );
 
-   F77_CALL(pglen)( INTEGER_ARG(&UNITS), CHARACTER_ARG(LTEXT),
-                    REAL_ARG(&XL), REAL_ARG(&YL) TRAIL_ARG(ftext) );
+   F77_LOCK( F77_CALL(pglen)( INTEGER_ARG(&UNITS), CHARACTER_ARG(LTEXT),
+                    REAL_ARG(&XL), REAL_ARG(&YL) TRAIL_ARG(ftext) ); )
 
    *xl = (float) XL;
    *yl = (float) YL;
@@ -1493,8 +1493,8 @@ static void ccpgqvp(int units, float *x1, float *x2, float *y1, float *y2){
    F77_REAL_TYPE Y2;
 
    UNITS = (F77_INTEGER_TYPE) units;
-   F77_CALL(pgqvp)( INTEGER_ARG(&UNITS), REAL_ARG(&X1), REAL_ARG(&X2),
-                    REAL_ARG(&Y1), REAL_ARG(&Y2) );
+   F77_LOCK( F77_CALL(pgqvp)( INTEGER_ARG(&UNITS), REAL_ARG(&X1), REAL_ARG(&X2),
+                    REAL_ARG(&Y1), REAL_ARG(&Y2) ); )
    *x1 = (float) X1;
    *x2 = (float) X2;
    *y1 = (float) Y1;
@@ -1509,8 +1509,8 @@ static void ccpgqvsz(int units, float *x1, float *x2, float *y1, float *y2){
    F77_REAL_TYPE Y2;
 
    UNITS = (F77_INTEGER_TYPE) units;
-   F77_CALL(pgqvsz)( INTEGER_ARG(&UNITS), REAL_ARG(&X1), REAL_ARG(&X2),
-                    REAL_ARG(&Y1), REAL_ARG(&Y2) );
+   F77_LOCK( F77_CALL(pgqvsz)( INTEGER_ARG(&UNITS), REAL_ARG(&X1), REAL_ARG(&X2),
+                    REAL_ARG(&Y1), REAL_ARG(&Y2) ); )
    *x1 = (float) X1;
    *x2 = (float) X2;
    *y1 = (float) Y1;
@@ -1523,8 +1523,8 @@ static void ccpgqwin(float *x1, float *x2, float *y1, float *y2){
    F77_REAL_TYPE Y1;
    F77_REAL_TYPE Y2;
 
-   F77_CALL(pgqwin)( REAL_ARG(&X1), REAL_ARG(&X2), REAL_ARG(&Y1),
-                     REAL_ARG(&Y2) );
+   F77_LOCK( F77_CALL(pgqwin)( REAL_ARG(&X1), REAL_ARG(&X2), REAL_ARG(&Y1),
+                     REAL_ARG(&Y2) ); )
    *x1 = (float) X1;
    *x2 = (float) X2;
    *y1 = (float) Y1;
@@ -1533,74 +1533,74 @@ static void ccpgqwin(float *x1, float *x2, float *y1, float *y2){
 
 static void ccpgqls(int *ls){
    F77_INTEGER_TYPE LS;
-   F77_CALL(pgqls)( INTEGER_ARG(&LS) );
+   F77_LOCK( F77_CALL(pgqls)( INTEGER_ARG(&LS) ); )
    *ls = (int) LS;
 }
 
 static void ccpgsls(int ls){
    F77_INTEGER_TYPE LS;
    LS = (F77_INTEGER_TYPE) ls;
-   F77_CALL(pgsls)( INTEGER_ARG(&LS) );
+   F77_LOCK( F77_CALL(pgsls)( INTEGER_ARG(&LS) ); )
 }
 
 static void ccpgqlw(int *lw){
    F77_INTEGER_TYPE LW;
-   F77_CALL(pgqlw)( INTEGER_ARG(&LW) );
+   F77_LOCK( F77_CALL(pgqlw)( INTEGER_ARG(&LW) ); )
    *lw = (int) LW;
 }
 
 static void ccpgslw(int lw){
    F77_INTEGER_TYPE LW;
    LW = (F77_INTEGER_TYPE) lw;
-   F77_CALL(pgslw)( INTEGER_ARG(&LW) );
+   F77_LOCK( F77_CALL(pgslw)( INTEGER_ARG(&LW) ); )
 }
 
 static void ccpgqch(float *ch){
    F77_REAL_TYPE CH;
-   F77_CALL(pgqch)( REAL_ARG(&CH) );
+   F77_LOCK( F77_CALL(pgqch)( REAL_ARG(&CH) ); )
    *ch = (float) CH;
 }
 
 static void ccpgsch(float ch){
    F77_REAL_TYPE CH;
    CH = (F77_REAL_TYPE) ch;
-   F77_CALL(pgsch)( REAL_ARG(&CH) );
+   F77_LOCK( F77_CALL(pgsch)( REAL_ARG(&CH) ); )
 }
 
 static void ccpgqcf(int *cf){
    F77_INTEGER_TYPE CF;
-   F77_CALL(pgqcf)( INTEGER_ARG(&CF) );
+   F77_LOCK( F77_CALL(pgqcf)( INTEGER_ARG(&CF) ); )
    *cf = (int) CF;
 }
 
 static void ccpgscf(int cf){
    F77_INTEGER_TYPE CF;
    CF = (F77_INTEGER_TYPE) cf;
-   F77_CALL(pgscf)( INTEGER_ARG(&CF) );
+   F77_LOCK( F77_CALL(pgscf)( INTEGER_ARG(&CF) ); )
 }
 
 static void ccpgqci(int *ci){
    F77_INTEGER_TYPE CI;
-   F77_CALL(pgqci)( INTEGER_ARG(&CI) );
+   F77_LOCK( F77_CALL(pgqci)( INTEGER_ARG(&CI) ); )
    *ci = (int) CI;
 }
 
 static void ccpgsci(int ci){
    F77_INTEGER_TYPE CI;
    CI = (F77_INTEGER_TYPE) ci;
-   F77_CALL(pgsci)( INTEGER_ARG(&ci) );
+   F77_LOCK( F77_CALL(pgsci)( INTEGER_ARG(&ci) ); )
 }
 
 static void ccpgupdt( void ){
-   F77_CALL(pgupdt)();
+   F77_LOCK( F77_CALL(pgupdt)(); )
 }
 
 static void ccpgbbuf( void ){
-   F77_CALL(pgbbuf)();
+   F77_LOCK( F77_CALL(pgbbuf)(); )
 }
 
 static void ccpgebuf( void ){
-   F77_CALL(pgebuf)();
+   F77_LOCK( F77_CALL(pgebuf)(); )
 }
 
 

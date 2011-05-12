@@ -93,12 +93,12 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER( mode, fmode );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_assoc)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(ndf_assoc)( CHARACTER_ARG(fparam),
                         CHARACTER_ARG(fmode),
                         INTEGER_ARG(&findf),
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(fparam)
-                        TRAIL_ARG(fmode) );
+                        TRAIL_ARG(fmode) ); )
 
    F77_FREE_CHARACTER( fparam );
    F77_FREE_CHARACTER( fmode );
@@ -130,12 +130,12 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_cinp)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(ndf_cinp)( CHARACTER_ARG(fparam),
                        INTEGER_ARG(&findf),
                        CHARACTER_ARG(fcomp),
                        INTEGER_ARG(&fstatus)
                        TRAIL_ARG(fparam)
-                       TRAIL_ARG(fcomp) );
+                       TRAIL_ARG(fcomp) ); )
 
    F77_FREE_CHARACTER( fparam );
    F77_FREE_CHARACTER( fcomp );
@@ -179,7 +179,7 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER_ARRAY( ubnd, fubnd, ndim );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_creat)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(ndf_creat)( CHARACTER_ARG(fparam),
                         CHARACTER_ARG(fftype),
                         INTEGER_ARG(&fndim),
                         INTEGER_ARRAY_ARG(flbnd),
@@ -187,7 +187,7 @@ DECLARE_INTEGER(fstatus);
                         INTEGER_ARG(&findf),
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(fparam)
-                        TRAIL_ARG(fftype) );
+                        TRAIL_ARG(fftype) ); )
 
    F77_FREE_CHARACTER( fparam );
    F77_FREE_CHARACTER( fftype );
@@ -229,14 +229,14 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER_ARRAY( ubnd, fubnd, ndim );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_crep)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(ndf_crep)( CHARACTER_ARG(fparam),
                        CHARACTER_ARG(fftype),
                        INTEGER_ARG(&fndim),
                        INTEGER_ARRAY_ARG(fubnd),
                        INTEGER_ARG(&findf),
                        INTEGER_ARG(&fstatus)
                        TRAIL_ARG(fparam)
-                       TRAIL_ARG(fftype) );
+                       TRAIL_ARG(fftype) ); )
 
    F77_FREE_CHARACTER( fparam );
    F77_FREE_CHARACTER( fftype );
@@ -268,12 +268,12 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER( mode, fmode );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_exist)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(ndf_exist)( CHARACTER_ARG(fparam),
                         CHARACTER_ARG(fmode),
                         INTEGER_ARG(&findf),
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(fparam)
-                        TRAIL_ARG(fmode) );
+                        TRAIL_ARG(fmode) ); )
 
    F77_FREE_CHARACTER( fparam );
    F77_FREE_CHARACTER( fmode );
@@ -308,13 +308,13 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER( param, fparam );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_prop)( INTEGER_ARG(&findf1),
+   F77_LOCK( F77_CALL(ndf_prop)( INTEGER_ARG(&findf1),
                        CHARACTER_ARG(fclist),
                        CHARACTER_ARG(fparam),
                        INTEGER_ARG(&findf2),
                        INTEGER_ARG(&fstatus)
                        TRAIL_ARG(fclist)
-                       TRAIL_ARG(fparam) );
+                       TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER( fclist );
    F77_FREE_CHARACTER( fparam );
@@ -340,10 +340,10 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER( param, fparam );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_crepl)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(ndf_crepl)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fplace),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER( fparam );
    F77_IMPORT_INTEGER( fplace, *place );

@@ -92,10 +92,10 @@ void ndgAssoc( const char * param, int verb, Grp ** igrp, size_t *size, int * fl
    F77_EXPORT_CHARACTER( param, PARAM, PAR__SZNAM );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(ndg_assoc)( CHARACTER_ARG(PARAM), LOGICAL_ARG(&VERB),
+   F77_LOCK( F77_CALL(ndg_assoc)( CHARACTER_ARG(PARAM), LOGICAL_ARG(&VERB),
 			INTEGER_ARG(&IGRP),
                         INTEGER_ARG(&SIZE), LOGICAL_ARG(&FLAG),
-                        INTEGER_ARG(&STATUS) TRAIL_ARG(PARAM) );
+                        INTEGER_ARG(&STATUS) TRAIL_ARG(PARAM) ); )
 
    F77_IMPORT_INTEGER( SIZE, *size );
    F77_IMPORT_LOGICAL( FLAG, *flag );
@@ -124,10 +124,10 @@ void ndgCreat( const char * param, const Grp *igrp0, Grp ** igrp, size_t *size, 
    F77_EXPORT_CHARACTER( param, PARAM, PAR__SZNAM );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(ndg_creat)( CHARACTER_ARG(PARAM), INTEGER_ARG(&IGRP0),
+   F77_LOCK( F77_CALL(ndg_creat)( CHARACTER_ARG(PARAM), INTEGER_ARG(&IGRP0),
 			INTEGER_ARG(&IGRP),
                         INTEGER_ARG(&SIZE), LOGICAL_ARG(&FLAG),
-                        INTEGER_ARG(&STATUS) TRAIL_ARG(PARAM) );
+                        INTEGER_ARG(&STATUS) TRAIL_ARG(PARAM) ); )
 
    F77_IMPORT_INTEGER( SIZE, *size );
    F77_IMPORT_LOGICAL( FLAG, *flag );
@@ -152,8 +152,8 @@ void ndgAddgh( const char param[], const Grp * igrp, int * status ) {
   F77_EXPORT_CHARACTER( param, PARAM, PAR__SZNAM );
   F77_EXPORT_INTEGER( *status, STATUS );
 
-  F77_CALL(ndg_addgh)( CHARACTER_ARG(PARAM), INTEGER_ARG(&IGRP),
-                       INTEGER_ARG(&STATUS) TRAIL_ARG(PARAM) );
+  F77_LOCK( F77_CALL(ndg_addgh)( CHARACTER_ARG(PARAM), INTEGER_ARG(&IGRP),
+                       INTEGER_ARG(&STATUS) TRAIL_ARG(PARAM) ); )
 
   F77_IMPORT_INTEGER( STATUS, *status );
   return;

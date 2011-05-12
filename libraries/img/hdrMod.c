@@ -72,9 +72,9 @@ DECLARE_CHARACTER_DYN(fparam);
    F77_CREATE_CHARACTER(fparam,strlen( param ));
    cnf_exprt( param, fparam, fparam_length );
 
-   F77_CALL(hdr_mod)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(hdr_mod)( CHARACTER_ARG(fparam),
                       INTEGER_ARG(status)
-                      TRAIL_ARG(fparam) );
+                      TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
 

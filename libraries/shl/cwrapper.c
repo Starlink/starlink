@@ -64,12 +64,12 @@ void shlTrnvar( const char libnam[], int isenv, char libray[],
   F77_CREATE_CHARACTER( LIBRAY, libray_len -1 );
   F77_EXPORT_INTEGER( *status, STATUS );
 
-  F77_CALL(shl_trnvar)( CHARACTER_ARG( LIBNAM ),
+  F77_LOCK( F77_CALL(shl_trnvar)( CHARACTER_ARG( LIBNAM ),
 			LOGICAL_ARG(&ISENV),
 			CHARACTER_ARG( LIBRAY ),
 			INTEGER_ARG( &STATUS )
 			TRAIL_ARG(LIBNAM)
-			TRAIL_ARG(LIBRAY) );
+			TRAIL_ARG(LIBRAY) ); )
 
   F77_FREE_CHARACTER( LIBNAM );
   F77_IMPORT_CHARACTER( LIBRAY, LIBRAY_length, libray );
@@ -101,12 +101,12 @@ void shlGethlp ( const char helplb[], const char keywrd[],
   F77_EXPORT_LOGICAL( inter, INTER );
   F77_EXPORT_INTEGER( *status, STATUS );
 
-  F77_CALL(shl_gethlp)( CHARACTER_ARG(HELPLB),
+  F77_LOCK( F77_CALL(shl_gethlp)( CHARACTER_ARG(HELPLB),
 			CHARACTER_ARG(KEYWRD),
 			LOGICAL_ARG(&INTER),
 			INTEGER_ARG(&STATUS)
 			TRAIL_ARG(HELPLB)
-			TRAIL_ARG(KEYWRD) );
+			TRAIL_ARG(KEYWRD) ); )
 
   F77_IMPORT_INTEGER(STATUS, *status );
 

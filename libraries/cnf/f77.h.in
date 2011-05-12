@@ -213,6 +213,8 @@
 *        be long.
 *      7-OCT-2008 (TIMJ):
 *        Initialise pointers.
+*      11-MAY-2011 (DSB):
+*        Added F77_LOCK
 *     {enter_further_changes_here}
 *
 
@@ -642,6 +644,12 @@
 #define F77_CALL(X)  F77_EXTERNAL_NAME(X)
 
 
+/*  ---  Execute code synchronised by the CNF global mutex                  */
+#define F77_LOCK(code) \
+   cnfLock(); \
+   code \
+   cnfUnlock();
+
 /*  ---  Pass arguments to a FORTRAN routine  ---			    */
 
 #define INTEGER_ARG(X)   X
@@ -1025,6 +1033,8 @@ void *cnfMalloc( size_t );
 void *cnfRealloc( void *, size_t );
 int cnfRegp( void * );
 void cnfUregp( void * );
+void cnfLock( void );
+void cnfUnlock( void );
 #endif
 
 #ifndef CNF_OLD_DEFINED

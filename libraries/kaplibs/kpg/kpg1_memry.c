@@ -138,9 +138,9 @@ static void Error( const char *text, int *STATUS ) {
       }
 
 /* Report the error. */
-      F77_CALL(err_rep)( CHARACTER_ARG(param), CHARACTER_ARG(mess),
+      F77_LOCK( F77_CALL(err_rep)( CHARACTER_ARG(param), CHARACTER_ARG(mess),
                          INTEGER_ARG(STATUS) TRAIL_ARG(param)
-                         TRAIL_ARG(mess) );
+                         TRAIL_ARG(mess) ); )
    }
 }
 

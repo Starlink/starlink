@@ -1185,9 +1185,9 @@ static void HandleInform( const char *msg_name,
       cnf_exprt( "^MESSAGE", MSG_TEXT, MSG_TEXT_length );
       emsSetnc( "MESSAGE", msg_value, msg_length );
       STATUS = *status;
-      F77_CALL(msg_out)( CHARACTER_ARG(MSG_NAME), CHARACTER_ARG(MSG_TEXT),
+      F77_LOCK( F77_CALL(msg_out)( CHARACTER_ARG(MSG_NAME), CHARACTER_ARG(MSG_TEXT),
                          INTEGER_ARG(&STATUS)
-                         TRAIL_ARG(MSG_NAME) TRAIL_ARG(MSG_TEXT) );
+                         TRAIL_ARG(MSG_NAME) TRAIL_ARG(MSG_TEXT) ); )
 
 /* Save the returned status. */
       *status = STATUS;
@@ -1425,10 +1425,10 @@ static void HandleParamReq( int path, int messid,
 #endif
                cnf_exprt( (char *) master, MASTER, MASTER_length );
                STATUS = *status;
-               F77_CALL(subpar_findpar)( CHARACTER_ARG(MASTER),
+               F77_LOCK( F77_CALL(subpar_findpar)( CHARACTER_ARG(MASTER),
                                          INTEGER_ARG(&IPAR),
                                          INTEGER_ARG(&STATUS)
-                                         TRAIL_ARG(MASTER) );
+                                         TRAIL_ARG(MASTER) ); )
                *status = STATUS;
 
 /* We will now try and obtain the master parameter value. If we have
@@ -1443,8 +1443,8 @@ static void HandleParamReq( int path, int messid,
                                  master );
 #endif
                   STATUS = *status;
-                  F77_CALL(subpar_cancl)( INTEGER_ARG(&IPAR),
-                                          INTEGER_ARG(&STATUS) );
+                  F77_LOCK( F77_CALL(subpar_cancl)( INTEGER_ARG(&IPAR),
+                                          INTEGER_ARG(&STATUS) ); )
                   *status = STATUS;
                }
 
@@ -1458,10 +1458,10 @@ static void HandleParamReq( int path, int messid,
 #endif
                   STATUS = *status;
                   cnf_exprt( (char *) suggested, SUGGESTED, SUGGESTED_length );
-                  F77_CALL(subpar_def0c)( INTEGER_ARG(&IPAR),
+                  F77_LOCK( F77_CALL(subpar_def0c)( INTEGER_ARG(&IPAR),
                                           CHARACTER_ARG(SUGGESTED),
                                           INTEGER_ARG(&STATUS)
-                                          TRAIL_ARG(SUGGESTED) );
+                                          TRAIL_ARG(SUGGESTED) ); )
                   *status = STATUS;
                }
 
@@ -1488,10 +1488,10 @@ static void HandleParamReq( int path, int messid,
 #endif
                   emsMark();
                   STATUS = *status;
-                  F77_CALL(subpar_getname)( INTEGER_ARG(&IPAR),
+                  F77_LOCK( F77_CALL(subpar_getname)( INTEGER_ARG(&IPAR),
                                             CHARACTER_ARG(PARVALUE),
                                             INTEGER_ARG(&STATUS)
-                                            TRAIL_ARG(PARVALUE) );
+                                            TRAIL_ARG(PARVALUE) ); )
                   *status = STATUS;
 
 /* Classify the returned status. If it indicates a "null" state for
@@ -1675,7 +1675,7 @@ void SlvObeyW( const char *task, const char *action,
          if ( istat != SAI__OK ) ErrFlush( path, messid, &istat );
          printf( "SYNC\n" );
 
-         F77_CALL(msg_sync)( INTEGER_ARG(status) );
+         F77_LOCK( F77_CALL(msg_sync)( INTEGER_ARG(status) ); )
          ams_reply( path, messid, MESSYS__MESSAGE, MESSYS__SYNCREP,
                     msg_context, replyaction, msg_length, msg_value, status );
       } else if ( ( msg_status != DTASK__ACTSTART ) &&

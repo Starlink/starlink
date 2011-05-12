@@ -118,10 +118,10 @@ void kpg1Filli( int value, int el, int *array, int *status ){
    F77_ASSOC_INTEGER_ARRAY( ARRAY, array );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(kpg1_filli)( INTEGER_ARG(&VALUE),
+   F77_LOCK( F77_CALL(kpg1_filli)( INTEGER_ARG(&VALUE),
                          INTEGER_ARG(&EL),
                          INTEGER_ARRAY_ARG(ARRAY),
-                         INTEGER_ARG(&STATUS) );
+                         INTEGER_ARG(&STATUS) ); )
 
    F77_IMPORT_INTEGER( STATUS, *status );
    F77_IMPORT_INTEGER_ARRAY( ARRAY, array, el );
@@ -148,10 +148,10 @@ void kpg1Fillr( float value, int el, float *array, int *status ){
    F77_ASSOC_REAL_ARRAY( ARRAY, array );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(kpg1_fillr)( REAL_ARG(&VALUE),
+   F77_LOCK( F77_CALL(kpg1_fillr)( REAL_ARG(&VALUE),
                          INTEGER_ARG(&EL),
                          REAL_ARRAY_ARG(ARRAY),
-                         INTEGER_ARG(&STATUS) );
+                         INTEGER_ARG(&STATUS) ); )
 
    F77_IMPORT_INTEGER( STATUS, *status );
    F77_IMPORT_REAL_ARRAY( ARRAY, array, el );
@@ -221,7 +221,7 @@ void kpg1Gausr( float sigma, int ibox, int sambad, float wlim, int nx,
    F77_ASSOC_REAL_ARRAY( WMAR, wmar );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(kpg1_gausr)( REAL_ARG(&SIGMA),
+   F77_LOCK( F77_CALL(kpg1_gausr)( REAL_ARG(&SIGMA),
                          INTEGER_ARG(&IBOX),
                          LOGICAL_ARG(&SAMBAD),
                          REAL_ARG(&WLIM),
@@ -235,7 +235,7 @@ void kpg1Gausr( float sigma, int ibox, int sambad, float wlim, int nx,
                          REAL_ARRAY_ARG(WEIGHT),
                          REAL_ARRAY_ARG(AMAR),
                          REAL_ARRAY_ARG(WMAR),
-                         INTEGER_ARG(&STATUS) );
+                         INTEGER_ARG(&STATUS) ); )
 
    F77_IMPORT_LOGICAL( BADOUT, *badout );
    F77_IMPORT_INTEGER( STATUS, *status );
@@ -331,7 +331,7 @@ void kpg1Manir( int ndimi, int *dimi, float *in, int ndimo, int *dimo,
    F77_ASSOC_REAL_ARRAY( OUT, out );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(kpg1_manir)( INTEGER_ARG(&NDIMI),
+   F77_LOCK( F77_CALL(kpg1_manir)( INTEGER_ARG(&NDIMI),
                          INTEGER_ARRAY_ARG(DIMI),
                          REAL_ARRAY_ARG(IN),
                          INTEGER_ARG(&NDIMO),
@@ -340,7 +340,7 @@ void kpg1Manir( int ndimi, int *dimi, float *in, int ndimo, int *dimo,
                          INTEGER_ARRAY_ARG(COLOFF),
                          INTEGER_ARRAY_ARG(EXPOFF),
                          REAL_ARRAY_ARG(OUT),
-                         INTEGER_ARG(&STATUS) );
+                         INTEGER_ARG(&STATUS) ); )
 
    F77_IMPORT_INTEGER( STATUS, *status );
    F77_IMPORT_REAL_ARRAY( OUT, out, nout );
@@ -362,7 +362,7 @@ F77_SUBROUTINE(kpg1_pseed)( INTEGER(STATUS) );
 void kpg1Pseed( int *status ){
    DECLARE_INTEGER(STATUS);
    F77_EXPORT_INTEGER( *status, STATUS );
-   F77_CALL(kpg1_pseed)( INTEGER_ARG(&STATUS) );
+   F77_LOCK( F77_CALL(kpg1_pseed)( INTEGER_ARG(&STATUS) ); )
    F77_IMPORT_INTEGER( STATUS, *status );
 }
 
@@ -415,7 +415,7 @@ void kpgStatd( int bad, int el, const double data[], int nclip, const float clip
   F77_EXPORT_REAL_ARRAY( clip, CLIP, nclip );
   F77_EXPORT_INTEGER( *status, STATUS );
 
-  F77_CALL(kpg1_statd)( LOGICAL_ARG(&BAD),
+  F77_LOCK( F77_CALL(kpg1_statd)( LOGICAL_ARG(&BAD),
 			INTEGER_ARG(&EL),
 			DOUBLE_ARRAY_ARG(DATA),
 			INTEGER_ARG(&NCLIP),
@@ -436,7 +436,7 @@ void kpgStatd( int bad, int el, const double data[], int nclip, const float clip
 			DOUBLE_ARG(&SUMC),
 			DOUBLE_ARG(&MEANC),
 			DOUBLE_ARG(&STDEVC),
-			INTEGER_ARG(&STATUS) );
+			INTEGER_ARG(&STATUS) ); )
 
   F77_IMPORT_INTEGER( STATUS, *status );
   F77_IMPORT_INTEGER( NGOOD, *ngood );
@@ -510,7 +510,7 @@ void kpgStati( int bad, int el, const int data[], int nclip, const float clip[],
   F77_EXPORT_REAL_ARRAY( clip, CLIP, nclip );
   F77_EXPORT_INTEGER( *status, STATUS );
 
-  F77_CALL(kpg1_stati)( LOGICAL_ARG(&BAD),
+  F77_LOCK( F77_CALL(kpg1_stati)( LOGICAL_ARG(&BAD),
 			INTEGER_ARG(&EL),
 			INTEGER_ARRAY_ARG(DATA),
 			INTEGER_ARG(&NCLIP),
@@ -531,7 +531,7 @@ void kpgStati( int bad, int el, const int data[], int nclip, const float clip[],
 			DOUBLE_ARG(&SUMC),
 			DOUBLE_ARG(&MEANC),
 			DOUBLE_ARG(&STDEVC),
-			INTEGER_ARG(&STATUS) );
+			INTEGER_ARG(&STATUS) ); )
 
   F77_IMPORT_INTEGER( STATUS, *status );
   F77_IMPORT_INTEGER( NGOOD, *ngood );
@@ -584,12 +584,12 @@ void kpg1Wwrt( AstObject *obj, const char *name, const HDSLoc *loc,
 
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(kpg1_wwrt)( INTEGER_ARG(&IAST),
+   F77_LOCK( F77_CALL(kpg1_wwrt)( INTEGER_ARG(&IAST),
                         CHARACTER_ARG(NAME),
                         CHARACTER_ARG(LOC),
                         INTEGER_ARG(&STATUS)
                         TRAIL_ARG(NAME)
-                        TRAIL_ARG(LOC) );
+                        TRAIL_ARG(LOC) ); )
 
    F77_FREE_CHARACTER( NAME );
    F77_IMPORT_INTEGER( STATUS, *status );
@@ -622,12 +622,12 @@ void kpg1Wread( const HDSLoc *loc, const char *name, AstObject **obj,
    F77_CREATE_EXPORT_CHARACTER( name, NAME );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(kpg1_wread)( CHARACTER_ARG(LOC),
+   F77_LOCK( F77_CALL(kpg1_wread)( CHARACTER_ARG(LOC),
                          CHARACTER_ARG(NAME),
                          INTEGER_ARG(&IAST),
                          INTEGER_ARG(&STATUS)
                          TRAIL_ARG(LOC)
-                         TRAIL_ARG(NAME) );
+                         TRAIL_ARG(NAME) ); )
    {
       int tmp;
       F77_IMPORT_INTEGER( IAST, tmp );
@@ -671,7 +671,7 @@ void kpg1Mxmnr( int bad, int el, float *array, int *ninval, float *maxmum,
    F77_ASSOC_REAL_ARRAY( ARRAY, array );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(kpg1_mxmnr)( LOGICAL_ARG(&BAD),
+   F77_LOCK( F77_CALL(kpg1_mxmnr)( LOGICAL_ARG(&BAD),
                          INTEGER_ARG(&EL),
                          REAL_ARRAY_ARG(ARRAY),
                          INTEGER_ARG(&NINVAL),
@@ -679,7 +679,7 @@ void kpg1Mxmnr( int bad, int el, float *array, int *ninval, float *maxmum,
                          REAL_ARG(&MINMUM),
                          INTEGER_ARG(&MAXPOS),
                          INTEGER_ARG(&MINPOS),
-                         INTEGER_ARG(&STATUS) );
+                         INTEGER_ARG(&STATUS) ); )
 
    F77_IMPORT_INTEGER( STATUS, *status );
    F77_IMPORT_REAL_ARRAY( ARRAY, array, el );
@@ -724,7 +724,7 @@ void kpg1Mxmni( int bad, int el, int *array, int *ninval, int *maxmum,
    F77_ASSOC_INTEGER_ARRAY( ARRAY, array );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(kpg1_mxmni)( LOGICAL_ARG(&BAD),
+   F77_LOCK( F77_CALL(kpg1_mxmni)( LOGICAL_ARG(&BAD),
                          INTEGER_ARG(&EL),
                          INTEGER_ARRAY_ARG(ARRAY),
                          INTEGER_ARG(&NINVAL),
@@ -732,7 +732,7 @@ void kpg1Mxmni( int bad, int el, int *array, int *ninval, int *maxmum,
                          INTEGER_ARG(&MINMUM),
                          INTEGER_ARG(&MAXPOS),
                          INTEGER_ARG(&MINPOS),
-                         INTEGER_ARG(&STATUS) );
+                         INTEGER_ARG(&STATUS) ); )
 
    F77_IMPORT_INTEGER( STATUS, *status );
    F77_IMPORT_INTEGER_ARRAY( ARRAY, array, el );
@@ -777,7 +777,7 @@ void kpg1Mxmnd( int bad, int el, double *array, int *ninval, double *maxmum,
    F77_ASSOC_DOUBLE_ARRAY( ARRAY, array );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(kpg1_mxmnd)( LOGICAL_ARG(&BAD),
+   F77_LOCK( F77_CALL(kpg1_mxmnd)( LOGICAL_ARG(&BAD),
                          INTEGER_ARG(&EL),
                          DOUBLE_ARRAY_ARG(ARRAY),
                          INTEGER_ARG(&NINVAL),
@@ -785,7 +785,7 @@ void kpg1Mxmnd( int bad, int el, double *array, int *ninval, double *maxmum,
                          DOUBLE_ARG(&MINMUM),
                          INTEGER_ARG(&MAXPOS),
                          INTEGER_ARG(&MINPOS),
-                         INTEGER_ARG(&STATUS) );
+                         INTEGER_ARG(&STATUS) ); )
 
    F77_IMPORT_INTEGER( STATUS, *status );
    F77_IMPORT_DOUBLE_ARRAY( ARRAY, array, el );
@@ -824,12 +824,12 @@ void kpg1Medud( int bad, int el, double *array, double *median,
    F77_ASSOC_DOUBLE_ARRAY( ARRAY, array );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(kpg1_medud)( LOGICAL_ARG(&BAD),
+   F77_LOCK( F77_CALL(kpg1_medud)( LOGICAL_ARG(&BAD),
                          INTEGER_ARG(&EL),
                          DOUBLE_ARRAY_ARG(ARRAY),
                          DOUBLE_ARG(&MEDIAN),
                          INTEGER_ARG(&NELUSE),
-                         INTEGER_ARG(&STATUS) );
+                         INTEGER_ARG(&STATUS) ); )
 
    F77_IMPORT_INTEGER( STATUS, *status );
    F77_IMPORT_DOUBLE( MEDIAN, *median );
@@ -861,12 +861,12 @@ void kpg1Medur( int bad, int el, float *array, float *median,
    F77_ASSOC_REAL_ARRAY( ARRAY, array );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(kpg1_medur)( LOGICAL_ARG(&BAD),
+   F77_LOCK( F77_CALL(kpg1_medur)( LOGICAL_ARG(&BAD),
                          INTEGER_ARG(&EL),
                          REAL_ARRAY_ARG(ARRAY),
                          REAL_ARG(&MEDIAN),
                          INTEGER_ARG(&NELUSE),
-                         INTEGER_ARG(&STATUS) );
+                         INTEGER_ARG(&STATUS) ); )
 
    F77_IMPORT_INTEGER( STATUS, *status );
    F77_IMPORT_REAL( MEDIAN, *median );
@@ -900,12 +900,12 @@ void kpg1Opgrd( int npos, const double pos[], int west, double *par, double *rdi
    F77_ASSOC_DOUBLE_ARRAY( PAR, par );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(kpg1_opgrd)( INTEGER_ARG(&NPOS),
+   F77_LOCK( F77_CALL(kpg1_opgrd)( INTEGER_ARG(&NPOS),
                          DOUBLE_ARRAY_ARG(POS),
                          LOGICAL_ARG(&WEST),
                          DOUBLE_ARRAY_ARG(PAR),
                          DOUBLE_ARG(&RDIAM),
-                         INTEGER_ARG(&STATUS) );
+                         INTEGER_ARG(&STATUS) ); )
 
    F77_IMPORT_INTEGER( STATUS, *status );
    F77_IMPORT_DOUBLE_ARRAY( PAR, par, 7 );
@@ -926,9 +926,9 @@ void kpg1Gtwcs( int indf, AstFrameSet **iwcs, int *status ){
    F77_EXPORT_INTEGER( indf, INDF );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(kpg1_gtwcs)( INTEGER_ARG(&INDF),
+   F77_LOCK( F77_CALL(kpg1_gtwcs)( INTEGER_ARG(&INDF),
                          INTEGER_ARG(&IWCS),
-                         INTEGER_ARG(&STATUS) );
+                         INTEGER_ARG(&STATUS) ); )
 
    {
       int tmp;
@@ -959,11 +959,11 @@ void kpg1Asffr( AstFrameSet *target, const char *domain, int *ifrm, int *status 
    F77_CREATE_EXPORT_CHARACTER( domain, DOMAIN );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(kpg1_asffr)( INTEGER_ARG(&TARGET),
+   F77_LOCK( F77_CALL(kpg1_asffr)( INTEGER_ARG(&TARGET),
                          CHARACTER_ARG(DOMAIN),
                          INTEGER_ARG(&IFRM),
                          INTEGER_ARG(&STATUS)
-                         TRAIL_ARG(DOMAIN) );
+                         TRAIL_ARG(DOMAIN) ); )
 
    F77_IMPORT_INTEGER( STATUS, *status );
    F77_IMPORT_INTEGER( IFRM, *ifrm );
@@ -1003,13 +1003,13 @@ void kpg1Datcp( const HDSLoc *loc1, HDSLoc *loc2, const char *name, int *status 
    F77_CREATE_EXPORT_CHARACTER( name, NAME );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(kpg1_datcp)( CHARACTER_ARG(LOC1),
+   F77_LOCK( F77_CALL(kpg1_datcp)( CHARACTER_ARG(LOC1),
                          CHARACTER_ARG(LOC2),
                          CHARACTER_ARG(NAME),
                          INTEGER_ARG(&STATUS)
                          TRAIL_ARG(LOC1)
                          TRAIL_ARG(LOC2)
-                         TRAIL_ARG(NAME) );
+                         TRAIL_ARG(NAME) ); )
 
    F77_FREE_CHARACTER( NAME );
    F77_IMPORT_INTEGER( STATUS, *status );
@@ -1051,7 +1051,7 @@ void kpg1Ghstd( int bad, int dim, const double *array, int numbin, int cumul,
    F77_ASSOC_INTEGER_ARRAY( HIST, hist );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(kpg1_ghstd)( LOGICAL_ARG(&BAD),
+   F77_LOCK( F77_CALL(kpg1_ghstd)( LOGICAL_ARG(&BAD),
                          INTEGER_ARG(&DIM),
                          DOUBLE_ARRAY_ARG(ARRAY),
                          INTEGER_ARG(&NUMBIN),
@@ -1059,7 +1059,7 @@ void kpg1Ghstd( int bad, int dim, const double *array, int numbin, int cumul,
                          DOUBLE_ARG(&VALMAX),
                          DOUBLE_ARG(&VALMIN),
                          INTEGER_ARRAY_ARG(HIST),
-                         INTEGER_ARG(&STATUS) );
+                         INTEGER_ARG(&STATUS) ); )
 
    F77_IMPORT_DOUBLE( VALMAX, *valmax );
    F77_IMPORT_DOUBLE( VALMIN, *valmin );
@@ -1105,7 +1105,7 @@ void kpg1Ghstr( int bad, int dim, const float *array, int numbin, int cumul,
    F77_ASSOC_INTEGER_ARRAY( HIST, hist );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(kpg1_ghstr)( LOGICAL_ARG(&BAD),
+   F77_LOCK( F77_CALL(kpg1_ghstr)( LOGICAL_ARG(&BAD),
                          INTEGER_ARG(&DIM),
                          REAL_ARRAY_ARG(ARRAY),
                          INTEGER_ARG(&NUMBIN),
@@ -1113,7 +1113,7 @@ void kpg1Ghstr( int bad, int dim, const float *array, int numbin, int cumul,
                          REAL_ARG(&VALMAX),
                          REAL_ARG(&VALMIN),
                          INTEGER_ARRAY_ARG(HIST),
-                         INTEGER_ARG(&STATUS) );
+                         INTEGER_ARG(&STATUS) ); )
 
    F77_IMPORT_REAL( VALMAX, *valmax );
    F77_IMPORT_REAL( VALMIN, *valmin );
@@ -1155,7 +1155,7 @@ void kpg1Hsstp( int numbin, const int *hist, double valmax, double valmin,
    F77_EXPORT_DOUBLE( valmin, VALMIN );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(kpg1_hsstp)( INTEGER_ARG(&NUMBIN),
+   F77_LOCK( F77_CALL(kpg1_hsstp)( INTEGER_ARG(&NUMBIN),
                          INTEGER_ARRAY_ARG(HIST),
                          DOUBLE_ARG(&VALMAX),
                          DOUBLE_ARG(&VALMIN),
@@ -1163,7 +1163,7 @@ void kpg1Hsstp( int numbin, const int *hist, double valmax, double valmin,
                          DOUBLE_ARG(&MEAN),
                          DOUBLE_ARG(&MEDIAN),
                          DOUBLE_ARG(&MODE),
-                         INTEGER_ARG(&STATUS) );
+                         INTEGER_ARG(&STATUS) ); )
 
    F77_IMPORT_DOUBLE( SUM, *sum );
    F77_IMPORT_DOUBLE( MEAN, *mean );
@@ -1187,9 +1187,9 @@ void fts1Astwn( AstFitsChan *fc, int indf, int *status ){
    F77_EXPORT_INTEGER( indf, INDF );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(fts1_astwn)( INTEGER_ARG(&FC),
+   F77_LOCK( F77_CALL(fts1_astwn)( INTEGER_ARG(&FC),
                          INTEGER_ARG(&INDF),
-                         INTEGER_ARG(&STATUS) );
+                         INTEGER_ARG(&STATUS) ); )
 
    F77_IMPORT_INTEGER( STATUS, *status );
 }
@@ -1212,11 +1212,11 @@ void kpg1Elgau( float *sig, float *sig0, float *axis, float *theta,
    F77_EXPORT_REAL_ARRAY( sig, SIG, 4 );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(kpg1_elgau)( REAL_ARRAY_ARG(SIG),
+   F77_LOCK( F77_CALL(kpg1_elgau)( REAL_ARRAY_ARG(SIG),
                          REAL_ARG(&SIG0),
                          REAL_ARG(&AXIS),
                          REAL_ARG(&THETA),
-                         INTEGER_ARG(&STATUS) );
+                         INTEGER_ARG(&STATUS) ); )
    F77_IMPORT_REAL( SIG0, *sig0 );
    F77_IMPORT_REAL( AXIS, *axis );
    F77_IMPORT_REAL( THETA, *theta );
@@ -1291,7 +1291,7 @@ void kpg1Loctd( int ndim, const int *lbnd, const int *ubnd,
    F77_EXPORT_REAL_ARRAY( work1, WORK1, nw );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(kpg1_loctd)( INTEGER_ARG(&NDIM),
+   F77_LOCK( F77_CALL(kpg1_loctd)( INTEGER_ARG(&NDIM),
                          INTEGER_ARRAY_ARG(LBND),
                          INTEGER_ARRAY_ARG(UBND),
                          DOUBLE_ARRAY_ARG(ARRAY),
@@ -1304,7 +1304,7 @@ void kpg1Loctd( int ndim, const int *lbnd, const int *ubnd,
                          INTEGER_ARG(&SEL),
                          REAL_ARRAY_ARG(FINAL),
                          REAL_ARRAY_ARG(WORK1),
-                         INTEGER_ARG(&STATUS) );
+                         INTEGER_ARG(&STATUS) ); )
 
    F77_IMPORT_INTEGER( STATUS, *status );
    F77_IMPORT_REAL_ARRAY( FINAL, final, nbnd );
@@ -1371,14 +1371,14 @@ void kpgPixsc( AstFrameSet * iwcs,
   F77_EXPORT_INTEGER( astP2I( iwcs ), IWCS );
   F77_EXPORT_INTEGER( *status, STATUS );
 
-  F77_CALL(kpg1_pixsc)( INTEGER_ARG(&IWCS),
+  F77_LOCK( F77_CALL(kpg1_pixsc)( INTEGER_ARG(&IWCS),
                         DOUBLE_ARRAY_ARG(AT),
                         DOUBLE_ARRAY_ARG(PIXSC),
                         CHARACTER_ARRAY_ARG(VALUE),
                         CHARACTER_ARRAY_ARG(UNIT),
                         INTEGER_ARG(&STATUS)
                         TRAIL_ARG(VALUE)
-                        TRAIL_ARG(UNIT) );
+                        TRAIL_ARG(UNIT) ); )
 
   F77_IMPORT_INTEGER( STATUS, *status );
   if (pixsc) {
@@ -1415,11 +1415,11 @@ void kpg1Badbx( int indf1, int oper, int *indf2, int *ngood, int *status ){
    F77_EXPORT_INTEGER( oper, OPER );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(kpg1_badbx)( INTEGER_ARG(&INDF1),
+   F77_LOCK( F77_CALL(kpg1_badbx)( INTEGER_ARG(&INDF1),
                          INTEGER_ARG(&OPER),
                          INTEGER_ARG(&INDF2),
                          INTEGER_ARG(&NGOOD),
-                         INTEGER_ARG(&STATUS) );
+                         INTEGER_ARG(&STATUS) ); )
 
    F77_IMPORT_INTEGER( INDF2, *indf2 );
    F77_IMPORT_INTEGER( NGOOD, *ngood );
@@ -1455,10 +1455,10 @@ void kpg1Pxscl( AstFrameSet *iwcs,
    F77_EXPORT_INTEGER( astP2I( iwcs ), IWCS );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(kpg1_pxscl)( INTEGER_ARG(&IWCS),
+   F77_LOCK( F77_CALL(kpg1_pxscl)( INTEGER_ARG(&IWCS),
                          DOUBLE_ARRAY_ARG(AT),
                          DOUBLE_ARRAY_ARG(PIXSC),
-                         INTEGER_ARG(&STATUS) );
+                         INTEGER_ARG(&STATUS) ); )
 
    F77_IMPORT_INTEGER( STATUS, *status );
    F77_IMPORT_DOUBLE_ARRAY( PIXSC, pixsc, nwcs );

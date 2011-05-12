@@ -143,7 +143,7 @@ void hdrOut( char *param,
     ptr2 += lens;
   }
 
-  F77_CALL(hdr_out)( CHARACTER_ARG(fparam),
+  F77_LOCK( F77_CALL(hdr_out)( CHARACTER_ARG(fparam),
                      CHARACTER_ARG(fxname),
                      CHARACTER_ARG(fitem),
                      CHARACTER_ARG(fcommen),
@@ -153,7 +153,7 @@ void hdrOut( char *param,
                      TRAIL_ARG(fxname)
                      TRAIL_ARG(fitem)
                      TRAIL_ARG(fcommen)
-                     TRAIL_ARG(fvalue) );
+                     TRAIL_ARG(fvalue) ); )
 
   F77_FREE_CHARACTER(fparam);
   F77_FREE_CHARACTER(fxname);

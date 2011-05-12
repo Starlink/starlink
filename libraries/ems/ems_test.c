@@ -126,31 +126,31 @@ int main( void ){
    fstatus = SAI__ERROR;
    cnfExprt( "ERR1", err, err_length );
    cnfExprt( "Error message 1", mess, mess_length );
-   F77_CALL(ems_rep)( CHARACTER_ARG( err ),
+   F77_LOCK( F77_CALL(ems_rep)( CHARACTER_ARG( err ),
                       CHARACTER_ARG( mess ),
                       INTEGER_ARG( &fstatus )
                       TRAIL_ARG( err )
-                      TRAIL_ARG( mess ) );
-   F77_CALL(ems_mark)();
+                      TRAIL_ARG( mess ) ); )
+   F77_LOCK( F77_CALL(ems_mark)(); )
    cnfExprt( "ERR1", err, err_length );
    cnfExprt( "This message should not appear", mess, mess_length );
-   F77_CALL(ems_rep)(  CHARACTER_ARG( err ),
+   F77_LOCK( F77_CALL(ems_rep)(  CHARACTER_ARG( err ),
                       CHARACTER_ARG( mess ),
                       INTEGER_ARG( &fstatus )
                       TRAIL_ARG( err )
-                      TRAIL_ARG( mess ) );
+                      TRAIL_ARG( mess ) ); )
    cnfExprt( "ERR2", err, err_length );
    cnfExprt( "Error message 2", mess, mess_length );
-   F77_CALL(ems_annul)( INTEGER_ARG( &fstatus ) );
+   F77_LOCK( F77_CALL(ems_annul)( INTEGER_ARG( &fstatus ) ); )
    fstatus = SAI__ERROR;
-   F77_CALL(ems_rep)(  CHARACTER_ARG( err ),
+   F77_LOCK( F77_CALL(ems_rep)(  CHARACTER_ARG( err ),
                       CHARACTER_ARG( mess ),
                       INTEGER_ARG( &fstatus )
                       TRAIL_ARG( err )
-                      TRAIL_ARG( mess ) );
+                      TRAIL_ARG( mess ) ); )
 
    printf( "This should appear between the two error messages\n" );
-   F77_CALL(ems_rlse)();
+   F77_LOCK( F77_CALL(ems_rlse)(); )
    printf( "\n" );
 
    /*  System error. */

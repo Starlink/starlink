@@ -66,8 +66,8 @@ void atlCreat( const char *param, AstObject *iast, int *status ){
    F77_EXPORT_INTEGER( astP2I( iast ), IAST );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(atl_creat)( CHARACTER_ARG(PARAM), INTEGER_ARG(&IAST),
-                        INTEGER_ARG(&STATUS) TRAIL_ARG(PARAM) );
+   F77_LOCK( F77_CALL(atl_creat)( CHARACTER_ARG(PARAM), INTEGER_ARG(&IAST),
+                        INTEGER_ARG(&STATUS) TRAIL_ARG(PARAM) ); )
 
    F77_IMPORT_INTEGER( STATUS, *status );
 

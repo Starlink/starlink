@@ -201,9 +201,9 @@ executing VMS image - ^MESSAGE.", STATUS );
 /* Get the value of the zero'th argument (the name of the command being	    */
 /* executed).								    */
       iarg = (F77_INTEGER_TYPE) 0;
-      F77_CALL(ndf1_gtarg)( INTEGER_ARG(&iarg), CHARACTER_ARG(arg0),
+      F77_LOCK( F77_CALL(ndf1_gtarg)( INTEGER_ARG(&iarg), CHARACTER_ARG(arg0),
                             INTEGER_ARG(&larg), INTEGER_ARG(STATUS)
-			    TRAIL_ARG(arg0) );
+			    TRAIL_ARG(arg0) ); )
 
 /* If the argument value is blank, then return "<unknown>" as the	    */
 /* application name.							    */

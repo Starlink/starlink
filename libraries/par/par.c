@@ -69,9 +69,9 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER(param, fparam);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_cancl)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_cancl)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_INTEGER(fstatus,*status);
@@ -113,7 +113,7 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_CHARACTER(fvalue,value_length-1);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_choic)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_choic)( CHARACTER_ARG(fparam),
                         CHARACTER_ARG(fdefaul),
                         CHARACTER_ARG(fopts),
                         LOGICAL_ARG(&fnull),
@@ -122,7 +122,7 @@ DECLARE_INTEGER(fstatus);
                         TRAIL_ARG(fparam)
                         TRAIL_ARG(fdefaul)
                         TRAIL_ARG(fopts)
-                        TRAIL_ARG(fvalue) );
+                        TRAIL_ARG(fvalue) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_CHARACTER(fdefaul);
@@ -166,7 +166,7 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_CHARACTER_ARRAY(fvalues,values_length-1,maxval);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_choiv)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_choiv)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fmaxval),
                         CHARACTER_ARG(fopts),
                         CHARACTER_ARRAY_ARG(fvalues),
@@ -174,7 +174,7 @@ DECLARE_INTEGER(fstatus);
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(fparam)
                         TRAIL_ARG(fopts)
-                        TRAIL_ARG(fvalues) );
+                        TRAIL_ARG(fvalues) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_CHARACTER(fopts);
@@ -206,11 +206,11 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER(value,fvalue);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_def0c)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_def0c)( CHARACTER_ARG(fparam),
                         CHARACTER_ARG(fvalue),
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(fparam)
-                        TRAIL_ARG(fvalue) );
+                        TRAIL_ARG(fvalue) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_CHARACTER(fvalue);
@@ -237,10 +237,10 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_DOUBLE(value,fvalue);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_def0d)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_def0d)( CHARACTER_ARG(fparam),
                         DOUBLE_ARG(&fvalue),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_INTEGER(fstatus,*status);
@@ -266,10 +266,10 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER(value,fvalue);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_def0i)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_def0i)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fvalue),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_INTEGER(fstatus,*status);
@@ -295,10 +295,10 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_LOGICAL(value,fvalue);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_def0l)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_def0l)( CHARACTER_ARG(fparam),
                         LOGICAL_ARG(&fvalue),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_INTEGER(fstatus,*status);
@@ -324,10 +324,10 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_REAL(value,fvalue);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_def0r)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_def0r)( CHARACTER_ARG(fparam),
                         REAL_ARG(&fvalue),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_INTEGER(fstatus,*status);
@@ -360,12 +360,12 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_CHARACTER_ARRAY_P(values,fvalues,fvalues_length,nval);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_def1c)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_def1c)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fnval),
                         CHARACTER_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(fparam)
-                        TRAIL_ARG(fvalues) );
+                        TRAIL_ARG(fvalues) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_CHARACTER(fvalues);
@@ -397,11 +397,11 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_DOUBLE_ARRAY(values,fvalues,nval);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_def1d)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_def1d)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fnval),
                         DOUBLE_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_DOUBLE(fvalues);
@@ -433,11 +433,11 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER_ARRAY(values,fvalues,nval);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_def1i)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_def1i)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fnval),
                         INTEGER_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_INTEGER(fvalues);
@@ -469,11 +469,11 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_LOGICAL_ARRAY(values,fvalues,nval);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_def1l)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_def1l)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fnval),
                         LOGICAL_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_LOGICAL(fvalues);
@@ -505,11 +505,11 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_REAL_ARRAY(values,fvalues,nval);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_def1r)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_def1r)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fnval),
                         REAL_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_REAL(fvalues);
@@ -555,14 +555,14 @@ int i,nvalues;
    F77_EXPORT_INTEGER_ARRAY(actd,factd,ndim);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_defnc)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_defnc)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fndim),
                         INTEGER_ARRAY_ARG(fmaxd),
                         CHARACTER_ARRAY_ARG(fvalues),
                         INTEGER_ARRAY_ARG(factd),
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(fparam)
-                        TRAIL_ARG(fvalues) );
+                        TRAIL_ARG(fvalues) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_INTEGER(fmaxd);
@@ -608,13 +608,13 @@ int i,nvalues;
    F77_EXPORT_INTEGER_ARRAY(actd,factd,ndim);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_defnd)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_defnd)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fndim),
                         INTEGER_ARRAY_ARG(fmaxd),
                         DOUBLE_ARRAY_ARG(fvalues),
                         INTEGER_ARRAY_ARG(factd),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_INTEGER(fmaxd);
@@ -660,13 +660,13 @@ int i,nvalues;
    F77_EXPORT_INTEGER_ARRAY(actd,factd,ndim);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_defni)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_defni)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fndim),
                         INTEGER_ARRAY_ARG(fmaxd),
                         INTEGER_ARRAY_ARG(fvalues),
                         INTEGER_ARRAY_ARG(factd),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_INTEGER(fmaxd);
@@ -712,13 +712,13 @@ int i,nvalues;
    F77_EXPORT_INTEGER_ARRAY(actd,factd,ndim);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_defnl)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_defnl)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fndim),
                         INTEGER_ARRAY_ARG(fmaxd),
                         LOGICAL_ARRAY_ARG(fvalues),
                         INTEGER_ARRAY_ARG(factd),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_INTEGER(fmaxd);
@@ -764,13 +764,13 @@ int i,nvalues;
    F77_EXPORT_INTEGER_ARRAY(actd,factd,ndim);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_defnr)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_defnr)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fndim),
                         INTEGER_ARRAY_ARG(fmaxd),
                         REAL_ARRAY_ARG(fvalues),
                         INTEGER_ARRAY_ARG(factd),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_INTEGER(fmaxd);
@@ -805,12 +805,12 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_CHARACTER_ARRAY(fvalues,values_length-1,nvals);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_exacc)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_exacc)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fnvals),
                         CHARACTER_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(fparam)
-                        TRAIL_ARG(fvalues) );
+                        TRAIL_ARG(fvalues) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_CHARACTER_ARRAY_P(fvalues,fvalues_length,values,values_length,
@@ -844,11 +844,11 @@ DECLARE_INTEGER(fstatus);
    F77_ASSOC_DOUBLE_ARRAY(fvalues,values);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_exacd)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_exacd)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fnvals),
                         DOUBLE_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_DOUBLE_ARRAY(fvalues,values,nvals);
@@ -881,11 +881,11 @@ DECLARE_INTEGER(fstatus);
    F77_ASSOC_INTEGER_ARRAY(fvalues,values);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_exaci)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_exaci)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fnvals),
                         INTEGER_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_INTEGER_ARRAY(fvalues,values,nvals);
@@ -918,11 +918,11 @@ DECLARE_INTEGER(fstatus);
    F77_ASSOC_LOGICAL_ARRAY(fvalues,values);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_exacl)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_exacl)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fnvals),
                         LOGICAL_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_LOGICAL_ARRAY(fvalues,values,nvals);
@@ -955,11 +955,11 @@ DECLARE_INTEGER(fstatus);
    F77_ASSOC_REAL_ARRAY(fvalues,values);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_exacr)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_exacr)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fnvals),
                         REAL_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_REAL_ARRAY(fvalues,values,nvals);
@@ -1002,14 +1002,14 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_LOGICAL(null,fnull);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_gdr0d)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_gdr0d)( CHARACTER_ARG(fparam),
                         DOUBLE_ARG(&fdefaul),
                         DOUBLE_ARG(&fvmin),
                         DOUBLE_ARG(&fvmax),
                         LOGICAL_ARG(&fnull),
                         DOUBLE_ARG(&fvalue),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_DOUBLE(fvalue,*value);
@@ -1051,14 +1051,14 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_LOGICAL(null,fnull);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_gdr0i)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_gdr0i)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fdefaul),
                         INTEGER_ARG(&fvmin),
                         INTEGER_ARG(&fvmax),
                         LOGICAL_ARG(&fnull),
                         INTEGER_ARG(&fvalue),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_INTEGER(fvalue,*value);
@@ -1100,14 +1100,14 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_LOGICAL(null,fnull);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_gdr0r)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_gdr0r)( CHARACTER_ARG(fparam),
                         REAL_ARG(&fdefaul),
                         REAL_ARG(&fvmin),
                         REAL_ARG(&fvmax),
                         LOGICAL_ARG(&fnull),
                         REAL_ARG(&fvalue),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_REAL(fvalue,*value);
@@ -1156,7 +1156,7 @@ DECLARE_INTEGER(fstatus);
    F77_ASSOC_DOUBLE_ARRAY(fvalues,values);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_gdr1d)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_gdr1d)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fnvals),
                         DOUBLE_ARRAY_ARG(fdefaul),
                         DOUBLE_ARG(&fvmin),
@@ -1164,7 +1164,7 @@ DECLARE_INTEGER(fstatus);
                         LOGICAL_ARG(&fnull),
                         DOUBLE_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_DOUBLE(fdefaul);
@@ -1215,7 +1215,7 @@ DECLARE_INTEGER(fstatus);
    F77_ASSOC_INTEGER_ARRAY(fvalues,values);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_gdr1i)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_gdr1i)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fnvals),
                         INTEGER_ARRAY_ARG(fdefaul),
                         INTEGER_ARG(&fvmin),
@@ -1223,7 +1223,7 @@ DECLARE_INTEGER(fstatus);
                         LOGICAL_ARG(&fnull),
                         INTEGER_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_INTEGER(fdefaul);
@@ -1274,7 +1274,7 @@ DECLARE_INTEGER(fstatus);
    F77_ASSOC_REAL_ARRAY(fvalues,values);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_gdr1r)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_gdr1r)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fnvals),
                         REAL_ARRAY_ARG(fdefaul),
                         REAL_ARG(&fvmin),
@@ -1282,7 +1282,7 @@ DECLARE_INTEGER(fstatus);
                         LOGICAL_ARG(&fnull),
                         REAL_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_REAL(fdefaul);
@@ -1327,14 +1327,14 @@ DECLARE_INTEGER(fstatus);
    F77_ASSOC_DOUBLE_ARRAY(fvalues,values);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_gdrvd)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_gdrvd)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fmaxval),
                         DOUBLE_ARG(&fvmin),
                         DOUBLE_ARG(&fvmax),
                         DOUBLE_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&factval),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_INTEGER(factval,*actval);
@@ -1379,14 +1379,14 @@ DECLARE_INTEGER(fstatus);
    F77_ASSOC_INTEGER_ARRAY(fvalues,values);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_gdrvi)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_gdrvi)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fmaxval),
                         INTEGER_ARG(&fvmin),
                         INTEGER_ARG(&fvmax),
                         INTEGER_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&factval),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_INTEGER(factval,*actval);
@@ -1431,14 +1431,14 @@ DECLARE_INTEGER(fstatus);
    F77_ASSOC_REAL_ARRAY(fvalues,values);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_gdrvr)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_gdrvr)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fmaxval),
                         REAL_ARG(&fvmin),
                         REAL_ARG(&fvmax),
                         REAL_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&factval),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_INTEGER(factval,*actval);
@@ -1469,11 +1469,11 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_CHARACTER(fvalue,value_length-1);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_get0c)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_get0c)( CHARACTER_ARG(fparam),
                         CHARACTER_ARG(fvalue),
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(fparam)
-                        TRAIL_ARG(fvalue) );
+                        TRAIL_ARG(fvalue) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_INTEGER(fstatus,*status);
@@ -1503,10 +1503,10 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_get0d)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_get0d)( CHARACTER_ARG(fparam),
                         DOUBLE_ARG(&fvalue),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_INTEGER(fstatus,*status);
@@ -1534,10 +1534,10 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_get0i)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_get0i)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fvalue),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_INTEGER(fstatus,*status);
@@ -1565,10 +1565,10 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_get0l)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_get0l)( CHARACTER_ARG(fparam),
                         LOGICAL_ARG(&fvalue),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_INTEGER(fstatus,*status);
@@ -1596,10 +1596,10 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_get0r)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_get0r)( CHARACTER_ARG(fparam),
                         REAL_ARG(&fvalue),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_INTEGER(fstatus,*status);
@@ -1637,13 +1637,13 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER(maxval,fmaxval);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_get1c)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_get1c)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fmaxval),
                         CHARACTER_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&factval),
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(fparam)
-                        TRAIL_ARG(fvalues) );
+                        TRAIL_ARG(fvalues) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_INTEGER(fstatus,*status);
@@ -1683,12 +1683,12 @@ DECLARE_INTEGER(fstatus);
    F77_ASSOC_DOUBLE_ARRAY(fvalues,values);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_get1d)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_get1d)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fmaxval),
                         DOUBLE_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&factval),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_INTEGER(fstatus,*status);
@@ -1727,12 +1727,12 @@ DECLARE_INTEGER(fstatus);
    F77_ASSOC_INTEGER_ARRAY(fvalues,values);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_get1i)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_get1i)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fmaxval),
                         INTEGER_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&factval),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_INTEGER(fstatus,*status);
@@ -1771,12 +1771,12 @@ DECLARE_INTEGER(fstatus);
    F77_ASSOC_LOGICAL_ARRAY(fvalues,values);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_get1l)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_get1l)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fmaxval),
                         LOGICAL_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&factval),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_INTEGER(fstatus,*status);
@@ -1815,12 +1815,12 @@ DECLARE_INTEGER(fstatus);
    F77_ASSOC_REAL_ARRAY(fvalues,values);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_get1r)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_get1r)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fmaxval),
                         REAL_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&factval),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_INTEGER(fstatus,*status);
@@ -1869,14 +1869,14 @@ int i,nvalues;
    F77_ASSOC_INTEGER_ARRAY(factd,actd);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_getnc)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_getnc)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fndim),
                         INTEGER_ARRAY_ARG(fmaxd),
                         CHARACTER_ARRAY_ARG(fvalues),
                         INTEGER_ARRAY_ARG(factd),
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(fparam)
-                        TRAIL_ARG(fvalues) );
+                        TRAIL_ARG(fvalues) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_INTEGER(fmaxd);
@@ -1927,13 +1927,13 @@ int i,nvalues;
    F77_ASSOC_INTEGER_ARRAY(factd,actd);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_getnd)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_getnd)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fndim),
                         INTEGER_ARRAY_ARG(fmaxd),
                         DOUBLE_ARRAY_ARG(fvalues),
                         INTEGER_ARRAY_ARG(factd),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_INTEGER(fmaxd);
@@ -1983,13 +1983,13 @@ int i,nvalues;
    F77_ASSOC_INTEGER_ARRAY(factd,actd);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_getni)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_getni)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fndim),
                         INTEGER_ARRAY_ARG(fmaxd),
                         INTEGER_ARRAY_ARG(fvalues),
                         INTEGER_ARRAY_ARG(factd),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_INTEGER(fmaxd);
@@ -2040,13 +2040,13 @@ int i,nvalues;
    F77_ASSOC_INTEGER_ARRAY(factd,actd);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_getnl)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_getnl)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fndim),
                         INTEGER_ARRAY_ARG(fmaxd),
                         LOGICAL_ARRAY_ARG(fvalues),
                         INTEGER_ARRAY_ARG(factd),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_INTEGER(fmaxd);
@@ -2096,13 +2096,13 @@ int i,nvalues;
    F77_ASSOC_INTEGER_ARRAY(factd,actd);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_getnr)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_getnr)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fndim),
                         INTEGER_ARRAY_ARG(fmaxd),
                         REAL_ARRAY_ARG(fvalues),
                         INTEGER_ARRAY_ARG(factd),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_INTEGER(fmaxd);
@@ -2145,13 +2145,13 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_CHARACTER_ARRAY(fvalues,values_length-1,maxval);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_getvc)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_getvc)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fmaxval),
                         CHARACTER_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&factval),
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(fparam)
-                        TRAIL_ARG(fvalues) );
+                        TRAIL_ARG(fvalues) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_INTEGER(fstatus,*status);
@@ -2191,12 +2191,12 @@ DECLARE_INTEGER(fstatus);
    F77_ASSOC_DOUBLE_ARRAY(fvalues,values);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_getvd)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_getvd)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fmaxval),
                         DOUBLE_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&factval),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_INTEGER(fstatus,*status);
@@ -2235,12 +2235,12 @@ DECLARE_INTEGER(fstatus);
    F77_ASSOC_INTEGER_ARRAY(fvalues,values);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_getvi)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_getvi)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fmaxval),
                         INTEGER_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&factval),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_INTEGER(fstatus,*status);
@@ -2279,12 +2279,12 @@ DECLARE_INTEGER(fstatus);
    F77_ASSOC_LOGICAL_ARRAY(fvalues,values);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_getvl)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_getvl)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fmaxval),
                         LOGICAL_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&factval),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_INTEGER(fstatus,*status);
@@ -2323,12 +2323,12 @@ DECLARE_INTEGER(fstatus);
    F77_ASSOC_REAL_ARRAY(fvalues,values);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_getvr)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_getvr)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fmaxval),
                         REAL_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&factval),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_INTEGER(fstatus,*status);
@@ -2374,14 +2374,14 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_LOGICAL(null,fnull);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_geven)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_geven)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fdefaul),
                         INTEGER_ARG(&fvmin),
                         INTEGER_ARG(&fvmax),
                         LOGICAL_ARG(&fnull),
                         INTEGER_ARG(&fvalue),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_INTEGER(fvalue,*value);
@@ -2423,14 +2423,14 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_LOGICAL(null,fnull);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_godd)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_godd)( CHARACTER_ARG(fparam),
                        INTEGER_ARG(&fdefaul),
                        INTEGER_ARG(&fvmin),
                        INTEGER_ARG(&fvmax),
                        LOGICAL_ARG(&fnull),
                        INTEGER_ARG(&fvalue),
                        INTEGER_ARG(&fstatus)
-                       TRAIL_ARG(fparam) );
+                       TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_INTEGER(fvalue,*value);
@@ -2481,7 +2481,7 @@ DECLARE_INTEGER(fstatus);
    F77_ASSOC_DOUBLE_ARRAY(fvalues,values);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_grm1d)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_grm1d)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fnvals),
                         DOUBLE_ARRAY_ARG(fdefaul),
                         DOUBLE_ARRAY_ARG(fvmin),
@@ -2489,7 +2489,7 @@ DECLARE_INTEGER(fstatus);
                         LOGICAL_ARG(&fnull),
                         DOUBLE_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_DOUBLE(fdefaul);
@@ -2544,7 +2544,7 @@ DECLARE_INTEGER(fstatus);
    F77_ASSOC_INTEGER_ARRAY(fvalues,values);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_grm1i)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_grm1i)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fnvals),
                         INTEGER_ARRAY_ARG(fdefaul),
                         INTEGER_ARRAY_ARG(fvmin),
@@ -2552,7 +2552,7 @@ DECLARE_INTEGER(fstatus);
                         LOGICAL_ARG(&fnull),
                         INTEGER_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_INTEGER(fdefaul);
@@ -2607,7 +2607,7 @@ DECLARE_INTEGER(fstatus);
    F77_ASSOC_REAL_ARRAY(fvalues,values);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_grm1r)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_grm1r)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fnvals),
                         REAL_ARRAY_ARG(fdefaul),
                         REAL_ARRAY_ARG(fvmin),
@@ -2615,7 +2615,7 @@ DECLARE_INTEGER(fstatus);
                         LOGICAL_ARG(&fnull),
                         REAL_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_REAL(fdefaul);
@@ -2664,14 +2664,14 @@ DECLARE_INTEGER(fstatus);
    F77_ASSOC_DOUBLE_ARRAY(fvalues,values);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_grmvd)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_grmvd)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fmaxval),
                         DOUBLE_ARRAY_ARG(fvmin),
                         DOUBLE_ARRAY_ARG(fvmax),
                         DOUBLE_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&factval),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_DOUBLE(fvmin);
@@ -2721,14 +2721,14 @@ DECLARE_INTEGER(fstatus);
    F77_ASSOC_INTEGER_ARRAY(fvalues,values);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_grmvi)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_grmvi)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fmaxval),
                         INTEGER_ARRAY_ARG(fvmin),
                         INTEGER_ARRAY_ARG(fvmax),
                         INTEGER_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&factval),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_INTEGER(fvmin);
@@ -2777,14 +2777,14 @@ DECLARE_INTEGER(fstatus);
    F77_ASSOC_REAL_ARRAY(fvalues,values);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_grmvr)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_grmvr)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fmaxval),
                         REAL_ARRAY_ARG(fvmin),
                         REAL_ARRAY_ARG(fvmax),
                         REAL_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&factval),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_REAL(fvmin);
@@ -2822,12 +2822,12 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_LOGICAL(null,fnull);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_gtd0l)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_gtd0l)( CHARACTER_ARG(fparam),
                         LOGICAL_ARG(&fdefaul),
                         LOGICAL_ARG(&fnull),
                         LOGICAL_ARG(&fvalue),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_LOGICAL(fvalue,*value);
@@ -2855,11 +2855,11 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER(value,fvalue);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_maxc)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_maxc)( CHARACTER_ARG(fparam),
                        CHARACTER_ARG(fvalue),
                        INTEGER_ARG(&fstatus)
                        TRAIL_ARG(fparam)
-                       TRAIL_ARG(fvalue) );
+                       TRAIL_ARG(fvalue) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_CHARACTER(fvalue);
@@ -2886,10 +2886,10 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_DOUBLE(value,fvalue);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_maxd)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_maxd)( CHARACTER_ARG(fparam),
                        DOUBLE_ARG(&fvalue),
                        INTEGER_ARG(&fstatus)
-                       TRAIL_ARG(fparam) );
+                       TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_INTEGER(fstatus,*status);
@@ -2915,10 +2915,10 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER(value,fvalue);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_maxi)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_maxi)( CHARACTER_ARG(fparam),
                        INTEGER_ARG(&fvalue),
                        INTEGER_ARG(&fstatus)
-                       TRAIL_ARG(fparam) );
+                       TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_INTEGER(fstatus,*status);
@@ -2944,10 +2944,10 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_REAL(value,fvalue);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_maxr)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_maxr)( CHARACTER_ARG(fparam),
                        REAL_ARG(&fvalue),
                        INTEGER_ARG(&fstatus)
-                       TRAIL_ARG(fparam) );
+                       TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_INTEGER(fstatus,*status);
@@ -2974,11 +2974,11 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER(value,fvalue);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_minc)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_minc)( CHARACTER_ARG(fparam),
                        CHARACTER_ARG(fvalue),
                        INTEGER_ARG(&fstatus)
                        TRAIL_ARG(fparam)
-                       TRAIL_ARG(fvalue) );
+                       TRAIL_ARG(fvalue) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_CHARACTER(fvalue);
@@ -3005,10 +3005,10 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_DOUBLE(value,fvalue);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_mind)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_mind)( CHARACTER_ARG(fparam),
                        DOUBLE_ARG(&fvalue),
                        INTEGER_ARG(&fstatus)
-                       TRAIL_ARG(fparam) );
+                       TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_INTEGER(fstatus,*status);
@@ -3034,10 +3034,10 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER(value,fvalue);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_mini)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_mini)( CHARACTER_ARG(fparam),
                        INTEGER_ARG(&fvalue),
                        INTEGER_ARG(&fstatus)
-                       TRAIL_ARG(fparam) );
+                       TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_INTEGER(fstatus,*status);
@@ -3063,10 +3063,10 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_REAL(value,fvalue);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_minr)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_minr)( CHARACTER_ARG(fparam),
                        REAL_ARG(&fvalue),
                        INTEGER_ARG(&fstatus)
-                       TRAIL_ARG(fparam) );
+                       TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_INTEGER(fstatus,*status);
@@ -3116,7 +3116,7 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_CHARACTER(fvalue,value_length-1);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_mix0d)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_mix0d)( CHARACTER_ARG(fparam),
                         CHARACTER_ARG(fdefaul),
                         DOUBLE_ARG(&fvmin),
                         DOUBLE_ARG(&fvmax),
@@ -3127,7 +3127,7 @@ DECLARE_INTEGER(fstatus);
                         TRAIL_ARG(fparam)
                         TRAIL_ARG(fdefaul)
                         TRAIL_ARG(fopts)
-                        TRAIL_ARG(fvalue) );
+                        TRAIL_ARG(fvalue) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_CHARACTER(fdefaul);
@@ -3181,7 +3181,7 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_CHARACTER(fvalue,value_length-1);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_mix0i)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_mix0i)( CHARACTER_ARG(fparam),
                         CHARACTER_ARG(fdefaul),
                         INTEGER_ARG(&fvmin),
                         INTEGER_ARG(&fvmax),
@@ -3192,7 +3192,7 @@ DECLARE_INTEGER(fstatus);
                         TRAIL_ARG(fparam)
                         TRAIL_ARG(fdefaul)
                         TRAIL_ARG(fopts)
-                        TRAIL_ARG(fvalue) );
+                        TRAIL_ARG(fvalue) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_CHARACTER(fdefaul);
@@ -3246,7 +3246,7 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_CHARACTER(fvalue,value_length-1);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_mix0r)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_mix0r)( CHARACTER_ARG(fparam),
                         CHARACTER_ARG(fdefaul),
                         REAL_ARG(&fvmin),
                         REAL_ARG(&fvmax),
@@ -3257,7 +3257,7 @@ DECLARE_INTEGER(fstatus);
                         TRAIL_ARG(fparam)
                         TRAIL_ARG(fdefaul)
                         TRAIL_ARG(fopts)
-                        TRAIL_ARG(fvalue) );
+                        TRAIL_ARG(fvalue) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_CHARACTER(fdefaul);
@@ -3310,7 +3310,7 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER(*actval,factval);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_mixvd)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_mixvd)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fmaxval),
                         DOUBLE_ARG(&fvmin),
                         DOUBLE_ARG(&fvmax),
@@ -3320,7 +3320,7 @@ DECLARE_INTEGER(fstatus);
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(fparam)
                         TRAIL_ARG(fopts)
-                        TRAIL_ARG(fvalues) );
+                        TRAIL_ARG(fvalues) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_CHARACTER(fopts);
@@ -3374,7 +3374,7 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER(*actval,factval);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_mixvi)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_mixvi)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fmaxval),
                         INTEGER_ARG(&fvmin),
                         INTEGER_ARG(&fvmax),
@@ -3384,7 +3384,7 @@ DECLARE_INTEGER(fstatus);
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(fparam)
                         TRAIL_ARG(fopts)
-                        TRAIL_ARG(fvalues) );
+                        TRAIL_ARG(fvalues) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_CHARACTER(fopts);
@@ -3438,7 +3438,7 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER(*actval,factval);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_mixvr)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_mixvr)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fmaxval),
                         REAL_ARG(&fvmin),
                         REAL_ARG(&fvmax),
@@ -3448,7 +3448,7 @@ DECLARE_INTEGER(fstatus);
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(fparam)
                         TRAIL_ARG(fopts)
-                        TRAIL_ARG(fvalues) );
+                        TRAIL_ARG(fvalues) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_CHARACTER(fopts);
@@ -3480,11 +3480,11 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER(prompt,fprompt);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_promt)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_promt)( CHARACTER_ARG(fparam),
                         CHARACTER_ARG(fprompt),
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(fparam)
-                        TRAIL_ARG(fprompt) );
+                        TRAIL_ARG(fprompt) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_CHARACTER(fprompt);
@@ -3512,11 +3512,11 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER(value,fvalue);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_put0c)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_put0c)( CHARACTER_ARG(fparam),
                         CHARACTER_ARG(fvalue),
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(fparam)
-                        TRAIL_ARG(fvalue) );
+                        TRAIL_ARG(fvalue) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_CHARACTER(fvalue);
@@ -3543,10 +3543,10 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_DOUBLE(value,fvalue);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_put0d)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_put0d)( CHARACTER_ARG(fparam),
                         DOUBLE_ARG(&fvalue),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_INTEGER(fstatus,*status);
@@ -3572,10 +3572,10 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER(value,fvalue);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_put0i)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_put0i)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fvalue),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_INTEGER(fstatus,*status);
@@ -3601,10 +3601,10 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_LOGICAL(value,fvalue);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_put0l)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_put0l)( CHARACTER_ARG(fparam),
                         LOGICAL_ARG(&fvalue),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_INTEGER(fstatus,*status);
@@ -3630,10 +3630,10 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_REAL(value,fvalue);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_put0r)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_put0r)( CHARACTER_ARG(fparam),
                         REAL_ARG(&fvalue),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_INTEGER(fstatus,*status);
@@ -3666,12 +3666,12 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_CHARACTER_ARRAY_P(values,fvalues,fvalues_length,nval);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_put1c)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_put1c)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fnval),
                         CHARACTER_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(fparam)
-                        TRAIL_ARG(fvalues) );
+                        TRAIL_ARG(fvalues) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_CHARACTER(fvalues);
@@ -3703,11 +3703,11 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_DOUBLE_ARRAY(values,fvalues,nval);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_put1d)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_put1d)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fnval),
                         DOUBLE_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_DOUBLE(fvalues);
@@ -3739,11 +3739,11 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER_ARRAY(values,fvalues,nval);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_put1i)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_put1i)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fnval),
                         INTEGER_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_INTEGER(fvalues);
@@ -3775,11 +3775,11 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_LOGICAL_ARRAY(values,fvalues,nval);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_put1l)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_put1l)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fnval),
                         LOGICAL_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_LOGICAL(fvalues);
@@ -3811,11 +3811,11 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_REAL_ARRAY(values,fvalues,nval);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_put1r)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_put1r)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fnval),
                         REAL_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_REAL(fvalues);
@@ -3861,14 +3861,14 @@ int i,nvalues;
    F77_EXPORT_INTEGER_ARRAY(actd,factd,ndim);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_putnc)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_putnc)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fndim),
                         INTEGER_ARRAY_ARG(fmaxd),
                         CHARACTER_ARRAY_ARG(fvalues),
                         INTEGER_ARRAY_ARG(factd),
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(fparam)
-                        TRAIL_ARG(fvalues) );
+                        TRAIL_ARG(fvalues) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_INTEGER(fmaxd);
@@ -3914,13 +3914,13 @@ int i,nvalues;
    F77_EXPORT_INTEGER_ARRAY(actd,factd,ndim);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_putnd)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_putnd)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fndim),
                         INTEGER_ARRAY_ARG(fmaxd),
                         DOUBLE_ARRAY_ARG(fvalues),
                         INTEGER_ARRAY_ARG(factd),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_INTEGER(fmaxd);
@@ -3966,13 +3966,13 @@ int i,nvalues;
    F77_EXPORT_INTEGER_ARRAY(actd,factd,ndim);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_putni)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_putni)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fndim),
                         INTEGER_ARRAY_ARG(fmaxd),
                         INTEGER_ARRAY_ARG(fvalues),
                         INTEGER_ARRAY_ARG(factd),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_INTEGER(fmaxd);
@@ -4018,13 +4018,13 @@ int i,nvalues;
    F77_EXPORT_INTEGER_ARRAY(actd,factd,ndim);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_putnl)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_putnl)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fndim),
                         INTEGER_ARRAY_ARG(fmaxd),
                         LOGICAL_ARRAY_ARG(fvalues),
                         INTEGER_ARRAY_ARG(factd),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_INTEGER(fmaxd);
@@ -4070,13 +4070,13 @@ int i,nvalues;
    F77_EXPORT_INTEGER_ARRAY(actd,factd,ndim);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_putnr)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_putnr)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fndim),
                         INTEGER_ARRAY_ARG(fmaxd),
                         REAL_ARRAY_ARG(fvalues),
                         INTEGER_ARRAY_ARG(factd),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_INTEGER(fmaxd);
@@ -4112,12 +4112,12 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_CHARACTER_ARRAY_P(values,fvalues,fvalues_length,nval);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_putvc)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_putvc)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fnval),
                         CHARACTER_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(fparam)
-                        TRAIL_ARG(fvalues) );
+                        TRAIL_ARG(fvalues) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_CHARACTER(fvalues);
@@ -4149,11 +4149,11 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_DOUBLE_ARRAY(values,fvalues,nval);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_putvd)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_putvd)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fnval),
                         DOUBLE_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_DOUBLE(fvalues);
@@ -4185,11 +4185,11 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER_ARRAY(values,fvalues,nval);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_putvi)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_putvi)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fnval),
                         INTEGER_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_INTEGER(fvalues);
@@ -4221,11 +4221,11 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_LOGICAL_ARRAY(values,fvalues,nval);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_putvl)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_putvl)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fnval),
                         LOGICAL_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_LOGICAL(fvalues);
@@ -4257,11 +4257,11 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_REAL_ARRAY(values,fvalues,nval);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_putvr)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_putvr)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fnval),
                         REAL_ARRAY_ARG(fvalues),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_REAL(fvalues);
@@ -4287,10 +4287,10 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_state)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_state)( CHARACTER_ARG(fparam),
                         INTEGER_ARG(&fstate),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam) );
+                        TRAIL_ARG(fparam) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_IMPORT_INTEGER(fstate,*state);
@@ -4318,11 +4318,11 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER(which,fwhich);
    F77_EXPORT_INTEGER(*status,fstatus);
 
-   F77_CALL(par_unset)( CHARACTER_ARG(fparam),
+   F77_LOCK( F77_CALL(par_unset)( CHARACTER_ARG(fparam),
                         CHARACTER_ARG(fwhich),
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(fparam)
-                        TRAIL_ARG(fwhich) );
+                        TRAIL_ARG(fwhich) ); )
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_CHARACTER(fwhich);

@@ -71,9 +71,9 @@ F77_SUBROUTINE(hds_run)( SUBROUTINE(subroutine),
       if ( !_ok( *status ) ) return;
 
 /* Start up HDS, call the application and close HDS down  */
-      F77_CALL(hds_start)( status );
+      F77_LOCK( F77_CALL(hds_start)( status ); )
       (*subroutine)( status );
-      F77_CALL(hds_stop)( status );
+      F77_LOCK( F77_CALL(hds_stop)( status ); )
 
 /* If an error occurred, then report contextual information.  */
       if ( !_ok( *status ) )

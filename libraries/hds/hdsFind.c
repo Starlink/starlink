@@ -89,7 +89,7 @@ void hdsFind( const HDSLoc *loc1, const char *name, const char *mode,
     F77_EXPORT_CHARACTER( mode, fmode, fmode_length );
     F77_EXPORT_INTEGER( *status, fstatus );
 
-    F77_CALL( hds_find )( CHARACTER_ARG( floc1 ),
+    F77_LOCK( F77_CALL( hds_find )( CHARACTER_ARG( floc1 ),
                           CHARACTER_ARG( fname ),
                           CHARACTER_ARG( fmode ),
                           CHARACTER_ARG( floc2 ),
@@ -97,7 +97,7 @@ void hdsFind( const HDSLoc *loc1, const char *name, const char *mode,
                           TRAIL_ARG( floc1 )
                           TRAIL_ARG( fname )
                           TRAIL_ARG( fmode )
-                          TRAIL_ARG( floc2 ) );
+                          TRAIL_ARG( floc2 ) ); )
 
     F77_FREE_CHARACTER( fname );
     F77_FREE_CHARACTER( fmode );

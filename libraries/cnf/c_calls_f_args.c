@@ -25,7 +25,7 @@ int main () {
 
    cnfInitRTL(iargc, argv);
 
-   F77_CALL(ftestarg)( retval, strlen(retval));
+   F77_LOCK( F77_CALL(ftestarg)( retval, strlen(retval)); )
 
    if (strcmp(retval, argv[1]) == 0) {
      printf("Correctly got '%s' and '%s'\n", argv[1], retval);

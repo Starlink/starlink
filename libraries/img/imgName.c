@@ -84,11 +84,11 @@ void imgName( char *param,
   cnf_exprt( param, fparam, fparam_length );
   F77_CREATE_CHARACTER(fvalue,value_length);
 
-  F77_CALL(img_name)( CHARACTER_ARG(fparam),
+  F77_LOCK( F77_CALL(img_name)( CHARACTER_ARG(fparam),
                       CHARACTER_ARG(fvalue),
                       INTEGER_ARG(status)
                       TRAIL_ARG(fparam)
-                      TRAIL_ARG(fvalue) );
+                      TRAIL_ARG(fvalue) ); )
 
   F77_FREE_CHARACTER(fparam);
   cnf_imprt( fvalue, fvalue_length, value );

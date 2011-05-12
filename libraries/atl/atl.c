@@ -94,12 +94,12 @@ void atlAxtrm( AstFrameSet *iwcs, int *axes, int *lbnd, int *ubnd,
    F77_EXPORT_INTEGER_ARRAY( ubnd, UBND, ndim );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(atl_axtrm)( INTEGER_ARG(&IWCS),
+   F77_LOCK( F77_CALL(atl_axtrm)( INTEGER_ARG(&IWCS),
                         INTEGER_ARRAY_ARG(AXES),
                         INTEGER_ARRAY_ARG(LBND),
                         INTEGER_ARRAY_ARG(UBND),
                         DOUBLE_ARRAY_ARG(work),
-                        INTEGER_ARG(&STATUS) );
+                        INTEGER_ARG(&STATUS) ); )
 
    F77_FREE_INTEGER( AXES );
    F77_FREE_INTEGER( LBND );
@@ -124,9 +124,9 @@ void atlPlroi( AstPlot *iplot, AstKeyMap **rplots, int *status ){
    F77_EXPORT_INTEGER( astP2I( iplot ), IPLOT );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(atl_plroi)( INTEGER_ARG(&IPLOT),
+   F77_LOCK( F77_CALL(atl_plroi)( INTEGER_ARG(&IPLOT),
                         INTEGER_ARG(&RPLOTS),
-                        INTEGER_ARG(&STATUS) );
+                        INTEGER_ARG(&STATUS) ); )
 
    F77_IMPORT_INTEGER( STATUS, *status );
    F77_IMPORT_INTEGER( RPLOTS, irplots );
@@ -165,14 +165,14 @@ void atlMklut( int ix, int iy, int npnt, int nvar, AstFrame *frm,
    F77_EXPORT_INTEGER( nvar, NVAR );
    F77_EXPORT_INTEGER( astP2I( frm ), FRM );
 
-   F77_CALL(atl_mklut)( INTEGER_ARG(&IX),
+   F77_LOCK( F77_CALL(atl_mklut)( INTEGER_ARG(&IX),
                         INTEGER_ARG(&IY),
                         INTEGER_ARG(&NPNT),
                         INTEGER_ARG(&NVAR),
                         INTEGER_ARG(&FRM),
                         DOUBLE_ARRAY_ARG(table),
                         INTEGER_ARG(&MAP),
-                        INTEGER_ARG(&STATUS) );
+                        INTEGER_ARG(&STATUS) ); )
 
 
    if( astOK ) {
@@ -210,11 +210,11 @@ void atlMgfts( int method, AstFitsChan *fc1, AstFitsChan *fc2,
    F77_EXPORT_INTEGER( astP2I( fc2 ), FC2 );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(atl_mgfts)( INTEGER_ARG(&METHOD),
+   F77_LOCK( F77_CALL(atl_mgfts)( INTEGER_ARG(&METHOD),
                         INTEGER_ARG(&FC1),
                         INTEGER_ARG(&FC2),
                         INTEGER_ARG(&FC3),
-                        INTEGER_ARG(&STATUS) );
+                        INTEGER_ARG(&STATUS) ); )
 
    F77_IMPORT_INTEGER( STATUS, *status );
    F77_IMPORT_INTEGER( FC3, ifc3 );
@@ -253,13 +253,13 @@ void atlPtfti( AstFitsChan *this, const char *name, int value,
 
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(atl_ptfti)( INTEGER_ARG(&THIS),
+   F77_LOCK( F77_CALL(atl_ptfti)( INTEGER_ARG(&THIS),
                         CHARACTER_ARG(NAME),
                         INTEGER_ARG(&VALUE),
                         CHARACTER_ARG(COMMNT),
                         INTEGER_ARG(&STATUS)
                         TRAIL_ARG(NAME)
-                        TRAIL_ARG(COMMNT) );
+                        TRAIL_ARG(COMMNT) ); )
 
    F77_FREE_CHARACTER( NAME );
    F77_FREE_CHARACTER( COMMNT );
@@ -298,13 +298,13 @@ void atlPtftl( AstFitsChan *this, const char *name, int value,
 
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(atl_ptftl)( INTEGER_ARG(&THIS),
+   F77_LOCK( F77_CALL(atl_ptftl)( INTEGER_ARG(&THIS),
                         CHARACTER_ARG(NAME),
                         LOGICAL_ARG(&VALUE),
                         CHARACTER_ARG(COMMNT),
                         INTEGER_ARG(&STATUS)
                         TRAIL_ARG(NAME)
-                        TRAIL_ARG(COMMNT) );
+                        TRAIL_ARG(COMMNT) ); )
 
    F77_FREE_CHARACTER( NAME );
    F77_FREE_CHARACTER( COMMNT );
@@ -344,13 +344,13 @@ void atlPtftr( AstFitsChan *this, const char *name, float value,
 
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(atl_ptftr)( INTEGER_ARG(&THIS),
+   F77_LOCK( F77_CALL(atl_ptftr)( INTEGER_ARG(&THIS),
                         CHARACTER_ARG(NAME),
                         REAL_ARG(&VALUE),
                         CHARACTER_ARG(COMMNT),
                         INTEGER_ARG(&STATUS)
                         TRAIL_ARG(NAME)
-                        TRAIL_ARG(COMMNT) );
+                        TRAIL_ARG(COMMNT) ); )
 
    F77_FREE_CHARACTER( NAME );
    F77_FREE_CHARACTER( COMMNT );
@@ -389,13 +389,13 @@ void atlPtftd( AstFitsChan *this, const char *name, double value,
 
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(atl_ptftd)( INTEGER_ARG(&THIS),
+   F77_LOCK( F77_CALL(atl_ptftd)( INTEGER_ARG(&THIS),
                         CHARACTER_ARG(NAME),
                         DOUBLE_ARG(&VALUE),
                         CHARACTER_ARG(COMMNT),
                         INTEGER_ARG(&STATUS)
                         TRAIL_ARG(NAME)
-                        TRAIL_ARG(COMMNT) );
+                        TRAIL_ARG(COMMNT) ); )
 
    F77_FREE_CHARACTER( NAME );
    F77_FREE_CHARACTER( COMMNT );
@@ -431,14 +431,14 @@ void atlPtfts( AstFitsChan *this, const char *name,
 
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(atl_ptfts)( INTEGER_ARG(&THIS),
+   F77_LOCK( F77_CALL(atl_ptfts)( INTEGER_ARG(&THIS),
                         CHARACTER_ARG(NAME),
                         CHARACTER_ARG(VALUE),
                         CHARACTER_ARG(COMMNT),
                         INTEGER_ARG(&STATUS)
                         TRAIL_ARG(NAME)
                         TRAIL_ARG(VALUE)
-                        TRAIL_ARG(COMMNT) );
+                        TRAIL_ARG(COMMNT) ); )
 
    F77_FREE_CHARACTER( NAME );
    F77_FREE_CHARACTER( VALUE );
@@ -461,8 +461,8 @@ void atlRmblft(  AstFitsChan * this, int *status ) {
 
   F77_EXPORT_INTEGER( *status, STATUS );
 
-  F77_CALL(atl_rmblft)( INTEGER_ARG(&THIS),
-                        INTEGER_ARG(&STATUS) );
+  F77_LOCK( F77_CALL(atl_rmblft)( INTEGER_ARG(&THIS),
+                        INTEGER_ARG(&STATUS) ); )
 
   F77_IMPORT_INTEGER( STATUS, *status );
 }
@@ -500,14 +500,14 @@ void atlTolut( AstMapping *inmap, double xlo, double xhi, double dx,
 
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(atl_tolut)( INTEGER_ARG(&INMAP),
+   F77_LOCK( F77_CALL(atl_tolut)( INTEGER_ARG(&INMAP),
                         DOUBLE_ARG(&XLO),
                         DOUBLE_ARG(&XHI),
                         DOUBLE_ARG(&DX),
                         CHARACTER_ARG(OPTS),
                         INTEGER_ARG(&OUTMAP),
                         INTEGER_ARG(&STATUS)
-                        TRAIL_ARG(OPTS) );
+                        TRAIL_ARG(OPTS) ); )
 
    F77_FREE_CHARACTER( OPTS );
 
@@ -552,13 +552,13 @@ void atlWcspx( AstKeyMap *km1, AstKeyMap *km2, double crpix[3], double obslon,
    F77_EXPORT_DOUBLE( obslat, OBSLAT );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(atl_wcspx)( INTEGER_ARG(&KM1),
+   F77_LOCK( F77_CALL(atl_wcspx)( INTEGER_ARG(&KM1),
                         INTEGER_ARG(&KM2),
                         DOUBLE_ARRAY_ARG(CRPIX),
                         DOUBLE_ARG(&OBSLON),
                         DOUBLE_ARG(&OBSLAT),
                         INTEGER_ARG(&IWCS),
-                        INTEGER_ARG(&STATUS) );
+                        INTEGER_ARG(&STATUS) ); )
 
    if( astOK ) {
       F77_IMPORT_INTEGER( IWCS, iiwcs );
@@ -595,12 +595,12 @@ void atlKychk( AstKeyMap *keymap, const char *key, const char *errmsg,
    F77_EXPORT_CHARACTER( errmsg, ERRMSG, ERRMSG_length );
    F77_EXPORT_INTEGER( *status, STATUS );
 
-   F77_CALL(atl_kychk)( INTEGER_ARG(&KEYMAP),
+   F77_LOCK( F77_CALL(atl_kychk)( INTEGER_ARG(&KEYMAP),
                         CHARACTER_ARG(KEY),
                         CHARACTER_ARG(ERRMSG),
                         INTEGER_ARG(&STATUS)
                         TRAIL_ARG(KEY)
-                        TRAIL_ARG(ERRMSG) );
+                        TRAIL_ARG(ERRMSG) ); )
 
    F77_FREE_CHARACTER( KEY );
    F77_FREE_CHARACTER( ERRMSG );

@@ -86,10 +86,10 @@ void subParFindpar( const char * name, size_t * namecode, int * status ) {
   F77_CREATE_EXPORT_CHARACTER(name, NAME);
   F77_EXPORT_INTEGER( *status, STATUS );
 
-  F77_CALL(subpar_findpar)( CHARACTER_ARG(NAME),
+  F77_LOCK( F77_CALL(subpar_findpar)( CHARACTER_ARG(NAME),
 			    INTEGER_ARG(&NAMECODE),
 			    INTEGER_ARG(&STATUS)
-			    TRAIL_ARG(NAME) );
+			    TRAIL_ARG(NAME) ); )
 
   F77_FREE_CHARACTER(NAME);
   F77_IMPORT_INTEGER( NAMECODE, *namecode );
@@ -116,8 +116,8 @@ void subParGet0c( size_t namecode, char *cvalue, size_t cvalue_length,
   F77_CREATE_CHARACTER( CVALUE, cvalue_length - 1 );
   F77_EXPORT_INTEGER( *status, STATUS );
 
-  F77_CALL(subpar_get0c)( INTEGER_ARG(&NAMECODE), CHARACTER_ARG(CVALUE),
-			  INTEGER_ARG(&STATUS) TRAIL_ARG(CVALUE) );
+  F77_LOCK( F77_CALL(subpar_get0c)( INTEGER_ARG(&NAMECODE), CHARACTER_ARG(CVALUE),
+			  INTEGER_ARG(&STATUS) TRAIL_ARG(CVALUE) ); )
 
   F77_IMPORT_CHARACTER( CVALUE, CVALUE_length, cvalue );
   F77_FREE_CHARACTER( CVALUE );
@@ -142,8 +142,8 @@ void subParGet0l( size_t namecode, int *lvalue, int * status ) {
   F77_EXPORT_INTEGER( namecode, NAMECODE );
   F77_EXPORT_INTEGER( *status, STATUS );
 
-  F77_CALL(subpar_get0l)( INTEGER_ARG(&NAMECODE), LOGICAL_ARG(&LVALUE),
-			  INTEGER_ARG(&STATUS) );
+  F77_LOCK( F77_CALL(subpar_get0l)( INTEGER_ARG(&NAMECODE), LOGICAL_ARG(&LVALUE),
+			  INTEGER_ARG(&STATUS) ); )
 
   F77_IMPORT_LOGICAL( LVALUE, *lvalue );
   F77_IMPORT_INTEGER( STATUS, *status );
@@ -169,8 +169,8 @@ void subParGetkey( size_t namecode, char *keyword, size_t keyword_length,
   F77_CREATE_CHARACTER( KEYWORD, keyword_length - 1 );
   F77_EXPORT_INTEGER( *status, STATUS );
 
-  F77_CALL(subpar_getkey)( INTEGER_ARG(&NAMECODE), CHARACTER_ARG(KEYWORD),
-			  INTEGER_ARG(&STATUS) TRAIL_ARG(KEYWORD) );
+  F77_LOCK( F77_CALL(subpar_getkey)( INTEGER_ARG(&NAMECODE), CHARACTER_ARG(KEYWORD),
+			  INTEGER_ARG(&STATUS) TRAIL_ARG(KEYWORD) ); )
 
   F77_IMPORT_CHARACTER( KEYWORD, KEYWORD_length, keyword );
   F77_FREE_CHARACTER( KEYWORD );
@@ -197,10 +197,10 @@ int subParGref( size_t namecode, char * refstr, size_t reflen ) {
   F77_EXPORT_INTEGER( namecode, NAMECODE );
   F77_CREATE_CHARACTER( REFSTR, reflen - 1 );
 
-  retval = F77_CALL(subpar_gref)( INTEGER_ARG(&NAMECODE),
+  F77_LOCK( retval = F77_CALL(subpar_gref)( INTEGER_ARG(&NAMECODE),
                                   CHARACTER_ARG(REFSTR),
                                   INTEGER_ARG(&REFLEN)
-                                  TRAIL_ARG(REFSTR) );
+                                  TRAIL_ARG(REFSTR) ); )
 
   F77_IMPORT_CHARACTER( REFSTR, REFSTR_length, refstr );
   F77_FREE_CHARACTER( REFSTR );
@@ -221,9 +221,9 @@ void subParState( size_t namecode, int * state, int * status ) {
   F77_EXPORT_INTEGER( namecode, NAMECODE );
   F77_EXPORT_INTEGER( *status, STATUS );
 
-  F77_CALL(subpar_state)( INTEGER_ARG(&NAMECODE),
+  F77_LOCK( F77_CALL(subpar_state)( INTEGER_ARG(&NAMECODE),
 			  INTEGER_ARG(&STATE),
-			  INTEGER_ARG(&STATUS) );
+			  INTEGER_ARG(&STATUS) ); )
 
   F77_IMPORT_INTEGER( STATE, *state );
   F77_IMPORT_INTEGER( STATUS, *status );
@@ -237,7 +237,7 @@ void subParSync( int * status ) {
   LOCK_MUTEX;
 
   F77_EXPORT_INTEGER( *status, STATUS );
-  F77_CALL(subpar_sync)( INTEGER_ARG(&STATUS) );
+  F77_LOCK( F77_CALL(subpar_sync)( INTEGER_ARG(&STATUS) ); )
   F77_IMPORT_INTEGER( STATUS, *status );
 
   UNLOCK_MUTEX;
@@ -256,9 +256,9 @@ void subParWrerr( const char * string, int * status ) {
   F77_CREATE_EXPORT_CHARACTER(string, STRING);
   F77_EXPORT_INTEGER( *status, STATUS );
 
-  F77_CALL(subpar_wrerr)( CHARACTER_ARG(STRING),
+  F77_LOCK( F77_CALL(subpar_wrerr)( CHARACTER_ARG(STRING),
 			  INTEGER_ARG(&STATUS)
-			  TRAIL_ARG(STRING) );
+			  TRAIL_ARG(STRING) ); )
 
   F77_FREE_CHARACTER(STRING);
   F77_IMPORT_INTEGER( STATUS, *status );
@@ -279,9 +279,9 @@ void subParWrmsg( const char * string, int * status ) {
   F77_CREATE_EXPORT_CHARACTER(string, STRING);
   F77_EXPORT_INTEGER( *status, STATUS );
 
-  F77_CALL(subpar_wrmsg)( CHARACTER_ARG(STRING),
+  F77_LOCK( F77_CALL(subpar_wrmsg)( CHARACTER_ARG(STRING),
 			  INTEGER_ARG(&STATUS)
-			  TRAIL_ARG(STRING) );
+			  TRAIL_ARG(STRING) ); )
 
   F77_FREE_CHARACTER(STRING);
   F77_IMPORT_INTEGER( STATUS, *status );

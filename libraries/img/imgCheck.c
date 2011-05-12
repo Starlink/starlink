@@ -60,7 +60,7 @@ F77_SUBROUTINE(img_check)( INTEGER(status) );
 
 void imgCheck( int *status ) {
 
-   F77_CALL(img_check)( INTEGER_ARG(status) );
+   F77_LOCK( F77_CALL(img_check)( INTEGER_ARG(status) ); )
 
    return;
 }

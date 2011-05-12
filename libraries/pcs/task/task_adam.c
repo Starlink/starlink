@@ -62,8 +62,8 @@ void taskGetName( char * taskname, size_t buflen, int * status ) {
   F77_CREATE_CHARACTER( TASKNAME, buflen - 1 );
 
   taskname[0] = '\0';
-  F77_CALL(task_get_name) ( CHARACTER_ARG(TASKNAME), INTEGER_ARG(&STATUS)
-                            TRAIL_ARG(TASKNAME) );
+  F77_LOCK( F77_CALL(task_get_name) ( CHARACTER_ARG(TASKNAME), INTEGER_ARG(&STATUS)
+                            TRAIL_ARG(TASKNAME) ); )
   cnfImprt( TASKNAME, TASKNAME_length, taskname );
   F77_FREE_CHARACTER(TASKNAME);
   F77_IMPORT_INTEGER( &STATUS, status );

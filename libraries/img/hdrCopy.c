@@ -99,7 +99,7 @@ void hdrCopy( char *param1,
     F77_EXPORT_CHARACTER(xname2,fxname2,fxname2_length);
     F77_EXPORT_INTEGER(*status,fstatus);
 
-    F77_CALL(hdr_copy)( CHARACTER_ARG(fparam1),
+    F77_LOCK( F77_CALL(hdr_copy)( CHARACTER_ARG(fparam1),
                         CHARACTER_ARG(fxname1),
                         CHARACTER_ARG(fparam2),
                         CHARACTER_ARG(fxname2),
@@ -107,7 +107,7 @@ void hdrCopy( char *param1,
                         TRAIL_ARG(fparam1)
                         TRAIL_ARG(fxname1)
                         TRAIL_ARG(fparam2)
-                        TRAIL_ARG(fxname2) );
+                        TRAIL_ARG(fxname2) ); )
 
     F77_FREE_CHARACTER(fparam1);
     F77_FREE_CHARACTER(fxname1);

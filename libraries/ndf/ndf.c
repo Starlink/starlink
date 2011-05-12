@@ -193,13 +193,13 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_CHARACTER( value, fvalue, fvalue_length );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_acget)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_acget)( INTEGER_ARG(&findf),
                         CHARACTER_ARG(fcomp),
                         INTEGER_ARG(&fiaxis),
                         CHARACTER_ARG(fvalue),
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(fcomp)
-                        TRAIL_ARG(fvalue) );
+                        TRAIL_ARG(fvalue) ); )
 
    F77_FREE_CHARACTER( fcomp );
    F77_IMPORT_CHARACTER( fvalue, fvalue_length, value );
@@ -233,12 +233,12 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( iaxis, fiaxis );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_aclen)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_aclen)( INTEGER_ARG(&findf),
                         CHARACTER_ARG(fcomp),
                         INTEGER_ARG(&fiaxis),
                         INTEGER_ARG(&flength),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fcomp) );
+                        TRAIL_ARG(fcomp) ); )
 
    F77_FREE_CHARACTER( fcomp );
    F77_IMPORT_INTEGER( flength, *length );
@@ -273,13 +273,13 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( iaxis, fiaxis );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_acmsg)( CHARACTER_ARG(ftoken),
+   F77_LOCK( F77_CALL(ndf_acmsg)( CHARACTER_ARG(ftoken),
                         INTEGER_ARG(&findf),
                         CHARACTER_ARG(fcomp),
                         INTEGER_ARG(&fiaxis),
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(ftoken)
-                        TRAIL_ARG(fcomp) );
+                        TRAIL_ARG(fcomp) ); )
 
    F77_FREE_CHARACTER( ftoken );
    F77_FREE_CHARACTER( fcomp );
@@ -314,13 +314,13 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( iaxis, fiaxis );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_acput)( CHARACTER_ARG(fvalue),
+   F77_LOCK( F77_CALL(ndf_acput)( CHARACTER_ARG(fvalue),
                         INTEGER_ARG(&findf),
                         CHARACTER_ARG(fcomp),
                         INTEGER_ARG(&fiaxis),
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(fvalue)
-                        TRAIL_ARG(fcomp) );
+                        TRAIL_ARG(fcomp) ); )
 
    F77_FREE_CHARACTER( fvalue );
    F77_FREE_CHARACTER( fcomp );
@@ -341,8 +341,8 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( indf, findf );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_acre)( INTEGER_ARG(&findf),
-                       INTEGER_ARG(&fstatus) );
+   F77_LOCK( F77_CALL(ndf_acre)( INTEGER_ARG(&findf),
+                       INTEGER_ARG(&fstatus) ); )
 
    F77_IMPORT_INTEGER( fstatus, *status );
 
@@ -376,13 +376,13 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_CHARACTER( fform, form_length-1 );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_aform)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_aform)( INTEGER_ARG(&findf),
                         CHARACTER_ARG(fcomp),
                         INTEGER_ARG(&fiaxis),
                         CHARACTER_ARG(fform),
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(fcomp)
-                        TRAIL_ARG(fform) );
+                        TRAIL_ARG(fform) ); )
 
    F77_FREE_CHARACTER( fcomp );
    F77_IMPORT_CHARACTER( fform, fform_length, form );
@@ -433,7 +433,7 @@ int nfield;
    F77_ASSOC_POINTER_ARRAY( fpntr, pntr );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_amap)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_amap)( INTEGER_ARG(&findf),
                        CHARACTER_ARG(fcomp),
                        INTEGER_ARG(&fiaxis),
                        CHARACTER_ARG(ftype),
@@ -443,7 +443,7 @@ int nfield;
                        INTEGER_ARG(&fstatus)
                        TRAIL_ARG(fcomp)
                        TRAIL_ARG(ftype)
-                       TRAIL_ARG(fmmod) );
+                       TRAIL_ARG(fmmod) ); )
 
    F77_FREE_CHARACTER( fcomp );
    F77_FREE_CHARACTER( ftype );
@@ -468,8 +468,8 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( *indf, findf );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_annul)( INTEGER_ARG(&findf),
-                        INTEGER_ARG(&fstatus) );
+   F77_LOCK( F77_CALL(ndf_annul)( INTEGER_ARG(&findf),
+                        INTEGER_ARG(&fstatus) ); )
 
    F77_IMPORT_INTEGER( findf, *indf );
    F77_IMPORT_INTEGER( fstatus, *status );
@@ -496,10 +496,10 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( iaxis, fiaxis );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_anorm)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_anorm)( INTEGER_ARG(&findf),
                         INTEGER_ARG(&fiaxis),
                         LOGICAL_ARG(&fnorm),
-                        INTEGER_ARG(&fstatus) );
+                        INTEGER_ARG(&fstatus) ); )
 
    F77_IMPORT_LOGICAL( fnorm, *norm );
    F77_IMPORT_INTEGER( fstatus, *status );
@@ -528,11 +528,11 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( iaxis, fiaxis );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_arest)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_arest)( INTEGER_ARG(&findf),
                         CHARACTER_ARG(fcomp),
                         INTEGER_ARG(&fiaxis),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fcomp) );
+                        TRAIL_ARG(fcomp) ); )
 
    F77_FREE_CHARACTER( fcomp );
    F77_IMPORT_INTEGER( fstatus, *status );
@@ -560,10 +560,10 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( iaxis, fiaxis );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_asnrm)( LOGICAL_ARG(&fnorm),
+   F77_LOCK( F77_CALL(ndf_asnrm)( LOGICAL_ARG(&fnorm),
                         INTEGER_ARG(&findf),
                         INTEGER_ARG(&fiaxis),
-                        INTEGER_ARG(&fstatus) );
+                        INTEGER_ARG(&fstatus) ); )
 
    F77_IMPORT_INTEGER( fstatus, *status );
 
@@ -594,12 +594,12 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( iaxis, fiaxis );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_astat)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_astat)( INTEGER_ARG(&findf),
                         CHARACTER_ARG(fcomp),
                         INTEGER_ARG(&fiaxis),
                         LOGICAL_ARG(&fstate),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fcomp) );
+                        TRAIL_ARG(fcomp) ); )
 
    F77_FREE_CHARACTER( fcomp );
    F77_IMPORT_LOGICAL( fstate, *state );
@@ -634,13 +634,13 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( iaxis, fiaxis );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_astyp)( CHARACTER_ARG(ftype),
+   F77_LOCK( F77_CALL(ndf_astyp)( CHARACTER_ARG(ftype),
                         INTEGER_ARG(&findf),
                         CHARACTER_ARG(fcomp),
                         INTEGER_ARG(&fiaxis),
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(ftype)
-                        TRAIL_ARG(fcomp) );
+                        TRAIL_ARG(fcomp) ); )
 
    F77_FREE_CHARACTER( ftype );
    F77_FREE_CHARACTER( fcomp );
@@ -676,13 +676,13 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_CHARACTER( ftype, type_length-1 );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_atype)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_atype)( INTEGER_ARG(&findf),
                         CHARACTER_ARG(fcomp),
                         INTEGER_ARG(&fiaxis),
                         CHARACTER_ARG(ftype),
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(fcomp)
-                        TRAIL_ARG(ftype) );
+                        TRAIL_ARG(ftype) ); )
 
    F77_FREE_CHARACTER( fcomp );
    F77_IMPORT_CHARACTER( ftype, ftype_length, type );
@@ -713,11 +713,11 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( iaxis, fiaxis );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_aunmp)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_aunmp)( INTEGER_ARG(&findf),
                         CHARACTER_ARG(fcomp),
                         INTEGER_ARG(&fiaxis),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fcomp) );
+                        TRAIL_ARG(fcomp) ); )
 
    F77_FREE_CHARACTER( fcomp );
    F77_IMPORT_INTEGER( fstatus, *status );
@@ -749,12 +749,12 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_LOGICAL( check, fcheck );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_bad)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_bad)( INTEGER_ARG(&findf),
                       CHARACTER_ARG(fcomp),
                       LOGICAL_ARG(&fcheck),
                       LOGICAL_ARG(&fbad),
                       INTEGER_ARG(&fstatus)
-                      TRAIL_ARG(fcomp) );
+                      TRAIL_ARG(fcomp) ); )
 
    F77_FREE_CHARACTER( fcomp );
    F77_IMPORT_LOGICAL( fbad, *bad );
@@ -778,9 +778,9 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( indf1, findf1 );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_base)( INTEGER_ARG(&findf1),
+   F77_LOCK( F77_CALL(ndf_base)( INTEGER_ARG(&findf1),
                        INTEGER_ARG(&findf2),
-                       INTEGER_ARG(&fstatus) );
+                       INTEGER_ARG(&fstatus) ); )
 
    F77_IMPORT_INTEGER( findf2, *indf2 );
    F77_IMPORT_INTEGER( fstatus, *status );
@@ -803,9 +803,9 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( indf, findf );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_bb)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_bb)( INTEGER_ARG(&findf),
                      UBYTE_ARG(&fbadbit),
-                     INTEGER_ARG(&fstatus) );
+                     INTEGER_ARG(&fstatus) ); )
 
    F77_IMPORT_UBYTE( fbadbit, *badbit );
    F77_IMPORT_INTEGER( fstatus, *status );
@@ -817,7 +817,7 @@ F77_SUBROUTINE(ndf_begin)( void );
 
 void ndfBegin( void ) {
 
-   F77_CALL(ndf_begin)();
+   F77_LOCK( F77_CALL(ndf_begin)(); )
 
    return;
 }
@@ -850,12 +850,12 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( iblock, fiblock );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_block)( INTEGER_ARG(&findf1),
+   F77_LOCK( F77_CALL(ndf_block)( INTEGER_ARG(&findf1),
                         INTEGER_ARG(&fndim),
                         INTEGER_ARRAY_ARG(fmxdim),
                         INTEGER_ARG(&fiblock),
                         INTEGER_ARG(&findf2),
-                        INTEGER_ARG(&fstatus) );
+                        INTEGER_ARG(&fstatus) ); )
 
    F77_FREE_INTEGER( fmxdim );
    F77_IMPORT_INTEGER( findf2, *indf2 );
@@ -893,12 +893,12 @@ DECLARE_INTEGER(fstatus);
    F77_ASSOC_INTEGER_ARRAY( fubnd, ubnd );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_bound)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_bound)( INTEGER_ARG(&findf),
                         INTEGER_ARG(&fndimx),
                         INTEGER_ARRAY_ARG(flbnd),
                         INTEGER_ARRAY_ARG(fubnd),
                         INTEGER_ARG(&fndim),
-                        INTEGER_ARG(&fstatus) );
+                        INTEGER_ARG(&fstatus) ); )
 
    F77_IMPORT_INTEGER_ARRAY( flbnd, lbnd, ndimx );
    F77_FREE_INTEGER( flbnd );
@@ -934,12 +934,12 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_CHARACTER( value, fvalue, fvalue_length );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_cget)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_cget)( INTEGER_ARG(&findf),
                        CHARACTER_ARG(fcomp),
                        CHARACTER_ARG(fvalue),
                        INTEGER_ARG(&fstatus)
                        TRAIL_ARG(fcomp)
-                       TRAIL_ARG(fvalue) );
+                       TRAIL_ARG(fvalue) ); )
 
    F77_FREE_CHARACTER( fcomp );
    F77_IMPORT_CHARACTER( fvalue, fvalue_length, value );
@@ -972,11 +972,11 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( ichunk, fichunk );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_chunk)( INTEGER_ARG(&findf1),
+   F77_LOCK( F77_CALL(ndf_chunk)( INTEGER_ARG(&findf1),
                         INTEGER_ARG(&fmxpix),
                         INTEGER_ARG(&fichunk),
                         INTEGER_ARG(&findf2),
-                        INTEGER_ARG(&fstatus) );
+                        INTEGER_ARG(&fstatus) ); )
 
    F77_IMPORT_INTEGER( findf2, *indf2 );
    F77_IMPORT_INTEGER( fstatus, *status );
@@ -1004,11 +1004,11 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_clen)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_clen)( INTEGER_ARG(&findf),
                        CHARACTER_ARG(fcomp),
                        INTEGER_ARG(&flength),
                        INTEGER_ARG(&fstatus)
-                       TRAIL_ARG(fcomp) );
+                       TRAIL_ARG(fcomp) ); )
 
    F77_FREE_CHARACTER( fcomp );
    F77_IMPORT_INTEGER( flength, *length );
@@ -1032,9 +1032,9 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( indf1, findf1 );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_clone)( INTEGER_ARG(&findf1),
+   F77_LOCK( F77_CALL(ndf_clone)( INTEGER_ARG(&findf1),
                         INTEGER_ARG(&findf2),
-                        INTEGER_ARG(&fstatus) );
+                        INTEGER_ARG(&fstatus) ); )
 
    F77_IMPORT_INTEGER( findf2, *indf2 );
    F77_IMPORT_INTEGER( fstatus, *status );
@@ -1062,11 +1062,11 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_cmplx)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_cmplx)( INTEGER_ARG(&findf),
                         CHARACTER_ARG(fcomp),
                         LOGICAL_ARG(&fcmplx),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fcomp) );
+                        TRAIL_ARG(fcomp) ); )
 
    F77_FREE_CHARACTER( fcomp );
    F77_IMPORT_LOGICAL( fcmplx, *cmplx );
@@ -1097,12 +1097,12 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_cmsg)( CHARACTER_ARG(ftoken),
+   F77_LOCK( F77_CALL(ndf_cmsg)( CHARACTER_ARG(ftoken),
                        INTEGER_ARG(&findf),
                        CHARACTER_ARG(fcomp),
                        INTEGER_ARG(&fstatus)
                        TRAIL_ARG(ftoken)
-                       TRAIL_ARG(fcomp) );
+                       TRAIL_ARG(fcomp) ); )
 
    F77_FREE_CHARACTER( ftoken );
    F77_FREE_CHARACTER( fcomp );
@@ -1130,10 +1130,10 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( *place, fplace );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_copy)( INTEGER_ARG(&findf1),
+   F77_LOCK( F77_CALL(ndf_copy)( INTEGER_ARG(&findf1),
                        INTEGER_ARG(&fplace),
                        INTEGER_ARG(&findf2),
-                       INTEGER_ARG(&fstatus) );
+                       INTEGER_ARG(&fstatus) ); )
 
    F77_IMPORT_INTEGER( fplace, *place );
    F77_IMPORT_INTEGER( findf2, *indf2 );
@@ -1164,12 +1164,12 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_cput)( CHARACTER_ARG(fvalue),
+   F77_LOCK( F77_CALL(ndf_cput)( CHARACTER_ARG(fvalue),
                        INTEGER_ARG(&findf),
                        CHARACTER_ARG(fcomp),
                        INTEGER_ARG(&fstatus)
                        TRAIL_ARG(fvalue)
-                       TRAIL_ARG(fcomp) );
+                       TRAIL_ARG(fcomp) ); )
 
    F77_FREE_CHARACTER( fvalue );
    F77_FREE_CHARACTER( fcomp );
@@ -1190,8 +1190,8 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( *indf, findf );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_delet)( INTEGER_ARG(&findf),
-                        INTEGER_ARG(&fstatus) );
+   F77_LOCK( F77_CALL(ndf_delet)( INTEGER_ARG(&findf),
+                        INTEGER_ARG(&fstatus) ); )
 
    F77_IMPORT_INTEGER( findf, *indf );
    F77_IMPORT_INTEGER( fstatus, *status );
@@ -1223,11 +1223,11 @@ DECLARE_INTEGER(fstatus);
    F77_ASSOC_INTEGER_ARRAY( fdim, dim );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_dim)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_dim)( INTEGER_ARG(&findf),
                       INTEGER_ARG(&fndimx),
                       INTEGER_ARRAY_ARG(fdim),
                       INTEGER_ARG(&fndim),
-                      INTEGER_ARG(&fstatus) );
+                      INTEGER_ARG(&fstatus) ); )
 
    F77_IMPORT_INTEGER_ARRAY( fdim, dim, ndimx );
    F77_FREE_INTEGER( fdim );
@@ -1245,7 +1245,7 @@ DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_end)( INTEGER_ARG(&fstatus) );
+   F77_LOCK( F77_CALL(ndf_end)( INTEGER_ARG(&fstatus) ); )
 
    F77_IMPORT_INTEGER( fstatus, *status );
 
@@ -1284,12 +1284,12 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER( name, fname );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_find)( CHARACTER_ARG(floc),
+   F77_LOCK( F77_CALL(ndf_find)( CHARACTER_ARG(floc),
                        CHARACTER_ARG(fname),
                        INTEGER_ARG(&findf),
                        INTEGER_ARG(&fstatus)
                        TRAIL_ARG(floc)
-                       TRAIL_ARG(fname) );
+                       TRAIL_ARG(fname) ); )
 
    F77_FREE_CHARACTER( fname );
    F77_IMPORT_INTEGER( findf, *indf );
@@ -1321,12 +1321,12 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_CHARACTER( fform, form_length-1 );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_form)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_form)( INTEGER_ARG(&findf),
                        CHARACTER_ARG(fcomp),
                        CHARACTER_ARG(fform),
                        INTEGER_ARG(&fstatus)
                        TRAIL_ARG(fcomp)
-                       TRAIL_ARG(fform) );
+                       TRAIL_ARG(fform) ); )
 
    F77_FREE_CHARACTER( fcomp );
    F77_IMPORT_CHARACTER( fform, fform_length, form );
@@ -1359,12 +1359,12 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_CHARACTER( fftype, ftype_length-1 );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_ftype)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_ftype)( INTEGER_ARG(&findf),
                         CHARACTER_ARG(fcomp),
                         CHARACTER_ARG(fftype),
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(fcomp)
-                        TRAIL_ARG(fftype) );
+                        TRAIL_ARG(fftype) ); )
 
    F77_FREE_CHARACTER( fcomp );
    F77_IMPORT_CHARACTER( fftype, fftype_length, ftype );
@@ -1390,10 +1390,10 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER( tpar, ftpar );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_gtune)( CHARACTER_ARG(ftpar),
+   F77_LOCK( F77_CALL(ndf_gtune)( CHARACTER_ARG(ftpar),
                         INTEGER_ARG(&fvalue),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(ftpar) );
+                        TRAIL_ARG(ftpar) ); )
 
    F77_FREE_CHARACTER( ftpar );
    F77_IMPORT_INTEGER( fvalue, *value );
@@ -1417,9 +1417,9 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( indf, findf );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_gtwcs)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_gtwcs)( INTEGER_ARG(&findf),
                         INTEGER_ARG(&fiwcs),
-                        INTEGER_ARG(&fstatus) );
+                        INTEGER_ARG(&fstatus) ); )
 
    {
       int tmp;
@@ -1444,9 +1444,9 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER( appn, fappn );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_happn)( CHARACTER_ARG(fappn),
+   F77_LOCK( F77_CALL(ndf_happn)( CHARACTER_ARG(fappn),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fappn) );
+                        TRAIL_ARG(fappn) ); )
 
    F77_FREE_CHARACTER( fappn );
    F77_IMPORT_INTEGER( fstatus, *status );
@@ -1466,8 +1466,8 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( indf, findf );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_hcre)( INTEGER_ARG(&findf),
-                       INTEGER_ARG(&fstatus) );
+   F77_LOCK( F77_CALL(ndf_hcre)( INTEGER_ARG(&findf),
+                       INTEGER_ARG(&fstatus) ); )
 
    F77_IMPORT_INTEGER( fstatus, *status );
 
@@ -1491,10 +1491,10 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER( appn, fappn );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_hdef)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_hdef)( INTEGER_ARG(&findf),
                        CHARACTER_ARG(fappn),
                        INTEGER_ARG(&fstatus)
-                       TRAIL_ARG(fappn) );
+                       TRAIL_ARG(fappn) ); )
 
    F77_FREE_CHARACTER( fappn );
    F77_IMPORT_INTEGER( fstatus, *status );
@@ -1527,10 +1527,10 @@ int len;
    F77_EXPORT_CHARACTER_ARRAY_P( text, ftext, len, nlines );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_hecho)( INTEGER_ARG(&fnlines),
+   F77_LOCK( F77_CALL(ndf_hecho)( INTEGER_ARG(&fnlines),
                         CHARACTER_ARRAY_ARG(ftext),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(ftext) );
+                        TRAIL_ARG(ftext) ); )
 
    F77_FREE_CHARACTER( ftext );
    F77_IMPORT_INTEGER( fstatus, *status );
@@ -1546,7 +1546,7 @@ DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_hend)( INTEGER_ARG(&fstatus) );
+   F77_LOCK( F77_CALL(ndf_hend)( INTEGER_ARG(&fstatus) ); )
 
    F77_IMPORT_INTEGER( fstatus, *status );
 
@@ -1581,12 +1581,12 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_LOGICAL( eq, feq );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_hfind)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_hfind)( INTEGER_ARG(&findf),
                         INTEGER_ARRAY_ARG(fymdhm),
                         REAL_ARG(&fsec),
                         LOGICAL_ARG(&feq),
                         INTEGER_ARG(&firec),
-                        INTEGER_ARG(&fstatus) );
+                        INTEGER_ARG(&fstatus) ); )
 
    F77_FREE_INTEGER( fymdhm );
    F77_IMPORT_INTEGER( firec, *irec );
@@ -1622,13 +1622,13 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_CHARACTER( fvalue, value_length-1 );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_hinfo)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_hinfo)( INTEGER_ARG(&findf),
                         CHARACTER_ARG(fitem),
                         INTEGER_ARG(&firec),
                         CHARACTER_ARG(fvalue),
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(fitem)
-                        TRAIL_ARG(fvalue) );
+                        TRAIL_ARG(fvalue) ); )
 
    F77_FREE_CHARACTER( fitem );
    F77_IMPORT_CHARACTER( fvalue, fvalue_length, value );
@@ -1653,9 +1653,9 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( indf, findf );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_hnrec)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_hnrec)( INTEGER_ARG(&findf),
                         INTEGER_ARG(&fnrec),
-                        INTEGER_ARG(&fstatus) );
+                        INTEGER_ARG(&fstatus) ); )
 
    F77_IMPORT_INTEGER( fnrec, *nrec );
    F77_IMPORT_INTEGER( fstatus, *status );
@@ -1715,10 +1715,10 @@ DECLARE_INTEGER(fstatus);
    ndfHout_croutin = routin;     /* Static variable */
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_hout)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_hout)( INTEGER_ARG(&findf),
                        INTEGER_ARG(&firec),
                        F77_EXTERNAL_NAME(ndfHout_froutin), /* F77-callable */
-                       INTEGER_ARG(&fstatus) );
+                       INTEGER_ARG(&fstatus) ); )
 
    F77_IMPORT_INTEGER( fstatus, *status );
 
@@ -1745,10 +1745,10 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( irec2, firec2 );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_hpurg)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_hpurg)( INTEGER_ARG(&findf),
                         INTEGER_ARG(&firec1),
                         INTEGER_ARG(&firec2),
-                        INTEGER_ARG(&fstatus) );
+                        INTEGER_ARG(&fstatus) ); )
 
    F77_IMPORT_INTEGER( fstatus, *status );
 
@@ -1811,7 +1811,7 @@ int len;
    F77_EXPORT_INTEGER( indf, findf );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_hput)( CHARACTER_ARG(fhmode),
+   F77_LOCK( F77_CALL(ndf_hput)( CHARACTER_ARG(fhmode),
                        CHARACTER_ARG(fappn),
                        LOGICAL_ARG(&frepl),
                        INTEGER_ARG(&fnlines),
@@ -1823,7 +1823,7 @@ int len;
                        INTEGER_ARG(&fstatus)
                        TRAIL_ARG(fhmode)
                        TRAIL_ARG(fappn)
-                       TRAIL_ARG(ftext) );
+                       TRAIL_ARG(ftext) ); )
 
    F77_FREE_CHARACTER( fhmode );
    F77_FREE_CHARACTER( fappn );
@@ -1850,10 +1850,10 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( indf, findf );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_hsdat)( CHARACTER_ARG(fdate),
+   F77_LOCK( F77_CALL(ndf_hsdat)( CHARACTER_ARG(fdate),
                         INTEGER_ARG(&findf),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fdate) );
+                        TRAIL_ARG(fdate) ); )
 
    F77_FREE_CHARACTER( fdate );
    F77_IMPORT_INTEGER( fstatus, *status );
@@ -1878,10 +1878,10 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( indf, findf );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_hsmod)( CHARACTER_ARG(fhmode),
+   F77_LOCK( F77_CALL(ndf_hsmod)( CHARACTER_ARG(fhmode),
                         INTEGER_ARG(&findf),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fhmode) );
+                        TRAIL_ARG(fhmode) ); )
 
    F77_FREE_CHARACTER( fhmode );
    F77_IMPORT_INTEGER( fstatus, *status );
@@ -1908,10 +1908,10 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_CHARACTER( hmode, fhmode, fhmode_length );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_hgmod)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_hgmod)( INTEGER_ARG(&findf),
                         CHARACTER_ARG(fhmode),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fhmode) );
+                        TRAIL_ARG(fhmode) ); )
 
    F77_IMPORT_CHARACTER( fhmode, fhmode_length, hmode );
    F77_FREE_CHARACTER( fhmode );
@@ -1940,11 +1940,11 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER( access, faccess );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_isacc)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_isacc)( INTEGER_ARG(&findf),
                         CHARACTER_ARG(faccess),
                         LOGICAL_ARG(&fisacc),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(faccess) );
+                        TRAIL_ARG(faccess) ); )
 
    F77_FREE_CHARACTER( faccess );
    F77_IMPORT_LOGICAL( fisacc, *isacc );
@@ -1968,9 +1968,9 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( indf, findf );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_isbas)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_isbas)( INTEGER_ARG(&findf),
                         LOGICAL_ARG(&fisbas),
-                        INTEGER_ARG(&fstatus) );
+                        INTEGER_ARG(&fstatus) ); )
 
    F77_IMPORT_LOGICAL( fisbas, *isbas );
    F77_IMPORT_INTEGER( fstatus, *status );
@@ -1997,10 +1997,10 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( indf2, findf2 );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_isin)( INTEGER_ARG(&findf1),
+   F77_LOCK( F77_CALL(ndf_isin)( INTEGER_ARG(&findf1),
                        INTEGER_ARG(&findf2),
                        LOGICAL_ARG(&fisin),
-                       INTEGER_ARG(&fstatus) );
+                       INTEGER_ARG(&fstatus) ); )
 
    F77_IMPORT_LOGICAL( fisin, *isin );
    F77_IMPORT_INTEGER( fstatus, *status );
@@ -2023,9 +2023,9 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( indf, findf );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_istmp)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_istmp)( INTEGER_ARG(&findf),
                         LOGICAL_ARG(&fistmp),
-                        INTEGER_ARG(&fstatus) );
+                        INTEGER_ARG(&fstatus) ); )
 
    F77_IMPORT_LOGICAL( fistmp, *istmp );
    F77_IMPORT_INTEGER( fstatus, *status );
@@ -2054,12 +2054,12 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER( mode, fmode );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_loc)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_loc)( INTEGER_ARG(&findf),
                       CHARACTER_ARG(fmode),
                       CHARACTER_ARG(floc),
                       INTEGER_ARG(&fstatus)
                       TRAIL_ARG(fmode)
-                      TRAIL_ARG(floc) );
+                      TRAIL_ARG(floc) ); )
 
    F77_FREE_CHARACTER( fmode );
    F77_IMPORT_INTEGER( fstatus, *status );
@@ -2115,7 +2115,7 @@ int nfield;
    F77_ASSOC_POINTER_ARRAY( fpntr, pntr );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_map)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_map)( INTEGER_ARG(&findf),
                       CHARACTER_ARG(fcomp),
                       CHARACTER_ARG(ftype),
                       CHARACTER_ARG(fmmod),
@@ -2124,7 +2124,7 @@ int nfield;
                       INTEGER_ARG(&fstatus)
                       TRAIL_ARG(fcomp)
                       TRAIL_ARG(ftype)
-                      TRAIL_ARG(fmmod) );
+                      TRAIL_ARG(fmmod) ); )
 
    F77_FREE_CHARACTER( fcomp );
    F77_FREE_CHARACTER( ftype );
@@ -2158,11 +2158,11 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( indf, findf );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_mapql)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_mapql)( INTEGER_ARG(&findf),
                         POINTER_ARG(&fpntr),
                         INTEGER_ARG(&fel),
                         LOGICAL_ARG(&fbad),
-                        INTEGER_ARG(&fstatus) );
+                        INTEGER_ARG(&fstatus) ); )
 
    F77_IMPORT_POINTER( fpntr, *pntr );
    F77_IMPORT_INTEGER( fel, *el );
@@ -2214,7 +2214,7 @@ int nfield;
    F77_ASSOC_POINTER_ARRAY( fipntr, ipntr );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_mapz)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_mapz)( INTEGER_ARG(&findf),
                        CHARACTER_ARG(fcomp),
                        CHARACTER_ARG(ftype),
                        CHARACTER_ARG(fmmod),
@@ -2224,7 +2224,7 @@ int nfield;
                        INTEGER_ARG(&fstatus)
                        TRAIL_ARG(fcomp)
                        TRAIL_ARG(ftype)
-                       TRAIL_ARG(fmmod) );
+                       TRAIL_ARG(fmmod) ); )
 
    F77_FREE_CHARACTER( fcomp );
    F77_FREE_CHARACTER( ftype );
@@ -2271,14 +2271,14 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_LOGICAL( check, fcheck );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_mbad)( LOGICAL_ARG(&fbadok),
+   F77_LOCK( F77_CALL(ndf_mbad)( LOGICAL_ARG(&fbadok),
                        INTEGER_ARG(&findf1),
                        INTEGER_ARG(&findf2),
                        CHARACTER_ARG(fcomp),
                        LOGICAL_ARG(&fcheck),
                        LOGICAL_ARG(&fbad),
                        INTEGER_ARG(&fstatus)
-                       TRAIL_ARG(fcomp) );
+                       TRAIL_ARG(fcomp) ); )
 
    F77_FREE_CHARACTER( fcomp );
    F77_IMPORT_LOGICAL( fbad, *bad );
@@ -2320,14 +2320,14 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_LOGICAL( check, fcheck );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_mbadn)( LOGICAL_ARG(&fbadok),
+   F77_LOCK( F77_CALL(ndf_mbadn)( LOGICAL_ARG(&fbadok),
                         INTEGER_ARG(&fn),
                         INTEGER_ARRAY_ARG(fndfs),
                         CHARACTER_ARG(fcomp),
                         LOGICAL_ARG(&fcheck),
                         LOGICAL_ARG(&fbad),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fcomp) );
+                        TRAIL_ARG(fcomp) ); )
 
    F77_FREE_INTEGER( fndfs );
    F77_FREE_CHARACTER( fcomp );
@@ -2358,11 +2358,11 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( *indf2, findf2 );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_mbnd)( CHARACTER_ARG(foption),
+   F77_LOCK( F77_CALL(ndf_mbnd)( CHARACTER_ARG(foption),
                        INTEGER_ARG(&findf1),
                        INTEGER_ARG(&findf2),
                        INTEGER_ARG(&fstatus)
-                       TRAIL_ARG(foption) );
+                       TRAIL_ARG(foption) ); )
 
    F77_FREE_CHARACTER( foption );
    F77_IMPORT_INTEGER( findf1, *indf1 );
@@ -2394,11 +2394,11 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER_ARRAY( ndfs, fndfs, n );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_mbndn)( CHARACTER_ARG(foption),
+   F77_LOCK( F77_CALL(ndf_mbndn)( CHARACTER_ARG(foption),
                         INTEGER_ARG(&fn),
                         INTEGER_ARRAY_ARG(fndfs),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(foption) );
+                        TRAIL_ARG(foption) ); )
 
    F77_FREE_CHARACTER( foption );
    F77_IMPORT_INTEGER_ARRAY( fndfs, ndfs, n );
@@ -2421,9 +2421,9 @@ DECLARE_INTEGER(findf);
    F77_CREATE_EXPORT_CHARACTER( token, ftoken );
    F77_EXPORT_INTEGER( indf, findf );
 
-   F77_CALL(ndf_msg)( CHARACTER_ARG(ftoken),
+   F77_LOCK( F77_CALL(ndf_msg)( CHARACTER_ARG(ftoken),
                       INTEGER_ARG(&findf)
-                      TRAIL_ARG(ftoken) );
+                      TRAIL_ARG(ftoken) ); )
 
    F77_FREE_CHARACTER( ftoken );
 
@@ -2468,7 +2468,7 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_CHARACTER( fdtype, dtype_length-1 );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_mtype)( CHARACTER_ARG(ftyplst),
+   F77_LOCK( F77_CALL(ndf_mtype)( CHARACTER_ARG(ftyplst),
                         INTEGER_ARG(&findf1),
                         INTEGER_ARG(&findf2),
                         CHARACTER_ARG(fcomp),
@@ -2478,7 +2478,7 @@ DECLARE_INTEGER(fstatus);
                         TRAIL_ARG(ftyplst)
                         TRAIL_ARG(fcomp)
                         TRAIL_ARG(fitype)
-                        TRAIL_ARG(fdtype) );
+                        TRAIL_ARG(fdtype) ); )
 
    F77_FREE_CHARACTER( ftyplst );
    F77_FREE_CHARACTER( fcomp );
@@ -2530,7 +2530,7 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_CHARACTER( fdtype, dtype_length-1 );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_mtypn)( CHARACTER_ARG(ftyplst),
+   F77_LOCK( F77_CALL(ndf_mtypn)( CHARACTER_ARG(ftyplst),
                         INTEGER_ARG(&fn),
                         INTEGER_ARRAY_ARG(fndfs),
                         CHARACTER_ARG(fcomp),
@@ -2540,7 +2540,7 @@ DECLARE_INTEGER(fstatus);
                         TRAIL_ARG(ftyplst)
                         TRAIL_ARG(fcomp)
                         TRAIL_ARG(fitype)
-                        TRAIL_ARG(fdtype) );
+                        TRAIL_ARG(fdtype) ); )
 
    F77_FREE_CHARACTER( ftyplst );
    F77_FREE_INTEGER( fndfs );
@@ -2578,11 +2578,11 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER_ARRAY( mxdim, fmxdim, ndim );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_nbloc)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_nbloc)( INTEGER_ARG(&findf),
                         INTEGER_ARG(&fndim),
                         INTEGER_ARRAY_ARG(fmxdim),
                         INTEGER_ARG(&fnblock),
-                        INTEGER_ARG(&fstatus) );
+                        INTEGER_ARG(&fstatus) ); )
 
    F77_FREE_INTEGER( fmxdim );
    F77_IMPORT_INTEGER( fnblock, *nblock );
@@ -2610,10 +2610,10 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( mxpix, fmxpix );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_nchnk)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_nchnk)( INTEGER_ARG(&findf),
                         INTEGER_ARG(&fmxpix),
                         INTEGER_ARG(&fnchunk),
-                        INTEGER_ARG(&fstatus) );
+                        INTEGER_ARG(&fstatus) ); )
 
    F77_IMPORT_INTEGER( fnchunk, *nchunk );
    F77_IMPORT_INTEGER( fstatus, *status );
@@ -2655,14 +2655,14 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( *place, fplace );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_new)( CHARACTER_ARG(fftype),
+   F77_LOCK( F77_CALL(ndf_new)( CHARACTER_ARG(fftype),
                       INTEGER_ARG(&fndim),
                       INTEGER_ARRAY_ARG(flbnd),
                       INTEGER_ARRAY_ARG(fubnd),
                       INTEGER_ARG(&fplace),
                       INTEGER_ARG(&findf),
                       INTEGER_ARG(&fstatus)
-                      TRAIL_ARG(fftype) );
+                      TRAIL_ARG(fftype) ); )
 
    F77_FREE_CHARACTER( fftype );
    F77_FREE_INTEGER( flbnd );
@@ -2703,13 +2703,13 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( *place, fplace );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_newp)( CHARACTER_ARG(fftype),
+   F77_LOCK( F77_CALL(ndf_newp)( CHARACTER_ARG(fftype),
                        INTEGER_ARG(&fndim),
                        INTEGER_ARRAY_ARG(fubnd),
                        INTEGER_ARG(&fplace),
                        INTEGER_ARG(&findf),
                        INTEGER_ARG(&fstatus)
-                       TRAIL_ARG(fftype) );
+                       TRAIL_ARG(fftype) ); )
 
    F77_FREE_CHARACTER( fftype );
    F77_FREE_INTEGER( fubnd );
@@ -2737,10 +2737,10 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( indf, findf );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_noacc)( CHARACTER_ARG(faccess),
+   F77_LOCK( F77_CALL(ndf_noacc)( CHARACTER_ARG(faccess),
                         INTEGER_ARG(&findf),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(faccess) );
+                        TRAIL_ARG(faccess) ); )
 
    F77_FREE_CHARACTER( faccess );
    F77_IMPORT_INTEGER( fstatus, *status );
@@ -2794,7 +2794,7 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER( stat, fstat );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_open)( CHARACTER_ARG(floc),
+   F77_LOCK( F77_CALL(ndf_open)( CHARACTER_ARG(floc),
                        CHARACTER_ARG(fname),
                        CHARACTER_ARG(fmode),
                        CHARACTER_ARG(fstat),
@@ -2804,7 +2804,7 @@ DECLARE_INTEGER(fstatus);
                        TRAIL_ARG(floc)
                        TRAIL_ARG(fname)
                        TRAIL_ARG(fmode)
-                       TRAIL_ARG(fstat) );
+                       TRAIL_ARG(fstat) ); )
 
    F77_FREE_CHARACTER( fname );
    F77_FREE_CHARACTER( fmode );
@@ -2848,12 +2848,12 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER( name, fname );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_place)( CHARACTER_ARG(floc),
+   F77_LOCK( F77_CALL(ndf_place)( CHARACTER_ARG(floc),
                         CHARACTER_ARG(fname),
                         INTEGER_ARG(&fplace),
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(floc)
-                        TRAIL_ARG(fname) );
+                        TRAIL_ARG(fname) ); )
 
    F77_FREE_CHARACTER( fname );
    F77_IMPORT_INTEGER( fplace, *place );
@@ -2878,9 +2878,9 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( indf, findf );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_ptwcs)( INTEGER_ARG(&fiwcs),
+   F77_LOCK( F77_CALL(ndf_ptwcs)( INTEGER_ARG(&fiwcs),
                         INTEGER_ARG(&findf),
-                        INTEGER_ARG(&fstatus) );
+                        INTEGER_ARG(&fstatus) ); )
 
    F77_IMPORT_INTEGER( fstatus, *status );
 
@@ -2902,9 +2902,9 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( indf, findf );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_qmf)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_qmf)( INTEGER_ARG(&findf),
                       LOGICAL_ARG(&fqmf),
-                      INTEGER_ARG(&fstatus) );
+                      INTEGER_ARG(&fstatus) ); )
 
    F77_IMPORT_LOGICAL( fqmf, *qmf );
    F77_IMPORT_INTEGER( fstatus, *status );
@@ -2929,10 +2929,10 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_reset)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_reset)( INTEGER_ARG(&findf),
                         CHARACTER_ARG(fcomp),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fcomp) );
+                        TRAIL_ARG(fcomp) ); )
 
    F77_FREE_CHARACTER( fcomp );
    F77_IMPORT_INTEGER( fstatus, *status );
@@ -2962,11 +2962,11 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( indf2, findf2 );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_same)( INTEGER_ARG(&findf1),
+   F77_LOCK( F77_CALL(ndf_same)( INTEGER_ARG(&findf1),
                        INTEGER_ARG(&findf2),
                        LOGICAL_ARG(&fsame),
                        LOGICAL_ARG(&fisect),
-                       INTEGER_ARG(&fstatus) );
+                       INTEGER_ARG(&fstatus) ); )
 
    F77_IMPORT_LOGICAL( fsame, *same );
    F77_IMPORT_LOGICAL( fisect, *isect );
@@ -2996,11 +2996,11 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_sbad)( LOGICAL_ARG(&fbad),
+   F77_LOCK( F77_CALL(ndf_sbad)( LOGICAL_ARG(&fbad),
                        INTEGER_ARG(&findf),
                        CHARACTER_ARG(fcomp),
                        INTEGER_ARG(&fstatus)
-                       TRAIL_ARG(fcomp) );
+                       TRAIL_ARG(fcomp) ); )
 
    F77_FREE_CHARACTER( fcomp );
    F77_IMPORT_INTEGER( fstatus, *status );
@@ -3024,9 +3024,9 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( indf, findf );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_sbb)( UBYTE_ARG(&fbadbit),
+   F77_LOCK( F77_CALL(ndf_sbb)( UBYTE_ARG(&fbadbit),
                       INTEGER_ARG(&findf),
-                      INTEGER_ARG(&fstatus) );
+                      INTEGER_ARG(&fstatus) ); )
 
    F77_IMPORT_INTEGER( fstatus, *status );
 
@@ -3059,11 +3059,11 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( indf, findf );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_sbnd)( INTEGER_ARG(&fndim),
+   F77_LOCK( F77_CALL(ndf_sbnd)( INTEGER_ARG(&fndim),
                        INTEGER_ARRAY_ARG(flbnd),
                        INTEGER_ARRAY_ARG(fubnd),
                        INTEGER_ARG(&findf),
-                       INTEGER_ARG(&fstatus) );
+                       INTEGER_ARG(&fstatus) ); )
 
    F77_FREE_INTEGER( flbnd );
    F77_FREE_INTEGER( fubnd );
@@ -3096,12 +3096,12 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( *place, fplace );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_scopy)( INTEGER_ARG(&findf1),
+   F77_LOCK( F77_CALL(ndf_scopy)( INTEGER_ARG(&findf1),
                         CHARACTER_ARG(fclist),
                         INTEGER_ARG(&fplace),
                         INTEGER_ARG(&findf2),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fclist) );
+                        TRAIL_ARG(fclist) ); )
 
    F77_FREE_CHARACTER( fclist );
    F77_IMPORT_INTEGER( fplace, *place );
@@ -3140,12 +3140,12 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER_ARRAY( ubnd, fubnd, ndim );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_sect)( INTEGER_ARG(&findf1),
+   F77_LOCK( F77_CALL(ndf_sect)( INTEGER_ARG(&findf1),
                        INTEGER_ARG(&fndim),
                        INTEGER_ARRAY_ARG(flbnd),
                        INTEGER_ARRAY_ARG(fubnd),
                        INTEGER_ARG(&findf2),
-                       INTEGER_ARG(&fstatus) );
+                       INTEGER_ARG(&fstatus) ); )
 
    F77_FREE_INTEGER( flbnd );
    F77_FREE_INTEGER( fubnd );
@@ -3176,10 +3176,10 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( indf, findf );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_shift)( INTEGER_ARG(&fnshift),
+   F77_LOCK( F77_CALL(ndf_shift)( INTEGER_ARG(&fnshift),
                         INTEGER_ARRAY_ARG(fshift),
                         INTEGER_ARG(&findf),
-                        INTEGER_ARG(&fstatus) );
+                        INTEGER_ARG(&fstatus) ); )
 
    F77_FREE_INTEGER( fshift );
    F77_IMPORT_INTEGER( fstatus, *status );
@@ -3202,9 +3202,9 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( indf, findf );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_size)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_size)( INTEGER_ARG(&findf),
                        INTEGER_ARG(&fnpix),
-                       INTEGER_ARG(&fstatus) );
+                       INTEGER_ARG(&fstatus) ); )
 
    F77_IMPORT_INTEGER( fnpix, *npix );
    F77_IMPORT_INTEGER( fstatus, *status );
@@ -3228,9 +3228,9 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( indf, findf );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_sqmf)( LOGICAL_ARG(&fqmf),
+   F77_LOCK( F77_CALL(ndf_sqmf)( LOGICAL_ARG(&fqmf),
                        INTEGER_ARG(&findf),
-                       INTEGER_ARG(&fstatus) );
+                       INTEGER_ARG(&fstatus) ); )
 
    F77_IMPORT_INTEGER( fstatus, *status );
 
@@ -3256,10 +3256,10 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( indf, findf );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_ssary)( INTEGER_ARG(&fiary1),
+   F77_LOCK( F77_CALL(ndf_ssary)( INTEGER_ARG(&fiary1),
                         INTEGER_ARG(&findf),
                         INTEGER_ARG(&fiary2),
-                        INTEGER_ARG(&fstatus) );
+                        INTEGER_ARG(&fstatus) ); )
 
    F77_IMPORT_INTEGER( fiary2, *iary2 );
    F77_IMPORT_INTEGER( fstatus, *status );
@@ -3287,11 +3287,11 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_state)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_state)( INTEGER_ARG(&findf),
                         CHARACTER_ARG(fcomp),
                         LOGICAL_ARG(&fstate),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fcomp) );
+                        TRAIL_ARG(fcomp) ); )
 
    F77_FREE_CHARACTER( fcomp );
    F77_IMPORT_LOGICAL( fstate, *state );
@@ -3322,12 +3322,12 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_stype)( CHARACTER_ARG(fftype),
+   F77_LOCK( F77_CALL(ndf_stype)( CHARACTER_ARG(fftype),
                         INTEGER_ARG(&findf),
                         CHARACTER_ARG(fcomp),
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(fftype)
-                        TRAIL_ARG(fcomp) );
+                        TRAIL_ARG(fcomp) ); )
 
    F77_FREE_CHARACTER( fftype );
    F77_FREE_CHARACTER( fcomp );
@@ -3347,8 +3347,8 @@ DECLARE_INTEGER(fstatus);
 
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_temp)( INTEGER_ARG(&fplace),
-                       INTEGER_ARG(&fstatus) );
+   F77_LOCK( F77_CALL(ndf_temp)( INTEGER_ARG(&fplace),
+                       INTEGER_ARG(&fstatus) ); )
 
    F77_IMPORT_INTEGER( fplace, *place );
    F77_IMPORT_INTEGER( fstatus, *status );
@@ -3373,10 +3373,10 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER( tpar, ftpar );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_tune)( INTEGER_ARG(&fvalue),
+   F77_LOCK( F77_CALL(ndf_tune)( INTEGER_ARG(&fvalue),
                        CHARACTER_ARG(ftpar),
                        INTEGER_ARG(&fstatus)
-                       TRAIL_ARG(ftpar) );
+                       TRAIL_ARG(ftpar) ); )
 
    F77_FREE_CHARACTER( ftpar );
    F77_IMPORT_INTEGER( fstatus, *status );
@@ -3407,12 +3407,12 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_CHARACTER( ftype, type_length-1 );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_type)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_type)( INTEGER_ARG(&findf),
                        CHARACTER_ARG(fcomp),
                        CHARACTER_ARG(ftype),
                        INTEGER_ARG(&fstatus)
                        TRAIL_ARG(fcomp)
-                       TRAIL_ARG(ftype) );
+                       TRAIL_ARG(ftype) ); )
 
    F77_FREE_CHARACTER( fcomp );
    F77_IMPORT_CHARACTER( ftype, ftype_length, type );
@@ -3445,12 +3445,12 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_CHARACTER( ftype, type_length-1 );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_sctyp)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_sctyp)( INTEGER_ARG(&findf),
                        CHARACTER_ARG(fcomp),
                        CHARACTER_ARG(ftype),
                        INTEGER_ARG(&fstatus)
                        TRAIL_ARG(fcomp)
-                       TRAIL_ARG(ftype) );
+                       TRAIL_ARG(ftype) ); )
 
    F77_FREE_CHARACTER( fcomp );
    F77_IMPORT_CHARACTER( ftype, ftype_length, type );
@@ -3477,10 +3477,10 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_unmap)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_unmap)( INTEGER_ARG(&findf),
                         CHARACTER_ARG(fcomp),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fcomp) );
+                        TRAIL_ARG(fcomp) ); )
 
    F77_FREE_CHARACTER( fcomp );
    F77_IMPORT_INTEGER( fstatus, *status );
@@ -3503,9 +3503,9 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( indf, findf );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_valid)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_valid)( INTEGER_ARG(&findf),
                         LOGICAL_ARG(&fvalid),
-                        INTEGER_ARG(&fstatus) );
+                        INTEGER_ARG(&fstatus) ); )
 
    F77_IMPORT_LOGICAL( fvalid, *valid );
    F77_IMPORT_INTEGER( fstatus, *status );
@@ -3530,10 +3530,10 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER( xname, fxname );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_xdel)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_xdel)( INTEGER_ARG(&findf),
                        CHARACTER_ARG(fxname),
                        INTEGER_ARG(&fstatus)
-                       TRAIL_ARG(fxname) );
+                       TRAIL_ARG(fxname) ); )
 
    F77_FREE_CHARACTER( fxname );
    F77_IMPORT_INTEGER( fstatus, *status );
@@ -3570,14 +3570,14 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_CHARACTER( value, fvalue, fvalue_length );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_xgt0c)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_xgt0c)( INTEGER_ARG(&findf),
                         CHARACTER_ARG(fxname),
                         CHARACTER_ARG(fcmpt),
                         CHARACTER_ARG(fvalue),
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(fxname)
                         TRAIL_ARG(fcmpt)
-                        TRAIL_ARG(fvalue) );
+                        TRAIL_ARG(fvalue) ); )
 
    F77_FREE_CHARACTER( fxname );
    F77_FREE_CHARACTER( fcmpt );
@@ -3614,13 +3614,13 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_DOUBLE( *value, fvalue );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_xgt0d)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_xgt0d)( INTEGER_ARG(&findf),
                         CHARACTER_ARG(fxname),
                         CHARACTER_ARG(fcmpt),
                         DOUBLE_ARG(&fvalue),
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(fxname)
-                        TRAIL_ARG(fcmpt) );
+                        TRAIL_ARG(fcmpt) ); )
 
    F77_FREE_CHARACTER( fxname );
    F77_FREE_CHARACTER( fcmpt );
@@ -3656,13 +3656,13 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( *value, fvalue );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_xgt0i)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_xgt0i)( INTEGER_ARG(&findf),
                         CHARACTER_ARG(fxname),
                         CHARACTER_ARG(fcmpt),
                         INTEGER_ARG(&fvalue),
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(fxname)
-                        TRAIL_ARG(fcmpt) );
+                        TRAIL_ARG(fcmpt) ); )
 
    F77_FREE_CHARACTER( fxname );
    F77_FREE_CHARACTER( fcmpt );
@@ -3698,13 +3698,13 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_LOGICAL( *value, fvalue );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_xgt0l)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_xgt0l)( INTEGER_ARG(&findf),
                         CHARACTER_ARG(fxname),
                         CHARACTER_ARG(fcmpt),
                         LOGICAL_ARG(&fvalue),
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(fxname)
-                        TRAIL_ARG(fcmpt) );
+                        TRAIL_ARG(fcmpt) ); )
 
    F77_FREE_CHARACTER( fxname );
    F77_FREE_CHARACTER( fcmpt );
@@ -3740,13 +3740,13 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_REAL( *value, fvalue );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_xgt0r)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_xgt0r)( INTEGER_ARG(&findf),
                         CHARACTER_ARG(fxname),
                         CHARACTER_ARG(fcmpt),
                         REAL_ARG(&fvalue),
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(fxname)
-                        TRAIL_ARG(fcmpt) );
+                        TRAIL_ARG(fcmpt) ); )
 
    F77_FREE_CHARACTER( fxname );
    F77_FREE_CHARACTER( fcmpt );
@@ -3786,7 +3786,7 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER( mode, fmode );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_xiary)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_xiary)( INTEGER_ARG(&findf),
                         CHARACTER_ARG(fxname),
                         CHARACTER_ARG(fcmpt),
                         CHARACTER_ARG(fmode),
@@ -3794,7 +3794,7 @@ DECLARE_INTEGER(fstatus);
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(fxname)
                         TRAIL_ARG(fcmpt)
-                        TRAIL_ARG(fmode) );
+                        TRAIL_ARG(fmode) ); )
 
    F77_FREE_CHARACTER( fxname );
    F77_FREE_CHARACTER( fcmpt );
@@ -3831,14 +3831,14 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER( mode, fmode );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_xloc)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_xloc)( INTEGER_ARG(&findf),
                        CHARACTER_ARG(fxname),
                        CHARACTER_ARG(fmode),
                        CHARACTER_ARG(floc),
                        INTEGER_ARG(&fstatus)
                        TRAIL_ARG(fxname)
                        TRAIL_ARG(fmode)
-                       TRAIL_ARG(floc) );
+                       TRAIL_ARG(floc) ); )
 
    F77_FREE_CHARACTER( fxname );
    F77_FREE_CHARACTER( fmode );
@@ -3882,11 +3882,11 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_CHARACTER( fxname, xname_length-1 );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_xname)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_xname)( INTEGER_ARG(&findf),
                         INTEGER_ARG(&fn),
                         CHARACTER_ARG(fxname),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fxname) );
+                        TRAIL_ARG(fxname) ); )
 
    F77_IMPORT_CHARACTER( fxname, fxname_length, xname );
    F77_FREE_CHARACTER( fxname );
@@ -3930,7 +3930,7 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER_ARRAY( dim, fdim, ndim );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_xnew)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_xnew)( INTEGER_ARG(&findf),
                        CHARACTER_ARG(fxname),
                        CHARACTER_ARG(ftype),
                        INTEGER_ARG(&fndim),
@@ -3939,7 +3939,7 @@ DECLARE_INTEGER(fstatus);
                        INTEGER_ARG(&fstatus)
                        TRAIL_ARG(fxname)
                        TRAIL_ARG(ftype)
-                       TRAIL_ARG(floc) );
+                       TRAIL_ARG(floc) ); )
 
    F77_FREE_CHARACTER( fxname );
    F77_FREE_CHARACTER( ftype );
@@ -3977,9 +3977,9 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( indf, findf );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_xnumb)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_xnumb)( INTEGER_ARG(&findf),
                         INTEGER_ARG(&fnextn),
-                        INTEGER_ARG(&fstatus) );
+                        INTEGER_ARG(&fstatus) ); )
 
    F77_IMPORT_INTEGER( fnextn, *nextn );
    F77_IMPORT_INTEGER( fstatus, *status );
@@ -4014,14 +4014,14 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER( cmpt, fcmpt );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_xpt0c)( CHARACTER_ARG(fvalue),
+   F77_LOCK( F77_CALL(ndf_xpt0c)( CHARACTER_ARG(fvalue),
                         INTEGER_ARG(&findf),
                         CHARACTER_ARG(fxname),
                         CHARACTER_ARG(fcmpt),
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(fvalue)
                         TRAIL_ARG(fxname)
-                        TRAIL_ARG(fcmpt) );
+                        TRAIL_ARG(fcmpt) ); )
 
    F77_FREE_CHARACTER( fvalue );
    F77_FREE_CHARACTER( fxname );
@@ -4057,13 +4057,13 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER( cmpt, fcmpt );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_xpt0d)( DOUBLE_ARG(&fvalue),
+   F77_LOCK( F77_CALL(ndf_xpt0d)( DOUBLE_ARG(&fvalue),
                         INTEGER_ARG(&findf),
                         CHARACTER_ARG(fxname),
                         CHARACTER_ARG(fcmpt),
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(fxname)
-                        TRAIL_ARG(fcmpt) );
+                        TRAIL_ARG(fcmpt) ); )
 
    F77_FREE_CHARACTER( fxname );
    F77_FREE_CHARACTER( fcmpt );
@@ -4098,13 +4098,13 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER( cmpt, fcmpt );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_xpt0i)( INTEGER_ARG(&fvalue),
+   F77_LOCK( F77_CALL(ndf_xpt0i)( INTEGER_ARG(&fvalue),
                         INTEGER_ARG(&findf),
                         CHARACTER_ARG(fxname),
                         CHARACTER_ARG(fcmpt),
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(fxname)
-                        TRAIL_ARG(fcmpt) );
+                        TRAIL_ARG(fcmpt) ); )
 
    F77_FREE_CHARACTER( fxname );
    F77_FREE_CHARACTER( fcmpt );
@@ -4139,13 +4139,13 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER( cmpt, fcmpt );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_xpt0l)( LOGICAL_ARG(&fvalue),
+   F77_LOCK( F77_CALL(ndf_xpt0l)( LOGICAL_ARG(&fvalue),
                         INTEGER_ARG(&findf),
                         CHARACTER_ARG(fxname),
                         CHARACTER_ARG(fcmpt),
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(fxname)
-                        TRAIL_ARG(fcmpt) );
+                        TRAIL_ARG(fcmpt) ); )
 
    F77_FREE_CHARACTER( fxname );
    F77_FREE_CHARACTER( fcmpt );
@@ -4180,13 +4180,13 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER( cmpt, fcmpt );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_xpt0r)( REAL_ARG(&fvalue),
+   F77_LOCK( F77_CALL(ndf_xpt0r)( REAL_ARG(&fvalue),
                         INTEGER_ARG(&findf),
                         CHARACTER_ARG(fxname),
                         CHARACTER_ARG(fcmpt),
                         INTEGER_ARG(&fstatus)
                         TRAIL_ARG(fxname)
-                        TRAIL_ARG(fcmpt) );
+                        TRAIL_ARG(fcmpt) ); )
 
    F77_FREE_CHARACTER( fxname );
    F77_FREE_CHARACTER( fcmpt );
@@ -4215,11 +4215,11 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER( xname, fxname );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_xstat)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_xstat)( INTEGER_ARG(&findf),
                         CHARACTER_ARG(fxname),
                         LOGICAL_ARG(&fthere),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fxname) );
+                        TRAIL_ARG(fxname) ); )
 
    F77_FREE_CHARACTER( fxname );
    F77_IMPORT_LOGICAL( fthere, *there );
@@ -4254,12 +4254,12 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_ptszi)( INTEGER_ARG(&fscale),
+   F77_LOCK( F77_CALL(ndf_ptszi)( INTEGER_ARG(&fscale),
                        INTEGER_ARG(&fzero),
                        INTEGER_ARG(&findf),
                        CHARACTER_ARG(fcomp),
                        INTEGER_ARG(&fstatus)
-                       TRAIL_ARG(fcomp) );
+                       TRAIL_ARG(fcomp) ); )
 
    F77_FREE_CHARACTER( fcomp );
    F77_IMPORT_INTEGER( fstatus, *status );
@@ -4292,12 +4292,12 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_ptszr)( REAL_ARG(&fscale),
+   F77_LOCK( F77_CALL(ndf_ptszr)( REAL_ARG(&fscale),
                        REAL_ARG(&fzero),
                        INTEGER_ARG(&findf),
                        CHARACTER_ARG(fcomp),
                        INTEGER_ARG(&fstatus)
-                       TRAIL_ARG(fcomp) );
+                       TRAIL_ARG(fcomp) ); )
 
    F77_FREE_CHARACTER( fcomp );
    F77_IMPORT_INTEGER( fstatus, *status );
@@ -4330,12 +4330,12 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_ptszd)( DOUBLE_ARG(&fscale),
+   F77_LOCK( F77_CALL(ndf_ptszd)( DOUBLE_ARG(&fscale),
                        DOUBLE_ARG(&fzero),
                        INTEGER_ARG(&findf),
                        CHARACTER_ARG(fcomp),
                        INTEGER_ARG(&fstatus)
-                       TRAIL_ARG(fcomp) );
+                       TRAIL_ARG(fcomp) ); )
 
    F77_FREE_CHARACTER( fcomp );
    F77_IMPORT_INTEGER( fstatus, *status );
@@ -4367,12 +4367,12 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_gtszi)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_gtszi)( INTEGER_ARG(&findf),
                        CHARACTER_ARG(fcomp),
                        INTEGER_ARG(&fscale),
                        INTEGER_ARG(&fzero),
                        INTEGER_ARG(&fstatus)
-                       TRAIL_ARG(fcomp) );
+                       TRAIL_ARG(fcomp) ); )
 
    F77_IMPORT_INTEGER( fscale, *scale );
    F77_IMPORT_INTEGER( fzero, *zero );
@@ -4405,12 +4405,12 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_gtszd)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_gtszd)( INTEGER_ARG(&findf),
                        CHARACTER_ARG(fcomp),
                        DOUBLE_ARG(&fscale),
                        DOUBLE_ARG(&fzero),
                        INTEGER_ARG(&fstatus)
-                       TRAIL_ARG(fcomp) );
+                       TRAIL_ARG(fcomp) ); )
 
    F77_IMPORT_DOUBLE( fscale, *scale );
    F77_IMPORT_DOUBLE( fzero, *zero );
@@ -4443,12 +4443,12 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_EXPORT_CHARACTER( comp, fcomp );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_gtszr)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_gtszr)( INTEGER_ARG(&findf),
                        CHARACTER_ARG(fcomp),
                        REAL_ARG(&fscale),
                        REAL_ARG(&fzero),
                        INTEGER_ARG(&fstatus)
-                       TRAIL_ARG(fcomp) );
+                       TRAIL_ARG(fcomp) ); )
 
    F77_IMPORT_REAL( fscale, *scale );
    F77_IMPORT_REAL( fzero, *zero );
@@ -4494,14 +4494,14 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( *place, fplace );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_zscal)( INTEGER_ARG(&findf1),
+   F77_LOCK( F77_CALL(ndf_zscal)( INTEGER_ARG(&findf1),
                         CHARACTER_ARG(ftype),
                         DOUBLE_ARRAY_ARG(fscale),
                         DOUBLE_ARRAY_ARG(fzero),
                         INTEGER_ARG(&fplace),
                         INTEGER_ARG(&findf2),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(ftype) );
+                        TRAIL_ARG(ftype) ); )
 
    F77_FREE_CHARACTER( ftype );
    F77_FREE_DOUBLE( fscale);
@@ -4553,7 +4553,7 @@ DECLARE_INTEGER(fstatus);
    F77_EXPORT_INTEGER( *place, fplace );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_zdelt)( INTEGER_ARG(&findf1),
+   F77_LOCK( F77_CALL(ndf_zdelt)( INTEGER_ARG(&findf1),
                         CHARACTER_ARG(fcomp),
                         REAL_ARG(&fminrat),
                         INTEGER_ARG(&fzaxis),
@@ -4562,7 +4562,7 @@ DECLARE_INTEGER(fstatus);
                         INTEGER_ARG(&findf2),
                         REAL_ARG(&fzratio),
                         INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fcomp) TRAIL_ARG(ftype) );
+                        TRAIL_ARG(fcomp) TRAIL_ARG(ftype) ); )
 
    F77_FREE_CHARACTER( fcomp );
    F77_FREE_CHARACTER( ftype );
@@ -4602,14 +4602,14 @@ DECLARE_INTEGER(fstatus);
    F77_CREATE_CHARACTER( fztype, ztype_length-1 );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf_gtdlt)( INTEGER_ARG(&findf),
+   F77_LOCK( F77_CALL(ndf_gtdlt)( INTEGER_ARG(&findf),
                        CHARACTER_ARG(fcomp),
                        INTEGER_ARG(&fzaxis),
                        CHARACTER_ARG(fztype),
                        REAL_ARG(&fzratio),
                        INTEGER_ARG(&fstatus)
                        TRAIL_ARG(fcomp)
-                       TRAIL_ARG(fztype) );
+                       TRAIL_ARG(fztype) ); )
 
    F77_IMPORT_INTEGER( fzaxis, *zaxis );
    F77_IMPORT_CHARACTER( fztype, fztype_length, ztype );

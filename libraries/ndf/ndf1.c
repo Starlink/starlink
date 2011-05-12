@@ -77,9 +77,9 @@ DECLARE_INTEGER(fstatus);
    fix_F77_EXPORT_CHARACTER( routin, froutin, froutin_length );
    F77_EXPORT_INTEGER( *status, fstatus );
 
-   F77_CALL(ndf1_trace)( CHARACTER_ARG(froutin),
+   F77_LOCK( F77_CALL(ndf1_trace)( CHARACTER_ARG(froutin),
                          INTEGER_ARG(&fstatus)
-                         TRAIL_ARG(froutin) );
+                         TRAIL_ARG(froutin) ); )
 
    F77_IMPORT_INTEGER( fstatus, *status );
 
