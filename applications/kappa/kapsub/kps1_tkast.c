@@ -5,15 +5,12 @@
 #include "ast.h"
 #include "f77.h"
 #include "sae_par.h"
+#include "mers.h"
 #include <tcl.h>
 #include <tk.h>
 
 static FILE *fd = NULL;
 
-extern F77_SUBROUTINE(err_rep)( CHARACTER(param), CHARACTER(mess),
-                                INTEGER(STATUS) TRAIL(param) TRAIL(mess) );
-
-static void Error( const char *, int * );
 static char *Envir( const char *, int * );
 static void SetVar( Tcl_Interp *, char *, char *, int, int * );
 static const char *GetVar( Tcl_Interp *, char *, int, int * );
@@ -101,6 +98,8 @@ F77_SUBROUTINE(kps1_tkast)( INTEGER(IAST), CHARACTER(TITLE),
 *     3-APR-2008 (PWD):
 *        Added PNAME argument and call to Tcl_FindExecutable.
 *        Removed dead support for Tk 4.0.
+*     12-MAY-2011 (TIMJ):
+*        Use errRepf natively rather than F77_CALL(err_rep)
 *     {enter_further_changes_here}
 
 *-
@@ -135,7 +134,7 @@ F77_SUBROUTINE(kps1_tkast)( INTEGER(IAST), CHARACTER(TITLE),
    ifd = mkstemp( fname );
    if( ifd == -1 ){
       *STATUS = SAI__ERROR;
-      Error( "Unable to create a temporary \"tkast\" file name.",
+      errRep( "", "Unable to create a temporary \"tkast\" file name.",
               STATUS );
       return;
    } else {
@@ -162,7 +161,7 @@ F77_SUBROUTINE(kps1_tkast)( INTEGER(IAST), CHARACTER(TITLE),
 /* Report an error if anything went wrong in AST. */
       if( !astOK ) {
          *STATUS = SAI__ERROR;
-         Error( "An error has been reported by the AST library.", STATUS );
+         errRep( "", "An error has been reported by the AST library.", STATUS );
 
 /* Otherwise, create a TCL interpreter. */
       } else {
@@ -180,14 +179,12 @@ F77_SUBROUTINE(kps1_tkast)( INTEGER(IAST), CHARACTER(TITLE),
 
          if( Tcl_Init( interp ) != TCL_OK ) {
             *STATUS = SAI__ERROR;
-            Error( "Failed to initialise Tcl commands.", STATUS );
-            Error( interp->result, STATUS );
-
+            errRep("", "Failed to initialise Tcl commands.", STATUS );
+            errRepf( "", "%s", STATUS, interp->result );
          } else if( Tk_Init( interp ) != TCL_OK ) {
             *STATUS = SAI__ERROR;
-            Error( "Failed to initialise Tk commands.", STATUS );
-            Error( interp->result, STATUS );
-
+            errRep( "", "Failed to initialise Tk commands.", STATUS );
+            errRepf( "", "%s", STATUS, interp->result );
          }
       }
 
@@ -198,8 +195,8 @@ F77_SUBROUTINE(kps1_tkast)( INTEGER(IAST), CHARACTER(TITLE),
 
          if( Tcl_EvalFile( interp, script ) != TCL_OK ){
             *STATUS = SAI__ERROR;
-            Error( "Failed to execute the TCL script...", STATUS );
-            Error( interp->result, STATUS );
+            errRep( "", "Failed to execute the TCL script...", STATUS );
+            errRepf( "", "%s", STATUS, interp->result );
 
 /* If succesfull, loop infinitely, waiting for commands to execute.  When
    there are no windows left, the loop exits. NOTE, it seems that an
@@ -220,86 +217,11 @@ F77_SUBROUTINE(kps1_tkast)( INTEGER(IAST), CHARACTER(TITLE),
 /* Report an error if the temporary file could not be opened. */
    } else {
       *STATUS = SAI__ERROR;
-      Error( "File to open temporary text file to hold dumps of AST Objects.", STATUS );
+      errRep( "", "File to open temporary text file to hold dumps of AST Objects.", STATUS );
    }
 
 }
 
-static void Error( const char *text, int *STATUS ) {
-/*
-*+
-*  Name:
-*     Error
-
-*  Purpose:
-*     Report an error using EMS.
-
-*  Language:
-*     Starlink C
-
-*  Description:
-*     The supplied text is used as the text of the error message.
-*     A blank parameter name is used.
-
-*  Notes:
-*     - If a NULL pointer is supplied for "text", no error is reported.
-
-*  Parameters:
-*     text
-*        The error message text. Only the first 80 characters are used.
-*     STATUS
-*        A pointer to the global status value. This should have been set
-*        to a suitable error value before calling this function.
-
-*  Copyright:
-*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
-*     All Rights Reserved.
-
-*  Licence:
-*     This program is free software; you can redistribute it and/or
-*     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
-*     the License, or (at your option) any later version.
-*
-*     This program is distributed in the hope that it will be
-*     useful, but WITHOUT ANY WARRANTY; without even the implied
-*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
-*
-*     You should have received a copy of the GNU General Public License
-*     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
-
-*-
-*/
-
-   DECLARE_CHARACTER(param,1);
-   DECLARE_CHARACTER(mess,80);
-   int j;
-
-/* Check the supplied pointer. */
-   if( text ) {
-
-/* Set the parameter name to a blank string. */
-      param[0] = ' ';
-
-/* Copy the first "mess_length" characters of the supplied message into
-      "mess". */
-      strncpy( mess, text, mess_length );
-
-/* Pad any remaining bytes with spaces (and replace the terminating null
-   character with a space). */
-      for( j = strlen(mess); j < mess_length; j++ ) {
-         mess[ j ] = ' ';
-      }
-
-/* Report the error. */
-      F77_CALL(err_rep)( CHARACTER_ARG(param), CHARACTER_ARG(mess),
-                         INTEGER_ARG(STATUS) TRAIL_ARG(param)
-                         TRAIL_ARG(mess) );
-   }
-}
 
 static char *Envir( const char *var, int *STATUS ){
 /*
@@ -347,15 +269,14 @@ static char *Envir( const char *var, int *STATUS ){
 *-
 */
    char *ret;
-   char mess[80];
 
    if( *STATUS != SAI__OK || !var ) return NULL;
 
    ret = getenv( var );
    if( !ret ) {
       *STATUS = SAI__ERROR;
-      sprintf( mess, "Failed to get environment variable \"%s\".", var );
-      Error( mess, STATUS );
+      errRepf( "",  "Failed to get environment variable \"%s\".", STATUS,
+               var );
    }
 
    return ret;
@@ -405,15 +326,12 @@ static void SetVar( Tcl_Interp *interp,  char *name,  char *value,
 *-
 */
 
-   char mess[80];
-
    if( *STATUS != SAI__OK ) return;
 
    if( !Tcl_SetVar( interp, name, value, flags) ){
       *STATUS = SAI__ERROR;
-      sprintf( mess, "Error setting TCL variable \"%s\".", name );
-      Error( mess, STATUS );
-      Error( interp->result,  STATUS );
+      errRepf( "", "Error setting TCL variable \"%s\".", STATUS, name );
+      errRepf( "", "%s", STATUS, interp->result );
    }
 }
 
@@ -460,7 +378,6 @@ static const char *GetVar( Tcl_Interp *interp,  char *name,  int flags, int *STA
 *-
 */
 
-   char mess[80];
    const char *ret;
 
    if( *STATUS != SAI__OK ) return NULL;
@@ -468,9 +385,8 @@ static const char *GetVar( Tcl_Interp *interp,  char *name,  int flags, int *STA
    ret = Tcl_GetVar( interp, name, flags );
    if ( !ret ) {
       *STATUS = SAI__ERROR;
-      sprintf( mess, "Error getting TCL variable \"%s\".", name );
-      Error( mess, STATUS );
-      Error( interp->result,  STATUS );
+      errRepf( "", "Error getting TCL variable \"%s\".", STATUS, name );
+      errRepf( "", "%s", STATUS, interp->result );
    }
 
    return ret;
@@ -531,7 +447,6 @@ static void SetSVar( Tcl_Interp *interp, const char *var, const char *string,
 */
 
    char *buf;
-   char mess[81];
 
 /* Check the inherited status. */
    if( *STATUS != SAI__OK ) return;
@@ -554,10 +469,8 @@ static void SetSVar( Tcl_Interp *interp, const char *var, const char *string,
 /* Report an error if the memory could not be allocated. */
    } else {
       *STATUS = SAI__ERROR;
-      sprintf( mess, "Unable to allocate %d bytes of memory. ", len + 1 );
-      Error( mess, STATUS );
-      sprintf( mess, "Failed to initialise Tcl variable \"%s\".", var );
-      Error( mess, STATUS );
+      errRepf("", "Unable to allocate %d bytes of memory. ", STATUS, len + 1 );
+      errRepf("", "Failed to initialise Tcl variable \"%s\".", STATUS, var );
    }
 
 }
@@ -923,7 +836,6 @@ static void GetRVar( Tcl_Interp *interp, const char *var, float *valptr, int *ST
 */
 
    const char *tp;
-   char mess[81];
 
 /* Check the inherited status. */
    if( *STATUS != SAI__OK ) return;
@@ -936,10 +848,8 @@ static void GetRVar( Tcl_Interp *interp, const char *var, float *valptr, int *ST
    if ( tp ) {
       if( sscanf( tp, "%g", valptr ) != 1 ) {
          *STATUS = SAI__ERROR;
-         sprintf( mess, "\"%s\" is not a floating point value.", tp );
-         Error( mess, STATUS );
-         sprintf( mess, "Failed to obtained a value for Tcl variable \"%s\".", var );
-         Error( mess, STATUS );
+         errRepf( "", "\"%s\" is not a floating point value.", STATUS, tp );
+         errRepf( "", "Failed to obtained a value for Tcl variable \"%s\".", STATUS, var );
       }
    }
 }
@@ -990,7 +900,6 @@ static void GetIVar( Tcl_Interp *interp, const char *var, int *valptr, int *STAT
 */
 
    const char *tp;
-   char mess[81];
 
 /* Check the inherited status. */
    if( *STATUS != SAI__OK ) return;
@@ -1003,10 +912,8 @@ static void GetIVar( Tcl_Interp *interp, const char *var, int *valptr, int *STAT
    if ( tp ) {
       if( sscanf( tp, "%d", valptr ) != 1 ) {
          *STATUS = SAI__ERROR;
-         sprintf( mess, "\"%s\" is not an integer value.", tp );
-         Error( mess, STATUS );
-         sprintf( mess, "Failed to obtained a value for Tcl variable \"%s\".", var );
-         Error( mess, STATUS );
+         errRepf( "", "\"%s\" is not an integer value.", STATUS, tp );
+         errRepf( "", "Failed to obtained a value for Tcl variable \"%s\".", STATUS, var );
       }
    }
 }

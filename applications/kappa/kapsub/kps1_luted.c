@@ -4,13 +4,9 @@
 #include <string.h>
 #include "f77.h"
 #include "sae_par.h"
-#include "merswrap.h"
+#include "mers.h"
 #include <tcl.h>
 
-extern F77_SUBROUTINE(err_rep)( CHARACTER(param), CHARACTER(mess),
-                                INTEGER(STATUS) TRAIL(param) TRAIL(mess) );
-
-void Error( const char *, int * );
 char *cstring( const char *, int, int * );
 
 F77_SUBROUTINE(kps1_luted)( CHARACTER(CMD), INTEGER(STATUS)
@@ -68,6 +64,8 @@ F77_SUBROUTINE(kps1_luted)( CHARACTER(CMD), INTEGER(STATUS)
 *        Replaced use of tmpnam with mkstemp.
 *     3-SEP-2004 (TIMJ):
 *        Now -Wall clean
+*     12-MAY-2011 (TIMJ):
+*        Use native errRep rather than F77_CALL(err_rep)
 *     {enter_further_changes_here}
 
 *-
@@ -100,7 +98,7 @@ F77_SUBROUTINE(kps1_luted)( CHARACTER(CMD), INTEGER(STATUS)
    ifd = mkstemp( outfile_name );
    if( ifd == -1 ){
       *STATUS = SAI__ERROR;
-      Error( "Unable to create a temporary \"luted_out\" file name.",
+      errRep( "", "Unable to create a temporary \"luted_out\" file name.",
               STATUS );
       return;
    } else {
@@ -118,7 +116,7 @@ F77_SUBROUTINE(kps1_luted)( CHARACTER(CMD), INTEGER(STATUS)
                                             + 1 ) );
          if( !script ) {
             *STATUS = SAI__ERROR;
-            Error( "Failed to allocate memory for full TCL command .",
+            errRep( "", "Failed to allocate memory for full TCL command .",
                     STATUS );
          } else {
             strcpy( script, cmd );
@@ -149,7 +147,7 @@ F77_SUBROUTINE(kps1_luted)( CHARACTER(CMD), INTEGER(STATUS)
 
             if( report && *STATUS == SAI__OK ){
                *STATUS = SAI__ERROR;
-               Error( "Messages received from the TCL script.", STATUS );
+               errRep( "", "Messages received from the TCL script.", STATUS );
             }
 
             fclose( fd );
@@ -163,82 +161,6 @@ F77_SUBROUTINE(kps1_luted)( CHARACTER(CMD), INTEGER(STATUS)
 /*  Free memory used to hold the null-terminated file name */
       free( cmd );
 
-   }
-}
-
-void Error( const char *text, int *STATUS ) {
-/*
-*+
-*  Name:
-*     Error
-
-*  Purpose:
-*     Report an error using EMS.
-
-*  Language:
-*     Starlink C
-
-*  Description:
-*     The supplied text is used as the text of the error message.
-*     A blank parameter name is used.
-
-*  Notes:
-*     - If a NULL pointer is supplied for "text", no error is reported.
-
-*  Parameters:
-*     text
-*        The error message text. Only the first 80 characters are used.
-*     STATUS
-*        A pointer to the global status value. This should have been set
-*        to a suitable error value before calling this function.
-
-*  Copyright:
-*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
-*     All Rights Reserved.
-
-*  Licence:
-*     This program is free software; you can redistribute it and/or
-*     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
-*     the License, or (at your option) any later version.
-*
-*     This program is distributed in the hope that it will be
-*     useful, but WITHOUT ANY WARRANTY; without even the implied
-*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
-*
-*     You should have received a copy of the GNU General Public License
-*     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
-
-*-
-*/
-
-   DECLARE_CHARACTER(param,1);
-   DECLARE_CHARACTER(mess,80);
-   int j;
-
-/* Check the supplied pointer. */
-   if( text ) {
-
-/* Set the parameter name to a blank string. */
-      param[0] = ' ';
-
-/* Copy the first "mess_length" characters of the supplied message into
-      "mess". */
-      strncpy( mess, text, mess_length );
-
-/* Pad any remaining bytes with spaces (and replace the terminating null
-   character with a space). */
-      for( j = strlen(mess); j < mess_length; j++ ) {
-         mess[ j ] = ' ';
-      }
-
-/* Report the error. */
-      F77_CALL(err_rep)( CHARACTER_ARG(param), CHARACTER_ARG(mess),
-                         INTEGER_ARG(STATUS) TRAIL_ARG(param)
-                         TRAIL_ARG(mess) );
    }
 }
 
@@ -291,7 +213,6 @@ char *cstring( const char *fstring, int len, int *STATUS ) {
 *-
 */
 
-   char mess[81];
    char *ret;
 
    ret = NULL;
@@ -306,7 +227,7 @@ char *cstring( const char *fstring, int len, int *STATUS ) {
 
 /* Allocate memory to hold a null-terminated copy of the supplied F77
    string. */
-   ret = (char *) malloc ( sizeof(char)*(size_t) ( len + 1 ) );
+   ret =  malloc ( sizeof(*ret)*(size_t) ( len + 1 ) );
 
 /* If successful, copy the string, and append a trailing null character. */
    if ( ret ) {
@@ -317,8 +238,8 @@ char *cstring( const char *fstring, int len, int *STATUS ) {
 /* Report an error if the memory could not be allocated. */
    } else {
       *STATUS = SAI__ERROR;
-      sprintf( mess, "Unable to allocate %d bytes of memory. ", len + 1 );
-      Error( mess, STATUS );
+      errRepf( "", "Unable to allocate %d bytes of memory. ",
+               STATUS, len + 1 );
    }
 
    return ret;
