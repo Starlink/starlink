@@ -39,6 +39,7 @@
 #include "mers.h"
 #include "ast.h"
 #include "star/grp.h"
+#include "star/one.h"
 #include <ctype.h>
 #include <float.h>
 #include <limits.h>
@@ -54,8 +55,6 @@
 
 /* Prototypes for Functions. */
 /* ========================= */
-extern F77_SUBROUTINE(chr_ctod)( CHARACTER(cval), DOUBLE(dval),
-                                 INTEGER(status) TRAIL(cval) );
 
 int pol1Split( const char *, char **, char **, char **, int *);
 int pol1Ustrcmp( const char *, const char * );
@@ -1844,7 +1843,7 @@ int pol1Cmpr( char *a1, char *a0, char *b1, char *b0 ){
 *     are numerical they care converted to double precision before doing
 *     the comparison so that for instance the strings "45.0", "45", "45.0E0",
 *     "45.0D0", "45.", etc, will all be considered equal. If either string
-*     is not numerical the srings must have the same length and must be
+*     is not numerical the strings must have the same length and must be
 *     identical, except for case in order to match.
 
 *  Parameters:
@@ -1860,38 +1859,49 @@ int pol1Cmpr( char *a1, char *a0, char *b1, char *b0 ){
 *  Returned Value:
 *     1 if the A and B strings are equal, and zero otherwise.
 */
-      DECLARE_INTEGER(ISTAT);
-      DECLARE_DOUBLE(DVALA);
-      DECLARE_DOUBLE(DVALB);
-
+      int istat;               /* Local status */
       int ret;                 /* The returned flag. */
       int a0_length;           /* Length of A string */
       int b0_length;           /* Length of B string */
+      char * acopy = NULL;     /* Local copy of A */
+      char * bcopy = NULL;     /* Local copy of B */
+      double dvala;            /* Double value from A string */
+      double dvalb;            /* Double value from B string */
 
 /* Initialise. */
       ret = 0;
-      ISTAT = 0;
+      istat = SAI__OK;
+
+      errMark();
 
 /* Save the lengths of the two strings. */
       a0_length = a1 - a0;
       b0_length = b1 - b0;
 
+/* Need proper C strings - copy specific number of characters out */
+      acopy = malloc( a0_length + 1 );
+      strncpy( acopy, a0, a0_length );
+      acopy[a0_length] = '\0';
+
 /* See if the first string is numerical. */
-      F77_CALL(chr_ctod)( CHARACTER_ARG(a0), DOUBLE_ARG(&DVALA),
-                          INTEGER_ARG(&ISTAT) TRAIL_ARG(a0) );
+      dvala = one_strtod( acopy, &istat );
 
 /* If so see if the second string is also numerical. */
-      if( ISTAT == SAI__OK ) {
-         F77_CALL(chr_ctod)( CHARACTER_ARG(b0), DOUBLE_ARG(&DVALB),
-                             INTEGER_ARG(&ISTAT) TRAIL_ARG(b0) );
+      if( istat == SAI__OK ) {
+         bcopy = malloc( b0_length + 1 );
+         strncpy( bcopy, b0, b0_length );
+         bcopy[b0_length] = '\0';
+         dvalb = one_strtod( bcopy, &istat );
+         if (bcopy) free(bcopy);
 
 /* If so, compare the numerical values. */
-         if( ISTAT == SAI__OK ) ret = ( DVALA == DVALB );
+         if( istat == SAI__OK ) ret = ( dvala == dvalb );
       }
+      if (acopy) free(acopy);
 
 /* If either of the two strings was not numerical, we compare the strings
    as text strings. */
-      if( ISTAT != SAI__OK ) {
+      if( istat != SAI__OK ) {
 
 /* Check that the strings are the same length. */
          if( a0_length == b0_length ) {
@@ -1901,6 +1911,9 @@ int pol1Cmpr( char *a1, char *a0, char *b1, char *b0 ){
 
          }
       }
+
+      if (istat != SAI__OK) errAnnul(&istat);
+      errRlse();
 
 /* Return the answer. */
       return ret;
