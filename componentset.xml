@@ -866,7 +866,7 @@ Traces an HDS file
 </component>
 
 <component id="kappa" support="S">
-  <version>1.13-2</version>
+  <version>1.13-3</version>
   <path>applications/kappa</path>
   <description>KAPPA - Kernel Application Package</description>
   <abstract><p>
@@ -5003,7 +5003,7 @@ No longer under active control.
 </component>
 
 <component id="cnf" support="S">
-  <version>4.3-0</version>
+  <version>5.0-0</version>
   <path>libraries/cnf</path>
   <description>Mixed Language Programming -- FORTRAN and C</description>
   <abstract><p>The CNF package comprises two sets of software which
@@ -6244,7 +6244,7 @@ Ultrix and for SunOS and may still work for them.
       a number have wider trigonometrical, numerical or general
       applications.</p></abstract>
   <dependencies >
-    <sourceset>star2html</sourceset>
+    <sourceset>star2html</sourceset><build>cnf</build>
   </dependencies>
   <developers>
     <person>

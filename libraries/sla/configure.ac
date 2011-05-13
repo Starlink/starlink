@@ -52,7 +52,7 @@ dnl
 dnl    Problem: Is the code in the *__win files specific to Windows
 dnl    or to MSFortran?  Since you'd only get MSFortran on Windows, I
 dnl    suppose it's the former (or might as well be).
-dnl    
+dnl
 dnl    The __vms files will never be matched by this macro (will the
 dnl    __win files?), since config.guess doesn't cover VMS at all, but
 dnl    the following, as well as documenting the relationship, also
@@ -88,6 +88,19 @@ AC_CHECK_LIB([pthread], [pthread_create], ,[use_pthreads="no"])
    fi
 fi
 
+dnl    Conditional defining whether we use CNF or not
+AC_ARG_WITH([cnf],
+            [ --with-cnf    Use Starlink CNF library for thread locking],
+        if test "$withval" = "yes"; then
+           use_cnf="yes"
+        else
+           use_cnf="no"
+        fi,
+        use_cnf="yes")
+if test "$use_cnf" = "yes"; then
+   AC_DEFINE([USE_CNF], [1], [Use Starlink CNF library for thread locking])
+fi
+
 STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl   We need this for the tests
@@ -108,6 +121,13 @@ dnl    Declare the build and use dependencies for this package
 dnl    There are neither build nor use dependencies
 
 STAR_LATEX_DOCUMENTATION(sun67)
+
+dnl    Declare the build and use dependencies for this package
+dnl    NOTE, cnf should be a link dependency rather than a build
+dnl    dependency, but there is clearly a bug in starconf somewhere
+dbl    because making it a link dependency results in no CNF dependency
+dnl    being added to Makefile.dependencies.
+STAR_DECLARE_DEPENDENCIES([build],  [cnf])
 
 AC_CONFIG_FILES(Makefile component.xml vers.f veri.f f77.h)
 

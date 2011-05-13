@@ -108,18 +108,22 @@ $(MANIFESTS)/ary: \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/ast: \
+		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/htx \
 		$(MANIFESTS)/messgen \
 		$(MANIFESTS)/sla \
 		$(MANIFESTS)/sst \
-		$(MANIFESTS)/star2html
+		$(MANIFESTS)/star2html \
+		$(MANIFESTS)/starmem
 	cd libraries/ast \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/astrom: \
 		$(MANIFESTS)/cfitsio \
+		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/sla \
-		$(MANIFESTS)/star2html
+		$(MANIFESTS)/star2html \
+		$(MANIFESTS)/starmem
 	cd applications/astrom \
 	  && $(MAKE_CPT)
 
@@ -392,8 +396,10 @@ $(MANIFESTS)/cnf: \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/coco: \
+		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/sla \
-		$(MANIFESTS)/star2html
+		$(MANIFESTS)/star2html \
+		$(MANIFESTS)/starmem
 	cd applications/coco \
 	  && $(MAKE_CPT)
 
@@ -2166,8 +2172,10 @@ $(MANIFESTS)/ref: \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/rv: \
+		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/sla \
-		$(MANIFESTS)/star2html
+		$(MANIFESTS)/star2html \
+		$(MANIFESTS)/starmem
 	cd applications/rv \
 	  && $(MAKE_CPT)
 
@@ -2425,7 +2433,9 @@ $(MANIFESTS)/skycat: \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/sla: \
-		$(MANIFESTS)/star2html
+		$(MANIFESTS)/cnf \
+		$(MANIFESTS)/star2html \
+		$(MANIFESTS)/starmem
 	cd libraries/sla \
 	  && $(MAKE_CPT)
 

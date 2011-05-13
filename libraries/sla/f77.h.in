@@ -522,10 +522,16 @@
 
 
 /*  ---  Execute code synchronised by the CNF global mutex                  */
+#include <config.h>
+
+#if USE_CNF
 #define F77_LOCK(code) \
    cnfLock(); \
    code \
    cnfUnlock();
+#else
+#define F77_LOCK(code) code
+#endif
 
 /*  ---  Pass arguments to a FORTRAN routine  ---			    */
 
