@@ -23,7 +23,7 @@
 *
 *        F77_SUBROUTINE(chandlr)( int id )
 *
-F77_LOCK( *        F77_CALL(fhandlr)( INTEGER_ARG(&id) ); )
+*        F77_LOCK( F77_CALL(fhandlr)( INTEGER_ARG(&id) ); )
 *
 
 *  Copyright:
