@@ -58,6 +58,23 @@ STAR_CNF_BLANK_COMMON
 dnl   Type used for trailing lengths of character strings, int or long.
 STAR_CNF_TRAIL_TYPE
 
+dnl    Conditional defining whether we build with POSIX thread support.
+dnl    We do this by default.
+AC_ARG_WITH([pthreads],
+            [ --with-pthreads   Build package with POSIX threads support],
+            [if test "$withval" = "yes"; then
+               use_pthreads="yes"
+             else
+               use_pthreads="no"
+             fi],
+            [use_pthreads="yes"])
+if test "$use_pthreads" = "yes"; then
+   AC_CHECK_LIB([pthread], [pthread_create], ,[use_pthreads="no"])
+   if test "$use_pthreads" = "yes"; then
+      AC_DEFINE([USE_PTHREADS], [1], [Build with POSIX threads support])
+   fi
+fi
+
 dnl   Need to know size of these trailing character lengths for CNF_CVAL.
 if test "$star_cv_cnf_trail_type" = "int"; then
    AC_CHECK_SIZEOF([int])

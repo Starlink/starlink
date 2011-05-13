@@ -38,6 +38,9 @@
 *     {enter_changes_here}
 */
 
+/* Set XOPEN_SOURCE to 500 in order to provide the recursive mutex
+   facilties. */
+#define _XOPEN_SOURCE 500
 
 /* Header files. */
 /* ============= */
@@ -49,13 +52,22 @@
 /* Static variables for this module. */
 /* ================================= */
 /* If the pthreads library is available define a mutex that can be used
-   to syncronise all calls to fortran from C. */
+   to syncronise all calls to fortran from C. This is a recursive mutex,
+   meaning that when the mutex is locked by a thread, that same thread
+   can lock it again without causing a dead-lock. We need this to guard
+   against cases where C calls Fortran, which then calls C, which then
+   calls Fortran. With a non-recursive mutex, the first level of Fortran
+   call would lock the mutex, causing the second level of Fortran call
+   to freeze when it attempts to lock the same mutex. */
 #if USE_PTHREADS
-static pthread_mutex_t cnf_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_once_t cnf_is_initialized = PTHREAD_ONCE_INIT;
+static pthread_mutexattr_t cnf_mutex_attr;
+static pthread_mutex_t cnf_mutex;
 #endif
 
 /* Function prototypes. */
 /* ==================== */
+static void cnf1Initialise( void );
 
 
 /* Function definitions. */
@@ -78,8 +90,16 @@ void cnfLock( void ) {
 
 *-
 */
+
+/* Do nothing if the pthreads library is not availanle. */
 #if USE_PTHREADS
+
+/* Ensure the cnf recursive mutex has been initialised. */
+   (void) pthread_once( &cnf_is_initialized, cnf1Initialise );
+
+/* Lock the mutex. */
    pthread_mutex_lock( &cnf_mutex );
+
 #endif
 }
 
@@ -100,8 +120,33 @@ void cnfUnlock( void ) {
 
 *-
 */
+
+/* Do nothing if the pthreads library is not availanle. */
 #if USE_PTHREADS
+
+/* Unlock the mutex */
    pthread_mutex_unlock( &cnf_mutex );
+
 #endif
 }
 
+static void cnf1Initialise( void ) {
+/*
+*  Name:
+*     cnf1Initialise
+
+*  Purpose:
+*     Initialise the CNF mutex
+
+*  Invocation:
+*     cnf1Initialise();
+
+*  Description:
+*     This function initialises the CNF global mutex, and sets its
+*     attributes so that it is a recursive mutex.
+
+*/
+   pthread_mutexattr_init( &cnf_mutex_attr );
+   pthread_mutexattr_settype( &cnf_mutex_attr, PTHREAD_MUTEX_RECURSIVE );
+   pthread_mutex_init( &cnf_mutex, &cnf_mutex_attr );
+}
