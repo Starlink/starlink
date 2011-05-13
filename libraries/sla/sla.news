@@ -3,6 +3,14 @@
 #        Improved sla_UE2PV.
 #        Package version number changed to 2.5-4.
 
+SLALIB_Version_2.5.5
+
+* The SLALIB C wrapper now optionally uses the CNF library to serialise
+calls from C to Fortran, there-by ensuring that the C functions are
+thread-safe. This dependency on CNF can be switched off by configuring
+SLALIB with the "--without-cnf" option, in which case CNF will not be
+used and the C wrappers will not be thread-safe.
+
 SLALIB_Version_2.5.4
 
 * Changes to sla_EL2UE, sla_FITXY, sla_PV2EL, sla_REFRO, sla_UE2PV and

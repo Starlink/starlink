@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="sla" support="S">
-  <version>2.5-4</version>
+  <version>2.5-5</version>
   <path>libraries/sla</path>
   <description>SLALIB --- Positional Astronomy Library</description>
   <abstract><p>SLALIB is a library used by writers of
