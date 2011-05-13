@@ -27,7 +27,15 @@
    - one_strlcat: C wrapper around the BSD strlcat function which itself
       is a safer replacement for the standard strncat function.
 
+   - one_strtod: Starlink status wrapped version of the standard strtod()
+     library function. C only.
+
 2 Changes_in_ONE
+
+3 V1.4
+
+  - Add one_strtod to provide standardised string to double conversion.
+    A Starlink status C version of CHR_CTOD.
 
 3 V1.3
 

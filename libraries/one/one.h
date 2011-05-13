@@ -15,9 +15,11 @@
  *  History:
  *     2008-05-29 (TIMJ):
  *        Initial version.
+ *     2011-05-12 (TIMJ):
+ *        Add one_strtod
 
  *  Copyright:
- *     Copyright (C) 2008 Science and Technology Facilities Council.
+ *     Copyright (C) 2008,2011 Science and Technology Facilities Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -52,7 +54,8 @@ size_t
 one_strlcpy( char * dest, const char * src, size_t size, int * status );
 size_t
 one_strlcat( char * dest, const char * src, size_t size, int * status );
-
+double
+one_strtod( const char * instr, int * status );
 
 /* STAR_ONE_H_INCLUDED */
 #endif

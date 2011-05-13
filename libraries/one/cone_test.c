@@ -62,6 +62,7 @@ main ( void ) {
   char dest1[ONEBUFSIZ];
   int status = SAI__OK;
   int exstat = EXIT_SUCCESS;
+  double dval = 0.0;
 
   dest1[0] = '\0';
 
@@ -111,6 +112,34 @@ main ( void ) {
     printf("Did not get truncation status. Copied %d characters\n",
            (int)len);
     exstat = EXIT_FAILURE;
+  }
+
+  /* Number parsing */
+  dval = one_strtod( "0.0", &status );
+  if (dval == 0.0) {
+    printf("Correctly parsed the double value as %g\n", dval);
+  } else {
+    printf("Did not read the double value properly (got %g)\n", dval);
+    emsAnnul( &status );
+    exstat = EXIT_FAILURE;
+  }
+
+  dval = one_strtod( "-5.2D5", &status );
+  if (dval == -520000) {
+    printf("Correctly parsed the double value as %g\n", dval);
+  } else {
+    printf("Did not read the double value properly (got %g)\n", dval);
+    emsAnnul( &status );
+    exstat = EXIT_FAILURE;
+  }
+
+  dval = one_strtod( "hello", &status );
+  if (status == SAI__OK) {
+    printf("Extracted number %g by mistake\n", dval);
+    exstat = EXIT_FAILURE;
+  } else {
+    printf("Correctly failed to parse text\n");
+    emsAnnul( &status );
   }
 
   return exstat;

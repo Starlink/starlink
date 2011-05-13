@@ -9,4 +9,5 @@ LENERR     <Name Length Error>
 MALLOCERR  <Malloc error>
 EXECERROR  <Error in exec/fork>
 TRUNC      <String truncated>
+CNVERR     <Format conversion error>
 .END

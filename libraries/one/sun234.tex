@@ -17,11 +17,11 @@
 {Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {234.3}
+\newcommand{\stardocnumber}    {234.4}
 \newcommand{\stardocauthors}   {R.T.Platon \& T. Jenness}
-\newcommand{\stardocdate}      {29th May 2008}
+\newcommand{\stardocdate}      {12th May 2011}
 \newcommand{\stardoctitle}     {ONE -- Odds and Ends Library}
-\newcommand{\stardocversion}   {Version 1.2}
+\newcommand{\stardocversion}   {Version 1.4}
 \newcommand{\stardocmanual}    {User's Guide}
 \newcommand{\stardocabstract}  {
 This library is a set of Fortran and C routines
@@ -579,7 +579,13 @@ The contents of the library are (in alphabetical order):\\
     {Wrapper around the standard BSD strlcat C function (safer variant
       of strncat).}
 \noteroutine{one\_strlcpy( dest, src, sizedest, status )}
-    {Wrapper around the standard BSD strlcpy C function (safer variant of strncpy).}
+   {Wrapper around the standard BSD strlcpy C function (safer variant of strncpy).}
+\noteroutine{one\_strtod( instr, status )}
+   {Extract a double precision value from a C string.}
+\noteroutine{ONE\_WORDEXP\_FILE( WORDS, CONTEXT, EXPAN, STATUS)}
+  {WORDEXP wrapper that verifies a file exists.}
+\noteroutine{ONE\_WORDEXP\_NOGLOB( WORDS, EXPAN, STATUS)}
+  {WORDEXP wrapper that expands shell variables without globbing.}
 \section{Routines descriptions}
 There follows a full description of the library routines in alphabetical order:
 
@@ -956,6 +962,153 @@ There follows a full description of the library routines in alphabetical order:
          \sstitem
          If available the system strlcpy routine will be used.
       }
+   }
+}
+\sstroutine{
+   one\_strtod
+}{
+   Starlink compliant wrapper around the standard strtod function
+}{
+   \sstdescription{
+      The strtod() function converts a string to a double precision
+      number. This function is the same except that there is not endptr
+      argument and it will set status to bad on failure and use inherited
+      status.
+   }
+   \sstinvocation{
+      dval = one\_strtod( const char $*$ instr, int $*$ status );
+   }
+   \sstarguments{
+      \sstsubsection{
+         instr = const char $*$ (Given)
+      }{
+         Input string to parse. Must be nul-terminated standard
+         C string suitable for the strtod() library call.
+      }
+      \sstsubsection{
+         status = int $*$ (Given and Returned)
+      }{
+         Inherited status. Will be set to ONE\_\_CNVERR if the string
+         did not contain a number.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         double dval
+      }{
+         Converted double precision value. VAL\_\_BADD on error.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This is for use from C only.
+
+         \sstitem
+         Fortran D format is supported so 5.2D5 is converted to 5.2E5
+           before involving strtod.
+      }
+   }
+   \sstdiytopic{
+      See Also
+   }{
+      \sstitemlist{
+
+         \sstitem
+         CHR\_CTOD subroutine.
+      }
+   }
+}
+\sstroutine{
+   ONE\_WORDEXP\_FILE
+}{
+   WORDEXP wrapper that verifies a file exists
+}{
+   \sstdescription{
+      A wrapper around PSX\_WORDEXP that only returns files that
+      match the supplied WORDS string following expansion. EXPAN
+      will be an empty string if there are no matches and CONECT
+      will be set to 0.
+   }
+   \sstinvocation{
+      CALL ONE\_WORDEXP\_FILE( WORDS, CONTEXT, EXPAN, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         WORDS = CHARACTER$*$($*$) (Given)
+      }{
+         The string to be shell expanded.
+      }
+      \sstsubsection{
+         CONTEXT = INTEGER (Given \& Returned)
+      }{
+         Should be initialised to 0 for initial shell expansion. Will
+         be set to zero when no more results are available.
+      }
+      \sstsubsection{
+         EXPAN = CHARACTER$*$($*$) (Given)
+      }{
+         Expanded string. A new string will be returned each call until
+         all are returned an CONTEXT is set to 0.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given \& Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Continue to call this routine until CONTEXT is set to 0, otherwise
+         there will be a possible memory leak.
+
+         \sstitem
+         If there are multiple returns from PSX\_WORDEXP that are not files
+         this routine will loop internally until a valid file is located.
+      }
+   }
+}
+\sstroutine{
+   ONE\_WORDEXP\_NOGLOB
+}{
+   WORDEXP wrapper that expands shell variables without globbing
+}{
+   \sstdescription{
+      A wrapper around PSX\_WORDEXP that does shell expansion without
+      doing globbing. Glob wildcard characters are escaped, as are
+      illegal, to wordexp(), shell metacharacters such as {\tt "}({\tt "} and {\tt "}){\tt "}.
+
+      Only a single expansion string is returned by this routine and it
+      is an error for wordexp() to return multiple matches.
+   }
+   \sstinvocation{
+      CALL ONE\_WORDEXP\_NOGLOB( WORDS, EXPAN, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         WORDS = CHARACTER$*$($*$) (Given)
+      }{
+         The string to be shell expanded.
+      }
+      \sstsubsection{
+         EXPAN = CHARACTER$*$($*$) (Given)
+      }{
+         Expanded string.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given \& Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstdiytopic{
+      See Also
+   }{
+      ONE\_SHELL\_ECHO is similar except that it guarantees to fork
+      whereas wordexp() might not fork.
    }
 }
 
