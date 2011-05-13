@@ -106,6 +106,8 @@
 *        Another API change to smf_create_lutwcs.
 *     2011-01-11 (TIMJ):
 *        Use sc2store_writejcmtstate
+*     2011-05-12 (TIMJ):
+*        Use one_strtod
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -152,6 +154,7 @@
 #include "sae_par.h"
 #include "star/slalib.h"
 #include "star/kaplibs.h"
+#include "star/one.h"
 
 /* SMURF includes */
 #include "smurf_par.h"
@@ -447,9 +450,9 @@ void smurf_impaztec( int *status ) {
 
     /* RA + Dec at centre of map */
     nc_get_att_text ( ncid, NC_GLOBAL, "jcmt_header_C1", ra_str );
-    ra = strtod ( ra_str, NULL );
+    ra = one_strtod( ra_str, status );
     nc_get_att_text ( ncid, NC_GLOBAL, "jcmt_header_C2", dec_str );
-    dec = strtod ( dec_str, NULL );
+    dec = one_strtod( dec_str, status );
     printf("IMPAZTEC ra,dec from jcmt_header: %g %g\n", ra, dec);
 
     /* Get tracking system */

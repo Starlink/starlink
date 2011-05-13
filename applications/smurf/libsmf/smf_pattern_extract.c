@@ -50,9 +50,11 @@
 *  History:
 *     2009-11-27 (TIMJ):
 *        Split from smf_fix_metadata
+*     2011-05-12 (TIMJ):
+*        Use one_strtod
 
 *  Copyright:
-*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2009,2011 Science & Technology Facilities Council.
 *     Copyright (C) 2009 University of British Columbia.
 *     All Rights Reserved.
 
@@ -109,15 +111,7 @@ int smf_pattern_extract ( const char * sourcestr, const char * pattern,
 
     /* Now need to convert it to a float if required. We trap for bad conversion. */
     if ( dresult ) {
-      char *endptr = NULL;
-      *dresult = strtod( result[0], &endptr );
-      if (*dresult == 0.0 && endptr == result[0]) {
-        *dresult = VAL__BADD;
-        if (*status == SAI__OK) {
-          *status = SAI__ERROR;
-          errRepf( " ", "Error converting '%s' to double", status, result[0]);
-        }
-      }
+      *dresult = one_strtod( result[0], status );
     }
     /* Copy to results buffer if required */
     if ( sresult ) {
