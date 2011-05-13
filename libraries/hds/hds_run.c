@@ -70,10 +70,12 @@ F77_SUBROUTINE(hds_run)( SUBROUTINE(subroutine),
 /* Check the inherited global status. */
       if ( !_ok( *status ) ) return;
 
-/* Start up HDS, call the application and close HDS down  */
-      F77_LOCK( F77_CALL(hds_start)( status ); )
+/* Start up HDS, call the application and close HDS down.
+   We do not need to lock because we know that internally these
+   are resolved as C functions with a Fortran API. */
+      F77_CALL(hds_start)( status );
       (*subroutine)( status );
-      F77_LOCK( F77_CALL(hds_stop)( status ); )
+      F77_CALL(hds_stop)( status );
 
 /* If an error occurred, then report contextual information.  */
       if ( !_ok( *status ) )

@@ -888,10 +888,13 @@ F77_SUBROUTINE(dat_getvc)( CHARACTER(locator),
   /* Export the new locator back to Fortran style */
   datExportFloc( &vecloc_c, 0, DAT__SZLOC, vecloc, status );
 
-  /* Call Fortran dat_put1c since that does all the bounds checking */
-  F77_LOCK( F77_CALL(dat_get1c)( CHARACTER_ARG(vecloc), INTEGER_ARG(maxval),
+  /* Call Fortran dat_put1c since that does all the bounds checking.
+     We do not need to lock a mutex because we know that this is
+     calling C code in this file.
+ */
+  F77_CALL(dat_get1c)( CHARACTER_ARG(vecloc), INTEGER_ARG(maxval),
 		       CHARACTER_ARG(values), INTEGER_ARG(actval), INTEGER_ARG(status)
-		       TRAIL_ARG(vecloc) TRAIL_ARG(values) ); )
+		       TRAIL_ARG(vecloc) TRAIL_ARG(values) );
 
   /* Now annul the vector locator */
   datAnnul( &vecloc_c, status );
@@ -2340,10 +2343,13 @@ F77_SUBROUTINE(dat_putvc)( CHARACTER(locator),
   /* Export the new locator back to Fortran style */
   datExportFloc( &vecloc_c, 0, DAT__SZLOC, vecloc, status );
 
-  /* Call Fortran dat_put1c since that does all the bounds checking */
-  F77_LOCK( F77_CALL(dat_put1c)( CHARACTER_ARG(vecloc), INTEGER_ARG(nval),
+  /* Call Fortran dat_put1c since that does all the bounds checking.
+     We do not need to lock a mutex because we know that this is
+     calling C code in this file.
+   */
+  F77_CALL(dat_put1c)( CHARACTER_ARG(vecloc), INTEGER_ARG(nval),
 		       CHARACTER_ARG(values), INTEGER_ARG(status)
-		       TRAIL_ARG(vecloc) TRAIL_ARG(values) ); )
+		       TRAIL_ARG(vecloc) TRAIL_ARG(values) );
 
   /* Now annul the vector locator */
   datAnnul( &vecloc_c, status );
