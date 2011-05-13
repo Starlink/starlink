@@ -8,12 +8,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "merswrap.h"
-
-static void Error( const char *, int * );
-extern F77_SUBROUTINE(err_rep)( CHARACTER(param), CHARACTER(mess),
-                                INTEGER(STATUS) TRAIL(param) TRAIL(mess) );
-
+#include "mers.h"
 
 F77_SUBROUTINE(kpg1_memry)( INTEGER(MEM), INTEGER(STATUS) ){
 /*
@@ -42,6 +37,7 @@ F77_SUBROUTINE(kpg1_memry)( INTEGER(MEM), INTEGER(STATUS) ){
 *        The inherited global status.
 
 *  Copyright:
+*     Copyright (C) 2011 Science & Technology Facilities Council.
 *     Copyright (C) 2002 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
 
@@ -63,11 +59,14 @@ F77_SUBROUTINE(kpg1_memry)( INTEGER(MEM), INTEGER(STATUS) ){
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     1-NOV-2002 (DSB):
 *        Original version.
+*     13-MAY-2011 (TIMJ):
+*        Use the C interface to errRep rather than the Fortran interface.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -87,60 +86,8 @@ F77_SUBROUTINE(kpg1_memry)( INTEGER(MEM), INTEGER(STATUS) ){
 
    if( getrusage( RUSAGE_SELF, &usage ) != 0 ) {
       *STATUS = SAI__ERROR;
-      Error( strerror( errno ), STATUS );
+      errRepf( "", "%s", STATUS, strerror( errno ) );
    } else {
       *MEM = (int) usage.ru_maxrss*getpagesize()/1024;
    }
 }
-
-static void Error( const char *text, int *STATUS ) {
-/*
-*+
-*  Name:
-*     Error
-
-*  Purpose:
-*     Report an error using EMS.
-
-*  Description:
-*     The supplied text is used as the text of the error message.
-*     A blank parameter name is used.
-
-*  Arguments:
-*     text
-*        The error message text. Only the first 80 characters are used.
-*     STATUS
-*        A pointer to the global status value. This should have been set
-*        to a suitable error value before calling this function.
-
-*  Notes:
-*     - If a NULL pointer is supplied for "text", no error is reported.
-*/
-
-   DECLARE_CHARACTER(param,1);
-   DECLARE_CHARACTER(mess,80);
-   int j;
-
-/* Check the supplied pointer. */
-   if( text ) {
-
-/* Set the parameter name to a blank string. */
-      param[0] = ' ';
-
-/* Copy the first "mess_length" characters of the supplied message into
-      "mess". */
-      strncpy( mess, text, mess_length );
-
-/* Pad any remaining bytes with spaces (and replace the terminating null
-   character with a space). */
-      for( j = strlen(mess); j < mess_length; j++ ) {
-         mess[ j ] = ' ';
-      }
-
-/* Report the error. */
-      F77_LOCK( F77_CALL(err_rep)( CHARACTER_ARG(param), CHARACTER_ARG(mess),
-                         INTEGER_ARG(STATUS) TRAIL_ARG(param)
-                         TRAIL_ARG(mess) ); )
-   }
-}
-
