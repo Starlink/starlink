@@ -44,15 +44,22 @@
  *     along with this program; if not, write to the Free Software
  *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
  *     02111-1307, USA
+
+ *  Copyright:
  *     Copyright (C) 2000 Central Laboratory of the Research Councils
+ *     Copyright (C) 2011 Science & Technology Facilities Council.
+ *     All Rights Reserved.
 
  *  Authors:
  *     PWD: Peter W. Draper (Starlink - Durham University)
+ *     TIMJ: Tim Jenness (JAC, Hawaii)
  *     {enter_new_authors_here}
 
  *  History:
  *     19-JUL-2000 (PWD):
  *        Original version.
+ *     13-MAY-2011 (TIMJ):
+ *        PCS task_get_name now has a C interface.
  *     {enter_further_changes_here}
 
  *-
@@ -64,6 +71,7 @@
 #include "par_par.h"
 #include "f77.h"
 #include "merswrap.h"
+#include "star/task_adam.h"
 
 /*  Define macro to generate functions for invoking any Fortran
  *  actions. CNAME is the function name as will be called from C (add
@@ -92,26 +100,6 @@ GENERATE_FORTRANCMD( tab2ascCmd,  tab2asc )
 GENERATE_FORTRANCMD( tab2catCmd,  tab2cat )
 GENERATE_FORTRANCMD( ardspectraCmd,  ardspectra )
 
-/*  Define TASK subroutine that returns name */
-extern void F77_EXTERNAL_NAME( task_get_name )(
-    CHARACTER( fname ),
-    INTEGER( fstatus )
-    TRAIL( fpath ) );
-
-static void taskGetName( char *name, int name_length, int *status )
-{
-   DECLARE_CHARACTER_DYN(fname);
-   DECLARE_INTEGER(fstatus);
-   F77_CREATE_CHARACTER( fname, name_length-1 );
-   F77_EXPORT_INTEGER( *status, fstatus );
-   F77_CALL( task_get_name )( CHARACTER_ARG( fname ),
-                              INTEGER_ARG( &fstatus )
-                              TRAIL_ARG( fname ) );
-   F77_IMPORT_CHARACTER( fname, fname_length, name );
-   F77_IMPORT_INTEGER( fstatus, *status );
-   return;
-}
-
 /*  ==============================================  */
 /*  Define the list of actions that we can invoke. */
 /*  ==============================================  */
@@ -134,7 +122,7 @@ static struct actionStruct {
 void gaiaMon( int *status )
 {
     /*  Local Variables: */
-    char name[PAR__SZNAM];
+    char name[PAR__SZNAM+1];
     unsigned int i;
     struct actionStruct *action;
 
@@ -142,7 +130,7 @@ void gaiaMon( int *status )
     if ( *status != SAI__OK ) return;
 
     /*  Get the action name. */
-    taskGetName( name, PAR__SZNAM, status );
+    taskGetName( name, PAR__SZNAM+1, status );
 
     /*  If the name is known then invoke the action */
     for ( i = 0; i < sizeof( actions_ ) / sizeof( *actions_ ); i++ ) {
