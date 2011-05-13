@@ -1,9 +1,6 @@
 #include "sae_par.h"
 #include "cupid.h"
-#include "f77.h"
-
-extern F77_SUBROUTINE(shl_adam)( CHARACTER(libnam), LOGICAL(isenv),
-                                 INTEGER(status) TRAIL(libnam) );
+#include "star/shl.h"
 
 void cupidhelp( int *status ){
 /*
@@ -113,6 +110,8 @@ void cupidhelp( int *status ){
 *  History:
 *     28-SEP-2005 (DSB):
 *        Original version.
+*     12-MAY-2011 (TIMJ):
+*        Use the official C interface to SHL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -121,20 +120,10 @@ void cupidhelp( int *status ){
 *-
 */
 
-/* Local Constants: */
-   DECLARE_CHARACTER(LIBNAM,10);
-   DECLARE_INTEGER(STATUS);
-   DECLARE_LOGICAL(ISENV);
-
 /* Check the inherited status. */
    if( *status != SAI__OK ) return;
 
 /* Open the help library application layer */
-   cnfExprt( "CUPID_HELP", LIBNAM, LIBNAM_length );
-   STATUS = SAI__OK;
-   ISENV = F77_TRUE;
-   F77_CALL(shl_adam)( CHARACTER_ARG(LIBNAM), LOGICAL_ARG(&ISENV),
-                       INTEGER_ARG(&STATUS) TRAIL_ARG(LIBNAM) );
-   *status = STATUS;
+   shlAdam( "CUPID", 1, status );
 
 }
