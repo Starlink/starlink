@@ -249,6 +249,8 @@
 *          100000 characters long. Put lower limits on other strings.
 *          - Ensure subsequent string pointers are NULLified if an error
 *          occurs whilst decoding Prov data.
+*      13-MAY-2011 (DSB):
+*          Fix memory leak in ndg1WriteProvenanceExtension.
 */
 
 
@@ -7794,6 +7796,7 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance,
       }
 
       datAnnul( &mloc, status );
+      mores = astFree( mores );
    }
 
    pdata = astFree( pdata );
