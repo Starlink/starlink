@@ -443,5 +443,6 @@ void smf_clean_dksquid( smfData *indata, smf_qual_t mask, size_t window, smfData
   if( !model && dksquid ) dksquid = astFree( dksquid );
 
   if( dkgood ) dkgood = astFree( dkgood );
+  if( dkav ) dkav = astFree( dkav );
 
 }
