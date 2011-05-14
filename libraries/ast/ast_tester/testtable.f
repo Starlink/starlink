@@ -169,10 +169,23 @@ c      call ast_watchmemory(483)
          call stopit( status, 'Table error 18' )
       endif
 
+      call ast_addparameter( table, 'COLOUR', status )
+      if( .not. ast_hasparameter( table, 'COLOUR', status ) ) then
+         call stopit( status, 'Table error 18_1' )
+      endif
 
+      call ast_mapput0C( table, 'COLOUR', 'Red', ' ', status )
+      if( ast_mapget0c( table, 'COLOUR', cval, l, status ) ) then
+         if( cval .ne. 'Red' ) call stopit( status, 'Table error 18_3' )
+         if( l .ne. 3 ) call stopit( status, 'Table error 18_4' )
+      else
+         call stopit( status, 'Table error 18_5' )
+      endif
 
-
-
+      call ast_removeparameter( table, 'COLOUR', status )
+      if( ast_hasparameter( table, 'COLOUR', status ) ) then
+         call stopit( status, 'Table error 18_2' )
+      endif
 
       call checkDump( table, 'checkDump 1 ', status )
 

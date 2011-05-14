@@ -35,6 +35,14 @@ f     AST_ADDCOLUMN
 *     have the same type and shape, as specified when the column is added
 *     to the Table.
 *
+*     Tables may have parameters that describe global properties of the
+*     entire table. These are stored as entries in the parent KeyMap and
+*     can be access using the get and set method of the KeyMap class.
+*     However, parameters must be declared using the
+c     astAddParameter
+f     AST_ADDPARAMETER
+*     method before being accessed.
+*
 *     Note - since accessing entries within a KeyMap is a relatively slow
 *     process, it is not recommended to use the Table class to store
 *     very large tables.
@@ -53,6 +61,7 @@ f     AST_ADDCOLUMN
 *     - ColumnUnit(column): The unit string describing each value in a column
 *     - Ncolumn: The number of columns currently in the Table
 *     - Nrow: The number of rows currently in the Table
+*     - Nparameter: The number of global parameters currently in the Table
 
 *  Functions:
 c     In addition to those functions applicable to all KeyMaps, the
@@ -61,22 +70,30 @@ f     In addition to those routines applicable to all KeyMaps, the
 f     following routines may also be applied to all Tables:
 *
 c     - astAddColumn: Add a new column definition to a Table
+c     - astAddParameter: Add a new global parameter definition to a Table
 c     - astColumnName: Return the name of the column with a given index
 c     - astColumnShape: Return the shape of the values in a named column
 c     - astHasColumn: Checks if a column exists in a Table
+c     - astHasParameter: Checks if a global parameter exists in a Table
+c     - astParameterName: Return the name of the parameter with a given index
 c     - astPurgeRows: Remove all empty rows from a Table
 c     - astRemoveColumn: Remove a column from a Table
+c     - astRemoveParameter: Remove a global parameter from a Table
 c     - astRemoveRow: Remove a row from a Table
 f     - AST_ADDCOLUMN: Add a new column definition to a Table
+f     - AST_ADDPARAMETER: Add a new global parameter definition to a Table
 f     - AST_COLUMNNAME: Return the name of the column with a given index
 f     - AST_COLUMNSHAPE: Return the shape of the values in a named column
 f     - AST_HASCOLUMN: Checks if a column exists in a Table
+f     - AST_HASPARAMETER: Checks if a global parameter exists in a Table
+f     - AST_PARAMETERNAME: Return the name of the parameter with a given index
 f     - AST_PURGEROWS: Remove all empty rows from a Table
 f     - AST_REMOVECOLUMN: Remove a column from a Table
+f     - AST_REMOVEPARAMETER: Remove a global parameter from a Table
 f     - AST_REMOVEROW: Remove a row from a Table
 
 *  Copyright:
-*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2010-2011 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -101,6 +118,8 @@ f     - AST_REMOVEROW: Remove a row from a Table
 *  History:
 *     22-NOV-2010 (DSB):
 *        Original version.
+*     13-MAY-2011 (DSB):
+*        Added support for table parameters.
 *class--
 */
 
@@ -263,7 +282,9 @@ AstTable *astTableId_( const char *, ... );
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
 static AstKeyMap *ColumnProps( AstTable *, int * );
+static AstKeyMap *ParameterProps( AstTable *, int * );
 static const char *ColumnName( AstTable *, int index, int * );
+static const char *ParameterName( AstTable *, int index, int * );
 static const char *GetColumnUnit( AstTable *, const char *, int * );
 static const char *TypeString( int );
 static int Equal( AstObject *, AstObject *, int * );
@@ -272,8 +293,10 @@ static int GetColumnLength( AstTable *, const char *, int * );
 static int GetColumnNdim( AstTable *, const char *, int * );
 static int GetColumnType( AstTable *, const char *, int * );
 static int GetNcolumn( AstTable *, int * );
+static int GetNparameter( AstTable *, int * );
 static int GetObjSize( AstObject *, int * );
 static int HasColumn( AstTable *, const char *, int *);
+static int HasParameter( AstTable *, const char *, int *);
 static int MapGet0A( AstKeyMap *, const char *, AstObject **, int * );
 static int MapGet0B( AstKeyMap *, const char *, unsigned char *, int * );
 static int MapGet0C( AstKeyMap *, const char *, const char **, int * );
@@ -300,6 +323,7 @@ static int MapGetElemP( AstKeyMap *, const char *, int, void **, int * );
 static int MapGetElemS( AstKeyMap *, const char *, int, short int *, int * );
 static int ParseKey( AstTable *, const char *, int, char *, int *, AstKeyMap **, const char *, int * );
 static void AddColumn( AstTable *, const char *, int, int, int *, const char *, int * );
+static void AddParameter( AstTable *, const char *, int * );
 static void ColumnShape( AstTable *, const char *, int, int *, int *, int *);
 static void Copy( const AstObject *, AstObject *, int * );
 static void Delete( AstObject *, int * );
@@ -331,6 +355,7 @@ static void MapPutElemS( AstKeyMap *, const char *, int, short int, int * );
 static void MapPutU( AstKeyMap *, const char *, const char *, int * );
 static void PurgeRows( AstTable *, int * );
 static void RemoveColumn( AstTable *, const char *, int * );
+static void RemoveParameter( AstTable *, const char *, int * );
 static void RemoveRow( AstTable *, int, int * );
 static void SetKeyCase( AstKeyMap *, int, int * );
 static void ClearKeyCase( AstKeyMap *, int * );
@@ -348,6 +373,7 @@ static int GetNrow( AstTable *, int * );
 static void SetNrow( AstTable *, int, int * );
 
 static int GetNcolumn( AstTable *, int * );
+static int GetNparameter( AstTable *, int * );
 
 
 /* Member functions. */
@@ -556,6 +582,85 @@ f     routine
    }
 }
 
+static void AddParameter( AstTable *this, const char *name, int *status ) {
+/*
+*++
+*  Name:
+c     astAddParameter
+f     AST_ADDPARAMETER
+
+*  Purpose:
+*     Add a new global parameter definition to a table.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "table.h"
+c     void astAddParameter( AstTable *this, const char *name )
+f     CALL AST_ADDPARAMETER( THIS, NAME, STATUS )
+
+*  Class Membership:
+*     Table method.
+
+*  Description:
+*     Adds the definition of a new global parameter to the supplied
+*     table. Note, this does not store a value for the parameter. To get
+*     or set the parameter value, the methods of the paremt KeyMap class
+*     should be used, using the name of the parameter as the key.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Table.
+c     name
+f     NAME = CHARACTER * ( * ) (Given)
+*        The parameter name. Trailing spaces are ignored (all other spaces
+*        are significant). The supplied string is converted to upper case.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Notes:
+*     - Unlike columns, the definition of a parameter does not specify its type,
+*     size or dimensionality.
+
+*--
+*/
+
+/* Local Variables: */
+   AstKeyMap *pars;      /* KeyMap holding all parameter details */
+   int namlen;           /* Used length of "name" */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Verify supplied values. */
+   namlen = astChrLen( name );
+   if( namlen == 0 ) {
+      astError( AST__BADKEY, "astAddParameter(%s): Illegal blank parameter name "
+               "supplied.", status, astGetClass( this ) );
+
+   } else if( namlen > AST__MXCOLNAMLEN ) {
+      astError( AST__BADKEY, "astAddParameter(%s): Parameter name '%s' is too "
+               "long (must be no more than %d characters).", status,
+               astGetClass( this ), name, AST__MXCOLNAMLEN );
+   }
+
+/* Do nothing if there is already a parameter with the given name. */
+   if( astOK ) {
+      pars = astParameterProps( this );
+      if( !astMapHasKey( pars, name ) ) {
+
+/* Add a suitable entry to the Parameters KeyMap. The value is arbitrary
+   and currently unused. */
+         astMapPut0I( pars, name, 1, NULL );
+      }
+
+/* Annul the local KeyMap pointer. */
+      pars = astAnnul( pars );
+   }
+}
+
 static void ClearAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
@@ -616,6 +721,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
    error. */
    if ( !strcmp( attrib, "nrow" ) ||
         !strcmp( attrib, "ncolumn" ) ||
+        !strcmp( attrib, "nparameter" ) ||
         MATCH( "columnlenc" ) ||
         MATCH( "columnlength" ) ||
         MATCH( "columnndim" ) ||
@@ -951,8 +1057,8 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 */
 
 /* Local Variables: */
-   AstKeyMap *this_cols;
-   AstKeyMap *that_cols;
+   AstKeyMap *this_km;
+   AstKeyMap *that_km;
    AstTable *that;
    AstTable *this;
    int result;
@@ -976,11 +1082,18 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
       if( (*parent_equal)( this_object, that_object, status ) ) {
 
 /* Check the Columns KeyMaps are equal.  */
-         this_cols = astColumnProps( this );
-         that_cols = astColumnProps( that );
-         result = astEqual( this_cols, that_cols );
-         this_cols = astAnnul( this_cols );
-         that_cols = astAnnul( that_cols );
+         this_km = astColumnProps( this );
+         that_km = astColumnProps( that );
+         result = astEqual( this_km, that_km );
+         this_km = astAnnul( this_km );
+         that_km = astAnnul( that_km );
+
+/* Check the Parameter KeyMaps are equal.  */
+         this_km = astParameterProps( this );
+         that_km = astParameterProps( that );
+         result = astEqual( this_km, that_km );
+         this_km = astAnnul( this_km );
+         that_km = astAnnul( that_km );
       }
    }
 
@@ -1085,6 +1198,15 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 /* ---- */
    } else if( !strcmp( attrib, "nrow" ) ) {
       ival = astGetNrow( this );
+      if ( astOK ) {
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
+      }
+
+/* Nparameter */
+/* ---------- */
+   } else if( !strcmp( attrib, "nparameter" ) ) {
+      ival = astGetNparameter( this );
       if ( astOK ) {
          (void) sprintf( getattrib_buff, "%d", ival );
          result = getattrib_buff;
@@ -1668,6 +1790,62 @@ static int GetNcolumn( AstTable *this, int *status ) {
    return result;
 }
 
+static int GetNparameter( AstTable *this, int *status ) {
+/*
+*+
+*  Name:
+*     astGetNparameter
+
+*  Purpose:
+*     Get the number of global parameters in a Table.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "table.h"
+*     int astGetNparameter( AstTable *this )
+
+*  Class Membership:
+*     Table method.
+
+*  Description:
+*     This function returns the number of global parameters currently in the Table.
+
+*  Parameters:
+*     this
+*        Pointer to the Table.
+
+*  Returned Value:
+*     Number of parameters.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*-
+*/
+
+/* Local Variables: */
+   AstKeyMap *pars;
+   int result;
+
+/* Check the global error status. */
+   if ( !astOK ) return 0;
+
+/* Get a pointer to the KeyMap holding the parameter definitions. */
+   pars = astParameterProps( this );
+
+/* Get the number of parameter definitions in the KeyMap. */
+   result = astMapSize( pars );
+
+/* Annul the KeyMap pointer. */
+   pars = astAnnul( pars );
+
+/* Return the result. */
+   return result;
+}
+
 static int GetObjSize( AstObject *this_object, int *status ) {
 /*
 *  Name:
@@ -1706,7 +1884,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
 */
 
 /* Local Variables: */
-   AstKeyMap *cols;           /* KeyMap holding column definitions */
+   AstKeyMap *km;             /* KeyMap holding column/parameter definitions */
    AstTable *this;            /* Pointer to Table structure */
    int result;                /* Result value to return */
 
@@ -1723,9 +1901,14 @@ static int GetObjSize( AstObject *this_object, int *status ) {
    then add on any components of the class structure defined by this class
    which are stored in dynamically allocated memory. */
    result = (*parent_getobjsize)( this_object, status );
-   cols = astColumnProps( this );
-   result += astGetObjSize( cols );
-   cols = astAnnul( cols );
+
+   km = astColumnProps( this );
+   result += astGetObjSize( km );
+   km = astAnnul( km );
+
+   km = astParameterProps( this );
+   result += astGetObjSize( km );
+   km = astAnnul( km );
 
 /* If an error occurred, clear the result value. */
    if ( !astOK ) result = 0;
@@ -1750,7 +1933,7 @@ f     AST_HASCOLUMN
 *  Synopsis:
 c     #include "table.h"
 c     int astHasColumn( AstTable *this, const char *column, int *status )
-f     RESULT = AST_COLUMNSHAPE( THIS, COLUMN, STATUS )
+f     RESULT = AST_HASCOLUMN( THIS, COLUMN, STATUS )
 
 *  Class Membership:
 *     Table method.
@@ -1801,6 +1984,79 @@ f     .FALSE.
 
 /* Free resources. */
    cols = astAnnul( cols );
+
+/* If an error has occurred, return zero. */
+   if( !astOK ) result = 0;
+   return result;
+}
+
+static int HasParameter( AstTable *this, const char *parameter, int *status ){
+/*
+*++
+*  Name:
+c     astHasParameter
+f     AST_HASPARAMETER
+
+*  Purpose:
+*     Returns a flag indicating if a named global parameter is present in a Table.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "table.h"
+c     int astHasParameter( AstTable *this, const char *parameter, int *status )
+f     RESULT = AST_HASPARAMETER( THIS, PARAMETER, STATUS )
+
+*  Class Membership:
+*     Table method.
+
+*  Description:
+c     This function
+f     This routine
+*     returns a flag indicating if a named parameter exists in a Table, for
+*     instance, by having been added to to the Table using
+c     astAddParameter.
+f     AST_ADDPARAMETER.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Table.
+c     parameter
+f     PARAMETER = CHARACTER * ( * ) (Given)
+*        The character string holding the upper case name of the parameter. Trailing
+*        spaces are ignored.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Notes:
+*     - A value of
+c     zero
+f     .FALSE.
+*     is returned for if an error occurs.
+
+*--
+*/
+
+/* Local Variables: */
+   AstKeyMap *pars;
+   int result;
+
+/* Initialise */
+   result = 0;
+
+/* Check the inherited status. */
+   if( !astOK ) return result;
+
+/* Get the KeyMap holding information about all parameters. */
+   pars = astParameterProps( this );
+
+/* See if it contains an entry for the named parameter. */
+   result = astMapHasKey( pars, parameter );
+
+/* Free resources. */
+   pars = astAnnul( pars );
 
 /* If an error has occurred, return zero. */
    if( !astOK ) result = 0;
@@ -1870,21 +2126,27 @@ void astInitTableVtab_(  AstTableVtab *vtab, const char *name, int *status ) {
 /* Store pointers to the member functions (implemented here) that provide
    virtual methods for this class. */
    vtab->AddColumn = AddColumn;
-   vtab->ColumnProps = ColumnProps;
-   vtab->RemoveColumn = RemoveColumn;
-   vtab->RemoveRow = RemoveRow;
-   vtab->PurgeRows = PurgeRows;
-   vtab->GetNrow = GetNrow;
-   vtab->SetNrow = SetNrow;
-   vtab->GetNcolumn = GetNcolumn;
+   vtab->AddParameter = AddParameter;
    vtab->ColumnName = ColumnName;
+   vtab->ParameterName = ParameterName;
+   vtab->ColumnProps = ColumnProps;
+   vtab->ColumnShape = ColumnShape;
    vtab->GetColumnLenC = GetColumnLenC;
    vtab->GetColumnLength = GetColumnLength;
    vtab->GetColumnNdim = GetColumnNdim;
    vtab->GetColumnType = GetColumnType;
    vtab->GetColumnUnit = GetColumnUnit;
-   vtab->ColumnShape = ColumnShape;
+   vtab->GetNcolumn = GetNcolumn;
+   vtab->GetNparameter = GetNparameter;
+   vtab->GetNrow = GetNrow;
    vtab->HasColumn = HasColumn;
+   vtab->HasParameter = HasParameter;
+   vtab->ParameterProps = ParameterProps;
+   vtab->PurgeRows = PurgeRows;
+   vtab->RemoveColumn = RemoveColumn;
+   vtab->RemoveParameter = RemoveParameter;
+   vtab->RemoveRow = RemoveRow;
+   vtab->SetNrow = SetNrow;
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
@@ -2054,6 +2316,9 @@ static int ManageLock( AstObject *this_object, int mode, int extra,
    if( !result && this->columns ) result = astManageLock( this->columns, mode, extra,
                                                           fail );
 
+   if( !result && this->parameters ) result = astManageLock( this->parameters, mode, extra,
+                                                             fail );
+
 /* Return the result. */
    return result;
 }
@@ -2151,11 +2416,16 @@ static int MapGet0##X( AstKeyMap *this_keymap, const char *key, Xtype *value, \
 /* Get a pointer to the Table structure. */ \
    this = (AstTable *) this_keymap; \
 \
+/* If the key is the name of a global table parameter, use the parent \
+   method to get the value of hte parameter. */ \
+   if( astHasParameter( this, key ) ) { \
+      result = (*parent_mapget0##Xlc)( this_keymap, key, value, status ); \
+\
 /* Check the supplied key looks like a table cell key, and get the \
    the column name and the row number. Also checks that the table \
    contains a column with the specified name. */ \
-   if( ParseKey( this, key, astGetKeyError( this ), colname, &irow, \
-                 NULL, "astMapGet0" #X, status ) ) { \
+   } else if( ParseKey( this, key, astGetKeyError( this ), colname, &irow, \
+                        NULL, "astMapGet0" #X, status ) ) { \
 \
 /* If the row index is larger than the current number of rows in the \
    table, do nothing more. */ \
@@ -2290,10 +2560,16 @@ static int MapGet1##X( AstKeyMap *this_keymap, const char *key, int mxval, int *
 /* Get a pointer to the Table structure. */ \
    this = (AstTable *) this_keymap; \
 \
+/* If the key is the name of a global table parameter, use the parent \
+   method to get the value of hte parameter. */ \
+   if( astHasParameter( this, key ) ) { \
+      result = (*parent_mapget1##Xlc)( this_keymap, key, mxval, nval, \
+                value, status ); \
+\
 /* Check the supplied key looks like a table cell key, and get the \
    the column name and the row number. Also checks that the table \
    contains a column with the specified name. */ \
-   if( ParseKey( this, key, astGetKeyError( this ), colname, &irow, \
+   } else if( ParseKey( this, key, astGetKeyError( this ), colname, &irow, \
                  NULL, "astMapGet1" #X, status ) ) { \
 \
 /* If the row index is larger than the current number of rows in the \
@@ -2374,11 +2650,17 @@ static int MapGet1C( AstKeyMap *this_keymap, const char *key, int l, int mxval,
 /* Get a pointer to the Table structure. */
    this = (AstTable *) this_keymap;
 
+/* If the key is the name of a global table parameter, use the parent
+   method to get the value of hte parameter. */
+   if( astHasParameter( this, key ) ) {
+      result = (*parent_mapget1c)( this_keymap, key, l, mxval, nval,
+                value, status );
+
 /* Check the supplied key looks like a table cell key, and get the
    the column name and the row number. Also checks that the table
    contains a column with the specified name. */
-   if( ParseKey( this, key, astGetKeyError( this ), colname, &irow,
-                 NULL, "astMapGet1C", status ) ) {
+   } else if( ParseKey( this, key, astGetKeyError( this ), colname, &irow,
+                        NULL, "astMapGet1C", status ) ) {
 
 /* If the row index is larger than the current number of rows in the
    table, do nothing more. */
@@ -2498,11 +2780,17 @@ static int MapGetElem##X( AstKeyMap *this_keymap, const char *key, int elem, \
 /* Get a pointer to the Table structure. */ \
    this = (AstTable *) this_keymap; \
 \
+/* If the key is the name of a global table parameter, use the parent \
+   method to get the value of hte parameter. */ \
+   if( astHasParameter( this, key ) ) { \
+      result = (*parent_mapgetelem##Xlc)( this_keymap, key, elem, \
+                                          value, status ); \
+\
 /* Check the supplied key looks like a table cell key, and get the \
    the column name and the row number. Also checks that the table \
    contains a column with the specified name. */ \
-   if( ParseKey( this, key, astGetKeyError( this ), colname, &irow, \
-                 NULL, "astMapGetElem" #X, status ) ) { \
+   } else if( ParseKey( this, key, astGetKeyError( this ), colname, &irow, \
+                        NULL, "astMapGetElem" #X, status ) ) { \
 \
 /* If the row index is larger than the current number of rows in the \
    table, do nothing more. */ \
@@ -2581,11 +2869,17 @@ static int MapGetElemC( AstKeyMap *this_keymap, const char *key, int l,
 /* Get a pointer to the Table structure. */
    this = (AstTable *) this_keymap;
 
+/* If the key is the name of a global table parameter, use the parent
+   method to get the value of hte parameter. */
+   if( astHasParameter( this, key ) ) {
+      result = (*parent_mapgetelemc)( this_keymap, key, l, elem,
+                                      value, status );
+
 /* Check the supplied key looks like a table cell key, and get the
    the column name and the row number. Also checks that the table
    contains a column with the specified name. */
-   if( ParseKey( this, key, astGetKeyError( this ), colname, &irow,
-                 NULL, "astMapGetElemC", status ) ) {
+   } else if( ParseKey( this, key, astGetKeyError( this ), colname, &irow,
+                        NULL, "astMapGetElemC", status ) ) {
 
 /* If the row index is larger than the current number of rows in the
    table, do nothing more. */
@@ -2686,11 +2980,16 @@ static void MapPut0##X( AstKeyMap *this_keymap, const char *key, Xtype value, \
 /* Get a pointer to the Table structure. */ \
    this = (AstTable *) this_keymap; \
 \
+/* If the key is the name of a global table parameter, use the parent \
+   method to put the value of the parameter. */ \
+   if( astHasParameter( this, key ) ) { \
+      (*parent_mapput0##Xlc)( this_keymap, key, value, comment, status ); \
+\
 /* Check the supplied key looks like a table cell key, and get the \
    the column name and the row number. Also checks that the table \
    contains a column with the specified name. */ \
-   if( ParseKey( this, key, 1, colname, &irow, &col_km, "astMapPut0" #X, \
-                 status ) ) { \
+   } else if( ParseKey( this, key, 1, colname, &irow, &col_km, "astMapPut0" #X, \
+                        status ) ) { \
 \
 /* Check the column holds scalar values of the type implied by the <X> \
    code in the function name. */ \
@@ -2812,11 +3111,17 @@ static void MapPut1##X( AstKeyMap *this_keymap, const char *key, int size, \
 /* Get a pointer to the Table structure. */ \
    this = (AstTable *) this_keymap; \
 \
+/* If the key is the name of a global table parameter, use the parent \
+   method to put the value of the parameter. */ \
+   if( astHasParameter( this, key ) ) { \
+      (*parent_mapput1##Xlc)( this_keymap, key, size, value, \
+                              comment, status ); \
+\
 /* Check the supplied key looks like a table cell key, and get the \
    the column name and the row number. Also checks that the table \
    contains a column with the specified name. */ \
-   if( ParseKey( this, key, 1, colname, &irow, NULL, "astMapPut1" #X, \
-                 status ) ) { \
+   } else if( ParseKey( this, key, 1, colname, &irow, NULL, "astMapPut1" #X, \
+                        status ) ) { \
 \
 /* Check the column holds vector values of the type implied by the <X> \
    code in the function name. */ \
@@ -2943,11 +3248,17 @@ static void MapPutElem##X( AstKeyMap *this_keymap, const char *key, int elem, \
 /* Get a pointer to the Table structure. */ \
    this = (AstTable *) this_keymap; \
 \
+/* If the key is the name of a global table parameter, use the parent \
+   method to put the value of the parameter. */ \
+   if( astHasParameter( this, key ) ) { \
+      (*parent_mapputelem##Xlc)( this_keymap, key, elem, value, \
+                                 status ); \
+\
 /* Check the supplied key looks like a table cell key, and get the \
    the column name and the row number. Also checks that the table \
    contains a column with the specified name. */ \
-   if( ParseKey( this, key, 1, colname, &irow, NULL, "astMapPutElem" #X, \
-                 status ) ) { \
+   } else if( ParseKey( this, key, 1, colname, &irow, NULL, "astMapPutElem" #X, \
+                        status ) ) { \
 \
 /* Check the column holds vector values of the type implied by the <X> \
    code in the function name. */ \
@@ -3058,11 +3369,16 @@ static void MapPutU( AstKeyMap *this_keymap, const char *key, const char *commen
 /* Get a pointer to the Table structure. */
    this = (AstTable *) this_keymap;
 
+/* If the key is the name of a global table parameter, use the parent
+   method to put the value of the parameter. */
+   if( astHasParameter( this, key ) ) {
+      (*parent_mapputu)( this_keymap, key, comment, status );
+
 /* Check the supplied key looks like a table cell key, and get the
    the column name and the row number. Also checks that the table
    contains a column with the specified name. */
-   if( ParseKey( this, key, 1, colname, &irow, NULL, "astMapPutU",
-                 status ) ) {
+   } else if( ParseKey( this, key, 1, colname, &irow, NULL, "astMapPutU",
+                        status ) ) {
 
 /* If the row index is larger than the current number of rows in the
    table, update the number of rows in the table. */
@@ -3072,6 +3388,145 @@ static void MapPutU( AstKeyMap *this_keymap, const char *key, const char *commen
    new cell contents. */
       (*parent_mapputu)( this_keymap, key, comment, status );
    }
+}
+
+static const char *ParameterName( AstTable *this, int index, int *status ) {
+/*
+*++
+*  Name:
+c     astParameterName
+f     AST_PARAMETERNAME
+
+*  Purpose:
+*     Get the name of the global parameter at a given index within the Table.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "table.h"
+c     const char *astParameterName( AstTable *this, int index )
+f     RESULT = AST_PARAMETERNAME( THIS, INDEX, STATUS )
+
+*  Class Membership:
+*     Table method.
+
+*  Description:
+*     This function returns a string holding the name of the global parameter with
+*     the given index within the Table.
+*
+*     This function is intended primarily as a means of iterating round all
+*     the parameters in a Table. For this purpose, the number of parameters in
+*     the Table is given by the Nparameter attribute of the Table. This function
+*     could then be called in a loop, with the index value going from
+c     zero to one less than Nparameter.
+f     one to Nparameter.
+*
+*     Note, the index associated with a parameter decreases monotonically with
+*     the age of the parameter: the oldest Parameter in the Table will have index
+*     one, and the Parameter added most recently to the Table will have the
+*     largest index.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Table.
+c     index
+f     INDEX = INTEGER (Given)
+*        The index into the list of parameters. The first parameter has index
+*        one, and the last has index "Nparameter".
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Returned Value:
+c     astParameterName()
+c        A pointer to a null-terminated string containing the
+f     AST_PARAMETERNAME = CHARACTER * ( AST__SZCHR )
+f        The
+*        upper case parameter name.
+
+*  Notes:
+c     - The returned pointer is guaranteed to remain valid and the
+c     string to which it points will not be over-written for a total
+c     of 50 successive invocations of this function. After this, the
+c     memory containing the string may be re-used, so a copy of the
+c     string should be made if it is needed for longer than this.
+c     - A NULL pointer will be returned if this function is invoked
+c     with the AST error status set, or if it should fail for any
+c     reason.
+f     - A blank string will be returned if this function is invoked
+f     with STATUS set to an error value, or if it should fail for any
+f     reason.
+*--
+*/
+
+/* Local Variables: */
+   AstKeyMap *pars;        /* KeyMap holding parameter definitions */
+   const char *result;
+
+/* Check the global error status. */
+   if ( !astOK ) return NULL;
+
+/* Get apointer to the KeyMap holding all parameter definitions. */
+   pars = astParameterProps( this );
+
+/* Issue a more useful error message than that issued by astMapKey if the
+   index is invalid. */
+   if( index < 1 || index > astMapSize( pars ) ) {
+      astError( AST__MPIND, "astParameterName(%s): Cannot find parameter "
+                "%d (zero-based) of the %s - invalid index.", status,
+                astGetClass( this ), index, astGetClass( this ) );
+   }
+
+/* Get the parameter name. */
+   result = astMapKey( pars, index - 1 );
+
+/* Free resources. */
+   pars = astAnnul( pars );
+
+/* Return a pointer to the required parameter name. */
+   return result;
+}
+
+static AstKeyMap *ParameterProps( AstTable *this, int *status ) {
+/*
+*+
+*  Name:
+*     astParameterProps
+
+*  Purpose:
+*     Returns a pointer to the KeyMap holding parameter properties.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "table.h"
+*     AstKeyMap *astParameterProps( AstTable *this )
+
+*  Class Membership:
+*     Table method.
+
+*  Description:
+*     This function returns a pointer to the KeyMap that holds
+*     definitions of all the parameters added to the Table.
+
+*  Parameters:
+*     this
+*        Pointer to the Table.
+
+*  Returned Value:
+*        A pointer to the KeyMap. It should be annulled using astAnnul
+*        when no longer needed.
+
+*-
+*/
+
+/* Check the global error status. */
+   if ( !astOK ) return NULL;
+
+/* Return a cloned pointer to the required KeyMap. */
+   return astClone( this->parameters );
 }
 
 static int ParseKey( AstTable *this, const char *key, int report,
@@ -3100,8 +3555,8 @@ static int ParseKey( AstTable *this, const char *key, int report,
 *     This function checks that the supplied KeyMap key conforms to the
 *     format expected for Table cells: i.e. "COLNAME(irow)", where
 *     "COLNAME" is the name of a column and "irow" is an integer row
-*     index (the first row is row 1). An error is reported if this is not
-*     the case.
+*     index (the first row is row 1), An error is reported if this is
+*     not the case.
 
 *  Parameters:
 *     this
@@ -3110,8 +3565,8 @@ static int ParseKey( AstTable *this, const char *key, int report,
 *        The key string to test.
 *     report
 *        If non-zero, an error will be reported if the key does not
-*        correspond to a cell of an existing column. Otherwise, no error
-*        will be reported.
+*        correspond to a cell of an existing column. Otherwise, no
+*        error will be reported.
 *     colname
 *        A buffer in which to return the column name.
 *     irow
@@ -3402,6 +3857,74 @@ f        The global status.
    cols = astAnnul( cols );
 }
 
+static void RemoveParameter( AstTable *this, const char *name, int *status ) {
+/*
+*++
+*  Name:
+c     astRemoveParameter
+f     AST_REMOVEPARAMETER
+
+*  Purpose:
+*     Remove a global parameter from a table.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "table.h"
+c     void astRemoveParameter( AstTable *this, const char *name )
+f     CALL AST_REMOVEPARAMETER( THIS, NAME, STATUS )
+
+*  Class Membership:
+*     Table method.
+
+*  Description:
+*     This function removes a specified global parameter from the supplied table.
+*     The
+c     function
+f     routine
+*     returns without action if the named parameter does not exist in the
+*     Table (no error is reported).
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Table.
+c     name
+f     NAME = CHARACTER * ( * ) (Given)
+*        The parameter name. Trailing spaces are ignored (all other spaces
+*        are significant). Case is significant.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*--
+*/
+
+/* Local Variables: */
+   AstKeyMap *pars;      /* KeyMap holding parameter definitions */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Verify supplied values. */
+   if( astChrLen( name ) == 0 ) {
+      astError( AST__BADKEY, "astRemoveParameter(%s): Illegal blank parameter name "
+               "supplied.", status, astGetClass( this ) );
+   }
+
+/* If there is no parameter with the given name in the Table, do nothing more. */
+   pars = astParameterProps( this );
+   if( astOK && astMapHasKey( pars, name ) ) {
+
+/* Remove the parameter description from the parameters keymap. */
+      astMapRemove( pars, name );
+
+/* Remove any entry holding the parameter value from the parent KeyMap. */
+      (*parent_mapremove)( (AstKeyMap *) this, name, status );
+   }
+   pars = astAnnul( pars );
+}
+
 static void RemoveRow( AstTable *this, int index, int *status ) {
 /*
 *++
@@ -3556,6 +4079,7 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
 /* If the attribute was not recognised, use this macro to report an error
    if a read-only attribute has been specified. */
    if ( MATCH( "ncolumn" ) ||
+        MATCH( "nparameter" ) ||
         MATCH( "nrow" ) ||
         MATCH2( "columnlenc" ) ||
         MATCH2( "columnlength" ) ||
@@ -3682,6 +4206,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
    read-only attributes of this class. If it does, then return
    zero. */
    if ( !strcmp( attrib, "ncolumn" ) ||
+        !strcmp( attrib, "nparameter" ) ||
         !strcmp( attrib, "nrow" ) ||
         MATCH( "columnlenc" ) ||
         MATCH( "columnlength" ) ||
@@ -3944,6 +4469,34 @@ f     AST_ADDCOLUMN and AST_REMOVECOLUMN
 /*
 *att++
 *  Name:
+*     Nparameter
+
+*  Purpose:
+*     The number of global parameters in the table.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer, read-only.
+
+*  Description:
+*     This attribute holds the number of global parameters currently in the table.
+*     Parameters are added and removed using the
+c     astAddParameter and astRemoveParameter
+f     AST_ADDPARAMETER and AST_REMOVEPARAMETER
+*     functions.
+
+*  Applicability:
+*     Table
+*        All Tables have this attribute.
+
+*att--
+*/
+
+/*
+*att++
+*  Name:
 *     Nrow
 
 *  Purpose:
@@ -4022,6 +4575,7 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 /* Make copies of the component KeyMaps and store pointers to them in the
    output Table structure. */
    out->columns = in->columns ? astCopy( in->columns ) : NULL;
+   out->parameters = in->parameters ? astCopy( in->parameters ) : NULL;
 }
 
 
@@ -4066,6 +4620,7 @@ static void Delete( AstObject *obj, int *status ) {
 
 /* Annul the pointers to the component KeyMaps. */
    if( this->columns ) this->columns = astAnnul( this->columns );
+   if( this->parameters ) this->parameters = astAnnul( this->parameters );
 
 }
 
@@ -4117,10 +4672,16 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
    astWriteInt( channel, "Nrow", 1, 1, astGetNrow( this ),
                 "Number of rows in table" );
 
-/* Write out the KeyMap holding parameters describing each column. */
+/* Write out the KeyMap holding definitions of each column. */
    if( this->columns ) {
       astWriteObject( channel, "Columns", 1, 0, this->columns, "KeyMap holding "
-                      "column parameters" );
+                      "column definitions" );
+   }
+
+/* Write out the KeyMap holding definitions of each global parameter. */
+   if( this->parameters ) {
+      astWriteObject( channel, "Params", 1, 0, this->parameters, "KeyMap holding "
+                      "parameter definitions" );
    }
 }
 
@@ -4183,6 +4744,14 @@ f     AST_ADDCOLUMN
 *     stored, but these must be vectorised when storing and retrieving
 *     them within a table cell. All cells within a single column must
 *     have the same type and shape (specified when the column is declared).
+*
+*     Tables may have parameters that describe global properties of the
+*     entire table. These are stored as entries in the parent KeyMap and
+*     can be access using the get and set method of the KeyMap class.
+*     However, parameters must be declared using the
+c     astAddParameter
+f     AST_ADDPARAMETER
+*     method before being accessed.
 *
 *     Note - since accessing entries within a KeyMap is a relatively slow
 *     process, it is not recommended to use the Table class to store
@@ -4431,6 +5000,7 @@ AstTable *astInitTable_( void *mem, size_t size, int init,
 /* ---------------------------- */
       new->nrow = 0;
       new->columns = astKeyMap( "KeyCase=0,Sortby=AgeDown", status );
+      new->parameters = astKeyMap( "KeyCase=0,Sortby=AgeDown", status );
 
 /* Tables require the KeyCase attribute to be zero. */
       (*parent_setkeycase)( (AstKeyMap *) new, 0, status );
@@ -4566,8 +5136,11 @@ AstTable *astLoadTable_( void *mem, size_t size, AstTableVtab *vtab,
 /* The number of rows. */
       new->nrow = astReadInt( channel, "nrow", 0 );
 
-/* KeyMap holding table global parameters. */
+/* KeyMap holding columns definitions. */
       new->columns = astReadObject( channel, "columns", NULL );
+
+/* KeyMap holding parameter definitions. */
+      new->parameters = astReadObject( channel, "params", NULL );
 
 /* If an error occurred, clean up by deleting the new Table. */
       if ( !astOK ) new = astDelete( new );
@@ -4594,9 +5167,17 @@ void astAddColumn_( AstTable *this, const char *name, int type,
    if ( !astOK ) return;
    (**astMEMBER(this,Table,AddColumn))(this,name,type,ndim,dims,unit,status);
 }
+void astAddParameter_( AstTable *this, const char *name, int *status ) {
+   if ( !astOK ) return;
+   (**astMEMBER(this,Table,AddParameter))(this,name,status);
+}
 void astRemoveColumn_( AstTable *this, const char *name, int *status ){
    if ( !astOK ) return;
    (**astMEMBER(this,Table,RemoveColumn))(this,name,status);
+}
+void astRemoveParameter_( AstTable *this, const char *name, int *status ){
+   if ( !astOK ) return;
+   (**astMEMBER(this,Table,RemoveParameter))(this,name,status);
 }
 void astRemoveRow_( AstTable *this, int index, int *status ){
    if ( !astOK ) return;
@@ -4610,9 +5191,17 @@ int astGetNcolumn_( AstTable *this, int *status ) {
    if ( !astOK ) return 0;
    return (**astMEMBER(this,Table,GetNcolumn))( this, status );
 }
+int astGetNparameter_( AstTable *this, int *status ) {
+   if ( !astOK ) return 0;
+   return (**astMEMBER(this,Table,GetNparameter))( this, status );
+}
 const char *astColumnName_( AstTable *this, int index, int *status ){
    if ( !astOK ) return NULL;
    return (**astMEMBER(this,Table,ColumnName))(this,index,status);
+}
+const char *astParameterName_( AstTable *this, int index, int *status ){
+   if ( !astOK ) return NULL;
+   return (**astMEMBER(this,Table,ParameterName))(this,index,status);
 }
 int astGetColumnType_( AstTable *this, const char *column, int *status ){
    if ( !astOK ) return 0;
@@ -4644,7 +5233,15 @@ AstKeyMap *astColumnProps_( AstTable *this, int *status ){
    if ( !astOK ) return NULL;
    return (**astMEMBER(this,Table,ColumnProps))(this,status);
 }
+AstKeyMap *astParameterProps_( AstTable *this, int *status ){
+   if ( !astOK ) return NULL;
+   return (**astMEMBER(this,Table,ParameterProps))(this,status);
+}
 int astHasColumn_( AstTable *this, const char *column, int *status ){
    if ( !astOK ) return 0;
    return (**astMEMBER(this,Table,HasColumn))(this,column,status);
+}
+int astHasParameter_( AstTable *this, const char *parameter, int *status ){
+   if ( !astOK ) return 0;
+   return (**astMEMBER(this,Table,HasParameter))(this,parameter,status);
 }

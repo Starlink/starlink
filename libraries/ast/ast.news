@@ -16,6 +16,9 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
+- Tables can now have any number of parameters describing the global
+properties of the Table.
+
 - Frames now interpret the unit string "A" as meaning "Ampere" rather
 than "Angstrom", as specified by FITS-WCS paper I.
 

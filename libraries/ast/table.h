@@ -99,7 +99,8 @@ typedef struct AstTable {
 
 /* Attributes specific to objects in this class. */
    int nrow;                     /* Mo. of rows in table */
-   AstKeyMap *columns;           /* KeyMap holding column parameters */
+   AstKeyMap *columns;           /* KeyMap holding column definitions */
+   AstKeyMap *parameters;        /* KeyMap holding parameter definitions */
 } AstTable;
 
 /* Virtual function table. */
@@ -117,19 +118,25 @@ typedef struct AstTableVtab {
 
 /* Properties (e.g. methods) specific to this class. */
    AstKeyMap *(* ColumnProps)( AstTable *, int * );
+   AstKeyMap *(* ParameterProps)( AstTable *, int * );
    const char *(* ColumnName)( AstTable *, int, int * );
+   const char *(* ParameterName)( AstTable *, int, int * );
    const char *(* GetColumnUnit)( AstTable *, const char *, int * );
    int (* GetColumnLenC)( AstTable *, const char *, int * );
    int (* GetColumnLength)( AstTable *, const char *, int * );
    int (* GetColumnNdim)( AstTable *, const char *, int * );
    int (* GetColumnType)( AstTable *, const char *, int * );
    int (* GetNcolumn)( AstTable *, int * );
+   int (* GetNparameter)( AstTable *, int * );
    int (* GetNrow)( AstTable *, int * );
    int (* HasColumn)( AstTable *, const char *, int * );
+   int (* HasParameter)( AstTable *, const char *, int * );
    void (* AddColumn)( AstTable *, const char *, int, int, int *, const char *, int * );
+   void (* AddParameter)( AstTable *, const char *, int * );
    void (* ColumnShape)( AstTable *, const char *, int, int *, int *, int * );
    void (* PurgeRows)( AstTable *, int * );
    void (* RemoveColumn)( AstTable *, const char *, int * );
+   void (* RemoveParameter)( AstTable *, const char *, int * );
    void (* RemoveRow)( AstTable *, int, int * );
    void (* SetNrow)( AstTable *, int, int * );
 } AstTableVtab;
@@ -185,21 +192,27 @@ AstTable *astLoadTable_( void *, size_t, AstTableVtab *,
 /* Prototypes for member functions. */
 /* -------------------------------- */
 void astAddColumn_( AstTable *, const char *, int, int, int *, const char *, int * );
+void astAddParameter_( AstTable *, const char *, int * );
 void astRemoveColumn_( AstTable *, const char *, int * );
+void astRemoveParameter_( AstTable *, const char *, int * );
 void astRemoveRow_( AstTable *, int, int * );
 void astPurgeRows_( AstTable *, int * );
 const char *astColumnName_( AstTable *, int, int * );
+const char *astParameterName_( AstTable *, int, int * );
 void astColumnShape_( AstTable *, const char *, int, int *, int *, int * );
 int astHasColumn_( AstTable *, const char *, int * );
+int astHasParameter_( AstTable *, const char *, int * );
 
 #if defined(astCLASS)            /* Protected */
 AstKeyMap *astColumnProps_( AstTable *, int * );
+AstKeyMap *astParameterProps_( AstTable *, int * );
 const char *astGetColumnUnit_( AstTable *, const char *, int * );
 int astGetColumnLenC_( AstTable *, const char *, int * );
 int astGetColumnLength_( AstTable *, const char *, int * );
 int astGetColumnNdim_( AstTable *, const char *, int * );
 int astGetColumnType_( AstTable *, const char *, int * );
 int astGetNcolumn_( AstTable *, int * );
+int astGetNparameter_( AstTable *, int * );
 int astGetNrow_( AstTable *, int * );
 void astSetNrow_( AstTable *, int, int * );
 #endif
@@ -251,19 +264,27 @@ astINVOKE(O,astLoadTable_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR
    to the wrong sort of Object is supplied. */
 
 #define astAddColumn(this,name,type,ndim,dims,unit) astINVOKE(V,astAddColumn_(astCheckTable(this),name,type,ndim,dims,unit, STATUS_PTR))
+#define astAddParameter(this,name) astINVOKE(V,astAddParameter_(astCheckTable(this),name,STATUS_PTR))
 #define astRemoveColumn(this,name) astINVOKE(V,astRemoveColumn_(astCheckTable(this),name,STATUS_PTR))
+#define astRemoveParameter(this,name) astINVOKE(V,astRemoveParameter_(astCheckTable(this),name,STATUS_PTR))
 #define astRemoveRow(this,index) astINVOKE(V,astRemoveRow_(astCheckTable(this),index,STATUS_PTR))
 #define astPurgeRows(this) astINVOKE(V,astPurgeRows_(astCheckTable(this),STATUS_PTR))
 #define astColumnName(this,index) astINVOKE(V,astColumnName_(astCheckTable(this),index,STATUS_PTR))
+#define astParameterName(this,index) astINVOKE(V,astParameterName_(astCheckTable(this),index,STATUS_PTR))
 #define astColumnShape(this,column,mxdim,ndim,dims) astINVOKE(V,astColumnShape_(astCheckTable(this),column,mxdim,ndim,dims,STATUS_PTR))
 #define astHasColumn(this,column) astINVOKE(V,astHasColumn_(astCheckTable(this),column,STATUS_PTR))
+#define astHasParameter(this,param) astINVOKE(V,astHasParameter_(astCheckTable(this),param,STATUS_PTR))
 
 #if defined(astCLASS)            /* Protected */
 
 #define astColumnProps(this) \
 astINVOKE(O,astColumnProps_(astCheckTable(this),STATUS_PTR))
+#define astParameterProps(this) \
+astINVOKE(O,astParameterProps_(astCheckTable(this),STATUS_PTR))
 #define astGetNcolumn(this) \
 astINVOKE(V,astGetNcolumn_(astCheckTable(this),STATUS_PTR))
+#define astGetNparameter(this) \
+astINVOKE(V,astGetNparameter_(astCheckTable(this),STATUS_PTR))
 #define astGetNrow(this) \
 astINVOKE(V,astGetNrow_(astCheckTable(this),STATUS_PTR))
 #define astSetNrow(this,value) \

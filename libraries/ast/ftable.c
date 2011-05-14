@@ -122,6 +122,22 @@ F77_SUBROUTINE(ast_addcolumn)( INTEGER(THIS),
    )
 }
 
+F77_SUBROUTINE(ast_addparameter)( INTEGER(THIS),
+                                  CHARACTER(NAME),
+                                  INTEGER(STATUS)
+                                  TRAIL(NAME) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(NAME)
+   char *name;
+
+   astAt( "AST_ADDPARAMETER", NULL, 0 );
+   astWatchSTATUS(
+      name = astString( NAME, NAME_length );
+      astAddParameter( astI2P( *THIS ), name );
+      astFree( name );
+   )
+}
+
 F77_SUBROUTINE(ast_removecolumn)( INTEGER(THIS),
                                   CHARACTER(NAME),
                                   INTEGER(STATUS)
@@ -134,6 +150,22 @@ F77_SUBROUTINE(ast_removecolumn)( INTEGER(THIS),
    astWatchSTATUS(
       name = astString( NAME, NAME_length );
       astRemoveColumn( astI2P( *THIS ), name );
+      astFree( name );
+   )
+}
+
+F77_SUBROUTINE(ast_removeparameter)( INTEGER(THIS),
+                                     CHARACTER(NAME),
+                                     INTEGER(STATUS)
+                                     TRAIL(NAME) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(NAME)
+   char *name;
+
+   astAt( "AST_REMOVEPARAMETER", NULL, 0 );
+   astWatchSTATUS(
+      name = astString( NAME, NAME_length );
+      astRemoveParameter( astI2P( *THIS ), name );
       astFree( name );
    )
 }
@@ -197,6 +229,42 @@ F77_SUBROUTINE(ast_columnname)( CHARACTER_RETURN_VALUE(RESULT),
    )
 }
 
+/* NO_CHAR_FUNCTION indicates that the f77.h method of returning a
+   character result doesn't work, so add an extra argument instead and
+   wrap this function up in a normal FORTRAN 77 function (in the file
+   keymap.f). */
+#if NO_CHAR_FUNCTION
+F77_SUBROUTINE(ast_parametername_a)( CHARACTER(RESULT),
+#else
+F77_SUBROUTINE(ast_parametername)( CHARACTER_RETURN_VALUE(RESULT),
+#endif
+                          INTEGER(THIS),
+                          INTEGER(INDEX),
+#if NO_CHAR_FUNCTION
+                          INTEGER(STATUS)
+                          TRAIL(RESULT) ) {
+#else
+                          INTEGER(STATUS) ) {
+#endif
+   GENPTR_CHARACTER(RESULT)
+   GENPTR_INTEGER(THIS)
+   GENPTR_INTEGER(INDEX)
+   const char *result;
+   int i;
+
+   astAt( "AST_PARAMETERNAME", NULL, 0 );
+   astWatchSTATUS(
+      result = astParameterName( astI2P( *THIS ), *INDEX );
+      i = 0;
+      if ( astOK ) {             /* Copy result */
+         for ( ; result[ i ] && i < RESULT_length; i++ ) {
+            RESULT[ i ] = result[ i ];
+         }
+      }
+      while ( i < RESULT_length ) RESULT[ i++ ] = ' '; /* Pad with blanks */
+   )
+}
+
 
 F77_SUBROUTINE(ast_columnshape)( INTEGER(THIS),
                                  CHARACTER(COLUMN),
@@ -231,10 +299,28 @@ F77_LOGICAL_FUNCTION(ast_hascolumn)( INTEGER(THIS),
    char *column;
 
    astWatchSTATUS(
-   astAt( "AST_ISATABLE", NULL, 0 );
+   astAt( "AST_HASCOLUMN", NULL, 0 );
       column = astString( COLUMN, COLUMN_length );
       RESULT = astHasColumn( astI2P( *THIS ), column ) ? F77_TRUE : F77_FALSE;
       astFree( column );
+   )
+   return RESULT;
+}
+
+F77_LOGICAL_FUNCTION(ast_hasparameter)( INTEGER(THIS),
+                                        CHARACTER(PARAM),
+                                        INTEGER(STATUS)
+                                        TRAIL(PARAM) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(PARAM)
+   F77_LOGICAL_TYPE(RESULT);
+   char *param;
+
+   astWatchSTATUS(
+   astAt( "AST_HASPARAMETER", NULL, 0 );
+      param = astString( PARAM, PARAM_length );
+      RESULT = astHasParameter( astI2P( *THIS ), param ) ? F77_TRUE : F77_FALSE;
+      astFree( param );
    )
    return RESULT;
 }
