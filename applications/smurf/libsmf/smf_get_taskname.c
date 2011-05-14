@@ -80,13 +80,8 @@
 #include "smf.h"
 
 #include "par.h"
-#include "f77.h"
 #include "star/task_adam.h"
 #include "sae_par.h"
-
-/* No proper C interface */
-F77_SUBROUTINE(task_get_name)(CHARACTER(TASKNAME),
-                              INTEGER(STATUS) TRAIL(TASKNAME));
 
 void
 smf_get_taskname( char * intaskname, char * prvname, int * status ) {
