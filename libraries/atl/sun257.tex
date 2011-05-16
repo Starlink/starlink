@@ -2224,86 +2224,6 @@ higher-level utility tasks.
    }
 }
 \sstroutine{
-   atlQuadFit2D
-}{
-   Determine a least-squares quadratic fit to a supplied 2D Mapping
-}{
-   \sstdescription{
-      This function returns an array holding the co-efficients of a
-      quadratic fit to the supplied Mapping over the input area specified
-      by {\tt "}lbnd{\tt "} and {\tt "}ubnd{\tt "}. The Mapping must have 2 inputs, but may have
-      any number of outputs. The i{\tt '}th Mapping output is modelled as a
-      quadratic function of the 2 inputs (x,y):
-
-      output\_i = a\_i\_0 $+$ a\_i\_1$*$x $+$ a\_i\_2$*$y $+$ a\_i\_3$*$x$*$y $+$ a\_i\_4$*$x$*$x $+$
-                 a\_i\_5$*$y$*$y
-
-      The {\tt "}fit{\tt "} array is returned holding the values of the co-efficients
-      a\_0\_0, a\_0\_1, etc.
-
-      The approximation is based on a regular grid of points within the
-      space spanned by the Mapping inputs. This grid covers the bounds
-      specified by {\tt "}lbnd{\tt "} and {\tt "}ubnd{\tt "}, using {\tt "}nx{\tt "} and {\tt "}ny{\tt "} points on the
-      two axes.
-   }
-   \sstinvocation{
-      void atlQuadFit2D( AstMapping $*$map, const double lbnd[2],
-                         const double ubnd[2], int nx, int ny,
-                         double $*$fit, int $*$status )
-   }
-   \sstarguments{
-      \sstsubsection{
-         map
-      }{
-         A pointer to the Mapping. An error is reported if it does not
-         have 2 inputs.
-      }
-      \sstsubsection{
-         lbnd
-      }{
-         A 2 element array holding the lower bounds on the Mapping inputs
-         of the area to be used in the fit.
-      }
-      \sstsubsection{
-         ubnd
-      }{
-         A 2 element array holding the upper bounds on the Mapping inputs
-         of the area to be used in the fit.
-      }
-      \sstsubsection{
-         nx
-      }{
-         The number of points to place along the first Mapping input. The
-         first point is at {\tt "}lbnd[0]{\tt "} and the last is at {\tt "}ubnd[0]{\tt "}. If a
-         value less than three is supplied a value of three will be used.
-      }
-      \sstsubsection{
-         ny
-      }{
-         The number of points to place along the second Mapping input. The
-         first point is at {\tt "}lbnd[1]{\tt "} and the last is at {\tt "}ubnd[1]{\tt "}. If a
-         value less than three is supplied a value of three will be used.
-      }
-      \sstsubsection{
-         fit
-      }{
-         Pointer to an array in which to store the co-efficients of the
-         fit. This array must have at least {\tt "}6$*$Nout{\tt "} elements (where
-         {\tt "}Nout{\tt "} is the value of the Nout attribute of the Mapping).
-         The first element of this array will be set to AST\_\_BAD if
-         no fit was possible. The first 6 values describe the fit to
-         the first Mapping output. The next 6 values describe the fit to
-         the second Mapping output etc. Within each group of 6, the values
-         are as described in the {\tt "}Description:{\tt "} section above.
-      }
-      \sstsubsection{
-         status
-      }{
-         Pointer to the global status variable.
-      }
-   }
-}
-\sstroutine{
    atlReadFile
 }{
    Reads an AST Object from a text file
@@ -2342,6 +2262,52 @@ higher-level utility tasks.
       \sstsubsection{
          could be read. A NULL pointer is also returned if an error occurs.
       }{
+      }
+   }
+}
+\sstroutine{
+   atlReadTable
+}{
+   Create an AST Table from a text file
+}{
+   \sstdescription{
+      This function creates an AST Table by reading the contents of a
+      given text file. The text file format matches that of TOPCAT{\tt '}s
+      {\tt "}ASCII{\tt "} format, except that any comment lines before the first row
+      of column values that are of the form {\tt "}\# name = value{\tt "} or
+      {\tt "}! name = value{\tt "} are used to create Table parameters. Here {\tt "}name{\tt "}
+      is a contiguous block of alphanumeric characters, and {\tt "}value{\tt "}
+      represents all characters following the equals sign, up to the end
+      of the line, excluding leading and trailing white space. If value
+      is a scalar integer or double, it is stored as such in the Table.
+      Otherwise, it is stored as a string.
+   }
+   \sstinvocation{
+      AstTable $*$atlReadTable( const char $*$fname, int $*$status )
+   }
+   \sstarguments{
+      \sstsubsection{
+         fname
+      }{
+         The file name.
+      }
+      \sstsubsection{
+         status
+      }{
+         Pointer to the global status variable.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         A pointer to the Table read from the file, or NULL if an error occurs.
+      }{
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         All columns in the returned Table will hold scalar values.
       }
    }
 }
