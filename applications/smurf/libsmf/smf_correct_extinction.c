@@ -249,7 +249,6 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
   double *vardata = NULL;  /* Pointer to variance array */
   AstFrameSet *wcs = NULL; /* Pointer to AST WCS frameset */
   double * wvmtau = NULL;  /* WVM tau (smoothed or not) for these data */
-  double zd = 0;           /* Zenith distance */
 
   /* Check status */
   if (*status != SAI__OK) return;
@@ -517,7 +516,11 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
       }
 
       if (quick) extcorr = exp(airmass*tau);
-    } else {
+    }
+
+    /* The previous test may have forced quick off so we can not combine
+       the tests in one if-then-else block */
+    if (!quick && tau != VAL__BADD )  {
       /* Not using quick so retrieve WCS to obtain elevation info */
       wcs = hdr->wcs;
       /* Check current frame, store it and then select the AZEL
@@ -553,6 +556,7 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
 
       if (!quick) {
         if (tau != VAL__BADD) {
+          double zd;
           zd = M_PI_2 - azel[npts+i];
           airmass = slaAirmas( zd );
           extcorr = exp(airmass*tau);
