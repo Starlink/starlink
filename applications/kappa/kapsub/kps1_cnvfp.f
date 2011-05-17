@@ -58,7 +58,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -68,8 +68,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -117,21 +117,21 @@
       DOUBLE PRECISION BACK      ! Background value within the supplied
                                  ! psf
       DOUBLE PRECISION FACTOR    ! Normalisation factor
-      INTEGER  LIN		 ! Line counter
+      INTEGER  LIN               ! Line counter
       INTEGER  OLIN              ! Line counter in output frame
       INTEGER  OLINHI            ! Highest value of OLIN (before wrap
-				 ! around) which can be stored in the
-				 ! output image
+                                 ! around) which can be stored in the
+                                 ! output image
       INTEGER  OLINLO            ! Lowest value of OLIN (before wrap
-				 ! around) which can be stored in the
-				 ! output image
+                                 ! around) which can be stored in the
+                                 ! output image
       INTEGER  OPIX              ! Pixel counter in output frame.
       INTEGER  OPIXHI            ! Highest value of OPIX (before wrap
-				 ! around) which can be stored in the
-				 ! output image
+                                 ! around) which can be stored in the
+                                 ! output image
       INTEGER  OPIXLO            ! Lowest value of OPIX (before wrap
-				 ! around) which can be stored in the
-				 ! output image
+                                 ! around) which can be stored in the
+                                 ! output image
       INTEGER  PIX               ! Pixel counter
       DOUBLE PRECISION SUM       ! Total data sum in PSF
 

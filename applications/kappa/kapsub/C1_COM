@@ -62,8 +62,8 @@
 *           A flag indicating if intermediate files are stored externally (i.e.
 *           in a dynamically allocated work array).
 
-      INTEGER	      C1_DIM(2)
-      REAL	      C1_ICF
+      INTEGER         C1_DIM(2)
+      REAL            C1_ICF
       INTEGER         C1_IP0
       INTEGER         C1_IP( 40 )
       INTEGER         C1_NLN

@@ -57,7 +57,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -67,8 +67,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -242,19 +242,19 @@
 *  to put integer values at the centre of the pixel (as required by AST_REBINSEQ).
          NDIM1 = AST_GETI( MAPS( I ), 'Nin', STATUS )
          DO J = 1, NDIM1
-   	    SHIFT( J ) = -0.5D0
+            SHIFT( J ) = -0.5D0
          END DO
-	 SM = AST_SHIFTMAP( NDIM1, SHIFT, ' ', STATUS )
+         SM = AST_SHIFTMAP( NDIM1, SHIFT, ' ', STATUS )
 
 *  Combine this with the above Mapping.
-	 MAPS( I ) = AST_CMPMAP( SM, MAPS( I ), .TRUE., ' ', STATUS )
+         MAPS( I ) = AST_CMPMAP( SM, MAPS( I ), .TRUE., ' ', STATUS )
 
 *  Do the inverse for the output pixel axes.
          DO J = 1, NDIM
-   	    SHIFT( J ) = 0.5D0
+            SHIFT( J ) = 0.5D0
          END DO
-	 SM = AST_SHIFTMAP( NDIM, SHIFT, ' ', STATUS )
-	 MAPS( I ) = AST_CMPMAP( MAPS( I ), SM, .TRUE., ' ', STATUS )
+         SM = AST_SHIFTMAP( NDIM, SHIFT, ' ', STATUS )
+         MAPS( I ) = AST_CMPMAP( MAPS( I ), SM, .TRUE., ' ', STATUS )
 
 *  Simplify the total Mapping.
          MAPS( I ) = AST_SIMPLIFY( MAPS( I ), STATUS )

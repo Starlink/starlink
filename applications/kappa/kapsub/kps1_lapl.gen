@@ -5,7 +5,7 @@
 *     KPS1_LAPL<T>
 
 *  Purpose:
-*     Subtracts Laplacian of input 2-d image to form output
+*     Subtracts Laplacian of input two-dimensional image to form output
 
 *  Language:
 *     Starlink Fortran 77
@@ -23,8 +23,8 @@
 *                             -N   -N   -N
 *
 *     where N is the integer number N. The convolution acts as
-*     a unidirectional edge detector, and for a flat areas in the 
-*     input array, the convolution sums to zero. 
+*     a unidirectional edge detector, and for a flat areas in the
+*     input array, the convolution sums to zero.
 
 *  Arguments:
 *     VAR = LOGICAL (Given)
@@ -78,7 +78,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -91,11 +91,11 @@
       LOGICAL BAD
       INTEGER DIM1
       INTEGER DIM2
-      <TYPE> IN( DIM1, DIM2 )      
+      <TYPE> IN( DIM1, DIM2 )
       INTEGER N
 
 *  Arguments Returned:
-      <TYPE> OUT( DIM1, DIM2 )      
+      <TYPE> OUT( DIM1, DIM2 )
       INTEGER NBAD
 
 *  Status:
@@ -134,7 +134,7 @@
 
 *  Do the convolution, including checks for bad pixels.
 *  ====================================================
-      IF( BAD ) THEN 
+      IF( BAD ) THEN
 
 *  Perform the Laplacian convolution - loop round all lines
          DO  JJ  =  1 , DIM2
@@ -186,7 +186,7 @@
                      END DO
                   END DO
 
-*  Read in next right-hand pixel, if there is one to be read, i.e. not at 
+*  Read in next right-hand pixel, if there is one to be read, i.e. not at
 *  right-hand edge
                   IF ( II + HBOX .LE. DIM1 ) THEN
 
@@ -217,42 +217,42 @@
 *  Compute approximation to the Laplacian, squaring the weights if
 *  processing variances.
                   SUM =  0.0
-                  IF( VAR ) THEN 
-	   
+                  IF( VAR ) THEN
+
                      DO  J = JB, JT
                         DO  I = IL, IR
                            IF ( I .NE. 0 .OR. J .NE. 0 ) THEN
-                              SUM  =  SUM + IN( II+I, JJ+J ) * 
+                              SUM  =  SUM + IN( II+I, JJ+J ) *
      :                                NUM_ITO<T>( MASK( I, J )**2 )
                            ELSE
 
 *  Use central weighting equals minus sum weights of neighbouring pixels
-                              SUM =  SUM + IN( II, JJ ) * 
+                              SUM =  SUM + IN( II, JJ ) *
      :                                     NUM_ITO<T>( CENWHT**2 )
                            END IF
                         END DO
                      END DO
-          
+
                   ELSE
-          
+
                      DO  J = JB, JT
                         DO  I = IL, IR
                            IF ( I .NE. 0 .OR. J .NE. 0 ) THEN
-                              SUM  =  SUM + IN( II+I, JJ+J ) * 
+                              SUM  =  SUM + IN( II+I, JJ+J ) *
      :                                NUM_ITO<T>( MASK( I, J ) )
                            ELSE
-                              SUM =  SUM + IN( II, JJ ) * 
+                              SUM =  SUM + IN( II, JJ ) *
      :                                     NUM_ITO<T>( CENWHT )
                            END IF
                         END DO
                      END DO
-          
+
                   END IF
-          
-                  OUT( II, JJ )  =  SUM 
+
+                  OUT( II, JJ )  =  SUM
 
                END IF
-                     
+
             END DO
          END DO
 
@@ -305,7 +305,7 @@
                      END DO
                   END DO
 
-*  Read in next right-hand pixel, if there is one to be read, i.e. not at 
+*  Read in next right-hand pixel, if there is one to be read, i.e. not at
 *  right-hand edge
                   IF ( II + HBOX .LE. DIM1 ) THEN
 
@@ -322,39 +322,39 @@
 *  Compute approximation to the Laplacian, squaring the weights if
 *  processing variances.
                SUM =  0.0
-               IF( VAR ) THEN 
-	   
+               IF( VAR ) THEN
+
                   DO  J = JB, JT
                      DO  I = IL, IR
                         IF ( I .NE. 0 .OR. J .NE. 0 ) THEN
-                           SUM  =  SUM + IN( II+I, JJ+J ) * 
+                           SUM  =  SUM + IN( II+I, JJ+J ) *
      :                             NUM_ITO<T>( MASK( I, J )**2 )
                         ELSE
 
 *  Use central weighting equals minus sum weights of neighbouring pixels
-                           SUM =  SUM + IN( II, JJ ) * 
+                           SUM =  SUM + IN( II, JJ ) *
      :                                  NUM_ITO<T>( CENWHT**2 )
                         END IF
                      END DO
                   END DO
-       
+
                ELSE
-       
+
                   DO  J = JB, JT
                      DO  I = IL, IR
                         IF ( I .NE. 0 .OR. J .NE. 0 ) THEN
-                           SUM  =  SUM + IN( II+I, JJ+J ) * 
+                           SUM  =  SUM + IN( II+I, JJ+J ) *
      :                             NUM_ITO<T>( MASK( I, J ) )
                         ELSE
-                           SUM =  SUM + IN( II, JJ ) * 
+                           SUM =  SUM + IN( II, JJ ) *
      :                                  NUM_ITO<T>( CENWHT )
                         END IF
                      END DO
                   END DO
-       
+
                END IF
-       
-               OUT( II, JJ )  =  SUM 
+
+               OUT( II, JJ )  =  SUM
 
             END DO
          END DO

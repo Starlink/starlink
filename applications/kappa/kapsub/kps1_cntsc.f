@@ -126,10 +126,10 @@
       INTEGER WMAP               ! Pointer to OLD_GRID -> NEW_GRID mapping
       REAL PCLBND                ! Pixel coord lower bounds of section
       REAL PCUBND                ! Pixel coord upper bounds of section
-      REAL X1		 	 ! Lower X bounds of section in GRAPHICS Frame
-      REAL X2	 		 ! Upper X bounds of section in GRAPHICS Frame
-      REAL Y1			 ! Lower Y bounds of section in GRAPHICS Frame
-      REAL Y2			 ! Upper Y bounds of section in GRAPHICS Frame
+      REAL X1                    ! Lower X bounds of section in GRAPHICS Frame
+      REAL X2                    ! Upper X bounds of section in GRAPHICS Frame
+      REAL Y1                    ! Lower Y bounds of section in GRAPHICS Frame
+      REAL Y2                    ! Upper Y bounds of section in GRAPHICS Frame
 *.
 
 *  Check the global inherited status.
