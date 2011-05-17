@@ -144,6 +144,8 @@ void findback( int *status ){
 *        Use MERS for message filtering.
 *     29-JUL-2009 (TIMJ):
 *        Rename ILEVEL to MSG_FILTER
+*     17-MAY-2011 (DSB):
+*        Use sqrt rather than sqrtf when calculating RMS.
 *     {enter_further_changes_here}
 
 *-
@@ -336,7 +338,7 @@ void findback( int *status ){
       }
 
       if( n > 0 ) {
-         rms = sqrtf( sum/n );
+         rms = sqrt( sum/n );
 
       } else {
          *status = SAI__ERROR;

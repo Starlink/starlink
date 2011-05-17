@@ -859,6 +859,8 @@ void findclumps( int *status ) {
 *        Change MaxBad from an absolute number of pixels to a fraction.
 *     25-AUG-2009 (EC):
 *        Add star/irq.h include as it is no longer in star/kaplibs.h.
+*     17-MAY-2011 (DSB):
+*        Use sqrt rather than sqrtf when calculating RMS.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1190,7 +1192,7 @@ void findclumps( int *status ) {
       }
 
       if( n > 0 ) {
-         rms = sqrtf( sum/n );
+         rms = sqrt( sum/n );
 
       } else {
          *status = SAI__ERROR;
