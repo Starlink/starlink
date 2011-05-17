@@ -423,9 +423,6 @@
 
       CALL MSG_BLANK( STATUS )
 
-*  Tidy up.
- 999  CONTINUE
-
 *  If an error occurred, attempt to delete the output NDF.
       IF ( STATUS .NE. SAI__OK ) CALL NDF_DELET( INDF2, STATUS )
 

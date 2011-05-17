@@ -239,9 +239,6 @@
          ENDIF
       END IF
 
-*  Tidy up.
- 999  CONTINUE
-
 *  Export the FrameSet from the AST context into the parent context.
       CALL AST_EXPORT( IWCSRT, STATUS )
 

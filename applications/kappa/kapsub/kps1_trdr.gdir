@@ -353,6 +353,4 @@
 *  Release the error context.
       CALL ERR_RLSE
 
-  999 CONTINUE
-
       END

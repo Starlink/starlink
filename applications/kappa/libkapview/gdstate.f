@@ -642,9 +642,6 @@
          CALL MSG_BLANK( STATUS )
       END IF
 
-*  Tidy up.
- 999  CONTINUE
-
 *  Clear the AST attribute synonyms.
       CALL KPG1_ASPSY( ' ', ' ', STATUS )
 
