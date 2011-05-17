@@ -70,28 +70,29 @@ enum { ATL__MXDIM  = 7 };
 
 /* Public function prototypes */
 /* -------------------------- */
+AstLutMap *atlTablelutMap( AstTable *, const char *, int * );
 AstObject *atlReadFile( const char *, const char *, int * );
-AstTable *atlReadTable( const char *, int * );
 AstRegion *atlMatchRegion( AstRegion *, AstFrame *, int * );
+AstTable *atlReadTable( const char *, int * );
 int atlMapGet1C( AstKeyMap *, const char *, int, int, int *, char *, int * );
 void atlAddWcsAxis( AstFrameSet *, AstMapping *, AstFrame *, int *, int *, int * );
 void atlAxtrm( AstFrameSet *, int *, int *, int *, double *, int * );
 void atlCreat( const char *, AstObject *, int * );
+void atlDumpFits( const char *, AstFitsChan *, int * );
 void atlGetParam( const char *, AstKeyMap *, int * );
 void atlKychk( AstKeyMap *, const char *, const char *, int * );
 void atlMapPut1C( AstKeyMap *, const char *, const char *, int, int, const char *, int * );
 void atlMgfts( int, AstFitsChan *, AstFitsChan *, AstFitsChan **, int * );
 void atlMklut( int, int, int, int, AstFrame *, double *, AstMapping **, int * );
 void atlPlroi( AstPlot *, AstKeyMap **, int * );
+void atlPtftd( AstFitsChan *, const char *, double, const char *, int * );
 void atlPtfti( AstFitsChan *, const char *, int, const char *, int * );
 void atlPtftl( AstFitsChan *, const char *, int, const char *, int * );
 void atlPtftr( AstFitsChan *, const char *, float, const char *, int * );
-void atlPtftd( AstFitsChan *, const char *, double, const char *, int * );
 void atlPtfts( AstFitsChan *, const char *, const char *, const char *,  int * );
 void atlRmblft( AstFitsChan *, int * );
 void atlShow( AstObject *, const char *, const char *, int * );
 void atlTolut( AstMapping *, double, double, double, const char *, AstMapping **, int * );
 void atlWcspx( AstKeyMap *, AstKeyMap *, double[3], double, double, AstFrameSet **, int * );
-void atlDumpFits( const char *, AstFitsChan *, int * );
 
 #endif

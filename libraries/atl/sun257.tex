@@ -2348,6 +2348,52 @@ higher-level utility tasks.
       }
    }
 }
+\sstroutine{
+   atlTableLutMap
+}{
+   Create a LutMap from a column of an AST Table
+}{
+   \sstdescription{
+      This function creates a LutMap containing the values stored in a
+      specified column of a Table.
+   }
+   \sstinvocation{
+      AstLutMap $*$atlTablelutMap( AstTable $*$table, const char $*$column,
+                                 int $*$status )
+   }
+   \sstarguments{
+      \sstsubsection{
+         table
+      }{
+         The Table.
+      }
+      \sstsubsection{
+         column
+      }{
+         The name of the column to use. The column must hold scalar
+         numerical values.
+      }
+      \sstsubsection{
+         status
+      }{
+         Pointer to the global status variable.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         A pointer to the LutMap. The input value corresponds to (one-based)
+      }{
+      }
+      \sstsubsection{
+         row number in the table, and the output value corresponds to the value
+      }{
+      }
+      \sstsubsection{
+         of the requested column.
+      }{
+      }
+   }
+}
 \normalsize
 
 \end{document}
