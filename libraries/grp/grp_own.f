@@ -23,7 +23,7 @@
 *     IGRP1 = INTEGER (Given)
 *        An identifier for the slave group whose owner is to be
 *        returned.
-*     IGRP2 = INTEGER (Given)
+*     IGRP2 = INTEGER (Returned)
 *        An identifier for the group which owns the group identified by
 *        IGRP1. Returned equal to GRP__NOID if an error occurs.
 *     STATUS = INTEGER (Given and Returned)

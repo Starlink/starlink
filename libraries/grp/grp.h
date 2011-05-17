@@ -143,6 +143,9 @@ void grpSetsz( Grp *, size_t, int * );
 void grpList( const char *, size_t, size_t, const char *, Grp *, int * );
 Grp *grpRemov( const Grp *, const char *, int * );
 void grpMsg( const char *, const Grp *, int );
+Grp *grpOwn( const Grp *, int * );
+void grpSown( Grp *, Grp *, int * );
+Grp *grpHead( const Grp *, int * );
 
 /* Semi-Public function prototypes: For Fortran interface wrappers only */
 /* -------------------------------------------------------------------- */

@@ -22,7 +22,7 @@
 *  Arguments:
 *     IGRP1 = INTEGER (Given)
 *        A group identifier.
-*     IGRP2 = INTEGER (Given)
+*     IGRP2 = INTEGER (Returned)
 *        The identifier for the group which is at the head of the
 *        owner-slave chain. Returned equal to GRP__NOID if an error
 *        occurs.

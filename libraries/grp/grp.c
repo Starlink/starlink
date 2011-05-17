@@ -698,6 +698,71 @@ void grpMsg( const char *token, const Grp *grp, int index ){
    }
 }
 
+F77_SUBROUTINE(grp_own)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(STATUS) );
+
+Grp *grpOwn( const Grp *grp, int *status ){
+   DECLARE_INTEGER(IGRP1);
+   DECLARE_INTEGER(IGRP2);
+   DECLARE_INTEGER(STATUS);
+   Grp *ret;
+
+   IGRP1 = grpC2F( (Grp *) grp, status );
+
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_LOCK( F77_CALL(grp_own)( INTEGER_ARG(&IGRP1),
+                                INTEGER_ARG(&IGRP2),
+                                INTEGER_ARG(&STATUS) ); )
+
+   F77_IMPORT_INTEGER( STATUS, *status );
+
+   ret = grpF2C( IGRP2, status );
+   return ret;
+}
+
+
+F77_SUBROUTINE(grp_sown)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(STATUS) );
+
+void grpSown( Grp *grp1, Grp *grp2, int *status ){
+   DECLARE_INTEGER(IGRP1);
+   DECLARE_INTEGER(IGRP2);
+   DECLARE_INTEGER(STATUS);
+
+   IGRP1 = grpC2F( grp1, status );
+   IGRP2 = grpC2F( grp2, status );
+
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_LOCK( F77_CALL(grp_sown)( INTEGER_ARG(&IGRP1),
+                                 INTEGER_ARG(&IGRP2),
+                                 INTEGER_ARG(&STATUS) ); )
+
+   F77_IMPORT_INTEGER( STATUS, *status );
+
+   return;
+}
+
+F77_SUBROUTINE(grp_head)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(STATUS) );
+
+Grp *grpHead( const Grp *grp, int *status ){
+   DECLARE_INTEGER(IGRP1);
+   DECLARE_INTEGER(IGRP2);
+   DECLARE_INTEGER(STATUS);
+   Grp *ret;
+
+   IGRP1 = grpC2F( (Grp *) grp, status );
+
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_LOCK( F77_CALL(grp_head)( INTEGER_ARG(&IGRP1),
+                                 INTEGER_ARG(&IGRP2),
+                                 INTEGER_ARG(&STATUS) ); )
+
+   F77_IMPORT_INTEGER( STATUS, *status );
+
+   ret = grpF2C( IGRP2, status );
+   return ret;
+}
 
 
 
