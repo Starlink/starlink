@@ -87,10 +87,17 @@ AstTable *atlReadTable( const char *fname, int *status ) {
    char *last_com;
    char *line;
    char *p;
+   char *tname;
    char key[ 200 ];
+   const char *cval;
+   const char *oldname;
+   const char *newname;
    double dval;
    int *old_status;
+   int *types;
+   int blank;
    int c;
+   int com;
    int first;
    int icol;
    int iline;
@@ -102,9 +109,9 @@ AstTable *atlReadTable( const char *fname, int *status ) {
    int more;
    int nc;
    int ncol;
+   int nrow;
    int nword;
    int skip;
-   int type;
    size_t len;
 
 /* Initialise */
@@ -146,6 +153,7 @@ AstTable *atlReadTable( const char *fname, int *status ) {
       first = 1;
       iline = 0;
       irow = 0;
+      types = NULL;
 
       while( more && *status == SAI__OK ) {
          iline++;
@@ -187,88 +195,109 @@ AstTable *atlReadTable( const char *fname, int *status ) {
 /* Terminate it again to exclude trailing white space. */
          line[ astChrLen( line ) ] = 0;
 
+/* Assume the line is a blank non-comment, and stpore a pointer to the first
+   character to use. */
+         blank = 1;
+         com = 0;
+         p = line;
+
 /* Skip blank lines. */
          if( line[ 0 ] ) {
 
 /* If the line starts with a comment character... */
             if( line[ 0 ] == '#' || line[ 0 ] == '!' ) {
+               com = 1;
 
 /* Get a pointer to the first non-space/tab character after the comment
    character. */
                p = line + 1;
                while( *p == ' ' || *p == '\t' ) p++;
 
-/* Skip blank comment lines. */
-               if( *p ) {
+/* Note if it is blank. */
+               if( *p ) blank = 0;
+
+/* If it is not a comment line, then the line is not blank. */
+            } else {
+               blank = 0;
+            }
+         }
+
+/* Skip blank lines, whether comment or not. */
+         if( ! blank ) {
+
+/* First handle comment lines. */
+            if( com ) {
 
 /* Does it look like a  parameter assignment... */
-                  words = astChrSplitRE( p, "^\\w+ *= *(.*)$", &nword, NULL );
-                  if( words ) {
+               words = astChrSplitRE( p, "^\\s*(\\w+)\\s*=\\s*(.*)$", &nword, NULL );
+               if( words ) {
 
 /* Add a parameter declaration to the Table. */
-                     astAddParameter( result, words[ 0 ] );
+                  astAddParameter( result, words[ 0 ] );
 
 /* Store the parameter value, using an appropriate data type. */
-                     len = strlen( words[ 1 ] );
-                     if( nc = 0, ( 1 == astSscanf( words[ 1 ], "%d%n", &ival, &nc ) )
-                         && ( nc >= len ) ) {
-                        astMapPut0I( result, words[ 0 ], ival, NULL );
+                  len = strlen( words[ 1 ] );
+                  if( nc = 0, ( 1 == astSscanf( words[ 1 ], "%d%n", &ival, &nc ) )
+                      && ( nc >= len ) ) {
+                     astMapPut0I( result, words[ 0 ], ival, NULL );
 
-                     } else if( nc = 0, ( 1 == astSscanf( words[ 1 ], "%lg%n", &dval, &nc ) )
-                                && ( nc >= len ) ) {
-                        astMapPut0D( result, words[ 0 ], dval, NULL );
+                  } else if( nc = 0, ( 1 == astSscanf( words[ 1 ], "%lg%n", &dval, &nc ) )
+                             && ( nc >= len ) ) {
+                     astMapPut0D( result, words[ 0 ], dval, NULL );
 
-                     } else {
-                        astMapPut0C( result, words[ 0 ], words[ 1 ], NULL );
-
-                     }
-
-/* Free the words returned by astChrSplitRE. */
-                     for( iword = 0; iword < nword; iword++ ) {
-                        words[ iword ] = astFree( words[ iword ] );
-                     }
-                     words = astFree( words );
-
-/* If it does not look like a parameter assignment... */
                   } else {
-
-/* Save a copy of it in case it turns out to be the last comment line
-   before the row data. */
-                     last_com = astStore( last_com, line, strlen( line ) + 1 );
+                     astMapPut0C( result, words[ 0 ], words[ 1 ], NULL );
 
                   }
+
+/* Free the words returned by astChrSplitRE. */
+                  for( iword = 0; iword < nword; iword++ ) {
+                     words[ iword ] = astFree( words[ iword ] );
+                  }
+                  words = astFree( words );
+
+/* If it does not look like a parameter assignment... */
+               } else {
+
+/* Save a copy of it in case it turns out to be the last non-blank comment
+   line before the first row of data values (in which case it should
+   contain the column names). */
+                  last_com = astStore( last_com, p, strlen( p ) + 1 );
                }
 
-/* If the line does not start with a comment character... */
+/* If the line is not a comment.. */
             } else {
 
 /* Get the words from the row. */
-               words = astChrSplit( line, &nword );
+               words = astChrSplit( p, &nword );
 
-/* If this is the first non-comment line, get the column names from the
-   previous comment line. */
+/* If this is the first non-blank non-comment line, get the column names from
+   the previous non-blank comment line. */
                if( first ) {
                   first = 0;
                   cols = astChrSplit( last_com, &ncol );
 
-/* Find the data types of the columns by looking at the words from the
-   current line. */
-                  for( iword = 0; iword < nword; nword++ ) {
+/* Create an array to hold the data type for each colum, and initialise
+   them to "integer". */
+                  types = astMalloc( ncol*sizeof( int ) ) ;
+                  for( iword = 0; iword < nword && astOK; iword++ ) {
                      if( iword < ncol ) {
+                        types[ iword ] = AST__INTTYPE;
 
-                        len = strlen( words[ 1 ] );
-                        if( nc = 0, ( 1 == astSscanf( words[ 1 ], "%d%n", &ival, &nc ) )
-                            && ( nc >= len ) ) {
-                           type = AST__INTTYPE;
-                        } else if( nc = 0, ( 1 == astSscanf( words[ 1 ], "%lg%n", &dval, &nc ) )
-                                   && ( nc >= len ) ) {
-                           type = AST__DOUBLETYPE;
-                        } else {
-                           type = AST__STRINGTYPE;
-                        }
+/* The columns are stored initially using interim names which have "T_"
+   prepended to the names given in the file. */
+                        tname = NULL;
+                        nc = 0;
+                        tname = astAppendString( tname, &nc, "T_" );
+                        tname = astAppendString( tname, &nc, cols[ iword ] );
+                        astFree( cols[ iword ] );
+                        cols[ iword ] = tname;
 
-/* Create the column definition within the returned Table. */
-                        astAddColumn( result, cols[ iword ], type, 0, NULL, " " );
+/* Create the column definition within the returned Table. We store them
+   initially as strings and then convert to the appropriate column data type
+   later (once all rows have been read and the the data types are known). */
+                        astAddColumn( result, cols[ iword ], AST__STRINGTYPE,
+                                      0, NULL, " " );
                      }
                   }
                }
@@ -280,18 +309,45 @@ AstTable *atlReadTable( const char *fname, int *status ) {
                   msgSeti( "I", iline );
                   msgSeti( "M", ncol );
                   msgSetc( "F", fname );
-                  errRep( " ", " Wrong number of values (^N) at line ^I in "
+                  errRep( " ", "Wrong number of values (^N) at line ^I in "
                           "file ^F (should be ^M).", status );
 
-/* Store each value in the table. */
+/* Otherwise increment the number of rows read. */
                } else {
                   irow++;
 
-                  for( iword = 0; iword < nword; iword++ ) {
-                     sprintf( key, "%s(%d)", cols[ iword ], irow );
-                     astMapPut0C( result, key, words[ iword ], NULL );
+/* Store each string value in the table, excluding "null" strings. Also check
+   the data type of each string an dupdate the column data types if necessary. */
+                  for( iword = 0; iword < nword && *status == SAI__OK; iword++ ) {
+                     if( strcmp( words[ iword ], "null" ) ) {
+                        sprintf( key, "%s(%d)", cols[ iword ], irow );
+                        astMapPut0C( result, key, words[ iword ], NULL );
+
+/* If the column is currently thought to hold integers, check that the
+   current word looks like an integer. If not, down-grade the column type
+   to double. */
+                        len = strlen( words[ iword ] );
+                        if( types[ iword ] == AST__INTTYPE ) {
+                           if( nc = 0, ( 1 != astSscanf( words[ iword ], "%d%n",
+                                                         &ival, &nc ) ) ||
+                                       ( nc < len ) ) {
+                              types[ iword ] = AST__DOUBLETYPE;
+                           }
+                        }
+
+/* If the column is currently thought to hold doubles, check that the
+   current word looks like an doubler. If not, down-grade the column type
+   to string. */
+                        if( types[ iword ] == AST__DOUBLETYPE ) {
+                           if( nc = 0, ( 1 != astSscanf( words[ iword ], "%lg%n",
+                                                         &dval, &nc ) ) ||
+                                       ( nc < len ) ) {
+                              types[ iword ] = AST__STRINGTYPE;
+                           }
+                        }
+                     }
                   }
-              }
+               }
 
 /* Free the words returned by astChrSplit. */
                for( iword = 0; iword < nword; iword++ ) {
@@ -303,9 +359,66 @@ AstTable *atlReadTable( const char *fname, int *status ) {
          }
       }
 
+/* The entire file has now been read, and a Table created in which every
+   column holds strings. We also have flags indicating whether the values
+   in each column are all integers or doubles. Modify the type of the
+   column within the Table to match these flags. */
+      nrow = astGetI( result, "Nrow" );
+      for( icol = 0; icol < ncol && *status == SAI__OK; icol++ ) {
+
+/* The column will be re-named from "T_<name>" to "<name>". */
+         oldname = cols[ icol ];
+         newname = oldname + 2;
+
+/* First convert string columns to integer columns if all the values in
+   the column look like integers. */
+         if( types[ icol ] == AST__INTTYPE ) {
+
+/* Create the new column */
+            astAddColumn( result, newname, AST__INTTYPE, 0, NULL, " " );
+
+/* Copy each cell of the current column, converting from string to integer. */
+            for( irow = 1; irow <= nrow; irow++ ) {
+               sprintf( key, "%s(%d)", oldname, irow );
+               if( astMapGet0I( result, key, &ival ) ) {
+                  sprintf( key, "%s(%d)", newname, irow );
+                  astMapPut0I( result, key, ival, NULL );
+               }
+            }
+
+/* Now do double columns in the same way. */
+         } else if( types[ icol ] == AST__DOUBLETYPE ) {
+            astAddColumn( result, newname, AST__DOUBLETYPE, 0, NULL, " " );
+            for( irow = 1; irow <= nrow; irow++ ) {
+               sprintf( key, "%s(%d)", oldname, irow );
+               if( astMapGet0D( result, key, &dval ) ) {
+                  sprintf( key, "%s(%d)", newname, irow );
+                  astMapPut0D( result, key, dval, NULL );
+               }
+            }
+
+/* Copy string values without change. */
+         } else {
+            astAddColumn( result, newname, AST__STRINGTYPE, 0, NULL, " " );
+            for( irow = 1; irow <= nrow; irow++ ) {
+               sprintf( key, "%s(%d)", oldname, irow );
+               if( astMapGet0C( result, key, &cval ) ) {
+                  sprintf( key, "%s(%d)", newname, irow );
+                  astMapPut0C( result, key, cval, NULL );
+               }
+            }
+         }
+
+/* Remove the old column. */
+         astRemoveColumn( result, oldname );
+
+      }
+
+
 /* Free resources. */
       line = astFree( line );
       last_com = astFree( last_com );
+      types = astFree( types );
       if( cols ) {
          for( icol = 0; icol < ncol; icol++ ) {
             cols[ icol ] = astFree( cols[ icol ] );
