@@ -180,11 +180,11 @@ void smf_add_grp_metadata( Grp *grp, const char *name, const char *value,
                  "long: '^I'", status );
       }
 
+/* Store the item in the slave group. */
+      grpPut1( slave, item, 0, status );
+
 /* Free resources. */
       item = astFree( item );
-
-/* Store the item in the slave group. */
-      grpPut1( grp, item, 0, status );
 
    }
 }

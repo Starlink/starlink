@@ -2564,6 +2564,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter pointing {
+                type _CHAR
+                prompt {Text file containing pointing corrections}
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                default !
+                helpkey *
+            }
+
             parameter ref {
                 type NDF
                 access READ
@@ -3904,6 +3913,15 @@ package @PACKAGE@ {
                 default !
                 vpath DEFAULT
                 ppath CURRENT DEFAULT
+                helpkey *
+            }
+
+            parameter pointing {
+                type _CHAR
+                prompt {Text file containing pointing corrections}
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                default !
                 helpkey *
             }
 

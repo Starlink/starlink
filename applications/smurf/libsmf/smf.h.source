@@ -1179,7 +1179,7 @@ void smf_get_goodrange( const smf_qual_t *quality, dim_t ntslice,
 void smf_get_gridcoords( double *row, double *col, int nrow, int ncol,
                          int *status );
 
-void smf_get_grp_metadata( Grp *grp, const char *name, char *value,
+void smf_get_grp_metadata( const Grp *grp, const char *name, char *value,
                            int *status );
 
 void smf_get_moltrans ( double restFreq, const char **molecule,
@@ -1415,6 +1415,8 @@ FILE *smf_open_textfile( const char *param, const char *mode, const char *def,
 
 int smf_pattern_extract ( const char * sourcestr, const char * pattern,
                           double *dresult, char * sresult, size_t szstr, int * status );
+
+void smf_pcorr( smfHead *head, const char *file, int *status );
 
 void smf_polext( int ondf, double angle, int *status );
 

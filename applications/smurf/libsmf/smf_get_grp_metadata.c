@@ -13,11 +13,11 @@
 *     C function
 
 *  Invocation:
-*     void smf_get_grp_metadata( Grp *grp, const char *name,
+*     void smf_get_grp_metadata( const Grp *grp, const char *name,
 *                                char *value, int *status )
 
 *  Arguments:
-*     grp = Grp * (Given)
+*     grp = const Grp * (Given)
 *        Pointer to the GRP from which metadata is to be retrieved.
 *     name = const char * (Given)
 *        A string giving the name of the metadata item to retrieve.
@@ -85,7 +85,7 @@
 /* SMURF includes */
 #include "libsmf/smf.h"
 
-void smf_get_grp_metadata( Grp *grp, const char *name, char *value,
+void smf_get_grp_metadata( const Grp *grp, const char *name, char *value,
                            int *status ){
 
 /* Local Variables: */

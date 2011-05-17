@@ -226,6 +226,9 @@
  *        Allow raw data to be read even if NOCREATE_DA is being used
  *     2010-10-19 (COBA):
  *        Validate FTS2 read in operations
+ *     2011-05-17 (DSB):
+ *        Add pointing corrections onto SMU jiggle positions before
+ *        returning.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -311,6 +314,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
   int vexists;               /* Boolean for presence of VARIANCE component */
   int itexists;              /* Boolean for presence of other components */
   char filename[GRP__SZNAM+1]; /* Input filename, derived from GRP */
+  char pbuff[GRP__SZNAM+1];  /* Point correction filename */
   char *pname;               /* Pointer to input filename */
   void *outdata[] = { NULL, NULL }; /* Array of pointers to
                                        output data components:
@@ -1279,6 +1283,15 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
       errAnnul(status);
     }
   }
+
+  /* If the supplied GRP group has a metadata item called POINTING
+     associated with it, the value of the item will be the name of a text
+     file from which pointing corrections should be read. In which case,
+     read the corrections from the file, and add them onto the SMU jiggle
+     positions in the header. */
+  pbuff[ 0 ] = 0;
+  smf_get_grp_metadata( igrp, "POINTING", pbuff, status );
+  if( pbuff[ 0 ] && hdr ) smf_pcorr( hdr, pbuff, status );
 
   /* free resources on error */
   if (*status != SAI__OK) {

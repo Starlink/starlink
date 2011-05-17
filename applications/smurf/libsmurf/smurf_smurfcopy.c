@@ -40,6 +40,27 @@
 *          VERBOSE, DEBUG or ALL. [NORMAL]
 *     OUT = NDF (Write)
 *          Output file. Extensions are not propagated.
+*     POINTING = LITERAL (Read)
+*          The name of a text file containing corrections to the pointing
+*          read from the input data files. If null (!) is supplied, no
+*          corrections are used. If a file is supplied, it should start
+*          with one or more lines containing "#" in column one. These are
+*          comment lines, but if any comment line has the form "# SYSTEM=AZEL"
+*          or "# SYSTEM=TRACKING" then it determines the system in which the
+*          pointing correction are specified (SYSTEM defaults to AZEL). The
+*          last comment line should be "# MJD DLON DLAT" and specifies the
+*          names for the three columns of numerical values that follow.
+*          Each remaining line should contain three numerical values
+*          separated by white space: the first is a TAI time given as an
+*          MJD, the second is a longitude offset in arc-seconds, and the
+*          third is a latitude offset in arc-seconds. The MJD values
+*          should be monotonic increasing with row number. The longitude and
+*          latitude axes are either AXEL or TRACKING as determined by the
+*          SYSTEM value in the header comments. Blank lines are ignored.
+*          The DLON and DLAT values are added onto the SMU jiggle
+*          positions stored in the JCMTSTATE extension of the input NDFs.
+*          DLON and DLAT values for non-tabulated times are determined by
+*          interpolation. [!]
 *     SLICE = _INTEGER (Read)
 *          Index of time axis (GRID coordinates). 0 can be used to specify
 *          the last slice in the file without having to know how many
@@ -161,6 +182,11 @@ void smurf_smurfcopy ( int * status ) {
     msgOutif(MSG__NORM, " ","All supplied input frames were DARK,"
        " nothing to extract", status );
   }
+
+  /* Allow the user to specify a text file containing a table of pointing
+     corrections. The name of the file (if any) is stored in the "igrp"
+     group as as an item of metadata. */
+  smf_add_grp_metadata( igrp, "POINTING", NULL, status );
 
   /* Use a loop so that we look like other routines and simplify
      the change if we support multiple input files */

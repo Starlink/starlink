@@ -199,6 +199,27 @@
 *          Pixel dimensions in the output image, in arcsec. If only one value
 *          is supplied, the same value will be used for both axes. The default
 *          depends on the wavelength of the input data.
+*     POINTING = LITERAL (Read)
+*          The name of a text file containing corrections to the pointing
+*          read from the input data files. If null (!) is supplied, no
+*          corrections are used. If a file is supplied, it should start
+*          with one or more lines containing "#" in column one. These are
+*          comment lines, but if any comment line has the form "# SYSTEM=AZEL"
+*          or "# SYSTEM=TRACKING" then it determines the system in which the
+*          pointing correction are specified (SYSTEM defaults to AZEL). The
+*          last comment line should be "# MJD DLON DLAT" and specifies the
+*          names for the three columns of numerical values that follow.
+*          Each remaining line should contain three numerical values
+*          separated by white space: the first is a TAI time given as an
+*          MJD, the second is a longitude offset in arc-seconds, and the
+*          third is a latitude offset in arc-seconds. The MJD values
+*          should be monotonic increasing with row number. The longitude and
+*          latitude axes are either AXEL or TRACKING as determined by the
+*          SYSTEM value in the header comments. Blank lines are ignored.
+*          The DLON and DLAT values are added onto the SMU jiggle
+*          positions stored in the JCMTSTATE extension of the input NDFs.
+*          DLON and DLAT values for non-tabulated times are determined by
+*          interpolation. [!]
 *     REF = NDF (Read)
 *          An existing NDF that is to be used to define the output grid.
 *          If supplied, the output grid will be aligned with the supplied
@@ -1045,6 +1066,8 @@
 *        Add TRIMBAD parameter (also accessed in smf_mapbounds).
 *     2011-03-14 (DSB):
 *        Rename TRIMBAD parameter as TRIM (for consistency with MAKECUBE).
+*     2011-05-17 (DSB):
+*        Added parameter POINTING.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -1341,6 +1364,11 @@ void smurf_makemap( int *status ) {
       sub_instruments = astAnnul( sub_instruments );
     }
   }
+
+  /* Allow the user to specify a text file containing a table of pointing
+     corrections. The name of the file (if any) is stored in the "igrp"
+     group as as an item of metadata. */
+  smf_add_grp_metadata( igrp, "POINTING", NULL, status );
 
   /* Calculate the map bounds */
 
