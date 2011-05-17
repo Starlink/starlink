@@ -199,6 +199,9 @@ f     - AST_SHOWMESH: Display a mesh of points on the surface of a Region
 *     29-APR-2011 (DSB):
 *        Prevent astFindFrame from matching a subclass template against a
 *        superclass target.
+*     17-MAY-2011 (DSB):
+*        In RegBaseGrid, accept the final try even if it is not within 5%
+*        of the required meshsize.
 *class--
 
 *  Implementation Notes:
@@ -7398,14 +7401,17 @@ static AstPointSet *RegBaseGrid( AstRegion *this, int *status ){
 /* Leave the loop if an error has occurred. */
          if( !astOK ) break;
 
-/* if the number of points in the grid is within 5% of the target value,
+/* If the number of points in the grid is within 5% of the target value,
    it is good enough, so break. */
          if( fabs( (double)( ipr - meshsize ) )/meshsize < 0.05 ) break;
 
 /* Otherwise, adjust the target size of the grid by the ratio by which it
-   is in error. */
-         np *= (double)meshsize/(double)ipr;
-         result = astAnnul( result );
+   is in error. Don't do this if we have reached the maximum number of
+   re-tries. */
+         if( ntry < 3 ) {
+            np *= (double)meshsize/(double)ipr;
+            result = astAnnul( result );
+         }
       }
 
 /* Truncate the "result" PointSet to exclude any unused space at the end
