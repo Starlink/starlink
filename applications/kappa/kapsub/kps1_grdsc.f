@@ -77,7 +77,6 @@
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'AST_PAR'          ! AST constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
-      INCLUDE 'CNF_PAR'          ! For CNF_PVAL
 
 *  Arguments Given:
       INTEGER IWCS
