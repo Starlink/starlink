@@ -111,6 +111,9 @@
 *     2011-04-14 (DSB):
 *        Remove gap filling since it is done in smf_fft_data (called by
 *        bolonoise).
+*     2011-05-16 (TIMJ):
+*        Fix memory leak. We were allocating memory inside a loop but
+*        freeing it outside the loop.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -251,24 +254,25 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
          this is initialized in smf_model_create), or else we calculate
          the noise after the first iteration. */
 
-      var = astCalloc( nbolo, sizeof(*var), 0 );
-
       if( (flags & SMF__DIMM_FIRSTITER) && (!calcfirst) ) {
 
-        /* Measure the noise from power spectra */
-        smf_bolonoise( wf, res->sdata[idx], 0, 0.5, SMF__F_WHITELO,
-                       SMF__F_WHITEHI, 0, zeropad ? SMF__MAXAPLEN : SMF__BADSZT,
-                       var, NULL, NULL, status );
+        var = astCalloc( nbolo, sizeof(*var), 0 );
 
-        for( i=0; i<nbolo; i++ ) if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {
-            /* Loop over time and store the variance for each sample */
-            for( j=0; j<mntslice; j++ ) {
-              model_data[i*mbstride+(j%mntslice)*mtstride] = var[i];
+        if (var) {
+
+          /* Measure the noise from power spectra */
+          smf_bolonoise( wf, res->sdata[idx], 0, 0.5, SMF__F_WHITELO,
+                         SMF__F_WHITEHI, 0, zeropad ? SMF__MAXAPLEN : SMF__BADSZT,
+                         var, NULL, NULL, status );
+
+          for( i=0; i<nbolo; i++ ) if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {
+              /* Loop over time and store the variance for each sample */
+              for( j=0; j<mntslice; j++ ) {
+                model_data[i*mbstride+(j%mntslice)*mtstride] = var[i];
+              }
             }
-          }
-      } else {
-        for( i=0; i<nbolo; i++ ) {
-          var[i] = model_data[i*mbstride];
+
+          var = astFree( var );
         }
       }
 
@@ -316,7 +320,5 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   }
 
   /* Clean Up */
-  if( var ) var = astFree( var );
-
   if( kmap ) kmap = astAnnul( kmap );
 }
