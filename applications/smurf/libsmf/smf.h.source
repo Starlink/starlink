@@ -520,6 +520,9 @@ void smf_accumulate_prov( const smfData * data, const Grp* igrp, size_t index,
                           int ondf, const char *creator,
                           NdgProvenance ** modprov, int * status );
 
+void smf_add_grp_metadata( Grp *grp, const char *name, const char *value,
+                           int *status );
+
 void smf_add_spectral_axis( int indf, AstFitsChan *fc, int *status );
 
 void smf_addmap1( double *map1, double *mapweight1, int *hitsmap1,
@@ -1175,6 +1178,9 @@ void smf_get_goodrange( const smf_qual_t *quality, dim_t ntslice,
 
 void smf_get_gridcoords( double *row, double *col, int nrow, int ncol,
                          int *status );
+
+void smf_get_grp_metadata( Grp *grp, const char *name, char *value,
+                           int *status );
 
 void smf_get_moltrans ( double restFreq, const char **molecule,
                         const char **transition, int *status );

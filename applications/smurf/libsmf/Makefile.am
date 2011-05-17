@@ -14,6 +14,7 @@ BUILT_C_ROUTINES = $(CGENERIC_ROUTINES:.cgen=.c)
 
 C_ROUTINES = \
 smf_accumulate_prov.c \
+smf_add_grp_metadata.c \
 smf_add_spectral_axis.c \
 smf_addmap1.c \
 smf_addto_smfArray.c \
@@ -205,6 +206,7 @@ smf_get_findex.c \
 smf_get_freemem.c \
 smf_get_goodrange.c \
 smf_get_gridcoords.c \
+smf_get_grp_metadata.c \
 smf_get_moltrans.c \
 smf_get_ndfid.c \
 smf_get_nthread.c \
