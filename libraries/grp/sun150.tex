@@ -6,13 +6,13 @@
 %------------------------------------------------------------------------------
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun150.8}
-\newcommand{\stardocnumber}    {150.8}
+\newcommand{\stardocsource}    {sun150.9}
+\newcommand{\stardocnumber}    {150.9}
 \newcommand{\stardocauthors}   {D.S. Berry}
-\newcommand{\stardocdate}      {2nd February 2011}
+\newcommand{\stardocdate}      {17th May 2011}
 \newcommand{\stardoctitle}     {GRP \\ [1ex]
                                 Routines for Managing Groups of Objects}
-\newcommand{\stardocversion}   {Version 3.5}
+\newcommand{\stardocversion}   {Version 3.6}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -1934,9 +1934,14 @@ A. This group could then be associated with group A. Similarly a group D could
 be created holding the names {\bf Messier} and {\bf Sb}, and associated with
 group B.
 
-Three routines are included in the GRP package for handling these associations;
-\htmlref{GRP\_SOWN}{GRP_SOWN} establishes one group as owner of another, \htmlref{GRP\_OWN}{GRP_OWN} returns the
-identifier of the group which owns a specified group, and \htmlref{GRP\_HEAD}{GRP_HEAD} returns the
+Four routines are included in the GRP package for handling these
+associations;
+\htmlref{GRP\_SOWN}{GRP_SOWN} establishes one group as owner of another,
+\htmlref{GRP\_OWN}{GRP_OWN} returns the
+identifier of the group which owns a specified group,
+\htmlref{GRP\_SLAVE}{GRP_SLAVE} returns the
+identifier of the group which is owned by (i.e. is a slave of) a specified group,
+and \htmlref{GRP\_HEAD}{GRP_HEAD} returns the
 group at the head of an owner-slave chain. Groups are ``free'' (i.e. are not
 owned by any other group) when they are created. A group which has had an owner
 established for it can be made free again by calling \htmlref{GRP\_SOWN}{GRP_SOWN} giving a null
@@ -2045,6 +2050,9 @@ group}
             {Establish a group as case sensitive or case insensitive}
 \noteroutine{\htmlref{GRP\_SETSZ}{GRP_SETSZ}}{( IGRP, SIZE, STATUS )}
             {Reduce the size of a group}
+\noteroutine{\htmlref{GRP\_SLAVE}{GRP_SLAVE}}{( IGRP1, IGRP2, STATUS )}
+            {Return the identifier of the group which is owned by a
+specified group}
 \noteroutine{\htmlref{GRP\_SOWN}{GRP_SOWN}}{( IGRP1, IGRP2, STATUS )}
             {Establish one group as ``owner'' of another group}
 \noteroutine{\htmlref{GRP\_VALID}{GRP_VALID}}{( IGRP, VALID, STATUS )}
@@ -2081,6 +2089,9 @@ group}
 \noteroutine{\htmlref{GRP\_OWN}{GRP_OWN}}{( IGRP1, IGRP2, STATUS )}
             {Return the identifier of the group which ``owns'' a specified
 group}
+\noteroutine{\htmlref{GRP\_SLAVE}{GRP_SLAVE}}{( IGRP1, IGRP2, STATUS )}
+            {Return the identifier of the group which is owned by a
+specified group}
 \noteroutine{\htmlref{GRP\_VALID}{GRP_VALID}}{( IGRP, VALID, STATUS )}
             {Check if a group identifier is valid}
 
@@ -3529,6 +3540,41 @@ environment}
    }
 }
 \sstroutine{
+   GRP\_SLAVE
+}{
+   Returns the identifier of the group which is owned by the specified
+   group
+}{
+   \sstdescription{
+      If the group identified by IGRP1 has had a {\tt "}slave{\tt "} group
+      established for it by a call to GRP\_SOWN, then the identifier of
+      the slave group is returned in IGRP2. Otherwise, the value
+      GRP\_\_NOID is returned (but no error is reported).
+   }
+   \sstinvocation{
+      CALL GRP\_SLAVE( IGRP1, IGRP2, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP1 = INTEGER (Given)
+      }{
+         An identifier for the owner group whose slave is to be
+         returned.
+      }
+      \sstsubsection{
+         IGRP2 = INTEGER (Returned)
+      }{
+         An identifier for the group which is owned by the group identified
+         by IGRP1. Returned equal to GRP\_\_NOID if an error occurs.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
    GRP\_SOWN
 }{
    Establish one group as the owner of another group
@@ -3666,6 +3712,13 @@ library (see \xref{SUN/121}{sun121}{}), the CHR library (see
 Peter Draper is thanked for his work on porting the original IRH\_ package to
 UNIX, and Rodney Warren-Smith is thanked for his extensive suggestions for
 improvements to the GRP\_ package.
+
+\section{Changes and New Features in V3.6}
+The following changes have occurred in the GRP\_ system since version 3.5:
+
+\begin{enumerate}
+\item Addition of routine GRP\_SLAVE.
+\end{enumerate}
 
 \section{Changes and New Features in V3.5}
 The following changes have occurred in the GRP\_ system since version 3.4:

@@ -721,6 +721,29 @@ Grp *grpOwn( const Grp *grp, int *status ){
 }
 
 
+F77_SUBROUTINE(grp_slave)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(STATUS) );
+
+Grp *grpSlave( const Grp *grp, int *status ){
+   DECLARE_INTEGER(IGRP1);
+   DECLARE_INTEGER(IGRP2);
+   DECLARE_INTEGER(STATUS);
+   Grp *ret;
+
+   IGRP1 = grpC2F( (Grp *) grp, status );
+
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_LOCK( F77_CALL(grp_slave)( INTEGER_ARG(&IGRP1),
+                                  INTEGER_ARG(&IGRP2),
+                                  INTEGER_ARG(&STATUS) ); )
+
+   F77_IMPORT_INTEGER( STATUS, *status );
+
+   ret = grpF2C( IGRP2, status );
+   return ret;
+}
+
+
 F77_SUBROUTINE(grp_sown)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(STATUS) );
 
 void grpSown( Grp *grp1, Grp *grp2, int *status ){
