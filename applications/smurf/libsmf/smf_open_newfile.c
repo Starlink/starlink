@@ -32,8 +32,10 @@
 *     ubnd[] = const int (Given)
 *        Upper pixel bounds of output file.
 *     flags = int (Given)
-*        Flags to denote whether to create flatfield, header, or file components
-*        and create variance and quality arrays
+*        Flags to denote whether to create variance or quality arrays. Default
+*        is to only create the data component. Allowed values are:
+*         - SMF__MAP_VAR - create variance
+*         - SMF__MAP_QUAL - create quality
 *     data = smfData ** (Returned)
 *        Pointer to pointer smfData struct to be filled with file info and data
 *        Should be freed using smf_close_file.
@@ -89,11 +91,15 @@
 *     2010-09-17 (COBA):
 *        - Updated smf_construct_smfData which now contains smfFts
 *        - Updated flags with SMF__NOCREATE_FTS
+*     2011-05-16 (TIMJ):
+*        Flags argument no longer passed to smf_create_smfData.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 University of British Columbia. All Rights
-*     Reserved.
+*     Copyright (C) 2011 Science & Technology Facilities Council.
+*     Copyright (C) 2006, 2008 University of British Columbia.
+*     Copyright (C) 2010 University of Lethbridge.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -154,6 +160,7 @@ void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, const int n
   char *pname = NULL;           /* Pointer to filename */
   void *pntr[] = { NULL, NULL }; /* Array of pointers for smfData */
   smf_qual_t * qual = NULL;     /* Pointer to quality */
+  int smfflags = 0;             /* Flags for smf_create_smfData */
 
   if ( *status != SAI__OK ) return;
 
@@ -164,8 +171,8 @@ void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, const int n
   }
 
   /* Create empty smfData with no extra components */
-  flags |= SMF__NOCREATE_DA | SMF__NOCREATE_FTS | SMF__NOCREATE_HEAD | SMF__NOCREATE_FILE;
-  *data = smf_create_smfData( flags, status);
+  smfflags |= SMF__NOCREATE_DA | SMF__NOCREATE_FTS | SMF__NOCREATE_HEAD | SMF__NOCREATE_FILE;
+  *data = smf_create_smfData( smfflags, status);
 
   /* Set the requested data type */
   (*data)->dtype = dtype;

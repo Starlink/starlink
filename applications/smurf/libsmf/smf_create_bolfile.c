@@ -15,7 +15,7 @@
 *  Invocation:
 *     void smf_create_bolfile( const Grp * bgrp, size_t index,
 *               const smfData* refdata, const char * datalabel,
-*               const char * units, int hasqual, smfData **bolmap,
+*               const char * units, int flags, smfData **bolmap,
 *               int *status );
 
 *  Arguments:
@@ -30,8 +30,10 @@
 *     datalabel = const char * (Given)
 *        Label for the data array. Can be NULL. Title will be derived
 *        from this.
-*     hasqual = int (Given)
-*        If true include a QUALITY component.
+*     flags = int (Given)
+*        Flags to indicates if QUALITY and/or VARIANCE should be created.
+*        Flags are SMF__MAP_QUAL and SMF__MAP_VAR. See smf_open_newfile
+*        for details.
 *     bolmap = smfData** (Returned)
 *        Output smfData.
 *     status = int* (Given and Returned)
@@ -67,12 +69,15 @@
 *        Work with any data order for refdata.
 *     2010-09-17 (COBA):
 *        Updated smf_construct_smfData which now contains smfFts
+*     2011-05-16 (TIMJ):
+*        Allow variance to be disabled as well as quality. Use a single
+*        flags argument instead of hasqual.
 
 *  Notes:
 *     - Does not propogate provenance or history from refdata.
 
 *  Copyright:
-*     Copyright (C) 2009-2010 Science and Technology Facilities Council.
+*     Copyright (C) 2009-2011 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -108,7 +113,7 @@
 
 void smf_create_bolfile( const Grp * bgrp, size_t index,
                          const smfData* refdata, const char *datalabel,
-                         const char *units, int hasqual, smfData **bolmap,
+                         const char *units, int flags, smfData **bolmap,
                          int *status ) {
 
   int col_index = SC2STORE__COL_INDEX;
@@ -136,9 +141,6 @@ void smf_create_bolfile( const Grp * bgrp, size_t index,
 
   /* either create the file or use malloc */
   if (bgrp) {
-    int flags = SMF__MAP_VAR;
-    if (hasqual) flags |= SMF__MAP_QUAL;
-
     /* create the file for WRITE access */
     smf_open_newfile( bgrp, index, SMF__DOUBLE, 2, lbnd, ubnd,
                       flags, bolmap, status );
@@ -157,8 +159,8 @@ void smf_create_bolfile( const Grp * bgrp, size_t index,
     nbols = mydims[0] * mydims[1];
 
     pntr[0] = astCalloc( nbols, sizeof(double), 0 );
-    pntr[1] = astCalloc( nbols, sizeof(double), 0 );
-    if (hasqual) qual = astCalloc( nbols, sizeof(*qual), 0 );
+    if (flags & SMF__MAP_VAR) pntr[1] = astCalloc( nbols, sizeof(double), 0 );
+    if (flags & SMF__MAP_QUAL) qual = astCalloc( nbols, sizeof(*qual), 0 );
 
     *bolmap = smf_construct_smfData( NULL, NULL, NULL, NULL, NULL, SMF__DOUBLE,
                                      pntr, qual, SMF__QFAM_TSERIES, NULL, 0,

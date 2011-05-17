@@ -223,7 +223,7 @@ smf_flat_calcflat( msglev_t msglev, const char flatname[],
     /* Create the file on disk or malloc it as required.
        (units will normalise so no need for prefix) */
     smf_create_bolfile( rgrp, 1, flatdata, "Responsivity",
-                        "A/W", 0, &respmap, status );
+                        "A/W", SMF__MAP_VAR, &respmap, status );
     if (rgrp) grpDelet( &rgrp, status );
   }
 

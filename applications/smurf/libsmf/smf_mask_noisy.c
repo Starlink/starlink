@@ -120,7 +120,7 @@ void smf_mask_noisy( smfWorkForce *wf, smfData *data, smfData **noise,
 
   /* Create some space for the result */
   smf_create_bolfile( NULL, 1, data, "Noise", "blahs s**0.5",
-                      0, &noisemap, status );
+                      SMF__MAP_VAR, &noisemap, status );
   if (noisemap) noisedata = (noisemap->pntr)[0];
 
   /* Calculate the noise on each bolometer */
