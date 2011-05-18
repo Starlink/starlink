@@ -413,7 +413,7 @@ smfCreateLutwcsCache *smf_create_lutwcs( int clearcache, const double *fplane_x,
          AzEl coords (in rads). */
 
       azelmap = sc2ast_maketanmap( state->tcs_az_ac1, state->tcs_az_ac2,
-  				 cache->azel, 0, status );
+  				 cache->azel, status );
 
 
       /* Get the SMU positional values. Any "bad" value gets set to 0 before

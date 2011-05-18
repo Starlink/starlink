@@ -295,6 +295,9 @@ int *status             /* global status (given and returned) */
                  one call and not NULL on the next call.
      06May2011 : Added NEW5 distortion (first estimate based on eight
                  arrays). (DSB)
+     18May2011 : The SMU corrections are defined in AZEL and so should be applied
+                 *after* de-rotating the Cartesian Nasmyth coord. So extract the
+                 de-rotation from smurf_maketanmap and do it here instead.
 */
 {
 
@@ -303,7 +306,7 @@ int *status             /* global status (given and returned) */
    AstMapping *azelmap;
    AstMapping *bmap;
    AstMapping *mapping;
-   AstMatrixMap *rotmap;
+   AstMapping *rotmap;
    AstPolyMap *polymap;
    AstShiftMap *instapmap;
    AstShiftMap *jigglemap;
@@ -1252,9 +1255,9 @@ int *status             /* global status (given and returned) */
         rot[ 2 ] =  cos( r );
         rot[ 3 ] =  sin( r );
       }
-      rotmap = astMatrixMap ( 2, 2, 0, rot, " " );
+      rotmap = (AstMapping *) astMatrixMap ( 2, 2, 0, rot, " " );
       cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ],
-                                                      rotmap, 1, " " );
+                                                       rotmap, 1, " " );
 
 /* See which version of the distortion polynomial and array reference
    points are to be used. If the environment variable is not set, use
@@ -1522,37 +1525,41 @@ int *status             /* global status (given and returned) */
 /* If sky coords are required in the returned FrameSet... */
    } else {
 
-/* Create a Mapping from these Cartesian Nasmyth coords (in rads) to spherical
-   AzEl coords (in rads). */
+/* Create a MatrixMap that rotates the focal plane so that the second
+   pixel axis is parallel to the elevation axis. The rotation angle is
+   just equal to the elevation of the boresight. */
+      r = state->tcs_az_ac2;
+      rot[ 0 ] =  cos( r );
+      rot[ 1 ] = -sin( r );
+      rot[ 2 ] =  sin( r );
+      rot[ 3 ] =  cos( r );
+      rotmap = (AstMapping *) astMatrixMap( 2, 2, 0, rot, " " );
 
+/* Create a ShiftMap that describes the SMU position correction. These
+   corrections refer to AZEL offsets so should be applied after the above
+   de-rotation MatrixMap. Replace rotmap with a suitable CmpMap combining
+   the original rotmap and the ShiftMap. */
+      if( state->smu_az_jig_x != VAL__BADD && state->smu_az_jig_y != VAL__BADD &&
+          state->smu_az_chop_x != VAL__BADD && state->smu_az_chop_y != VAL__BADD &&
+          ( state->smu_az_jig_x != 0.0 || state->smu_az_jig_y != 0.0 ||
+            state->smu_az_chop_x != 0.0 || state->smu_az_chop_y != 0.0 ) ) {
+         shifts[ 0 ] = (state->smu_az_jig_x + state->smu_az_chop_x) * AST__DD2R / 3600.0;
+         shifts[ 1 ] = (state->smu_az_jig_y + state->smu_az_chop_y) * AST__DD2R / 3600.0;
+         jigglemap = astShiftMap( 2, shifts, " " );
+         rotmap = (AstMapping *) astCmpMap( rotmap, jigglemap, 1, " " );
+      }
+
+/* Create a Mapping from these de-rotated, SMU corrected, Cartesian Nasmyth coords
+   (in rads) to spherical AzEl coords (in rads). */
       azelmap = sc2ast_maketanmap( state->tcs_az_ac1, state->tcs_az_ac2,
-   				cache->azel, state->tcs_az_ac2, status );
-
-/* Calculate final mapping with SMU position correction only if needed
-   (i.e. ignore SMU if all four values are zero or if any single value is bad) */
-      if( ( (!state->smu_az_jig_x) && (!state->smu_az_jig_y) &&
-            (!state->smu_az_chop_x) && (!state->smu_az_chop_y) ) ||
-          state->smu_az_jig_x == VAL__BADD || state->smu_az_jig_y == VAL__BADD ||
-          state->smu_az_chop_x == VAL__BADD || state->smu_az_chop_y == VAL__BADD ){
+   				   cache->azel, status );
 
 /* Combine these with the cached Mapping (from GRID coords for subarray
    to Tanplane Nasmyth coords in rads), to get total Mapping from GRID
    coords to spherical AzEl in rads. */
-
-         mapping = (AstMapping *) astCmpMap( cache->map[ subnum ], azelmap, 1,
-   					  " " );
-
-      } else {
-/* Create a ShiftMap which moves the origin of projection plane (X,Y)
-   coords to take account of the small offsets of SMU jiggle pattern. */
-         shifts[ 0 ] = (state->smu_az_jig_x + state->smu_az_chop_x) * AST__DD2R / 3600.0;
-         shifts[ 1 ] = (state->smu_az_jig_y + state->smu_az_chop_y) * AST__DD2R / 3600.0;
-         jigglemap = astShiftMap( 2, shifts, " " );
-
-         mapping = (AstMapping *) astCmpMap( cache->map[ subnum ],
-   					  astCmpMap( jigglemap, azelmap, 1,
-   						     " " ), 1, " " );
-      }
+      mapping = (AstMapping *) astCmpMap( cache->map[ subnum ],
+                                          astCmpMap( rotmap, azelmap, 1, " " ),
+                                          1, " " );
 
 /* If not already created, create a SkyFrame describing (Az,El). Hard-wire
    the geodetic longitude and latitude of JCMT into this Frame. Note, the
@@ -1895,7 +1902,6 @@ AstMapping *sc2ast_maketanmap
 double lon,              /* Celestial longitude at ref point (rads) */
 double lat,              /* Celestial latitude at ref point (rads) */
 AstMapping *cache[ 2 ],  /* Cached Mappings (supply as NULL on 1st call) */
-double rot,              /* Rotation needed to align input Y axis with North */
 int *status              /* global status (given and returned) */
 )
 /* Method :
@@ -1909,8 +1915,8 @@ int *status              /* global status (given and returned) */
     Mappings which will be needed on subsequent calls (these pointers are
     exempted from AST context handling).
 
-    If the input Cartesian coordinates represent Nasmyth (X,Y) coords,
-    then the "rot" angle should be the elevation of the boresight.
+    The input Cartesian coordinates represent tangent plane AZEL offsets
+    (i.e. the Carestian axes are parallel to the AZEL axes).
 
    Authors :
      D.S.Berry (dsb@ast.man.ac.uk)
@@ -1919,6 +1925,9 @@ int *status              /* global status (given and returned) */
      10Feb2006 : original (dsb)
      1Sep2008  : Set the SphMap attribute "UnitRadius" so that SphMaps
                  can be simplified. (dsb)
+     17May2011 : Remove the "rot" argument and stipulate that the input
+                 Cartesian axes must already have been rotated so that
+                 they are parallel to Az and El. (dsb)
 */
 
 {
@@ -1969,7 +1978,7 @@ int *status              /* global status (given and returned) */
    (lon,lat) = (90 degs,0) (the slalib convention). */
 
    strcpy(eul, "ZYZ" );
-   slaDeuler( eul, -rot, -(PIBY2-lat), -lon, mat );
+   slaDeuler( eul, 0.0, -(PIBY2-lat), -lon, mat );
    matmap = astMatrixMap( 3, 3, 0, (double *) mat, " " );
 
 /* Create the required compound Mapping. */

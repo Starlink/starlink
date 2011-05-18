@@ -91,7 +91,6 @@ AstMapping *sc2ast_maketanmap
 double lon,              /* Celestial longitude at ref point (rads) */
 double lat,              /* Celestial latitude at ref point (rads) */
 AstMapping *cache[ 2 ],  /* Cached Mappings (supply as NULL on 1st call) */
-double rot,              /* Rotation needed to align input Y axis with North */
 int *status              /* global status (given and returned) */
 );
 

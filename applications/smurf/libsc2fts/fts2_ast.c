@@ -24,11 +24,16 @@
 *  Authors:
 *     Tanner Heggie (UoL)
 *     COBA: Coskun Oba (UoL)
+*     DSB: David Berry (JAC)
 
 *  History :
 *     Created: May 17, 2010
 *     2010-09-20 (COBA):
 *       Replaced PI and PIBY2 with AST__DPI and AST__DPIBY2
+*     2011-05-17 (DSB):
+*       The SMU corrections are defined in AZEL and so should be applied
+*       *after* de-rotating the Cartesian Nasmyth coord. So extract the
+*       de-rotation from smurf_maketanmap and do it here instead.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -102,7 +107,7 @@ sc2astCache *fts2ast_createwcs2
 {
   AstMapping *azelmap;
   AstMapping *mapping;
-  AstMatrixMap *rotmap;
+  AstMapping *rotmap;
   AstMatrixMap *flipmap;
   AstPolyMap *polymap;
   AstShiftMap *shiftmap;
@@ -279,7 +284,7 @@ sc2astCache *fts2ast_createwcs2
       rot[ 2 ] =  cos( r );
       rot[ 3 ] =  sin( r );
     }
-    rotmap = astMatrixMap ( 2, 2, 0, rot, " " );
+    rotmap = (AstMapping *) astMatrixMap ( 2, 2, 0, rot, " " );
     cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], rotmap, 1, " " );
 
     /* For each 450/850 subarray, the next Mapping creates FRAME450/FRAME850 (Right, UP) coordinates,
@@ -557,31 +562,42 @@ sc2astCache *fts2ast_createwcs2
     return result;
   }
 
+  /* Create a MatrixMap that rotates the focal plane so that the second
+     pixel axis is parallel to the elevation axis. The rotation angle is
+     just equal to the elevation of the boresight. */
+  r = state->tcs_az_ac2;
+  rot[ 0 ] =  cos( r );
+  rot[ 1 ] = -sin( r );
+  rot[ 2 ] =  sin( r );
+  rot[ 3 ] =  cos( r );
+  rotmap = (AstMapping *) astMatrixMap( 2, 2, 0, rot, " " );
 
-  // Create a Mapping from these Cartesian Nasmyth coords (in rads) to spherical AzEl coords (in rads).
-  azelmap = sc2ast_maketanmap( state->tcs_az_ac1, state->tcs_az_ac2, cache->azel, state->tcs_az_ac2, status );
+  /* Create a ShiftMap that describes the SMU position correction. These
+     corrections refer to AZEL offsets so should be applied after the above
+     de-rotation MatrixMap. Replace rotmap with a suitable CmpMap combining
+     the original rotmap and the ShiftMap. */
 
-  // Calculate final mapping with SMU position correction only if needed
-  if( (!state->smu_az_jig_x)  && (!state->smu_az_jig_y) &&
-       (!state->smu_az_chop_x) && (!state->smu_az_chop_y) )
-  {
-    /* Combine these with the cached Mapping (from GRID coords for subarray
-     * to Tanplane Nasmyth coords in rads), to get total Mapping from GRID
-     * coords to spherical AzEl in rads.
-     */
-	mapping = (AstMapping *) astCmpMap( cache->map[ subnum ], azelmap, 1, " " );
+  if( state->smu_az_jig_x != VAL__BADD && state->smu_az_jig_y != VAL__BADD &&
+      state->smu_az_chop_x != VAL__BADD && state->smu_az_chop_y != VAL__BADD &&
+      ( state->smu_az_jig_x != 0.0 ||  state->smu_az_jig_y != 0.0 ||
+        state->smu_az_chop_x != 0.0 ||  state->smu_az_chop_y != 0.0 ) ) {
+     shifts[ 0 ] = (state->smu_az_jig_x + state->smu_az_chop_x) * AST__DD2R / 3600.0;
+     shifts[ 1 ] = (state->smu_az_jig_y + state->smu_az_chop_y) * AST__DD2R / 3600.0;
+     jigglemap = astShiftMap( 2, shifts, " " );
+     rotmap = (AstMapping *) astCmpMap( rotmap, jigglemap, 1, " " );
   }
-  else
-  {
-    /* Create a ShiftMap which moves the origin of projection plane (X,Y)
-     * coords to take account of the small offsets of SMU jiggle pattern.
-     */
-    shifts[ 0 ] = state->smu_az_jig_x + state->smu_az_chop_x;
-    shifts[ 1 ] = state->smu_az_jig_y + state->smu_az_chop_y;
-    jigglemap = astShiftMap( 2, shifts, " " );
 
-    mapping = (AstMapping *) astCmpMap( cache->map[ subnum ], astCmpMap( jigglemap, azelmap, 1, " " ), 1, " " );
-  }
+  /* Create a Mapping from these de-rotated, SMU corrected, Cartesian Nasmyth coords
+     (in rads) to spherical AzEl coords (in rads). */
+  azelmap = sc2ast_maketanmap( state->tcs_az_ac1, state->tcs_az_ac2,
+                               cache->azel, status );
+
+  /* Combine these with the cached Mapping (from GRID coords for subarray
+     to Tanplane Nasmyth coords in rads), to get total Mapping from GRID
+     coords to spherical AzEl in rads. */
+  mapping = (AstMapping *) astCmpMap( cache->map[ subnum ],
+                                      astCmpMap( rotmap, azelmap, 1, " " ),
+                                      1, " " );
 
   /* If not already created, create a SkyFrame describing (Az,El).
    * Hard-wire the geodetic longitude and latitude of JCMT into this Frame.
