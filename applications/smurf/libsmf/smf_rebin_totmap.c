@@ -142,11 +142,12 @@ AstMapping *smf_rebin_totmap( smfData *data, dim_t itime,
    hdr = data->hdr;
 
 /* Get a FrameSet describing the spatial coordinate systems associated with
-   the current time slice of the current input data file. The base frame in
-   the FrameSet will be a 2D Frame in which axis 1 is detector number and
-   axis 2 is unused. The current Frame will be a SkyFrame (the SkyFrame
-   System may be any of the JCMT supported systems). The Epoch will be
-   set to the epoch of the time slice. */
+   the current time slice of the current input data file. For ACSIS, the base
+   frame in the FrameSet will be a 2D Frame in which axis 1 is detector number
+   and axis 2 is unused. For SCUBA-2, the base frame will be 2D grid coords
+   in the bolometer array. The current Frame will be a SkyFrame (the SkyFrame
+   System may be any of the JCMT supported systems). The Epoch will be set
+   to the epoch of the time slice. */
    smf_tslice_ast( data, itime, 1, status );
    swcsin = hdr->wcs;
    if (!swcsin) return NULL;
@@ -192,10 +193,10 @@ AstMapping *smf_rebin_totmap( smfData *data, dim_t itime,
       return NULL;
    }
 
-/* The "fs" FrameSet has input GRID coords as its base Frame, and output
-   (absolute) sky coords as its current frame. If the target is moving,
-   modify this so that the current Frame represents offsets from the
-   current telescope base pointing position (the mapping in the "fs"
+/* The "fs" FrameSet has input sky coords (usually azel) as its base Frame,
+   and output (absolute) sky coords as its current frame. If the target is
+   moving, modify this so that the current Frame represents offsets from
+   the current telescope base pointing position (the mapping in the "fs"
    FrameSet is also modified automatically). */
    if( moving ) {
      AstFrameSet* tempfs = NULL;
