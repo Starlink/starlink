@@ -97,7 +97,7 @@ Usage: smas [-a diam] <in-list> <out-table> [<out-image>]
    arguments:
       <in-list>: a text file in which each line contains the path
           to an NDF holding a SCUBA-2 map of a point source (or
-	  the moon). an NDF contains a MORE.SMURF.SHORTMAPS or
+	  the moon). If an NDF contains a MORE.SMURF.SHORTMAPS or
 	  MORE.SMURF.BOLOMAPS extension item, then the NDFs in the
 	  SHORTMAPS or BOLOMAPS array are used in place of the
 	  supplied NDF (SHORTMAPS is used in preference to BOLOMAPS
@@ -112,7 +112,8 @@ Usage: smas [-a diam] <in-list> <out-table> [<out-image>]
 
       <out-image>: if supplied, and if the input data contains bolomaps,
           a 2D NDF containing the fsum values for each bolometer is
-	  created, with the name given by <out-image>.
+	  created, with the name given by <out-image>. The FITS headers
+          from the first input NDF are copied to the output NDF.
 
    Description:
 
@@ -249,9 +250,12 @@ foreach n (`cat $inlist`)
       exit
    endif
 
-#  Check all the data is for the same wavelength.
+#  Check all the data is for the same wavelength. Also copy the FITS headers from the
+#  first input file to a text file (they will later be stored in the output image).
    if( $sar == -1 ) then
       set sar = $array
+      rm -f smas-fits.log >& /dev/null
+      $KAPPA_DIR/fitslist $in smas-fits.log
    else
       if( $subarray != $sar ) then
          echo "$n is for subarray $subarrray, which is not the same as the first NDF"
@@ -621,9 +625,12 @@ if( "$outimage" != " " ) then
    endif
 
    $KAPPA_DIR/trandat freename=cat.smas poscols="[1,2]" valcol=3 auto=no ndf=$outimage
+
+#  Copy FITS headers from the first input NDF to the output NDF.
+   $KAPPA_DIR/fitstext $outimage file=smas-fits.log
 endif
 
 # Clean up.
-rm -f cat.smas back.sdf files.smas log.smas cut-smas.sdf coin.smas temp-smas.sdf pos-smas.sdf filled-smas.sdf >& /dev/null
+rm -f cat.smas back.sdf files.smas log.smas cut-smas.sdf coin.smas temp-smas.sdf pos-smas.sdf filled-smas.sdf smas-fits.log >& /dev/null
 
 
