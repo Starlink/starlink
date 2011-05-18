@@ -602,8 +602,8 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
              then add the suffix "_con.dimm" to denote concatenated
              iterative map-maker data */
 
-          ingrp = grpNew( "GRP", status );
-          outgrp = grpNew( "GRP", status );
+          ingrp = smf_grp_new( igrp->grp, "GRP", status );
+          outgrp = smf_grp_new( igrp->grp, "GRP", status );
 
           ndgCpsup( igrp->grp, igrp->subgroups[j][i], ingrp, status );
           ndgCrexp( "./*_con" SMF__DIMM_SUFFIX "|.sdf||", ingrp, &outgrp,
@@ -986,7 +986,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
          have a bunch of bolometers that don't change with time that
          were turned off by the DA system. Explicitly do that check
          here in the non-padded region of the concatenated array and
-         set SMF__Q_BADDA. Also set the data values to VAL__BADD to 
+         set SMF__Q_BADDA. Also set the data values to VAL__BADD to
          prevent quality/data inconsistencies being reported. */
       if( (*status == SAI__OK) && (!ensureflat) && (data->qual) ) {
         if( data->dtype == SMF__DOUBLE ) {

@@ -205,7 +205,7 @@ AstKeyMap *smf_groupscans( const Grp *igrp,  int size, int *maxsyspop,
 
 /* Create a new GRP group to hold the names of the first input NDF
    associated with each observation/sub-system. */
-   *ogrp = grpNew( " ", status );
+   *ogrp = smf_grp_new( igrp, " ", status );
 
 /* Now traverse the returned set of nested KeyMaps in their natural
    order. We use a separate pass through the KeyMaps (rather than storing

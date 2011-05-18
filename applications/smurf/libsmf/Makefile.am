@@ -223,6 +223,7 @@ smf_getobsidss.c \
 smf_getrefwcs.c \
 smf_getspectralwcs.c \
 smf_groupscans.c \
+smf_grp_new.c \
 smf_grp_related.c \
 smf_history_add.c \
 smf_history_check.c \
@@ -258,6 +259,7 @@ smf_model_getptr.c \
 smf_model_gettype.c \
 smf_model_stripsuffix.c \
 smf_ndf_sbnd.c \
+smf_ndg_copy.c \
 smf_obsmap_fill.c \
 smf_obsmap_report.c \
 smf_obsmode_str.c \

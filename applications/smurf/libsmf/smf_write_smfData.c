@@ -185,7 +185,7 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
     grpPut1( ogrp, filename, 0, status );
   } else if (igrp) {
     /* Copy the required entry to a new group */
-    ogrp = ndgCopy( igrp, grpindex, grpindex, 0, status );
+    ogrp = smf_ndg_copy( igrp, grpindex, grpindex, 0, status );
   } else {
     *status = SAI__ERROR;
     errRep( "", FUNC_NAME ": Must supply a filename or a group."

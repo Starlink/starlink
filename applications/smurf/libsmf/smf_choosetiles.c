@@ -299,7 +299,7 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
 /* Create a GRP group to hold the names of the input files that have data
    that falls within the bounds of the extended tile area. This is just a
    copy of the supplied group. */
-         result->grp = ndgCopy( igrp, 0, 0, 0, status );
+         result->grp = smf_ndg_copy( igrp, 0, 0, 0, status );
          result->size = size;
 
 /* A NULL pointer for "jndf" means that the index of an NDF within a tile
@@ -542,7 +542,7 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
 
 /* Create a GRP group to hold the names of the input files that have data
    that falls within the bounds of the extended tile area. */
-            tile->grp = grpNew( "", status );
+            tile->grp = smf_grp_new( igrp, "", status );
             tile->jndf = astMalloc( sizeof( int )* size );
             if( tile->jndf ) {
 

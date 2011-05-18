@@ -361,7 +361,7 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
     isize = grpGrpsz( igroup->grp, status );
 
     /* Create group of NDF names with model name suffix */
-    mgrp = grpNew( "model component", status );
+    mgrp = smf_grp_new( igroup->grp, "model component", status );
     mname = smf_model_getname( mtype, status );
 
     /* Form a group expression for the filename */

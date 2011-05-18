@@ -263,13 +263,13 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
   smf_timerinit( &tv1, &tv2, status );
 
   /* Create new group for output files */
-  ogrp = grpNew( "Science", status );
+  ogrp = smf_grp_new( ingrp, "Science", status );
 
   /* and a new group for darks */
-  dgrp = grpNew( "DarkFiles", status );
+  dgrp =  smf_grp_new( ingrp, "DarkFiles", status );
 
   /* and for fast flats */
-  fgrp = grpNew( "FastFlats", status );
+  fgrp =  smf_grp_new( ingrp, "FastFlats", status );
 
   /* and also create a keymap for the observation description */
   obsmap = astKeyMap( " " );

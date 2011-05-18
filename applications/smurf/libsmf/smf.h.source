@@ -1231,6 +1231,8 @@ void smf_getspectralwcs( AstFrameSet *fset, int type, AstFrameSet **specwcs,
 AstKeyMap *smf_groupscans( const Grp *igrp,  int size, int *maxsyspop,
                            int *conform, Grp **ogrp, int *status );
 
+Grp *smf_grp_new( const Grp *grp, const char *type, int *status );
+
 void smf_grp_related( const Grp *igrp, const size_t grpsize,
                       const int grouping, dim_t maxlen, AstKeyMap *keymap,
                       double downsampscale, dim_t *maxconcatlen,
@@ -1348,6 +1350,8 @@ smf_modeltype smf_model_gettype( const char *modelname, int *status );
 void smf_model_stripsuffix( const char *instr, char *outstr, int *status );
 
 void smf_ndf_sbnd( int ndim, int *lbnd, int *ubnd, smfData *data, int *status );
+
+Grp *smf_ndg_copy( const Grp *grp1, size_t indxlo, size_t indxhi, int reject, int *status );
 
 void smf_obsmap_fill( const smfData * data, AstKeyMap * obsmap,
                       AstKeyMap * objmap, int * status );

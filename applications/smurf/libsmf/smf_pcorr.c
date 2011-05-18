@@ -103,6 +103,7 @@ void smf_pcorr( smfHead *head, const char *file, int *status ){
    double dlon_tr;
    double rot;
    double sinrot;
+   int azel;
 
 /* Check the inherited status. */
    if( *status != SAI__OK ) return;
@@ -144,68 +145,76 @@ void smf_pcorr( smfHead *head, const char *file, int *status ){
 /* See what system the DLON/DLAT values refer to. Default to AZEL. */
       if( !astMapGet0C( table, "SYSTEM", &system ) ) system = "AZEL";
 
+      if( astChrMatch( system, "AZEL" ) ) {
+         azel = 1;
+
+      } else if( astChrMatch( system, "TRACKING" ) ) {
+         azel = 0;
+
+      } else if( *status == SAI__OK ){
+         msgSetc( "S", system );
+         *status = SAI__ERROR;
+         errRep( " ", "Unknown SYSTEM '^S' specified in pointing "
+                 "corrections file.", status );
+      }
+
+      if( *status == SAI__OK ) {
+
 /* Loop round every time slice */
-      dlon_az = AST__BAD;
-      dlat_az = AST__BAD;
-      dlon_tr = AST__BAD;
-      dlat_tr = AST__BAD;
-      for( iframe = 0; iframe < head->nframes; iframe++ ){
-         state = head->allState + iframe;
+         dlon_az = AST__BAD;
+         dlat_az = AST__BAD;
+         dlon_tr = AST__BAD;
+         dlat_tr = AST__BAD;
+
+         for( iframe = 0; iframe < head->nframes ; iframe++ ){
+            state = head->allState + iframe;
 
 /* Get the rotation, in rads, from tracking north to elevation, measured
    positive from tracking north to tracking east. */
-         rot = state->tcs_tr_ang + state->tcs_az_ang;
-         cosrot = cos( rot );
-         sinrot = sin( rot );
+            rot = state->tcs_az_ang - state->tcs_tr_ang;
+            cosrot = cos( rot );
+            sinrot = sin( rot );
 
 /* Get the DLON/DLAT values in tracking and in azel. */
-         if( !strcmp( system, "AZEL" ) ) {
-            dlon_az = dlon[ iframe ];
-            dlat_az = dlat[ iframe ];
-            dlon_tr = -dlon_az*cosrot + dlat_az*sinrot;
-            dlat_tr =  dlon_az*sinrot + dlat_az*cosrot;
+            if( azel ) {
+               dlon_az = dlon[ iframe ];
+               dlat_az = dlat[ iframe ];
+               dlon_tr = -dlon_az*cosrot + dlat_az*sinrot;
+               dlat_tr =  dlon_az*sinrot + dlat_az*cosrot;
 
-         } else if( !strcmp( system, "TRACKING" ) ) {
-            dlon_tr = dlon[ iframe ];
-            dlat_tr = dlat[ iframe ];
-            dlon_az = -dlon_tr*cosrot + dlat_tr*sinrot;
-            dlat_az =  dlon_tr*sinrot + dlat_tr*cosrot;
-
-         } else if( *status == SAI__OK ){
-            msgSetc( "S", system );
-            *status = SAI__ERROR;
-            errRep( " ", "Unknown SYSTEM '^S' specified in pointing "
-                    "corrections file.", status );
-            break;
-         }
+            } else {
+               dlon_tr = dlon[ iframe ];
+               dlat_tr = dlat[ iframe ];
+               dlon_az = -dlon_tr*cosrot + dlat_tr*sinrot;
+               dlat_az =  dlon_tr*sinrot + dlat_tr*cosrot;
+            }
 
 /* Add the dlon and dlat values onto the SMU jiggle positions (note, these
    are in units of arc-seconds, not radians). */
-         if(  state->smu_az_jig_x == VAL__BADD ) {
-            state->smu_az_jig_x = dlon_az;
-         } else {
-            state->smu_az_jig_x += dlon_az;
-         }
+            if(  state->smu_az_jig_x != VAL__BADD ) {
+               state->smu_az_jig_x += dlon_az;
+            }
 
-         if(  state->smu_az_jig_y == VAL__BADD ) {
-            state->smu_az_jig_y = dlat_az;
-         } else {
-            state->smu_az_jig_y += dlat_az;
-         }
+            if(  state->smu_az_jig_y != VAL__BADD ) {
+               state->smu_az_jig_y += dlat_az;
+            }
 
-         if(  state->smu_tr_jig_x == VAL__BADD ) {
-            state->smu_tr_jig_x = dlon_tr;
-         } else {
-            state->smu_tr_jig_x += dlon_tr;
-         }
+            if(  state->smu_tr_jig_x != VAL__BADD ) {
+               state->smu_tr_jig_x += dlon_tr;
+            }
 
-         if(  state->smu_tr_jig_y == VAL__BADD ) {
-            state->smu_tr_jig_y = dlat_tr;
-         } else {
-            state->smu_tr_jig_y += dlat_tr;
+            if(  state->smu_tr_jig_y != VAL__BADD ) {
+               state->smu_tr_jig_y += dlat_tr;
+            }
          }
       }
    }
+
+/* Debug message. */
+   msgSetc( "F", file );
+   msgSetc( "S", azel ? "AZEL" : "TRACKING" );
+   msgOutif( MSG__DEBUG, " ", "^S pointing corrections read from file ^F",
+             status );
 
 /* Free resources. */
    mjd = astFree( mjd );

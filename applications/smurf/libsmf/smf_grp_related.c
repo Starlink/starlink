@@ -601,7 +601,7 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
   /* Create a base group for output files if required */
   /* Create a base group of filenames */
   if (*status == SAI__OK && basegrp ) {
-    *basegrp = grpNew( "Base Group", status );
+    *basegrp = smf_grp_new( (*group)->grp, "Base Group", status );
 
     /* Loop over time chunks */
     for( i=0; (*status==SAI__OK)&&(i<(*group)->ngroups); i++ ) {

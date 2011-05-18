@@ -123,7 +123,7 @@ smf_expand_tilegroup ( Grp * ogrp, size_t ntile, int npbin, size_t * outsize,
    and tile. */
   if( npbin > 1 ) {
     /* get a copy of the current output group */
-    tgrp = ndgCopy(ogrp, 0, 0, 0, status);
+    tgrp = smf_ndg_copy(ogrp, 0, 0, 0, status);
 
     /* and clear the output group in preparation for repopulating it */
     grpSetsz(ogrp, 0, status );
