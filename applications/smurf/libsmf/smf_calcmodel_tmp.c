@@ -275,8 +275,8 @@ void smf_calcmodel_tmp( smfWorkForce *wf, smfDIMMData *dat, int chunk,
           model_data[i*mbstride+2*mcstride] = corr;
 
           /* Report per-bolo stats */
-          msgOutiff( MSG__DEBUG, "", FUNC_NAME
-                     ": bolo %zu gain=%lf off=%lf corr=%lf", status,
+          msgOutiff( MSG__DEBUG, "",
+                     "    bolo %zu gain=%lf off=%lf corr=%lf", status,
                      i, g, o, corr );
         }
       }
@@ -295,11 +295,11 @@ void smf_calcmodel_tmp( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         smf_stats1D( model_data + 0*mcstride, mbstride, nbolo,
                      NULL, 0, 0, &mean_corr, NULL, &n_corr, status );
 
-        msgOutiff( MSG__VERB, "", FUNC_NAME ": mean gain=%lf (%zu samples)",
+        msgOutiff( MSG__VERB, "", "    mean gain=%lf (%zu samples)",
                    status, mean_g, n_g);
-        msgOutiff( MSG__VERB, "", FUNC_NAME ": mean off =%lf (%zu samples)",
+        msgOutiff( MSG__VERB, "", "    mean off =%lf (%zu samples)",
                    status, mean_o, n_o );
-        msgOutiff( MSG__VERB, "", FUNC_NAME ": mean corr=%lf (%zu samples)",
+        msgOutiff( MSG__VERB, "", "    mean corr=%lf (%zu samples)",
                    status, mean_corr, n_corr );
 
       }
