@@ -36,7 +36,7 @@
 *        of outliers.
 *     DIMS( NDF__MXDIM ) = INTEGER (Given)
 *        The dimensions of the unbinned array.
-*     DIMS( NDF__MXDIM ) = INTEGER (Given)
+*     BDIMS( NDF__MXDIM ) = INTEGER (Given)
 *        The dimensions of the binned array.
 *     BARRAY( * ) = ? (Given)
 *        The binned array.
@@ -52,7 +52,8 @@
 *     specified.
 
 *  Copyright:
-*     Copyright (C) 2007, 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2009, 2011 Science & Technology Facilities
+*     Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -87,6 +88,9 @@
 *        the dimensions of the binned array as being DIMS(I)/COMPRS(I)
 *        for the ith dimension.  Instead the new BDIMS argument supplies
 *        the actual dimensions of the binned array.
+*     2011 May 19 (MJC):
+*        Fixed bug occurring when the final compressed section has one
+*        fewer elements than the other sections.
 *     {enter_further_changes_here}
 
 *-
@@ -193,7 +197,7 @@
             DO J = 1, NDF__MXDIM
                OFFSET( J ) = ( BIND( J ) - 1 ) * COMPRS( J )
                FINAL = FINAL .OR. 
-     :                 OFFSET( J ) + COMPRS( J ) - 1 .GT. DIMS( J )
+     :                 OFFSET( J ) + COMPRS( J ) .GT. DIMS( J )
             END DO
 
 *  Transfer only what can be accommodated in the mask (that has the
