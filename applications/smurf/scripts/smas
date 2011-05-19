@@ -14,7 +14,7 @@ set narg = 0
 while( $# > 0 )
 
 #  Does the first word look like an option?
-   echo $argv[1] | grep -q "^-"
+   echo "$argv[1]" | grep -q "^-"
    if( $status == 0 ) then
       set option = 1
    else
@@ -25,13 +25,13 @@ while( $# > 0 )
 #  and then look at the second word to see if it looks like a value for the
 #  option. If it does, use it in place of the default value and shift the
 #  argument list so that it is not re-used.
-   if( $argv[1] == "-a" ) then
+   if( "$argv[1]" == "-a" ) then
       set sum_method = APERADD
 
       if( $# > 1 ) then
-         echo $argv[2] | grep -q '[a-zA-Z]'
+         echo "$argv[2]" | grep -q '[a-zA-Z]'
          if( $status == 1 ) then
-            set diam = $argv[2]
+            set diam = "$argv[2]"
             shift
          endif
       endif
@@ -48,11 +48,11 @@ while( $# > 0 )
 #  argument.
    else
       if( $narg == 0 ) then
-         set inlist = $argv[1]
+         set inlist = "$argv[1]"
       else if( $narg == 1 ) then
-         set outtable = $argv[1]
+         set outtable = "$argv[1]"
       else if( $narg == 2 ) then
-         set outimage = $argv[1]
+         set outimage = "$argv[1]"
       else
          echo "Too many arguments"
          set help = 1
