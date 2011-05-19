@@ -265,15 +265,35 @@ foreach n (`cat $inlist`)
       exit
    endif
 
-#  Check all the data is for the same wavelength. Also copy the FITS headers from the
-#  first input file to a text file (they will later be stored in the output image).
+#  Get the coordinate system used by MAKEMAP
+   $KAPPA_DIR/hislist $in | grep -q SYSTEM=\'TRACKING\'
+   if( $status == 0 ) then
+      set system = "TRACKING"
+   else
+      $KAPPA_DIR/hislist $in | grep -q SYSTEM=\'AZEL\'
+      if( $status == 0 ) then
+         set system = "AZEL"
+      else
+         echo "Cannot determine value used for MAKEMAP parameter 'SYSTEM' in $in"
+         exit
+      endif
+   endif
+
+#  Check all the data is for the same wavelength, and in the same SYSTEM. Also copy
+#  the FITS headers from the first input file to a text file (they will later be
+#  stored in the output image).
    if( $sar == -1 ) then
       set sar = $array
       rm -f smas-fits.log >& /dev/null
       $KAPPA_DIR/fitslist $in smas-fits.log
+      set system0 = $system
    else
       if( $subarray != $sar ) then
          echo "$n is for subarray $subarrray, which is not the same as the first NDF"
+         exit
+      endif
+      if( $system != $system0 ) then
+         echo "$n uses SYSTEM=$system, which is not the same as the first NDF"
          exit
       endif
    endif
@@ -343,11 +363,14 @@ foreach n (`cat $inlist`)
    endif
 end
 
-#  Create the line holding the column names in the output catalogue.
+
+#  Create the line holding the system name and the line holding the column names in
+#  the output catalogue.
+echo "# SYSTEM = $system" > $outtable
 if( $moon == 0 ) then
-   echo "# TAI UTC SEQSTART SEQEND DLON DLAT AMP SUM FWHM AXISR GAMMA ORIENT NDF BXCEN BYCEN BAMP BSUM BFWHM BAXISR BORIENT ROW COL" > $outtable
+   echo "# TAI UTC SEQSTART SEQEND DLON DLAT AMP SUM FWHM AXISR GAMMA ORIENT NDF BXCEN BYCEN BAMP BSUM BFWHM BAXISR BORIENT ROW COL" >> $outtable
 else
-   echo "# SUM ROW COL" > $outtable
+   echo "# SUM ROW COL" >> $outtable
 endif
 
 # Next loop round all the NDFs to be processed.
