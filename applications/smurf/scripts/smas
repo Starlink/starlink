@@ -3,6 +3,7 @@
 #  Set defaults
 set sum_method = PSF
 set diam = " "
+set error = " "
 set inlist = " "
 set outtable = " "
 set outimage = " "
@@ -36,7 +37,18 @@ while( $# > 0 )
          endif
       endif
 
-   else if( $argv[1] == "-h" || $argv[1] == "--help" ) then
+   else if( "$argv[1]" == "-e" ) then
+      set error = "1.0"
+
+      if( $# > 1 ) then
+         echo "$argv[2]" | grep -q '[a-zA-Z]'
+         if( $status == 1 ) then
+            set error = "$argv[2]"
+            shift
+         endif
+      endif
+
+   else if( "$argv[1]" == "-h" || "$argv[1]" == "--help" ) then
       set help = 1
 
 #  Report an error if it looks like an unknown option.
@@ -76,7 +88,7 @@ if( $help == 1 ) then
 
 Short Map Analysis Script
 
-Usage: smas [-a diam] <in-list> <out-table> [<out-image>]
+Usage: smas [-a diam] [-e error] <in-list> <out-table> [<out-image>]
 
    option:
       -a: Specifies that the catalogue fsum column values (the total
@@ -88,6 +100,14 @@ Usage: smas [-a diam] <in-list> <out-table> [<out-image>]
 	  integrated value under the model source calculated by
 	  KAPPA:PSF. If "diam" is not supplied, defaults of 30 and
 	  15 are used for 850 and 450 um data respectively.
+
+      -e: Specifies the maximum allowed error (in arc-seconds) between the
+          source position as determined by KAPPA:BEAMFIT and KAPPA:PSF.
+          If the discrepancy in X or Y is greater than this value, then
+          the shortmap or bolomap is not included in the returned catalogue
+          or image. If the -e option is unspecified, then no sources are
+          rejected. If no "error" value is supplied, a default of 1
+          arc-second is used.
 
    arguments:
       <in-list>: a text file in which each line contains the path
@@ -454,107 +474,126 @@ foreach n (`cat files.smas`)
          set orient = `$KAPPA_DIR/parget orient psf`
          set gamma = `$KAPPA_DIR/parget gamma psf`
 
+#  See if the beamfit and psf source positions are sufficiently similar.
+         if( $error != " " ) then
+            if( $bxcen != "null" && $bycen != "null" ) then
+               set ok = `$KAPPA_DIR/calc exp="abs(pa-pb)<=pc" pa=$bxcen pb=$posxy[1] pc=$error`
+               if( $ok == 1 ) then
+                  set ok = `$KAPPA_DIR/calc exp="abs(pa-pb)<=pc" pa=$bycen pb=$posxy[2] pc=$error`
+               endif
+            else
+               set ok = 0
+            endif
+         else
+            set ok = 1
+         endif
+
+#  Skip this map if the beamfit and psf positions disagree.
+         if( $ok == 1 ) then
+
 #  Get the total data sum. Two methods - 1) aperture photometry...
-         if( $sum_method == APERADD ) then
+            if( $sum_method == APERADD ) then
 
 #  Choose the aperture size in pixels (60 arc-secs assuming default makemap
 #  pixel sizes of 2 and 4 arc-seconds)..
-            if( "$diam" == " " ) then
-               if( $sar > 3 ) then
-                  set diam = 30
-               else
-                  set diam = 15
+               if( "$diam" == " " ) then
+                  if( $sar > 3 ) then
+                     set diam = 30
+                  else
+                     set diam = 15
+                  endif
                endif
-            endif
 
-            if( $first == 1  ) then
-               echo
-               echo "Using KAPPA:APERADD to determine total flux (aperture $diam arcsec)"
-               echo
-            endif
+               if( $first == 1  ) then
+                  echo
+                  echo "Using KAPPA:APERADD to determine total flux (aperture $diam arcsec)"
+                  echo
+               endif
 
 #  Replace any bad pixels within a box centred on the max pixel with sides twice
 #  the above diameter.
-            @ size = $diam + $diam
-            $KAPPA_DIR/fillbad in=$ndf\($maxco[1]~$size,$maxco[2]~$size\) size=2 out=filled-smas quiet
+               @ size = $diam + $diam
+               $KAPPA_DIR/fillbad in=$ndf\($maxco[1]~$size,$maxco[2]~$size\) size=2 out=filled-smas quiet
 
 #  Do the aperture photometry within the filled image. Check some bad pixels
 #  were filled. If not, use $ndf instead of "filled-smas".
-            if( $status == 0 ) then
-               $KAPPA_DIR/aperadd filled-smas centre="'$posxy'" diam=$diam quiet
-            else
-               $KAPPA_DIR/aperadd $ndf centre="'$posxy'" diam=$diam quiet
-            endif
-            set fsum = `$KAPPA_DIR/parget total aperadd`
+               if( $status == 0 ) then
+                  $KAPPA_DIR/aperadd filled-smas centre="'$posxy'" diam=$diam quiet
+               else
+                  $KAPPA_DIR/aperadd $ndf centre="'$posxy'" diam=$diam quiet
+               endif
+               set fsum = `$KAPPA_DIR/parget total aperadd`
 
 #  Alternatively - 2) use the integral of the model PSF as the souce total data sum.
-         else
-            if( $first == 1  ) then
-               echo
-               echo "Using KAPPA:PSF to determine total flux"
-               echo
+            else
+               if( $first == 1  ) then
+                  echo
+                  echo "Using KAPPA:PSF to determine total flux"
+                  echo
+               endif
+               set fsum = `$KAPPA_DIR/parget total psf`
             endif
-            set fsum = `$KAPPA_DIR/parget total psf`
-         endif
 
 #  Get the sequence number at start and end, if possible
-         set seqstart = `$KAPPA_DIR/fitsmod $ndf edit=print keyword=SEQSTART`
-         echo $seqstart | grep "does not exist" >& /dev/null
-         if( $status != 1 ) then
-            set seqstart = null
-         endif
+            set seqstart = `$KAPPA_DIR/fitsmod $ndf edit=print keyword=SEQSTART`
+            echo $seqstart | grep "does not exist" >& /dev/null
+            if( $status != 1 ) then
+               set seqstart = null
+            endif
 
-         set seqend = `$KAPPA_DIR/fitsmod $ndf edit=print keyword=SEQEND`
-         echo $seqend | grep "does not exist" >& /dev/null
-         if( $status != 1 ) then
-            set seqend = null
-         endif
+            set seqend = `$KAPPA_DIR/fitsmod $ndf edit=print keyword=SEQEND`
+            echo $seqend | grep "does not exist" >& /dev/null
+            if( $status != 1 ) then
+               set seqend = null
+            endif
 
-#  If possible get the MJD-AVG and TIMESYS FITS headers (shortmaps should have both of these).
-         set mjdavg = `$KAPPA_DIR/fitsmod $ndf edit=print keyword=MJD-AVG`
-         echo $mjdavg | grep "does not exist" >& /dev/null
-         if( $status != 1 ) then
-            set mjdavg = null
-            set timesys = null
-         else
-            set timesys = `$KAPPA_DIR/fitsmod $ndf edit=print keyword=TIMESYS`
-            echo $timesys | grep "does not exist" >& /dev/null
+#  If possible get the MJD-AVG and TIMESYS FITS headers (shortmaps should
+#  have both of these).
+            set mjdavg = `$KAPPA_DIR/fitsmod $ndf edit=print keyword=MJD-AVG`
+            echo $mjdavg | grep "does not exist" >& /dev/null
             if( $status != 1 ) then
                set mjdavg = null
                set timesys = null
+            else
+               set timesys = `$KAPPA_DIR/fitsmod $ndf edit=print keyword=TIMESYS`
+               echo $timesys | grep "does not exist" >& /dev/null
+               if( $status != 1 ) then
+                  set mjdavg = null
+                  set timesys = null
+               endif
             endif
-         endif
 
 #  If we have an MJD-AVG, store it as the TimeOrigin value in a TimeFrame.
-         $ATOOLS_DIR/asttimeframe options='system=mjd' result=tf
-         if( $mjdavg != null ) then
-            $ATOOLS_DIR/astset tf timescale $timesys result=tf
-            $ATOOLS_DIR/astset tf timeorigin $mjdavg result=tf
+            $ATOOLS_DIR/asttimeframe options='system=mjd' result=tf
+            if( $mjdavg != null ) then
+               $ATOOLS_DIR/astset tf timescale $timesys result=tf
+               $ATOOLS_DIR/astset tf timeorigin $mjdavg result=tf
 
 # If we do not have an MJD-AVG value, get the epoch from the WCS FrameSet, and
 # store it as the TimeOrigin value in a TimeFrame.
-         else
-            $ATOOLS_DIR/astset tf system JEPOCH result=tf
-            $ATOOLS_DIR/astset tf timescale TDB result=tf
-            set tdb = `$ATOOLS_DIR/astget $ndf epoch`
-            $ATOOLS_DIR/astset tf timeorigin $tdb result=tf
-            $ATOOLS_DIR/astset tf system MJD result=tf
-         endif
+            else
+               $ATOOLS_DIR/astset tf system JEPOCH result=tf
+               $ATOOLS_DIR/astset tf timescale TDB result=tf
+               set tdb = `$ATOOLS_DIR/astget $ndf epoch`
+               $ATOOLS_DIR/astset tf timeorigin $tdb result=tf
+               $ATOOLS_DIR/astset tf system MJD result=tf
+            endif
 
 #  Convert the TimeFrame to TAI timescale and get the converted TimeOrigin value.
-         $ATOOLS_DIR/astset tf timescale TAI result=tf
-         set tai = `$ATOOLS_DIR/astget tf timeorigin`
+            $ATOOLS_DIR/astset tf timescale TAI result=tf
+            set tai = `$ATOOLS_DIR/astget tf timeorigin`
 
 #  Covert the TimeFrame to UTC timescale and get the converted TimeOrigin value.
-         $ATOOLS_DIR/astset tf timescale UTC result=tf
-         set utc = `$ATOOLS_DIR/astget tf timeorigin`
+            $ATOOLS_DIR/astset tf timescale UTC result=tf
+            set utc = `$ATOOLS_DIR/astget tf timeorigin`
 
 #  Set the TimeFrame Format to ISO and get the UTC date-time string.
-         $ATOOLS_DIR/astset tf format iso.2T result=tf
-         set date = `$ATOOLS_DIR/astformat tf axis=1 value=0.0`
+            $ATOOLS_DIR/astset tf format iso.2T result=tf
+            set date = `$ATOOLS_DIR/astformat tf axis=1 value=0.0`
 
 #  Write a row to the output catalogue.
-         echo "$tai $date $seqstart $seqend $posxy[1] $posxy[2] $amp $fsum $fwhm $axisr $gamma $orient $n $bxcen $bycen $bamp $bsum $bfwhm $baxisr $borient $row $col" >> $outtable
+            echo "$tai $date $seqstart $seqend $posxy[1] $posxy[2] $amp $fsum $fwhm $axisr $gamma $orient $n $bxcen $bycen $bamp $bsum $bfwhm $baxisr $borient $row $col" >> $outtable
+         endif
 
 #  Report any PSF failure.
       else
