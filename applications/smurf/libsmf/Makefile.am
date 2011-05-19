@@ -280,6 +280,7 @@ smf_open_textfile.c \
 smf_pattern_extract.c \
 smf_pcorr.c \
 smf_polext.c \
+smf_pread.c \
 smf_puthistory.c \
 smf_qfamily_count.c \
 smf_qfamily_str.c \
@@ -311,6 +312,7 @@ smf_rebinseq_thread.c \
 smf_rebinslices.c \
 smf_rebinsparse.c \
 smf_reduce_dark.c \
+smf_remove_grp_metadata.c \
 smf_reorder.c \
 smf_reportprogress.c \
 smf_request_mask.c \

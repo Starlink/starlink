@@ -98,19 +98,16 @@ void smf_add_grp_metadata( Grp *grp, const char *name, const char *value,
                            int *status ){
 
 /* Local Variables: */
-   Grp *newslave;                /* New slave group */
    Grp *slave;                   /* Slave group */
    char *item;                   /* Buffer for formatted item */
-   char buff[ GRP__SZNAM  + 1 ]; /* Buffer for group element text */
    char vbuff[ GRP__SZNAM ];     /* Buffer for user-supplied value */
-   int changed;                  /* Have slave group been changed? */
    int nc;                       /* Length of item */
-   size_t i;                     /* Index of current group element */
-   size_t nlen;                  /* Length of supplied name */
-   size_t size;                  /* Size of slave group */
 
 /* Check the inherited status. */
    if( *status != SAI__OK ) return;
+
+/* Delete any existing value for the metadata item. */
+   smf_remove_grp_metadata( grp, name, status );
 
 /* If no value was supplied, get a value from the environment using the
    supplied name as a parameter name. */
@@ -138,31 +135,6 @@ void smf_add_grp_metadata( Grp *grp, const char *name, const char *value,
       if( !slave ) {
          slave = grpNew( " ", status );
          grpSown( slave, grp, status );
-
-/* If a slave group already exists, create a new slave group that excludes
-   any existing value for the specified name. */
-      } else {
-         changed = 0;
-         newslave = grpNew( " ", status );
-         nlen = strlen( name );
-         size = grpGrpsz( slave, status );
-         for( i = 1; i <= size; i++ ) {
-            grpInfoc( slave, i, "NAME", buff, sizeof( buff ), status );
-            if( strncmp( buff, name, nlen ) || buff[ nlen ] != '=' ) {
-               grpPut1( newslave, buff, 0, status );
-            } else {
-               changed = 1;
-            }
-         }
-
-         if( changed ) {
-            grpSown( slave, NULL, status );
-            grpDelet( &slave, status );
-            slave = newslave;
-            grpSown( slave, grp, status );
-         } else {
-            grpDelet( &newslave, status );
-         }
       }
 
 /* Format the metadata item. */

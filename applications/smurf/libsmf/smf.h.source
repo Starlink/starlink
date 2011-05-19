@@ -1420,9 +1420,11 @@ FILE *smf_open_textfile( const char *param, const char *mode, const char *def,
 int smf_pattern_extract ( const char * sourcestr, const char * pattern,
                           double *dresult, char * sresult, size_t szstr, int * status );
 
-void smf_pcorr( smfHead *head, const char *file, int *status );
+void smf_pcorr( smfHead *head, const Grp *igrp, int *status );
 
 void smf_polext( int ondf, double angle, int *status );
+
+void smf_pread( Grp *igrp, const char *param, int *status );
 
 void smf_puthistory( smfData *data, const char *appn, int *status );
 
@@ -1570,6 +1572,8 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
 
 void smf_reduce_dark( const smfData *indark, smf_dtype dtype,
                       smfData **outdark, int *status );
+
+void smf_remove_grp_metadata( Grp *grp, const char *name, int *status );
 
 void smf_reorder( const char *type, void *in, int len, int ndim, int *dims,
                   int axis, int *index, int maxis, int *mask, void *out,

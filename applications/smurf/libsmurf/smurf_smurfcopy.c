@@ -183,9 +183,9 @@ void smurf_smurfcopy ( int * status ) {
   }
 
   /* Allow the user to specify a text file containing a table of pointing
-     corrections. The name of the file (if any) is stored in the "igrp"
-     group as as an item of metadata. */
-  smf_add_grp_metadata( igrp, "POINTING", NULL, status );
+     corrections. Corresponding Mappings are created form the column data
+     in this table and stored in the "igrp" group as items of metadata. */
+  smf_pread( igrp, "POINTING", status );
 
   /* Use a loop so that we look like other routines and simplify
      the change if we support multiple input files */
@@ -265,7 +265,10 @@ void smurf_smurfcopy ( int * status ) {
   }
 
   /* tidy */
-  if (igrp) grpDelet( &igrp, status );
+  if (igrp) {
+    smf_pread( igrp, NULL, status );
+    grpDelet( &igrp, status );
+  }
   if (ogrp) grpDelet( &ogrp, status );
 
   ndfEnd(status);

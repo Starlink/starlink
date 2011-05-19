@@ -13,21 +13,17 @@
 *     C function
 
 *  Invocation:
-*     void smf_pcorr( smfHead *head, const char *file, int *status )
+*     void smf_pcorr( smfHead *head, const Grp *igrp, int *status )
 
 *  Arguments:
 *     head = smfHead * (Given)
 *        Pointer to the smfHead structure conting the JCMTSTATE
 *        information to be modified.
-*     file = const char * (Given)
-*        The name of the text file contining a table of longitude and
-*        latitude offsets against time. The file should be in TOPCAT
-*        "ascii" format with three columns called TAI, DLON and DLAT.
-*        The TAI column is the TAI MJD, the DLON column is the longitude
-*        offset in arc-seconds, and the DLAT column is the latitude offset
-*        arc-seconds. The longitude and latitude axes are AZEL unless the
-*        table contains a comment line of the form "# SYSTEM=TRACKING".
-*        The TAI values should be monotonic increasing with row number.
+*     igrp = const Grp * (Given)
+*        A group which has associated metadata contining Mappings from MJD
+*        to DLON and DLAT, and the system (TRACKING or AZEL) of the
+*        DLON/DLAT values. This information is stored in the group by
+*        smf_pread.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -74,7 +70,7 @@
 
 /* Starlink includes */
 #include "ast.h"
-#include "star/atl.h"
+#include "star/grp.h"
 #include "mers.h"
 #include "sae_par.h"
 
@@ -83,15 +79,13 @@
 #include "libsmf/smf_typ.h"
 #include "jcmt/state.h"
 
-void smf_pcorr( smfHead *head, const char *file, int *status ){
+void smf_pcorr( smfHead *head, const Grp *igrp, int *status ){
 
 /* Local Variables: */
    AstMapping *dlatmap;
    AstMapping *dlonmap;
-   AstMapping *taimap;
-   AstTable *table;
    JCMTState *state;
-   const char *system;
+   char buff[ GRP__SZNAM + 1 ];
    dim_t iframe;
    double *dlat;
    double *dlon;
@@ -104,61 +98,79 @@ void smf_pcorr( smfHead *head, const char *file, int *status ){
    double rot;
    double sinrot;
    int azel;
+   void *p;
 
 /* Check the inherited status. */
    if( *status != SAI__OK ) return;
 
-/* Begin an AST context */
-   astBegin;
+/* See if the supplied group has a metadata item called "DLONMAP". If
+   not, there are no pointing corrections to apply. */
+   buff[ 0 ] = 0;
+   smf_get_grp_metadata( igrp, "DLONMAP", buff, status );
+   if( buff[ 0 ] ) {
 
-/* Attempt to read an AST Table from the text file. */
-   table = atlReadTable( file, status );
+/* The value of the DLONMAP metadata item in the group is the formatted
+   pointer to an AST Mapping from TAI MJD to arc-distance offsets
+   parallel to the longitude axis (in arc-seconds). Unformat the text to
+   get the usable pointer. */
+      sscanf( buff, "%p", &p );
+      dlonmap = (AstMapping *) p;
 
-/* Create a LutMap from each of the three columns. */
-   taimap = (AstMapping *) atlTablelutMap( table, "TAI", status );
-   dlonmap = (AstMapping *) atlTablelutMap( table, "DLON", status );
-   dlatmap = (AstMapping *) atlTablelutMap( table, "DLAT", status );
+/* Likewise, get a pointer to the DLATMAP Mapping, from TAI MJD to arc-distance
+   offsets parallel to the latitude axis (in arc-seconds). */
+      buff[ 0 ] = 0;
+      smf_get_grp_metadata( igrp, "DLATMAP", buff, status );
+      if( !buff[ 0 ] ) {
+         dlatmap = NULL;
+         *status = SAI__ERROR;
+         errRep( " ", "smf_pcorr: DLATMAP not found in group metadata.",
+                 status );
+      } else {
+         sscanf( buff, "%p", &p );
+         dlatmap = (AstMapping *) p;
+      }
 
-/* Create Mappings that transforms TAI into a DLON and DLAT. These use
-   linear interpolation for non-tabulated TAI values. */
-   astInvert( taimap );
-   dlonmap = (AstMapping *) astCmpMap( taimap, dlonmap, 1, " " );
-   dlatmap = (AstMapping *) astCmpMap( taimap, dlatmap, 1, " " );
+/* Also get the system of the axes - AZEL or TRACKING. Default to AZEL. */
+      azel = 1;
+      buff[ 0 ] = 0;
+      smf_get_grp_metadata( igrp, "PSYSTEM", buff, status );
+      if( buff[ 0 ] ) {
+         buff[ astChrLen( buff ) ] = 0;
+         if( astChrMatch( buff, "TRACKING" ) ) {
+            azel = 0;
+         } else if( !astChrMatch( buff, "AZEL" ) && *status == SAI__OK ) {
+            *status = SAI__ERROR;
+            msgSetc( "S", buff );
+            errRep( " ", "smf_pcorr: Bad system (^S).", status );
+         }
+      }
 
 /* Allocate arrays to hold the tai, dlon and dlat values at every frame. */
-   tai = astMalloc( head->nframes*sizeof( double ) );
-   dlon = astMalloc( head->nframes*sizeof( double ) );
-   dlat = astMalloc( head->nframes*sizeof( double ) );
-   if( *status == SAI__OK ) {
+      tai = astMalloc( head->nframes*sizeof( double ) );
+      dlon = astMalloc( head->nframes*sizeof( double ) );
+      dlat = astMalloc( head->nframes*sizeof( double ) );
+      if( *status == SAI__OK ) {
 
 /* Store the TAI at every frame. */
-      for( iframe = 0; iframe < head->nframes; iframe++ ){
-         state = head->allState + iframe;
-         tai[ iframe ] = state->tcs_tai;
-      }
+         for( iframe = 0; iframe < head->nframes; iframe++ ){
+            state = head->allState + iframe;
+            tai[ iframe ] = state->tcs_tai;
+         }
 
-/* Use the above Mappings to transform TAI into DLON and DLAT values at
-   every frame (still in arc-seconds). */
-      astTran1( dlonmap, head->nframes, tai, 1, dlon );
-      astTran1( dlatmap, head->nframes, tai, 1, dlat );
+/* Lock the Mappings for use by this thread. Wait for them if they are
+   currently in use by a different thread. */
+         astLock( dlonmap, 1 );
+         astLock( dlatmap, 1 );
 
-/* See what system the DLON/DLAT values refer to. Default to AZEL. */
-      if( !astMapGet0C( table, "SYSTEM", &system ) ) system = "AZEL";
+/* Use the Mappings to transform TAI into DLON and DLAT values at every frame
+   (still in arc-seconds). */
+         astTran1( dlonmap, head->nframes, tai, 1, dlon );
+         astTran1( dlatmap, head->nframes, tai, 1, dlat );
 
-      if( astChrMatch( system, "AZEL" ) ) {
-         azel = 1;
-
-      } else if( astChrMatch( system, "TRACKING" ) ) {
-         azel = 0;
-
-      } else if( *status == SAI__OK ){
-         msgSetc( "S", system );
-         *status = SAI__ERROR;
-         errRep( " ", "Unknown SYSTEM '^S' specified in pointing "
-                 "corrections file.", status );
-      }
-
-      if( *status == SAI__OK ) {
+/* We have now finished with the Mappings, so unlock them so that hey can
+   be used by other threads. */
+         astUnlock( dlonmap, 1 );
+         astUnlock( dlatmap, 1 );
 
 /* Loop round every time slice */
          dlon_az = AST__BAD;
@@ -208,27 +220,11 @@ void smf_pcorr( smfHead *head, const char *file, int *status ){
             }
          }
       }
-   }
-
-/* Debug message. */
-   msgSetc( "F", file );
-   msgSetc( "S", azel ? "AZEL" : "TRACKING" );
-   msgOutif( MSG__DEBUG, " ", "^S pointing corrections read from file ^F",
-             status );
 
 /* Free resources. */
-   tai = astFree( tai );
-   dlon = astFree( dlon );
-   dlat = astFree( dlat );
-
-/* End the AST context */
-   astEnd;
-
-/* Issue a context message if anything went wrong. */
-   if( *status != SAI__OK ) {
-      msgSetc( "F", file );
-      errRep( " ", "Failed to read pointing corrections from text file ^F.",
-              status );
+      tai = astFree( tai );
+      dlon = astFree( dlon );
+      dlat = astFree( dlat );
    }
 }
 

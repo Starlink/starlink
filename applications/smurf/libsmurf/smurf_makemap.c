@@ -1365,9 +1365,9 @@ void smurf_makemap( int *status ) {
   }
 
   /* Allow the user to specify a text file containing a table of pointing
-     corrections. The name of the file (if any) is stored in the "igrp"
-     group as as an item of metadata. */
-  smf_add_grp_metadata( igrp, "POINTING", NULL, status );
+     corrections. Corresponding Mappings are created from the column data
+     and stored in the "igrp" group as items of metadata. */
+  smf_pread( igrp, "POINTING", status );
 
   /* Calculate the map bounds */
 
@@ -2093,7 +2093,10 @@ void smurf_makemap( int *status ) {
   if( wf ) wf = smf_destroy_workforce( wf );
   if( spacerefwcs ) spacerefwcs = astAnnul( spacerefwcs );
   if( outfset != NULL ) outfset = astAnnul( outfset );
-  if( igrp != NULL ) grpDelet( &igrp, status);
+  if( igrp != NULL ) {
+    smf_pread( igrp, NULL, status );
+    grpDelet( &igrp, status);
+  }
   if( igrp4 != NULL) grpDelet( &igrp4, status);
   if( ogrp != NULL ) grpDelet( &ogrp, status);
   if( boxes ) boxes = astFree( boxes );
