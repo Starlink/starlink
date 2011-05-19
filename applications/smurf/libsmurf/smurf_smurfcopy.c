@@ -48,19 +48,18 @@
 *          comment lines, but if any comment line has the form "# SYSTEM=AZEL"
 *          or "# SYSTEM=TRACKING" then it determines the system in which the
 *          pointing correction are specified (SYSTEM defaults to AZEL). The
-*          last comment line should be "# MJD DLON DLAT" and specifies the
-*          names for the three columns of numerical values that follow.
-*          Each remaining line should contain three numerical values
-*          separated by white space: the first is a TAI time given as an
-*          MJD, the second and third give arc-distance offsets parallel
-*          to the longitude and latitude axes, in arc-seconds. The MJD values
+*          last comment line should be a space-separated list of column names,
+*          including "TAI", "DLON" and "DLAT". Each remaining line should
+*          contain numerical values for each column, separated by white space.
+*          The TAI column should contain the TAI time given as an MJD. The
+*          DLON and DLAT columns should give arc-distance offsets parallel
+*          to the longitude and latitude axes, in arc-seconds. The TAI values
 *          should be monotonic increasing with row number. The longitude and
 *          latitude axes are either AXEL or TRACKING as determined by the
 *          SYSTEM value in the header comments. Blank lines are ignored.
-*          The DLON and DLAT values are added onto the SMU jiggle
-*          positions stored in the JCMTSTATE extension of the input NDFs.
-*          DLON and DLAT values for non-tabulated times are determined by
-*          interpolation. [!]
+*          The DLON and DLAT values are added onto the SMU jiggle positions
+*          stored in the JCMTSTATE extension of the input NDFs. DLON and DLAT
+*          values for non-tabulated times are determined by interpolation. [!]
 *     SLICE = _INTEGER (Read)
 *          Index of time axis (GRID coordinates). 0 can be used to specify
 *          the last slice in the file without having to know how many

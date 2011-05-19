@@ -22,12 +22,12 @@
 *     file = const char * (Given)
 *        The name of the text file contining a table of longitude and
 *        latitude offsets against time. The file should be in TOPCAT
-*        "ascii" format with three columns called MJD DLON and DLAT.
-*        The MJD column is the TAI MJD, the DLON column is the longitude
+*        "ascii" format with three columns called TAI, DLON and DLAT.
+*        The TAI column is the TAI MJD, the DLON column is the longitude
 *        offset in arc-seconds, and the DLAT column is the latitude offset
 *        arc-seconds. The longitude and latitude axes are AZEL unless the
 *        table contains a comment line of the form "# SYSTEM=TRACKING".
-*        The MJD values should be monotonic increasing with row number.
+*        The TAI values should be monotonic increasing with row number.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -88,14 +88,14 @@ void smf_pcorr( smfHead *head, const char *file, int *status ){
 /* Local Variables: */
    AstMapping *dlatmap;
    AstMapping *dlonmap;
-   AstMapping *mjdmap;
+   AstMapping *taimap;
    AstTable *table;
    JCMTState *state;
    const char *system;
    dim_t iframe;
    double *dlat;
    double *dlon;
-   double *mjd;
+   double *tai;
    double cosrot;
    double dlat_az;
    double dlat_tr;
@@ -115,32 +115,32 @@ void smf_pcorr( smfHead *head, const char *file, int *status ){
    table = atlReadTable( file, status );
 
 /* Create a LutMap from each of the three columns. */
-   mjdmap = (AstMapping *) atlTablelutMap( table, "MJD", status );
+   taimap = (AstMapping *) atlTablelutMap( table, "TAI", status );
    dlonmap = (AstMapping *) atlTablelutMap( table, "DLON", status );
    dlatmap = (AstMapping *) atlTablelutMap( table, "DLAT", status );
 
-/* Create Mappings that transforms MJD into a DLON and DLAT. These use
-   linear interpolation for non-tabulated MJD values. */
-   astInvert( mjdmap );
-   dlonmap = (AstMapping *) astCmpMap( mjdmap, dlonmap, 1, " " );
-   dlatmap = (AstMapping *) astCmpMap( mjdmap, dlatmap, 1, " " );
+/* Create Mappings that transforms TAI into a DLON and DLAT. These use
+   linear interpolation for non-tabulated TAI values. */
+   astInvert( taimap );
+   dlonmap = (AstMapping *) astCmpMap( taimap, dlonmap, 1, " " );
+   dlatmap = (AstMapping *) astCmpMap( taimap, dlatmap, 1, " " );
 
-/* Allocate arrays to hold the mjd, dlon and dlat values at every frame. */
-   mjd = astMalloc( head->nframes*sizeof( double ) );
+/* Allocate arrays to hold the tai, dlon and dlat values at every frame. */
+   tai = astMalloc( head->nframes*sizeof( double ) );
    dlon = astMalloc( head->nframes*sizeof( double ) );
    dlat = astMalloc( head->nframes*sizeof( double ) );
    if( *status == SAI__OK ) {
 
-/* Store the MJD at every frame. */
+/* Store the TAI at every frame. */
       for( iframe = 0; iframe < head->nframes; iframe++ ){
          state = head->allState + iframe;
-         mjd[ iframe ] = state->tcs_tai;
+         tai[ iframe ] = state->tcs_tai;
       }
 
-/* Use the above Mappings to transform MJD into DLON and DLAT values at
+/* Use the above Mappings to transform TAI into DLON and DLAT values at
    every frame (still in arc-seconds). */
-      astTran1( dlonmap, head->nframes, mjd, 1, dlon );
-      astTran1( dlatmap, head->nframes, mjd, 1, dlat );
+      astTran1( dlonmap, head->nframes, tai, 1, dlon );
+      astTran1( dlatmap, head->nframes, tai, 1, dlat );
 
 /* See what system the DLON/DLAT values refer to. Default to AZEL. */
       if( !astMapGet0C( table, "SYSTEM", &system ) ) system = "AZEL";
@@ -217,7 +217,7 @@ void smf_pcorr( smfHead *head, const char *file, int *status ){
              status );
 
 /* Free resources. */
-   mjd = astFree( mjd );
+   tai = astFree( tai );
    dlon = astFree( dlon );
    dlat = astFree( dlat );
 
