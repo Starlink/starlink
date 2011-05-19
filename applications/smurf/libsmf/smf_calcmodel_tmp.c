@@ -292,7 +292,7 @@ void smf_calcmodel_tmp( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         smf_stats1D( model_data + 1*mcstride, mbstride, nbolo,
                      NULL, 0, 0, &mean_o, NULL, &n_o, status );
 
-        smf_stats1D( model_data + 0*mcstride, mbstride, nbolo,
+        smf_stats1D( model_data + 2*mcstride, mbstride, nbolo,
                      NULL, 0, 0, &mean_corr, NULL, &n_corr, status );
 
         msgOutiff( MSG__VERB, "", "    mean gain=%lf (%zu samples)",
