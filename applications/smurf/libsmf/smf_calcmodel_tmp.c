@@ -47,6 +47,8 @@
 *  History:
 *     2011-04-21 (EC):
 *        Initial Version borrowing from smf_calcmodel_tmp
+*     2011-05-19 (EC):
+*        Add some diagnostic output for MSG__DEBUG and MSG__VERB
 
 *  Copyright:
 *     Copyright (C) 2011 University of British Columbia.
@@ -271,7 +273,35 @@ void smf_calcmodel_tmp( smfWorkForce *wf, smfDIMMData *dat, int chunk,
           model_data[i*mbstride+0*mcstride] = g;
           model_data[i*mbstride+1*mcstride] = o;
           model_data[i*mbstride+2*mcstride] = corr;
+
+          /* Report per-bolo stats */
+          msgOutiff( MSG__DEBUG, "", FUNC_NAME
+                     ": bolo %zu gain=%lf off=%lf corr=%lf", status,
+                     i, g, o, corr );
         }
+      }
+
+      /* Report mean stats */
+      if( msgIflev( NULL, status ) >= MSG__VERB ) {
+        double mean_g, mean_o, mean_corr;
+        size_t n_g, n_o, n_corr;
+
+        smf_stats1D( model_data + 0*mcstride, mbstride, nbolo,
+                     NULL, 0, 0, &mean_g, NULL, &n_g, status );
+
+        smf_stats1D( model_data + 1*mcstride, mbstride, nbolo,
+                     NULL, 0, 0, &mean_o, NULL, &n_o, status );
+
+        smf_stats1D( model_data + 0*mcstride, mbstride, nbolo,
+                     NULL, 0, 0, &mean_corr, NULL, &n_corr, status );
+
+        msgOutiff( MSG__VERB, "", FUNC_NAME ": mean gain=%lf (%zu samples)",
+                   status, mean_g, n_g);
+        msgOutiff( MSG__VERB, "", FUNC_NAME ": mean off =%lf (%zu samples)",
+                   status, mean_o, n_o );
+        msgOutiff( MSG__VERB, "", FUNC_NAME ": mean corr=%lf (%zu samples)",
+                   status, mean_corr, n_corr );
+
       }
     }
   }
