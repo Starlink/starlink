@@ -145,8 +145,8 @@ Usage: smas [-a diam] [-e error] <in-list> <out-table> [<out-image>]
       - UTC: The UTC date and time string associated with the NDF
       - SEQSTART - RTS index number of first frame
       - SEQEND - RTS index number of last frame
-      - XCEN: The X pixel co-ordinate at the centre of the source
-      - YCEN: The Y pixel co-ordinate at the centre of the source
+      - DLON: The longitude offset at the centre of the source, in arc-seconds
+      - DLAT: The latitude offset at the centre of the source, in arc-seconds
       - AMP: The peak value in the source
       - SUM: The total data sum in the source. This is the integral
         of the Gaussian-like model calculated by KAPPA:PSF
@@ -345,7 +345,7 @@ end
 
 #  Create the line holding the column names in the output catalogue.
 if( $moon == 0 ) then
-   echo "# TAI UTC SEQSTART SEQEND XCEN YCEN AMP SUM FWHM AXISR GAMMA ORIENT NDF BXCEN BYCEN BAMP BSUM BFWHM BAXISR BORIENT ROW COL" > $outtable
+   echo "# TAI UTC SEQSTART SEQEND DLON DLAT AMP SUM FWHM AXISR GAMMA ORIENT NDF BXCEN BYCEN BAMP BSUM BFWHM BAXISR BORIENT ROW COL" > $outtable
 else
    echo "# SUM ROW COL" > $outtable
 endif
