@@ -1150,8 +1150,10 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                              &res[0], NULL, status );
 
         /* Assign each time slice to a scan angle bin */
-        smf_find_thetabins( res[0]->sdata[0], 1, &thetabins, &thetabincen,
-                            &nthetabin, &whichthetabin, status );
+        if (*status == SAI__OK) {
+          smf_find_thetabins( res[0]->sdata[0], 1, &thetabins, &thetabincen,
+                              &nthetabin, &whichthetabin, status );
+        }
 
         /*** TIMER ***/
         msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ": ** %f s concatenating data",
