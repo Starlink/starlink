@@ -8,62 +8,57 @@ set outtable = " "
 set outimage = " "
 set help = 0
 set narg = 0
-set word = " "
-
-#  Look at each word on the command line in turn.
-while( $# > 0 )
-   set arg = " "
 
 #  Classify the first word left on the command line, and then shift all
-#  words one to the left so that he second word becomes the first word.
+#  words one to the left so that the second word becomes the first word.
+while( $# > 0 )
 
-#  If the previous first word was "-a" then the current first word is either
-#  the aperture diameter or the <in-list> file. We assume it is the diameter
-#  if the word consists only of digits.
-   if( $word == "-a" ) then
-      echo $argv[1] | grep -q '[a-zA-Z]'
-      if( $status == 1 ) then
-         set diam = $argv[1]
-      else
-         set arg = $argv[1]
-      endif
+#  Does the first word look like an option?
+   echo $argv[1] | grep -q "^-"
+   if( $status == 0 ) then
+      set option = 1
+   else
+      set option = 0
+   endif
 
-#  Check for each supported option.
-   else if( $argv[1] == "-a" ) then
+#  If the first word is a known option, set the default value for the option
+#  and then look at the second word to see if it looks like a value for the
+#  option. If it does, use it in place of the default value and shift the
+#  argument list so that it is not re-used.
+   if( $argv[1] == "-a" ) then
       set sum_method = APERADD
+
+      if( $# > 1 ) then
+         echo $argv[2] | grep -q '[a-zA-Z]'
+         if( $status == 1 ) then
+            set diam = $argv[2]
+            shift
+         endif
+      endif
 
    else if( $argv[1] == "-h" || $argv[1] == "--help" ) then
       set help = 1
 
-#  See if the first word is an argument (i.e. a word that does not begin with
-#  a dash).
-   else
-      echo $argv[1] | grep -q "^-"
-      if( $status == 0 ) then
-         echo "Unknown option: $argv[1]"
-         set help = 1
-      else
-         set arg = $argv[1]
-      endif
-   endif
+#  Report an error if it looks like an unknown option.
+   else if( $option == 1 ) then
+      echo "Unknown option: $argv[1]"
+      set help = 1
 
-#  Each argument is identified by its index within the total list of arguments.
-   if( "$arg" != " " ) then
+#  If the current word is not an option, use it as the next positional
+#  argument.
+   else
       if( $narg == 0 ) then
-         set inlist = $arg
+         set inlist = $argv[1]
       else if( $narg == 1 ) then
-         set outtable = $arg
+         set outtable = $argv[1]
       else if( $narg == 2 ) then
-         set outimage = $arg
+         set outimage = $argv[1]
       else
          echo "Too many arguments"
          set help = 1
       endif
       @ narg = $narg + 1
    endif
-
-#  Save the current first word.
-   set word = $argv[1]
 
 #  Shift the command line words so that the second word becomes the first
 #  word (and the first word is lost)
