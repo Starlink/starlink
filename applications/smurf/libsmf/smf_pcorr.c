@@ -204,19 +204,19 @@ void smf_pcorr( smfHead *head, const Grp *igrp, int *status ){
 /* Add the dlon and dlat values onto the SMU jiggle positions (note, these
    are in units of arc-seconds, not radians). */
             if(  state->smu_az_jig_x != VAL__BADD ) {
-               state->smu_az_jig_x += dlon_az;
+               state->smu_az_jig_x -= dlon_az;
             }
 
             if(  state->smu_az_jig_y != VAL__BADD ) {
-               state->smu_az_jig_y += dlat_az;
+               state->smu_az_jig_y -= dlat_az;
             }
 
             if(  state->smu_tr_jig_x != VAL__BADD ) {
-               state->smu_tr_jig_x += dlon_tr;
+               state->smu_tr_jig_x -= dlon_tr;
             }
 
             if(  state->smu_tr_jig_y != VAL__BADD ) {
-               state->smu_tr_jig_y += dlat_tr;
+               state->smu_tr_jig_y -= dlat_tr;
             }
          }
       }
