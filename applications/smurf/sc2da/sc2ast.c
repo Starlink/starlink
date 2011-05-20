@@ -2117,7 +2117,7 @@ const char * sc2ast_convert_system
    } else {
       *status = SAI__ERROR;
       sprintf( errmess,
-               "The JCMT coordinate system %s does not "
+               "The JCMT coordinate system '%s' does not "
                "have an equivalent AST System value.", label );
       ErsRep( 0, status, errmess);
    }
