@@ -846,6 +846,9 @@
 *        detectors were trimmed).
 *     26-MAR-2011 (DSB)
 *        Added parameters REFPIX1, REFPIX2 and PIXREF.
+*     20-MAY-2011 (DSB)
+*        If TRIM is TRUE, annul error caused by empty output tiles, and
+*        proceed to produce remaining tiles.
 
 *  Copyright:
 *     Copyright (C) 2007-2011 Science and Technology Facilities Council.
@@ -2035,10 +2038,30 @@ void smurf_makecube( int *status ) {
          smf_reshapendf( &odata, tile, status );
 
 /* If required trim any remaining bad borders, and annul the cloned output
-   NDF identifier. */
+   NDF identifier. Catch NDFs that have no good data values. Annul the
+   error, flag that the output NDF should be deleted and issue a warning. */
          if( tndf != NDF__NOID ) {
-            if( trim ) kpg1Badbx( tndf, 2, &junk, &junk, status );
-            ndfAnnul( &tndf, status );
+            int delete = 0;
+            if( trim && *status == SAI__OK ) {
+               kpg1Badbx( tndf, 2, &junk, &junk, status );
+               if( *status == SAI__ERROR ) {
+                  errAnnul( status );
+                  delete = 1;
+                  msgOutif( MSG__NORM, " ", "      No usable input data "
+                            "falls within this output tile.", status );
+                  msgOutif( MSG__NORM, " ", "      The tile will not be "
+                            "created.", status );
+                  msgBlank( status );
+                  blank = 1;
+               }
+            }
+
+/* Delete or annul the NDF as required. */
+            if( delete ) {
+               ndfDelet( &tndf, status );
+            } else {
+               ndfAnnul( &tndf, status );
+            }
          }
 
 /* Free other resources related to the current tile. */
