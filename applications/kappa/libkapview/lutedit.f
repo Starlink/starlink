@@ -61,12 +61,14 @@
 
 *  Copyright:
 *     Copyright (C) 2001, 2004 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils.
+*     Copyright (C) 2011 Science and Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -76,19 +78,24 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB David S. Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     19-NOV-2001 (DSB):
 *        Original version.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2011 May 20 (MJC):
+*        Add an AGI context before calling AGI_ASSOC, so that the code
+*        adheres to 2006-revised expectations of the AGI closing
+*        subroutine.
 *     {enter_further_changes_here}
 
 *-
@@ -137,10 +144,16 @@
 *  Begin an NDF context.
       CALL NDF_BEGIN
 
+*  Start an initial AGI context. This allows the corresponding AST_END
+*  to annul the identifier returned by the following call to AGI_ASSOC.
+*  This accounts for the 2006 Feb 6 changes to KPG1_PGOPN and
+*  KPG1_PGCLS.
+      CALL AGI_BEGIN
+
 *  Associate the parameter with a workstation and current picture.
       CALL AGI_ASSOC( 'DEVICE', 'READ', IPIC, STATUS )
 
-*  If no device given, annull the error.
+*  If no device given, annul the error.
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          DEVOPN = .FALSE.
