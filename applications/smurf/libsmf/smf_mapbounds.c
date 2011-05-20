@@ -157,6 +157,8 @@
 *        - Ensure that the "moving" flag is assigned a value even if the
 *        output skyframe is supplied via spacerefwcs.
 *        - Report an error if the extreme positions cannot be found.
+*     2011-05-19 (TIMJ):
+*        Find the first valid TCS position when building up framesets.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -393,13 +395,38 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
     }
 
     if( *status == SAI__OK) {
+      size_t goodidx = SMF__BADSZT;
+
+      /* Need to build up a frameset based on good telescope position.
+         We can not assume that we the first step will be a good TCS position
+         so we look for one. If we can not find anything we skip to the
+         next file. */
+      maxloop = (data->dims)[2];
+      for (j=0; j<maxloop; j++) {
+        JCMTState state = (hdr->allState)[j];
+        if (state.jos_drcontrol >= 0 && state.jos_drcontrol & drcntrl_mask ) {
+          /* bad TCS - so try again */
+        } else {
+          /* Good tcs */
+          goodidx = j;
+          break;
+        }
+      }
+
+      if (goodidx == SMF__BADSZT) {
+        smf_smfFile_msg( data->file, "FILE", 1, "<unknown>");
+        msgOutif( MSG__QUIET, "", "No good telescope positions found in file ^FILE. Ignoring",
+                  status );
+        smf_close_file( &data, status );
+        continue;
+      }
 
       /* Create output SkyFrame if it has not come from a reference */
       if ( oskyframe == NULL ) {
 
         /* smf_tslice_ast only needs to get called once to set up framesets */
-        if( data->hdr->wcs == NULL ) {
-          smf_tslice_ast( data, 0, 1, status);
+        if( hdr->wcs == NULL ) {
+          smf_tslice_ast( data, goodidx, 1, status);
         }
 
         /* Retrieve input SkyFrame */
@@ -431,8 +458,8 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
       } else {
 
         /* smf_tslice_ast only needs to get called once to set up framesets */
-        if( data->hdr->wcs == NULL ) {
-          smf_tslice_ast( data, 0, 1, status);
+        if( hdr->wcs == NULL ) {
+          smf_tslice_ast( data, goodidx, 1, status);
         }
 
         /* Retrieve input SkyFrame */
@@ -484,7 +511,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
            For dream/stare we just look at the start and end time slices to
            account for sky rotation. */
 
-        if (data->hdr->obsmode != SMF__OBS_SCAN) {
+        if (hdr->obsmode != SMF__OBS_SCAN) {
           textreme[0] = 0;
           textreme[1] = (data->dims)[2] - 1;
           maxloop = 2;
@@ -503,15 +530,15 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
           for (j=0; j<4; j++) { textreme[j] = (dim_t)VAL__BADI; }
 
           /* see if the input frame is moving but the output is not */
-          tracksys = sc2ast_convert_system( (hdr->allState)[0].tcs_tr_sys,
+          tracksys = sc2ast_convert_system( (hdr->allState)[goodidx].tcs_tr_sys,
                                             status );
           if (strcmp(tracksys, "GAPPT") == 0 ||
               strcmp(tracksys, "AZEL") == 0) {
             if (strcmp(system, "APP") != 0 &&
                 strcmp(system, "AZEL") != 0) {
               usefixedbase = 1;
-              bc1 = (hdr->allState)[0].tcs_tr_bc1;
-              bc2 = (hdr->allState)[0].tcs_tr_bc2;
+              bc1 = (hdr->allState)[goodidx].tcs_tr_bc1;
+              bc2 = (hdr->allState)[goodidx].tcs_tr_bc2;
             }
           }
 
