@@ -293,6 +293,8 @@ f     - AST_SKYOFFSETMAP: Obtain a Mapping from absolute to offset coordinates
 *     29-APR-2011 (DSB):
 *        Prevent astFindFrame from matching a subclass template against a
 *        superclass target.
+*     23-MAY-2011 (DSB):
+*        Truncate returned PointSet in function FrameGrid to exclude unused points.
 *class--
 */
 
@@ -2142,6 +2144,9 @@ static AstPointSet *FrameGrid( AstFrame *this_object, int size, const double *lb
 /* Get the latitude on the next parallel. */
             lat += lat_size;
          }
+
+/* Truncate the PointSet to exclude unused elements at the end. */
+         astSetNpoint( result, ip );
       }
 
 /* Report error if supplied values were bad. */
