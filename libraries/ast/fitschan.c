@@ -37180,8 +37180,9 @@ static AstMapping *ZPXMapping( AstFitsChan *this, FitsStore *store, char s,
 
       if( ncoeff[ 0 ] || ncoeff[ 1 ] ) {
          ret = (AstMapping *) astWcsMap( naxes, AST__TPN, zpxaxes[ 0 ] + 1,
-                                         zpxaxes[ 1 ] + 1, "FITSProj=0,"
-                                         "Invert=1", status );
+                                         zpxaxes[ 1 ] + 1, "Invert=1",
+                                         status );
+         astSetFITSProj( ret, 0 );
          astSetTPNTan( ret, 0 );
          for( i = 0; i < 2; i++ ){
             for( icoeff = 0; icoeff < ncoeff[ i ]; icoeff++ ) {

@@ -1,6 +1,6 @@
 AST Library
 -----------
-   A new release (V5.6-1) of the Starlink AST (astrometry) library is
+   A new release (V5.7-0) of the Starlink AST (astrometry) library is
 now available.
 
    AST provides a comprehensive range of facilities for attaching
@@ -16,6 +16,28 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
+- The FitsChan class support for the IRAF-specific "TNX" projection has
+been extended to include reading TNX headers that use a Chebyshev
+representation for the distortion polynomial.
+
+- The FitsChan class support for the IRAF-specific "ZPX" projection has
+been extended to include reading ZPX headers that use simple or Chebyshev
+representation for the distortion polynomial.
+
+- A bug has been fixed in the FitsChan class that caused headers
+including the Spitzer "-SIP" distortion code to be read incorrectly if no
+inverse polynomial was specified in the header.
+
+- A new attribute called PolyTan has been added to the FitsChan class. It
+can be used to indicate that FITS headers that specify a TAN projection
+should be interpreted according to the "distorted TAN" convention
+included in an early draft of FITS-WCS paper II. Such headers are created
+by (for instance) the SCAMP tool (http://www.astromatic.net/software/scamp).
+
+
+Main Changes in V5.6-1
+-----------------------
+
 - Tables can now have any number of parameters describing the global
 properties of the Table.
 
@@ -26,7 +48,6 @@ than "Angstrom", as specified by FITS-WCS paper I.
 allowed a template Frame of a more specialised class to match a target
 frame of a less specialised class. For example, this bug would allow a
 template SkyFrame to match a target Frame. This no longer happens.
-
 
 
 Main Changes in V5.6-0

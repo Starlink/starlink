@@ -59,7 +59,6 @@ f     AST_WCSMAP
 *     In addition to those attributes common to all Mappings, every
 *     WcsMap also has the following attributes:
 *
-*     - FITSProj: Is this WcsMap used as a FITS-WCS projection?
 *     - NatLat: Native latitude of the reference point of a FITS-WCS projection
 *     - NatLon: Native longitude of the reference point of a FITS-WCS projection
 *     - PVi_m: FITS-WCS projection parameters
@@ -206,8 +205,8 @@ f     The WcsMap class does not define any new routines beyond those
 *        In function Map, only do the longitude check if the projection
 *        is not cyclic.
 *     24-MAY-2011 (DSB):
-*        Added public FITSProj attribute and protected TPNTan attribute (TPNTan 
-*        should be removed when the PolyMap class has an iterative inverse).
+*        Added protected FITSProj and TPNTan attributes (they should be
+*        removed when the PolyMap class has an iterative inverse).
 *class--
 */
 
@@ -1149,14 +1148,9 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
 
 /* Check the attribute name and clear the appropriate attribute. */
 
-/* FITSProj */
-/* -------- */
-   if ( !strcmp( attrib, "fitsproj" ) ) {
-      astClearFITSProj( this );
-
 /* ProjP. */
 /* ------ */
-   } else if ( nc = 0, ( 1 == astSscanf( attrib, "prpjp(%d)%n", &m, &nc ) )
+   if ( nc = 0, ( 1 == astSscanf( attrib, "prpjp(%d)%n", &m, &nc ) )
                   && ( nc >= len ) ) {
       astClearPV( this, astGetWcsAxis( this, 1 ), m );
 
@@ -1770,18 +1764,9 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
    the value into "getattrib_buff" as a null-terminated string in an appropriate
    format.  Set "result" to point at the result string. */
 
-/* FITSProj. */
-/* --------- */
-   if ( !strcmp( attrib, "fitsproj" ) ) {
-      ival = astGetFITSProj( this );
-      if ( astOK ) {
-         (void) sprintf( getattrib_buff, "%d", ival );
-         result = getattrib_buff;
-      }
-
 /* ProjP. */
 /* ------ */
-   } else if ( nc = 0, ( 1 == astSscanf( attrib, "projp(%d)%n", &m, &nc ) )
+   if ( nc = 0, ( 1 == astSscanf( attrib, "projp(%d)%n", &m, &nc ) )
                   && ( nc >= len ) ) {
       dval = astGetPV( this, astGetWcsAxis( this, 1 ), m );
       if ( astOK ) {
@@ -3731,15 +3716,9 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
    in "nc" to check that the entire string was matched. Once a value
    has been obtained, use the appropriate method to set it. */
 
-/* FITSProj */
-/* -------- */
-   if ( nc = 0, ( 1 == astSscanf( setting, "fitsproj= %d %n",
-                                  &ival, &nc ) ) && ( nc >= len ) ) {
-      astSetFITSProj( this, ival );
-
 /* ProjP(i). */
 /* --------- */
-   } else if ( nc = 0, ( 2 == astSscanf( setting, "projp(%d)= %lg %n", &m, &dval, &nc ) )
+   if ( nc = 0, ( 2 == astSscanf( setting, "projp(%d)= %lg %n", &m, &dval, &nc ) )
                   && ( nc >= len ) ) {
       astSetPV( this, astGetWcsAxis( this, 1 ), m, dval );
 
@@ -3996,14 +3975,9 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
 /* Check the attribute name and test the appropriate attribute. */
 
 
-/* FITSProj */
-/* -------- */
-   if ( !strcmp( attrib, "fitsproj" ) ) {
-      result = astTestFITSProj( this );
-
 /* ProjP(i). */
 /* --------- */
-   } else if ( nc = 0, ( 1 == astSscanf( attrib, "projp(%d)%n", &m, &nc ) )
+   if ( nc = 0, ( 1 == astSscanf( attrib, "projp(%d)%n", &m, &nc ) )
                   && ( nc >= len ) ) {
       result = astTestPV( this, astGetWcsAxis( this, 1 ), m );
 
@@ -4662,7 +4636,7 @@ static void WcsPerm( AstMapping **maps, int *inverts, int iwm, int *status ){
 
 
 /*
-*att++
+*att+
 *  Name:
 *     FITSProj
 
@@ -4670,7 +4644,7 @@ static void WcsPerm( AstMapping **maps, int *inverts, int iwm, int *status ){
 *     Is this WcsMap used as a FITS-WCS projection?
 
 *  Type:
-*     Public attribute.
+*     Protected attribute.
 
 *  Synopsis:
 *     Integer (boolean).
@@ -4693,7 +4667,7 @@ f     AST_WRITE routine,
 *  Applicability:
 *     WcsMap
 *        All Frames have this attribute.
-*att--
+*att-
 */
 astMAKE_CLEAR(WcsMap,FITSProj,fits_proj,-INT_MAX)
 astMAKE_GET(WcsMap,FITSProj,int,1,( ( this->fits_proj != -INT_MAX ) ?

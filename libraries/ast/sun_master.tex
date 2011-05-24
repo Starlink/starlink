@@ -24,7 +24,7 @@ f+
 \newcommand{\stardocnumber}    {210.26}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {13th May 2011}
+\newcommand{\stardocdate}      {24th May 2011}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -19394,11 +19394,9 @@ WcsMap with type of
 AST\_\_ZPN. Projection parameter values are read from any WAT\emph{i\_nnn}
 keywords, and corresponding PVi\_m attributes are set in the
 WcsMap. The WAT\emph{i\_nnn} keywords may specify corrections to the basic
-ZPN projection by including ``lngcor'' or ``latcor'' terms. There is no
-direct equivalent in FITS-WCS to these terms and so they are ignored. If
-these correction terms are found, ASTWARN keywords are added to the FitsChan
-containing a warning message (but only if the Warnings
-attribute of the FitsChan is set appropriately).
+ZPN projection by including ``lngcor'' or ``latcor'' terms. These are
+supported if they use half cross-terms, in either simple or Chebyshev
+representation.
 
 \item The IRAF ``TNX'' projection is represented by a WcsMap with type of
 AST\_\_TPN (a distorted TAN projection retained within the WcsMap class
@@ -19407,11 +19405,18 @@ are read from any WAT\emph{i\_nnn} keywords, and corresponding PV
 attributes are set in the WcsMap. If the TNX projection cannot be
 converted exactly into an AST\_\_TPN projection, ASTWARN keywords are
 added to the FitsChan containing a warning message (but only if the
-Warnings attribute of the FitsChan is set appropriately).
+Warnings attribute of the FitsChan is set appropriately). Currently,
+TNX projections that use half cross-terms, in either simple or Chebyshev
+representation, are supported.
 
 \item ``QV'' parameters for TAN projections (as produced by
 \htmladdnormallink{AUTOASTROM}{http://www.astro.gla.ac.uk/users/norman/star/autoastrom/}
 are renamed to the equivalent ``PV'' parameters.
+
+\item TAN projections that have associated ``PV'' parameters on the
+latitude axis are converted to the corresponding TPN (distorted TAN)
+projections. This conversion can be controlled using the PolyTan attribute
+of the FitsChan class.
 
 \end{itemize}
 
@@ -22291,12 +22296,10 @@ Region.
 \end{enumerate}
 
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V5.6-1}
+\subsection{ChangesIntroduced in V5.6-1}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V5.6-0 and V5.6-1 (the
-current version):
+The following describes the most significant changes which
+occurred in the AST library between versions V5.6-0 and V5.6-1:
 
 \begin{enumerate}
 
@@ -22317,6 +22320,36 @@ method that allowed a template Frame of a more specialised class to match
 a target frame of a less specialised class. For example, this bug would
 allow a template SkyFrame to match a target Frame. This no longer
 happens.
+
+\end{enumerate}
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V5.7-0}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V5.6-1 and V5.7-0 (the
+current version):
+
+\begin{enumerate}
+
+\item The FitsChan class support for the IRAF-specific ``TNX'' projection has
+been extended to include reading TNX headers that use a Chebyshev
+representation for the distortion polynomial.
+
+\item The FitsChan class support for the IRAF-specific ``ZPX'' projection has
+been extended to include reading ZPX headers that use simple or Chebyshev
+representation for the distortion polynomial.
+
+\item A bug has been fixed in the FitsChan class that caused headers
+including the Spitzer ``-SIP'' distortion code to be read incorrectly if no
+inverse polynomial was specified in the header.
+
+\item A new attribute called PolyTan has been added to the FitsChan class. It
+can be used to indicate that FITS headers that specify a TAN projection
+should be interpreted according to the ``distorted TAN'' convention
+included in an early draft of FITS-WCS paper II. Such headers are created
+by (for instance) the SCAMP tool (\htmladdnormallink{http://www.astromatic.net/software/scamp}{http://www.astromatic.net/software/scamp}).
+
 
 \end{enumerate}
 
