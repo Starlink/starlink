@@ -39,7 +39,7 @@
 *     channel spacing in the input.
 
 *  Usage:
-*     specx2ndf in out [gridfile] [telescope] [latitude] [longitude]
+*     specx2ndf in out [gridfile] [system] [telescope] [latitude] [longitude]
 
 *  ADAM Parameters:
 *     AXIS =  _LOGICAL (Read)
@@ -52,6 +52,12 @@
 *        containing the schematic is not to be written reply with an
 *        exclamation mark ("!").  See Section 'Schematic of the map
 *        grid' (below) for further details.  [!]
+*     SYSTEM = LITERAL (Read)
+*         Celestial coord system for output cube. SPECX files do not
+*         record the coordinate system for any offsets. By default
+*         these are assumed to be RJ. SYSTEM needs to be used to manually
+*         set the correct coordinates for a map file.
+*         (AZ=azel, RD=radec of date, RJ=j2000, RB=b1950, GA=galactic)
 *     IN  =  NDF (Read)
 *        The name of the input SPECX map, or container file.  The file
 *        extension ('.sdf') should not be included since it is appended
@@ -306,9 +312,11 @@
       CHARACTER GRIDFL*70      ! File containing schematic of map grid
       CHARACTER TELSCP*10      ! Name of telescope
       CHARACTER TTL*80         ! Title for output NDF
+      CHARACTER SYSTEM*8       ! Celestial coord system for output cube
       DOUBLE PRECISION HT      ! Height above sea level
       DOUBLE PRECISION LAT     ! Geodetic latitude
       DOUBLE PRECISION LONG    ! Geodetic latitude
+      INTEGER CELLCODE         ! 1: AZ, 4: RD, 6: RB, 7: RJ, 8: GA
       INTEGER CLWBND(3)        ! Lower bounds for the data cube
       INTEGER CUPBND(3)        ! Upper bounds for the data cube
       INTEGER DIM( 3 )         ! Dimension sizes
@@ -364,6 +372,32 @@
          CALL ERR_ANNUL( STATUS )
          GOTMAP = .FALSE.
       END IF
+
+*  Get the desired coordinate system for the output map
+      CALL PAR_GET0C( 'SYSTEM', SYSTEM, STATUS )
+      CALL CHR_UCASE( SYSTEM )
+      CELLCODE = 6
+      IF ( SYSTEM .EQ. 'AZ' ) THEN
+        SYSTEM = 'AZEL'
+        CELLCODE = 1
+      ELSE IF ( SYSTEM .EQ. 'RD' ) THEN
+        SYSTEM = 'APP'
+        CELLCODE = 4
+      ELSE IF ( SYSTEM .EQ. 'RB' ) THEN
+        SYSTEM = 'B1950'
+        CELLCODE = 6
+      ELSE IF ( SYSTEM .EQ. 'RJ' ) THEN
+        SYSTEM = 'J2000'
+        CELLCODE = 7
+      ELSE IF ( SYSTEM .EQ. 'GA' ) THEN
+        SYSTEM = 'GAL'
+        CELLCODE = 8
+      ELSE
+        STATUS = SAI__ERROR
+        CALL MSG_SETC( 'SYSTEM', SYSTEM )
+        CALL ERR_REP( 'SPECX2NDF_SYS', 'The given SYSTEM '//
+     :                '(^SYSTEM) is unknown.', STATUS )
+      ENDIF
 
 *  Determine the geodetic longitude and latitude of the observer.
       CALL PAR_GET0C( 'TELESCOPE', TELSCP, STATUS )
@@ -460,7 +494,11 @@
      :                  NSPEC, SPTS, INDF2, STATUS )
 
 *  Create the WCS component.
-         CALL CON_WCSPX( INDF2, INDF1, LONG, LAT, VAR, STATUS )
+         IF ( CELLCODE .EQ. 0 ) THEN
+           CELLCODE = 6
+         ENDIF
+         CALL CON_WCSPX( INDF2, INDF1, CELLCODE, LONG, LAT, VAR,
+     :                   STATUS )
 
 *  Map the output variance array and fill it with the constant value
 *  returned by CON_WCSPX.
@@ -615,7 +653,8 @@
                CALL NDF_UNMAP( INDF2, '*', STATUS )
 
 *  Create the WCS component.
-               CALL CON_WCSPX( INDF2, INDF1, LONG, LAT, VAR, STATUS )
+               CALL CON_WCSPX( INDF2, INDF1, CELLCODE, LONG, LAT, VAR,
+     :                   STATUS )
 
 *  Map the output variance array and fill it with the constant value
 *  returned by CON_WCSPX.

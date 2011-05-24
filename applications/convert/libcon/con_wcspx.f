@@ -1,4 +1,5 @@
-      SUBROUTINE CON_WCSPX( INDF, IMAP, OBSLON, OBSLAT, VAR, STATUS )
+      SUBROUTINE CON_WCSPX( INDF, IMAP, CELLCODE, OBSLON, OBSLAT, VAR,
+     :                      STATUS )
 *+
 *  Name:
 *     CON_WCSPX
@@ -10,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CON_WCSPX( INDF, IMAP, OBSLON, OBSLAT, VAR, STATUS )
+*     CALL CON_WCSPX( INDF, IMAP, CELLCODE, OBSLON, OBSLAT, VAR, STATUS )
 
 *  Description:
 *     This routine adds a WCS component to the output NDF holdiong a
@@ -27,6 +28,10 @@
 *        The NDF identifier for the NDF created by SPECX2NDF.
 *     IMAP = INTEGER (Given)
 *        The NDF identifier for the SPECX map file.
+*     CELLCODE  = INTEGER (Given)
+*        The cellcode for maps (default: B1950/RB). Specx files and maps
+*        do not retain this information.
+*        1: azel/az, 4: app/rd, 6: b1950/rb, 7: j2000/rj, 8: gal/ga
 *     OBSLON = DOUBLE PRECISION (Given)
 *        The geodetic longitude of the observatory. Radians, positive east.
 *     OBSLAT = DOUBLE PRECISION (Given)
@@ -117,6 +122,7 @@
 *  Arguments Given:
       INTEGER INDF
       INTEGER IMAP
+      INTEGER CELLCODE
       DOUBLE PRECISION OBSLON
       DOUBLE PRECISION OBSLAT
 
@@ -226,6 +232,9 @@
          KEY = 'POSANGLE'
          CALL NDF_XGT0D( IMAP, 'SPECX_MAP', KEY, DVAL, STATUS )
          CALL AST_MAPPUT0D( KM2, KEY, DVAL, ' ', STATUS )
+
+         KEY = 'CELLCODE'
+         CALL AST_MAPPUT0I( KM2, KEY, CELLCODE, ' ', STATUS )
 
       ELSE
          KM2 = AST__NULL

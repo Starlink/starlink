@@ -88,4 +88,14 @@ interface SPECX2NDF
       helpkey  '*'
    endparameter
 
+   parameter SYSTEM
+      type        LITERAL
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Celestial coord system for output cube'
+      ppath       'CURRENT,DEFAULT'
+      default     'TRACKING'
+      helpkey     '*'
+   endparameter
+
 endinterface
