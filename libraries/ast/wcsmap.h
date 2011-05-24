@@ -365,7 +365,8 @@ typedef struct AstWcsMap {
    int *np;                      /* Pointer to array of projection parameter counts */
    struct AstPrjPrm params;      /* WCS structure holding projection
                                     parameters, etc. Defined in proj.h */
-
+   int fits_proj;                /* Use as FITS-WCS projection? */
+   int tpn_tan;                  /* Include TAN projection in TPN transformation? */
 } AstWcsMap;
 
 /* Virtual function table. */
@@ -392,6 +393,16 @@ typedef struct AstWcsMapVtab {
    void (* ClearPV)( AstWcsMap *, int, int, int * );
    void (* SetPV)( AstWcsMap *, int, int, double, int * );
    int (* IsZenithal)( AstWcsMap *, int * );
+
+   int (* GetFITSProj)( AstWcsMap *, int * );
+   int (* TestFITSProj)( AstWcsMap *, int * );
+   void (* ClearFITSProj)( AstWcsMap *, int * );
+   void (* SetFITSProj)( AstWcsMap *, int, int * );
+
+   int (* GetTPNTan)( AstWcsMap *, int * );
+   int (* TestTPNTan)( AstWcsMap *, int * );
+   void (* ClearTPNTan)( AstWcsMap *, int * );
+   void (* SetTPNTan)( AstWcsMap *, int, int * );
 
 } AstWcsMapVtab;
 
@@ -458,6 +469,17 @@ void astInitWcsMapGlobals_( AstWcsMapGlobals * );
    int astIsZenithal_( AstWcsMap *, int * );
    void astClearPV_( AstWcsMap *, int, int, int * );
    void astSetPV_( AstWcsMap *, int, int, double, int * );
+
+   int astGetFITSProj_( AstWcsMap *, int * );
+   int astTestFITSProj_( AstWcsMap *, int * );
+   void astClearFITSProj_( AstWcsMap *, int * );
+   void astSetFITSProj_( AstWcsMap *, int, int * );
+
+   int astGetTPNTan_( AstWcsMap *, int * );
+   int astTestTPNTan_( AstWcsMap *, int * );
+   void astClearTPNTan_( AstWcsMap *, int * );
+   void astSetTPNTan_( AstWcsMap *, int, int * );
+
 #endif
 
 /* Function interfaces. */
@@ -520,6 +542,24 @@ astINVOKE(V,astGetPV_(astCheckWcsMap(this),i,j,STATUS_PTR))
 astINVOKE(V,astSetPV_(astCheckWcsMap(this),i,j,par,STATUS_PTR))
 #define astTestPV(this,i,j) \
 astINVOKE(V,astTestPV_(astCheckWcsMap(this),i,j,STATUS_PTR))
+
+#define astClearFITSProj(this) \
+astINVOKE(V,astClearFITSProj_(astCheckWcsMap(this),STATUS_PTR))
+#define astGetFITSProj(this) \
+astINVOKE(V,astGetFITSProj_(astCheckWcsMap(this),STATUS_PTR))
+#define astSetFITSProj(this,value) \
+astINVOKE(V,astSetFITSProj_(astCheckWcsMap(this),value,STATUS_PTR))
+#define astTestFITSProj(this) \
+astINVOKE(V,astTestFITSProj_(astCheckWcsMap(this),STATUS_PTR))
+
+#define astClearTPNTan(this) \
+astINVOKE(V,astClearTPNTan_(astCheckWcsMap(this),STATUS_PTR))
+#define astGetTPNTan(this) \
+astINVOKE(V,astGetTPNTan_(astCheckWcsMap(this),STATUS_PTR))
+#define astSetTPNTan(this,value) \
+astINVOKE(V,astSetTPNTan_(astCheckWcsMap(this),value,STATUS_PTR))
+#define astTestTPNTan(this) \
+astINVOKE(V,astTestTPNTan_(astCheckWcsMap(this),STATUS_PTR))
 
 #define astGetWcsType(this) \
 astINVOKE(V,astGetWcsType_(astCheckWcsMap(this),STATUS_PTR))

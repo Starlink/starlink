@@ -174,6 +174,7 @@ typedef struct AstFitsChan {
    int defb1950;    /* Use FK4 B1950 as defaults? */
    int tabok;       /* Support -TAB algorithm? */
    int cdmatrix;    /* Use a CD matrix in FITS-WCS Encoding? */
+   int polytan;     /* Use distorted TAN convention? */
    int carlin;      /* Use linear CAR mappings? */
    int iwc;         /* Include an IWC Frame? */
    int clean;       /* Remove used cards even if an error occurs? */
@@ -301,6 +302,11 @@ typedef struct AstFitsChanVtab {
    int (* TestCDMatrix)( AstFitsChan *, int * );
    void (* SetCDMatrix)( AstFitsChan *, int, int * );
    void (* ClearCDMatrix)( AstFitsChan *, int * );
+
+   int (* GetPolyTan)( AstFitsChan *, int * );
+   int (* TestPolyTan)( AstFitsChan *, int * );
+   void (* SetPolyTan)( AstFitsChan *, int, int * );
+   void (* ClearPolyTan)( AstFitsChan *, int * );
 
    int (* GetIwc)( AstFitsChan *, int * );
    int (* TestIwc)( AstFitsChan *, int * );
@@ -477,6 +483,11 @@ void astInitFitsChanGlobals_( AstFitsChanGlobals * );
    int astTestCDMatrix_( AstFitsChan *, int * );
    void astSetCDMatrix_( AstFitsChan *, int, int * );
    void astClearCDMatrix_( AstFitsChan *, int * );
+
+   int astGetPolyTan_( AstFitsChan *, int * );
+   int astTestPolyTan_( AstFitsChan *, int * );
+   void astSetPolyTan_( AstFitsChan *, int, int * );
+   void astClearPolyTan_( AstFitsChan *, int * );
 
    int astGetCarLin_( AstFitsChan *, int * );
    int astTestCarLin_( AstFitsChan *, int * );
@@ -719,6 +730,15 @@ astINVOKE(V,astGetCDMatrix_(astCheckFitsChan(this),STATUS_PTR))
 astINVOKE(V,astSetCDMatrix_(astCheckFitsChan(this),cdmatrix,STATUS_PTR))
 #define astTestCDMatrix(this) \
 astINVOKE(V,astTestCDMatrix_(astCheckFitsChan(this),STATUS_PTR))
+
+#define astClearPolyTan(this) \
+astINVOKE(V,astClearPolyTan_(astCheckFitsChan(this),STATUS_PTR))
+#define astGetPolyTan(this) \
+astINVOKE(V,astGetPolyTan_(astCheckFitsChan(this),STATUS_PTR))
+#define astSetPolyTan(this,value) \
+astINVOKE(V,astSetPolyTan_(astCheckFitsChan(this),value,STATUS_PTR))
+#define astTestPolyTan(this) \
+astINVOKE(V,astTestPolyTan_(astCheckFitsChan(this),STATUS_PTR))
 
 #define astClearCarLin(this) \
 astINVOKE(V,astClearCarLin_(astCheckFitsChan(this),STATUS_PTR))

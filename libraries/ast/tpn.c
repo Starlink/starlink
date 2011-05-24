@@ -19,6 +19,8 @@
 *      prj->p2      Array of longitude coefficients
 *      prj->flag    TPN, or -TPN if prj->flag is given < 0.
 *      prj->r0      r0; reset to 180/pi if 0.
+*      prj->n       If zero, only do poly part of transformation (i.e. omit
+*                   the TAN projection).
 *
 *   Returned:
 *      prj->code    "TPN"
@@ -93,9 +95,14 @@ struct AstPrjPrm *prj;
       return 2;
    }
 
-   r =  prj->r0*astCosd(theta)/s;
-   xi =  r*astSind(phi);
-   eta = -r*astCosd(phi);
+   if( prj->n ) {
+      r =  prj->r0*astCosd(theta)/s;
+      xi =  r*astSind(phi);
+      eta = -r*astCosd(phi);
+   } else {
+      xi = phi;
+      eta = theta;
+   }
 
    /* Simple tan */
    if( prj->w[ 0 ] == 0.0 ){
@@ -369,13 +376,18 @@ struct AstPrjPrm *prj;
    }
 
    /* Now do the tan projection */
-   r = sqrt(xi*xi + eta*eta);
-   if (r == 0.0) {
-      *phi = 0.0;
+   if( prj->n ) {
+      r = sqrt(xi*xi + eta*eta);
+      if (r == 0.0) {
+         *phi = 0.0;
+      } else {
+         *phi = astATan2d(xi, -eta);
+      }
+      *theta = astATan2d(prj->r0, r);
    } else {
-      *phi = astATan2d(xi, -eta);
+      *phi = xi;
+      *theta = eta;
    }
-   *theta = astATan2d(prj->r0, r);
 
    return 0;
 }

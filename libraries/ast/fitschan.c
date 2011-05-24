@@ -119,6 +119,7 @@ f     encodings), then write operations using AST_WRITE will
 *     - Iwc: Add a Frame describing Intermediate World Coords?
 *     - Ncard: Number of FITS header cards in a FitsChan
 *     - TabOK: Should the FITS "-TAB" algorithm be recognised?
+*     - PolyTan: Use PVi_m keywords to define distorted TAN projection?
 *     - Warnings: Produces warnings about selected conditions
 
 *  Functions:
@@ -954,6 +955,13 @@ f     - AST_TESTFITS: Test if a keyword has a defined value in a FitsChan
 *        first pixel starts at GRID=0.5, not GRID=0.0. So the CRPIX value
 *        needs to be reduced by 0.5 prior to normalisation, and then
 *        increased by 0.5 after normalisation.
+*     23-MAY-2011 (DSB):
+*        Add support for TNX projections that use Chebyshev polynomials.
+*     24-MAY-2011 (DSB):
+*        - Add support for ZPX projections that include IRAF polynomial
+*        corrections.
+*        - Add PolyTan attribute.
+*        - Fix interpretation of -SIP headers that have no inverse.
 *class--
 */
 
@@ -1471,6 +1479,10 @@ static void ClearCarLin( AstFitsChan *, int * );
 static int GetCarLin( AstFitsChan *, int * );
 static int TestCarLin( AstFitsChan *, int * );
 static void SetCarLin( AstFitsChan *, int, int * );
+static void ClearPolyTan( AstFitsChan *, int * );
+static int GetPolyTan( AstFitsChan *, int * );
+static int TestPolyTan( AstFitsChan *, int * );
+static void SetPolyTan( AstFitsChan *, int, int * );
 static void ClearIwc( AstFitsChan *, int * );
 static int GetIwc( AstFitsChan *, int * );
 static int TestIwc( AstFitsChan *, int * );
@@ -1501,6 +1513,7 @@ static AstMapping *MakeColumnMap( AstFitsTable *, const char *, int, int, const 
 static AstMapping *NonLinSpecWcs( AstFitsChan *, char *, FitsStore *, int, char, AstSpecFrame *, const char *, const char *, int * );
 static AstMapping *OtherAxes( AstFitsChan *, AstFrameSet *, double *, int *, char, FitsStore *, double *, int *, const char *, const char *, int * );
 static AstMapping *SIPMapping( FitsStore *, char, int, const char *, const char *, int * );
+static AstMapping *ZPXMapping( AstFitsChan *, FitsStore *, char, int, int[2], const char *, const char *, int * );
 static AstMapping *SpectralAxes( AstFitsChan *, AstFrameSet *, double *, int *, char, FitsStore *, double *, int *, const char *, const char *, int * );
 static AstMapping *TabMapping( AstFitsChan *, FitsStore *, char, int **, const char *, const char *, int *);
 static AstMapping *WcsCelestial( AstFitsChan *, FitsStore *, char, AstFrame **, AstFrame *, double *, double *, AstSkyFrame **, AstMapping **, int *, const char *, const char *, int * );
@@ -1522,6 +1535,8 @@ static FitsStore *FreeStore( FitsStore *, int * );
 static FitsStore *FsetToStore( AstFitsChan *, AstFrameSet *, int, double *, const char *, const char *, int * );
 static char *CardComm( AstFitsChan *, int * );
 static char *CardName( AstFitsChan *, int * );
+static double *Cheb2Poly( double *, int, int, double, double, double, double, int * );
+static char *ConcatWAT( AstFitsChan *, int, const char *, const char *, int * );
 static char *FormatKey( const char *, int, int, char, int * );
 static char *GetItemC( char *****, int, int, char, char *, const char *method, const char *class, int * );
 static char *SourceWrap( const char *(*)( void ), int * );
@@ -1581,6 +1596,7 @@ static int GetMaxJM( double ****item, char, int * );
 static int GetMaxJMC( char *****item, char, int * );
 static int GetNcard( AstFitsChan *, int * );
 static int GetSkip( AstChannel *, int * );
+static int GetUsedPolyTan( AstFitsChan *, int, int, char, int * );
 static int GetValue( AstFitsChan *, const char *, int, void *, int, int, const char *, const char *, int * );
 static int GetValue2( AstFitsChan *, AstFitsChan *, const char *, int, void *, int, const char *, const char *, int * );
 static int GoodWarns( const char *, int * );
@@ -1611,6 +1627,7 @@ static int TestFits( AstFitsChan *, const char *, int *, int * );
 static int Use( AstFitsChan *, int, int, int * );
 static int Ustrcmp( const char *, const char *, int * );
 static int Ustrncmp( const char *, const char *, size_t, int * );
+static int WATCoeffs( const char *, int, double **, int **, int *, int * );
 static int WcsFromStore( AstFitsChan *, FitsStore *, const char *, const char *, int * );
 static int WcsNatPole( AstFitsChan *, AstWcsMap *, double, double, double, double *, double *, double *, int * );
 
@@ -1621,6 +1638,7 @@ static void AdaptLut( AstMapping *, int, double, double, double, double, double,
 static void AddFrame( AstFitsChan *, AstFrameSet *, int, int, FitsStore *, char, const char *, const char *, int * );
 static void ChangePermSplit( AstMapping *, int * );
 static void CheckZero( char *, double, int, int * );
+static void Chpc1( double *, double *, int, int *, int *, int * );
 static void ClassTrans( AstFitsChan *, AstFitsChan *, int, int, const char *, const char *, int * );
 static void ClearAttrib( AstObject *, const char *, int * );
 static void Copy( const AstObject *, AstObject *, int * );
@@ -1675,6 +1693,7 @@ static void SetFitsU( AstFitsChan *, const char *, const char *, int, int * );
 static void SetItem( double ****, int, int, char, double, int * );
 static void SetItemC( char *****, int, int, char, const char *, int * );
 static void SetValue( AstFitsChan *, const char *, void *, int, const char *, int * );
+static void Shpc1( double, double, int, double *, double *, int * );
 static void SinkWrap( void (*)( const char * ), const char *, int * );
 static void SkyPole( AstWcsMap *, AstMapping *, int, int, int *, char, FitsStore *, const char *, const char *, int * );
 static void TableSource( AstFitsChan *, void (*)( AstFitsChan *, const char *, int, int, int * ), int * );
@@ -4711,6 +4730,181 @@ static void ChangePermSplit( AstMapping *map, int *status ){
    }
 }
 
+static double *Cheb2Poly( double *c, int nx, int ny, double xmin, double xmax,
+                          double ymin, double ymax, int *status ){
+/*
+*  Name:
+*     Cheb2Poly
+
+*  Purpose:
+*     Converts a two-dimensional Chebyshev polynomial to standard form and
+*     scale the arguments.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "fitschan.h"
+*     double *Cheb2Poly( double *c, int nx, int ny, double xmin, double xmax,
+*                        double ymin, double ymax, int *status )
+
+*  Class Membership:
+*     FitsChan
+
+*  Description:
+*     Given the coefficients of a two-dimensional Chebychev polynomial P(u,v),
+*     find the coefficients of the equivalent standard two-dimensional
+*     polynomial Q(x,y). The allowed range of u and v is assumed to be the
+*     unit square, and this maps on to the rectangle in (x,y) given by
+*     (xmin:xmax,ymin:ymax).
+
+*  Parameters:
+*     c
+*        An array of (nx,ny) elements supplied holding the coefficients of
+*        P, such that the coefficient of (Ti(u)*Tj(v)) is held in element
+*        (i + j*nx), where "Ti(u)" is the Chebychev polynomial (of the
+*        first kind) of order "i" evaluated at "u", and "Tj(v)" is the
+*        Chebychev polynomial of order "j" evaluated at "v".
+*     nx
+*        One more than the maximum power of u within P.
+*     ny
+*        One more than the maximum power of v within P.
+*     xmin
+*        X value corresponding to u = -1
+*     xmax
+*        X value corresponding to u = +1
+*     ymin
+*        Y value corresponding to v = -1
+*     ymax
+*        Y value corresponding to v = +1
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     Pointer to a dynamically allocated array of (nx,ny) elements holding
+*     the coefficients of Q, such that the coefficient of (x^i*y^j) is held
+*     in element (i + j*nx). Free it using astFree when no longer needed.
+*/
+
+/* Local Variables: */
+   double *d;
+   double *pa;
+   double *pw;
+   double *work1;
+   double *work2;
+   double *work3;
+   int *iw1;
+   int *iw2;
+   int i;
+   int j;
+
+/* Check the status and supplied value pointer. */
+   if( !astOK ) return NULL;
+
+/* Allocate returned array. */
+   d = astMalloc( sizeof( *d )*nx*ny );
+
+/* Allocate workspace. */
+   work1 = astMalloc( sizeof( *work1 )*ny );
+   work2 = astMalloc( sizeof( *work2 )*ny );
+   work3 = astMalloc( sizeof( *work2 )*nx );
+   iw1 = astMalloc( sizeof(int)*( nx > ny ? nx : ny ) );
+   iw2 = astMalloc( sizeof(int)*( nx > ny ? nx : ny ) );
+   if( astOK ) {
+
+/* Thinking of P as a 1D polynomial in v, each coefficient would itself then
+   be a 1D polynomial in u:
+
+   P = (   c[0] +      c[1]*T1(u) +      c[2]*T2(u) + ... ) +
+       (  c[nx] +   c[nx+1]*T1(u) +   c[nx+2]*T2(u) + ... )*T1(v) +
+       (c[2*nx] + c[2*nx+1]*T1(u) + c[2*nx+2]*T2(u) + ... )*T2(v) +
+       ...
+       (c[(ny-1)*nx] + c[(ny-1)*nx+1]*T1(u) + c[(ny-1)*nx+2]*T2(u) + ... )T{ny-1}(v)
+
+   Use Chpc1 to convert these "polynomial coefficients" to standard
+   form, storing the result in the corresponding row of "d" . Also,
+   convert them from u to x. */
+
+      for( j = 0; j < ny; j++ ) {
+         Chpc1( c + j*nx, work3, nx, iw1, iw2, status );
+         Shpc1( xmin, xmax, nx, work3, d + j*nx, status );
+      }
+
+/* The polynomial value is now:
+
+    (   d[0] +      d[1]*x +      d[2]*x*x + ... ) +
+    (  d[nx] +   d[nx+1]*x +   d[nx+2]*x*x + ... )*T1(v) +
+    (d[2*nx] + d[2*nx+1]*x + d[2*nx+2]*x*x + ... )*T2(v) +
+    ...
+    (d[(ny-1)*nx] + d[(ny-1)*nx+1]*x + d[(ny-1)*nx+2]*x*x + ... )*T{ny-1}(v)
+
+   If we rearrange this expression to view it as a 1D polynomial in x,
+   rather than v, each coefficient of the new 1D polynomial is then
+   itself a polynomial in v:
+
+    ( d[0] +   d[nx]*T1(v) +   d[2*nx]*T2(v) + ... d[(ny-1)*nx]*T{ny-1}(v) ) +
+    ( d[1] + d[nx+1]*T1(v) + d[2*nx+1]*T2(v) + ... d[(ny-1)*nx+1]T{ny-1}(v)... )*x +
+    ( d[2] + d[nx+2]*T1(v) + d[2*nx+2]*T2(v) + ... d[(ny-1)*nx+2]T{ny-1}(v)... )*x*x +
+    ...
+    ( d[nx-1] + d[2*nx-1]*T1(v) + d[3*nx-1]*T2(v) + ... d[ny*nx-1]*T{ny-1}(v) )*x*x*...
+
+
+   Now use Chpc1 to convert each of these "polynomial coefficients"
+   to standard form. We copy each column of the d array into a 1D work array,
+   use Shpc1 to modify the values in the work array, and then write
+   the modified values back into the current column of d. Also convert
+   from v to y. */
+
+      for( i = 0; i < nx; i++ ) {
+         pa = d + i;
+         pw = work1;
+         for( j = 0; j < ny; j++ ) {
+            *(pw++) = *pa;
+            pa += nx;
+         }
+
+         Chpc1( work1, work2, ny, iw1, iw2, status );
+         Shpc1( ymin, ymax, ny, work2, work1, status );
+
+         pa = d + i;
+         pw = work1;
+         for( j = 0; j < ny; j++ ) {
+            *pa = *(pw++);
+            pa += nx;
+         }
+      }
+
+/* So the polynomial is now:
+
+    ( d[0] +   d[nx]*y +   d[2*nx]*y*y + ... d[(ny-1)*nx]*y*y*... ) +
+    ( d[1] + d[nx+1]*y + d[2*nx+1]*y*y + ... d[(ny-1)*nx+1]*y*y*... )*x +
+    ( d[2] + d[nx+2]*y + d[2*nx+2]*y*y + ... d[(ny-1)*nx+2]*y*y*... )*x*x +
+    ...
+    ( d[nx-1] + d[2*nx-1]*y + d[3*nx-1]*y*y + ... d[ny*nx-1]*y*y*... )*x*x*...
+
+  Re-arranging, this is:
+
+    (   d[0] +      d[1]*x +      d[2]*x*x + ... ) +
+    (  d[nx] +   d[nx+1]*x +   d[nx+2]*x*x + ... )*y +
+    (d[2*nx] + d[2*nx+1]*x + d[2*nx+2]*x*x + ... )*y*y +
+    ...
+    (d[(ny-1)*nx] + d[(ny-1)*nx+1]*x + d[(ny-1)*nx+2]*x*x + ... )*y*y*...
+
+   as required. */
+
+   }
+
+/* Free the workspace. */
+   work1 = astFree( work1 );
+   work2 = astFree( work2 );
+   work3 = astFree( work3 );
+   iw1 = astFree( iw1 );
+   iw2 = astFree( iw2 );
+
+/* Return the result. */
+   return d;
+}
+
 static int CheckFitsName( const char *name, const char *method,
                           const char *class, int *status ){
 /*
@@ -4988,6 +5182,115 @@ static double ChooseEpoch( FitsStore *store, char s, const char *method,
 
 /* Return the answer. */
    return mjd;
+}
+
+static void Chpc1( double *c, double *d, int n, int *w0, int *w1, int *status ){
+/*
+*  Name:
+*     Chpc1
+
+*  Purpose:
+*     Converts a one-dimensional Chebyshev polynomial to standard form.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "fitschan.h"
+*     void Chpc1( double *c, double *d, int n, int *w0, int *w1, int *status )
+
+*  Class Membership:
+*     FitsChan
+
+*  Description:
+*     Given the coefficients of a one-dimensional Chebychev polynomial P(u),
+*     find the coefficients of the equivalent standard 1D polynomial Q(u).
+*     The allowed range of u is assumed to be the unit interval.
+
+*  Parameters:
+*     c
+*        An array of n elements supplied holding the coefficients of
+*        P, such that the coefficient of (Ti(u)) is held in element
+*        (i), where "Ti(u)" is the Chebychev polynomial (of the
+*        first kind) of order "i" evaluated at "u".
+*     d
+*        An array of n elements returned holding the coefficients of
+*        Q, such that the coefficient of (u^i) is held in element (i).
+*     n
+*        One more than the highest power of u in P.
+*     w0
+*        Pointer to a work array of n elements.
+*     w1
+*        Pointer to a work array of n elements.
+*     status
+*        Inherited status value
+
+*  Notes:
+*    - Vaguely inspired by the Numerical Recipes routine "chebpc". But the
+*    original had bugs, so I wrote this new version from first principles.
+
+*/
+
+/* Local Variables: */
+   int sv;
+   int j;
+   int k;
+
+/* Check inherited status */
+   if( !astOK ) return;
+
+/* Initialise the returned coefficients array. */
+   for( j = 0; j < n; j++ ) d[ j ] = 0.0;
+
+/* Use the recurrence relation
+
+   T{k+1}(x) = 2.x.T{k}(x) - T{k-1}(x).
+
+   w0[i] holds the coefficient of x^i in T{k-1}. w1[i] holds the
+   coefficient of x^i in T{k}. Initialise them for T0 (="1") and
+   T1 (="x"). */
+   for( j = 0; j < n; j++ ) w0[ j ] = w1[ j ] = 0;
+   w0[ 0 ] = 1;
+   w1[ 1 ] = 1;
+
+/* Update the returned coefficients array to include the T0 and T1 terms. */
+   d[ 0 ] = c[ 0 ];
+   d[ 1 ] = c[ 1 ];
+
+/* Loop round using the above recurrence relation until we have found
+   T{n-1}. */
+   for( k = 1; k < n - 1; k++ ){
+
+/* To get the coefficients of T{k+1} shift the contents of w1 up one
+   element, introducing a zero at the low end, and then double all the
+   values in w1. Finally subtract off the values in w0. This implements
+   the above recurrence relationship. Starting at the top end and working
+   down to the bottom, store a new value for each element of w1. */
+      for( j = n - 1; j > 0; j-- ) {
+
+/* First save the original element of w1 in w0 for use next time. But we
+   also need the original w0 element later on so save it first. */
+         sv = w0[ j ];
+         w0[ j ] = w1[ j ];
+
+/* Double the lower neighbouring w1 element and subtract off the w0
+   element saved above. This forms the new value for w1. */
+         w1[ j ] = 2*w1[ j - 1 ] - sv;
+      }
+
+/* Introduce a zero into the lowest element of w1, saving the original
+   value first in w0. Then subtract off the original value of w0. */
+      sv = w0[ 0 ];
+      w0[ 0 ] = w1[ 0 ];
+      w1[ 0 ] = -sv;
+
+/* W1 now contains the coefficients of T{k+1} in w1, and the coefficients
+   of T{k} in w0. Multiply these by the supplied coefficient for T{k+1},
+   and add them into the returned array. */
+      for( j = 0; j <= k + 1; j++ ){
+         d[ j ] += c[ k + 1 ]*w1[ j ];
+      }
+   }
 }
 
 static int ChrLen( const char *string, int *status ){
@@ -5912,6 +6215,11 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
    } else if ( !strcmp( attrib, "carlin" ) ) {
       astClearCarLin( this );
 
+/* PolyTan */
+/* ------- */
+   } else if ( !strcmp( attrib, "polytan" ) ) {
+      astClearPolyTan( this );
+
 /* Iwc */
 /* --- */
    } else if ( !strcmp( attrib, "iwc" ) ) {
@@ -6607,6 +6915,111 @@ static int ComBlock( AstFitsChan *this, int incr, const char *method,
    return ret;
 }
 
+static char *ConcatWAT( AstFitsChan *this, int iaxis, const char *method,
+                        const char *class, int *status ){
+/*
+*  Name:
+*     ConcatWAT
+
+*  Purpose:
+*     Concatenate all the IRAF "WAT" keywords for an axis.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "fitschan.h"
+*     char *ConcatWAT( AstFitsChan *this, int iaxis, const char *method,
+*                      const char *class, int *status )
+
+*  Class Membership:
+*     FitsChan member function.
+
+*  Description:
+*     This function searches the supplied FitsChan for any keywords of
+*     the form "WATi_j", where i and j are integers and i is equal to the
+*     supplied "iaxis" value plus one, and concatenates their strig
+*     values into a single string. Such keywords are created by IRAF to
+*     describe their non-standard ZPX and TNX projections.
+
+*  Parameters:
+*     this
+*        The FistChan.
+*     iaxis
+*        The zero-based index of the axis to be retrieved.
+*     method
+*         The name of the calling method to include in error messages.
+*     class
+*         The object type to include in error messages.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     A pointer to a dynamically allocated, null terminated string
+*     containing a copy of the concatentated WAT values. This string must
+*     be freed by the caller (using astFree) when no longer required.
+*
+*     A NULL pointer will be returned if there are no WAT kewyords for
+*     the requested axis in the FitsChan.
+
+*  Notes:
+*     - A NULL pointer value will be returned if this function is
+*     invoked with the global error status set or if it should fail
+*     for any reason.
+*/
+
+/* Local Variables: */
+   char keyname[ FITSNAMLEN + 5 ];/* Keyword name */
+   char *wat;                     /* Pointer to a single WAT string */
+   char *result;                  /* Returned string */
+   int watlen;                    /* Length of total WAT string (inc. term null)*/
+   int j;                         /* WAT index */
+   size_t size;                   /* Length of string value */
+
+/* Initialise returned value. */
+   result = NULL;
+
+/* Check inherited status */
+   if( !astOK ) return result;
+
+/* Rewind the FitsChan. */
+   astClearCard( this );
+
+/* Concatenate all the IRAF "WAT" keywords together for this axis. These
+   keywords are marked as having been used, so that they are not written
+   out when the FitsChan is deleted. */
+   watlen = 1;
+   j = 1;
+   sprintf( keyname, "WAT%d_%.3d", iaxis + 1, j );
+   while( astOK ) {
+
+/* Search forward from the current card for the next WAT card. If no
+   found, try searching again from the start of the FitsChan. If not found
+   evenm then, break. */
+      if( ! FindKeyCard( this, keyname, method, class, status ) ) {
+         astClearCard( this );
+         if( ! FindKeyCard( this, keyname, method, class, status ) ) break;
+      }
+
+      wat = (char *) CardData( this, &size, status );
+      result = (char *) astRealloc( (void *) result,
+                                    watlen - 1 + size );
+      if( result ) {
+         strcpy( result + watlen - 1, wat );
+         watlen += size - 1;
+         MarkCard( this, status );
+         MoveCard( this, 1, method, class, status );
+         j++;
+         sprintf( keyname, "WAT%d_%.3d", iaxis + 1, j );
+      } else {
+         break;
+      }
+   }
+
+/* Return the result. */
+   return result;
+}
+
 static int CountFields( const char *temp, char type, const char *method,
                         const char *class, int *status ){
 /*
@@ -7251,12 +7664,14 @@ static void DistortMaps( AstFitsChan *this, FitsStore *store, char s,
 /* Local Variables: */
    AstMapping *tmap1;        /* Mapping pointer */
    AstMapping *tmap2;        /* Mapping pointer */
-   char msgbuf[ 250 ];       /* Buffer for warning message */
-   int i;                    /* FITS axis index */
    char *ctype;              /* Pointer to CTYPE value */
-   char type[ 5 ];           /* Axis type extracted from CTYPE */
    char code[ 4 ];           /* Projection code extracted from CTYPE */
    char dist[ 4 ];           /* Distortion code extracted from CTYPE */
+   char msgbuf[ 250 ];       /* Buffer for warning message */
+   char type[ 5 ];           /* Axis type extracted from CTYPE */
+   int found_axes[ 2 ];      /* Index of axes with the distortion code */
+   int i;                    /* FITS axis index */
+   int nfound;               /* No. of axes with the distortion code */
    int warned;               /* Have any ASTWARN cards been issued? */
 
 /* Initialise pointers to the returned Mappings. */
@@ -7270,7 +7685,7 @@ static void DistortMaps( AstFitsChan *this, FitsStore *store, char s,
 
 /* First check each known distortion type... */
 
-/* "-SIP": Spitzer (http://ssc.spitzer.caltech.edu/postbcd/doc/shupeADASS.pdf)
+/* "-SIP": Spitzer (http://irsa.ipac.caltech.edu/data/SPITZER/docs/files/spitzer/shupeADASS.pdf)
    ============= */
 
 /* Spitzer distortion is limited to 2D. Check the first two axes to see if
@@ -7321,6 +7736,55 @@ static void DistortMaps( AstFitsChan *this, FitsStore *store, char s,
             }
             ctype[ 8 ] = 0;
          }
+      }
+   }
+
+/* "-ZPX": IRAF (http://iraf.noao.edu/projects/ccdmosaic/zpx.html)
+   ============= */
+
+/* An IRAF ZPX header uses a ZPX projection within each CTYPE value in place
+   of the basic ZPN projection. The SpecTrans function converts -ZPX" to
+   "-ZPN-ZPX" (i.e. a basic projection of ZPN with a distortion code of
+   "-ZPX"). This function then traps and processes the "-ZPX" distortion
+   code. */
+
+/* Look for axes that have the "-ZPX" code in their CTYPE values. If any
+   are found, check that there are exactly two such axes, and terminate the
+   ctype strings in order to exclude the distortion code (this is so that
+   later functions do not need to allow for the possibility of a distortion
+   code  being present in the CTYPE value)*/
+   nfound = 0;
+   for( i = 0; i < naxes; i++ ){
+      ctype = GetItemC( &(store->ctype), i, 0, s, NULL, method, class, status );
+      if( ctype && 3 == astSscanf( ctype, "%4s-%3s-%3s", type, code, dist ) ){
+         if( !strcmp( "ZPX", dist ) ){
+            if( nfound < 2 ) found_axes[ nfound ] = i;
+            nfound++;
+            ctype[ 8 ] = 0;
+         }
+      }
+   }
+
+/* Issue a warning if more than two ZPX axes were found. */
+   if( nfound > 2 ) {
+      Warn( this, "distortion", "More than two axes were found "
+            "with the \"-ZPX\" projection code. A ZPN projection "
+            "will be used instead.", method, class, status );
+
+/* Otherwise, create a Mapping describing the distortion (other axes are passed
+   unchanged by this Mapping), and add it in series with the returned map4
+   (ZPX distortion is applied to the translated, rotated, scaled IWC
+   coordinates). */
+   } else if( nfound == 2 ){
+      tmap1 = ZPXMapping( this, store, s, naxes,  found_axes, method,
+                          class, status );
+      if( ! *map4 ) {
+         *map4 = tmap1;
+      } else {
+         tmap2 = (AstMapping *) astCmpMap( *map4, tmap1, 1, "", status );
+         *map4 = astAnnul( *map4 );
+         tmap1 = astAnnul( tmap1 );
+         *map4 = tmap2;
       }
    }
 
@@ -12146,6 +12610,106 @@ f     function is invoked with STATUS set to an error value, or if it
    return result;
 }
 
+static int GetUsedPolyTan( AstFitsChan *this, int latax, int lonax,
+                           char s, int *status ){
+/*
+*  Name:
+*     GetUsedPolyTan
+
+*  Purpose:
+*     Get the value to use for the PolyTan attribute.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "fitschan.h"
+*     int GetUsedPolyTan( AstFitsChan *this, int latax, int lonax,
+*                         char s, int *status )
+
+*  Class Membership:
+*     FitsChan member function.
+
+*  Description:
+*     If the PolyTan attribute is zero or positive, then its value is
+*     returned. If it is negative, the supplied FitsChan is searched for
+*     keywords of the form PVi_m. If any are found on the latitude axis,
+*     or if any are found on the longitude axis with "m" > 4, zero is
+*     returned (meaning "use the distorted TAN conventio"). Otherwise +1
+*     is returned (meaning "use the standard TAN convention").
+
+*  Parameters:
+*     this
+*        Pointer to the FitsChan.
+*     latax
+*        The one-based index of the latitude axis within the FITS header.
+*     lonax
+*        The one-based index of the longitude axis within the FITS header.
+*     s
+*        A character identifying the co-ordinate version to use. A space
+*        means use primary axis descriptions. Otherwise, it must be an
+*        upper-case alphabetical characters ('A' to 'Z').
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     The attribute value to use.
+
+*  Notes:
+*     -  A value of zero is returned if an error has already occurred
+*     or if an error occurs for any reason within this function.
+*/
+
+/* Local Variables... */
+   char template[ 20 ];
+   int lbnd;
+   int nfound;
+   int ret;
+   int ubnd;
+
+/* Check the global status. */
+   if( !astOK ) return 0;
+
+/* Get the value of the PolyTan attribute. */
+   ret = astGetPolyTan( this );
+
+/* If it is negative, we examine the FitsChan to see which convention to
+   use. */
+   if( ret < 0 ) {
+
+/* Search the FitsChan for latitude PV cards. */
+      if( s != ' ' ) {
+         sprintf( template, "PV%d_%%d%c", latax, s );
+      } else {
+         sprintf( template, "PV%d_%%d", latax );
+      }
+      nfound = astKeyFields( this, template, 1, &ubnd, &lbnd );
+
+/* If any were found, assume the distorted TAN convention is in use. */
+      if( nfound ) {
+         ret = 1;
+
+/* If no PVi_m keywords were foudn for the latitude axis, see if there
+   are any on the longitude axis. */
+      } else {
+         if( s != ' ' ) {
+            sprintf( template, "PV%d_%%d%c", lonax, s );
+         } else {
+            sprintf( template, "PV%d_%%d", lonax );
+         }
+         nfound = astKeyFields( this, template, 1, &ubnd, &lbnd );
+
+/* If any were found with "m" value greater than 4, assume the distirted
+   TAN convention is in use. Otherwise assume the stdanrd TAN convention is
+   in use. */
+         ret = ( nfound && ubnd > 4 ) ? 1 : 0;
+      }
+   }
+
+/* Return  the result. */
+   return astOK ? ret : 0;
+}
+
 static int GoodWarns( const char *value, int *status ){
 /*
 *  Name:
@@ -12441,7 +13005,6 @@ static int KeyFields( AstFitsChan *this, const char *filter, int maxfld,
 
 *  Synopsis:
 *     #include "fitschan.h"
-
 *     int astKeyFields( AstFitsChan *this, const char *filter, int maxfld,
 *                       int *ubnd, int *lbnd )
 
@@ -12479,7 +13042,6 @@ static int KeyFields( AstFitsChan *this, const char *filter, int maxfld,
 
 *  Filter Syntax:
 *     -  The criteria for a keyword name to match a filter template are
-
 *     as follows:
 *     -  All characters in the template other than "%" (and the field width
 *     and type specifiers which follow a "%") must be matched by an
@@ -15037,6 +15599,15 @@ const char *GetAttrib( AstObject *this_object, const char *attrib, int *status )
          result = getattrib_buff;
       }
 
+/* PolyTan */
+/* ------- */
+   } else if ( !strcmp( attrib, "polytan" ) ) {
+      ival = astGetPolyTan( this );
+      if ( astOK ) {
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
+      }
+
 /* Iwc */
 /* --- */
    } else if ( !strcmp( attrib, "iwc" ) ) {
@@ -16313,6 +16884,10 @@ void astInitFitsChanVtab_(  AstFitsChanVtab *vtab, const char *name, int *status
    vtab->TestCarLin = TestCarLin;
    vtab->SetCarLin = SetCarLin;
    vtab->GetCarLin = GetCarLin;
+   vtab->ClearPolyTan = ClearPolyTan;
+   vtab->TestPolyTan = TestPolyTan;
+   vtab->SetPolyTan = SetPolyTan;
+   vtab->GetPolyTan = GetPolyTan;
    vtab->ClearIwc = ClearIwc;
    vtab->TestIwc = TestIwc;
    vtab->SetIwc = SetIwc;
@@ -24035,6 +24610,13 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
         && ( nc >= len ) ) {
       astSetCarLin( this, ival );
 
+/* PolyTan */
+/* ------- */
+   } else if ( nc = 0,
+        ( 1 == astSscanf( setting, "polytan= %d %n", &ival, &nc ) )
+        && ( nc >= len ) ) {
+      astSetPolyTan( this, ival );
+
 /* Iwc */
 /* --- */
    } else if ( nc = 0,
@@ -24650,6 +25232,134 @@ static void SetValue( AstFitsChan *this, const char *keyname, void *value,
    }
 }
 
+static void Shpc1( double xmin, double xmax, int n, double *d, double *w,
+                   int *status ){
+/*
+*  Name:
+*     Shpc1
+
+*  Purpose:
+*     Modifies a one-dimensional polynomial to scale the polynomial argument.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "fitschan.h"
+*     void Shpc1( double xmin, double xmax, int n, double *d, double *w,
+*                 int *status )
+
+*  Description:
+*     Given the coefficients of a one-dimensional polynomial P(u) defined on a
+*     unit interval (i.e. -1 <= u <= +1 ), find the coefficients of another
+*     one-dimensional polynomial Q(x) where:
+*
+*       Q(x) = P(u)
+*       u = ( 2*x - ( xmax + xmin ) ) / ( xmax - xmin )
+*
+*     That is, u is a scaled version of x, such that the unit interval in u
+*     maps onto (xmin:xmax) in x.
+
+*  Parameters:
+*     xmin
+*        X value corresponding to u = -1
+*     xmax
+*        X value corresponding to u = +1
+*     n
+*        One more than the maximum power of u within P.
+*     d
+*        An array of n elements supplied holding the coefficients of P such
+*        that the coefficient of (u^i) is held in element (i).
+*     w
+*        An array of n elements returned holding the coefficients of Q such
+*        that the coefficient of (x^i) is held in element (i).
+*     status
+*        Pointer to the inherited status variable.
+
+*  Notes:
+*    - Vaguely inspired by the Numerical Recipes routine "pcshft". But the
+*    original had bugs, so I wrote this new version from first principles.
+
+*/
+
+/* Local Variables: */
+   double b;
+   double a;
+   int j;
+   int i;
+
+/* Check inherited status */
+   if( !astOK ) return;
+
+/* Get the scale and shift terms so that u = a*x + b */
+   a = 2.0/( xmax - xmin );
+   b = ( xmin + xmax )/( xmin - xmax );
+
+/* Initialise the returned coeffs */
+   for( i = 0; i < n; i++ ) w[ i ] = 0.0;
+
+/* The supplied Polynomial is
+
+   P(u) = d0 + d1*u + d2*u^2 + ...
+
+        = d0 + u*( d1 + u*( d2 + ... u*( d{n-1} ) ) )  . . . . . (1)
+
+        = d0 + (a*x+b)*( d1 + (a*x+b)*( d2 + ... (a*x+b)*( d[n-1] ) ) )
+
+   The inner-most parenthesised expression is a polynomial of order zero
+   (a constant - d[n-1]). Store the coefficients of this zeroth order
+   polynomial in the returned array. The "w" array is used to hold the
+   coefficients of Q, i.e. coefficients of powers of "x", not "u", but
+   since the inner-most polynomial is a constant, it makes no difference
+   (x^0 == u^0 == 1). */
+   w[ 0 ] = d[ n - 1 ];
+
+/* Now loop through each remaining level of parenthetic nesting in (1). At
+   each level, the parenthesised expression represents a polynomial of order
+   "i". At the end of each pass though this loop, the returned array "w"
+   holds the coefficients of this "i"th order polynomial. So on the last
+   loop, i = n-1, "w" holds the required coefficients of Q. */
+   for( i = 1; i < n; i++ ) {
+
+/* If "R" is the polynomial at the "i-1"th level of nesting (the
+   coefficiemts of which are currently held in "w"), and "S" is the
+   polynomial at the "i"th level of nesting, we can see from (1) that:
+
+   S = d[ n - 1 - i ] + u*R
+
+   Substituting for "u", this becomes
+
+   S = d[ n - 1 - i ] + ( a*x + b )*R
+     = d[ n - 1 - i ] + a*R*x + b*R
+
+   Looking at each of these three terms in reverse order:
+
+   1) The "b*R" term is implemented by simply scaling the current contents
+   of the "w" array by "b"; in the "a*R*x" term.
+
+   2) In "a*R*x", the effect of multiplying by "x" is to move the existing
+   coefficients in "w" up one element. We then multiply the shifted
+   coefficients by "a" and add them onto the coefficients produced at
+   step 1) above.
+
+   We know that "w" still contains the initial zeros at indices higher than
+   "i" so we only need to scale the bottom "i" elements. We do not do the
+   zeroth term in this loop since there is no lower term to shift up into
+   it. */
+
+      for( j = i; j > 0; j-- ){
+         w[ j ] = b*w[ j ] + a*w[ j - 1 ];
+      }
+
+/* Now do the zeroth term. Scale the existing zeroth term by "b" as
+   required by step 1) and add on the first term, the constant
+   "d[ n - 1 - i ]". Step 2) is a no-op, since in effect the value of
+   "w[-1]" is zero. */
+      w[ 0 ] = d[ n - i - 1 ] + b*w[ 0 ];
+   }
+
+}
+
 static int Similar( const char *str1, const char *str2, int *status ){
 /*
 *  Name:
@@ -24823,7 +25533,7 @@ static AstMapping *SIPMapping( FitsStore *store, char s, int naxes,
 
 *     code used by the Spitzer project and is described in:
 *
-*     http://ssc.spitzer.caltech.edu/postbcd/doc/shupeADASS.pdf
+*     http://irsa.ipac.caltech.edu/data/SPITZER/docs/files/spitzer/shupeADASS.pdf
 *
 *     SIP distortion can only be applied to axes 0 and 1. Other axes are
 *     passed unchanged by the returned Mapping.
@@ -25027,7 +25737,7 @@ static AstMapping *SIPMapping( FitsStore *store, char s, int naxes,
 
 /* If no coefficients were supplied in the FitsStore, the forward
    transformation is undefined. */
-   if( !def ) ncoeff_f = 0;
+   if( !def ) ncoeff_i = 0;
 
 /* Create the returned Mapping:
    ============================ */
@@ -26434,18 +27144,11 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 
 *       (i = 1, naxis) are "-ZPX", then:
 *	- "ZPX" is replaced by "ZPN" within the CTYPEi value
+*	- A distortion code of "-ZPX" is appended to the end of the CTYPEi
+*       value (this is used later by the DistortMaps function).
 *       - If the FitsChan contains no PROJP keywords, then projection
 *       parameter valus are read from any WATi_nnn keywords, and
 *       corresponding PV keywords are added to the FitsChan.
-*       - The WATi_nnn keywords may specify corrections to the basic ZPN
-*       projection by including "lngcor" or "latcor" terms. There is no
-*       direct equivalent in FITS-PC to these terms and so they are
-*       ignored (it may be possible to use a pixel correction image but
-*       such images are not supported by AST anyway). If these correction
-*       terms are found ASTWARN keywords are added to the FitsChan
-*       containing a warning message. The calling application can (if it
-*       wants to) check for this keyword, and report its contents to the
-*       user.
 *
 *     13) The IRAF "TNX" projection. If the last 4 chacaters of CTYPEi
 
@@ -26490,6 +27193,10 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 *     21) Various translations specific to the FITS-CLASS encoding.
 *
 *     21) CTYPE == "LAMBDA" changed to CTYPE = "WAVE"
+*
+*     22) if the projection is TAN and the PolyTan attribute is non-zero,
+*     the projection is changed to TPN (the AST code for the draft FITS-WCS
+*     paper II conventions for a distorted TAN projection).
 
 *  Parameters:
 *     this
@@ -26512,24 +27219,24 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 
 /* Local Variables: */
    AstFitsChan *ret;              /* The returned FitsChan */
-   char *astype;                  /* AIPS spectral type */
    char *assys;                   /* AIPS standad of rest type */
+   char *astype;                  /* AIPS spectral type */
    char *comm;                    /* Pointer to comment string */
    char *cval;                    /* Pointer to character string */
    char *start;                   /* Pointer to start of projp term */
-   char *wat;                     /* Pointer to a single WAT string */
    char *watmem;                  /* Pointer to total WAT string */
    char bj;                       /* Besselian/Julian indicator */
    char format[ 50 ];             /* scanf format string */
    char keyname[ FITSNAMLEN + 5 ];/* General keyword name + formats */
-   char template[ FITSNAMLEN + 1 ];/* General keyword name template */
    char lattype[MXCTYPELEN];      /* CTYPE value for latitude axis */
    char lontype[MXCTYPELEN];      /* CTYPE value for longitude axis */
-   char spectype[MXCTYPELEN];     /* CTYPE value for spectral axis */
    char prj[6];                   /* Spatial projection string */
-   char sprj[6];                  /* Spectral projection string */
    char s;                        /* Co-ordinate version character */
+   char spectype[MXCTYPELEN];     /* CTYPE value for spectral axis */
+   char sprj[6];                  /* Spectral projection string */
    char ss;                       /* Co-ordinate version character */
+   char template[ FITSNAMLEN + 1 ];/* General keyword name template */
+   double *cvals;                 /* PVi_m values for TPN projection */
    double cdelt;                  /* CDELT value */
    double cdelti;                 /* CDELT for longitude axis */
    double cdeltj;                 /* CDELT for latitude axis */
@@ -26544,52 +27251,28 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
    double rowsum2;                /* Sum of squared CDi_j row elements */
    double sinrota;                /* Sin( CROTA ) */
    double sinval;                 /* Sin( dec ref ) */
-   const int *mp;                 /* Pointer to next projection parameter index */
+   int *mvals;                    /* "m" index of each PVi_m value */
    int axlat;                     /* Index of latitude axis */
    int axlon;                     /* Index of longitude axis */
    int diag;                      /* Sign of diagonal CDi_j element */
    int gotpcij;                   /* Does FitsChan contain any PCi_j keywords? */
    int i,j;                       /* Indices */
-   int jlo;                       /* Lowest axis index */
-   int jhi;                       /* Highest axis index */
    int iaxis;                     /* Axis index */
+   int icoeff;                    /* Index of next PVi_m value */
    int iproj;                     /* Projection parameter index */
+   int jhi;                       /* Highest axis index */
+   int jlo;                       /* Lowest axis index */
    int lbnd[ 2 ];                 /* Lower index bounds */
    int m;                         /* Co-ordinate version index */
    int naxis;                     /* Number of axes */
-   int nch;                       /* No. of characters read */
+   int ncoeff;                    /* Number of PVi_m values */
    int norot;                     /* Non-zero if there is no axis rotation */
    int ok;                        /* Can projection be represented in FITS-WCS?*/
-   int porder;                    /* Order of polynomial */
    int tlbnd[ 2 ];                /* Lower index bounds */
    int tubnd[ 2 ];                /* Upper index bounds */
    int ubnd[ 2 ];                 /* Upper index bounds */
    int use_projp;                 /* Use PROJP keywors in favour of PV keywords? */
-   int watlen;                    /* Length of total WAT string (inc. term null)*/
    size_t size;                   /* Length of string value */
-
-/* Arrays needed to convert the index of a TNX co-efficient into an index
-   of a TAN projection parameter. */
-   static const int abskip[] = {0,1,4,10,20,35,56,84};
-   static const int nab[] = {1,3,6,10,15,21,28,36};
-   static const int a[] = {
-0,
-0,1,2,
-0,1,4,2,5,6,
-0,1,4,7,2,5,8,6,9,10,
-0,1,4,7,12,2,5,8,13,6,9,14,10,15,16,
-0,1,4,7,12,17,2,5,8,13,18,6,9,14,19,10,15,20,16,21,22,
-0,1,4,7,12,17,24,2,5,8,13,18,25,6,9,14,19,26,10,15,20,27,16,21,28,22,29,30,
-0,1,4,7,12,17,24,31,2,5,8,13,18,25,32,6,9,14,19,26,33,10,15,20,27,34,16,21,28,35,22,29,36,30,37,38};
-   static const int b[] = {
-0,
-0,2,1,
-0,2,6,1,5,4,
-0,2,6,10,1,5,9,4,8,7,
-0,2,6,10,16,1,5,9,15,4,8,14,7,13,12,
-0,2,6,10,16,22,1,5,9,15,21,4,8,14,20,7,13,19,12,18,17,
-0,2,6,10,16,22,30,1,5,9,15,21,29,4,8,14,20,28,7,13,19,27,12,18,26,17,25,24,
-0,2,6,10,16,22,30,38,1,5,9,15,21,29,37,4,8,14,20,28,36,7,13,19,27,35,12,18,26,34,17,25,33,24,32,31};
 
 /* Check the global error status. */
    if ( !astOK ) return NULL;
@@ -27390,16 +28073,38 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
          MoveCard( this, 1, method, class, status );
       }
 
+
+
+/* Change any TAN projection to TPN projection if the PolyTan attribute
+   is non-zero.
+   --------------------------------------------------- */
+      if( !Ustrcmp( prj, "-TAN", status ) ){
+         if( GetUsedPolyTan( this, axlat + 1, axlon + 1, s, status ) ){
+            strcpy( prj, "-TPN" );
+            strcpy( lontype + 4, "-TPN" );
+            cval = lontype;
+            SetValue( ret, FormatKey( "CTYPE", axlon + 1, -1, s, status ),
+                      (void *) &cval, AST__STRING, NULL, status );
+            strcpy( lattype + 4, "-TPN" );
+            cval = lattype;
+            SetValue( ret, FormatKey( "CTYPE", axlat + 1, -1, s, status ),
+                      (void *) &cval, AST__STRING, NULL, status );
+         }
+      }
+
+
+
 /* IRAF "ZPX" projections
    --------------------- */
       if( s == ' ' && !Ustrcmp( prj, "-ZPX", status ) ) {
 
-/* Replace ZPX with ZPN in the CTYPE values. */
-         strcpy( lontype + 4, "-ZPN" );
+/* Replace "ZPX" with "ZPN-ZPX" (i.e. ZPN projection with ZPX distortion
+   code) in the CTYPE values. */
+         strcpy( lontype + 4, "-ZPN-ZPX" );
          cval = lontype;
          SetValue( ret, FormatKey( "CTYPE", axlon + 1, -1, ' ', status ),
                    (void *) &cval, AST__STRING, NULL, status );
-         strcpy( lattype + 4, "-ZPN" );
+         strcpy( lattype + 4, "-ZPN-ZPX" );
          cval = lattype;
          SetValue( ret, FormatKey( "CTYPE", axlat + 1, -1, ' ', status ),
                    (void *) &cval, AST__STRING, NULL, status );
@@ -27408,31 +28113,10 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
          for( i = 0; i < 2; i++ ){
             iaxis = i ? axlat : axlon;
 
-/* Rewind the FitsChan. */
-            astClearCard( this );
-
 /* Concatenate all the IRAF "WAT" keywords together for this axis. These
    keywords are marked as having been used, so that they are not written
    out when the FitsChan is deleted. */
-            watmem = NULL;
-            watlen = 1;
-            j = 1;
-            sprintf( keyname, "WAT%d_%.3d", iaxis + 1, j );
-            while( FindKeyCard( this, keyname, method, class, status ) && astOK ) {
-               wat = (char *) CardData( this, &size, status );
-               watmem = (char *) astRealloc( (void *) watmem,
-                                             watlen - 1 + size );
-               if( watmem ) {
-                  strcpy( watmem + watlen - 1, wat );
-                  watlen += size - 1;
-                  MarkCard( this, status );
-                  MoveCard( this, 1, method, class, status );
-                  j++;
-                  sprintf( keyname, "WAT%d_%.3d", iaxis + 1, j );
-               } else {
-                  break;
-               }
-            }
+            watmem = ConcatWAT( this, iaxis, method, class, status );
 
 /* Search the total WAT string for any projp terms. */
             if( watmem ){
@@ -27447,17 +28131,6 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
                                   "ZPN projection parameter", status );
                      }
                   }
-               }
-
-/* See if the WAT string contains any lngcor or latcor terms. If so, add
-   warning keywords to the FitsChan. */
-               if( ( strstr( watmem, "lngcor" ) ||
-                     strstr( watmem, "latcor" ) ) ){
-                  Warn( this, "zpn", "This FITS header includes, or was "
-                        "derived from, a ZPN projection which requires "
-                        "unsupported IRAF-specific corrections (lngcor "
-                        "and/or latcor). The WCS information may therefore "
-                        "be incorrect.", method, class, status );
                }
 
 /*  Release the memory used to hold the concatenated WAT keywords. */
@@ -27483,110 +28156,36 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
          for( i = 0; i < 2; i++ ){
             iaxis = i ? axlat : axlon;
 
-/* Assume the TNX axis can be represented in FITS-WCS. */
-            ok = 1;
-
-/* Rewind the FitsChan. */
-            astClearCard( this );
-
 /* Concatenate all the IRAF "WAT" keywords together for this axis. These
    keywords are marked as having been used, so that they are not written
    out when the FitsChan is deleted. */
-            watmem = NULL;
-            watlen = 1;
-            j = 1;
-            sprintf( keyname, "WAT%d_%.3d", iaxis + 1, j );
-            while( FindKeyCard( this, keyname, method, class, status ) && astOK ) {
-               wat = (char *) CardData( this, &size, status );
-               watmem = (char *) astRealloc( (void *) watmem,
-                                             watlen - 1 + size );
-               if( watmem ) {
-                  strcpy( watmem + watlen - 1, wat );
-                  watlen += size - 1;
-                  MarkCard( this, status );
-                  MoveCard( this, 1, method, class, status );
-                  j++;
-                  sprintf( keyname, "WAT%d_%.3d", iaxis + 1, j );
-               } else {
-                  break;
-               }
-            }
+            watmem = ConcatWAT( this, iaxis, method, class, status );
 
-/* Search the total WAT string for any lngcor or latcor terms. */
-            if( watmem ){
-               start = strstr( watmem, "cor = \"" );
+/* Extract the polynomial coefficients from the concatenated WAT string.
+   These are returned in the form of a list of PVi_m values for a TPN
+   projection. */
+            ncoeff = WATCoeffs( watmem, i, &cvals, &mvals, &ok, status );
 
-/* If found, extract the numerical values which follow. */
-               if( start ) {
-                  start = strstr( start, "\"" ) + 1;
-                  mp = 0;
-                  j = 0;
-                  nch = 0;
-                  porder = -1;
-                  while( ok && 1 == astSscanf( start, " %lf %n", (double *) &dval, &nch ) ){
-
-/* The first value gives the correction surface type. We can only handle
-   type 3 (simple polynonial). */
-                     if( j == 0 ){
-                        if( dval != 3.0 ) ok = 0;
-
-/* The second and third numbers gives the orders of the polynomial in X
-   and Y. We can only handle cases in which the orders are the same on
-   both axes, and greater than 0 and less than 9. Store a pointer to the
-   first TAN projection parameter index to use. */
-                     } else if( j == 1 ){
-                        porder = dval - 1;
-                     } else if( j == 2 ){
-                        if( dval - 1 != porder || dval < 0 || dval > 7 ) ok = 0;
-                        mp = (i?b:a) + abskip[ porder ];
-
-/* The fourth number defines the type of cross-terms. We can only handle
-   type 2 (half-cross terms). */
-                     } else if( j == 3 ){
-                        if( dval != 2.0 ) ok = 0;
-
-/* The next 4 numbers describe the region of validity of the fits in
-   xi and eta space, e.g. ximin, ximax, etamin, etamax. We skip over these
-   since we have no means of implementing any limit on the region of
-   validity. */
-
-/* The remaining terms are the coefficients of the polynomial terms. */
-                     } else if( j > 7 ){
-
-/* Find the index of the corresponding PV keyword. */
-                        m = *(mp++);
-
-/* TNX polynomials provide a "correction* to be added to the supplied X and
-   Y values. Therefore increase the linear co-efficients by 1 on both
-   axes. */
-                        if( m == 1 ) dval += 1.0;
-
-/* Store the PV value */
-                        SetValue( ret, FormatKey( "PV", iaxis + 1, m, ' ', status ),
-                                  (void *) &dval, AST__FLOAT,
-                                  "TAN projection parameter", status );
-                     }
-                     start += nch;
-                     nch = 0;
-                     j++;
-                  }
-
-/* Check that all the required co-efficients were found */
-                  if( porder == -1 || j != 8 + nab[ porder ] ) ok = 0;
+/* If we can handle the TNX projection, store the PV values in the FitsChan. */
+            if( ok ) {
+               for( icoeff = 0; icoeff < ncoeff; icoeff++ ) {
+                  SetValue( ret, FormatKey( "PV", iaxis + 1, mvals[ icoeff ],
+                                            ' ', status ),
+                           (void *) (cvals + icoeff), AST__FLOAT,
+                           "TAN projection parameter", status );
                }
 
 /* If the TNX cannot be represented in FITS-WCS (within our restrictions), add
    warning keywords to the FitsChan. */
-               if( !ok ){
-                  Warn( this, "tnx", "This FITS header includes, or was "
-                        "derived from, a TNX projection which requires "
-                        "unsupported IRAF-specific corrections. The WCS "
-                        "information may therefore be incorrect.", method, class, status );
-               }
+            } else {
+               Warn( this, "tnx", "This FITS header includes, or was "
+                     "derived from, a TNX projection which requires "
+                     "unsupported IRAF-specific corrections. The WCS "
+                     "information may therefore be incorrect.", method, class, status );
+            }
 
 /*  Release the memory used to hold the concatenated WAT keywords. */
-               watmem = (char *) astFree( (void *) watmem );
-            }
+            watmem = (char *) astFree( (void *) watmem );
          }
       }
 
@@ -28192,14 +28791,14 @@ static int SplitMap( AstMapping *map, int invert, int ilon, int ilat,
 *  Description:
 *     If possible, the supplied Mapping is decomposed into three component
 *     mappings to be compounded in series. To be acceptable, the second of
-*     these three Mappings must be an inverted WcsMap, and there must not
-*     be a WcsMap in either of the other two Mappings. If it is not
-*     possible to produce such a group of three Mappings, then a zero
-*     function value is returned, together with three NULL Mapping
-*     pointers. All the mappings before the WcsMap are compounded
-*     together and returned as "map1". The inverse of the WcsMap itself is
-*     returned as "map2", and any remaining Mappings are compounded together
-*     and returned as "map3".
+*     these three Mappings must be an inverted WcsMap with a non-zero
+*     FITSProj attribute value, and there must not be such a WcsMap in
+*     either of the other two Mappings. If it is not possible to produce
+*     such a group of three Mappings, then a zero function value is returned,
+*     together with three NULL Mapping pointers. All the mappings before the
+*     WcsMap are compounded together and returned as "map1". The inverse of
+*     the WcsMap itself is returned as "map2", and any remaining Mappings
+*     are compounded together and returned as "map3".
 *
 *     The search algorithm allows for an arbitrary combination of series and
 *     parallel CmpMaps.
@@ -28218,9 +28817,9 @@ static int SplitMap( AstMapping *map, int invert, int ilon, int ilat,
 *        A location at which to return a pointer to the Mapping from pixel
 *        to intermediate world coordinates.
 *     map2
-*        A location at which to return a pointer to the Mapping from intermediate
-*        world coordinates to native spherical coordinates. This will
-*        be an inverted WcsMap.
+*        A location at which to return a pointer to the Mapping from
+*        intermediate world coordinates to native spherical coordinates. This
+*        will be an inverted WcsMap with non-zero FITSProj attribute value.
 *     map3
 *        A location at which to return a pointer to the Mapping from
 *        native spherical coordinates to physical coordinates.
@@ -28231,7 +28830,7 @@ static int SplitMap( AstMapping *map, int invert, int ilon, int ilat,
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     One if a WcsMap was found, zero otherwise.
+*     One if a suitable WcsMap was found, zero otherwise.
 
 *  Notes:
 *     -  The returned Mappings contain independant copies of the relevant
@@ -28286,11 +28885,15 @@ static int SplitMap( AstMapping *map, int invert, int ilon, int ilat,
 /* Check that the WcsMap is inverted. */
       if( astGetInvert( *map2 ) ) {
 
-/* Check that map 1 does not contain a WcsMap. */
-         if( !SplitMap2( *map1, astGetInvert( *map1 ), &mapa, &mapb, &mapc, status ) ) {
+/* Check that map 1 does not contain a WcsMap with non-zero FITSProj
+   attribute. */
+         if( !SplitMap2( *map1, astGetInvert( *map1 ), &mapa, &mapb, &mapc,
+                         status ) ) {
 
-/* Check that map 3 does not contain a WcsMap. */
-            if( !SplitMap2( *map3, astGetInvert( *map3 ), &mapa, &mapb, &mapc, status ) ) {
+/* Check that map 3 does not contain a WcsMap with non-zero FITSProj
+   attribute. */
+            if( !SplitMap2( *map3, astGetInvert( *map3 ), &mapa, &mapb, &mapc,
+                            status ) ) {
 
 /* If so, the three Mappings are OK. */
                ret = 1;
@@ -28464,12 +29067,12 @@ static int SplitMap2( AstMapping *map, int invert, AstMapping **map1,
 *  Description:
 *     If possible, the supplied Mapping is decomposed into three component
 *     mappings to be compounded in series. To be acceptable, the second of
-*     these three Mappings must be a WcsMap. If it is not possible to produce
-*     such a group of three Mappings, then a zero function value is returned,
-*     together with three NULL Mapping pointers. All the mappings before the
-*     WcsMap are compounded together and returned as "map1". The WcsMap itself
-*     is returned as "map2", and any remaining Mappings are compounded together
-*     and returned as "map3".
+*     these three Mappings must be a WcsMap with a non-zero FITSProj value.
+*     If it is not possible to produce such a group of three Mappings, then a
+*     zero function value is returned, together with three NULL Mapping
+*     pointers. All the mappings before the WcsMap are compounded together
+*     and returned as "map1". The WcsMap itself is returned as "map2", and
+*     any remaining Mappings are compounded together and returned as "map3".
 *
 *     The search algorithm allows for an arbitrary combination of series and
 *     parallel CmpMaps.
@@ -28486,7 +29089,7 @@ static int SplitMap2( AstMapping *map, int invert, AstMapping **map1,
 *     map2
 *        A location at which to return a pointer to the Mapping from relative
 *        physical coordinates to native spherical coordinates. This will
-*        be a WcsMap.
+*        be a WcsMap, and it will have a non-zero FITSProj value.
 *     map3
 *        A location at which to return a pointer to the Mapping from
 *        native spherical coordinates to physical coordinates.
@@ -28497,14 +29100,14 @@ static int SplitMap2( AstMapping *map, int invert, AstMapping **map1,
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     One if a WcsMap was found, zero otherwise.
+*     One if a suitable WcsMap was found, zero otherwise.
 
 *  Notes:
 *     -  The returned Mappings contain independant copies of the relevant
 *     components of the supplied Mapping and can be modified without
 *     changing the supplied Mapping.
 *     -  NULL pointers will be returned for all Mappings if no WcsMap
-*     can be found in the supplied Mapping.
+*     with anon-zero FITSProj value can be found in the supplied Mapping.
 *     -  A pointer to a UnitMap will be returned for map1 if no mappings
 *     exist before the WcsMap.
 *     -  A pointer to a UnitMap will be returned for map3 if no mappings
@@ -28512,6 +29115,8 @@ static int SplitMap2( AstMapping *map, int invert, AstMapping **map1,
 *     -  NULL pointers will be returned for all Mappings and a function
 *     value of zero will be returned if an error has occurred, or if this
 *     function should fail for any reason.
+*     - "*map1" and "*map3" may contain WcsMaps, but they will have zero
+*     values for their FITSProj values.
 */
 
 /* Local Variables */
@@ -28708,10 +29313,10 @@ static int SplitMap2( AstMapping *map, int invert, AstMapping **map1,
       map_list = astFree( map_list );
       invert_list = astFree( invert_list );
 
-/* If the supplied Mapping is not a CmpMap, see if it is a WcsMap. If so,
-   take a copy and set its invert attribute correctly. Also create UnitMaps
-   for the pre and post wcs mappings. */
-   } else if( !strcmp( class, "WcsMap" ) ){
+/* If the supplied Mapping is not a CmpMap, see if it is a WcsMap with a
+   non-zero FITSProj value. If so, take a copy and set its invert attribute
+   correctly. Also create UnitMaps for the pre and post wcs mappings. */
+   } else if( astOK && !strcmp( class, "WcsMap" ) && astGetFITSProj( map ) ){
       ret = 1;
       nax = astGetNin( map );
       *map1 = (AstMapping *) astUnitMap( nax, "", status );
@@ -28720,7 +29325,8 @@ static int SplitMap2( AstMapping *map, int invert, AstMapping **map1,
       *map3 = (AstMapping *) astUnitMap( nax, "", status );
    }
 
-/* If an error has occurred, or if no WcsMap was found, annul any Mappings. */
+/* If an error has occurred, or if no suitable WcsMap was found, annul any
+   Mappings. */
    if( !astOK || !ret ){
       ret = 0;
       if( *map1 ) *map1 = astAnnul( *map1 );
@@ -29661,6 +30267,11 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
    } else if ( !strcmp( attrib, "carlin" ) ) {
       result = astTestCarLin( this );
 
+/* PolyTan */
+/* ------- */
+   } else if ( !strcmp( attrib, "polytan" ) ) {
+      result = astTestPolyTan( this );
+
 /* Iwc. */
 /* ---- */
    } else if ( !strcmp( attrib, "iwc" ) ) {
@@ -30480,6 +31091,240 @@ static void Warn( AstFitsChan *this, const char *condition, const char *text,
          astSetFitsS( this, "ASTWARN", " ", NULL, 0 );
       }
    }
+}
+
+static int WATCoeffs( const char *watstr, int iaxis, double **cvals,
+                      int **mvals, int *ok, int *status ){
+/*
+*  Name:
+*     WATCoeffs
+
+*  Purpose:
+*     Get the polynomial coefficients from the lngcor or latcor component
+*     of an IRAF WAT string.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     int WATCoeffs( const char *watstr, int iaxis, double **cvals,
+*                    int **mvals, int *ok, int *status )
+
+*  Class Membership:
+*     FitsChan
+
+*  Description:
+*     This function extracts the polynomial coefficients from a supplied
+*     string containing the concatenated values of a set of IRAF "WAT"
+*     keywords, such as used for the IRAF-specific TNX and ZPX projections.
+*     The coefficients are returned in the form of a set of PVi_m values
+*     for a TPN projection.
+
+*  Parameters:
+*     watstr
+*        The concatentated WAT keyword values.
+*     iaxis
+*        Zero based index of the axis to which the WAT keywords refer (0
+*        or 1).
+*     cvals
+*        Location at which to return a pointer to a dynamically allocated
+*        list of coefficient values, or NULL if no lngcor/latcor values
+*        were found in the WAT string. Free using astFree.
+*     mvals
+*        Location at which to return a pointer to a dynamically allocated
+*        list of coefficient indices, or NULL if no lngcor/latcor values
+*        were found in the WAT string. Free using astFree.
+*     ok
+*        Pointer to an in which is returned set to zero if the polynomial
+*        in the supplied WAT string cannot be represented using TPN form.
+*        Non-zero otherwise.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     The size of the returned cvals and mvals arrays.
+
+*/
+
+/* Local Variables: */
+   char **w1;
+   char **w2;
+   double *coeff;
+   double *pc;
+   int result;
+   double dval;
+   double etamax;
+   double etamin;
+   double ximax;
+   double ximin;
+   int cheb;
+   int etaorder;
+   int iword;
+   int m;
+   int mn;
+   int nword;
+   int order;
+   int porder;
+   int xiorder;
+   int ires;
+
+/* The number of lngcor/latcor values needed for each order. */
+   static const int nab[] = {1,3,6,10,15,21,28,36};
+
+/* Initialise the pointer to the returned Mapping. */
+   result = 0;
+   *mvals = NULL;
+   *cvals = NULL;
+   *ok = 1;
+
+/* Check the global status. */
+   if ( !astOK || !watstr ) return result;
+
+/* Look for cor = "..." and extract the "..." string. */
+   w1 = astChrSplitRE( watstr, "cor *= *\"(.*)\"", &nword, NULL );
+   if( w1 ) {
+
+/* Split the "..." string into words. */
+      w2 = astChrSplit( w1[ 0 ], &nword );
+      if( w2 ) {
+
+/* Initialise flags. */
+         cheb = 0;
+         xiorder = 0;
+         etaorder = 0;
+         coeff = NULL;
+         porder = -1;
+
+/* Loop round each word. */
+         for( iword = 0; iword < nword; iword++ ) {
+
+/* Convert the word to double. */
+            dval = astChr2Double( w2[ iword ] );
+
+/* The first value gives the correction surface type. We can only handle type
+   1 (chebyshev) or 3 (simple polynomial). */
+            if( iword == 0 ){
+               if( dval == 1.0 ) {
+                  cheb = 1;
+               } else if( dval == 2.0 ) {
+                  *ok = 0;
+               }
+
+/* The second and third numbers gives the orders of the polynomial in X
+   and Y. We can only handle cases in which the orders are the same on
+   both axes, and greater than 0 and less than 8. Store a pointer to the
+   first TAN projection parameter index to use. */
+            } else if( iword == 1 ){
+               order = dval;
+               porder = order - 1;
+
+            } else if( iword == 2 ){
+               if( dval - 1 != porder || dval < 0 || dval > 7 ) *ok = 0;
+
+/* The fourth number defines the type of cross-terms. We can only handle
+   type 2 (half-cross terms). */
+            } else if( iword == 3 ){
+               if( dval != 2.0 ) *ok = 0;
+
+/* We now know the maximum number of co-efficients that may be needed.
+   Allocate memory to hold them, and fill it with zeros. They are
+   stored in this array as if full cross-terms have been supplied (the
+   unspecified coefficients retain their initialised value of zero).  */
+               coeff = astCalloc( order*order, sizeof( double ), 1 );
+               if( !astOK ) break;
+
+/* The next 4 numbers describe the region of validity of the fits in IRAF's
+   xi and eta space, e.g. ximin, ximax, etamin, etamax. We only uses
+   these if we have a chebyshev polynomial. */
+            } else if( iword == 4 ) {
+               ximin = dval;
+
+            } else if( iword == 5 ) {
+               ximax = dval;
+
+            } else if( iword == 6 ) {
+               etamin = dval;
+
+            } else if( iword == 7 ) {
+               etamax = dval;
+
+/* The remaining terms are the coefficients of the polynomial terms. */
+            } else if( iword > 7 ){
+
+/* Store the coefficient in the array. They are stored so that power of
+   xi increases fastest. */
+               coeff[ xiorder + order*etaorder ] = dval;
+
+/* Increment the powers of the next coefficient. We know we only have half
+   cross-terms, so the maximum power of xi decreases from order to zero
+   as we move through the list of coefficients. */
+               if( ++xiorder == order - etaorder ) {
+                  xiorder = 0;
+                  etaorder++;
+               }
+            }
+         }
+
+/* Check that all the required co-efficients were found */
+         if( porder == -1 || nword != 8 + nab[ porder ] ) *ok = 0;
+
+/* If we can handle the projection, proceed. */
+         if( *ok ) {
+
+/* If the coefficients were supplied in chebyshev form, convert to simple
+   form. */
+            if( cheb ) {
+               double *tcoeff = coeff;
+               coeff = Cheb2Poly( tcoeff, order, order, ximin,
+                                  ximax, etamin, etamax, status );
+               tcoeff = astFree( tcoeff );
+            }
+
+/* The polynomials provide a "correction* to be added to the supplied X and
+   Y values. Therefore increase the linear co-efficients by 1 on the axis
+   that is being calculated. */
+            coeff[ iaxis ? order : 1 ] += 1.0;
+
+/* Loop round all coefficients, keeping track of the power of xi and eta
+   for the current coefficient. */
+            pc = coeff;
+            for( etaorder = 0; etaorder < order; etaorder++ ) {
+               for( xiorder = 0; xiorder < order; xiorder++,pc++ ) {
+
+/* Skip coefficients that have their default values (zero, except for the
+   linear coefficients which default to 1.0). */
+                  mn = xiorder + etaorder;
+                  if( *pc != ( mn == 1 ? 1.0 : 0.0 ) ) {
+
+/* Find the "m" index of the PVi_m FITS keyword for the current
+   coefficient. */
+                     m = mn*( 1 + mn )/2 + mn/2;
+                     m += iaxis ? xiorder : etaorder;
+
+/* Append the PV and m values to the ends of the returned arrays. */
+                     ires = result++;
+                     *cvals = astGrow( *cvals, sizeof( double ), result );
+                     *mvals = astGrow( *mvals, sizeof( int ), result );
+                     if( astOK ) {
+                        (*cvals)[ ires ] = *pc;
+                        (*mvals)[ ires ] = m;
+                     }
+                  }
+               }
+            }
+
+/* Free coefficients arrays */
+            coeff = astFree( coeff );
+         }
+
+/* Free resources */
+         w2 = astFree( w2 );
+      }
+      w1 = astFree( w1 );
+   }
+
+/* Return the result. */
+   return result;
 }
 
 static AstMatrixMap *WcsCDeltMatrix( FitsStore *store, char s, int naxes,
@@ -32504,8 +33349,14 @@ static AstMapping *WcsIntWorld( AstFitsChan *this, FitsStore *store, char s,
    }
 
 /* Now try to create a MatrixMap to implement the PC matrix. Combine it
-   with the above Mapping.  */
+   with the above Mapping. Add a Warning if this mapping cannot be inverted. */
    map1 = (AstMapping *) WcsPCMatrix( store, s, naxes, method, class, status );
+   if( !astGetTranInverse( map1 ) ) {
+      Warn( this, "badmat", "The pixel rotation matrix in the original FITS "
+            "header (specified by CD or PC keywords) could not be inverted. "
+            "This may be because the matrix contains rows or columns which "
+            "are entirely zero.", method, class, status );
+   }
    map0 = (AstMapping *) astCmpMap( ret, map1, 1, "", status );
    ret = astAnnul( ret );
    map1 = astAnnul( map1 );
@@ -32675,14 +33526,6 @@ static AstMapping *WcsMapFrm( AstFitsChan *this, FitsStore *store, char s,
    for all axes. It uses the CRPIXj, PCi_j and CDELTi headers (and
    distortion codes from the CTYPE keywords). */
    map1 = WcsIntWorld( this, store, s, wcsaxes, method, class, status );
-
-/* Add a Warning if this mapping cannot be inverted. */
-   if( !astGetTranInverse( map1 ) ) {
-      Warn( this, "badmat", "The pixel rotation matrix in the original FITS "
-            "header (specified by CD or PC keywords) could not be inverted. "
-            "This may be because the matrix contains rows or columns which "
-            "are entirely zero.", method, class, status );
-   }
 
 /* The conversion from intermediate world coordinates to the final world
    coordinates depends on the type of axis being converted (as specified
@@ -36229,6 +37072,142 @@ static void WriteString( AstChannel *this_channel, const char *name,
    }
 }
 
+static AstMapping *ZPXMapping( AstFitsChan *this, FitsStore *store, char s,
+                               int naxes, int zpxaxes[2], const char *method,
+                               const char *class, int *status ){
+/*
+*  Name:
+*     ZPXMapping
+
+*  Purpose:
+*     Create a Mapping descriping "-ZPX" (IRAF) distortion.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     AstMapping *ZPXMapping( AstFitsChan *this, FitsStore *store, char s,
+*                             int naxes, int zpxaxes[2], const char *method,
+*                             const char *class, int *status )
+
+*  Class Membership:
+*     FitsChan
+
+*  Description:
+*     This function uses the values in the supplied FitsStore to create a
+*     Mapping which implements the "-ZPX" distortion code, produced by
+*     the IRAF project. See:
+*
+*     http://iraf.noao.edu/projects/ccdmosaic/zpx.html
+*
+*     Note, the Mapping created by this function implements the "lngcor"
+*     and "latcor" corrections described in the WAT... keywords. The
+*     basic ZPN projection code is handled in the normal way, as any
+*     other projection is handled.
+
+*  Parameters:
+*     store
+*        A structure containing information about the requested axis
+*        descriptions derived from a FITS header.
+*     s
+*        A character identifying the co-ordinate version to use. A space
+*        means use primary axis descriptions. Otherwise, it must be an
+*        upper-case alphabetical characters ('A' to 'Z').
+*     naxes
+*        The number of intermediate world coordinate axes (WCSAXES).
+*     zpxaxes
+*        The zero-based indices of the two IWC axes that use the ZPX projection.
+*     method
+*        A pointer to a string holding the name of the calling method.
+*        This is used only in the construction of error messages.
+*     class
+*        A pointer to a string holding the class of the object being
+*        read. This is used only in the construction of error messages.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     A pointer to the Mapping.
+*/
+
+/* Local Variables: */
+   AstMapping   *ret;
+   char *watstr;
+   double *cvals[ 2 ];
+   int *mvals[ 2 ];
+   int ncoeff[ 2 ];
+   int i;
+   int icoeff;
+   int ok;
+
+/* Initialise the pointer to the returned Mapping. */
+   ret = NULL;
+
+/* Check the global status. */
+   if ( !astOK ) return ret;
+
+/* Check both axes */
+   for( i = 0; i < 2; i++ ){
+      mvals[ i ] = NULL;
+      cvals[ i ] = NULL;
+      ncoeff[ i ] = 0;
+
+/* Concatenate all the IRAF "WAT" keywords together for this axis. These
+   keywords are marked as having been used, so that they are not written
+   out when the FitsChan is deleted. */
+      watstr = ConcatWAT( this, zpxaxes[ i ], method, class, status );
+
+/* Extract the polynomial coefficients from the concatenated WAT string.
+   These are returned in the form of a list of PVi_m values for a TPN
+   projection. */
+      ncoeff[ i ] = WATCoeffs( watstr, i, cvals + i, mvals + i, &ok, status );
+
+/* If the current axis of the ZPX projection uses features not supported
+   by AST, do not do any more axes. */
+      if( !ok ) break;
+
+/* Free the WAT string. */
+      watstr = astFree( watstr );
+   }
+
+/* If we can handle the ZPX projection, store the polynomial coefficients in
+   a new inverted TPN WcsMap. This WcsMap is used as a correction to the ZPN
+   WcsMap to be created later, therefore set its FITSProj value to zero so
+   that it is not used as the FITS projection when written out via
+   astWrite. Also set TPNTan to zero to indicate that the TAN part of the
+   TPN projection should not be used (i.e. just use the polynomial part). */
+   if( ok && astOK ) {
+
+      if( ncoeff[ 0 ] || ncoeff[ 1 ] ) {
+         ret = (AstMapping *) astWcsMap( naxes, AST__TPN, zpxaxes[ 0 ] + 1,
+                                         zpxaxes[ 1 ] + 1, "FITSProj=0,"
+                                         "Invert=1", status );
+         astSetTPNTan( ret, 0 );
+         for( i = 0; i < 2; i++ ){
+            for( icoeff = 0; icoeff < ncoeff[ i ]; icoeff++ ) {
+               astSetPV( ret, zpxaxes[ i ], (mvals[ i ])[ icoeff ],
+                         (cvals[ i ])[ icoeff ] );
+            }
+         }
+
+      } else {
+         ret = (AstMapping *) astUnitMap( naxes, " ", status );
+      }
+
+/* If the TNX cannot be represented in FITS-WCS (within our restrictions), add
+   warning keywords to the FitsChan. */
+   } else {
+      Warn( this, "zpx", "This FITS header includes, or was "
+            "derived from, a ZPX projection which requires "
+            "unsupported IRAF-specific corrections. The WCS "
+            "information may therefore be incorrect.", method, class,
+            status );
+   }
+
+/* Return the result. */
+   return ret;
+}
+
 /* Functions which access class attributes. */
 /* ---------------------------------------- */
 
@@ -37029,6 +38008,57 @@ astMAKE_GET(FitsChan,CarLin,int,1,(this->carlin == -1 ? 0 : this->carlin))
 astMAKE_SET(FitsChan,CarLin,int,carlin,( value ? 1 : 0 ))
 astMAKE_TEST(FitsChan,CarLin,( this->carlin != -1 ))
 
+/* PolyTan */
+/* ======= */
+
+/*
+*att++
+*  Name:
+*     PolyTan
+
+*  Purpose:
+*     Use PVi_m keywords to define distorted TAN projection?
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer.
+
+*  Description:
+*     This attribute is a boolean value which specifies how FITS "TAN"
+*     projections should be treated when reading a FrameSet from a foreign
+*     encoded FITS header. If zero, the projection is assumed to conform
+*     to the published FITS-WCS standard. If positive, the convention
+*     for a distorted TAN projection included in an early draft version
+*     of FITS-WCS paper II are assumed. In this convention the
+*     coefficients of a polynomial distortion to be applied to
+*     intermediate world coordinates are specified by the PVi_m keywords.
+*     This convention was removed from the paper before publication and so
+*     does not form part of the standard. Indeed, it is incompatible with
+*     the published standard because it re-defines the meaning of the
+*     first five PVi_m keywords on the longitude axis, which are reserved
+*     by the published standard for other purposes. However, headers that
+*     use this convention are still to be found, for instance the SCAMP
+*     utility (http://www.astromatic.net/software/scamp) creates them.
+*
+*     The default value for the PolyTan attribute is -1. A negative
+*     values causes the used convention to depend on the contents
+*     of the FitsChan. If the FitsChan contains any PVi_m keywords for
+*     the latitude axis, or if it contains PVi_m keywords for the
+*     longitude axis with "m" greater than 4, then the distorted TAN
+*     convention is used. Otherwise, the standard convention is used.
+
+*  Applicability:
+*     FitsChan
+*        All FitsChans have this attribute.
+*att--
+*/
+astMAKE_CLEAR(FitsChan,PolyTan,polytan,-INT_MAX)
+astMAKE_SET(FitsChan,PolyTan,int,polytan,value)
+astMAKE_TEST(FitsChan,PolyTan,( this->polytan != -INT_MAX ))
+astMAKE_GET(FitsChan,PolyTan,int,-1,(this->polytan == -INT_MAX ? -1 : this->polytan))
+
 /* Iwc */
 /* === */
 
@@ -37728,6 +38758,12 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
    set = TestCarLin( this, status );
    ival = set ? GetCarLin( this, status ) : astGetCarLin( this );
    astWriteInt( channel, "CarLin", set, 1, ival, (ival ? "Use simple linear CAR projections": "Use full FITS-WCS CAR projections") );
+
+/* PolyTan */
+/* ------- */
+   set = TestPolyTan( this, status );
+   ival = set ? GetPolyTan( this, status ) : astGetPolyTan( this );
+   astWriteInt( channel, "PolyTan", set, 0, ival, (ival ? "Use distorted TAN convention": "Use standard TAN convention") );
 
 /* Iwc */
 /* --- */
@@ -38539,6 +39575,7 @@ AstFitsChan *astInitFitsChan_( void *mem, size_t size, int init,
       new->tabok = -INT_MAX;
       new->cdmatrix = -1;
       new->carlin = -1;
+      new->polytan = -INT_MAX;
       new->iwc = -1;
       new->clean = -1;
       new->fitsdigits = DBL_DIG;
@@ -38753,6 +39790,11 @@ AstFitsChan *astLoadFitsChan_( void *mem, size_t size,
 /* ------ */
       new->carlin = astReadInt( channel, "carlin", -1 );
       if ( TestCarLin( new, status ) ) SetCarLin( new, new->carlin, status );
+
+/* PolyTan */
+/* ------- */
+      new->polytan = astReadInt( channel, "polytan", -1 );
+      if ( TestPolyTan( new, status ) ) SetPolyTan( new, new->polytan, status );
 
 /* Iwc */
 /* --- */
@@ -39150,3 +40192,14 @@ static void ListFC( AstFitsChan *this, const char *ttl ) {
    this->card = cardo;
 }
 */
+
+
+
+
+
+
+
+
+
+
+

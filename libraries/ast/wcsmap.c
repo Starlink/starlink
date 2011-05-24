@@ -59,6 +59,7 @@ f     AST_WCSMAP
 *     In addition to those attributes common to all Mappings, every
 *     WcsMap also has the following attributes:
 *
+*     - FITSProj: Is this WcsMap used as a FITS-WCS projection?
 *     - NatLat: Native latitude of the reference point of a FITS-WCS projection
 *     - NatLon: Native longitude of the reference point of a FITS-WCS projection
 *     - PVi_m: FITS-WCS projection parameters
@@ -204,6 +205,9 @@ f     The WcsMap class does not define any new routines beyond those
 *     7-MAR-2011 (DSB):
 *        In function Map, only do the longitude check if the projection
 *        is not cyclic.
+*     24-MAY-2011 (DSB):
+*        Added public FITSProj attribute and protected TPNTan attribute (TPNTan 
+*        should be removed when the PolyMap class has an iterative inverse).
 *class--
 */
 
@@ -747,6 +751,16 @@ static double GetNatLat( AstWcsMap *, int * );
 static double GetNatLon( AstWcsMap *, int * );
 static int GetWcsAxis( AstWcsMap *, int, int * );
 
+static int GetFITSProj( AstWcsMap *, int * );
+static int TestFITSProj( AstWcsMap *, int * );
+static void ClearFITSProj( AstWcsMap *, int * );
+static void SetFITSProj( AstWcsMap *, int, int * );
+
+static int GetTPNTan( AstWcsMap *, int * );
+static int TestTPNTan( AstWcsMap *, int * );
+static void ClearTPNTan( AstWcsMap *, int * );
+static void SetTPNTan( AstWcsMap *, int, int * );
+
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
 static const PrjData *FindPrjData( int, int * );
 static const char *GetAttrib( AstObject *, const char *, int * );
@@ -1135,9 +1149,14 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
 
 /* Check the attribute name and clear the appropriate attribute. */
 
+/* FITSProj */
+/* -------- */
+   if ( !strcmp( attrib, "fitsproj" ) ) {
+      astClearFITSProj( this );
+
 /* ProjP. */
 /* ------ */
-   if ( nc = 0, ( 1 == astSscanf( attrib, "prpjp(%d)%n", &m, &nc ) )
+   } else if ( nc = 0, ( 1 == astSscanf( attrib, "prpjp(%d)%n", &m, &nc ) )
                   && ( nc >= len ) ) {
       astClearPV( this, astGetWcsAxis( this, 1 ), m );
 
@@ -1231,6 +1250,46 @@ static void ClearPV( AstWcsMap *this, int i, int m, int *status ) {
 /* Re-initialize the values stored in the "AstPrjPrm" structure. */
       InitPrjPrm( this, status );
    }
+}
+
+static void ClearTPNTan( AstWcsMap *this, int *status ) {
+/*
+*+
+*  Name:
+*     astClearTPNTan
+
+*  Purpose:
+*     Clear the TPNTan attribute.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "wcsmap.h"
+*     void ClearTPNTan( AstWcsMap *this, int *status )
+
+*  Class Membership:
+*     WcsMap protected function
+
+*  Description:
+*     This function clears the TPNTan attribute, ensuring the projection
+*     parameters used by WCSLIB are adjusted accordingly.
+
+*  Parameters:
+*     this
+*        A pointer to the WcsMap.
+
+*-
+*/
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Clear the value. */
+   this->tpn_tan = -INT_MAX;
+
+/* Re-initialize the values stored in the "AstPrjPrm" structure. */
+   InitPrjPrm( this, status );
 }
 
 static void CopyPV( AstWcsMap *in, AstWcsMap *out, int *status ) {
@@ -1711,9 +1770,18 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
    the value into "getattrib_buff" as a null-terminated string in an appropriate
    format.  Set "result" to point at the result string. */
 
+/* FITSProj. */
+/* --------- */
+   if ( !strcmp( attrib, "fitsproj" ) ) {
+      ival = astGetFITSProj( this );
+      if ( astOK ) {
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
+      }
+
 /* ProjP. */
 /* ------ */
-   if ( nc = 0, ( 1 == astSscanf( attrib, "projp(%d)%n", &m, &nc ) )
+   } else if ( nc = 0, ( 1 == astSscanf( attrib, "projp(%d)%n", &m, &nc ) )
                   && ( nc >= len ) ) {
       dval = astGetPV( this, astGetWcsAxis( this, 1 ), m );
       if ( astOK ) {
@@ -2159,6 +2227,11 @@ static void InitPrjPrm( AstWcsMap *this, int *status ) {
    params->flag = 0;
    params->r0 = 0;
 
+/* If this is a TPN projection, indicate whether or not the
+   transformation should include the TAN projection or just the
+   polynomial transformation. */
+   if( this->type == AST__TPN ) params->n = astGetTPNTan( this );
+
 /* Find the max number of projection parameters associated with each
    axis.*/
    plen2 = astSizeOf( params->p2 )/sizeof( double );
@@ -2334,6 +2407,16 @@ void astInitWcsMapVtab_(  AstWcsMapVtab *vtab, const char *name, int *status ) {
    vtab->SetPV = SetPV;
    vtab->TestPV = TestPV;
    vtab->IsZenithal = IsZenithal;
+
+   vtab->ClearFITSProj = ClearFITSProj;
+   vtab->TestFITSProj = TestFITSProj;
+   vtab->GetFITSProj = GetFITSProj;
+   vtab->SetFITSProj = SetFITSProj;
+
+   vtab->ClearTPNTan = ClearTPNTan;
+   vtab->TestTPNTan = TestTPNTan;
+   vtab->GetTPNTan = GetTPNTan;
+   vtab->SetTPNTan = SetTPNTan;
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
@@ -2621,11 +2704,11 @@ static int Map( AstWcsMap *this, int forward, int npoint, double *in0,
 */
 
 /* Local Variables: */
-   struct AstPrjPrm *params;     /* Pointer to structure holding WCSLIB info */
    const PrjData *prjdata;       /* Information about the projection */
+   double factor;                /* Factor that scales input into radians. */
    double latitude;              /* Latitude value in degrees */
-   double longitude;             /* Longitude value in degrees */
    double longhi;                /* Upper longitude limit in degrees */
+   double longitude;             /* Longitude value in degrees */
    double longlo;                /* Lower longitude limit in degrees */
    double x;                     /* X Cartesian coordinate in degrees */
    double y;                     /* Y Cartesian coordinate in degrees */
@@ -2633,8 +2716,9 @@ static int Map( AstWcsMap *this, int forward, int npoint, double *in0,
    int i;                        /* Loop count */
    int plen;                     /* Length of proj par array */
    int point;                    /* Loop counter for points */
-   int wcs_status;               /* Status from WCSLIB functions */
    int type;                     /* Projection type */
+   int wcs_status;               /* Status from WCSLIB functions */
+   struct AstPrjPrm *params;     /* Pointer to structure holding WCSLIB info */
 
 /* Check the global error status. */
    if ( !astOK ) return 4;
@@ -2664,7 +2748,14 @@ static int Map( AstWcsMap *this, int forward, int npoint, double *in0,
 
 /* If we are doing a reverse mapping, get the acceptable range of longitude
    values. */
-   cyclic = forward ? 0 : LongRange( prjdata, params, &longhi, &longlo, status );
+   cyclic = forward ? 0 : LongRange( prjdata, params, &longhi, &longlo,
+                                     status );
+
+/* The WcsMap input and output values are normally in radians, but if
+   the TPNTan attribute has been reset then they are in degrees. The
+   WCSLIB projection functions always expect and return degrees. Get
+   the factor that scales the WcsMap input into radians. */
+   factor = astGetTPNTan( this ) ? 1.0 : AST__DD2R;
 
 /* Loop to apply the projection to each point in turn, checking for
    (and propagating) bad values in the process. */
@@ -2679,22 +2770,22 @@ static int Map( AstWcsMap *this, int forward, int npoint, double *in0,
          if ( forward ){
 
 /* The input coordinates are assumed to be longitude and latitude, in
-   radians (as used by SLALIB). Convert them to degrees ensuring that
-   the longitude value is in the range [-180,180] and the latitude is
-   in the range [-90,90] (as required by the WCSLIB library). Any point with
-   a latitude outside the range [-90,90] is converted to the equivalent
-   point on the complementary meridian. */
-            latitude = AST__DR2D*palSlaDrange(  in1[ point ] );
+   radians or degrees (as specified by the TPNTan attribute). Convert them
+   to degrees ensuring that the longitude value is in the range [-180,180]
+   and the latitude is in the range [-90,90] (as required by the WCSLIB
+   library). Any point with a latitude outside the range [-90,90] is
+   converted to the equivalent point on the complementary meridian. */
+            latitude = AST__DR2D*palSlaDrange(  factor*in1[ point ] );
             if ( latitude > 90.0 ){
                latitude = 180.0 - latitude;
-               longitude = AST__DR2D*palSlaDrange( AST__DPI + in0[ point ] );
+               longitude = AST__DR2D*palSlaDrange( AST__DPI + factor*in0[ point ] );
 
             } else if ( latitude < -90.0 ){
                latitude = -180.0 - latitude;
-               longitude = AST__DR2D*palSlaDrange( AST__DPI + in0[ point ] );
+               longitude = AST__DR2D*palSlaDrange( AST__DPI + factor*in0[ point ] );
 
             } else {
-               longitude = AST__DR2D*palSlaDrange( in0[ point ] );
+               longitude = AST__DR2D*palSlaDrange( factor*in0[ point ] );
             }
 
 /* Call the relevant WCSLIB forward projection function. */
@@ -2704,8 +2795,8 @@ static int Map( AstWcsMap *this, int forward, int npoint, double *in0,
    to radians. If the position could not be projected, use the value
    AST__BAD.  Abort for any other bad status. */
             if( wcs_status == 0 ){
-               out0[ point ] = AST__DD2R*x;
-               out1[ point ] = AST__DD2R*y;
+               out0[ point ] = (AST__DD2R/factor)*x;
+               out1[ point ] = (AST__DD2R/factor)*y;
 
             } else if( wcs_status == 1 ){
                return 2;
@@ -2722,8 +2813,8 @@ static int Map( AstWcsMap *this, int forward, int npoint, double *in0,
          } else {
 
 /* Convert the supplied Cartesian coordinates from radians to degrees. */
-            x = AST__DR2D*in0[ point ];
-            y = AST__DR2D*in1[ point ];
+            x = (AST__DR2D*factor)*in0[ point ];
+            y = (AST__DR2D*factor)*in1[ point ];
 
 /* Call the relevant WCSLIB reverse projection function. */
             wcs_status = prjdata->WcsRev( x, y, params, &longitude, &latitude );
@@ -2742,8 +2833,8 @@ static int Map( AstWcsMap *this, int forward, int npoint, double *in0,
 /* Assign zero longitude to positions very close to a pole. */
                   if( fabs( latitude ) > 89.999998 ) longitude = 0.0;
 
-                  out0[ point ] = AST__DD2R*longitude;
-                  out1[ point ] = AST__DD2R*latitude;
+                  out0[ point ] = (AST__DD2R/factor)*longitude;
+                  out1[ point ] = (AST__DD2R/factor)*latitude;
 
                } else {
                   out0[ point ] = AST__BAD;
@@ -3619,6 +3710,7 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
 /* Local Variables: */
    AstWcsMap *this;              /* Pointer to the WcsMap structure */
    double dval;                  /* Attribute value */
+   int ival;                     /* Attribute value */
    int len;                      /* Length of setting string */
    int nc;                       /* Number of characters read by astSscanf */
    int i;                        /* Axis index */
@@ -3639,9 +3731,15 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
    in "nc" to check that the entire string was matched. Once a value
    has been obtained, use the appropriate method to set it. */
 
+/* FITSProj */
+/* -------- */
+   if ( nc = 0, ( 1 == astSscanf( setting, "fitsproj= %d %n",
+                                  &ival, &nc ) ) && ( nc >= len ) ) {
+      astSetFITSProj( this, ival );
+
 /* ProjP(i). */
 /* --------- */
-   if ( nc = 0, ( 2 == astSscanf( setting, "projp(%d)= %lg %n", &m, &dval, &nc ) )
+   } else if ( nc = 0, ( 2 == astSscanf( setting, "projp(%d)= %lg %n", &m, &dval, &nc ) )
                   && ( nc >= len ) ) {
       astSetPV( this, astGetWcsAxis( this, 1 ), m, dval );
 
@@ -3792,6 +3890,48 @@ static void SetPV( AstWcsMap *this, int i, int m, double val, int *status ) {
    InitPrjPrm( this, status );
 }
 
+static void SetTPNTan( AstWcsMap *this, int val, int *status ) {
+/*
+*+
+*  Name:
+*     astSetTPNTan
+
+*  Purpose:
+*     Set the value of a TPNTan attribute.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "wcsmap.h"
+*     void astSetTPNTan( AstWcsMap *this, int val )
+
+*  Class Membership:
+*     WcsMap protected function
+
+*  Description:
+*     This function stores a value for the TPNTan attribute and updates
+*     the projection parameters used by WCSLIB accordingly.
+
+*  Parameters:
+*     this
+*        A pointer to the WcsMap.
+*     val
+*        New attribute value.
+
+*-
+*/
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Store the new value. */
+   this->tpn_tan = ( val != 0 );
+
+/* Re-initialize the values stored in the "AstPrjPrm" structure. */
+   InitPrjPrm( this, status );
+}
+
 static int TestAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
@@ -3856,9 +3996,14 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
 /* Check the attribute name and test the appropriate attribute. */
 
 
+/* FITSProj */
+/* -------- */
+   if ( !strcmp( attrib, "fitsproj" ) ) {
+      result = astTestFITSProj( this );
+
 /* ProjP(i). */
 /* --------- */
-   if ( nc = 0, ( 1 == astSscanf( attrib, "projp(%d)%n", &m, &nc ) )
+   } else if ( nc = 0, ( 1 == astSscanf( attrib, "projp(%d)%n", &m, &nc ) )
                   && ( nc >= len ) ) {
       result = astTestPV( this, astGetWcsAxis( this, 1 ), m );
 
@@ -4065,7 +4210,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
       lonax = astGetWcsAxis( map, 0 );
       latax = astGetWcsAxis( map, 1 );
       status_value = Map( map, forward, npoint, ptr_in[ lonax ], ptr_in[ latax ],
-                    ptr_out[ lonax ], ptr_out[ latax ], status );
+                          ptr_out[ lonax ], ptr_out[ latax ], status );
 
 /* Report an error if the projection type was unrecognised. */
       if ( status_value == 1 ) {
@@ -4515,6 +4660,82 @@ static void WcsPerm( AstMapping **maps, int *inverts, int iwm, int *status ){
    "object.h" file. For a description of each attribute, see the class
    interface (in the associated .h file). */
 
+
+/*
+*att++
+*  Name:
+*     FITSProj
+
+*  Purpose:
+*     Is this WcsMap used as a FITS-WCS projection?
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer (boolean).
+
+*  Description:
+*     This attribute controls how a WcsMap is used when creating a set
+*     of FITS headers. If the WcsMap is contained within a FrameSet
+*     that is to be  converted into a set of FITS headers using the
+c     astWrite funtion,
+f     AST_WRITE routine,
+*     the WcsMap will be used to define the projection code appeneded to
+*     the FITS "CTYPEi" keywords if, and only if, the FITSProj attribute
+*     is set non-zero in the WcsMap. In order for the conversion to be
+*     successful, the compoound Mapping connecting the base and current
+*     Frames in the FrameSet must contained one (and only one) WcsMap
+*     that has a non-zero value for its FITSProj attribute.
+*
+*     The default value is one.
+
+*  Applicability:
+*     WcsMap
+*        All Frames have this attribute.
+*att--
+*/
+astMAKE_CLEAR(WcsMap,FITSProj,fits_proj,-INT_MAX)
+astMAKE_GET(WcsMap,FITSProj,int,1,( ( this->fits_proj != -INT_MAX ) ?
+                                       this->fits_proj : 1 ))
+astMAKE_SET(WcsMap,FITSProj,int,fits_proj,( value != 0 ))
+astMAKE_TEST(WcsMap,FITSProj,( this->fits_proj != -INT_MAX ))
+
+/*
+*att+
+*  Name:
+*     TPNTan
+
+*  Purpose:
+*     Should the TPN projection include a TAN projection?
+
+*  Type:
+*     Protected attribute.
+
+*  Synopsis:
+*     Integer (boolean).
+
+*  Description:
+*     This attribute controls how a WcsMap with a AST__TPN projection
+*     type behaves. If the attribute value is non-zero (the default),
+*     the complete projection is performed as described in the draft
+*     version of FITS-WCS paper II. If it is zero, then the TAN
+*     projection from (psi,theta) to (xi,eta) is replaced by a unit
+*     transformation, so that the WcsMap implements the polynomial
+*     transformation only, without any preceeding TAN projection.
+*
+*     In addition if the TPNTan value is zero, then the WcsMap
+*     assumes that the input and output values are in degrees rather
+*     than radians.
+
+*  Applicability:
+*     WcsMap
+*        All Frames have this attribute.
+*att-
+*/
+astMAKE_GET(WcsMap,TPNTan,int,1,( ( this->tpn_tan != -INT_MAX ) ?
+                                       this->tpn_tan : 1 ))
+astMAKE_TEST(WcsMap,TPNTan,( this->tpn_tan != -INT_MAX ))
 
 /* ProjP. */
 /* ------ */
@@ -5007,6 +5228,22 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
    comment_buff[ 0 ] = toupper( comment_buff[ 0 ] );
    astWriteString( channel, "Type", 1, 1, prjdata->ctype + 1, comment_buff );
 
+/* FITSProj */
+/* -------- */
+   set = TestFITSProj( this, status );
+   ival = set ? GetFITSProj( this, status ) : astGetFITSProj( this );
+   astWriteInt( channel, "FitsPrj", set, 0, ival,
+                ival ? "Defines the FITS-WCS projection" :
+                       "Does not define the FITS-WCS projection" );
+
+/* TPNTan */
+/* ------ */
+   set = TestTPNTan( this, status );
+   ival = set ? GetTPNTan( this, status ) : astGetTPNTan( this );
+   astWriteInt( channel, "TpnTan", set, 0, ival,
+                ival ? "Include TAN projection in TPN mapping" :
+                       "Exclude TAN projection from TPN mapping" );
+
 /* PVi_m. */
 /* ------ */
    for( i = 0; i < astGetNin( this ); i++ ){
@@ -5497,6 +5734,12 @@ AstWcsMap *astInitWcsMap_( void *mem, size_t size, int init,
 /* Store the projection type. */
          new->type = type;
 
+/* Store the "use as FITS-WCS projection" flag. */
+         new->fits_proj = -INT_MAX;
+
+/* Store the "include TAN component in TPN Mapping" flag. */
+         new->tpn_tan = -INT_MAX;
+
 /* Store the axes associated with longitude and latitude. */
          new->wcsaxis[0] = lonax;
          new->wcsaxis[1] = latax;
@@ -5660,6 +5903,20 @@ AstWcsMap *astLoadWcsMap_( void *mem, size_t size,
    function to validate and set the value properly. Note, this is only
    done for read/write attributes, not read-only ones. */
 
+/* FITSProj */
+/* -------- */
+      new->fits_proj = astReadInt( channel, "fitsprj", -INT_MAX );
+      if ( TestFITSProj( new, status ) ) {
+         SetFITSProj( new, new->fits_proj, status );
+      }
+
+/* TPNTan */
+/* -------- */
+      new->tpn_tan = astReadInt( channel, "tpntan", -INT_MAX );
+      if ( TestTPNTan( new, status ) ) {
+         SetTPNTan( new, new->tpn_tan, status );
+      }
+
 /* WcsType */
 /* ------- */
       text = astReadString( channel, "type", " " );
@@ -5746,6 +6003,11 @@ void astClearPV_( AstWcsMap *this, int i, int m, int *status ) {
    (**astMEMBER(this,WcsMap,ClearPV))( this, i, m, status );
 }
 
+void astClearTPNTan_( AstWcsMap *this, int *status ) {
+   if ( !astOK ) return;
+   (**astMEMBER(this,WcsMap,ClearTPNTan))( this, status );
+}
+
 double astGetPV_( AstWcsMap *this, int i, int m, int *status ) {
    if ( !astOK ) return AST__BAD;
    return (**astMEMBER(this,WcsMap,GetPV))( this, i, m, status );
@@ -5754,6 +6016,11 @@ double astGetPV_( AstWcsMap *this, int i, int m, int *status ) {
 void astSetPV_( AstWcsMap *this, int i, int m, double val, int *status ) {
    if ( !astOK ) return;
    (**astMEMBER(this,WcsMap,SetPV))( this, i, m, val, status );
+}
+
+void astSetTPNTan_( AstWcsMap *this, int val, int *status ) {
+   if ( !astOK ) return;
+   (**astMEMBER(this,WcsMap,SetTPNTan))( this, val, status );
 }
 
 int astTestPV_( AstWcsMap *this, int i, int m, int *status ) {
