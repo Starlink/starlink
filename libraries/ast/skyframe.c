@@ -295,6 +295,10 @@ f     - AST_SKYOFFSETMAP: Obtain a Mapping from absolute to offset coordinates
 *        superclass target.
 *     23-MAY-2011 (DSB):
 *        Truncate returned PointSet in function FrameGrid to exclude unused points.
+*     24-MAY-2011 (DSB):
+*        When clearing or setting the System attribute, clear SkyRef rather
+*        than reporting an error if the Mapping from the old System to the
+*        new System is unknown.
 *class--
 */
 
@@ -1769,23 +1773,41 @@ static void ClearSystem( AstFrame *this_frame, int *status ) {
    we do not end up with infinite recursion. */
       fs = astConvert( sfrm, this, "" );
 
+/* Check the Mapping was found. */
+      if( fs ) {
+
 /* Use the Mapping to find the SkyRef and SkyRefP positions in the default
    coordinate system. */
-      astTran2( fs, 2, xin, yin, 1, xout, yout );
+         astTran2( fs, 2, xin, yin, 1, xout, yout );
 
 /* Store the values as required. */
-      if( skyref_set ) {
-         astSetSkyRef( this, 0, xout[ 0 ] );
-         astSetSkyRef( this, 1, yout[ 0 ] );
-      }
+         if( skyref_set ) {
+            astSetSkyRef( this, 0, xout[ 0 ] );
+            astSetSkyRef( this, 1, yout[ 0 ] );
+         }
 
-      if( skyrefp_set ) {
-         astSetSkyRefP( this, 0, xout[ 1 ] );
-         astSetSkyRefP( this, 1, yout[ 1 ] );
+         if( skyrefp_set ) {
+            astSetSkyRefP( this, 0, xout[ 1 ] );
+            astSetSkyRefP( this, 1, yout[ 1 ] );
+         }
+
+/* Free resources. */
+         fs = astAnnul( fs );
+
+/* If the Mapping is not defined, we cannot convert the SkyRef or SkyRefP
+   positions in the new Frame so clear them. */
+      } else {
+         if( skyref_set ) {
+            astClearSkyRef( this, 0 );
+            astClearSkyRef( this, 1 );
+         }
+         if( skyrefp_set ) {
+            astClearSkyRefP( this, 0 );
+            astClearSkyRefP( this, 1 );
+         }
       }
 
 /* Free resources. */
-      fs = astAnnul( fs );
       sfrm = astAnnul( sfrm );
    }
 }
@@ -9209,11 +9231,17 @@ static void SetSystem( AstFrame *this_frame, AstSystemType system, int *status )
    to be careful to ensure that SkyRef and SKyRefP are cleared above - doing
    so ensure we do not end up with infinite recursion. */
       fs = astConvert( sfrm, this, "" );
+
+/* If the conversion is not possible, clear the SkyRef and SkyRefP
+   values. */
       if( !fs ) {
-         if( astOK ) {
-            astError( AST__INTER, "astSetSystem(SkyFrame): Cannot convert "
-                      "SkyRef positions from %s to %s.", status,
-                      astGetC( sfrm, "System" ), astGetC( this, "System" ) );
+         if( skyref_set ) {
+            astClearSkyRef( this, 0 );
+            astClearSkyRef( this, 1 );
+         }
+         if( skyrefp_set ) {
+            astClearSkyRefP( this, 0 );
+            astClearSkyRefP( this, 1 );
          }
 
 /* Use the Mapping to find the SkyRef and SkyRefP positions in the new
