@@ -85,7 +85,9 @@
 *     -  ANSI C standard (1989), section 4.10.3.1
 
 *  Copyright:
-*     Copyright (C) 1991 Science & Engineering Research Council
+*     Copyright (C) 1991 Science & Engineering Research Council.
+*     Copyright (C) 2011 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -134,6 +136,8 @@
 *        Fix compiler warning when sizeof(size_t) != sizeof(int)
 *      19-DEC-2006 (TIMJ):
 *        Error message should be unsigned.
+*     25-MAY-2011 (TIMJ):
+*        Simplify error reporting.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -177,12 +181,10 @@ F77_SUBROUTINE(psx_calloc)( INTEGER(nmemb), CHARACTER(type),
 /* Local Variables:							    */
 
    int i;			 /* Loop counter			    */
-   unsigned long total;          /* Total number of bytes for error msg     */
    size_t size;			 /* The size in bytes of the data type	    */
    void *temp;			 /* Temporary return value from malloc	    */
    char type_c[maxlen+1];	 /* A C string copy of the argument TYPE    */
    char *p;			 /* Temporary pointer			    */
-   char errbuf[100];		 /* Buffer for error message		    */
 
 /* Variable initialisation */
    size = 0;
@@ -254,13 +256,14 @@ F77_SUBROUTINE(psx_calloc)( INTEGER(nmemb), CHARACTER(type),
 /* error.								    */
 
       {
+         size_t total = 0;
          *pntr = (F77_POINTER_TYPE)0;
          *status = PSX__NOALL;
-	 total = (unsigned long)(*nmemb * size);
-         sprintf( errbuf,
-            "Failed to allocate space with calloc. %d elements of size %d bytes (%lu bytes total) requested",
-		  (int)*nmemb, (int)size, (unsigned long)total );
-         psx1_rep_c( "PSX_CALLOC_NOALL", errbuf, status );
+	 total = *nmemb * size;
+         psx1_rep_c( "PSX_CALLOC_NOALL",
+                     "Failed to allocate space with calloc. %d elements of size %d bytes (%zu bytes total) requested",
+                     status,
+                     (int)*nmemb, (int)size, total );
       }
    }
 

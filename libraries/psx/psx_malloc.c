@@ -77,7 +77,9 @@
 *     -  ANSI C standard (1989), section 4.10.3.3
 
 *  Copyright:
-*     Copyright (C) 1991 Science & Engineering Research Council
+*     Copyright (C) 1991 Science & Engineering Research Council.
+*     Copyright (C) 2011 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -122,6 +124,8 @@
 *        Tidy refs to CNF routines
 *     6-DEC-2004 (TIMJ):
 *        Report allocation failure as requesting unsigned int bytes
+*     25-MAY-2011 (TIMJ):
+*        Simplify error reporting.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -154,7 +158,6 @@ F77_SUBROUTINE(psx_malloc)( INTEGER(size), POINTER(pntr), INTEGER(status) )
 /* Local Variables:							    */
 
    void *temp;			 /* Temporary return value from malloc.	    */
-   char errbuf[100];		 /* Buffer for error message		    */
 
 /* Check inherited global status.					    */
 
@@ -182,10 +185,9 @@ F77_SUBROUTINE(psx_malloc)( INTEGER(size), POINTER(pntr), INTEGER(status) )
    {
       *pntr = (F77_POINTER_TYPE)0;
       *status = PSX__NOALL;
-      sprintf( errbuf,
-         "Failed to allocate space with malloc. %lu bytes requested",
-	       (unsigned long)(*size) );
-      psx1_rep_c( "PSX_MALLOC_NOALL", errbuf, status );
+      psx1_rep_c( "PSX_MALLOC_NOALL",
+                  "Failed to allocate space with malloc. %lu bytes requested",
+                  status, (unsigned long)(*size) );
    }
 
 }

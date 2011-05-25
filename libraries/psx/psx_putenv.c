@@ -35,7 +35,10 @@
 *    BSD 4.3
 
 *  Copyright:
-*    Copyright (C) 2003 Particle Physics and Astronomy Research Council
+*     Copyright (C) 2003 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2011 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -71,6 +74,8 @@
 *        malloc library.
 *     23-FEB-2006 (TIMJ):
 *        Use starMalloc
+*     25-MAY-2011 (TIMJ):
+*        Simplify error reporting.
 
 *  Notes:
 *    Uses the setenv() function where available. If setenv()
@@ -116,7 +121,6 @@ F77_SUBROUTINE(psx_putenv)( CHARACTER(name),
 #if !HAVE_SETENV
    char *envstr;
 #endif
-   char errmsg[100];    /* Adequate space for constructed error message */
    int putstat;
 
   /* Check inherited global status. */
@@ -178,9 +182,8 @@ F77_SUBROUTINE(psx_putenv)( CHARACTER(name),
      cnfFree( temp_value );
 
    if( *status != SAI__OK ) {
-      strcpy( errmsg, "Error setting environment variable " );
-      strcat( errmsg, name );
-      psx1_rep_c( "PSX_PUTENV_NOENV", errmsg, status );
+      psx1_rep_c( "PSX_PUTENV_NOENV", "Error setting environment variable \"%s\"",
+                  status, name );
    }
 
 }

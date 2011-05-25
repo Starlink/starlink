@@ -49,8 +49,14 @@
 #if !defined(PSX1_MACROS)
 #define PSX1_MACROS
 
+/* If we're not using GNU C, elide __attribute__ */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
+#endif
+
 /* Internal error reporting.						    */
-void psx1_rep_c( const char *param, const char *text, int *status );
+void psx1_rep_c( const char *param, const char *text, int *status,
+                 ... )  __attribute__((format (printf, 2, 4 )));
 
 /* Initialize the VAX C run time library.				    */
 void psx1_init_rtl( void );

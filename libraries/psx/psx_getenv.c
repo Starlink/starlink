@@ -41,7 +41,9 @@
 *     -  ANSI C standard (1989), section 4.10.4.4
 
 *  Copyright:
-*     Copyright (C) 1991 Science & Engineering Research Council
+*     Copyright (C) 1991 Science & Engineering Research Council.
+*     Copyright (C) 2011 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -90,6 +92,8 @@
 *        Use starMalloc
 *     28-JUL-2009 (TIMJ):
 *        Report an error if the environment value won't fit in the return buffer.
+*     25-MAY-2011 (TIMJ):
+*        Simplify error reporting.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -127,10 +131,8 @@ F77_SUBROUTINE(psx_getenv)( CHARACTER(name),
 
 /* Local Variables:							    */
 
-   char *temp_name;     	 /* Pointer to local copy of name 	    */
-   char *ptr;			 /* Pointer to environment variable	    */
-   char *errmsg_p;		 /* Pointer to complete error message	    */
-   char errmsg_buff[64];  /* Buffer to build up for error message */
+   char *temp_name = NULL;     	 /* Pointer to local copy of name 	    */
+   char *ptr = NULL;		 /* Pointer to environment variable	    */
 #if defined(vms)
    char errmsg1[] = "There is no translation for logical name or symbol ";
 #else
@@ -154,7 +156,7 @@ F77_SUBROUTINE(psx_getenv)( CHARACTER(name),
 
 /* Get a pointer to the environment variable.				    */
 
-   ptr = getenv( temp_name );
+   if ( temp_name ) ptr = getenv( temp_name );
 
    if( ptr != 0 )
    {
@@ -166,10 +168,10 @@ F77_SUBROUTINE(psx_getenv)( CHARACTER(name),
       if ( cnfLenc(ptr) > trans_length ) {
 
           *status = PSX__TRUNC;
-          sprintf( errmsg_buff, "Unable to copy environment variable into Fortran buffer. "
-                   "Requires %d characters but return string only has %d",
-                   cnfLenc(ptr), trans_length);
-          psx1_rep_c( "PSX_GETENV_TRUNC", errmsg_buff, status );
+          psx1_rep_c( "PSX_GETENV_TRUNC",
+                      "Unable to copy environment variable into Fortran buffer. "
+                      "Requires %d characters but return string only has %d",
+                      status, cnfLenc(ptr), trans_length);
 
      }
 
@@ -188,18 +190,10 @@ F77_SUBROUTINE(psx_getenv)( CHARACTER(name),
       cnfExprt( " ", trans, trans_length );
       *status = PSX__NOENV;
 
-/* Build the error message. The space allocated is enough for the beginning */
-/* of the message, the name of the environment variable, two quotes and the */
-/* trailing null .							    */
+      psx1_rep_c( "PSX_GETENV_NOENV", "%s \"%s\"",
+                  status, errmsg1, temp_name );
 
-      errmsg_p = starMalloc( strlen( errmsg1 ) + strlen( temp_name ) + 3 );
-      strcpy( errmsg_p, errmsg1 );
-      strcat( errmsg_p, "\"" );
-      strcat( errmsg_p, temp_name );
-      strcat( errmsg_p, "\"" );
-      psx1_rep_c( "PSX_GETENV_NOENV", errmsg_p, status );
-      starFree( errmsg_p );
-      cnfFree( temp_name );
+      if (temp_name) cnfFree( temp_name );
    }
 
 

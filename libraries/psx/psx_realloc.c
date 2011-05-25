@@ -82,7 +82,9 @@
 *     -  ANSI C standard (1989), section 4.10.3.4
 
 *  Copyright:
-*     Copyright (C) 1991 Science & Engineering Research Council
+*     Copyright (C) 1991 Science & Engineering Research Council.
+*     Copyright (C) 2011 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -126,6 +128,8 @@
 *     23-FEB-2006 (TIMJ):
 *        Fix sprintf warning by casting size_t to unsigned long.
 *        Use cnfRealloc (which is most of the old psx_realloc)
+*     25-MAY-2011 (TIMJ):
+*        Simplify error reporting.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -160,7 +164,6 @@ F77_SUBROUTINE(psx_realloc)( INTEGER(size), POINTER(pntr), INTEGER(status) )
 
 /* Local Variables:							    */
 
-   char errbuf[100];		 /* Buffer for error message		    */
    size_t csize;                 /* Required memory size                    */
    void *cpntr;                  /* C version of input pointer              */
    void *temp;			 /* Temporary return value from malloc 	    */
@@ -197,10 +200,9 @@ F77_SUBROUTINE(psx_realloc)( INTEGER(size), POINTER(pntr), INTEGER(status) )
       cnfFree( pntr );
       *pntr = (F77_POINTER_TYPE)0;
       *status = PSX__NOALL;
-      sprintf( errbuf,
-         "Failed to allocate space with realloc. %lu bytes requested",
-	       (unsigned long) csize );
-      psx1_rep_c( "PSX_REALLOC_NOALL", errbuf, status );
+      psx1_rep_c( "PSX_REALLOC_NOALL",
+                  "Failed to allocate space with realloc. %zu bytes requested",
+                  status, csize );
    }
 
 }

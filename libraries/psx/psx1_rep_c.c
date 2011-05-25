@@ -1,7 +1,10 @@
 #include "ems.h"		 /* EMS function prototypes		    */
 #include "psx1.h"
 
-void psx1_rep_c( const char *param, const char *text, int *status )
+#include <stdio.h>
+#include <stdarg.h>
+
+void psx1_rep_c( const char *param, const char *text, int *status, ... )
 
 /*
 *+
@@ -9,31 +12,37 @@ void psx1_rep_c( const char *param, const char *text, int *status )
 *     psx1_rep_c
 
 *  Purpose:
-*     Provide a PSX wrap up for ems_rep_c
+*     Provide a PSX wrap up for emsRepf
 
 *  Language:
 *     ANSI C
 
 *  Invocation:
-*     psx1_rep_c( param, text, status )
+*     psx1_rep_c( param, text, status, ... )
 
 *  Description:
-*     Provide a wrap up for the C callable EMS routine ems_rep_c so that
+*     Provide a wrap up for the C callable EMS routine emsRepf so that
 *     error reporting can easily be replaced with calls to something
 *     other than EMS should the need arise.
 
 *  Arguments:
-*     char *param (Given)
-*     char *text (Given)
-*     int *status (Given and Returned via Pointer)
+*     param = const char * (Given)
+*        The error message name.
+*     text = const char * (Given)
+*        The error message text. Can include format specifiers as described
+*        in printf(3).
+*     status = int * (Given and Returned)
+*        The global status value.
+*     ... = arguments for sprintf
+*        Variadic arguments matching the format specifiers given in "text".
 
 *  External Routines Used:
 *     EMS:
-*        emsRep
+*        emsRepv
 
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008, 2011 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -62,6 +71,8 @@ void psx1_rep_c( const char *param, const char *text, int *status )
 *        Original version.
 *     16-SEP-2008 (TIMJ):
 *        Use modern interface to emsRep
+*     2011-05-25 (TIMJ):
+*        Change API to look like emsRepf
 *     {enter_changes_here}
 
 *  Bugs:
@@ -73,5 +84,11 @@ void psx1_rep_c( const char *param, const char *text, int *status )
 
 
 {
-   emsRep( param, text, status );
+  va_list args;
+
+  /* read the arguments into a va_list so that we can pass them to
+     the formatting function - ignore truncation */
+  va_start( args, status );
+  emsRepv( param, text, args, status );
+  va_end( args );
 }
