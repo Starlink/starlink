@@ -498,7 +498,7 @@ foreach n (`cat files.smas`)
          set gamma = `$KAPPA_DIR/parget gamma psf`
 
 #  See if the beamfit and psf source positions are sufficiently similar.
-         if( $error != " " ) then
+         if( "$error" != " " ) then
             if( $bxcen != "null" && $bycen != "null" ) then
                set ok = `$KAPPA_DIR/calc exp="abs(pa-pb)<=pc" pa=$bxcen pb=$posxy[1] pc=$error`
                if( $ok == 1 ) then
