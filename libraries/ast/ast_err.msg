@@ -186,4 +186,7 @@ BADSIZ          <Invalid array size>
 BADTAB          <Error reading WCS from FITS binary table>
 NOTAB           <Cannot access FITS binary table>
 
+! New codes introduced for V5.7
+LEVMAR          <Error in levmar Levenberg-Marquardt code>
+
 .END

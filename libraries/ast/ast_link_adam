@@ -289,9 +289,9 @@
 
 #  Link with the main AST library.
 #  -------------------------------
-#  Start forming the list of arguments with the main AST library itself and
-#  the "wcslib" module.
-      args='-last -last_wcslib'
+#  Start forming the list of arguments with the main AST library itself, the
+#  "wcslib" module and the "levmar" module.
+      args='-last -last_wcslib -last_levmar'
 
 #  Generate arguments for linking SLALIB.
 #  --------------------------------------

@@ -138,6 +138,7 @@ GRP_C_ROUTINES = \
 AST_H_FILES = \
     xml.h \
     wcstrig.h \
+    levmar.h \
     proj.h \
     memory.h \
     error.h \
@@ -288,6 +289,10 @@ PAL_FILES = \
     pal.h \
     slamac.h
 
+LEVMAR_FILES = \
+    levmar.c \
+    levmar.h
+
 
 bin_SCRIPTS = ast_link
 dist_bin_SCRIPTS = ast_link_adam
@@ -319,7 +324,8 @@ lib_LTLIBRARIES = \
     libast_pgplot.la \
     libast_pgplot3d.la \
     libast_pal.la \
-    libast_wcslib.la
+    libast_wcslib.la \
+    libast_levmar.la
 
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
@@ -357,6 +363,7 @@ libast_pgplot_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 libast_pgplot3d_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 libast_pal_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 libast_wcslib_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
+libast_levmar_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 endif
 
 #  The module containing the main AST classes
@@ -405,6 +412,9 @@ libast_pgplot3d_la_SOURCES = grf3d_pgplot.c
 
 #  Modules adapted from the wcslib library.
 libast_wcslib_la_SOURCES = proj.c wcstrig.c tpn.c
+
+#  Modules adapted from the levmar library.
+libast_levmar_la_SOURCES = levmar.c
 
 #  Modules supplied by tpoint.
 libast_pal_la_SOURCES = pal.c
@@ -512,4 +522,4 @@ ast_test_SOURCES = ast_test.c
 
 #ast_test_LDADD = `ast_link`
 # Expand ast_link to avoid libast_pass2, which causes problems for Solaris
-ast_test_LDADD = libast.la libast_pal.la libast_grf_3.2.la libast_grf_5.6.la libast_wcslib.la libast_grf_2.0.la libast_grf3d.la libast_err.la -lm
+ast_test_LDADD = libast.la libast_pal.la libast_grf_3.2.la libast_grf_5.6.la libast_wcslib.la libast_levmar.la libast_grf_2.0.la libast_grf3d.la libast_err.la -lm
