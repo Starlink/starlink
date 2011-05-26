@@ -165,7 +165,7 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
 
   /* Create the smfData for the result. Flatfield of type POLYNOMIAL
      requires the third dimension to be 6 so we initialise all to 0.0 */
-  coptr = astCalloc( NCOEFF * nbol, sizeof(*coptr), 1 );
+  coptr = astCalloc( NCOEFF * nbol, sizeof(*coptr) );
   {
     void * pntr[2];
     dim_t dims[3];
@@ -185,14 +185,14 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
   }
 
   /* Get some work space for the fits */
-  scan = astCalloc( nheat, sizeof(*scan), 1 );
-  if (bolvar) scanvar = astCalloc( nheat, sizeof(*scanvar), 1 );
-  ht = astCalloc( nheat, sizeof(*ht), 1 );
-  goodht = astCalloc( nheat, sizeof(*goodht), 1 );
-  scoeff = astCalloc( order + 1, sizeof(*scoeff), 0 );
-  scoeffvar = astCalloc( order + 1, sizeof(*scoeffvar), 0 );
-  goodidx = astCalloc( nheat, sizeof(*goodidx), 1 );
-  corrs = astCalloc( nbol, sizeof(*corrs), 0 );
+  scan = astCalloc( nheat, sizeof(*scan) );
+  if (bolvar) scanvar = astCalloc( nheat, sizeof(*scanvar) );
+  ht = astCalloc( nheat, sizeof(*ht) );
+  goodht = astCalloc( nheat, sizeof(*goodht) );
+  scoeff = astMalloc( (order + 1)*sizeof(*scoeff) );
+  scoeffvar = astMalloc( (order + 1)*sizeof(*scoeffvar) );
+  goodidx = astCalloc( nheat, sizeof(*goodidx) );
+  corrs = astMalloc( nbol*sizeof(*corrs) );
 
   /* Assume that we have monotonically increasing heater settings and so
      pick a value from the middle as a reference. Ramps may well have an
@@ -203,8 +203,8 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
   }
 
   /* space for the calculated polynomial */
-  if (polyfit && order == 1) polybol = astCalloc( nheat*nbol, sizeof(*polybol), 0 );
-  poly = astCalloc( nheat, sizeof(*poly), 0 );
+  if (polyfit && order == 1) polybol = astMalloc( (nheat*nbol)*sizeof(*polybol) );
+  poly = astMalloc( nheat*sizeof(*poly) );
 
   /* Now loop over each bolometer and extract the measurements */
   for (bol=0; bol<nbol; bol++) {

@@ -471,8 +471,8 @@ void smf_calc_mapcoord( smfWorkForce *wf, smfData *data, AstFrameSet *outfset,
       }
     } else {
       /* alloc the LUT and THETA arrays */
-      lut = astCalloc( nbolo*ntslice, sizeof(*(data->lut)), 0 );
-      theta = astCalloc( ntslice, sizeof(*(data->theta)), 0 );
+      lut = astMalloc( (nbolo*ntslice)*sizeof(*(data->lut)) );
+      theta = astMalloc( ntslice*sizeof(*(data->theta)) );
     }
 
     /* Retrieve the sky2map mapping from the output frameset (actually
@@ -506,7 +506,7 @@ void smf_calc_mapcoord( smfWorkForce *wf, smfData *data, AstFrameSet *outfset,
       smf_begin_job_context( wf, status );
 
       /* Allocate job data for threads */
-      job_data = astCalloc( nw, sizeof(*job_data), 1 );
+      job_data = astCalloc( nw, sizeof(*job_data) );
       if( *status == SAI__OK ) {
 
         /* Set up job data, and start calculating pointing for blocks of

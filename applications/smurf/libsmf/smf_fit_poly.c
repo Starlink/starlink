@@ -187,16 +187,16 @@ static void smfFitPolyPar( void *job_data_ptr, int *status ) {
      data per-bolo also needs to be re-ordered so allocate a temp array. */
 
   if( pdata->isTordered ) {
-    curbolo = astCalloc( ntslice, sizeof(*curbolo), 0 );
-    curqual = astCalloc( ntslice, sizeof(*curqual), 0 );
+    curbolo = astMalloc( ntslice*sizeof(*curbolo) );
+    curqual = astMalloc( ntslice*sizeof(*curqual) );
   }
-  curpoly = astCalloc( ncoeff, sizeof(*curpoly), 0 );
+  curpoly = astMalloc( ncoeff*sizeof(*curpoly) );
 
   /* If removing the fit from the data, allocate space for evaluated
      polynomial here */
 
   if( pdata->remove ) {
-    curpolydata = astCalloc( ntslice, sizeof(*curpolydata), 0 );
+    curpolydata = astMalloc( ntslice*sizeof(*curpolydata) );
   }
 
   /* Loop over bolometers. Only fit this bolometer if it is not
@@ -329,7 +329,7 @@ void smf_fit_poly( smfWorkForce *wf, smfData *data, const size_t order,
     }
   }
 
-  job_data = astCalloc( nw, sizeof(*job_data), 1 );
+  job_data = astCalloc( nw, sizeof(*job_data) );
 
   for( i=0; (*status==SAI__OK)&&i<nw; i++ ) {
     pdata = job_data + i;

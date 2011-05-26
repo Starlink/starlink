@@ -207,7 +207,7 @@ void smf_apply_mask( smfData *indata,
         }
       }
 
-      odata = astCalloc( nelem, smf_dtype_sz(bbm->dtype, status ), 0 );
+      odata = astMalloc( nelem*smf_dtype_sz(bbm->dtype, status ) );
       bbm->pntr[0] = odata;
 
       /* now copy in the mask */

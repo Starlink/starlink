@@ -129,7 +129,7 @@ void smf_check_smfDA( const smfData *idata, smfData *odata, int * status ) {
     /* OK output smfDA is not NULL so check individual components */
     if ( oda->flatcal == NULL && ida->flatcal) {
       nbol = (odata->dims)[0] * (odata->dims)[1];
-      flatcal = astCalloc( nbol*nflat, sizeof(*flatcal), 0 );
+      flatcal = astMalloc( (nbol*nflat)*sizeof(*flatcal) );
       if ( flatcal != NULL ) {
 	memcpy( flatcal, ida->flatcal, nbol*nflat*sizeof(*flatcal) );
       }
@@ -137,7 +137,7 @@ void smf_check_smfDA( const smfData *idata, smfData *odata, int * status ) {
     }
 
     if ( oda->flatpar == NULL && ida->flatcal ) {
-      flatpar = astCalloc( nflat, sizeof(*flatpar), 0 );
+      flatpar = astMalloc( nflat*sizeof(*flatpar) );
       if ( flatpar != NULL ) {
 	memcpy( flatpar, ida->flatpar, nflat*sizeof(*flatpar));
       }
@@ -152,7 +152,7 @@ void smf_check_smfDA( const smfData *idata, smfData *odata, int * status ) {
     if ( oda->heatval == NULL && ida->heatval ) {
       double * heatval;
       nbol = (odata->dims)[0] * (odata->dims)[1];
-      heatval = astCalloc( nbol*oda->nheat, sizeof(*heatval), 0 );
+      heatval = astMalloc( (nbol*oda->nheat)*sizeof(*heatval) );
       if ( heatval ) {
 	memcpy( heatval, ida->heatval, nbol*nflat*sizeof(*heatval) );
       }

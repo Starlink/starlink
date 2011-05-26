@@ -292,7 +292,7 @@ void smurf_sc2threadtest( int *status ) {
           ": Creating ^NS subarrays of data with ^C chunks * ^T samples",
           status );
 
-  res = astCalloc( nchunks, sizeof(*res), 1 );
+  res = astCalloc( nchunks, sizeof(*res) );
 
   for( k=0; (*status==SAI__OK)&&(k<nchunks); k++ ) {
 
@@ -315,7 +315,7 @@ void smurf_sc2threadtest( int *status ) {
 
         data->hdr->steptime = 0.005;
 
-        data->pntr[0] = astCalloc( datalen, smf_dtype_sz(data->dtype,status), 1 );
+        data->pntr[0] = astCalloc( datalen, smf_dtype_sz(data->dtype,status) );
       }
 
       smf_addto_smfArray( res[k], data, status );
@@ -343,7 +343,7 @@ void smurf_sc2threadtest( int *status ) {
      smfTimeChunkData's that hold the information required for each
      thread */
 
-  job_data = astCalloc( nthread, sizeof(*job_data), 1 );
+  job_data = astCalloc( nthread, sizeof(*job_data) );
 
   for( i=0; (i<(size_t)nthread) && (*status==SAI__OK); i++ ) {
     pdata = job_data + i;

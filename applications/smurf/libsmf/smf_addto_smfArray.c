@@ -112,7 +112,7 @@ void smf_addto_smfArray( smfArray *ary, smfData *data, int *status ) {
 
   /* we need to switch from static to dynamic buffer */
   if (ndat == SMF__MXSMF && ary->dyndata == NULL) {
-    ary->dyndata = astCalloc( 2 * ndat, sizeof(smfData*), 1 );
+    ary->dyndata = astCalloc( 2 * ndat, sizeof(smfData*) );
 
     /* copy from the static to dynamic buffer */
     for (i=0; i<ndat; i++) {

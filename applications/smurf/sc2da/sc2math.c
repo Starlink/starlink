@@ -31,7 +31,7 @@
 #ifdef PACKAGE_UPCASE
 #define malloc astMalloc
 #define free astFree
-#define calloc( count, size )   astCalloc( count, size, 1 )
+#define calloc( count, size )   astCalloc( count, size )
 #endif
 
 /* The C99 standard does not define M_PI so we have to have a fallback.

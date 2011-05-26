@@ -269,7 +269,7 @@ void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, i
     }
     if ( odata->poly == NULL) {
       npoly = (odata->dims)[0] * (odata->dims)[1] * odata->ncoeff;
-      opoly = astCalloc( npoly, sizeof( double ), 0 );
+      opoly = astMalloc( npoly*sizeof( double ) );
       if ( *status == SAI__OK ) {
         memcpy( opoly, idata->poly, npoly*sizeof( double ) );
         odata->poly = opoly;

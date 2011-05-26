@@ -143,7 +143,7 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
 
     /* Sort everything into order - this takes additional time since we have to read the
        KeyMap twice, but makes the output more amenable to scrutiny */
-    obslist = astCalloc( nobs, sizeof(*obslist), 1 );
+    obslist = astCalloc( nobs, sizeof(*obslist) );
     for (i = 0; i < nobs; i++) {
       AstObject * ao = NULL;
       const char * instrume = NULL;

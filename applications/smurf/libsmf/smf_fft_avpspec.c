@@ -179,8 +179,8 @@ smfData *smf_fft_avpspec( const smfData *pspec, smf_qual_t *quality,
     }
 
     /* Allocate space for DATA and VARIANCE components */
-    retdata->pntr[0] = astCalloc( ndata, smf_dtype_sz(retdata->dtype,status), 1 );
-    retdata->pntr[1] = astCalloc( ndata, smf_dtype_sz(retdata->dtype,status), 1 );
+    retdata->pntr[0] = astCalloc( ndata, smf_dtype_sz(retdata->dtype,status) );
+    retdata->pntr[1] = astCalloc( ndata, smf_dtype_sz(retdata->dtype,status) );
 
     /* Pointers to output data */
     odptr = retdata->pntr[0];

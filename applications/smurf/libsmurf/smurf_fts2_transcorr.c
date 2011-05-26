@@ -260,7 +260,7 @@ void smurf_fts2_transcorr(int* status)
       outData->lbnd[0] = outData->lbnd[0];
       outData->lbnd[1] = outData->lbnd[1];
       outData->lbnd[2] = outData->lbnd[2];
-      outData->pntr[0] = (double*) astCalloc(N * bolCount, sizeof(double), 0);
+      outData->pntr[0] = (double*) astMalloc( (N * bolCount)*sizeof(double) );
       outPntr          = outData->pntr[0];
 
       // DETERMINE WAVENUMBER FACTOR FROM FITS

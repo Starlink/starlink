@@ -1585,7 +1585,7 @@ void smurf_makemap( int *status ) {
          plane 2 of this 3-D array is stored in the weights component
          later. Initialize to zero. We need one such weights array for
          each thread, so we actually allocate a 4D array. */
-      weights3d = astCalloc( 2*nxy*wf->nworker, sizeof(double), 1 );
+      weights3d = astCalloc( 2*nxy*wf->nworker, sizeof(double) );
 
       /* Each worker thread needs its own output array. This is needed since
          otherwise different threads may attempt to write to the same output
@@ -1595,8 +1595,8 @@ void smurf_makemap( int *status ) {
          rebinning is complete, these multiple output arrays are combined
          into one, and copied into the output NDF. */
       if( wf->nworker > 1 ) {
-         map = astCalloc( nxy*wf->nworker, sizeof(double), 0 );
-         variance = astCalloc( nxy*wf->nworker, sizeof(double), 0 );
+         map = astMalloc( (nxy*wf->nworker)*sizeof(double) );
+         variance = astMalloc( (nxy*wf->nworker)*sizeof(double) );
       } else {
          map = (odata->pntr)[0];
          variance = (odata->pntr)[1];
@@ -1935,7 +1935,7 @@ void smurf_makemap( int *status ) {
              status);
 
     /* Allocate space for hitsmap */
-    hitsmap = astCalloc( nxy, sizeof (*hitsmap), 1 );
+    hitsmap = astCalloc( nxy, sizeof (*hitsmap) );
 
     /* Loop over all input data files to setup provenance handling */
     for(i=1; (i<=size) && ( *status == SAI__OK ); i++ ) {

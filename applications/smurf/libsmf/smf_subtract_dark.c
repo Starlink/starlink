@@ -279,8 +279,8 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
                      &idkp1, &idkpv1, status );
     smf_select_pntr( dark2->pntr, dark2->dtype, &ddkp2, &ddkpv2,
                      &idkp2, &idkpv2, status );
-    dkbuf = astCalloc( nbols, sizeof(*dkbuf), 0 );
-    dkvbuf = astCalloc( nbols, sizeof(*dkvbuf), 0 );
+    dkbuf = astMalloc( nbols*sizeof(*dkbuf) );
+    dkvbuf = astMalloc( nbols*sizeof(*dkvbuf) );
     ddark = dkbuf;
     dvdark = dkvbuf;
 

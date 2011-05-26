@@ -345,8 +345,8 @@ void smurf_sc2fft( int *status ) {
             double mean, sig, freqlo;
             size_t ngood, newgood;
 
-            whitenoise = astCalloc( nbolo, sizeof(*whitenoise), 1 );
-            bolomask = astCalloc( nbolo, sizeof(*bolomask), 1 );
+            whitenoise = astCalloc( nbolo, sizeof(*whitenoise) );
+            bolomask = astCalloc( nbolo, sizeof(*bolomask) );
 
 	    freqlo = 1. / (idata->hdr->steptime * idata->hdr->nframes);
 

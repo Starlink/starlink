@@ -120,8 +120,8 @@ void sc2sim_fitheat
   }
 
   if ( nframes > 10 ) {
-    scan = astCalloc( nframes, sizeof(*scan), 1 );
-    ht = astCalloc( nframes, sizeof(*ht), 1 );
+    scan = astCalloc( nframes, sizeof(*scan) );
+    ht = astCalloc( nframes, sizeof(*ht) );
 
     for ( i=0; i<nframes; i++ ) {
       ht[i] = heat[i] - heat[nframes/2];

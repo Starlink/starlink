@@ -113,7 +113,7 @@ static int sc2store_zindf = NDF__NOID;       /* NDF identifier for compression z
 #ifdef PACKAGE_UPCASE
 #define malloc astMalloc
 #define free astFree
-#define calloc( count, size )   astCalloc( count, size, 1 )
+#define calloc( count, size )   astCalloc( count, size )
 #endif
 
 /*+ sc2store_compress - compress frame of integers to unsigned short */

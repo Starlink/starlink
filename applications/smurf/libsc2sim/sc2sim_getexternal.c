@@ -104,7 +104,7 @@ void sc2sim_getexternal
   *scancount = data->hdr->nframes;
 
   /* Allocate memory for the list of positions */
-  *posptr = astCalloc( (*scancount)*2, sizeof(**posptr), 1 );
+  *posptr = astCalloc( (*scancount)*2, sizeof(**posptr) );
  
  
   /* Get the scan positions */

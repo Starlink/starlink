@@ -210,7 +210,7 @@ int astIsDynamic_( const void *, int * );
 size_t astTSizeOf_( const void *, int * );
 void *astFree_( void *, int * );
 void *astGrow_( void *, int, size_t, int * );
-void *astCalloc_( size_t, size_t, int, int * );
+void *astCalloc_( size_t, size_t, int * );
 void *astMalloc_( size_t, int, int * );
 void *astRealloc_( void *, size_t, int * );
 void *astStore_( void *, const void *, size_t, int * );
@@ -248,7 +248,7 @@ void astEndPM_( int * );
 /* ==================== */
 /* These wrap up the functions defined by this module. */
 
-#define astCalloc(nmemb,size,init) astERROR_INVOKE(astCalloc_(nmemb,size,init,STATUS_PTR))
+#define astCalloc(nmemb,size) astERROR_INVOKE(astCalloc_(nmemb,size,STATUS_PTR))
 #define astChrMatch(str1,str2) astERROR_INVOKE(astChrMatch_(str1,str2,STATUS_PTR))
 #define astChrMatchN(str1,str2,n) astERROR_INVOKE(astChrMatchN_(str1,str2,n,STATUS_PTR))
 #define astFree(ptr) astERROR_INVOKE(astFree_(ptr,STATUS_PTR))

@@ -107,7 +107,11 @@ void * smf_map_or_malloc (size_t nelem, smf_dtype type, int zero, int indf,
 
   /* just malloc if we do not have a file */
   if ( indf == NDF__NOID) {
-    return astCalloc( nelem, smf_dtype_sz(type, status), zero );
+     if( zero ) {
+       return astCalloc( nelem, smf_dtype_sz(type, status) );
+     } else {
+       return astMalloc( nelem*smf_dtype_sz(type, status) );
+     }
   }
 
   ndfMap( indf, comp, smf_dtype_str(type, status),

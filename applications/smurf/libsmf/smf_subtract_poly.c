@@ -164,7 +164,7 @@ void smf_subtract_poly(smfData *data, int rel, int *status) {
   }
 
   /* Allocate memory for one frame of data, initialize to zero */
-  firstframe = astCalloc( nbol, sizeof(double), 1 );
+  firstframe = astCalloc( nbol, sizeof(double) );
   if ( firstframe == NULL ) {
     *status = SAI__ERROR;
     goto CLEANUP;

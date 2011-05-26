@@ -6808,7 +6808,7 @@ static Provenance *ndg1ReadProvenanceExtension( HDSLoc *xloc, const char *npath,
                result->provs = astMalloc( nprov*sizeof( Prov * ) );
                if( *status == SAI__OK ) {
                   for( iprov = 0; iprov < nprov; iprov++ ) {
-                     (result->provs)[ iprov ] = astCalloc( 1, sizeof( Prov ), 1 );
+                     (result->provs)[ iprov ] = astCalloc( 1, sizeof( Prov ) );
                   }
                   result->main = (result->provs)[ 0 ];
                }

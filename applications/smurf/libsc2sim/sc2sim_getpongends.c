@@ -161,8 +161,8 @@ void sc2sim_getpongends
        centered over (0,0) - note that this is 1 greater than the number
        of grid segments along each side. */
 
-    xgrid = astCalloc( x_ngridseg+1, sizeof(*xgrid), 0 );
-    ygrid = astCalloc( y_ngridseg+1, sizeof(*ygrid), 0 );
+    xgrid = astMalloc( (x_ngridseg+1)*sizeof(*xgrid) );
+    ygrid = astMalloc( (y_ngridseg+1)*sizeof(*ygrid) );
 
   }
 

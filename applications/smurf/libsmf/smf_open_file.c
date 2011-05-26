@@ -508,7 +508,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
             ndfDim( gndf, NDF__MXDIM, pdims, &npdims, status );
             (*data)->ncoeff = pdims[2];
             /* Allocate memory for poly coeffs & copy over */
-            opoly = astCalloc( npoly, sizeof( *opoly ), 0 );
+            opoly = astMalloc( npoly*sizeof( *opoly ) );
             memcpy( opoly, poly, npoly*sizeof( *opoly ) );
             (*data)->poly = opoly;
           }
@@ -578,7 +578,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 
                   // MAKE A DEEP COPY
                   count = dimsFTS[0] * dimsFTS[1];
-                  fts->zpd->pntr[0] = astCalloc(count, sizeof(int), 0);
+                  fts->zpd->pntr[0] = astMalloc( count*sizeof(int) );
                   for(index = 0; index < count; index++) {
                     *((int*) (fts->zpd->pntr[0]) + index) = *((int*) pntr + index);
                   }
@@ -612,7 +612,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 
                   // MAKE A DEEP COPY
                   count = dimsFTS[0] * dimsFTS[1] * dimsFTS[2];
-                  fts->fpm->pntr[0] = astCalloc(count, sizeof(double), 0);
+                  fts->fpm->pntr[0] = astMalloc( count*sizeof(double) );
                   for(index = 0; index < count; index++) {
                     *((double*) (fts->fpm->pntr[0]) + index) = *((double*) pntr + index);
                   }
@@ -644,7 +644,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 
                   // MAKE A DEEP COPY
                   count = dimsFTS[0] * dimsFTS[1];
-                  fts->sigma->pntr[0] = astCalloc(count, sizeof(double), 0);
+                  fts->sigma->pntr[0] = astMalloc( count*sizeof(double) );
                   for(index = 0; index < count; index++) {
                     *((double*) (fts->sigma->pntr[0]) + index) = *((double*) pntr + index);
                   }
@@ -840,7 +840,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
             sc2store_headrmap( xloc, nframes, hdr->instrument, status );
 
             /* Malloc some memory to hold all the time series data */
-            hdr->allState = astCalloc( nframes, sizeof(*(hdr->allState)), 1 );
+            hdr->allState = astCalloc( nframes, sizeof(*(hdr->allState)) );
 
             /* Loop over each element, reading in the information */
             tmpState = hdr->allState;
@@ -994,9 +994,9 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
              This allows us to close the file immediately so that
              we do not need to worry about sc2store only allowing
              a single file at a time */
-          da->flatcal = astCalloc( colsize * rowsize * da->nflat,
-                                   sizeof(*(da->flatcal)), 0 );
-          da->flatpar = astCalloc( da->nflat, sizeof(*(da->flatpar)), 0 );
+          da->flatcal = astMalloc( colsize * rowsize * da->nflat *
+                                   sizeof(*(da->flatcal)) );
+          da->flatpar = astMalloc( (da->nflat)*sizeof(*(da->flatpar)) );
 
           /* Now copy across from the mapped version */
           if (da->flatcal != NULL) memcpy(da->flatcal, flatcal,
@@ -1022,9 +1022,9 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
             da->dksquid->lbnd[1] = 0;
             da->dksquid->lbnd[2] = 1;
 
-            da->dksquid->pntr[0] = astCalloc( rowsize*nframes,
+            da->dksquid->pntr[0] = astMalloc( rowsize*nframes*
                                               smf_dtype_size(da->dksquid,
-                                                             status), 0 );
+                                                             status) );
 
             /* Convert to double precision when we copy into da->dksquid */
             if( *status == SAI__OK ) {
@@ -1036,7 +1036,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 
             /* Create an empty QUALITY array */
             da->dksquid->qual = astCalloc( rowsize*nframes,
-                                           sizeof(*(da->dksquid->qual)),1);
+                                           sizeof(*(da->dksquid->qual)));
             da->dksquid->qfamily = SMF__QFAM_TSERIES;
           }
         }
@@ -1320,7 +1320,7 @@ static char * smf__read_ocsconfig ( int ndfid, int *status) {
       /* allocate it slightly bigger in case the config *just* fits
          in SIZE * CLEN characters and we can't terminate it. Also
          initialise it so that we can walk back from the end */
-      ocscfg = astCalloc( size + 1, clen, 1 );
+      ocscfg = astCalloc( size + 1, clen );
       ocscfg[0] = '\0'; /* just to make sure */
       dims[0] = size;
       datGetC( configloc, 1, dims, ocscfg, clen, status );

@@ -191,7 +191,7 @@ void smf_calc_smoothedwvm ( const smfArray * alldata, const smfData * adata,
      use the smoothed data directly rather than having to interpolate
      from the 1.2 second data back into the 200 Hz data. */
 
-  taudata = astCalloc( nframes, sizeof(*taudata), 1 );
+  taudata = astCalloc( nframes, sizeof(*taudata) );
 
   /* Macro to find a smfData in the smfGroup that contains valid
      data at this time slice */

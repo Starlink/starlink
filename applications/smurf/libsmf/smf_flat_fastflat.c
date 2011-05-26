@@ -226,7 +226,7 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
   nheat = astMapSize( heatmap );
 
   /* sort the heater settings in an integer array */
-  heatval = astCalloc( nheat, sizeof(*heatval), 1 );
+  heatval = astCalloc( nheat, sizeof(*heatval) );
   if (*status == SAI__OK) {
     for (i = 0; i < nheat; i++ ) {
       int h;
@@ -275,25 +275,25 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
     size_t bol;
 
     /* get some memory for the indices */
-    indices = astCalloc( maxfound, sizeof(*indices), 1 );
+    indices = astCalloc( maxfound, sizeof(*indices) );
 
     /* and equivalent memory for the readings at each index */
-    idata = astCalloc( maxfound, smf_dtype_sz( fflat->dtype, status ), 1 );
+    idata = astCalloc( maxfound, smf_dtype_sz( fflat->dtype, status ) );
 
     /* Need some memory for the JCMTSTATE information. */
-    outstate = astCalloc( nheat, sizeof(*outstate), 0 );
+    outstate = astMalloc( nheat*sizeof(*outstate) );
     (*bolvald)->hdr->allState = outstate;
 
     /* First need to compensate for any drift in the DC sky level.
        We do this by looking at the heater measurements for the reference
        heater as a function of time (index) for each bolometer and then
        fitting it with a polynomial. */
-    skycoeffs = astCalloc( nbols * (skyorder+1), sizeof(*skycoeffs), 1 );
-    skycoeffsvar = astCalloc( nbols * (skyorder+1), sizeof(*skycoeffs), 1 );
+    skycoeffs = astCalloc( nbols * (skyorder+1), sizeof(*skycoeffs) );
+    skycoeffsvar = astCalloc( nbols * (skyorder+1), sizeof(*skycoeffs) );
 
     /* temp memory to hold the coefficients for a single bolometer */
-    coeff = astCalloc( skyorder + 1, sizeof(*coeff), 1 );
-    coeffvar = astCalloc( skyorder + 1, sizeof(*coeffvar), 1 );
+    coeff = astCalloc( skyorder + 1, sizeof(*coeff) );
+    coeffvar = astCalloc( skyorder + 1, sizeof(*coeffvar) );
 
     /* check status after memory allocation */
     if (*status == SAI__OK) {
@@ -318,7 +318,7 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
          are close enough that a linear fit on the first N measurements in the
          ramp will be a reasonable approximation. We'll need the first N heater
          measurements. */
-        before_heat = astCalloc( szfit, sizeof(*before_heat), 1 );
+        before_heat = astCalloc( szfit, sizeof(*before_heat) );
         extras += meas_per_heat;
         for (i=0; i<szfit; i++) {
           before_heat[i] = (hdr->allState)[i].sc2_heat;
@@ -330,7 +330,7 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
          are close enough that a linear fit on the first N measurements in the
          ramp will be a reasonable approximation. We'll need the first N heater
          measurements. */
-        after_heat = astCalloc( szfit, sizeof(*after_heat), 1 );
+        after_heat = astCalloc( szfit, sizeof(*after_heat) );
         extras += meas_per_heat;
         for (i=0;i<szfit; i++) {
           after_heat[i] = (hdr->allState)[nframes-1-i].sc2_heat;
@@ -338,10 +338,10 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
       }
 
       /* and _DOUBLE versions because smf_fit_poly1d takes doubles */
-      ddata = astCalloc( maxfound + extras, sizeof(*ddata), 1 );
-      dindices = astCalloc( maxfound + extras, sizeof(*dindices), 1 );
+      ddata = astCalloc( maxfound + extras, sizeof(*ddata) );
+      dindices = astCalloc( maxfound + extras, sizeof(*dindices) );
 
-      if (before_heat || after_heat) heatmeas = astCalloc( szfit, sizeof(*heatmeas), 1 );
+      if (before_heat || after_heat) heatmeas = astCalloc( szfit, sizeof(*heatmeas) );
 
       if (*status == SAI__OK) {
         for (bol = 0; bol < nbols; bol++) {
@@ -497,7 +497,7 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
   /* Create a smfDA struct to store the heater settings. */
   if (*status == SAI__OK) {
     smfDA * da = NULL;
-    double * dheatval = astCalloc( nheat, sizeof(*dheatval), 0 );
+    double * dheatval = astMalloc( nheat*sizeof(*dheatval) );
 
     for (i = 0; i < nheat; i++) {
       dheatval[i] = heatval[i];

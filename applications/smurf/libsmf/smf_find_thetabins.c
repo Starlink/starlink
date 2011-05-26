@@ -144,7 +144,7 @@ void smf_find_thetabins( const smfData *data, int nosign, double **bins,
     min = 0;
     max = AST__DPI;
 
-    theta = astCalloc( ntslice, sizeof(*theta), 1 );
+    theta = astCalloc( ntslice, sizeof(*theta) );
     for( i=0; i<ntslice; i++ ) {
       if( data->theta[i] == VAL__BADD ) {
         theta[i] = VAL__BADD;
@@ -179,7 +179,7 @@ void smf_find_thetabins( const smfData *data, int nosign, double **bins,
   /* Find all of the local maxima above (THETABINS_THRESH * maxcount). When
      doing this, account for wraparound in the angle. */
 
-  bc = astCalloc( THETABINS_MAXBINS, sizeof(*bc), 1);
+  bc = astCalloc( THETABINS_MAXBINS, sizeof(*bc) );
   nb = 0;
 
   for( i=0; (*status==SAI__OK) && (i<THETABINS_MAXBINS); i++ ) {
@@ -197,7 +197,7 @@ void smf_find_thetabins( const smfData *data, int nosign, double **bins,
   /* Then calculate bin edges that are equidistant between the peaks (again,
      account for wraparound */
 
-  bin = astCalloc( nb, sizeof(*bin), 1 );
+  bin = astCalloc( nb, sizeof(*bin) );
 
   if( *status == SAI__OK ) {
     /* The first bin deals with wraparound */
@@ -219,7 +219,7 @@ void smf_find_thetabins( const smfData *data, int nosign, double **bins,
     int which;
     int wrapstart=0;   /* flag if first bin is wrapped. Otherwise last */
 
-    *whichbin = astCalloc( ntslice, sizeof(**whichbin), 1 );
+    *whichbin = astCalloc( ntslice, sizeof(**whichbin) );
 
     if( nb == 1 ) {
       /* Special case: if only 1 bin, all samples go into it */

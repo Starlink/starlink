@@ -215,7 +215,7 @@ smfDream *smf_construct_smfDream( smfData *data, size_t nvert,
                               &griddata, status);
 		if ( griddata != NULL ) {
 		  nelem = (size_t)((griddata->dims)[0] * (griddata->dims)[1]);
-		  gridwts = astCalloc( nelem, sizeof(double), 1 );
+		  gridwts = astCalloc( nelem, sizeof(double) );
 		  if ( gridwts != NULL ) {
 		    gridptr = (griddata->pntr)[0];
 		    memcpy( gridwts, gridptr, nelem*sizeof(double) );
@@ -230,7 +230,7 @@ smfDream *smf_construct_smfDream( smfData *data, size_t nvert,
 		smf_open_ndf( ndfid, "READ", SMF__DOUBLE, &griddata, status);
 		if ( griddata != NULL ) {
 		  nelem = (size_t)((griddata->dims)[0]);
-		  invmatx = astCalloc( nelem, sizeof(double), 1 );
+		  invmatx = astCalloc( nelem, sizeof(double) );
 		  if ( invmatx != NULL ) {
 		    gridptr = (griddata->pntr)[0];
 		    memcpy( invmatx, gridptr, nelem*sizeof(double) );

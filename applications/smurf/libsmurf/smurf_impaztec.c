@@ -361,39 +361,39 @@ void smurf_impaztec( int *status ) {
     nframes = framespersecond*seconds;
 
     /* Allocate temporary memory for the bolometer signals */
-    bolosig = astCalloc( nframes, sizeof( *bolosig ), 0 );
+    bolosig = astMalloc( nframes*sizeof( *bolosig ) );
 
     /* create and fill the header with rts/tcs data */
-    head = astCalloc( nframes, sizeof(*head), 1 );
+    head = astCalloc( nframes, sizeof(*head) );
 
     /* Retrieve values to convert from the netcdf file. */
 
-    time = astCalloc( nframes, sizeof(*time), 1 );
-    airmass = astCalloc( nframes, sizeof(*airmass), 1 );
-    tel_lst = astCalloc( nframes, sizeof(*tel_lst), 1 );
-    trackactc1 = astCalloc( nframes, sizeof(*trackactc1), 1 );
-    trackactc2 = astCalloc( nframes, sizeof(*trackactc2), 1 );
-    trackdemandc1 = astCalloc( nframes, sizeof(*trackdemandc1), 1 );
-    trackdemandc2 = astCalloc( nframes, sizeof(*trackdemandc2), 1 );
-    trackbasec1 = astCalloc( nframes, sizeof(*trackbasec1), 1 );
-    trackbasec2 = astCalloc( nframes, sizeof(*trackbasec2), 1 );
-    azelactc1 = astCalloc( nframes, sizeof(*azelactc1), 1 );
-    azelactc2 = astCalloc( nframes, sizeof(*azelactc2), 1 );
-    azeldemandc1 = astCalloc( nframes, sizeof(*azeldemandc1), 1 );
-    azeldemandc2 = astCalloc( nframes, sizeof(*azeldemandc2), 1 );
-    azelbasec1 = astCalloc( nframes, sizeof(*azelbasec1), 1 );
-    azelbasec2 = astCalloc( nframes, sizeof(*azelbasec2), 1 );
-    dbuf = astCalloc( nframes*nbolos, sizeof(*dbuf), 0 );
-    dksquid = astCalloc( nframes*nbolos, sizeof(*dksquid), 0 );
-    posptr = astCalloc( 2*nframes, sizeof(*posptr), 0 );
-    fcal = astCalloc( nbolos, sizeof(*fcal), 0 );
-    fpar = astCalloc( nflat, sizeof(*fpar), 0 );
-    mjuldate = astCalloc( nframes, sizeof(*mjuldate), 1 );
-    tempbuff = astCalloc( nframes, sizeof(*tempbuff), 1 );
-    ra_app = astCalloc( nframes, sizeof(*ra_app), 1 );
-    dec_app = astCalloc( nframes, sizeof(*dec_app), 1 );
+    time = astCalloc( nframes, sizeof(*time) );
+    airmass = astCalloc( nframes, sizeof(*airmass) );
+    tel_lst = astCalloc( nframes, sizeof(*tel_lst) );
+    trackactc1 = astCalloc( nframes, sizeof(*trackactc1) );
+    trackactc2 = astCalloc( nframes, sizeof(*trackactc2) );
+    trackdemandc1 = astCalloc( nframes, sizeof(*trackdemandc1) );
+    trackdemandc2 = astCalloc( nframes, sizeof(*trackdemandc2) );
+    trackbasec1 = astCalloc( nframes, sizeof(*trackbasec1) );
+    trackbasec2 = astCalloc( nframes, sizeof(*trackbasec2) );
+    azelactc1 = astCalloc( nframes, sizeof(*azelactc1) );
+    azelactc2 = astCalloc( nframes, sizeof(*azelactc2) );
+    azeldemandc1 = astCalloc( nframes, sizeof(*azeldemandc1) );
+    azeldemandc2 = astCalloc( nframes, sizeof(*azeldemandc2) );
+    azelbasec1 = astCalloc( nframes, sizeof(*azelbasec1) );
+    azelbasec2 = astCalloc( nframes, sizeof(*azelbasec2) );
+    dbuf = astMalloc( (nframes*nbolos)*sizeof(*dbuf) );
+    dksquid = astMalloc( (nframes*nbolos)*sizeof(*dksquid) );
+    posptr = astMalloc( (2*nframes)*sizeof(*posptr) );
+    fcal = astMalloc( nbolos*sizeof(*fcal) );
+    fpar = astMalloc( nflat*sizeof(*fpar) );
+    mjuldate = astCalloc( nframes, sizeof(*mjuldate) );
+    tempbuff = astCalloc( nframes, sizeof(*tempbuff) );
+    ra_app = astCalloc( nframes, sizeof(*ra_app) );
+    dec_app = astCalloc( nframes, sizeof(*dec_app) );
 
-    quality = astCalloc( nframes, sizeof(*quality), 1 );
+    quality = astCalloc( nframes, sizeof(*quality) );
     memset( quality, 0, nframes*sizeof(int) );
 
     /* Calculate the time for each frame.  First, get the modified julian

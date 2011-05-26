@@ -206,7 +206,7 @@ smf_flat_params( const smfData * refdata, const char resistpar[],
   }
 
   nbols = ncols * nrows;
-  *resistance = astCalloc( nbols, sizeof(**resistance), 0 );
+  *resistance = astMalloc( nbols*sizeof(**resistance) );
 
   if (*status == SAI__OK) {
     for (j = 0; j < (size_t)ncols; j++) {

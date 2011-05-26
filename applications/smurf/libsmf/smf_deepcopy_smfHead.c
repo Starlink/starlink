@@ -165,7 +165,7 @@ smf_deepcopy_smfHead( const smfHead *old, int * status ) {
   /* Only allocate space for allState if we have a non-NULL input
      allState */
   if ( old->allState != NULL) {
-    allState = astCalloc( nframes, sizeof(*allState), 0 );
+    allState = astMalloc( nframes*sizeof(*allState) );
     if ( allState == NULL) {
       /* Status should be bad from astCalloc */
       if (*status == SAI__OK) *status = SAI__ERROR;
@@ -178,10 +178,10 @@ smf_deepcopy_smfHead( const smfHead *old, int * status ) {
   /* need to allocate focal plane offsets */
   if (old->ndet > 0 && old->fplanex && old->fplaney) {
     ndet = old->ndet;
-    fplanex = astCalloc( ndet, sizeof(*fplanex), 0 );
+    fplanex = astMalloc( ndet*sizeof(*fplanex) );
     if (fplanex) memcpy( fplanex, old->fplanex, ndet*sizeof(*fplanex) );
 
-    fplaney = astCalloc( ndet, sizeof(*fplaney), 0 );
+    fplaney = astMalloc( ndet*sizeof(*fplaney) );
     if (fplaney) memcpy( fplaney, old->fplaney, ndet*sizeof(*fplaney) );
   }
 
@@ -189,14 +189,14 @@ smf_deepcopy_smfHead( const smfHead *old, int * status ) {
   if (old->ndet > 0 && old->nframes > 0 && old->detpos) {
     ndet = old->ndet;
     nframes = old->nframes;
-    detpos = astCalloc( 2*ndet*nframes, sizeof(*detpos), 0 );
+    detpos = astMalloc( (2*ndet*nframes)*sizeof(*detpos) );
     if (detpos) memcpy( detpos, old->detpos, 2*ndet*nframes*sizeof(*detpos) );
   }
 
   /* need to allocate detector name array */
   if (old->ndet > 0 && old->detname) {
     ndet = old->ndet;
-    detname = astCalloc( ndet, strlen( old->detname ) + 1, 0 );
+    detname = astMalloc( ndet*strlen( old->detname ) + 1 );
     if( detname ) memcpy( detname, old->detname,
                           ndet*( strlen( old->detname ) + 1 ) );
   }
@@ -205,13 +205,13 @@ smf_deepcopy_smfHead( const smfHead *old, int * status ) {
   if (old->ndet > 0 && old->tsys) {
     ndet = old->ndet;
     nframes = old->nframes;
-    tsys = astCalloc( ndet*nframes, sizeof(*tsys), 0 );
+    tsys = astMalloc( (ndet*nframes)*sizeof(*tsys) );
     if ( tsys ) memcpy( tsys, old->tsys, ndet*nframes*sizeof(*tsys) );
   }
 
   /* Allocate ocsconfig */
   if (old->ocsconfig != NULL) {
-    ocsconfig = astCalloc( 1, strlen( old->ocsconfig ) + 1, 0 );
+    ocsconfig = astMalloc( 1*strlen( old->ocsconfig ) + 1 );
     if (ocsconfig) strcpy( ocsconfig, old->ocsconfig );
   }
 

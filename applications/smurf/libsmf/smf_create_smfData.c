@@ -133,7 +133,7 @@ smf_create_smfData( int flags, int * status ) {
 
   if (*status != SAI__OK) return NULL;
 
-  data = astCalloc( 1, sizeof(smfData), 0 );
+  data = astMalloc( 1*sizeof(smfData) );
   if (! (flags & SMF__NOCREATE_FILE) )
     file = smf_create_smfFile( status );
   if (! (flags & SMF__NOCREATE_HEAD) )

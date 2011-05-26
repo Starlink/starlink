@@ -196,13 +196,13 @@ size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snr
   if (istable) {
 
     /* Space for fit data */
-    bolv = astCalloc( nheat, sizeof(*bolv), 0 );
-    if (usevar && bolvalvar) bolvv = astCalloc( nheat, sizeof(*bolvv), 0 );
-    powv = astCalloc( nheat, sizeof(*powv), 0 );
+    bolv = astMalloc( nheat*sizeof(*bolv) );
+    if (usevar && bolvalvar) bolvv = astMalloc( nheat*sizeof(*bolvv) );
+    powv = astMalloc( nheat*sizeof(*powv) );
 
     /* Polynomial expansion */
-    if (polyfit) polybol = astCalloc( nheat*nbol, sizeof(*polybol), 0 );
-    poly = astCalloc( nheat, sizeof(*poly), 0 );
+    if (polyfit) polybol = astMalloc( (nheat*nbol)*sizeof(*polybol) );
+    poly = astMalloc( nheat*sizeof(*poly) );
 
     /* prefil polynomial with bad */
     if (polybol) {
@@ -212,11 +212,11 @@ size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snr
     }
 
     /* some memory for good indices */
-    goodidx = astCalloc( nheat, sizeof(*goodidx), 1 );
+    goodidx = astCalloc( nheat, sizeof(*goodidx) );
 
     /* coefficients */
-    coeffs = astCalloc( order+1, sizeof(*coeffs), 1 );
-    varcoeffs = astCalloc( order+1, sizeof(*varcoeffs), 1 );
+    coeffs = astCalloc( order+1, sizeof(*coeffs) );
+    varcoeffs = astCalloc( order+1, sizeof(*varcoeffs) );
 
     /* dim1 must change slower than dim0 */
     for (bol=0; bol < nbol; bol++) {

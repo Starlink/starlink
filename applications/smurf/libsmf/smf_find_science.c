@@ -280,8 +280,8 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
   /* Work out how many input files we have and allocate sufficient sorting
      space */
   insize = grpGrpsz( ingrp, status );
-  alldarks = astCalloc( insize, sizeof(*alldarks), 1 );
-  allfflats = astCalloc( insize, sizeof(*allfflats), 1 );
+  alldarks = astCalloc( insize, sizeof(*alldarks) );
+  allfflats = astCalloc( insize, sizeof(*allfflats) );
 
   /* check each file in turn */
   for (i = 1; i <= insize; i++) {

@@ -447,9 +447,9 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
     size_t thischunk;
 
     /* Get the chunk flags and also store the size of the chunk */
-    chunk = astCalloc( ngroups, sizeof(*chunk), 1 );
-    chunklen = astCalloc( ngroups, sizeof(*chunklen), 1 );
-    piecelen = astCalloc( ngroups, sizeof(*piecelen), 1 );
+    chunk = astCalloc( ngroups, sizeof(*chunk) );
+    chunklen = astCalloc( ngroups, sizeof(*chunklen) );
+    piecelen = astCalloc( ngroups, sizeof(*piecelen) );
 
     thischunk = 0;  /* The current chunk */
     for (i=0; i<ngroups; i++) {
@@ -526,7 +526,7 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
   /* Decide if we are keeping a chunk by looking at the length. */
   maxconcat = 0;
   nkeep = 0;
-  keepchunk = astCalloc( ngroups, sizeof(*keepchunk), 0 );
+  keepchunk = astMalloc( ngroups*sizeof(*keepchunk) );
   for (i=0; i<ngroups; i++) {
     size_t thischunk;
 
@@ -549,16 +549,16 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
   /* Allocate a subgroup array of the right size and fill it. They keymap
      is sorted by date (and wavelength) so we can always index into it by using
      indices from the subgroup. */
-  subgroups = astCalloc( nkeep, sizeof(*subgroups), 1 );
-  new_chunk = astCalloc( nkeep, sizeof(*new_chunk), 1 );
-  new_tlen  = astCalloc( nkeep, sizeof(*new_tlen), 1 );
+  subgroups = astCalloc( nkeep, sizeof(*subgroups) );
+  new_chunk = astCalloc( nkeep, sizeof(*new_chunk) );
+  new_tlen  = astCalloc( nkeep, sizeof(*new_tlen) );
 
   currentindex = 0;
   for (i=0;i<ngroups;i++) {
     AstKeyMap * thismap = NULL;
     AstKeyMap * grpindices = NULL;
     size_t nsubarrays = 0;
-    size_t *indices = astCalloc( maxrelated, sizeof(*indices), 1 );
+    size_t *indices = astCalloc( maxrelated, sizeof(*indices) );
 
     /* skip if we are dropping this chunk */
     if (!keepchunk[i]) continue;

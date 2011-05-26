@@ -174,7 +174,7 @@ void smf_flag_slewspeed( smfData *data, double smin, double smax,
   }
 
   /* Allocate flag array */
-  flag = astCalloc( ntslice, sizeof(*flag), 1 );
+  flag = astCalloc( ntslice, sizeof(*flag) );
 
   /* Initial conditions */
   if( *status == SAI__OK ) {

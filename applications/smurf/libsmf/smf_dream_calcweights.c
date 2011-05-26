@@ -203,7 +203,7 @@ void smf_dream_calcweights( smfData *data, const Grp *ogrp, const int index,
       /* Allocate quality array */
       qualdim[0] = nbolx;
       qualdim[1] = nboly;
-      qual = astCalloc( qualdim[0]*qualdim[1], sizeof(int), 1 );
+      qual = astCalloc( qualdim[0]*qualdim[1], sizeof(int) );
 
 
       sc2math_calcmapwt( subarray, nbolx, nboly,

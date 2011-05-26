@@ -97,7 +97,7 @@ smf_create_smfDA( int * status ) {
 
   if (*status != SAI__OK) return NULL;
 
-  da = astCalloc( 1, sizeof(*da), 0 );
+  da = astMalloc( 1*sizeof(*da) );
 
   if (*status != SAI__OK) {
     errRep(FUNC_NAME,"Unable to allocate memory for smfDA structure",

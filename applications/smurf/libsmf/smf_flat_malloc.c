@@ -136,7 +136,7 @@ void smf_flat_malloc( size_t nheat, const smfData * refdata,
   oldhdr = refdata->hdr;
 
   if (powvald) {
-    powval = astCalloc( nheat, sizeof(*powval), 1 );
+    powval = astCalloc( nheat, sizeof(*powval) );
     pntr[0] = powval;
     pntr[1] = NULL;
     dims[0] = nheat;
@@ -154,8 +154,8 @@ void smf_flat_malloc( size_t nheat, const smfData * refdata,
     }
 
     nelem = refdata->dims[rowidx] * refdata->dims[colidx];
-    bolval = astCalloc( nheat * nelem, sizeof(*bolval), 1 );
-    bolvalvar = astCalloc( nheat * nelem, sizeof(*bolvalvar), 1 );
+    bolval = astCalloc( nheat * nelem, sizeof(*bolval) );
+    bolvalvar = astCalloc( nheat * nelem, sizeof(*bolvalvar) );
     pntr[0] = bolval;
     pntr[1] = bolvalvar;
     dims[SC2STORE__ROW_INDEX] = refdata->dims[rowidx];

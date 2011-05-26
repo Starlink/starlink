@@ -132,9 +132,11 @@
 *        Modify memory allocation to use "calloc" directly, rather than
 *        using "malloc+memset".
 *     12-APR-2011 (DSB):
-*        Fix regular expression problem where a ".*" template field failed to 
-*        match a null string if it occurred before a closing parenthesis at 
+*        Fix regular expression problem where a ".*" template field failed to
+*        match a null string if it occurred before a closing parenthesis at
 *        the end of the template.
+*     26-MAY-2011 (DSB):
+*        Chhanged API for astCalloc to match RTL (i.e. remove "init").
 */
 
 /* Configuration results. */
@@ -605,27 +607,27 @@ char *astAppendString_( char *str1, int *nc, const char *str2, int *status ) {
    return result;
 }
 
-void *astCalloc_( size_t nmemb, size_t size, int init, int *status ) {
+void *astCalloc_( size_t nmemb, size_t size, int *status ) {
 /*
 *++
 *  Name:
 *     astCalloc
 
 *  Purpose:
-*     Allocate, and optionally initialise, memory.
+*     Allocate and initialise memory.
 
 *  Type:
 *     Public function.
 
 *  Synopsis:
 *     #include "memory.h"
-*     void *astCalloc( size_t nmemb, size_t size, int init )
+*     void *astCalloc( size_t nmemb, size_t size )
 
 *  Description:
 *     This function allocates memory in a similar manner to the
 *     standard C "calloc" function, but with improved security
 *     (against memory leaks, etc.) and with error reporting. It also
-*     allows the allocated memory to be filled with zeros.
+*     fills the allocated memory with zeros.
 *
 *     Like astMalloc, it allows zero-sized memory allocation
 *     (without error), resulting in a NULL returned pointer value.
@@ -635,8 +637,6 @@ void *astCalloc_( size_t nmemb, size_t size, int init, int *status ) {
 *        The number of array elements for which memory is to be allocated.
 *     size
 *        The size of each array element, in bytes.
-*     init
-*        If non-zero, the allocated memory will be filled with zeros.
 
 *  Returned Value:
 *     astCalloc()
@@ -659,13 +659,8 @@ void *astCalloc_( size_t nmemb, size_t size, int init, int *status ) {
 /* Check the global error status. */
    if ( !astOK ) return result;
 
-/* Attempt to allocate and optionally initialise the required amount of
-   memory. */
-   if( init ) {
-      result = astMallocInit( nmemb*size );
-   } else {
-      result = astMalloc( nmemb*size );
-   }
+/* Attempt to allocate and initialise the required amount of memory. */
+   result = astMallocInit( nmemb*size );
 
 /* If the above call failed due to failure of the system malloc function,
    issue an extra error giving the number of elements and element size. */

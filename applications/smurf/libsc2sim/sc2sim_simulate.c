@@ -716,7 +716,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       /* Stare just points at a nasmyth offset of 0 from the map centre */
       msgOutif(MSG__VERB, " ", "Do a STARE observation", status );
       count = inx->numsamples;
-      posptr = astCalloc( count*2, sizeof(*posptr), 1 );
+      posptr = astCalloc( count*2, sizeof(*posptr) );
       if( *status == SAI__OK ) {
         memset( posptr, 0, count*2*sizeof(double) );
       }
@@ -728,7 +728,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       msgOutif(MSG__VERB, " ", "Do a NOISE observation", status );
       /* Always only lasts 10 s */
       count = 10. / inx->steptime;
-      posptr = astCalloc( count*2, sizeof(*posptr), 1 );
+      posptr = astCalloc( count*2, sizeof(*posptr) );
       if( *status == SAI__OK ) {
         memset( posptr, 0, count*2*sizeof(double) );
       }
@@ -755,7 +755,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
       /* dream uses the SMU to do the jiggle pattern so the posptr
          is just set to 0 */
-      posptr = astCalloc( count*2, sizeof(*posptr), 1 );
+      posptr = astCalloc( count*2, sizeof(*posptr) );
 
       if( *status == SAI__OK ) {
         memset( posptr, 0, count*2*sizeof(double) );
@@ -892,24 +892,24 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
      time-slice */
 
   /* All four subarrays need to have their data stored simultaneously */
-  dbuf = astCalloc( maxwrite*nbol*(sinx->nsubarrays), sizeof(*dbuf), 1 );
-  digits = astCalloc( maxwrite*nbol, sizeof(*digits), 1 );
-  dksquid = astCalloc( maxwrite*inx->rowsize, sizeof(*dksquid), 1 );
+  dbuf = astCalloc( maxwrite*nbol*(sinx->nsubarrays), sizeof(*dbuf) );
+  digits = astCalloc( maxwrite*nbol, sizeof(*digits) );
+  dksquid = astCalloc( maxwrite*inx->rowsize, sizeof(*dksquid) );
 
   /* Frames will be "chunked" into blocks of size 'maxwrite' */
-  mjuldate = astCalloc( maxwrite, sizeof(*mjuldate), 1 );
-  lst = astCalloc( maxwrite, sizeof(*lst), 1 );
-  base_az = astCalloc( maxwrite, sizeof(*base_az), 1 );
-  base_el = astCalloc( maxwrite, sizeof(*base_el), 1 );
-  base_p = astCalloc( maxwrite, sizeof(*base_p), 1 );
-  bor_az = astCalloc( maxwrite, sizeof(*bor_az), 1 );
-  bor_el = astCalloc( maxwrite, sizeof(*bor_el), 1 );
-  bor_ra = astCalloc( maxwrite, sizeof(*bor_ra), 1 );
-  bor_dec = astCalloc( maxwrite, sizeof(*bor_dec), 1 );
-  jig_x_hor = astCalloc( maxwrite, sizeof(*jig_x_hor), 1 );
-  jig_y_hor = astCalloc( maxwrite, sizeof(*jig_y_hor), 1 );
-  airmass = astCalloc( maxwrite, sizeof(*airmass), 1 );
-  head = astCalloc( maxwrite, sizeof( *head ), 1 );
+  mjuldate = astCalloc( maxwrite, sizeof(*mjuldate) );
+  lst = astCalloc( maxwrite, sizeof(*lst) );
+  base_az = astCalloc( maxwrite, sizeof(*base_az) );
+  base_el = astCalloc( maxwrite, sizeof(*base_el) );
+  base_p = astCalloc( maxwrite, sizeof(*base_p) );
+  bor_az = astCalloc( maxwrite, sizeof(*bor_az) );
+  bor_el = astCalloc( maxwrite, sizeof(*bor_el) );
+  bor_ra = astCalloc( maxwrite, sizeof(*bor_ra) );
+  bor_dec = astCalloc( maxwrite, sizeof(*bor_dec) );
+  jig_x_hor = astCalloc( maxwrite, sizeof(*jig_x_hor) );
+  jig_y_hor = astCalloc( maxwrite, sizeof(*jig_y_hor) );
+  airmass = astCalloc( maxwrite, sizeof(*airmass) );
+  head = astCalloc( maxwrite, sizeof( *head ) );
 
   /* Create an instrumental 1/f noise sequence for each bolometer by
      generating random amplitudes for the sine and cosine

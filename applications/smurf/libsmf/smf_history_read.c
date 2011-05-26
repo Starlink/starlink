@@ -155,9 +155,9 @@ void smf_history_read( smfData* data,int *status) {
     datClen( shloc, &clen, status );
     datSize( shloc, &nrec, status );
 
-    pntrs = astCalloc( nrec, sizeof(*pntrs), 0 );
+    pntrs = astMalloc( nrec*sizeof(*pntrs) );
     bufelem = (clen+1)*sizeof(*buffer);
-    buffer = astCalloc( nrec, bufelem, 1 );
+    buffer = astCalloc( nrec, bufelem );
 
     datGet1C( shloc, nrec, bufelem*nrec, buffer, pntrs, &nrec, status );
     datAnnul( &shloc, status );

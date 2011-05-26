@@ -161,7 +161,7 @@ void smf_fit_poly1d ( size_t order, size_t nelem, double clip, const double x[],
     if (polydata) {
       pptr = polydata;
     } else {
-      polyptr = astCalloc( nelem, sizeof(*polyptr), 1 );
+      polyptr = astCalloc( nelem, sizeof(*polyptr) );
       pptr = polyptr;
     }
 
@@ -172,7 +172,7 @@ void smf_fit_poly1d ( size_t order, size_t nelem, double clip, const double x[],
        is expanded properly afterwards. It does mean that
        we will always end up in the weighted branch even if
        there is no supplied variance. */
-    varptr = astCalloc( nelem, sizeof(*varptr), 0 );
+    varptr = astMalloc( nelem*sizeof(*varptr) );
     if (varptr) {
       if (vary && varptr) {
         memcpy( varptr, vary, sizeof(*varptr) * nelem );
@@ -183,7 +183,7 @@ void smf_fit_poly1d ( size_t order, size_t nelem, double clip, const double x[],
       }
     }
 
-    resid = astCalloc( nelem, sizeof(*resid), 0 );
+    resid = astMalloc( nelem*sizeof(*resid) );
 
     /* we are clipping */
     while (iterating && *status == SAI__OK) {
@@ -286,7 +286,7 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[],
   if (x) {
     xx = x;
   } else {
-    xptr = astCalloc( nelem, sizeof(*xptr), 0 );
+    xptr = astMalloc( nelem*sizeof(*xptr) );
     for ( i = 0; i < nelem; i++) {
       xptr[i] = i;
     }
@@ -398,7 +398,7 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[],
 
     if (vary) {
       /* Space for the weights */
-      double * w = astCalloc( nelem, sizeof(*w), 0 );
+      double * w = astMalloc( nelem*sizeof(*w) );
 
       /* weighted fit */
       for (i = 0; i < nelem; i++) {
@@ -419,8 +419,8 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[],
     } else {
       /* We need some space to copy the data because we are worried about bad
          values for x and y */
-      double * fx = astCalloc( nelem, sizeof(*fx), 0 );
-      double * fy = astCalloc( nelem, sizeof(*fy), 0 );
+      double * fx = astMalloc( nelem*sizeof(*fx) );
+      double * fy = astMalloc( nelem*sizeof(*fy) );
 
       for (i = 0; i < nelem; i++) {
         if ( xx[i] != VAL__BADD && y[i] != VAL__BADD &&
@@ -484,7 +484,7 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[],
       if (varcoeffs) {
         var = varcoeffs;
       } else {
-        var = astCalloc( order+1, sizeof(*var), 1 );
+        var = astCalloc( order+1, sizeof(*var) );
       }
       sc2math_cubfit( nelem, (double*)x, (double*)y, coeffs, var, status);
       if (var && !varcoeffs) var = astFree( var );

@@ -237,11 +237,11 @@ acs_fill_smfHead( smfHead * hdr, int indf, int * status ) {
   /* allocate memory and copy */
   if (*status == SAI__OK) {
     hdr->ndet = sizex;
-    fplanex = astCalloc( sizex, sizeof(*fplanex), 0 );
-    fplaney = astCalloc( sizex, sizeof(*fplaney), 0 );
-    receppos = astCalloc( sizer, sizeof(*receppos), 0 );
-    tsys = astCalloc( sizet, sizeof(*tsys), 0 );
-    receptor = astCalloc( sizen, clen + 1, 0 );
+    fplanex = astMalloc( sizex*sizeof(*fplanex) );
+    fplaney = astMalloc( sizex*sizeof(*fplaney) );
+    receppos = astMalloc( sizer*sizeof(*receppos) );
+    tsys = astMalloc( sizet*sizeof(*tsys) );
+    receptor = astMalloc( sizen*(clen + 1) );
 
     /* need to convert fplane values from arcsec to radians since they are
        stored in arcsec in the ACSIS data files. */

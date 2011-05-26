@@ -707,7 +707,7 @@ void smurf_sc2sim( int *status ) {
 
   nbol = inx.colsize * inx.rowsize;
   /* Bad bolometer mask */
-  bolos = astCalloc( (size_t)(nbol), sizeof(int), 1 );
+  bolos = astCalloc( (size_t)(nbol), sizeof(int) );
   lbnd[0] = 1;
   lbnd[1] = 1;
   ubnd[SC2STORE__COL_INDEX] = inx.rowsize;

@@ -217,7 +217,7 @@ void CGEN_FUNCTION(smf_average_data)( const smfData *data, dim_t start,  dim_t n
   /* Retrieve pointer to the input data */
   tstream = (data->pntr)[0];
   /* Allocate space for output data */
-  *avdata = astCalloc( *nelem, sizeof(*avdata), 1 );
+  *avdata = astCalloc( *nelem, sizeof(*avdata) );
   if ( *status == SAI__OK ) {
     /* All's well so calculate average values */
     base = start + interval - 1;

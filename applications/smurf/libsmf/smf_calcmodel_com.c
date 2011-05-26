@@ -657,13 +657,13 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     gai = dat->gai[chunk];
 
     /* Make a copy of gai_data (each subarray) for calculating convergence */
-    gai_data_copy = astCalloc( gai->ndat, sizeof(*gai_data_copy), 0 );
+    gai_data_copy = astMalloc( (gai->ndat)*sizeof(*gai_data_copy) );
     for( idx=0; (idx<gai->ndat)&&(*status==SAI__OK); idx++ ) {
 
       smf_get_dims( gai->sdata[idx],  NULL, NULL, NULL, NULL,
                     &thisndata, NULL, NULL, status);
 
-      gai_data_copy[idx] = astCalloc( thisndata, sizeof(*gai_data_copy[idx]), 0 );
+      gai_data_copy[idx] = astMalloc( thisndata*sizeof(*gai_data_copy[idx]) );
 
       gai_data = (gai->sdata[idx]->pntr)[0];
 
@@ -683,13 +683,13 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
     /* Copy of model data array */
     model_data_copy = astCalloc( (model->sdata[0]->dims)[0],
-                                 sizeof(*model_data_copy), 1 );
+                                 sizeof(*model_data_copy) );
     if( *status == SAI__OK ) {
       memcpy( model_data_copy, model_data, (model->sdata[0]->dims)[0] *
 	      sizeof(*model_data_copy) );
     }
     /* Temporary buffer to store weights */
-    weight = astCalloc( (model->sdata[0]->dims)[0], sizeof(*weight), 0 );
+    weight = astMalloc( ((model->sdata[0]->dims)[0])*sizeof(*weight) );
 
     /* Find the number of blocks of time slices per bolometer. Each
        block contains "gain_box" time slices (except possibly for the
@@ -706,7 +706,7 @@ void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   }
 
   /* Allocate job data for threads */
-  job_data = astCalloc( nw, sizeof(*job_data), 1 );
+  job_data = astCalloc( nw, sizeof(*job_data) );
 
 
 

@@ -151,7 +151,7 @@ void * smf_dataOrder_ndims( void * oldbuf, smf_dtype dtype, size_t ndata,
   sz = smf_dtype_sz(dtype, status);
 
   /* Allocate buffer */
-  newbuf = astCalloc( ndata, sz, 0 );
+  newbuf = astMalloc( ndata*sz );
 
   if( *status == SAI__OK ) {
 

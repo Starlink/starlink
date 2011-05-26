@@ -146,8 +146,8 @@ smf_subtract_plane3( smfWorkForce *wf, smfData *data,
 
   /* get some memory for the lut coordinates so we do not need to calculate
      it multiple times. */
-  xpos = astCalloc( nbolo, sizeof(*xpos), 0 );
-  ypos = astCalloc( nbolo, sizeof(*ypos), 0 );
+  xpos = astMalloc( nbolo*sizeof(*xpos) );
+  ypos = astMalloc( nbolo*sizeof(*ypos) );
 
 
   /* We need to loop over each time slice populating the matrices */

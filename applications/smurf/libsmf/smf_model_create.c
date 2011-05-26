@@ -892,7 +892,11 @@ void smf_model_create( smfWorkForce *wf, const smfGroup *igroup,
                to allocate memory. It's much faster than malloc+memset
                for very large blocks so we initialise here rather than
                later. */
-            dataptr = astCalloc( datalen, 1, init_mem );
+            if( init_mem ) {
+               dataptr = astCalloc( datalen, 1 );
+            } else {
+               dataptr = astMalloc( datalen );
+            }
             is_initialised = init_mem;
 
           } else {

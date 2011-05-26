@@ -131,7 +131,7 @@ CupidPixelSet **CGEN_FUNCTION(cupidFWPixelSets)( CGEN_TYPE *array, int nel,
 /* Allocate the returned array to have an element for each clump index in
    "ipa", initialising the contents of the array to zero (i.e. NULL
    pointers). */
-   result = astCalloc( npeak + 1, sizeof( *result ), 1 );
+   result = astCalloc( npeak + 1, sizeof( *result ) );
 
 /* Check the memory was allocated. */
    if( result ) {

@@ -3716,7 +3716,7 @@ f        The global status.
 
 /* Create workspace to hold the number of defined values stored in each
    row. Initialise every row to have zero defined values. */
-   w1 = astCalloc( nrow, sizeof( int ), 1 );
+   w1 = astCalloc( nrow, sizeof( int ) );
    if( astOK ) {
 
 /* Iterate round all keys in the KeyMap. */

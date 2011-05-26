@@ -108,7 +108,7 @@ smfArray *smf_create_smfArray( int * status ) {
 
   if (*status != SAI__OK) return NULL;
 
-  ary = astCalloc( 1, sizeof(smfArray), 0 );
+  ary = astMalloc( 1*sizeof(smfArray) );
 
   if (*status != SAI__OK) {
     /* Add our own message to the stack */

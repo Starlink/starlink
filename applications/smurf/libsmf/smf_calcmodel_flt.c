@@ -179,7 +179,7 @@ void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
   if(dat->noi) {
     noi = dat->noi[chunk];
-    model_data_copy = astCalloc( ndata, sizeof(*model_data_copy), 1 );
+    model_data_copy = astCalloc( ndata, sizeof(*model_data_copy) );
   }
   model = allmodel[chunk];
 

@@ -256,7 +256,7 @@ void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
       if( (flags & SMF__DIMM_FIRSTITER) && (!calcfirst) ) {
 
-        var = astCalloc( nbolo, sizeof(*var), 0 );
+        var = astMalloc( nbolo*sizeof(*var) );
 
         if (var) {
 

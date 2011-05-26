@@ -87,7 +87,7 @@ smf_create_smfFts(int* status)
   if(*status != SAI__OK) { return NULL; }
 
   smfFts* fts = NULL;
-  fts = astCalloc(1, sizeof(*fts), 0);
+  fts = astMalloc( 1*sizeof(*fts) );
   if(!fts) {
     *status = SAI__ERROR;
     errRep( FUNC_NAME,

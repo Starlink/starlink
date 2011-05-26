@@ -242,7 +242,7 @@ void smf_clean_dksquid( smfData *indata, smf_qual_t mask, size_t window, smfData
     }
   } else {
     /* Otherwise allocate space for local dksquid buffer */
-    dksquid = astCalloc( ntslice, sizeof(*dksquid), 1 );
+    dksquid = astCalloc( ntslice, sizeof(*dksquid) );
   }
 
   /* Pointer to quality */
@@ -252,8 +252,8 @@ void smf_clean_dksquid( smfData *indata, smf_qual_t mask, size_t window, smfData
      a surrogate for columns with dead dark squids. In the second we do the
      actual cleaning etc. */
 
-  dkgood = astCalloc( ncol, sizeof(*dkgood), 1 );
-  dkav = astCalloc( ntslice, sizeof(*dkav), 1 );
+  dkgood = astCalloc( ncol, sizeof(*dkgood) );
+  dkav = astCalloc( ntslice, sizeof(*dkav) );
 
   for( pass=0; (*status==SAI__OK)&&(pass<2); pass++ ) {
 

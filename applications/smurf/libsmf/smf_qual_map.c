@@ -122,7 +122,7 @@ smf_qual_t * smf_qual_map( int indf, const char mode[], smf_qfam_t *family,
   /* malloc the QUALITY buffer. Initialise to zero to simplify logic
      below. It is difficult to determine in advance which case can use
      initialisation. */
-  retval = astCalloc( nout, sizeof(*retval), 1 );
+  retval = astCalloc( nout, sizeof(*retval) );
 
   /* READ and UPDATE mode require that the QUALITY is processed
      and copied before being returned. WRITE mode means that the

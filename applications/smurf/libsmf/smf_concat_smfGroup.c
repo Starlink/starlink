@@ -387,7 +387,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
   }
 
   /* Allocate space for array of downsampled lengths for each file */
-  dslen = astCalloc( lastpiece-firstpiece+1, sizeof(*dslen), 1 );
+  dslen = astCalloc( lastpiece-firstpiece+1, sizeof(*dslen) );
 
   /* Loop over related elements (number of subarrays). */
   for( i=0; (*status == SAI__OK) && i<nrelated; i++ ) {
@@ -785,7 +785,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
 
               /* Allocate space for the concatenated allState */
               hdr->nframes = tlen;
-              hdr->allState = astCalloc( tlen, sizeof(*(hdr->allState)), 1 );
+              hdr->allState = astCalloc( tlen, sizeof(*(hdr->allState)) );
 
               /* Allocate space in the smfData for DATA/VARAIANCE/QUALITY */
               if( isTordered ) {
@@ -841,14 +841,13 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
 
                 da->dksquid->pntr[0] = astCalloc(ncol*tlen,
                                                  smf_dtype_size(da->dksquid,
-                                                                status), 1 );
+                                                                status) );
 
                 /* QUALITY too if requested */
                 if( !(flags&SMF__NOCREATE_QUALITY) ) {
                   da->dksquid->qfamily = refdata->da->dksquid->qfamily;
                   da->dksquid->qual = astCalloc(ncol*tlen,
-                                                sizeof(*(da->dksquid->qual)),
-                                                1);
+                                                sizeof(*(da->dksquid->qual)));
                 }
 
               }
@@ -861,10 +860,10 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
               /* Allocate space for arrays being propagated from template */
               for( k=0; k<2; k++ ) if( havearray[k] ) {
                   size_t sz = smf_dtype_sz(data->dtype, status );
-                  data->pntr[k] = astCalloc( ndata, sz, 1 );
+                  data->pntr[k] = astCalloc( ndata, sz );
                 }
               if (havequal) {
-                data->qual = astCalloc( ndata, sizeof(*(data->qual)), 1 );
+                data->qual = astCalloc( ndata, sizeof(*(data->qual)) );
               }
 
               /* Check to see if havearray for QUALITY is not set,
@@ -872,13 +871,13 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
                  case, allocate a fresh QUALITY component that will
                  not require propagation from the template */
               if( !havequal && !(flags & SMF__NOCREATE_QUALITY) ) {
-                data->qual = astCalloc(ndata, sizeof(*(data->qual)), 1);
+                data->qual = astCalloc(ndata, sizeof(*(data->qual)) );
               }
 
               /* Allocate space for the pointing LUT, and theta if needed */
               if( havelut ) {
-                data->lut = astCalloc(ndata, sizeof(*(data->lut)), 1 );
-                data->theta = astCalloc(tlen, sizeof(*(data->theta)), 1 );
+                data->lut = astCalloc(ndata, sizeof(*(data->lut)) );
+                data->theta = astCalloc(tlen, sizeof(*(data->theta)) );
               }
 
               /* Copy over the FITS header */

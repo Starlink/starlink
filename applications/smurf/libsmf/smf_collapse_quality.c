@@ -146,7 +146,7 @@ void smf_collapse_quality( const smf_qual_t *inqual, smf_qfam_t qfamily,
     stride = tstride;
   }
 
-  qual = astCalloc( len, sizeof(*qual), 0 );
+  qual = astMalloc( len*sizeof(*qual) );
 
   /* Need to work out the initial bad quality for this family.
      When we collapse we retain a bit in the output if it

@@ -146,7 +146,7 @@ void sc2sim_getast_wcs
      /* Allocate space for arrays */
 
      nboll = colsize * rowsize;
-     skycoord = astCalloc( nboll*2, sizeof(*skycoord), 1 );
+     skycoord = astCalloc( nboll*2, sizeof(*skycoord) );
 
      lbnd_in[0] = 1;
      ubnd_in[SC2STORE__ROW_INDEX] = colsize;

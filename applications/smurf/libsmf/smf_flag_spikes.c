@@ -651,7 +651,7 @@ void smf_flag_spikes( smfWorkForce *wf, smfData *data, smf_qual_t mask,
      }
    }
 
-   job_data = astCalloc( nw, sizeof(*job_data), 1 );
+   job_data = astCalloc( nw, sizeof(*job_data) );
 
    for( i=0; (*status==SAI__OK)&&i<nw; i++ ) {
      pdata = job_data + i;

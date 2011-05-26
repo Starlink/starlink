@@ -207,7 +207,7 @@ void smf_check_smfHead( const smfData *idata, smfData *odata, int * status ) {
     } else {
       nframes = ohdr->nframes;
       if (*status == SAI__OK) {
-        allState = astCalloc( nframes, sizeof(*allState), 0 );
+        allState = astMalloc( nframes*sizeof(*allState) );
         if ( allState == NULL) {
           if (*status == SAI__OK) *status = SAI__ERROR;
           errRep(FUNC_NAME,"Unable to allocate memory for allState", status);
@@ -221,12 +221,12 @@ void smf_check_smfHead( const smfData *idata, smfData *odata, int * status ) {
   /* focal plane coordinate */
   if (ohdr->ndet == 0 && ihdr->ndet > 0) {
     if (ohdr->fplanex == NULL && ohdr->fplaney == NULL) {
-      ohdr->fplanex = astCalloc( ihdr->ndet, sizeof(*(ohdr->fplanex)), 0 );
+      ohdr->fplanex = astMalloc( (ihdr->ndet)*sizeof(*(ohdr->fplanex)) );
       if (ohdr->fplanex) {
         memcpy( ohdr->fplanex, ihdr->fplanex,
                 ihdr->ndet * sizeof(*(ohdr->fplanex)));
       }
-      ohdr->fplaney = astCalloc( ihdr->ndet, sizeof(*(ohdr->fplaney)), 0 );
+      ohdr->fplaney = astMalloc( (ihdr->ndet)*sizeof(*(ohdr->fplaney)) );
       if (ohdr->fplaney) {
         memcpy( ohdr->fplaney, ihdr->fplaney,
                 ihdr->ndet * sizeof(*(ohdr->fplaney)));
@@ -236,8 +236,8 @@ void smf_check_smfHead( const smfData *idata, smfData *odata, int * status ) {
 
     /* Detector positions */
     if (ohdr->detpos == NULL ){
-      ohdr->detpos = astCalloc( 2*ihdr->ndet*ihdr->nframes,
-                                sizeof(*(ohdr->detpos)), 0 );
+      ohdr->detpos = astMalloc( 2*ihdr->ndet*ihdr->nframes*
+                                sizeof(*(ohdr->detpos)) );
       if (ohdr->detpos) {
         memcpy( ohdr->detpos, ihdr->detpos,
                 2*ihdr->ndet*ihdr->nframes * sizeof(*(ohdr->detpos)));
@@ -246,8 +246,8 @@ void smf_check_smfHead( const smfData *idata, smfData *odata, int * status ) {
 
     /* Detector names */
     if (ohdr->detname == NULL ){
-      ohdr->detname = astCalloc( ihdr->ndet,
-                                 ( strlen( ohdr->detname ) + 1 ), 0 );
+      ohdr->detname = astMalloc( ihdr->ndet*
+                                 ( strlen( ohdr->detname ) + 1 ) );
       if( ohdr->detname ) {
         memcpy( ohdr->detname, ihdr->detname,
                 ihdr->ndet*( strlen( ohdr->detname ) + 1 ) );
@@ -256,8 +256,8 @@ void smf_check_smfHead( const smfData *idata, smfData *odata, int * status ) {
 
     /* OCS Config */
     if (ohdr->ocsconfig == NULL ){
-      ohdr->ocsconfig = astCalloc( ihdr->ndet,
-                                   ( strlen( ohdr->ocsconfig ) + 1 ), 0 );
+      ohdr->ocsconfig = astMalloc( ihdr->ndet*
+                                   ( strlen( ohdr->ocsconfig ) + 1 ) );
       if( ohdr->ocsconfig ) {
         strcpy( ohdr->ocsconfig, ihdr->ocsconfig );
       }

@@ -120,7 +120,7 @@ void sc2sim_getsinglescan
                           status );
 
   /* Allocate memory for the list of positions */
-  *posptr = astCalloc( (*scancount)*2, sizeof(**posptr), 1 );
+  *posptr = astCalloc( (*scancount)*2, sizeof(**posptr) );
   /* Get the scan positions */
 
   sc2sim_getscanseg ( samptime, cstart, cend, accel, vmax, *scancount,

@@ -296,7 +296,7 @@ void smf_model_createHdr( smfData *model, smf_modeltype type,
   if( (*status==SAI__OK) && (refhdr->allState) ) {
     model->hdr->nframes = refhdr->nframes;
     model->hdr->allState = astCalloc( refhdr->nframes,
-                                      sizeof(*(model->hdr->allState)), 1 );
+                                      sizeof(*(model->hdr->allState)));
     if (model->hdr->allState) {
       memcpy( model->hdr->allState, refhdr->allState,
               refhdr->nframes*sizeof(*refhdr->allState) );

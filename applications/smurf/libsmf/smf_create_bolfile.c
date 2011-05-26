@@ -158,9 +158,9 @@ void smf_create_bolfile( const Grp * bgrp, size_t index,
     mydims[1] = ubnd[1] - lbnd[1] + 1;
     nbols = mydims[0] * mydims[1];
 
-    pntr[0] = astCalloc( nbols, sizeof(double), 0 );
-    if (flags & SMF__MAP_VAR) pntr[1] = astCalloc( nbols, sizeof(double), 0 );
-    if (flags & SMF__MAP_QUAL) qual = astCalloc( nbols, sizeof(*qual), 0 );
+    pntr[0] = astMalloc( nbols*sizeof(double) );
+    if (flags & SMF__MAP_VAR) pntr[1] = astMalloc( nbols*sizeof(double) );
+    if (flags & SMF__MAP_QUAL) qual = astMalloc( nbols*sizeof(*qual) );
 
     *bolmap = smf_construct_smfData( NULL, NULL, NULL, NULL, NULL, SMF__DOUBLE,
                                      pntr, qual, SMF__QFAM_TSERIES, NULL, 0,

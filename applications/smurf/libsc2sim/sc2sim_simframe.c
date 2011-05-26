@@ -302,7 +302,7 @@ void sc2sim_simframe
 
   /* Allocate space for array */
   if( *status == SAI__OK ) {
-    skycoord = astCalloc( nbol*2, sizeof(*skycoord), 1 );
+    skycoord = astCalloc( nbol*2, sizeof(*skycoord) );
 
     lbnd_in[0] = 1;
     ubnd_in[SC2STORE__ROW_INDEX] = inx.colsize;

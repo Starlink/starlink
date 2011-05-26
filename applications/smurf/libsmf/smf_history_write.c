@@ -155,7 +155,7 @@ void smf_history_write( const smfData* data, int *status) {
 	char ** array = NULL;
 	/* Create a char** array and attach strings. Also find the
 	   longest string as we go */
-	array = astCalloc( nrec, sizeof(*array), 0 );
+	array = astMalloc( nrec*sizeof(*array) );
 	if (array) {
 	  for ( i=0; i<nrec; i++ ) {
 	    const char *key = NULL;
@@ -164,7 +164,7 @@ void smf_history_write( const smfData* data, int *status) {
 	    len = strlen( key );
 	    if ( len > maxlen ) maxlen = len;
 
-	    array[i] = astCalloc( 1, (len+1)*sizeof(**array), 0 );
+	    array[i] = astMalloc( 1*(len+1)*sizeof(**array) );
 	    one_strlcpy( array[i], key, len+1, status );
 	  }
 	}

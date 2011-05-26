@@ -195,7 +195,7 @@ void smurf_stackframes( int *status ) {
   /* To sort into time order we need to extract some information
      from each file. For ease of programming we do use the sort
      struct even if not sorting */
-  sortinfo = astCalloc( size, sizeof(*sortinfo), 1 );
+  sortinfo = astCalloc( size, sizeof(*sortinfo) );
 
   /* First check that all the input files are the right shape.
      We also sort out FITS header merging here for the output fits header
@@ -385,7 +385,7 @@ void smurf_stackframes( int *status ) {
   if (*status != SAI__OK) goto CLEANUP;
 
   /* Create an array of doubles to store the LutMap information */
-  times = astCalloc( size, sizeof(*times), 0 );
+  times = astMalloc( size*sizeof(*times) );
 
   /* get pointers to each component and the size of each plane to be
      copied (noting that QUALITY is _CHAR type but we also work in bytes. */

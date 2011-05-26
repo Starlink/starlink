@@ -188,7 +188,7 @@ void smf_calcmodel_two( smfWorkForce *wf __attribute__((unused)),
 
     nmodel = (model->sdata[0])->dims[0] * (model->sdata[0])->dims[1];
 
-    model_data_copy = astCalloc( nmodel, sizeof(*model_data_copy), 1 );
+    model_data_copy = astCalloc( nmodel, sizeof(*model_data_copy) );
   }
 
   /* Assert bolo-ordered data */

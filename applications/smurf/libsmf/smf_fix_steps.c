@@ -466,7 +466,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, double dcthresh,
 
 /* Allocate a work array to hold the number of bolometers that show a
    jump at each time slice. */
-   bcount = ( dclimcorr > 0 ) ? astCalloc( ntslice, sizeof( *bcount ), 1 ) : NULL;
+   bcount = ( dclimcorr > 0 ) ? astCalloc( ntslice, sizeof( *bcount ) ) : NULL;
 
 /* Create structures used to pass information to the worker threads. */
    nworker = wf ? wf->nworker : 1;
@@ -522,7 +522,7 @@ void smf_fix_steps( smfWorkForce *wf, smfData *data, double dcthresh,
    bolometers found to be in a jump at that time slice. Initialise it to
    hold zero at every element. */
          pdata->bcount = bcount ?
-                         astCalloc( ntslice, sizeof( *(pdata->bcount) ), 1 ) :
+                         astCalloc( ntslice, sizeof( *(pdata->bcount) ) ) :
                          NULL;
 
 /* Pass the job to the workforce for execution. */

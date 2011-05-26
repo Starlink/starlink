@@ -185,7 +185,7 @@ void smurf_rawpress( int *status ) {
                   NULL, status);
 
     /* Convert the dark squids back to integers */
-    idksquid = astCalloc( nframes*rowsize, sizeof(*idksquid), 0);
+    idksquid = astMalloc( (nframes*rowsize)*sizeof(*idksquid) );
     if (idksquid) {
       size_t j;
       double * dkpntr = (data->da->dksquid->pntr)[0];

@@ -163,7 +163,7 @@ void sc2sim_getbous
   }
 
   /* Allocate memory for the list of positions */
-  *posptr = astCalloc( (*bouscount)*2, sizeof(**posptr), 1 );
+  *posptr = astCalloc( (*bouscount)*2, sizeof(**posptr) );
   curroff = 0;
   cend[0] = 0.0;
   cend[1] = 0.0;

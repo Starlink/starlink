@@ -133,7 +133,7 @@ void smf_clipped_stats1D( const double *data, size_t nclips,
   /* We are going to control smf_stats1 by using quality so we have to either
      create our own quality or copy an existing one. We will then use our own
      mask and a qstride that is 1 by definition. */
-  qua = astCalloc( nsamp, sizeof(*qua), 1 );
+  qua = astCalloc( nsamp, sizeof(*qua) );
 
   if ( quality ) {
     size_t j = 0;

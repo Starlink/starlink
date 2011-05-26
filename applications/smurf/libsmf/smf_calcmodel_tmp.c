@@ -170,7 +170,7 @@ void smf_calcmodel_tmp( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   if( *status == SAI__OK ) {
     smfHead *hdr = res->sdata[0]->hdr;
 
-    template = astCalloc( ntslice, sizeof(*template), 1 );
+    template = astCalloc( ntslice, sizeof(*template) );
 
     if( strncasecmp(source, "state_az", 8) == 0 ) {
       /* Telescope azimuth */

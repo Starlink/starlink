@@ -110,7 +110,7 @@ void smf_filter_ident( smfFilter *filt, int complex, int *status ) {
   val = 1./ (double) filt->ntslice;
 
   /* Allocate space for real and imaginary parts and initialize */
-  filt->real = astCalloc( filt->dim, sizeof(*filt->real), 0 );
+  filt->real = astMalloc( (filt->dim)*sizeof(*filt->real) );
 
   if( *status == SAI__OK ) {
     for( i=0; i<filt->dim; i++ ) {
@@ -119,7 +119,7 @@ void smf_filter_ident( smfFilter *filt, int complex, int *status ) {
   }
 
   if( complex ) {
-    filt->imag = astCalloc( filt->dim, sizeof(*filt->imag), 1 );
+    filt->imag = astCalloc( filt->dim, sizeof(*filt->imag) );
     filt->isComplex = 1;
   }
 }

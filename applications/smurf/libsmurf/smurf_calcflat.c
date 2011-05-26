@@ -340,7 +340,7 @@ void smurf_calcflat( int *status ) {
       msgOutif( MSG__NORM, " ", "Reference heater setting: ^PX", status );
 
       /* get some memory for pixel heater settings */
-      pixheat = astCalloc( flatfiles->ndat, sizeof(*pixheat), 0 );
+      pixheat = astMalloc( (flatfiles->ndat)*sizeof(*pixheat) );
 
       /* and some memory for non-reference frames */
       bbhtframe = smf_create_smfArray( status );

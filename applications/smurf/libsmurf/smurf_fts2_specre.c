@@ -146,7 +146,7 @@ void smurf_fts2_specre(int* status)
       src3D->lbnd[0] = 0;
       src3D->lbnd[1] = 0;
       src3D->lbnd[2] = 1;
-      src3D->pntr[0] = (double*) astCalloc(ndata, sizeof(double), 0);
+      src3D->pntr[0] = (double*) astMalloc( ndata*sizeof(double) );
 
       int i = 0;
       int j = 0;

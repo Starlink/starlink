@@ -179,10 +179,10 @@ void smf_write_bolomap( smfArray *ast, smfArray *res, smfArray *lut,
        will unset BADB for one bolo at a time to make individual
        maps. */
 
-    bolomask = astCalloc( nbolo, sizeof(*bolomask), 0 );
-    bmapweight = astCalloc( msize, sizeof(*bmapweight), 0 );
-    bmapweightsq = astCalloc( msize, sizeof(*bmapweightsq), 0 );
-    bhitsmap = astCalloc( msize, sizeof(*bhitsmap), 0 );
+    bolomask = astMalloc( nbolo*sizeof(*bolomask) );
+    bmapweight = astMalloc( msize*sizeof(*bmapweight) );
+    bmapweightsq = astMalloc( msize*sizeof(*bmapweightsq) );
+    bhitsmap = astMalloc( msize*sizeof(*bhitsmap) );
 
     if( *status == SAI__OK ) {
       for( k=0; k<nbolo; k++ ) {
@@ -248,8 +248,8 @@ void smf_write_bolomap( smfArray *ast, smfArray *res, smfArray *lut,
 
           if( *status == SAI__OK ) {
             /* Allocate memory for the new rebinned data */
-            curmap = astCalloc( msize, sizeof(*curmap), 1 );
-            curvar = astCalloc( msize, sizeof(*curvar), 1 );
+            curmap = astCalloc( msize, sizeof(*curmap) );
+            curvar = astCalloc( msize, sizeof(*curvar) );
             addtomap = 1;
           } else if( *status == DAT__NAMIN ) {
             /* Create a new extension */

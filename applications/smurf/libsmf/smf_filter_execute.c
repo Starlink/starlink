@@ -618,7 +618,7 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
     step = nbolo/nw;
   }
 
-  job_data = astCalloc( nw, sizeof(*job_data), 1 );
+  job_data = astCalloc( nw, sizeof(*job_data) );
   for( i=0; (*status==SAI__OK)&&i<nw; i++ ) {
     pdata = job_data + i;
 
@@ -632,8 +632,8 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
     pdata->data = data;
     pdata->qua = qua;
 
-    pdata->data_fft_r = astCalloc( filt->dim, sizeof(*pdata->data_fft_r), 0 );
-    pdata->data_fft_i = astCalloc( filt->dim, sizeof(*pdata->data_fft_i), 0 );
+    pdata->data_fft_r = astMalloc( (filt->dim)*sizeof(*pdata->data_fft_r) );
+    pdata->data_fft_i = astMalloc( (filt->dim)*sizeof(*pdata->data_fft_i) );
     pdata->filt = filt;
     pdata->whiten = whiten;
     pdata->complement = complement;

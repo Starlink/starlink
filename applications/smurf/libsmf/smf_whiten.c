@@ -150,8 +150,8 @@ void smf_whiten( double *re, double *im, double df, dim_t nf, size_t box,
 
   /* Calculate the power spectrum and a smoothed version. Also create a
      quality array to go with it. */
-  pspec = astCalloc( nf, sizeof(*pspec), 0 );
-  qual = astCalloc( nf, sizeof(*qual), 1 );
+  pspec = astMalloc( nf*sizeof(*pspec) );
+  qual = astCalloc( nf, sizeof(*qual) );
 
   if( *status == SAI__OK ) {
     for( i=0; i<nf; i++ ) {
@@ -250,8 +250,8 @@ void smf_whiten( double *re, double *im, double df, dim_t nf, size_t box,
     }
 
     /* Now fit a straight line to the log of the two axes */
-    x = astCalloc( nfit-1, sizeof(*x), 0 );
-    y = astCalloc( nfit-1, sizeof(*y), 0 );
+    x = astMalloc( (nfit-1)*sizeof(*x) );
+    y = astMalloc( (nfit-1)*sizeof(*y) );
 
     if( *status == SAI__OK ) {
       for( i=0; i<(nfit-1); i++ ) {

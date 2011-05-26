@@ -149,8 +149,8 @@ void smf_collapse_tseries( const smfData *indata, int nclip, const float clip[],
   dims[1] = (indata->dims)[1];
   nelem = dims[0] * dims[1];
   nbperel = smf_dtype_sz(dtype, status);
-  pntr[0] = astCalloc( nelem, nbperel, 0 );
-  pntr[1] = astCalloc( nelem, nbperel, 0 );
+  pntr[0] = astMalloc( nelem*nbperel );
+  pntr[1] = astMalloc( nelem*nbperel );
 
 
   /* Assign the pointers */

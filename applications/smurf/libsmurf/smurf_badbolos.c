@@ -255,8 +255,8 @@ void smurf_badbolos( int *status ) {
    } else if ( strncmp( method, "RAN", 3 ) == 0 ) {
 
      /* Allocate memory for the arrays */
-     badcols = astCalloc( (size_t)dims[0], sizeof ( *badcols ), 1 );
-     badrows = astCalloc( (size_t)dims[1], sizeof ( *badrows ), 1 );
+     badcols = astCalloc( (size_t)dims[0], sizeof ( *badcols ) );
+     badrows = astCalloc( (size_t)dims[1], sizeof ( *badrows ) );
 
      /* Get number of bad columns and make sure it isn't greater
 	than the max */

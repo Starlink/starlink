@@ -144,7 +144,7 @@ void smurf_calcresp( int *status ) {
              &ogrp, &outsize, status );
 
   /* Allocate some memory for the tracking of the number of good bolometers */
-  ngood = astCalloc( size, sizeof( *ngood ), 1 );
+  ngood = astCalloc( size, sizeof( *ngood ) );
 
   /* Loop over input files */
   for (i=1; i<=size; i++) {

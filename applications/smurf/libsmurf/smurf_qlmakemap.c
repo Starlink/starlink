@@ -452,7 +452,7 @@ void smurf_qlmakemap( int *status ) {
   } else {
     nweights = mapsize;
   }
-  weights = astCalloc( nweights*wf->nworker, sizeof(double), 1 );
+  weights = astCalloc( nweights*wf->nworker, sizeof(double) );
 
   /* Create an output smfData */
   kpg1Wgndf( "OUT", igrp, 1, 1, "More output files required...",
@@ -477,9 +477,9 @@ void smurf_qlmakemap( int *status ) {
      rebinning is complete, these multiple output arrays are combined
      into one, and copied into the output NDF. */
     if( wf->nworker > 1 ) {
-      map = astCalloc( mapsize*wf->nworker, sizeof(double), 0 );
+      map = astMalloc( (mapsize*wf->nworker)*sizeof(double) );
       if (genvar) {
-        variance = astCalloc( mapsize*wf->nworker, sizeof(double), 0 );
+        variance = astMalloc( (mapsize*wf->nworker)*sizeof(double) );
       }
     } else {
       map = (odata->pntr)[0];
@@ -534,7 +534,7 @@ void smurf_qlmakemap( int *status ) {
     msgOutif(MSG__VERB, " ", "SMURF_QLMAKEMAP: Measuring Noise",
              status);
     smf_get_dims( data, NULL, NULL, &nbolo, NULL, NULL, NULL, NULL, status );
-    bolonoise = astCalloc( nbolo, sizeof(*bolonoise), 1 );
+    bolonoise = astCalloc( nbolo, sizeof(*bolonoise) );
 
     /*** TIMER ***/
     smf_timerupdate(&tv1,&tv2,status);

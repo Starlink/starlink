@@ -398,7 +398,7 @@ void smf_clean_pca( smfWorkForce *wf, smfData *data, double thresh,
     }
 
     /* Now remember which were the good bolometers */
-    goodbolo = astCalloc( ngoodbolo, sizeof(*goodbolo), 1 );
+    goodbolo = astCalloc( ngoodbolo, sizeof(*goodbolo) );
     ngoodbolo = 0;
     for( i=0; i<nbolo; i++ ) {
       if( !(qua[i*bstride]&SMF__Q_BADB) ) {
@@ -410,7 +410,7 @@ void smf_clean_pca( smfWorkForce *wf, smfData *data, double thresh,
   } else {
     /* Otherwise assume all bolometers are good */
     ngoodbolo = nbolo;
-    goodbolo = astCalloc( ngoodbolo, sizeof(*goodbolo), 1 );
+    goodbolo = astCalloc( ngoodbolo, sizeof(*goodbolo) );
     for( i=0; i<ngoodbolo; i++ ) {
       goodbolo[i] = i;
     }
@@ -423,8 +423,8 @@ void smf_clean_pca( smfWorkForce *wf, smfData *data, double thresh,
   }
 
   /* Allocate arrays */
-  amp = astCalloc( nbolo*nbolo, sizeof(*amp),1 );
-  comp = astCalloc( ngoodbolo*ntslice, sizeof(*comp),1 );
+  amp = astCalloc( nbolo*nbolo, sizeof(*amp) );
+  comp = astCalloc( ngoodbolo*ntslice, sizeof(*comp) );
   cov = gsl_matrix_alloc( ngoodbolo, ngoodbolo );
   s = gsl_vector_alloc( ngoodbolo );
   v = gsl_matrix_alloc( ngoodbolo, ngoodbolo );
@@ -443,7 +443,7 @@ void smf_clean_pca( smfWorkForce *wf, smfData *data, double thresh,
   d = data->pntr[0];
 
   /* Allocate job data for threads */
-  job_data = astCalloc( nw, sizeof(*job_data), 1 );
+  job_data = astCalloc( nw, sizeof(*job_data) );
 
   /* Set up the division of labour for threads: independent blocks of time */
 
@@ -487,10 +487,10 @@ void smf_clean_pca( smfWorkForce *wf, smfData *data, double thresh,
     /* Each thread will accumulate sums of x, y, and x*y for each bolo when
        calculating the covariance matrix */
     pdata->covwork = astCalloc( ngoodbolo*ngoodbolo,
-                                sizeof(*(pdata->covwork)), 1 );
+                                sizeof(*(pdata->covwork)) );
 
     /* each thread gets its own copy of the goodbolo lookup table */
-    pdata->goodbolo = astCalloc( ngoodbolo, sizeof(*(pdata->goodbolo)), 1 );
+    pdata->goodbolo = astCalloc( ngoodbolo, sizeof(*(pdata->goodbolo)) );
     if( *status == SAI__OK ) {
       memcpy( pdata->goodbolo, goodbolo,
               ngoodbolo*sizeof(*(pdata->goodbolo)) );
@@ -660,7 +660,7 @@ void smf_clean_pca( smfWorkForce *wf, smfData *data, double thresh,
 
     /* Create a 1d array containing a copy of the first component as a
        template */
-    template = astCalloc( ntslice, sizeof(*template),1 );
+    template = astCalloc( ntslice, sizeof(*template) );
     if( *status == SAI__OK ) {
       for( i=0; i<ntslice; i++ ) {
         template[i] = comp[i*ctstride];
@@ -710,7 +710,7 @@ void smf_clean_pca( smfWorkForce *wf, smfData *data, double thresh,
        gives a typical amplitude of the component that can be compared
        to other components */
 
-    rms_amp = astCalloc( ngoodbolo, sizeof(*rms_amp), 1 );
+    rms_amp = astCalloc( ngoodbolo, sizeof(*rms_amp) );
 
     if( *status == SAI__OK ) {
       for( i=0; i<ngoodbolo; i++ ) {     /* Loop over component */
@@ -853,7 +853,7 @@ void smf_clean_pca( smfWorkForce *wf, smfData *data, double thresh,
     smf_qual_t *q=NULL;   /* Quality array that just maps SMF__Q_BADB */
 
     if( qua ) {
-      q = astCalloc( nbolo*ngoodbolo, sizeof(*q), 1 );
+      q = astCalloc( nbolo*ngoodbolo, sizeof(*q) );
 
       if( *status == SAI__OK ) {
         for( i=0; i<nbolo; i++ ) {        /* bolometer */

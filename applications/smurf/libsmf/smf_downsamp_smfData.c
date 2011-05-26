@@ -193,7 +193,7 @@ void smf_downsamp_smfData( const smfData *idata, smfData **odata,
     if( todouble ) size = sizeof(double);
     else size = smf_dtype_size(*odata,status);
 
-    (*odata)->pntr[0] = astCalloc( ondata, size, 1 );
+    (*odata)->pntr[0] = astCalloc( ondata, size );
   }
 
   if( (*status==SAI__OK) && (*odata) ) {
@@ -249,7 +249,7 @@ void smf_downsamp_smfData( const smfData *idata, smfData **odata,
     if( instate ) {
       /* Down-sample all the JCMTState values using nearest neighbours */
 
-      hdr->allState = astCalloc( ontslice, sizeof(*instate), 1 );
+      hdr->allState = astCalloc( ontslice, sizeof(*instate) );
       outstate = hdr->allState;
 
       if( *status == SAI__OK ) {

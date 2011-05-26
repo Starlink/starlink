@@ -29691,7 +29691,7 @@ static AstMapping *TabMapping( AstFitsChan *this, FitsStore *store, char s,
 
 /* Allocate memory to indicate if each WCS axis is described by a -TAB
    algorithm or not. Initialiss it to zero. */
-      *tabaxis = astCalloc( wcsaxes, sizeof( int ), 1 );
+      *tabaxis = astCalloc( wcsaxes, sizeof( int ) );
 
 /* Allocate memory to hold the FITS-WCS axis index corresponding to each
    input of the "tmap0" Mapping. Indicate that as yet, not values are
@@ -31230,7 +31230,7 @@ static int WATCoeffs( const char *watstr, int iaxis, double **cvals,
    Allocate memory to hold them, and fill it with zeros. They are
    stored in this array as if full cross-terms have been supplied (the
    unspecified coefficients retain their initialised value of zero).  */
-               coeff = astCalloc( order*order, sizeof( double ), 1 );
+               coeff = astCalloc( order*order, sizeof( double ) );
                if( !astOK ) break;
 
 /* The next 4 numbers describe the region of validity of the fits in IRAF's
@@ -32919,7 +32919,7 @@ static int WcsFromStore( AstFitsChan *this, FitsStore *store,
 
 /* Allocate memory to indicate if each WCS axis is described by a -TAB
    algorithm or not. Initialiss it to zero. */
-      tabaxis = astCalloc( nwcs, sizeof( int ), 1 );
+      tabaxis = astCalloc( nwcs, sizeof( int ) );
 
 /* Get and save CTYPE for all WCS axes. These are required, so
    pass on if they are not available. */

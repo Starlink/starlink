@@ -679,7 +679,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       /* Adding in signal from an external fakemap? */
       astMapGet0C( keymap, "FAKEMAP", &tempstr );
       if( tempstr ) {
-        fakemap = astCalloc( 255, 1, 1 );
+        fakemap = astCalloc( 255, 1 );
         one_strlcpy( fakemap, tempstr, 255, status );
 
         if( !memiter ) {
@@ -731,9 +731,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       /* Allocate modeltyps */
       if( nmodels >= 1 ) {
-        modeltyps = astCalloc( nmodels, sizeof(*modeltyps), 1 );
+        modeltyps = astCalloc( nmodels, sizeof(*modeltyps) );
         /* Extra components for exportNDF_which for 'res', 'qua' */
-        exportNDF_which = astCalloc( nmodels+2, sizeof(*exportNDF_which), 1);
+        exportNDF_which = astCalloc( nmodels+2, sizeof(*exportNDF_which) );
       } else {
         msgOut(" ", FUNC_NAME ": No valid models in MODELORDER",
                status );
@@ -1116,17 +1116,17 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         thisqual = mapqual;
         thisvar = mapvar;
         thisweight = weights;
-        mapweightsq = astCalloc( msize, sizeof(*mapweightsq), 0 );
+        mapweightsq = astMalloc( msize*sizeof(*mapweightsq) );
         thisweightsq = mapweightsq;
       } else if( contchunk == 1 ) {
         /* Subsequent continuous chunks are done in new map arrays and
            then added to the first */
-        thismap = astCalloc( msize, sizeof(*thismap), 1 );
-        thishits = astCalloc( msize, sizeof(*thishits), 1 );
-        thisqual = astCalloc( msize, sizeof(*thisqual), 1 );
-        thisvar = astCalloc( msize, sizeof(*thisvar), 1 );
-        thisweight = astCalloc( msize, sizeof(*thisweight), 1 );
-        thisweightsq = astCalloc( msize, sizeof(*thisweightsq), 1 );
+        thismap = astCalloc( msize, sizeof(*thismap) );
+        thishits = astCalloc( msize, sizeof(*thishits) );
+        thisqual = astCalloc( msize, sizeof(*thisqual) );
+        thisvar = astCalloc( msize, sizeof(*thisvar) );
+        thisweight = astCalloc( msize, sizeof(*thisweight) );
+        thisweightsq = astCalloc( msize, sizeof(*thisweightsq) );
       }
 
       if( memiter ) {
@@ -1141,7 +1141,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                  status);
 
         /* Allocate length 1 array of smfArrays. */
-        res = astCalloc( nfilegroups, sizeof(*res), 1 );
+        res = astCalloc( nfilegroups, sizeof(*res) );
 
         /* Concatenate (no variance since we calculate it ourselves -- NOI) */
         smf_concat_smfGroup( wf, igroup, darks, bbms, flatramps, contchunk,
@@ -1168,8 +1168,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
     /* Allocate space for the chisquared array */
     if( havenoi && (*status == SAI__OK) ) {
-      chisquared = astCalloc( nfilegroups, sizeof(*chisquared), 1 );
-      lastchisquared = astCalloc( nfilegroups, sizeof(*chisquared), 1 );
+      chisquared = astCalloc( nfilegroups, sizeof(*chisquared) );
+      lastchisquared = astCalloc( nfilegroups, sizeof(*chisquared) );
     }
 
     /* Create containers for time-series model components******************* */
@@ -1181,15 +1181,15 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     if( igroup && (nmodels > 0) && (*status == SAI__OK) ) {
 
       /* nmodel array of pointers to nfilegroups smfArray pointers */
-      model = astCalloc( nmodels, sizeof(*model), 1 );
+      model = astCalloc( nmodels, sizeof(*model) );
 
       if( memiter != 1 ) {
         /* Array of smfgroups (one for each dynamic model component) */
-        modelgroups = astCalloc( nmodels, sizeof(*modelgroups), 1 );
+        modelgroups = astCalloc( nmodels, sizeof(*modelgroups) );
       }
 
       for( i=0; i<nmodels; i++ ) {
-        model[i] = astCalloc( nfilegroups, sizeof(**model), 1 );
+        model[i] = astCalloc( nfilegroups, sizeof(**model) );
       }
 
     }
@@ -1199,9 +1199,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     if( igroup && (*status == SAI__OK) ) {
 
       /* there is one smfArray for LUT, AST and QUA for each filegroup */
-      lut = astCalloc( nfilegroups, sizeof(*lut), 1 );
-      ast = astCalloc( nfilegroups, sizeof(*ast), 1 );
-      qua = astCalloc( nfilegroups, sizeof(*qua), 1 );
+      lut = astCalloc( nfilegroups, sizeof(*lut) );
+      ast = astCalloc( nfilegroups, sizeof(*ast) );
+      qua = astCalloc( nfilegroups, sizeof(*qua) );
 
       if( memiter ) {
         /* If iterating in memory then RES has already been created from
@@ -1351,7 +1351,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
            information to smf_model_create. Also assert bolo-ordered
            template (in this case res). */
 
-        res = astCalloc( nfilegroups, sizeof(*res), 1 );
+        res = astCalloc( nfilegroups, sizeof(*res) );
 
         smf_model_create( wf, igroup, NULL, darks, bbms, flatramps, NULL, 0,
                           SMF__RES, 0, NULL, 0, NULL, NULL,

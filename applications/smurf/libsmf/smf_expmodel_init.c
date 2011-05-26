@@ -144,7 +144,7 @@ void smf_expmodel_init( const smfData *indata, smfData **outdata, int *status) {
 
   if (!data) return;
 
-  d = astCalloc( ndata, sizeof(*d), 0 );
+  d = astMalloc( ndata*sizeof(*d) );
   if( *status == SAI__OK ) {
     for( i=0; i<ndata; i++ ) {
       d[i] = VAL__BADD;

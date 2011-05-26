@@ -254,7 +254,7 @@ void smf_calcmodel_ast( smfWorkForce *wf __attribute__((unused)),
 
       if( zero_c_n==3 ) {
         /* Allocate space for the zeromask */
-        dat->zeromask = astCalloc( dat->msize, sizeof(*dat->zeromask), 1 );
+        dat->zeromask = astCalloc( dat->msize, sizeof(*dat->zeromask) );
 
         /* The supplied bounds are for pixel coordinates... we need bounds
            for grid coordinates which have an offset */

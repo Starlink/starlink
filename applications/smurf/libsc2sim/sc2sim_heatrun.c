@@ -212,12 +212,12 @@ void sc2sim_heatrun ( struct sc2sim_obs_struct *inx,
 
   /* Allocate workspace */
 
-  output = astCalloc( numsamples, sizeof(*output), 1 );
-  heatptr = astCalloc( numsamples, sizeof(*heatptr), 1 );
-  dbuf = astCalloc( numsamples*nbol, sizeof(*dbuf), 1 );
-  digits = astCalloc( numsamples*nbol, sizeof(*digits), 1 );
-  dksquid = astCalloc( numsamples*inx->rowsize, sizeof(*dksquid), 1 );
-  head = astCalloc( numsamples, sizeof(*head), 1 );
+  output = astCalloc( numsamples, sizeof(*output) );
+  heatptr = astCalloc( numsamples, sizeof(*heatptr) );
+  dbuf = astCalloc( numsamples*nbol, sizeof(*dbuf) );
+  digits = astCalloc( numsamples*nbol, sizeof(*digits) );
+  dksquid = astCalloc( numsamples*inx->rowsize, sizeof(*dksquid) );
+  head = astCalloc( numsamples, sizeof(*head) );
 
   /* Generate the list of heater settings */
   for ( sample=0; sample<numsamples; sample++ ) {
@@ -284,8 +284,8 @@ void sc2sim_heatrun ( struct sc2sim_obs_struct *inx,
   /* Perform the fit */
   if ( strcmp ( inx->flatname, "POLYNOMIAL" ) == 0 ) {
     nflat = 6;
-    flatcal = astCalloc( nbol*nflat, sizeof(*flatcal), 1 );
-    flatpar = astCalloc( nflat, sizeof(*flatpar), 1 );
+    flatcal = astCalloc( nbol*nflat, sizeof(*flatcal) );
+    flatpar = astCalloc( nflat, sizeof(*flatpar) );
     strcpy ( flatname, "POLYNOMIAL" );
     sc2sim_fitheat ( nbol, numsamples, heatptr, dbuf, flatcal, status );
     for ( j=0; j<nflat; j++ ) {
@@ -295,8 +295,8 @@ void sc2sim_heatrun ( struct sc2sim_obs_struct *inx,
   } else {
     /* Generate a simple lookup table */
     nflat = numsamples;
-    flatcal = astCalloc( nbol*nflat, sizeof(*flatcal), 1 );
-    flatpar = astCalloc( nflat, sizeof(*flatpar), 1 );
+    flatcal = astCalloc( nbol*nflat, sizeof(*flatcal) );
+    flatpar = astCalloc( nflat, sizeof(*flatpar) );
     strcpy ( flatname, "TABLE" );
 
     for ( j=0; j<nflat; j++ ) {

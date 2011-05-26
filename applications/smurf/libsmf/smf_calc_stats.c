@@ -293,7 +293,7 @@ void smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
   /* Allocate memory for data */
   npts = hi - lo + 1;
 
-  statsdata = astCalloc( npts, nbperel, 0 );
+  statsdata = astMalloc( npts*nbperel );
   if( statsdata == NULL ) {
     errRep( FUNC_NAME, "Unable to allocate memory for statistics array",
             status );

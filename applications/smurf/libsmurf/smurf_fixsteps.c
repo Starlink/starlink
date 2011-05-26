@@ -723,7 +723,7 @@ static int smf1_check_steps( const char *param, int first, dim_t nx,
    Each element holds zero if the new step has not yet been associated
    with any old step. Otherwise, it holds the one-based index of the
    associated old step. Initialise it to hold zero at every element. */
-   new_flags = astCalloc( nnew, sizeof( *new_flags ), 1 );
+   new_flags = astCalloc( nnew, sizeof( *new_flags ) );
    if( *status == SAI__OK ) {
 
 /* Loop round each old step. */

@@ -170,9 +170,9 @@ void smf_write_shortmap( int shortmap, smfArray *ast, smfArray *res,
   }
 
   /* Allocate space for the arrays */
-  shortmapweight = astCalloc( msize, sizeof(*shortmapweight), 0 );
-  shortmapweightsq = astCalloc( msize, sizeof(*shortmapweightsq), 0 );
-  shorthitsmap = astCalloc( msize, sizeof(*shorthitsmap), 0 );
+  shortmapweight = astMalloc( msize*sizeof(*shortmapweight) );
+  shortmapweightsq = astMalloc( msize*sizeof(*shortmapweightsq) );
+  shorthitsmap = astMalloc( msize*sizeof(*shorthitsmap) );
 
   /* Use first subarray to figure out time dimension. Get the
      useful start and end points of the time series, and then
