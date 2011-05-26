@@ -136,7 +136,9 @@
 *        match a null string if it occurred before a closing parenthesis at
 *        the end of the template.
 *     26-MAY-2011 (DSB):
-*        Chhanged API for astCalloc to match RTL (i.e. remove "init").
+*        - Changed API for astCalloc to match RTL (i.e. remove "init").
+*        - Changed astChr2Double to check for strigs like "2.", which
+*        some sscanfs fail to read as a floating point value.
 */
 
 /* Configuration results. */
@@ -967,21 +969,35 @@ double astChr2Double_( const char *str, int *status ) {
 */
 
 /* Local Variables: */
-   int nc;            /* Number of characters read from the string */
    double result;     /* The returned value */
+   int ival;          /* Integer value read from string */
+   int len;           /* Length of supplied string */
+   int nc;            /* Number of characters read from the string */
 
 /* Check the global error status and supplied pointer. */
    if ( !astOK || !str ) return AST__BAD;
 
+/* Save the length of the supplied string. */
+   len = strlen( str );
+
 /* Use scanf to read the floating point value. This fails if either 1) the
    string does not begin with a numerical value (in which case astSscanf
    returns zero), or 2) there are non-white characters following the
-   numerical value (i nwhich case "nc" - the number of characters read from
+   numerical value (in which case "nc" - the number of characters read from
    the string - is less than the length of the string). */
    if ( nc = 0,
-        ( 1 != astSscanf( str, " %lg %n", &result, &nc ) )
-        || ( nc < strlen( str ) ) ) {
+        ( 1 != astSscanf( str, " %lg %n", &result, &nc ) ) || ( nc < len ) ) {
       result = AST__BAD;
+   }
+
+/* If the above failed, try again allowing the string to be an integer
+   followed by a dot (e.g. "1."). Some implementations of sscanf do not
+   consider this to be a floating point value. */
+   if( 1 || result == AST__BAD ) {
+      if ( nc = 0,
+           ( 1 == astSscanf( str, " %d. %n", &ival, &nc ) ) && ( nc >= len ) ) {
+         result = ival;
+      }
    }
 
 /* Return the result. */

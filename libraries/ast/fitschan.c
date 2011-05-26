@@ -31200,6 +31200,12 @@ static int WATCoeffs( const char *watstr, int iaxis, double **cvals,
 
 /* Convert the word to double. */
             dval = astChr2Double( w2[ iword ] );
+            if( dval == AST__BAD ) {
+               astError( AST__BDFTS, "astRead(FitsChan): Failed to read a "
+                         "numerical value from sub-string \"%s\" found in "
+                         "an IRAF \"WAT...\" keyword.", status,  w2[ iword ] );
+               break;
+            }
 
 /* The first value gives the correction surface type. We can only handle type
    1 (chebyshev) or 3 (simple polynomial). */
