@@ -79,7 +79,7 @@ double *xx, *yy;
 struct AstPrjPrm *prj;
 
 {
-   double r, s, xi, eta, x2, xy, y2, r2, x3, x2y, xy2, y3, r3, x4, x3y,
+   double r, xi, eta, x2, xy, y2, r2, x3, x2y, xy2, y3, r3, x4, x3y,
           x2y2, xy3, y4, x5, x4y, x3y2, x2y3, xy4, y5, r5, x6, x5y, x4y2,
 	  x3y3, x2y4, xy5, y6, x7, x6y, x5y2, x4y3, x3y4, x2y5, xy6, y7,
 	  r7, tol, f, g, fx, fy, gx, gy, dx, dy, x, y, denom;
@@ -90,12 +90,11 @@ struct AstPrjPrm *prj;
       if (astTPNset(prj)) return 1;
    }
 
-   s = astSind(theta);
-   if (prj->flag > 0 && s < 0.0) {
-      return 2;
-   }
-
    if( prj->n ) {
+      double s = astSind(theta);
+      if (prj->flag > 0 && s < 0.0) {
+         return 2;
+      }
       r =  prj->r0*astCosd(theta)/s;
       xi =  r*astSind(phi);
       eta = -r*astCosd(phi);
