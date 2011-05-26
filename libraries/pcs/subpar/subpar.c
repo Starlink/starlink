@@ -57,7 +57,9 @@
 
 #include "f77.h"
 
+#include "sae_par.h"
 #include "subpar.h"
+#include "ems.h"
 
 F77_SUBROUTINE(subpar_findpar)( CHARACTER(NAME), INTEGER(NAMECODE),
 				INTEGER(STATUS) TRAIL(NAME) );
@@ -68,8 +70,19 @@ void subParFindpar( const char * name, size_t * namecode, int * status ) {
   DECLARE_INTEGER(NAMECODE);
   DECLARE_INTEGER(STATUS);
 
+  if (*status != SAI__OK) {
+    *namecode = 0;
+    return;
+  }
+
   F77_CREATE_EXPORT_CHARACTER(name, NAME);
   F77_EXPORT_INTEGER( *status, STATUS );
+
+  if (!NAME) {
+    *status = SAI__ERROR;
+    emsRep("", "Error exporting C string to Fortran", status );
+    return;
+  }
 
   F77_LOCK( F77_CALL(subpar_findpar)( CHARACTER_ARG(NAME),
 			    INTEGER_ARG(&NAMECODE),
@@ -93,9 +106,20 @@ void subParGet0c( size_t namecode, char *cvalue, size_t cvalue_length,
   DECLARE_CHARACTER_DYN(CVALUE);
   DECLARE_INTEGER(STATUS);
 
+  if (*status != SAI__OK) {
+    if (cvalue) cvalue[0] = '\0';
+    return;
+  }
+
   F77_EXPORT_INTEGER( namecode, NAMECODE );
   F77_CREATE_CHARACTER( CVALUE, cvalue_length - 1 );
   F77_EXPORT_INTEGER( *status, STATUS );
+
+  if (!CVALUE) {
+    *status = SAI__ERROR;
+    emsRep("", "Error allocating Fortran string", status );
+    return;
+  }
 
   F77_LOCK( F77_CALL(subpar_get0c)( INTEGER_ARG(&NAMECODE), CHARACTER_ARG(CVALUE),
 			  INTEGER_ARG(&STATUS) TRAIL_ARG(CVALUE) ); )
@@ -115,6 +139,11 @@ void subParGet0l( size_t namecode, int *lvalue, int * status ) {
   DECLARE_INTEGER(NAMECODE);
   DECLARE_LOGICAL(LVALUE);
   DECLARE_INTEGER(STATUS);
+
+  if (*status != SAI__OK) {
+    *lvalue = 0;
+    return;
+  }
 
   F77_EXPORT_INTEGER( namecode, NAMECODE );
   F77_EXPORT_INTEGER( *status, STATUS );
@@ -138,9 +167,20 @@ void subParGetkey( size_t namecode, char *keyword, size_t keyword_length,
   DECLARE_CHARACTER_DYN(KEYWORD);
   DECLARE_INTEGER(STATUS);
 
+  if (*status != SAI__OK) {
+    keyword[0] = '\0';
+    return;
+  }
+
   F77_EXPORT_INTEGER( namecode, NAMECODE );
   F77_CREATE_CHARACTER( KEYWORD, keyword_length - 1 );
   F77_EXPORT_INTEGER( *status, STATUS );
+
+  if (!KEYWORD) {
+    *status = SAI__ERROR;
+    emsRep("", "Error allocating Fortran string", status );
+    return;
+  }
 
   F77_LOCK( F77_CALL(subpar_getkey)( INTEGER_ARG(&NAMECODE), CHARACTER_ARG(KEYWORD),
 			  INTEGER_ARG(&STATUS) TRAIL_ARG(KEYWORD) ); )
@@ -166,6 +206,10 @@ int subParGref( size_t namecode, char * refstr, size_t reflen ) {
   F77_EXPORT_INTEGER( namecode, NAMECODE );
   F77_CREATE_CHARACTER( REFSTR, reflen - 1 );
 
+  if (!REFSTR) {
+    return retval;
+  }
+
   F77_LOCK( retval = F77_CALL(subpar_gref)( INTEGER_ARG(&NAMECODE),
                                   CHARACTER_ARG(REFSTR),
                                   INTEGER_ARG(&REFLEN)
@@ -183,6 +227,8 @@ void subParState( size_t namecode, int * state, int * status ) {
   DECLARE_INTEGER(NAMECODE);
   DECLARE_INTEGER(STATE);
   DECLARE_INTEGER(STATUS);
+
+  if (*status != SAI__OK) return;
 
   F77_EXPORT_INTEGER( namecode, NAMECODE );
   F77_EXPORT_INTEGER( *status, STATUS );
@@ -213,8 +259,16 @@ void subParWrerr( const char * string, int * status ) {
   DECLARE_CHARACTER_DYN(STRING);
   DECLARE_INTEGER(STATUS);
 
+  if (*status != SAI__OK) return;
+
   F77_CREATE_EXPORT_CHARACTER(string, STRING);
   F77_EXPORT_INTEGER( *status, STATUS );
+
+  if (!STRING) {
+    *status = SAI__ERROR;
+    emsRep("", "Error allocating Fortran string", status );
+    return;
+  }
 
   F77_LOCK( F77_CALL(subpar_wrerr)( CHARACTER_ARG(STRING),
 			  INTEGER_ARG(&STATUS)
@@ -232,8 +286,16 @@ void subParWrmsg( const char * string, int * status ) {
   DECLARE_CHARACTER_DYN(STRING);
   DECLARE_INTEGER(STATUS);
 
+  if (*status != SAI__OK) return;
+
   F77_CREATE_EXPORT_CHARACTER(string, STRING);
   F77_EXPORT_INTEGER( *status, STATUS );
+
+  if (!STRING) {
+    *status = SAI__ERROR;
+    emsRep("", "Error allocating Fortran string", status );
+    return;
+  }
 
   F77_LOCK( F77_CALL(subpar_wrmsg)( CHARACTER_ARG(STRING),
 			  INTEGER_ARG(&STATUS)
