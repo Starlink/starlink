@@ -209,20 +209,25 @@ int ems1Starf( const char *envar, const char *relpath, const char *acmode,
        /* If blank, initialize tmppath to a space, otherwise copy its value. */
        if ( strspn( s, " " ) == strlen( s ) ) {
            tmppath = (char *) starMalloc( 3 );
-           (void) strcpy( tmppath, " :"  );
+           if (tmppath) strcpy( tmppath, " :"  );
        } else {
            tmppath = (char *) starMalloc( strlen( s ) + 1 );
-           (void) strcpy( tmppath, s );
+           if (tmppath) strcpy( tmppath, s );
        }
    } else {
 
        /* Env variable not given, use an empty search path. */
        tmppath = (char *) starMalloc( 3 );
-       (void) strcpy( tmppath, " :" );
+       if (tmppath) strcpy( tmppath, " :" );
    }
 #if USE_PTHREADS
         pthread_mutex_unlock( &foo_mutex );
 #endif
+
+if (!tmppath) {
+     *pathlen = 0;
+     return 0;
+   }
 
    /*
     * tmppath is now the required search path (or blank if a given environment
@@ -274,7 +279,7 @@ int ems1Starf( const char *envar, const char *relpath, const char *acmode,
        }
    }
 
-   starFree( tmppath );
+   if (tmppath) starFree( tmppath );
 
    if ( !notfound ) {
        *pathlen = strlen( pathname) - 1;

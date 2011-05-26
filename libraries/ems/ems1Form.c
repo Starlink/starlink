@@ -143,8 +143,16 @@ void ems1Form( const char *text, const int maxlen, Logical esctokval,
 
     /*  Initialise the returned message. */
     opstr[0] = '\0';
+    *oplen = 0;
 
     /*  Get the length of the given string. */
+    if (!text) {
+      strcpy( opstr, "Internal malloc failure. Abort!" );
+      *oplen = strlen( opstr );
+      /*  Clear the message token table. */
+      ems1Ktok();
+      return;
+    }
     texlen = strlen( text );
 
     /*  Check for an empty string. */
@@ -152,6 +160,13 @@ void ems1Form( const char *text, const int maxlen, Logical esctokval,
 
         /*  Use a temporary text buffer which can be modified */
         texbuf = starMalloc( texlen + 1 );
+        if (!texbuf) {
+          strcpy( opstr, "Internal malloc failure. Abort!" );
+          *oplen = strlen( opstr );
+          /*  Clear the message token table. */
+          ems1Ktok();
+          return;
+        }
         strcpy( texbuf, text );
 
         /*  Initialise the text pointers and local status. */

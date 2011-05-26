@@ -287,11 +287,14 @@ void ems1_get_facility_error( unsigned int errcode, char **facility_name,
         /* Cache the facility code and filename to avoid future PATH
          * searches. */
         if ( fp != NULL ) {
-            global_facilities[global_cur_fac].fac_code = fac_code;
-            global_facilities[global_cur_fac].file =
-                (char *)starMalloc( strlen(foundfile) + 1);
-            strcpy( global_facilities[global_cur_fac].file, foundfile );
-            global_cur_fac++;
+            char * tmpstr = NULL;
+            tmpstr = starMalloc( strlen( foundfile ) + 1);
+            if (tmpstr) {
+               strcpy( tmpstr, foundfile );
+               global_facilities[global_cur_fac].fac_code = fac_code;
+               global_facilities[global_cur_fac].file = tmpstr;
+               global_cur_fac++;
+            }
         }
     }
 

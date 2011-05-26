@@ -94,6 +94,7 @@ void ems1Stok( const char *token, const char *string )
     ems_toktab_t *toktab = ems1Gtoktab();  /* Current token table */
 
     TRACE( "ems1Stok" );
+    if (!token) return;
 
     /*  Get the token length. */
     tlen = strlen( token );
