@@ -66,10 +66,10 @@ struct STR
 /* Macros to handle null terminated strings - as in the C interface in HDS 4 */
 
 #define _strcsimp(d,c)\
-        _dscinit(d,strlen(c),c)
+  _dscinit(d,(c?strlen(c):0),c)
 
 #define _strcsexp(d,c)\
-        _dscinit(d,strlen(c),c)
+  _dscinit(d,(c?strlen(c):0),c)
 
 #define _strflcsimp(d,c,l)\
         _dscinit(d,l,c)
