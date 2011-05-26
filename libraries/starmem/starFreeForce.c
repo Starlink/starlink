@@ -70,6 +70,10 @@
 */
 
 void starFreeForce( void * ptr ) {
+#if USE_AST_MALLOC
+  int ast_status = 0;
+  int *old_ast_status = NULL;
+#endif
 
 #if STARMEM_DEBUG
   if (STARMEM_PRINT_MALLOC)
@@ -80,6 +84,16 @@ void starFreeForce( void * ptr ) {
 
   case STARMEM__SYSTEM:
     free( ptr );
+    break;
+
+  case STARMEM__AST:
+#if USE_AST_MALLOC
+    old_ast_status = astWatch( &ast_status );
+    astFree( ptr );
+    astWatch( old_ast_status );
+#else
+    starMemFatalAST;
+#endif
     break;
 
   case STARMEM__DL:

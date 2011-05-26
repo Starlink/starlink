@@ -57,6 +57,8 @@
 *       starMemInit macro.
 *     - The STARMEM_MALLOC environment variable can be used to control
 *       the malloc behaviour. It can have the following values:
+*       AST: Use AST for malloc/free. This can be dangerous and will only
+*           be enabled via special builds of the library. Use with care.
 *       DL: Use Doug Lea's malloc (dlmalloc).
 *           http://g.oswego.edu/dl/html/malloc.html
 *       GC: Garbage Collection must be used. An error occurs if that is
@@ -137,6 +139,10 @@ starMemInitPrivate( int gc_initialised ) {
   } else if (strncmp(starenv, "SYS", 3) == 0) {
     /* use system version */
     STARMEM_MALLOC = STARMEM__SYSTEM;
+
+  } else if (strncmp(starenv, "AST", 3) == 0) {
+    /* use AST version */
+    STARMEM_MALLOC = STARMEM__AST;
 
   } else if (strncmp(starenv, "DL", 2) == 0) {
     /* use system version */

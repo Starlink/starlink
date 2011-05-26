@@ -83,8 +83,12 @@
 */
 
 void * starMallocAtomic( size_t size ) {
-  void * tmp;
+  void * tmp = NULL;
   static const size_t THRESHOLD = 1024 * 100; /* Bytes */
+#if USE_AST_MALLOC
+  int ast_status = 0;
+  int *old_ast_status = NULL;
+#endif
 
   /* Force initialisation - only needed when allocating not freeing
      since free is too late. Note that we have clearly not run any
@@ -98,6 +102,16 @@ void * starMallocAtomic( size_t size ) {
 
   case STARMEM__SYSTEM:
     tmp = malloc( size );
+    break;
+
+  case STARMEM__AST:
+#if USE_AST_MALLOC
+    old_ast_status = astWatch( &ast_status );
+    tmp = astMalloc( size );
+    astWatch( old_ast_status );
+#else
+    starMemFatalAST;
+#endif
     break;
 
   case STARMEM__DL:

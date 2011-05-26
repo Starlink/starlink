@@ -44,6 +44,12 @@
 /* Internal system header files */
 #include <stdio.h>
 
+#define USE_AST_MALLOC 0
+
+#if USE_AST_MALLOC
+#  include "ast.h"
+#endif
+
 /* If debugging set to true. Debugging messages controlled by STARMEM_PRINT_MALLOC
    environment variable if this is true. Will cause overhead. */
 #define STARMEM_DEBUG 0
@@ -57,6 +63,7 @@
 typedef enum STARMEM_MALLOCS {
   STARMEM__NULL,
   STARMEM__SYSTEM,
+  STARMEM__AST,
   STARMEM__DL,
   STARMEM__GC,
 } STARMEM_MALLOCS;
@@ -79,6 +86,8 @@ extern int STARMEM_PRINT_INFO;
 #define starMemFatalGC starMemFatal( "GC requested but not available" )
 
 #define starMemFatalNone starMemFatal( "Unable to determine malloc scheme.")
+
+#define starMemFatalAST starMemFatal( "Unable to use AST library for malloc." )
 
 /* STAR_MEM1_INCLUDED */
 #endif

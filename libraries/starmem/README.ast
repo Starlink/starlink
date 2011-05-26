@@ -1,0 +1,37 @@
+
+How to use AST malloc/free in starmem
+=====================================
+
+ - Edit mem1.h to define USE_AST_MALLOC to be 1.
+ - rebuild starmem
+ - Set the STARMEM_MALLOC environment variable to "AST"
+
+Note that if AST is not linked into the binary that is being tested
+then there will be link errors. Most ADAM monoliths are fine of
+course.
+
+We can also not have starmem depend on AST because AST depends on SST
+which depends on starmem.
+
+To enable AST memory debugging in A-tasks:
+
+ - Edit pcs/dtask/dts_dcltask.f to call AST_ACTIVEMEMORY('At exit:') and
+   AST_FLUSHMEMORY( 1 )
+ - Replace starMalloc/Free/Realloc/Calloc in HDS with system versions. This
+   is required because HDS uses an exit handler that requires the memory
+   be available at program exit.
+
+Programs like HDSTRACE and SST will fail to link and run because they
+will be missing AST symbols. SST is needed for building SMURF and AST
+so it may be necessary to add ast_link to the SST build. The easy fix
+is to
+
+  touch libsmurf/smurfmon.tex
+
+to get the build to continue.
+
+NOTES
+
+There will always be a chance of a memory leak due to ems1Fcerr which
+caches the paths to facility files but provides no scheme for
+releasing that memory.

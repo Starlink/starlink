@@ -85,6 +85,10 @@
 
 void * starRealloc( void * ptr, size_t size ) {
   void * tmp = NULL;
+#if USE_AST_MALLOC
+  int ast_status = 0;
+  int *old_ast_status = NULL;
+#endif
 
   /* Force initialisation - only needed when allocating not freeing
      since free is too late. Note that we have clearly not run any
@@ -98,6 +102,16 @@ void * starRealloc( void * ptr, size_t size ) {
 
   case STARMEM__SYSTEM:
     tmp = realloc( ptr, size );
+    break;
+
+  case STARMEM__AST:
+#if USE_AST_MALLOC
+    old_ast_status = astWatch( &ast_status );
+    tmp = astRealloc( ptr, size );
+    astWatch( old_ast_status );
+#else
+    starMemFatalAST;
+#endif
     break;
 
   case STARMEM__DL:
