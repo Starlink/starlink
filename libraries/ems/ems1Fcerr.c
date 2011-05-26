@@ -321,6 +321,8 @@ void ems1_get_facility_error( unsigned int errcode, char **facility_name,
     if ( strncmp( buffer, "FACILITY", 8 ) != 0 ) {
         strcpy( ident, "BADFIL" );
         strcat( text, " bad message file format" );
+        if (global_facilities[global_cur_fac].file)
+          starFree( global_facilities[global_cur_fac].file );
         global_cur_fac--;
         fclose( fp );
 
