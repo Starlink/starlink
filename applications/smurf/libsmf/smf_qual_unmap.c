@@ -52,6 +52,7 @@
 *     - We set badbits mask except when the MAP family is being used. This is
 *     because currently MAKEMAP handles badbits mask based on config settings. The
 *     fix here is to attach a badbits mask to the quality information.
+*     - Attempts to free quality even if status is bad.
 
 *  History:
 *     2010-06-17 (TIMJ):
@@ -71,6 +72,8 @@
 *        Add SMF__Q_EXT
 *     2011-04-26 (DSB):
 *        Add SMF__Q_LOWAP
+*     2011-05-26 (TIMJ):
+*        Attempt to free QUAL memory even if status is bad.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -113,7 +116,7 @@ smf_qual_t * smf_qual_unmap( int indf, smf_qfam_t family, smf_qual_t * qual, int
   int canwrite = 0;   /* can we write to the file? */
   size_t nqbits = 0;  /* Number of quality bits in this family */
 
-  if (*status != SAI__OK) return NULL;
+  if (*status != SAI__OK) goto CLEANUP;
 
   /* do nothing if there is no quality */
   if (!qual) return NULL;
@@ -343,7 +346,7 @@ smf_qual_t * smf_qual_unmap( int indf, smf_qfam_t family, smf_qual_t * qual, int
 
  CLEANUP:
   /* Tidy up */
-  qual = astFree( qual );
+  if (qual) qual = astFree( qual );
   return NULL;
 
 }
