@@ -98,7 +98,7 @@ void cnfExprt( const char *source_c, char *dest_f, int dest_len )
 /* And fill the rest of the output FORTRAN string with blanks.		    */
 
 /* First see how long the string actually is                                */
-   if ( source_c != NULL ) {
+   if ( source_c != NULL && dest_f != NULL ) {
        clen = strlen( source_c );
 
 /* Now decide whether to copy everything and pad, or truncate               */
