@@ -190,6 +190,9 @@ void msg1Form ( const char * param, const char * text, int clean,
   size_t szst;           /* Length of STATUS string */
   ptrdiff_t offset;      /* offset into string */
 
+  /* Can not do anything if we have a null pointer */
+  if (!msgstr || msglen == 0) return;
+
   /*  Operate regardless of STATUS - use local status */
   lstat = SAI__OK;
 

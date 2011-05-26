@@ -132,7 +132,11 @@ F77_SUBROUTINE(msg_load)( CHARACTER(PARAM),
 
   F77_IMPORT_INTEGER( *STATUS, status );
   opstr = starMallocAtomic( OPSTR_length + 1 );
-  opstr[0] = '\0';
+  if (opstr) {
+    opstr[0] = '\0';
+  } else {
+    OPSTR_length = 0;
+  }
 
   if (status == SAI__OK) {
     cnfImpn( PARAM, PARAM_length, ERR__SZPAR, param );

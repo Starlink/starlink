@@ -123,10 +123,11 @@ void msgLoad( const char *param,
               int *status ) {
 
   /*  Check the inherited global status. */
-  if (*status != SAI__OK) {
+  if (*status != SAI__OK || opstr == NULL) {
 
     /*     Status is not SAI__OK, so just annul the token table. */
     msg1Ktok();
+    *oplen = 0;
 
   } else {
 
