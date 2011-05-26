@@ -529,5 +529,12 @@ smo.type = median
 # is. Presently the only two valid options are "state_az" and
 # "state_el" to use the telescope azimuth and elevation
 # respectively. The former seems to be a good way for removing
-# magnetic field pickup.
+# magnetic field pickup. You may also request that the sine or or
+# cosine be taken of the template before fitting (tmp.dosin and
+# tmp.docos respectively), and before doing that a fixed offset may
+# be added (tmp.trigoffset). It is assumed that the template
+# quantities are in radians.
+#
 # tmp.source = state_az
+# tmp.dosin = 1
+# tmp.trigoffset = 0

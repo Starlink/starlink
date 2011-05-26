@@ -49,6 +49,8 @@
 *        Initial Version borrowing from smf_calcmodel_tmp
 *     2011-05-19 (EC):
 *        Add some diagnostic output for MSG__DEBUG and MSG__VERB
+*     2011-05-26 (EC):
+*        Add dosin, docos and trigoffset parameters
 
 *  Copyright:
 *     Copyright (C) 2011 University of British Columbia.
@@ -100,6 +102,8 @@ void smf_calcmodel_tmp( smfWorkForce *wf, smfDIMMData *dat, int chunk,
 
   /* Local Variables */
   size_t bstride;               /* bolo stride */
+  int docos;                    /* take the cos(template)? */
+  int dosin;                    /* take the sin(template)? */
   size_t i;                     /* loop counter */
   size_t idx;                   /* Subarry index */
   size_t j;                     /* loop counter */
@@ -120,6 +124,7 @@ void smf_calcmodel_tmp( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   char source[255];             /* String indicating source template */
   double *template=NULL;        /* The template */
   const char *tempstr=NULL;     /* Temporary pointer to static char buffer */
+  double trigoffset;            /* Offset to apply before trig functions */
   size_t tstride;               /* time stride */
 
   /* Main routine */
@@ -167,6 +172,19 @@ void smf_calcmodel_tmp( smfWorkForce *wf, smfDIMMData *dat, int chunk,
     goto CLEANUP;
   }
 
+  /* Are we taking the sin or cos of the template? */
+  astMapGet0I( kmap, "DOSIN", &dosin );
+  astMapGet0I( kmap, "DOCOS", &docos );
+
+  if( (*status==SAI__OK) && dosin && docos ) {
+    *status = SAI__ERROR;
+    errRep( "", FUNC_NAME ": can't request both COS and SIN of template",
+            status );
+  }
+
+  /* Apply fixed offset before trig function? */
+  astMapGet0D( kmap, "TRIGOFFSET", &trigoffset );
+
   if( *status == SAI__OK ) {
     smfHead *hdr = res->sdata[0]->hdr;
 
@@ -188,9 +206,19 @@ void smf_calcmodel_tmp( smfWorkForce *wf, smfDIMMData *dat, int chunk,
                source );
     }
 
-    /* Remove mean */
     if( *status == SAI__OK ) {
       double m;
+
+      /* Apply trig function if requested */
+      if( dosin ) for( i=0; i<ntslice; i++ ) {
+          template[i] = sin(template[i] + trigoffset);
+        }
+
+      if( docos ) for( i=0; i<ntslice; i++ ) {
+          template[i] = cos(template[i] + trigoffset);
+        }
+
+      /* Remove mean */
       smf_stats1D( template, 1, ntslice, NULL, 0, 0, &m, NULL, NULL, status );
 
       if( *status == SAI__OK ) {

@@ -175,3 +175,6 @@ two.bmap = <undef>
 # External template fitting
 
 tmp.source = <undef>
+tmp.dosin = 0
+tmp.docos = 0
+tmp.trigoffset = 0
