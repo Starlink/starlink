@@ -26,7 +26,7 @@ C_ROUTINES = cnfCopyf.c cnfCreat.c cnfCref.c cnfCrefa.c cnfCreib.c \
     cnfFreef.c \
     cnfImpb.c cnfImpbn.c cnfImpch.c cnfImpla.c cnfImpn.c cnfImprt.c \
     cnfImprta.c cnfImprtap.c cnfLenc.c cnfLenf.c \
-    cnfMem.c cnfLock.c oldnames.c
+    cnfMem.c cnfLock.c
 
 RTL_ROUTINES = cnfInitRTL.c
 
