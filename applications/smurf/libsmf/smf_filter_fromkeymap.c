@@ -122,7 +122,7 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap,
   double f_notchhigh[SMF__MXNOTCH];/* Array high-freq. edges of notch filters */
   int f_nnotch=0;           /* Number of notch filters in array */
   int i;                    /* Loop count */
-  int ival;                 /* Dummy integer argument */
+  int ival = 0;             /* Dummy integer argument */
   int whitening;            /* Will we apply a whitening filter? */
 
   /* Main routine */
@@ -170,8 +170,7 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap,
     /* If no apodisation length has been given, use a default of
        1/(steptime*freq) where freq is the lowest edge or notch
        frequency. We only apodise if we are padding data with zeros. */
-    astMapGet0I( keymap, "ZEROPAD", &ival );
-    if( ival ) {
+    if( astMapGet0I( keymap, "ZEROPAD", &ival ) && ival ) {
        if( astMapGet0I( keymap, "APOD", &ival ) ) {
           filt->apod_length = ival;
 
