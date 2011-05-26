@@ -173,6 +173,7 @@ void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, const int n
   /* Create empty smfData with no extra components */
   smfflags |= SMF__NOCREATE_DA | SMF__NOCREATE_FTS | SMF__NOCREATE_HEAD | SMF__NOCREATE_FILE;
   *data = smf_create_smfData( smfflags, status);
+  if (*data == NULL) goto CLEANUP;
 
   /* Set the requested data type */
   (*data)->dtype = dtype;
@@ -199,7 +200,7 @@ void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, const int n
       msgSeti( "NDIMS", ndims);
       errRep( FUNC_NAME,
 	      "Number of dimensions in output, ^NDIMS, is not in the range 1-4",	      status);
-      return;
+      goto CLEANUP;
     }
   }
 
@@ -210,6 +211,7 @@ void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, const int n
       *status = SAI__ERROR;
       errRep( FUNC_NAME, "Unsupported data type. Unable to open new file.",
 	      status );
+      goto CLEANUP;
     }
   }
 
@@ -217,19 +219,19 @@ void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, const int n
   ndgNdfcr( igrp, index, datatype, ndims, lbnd, ubnd, &newndf, status );
   if ( *status != SAI__OK ) {
     errRep(FUNC_NAME, "Unable to create new file", status);
-    return;
+    goto CLEANUP;
   }
 
   ndfMap(newndf, "DATA", datatype, "WRITE", &(pntr[0]), &nel, status);
   if ( *status != SAI__OK ) {
     errRep(FUNC_NAME, "Unable to map data array", status);
-    return;
+    goto CLEANUP;
   }
   if ( flags & SMF__MAP_VAR ) {
     ndfMap(newndf, "VARIANCE", datatype, "WRITE/BAD", &(pntr[1]), &nel, status);
     if ( *status != SAI__OK ) {
       errRep(FUNC_NAME, "Unable to map variance array", status);
-      return;
+      goto CLEANUP;
     }
   }
   if ( flags & SMF__MAP_QUAL ) {
@@ -239,7 +241,7 @@ void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, const int n
 
     if ( *status != SAI__OK ) {
       errRep(FUNC_NAME, "Unable to map quality array", status);
-      return;
+      goto CLEANUP;
     }
   }
 
@@ -251,7 +253,7 @@ void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, const int n
   grpGet( igrp, index, 1, &pname, SMF_PATH_MAX, status);
   if ( *status != SAI__OK ) {
     errRep(FUNC_NAME, "Unable to retrieve file name", status);
-    return;
+    goto CLEANUP;
   }
 
   file = smf_construct_smfFile( NULL, newndf, 0, isTstream, pname,
@@ -274,10 +276,27 @@ void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, const int n
                                  NULL, 1, (*data)->dims, (*data)->lbnd, ndims, 0, 0, NULL, NULL,
                                  status);
 
+ CLEANUP:
   if ( *data == NULL ) {
     if ( *status == SAI__OK ) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unable to construct smfData for new file", status);
+    }
+  }
+
+  /* Have to free resources on error */
+  if (*status != SAI__OK) {
+    if (*data) {
+      if ( !(*data)->qual && qual ) qual = astFree( qual );
+      if ( !(*data)->file && file ) {
+        if (newndf != NDF__NOID) ndfAnnul( &newndf, status );
+        if (file) file = astFree( file );
+      }
+      smf_close_file( data, status );
+    } else {
+      if (qual) qual = astFree( qual );
+      if (newndf != NDF__NOID) ndfAnnul( &newndf, status );
+      if (file) file = astFree( file );
     }
   }
 
