@@ -253,5 +253,5 @@ void smf_flag_slewspeed( smfData *data, double smin, double smax,
   if( average_speed ) *average_speed = avspeed;
 
   /* Clean up */
-  if( flag ) flag = astFree( flag );
+  flag = astFree( flag );
 }

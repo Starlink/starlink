@@ -2092,7 +2092,7 @@ L998:;
    if( igrp4 != NULL) grpDelet( &igrp4, status);
    if( igrp != NULL) grpDelet( &igrp, status);
    if( ogrp != NULL) grpDelet( &ogrp, status);
-   if( boxes ) boxes = astFree( boxes );
+   boxes = astFree( boxes );
    if( tiles ) tiles = smf_freetiles( tiles, ntile, status );
    ptime = smf_freepolbins( size, npbin, &pangle, ptime, status );
    wf = smf_destroy_workforce( wf );

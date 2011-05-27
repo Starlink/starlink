@@ -1601,14 +1601,14 @@ void smurf_dsutils( int *status ) {
       L998:
 
 /* Free resources. */
-      if( work ) work = astFree( work );
+      work = astFree( work );
 
 /* Close the input data file. */
       smf_close_file( &data, status);
 
 /* Free resources. */
       if( igrp != NULL ) grpDelet( &igrp, status);
-      if( slices ) slices = astFree( slices );
+      slices = astFree( slices );
    }
 
    L999:

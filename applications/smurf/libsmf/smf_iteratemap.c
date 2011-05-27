@@ -2492,13 +2492,13 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     nsamples_tot += nsamples;
 
     /* Free chisquared array */
-    if( chisquared) chisquared = astFree( chisquared );
-    if( lastchisquared) lastchisquared = astFree( lastchisquared );
+    chisquared = astFree( chisquared );
+    lastchisquared = astFree( lastchisquared );
 
     /* Free scan angle binning arrays */
-    if( thetabincen ) thetabincen = astFree( thetabincen );
-    if( thetabins ) thetabins = astFree( thetabins );
-    if( whichthetabin ) whichthetabin = astFree( whichthetabin );
+    thetabincen = astFree( thetabincen );
+    thetabins = astFree( thetabins );
+    whichthetabin = astFree( whichthetabin );
   }
 
 
@@ -2543,10 +2543,10 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   if( thisvar != mapvar ) thisvar = astFree( thisvar );
   if( thisweight != weights ) thisweight = astFree( thisweight );
   if( thisweightsq != mapweightsq ) thisweightsq = astFree( thisweightsq );
-  if( mapweightsq ) mapweightsq = astFree( mapweightsq );
+  mapweightsq = astFree( mapweightsq );
 
-  if( modeltyps ) modeltyps = astFree( modeltyps );
-  if( exportNDF_which ) exportNDF_which = astFree( exportNDF_which );
+  modeltyps = astFree( modeltyps );
+  exportNDF_which = astFree( exportNDF_which );
 
   if( igroup ) {
     smf_close_smfGroup( &igroup, status );
@@ -2554,7 +2554,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
   if( dat.zeromask ) dat.zeromask = astFree( dat.zeromask );
 
-  if( fakemap ) fakemap = astFree( fakemap );
+  fakemap = astFree( fakemap );
   if( fakendf != NDF__NOID ) ndfAnnul( &fakendf, status );
 
   /* Ensure that FFTW doesn't have any used memory kicking around */

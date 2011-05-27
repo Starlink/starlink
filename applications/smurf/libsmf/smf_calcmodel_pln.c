@@ -197,5 +197,5 @@ void smf_calcmodel_pln( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   }
 
   if( kmap ) kmap = astAnnul( kmap );
-  if( model_data_copy ) model_data_copy = astFree( model_data_copy );
+  model_data_copy = astFree( model_data_copy );
 }

@@ -442,7 +442,7 @@ void smf_clean_dksquid( smfData *indata, smf_qual_t mask, size_t window, smfData
   /* Free dksquid only if it was a local buffer */
   if( !model && dksquid ) dksquid = astFree( dksquid );
 
-  if( dkgood ) dkgood = astFree( dkgood );
-  if( dkav ) dkav = astFree( dkav );
+  dkgood = astFree( dkgood );
+  dkav = astFree( dkav );
 
 }

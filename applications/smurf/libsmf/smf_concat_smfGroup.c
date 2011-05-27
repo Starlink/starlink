@@ -1163,5 +1163,5 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
   }
 
   /* Clean up */
-  if( dslen ) dslen = astFree( dslen );
+  dslen = astFree( dslen );
 }

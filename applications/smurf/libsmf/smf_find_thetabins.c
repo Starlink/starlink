@@ -272,13 +272,13 @@ void smf_find_thetabins( const smfData *data, int nosign, double **bins,
   if( bincen ) {
     *bincen = bc;
   } else {
-    if( bc ) bc = astFree( bc );
+    bc = astFree( bc );
   }
 
   if( bins ) {
     *bins = bin;
   } else {
-    if( bin ) bin = astFree( bin );
+    bin = astFree( bin );
   }
 
   if( nbin ) *nbin = nb;

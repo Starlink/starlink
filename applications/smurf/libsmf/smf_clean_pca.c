@@ -683,7 +683,7 @@ void smf_clean_pca( smfWorkForce *wf, smfData *data, double thresh,
                     gain_array->sdata[0], &nrej, status );
 
     /* Clean up */
-    if( template ) template = astFree( template );
+    template = astFree( template );
     if( data_array ) {
       /* Data doesn't belong to us, so avoid freeing */
       data_array->owndata = 0;
@@ -799,7 +799,7 @@ void smf_clean_pca( smfWorkForce *wf, smfData *data, double thresh,
     /* Wait until all of the submitted jobs have completed */
     smf_wait( wf, status );
 
-    if( rms_amp ) rms_amp = astFree( rms_amp );
+    rms_amp = astFree( rms_amp );
   }
 
   /* Returning components? ---------------------------------------------------*/
@@ -894,9 +894,9 @@ void smf_clean_pca( smfWorkForce *wf, smfData *data, double thresh,
 
   /* Clean up */
  CLEANUP:
-  if( amp ) amp = astFree( amp );
-  if( comp ) comp = astFree( comp );
-  if( goodbolo ) goodbolo = astFree( goodbolo );
+  amp = astFree( amp );
+  comp = astFree( comp );
+  goodbolo = astFree( goodbolo );
   if( cov ) gsl_matrix_free( cov );
   if( s ) gsl_vector_free( s );
   if( v ) gsl_matrix_free( v );

@@ -241,11 +241,11 @@ static void smfFitPolyPar( void *job_data_ptr, int *status ) {
 
   /* Free up temp space */
   if( pdata->isTordered ) {
-    if( curbolo ) curbolo = astFree( curbolo );
-    if( curqual ) curqual = astFree( curqual );
+    curbolo = astFree( curbolo );
+    curqual = astFree( curqual );
   }
-  if( curpoly ) curpoly = astFree( curpoly );
-  if( curpolydata ) curpolydata = astFree( curpolydata );
+  curpoly = astFree( curpoly );
+  curpolydata = astFree( curpolydata );
 
   /* Debugging message indicating thread finished work */
   msgOutiff( MSG__DEBUG, "",

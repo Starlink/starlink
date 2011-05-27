@@ -330,6 +330,6 @@ void smf_resampcube_ast( smfData *data, dim_t nchan,
    }
 
 /* Free resources. */
-   if( detlut ) detlut = astFree( detlut );
+   detlut = astFree( detlut );
 }
 

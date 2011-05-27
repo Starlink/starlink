@@ -337,5 +337,5 @@ void smf_calcmodel_tmp( smfWorkForce *wf, smfDIMMData *dat, int chunk,
   /* Clean up */
  CLEANUP:
   if( kmap ) kmap = astAnnul( kmap );
-  if( template ) template = astFree( template );
+  template = astFree( template );
 }

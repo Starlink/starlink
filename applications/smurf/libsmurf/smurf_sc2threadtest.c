@@ -532,7 +532,7 @@ void smurf_sc2threadtest( int *status ) {
     res = astFree( res );
   }
   if( wf ) wf = smf_destroy_workforce( wf );
-  if( job_data ) job_data = astFree( job_data );
+  job_data = astFree( job_data );
 
   /* Ensure that FFTW doesn't have any used memory kicking around */
   fftw_cleanup();

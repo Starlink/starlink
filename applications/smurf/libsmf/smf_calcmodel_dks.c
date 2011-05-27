@@ -349,5 +349,5 @@ void smf_calcmodel_dks( smfWorkForce *wf __attribute__((unused)),
   }
 
   if( kmap ) kmap = astAnnul( kmap );
-  if( model_data_copy ) model_data_copy = astFree( model_data_copy );
+  model_data_copy = astFree( model_data_copy );
 }

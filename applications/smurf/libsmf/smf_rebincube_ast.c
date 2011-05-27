@@ -628,8 +628,8 @@ void smf_rebincube_ast( smfWorkForce *wf, smfData *data, int first, int last,
    }
 
 /* Free resources. */
-   if( detlut ) detlut = astFree( detlut );
-   if( detwork ) detwork = astFree( detwork );
-   if( varwork ) varwork = astFree( varwork );
+   detlut = astFree( detlut );
+   detwork = astFree( detwork );
+   varwork = astFree( varwork );
 }
 

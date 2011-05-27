@@ -352,8 +352,8 @@ void smf_write_shortmap( int shortmap, smfArray *ast, smfArray *res,
   }
 
   /* Free up memory */
-  if( shortmapweight ) shortmapweight = astFree( shortmapweight );
-  if( shortmapweightsq ) shortmapweightsq = astFree( shortmapweightsq );
-  if( shorthitsmap ) shorthitsmap = astFree( shorthitsmap );
+  shortmapweight = astFree( shortmapweight );
+  shortmapweightsq = astFree( shortmapweightsq );
+  shorthitsmap = astFree( shorthitsmap );
 
 }

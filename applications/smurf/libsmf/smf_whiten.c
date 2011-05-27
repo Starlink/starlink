@@ -314,8 +314,8 @@ void smf_whiten( double *re, double *im, double df, dim_t nf, size_t box,
 
   /* Clean up */
  CLEANUP:
-  if( pspec ) pspec = astFree( pspec );
-  if( qual ) qual = astFree( qual );
-  if( x ) x = astFree( x );
-  if( y ) y = astFree( y );
+  pspec = astFree( pspec );
+  qual = astFree( qual );
+  x = astFree( x );
+  y = astFree( y );
 }

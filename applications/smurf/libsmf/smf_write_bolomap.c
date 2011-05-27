@@ -307,8 +307,8 @@ void smf_write_bolomap( smfArray *ast, smfArray *res, smfArray *lut,
             }
 
             /* Free up temporary arrays */
-            if( curmap ) curmap = astFree( curmap );
-            if( curvar ) curvar = astFree( curvar );
+            curmap = astFree( curmap );
+            curvar = astFree( curvar );
           }
 
           /* Write out COLNUM and ROWNUM to FITS header */
@@ -348,10 +348,10 @@ void smf_write_bolomap( smfArray *ast, smfArray *res, smfArray *lut,
     }
 
     /* Free up memory */
-    if( bolomask ) bolomask = astFree( bolomask );
-    if( bmapweight ) bmapweight = astFree( bmapweight );
-    if( bmapweightsq ) bmapweightsq = astFree( bmapweightsq );
-    if( bhitsmap ) bhitsmap = astFree( bhitsmap );
+    bolomask = astFree( bolomask );
+    bmapweight = astFree( bmapweight );
+    bmapweightsq = astFree( bmapweightsq );
+    bhitsmap = astFree( bhitsmap );
 
     /* Remove ast from res once again */
     for( k=0; k<dsize; k++ ) {

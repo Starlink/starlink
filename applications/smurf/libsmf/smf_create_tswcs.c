@@ -156,6 +156,6 @@ void smf_create_tswcs( smfHead *hdr, AstFrameSet **frameset, int *status ){
     }
   }
   /* Clean up */
-  if( times ) times = astFree( times );
+  times = astFree( times );
 
 }
