@@ -139,6 +139,9 @@
 *        - Changed API for astCalloc to match RTL (i.e. remove "init").
 *        - Changed astChr2Double to check for strigs like "2.", which
 *        some sscanfs fail to read as a floating point value.
+*     27-MAY-2011 (DSB):
+*        Added astFreeDouble to free a dynamically allocated array of 
+*        pointers to other dynamically allocated arrays.
 */
 
 /* Configuration results. */
@@ -1968,6 +1971,83 @@ void *astFree_( void *ptr, int *status ) {
 /* Always return a NULL pointer. */
    return NULL;
 
+}
+
+void *astFreeDouble_( void *ptr, int *status ) {
+/*
+*++
+*  Name:
+*     astFreeDouble
+
+*  Purpose:
+*     Free previously double allocated memory.
+
+*  Type:
+*     Public function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     void *astFreeDouble( void *ptr )
+
+*  Description:
+*     This function frees memory that has previouly been dynamically
+*     allocated using one of the AST memory function. It assumes that
+*     the supplied pointer is a pointer to an array of pointers. Each
+*     of these pointers is first freed, and then the supplied pointer
+*     is freed.
+
+*  Parameters:
+*     ptr
+*        Pointer to previously allocated memory. An error will result
+*        if the memory has not previously been allocated by another
+*        function in this module. However, a NULL pointer value is
+*        accepted (without error) as indicating that no memory has yet
+*        been allocated, so that no action is required.
+
+*  Returned Value:
+*     astFreeDouble()
+*        Always returns a NULL pointer.
+
+*--
+*/
+
+/* Local Variables: */
+   int iptr;                     /* Index of sub-pointer */
+   int nptr;                     /* Number of sub-pointers */
+   size_t size;                  /* The usable size of the memory block */
+   void **ptrs;                  /* Pointer to array of pointers */
+
+/* Check a pointer was supplied. */
+   if( ! ptr ) return NULL;
+
+/* Get the size of the memory area. */
+   size = astSizeOf( ptr );
+
+/* Get the number of points this amount of memory could hold. */
+   nptr = size/sizeof( void * );
+
+/* Report an error if the size is not an integer multiple of an address
+   size. */
+   if( nptr*sizeof( void * ) != size ) {
+      astError( AST__MEMIN, "Invalid attempt to free double allocated "
+                "memory: the supplied memory size (%lu bytes) is not "
+                "an integer multiple of %lu.", status, size,
+                sizeof( void * ) );
+
+   } else {
+
+/* Free each sub-pointer. */
+      ptrs = (void **) ptr;
+      for( iptr = 0; iptr < nptr; iptr++ ) {
+         ptrs[ iptr ] = astFree(  ptrs[ iptr ] );
+      }
+
+/* Free the supplied pointer. */
+      ptr = astFree( ptr );
+   }
+
+/* Always return a NULL pointer. */
+   return NULL;
 }
 
 void *astGrow_( void *ptr, int n, size_t size, int *status ) {

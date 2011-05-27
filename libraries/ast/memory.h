@@ -209,6 +209,7 @@ size_t astSizeOf_( const void *, int * );
 int astIsDynamic_( const void *, int * );
 size_t astTSizeOf_( const void *, int * );
 void *astFree_( void *, int * );
+void *astFreeDouble_( void *, int * );
 void *astGrow_( void *, int, size_t, int * );
 void *astCalloc_( size_t, size_t, int * );
 void *astMalloc_( size_t, int, int * );
@@ -252,6 +253,7 @@ void astEndPM_( int * );
 #define astChrMatch(str1,str2) astERROR_INVOKE(astChrMatch_(str1,str2,STATUS_PTR))
 #define astChrMatchN(str1,str2,n) astERROR_INVOKE(astChrMatchN_(str1,str2,n,STATUS_PTR))
 #define astFree(ptr) astERROR_INVOKE(astFree_(ptr,STATUS_PTR))
+#define astFreeDouble(ptr) astERROR_INVOKE(astFreeDouble_(ptr,STATUS_PTR))
 #define astGrow(ptr,n,size) astERROR_INVOKE(astGrow_(ptr,n,size,STATUS_PTR))
 #define astMalloc(size) astERROR_INVOKE(astMalloc_(size,0,STATUS_PTR))
 #define astMemCaching(flag) astERROR_INVOKE(astMemCaching_(flag,STATUS_PTR))
