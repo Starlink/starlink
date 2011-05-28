@@ -1,0 +1,454 @@
+#!/star/Perl/bin/perl
+
+=head1 NAME
+
+mcehead2cat - convert JCMT state structure into TST format
+
+=head1 SYNOPSIS
+
+  mcehead2cat *.sdf
+  mcehead2cat *.sdf -out="out_root" -item=par1,par2
+  mcehead2cat *.sdf -item=^list.in
+
+=head1 DESCRIPTION
+
+Reads a set of SCUBA-2 and writes catalogues of the mcehead information
+to files. The output files are in TST format and can be read into the
+TOPCAT application (but may require that TOPCAT is told explicitly that
+the catalogue is in TST format, e.g. with the "-f tst" command line option).
+
+Multiple output files are created since the data is stored with
+different dimensionality. The "root" name for the output files can be
+specified using the -out parameter (default: uses the s??ddmmyyyy_#####
+part of the input file name or the basename of the filename is different).
+
+Output files (suffix: tst) are as follows:
+      "root"_gen:  parameters that have a single value
+                   (includes the 10 values for psc_status_psc which
+                    don't fit the scheme)
+      "root"_crd:  parameters that have 4 values
+      "root"_col:  parameters that have 32 values
+                   (includes parameters that have 8 values since they
+                    always come in sets of 4).
+      "root"_row:  parameters that have 41 values
+
+If -out is used to specify the root output file name, out from all
+input files will be concatinated into a single set of output files.
+
+=head1 OPTIONS
+
+The following options are supported:
+
+=over 4
+
+=item B<-help>
+
+Print help information.
+
+=item B<-version>
+
+Print version information.
+
+=item B<-man>
+
+Print the full documentation to STDOUT.
+
+=item B<-out>
+
+Optional root name for the output files.
+
+=item B<-items>
+
+Optional comma-separated list of header items to print. Instead a filename
+listing the item names can be given as '-item=^file'. The format of the
+file is the desired list of item names with one item per line.
+
+=back
+
+=head1 NOTES
+
+For SCUBA-2 raw files, the program will only process the first file of
+any observation and skip all others. Assuming there are 10 observations
+for the night:
+
+    mcehead2cat /jcmtdata/raw/scuba2/s4a/20110524/*/*.sdf 
+
+will only process 10 files, not all x-nr sdf files that may be there.
+It will produce 10 sets of output files unless -out has been specified, 
+in which case the mceheaders from the 10 files will be written to a
+single set of output files.
+
+=cut
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+use Astro::FITS::Header::NDF;
+use NDF;
+
+# Set up array for dimensions that will be printed to a separate file.
+# NOTE: the 'oddly-dimensioned' PSC_STATUS_PSC(10) will be unpacked
+# into scalar items. The sets of four 8-dimensioned parameters
+# will be mapped into the 32-dim arrays.
+
+# Dims for which to print files and id to append to root outname;
+my @pdims = ( 1, 4, 32, 41 );
+my @prtid = ( "gen", "crd", "col", "row" );
+
+# Dims which to combine into larger bins. Note that parameter names
+# for these items must end in a sequence number indicating their
+# order: PAR1, PAR2 etc.
+my %combine = ( "8" => 32 );
+
+# Dims which to unpack into scalar items
+my @unpack = ( 10 );
+
+#
+# === Parse command line ===
+#
+
+my ($help, $man, $version, $out_root, $itms);
+
+my $ostatus = GetOptions( "help" => \$help,
+                          "man" => \$man,
+                          "version" => \$version,
+                          "out=s" => \$out_root,
+                          "items=s" => \$itms
+                        );
+
+pod2usage(1) if $help;
+pod2usage(-exitstatus => 0, -verbose =>2) if $man;
+
+if ($version) {
+  my $id = '$Id$';
+  print "mcehead2cat - convert SCUBA2 MCEHEAD information to catalog\n";
+  print "              version 1.0";
+  exit;
+}
+
+# If no files give help
+pod2usage(1) if ($help || @ARGV == 0);
+
+# Files to process
+my @files = @ARGV;
+
+# Single output file defined
+my $single_file = 0;
+my $oroot = "";
+if (defined $out_root) {
+  $single_file = 1;
+  $oroot = $out_root;
+}
+
+# User is asking for specific header items
+my @items;
+if ( defined $itms ) {
+  chomp($itms);
+  $itms =~ s/\s+//g;
+  if ( $itms =~ /^\^(.+)/ ) {
+    my $itemsfile = $1;
+    open ITM, "<${itemsfile}" ||
+      die "Failed to open items file '$itemsfile': $!";
+    while ( <ITM> ) {
+      my $item = $_;
+      chomp($item);
+      $item =~ s/\s+//g;
+      push @items, $item;
+    }
+    close ITM;
+  } else {
+    @items = split /\,/, $itms;
+  }
+}
+
+#
+# === Cycle over files ===
+#
+my $isfirst_file = 1;
+my %cols;
+my %skip;
+
+for my $f ( @files ) {
+
+  my $basename = (split /\//, $f)[-1];
+
+  if ( $basename =~ /^(s[4|8][a|b|c|d]\d{8}_\d{5})_/ ) {
+
+    my $rname = $1;
+    # only read one file from each observation
+    next if ( exists $skip{$rname} );
+
+    $skip{$rname} = 1;
+    $oroot = $rname unless ( $single_file );
+
+  } else{
+    $oroot = (split /\./, $basename)[0] unless ( $single_file );
+  }
+
+  print "Printing results from $f to ${oroot}_*.tst ...\n";
+
+  # Read MCEHEAD information
+  my %local = read_mcehead( $f, \@items );
+
+  # Deal with the items that need unpacking.
+  foreach my $idim ( @unpack ) {
+    foreach my $col ( keys %local ) {
+
+      next unless ( $local{$col}->{dim} == $idim );
+
+      for ( my $i = 0; $i < $local{$col}->{dim}; $i++ ) {
+	my %ref;
+	my @values;
+	$values[0] = ${ $local{$col}->{values} }[$i];
+	$ref{"values"} = \@values;
+	$ref{"dim"}    = 1;
+	$ref{"type"}   = $local{$col}->{type};
+	my $nkey = sprintf "${col}%2.2d", $i+1;
+	$local{$nkey} = \%ref;
+      }
+      delete $local{$col};
+    }
+  }
+
+  # Deal with the parameters that need to be combined
+  foreach my $col ( keys %local ) {
+
+    my $idim = $local{$col}->{dim};
+    next unless ( exists $combine{$idim} );
+    my $ndim = $combine{$idim};
+
+    my $name;
+    my $seq;
+    if ( reverse($col) =~ /^(\d+)(\w+)$/ ) {
+      $name = reverse($2);
+      $seq = reverse($1);
+    } else {
+      next;
+    }
+
+    unless ( exists $local{$name} ) {
+      my %ref;
+      my @values = map { 0 } (1..${ndim});
+      $ref{"values"} = \@values;
+      $ref{"dim"}    = ${ndim};
+      $ref{"type"}   = $local{$col}->{type};
+      $local{$name}  = \%ref;
+    }
+    splice @{ $local{$name}->{values} }, ($seq-1)*${idim}, ${idim},
+           @{ $local{$col}->{values} };
+    delete $local{$col};
+  }
+
+  # Lose ordering associated with the file but since
+  # all sections share subsystem prefix then we will
+  # not be grossly out of order
+  my @cols = sort keys %local;
+
+  # Find some regular header items, such as the file-id.
+  my $hdr = Astro::FITS::Header::NDF->new( File => $f );
+  my $subarray = $hdr->value( "SUBARRAY" );
+  my $date_obs = $hdr->value( "DATE-OBS" );
+  my $date_end = $hdr->value( "DATE-END" );
+  my $obsnum   = $hdr->value( "OBSNUM" );
+
+  # Process the parameters grouped by the dimensions to be printed
+  #
+  my $idim = -1;
+  foreach my $ndim ( @pdims ) {
+
+    my $isfirst = 1;
+    my @columns;
+
+    $idim ++;
+
+    my $header = "";
+
+    # Select items with correct dimension
+    foreach my $col (@cols ) {
+      push @columns, $col if ( $local{$col}->{dim} == $ndim );
+    }
+
+    # Dump the values
+    next if ( @columns == 0 );
+
+    for ( my $i = 0; $i < $ndim; $i++ ) {
+      my $id = sprintf("%s%2.2d", $prtid[$idim], $i+1);
+      $header .= sprintf join("\t", $subarray, $id, $date_obs, $date_end, $obsnum);
+      foreach my $col ( @columns ) {
+	my $val = ${ $local{$col}->{values} }[$i];
+	if ($local{$col}->{type} =~ /^_(DOUBLE|REAL)$/) {
+	  $header .= sprintf "\t%g", $val;
+	} elsif ($local{$col}->{type} eq '_INTEGER') {
+	  $header .= sprintf "\t%d", $val;
+	} else {
+	  $header .= sprintf "\t%s", $val;
+	}
+      }
+
+      $header .= sprintf "\n";
+    }
+
+    # Write or append to file if there is anything to write
+    if ( $isfirst_file || not $single_file ) {
+      open OUT,">${oroot}_${prtid[$idim]}.tst" ||
+	die "Failed to output file '${oroot}_${prtid[$idim]}.tst': $!";
+
+      print OUT "# This is a TST formatted file\n";
+      print OUT
+	join("\t", "ARRAY", "ID", "START", "END", "OBSNUM", @columns) ,"\n";
+      print OUT join("\t", map { "--" } (0..($#columns+5))),"\n";
+    } else {
+      open OUT,">>${oroot}_${prtid[$idim]}.tst" ||
+	die "Failed to output file '${oroot}_${prtid[$idim]}.tst': $!";
+    }
+    print OUT "$header";
+    close OUT;
+
+  }
+
+  $isfirst_file = 0;
+
+}
+exit;
+
+
+sub read_mcehead {
+
+  my ($file, $aref) = @_;
+
+  @items = @{$aref};
+
+  # Get a hash indicating which items are requested
+  my %items = map { uc($_), undef } @items;
+
+  # Open up the file, retrieve the MCEHEAD structure, and store it
+  # in our cache.
+  my $status = &NDF::SAI__OK();
+  err_begin($status);
+
+  # Somewhere to store the results
+  my %results;
+  # Use HDS directly
+  hds_open( $file, "READ", my $loc, $status);
+  dat_find( $loc, "MORE", my $mloc, $status);
+  dat_there( $mloc, "SCUBA2", my $there, $status );
+  return %results unless ($there);
+  dat_find( $mloc, "SCUBA2", my $sc2loc, $status );
+  dat_there( $sc2loc, "MCEHEAD", $there, $status );
+  return %results unless ($there);
+  dat_find( $sc2loc, "MCEHEAD", my $mcloc, $status );
+  dat_annul( $mloc, $status );
+  dat_annul( $sc2loc, $status );
+
+  # Error string indicating that we had a problem and should clean up
+  my $errstr;
+
+  # find out how many extensions we have
+  dat_ncomp( $mcloc, my $ncomp, $status );
+
+  # Keep a count of how many we retrieved
+  my $found = 0;
+
+  # Loop over each
+  if ($status == &NDF::SAI__OK && !defined $errstr) {
+    for my $i (1..$ncomp) {
+
+      last if $status != &NDF::SAI__OK;
+      dat_index( $mcloc, $i, my $iloc, $status );
+
+      dat_name( $iloc, my $name, $status );
+      # skip if we are selecting a subset
+      next if (@items && !exists $items{$name});
+
+      $found++;
+
+      my @dims;
+      dat_shape( $iloc, 1, @dims, my $actdim, $status);
+
+      # Check for special case of 1 element vector
+      my $is_array = ( $actdim == 0 ? 0 : 1 );
+      $dims[0] = 1 unless( $is_array );
+
+      # Need the type to decide what to call next
+      dat_type( $iloc, my $type, $status );
+
+      my $coderef;
+      my @values;
+      if ($type =~ /^_(DOUBLE|REAL)$/) {
+        $coderef = ($is_array ? \&dat_getvd : \&dat_get0d );
+      } elsif ($type eq '_INTEGER') {
+        $coderef = ($is_array ? \&dat_getvi : \&dat_get0i );
+      } else {
+        $coderef = ($is_array ? \&dat_getvc : \&dat_get0c );
+      }
+
+      if ($is_array) {
+        $coderef->( $iloc, $dims[0], \@values, my $el, $status );
+      } else {
+        $coderef->( $iloc, my $val, $status );
+	push @values, $val;
+      }
+
+      # store the results in anonymous hash
+      my %ref;
+      $ref{"values"}  = \@values;
+      $ref{"dim"}     = $dims[0];
+      $ref{"type"}    = $type;
+      $results{$name} = \%ref;
+
+      # free the locator associated with this component
+      dat_annul( $iloc, $status );
+    }
+  }
+  dat_annul( $mcloc, $status );
+  dat_annul( $loc, $status );
+
+  if ($status != &NDF::SAI__OK()) {
+    $errstr .= &NDF::err_flush_to_string( $status );
+  }
+  err_end($status);
+  print "Error reading MCEHEAD from file $file: $errstr\n"
+    if defined $errstr;
+
+  # report if we did not find all that was requested
+  if (@items && $found != @items) {
+    print("Requested ".@items." components but only found $found.\n");
+    print("Could not find the following requested headers:\n");
+    foreach my $name ( @items ) {
+      print "\t\t'$name'\n" unless ( exists $results{$name} );
+    }
+  }
+
+  return %results;
+}
+
+
+=head1 AUTHOR
+
+Remo Tilanus E<lt>r.tilanus@jach.hawaii.eduE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2007 Particle Physics and Astronomy Research Council.
+Copyright (C) 2007-2011 Science and Technology Facilities Council.
+All Rights Reserved.
+
+=head1 LICENCE
+
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 3 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful,but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+Place,Suite 330, Boston, MA  02111-1307, USA
+
+=cut

@@ -239,6 +239,8 @@
 #         - Removed ZPD param from FTS2PHASECORR
 #     2011-03-18 (EC):
 #         Add sc2pca
+#     2011-05-28 (RPT):
+#         Add mcehead2cat
 #     {enter_changes_here}
 
 #  Bugs:
@@ -4258,6 +4260,10 @@ package @PACKAGE@ {
 
     command jcmtstate2cat {
         obey {starperl $SMURF_DIR/jcmtstate2cat}
+    }
+
+    command mcehead2cat {
+        obey {starperl $SMURF_DIR/mcehead2cat}
     }
 
     command dumpocscfg {
