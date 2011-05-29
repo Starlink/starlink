@@ -32,6 +32,8 @@ dreamsolve \
 dreamweights \
 dsutils \
 extinction \
+fit1d\
+fit1e\
 fixsteps \
 flatfield \
 fts2deglitch \
@@ -140,7 +142,7 @@ dist_pkgdata_DATA = LICENCE $(EXAMPLE_FILES)
 DYNSCRIPTS = smurf.sh smurf.csh smurf.icl
 
 # Install without modification
-STATICSCRIPTS = scripts/jcmtstate2cat scripts/dumpocscfg scripts/gettsys \
+STATICSCRIPTS = scripts/jcmtstate2cat scripts/mcehead2cat scripts/dumpocscfg scripts/gettsys \
 scripts/distortion scripts/showdistortion scripts/tobeam scripts/print_index \
 scripts/cbas scripts/bolcoords scripts/matched-filter scripts/smas scripts/canfar_scuba2_map.sh
 
