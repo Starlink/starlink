@@ -32,8 +32,6 @@ dreamsolve \
 dreamweights \
 dsutils \
 extinction \
-fit1d\
-fit1e\
 fixsteps \
 flatfield \
 fts2deglitch \
