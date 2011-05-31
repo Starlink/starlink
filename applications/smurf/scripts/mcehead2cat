@@ -170,6 +170,8 @@ my $isfirst_file = 1;
 my %cols;
 my %skip;
 
+my $file_id = 0;
+
 for my $f ( @files ) {
 
   my $basename = (split /\//, $f)[-1];
@@ -191,6 +193,9 @@ for my $f ( @files ) {
 
   # Read MCEHEAD information
   my %local = read_mcehead( $f, \@items );
+
+  # Give each input file a unique file-id
+  $file_id++;
 
   # Deal with the items that need unpacking.
   foreach my $idim ( @unpack ) {
@@ -275,7 +280,9 @@ for my $f ( @files ) {
 
     for ( my $i = 0; $i < $ndim; $i++ ) {
       my $id = sprintf("%s%2.2d", $prtid[$idim], $i+1);
-      $header .= sprintf join("\t", $subarray, $id, $date_obs, $date_end, $obsnum);
+      my $fid = sprintf("%4.4d", $file_id);
+      $header .= sprintf join("\t", $fid, $subarray, $id, $date_obs,
+			      $date_end, $obsnum);
       foreach my $col ( @columns ) {
 	my $val = ${ $local{$col}->{values} }[$i];
 	if ($local{$col}->{type} =~ /^_(DOUBLE|REAL)$/) {
@@ -297,8 +304,8 @@ for my $f ( @files ) {
 
       print OUT "# This is a TST formatted file\n";
       print OUT
-	join("\t", "ARRAY", "ID", "START", "END", "OBSNUM", @columns) ,"\n";
-      print OUT join("\t", map { "--" } (0..($#columns+5))),"\n";
+	join("\t", "FILE", "ARRAY", "ID", "START", "END", "OBSNUM", @columns) ,"\n";
+      print OUT join("\t", map { "--" } (0..($#columns+6))),"\n";
     } else {
       open OUT,">>${oroot}_${prtid[$idim]}.tst" ||
 	die "Failed to output file '${oroot}_${prtid[$idim]}.tst': $!";
