@@ -962,6 +962,9 @@ f     - AST_TESTFITS: Test if a keyword has a defined value in a FitsChan
 *        corrections.
 *        - Add PolyTan attribute.
 *        - Fix interpretation of -SIP headers that have no inverse.
+*     1-JUN-2011 (DSB):
+*        In astInitFitsChanVtab, only create the two TimeFrames if they
+*        have not already been created (fixes scuba2 trac ticket #666).
 *class--
 */
 
@@ -16959,8 +16962,8 @@ void astInitFitsChanVtab_(  AstFitsChanVtab *vtab, const char *name, int *status
 /* Create a pair of MJD TimeFrames which will be used for converting to and
    from TDB. */
    astBeginPM;
-   tdbframe = astTimeFrame( "system=MJD,timescale=TDB", status );
-   timeframe = astTimeFrame( "system=MJD", status );
+   if( !tdbframe ) tdbframe = astTimeFrame( "system=MJD,timescale=TDB", status );
+   if( !timeframe ) timeframe = astTimeFrame( "system=MJD", status );
    astEndPM;
    UNLOCK_MUTEX4
 
@@ -31200,12 +31203,6 @@ static int WATCoeffs( const char *watstr, int iaxis, double **cvals,
 
 /* Convert the word to double. */
             dval = astChr2Double( w2[ iword ] );
-            if( dval == AST__BAD ) {
-               astError( AST__BDFTS, "astRead(FitsChan): Failed to read a "
-                         "numerical value from sub-string \"%s\" found in "
-                         "an IRAF \"WAT...\" keyword.", status,  w2[ iword ] );
-               break;
-            }
 
 /* The first value gives the correction surface type. We can only handle type
    1 (chebyshev) or 3 (simple polynomial). */
