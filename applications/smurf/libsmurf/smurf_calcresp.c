@@ -183,14 +183,18 @@ void smurf_calcresp( int *status ) {
       ngood[i-1] = smf_flat_responsivity( flatmethod, respmap, snrmin, 1, powval, bolval, NULL, status );
       if (powval) smf_close_file( &powval, status );
       if (bolval) smf_close_file( &bolval, status );
-    }
 
-    /* Report the number of good responsivities */
-    msgSeti( "NG", ngood[i-1] );
-    msgSeti( "I", i );
-    msgSetd( "SNR", snrmin );
-    msgOutif( MSG__NORM, "",
-              "Number of responsivities with S/N ratio > ^SNR for file ^I: ^NG", status);
+      /* Report the number of good responsivities */
+      if (flatmethod == SMF__FLATMETH_TABLE) {
+        msgOutiff( MSG__NORM, "",
+                   "Number of responsivities with S/N ratio > %.1f for file %zu: %zu",
+                   status, snrmin, i, ngood[i-1] );
+      } else {
+        msgOutiff( MSG__NORM, "",
+                   "Number of responsivities for file %zu: %zu",
+                   status, i, ngood[i-1] );
+      }
+    }
 
     /* close files */
     if (idata) smf_close_file( &idata, status );
