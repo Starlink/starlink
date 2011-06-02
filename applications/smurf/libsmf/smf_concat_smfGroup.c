@@ -759,6 +759,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
               hdr->steptime = refhdr->steptime;
               hdr->obsmode = refhdr->obsmode;
               hdr->obstype = refhdr->obstype;
+              hdr->seqtype = refhdr->seqtype;
               hdr->swmode = refhdr->swmode;
               hdr->instap[ 0 ] = refhdr->instap[ 0 ];
               hdr->instap[ 1 ] = refhdr->instap[ 1 ];
