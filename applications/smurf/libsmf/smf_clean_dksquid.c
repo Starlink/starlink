@@ -371,16 +371,13 @@ void smf_clean_dksquid( smfData *indata, smf_qual_t mask, size_t window, smfData
                       status );
             }
 
-            if( *status == SMF__INSMP ) {
+            if( *status == SMF__INSMP || *status == SMF__DIVBZ ) {
+              int wasinsmp = (*status == SMF__INSMP ? 1 : 0 );
               /* Annul SMF__INSMP as it was probably due to a bad bolometer */
               errAnnul( status );
-              if( msgFlevok( MSG__DEBUG, status) ) {
-                msgSeti( "COL", i );
-                msgSeti( "ROW", j );
-                msgOutif( MSG__DEBUG, "", FUNC_NAME
-                          ": ROW,COL (^ROW,^COL) insufficient good samples",
-                          status );
-              }
+              msgOutiff( MSG__DEBUG, "", FUNC_NAME
+                         ": ROW,COL (%zu,%zu) %s", status, j, i,
+                         (wasinsmp ? "insufficient good samples" : "division by zero" ));
 
               /* Flag entire bolo as bad if it isn't already */
               if( qua && !(qua[b*bstride]&SMF__Q_BADB) ) {
