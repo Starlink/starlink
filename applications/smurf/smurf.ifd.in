@@ -510,6 +510,24 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter nepgoodbol {
+                type _INTEGER
+                access WRITE
+                vpath DEFAULT
+                prompt {Number of bolometers with good NEP measurements}
+                default 0
+                helpkey *
+            }
+
+            parameter noisegoodbol {
+                type _INTEGER
+                access WRITE
+                vpath DEFAULT
+                prompt {Number of bolometers with good NOISE measurements}
+                default 0
+                helpkey *
+            }
+
             parameter out {
                 position 2
                 type NDF
@@ -4288,6 +4306,10 @@ package @PACKAGE@ {
 
     command distortion {
         obey {$SMURF_DIR/distortion}
+    }
+
+    command sc2tsnoise {
+        obey {$SMURF_DIR/sc2tsnoise}
     }
 
     command showdistortion {

@@ -100,6 +100,10 @@
 *          Control the verbosity of the application. Values can be
 *          NONE (no messages), QUIET (minimal messages), NORMAL,
 *          VERBOSE, DEBUG or ALL. [NORMAL]
+*     NEPGOODBOL = _INTEGER (Write)
+*          The number of bolometers with good NEP measurements (see EFFNEP)
+*     NOISEGOODBOL = _INTEGER (Write)
+*          The number of bolometers with good NOISE measurements (see EFFNOISE)
 *     OUT = NDF (Write)
 *          Output files (either noise or NEP images depending on the NEP
 *          parameter). Number of output files may differ from the
@@ -136,6 +140,7 @@
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
 *     David S Berry (JAC, Hawaii)
+*     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -177,7 +182,7 @@
 *     2011-04-20 (DSB):
 *        - Clean the arrays before calculating the noise.
 *        - Added CONFIG parameter.
-*        - When calling smf_bolonoise, only apodize if ZEROPAD is set (as done in 
+*        - When calling smf_bolonoise, only apodize if ZEROPAD is set (as done in
 *          the makemap NOI model).
 *     2011-04-20 (TIMJ):
 *        CONFIG=! disables all cleaning and uses full apodization.
@@ -186,10 +191,13 @@
 *        Calculate effective NEP
 *     2011-04-29 (TIMJ):
 *        Calculate effective NEP over all input chunks/subarrays.
+*     2011-06-03 (EC):
+*        Add NEPGOODBOL and NOISEGOODBOL output ADAM parameters
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2009-2011 Science and Technology Facilities Council.
+*     Copyright (C) 2011 University of British Columbia
 *     All Rights Reserved.
 
 *  Licence:
@@ -689,8 +697,10 @@ void smurf_calcnoise( int *status ) {
     msgOutf( "", "Effective noise = %g %s from %zu bolometers",
              status, noiseeff, refunits, noisegoodbol );
     parPut0d( "EFFNOISE", noiseeff, status );
+    parPut0i( "NOISEGOODBOL", noisegoodbol, status );
   } else {
     parPut0d( "EFFNOISE", VAL__BADD, status );
+    parPut0i( "NOISEGOODBOL", VAL__BADI, status );
   }
   if (calc_effnoise && nepgoodbol) {
     double nepeff;
@@ -698,8 +708,10 @@ void smurf_calcnoise( int *status ) {
     msgOutf( "", "Effective NEP = %g %s from %zu bolometers",
              status, nepeff, refnepunits, nepgoodbol );
     parPut0d( "EFFNEP", nepeff, status );
+    parPut0i( "NEPGOODBOL", nepgoodbol, status );
   } else {
     parPut0d( "EFFNEP", VAL__BADD, status );
+    parPut0i( "NEPGOODBOL", VAL__BADI, status );
   }
 
 

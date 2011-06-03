@@ -1,0 +1,331 @@
+#!/bin/tcsh
+
+source $SMURF_DIR/smurf.csh > /dev/null
+source $CONVERT_DIR/convert.csh > /dev/null
+source $KAPPA_DIR/kappa.csh > /dev/null
+
+if ( $#argv != 3 ) then
+    echo sc2tsnoise: calculate SCUBA-2 time-series noise
+    echo " "
+    echo usage:
+    echo "    sc2tsnoise [obsdir.txt] [nepfile.txt] [outdir]"
+    echo " "
+    echo parameters:
+    echo "    obsdir.txt  a text file with path to SCUBA-2 obs dirs on each line"
+    echo "    nepfile.txt output text file containing NEPs etc."
+    echo "    outdir      path to directory containing processed data"
+
+    goto done
+endif
+
+# parse the command line
+set filenames = $1   # file with path names to observations
+set nepfile = $2     # name of text file to store NEPs
+set outdir = $3      # name of subdir to but output files
+
+# ensure ADAM tasks fail rather than prompting
+setenv ADAM_NOPROMPT 1
+
+# ensure that failed ADAM task returns a status of 1
+setenv ADAM_EXIT 1
+
+mkdir $outdir > /dev/null
+rm $outdir/* > /dev/null
+
+rm "$nepfile" > /dev/null
+echo SUBARR OBSDATE OBSNUM SUBSCAN TIMEDATE OBJECT SHUTTER DARKHEAT PIXHEAT ELSTART TAU_ST TAU_EN AIRMASS EFFNEP NBOLO MEANTRANS > $nepfile
+echo ------ ------- ------ ------- -------- ------ ------- -------- ------- ------- ------ ------ ------- ------ ----- --------- >> $nepfile
+
+# loop over all of the observation directories that were specified
+foreach obsdir (`cat $filenames`)
+
+    echo === Processing $obsdir ===
+
+    # remove temp files from last time
+    rm noise.sdf > /dev/null
+    rm noise_nep.sdf > /dev/null
+    rm noise_flat.sdf > /dev/null
+    rm noise_flat_ext.sdf > /dev/null
+    rm trans.sdf > /dev/null
+
+    # obtain the obs num, date and subarray from obsdir
+    set obsnum = `basename $obsdir`
+    set temp = `dirname $obsdir`
+    set obsdate = `basename $temp`
+    set temp = `dirname $temp`
+    set subarr = `basename $temp`
+
+    # this is the root of the data tree
+    set basedir = `dirname $temp`
+
+    # set this flag once we have done an open-shutter sky measurement
+    set havesky = 0
+
+    # set this flag to ndf name if we encounter a skyflat
+    set haveskyflat = 0
+
+    # Loop over the first few files. For normal science observations we
+    # will have a dark noise, followed by a skyflat, and then shutter-open
+    # science. We will try up to file 4 to get the dark and shutter-open
+    # noise measurements
+
+    foreach filenum (1 2 3 4)
+
+        # do several checks before trying to do measurement
+        set ok = 1
+        set trans = "-1"
+
+        set thisndf = $obsdir/$subarr$obsdate\_$obsnum\_000$filenum
+
+        # does this file exist? If so, see if it is accessible, and
+        # figure out what type of file it is, and what the flatfield is
+
+        if ( -e $thisndf.sdf ) then
+            set shutter = `fitsval $thisndf SHUTTER`
+            set seqtype = `fitsval $thisndf SEQ_TYPE`
+
+            # if these failed the data are probably messed up
+            if ( $? != 0 ) then
+                echo Could not read FITS header of $thisndf
+                set ok = 0
+            endif
+
+            # if this is a shutter-open fastflat then simply remember it for
+            # future use
+
+            if ( ($ok == 1) && ("$seqtype" =~ "FASTFLAT") && \
+                ("$shutter" =~ "1") ) then
+                set haveskyflat = $thisndf
+                set ok = 0
+            endif
+
+            # If we're still OK we don't have a FASTFLAT. Try to identify
+            # an appropriate flatfield
+            if ( $ok == 1 ) then
+
+                # this is the flatfield referred to in the header. We pick
+                # off the subarray, date and obs number so that we can
+                # re-process the raw data if needed. Assume it lives in
+                # the same tree as the main observation
+                set flatfile = `fitsval $thisndf FLAT`
+                set flatsub  = `echo $flatfile | cut -b 1-3`
+                set flatdate = `echo $flatfile | cut -b 4-11`
+                set flatobs  = `echo $flatfile | cut -b 13-17`
+
+                # set flatfile to the first raw data file from the flat obs
+                set flatfile = $basedir/$flatsub/$flatdate/$flatobs
+                set flatfile = $flatfile/$flatsub$flatdate\_$flatobs\_0001.sdf
+
+                # dark observation. Make sure that flatfile exists and
+                # is also shutter-closed
+                if ( "$shutter" =~ "0" ) then
+
+                    if ( -e $flatfile ) then
+
+                        echo flat is $flatfile
+
+                        set flatshutter = `fitsval $flatfile SHUTTER`
+
+                        if ( $? == 0 ) then
+                            if ( "$flatshutter" !~ "0" ) then
+                                echo Flatfield $flatfile for dark $thisndf \
+                                    has shutter open!
+                                set ok = 0
+                            else
+                                # if we get here the data look good. Set
+                                # flatfile to a wildcard because we need to
+                                # process several header steps in different
+                                # files
+
+                                set flatfile = "$basedir/$flatsub/$flatdate/$flatobs/$flatsub$flatdate\_$flatobs\_????.sdf"
+                            endif
+                        else
+                            # problem reading fits header
+                            echo Could not read dark flat $flatfile FITS header
+                            set ok = 0
+                        endif
+                     else
+                        echo Dark flat $flatfile does not exist
+                        set ok = 0
+                    endif
+                endif
+
+                # shutter open. If we don't have a skyflat then check to see
+                # if flat is a stepped shutter-open flatfield
+                if ( "$shutter" =~ "1" ) then
+
+                    # if havesky was set we don't need to continue
+                    if ( $havesky == 1 ) set ok = 0
+
+                    if ( "$haveskyflat" !~ "0" ) then
+                        # override flatfile with skyflat if we have it
+                        set flatfile = $haveskyflat
+
+                        set temp = `basename $flatfile`
+                        set flatsub  = `echo $temp | cut -b 1-3`
+                        set flatdate = `echo $temp | cut -b 4-11`
+                        set flatobs  = `echo $temp | cut -b 13-17`
+                    else
+                        # otherwise look for stepped shutter-open flatfield
+                        if ( -e $flatfile ) then
+
+                            set flatshutter = `fitsval $flatfile SHUTTER`
+
+                            if ( $? == 0 ) then
+                                if ( "$flatshutter" !~ "0" ) then
+                                    echo Flatfield $flatfile for sky \
+                                        $thisndf has shutter closed!
+                                    set ok = 0
+
+                                else
+                                    # looks good, processing multi heater-steps
+                                    set flatfile = "$basedir/$flatsub/$flatdate/$flatobs/$flatsub$flatdate\_$flatobs\_????.sdf"
+                                endif
+
+                            else
+                                # problem reading fits header
+                                echo Could not read sky flat $flatfile FITS header
+                                set ok = 0
+                            endif
+
+                        endif
+                    endif
+
+                endif
+            endif
+
+            # if we get here OK, then we have established that we have both
+            # useful shutter open or closed data and a flatfield.
+            if ( $ok == 1 ) then
+                set utdate = `fitsval $thisndf UTDATE`
+                if ( $? != 0 ) set utdate = -1
+
+                set timedate = `fitsval $thisndf DATE-OBS`
+                if ( $? != 0 ) set timedate = -1
+
+                set object = `fitsval $thisndf OBJECT | sed 's/ /_/g'`
+                if ( $? != 0 ) set object = -1
+
+                set darkheat = `fitsval $thisndf DARKHEAT`
+                if ( $? != 0 ) set darkheat = -1
+
+                set pixheat = `fitsval $thisndf PIXHEAT`
+                if ( $? != 0 ) set pixheat = -1
+
+                set elstart = `fitsval $thisndf ELSTART`
+                if ( $? != 0 ) set elstart = -1
+
+                set tau_st = `fitsval $thisndf WVMTAUST`
+                if ( $? != 0 ) set tau_st = -1
+
+                set tau_en = `fitsval $thisndf WVMTAUEN`
+                if ( $? != 0 ) set tau_en = -1
+
+                set airmass = `fitsval $thisndf AMSTART`
+                if ( $? != 0 ) set airmass = -1
+
+                echo "$object : file $filenum"
+                echo "    shutter is $shutter"
+                echo "    seq_type is $seqtype"
+                echo "    noise is $thisndf"
+                echo "    flat is $flatfile"
+
+                # make a local copy of the noise, using only first 2000 samples
+                # if shutter-open
+
+                if ( "$shutter" =~ "0" )  then
+                    cp $thisndf.sdf noise.sdf
+                else
+                    ndfcopy "$thisndf(,,1:2000)" noise.sdf > /dev/null
+                endif
+                chmod u+w noise.sdf
+
+                # calculate flatfield if needed
+                set flatout = $outdir/$flatsub$flatdate\_$flatobs\_flat.sdf
+
+                if ( ! -e $flatout ) then
+                    calcflat "$flatfile" out=$flatout method=polynomial \
+                    resp=$outdir/$flatsub$flatdate\_$flatobs\_resp \
+                    respmask > /dev/null
+
+                    if ( $? != 0 ) then
+                        echo Could not calculate flatfield from "$flatfile"
+                        set ok = 0
+                    endif
+                endif
+
+                # try to copy the new flatfield to the noise observation
+                if ( $ok == 1 ) then
+                    copyflat $flatout noise accept > /dev/null
+
+                    if ( $? != 0 ) then
+                        echo Could not copy flatfield
+                        set ok = 0
+                    endif
+                endif
+
+                # calculate the NEP
+                if ( $ok == 1 ) then
+                    calcnoise noise noise_nep \
+                        power=$outdir/$subarr$obsdate\_$obsnum\_pspec \
+                        accept > /dev/null
+
+                    set effnep = `parget effnep calcnoise`
+                    set nbolo = `parget nepgoodbol calcnoise`
+
+                    if ( $? != 0 ) then
+                        echo Could not calculate noise
+                        set ok = 0
+                    else
+                        set nepname = `basename $thisndf`
+                        set nepname = $outdir/$nepname\_nep
+                        ndfcopy noise_nep.more.smurf.nep $nepname
+                endif
+
+                # calculate extinction from flatfielded data (to pick
+                # up masked bolometers), and then calculate a mean
+                # value for the transmission from the ratio of the two
+
+                if ( ($ok == 1) && ("$shutter" =~ "1") ) then
+
+                    flatfield noise noise_flat > /dev/null
+
+                    extinction noise_flat noise_flat_ext hasskyrem tausrc=auto \
+                        method=adaptive accept > /dev/null
+
+                    div noise_flat noise_flat_ext trans > /dev/null
+
+                    if ( -e trans.sdf ) then
+                        stats trans > /dev/null
+
+                        if ( $? == 0 ) then
+                            set meantrans = `parget mean stats`
+                        else
+                            echo Error running "KAPPA:STATS"
+                            set ok = 0
+                        endif
+
+                    else
+                        echo Error calculating transmission
+                        set ok = 0
+                    endif
+                endif
+
+            endif
+
+
+            # if OK is set, we got useful results to report
+            if ( $ok == 1 ) then
+                if ( ("$shutter" =~ "1") && ( $havesky != 1 ) ) set havesky = 1
+
+                echo $subarr $obsdate $obsnum 000$filenum $timedate $object $shutter $darkheat $pixheat $elstart $tau_st $tau_en $airmass $effnep $nbolo $meantrans >> $nepfile
+            endif
+
+        endif
+    end
+
+done:
+    exit 0
+
+end
+
