@@ -318,7 +318,7 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
       errRep( FUNC_NAME, "Method WVMRaw can not be used on 2-D image data", status );
       return;
     }
-  } else if (ndims != 3) {
+  } else if (ndims < 2 || ndims > 3) {
     if (*status == SAI__OK) {
       *status = SAI__ERROR;
       errRepf( FUNC_NAME, "Can not extinction correct data with %zd dimension(s)", status,
