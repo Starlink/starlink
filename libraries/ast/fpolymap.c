@@ -107,3 +107,27 @@ F77_INTEGER_FUNCTION(ast_polymap)( INTEGER(NIN),
    )
    return RESULT;
 }
+
+
+F77_INTEGER_FUNCTION(ast_polytran)( INTEGER(THIS),
+                                    LOGICAL(FORWARD),
+                                    DOUBLE(ACC),
+                                    DOUBLE_ARRAY(LBND),
+                                    DOUBLE_ARRAY(UBND),
+                                    INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_LOGICAL(FORWARD)
+   GENPTR_DOUBLE(ACC)
+   GENPTR_DOUBLE_ARRAY(LBND)
+   GENPTR_DOUBLE_ARRAY(UBND)
+   F77_INTEGER_TYPE(RESULT);
+
+   astAt( "AST_POLYTRAN", NULL, 0 );
+   astWatchSTATUS(
+      RESULT = astP2I( astPolyTran( astI2P( *THIS ), F77_ISTRUE( *FORWARD ),
+                                    *ACC, LBND, UBND ) );
+   )
+   return RESULT;
+}
+
+

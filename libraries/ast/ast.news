@@ -34,6 +34,11 @@ should be interpreted according to the "distorted TAN" convention
 included in an early draft of FITS-WCS paper II. Such headers are created
 by (for instance) the SCAMP tool (http://www.astromatic.net/software/scamp).
 
+- The PolyMap class now provides a method called astPolyTran (AST_POLYTRAN)
+that adds an inverse transformation to a PolyMap by sampling the forward
+transformation on a regular grid, and then fitting a polynomial function
+from the resulting output values to the grid of input values.
+
 
 Main Changes in V5.6-1
 -----------------------

@@ -22350,6 +22350,16 @@ should be interpreted according to the ``distorted TAN'' convention
 included in an early draft of FITS-WCS paper II. Such headers are created
 by (for instance) the SCAMP tool (\htmladdnormallink{http://www.astromatic.net/software/scamp}{http://www.astromatic.net/software/scamp}).
 
+\item The PolyMap class now provides a method called
+c+
+astPolyTran
+c-
+f+
+AST\_POLYTRAN
+f-
+that adds an inverse transformation to a PolyMap by sampling the forward
+transformation on a regular grid, and then fitting a polynomial function
+from the resulting output values to the grid of input values.
 
 \end{enumerate}
 

@@ -176,6 +176,7 @@ typedef struct AstPolyMapVtab {
    AstClassIdentifier id;
 
 /* Properties (e.g. methods) specific to this class. */
+   AstPolyMap *(* PolyTran)( AstPolyMap *, int, double, double *, double *, int * );
 
 } AstPolyMapVtab;
 
@@ -228,6 +229,7 @@ AstPolyMap *astLoadPolyMap_( void *, size_t, AstPolyMapVtab *,
 /* Prototypes for member functions. */
 /* -------------------------------- */
 # if defined(astCLASS)           /* Protected */
+AstPolyMap *astPolyTran_( AstPolyMap *, int, double, double *, double *, int * );
 #endif
 
 /* Function interfaces. */
@@ -275,6 +277,8 @@ astINVOKE(O,astLoadPolyMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_P
 /* Here we make use of astCheckPolyMap to validate PolyMap pointers
    before use.  This provides a contextual error report if a pointer
    to the wrong sort of Object is supplied. */
+
+#define astPolyTran(this,forward,acc,lbnd,ubnd) astINVOKE(O,astPolyTran_(astCheckPolyMap(this),forward,acc,lbnd,ubnd,STATUS_PTR))
 
 #if defined(astCLASS)            /* Protected */
 #endif
