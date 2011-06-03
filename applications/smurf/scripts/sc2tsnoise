@@ -37,7 +37,7 @@ echo SUBARR OBSDATE OBSNUM SUBSCAN TIMEDATE OBJECT SHUTTER DARKHEAT PIXHEAT ELST
 echo ------ ------- ------ ------- -------- ------ ------- -------- ------- ------- ------ ------ ------- ------ ----- --------- >> $nepfile
 
 # loop over all of the observation directories that were specified
-foreach obsdir (`cat $filenames`)
+foreach obsdir ( `cat $filenames` )
 
     echo === Processing $obsdir ===
 
@@ -259,7 +259,7 @@ foreach obsdir (`cat $filenames`)
                     copyflat $flatout noise accept > /dev/null
 
                     if ( $? != 0 ) then
-                        echo Could not copy flatfield
+                        echo Could not copy flatfield $flatout
                         set ok = 0
                     endif
                 endif
@@ -324,8 +324,8 @@ foreach obsdir (`cat $filenames`)
         endif
     end
 
+end
+
 done:
     exit 0
-
-end
 
