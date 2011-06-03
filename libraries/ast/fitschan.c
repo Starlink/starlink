@@ -1515,7 +1515,7 @@ static AstMapping *LogWcs( FitsStore *, int, char, const char *, const char *, i
 static AstMapping *MakeColumnMap( AstFitsTable *, const char *, int, int, const char *, const char *, int * );
 static AstMapping *NonLinSpecWcs( AstFitsChan *, char *, FitsStore *, int, char, AstSpecFrame *, const char *, const char *, int * );
 static AstMapping *OtherAxes( AstFitsChan *, AstFrameSet *, double *, int *, char, FitsStore *, double *, int *, const char *, const char *, int * );
-static AstMapping *SIPMapping( FitsStore *, char, int, const char *, const char *, int * );
+static AstMapping *SIPMapping( double *, FitsStore *, char, int, const char *, const char *, int * );
 static AstMapping *ZPXMapping( AstFitsChan *, FitsStore *, char, int, int[2], const char *, const char *, int * );
 static AstMapping *SpectralAxes( AstFitsChan *, AstFrameSet *, double *, int *, char, FitsStore *, double *, int *, const char *, const char *, int * );
 static AstMapping *TabMapping( AstFitsChan *, FitsStore *, char, int **, const char *, const char *, int *);
@@ -7672,6 +7672,7 @@ static void DistortMaps( AstFitsChan *this, FitsStore *store, char s,
    char dist[ 4 ];           /* Distortion code extracted from CTYPE */
    char msgbuf[ 250 ];       /* Buffer for warning message */
    char type[ 5 ];           /* Axis type extracted from CTYPE */
+   double *dim;              /* Array holding array dimensions */
    int found_axes[ 2 ];      /* Index of axes with the distortion code */
    int i;                    /* FITS axis index */
    int nfound;               /* No. of axes with the distortion code */
@@ -7686,6 +7687,16 @@ static void DistortMaps( AstFitsChan *this, FitsStore *store, char s,
 /* Check the global status. */
    if ( !astOK ) return;
 
+/* Allocate memory to hold the image dimensions. */
+   dim = (double *) astMalloc( sizeof(double)*naxes );
+   if( dim ){
+
+/* Note the image dimensions, if known. If not, store AST__BAD values. */
+      for( i = 0; i < naxes; i++ ){
+         if( !astGetFitsF( this, FormatKey( "NAXIS", i + 1, -1, ' ', status ),
+                           dim + i ) ) dim[ i ] = AST__BAD;
+      }
+
 /* First check each known distortion type... */
 
 /* "-SIP": Spitzer (http://irsa.ipac.caltech.edu/data/SPITZER/docs/files/spitzer/shupeADASS.pdf)
@@ -7696,51 +7707,51 @@ static void DistortMaps( AstFitsChan *this, FitsStore *store, char s,
    ctype string in order to exclude the distortion code (this is so that
    later functions do not need to allow for the possibility of a distortion
    code  being present in the CTYPE value)*/
-   ctype = GetItemC( &(store->ctype), 0, 0, s, NULL, method, class, status );
-   if( ctype && 3 == astSscanf( ctype, "%4s-%3s-%3s", type, code, dist ) ){
-      if( !strcmp( "SIP", dist ) ) {
-         ctype[ 8 ] = 0;
-         ctype = GetItemC( &(store->ctype), 1, 0, s, NULL, method, class, status );
-         if( ctype && 3 == astSscanf( ctype, "%4s-%3s-%3s", type, code, dist ) ){
-            if( !strcmp( "SIP", dist ) ) {
-               ctype[ 8 ] = 0;
+      ctype = GetItemC( &(store->ctype), 0, 0, s, NULL, method, class, status );
+      if( ctype && 3 == astSscanf( ctype, "%4s-%3s-%3s", type, code, dist ) ){
+         if( !strcmp( "SIP", dist ) ) {
+            ctype[ 8 ] = 0;
+            ctype = GetItemC( &(store->ctype), 1, 0, s, NULL, method, class, status );
+            if( ctype && 3 == astSscanf( ctype, "%4s-%3s-%3s", type, code, dist ) ){
+               if( !strcmp( "SIP", dist ) ) {
+                  ctype[ 8 ] = 0;
 
 /* Create a Mapping describing the distortion (other axes are passed
    unchanged by this Mapping), and add it in series with the returned map2
    (Spitzer distortion is applied to the translated pixel coordinates). */
-               tmap1 = SIPMapping( store, s, naxes, method, class, status );
-               if( ! *map2 ) {
-                  *map2 = tmap1;
-               } else {
-                  tmap2 = (AstMapping *) astCmpMap( *map2, tmap1, 1, "", status );
-                  *map2 = astAnnul( *map2 );
-                  tmap1 = astAnnul( tmap1 );
-                  *map2 = tmap2;
+                  tmap1 = SIPMapping( dim, store, s, naxes, method, class, status );
+                  if( ! *map2 ) {
+                     *map2 = tmap1;
+                  } else {
+                     tmap2 = (AstMapping *) astCmpMap( *map2, tmap1, 1, "", status );
+                     *map2 = astAnnul( *map2 );
+                     tmap1 = astAnnul( tmap1 );
+                     *map2 = tmap2;
+                  }
                }
             }
          }
       }
-   }
 
 /* Check that the "-SIP" code is not included in any axes other than axes
    0 and 1. Issue a warning if it is, and remove it. */
-   warned = 0;
-   for( i = 2; i < naxes; i++ ){
-      ctype = GetItemC( &(store->ctype), i, 0, s, NULL, method, class, status );
-      if( ctype && 3 == astSscanf( ctype, "%4s-%3s-%3s", type, code, dist ) ){
-         if( !strcmp( "SIP", dist ) ){
-            if( !warned ){
-               warned = 1;
-               sprintf( msgbuf, "The \"-SIP\" distortion code can only be "
-                        "used on axes 1 and 2, but was found in keyword "
-                        "%s (='%s'). The distortion will be ignored.",
-                        FormatKey( "CTYPE", i + 1, -1, ' ', status ),  ctype );
-               Warn( this, "distortion", msgbuf, method, class, status );
+      warned = 0;
+      for( i = 2; i < naxes; i++ ){
+         ctype = GetItemC( &(store->ctype), i, 0, s, NULL, method, class, status );
+         if( ctype && 3 == astSscanf( ctype, "%4s-%3s-%3s", type, code, dist ) ){
+            if( !strcmp( "SIP", dist ) ){
+               if( !warned ){
+                  warned = 1;
+                  sprintf( msgbuf, "The \"-SIP\" distortion code can only be "
+                           "used on axes 1 and 2, but was found in keyword "
+                           "%s (='%s'). The distortion will be ignored.",
+                           FormatKey( "CTYPE", i + 1, -1, ' ', status ),  ctype );
+                  Warn( this, "distortion", msgbuf, method, class, status );
+               }
+               ctype[ 8 ] = 0;
             }
-            ctype[ 8 ] = 0;
          }
       }
-   }
 
 /* "-ZPX": IRAF (http://iraf.noao.edu/projects/ccdmosaic/zpx.html)
    ============= */
@@ -7756,40 +7767,40 @@ static void DistortMaps( AstFitsChan *this, FitsStore *store, char s,
    ctype strings in order to exclude the distortion code (this is so that
    later functions do not need to allow for the possibility of a distortion
    code  being present in the CTYPE value)*/
-   nfound = 0;
-   for( i = 0; i < naxes; i++ ){
-      ctype = GetItemC( &(store->ctype), i, 0, s, NULL, method, class, status );
-      if( ctype && 3 == astSscanf( ctype, "%4s-%3s-%3s", type, code, dist ) ){
-         if( !strcmp( "ZPX", dist ) ){
-            if( nfound < 2 ) found_axes[ nfound ] = i;
-            nfound++;
-            ctype[ 8 ] = 0;
+      nfound = 0;
+      for( i = 0; i < naxes; i++ ){
+         ctype = GetItemC( &(store->ctype), i, 0, s, NULL, method, class, status );
+         if( ctype && 3 == astSscanf( ctype, "%4s-%3s-%3s", type, code, dist ) ){
+            if( !strcmp( "ZPX", dist ) ){
+               if( nfound < 2 ) found_axes[ nfound ] = i;
+               nfound++;
+               ctype[ 8 ] = 0;
+            }
          }
       }
-   }
 
 /* Issue a warning if more than two ZPX axes were found. */
-   if( nfound > 2 ) {
-      Warn( this, "distortion", "More than two axes were found "
-            "with the \"-ZPX\" projection code. A ZPN projection "
-            "will be used instead.", method, class, status );
+      if( nfound > 2 ) {
+         Warn( this, "distortion", "More than two axes were found "
+               "with the \"-ZPX\" projection code. A ZPN projection "
+               "will be used instead.", method, class, status );
 
 /* Otherwise, create a Mapping describing the distortion (other axes are passed
    unchanged by this Mapping), and add it in series with the returned map4
    (ZPX distortion is applied to the translated, rotated, scaled IWC
    coordinates). */
-   } else if( nfound == 2 ){
-      tmap1 = ZPXMapping( this, store, s, naxes,  found_axes, method,
-                          class, status );
-      if( ! *map4 ) {
-         *map4 = tmap1;
-      } else {
-         tmap2 = (AstMapping *) astCmpMap( *map4, tmap1, 1, "", status );
-         *map4 = astAnnul( *map4 );
-         tmap1 = astAnnul( tmap1 );
-         *map4 = tmap2;
+      } else if( nfound == 2 ){
+         tmap1 = ZPXMapping( this, store, s, naxes,  found_axes, method,
+                             class, status );
+         if( ! *map4 ) {
+            *map4 = tmap1;
+         } else {
+            tmap2 = (AstMapping *) astCmpMap( *map4, tmap1, 1, "", status );
+            *map4 = astAnnul( *map4 );
+            tmap1 = astAnnul( tmap1 );
+            *map4 = tmap2;
+         }
       }
-   }
 
 /* (There are currently no other supported distortion codes.) */
 
@@ -7799,38 +7810,42 @@ static void DistortMaps( AstFitsChan *this, FitsStore *store, char s,
    =================================================================== */
 
 /* Indicate that we have not yet issued a warning. */
-   warned = 0;
+      warned = 0;
 
 /* Do each IWC axis. */
-   for( i = 0; i < naxes; i++ ){
+      for( i = 0; i < naxes; i++ ){
 
 /* Get the CTYPE value for this axis. */
-      ctype = GetItemC( &(store->ctype), i, 0, s, NULL, method, class, status );
-      if( ctype ) {
+         ctype = GetItemC( &(store->ctype), i, 0, s, NULL, method, class, status );
+         if( ctype ) {
 
 /* See if has the "4-3-3" form described in FITS-WCS paper IV. */
-         if( 3 == astSscanf( ctype, "%4s-%3s-%3s", type, code, dist ) ){
+            if( 3 == astSscanf( ctype, "%4s-%3s-%3s", type, code, dist ) ){
 
 /* Add an ASTWARN card to the FitsChan. Only issue one warning (this avoids
    multiple warnings about the same distortion code in multiple CTYPE values). */
-            if( !warned ){
-               warned = 1;
-               sprintf( msgbuf, "The header contains CTYPE values (e.g. "
-                        "%s = '%s') which "
-                        "include a distortion code \"-%s\". AST "
-                        "currently ignores this distortion. The code "
-                        "has been removed from the CTYPE values.",
-                        FormatKey( "CTYPE", i + 1, -1, ' ', status ),  ctype, dist );
-               Warn( this, "distortion", msgbuf, method, class, status );
-            }
+               if( !warned ){
+                  warned = 1;
+                  sprintf( msgbuf, "The header contains CTYPE values (e.g. "
+                           "%s = '%s') which "
+                           "include a distortion code \"-%s\". AST "
+                           "currently ignores this distortion. The code "
+                           "has been removed from the CTYPE values.",
+                           FormatKey( "CTYPE", i + 1, -1, ' ', status ),  ctype, dist );
+                  Warn( this, "distortion", msgbuf, method, class, status );
+               }
 
 /* Terminate the CTYPE value in the FitsStore in order to exclude the distortion
    code. This means that later functions will not need to take account of
    distortion codes. */
-            ctype[ 8 ] = 0;
+               ctype[ 8 ] = 0;
+            }
          }
       }
    }
+
+/* Free resources. */
+   dim = astFree( dim );
 }
 
 static void DSBSetUp( AstFitsChan *this, FitsStore *store,
@@ -25511,8 +25526,9 @@ static void SinkWrap( void (* sink)( const char * ), const char *line, int *stat
    ( *sink )( line );
 }
 
-static AstMapping *SIPMapping( FitsStore *store, char s, int naxes,
-                               const char *method, const char *class, int *status ){
+static AstMapping *SIPMapping( double *dim, FitsStore *store, char s,
+                               int naxes, const char *method,
+                               const char *class, int *status ){
 /*
 *  Name:
 *     SIPMapping
@@ -25524,7 +25540,7 @@ static AstMapping *SIPMapping( FitsStore *store, char s, int naxes,
 *     Private function.
 
 *  Synopsis:
-*     AstMapping *SIPMapping( FitsStore *store, char s, int naxes,
+*     AstMapping *SIPMapping( double *dim, FitsStore *store, char s, int naxes,
 *                             const char *method, const char *class, int *status )
 
 *  Class Membership:
@@ -25542,6 +25558,9 @@ static AstMapping *SIPMapping( FitsStore *store, char s, int naxes,
 *     passed unchanged by the returned Mapping.
 
 *  Parameters:
+*     dim
+*        The dimensions of the array in pixels. AST__BAD is stored for
+*        each value if dimensions are not known.
 *     store
 *        A structure containing information about the requested axis
 *        descriptions derived from a FITS header.
@@ -25567,11 +25586,14 @@ static AstMapping *SIPMapping( FitsStore *store, char s, int naxes,
 /* Local Variables: */
    AstMapping   *ret;        /* Pointer to the returned Mapping */
    AstPolyMap *pmap;         /* PolyMap describing the distortion */
+   AstPolyMap *pmap2;        /* New PolyMap describing the distortion */
    double ****item;          /* Address of FitsStore item to use */
    double *c;                /* Pointer to start of coefficient description */
    double *coeff_f;          /* Array of coeffs. for forward transformation */
    double *coeff_i;          /* Array of coeffs. for inverse transformation */
    double cof;               /* Coefficient value */
+   double lbnd[ 2 ];         /* Lower bounds of fitted region */
+   double ubnd[ 2 ];         /* Upper bounds of fitted region */
    int def;                  /* Is transformation defined? */
    int iin;                  /* Input (u or v) index */
    int iout;                 /* Output (U or V) index */
@@ -25752,6 +25774,19 @@ static AstMapping *SIPMapping( FitsStore *store, char s, int naxes,
 /* Otherwise, create a PolyMap to describe axes 0 and 1. */
    } else {
       pmap = astPolyMap( 2, 2, ncoeff_f, coeff_f, ncoeff_i, coeff_i, "", status );
+
+/* If only one transformation was supplied, create the other by sampliong
+   the supplied transformation, and fitting a polynomial to the sampled
+   positions. */
+      if( ncoeff_f == 0 || ncoeff_i == 0 ){
+         lbnd[ 0 ] = 1.0;
+         lbnd[ 1 ] = 1.0;
+         ubnd[ 0 ] = dim[ 0 ] != AST__BAD ? dim[ 0 ] : 1000.0;
+         ubnd[ 1 ] = dim[ 1 ] != AST__BAD ? dim[ 1 ] : 1000.0;
+         pmap2 = astPolyTran( pmap, (ncoeff_f == 0), 0.001, lbnd, ubnd );
+         (void) astAnnul( pmap );
+         pmap = pmap2;
+      }
 
 /* Add the above Mapping in parallel with a UnitMap which passes any
    other axes unchanged. */
