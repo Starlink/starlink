@@ -5,15 +5,19 @@ source $CONVERT_DIR/convert.csh > /dev/null
 source $KAPPA_DIR/kappa.csh > /dev/null
 
 if ( $#argv != 3 ) then
-    echo sc2tsnoise: calculate SCUBA-2 time-series noise
+    echo "sc2tsnoise: calculate SCUBA-2 time-series noise (effective NEPs)"
     echo " "
-    echo usage:
+    echo "usage:"
     echo "    sc2tsnoise [obsdir.txt] [nepfile.txt] [outdir]"
     echo " "
-    echo parameters:
-    echo "    obsdir.txt  a text file with path to SCUBA-2 obs dirs on each line"
+    echo "parameters:"
+    echo "    obsdir.txt  a text file with path to SCUBA-2 obs dirs each line"
     echo "    nepfile.txt output text file containing NEPs etc."
     echo "    outdir      path to directory containing processed data"
+    echo " "
+    echo "example:"
+    echo "    ls -d /jcmtdata/raw/scuba2/s4a/2011????/0???? > s4a_obsdirs.txt"
+    echo "    sc2tsnoise s4a_obsdirs.txt s4a_effnep.txt s4afiles"
 
     goto done
 endif
@@ -29,12 +33,13 @@ setenv ADAM_NOPROMPT 1
 # ensure that failed ADAM task returns a status of 1
 setenv ADAM_EXIT 1
 
+# intialize output file/directories
 mkdir $outdir > /dev/null
 rm $outdir/* > /dev/null
 
 rm "$nepfile" > /dev/null
-echo SUBARR OBSDATE OBSNUM SUBSCAN TIMEDATE OBJECT SHUTTER DARKHEAT PIXHEAT ELSTART TAU_ST TAU_EN AIRMASS EFFNEP NBOLO MEANTRANS > $nepfile
-echo ------ ------- ------ ------- -------- ------ ------- -------- ------- ------- ------ ------ ------- ------ ----- --------- >> $nepfile
+echo SUBARR OBSDATE OBSNUM SUBSCAN TIMEDATE OBJECT SEQTYPE SHUTTER DARKHEAT PIXHEAT ELSTART TAU_ST TAU_EN AIRMASS EFFNEP NBOLO MEANTRANS > $nepfile
+echo ------ ------- ------ ------- -------- ------ ------- ------- -------- ------- ------- ------ ------ ------- ------ ----- --------- >> $nepfile
 
 # loop over all of the observation directories that were specified
 foreach obsdir ( `cat $filenames` )
@@ -73,7 +78,7 @@ foreach obsdir ( `cat $filenames` )
 
         # do several checks before trying to do measurement
         set ok = 1
-        set trans = "-1"
+        set meantrans = "-1"
 
         set thisndf = $obsdir/$subarr$obsdate\_$obsnum\_000$filenum
 
@@ -81,12 +86,16 @@ foreach obsdir ( `cat $filenames` )
         # figure out what type of file it is, and what the flatfield is
 
         if ( -e $thisndf.sdf ) then
-            set shutter = `fitsval $thisndf SHUTTER`
-            set seqtype = `fitsval $thisndf SEQ_TYPE`
-
             # if these failed the data are probably messed up
+            set shutter = `fitsval $thisndf SHUTTER`
             if ( $? != 0 ) then
-                echo Could not read FITS header of $thisndf
+                echo Could not read SHUTTER in FITS header of $thisndf
+                set ok = 0
+            endif
+
+            set seqtype = `fitsval $thisndf SEQ_TYPE`
+            if ( $? != 0 ) then
+                echo Could not read SEQ_TYPE in FITS header of $thisndf
                 set ok = 0
             endif
 
@@ -144,7 +153,7 @@ foreach obsdir ( `cat $filenames` )
                             echo Could not read dark flat $flatfile FITS header
                             set ok = 0
                         endif
-                     else
+                    else
                         echo Dark flat $flatfile does not exist
                         set ok = 0
                     endif
@@ -187,7 +196,9 @@ foreach obsdir ( `cat $filenames` )
                                 echo Could not read sky flat $flatfile FITS header
                                 set ok = 0
                             endif
-
+                        else
+                            echo Stepped sky flat $flatfile does not exist
+                            set ok = 0
                         endif
                     endif
 
@@ -198,31 +209,31 @@ foreach obsdir ( `cat $filenames` )
             # useful shutter open or closed data and a flatfield.
             if ( $ok == 1 ) then
                 set utdate = `fitsval $thisndf UTDATE`
-                if ( $? != 0 ) set utdate = -1
+                if ( ($? != 0) || ("$utdate" =~ "") ) set utdate = -1
 
                 set timedate = `fitsval $thisndf DATE-OBS`
-                if ( $? != 0 ) set timedate = -1
+                if ( ($? != 0) || ("$timedate" =~ "") ) set timedate = -1
 
                 set object = `fitsval $thisndf OBJECT | sed 's/ /_/g'`
-                if ( $? != 0 ) set object = -1
+                if ( ($? != 0) || ("$object" =~ "") ) set object = -1
 
                 set darkheat = `fitsval $thisndf DARKHEAT`
-                if ( $? != 0 ) set darkheat = -1
+                if ( ($? != 0) || ("$darkheat" =~ "") ) set darkheat = -1
 
                 set pixheat = `fitsval $thisndf PIXHEAT`
-                if ( $? != 0 ) set pixheat = -1
+                if ( ($? != 0) || ("$pixheat" =~ "") ) set pixheat = -1
 
                 set elstart = `fitsval $thisndf ELSTART`
-                if ( $? != 0 ) set elstart = -1
+                if ( ($? != 0) || ("$elstart" =~ "") ) set elstart = -1
 
                 set tau_st = `fitsval $thisndf WVMTAUST`
-                if ( $? != 0 ) set tau_st = -1
+                if ( ($? != 0) || ("$tau_st" =~ "") ) set tau_st = -1
 
                 set tau_en = `fitsval $thisndf WVMTAUEN`
-                if ( $? != 0 ) set tau_en = -1
+                if ( ($? != 0) || ("$tau_en" =~ "") ) set tau_en = -1
 
                 set airmass = `fitsval $thisndf AMSTART`
-                if ( $? != 0 ) set airmass = -1
+                if ( ($? != 0) || ("$airmass" =~ "") ) set airmass = -1
 
                 echo "$object : file $filenum"
                 echo "    shutter is $shutter"
@@ -233,7 +244,7 @@ foreach obsdir ( `cat $filenames` )
                 # make a local copy of the noise, using only first 2000 samples
                 # if shutter-open
 
-                if ( "$shutter" =~ "0" )  then
+                if ( "$shutter" =~ "0" ) then
                     cp $thisndf.sdf noise.sdf
                 else
                     ndfcopy "$thisndf(,,1:2000)" noise.sdf > /dev/null
@@ -271,7 +282,10 @@ foreach obsdir ( `cat $filenames` )
                         accept > /dev/null
 
                     set effnep = `parget effnep calcnoise`
+                    if ( $? != 0 ) set effnep = -1
+
                     set nbolo = `parget nepgoodbol calcnoise`
+                    if ( $? != 0 ) set nbolo = -1
 
                     if ( $? != 0 ) then
                         echo Could not calculate noise
@@ -280,6 +294,7 @@ foreach obsdir ( `cat $filenames` )
                         set nepname = `basename $thisndf`
                         set nepname = $outdir/$nepname\_nep
                         ndfcopy noise_nep.more.smurf.nep $nepname
+                    endif
                 endif
 
                 # calculate extinction from flatfielded data (to pick
@@ -300,6 +315,7 @@ foreach obsdir ( `cat $filenames` )
 
                         if ( $? == 0 ) then
                             set meantrans = `parget mean stats`
+                            if ( $? != 0 ) set meantrans = -1
                         else
                             echo Error running "KAPPA:STATS"
                             set ok = 0
@@ -318,14 +334,17 @@ foreach obsdir ( `cat $filenames` )
             if ( $ok == 1 ) then
                 if ( ("$shutter" =~ "1") && ( $havesky != 1 ) ) set havesky = 1
 
-                echo $subarr $obsdate $obsnum 000$filenum $timedate $object $shutter $darkheat $pixheat $elstart $tau_st $tau_en $airmass $effnep $nbolo $meantrans >> $nepfile
+                echo "    trans=$meantrans effNEP=$effnep"
+
+                echo $subarr $obsdate $obsnum 000$filenum $timedate $object $seqtype $shutter $darkheat $pixheat $elstart $tau_st $tau_en $airmass $effnep $nbolo $meantrans >> $nepfile
             endif
 
+        else
+            echo Data file $thisndf.sdf does not exist
         endif
     end
 
 end
 
 done:
-    exit 0
-
+exit 0
