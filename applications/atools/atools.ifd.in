@@ -1776,6 +1776,56 @@ iraf! {
           }
       }
 
+      action astpolytran {
+         helplib {$ATOOLS_HELP}
+         parameter acc {
+            position 3
+            type _DOUBLE
+            access READ
+            prompt {The required accuracy}
+            ppath CURRENT
+            helpkey *
+          }
+         parameter forward {
+            position 2
+            type _LOGICAL
+            access READ
+            prompt {Replace the forward transformation?}
+            ppath CURRENT
+            helpkey *
+          }
+         parameter lbnd {
+            position 4
+            type _DOUBLE
+            prompt {Lower bounds of fitting box}
+            ppath CURRENT
+            helpkey *
+          }
+         parameter result {
+            position 6
+            type LITERAL
+            prompt {Name of file in which to store the new PolyMap}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input PolyMap}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+         parameter ubnd {
+            position 5
+            type _DOUBLE
+            prompt {Upper bounds of fitting box}
+            ppath CURRENT
+            helpkey *
+          }
+      }
+
       action astrate {
          helplib {$ATOOLS_HELP}
          parameter at {

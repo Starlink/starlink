@@ -304,6 +304,9 @@
       ELSE IF ( NAME .EQ. 'ASTWCSMAP' ) THEN
          CALL ASTWCSMAP( STATUS )
 
+      ELSE IF ( NAME .EQ. 'ASTPOLYTRAN' ) THEN
+         CALL ASTPOLYTRAN( STATUS )
+
 *  If the action name is not recognised, then report an error.
       ELSE
          STATUS = SAI__ERROR

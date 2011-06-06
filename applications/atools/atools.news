@@ -9,6 +9,10 @@
  high-level interface to the AST library.
 
 
+  Changes in V1.9-9
+
+  - New command astpolytran.
+
   Changes in V1.9-8
 
   - New command astratemap.

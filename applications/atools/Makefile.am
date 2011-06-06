@@ -26,7 +26,7 @@ atools_mon_TASKS = astcopy astaddframe astclear astget astset asttest \
  astselectormap astinterval astbox astshowmesh astzoommap astdistance \
  astcircle astlinearapprox astnegate astremoveregion astdownsize \
  astoutline astrate astoverlap astmask asttrangrid astquadapprox \
- astratemap astwcsmap
+ astratemap astwcsmap astpolytran
 
 FSRC = \
  atl1_gtfrm.f \
