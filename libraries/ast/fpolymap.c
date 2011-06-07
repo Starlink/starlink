@@ -112,12 +112,16 @@ F77_INTEGER_FUNCTION(ast_polymap)( INTEGER(NIN),
 F77_INTEGER_FUNCTION(ast_polytran)( INTEGER(THIS),
                                     LOGICAL(FORWARD),
                                     DOUBLE(ACC),
+                                    DOUBLE(MAXACC),
+                                    INTEGER(MAXORDER),
                                     DOUBLE_ARRAY(LBND),
                                     DOUBLE_ARRAY(UBND),
                                     INTEGER(STATUS) ) {
    GENPTR_INTEGER(THIS)
    GENPTR_LOGICAL(FORWARD)
    GENPTR_DOUBLE(ACC)
+   GENPTR_DOUBLE(MAXACC)
+   GENPTR_INTEGER(MAXORDER)
    GENPTR_DOUBLE_ARRAY(LBND)
    GENPTR_DOUBLE_ARRAY(UBND)
    F77_INTEGER_TYPE(RESULT);
@@ -125,7 +129,7 @@ F77_INTEGER_FUNCTION(ast_polytran)( INTEGER(THIS),
    astAt( "AST_POLYTRAN", NULL, 0 );
    astWatchSTATUS(
       RESULT = astP2I( astPolyTran( astI2P( *THIS ), F77_ISTRUE( *FORWARD ),
-                                    *ACC, LBND, UBND ) );
+                                    *ACC, *MAXACC, *MAXORDER, LBND, UBND ) );
    )
    return RESULT;
 }

@@ -53,11 +53,15 @@
 *     of Y and P_f(X).
 *
 *     This fitting process is performed repeatedly with increasing
-*     polynomial orders (starting with quadratic) until the specified
-*     accuracy is achieved (up to a maximum of 20).
+*     polynomial orders (starting with quadratic) until the target
+*     accuracy is achieved, or a specified maximum order (MAXORDER) is
+*     reached. If the target accuracy cannot be achieved even with this
+*     maximum-order polynomial, the best fitting maximum-order polynomial
+*     is returned so long as its accuracy is better than MAXACC. If it is
+*     not, an error is reported.
 
 *  Usage:
-*     astpolytran this forward acc lbnd ubnd result
+*     astpolytran this forward acc maxacc maxorder lbnd ubnd result
 
 *  ADAM Parameters:
 *     ACC = DOUBLE (Given)
@@ -73,6 +77,14 @@
 *        FORWARD is TRUE). The new polynomial will be evaluated over this
 *        rectangle. The length of this array should equal the value of the
 *        PolyMap's Nin or Nout attribute, depending on FORWARD.
+*     MAXACC = DOUBLE (Read)
+*        The maximum allowed accuracy for an acceptable polynomial,
+*        expressed as a geodesic distance within the PolyMap's input
+*        space (if FORWARD is FALSE) or output space (if FORWARD is TRUE).
+*     MAXORDER = INTEGER (Read)
+*        The maximum allowed polynomial order. This is one more than the
+*        maximum power of either input axis. So for instance, a value of
+*        3 refers to a quadratic polynomial.
 *     RESULT = LITERAL (Read)
 *        A text file to receive the new PolyMap.
 *     THIS = LITERAL (Read)
@@ -133,9 +145,10 @@
       INTEGER STATUS
 
 *  Local Variables:
-      INTEGER THIS, NIN, RESULT
+      INTEGER THIS, NIN, RESULT, MAXORDER
       LOGICAL FORWRD
-      DOUBLE PRECISION ACC, LBND( NDF__MXDIM ), UBND( NDF__MXDIM )
+      DOUBLE PRECISION ACC, MAXACC, LBND( NDF__MXDIM ),
+     :                 UBND( NDF__MXDIM )
 *.
 
 *  Check inherited status.
@@ -158,12 +171,19 @@
 *  Get the ACC parameter.
       CALL PAR_GET0D( 'ACC', ACC, STATUS )
 
+*  Get the MAXACC parameter.
+      CALL PAR_GET0D( 'MAXACC', MAXACC, STATUS )
+
+*  Get the MAXORDER parameter.
+      CALL PAR_GET0I( 'MAXORDER', MAXORDER, STATUS )
+
 *  Get the lower and upper input limits.
       CALL PAR_EXACD( 'LBND', NIN, LBND, STATUS )
       CALL PAR_EXACD( 'UBND', NIN, UBND, STATUS )
 
 *  Create the new PolyMap.
-      RESULT = AST_POLYTRAN( THIS, FORWRD, ACC, LBND, UBND, STATUS )
+      RESULT = AST_POLYTRAN( THIS, FORWRD, ACC, MAXACC, MAXORDER, LBND,
+     :                       UBND, STATUS )
 
 *  Write the results out to a text file.
       CALL ATL1_PTOBJ( 'RESULT', ' ', RESULT, STATUS )

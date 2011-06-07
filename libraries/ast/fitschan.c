@@ -25783,7 +25783,8 @@ static AstMapping *SIPMapping( double *dim, FitsStore *store, char s,
          lbnd[ 1 ] = 1.0;
          ubnd[ 0 ] = dim[ 0 ] != AST__BAD ? dim[ 0 ] : 1000.0;
          ubnd[ 1 ] = dim[ 1 ] != AST__BAD ? dim[ 1 ] : 1000.0;
-         pmap2 = astPolyTran( pmap, (ncoeff_f == 0), 0.001, lbnd, ubnd );
+         pmap2 = astPolyTran( pmap, (ncoeff_f == 0), 0.001, 1.0, 10, lbnd,
+                              ubnd );
          (void) astAnnul( pmap );
          pmap = pmap2;
       }

@@ -17,9 +17,14 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
+/* define astCLASS so that the AST error reporting module does not
+   consider this file to be an external file, and so report line numbers
+   within levmar.c when issuing error reports. */
+#define astCLASS levmar
 
 #include <float.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 
 #include "memory.h"
@@ -99,13 +104,14 @@ int dlevmar_der (
    double tau, eps1, eps2, eps2_sq, eps3;
    double init_p_eL2;
    int nu = 2, nu2, stop = 0, nfev, njev = 0, nlss = 0;
+   int *status = astGetStatusPtr;
    const int nm = n * m;
    int (*linsolver) (double *A, double *B, double *x, int m) = NULL;
    mu = jacTe_inf = 0.0; /* -Wall */
 
    if (n < m) {
       astError( AST__LEVMAR, "dlevmar_der: cannot solve a problem with "
-                "fewer measurements [%d] than unknowns [%d]", n, m );
+                "fewer measurements [%d] than unknowns [%d]", status, n, m );
       return -1;
    }
 
@@ -113,7 +119,7 @@ int dlevmar_der (
       astError( AST__LEVMAR, "dlevmar_der: No function specified for "
                 "computing the Jacobian in dlevmar_der().\nIf no such "
                 "function is available, use dlevmar_dif() rather than "
-                "dlevmar_der()" );
+                "dlevmar_der()", status );
       return -1;
    }
 
@@ -137,7 +143,7 @@ int dlevmar_der (
 
 /* allocate a big chunk in one step */
       if (!work) {
-         astError( AST__LEVMAR, "dlevmar_der: memory allocation request failed." );
+         astError( AST__LEVMAR, "dlevmar_der: memory allocation request failed.", status );
          return -1;
       }
       freework = 1;
@@ -703,6 +709,7 @@ static int dlevmar_LUinverse_noLapack(double *A,double *B, int m) {
    register int i, j, k, l;
    int *idx, maxi = -1, idx_sz, a_sz, x_sz, work_sz, tot_sz;
    double *a, *x, *work, max, sum, tmp;
+   int *status = astGetStatusPtr;
 
 /* calculate required memory size */
    idx_sz = m;
@@ -715,7 +722,7 @@ static int dlevmar_LUinverse_noLapack(double *A,double *B, int m) {
    buf_sz = tot_sz;
    buf = (void *) astMalloc(tot_sz);
    if (!buf) {
-      astError( AST__LEVMAR, "memory allocation in dlevmar_LUinverse_noLapack() failed!");
+      astError( AST__LEVMAR, "memory allocation in dlevmar_LUinverse_noLapack() failed!", status );
       return 0;
    }
    a = buf;
@@ -734,7 +741,7 @@ static int dlevmar_LUinverse_noLapack(double *A,double *B, int m) {
          if ((tmp = (((a[i * m + j]) >= 0.0) ? (a[i * m + j]) : -(a[i * m + j]))) > max) max = tmp;
 
       if (max == 0.0) {
-         astError( AST__LEVMAR, "Singular matrix A in dlevmar_LUinverse_noLapack()!");
+         astError( AST__LEVMAR, "Singular matrix A in dlevmar_LUinverse_noLapack()!", status );
          buf = astFree(buf);
         return 0;
       }
@@ -829,6 +836,7 @@ static int dAx_eq_b_LU_noLapack(double *A, double *B,double *x, int m) {
    register int i, j, k;
    int *idx, maxi = -1, idx_sz, a_sz, work_sz, tot_sz;
    double *a, *work, max, sum, tmp;
+   int *status = astGetStatusPtr;
 
    if (!A) {
       buf = astFree(buf);
@@ -852,7 +860,7 @@ static int dAx_eq_b_LU_noLapack(double *A, double *B,double *x, int m) {
       buf_sz = tot_sz;
       buf = (void *) astMalloc(tot_sz);
       if (!buf) {
-         astError( AST__LEVMAR, "memory allocation in " "dAx_eq_b_LU_noLapack() failed!");
+         astError( AST__LEVMAR, "memory allocation in dAx_eq_b_LU_noLapack() failed!", status );
          return 0;
       }
    }
@@ -883,7 +891,7 @@ static int dAx_eq_b_LU_noLapack(double *A, double *B,double *x, int m) {
       max = 0.0;
       for (j = 0; j < m; ++j) if ((tmp = (((a[i * m + j]) >= 0.0) ? (a[i * m + j]) : -(a[i * m + j]))) > max) max = tmp;
       if (max == 0.0) {
-         astError( AST__LEVMAR, "Singular matrix A in dAx_eq_b_LU_noLapack()!");
+         astError( AST__LEVMAR, "Singular matrix A in dAx_eq_b_LU_noLapack()!", status );
          return 0;
       }
       work[i] = (1.0) / max;

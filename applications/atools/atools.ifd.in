@@ -1782,7 +1782,7 @@ iraf! {
             position 3
             type _DOUBLE
             access READ
-            prompt {The required accuracy}
+            prompt {The target accuracy}
             ppath CURRENT
             helpkey *
           }
@@ -1795,14 +1795,30 @@ iraf! {
             helpkey *
           }
          parameter lbnd {
-            position 4
+            position 6
             type _DOUBLE
             prompt {Lower bounds of fitting box}
             ppath CURRENT
             helpkey *
           }
+         parameter maxacc {
+            position 4
+            type _DOUBLE
+            access READ
+            prompt {The maximum allowed accuracy}
+            ppath CURRENT
+            helpkey *
+          }
+         parameter maxorder {
+            position 5
+            type _INTEGER
+            access READ
+            prompt {The maximum polynomial order}
+            ppath CURRENT
+            helpkey *
+          }
          parameter result {
-            position 6
+            position 8
             type LITERAL
             prompt {Name of file in which to store the new PolyMap}
             ppath DYNAMIC CURRENT
@@ -1818,7 +1834,7 @@ iraf! {
             helpkey *
           }
          parameter ubnd {
-            position 5
+            position 7
             type _DOUBLE
             prompt {Upper bounds of fitting box}
             ppath CURRENT
