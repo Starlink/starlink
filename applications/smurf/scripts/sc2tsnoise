@@ -4,15 +4,38 @@ source $SMURF_DIR/smurf.csh > /dev/null
 source $CONVERT_DIR/convert.csh > /dev/null
 source $KAPPA_DIR/kappa.csh > /dev/null
 
-if ( ($#argv < 3) || ($#argv > 4) ) then
+if ( ($#argv < 3) || ($#argv > 5) ) then
     echo "sc2tsnoise: calculate SCUBA-2 time-series noise (effective NEPs)"
     echo " "
     echo "usage:"
-    echo "    sc2tsnoise <obsdir.txt> <nepfile.txt> <outdir> [-pspec]"
+    echo "    sc2tsnoise <obsdir.txt> <nepfile.txt> <outdir> [-pspec] [-clean]"
     echo " "
     echo "parameters:"
     echo "    obsdir.txt  a text file with path to SCUBA-2 obs dirs each line"
     echo "    nepfile.txt output text file containing effective NEPs etc."
+    echo "    outdir      directory to store intermediate files (NEP maps etc.)"
+    echo "    -pspec      if set write noise power spectra to <outdir>"
+    echo "    -clean      if set clean <outdir> before starting"
+    echo " "
+    echo "notes:"
+    echo " o <nepfile.txt> is rewritten each time the script is executed, so"
+    echo "   be sure to make a copy if you care about the results of a long"
+    echo "   run before re-starting!"
+    echo " o a single flatfield may be used for multiple noise observations,"
+    echo "   so if you run the script multiple times you can save some"
+    echo "   execution time if you _don't_ set -clean, since the old flatfield"
+    echo "   will be cached in <outdir>"
+    echo " o the script just checks the first 4 files (subscans) for"
+    echo "   shutter-closed and shutter-open files suitable for noise"
+    echo "   measurements. It will only reduce one shutter-open file, but"
+    echo "   it will reduce multiple shutter-closed files."
+    echo " o to improve execution time only the first 2000 samples (10s)"
+    echo "   of each subscan are analyzed. This should be fine since we"
+    echo "   are only measuring the 2--20 Hz noise level."
+    echo " "
+    echo "example:"
+    echo "    ls -d /jcmtdata/raw/scuba2/s4?/2011????/0???? > obsdir.txt"
+    echo "    sc2tsnoise obsdir.txt effnep_450_2011.txt out"
     echo " "
 
     goto done
@@ -23,10 +46,23 @@ set filenames = $1   # file with path names to observations
 set nepfile = $2     # name of text file to store NEPs
 set outdir = $3      # name of subdir to but output files
 
+shift
+shift
+shift
+
 set writepspec = 0   # write out power spectra?
-if ( $#argv == 4 ) then
-    if ( "$4" =~ "-pspec" ) set writepspec = 1
-endif
+set cleanout = 0     # clean outdir before starting?
+
+while ( $# > 0 )
+    set arg = $1
+    shift
+
+    if ( "$arg" =~ "-pspec" ) then
+        set writepspec = 1
+    else if ( "$arg" =~ "-clean" ) then
+        set cleanout = 1
+    endif
+end
 
 # ensure ADAM tasks fail rather than prompting
 setenv ADAM_NOPROMPT 1
@@ -35,12 +71,15 @@ setenv ADAM_NOPROMPT 1
 setenv ADAM_EXIT 1
 
 # intialize output file/directories
-mkdir $outdir > /dev/null
-rm $outdir/* > /dev/null
+if ( ! -e $outdir ) then
+    mkdir $outdir > /dev/null
+else if ( $cleanout == 1 ) then
+    rm $outdir/*
+endif
 
 if ( -e "$nepfile" ) rm "$nepfile" > /dev/null
-echo SUBARR OBSDATE OBSNUM SUBSCAN TIMEDATE EFFNEP NBOLO MEANTRANS OBJECT SEQTYPE SHUTTER DARKHEAT PIXHEAT ELSTART TAU_ST TAU_EN AIRMASS WEIGHTRESP > $nepfile
-echo ------ ------- ------ ------- -------- ------ ----- --------- ------ ------- ------- -------- ------- ------- ------ ------ ------- ---------- >> $nepfile
+echo SUBARR OBSDATE OBSNUM SUBSCAN TIMEDATE EFFNEP NBOLO MEANTRANS OBJECT SEQTYPE SHUTTER DARKHEAT PIXHEAT ELSTART TAU_ST TAU_EN AIRMASS WEIGHTRESP WEIGHTNEP > $nepfile
+echo ------ ------- ------ ------- -------- ------ ----- --------- ------ ------- ------- -------- ------- ------- ------ ------ ------- ---------- --------- >> $nepfile
 
 # loop over all of the observation directories that were specified
 foreach obsdir ( `cat $filenames` )
@@ -55,6 +94,7 @@ foreach obsdir ( `cat $filenames` )
     if (-e trans.sdf) rm trans.sdf > /dev/null
     if (-e invvar.sdf) rm invvar.sdf > /dev/null
     if (-e respweight.sdf) rm respweight.sdf > /dev/null
+    if (-e nepweight.sdf) rm nepweight.sdf > /dev/null
 
     # obtain the obs num, date and subarray from obsdir
     set obsnum = `basename $obsdir`
@@ -252,13 +292,9 @@ foreach obsdir ( `cat $filenames` )
                 echo "    flat is $flatfile"
 
                 # make a local copy of the noise, using only first 2000 samples
-                # if shutter-open
+                # which should be plenty to just measure a white-noise level
 
-                if ( "$shutter" =~ "0" ) then
-                    cp $thisndf.sdf noise.sdf
-                else
-                    ndfcopy "$thisndf(,,1:2000)" noise.sdf > /dev/null
-                endif
+                ndfcopy "$thisndf(,,1:2000)" noise.sdf > /dev/null
                 chmod u+w noise.sdf
 
                 # calculate flatfield if needed
@@ -316,12 +352,6 @@ foreach obsdir ( `cat $filenames` )
                         pow $nepndf -2 invvar > /dev/null
                         mult $respndf invvar respweight > /dev/null
 
-                        # terrible kludge due to prevision of KAPPA:CALC...
-                        cmult invvar 1d-30 temp1
-                        cmult respweight 1d-30 temp2
-                        mv temp1.sdf invvar.sdf
-                        mv temp2.sdf respweight.sdf
-
                         stats respweight > /dev/null
                         set sumrespweight = `parget total stats`
                         if ( $? != 0 ) set sumrespweight = -1
@@ -331,8 +361,18 @@ foreach obsdir ( `cat $filenames` )
                         if ( $? != 0 ) set suminvvar = 1
 
                         set weightresp = \
-                        `calc "pa/pb" pa=$sumrespweight pb=$suminvvar`
+                        `calc "pa/pb" pa=$sumrespweight pb=$suminvvar prec=_d`
                         if ( $? != 0 ) set weightresp = -1
+
+                        # similarly calculate inverse-noise^2 weighted NEP
+                        mult $nepndf invvar nepweight > /dev/null
+                        stats nepweight > /dev/null
+                        set sumnepweight = `parget total stats`
+                        if ( $? != 0 ) set sumnepweight = -1
+
+                        set weightnep = \
+                        `calc "pa/pb" pa=$sumnepweight pb=$suminvvar prec=_d`
+                        if ( $? != 0 ) set weightnep = -1
 
                     endif
                 endif
@@ -376,11 +416,9 @@ foreach obsdir ( `cat $filenames` )
 
                 echo "    trans=$meantrans effNEP=$effnep"
 
-                echo $subarr $obsdate $obsnum 000$filenum $timedate $effnep $nbolo $meantrans $object $seqtype $shutter $darkheat $pixheat $elstart $tau_st $tau_en $airmass $weightresp >> $nepfile
+                echo $subarr $obsdate $obsnum 000$filenum $timedate $effnep $nbolo $meantrans $object $seqtype $shutter $darkheat $pixheat $elstart $tau_st $tau_en $airmass $weightresp $weightnep >> $nepfile
             endif
 
-        else
-            echo Data file $thisndf.sdf does not exist
         endif
     end
 
