@@ -217,7 +217,7 @@ void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status ) {
   }
 
   /* Convert the units and labels of the axes using AST */
-  if( data->hdr && power ) {
+  if( data->hdr && power && (data->hdr->units[0] != '\0') ) {
     AstFrame *unitframe = NULL;
     char newunits[SMF__CHARLABEL];
     char label[SMF__CHARLABEL];
