@@ -291,10 +291,16 @@ foreach obsdir ( `cat $filenames` )
                 echo "    noise is $thisndf"
                 echo "    flat is $flatfile"
 
-                # make a local copy of the noise, using only first 2000 samples
-                # which should be plenty to just measure a white-noise level
+                # make a local copy of the noise, using only first
+                # 2000 samples (or full length if shorter) which
+                # should be plenty to just measure a white-noise level
 
-                ndfcopy "$thisndf(,,1:2000)" noise.sdf > /dev/null
+                ndftrace $thisndf > /dev/null
+                set len = 2000
+                set maxlen = `parget dims ndftrace | awk '{split($0,a," "); print a[3]}'`
+                if ( $maxlen < $len ) set len = $maxlen
+
+                ndfcopy "$thisndf(,,1:$len)" noise.sdf > /dev/null
                 chmod u+w noise.sdf
 
                 # calculate flatfield if needed
