@@ -139,7 +139,7 @@ static double smf__find_utc( const smfHead *hdr, int first, int *status) {
       astSet( tf, "TimeOrigin=MJD %.*g", DBL_DIG, (hdr->allState)[index].rts_end);
       astSet( tf, "TimeScale=UTC" ); /* we need UTC */
 
-    } else if (hdr->fitshdr) {
+  } else if (hdr->fitshdr) {
       /* look for DATE-OBS */
       char iso[81];
       const char * fitscard = NULL;
@@ -152,14 +152,17 @@ static double smf__find_utc( const smfHead *hdr, int first, int *status) {
       smf_fits_getS( hdr, fitscard, iso, sizeof(iso), status );
       astSet( tf, "TimeOrigin=%s", iso );
 
-    } else {
+  } else {
       *status = SAI__ERROR;
       errRep( " ","Can not find date of observation without FITS header "
               "or JCMTSTATE extension", status );
-    }
+  }
 
-    /* now read back the TimeOrigin as an MJD */
-    if (*status == SAI__OK) utc = astGetD( tf, "TimeOrigin" );
+  /* now read back the TimeOrigin as an MJD */
+  if (*status == SAI__OK) utc = astGetD( tf, "TimeOrigin" );
 
-    return utc;
+  /* Clean up */
+  tf = astAnnul( tf );
+
+  return utc;
 }
