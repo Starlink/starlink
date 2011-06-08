@@ -480,6 +480,7 @@ void smurf_calcnoise( int *status ) {
         smfData *thedata = concat->sdata[idx];
         smfData *outdata = NULL;
         smfData *ratdata = NULL;
+        double raw2current;
         smfData *powdata = NULL;
         int do_nep = 1;
         char noiseunits[SMF__CHARLABEL];
@@ -491,12 +492,15 @@ void smurf_calcnoise( int *status ) {
           break;
         }
 
+        /* Get the raw to current conversion factor */
+        raw2current = smf_raw2current( thedata->hdr, status );
+
         /* Convert the data to amps if we have DAC units. Else leave them
            alone. */
         if ( strncmp(thedata->hdr->units, "adu", 3) == 0) {
           msgOutiff( MSG__VERB, "", "Scaling data from '%s' to amps",
                      status, thedata->hdr->units );
-          smf_scalar_multiply( thedata, RAW2CURRENT, status );
+          smf_scalar_multiply( thedata, raw2current, status );
           smf_set_clabels( NULL, NULL, SIPREFIX "A", thedata->hdr, status );
         } else {
           do_nep = 0;
@@ -576,7 +580,7 @@ void smurf_calcnoise( int *status ) {
               smf_flatmeth flatmethod;
               smf_flat_override( flatramps, thedata, status );
               smf_flat_smfData( thedata, &flatmethod, &powval, &bolval, status );
-              ngood = smf_flat_responsivity( flatmethod, respmap, 5.0, 1, powval, bolval, NULL, status);
+              ngood = smf_flat_responsivity( flatmethod, respmap, 5.0, 1, powval, bolval, raw2current, NULL, status);
               if (powval) smf_close_file( &powval, status );
               if (bolval) smf_close_file( &bolval, status );
             }

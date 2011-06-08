@@ -399,6 +399,8 @@
  *        Add smf_downsamp_smfData
  *     2010-10-06 (RPT)
  *        Added smf_dataOrder_ndims.c
+ *     2011-06-08 (EC)
+ *        Add smf_raw2current.c
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -1114,7 +1116,7 @@ void smf_flat_precondition( int allbad, smfData * powvald, smfData * bolvald,
 
 size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snrmin, size_t order,
                                const smfData * powval, const smfData * bolval,
-                               smfData ** polyfit, int *status );
+                               double raw2current, smfData ** polyfit, int *status );
 
 void smf_flat_smfData ( const smfData *data, smf_flatmeth * flatmethod,
                         smfData ** powval, smfData **bolval,
@@ -1460,6 +1462,8 @@ void smf_qualstats_report( msglev_t msglev, smf_qfam_t qfamily, int nopad,
 
 double smf_quick_noise( const smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
                         smf_qual_t mask, int *status );
+
+double smf_raw2current( smfHead *hdr, int *status );
 
 AstMapping *smf_rebin_totmap( smfData *data, dim_t itime,
                               AstSkyFrame *abskyfrm,

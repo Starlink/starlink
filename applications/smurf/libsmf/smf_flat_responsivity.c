@@ -15,7 +15,7 @@
 *  Invocation:
 *     size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snrmin,
 *                                    size_t order, const smfData * powval, const smfData * bolval,
-*                                    smfData ** polyfit, int *status );
+*                                    double raw2current, smfData ** polyfit, int *status );
 
 *  Arguments:
 *     method = smf_flatmeth (Given)
@@ -37,6 +37,8 @@
 *        Response of each bolometer to powval. Dimensioned as number of
 *        number of bolometers (size of respmap) times number of heater
 *        measurements (size of powval).
+*     raw2current = double (Given)
+*        The conversion from raw DAC units to current units
 *     polyfit = smfData ** (Returned)
 *        If a polynomial is being fitted this is the polynomial expansion
 *        for each powval coordinate for direct comparison with "bolval".
@@ -57,11 +59,11 @@
 
 *  Notes:
 *     - powval and bolval are calculated by smf_flat_standardpow.
-*     - "RAW2CURRENT" converts raw (10 or 20 kHz) data numbers to
+*     - "raw2current" converts raw (10 or 20 kHz) data numbers to
 *       current through a TES
 *     - The MCE firmware low-pass filters the raw data and subsamples
 *       down to 200 Hz. This filtering is the reason for the "mcepass"
-*       factor included in the RAW2CURRENT macro.
+*       factor included in raw2current returned by smf_raw2current.
 *     - The bolometers are nominally supposed to have a responsivity
 *       of -1.0e6 Amps/Watt.
 *     - Does not attempt to "pre-condition" TABLE data. Assumption
@@ -71,6 +73,7 @@
 *     BDK: Dennis Kelly (UKATC)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 *     COBA: Coskun Oba (UoL)
+*     EC: Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -100,10 +103,13 @@
 *        Updated smf_construct_smfData which now contains smfFts
 *     2011-04-15 (TIMJ):
 *        Lower MINRESP by an order of magnitude.
+*     2011-06-08 (EC):
+*        Add raw2current to API
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2007-2011 Science and Technology Facilities Council.
+*     Copyright (C) 2011 University of British Columbia
 *     All Rights Reserved.
 
 *  Licence:
@@ -139,7 +145,7 @@
 
 size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snrmin,
                                size_t order, const smfData * powvald, const smfData * bolvald,
-                               smfData ** polyfit, int *status ) {
+                               double raw2current, smfData ** polyfit, int *status ) {
 
   size_t bol;                  /* Bolometer offset into array */
   double * bolv = NULL;        /* Temp space for bol values */
@@ -226,11 +232,11 @@ size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snr
       for (k = 0; k < nheat; k++) {
         if ( bolval[k*nbol+bol] != VAL__BADD &&
              powval[k] != VAL__BADD) {
-          bolv[nrgood] = RAW2CURRENT * bolval[k*nbol+bol];
+          bolv[nrgood] = raw2current * bolval[k*nbol+bol];
           powv[nrgood] = powval[k];
           if (bolvv) {
             if  (bolvalvar[k*nbol+bol] != VAL__BADD) {
-              bolvv[nrgood] = bolvalvar[k*nbol+bol] * pow(RAW2CURRENT,2);
+              bolvv[nrgood] = bolvalvar[k*nbol+bol] * pow(raw2current,2);
             } else {
               bolvv[nrgood] = VAL__BADD;
             }
@@ -286,7 +292,7 @@ size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snr
         if (polybol) {
           for (k=0; k<nrgood; k++) {
             size_t idx = goodidx[k];
-            polybol[idx*nbol+bol] = poly[k] / (RAW2CURRENT);
+            polybol[idx*nbol+bol] = poly[k] / (raw2current);
           }
         }
 
@@ -329,7 +335,7 @@ size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snr
         resp = 1.0 / fabs(resp);
 
         /* That gradient is DAC/W and we want A/W */
-        resp *= RAW2CURRENT;
+        resp *= raw2current;
 
         /* can not do a signal-to-noise clip */
         if ( resp > MAXRESP || resp < MINRESP ) {

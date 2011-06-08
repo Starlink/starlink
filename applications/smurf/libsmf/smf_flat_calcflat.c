@@ -69,7 +69,6 @@
 
 *  Notes:
 
-
 *  History:
 *     2010-03-09 (TIMJ):
 *        Initial version
@@ -231,6 +230,7 @@ smf_flat_calcflat( msglev_t msglev, const char flatname[],
   /* Calculate the responsivity in Amps/Watt (using the supplied
      signal-to-noise ratio minimum */
   ngood = smf_flat_responsivity( flatmeth, respmap, snrmin, 1, powref, bolref,
+                                 smf_raw2current( flatdata->hdr, status ),
                                  (flatmeth == SMF__FLATMETH_TABLE ? &flatpoly : NULL), status );
 
   /* Report the number of good responsivities and allow the caller

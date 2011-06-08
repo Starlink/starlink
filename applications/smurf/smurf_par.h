@@ -28,6 +28,7 @@
  *  Authors:
  *     Andy Gibb (UBC)
  *     Tim Jenness (JAC, Hawaii)
+ *     Ed Chapin (UBC)
  *     {enter_new_authors_here}
 
  *  History:
@@ -52,12 +53,14 @@
  *        for the resistors.
  *     2011-04-08 (TIMJ):
  *        Use correct DTOI value.
+ *     2011-06-08 (EC):
+ *        RAW2CURRENT is no longer a constant, moved to smf_raw2current.c
  *     {enter_further_changes_here}
 
  *  Copyright:
  *     Copyright (C) 2008-2011 Science and Technology Facilities Council.
  *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
- *     University of British Columbia.
+ *     Copyright (C) 2005,2006,2011 University of British Columbia.
  *     All Rights Reserved.
 
  *  Licence:
@@ -189,23 +192,23 @@ error can not determine PI
 
 /* SI prefix and multiplied for output data. Used for Watts and Amps calculations
   Set to 1e12 if you want all output in pico amps and pico watts.
-  Set to 1.0 if you want Watts or Amps. */
+  Set to 1.0 if you want Watts or Amps.
+
+  Note that we convert raw DAC numbers both to current and power units:
+  - include factor for MCE low-pass filter
+  - convert everything to pA and pW (Since that is what
+   Wayne uses).
+
+   MCE * (DAC->Amps) * (Amps->pico Amps )
+
+   For the conversion call smf_raw2current
+ */
+
 #define SIPREFIX "p"
 #define SIMULT   1.0e12
 
 /* Heater circuit constant for converting D/A setting to Amps */
 
 #define SC2FLAT__DTOI (24.71e-6/65536)
-
-/* Convert raw DAC numbers to current
-   - include factor for MCE low-pass filter
-   - convert everything to pA and pW (Since that is what
-   Wayne uses).
-
-    MCE * (DAC->Amps) * (Amps->pico Amps )
- */
-
-static const double RAW2CURRENT = SIMULT * 3.3 * 1.52e-13;
-
 
 #endif /* SMURF_PAR_DEFINED */

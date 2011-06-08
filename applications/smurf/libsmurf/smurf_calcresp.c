@@ -180,7 +180,7 @@ void smurf_calcresp( int *status ) {
       smfData * bolval;
       smf_flatmeth flatmethod;
       smf_flat_smfData( idata, &flatmethod, &powval, &bolval, status );
-      ngood[i-1] = smf_flat_responsivity( flatmethod, respmap, snrmin, 1, powval, bolval, NULL, status );
+      ngood[i-1] = smf_flat_responsivity( flatmethod, respmap, snrmin, 1, powval, bolval, smf_raw2current( idata->hdr, status ), NULL, status );
       if (powval) smf_close_file( &powval, status );
       if (bolval) smf_close_file( &bolval, status );
 

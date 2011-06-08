@@ -293,6 +293,7 @@ smf_qualstats.c \
 smf_qualstats_model.c \
 smf_qualstats_report.c \
 smf_quick_noise.c \
+smf_raw2current.c \
 smf_rebin_totmap.c \
 smf_rebincube.c \
 smf_rebincube_ast.c \
