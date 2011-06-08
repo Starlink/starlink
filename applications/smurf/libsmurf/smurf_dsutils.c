@@ -2005,7 +2005,8 @@ static int SaveBoloMapping( const char *param, smfData *data, int *status ){
    slice is found. */
    for( itime = data->dims[ 2 ]/2; itime <  data->dims[ 2 ]; itime++ ) {
 
-/* Get the WCS FrameSet describing the time slice */
+/* Get the WCS FrameSet describing the time slice. Current frame is AZEL
+   at the epoch of the time slice. */
       smf_tslice_ast( data, itime, 1, status );
       swcsin = data->hdr->wcs;
 
@@ -2024,7 +2025,7 @@ static int SaveBoloMapping( const char *param, smfData *data, int *status ){
       }
    }
 
-/* If the current Frame (the SkyFrame) currrently represents absolute
+/* If the current Frame (the AZEL SkyFrame) currrently represents absolute
    coords, temporarily set it to represent offset coords. */
    skyrefis = astGetC( swcsin, "SkyRefIs" );
    if( skyrefis && strcmp( skyrefis, "Origin" ) ) {

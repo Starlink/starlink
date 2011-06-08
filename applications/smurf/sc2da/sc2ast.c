@@ -165,9 +165,10 @@ int *status             /* global status (given and returned) */
 )
 /* Method :
      Build an AST frameset containing mappings from the original GRID
-     coordinates of the bolometers to celestial coordinates. This
-     includes the rotations and reflections relevant to each subarray and
-     the distortion imposed by the SCUBA-2 optics.
+     coordinates of the bolometers to celestial coordinates (AZEL at the
+     epoch of the time slice). This includes the rotations and reflections
+     relevant to each subarray and the distortion imposed by the SCUBA-2
+     optics.
 
      In addition to the base (GRID) Frame and the current (SKY) Frame,
      the returned FrameSet also contains a Frame with Domain FPLANE
@@ -1607,10 +1608,7 @@ int *status             /* global status (given and returned) */
               DBL_DIG, dut1 );
 
 /* Now modify the cached FrameSet to use the new Mapping and SkyFrame.
-   First remove any existing SKY Frame and then add in the new one. Note,
-   we add a copy of the SkyFrame rather than the cached SkyFrame itself
-   since the SkyFrame contained in the FrameSet will be modified by later
-   functions.  */
+   First remove any existing SKY Frame and then add in the new one. */
       if( nfrm >= SKY_IFRAME ) astRemoveFrame( cache->frameset[ subnum ],
                                                SKY_IFRAME );
       astAddFrame( cache->frameset[ subnum ], GRID_IFRAME, mapping,
