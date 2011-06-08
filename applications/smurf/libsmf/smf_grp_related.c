@@ -546,6 +546,13 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
 
   }
 
+  /* If no useful chunks generate an error */
+  if( (*status==SAI__OK) && (!nkeep) ) {
+    *status = SAI__ERROR;
+    errRep( "", FUNC_NAME ": No useful chunks.", status );
+    goto CLEANUP;
+  }
+
   /* Allocate a subgroup array of the right size and fill it. They keymap
      is sorted by date (and wavelength) so we can always index into it by using
      indices from the subgroup. */
