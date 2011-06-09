@@ -15,7 +15,7 @@
 *  Invocation:
 *     size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snrmin,
 *                                    size_t order, const smfData * powval, const smfData * bolval,
-*                                    double raw2current, smfData ** polyfit, int *status );
+*                                    smfData ** polyfit, int *status );
 
 *  Arguments:
 *     method = smf_flatmeth (Given)
@@ -37,8 +37,6 @@
 *        Response of each bolometer to powval. Dimensioned as number of
 *        number of bolometers (size of respmap) times number of heater
 *        measurements (size of powval).
-*     raw2current = double (Given)
-*        The conversion from raw DAC units to current units
 *     polyfit = smfData ** (Returned)
 *        If a polynomial is being fitted this is the polynomial expansion
 *        for each powval coordinate for direct comparison with "bolval".
@@ -105,6 +103,8 @@
 *        Lower MINRESP by an order of magnitude.
 *     2011-06-08 (EC):
 *        Add raw2current to API
+*     2011-06-09 (EC):
+*        Don't need raw2current because the respmap header has what we need
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -145,7 +145,7 @@
 
 size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snrmin,
                                size_t order, const smfData * powvald, const smfData * bolvald,
-                               double raw2current, smfData ** polyfit, int *status ) {
+                               smfData ** polyfit, int *status ) {
 
   size_t bol;                  /* Bolometer offset into array */
   double * bolv = NULL;        /* Temp space for bol values */
@@ -161,6 +161,7 @@ size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snr
   double *poly = NULL;         /* polynomial expansion of each fit */
   double *polybol = NULL;      /* polynomial expansion for all bolometers */
   double *powv = NULL;         /* Temp space for power values */
+  double raw2current=VAL__BADD;/* Conversion from DAC --> current units */
   double *respdata = NULL;     /* responsivity data */
   double *respvar = NULL;      /* responsivity variance */
   double * varcoeffs = NULL;   /* variance in polynomial coefficients of 1d fit */
@@ -185,6 +186,7 @@ size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snr
   /* Extract relevant information from the smfData */
   respdata = (respmap->pntr)[0];
   respvar  = (respmap->pntr)[1];
+  raw2current = smf_raw2current( respmap->hdr, status );
 
   powval = (powvald->pntr)[0];
   bolval = (bolvald->pntr)[0];

@@ -1116,7 +1116,7 @@ void smf_flat_precondition( int allbad, smfData * powvald, smfData * bolvald,
 
 size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snrmin, size_t order,
                                const smfData * powval, const smfData * bolval,
-                               double raw2current, smfData ** polyfit, int *status );
+                               smfData ** polyfit, int *status );
 
 void smf_flat_smfData ( const smfData *data, smf_flatmeth * flatmethod,
                         smfData ** powval, smfData **bolval,
