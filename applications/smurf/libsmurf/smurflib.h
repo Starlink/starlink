@@ -83,6 +83,8 @@
 *         Add smurf_fts2_init
 *     2011-03-18 (EC):
 *         Add smurf_sc2pca
+*     2011-06-8 (DSB):
+*         Add smurf_unmakemap
 
 *     {enter_further_changes_here}
 
@@ -164,5 +166,6 @@ void smurf_stackframes( int * );
 void smurf_starecalc( int * );
 void smurf_timesort( int * );
 void smurf_unmakecube( int * );
+void smurf_unmakemap( int * );
 
 #endif /* SMURF_LIB_DEFINED */

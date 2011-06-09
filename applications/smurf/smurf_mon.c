@@ -141,6 +141,8 @@
 *        Add FTS2SPECRE
 *     2011-03-18 (EC):
 *        Add SC2PCA
+*     2008-06-08 (DSB):
+*        Add UNMAKEMAP
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -353,6 +355,8 @@ void smurf_mon( int * status ) {
     smurf_timesort( status );
   } else if (strcmp( taskname, "UNMAKECUBE" ) == 0 ) {
     smurf_unmakecube( status );
+  } else if (strcmp( taskname, "UNMAKEMAP" ) == 0 ) {
+    smurf_unmakemap( status );
   } else {
     *status = SAI__ERROR;
     msgSetc( "TASK", taskname );

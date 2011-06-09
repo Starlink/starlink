@@ -321,6 +321,7 @@ smf_resampcube.c \
 smf_resampcube_ast.c \
 smf_resampcube_copy.c \
 smf_resampcube_nn.c \
+smf_resampmap.c \
 smf_reshapendf.c \
 smf_rolling_fit.c \
 smf_samedims_smfData.c \

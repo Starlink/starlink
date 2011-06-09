@@ -1613,6 +1613,12 @@ void smf_resampcube_nn( smfData *data, dim_t nchan,
                         Grp *detgrp, int moving, float *in_data,
                         float *out_data, int *overlap, int *status );
 
+void smf_resampmap( smfWorkForce *wf, smfData *data, AstSkyFrame *abskyfrm,
+                    AstMapping *sky2map, int moving, int slbnd[ 2 ],
+                    int subnd[ 2 ], int interp, const double params[],
+                    double sigma, double *in_data, double *out_data, int *ngood,
+                    int *status );
+
 void smf_reshapendf( smfData **data, smfTile *tile, int *status );
 
 void smf_rolling_fit( dim_t box, float wlim, dim_t el, dim_t start,

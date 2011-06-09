@@ -53,7 +53,8 @@ smurf_smurfhelp.c \
 smurf_stackframes.c \
 smurf_starecalc.c \
 smurf_timesort.c \
-smurf_unmakecube.c
+smurf_unmakecube.c \
+smurf_unmakemap.c
 
 noinst_INCLUDES = smurflib.h
 

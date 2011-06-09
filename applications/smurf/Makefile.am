@@ -69,7 +69,8 @@ smurfhelp \
 stackframes \
 starecalc \
 timesort \
-unmakecube
+unmakecube \
+unmakemap
 
 # These files are not built inside a subdir because they are in CVS
 # under an alternate build system that SMURF can not modify.
