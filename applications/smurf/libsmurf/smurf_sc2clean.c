@@ -164,6 +164,8 @@
 *        Complete output NDF history by calling smf_puthistory before exiting.
 *     2011-03-30 (EC):
 *        Add concatenation functionality from SMURF:SC2CONCAT
+*     2011-06-09 (EC):
+*        Make it possible to downsample with some re-ordering of the code
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -308,7 +310,6 @@ void smurf_sc2clean( int *status ) {
   smf_request_mask( "BBM", &bbms, status );
 
   /* Group the input files by subarray and continuity ----------------------- */
-
   smf_grp_related( igrp, size, 1, maxlen-padStart-padEnd, NULL, 0, &maxconcat,
                    NULL, &igroup, &basegrp, NULL, status );
 
@@ -324,9 +325,44 @@ void smurf_sc2clean( int *status ) {
              "More output files required...",
              &ogrp, &osize, status );
 
- /* Loop over continuous chunks and clean ------------------------------------*/
+  /* Loop over continuous chunks and clean -----------------------------------*/
   gcount = 1;
   for( contchunk=0;(*status==SAI__OK)&&contchunk<ncontchunks; contchunk++ ) {
+    AstKeyMap *keymap=NULL;
+    int dkclean;
+    double downsampscale;
+    AstKeyMap *sub_instruments=NULL;
+
+    /* Place cleaning parameters into a keymap and set defaults. Do
+       this inside the loop in case we are cleaning files with
+       differing sub-instruments.  Note that we use the map-maker
+       defaults file here (which loads the sc2clean defaults) so that
+       we populate the locked keymap with all the parameters that
+       people may come across to allow them to load their map-maker
+       config directly into sc2clean.
+    */
+
+    sub_instruments = smf_subinst_keymap( SMF__SUBINST_NONE,
+                                          NULL, igrp,
+                                          igroup->subgroups[contchunk][0],
+                                          status );
+
+    keymap = kpg1Config( "CONFIG", "$SMURF_DIR/smurf_makemap.def",
+                         sub_instruments, status );
+    if( sub_instruments ) sub_instruments = astAnnul( sub_instruments );
+
+    /* Are we downsampling the data? */
+    astMapGet0D( keymap, "DOWNSAMPSCALE", &downsampscale );
+
+    /* Now rerun smf_grp_related to figure out how long each downsampled
+       chunk of data will be. */
+
+    if( basegrp ) grpDelet( &basegrp, status );
+    if( igroup ) smf_close_smfGroup( &igroup, status );
+
+    smf_grp_related( igrp, size, 1, maxlen-padStart-padEnd, NULL,
+                     downsampscale, &maxconcat, NULL, &igroup, &basegrp, NULL,
+                     status );
 
     /* Concatenate this continuous chunk */
     smf_concat_smfGroup( wf, igroup, usedarks ? darks:NULL, bbms, flatramps,
@@ -334,26 +370,6 @@ void smurf_sc2clean( int *status ) {
                          padStart, padEnd, 0, 1, &concat, NULL, status );
 
     if( *status == SAI__OK) {
-      AstKeyMap *keymap=NULL;
-      int dkclean;
-      AstKeyMap *sub_instruments=NULL;
-
-
-      /* Place cleaning parameters into a keymap and set defaults. Do
-         this inside the loop in case we are cleaning files with
-         differing sub-instruments.  Note that we use the map-maker
-         defaults file here (which loads the sc2clean defaults) so that
-         we populate the locked keymap with all the parameters that
-         people may come across to allow them to load their map-maker
-         config directly into sc2clean.
-      */
-
-      sub_instruments = smf_subinst_keymap( SMF__SUBINST_NONE,
-                                            concat->sdata[0], NULL, 0, status );
-      keymap = kpg1Config( "CONFIG", "$SMURF_DIR/smurf_makemap.def",
-                           sub_instruments, status );
-      if( sub_instruments ) sub_instruments = astAnnul( sub_instruments );
-
       /* clean the dark squids now since we might need to use them
          to clean the bolometer data */
 
@@ -402,6 +418,7 @@ void smurf_sc2clean( int *status ) {
                               last_qcount, &last_nmap, 1, NULL, NULL, status );
       }
 
+      /* Clean up for contchunk loop */
       if( keymap ) keymap = astAnnul( keymap );
     }
 
