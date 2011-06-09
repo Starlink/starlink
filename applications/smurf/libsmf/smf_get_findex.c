@@ -29,9 +29,12 @@
 *     Index to the nearest frequency in the FFT to the frequency f.
 
 *  Description:
-*     Calculate the index of the nearest frequency in an FFT to a given
-*     frequency in Hz (using rounding). Checks that the index is between
-*     0 and the Nyquist frequency (setting bad status if necessary).
+
+*     Calculate the index of the nearest frequency in an FFT to a
+*     given frequency in Hz (using rounding). If df <= 0, or f < 0
+*     SMF__INFREQ status is set. If a frequency higher than Nyquist is
+*     requested, the return value will be truncated to Nyquist (nf-1). Also,
+*     very low frequencies could be rounded to 0 (DC).
 
 *  Authors:
 *     Edward Chapin (UBC)
@@ -40,10 +43,13 @@
 *  History:
 *     2008-09-15 (EC)
 *        Initial version.
+*     2011-06-09 (EC)
+*        Modify behaviour to truncate high-frequencies to Nyquist, and round
+*        low frequencies to 0 as well.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2008,2011 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -83,13 +89,13 @@ size_t smf_get_findex( double f, double df, dim_t nf, int *status ) {
    if( *status != SAI__OK ) return retval;
 
    if( f < 0 ) {
-     *status = SAI__ERROR;
+     *status = SMF__INFREQ;
      errRep( "", FUNC_NAME ": f is < 0, possible programming error", status );
      return retval;
    }
 
    if( df <= 0 ) {
-     *status = SAI__ERROR;
+     *status = SMF__INFREQ;
      errRep( "", FUNC_NAME ": df is <= 0, possible programming error", status );
      return retval;
    }
@@ -103,19 +109,18 @@ size_t smf_get_findex( double f, double df, dim_t nf, int *status ) {
    /* If we get here, retval is guaranteed to be >= 0, and not infinity */
    retval = (size_t) round( f/df );
 
-   if( retval >= nf ) {
-     *status= SMF__INFREQ;
-     errRepf( FUNC_NAME, "Invalid frequency %lf Hz is > Nyquist %lf Hz", status,
-              f, df*nf);
-     retval = 0;
+   if( retval > nf ) {
+     msgOutiff( MSG__DEBUG, "", FUNC_NAME
+              ": Frequency %lf Hz is > Nyquist %lf Hz, "
+              "truncating to Nyquist." , status, f, df*nf);
+     retval = nf-1;
    }
 
-   if( (f > 0) && (retval == 0) ) {
-     *status= SMF__INFREQ;
-     errRepf( FUNC_NAME, "Invalid frequency %lf Hz is being rounded to 0 "
+   if( (f >= 0) && (retval == 0) ) {
+     msgOutiff( MSG__DEBUG, "", FUNC_NAME
+              ": warning, low frequency %lf Hz was rounded to 0 Hz "
               "(data stream is too short to sample this frequency)", status,
               f );
-     retval = 0;
    }
 
    return retval;
