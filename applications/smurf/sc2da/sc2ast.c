@@ -6,6 +6,7 @@
 #include "star/slalib.h"
 #include "sae_par.h"
 #include "prm_par.h"
+#include "mers.h"
 #include "ast.h"
 #include "ndf.h"
 #include "Ers.h"
@@ -299,6 +300,7 @@ int *status             /* global status (given and returned) */
      18May2011 : The SMU corrections are defined in AZEL and so should be applied
                  *after* de-rotating the Cartesian Nasmyth coord. So extract the
                  de-rotation from smurf_maketanmap and do it here instead.
+     9Jun2011  : Report the distortion map being used in MSG verbose mode.
 */
 {
 
@@ -317,6 +319,7 @@ int *status             /* global status (given and returned) */
    AstZoomMap *zoommap;
    const char *cval;
    const char *distortion;
+   const char *used_distortion;
    const double *c_f;
    const double *c_i;
    const double rotangle[8] = { 0.0, PIBY2, 2*PIBY2, 3*PIBY2, 3*PIBY2, 2*PIBY2, PIBY2, 0.0 };
@@ -1311,26 +1314,32 @@ int *status             /* global status (given and returned) */
    coordinates, which are coordinates in millimetres with origin at the
    center of the focal plane. */
       if( NEW1_DISTORTION == idistortion ) {
+         used_distortion = "NEW1";
          shift[ 0 ] = xoff_NEW1[ subnum ];
          shift[ 1 ] = yoff_NEW1[ subnum ];
 
       } else if( NEW2_DISTORTION == idistortion ) {
+         used_distortion = "NEW2";
          shift[ 0 ] = xoff_NEW2[ subnum ];
          shift[ 1 ] = yoff_NEW2[ subnum ];
 
       } else if( NEW3_DISTORTION == idistortion ) {
+         used_distortion = "NEW3";
          shift[ 0 ] = xoff_NEW3[ subnum ];
          shift[ 1 ] = yoff_NEW3[ subnum ];
 
       } else if( NEW4_DISTORTION == idistortion ) {
+         used_distortion = "NEW4";
          shift[ 0 ] = xoff_NEW4[ subnum ];
          shift[ 1 ] = yoff_NEW4[ subnum ];
 
       } else if( NEW5_DISTORTION == idistortion ) {
+         used_distortion = "NEW5";
          shift[ 0 ] = xoff_NEW5[ subnum ];
          shift[ 1 ] = yoff_NEW5[ subnum ];
 
       } else {
+         used_distortion = "ORIGINAL";
          shift[ 0 ] = xoff[ subnum ];
          shift[ 1 ] = yoff[ subnum ];
       }
@@ -1338,6 +1347,10 @@ int *status             /* global status (given and returned) */
       shiftmap = astShiftMap( 2, shift, " " );
       cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ],
                                                       shiftmap, 1, " " );
+
+/* Report the distorion. */
+      msgSetc( "C", used_distortion );
+      msgOutif( MSG__VERB, " ", "sc2ast: Using ^C distortion map\n", status );
 
 /* The mapping from pixel numbers to millimetres is a simple scaling,
    because the pixel separation is the same in both coordinates and is
