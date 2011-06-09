@@ -24,7 +24,7 @@ f+
 \newcommand{\stardocnumber}    {210.26}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {24th May 2011}
+\newcommand{\stardocdate}      {9th June 2011}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -22323,12 +22323,10 @@ happens.
 
 \end{enumerate}
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V5.7-0}
+\subsection{Changes Introduced in V5.7-0}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V5.6-1 and V5.7-0 (the
-current version):
+The following describes the most significant changes which
+occurred in the AST library between versions V5.6-1 and V5.7-0:
 
 \begin{enumerate}
 
@@ -22360,6 +22358,26 @@ f-
 that adds an inverse transformation to a PolyMap by sampling the forward
 transformation on a regular grid, and then fitting a polynomial function
 from the resulting output values to the grid of input values.
+
+\end{enumerate}
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V5.7-1}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V5.7-0 and V5.7-1 (the
+current version):
+
+\begin{enumerate}
+
+\item - The FitsChan class now ignores trailing spaces in character-valued WCS
+keywords when reading a FrameSet from a FITS header.
+
+\item - If the FitsChan astRead method reads a FITS header that uses the
+-SIP (Spitzer) distortion code within the CTYPE values, but which does
+not provide an inverse polynomial correction, the FitsChan class will now
+use the PolyTran method of the PolyMap class to create an estimate of the
+inverse polynomial correction.
 
 \end{enumerate}
 

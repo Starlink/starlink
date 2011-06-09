@@ -1,6 +1,6 @@
 AST Library
 -----------
-   A new release (V5.7-0) of the Starlink AST (astrometry) library is
+   A new release (V5.7-1) of the Starlink AST (astrometry) library is
 now available.
 
    AST provides a comprehensive range of facilities for attaching
@@ -15,6 +15,20 @@ environment-independent.
 
 Main Changes in this Version
 ----------------------------
+
+- The FitsChan class now ignores trailing spaces in character-valued WCS
+keywords when reading a FrameSet from a FITS header.
+
+- If the FitsChan astRead method reads a FITS header that uses the -SIP
+(Spitzer) distortion code within the CTYPE values, but which does not
+provide an inverse polynomial correction, the FitsChan class will now use
+the PolyTran method of the PolyMap class to create an estimate of the
+inverse polynomial correction.
+
+
+
+Main Changes in V5.7-0
+-----------------------
 
 - The FitsChan class support for the IRAF-specific "TNX" projection has
 been extended to include reading TNX headers that use a Chebyshev

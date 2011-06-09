@@ -965,6 +965,9 @@ f     - AST_TESTFITS: Test if a keyword has a defined value in a FitsChan
 *     1-JUN-2011 (DSB):
 *        In astInitFitsChanVtab, only create the two TimeFrames if they
 *        have not already been created (fixes scuba2 trac ticket #666).
+*     9-JUN-2011 (DSB):
+*        In WCSFcRead, ignore trailing spaces when reading string values
+*        for WCS keywords.
 *class--
 */
 
@@ -32766,6 +32769,7 @@ static void WcsFcRead( AstFitsChan *fc, AstFitsChan *fc2, FitsStore *store,
             }
          } else {
             if( CnvValue( fc, AST__STRING, undef, &cval, method, status ) ) {
+               cval[ astChrLen( cval ) ] = 0;  /* Exclude trailing spaces */
                SetItemC( (char *****) item, i, jm, s, cval, status );
                if( mark ) MarkCard( fc, status );
             } else {
