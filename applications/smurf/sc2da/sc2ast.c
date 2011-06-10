@@ -1339,7 +1339,8 @@ int *status             /* global status (given and returned) */
          shift[ 1 ] = yoff_NEW5[ subnum ];
 
       } else {
-         used_distortion = "ORIGINAL";
+         used_distortion = ( idistortion == NONE_DISTORTION ) ?
+                             "NONE" : "ORIGINAL";
          shift[ 0 ] = xoff[ subnum ];
          shift[ 1 ] = yoff[ subnum ];
       }
