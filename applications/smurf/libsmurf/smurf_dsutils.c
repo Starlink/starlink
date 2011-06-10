@@ -157,13 +157,21 @@
 *          gives the name of the NDF in which to store the inverse Y axis
 *          corrections at each bolometer in the subarray (in mm). If a
 *          value was supplied for INCAT, then OUTDX is the name of an NDF
-*          to recieve the forward Y axis correctiosn at every bolometer
+*          to recieve the forward Y axis correction at every bolometer
 *          in the subarray (in mm).
 *     OUTANG = NDF (Write)
 *          Only acccessed if a non-null value is supplied for parameter
 *          OUTMAG. OUTANG specifies the output NDF to receive the
 *          orientation of the distortion (in degrees anti-clockwise from
 *          the positive Y axis) at each point in the focal plane.
+*     OUTFX = NDF (Write)
+*          The name of an NDF to recieve the focal plane X value (in
+*          arc-sec) at each bolometer in the subarray specified by SUBARRAY.
+*          Only produced if a non-null value is also supplied for OUTFY. [!]
+*     OUTFY = NDF (Write)
+*          The name of an NDF to recieve the focal plane Y value (in
+*          arc-sec) at each bolometer in the subarray specified by SUBARRAY.
+*          Only produced if a non-null value is also supplied for OUTFX. [!]
 *     OUTMAG = NDF (Write)
 *          An output NDF to receive the magnitude of the distortion (in mm)
 *          at each point in the focal plane. If a null (!) value is supplied,
@@ -499,6 +507,9 @@ void smurf_dsutils( int *status ) {
    created. This is the case if a value is supplied for OUTMAG.
    --------------------------------------------------------------------- */
 
+/* Begin a new AST context. */
+   astBegin;
+
 /* First get the focal plane bounds of the required output NDF (in mm). */
    parGet0d( "FXLO", &fxlo, status );
    parGet0d( "FXHI", &fxhi, status );
@@ -525,9 +536,6 @@ void smurf_dsutils( int *status ) {
 /* Otherwise, create the output vector angle NDF. */
    } else {
       ndfCreat( "OUTANG", "_DOUBLE", 2, lbnd, ubnd, &indf2, status );
-
-/* Begin a new AST context. */
-      astBegin;
 
 /* Get a Mapping from GRID coords to focal plane coords, in mm. */
       ina[ 0 ] = 0.0;
@@ -687,13 +695,79 @@ void smurf_dsutils( int *status ) {
       worka = astFree( worka );
       workb = astFree( workb );
 
-/* End the AST context. */
-      astEnd;
+/* Close the NDFs. */
+      ndfAnnul( &indf1, status );
+      ndfAnnul( &indf2, status );
+   }
+
+/* Get the NDFs to hold the focal plane X and Y values at every bolometer. */
+   lbnd_out[ 0 ] = 1;
+   lbnd_out[ 1 ] = 1;
+   ubnd_out[ 0 ] = 32;
+   ubnd_out[ 1 ] = 40;
+   ndfCreat( "OUTFX", "_DOUBLE", 2, lbnd_out, ubnd_out, &indf1, status );
+   ndfCreat( "OUTFY", "_DOUBLE", 2, lbnd_out, ubnd_out, &indf2, status );
+
+   if( *status == PAR__NULL ) {
+      errAnnul( status );
+
+   } else {
+
+/* Create the GRID->FP FrameSet for the required subarray. */
+      parGet0c( "SUBARRAY", subarray, 8, status );
+      sc2ast_name2num( subarray, &subnum, status );
+      sc2ast_createwcs( subnum, NULL, NULL, NULL, &fp_fset, status );
+
+/* Calculate the focal plane positions at every bolometer. */
+      nxy = ( ubnd_out[ 0 ] - lbnd_out[ 0 ] + 1 );
+      nxy *= ( ubnd_out[ 1 ] - lbnd_out[ 1 ] + 1 );
+      worka = astMalloc( 2*nxy*sizeof( double ) ) ;
+      map = astGetMapping( fp_fset, AST__BASE, AST__CURRENT );
+      astTranGrid( map, 2, lbnd_out, ubnd_out, 0.0, 0, 1, 2, nxy, worka );
+
+/* Store the subarray. */
+      ndfXnew( indf1, "DSUTILS", "DSUTILS", 0, NULL, &xloc1, status );
+      ndfXpt0c( subarray, indf1, "DSUTILS", "SUBARRAY", status );
+      datAnnul( &xloc1, status );
+
+      ndfXnew( indf2, "DSUTILS", "DSUTILS", 0, NULL, &xloc2, status );
+      ndfXpt0c( subarray, indf2, "DSUTILS", "SUBARRAY", status );
+      datAnnul( &xloc2, status );
+
+/* Map the NDF DATA arrays. */
+      ndfMap( indf1, "Data", "_DOUBLE", "Write", (void *) &data1,
+              &nel, status );
+      ndfMap( indf2, "Data", "_DOUBLE", "Write", (void *) &data2,
+              &nel, status );
+
+/* Copy the axis values into the NDF data arrays. */
+      double *p1 = worka;
+      double *p2 = worka + nxy;
+      for( i = 0; i < nxy; i++ ) {
+         *(data1++) = *(p1++);
+         *(data2++) = *(p2++);
+      }
+
+/* NDF character components. */
+      ndfCput( "Focal plane X value", indf1, "Label", status );
+      ndfCput( "mm", indf1, "Unit", status );
+      ndfCput( "Focal plane Y value", indf2, "Label", status );
+      ndfCput( "mm", indf2, "Unit", status );
+
+/* WCS FrameSets (in mm with no PolyMap). */
+      fp_fset = GetFPFrameSet( subarray, status );
+      ndfPtwcs( fp_fset, indf1, status );
+      ndfPtwcs( fp_fset, indf2, status );
 
 /* Close the NDFs. */
       ndfAnnul( &indf1, status );
       ndfAnnul( &indf2, status );
    }
+
+/* End the AST context. */
+   astEnd;
+
+
 
 /* If input NDFs are supplied for parameter INFITX and INFITY, we can do
    three things: 1) create C source code defining the coefficients

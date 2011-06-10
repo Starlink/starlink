@@ -992,6 +992,25 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+
+            parameter outfx {
+                type NDF
+                access WRITE
+                vpath {PROMPT }
+                association ->GLOBAL.DATA_ARRAY
+                prompt {Output NDF holding focal-plane X coords}
+                helpkey *
+            }
+
+            parameter outfy {
+                type NDF
+                access WRITE
+                vpath {PROMPT }
+                association ->GLOBAL.DATA_ARRAY
+                prompt {Output NDF holding focal-plane Y coords}
+                helpkey *
+            }
+
             parameter outcat {
                 type LITERAL
                 prompt {Name of output catalogue text file}
