@@ -145,6 +145,12 @@ void CGEN_FUNCTION(smf_stats1)( const CGEN_TYPE *data, size_t stride, size_t nsa
   /* Check status */
   if (*status != SAI__OK) return;
 
+  if( !data ) {
+    *status = SAI__ERROR;
+    errRep( "", FUNC_NAME ": NULL data supplied", status );
+    return;
+  }
+
   if( !stride ) {
     *status = SAI__ERROR;
     errRep(" ", FUNC_NAME ": stride cannot be 0", status);
