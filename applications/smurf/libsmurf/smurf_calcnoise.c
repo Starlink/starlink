@@ -126,6 +126,11 @@
 *     RESPMASK = _LOGICAL (Read)
 *          If true, responsivity data will be used to mask bolometer data
 *          when calculating the flatfield. [TRUE]
+*     TSERIES = NDF (Write)
+*          Output files to contain the cleaned time-series for each processed
+*          chunk. There will be the same number of output files as
+*          created for the OUT parameter. If a null (!) value
+*          is supplied no files will be created. [!]
 
 *  Notes:
 *     - NEP and NOISERATIO images are stored in the .MORE.SMURF extension
@@ -290,6 +295,7 @@ void smurf_calcnoise( int *status ) {
   char refnepunits[SMF__CHARLABEL]; /* Reference units for effective NEP calc */
   size_t size;              /* Number of files in input group */
   AstKeyMap *sub_instruments=NULL; /* KeyMap holding subinstrument names */
+  Grp *tsgrp = NULL;        /* Group for output cleaned time-series */
   smfWorkForce *wf = NULL;  /* Pointer to a pool of worker threads */
   int zeropad;              /* Pad with zeros before FFTing? */
   double f_low = 0.5;       /* Frequency to use for noise ratio image */
@@ -355,6 +361,15 @@ void smurf_calcnoise( int *status ) {
     }
   }
 
+  /* and see if we want power spectra */
+  if (*status == SAI__OK) {
+    kpg1Wgndf( "TSERIES", basegrp, size, size, "More output files required...",
+               &tsgrp, &outsize, status );
+    if (*status == PAR__NULL) {
+      errAnnul( status );
+    }
+  }
+
   /* Obtain the number of continuous chunks and subarrays */
   if( *status == SAI__OK ) {
     ncontchunks = igroup->chunk[igroup->ngroups-1]+1;
@@ -386,7 +401,7 @@ void smurf_calcnoise( int *status ) {
 
     if (doclean) {
       /* Get the first smfData that will contribute to this continuous chunk,
-         but do not concatanate the data just yet. */
+         but do not concatenate the data just yet. */
       smf_concat_smfGroup( wf, igroup, NULL, NULL, NULL, contchunk, 0, 1,
                            NULL, 0, NULL, NULL, 0, 0, 0, 1, NULL, &firstdata,
                            status );
@@ -546,12 +561,22 @@ void smurf_calcnoise( int *status ) {
             }
           }
 
+          /* Write out power spectra and cleaned tseries if requested */
+
           if (powdata) {
             int provid = NDF__NOID;
             /* open a reference input file for provenance propagation */
             ndgNdfas( basegrp, gcount, "READ", &provid, status );
             smf_write_smfData( powdata, NULL, NULL, powgrp, gcount, provid, status );
             smf_close_file( &powdata, status );
+            ndfAnnul( &provid, status );
+          }
+
+          if (tsgrp ) {
+            int provid = NDF__NOID;
+            /* open a reference input file for provenance propagation */
+            ndgNdfas( basegrp, gcount, "READ", &provid, status );
+            smf_write_smfData( thedata, NULL, NULL, tsgrp, gcount, provid, status );
             ndfAnnul( &provid, status );
           }
 
@@ -728,6 +753,7 @@ void smurf_calcnoise( int *status ) {
   if (igrp) grpDelet( &igrp, status);
   if (ogrp) grpDelet( &ogrp, status);
   if (powgrp) grpDelet( &powgrp, status );
+  if (tsgrp) grpDelet( &tsgrp, status );
   if (basegrp) grpDelet( &basegrp, status );
   if( igroup ) smf_close_smfGroup( &igroup, status );
   if( flatramps ) smf_close_related( &flatramps, status );
