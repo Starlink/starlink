@@ -3480,7 +3480,7 @@ package @PACKAGE@ {
                 type _DOUBLE
                 vpath {DEFAULT}
                 prompt {N-sigma threshold for defining good detectors for average power spectrum}
-                default 3
+                default 5
                 helpkey *
             }
 
