@@ -251,6 +251,10 @@
 *          occurs whilst decoding Prov data.
 *      13-MAY-2011 (DSB):
 *          Fix memory leak in ndg1WriteProvenanceExtension.
+*      13-JUNE-2011 (DSB):
+*          Add a sticking paster ( a single bit shift) to get round a problem
+*          in ndg1GetProvId that caused equal ProvId values to be generated
+*          for different NDFs.
 */
 
 
@@ -5142,9 +5146,11 @@ static int ndg1GetProvId( Prov *prov, int *status ) {
       if( prov->creator ) ihash = ndg1HashFun( prov->creator, ihash, status );
 
 /* Obtain a hash code for each parent Prov, and combine it with the
-   existing hash code using a bit-wise exclusive-OR operation. */
+   existing hash code using a bit-wise exclusive-OR operation. Shift the
+   new hash code by one bit since for some reason this prevents some
+   cases where identical hash codes are produced for different files. */
       for( iparent = 0; iparent < prov->nparent; iparent++ ) {
-         ihash ^= ndg1GetProvId( prov->parents[ iparent ], status );
+         ihash ^= ( ndg1GetProvId( prov->parents[ iparent ], status ) << 1 );
       }
 
 /* For efficiency, store the hash code in the Prov structure so that it
