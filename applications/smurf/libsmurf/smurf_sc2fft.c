@@ -35,7 +35,7 @@
 *  ADAM Parameters:
 *     AVPSPEC = _LOGICAL (Read)
 *          Calculate average power spectral density over "good" bolometers.
-*          [FALSE]
+*          By default a 1/noise^2 weight is applued (see WEIGHTAVPSPEC). [FALSE]
 *     AVPSPECTHRESH = _DOUBLE (Read)
 *          N-sigma noise threshold to define "good" bolometers for AVPSPEC
 *          [5]
@@ -76,6 +76,9 @@
 *          Use polar representation of FFT with squared
 *          amplitudes divided by the frequency bin spacing (gives a
 *          power spectral density, PSD). [FALSE]
+*     WEIGHTAVPSPEC = _LOGICAL (Read)
+*          If set, weight power spectrum of each bolo by 1/noise^2 when
+*          calculating the average (estimated from 2--20 Hz spectrum). [TRUE]
 *     ZEROBAD = _LOGICAL (Read)
 *          Zero any bad values in the data before taking FFT. [TRUE]
 
@@ -121,11 +124,13 @@
 *        concatenation happens for inverse tranforms.
 *     2011-02-17 (TIMJ):
 *        Use AVPSPECTHRESH rather than simply ignoring it.
+*     2011-06-13 (EC):
+*        Add WEIGHTAVPSPEC option.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008-2011 Science and Technology Facilities Council.
-*     Copyright (C) 2008-2010 University of British Columbia.
+*     Copyright (C) 2008-2011 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -202,6 +207,7 @@ void smurf_sc2fft( int *status ) {
   int power=0;              /* Flag for squaring amplitude coeffs */
   size_t size;              /* Number of files in input group */
   smfData *tempdata=NULL;   /* Temporary smfData pointer */
+  int weightavpspec=0;      /* Flag for 1/noise^2 weighting */
   smfWorkForce *wf = NULL;  /* Pointer to a pool of worker threads */
   int zerobad;              /* Zero VAL__BADD before taking FFT? */
 
@@ -272,6 +278,8 @@ void smurf_sc2fft( int *status ) {
   if( avpspec ) {
     power = 1;
     parGet0d( "AVPSPECTHRESH", &avpspecthresh, status );
+
+    parGet0l( "WEIGHTAVPSPEC", &weightavpspec, status );
   }
 
   /* If power is true, we must be in polar form */
@@ -360,6 +368,9 @@ void smurf_sc2fft( int *status ) {
             for( i=0; i<nbolo; i++ ) {
               if( whitenoise[i] == VAL__BADD ) {
                 bolomask[i] = SMF__Q_BADB;
+              } else {
+                /* smf_bolonoise returns a variance, so take sqrt */
+                whitenoise[i] = sqrt(whitenoise[i]);
               }
             }
 
@@ -371,8 +382,8 @@ void smurf_sc2fft( int *status ) {
               ngood = newgood;
               smf_stats1D( whitenoise, 1, nbolo, bolomask, 1, SMF__Q_BADB,
                            &mean, &sig, NULL, status );
-              msgOutiff( MSG__DEBUG, "",
-                         "SC2FFT: mean=%lf sig=%lf ngood=%li\n", status,
+              msgOutiff( MSG__DEBUG, "", TASK_NAME
+                         ": mean=%lf sig=%lf ngood=%li\n", status,
                          mean, sig, ngood);
 
               newgood=0;
@@ -388,12 +399,26 @@ void smurf_sc2fft( int *status ) {
               }
             }
 
-            msgOutf( "",
-                     "SC2FFT: Calculating average power spectrum of best %li "
+            msgOutf( "", TASK_NAME
+                     ": Calculating average power spectrum of best %li "
                      " bolometers.", status, newgood);
+
+            /* If using 1/noise^2 weights, calculate 1/whitenoise^2 in-place
+               to avoid allocating another array */
+            if( weightavpspec ) {
+              msgOutif( MSG__VERB, "", TASK_NAME ": using 1/noise^2 weights",
+                        status );
+
+              for( i=0; i<nbolo; i++ ) {
+                if( whitenoise[i] && (whitenoise[i] != VAL__BADD) ) {
+                  whitenoise[i] = 1/(whitenoise[i]*whitenoise[i]);
+                }
+              }
+            }
 
             /* Calculate the average power spectrum of good detectors */
             tempdata = smf_fft_avpspec( odata, bolomask, 1, SMF__Q_BADB,
+                                        weightavpspec ? whitenoise : NULL,
                                         status );
             smf_close_file( &odata, status );
             whitenoise = astFree( whitenoise );

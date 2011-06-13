@@ -3570,6 +3570,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter weightavpspec {
+                type _LOGICAL
+                vpath {DEFAULT }
+                prompt {Weight bolos in avpspec as 1/noise^2?}
+                ppath GLOBAL CURRENT
+                default TRUE
+                helpkey *
+            }
+
             parameter zerobad {
                 type _LOGICAL
                 vpath {DEFAULT }

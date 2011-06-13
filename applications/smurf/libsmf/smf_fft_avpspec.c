@@ -15,7 +15,7 @@
 *  Invocation:
 *     pntr = smf_fft_avpspec( const smfData *pspec,
 *                             smf_qual_t *quality, size_t qstride,
-*                             smf_qual_t mask, int *status ) {
+*                             smf_qual_t mask, double *weights, int *status ) {
 
 *  Arguments:
 *     pspec = smfData * (Given)
@@ -29,6 +29,9 @@
 *     mask = smf_qual_t (Given)
 *        Use with qual to define which bits in quality are relevant to
 *        ignore data in the calculation.
+*     weights = double * (Given)
+*        Optional array of weights for each bolometer (otherwise a straight
+*        average is performed).
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -40,7 +43,8 @@
 *     At each time slice calculate the average power spectrum from
 *     each detector. Also generates a variance array from the scatter. It
 *     is assumed that the input power spectrum is already in the correct
-*     polar/power form (i.e. not cartesian -- see smf_fft_cart2pol).
+*     polar/power form (i.e. not cartesian -- see smf_fft_cart2pol). If
+*     a noise array is supplied, 1/noise^2 weighting is used in the average.
 
 *  Notes:
 
@@ -57,10 +61,12 @@
 *        Fix 32-bit incompatibility.
 *     2010-09-21 (COBA):
 *        Add SMF__NOCREATE_FTS
+*     2011-06-13 (EC):
+*        Add weights.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2010 University of British Columbia.
+*     Copyright (C) 2010,2011 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -105,7 +111,8 @@
 #define FUNC_NAME "smf_fft_avpspec"
 
 smfData *smf_fft_avpspec( const smfData *pspec, smf_qual_t *quality,
-                          size_t qstride, smf_qual_t mask, int *status ) {
+                          size_t qstride, smf_qual_t mask, double *weights,
+                          int *status ) {
 
   size_t i;                     /* Loop counter */
   double *idptr=NULL;           /* Pointer to input data */
@@ -191,12 +198,12 @@ smfData *smf_fft_avpspec( const smfData *pspec, smf_qual_t *quality,
 
     /* Since we assumed we're in power/polar form just need to calculate
        average and scatter of the amplitude coefficients. The phase
-       coefficients are left at there initialized values of 0. */
+       coefficients are left at their initialized values of 0. */
 
     for( i=0; i<nf; i++ ) {
       /* The bolometer stride is nf */
-      smf_stats1D( idptr+i, nf, nbolo, quality, qstride, mask, &mean,
-                   &sigma, &ngood, status );
+      smf_weightstats1D( idptr+i, nf, nbolo, quality, qstride, mask,
+                         weights, 1, &mean, &sigma, &ngood, status );
 
       if( *status == SMF__INSMP ) {
         /* If not enough samples just annul and set bad value */

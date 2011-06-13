@@ -1,0 +1,257 @@
+/* -*- C -*-
+*+
+*  Name:
+*     smf_weightstats1
+
+*  Purpose:
+*     Low-level routine for calculating mean and standard deviation of
+*     a data array using weights.
+
+*  Language:
+*     Starlink ANSI C
+
+*  Type of Module:
+*     Subroutine
+
+*  Invocation:
+*     void smf_weightstats1<X>( const CGEN_TYPE *data, size_t stride,
+*                               size_t nsamp, const smf_qual_t *qual,
+*                               size_t qstride,  smf_qual_t mask,
+*                               const double *weights, size_t wstride,
+*                               double *mean, double *sigma, size_t *ngood,
+*                               int *status )
+
+*  Arguments:
+*     data = const CGEN_TYPE* (Given)
+*        Pointer to input data array
+*     stride = size_t (Given)
+*        Index stride between elements
+*     nsamp = size_t (Given)
+*        Length of the interval to analyze
+*     qual = const smf_qual_t* (Given)
+*        If specified, use this QUALITY array to decide which samples
+*        to use (provided mask). Otherwise data are only ignored if set
+*        to CGEN_BAD.
+*     qstride = size_t (Given)
+*        Stride for qual. If 0 assumed to be stride.
+*     mask = smf_qual_t (Given)
+*        Use with qual to define which bits in quality are relevant to
+*        ignore data in the calculation.
+*     weights = const double * (Given)
+*        Pointer to array containing nsamp weights for each data point (with
+*        stride wstride). If NULL smf_stats1 will be called.
+*     wstride = size_t (Given)
+*        Stride for weight values in weights array (if 0 assumed to be same
+*        as stride)
+*     mean = double* (Given and Returned)
+*        Pointer to variable that will contain the mean of the data.
+*     sigma = double* (Given and Returned)
+*        Pointer to variable that will contain the standard deviation of
+*        the data. If NULL this routine will run faster and not calculate
+*        the standard deviation.
+*     ngood = size_t* (Given and Returned)
+*        Pointer to variable that will indicate how many samples were used
+*        to calculate the statistics.
+*     status = int* (Given and Returned)
+*        Pointer to global status.
+
+*  Description:
+*     Calculate mean and standard deviation provided there is at least 1
+*     good sample. However, status is set to SMF__INSMP if there are not
+*     at least SMF__MINSTATSAMP good samples.
+
+*  Notes:
+*     The algorithm is "naive" and may suffer roundoff problems. It may be
+*     necessary to switch to a (slower) compensated method. See:
+*     http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
+*     The formula for calculated sigma is derived from the biased weighted
+*     sample variance as used in smf_rebinmap1.c. If no weights supplied
+*     this function will revert to the unweighted smf_stats1.
+
+*  Authors:
+*     Edward Chapin (UBC)
+*     {enter_new_authors_here}
+
+*  History:
+*     2011-06-13 (EC):
+*        Initial version cloned from smf_stats1.cgen
+
+*  Copyright:
+*     Copyright (C) 2011 University of British Columbia.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 3 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
+
+*  Bugs:
+*     {note_any_bugs_here}
+*-
+*/
+
+/* Standard includes */
+#include <math.h>
+
+/* Starlink includes */
+#include "sae_par.h"
+#include "ast.h"
+#include "mers.h"
+#include "msg_par.h"
+#include "prm_par.h"
+
+/* SMURF includes */
+#include "smf.h"
+#include "smurf_par.h"
+#include "smurf_typ.h"
+#include "libsmf/smf_err.h"
+
+/* Simple default string for errRep */
+#define FUNC_NAME "smf_stats1"
+
+void CGEN_FUNCTION(smf_weightstats1)( const CGEN_TYPE *data, size_t stride,
+                                      size_t nsamp, const smf_qual_t *qual,
+                                      size_t qstride,  smf_qual_t mask,
+                                      const double *weights, size_t wstride,
+                                      double *mean, double *sigma,
+                                      size_t *ngood, int *status ) {
+
+  /* Local variables */
+  size_t count=0;             /* Number of samples in estimate */
+  double d;                   /* Temporary data value */
+  size_t i;                   /* Loop counter */
+  double mu=0;                /* Estimate of the mean */
+  smf_qual_t q;               /* Temporary quality value */
+  double sumwd=0;             /* Sum of the weights time data */
+  double sumwdsq=0;           /* Sum of the weights times square of the data */
+  double sumw=0;              /* Sum of the weights */
+  double w;                   /* Temporary weight value */
+
+  if( !weights ) {
+    /* No weights supplied... call smf_stats1 */
+    CGEN_FUNCTION(smf_stats1)( data, stride, nsamp, qual, qstride,
+                               mask, mean, sigma, ngood, status );
+    return;
+  }
+
+  /* initialise return values */
+  if (sigma) *sigma = VAL__BADD;
+  if (ngood) *ngood = 0;
+  if (mean) *mean = VAL__BADD;
+
+  /* Check status */
+  if (*status != SAI__OK) return;
+
+  if( !stride ) {
+    *status = SAI__ERROR;
+    errRep(" ", FUNC_NAME ": stride cannot be 0", status);
+    return;
+  }
+
+  if( !data ) {
+    *status = SAI__ERROR;
+    errRep( "", FUNC_NAME ": NULL data supplied", status );
+    return;
+  }
+
+  /* Assume qstride/wstride = stride if not specified */
+  if( !qstride ) {
+    qstride = stride;
+  }
+
+  if( !wstride ) {
+    wstride = stride;
+  }
+
+  /* Initialization */
+  if( qual ) {
+    /* Quality checking version */
+    if( sigma ) {
+      /* Standard deviation calculating version */
+      for( i=0; i<nsamp; i++ ) {
+        d = (double) data[i*stride];
+        q = qual[i*qstride];
+        w = weights[i*wstride];
+
+        if( !(q & mask) ) {
+          sumwd += w*d;
+          sumwdsq += w*d*d;
+          sumw += w;
+          count++;
+        }
+      }
+    } else {
+      /* Mean only */
+      for( i=0; i<nsamp; i++ ) {
+        d = (double) data[i*stride];
+        q = qual[i*qstride];
+        w = weights[i*wstride];
+        if( !(q & mask) ) {
+          sumwd += w*d;
+          sumw += w;
+          count++;
+        }
+      }
+    }
+  } else {
+    /* CGEN_BAD checking version */
+    if( sigma ) {
+      /* Standard deviation calculating version */
+      for( i=0; i<nsamp; i++ ) {
+        d = (double) data[i*stride];
+        w = weights[i*wstride];
+        if( (d != CGEN_BAD) && (w != VAL__BADD) ) {
+          sumwd += w*d;
+          sumwdsq += w*d*d;
+          sumw += w;
+          count++;
+        }
+      }
+    } else {
+      /* Mean only */
+      for( i=0; i<nsamp; i++ ) {
+        d = (double) data[i*stride];
+        w = weights[i*wstride];
+        if( (d != CGEN_BAD) && (w != VAL__BADD) ) {
+          sumwd += w*d;
+          sumw += w;
+          count++;
+        }
+      }
+    }
+  }
+
+  /* Calculate numbers as long as count > 0 and sumw != 0 */
+  if( (count > 0) && sumw ) {
+    mu = sumwd / sumw;
+    if( mean ) *mean = mu;
+    if( sigma ) {
+      *sigma = sqrt( (sumw*sumwdsq - sumwd*sumwd) / (count*sumw*sumw) );
+    }
+  }
+  if( ngood ) *ngood = count;
+
+  /* Enough samples? */
+  if( count < SMF__MINSTATSAMP ) {
+    *status = SMF__INSMP;
+    msgSeti("MIN",SMF__MINSTATSAMP);
+    msgSeti("N", count );
+    msgSeti("MX", nsamp );
+    errRep( "", FUNC_NAME
+            ": Insufficient number of good samples (^N<^MIN out of ^MX) for "
+            "statistics", status );
+    return;
+  }
+
+}

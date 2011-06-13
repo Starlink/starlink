@@ -943,7 +943,8 @@ void smf_extracols( smfHead *hdr, Grp *colgrp, void **cols_info,
                     AstKeyMap **km, int *status );
 
 smfData *smf_fft_avpspec( const smfData *pspec, smf_qual_t *quality,
-                          size_t qstride, smf_qual_t mask, int *status );
+                          size_t qstride, smf_qual_t mask, double *weights,
+                          int *status );
 
 void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status );
 
