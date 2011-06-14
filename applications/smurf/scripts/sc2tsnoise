@@ -4,16 +4,17 @@ source $SMURF_DIR/smurf.csh > /dev/null
 source $CONVERT_DIR/convert.csh > /dev/null
 source $KAPPA_DIR/kappa.csh > /dev/null
 
-if ( ($#argv < 3) || ($#argv > 5) ) then
+if ( ($#argv < 3) || ($#argv > 6) ) then
     echo "sc2tsnoise: calculate SCUBA-2 time-series noise (effective NEPs)"
     echo " "
     echo "usage:"
-    echo "    sc2tsnoise <obsdir.txt> <nepfile.txt> <outdir> [-pspec] [-clean]"
+    echo "    sc2tsnoise <obsdir.txt> <nepfile.txt> <outdir> [-tseries] [-pspec] [-clean]"
     echo " "
     echo "parameters:"
     echo "    obsdir.txt  a text file with path to SCUBA-2 obs dirs each line"
     echo "    nepfile.txt output text file containing effective NEPs etc."
     echo "    outdir      directory to store intermediate files (NEP maps etc.)"
+    echo "    -tseries    if set write cleaned time-series to <outdir>"
     echo "    -pspec      if set write noise power spectra to <outdir>"
     echo "    -clean      if set clean <outdir> before starting"
     echo " "
@@ -50,6 +51,7 @@ shift
 shift
 shift
 
+set writetseries = 0 # write out cleaned time-series?
 set writepspec = 0   # write out power spectra?
 set cleanout = 0     # clean outdir before starting?
 
@@ -57,7 +59,9 @@ while ( $# > 0 )
     set arg = $1
     shift
 
-    if ( "$arg" =~ "-pspec" ) then
+    if ( "$arg" =~ "-tseries" ) then
+        set writetseries = 1
+    else if ( "$arg" =~ "-pspec" ) then
         set writepspec = 1
     else if ( "$arg" =~ "-clean" ) then
         set cleanout = 1
@@ -330,14 +334,22 @@ foreach obsdir ( `cat $filenames` )
                 # calculate the NEP
                 if ( $ok == 1 ) then
 
+                    if ( $writetseries == 1 ) then
+                        set tfile = \
+                        $outdir/$subarr$obsdate\_$obsnum\_000$filenum\_tseries
+                    else
+                        set tfile = "!"
+                    endif
+
                     if ( $writepspec == 1 ) then
                         set pfile = \
-                        $outdir/$subarr$obsdate\_$obsnum\_pspec
+                        $outdir/$subarr$obsdate\_$obsnum\_000$filenum\_pspec
                     else
                         set pfile = "!"
                     endif
 
-                    calcnoise noise noise_nep power="$pfile" accept > /dev/null
+                    calcnoise noise noise_nep power="$pfile" tseries="$tfile" \
+                        accept > /dev/null
 
                     set effnep = `parget effnep calcnoise`
                     if ( $? != 0 ) set effnep = -1
