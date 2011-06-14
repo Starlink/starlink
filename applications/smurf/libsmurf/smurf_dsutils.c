@@ -458,6 +458,7 @@ void smurf_dsutils( int *status ) {
    int gxoff;
    int gyoff;
    int i;                    /* Loop count */
+   int icurr;                /* Index of current Frame in FrameSet */
    int indf1;                /* Identifier for NDF */
    int indf2;                /* Identifier for NDF */
    int irow;                 /* Row index */
@@ -754,10 +755,17 @@ void smurf_dsutils( int *status ) {
       ndfCput( "Focal plane Y value", indf2, "Label", status );
       ndfCput( "mm", indf2, "Unit", status );
 
-/* WCS FrameSets (in mm with no PolyMap). */
-      fp_fset = GetFPFrameSet( subarray, status );
-      ndfPtwcs( fp_fset, indf1, status );
-      ndfPtwcs( fp_fset, indf2, status );
+/* WCS FrameSets. Current Frame (FPLANE) is fplane in mm with no PolyMap,
+   but also include FPLANE2 in arc-sec with PolyMap. */
+      wcs = GetFPFrameSet( subarray, status );
+      icurr = astGetI( wcs, "Current" );
+      astSetC( fp_fset, "Domain", "FPLANE2" );
+      astSetI( fp_fset, "Current", astGetI( fp_fset, "Base" ) );
+      astAddFrame( wcs, AST__BASE, astUnitMap( 2, " " ), fp_fset );
+      astSetI( wcs, "Current", icurr );
+
+      ndfPtwcs( wcs, indf1, status );
+      ndfPtwcs( wcs, indf2, status );
 
 /* Close the NDFs. */
       ndfAnnul( &indf1, status );
