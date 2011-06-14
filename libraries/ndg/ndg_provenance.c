@@ -255,6 +255,12 @@
 *          Add a sticking paster ( a single bit shift) to get round a problem
 *          in ndg1GetProvId that caused equal ProvId values to be generated
 *          for different NDFs.
+*      14-JUNE-2011 (DSB):
+*          Equality of two hash codes does not guarantee that the two
+*          hashed objects are equal, it just suggests they may be. So
+*          when checking for equality of two NDFs, do not simply rely
+*          on equality of hash codes - if the hash codes are equal go
+*          on to perform further checks.
 */
 
 
@@ -308,6 +314,12 @@
 /* "char" value used to fill unused space at the end of the encoded
    provenance data */
 #define PAD_FLAG 123
+
+/* Compare two strings, allowing for NULL pointers. Note, "a" and "b"
+   are evaluated multiple times in this macro, so they should not have any
+   side effects. Macro value is non-zero if the strings match. */
+#define CMP_STRING(a,b) ((!(a)&&!(b))||((a)&&(b)&&!strcmp((a),(b))))
+
 
 /* Include files. */
 /* -------------- */
@@ -3462,16 +3474,20 @@ static int ndg1CheckSameParents( Prov *prov1, Prov *prov2, int *status ) {
 *     ndg1CheckSameParents
 
 *  Purpose:
-*     Checks if two Prov structures have the same parents.
+*     Checks if two Prov structures may have the same parents.
 
 *  Invocation:
 *     void ndg1CheckSameParents( Prov *prov1, Prov *prov2, int *status )
 
 *  Description:
 *     This function returns a flag indicating if the two supplied Prov
-*     structures have the same parents.
+*     structures may have the same parents.
 *
 *     Note, two parents are considered equal if they have the same path.
+*     This is fast(ish) but not totally reliable since two distinct NDFs
+*     can have the same path is they were created at different times.
+*     Better would be an algorithm that used ndg1TheSame to determine if
+*     two NDFs are the same, but this would be slow.
 
 *  Arguments:
 *     prov1
@@ -3482,8 +3498,8 @@ static int ndg1CheckSameParents( Prov *prov1, Prov *prov2, int *status ) {
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     Non-zero if the two supplied Prov structures have the same list of
-*     parents. Zero otherwise, or if an error occurs.
+*     Non-zero if the two supplied Prov structures may have the same list
+*     of parents. Zero otherwise, or if an error occurs.
 
 */
 
@@ -6128,7 +6144,7 @@ static void ndg1PurgeProvenance( Provenance *provenance,
       }
 
 /* Now work through the array looking for blocks of Provs that have equal
-   ProvId value (i.e. represent the same ancestor NDF). We ignore null
+   ProvId value (i.e. may represent the same ancestor NDF). We ignore null
    Provs or alien Provs (i.e. Provs that have no parents or children -
    such as may be generated on a previous pass round this loop). */
       for( i = 0; i < provenance->nprov - 1; i++ ) {
@@ -6137,21 +6153,27 @@ static void ndg1PurgeProvenance( Provenance *provenance,
             provid = pids[ i ];
 
 /* Move forward from the i'th Prov until we find a Prov which has a
-   different provid value (i.e describes a different ancestor). */
+   different provid value (i.e definately describes a different ancestor). */
             for( j = i + 1; j < provenance->nprov; j++ ) {
                prov2 = provs[ j ];
                if( prov2 && ( prov2->nchild > 0 || prov2->nparent > 0 ) ) {
 
-/* If the j'th Prov does not refer to the same ancestor NDF as the i'th
-   Prov, then we have reached the end of the block (if any) so break out of
-   the "j" loop, setting the j'th Prov as the start of the next block. */
+/* If the j'th Prov definately does not refer to the same ancestor NDF as the
+   i'th Prov, then we have reached the end of the block (if any) so break out
+   of the "j" loop, setting the j'th Prov as the start of the next block. */
                   if( pids[ j ] != provid ){
                      i = j - 1;
                      break;
 
-/* If the two provenance structures refer to the same NDF, check they have
-   the same list of parents, and report an error if not. */
-                  } else {
+/* If the two ProvId values are the same, the two provenance structures
+   may refer to the same NDF. Do further checks to make sure they do. */
+                  } else if( ndg1TheSame( prov1, prov2, status ) ){
+
+/* Check they have the same list of parents, and report an error if not. This
+   is currently not a totally reliable check in that there are possible cases
+   where the parents are indicated as being the same when in fact they are
+   not the same. But this partial check is at least better than no check
+   at all. */
                      if( !ndg1CheckSameParents( prov1, prov2, status ) ) {
                         if( *status == SAI__OK ) {
 
@@ -7656,6 +7678,7 @@ static int ndg1TheSame( Prov *prov1, Prov *prov2, int *status ) {
 
 /* Local Variables: */
    int result;
+   int i;
 
 /* Initialise. */
    result = 0;
@@ -7663,25 +7686,62 @@ static int ndg1TheSame( Prov *prov1, Prov *prov2, int *status ) {
 /* Check the inherited status value. */
    if( *status != SAI__OK ) return result;
 
-/* If the pointer are the same, they describe the same ND. */
+/* If the pointers are the same, they describe the same NDF. */
    if( prov1 == prov2 ) {
       result = 1;
       static_provid1 = -1;
       static_provid2 = -1;
 
-/* Otherwise, we assume a match if the ProvId values match. The ProvId is
-   a hash code describing the content of the Prov and all its ancestors.
-   Since it is possible for the same NDF name to be re-used to hold
-   different data, just comparing the path is not good enough. Even
+/* If the ProvId values differ, the NDFs are definitely different. The
+   ProvId is a hash code describing the content of the Prov and all its
+   ancestors. Since it is possible for the same NDF name to be re-used to
+   hold different data, just comparing the path is not good enough. Even
    including the command and date is not good enough since the same
    command may be used more than once to produce NDFs with the same name
    within a very short time. For this reason we use the ProvId which
-   incorporates not only the name, command and date of this Prov, but also
-   all its ancestor Provs. */
+   incorporates not only the name, command and date of this Prov, but
+   also all its ancestor Provs. However, hash code clashes are possible
+   so equality of hash code does not guarantee equality of NDF. */
    } else {
       static_provid1 = ndg1GetProvId( prov1, status );
       static_provid2 = ndg1GetProvId( prov2, status );
-      result = (static_provid1 == static_provid2);
+      if( static_provid1 != static_provid2 ) {
+         result = 0;
+
+/* If the ProvId values are equal we need to do more checks to see if the
+   NDFs are the same. */
+      } else {
+
+/* Compare the path, date, creator, no. of parents and no. of children for
+   both structures. If any of these values differ, the NDFs are different. */
+         result = CMP_STRING( prov1->path, prov2->path ) &&
+                  CMP_STRING( prov1->date, prov2->date ) &&
+                  CMP_STRING( prov1->creator, prov2->creator ) &&
+                  ( prov1->nchild == prov2->nchild ) &&
+                  ( prov1->nparent == prov2->nparent );
+
+/* If the above components match, check that all parents are the same. */
+         if( result ) {
+            for( i = 0; i < prov1->nparent; i++ ) {
+               if( !ndg1TheSame( prov1->parents[ i ], prov2->parents[ i ],
+                                 status ) ) {
+                  result = 0;
+                  break;
+               }
+            }
+         }
+
+/* If everything above matches, check that all children are the same. */
+         if( result ) {
+            for( i = 0; i < prov1->nchild; i++ ) {
+               if( !ndg1TheSame( prov1->children[ i ], prov2->children[ i ],
+                                 status ) ) {
+                  result = 0;
+                  break;
+               }
+            }
+         }
+      }
    }
 
 /* Return the result. */
