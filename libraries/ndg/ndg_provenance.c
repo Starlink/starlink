@@ -7730,17 +7730,6 @@ static int ndg1TheSame( Prov *prov1, Prov *prov2, int *status ) {
                }
             }
          }
-
-/* If everything above matches, check that all children are the same. */
-         if( result ) {
-            for( i = 0; i < prov1->nchild; i++ ) {
-               if( !ndg1TheSame( prov1->children[ i ], prov2->children[ i ],
-                                 status ) ) {
-                  result = 0;
-                  break;
-               }
-            }
-         }
       }
    }
 
