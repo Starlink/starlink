@@ -1006,7 +1006,8 @@ package @PACKAGE@ {
             parameter outfx {
                 type NDF
                 access WRITE
-                vpath {PROMPT }
+                vpath {DEFAULT}
+                default !
                 association ->GLOBAL.DATA_ARRAY
                 prompt {Output NDF holding focal-plane X coords}
                 helpkey *
@@ -1015,7 +1016,8 @@ package @PACKAGE@ {
             parameter outfy {
                 type NDF
                 access WRITE
-                vpath {PROMPT }
+                vpath {DEFAULT}
+                default !
                 association ->GLOBAL.DATA_ARRAY
                 prompt {Output NDF holding focal-plane Y coords}
                 helpkey *
