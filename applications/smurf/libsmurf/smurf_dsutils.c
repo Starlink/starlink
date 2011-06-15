@@ -317,6 +317,8 @@ static void PasteNDF( const char *subarray, int *lb, int *ub, int nvals,
                       int genvar, double wlim, const char *param, int *status );
 static void Filter( int n, double *flags, double *vals, double nsigma,
                     const char *title, int * status );
+static void Filter2( int n, double *flags, double *vals, double nsigma,
+                     const char *title, int * status );
 static int SaveBoloMapping( const char *param, smfData *data, int *status );
 static int SaveTimeSlice( const char *param1, const char *param2, smfData *data, int *status );
 static AstKeyMap *GetHeader( FILE *fp, int *status );
@@ -326,6 +328,7 @@ static void AddColName( AstKeyMap *header, const char *colname, const char *desc
 static void PutHeader( FILE *fp, AstKeyMap *header, int *status );
 static AstPolyMap *FindPolyMap( AstMapping *map, int *status );
 static double *SmoothZ( int zbox, int nrow, double *in_vals, double *iz_vals, int *status );
+static double Mode( int n, double *vals, double *dev, int * status );
 
 
 #define __USE_GNU 1
@@ -1307,7 +1310,7 @@ void smurf_dsutils( int *status ) {
       printf( "%d bad rows\n", l - nrow );
 
 /* Flag unusual rows by storing a bad value for each in "bc1_vals". */
-      Filter( nrow, bc1_vals, amp_vals, 3.0, "AMP", status );
+      Filter2( nrow, bc1_vals, amp_vals, 1.0, "AMP", status );
       Filter( nrow, bc1_vals, damp_vals, 3.0, "DAMP", status );
       Filter( nrow, bc1_vals, rms_vals, 3.0, "RMS", status );
 
@@ -2575,3 +2578,128 @@ static double *SmoothZ( int zbox, int nrow, double *in_vals, double *iz_vals,
    astFree( in_vals );
    return result;
 }
+
+static double Mode( int n, double *vals, double *dev, int * status ) {
+
+#define NBIN 100
+
+/* Local Variables: */
+   int i;
+   int ns;
+   int hist[ NBIN ];
+   int ibin;
+   double s1;
+   double s2;
+   double mean;
+   double var;
+   double sigma;
+   double a,b,delta;
+   double *p;
+   double mode;
+
+/* Check inherited status */
+   *dev = 0.0;
+   if( *status != SAI__OK ) return 0.0;
+
+/* Find mean and sigma */
+   s1 = 0.0;
+   s2 = 0.0;
+   ns = 0;
+   p = vals;
+   for( i = 0; i < n; i++,p++ ) {
+      if( *p != VAL__BADD ) {
+         s1 += *p;
+         s2 += (*p)*(*p);
+         ns++;
+      }
+   }
+
+   mean = s1/ns;
+   var = s2/ns - mean*mean;
+   sigma = sqrt( var );
+
+/* Find bin width - NBIN bins over the range mean +/- 2*sigma */
+   delta = 4*sigma/NBIN;
+
+/* Initialise histogram. */
+   memset( hist, 0, sizeof( int )*NBIN );
+
+/* Form histogram. */
+   a = 1.0/delta;
+   b = (mean - 2*sigma)/delta;
+   p = vals;
+   for( i = 0; i < n; i++,p++ ) {
+      if( *p != VAL__BADD ) {
+         ibin = (*p)*a - b;
+         if( ibin >= 0 && ibin < NBIN ) hist[ ibin ]++;
+      }
+   }
+
+/* Find mode. */
+   int imax = 0;
+   for( i = 0; i < NBIN; i++ ) {
+      if( hist[ i ] > hist[ imax ] ) imax = i;
+   }
+   mode = (imax + 0.5 + b)/a;
+
+/* Find deviation */
+   s1 = 0.0;
+   s2 = 0.0;
+   ns = 0;
+   p = vals;
+   for( i = 0; i < n; i++,p++ ) {
+      if( *p != VAL__BADD ) {
+         s1 = *p - mode;
+         s2 += s1*s1;
+         ns++;
+      }
+   }
+   *dev = sqrt( s2/ns );
+
+   return mode;
+#undef NBIN
+}
+
+
+/* Perform sigma-clipping to identify outlying values in a list of values.
+   --------------------------------------------------------------------- */
+
+static void Filter2( int n, double *flags, double *vals, double nsigma,
+                     const char *title, int * status ) {
+
+/* Local Variables: */
+   int nrej;
+   int i, iter;
+   double mode;
+   double dev;
+   double *p;
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* Find the mode and the RMS deviation about the mode. */
+   mode = Mode( n, vals, &dev, status );
+
+/* Do three rejection iterations. */
+   nrej = 0;
+   for( iter = 0; iter < 3; iter++ ) {
+
+/* Reject points more than "nsigma" deviations from the mode. */
+      p = vals;
+      for( i = 0; i < n; i++,p++ ) {
+         if( *p != VAL__BADD ) {
+            if( fabs( mode - *p ) > nsigma*dev ) {
+               *p = VAL__BADD;
+               flags[ i ] = VAL__BADD;
+               nrej++;
+            }
+         } else {
+            flags[ i ] = VAL__BADD;
+         }
+      }
+   }
+
+   printf("Mode filtering %s removed %d rows\n", title, nrej );
+
+}
+
