@@ -322,6 +322,8 @@
 *        Add Parameter TEMPSTYLE.
 *     2010 October 14 (MJC):
 *        Permit temporary style attributes.  Withdraw TEMPSTYLE.
+*     16-JUN-2011 (DSB):
+*        Changed to allow display of data values outside range of _REAL.
 *     {enter_further_changes_here}
 
 *-
@@ -363,11 +365,13 @@
       INTEGER AXPNTR( 1 )        ! Pointer to the histogram axis centres
       LOGICAL BAD                ! There may be bad values in the array
       REAL BINWID                ! Histogram bin width
+      DOUBLE PRECISION BSCALE( 2 ) ! Scale factors for labels
       CHARACTER * ( SZBUF ) BUFFER ! Text buffer
       CHARACTER * ( 8 ) COMP     ! Name of array component to analyse
       LOGICAL CUMUL              ! Produce cumulative histogram?
       DOUBLE PRECISION DDUMMY    ! Dummy for swapping the data range
       DOUBLE PRECISION DRANGE( 2 ) ! Data range of the histogram
+      DOUBLE PRECISION DRAT      ! Max ratio of data value to _REAL 
       INTEGER EL                 ! Number of array elements mapped
       INTEGER FRAME              ! Frame used to pass default attributes
       INTEGER HPNTR              ! Pointer to the histogram
@@ -572,6 +576,11 @@
 *  Compute and report the histogram.
 *  =================================
 
+*  Assume the data limits are within the range of a REAL, so no scaling
+*  is required to produce the labels.
+      BSCALE( 1 ) = 1.0D0
+      BSCALE( 2 ) = 1.0D0
+
 *  Call the appropriate routines to compute the histogram and then
 *  report the results.  The double-precision range values must be
 *  converted to the appropriate type for the routines.
@@ -616,6 +625,20 @@
             CALL KPG1_HSFLD( IFIL, NUMBIN, %VAL( CNF_PVAL( HPNTR ) ),
      :                       DRANGE( 1 ),
      :                       DRANGE( 2 ), STATUS )
+         END IF
+
+*  We will need to convert the data range to single precision later on.
+*  But this could cause problems if the data range is close to or
+*  exceeds the range of single precision numbers. So if either limit is
+*  more than one millionth of the max or min value that can be stored
+*  in a REAL, reduce the limits by a factor of one million. This
+*  scaling is removed when the axis labels are drawn.
+         DRAT = MAX ( ABS( DRANGE( 1 )/DBLE( VAL__MINR ) ),
+     :                ABS( DRANGE( 2 )/DBLE( VAL__MAXR ) ) )
+         IF( DRAT .GT. 1.0D-6 ) THEN
+            BSCALE( 1 ) = 1.0D6
+            DRANGE( 1 ) = DRANGE( 1 )/BSCALE( 1 )
+            DRANGE( 2 ) = DRANGE( 2 )/BSCALE( 1 )
          END IF
 
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
@@ -800,7 +823,7 @@
      :                    0.0, 0.0,  XL, YL, ' ', ' ',
      :                    ' ', 1, .TRUE., VAL__BADR, VAL__BADR,
      :                    0.0, VAL__BADR, 'KAPPA_HISTOGRAM', .TRUE.,
-     :                    .FALSE., FRAME, STATUS )
+     :                    .FALSE., BSCALE, FRAME, STATUS )
 
 *  If anything was plotted, shut down the graphics workstation and
 *  database.
@@ -856,31 +879,42 @@
       CALL NDF_CGET( NDFI, 'Label', LABEL, STATUS )
       CALL NDF_CGET( NDFI, 'Units', UNITS, STATUS )
 
+*  Only create AXIS values if the data range fits into the range of a
+*  REAL.
+      IF( BSCALE( 1 ) .EQ. 1.0D0 ) THEN
+
 *  Put the label and units in the axis structure, which is
 *  also created at this point.  There is only one axis.  Note that
 *  NDF_ACPUT does not truncate trailing blanks.
-      IF ( LABEL .NE. ' ' ) THEN
-         NC = CHR_LEN( LABEL )
-         CALL NDF_ACPUT( LABEL( :NC ), NDFO, 'Label', 1, STATUS )
-      END IF
+         IF ( LABEL .NE. ' ' ) THEN
+            NC = CHR_LEN( LABEL )
+            CALL NDF_ACPUT( LABEL( :NC ), NDFO, 'Label', 1, STATUS )
+         END IF
 
-      IF ( UNITS .NE. ' ' ) THEN
-         NC = CHR_LEN( UNITS )
-         CALL NDF_ACPUT( UNITS( :NC ), NDFO, 'Units', 1, STATUS )
-      END IF
+         IF ( UNITS .NE. ' ' ) THEN
+            NC = CHR_LEN( UNITS )
+            CALL NDF_ACPUT( UNITS( :NC ), NDFO, 'Units', 1, STATUS )
+         END IF
 
 *  Map the axis centres.
-      CALL NDF_AMAP( NDFO, 'CENTRE', 1, '_REAL', 'WRITE', AXPNTR,
-     :               NUMBIN, STATUS )
+         CALL NDF_AMAP( NDFO, 'CENTRE', 1, '_REAL', 'WRITE', AXPNTR,
+     :                  NUMBIN, STATUS )
 
 *  Fill the axis array with the centres of the histogram bins by first
 *  finding the bin width.  This assumes an even distribution of points
 *  within the bin which is probably not the case, but the difference is
 *  only likely to be serious when the number of non-empty bins is low.
-      BINWID = ( MAXIM - MINIM ) / REAL( NUMBIN )
-      CALL KPG1_SSCOF( NUMBIN, DBLE( BINWID ),
-     :                 DBLE( MINIM + 0.5 * BINWID ),
-     :                 %VAL( CNF_PVAL( AXPNTR( 1 ) ) ), STATUS )
+         BINWID = ( MAXIM - MINIM ) / REAL( NUMBIN )
+         CALL KPG1_SSCOF( NUMBIN, DBLE( BINWID ),
+     :                    DBLE( MINIM + 0.5 * BINWID ),
+     :                    %VAL( CNF_PVAL( AXPNTR( 1 ) ) ), STATUS )
+
+*  Warn the user if the AXIS structures cannot be created.
+      ELSE
+         CALL NDF_MSG( 'N', NDFO )
+         CALL MSG_OUT( ' ', 'No AXIS structures will be stored in ^N '//
+     :                 'because the data range is too large.', STATUS )
+      END IF
 
 *  Handle the null case invisibly.
       IF ( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )

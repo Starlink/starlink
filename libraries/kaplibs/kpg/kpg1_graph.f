@@ -1,6 +1,6 @@
       SUBROUTINE KPG1_GRAPH( N, X, Y, NSIGMA, YSIGMA, XLAB, YLAB, TTL,
      :                       XSYM, YSYM, MODE, NULL, XL, XR, YB, YT,
-     :                       APP, QUIET, LMODE, IPLOT, STATUS )
+     :                       APP, QUIET, LMODE, BSCALE, IPLOT, STATUS )
 *+
 *  Name:
 *     KPG1_GRAPH
@@ -14,7 +14,7 @@
 *  Invocation:
 *     CALL KPG1_GRAPH( N, X, Y, NSIGMA, YSIGMA, XLAB, YLAB, TTL, XSYM,
 *                      YSYM, MODE, NULL, XL, XR, YB, YT, APP, QUIET,
-*                      LMODE, IPLOT, STATUS )
+*                      LMODE, BSCALE, IPLOT, STATUS )
 
 *  Description:
 *     Opens a graphics device and draws a graph displaying a supplied
@@ -35,9 +35,11 @@
 *     N = INTEGER (Given)
 *        Number of points
 *     X( N ) = REAL (Given)
-*        X value at each point.
+*        X value at each point. These are scaled by the value supplied
+*        in BSCALE(1) to generate the axis labels.
 *     Y( N ) = REAL (Given)
-*        Y value at each point.
+*        Y value at each point. These are scaled by the value supplied
+*        in BSCALE(2) to generate the axis labels.
 *     NSIGMA = REAL (Given)
 *        Controls the length of the vertical error bars. A value of zero
 *        suppresses error bars. Otherwise error bars are drawn which extend
@@ -116,6 +118,10 @@
 *        .FALSE., the supplied bounds (YB, YT ) are used, and the
 *        eqivalent of "Extended" LMODE is used for any bounds which are
 *        not supplied.
+*     BSCALE( 2 ) = DOUBLE PRECISION (Given)
+*        Scale factors which converts the supplied (x,y) values into the
+*        values to label on the plot. A similar BZERO argument could be
+*        added if there is ever a need.
 *     IPLOT = INTEGER (Given and Returned)
 *        On entry, this can either be AST_NULL or a pointer to a two-dimensional
 *        Frame. If AST__NULL, the supplied values for the XLAB, YLAB,
@@ -135,7 +141,7 @@
 
 *  Copyright:
 *     Copyright (C) 1999, 2004 Central Laboratory of the Research Councils.
-*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2009-2011 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -168,6 +174,8 @@
 *        Use CNF_PVAL
 *     15-OCT-2009 (DSB):
 *        Allow IPLOT to be used to supply default Frame attribute values.
+*     16-JUN-2011 (DSB):
+*        Added argument BSCALE.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -202,6 +210,7 @@
       CHARACTER APP*(*)
       LOGICAL QUIET
       LOGICAL LMODE
+      DOUBLE PRECISION BSCALE( 2 )
 
 *  Arguments Returned:
       INTEGER IPLOT
@@ -231,7 +240,7 @@
 *  Draw the graph.
       CALL KPG1_GRPHW( N, X, Y, NSIGMA, YSIGMA, XLAB, YLAB, TTL,
      :                 XSYM, YSYM, MODE, NULL, XL, XR, YB, YT, APP,
-     :                 QUIET, LMODE, %VAL( CNF_PVAL( IPW1 ) ),
+     :                 QUIET, LMODE, BSCALE, %VAL( CNF_PVAL( IPW1 ) ),
      :                 %VAL( CNF_PVAL( IPW2 ) ),
      :                 %VAL( CNF_PVAL( IPW3 ) ), IPLOT, STATUS )
 

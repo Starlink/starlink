@@ -245,6 +245,11 @@
 *        Ignore points that are bad in either input NDF.
 *     2010 October 14 (MJC):
 *        Document temporary style attributes.
+*     16-JUN-2011 (DSB):
+*        Added BSCALE argument to KPG1_GRAPH. BSCALE is currently unused
+*        by SCATTER. At some point SCATTER should be changed to handle
+*        data that exceeds the range of a REAL (as has been done to
+*        HISTOGRAM).
 *     {enter_further_changes_here}
 
 *-
@@ -276,6 +281,7 @@
       CHARACTER NDFNAM*80        ! NDF name (without directory path)
       CHARACTER UNITS1*30        ! Units string from NDF IN1
       CHARACTER UNITS2*30        ! Units string from NDF IN2
+      DOUBLE PRECISION BSCALE( 2 )! Scaling for plot labels
       INTEGER CMPRS( NDF__MXDIM )! Compression factors for each axis
       INTEGER CDIM( NDF__MXDIM ) ! Dimensions of compressed array
       INTEGER CEL                ! No of elements in compressed array
@@ -551,14 +557,16 @@
       END IF
 
 *  Produce the scatter plot.
+      BSCALE( 1 ) = 1.0D0
+      BSCALE( 2 ) = 1.0D0
       IPLOT = AST__NULL
       CALL KPG1_GRAPH( NEL, %VAL( CNF_PVAL( IPW3 ) ),
      :                 %VAL( CNF_PVAL( IPW4 ) ), 0.0, 0.0,
      :                 LAB1( : LEN1 ), LAB2( : LEN2 ), 'Scatter plot',
      :                 'XDATA', 'YDATA', 3, .FALSE., PERV1( 1 ),
      :                 PERV1( 2 ), PERV2( 1 ), PERV2( 2 ),
-     :                 'KAPPA_SCATTER', .FALSE., .FALSE., IPLOT,
-     :                 STATUS )
+     :                 'KAPPA_SCATTER', .FALSE., .FALSE., BSCALE,
+     :                 IPLOT, STATUS )
 
 *  Close the workstation.
       CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )

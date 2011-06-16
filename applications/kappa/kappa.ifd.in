@@ -6998,7 +6998,7 @@ package kappa {
          }
 
          parameter xleft {
-            type _REAL
+            type _DOUBLE
             prompt {Axis value at left end of horizontal axis}
             vpath DEFAULT
             ppath DYNAMIC
@@ -7007,7 +7007,7 @@ package kappa {
          }
 
          parameter xright {
-            type _REAL
+            type _DOUBLE
             prompt {Axis value at right end of horizontal axis}
             vpath DEFAULT
             ppath DYNAMIC
@@ -7016,7 +7016,7 @@ package kappa {
          }
 
          parameter ybot {
-            type _REAL
+            type _DOUBLE
             prompt {Axis value at bottom of vertical axis}
             vpath DEFAULT
             ppath DYNAMIC
@@ -7025,7 +7025,7 @@ package kappa {
          }
 
          parameter ytop {
-            type _REAL
+            type _DOUBLE
             prompt {Axis value at top of vertical axis}
             vpath DEFAULT
             ppath DYNAMIC
@@ -11420,7 +11420,7 @@ package kappa {
          }
 
          parameter xleft {
-            type _REAL
+            type _DOUBLE
             prompt {Axis value at left end of horizontal axis}
             vpath DEFAULT
             ppath DYNAMIC
@@ -11437,7 +11437,7 @@ package kappa {
          }
 
          parameter xright {
-            type _REAL
+            type _DOUBLE
             prompt {Axis value at right end of horizontal axis}
             vpath DEFAULT
             ppath DYNAMIC
@@ -11446,7 +11446,7 @@ package kappa {
          }
 
          parameter ybot {
-            type _REAL
+            type _DOUBLE
             prompt {Axis value at bottom of vertical axis}
             vpath DEFAULT
             ppath DYNAMIC
@@ -11463,7 +11463,7 @@ package kappa {
          }
 
          parameter ytop {
-            type _REAL
+            type _DOUBLE
             prompt {Axis value at top of vertical axis}
             vpath DEFAULT
             ppath DYNAMIC
@@ -14046,7 +14046,7 @@ iraf! {
          }
 
          parameter xleft {
-            type _REAL
+            type _DOUBLE
             prompt {Axis value at left end of horizontal axis}
             vpath DEFAULT
             ppath DYNAMIC
@@ -14055,7 +14055,7 @@ iraf! {
          }
 
          parameter xright {
-            type _REAL
+            type _DOUBLE
             prompt {Axis value at right end of horizontal axis}
             vpath DEFAULT
             ppath DYNAMIC
@@ -14064,7 +14064,7 @@ iraf! {
          }
 
          parameter ybot {
-            type _REAL
+            type _DOUBLE
             prompt {Axis value at bottom of vertical axis}
             vpath DEFAULT
             ppath DYNAMIC
@@ -14073,7 +14073,7 @@ iraf! {
          }
 
          parameter ytop {
-            type _REAL
+            type _DOUBLE
             prompt {Axis value at top of vertical axis}
             vpath DEFAULT
             ppath DYNAMIC
@@ -15147,7 +15147,7 @@ iraf! {
          }
 
          parameter xleft {
-            type _REAL
+            type _DOUBLE
             prompt {Axis value at left end of horizontal axis}
             vpath DEFAULT
             ppath DYNAMIC
@@ -15156,7 +15156,7 @@ iraf! {
          }
 
          parameter xright {
-            type _REAL
+            type _DOUBLE
             prompt {Axis value at right end of horizontal axis}
             vpath DEFAULT
             ppath DYNAMIC
@@ -15165,7 +15165,7 @@ iraf! {
          }
 
          parameter ybot {
-            type _REAL
+            type _DOUBLE
             prompt {Axis value at bottom of vertical axis}
             vpath DEFAULT
             ppath DYNAMIC
@@ -15183,7 +15183,7 @@ iraf! {
          }
 
          parameter ytop {
-            type _REAL
+            type _DOUBLE
             prompt {Axis value at top of vertical axis}
             vpath DEFAULT
             ppath DYNAMIC

@@ -126,6 +126,11 @@
 *        Remove unused variables and wrapped long lines.
 *     2010 October 14 (MJC):
 *        Permit temporary style attributes.
+*     16-JUN-2011 (DSB):
+*        Added BSCALE argument to KPG1_GRAPH. BSCALE is currently unused
+*        by NORMALIZE. At some point NORMALIZE should be changed to handle
+*        data that exceeds the range of a REAL (as has been done to
+*        HISTOGRAM).
 *     {enter_further_changes_here}
 
 *-
@@ -172,6 +177,7 @@
       CHARACTER YL*( 255 )       ! Default Y-axis label
       DOUBLE PRECISION ABOT      ! Lowest vector A value actually used
       DOUBLE PRECISION ATOP      ! Highest vector A value actually used
+      DOUBLE PRECISION BSCALE( 2 )! Scaling for plot labels
       DOUBLE PRECISION FINISH( 2 ) ! End of best fitting line
       DOUBLE PRECISION START( 2 ) ! Start of best fitting line
       DOUBLE PRECISION WT        ! Weight for current bin
@@ -408,12 +414,14 @@
 
 *  Draw the plot.
             IPLOT = AST__NULL
+            BSCALE( 1 ) = 1.0D0
+            BSCALE( 2 ) = 1.0D0
             CALL KPG1_GRAPH( NDATA, ASUM, BSUM, 1.0, VARLIM,
      :                       XL( : LENXL ), YL( : LENYL ),
      :                       'Normalization plot', 'XDATA', 'YDATA', 3,
      :                       .TRUE., VAL__BADR, VAL__BADR, VAL__BADR,
      :                       VAL__BADR, 'KAPPA_NORMALIZE', .TRUE.,
-     :                       .FALSE., IPLOT, STATUS )
+     :                       .FALSE., BSCALE, IPLOT, STATUS )
 
 *  If a Plot was produced, we need to draw the best fitting straight
 *  line over it.

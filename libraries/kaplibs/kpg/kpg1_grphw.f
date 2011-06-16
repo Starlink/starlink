@@ -1,7 +1,7 @@
       SUBROUTINE KPG1_GRPHW( N, X, Y, NSIGMA, YSIGMA, XLAB, YLAB, TTL,
      :                       XSYM, YSYM, MODE, NULL, XL, XR, YB, YT,
-     :                       APP, QUIET, LMODE, DX, DY, DBAR, IPLOT,
-     :                       STATUS )
+     :                       APP, QUIET, LMODE, BSCALE, DX, DY, DBAR,
+     :                       IPLOT, STATUS )
 *+
 *  Name:
 *     KPG1_GRPHW
@@ -15,7 +15,7 @@
 *  Invocation:
 *     CALL KPG1_GRPHW( N, X, Y, NSIGMA, YSIGMA, XLAB, YLAB, TTL,
 *                      XSYM, YSYM, MODE, NULL, XL, XR, YB, YT, APP,
-*                      QUIET, LMODE, DX, DY, DBAR, IPLOT, STATUS )
+*                      QUIET, LMODE, BSCALE, DX, DY, DBAR, IPLOT, STATUS )
 
 *  Description:
 *     Opens a graphics device and draws a graph displaying a supplied
@@ -110,22 +110,22 @@
 *           A description of plotting style required in addition to that
 *           define by STYLE.  See STYLE for allowed synonyms.  Unlike
 *           STYLE its values are not persistent between invocations.
-*        XLEFT = _REAL (Read)
+*        XLEFT = _DOUBLE (Read)
 *           The axis value to place at the left-hand end of the
 *           horizontal axis. The dynamic default is specified by
 *           argument XL. The value supplied may be greater than or less
 *           than the value supplied for XRIGHT.
-*        XRIGHT = _REAL (Read)
+*        XRIGHT = _DOUBLE (Read)
 *           The axis value to place at the right-hand end of the
 *           horizontal axis. The dynamic default is specified by
 *           argument XR. The value supplied may be greater than or less
 *           than the value supplied for XLEFT.
-*        YBOT = _REAL (Read)
+*        YBOT = _DOUBLE (Read)
 *           The axis value to place at the bottom end of the vertical
 *           axis. The dynamic default is specified by argument YB. The
 *           value supplied may be greater than or less than the value
 *           supplied for YTOP.
-*        YTOP = _REAL (Read)
+*        YTOP = _DOUBLE (Read)
 *           The axis value to place at the top end of the vertical axis.
 *           The dynamic default is specified by argument YT. The value
 *           supplied may be greater than or less than the value supplied
@@ -135,9 +135,11 @@
 *     N = INTEGER (Given)
 *        Nuumber of points
 *     X( N ) = REAL (Given)
-*        X value at each point.
+*        X value at each point. These are scaled by the value supplied
+*        in BSCALE(1) to generate the axis labels.
 *     Y( N ) = REAL (Given)
-*        Y value at each point.
+*        Y value at each point. These are scaled by the value supplied
+*        in BSCALE(2) to generate the axis labels.
 *     NSIGMA = REAL (Given)
 *        Controls the length of the vertical error bars. A value of zero
 *        suppresses error bars. Otherwise error bars are drawn that
@@ -221,6 +223,10 @@
 *        .FALSE., the supplied bounds (YB, YT ) are used, and the
 *        equivalent of "Extended" LMODE is used for any bounds that are
 *        not supplied.
+*     BSCALE( 2 ) = DOUBLE PRECISION (Given)
+*        Scale factors which converts the supplied (x,y) values into the
+*        values to label on the plot. A similar BZERO argument could be
+*        added if there is ever a need.
 *     DX( N ) = DOUBLE PRECISION (Given and Returned)
 *        Work space.
 *     DY( N ) = DOUBLE PRECISION (Given and Returned)
@@ -247,7 +253,7 @@
 *  Copyright:
 *     Copyright (C) 1999, 2001 Central Laboratory of the Research
 *     Councils.
-*     Copyright (C) 2009, 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2009 - 2011 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -296,6 +302,8 @@
 *     2010 October 11 (MJC):
 *        Removed TEMPSTYLE, instead use STYLE for temporary attributes
 *        via the + prefix notation.
+*     16-JUN-2011 (DSB):
+*        Added argument BSCALE.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -332,6 +340,7 @@
       CHARACTER APP*(*)
       LOGICAL QUIET
       LOGICAL LMODE
+      DOUBLE PRECISION BSCALE( 2 )
 
 *  Arguments Given and Returned:
       DOUBLE PRECISION DX( N )
@@ -350,6 +359,7 @@
 *  Local Variables:
       CHARACTER PLMODE*5      ! LMODE parameter name
       DOUBLE PRECISION BOX( 4 ) ! Bounding box for plot
+      DOUBLE PRECISION DVAL   ! Parameter value
       INTEGER AXMAPS( 2 )     ! one-dimensional Mappings for each axis
       INTEGER FRAME           ! Current Frame for Plot
       INTEGER I               ! Loop index
@@ -357,6 +367,7 @@
       INTEGER IMARK           ! Marker type to use
       INTEGER IPICD           ! AGI picture id for DATA picture
       INTEGER IPICF           ! AGI picture id for FRAME picture
+      INTEGER IPLOT2          ! Plot with requested axis scalings
       INTEGER IVAL            ! Unused integer argument
       INTEGER NGOOD           ! No. of points to plot
       INTEGER NMARG           ! No. of supplied margin widths
@@ -365,13 +376,9 @@
       REAL DEFMAR             ! Default margin value
       REAL MARGIN( 4 )        ! Margins for plot annotation
       REAL XLEFT              ! X at left edge
-      REAL XMAX               ! Maximum X in plot
-      REAL XMIN               ! Minimum X in plot
       REAL XRIGHT             ! X at right edge
       REAL XX                 ! Central X value
       REAL YBOT               ! Y at bottom edge
-      REAL YMAX               ! Maximum Y in plot
-      REAL YMIN               ! Minimum Y in plot
       REAL YTOP               ! Y at top edge
       REAL YY                 ! Central Y value
 *.
@@ -404,28 +411,38 @@
       CALL KPG1_GRLM1( PLMODE, N, Y, X, NSIGMA, YSIGMA, YBOT, YTOP,
      :                 STATUS )
 
-*  Get new bounds for the plot, using these as dynamic defaults.
+*  Get new bounds for the plot, using these as dynamic defaults. The user 
+*  deals wants to see original unscaled data values, so remove the scaling
+*  from the default value, and then put it back into the obtaiend value. 
       IF( STATUS .EQ. SAI__OK ) THEN
-         CALL PAR_DEF0R( 'XLEFT', XLEFT, STATUS )
-         CALL PAR_GET0R( 'XLEFT', XLEFT, STATUS )
+         DVAL = XLEFT*BSCALE( 1 )
+         CALL PAR_DEF0D( 'XLEFT', DVAL, STATUS )
+         CALL PAR_GET0D( 'XLEFT', DVAL, STATUS )
+         XLEFT = DVAL/BSCALE( 1 )
          IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
       END IF
 
       IF( STATUS .EQ. SAI__OK ) THEN
-         CALL PAR_DEF0R( 'XRIGHT', XRIGHT, STATUS )
-         CALL PAR_GET0R( 'XRIGHT', XRIGHT, STATUS )
+         DVAL = XRIGHT*BSCALE( 1 )
+         CALL PAR_DEF0D( 'XRIGHT', DVAL, STATUS )
+         CALL PAR_GET0D( 'XRIGHT', DVAL, STATUS )
+         XRIGHT = DVAL/BSCALE( 1 )
          IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
       END IF
 
       IF( STATUS .EQ. SAI__OK ) THEN
-         CALL PAR_DEF0R( 'YBOT', YBOT, STATUS )
-         CALL PAR_GET0R( 'YBOT', YBOT, STATUS )
+         DVAL = YBOT*BSCALE( 2 )
+         CALL PAR_DEF0D( 'YBOT', DVAL, STATUS )
+         CALL PAR_GET0D( 'YBOT', DVAL, STATUS )
+         YBOT = DVAL/BSCALE( 2 )
          IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
       END IF
 
       IF( STATUS .EQ. SAI__OK ) THEN
-         CALL PAR_DEF0R( 'YTOP', YTOP, STATUS )
-         CALL PAR_GET0R( 'YTOP', YTOP, STATUS )
+         DVAL = YTOP*BSCALE( 2 )
+         CALL PAR_DEF0D( 'YTOP', DVAL, STATUS )
+         CALL PAR_GET0D( 'YTOP', DVAL, STATUS )
+         YTOP = DVAL/BSCALE( 2 )
          IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
       END IF
 
@@ -434,12 +451,6 @@
       BOX( 2 ) = DBLE( YBOT )
       BOX( 3 ) = DBLE( XRIGHT )
       BOX( 4 ) = DBLE( YTOP )
-
-*  Find the minimum and maximum data values to be displayed.
-      XMIN = MIN( XLEFT, XRIGHT )
-      XMAX = MAX( XLEFT, XRIGHT )
-      YMIN = MIN( YTOP, YBOT )
-      YMAX = MAX( YTOP, YBOT )
 
 *  Copy the supplied data to the double precision work arrays.
       NGOOD = 0
@@ -611,8 +622,17 @@
      :                    0.0D0, DBAR, 0.0D0, '+STYLE', IPLOT,
      :                    MODE, IMARK, 1, 1, APP, STATUS )
 
-*  Draw the axes if required.
-         IF( AXES ) CALL KPG1_ASGRD( IPLOT, IPICF, .TRUE., STATUS )
+*  Draw the axes if required. We want to include the supplied bscale
+*  factors in the labels, so take a copy of the Plot and rescale the
+*  current Frame using a MatrixMap that applies the required scalings.
+         IF( AXES ) THEN
+            IPLOT2 = AST_COPY( IPLOT, STATUS )
+            CALL AST_REMAPFRAME( IPLOT2, AST__CURRENT,
+     :                           AST_MATRIXMAP( 2, 2, 1, BSCALE, ' ',
+     :                                          STATUS ),
+     :                           STATUS )
+            CALL KPG1_ASGRD( IPLOT2, IPICF, .TRUE., STATUS )
+         ENDIF
 
 *  End the PGPLOT buffering context.
          CALL PGEBUF

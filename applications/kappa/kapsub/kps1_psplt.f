@@ -139,6 +139,11 @@
 *        Trim trailing blanks from output NDF character components.
 *     2010 October 14 (MJC):
 *        Permit temporary style attributes.
+*     16-JUN-2011 (DSB):
+*        Added BSCALE argument to KPG1_GRAPH. BSCALE is currently unused
+*        by NORMALIZE. At some point NORMALIZE should be changed to handle
+*        data that exceeds the range of a REAL (as has been done to
+*        HISTOGRAM).
 *     {enter_further_changes_here}
 
 *-
@@ -185,6 +190,7 @@
       CHARACTER DEFTTL*72        ! Default title
       CHARACTER NDFLBX*72        ! X axis label for output NDF
       CHARACTER NDFLBY*72        ! Y axis label for output NDF
+      DOUBLE PRECISION BSCALE( 2 )! Scaling for plot labels
       INTEGER BIN                ! Bin counter for a star
       INTEGER EL                 ! The number of mapped values
       INTEGER IATTTL             ! Length of title
@@ -338,11 +344,14 @@
 
 *  Plot the binned data.
       IPLOT = AST__NULL
+      BSCALE( 1 ) = 1.0D0
+      BSCALE( 2 ) = 1.0D0
       CALL KPG1_GRAPH( NDATA + 1, PROFR, PROFIL, 0.0, 0.0,
      :                 DEFLBX( : IATX ), DEFLBY( : IATY ),
      :                 DEFTTL( : IATTTL ), 'XDATA', 'YDATA', 3,
      :                 .TRUE., 0.0, VAL__BADR, DMIN, DMAX,
-     :                 'KAPPA_PSF', .TRUE., .FALSE., IPLOT, STATUS )
+     :                 'KAPPA_PSF', .TRUE., .FALSE., BSCALE, IPLOT,
+     :                 STATUS )
 
 *  Only proceed if a plot was produced.
       IF ( IPLOT .NE. AST__NULL ) THEN
