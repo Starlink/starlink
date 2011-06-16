@@ -371,7 +371,7 @@
       LOGICAL CUMUL              ! Produce cumulative histogram?
       DOUBLE PRECISION DDUMMY    ! Dummy for swapping the data range
       DOUBLE PRECISION DRANGE( 2 ) ! Data range of the histogram
-      DOUBLE PRECISION DRAT      ! Max ratio of data value to _REAL 
+      DOUBLE PRECISION DRAT      ! Max ratio of data value to _REAL
       INTEGER EL                 ! Number of array elements mapped
       INTEGER FRAME              ! Frame used to pass default attributes
       INTEGER HPNTR              ! Pointer to the histogram
@@ -631,14 +631,15 @@
 *  But this could cause problems if the data range is close to or
 *  exceeds the range of single precision numbers. So if either limit is
 *  more than one millionth of the max or min value that can be stored
-*  in a REAL, reduce the limits by a factor of one million. This
-*  scaling is removed when the axis labels are drawn.
-         DRAT = MAX ( ABS( DRANGE( 1 )/DBLE( VAL__MINR ) ),
-     :                ABS( DRANGE( 2 )/DBLE( VAL__MAXR ) ) )
-         IF( DRAT .GT. 1.0D-6 ) THEN
-            BSCALE( 1 ) = 1.0D6
-            DRANGE( 1 ) = DRANGE( 1 )/BSCALE( 1 )
-            DRANGE( 2 ) = DRANGE( 2 )/BSCALE( 1 )
+*  in a REAL, choose a scale factor for the data so that the scaled data
+*  does not exceed this limit. This scaling is removed when the axis
+*  labels are drawn.
+         DRAT = 1.0D6*MAX ( ABS( DRANGE( 1 )/DBLE( VAL__MINR ) ),
+     :                      ABS( DRANGE( 2 )/DBLE( VAL__MAXR ) ) )
+         IF( DRAT .GT. 1.0 ) THEN
+            BSCALE( 1 ) = DRAT
+            DRANGE( 1 ) = DRANGE( 1 )/DRAT
+            DRANGE( 2 ) = DRANGE( 2 )/DRAT
          END IF
 
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
