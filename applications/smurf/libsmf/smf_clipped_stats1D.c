@@ -164,7 +164,8 @@ void smf_clipped_stats1D( const double *data, size_t nclips,
   for ( clip = 0; clip < nclips; clip++) {
 
     /* Calculate stats with our quality and qstride of 1 */
-    smf_stats1D( data, stride, nsamp, qua, 1, BADQUAL, &lmean, &lsigma, &lngood, status );
+    smf_stats1D( data, stride, nsamp, qua, 1, BADQUAL, &lmean, &lsigma, NULL,
+                 &lngood, status );
 
     /* Flag any values exceeding the specified clip */
     lngood = smf__flag_clipped_data( data, stride, nsamp, qua, BADQUAL, lmean, lsigma,
@@ -174,7 +175,8 @@ void smf_clipped_stats1D( const double *data, size_t nclips,
   }
 
   /* and one final stats now that all clips have been applied*/
-  smf_stats1D( data, stride, nsamp, qua, 1, BADQUAL, &lmean, &lsigma, &lngood, status );
+  smf_stats1D( data, stride, nsamp, qua, 1, BADQUAL, &lmean, &lsigma, NULL,
+               &lngood, status );
 
   /* Free quality */
   qua = astFree( qua );

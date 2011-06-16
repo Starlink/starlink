@@ -581,7 +581,7 @@ void smf_clean_pca( smfWorkForce *wf, smfData *data, double thresh,
     double sigma;
 
     smf_stats1D( comp + i*ccompstride, ctstride, ntslice, NULL, 0,
-                 0, NULL, &sigma, NULL, status );
+                 0, NULL, &sigma, NULL, NULL, status );
 
     /* Apparently we need this to get the normalization right */
     sigma *= sqrt((double) ntslice);
@@ -745,7 +745,7 @@ void smf_clean_pca( smfWorkForce *wf, smfData *data, double thresh,
       iter ++;
 
       /* Measure mean and standard deviation of non-flagged samples */
-      smf_stats1D( rms_amp, 1, ngoodbolo, NULL, 0, 0, &m, &sig, &ngood,
+      smf_stats1D( rms_amp, 1, ngoodbolo, NULL, 0, 0, &m, &sig, NULL, &ngood,
                    status );
 
       msgOutiff( MSG__DEBUG, "", FUNC_NAME

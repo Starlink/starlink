@@ -219,7 +219,8 @@ void smf_calcmodel_tmp( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         }
 
       /* Remove mean */
-      smf_stats1D( template, 1, ntslice, NULL, 0, 0, &m, NULL, NULL, status );
+      smf_stats1D( template, 1, ntslice, NULL, 0, 0, &m, NULL, NULL, NULL,
+                   status );
 
       if( *status == SAI__OK ) {
         for( i=0; i<ntslice; i++ ) {
@@ -315,13 +316,13 @@ void smf_calcmodel_tmp( smfWorkForce *wf, smfDIMMData *dat, int chunk,
         size_t n_g, n_o, n_corr;
 
         smf_stats1D( model_data + 0*mcstride, mbstride, nbolo,
-                     NULL, 0, 0, &mean_g, NULL, &n_g, status );
+                     NULL, 0, 0, &mean_g, NULL, NULL, &n_g, status );
 
         smf_stats1D( model_data + 1*mcstride, mbstride, nbolo,
-                     NULL, 0, 0, &mean_o, NULL, &n_o, status );
+                     NULL, 0, 0, &mean_o, NULL, NULL, &n_o, status );
 
         smf_stats1D( model_data + 2*mcstride, mbstride, nbolo,
-                     NULL, 0, 0, &mean_corr, NULL, &n_corr, status );
+                     NULL, 0, 0, &mean_corr, NULL, NULL, &n_corr, status );
 
         msgOutiff( MSG__VERB, "", "    mean gain=%lf (%zu samples)",
                    status, mean_g, n_g);

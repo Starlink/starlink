@@ -232,7 +232,7 @@ void smf_fit_poly1d ( size_t order, size_t nelem, double clip, const double x[],
 
       /* calculate the standard deviation. Don't need quality here because
          resid is already VAL__BADD wherever there was bad quality */
-      smf_stats1D( resid, 1, nelem, NULL, 0, 0, &mean, &stdev, &ngood,
+      smf_stats1D( resid, 1, nelem, NULL, 0, 0, &mean, &stdev, NULL, &ngood,
                    status );
 
       /* see if any points are outside the clip range */
@@ -342,8 +342,8 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[],
       double variance;
 
       /* simple average */
-      smf_stats1D( y, 1, nelem, qual, 1, SMF__Q_FIT, &mean, &sigma, &nrgood,
-                   status );
+      smf_stats1D( y, 1, nelem, qual, 1, SMF__Q_FIT, &mean, &sigma, NULL,
+                   &nrgood, status );
 
       if( (*status == SAI__OK) && (nrgood > 0) ) {
         /* Convert population error to variance on the mean */

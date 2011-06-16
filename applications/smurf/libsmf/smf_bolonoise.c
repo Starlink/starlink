@@ -242,7 +242,7 @@ void smf_bolonoise( smfWorkForce *wf, smfData *data,
     /* Measure the power */
     if( *status == SAI__OK ) {
       p_low = base[i_low];
-      smf_stats1D( base+i_w1, 1, i_w2-i_w1+1, NULL, 0, 0, &p_white, NULL,
+      smf_stats1D( base+i_w1, 1, i_w2-i_w1+1, NULL, 0, 0, &p_white, NULL, NULL,
                    &ngood, status );
 
       /* It's OK if bad status was generated as long as a mean was calculated */

@@ -462,7 +462,8 @@ void smf_flat_fastflat( const smfData * fflat, smfData **bolvald, int *status ) 
           }
 
           if (nind > 1) {
-            smf_stats1I( idata, 1, nind, NULL, 0, 0, &mean, &sigma, &ngood, status );
+            smf_stats1I( idata, 1, nind, NULL, 0, 0, &mean, &sigma, NULL,
+                         &ngood, status );
           } else {
             mean = idata[0];
             /* put in a small value rather than zero so that everything will be

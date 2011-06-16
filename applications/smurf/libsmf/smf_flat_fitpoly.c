@@ -374,7 +374,8 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
     double corr_smalltol = 0.75;
     double delta_mean = 0.0;
 
-    smf_stats1D( corrs, 1, nbol, NULL, 0, 0, &cmean, &csig, &ngood, status );
+    smf_stats1D( corrs, 1, nbol, NULL, 0, 0, &cmean, &csig, NULL, &ngood,
+                 status );
 
     if (*status == SMF__INSMP) {
       /* it has all gone horribly wrong. Let someone else report the bad news */

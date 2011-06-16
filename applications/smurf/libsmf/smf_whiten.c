@@ -174,7 +174,7 @@ void smf_whiten( double *re, double *im, double df, dim_t nf, size_t box,
     double thresh;
 
     smf_stats1D( pspec+i_wlo, 1, i_whi-i_wlo+1, qual, 1, SMF__Q_SPIKE, &white,
-                 &sigma, NULL, status );
+                 &sigma, NULL, NULL, status );
 
     if( *status==SAI__OK ) {
 

@@ -576,9 +576,9 @@ int smf_find_gains( smfWorkForce *wf, smfData *data, double *template,
    smf_stats1D would produce better estimates of mean and sigma, and so
    reduce the number of iterative calls to this function needed to achieve
    convergence? */
-            smf_stats1D( glog, 1, nbolo, NULL, 0, 0, &gmean, &gsig, &ggood,
+            smf_stats1D( glog, 1, nbolo, NULL, 0, 0, &gmean, &gsig, NULL,&ggood,
                          status );
-            smf_stats1D( corr, 1, nbolo, NULL, 0, 0, &cmean, &csig, &cgood,
+            smf_stats1D( corr, 1, nbolo, NULL, 0, 0, &cmean, &csig, NULL,&cgood,
                          status );
 
 /* If there are insufficient usable bolometers left to find the statistics,

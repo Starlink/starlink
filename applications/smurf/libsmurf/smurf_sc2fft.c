@@ -381,7 +381,7 @@ void smurf_sc2fft( int *status ) {
             while( ngood != newgood ) {
               ngood = newgood;
               smf_stats1D( whitenoise, 1, nbolo, bolomask, 1, SMF__Q_BADB,
-                           &mean, &sig, NULL, status );
+                           &mean, &sig, NULL, NULL, status );
               msgOutiff( MSG__DEBUG, "", TASK_NAME
                          ": mean=%lf sig=%lf ngood=%li\n", status,
                          mean, sig, ngood);

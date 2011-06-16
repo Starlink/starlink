@@ -141,7 +141,7 @@ void CGEN_FUNCTION(smf_weightstats1)( const CGEN_TYPE *data, size_t stride,
   if( !weights ) {
     /* No weights supplied... call smf_stats1 */
     CGEN_FUNCTION(smf_stats1)( data, stride, nsamp, qual, qstride,
-                               mask, mean, sigma, ngood, status );
+                               mask, mean, sigma, NULL, ngood, status );
     return;
   }
 

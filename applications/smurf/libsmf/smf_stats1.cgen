@@ -16,8 +16,8 @@
 *  Invocation:
 *     void smf_stats1<X>( const CGEN_TYPE *data, size_t stride, size_t nsamp,
 *                         const smf_qual_t *qual, size_t qstride,
-*                         smf_qual_t mask, double *mean,
-*                         double *sigma, size_t *ngood, int *status )
+*                         smf_qual_t mask, double *mean, double *sigma,
+*                         double *median, size_t *ngood, int *status )
 
 *  Arguments:
 *     data = const CGEN_TYPE* (Given)
@@ -41,6 +41,9 @@
 *        Pointer to variable that will contain the standard deviation of
 *        the data. If NULL this routine will run faster and not calculate
 *        the standard deviation.
+*     median = double* (Given and Returned)
+*        Pointer to variable that will contain median of the data. If
+*        NULL this routine will not calculate the median and run faster.
 *     ngood = size_t* (Given and Returned)
 *        Pointer to variable that will indicate how many samples were used
 *        to calculate the statistics.
@@ -48,9 +51,11 @@
 *        Pointer to global status.
 
 *  Description:
-*     Calculate mean and standard deviation provided there is at least 1
-*     good sample. However, status is set to SMF__INSMP if there are not
-*     at least SMF__MINSTATSAMP good samples.
+*     Calculate mean and standard deviation provided there is at least
+*     1 good sample. If requested, medians are calculated by sorting
+*     the data with the system qsort routine and picking off the
+*     central value. However, status is set to SMF__INSMP if there are
+*     not at least SMF__MINSTATSAMP good samples.
 
 *  Notes:
 *     The algorithm is "naive" and may suffer roundoff problems. It may be
@@ -76,11 +81,13 @@
 *     2010-02-04 (EC):
 *        Add qstride to interface, and switch to size_t from dim_t for
 *        stride/nsamp
+*     2011-06-16 (EC):
+*        Add median
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
-*     Copyright (C) 2008-2010 University of British Columbia.
+*     Copyright (C) 2008-2011 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -106,6 +113,7 @@
 
 /* Standard includes */
 #include <math.h>
+#include <stdlib.h>
 
 /* Starlink includes */
 #include "sae_par.h"
@@ -120,13 +128,35 @@
 #include "smurf_typ.h"
 #include "libsmf/smf_err.h"
 
+/* Local comparison function for sorting -------------------------------------*/
+
+/* Since this is a generic function we need the #ifndef to avoid re-defining
+   the function for each data type */
+
+#ifndef SMFSTATS1COMPARE_DEFINED
+#define SMFSTATS1COMPARE_DEFINED
+
+int smfStats1Compare( const void *arg1, const void *arg2 );
+
+int smfStats1Compare( const void *arg1, const void *arg2 ) {
+  double diff;
+  double *d1 = (double *) arg1;
+  double *d2 = (double *) arg2;
+
+  diff = *d1 - *d2;
+  return (diff < 0) ? -1 : (diff == 0) ? 0 : 1;
+}
+#endif
+
+/* Main function -------------------------------------------------------------*/
+
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_stats1"
 
-void CGEN_FUNCTION(smf_stats1)( const CGEN_TYPE *data, size_t stride, size_t nsamp,
-                                const smf_qual_t *qual, size_t qstride,
-                                smf_qual_t mask, double *mean,
-                                double *sigma, size_t *ngood,
+void CGEN_FUNCTION(smf_stats1)( const CGEN_TYPE *data, size_t stride,
+                                size_t nsamp, const smf_qual_t *qual,
+                                size_t qstride, smf_qual_t mask, double *mean,
+                                double *sigma, double *median, size_t *ngood,
                                 int *status ) {
 
   /* Local variables */
@@ -141,6 +171,7 @@ void CGEN_FUNCTION(smf_stats1)( const CGEN_TYPE *data, size_t stride, size_t nsa
   if (sigma) *sigma = VAL__BADD;
   if (ngood) *ngood = 0;
   if (mean) *mean = VAL__BADD;
+  if (median) *median = VAL__BADD;
 
   /* Check status */
   if (*status != SAI__OK) return;
@@ -165,8 +196,9 @@ void CGEN_FUNCTION(smf_stats1)( const CGEN_TYPE *data, size_t stride, size_t nsa
   /* Initialization */
   if( qual ) {
     /* Quality checking version */
+
     if( sigma ) {
-      /* Standard deviation calculating version */
+      /* Standard deviation + mean calculating version */
       j = 0;
       for( i=0; i<nsamp*stride; i+=stride ) {
         if( !(qual[j] & mask) ) {
@@ -177,7 +209,10 @@ void CGEN_FUNCTION(smf_stats1)( const CGEN_TYPE *data, size_t stride, size_t nsa
         j += qstride;
       }
     } else {
-      /* Mean only */
+      /* Always calculate mean... even if we're only asking for the
+         median we only have to count the number of good samples here,
+         and the calculation is fast compared to sorting to get the
+         median. */
       j = 0;
       for( i=0; i<nsamp*stride; i+=stride ) {
         if( !(qual[j] & mask) ) {
@@ -187,6 +222,35 @@ void CGEN_FUNCTION(smf_stats1)( const CGEN_TYPE *data, size_t stride, size_t nsa
         j += qstride;
       }
     }
+
+    /* Median calculation is independent of mean / standard deviation except
+       that we know how many good values there are from the mean calculation */
+    if( median && count) {
+      double *sortbuf=NULL;
+
+      /* Put all of the good values into a buffer that we can sort */
+      sortbuf = astCalloc( count, sizeof(*sortbuf) );
+
+      if( *status == SAI__OK ) {
+        size_t index = 0;
+        for( i=0; i<nsamp*stride; i+=stride ) {
+          if( !(qual[j] & mask) ) {
+            sortbuf[index] = (double) data[i];
+            index++;
+          }
+        }
+
+        /* Sort the buffer */
+        qsort( sortbuf, count, sizeof(*sortbuf), smfStats1Compare );
+
+        /* Set the median to the central value */
+        *median = sortbuf[index/2];
+      }
+
+      /* Clean up */
+      if( sortbuf ) sortbuf = astFree( sortbuf );
+    }
+
   } else {
     /* CGEN_BAD checking version */
     if( sigma ) {
@@ -203,6 +267,34 @@ void CGEN_FUNCTION(smf_stats1)( const CGEN_TYPE *data, size_t stride, size_t nsa
           count++;
         }
     }
+
+    /* Median calculation */
+    if( median && count) {
+      double *sortbuf=NULL;
+
+      /* Put all of the good values into a buffer that we can sort */
+      sortbuf = astCalloc( count, sizeof(*sortbuf) );
+
+      if( *status == SAI__OK ) {
+        size_t index = 0;
+        for( i=0; i<nsamp*stride; i+=stride ) {
+          if( data[i] != CGEN_BAD ) {
+            sortbuf[index] = (double) data[i];
+            index++;
+          }
+        }
+
+        /* Sort the buffer */
+        qsort( sortbuf, count, sizeof(*sortbuf), smfStats1Compare );
+
+        /* Set the median to the central value */
+        *median = sortbuf[index/2];
+      }
+
+      /* Clean up */
+      if( sortbuf ) sortbuf = astFree( sortbuf );
+    }
+
   }
 
   /* Calculate numbers as long as count > 0 */
@@ -226,3 +318,5 @@ void CGEN_FUNCTION(smf_stats1)( const CGEN_TYPE *data, size_t stride, size_t nsa
   }
 
 }
+
+
