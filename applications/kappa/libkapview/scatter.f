@@ -145,22 +145,22 @@
 *        The appearance of markers is controlled by Colour(Markers),
 *        Width(Markers), etc. (the synonym Symbols may be used in place
 *        of Markers).  [current value]
-*     XLEFT = _REAL (Read)
+*     XLEFT = _DOUBLE (Read)
 *        The axis value to place at the left hand end of the horizontal
 *        axis. If a null (!) value is suplied, the value used is determined
 *        by Parameter PERC1. The value supplied may be greater than or less
 *        than the value supplied for XRIGHT.  [!]
-*     XRIGHT = _REAL (Read)
+*     XRIGHT = _DOUBLE (Read)
 *        The axis value to place at the right hand end of the horizontal
 *        axis. If a null (!) value is suplied, the value used is determined
 *        by Parameter PERC1. The value supplied may be greater than or less
 *        than the value supplied for XLEFT.  [!]
-*     YBOT = _REAL (Read)
+*     YBOT = _DOUBLE (Read)
 *        The axis value to place at the bottom end of the vertical axis.
 *        If a null (!) value is suplied, the value used is determined
 *        by Parameter PERC2. The value supplied may be greater than or less
 *        than the value supplied for YTOP.  [!]
-*     YTOP = _REAL (Read)
+*     YTOP = _DOUBLE (Read)
 *        The axis value to place at the top end of the vertical axis.
 *        If a null (!) value is suplied, the value used is determined
 *        by Parameter PERC2. The value supplied may be greater than or less

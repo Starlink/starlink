@@ -166,7 +166,7 @@
 *        Line may be used in place of Curves.)  [current value]
 *     TITLE = LITERAL (Read)
 *        Title for the histogram NDF.  ["KAPPA - Histogram"]
-*     XLEFT = _REAL (Read)
+*     XLEFT = _DOUBLE (Read)
 *        The axis value to place at the left hand end of the horizontal
 *        axis of the plot.  If a null (!) value is supplied, the minimum
 *        data value in the histogram is used.  The value supplied may be
@@ -175,12 +175,12 @@
 *        TRUE if the plot X axis is to be logarithmic.  Any histogram
 *        bins which have negative or zero central data values are
 *        omitted from the plot.  [FALSE]
-*     XRIGHT = _REAL (Read)
+*     XRIGHT = _DOUBLE (Read)
 *        The axis value to place at the right hand end of the horizontal
 *        axis of the plot.  If a null (!) value is supplied, the maximum
 *        data value in the histogram is used.  The value supplied may be
 *        greater than or less than the value supplied for XLEFT.  [!]
-*     YBOT = _REAL (Read)
+*     YBOT = _DOUBLE (Read)
 *        The axis value to place at the bottom end of the vertical axis
 *        of the plot.  If a null (!) value is supplied, the lowest count
 *        the histogram is used.  The value supplied may be greater than
@@ -188,7 +188,7 @@
 *     YLOG = _LOGICAL (Read)
 *        TRUE if the plot Y axis is to be logarithmic.  Empty bins are
 *        removed from the plot if the Y axis is logarithmic.  [FALSE]
-*     YTOP = _REAL (Read)
+*     YTOP = _DOUBLE (Read)
 *        The axis value to place at the top end of the vertical axis of
 *        the plot.  If a null (!) value is supplied, the largest count
 *        in the histogram is used.  The value supplied may be greater

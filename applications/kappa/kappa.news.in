@@ -18,6 +18,11 @@
 
 2 Modified_applications
 
+   o HISTOGRAM
+
+      -  Now permits plotting of the histogram for data-value limits
+      that exceed the single-precision data range.
+
    o  LOOK
 
       -  New format "wglist" has been added, which lists the WCS

@@ -180,25 +180,25 @@
 *        Value for the title of the output NDF.  A null value will cause
 *        the title of the NDF supplied for Parameter IN1 to be used
 *        instead.  [!]
-*     XLEFT = _REAL (Read)
+*     XLEFT = _DOUBLE (Read)
 *        The axis value to place at the left hand end of the horizontal
 *        axis of the plot.  If a null (!) value is supplied, the value
 *        used is the minimum data value used by the fitting algorithm
 *        from IN2 (with a small margin).  The value supplied may be
 *        greater than or less than the value supplied for XRIGHT.  [!]
-*     XRIGHT = _REAL (Read)
+*     XRIGHT = _DOUBLE (Read)
 *        The axis value to place at the right hand end of the horizontal
 *        axis of the plot.  If a null (!) value is supplied, the value
 *        used is the maximum data value used by the fitting algorithm
 *        from IN2 (with a small margin).  The value supplied may be
 *        greater than or less than the value supplied for XLEFT.  [!]
-*     YBOT = _REAL (Read)
+*     YBOT = _DOUBLE (Read)
 *        The axis value to place at the bottom end of the vertical axis
 *        of the plot.  If a null (!) value is supplied, the value used
 *        is the minimum data value used by the fitting algorithm from
 *        IN1 (with a small margin).  The value supplied may be greater
 *        than or less than the value supplied for YTOP.  []
-*     YTOP = _REAL (Read)
+*     YTOP = _DOUBLE (Read)
 *        The axis value to place at the top end of the vertical axis of
 *        the plot.  If a null (!) value is supplied, the value used is
 *        the maximum data value used by the fitting algorithm from IN1
