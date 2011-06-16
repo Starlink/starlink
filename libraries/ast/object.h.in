@@ -1283,6 +1283,7 @@ typedef struct AstObject {
    char *id;                     /* Pointer to ID string */
    char *ident;                  /* Pointer to Ident string */
    char usedefs;                 /* Use default attribute values? */
+   int iref;                     /* Object index (unique within class) */
 
 #if defined(THREAD_SAFE)
    int locker;                   /* Thread that has locked this Object */

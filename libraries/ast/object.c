@@ -202,6 +202,10 @@ f     - AST_VERSION: Return the verson of the AST library being used.
 *     24-AUG-2010 (DSB):
 *        Allow commas to be included in attribute values supplied to
 *        astSet or astVSet by putting quotes around the attribute value.
+*     16-JUN-2011 (DSB):
+*        Added component "iref" to the Object structure. This is an
+*        integer identifier for each object that is unique within the
+*        class of the object. Useful for debugging.
 *class--
 */
 
@@ -4926,8 +4930,10 @@ AstObject *astInitObject_( void *mem, size_t size, int init,
 /* Use default values for unspecified attributes. */
          new->usedefs = CHAR_MAX;
 
-/* Increment the count of active Objects in the virtual function table. */
-         vtab->nobject++;
+/* Increment the count of active Objects in the virtual function table.
+   Use the count as a unique identifier (unique within the class) for
+   the Object. */
+         new->iref = vtab->nobject++;
       }
 
 /* If an error occurred, clean up by deleting the new Object. Otherwise
