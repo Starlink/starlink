@@ -121,7 +121,8 @@
 *     RESIST = GROUP (Read)
 *          A group expression containing the resistor settings for
 *          each bolometer.  Usually specified as a text file using "^"
-*          syntax. An example can be found in $STARLINK_DIR/share/smurf/resist.cfg
+*          syntax. An example can be found in
+*          $STARLINK_DIR/share/smurf/resist.cfg
 *          [$STARLINK_DIR/share/smurf/resist.cfg]
 *     RESPMASK = _LOGICAL (Read)
 *          If true, responsivity data will be used to mask bolometer data
@@ -183,12 +184,13 @@
 *     2010-12-07 (TIMJ):
 *        Let the NEP output image be blank.
 *     2011-04-19 (TIMJ):
-*        Presence of DA struct is not enough to determine if flatfield is available.
+*        Presence of DA struct is not enough to determine if flatfield is
+*        available.
 *     2011-04-20 (DSB):
 *        - Clean the arrays before calculating the noise.
 *        - Added CONFIG parameter.
-*        - When calling smf_bolonoise, only apodize if ZEROPAD is set (as done in
-*          the makemap NOI model).
+*        - When calling smf_bolonoise, only apodize if ZEROPAD is set (as done
+*          in the makemap NOI model).
 *     2011-04-20 (TIMJ):
 *        CONFIG=! disables all cleaning and uses full apodization.
 *        Use rt(s) instead of /rt(Hz) for noise units.
@@ -300,7 +302,7 @@ void smurf_calcnoise( int *status ) {
   int zeropad;              /* Pad with zeros before FFTing? */
   double f_low = 0.5;       /* Frequency to use for noise ratio image */
   double freqdef[] = { SMF__F_WHITELO,
-                       SMF__F_WHITEHI }; /* Default values for frequency range */
+                       SMF__F_WHITEHI };/* Default values for frequency range */
   double freqs[2];          /* Frequencies to use for white noise */
 
   if (*status != SAI__OK) return;
@@ -317,9 +319,9 @@ void smurf_calcnoise( int *status ) {
   /* Get the low frequency to use for the noise ratio */
   parGdr0d( "FLOW", f_low, 0.0, 50.0, 1, &f_low, status );
 
-  msgOutf( "", "Calculating noise between %g and %g Hz and noise ratio for %g Hz", status,
-           freqs[0], freqs[1], f_low);
-
+  msgOutf( "",
+           "Calculating noise between %g and %g Hz and noise ratio for %g Hz",
+           status, freqs[0], freqs[1], f_low);
 
   /* Get input file(s) */
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
@@ -337,7 +339,8 @@ void smurf_calcnoise( int *status ) {
     igrp = fgrp;
     fgrp = NULL;
   } else {
-    msgOutif( MSG__NORM, " ", "No valid frames supplied. Nothing to do.", status );
+    msgOutif( MSG__NORM, " ", "No valid frames supplied. Nothing to do.",
+              status );
     if (fgrp) grpDelet( &fgrp, status );
     goto CLEANUP;
   }
@@ -501,8 +504,8 @@ void smurf_calcnoise( int *status ) {
 
         if ( ! thedata || !thedata->hdr ) {
           *status = SAI__ERROR;
-          errRepf( "", "Concatenated data set %zu is missing a header. Should not be possible",
-                   status, idx);
+          errRepf( "", "Concatenated data set %zu is missing a header. "
+                   "Should not be possible", status, idx);
           break;
         }
 
@@ -517,19 +520,24 @@ void smurf_calcnoise( int *status ) {
         } else {
           do_nep = 0;
           msgOutiff( MSG__VERB, "",
-                     "Data in units of '%s' and not raw, so not generating NEP image",
-                     status, strlen(thedata->hdr->units) ? thedata->hdr->units : "<none>" );
+                     "Data in units of '%s' and not raw, so not generating NEP "
+                     "image", status, strlen(thedata->hdr->units) ?
+                     thedata->hdr->units : "<none>" );
         }
 
-        one_strlcpy( noiseunits, thedata->hdr->units, sizeof(noiseunits), status );
-        if (strlen(noiseunits)) one_strlcat( noiseunits, " ", sizeof(noiseunits), status );
+        one_strlcpy( noiseunits, thedata->hdr->units, sizeof(noiseunits),
+                     status );
+        if (strlen(noiseunits)) one_strlcat( noiseunits, " ",
+                                             sizeof(noiseunits), status );
         one_strlcat( noiseunits, "s**0.5", sizeof(noiseunits), status );
 
-        /* Sanity check units for effective noise calculations - this will also disable NEP */
+        /* Sanity check units for effective noise calculations - this
+           will also disable NEP */
         if (strlen(refunits)) {
           if (strcmp( refunits, noiseunits ) != 0) {
-            msgOutiff(MSG__QUIET, "", "Units for input data (%s) do not match previous files (%s)."
-                      " Will not calculate effective noise", status, noiseunits, refunits );
+            msgOutiff(MSG__QUIET, "", "Units for input data (%s) do not match "
+                      "previous files (%s). Will not calculate effective noise",
+                      status, noiseunits, refunits );
             calc_effnoise = 0;
           }
         } else {
@@ -567,7 +575,8 @@ void smurf_calcnoise( int *status ) {
             int provid = NDF__NOID;
             /* open a reference input file for provenance propagation */
             ndgNdfas( basegrp, gcount, "READ", &provid, status );
-            smf_write_smfData( powdata, NULL, NULL, powgrp, gcount, provid, status );
+            smf_write_smfData( powdata, NULL, NULL, powgrp, gcount, provid,
+                               status );
             smf_close_file( &powdata, status );
             ndfAnnul( &provid, status );
           }
@@ -576,7 +585,8 @@ void smurf_calcnoise( int *status ) {
             int provid = NDF__NOID;
             /* open a reference input file for provenance propagation */
             ndgNdfas( basegrp, gcount, "READ", &provid, status );
-            smf_write_smfData( thedata, NULL, NULL, tsgrp, gcount, provid, status );
+            smf_write_smfData( thedata, NULL, NULL, tsgrp, gcount, provid,
+                               status );
             ndfAnnul( &provid, status );
           }
 
@@ -601,8 +611,10 @@ void smurf_calcnoise( int *status ) {
               smfData * bolval;
               smf_flatmeth flatmethod;
               smf_flat_override( flatramps, thedata, status );
-              smf_flat_smfData( thedata, &flatmethod, &powval, &bolval, status );
-              ngood = smf_flat_responsivity( flatmethod, respmap, 5.0, 1, powval, bolval, NULL, status);
+              smf_flat_smfData( thedata, &flatmethod, &powval, &bolval,
+                                status );
+              ngood = smf_flat_responsivity( flatmethod, respmap, 5.0, 1,
+                                             powval, bolval, NULL, status);
               if (powval) smf_close_file( &powval, status );
               if (bolval) smf_close_file( &bolval, status );
             }
@@ -624,8 +636,8 @@ void smurf_calcnoise( int *status ) {
 
             if (ngood == 0) {
               msgOutif( MSG__QUIET, "",
-                        "WARNING: No good responsivities in flatfield. Blank NEP image.",
-                        status );
+                        "WARNING: No good responsivities in flatfield. Blank "
+                        "NEP image.", status );
             }
 
             /* now create the output image for NEP data */
@@ -636,8 +648,11 @@ void smurf_calcnoise( int *status ) {
             /* and divide the noise data by the responsivity
                correcting for SIMULT */
             if (*status == SAI__OK) {
-              if (strlen(refnepunits) == 0) one_strlcpy( refnepunits, nepdata->hdr->units,
-                                                          sizeof(refnepunits), status );
+              if (strlen(refnepunits) == 0) one_strlcpy( refnepunits,
+                                                         nepdata->hdr->units,
+                                                          sizeof(refnepunits),
+                                                         status );
+
               for (i = 0; i < (nepdata->dims)[0]*(nepdata->dims)[1]; i++) {
                 /* ignore variance since noise will not have any */
                 double * noise = (outdata->pntr)[0];
