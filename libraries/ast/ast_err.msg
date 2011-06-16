@@ -189,5 +189,6 @@ NOTAB           <Cannot access FITS binary table>
 ! New codes introduced for V5.7
 LEVMAR          <Error in levmar Levenberg-Marquardt code>
 NOFIT           <Fit failed>
+ISNAN           <A transformation generated one or more NaN values>
 
 .END

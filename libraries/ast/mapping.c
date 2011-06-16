@@ -302,6 +302,13 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        When rebinning (in macros NEAR_1/2/ND, KERNEL_1/2/ND, LINEAR_1/2/ND),
 *        do not treat a zero variance as bad unless the reciprocals of the
 *        variances are being used as weights.
+*     16-JUN-2011 (DSB):
+*        Allow a check for NaNs to be performed as a debugging tool after
+*        every invocation of astTransform. This is controlled by the
+*        AST_REPLACE_NAN environment variable: if unset, no check is
+*        performed, if set to "1" NaNs are changed to AST__BAD but no
+*        error is reported, if set to anything else NaNs are changed to
+*        AST__BAD and an error is reported.
 *class--
 */
 
@@ -23688,8 +23695,11 @@ AstMapping *astSimplify_( AstMapping *this, int *status ) {
 }
 AstPointSet *astTransform_( AstMapping *this, AstPointSet *in,
                             int forward, AstPointSet *out, int *status ) {
+   AstPointSet *result;
    if ( !astOK ) return NULL;
-   return (**astMEMBER(this,Mapping,Transform))( this, in, forward, out, status );
+   result = (**astMEMBER(this,Mapping,Transform))( this, in, forward, out, status );
+   (void) astReplaceNaN( result );
+   return result;
 }
 void astTran1_( AstMapping *this, int npoint, const double xin[],
                 int forward, double xout[], int *status ) {

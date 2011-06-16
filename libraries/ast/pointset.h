@@ -467,6 +467,7 @@ typedef struct AstPointSetVtab {
    void (* SetNpoint)( AstPointSet *, int, int * );
    void (* SetPoints)( AstPointSet *, double **, int * );
    void (* SetSubPoints)( AstPointSet *, int, int, AstPointSet *, int * );
+   int (* ReplaceNaN)( AstPointSet *, int * );
 
    double (* GetPointAccuracy)( AstPointSet *, int, int * );
    int (* TestPointAccuracy)( AstPointSet *, int, int * );
@@ -532,6 +533,7 @@ void astSetNpoint_( AstPointSet *, int, int * );
 void astSetSubPoints_( AstPointSet *, int, int, AstPointSet *, int * );
 AstPointSet *astAppendPoints_( AstPointSet *, AstPointSet *, int * );
 void astBndPoints_( AstPointSet *, double *, double *, int * );
+int astReplaceNaN_( AstPointSet *, int * );
 
 # if defined(astCLASS)           /* Protected */
 int astGetNcoord_( const AstPointSet *, int * );
@@ -607,6 +609,8 @@ astINVOKE(V,astSetSubPoints_(astCheckPointSet(point1),point,coord,astCheckPointS
 astINVOKE(O,astAppendPoints_(astCheckPointSet(this),astCheckPointSet(that),STATUS_PTR))
 #define astBndPoints(this,lbnd,ubnd) \
 astINVOKE(V,astBndPoints_(astCheckPointSet(this),lbnd,ubnd,STATUS_PTR))
+#define astReplaceNaN(this) \
+astINVOKE(V,astReplaceNaN_(astCheckPointSet(this),STATUS_PTR))
 
 #if defined(astCLASS)            /* Protected */
 #define astGetNpoint(this) \

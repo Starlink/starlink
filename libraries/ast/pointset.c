@@ -62,6 +62,8 @@
 *        Avoid allocating memory for "acc" unless needed.
 *     1-MAY-2009 (DSB):
 *        Added astBndPoints.
+*     16-JUN-2011 (DSB):
+*        Added astReplaceNan.
 */
 
 /* Module Macros. */
@@ -71,6 +73,10 @@
    "protected" symbols available. */
 #define astCLASS PointSet
 
+/* Values that control the behaviour of the astReplaceNaN method. */
+#define IGNORE_NANS  0
+#define REPLACE_NANS 1
+#define REPORT_NANS  2
 
 /*
 *
@@ -476,6 +482,9 @@ static double ast_nan;
    Nan value. */
 static float ast_nanf;
 
+/* Enable or disable the astReplaceNan method. */
+static int replace_nan = -1;
+
 /* Pointers to parent class methods which are extended by this class. */
 static const char *(* parent_getattrib)( AstObject *, const char *, int * );
 static int (* parent_testattrib)( AstObject *, const char *, int * );
@@ -536,6 +545,7 @@ static int Equal( AstObject *, AstObject *, int * );
 static int GetNcoord( const AstPointSet *, int * );
 static int GetNpoint( const AstPointSet *, int * );
 static int GetObjSize( AstObject *, int * );
+static int ReplaceNaN( AstPointSet *, int * );
 static int TestAttrib( AstObject *, const char *, int * );
 static AstPointSet *AppendPoints( AstPointSet *, AstPointSet *, int * );
 static void BndPoints( AstPointSet *, double *, double *, int * );
@@ -1527,6 +1537,7 @@ void astInitPointSetVtab_(  AstPointSetVtab *vtab, const char *name, int *status
 /* Local Variables: */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
+   const char *envvar;           /* Pointer to environment variable value */
    size_t i;                     /* Index of next byte in NaN value */
    unsigned char *p;             /* Pointer to next byte in NaN value */
 
@@ -1557,6 +1568,7 @@ void astInitPointSetVtab_(  AstPointSetVtab *vtab, const char *name, int *status
    vtab->GetNpoint = GetNpoint;
    vtab->GetPoints = GetPoints;
    vtab->PermPoints = PermPoints;
+   vtab->ReplaceNaN = ReplaceNaN;
    vtab->SetPoints = SetPoints;
    vtab->SetNpoint = SetNpoint;
    vtab->SetSubPoints = SetSubPoints;
@@ -1595,6 +1607,22 @@ void astInitPointSetVtab_(  AstPointSetVtab *vtab, const char *name, int *status
    for( i = 0; i < sizeof( ast_nan ); i++ ) *(p++) = 255;
    p = (unsigned char *) &ast_nanf;
    for( i = 0; i < sizeof( ast_nanf ); i++ ) *(p++) = 255;
+
+/* See what  action the astReplaceNaN method should perform. This
+   is determined by the value of the AST_REPLACE_NAN environment
+   variable. Not set = do not check for NaNs, "1" = replace NaNs with
+   AST__BAD silently, anything else = report an error if any NaNs are
+   encountered. */
+   if( replace_nan == -1 ) {
+      envvar = getenv( "AST_REPLACE_NAN" );
+      if( !envvar ) {
+         replace_nan = IGNORE_NANS;
+      } else if( !strcmp( envvar, "1" ) ) {
+         replace_nan = REPLACE_NANS;
+      } else {
+         replace_nan = REPORT_NANS;
+      }
+   }
    UNLOCK_MUTEX1
 
 /* If we have just initialised the vtab for the current class, indicate
@@ -1771,6 +1799,98 @@ static void PermPoints( AstPointSet *this, int forward, const int perm[], int *s
 
 /* Free the temporary copy of the old array. */
    old = astFree( old );
+}
+
+static int ReplaceNaN( AstPointSet *this, int *status ) {
+/*
+*+
+*  Name:
+*     astReplaceNaN
+
+*  Purpose:
+*     Check for NaNs in a PointSet.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "pointset.h"
+*     int astReplaceNaNs( AstPointSet *this )
+
+*  Class Membership:
+*     PointSet method.
+
+*  Description:
+*     The behaviour of this method is determined by the AST_REPLACE_NAN
+*     environment variable. If AST_REPLACE_NAN is undefined, then the
+*     method returns without action. If AST_REPLACE_NAN is "1", then the
+*     method examines the supplied PointSet and replaces any NaN values
+*     with AST__BAD. If AST_REPLACE_NAN has any other value, any NaNs in
+*     the supplied PointSet are still replaced, but in addition an error
+*     is reported.
+
+*  Parameters:
+*     this
+*        Pointer to the PointSet.
+
+*  Returned Value:
+*     Non-zero if any NaN values were found in the PointSet. If AST_REPLACE_NAN
+*     is undefined, then zero is always returned.
+
+*  Notes:
+*    The value of the AST_REPLACE_NAN environment variable is obtained
+*    only once, when the PointSet virtual function table is first
+*    created. This value is saved for all subsequent invocations of this
+*    method.
+
+*-
+*/
+
+/* Local Variables: */
+   double **ptr;
+   double *p0;
+   double *p;
+   int ic;
+   int nc;
+   int np;
+   int result;
+
+/* Initialise */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Unless the AST_REPALCE_NAN environment variable is undefined, check
+   for NaNs in the supplied PointSet, replacing any with AST__BAD. */
+   if( replace_nan != IGNORE_NANS ) {
+      ptr = astGetPoints( this );
+      if( ptr ) {
+         nc = astGetNcoord( this );
+         np = astGetNpoint( this );
+         for( ic = 0; ic < nc; ic++ ) {
+            p = ptr[ ic ];
+            p0 = p + np;
+            for( ; p < p0; p++ ) {
+               if( astISNAN(*p) ) {
+                  result = 1;
+                  *p = AST__BAD;
+               }
+            }
+         }
+
+/* If any NaNs were found, and AST_REPLACE_NAN is not set to "1", report
+   an error. */
+         if( result && replace_nan == REPORT_NANS ) {
+            astError( AST__ISNAN, "astReplaceNan(%s): One or more NaN values "
+                      "were encountered within an AST PointSet.", status,
+                      astGetClass( this ) );
+         }
+      }
+   }
+
+/* Return the result. */
+   return result;
 }
 
 static void SetAttrib( AstObject *this_object, const char *setting, int *status ) {
@@ -3072,6 +3192,11 @@ AstPointSet *astAppendPoints_( AstPointSet *this, AstPointSet *that, int *status
 void astBndPoints_( AstPointSet *this, double *lbnd, double *ubnd, int *status ) {
    if ( !astOK ) return;
    (**astMEMBER(this,PointSet,BndPoints))( this, lbnd, ubnd, status );
+}
+
+int astReplaceNaN_( AstPointSet *this, int *status ) {
+   if ( !astOK ) return 0;
+   return (**astMEMBER(this,PointSet,ReplaceNaN))( this, status );
 }
 
 
