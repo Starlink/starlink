@@ -2581,7 +2581,7 @@ static double *SmoothZ( int zbox, int nrow, double *in_vals, double *iz_vals,
 
 static double Mode( int n, double *vals, double *dev, int * status ) {
 
-#define NBIN 100
+#define NBIN 10
 
 /* Local Variables: */
    int i;
