@@ -14,9 +14,9 @@
 
 *  Invocation:
 *     void smf_clipped_stats1D( const double *data, size_t nclips,
-*                               const float clips[], size_t stride, size_t nsamp,
-*                               smf_qual_t *quality, size_t qstride,
-*                               smf_qual_t mask, double *mean,
+*                               const float clips[], size_t stride,
+*                               size_t nsamp, smf_qual_t *quality,
+*                               size_t qstride, smf_qual_t mask, double *mean,
 *                               double *sigma, size_t *ngood, int *status );
 
 *  Arguments:
@@ -100,9 +100,11 @@
 #include "smf.h"
 #include "sae_par.h"
 
-static size_t smf__flag_clipped_data( const double *data, size_t stride, size_t nsamp,
-                                      smf_qual_t *qua, smf_qual_t badqual, double mean,
-                                      double sigma, double sigclip, int * status );
+static size_t smf__flag_clipped_data( const double *data, size_t stride,
+                                      size_t nsamp, smf_qual_t *qua,
+                                      smf_qual_t badqual, double mean,
+                                      double sigma, double sigclip,
+                                      int * status );
 
 void smf_clipped_stats1D( const double *data, size_t nclips,
                           const float clips[], size_t stride, size_t nsamp,
@@ -168,10 +170,8 @@ void smf_clipped_stats1D( const double *data, size_t nclips,
                  &lngood, status );
 
     /* Flag any values exceeding the specified clip */
-    lngood = smf__flag_clipped_data( data, stride, nsamp, qua, BADQUAL, lmean, lsigma,
-                                     clips[clip], status );
-
-
+    lngood = smf__flag_clipped_data( data, stride, nsamp, qua, BADQUAL, lmean,
+                                     lsigma, clips[clip], status );
   }
 
   /* and one final stats now that all clips have been applied*/
@@ -189,12 +189,15 @@ void smf_clipped_stats1D( const double *data, size_t nclips,
 }
 
 
-/* Helper routine to run through the data array and setting quality to the supplied
-   value if a data point is out of range. It does recalculate ngood and returns it. */
+/* Helper routine to run through the data array and setting quality to
+   the suppliedq value if a data point is out of range. It does
+   recalculate ngood and returns it. */
 
-static size_t smf__flag_clipped_data( const double *data, size_t stride, size_t nsamp,
-                                      smf_qual_t *qua, smf_qual_t badqual, double mean,
-                                      double sigma, double sigclip, int * status ) {
+static size_t smf__flag_clipped_data( const double *data, size_t stride,
+                                      size_t nsamp, smf_qual_t *qua,
+                                      smf_qual_t badqual, double mean,
+                                      double sigma, double sigclip,
+                                      int * status ) {
 
   size_t i = 0;
   size_t j = 0;
