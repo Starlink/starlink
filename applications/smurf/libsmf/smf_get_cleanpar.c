@@ -24,7 +24,7 @@
 *                       double *flagfast, int *order, double *spikethresh,
 *                       size_t *spikebox, double *noiseclip,
 *                       int *whiten, int *compreprocess, double *pcathresh,
-*                       int groupsubarray, int *status )
+*                       int groupsubarray, double *downsampfreq, int *status )
 
 *  Arguments:
 *     keymap = AstKeyMap* (Given)
@@ -100,9 +100,11 @@
 *        If set do common-mode rejection and bad-data rejection.
 *     pcathresh = double (Returned)
 *        Outlier threshold for PCA amplitudes to remove from data for cleaning
-*     groupsubarray = int (Returned)
+*     groupsubarray = int * (Returned)
 *        If set, handle subarrays separately instead of grouping data at same
 *        wavelength that were taken simultaneously together.
+*     downsampfreq = double * (Returned)
+*        Target down-sampling rate in Hz.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -157,6 +159,8 @@
 *        Add pcathresh
 *     2011-04-15 (EC):
 *        Add groupsubarray
+*     2011-06-16 (EC):
+*        Add downsampfreq
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -215,7 +219,8 @@ void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac, dim_t *dcfitbox,
                        double *flagslow, double *flagfast, int *order,
                        double *spikethresh, size_t *spikebox,
                        double *noiseclip, int *whiten, int *compreprocess,
-                       double *pcathresh, int *groupsubarray, int *status ) {
+                       double *pcathresh, int *groupsubarray,
+                       double *downsampfreq, int *status ) {
 
   int dofft=0;                  /* Flag indicating that filtering is required */
   int f_nnotch=0;               /* Number of notch filters in array */
@@ -546,5 +551,17 @@ void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac, dim_t *dcfitbox,
 
     msgOutiff( MSG__DEBUG, "", FUNC_NAME ": GROUPSUBARRAY is %s", status,
                (*groupsubarray ? "enabled" : "disabled" ) );
+  }
+
+  if( downsampfreq ) {
+    *downsampfreq = 0;
+    astMapGet0D( keymap, "DOWNSAMPFREQ", downsampfreq );
+    if( *downsampfreq <= 0 ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "DOWNSAMPFREQ must be > 0.", status );
+    }
+
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DOWNSAMPFREQ=%f", status,
+               *downsampfreq );
   }
 }

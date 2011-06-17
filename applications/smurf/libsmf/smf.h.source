@@ -1161,7 +1161,8 @@ void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac,
                        int *dofilt, double *flagslow, double *flagfast,
                        int *order, double *spikethresh, size_t *spikeiter,
                        double *noiseclip, int *whiten, int *compreprocess,
-                       double *pcathresh, int *groupsubarray, int *status );
+                       double *pcathresh, int *groupsubarray, double *downsampfreq,
+                       int *status );
 
 void smf_get_dims( const smfData *data, dim_t *nrows, dim_t *ncols,
                    dim_t *nbolo, dim_t *ntslice, dim_t *ndata,
