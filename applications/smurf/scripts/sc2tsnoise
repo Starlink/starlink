@@ -113,8 +113,10 @@ foreach obsdir ( `cat $filenames` )
     # set this flag once we have done an open-shutter sky measurement
     set havesky = 0
 
-    # set this flag to ndf name if we encounter a skyflat
+    # set this flag to ndf name if we encounter a skyflat or darkflat
+    # when looking at the first few sequences
     set haveskyflat = 0
+    set havedarkflat = 0
 
     # Loop over the first few files. For normal science observations we
     # will have a dark noise, followed by a skyflat, and then shutter-open
@@ -146,14 +148,16 @@ foreach obsdir ( `cat $filenames` )
                 set ok = 0
             endif
 
-            # if this is a shutter-open fastflat then simply remember it for
-            # future use. If seqtype is flatfield or FASTFLAT skip processing
-            # for noise.
+            # if this is a shutter-open fastflat then simply remember
+            # it for future use. Likewise for dark fastflat. If
+            # seqtype is flatfield or # FASTFLAT skip processing for
+            # noise.
 
             if ( $ok == 1 ) then
 
-                if ( ("$seqtype" =~ "FASTFLAT") && ("$shutter" =~ "1") ) then
-                    set haveskyflat = $thisndf
+                if ( "$seqtype" =~ "FASTFLAT") then
+                    if ("$shutter" =~ "0") set havedarkflat = $thisndf
+                    if ("$shutter" =~ "1") set haveskyflat = $thisndf
                 endif
 
                 if ( ("$seqtype" =~ "flatfield") || \
@@ -183,33 +187,45 @@ foreach obsdir ( `cat $filenames` )
                 # is also shutter-closed
                 if ( "$shutter" =~ "0" ) then
 
-                    if ( -e $flatfile ) then
+                    if ( "$havedarkflat" !~ "0" ) then
+                        # override flatfile with darkflat if we have it
+                        set flatfile = $havedarkflat
 
-                        echo flat is $flatfile
+                        set temp = `basename $flatfile`
+                        set flatsub  = `echo $temp | cut -b 1-3`
+                        set flatdate = `echo $temp | cut -b 4-11`
+                        set flatobs  = `echo $temp | cut -b 13-17`
+                    else
+                        # otherwise look for flatfield in header
 
-                        set flatshutter = `fitsval $flatfile SHUTTER`
+                        if ( -e $flatfile ) then
 
-                        if ( $? == 0 ) then
-                            if ( "$flatshutter" !~ "0" ) then
-                                echo Flatfield $flatfile for dark $thisndf \
-                                    has shutter open!
-                                set ok = 0
+                            echo flat is $flatfile
+
+                            set flatshutter = `fitsval $flatfile SHUTTER`
+
+                            if ( $? == 0 ) then
+                                if ( "$flatshutter" !~ "0" ) then
+                                    echo Flatfield $flatfile for dark $thisndf \
+                                        has shutter open!
+                                    set ok = 0
+                                else
+                                    # if we get here the data look good. Set
+                                    # flatfile to a wildcard because we need to
+                                    # process several header steps in different
+                                    # files
+
+                                    set flatfile = "$basedir/$flatsub/$flatdate/$flatobs/$flatsub$flatdate\_$flatobs\_????.sdf"
+                                endif
                             else
-                                # if we get here the data look good. Set
-                                # flatfile to a wildcard because we need to
-                                # process several header steps in different
-                                # files
-
-                                set flatfile = "$basedir/$flatsub/$flatdate/$flatobs/$flatsub$flatdate\_$flatobs\_????.sdf"
+                                # problem reading fits header
+                                echo Could not read dark flat $flatfile FITS header
+                                set ok = 0
                             endif
                         else
-                            # problem reading fits header
-                            echo Could not read dark flat $flatfile FITS header
+                            echo Dark flat $flatfile does not exist
                             set ok = 0
                         endif
-                    else
-                        echo Dark flat $flatfile does not exist
-                        set ok = 0
                     endif
                 endif
 
@@ -229,7 +245,7 @@ foreach obsdir ( `cat $filenames` )
                         set flatdate = `echo $temp | cut -b 4-11`
                         set flatobs  = `echo $temp | cut -b 13-17`
                     else
-                        # otherwise look for stepped shutter-open flatfield
+                        # otherwise look for flatfield in header
                         if ( -e $flatfile ) then
 
                             set flatshutter = `fitsval $flatfile SHUTTER`
@@ -349,6 +365,8 @@ foreach obsdir ( `cat $filenames` )
                     endif
 
                     calcnoise noise noise_nep power="$pfile" tseries="$tfile" \
+                        noicliplog noicliplow=3 noicliphigh=! \
+                        nepcliplog nepcliplow=3 nepcliphigh=! \
                         accept > /dev/null
 
                     set effnep = `parget effnep calcnoise`
