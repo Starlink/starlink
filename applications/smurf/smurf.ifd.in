@@ -512,12 +512,66 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter nepcliphigh {
+                type _DOUBLE
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                default !
+                prompt {Clip NEP values this many standard deviations above median}
+                helpkey *
+            }
+
+            parameter nepcliplow {
+                type _DOUBLE
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                default 3
+                prompt {Clip NEP values this many standard deviations below median}
+                helpkey *
+            }
+
+            parameter nepcliplog {
+                type _LOGICAL
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                default TRUE
+                prompt {Clip based on log of the NEP}
+                helpkey *
+            }
+
             parameter nepgoodbol {
                 type _INTEGER
                 access WRITE
                 vpath DEFAULT
                 prompt {Number of bolometers with good NEP measurements}
                 default 0
+                helpkey *
+            }
+
+            parameter noicliphigh {
+                type _DOUBLE
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                default !
+                prompt {Clip NOISE values this many standard deviations above median}
+                helpkey *
+            }
+
+            parameter noicliplow {
+                type _DOUBLE
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                default 3
+                prompt {Clip NOISE values this many standard deviations below median}
+                helpkey *
+            }
+
+            parameter noicliplog {
+                type _LOGICAL
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                default TRUE
+                prompt {Clip based on log of the NOISE}
                 helpkey *
             }
 

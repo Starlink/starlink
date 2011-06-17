@@ -100,8 +100,25 @@
 *          Control the verbosity of the application. Values can be
 *          NONE (no messages), QUIET (minimal messages), NORMAL,
 *          VERBOSE, DEBUG or ALL. [NORMAL]
+*     NEPCLIPHIGH = _DOUBLE (Given)
+*          Flag NEP values this number of standard deviations above the median.
+*          If a null (!) value is supplied now high-outlier clipping. [!]
+*     NEPCLIPLOW = _DOUBLE (Given)
+*          Flag NEP values this number of standard deviations below the median.
+*          If a null (!) value is supplied now low-outlier clipping. [3]
+*     NEPCLIPLOG = _LOGICAL (Given)
+*          Clip based on the log of the NEP. [TRUE]
 *     NEPGOODBOL = _INTEGER (Write)
 *          The number of bolometers with good NEP measurements (see EFFNEP)
+*     NOICLIPHIGH = _DOUBLE (Given)
+*          Flag NOISE values this number of standard deviations above the
+*          median. If a null (!) value is supplied now high-outlier
+*          clipping. [!]
+*     NOICLIPLOW = _DOUBLE (Given)
+*          Flag NOISE values this number of standard deviations below the
+*          median. If a null (!) value is supplied now low-outlier clipping. [3]
+*     NOICLIPLOG = _LOGICAL (Given)
+*          Clip based on the log of the NOISE. [TRUE]
 *     NOISEGOODBOL = _INTEGER (Write)
 *          The number of bolometers with good NOISE measurements (see EFFNOISE)
 *     OUT = NDF (Write)
@@ -137,8 +154,12 @@
 *     - NEP and NOISERATIO images are stored in the .MORE.SMURF extension
 *     - NEP image is only created for raw, unflatfielded data.
 *     - If the data have flatfield information available the noise and
-*     NOISERATIO images will be masked by the flatfield bad bolometer mask.
-*     The mask can be removed using SETQUAL or SETBB (clear the bad bits mask).
+*       NOISERATIO images will be masked by the flatfield bad
+*       bolometer mask.  The mask can be removed using SETQUAL or
+*       SETBB (clear the bad bits mask).
+*     - [NOISE/NEP]CLIP[LOW/HIGH] are done independently for the NOISE
+*       and NEP images (so a bolometer may be clipped in one, but not
+*       the other).
 
 *  Related Applications:
 *     SMURF: SC2CONCAT, SC2CLEAN, SC2FFT
@@ -200,6 +221,8 @@
 *        Calculate effective NEP over all input chunks/subarrays.
 *     2011-06-03 (EC):
 *        Add NEPGOODBOL and NOISEGOODBOL output ADAM parameters
+*     2011-06-17 (EC):
+*        Add ability to asymmetrically clip outlier NEP/NOISE values.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -262,6 +285,8 @@ smf__create_bolfile_extension( const Grp * ogrp, size_t gcount,
                                const char datalabel[], const char units[],
                                int * status );
 
+void smf__clipnoise( double *clipdata, size_t ndata, int cliplog,
+                     double cliplow, double cliphigh, int *status );
 
 void smurf_calcnoise( int *status ) {
 
@@ -283,8 +308,16 @@ void smurf_calcnoise( int *status ) {
   AstKeyMap *keymap=NULL;   /* KeyMap holding configuration parameters */
   dim_t maxconcat=0;        /* Longest continuous chunk length in samples */
   size_t ncontchunks=0;     /* Number continuous chunks outside iter loop */
+  size_t nepbolo;           /* Number of bolometers in NEP map */
+  double nepcliphigh=VAL__BADD; /* Clip high NEP values */
+  double nepcliplow=VAL__BADD;  /* Clip low NEP values */
+  int nepcliplog=1;             /* Clip based on log(NEP) */
   size_t nepgoodbol = 0;    /* Number of bolometers used in eff NEP calc */
   double nepsum = 0.0;      /* Sum of weights for effective NEP calculation */
+  size_t noisebolo;         /* Number of bolometers in noise map*/
+  double noicliphigh=VAL__BADD; /* Clip high noise values */
+  double noicliplow=VAL__BADD;  /* Clip low noise values */
+  int noicliplog=1;             /* Clip based on log(NOISE) */
   size_t noisegoodbol = 0;  /* Number of bolometers used in eff noise calc */
   double noisesum = 0.0;    /* Sum of weights for effective noise calculation */
   smfData *odata = NULL;    /* Pointer to output data struct */
@@ -364,7 +397,7 @@ void smurf_calcnoise( int *status ) {
     }
   }
 
-  /* and see if we want power spectra */
+  /* and time-sereis */
   if (*status == SAI__OK) {
     kpg1Wgndf( "TSERIES", basegrp, size, size, "More output files required...",
                &tsgrp, &outsize, status );
@@ -372,6 +405,51 @@ void smurf_calcnoise( int *status ) {
       errAnnul( status );
     }
   }
+
+  /* Get clipping parameters */
+  parGet0d( "NEPCLIPHIGH", &nepcliphigh, status );
+  if( *status == PAR__NULL ) {
+    nepcliphigh = VAL__BADD;
+    errAnnul( status );
+  }
+  if( (*status==SAI__OK) && (nepcliphigh!=VAL__BADD) && (nepcliphigh < 0) ) {
+    *status = SAI__ERROR;
+    errRep( "", TASK_NAME ": NEPCLIPHIGH must be >= 0", status );
+  }
+
+  parGet0d( "NEPCLIPLOW", &nepcliplow, status );
+  if( *status == PAR__NULL ) {
+    nepcliplow = VAL__BADD;
+    errAnnul( status );
+  }
+  if( (*status==SAI__OK) && (nepcliplow!=VAL__BADD) && (nepcliplow < 0) ) {
+    *status = SAI__ERROR;
+    errRep( "", TASK_NAME ": NEPCLIPLOW must be >= 0", status );
+  }
+
+  parGet0l( "NEPCLIPLOG", &nepcliplog, status );
+
+  parGet0d( "NOICLIPHIGH", &noicliphigh, status );
+  if( *status == PAR__NULL ) {
+    noicliphigh = VAL__BADD;
+    errAnnul( status );
+  }
+  if( (*status==SAI__OK) && (noicliphigh!=VAL__BADD) && (noicliphigh < 0) ){
+    *status = SAI__ERROR;
+    errRep( "", TASK_NAME ": NOICLIPHIGH must be >= 0", status );
+  }
+
+  parGet0d( "NOICLIPLOW", &noicliplow, status );
+  if( *status == PAR__NULL ) {
+    noicliphigh = VAL__BADD;
+    errAnnul( status );
+  }
+  if( (*status==SAI__OK) && (noicliplow!=VAL__BADD) && (noicliplow < 0) ) {
+    *status = SAI__ERROR;
+    errRep( "", TASK_NAME ": NOICLIPLOW must be >= 0", status );
+  }
+
+  parGet0l( "NOICLIPLOG", &noicliplog, status );
 
   /* Obtain the number of continuous chunks and subarrays */
   if( *status == SAI__OK ) {
@@ -557,17 +635,18 @@ void smurf_calcnoise( int *status ) {
           double * od = (outdata->pntr)[0];
           smf_bolonoise( wf, thedata, 0, f_low, freqs[0], freqs[1],
                          1, zeropad ? SMF__MAXAPLEN : SMF__BADSZT,
-                         (outdata->pntr)[0], (ratdata->pntr)[0],
+                         od, (ratdata->pntr)[0],
                          (powgrp ? &powdata : NULL), status );
 
+          noisebolo = (outdata->dims)[0]*(outdata->dims)[1];
+
           /* Bolonoise gives us a variance - we want square root */
-          for (i = 0; i < (outdata->dims)[0]*(outdata->dims)[1]; i++) {
+          for (i = 0; i < noisebolo; i++) {
             if ( od[i] != VAL__BADD ) {
-              noisegoodbol++;
-              noisesum += 1.0 / od[i];
               od[i] = sqrt( od[i] );
             }
           }
+
 
           /* Write out power spectra and cleaned tseries if requested */
 
@@ -645,27 +724,43 @@ void smurf_calcnoise( int *status ) {
                                                      ".MORE.SMURF.NEP", "NEP",
                                                      "W s**0.5", status );
 
+            nepbolo = (nepdata->dims)[0]*(nepdata->dims)[1];
+
             /* and divide the noise data by the responsivity
                correcting for SIMULT */
             if (*status == SAI__OK) {
+              double * noise = (outdata->pntr)[0];
+              double * resp = (respmap->pntr)[0];
+              double * nep  = (nepdata->pntr)[0];
+
               if (strlen(refnepunits) == 0) one_strlcpy( refnepunits,
                                                          nepdata->hdr->units,
-                                                          sizeof(refnepunits),
+                                                         sizeof(refnepunits),
                                                          status );
 
-              for (i = 0; i < (nepdata->dims)[0]*(nepdata->dims)[1]; i++) {
+              for (i = 0; i < nepbolo; i++) {
                 /* ignore variance since noise will not have any */
-                double * noise = (outdata->pntr)[0];
-                double * resp = (respmap->pntr)[0];
-                double * nep  = (nepdata->pntr)[0];
                 if (noise[i] == VAL__BADD || resp[i] == VAL__BADD) {
                   nep[i] = VAL__BADD;
                 } else {
                   nep[i] = (noise[i] / SIMULT) / resp[i];
+                }
+              }
+
+              /* Clip outlier NEPs */
+              msgOutif( MSG__VERB, "", TASK_NAME ": Clipping NEP outliers",
+                        status );
+              smf__clipnoise( nep, nepbolo, nepcliplog, nepcliplow,
+                              nepcliphigh, status );
+
+              /* Finally, count good NEP values and calculate nepsum */
+              for( i=0; i<nepbolo; i++ ) {
+                if( nep[i] != VAL__BADD ) {
                   nepsum += ( 1.0 / (nep[i] * nep[i]) );
                   nepgoodbol++;
                 }
               }
+
             }
             if (*status == SAI__OK && nepdata->file) {
               smf_accumulate_prov( NULL, basegrp, 1, nepdata->file->ndfid,
@@ -674,7 +769,24 @@ void smurf_calcnoise( int *status ) {
             if (nepdata) smf_close_file( &nepdata, status );
           }
 
-          /* now mask the noise and ratio data */
+          /* Clip outlier noise values now that we've finished with the
+             NEP */
+          msgOutif( MSG__VERB, "", TASK_NAME ": Clipping NOISE outliers",
+                    status );
+          printf(" %i %lg %lg\n", noicliplog, noicliplow, noicliphigh);
+          smf__clipnoise( (outdata->pntr)[0], noisebolo, noicliplog,
+                          noicliplow, noicliphigh, status );
+
+          /* count good noise values and calculate noisesum */
+          for (i = 0; i < noisebolo; i++) {
+            double *od = (outdata->pntr)[0];
+            if ( od[i] != VAL__BADD ) {
+              noisegoodbol++;
+              noisesum += 1.0 / od[i];
+            }
+          }
+
+          /* now mask the noise and ratio data using responsivity*/
           if (respmap) {
             double * rdata = (respmap->pntr)[0];
             smf_qual_t * outq = outdata->qual;
@@ -683,7 +795,7 @@ void smurf_calcnoise( int *status ) {
             if (ratdata) ratq = ratdata->qual;
 
             /* set the quality mask */
-            for (i = 0; i < (outdata->dims)[0]*(outdata->dims)[1]; i++) {
+            for (i = 0; i < noisebolo; i++) {
               if ( rdata[i] == VAL__BADD) {
                 outq[i] |= SMF__Q_BADB;
                 if (ratq) ratq[i] |= SMF__Q_BADB;
@@ -731,6 +843,7 @@ void smurf_calcnoise( int *status ) {
     /* Annul the configuration keymap. */
     if (keymap) keymap = astAnnul( keymap );
   }
+
 
   if (calc_effnoise && noisegoodbol) {
     double noiseeff;
@@ -802,4 +915,84 @@ smf__create_bolfile_extension( const Grp * ogrp, size_t gcount,
   if (tempgrp) grpDelet( &tempgrp, status );
   return newdata;
 
+}
+
+void smf__clipnoise( double *clipdata, size_t ndata, int cliplog,
+                     double cliplow, double cliphigh, int *status ) {
+
+  const float clips[] = {3,3,3,3,3};
+  const size_t nclips = sizeof(clips)/sizeof(*clips);
+  size_t i;
+  size_t nlow=0;
+  size_t nhigh=0;
+  double *work=NULL;
+  double median, mean, sigma;
+
+  if( *status != SAI__OK ) return;
+
+  if( cliplog ) msgOutif( MSG__VERB, "", TASK_NAME
+                          ":   taking log10 of the data", status );
+
+  if( (cliphigh != VAL__BADD) || (cliplow != VAL__BADD ) ) {
+    work = astCalloc( ndata, sizeof(*work) );
+
+    /* Copy the data, or its log, into a buffer */
+    if( *status == SAI__OK ) {
+      for( i=0; i<ndata; i++ ) {
+        if( (clipdata[i] != VAL__BADD) && (clipdata[i] > 0) ) {
+          work[i] = cliplog ? log10(clipdata[i]) : clipdata[i];
+        } else {
+          work[i] = VAL__BADD;
+        }
+      }
+    }
+
+    /* Measure the clipped median, mean and standard deviation. We
+       use 3-sigma as the clip level because the main purpose is
+       to establish the standard deviation of the central part of
+       the distribution. We use the median rather than the mean
+       as the reference point since it is more robust in the case
+       of a skewed distribution. */
+    smf_clipped_stats1D( work, nclips, clips, 1, ndata, NULL, 0, 0,
+                         &mean, &sigma, &median, 1, NULL, status );
+
+    msgOutiff( MSG__VERB, "", TASK_NAME
+               ":   mean=%lg median=%lg standard dev=%lg",
+               status, mean, median, sigma );
+
+    /* Then clip the high/low outliers relative to the median */
+    if( *status==SAI__OK ) {
+      for( i=0; i<ndata; i++ ) {
+        if( work[i] != VAL__BADD ) {
+          double d = work[i] - median;
+
+          if( (cliphigh!=VAL__BADD) &&
+              (d >= sigma*cliphigh) ) {
+
+            clipdata[i] = VAL__BADD;
+            nhigh++;
+          }
+
+          if( (cliplow!=VAL__BADD) &&
+              (-d >= sigma*cliplow) ) {
+
+            clipdata[i] = VAL__BADD;
+            nlow++;
+          }
+        }
+      }
+    }
+
+    if( nhigh ) msgOutiff( MSG__VERB, "", TASK_NAME
+                           ":   clipped %zu values >= %lg",
+                           status, nhigh,
+                           median + sigma*cliphigh );
+    if( nlow ) msgOutiff( MSG__VERB, "", TASK_NAME
+                          ":   clipped %zu values <= %lg",
+                          status, nlow,
+                          median - sigma*cliplow );
+
+    /* Free temporary buffer */
+    if( work ) work = astFree( work );
+  }
 }
