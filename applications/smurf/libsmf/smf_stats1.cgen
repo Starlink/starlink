@@ -233,11 +233,14 @@ void CGEN_FUNCTION(smf_stats1)( const CGEN_TYPE *data, size_t stride,
 
       if( *status == SAI__OK ) {
         size_t index = 0;
+
+        j = 0;
         for( i=0; i<nsamp*stride; i+=stride ) {
           if( !(qual[j] & mask) ) {
             sortbuf[index] = (double) data[i];
             index++;
           }
+          j += qstride;
         }
 
         /* Sort the buffer */
