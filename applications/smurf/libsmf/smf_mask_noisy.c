@@ -142,7 +142,7 @@ void smf_mask_noisy( smfWorkForce *wf, smfData *data, smfData **noise,
      we sort the data. For now just use a clipped MEAN */
 
   smf_clipped_stats1D( (noisemap->pntr)[0], nclips, clips, 1, nbolo,
-                       NULL, 0, 0, &mean, &sigma, &ngood, status );
+                       NULL, 0, 0, &mean, &sigma, NULL, 0, &ngood, status );
 
   /* Now create a mask and then mask the quality. We only mask bolometers
      that are too noisy. We also do not mask bolometers that were already

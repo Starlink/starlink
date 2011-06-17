@@ -680,8 +680,9 @@ void smf_checkmem_map( const int lbnd[2], const int ubnd[2], int rebin,
 void smf_clipped_stats1D( const double *data, size_t nclips,
                           const float clips[], size_t stride, size_t nsamp,
                           const smf_qual_t *quality, size_t qstride,
-                          smf_qual_t mask, double *mean,
-                          double *sigma, size_t *ngood, int *status );
+                          smf_qual_t mask, double *mean, double *sigma,
+                          double *median, int usemedian, size_t *ngood,
+                          int *status );
 
 void smf_choose_closest( const smfArray *alldata, const smfData *indata,
                          size_t *previdx, size_t *nextidx, int * status );

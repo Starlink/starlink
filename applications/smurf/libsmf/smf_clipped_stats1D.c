@@ -4,7 +4,7 @@
 *     smf_clipped_stats1D
 
 *  Purpose:
-*     Calculate mean and standard deviation of data array with sigma clipping
+*     Calculate mean, median and standard deviation of data with sigma clipping
 
 *  Language:
 *     Starlink ANSI C
@@ -17,7 +17,8 @@
 *                               const float clips[], size_t stride,
 *                               size_t nsamp, smf_qual_t *quality,
 *                               size_t qstride, smf_qual_t mask, double *mean,
-*                               double *sigma, size_t *ngood, int *status );
+*                               double *sigma, double *median, int usemedian,
+*                               size_t *ngood, int *status );
 
 *  Arguments:
 *     data = const double* (Given)
@@ -46,6 +47,9 @@
 *        Pointer to variable that will contain the standard deviation of
 *        the data. If NULL this routine will run faster and not calculate
 *        the standard deviation.
+*     usemedian = int (Given)
+*        If set, when applying the clips, will check for offsets from the
+*        median rather than the mean.
 *     ngood = size_t* (Given and Returned)
 *        Pointer to variable that will indicate how many samples were used
 *        to calculate the statistics.
@@ -60,6 +64,7 @@
 
 *  Authors:
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     EC: Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  Notes:
@@ -69,10 +74,13 @@
 *  History:
 *     2010-07-02 (TIMJ):
 *        Initial version
+*     2011-06-16 (EC):
+*        Add median / usemedian
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
+*     Copyright (C) 2011 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -109,12 +117,14 @@ static size_t smf__flag_clipped_data( const double *data, size_t stride,
 void smf_clipped_stats1D( const double *data, size_t nclips,
                           const float clips[], size_t stride, size_t nsamp,
                           const smf_qual_t *quality, size_t qstride,
-                          smf_qual_t mask, double *mean,
-                          double *sigma, size_t *ngood, int *status ) {
+                          smf_qual_t mask, double *mean, double *sigma,
+                          double *median, int usemedian, size_t *ngood,
+                          int *status ) {
 
   size_t clip = 0;                /* Clip index */
   size_t i = 0;                   /* Loop counter */
   double lmean = VAL__BADD;       /* Local mean */
+  double lmedian = VAL__BADD;     /* Local median */
   size_t lngood = 0;              /* Local ngood */
   double lsigma = VAL__BADD;      /* Local sigma */
   const smf_qual_t BADQUAL = 1;   /* The value we use for local bad quality */
@@ -125,6 +135,7 @@ void smf_clipped_stats1D( const double *data, size_t nclips,
   if (sigma) *sigma = VAL__BADD;
   if (ngood) *ngood = 0;
   if (mean) *mean = VAL__BADD;
+  if (median) *median = VAL__BADD;
 
   /* Check status */
   if (*status != SAI__OK) return;
@@ -166,17 +177,18 @@ void smf_clipped_stats1D( const double *data, size_t nclips,
   for ( clip = 0; clip < nclips; clip++) {
 
     /* Calculate stats with our quality and qstride of 1 */
-    smf_stats1D( data, stride, nsamp, qua, 1, BADQUAL, &lmean, &lsigma, NULL,
-                 &lngood, status );
+    smf_stats1D( data, stride, nsamp, qua, 1, BADQUAL, &lmean, &lsigma,
+                 usemedian ? &lmedian : NULL, &lngood, status );
 
     /* Flag any values exceeding the specified clip */
-    lngood = smf__flag_clipped_data( data, stride, nsamp, qua, BADQUAL, lmean,
+    lngood = smf__flag_clipped_data( data, stride, nsamp, qua, BADQUAL,
+                                     usemedian ? lmedian : lmean,
                                      lsigma, clips[clip], status );
   }
 
   /* and one final stats now that all clips have been applied*/
-  smf_stats1D( data, stride, nsamp, qua, 1, BADQUAL, &lmean, &lsigma, NULL,
-               &lngood, status );
+  smf_stats1D( data, stride, nsamp, qua, 1, BADQUAL, &lmean, &lsigma,
+               median ? &lmedian : NULL, &lngood, status );
 
   /* Free quality */
   qua = astFree( qua );
@@ -184,6 +196,7 @@ void smf_clipped_stats1D( const double *data, size_t nclips,
   /* Copy results */
   if (mean) *mean = lmean;
   if (sigma) *sigma = lsigma;
+  if (median) *median = lmedian;
   if (ngood) *ngood = lngood;
 
 }

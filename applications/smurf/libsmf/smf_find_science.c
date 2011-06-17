@@ -474,8 +474,8 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
                 }
 
                 /* find some statistics */
-                smf_clipped_stats1D( out, 2, clips, 1, nbolo, NULL, 0, 0, &mean, &sigma,
-                                     &ngood, status );
+                smf_clipped_stats1D( out, 2, clips, 1, nbolo, NULL, 0, 0, &mean,
+                                     &sigma, NULL, 0, &ngood, status );
 
                 if (*status == SMF__INSMP) {
                   errAnnul(status);
