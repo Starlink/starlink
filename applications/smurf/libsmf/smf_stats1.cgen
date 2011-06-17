@@ -140,8 +140,8 @@ int smfStats1Compare( const void *arg1, const void *arg2 );
 
 int smfStats1Compare( const void *arg1, const void *arg2 ) {
   double diff;
-  double *d1 = (double *) arg1;
-  double *d2 = (double *) arg2;
+  const double *d1 = arg1;
+  const double *d2 = arg2;
 
   diff = *d1 - *d2;
   return (diff < 0) ? -1 : (diff == 0) ? 0 : 1;
