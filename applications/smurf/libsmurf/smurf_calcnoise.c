@@ -773,7 +773,6 @@ void smurf_calcnoise( int *status ) {
              NEP */
           msgOutif( MSG__VERB, "", TASK_NAME ": Clipping NOISE outliers",
                     status );
-          printf(" %i %lg %lg\n", noicliplog, noicliplow, noicliphigh);
           smf__clipnoise( (outdata->pntr)[0], noisebolo, noicliplog,
                           noicliplow, noicliphigh, status );
 
