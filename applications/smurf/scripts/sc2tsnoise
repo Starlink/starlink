@@ -365,8 +365,8 @@ foreach obsdir ( `cat $filenames` )
                     endif
 
                     calcnoise noise noise_nep power="$pfile" tseries="$tfile" \
-                        noicliplog noicliplow=3 noicliphigh=! \
-                        nepcliplog nepcliplow=3 nepcliphigh=! \
+                        noicliplog noicliplow=1.5 noicliphigh=5 \
+                        nepcliplog nepcliplow=1.5 nepcliphigh=5 \
                         accept > /dev/null
 
                     set effnep = `parget effnep calcnoise`
