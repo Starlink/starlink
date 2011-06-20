@@ -140,7 +140,7 @@
 *        - Changed astChr2Double to check for strigs like "2.", which
 *        some sscanfs fail to read as a floating point value.
 *     27-MAY-2011 (DSB):
-*        Added astFreeDouble to free a dynamically allocated array of 
+*        Added astFreeDouble to free a dynamically allocated array of
 *        pointers to other dynamically allocated arrays.
 */
 
@@ -2334,6 +2334,7 @@ void *astMalloc_( size_t size, int init, int *status ) {
 
 #ifdef MEM_DEBUG
             mem->id = -1;
+            mem->prev = NULL;
 #endif
 
          }
@@ -3112,7 +3113,7 @@ void *astRealloc_( void *ptr, size_t size, int *status ) {
 
    using astMalloc, astFree and memcpy explicitly in order to ensure
    that the memory blocks are cached. */
-               if( use_cache && mem->size <= MXCSIZE && size <= MXCSIZE ) {
+               if( use_cache && ( mem->size <= MXCSIZE || size <= MXCSIZE ) ) {
                   result = astMalloc( size );
                   if( result ) {
                      if( mem->size < size ) {
@@ -3157,6 +3158,7 @@ void *astRealloc_( void *ptr, size_t size, int *status ) {
                      mem->next = NULL;
 #ifdef MEM_DEBUG
                      mem->id = -1;
+                     mem->prev = NULL;
                      Issue( mem, status );
 #endif
                      result = mem;
@@ -4627,9 +4629,9 @@ void astFlushMemory_( int leak, int *status ) {
 *  Description:
 *     This function should only be called once all use of AST by an
 *     application has finished. It frees any allocated but currently
-*     unused memory (stored in an internal cache of unused memory
-*     pointers), together with any memory used permanently to store
-*     internal AST state information.
+*     unused memory stored in an internal cache of unused memory
+*     pointers. (Note, it does not free any memory used permanently to
+*     store internal AST state information).
 *
 *     It is not normally necessary to call this function since the memory
 *     will be freed anyway by the operating system when the application
@@ -4805,6 +4807,8 @@ static void DeIssue( Memory *mem, int *status ) {
    if( prev ) prev->next = next;
    if( next ) next->prev = prev;
    if( mem == Active_List ) Active_List = next;
+   mem->next = NULL;
+   mem->prev = NULL;
 
 /* Update the current memory usage. */
    Current_Usage -= mem->size + SIZEOF_MEMORY;
