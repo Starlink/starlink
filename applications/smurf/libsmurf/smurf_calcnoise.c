@@ -919,7 +919,7 @@ smf__create_bolfile_extension( const Grp * ogrp, size_t gcount,
 void smf__clipnoise( double *clipdata, size_t ndata, int cliplog,
                      double cliplow, double cliphigh, int *status ) {
 
-  const float clips[] = {3,3,3,3,3};
+  const float clips[] = {5,4,3,2,1};
   const size_t nclips = sizeof(clips)/sizeof(*clips);
   size_t i;
   size_t nlow=0;
@@ -947,13 +947,18 @@ void smf__clipnoise( double *clipdata, size_t ndata, int cliplog,
     }
 
     /* Measure the clipped median, mean and standard deviation. We
-       use 3-sigma as the clip level because the main purpose is
-       to establish the standard deviation of the central part of
-       the distribution. We use the median rather than the mean
-       as the reference point since it is more robust in the case
-       of a skewed distribution. */
+       step down from 5- to 1-sigma, using the median rather than the
+       mean as our central measure to ensure robustness against large
+       outliers. This should end up near the mode of the distribution,
+       although the RMS of the sample will under-estimate, by nearly a
+       factor of 2, the standard deviation for a Gaussian distribution
+       since we've clipped so much of the wings. We scale it back up
+       so that it would give the right answer for a Gaussian. */
+
     smf_clipped_stats1D( work, nclips, clips, 1, ndata, NULL, 0, 0,
                          &mean, &sigma, &median, 1, NULL, status );
+
+    sigma *= 1.85;
 
     msgOutiff( MSG__VERB, "", TASK_NAME
                ":   mean=%lg median=%lg standard dev=%lg",
