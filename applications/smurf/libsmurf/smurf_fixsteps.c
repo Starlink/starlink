@@ -280,7 +280,7 @@ void smurf_fixsteps( int *status ) {
 
 /* Find the number of cores/processors available and create a pool of
    threads of the same size. */
-   wf = smf_create_workforce( smf_get_nthread( status ), status );
+   wf = smf_get_workforce( smf_get_nthread( status ), status );
 
 /* Fix the steps. */
    smf_fix_steps( wf, data, dcthresh, dcsmooth, dcfitbox, dcmaxsteps,
@@ -369,7 +369,6 @@ void smurf_fixsteps( int *status ) {
    }
 
 /* Free resources. */
-   wf = smf_destroy_workforce( wf );
    newsteps = astFree( newsteps );
    grpDelet( &igrp, status );
    grpDelet( &ogrp, status );

@@ -1050,7 +1050,7 @@ void smurf_makecube( int *status ) {
 
 /* Find the number of cores/processors available and create a pool of
    threads of the same size. */
-   wf = smf_create_workforce( smf_get_nthread( status ), status );
+   wf = smf_get_workforce( smf_get_nthread( status ), status );
 
 /* Get a group of input files */
    ndgAssoc( "IN", 1, &igrp, &size, &flag, status );
@@ -2095,7 +2095,6 @@ L998:;
    boxes = astFree( boxes );
    if( tiles ) tiles = smf_freetiles( tiles, ntile, status );
    ptime = smf_freepolbins( size, npbin, &pangle, ptime, status );
-   wf = smf_destroy_workforce( wf );
 
 /* End the NDF context. */
    ndfEnd( status );

@@ -158,7 +158,7 @@ void smurf_sc2pca( int *status ) {
 
   /* Find the number of cores/processors available and create a pool of
      threads of the same size. */
-  wf = smf_create_workforce( smf_get_nthread( status ), status );
+  wf = smf_get_workforce( smf_get_nthread( status ), status );
 
   /* Get input file(s) */
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
@@ -232,7 +232,6 @@ void smurf_sc2pca( int *status ) {
   if( darks ) smf_close_related( &darks, status );
   if( bbms ) smf_close_related( &bbms, status );
   if( flatramps ) smf_close_related( &flatramps, status );
-  if( wf ) wf = smf_destroy_workforce( wf );
   ndfEnd( status );
 }
 

@@ -1239,7 +1239,7 @@ void smurf_makemap( int *status ) {
 
   /* Find the number of cores/processors available and create a pool of
      threads of the same size. */
-  wf = smf_create_workforce( smf_get_nthread( status ), status );
+  wf = smf_get_workforce( smf_get_nthread( status ), status );
 
   /* Get group of input files */
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
@@ -2090,7 +2090,6 @@ void smurf_makemap( int *status ) {
 
   /* Arrive here if no output NDF is being created. */
  L998:;
-  if( wf ) wf = smf_destroy_workforce( wf );
   if( spacerefwcs ) spacerefwcs = astAnnul( spacerefwcs );
   if( outfset != NULL ) outfset = astAnnul( outfset );
   if( igrp != NULL ) {

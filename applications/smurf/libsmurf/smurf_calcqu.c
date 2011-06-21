@@ -277,7 +277,7 @@ void smurf_calcqu( int *status ) {
 
 /* Find the number of cores/processors available and create a work force
    holding the same number of threads. */
-   wf = smf_create_workforce( smf_get_nthread( status ), status );
+   wf = smf_get_workforce( smf_get_nthread( status ), status );
 
 /* Get a group of input files */
    kpg1Rgndf( "IN", 0, 1, "  Give more NDFs...", &igrp, &ssize, status );
@@ -607,7 +607,6 @@ void smurf_calcqu( int *status ) {
    }
 
 /* Free resources. */
-   wf = smf_destroy_workforce( wf );
    smf_close_related( &darks, status );
    smf_close_related( &flatramps, status );
 

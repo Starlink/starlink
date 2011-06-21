@@ -377,7 +377,7 @@ void smurf_qlmakemap( int *status ) {
 
   /* Find the number of cores/processors available and create a pool of
      threads of the same size. */
-  wf = smf_create_workforce( smf_get_nthread( status ), status );
+  wf = smf_get_workforce( smf_get_nthread( status ), status );
 
   /* Get group of input files */
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
@@ -613,7 +613,6 @@ void smurf_qlmakemap( int *status ) {
   if( darks ) smf_close_related( &darks, status );
   if( bbms ) smf_close_related( &bbms, status );
   grpDelet( &igrp, status );
-  if( wf ) wf = smf_destroy_workforce( wf );
   if (extpars) extpars = astAnnul( extpars );
 
   ndfEnd( status );

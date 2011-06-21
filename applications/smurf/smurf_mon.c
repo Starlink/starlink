@@ -141,8 +141,12 @@
 *        Add FTS2SPECRE
 *     2011-03-18 (EC):
 *        Add SC2PCA
-*     2008-06-08 (DSB):
+*     2011-06-08 (DSB):
 *        Add UNMAKEMAP
+*     2011-06-21 (DSB):
+*        Use astCheckMemory rather than astFlushMemory since we do not want 
+*        to free the memory used to hold the singleton workforce returned by 
+*        smf_get_workforce. 
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -446,14 +450,14 @@ void smurf_mon( int * status ) {
   }
   */
 
-  /* The astFlushMemory function does nothing unless AST has been compiled
-   * with the MEM_DEBUG flag. If this is the case, then it frees all AST
-   * internal structures, and report the number of memory blocks that have
-   * not been freed (useful for identifying memory leaks).
-   * Use astActiveMemory() below to list all active memory and then
-   * use astWatchMemory() at the start of this routine to get reports when
-   * a particular ID is used. Set a breakpoint in the debugger for astMemoryAlarm_
+  /* The astCheckMemory function does nothing unless AST has been compiled
+   * with the MEM_DEBUG flag. If this is the case, then it reports the number
+   * of memory blocks that have not been freed (useful for identifying memory
+   * leaks). Use astActiveMemory() below to list all active memory and
+   * then use astWatchMemory() at the start of this routine to get reports
+   * when a particular ID is used. Set a breakpoint in the debugger for
+   * astMemoryAlarm_
    */
-  /* astActiveMemory("Exit:"); */
-  astFlushMemory( 1 );
+  astActiveMemory("Exit:");
+  astCheckMemory;
 }

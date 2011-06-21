@@ -104,6 +104,7 @@ void smf_cond_wait( pthread_cond_t *cond, pthread_mutex_t *mutex, int *status );
 /* Prototypes for public worker and workforce related functions. */
 smfWorkForce *smf_create_workforce( int nworker, int *status );
 smfWorkForce *smf_destroy_workforce( smfWorkForce *workforce );
+smfWorkForce *smf_get_workforce( int nworker, int *status );
 void smf_wait( smfWorkForce *workforce, int *status );
 int smf_add_job( smfWorkForce *workforce, int flags, void *data,
                  void (*func)( void *, int * ), int nwait_on,

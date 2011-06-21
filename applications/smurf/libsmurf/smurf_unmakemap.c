@@ -240,7 +240,7 @@ void smurf_unmakemap( int *status ) {
 
 /* Find the number of cores/processors available and create a pool of
    threads of the same size. */
-   wf = smf_create_workforce( smf_get_nthread( status ), status );
+   wf = smf_get_workforce( smf_get_nthread( status ), status );
 
 /* Get an identifier for the input NDF. We use NDG (via kpg1Rgndf)
    instead of calling ndfAssoc directly since NDF/HDS has problems with
@@ -421,7 +421,6 @@ void smurf_unmakemap( int *status ) {
    if( igrp1 != NULL) grpDelet( &igrp1, status);
    if( igrp2 != NULL) grpDelet( &igrp2, status);
    if( ogrp != NULL) grpDelet( &ogrp, status);
-   wf = smf_destroy_workforce( wf );
 
 /* End the NDF context. */
    ndfEnd( status );

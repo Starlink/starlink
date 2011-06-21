@@ -142,6 +142,9 @@
 *     27-MAY-2011 (DSB):
 *        Added astFreeDouble to free a dynamically allocated array of
 *        pointers to other dynamically allocated arrays.
+*     21-JUN-2011 (DSB):
+*        Added astCheckMemory - an alternative to astFlushMemory that does
+*        not free any memory.
 */
 
 /* Configuration results. */
@@ -4141,7 +4144,6 @@ void astActiveMemory_( const char *label ) {
 *     - This function attempts to execute even if an error has occurred.
 *     - Memory blocks which are not usually freed are not reported. Such
 *     blocks are typically used by AST to hold internal state information.
-*     They can be freed explicitly by calling astFlushMemory.
 *-
 */
 
@@ -4687,6 +4689,64 @@ void astFlushMemory_( int leak, int *status ) {
 
    } else {
       printf("astFlushMemory: All AST memory blocks were released correctly.\n" );
+   }
+}
+
+void astCheckMemory_( int *status ) {
+/*
+*+
+*  Name:
+*     astCheckMemory
+
+*  Purpose:
+*     Check that all AST memory blocks have been released.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     astCheckMemory
+
+*  Description:
+*     This macro reports an error if any active AST memory pointers
+*     remain which have not been freed (other than pointers for cached
+*     and "permanently allocated" memory). Leakage of active memory blocks
+*     can be investigated using astActiveMemory and astWatchMemory.
+*-
+*/
+
+/* Local Variables: */
+   Memory *next;
+   int nact;
+   int istat;
+
+/* Empty the cache. */
+   astMemCaching( astMemCaching( AST__TUNULL ) );
+
+/* Count all non-permanent memory blocks. */
+   nact = 0;
+   next = Active_List;
+   while( Active_List ) {
+      next = Active_List->next;
+      if( !Active_List->perm ) nact++;
+      Active_List = next;
+   }
+
+/* Report an error if any active pointers remained. If an error has
+   already occurred, use the existing status value. */
+   if( nact ){
+
+      if( astOK ) {
+         istat = AST__INTER;
+      } else {
+         istat = astStatus;
+      }
+      astError( istat, "astCheckMemory: %d AST memory blocks have not "
+                "been released (programming error).", status, nact );
+
+   } else {
+      printf("astCheckMemory: All AST memory blocks were released correctly.\n" );
    }
 }
 

@@ -174,7 +174,7 @@ void smurf_sc2concat( int *status ) {
 
   /* Find the number of cores/processors available and create a pool of
      threads of the same size. */
-  wf = smf_create_workforce( smf_get_nthread( status ), status );
+  wf = smf_get_workforce( smf_get_nthread( status ), status );
 
   /* Read the input file */
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &isize, status );
@@ -278,7 +278,6 @@ void smurf_sc2concat( int *status ) {
   }
 
  CLEANUP:
-  if( wf ) wf = smf_destroy_workforce( wf );
   if( darks ) smf_close_related( &darks, status );
   if( flatramps ) smf_close_related( &flatramps, status );
   if( igrp ) grpDelet( &igrp, status);

@@ -28,8 +28,10 @@
 *     the jobs within a task (using smf_add_job), the calling thread waits
 *     until all the jobs have been completed.
 *
-*     - smf_create_workforce: Create a workforce with a given number of
-*       workers
+*     - smf_get_workforce: Get a pointer to an existing workforce, or
+*       create a new one if no workforce currently exists.
+*     - smf_create_workforce: Create a new workforce with a given number
+*       of workers
 *     - smf_destroy_workforce: Free all resources used by a workforce.
 *     - smf_add_job: Tell the workforce about a specific job that forms
 *       part of the overall task.
@@ -39,7 +41,7 @@
 *       been completed.
 
 *  Copyright:
-*     Copyright (C) 2008-2009 Science & Technology Facilities Council.
+*     Copyright (C) 2008-2011 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -104,6 +106,9 @@
 *        the new job can be started.
 *     7-APR-2011 (DSB):
 *        Allow job data to be freed automatically when a job completes.
+*     21-JUN-2011 (DSB):
+*        - Added smf_get_workforce.
+*        - Workers now executes each job in a new AST context
 */
 
 
@@ -147,6 +152,7 @@ typedef struct JobError {
 static FILE *fd = NULL;
 static int njob = 0;
 pthread_mutex_t fd_mutex = PTHREAD_MUTEX_INITIALIZER;
+static smfWorkForce *singleton = NULL;
 
 /* Module Prototypes */
 /* ----------------- */
@@ -272,10 +278,15 @@ int smf_add_job( smfWorkForce *workforce, int flags, void *data,
 
 /* Get a structure in which to place the job description. If any such
    structures are available on the workforce's list of free job structures,
-   use one from the free list. Otherwise, create a new one and initialise it. */
+   use one from the free list. Otherwise, create a new one and initialise it.
+   If the job is being added to the singleton workforce (see
+   smf_get_workforce), then do this in an AST "permanent memory" context so
+   that the memory for the job structure is not reported as a memory leak. */
    job = smf_pop_list_head( &(workforce->free_jobs), status );
    if( ! job ) {
+      if( workforce == singleton ) astBeginPM;
       job = astMalloc( sizeof( smfJob ) );
+      if( workforce == singleton ) astEndPM;
       if( job ) job->status = NULL;
       smf_init_job( job, status );
    }
@@ -355,6 +366,57 @@ int smf_add_job( smfWorkForce *workforce, int flags, void *data,
 
 /* Return the job identifier. */
    return job->ijob;
+}
+
+void smf_begin_job_context( smfWorkForce *workforce, int *status ){
+/*
+*  Name:
+*     smf_job_context
+
+*  Purpose:
+*     Starts a new job context.
+
+*  Language:
+*     Starlink ANSI C
+
+*  Type of Module:
+*     C function
+
+*  Invocation:
+*     #include "smf_threads.h"
+*     void smf_begin_job_context( smfWorkForce *workforce, int *status )
+
+*  Arguments:
+*     workforce
+*        Pointer to the workforce performing the jobs. If NULL is
+*        supplied, this function returns without action.
+*     status
+*        Pointer to the inherited status value.
+
+*  Description:
+*     This function indicates that all jobs created before the subsequent matching
+*     call to smf_end_job_context should be grouped together. This affects the
+*     behaviour of functions smf_wait and smf_job_wait.
+
+*/
+
+/* Check inherited status */
+   if( *status != SAI__OK || !workforce ) return;
+
+/* Increment the depth of context nesting. */
+   (workforce->condepth)++;
+
+/* Ensure the array of context identifiers held in the workforce is
+   large enough. If we are usinging the singleton workforce (see
+   smf_get_workforce), then do this in an AST "permanent memory" context
+   so that the allocated memory is not reported as a leak. */
+   if( workforce == singleton ) astBeginPM;
+   workforce->contexts = astGrow( workforce->contexts, workforce->condepth, sizeof( int ) );
+   if( workforce == singleton ) astEndPM;
+
+/* Create a new identifier for the new context and store it as the last entry in the list
+   of context identifiers in the workforce. */
+   (workforce->contexts)[ workforce->condepth-1 ] = (workforce->ncontext)++;
 }
 
 smfWorkForce *smf_create_workforce( int nworker, int *status ) {
@@ -592,6 +654,10 @@ smfWorkForce *smf_destroy_workforce( smfWorkForce *workforce ) {
 /* Free the workforce status structure. */
       workforce->status = smf_free_status( workforce->status );
 
+/* If we are freeing the singleton workforce, store a NULL pointer in the
+   module variable. */
+      if( workforce == singleton ) singleton = NULL;
+
 /* Free the memory holding the workforce. */
       workforce = astFree( workforce );
    }
@@ -739,13 +805,13 @@ void *smf_get_job_data( int ijob, smfWorkForce *workforce, int *status ){
    return ( *status == SAI__OK ) ? job->data : NULL;
 }
 
-void smf_begin_job_context( smfWorkForce *workforce, int *status ){
+smfWorkForce *smf_get_workforce( int nworker, int *status ) {
 /*
 *  Name:
-*     smf_job_context
+*     smf_get_workforce
 
 *  Purpose:
-*     Starts a new job context.
+*     Return a pointer to a singleton workforce.
 
 *  Language:
 *     Starlink ANSI C
@@ -755,34 +821,54 @@ void smf_begin_job_context( smfWorkForce *workforce, int *status ){
 
 *  Invocation:
 *     #include "smf_threads.h"
-*     void smf_begin_job_context( smfWorkForce *workforce, int *status )
+*     smfWorkForce *smf_get_workforce( int nworker, int *status )
 
 *  Arguments:
-*     workforce
-*        Pointer to the workforce performing the jobs. If NULL is
-*        supplied, this function returns without action.
+*     nworker
+*        The number of threads to use if a new workforce is created.
 *     status
 *        Pointer to the inherited status value.
 
+*  Returned Value:
+*     A pointer to a workforce. The returned pointer should not usually be
+*     freed explicitly (e.g. with smf_destroy_workforce).
+
 *  Description:
-*     This function indicates that all jobs created before the subsequent matching
-*     call to smf_end_job_context should be grouped together. This affects the
-*     behaviour of functions smf_wait and smf_job_wait.
+*     Applications that may be run in a monolith environment such as ICL
+*     or ORAC-DR should normally use this function in preference to
+*     smf_create_workforce. Use of this function reduces the total number
+*     of threads that are started and killed within a monolith, thus reducing
+*     the associated overheads of CPU time and memory.
+*
+*     One the first invocation, this function invokes smf_create_workforce
+*     to create a new workforce with the requested number of threads.
+*     A pointer to this workforce is stored internally, and the same
+*     pointer is returned on each subsequent invocation of this function.
+*
+*     If the returned workforce is freed explicitly using
+*     smf_destroy_workforce, then the next invocation of this function
+*     will create a new workforce again. For this reason, applications
+*     should not normally free the returned workforce explicitly. The
+*     resources associated with the workforce will be freed when the
+*     monolith process terminates.
 
 */
 
-/* Check inherited status */
-   if( *status != SAI__OK || !workforce ) return;
+/* Check in herited status */
+   if( *status != SAI__OK ) return NULL;
 
-/* Increment the depth of context nesting. */
-   (workforce->condepth)++;
+/* If no singleton workforce is available, create one. Enclose the
+   creation in an AST "permanent memory" context, so that the memory
+   allocated during the creation is not included in the list of active
+   memory pointers reported by astCheckMemory/astFlushMemory. */
+   if( !singleton ) {
+      astBeginPM;
+      singleton = smf_create_workforce( nworker, status );
+      astEndPM;
+   }
 
-/* Ensure the array of context identifiers held in the workforce is large enough. */
-   workforce->contexts = astGrow( workforce->contexts, workforce->condepth, sizeof( int ) );
-
-/* Create a new identifier for the new context and store it as the last entry in the list
-   of context identifiers in the workforce. */
-   (workforce->contexts)[ workforce->condepth-1 ] = (workforce->ncontext)++;
+/* Return the workforce. */
+   return singleton;
 }
 
 int smf_job_wait( smfWorkForce *workforce, int *status ) {
@@ -2161,9 +2247,11 @@ static void *smf_run_worker( void *wf_ptr ) {
          smf_thread_log( "run_worker: left desk to do job", ACTIVE,
                          job->ijob );
 
-/* If no error has occurred, do the job. */
+/* If no error has occurred, do the job in a new AST context. */
          if( status == SAI__OK ) {
+            astBegin;
             (*job->func)( job->data, &status );
+            astEnd;
             smf_thread_log( "run_worker: completed job - joining queue",
                             WAIT, job->ijob );
 

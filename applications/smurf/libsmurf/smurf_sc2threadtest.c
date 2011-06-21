@@ -330,7 +330,7 @@ void smurf_sc2threadtest( int *status ) {
           ": Starting test 1 __parallel time: dataOrder__", status );
 
   /* Create a pool of threads. */
-  wf = smf_create_workforce( nthread, status );
+  wf = smf_get_workforce( nthread, status );
 
   /* Work out number of chunks per thread */
   joblen = nchunks/nthread;
@@ -531,7 +531,6 @@ void smurf_sc2threadtest( int *status ) {
     }
     res = astFree( res );
   }
-  if( wf ) wf = smf_destroy_workforce( wf );
   job_data = astFree( job_data );
 
   /* Ensure that FFTW doesn't have any used memory kicking around */

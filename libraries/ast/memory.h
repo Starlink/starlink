@@ -231,6 +231,7 @@ void astEnableTimers_( int, int * );
 #ifdef MEM_DEBUG
 void astActiveMemory_( const char * );
 void astWatchMemory_( int );
+void astCheckMemory_( int * );
 void astFlushMemory_( int, int * );
 int astMemoryTune_( const char *, int, int * );
 void *astMemoryPtr_( int );
@@ -299,6 +300,7 @@ void astEndPM_( int * );
 #define astActiveMemory(label) astERROR_INVOKE(astActiveMemory_(label))
 #define astMemoryTune(name,value) astERROR_INVOKE(astMemoryTune_(name,value,STATUS_PTR))
 #define astWatchMemory(id) astERROR_INVOKE(astWatchMemory_(id))
+#define astCheckMemory astERROR_INVOKE(astCheckMemory_(STATUS_PTR))
 #define astFlushMemory(leak) astERROR_INVOKE(astFlushMemory_(leak,STATUS_PTR))
 #define astBeginPM astERROR_INVOKE(astBeginPM_(STATUS_PTR))
 #define astEndPM astERROR_INVOKE(astEndPM_(STATUS_PTR))
@@ -313,6 +315,7 @@ void astEndPM_( int * );
 #define astActiveMemory(label)
 #define astMemoryTune(name,value)
 #define astWatchMemory(id)
+#define astCheckMemory
 #define astFlushMemory(leak)
 #define astBeginPM
 #define astEndPM
