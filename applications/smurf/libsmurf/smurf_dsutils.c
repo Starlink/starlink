@@ -1318,7 +1318,7 @@ void smurf_dsutils( int *status ) {
       printf( "%d bad rows\n", l - nrow );
 
 /* Flag unusual rows by storing a bad value for each in "bc1_vals". */
-      Filter2( nrow, bc1_vals, amp_vals, 1.0, "AMP", status );
+      Filter2( nrow, bc1_vals, amp_vals, 3.0, "AMP", status );
       Filter( nrow, bc1_vals, damp_vals, 3.0, "DAMP", status );
       Filter( nrow, bc1_vals, rms_vals, 3.0, "RMS", status );
 
