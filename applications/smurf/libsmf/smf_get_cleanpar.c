@@ -24,7 +24,8 @@
 *                       double *flagfast, int *order, double *spikethresh,
 *                       size_t *spikebox, double *noiseclip,
 *                       int *whiten, int *compreprocess, double *pcathresh,
-*                       int groupsubarray, double *downsampfreq, int *status )
+*                       int groupsubarray, double *downsampscale,
+*                       double *downsampfreq, int *status )
 
 *  Arguments:
 *     keymap = AstKeyMap* (Given)
@@ -103,6 +104,9 @@
 *     groupsubarray = int * (Returned)
 *        If set, handle subarrays separately instead of grouping data at same
 *        wavelength that were taken simultaneously together.
+*     downsampscale = double * (Returned)
+*        Determine downsampfreq internally based on this angular scale (arcsec)
+*        and the slew speed.
 *     downsampfreq = double * (Returned)
 *        Target down-sampling rate in Hz.
 *     status = int* (Given and Returned)
@@ -160,6 +164,10 @@
 *     2011-04-15 (EC):
 *        Add groupsubarray
 *     2011-06-16 (EC):
+*        Add downsampfreq
+*     2011-06-21 (EC):
+*        Add downsampscale
+*     2011-06-22 (EC):
 *        Add downsampfreq
 *     {enter_further_changes_here}
 
@@ -220,7 +228,8 @@ void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac, dim_t *dcfitbox,
                        double *spikethresh, size_t *spikebox,
                        double *noiseclip, int *whiten, int *compreprocess,
                        double *pcathresh, int *groupsubarray,
-                       double *downsampfreq, int *status ) {
+                       double *downsampscale, double *downsampfreq,
+                       int *status ) {
 
   int dofft=0;                  /* Flag indicating that filtering is required */
   int f_nnotch=0;               /* Number of notch filters in array */
@@ -553,12 +562,26 @@ void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac, dim_t *dcfitbox,
                (*groupsubarray ? "enabled" : "disabled" ) );
   }
 
+  if( downsampscale ) {
+    *downsampscale = 0;
+
+    astMapGet0D( keymap, "DOWNSAMPSCALE", downsampscale );
+
+    if( *downsampscale < 0 ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "DOWNSAMPSCALE must be >= 0.", status );
+    }
+
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DOWNSAMPSCALE=%f", status,
+               *downsampscale );
+  }
+
   if( downsampfreq ) {
     *downsampfreq = 0;
     astMapGet0D( keymap, "DOWNSAMPFREQ", downsampfreq );
-    if( *downsampfreq <= 0 ) {
+    if( *downsampfreq < 0 ) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "DOWNSAMPFREQ must be > 0.", status );
+      errRep(FUNC_NAME, "DOWNSAMPFREQ must be >= 0.", status );
     }
 
     msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DOWNSAMPFREQ=%f", status,

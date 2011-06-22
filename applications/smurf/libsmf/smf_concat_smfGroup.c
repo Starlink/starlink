@@ -651,7 +651,7 @@ void smf_concat_smfGroup( smfWorkForce *wf, const smfGroup *igrp,
            double precision. Then release the original data. */
         if( dslen && dslen[j-firstpiece] ) {
           smf_downsamp_smfData( tmpdata, &refdata, dslen[j-firstpiece],
-                                1, status );
+                                1, 0, status );
           smf_close_file( &tmpdata, status );
 
         /* Otherwise, if the data is raw, convert it to double precision

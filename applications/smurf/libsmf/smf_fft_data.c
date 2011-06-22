@@ -103,6 +103,8 @@
 *        always bolometer ordered).
 *     2011-04-25 (TIMJ):
 *        Fix stride argument to smf_dataOrder_array
+*     2011-06-25 (EC):
+*        If input data are SMF__INTEGER they will be converted to SMF__DOUBLE
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -279,10 +281,12 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
   smfFFTData *job_data=NULL;    /* Array of job data for each thread */
   AstCmpMap *mapping3d=NULL;    /* Mapping from 3d GRID to FREQ, X, Y */
   dim_t nbolo=0;                /* Number of detectors  */
+  dim_t ncols;                  /* Number of columns */
   dim_t ndata=0;                /* Number of elements in new array */
   dim_t nf=0;                   /* Number of frequencies in FFT */
   int njobs=0;                  /* Number of jobs to be processed */
   double norm=1.;               /* Normalization factor for the FFT */
+  dim_t nrows;                  /* Number of rows */
   dim_t ntslice=0;              /* Number of time slices */
   int nw;                       /* Number of worker threads */
   smfFFTData *pdata=NULL;       /* Pointer to current job data */
@@ -310,25 +314,20 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
     return NULL;
   }
 
-  /* Check for double-precision data */
-  if( indata->dtype != SMF__DOUBLE ) {
-    *status = SAI__ERROR;
-    errRep( "", FUNC_NAME ": Data are not double precision", status );
-    return NULL;
-  }
-
   /* Data dimensions. Time dimensions are either 1-d or 3-d. Frequency
      dimensions are either 2- or 4-d to store the real and imaginary
      parts along the last index. */
 
   if( indata->ndims == 3 ) {
-    smf_get_dims( indata, NULL, NULL, &nbolo, &ntslice, NULL, &inbstr,
+    smf_get_dims( indata, &nrows, &ncols, &nbolo, &ntslice, NULL, &inbstr,
                   &intstr, status );
     nf = ntslice/2 + 1;
     isFFT = 0;
   } else if( (indata->ndims==4) && (indata->dims[3]==2) ) {
-    /* 3-d FFT of entire subarray */
+    /* 3-d FFT of entire subarray... always bolo ordered */
     isFFT = smf_isfft( indata, &ntslice, &nbolo, &nf, status );
+    nrows = indata->dims[1+SC2STORE__ROW_INDEX];
+    ncols = indata->dims[1+SC2STORE__COL_INDEX];
   } else {
     *status = SAI__ERROR;
     errRep( "", FUNC_NAME ": smfData has strange dimensions", status );
@@ -348,8 +347,10 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
      apodization will not be propagated back to the input
      smfData since we work on the copy. We therefore create
      a workspace copy of the quality. Re-ordering is also done
-     if needed to ensure the copy is bolometer ordered. */
-  data = smf_deepcopy_smfData( indata, 0,
+     if needed to ensure the copy is bolometer ordered. Finally, if
+     the data are raw integers, the deepcopy will convert them
+     to doubles. */
+  data = smf_deepcopy_smfData( indata, 1,
                                SMF__NOCREATE_VARIANCE |
                                SMF__NOCREATE_QUALITY |
                                SMF__NOCREATE_FILE |
@@ -367,8 +368,8 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
 
     if (inqual) {
       data->qual = smf_dataOrder_array( (void *)inqual, SMF__QUALTYPE,
-                                        nbolo*ntslice, ntslice, nbolo,
-                                        intstr, inbstr, 1, ntslice, 0, 0,
+                                        SMF__QUALTYPE, nbolo*ntslice, ntslice,
+                                        nbolo, intstr, inbstr, 1, ntslice, 0, 0,
                                         status );
     }
 
@@ -407,15 +408,24 @@ smfData *smf_fft_data( smfWorkForce *wf, const smfData *indata, int inverse,
       /* Doing an inverse FFT to the time domain */
         retdata->ndims = 3;
         retdata->dims[0] = ntslice;
-        retdata->dims[1] = data->dims[1];
-        retdata->dims[2] = data->dims[2];
+        retdata->dims[SC2STORE__COL_INDEX+1] = ncols;
+        retdata->dims[SC2STORE__ROW_INDEX+1] = nrows;
+
+        retdata->lbnd[0] = 1;
+        retdata->lbnd[1] = 0;
+        retdata->lbnd[2] = 0;
     } else {
       /* Doing a forward FFT to the frequency domain */
       retdata->ndims = 4;
       retdata->dims[0] = nf;
-      retdata->dims[1] = data->dims[1];
-      retdata->dims[2] = data->dims[2];
+      retdata->dims[SC2STORE__COL_INDEX+1] = ncols;
+      retdata->dims[SC2STORE__ROW_INDEX+1] = nrows;
       retdata->dims[3] = 2;
+
+      retdata->lbnd[0] = 1;
+      retdata->lbnd[1] = 0;
+      retdata->lbnd[2] = 0;
+      retdata->lbnd[3] = 1;
     }
 
     /* Returned data is always bolo-ordered */

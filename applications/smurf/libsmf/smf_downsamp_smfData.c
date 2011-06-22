@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_downsamp_smfData( smfData *idata, smfData **odata, dim_t ontslice,
-*                           int todouble, int *status );
+*                           int todouble, int method, int *status );
 
 *  Arguments:
 *     idata = smfData* (Given)
@@ -27,17 +27,28 @@
 *     todouble = int (Given)
 *        If set, odata will be converted to SMF__DOUBLE even if the input
 *        has a fixed-point data type.
+*     method = int (Given)
+*        If 0 use time-domain boxcar filter method
+*        If 1 use FFT frequency truncation method
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
 *  Description:
-*     This routine produces a copy of a smfData at a lower sample rate.
-*     All bolometer and dark squid data are downsampled using smf_downsamp1
-*     which uses simple averages. JCMTState information is propagated
-*     using a nearest-neighbour resampling.
+*     This routine produces a copy of a smfData at a lower sample
+*     rate.  All bolometer and dark squid data are downsampled using
+*     either simple time-domain boxcar averages if method = 0, or by
+*     taking the FFT, and simply removing all modes above the new
+*     target Nyquist frequency before transforming back (i.e., a
+*     boxcar filter in the frequency domain) if method = 1. Most
+*     JCMTState information is propagated using a nearest-neighbour
+*     resampling, although the pointing information is re-sampled
+*     using the time-domain boxcar smooth. The time-domain method is a
+*     SINC function in the frequency domain (so it will suffer some
+*     aliasing artifacts). Similarly, the FFT method will result in a
+*     SINC function time-domain response.
 
 *  Notes:
-*     This routine does not downsample the NOISE or QUALITY components.
+*     This routine does not downsample the VARIANCE or QUALITY components.
 
 *  Authors:
 *     Ed Chapin (UBC)
@@ -51,10 +62,12 @@
 *        for important fast-changing fields.
 *     2010-10-22 (EC)
 *        Add todouble flag
+*     2011-06-22 (EC)
+*        Add FFT-based method
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2010 University of British Columbia
+*     Copyright (C) 2010-2011 University of British Columbia
 *     All Rights Reserved.
 
 *  Licence:
@@ -101,7 +114,8 @@
 #define FUNC_NAME "smf_downsamp_smfData"
 
 void smf_downsamp_smfData( const smfData *idata, smfData **odata,
-                           dim_t ontslice, int todouble, int *status ) {
+                           dim_t ontslice, int todouble, int method,
+                           int *status ) {
 
   size_t i;                /* loop counter */
   size_t ibstride;         /* bstride of idata */
@@ -109,12 +123,18 @@ void smf_downsamp_smfData( const smfData *idata, smfData **odata,
   JCMTState *instate=NULL; /* Pointer to input JCMTState */
   dim_t intslice;          /* ntslice of idata */
   size_t itstride;         /* tstride of idata */
+  size_t j;                /* loop counter */
   dim_t nbolo;             /* number of bolos */
+  dim_t ncols;             /* number of columns */
+  dim_t nrows;             /* number of rows */
   size_t obstride;         /* bstride of odata */
   dim_t ondata;            /* ndata of odata */
   size_t otstride;         /* tstride of odata */
   JCMTState *outstate=NULL;/* Pointer to output JCMTState */
   double scale;            /* how much longer new samples are */
+  int size;                /* size of array element in bytes */
+
+
 
   if( *status != SAI__OK ) return;
 
@@ -130,8 +150,15 @@ void smf_downsamp_smfData( const smfData *idata, smfData **odata,
     return;
   }
 
+  if( (idata->dtype!=SMF__DOUBLE) && (!todouble) && method ) {
+    *status = SAI__ERROR;
+    errRep( "", FUNC_NAME ": downsampling method requires target data to be "
+            "double precision", status );
+    return;
+  }
+
   /* Dimensions of input */
-  smf_get_dims( idata, NULL, NULL, &nbolo, &intslice, NULL, &ibstride,
+  smf_get_dims( idata, &nrows, &ncols, &nbolo, &intslice, NULL, &ibstride,
                 &itstride, status );
 
   if( ontslice > intslice ) {
@@ -175,7 +202,7 @@ void smf_downsamp_smfData( const smfData *idata, smfData **odata,
     idata->da->dksquid = indksquid;
   }
 
-  /* Down-sample the bolometer data */
+  /* Length of time-axis for down-sampled bolometer data */
   if( *status == SAI__OK ) {
     if( (*odata)->isTordered ) {
       (*odata)->dims[2] = ontslice;
@@ -187,58 +214,164 @@ void smf_downsamp_smfData( const smfData *idata, smfData **odata,
   smf_get_dims( *odata, NULL, NULL, NULL, NULL, &ondata, &obstride,
                 &otstride, status );
 
+  /* Data type depends on input data and todouble flag */
   if( *status == SAI__OK ) {
-    int size;
-
-    if( todouble ) size = sizeof(double);
-    else size = smf_dtype_size(*odata,status);
-
-    (*odata)->pntr[0] = astCalloc( ondata, size );
+    if( todouble ) {
+      size = sizeof(double);
+      (*odata)->dtype = SMF__DOUBLE;
+    } else {
+      (*odata)->dtype = idata->dtype;
+      size = smf_dtype_size(*odata,status);
+    }
   }
 
   if( (*status==SAI__OK) && (*odata) ) {
 
-    if( (*odata)->dtype == SMF__DOUBLE ) {
-      /* Input data are doubles */
+    if( method ) {
+      /* Truncated FFT method ---------------------------------------------- */
 
-      double *idat = idata->pntr[0];
-      double *odat = (*odata)->pntr[0];
+      smfData *fft_idata=NULL;
+      smfData *fft_odata=NULL;
+      smfData *tempdata=NULL;
+      dim_t nf_i;               /* Number of frequencies in input data */
+      dim_t nf_o;               /* Number of frequencies in output data */
 
-      for( i=0; (*status==SAI__OK) && i<nbolo; i++ ) {
-        smf_downsamp1D( idat+i*ibstride, itstride, 0, intslice,
-                        odat+i*obstride, otstride, 0, ontslice, 1, 0, status );
+      /* Calculate the FFT of the data */
+      fft_idata = smf_fft_data( NULL, idata, 0, 0, status );
+      smf_isfft( fft_idata, NULL, NULL, &nf_i, status );
+
+      /* Create container for FFT of down-sampled data and copy over
+         up to the Nyquist frequency */
+      fft_odata = smf_deepcopy_smfData( fft_idata, 0, SMF__NOCREATE_DATA |
+                                        SMF__NOCREATE_VARIANCE |
+                                        SMF__NOCREATE_QUALITY |
+                                        SMF__NOCREATE_FILE | SMF__NOCREATE_HEAD,
+                                        0, 0, status );
+
+      nf_o = ontslice/2 + 1;
+
+      if( *status == SAI__OK ) {
+
+        /* New FFT is shorter */
+        fft_odata->dims[0] = nf_o;
+
+        fft_odata->pntr[0] = astCalloc( nf_o*nbolo*2,
+                                        smf_dtype_size(fft_odata,status) );
+
+        /* A slight kludge... create a smfHead for the sole purpose of
+           setting nframes so that smf_isfft can unambigiously get the
+           right number of time-slices when we do the inverse transform
+           of the truncated data */
+        fft_odata->hdr = smf_create_smfHead( status );
+        if( fft_odata->hdr ) fft_odata->hdr->nframes = ontslice;
       }
-    } else if( (*odata)->dtype == SMF__INTEGER ) {
-      /* Input data are integers */
 
-      int *idat = idata->pntr[0];
+      if( *status == SAI__OK ) {
+        size_t co_i = nf_i*nbolo;           /* Component offset input */
+        size_t co_o = nf_o*nbolo;           /* Component offset output */
+        double *ip = fft_idata->pntr[0];    /* Pointer to input data */
+        double *op = fft_odata->pntr[0];    /* Pointer to output data */
 
-      if( todouble ) {
-        /* converting int to double */
-        double *odat = (*odata)->pntr[0];
+        for( i=0; i<nbolo; i++ ) {
+          for( j=0; j<nf_o; j++ ) {
+            op[i*nf_o + j] = ip[i*nf_i + j];                 /* Real Values */
+            op[i*nf_o + j + co_o] = ip[i*nf_i + j + co_i];   /* Imag Values */
+          }
 
-        (*odata)->dtype = SMF__DOUBLE;
-
-        for( i=0; (*status==SAI__OK) && i<nbolo; i++ ) {
-          smf_downsamp1I( idat+i*ibstride, itstride, 0, intslice,
-                          odat+i*obstride, otstride, 0, ontslice, 1, 0, status);
-        }
-      } else {
-        /* output will also be int */
-        int *odat = (*odata)->pntr[0];
-
-        for( i=0; (*status==SAI__OK) && i<nbolo; i++ ) {
-          smf_downsamp1I( idat+i*ibstride, itstride, 0, intslice,
-                          odat+i*obstride, otstride, 0, ontslice, 0, 0, status);
+          /* If target time-series has even number of samples, Nyquist
+             frequency in FFT'd data needs to be real valued */
+          if( !(ontslice % 2) ) {
+            j = nf_o - 1;
+            op[i*nf_o + j + co_o] = 0;
+          }
         }
       }
+
+      /* Transform back to the time-domain and convert to the same order
+         as the input */
+      tempdata = smf_fft_data( NULL, fft_odata, 1, 0, status );
+      smf_dataOrder( tempdata, idata->isTordered, status );
+
+      if( *status == SAI__OK ) {
+        /* Copy over the data pointer and then null it in tempdata to
+           avoid closing it twice. */
+        (*odata)->pntr[0] = tempdata->pntr[0];
+        tempdata->pntr[0] = NULL;
+
+        if( (*odata)->ndims != tempdata->ndims ) {
+          *status = SAI__ERROR;
+          errRep( "", FUNC_NAME ": programming error, wrong number of dims!",
+                  status );
+        }
+
+        for( i=0; (*status==SAI__OK)&&(i<(*odata)->ndims); i++ ) {
+          if( (*odata)->dims[i] != tempdata->dims[i] ) {
+            *status = SAI__ERROR;
+            errRepf( "", FUNC_NAME ": programming error, dim(%zu) don't match! "
+                     "got %zu, should be %zu", status, i, (*odata)->dims[i],
+                     tempdata->dims[i] );
+          }
+        }
+      }
+
+      /* Clean up */
+      smf_close_file( &fft_idata, status );
+      smf_close_file( &fft_odata, status );
+      smf_close_file( &tempdata, status );
     } else {
-      *status = SAI__ERROR;
-      errRep( "", FUNC_NAME ": don't know how to handle data type", status );
+      /* Time-domain filter method ----------------------------------------- */
+
+      (*odata)->pntr[0] = astCalloc( ondata, size );
+
+      if( *status == SAI__OK ) {
+
+        if( idata->dtype == SMF__DOUBLE ) {
+          /* Input and output data are doubles */
+
+          double *idat = idata->pntr[0];
+          double *odat = (*odata)->pntr[0];
+
+          for( i=0; (*status==SAI__OK) && i<nbolo; i++ ) {
+            smf_downsamp1D( idat+i*ibstride, itstride, 0, intslice,
+                            odat+i*obstride, otstride, 0, ontslice, 1, 0,
+                            status );
+          }
+        } else if( idata->dtype==SMF__INTEGER ) {
+          /* Input data are integers */
+
+          int *idat = idata->pntr[0];
+
+          if( todouble ) {
+            /* converting int to double */
+            double *odat = (*odata)->pntr[0];
+
+            (*odata)->dtype = SMF__DOUBLE;
+
+            for( i=0; (*status==SAI__OK) && i<nbolo; i++ ) {
+              smf_downsamp1I( idat+i*ibstride, itstride, 0, intslice,
+                              odat+i*obstride, otstride, 0, ontslice, 1, 0,
+                              status);
+            }
+          } else {
+            /* output will also be int */
+            int *odat = (*odata)->pntr[0];
+
+            for( i=0; (*status==SAI__OK) && i<nbolo; i++ ) {
+              smf_downsamp1I( idat+i*ibstride, itstride, 0, intslice,
+                              odat+i*obstride, otstride, 0, ontslice, 0, 0,
+                              status);
+            }
+          }
+        } else {
+          *status = SAI__ERROR;
+          errRep( "", FUNC_NAME ": Don't know how to handle data type",
+                  status );
+        }
+      }
     }
   }
 
-  /* Down-sample the smfHead */
+  /* Down-sample the smfHead -------------------------------------------------*/
   if( (*status==SAI__OK) && (*odata) && (*odata)->hdr ) {
     smfHead *hdr = (*odata)->hdr;
 
@@ -300,7 +433,6 @@ void smf_downsamp_smfData( const smfData *idata, smfData **odata,
 
         RESAMPSTATE(instate, outstate, tcs_dm_abs, intslice, ontslice);
         RESAMPSTATE(instate, outstate, tcs_dm_rel, intslice, ontslice);
-
       }
 
     }
@@ -313,7 +445,7 @@ void smf_downsamp_smfData( const smfData *idata, smfData **odata,
     /* Down-sample the dark squids */
     if( indksquid ) {
       smf_downsamp_smfData( indksquid, &da->dksquid, ontslice, todouble,
-                            status );
+                            method, status );
     }
   }
 

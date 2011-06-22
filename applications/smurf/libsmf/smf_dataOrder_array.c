@@ -14,7 +14,8 @@
 
 *  Invocation:
 
-*     newbuf = smf_dataOrder_array( void * oldbuf, smf_dtype dtype,
+*     newbuf = smf_dataOrder_array( void * oldbuf, smf_dtype oldtype,
+*                                   smf_dtype newtype,
 *                                   size_t ndata, size_t ntslice,
 *                                   size_t nbolo, size_t tstr1, size_t bstr1,
 *                                   size_t tstr2, size_t bstr2, int inPlace,
@@ -24,8 +25,10 @@
 *     oldbuf = void * (Given and Returned)
 *        Pointer to the data buffer to be re-ordered. Also contains the
 *        re-ordered data if inPlace=1
-*     dtype = smf_dtype (Given)
-*        Data type of the buffer
+*     oldtype = smf_dtype (Given)
+*        Data type of the original buffer
+*     newtype = smf_dtype (Given)
+*        Data type of the target buffer
 *     ndata = size_t (Given)
 *        Number of elements in oldbuf
 *     ntslice = size_t (Given)
@@ -58,8 +61,8 @@
 *        Pointer to the re-ordered data.
 
 *  Notes:
-*     Will do nothing if the input and output strides are the same
-*     and the inPlace flag is true.
+*     Will do nothing if the input and output strides are the same,
+*     the inPlace flag is true, and the data types are the same.
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
@@ -73,12 +76,14 @@
 *        Add freeOrder flag in case routine is being used for copy
 *     2011-04-25 (TIMJ):
 *        Trap case when input and output strides are the same.
+*     2011-06-22 (EC):
+*        Add ability to typecast while copying (oldtype/newtype)
 
 *  Notes:
 
 *  Copyright:
 *     Copyright (C) 2010-2011 Science & Technology Facilities Council.
-*     Copyright (C) 2010 University of British Columbia.
+*     Copyright (C) 2010-2011 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -117,48 +122,87 @@
 
 #define FUNC_NAME "smf_dataOrder_array"
 
-void * smf_dataOrder_array( void * oldbuf, smf_dtype dtype, size_t ndata,
-                            size_t ntslice, size_t nbolo,
+void * smf_dataOrder_array( void * oldbuf, smf_dtype oldtype, smf_dtype newtype,
+                            size_t ndata, size_t ntslice, size_t nbolo,
                             size_t tstr1, size_t bstr1,
                             size_t tstr2, size_t bstr2, int inPlace,
                             int freeOld, int * status ) {
-  size_t sz = 0;        /* Size of data type */
-  void * newbuf = NULL; /* Space to do the reordering */
-  void * retval = NULL; /* Return value with reordered buffer */
+  size_t szold = 0;        /* Size of old data type */
+  size_t sznew = 0;        /* Size of new data type */
+  void * newbuf = NULL;    /* Space to do the reordering */
+  void * retval = NULL;    /* Return value with reordered buffer */
 
   retval = oldbuf;
   if (*status != SAI__OK) return retval;
   if (!retval) return retval;
 
-  /* Special case the inPlace variant with no reordering */
-  if ( inPlace && tstr1 == tstr2 && bstr1 == bstr2 ) {
+  /* Can't do inPlace without realloc'ing if data types don't match...
+     so generate bad status for now */
+  if( (newtype != oldtype) && inPlace ) {
+    *status = SAI__ERROR;
+    errRep( "", FUNC_NAME ": inPlace not supported if newtype != oldtype",
+            status );
+    return retval;
+  }
+
+  /* For now the only data conversion that is supported is from SMF__INTEGER
+     to SMF__DOUBLE */
+  if( (oldtype!=newtype) &&
+      ((newtype!=SMF__DOUBLE) || (oldtype!=SMF__INTEGER)) ) {
+    *status = SAI__ERROR;
+    errRep( "", FUNC_NAME
+            ": type conversion only supported from integer -> double",
+            status );
+    return retval;
+  }
+
+  /* Special case the inPlace variant with no reordering / typecasting */
+  if ( inPlace && tstr1 == tstr2 && bstr1 == bstr2 && oldtype == newtype ) {
     return retval;
   }
 
   /* Size of data type */
-  sz = smf_dtype_sz(dtype, status);
+  sznew = smf_dtype_sz(newtype, status);
+  szold = smf_dtype_sz(oldtype, status);
 
   /* Allocate buffer */
-  newbuf = astMalloc( ndata*sz );
+  newbuf = astMalloc( ndata*sznew );
 
   if( *status == SAI__OK ) {
 
-    /* if the input and output strides are the same we just memcpy */
-    if ( tstr1 == tstr2 && bstr1 == bstr2 ) {
+    /* if the input and output strides are the same, and the data types are
+       the same,  we just memcpy */
+    if ( tstr1 == tstr2 && bstr1 == bstr2 && oldtype == newtype ) {
 
-      memcpy( newbuf, oldbuf, sz*ndata );
+      memcpy( newbuf, oldbuf, sznew*ndata );
 
     } else {
       size_t j;
       size_t k;
 
       /* Loop over all of the elements and re-order the data */
-      switch( dtype ) {
+      switch( oldtype ) {
       case SMF__INTEGER:
-        for( j=0; j<ntslice; j++ ) {
-          for( k=0; k<nbolo; k++ ) {
-            ((int *)newbuf)[j*tstr2+k*bstr2] =
-              ((int *)oldbuf)[j*tstr1+k*bstr1];
+        if( newtype == SMF__DOUBLE ) {
+          /* Convert integer to double */
+          for( j=0; j<ntslice; j++ ) {
+            for( k=0; k<nbolo; k++ ) {
+              int val = ((int *)oldbuf)[j*tstr1+k*bstr1];
+              if( val != VAL__BADI ) {
+                ((double *)newbuf)[j*tstr2+k*bstr2] = val;
+              } else {
+                ((double *)newbuf)[j*tstr2+k*bstr2] = VAL__BADD;
+              }
+            }
+          }
+
+        } else {
+          /* integer to integer */
+          for( j=0; j<ntslice; j++ ) {
+            for( k=0; k<nbolo; k++ ) {
+              ((int *)newbuf)[j*tstr2+k*bstr2] =
+                ((int *)oldbuf)[j*tstr1+k*bstr1];
+            }
           }
         }
         break;
@@ -200,7 +244,7 @@ void * smf_dataOrder_array( void * oldbuf, smf_dtype dtype, size_t ndata,
         break;
 
       default:
-        msgSetc("DTYPE",smf_dtype_str(dtype, status));
+        msgSetc("DTYPE",smf_dtype_str(oldtype, status));
         *status = SAI__ERROR;
         errRep( "", FUNC_NAME
                 ": Don't know how to handle ^DTYPE type.", status);
@@ -209,7 +253,7 @@ void * smf_dataOrder_array( void * oldbuf, smf_dtype dtype, size_t ndata,
 
     if( inPlace ) {
       /* Copy newbuf to oldbuf */
-      memcpy( oldbuf, newbuf, ndata*sz );
+      memcpy( oldbuf, newbuf, ndata*sznew );
       /* Free newbuf */
       newbuf = astFree( newbuf );
 

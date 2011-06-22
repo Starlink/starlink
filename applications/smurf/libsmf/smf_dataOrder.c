@@ -217,14 +217,15 @@ int smf_dataOrder( smfData *data, int isTordered, int *status ) {
 
   /* Loop over elements of data->ptr and re-form arrays */
   for( i=0; i<2; i++ ) {
-    data->pntr[i] = smf_dataOrder_array( data->pntr[i], data->dtype, ndata,
+    data->pntr[i] = smf_dataOrder_array( data->pntr[i], data->dtype,
+                                         data->dtype, ndata,
                                          ntslice, nbolo, tstr1, bstr1, tstr2,
                                          bstr2, inPlace, 1, status );
   }
 
   /* And Quality */
-  data->qual = smf_dataOrder_array( data->qual, SMF__QUALTYPE, ndata,
-                                    ntslice, nbolo, tstr1, bstr1, tstr2,
+  data->qual = smf_dataOrder_array( data->qual, SMF__QUALTYPE, SMF__QUALTYPE,
+                                    ndata, ntslice, nbolo, tstr1, bstr1, tstr2,
                                     bstr2, inPlace, 1, status );
 
   /* If NDF associated with data, modify dimensions of the data */
@@ -235,9 +236,9 @@ int smf_dataOrder( smfData *data, int isTordered, int *status ) {
   }
 
   /* If there is a LUT re-order it here */
-  data->lut = smf_dataOrder_array( data->lut, SMF__INTEGER, ndata, ntslice,
-                                   nbolo, tstr1, bstr1, tstr2, bstr2, inPlace,
-                                   1, status );
+  data->lut = smf_dataOrder_array( data->lut, SMF__INTEGER, SMF__INTEGER, ndata,
+                                   ntslice, nbolo, tstr1, bstr1, tstr2, bstr2,
+                                   inPlace, 1, status );
 
   /* Set the new dimensions in the smfData */
   if( *status == SAI__OK ) {

@@ -380,7 +380,7 @@ void smurf_calcnoise( int *status ) {
 
   /* We now need to combine files from the same subarray and same sequence
      to form a continuous time series */
-  smf_grp_related( igrp, size, 1, 0, NULL, 0, &maxconcat, NULL, &igroup,
+  smf_grp_related( igrp, size, 1, 0, NULL, &maxconcat, NULL, &igroup,
                    &basegrp, NULL, status );
 
   /* Get output file(s) */
@@ -504,7 +504,7 @@ void smurf_calcnoise( int *status ) {
       astMapGet0D( keymap, "DOWNSAMPSCALE", &downsampscale );
 
       /* Get the padding to use. */
-      pad = smf_get_padding( keymap, downsampscale, 0, firstdata->hdr, status );
+      pad = smf_get_padding( keymap, 0, firstdata->hdr, status );
 
       /* Free the first smfData. */
       smf_close_file( &firstdata, status );
@@ -526,7 +526,7 @@ void smurf_calcnoise( int *status ) {
       smf_get_cleanpar( keymap, NULL, NULL, NULL, NULL, NULL, NULL, &dkclean,
                         NULL, &zeropad, NULL, NULL, NULL, NULL, NULL, NULL,
                         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-                        NULL, NULL, NULL, NULL, status );
+                        NULL, NULL, NULL, NULL, NULL, status );
 
       for( idx=0; dkclean&&(*status==SAI__OK)&&idx<concat->ndat; idx++ ) {
         odata = concat->sdata[idx];

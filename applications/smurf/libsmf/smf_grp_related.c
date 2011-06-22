@@ -15,9 +15,9 @@
  *  Invocation:
  *     smf_grp_related( const Grp *igrp, const size_t grpsize,
  *                      const int grouping, dim_t maxlen, AstKeyMap *keymap,
- *                      double downsampscale, dim_t *maxconcatlen,
- *                      dim_t *maxfilelen, smfGroup **group, Grp **basegrp,
- *                      dim_t *pad, int *status );
+ *                      dim_t *maxconcatlen, dim_t *maxfilelen,
+ *                      smfGroup **group, Grp **basegrp, dim_t *pad,
+ *                      int *status );
 
  *  Arguments:
  *     igrp = const Grp* (Given)
@@ -35,10 +35,6 @@
  *     keymap = AstKeyMap * (Given)
  *        A pointer to a KeyMap holding the configuration parameters. Only
  *        needed if "pad" is not NULL.
- *     downsampscale = double (Given)
- *        If set, downsample the data such that this scale (in arcsec) is
- *        retained. This factor will be used to calculate maxconcatlen and
- *        at maxfilelen.
  *     maxconcatlen = dim_t* (Returned)
  *        The actual length in time samples of the longest continuous chunk.
  *        Can be NULL.
@@ -239,15 +235,16 @@
 
 void smf_grp_related( const Grp *igrp, const size_t grpsize,
                       const int grouping, dim_t maxlen, AstKeyMap *keymap,
-                      double downsampscale, dim_t *maxconcatlen,
-                      dim_t *maxfilelen, smfGroup **group, Grp **basegrp,
-                      dim_t *pad, int *status ) {
+                      dim_t *maxconcatlen, dim_t *maxfilelen, smfGroup **group,
+                      Grp **basegrp, dim_t *pad, int *status ) {
 
   /* Local variables */
   size_t *chunk=NULL;         /* Array of flags for continuous chunks */
   dim_t * chunklen = NULL;    /* Length of continuous chunk */
   size_t currentindex = 0;    /* Counter */
   smfData *data = NULL;       /* Current smfData */
+  double downsampscale=0;     /* Angular scale downsampling size */
+  double downsampfreq=0;      /* Target downsampling frequency */
   AstKeyMap * grouped = NULL; /* Primary AstKeyMap for grouping */
   size_t i;                   /* Loop counter for index into Grp */
   int isFFT=0;                /* Set if data are 4d FFT */
@@ -256,15 +253,31 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
   dim_t maxconcat=0;          /* Longest continuous chunk length */
   dim_t maxflen=0;            /* Max file length in time steps */
   dim_t maxpad=0;             /* Maximum padding neeed for any input file */
-  size_t maxrelated = 0;     /* Keep track of max number of related items */
+  size_t maxrelated = 0;      /* Keep track of max number of related items */
   size_t *new_chunk=NULL;     /* keeper chunks associated with subgroups */
   dim_t *new_tlen=NULL;       /* tlens for new_subgroup */
   size_t ngroups = 0;         /* Counter for subgroups to be stored */
   size_t nkeep = 0;           /* Number of chunks to keep */
-  dim_t * piecelen = NULL;   /* Length of single file */
+  dim_t * piecelen = NULL;    /* Length of single file */
   size_t **subgroups = NULL;  /* Array containing index arrays to parent Grp */
 
   if ( *status != SAI__OK ) return;
+
+  /* Get downsampling parameters */
+
+  if( keymap ) {
+    smf_get_cleanpar( keymap, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+                      NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+                      NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+                      NULL, &downsampscale, &downsampfreq, status );
+
+    if( downsampscale && downsampfreq ) {
+      *status = SAI__ERROR;
+      errRep( "", FUNC_NAME ": both downsampscale and downsampfreq are set",
+              status );
+      return;
+    }
+  }
 
   /* Loop over files in input Grp: remember Grps are indexed from 1 */
   grouped = astKeyMap( "SortBy=KeyUp" );
@@ -351,20 +364,32 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
                     status );
 
       /* Find length of down-sampled data and steptime */
-      if( downsampscale && data->hdr && (*status==SAI__OK) ) {
-        double oldscale = steptime * data->hdr->scanvel;
-        double scalelen = oldscale / downsampscale;
+      if( (downsampscale || downsampfreq) && data->hdr && (*status==SAI__OK) ) {
+        double scalelen;
 
-        /* only down-sample if it will be at least a factor of 20% */
-        if( scalelen <= SMF__DOWNSAMPLIMIT ) {
+        if( downsampscale ) {
+          double oldscale = steptime * data->hdr->scanvel;
+          scalelen = oldscale / downsampscale;
+        } else {
+          if( steptime ) {
+            double oldsampfreq = 1./steptime;
+            scalelen = downsampfreq / oldsampfreq;
+          } else {
+            *status = SAI__ERROR;
+            scalelen = VAL__BADD;
+            errRep( "", FUNC_NAME ": can't resample because smfData has "
+                    "unknown sample rate", status );
+          }
+        }
+
+        /* only down-sample if it will be a reasonable factor */
+        if( (*status==SAI__OK) && (scalelen <= SMF__DOWNSAMPLIMIT) ) {
           smf_smfFile_msg(data->file, "FILE", 1, "" );
           msgOutiff( MSG__VERB, "", FUNC_NAME
-                     ": will down-sample file ^FILE from %5.1lf Hz to %5.1lf Hz", status,
-                     (1./steptime),
-                     (scalelen/steptime) );
+                     ": will down-sample file ^FILE from %5.1lf Hz to "
+                     "%5.1lf Hz", status, (1./steptime), (scalelen/steptime) );
 
           ntslice = round(ntslice * scalelen);
-
         }
       }
 
@@ -385,7 +410,7 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
 
       /* Work out the padding needed for this file including downsampling. */
       if( keymap ) {
-        thispad = smf_get_padding( keymap, downsampscale, 0, data->hdr, status );
+        thispad = smf_get_padding( keymap, 0, data->hdr, status );
         if( thispad > maxpad ) maxpad = thispad;
       } else {
         thispad = 0;

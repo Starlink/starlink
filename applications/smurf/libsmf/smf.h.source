@@ -855,8 +855,8 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 
 int smf_dataOrder( smfData *data, int isTordered, int *status );
 
-void * smf_dataOrder_array( void * oldbuf, smf_dtype dtype, size_t ndata,
-                            size_t ntslice, size_t nbolo,
+void * smf_dataOrder_array( void * oldbuf, smf_dtype oldtype, smf_dtype newtype,
+                            size_t ndata, size_t ntslice, size_t nbolo,
                             size_t tstr1, size_t bstr1,
                             size_t tstr2, size_t bstr2, int inPlace,
                             int freeOld, int * status );
@@ -895,7 +895,8 @@ void smf_display_projpars( AstSkyFrame * skyframe, double par[7],
                            int *status);
 
 void smf_downsamp_smfData( const smfData *idata, smfData **odata,
-                           dim_t ontslice, int todouble, int *status );
+                           dim_t ontslice, int todouble, int method,
+                           int *status );
 
 void smf_dream_calcweights ( smfData *data, const Grp *ogrp, const int index,
                              const double gridstep, const int ngrid,
@@ -1162,7 +1163,8 @@ void smf_get_cleanpar( AstKeyMap *keymap, double *badfrac,
                        int *dofilt, double *flagslow, double *flagfast,
                        int *order, double *spikethresh, size_t *spikeiter,
                        double *noiseclip, int *whiten, int *compreprocess,
-                       double *pcathresh, int *groupsubarray, double *downsampfreq,
+                       double *pcathresh, int *groupsubarray,
+                       double *downsampscale, double *downsampfreq,
                        int *status );
 
 void smf_get_dims( const smfData *data, dim_t *nrows, dim_t *ncols,
@@ -1196,8 +1198,8 @@ int smf_get_ndfid ( const HDSLoc *loc, const char *name, const char *accmode,
 
 int smf_get_nthread( int *status );
 
-dim_t smf_get_padding( AstKeyMap *keymap, double downsampscale, int report,
-                       const smfHead *hdr, int *status );
+dim_t smf_get_padding( AstKeyMap *keymap, int report,const smfHead *hdr,
+                       int *status );
 
 void smf_get_projpar( AstSkyFrame *skyframe, const double skyref[2],
                       int moving, int autogrid,
@@ -1240,9 +1242,8 @@ Grp *smf_grp_new( const Grp *grp, const char *type, int *status );
 
 void smf_grp_related( const Grp *igrp, const size_t grpsize,
                       const int grouping, dim_t maxlen, AstKeyMap *keymap,
-                      double downsampscale, dim_t *maxconcatlen,
-                      dim_t *maxfilelen, smfGroup **group, Grp **basegrp,
-                      dim_t *pad, int *status );
+                      dim_t *maxconcatlen, dim_t *maxfilelen, smfGroup **group,
+                      Grp **basegrp, dim_t *pad, int *status );
 
 void smf_history_add( smfData* data, const char * appl,
                       int *status);

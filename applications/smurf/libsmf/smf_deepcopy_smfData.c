@@ -61,8 +61,6 @@
 *       is not owned by the smfData.
 *     - The sidequal pointer is not copied if SMF__NOCREATE_QUALITY flag
 *       is set.
-*     - if rawconvert is set this routine can not re-order data and generates
-*       bad status if assertOrder is also set.
 
 *  Authors:
 *     Tim Jenness (TIMJ)
@@ -105,12 +103,15 @@
 *        Add smfFts
 *     2011-04-25 (TIMJ):
 *        Fix reordering bug associated with quality.
+*     2011-06-22 (EC):
+*        Added ability to rawconvert and reOrder at the same time.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008, 2010-2011 Science and Technology Facilities Council.
-*     Copyright (C) 2006 Particle Physics and Astronomy Research
-*     Council. University of British Columbia. All Rights Reserved.
+*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2006,2008,2010-2011 University of British Columbia.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -161,11 +162,10 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
   smfDA *da = NULL;           /* New smfDA */
   smfFts* fts = NULL;         /* FTS2 data */
   dim_t dims[NDF__MXDIM];     /* Dimensions of each axis of data array */
-  smf_dtype dtype;            /* Data type */
+  smf_dtype oldtype;          /* Data type for original smfData */
   smfFile *file = NULL;       /* New smfFile */
   smfHead *hdr = NULL;        /* New smfHead */
   size_t i;                   /* Loop counter */
-  int oldOrder;               /* Data order in old data buffer */
   size_t j;                   /* Loop counter */
   int lbnd[NDF__MXDIM];       /* lower bounds of each axis of data array */
   dim_t nbolo;                /* number of bolometers */
@@ -174,9 +174,11 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
   size_t ndims;               /* Number of dimensions in data array */
   smfData *new = NULL;        /* New smfData */
   int newOrder;               /* Data order in new data buffer */
+  smf_dtype newtype;          /* Data type for new smfData */
+  int oldOrder;               /* Data order in old data buffer */
+  double *outdata;            /* Pointer to output DATA */
   size_t npts;                /* Number of data points */
   dim_t ntslice;              /* Number of time slices */
-  double *outdata;            /* Pointer to output DATA */
   void *pntr[2];              /* Data and variance arrays */
   double *poly = NULL;        /* Polynomial coefficients */
   smf_qual_t *qual = NULL;    /* Quality array */
@@ -194,7 +196,7 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
   ndims = old->ndims;
   ncoeff = old->ncoeff;
   virtual = old->virtual;
-  dtype = old->dtype;
+  oldtype = old->dtype;
   oldOrder = old->isTordered;
   newOrder = oldOrder;
 
@@ -212,13 +214,6 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
   if( assertOrder ) {
     if( old->ndims == 3 ) {
       if( old->isTordered != isTordered ) {
-        if( rawconvert ) {
-          *status = SAI__ERROR;
-          errRep( "", FUNC_NAME ": Can't re-order if rawconvert is set.",
-                  status );
-          return NULL;
-        }
-
         reOrder = 1;
         newOrder = isTordered;
         smf_get_dims( old, NULL, NULL, &nbolo, &ntslice, NULL, &bstr1, &tstr1,
@@ -277,15 +272,24 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
     create[2] = 1;
   }
 
+  /* What is the data type for the new smfData */
+  if (rawconvert && (oldtype == SMF__INTEGER) ) {
+    newtype = SMF__DOUBLE;
+  } else {
+    newtype = old->dtype;
+  }
+
   /* DATA and VARIANCE */
   for (i=0; i<2; i++) {
 
-    if ( ((old->pntr)[i] != NULL) && create[i] ) {
+    if ( (old->pntr)[i] && create[i] ) {
 
-      /* Check if we are converting from integer to double */
-      if (rawconvert && (old->dtype == SMF__INTEGER) ) {
+      if (rawconvert && (old->dtype == SMF__INTEGER) && !reOrder) {
+
+        /* Check if we are only converting from integer to double, and
+           no re-ordering */
+
         nbytes = sizeof(double);
-        dtype = SMF__DOUBLE;
         pntr[i] = astMalloc( npts*nbytes );
         outdata = pntr[i];
         tstream = (old->pntr)[i];
@@ -298,51 +302,56 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
           }
         }
         pntr[i] = outdata;
+
+      } else if( reOrder ) {
+
+        /* Use smf_dataOrder if we are re-ordering (this is guaranteed to
+           be 3-D data). This routine also does typecasting if needed. */
+
+        pntr[i] = smf_dataOrder_array( old->pntr[i], oldtype, newtype, npts,
+                                       ntslice, nbolo, tstr1, bstr1, tstr2,
+                                       bstr2, 0, 0, status );
+
       } else {
 
-        if( reOrder ) {
-          /* Do a re-ordering copy into a new buffer */
-          pntr[i] = smf_dataOrder_array( old->pntr[i], old->dtype, npts,
-                                         ntslice, nbolo, tstr1, bstr1, tstr2,
-                                         bstr2, 0, 0, status );
-        } else {
-          /* Allocate space and memcpy */
-          nbytes = smf_dtype_size(old, status);
-          pntr[i] = astMalloc( npts*nbytes );
-          if ( pntr[i] == NULL ) {
-            if ( i == 0) {
-              msgSetc("C", "Data");
-            } else if ( i == 1 ) {
-              msgSetc("C", "Variance");
-            } else {
-              if ( *status == SAI__OK ) {
-                *status = SAI__ERROR;
-                errRep(FUNC_NAME, "Loop counter out of range. "
-                       "Possible programming error?", status);
-                return NULL;
-              }
+        /* Otherwise we are just cloning the data */
+
+        nbytes = smf_dtype_size(old, status);
+        pntr[i] = astMalloc( npts*nbytes );
+        if ( pntr[i] == NULL ) {
+          if ( i == 0) {
+            msgSetc("C", "Data");
+          } else if ( i == 1 ) {
+            msgSetc("C", "Variance");
+          } else {
+            if ( *status == SAI__OK ) {
+              *status = SAI__ERROR;
+              errRep(FUNC_NAME, "Loop counter out of range. "
+                     "Possible programming error?", status);
+              return NULL;
             }
-            *status = SAI__ERROR;
-            errRep(FUNC_NAME, "Unable to allocate memory for ^C component",
-                   status);
-            return NULL;
           }
-          memcpy( pntr[i], (old->pntr)[i], nbytes*npts);
+          *status = SAI__ERROR;
+          errRep(FUNC_NAME, "Unable to allocate memory for ^C component",
+                 status);
+          return NULL;
         }
+        memcpy( pntr[i], (old->pntr)[i], nbytes*npts);
       }
     } else {
       pntr[i] = NULL;
     }
   }
   /* Quality */
-  if ( (old->qual != NULL) && create[2] ) {
+  if ( old->qual && create[2] ) {
+
     if( reOrder ) {
-      /* Do a re-ordering copy into a new buffer */
-      qual = smf_dataOrder_array( old->qual, SMF__QUALTYPE, npts,
+      /* Re-ordering copy */
+      qual = smf_dataOrder_array( old->qual, SMF__QUALTYPE, SMF__QUALTYPE, npts,
                                   ntslice, nbolo, tstr1, bstr1, tstr2,
                                   bstr2, 0, 0, status );
     } else {
-      /* Allocate space and memcpy */
+      /* Straight copy */
       qual = astMalloc( npts*sizeof(*qual) );
       if ( qual == NULL ) {
         *status = SAI__ERROR;
@@ -352,6 +361,7 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
       }
       memcpy( qual, old->qual, npts*sizeof(*qual) );
     }
+
   } else {
     qual = NULL;
   }
@@ -389,7 +399,7 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
   /* Copy smfDA if desired */
   if (! (flags & SMF__NOCREATE_DA) )
     da = smf_deepcopy_smfDA( old, 1, status );
-    
+
   /* Copy smfFts if desired */
   if(!(flags & SMF__NOCREATE_FTS)) {
     fts = smf_deepcopy_smfFts(old, status );
@@ -401,7 +411,7 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
   }
 
   /* Construct the new smfData */
-  new = smf_construct_smfData( new, file, hdr, da, fts, dtype, pntr, qual,
+  new = smf_construct_smfData( new, file, hdr, da, fts, newtype, pntr, qual,
                                old->qfamily, sidequal, newOrder, dims,
                                lbnd, ndims, virtual, ncoeff, poly, history,
                                status);

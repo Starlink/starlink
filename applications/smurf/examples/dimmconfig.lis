@@ -126,6 +126,11 @@ exportndf = 0
 #450.downsampscale = 2
 #850.downsampscale = 4
 
+# Alternatively, if you wish to downsample to a specific sample rate it
+# can be specified with downsampfreq in Hz.
+
+# downsampfreq = 50.
+
 # To test the response of the map-maker to different known
 # astronomical sources, an external "fakemap" can be specified to
 # provide an image of the sky that will produce additional

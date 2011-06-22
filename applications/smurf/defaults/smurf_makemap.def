@@ -55,7 +55,10 @@ varmapmethod = 1
 maxlen = 0
 pad = <undef>
 
+# these are here instead of in smurf_sc2clean.def since they are used
+# during concatenation, and not during calls to the cleaning function
 downsampscale = 0
+downsampfreq = 0
 
 modelorder = (com,gai,ext,flt,ast,noi)
 exportndf = 0

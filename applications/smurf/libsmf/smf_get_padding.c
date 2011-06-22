@@ -14,15 +14,12 @@
 *     C function
 
 *  Invocation:
-*     result = smf_get_padding( AstKeyMap *keymap, double downsampscale,
-*                               int report, const smfHead *hdr, int *status )
+*     result = smf_get_padding( AstKeyMap *keymap, int report,
+*                               const smfHead *hdr, int *status )
 
 *  Arguments:
 *     keymap = AstKeyMap* (Given)
 *        keymap containing the user-supplied configuration.
-*     downsampscale = double (Given)
-*        If not zero, downsample the data such that this scale (in arcsec)
-*        is retained.
 *     report = int (Given)
 *        If non-zero, report the default value if it is used.
 *     hdr = smfHead *(Given)
@@ -52,6 +49,8 @@
 
 *  Authors:
 *     DSB: David S. Berry (JAC, Hawaii)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+*     EC: Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -65,12 +64,15 @@
 *        - Take account of any downsampling.
 *     2011-04-20 (TIMJ):
 *        Trap for a stationary telescope when working out padding.
+*     2011-06-22 (EC):
+*        Don't need downsampscale since it is in the keymap
 *     {enter_further_changes_here}
 
 *  Notes:
 
 *  Copyright:
 *     Copyright (C) 2010-2011 Science & Technology Facilities Council.
+*     Copyright (C) 2011 University of British Columbia
 *     All Rights Reserved.
 
 *  Licence:
@@ -104,8 +106,10 @@
 #include "libsmf/smf_err.h"
 #include "libsmf/smf.h"
 
-dim_t smf_get_padding( AstKeyMap *keymap, double downsampscale, int report,
-                       const smfHead *hdr, int *status ) {
+#define FUNC_NAME "smf_get_padding"
+
+dim_t smf_get_padding( AstKeyMap *keymap, int report, const smfHead *hdr,
+                       int *status ) {
 
 /* Local Variables: */
    AstObject *obj;
@@ -124,6 +128,8 @@ dim_t smf_get_padding( AstKeyMap *keymap, double downsampscale, int report,
    int nel;
    int temp;
    double scalelen;
+   double downsampscale;
+   double downsampfreq;
 
 /* Initialise */
    result = 0;
@@ -157,7 +163,13 @@ dim_t smf_get_padding( AstKeyMap *keymap, double downsampscale, int report,
                         NULL, &filt_edgelow, &filt_edgehigh, &filt_edgesmall,
                         &filt_edgelarge, filt_notchlow, NULL, &f_nnotch, NULL,
                         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-                        NULL, NULL, status );
+                        NULL, &downsampscale, &downsampfreq, status );
+
+      if( downsampscale && downsampfreq ) {
+        *status = SAI__ERROR;
+        errRep( "", FUNC_NAME ": both downsampscale and downsampfreq are set",
+                status );
+      }
 
 /* If none were found, annul the error and return a padding length of
    zero. */
@@ -186,11 +198,25 @@ dim_t smf_get_padding( AstKeyMap *keymap, double downsampscale, int report,
          steptime = hdr->steptime;
 
 /* If any down-sampling is occurring, set the step time to value implied by
-   the requested downsample size (in effect this is downsampscale/scanvel).
-   Only down-sample if it will be at least a factor of 20% */
-         if( downsampscale != 0.0 ) {
-            scalelen = steptime * hdr->scanvel / downsampscale;
-            if( scalelen <= SMF__DOWNSAMPLIMIT ) steptime = steptime/scalelen;
+   the requested downsampling factor. This should match the calculation in
+   smf_grp_related */
+
+         if( downsampscale || downsampfreq ) {
+           if( downsampscale ) {
+             scalelen = steptime * hdr->scanvel / downsampscale;
+           } else {
+             if( hdr->steptime ) {
+               scalelen = downsampfreq / (1./hdr->steptime);
+             } else {
+               *status = SAI__ERROR;
+               scalelen = VAL__BADD;
+               errRep( "", FUNC_NAME ": can't resample because smfData has "
+                       "unknown sample rate", status );
+             }
+           }
+
+           if( (*status==SAI__OK) && (scalelen<=SMF__DOWNSAMPLIMIT) )
+               steptime = steptime/scalelen;
          }
 
 /* Find the corresponding padding. */
@@ -215,7 +241,7 @@ dim_t smf_get_padding( AstKeyMap *keymap, double downsampscale, int report,
                (void) astMapGet0A( keymap, key, &obj );
 
 /* Call this function to get the padding implied by the sub-KeyMap. */
-               pad = smf_get_padding( (AstKeyMap *) obj, downsampscale, report, hdr,
+               pad = smf_get_padding( (AstKeyMap *) obj, report, hdr,
                                       status );
 
 /* Use the larger of the two paddings. */

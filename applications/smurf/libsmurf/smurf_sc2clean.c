@@ -310,7 +310,7 @@ void smurf_sc2clean( int *status ) {
   smf_request_mask( "BBM", &bbms, status );
 
   /* Group the input files by subarray and continuity ----------------------- */
-  smf_grp_related( igrp, size, 1, maxlen-padStart-padEnd, NULL, 0, &maxconcat,
+  smf_grp_related( igrp, size, 1, maxlen-padStart-padEnd, NULL, &maxconcat,
                    NULL, &igroup, &basegrp, NULL, status );
 
   /* Obtain the number of continuous chunks and subarrays */
@@ -330,7 +330,6 @@ void smurf_sc2clean( int *status ) {
   for( contchunk=0;(*status==SAI__OK)&&contchunk<ncontchunks; contchunk++ ) {
     AstKeyMap *keymap=NULL;
     int dkclean;
-    double downsampscale;
     AstKeyMap *sub_instruments=NULL;
 
     /* Place cleaning parameters into a keymap and set defaults. Do
@@ -351,17 +350,14 @@ void smurf_sc2clean( int *status ) {
                          sub_instruments, status );
     if( sub_instruments ) sub_instruments = astAnnul( sub_instruments );
 
-    /* Are we downsampling the data? */
-    astMapGet0D( keymap, "DOWNSAMPSCALE", &downsampscale );
-
     /* Now rerun smf_grp_related to figure out how long each downsampled
        chunk of data will be. */
 
     if( basegrp ) grpDelet( &basegrp, status );
     if( igroup ) smf_close_smfGroup( &igroup, status );
 
-    smf_grp_related( igrp, size, 1, maxlen-padStart-padEnd, NULL,
-                     downsampscale, &maxconcat, NULL, &igroup, &basegrp, NULL,
+    smf_grp_related( igrp, size, 1, maxlen-padStart-padEnd, keymap,
+                     &maxconcat, NULL, &igroup, &basegrp, NULL,
                      status );
 
     /* Concatenate this continuous chunk */
@@ -376,7 +372,7 @@ void smurf_sc2clean( int *status ) {
       smf_get_cleanpar( keymap, NULL, NULL, NULL, NULL, NULL, NULL, &dkclean,
                         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-                        NULL, NULL, NULL, NULL, status );
+                        NULL, NULL, NULL, NULL, NULL, status );
 
       for( idx=0; dkclean&&(*status==SAI__OK)&&idx<concat->ndat; idx++ ) {
         odata = concat->sdata[idx];
