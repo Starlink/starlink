@@ -388,6 +388,8 @@ void smurf_dsutils( int *status ) {
    double *dpx_vals = NULL;  /* Pointer to pixel X offset values */
    double *dpy_vals = NULL;  /* Pointer to pixel Y offset values */
    double *extra_vals = NULL;
+   double *fx_vals = NULL;   /* Pointer to focal plane X values */
+   double *fy_vals = NULL;   /* Pointer to focal plane Y values */
    double *f1_vals = NULL;   /* Pointer to F1 column values */
    double *f2_vals = NULL;   /* Pointer to F2 column values */
    double *iz_vals = NULL;
@@ -1249,11 +1251,17 @@ void smurf_dsutils( int *status ) {
             bc2_vals[ nrow ] = yout[ 0 ] - yout[ 1 ];
 
 /* Expand memory to hold new columns in output catalogue. */
+            fx_vals = astGrow( fx_vals, nrow + 1, sizeof( *fx_vals ) );
+            fy_vals = astGrow( fy_vals, nrow + 1, sizeof( *fy_vals ) );
             dpx_vals = astGrow( dpx_vals, nrow + 1, sizeof( *dpx_vals ) );
             dpy_vals = astGrow( dpy_vals, nrow + 1, sizeof( *dpy_vals ) );
             dfx_vals = astGrow( dfx_vals, nrow + 1, sizeof( *dfx_vals ) );
             dfy_vals = astGrow( dfy_vals, nrow + 1, sizeof( *dfy_vals ) );
             if( *status == SAI__OK ) {
+
+/* Store focal plane position */
+               fx_vals[ nrow ] = xout[ 1 ];
+               fy_vals[ nrow ] = yout[ 1 ];
 
 /* Store pixel offsets */
                dpx_vals[ nrow ] = xin[ 0 ] - xin[ 1 ];
@@ -1332,6 +1340,8 @@ void smurf_dsutils( int *status ) {
       if( fp2 ) {
 
 /* Add the new column nmaes to the header. */
+         AddColName( header, "FX", "Focal plane X position in mm", status );
+         AddColName( header, "FY", "Focal plane Y position in mm", status );
          AddColName( header, "DPX", "Focal plane X offsets in pixels", status );
          AddColName( header, "DPY", "Focal plane Y offsets in pixels", status );
          AddColName( header, "DFX", "Unsmoothed Focal plane X offsets in mm", status );
@@ -1350,7 +1360,8 @@ void smurf_dsutils( int *status ) {
          irow = 0;
          do {
             if( buf[ strlen( buf ) - 1 ] == '\n' ) buf[ strlen( buf ) - 1 ] = 0;
-            if( bc1_vals[ irow ] != VAL__BADD ) fprintf( fp2, "%s %g %g %g %g %g %g\n", buf,
+            if( bc1_vals[ irow ] != VAL__BADD ) fprintf( fp2, "%s %g %g %g %g %g %g %g %g\n", buf,
+                                                         fx_vals[irow],  fy_vals[irow],
                                                          dpx_vals[irow], dpy_vals[irow],
                                                          dfx_vals[irow], dfy_vals[irow],
                                                          bc1_vals[irow], bc2_vals[irow] );
@@ -1399,6 +1410,8 @@ void smurf_dsutils( int *status ) {
       amp_vals = astFree( amp_vals );
       damp_vals = astFree( damp_vals );
       rms_vals = astFree( rms_vals );
+      fx_vals = astFree( fx_vals );
+      fy_vals = astFree( fy_vals );
       dpx_vals = astFree( dpx_vals );
       dpy_vals = astFree( dpy_vals );
       dfx_vals = astFree( dfx_vals );
