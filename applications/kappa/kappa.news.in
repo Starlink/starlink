@@ -18,6 +18,11 @@
 
 2 Modified_applications
 
+   o FITSMOD
+
+      - New parameter READONLY allows FITSMOD to be used to perform
+      read-only edits such as "Print" and "Exist" on write-protected NDFs.
+
    o HISTOGRAM
 
       -  Now permits plotting of the histogram for data-value limits

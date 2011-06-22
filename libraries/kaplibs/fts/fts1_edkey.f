@@ -204,6 +204,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -220,6 +221,9 @@
 *     2009 January 19 (MJC):
 *        Description modified for Null option retaining the Value
 *        Indicator.
+*     22-JUN-2011 (DSB):
+*        Allow read-only operations to be performed without needing
+*        write-access to anything.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -310,6 +314,7 @@
       INTEGER LREFVK             ! Length of the value reference keyword
       INTEGER LSTCAR             ! Last card number of FITS array
       LOGICAL LVALUE             ! FITS value
+      INTEGER MXCLIM             ! Lowest allowed value for MXCARD
       CHARACTER * ( HKEYLN ) NEWKEY ! Replacement keyword
       INTEGER OLDLST             ! Last card number of old FITS array
       INTEGER PCARD              ! Number of positional card
@@ -318,6 +323,7 @@
       LOGICAL PRESNT             ! Named card is present? (dummy)
       CHARACTER * ( HKEYLN ) PSTNAM ! A position keyword
       CHARACTER * ( 70 ) RCOMNT  ! FITS comment of reference-value card
+      LOGICAL RDONLY             ! Are all edits read-only?
       INTEGER RECOC              ! Reference-comment-keyword occurrence
                                  ! number
       LOGICAL REFCOM             ! Value contains comment reference
@@ -350,8 +356,21 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Set a flag indicating if none of the edits change anything.
+      RDONLY = .TRUE.
+      DO I = 1, NKEY
+         IF( EDITS( I )( 1 : 1 ) .NE. 'E' .AND.
+     :       EDITS( I )( 1 : 1 ) .NE. 'P' ) RDONLY = .FALSE.
+      END DO
+
 *  Validate the input dimensions.
-      IF ( MXCARD .LT. NOCARD + NKEY + 1 . OR. NOCARD .LT. 1 .OR.
+      IF( RDONLY ) THEN
+         MXCLIM = NOCARD
+      ELSE
+         MXCLIM = NOCARD + NKEY + 1
+      END IF
+
+      IF ( MXCARD .LT. MXCLIM . OR. NOCARD .LT. 1 .OR.
      :     NKEY .LT. 1 ) THEN
          CALL MSG_SETI( 'M', NOCARD )
          CALL MSG_SETI( 'N', NKEY )
@@ -386,7 +405,7 @@
       ELSE
          OLDLST = NOCARD + 1
          ENDCAR = OLDLST
-         FTSCAR( ENDCAR ) = 'END '
+         IF( .NOT. RDONLY ) FTSCAR( ENDCAR ) = 'END '
 
       END IF
 
@@ -1262,11 +1281,13 @@
          CARD = IARY1( CARD )
       END DO
 
-*  Copy the cards from the temporary character work space back to FITS
-*  array.
-      DO CARD = 1, ACTNUM
-         FTSCAR( CARD ) = CARY( CARD )
-      END DO
+*  If anything may have changed, copy the cards from the temporary
+*  character work space back to FITS array.
+      IF( .NOT. RDONLY ) THEN
+         DO CARD = 1, ACTNUM
+            FTSCAR( CARD ) = CARY( CARD )
+         END DO
+      END IF
 
 *  If there was no END-card originally, remove the END-card that was
 *  added.

@@ -660,6 +660,15 @@ package kappa {
             helpkey *
          }
 
+         parameter readonly {
+            type _LOGICAL
+            vpath DYNAMIC DEFAULT
+            ppath DYNAMIC DEFAULT
+            prompt {Open the NDF for reading only?}
+            default FALSE
+            helpkey *
+         }
+
          parameter string {
             type _LOGICAL
             vpath DEFAULT

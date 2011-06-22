@@ -153,6 +153,19 @@
 *
 *        A positional keyword is only accessed by the "Move", "Write",
 *        "Amend", and "Update" editing commands.
+*     READONLY = _LOGICAL (Read)
+*        Determines if read or write access is requested for the NDF.
+*        If a TRUE value is supplied for READONLY, the NDF is opened
+*        for reading only. An error will then be reported if any of the
+*        requested editing operations would change the contents of the
+*        NDF. If a FALSE value is supplied for READONLY, the NDF is
+*        opened for both reading and writing, but an error will be
+*        reported if the NDF file is write-protected on disk. If the
+*        MODE parameter is set to "File", the dynamic default value for
+*        READONLY is FALSE. If MODE is set to "Interface", the dynamic
+*        default value for READONLY depends on the value of the EDIT
+*        parameter: TRUE for "Print" and "Exist", and FALSE for all other
+*        editing commands. []
 *     STRING = _LOGICAL (Read)
 *        When STRING is FALSE, inferred data typing is used for the
 *        "Write", "Update", and "Amend" editing commands.  So for
@@ -499,6 +512,8 @@
 *        read.
 *     2009 January 11 (MJC):
 *        Add Null editing option.
+*     22-JUN-2011 (DSB):
+*        Added READONLY parameter.
 *     {enter_further_changes_here}
 
 *-
@@ -543,6 +558,7 @@
 
 
 *  Local Variables:
+      CHARACTER * ( 6 ) AMODE    ! NDF access mode
       INTEGER ATEMPT             ! Number of attempts to obtain a
                                  ! valid keyword
       CHARACTER * ( DAT__SZLOC ) CELLOC ! Locator to first element of
@@ -578,6 +594,7 @@
       INTEGER POCCUR             ! Occurrence of positional keyword
       INTEGER POPNTR             ! Pointer to mapped poistional-keyword
                                  ! occurrences
+      LOGICAL RDONLY             ! Will all the editing be read-only?
       LOGICAL STRING             ! Is value a string?
       LOGICAL EXISTS             ! Result of final "Exist" operation
       LOGICAL THERE              ! FITS extension already exists?
@@ -600,8 +617,41 @@
 *  Access the FITS extension.
 *  ==========================
 
+*  Set the default for the READONLY parameter. For FILE mode, this is
+*  always FALSE (since we do not know what commands will be performed
+*  until the file is read we have to assume that they may require write
+*  access). For INTERFACE mode, the default depends on the requested
+*  editing command.
+      IF( MODE .EQ. 'FILE' ) THEN
+         RDONLY = .FALSE.
+
+*  For INTERFACE mode, the default depends on the requested editing
+*  command.
+      ELSE
+
+*  Obtain the edit command
+         CALL PAR_CHOIC( 'EDIT', 'Read', 'Amend,Delete,Exist,Move,'/
+     :                    /'Null,Print,Rename,Update,Write',
+     :                   .FALSE., EDIT, STATUS )
+
+*  If the editing command does not change the file, use a default of TRUE
+*  for READONLY.
+         RDONLY = ( EDIT .EQ. 'EXIST' .OR. EDIT .EQ. 'PRINT' )
+      END IF
+
+*  Set the default for READONLY and get a value from the environment.
+      CALL PAR_DEF0L( 'READONLY', RDONLY, STATUS )
+      CALL PAR_GET0L( 'READONLY', RDONLY, STATUS )
+
+*  Choose the appropriate NDF access mode.
+      IF( RDONLY ) THEN
+         AMODE = 'READ'
+      ELSE
+         AMODE = 'UPDATE'
+      END IF
+
 *  Obtain the NDF to be updated.
-      CALL LPG_ASSOC( 'NDF', 'UPDATE', INDF, STATUS )
+      CALL LPG_ASSOC( 'NDF', AMODE, INDF, STATUS )
 
 *  See whether or not there is a FITS extension.
       CALL NDF_XSTAT( INDF, 'FITS', THERE, STATUS )
@@ -621,7 +671,7 @@
       ELSE
 
 *  Find the FITS extension.
-         CALL NDF_XLOC( INDF, 'FITS', 'UPDATE', LOC, STATUS )
+         CALL NDF_XLOC( INDF, 'FITS', AMODE, LOC, STATUS )
       END IF
 
 *    Abort if the answer is illegal.
@@ -709,11 +759,6 @@
 
 *  Interface mode only allows one edit per invocation.
          NEDIT = 1
-
-*  Obtain the edit command
-         CALL PAR_CHOIC( 'EDIT', 'Read', 'Amend,Delete,Exist,Move,'/
-     :                    /'Null,Print,Rename,Update,Write',
-     :                   .FALSE., EDIT, STATUS )
 
 *  Obtain the edit keyword and occurrence.
 *  ---------------------------------------

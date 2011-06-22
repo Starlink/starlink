@@ -156,13 +156,14 @@
 *        The global status.
 
 *  Prior Requirements:
-*     The FITS extension is mapped for update access.  It therefore must
-*     have some values assigned before using the routine.
+*     Unless all edits are read-only, the The FITS extension is mapped
+*     for update access.  It therefore must have some values assigned
+*     before using the routine.
 
 *  Copyright:
 *     Copyright (C) 1996, 1999, 2004 Central Laboratory of the Research
 *                   Councils.
-*     Copyright (C) 2008, 2009 Science and Technology Facilties Council.
+*     Copyright (C) 2008-2011 Science and Technology Facilties Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -201,6 +202,9 @@
 *     2009 January 19 (MJC):
 *        Description modified for Null option retaining the Value
 *        Indicator.
+*     22-JUN-2011 (DSB):
+*        Use READ access if none of the editing operations change
+*        anything.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -239,9 +243,11 @@
 
 *  Local Variables:
       INTEGER ACTNUM             ! Actual no. of keywords in new FITS X
+      CHARACTER * ( 6 ) AMODE    ! Access mode
       INTEGER CPNTR( 1 )         ! Pointer to mapped temp. char. array
       INTEGER EL                 ! Element number of a mapped array
       INTEGER FTSPNT( 1 )        ! Pointer to mapped FITS X
+      INTEGER IKEY               ! Index of edit string
       INTEGER IPNTR1( 1 )        ! Pointer to mapped temp. integer array
       INTEGER IPNTR2( 1 )        ! Pointer to mapped temp. integer array
       INTEGER NEWSIZ( 1 )        ! Size of new FITS extension
@@ -270,23 +276,36 @@
          GOTO 999
       END IF
 
+*  Determine the access mode required - READ if none of the edits change
+*  anything, and UPDATE otherwise.
+      AMODE = 'READ'
+      DO IKEY = 1, NKEY
+         IF( EDITS( IKEY )( 1 : 1 ) .NE. 'E' .AND.
+     :       EDITS( IKEY )( 1 : 1 ) .NE. 'P' ) AMODE = 'UPDATE'
+      END DO
+
 *  Get the size of the original FITS array.
       CALL DAT_SIZE( FTSLOC, OLDSIZ, STATUS )
 
-*  Increase the size of the FITS array to the possible maximum size
-*  after inserting new cards (and allow for possible extra END card).
-      NEWSIZ( 1 ) = OLDSIZ + NKEY + 1
-      CALL DAT_ALTER( FTSLOC, 1, NEWSIZ, STATUS )
+*  Unless all editing is read-only, increase the size of the FITS array
+*  to the possible maximum size after inserting new cards (and allow for
+*  possible extra END card).
+      IF( AMODE .EQ. 'READ' ) THEN
+         NEWSIZ( 1 ) = OLDSIZ
+      ELSE
+         NEWSIZ( 1 ) = OLDSIZ + NKEY + 1
+         CALL DAT_ALTER( FTSLOC, 1, NEWSIZ, STATUS )
 
 *  Check status, if error, report and exit.
-      IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'FTS1_EDFEX', 'Unable to increase the size of '/
-     :                /'FITS array.', STATUS )
-         GOTO 999
+         IF ( STATUS .NE. SAI__OK ) THEN
+            CALL ERR_REP( 'FTS1_EDFEX', 'Unable to increase the size '/
+     :                   /'of FITS array.', STATUS )
+            GOTO 999
+         END IF
       END IF
 
 *  Map the 80-character FITS card array.
-      CALL DAT_MAPV( FTSLOC, '_CHAR', 'UPDATE', FTSPNT, EL, STATUS )
+      CALL DAT_MAPV( FTSLOC, '_CHAR', AMODE, FTSPNT, EL, STATUS )
 
 *  Create and map workspace to hold two temporary integer arrays and a
 *  temporary character array.
@@ -326,8 +345,10 @@
 *  Unmap the FITS array.
       CALL DAT_UNMAP( FTSLOC, STATUS )
 
-*  Reduce the size of FITS array to the actual number of cards.
-      CALL DAT_ALTER( FTSLOC, 1, ACTNUM, STATUS )
+*  If required, reduce the size of FITS array to the actual number of
+*  cards.
+      IF( AMODE .NE. 'READ' ) CALL DAT_ALTER( FTSLOC, 1, ACTNUM,
+     :                                        STATUS )
 
  990  CONTINUE
 

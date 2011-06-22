@@ -25248,6 +25248,22 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
          {\tt "Amend"}, {\tt "Write"}, and {\tt "Update"} editing commands.
       }
       \sstsubsection{
+         READONLY = \_LOGICAL (Read)
+      }{
+         Determines if read or write access is requested for the NDF. If
+	 a TRUE value is supplied for READONLY, the NDF is opened for
+	 reading only. An error will then be reported if any of the
+	 requested editing operations would change the contents of the
+	 NDF. If a FALSE value is supplied for READONLY, the NDF is
+	 opened for both reading and writing, but an error will be
+	 reported if the NDF file is write-protected on disk. If the MODE
+	 parameter is set to {\tt "File"}, the dynamic default value for
+	 READONLY is FALSE. If MODE is set to {\tt "Interface"}, the
+	 dynamic default value for READONLY depends on the value of the
+	 EDIT parameter: TRUE for {\tt "Print"} and {\tt "Exist"}, and
+	 FALSE for all other editing commands.  {\tt[]}
+      }
+      \sstsubsection{
          STRING = \_LOGICAL (Read)
       }{
          When STRING is {\tt FALSE}, inferred data typing is used for the
@@ -57724,6 +57740,13 @@ The following applications have been modified:
 The following applications have been modified:
 
 \begin{description}
+   \item [\htmlref{FITSMOD}{FITSMOD}]\mbox{}
+      \begin{itemize}
+        \item New parameter READONLY allows FITSMOD to be used to perform
+        read-only edits such as {\tt "Print"} and {\tt "Exist"} on
+        write-protected NDFs.
+      \end{itemize}
+
    \item [\htmlref{HISTOGRAM}{HISTOGRAM}]\mbox{}
       \begin{itemize}
         \item Now permits plotting of the histogram for data-value
