@@ -402,10 +402,14 @@
          OLDLST = ENDCAR
 
 *  Otherwise, the last element of FITS array is the last card.
+      ELSE IF( RDONLY ) THEN
+         OLDLST = NOCARD
+         ENDCAR = OLDLST
+
       ELSE
          OLDLST = NOCARD + 1
          ENDCAR = OLDLST
-         IF( .NOT. RDONLY ) FTSCAR( ENDCAR ) = 'END '
+         FTSCAR( ENDCAR ) = 'END '
 
       END IF
 
