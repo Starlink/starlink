@@ -432,7 +432,8 @@ if( $operation == "add" ) then
 #  containing FplaneX offsets and the other containing FplaneY offsets,
 #  both in units of mm. The current WCS Frame in these images is FPLANE
 #  (also in units of mm). The GRID->FPLANE mapping includes no polynomial
-#  distortion.
+#  distortion. The pixel values in these images are equal but opposite in
+#  sign to the $dfp values above.
       $SMURF_DIR/dsutils infitx=\! incat=$cat subarray=$subarray \
                      outdx=outdx outdy=outdy outcat=\! zbox=\! | tee dsutils.log
 
