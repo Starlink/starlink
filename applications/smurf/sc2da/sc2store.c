@@ -3739,8 +3739,8 @@ int *status                 /* global status (given and returned) */
 
 {
    size_t i = 0;                      /* Loop counter */
-   AstFrameSet * wcs;                 /* World Coordinates frame set */
-   int *oldstat;                      /* Previous status used by AST */
+   AstFrameSet * wcs=NULL;            /* World Coordinates frame set */
+   int *oldstat=NULL;                 /* Previous status used by AST */
    double * rts_end = NULL;           /* Place to store the times */
 
    if ( !StatusOkP(status) ) return;
@@ -3785,8 +3785,10 @@ int *status                 /* global status (given and returned) */
 /* And create a convenience frameset for focal plane and time coordinates.
    Need the RTS_END information. */
    rts_end = astMalloc( nframes * sizeof(*rts_end) );
-   for (i=0; i<nframes; i++) {
-     rts_end[i] = head[i].rts_end;
+   if( StatusOkP(status) ) {
+     for (i=0; i<nframes; i++) {
+       rts_end[i] = head[i].rts_end;
+     }
    }
    oldstat = astWatch( status );
    wcs = sc2store_timeWcs ( subnum, nframes, 1, telpar,
