@@ -964,6 +964,10 @@ The following new applications have been added:
    three-dimensional NDF independently, using the same two-dimensional
    box.  The smoothing plane can be parallel to any face of the cube.
 
+   o  The FITSVAL command is now a self-contained application.  It
+   needs only read access to an NDF, unlike the former version
+   that was an alias to FITSMOD.
+
    o  The NDFTRACE application now displays the bounds of the NDF within
    each WCS Frame if FULLFRAME is set to YES.  Also, the bounds of the
    NDF within the current WCS Frame are written to the new output

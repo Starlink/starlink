@@ -56367,17 +56367,21 @@ ABORT.
 
 \begin{itemize}
 
-\item The \htmlref{NDFTRACE}{NDFTRACE} application now displays the
-bounds of the NDF within each WCS Frame if FULLFRAME is set to YES.
-Also, the bounds of the NDF within the \htmlref{current WCS
-Frame}{se:curframe}~ are written to
-the new output Parameters FLBND and FUBND.
-
 \item The \htmlref{BLOCK}{BLOCK} application can now smooth
 three-dimensional NDFs, in the sense that it will smooth all the
 two-dimensional planes within a three-dimensional NDF independently,
 using the same two-dimensional box.  The smoothing plane can be
 parallel to any face of the cube.
+
+\item The \htmlref{FITSVAL}{FITSVAL}] command is now a self-contained
+application.  It needs only read access to an NDF, unlike the former
+version that was an alias to \htmlref{FITSMOD}{FITSMOD}.
+
+\item The \htmlref{NDFTRACE}{NDFTRACE} application now displays the
+bounds of the NDF within each WCS Frame if FULLFRAME is set to YES.
+Also, the bounds of the NDF within the \htmlref{current WCS
+Frame}{se:curframe}~ are written to the new output parameters
+FLBND and FUBND.
 
 \end{itemize}
 
