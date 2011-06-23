@@ -301,6 +301,14 @@ int *status             /* global status (given and returned) */
                  *after* de-rotating the Cartesian Nasmyth coord. So extract the
                  de-rotation from smurf_maketanmap and do it here instead.
      9Jun2011  : Report the distortion map being used in MSG verbose mode.
+     23Jun2011 : Allow distortion to be specified via an external file. The
+                 SMURF_DISTORTION value should be of the form "CUSTOM:<file>",
+                 where <file> is the path to a text file holding a dump of
+                 a PolyMap followed by the dump of a ZoomMap. The PolyMap
+                 should describe the required polynomial distortion, and the
+                 ZoomMap should implement the conversion from mm to radians
+                 (i.e. it encapsulates a value to use in place of the MM2RAD
+                 constant defined below). (DSB)
 */
 {
 
@@ -310,15 +318,17 @@ int *status             /* global status (given and returned) */
    AstMapping *bmap;
    AstMapping *mapping;
    AstMapping *rotmap;
-   AstPolyMap *polymap;
+   AstPolyMap *polymap = NULL;
    AstShiftMap *instapmap;
    AstShiftMap *jigglemap;
    AstShiftMap *shiftmap;
    AstShiftMap *zshiftmap;
    AstZoomMap *radmap;
    AstZoomMap *zoommap;
+   AstChannel *ch_custom = NULL;
    const char *cval;
    const char *distortion;
+   const char *fname_custom = NULL;
    const char *used_distortion;
    const double *c_f;
    const double *c_i;
@@ -352,7 +362,8 @@ int *status             /* global status (given and returned) */
       NEW2_DISTORTION,     /* Second estimate prior to C2 mirror fix */
       NEW3_DISTORTION,     /* First estimate after C2 mirror fix */
       NEW4_DISTORTION,     /* First estimate based on 7 arrays */
-      NEW5_DISTORTION      /* First estimate based on 8 arrays */
+      NEW5_DISTORTION,     /* First estimate based on 8 arrays */
+      CUSTOM_DISTORTION    /* An estimate defined in an external file */
    } idistortion;
 
 /* xoff and yoff are the distance in pixel units from the tracking centre
@@ -1287,6 +1298,16 @@ int *status             /* global status (given and returned) */
          idistortion = NEW4_DISTORTION;
       } else if( !strcmp( distortion, "NEW5" ) ) {
          idistortion = NEW5_DISTORTION;
+
+/* If the DISTORTION value starts with "CUSTOM:", the remainder should be
+   the path to a text file holding a dump of a PolyMap followed by the
+   dump of a ZoomMap. Create a Channel to read the objects from the file. */
+      } else if( !strncmp( distortion, "CUSTOM:", 7 ) ) {
+         idistortion = CUSTOM_DISTORTION;
+         fname_custom = distortion + 7;
+         ch_custom = astChannel( NULL, NULL, "SourceFile=%s", fname_custom );
+
+/* Report an error for any unknwon value for SMURF_DISTORTION. */
       } else if( *status == SAI__OK ) {
          *status = SAI__ERROR;
          sprintf( errmess, "Environment variable SMURF_DISTORTION has "
@@ -1337,6 +1358,11 @@ int *status             /* global status (given and returned) */
          used_distortion = "NEW5";
          shift[ 0 ] = xoff_NEW5[ subnum ];
          shift[ 1 ] = yoff_NEW5[ subnum ];
+
+      } else if( CUSTOM_DISTORTION == idistortion ) {
+         used_distortion = distortion;
+         shift[ 0 ] = xoff[ subnum ];
+         shift[ 1 ] = yoff[ subnum ];
 
       } else {
          used_distortion = ( idistortion == NONE_DISTORTION ) ?
@@ -1422,11 +1448,30 @@ int *status             /* global status (given and returned) */
          c_i = coeff_i;
       }
 
-      if( nc_f > 0 && nc_i > 0 ) {
+      if( CUSTOM_DISTORTION == idistortion && astOK ) {
+         polymap = astRead( ch_custom );
+         if( !polymap && *status == SAI__OK ) {
+            *status = SAI__ERROR;
+            sprintf( errmess, "Failed to read a custom distortion PolyMap "
+                     "from file %s.", fname_custom );
+            ErsRep( 0, status, errmess );
+
+         } else if( !astIsAPolyMap( polymap ) && *status == SAI__OK ) {
+            const char *class = astGetC( polymap, "Class" );
+            *status = SAI__ERROR;
+            sprintf( errmess, "A %s was read from custom distortion file "
+                     "%s (should be a PolyMap).", class, fname_custom );
+            ErsRep( 0, status, errmess );
+         } else if( *status != SAI__OK ) {
+            sprintf( errmess, "Error creating a custom distorion map from "
+                     "file %s.", fname_custom );
+            ErsRep( 0, status, errmess );
+         }
+      } else if( nc_f > 0 && nc_i > 0 ) {
          polymap = astPolyMap( 2, 2, nc_f, c_f, nc_i, c_i, " " );
-         cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ],
-      						          polymap, 1, " " );
       }
+      cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ],
+                                                       polymap, 1, " " );
 
 /* Convert from mm to radians (but these coords are still cartesian (x,y)
    (i.e. measured in the tangent plane) rather than spherical (lon,lat)
@@ -1446,11 +1491,31 @@ int *status             /* global status (given and returned) */
       } else if( NEW5_DISTORTION == idistortion ) {
          radmap = astZoomMap ( 2, MM2RAD_NEW5, " " );
 
+      } else if( CUSTOM_DISTORTION == idistortion ) {
+         radmap = astRead( ch_custom );
+         if( !radmap && *status == SAI__OK ) {
+            *status = SAI__ERROR;
+            sprintf( errmess, "Failed to read a custom distortion ZoomMap "
+                     "from file %s.", fname_custom );
+            ErsRep( 0, status, errmess );
+
+         } else if( !astIsAZoomMap( radmap ) && *status == SAI__OK ) {
+            const char *class = astGetC( radmap, "Class" );
+            *status = SAI__ERROR;
+            sprintf( errmess, "A %s was read from custom distortion file "
+                     "%s (should be a ZooMMap).", class, fname_custom );
+            ErsRep( 0, status, errmess );
+         }
+
       } else {
          radmap = astZoomMap ( 2, MM2RAD, " " );
       }
       cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ],
                                                       radmap, 1, " " );
+
+/* If using a custom distortion, we can now annul the Channel, thus closing
+   the souce file. */
+      if( CUSTOM_DISTORTION == idistortion ) ch_custom = astAnnul( ch_custom );
 
 /* Apply focal plane offsets - if supplied. Note the effective values in
    the cache so that we can spot if they are changed. */
