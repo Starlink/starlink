@@ -276,6 +276,10 @@ typedef struct AstChannel {
    void *data;                   /* Data to pass to source/sink functions */
    char **warnings;              /* Array of warning strings */
    int nwarn;                    /* Size of warnings array */
+   FILE *fd_in;                  /* Descriptor for source text file */
+   char *fn_in;                  /* Full path for source text file */
+   FILE *fd_out;                 /* Descriptor for sink text file */
+   char *fn_out;                 /* Full path for sink text file */
 } AstChannel;
 
 /* Virtual function table. */
@@ -340,6 +344,15 @@ typedef struct AstChannelVtab {
    void (* ClearIndent)( AstChannel *, int * );
    void (* SetIndent)( AstChannel *, int, int * );
 
+   const char *(* GetSourceFile)( AstChannel *, int * );
+   int (* TestSourceFile)( AstChannel *, int * );
+   void (* ClearSourceFile)( AstChannel *, int * );
+   void (* SetSourceFile)( AstChannel *, const char *, int * );
+
+   const char *(* GetSinkFile)( AstChannel *, int * );
+   int (* TestSinkFile)( AstChannel *, int * );
+   void (* ClearSinkFile)( AstChannel *, int * );
+   void (* SetSinkFile)( AstChannel *, const char *, int * );
 } AstChannelVtab;
 
 /* Define a private structure type used to store linked lists of
@@ -486,6 +499,15 @@ int astTestIndent_( AstChannel *, int * );
 void astClearIndent_( AstChannel *, int * );
 void astSetIndent_( AstChannel *, int, int * );
 
+const char *astGetSourceFile_( AstChannel *, int * );
+int astTestSourceFile_( AstChannel *, int * );
+void astClearSourceFile_( AstChannel *, int * );
+void astSetSourceFile_( AstChannel *, const char *, int * );
+
+const char *astGetSinkFile_( AstChannel *, int * );
+int astTestSinkFile_( AstChannel *, int * );
+void astClearSinkFile_( AstChannel *, int * );
+void astSetSinkFile_( AstChannel *, const char *, int * );
 
 #endif
 
@@ -634,6 +656,24 @@ astINVOKE(V,astGetIndent_(astCheckChannel(this),STATUS_PTR))
 astINVOKE(V,astSetIndent_(astCheckChannel(this),value,STATUS_PTR))
 #define astTestIndent(this) \
 astINVOKE(V,astTestIndent_(astCheckChannel(this),STATUS_PTR))
+
+#define astClearSourceFile(this) \
+astINVOKE(V,astClearSourceFile_(astCheckChannel(this),STATUS_PTR))
+#define astGetSourceFile(this) \
+astINVOKE(V,astGetSourceFile_(astCheckChannel(this),STATUS_PTR))
+#define astSetSourceFile(this,value) \
+astINVOKE(V,astSetSourceFile_(astCheckChannel(this),value,STATUS_PTR))
+#define astTestSourceFile(this) \
+astINVOKE(V,astTestSourceFile_(astCheckChannel(this),STATUS_PTR))
+
+#define astClearSinkFile(this) \
+astINVOKE(V,astClearSinkFile_(astCheckChannel(this),STATUS_PTR))
+#define astGetSinkFile(this) \
+astINVOKE(V,astGetSinkFile_(astCheckChannel(this),STATUS_PTR))
+#define astSetSinkFile(this,value) \
+astINVOKE(V,astSetSinkFile_(astCheckChannel(this),value,STATUS_PTR))
+#define astTestSinkFile(this) \
+astINVOKE(V,astTestSinkFile_(astCheckChannel(this),STATUS_PTR))
 
 #endif
 #endif

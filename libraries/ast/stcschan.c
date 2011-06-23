@@ -70,7 +70,11 @@ c     encodings and the internal ASCII encoding. If no such functions
 f     encodings and the internal ASCII encoding. If no such routines
 *     are supplied, a Channel will read from standard input and write
 *     to standard output.
-
+*
+*     Alternatively, an XmlChan can be told to read or write from
+*     specific text files using the SinkFile and SourceFile attributes,
+*     in which case no sink or source function need be supplied.
+*
 *     Support for STC-S is currently based on the IVOA document "STC-S:
 *     Space-Time Coordinate (STC) Metadata Linear String Implementation",
 *     version 1.30 (dated 5th December 2007), available at
@@ -7925,21 +7929,27 @@ c     encodings and the internal ASCII encoding. If no such functions
 f     encodings and the internal ASCII encoding. If no such routines
 *     are supplied, a Channel will read from standard input and write
 *     to standard output.
+*
+*     Alternatively, an XmlChan can be told to read or write from
+*     specific text files using the SinkFile and SourceFile attributes,
+*     in which case no sink or source function need be supplied.
 
 *  Parameters:
 c     source
 f     SOURCE = SUBROUTINE (Given)
 c        Pointer to a source function that takes no arguments and
-c        returns a pointer to a null-terminated string.  This function
+c        returns a pointer to a null-terminated string.  If no value
+c        has been set for the SourceFile attribute, this function
 c        will be used by the StcsChan to obtain lines of input text. On
 c        each invocation, it should return a pointer to the next input
 c        line read from some external data store, and a NULL pointer
 c        when there are no more lines to read.
 c
-c        If "source" is NULL, the Channel will read from standard
-c        input instead.
+c        If "source" is NULL and no value has been set for the SourceFile
+c        attribute, the StcsChan will read from standard input instead.
 f        A source routine, which is a subroutine which takes a single
-f        integer error status argument.  This routine will be used by
+f        integer error status argument.   If no value has been set
+f        for the SourceFile attribute, this routine will be used by
 f        the StcsChan to obtain lines of input text. On each
 f        invocation, it should read the next input line from some
 f        external data store, and then return the resulting text to
@@ -7949,19 +7959,22 @@ f        If an error occurs, it should set its own error status
 f        argument to an error value before returning.
 f
 f        If the null routine AST_NULL is suppied as the SOURCE value,
-f        the Channel will read from standard input instead.
+f        and no value has been set for the SourceFile attribute,
+f        the StcsChan will read from standard input instead.
 c     sink
 f     SINK = SUBROUTINE (Given)
 c        Pointer to a sink function that takes a pointer to a
-c        null-terminated string as an argument and returns void.  This
+c        null-terminated string as an argument and returns void.
+c        If no value has been set for the SinkFile attribute, this
 c        function will be used by the StcsChan to deliver lines of
 c        output text. On each invocation, it should deliver the
 c        contents of the string supplied to some external data store.
 c
-c        If "sink" is NULL, the StcsChan will write to standard output
-c        instead.
+c        If "sink" is NULL, and no value has been set for the SinkFile
+c        attribute, the StcsChan will write to standard output instead.
 f        A sink routine, which is a subroutine which takes a single
-f        integer error status argument.  This routine will be used by
+f        integer error status argument.  If no value has been set
+f        for the SinkFile attribute, this routine will be used by
 f        the StcsChan to deliver lines of output text. On each
 f        invocation, it should obtain the next output line from the
 f        AST library by calling AST_GETLINE, and then deliver the
@@ -7970,7 +7983,8 @@ f        occurs, it should set its own error status argument to an
 f        error value before returning.
 f
 f        If the null routine AST_NULL is suppied as the SINK value,
-f        the Channel will write to standard output instead.
+f        and no value has been set for the SinkFile attribute,
+f        the StcsChan will write to standard output instead.
 c     options
 f     OPTIONS = CHARACTER * ( * ) (Given)
 c        Pointer to a null-terminated string containing an optional

@@ -42,13 +42,18 @@ f     (AST_GETFITS<X>) or changed (AST_SETFITS<X>).
 *     a source function, it is used to fill the FitsChan with header cards
 *     when it is accessed for the first time. If you do not provide a
 *     source function, the FitsChan remains empty until you explicitly enter
-c     data into it (e.g. using astPutFits, astPutCards or astWrite). If you
-f     data into it (e.g. using AST_PUTFITS, AST_PUTCARDS or AST_WRITE). If you
-*     provide a sink function, it is used to deliver any remaining
-*     contents of a FitsChan to an external data store when the
-*     FitsChan is deleted. If you do not provide a sink function, any
-*     header cards remaining when the FitsChan is deleted will be
-*     lost, so you should arrange to extract them first if necessary
+c     data into it (e.g. using astPutFits, astPutCards, astWrite
+f     data into it (e.g. using AST_PUTFITS, AST_PUTCARDS, AST_WRITE
+*     or by using the SourceFile attribute to specifying a text file from
+*     which headers should be read). When the FitsChan is deleted, any
+*     remaining header cards in the FitsChan can be saved in either of
+*     two ways: 1) by specifying a value for the SinkFile attribute (the
+*     name of a text file to which header cards should be written), or 2)
+*     by providing a sink function (used to to deliver header cards to an
+*     external data store). If you do not provide a sink function or a
+*     value for SinkFile, any header cards remaining when the FitsChan
+*     is deleted will be lost, so you should arrange to extract them
+*     first if necessary
 c     (e.g. using astFindFits or astRead).
 f     (e.g. using AST_FINDFITS or AST_READ).
 *
@@ -968,6 +973,13 @@ f     - AST_TESTFITS: Test if a keyword has a defined value in a FitsChan
 *     9-JUN-2011 (DSB):
 *        In WCSFcRead, ignore trailing spaces when reading string values
 *        for WCS keywords.
+*     23-JUN-2011 (DSB):
+*        - Override the parent astSetSourceFile method so that it reads
+*        headers from the SourceFile and appends them to the end of the
+*        FitsChan.
+*        - On deletion, write out the FitsChan contents to the file
+*        specified by the SinkFile attribute. If no file is specified,
+*        use the sink function specified when the FitsChan was created.
 *class--
 */
 
@@ -1181,6 +1193,7 @@ f     - AST_TESTFITS: Test if a keyword has a defined value in a FitsChan
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <errno.h>
 
 /* Type Definitions */
 /* ================ */
@@ -1251,6 +1264,7 @@ typedef struct FitsStore {
 static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
+static void (* parent_setsourcefile)( AstChannel *, const char *, int * );
 static int (* parent_getobjsize)( AstObject *, int * );
 static const char *(* parent_getattrib)( AstObject *, const char *, int * );
 static int (* parent_getfull)( AstChannel *, int * );
@@ -1698,6 +1712,7 @@ static void SetFitsS( AstFitsChan *, const char *, const char *, const char *, i
 static void SetFitsU( AstFitsChan *, const char *, const char *, int, int * );
 static void SetItem( double ****, int, int, char, double, int * );
 static void SetItemC( char *****, int, int, char, const char *, int * );
+static void SetSourceFile( AstChannel *, const char *, int * );
 static void SetValue( AstFitsChan *, const char *, void *, int, const char *, int * );
 static void Shpc1( double, double, int, double *, double *, int * );
 static void SinkWrap( void (*)( const char * ), const char *, int * );
@@ -16966,6 +16981,8 @@ void astInitFitsChanVtab_(  AstFitsChanVtab *vtab, const char *name, int *status
    channel->WriteString = WriteString;
    channel->WriteObject = WriteObject;
    channel->GetNextData = GetNextData;
+   parent_setsourcefile = channel->SetSourceFile;
+   channel->SetSourceFile = SetSourceFile;
 
 /* Declare the class dump, copy and delete functions.*/
    astSetDump( vtab, Dump, "FitsChan", "I/O channels to FITS files" );
@@ -25061,6 +25078,103 @@ static void SetItemC( char *****item, int i, int jm, char s, const char *val,
       }
    }
 }
+
+static void SetSourceFile( AstChannel *this_channel, const char *source_file,
+                           int *status ) {
+/*
+*  Name:
+*     SetSourceFile
+
+*  Purpose:
+*     Set a new value for the SourceFile attribute.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "fitschan.h"
+*     void SetSourceFile( AstChannel *this, const char *source_file,
+*                         int *status )
+
+*  Class Membership:
+*     FitsChan member function (over-rides the astSetSourceFile
+*     method inherited from the Channel class).
+
+*  Description:
+*     This function stores the supplied string as the new value for the
+*     SourceFile attribute. In addition, it also attempts to open the
+*     file, read FITS headers from it and append them to the end of the
+*     FitsChan. It then closes the SourceFile.
+
+*  Parameters:
+*     this
+*        Pointer to the FitsChan.
+*     source_file
+*        The new attribute value. Should be the path to an existing text
+*        file, holding FITS headers (one per line)
+*     status
+*        Inherited status pointer.
+
+*/
+
+/* Local Constants: */
+#define ERRBUF_LEN 80
+
+/* Local Variables: */
+   AstFitsChan *this;            /* Pointer to the FitsChan structure */
+   FILE *fd;                     /* Descriptor for source file */
+   char *errstat;                /* Pointer for system error message */
+   char card[ AST__FITSCHAN_FITSCARDLEN + 2 ]; /* Buffer for source line */
+   char errbuf[ ERRBUF_LEN ];    /* Buffer for system error message */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the FitsChan structure. */
+   this = (AstFitsChan *) this_channel;
+
+/* Invoke the parent astSetSourceFile method to store  the supplied
+   string in the Channel structure. */
+   (*parent_setsourcefile)( this_channel, source_file, status );
+
+/* Attempt to open the file. */
+   fd = NULL;
+   if( astOK ) {
+      fd = fopen( source_file, "r" );
+      if( !fd ) {
+         if ( errno ) {
+#if HAVE_STRERROR_R
+            strerror_r( errno, errbuf, ERRBUF_LEN );
+            errstat = errbuf;
+#else
+            errstat = strerror( errno );
+#endif
+            astError( AST__RDERR, "astSetSourceFile(%s): Failed to open input "
+                      "SourceFile '%s' - %s.", status, astGetClass( this ),
+                      source_file, errbuf );
+         } else {
+            astError( AST__RDERR, "astSetSourceFile(%s): Failed to open input "
+                      "SourceFile '%s'.", status, astGetClass( this ),
+                      source_file );
+         }
+      }
+   }
+
+/* Move the FitsChan to EOF */
+   astSetCard( this, INT_MAX );
+
+/* Read each line from the file, remove trailing space, and append to the
+   FitsChan. */
+   while( astOK && fgets( card, AST__FITSCHAN_FITSCARDLEN + 2, fd ) ) {
+      card[ astChrLen( card ) ] = 0;
+      astPutFits( this, card, 0 );
+   }
+
+/* Close the source file. */
+   if( fd ) fclose( fd );
+
+}
+
 static void SetTableSource( AstFitsChan *this,
                             void (*tabsource)( void ),
                             void (*tabsource_wrap)( void (*)( void ),
@@ -36832,7 +36946,7 @@ static void WriteToSink( AstFitsChan *this, int *status ){
 *     WriteToSink
 
 *  Purpose:
-*     Write the contents of the FitsChan out through the sink function.
+*     Write the contents of the FitsChan out to the sink file or function.
 
 *  Type:
 *     Private function.
@@ -36846,10 +36960,12 @@ static void WriteToSink( AstFitsChan *this, int *status ){
 *     FitsChan member function.
 
 *  Description:
-*     Each card in the FitsChan is passed in turn to the sink function
-*     specified when the FitsChan was created. If no sink function was
-*     provided, the cards are not written out. Cards marked as having been
-*     read into an AST object are not written out.
+*     If the SinkFile attribute is set, each card in the FitsChan is
+*     written out to the sink file. Otherwise, the cards are passed in
+*     turn to the sink function specified when the FitsChan was created.
+*     If no sink function was provided, the cards are not written out.
+*     Cards marked as having been read into an AST object are not written
+*     out.
 
 *  Parameters:
 *     this
@@ -36861,9 +36977,16 @@ static void WriteToSink( AstFitsChan *this, int *status ){
 *     -  The current card is left unchanged.
 */
 
+/* Local Constants: */
+#define ERRBUF_LEN 80
+
 /* Local Variables: */
+   FILE *fd;                    /* File descriptor for sink file */
    astDECLARE_GLOBALS           /* Declare the thread specific global data */
+   char *errstat;               /* Pointer for system error message */
    char card[ AST__FITSCHAN_FITSCARDLEN + 1]; /* Buffer for header card */
+   char errbuf[ ERRBUF_LEN ];   /* Buffer for system error message */
+   const char *sink_file;       /* Path to output sink file */
    int icard;                   /* Current card index on entry */
    int old_ignore_used;         /* Original value of external variable ignore_used */
 
@@ -36873,8 +36996,32 @@ static void WriteToSink( AstFitsChan *this, int *status ){
 /* Get a pointer to the structure holding thread-specific global data. */
    astGET_GLOBALS(this);
 
-/* Only proceed if a sink function and wrapper were supplied. */
-   if( this->sink && this->sink_wrap ){
+/* If the SinkFile attribute is set, open the file. */
+   fd = NULL;
+   if( astTestSinkFile( this ) ) {
+      sink_file = astGetSinkFile( this );
+      fd = fopen( sink_file, "w" );
+      if( !fd ) {
+         if ( errno ) {
+#if HAVE_STRERROR_R
+            strerror_r( errno, errbuf, ERRBUF_LEN );
+            errstat = errbuf;
+#else
+            errstat = strerror( errno );
+#endif
+            astError( AST__WRERR, "astDelete(%s): Failed to open output "
+                      "SinkFile '%s' - %s.", status, astGetClass( this ),
+                      sink_file, errbuf );
+         } else {
+            astError( AST__WRERR, "astDelete(%s): Failed to open output "
+                      "SinkFile '%s'.", status, astGetClass( this ),
+                      sink_file );
+         }
+      }
+   }
+
+/* Only proceed if a file was opened, or sink function and wrapper were supplied. */
+   if( fd || ( this->sink && this->sink_wrap ) ){
 
 /* Store the current card index. */
       icard = astGetCard( this );
@@ -36896,11 +37043,17 @@ static void WriteToSink( AstFitsChan *this, int *status ){
    The call to astFindFits increments the current card. */
          if( astFindFits( this, "%f", card, 1 ) ) {
 
-/* The sink function is an externally supplied function which may not be
-   thread-safe, so lock a mutex first. */
-            LOCK_MUTEX3;
-            ( *this->sink_wrap )( *this->sink, card, status );
-            UNLOCK_MUTEX3;
+/* If s sink file was opened, write the card out to it. */
+            if( fd ) {
+               fprintf( fd, "%s\n", card );
+
+/* Otherwise, use the isnk function. The sink function is an externally
+   supplied function which may not be thread-safe, so lock a mutex first. */
+            } else {
+               LOCK_MUTEX3;
+               ( *this->sink_wrap )( *this->sink, card, status );
+               UNLOCK_MUTEX3;
+            }
          }
       }
 
@@ -36911,6 +37064,9 @@ static void WriteToSink( AstFitsChan *this, int *status ){
 /* Set the current card index back to what it was on entry. */
       astSetCard( this, icard );
    }
+
+/* Close the sink file. */
+   if( fd ) fclose( fd );
 }
 
 static void WriteString( AstChannel *this_channel, const char *name,
@@ -38993,15 +39149,20 @@ f     existing ones may be deleted (AST_DELFITS) or changed (AST_SETFITS<X>).
 *     "source" and "sink" functions which connect it to external data
 *     stores by reading and writing FITS header cards. If you provide
 *     a source function, it is used to fill the FitsChan with header cards
-*     when it is accessed for the first time. If you do not provide a source
-*     function, the FitsChan remains empty until you explicitly enter
-c     data into it (e.g. using astPutCards, astPutFits or astWrite). If you
-f     data into it (e.g. using AST_PUTCARDS, AST_PUTFITS or AST_WRITE). If you
-*     provide a sink function, it is used to deliver any remaining
-*     contents of a FitsChan to an external data store when the
-*     FitsChan is deleted. If you do not provide a sink function, any
-*     header cards remaining when the FitsChan is deleted will be
-*     lost, so you should arrange to extract them first if necessary
+*     when it is accessed for the first time. If you do not provide a
+*     source function, the FitsChan remains empty until you explicitly enter
+c     data into it (e.g. using astPutFits, astPutCards, astWrite
+f     data into it (e.g. using AST_PUTFITS, AST_PUTCARDS, AST_WRITE
+*     or by using the SourceFile attribute to specifying a text file from
+*     which headers should be read). When the FitsChan is deleted, any
+*     remaining header cards in the FitsChan can be saved in either of
+*     two ways: 1) by specifying a value for the SinkFile attribute (the
+*     name of a text file to which header cards should be written), or 2)
+*     by providing a sink function (used to to deliver header cards to an
+*     external data store). If you do not provide a sink function or a
+*     value for SinkFile, any header cards remaining when the FitsChan
+*     is deleted will be lost, so you should arrange to extract them
+*     first if necessary
 c     (e.g. using astFindFits or astRead).
 f     (e.g. using AST_FINDFITS or AST_READ).
 *
@@ -39060,7 +39221,8 @@ c        should return a NULL pointer when there are no more cards to
 c        be read.
 c
 c        If "source" is NULL, the FitsChan will remain empty until
-c        cards are explicitly stored in it (e.g. using astPutCards or astPutFits).
+c        cards are explicitly stored in it (e.g. using astPutCards,
+c        astPutFits or via the SourceFile attribute).
 f        A source routine, which is a function taking two arguments: a
 f        character argument of length 80 to contain a FITS card, and an
 f        integer error status argument. It should return an integer value.
@@ -39075,11 +39237,13 @@ f        status argument to an error value before returning.
 f
 f        If the null routine AST_NULL is supplied as the SOURCE value,
 f        the FitsChan will remain empty until cards are explicitly
-f        stored in it (e.g. using AST_PUTCARDS or AST_PUTFITS).
+f        stored in it (e.g. using AST_PUTCARDS, AST_PUTFITS or via the
+f        SourceFile attribute).
 c     sink
 f     SINK = SUBROUTINE (Given)
 c        Pointer to a sink function that takes a pointer to a
-c        null-terminated string as an argument and returns void.  This
+c        null-terminated string as an argument and returns void.  If
+c        no value has been set for the SinkFile attribute, this
 c        function will be used by the FitsChan to deliver any FITS
 c        header cards it contains when it is finally deleted. On
 c        each invocation, it should deliver the contents of the character
@@ -39087,7 +39251,8 @@ c        string passed to it as a FITS header card to some external
 c        data store (such as a FITS file).
 f        A sink routine, which is a subroutine which takes two
 f        arguments: a character argument of length 80 to contain a
-f        FITS card, and an integer error status argument. This routine
+f        FITS card, and an integer error status argument. If no
+f        value has been set for the SinkFile attribute, this routine
 f        will be used by the FitsChan to deliver any FITS header cards
 f        it contains when it is finally deleted. On each invocation,
 f        it should deliver the contents of the character string passed
@@ -39097,8 +39262,8 @@ f        status argument to an error value before returning.
 *
 c        If "sink" is NULL,
 f        If the null routine AST_NULL is supplied as the SINK value,
-*        the contents of the FitsChan will not be written out when it
-*        is deleted.
+*        and no value has been set for the SinkFile attribute, the
+*        contents of the FitsChan will be lost when it is deleted.
 c     options
 f     OPTIONS = CHARACTER * ( * ) (Given)
 c        Pointer to a null-terminated string containing an optional

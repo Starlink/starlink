@@ -190,5 +190,6 @@ NOTAB           <Cannot access FITS binary table>
 LEVMAR          <Error in levmar Levenberg-Marquardt code>
 NOFIT           <Fit failed>
 ISNAN           <A transformation generated one or more NaN values>
+WRERR           <write error>
 
 .END

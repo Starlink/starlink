@@ -21,7 +21,9 @@ c     and "sink" functions which connect it to an external data store
 f     and "sink" routines which connect it to an external data store
 *     by reading and writing the resulting text. By default, however,
 *     a Channel will read from standard input and write to standard
-*     output.
+*     output. Alternatively, a Channel can be told to read or write from
+*     specific text files using the SinkFile and SourceFile attributes,
+*     in which case no sink or source function need be supplied.
 
 *  Inheritance:
 *     The Channel class inherits from the Object class.
@@ -34,7 +36,9 @@ f     and "sink" routines which connect it to an external data store
 *     - Full: Set level of output detail
 *     - Indent: Indentation increment between objects
 *     - ReportLevel: Selects the level of error reporting
+*     - SinkFile: The path to a file to which the Channel should write
 *     - Skip: Skip irrelevant data?
+*     - SourceFile: The path to a file from which the Channel should read
 *     - Strict: Generate errors instead of warnings?
 
 *  Functions:
@@ -110,6 +114,8 @@ f     - AST_WRITE: Write an Object to a Channel
 *        Added Indent attribute.
 *     12-FEB-2010 (DSB):
 *        Represent AST__BAD externally using the string "<bad>".
+*     23-JUN-2011 (DSB):
+*        Added attributes SinkFile and SourceFile.
 *class--
 */
 
@@ -371,6 +377,15 @@ static int TestIndent( AstChannel *, int * );
 static void ClearIndent( AstChannel *, int * );
 static void SetIndent( AstChannel *, int, int * );
 
+static const char *GetSourceFile( AstChannel *, int * );
+static int TestSourceFile( AstChannel *, int * );
+static void ClearSourceFile( AstChannel *, int * );
+static void SetSourceFile( AstChannel *, const char *, int * );
+
+static const char *GetSinkFile( AstChannel *, int * );
+static int TestSinkFile( AstChannel *, int * );
+static void ClearSinkFile( AstChannel *, int * );
+static void SetSinkFile( AstChannel *, const char *, int * );
 
 /* Member functions. */
 /* ================= */
@@ -656,6 +671,16 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
 /* ----- */
    } else if ( !strcmp( attrib, "skip" ) ) {
       astClearSkip( this );
+
+/* SourceFile. */
+/* ----------- */
+   } else if ( !strcmp( attrib, "sourcefile" ) ) {
+      astClearSourceFile( this );
+
+/* SinkFile. */
+/* --------- */
+   } else if ( !strcmp( attrib, "sinkfile" ) ) {
+      astClearSinkFile( this );
 
 /* Strict. */
 /* ------- */
@@ -962,6 +987,16 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
          (void) sprintf( getattrib_buff, "%d", skip );
          result = getattrib_buff;
       }
+
+/* SourceFile. */
+/* ----------- */
+   } else if ( !strcmp( attrib, "sourcefile" ) ) {
+      result = astGetSourceFile( this );
+
+/* SinkFile. */
+/* --------- */
+   } else if ( !strcmp( attrib, "sinkfile" ) ) {
+      result = astGetSinkFile( this );
 
 /* Strict. */
 /* ------- */
@@ -1309,9 +1344,12 @@ static char *GetNextText( AstChannel *this, int *status ) {
 #define ERRBUF_LEN 80
 
 /* Local Variables: */
-   char errbuf[ ERRBUF_LEN ];    /* Buffer for system error message */
+   FILE *fd;                     /* Input file descriptor */
    char *errstat;                /* Pointer for system error message */
    char *line;                   /* Pointer to line data to be returned */
+   char errbuf[ ERRBUF_LEN ];    /* Buffer for system error message */
+   const char *sink_file;        /* Path to output sink file */
+   const char *source_file;      /* Path to source file */
    int c;                        /* Input character */
    int len;                      /* Length of input line */
    int readstat;                 /* "errno" value set by "getchar" */
@@ -1323,31 +1361,75 @@ static char *GetNextText( AstChannel *this, int *status ) {
 /* Check the global error status. */
    if ( !astOK ) return line;
 
-/* About to call an externally supplied function which may not be
-   thread-safe, so lock a mutex first. */
-   LOCK_MUTEX3;
+/* If the SourceFile attribute of the Channel specifies an input file,
+   but no input file has yet been opened, open it now. Report an error if
+   it is the same as the sink file. */
+   if( astTestSourceFile( this ) && !this->fd_in ) {
+      source_file = astGetSourceFile( this );
 
-/* Source function defined. */
-/* ------------------------ */
-/* If a source function (and its wrapper function) is defined for the
+      if( this->fd_out ) {
+         sink_file = astGetSinkFile( this );
+         if( astOK && !strcmp( sink_file, source_file ) ) {
+            astError( AST__RDERR, "astRead(%s): Failed to open input "
+                      "SourceFile '%s' - the file is currently being used "
+                      "as the output SinkFile.", status, astGetClass( this ),
+                      source_file );
+         }
+      }
+
+      if( astOK ) {
+         this->fd_in = fopen( source_file, "r" );
+         if( !this->fd_in ) {
+            if ( errno ) {
+#if HAVE_STRERROR_R
+               strerror_r( errno, errbuf, ERRBUF_LEN );
+               errstat = errbuf;
+#else
+               errstat = strerror( errno );
+#endif
+               astError( AST__RDERR, "astRead(%s): Failed to open input "
+                         "SourceFile '%s' - %s.", status, astGetClass( this ),
+                         source_file, errbuf );
+            } else {
+               astError( AST__RDERR, "astRead(%s): Failed to open input "
+                         "SourceFile '%s'.", status, astGetClass( this ),
+                         source_file );
+            }
+         }
+
+      }
+   }
+
+/* Source function defined, but no input file. */
+/* ------------------------------------------- */
+/* If no active input file descriptor is stored in the Channel, but
+   a source function (and its wrapper function) is defined for the
    Channel, use the wrapper function to invoke the source function to
    read a line of input text. This is returned in a dynamically
    allocated string. */
-   if ( this->source && this->source_wrap ) {
-      line = ( *this->source_wrap )( this->source, status );
+   if ( !this->fd_in && this->source && this->source_wrap ) {
 
-/* No source function. */
-/* ------------------- */
-/* Read the line from standard input. */
-   } else {
+/* About to call an externally supplied function which may not be
+   thread-safe, so lock a mutex first. */
+      LOCK_MUTEX3;
+      line = ( *this->source_wrap )( this->source, status );
+      UNLOCK_MUTEX3;
+
+/* Input file defined, or no source function. */
+/* ------------------------------------------ */
+/* Read the line from the input file or from standard input. */
+   } else if( astOK ) {
       c = '\0';
       len = 0;
       size = 0;
 
+/* Choose the file descriptor to use. */
+      fd = this->fd_in ? this->fd_in : stdin;
+
 /* Loop to read input characters, saving any "errno" value that may be
    set by "getchar" if an error occurs. Quit if an end of file (or
    error) occurs or if a newline character is read. */
-      while ( errno = 0, c = getchar(), readstat = errno,
+      while ( errno = 0, c = getc( fd ), readstat = errno,
               ( c != EOF ) && ( c != '\n' ) ) {
 
 /* If no memory has yet been allocated to hold the line, allocate some
@@ -1373,7 +1455,7 @@ static char *GetNextText( AstChannel *this, int *status ) {
    status, check the last character read and use "ferror" to see if a
    read error occurred. If so, report the error, using the saved
    "errno" value (but only if one was set). */
-      if ( astOK && ( c == EOF ) && ferror( stdin ) ) {
+      if ( astOK && ( c == EOF ) && ferror( fd ) ) {
          if ( readstat ) {
 #if HAVE_STRERROR_R
             strerror_r( readstat, errbuf, ERRBUF_LEN );
@@ -1410,7 +1492,6 @@ static char *GetNextText( AstChannel *this, int *status ) {
       }
    }
 
-   UNLOCK_MUTEX3;
 
 /* Return the result pointer. */
    return line;
@@ -1711,6 +1792,13 @@ AstChannel *astInitChannel_( void *mem, size_t size, int init,
       new->sink = sink;
       new->sink_wrap = sink_wrap;
 
+/* Indicate no input or output files have been associated with the
+   Channel. */
+      new->fd_in = NULL;
+      new->fn_in = NULL;
+      new->fd_out = NULL;
+      new->fn_out = NULL;
+
 /* Set all attributes to their undefined values. */
       new->comment = -INT_MAX;
       new->full = -INT_MAX;
@@ -1837,6 +1925,16 @@ void astInitChannelVtab_(  AstChannelVtab *vtab, const char *name, int *status )
    vtab->GetIndent = GetIndent;
    vtab->SetIndent = SetIndent;
    vtab->TestIndent = TestIndent;
+
+   vtab->ClearSourceFile = ClearSourceFile;
+   vtab->GetSourceFile = GetSourceFile;
+   vtab->SetSourceFile = SetSourceFile;
+   vtab->TestSourceFile = TestSourceFile;
+
+   vtab->ClearSinkFile = ClearSinkFile;
+   vtab->GetSinkFile = GetSinkFile;
+   vtab->SetSinkFile = SetSinkFile;
+   vtab->TestSinkFile = TestSinkFile;
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
@@ -2211,27 +2309,79 @@ static void PutNextText( AstChannel *this, const char *line, int *status ) {
 *-
 */
 
+/* Local Constants: */
+#define ERRBUF_LEN 80
+
+/* Local Variables: */
+   char *errstat;                /* Pointer for system error message */
+   char errbuf[ ERRBUF_LEN ];    /* Buffer for system error message */
+   const char *sink_file;        /* Path to output sink file */
+   const char *source_file;      /* Path to output source file */
+
 /* Check the global error status. */
    if ( !astOK ) return;
 
-/* About to call an externally supplied function which may not be
-   thread-safe, so lock a mutex first. */
-   LOCK_MUTEX2;
+/* If the SinkFile attribute of the Channel specifies an output file,
+   but no output file has yet been opened, open it now. Report an error
+   if it is the same as the source file. */
+   if( astTestSinkFile( this ) && !this->fd_out ) {
+      sink_file = astGetSinkFile( this );
 
-/* If a sink function (and its wrapper function) is defined for the
-   Channel, use the wrapper function to invoke the sink function to
-   output the text line. */
-   if ( this->sink && this->sink_wrap ) {
-      ( *this->sink_wrap )( *this->sink, line, status );
+      if( this->fd_out ) {
+         source_file = astGetSourceFile( this );
+         if( astOK && !strcmp( sink_file, source_file ) ) {
+            astError( AST__WRERR, "astWrite(%s): Failed to open output "
+                      "SinkFile '%s' - the file is currently being used "
+                      "as the input SourceFile.", status, astGetClass( this ),
+                      sink_file );
+         }
+      }
+
+      if( astOK ) {
+         this->fd_out = fopen( sink_file, "w" );
+         if( !this->fd_out ) {
+            if ( errno ) {
+#if HAVE_STRERROR_R
+               strerror_r( errno, errbuf, ERRBUF_LEN );
+               errstat = errbuf;
+#else
+               errstat = strerror( errno );
+#endif
+               astError( AST__WRERR, "astWrite(%s): Failed to open output "
+                         "SinkFile '%s' - %s.", status, astGetClass( this ),
+                         sink_file, errbuf );
+            } else {
+               astError( AST__WRERR, "astWrite(%s): Failed to open output "
+                         "SinkFile '%s'.", status, astGetClass( this ),
+                         sink_file );
+            }
+         }
+      }
+   }
+
+/* Check no error occurred above. */
+   if( astOK ) {
+
+/* If an active output file descriptor is stored in the channel, write
+   the text to it, with a newline appended. */
+      if( this->fd_out ) {
+         (void) fprintf( this->fd_out, "%s\n", line );
+
+/* Otherwise, if a sink function (and its wrapper function) is defined for
+   the Channel, use the wrapper function to invoke the sink function to
+   output the text line. Since we are about to call an externally supplied
+   function which may not be thread-safe, lock a mutex first. */
+      } else if ( this->sink && this->sink_wrap ) {
+         LOCK_MUTEX2;
+         ( *this->sink_wrap )( *this->sink, line, status );
+         UNLOCK_MUTEX2;
 
 /* Otherwise, simply write the text to standard output with a newline
    appended. */
-   } else {
-      (void) printf( "%s\n", line );
+      } else {
+         (void) printf( "%s\n", line );
+      }
    }
-
-   UNLOCK_MUTEX2;
-
 }
 
 static AstObject *Read( AstChannel *this, int *status ) {
@@ -3269,6 +3419,8 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
    int nc;                       /* Number of characters read by "astSscanf" */
    int report_level;             /* Skip attribute value */
    int skip;                     /* Skip attribute value */
+   int sourcefile;               /* Offset of SourceFile string */
+   int sinkfile;                 /* Offset of SinkFile string */
    int strict;                   /* Report errors instead of warnings? */
 
 /* Check the global error status. */
@@ -3320,6 +3472,20 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
                ( 1 == astSscanf( setting, "skip= %d %n", &skip, &nc ) )
                && ( nc >= len ) ) {
       astSetSkip( this, skip );
+
+/* SinkFile. */
+/* --------- */
+   } else if ( nc = 0,
+               ( 0 == astSscanf( setting, "sinkfile=%n%*[^\n]%n", &sinkfile, &nc ) )
+               && ( nc >= len ) ) {
+      astSetSinkFile( this, setting + sinkfile );
+
+/* SourceFile. */
+/* ----------- */
+   } else if ( nc = 0,
+               ( 0 == astSscanf( setting, "sourcefile=%n%*[^\n]%n", &sourcefile, &nc ) )
+               && ( nc >= len ) ) {
+      astSetSourceFile( this, setting + sourcefile );
 
 /* Strict. */
 /* ------- */
@@ -3526,6 +3692,16 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
 /* ----- */
    } else if ( !strcmp( attrib, "skip" ) ) {
       result = astTestSkip( this );
+
+/* SourceFile. */
+/* ----------- */
+   } else if ( !strcmp( attrib, "sourcefile" ) ) {
+      result = astTestSourceFile( this );
+
+/* SinkFile. */
+/* ----------- */
+   } else if ( !strcmp( attrib, "sinkfile" ) ) {
+      result = astTestSinkFile( this );
 
 /* Strict. */
 /* ------- */
@@ -4681,6 +4857,161 @@ static void WriteString( AstChannel *this, const char *name,
 /*
 *att++
 *  Name:
+*     SourceFile
+
+*  Purpose:
+*     Input file from which to read data.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     String.
+
+*  Description:
+*     This attribute specifies the name of a file from which the Channel
+*     should read data. If specified it is used in preference to any source
+*     function specified when the Channel was created.
+*
+*     Assigning a new value to this attribute will cause any previously
+*     opened SourceFile to be closed. The first subsequent call to
+c     astRead
+f     AST_READ
+*     will attempt to open the new file (an error will be reported if the
+*     file cannot be opened), and read data from it. All subsequent call to
+c     astRead
+f     AST_READ
+*     will read data from the new file, until the SourceFile attribute is
+*     cleared or changed.
+*
+*     Clearing the attribute causes any open SourceFile to be closed. All
+*     subsequent data reads will use the source function specified when the
+*     Channel was created, or will read from standard input if no source
+*     function was specified.
+*
+*     If no value has been assigned to SourceFile, a null string will be
+*     returned if an attempt is made to get the attribute value.
+
+*  Notes:
+*     - Any open SourceFile is closed when the Channel is deleted.
+*     - If the Channel is copied or dumped
+c     (using astCopy or astDump)
+f     (using AST_COPY or AST_DUMP)
+*     the SourceFile attribute is left in a cleared state in the output
+*     Channel (i.e. the value of the SourceFile attribute is not copied).
+
+*  Applicability:
+*     FitsChan
+*        In the case of a FitsChan, the specified SourceFile supplements
+*        the source function specified when the FitsChan was created,
+*        rather than replacing the source function. The source file
+*        should be a text file (not a FITS file) containing one header per
+*        line. When a value is assigned to SourceFile, the file is opened
+*        and read immediately, and all headers read from the file are
+*        appended to the end of any header already in the FitsChan. The file
+*        is then closed. Clearing the SourceFile attribute has no further
+*        effect, other than nullifying the string (i.e. the file name)
+*        associated with the attribute.
+
+*att--
+*/
+
+/* Clear the SourceFile value by closing any open file, freeing the
+   allocated memory and assigning a NULL pointer. */
+astMAKE_CLEAR(Channel,SourceFile,fn_in,((this->fd_in=(this->fd_in?(fclose(this->fd_in),NULL):NULL)),astFree(this->fn_in)))
+
+/* If the SourceFile value is not set, supply a default in the form of a
+   pointer to the constant string "". */
+astMAKE_GET(Channel,SourceFile,const char *,NULL,( this->fn_in ? this->fn_in : "" ))
+
+/* Set a SourceFile value by closing any open file, freeing any previously
+   allocated memory, allocating new memory, storing the string and saving
+   the pointer to the copy. */
+astMAKE_SET(Channel,SourceFile,const char *,fn_in,((this->fd_in=(this->fd_in?(fclose(this->fd_in),NULL):NULL)),astStore( this->fn_in, value, strlen( value ) + (size_t) 1 )))
+
+/* The SourceFile value is set if the pointer to it is not NULL. */
+astMAKE_TEST(Channel,SourceFile,( this->fn_in != NULL ))
+
+/*
+*att++
+*  Name:
+*     SinkFile
+
+*  Purpose:
+*     Output file to which to data should be written.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     String.
+
+*  Description:
+*     This attribute specifies the name of a file to which the Channel
+*     should write data. If specified it is used in preference to any sink
+*     function specified when the Channel was created.
+*
+*     Assigning a new value to this attribute will cause any previously
+*     opened SinkFile to be closed. The first subsequent call to
+c     astWrite
+f     AST_WRITE
+*     will attempt to open the new file (an error will be reported if the
+*     file cannot be opened), and write data to it. All subsequent call to
+c     astWrite
+f     AST_WRITE
+*     will write data to the new file, until the SinkFile attribute is
+*     cleared or changed.
+*
+*     Clearing the attribute causes any open SinkFile to be closed. All
+*     subsequent data writes will use the sink function specified when the
+*     Channel was created, or will write to standard output if no sink
+*     function was specified.
+*
+*     If no value has been assigned to SinkFile, a null string will be
+*     returned if an attempt is made to get the attribute value.
+
+*  Notes:
+*     - A new SinkFile will over-write any existing file with the same
+*     name unless the existing file is write protected, in which case an
+*     error will be reported.
+*     - Any open SinkFile is closed when the Channel is deleted.
+*     - If the Channel is copied or dumped
+c     (using astCopy or astDump)
+f     (using AST_COPY or AST_DUMP)
+*     the SinkFile attribute is left in a cleared state in the output
+*     Channel (i.e. the value of the SinkFile attribute is not copied).
+
+*  Applicability:
+*     FitsChan
+*        When the FitsChan is destroyed, any headers in the FitsChan will be
+*        written out to the sink file, if one is specified (if not, the
+*        sink function used when the FitsChan was created is used). The
+*        sink file is a text file (not a FITS file) containing one header
+*        per line.
+
+*att--
+*/
+
+/* Clear the SinkFile value by closing any open file, freeing the allocated
+   memory and assigning a NULL pointer. */
+astMAKE_CLEAR(Channel,SinkFile,fn_out,((this->fd_out=(this->fd_out?(fclose(this->fd_out),NULL):NULL)),astFree(this->fn_out)))
+
+/* If the SinkFile value is not set, supply a default in the form of a
+   pointer to the constant string "". */
+astMAKE_GET(Channel,SinkFile,const char *,NULL,( this->fn_out ? this->fn_out : "" ))
+
+/* Set a SinkFile value by closing any open file, freeing any previously
+   allocated memory, allocating new memory, storing the string and saving
+   the pointer to the copy. */
+astMAKE_SET(Channel,SinkFile,const char *,fn_out,((this->fd_out=(this->fd_out?(fclose(this->fd_out),NULL):NULL)),astStore( this->fn_out, value, strlen( value ) + (size_t) 1 )))
+
+/* The SinkFile value is set if the pointer to it is not NULL. */
+astMAKE_TEST(Channel,SinkFile,( this->fn_out != NULL ))
+
+
+/*
+*att++
+*  Name:
 *     Comment
 
 *  Purpose:
@@ -5037,6 +5368,13 @@ static void Delete( AstObject *obj, int *status ) {
 /* Free memory used to store warnings. */
    astAddWarning( this, 0, NULL, NULL, status );
 
+/* Close any open input or output files. */
+   if( this->fd_in ) fclose( this->fd_in );
+   if( this->fd_out ) fclose( this->fd_out );
+
+/* Free file name memory. */
+   this->fn_in = astFree( this->fn_in );
+   this->fn_out = astFree( this->fn_out );
 }
 
 /* Copy constructor. */
@@ -5085,7 +5423,10 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
    the output Channel. */
    out->warnings = NULL;
    out->nwarn = 0;
-
+   out->fd_in = NULL;
+   out->fn_in = NULL;
+   out->fd_out = NULL;
+   out->fn_out = NULL;
 }
 
 /* Dump function. */
@@ -5375,22 +5716,26 @@ c     and "sink" functions which connect it to an external data store
 f     and "sink" routines which connect it to an external data store
 *     by reading and writing the resulting text. By default, however,
 *     a Channel will read from standard input and write to standard
-*     output.
+*     output. Alternatively, a Channel can be told to read or write from
+*     specific text files using the SinkFile and SourceFile attributes,
+*     in which case no sink or source function need be supplied.
 
 *  Parameters:
 c     source
 f     SOURCE = SUBROUTINE (Given)
 c        Pointer to a source function that takes no arguments and
-c        returns a pointer to a null-terminated string.  This function
+c        returns a pointer to a null-terminated string.  If no value
+c        has been set for the SourceFile attribute, this function
 c        will be used by the Channel to obtain lines of input text. On
 c        each invocation, it should return a pointer to the next input
 c        line read from some external data store, and a NULL pointer
 c        when there are no more lines to read.
 c
-c        If "source" is NULL, the Channel will read from standard
-c        input instead.
+c        If "source" is NULL and no value has been set for the SourceFile
+c        attribute, the Channel will read from standard input instead.
 f        A source routine, which is a subroutine which takes a single
-f        integer error status argument.  This routine will be used by
+f        integer error status argument.   If no value has been set
+f        for the SourceFile attribute, this routine will be used by
 f        the Channel to obtain lines of input text. On each
 f        invocation, it should read the next input line from some
 f        external data store, and then return the resulting text to
@@ -5400,19 +5745,22 @@ f        If an error occurs, it should set its own error status
 f        argument to an error value before returning.
 f
 f        If the null routine AST_NULL is suppied as the SOURCE value,
+f        and no value has been set for the SourceFile attribute,
 f        the Channel will read from standard input instead.
 c     sink
 f     SINK = SUBROUTINE (Given)
 c        Pointer to a sink function that takes a pointer to a
-c        null-terminated string as an argument and returns void.  This
+c        null-terminated string as an argument and returns void.
+c        If no value has been set for the SinkFile attribute, this
 c        function will be used by the Channel to deliver lines of
 c        output text. On each invocation, it should deliver the
 c        contents of the string supplied to some external data store.
 c
-c        If "sink" is NULL, the Channel will write to standard output
-c        instead.
+c        If "sink" is NULL, and no value has been set for the SinkFile
+c        attribute, the Channel will write to standard output instead.
 f        A sink routine, which is a subroutine which takes a single
-f        integer error status argument.  This routine will be used by
+f        integer error status argument.  If no value has been set
+f        for the SinkFile attribute, this routine will be used by
 f        the Channel to deliver lines of output text. On each
 f        invocation, it should obtain the next output line from the
 f        AST library by calling AST_GETLINE, and then deliver the
@@ -5421,6 +5769,7 @@ f        occurs, it should set its own error status argument to an
 f        error value before returning.
 f
 f        If the null routine AST_NULL is suppied as the SINK value,
+f        and no value has been set for the SinkFile attribute,
 f        the Channel will write to standard output instead.
 c     options
 f     OPTIONS = CHARACTER * ( * ) (Given)
@@ -5837,6 +6186,13 @@ AstChannel *astLoadChannel_( void *mem, size_t size,
 /* No warnings yet. */
       new->warnings = NULL;
       new->nwarn = 0;
+
+/* Indicate no input or output files have been associated with the
+   Channel. */
+      new->fd_in = NULL;
+      new->fn_in = NULL;
+      new->fd_out = NULL;
+      new->fn_out = NULL;
 
 /* Now read each individual data item from this list and use it to
    initialise the appropriate instance variable(s) for this class. */

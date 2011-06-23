@@ -12,6 +12,49 @@
 c      call ast_watchmemory( 225192 )
       call ast_begin( status )
 
+*  Create a FitsChan that will write its contents out to text file
+*  fred.txt when it is deleted.
+      fc = ast_fitschan( AST_NULL, AST_NULL, 'SinkFile=./fred.txt',
+     :                   status )
+
+*  Put a FITS-WCS header into it.
+      cards(1) = 'CRPIX1  =                   45'
+      cards(2) = 'CRPIX2  =                   45'
+      cards(3) = 'CRVAL1  =                   45'
+      cards(4) = 'CRVAL2  =                 89.9'
+      cards(5) = 'CDELT1  =                -0.01'
+      cards(6) = 'CDELT2  =                 0.01'
+      cards(7) = 'CTYPE1  = ''RA---TAN'''
+      cards(8) = 'CTYPE2  = ''DEC--TAN'''
+      do i = 1, 8
+         call ast_putfits( fc, cards(i), .false., status )
+      end do
+
+*  Annul the fitschan. Only 1 ref so this should delete it.
+      call ast_annul( fc, status )
+
+*  Create another FitsChan and tell it to read headers from fred.txt.
+      fc = ast_fitschan( AST_NULL, AST_NULL, 'SourceFile=./fred.txt',
+     :                   status )
+
+*  Check it looks like the original header.
+      if( ast_geti( fc, 'NCard', status ) .ne. 8 ) then
+         write(*,*) ast_geti( fc, 'NCard', status )
+         call stopit( 1000, ' ', status )
+      endif
+
+      call ast_clear( fc, 'Card', status )
+      i = 0
+      do while( ast_findfits( fc, '%f', card, .true., status ) )
+         i = i + 1
+         if( card .ne. cards( i ) ) then
+            call stopit( 1001, ' ', status )
+         endif
+      end do
+
+*  Annul the fitschan.
+      call ast_annul( fc, status )
+
 *  Put a simple FITS-WCS header into a FitsChan.
       cards(1) = 'CRPIX1  = 45'
       cards(2) = 'CRPIX2  = 45'

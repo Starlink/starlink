@@ -13055,7 +13055,10 @@ which means that textual input will be read from the program's
 standard input stream (typically, this means your keyboard) while
 textual output will go to the standard output stream (typically
 appearing on your screen). On UNIX systems, of course, either of these
-streams can easily be redirected to files.
+streams can easily be redirected to files. This default behaviour can be
+changed by assigning values to the Channel's SinkFile and/or SourceFile
+attributes. These attributes specify the paths to text files that are to
+be used in place of the standard input and output streams.
 c-
 f+
 In this very simple example we have supplied the name of the null
@@ -13140,9 +13143,9 @@ f-
 Before discussing the format of the output produced above
 (\secref{ss:writingtoachannel}), let us consider how to read it back,
 so as to reconstruct the original Object. Naturally, we would first
-need to save the output in a file. On UNIX systems, we can do that
-simply by redirecting standard output to a file using a shell command
-like:
+need to save the output in a file. We can do that either by using the
+SinkFile attribute, or (on UNIX systems), by redirecting standard output
+to a file using a shell command like:
 
 \begin{quote}
 \small
@@ -13190,6 +13193,15 @@ program2 <file
 \end{verbatim}
 \normalsize
 \end{quote}
+
+Alternatively, we could have assigned a value to the SinkFile attribute
+before invoking
+c+
+astRead.
+c-
+f+
+AST\_READ.
+f-
 
 \subsection{Saving and Restoring Multiple Objects}
 
@@ -13856,16 +13868,50 @@ in reading and writing Objects through a program's standard input and
 output streams. We will now consider how to access Objects stored in
 files more directly.
 
-Because the AST library is designed to be used from more than one
-language, it has to be a little careful about reading and writing to
-files. This is due to the incompatibilities that often exist between
-the file I/O facilities provided by different languages.  Fortunately,
-this ties in well with the principle that AST should also be
-independent of any particular data storage system, which we mention
-again in \secref{ss:otherplaces}.
+The simple approach is to use the SinkFile and SourceFile attributes of
+the Channel. For instance, the following will read a pair of Objects from
+a text file called ``fred.txt'':
 
 c+
-What this means in practice is that you must provide some simple C
+\begin{quote}
+\small
+\begin{verbatim}
+   astSet( channel, "SourceFile=fred.txt" );
+   obj1 = astRead( channel );
+   obj2 = astRead( channel );
+   astClear( channel, "SourceFile" );
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+   CALL AST_SET( CHANNEL, 'SourceFile=fred.txt', STATUS )
+   OBJ1 = AST_READ( CHANNEL, STATUS )
+   OBJ2 = AST_READ( CHANNEL, STATUS )
+   CALL AST_CLEAR( CHANNEL, 'SourceFile', STATUS )
+\end{verbatim}
+\normalsize
+f-
+
+Note, the act of clearing the attribute tells AST that no more Objects
+are to be read from the file and so the file is then closed. If the
+attribute is not cleared, the file will remain open and further Objects
+can be read from it. The file will always be closed when the Channel is
+deleted.
+
+This simple approach will normally be sufficient. However, because the
+AST library is designed to be used from more than one language, it has
+to be a little careful about reading and writing to files. This is due
+to incompatibilities that may exist between the file I/O facilities
+provided by different languages. If such incompatibilities prevent the
+above simple system being used, we need to adopt a system that off-loads
+all file I/O to external code.
+
+c+
+What this means in practice is that if the above simple approach cannot
+be used, you must instead provide some simple C
 functions that perform the actual transfer of data to and from files
 and similar external data stores. The functions you provide are
 supplied as the source and/or sink function arguments to astChannel
@@ -13873,7 +13919,8 @@ when you create a Channel (\secref{ss:creatingachannel}). An example is
 the best way to illustrate this.
 c-
 f+
-What this means in practice is that you must provide some simple
+What this means in practice is that if the above simple approach cannot
+be used, you must instead provide some simple
 Fortran routines that perform the actual transfer of data to and from
 files and similar external data stores. The routines you provide are
 supplied as the source and/or sink routine arguments to AST\_CHANNEL
@@ -13991,12 +14038,56 @@ data from the file, the end-of-file being detected when it yields a
 negative line length.
 f-
 
+Note, if a value is set for the SourceFile attribute,
+c+
+the astRead function will ignore any source function
+c-
+f+
+the AST\_READ function will ignore any source routine
+f-
+specified when the Channel was created.
+
 \subsection{\label{ss:channelsink}Writing Objects to Files}
 
+As for reading, writing Objects to files can be done in two different ways.
+Again, the simple approach is to use the SinkFile attribute of the Channel.
+For instance, the following will write a pair of Objects to a text file
+called ``fred.txt'':
+
 c+
-We can also write a Sink function, that writes a line of output text
-to a file, and use it in basically the same way as the Source function
-in the previous section (\secref{ss:channelsource}):
+\begin{quote}
+\small
+\begin{verbatim}
+   astSet( channel, "SinkFile=fred.txt" );
+   nobj = astWrite( channel, object1 );
+   nobj = astWrite( channel, object2 );
+   astClear( channel, "SinkFile" );
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+   CALL AST_SET( CHANNEL, 'SinkFile=fred.txt', STATUS )
+   NOBJ = AST_WRITE( CHANNEL, OBJECT1, STATUS )
+   NOBJ = AST_WRITE( CHANNEL, OBJECT2, STATUS )
+   CALL AST_CLEAR( CHANNEL, 'SinkFile', STATUS )
+\end{verbatim}
+\normalsize
+f-
+
+Note, the act of clearing the attribute tells AST that no more output
+will be written to the file and so the file is then closed. If the
+attribute is not cleared, the file will remain open and further Objects
+can be written to it. The file will always be closed when the Channel is
+deleted.
+
+c+
+If the details of the language's I/O system on the computer you are using
+means that the above approach cannot be used, then we can write a Sink function,
+that writes a line of output text to a file, and use it in basically the same
+way as the Source function in the previous section (\secref{ss:channelsource}):
 
 \begin{quote}
 \small
@@ -14013,10 +14104,11 @@ void Sink( const char *line ) {
 Note that we must supply the final newline character ourselves.
 c-
 f+
-We can also write a SINK routine, that obtains a line of output text
-from the AST library by calling AST\_GETLINE and then writes it to a
-file. We can use this in basically the same way as the SOURCE routine
-in the previous section (\secref{ss:channelsource}):
+If the details of the language's I/O system on the computer you are using
+means that the above approach cannot be used, then we can write a SINK routine,
+that obtains a line of output text from the AST library by calling AST\_GETLINE
+and then writes it to a file. We can use this in basically the same way as
+the SOURCE routine in the previous section (\secref{ss:channelsource}):
 
 \small
 \begin{verbatim}
@@ -14114,6 +14206,15 @@ If an error occurs in your source or sink routine, you can communicate
 this to the AST library by setting the STATUS argument to any error
 value. This will immediately terminate the read or write operation.
 f-
+
+Note, if a value is set for the SinkFile attribute,
+c+
+the astWrite function will ignore any sink function
+c-
+f+
+the AST\_WRITE function will ignore any sink routine
+f-
+specified when the Channel was created.
 
 \subsection{\label{ss:otherplaces}Reading and Writing Objects to other Places}
 
@@ -14220,10 +14321,10 @@ I/O between AST Objects and FITS headers is supported by a specialised
 form of Channel called a FitsChan. A FitsChan contains a buffer which
 may hold any number, including zero, of FITS header cards. This buffer
 forms a workspace in which you can assemble FITS cards and manipulate
-them before writing them out to a FITS file.
+them before writing them out to a file.
 
 By default, when a FitsChan is first created, it contains no cards and
-there are four ways of inserting cards into it:
+there are five ways of inserting cards into it:
 
 \begin{enumerate}
 c+
@@ -14257,6 +14358,18 @@ which will have the effect of creating new cards within the FitsChan
 which describe the Object (\secref{ss:writingnativefits}).
 f-
 
+\item You may assign a value to the SourceFile attribute of the FitsChan.
+The value should be the path to a text file holding a set of FITS header
+cards, one per line. When the SourceFile value is set (using
+c+
+astSetC or astSet),
+c-
+f+
+AST\_SETC or AST\_SET).
+f-
+the file is opened and the headers copied from it into the FitsChan.
+The file is then imemdiately closed.
+
 c+
 \item You may specify a source function which reads data from some
 external store of FITS cards, just like the source associated with a
@@ -14273,7 +14386,7 @@ fill it with an initial set of cards (\secref{ss:fitssourceandsink}).
 f-
 \end{enumerate}
 
-There are also three ways of removing cards from a FitsChan:
+There are also four ways of removing cards from a FitsChan:
 
 \begin{enumerate}
 c+
@@ -14296,19 +14409,25 @@ which will have the effect of removing those cards from the FitsChan
 which describe the Object (\secref{ss:readingnativefits}).
 f-
 
+\item You may assign a value to the FitsChan's SinkFile attribute. When
+the FitsCHan is deleted, any remaining headers are written out to a text
+file with path equal to the value of the SinkFile attribute.
+
 c+
-\item You may specify a sink function which writes data to some
+\item Alternatively, you may specify a sink function which writes data to some
 external store of FITS cards, just like the sink associated with a
 basic Channel (\secref{ss:channelsink}). If you supply a sink function,
 it will be called when the FitsChan is deleted in order to write out
-any FITS cards that remain in it (\secref{ss:fitssourceandsink}).
+any FITS cards that remain in it (\secref{ss:fitssourceandsink}). Note,
+the sink function is not called if the SinkFile attribute has been set.
 c-
 f+
-\item You may specify a sink routine which writes data to some
+\item Alternatively, You may specify a sink routine which writes data to some
 external store of FITS cards, just like the sink associated with a
 basic Channel (\secref{ss:channelsink}). If you supply a sink routine,
 it will be called when the FitsChan is deleted in order to write out
-any FITS cards that remain in it (\secref{ss:fitssourceandsink}).
+any FITS cards that remain in it (\secref{ss:fitssourceandsink}). Note,
+the sink routine is not called if the SinkFile attribute has been set.
 f-
 \end{enumerate}
 
@@ -22369,6 +22488,11 @@ occurred in the AST library between versions V5.7-0 and V5.7-1 (the
 current version):
 
 \begin{enumerate}
+
+\item - All classes of Channel can now read to and write from specified
+text files, without the need to provide source and sink functions when
+the Channel is created. The files to use are specified by the new
+attributes SourceFile and SinkFile.
 
 \item - The FitsChan class now ignores trailing spaces in character-valued WCS
 keywords when reading a FrameSet from a FITS header.

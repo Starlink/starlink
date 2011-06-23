@@ -16,6 +16,11 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
+- All classes of Channel can now read to and write from specified text
+files, without the need to provide source and sink functions when the
+Channel is created. The files to use are specified by the new attributes
+SourceFile and SinkFile.
+
 - The FitsChan class now ignores trailing spaces in character-valued WCS
 keywords when reading a FrameSet from a FITS header.
 
