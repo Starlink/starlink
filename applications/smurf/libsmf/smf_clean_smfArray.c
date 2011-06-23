@@ -460,7 +460,7 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
     if( (*status == SAI__OK) && (noiseclip > 0.0) ) {
       smf_mask_noisy( wf, data,
                       (noisemaps && *noisemaps) ? (&noisemap) : NULL, noiseclip,
-                      1, zeropad, status );
+                      0, zeropad, status );
 
       if( noisemaps && *noisemaps && noisemap ) {
         smf_addto_smfArray( *noisemaps, noisemap, status );
