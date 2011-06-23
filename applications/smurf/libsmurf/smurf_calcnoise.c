@@ -223,6 +223,8 @@
 *        Add NEPGOODBOL and NOISEGOODBOL output ADAM parameters
 *     2011-06-17 (EC):
 *        Add ability to asymmetrically clip outlier NEP/NOISE values.
+*     2011-06-23 (EC):
+*        Moved private function smf__clipnoise to public smf_clipnoise
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -284,9 +286,6 @@ smf__create_bolfile_extension( const Grp * ogrp, size_t gcount,
                                const smfData *refdata, const char hdspath[],
                                const char datalabel[], const char units[],
                                int * status );
-
-void smf__clipnoise( double *clipdata, size_t ndata, int cliplog,
-                     double cliplow, double cliphigh, int *status );
 
 void smurf_calcnoise( int *status ) {
 
@@ -750,8 +749,8 @@ void smurf_calcnoise( int *status ) {
               /* Clip outlier NEPs */
               msgOutif( MSG__VERB, "", TASK_NAME ": Clipping NEP outliers",
                         status );
-              smf__clipnoise( nep, nepbolo, nepcliplog, nepcliplow,
-                              nepcliphigh, status );
+              smf_clipnoise( nep, nepbolo, nepcliplog, nepcliplow,
+                             nepcliphigh, NULL, status );
 
               /* Finally, count good NEP values and calculate nepsum */
               for( i=0; i<nepbolo; i++ ) {
@@ -773,8 +772,8 @@ void smurf_calcnoise( int *status ) {
              NEP */
           msgOutif( MSG__VERB, "", TASK_NAME ": Clipping NOISE outliers",
                     status );
-          smf__clipnoise( (outdata->pntr)[0], noisebolo, noicliplog,
-                          noicliplow, noicliphigh, status );
+          smf_clipnoise( (outdata->pntr)[0], noisebolo, noicliplog,
+                         noicliplow, noicliphigh, NULL, status );
 
           /* count good noise values and calculate noisesum */
           for (i = 0; i < noisebolo; i++) {
@@ -915,87 +914,4 @@ smf__create_bolfile_extension( const Grp * ogrp, size_t gcount,
 
 }
 
-void smf__clipnoise( double *clipdata, size_t ndata, int cliplog,
-                     double cliplow, double cliphigh, int *status ) {
 
-  const float clips[] = {5,4,3,2,1};
-  const size_t nclips = sizeof(clips)/sizeof(*clips);
-  size_t i;
-  size_t nlow=0;
-  size_t nhigh=0;
-  double *work=NULL;
-  double median, mean, sigma;
-
-  if( *status != SAI__OK ) return;
-
-  if( cliplog ) msgOutif( MSG__VERB, "", TASK_NAME
-                          ":   taking log10 of the data", status );
-
-  if( (cliphigh != VAL__BADD) || (cliplow != VAL__BADD ) ) {
-    work = astCalloc( ndata, sizeof(*work) );
-
-    /* Copy the data, or its log, into a buffer */
-    if( *status == SAI__OK ) {
-      for( i=0; i<ndata; i++ ) {
-        if( (clipdata[i] != VAL__BADD) && (clipdata[i] > 0) ) {
-          work[i] = cliplog ? log10(clipdata[i]) : clipdata[i];
-        } else {
-          work[i] = VAL__BADD;
-        }
-      }
-    }
-
-    /* Measure the clipped median, mean and standard deviation. We
-       step down from 5- to 1-sigma, using the median rather than the
-       mean as our central measure to ensure robustness against large
-       outliers. This should end up near the mode of the distribution,
-       although the RMS of the sample will under-estimate, by nearly a
-       factor of 2, the standard deviation for a Gaussian distribution
-       since we've clipped so much of the wings. We scale it back up
-       so that it would give the right answer for a Gaussian. */
-
-    smf_clipped_stats1D( work, nclips, clips, 1, ndata, NULL, 0, 0,
-                         &mean, &sigma, &median, 1, NULL, status );
-
-    sigma *= 1.85;
-
-    msgOutiff( MSG__VERB, "", TASK_NAME
-               ":   mean=%lg median=%lg standard dev=%lg",
-               status, mean, median, sigma );
-
-    /* Then clip the high/low outliers relative to the median */
-    if( *status==SAI__OK ) {
-      for( i=0; i<ndata; i++ ) {
-        if( work[i] != VAL__BADD ) {
-          double d = work[i] - median;
-
-          if( (cliphigh!=VAL__BADD) &&
-              (d >= sigma*cliphigh) ) {
-
-            clipdata[i] = VAL__BADD;
-            nhigh++;
-          }
-
-          if( (cliplow!=VAL__BADD) &&
-              (-d >= sigma*cliplow) ) {
-
-            clipdata[i] = VAL__BADD;
-            nlow++;
-          }
-        }
-      }
-    }
-
-    if( nhigh ) msgOutiff( MSG__VERB, "", TASK_NAME
-                           ":   clipped %zu values >= %lg",
-                           status, nhigh,
-                           median + sigma*cliphigh );
-    if( nlow ) msgOutiff( MSG__VERB, "", TASK_NAME
-                          ":   clipped %zu values <= %lg",
-                          status, nlow,
-                          median - sigma*cliplow );
-
-    /* Free temporary buffer */
-    if( work ) work = astFree( work );
-  }
-}

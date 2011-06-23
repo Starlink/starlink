@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_mask_noisy( smfWorkForce *wf, smfData *data, smfData **noise,
-*                     double sigclip, int zeropad, int * status );
+*                     double sigclip, int cliplog, int zeropad, int * status );
 
 *  Arguments:
 *     wf = smfWorkForce * (Given)
@@ -26,6 +26,8 @@
 *     sigclip = double (Given)
 *        Number of standard deviations above the mean to clip noisy bolometers.
 *        Returns immediately unless this value is greater than zero.
+*     cliplog = int (Given)
+*        If set, calculate statistics on log of noise instead of noise
 *     zeropad = int (Given)
 *        Pad with zeros instead of with artificial data prior to doing
 *        the FFTs?
@@ -35,7 +37,10 @@
 *  Description:
 *     Calculates the noise for each bolometer for a specific frequency
 *     range using smf_bolonoise. Then for any bolometers that are out
-*     of specification it sets their quality to bad using SMF__Q_NOISE
+*     of specification it sets their quality to bad using
+*     SMF__Q_NOISE.  The log of the noise values can be used instead
+*     of the values themselves if the distribution has large
+*     tails. The clipping itself is done with smf_clipnoise.
 
 *  Authors:
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -44,9 +49,7 @@
 *     {enter_new_authors_here}
 
 *  Notes:
-*     Uses 5 sigma clipping 5 times to work out the mean and standard
-*     deviation of the noise data. It does this because noise data have
-*     a long tail.
+*
 
 *  History:
 *     2010-07-02 (TIMJ):
@@ -64,11 +67,14 @@
 *        bolonoise).
 *     2011-04-20 (TIMJ):
 *        Use rt(s) instead of /rt(Hz) for noise units.
+*     2011-06-23 (EC):
+*        Move clipping into smf_clean_smfArray call, enabling us to use
+*        log instead of actual values if desired.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2010-2011 Science and Technology Facilities Council.
-*     Copyright (C) 2010 University of British Columbia.
+*     Copyright (C) 2010-2011 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -97,18 +103,16 @@
 #include "sae_par.h"
 #include "mers.h"
 
-void smf_mask_noisy( smfWorkForce *wf, smfData *data, smfData **noise,
-                     double sigclip, int zeropad, int * status ) {
+#define FUNC_NAME "smf_mask_noise"
 
-  const float clips[] = { 5, 5, 5, 5, 5 };  /* Clip levels for noise data */
+void smf_mask_noisy( smfWorkForce *wf, smfData *data, smfData **noise,
+                     double sigclip, int cliplog, int zeropad, int * status ) {
+
   size_t i;
-  double mean = VAL__BADD;     /* Mean noise */
   dim_t nbolo = 0;             /* Number of bolometers */
-  const size_t nclips = sizeof(clips)/sizeof(*clips); /* number of clip levels */
-  size_t ngood = 0;            /* Number of good bolometers */
   double *noisedata = NULL;    /* Pointer to the noise data array */
   smfData * noisemap = NULL;   /* Somewhere to receive the result */
-  double sigma = VAL__BADD;    /* Standard deviation of noise */
+  double *work = NULL;         /* Temporary work array */
 
   if (*status != SAI__OK) return;
 
@@ -137,32 +141,35 @@ void smf_mask_noisy( smfWorkForce *wf, smfData *data, smfData **noise,
     }
   }
 
-  /* we do not have a routine to work out the median that is fast
-     and thread-safe. smf_find_median uses KAPLIBS. GSL requires that
-     we sort the data. For now just use a clipped MEAN */
-
-  smf_clipped_stats1D( (noisemap->pntr)[0], nclips, clips, 1, nbolo,
-                       NULL, 0, 0, &mean, &sigma, NULL, 0, &ngood, status );
-
   /* Now create a mask and then mask the quality. We only mask bolometers
      that are too noisy. We also do not mask bolometers that were already
      masked. We want the statistics to reflect what we actually masked
      and not any previous masking. This will miss any bolometers masked
      out by smf_bolonoise because they had zero power. */
-  if (noisedata) {
-    size_t nmasked = 0;
-    double thrhi = mean + (sigclip * sigma);
-    for (i = 0; i<nbolo; i++) {
-      if (noisedata[i] == VAL__BADD) {
-        noisedata[i] = 0.0;
-      } else if ( noisedata[i] > thrhi ) {
-        nmasked ++;
+
+  msgOutif( MSG__VERB, "", FUNC_NAME
+            ": Checking for bolometers with outlier noise values. ", status );
+
+  msgOutiff( MSG__VERB, "", FUNC_NAME
+             ": Units are (%s s**0.5): ", status, data->hdr->units );
+
+  work = astCalloc( nbolo, sizeof(*work) );
+
+  if( *status == SAI__OK ) memcpy( work, noisedata, nbolo*sizeof(*work) );
+
+  smf_clipnoise( noisedata, nbolo, cliplog, VAL__BADD, sigclip, NULL, status );
+
+  if( *status == SAI__OK ) {
+    for( i=0; i<nbolo; i++ ) {
+      if( noisedata[i] == VAL__BADD ) {
+        noisedata[i] = 0;
+      } else if( work[i] == VAL__BADD ) {
         noisedata[i] = VAL__BADD;
       }
     }
-    msgOutiff( MSG__VERB, "", "Removed %zu bolometers with noise exceeding %g %s s**0.5",
-               status, nmasked, thrhi, data->hdr->units );
   }
+
+  if( work ) work = astFree( work );
 
   /* The mask has to be inside a smfArray */
   if (*status == SAI__OK) {
@@ -180,5 +187,4 @@ void smf_mask_noisy( smfWorkForce *wf, smfData *data, smfData **noise,
   } else {
     smf_close_file( &noisemap, status );
   }
-
 }

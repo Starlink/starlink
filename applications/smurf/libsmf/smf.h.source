@@ -714,6 +714,10 @@ void smf_clean_pca( smfWorkForce *wf, smfData *data, double thresh,
 void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
                          smfArray **noisemaps, AstKeyMap *keymap, int *status );
 
+void smf_clipnoise( double *clipdata, size_t ndata, int cliplog,
+                    double cliplow, double cliphigh, size_t *nclipped,
+                    int *status );
+
 void smf_clone_data ( const smfData *idata, smfData **odata, int *status );
 
 void smf_close_file( smfData **, int *status);
@@ -1318,7 +1322,7 @@ void smf_mapbounds_approx( Grp *igrp, size_t index, char *system,
                            int *status );
 
 void smf_mask_noisy( smfWorkForce *wf, smfData *data, smfData **noise,
-                     double sigclip, int zeropad, int * status );
+                     double sigclip, int cliplog, int zeropad, int * status );
 
 void smf_maskacsis( int indf, int *mask, int *status );
 
