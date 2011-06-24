@@ -234,6 +234,8 @@
 *     2009 November 11 (PWD):
 *        Fix initialisation of OFF variable to be correct for double
 *        precision data. Previously this only worked for real data.
+*     24-JUN-2011 (DSB):
+*        Ignore the input Variance component if it is full of bad values.
 *     {enter_further_changes_here}
 
 *-
@@ -283,6 +285,7 @@
       INTEGER LDIM( 2 )          ! Sizes of looping axes
       INTEGER LNAX               ! No. of looping axes
       INTEGER LNEL               ! No. of spectra/planes
+      INTEGER NBADV              ! No. of bad input variance values
       INTEGER NCLIP              ! Number of gammas given by users, and
                                  ! also the number of rejecting
                                  ! iteration will be performed
@@ -567,6 +570,30 @@
 
 *  Exit if an error occurred.
       IF ( STATUS .NE. SAI__OK ) GOTO 999
+
+*  If a variance array exists, count the bad values in it.
+      IF( VAR ) THEN
+         IF( ITYPE .EQ. '_DOUBLE' ) THEN
+            CALL KPG1_NBADD( NEL, %VAL( CNF_PVAL( PNTIN( 2 ) ) ), NBADV,
+     :                       STATUS )
+         ELSE
+            CALL KPG1_NBADR( NEL, %VAL( CNF_PVAL( PNTIN( 2 ) ) ), NBADV,
+     :                       STATUS )
+         END IF
+
+*  If all values are bad, warn the user and pretend no input variance
+*  array is available.
+         IF( NBADV .EQ. NEL ) THEN
+            CALL NDF_UNMAP( NDFI, 'VARIANCE', STATUS )
+            IF( .NOT. GENVAR ) CALL NDF_UNMAP( NDFO, 'VARIANCE',
+     :                                         STATUS )
+            VAR = .FALSE.
+            CALL MSG_OUT( ' ', 'All input variances are bad, and so '//
+     :                    'will not be used.', STATUS )
+         END IF
+
+      END IF
+
 
 *  Create a dummy variance if it is not present.
 *  =============================================
