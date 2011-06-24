@@ -5,7 +5,7 @@
 
 modelorder = (com,gai,smo,ext,ast,noi)
 
-noiseclip=20
+noisecliphigh=20
 
 ast.mapspike=100
 

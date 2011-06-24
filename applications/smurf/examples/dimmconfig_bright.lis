@@ -15,7 +15,7 @@
 numiter = 20
 
 # Much weaker bolometer noise clip
-noiseclip = 10.0
+noisecliphigh = 10.0
 
 # Less aggressive DC step finder to avoid problems with bright sources
 dcthresh = 100

@@ -52,7 +52,8 @@ flagfast = 0
 order = -1
 spikethresh = 0
 spikebox = 50
-noiseclip = 0.0
+noisecliphigh = 0
+noisecliplow = 0
 pcathresh = 0
 groupsubarray = 0
 

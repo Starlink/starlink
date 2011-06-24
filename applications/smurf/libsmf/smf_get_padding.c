@@ -163,7 +163,7 @@ dim_t smf_get_padding( AstKeyMap *keymap, int report, const smfHead *hdr,
                         NULL, &filt_edgelow, &filt_edgehigh, &filt_edgesmall,
                         &filt_edgelarge, filt_notchlow, NULL, &f_nnotch, NULL,
                         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-                        NULL, &downsampscale, &downsampfreq, status );
+                        NULL, NULL, &downsampscale, &downsampfreq, status );
 
       if( downsampscale && downsampfreq ) {
         *status = SAI__ERROR;

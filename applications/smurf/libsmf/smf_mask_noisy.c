@@ -14,7 +14,8 @@
 
 *  Invocation:
 *     smf_mask_noisy( smfWorkForce *wf, smfData *data, smfData **noise,
-*                     double sigclip, int cliplog, int zeropad, int * status );
+*                     double sigcliphigh, double sigcliplow, int cliplog,
+*                     int zeropad, int * status );
 
 *  Arguments:
 *     wf = smfWorkForce * (Given)
@@ -23,9 +24,12 @@
 *        The data that will be flagged
 *     noise = smfData ** (Returned)
 *        Optionally return pointer to smfData containing noise map. Can be NULL.
-*     sigclip = double (Given)
-*        Number of standard deviations above the mean to clip noisy bolometers.
-*        Returns immediately unless this value is greater than zero.
+*     sigcliphigh = double (Given)
+*        Number of standard deviations above median to clip noisy bolometers.
+*        Ignored unless value is greater than zero.
+*     sigcliplow = double (Given)
+*        Number of standard deviations below median to clip noisy bolometers.
+*        Ignored unless value is greater than zero.
 *     cliplog = int (Given)
 *        If set, calculate statistics on log of noise instead of noise
 *     zeropad = int (Given)
@@ -68,8 +72,10 @@
 *     2011-04-20 (TIMJ):
 *        Use rt(s) instead of /rt(Hz) for noise units.
 *     2011-06-23 (EC):
-*        Move clipping into smf_clean_smfArray call, enabling us to use
-*        log instead of actual values if desired.
+*        - Move clipping into smf_clean_smfArray call, enabling us to use
+*          log instead of actual values if desired.
+*        - sigcliphigh and sigcliplow instead of sigclip
+*        - median instead of mean for central measure
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -106,7 +112,8 @@
 #define FUNC_NAME "smf_mask_noise"
 
 void smf_mask_noisy( smfWorkForce *wf, smfData *data, smfData **noise,
-                     double sigclip, int cliplog, int zeropad, int * status ) {
+                     double sigcliphigh, double sigcliplow, int cliplog,
+                     int zeropad, int * status ) {
 
   size_t i;
   dim_t nbolo = 0;             /* Number of bolometers */
@@ -116,7 +123,7 @@ void smf_mask_noisy( smfWorkForce *wf, smfData *data, smfData **noise,
 
   if (*status != SAI__OK) return;
 
-  if (sigclip <= 0.0) return;
+  if( (sigcliphigh <= 0.0) && (sigcliplow <= 0.0) ) return;
 
   /* Work out how many bolometers we have */
   smf_get_dims( data, NULL, NULL, &nbolo, NULL, NULL,
@@ -157,7 +164,8 @@ void smf_mask_noisy( smfWorkForce *wf, smfData *data, smfData **noise,
 
   if( *status == SAI__OK ) memcpy( work, noisedata, nbolo*sizeof(*work) );
 
-  smf_clipnoise( noisedata, nbolo, cliplog, VAL__BADD, sigclip, NULL, status );
+  smf_clipnoise( noisedata, nbolo, cliplog, sigcliplow, sigcliphigh, NULL,
+                 status );
 
   if( *status == SAI__OK ) {
     for( i=0; i<nbolo; i++ ) {

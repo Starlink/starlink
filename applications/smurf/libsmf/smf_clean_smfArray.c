@@ -50,7 +50,7 @@
 *     PCA          : PCATHRESH
 *     Filtering    : FILT_EDGELOW, FILT_EDGEHIGH, FILT_NOTCHLOW,
 *                    FILT_NOTCHHIGH, APOD, FILT_WLIM, WHITEN
-*     Noisy Bolos  : NOISECLIP
+*     Noisy Bolos  : NOISECLIPHIGH, NOISECLIPLOW
 
 *  Notes:
 *     The resulting dataOrder of the cube is not guaranteed, so smf_dataOrder
@@ -96,6 +96,8 @@
 *        Only measure/flag slew speeds when telescope moving
 *     2011-04-14 (DSB):
 *        Remove gap filling since it is now done in smf_filter_execute.
+*     2011-06-23 (EC):
+*        Now have noisecliphigh and noisecliplow instead of noiseclip.
 
 *  Copyright:
 *     Copyright (C) 2010-2011 Univeristy of British Columbia.
@@ -156,7 +158,8 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
   double flagslow;          /* Threshold for flagging slow slews */
   dim_t idx;                /* Index within subgroup */
   size_t nflag;             /* Number of elements flagged */
-  double noiseclip = 0;     /* Sigma clipping based on noise */
+  double noisecliphigh = 0; /* Sigma clip high-noise outlier bolos */
+  double noisecliplow = 0;  /* Sigma clip low-noise outlier bolos */
   smfData *noisemap=NULL;   /* Individual noisemap */
   int order;                /* Order of polynomial for baseline fitting */
   double pcathresh;         /* n-sigma threshold for PCA cleaning */
@@ -197,8 +200,9 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
                     &dcthresh, &dcsmooth, &dclimcorr, &dkclean,
                     NULL, &zeropad, NULL, NULL, NULL, NULL, NULL,
                     NULL, NULL, NULL, &flagslow, &flagfast, &order,
-                    &spikethresh, &spikebox, &noiseclip, NULL,
-                    &compreprocess, &pcathresh, NULL, NULL, NULL, status );
+                    &spikethresh, &spikebox, &noisecliphigh, &noisecliplow,
+                    NULL, &compreprocess, &pcathresh, NULL, NULL, NULL,
+                    status );
 
   /* Loop over subarray */
   for( idx=0; (idx<array->ndat)&&(*status==SAI__OK); idx++ ) {
@@ -457,10 +461,10 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
     filt = smf_free_smfFilter( filt, status );
 
     /* Noise mask */
-    if( (*status == SAI__OK) && (noiseclip > 0.0) ) {
+    if( (*status==SAI__OK) && ((noisecliphigh>0.0) || (noisecliplow>0.0)) ) {
       smf_mask_noisy( wf, data,
-                      (noisemaps && *noisemaps) ? (&noisemap) : NULL, noiseclip,
-                      0, zeropad, status );
+                      (noisemaps && *noisemaps) ? (&noisemap) : NULL,
+                      noisecliphigh, noisecliplow, 1, zeropad, status );
 
       if( noisemaps && *noisemaps && noisemap ) {
         smf_addto_smfArray( *noisemaps, noisemap, status );

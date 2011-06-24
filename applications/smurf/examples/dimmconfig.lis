@@ -324,9 +324,10 @@ fillgaps = 1
 # whiten = 1
 
 # Clip bolometers based on their noise. This parameter will remove
-# any bolometers noisier than noiseclip standard deviations above
-# the mean.
-noiseclip = 4.0
+# any bolometers noisier than noisecliphigh standard deviations above
+# the median, or noisecliplow standard deviations below the median
+noisecliphigh = 4.0
+#noisecliplow = 4.0
 
 # ----------------------------------------------------------------------------
 # A number of analagous parameters to clean dark squid signals before fitting

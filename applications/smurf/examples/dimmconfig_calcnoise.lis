@@ -14,7 +14,10 @@
 
 order = 3
 
-noiseclip = 0
+# turn off noise clipping during pre-processing since CALCNOISE has its
+# own ADAM parameters to control clipping
+noisecliphigh = 0
+noisecliplow = 0
 
 modelorder = <undef>
 

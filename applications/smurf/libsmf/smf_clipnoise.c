@@ -26,10 +26,10 @@
 *        If set do clipping based on log of data instead of data
 *     cliplow = double (Given)
 *        Throw out values this many standard deviations below median. Set to
-*        VAL__BADD to disable low-outlier clipping.
+*        value <= 0 to disable low-outlier clipping.
 *     cliphigh = double (Given)
 *        Throw out values this many standard deviations above median. Set to
-*        VAL__BADD to disable high-outlier clipping.
+*        value <= 0 to disable high-outlier clipping.
 *     nclipped = size_t * (Given and Returned)
 *        Number of values that were clipped (can be NULL)
 *     status = int* (Given and Returned)
@@ -108,7 +108,7 @@ void smf_clipnoise( double *clipdata, size_t ndata, int cliplog,
   if( cliplog ) msgOutif( MSG__DEBUG, "", FUNC_NAME
                           ":   taking log10 of the data", status );
 
-  if( (cliphigh != VAL__BADD) || (cliplow != VAL__BADD ) ) {
+  if( (cliphigh > 0) || (cliplow > 0 ) ) {
     work = astCalloc( ndata, sizeof(*work) );
 
     /* Copy the data, or its log, into a buffer */
@@ -146,14 +146,14 @@ void smf_clipnoise( double *clipdata, size_t ndata, int cliplog,
         if( work[i] != VAL__BADD ) {
           double d = work[i] - median;
 
-          if( (cliphigh!=VAL__BADD) &&
+          if( (cliphigh>0) &&
               (d >= sigma*cliphigh) ) {
 
             clipdata[i] = VAL__BADD;
             nhigh++;
           }
 
-          if( (cliplow!=VAL__BADD) &&
+          if( (cliplow>0) &&
               (-d >= sigma*cliplow) ) {
 
             clipdata[i] = VAL__BADD;
