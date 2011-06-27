@@ -352,6 +352,10 @@
 *        Add fakemap capability to add external astronomical signal
 *     2011-04-15 (EC):
 *        Optionally handle subarrays separately with new groupsubarray flag
+*     2011-06-27 (EC):
+*        Report # chunks with no samples or bad convergence, and set
+*        SMF__MINSMP or SMF__MCNVG status respecitively at the end before
+*        returning.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -445,6 +449,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   char *fakemap=NULL;           /* Name of external map with fake sources */
   int fakendf=NDF__NOID;        /* NDF id for fakemap */
   double fakescale;             /* Scale factor for fakemap */
+  size_t count_mcnvg=0;         /* # chunks fail to converge */
+  size_t count_minsmp=0;        /* # chunks fail due to insufficient samples */
   smf_qual_t flagmap=0;         /* bit mask for flagmaps */
   double *fmapdata=NULL;        /* fakemap for adding external ast signal */
   int groupsubarray;            /* Handle subarrays separately? */
@@ -2021,6 +2027,10 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                   FUNC_NAME ": ****** Solution did NOT converge",
                   status);
 
+          /* Increment counter of how many chunks did not converge so
+             that we can set SMF__MCNVG at the very end before
+             returning */
+          count_mcnvg++;
         }
       }
 
@@ -2269,8 +2279,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                                           ntslice, bstride, tstride, 0,
                                           &tempqual, status );
 
-                    com->sidequal = smf_construct_smfData( NULL, NULL, NULL, NULL,
-                                                           NULL, SMF__QUALTYPE,
+                    com->sidequal = smf_construct_smfData( NULL, NULL, NULL,
+                                                           NULL, NULL,
+                                                           SMF__QUALTYPE,
                                                            NULL, tempqual,
                                                            SMF__QFAM_TSERIES,
                                                            NULL, 1, com->dims,
@@ -2326,7 +2337,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
        of the data as bad for some reason. In a multi-contchunk map it is
        annoying to have the whole thing die here. So, annul the error,
        warn the user, and then continue on... This will also help us
-       to properly free up resources used by this chunk. */
+       to properly free up resources used by this chunk. However, we use
+       the count_minsmp to remember that this happened, and will set
+       SMF__MINSMP before returning at the very end. */
 
     if( *status == SMF__INSMP ) {
       errAnnul( status );
@@ -2339,6 +2352,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       msgOut(""," Annuling the bad status and trying to continue...", status);
       msgOut(""," ************************************************************",
              status );
+
+      /* Remember how many chunks failed due to lack of samples */
+      count_minsmp++;
     } else {
       /* In the multiple contchunk case, add this map to the total if
          we got here with clean status */
@@ -2559,4 +2575,41 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
   /* Ensure that FFTW doesn't have any used memory kicking around */
   fftw_cleanup();
+
+  /* Last thing before we return. We check to see if any chunk failed due
+     to insufficient map samples and set SMF__MINSMP. IF not, we then
+     check to see if any chunks failed to converge and set SMF__MCNVG. Since
+     we can only set bad status for one of them, we also generate a message
+     reporting both of them first. */
+
+
+  /* Report count_minsmp and count_mcnvg here before we set bad status
+     for only one of them */
+  if( count_minsmp || count_mcnvg ) {
+    msgOut(""," ************************* Warning! *************************",
+           status );
+    msgOutf( "", " Of %zu continuous chunks, %zu failed due to "
+             "insufficient samples, and %zu did not converge.", status,
+             ncontchunks, count_minsmp, count_mcnvg );
+    msgOut(""," ************************************************************",
+           status );
+  }
+
+  if( *status == SAI__OK ) {
+    if( count_minsmp ) {
+      *status = SMF__MINSMP;
+      errRepf( "", FUNC_NAME
+              ": %zu / %zu chunks of data failed to produce a map due "
+               "to insufficient samples. This usually happens if all of "
+               "the data were flagged as bad for some reason.", status,
+               count_minsmp, ncontchunks );
+    } else if( count_mcnvg ) {
+      *status = SMF__MCNVG;
+      errRepf( "", FUNC_NAME
+               ": %zu / %zu chunks of data failed to converge. Try setting "
+               "itermap=1, and then inspect the .more.smurf.itermaps "
+               "extensions to investigate the convergence visually.", status,
+               count_mcnvg, ncontchunks );
+    }
+  }
 }

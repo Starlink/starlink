@@ -23,4 +23,8 @@ BADQNM     <Unknown quality name>
 BADFLAT    <Bad flatfield data>
 NOSCI      <No science data found>
 TELSTAT    <Telescope is stationary>
+MCNVG      <At least one map chunk failed to converge>
+MINSMP     <At least one map chunk failed due to insufficient samples>
+
+
 .END
