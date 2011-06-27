@@ -1467,11 +1467,18 @@ int *status             /* global status (given and returned) */
                      "file %s.", fname_custom );
             ErsRep( 0, status, errmess );
          }
+
       } else if( nc_f > 0 && nc_i > 0 ) {
          polymap = astPolyMap( 2, 2, nc_f, c_f, nc_i, c_i, " " );
+
+      } else {
+         polymap = NULL;
       }
-      cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ],
-                                                       polymap, 1, " " );
+
+      if( polymap ) {
+         cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ],
+                                                          polymap, 1, " " );
+      }
 
 /* Convert from mm to radians (but these coords are still cartesian (x,y)
    (i.e. measured in the tangent plane) rather than spherical (lon,lat)
