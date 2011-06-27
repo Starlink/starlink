@@ -1281,7 +1281,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      int moving, int *lbnd_out, int *ubnd_out, size_t maxmem,
                      double *map, int *hitsmap, double * exp_time,
                      double *mapvar, smf_qual_t *mapqual, double *weights,
-                     char data_units[], double * nboloeff, int *status );
+                     char data_units[], double * nboloeff,
+                     size_t *numcontchunks, size_t *numinsmp,
+                     size_t *numcnvg, int *status );
 
 void smf_km2ext( int indf, const char *xname, AstKeyMap *keymap,
                  int *timeout, int *status );

@@ -158,6 +158,15 @@
 *          Control the verbosity of the application. Values can be
 *          NONE (no messages), QUIET (minimal messages), NORMAL,
 *          VERBOSE, DEBUG or ALL. [NORMAL]
+*     NCONTCHUNK = _INTEGER (Write)
+*          Total number of continuous data chunks processed by makemap
+*          when METHOD=iterate. [!]
+*     NMCNVG = _INTEGER (Write)
+*          Total number of continuous data chunks processed by makemap
+*          when METHOD=iterate that failed to converge. [!]
+*     NMINSMP = _INTEGER (Write)
+*          Total number of continuous data chunks processed by makemap
+*          when METHOD=iterate that failed due to insufficient samples. [!]
 *     NTILE = _INTEGER (Write)
 *          The number of output tiles used to hold the entire output
 *          array (see parameter TILEDIMS). If no input data fall within
@@ -1067,6 +1076,8 @@
 *        Rename TRIMBAD parameter as TRIM (for consistency with MAKECUBE).
 *     2011-05-17 (DSB):
 *        Added parameter POINTING.
+*     2011-06-27 (EC):
+*        Added NCONTCHUNK, NMINSMP, NMCNVG
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -1853,6 +1864,9 @@ void smurf_makemap( int *status ) {
     Grp *shortrootgrp = NULL;
     char tempfile[GRP__SZNAM+1];
     double nboloeff = 0.0;
+    size_t ncontchunks=0;
+    size_t ninsmp=0;
+    size_t ncnvg=0;
     NdgProvenance * oprov = NULL;
 
     /************************* I T E R A T E *************************************/
@@ -1971,9 +1985,14 @@ void smurf_makemap( int *status ) {
     /* Call the low-level iterative map-maker */
 
     smf_iteratemap( wf, igrp, iterrootgrp, bolrootgrp, shortrootgrp,
-                    flagrootgrp, keymap, NULL, bbms, flatramps, outfset, moving,
-                    lbnd_out, ubnd_out, maxmem-mapmem, map, hitsmap, exp_time,
-                    variance, mapqual, weights, data_units, &nboloeff, status );
+                    flagrootgrp, keymap, NULL, bbms, flatramps, outfset,
+                    moving, lbnd_out, ubnd_out, maxmem-mapmem, map, hitsmap,
+                    exp_time, variance, mapqual, weights, data_units,
+                    &nboloeff, &ncontchunks, &ninsmp, &ncnvg, status );
+
+    parPut0i( "NCONTCHUNK", (int) ncontchunks, status );
+    parPut0i( "NMINSMP", (int) ninsmp, status );
+    parPut0i( "NMCNVG", (int) ncnvg, status );
 
     if( bolrootgrp ) grpDelet( &bolrootgrp, status );
     if( iterrootgrp ) grpDelet( &iterrootgrp, status );

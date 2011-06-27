@@ -2618,6 +2618,30 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter ncontchunk {
+                type _INTEGER
+                access WRITE
+                vpath DEFAULT
+                default 0
+                helpkey *
+            }
+
+            parameter nmcnvg {
+                type _INTEGER
+                access WRITE
+                vpath DEFAULT
+                default 0
+                helpkey *
+            }
+
+            parameter nminsmp {
+                type _INTEGER
+                access WRITE
+                vpath DEFAULT
+                default 0
+                helpkey *
+            }
+
             parameter ntile {
                 type _INTEGER
                 access WRITE

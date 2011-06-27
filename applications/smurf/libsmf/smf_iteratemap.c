@@ -22,7 +22,9 @@
 *                    int moving, int *lbnd_out, int *ubnd_out, size_t maxmem,
 *                    double *map, int *hitsmap, double *exp_time,
 *                    double *mapvar, smf_qual_t *mapqual, double *weights,
-*                    char data_units[], double *nboloeff, int *status );
+*                    char data_units[], double *nboloeff,
+*                    size_t *numcontchunks, size_t *numinsmp, size_t *numcnvg,
+*                     int *status );
 
 *  Arguments:
 *     wf = smfWorkForce * (Given)
@@ -82,6 +84,15 @@
 *     nboloeff = double * (Returned)
 *        If non-NULL, will contain the effective number of bolometers used
 *        to create the map.
+*     numcontchunks = size_t *(Returned)
+*        If non-NULL, will contain the number of continuous data chunks that
+*        were processed.
+*     numinsmp = size_t *(Returned)
+*        If non-NULL, will contain the number of continuous data chunks that
+*        did not go into the map due to insufficient samples.
+*     numcnvg = size_t *(Returned)
+*        If non-NULL, will contain the number of continuous data chunks that
+*        did not converge (although they are still added to the map).
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -353,9 +364,8 @@
 *     2011-04-15 (EC):
 *        Optionally handle subarrays separately with new groupsubarray flag
 *     2011-06-27 (EC):
-*        Report # chunks with no samples or bad convergence, and set
-*        SMF__MINSMP or SMF__MCNVG status respecitively at the end before
-*        returning.
+*        Report # chunks with no samples or bad convergence, and return
+*        along with ncontchunks back to the caller.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -396,6 +406,7 @@
 #include "sae_par.h"
 #include "star/ndg.h"
 #include "prm_par.h"
+#include "par.h"
 #include "par_par.h"
 #include "star/one.h"
 #include "star/atl.h"
@@ -421,7 +432,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      int moving, int *lbnd_out, int *ubnd_out, size_t maxmem,
                      double *map, int *hitsmap, double * exp_time,
                      double *mapvar, smf_qual_t *mapqual, double *weights,
-                     char data_units[], double * nboloeff, int *status ) {
+                     char data_units[], double * nboloeff,
+                     size_t *numcontchunks, size_t *numinsmp,
+                     size_t *numcnvg, int *status ) {
 
   /* Local Variables */
   smfArray **ast=NULL;          /* Astronomical signal */
@@ -2028,8 +2041,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                   status);
 
           /* Increment counter of how many chunks did not converge so
-             that we can set SMF__MCNVG at the very end before
-             returning */
+             that we can tell the caller */
           count_mcnvg++;
         }
       }
@@ -2333,13 +2345,13 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       }
     }
 
-    /* If we get here and there is a SMF__INSMP we probably flagged all
-       of the data as bad for some reason. In a multi-contchunk map it is
-       annoying to have the whole thing die here. So, annul the error,
-       warn the user, and then continue on... This will also help us
-       to properly free up resources used by this chunk. However, we use
-       the count_minsmp to remember that this happened, and will set
-       SMF__MINSMP before returning at the very end. */
+    /* If we get here and there is a SMF__INSMP we probably flagged
+       all of the data as bad for some reason. In a multi-contchunk
+       map it is annoying to have the whole thing die here. So, annul
+       the error, warn the user, and then continue on... This will
+       also help us to properly free up resources used by this
+       chunk. However, we use the count_minsmp to remember that this
+       happened, and will tell the caller. */
 
     if( *status == SMF__INSMP ) {
       errAnnul( status );
@@ -2576,15 +2588,8 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   /* Ensure that FFTW doesn't have any used memory kicking around */
   fftw_cleanup();
 
-  /* Last thing before we return. We check to see if any chunk failed due
-     to insufficient map samples and set SMF__MINSMP. IF not, we then
-     check to see if any chunks failed to converge and set SMF__MCNVG. Since
-     we can only set bad status for one of them, we also generate a message
-     reporting both of them first. */
-
-
-  /* Report count_minsmp and count_mcnvg here before we set bad status
-     for only one of them */
+  /* Report count_minsmp, count_mcnvg, as well as reporting back
+     continuous chunk counters to caller */
   if( count_minsmp || count_mcnvg ) {
     msgOut(""," ************************* Warning! *************************",
            status );
@@ -2595,21 +2600,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
            status );
   }
 
-  if( *status == SAI__OK ) {
-    if( count_minsmp ) {
-      *status = SMF__MINSMP;
-      errRepf( "", FUNC_NAME
-              ": %zu / %zu chunks of data failed to produce a map due "
-               "to insufficient samples. This usually happens if all of "
-               "the data were flagged as bad for some reason.", status,
-               count_minsmp, ncontchunks );
-    } else if( count_mcnvg ) {
-      *status = SMF__MCNVG;
-      errRepf( "", FUNC_NAME
-               ": %zu / %zu chunks of data failed to converge. Try setting "
-               "itermap=1, and then inspect the .more.smurf.itermaps "
-               "extensions to investigate the convergence visually.", status,
-               count_mcnvg, ncontchunks );
-    }
-  }
+  if( numcontchunks) *numcontchunks = ncontchunks;
+  if( numinsmp ) *numinsmp = count_minsmp;
+  if( numcnvg ) *numcnvg = count_mcnvg;
 }
