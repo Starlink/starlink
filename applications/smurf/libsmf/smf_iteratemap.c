@@ -24,7 +24,7 @@
 *                    double *mapvar, smf_qual_t *mapqual, double *weights,
 *                    char data_units[], double *nboloeff,
 *                    size_t *numcontchunks, size_t *numinsmp, size_t *numcnvg,
-*                     int *status );
+*                    int *status );
 
 *  Arguments:
 *     wf = smfWorkForce * (Given)
@@ -1826,6 +1826,10 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                                  outfset, res[i]->sdata[0]->hdr, qua[i],
                                  status );
 
+              /*** TIMER ***/
+              msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+                         ": ** %f s writing itermap",
+                         status, smf_timerupdate(&tv1,&tv2,status) );
             }
           }
 
@@ -2081,6 +2085,11 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           smf_write_bolomap( ast[0], res[0], lut[0], qua[0], &dat, msize,
                              bolrootgrp, varmapmethod, lbnd_out, ubnd_out,
                              outfset, status );
+
+          /*** TIMER ***/
+          msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+                     ": ** %f s writing bolomap",
+                     status, smf_timerupdate(&tv1,&tv2,status) );
         }
       }
 
@@ -2096,6 +2105,10 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           smf_write_shortmap( shortmap, ast[0], res[0], lut[0], qua[0], &dat,
                               msize, shortrootgrp, contchunk, varmapmethod,
                               lbnd_out, ubnd_out, outfset, status );
+          /*** TIMER ***/
+          msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+                     ": ** %f s writing shortmap",
+                     status, smf_timerupdate(&tv1,&tv2,status) );
         }
       }
 
@@ -2110,6 +2123,10 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         } else {
           smf_write_flagmap( flagmap, lut[0], qua[0], &dat, flagrootgrp,
                              contchunk, lbnd_out, ubnd_out, outfset, status );
+          /*** TIMER ***/
+          msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+                     ": ** %f s writing flagmap",
+                     status, smf_timerupdate(&tv1,&tv2,status) );
         }
       }
 
