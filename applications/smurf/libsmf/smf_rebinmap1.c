@@ -250,7 +250,8 @@ void smf_rebinmap1( smfData *data, smfData *variance, int *lut,
                   &vtstride, status );
 
     /* Check that the variance dimensions are compatible with data */
-    if( (vnbolo != nbolo) || ( (vntslice>1) && (vntslice!=ntslice) ) ) {
+    if( (*status==SAI__OK) &&
+        ((vnbolo != nbolo) || ((vntslice>1)&&(vntslice!=ntslice))) ) {
       *status = SAI__ERROR;
       errRep(" ", FUNC_NAME ": variance dimensions incompatible with data",
              status );
