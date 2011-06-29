@@ -2682,12 +2682,17 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   /* Report count_minsmp, count_mcnvg, as well as reporting back
      continuous chunk counters to caller */
   if( count_minsmp || count_mcnvg ) {
-    msgOut(""," ************************* Warning! *************************",
+    msgOut("","*************** Warning! ***************",
            status );
-    msgOutf( "", " Of %zu continuous chunks, %zu failed due to "
-             "insufficient samples, and %zu did not converge.", status,
-             ncontchunks, count_minsmp, count_mcnvg );
-    msgOut(""," ************************************************************",
+    msgOutf( "", "Of %zu continuous chunk:", status, ncontchunks );
+    if( count_minsmp ) {
+      msgOutf( "", "     %zu failed due to insufficient samples", status,
+               count_minsmp );
+    }
+    if( count_mcnvg ) {
+      msgOutf( "", "     %zu did not converge", status, count_mcnvg );
+    }
+    msgOut("","****************************************",
            status );
   }
 
