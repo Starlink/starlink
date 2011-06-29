@@ -53,6 +53,12 @@
 *     each sample when estimating the map.
 
 *  Notes:
+*     The outer loop when projected data into each plane of the cube is
+*     over bolometer, and the inner loop is over time. This means that
+*     the earlier planes in the cube are dominated by samples from the
+*     earlier bolometers, and the later planes are dominated by samples
+*     from the later bolometers. i.e., the third dimension of the data
+*     cube is more closely related to bolometer than time.
 
 *  Authors:
 *     EC: Ed Chapin (UBC)
