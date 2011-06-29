@@ -16,7 +16,8 @@
 
 *     smf_iteratemap(smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 *                    const Grp *bolrootgrp, const Grp *shortrootgrp,
-*                    const Grp *flagrootgrp, AstKeyMap *keymap,
+*                    const Grp *flagrootgrp, const Grp *samprootgrp,
+*                    AstKeyMap *keymap,
 *                    const smfArray * darks, const smfArray *bbms,
 *                    const smfArray * flatramps, AstFrameSet *outfset,
 *                    int moving, int *lbnd_out, int *ubnd_out, size_t maxmem,
@@ -42,6 +43,9 @@
 *        path to an HDS container.
 *     flagrootgrp = const Grp * (Given)
 *        Root name to use for flag output maps (if required). Can be a
+*        path to an HDS container.
+*     samprootgrp = const Grp * (Given)
+*        Root name to use for sample output cubes (if required). Can be a
 *        path to an HDS container.
 *     keymap = AstKeyMap* (Given)
 *        keymap containing parameters to control map-maker
@@ -366,6 +370,8 @@
 *     2011-06-27 (EC):
 *        Report # chunks with no samples or bad convergence, and return
 *        along with ncontchunks back to the caller.
+*     2011-06-29 (EC):
+*        Add sampcubes extension
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -373,7 +379,7 @@
 *  Copyright:
 *     Copyright (C) 2008-2010 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2006-2010 University of British Columbia.
+*     Copyright (C) 2006-2011 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -426,7 +432,8 @@
 /* Main routine */
 void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      const Grp *bolrootgrp, const Grp *shortrootgrp,
-                     const Grp *flagrootgrp, AstKeyMap *keymap,
+                     const Grp *flagrootgrp, const Grp *samprootgrp,
+                     AstKeyMap *keymap,
                      const smfArray *darks, const smfArray *bbms,
                      const smfArray * flatramps, AstFrameSet *outfset,
                      int moving, int *lbnd_out, int *ubnd_out, size_t maxmem,
@@ -525,6 +532,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   smfArray **res=NULL;          /* Residual signal */
   double *res_data=NULL;        /* Pointer to DATA component of res */
   smfGroup *resgroup=NULL;      /* smfGroup of model residual files */
+  int sampcube;                 /* write SAMPCUBES extensions? */
   double scalevar=0;            /* scale factor for variance */
   int shortmap=0;               /* If set, produce maps every shortmap tslices*/
   double steptime;              /* Length of a sample in seconds */
@@ -666,6 +674,9 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           flagmap |= smf_qual_str_to_val( flagname, NULL, status );
         }
       }
+
+      /* Are we going to produce SAMPCUBES extensions? */
+      astMapGet0I( keymap, "SAMPCUBE", &sampcube );
 
       /* Are we going to apply the flatfield when we load data? */
       astMapGet0I( keymap, "ENSUREFLAT", &ensureflat );
@@ -2071,9 +2082,30 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
          previous contchunks if necessary.
       *********************************************************************** */
 
-      /* Create sub-maps for each bolometer if requested. We add AST back
-         into the residual, and rebin that single for each detector that
-         is flagged as being OK */
+      /* ---------------------------------------------------------------- */
+      /* All of bolomap, shortmap and sampcube require AST to be added back
+         into RES so that we can re-rebin maps. We can only currently
+         do these operations only if memiter is true. */
+
+      if( memiter && (bolomap || shortmap || sampcube) ) {
+        for( idx=0; (idx<res[0]->ndat)&&(*status==SAI__OK); idx++ ){
+          smf_get_dims( res[0]->sdata[idx], NULL, NULL, NULL, NULL,
+                        &dsize, NULL, NULL, status );
+
+          res_data = res[0]->sdata[idx]->pntr[0];
+          ast_data = ast[0]->sdata[idx]->pntr[0];
+          qua_data = qua[0]->sdata[idx]->pntr[0];
+
+          /* Add ast back into res. Mask should match ast_calcmodel_ast. */
+          for( k=0; k<dsize; k++ ) {
+            if( !(qua_data[k]&SMF__Q_MOD) && (ast_data[k]!=VAL__BADD) ) {
+              res_data[k] += ast_data[k];
+            }
+          }
+        }
+      }
+
+      /* Create sub-maps for each bolometer if requested. */
 
       if( bolomap ) {
         /* Currently only support memiter=1 case to avoid having to do
@@ -2082,7 +2114,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           msgOut( "", FUNC_NAME
                   ": *** WARNING *** bolomap=1, but memiter=0", status );
         } else {
-          smf_write_bolomap( ast[0], res[0], lut[0], qua[0], &dat, msize,
+          smf_write_bolomap( res[0], lut[0], qua[0], &dat, msize,
                              bolrootgrp, varmapmethod, lbnd_out, ubnd_out,
                              outfset, status );
 
@@ -2102,7 +2134,7 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           msgOut( "", FUNC_NAME
                   ": *** WARNING *** shortmap=1, but memiter=0", status );
         } else {
-          smf_write_shortmap( shortmap, ast[0], res[0], lut[0], qua[0], &dat,
+          smf_write_shortmap( shortmap, res[0], lut[0], qua[0], &dat,
                               msize, shortrootgrp, contchunk, varmapmethod,
                               lbnd_out, ubnd_out, outfset, status );
           /*** TIMER ***/
@@ -2111,6 +2143,48 @@ void smf_iteratemap( smfWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      status, smf_timerupdate(&tv1,&tv2,status) );
         }
       }
+
+      /* Create a data sample cube where the first two dimensions
+         match the map, and the third dimension enumerates samples that
+         land in each pixel */
+
+      if( sampcube ) {
+        if( !memiter ) {
+          msgOut( "", FUNC_NAME
+                  ": *** WARNING *** sampcube=1, but memiter=0",
+                  status );
+        } else {
+          smf_write_sampcube( res[0], lut[0], qua[0], &dat, thishits,
+                              samprootgrp, contchunk, lbnd_out, ubnd_out,
+                              status );
+
+          /*** TIMER ***/
+          msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+                     ": ** %f s writing sampcube",
+                     status, smf_timerupdate(&tv1,&tv2,status) );
+        }
+      }
+
+      /* Now we can remove AST from RES again before continuing */
+
+      if( memiter && (bolomap || shortmap || sampcube) ) {
+        for( idx=0; (idx<res[0]->ndat)&&(*status==SAI__OK); idx++ ){
+          smf_get_dims( res[0]->sdata[idx], NULL, NULL, NULL, NULL,
+                        &dsize, NULL, NULL, status );
+
+          res_data = res[0]->sdata[idx]->pntr[0];
+          ast_data = ast[0]->sdata[idx]->pntr[0];
+          qua_data = qua[0]->sdata[idx]->pntr[0];
+
+          /* Add ast back into res. Mask should match ast_calcmodel_ast. */
+          for( k=0; k<dsize; k++ ) {
+            if( !(qua_data[k]&SMF__Q_MOD) && (ast_data[k]!=VAL__BADD) ) {
+              res_data[k] -= ast_data[k];
+            }
+          }
+        }
+      }
+      /* ---------------------------------------------------------------- */
 
       /* Create maps indicating locations of flags matching bitmask */
 

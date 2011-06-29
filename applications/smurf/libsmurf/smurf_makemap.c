@@ -1078,6 +1078,8 @@
 *        Added parameter POINTING.
 *     2011-06-27 (EC):
 *        Added NCONTCHUNK, NMINSMP, NMCNVG
+*     2011-06-29 (EC):
+*        Added sampcubes extensions to iterative map-maker
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -1861,6 +1863,7 @@ void smurf_makemap( int *status ) {
     Grp *bolrootgrp = NULL;
     Grp *flagrootgrp = NULL;
     Grp *iterrootgrp = NULL;
+    Grp *samprootgrp = NULL;
     Grp *shortrootgrp = NULL;
     char tempfile[GRP__SZNAM+1];
     double nboloeff = 0.0;
@@ -1911,6 +1914,13 @@ void smurf_makemap( int *status ) {
     one_strlcat( tempfile, ".MORE.SMURF.FLAGMAPS", sizeof(tempfile), status);
     flagrootgrp = grpNew( "flagmap root", status );
     grpPut1( flagrootgrp, tempfile, 0, status );
+
+    /* Work out the name for the sample cube file path if sampcubes are being
+       created*/
+    grpGet( ogrp, 1, 1, &pname, sizeof(tempfile), status );
+    one_strlcat( tempfile, ".MORE.SMURF.SAMPCUBES", sizeof(tempfile), status);
+    samprootgrp = grpNew( "sampcube root", status );
+    grpPut1( samprootgrp, tempfile, 0, status );
 
     /* Compute number of pixels in output map */
     nxy = (ubnd_out[0] - lbnd_out[0] + 1) * (ubnd_out[1] - lbnd_out[1] + 1);
@@ -1985,9 +1995,9 @@ void smurf_makemap( int *status ) {
     /* Call the low-level iterative map-maker */
 
     smf_iteratemap( wf, igrp, iterrootgrp, bolrootgrp, shortrootgrp,
-                    flagrootgrp, keymap, NULL, bbms, flatramps, outfset,
-                    moving, lbnd_out, ubnd_out, maxmem-mapmem, map, hitsmap,
-                    exp_time, variance, mapqual, weights, data_units,
+                    flagrootgrp, samprootgrp, keymap, NULL, bbms, flatramps,
+                    outfset, moving, lbnd_out, ubnd_out, maxmem-mapmem, map,
+                    hitsmap, exp_time, variance, mapqual, weights, data_units,
                     &nboloeff, &ncontchunks, &ninsmp, &ncnvg, status );
 
     parPut0i( "NCONTCHUNK", (int) ncontchunks, status );
@@ -1998,6 +2008,7 @@ void smurf_makemap( int *status ) {
     if( iterrootgrp ) grpDelet( &iterrootgrp, status );
     if( shortrootgrp ) grpDelet( &shortrootgrp, status );
     if( flagrootgrp ) grpDelet( &flagrootgrp, status );
+    if( samprootgrp ) grpDelet( &samprootgrp, status );
 
     /* free the hits map */
     hitsmap = astFree( hitsmap );

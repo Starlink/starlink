@@ -98,6 +98,10 @@ exportndf = 0
 #
 #flagmap = (BADBOL,SPIKE,DCJUMP,COM)
 
+# Create .MORE.SMURF.SAMPCUBES extensions providing data cubes of data samples
+# that go into each map pixel?
+#sampcube = 1
+
 # Apply the flatfield if loading raw data? Default is 1 (true) -- you must
 # explicitly set this to 0 if you want to produce a map in raw DAC units (and
 # also supply raw data).

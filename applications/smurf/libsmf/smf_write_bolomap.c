@@ -13,15 +13,13 @@
 *     Library routine
 
 *  Invocation:
-*     smf_write_bolomap( smfArray *ast, smfArray *res, smfArray *lut,
+*     smf_write_bolomap( smfArray *res, smfArray *lut,
 *                        smfArray *qua, smfDIMMData *dat, dim_t msize,
 *                        const Grp *bolrootgrp, int varmapmethod,
 *                        const int *lbnd_out, const int *ubnd_out,
 *                        AstFrameSet *outfset, int *status ) {
 
 *  Arguments:
-*     ast = smfArray* (Given)
-*        AST model smfArray
 *     res = smfArray* (Given)
 *        RES model smfArray
 *     lut = smfArray* (Given)
@@ -51,11 +49,8 @@
 *     NDF. The root of the name is supplied by bolrootgrp, and the
 *     suffix will be ???C##R##, where the first 3 characters indicate
 *     the subarray, "C" refers to the column, and "R" refers to the
-*     row of the bolometer. The AST and RES data are temporarily
-*     combined in this routine before re-gridding into the output map
-*     for each detector. Upon completion AST is once again subtracted
-*     from RES. No maps will be made for bolometers flaged as
-*     SMF__Q_BADB.
+*     row of the bolometer. RES contains the data to be rebinned. No
+*     maps will be made for bolometers flaged as SMF__Q_BADB.
 
 *  Notes:
 
@@ -72,6 +67,8 @@
 *        the subarray string in output name.
 *     2011-03-28 (EC):
 *        Don't write a different map for each chunk, instead combine them
+*     2011-06-29 (EC):
+*        Remove ast from interface since res+ast sum now in smf_iteratemap
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -119,14 +116,13 @@
 
 #define FUNC_NAME "smf_write_bolomap"
 
-void smf_write_bolomap( smfArray *ast, smfArray *res, smfArray *lut,
+void smf_write_bolomap( smfArray *res, smfArray *lut,
                         smfArray *qua, smfDIMMData *dat, dim_t msize,
                         const Grp *bolrootgrp, int varmapmethod,
                         const int *lbnd_out, const int *ubnd_out,
                         AstFrameSet *outfset, int *status ) {
 
   int addtomap=0;               /* Set if adding to existing map */
-  double *ast_data=NULL;        /* Pointer to DATA component of ast */
   size_t bstride;               /* Bolometer stride */
   double *curmap=NULL;          /* Pointer to current map being rebinned */
   double *curvar=NULL;          /* Pointer to variance associate with curmap */
@@ -143,7 +139,7 @@ void smf_write_bolomap( smfArray *ast, smfArray *res, smfArray *lut,
 
   if( *status != SAI__OK ) return;
 
-  if( !ast || !res || !lut || !qua || !dat || !bolrootgrp ||
+  if( !res || !lut || !qua || !dat || !bolrootgrp ||
       !lbnd_out || !ubnd_out || !outfset ) {
     *status = SAI__ERROR;
     errRep( "", FUNC_NAME ": NULL inputs supplied", status );
@@ -158,21 +154,12 @@ void smf_write_bolomap( smfArray *ast, smfArray *res, smfArray *lut,
     int *bhitsmap = NULL;
 
     /* Pointers to everything we need */
-    ast_data = ast->sdata[idx]->pntr[0];
     res_data = res->sdata[idx]->pntr[0];
     lut_data = lut->sdata[idx]->pntr[0];
     qua_data = qua->sdata[idx]->pntr[0];
 
     smf_get_dims( res->sdata[idx], NULL, NULL, &nbolo, NULL,
                   &dsize, &bstride, NULL, status );
-
-    /* Add ast back into res. Mask should match ast_calcmodel_ast. */
-
-    for( k=0; k<dsize; k++ ) {
-      if( !(qua_data[k]&SMF__Q_MOD) && (ast_data[k]!=VAL__BADD) ) {
-        res_data[k] += ast_data[k];
-      }
-    }
 
     /* Make a copy of the quality at first time slice as a good
        bolo mask, and then set quality to SMF__Q_BADB. Later we
@@ -352,13 +339,6 @@ void smf_write_bolomap( smfArray *ast, smfArray *res, smfArray *lut,
     bmapweight = astFree( bmapweight );
     bmapweightsq = astFree( bmapweightsq );
     bhitsmap = astFree( bhitsmap );
-
-    /* Remove ast from res once again */
-    for( k=0; k<dsize; k++ ) {
-      if( !(qua_data[k]&SMF__Q_MOD) && (ast_data[k]!=VAL__BADD) ) {
-        res_data[k] -= ast_data[k];
-      }
-    }
   }
 
   msgOutf( "", "*** Wrote %zu bolo maps", status, nbolomaps );

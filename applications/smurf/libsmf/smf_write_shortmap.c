@@ -13,8 +13,8 @@
 *     Library routine
 
 *  Invocation:
-*     smf_write_shortmap( int shortmap, smfArray *ast, smfArray *res,
-*                         smfArray *lut, smfArray *qua, smfDIMMData *dat,
+*     smf_write_shortmap( int shortmap, smfArray *res, smfArray *lut,
+*                         smfArray *qua, smfDIMMData *dat,
 *                         dim_t msize, const Grp *shortrootgrp,size_t contchunk,
 *                         int varmapmethod, const int *lbnd_out,
 *                         const int *ubnd_out, AstFrameSet *outfset,
@@ -25,10 +25,8 @@
 *        Number of time slices per short map, or if set to -1, create a map
 *        each time TCS_INDEX is incremented (i.e., produce a map each time
 *        a full pass through the scan pattern is completed).
-*     ast = smfArray* (Given)
-*        AST model smfArray
 *     res = smfArray* (Given)
-*        RES model smfArray
+*        RES model smfArray to be rebeinned
 *     lut = smfArray* (Given)
 *        LUT model smfArray
 *     qua = smfArray* (Given)
@@ -58,11 +56,10 @@
 *     shortmap timeslices of data, in an NDF. The root of the name is
 *     supplied by shortrootgrp, and the suffix will be CH##SH######,
 *     where "CH" is the continuous chunk, and "SH" refers to the
-*     shortmap number. The AST and RES data are temporarily combined
-*     in this routine before re-gridding into the output map for each
-*     shortmap. Upon completion AST is once again subtracted from
-*     RES. The following FITS keywords are set to keep track of which
-*     portion of the data were used for each shortmap:
+*     shortmap number. RES contains the data to be rebinned. The
+*     following FITS keywords are set to keep track of which portion
+*     of the data were used for each shortmap:
+
 *
 *       SEQSTART: the RTS index number of first frame
 *         SEQEND: the RTS index number of last frame
@@ -80,10 +77,12 @@
 *        Initial version factored out of smf_iteratemap.
 *     2010-09-22 (EC):
 *        If shortmap=0, create map each time TCS_INDEX increments
+*     2011-06-29 (EC):
+*        Remove ast from interface since res+ast sum now in smf_iteratemap
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2010 University of British Columbia
+*     Copyright (C) 2010-2011 University of British Columbia
 *     All Rights Reserved.
 
 *  Licence:
@@ -123,14 +122,13 @@
 
 #define FUNC_NAME "smf_write_shortmap"
 
-void smf_write_shortmap( int shortmap, smfArray *ast, smfArray *res,
-                         smfArray *lut, smfArray *qua, smfDIMMData *dat,
+void smf_write_shortmap( int shortmap, smfArray *res, smfArray *lut,
+                         smfArray *qua, smfDIMMData *dat,
                          dim_t msize, const Grp *shortrootgrp, size_t contchunk,
                          int varmapmethod, const int *lbnd_out,
                          const int *ubnd_out, AstFrameSet *outfset,
                          int *status ) {
 
-  double *ast_data=NULL;        /* Pointer to DATA component of ast */
   dim_t dsize;                  /* Size of data arrays in containers */
   size_t i;                     /* loop counter */
   size_t idx=0;                 /* index within subgroup */
@@ -154,7 +152,7 @@ void smf_write_shortmap( int shortmap, smfArray *ast, smfArray *res,
 
   if( *status != SAI__OK ) return;
 
-  if( !ast || !res || !lut || !qua || !dat || !shortrootgrp ||
+  if( !res || !lut || !qua || !dat || !shortrootgrp ||
       !lbnd_out || !ubnd_out || !outfset || !shortmap ) {
     *status = SAI__ERROR;
     errRep( "", FUNC_NAME ": NULL inputs supplied", status );
@@ -255,20 +253,12 @@ void smf_write_shortmap( int shortmap, smfArray *ast, smfArray *res,
       int rebinflag = 0;
 
       /* Pointers to everything we need */
-      ast_data = (ast->sdata[idx]->pntr)[0];
       res_data = (res->sdata[idx]->pntr)[0];
       lut_data = (lut->sdata[idx]->pntr)[0];
       qua_data = (qua->sdata[idx]->pntr)[0];
 
       smf_get_dims( res->sdata[idx], NULL, NULL, NULL, &ntslice,
                     &dsize, NULL, &tstride, status );
-
-      /* Add ast back into res. Mask should match ast_calcmodel_ast. */
-      for( k=0; k<dsize; k++ ) {
-        if( !(qua_data[k]&SMF__Q_MOD) && (ast_data[k]!=VAL__BADD) ) {
-          res_data[k] += ast_data[k];
-        }
-      }
 
       /* Rebin the data for this range of tslices. */
       if( idx == 0 ) {
@@ -301,13 +291,6 @@ void smf_write_shortmap( int shortmap, smfArray *ast, smfArray *res,
                      mapdata->pntr[0],
                      shortmapweight, shortmapweightsq, shorthitsmap,
                      mapdata->pntr[1], msize, NULL, status );
-
-      /* Remove ast from res once again */
-      for( k=0; k<dsize; k++ ) {
-        if( !(qua_data[k]&SMF__Q_MOD) && (ast_data[k]!=VAL__BADD) ) {
-          res_data[k] -= ast_data[k];
-        }
-      }
 
       /* Write out FITS header */
       if( (*status == SAI__OK) && res->sdata[idx]->hdr &&
