@@ -119,7 +119,7 @@ void smf_write_sampcube( const smfArray *res, const smfArray *lut,
   size_t bstride;               /* Time series cube bolo stride */
   double *data=NULL;            /* Data buffer */
   size_t di;                    /* data time series cube index */
-  size_t dsize;                 /* Number of elements in data buffer */
+  dim_t dsize;                  /* Number of elements in data buffer */
   size_t height;                /* Height of the map */
   size_t *hitscount=NULL;       /* Local 2d hits counter */
   size_t i;                     /* loop counter */
