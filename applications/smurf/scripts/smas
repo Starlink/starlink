@@ -288,8 +288,8 @@ foreach n (`cat $inlist`)
       $KAPPA_DIR/fitslist $in smas-fits.log
       set system0 = $system
    else
-      if( $subarray != $sar ) then
-         echo "$n is for subarray $subarrray, which is not the same as the first NDF"
+      if( $array != $sar ) then
+         echo "$n is for subarray $subarray, which is not the same as the first NDF"
          exit
       endif
       if( $system != $system0 ) then
