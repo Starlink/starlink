@@ -96,7 +96,9 @@
 *          the OUTCAT parameter can be used to create a catalogue holding
 *          details of the source position and amplitude in every time slice.
 *          A single time slice from this cube can also be written to an
-*          output NDF (see parameter OUTSLICE).
+*          output NDF (see parameter OUTSLICE). A list of time slices in
+*          which the reference point is close to a specified bolometer can
+*          also be produced (see parameter XBOL).
 *     INFITX = NDF (Read)
 *          A 2D NDF holding fitted focal plane X offsets (in mm) at every
 *          bolometer, or null (!). This NDF shoudl have been created by
@@ -192,6 +194,19 @@
 *          "s8b", "s8d", "s4a", "s4b", "s4b", "s4d". If OUTMAG is not
 *          null, then the value supplied for SUBARRAY determines the waveband
 *          for which the distortion is returned.
+*     XBOL = _INTEGER (Read)
+*          The index of a test bolometer on the first GRID axis within
+*          the sub-array containing the bolometer. If values are supplied
+*          for all of IN, XBOL, YBOL and RADIUS, then a list of time slice
+*          indices are displayed. These are the indicies of the time
+*          slice in which the reference point is close to the bolometer
+*          specified by (XBOL,YBOL). The RADIUS parameter spcified the
+*          distance limit. [!]
+*     YBOL = _INTEGER (Read)
+*          The index of a test bolometer on the second GRID axis within
+*          the sub-array containing the bolometer. See XBOL. [!]
+*     RADIUS = _REAL (Given)
+*          The radius of a test circle, in bolometers. See XBOL. [!]
 
 *  Related Applications:
 *     SMURF: DISTORTION, SHOWDISTORTION
@@ -329,6 +344,7 @@ static void PutHeader( FILE *fp, AstKeyMap *header, int *status );
 static AstPolyMap *FindPolyMap( AstMapping *map, int *status );
 static double *SmoothZ( int zbox, int nrow, double *in_vals, double *iz_vals, int *status );
 static double Mode( int n, double *vals, double *dev, int * status );
+static int FindSlices( const char *pxbol, const char *pybol, const char *pradius, smfData *data, int *status );
 
 
 #define __USE_GNU 1
@@ -1441,6 +1457,10 @@ void smurf_dsutils( int *status ) {
 
 /* Obtain information about the input NDF. */
       smf_open_file( igrp, 1, "READ", 0, &data, status );
+
+/* Display the indicies of time slices for which the reference position
+   is close a to a specified bolometer. */
+      if( FindSlices( "XBOL", "YBOL", "RADIUS", data, status ) ) goto L998;
 
 /* Write the Mapping from a modified PIXEL Frame to the SKY offset frame.
    The PIXEL frame is modified in the sense that its origin (i.e. pixel
@@ -2715,4 +2735,83 @@ static void Filter2( int n, double *flags, double *vals, double nsigma,
    printf("Mode filtering %s removed %d rows\n", title, nrej );
 
 }
+
+
+
+/* Display details of times slices in which the reference position is close
+   to a nomiated bolometer. */
+
+static int FindSlices( const char *pxbol, const char *pybol, const char *pradius,
+                       smfData *data, int *status ) {
+
+
+/* Local Variables: */
+   AstFrameSet *swcsin = NULL;
+   const char *srefis;
+   double ox;
+   double oy;
+   double gx;
+   double gy;
+   float radius, r2;
+   dim_t itime;
+   int ix, iy;
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return 0;
+
+/* Get the required parameter values. */
+   parGet0i( pxbol, &ix, status );
+   parGet0i( pybol, &iy, status );
+   parGet0r( pradius, &radius, status );
+
+/* If any parameters were not supplied, annul the error and return. */
+   if( *status == PAR__NULL ) {
+      errAnnul( status );
+      return 0;
+   }
+
+   astBegin;
+
+/* Store squared radius */
+   r2 = radius*radius;
+
+/* Loop over all time slices. */
+   for( itime = 0; itime <  data->dims[ 2 ]; itime++ ) {
+
+/* Get the WCS FrameSet describing the time slice. Current frame is AZEL
+   at the epoch of the time slice. */
+      smf_tslice_ast( data, itime, 1, status );
+      swcsin = data->hdr->wcs;
+
+/* Ensure the current Frame is offsets from the reference point. */
+      srefis = astGetC( swcsin, "SkyRefIs" );
+      astSet( swcsin, "SkyRefIs=ORIGIN" );
+
+/* Get the grid coords of the reference poition. */
+      ox = 0.0;
+      oy = 0.0;
+      astTran2( swcsin, 1, &ox, &oy, 0, &gx, &gy );
+
+      astSetC( swcsin, "SkyRefIs", srefis );
+
+/* Check they are good. */
+      if( gx != AST__BAD && gy != AST__BAD ) {
+
+/* See if the reference point is close to the specified bolometer. */
+         gx -= ix;
+         gy -= iy;
+         if( gx*gx + gy*gy < r2 ) {
+            printf( "%d: %g %g\n", (int) itime, gx + ix, gy + iy );
+         }
+      }
+   }
+
+/* Export the swcsin pointer, since it is annulled explicitly when the
+   input data file is closed. */
+   astExport( swcsin );
+   astEnd;
+
+   return 1;
+}
+
 

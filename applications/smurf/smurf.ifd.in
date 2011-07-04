@@ -1110,11 +1110,35 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter radius {
+                type _REAL
+                prompt {Radius of test circle (in bolometers)}
+                default !
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                helpkey *
+            }
             parameter subarray {
                 type LITERAL
                 prompt {SCUBA-2 sub-array name}
                 ppath CURRENT DEFAULT
                 default s8d
+                helpkey *
+            }
+            parameter xbol {
+                type _INTEGER
+                prompt {X GRID index of test bolometer}
+                default !
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                helpkey *
+            }
+            parameter ybol {
+                type _INTEGER
+                prompt {Y GRID index of test bolometer}
+                default !
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
                 helpkey *
             }
             parameter zbox {
