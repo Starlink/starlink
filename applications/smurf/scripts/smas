@@ -266,11 +266,11 @@ foreach n (`cat $inlist`)
    endif
 
 #  Get the coordinate system used by MAKEMAP
-   $KAPPA_DIR/hislist $in | grep -q SYSTEM=\'TRACKING\'
+   $KAPPA_DIR/hislist $in | grep -qi SYSTEM=\'TRACKING\'
    if( $status == 0 ) then
       set system = "TRACKING"
    else
-      $KAPPA_DIR/hislist $in | grep -q SYSTEM=\'AZEL\'
+      $KAPPA_DIR/hislist $in | grep -qi SYSTEM=\'AZEL\'
       if( $status == 0 ) then
          set system = "AZEL"
       else
