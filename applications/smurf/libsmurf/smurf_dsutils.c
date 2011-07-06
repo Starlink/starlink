@@ -90,15 +90,14 @@
 *          in OUTANG. No offset is removed if a null (!) value is supplied. [!]
 *     IN = NDF (Read)
 *          Only accessed if null (!) values are supplied for parameter INFITX,
-*          INFITY, and INCAT. It should be a flatfielded time series
-*          cube. If a non-null value is supplied, then the BMAP parameter
-*          can be used to get the WCS Mapping for a typical time slice, or
-*          the OUTCAT parameter can be used to create a catalogue holding
-*          details of the source position and amplitude in every time slice.
-*          A single time slice from this cube can also be written to an
-*          output NDF (see parameter OUTSLICE). A list of time slices in
-*          which the reference point is close to a specified bolometer can
-*          also be produced (see parameter XBOL).
+*          INFITY, and INCAT. It should be a time series cube. If a non-null
+*          value is supplied, then the BMAP parameter can be used to get the
+*          WCS Mapping for a typical time slice, or the OUTCAT parameter can be
+*          used to create a catalogue holding the expected source position (in
+*          GRID coords) in every time slice. A single time slice from this cube
+*          can also be written to an output NDF (see parameter OUTSLICE). A
+*          list of time slices in which the reference point is close to a
+*          specified bolometer can also be produced (see parameter XBOL).
 *     INFITX = NDF (Read)
 *          A 2D NDF holding fitted focal plane X offsets (in mm) at every
 *          bolometer, or null (!). This NDF shoudl have been created by
@@ -141,7 +140,9 @@
 *          catalogue form which abberant rows have been removed, and
 *          contaiing some extra informative columns (e.g. offsets in
 *          focal plane and pixel coordinates). No catalogue is created if
-*          a null (!) value is supplied.
+*          a null (!) value is supplied. If a value is supplied for IN,
+*          then OUTCAT will hold the expected source position in each time
+*          slice.
 *     OUTCODE = FILENAME (Write)
 *          If a value was supplied for INFITX and INFITY, then OUTCODE is
 *          the name of an output text file in which to store the C code
@@ -345,6 +346,7 @@ static AstPolyMap *FindPolyMap( AstMapping *map, int *status );
 static double *SmoothZ( int zbox, int nrow, double *in_vals, double *iz_vals, int *status );
 static double Mode( int n, double *vals, double *dev, int * status );
 static int FindSlices( const char *pxbol, const char *pybol, const char *pradius, smfData *data, int *status );
+static int ShowSlices( const char *param, smfData *data, int *status );
 
 
 #define __USE_GNU 1
@@ -1457,6 +1459,10 @@ void smurf_dsutils( int *status ) {
 
 /* Obtain information about the input NDF. */
       smf_open_file( igrp, 1, "READ", 0, &data, status );
+
+/* Display the indicies of time slices for which the reference position
+   is close a to a specified bolometer. */
+      if( ShowSlices( "OUTCAT", data, status ) ) goto L998;
 
 /* Display the indicies of time slices for which the reference position
    is close a to a specified bolometer. */
@@ -2810,6 +2816,88 @@ static int FindSlices( const char *pxbol, const char *pybol, const char *pradius
    input data file is closed. */
    astExport( swcsin );
    astEnd;
+
+   return 1;
+}
+
+
+
+
+/* Create a ascii catalogue containing the grid coords of the reference
+   point in every slice of an input time serices cube. */
+
+static int ShowSlices( const char *param, smfData *data, int *status ) {
+
+
+/* Local Variables: */
+   AstFrameSet *swcsin = NULL;
+   const char *srefis;
+   double gx;
+   double gy;
+   double ox;
+   double oy;
+   dim_t itime;
+   char outcat[ 255 ];
+   FILE *fd = NULL;
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return 0;
+
+/* Get the name of the output catalogue and open it. */
+   parGet0c( param, outcat, 254, status );
+   if( *status == PAR__NULL ) {
+      errAnnul( status );
+   } else if( *status == SAI__OK ) {
+      fd = fopen( outcat, "w" );
+      if( !fd && *status == SAI__OK ) {
+         *status = SAI__ERROR;
+         msgSetc ( "CAT", outcat );
+         errRep( " ", "Output catalogue '^CAT' could not be opened "
+                 "for writing.", status );
+      }
+   }
+
+/* Return if no file was opened. */
+   if( ! fd ) return 0;
+
+   fprintf( fd, "#itime gx gy\n" );
+
+   astBegin;
+
+/* Loop over all time slices. */
+   for( itime = 0; itime <  data->dims[ 2 ]; itime++ ) {
+
+/* Get the WCS FrameSet describing the time slice. Current frame is AZEL
+   at the epoch of the time slice. */
+      smf_tslice_ast( data, itime, 1, status );
+      swcsin = data->hdr->wcs;
+
+/* Ensure the current Frame is offsets from the reference point. */
+      srefis = astGetC( swcsin, "SkyRefIs" );
+      astSet( swcsin, "SkyRefIs=ORIGIN" );
+
+/* Get the grid coords of the reference poition. */
+      ox = 0.0;
+      oy = 0.0;
+      astTran2( swcsin, 1, &ox, &oy, 0, &gx, &gy );
+
+/* Reset SkyRefIs. */
+      astSetC( swcsin, "SkyRefIs", srefis );
+
+/* Check they are good. */
+      if( gx != AST__BAD && gy != AST__BAD ) {
+         fprintf( fd, "%d %g %g\n", (int) itime, gx, gy );
+      } else {
+         fprintf( fd, "%d null null\n", (int) itime );
+      }
+   }
+
+/* Export the swcsin pointer, since it is annulled explicitly when the
+   input data file is closed. */
+   astExport( swcsin );
+   astEnd;
+
+   fclose( fd );
 
    return 1;
 }
