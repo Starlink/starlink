@@ -177,6 +177,8 @@
  *        Change grpbywave to grouping to enable handling subarrays separately
  *     2011-04-20 (DSB):
  *        Change interface for smf_get_padding.
+ *     2011-07-06 (DSB):
+ *        Fix infinite loop when freeing memory used by subgroups.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -669,7 +671,7 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
       new_tlen = astFree( new_tlen );
       if( subgroups ) {
         size_t isub;
-        for( isub=0; isub<nkeep; i++ ) {
+        for( isub=0; isub<nkeep; isub++ ) {
           subgroups[isub] = astFree( subgroups[isub] );
         }
         subgroups = astFree( subgroups );
