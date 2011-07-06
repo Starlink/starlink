@@ -462,6 +462,7 @@ void smf_clean_smfArray( smfWorkForce *wf, smfArray *array,
 
     /* Noise mask */
     if( (*status==SAI__OK) && ((noisecliphigh>0.0) || (noisecliplow>0.0)) ) {
+      msgOutif( MSG__VERB, "", FUNC_NAME ": masking noisy bolometers", status );
       smf_mask_noisy( wf, data,
                       (noisemaps && *noisemaps) ? (&noisemap) : NULL,
                       noisecliphigh, noisecliplow, 1, zeropad, status );

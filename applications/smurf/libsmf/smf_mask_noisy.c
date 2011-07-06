@@ -167,12 +167,13 @@ void smf_mask_noisy( smfWorkForce *wf, smfData *data, smfData **noise,
   smf_clipnoise( noisedata, nbolo, cliplog, sigcliplow, sigcliphigh, NULL,
                  status );
 
+  /* The only bad values that should appear in noisedata are new bolometers
+     that were clipped by smf_clipnoise, not bolometers that were bad before
+     for other reasons. */
   if( *status == SAI__OK ) {
     for( i=0; i<nbolo; i++ ) {
-      if( noisedata[i] == VAL__BADD ) {
+      if( (noisedata[i]==VAL__BADD) && (work[i] == VAL__BADD) ) {
         noisedata[i] = 0;
-      } else if( work[i] == VAL__BADD ) {
-        noisedata[i] = VAL__BADD;
       }
     }
   }

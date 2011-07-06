@@ -37,9 +37,9 @@
 
 *  Description:
 *     An iterative clip of the data (or its log) is done to first
-*     identify the median, and the stardard deviation. The median is
+*     identify the median, and the standard deviation. The median is
 *     used as the central measure after each iteration to minimize the
-*     impact of outliers, and there are 5 steps from 5- to 1-sigma. At
+*     impact of outliers, and there are 3 steps from 5- to 1-sigma. At
 *     the end of this procedure the median should lie very close to the
 *     mode, but the standard deviation of the 1-sigma clipped data will be
 *     under-predicted, so it is multiplied by 1.85 to give the standard
@@ -95,7 +95,7 @@ void smf_clipnoise( double *clipdata, size_t ndata, int cliplog,
                     double cliplow, double cliphigh, size_t *nclipped,
                     int *status ) {
 
-  const float clips[] = {5,4,3,2,1};
+  const float clips[] = {5,3,1};
   const size_t nclips = sizeof(clips)/sizeof(*clips);
   size_t i;
   size_t nlow=0;
