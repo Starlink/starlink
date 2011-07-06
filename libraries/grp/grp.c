@@ -70,8 +70,10 @@
 *          passing in a pointer. More flexible that way.
 *        - grpGrpex now passes in a size_t*
 *     6-JUL-201 (DSB):
-*        grpValid should return zero without error if the supplied Grp
+*        - grpValid should return zero without error if the supplied Grp
 *        pointer is invalid.
+*        - grpF2C was not modifing the contents of the returned Grp 
+*        structure if a previously allocated structure was re-used.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -166,13 +168,15 @@ Grp *grpF2C( F77_INTEGER_TYPE IGRP, int * status ) {
             ret = starMalloc( sizeof( Grp ) );
             if( ret ) {
                Grp_Pointers[ slot ] = ret;
-               ret->igrp = IGRP;
-               ret->slot = slot;
             } else {
                *status = GRP__NOMEM;
                errRep( "GRP_F2C_ERR", "Unable to allocate memory for Grp object",
                        status );
             }
+         }
+         if( ret ) {
+            ret->igrp = IGRP;
+            ret->slot = slot;
          }
       }
    }
