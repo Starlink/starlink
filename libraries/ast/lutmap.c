@@ -103,6 +103,9 @@ f     The LutMap class does not define any new routines beyond those
 *        array contains sections of equal or bad values. The inverse
 *        transformation will generate bad values if used within such
 *        regions of the coordinate array.
+*     6-JUL-2011 (DSB):
+*        Avoid indexing the lut array beyond the end when doing an
+*        inverse transform.
 *class--
 */
 
@@ -1598,7 +1601,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* Perform a binary search to identify two adjacent lookup table
    elements whose values bracket the input coordinate value. */
                i1 = -1;
-               i2 = nlut;
+               i2 = nlutm1;
                while ( i2 > ( i1 + 1 ) ) {
                   i = ( i1 + i2 ) / 2;
                   *( ( ( value_in >= lut[ i ] ) == up ) ? &i1 : &i2 ) = i;
