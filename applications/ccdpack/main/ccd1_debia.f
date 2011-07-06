@@ -286,8 +286,8 @@
 *  direction and the bias strip bounds, however the first question is do
 *  we have a bias if not do we just want to use a constant for the bias
 *  level ?
+      USECON = .FALSE.
       IF ( OFFSET .OR. .NOT. GOTBIA ) THEN
-         USECON = .FALSE.
          IF ( .NOT. GOTBIA ) THEN
             CALL PAR_GET0L( 'USECON', USECON, STATUS )
          END IF

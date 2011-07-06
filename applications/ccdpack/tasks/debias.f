@@ -1545,6 +1545,7 @@
 999   CONTINUE
 
 *  Release workspace NDF if it is still active.
+      VALID = .FALSE.
       CALL NDF_VALID( IDWRK, VALID, STATUS )
       IF ( VALID ) CALL NDF_ANNUL( IDWRK, STATUS )
 
