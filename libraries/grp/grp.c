@@ -69,11 +69,14 @@
 *        - return result for grpValid, grpIndex and grpGrpsz rather than
 *          passing in a pointer. More flexible that way.
 *        - grpGrpex now passes in a size_t*
+*     6-JUL-201 (DSB):
+*        grpValid should return zero without error if the supplied Grp
+*        pointer is invalid.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2007, 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2008, 2011 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -352,16 +355,25 @@ int grpValid( const Grp *grp, int *status ){
    DECLARE_INTEGER(STATUS);
    int valid;
 
+   if( *status != SAI__OK ) return 0;
+
    IGRP = grpC2F( grp, status );
 
-   F77_EXPORT_INTEGER( *status, STATUS );
+   if( *status != SAI__OK ) {
+      errAnnul( status );
+      valid = 0;
 
-   F77_LOCK( F77_CALL(grp_valid)( INTEGER_ARG(&IGRP),
-                        LOGICAL_ARG(&VALID),
-                        INTEGER_ARG(&STATUS) ); )
+   } else {
 
-   F77_IMPORT_LOGICAL( VALID, valid );
-   F77_IMPORT_INTEGER( STATUS, *status );
+      F77_EXPORT_INTEGER( *status, STATUS );
+
+      F77_LOCK( F77_CALL(grp_valid)( INTEGER_ARG(&IGRP),
+                           LOGICAL_ARG(&VALID),
+                           INTEGER_ARG(&STATUS) ); )
+
+      F77_IMPORT_LOGICAL( VALID, valid );
+      F77_IMPORT_INTEGER( STATUS, *status );
+   }
 
    return valid;
 }
