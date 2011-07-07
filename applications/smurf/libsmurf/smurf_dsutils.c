@@ -774,9 +774,9 @@ void smurf_dsutils( int *status ) {
 
 /* NDF character components. */
       ndfCput( "Focal plane X value", indf1, "Label", status );
-      ndfCput( "mm", indf1, "Unit", status );
+      ndfCput( "arc-sec", indf1, "Unit", status );
       ndfCput( "Focal plane Y value", indf2, "Label", status );
-      ndfCput( "mm", indf2, "Unit", status );
+      ndfCput( "arc-sec", indf2, "Unit", status );
 
 /* WCS FrameSets. Current Frame (FPLANE) is fplane in mm with no PolyMap,
    but also include FPLANE2 in arc-sec with PolyMap. */
