@@ -211,6 +211,11 @@ endif
 # Check no files are left over from previous runs
 rm -f files.smas >& /dev/null
 
+#  Create a temporary ADAM directory within this directory.
+rm -rf smas-adam >& /dev/null
+mkdir smas-adam
+setenv ADAM_USER $PWD/smas-adam
+
 # First task is get a complete list of all the NDFs to be processed,
 # substituting shortmap/bolomap names for their parent NDF name. Loop round
 # each NDF in the input text file
@@ -689,5 +694,5 @@ endif
 
 # Clean up.
 rm -f cat.smas back.sdf files.smas log.smas cut-smas.sdf coin.smas temp-smas.sdf pos-smas.sdf filled-smas.sdf smas-fits.log >& /dev/null
-
+rm -rf smas-adam
 
