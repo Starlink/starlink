@@ -16,9 +16,9 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {139.17}
+\newcommand{\stardocnumber}    {139.18}
 \newcommand{\stardocauthors}   {Peter W. Draper, Mark Taylor, Alasdair Allan}
-\newcommand{\stardocdate}      {1 February 2006}
+\newcommand{\stardocdate}      {7 July 2011}
 \newcommand{\stardoctitle}     {CCDPACK}
 \newcommand{\stardoconeline}   {CCD data reduction package}
 \newcommand{\stardocversion}   {Version 4.0}
@@ -13364,7 +13364,9 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
       This routine combines a set of frames into a flatfield. The
       input data should be of a photometrically flat source, and
       should be corrected for any instrumental effects. The output
-      calibration frame is normalised to have an average value of one.
+      calibration frame is normalised to have an average value of one
+      or can be left unnormalised if a larger scaled normalisation
+      is more appropriate (over a CCD mosaic).
 
       The input data are filtered in an attempt to remove any small
       blemishes etc. before combination.  This is achieved by smoothing
@@ -13586,6 +13588,12 @@ TIMES.FLASH & \_DOUBLE & Pre-flash time.
       } {
          The number of refining iterations performed if METHOD = \qt{MODE}.
          [7]
+      }
+      \sstsubsection{
+         NORM = \_LOGICAL (Read)
+      } {
+        Whether to normalise the output NDF to have a mean of one.
+        [TRUE]
       }
       \sstsubsection{
          OUT = LITERAL (Write)

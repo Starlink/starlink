@@ -23,7 +23,9 @@
 *     This routine combines a set of frames into a flatfield. The
 *     input data should be of a photometrically flat source, and
 *     should be corrected for any instrumental effects. The output
-*     calibration frame is normalised to have an average value of one.
+*     calibration frame is normalised to have an average value of one
+*     or can be left unnormalised if a larger scaled normalisation
+*     is more appropriate (over a CCD mosaic).
 *
 *     The input data are filtered in an attempt to remove any small
 *     blemishes etc. before combination.  This is achieved by smoothing
@@ -160,6 +162,9 @@
 *     NITER = _INTEGER (Read)
 *        The number of refining iterations performed if METHOD = "MODE".
 *        [7]
+*     NORM = _LOGICAL (Read)
+*        Whether to normalise the output NDF to have a mean of one.
+*        [TRUE]
 *     OUT = LITERAL (Write)
 *        Name of an output file to contain the output flatfield data.
 *        Note that output NDFs have a precision of at least _REAL.
@@ -254,6 +259,7 @@
 *     The exceptions to this rule are:
 *        - TITLE   -- always "Output from MAKEFLAT"
 *        - KEEPIN  -- always TRUE
+*        - NORM    -- always TRUE
 *
 *     Retaining parameter values has the advantage of allowing you to
 *     define the default behaviour of the application but does mean
@@ -321,6 +327,8 @@
 *        Replaced use of IRH/IRG with GRP/NDG.
 *     8-FEB-2001 (MBT):
 *        Upgraded for use with Sets.
+*     07-JUL-2011 (PDRAPER):
+*        Make normalisation an option.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -426,6 +434,7 @@
       LOGICAL DELETE            ! Delete input NDFs when processed
       LOGICAL GENVAR            ! Whether to generate output variances
       LOGICAL HAVVAR            ! Set if all variances components are present.
+      LOGICAL NORM              ! Whether to normalise the output
       LOGICAL THSVAR            ! This variance - used for testing variance presence.
       LOGICAL USED( CCD1__MXNDF ) ! Workspace for flagging image usage
       LOGICAL USESET            ! Should we use Set header info?
@@ -507,6 +516,9 @@
 *  Obtain number of standard deviations for rejection threshold.
          CALL PAR_GET0R( 'GAMMA', GAMMA, STATUS )
       END IF
+
+*  Do we want to normalise the output.
+      CALL PAR_GET0L( 'NORM', NORM, STATUS )
 
 *  Loop over subgroups performing the calculations separately for each
 *  one.
@@ -718,34 +730,38 @@
      :                                    STATUS )
 
 * ----------------------------------------------------------------------
+            IF ( NORM ) THEN
+
 *  Normalisation section.
 *  Determine the mean value in each frame and divide by this. Also
 *  process any variances similarily.
-            CALL CCD1_MEAN( PTYPE, BAD, IPSLI, EL, AVEACC( I ), NGOOD,
-     :                      STATUS )
+               CALL CCD1_MEAN( PTYPE, BAD, IPSLI, EL, AVEACC( I ),
+     :                         NGOOD, STATUS )
 
 *  Divide the data by this value, check mean of input data is not
 *  exactly zero first, data with this characteristic cannot be real
 *  a corruption or improper test data must be responsible.
-            IF ( AVEACC( I ) .EQ. 0.0D0 ) THEN
-               STATUS = SAI__ERROR
-               CALL ERR_REP( ' ', '  Input data component has a mean'//
-     :         ' of zero - MAKEFLAT cannot process this', STATUS )
-            END IF
-            IF ( STATUS .NE. SAI__OK ) GO TO 99
-            CVAL = 1.0D0 / AVEACC( I )
-            CALL CCD1_CMULT( BAD, PTYPE, IPSLI, EL, CVAL, IPIST, NERR,
-     :                       STATUS )
+               IF ( AVEACC( I ) .EQ. 0.0D0 ) THEN
+                  STATUS = SAI__ERROR
+                  CALL ERR_REP( ' ', '  Input data component has a ' //
+     :                          'mean of zero - MAKEFLAT cannot ' //
+     :                          'process this', STATUS )
+               END IF
+               IF ( STATUS .NE. SAI__OK ) GO TO 99
+               CVAL = 1.0D0 / AVEACC( I )
+               CALL CCD1_CMULT( BAD, PTYPE, IPSLI, EL, CVAL, IPIST, 
+     :                          NERR, STATUS )
 
 *  Modify any variances, existing variances are modified by dividing by
 *  the signal squared. If no variances exist then use the signal level
 *  as a weight (inverted so looks like variance)
-            IF ( HAVVAR ) THEN
-               CVAL = CVAL * CVAL
-               CALL CCD1_CMULT( BAD, PTYPE, IPVSLI, EL, CVAL, IPIST,
-     :                          NERR, STATUS )
-            ELSE
-               INVAVE( I ) = CVAL
+               IF ( HAVVAR ) THEN
+                  CVAL = CVAL * CVAL
+                  CALL CCD1_CMULT( BAD, PTYPE, IPVSLI, EL, CVAL, IPIST,
+     :                             NERR, STATUS )
+               ELSE
+                  INVAVE( I ) = CVAL
+               END IF
             END IF
 
 *  Release the input NDF and the stack slice.

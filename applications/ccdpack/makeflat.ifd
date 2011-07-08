@@ -50,6 +50,8 @@
 #        Generated IFD file from IFL file.
 #     9-FEB-2001 (MBT):
 #        Added USESET parameter.
+#     07-JUL-2011 (PDRAPER):
+#        Added NORM parameter.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -281,6 +283,16 @@
             ppath CURRENT DEFAULT
             default TRUE
             prompt {Use variance during data combination?}
+            helpkey *
+          }
+
+         parameter norm {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            prompt "Normalise the output data to mean of one"
+            default TRUE
             helpkey *
           }
 

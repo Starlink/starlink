@@ -1,5 +1,9 @@
 1 CCDPACK_bugfix_update
 
+  Release v4.0-25 adds a new parameter NORM to the MAKEFLAT application.
+  This allows the output flatfield to not be normalised to have a mean
+  of one.
+
   Release v4.0-24 fixes logging system bugs in the makeset, showset
   reduce and ccdalign applications. Previously these applications did
   not close the log file. This caused problems when running as a
