@@ -427,7 +427,7 @@ foreach n (`cat files.smas`)
 
 #  Check that the box contains at least 95% good pixels.
       set numgood = `$KAPPA_DIR/parget numgood stats`
-      if( $numgood > 380 ) then
+      if( $numgood < 380 ) then
          echo "  Insufficient good data found around expected source position"
          continue
       endif
