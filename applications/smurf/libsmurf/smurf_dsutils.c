@@ -765,11 +765,13 @@ void smurf_dsutils( int *status ) {
               &nel, status );
 
 /* Copy the axis values into the NDF data arrays. */
-      double *p1 = worka;
-      double *p2 = worka + nxy;
-      for( i = 0; i < nxy; i++ ) {
-         *(data1++) = *(p1++);
-         *(data2++) = *(p2++);
+      if( *status == SAI__OK ) {
+         double *p1 = worka;
+         double *p2 = worka + nxy;
+         for( i = 0; i < nxy; i++ ) {
+            *(data1++) = *(p1++);
+            *(data2++) = *(p2++);
+         }
       }
 
 /* NDF character components. */
