@@ -415,15 +415,15 @@ foreach n (`cat files.smas`)
 #  nominally at the reference point and so should, in the absence of errors,
 #  have coords (0.0,0.0). PSF fails unless a good central position is
 #  supplied, so first find the peak value in a box centred on (0,0)
-      $KAPPA_DIR/stats $ndf quiet
+      $KAPPA_DIR/stats $ndf'(0~20,0~20)' quiet
       set maxco = `$KAPPA_DIR/parget maxwcs stats`
       rm -f coin.smas > /dev/null
       echo $maxco > coin.smas
 
-#  Check there are some good pixels
+#  Check that the box contains at least 95% good pixels.
       set numgood = `$KAPPA_DIR/parget numgood stats`
-      if( $numgood == 0 ) then
-         echo "  no good data found"
+      if( $numgood > 380 ) then
+         echo "  Insufficient good data found around expected source position"
          continue
       endif
 
