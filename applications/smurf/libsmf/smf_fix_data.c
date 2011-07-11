@@ -102,6 +102,9 @@
 /* Indent for informational messages */
 #define INDENT "   "
 
+/* Define missing row for the s4a may/june 2011 readout error */
+#define FIXDATA_S4A_MISSROW 14
+
 int smf_fix_data ( msglev_t msglev, smfData * data, int * status ) {
 
   int have_fixed = 0;        /* Did we fix anything? */
@@ -212,14 +215,15 @@ int smf_fix_data ( msglev_t msglev, smfData * data, int * status ) {
                 "don't have 40 rows.", status );
       }
 
-      /* Rows 0--13 are OK, row 14 was not read out, so we need to
-         move all of rows 15--38 up to the range 16--39. After doing
-         the shift, overwrite the missing row 14 with 0 (or should
-         this be VAL__BAD? in some situations?) */
+      /* Rows 0--13 are OK, row 14 was not read out
+         (FIXDATA_S4A_MISSROW), so we need to move all of rows 14--38
+         up to the range 15--39. After doing the shift, overwrite the
+         missing row 14 with 0 (or should this be VAL__BAD? in some
+         situations?) */
 
       if( *status==SAI__OK ) {
         /* Row counter */
-        for( i=39; (*status==SAI__OK)&&(i>15); i-- ) {
+        for( i=nrows-1; (*status==SAI__OK)&&(i>=(FIXDATA_S4A_MISSROW+1)); i-- ){
           for( j=0; (*status==SAI__OK)&&(j<ncols); j++ ) {
             smf_qual_t *qual = data->qual;
 
@@ -246,7 +250,7 @@ int smf_fix_data ( msglev_t msglev, smfData * data, int * status ) {
                       ((int *)buf)[sourcebolo*bstride + k*tstride];
                   }
 
-                  if( i==16 ) {
+                  if( i==(FIXDATA_S4A_MISSROW+1) ) {
                     for( k=0; k<ntslice; k++ ) {
                       ((int *)buf)[sourcebolo*bstride + k*tstride] = 0;
                     }
@@ -259,7 +263,7 @@ int smf_fix_data ( msglev_t msglev, smfData * data, int * status ) {
                       ((unsigned short *)buf)[sourcebolo*bstride + k*tstride];
                   }
 
-                  if( i==16 ) {
+                  if( i==(FIXDATA_S4A_MISSROW+1) ) {
                     for( k=0; k<ntslice; k++ ) {
                       ((unsigned short *)buf)[sourcebolo*bstride + k*tstride] =
                         0;
@@ -274,7 +278,7 @@ int smf_fix_data ( msglev_t msglev, smfData * data, int * status ) {
                       ((double *)buf)[sourcebolo*bstride + k*tstride];
                   }
 
-                  if( i==16 ) {
+                  if( i==(FIXDATA_S4A_MISSROW+1) ) {
                     for( k=0; k<ntslice; k++ ) {
                       ((double *)buf)[sourcebolo*bstride + k*tstride] =
                         0;
@@ -301,7 +305,7 @@ int smf_fix_data ( msglev_t msglev, smfData * data, int * status ) {
                   qual[sourcebolo*bstride + k*tstride];
               }
               
-              if( i==16 ) {
+              if( i==(FIXDATA_S4A_MISSROW+1) ) {
                 for( k=0; k<ntslice; k++ ) {
                   qual[sourcebolo*bstride + k*tstride] = SMF__Q_BADDA;
                 }
