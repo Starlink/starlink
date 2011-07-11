@@ -1288,9 +1288,13 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
      header. */
   if( hdr ) smf_pcorr( hdr, igrp, status );
 
-  /* Now that everything else is done, check to see if any corrections to the
-     DATA/VARIANCE/QUALITY components are needed. Hide messages by default. */
-  if( !(flags&SMF__NOFIX_DATA) ) smf_fix_data( MSG__DEBUG, *data, status );
+  /* Now that everything else is done, check to see if any corrections
+     to the DATA/VARIANCE/QUALITY components are needed (only
+     meaningful for time series data at the moment). Hide messages by
+     default. */
+  if( !(flags&SMF__NOFIX_DATA) && isTseries ) {
+    smf_fix_data( MSG__DEBUG, *data, status );
+  }
 
   /* free resources on error */
   if (*status != SAI__OK) {
