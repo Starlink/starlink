@@ -124,6 +124,7 @@
 
 * Authors:
 *  T.N.Wilkins, IoA Cambridge (TNW)
+*  Malcolm J. Currie (MJC)
 
 * History:
 *  TNW: September 1991 Re-write of previous version.
@@ -131,6 +132,8 @@
 *  TNW: 8th Sept 1992 max_cmp passed in common
 *  TNW: 28th June 1993, reflect changes in opt_cmn
 *  TNW: 29th June 1993, changes to alter_guess, etc.
+*  MJC: 2011 June 30 Tidy workspace assuming DYN_INCAD now used for
+*       offset addressing.
 *-
       implicit none
 
@@ -420,6 +423,25 @@
      :                    n,mstore,aic,fstat,status)
         if((status.ne.SAI__OK).or.(fstat.ne.0)) loop = .false.
       end do
+
+* Tidy workspace pointers defined in opt_get_work.  Note guessptr,
+* bndptr, weightptr, densptr, and dataptr are also defined in that
+* routine but passed in common, so it is not obvious whether to tidy
+* those here.  MJC
+
+* No need to release opt_slot as it's handled by opt_release that
+* assumes one big array divided using pointer offsets.  MJC
+      call dsa_free_workspace(opt_slot3, status)
+      call dsa_free_workspace(opt_slot4, status)
+      call dsa_free_workspace(opt_slot5, status)
+      if ( bystor.gt.0) then
+        call dsa_free_workspace(opt_slot6, status)
+        call dsa_free_workspace(opt_slot7, status)
+      end if
+
+* Release registered pointers.
+      call cnf_unregp(weightptr)
+      call cnf_unregp(densptr)
 
 * For multiples convert all the sigma's to FWHM for storage in the
 * results cube

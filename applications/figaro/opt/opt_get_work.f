@@ -58,16 +58,22 @@
 *   TNW 9/6/92 Minor changes
 *   TNW 28-MAY-1993 Workspace for altering guesses increased
 *   TNW 29-SEP-1993 Make sure bygues is a multiple of VAL__NBD
+*   MJC 2011 June 30 Use DYN_INCAD for offset addressing.
+*   MJC 2001 July 4 Switched from DYN_INCAD to a series of
+*       DSA_GET_WORK* calls using common slots opt_slot3-7
+*       so it is clearer what is going on and for tidying.
 *-
       implicit none
       include 'opt_cmn'
       include 'status_inc'
       include 'fit_coding_inc'
       include 'PRM_PAR'
+      include 'CNF_PAR'
       integer wavdim
       integer n
       integer status,nbytes,work,vbase
       integer resstr,tmpbas,max_pars,bywork,ncmp,pstat
+      integer dumptr
 
 * Bytes for the guesses
 
@@ -92,6 +98,7 @@
 
 * Bytes for storing previous results/bounds
 
+      integer bybnd
       integer bystor
 
 * Bytes for plotting
@@ -157,7 +164,8 @@
 *        2*max_pars*deccntr(FIT_NCMP)*max_times*VAL__NBR for bounds
 *        max_pars*deccntr(FIT_NCMP)*max_times*VAL__NBR for previous results
 
-        bystor = 3*max_pars*ncmp*max_times*VAL__NBR
+        bybnd = max_pars*ncmp*max_times*VAL__NBR
+        bystor = 3*bybnd
 
       else
 
@@ -183,8 +191,10 @@
           bygues = max(4,n)*VAL__NBR
           bywges = mpts*3*VAL__NBR
         end if
+
         byaltr = 0
         bystor = 0
+        bybnd = 0
       end if
 
 * Workspace for plotting
@@ -258,15 +268,21 @@
       nbytes = bygues + bywork + bystor
      :             + mpts*VAL__NBR           ! For VBASE
 
-* Get virtual memory
+* Get virtual memory, but obtain 0 bytes for a dummy pointer
+* and obtain guessptr workspace below.
 
-      call get_opt_vm(nbytes,guessptr,status)
+      call get_opt_vm(0,dumptr,status)
 
-* and divide it up into "pointers"
+* opt_slot and opt_slot2 are reserved.
 
-      work = guessptr + bygues
-      vbase =  work + bywork
-      bndptr = vbase + mpts*VAL__NBR
-      resstr = bndptr + 2*max_pars*ncmp*max_times*VAL__NBR
+      call dsa_get_workspace(bygues,guessptr,opt_slot3,status)
+      call dsa_get_workspace(bywork,work,opt_slot4,status)
+      call dsa_get_work_array(mpts,'float',vbase,opt_slot5,status)
+      if ( bystor .gt. 0 ) then
+        call dsa_get_work_array(bybnd,'float',bndptr,opt_slot6,status)
+        call dsa_get_work_array(bystor-bybnd,'float',
+     :                          resstr,opt_slot7,status)
+      end if
       tmpbas = work
+
       end

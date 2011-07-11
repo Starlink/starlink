@@ -46,27 +46,34 @@
 *    "  9/10/90 Allow extra workspace to be obtained at the same time.
 *    "  21/10/91 Changes for scaling "in situ"
 *    "  21/8/92 MPTS from opt_cmn used instead of passing m.
+*   MJC 2011 June 30 Use DYN_INCAD for offset addressing.
+*   MJC 2011 July 11 Replace GETVM call with DSA_GET_WORKSPACE as
+*       the former uses the DYN_ELEMENT that causes DYN_INCAD to
+*       create offsets not pointers.
 *-
       implicit none
-      integer status,bytes,ptr,total
       include 'opt_cmn'
       include 'SAE_PAR'
       include 'PRM_PAR'
-*
-*   Get virtual memory, 3 double precision arrays of M elements, plus
-*   whatever else is asked for.
-*
+
+      integer status,bytes,ptr,total
+      logical isnew
+
+*  Get virtual memory.
       total = mpts*3*VAL__NBD+bytes
-      call getvm(total,dataptr,opt_slot,status)
-      densptr = dataptr + VAL__NBD*mpts
-      weightptr = densptr + VAL__NBD*mpts
-      ptr = weightptr + VAL__NBD*mpts
+      call dsa_get_workspace(total,dataptr,opt_slot,status)
 
-*   Get logical unit for .itt file
+*  Indicate that we have VM.
+      got_opt_vm = status.eq.SAI__OK
 
+*  Divide the workspace into three double-precision arrays of M
+*  elements, plus whatever else is asked for.
+      call dyn_incad(dataptr,'double',mpts,densptr,isnew,status)
+      call dyn_incad(densptr,'double',mpts,weightptr,isnew,status)
+      if (bytes.gt.0)
+     :  call dyn_incad(weightptr,'double',mpts,ptr,isnew,status)
+
+*  Get the logical unit for .itt file.
       call dsa_get_lu(opt_lu,status)
 
-*   Indicate that we have VM
-
-      got_opt_vm = status.eq.SAI__OK
       end
