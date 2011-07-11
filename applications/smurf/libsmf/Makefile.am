@@ -170,8 +170,10 @@ smf_fits_getL.c \
 smf_fits_getS.c \
 smf_fits_outhdr.c \
 smf_fits_updateD.c \
+smf_fits_updateI.c \
 smf_fits_updateS.c \
 smf_fits_updateU.c \
+smf_fix_data.c \
 smf_fix_metadata.c \
 smf_fix_metadata_acsis.c \
 smf_fix_metadata_scuba2.c \

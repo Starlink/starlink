@@ -384,8 +384,13 @@ typedef enum smf_bbm_meth {
 typedef enum smf_metadata_fixups {
   SMF__FIXED_FITSHDR=1,   /* Updated FITS header */
   SMF__FIXED_JCMTSTATE=2, /* Updated JCMTSTATE information */
-  SMF__FIXED_ACSIS=4     /* Updated ACSIS extension information */
+  SMF__FIXED_ACSIS=4      /* Updated ACSIS extension information */
 } smf_metadata_fixups;
+
+/* Parts of the data/variance/quality components of smfData can have fixes */
+typedef enum smf_data_fixups {
+  SMF__FIXED_ROWORDER=1   /* Updated incorrect row ordering */ 
+} smf_data_fixups;
 
 /* Flatfield method */
 typedef enum smf_flatmeth {
@@ -428,7 +433,8 @@ typedef enum {
   SMF__NOCREATE_LUT      = BIT_TO_VAL(6),  /* Don't open pointing LUT */
   SMF__NOFIX_METADATA    = BIT_TO_VAL(7),  /* Do not fix up metadata */
   SMF__NOTTSERIES        = BIT_TO_VAL(8),  /* File is not time series data */
-  SMF__NOCREATE_FTS      = BIT_TO_VAL(9)   /* Don't open FTS data */
+  SMF__NOCREATE_FTS      = BIT_TO_VAL(9),  /* Don't open FTS data */
+  SMF__NOFIX_DATA        = BIT_TO_VAL(10)  /* Do not fix up data */
 } smf_open_file_flags;
 
 /* Flags for smf_open_newfile

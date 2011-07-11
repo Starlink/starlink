@@ -229,12 +229,14 @@
  *     2011-05-17 (DSB):
  *        Add pointing corrections onto SMU jiggle positions before
  *        returning.
+ *     2011-07-11 (EC):
+ *        Call smf_fix_data to repair may/june 2011 s4a row order problem 
  *     {enter_further_changes_here}
 
  *  Copyright:
  *     Copyright (C) 2007-2010 Science and Technology Facilities Council.
  *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
- *     Copyright (C) 2005-2008,2010 University of British Columbia.
+ *     Copyright (C) 2005-2008,2010-2011 University of British Columbia.
  *     All Rights Reserved.
 
  *  Licence:
@@ -1262,7 +1264,6 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
     hdr->scanvel = scanvel;
   }
 
-
   /* report data units */
   if (hdr) {
     msgOutiff( MSG__DEBUG, "", "Data read with label '%s (%s)'",
@@ -1286,6 +1287,10 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
   /* Add any required pointing corrections on to the SMU jiggle positions in the
      header. */
   if( hdr ) smf_pcorr( hdr, igrp, status );
+
+  /* Now that everything else is done, check to see if any corrections to the
+     DATA/VARIANCE/QUALITY components are needed. Hide messages by default. */
+  if( !(flags&SMF__NOFIX_DATA) ) smf_fix_data( MSG__DEBUG, *data, status );
 
   /* free resources on error */
   if (*status != SAI__OK) {
